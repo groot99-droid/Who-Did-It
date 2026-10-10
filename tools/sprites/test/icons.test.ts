@@ -8,7 +8,9 @@ const SPRITES = join(import.meta.dirname, '../../../docs/SPRITES.md');
 const palette = new Set(Object.values(PALETTE).map((h) => h.toUpperCase()));
 
 describe('UI icons (docs/SPRITES.md 9)', () => {
-  const files = readdirSync(ICONS).filter((f) => f.endsWith('.svg')).sort();
+  const files = readdirSync(ICONS)
+    .filter((f) => f.endsWith('.svg'))
+    .sort();
 
   it('match the keys listed in SPRITES.md', () => {
     const section = readFileSync(SPRITES, 'utf8').split('## 9. UI icons')[1]!;
@@ -22,7 +24,8 @@ describe('UI icons (docs/SPRITES.md 9)', () => {
       expect(svg).toContain('viewBox="0 0 48 48"');
       expect(svg).toContain('stroke="#12141C"');
       for (const [, w] of svg.matchAll(/stroke-width="([^"]+)"/g)) expect(w).toBe('2');
-      for (const [hex] of svg.matchAll(/#[0-9A-Fa-f]{3,8}\b/g)) expect(palette.has(hex.toUpperCase())).toBe(true);
+      for (const [hex] of svg.matchAll(/#[0-9A-Fa-f]{3,8}\b/g))
+        expect(palette.has(hex.toUpperCase())).toBe(true);
       expect(svg).not.toMatch(/<text|font-family|<image|href=/);
     });
   }

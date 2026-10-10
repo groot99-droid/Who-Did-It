@@ -164,3 +164,37 @@ Read `CLAUDE.md`, this file, `docs/ASSETS.md` in full, `docs/WORLD.md` 4.1, 4.2,
 
 CC0 by default, CC-BY only with a `CREDITS.md` row, never Synty, never raw Mixamo or Quaternius
 in the repo. Leave `LICENSE-ASSETS` absent until open question 6 is answered.
+
+## Integration log (2026-10-10)
+
+All four sessions finished their briefs in one pass each and opened draft PRs #1 to #4. The
+orchestrator merged the four branches into `claude/zen-turing-m1jnw0` in the order A, C, B, D
+(the only conflicts were in `pnpm-lock.yaml`, regenerated with `pnpm install`), reviewed the
+integrated tree, and fixed the seams in one commit on top of the merges:
+
+- Session A's eslint and prettier now apply to every package: the client's untyped room, the
+  Playwright spec swept up by vitest, and the formatting of B, C and D files; `packages/content/data`,
+  `apps/client/public/assets` and `assets/source` are prettier-ignored because their generators own
+  their layout.
+- `assignRoles` reads `roster[String(n)].deal`, the row shape of `roles.json` (A12); rules numbers left
+  `@wdi/shared/constants.ts` for `balance.json`.
+- The matchmake throttle keys on the last `x-forwarded-for` hop and `maxMessagesPerSecond` is applied
+  (A13); the client treats `CloseCode.CONSENTED`, not 1000, as a consented leave.
+- Docs reconciled: well ladder (A10), interior minimum (A11), rig built from code (A9), the Hireling act
+  id, the M4 task count, the quick-mode chip, dependency rows in ARCHITECTURE 5.1, root `assets:render`.
+- Held back: the two Higgsfield concept images stay on `claude/art-pipeline` until open question 13.
+
+### Follow-ups for the next sessions
+
+1. **Client imports `@wdi/shared/protocol`** instead of its local copy: add the workspace dependency,
+   delete the duplicated types in `apps/client/src/net/protocol.ts`, and align the `roleReveal` payload
+   (trait value ids, `teammates[]` element shape, `uses: number | null`). M1 blocker before Start works.
+2. **Server Start**: `lobby.start` handler calling `assignRoles(ids, settings, rng, roles.rosters)` with
+   `@wdi/content` as a server dependency, then `roleReveal` per client and the lobby -> roleReveal phase.
+3. **Accomplice kit**: GDD 3.2 lists Forged Alibi (V1.5) in the kit while `roles.json` omits it; either
+   add it with a `ships` flag or move it to the V1.5 note and delete the dead test exception.
+4. `tools/sprites` declares `engines.node >= 22.18` (type stripping) against the root `>= 22.12`;
+   `batch_render.py` writes `Feet` pivots only during the `body` pass; ARCHITECTURE 5.4's excerpt still
+   shows `t.array(t.string())`; `/health.patchBytes` is not fed yet.
+5. **Owner**: open questions 12 to 14 in `docs/DECISIONS.md`; GitHub Pages source = GitHub Actions and the
+   `VITE_SERVER_URL` Actions variable; the Render Free service for `apps/server`.

@@ -10,12 +10,12 @@ export function h<K extends keyof HTMLElementTagNameMap>(
   const el = document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) {
     if (value === null || value === undefined || value === false) continue;
-    if (key.startsWith("on") && typeof value === "function") {
+    if (key.startsWith('on') && typeof value === 'function') {
       el.addEventListener(key.slice(2).toLowerCase(), value);
-    } else if (key === "class") {
+    } else if (key === 'class') {
       el.className = String(value);
     } else {
-      el.setAttribute(key, value === true ? "" : String(value));
+      el.setAttribute(key, value === true ? '' : String(value));
     }
   }
   for (const child of children) {
@@ -26,8 +26,8 @@ export function h<K extends keyof HTMLElementTagNameMap>(
 }
 
 export function overlayRoot(): HTMLElement {
-  const root = document.getElementById("overlay");
-  if (root === null) throw new Error("#overlay missing from index.html");
+  const root = document.getElementById('overlay');
+  if (root === null) throw new Error('#overlay missing from index.html');
   return root;
 }
 

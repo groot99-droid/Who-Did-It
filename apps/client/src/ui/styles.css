@@ -2,14 +2,14 @@
   font-family: Oswald;
   font-weight: 200 700;
   font-display: swap;
-  src: url("../assets/fonts/oswald-latin-wght-normal.woff2") format("woff2");
+  src: url('../assets/fonts/oswald-latin-wght-normal.woff2') format('woff2');
 }
 
 @font-face {
   font-family: Inter;
   font-weight: 100 900;
   font-display: swap;
-  src: url("../assets/fonts/inter-latin-wght-normal.woff2") format("woff2");
+  src: url('../assets/fonts/inter-latin-wght-normal.woff2') format('woff2');
 }
 
 :root {
@@ -22,7 +22,7 @@
   --village: #4f8a5b;
   --cabal: #b8483f;
   --neutral: #8a8f98;
-  --font-head: Oswald, "Arial Narrow", sans-serif;
+  --font-head: Oswald, 'Arial Narrow', sans-serif;
   --font-body: Inter, system-ui, sans-serif;
 }
 

@@ -1,19 +1,19 @@
 // Cross-file checks that a single zod schema cannot express: every id a record refers to exists,
 // roster and deck rows add up, and every scene grid agrees with its portals, spawns and spots.
-import type { AbilitiesFile } from "./schemas/abilities.js";
-import { PROFILE_RANK, type BalanceFile, type Profile } from "./schemas/balance.js";
-import type { CluesFile } from "./schemas/clues.js";
-import { PLAYER_COUNTS } from "./schemas/common.js";
-import type { ItemsFile } from "./schemas/items.js";
-import type { MetricsFile } from "./schemas/metrics.js";
-import type { OnubBalanceFile } from "./schemas/onubBalance.js";
-import type { OnubRolesFile } from "./schemas/onubRoles.js";
-import type { PaletteFile } from "./schemas/palette.js";
-import type { RolesFile } from "./schemas/roles.js";
-import type { Scene, SceneId } from "./schemas/scene.js";
-import type { StyleFile } from "./schemas/style.js";
-import type { TasksFile } from "./schemas/tasks.js";
-import type { TraitsFile } from "./schemas/traits.js";
+import type { AbilitiesFile } from './schemas/abilities.js';
+import { PROFILE_RANK, type BalanceFile, type Profile } from './schemas/balance.js';
+import type { CluesFile } from './schemas/clues.js';
+import { PLAYER_COUNTS } from './schemas/common.js';
+import type { ItemsFile } from './schemas/items.js';
+import type { MetricsFile } from './schemas/metrics.js';
+import type { OnubBalanceFile } from './schemas/onubBalance.js';
+import type { OnubRolesFile } from './schemas/onubRoles.js';
+import type { PaletteFile } from './schemas/palette.js';
+import type { RolesFile } from './schemas/roles.js';
+import type { Scene, SceneId } from './schemas/scene.js';
+import type { StyleFile } from './schemas/style.js';
+import type { TasksFile } from './schemas/tasks.js';
+import type { TraitsFile } from './schemas/traits.js';
 
 export interface Content {
   palette: PaletteFile;
@@ -50,13 +50,13 @@ export function validateContent(c: Content): string[] {
   const { roles, abilities, items, clues, tasks, balance, onubRoles, onubBalance } = c;
   const scenes: Record<string, Scene | undefined> = c.scenes;
 
-  keyedById("roles.json", roles.roles, errors);
-  keyedById("abilities.json", abilities.abilities, errors);
-  keyedById("items.json", items.items, errors);
-  keyedById("clues.json", clues.clues, errors);
-  keyedById("tasks.json", tasks.tasks, errors);
-  keyedById("roles.onub.json", onubRoles.roles, errors);
-  keyedById("balance.onub.json acts", onubBalance.acts, errors);
+  keyedById('roles.json', roles.roles, errors);
+  keyedById('abilities.json', abilities.abilities, errors);
+  keyedById('items.json', items.items, errors);
+  keyedById('clues.json', clues.clues, errors);
+  keyedById('tasks.json', tasks.tasks, errors);
+  keyedById('roles.onub.json', onubRoles.roles, errors);
+  keyedById('balance.onub.json acts', onubBalance.acts, errors);
 
   const isItem = (id: string) => id in items.items;
   const isAbility = (id: string) => id in abilities.abilities;
@@ -68,22 +68,23 @@ export function validateContent(c: Content): string[] {
     for (const a of role.abilities) {
       cardAbilities.add(a);
       if (!isAbility(a)) err(`role ${role.id}: unknown ability ${a}`);
-      else if (abilities.abilities[a]?.scope !== "role") err(`role ${role.id}: ${a} is not a role ability`);
+      else if (abilities.abilities[a]?.scope !== 'role') err(`role ${role.id}: ${a} is not a role ability`);
     }
-    if ((role.faction === "cabal") !== (role.winsWith === "cabal")) err(`role ${role.id}: faction/winsWith`);
+    if ((role.faction === 'cabal') !== (role.winsWith === 'cabal')) err(`role ${role.id}: faction/winsWith`);
   }
   const standIn = roles.roles[roles.standIn];
-  if (!standIn || standIn.ships !== "V1") err(`roles.json: stand-in ${roles.standIn} must be a V1 role`);
+  if (!standIn || standIn.ships !== 'V1') err(`roles.json: stand-in ${roles.standIn} must be a V1 role`);
   for (const n of PLAYER_COUNTS) {
     const row = roles.rosters[n];
     const count = Number(n);
     if (row.deal.length !== count) err(`roster ${n}: deal has ${row.deal.length} roles`);
     if (row.planned.length !== count) err(`roster ${n}: planned has ${row.planned.length} roles`);
-    for (const id of [...row.deal, ...row.planned]) if (!roles.roles[id]) err(`roster ${n}: unknown role ${id}`);
+    for (const id of [...row.deal, ...row.planned])
+      if (!roles.roles[id]) err(`roster ${n}: unknown role ${id}`);
     for (const id of row.deal) {
-      if (roles.roles[id] && roles.roles[id].ships !== "V1") err(`roster ${n}: deals unshipped role ${id}`);
+      if (roles.roles[id] && roles.roles[id].ships !== 'V1') err(`roster ${n}: deals unshipped role ${id}`);
     }
-    const expected = row.planned.map((id) => (roles.roles[id]?.ships === "V1" ? id : roles.standIn));
+    const expected = row.planned.map((id) => (roles.roles[id]?.ships === 'V1' ? id : roles.standIn));
     if (!sameMultiset(expected, row.deal)) err(`roster ${n}: deal is not planned with stand-ins`);
     if (!row.deal.includes(roles.standIn)) err(`roster ${n}: no ${roles.standIn} (never fewer than 1)`);
     if (row.practice !== (count === 4)) err(`roster ${n}: only 4 is a practice party`);
@@ -94,7 +95,7 @@ export function validateContent(c: Content): string[] {
     for (const ref of [ab.requires, ab.consumes]) {
       if (ref !== undefined && !isItem(ref)) err(`ability ${ab.id}: unknown item ${ref}`);
     }
-    if (ab.scope === "role" && !cardAbilities.has(ab.id)) err(`ability ${ab.id}: on no role card`);
+    if (ab.scope === 'role' && !cardAbilities.has(ab.id)) err(`ability ${ab.id}: on no role card`);
   }
   const itemUses = new Set<string>();
   for (const item of Object.values(items.items)) {
@@ -102,11 +103,11 @@ export function validateContent(c: Content): string[] {
       itemUses.add(item.use);
       if (!isAbility(item.use)) err(`item ${item.id}: unknown ability ${item.use}`);
     }
-    if (item.roleBound && item.onDeath === "drops") err(`item ${item.id}: role-bound items never drop`);
-    if (!item.roleBound && item.onDeath !== "drops") err(`item ${item.id}: only role-bound items stay`);
+    if (item.roleBound && item.onDeath === 'drops') err(`item ${item.id}: role-bound items never drop`);
+    if (!item.roleBound && item.onDeath !== 'drops') err(`item ${item.id}: only role-bound items stay`);
   }
   for (const ab of Object.values(abilities.abilities)) {
-    if (ab.scope === "item" && !itemUses.has(ab.id)) err(`ability ${ab.id}: no item uses it`);
+    if (ab.scope === 'item' && !itemUses.has(ab.id)) err(`ability ${ab.id}: no item uses it`);
   }
   for (const clue of Object.values(clues.clues)) {
     if (clue.readWith !== undefined && !isAbility(clue.readWith)) {
@@ -128,7 +129,7 @@ export function validateContent(c: Content): string[] {
       portalIds.add(portal.id);
       if (portal.from !== scene.id) err(`${where}: portal ${portal.id} has from ${portal.from}`);
       if (portal.to === null || portal.toSpawn === null) {
-        if (portal.ships === "V1") err(`${where}: V1 portal ${portal.id} has no target`);
+        if (portal.ships === 'V1') err(`${where}: V1 portal ${portal.id} has no target`);
         continue;
       }
       const target = scenes[portal.to];
@@ -143,8 +144,8 @@ export function validateContent(c: Content): string[] {
       if (portal.minProfile !== gated) {
         err(`${where}: portal ${portal.id} minProfile ${portal.minProfile}, expected ${gated}`);
       }
-      if (portal.kind === "drop" && portal.noise !== "oneWayDrop") err(`${where}: drop ${portal.id} noise`);
-      if (portal.kind === "drop" && !portal.oneWay) err(`${where}: drop ${portal.id} must be one-way`);
+      if (portal.kind === 'drop' && portal.noise !== 'oneWayDrop') err(`${where}: drop ${portal.id} noise`);
+      if (portal.kind === 'drop' && !portal.oneWay) err(`${where}: drop ${portal.id} must be one-way`);
     }
     for (const obj of [...scene.spots, ...scene.props, ...scene.gates, ...scene.paths]) {
       if (objectIds.has(obj.id)) err(`${where}: duplicate id ${obj.id}`);
@@ -163,7 +164,9 @@ export function validateContent(c: Content): string[] {
   for (const scene of Object.values(c.scenes)) {
     for (const portal of scene.portals) {
       if (portal.oneWay || portal.to === null) continue;
-      const back = scenes[portal.to]?.portals.find((p) => p.to === scene.id && !p.oneWay && p.toSpawn !== null);
+      const back = scenes[portal.to]?.portals.find(
+        (p) => p.to === scene.id && !p.oneWay && p.toSpawn !== null,
+      );
       if (!back) err(`portal ${portal.id}: no portal leads back from ${portal.to}`);
     }
   }
@@ -177,10 +180,10 @@ export function validateContent(c: Content): string[] {
     if (task.source && task.targets.some((t) => t.scene === task.source?.scene)) {
       err(`task ${task.id}: the tool must come from another scene`);
     }
-    if (task.kind === "fetch" && (task.tool === undefined || task.source === undefined)) {
+    if (task.kind === 'fetch' && (task.tool === undefined || task.source === undefined)) {
       err(`task ${task.id}: fetch tasks need a tool and a source`);
     }
-    if (task.kind === "coop" && (task.coopPlayers === undefined || task.coopRadiusTiles === undefined)) {
+    if (task.kind === 'coop' && (task.coopPlayers === undefined || task.coopRadiusTiles === undefined)) {
       err(`task ${task.id}: co-op tasks need coopPlayers and coopRadiusTiles`);
     }
   }
@@ -189,13 +192,13 @@ export function validateContent(c: Content): string[] {
   for (const n of PLAYER_COUNTS) {
     const profile = balance.byCount[n].profile;
     const count = Number(n);
-    const expected: Profile = count <= 6 ? "small" : count <= 8 ? "medium" : "large";
+    const expected: Profile = count <= 6 ? 'small' : count <= 8 ? 'medium' : 'large';
     if (profile !== expected) err(`balance ${n}: profile ${profile}, WORLD 4.3 says ${expected}`);
   }
 
   // Quick mode: decks, windows and acts.
   const onubRole = (id: string) => onubRoles.roles[id];
-  if (onubRole(onubRoles.standIn)?.ships !== "V1") err(`roles.onub.json: stand-in must ship in V1`);
+  if (onubRole(onubRoles.standIn)?.ships !== 'V1') err(`roles.onub.json: stand-in must ship in V1`);
   for (const n of PLAYER_COUNTS) {
     const row = onubBalance.byCount[n];
     const loaves = Number(n) + onubBalance.deadLoaves;
@@ -203,19 +206,20 @@ export function validateContent(c: Content): string[] {
     if (row.deck.length !== loaves) err(`onub ${n}: deck has ${row.deck.length} loaves`);
     if (row.planned.length !== loaves) err(`onub ${n}: planned deck has ${row.planned.length} loaves`);
     for (const id of [...row.deck, ...row.planned]) if (!onubRole(id)) err(`onub ${n}: unknown role ${id}`);
-    const expected = row.planned.map((id) => (onubRole(id)?.ships === "V1" ? id : onubRoles.standIn));
+    const expected = row.planned.map((id) => (onubRole(id)?.ships === 'V1' ? id : onubRoles.standIn));
     if (!sameMultiset(expected, row.deck)) err(`onub ${n}: deck is not planned with stand-ins`);
   }
   const windowRoles = onubBalance.windows.map((w) => w.role);
-  if (new Set(windowRoles).size !== windowRoles.length) err("onub: a role has two night windows");
+  if (new Set(windowRoles).size !== windowRoles.length) err('onub: a role has two night windows');
   onubBalance.windows.forEach((w, i) => {
     if (w.order !== i + 1) err(`onub window ${w.role}: order ${w.order}, expected ${i + 1}`);
     if (!onubRole(w.role)) err(`onub window: unknown role ${w.role}`);
-    for (const a of w.acts) if (!(a.act in onubBalance.acts)) err(`onub window ${w.role}: unknown act ${a.act}`);
+    for (const a of w.acts)
+      if (!(a.act in onubBalance.acts)) err(`onub window ${w.role}: unknown act ${a.act}`);
   });
   for (const role of Object.values(onubRoles.roles)) {
     if (role.wakes !== windowRoles.includes(role.id)) {
-      err(`onub role ${role.id}: wakes=${role.wakes} but ${role.wakes ? "has no" : "has a"} window`);
+      err(`onub role ${role.id}: wakes=${role.wakes} but ${role.wakes ? 'has no' : 'has a'} window`);
     }
   }
 
@@ -224,10 +228,10 @@ export function validateContent(c: Content): string[] {
 
 export function assertValid(c: Content): void {
   const errors = validateContent(c);
-  if (errors.length) throw new Error(`@wdi/content is inconsistent:\n- ${errors.join("\n- ")}`);
+  if (errors.length) throw new Error(`@wdi/content is inconsistent:\n- ${errors.join('\n- ')}`);
 }
 
-const SOLID_USED_FROM_FLOOR = new Set(["D", "H", "B"]);
+const SOLID_USED_FROM_FLOOR = new Set(['D', 'H', 'B']);
 
 /** Grid size, legend bijections and object bounds for one scene. */
 export function checkGrid(scene: Scene): string[] {
@@ -249,13 +253,15 @@ export function checkGrid(scene: Scene): string[] {
     else if (at(x, y) !== ch) errors.push(`${where}: ${what} at ${key} is "${at(x, y)}", expected "${ch}"`);
     expect.set(key, ch);
   };
-  for (const p of scene.portals) mark(p.x, p.y, "D", `portal ${p.id}`);
-  for (const s of scene.spawns) mark(s.x, s.y, "S", `spawn ${s.id}`);
-  for (const s of scene.spots) mark(s.x, s.y, s.kind === "hide" ? "H" : "B", `spot ${s.id}`);
+  for (const p of scene.portals) mark(p.x, p.y, 'D', `portal ${p.id}`);
+  for (const s of scene.spawns) mark(s.x, s.y, 'S', `spawn ${s.id}`);
+  for (const s of scene.spots) mark(s.x, s.y, s.kind === 'hide' ? 'H' : 'B', `spot ${s.id}`);
   scene.grid.forEach((row, y) =>
     [...row].forEach((ch, x) => {
-      if ("DSHB".includes(ch) && !expect.has(`${x},${y}`)) {
-        errors.push(`${where}: "${ch}" at ${x},${y} has no ${ch === "D" ? "portal" : ch === "S" ? "spawn" : "spot"}`);
+      if ('DSHB'.includes(ch) && !expect.has(`${x},${y}`)) {
+        errors.push(
+          `${where}: "${ch}" at ${x},${y} has no ${ch === 'D' ? 'portal' : ch === 'S' ? 'spawn' : 'spot'}`,
+        );
       }
     }),
   );
@@ -268,7 +274,7 @@ export function checkGrid(scene: Scene): string[] {
   }
 
   // Solid interactables must be usable from an orthogonally adjacent floor tile.
-  const floorish = (x: number, y: number) => at(x, y) === "." || at(x, y) === "S";
+  const floorish = (x: number, y: number) => at(x, y) === '.' || at(x, y) === 'S';
   const touchesFloor = (x: number, y: number) =>
     floorish(x + 1, y) || floorish(x - 1, y) || floorish(x, y + 1) || floorish(x, y - 1);
   for (const o of [...scene.portals, ...scene.spots, ...scene.props]) {
@@ -276,15 +282,15 @@ export function checkGrid(scene: Scene): string[] {
       errors.push(`${where}: ${o.id} out of bounds`);
       continue;
     }
-    const ch = at(o.x, o.y) ?? "#";
-    if ((SOLID_USED_FROM_FLOOR.has(ch) || ch === "#") && !touchesFloor(o.x, o.y)) {
+    const ch = at(o.x, o.y) ?? '#';
+    if ((SOLID_USED_FROM_FLOOR.has(ch) || ch === '#') && !touchesFloor(o.x, o.y)) {
       errors.push(`${where}: ${o.id} at ${o.x},${o.y} has no adjacent floor`);
     }
   }
   for (const g of scene.gates) {
     for (let y = g.y; y < g.y + g.h; y++) {
       for (let x = g.x; x < g.x + g.w; x++) {
-        if (at(x, y) !== ".") errors.push(`${where}: gate ${g.id} covers ${x},${y} which is not floor`);
+        if (at(x, y) !== '.') errors.push(`${where}: gate ${g.id} covers ${x},${y} which is not floor`);
       }
     }
   }

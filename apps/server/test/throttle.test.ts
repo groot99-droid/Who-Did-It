@@ -47,6 +47,19 @@ describe('matchmake route guard', () => {
     expect(results.throttled).toBeGreaterThanOrEqual(994);
   });
 
+  it('keys the bucket on the last forwarded hop, so a forged first hop earns no fresh bucket', async () => {
+    const post = (xff: string) =>
+      fetch(`http://localhost:${PORT}/matchmake/joinById/party`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-forwarded-for': xff },
+        body: JSON.stringify({ roomId: 'ZZZZZ', ...o('Mallory') }),
+      });
+    const forged = await Promise.all(Array.from({ length: 12 }, (_, i) => post(`10.0.0.${i}, 203.0.113.9`)));
+    expect(forged.filter((r) => r.status === THROTTLED_CODE).length).toBeGreaterThanOrEqual(7);
+    const distinct = await Promise.all(Array.from({ length: 6 }, (_, i) => post(`1.1.1.1, 198.51.100.${i}`)));
+    expect(distinct.filter((r) => r.status === THROTTLED_CODE).length).toBe(0);
+  });
+
   it('answers a disallowed origin without an allow-origin header', async () => {
     const res = await fetch(`http://localhost:${PORT}/matchmake/joinById/party`, {
       method: 'POST',

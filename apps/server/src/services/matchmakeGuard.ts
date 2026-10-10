@@ -42,7 +42,7 @@ export function installMatchmakeGuard(
   const original: Invoke = matchMaker.controller.invokeMethod.bind(matchMaker.controller);
 
   matchMaker.controller.invokeMethod = async (method, roomName, clientOptions, authOptions) => {
-    const ip = authOptions?.ip ?? 'unknown';
+    const ip = clientIp(authOptions);
     const allowed = perIp.take(ip, clock.now()) && (method !== 'joinById' || global.take(clock.now()));
     if (!allowed) throw new ServerError(THROTTLED_CODE, 'too many requests');
     try {
@@ -55,6 +55,21 @@ export function installMatchmakeGuard(
   return () => {
     matchMaker.controller.invokeMethod = original;
   };
+}
+
+/**
+ * The address the per-IP bucket keys on. `AuthContext.ip` is the FIRST `x-forwarded-for` hop, which
+ * the client can forge to get a fresh bucket per request; behind the single trusted proxy of Render or
+ * Railway the real address is the LAST hop, the one the proxy appended. Express's `trust proxy` setting
+ * never reaches the matchmake route, so the guard derives the key itself.
+ */
+export function clientIp(auth?: {
+  ip?: string | undefined;
+  headers?: { get(name: string): string | null | undefined } | undefined;
+}): string {
+  const xff = auth?.headers?.get('x-forwarded-for');
+  const last = xff?.split(',').at(-1)?.trim();
+  return last || auth?.ip || 'unknown';
 }
 
 const ALLOWED_ORIGINS = new Set(['https://groot99-droid.github.io']);

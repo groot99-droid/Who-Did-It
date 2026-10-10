@@ -1,4 +1,4 @@
-export type ArtMode = "default" | "placeholder";
+export type ArtMode = 'default' | 'placeholder';
 
 export interface Flags {
   /** `?art=placeholder` keeps playtests running before the real atlas lands. */
@@ -23,19 +23,19 @@ export function isValidCode(raw: string): boolean {
 
 export function readFlags(search: string, hash: string): Flags {
   const params = new URLSearchParams(search);
-  const route = hash.replace(/^#\/?/, "").split("/");
+  const route = hash.replace(/^#\/?/, '').split('/');
   const code = route[1] !== undefined && isValidCode(route[1]) ? normalizeCode(route[1]) : null;
   return {
-    art: params.get("art") === "placeholder" ? "placeholder" : "default",
-    mock: params.get("mock") === "1",
-    joinCode: route[0] === "join" ? code : null,
-    resumeCode: route[0] === "lobby" ? code : null,
+    art: params.get('art') === 'placeholder' ? 'placeholder' : 'default',
+    mock: params.get('mock') === '1',
+    joinCode: route[0] === 'join' ? code : null,
+    resumeCode: route[0] === 'lobby' ? code : null,
   };
 }
 
-export function setRoute(route: "" | `join/${string}` | `lobby/${string}`): void {
-  const hash = route === "" ? "" : `#/${route}`;
-  history.replaceState(null, "", `${location.pathname}${location.search}${hash}`);
+export function setRoute(route: '' | `join/${string}` | `lobby/${string}`): void {
+  const hash = route === '' ? '' : `#/${route}`;
+  history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
 }
 
 /** Shareable deep link for a room code, honouring the Pages base path. */

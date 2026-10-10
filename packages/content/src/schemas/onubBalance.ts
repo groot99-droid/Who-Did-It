@@ -1,14 +1,14 @@
-import { z } from "zod";
-import { GddRef, Id, Seconds, Tiles, byPlayerCount } from "./common.js";
-import { OnubActId } from "./onubRoles.js";
+import { z } from 'zod';
+import { GddRef, Id, Seconds, Tiles, byPlayerCount } from './common.js';
+import { OnubActId } from './onubRoles.js';
 
 export const OnubAct = z.strictObject({
   id: OnubActId,
-  target: z.enum(["deadLoaf", "otherPlate", "ownPlate", "ledger"]),
+  target: z.enum(['deadLoaf', 'otherPlate', 'ownPlate', 'ledger']),
   /** Hold E per pick. */
   holdS: Seconds,
   /** `withOwn`: the picked loaf trades places with the actor's; `pair`: two picks trade places. */
-  swap: z.enum(["none", "withOwn", "pair"]),
+  swap: z.enum(['none', 'withOwn', 'pair']),
   /** The actor is shown the token of what they picked (or now hold). */
   reveals: z.boolean(),
   description: z.string().min(1),
@@ -26,8 +26,8 @@ export const OnubWindow = z.strictObject({
   /** The acts are allowed only when exactly one player holds this dealt role. */
   onlyIfAlone: z.boolean(),
   /** `seededPick`: a mandatory act the server completes by seed when the window expires. */
-  onTimeout: z.enum(["nothing", "seededPick"]),
-  trace: z.enum(["none", "ledgeScuff", "ledgerOpen", "plateTurned", "twoPlatesTurned"]),
+  onTimeout: z.enum(['nothing', 'seededPick']),
+  trace: z.enum(['none', 'ledgeScuff', 'ledgerOpen', 'plateTurned', 'twoPlatesTurned']),
   traceText: z.string(),
 });
 export type OnubWindow = z.infer<typeof OnubWindow>;
@@ -54,7 +54,7 @@ export const WinnerRow = z.strictObject({
     anyoneOut: Flag,
   }),
   /** `hirelingIfMourner`: the Hireling wins if they hold a mourner's plate, else nobody. */
-  winners: z.array(z.enum(["debtor", "village", "cabal", "hirelingIfMourner", "nobody"])).min(1),
+  winners: z.array(z.enum(['debtor', 'village', 'cabal', 'hirelingIfMourner', 'nobody'])).min(1),
   text: z.string().min(1),
 });
 export type WinnerRow = z.infer<typeof WinnerRow>;

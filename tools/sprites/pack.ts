@@ -137,7 +137,9 @@ export function readRender(dir: string): { manifest: FeetManifest; framesByPass:
   const framesByPass = new Map<Pass, PackInput[]>();
   for (const pass of manifest.passes as Pass[]) {
     if (!PASSES.includes(pass)) throw new Error(`unknown pass ${pass}`);
-    const files = readdirSync(join(dir, pass)).filter((f) => f.endsWith('.png')).sort();
+    const files = readdirSync(join(dir, pass))
+      .filter((f) => f.endsWith('.png'))
+      .sort();
     framesByPass.set(
       pass,
       files.map((f) => {

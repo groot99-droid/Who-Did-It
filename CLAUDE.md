@@ -5,7 +5,7 @@
 A browser multiplayer hidden-role game for 4 to 10 players: a static Phaser client on
 GitHub Pages and an authoritative Colyseus server. V1 is top-down 2.5D with pre-rendered
 Blender sprites; V2 is first-person 3D on the same server, rules and world data. It also
-ships a 6-9 minute quick mode, One Night Ultimate Baguette.
+ships a short quick mode, One Night Ultimate Baguette (length in `GDD.md` 3.11).
 
 Implementation started 2026-10-10 in four parallel sessions; `docs/SESSIONS.md` says which paths
 each session owns. Until their PRs merge, `docs/` and the root scaffold are the whole project.

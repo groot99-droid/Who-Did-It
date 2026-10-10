@@ -6,15 +6,32 @@ import { fileURLToPath } from 'node:url';
 import { createCanvas, GlobalFonts, type SKRSContext2D } from '@napi-rs/canvas';
 import type { FeetManifest } from './gen-anims.ts';
 import {
-  CELL_PX, CLIP_CELL, DIRECTIONS, FEET_ROW_PX, PASSES, V1_CLIPS, frameFileName, frameKey,
-  type Anim, type Dir, type Pass,
+  CELL_PX,
+  CLIP_CELL,
+  DIRECTIONS,
+  FEET_ROW_PX,
+  PASSES,
+  V1_CLIPS,
+  frameFileName,
+  frameKey,
+  type Anim,
+  type Dir,
+  type Pass,
 } from './keys.ts';
 import { atlasJson, packCharacter, packFrames, writeFiles, type PackInput } from './pack.ts';
 
 // docs/ASSETS.md 6.1. TODO: read packages/content/data/palette.json once @wdi/content merges.
 export const PALETTE = {
-  ink: '#12141C', slate: '#2C3240', fog: '#6F7A8C', bone: '#D9D2C2', mustard: '#F2B33D',
-  teal: '#2EC4B6', magenta: '#E04E9A', blood: '#B3121F', lantern: '#FFB457', moon: '#7FA8FF',
+  ink: '#12141C',
+  slate: '#2C3240',
+  fog: '#6F7A8C',
+  bone: '#D9D2C2',
+  mustard: '#F2B33D',
+  teal: '#2EC4B6',
+  magenta: '#E04E9A',
+  blood: '#B3121F',
+  lantern: '#FFB457',
+  moon: '#7FA8FF',
 } as const;
 type Token = keyof typeof PALETTE;
 
@@ -51,8 +68,14 @@ function registerFont(): void {
 }
 
 const DIR_VEC: Record<Dir, [number, number]> = {
-  n: [0, -1], ne: [0.7071, -0.7071], e: [1, 0], se: [0.7071, 0.7071],
-  s: [0, 1], sw: [-0.7071, 0.7071], w: [-1, 0], nw: [-0.7071, -0.7071],
+  n: [0, -1],
+  ne: [0.7071, -0.7071],
+  e: [1, 0],
+  se: [0.7071, 0.7071],
+  s: [0, 1],
+  sw: [-0.7071, 0.7071],
+  w: [-1, 0],
+  nw: [-0.7071, -0.7071],
 };
 
 /** Deterministic PRNG (mulberry32), same as @wdi/shared. */
@@ -118,7 +141,14 @@ function pose(anim: Anim, dir: Dir, i: number): { bob: number; lean: number; arm
 const BODY_W = 30;
 const BODY_H = 84;
 
-function drawLayer(g: SKRSContext2D, pass: Pass, anim: Anim, dir: Dir, i: number, feet: [number, number]): void {
+function drawLayer(
+  g: SKRSContext2D,
+  pass: Pass,
+  anim: Anim,
+  dir: Dir,
+  i: number,
+  feet: [number, number],
+): void {
   const p = pose(anim, dir, i);
   const [vx, vy] = DIR_VEC[dir];
   g.save();
@@ -140,7 +170,8 @@ function drawLayer(g: SKRSContext2D, pass: Pass, anim: Anim, dir: Dir, i: number
     g.lineWidth = 2;
     g.strokeStyle = PALETTE.ink;
     g.stroke();
-    if (vy >= 0 || Math.abs(vx) > 0.5) shape(g, 'slate', () => g.arc(vx * 9, headY + vy * 4, 3, 0, 2 * Math.PI), false);
+    if (vy >= 0 || Math.abs(vx) > 0.5)
+      shape(g, 'slate', () => g.arc(vx * 9, headY + vy * 4, 3, 0, 2 * Math.PI), false);
     if (p.arm !== null) {
       const a = Math.atan2(vy, vx) + p.arm;
       g.beginPath();
@@ -175,7 +206,14 @@ function drawLayer(g: SKRSContext2D, pass: Pass, anim: Anim, dir: Dir, i: number
 
 export function characterFrames(): { manifest: FeetManifest; framesByPass: Map<Pass, PackInput[]> } {
   registerFont();
-  const manifest: FeetManifest = { version: 1, body: BODY, cell: CELL_PX, fps: 12, passes: [...PASSES], frames: {} };
+  const manifest: FeetManifest = {
+    version: 1,
+    body: BODY,
+    cell: CELL_PX,
+    fps: 12,
+    passes: [...PASSES],
+    frames: {},
+  };
   const framesByPass = new Map<Pass, PackInput[]>(PASSES.map((p) => [p, []]));
   for (const anim of Object.keys(V1_CLIPS) as Anim[]) {
     const [cell, feetRow] = CLIP_CELL[anim] ?? [CELL_PX, FEET_ROW_PX];
@@ -213,7 +251,8 @@ export function clueFrames(): PackInput[] {
   };
   const radius = { s: 14, m: 18, t: 22 } as const;
   for (const h of ['s', 'm', 't'] as const) {
-    for (const [tint, token] of Object.entries(MUD)) add(`clue_footprint_${h}_${tint}`, token, 'F', radius[h]);
+    for (const [tint, token] of Object.entries(MUD))
+      add(`clue_footprint_${h}_${tint}`, token, 'F', radius[h]);
   }
   for (const [colour, token] of Object.entries(SCARF)) add(`clue_thread_${colour}`, token, 'T');
   add('clue_felt_cap', 'slate', 'H');
@@ -304,17 +343,36 @@ export async function generate(): Promise<Map<string, Buffer>> {
   const entries: ManifestEntry[] = [];
 
   const { manifest, framesByPass } = characterFrames();
-  for (const [name, bytes] of await packCharacter(BODY, framesByPass, manifest)) files.set(`chars/${name}`, bytes);
+  for (const [name, bytes] of await packCharacter(BODY, framesByPass, manifest))
+    files.set(`chars/${name}`, bytes);
   entries.push(
-    { key: `char_${BODY}`, type: 'multiatlas', url: `chars/char_${BODY}.json`, path: 'chars/', filter: 'linear' },
-    { key: `ovl_${BODY}`, type: 'multiatlas', url: `chars/ovl_${BODY}.json`, path: 'chars/', filter: 'linear' },
+    {
+      key: `char_${BODY}`,
+      type: 'multiatlas',
+      url: `chars/char_${BODY}.json`,
+      path: 'chars/',
+      filter: 'linear',
+    },
+    {
+      key: `ovl_${BODY}`,
+      type: 'multiatlas',
+      url: `chars/ovl_${BODY}.json`,
+      path: 'chars/',
+      filter: 'linear',
+    },
     { key: `anims_${BODY}`, type: 'animation', url: `chars/${BODY}.anims.json` },
   );
 
   const clues = await packFrames('clues', clueFrames());
   for (const [name, bytes] of clues.pages) files.set(`clues/${name}`, bytes);
   files.set('clues/clues.json', Buffer.from(atlasJson(clues.atlas)));
-  entries.push({ key: 'clues', type: 'multiatlas', url: 'clues/clues.json', path: 'clues/', filter: 'linear' });
+  entries.push({
+    key: 'clues',
+    type: 'multiatlas',
+    url: 'clues/clues.json',
+    path: 'clues/',
+    filter: 'linear',
+  });
 
   for (const b of BUILDINGS) {
     const key = `bld_${b.id}_ext`;
@@ -337,7 +395,14 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const outDir = resolve(process.argv[2] ?? join(here, '../../apps/client/public/assets/placeholder'));
   const files = await generate();
   for (const sub of new Set([...files.keys()].map((k) => dirname(k)))) {
-    writeFiles(join(outDir, sub), new Map([...files].filter(([k]) => dirname(k) === sub).map(([k, v]) => [k.slice(sub === '.' ? 0 : sub.length + 1), v])));
+    writeFiles(
+      join(outDir, sub),
+      new Map(
+        [...files]
+          .filter(([k]) => dirname(k) === sub)
+          .map(([k, v]) => [k.slice(sub === '.' ? 0 : sub.length + 1), v]),
+      ),
+    );
   }
   console.log(`placeholder: ${files.size} files -> ${outDir}`);
 }

@@ -1,12 +1,12 @@
-import { z } from "zod";
-import { Faction, GddRef, Id, PaletteToken, Ships, byPlayerCount } from "./common.js";
+import { z } from 'zod';
+import { Faction, GddRef, Id, PaletteToken, Ships, byPlayerCount } from './common.js';
 
 export const KitEntry = z.strictObject({ item: Id, qty: z.number().int().positive() });
 
 export const FactionInfo = z.strictObject({
   name: z.string().min(1),
   color: PaletteToken,
-  icon: z.enum(["shield", "dagger", "mask"]),
+  icon: z.enum(['shield', 'dagger', 'mask']),
   /** Members are told each other's names on the role card (Cabal only). */
   membersKnowEachOther: z.boolean(),
 });
@@ -21,10 +21,10 @@ export const Role = z.strictObject({
   /** One-line goal on the role card and the HUD chip. */
   goal: z.string().min(1),
   /** Who this role wins with; parity and practice rules live in balance.json. */
-  winsWith: z.enum(["village", "cabal", "self"]),
+  winsWith: z.enum(['village', 'cabal', 'self']),
   win: z.string().min(1),
   /** What the role counts as for the parity check (GDD 3.8). */
-  parity: z.enum(["village", "cabal", "nobody"]),
+  parity: z.enum(['village', 'cabal', 'nobody']),
   startKit: z.array(KitEntry),
   /** Ability ids from abilities.json in card order; the card shows at most 3. */
   abilities: z.array(Id).max(3),

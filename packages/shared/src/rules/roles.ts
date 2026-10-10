@@ -1,11 +1,14 @@
 import { shuffle, type Rng } from './prng';
 
 /**
- * One roster row of `roles.json`, read by player count with no transformation:
- * role id -> how many players get it. Interface with the content session (docs/SESSIONS.md);
- * Townsfolk are an ordinary entry, so the counts must sum to the player count.
+ * One roster row of `roles.json` (`rosters["4".."10"]`), read by player count with no transformation:
+ * `deal` lists the role id of every seat, Townsfolk included, so its length is the player count.
+ * Interface with `@wdi/content` (docs/SESSIONS.md); the row's other fields (`practice`, `planned`,
+ * `gddRef`) are ignored here.
  */
-export type RosterRow = Record<string, number>;
+export interface RosterRow {
+  readonly deal: readonly string[];
+}
 /** Keyed by player count as a string ("4" .. "10"). */
 export type Roster = Record<string, RosterRow>;
 
@@ -22,8 +25,7 @@ export function assignRoles(
 ): Map<string, string> {
   const row = roster[String(ids.length)];
   if (!row) throw new Error(`no roster row for ${ids.length} players`);
-  const deck: string[] = [];
-  for (const [roleId, count] of Object.entries(row)) for (let i = 0; i < count; i++) deck.push(roleId);
+  const deck = [...row.deal];
   if (deck.length !== ids.length) {
     throw new Error(`roster row for ${ids.length} players deals ${deck.length} roles`);
   }

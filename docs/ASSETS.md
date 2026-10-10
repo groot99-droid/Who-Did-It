@@ -44,7 +44,7 @@ Style suffix on every prompt: "stylized toon-noir, chunky low-poly 3-heads-tall 
 
 ### 6.6 Folder and LFS plan
 
-Day 1 commits `.gitattributes` before any binary: LFS for `*.blend *.psd *.ai *.aep *.fbx *.glb *.wav`, limited to `render_rig.blend` and small rig sources; every master (`.ai`, `.aep`, `.psd`, character `.blend`, source `.glb`) lives on the owner's laptop in the ROSW checkout under `studio/assets/who-did-it/<kind>/<slug>/` (git-ignored there, recorded by a studio note; see 6.10) and is listed in `assets/source/MANIFEST.md` with hash and date. Exports (`apps/client/public/assets/**`) are committed in plain git in batched "art drop" PRs; the deterministic packer keeps unchanged pages byte-identical; CI warns when a PR adds more than 25 MB of binaries. `ci.yml` checks out with `lfs: false`.
+Day 1 commits `.gitattributes` before any binary: LFS rules for `*.blend *.psd *.ai *.aep *.fbx *.glb *.wav` exist but nothing uses them yet, because the render rig is built from code (`tools/blender/build_rig.py`, 6.2) and no `.blend` is committed; every master (`.ai`, `.aep`, `.psd`, character `.blend`, source `.glb`) lives on the owner's laptop in the ROSW checkout under `studio/assets/who-did-it/<kind>/<slug>/` (git-ignored there, recorded by a studio note; see 6.10) and is listed in `assets/source/MANIFEST.md` with hash and date. Exports (`apps/client/public/assets/**`) are committed in plain git in batched "art drop" PRs; the deterministic packer keeps unchanged pages byte-identical; CI warns when a PR adds more than 25 MB of binaries. `ci.yml` checks out with `lfs: false`.
 
 ### 6.7 V1 asset backlog
 
@@ -104,7 +104,7 @@ The owner's plugins repo ("ROSW") is the studio behind this game. What lives whe
 | The record of how each master was made (brief, context, recipe, execute log, review) | ROSW `studio/vault/who-did-it/<kind>/<slug>.md`, written only by the studio pipeline (`studio-pipeline` skill, six checkpointed stages) | Yes |
 | Every Higgsfield generation (prompt, model, settings, inputs, link) | ROSW `studio/library/catalog.json` + `thumbs/`, kept current with the `higgsfield-library-sync` skill | Yes (public: prompts and links become public when pushed) |
 | Exports the game loads (atlases, tiles, icons, audio) | This repo, `apps/client/public/assets/**`, in batched art-drop PRs | Yes |
-| The render rig `.blend` and small rig sources | This repo via Git LFS | Yes |
+| The render rig | Built from code by `tools/blender/build_rig.py` in this repo; the `.blend` is never committed | Yes (the script) |
 
 Studio pipelines already implemented in ROSW that this project uses: `still-image` (Higgsfield concepts, portraits, decals), `video-shot` (landing loop, trailer plates), `music-cue` (stems), `edit-2d` (Adobe connector: cleanup, defringe, atlas passes), `scene-blender` (Higgsfield scene builder in Blender 5.2 for block-outs), `scene-3d` (walkable Three.js rooms). The brand gates in ROSW scope the studio's own surfaces, not product work: this game's palette (6.1), fonts and style formula are its own Decisions in Force and are stated at a run's context stage, never filled from the gates.
 

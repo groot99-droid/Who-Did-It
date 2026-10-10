@@ -59,6 +59,12 @@ Open questions 1, 2, 3 and 7 above are closed. Still open: 4 (practice at 4), 5 
 | A6 | Hosting (open question 2) | **Render Free until the M3 exit, then Railway Hobby.** The landing page shows "Waking the village..." while `/health` is polled; only `VITE_SERVER_URL` changes at the move. `ARCHITECTURE.md` 5.10, `ROADMAP.md` M0, M3, day 3 and risk 1 updated. |
 | A7 | First playable (open question 8) | **M3 (the full loop) first**, then M3b (the quick mode). |
 | A8 | Marketplace settings (A4) | **Approved.** `.claude/settings.json` registers the `rosw` marketplace and enables `ui-design@rosw`. |
+| A9 | Render rig (ASSETS 6.2), from Session D's calibration render | Key light at azimuth **225°** (at 315° every camera-facing surface fell into the shadow band); `die` renders in **256 px cells** with the feet centred (a falling 1.7 m body overshoots 128 px); the rig is **built from code**, no `.blend` committed. Pending the owner's look at the calibration sheet. |
+| A10 | Well ladder (GDD 3.6, WORLD 4.3) | `ov.well` -> `cellar.well` **ships in V1 at the Large profile** as a plain portal; the Shove verb stays V1.5. |
+| A11 | Interior minimum (WORLD 4.2) | Interiors are **at least 12x9 tiles**; the 20x11 figure was never met by the loft and bedroom rooms of 4.3. |
+| A12 | Roster interface (ARCHITECTURE 5.8) | `assignRoles(ids, settings, rng, roster)` reads `roster[String(n)].deal`, the exact row shape of `roles.json`; rules numbers (vision, noise, radii) were removed from `@wdi/shared/constants.ts` and live only in `balance.json`. |
+| A13 | Matchmake throttle (ARCHITECTURE 5.3) | The per-IP bucket keys on the **last** `x-forwarded-for` hop (`clientIp`), since `AuthContext.ip` is the forgeable first hop and Express's `trust proxy` does not reach the route; `maxMessagesPerSecond = 100` is now applied on the room (5.11). |
+| A14 | Higgsfield concepts (ASSETS 6.5) | The two generated concept images stay on branch `claude/art-pipeline` and are **held out of the integrated tree** until a dated copy of Higgsfield's terms is saved in `LICENSES/vendors/` (open question 13). Their `CREDITS.md` and `MANIFEST.md` rows remain. |
 
 ## Spike results (M0)
 
@@ -72,3 +78,9 @@ Run 2026-10-10 against the pinned `colyseus 0.18.9`, `@colyseus/core 0.18.18`, `
 | Join errors | `matchMaker.joinById` throws different messages for a missing room (`not found`) and a locked or full room (`is locked`; a room that reaches `maxClients` locks itself), so they leak. The single entry of the HTTP matchmake route is `matchMaker.controller.invokeMethod`; wrapping it turns every failure (missing, locked, full, version mismatch via the static `onAuth`, bad name) into `404 "party not found or unavailable"`. The same wrapper holds the per-IP and global token buckets and answers `429` when throttled. |
 | CORS | The matchmake route reads `matchMaker.controller.DEFAULT_CORS_HEADERS` and `getCorsHeaders()`; the default sends `Access-Control-Allow-Origin: *`, so the default header is deleted and `getCorsHeaders` echoes only `https://groot99-droid.github.io` and localhost. |
 | Not verified | `patchBytes` on `/health` is wired but not yet fed (patch size is not exposed on the room in 0.18; M2 must find a hook). The production-build check for `debug.roles` is runtime-gated by `WDI_DEBUG`, so the handler's code is present in the bundle but never registered; a stricter build-time strip is open. `trust proxy` is set on the Express app; the matchmake route takes the client address from Colyseus' `AuthContext.ip`, which needs a check behind Render's proxy at the first deploy. |
+
+## Open questions added at integration (2026-10-10)
+
+12. **Quick mode length.** With the timers in `balance.onub.json` a match runs about 5-7 minutes, under the 6-9 minute target of `GDD.md` 3.11. Raise the discussion timers to meet the target, or accept the shorter match and change the target?
+13. **Higgsfield terms.** Save a dated copy of Higgsfield's terms of service into `LICENSES/vendors/` (Session D could not fetch them; the account is the paid Plus tier, which settles open question 5). The two concept images then return from branch `claude/art-pipeline` into `assets/source/concepts/`.
+14. **Calibration sheet.** Look at `apps/client/public/assets/calibration/calibration_sheet.png` and confirm A9 (key light 225°, `die` in 256 px cells) or ask for a re-render.

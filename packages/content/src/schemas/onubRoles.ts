@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { Faction, GddRef, Id, Ships } from "./common.js";
+import { z } from 'zod';
+import { Faction, GddRef, Id, Ships } from './common.js';
 
 /** Quick-mode act ids sent as `act.ability` (ARCHITECTURE 5.14), e.g. `onub.take`. */
 export const OnubActId = z.string().regex(/^onub\.[a-z][A-Za-z]*$/);
@@ -10,7 +10,7 @@ export const OnubRole = z.strictObject({
   faction: Faction,
   ships: Ships,
   /** Who this role wins with when the dawn table is judged on final loaves. */
-  winsWith: z.enum(["village", "cabal", "self"]),
+  winsWith: z.enum(['village', 'cabal', 'self']),
   /** Has a night window in balance.onub.json (false: Debtor, Gamekeeper, Mourner). */
   wakes: z.boolean(),
   /** Night act summary for the role card; the window itself lives in balance.onub.json. */

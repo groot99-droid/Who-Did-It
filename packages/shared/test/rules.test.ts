@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { assignRoles, dealTraits, mulberry32, shuffle, type Roster } from '../src/rules';
 
-// Inline fixture copying GDD 3.1 until packages/content lands roles.json.
-const roster: Roster = {
+// Inline fixture copying GDD 3.1; `packages/content/data/roles.json` carries the same `deal` shape.
+const rosterCounts: Record<string, Record<string, number>> = {
   '4': { killer: 1, detective: 1, townsfolk: 2 },
   '5': { killer: 1, detective: 1, doctor: 1, townsfolk: 2 },
   '6': { killer: 1, detective: 1, doctor: 1, butler: 1, townsfolk: 2 },
@@ -21,6 +21,12 @@ const roster: Roster = {
     townsfolk: 1,
   },
 };
+const roster: Roster = Object.fromEntries(
+  Object.entries(rosterCounts).map(([n, counts]) => [
+    n,
+    { deal: Object.entries(counts).flatMap(([roleId, k]) => Array.from({ length: k }, () => roleId)) },
+  ]),
+);
 const idsFor = (n: number) => Array.from({ length: n }, (_, i) => `p${i}`);
 const settings = { mode: 0 };
 
@@ -52,7 +58,7 @@ describe('assignRoles', () => {
         const roles = assignRoles(idsFor(n), settings, mulberry32(seed), roster);
         const counts: Record<string, number> = {};
         for (const r of roles.values()) counts[r] = (counts[r] ?? 0) + 1;
-        expect(counts).toEqual(roster[String(n)]);
+        expect(counts).toEqual(rosterCounts[String(n)]);
         expect(roles.size).toBe(n);
       }
     });
@@ -79,7 +85,9 @@ describe('assignRoles', () => {
 
   it('throws without a roster row or when the row does not sum to the count', () => {
     expect(() => assignRoles(idsFor(3), settings, mulberry32(1), roster)).toThrow(/no roster row/);
-    expect(() => assignRoles(idsFor(4), settings, mulberry32(1), { '4': { killer: 1 } })).toThrow(/deals 1/);
+    expect(() => assignRoles(idsFor(4), settings, mulberry32(1), { '4': { deal: ['killer'] } })).toThrow(
+      /deals 1/,
+    );
   });
 });
 

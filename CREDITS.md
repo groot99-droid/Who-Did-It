@@ -23,18 +23,18 @@ Every third-party or generated asset that ships in this repository has a row her
 
 ## Third-party assets
 
-| Files | Title | Author | URL | Licence | Notes |
-|---|---|---|---|---|---|
+| Files                                                                                         | Title | Author           | URL                           | Licence | Notes                                                          |
+| --------------------------------------------------------------------------------------------- | ----- | ---------------- | ----------------------------- | ------- | -------------------------------------------------------------- |
 | `tools/sprites` placeholder labels (rendered into `apps/client/public/assets/placeholder/**`) | Inter | Rasmus Andersson | https://github.com/rsms/inter | OFL-1.1 | via `@fontsource/inter`; text in `LICENSES/fonts/` (Session B) |
 
 ## Generated assets
 
-| Files | Tool | Model / feature | Date | Generation id | Catalog id | Notes |
-|---|---|---|---|---|---|---|
-| `assets/source/concepts/villager-hero-front.png` | Higgsfield (Plus plan, paid) | `generate_image`, `gpt_image_2_5`, 3:4 | 2026-10-10 | `ab6c960d-28d9-4f48-b6bf-23def6ae3fb0` | pending `higgsfield-library-sync` | Prompt (1) subject as a single front view, style suffix verbatim. Drifted to about 7 heads tall and soft shading |
-| `assets/source/concepts/villager-turnaround.png` | Higgsfield (Plus plan, paid) | `generate_image`, `gpt_image_2_5`, 16:9, hero as `image_references` | 2026-10-10 | `88a9ae17-2b15-4588-b1b5-9aba9459a90d` | pending `higgsfield-library-sync` | Prompt (1) turnaround with "3-heads-tall" and "flat cel" restated; consistent four views, about 4.5 heads tall |
+| Files                                                                                                            | Tool                         | Model / feature                                                     | Date       | Generation id                          | Catalog id                        | Notes                                                                                                            |
+| ---------------------------------------------------------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------- | ---------- | -------------------------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `assets/source/concepts/villager-hero-front.png` _(held on branch `claude/art-pipeline` until open question 13)_ | Higgsfield (Plus plan, paid) | `generate_image`, `gpt_image_2_5`, 3:4                              | 2026-10-10 | `ab6c960d-28d9-4f48-b6bf-23def6ae3fb0` | pending `higgsfield-library-sync` | Prompt (1) subject as a single front view, style suffix verbatim. Drifted to about 7 heads tall and soft shading |
+| `assets/source/concepts/villager-turnaround.png` _(held on branch `claude/art-pipeline` until open question 13)_ | Higgsfield (Plus plan, paid) | `generate_image`, `gpt_image_2_5`, 16:9, hero as `image_references` | 2026-10-10 | `88a9ae17-2b15-4588-b1b5-9aba9459a90d` | pending `higgsfield-library-sync` | Prompt (1) turnaround with "3-heads-tall" and "flat cel" restated; consistent four views, about 4.5 heads tall   |
 
 ## Adobe generative use
 
 | Files | Feature | Date | Notes |
-|---|---|---|---|
+| ----- | ------- | ---- | ----- |

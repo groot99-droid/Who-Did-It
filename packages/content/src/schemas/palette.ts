@@ -1,9 +1,9 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-const Hex = z.string().regex(/^#[0-9A-F]{6}$/, "colours are #RRGGBB upper case");
+const Hex = z.string().regex(/^#[0-9A-F]{6}$/, 'colours are #RRGGBB upper case');
 
 export const PaletteFile = z.strictObject({
-  source: z.literal("docs/ASSETS.md 6.1"),
+  source: z.literal('docs/ASSETS.md 6.1'),
   colors: z.strictObject({
     ink: Hex,
     slate: Hex,
@@ -23,11 +23,11 @@ export const PaletteFile = z.strictObject({
   }),
   rules: z.strictObject({
     maxSaturatedAccentShare: z.number().min(0).max(1),
-    outlineToken: z.literal("ink"),
+    outlineToken: z.literal('ink'),
     outlinePx: z.number().positive(),
-    interactableToken: z.literal("teal"),
-    hazardToken: z.literal("magenta"),
-    primaryButtonToken: z.literal("mustard"),
+    interactableToken: z.literal('teal'),
+    hazardToken: z.literal('magenta'),
+    primaryButtonToken: z.literal('mustard'),
     uiStrokePx: z.number().positive(),
   }),
 });

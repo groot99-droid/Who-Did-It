@@ -147,7 +147,7 @@ The only colours allowed (`ASSETS.md` 6.1; machine copy `packages/content/data/p
 | `lantern` | `#FFB457` | warm light, key light colour family |
 | `moon` | `#7FA8FF` | cool light, fill colour family, Village faction |
 
-**Scarf tints (proposal, pending a `scarf` entry in `palette.json` by Session C).** Red = `blood`,
+**Scarf tints (source: `packages/content/data/traits.json`, `axes.scarf.values[].tint`).** Red = `blood`,
 green = `teal`, blue = `moon`. The nameplate shape (diamond, circle, square; GDD 3.1) carries the
 trait for colour-blind players, so the tint is never the only signal.
 

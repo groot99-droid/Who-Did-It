@@ -7,3 +7,7 @@ docs
 CLAUDE.md
 README.md
 .claude
+# @wdi/content data has its own canonical layout (packages/content/scripts/lint-data.mjs, `pnpm --filter @wdi/content format`)
+packages/content/data
+apps/client/public/assets
+assets/source

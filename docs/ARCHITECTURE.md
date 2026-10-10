@@ -15,6 +15,10 @@
 | zod | `zod ^4.6.5` | `@wdi/content` validators (Session C, 2026-10-10) |
 | TypeScript | ~5.9 | 7.x breaks typescript-eslint until 7.1 |
 | Tooling (Session A, caret pins) | `eslint ^10.12`, `typescript-eslint ^8.71`, `@eslint/js ^10.0.1`, `globals ^17.13`, `prettier ^3.9`, `tsup ^8.5` (server bundle), `tsx ^4.23` (dev) | Added 2026-10-10 |
+| Client runtime | `mitt ^3.0.1` | `NetworkService` event bus (Session B, 2026-10-10) |
+| Sprite tools | `free-tex-packer-core ^0.3.9`, `@napi-rs/canvas ^1.0.11`, `@fontsource/inter ^5.3.0` | `tools/sprites` packer and placeholder atlas (Session D, 2026-10-10) |
+| Type stubs | `@types/node ^22`, `@types/express ^5` | Added 2026-10-10 |
+| Python | 3.12+ for `tools/blender` tests (`python3 -m unittest`); the `bpy 5.2.0` wheel only for rendering | CI runs the tests without Blender |
 | Blender / Tiled / Audacity | 5.2 LTS / 1.11 / 4.0.1 | Tiled only from M6 |
 
 ### 5.2 Monorepo
@@ -138,13 +142,13 @@ Stays: server, `@wdi/shared`, `@wdi/content`, lobby, CI, hosting. Changes: rende
 
 | Area | Delta |
 |---|---|
-| Settings | `Settings.mode: uint8` (0 main, 1 onub); `floury` toggle (V1.1). The lobby chip reads "One Night Ultimate Baguette, 6-9 min, 4-10". |
+| Settings | `Settings.mode: uint8` (0 main, 1 onub); `floury` toggle (V1.1). The lobby chip reads "One Night Ultimate Baguette, 5-7 min, 4-10" (length from `balance.onub.json`; open question 12). |
 | Phases | lobby -> roleReveal -> dusk -> night -> dawn -> meetingDiscussion -> meetingVote -> reveal. Unused: grace, day, immunity, finalNight. The night Conductor is a server-side window list; `phaseEndsTick` is public, the open window is not. |
 | Rules (pure, `packages/shared/src/rules/onub.ts`) | `buildOnubDeck(count)`, `dealOnub(ids, deck, rng)` -> `{dealt, center[3]}`, `nightScript(deck)` -> windows (every role's window runs even when it sits in the center), `applyNightAct(night, act)` -> `{next, reveal}`, `tallyNoSkip(votes)`, `resolveDawn(tally, finals, gamekeeperVote)`, `onubWinners(outs, finals, center)`. Property tests: deck size is count + 3 for every row, every swap is a permutation, the winner table is exhaustive. |
 | Reused rules | seeded PRNG, `dealTraits` (cosmetic), the vote tally helper, the roster loader. |
 | Schema | `Private.dealtRole`, `Private.nightReveal: array<{slot, roleId}>`; `cabalMates` reused for Poisoners, Hireling and Pallbearers. Bakery `SceneState.props` holds `plate_<playerId>` and `deadloaf_0..2` with a `turned` bit. Server memory only: `finalRoles`, `center`, `swapLog`, the Conductor. `winner` enum adds `debtor` and `nobody`. |
 | Privacy | Sleepers are moved to a `loft` pseudo-scene with no presence encoding; only the players woken for a window share the `bakery` view, so a sleeper's client never receives who is awake. The woken set is derived from the DEALT role, never the current one. |
-| Messages | `act.ability` ids `onub.peekPlate`, `onub.peekDead`, `onub.take`, `onub.swapPlates {targetId, targetId2}`, `onub.swapDead`, `onub.check`; `meeting.vote` rejects `"skip"` with 422 in this mode; S->C private `nightWake {windowRole, endsTick, spawn}`, `nightReveal {entries}`, `nightSleep`; `gameOver` adds `dealt`, `final`, `center`, `swapLog`, `votes`, `outs`. |
+| Messages | `act.ability` ids `onub.peekPlate`, `onub.peekDead`, `onub.take`, `onub.swapPlates {targetId, targetId2}`, `onub.swapDead`, `onub.check`, `onub.readLedger` (Hireling); `meeting.vote` rejects `"skip"` with 422 in this mode; S->C private `nightWake {windowRole, endsTick, spawn}`, `nightReveal {entries}`, `nightSleep`; `gameOver` adds `dealt`, `final`, `center`, `swapLog`, `votes`, `outs`. |
 | Unchanged | codes, join, reconnection, the RoleReveal card, the World scene, movement, portals, the Meeting scene (chat, secret vote, early end, reveal), traits and nameplates, rate limits, the privacy views. |
 | Tests | `@colyseus/testing`: a 6-bot deal has 9 loaves; the Hireling's `nightReveal` names both Poisoners; a sleeper receives no `presence` during any window; a vote of `"skip"` is refused; the swap log replays to the final roles. |
 

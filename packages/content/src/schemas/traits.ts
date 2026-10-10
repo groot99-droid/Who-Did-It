@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { GddRef, Id, PaletteToken, Ships, WorldId } from "./common.js";
+import { z } from 'zod';
+import { GddRef, Id, PaletteToken, Ships, WorldId } from './common.js';
 
 const TraitValue = z.strictObject({
   id: Id,
@@ -11,24 +11,24 @@ export const TraitsFile = z.strictObject({
   gddRef: GddRef,
   axes: z.strictObject({
     height: z.strictObject({
-      clue: z.literal("footprints"),
+      clue: z.literal('footprints'),
       values: z.array(TraitValue.extend({ spriteScale: z.number().positive() })).length(3),
     }),
     scarf: z.strictObject({
-      clue: z.literal("thread"),
+      clue: z.literal('thread'),
       values: z
         .array(
           TraitValue.extend({
             tint: PaletteToken,
-            nameplateShape: z.enum(["diamond", "circle", "square"]),
+            nameplateShape: z.enum(['diamond', 'circle', 'square']),
           }),
         )
         .length(3),
     }),
     hat: z.strictObject({
-      clue: z.literal("felt"),
+      clue: z.literal('felt'),
       values: z
-        .array(TraitValue.extend({ overlayPass: z.enum(["hat_cap", "hat_bowler"]).nullable() }))
+        .array(TraitValue.extend({ overlayPass: z.enum(['hat_cap', 'hat_bowler']).nullable() }))
         .length(3),
     }),
   }),

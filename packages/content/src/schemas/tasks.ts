@@ -1,12 +1,12 @@
-import { z } from "zod";
-import { GddRef, Id, PrefixedId, Seconds, Ships, Tiles, WorldId } from "./common.js";
+import { z } from 'zod';
+import { GddRef, Id, PrefixedId, Seconds, Ships, Tiles, WorldId } from './common.js';
 
 const Node = z.strictObject({ scene: WorldId, prop: PrefixedId });
 
 export const Task = z.strictObject({
   id: Id,
   name: z.string().min(1),
-  kind: z.enum(["fetch", "coop"]),
+  kind: z.enum(['fetch', 'coop']),
   /** Item fetched from `source` and delivered to one of `targets` (fetch tasks). */
   tool: Id.optional(),
   toolQty: z.number().int().positive().optional(),

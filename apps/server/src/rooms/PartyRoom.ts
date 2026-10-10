@@ -4,6 +4,7 @@ import {
   C2S,
   GameState,
   type GameStateType,
+  MAX_MESSAGES_PER_SECOND,
   MAX_PLAYERS,
   NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
@@ -41,6 +42,8 @@ const isCommandType = (type: string): boolean => (Object.values(C2S) as string[]
 export class PartyRoom extends Room<{ state: GameStateType }> {
   override maxClients = MAX_PLAYERS;
   override patchRate = PATCH_RATE_MS;
+  /** Hard cap (ARCHITECTURE 5.11); the per-type buckets of M7 drop rather than disconnect. */
+  override maxMessagesPerSecond = MAX_MESSAGES_PER_SECOND;
   readonly commands = new CommandQueue();
   private code = '';
 

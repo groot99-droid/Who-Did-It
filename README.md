@@ -10,7 +10,7 @@ It crosses Among Us (tasks, bodies, emergency meetings), Mafia / Werewolf (hidde
 a vote as the climax), a whodunit (physical clues with hidden traits and a Detective who verifies
 them) and Hello Neighbor (enterable houses, locked doors, hiding spots, wolves in the woods).
 
-It also ships **One Night Ultimate Baguette**, a 6-9 minute quick mode played around the baker's
+It also ships **One Night Ultimate Baguette**, a short quick mode (one night, one vote) played around the baker's
 wake loaves: one night of peeking and swapping, one vote, and the loaf on your plate at dawn is
 who you are. The owner's friend invented it as a wrapper of the one-night hidden-role card game.
 

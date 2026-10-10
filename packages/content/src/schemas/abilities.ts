@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { GddRef, Id, Seconds, Ships, Tiles } from "./common.js";
-import { NoiseKey } from "./balance.js";
+import { z } from 'zod';
+import { GddRef, Id, Seconds, Ships, Tiles } from './common.js';
+import { NoiseKey } from './balance.js';
 
 /**
  * Every verb that carries a number: role abilities shown on a card, item uses (an item's
@@ -9,10 +9,10 @@ import { NoiseKey } from "./balance.js";
 export const Ability = z.strictObject({
   id: Id,
   name: z.string().min(1),
-  scope: z.enum(["role", "item", "universal"]),
+  scope: z.enum(['role', 'item', 'universal']),
   /** `hold` is a start/stop command re-validated every tick (`act.hold`). */
-  kind: z.enum(["active", "hold", "passive"]),
-  target: z.enum(["none", "self", "player", "body", "clue", "door", "spot", "ground", "water"]),
+  kind: z.enum(['active', 'hold', 'passive']),
+  target: z.enum(['none', 'self', 'player', 'body', 'clue', 'door', 'spot', 'ground', 'water']),
   cooldownS: Seconds.optional(),
   /** Time the actor must hold or channel before it resolves; 0 is instant. */
   castS: Seconds.optional(),

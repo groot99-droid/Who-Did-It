@@ -1,26 +1,26 @@
-import { z } from "zod";
-import { GddRef, Id, Seconds, Tiles, byPlayerCount } from "./common.js";
+import { z } from 'zod';
+import { GddRef, Id, Seconds, Tiles, byPlayerCount } from './common.js';
 
 export const NOISE_KEYS = [
-  "walk",
-  "run",
-  "door",
-  "killScream",
-  "rag",
-  "skeletonKey",
-  "crowbar",
-  "bolt",
-  "lockpick",
-  "hide",
-  "burst",
-  "oneWayDrop",
-  "goat",
-  "wispRattle",
+  'walk',
+  'run',
+  'door',
+  'killScream',
+  'rag',
+  'skeletonKey',
+  'crowbar',
+  'bolt',
+  'lockpick',
+  'hide',
+  'burst',
+  'oneWayDrop',
+  'goat',
+  'wispRattle',
 ] as const;
 export const NoiseKey = z.enum(NOISE_KEYS);
 export type NoiseKey = z.infer<typeof NoiseKey>;
 
-export const Profile = z.enum(["small", "medium", "large"]);
+export const Profile = z.enum(['small', 'medium', 'large']);
 export type Profile = z.infer<typeof Profile>;
 export const PROFILE_RANK: Record<Profile, number> = { small: 0, medium: 1, large: 2 };
 
@@ -31,7 +31,7 @@ export const BalanceRow = z.strictObject({
   discussionS: Seconds,
   tasksEach: z.number().int().positive(),
   /** `villageAtMostOne`: Cabal wins when living Village <= 1 (4-5 players). */
-  cabalWin: z.enum(["parity", "villageAtMostOne"]),
+  cabalWin: z.enum(['parity', 'villageAtMostOne']),
   profile: Profile,
   gddRef: GddRef,
 });

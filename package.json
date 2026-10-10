@@ -14,7 +14,8 @@
     "lint": "pnpm -r --if-present lint && eslint . && prettier --check .",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "assets:render": "pnpm --filter @wdi/blender render:smoke"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

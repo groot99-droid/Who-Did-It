@@ -1,7 +1,7 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const MetricsFile = z.strictObject({
-  source: z.literal("docs/WORLD.md 4.2, docs/ASSETS.md 6.1-6.3"),
+  source: z.literal('docs/WORLD.md 4.2, docs/ASSETS.md 6.1-6.3'),
   tilePx: z.literal(64),
   metersPerTile: z.literal(1),
   characterCellPx: z.literal(128),

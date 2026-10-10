@@ -12,7 +12,7 @@
 
 ### 4.2 Metrics
 
-`TILE_PX = 64`; 1 tile = 1 m; character render cell 128 px; max standing silhouette 90 px; interiors are authored at 20x11 tiles or larger with camera follow (no whole-room fit). The exporter fails on any tileset whose `tilewidth` is not 64. All radii in rules are in tiles and live in `@wdi/shared/constants.ts`.
+`TILE_PX = 64`; 1 tile = 1 m; character render cell 128 px; max standing silhouette 90 px; interiors are at least 12x9 tiles (the loft and bedroom rooms) with camera follow (no whole-room fit); every size is in 4.3 and `scenes/*.json`. The exporter fails on any tileset whose `tilewidth` is not 64. All radii in rules are in tiles and live in `@wdi/shared/constants.ts`.
 
 ### 4.3 Scene graph
 

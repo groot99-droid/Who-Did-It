@@ -1,15 +1,15 @@
-import Phaser from "phaser";
-import { setRoute } from "../flags";
-import { mountLanding } from "../ui/Landing";
-import { overlayRoot, type Screen } from "../ui/dom";
-import { Backdrop } from "../view/Backdrop";
-import { getFlags, getHealth, getNet } from "./registry";
+import Phaser from 'phaser';
+import { setRoute } from '../flags';
+import { mountLanding } from '../ui/Landing';
+import { overlayRoot, type Screen } from '../ui/dom';
+import { Backdrop } from '../view/Backdrop';
+import { getFlags, getHealth, getNet } from './registry';
 
 export class Landing extends Phaser.Scene {
   private screen: Screen | null = null;
 
   constructor() {
-    super("Landing");
+    super('Landing');
   }
 
   create(): void {
@@ -21,7 +21,7 @@ export class Landing extends Phaser.Scene {
 
     const enterLobby = (code: string) => {
       setRoute(`lobby/${code}`);
-      this.scene.start("Lobby");
+      this.scene.start('Lobby');
     };
 
     const show = () => {
@@ -38,7 +38,7 @@ export class Landing extends Phaser.Scene {
       void net.resume(code).then((ok) => {
         if (!this.scene.isActive()) return;
         if (ok) return enterLobby(code);
-        setRoute("");
+        setRoute('');
         show();
       });
     } else {

@@ -16,7 +16,8 @@ export function createServer(limits: Partial<GuardLimits> = {}) {
     greet: false,
     rooms: { party: defineRoom(PartyRoom) },
     express: (app) => {
-      // Render and Railway sit behind one proxy hop; the per-IP bucket reads the forwarded address.
+      // One proxy hop on Render and Railway. This only affects Express's `req.ip`; the matchmake bucket
+      // derives the caller address itself (`clientIp` in matchmakeGuard.ts).
       app.set('trust proxy', 1);
       app.get('/health', (req, res) => {
         const origin = req.headers.origin;

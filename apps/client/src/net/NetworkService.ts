@@ -1,6 +1,6 @@
-import { Callbacks, Client, type Room as ColyseusRoom } from "@colyseus/sdk";
-import mitt, { type Emitter } from "mitt";
-import { BUILD_VERSION, SERVER_URL } from "../health";
+import { Callbacks, Client, CloseCode, type Room as ColyseusRoom } from '@colyseus/sdk';
+import mitt, { type Emitter } from 'mitt';
+import { BUILD_VERSION, SERVER_URL } from '../health';
 import {
   type ClientMessages,
   type ClientMessageType,
@@ -14,11 +14,11 @@ import {
   type RoleRevealPayload,
   type ServerMessageType,
   type ServerMessages,
-} from "./protocol";
-import { deviceId, reconnectTokens } from "./storage";
+} from './protocol';
+import { deviceId, reconnectTokens } from './storage';
 
 /** The state schema arrives with `@wdi/shared`; until then the room is dynamically typed. */
-type Room = ColyseusRoom<any, any>;
+type Room = ColyseusRoom;
 
 export interface LobbySnapshot {
   code: string;
@@ -41,7 +41,7 @@ export type NetEvents = {
 export class JoinError extends Error {
   constructor() {
     super(JOIN_FAILED_MESSAGE);
-    this.name = "JoinError";
+    this.name = 'JoinError';
   }
 }
 
@@ -64,7 +64,7 @@ export interface NetworkService {
   leave(): Promise<void>;
 }
 
-const SERVER_MESSAGES: readonly ServerMessageType[] = ["roleReveal", "phaseChange", "gameOver", "error"];
+const SERVER_MESSAGES: readonly ServerMessageType[] = ['roleReveal', 'phaseChange', 'gameOver', 'error'];
 
 /** Minimal view of the room state the lobby needs; the real schema arrives with `@wdi/shared`. */
 interface PlayerState {
@@ -76,10 +76,10 @@ interface PlayerState {
 
 /** The slice of the `Callbacks` API the lobby uses, typed for the dynamic state above. */
 interface LobbyCallbacks {
-  onAdd(prop: "players", handler: (player: PlayerState, key: string) => void): () => void;
-  onRemove(prop: "players", handler: (player: PlayerState, key: string) => void): () => void;
+  onAdd(prop: 'players', handler: (player: PlayerState, key: string) => void): () => void;
+  onRemove(prop: 'players', handler: (player: PlayerState, key: string) => void): () => void;
   onChange(instance: object, handler: () => void): () => void;
-  listen(prop: "leaderId", handler: (value: string) => void): () => void;
+  listen(prop: 'leaderId', handler: (value: string) => void): () => void;
 }
 
 export class ColyseusNetwork implements NetworkService {
@@ -87,7 +87,7 @@ export class ColyseusNetwork implements NetworkService {
   private readonly client = new Client(SERVER_URL);
   private room: Room | null = null;
   private players = new Map<string, PlayerState>();
-  private leaderId = "";
+  private leaderId = '';
   private last: LobbySnapshot | null = null;
   private disposers: Array<() => void> = [];
 
@@ -130,7 +130,7 @@ export class ColyseusNetwork implements NetworkService {
     payload: ClientMessages[K],
     timeoutMs = 5000,
   ): Promise<Res> {
-    if (this.room === null) throw new Error("not connected");
+    if (this.room === null) throw new Error('not connected');
     return this.room.request<ClientMessages[K], Res>(type as never, payload, { timeout: timeoutMs });
   }
 
@@ -140,7 +140,7 @@ export class ColyseusNetwork implements NetworkService {
     reconnectTokens.clear(room.roomId);
     this.detach();
     await room.leave(true);
-    this.bus.emit("left", { consented: true });
+    this.bus.emit('left', { consented: true });
   }
 
   private async enter(connect: () => Promise<Room>): Promise<string> {
@@ -160,37 +160,37 @@ export class ColyseusNetwork implements NetworkService {
   private wire(room: Room): void {
     for (const type of SERVER_MESSAGES) {
       room.onMessage(type, (payload: ServerMessages[typeof type]) => {
-        if (type === "gameOver") reconnectTokens.clear(room.roomId);
+        if (type === 'gameOver') reconnectTokens.clear(room.roomId);
         this.bus.emit(type, payload as never);
       });
     }
     room.onLeave((code) => {
-      const consented = code === 1000;
+      const consented = code === CloseCode.CONSENTED;
       if (consented) reconnectTokens.clear(room.roomId);
       if (this.room === room) this.room = null;
-      this.bus.emit("left", { consented });
+      this.bus.emit('left', { consented });
     });
     room.onError((_code, message) => {
       // Transport-level problems are not game errors; surface them without any payload detail.
-      this.bus.emit("error", { code: 422, msg: message ?? "connection error" });
+      this.bus.emit('error', { code: 422, msg: message ?? 'connection error' });
     });
 
     this.players = new Map();
-    this.leaderId = "";
+    this.leaderId = '';
     this.last = null;
     const cb = Callbacks.get(room) as unknown as LobbyCallbacks;
     const emit = () => this.emitLobby(room);
     this.disposers.push(
-      cb.onAdd("players", (player: PlayerState, key: string) => {
+      cb.onAdd('players', (player: PlayerState, key: string) => {
         this.players.set(key, player);
         this.disposers.push(cb.onChange(player, emit));
         emit();
       }),
-      cb.onRemove("players", (_player: PlayerState, key: string) => {
+      cb.onRemove('players', (_player: PlayerState, key: string) => {
         this.players.delete(key);
         emit();
       }),
-      cb.listen("leaderId", (value: string) => {
+      cb.listen('leaderId', (value: string) => {
         this.leaderId = value;
         emit();
       }),
@@ -206,7 +206,7 @@ export class ColyseusNetwork implements NetworkService {
       connected: p.connected,
     }));
     this.last = { code: room.roomId, selfId: room.sessionId, leaderId: this.leaderId, players };
-    this.bus.emit("lobby", this.last);
+    this.bus.emit('lobby', this.last);
   }
 
   private detach(): void {

@@ -19,7 +19,7 @@ export function removeItem(key: string): void {
   safe(() => localStorage.removeItem(key), undefined);
 }
 
-const DEVICE_KEY = "wdi:deviceId";
+const DEVICE_KEY = 'wdi:deviceId';
 
 /** Stable random id per browser; used by the server for room bans (5.3). Not a secret. */
 export function deviceId(): string {
