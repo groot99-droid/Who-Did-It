@@ -21,7 +21,7 @@ Planning complete, implementation not started. Everything about the game lives i
 
 | Version | Rendering | Networking | Players | Art |
 |---|---|---|---|---|
-| **V1** (this repo first) | Top-down 2.5D in Phaser with pre-rendered 3D sprites from Blender | Static client on GitHub Pages, authoritative Colyseus server on a small host | 4-10 | Stylized toon-noir |
+| **V1** (this repo first) | Top-down 2.5D in Phaser 4 with pre-rendered 3D sprites from Blender | Static client on GitHub Pages, authoritative Colyseus server (Render Free, then Railway) | 4-10 | Stylized toon-noir |
 | **V2** (later) | First-person 3D in the browser, same server, rules and world data | same | 4-10 | same |
 
 ## Planned layout
@@ -39,7 +39,7 @@ docs/             game design, world bible, architecture, asset pipeline, roadma
 
 Art masters, studio notes and the Higgsfield generations library live in the owner's ROSW repo,
 [Pipelines-Plugin](https://github.com/groot99-droid/Pipelines-Plugin); see `docs/ASSETS.md` 6.10.
-`docs/ASSETS.md` 6.10 has the one-file settings change that registers that marketplace here and enables its `ui-design` plugin.
+This repo's `.claude/settings.json` registers that marketplace and enables its `ui-design` plugin.
 
 ## Documents
 

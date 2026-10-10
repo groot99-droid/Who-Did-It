@@ -2,7 +2,7 @@
 
 Status: v0.1 master plan, committed 2026-10-10 for owner review. The working documents under `docs/` (`GDD.md`, `WORLD.md`, `ARCHITECTURE.md`, `ASSETS.md`, `ROADMAP.md`, `DECISIONS.md`, `RESEARCH.md`) are generated from this file; once the owner answers the open questions in `DECISIONS.md` the working documents become the source of truth and this file stays as the frozen snapshot. `GDD.md` and `packages/content/data/balance.json` are the only sources of numbers; every other document references them.
 
-Amendments since v0.1 (the hat trait approved, masters on the owner's laptop, the One Night Ultimate Baguette quick mode, the ROSW repo connection) are logged in `docs/DECISIONS.md` under Amendments and applied to the working documents. This snapshot is not edited.
+Amendments since v0.1 (the hat trait approved, masters on the owner's laptop, the One Night Ultimate Baguette quick mode, the ROSW repo connection, Phaser 4.2.1, Render Free then Railway, the full loop before the quick mode) are logged in `docs/DECISIONS.md` under Amendments and applied to the working documents. This snapshot is not edited.
 
 ## 1. Vision & pillars
 

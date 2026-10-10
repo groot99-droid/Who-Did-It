@@ -57,11 +57,10 @@ Versions are pinned in `docs/ARCHITECTURE.md` 5.1. Sessions never upgrade depend
   `assets/source/MANIFEST.md` in this repo mirrors every master's path, hash and date.
 - Higgsfield generations are catalogued in ROSW `studio/library/catalog.json`; a
   `CREDITS.md` row for a generated asset cites that catalog id.
-- The ROSW marketplace and its `ui-design` plugin (style catalog, contrast-checked
-  design-system generator) are meant to be registered for this repo through
-  `.claude/settings.json`; the exact file is in `docs/ASSETS.md` 6.10 and is added once the
-  owner approves it. The `rosw` plugin itself (creative-writing and studio pipelines) only
-  works from the ROSW checkout, so it is not enabled here.
+- `.claude/settings.json` registers the ROSW marketplace and enables its `ui-design`
+  plugin (style catalog, contrast-checked design-system generator); see `docs/ASSETS.md`
+  6.10. The `rosw` plugin itself (creative-writing and studio pipelines) only works from
+  the ROSW checkout, so it is not enabled here.
 - ROSW `writing-museum/` is a Three.js first-person viewer with doors, rooms, lights,
   touch and gamepad input; it is the candidate seed for the V2 renderer.
 

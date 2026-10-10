@@ -9,7 +9,7 @@
 | Component | Pin | Note |
 |---|---|---|
 | Node / pnpm | 22.12+ / 10 | `.nvmrc` 22; `engines.node >= 22.12` |
-| Phaser | 3.90.0 (owner decision; see open question 1) | No Phaser-4-only features used; `pixelArt: false` globally |
+| Phaser | 4.2.1 (owner decision 2026-10-10) | Official Vite + TypeScript template; lighting via `setLighting(true)`, tint fill via `setTintMode`, filters for vignette and bloom; `pixelArt: false` globally; the GPU tilemap layer is optional (orthographic, single tileset) |
 | Colyseus | `colyseus ^0.18.9`, `@colyseus/core ^0.18.18`, `@colyseus/schema ^5.0.36`, `@colyseus/sdk ^0.18.5`, `@colyseus/testing ^0.18.6` | Never `colyseus.js` |
 | Vite / Vitest / Playwright | ^8.3 / ^5.0 / ^1.64 | |
 | TypeScript | ~5.9 | 7.x breaks typescript-eslint until 7.1 |
@@ -116,7 +116,7 @@ Scenes: `Boot` (flags, `/health` poll) -> `Preload` -> `Landing` (DOM) -> `Lobby
 
 - `ci.yml` (push / PR): checkout@v7, setup-node@v7 (22), pnpm via corepack, `pnpm lint && pnpm typecheck && pnpm test`, a dist size report.
 - `pages.yml` (main): build the client with `VITE_SERVER_URL` and `VITE_BUILD_VERSION=${GITHUB_SHA::8}` from Actions variables, configure-pages@v6, upload-pages-artifact@v5 (`apps/client/dist`), deploy-pages@v5; Pages source = GitHub Actions; `base: '/Who-Did-It/'`; hash routing.
-- **Server host: Railway Hobby ($5/month, always-on, managed wss)** deployed through Railway's GitHub integration with Nixpacks (build `pnpm --filter @wdi/server build`, start `node apps/server/build/index.js`, `NODE_ENV=production`, `WDI_DEBUG` unset). No Dockerfile, no deploy workflow, no staging server, no PR previews. Fallback for early playtests: Render Free with the "waking" landing state. Single process; no Redis.
+- **Server host, two steps (owner decision 2026-10-10).** M0 to M3: **Render Free** web service built from the GitHub repo (same build and start commands), accepting the 15-minute idle spin-down and the one-minute wake; the landing page polls `/health` and shows "Waking the village..." until the server answers. From the first playtest with friends (M3 exit): **Railway Hobby ($5/month, always-on, managed wss)** through Railway's GitHub integration with Nixpacks (build `pnpm --filter @wdi/server build`, start `node apps/server/build/index.js`, `NODE_ENV=production`, `WDI_DEBUG` unset); only `VITE_SERVER_URL` changes. No Dockerfile, no deploy workflow, no staging server, no PR previews. Single process; no Redis.
 - `GET /health` -> `{ok, build, rooms, tickP95, patchBytes}`. CORS restricted to `https://groot99-droid.github.io` and localhost. The client pings every 20 s. `BUILD_VERSION` from `@wdi/shared/version.ts` is injected on both sides; mismatches are refused with the generic join error and the client shows "refresh to update".
 
 ### 5.11 Security
