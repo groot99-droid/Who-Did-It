@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Hat: cap">
+  <title>Hat: cap</title>
+  <path d="M9 27 C9 16 16 11 25 11 C33 11 38 16 38 24 L38 27 Z" fill="#2C3240"/>
+  <path d="M30 26 C36 26 43 28 43 31 C43 33 38 33 33 32 L30 31 Z" fill="#2C3240"/>
+  <path d="M8 31 H32" />
+  <circle cx="24" cy="11" r="2" fill="#6F7A8C"/>
+</svg>

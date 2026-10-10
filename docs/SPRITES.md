@@ -194,13 +194,15 @@ grammar in M6.
 
 Hand-written SVG in `apps/client/public/assets/ui/icons/`, loaded by the DOM overlay, not Phaser.
 48 px grid (`viewBox="0 0 48 48"`), 2 px `ink` stroke with round caps and joins, palette fills only,
-no text. File name = key.
+no text. File name = key. They are drawn for the `bone` paper fill of the UI; on `slate` or `ink` panels
+put them on a `bone` chip, since the ink hats disappear otherwise. `tools/sprites/test/icons.test.ts`
+checks this list, the grid, the stroke and the colours.
 
 | Key | Meaning |
 |---|---|
-| `icon_faction_village` | Village: shield, `moon` |
+| `icon_faction_village` | Village: shield, `moon`, `bone` chevron |
 | `icon_faction_cabal` | Cabal: dagger, `blood` |
-| `icon_faction_neutral` | Neutral: mask, `mustard` |
+| `icon_faction_neutral` | Neutral: masquerade mask, `mustard` |
 | `icon_height_tall`, `icon_height_short` | Height trait (medium has no icon; the HUD shows the bare figure) |
 | `icon_scarf_red`, `icon_scarf_green`, `icon_scarf_blue` | Scarf trait; the nameplate shape (diamond, circle, square) is drawn on the scarf |
 | `icon_hat_cap`, `icon_hat_bowler`, `icon_hat_bare` | Hat trait |

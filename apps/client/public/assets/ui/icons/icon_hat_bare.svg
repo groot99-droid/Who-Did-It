@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Hat: bare">
+  <title>Hat: bare</title>
+  <circle cx="24" cy="29" r="12" fill="#D9D2C2"/>
+  <path d="M13 24 C15 18 20 16 24 17 C29 16 34 19 35 24" fill="#6F7A8C"/>
+  <path d="M12 12 C12 8 16 5 24 5 C32 5 36 8 36 12" stroke-dasharray="3 4" />
+</svg>
