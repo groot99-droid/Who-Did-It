@@ -1,0 +1,28 @@
+import { defineRoom, defineServer } from 'colyseus';
+import { BUILD_VERSION } from '@wdi/shared';
+import { PartyRoom } from './rooms/PartyRoom';
+import {
+  type GuardLimits,
+  installCors,
+  isAllowedOrigin,
+  installMatchmakeGuard,
+} from './services/matchmakeGuard';
+import { metrics } from './services/Metrics';
+
+export function createServer(limits: Partial<GuardLimits> = {}) {
+  installCors();
+  installMatchmakeGuard(limits);
+  return defineServer({
+    greet: false,
+    rooms: { party: defineRoom(PartyRoom) },
+    express: (app) => {
+      // Render and Railway sit behind one proxy hop; the per-IP bucket reads the forwarded address.
+      app.set('trust proxy', 1);
+      app.get('/health', (req, res) => {
+        const origin = req.headers.origin;
+        if (isAllowedOrigin(origin)) res.set({ 'Access-Control-Allow-Origin': origin, Vary: 'Origin' });
+        res.json(metrics.snapshot(BUILD_VERSION));
+      });
+    },
+  });
+}

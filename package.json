@@ -2,6 +2,7 @@
   "name": "who-did-it",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "description": "Browser multiplayer hidden-role game: static Phaser client on GitHub Pages, authoritative Colyseus server.",
   "license": "MIT",
   "packageManager": "pnpm@10.28.0",
@@ -10,8 +11,23 @@
   },
   "scripts": {
     "build": "pnpm -r --if-present build",
-    "lint": "pnpm -r --if-present lint",
+    "lint": "pnpm -r --if-present lint && eslint . && prettier --check .",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test"
+    "test": "pnpm -r --if-present test",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.71.1",
+    "vitest": "^5.0.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "@colyseus/uwebsockets-transport": "-"
+    }
   }
 }
