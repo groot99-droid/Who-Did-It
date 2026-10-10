@@ -1,0 +1,31 @@
+{
+  "gddRef": "3.1",
+  "axes": {
+    "height": {
+      "clue": "footprints",
+      "values": [
+        { "id": "short", "label": "Short", "spriteScale": 0.9 },
+        { "id": "mid", "label": "Medium height", "spriteScale": 1 },
+        { "id": "tall", "label": "Tall", "spriteScale": 1.1 }
+      ]
+    },
+    "scarf": {
+      "clue": "thread",
+      "values": [
+        { "id": "red", "label": "Red scarf", "tint": "blood", "nameplateShape": "diamond" },
+        { "id": "green", "label": "Green scarf", "tint": "teal", "nameplateShape": "circle" },
+        { "id": "blue", "label": "Blue scarf", "tint": "moon", "nameplateShape": "square" }
+      ]
+    },
+    "hat": {
+      "clue": "felt",
+      "values": [
+        { "id": "cap", "label": "Cap", "overlayPass": "hat_cap" },
+        { "id": "bowler", "label": "Bowler hat", "overlayPass": "hat_bowler" },
+        { "id": "bare", "label": "Bare head", "overlayPass": null }
+      ]
+    }
+  },
+  "overlayPasses": ["scarf", "hat_cap", "hat_bowler", "blood"],
+  "bodies": [{ "id": "villager", "ships": "V1" }]
+}

@@ -1,0 +1,412 @@
+{
+  "gddRef": "3.5",
+  "inventorySlots": 5,
+  "items": {
+    "knife": {
+      "id": "knife",
+      "name": "Knife",
+      "kind": "weapon",
+      "roleBound": true,
+      "onDeath": "kept",
+      "use": "kill",
+      "tooltip": "Kill.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "skeletonKey": {
+      "id": "skeletonKey",
+      "name": "Skeleton Key",
+      "kind": "key",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "skeletonKey",
+      "tooltip": "Open any locked door; leaves a print.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "masterKeyring": {
+      "id": "masterKeyring",
+      "name": "Master Keyring",
+      "kind": "key",
+      "roleBound": true,
+      "onDeath": "kept",
+      "use": "lockUnlock",
+      "tooltip": "Lock or unlock any door.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "bloodyRag": {
+      "id": "bloodyRag",
+      "name": "Bloody Rag",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "rag",
+      "tooltip": "Erase one clue.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "bucket": {
+      "id": "bucket",
+      "name": "Bucket",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "wash",
+      "tooltip": "Wash Blood off at water.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "plantKit": {
+      "id": "plantKit",
+      "name": "Plant Kit",
+      "kind": "charge",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "plantClue",
+      "tooltip": "Fake a trait clue.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "crowbar": {
+      "id": "crowbar",
+      "name": "Crowbar",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "crowbar",
+      "tooltip": "Break a locked door; it stays broken.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "magnifier": {
+      "id": "magnifier",
+      "name": "Magnifier",
+      "kind": "tool",
+      "roleBound": true,
+      "onDeath": "inspectStation",
+      "use": "inspect",
+      "tooltip": "Inspect a clue.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "notebook": {
+      "id": "notebook",
+      "name": "Notebook",
+      "kind": "tool",
+      "roleBound": true,
+      "onDeath": "kept",
+      "tooltip": "Auto-logs what you collect and learn.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "lens": {
+      "id": "lens",
+      "name": "Lens",
+      "kind": "charge",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "One Inspect.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "fingerprintKit": {
+      "id": "fingerprintKit",
+      "name": "Fingerprint Kit",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "dustCompare",
+      "tooltip": "Dust and Compare prints.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "medkit": {
+      "id": "medkit",
+      "name": "Medkit",
+      "kind": "medical",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "heal",
+      "tooltip": "Heal a wound.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "bandage": {
+      "id": "bandage",
+      "name": "Bandage",
+      "kind": "medical",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "bandage",
+      "tooltip": "The target survives the next kill attempt.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "salts": {
+      "id": "salts",
+      "name": "Salts",
+      "kind": "medical",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "salts",
+      "tooltip": "Cure Wounded or Snared.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "lantern": {
+      "id": "lantern",
+      "name": "Lantern",
+      "kind": "light",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "light",
+      "lightRadiusTiles": 4,
+      "tooltip": "Carried light; wolves flee it. Off is stealthier.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "candle": {
+      "id": "candle",
+      "name": "Candle",
+      "kind": "light",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "light",
+      "lightRadiusTiles": 2,
+      "tooltip": "Small carried light; wolves flee it.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "pocketWatch": {
+      "id": "pocketWatch",
+      "name": "Pocket Watch",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Shows the time.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "chalk": {
+      "id": "chalk",
+      "name": "Chalk",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "chalk",
+      "tooltip": "Floor marks visible to all.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "rope": {
+      "id": "rope",
+      "name": "Rope",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "rope",
+      "tooltip": "Free a snared player.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "slingshot": {
+      "id": "slingshot",
+      "name": "Slingshot",
+      "kind": "weapon",
+      "roleBound": true,
+      "onDeath": "kept",
+      "use": "slingshot",
+      "tooltip": "Stun a player.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "replicaKnife": {
+      "id": "replicaKnife",
+      "name": "Replica Knife",
+      "kind": "weapon",
+      "roleBound": true,
+      "onDeath": "kept",
+      "tooltip": "Looks like a knife. It is not.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "oil": {
+      "id": "oil",
+      "name": "Oil",
+      "kind": "deliverable",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Task: light the lanterns.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "wrench": {
+      "id": "wrench",
+      "name": "Wrench",
+      "kind": "deliverable",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Task: fix the well pump.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "planks": {
+      "id": "planks",
+      "name": "Planks",
+      "kind": "deliverable",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Task: mend the fence.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "letter": {
+      "id": "letter",
+      "name": "Letter",
+      "kind": "deliverable",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Task: deliver the letter.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "flour": {
+      "id": "flour",
+      "name": "Flour",
+      "kind": "deliverable",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Task: fetch the flour.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "forgedAlibi": {
+      "id": "forgedAlibi",
+      "name": "Forged Alibi",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "V1.5 Accomplice kit.",
+      "ships": "V1.5",
+      "gddRef": "3.5"
+    },
+    "handcuffs": {
+      "id": "handcuffs",
+      "name": "Handcuffs",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "V1.5.",
+      "ships": "V1.5",
+      "gddRef": "3.5"
+    },
+    "crossbow": {
+      "id": "crossbow",
+      "name": "Crossbow",
+      "kind": "weapon",
+      "roleBound": true,
+      "onDeath": "kept",
+      "use": "shoot",
+      "tooltip": "Shoot wolves; one Arrest.",
+      "ships": "V1.5",
+      "gddRef": "3.5"
+    },
+    "bolt": {
+      "id": "bolt",
+      "name": "Bolt",
+      "kind": "charge",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Crossbow ammunition.",
+      "ships": "V1.5",
+      "gddRef": "3.5"
+    },
+    "snare": {
+      "id": "snare",
+      "name": "Snare",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "snare",
+      "tooltip": "Holds a player who steps in.",
+      "ships": "V1.5",
+      "gddRef": "3.5"
+    },
+    "torch": {
+      "id": "torch",
+      "name": "Torch",
+      "kind": "light",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "light",
+      "lightRadiusTiles": 4,
+      "tooltip": "Carried light.",
+      "ships": "V1.5",
+      "gddRef": "3.5"
+    },
+    "lockpicks": {
+      "id": "lockpicks",
+      "name": "Lockpicks",
+      "kind": "charge",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "lockpick",
+      "tooltip": "Open a locked door.",
+      "ships": "V1.5",
+      "gddRef": "3.5"
+    },
+    "sack": {
+      "id": "sack",
+      "name": "Sack",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Carries Heirlooms.",
+      "ships": "V1.5",
+      "gddRef": "3.5"
+    },
+    "smokeBomb": {
+      "id": "smokeBomb",
+      "name": "Smoke Bomb",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "smoke",
+      "tooltip": "Blocks sight.",
+      "ships": "V1.5",
+      "gddRef": "3.5"
+    },
+    "heirloom": {
+      "id": "heirloom",
+      "name": "Heirloom",
+      "kind": "valuable",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "The Thief needs three.",
+      "ships": "V1.5",
+      "gddRef": "3.5"
+    },
+    "studyKey": {
+      "id": "studyKey",
+      "name": "Study Key",
+      "kind": "key",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Opens the locked study in Vane Manor.",
+      "ships": "V1.5",
+      "gddRef": "3.5"
+    },
+    "seanceChalk": {
+      "id": "seanceChalk",
+      "name": "Seance Chalk",
+      "kind": "tool",
+      "roleBound": true,
+      "onDeath": "kept",
+      "use": "seance",
+      "tooltip": "Hold a seance at a body.",
+      "ships": "V2",
+      "gddRef": "3.5"
+    }
+  }
+}

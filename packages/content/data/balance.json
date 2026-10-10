@@ -1,0 +1,180 @@
+{
+  "gddRef": "3.9",
+  "tickHz": 20,
+  "players": { "min": 4, "max": 10, "gddRef": "3.1" },
+  "lobby": {
+    "nameMin": 2,
+    "nameMax": 16,
+    "codeLength": 5,
+    "codeAlphabet": "ABCDEFGHJKLMNPQRSTUVWXYZ23456789",
+    "gddRef": "2"
+  },
+  "phases": {
+    "roleRevealS": 12,
+    "countdownS": 3,
+    "graceS": 30,
+    "dayS": 110,
+    "duskS": 10,
+    "nightS": 80,
+    "voteS": 25,
+    "revealS": 8,
+    "immunityS": 15,
+    "gddRef": "3.3"
+  },
+  "byCount": {
+    "4": {
+      "killCooldownS": 60,
+      "globalKillLockS": 0,
+      "discussionS": 60,
+      "tasksEach": 3,
+      "cabalWin": "villageAtMostOne",
+      "profile": "small",
+      "gddRef": "3.9"
+    },
+    "5": {
+      "killCooldownS": 60,
+      "globalKillLockS": 0,
+      "discussionS": 60,
+      "tasksEach": 3,
+      "cabalWin": "villageAtMostOne",
+      "profile": "small",
+      "gddRef": "3.9"
+    },
+    "6": {
+      "killCooldownS": 35,
+      "globalKillLockS": 0,
+      "discussionS": 75,
+      "tasksEach": 4,
+      "cabalWin": "parity",
+      "profile": "small",
+      "gddRef": "3.9"
+    },
+    "7": {
+      "killCooldownS": 35,
+      "globalKillLockS": 0,
+      "discussionS": 75,
+      "tasksEach": 4,
+      "cabalWin": "parity",
+      "profile": "medium",
+      "gddRef": "3.9"
+    },
+    "8": {
+      "killCooldownS": 30,
+      "globalKillLockS": 0,
+      "discussionS": 90,
+      "tasksEach": 4,
+      "cabalWin": "parity",
+      "profile": "medium",
+      "gddRef": "3.9"
+    },
+    "9": {
+      "killCooldownS": 30,
+      "globalKillLockS": 0,
+      "discussionS": 90,
+      "tasksEach": 4,
+      "cabalWin": "parity",
+      "profile": "large",
+      "gddRef": "3.9"
+    },
+    "10": {
+      "killCooldownS": 40,
+      "globalKillLockS": 15,
+      "discussionS": 90,
+      "tasksEach": 5,
+      "cabalWin": "parity",
+      "profile": "large",
+      "gddRef": "3.9"
+    }
+  },
+  "meeting": {
+    "voteOpensImmediately": true,
+    "endsWhenAllVoted": true,
+    "secretVotes": true,
+    "skipAllowed": true,
+    "wrongEjectionDiscussionBonusS": 15,
+    "noEjectionStreak": 2,
+    "forcedVoteDivisor": 3,
+    "presentPerPlayer": 1,
+    "suspectSetMax": 3,
+    "gddRef": "3.8"
+  },
+  "finalNight": {
+    "afterCycle": 5,
+    "huntS": 90,
+    "killCooldownS": 20,
+    "skipAllowed": false,
+    "tieEjectsNobody": true,
+    "gddRef": "3.8"
+  },
+  "snowball": {
+    "villageMargin": 2,
+    "killCooldownPenaltyS": 10,
+    "nextKillTraitClues": 3,
+    "lastKillerMinAlive": 6,
+    "lastKillerCooldownDeltaS": -5,
+    "gddRef": "3.9"
+  },
+  "hunger": { "cyclesWithoutKill": 2, "gddRef": "3.8" },
+  "disconnect": { "deathAfterS": 60, "gddRef": "3.8" },
+  "clues": {
+    "traitCluesPerKill": 2,
+    "firstBodyTraitClues": 2,
+    "capPerScene": 40,
+    "collectHoldS": 2,
+    "gddRef": "3.4"
+  },
+  "health": {
+    "maxHp": 2,
+    "regenHp": 1,
+    "regenEveryS": 90,
+    "knifeDamage": 2,
+    "wolfDamage": 1,
+    "woundedS": 20,
+    "woundedSpeedFactor": 0.8,
+    "gddRef": "3.6"
+  },
+  "movement": { "walkTilesPerS": 3, "runTilesPerS": 4.5, "sneakFactor": 0.6, "gddRef": "3.7" },
+  "vision": { "dayTiles": 7, "nightTiles": 3.5, "childDeltaTiles": -1, "gddRef": "3.7" },
+  "noise": {
+    "walk": 2,
+    "run": 6,
+    "door": 4,
+    "killScream": 8,
+    "rag": 4,
+    "skeletonKey": 5,
+    "crowbar": 10,
+    "bolt": 10,
+    "lockpick": 5,
+    "hide": 2,
+    "burst": 6,
+    "oneWayDrop": 9,
+    "goat": 4,
+    "wispRattle": 2,
+    "portalFactor": 0.5,
+    "gddRef": "3.7"
+  },
+  "doors": { "swingS": 3, "transitS": 0.6, "sceneFadeS": 0.4, "gddRef": "3.7" },
+  "tasks": { "cabalFakeList": true, "ghostShareCap": 0.25, "gddRef": "3.5" },
+  "wolves": {
+    "count": 3,
+    "fleeLightTiles": 4,
+    "gateClearingTiles": 6,
+    "intrudersWhenFenceBroken": 1,
+    "gddRef": "3.6"
+  },
+  "ghosts": { "wispsPerCycle": 1, "gddRef": "3.7" },
+  "chat": {
+    "quickChatRadiusTiles": 5,
+    "quickChat": [
+      { "id": "followMe", "text": "Follow me" },
+      { "id": "whereWereYou", "text": "Where were you?" },
+      { "id": "sawSomething", "text": "I saw something" },
+      { "id": "help", "text": "Help!" },
+      { "id": "clear", "text": "Clear" },
+      { "id": "suspicious", "text": "Suspicious" },
+      { "id": "wait", "text": "Wait" },
+      { "id": "go", "text": "Go" }
+    ],
+    "gddRef": "3.5"
+  }
+}

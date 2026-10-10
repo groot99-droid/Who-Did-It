@@ -1,0 +1,19 @@
+{
+  "source": "docs/WORLD.md 4.2, docs/ASSETS.md 6.1-6.3",
+  "tilePx": 64,
+  "metersPerTile": 1,
+  "characterCellPx": 128,
+  "maxStandingSilhouettePx": 90,
+  "maxSilhouetteTiles": 1.4,
+  "characterHeadsTall": 3,
+  "camera": {
+    "tiltXDeg": 40,
+    "yawZDeg": 0,
+    "verticalSquash": 0.77,
+    "wallPxPerMeter": 41,
+    "groundTileTiltXDeg": 0
+  },
+  "render": { "fps": 12, "overscan": 0.03, "propCellPx": { "min": 64, "max": 128 } },
+  "overworldTiles": { "w": 64, "h": 48 },
+  "interiorCameraFollow": true
+}
