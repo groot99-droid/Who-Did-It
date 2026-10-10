@@ -1,0 +1,159 @@
+/*
+ * Who Did It: design tokens (docs/UI.md).
+ *
+ * Every colour below is a token from packages/content/data/palette.json (docs/ASSETS.md 6.1);
+ * theme.test.ts fails if a hex here is not in that file or if the colour block drifts from it.
+ * Alpha variants are written as `rgb(var(--wdi-<name>-rgb) / a)` so no new hex is ever born.
+ * Shadows tint toward slate or moon, never black.
+ *
+ * One import (`import './ui/theme/tokens.css'`) gives a screen the fonts, the palette, the type
+ * scale, spacing, radii, strokes, shadows and motion. Component classes live in components.css.
+ */
+
+@font-face {
+  font-family: Oswald;
+  font-weight: 200 700;
+  font-display: swap;
+  src: url('../../assets/fonts/oswald-latin-wght-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: Inter;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../../assets/fonts/inter-latin-wght-normal.woff2') format('woff2');
+}
+
+:root {
+  /* ---- palette.json colours (generated block; keep in file order) ---- */
+  --wdi-ink: #12141c;
+  --wdi-slate: #2c3240;
+  --wdi-fog: #6f7a8c;
+  --wdi-bone: #d9d2c2;
+  --wdi-mustard: #f2b33d;
+  --wdi-teal: #2ec4b6;
+  --wdi-magenta: #e04e9a;
+  --wdi-blood: #b3121f;
+  --wdi-lantern: #ffb457;
+  --wdi-moon: #7fa8ff;
+
+  /* The same colours as space-separated RGB for alpha use: rgb(var(--wdi-bone-rgb) / 0.72). */
+  --wdi-ink-rgb: 18 20 28;
+  --wdi-slate-rgb: 44 50 64;
+  --wdi-fog-rgb: 111 122 140;
+  --wdi-bone-rgb: 217 210 194;
+  --wdi-mustard-rgb: 242 179 61;
+  --wdi-teal-rgb: 46 196 182;
+  --wdi-magenta-rgb: 224 78 154;
+  --wdi-blood-rgb: 179 18 31;
+  --wdi-lantern-rgb: 255 180 87;
+  --wdi-moon-rgb: 127 168 255;
+
+  /* ---- roles: night mode (light on dark). Ratios in docs/UI.md 10. ---- */
+  --wdi-bg: var(--wdi-ink); /* page and world scrim */
+  --wdi-surface: var(--wdi-slate); /* panels, dialogs, the meeting board */
+  --wdi-surface-sunken: var(--wdi-ink); /* wells inside a panel: timers, code boxes */
+  --wdi-paper: var(--wdi-bone); /* everything you touch: cards, inputs, chips */
+  --wdi-text: var(--wdi-bone); /* on bg and surface: 12.21 / 8.52 */
+  --wdi-text-muted: rgb(var(--wdi-bone-rgb) / 0.72); /* on surface 5.5, on bg 7.6 */
+  --wdi-text-on-paper: var(--wdi-ink); /* 12.21 */
+  --wdi-text-on-paper-muted: var(--wdi-slate); /* 8.52 */
+  --wdi-stroke: var(--wdi-ink); /* the 2 px ink stroke of every paper element */
+  --wdi-hairline: rgb(var(--wdi-bone-rgb) / 0.22); /* panel edges and dividers on dark */
+  --wdi-hairline-on-paper: rgb(var(--wdi-ink-rgb) / 0.18);
+
+  --wdi-primary: var(--wdi-mustard); /* palette.rules.primaryButtonToken */
+  --wdi-on-primary: var(--wdi-ink); /* 9.88 */
+  --wdi-interact: var(--wdi-teal); /* palette.rules.interactableToken: links, focus on dark, live */
+  --wdi-hazard: var(--wdi-magenta); /* palette.rules.hazardToken: glows and icons, never small text */
+  --wdi-danger: var(--wdi-blood); /* destructive buttons, warnings on paper */
+  --wdi-on-danger: var(--wdi-bone); /* 4.61 */
+  --wdi-warm: var(--wdi-lantern); /* timers, lantern light, the "beware" rule */
+  --wdi-cool: var(--wdi-moon); /* night, ghosts, verified marks */
+
+  /* Factions: appear only on the player's own card and the end-of-match reveal. */
+  --wdi-faction-village: var(--wdi-moon);
+  --wdi-on-village: var(--wdi-ink); /* 7.83 */
+  --wdi-faction-cabal: var(--wdi-blood);
+  --wdi-on-cabal: var(--wdi-bone); /* 4.61 */
+  --wdi-faction-neutral: var(--wdi-mustard);
+  --wdi-on-neutral: var(--wdi-ink); /* 9.88 */
+
+  /* ---- type: Oswald for display, Inter for text (both self-hosted, OFL) ---- */
+  --wdi-font-display: Oswald, 'Arial Narrow', 'Helvetica Neue', sans-serif;
+  --wdi-font-text: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --wdi-display-xl: 2.75rem; /* 44: party code */
+  --wdi-display-lg: 2rem; /* 32: screen titles, role name */
+  --wdi-display-md: 1.5rem; /* 24: section titles, portrait names */
+  --wdi-display-sm: 1.125rem; /* 18: card stripe, HUD chip, tabs */
+  --wdi-text-lg: 1.125rem; /* 18: card goal */
+  --wdi-text-md: 1rem; /* 16: body, inputs (16 stops iOS zoom) */
+  --wdi-text-sm: 0.875rem; /* 14: hints, roster meta */
+  --wdi-text-xs: 0.75rem; /* 12: tags and caps labels; nothing smaller */
+  --wdi-leading-display: 1.1;
+  --wdi-leading-text: 1.45;
+  --wdi-tracking-display: 0.04em;
+  --wdi-tracking-caps: 0.12em;
+  --wdi-tracking-code: 0.18em;
+  --wdi-weight-display: 600;
+  --wdi-weight-text: 400;
+  --wdi-weight-strong: 600;
+
+  /* ---- space (4 px base) and radii ---- */
+  --wdi-space-1: 4px;
+  --wdi-space-2: 8px;
+  --wdi-space-3: 12px;
+  --wdi-space-4: 16px;
+  --wdi-space-5: 24px;
+  --wdi-space-6: 32px;
+  --wdi-space-7: 48px;
+  --wdi-radius-xs: 2px; /* stroke corners, timer bars */
+  --wdi-radius-sm: 6px; /* chips, inputs, kbd */
+  --wdi-radius-md: 10px; /* buttons, roster rows, toasts */
+  --wdi-radius-lg: 16px; /* panels, dialogs */
+  --wdi-radius-card: 20px; /* the role card */
+  --wdi-radius-pill: 999px;
+  --wdi-stroke-w: 2px; /* palette.rules.uiStrokePx */
+  --wdi-frame-margin: 24px; /* nine-slice margin of the card frames */
+  --wdi-touch: 44px; /* minimum hit target */
+  --wdi-grid: 48px; /* icon and frame grid */
+
+  /* ---- shadows: slate for depth, moon for night glow ---- */
+  --wdi-shadow-1: 0 2px 6px rgb(var(--wdi-slate-rgb) / 0.55);
+  --wdi-shadow-2: 0 8px 24px rgb(var(--wdi-slate-rgb) / 0.7);
+  --wdi-shadow-3: 0 18px 48px rgb(var(--wdi-slate-rgb) / 0.85);
+  --wdi-glow-moon: 0 0 0 1px rgb(var(--wdi-moon-rgb) / 0.35), 0 0 24px rgb(var(--wdi-moon-rgb) / 0.25);
+  --wdi-glow-interact: 0 0 0 1px rgb(var(--wdi-teal-rgb) / 0.5), 0 0 16px rgb(var(--wdi-teal-rgb) / 0.35);
+  --wdi-glow-hazard: 0 0 0 1px rgb(var(--wdi-magenta-rgb) / 0.5), 0 0 16px rgb(var(--wdi-magenta-rgb) / 0.35);
+  --wdi-scrim: rgb(var(--wdi-ink-rgb) / 0.72);
+
+  /* Paper grain: ink noise at <= 10% over bone. No colour of its own. */
+  --wdi-paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.07 0 0 0 0 0.08 0 0 0 0 0.11 0 0 0 0.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+
+  /* ---- Art-Deco card frames: nine-slice data URIs, 24 px margins (build-frames.mjs) ---- */
+  --wdi-frame-plain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='288' viewBox='0 0 192 288' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' role='img' aria-label='Card frame' data-slice='24'%3E%3Crect x='1' y='1' width='190' height='286' rx='2' stroke='%2312141C'/%3E%3Cg stroke='%232C3240'%3E%3Crect x='7' y='7' width='178' height='274' rx='1'/%3E%3Cpath d='M11 21V11H21'/%3E%3Cpath d='M11 21V11H21' transform='translate(192 0) scale(-1 1)'/%3E%3Cpath d='M11 21V11H21' transform='translate(0 288) scale(1 -1)'/%3E%3Cpath d='M11 21V11H21' transform='translate(192 288) scale(-1 -1)'/%3E%3C/g%3E%3C/svg%3E");
+  --wdi-frame-village: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='288' viewBox='0 0 192 288' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' role='img' aria-label='Village card frame' data-slice='24'%3E%3Crect x='1' y='1' width='190' height='286' rx='2' stroke='%2312141C'/%3E%3Cg stroke='%237FA8FF'%3E%3Crect x='7' y='7' width='178' height='274' rx='1'/%3E%3Cpath d='M11 21V11H21M16 21V16H21'/%3E%3Cpath d='M11 21V11H21M16 21V16H21' transform='translate(192 0) scale(-1 1)'/%3E%3Cpath d='M11 21V11H21M16 21V16H21' transform='translate(0 288) scale(1 -1)'/%3E%3Cpath d='M11 21V11H21M16 21V16H21' transform='translate(192 288) scale(-1 -1)'/%3E%3C/g%3E%3C/svg%3E");
+  --wdi-frame-cabal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='288' viewBox='0 0 192 288' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' role='img' aria-label='Cabal card frame' data-slice='24'%3E%3Crect x='1' y='1' width='190' height='286' rx='2' stroke='%2312141C'/%3E%3Cg stroke='%23B3121F'%3E%3Crect x='7' y='7' width='178' height='274' rx='1'/%3E%3Cpath d='M11 11L20 20M11 17L15 21M17 11L21 15'/%3E%3Cpath d='M11 11L20 20M11 17L15 21M17 11L21 15' transform='translate(192 0) scale(-1 1)'/%3E%3Cpath d='M11 11L20 20M11 17L15 21M17 11L21 15' transform='translate(0 288) scale(1 -1)'/%3E%3Cpath d='M11 11L20 20M11 17L15 21M17 11L21 15' transform='translate(192 288) scale(-1 -1)'/%3E%3C/g%3E%3C/svg%3E");
+  --wdi-frame-neutral: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='288' viewBox='0 0 192 288' fill='none' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' role='img' aria-label='Neutral card frame' data-slice='24'%3E%3Crect x='1' y='1' width='190' height='286' rx='2' stroke='%2312141C'/%3E%3Cg stroke='%23F2B33D'%3E%3Crect x='7' y='7' width='178' height='274' rx='1'/%3E%3Cpath d='M11 21A10 10 0 0 1 21 11M16 21A5 5 0 0 1 21 16'/%3E%3Cpath d='M11 21A10 10 0 0 1 21 11M16 21A5 5 0 0 1 21 16' transform='translate(192 0) scale(-1 1)'/%3E%3Cpath d='M11 21A10 10 0 0 1 21 11M16 21A5 5 0 0 1 21 16' transform='translate(0 288) scale(1 -1)'/%3E%3Cpath d='M11 21A10 10 0 0 1 21 11M16 21A5 5 0 0 1 21 16' transform='translate(192 288) scale(-1 -1)'/%3E%3C/g%3E%3C/svg%3E");
+
+  /* ---- motion ---- */
+  --wdi-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --wdi-dur-fast: 120ms; /* hover, press */
+  --wdi-dur-base: 220ms; /* toasts, dialogs */
+  --wdi-dur-flip: 600ms; /* the card flip itself */
+  --wdi-card-hold: 12s; /* GDD 2 step 4: the card holds 12 s */
+
+  /* ---- layers ---- */
+  --wdi-z-hud: 10;
+  --wdi-z-panel: 20;
+  --wdi-z-dialog: 30;
+  --wdi-z-toast: 40;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --wdi-dur-fast: 0ms;
+    --wdi-dur-base: 0ms;
+    --wdi-dur-flip: 0ms;
+  }
+}

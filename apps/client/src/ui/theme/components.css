@@ -1,0 +1,1676 @@
+/*
+ * Who Did It: component classes (docs/UI.md). Needs tokens.css first.
+ *
+ * Night chrome, paper controls: the page and panels are ink and slate; everything the player
+ * touches (buttons, inputs, chips, cards) is bone paper with a 2 px ink stroke, so the eye
+ * always knows what is live. One saturated accent per element. Nothing below carries meaning
+ * by colour alone: every state also changes a glyph, a label, a stroke or a shape.
+ *
+ * Classes are prefixed `wdi-`; element parts use `__`, modifiers `--`, states `is-`.
+ */
+
+/* ---------------------------------------------------------------- root and text */
+
+.wdi-root {
+  font-family: var(--wdi-font-text);
+  font-size: var(--wdi-text-md);
+  line-height: var(--wdi-leading-text);
+  color: var(--wdi-text);
+  background: var(--wdi-bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.wdi-root *,
+.wdi-root *::before,
+.wdi-root *::after {
+  box-sizing: border-box;
+}
+
+.wdi-root [hidden] {
+  display: none !important;
+}
+
+.wdi-display,
+.wdi-title,
+.wdi-subtitle,
+.wdi-eyebrow {
+  font-family: var(--wdi-font-display);
+  font-weight: var(--wdi-weight-display);
+  line-height: var(--wdi-leading-display);
+  letter-spacing: var(--wdi-tracking-display);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.wdi-display--xl {
+  font-size: var(--wdi-display-xl);
+}
+
+.wdi-display--lg,
+.wdi-title {
+  font-size: var(--wdi-display-lg);
+}
+
+.wdi-display--md,
+.wdi-subtitle {
+  font-size: var(--wdi-display-md);
+}
+
+.wdi-display--sm {
+  font-size: var(--wdi-display-sm);
+}
+
+.wdi-eyebrow {
+  font-size: var(--wdi-text-xs);
+  letter-spacing: var(--wdi-tracking-caps);
+  color: var(--wdi-text-muted);
+}
+
+.wdi-text {
+  margin: 0;
+  font-size: var(--wdi-text-md);
+}
+
+.wdi-text--lg {
+  font-size: var(--wdi-text-lg);
+}
+
+.wdi-text--sm,
+.wdi-hint {
+  font-size: var(--wdi-text-sm);
+}
+
+.wdi-muted,
+.wdi-hint {
+  color: var(--wdi-text-muted);
+  margin: 0;
+}
+
+:is(.wdi-paper, .wdi-card, .wdi-notebook) .wdi-muted,
+:is(.wdi-paper, .wdi-card, .wdi-notebook) .wdi-hint,
+:is(.wdi-paper, .wdi-card, .wdi-notebook) .wdi-eyebrow {
+  color: var(--wdi-text-on-paper-muted);
+}
+
+.wdi-strong {
+  font-weight: var(--wdi-weight-strong);
+}
+
+.wdi-link {
+  color: var(--wdi-interact);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.wdi-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- layout helpers */
+
+.wdi-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-3);
+}
+
+.wdi-stack--tight {
+  gap: var(--wdi-space-2);
+}
+
+.wdi-stack--loose {
+  gap: var(--wdi-space-5);
+}
+
+.wdi-row {
+  display: flex;
+  align-items: center;
+  gap: var(--wdi-space-3);
+  min-width: 0;
+}
+
+.wdi-row--between {
+  justify-content: space-between;
+}
+
+.wdi-row--wrap {
+  flex-wrap: wrap;
+}
+
+.wdi-grow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.wdi-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wdi-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--wdi-space-3);
+  color: var(--wdi-text-muted);
+  font-size: var(--wdi-text-sm);
+}
+
+.wdi-divider::before,
+.wdi-divider::after {
+  content: '';
+  flex: 1;
+  height: var(--wdi-stroke-w);
+  background: var(--wdi-hairline);
+  border-radius: var(--wdi-radius-xs);
+}
+
+/* ---------------------------------------------------------------- paper and panels */
+
+/* Bone paper with ink grain: the fill of every control and card. */
+.wdi-paper {
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+}
+
+.wdi-panel {
+  position: relative;
+  width: min(440px, 100%);
+  max-height: calc(100dvh - 2 * var(--wdi-space-4));
+  overflow: auto;
+  padding: var(--wdi-space-5);
+  color: var(--wdi-text);
+  background: var(--wdi-surface);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-lg);
+  box-shadow:
+    inset 0 0 0 1px var(--wdi-hairline),
+    var(--wdi-shadow-2);
+}
+
+.wdi-panel--wide {
+  width: min(720px, 100%);
+}
+
+.wdi-panel--paper {
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+  box-shadow: var(--wdi-shadow-2);
+}
+
+.wdi-well {
+  padding: var(--wdi-space-3) var(--wdi-space-4);
+  background: var(--wdi-surface-sunken);
+  border-radius: var(--wdi-radius-md);
+  box-shadow: inset 0 0 0 1px var(--wdi-hairline);
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.wdi-btn {
+  --_bg: var(--wdi-paper);
+  --_fg: var(--wdi-text-on-paper);
+  --_stroke: var(--wdi-stroke);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wdi-space-2);
+  min-height: var(--wdi-touch);
+  padding: var(--wdi-space-2) var(--wdi-space-4);
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-display-sm);
+  font-weight: var(--wdi-weight-display);
+  letter-spacing: var(--wdi-tracking-display);
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--_fg);
+  background-color: var(--_bg);
+  background-image: var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--_stroke);
+  border-radius: var(--wdi-radius-md);
+  box-shadow: var(--wdi-shadow-1);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--wdi-dur-fast) var(--wdi-ease),
+    box-shadow var(--wdi-dur-fast) var(--wdi-ease),
+    filter var(--wdi-dur-fast) var(--wdi-ease);
+}
+
+.wdi-btn--primary {
+  --_bg: var(--wdi-primary);
+  --_fg: var(--wdi-on-primary);
+  background-image: none;
+}
+
+.wdi-btn--danger {
+  --_bg: var(--wdi-danger);
+  --_fg: var(--wdi-on-danger);
+  background-image: none;
+}
+
+.wdi-btn--ghost {
+  --_bg: transparent;
+  --_fg: var(--wdi-text);
+  --_stroke: var(--wdi-hairline);
+  background-image: none;
+  box-shadow: none;
+}
+
+.wdi-btn--sm {
+  min-height: 36px;
+  padding: var(--wdi-space-1) var(--wdi-space-3);
+  font-size: var(--wdi-text-sm);
+}
+
+.wdi-btn--lg {
+  min-height: 56px;
+  padding: var(--wdi-space-3) var(--wdi-space-6);
+  font-size: var(--wdi-display-md);
+}
+
+.wdi-btn--block {
+  width: 100%;
+}
+
+.wdi-btn--icon {
+  width: var(--wdi-touch);
+  padding: 0;
+}
+
+.wdi-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--wdi-shadow-2);
+  filter: brightness(1.06);
+}
+
+.wdi-btn:active {
+  transform: translateY(1px);
+  box-shadow: none;
+  filter: brightness(0.96);
+}
+
+.wdi-btn:disabled,
+.wdi-btn[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+
+.wdi-btn[aria-busy='true'] {
+  cursor: progress;
+}
+
+.wdi-btn[aria-busy='true']::after {
+  content: '';
+  width: 1em;
+  height: 1em;
+  border: var(--wdi-stroke-w) solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: wdi-spin 0.8s linear infinite;
+}
+
+/* Focus: an ink ring against the element and a mustard ring against the surface, so the pair
+   passes on paper (ink 12.21) and on slate or ink (mustard 6.90 / 9.88). */
+.wdi-btn:focus-visible,
+.wdi-input:focus-visible,
+.wdi-chip:is(button, a):focus-visible,
+.wdi-portrait:is(button, a):focus-visible,
+.wdi-touch-btn:focus-visible,
+.wdi-tab:focus-visible,
+.wdi-link:focus-visible {
+  outline: var(--wdi-stroke-w) solid var(--wdi-primary);
+  outline-offset: var(--wdi-stroke-w);
+  box-shadow: 0 0 0 var(--wdi-stroke-w) var(--wdi-ink);
+}
+
+.wdi-btn .wdi-icon {
+  margin-inline: -2px;
+}
+
+/* ---------------------------------------------------------------- inputs */
+
+.wdi-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-1);
+  min-width: 0;
+}
+
+.wdi-label {
+  font-size: var(--wdi-text-sm);
+  font-weight: var(--wdi-weight-strong);
+  color: var(--wdi-text);
+}
+
+:is(.wdi-paper, .wdi-card, .wdi-notebook) .wdi-label {
+  color: var(--wdi-text-on-paper);
+}
+
+.wdi-input {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--wdi-touch);
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  font: inherit;
+  font-size: var(--wdi-text-md); /* 16 px stops iOS zooming on focus */
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-sm);
+  box-shadow: inset 0 2px 0 var(--wdi-hairline-on-paper);
+}
+
+.wdi-input::placeholder {
+  color: var(--wdi-text-on-paper-muted);
+  opacity: 1;
+}
+
+.wdi-input:disabled {
+  opacity: 0.5;
+}
+
+.wdi-input[aria-invalid='true'] {
+  border-color: var(--wdi-danger);
+  box-shadow:
+    inset 0 0 0 1px var(--wdi-danger),
+    inset 0 2px 0 var(--wdi-hairline-on-paper);
+}
+
+.wdi-input--code {
+  width: 7.5em;
+  flex: none;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-display-sm);
+  letter-spacing: var(--wdi-tracking-code);
+}
+
+/* Messages under a field: lantern with a glyph on dark, blood on paper; never red on slate. */
+.wdi-field__msg {
+  display: flex;
+  align-items: center;
+  gap: var(--wdi-space-2);
+  min-height: 1.45em;
+  margin: 0;
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-text-muted);
+}
+
+.wdi-field__msg--error {
+  color: var(--wdi-warm);
+}
+
+:is(.wdi-paper, .wdi-card, .wdi-notebook) .wdi-field__msg--error {
+  color: var(--wdi-danger);
+}
+
+/* ---------------------------------------------------------------- chips and tags */
+
+.wdi-chip {
+  --_bg: var(--wdi-paper);
+  --_fg: var(--wdi-text-on-paper);
+  --_stroke: var(--wdi-stroke);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wdi-space-1);
+  min-height: 28px;
+  padding: 2px var(--wdi-space-2);
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-text-xs);
+  font-weight: var(--wdi-weight-display);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--_fg);
+  background-color: var(--_bg);
+  background-image: var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--_stroke);
+  border-radius: var(--wdi-radius-sm);
+}
+
+.wdi-chip:is(button) {
+  cursor: pointer;
+  font: inherit;
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-text-xs);
+  font-weight: var(--wdi-weight-display);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+}
+
+.wdi-chip--lead {
+  --_bg: var(--wdi-primary);
+  --_fg: var(--wdi-on-primary);
+  background-image: none;
+}
+
+.wdi-chip--ready {
+  --_bg: var(--wdi-interact);
+  --_fg: var(--wdi-ink);
+  background-image: none;
+}
+
+.wdi-chip--verified {
+  --_bg: var(--wdi-cool);
+  --_fg: var(--wdi-ink);
+  background-image: none;
+}
+
+.wdi-chip--danger {
+  --_bg: var(--wdi-danger);
+  --_fg: var(--wdi-on-danger);
+  background-image: none;
+}
+
+/* Away, ghost, abstained: an outline chip on dark, text muted, always with a glyph. */
+.wdi-chip--quiet {
+  --_bg: transparent;
+  --_fg: var(--wdi-text-muted);
+  --_stroke: var(--wdi-hairline);
+  background-image: none;
+}
+
+:is(.wdi-paper, .wdi-card, .wdi-notebook) .wdi-chip--quiet {
+  --_fg: var(--wdi-text-on-paper-muted);
+  --_stroke: var(--wdi-hairline-on-paper);
+}
+
+/* A vote chip is a count: the stamp mark plus a number, on paper. */
+.wdi-chip--vote {
+  min-height: 32px;
+  padding-inline: var(--wdi-space-2) var(--wdi-space-3);
+  font-size: var(--wdi-text-md);
+  letter-spacing: var(--wdi-tracking-display);
+}
+
+/* A claim chip is a sentence fragment a player tapped: Inter, not caps. */
+.wdi-chip--claim {
+  min-height: 36px;
+  padding: var(--wdi-space-1) var(--wdi-space-3);
+  font-family: var(--wdi-font-text);
+  font-size: var(--wdi-text-sm);
+  font-weight: var(--wdi-weight-strong);
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+  text-align: left;
+}
+
+.wdi-chip--claim.is-selected {
+  box-shadow: var(--wdi-glow-interact);
+  border-color: var(--wdi-interact);
+}
+
+.wdi-chip .wdi-icon {
+  width: 1.25em;
+  height: 1.25em;
+}
+
+/* ---------------------------------------------------------------- icons and marks */
+
+/* Icons are ink-stroked SVG files (assets/ui/icons, glyphs, marks). On a dark surface they sit
+   on a paper disc so the ink stroke stays visible (docs/SPRITES.md 9). */
+.wdi-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  vertical-align: middle;
+}
+
+.wdi-icon--sm {
+  width: 16px;
+  height: 16px;
+}
+
+.wdi-icon--lg {
+  width: 32px;
+  height: 32px;
+}
+
+.wdi-icon--xl {
+  width: var(--wdi-grid);
+  height: var(--wdi-grid);
+}
+
+.wdi-icon-disc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: 50%;
+}
+
+.wdi-icon-disc--lg {
+  width: var(--wdi-grid);
+  height: var(--wdi-grid);
+}
+
+.wdi-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 var(--wdi-space-2);
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-text-sm);
+  font-weight: var(--wdi-weight-display);
+  color: var(--wdi-text);
+  background: var(--wdi-surface-sunken);
+  border: var(--wdi-stroke-w) solid var(--wdi-hairline);
+  border-bottom-width: 3px;
+  border-radius: var(--wdi-radius-sm);
+}
+
+:is(.wdi-paper, .wdi-card, .wdi-notebook) .wdi-kbd {
+  color: var(--wdi-text-on-paper);
+  background: transparent;
+  border-color: var(--wdi-stroke);
+}
+
+/* ---------------------------------------------------------------- roster rows */
+
+.wdi-roster {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wdi-roster__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--wdi-space-3);
+  min-height: 52px;
+  padding: var(--wdi-space-2) 0;
+  border-bottom: var(--wdi-stroke-w) solid var(--wdi-hairline);
+}
+
+.wdi-roster__row:last-child {
+  border-bottom: 0;
+}
+
+:is(.wdi-paper, .wdi-card, .wdi-notebook) .wdi-roster__row {
+  border-color: var(--wdi-hairline-on-paper);
+}
+
+.wdi-roster__name {
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-display-sm);
+  letter-spacing: var(--wdi-tracking-display);
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wdi-roster__meta {
+  display: block;
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-text-muted);
+}
+
+:is(.wdi-paper, .wdi-card, .wdi-notebook) .wdi-roster__meta {
+  color: var(--wdi-text-on-paper-muted);
+}
+
+.wdi-roster__tags {
+  display: flex;
+  gap: var(--wdi-space-1);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.wdi-roster__row.is-away {
+  opacity: 0.65;
+}
+
+.wdi-roster__row.is-dead .wdi-roster__name {
+  text-decoration: line-through;
+  text-decoration-thickness: var(--wdi-stroke-w);
+}
+
+/* A seat: the round avatar slot of a row or portrait. Never tinted by role. */
+.wdi-seat {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-text-md);
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: 50%;
+}
+
+/* ---------------------------------------------------------------- the role card */
+
+/* A rectangular paper card with a nine-slice Art-Deco frame (tokens: --wdi-frame-*). The frame
+   is 24 px wide; padding starts inside it. The faction frames appear only on the player's own
+   card and in the end-of-match reveal. */
+.wdi-card {
+  --wdi-faction: var(--wdi-slate);
+  --wdi-on-faction: var(--wdi-bone);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-3);
+  width: min(400px, 100%);
+  max-height: calc(100dvh - 2 * var(--wdi-space-4));
+  overflow-y: auto;
+  padding: var(--wdi-space-3) var(--wdi-space-4) var(--wdi-space-4);
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+  background-origin: border-box;
+  background-clip: border-box;
+  border: var(--wdi-frame-margin) solid transparent;
+  border-image: var(--wdi-frame-plain) 24 / var(--wdi-frame-margin) stretch;
+  box-shadow: var(--wdi-shadow-3);
+}
+
+.wdi-card--village {
+  --wdi-faction: var(--wdi-faction-village);
+  --wdi-on-faction: var(--wdi-on-village);
+  border-image-source: var(--wdi-frame-village);
+}
+
+.wdi-card--cabal {
+  --wdi-faction: var(--wdi-faction-cabal);
+  --wdi-on-faction: var(--wdi-on-cabal);
+  border-image-source: var(--wdi-frame-cabal);
+}
+
+.wdi-card--neutral {
+  --wdi-faction: var(--wdi-faction-neutral);
+  --wdi-on-faction: var(--wdi-on-neutral);
+  border-image-source: var(--wdi-frame-neutral);
+}
+
+/* The faction stripe: colour, icon and word together. */
+.wdi-card__stripe {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wdi-space-2);
+  min-height: 36px;
+  padding: var(--wdi-space-1) var(--wdi-space-3);
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-display-sm);
+  font-weight: var(--wdi-weight-display);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+  color: var(--wdi-on-faction);
+  background: var(--wdi-faction);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-sm);
+}
+
+.wdi-card__stripe .wdi-icon {
+  background-color: var(--wdi-paper);
+  border-radius: 50%;
+}
+
+.wdi-card__title {
+  font-size: var(--wdi-display-lg);
+  text-align: center;
+}
+
+.wdi-card__look {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wdi-space-2);
+  flex-wrap: wrap;
+  margin: 0;
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-text-on-paper-muted);
+}
+
+.wdi-card__trait {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.wdi-card__trait .wdi-icon {
+  margin-right: var(--wdi-space-1);
+}
+
+.wdi-card__goal {
+  margin: 0;
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  font-size: var(--wdi-text-lg);
+  font-weight: var(--wdi-weight-strong);
+  text-align: center;
+  border-top: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-bottom: var(--wdi-stroke-w) solid var(--wdi-stroke);
+}
+
+.wdi-card__abilities {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-1);
+}
+
+.wdi-card__ability {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--wdi-space-2);
+  min-height: 32px;
+  font-size: var(--wdi-text-sm);
+}
+
+.wdi-card__cooldown {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--wdi-text-on-paper-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.wdi-card__inventory {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wdi-space-1);
+}
+
+.wdi-card__text {
+  margin: 0;
+  font-size: var(--wdi-text-sm);
+}
+
+/* The Beware line: lantern rule and a warning glyph, text stays ink. */
+.wdi-card__beware {
+  display: flex;
+  gap: var(--wdi-space-2);
+  margin: 0;
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  font-size: var(--wdi-text-sm);
+  border-left: 4px solid var(--wdi-warm);
+  background: rgb(var(--wdi-lantern-rgb) / 0.14);
+  border-radius: 0 var(--wdi-radius-sm) var(--wdi-radius-sm) 0;
+}
+
+.wdi-card__mates {
+  margin: 0;
+  font-size: var(--wdi-text-sm);
+}
+
+.wdi-card__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--wdi-space-3);
+  margin-top: var(--wdi-space-1);
+}
+
+/* The card back: dark, with the plain frame drawn as a bone hairline so the back never hints
+   at the faction. */
+.wdi-card--back {
+  --wdi-faction: var(--wdi-hairline);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--wdi-text);
+  background: var(--wdi-surface);
+  background-image: none;
+  border-image: none;
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-xs);
+  box-shadow:
+    inset 0 0 0 6px var(--wdi-surface),
+    inset 0 0 0 8px var(--wdi-hairline),
+    var(--wdi-shadow-3);
+}
+
+.wdi-card--back .wdi-card__title {
+  color: var(--wdi-text);
+}
+
+/* The back is dark, so its muted text is the dark-surface muted again. */
+.wdi-card--back .wdi-muted,
+.wdi-card--back .wdi-hint,
+.wdi-card--back .wdi-eyebrow,
+.wdi-card--back .wdi-label {
+  color: var(--wdi-text-muted);
+}
+
+/* The flip: perspective wrapper, a rotating inner, two faces. The card holds 12 s
+   (GDD 2 step 4) after the flip; the hold is a timer, not a motion, so it survives
+   prefers-reduced-motion while the rotation does not. */
+.wdi-flip {
+  perspective: 1200px;
+  width: min(400px, 100%);
+}
+
+.wdi-flip__inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform var(--wdi-dur-flip) var(--wdi-ease);
+}
+
+.wdi-flip__inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.wdi-flip__face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* The front sets the height and starts rotated, so the flip lands it face up. */
+.wdi-flip__face--front {
+  position: relative;
+  transform: rotateY(180deg);
+}
+
+.wdi-flip__face--back {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---------------------------------------------------------------- timer */
+
+.wdi-timer {
+  position: relative;
+  height: 8px;
+  overflow: hidden;
+  background: var(--wdi-surface-sunken);
+  border-radius: var(--wdi-radius-xs);
+}
+
+:is(.wdi-paper, .wdi-card, .wdi-notebook) .wdi-timer,
+.wdi-card .wdi-timer {
+  box-shadow: inset 0 0 0 1px var(--wdi-stroke);
+}
+
+.wdi-timer__bar {
+  height: 100%;
+  width: 100%;
+  background: var(--wdi-warm);
+  transform-origin: left;
+}
+
+.wdi-timer__bar.is-running {
+  animation: wdi-drain var(--wdi-timer-duration, var(--wdi-card-hold)) linear forwards;
+}
+
+/* ---------------------------------------------------------------- dialogs and toasts */
+
+.wdi-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--wdi-z-dialog);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--wdi-space-4);
+  background: var(--wdi-scrim);
+  animation: wdi-fade var(--wdi-dur-base) var(--wdi-ease) both;
+}
+
+.wdi-dialog {
+  width: min(400px, 100%);
+  animation: wdi-rise var(--wdi-dur-base) var(--wdi-ease) both;
+}
+
+.wdi-dialog__title {
+  margin-bottom: var(--wdi-space-2);
+}
+
+.wdi-dialog__body {
+  margin: 0 0 var(--wdi-space-4);
+  color: var(--wdi-text-muted);
+}
+
+.wdi-dialog__actions {
+  display: flex;
+  gap: var(--wdi-space-3);
+  flex-wrap: wrap;
+}
+
+.wdi-dialog__actions > .wdi-btn:first-child {
+  flex: 1 1 auto;
+}
+
+/* Toasts stack above the touch controls, bottom centre, newest last. */
+.wdi-toasts {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--wdi-space-5) + env(safe-area-inset-bottom));
+  z-index: var(--wdi-z-toast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--wdi-space-2);
+  width: min(480px, calc(100% - 2 * var(--wdi-space-4)));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.wdi-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--wdi-space-3);
+  width: 100%;
+  min-height: var(--wdi-touch);
+  padding: var(--wdi-space-2) var(--wdi-space-4) var(--wdi-space-2) var(--wdi-space-3);
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-left-width: 6px;
+  border-radius: var(--wdi-radius-md);
+  box-shadow: var(--wdi-shadow-2);
+  pointer-events: auto;
+  animation: wdi-rise var(--wdi-dur-base) var(--wdi-ease) both;
+}
+
+.wdi-toast--interact {
+  border-left-color: var(--wdi-interact);
+}
+
+.wdi-toast--hazard {
+  border-left-color: var(--wdi-hazard);
+}
+
+.wdi-toast--warm {
+  border-left-color: var(--wdi-warm);
+}
+
+.wdi-toast__kbd {
+  margin-left: auto;
+}
+
+/* ---------------------------------------------------------------- HUD */
+
+.wdi-hud {
+  position: fixed;
+  inset: 0;
+  z-index: var(--wdi-z-hud);
+  padding: calc(var(--wdi-space-3) + env(safe-area-inset-top))
+    calc(var(--wdi-space-3) + env(safe-area-inset-right))
+    calc(var(--wdi-space-3) + env(safe-area-inset-bottom))
+    calc(var(--wdi-space-3) + env(safe-area-inset-left));
+  pointer-events: none;
+}
+
+.wdi-hud > * {
+  pointer-events: auto;
+}
+
+.wdi-hud__tl {
+  position: absolute;
+  top: inherit;
+  left: inherit;
+}
+
+.wdi-hud__tc {
+  position: absolute;
+  top: inherit;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.wdi-hud__tr {
+  position: absolute;
+  top: inherit;
+  right: inherit;
+}
+
+.wdi-hud__bl {
+  position: absolute;
+  bottom: inherit;
+  left: inherit;
+}
+
+.wdi-hud__br {
+  position: absolute;
+  bottom: inherit;
+  right: inherit;
+}
+
+/* The HUD chip: your goal, top-left, a paper button that reopens the card (Tab). */
+.wdi-hud-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wdi-space-2);
+  max-width: min(360px, calc(100vw - 2 * var(--wdi-space-3)));
+  min-height: var(--wdi-touch);
+  padding: var(--wdi-space-1) var(--wdi-space-3) var(--wdi-space-1) var(--wdi-space-1);
+  font: inherit;
+  font-size: var(--wdi-text-sm);
+  text-align: left;
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-pill);
+  box-shadow: var(--wdi-shadow-2);
+  cursor: pointer;
+}
+
+.wdi-hud-chip:focus-visible {
+  outline: var(--wdi-stroke-w) solid var(--wdi-primary);
+  outline-offset: var(--wdi-stroke-w);
+  box-shadow: 0 0 0 var(--wdi-stroke-w) var(--wdi-ink);
+}
+
+.wdi-hud-chip__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.wdi-hud-chip__goal {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wdi-hud-chip__role {
+  display: block;
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-text-xs);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+  color: var(--wdi-text-on-paper-muted);
+}
+
+/* Phase and clock, top centre: an ink well with lantern digits. */
+.wdi-hud-clock {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wdi-space-2);
+  min-height: var(--wdi-touch);
+  padding: var(--wdi-space-1) var(--wdi-space-4);
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-display-md);
+  letter-spacing: var(--wdi-tracking-display);
+  font-variant-numeric: tabular-nums;
+  color: var(--wdi-warm);
+  background: var(--wdi-scrim);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-pill);
+  box-shadow: inset 0 0 0 1px var(--wdi-hairline);
+}
+
+.wdi-hud-clock__phase {
+  font-size: var(--wdi-text-xs);
+  letter-spacing: var(--wdi-tracking-caps);
+  color: var(--wdi-text);
+}
+
+.wdi-hud-clock--night {
+  color: var(--wdi-cool);
+  box-shadow:
+    inset 0 0 0 1px var(--wdi-hairline),
+    var(--wdi-glow-moon);
+}
+
+/* Event log lines, top right, fading out. */
+.wdi-log {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--wdi-space-1);
+  max-width: min(320px, 60vw);
+}
+
+.wdi-log__line {
+  padding: var(--wdi-space-1) var(--wdi-space-3);
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-text);
+  background: var(--wdi-scrim);
+  border-radius: var(--wdi-radius-sm);
+  box-shadow: inset 0 0 0 1px var(--wdi-hairline);
+}
+
+/* Screen-edge direction cue (a scream, a loft creak): a ring with an arrow, hazard glow. */
+.wdi-edge-cue {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--wdi-stroke-w) solid var(--wdi-hazard);
+  border-radius: 50%;
+  box-shadow: var(--wdi-glow-hazard);
+  animation: wdi-pulse 1.2s var(--wdi-ease) infinite;
+}
+
+.wdi-edge-cue--cool {
+  border-color: var(--wdi-cool);
+  box-shadow: var(--wdi-glow-moon);
+}
+
+/* ---------------------------------------------------------------- touch controls */
+
+.wdi-stick {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  background: rgb(var(--wdi-ink-rgb) / 0.55);
+  border: var(--wdi-stroke-w) solid var(--wdi-hairline);
+  box-shadow: inset 0 0 0 14px rgb(var(--wdi-slate-rgb) / 0.4);
+  touch-action: none;
+}
+
+.wdi-stick__knob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 56px;
+  height: 56px;
+  transform: translate(-50%, -50%);
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: 50%;
+  box-shadow: var(--wdi-shadow-1);
+}
+
+.wdi-touch-cluster {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: var(--wdi-space-3);
+  align-items: end;
+}
+
+.wdi-touch-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  font: inherit;
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-text-xs);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: 50%;
+  box-shadow: var(--wdi-shadow-1);
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.wdi-touch-btn--primary {
+  width: 80px;
+  height: 80px;
+  background-color: var(--wdi-primary);
+  background-image: none;
+  color: var(--wdi-on-primary);
+}
+
+.wdi-touch-btn__key {
+  font-size: 1.25rem;
+  letter-spacing: 0;
+}
+
+.wdi-touch-btn:active {
+  transform: scale(0.96);
+  box-shadow: none;
+}
+
+.wdi-touch-btn:disabled {
+  opacity: 0.5;
+}
+
+/* ---------------------------------------------------------------- meeting: portraits, votes */
+
+.wdi-portraits {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: var(--wdi-space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* A portrait tile: paper, the picture, the name, trait icons, a vote count. The faction never
+   shows here. `is-dead` greys and marks with the ghost glyph; `is-selected` is your vote. */
+.wdi-portrait {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--wdi-space-1);
+  width: 100%;
+  padding: var(--wdi-space-2);
+  font: inherit;
+  text-align: center;
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-md);
+  box-shadow: var(--wdi-shadow-1);
+  cursor: pointer;
+}
+
+.wdi-portrait__pic {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  max-height: 150px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--wdi-surface);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-sm);
+}
+
+.wdi-portrait__pic > img,
+.wdi-portrait__pic > svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wdi-portrait__name {
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-display-sm);
+  letter-spacing: var(--wdi-tracking-display);
+  text-transform: uppercase;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wdi-portrait__traits {
+  display: flex;
+  gap: 2px;
+}
+
+.wdi-portrait__traits .wdi-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.wdi-portrait__votes {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+}
+
+.wdi-portrait.is-self {
+  outline: var(--wdi-stroke-w) dashed var(--wdi-text-on-paper-muted);
+  outline-offset: -8px;
+}
+
+.wdi-portrait.is-selected {
+  border-color: var(--wdi-interact);
+  box-shadow: var(--wdi-glow-interact);
+}
+
+.wdi-portrait.is-dead {
+  color: var(--wdi-text-on-paper-muted);
+  cursor: default;
+}
+
+.wdi-portrait.is-dead .wdi-portrait__pic {
+  filter: grayscale(1) contrast(0.8);
+}
+
+.wdi-portrait.is-dead .wdi-portrait__name {
+  text-decoration: line-through;
+  text-decoration-thickness: var(--wdi-stroke-w);
+}
+
+.wdi-portrait__ghost {
+  position: absolute;
+  top: var(--wdi-space-3);
+  left: var(--wdi-space-3);
+}
+
+/* The vote stamp lands on a portrait once the tally is revealed. */
+.wdi-stamp {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  width: 64px;
+  height: 64px;
+  margin-left: -32px;
+  transform: rotate(-12deg);
+  filter: drop-shadow(0 2px 2px rgb(var(--wdi-slate-rgb) / 0.6));
+  animation: wdi-stamp var(--wdi-dur-base) var(--wdi-ease) both;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- meeting: chat, board */
+
+.wdi-chat {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.wdi-chat__log {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  font-size: var(--wdi-text-sm);
+  background: var(--wdi-surface-sunken);
+  border-radius: var(--wdi-radius-md);
+  box-shadow: inset 0 0 0 1px var(--wdi-hairline);
+}
+
+.wdi-chat__line {
+  margin: 0;
+  padding: 2px 0;
+}
+
+.wdi-chat__who {
+  font-family: var(--wdi-font-display);
+  letter-spacing: var(--wdi-tracking-display);
+  text-transform: uppercase;
+  margin-right: var(--wdi-space-1);
+}
+
+.wdi-chat__line--system {
+  color: var(--wdi-text-muted);
+  font-style: italic;
+}
+
+.wdi-chat__form {
+  display: flex;
+  gap: var(--wdi-space-2);
+  margin-top: var(--wdi-space-2);
+}
+
+.wdi-quick {
+  display: flex;
+  gap: var(--wdi-space-2);
+  flex-wrap: wrap;
+}
+
+.wdi-tabs {
+  display: flex;
+  gap: var(--wdi-space-1);
+  border-bottom: var(--wdi-stroke-w) solid var(--wdi-hairline);
+}
+
+.wdi-tab {
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  font: inherit;
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-display-sm);
+  letter-spacing: var(--wdi-tracking-display);
+  text-transform: uppercase;
+  color: var(--wdi-text-muted);
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: calc(-1 * var(--wdi-stroke-w));
+  cursor: pointer;
+}
+
+.wdi-tab[aria-selected='true'] {
+  color: var(--wdi-text);
+  border-bottom-color: var(--wdi-primary);
+}
+
+/* ---------------------------------------------------------------- notebook */
+
+.wdi-notebook {
+  position: relative;
+  padding: var(--wdi-space-5) var(--wdi-space-4) var(--wdi-space-4);
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  background-image:
+    repeating-linear-gradient(to bottom, transparent 0 27px, var(--wdi-hairline-on-paper) 27px 28px),
+    var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-xs) var(--wdi-radius-md) var(--wdi-radius-md) var(--wdi-radius-xs);
+  box-shadow:
+    inset 6px 0 0 var(--wdi-hairline-on-paper),
+    var(--wdi-shadow-2);
+}
+
+.wdi-notebook__entry {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--wdi-space-2);
+  min-height: 28px;
+  font-size: var(--wdi-text-sm);
+}
+
+/* ---------------------------------------------------------------- quick mode: the dark loft */
+
+.wdi-loft {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wdi-space-5);
+  padding: var(--wdi-space-5);
+  color: var(--wdi-text-muted);
+  background:
+    radial-gradient(ellipse at 50% 20%, rgb(var(--wdi-moon-rgb) / 0.12), transparent 60%), var(--wdi-bg);
+}
+
+.wdi-bedrolls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 72px);
+  justify-content: center;
+  gap: var(--wdi-space-3);
+  width: min(560px, 100%);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Every seat's bedroll is drawn occupied all night (GDD 3.11, A21). */
+.wdi-bedroll {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--wdi-space-1);
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-text-xs);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+}
+
+.wdi-bedroll__blanket {
+  width: 56px;
+  height: 92px;
+  background: var(--wdi-surface);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: 14px 14px 10px 10px;
+  box-shadow:
+    inset 0 18px 0 rgb(var(--wdi-bone-rgb) / 0.35),
+    inset 0 0 0 1px var(--wdi-hairline);
+}
+
+.wdi-bedroll__blanket::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 8px auto 0;
+  background: rgb(var(--wdi-bone-rgb) / 0.6);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: 50%;
+}
+
+.wdi-bedroll.is-self .wdi-bedroll__blanket {
+  box-shadow:
+    inset 0 18px 0 rgb(var(--wdi-bone-rgb) / 0.35),
+    var(--wdi-glow-moon);
+}
+
+/* ---------------------------------------------------------------- motion */
+
+@keyframes wdi-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes wdi-drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes wdi-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes wdi-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes wdi-stamp {
+  from {
+    opacity: 0;
+    transform: rotate(-12deg) scale(1.6);
+  }
+}
+
+@keyframes wdi-pulse {
+  50% {
+    transform: scale(1.12);
+    opacity: 0.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-flip__inner,
+  .wdi-btn,
+  .wdi-touch-btn {
+    transition: none;
+  }
+
+  .wdi-scrim,
+  .wdi-dialog,
+  .wdi-toast,
+  .wdi-stamp,
+  .wdi-edge-cue {
+    animation: none;
+  }
+
+  .wdi-btn:hover {
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------- short viewports */
+
+@media (max-height: 760px) {
+  .wdi-card {
+    gap: var(--wdi-space-2);
+  }
+
+  .wdi-card__title {
+    font-size: var(--wdi-display-md);
+  }
+}
+
+/* ---------------------------------------------------------------- phones (390 px wide) */
+
+@media (max-width: 480px) {
+  :root {
+    --wdi-display-xl: 2.25rem;
+    --wdi-display-lg: 1.75rem;
+  }
+
+  .wdi-panel {
+    padding: var(--wdi-space-4);
+    border-radius: var(--wdi-radius-md);
+  }
+
+  .wdi-card {
+    padding: var(--wdi-space-2) var(--wdi-space-3) var(--wdi-space-3);
+  }
+
+  /* HUD on a phone: chip left, clock right, log under the clock, toasts above the controls. */
+  .wdi-hud-chip {
+    max-width: 56vw;
+  }
+
+  .wdi-hud__tc {
+    left: auto;
+    right: inherit;
+    transform: none;
+  }
+
+  .wdi-hud__tr {
+    top: calc(var(--wdi-space-3) + env(safe-area-inset-top) + 56px);
+  }
+
+  .wdi-log {
+    max-width: 70vw;
+  }
+
+  .wdi-toasts {
+    bottom: calc(176px + env(safe-area-inset-bottom));
+  }
+
+  .wdi-portraits {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: var(--wdi-space-2);
+  }
+
+  .wdi-portrait__pic {
+    max-height: 110px;
+  }
+}
