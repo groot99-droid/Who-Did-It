@@ -65,7 +65,7 @@ the regex and arrive after the M3 gate.
 | `idle` | 8 | loop | |
 | `walk` | 8 | loop | |
 | `swing` | 6 | once | Shared by Kill, Crowbar and Check (`ARCHITECTURE.md` 5.4); never role-specific |
-| `die` | 8 | once, hold last frame | The last frame is the body on the floor |
+| `die` | 8 | once, hold last frame | The last frame is the body on the floor. Rendered in 256 px cells with the feet at the centre (a fallen body reaches about 90 px below the feet); trim and the pivot hide the difference |
 
 ## 4. Feet pivot manifest
 
@@ -85,10 +85,11 @@ The rig projects the `Feet` empty into camera space on every rendered frame and 
 }
 ```
 
-`feet` is in cell pixels from the top-left corner of the untrimmed 128 px cell. Every pass of a frame
+`feet` is in cell pixels from the top-left corner of the untrimmed cell; a frame rendered in a
+larger cell (`die`, 256 px) also carries `"cell": 256`. Every pass of a frame
 shares the body's pivot, so the overlays stay registered. The packer keeps `sourceSize` and
 `spriteSourceSize` (trim is reversible) and `gen-anims.ts` writes the pivot into every atlas frame as
-`pivot: {x: feet.x / 128, y: feet.y / 128}`; Phaser applies a frame's custom pivot as the sprite
+`pivot: {x: feet.x / cell, y: feet.y / cell}`; Phaser applies a frame's custom pivot as the sprite
 origin when the frame is set, so the feet stay put while the trimmed size changes.
 
 ## 5. Asset manifest and loading
