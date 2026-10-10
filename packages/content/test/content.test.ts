@@ -173,6 +173,24 @@ describe('balance (GDD 3.3, 3.9)', () => {
   });
 });
 
+describe('NPC fill (GDD 3.12)', () => {
+  it('has three difficulty rows that get harsher in order', () => {
+    const { easy, normal, hard } = balance.npc.difficulty;
+    expect(balance.npc.defaultDifficulty).toBe('normal');
+    expect(easy.killChancePer10s).toBeLessThan(normal.killChancePer10s);
+    expect(normal.killChancePer10s).toBeLessThan(hard.killChancePer10s);
+    expect(easy.reportDelayS).toBeGreaterThan(normal.reportDelayS);
+    expect(normal.reportDelayS).toBeGreaterThan(hard.reportDelayS);
+    expect(easy.plantsPerNight).toBeLessThanOrEqual(normal.plantsPerNight);
+    expect(normal.plantsPerNight).toBeLessThanOrEqual(hard.plantsPerNight);
+  });
+
+  it('turns difficulty on only with enough NPC seats to fill a party', () => {
+    expect(balance.npc.difficultyMinNpcs).toBeGreaterThan(0);
+    expect(balance.npc.difficultyMinNpcs).toBeLessThan(balance.players.max);
+  });
+});
+
 describe('items (GDD 3.5)', () => {
   it('keeps the Knife bound and lets the Magnifier drop as an Inspect station', () => {
     expect(items.items.knife).toMatchObject({ roleBound: true, onDeath: 'kept' });

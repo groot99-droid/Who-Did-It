@@ -2,8 +2,8 @@
 
 Every third-party or generated asset that ships in this repository has a row here before it lands
 (`docs/ASSETS.md` 6.5). Code is MIT (`LICENSE`). **AI-generated images in this repo are dedicated to the public domain
-under CC0 1.0** (`LICENSES/CC0-1.0.txt`, `docs/DECISIONS.md` A17). The licence for hand-made original
-art (renders, vectors, audio) is still open (open question 6), so there is no `LICENSE-ASSETS` yet.
+under CC0 1.0** (`LICENSES/CC0-1.0.txt`, `docs/DECISIONS.md` A17). Hand-made original art
+(renders, vectors, audio) is CC BY 4.0 (`LICENSE-ASSETS`, `LICENSES/CC-BY-4.0.txt`, `docs/DECISIONS.md` A19).
 
 ## Policy
 

@@ -73,6 +73,9 @@ export const OnubBalanceFile = z.strictObject({
     dawnS: Seconds,
     voteS: Seconds,
     revealS: Seconds,
+    /** Sleepers in the loft hear a fake noise pulse every min..max s, generated client-side. */
+    sleeperPulseMinS: Seconds,
+    sleeperPulseMaxS: Seconds,
     gddRef: GddRef,
   }),
   actRangeTiles: Tiles,

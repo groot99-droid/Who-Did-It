@@ -69,7 +69,7 @@ Values the table leaves open (decided 2026-10-10, Session C): Kill, Bandage, Sal
 
 | Phase | Trigger | Duration |
 |---|---|---|
-| Lobby | Leader creates party; Start at >= 4 | – |
+| Lobby | Leader creates party; Start with >= 1 human (NPCs fill to 4, 3.12) | – |
 | Role reveal | Server deals roles and traits | 12 s, then 3-2-1 |
 | Grace | Spawn spread around the square; kills disabled; guided clue | 30 s |
 | Day | Free roam, tasks; light radius 7 tiles | 110 s |
@@ -207,7 +207,7 @@ Origin: the owner's friend first framed the whole game as "One Night Ultimate Ba
 
 Both Poisoners sit among the dead's loaves in 3 / C(N+3, 2) of deals: 14% at 4 players, 8% at 6, 4% at 10. Those games are won by the village only if nobody is turned out.
 
-**Night.** After the 12 s role card (your dealt token) and a 10 s Dusk in which everyone walks into the bakery and sets their loaf (hold E on your own plate, 1 s), every client goes to a black "you sleep in the loft" screen with storm ambience and no clock. Sleepers are moved to a `loft` pseudo-scene so the server encodes no presence to them. The server runs a Conductor: a fixed list of windows built from the deck. Every window runs even when its role sits among the dead's loaves, so night length never leaks the deal. Only players whose **dealt** role matches the open window are spawned at the bakery door for that window; they act as what they were dealt, not as what they may now hold, then fade back to black. Windows carry a seeded 0-4 s jitter.
+**Night.** After the 12 s role card (your dealt token) and a 10 s Dusk in which everyone walks into the bakery and sets their loaf (hold E on your own plate, 1 s), every client goes to the dark loft (owner decision A21): you lie still in your bedroll, with no movement and no clock, under storm ambience. The client draws one bedroll per seat, every one of them occupied all night, including those whose players are awake, so nobody can see who gets up. Muffled noise pulses (a creak, footsteps below) come from a random direction at random intervals between `timers.sleeperPulseMinS` and `timers.sleeperPulseMaxS`; the client generates them on its own, with no link to the windows, so they leak nothing. Sleepers are moved to a `loft` pseudo-scene so the server encodes no presence to them. The server runs a Conductor: a fixed list of windows built from the deck. Every window runs even when its role sits among the dead's loaves, so night length never leaks the deal. Only players whose **dealt** role matches the open window are spawned at the bakery door for that window; they act as what they were dealt, not as what they may now hold, then fade back to the loft. Windows carry a seeded 0-4 s jitter.
 
 | # | Window | Who wakes | Physical act (object, hold time) | Trace at dawn |
 |---|---|---|---|---|
@@ -258,17 +258,27 @@ Reveal (20 s): every plate cracks open. The end screen shows dealt and final rol
 | Gamekeeper | If the village turns you out, you take your vote with you. Point carefully. |
 | Mourner | You came for the bread and the will. Listen, count the claims, and vote. |
 
-**Balance.** At 4-5 the deal is swap chaos with the Debtor as the first bluff; 150 s of text discussion is enough. At 6-7 the Hireling punishes "no Poisoner here, vote in a circle" play and the Lamplighter gives the first verifiable late claim. At 8-10 three verified-claim sources (Sin-Eater, Lamplighter, Pallbearers) face two liars and a Hireling, and the Gamekeeper makes mass-voting costly. Every count lands at about 5-7 minutes (card 12 + dusk 10 + night 60-102 plus jitter + dawn 10 + discussion 150-210 + vote up to 25 + reveal 20), short of the 5-7 minute target at 4-7 players; raising discussion is the knob if playtests want the longer match. Replayability comes from the deal and the swaps reshuffling identity every match and the swap log teaching the table at the end. The mode has no ranking.
+**Balance.** At 4-5 the deal is swap chaos with the Debtor as the first bluff; 150 s of text discussion is enough. At 6-7 the Hireling punishes "no Poisoner here, vote in a circle" play and the Lamplighter gives the first verifiable late claim. At 8-10 three verified-claim sources (Sin-Eater, Lamplighter, Pallbearers) face two liars and a Hireling, and the Gamekeeper makes mass-voting costly. Every count lands inside the 5-7 minute target (card 12 + dusk 10 + night 60-102 plus jitter + dawn 10 + discussion 150-210 + vote up to 25 + reveal 20); discussion is the knob if playtests want a longer match. Replayability comes from the deal and the swaps reshuffling identity every match and the swap log teaching the table at the end. The mode has no ranking.
 
-**V1 cut.** Ships: mode toggle; decks for 4-10 with the Pallbearers and Gamekeeper replaced by Mourners (nine roles); bakery greybox with plates, ledge and ledger; sleep screen and Conductor; dusk plate-setting; Meeting reuse with no Skip and claim chips; `resolveDawn` and the winner table; the reveal with the swap log. V1.1: Pallbearers, Gamekeeper, a dawn walk in the bakery before the meeting, flour footprints, eleven role portraits, lobby role picks.
+**V1 cut.** Ships: mode toggle; decks for 4-10 with the Pallbearers and Gamekeeper replaced by Mourners (nine roles); bakery greybox with plates, ledge and ledger; dark loft view and Conductor; dusk plate-setting; Meeting reuse with no Skip and claim chips; `resolveDawn` and the winner table; the reveal with the swap log. V1.1: Pallbearers, Gamekeeper, a dawn walk in the bakery before the meeting, flour footprints, eleven role portraits, lobby role picks.
 
-**Trademark note.** The mechanics of the one-night card game are not protected, but its name and its card art and text belong to its publisher. The parody title is fine for a free game among friends; if Who Did It is ever sold, ship the mode under a neutral label (suggested: "The Wake Loaves") and never reuse the card game's text or art.
+**Trademark note.** The mechanics of the one-night card game are not protected, but its name and its card art and text belong to its publisher. The parody title is fine for a free game among friends; if Who Did It is ever sold, ship the mode under a neutral label and never reuse the card game's text or art. The label is chosen only if a sale happens (A22); "The Wake Loaves" is the working suggestion.
 
 ### 3.12 NPC fill (below the minimum)
 
-**Decision (owner, 2026-10-10, A16):** a party may start with fewer than 4 humans; the server fills the empty seats with NPC villagers so the full roster is dealt. The numbers and the role policy below are the proposal behind open question 15 in `DECISIONS.md`; they move to `balance.json` when the owner confirms them.
+**Decision (owner, 2026-10-10, A16 and A26):** a party may start with fewer than `players.min` humans; the server fills the empty seats with NPC villagers so the full roster is dealt.
 
-- **Trigger.** Start is enabled with at least 1 human. If the party has fewer than 4 players, the server adds NPCs up to 4 before dealing. The leader may add NPCs by hand up to 6 players in total; a human joining a lobby takes the place of an NPC. Below 4 humans the lobby reads "Practice party with NPCs: roles on, no ranking".
-- **Identity.** NPC seats are marked in the lobby and on the roster (`isNpc` is public). Their roles are dealt from the same roster row as everyone else's and are as secret as a human's: an NPC can be the Killer.
-- **Behaviour (V1, scripted, server-side, no client).** Wander between scenes through the portal graph; perform tasks at nodes at a slow pace; at night prefer lit scenes and hiding spots; report a body on sight after a 3 s delay; vote in the meeting for the player with the most Verified clues on the Case Board, else Skip. A Killer NPC strikes a human who is alone in a scene at night with a 40% chance per 10 s of opportunity, washes at the nearest basin, then returns to the square and votes with the majority. An Accomplice NPC plants one false clue per night.
-- **Scope.** NPCs ship in M3c (ROADMAP 7.1) after the first playable, reusing the bot movement of `tools/bots/swarm.ts` inside the room as entities rather than clients. NPCs never speak in chat; quick mode (3.11) deals NPCs as sleepers whose acts the Conductor resolves at random within their window.
+- **Seats.** Start is enabled with at least 1 human. With fewer than `players.min` players the server adds NPCs up to `players.min` before dealing; the leader may add NPCs by hand up to `players.max`. A human joining the lobby takes an NPC's seat.
+- **Same game.** NPCs are dealt from the same roster row and can hold any role, the Killer included; their roles are as secret as a human's. Rules, the practice label at 4 (3.1, 3.9) and any ranking depend only on the total player count, never on how many seats are NPCs.
+- **Hidden seats.** Nothing a client receives marks a seat as an NPC: `isNpc` lives in room memory only, and NPCs take human-style names from a name pool. NPCs never chat, which a table that knows each other will notice; nothing on the wire confirms it.
+- **Difficulty.** A lobby setting, Easy / Normal / Hard, default `npc.defaultDifficulty`. It is enabled only when the party holds at least `npc.difficultyMinNpcs` NPC seats; with fewer, NPCs play the default. Each level is a row of `balance.json` `npc.difficulty`:
+
+| Value | Meaning |
+|---|---|
+| `killChancePer10s` | A Killer NPC strikes a human alone in its scene at night with this chance per 10 s of opportunity |
+| `reportDelayS` | Delay before an NPC reports a body it sees |
+| `plantsPerNight` | False clues an Accomplice NPC plants per night |
+| `suspectVoteChance` | Chance an NPC votes for the player with the most Verified clues on the Case Board instead of Skip |
+
+- **Behaviour (V1, scripted, server-side, no client).** Wander between scenes through the portal graph; perform tasks at nodes at a slow pace; at night prefer lit scenes and hiding spots; report a body on sight; vote as the difficulty row says. A Killer NPC washes at the nearest basin after a kill, returns to the square and votes with the majority.
+- **Scope.** NPCs ship in M3c (ROADMAP 7.1) after the first playable, reusing the bot movement of `tools/bots/swarm.ts` inside the room as entities rather than clients. In quick mode (3.11) NPCs are sleepers with a bedroll like everyone else, and the Conductor resolves their acts at random within their window.

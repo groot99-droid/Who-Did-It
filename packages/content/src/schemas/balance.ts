@@ -39,6 +39,20 @@ export type BalanceRow = z.infer<typeof BalanceRow>;
 
 const Section = <T extends z.ZodRawShape>(shape: T) => z.strictObject({ ...shape, gddRef: GddRef });
 
+export const NpcDifficulty = z.enum(['easy', 'normal', 'hard']);
+export type NpcDifficulty = z.infer<typeof NpcDifficulty>;
+const Chance = z.number().min(0).max(1);
+export const NpcDifficultyRow = z.strictObject({
+  /** A Killer NPC strikes a human alone in its scene at night with this chance per 10 s of opportunity. */
+  killChancePer10s: Chance,
+  reportDelayS: Seconds,
+  /** False clues an Accomplice NPC plants per night. */
+  plantsPerNight: z.number().int().nonnegative(),
+  /** Chance an NPC votes for the top Case Board suspect rather than Skip. */
+  suspectVoteChance: Chance,
+});
+export type NpcDifficultyRow = z.infer<typeof NpcDifficultyRow>;
+
 export const BalanceFile = z.strictObject({
   gddRef: GddRef,
   tickHz: z.number().int().positive(),
@@ -136,6 +150,16 @@ export const BalanceFile = z.strictObject({
     fleeLightTiles: Tiles,
     gateClearingTiles: Tiles,
     intrudersWhenFenceBroken: z.number().int().nonnegative(),
+  }),
+  npc: Section({
+    /** Below this many NPC seats the difficulty setting is off and NPCs play `defaultDifficulty`. */
+    difficultyMinNpcs: z.number().int().positive(),
+    defaultDifficulty: NpcDifficulty,
+    difficulty: z.strictObject({
+      easy: NpcDifficultyRow,
+      normal: NpcDifficultyRow,
+      hard: NpcDifficultyRow,
+    }),
   }),
   ghosts: Section({ wispsPerCycle: z.number().int().nonnegative() }),
   chat: Section({

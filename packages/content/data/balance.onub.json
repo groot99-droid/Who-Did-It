@@ -199,6 +199,8 @@
     "dawnS": 10,
     "voteS": 25,
     "revealS": 20,
+    "sleeperPulseMinS": 6,
+    "sleeperPulseMaxS": 14,
     "gddRef": "3.11"
   },
   "actRangeTiles": 2,

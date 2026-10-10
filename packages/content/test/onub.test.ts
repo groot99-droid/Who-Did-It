@@ -127,6 +127,20 @@ describe('night windows (GDD 3.11)', () => {
     }
   });
 
+  it('fires several sleeper pulses in even the shortest night', () => {
+    const { sleeperPulseMinS, sleeperPulseMaxS } = onubBalance.timers;
+    const shortest = Math.min(
+      ...counts.map((n) =>
+        onubBalance.windows
+          .filter((w) => onubFor(n).deck.includes(w.role))
+          .reduce((s, w) => s + w.seconds + onubBalance.timers.fadeS, 0),
+      ),
+    );
+    expect(sleeperPulseMinS).toBeGreaterThan(0);
+    expect(sleeperPulseMinS).toBeLessThan(sleeperPulseMaxS);
+    expect(Math.floor(shortest / sleeperPulseMaxS)).toBeGreaterThanOrEqual(3);
+  });
+
   it("references only defined acts and makes the Sot's swap mandatory", () => {
     for (const w of onubBalance.windows)
       for (const a of w.acts) expect(onubBalance.acts[a.act]).toBeDefined();

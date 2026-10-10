@@ -162,6 +162,31 @@
     "intrudersWhenFenceBroken": 1,
     "gddRef": "3.6"
   },
+  "npc": {
+    "difficultyMinNpcs": 4,
+    "defaultDifficulty": "normal",
+    "difficulty": {
+      "easy": {
+        "killChancePer10s": 0.25,
+        "reportDelayS": 5,
+        "plantsPerNight": 0,
+        "suspectVoteChance": 0.5
+      },
+      "normal": {
+        "killChancePer10s": 0.4,
+        "reportDelayS": 3,
+        "plantsPerNight": 1,
+        "suspectVoteChance": 0.75
+      },
+      "hard": {
+        "killChancePer10s": 0.6,
+        "reportDelayS": 1.5,
+        "plantsPerNight": 2,
+        "suspectVoteChance": 1
+      }
+    },
+    "gddRef": "3.12"
+  },
   "ghosts": { "wispsPerCycle": 1, "gddRef": "3.7" },
   "chat": {
     "quickChatRadiusTiles": 5,
