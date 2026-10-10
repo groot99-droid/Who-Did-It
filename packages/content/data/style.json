@@ -1,5 +1,28 @@
 {
   "source": "docs/ASSETS.md 6.4, 6.9",
   "styleFormula": "stylized toon-noir, chunky low-poly 3-heads-tall proportions, flat two-tone cel shading, thick dark ink outlines, moody night lighting with warm lantern orange and cool moonlight blue, palette #12141C #2C3240 #6F7A8C #D9D2C2 #F2B33D #2EC4B6 #E04E9A, clean solid background, no text.",
-  "styleToken": "toon-noir low-poly 3-heads-tall, flat 2-tone cel, thick ink outlines, lantern orange vs moon blue, plain bg, no text"
+  "styleToken": "toon-noir low-poly 3-heads-tall, flat 2-tone cel, thick ink outlines, lantern orange vs moon blue, plain bg, no text",
+  "ui": {
+    "source": "docs/UI.md",
+    "fonts": { "display": "Oswald", "text": "Inter" },
+    "typeScalePx": {
+      "displayXl": 44,
+      "displayLg": 32,
+      "displayMd": 24,
+      "displaySm": 18,
+      "textLg": 18,
+      "textMd": 16,
+      "textSm": 14,
+      "textXs": 12
+    },
+    "lineHeight": { "display": 1.1, "text": 1.45 },
+    "trackingEm": { "display": 0.04, "caps": 0.12, "code": 0.18 },
+    "spacePx": [4, 8, 12, 16, 24, 32, 48],
+    "radiusPx": { "xs": 2, "sm": 6, "md": 10, "lg": 16, "card": 20 },
+    "frameMarginPx": 24,
+    "gridPx": 48,
+    "touchTargetPx": 44,
+    "minViewportPx": 390,
+    "contrast": { "textMin": 4.5, "largeTextAndUiMin": 3 }
+  }
 }
