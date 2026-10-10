@@ -15,7 +15,9 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "format": "prettier --write .",
-    "assets:render": "pnpm --filter @wdi/blender render:smoke"
+    "assets:render": "pnpm --filter @wdi/blender render:smoke",
+    "docs:protocol": "pnpm --filter @wdi/shared docs:protocol",
+    "bots": "pnpm --filter @wdi/bots start"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

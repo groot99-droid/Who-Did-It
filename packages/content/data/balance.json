@@ -7,6 +7,7 @@
     "nameMax": 16,
     "codeLength": 5,
     "codeAlphabet": "ABCDEFGHJKLMNPQRSTUVWXYZ23456789",
+    "startMinHumans": 1,
     "gddRef": "2"
   },
   "phases": {

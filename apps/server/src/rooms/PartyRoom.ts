@@ -27,6 +27,7 @@ import { CodeRegistry } from '../services/CodeRegistry';
 import { genericJoinError } from '../services/matchmakeGuard';
 import { metrics } from '../services/Metrics';
 import { registerDebugHandlers } from './handlers/debug';
+import { isLobbyCommand, runLobbyCommands, runLobbyPhase } from './handlers/lobby';
 
 const codeRegistries = new WeakMap<object, CodeRegistry>();
 
@@ -45,6 +46,10 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
   /** Hard cap (ARCHITECTURE 5.11); the per-type buckets of M7 drop rather than disconnect. */
   override maxMessagesPerSecond = MAX_MESSAGES_PER_SECOND;
   readonly commands = new CommandQueue();
+  /** Lobby and role-card messages; drained by `runLobbyCommands` inside the fixed step. */
+  readonly lobbyCommands = new CommandQueue();
+  /** Room memory only: never sent to clients, kept for reproducing a deal while debugging. */
+  matchSeed = 0;
   private code = '';
 
   /**
@@ -82,12 +87,15 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
 
     this.onMessage('*', (client, type, payload) => {
       // Nothing mutates state here: the step consumes the queue (ARCHITECTURE 5.6).
-      if (typeof type === 'string' && isCommandType(type)) this.commands.push(client, type, payload);
+      if (typeof type !== 'string' || !isCommandType(type)) return;
+      (isLobbyCommand(type) ? this.lobbyCommands : this.commands).push(client, type, payload);
     });
 
     this.setFixedTimestep((ctx) => {
       const t0 = performance.now();
       step(this, ctx);
+      runLobbyCommands(this);
+      runLobbyPhase(this);
       metrics.recordTick(performance.now() - t0);
     }, TICK_RATE);
 

@@ -1,3 +1,5 @@
+import { BUILD_VERSION } from '@wdi/shared/version';
+
 export interface Health {
   ok: boolean;
   build: string;
@@ -8,7 +10,21 @@ export const SERVER_URL: string = (import.meta.env.VITE_SERVER_URL || 'http://lo
   /\/+$/,
   '',
 );
-export const BUILD_VERSION: string = import.meta.env.VITE_BUILD_VERSION || 'dev';
+export { BUILD_VERSION } from '@wdi/shared/version';
+
+export const REFRESH_MESSAGE = 'A new version is out: refresh to update.';
+
+/** The server and this page were built from different commits, so joins would be refused (ARCHITECTURE 5.10). */
+export const isStale = (health: Health): boolean => health.build !== BUILD_VERSION;
+
+/** One-shot `/health` read for a failed join: resolves true when the page is out of date. */
+export async function buildIsStale(): Promise<boolean> {
+  try {
+    return isStale(await fetchHealth(AbortSignal.timeout(TIMEOUT_MS)));
+  } catch {
+    return false;
+  }
+}
 
 const POLL_MS = 2000;
 const TIMEOUT_MS = 6000;

@@ -62,6 +62,8 @@ export const BalanceFile = z.strictObject({
     nameMax: z.number().int().positive(),
     codeLength: z.number().int().positive(),
     codeAlphabet: z.string().regex(/^[A-Z2-9]+$/),
+    /** Humans needed to press Start; below `players.min` the seats are NPC-filled (GDD 3.12). */
+    startMinHumans: z.number().int().min(1),
   }),
   phases: Section({
     roleRevealS: Seconds,

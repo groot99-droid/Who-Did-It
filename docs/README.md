@@ -9,6 +9,7 @@
 | [ASSETS.md](ASSETS.md) | Palette, Blender 8-direction rig, per-asset pipelines, Higgsfield tool map, Adobe usage, licensing policy, backlog, budgets. |
 | [ROADMAP.md](ROADMAP.md) | Milestones M0-M7, parallel tracks, placeholder strategy, risk register, playtest plan, day 1-14 schedule, V2 outline. |
 | [DECISIONS.md](DECISIONS.md) | Decisions locked with the owner, changes from review, open questions. |
+| [PROTOCOL.md](PROTOCOL.md) | Generated wire protocol: message tables, payload types, error codes (`pnpm docs:protocol`). |
 | [RESEARCH.md](RESEARCH.md) | Sourced facts behind the version pins, hosting choice and licensing rules. |
 | [SESSIONS.md](SESSIONS.md) | The four parallel build sessions: path ownership, branches, PR base, interfaces and briefs. |
 

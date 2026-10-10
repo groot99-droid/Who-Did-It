@@ -23,9 +23,10 @@ test('two players create and join a party and both reach the lobby', async ({ br
   await expect(guest.getByTestId('party-code')).toHaveText(code);
   await expect(guest.getByTestId('player-list')).toContainText('Gus');
 
-  // Leader-only Start, gated at 4 players with a confirm dialog.
+  // Leader-only Start with a confirm dialog.
   await expect(guest.getByTestId('start')).toBeHidden();
   const start = host.getByTestId('start');
+  await expect(host.getByTestId('player-count')).toHaveText('4 / 10', { timeout: 5000 });
   await expect(start).toBeEnabled();
   await start.click();
   await expect(host.getByRole('dialog')).toContainText('Start with 4 players?');
@@ -34,6 +35,7 @@ test('two players create and join a party and both reach the lobby', async ({ br
   // Role card: private, flips, Ready dismisses it, Tab brings it back.
   await expect(host.getByTestId('role-name')).toHaveText('Killer');
   await host.getByTestId('ready').click();
+  await expect(host.getByTestId('entered')).toContainText('overworld');
   await expect(host.getByTestId('rolecard')).toBeHidden();
   await host.keyboard.press('Tab');
   await expect(host.getByTestId('rolecard')).toBeVisible();
@@ -62,7 +64,7 @@ test('boot prints {ok, build} from /health', async ({ page }) => {
     route.fulfill({
       contentType: 'application/json',
       headers: { 'access-control-allow-origin': '*' },
-      body: JSON.stringify({ ok: true, build: 'abc12345' }),
+      body: JSON.stringify({ ok: true, build: 'dev' }),
     }),
   );
   await page.goto('/Who-Did-It/');

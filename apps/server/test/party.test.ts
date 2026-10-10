@@ -133,7 +133,7 @@ describe('fixed step and command queue', () => {
     const room = colyseus.getRoomById(leader.roomId) as unknown as PartyRoom;
     const player = room.state.players.get(leader.sessionId);
     // Hold the step still, deliver the message, and check nothing changed until a step runs.
-    const queue = room.commands;
+    const queue = room.lobbyCommands;
     const drain = queue.drain.bind(queue);
     let held = true;
     queue.drain = () => (held ? [] : drain());

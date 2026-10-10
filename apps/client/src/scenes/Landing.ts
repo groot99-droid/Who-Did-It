@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { setRoute } from '../flags';
+import { buildIsStale, REFRESH_MESSAGE } from '../health';
 import { mountLanding } from '../ui/Landing';
 import { overlayRoot, type Screen } from '../ui/dom';
 import { Backdrop } from '../view/Backdrop';
@@ -29,6 +30,7 @@ export class Landing extends Phaser.Scene {
         joinCode: flags.joinCode,
         onCreate: async (name) => enterLobby(await net.create(name)),
         onJoin: async (code, name) => enterLobby(await net.join(code, name)),
+        explainFailure: async () => (!flags.mock && (await buildIsStale()) ? REFRESH_MESSAGE : null),
       });
     };
 

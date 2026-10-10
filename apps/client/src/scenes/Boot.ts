@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { type Flags, readFlags } from '../flags';
-import { type Health, waitForHealth } from '../health';
+import { type Health, isStale, REFRESH_MESSAGE, waitForHealth } from '../health';
 import { createNetwork } from '../net';
 import { Backdrop } from '../view/Backdrop';
 import { REG_FLAGS, REG_HEALTH, REG_NET } from './registry';
@@ -35,6 +35,10 @@ export class Boot extends Phaser.Scene {
 
   private finish(health: Health, backdrop: Backdrop): void {
     this.registry.set(REG_HEALTH, health);
+    if (!(this.registry.get(REG_FLAGS) as Flags).mock && isStale(health)) {
+      backdrop.setStatus(REFRESH_MESSAGE);
+      return;
+    }
     backdrop.setHealth(health);
     this.time.delayedCall(900, () => this.scene.start('Preload'));
   }

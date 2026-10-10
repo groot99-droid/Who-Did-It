@@ -227,3 +227,7 @@ and art run on Opus 5.5 or Fable 5.1.
 | J | H | J's studio notes and `higgsfield-library-sync` catalog ids are what H cites in `CREDITS.md` rows once J exists; until then H cites generation ids as D did. |
 
 Suggested merge order: F, G, I, H, J.
+
+### Round 2 log: F (M1 finish)
+
+Done on `claude/m1-finish`: follow-ups 1 to 3 and the 5.4 excerpt of item 4 above. For G: lobby and role-card messages (`lobby.start`, `lobby.ready`, `role.ready`) go to `PartyRoom.lobbyCommands`, not `commands`, so `sim/Commands.ts` never sees them and its `lobby.ready` case is dead code you can delete. `PartyRoom` calls `runLobbyCommands` and `runLobbyPhase` after `step()`. `net.roleCard` keeps the player's own card for Tab in any scene; `RoleReveal` starts a `World` scene (if registered) on `sceneEnter`. The server runs from source with `pnpm --filter @wdi/server serve` (tsx needs `--conditions=development` to read `@wdi/content` source).

@@ -1,7 +1,7 @@
-import type { RoleRevealPayload, Traits } from '../net/protocol';
+import type { RoleRevealPayload, TraitIds } from '../net/protocol';
 import { h, isTyping, type Screen } from './dom';
 
-// TODO: import from `@wdi/shared/constants` when it merges (GDD 3.x: the card holds 12 s).
+/** Fallback hold time (`balance.json` phases.roleRevealS); the server's `phaseChange.endsTick` overrides it. */
 export const ROLE_CARD_SECONDS = 12;
 
 const FLIP_DELAY_MS = 650;
@@ -12,13 +12,17 @@ const TEAM_LABEL: Record<RoleRevealPayload['team'], string> = {
   neutral: 'Neutral',
 };
 
-const HEIGHT_LABEL: Record<Traits['height'], string> = { S: 'Short', M: 'Average height', T: 'Tall' };
-const HAT_LABEL: Record<Traits['hat'], string> = { cap: 'Cap', bowler: 'Bowler hat', bare: 'No hat' };
+/** Words for the trait value ids of `traits.json`; a test keeps these in step with its `label` fields. */
+export const TRAIT_LABELS: { [A in keyof TraitIds]: Record<TraitIds[A], string> } = {
+  height: { short: 'Short', mid: 'Medium height', tall: 'Tall' },
+  scarf: { red: 'Red scarf', green: 'Green scarf', blue: 'Blue scarf' },
+  hat: { cap: 'Cap', bowler: 'Bowler hat', bare: 'Bare head' },
+};
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-export function lookLine(t: Traits): string {
-  return `You look like: ${HEIGHT_LABEL[t.height]} / ${cap(t.scarf)} scarf / ${HAT_LABEL[t.hat]}`;
+export function lookLine(t: TraitIds): string {
+  return `You look like: ${TRAIT_LABELS.height[t.height]} / ${TRAIT_LABELS.scarf[t.scarf]} / ${TRAIT_LABELS.hat[t.hat]}`;
 }
 
 export function roleTitle(roleId: string): string {
@@ -59,7 +63,7 @@ export function mountRoleCard(
       ),
     );
   const items = role.inventory.map((i) =>
-    h('li', { title: i.tooltip }, i.qty > 1 ? `${i.defId} x${i.qty}` : i.defId),
+    h('li', { title: i.tooltip }, i.qty > 1 ? `${i.name} x${i.qty}` : i.name),
   );
 
   const front = h(

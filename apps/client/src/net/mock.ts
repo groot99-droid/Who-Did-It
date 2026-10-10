@@ -6,7 +6,7 @@ import {
   type ClientMessageType,
   type LobbyPlayer,
   MAX_PLAYERS,
-  MIN_PLAYERS_TO_START,
+  type RoleRevealPayload,
 } from './protocol';
 
 /** Same alphabet idea as the server: no 0/O/1/I/L lookalikes. */
@@ -30,6 +30,7 @@ export class MockNetwork implements NetworkService {
   readonly bus: Emitter<NetEvents> = mitt<NetEvents>();
   private room: LobbySnapshot | null = null;
   private timers: number[] = [];
+  private card: RoleRevealPayload | null = null;
 
   get code(): string | null {
     return this.room?.code ?? null;
@@ -37,6 +38,10 @@ export class MockNetwork implements NetworkService {
 
   get snapshot(): LobbySnapshot | null {
     return this.room;
+  }
+
+  get roleCard(): RoleRevealPayload | null {
+    return this.card;
   }
 
   async create(name: string): Promise<string> {
@@ -60,15 +65,29 @@ export class MockNetwork implements NetworkService {
     return false;
   }
 
-  send<K extends ClientMessageType>(type: K, _payload: ClientMessages[K]): void {
+  send<K extends ClientMessageType>(type: K, payload: ClientMessages[K]): void {
     const room = this.room;
     if (room === null) return;
-    if (
-      type === 'lobby.start' &&
-      room.leaderId === room.selfId &&
-      room.players.length >= MIN_PLAYERS_TO_START
-    ) {
-      this.later(() => this.bus.emit('roleReveal', MOCK_ROLE_REVEAL), 300);
+    // Mirrors the server: Start is leader-only and needs one human; the rest of the party is Ready.
+    if (type === 'lobby.start' && room.leaderId === room.selfId && this.card === null) {
+      this.later(() => {
+        this.card = MOCK_ROLE_REVEAL;
+        this.bus.emit('roleReveal', MOCK_ROLE_REVEAL);
+      }, 300);
+    }
+    if (type === 'lobby.ready' && this.card === null) {
+      const ready = (payload as ClientMessages['lobby.ready']).ready;
+      this.room = {
+        ...room,
+        players: room.players.map((p) => (p.id === room.selfId ? { ...p, ready } : p)),
+      };
+      this.bus.emit('lobby', this.room);
+    }
+    if (type === 'lobby.ready' && (payload as ClientMessages['lobby.ready']).ready && this.card !== null) {
+      this.later(
+        () => this.bus.emit('sceneEnter', { sceneId: 'overworld', spawn: 'square_0', facing: 's' }),
+        300,
+      );
     }
   }
 
@@ -108,5 +127,6 @@ export class MockNetwork implements NetworkService {
     for (const t of this.timers) window.clearTimeout(t);
     this.timers = [];
     this.room = null;
+    this.card = null;
   }
 }

@@ -202,7 +202,6 @@ describe('items (GDD 3.5)', () => {
     for (const role of Object.values(roles.roles)) {
       if (role.ships !== 'V1') continue;
       for (const k of role.startKit) {
-        if (k.item === 'forgedAlibi') continue; // the Accomplice's V1.5 kit item
         expect(items.items[k.item]?.ships, `${role.id} ${k.item}`).toBe('V1');
       }
     }

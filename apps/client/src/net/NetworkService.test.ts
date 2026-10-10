@@ -113,8 +113,8 @@ describe('ColyseusNetwork', () => {
   it('sends typed messages through the room', async () => {
     const net = new ColyseusNetwork();
     await net.create('Ada');
-    net.send('role.ready', {});
-    expect(hoisted.lastRoom.current?.send).toHaveBeenCalledWith('role.ready', {});
+    net.send('lobby.ready', { ready: true });
+    expect(hoisted.lastRoom.current?.send).toHaveBeenCalledWith('lobby.ready', { ready: true });
   });
 
   it('clears the token when gameOver arrives', async () => {

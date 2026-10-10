@@ -8,6 +8,8 @@ export interface LandingOptions {
   joinCode: string | null;
   onCreate(name: string): Promise<void>;
   onJoin(code: string, name: string): Promise<void>;
+  /** After a failed join: a better message than the generic one, if there is one (stale build). */
+  explainFailure?(): Promise<string | null>;
 }
 
 const NAME_KEY = 'wdi:name';
@@ -63,6 +65,9 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
     } catch {
       message.textContent = JOIN_FAILED_MESSAGE;
       setBusy(false);
+      void opts.explainFailure?.().then((better) => {
+        if (better !== null) message.textContent = better;
+      });
     }
   };
 

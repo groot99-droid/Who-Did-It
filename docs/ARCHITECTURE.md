@@ -50,7 +50,7 @@ Schema 5 builder style, no decorators, every Schema under 63 fields, four privac
 export const Presence = schema({ x: t.int16(), y: t.int16(), z: t.int8(), yaw: t.float32(),
   animId: t.uint8(), statusBits: t.uint16(), transitUntilTick: t.uint32() }, "Presence");
 export const Private = schema({ role: Role, inventory: Inventory, notebook: t.array(NotebookEntry),
-  tasks: t.array(TaskEntry), cabalMates: t.array(t.string()), cooldownEndTick: t.map(t.uint32()),
+  tasks: t.array(TaskEntry), cabalMates: t.array('string'), cooldownEndTick: t.map('uint32'),
   ledger: t.array(LedgerLine), lensCharges: t.uint8(), myVote: t.string() }, "Private");
 export const Player = schema({
   id: t.string(), name: t.string(), traits: Traits, alive: t.boolean(), connected: t.boolean(),
@@ -81,11 +81,15 @@ export const GameState = schema({ schemaVersion: t.uint8(), phase: t.uint8(), ph
 | C->S | `act.present` | `{entryId}` | 2/s |
 | C->S | `meeting.vote` | `{targetId \| "skip"}` | 2/s |
 | C->S | `chat.say` / `chat.quick` / `world.ping` | `{text}` / `{phraseId}` / `{x, y}` (channel derived server-side) | 2/s |
-| C->S | `role.ready`, `net.ping` | `{}` / `{t}` | – |
-| C->S | `lobby.start`, `lobby.ready` | `{}` / `{ready}` (leader-only Start; Ready is advisory) | 2/s |
-| S->C private | `roleReveal` | `{roleId, team, goal, abilities[{id,name,key,cooldown,uses}], inventory[{defId,qty,tooltip}], cardText, beware, teammates[], traits}` | |
+| C->S | `net.ping` | `{t}` | – |
+| C->S | `lobby.start`, `lobby.ready` | `{}` / `{ready}`. Start: leader only, phase lobby, at least 1 human, else `error 422`. Ready ticks the lobby roster; on the role card it dismisses the card (`role.ready` stays as a deprecated alias of `{ready: true}`) | 2/s |
+| S->C private | `roleReveal` | the payload below | |
 | S->C private | `sceneEnter`, `clueFound`, `killed`, `chat.msg` | `{sceneId, spawn, facing}` / entry / `{sceneId}` / `{from, text, channel}` | |
 | S->C | `phaseChange`, `meetingStart`, `voteResult`, `gameOver`, `noise`, `error` | `{phase, endsTick}` / `{reason, callerId, bodyOf?, missing[]}` / `{tally, ejectedId?, role?}` / `{winner, roles, summary}` / `{sceneId, x, y, kind}` / `{code, msg}` | |
+
+**`roleReveal` payload (final, M1).** `{roleId, team: "village"|"cabal"|"neutral", goal, abilities: [{id, name, key, cooldown: number, uses: number | null}], inventory: [{defId, name, qty, tooltip}], cardText, beware, teammates: [{id, name}], traits: {height: "short"|"mid"|"tall", scarf: "red"|"green"|"blue", hat: "cap"|"bowler"|"bare"}}`. Trait values are the ids of `traits.json` (the same order as the public `Player.traits` indices); `teammates` lists the other members of a faction whose `membersKnowEachOther` is true (the Cabal) and is empty for everyone else; `uses` is `usesPerMatch` or null; `cooldown` is seconds, and Kill's is the cooldown of the party size; abilities gated by `minPlayers` above the party size are omitted. The payload is built from `roles.json`, `abilities.json` and `items.json` by `buildRoleReveal` on the server. `docs/PROTOCOL.md` carries the full, generated message tables.
+
+**Start flow (M1).** `lobby.start` is queued like every message and consumed in the room's fixed step (`runLobbyCommands`, `rooms/handlers/lobby.ts`). It seeds `mulberry32` from `crypto.randomInt` (kept in room memory), calls `assignRoles(ids, settings, rng, roster)` and `dealTraits`, writes `priv.role`, `priv.inventory`, `priv.cabalMates` and the public `traits`, locks the room, sets `phase = roleReveal` with `phaseEndsTick` from `balance.json` `phases.roleRevealS`, and sends each client its own `roleReveal`. When every living, connected player is Ready or the card time elapses the phase becomes `grace` (`phases.graceS`) and each client gets `sceneEnter {sceneId: "overworld", spawn, facing}` with its seat's `square_N` spawn (the first overworld spawn if the scene has none). Below `players.min` humans the roster row of 4 is cut to the real count until NPC fill (M3c) lands.
 
 Error codes: 422 cannot, 423 locked, 424 cooldown, 425 wrong phase, 426 busy, 427 out of range, 428 closed (profile). `docs/PROTOCOL.md` is generated from `@wdi/shared/protocol`.
 
@@ -113,7 +117,7 @@ Every C->S action is queued and consumed inside `step()`; nothing mutates state 
 
 ### 5.8 Rules engine
 
-`packages/shared/src/rules`: pure functions with a seeded PRNG (`mulberry32`) and tick-based time: `assignRoles(ids, settings, rng)` reads `roles.json` by count; `dealTraits`; `validateKill(actor, target, scene, tick)`; `generateClues(kill, sceneGraph, rng)` (2 of 3 traits, print, Blood, smear); `resolveVotes(votes, alive, suspectSet, consecutiveNoEject)`; `intersectSuspects(verified, living)`; `checkWin(state)` (parity with Thief/Drifter exceptions, practice rule, tasks, Final Night); `rollCall(state)`. Property tests cover every roster row ("Detective present at 4", counts per size, seed reproducibility). The room only orchestrates: read state, call rule, write state.
+`packages/shared/src/rules`: pure functions with a seeded PRNG (`mulberry32`) and tick-based time: `assignRoles(ids, settings, rng, roster)` reads `roster[String(n)].deal` (the `roles.json` `rosters` object, no transformation); `dealTraits`; `validateKill(actor, target, scene, tick)`; `generateClues(kill, sceneGraph, rng)` (2 of 3 traits, print, Blood, smear); `resolveVotes(votes, alive, suspectSet, consecutiveNoEject)`; `intersectSuspects(verified, living)`; `checkWin(state)` (parity with Thief/Drifter exceptions, practice rule, tasks, Final Night); `rollCall(state)`. Property tests cover every roster row ("Detective present at 4", counts per size, seed reproducibility). The room only orchestrates: read state, call rule, write state.
 
 ### 5.9 Client
 

@@ -11,18 +11,18 @@ export const MOCK_ROLE_REVEAL: RoleRevealPayload = {
   goal: 'Outlast the village without being voted out.',
   abilities: [
     { id: 'kill', name: 'Kill', key: 'Q', cooldown: 0, uses: null },
-    { id: 'lockDoor', name: 'Lock door', key: 'R', cooldown: 0, uses: null },
-    { id: 'dragBody', name: 'Drag body', key: 'E', cooldown: 0, uses: null },
+    { id: 'killerLock', name: 'Lock door', key: 'R', cooldown: 0, uses: null },
+    { id: 'dragBody', name: 'Drag body', key: 'F', cooldown: 0, uses: null },
   ],
   inventory: [
-    { defId: 'Knife', qty: 1, tooltip: 'Bound to you.' },
-    { defId: 'Bloody Rag', qty: 2, tooltip: 'Erases one clue.' },
+    { defId: 'knife', name: 'Knife', qty: 1, tooltip: 'Kill.' },
+    { defId: 'bloodyRag', name: 'Bloody Rag', qty: 2, tooltip: 'Erase one clue.' },
   ],
   cardText:
     'Strike when the room is empty, clean one clue, wash at the well, then be the loudest voice asking who did it.',
   beware: 'Your clues match your traits.',
   teammates: [{ id: 'mock-ada', name: 'Ada' }],
-  traits: { height: 'T', scarf: 'green', hat: 'bowler' },
+  traits: { height: 'tall', scarf: 'green', hat: 'bowler' },
 };
 
 export const MOCK_BOTS: LobbyPlayer[] = [

@@ -12,7 +12,7 @@ import {
   type PhaseChangePayload,
   ROOM_NAME,
   type RoleRevealPayload,
-  type ServerMessageType,
+  type SceneEnterPayload,
   type ServerMessages,
 } from './protocol';
 import { deviceId, reconnectTokens } from './storage';
@@ -31,11 +31,15 @@ export type NetEvents = {
   lobby: LobbySnapshot;
   roleReveal: RoleRevealPayload;
   phaseChange: PhaseChangePayload;
+  sceneEnter: SceneEnterPayload;
   gameOver: GameOverPayload;
   error: ErrorPayload;
   /** The connection to the room ended; `consented` is true when the player chose to leave. */
   left: { consented: boolean };
 };
+
+/** The server messages the bus forwards as events. */
+type NetMessageType = Exclude<keyof NetEvents, 'lobby' | 'left'>;
 
 /** Thrown by create/join/resume; the UI shows `JOIN_FAILED_MESSAGE` for every cause. */
 export class JoinError extends Error {
@@ -51,6 +55,8 @@ export interface NetworkService {
   readonly code: string | null;
   /** Latest roster, so a scene that mounts after the first event still renders at once. */
   readonly snapshot: LobbySnapshot | null;
+  /** This player's own card, kept for the whole match so Tab can reopen it in any scene. */
+  readonly roleCard: RoleRevealPayload | null;
   create(name: string): Promise<string>;
   join(code: string, name: string): Promise<string>;
   /** Re-enter a room with the stored token; resolves false when there is none or it is stale. */
@@ -64,7 +70,13 @@ export interface NetworkService {
   leave(): Promise<void>;
 }
 
-const SERVER_MESSAGES: readonly ServerMessageType[] = ['roleReveal', 'phaseChange', 'gameOver', 'error'];
+const SERVER_MESSAGES: readonly NetMessageType[] = [
+  'roleReveal',
+  'phaseChange',
+  'sceneEnter',
+  'gameOver',
+  'error',
+];
 
 /** Minimal view of the room state the lobby needs; the real schema arrives with `@wdi/shared`. */
 interface PlayerState {
@@ -89,6 +101,7 @@ export class ColyseusNetwork implements NetworkService {
   private players = new Map<string, PlayerState>();
   private leaderId = '';
   private last: LobbySnapshot | null = null;
+  private card: RoleRevealPayload | null = null;
   private disposers: Array<() => void> = [];
 
   get code(): string | null {
@@ -97,6 +110,10 @@ export class ColyseusNetwork implements NetworkService {
 
   get snapshot(): LobbySnapshot | null {
     return this.last;
+  }
+
+  get roleCard(): RoleRevealPayload | null {
+    return this.card;
   }
 
   async create(name: string): Promise<string> {
@@ -161,6 +178,7 @@ export class ColyseusNetwork implements NetworkService {
     for (const type of SERVER_MESSAGES) {
       room.onMessage(type, (payload: ServerMessages[typeof type]) => {
         if (type === 'gameOver') reconnectTokens.clear(room.roomId);
+        if (type === 'roleReveal') this.card = payload as RoleRevealPayload;
         this.bus.emit(type, payload as never);
       });
     }
@@ -178,6 +196,7 @@ export class ColyseusNetwork implements NetworkService {
     this.players = new Map();
     this.leaderId = '';
     this.last = null;
+    this.card = null;
     const cb = Callbacks.get(room) as unknown as LobbyCallbacks;
     const emit = () => this.emitLobby(room);
     this.disposers.push(
@@ -213,5 +232,6 @@ export class ColyseusNetwork implements NetworkService {
     for (const dispose of this.disposers) dispose();
     this.disposers = [];
     this.room = null;
+    this.card = null;
   }
 }

@@ -1,6 +1,7 @@
 import { defineConfig } from 'tsup';
 
-// Bundles @wdi/shared (a devDependency, TypeScript source) into build/index.js; colyseus stays external.
+// Bundles @wdi/shared and @wdi/content (workspace devDependencies, TypeScript source and JSON) into
+// build/index.js; colyseus stays external. The `development` condition selects @wdi/content's source entry.
 export default defineConfig({
   entry: ['src/index.ts'],
   outDir: 'build',
@@ -9,4 +10,7 @@ export default defineConfig({
   platform: 'node',
   clean: true,
   sourcemap: true,
+  esbuildOptions(options) {
+    options.conditions = ['development'];
+  },
 });

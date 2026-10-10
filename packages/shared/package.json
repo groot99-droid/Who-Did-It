@@ -16,9 +16,15 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --config ../../vitest.config.ts"
+    "test": "vitest run --config ../../vitest.config.ts",
+    "docs:protocol": "tsx scripts/protocol-doc.ts"
   },
   "dependencies": {
     "@colyseus/schema": "^5.0.36"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.0",
+    "typescript": "~5.9.3",
+    "@types/node": "^22.0.0"
   }
 }

@@ -38,6 +38,9 @@ importers:
       '@colyseus/sdk':
         specifier: ^0.18.5
         version: 0.18.5(@colyseus/core@0.18.18)(typescript@5.9.3)(zod@4.6.5)
+      '@wdi/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       mitt:
         specifier: ^3.0.1
         version: 3.0.1
@@ -51,6 +54,9 @@ importers:
       '@types/node':
         specifier: ^22.20.5
         version: 22.20.5
+      '@wdi/content':
+        specifier: workspace:*
+        version: link:../../packages/content
       typescript:
         specifier: ~5.9.2
         version: 5.9.3
@@ -82,6 +88,9 @@ importers:
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.5
+      '@wdi/content':
+        specifier: workspace:*
+        version: link:../../packages/content
       '@wdi/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -113,8 +122,37 @@ importers:
       '@colyseus/schema':
         specifier: ^5.0.36
         version: 5.0.36(typescript@5.9.3)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.5
+      tsx:
+        specifier: ^4.23.0
+        version: 4.23.15
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
 
   tools/blender: {}
+
+  tools/bots:
+    dependencies:
+      '@colyseus/sdk':
+        specifier: ^0.18.5
+        version: 0.18.5(@colyseus/core@0.18.18)(typescript@5.9.3)(zod@4.6.5)
+      '@wdi/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+    devDependencies:
+      '@types/node':
+        specifier: ^22.20.5
+        version: 22.20.5
+      tsx:
+        specifier: ^4.23.0
+        version: 4.23.15
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
 
   tools/sprites:
     dependencies:

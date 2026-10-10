@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import { setRoute } from '../flags';
 import type { LobbySnapshot } from '../net/NetworkService';
-import type { RoleRevealPayload } from '../net/protocol';
 import { type LobbyScreen, mountLobby } from '../ui/Lobby';
 import { overlayRoot } from '../ui/dom';
 import { Backdrop } from '../view/Backdrop';
@@ -20,12 +19,13 @@ export class Lobby extends Phaser.Scene {
 
     this.screen = mountLobby(overlayRoot(), {
       onStart: () => net.send('lobby.start', {}),
+      onReady: (ready) => net.send('lobby.ready', { ready }),
       onLeave: () => void net.leave(),
     });
     if (net.snapshot !== null) this.screen.update(net.snapshot);
 
     const onLobby = (snapshot: LobbySnapshot) => this.screen?.update(snapshot);
-    const onReveal = (payload: RoleRevealPayload) => this.scene.start('RoleReveal', { payload });
+    const onReveal = () => this.scene.start('RoleReveal');
     const onLeft = () => {
       setRoute('');
       this.scene.start('Landing');
