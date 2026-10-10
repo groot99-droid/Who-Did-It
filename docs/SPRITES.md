@@ -110,7 +110,9 @@ manifest.json` (generated placeholders) have the same keys; `?art=placeholder` p
 ```
 
 `type` maps to the Phaser loader method (`multiatlas`, `atlas`, `image`, `animation`); `filter` is
-`linear` or `nearest` and is set per texture after load. Anim files use Phaser's own
+`linear` or `nearest` and is set per texture after load; `origin` (optional, `[x, y]` normalised) is
+the display origin for single images: building exteriors use `[0.5, 1]`, the middle of the front wall's
+base. Atlas pages are always named `<key>-<n>.png`. Clue frames are centred (no pivot). Anim files use Phaser's own
 `{anims: [{key, frames: [{key, frame}], frameRate, repeat}]}` format for `load.animation`.
 
 ## 6. Overlay passes

@@ -1,0 +1,26 @@
+{
+  "name": "@wdi/sprites",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sprite packer, anim generator and placeholder atlas for Who Did It (docs/SPRITES.md).",
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "vitest run",
+    "placeholder": "node placeholder.ts",
+    "pack": "node pack.ts"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "@napi-rs/canvas": "^1.0.11",
+    "free-tex-packer-core": "^0.3.9"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "~5.9.3",
+    "vitest": "^5.0.3"
+  },
+  "engines": {
+    "node": ">=22.18"
+  }
+}

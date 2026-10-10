@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "art": "placeholder",
+  "entries": [
+    {
+      "key": "char_villager",
+      "type": "multiatlas",
+      "url": "chars/char_villager.json",
+      "path": "chars/",
+      "filter": "linear"
+    },
+    {
+      "key": "ovl_villager",
+      "type": "multiatlas",
+      "url": "chars/ovl_villager.json",
+      "path": "chars/",
+      "filter": "linear"
+    },
+    {
+      "key": "anims_villager",
+      "type": "animation",
+      "url": "chars/villager.anims.json"
+    },
+    {
+      "key": "clues",
+      "type": "multiatlas",
+      "url": "clues/clues.json",
+      "path": "clues/",
+      "filter": "linear"
+    },
+    {
+      "key": "bld_tavern_ext",
+      "type": "image",
+      "url": "buildings/bld_tavern_ext.png",
+      "filter": "linear",
+      "origin": [
+        0.5,
+        1
+      ]
+    },
+    {
+      "key": "bld_apoth_ext",
+      "type": "image",
+      "url": "buildings/bld_apoth_ext.png",
+      "filter": "linear",
+      "origin": [
+        0.5,
+        1
+      ]
+    },
+    {
+      "key": "bld_widow_ext",
+      "type": "image",
+      "url": "buildings/bld_widow_ext.png",
+      "filter": "linear",
+      "origin": [
+        0.5,
+        1
+      ]
+    },
+    {
+      "key": "bld_bakery_ext",
+      "type": "image",
+      "url": "buildings/bld_bakery_ext.png",
+      "filter": "linear",
+      "origin": [
+        0.5,
+        1
+      ]
+    },
+    {
+      "key": "tiles_grass",
+      "type": "image",
+      "url": "tiles/tiles_grass.png",
+      "filter": "linear"
+    },
+    {
+      "key": "tiles_path",
+      "type": "image",
+      "url": "tiles/tiles_path.png",
+      "filter": "linear"
+    },
+    {
+      "key": "tiles_cobble",
+      "type": "image",
+      "url": "tiles/tiles_cobble.png",
+      "filter": "linear"
+    },
+    {
+      "key": "tiles_floorboards",
+      "type": "image",
+      "url": "tiles/tiles_floorboards.png",
+      "filter": "linear"
+    },
+    {
+      "key": "tiles_caverock",
+      "type": "image",
+      "url": "tiles/tiles_caverock.png",
+      "filter": "linear"
+    },
+    {
+      "key": "tiles_forestfloor",
+      "type": "image",
+      "url": "tiles/tiles_forestfloor.png",
+      "filter": "linear"
+    }
+  ]
+}
