@@ -1,0 +1,98 @@
+{
+  "id": "manor_upper",
+  "prefix": "mu",
+  "name": "Vane Manor, upstairs",
+  "zoneId": "manor_upper",
+  "profile": "medium",
+  "kind": "interior",
+  "size": { "w": 24, "h": 12 },
+  "notes": "Locked study (Study Key in the barn [M] or the cellar [L]; V1.5).",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "mu.stairs",
+      "from": "manor_upper",
+      "x": 12,
+      "y": 11,
+      "kind": "stairs",
+      "to": "manor_hall",
+      "toSpawn": "stairs",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": -3,
+      "minProfile": "medium",
+      "ships": "V1"
+    },
+    {
+      "id": "mu.balcony",
+      "from": "manor_upper",
+      "x": 23,
+      "y": 5,
+      "kind": "drop",
+      "to": "overworld",
+      "toSpawn": "balcony_drop",
+      "oneWay": true,
+      "lock": null,
+      "window": null,
+      "noise": "oneWayDrop",
+      "elevationDelta": -3,
+      "minProfile": "medium",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [{ "id": "stairs", "x": 12, "y": 10, "z": 0, "facing": "n" }],
+  "spots": [
+    {
+      "id": "mu.under_bed_w",
+      "kind": "hide",
+      "variant": "underBed",
+      "x": 3,
+      "y": 2,
+      "childOnly": false
+    },
+    {
+      "id": "mu.under_bed_e",
+      "kind": "hide",
+      "variant": "underBed",
+      "x": 8,
+      "y": 2,
+      "childOnly": false
+    },
+    {
+      "id": "mu.attic_hatch",
+      "kind": "hide",
+      "variant": "atticHatch",
+      "x": 20,
+      "y": 1,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    {
+      "id": "mu.study_door",
+      "kind": "lockedDoor",
+      "x": 6,
+      "y": 8,
+      "item": "studyKey",
+      "ships": "V1.5"
+    }
+  ],
+  "gates": [],
+  "paths": [],
+  "grid": [
+    "########################",
+    "#...................H..#",
+    "#..H....H..............#",
+    "#......................#",
+    "#......................#",
+    "#......................D",
+    "#######................#",
+    "#######................#",
+    "#######................#",
+    "#######................#",
+    "#######.....S..........#",
+    "############D###########"
+  ]
+}

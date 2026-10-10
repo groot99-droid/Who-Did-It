@@ -1,0 +1,93 @@
+{
+  "gddRef": "3.5",
+  "tasks": {
+    "lightLanterns": {
+      "id": "lightLanterns",
+      "name": "Light the lanterns",
+      "kind": "fetch",
+      "tool": "oil",
+      "toolQty": 1,
+      "source": { "scene": "tavern_back", "prop": "tk.oil_barrel" },
+      "targets": [
+        { "scene": "overworld", "prop": "ov.lantern_0" },
+        { "scene": "overworld", "prop": "ov.lantern_1" },
+        { "scene": "overworld", "prop": "ov.lantern_2" },
+        { "scene": "overworld", "prop": "ov.lantern_3" }
+      ],
+      "holdS": 2,
+      "nightOnly": true,
+      "effect": "Fill a square lantern with oil from the tavern back room.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "fixPump": {
+      "id": "fixPump",
+      "name": "Fix the well pump",
+      "kind": "fetch",
+      "tool": "wrench",
+      "toolQty": 1,
+      "source": { "scene": "apoth_shop", "prop": "as.bench" },
+      "targets": [{ "scene": "overworld", "prop": "ov.pump" }],
+      "holdS": 2,
+      "nightOnly": false,
+      "effect": "Fix the pump with the wrench from the apothecary bench.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "deliverLetter": {
+      "id": "deliverLetter",
+      "name": "Deliver a letter",
+      "kind": "fetch",
+      "tool": "letter",
+      "toolQty": 1,
+      "source": { "scene": "widow_parlour", "prop": "wp.letter_box" },
+      "targets": [{ "scene": "tavern_bar", "prop": "tb.dartboard" }],
+      "holdS": 2,
+      "nightOnly": false,
+      "effect": "Take the letter from the widow's letter box to the tavern dartboard.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "mendFence": {
+      "id": "mendFence",
+      "name": "Mend the fence",
+      "kind": "fetch",
+      "tool": "planks",
+      "toolQty": 2,
+      "source": { "scene": "forest", "prop": "fo.planks" },
+      "targets": [{ "scene": "overworld", "prop": "ov.fence" }],
+      "holdS": 2,
+      "nightOnly": false,
+      "effect": "Mend the fence with planks from the edge of Gallows Wood; while mended, wolves cannot enter the village.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "fetchFlour": {
+      "id": "fetchFlour",
+      "name": "Fetch the flour",
+      "kind": "fetch",
+      "tool": "flour",
+      "toolQty": 1,
+      "source": { "scene": "bakery", "prop": "bk.flour_sacks" },
+      "targets": [{ "scene": "tavern_bar", "prop": "tb.flour_bin" }],
+      "holdS": 2,
+      "nightOnly": false,
+      "effect": "Carry a sack of flour from Crumb's Ovens to the tavern.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "shutterWindows": {
+      "id": "shutterWindows",
+      "name": "Shutter the windows",
+      "kind": "coop",
+      "coopPlayers": 2,
+      "coopRadiusTiles": 2,
+      "targets": [{ "scene": "tavern_bar", "prop": "tb.shutters" }],
+      "holdS": 4,
+      "nightOnly": false,
+      "effect": "Both players within range hold E; progress pauses when one releases.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    }
+  }
+}

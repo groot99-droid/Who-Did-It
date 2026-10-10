@@ -1,0 +1,82 @@
+{
+  "id": "tavern_back",
+  "prefix": "tk",
+  "name": "Tavern back room",
+  "zoneId": "tavern_back",
+  "profile": "small",
+  "kind": "interior",
+  "size": { "w": 12, "h": 10 },
+  "notes": "Oil barrel (task tool).",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "tk.door",
+      "from": "tavern_back",
+      "x": 6,
+      "y": 0,
+      "kind": "door",
+      "to": "tavern_bar",
+      "toSpawn": "back",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "tk.trap",
+      "from": "tavern_back",
+      "x": 9,
+      "y": 6,
+      "kind": "hatch",
+      "to": "cellar",
+      "toSpawn": "trap",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": -3,
+      "minProfile": "large",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "door", "x": 6, "y": 1, "z": 0, "facing": "s" },
+    { "id": "trap", "x": 8, "y": 6, "z": 0, "facing": "w" }
+  ],
+  "spots": [
+    {
+      "id": "tk.wardrobe",
+      "kind": "hide",
+      "variant": "wardrobe",
+      "x": 1,
+      "y": 2,
+      "childOnly": false
+    },
+    {
+      "id": "tk.crate_pile",
+      "kind": "body",
+      "variant": "cratePile",
+      "x": 10,
+      "y": 8,
+      "childOnly": false
+    }
+  ],
+  "props": [{ "id": "tk.oil_barrel", "kind": "taskSource", "x": 0, "y": 7, "item": "oil" }],
+  "gates": [],
+  "paths": [],
+  "grid": [
+    "######D#####",
+    "#.....S....#",
+    "#H.........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#.......SD.#",
+    "#..........#",
+    "#.........B#",
+    "############"
+  ]
+}

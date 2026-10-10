@@ -1,0 +1,79 @@
+{
+  "id": "widow_parlour",
+  "prefix": "wp",
+  "name": "Widow Vane's parlour",
+  "zoneId": "widow_parlour",
+  "profile": "small",
+  "kind": "interior",
+  "size": { "w": 16, "h": 11 },
+  "notes": "Portrait turned to the wall; letter box.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "wp.door",
+      "from": "widow_parlour",
+      "x": 15,
+      "y": 5,
+      "kind": "door",
+      "to": "overworld",
+      "toSpawn": "widow",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "wp.bedroom",
+      "from": "widow_parlour",
+      "x": 3,
+      "y": 0,
+      "kind": "door",
+      "to": "widow_bedroom",
+      "toSpawn": "door",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "door", "x": 14, "y": 5, "z": 0, "facing": "w" },
+    { "id": "bedroom", "x": 3, "y": 1, "z": 0, "facing": "s" }
+  ],
+  "spots": [
+    { "id": "wp.pantry", "kind": "hide", "variant": "pantry", "x": 1, "y": 9, "childOnly": false },
+    {
+      "id": "wp.crawl_stairs",
+      "kind": "hide",
+      "variant": "crawlspace",
+      "x": 13,
+      "y": 1,
+      "childOnly": true
+    }
+  ],
+  "props": [
+    { "id": "wp.letter_box", "kind": "taskSource", "x": 15, "y": 8, "item": "letter" },
+    { "id": "wp.portrait", "kind": "decor", "x": 8, "y": 0 }
+  ],
+  "gates": [],
+  "paths": [],
+  "grid": [
+    "###D############",
+    "#..S.........H.#",
+    "#..............#",
+    "#..............#",
+    "#..............#",
+    "#.............SD",
+    "#..............#",
+    "#..............#",
+    "#..............#",
+    "#H.............#",
+    "################"
+  ]
+}

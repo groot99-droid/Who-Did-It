@@ -1,0 +1,87 @@
+{
+  "id": "barn",
+  "prefix": "ba",
+  "name": "Hale Barn",
+  "zoneId": "barn",
+  "profile": "medium",
+  "kind": "interior",
+  "size": { "w": 20, "h": 12 },
+  "entryNoise": "goat",
+  "notes": "Goat bleats when anyone enters; wolf pelt on the door.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "ba.door",
+      "from": "barn",
+      "x": 10,
+      "y": 11,
+      "kind": "door",
+      "to": "overworld",
+      "toSpawn": "barn",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "medium",
+      "ships": "V1"
+    },
+    {
+      "id": "ba.loft",
+      "from": "barn",
+      "x": 17,
+      "y": 1,
+      "kind": "drop",
+      "to": "overworld",
+      "toSpawn": "barn_loft_drop",
+      "oneWay": true,
+      "lock": null,
+      "window": null,
+      "noise": "oneWayDrop",
+      "elevationDelta": -3,
+      "minProfile": "medium",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [{ "id": "door", "x": 10, "y": 10, "z": 0, "facing": "n" }],
+  "spots": [
+    { "id": "ba.hay_w", "kind": "hide", "variant": "hayPile", "x": 3, "y": 3, "childOnly": false },
+    { "id": "ba.hay_e", "kind": "hide", "variant": "hayPile", "x": 15, "y": 8, "childOnly": false },
+    {
+      "id": "ba.hay_body",
+      "kind": "body",
+      "variant": "hayPile",
+      "x": 3,
+      "y": 8,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    { "id": "ba.goat", "kind": "goat", "x": 17, "y": 9 },
+    {
+      "id": "ba.study_key",
+      "kind": "keyCache",
+      "x": 1,
+      "y": 1,
+      "item": "studyKey",
+      "profiles": ["medium"],
+      "ships": "V1.5"
+    }
+  ],
+  "gates": [],
+  "paths": [],
+  "grid": [
+    "####################",
+    "#................D.#",
+    "#..................#",
+    "#..H...............#",
+    "#.....#......#.....#",
+    "#.....#......#.....#",
+    "#.....#......#.....#",
+    "#.....#......#.....#",
+    "#..B..#......#.H...#",
+    "#................#.#",
+    "#.........S........#",
+    "##########D#########"
+  ]
+}

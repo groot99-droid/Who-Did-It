@@ -1,0 +1,29 @@
+{
+  "source": "docs/ASSETS.md 6.1",
+  "colors": {
+    "ink": "#12141C",
+    "slate": "#2C3240",
+    "fog": "#6F7A8C",
+    "bone": "#D9D2C2",
+    "mustard": "#F2B33D",
+    "teal": "#2EC4B6",
+    "magenta": "#E04E9A",
+    "blood": "#B3121F",
+    "lantern": "#FFB457",
+    "moon": "#7FA8FF"
+  },
+  "ambient": {
+    "day": { "color": "#2C3240", "intensity": 0.6 },
+    "night": { "color": "#12141C", "intensity": 0.25 },
+    "fogOfWarLuminanceFloor": 0.25
+  },
+  "rules": {
+    "maxSaturatedAccentShare": 0.1,
+    "outlineToken": "ink",
+    "outlinePx": 1.5,
+    "interactableToken": "teal",
+    "hazardToken": "magenta",
+    "primaryButtonToken": "mustard",
+    "uiStrokePx": 2
+  }
+}

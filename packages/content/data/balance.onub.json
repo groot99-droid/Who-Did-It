@@ -1,0 +1,400 @@
+{
+  "gddRef": "3.11",
+  "deadLoaves": 3,
+  "byCount": {
+    "4": {
+      "loaves": 7,
+      "deck": ["poisoner", "poisoner", "sinEater", "cutpurse", "busybody", "mourner", "mourner"],
+      "planned": ["poisoner", "poisoner", "sinEater", "cutpurse", "busybody", "mourner", "mourner"],
+      "discussionS": 150,
+      "gddRef": "3.11"
+    },
+    "5": {
+      "loaves": 8,
+      "deck": [
+        "poisoner",
+        "poisoner",
+        "sinEater",
+        "cutpurse",
+        "busybody",
+        "mourner",
+        "mourner",
+        "debtor"
+      ],
+      "planned": [
+        "poisoner",
+        "poisoner",
+        "sinEater",
+        "cutpurse",
+        "busybody",
+        "mourner",
+        "mourner",
+        "debtor"
+      ],
+      "discussionS": 150,
+      "gddRef": "3.11"
+    },
+    "6": {
+      "loaves": 9,
+      "deck": [
+        "poisoner",
+        "poisoner",
+        "sinEater",
+        "cutpurse",
+        "busybody",
+        "mourner",
+        "mourner",
+        "debtor",
+        "hireling"
+      ],
+      "planned": [
+        "poisoner",
+        "poisoner",
+        "sinEater",
+        "cutpurse",
+        "busybody",
+        "mourner",
+        "mourner",
+        "debtor",
+        "hireling"
+      ],
+      "discussionS": 180,
+      "gddRef": "3.11"
+    },
+    "7": {
+      "loaves": 10,
+      "deck": [
+        "poisoner",
+        "poisoner",
+        "sinEater",
+        "cutpurse",
+        "busybody",
+        "mourner",
+        "mourner",
+        "debtor",
+        "hireling",
+        "lamplighter"
+      ],
+      "planned": [
+        "poisoner",
+        "poisoner",
+        "sinEater",
+        "cutpurse",
+        "busybody",
+        "mourner",
+        "mourner",
+        "debtor",
+        "hireling",
+        "lamplighter"
+      ],
+      "discussionS": 180,
+      "gddRef": "3.11"
+    },
+    "8": {
+      "loaves": 11,
+      "deck": [
+        "poisoner",
+        "poisoner",
+        "sinEater",
+        "cutpurse",
+        "busybody",
+        "mourner",
+        "mourner",
+        "debtor",
+        "hireling",
+        "lamplighter",
+        "sot"
+      ],
+      "planned": [
+        "poisoner",
+        "poisoner",
+        "sinEater",
+        "cutpurse",
+        "busybody",
+        "mourner",
+        "mourner",
+        "debtor",
+        "hireling",
+        "lamplighter",
+        "sot"
+      ],
+      "discussionS": 210,
+      "gddRef": "3.11"
+    },
+    "9": {
+      "loaves": 12,
+      "deck": [
+        "poisoner",
+        "poisoner",
+        "sinEater",
+        "cutpurse",
+        "busybody",
+        "mourner",
+        "debtor",
+        "hireling",
+        "lamplighter",
+        "sot",
+        "mourner",
+        "mourner"
+      ],
+      "planned": [
+        "poisoner",
+        "poisoner",
+        "sinEater",
+        "cutpurse",
+        "busybody",
+        "mourner",
+        "debtor",
+        "hireling",
+        "lamplighter",
+        "sot",
+        "pallbearer",
+        "pallbearer"
+      ],
+      "discussionS": 210,
+      "gddRef": "3.11"
+    },
+    "10": {
+      "loaves": 13,
+      "deck": [
+        "poisoner",
+        "poisoner",
+        "sinEater",
+        "cutpurse",
+        "busybody",
+        "mourner",
+        "debtor",
+        "hireling",
+        "lamplighter",
+        "sot",
+        "mourner",
+        "mourner",
+        "mourner"
+      ],
+      "planned": [
+        "poisoner",
+        "poisoner",
+        "sinEater",
+        "cutpurse",
+        "busybody",
+        "mourner",
+        "debtor",
+        "hireling",
+        "lamplighter",
+        "sot",
+        "pallbearer",
+        "pallbearer",
+        "gamekeeper"
+      ],
+      "discussionS": 210,
+      "gddRef": "3.11"
+    }
+  },
+  "timers": {
+    "roleCardS": 12,
+    "duskS": 10,
+    "plateHoldS": 1,
+    "fadeS": 2,
+    "windowJitterMaxS": 4,
+    "dawnS": 10,
+    "voteS": 25,
+    "revealS": 20,
+    "gddRef": "3.11"
+  },
+  "actRangeTiles": 2,
+  "acts": {
+    "onub.peekDead": {
+      "id": "onub.peekDead",
+      "target": "deadLoaf",
+      "holdS": 2,
+      "swap": "none",
+      "reveals": true,
+      "description": "Shows the token in one of the dead's loaves."
+    },
+    "onub.readLedger": {
+      "id": "onub.readLedger",
+      "target": "ledger",
+      "holdS": 2,
+      "swap": "none",
+      "reveals": true,
+      "description": "The Baker's ledger names the Poisoners."
+    },
+    "onub.peekPlate": {
+      "id": "onub.peekPlate",
+      "target": "otherPlate",
+      "holdS": 2,
+      "swap": "none",
+      "reveals": true,
+      "description": "Shows the token in another mourner's loaf."
+    },
+    "onub.take": {
+      "id": "onub.take",
+      "target": "otherPlate",
+      "holdS": 2,
+      "swap": "withOwn",
+      "reveals": true,
+      "description": "The loaves swap; your new token is shown."
+    },
+    "onub.swapPlates": {
+      "id": "onub.swapPlates",
+      "target": "otherPlate",
+      "holdS": 1,
+      "swap": "pair",
+      "reveals": false,
+      "description": "Two other mourners' loaves swap; nothing is shown."
+    },
+    "onub.swapDead": {
+      "id": "onub.swapDead",
+      "target": "deadLoaf",
+      "holdS": 2,
+      "swap": "withOwn",
+      "reveals": false,
+      "description": "One of the dead's loaves swaps with your own, unseen."
+    },
+    "onub.check": {
+      "id": "onub.check",
+      "target": "ownPlate",
+      "holdS": 2,
+      "swap": "none",
+      "reveals": true,
+      "description": "Shows your current token."
+    }
+  },
+  "windows": [
+    {
+      "order": 1,
+      "role": "poisoner",
+      "seconds": 12,
+      "seeEachOther": true,
+      "acts": [{ "act": "onub.peekDead", "picks": 1 }],
+      "onlyIfAlone": true,
+      "onTimeout": "nothing",
+      "trace": "ledgeScuff",
+      "traceText": "Flour is scuffed on the oven ledge."
+    },
+    {
+      "order": 2,
+      "role": "hireling",
+      "seconds": 8,
+      "seeEachOther": false,
+      "acts": [{ "act": "onub.readLedger", "picks": 1 }],
+      "onlyIfAlone": false,
+      "onTimeout": "nothing",
+      "trace": "ledgerOpen",
+      "traceText": "The Baker's ledger lies open."
+    },
+    {
+      "order": 3,
+      "role": "pallbearer",
+      "seconds": 8,
+      "seeEachOther": true,
+      "acts": [],
+      "onlyIfAlone": false,
+      "onTimeout": "nothing",
+      "trace": "none",
+      "traceText": ""
+    },
+    {
+      "order": 4,
+      "role": "sinEater",
+      "seconds": 14,
+      "seeEachOther": false,
+      "acts": [{ "act": "onub.peekPlate", "picks": 1 }, { "act": "onub.peekDead", "picks": 2 }],
+      "onlyIfAlone": false,
+      "onTimeout": "nothing",
+      "trace": "plateTurned",
+      "traceText": "A plate has been turned."
+    },
+    {
+      "order": 5,
+      "role": "cutpurse",
+      "seconds": 12,
+      "seeEachOther": false,
+      "acts": [{ "act": "onub.take", "picks": 1 }],
+      "onlyIfAlone": false,
+      "onTimeout": "nothing",
+      "trace": "twoPlatesTurned",
+      "traceText": "Two plates have been turned."
+    },
+    {
+      "order": 6,
+      "role": "busybody",
+      "seconds": 14,
+      "seeEachOther": false,
+      "acts": [{ "act": "onub.swapPlates", "picks": 2 }],
+      "onlyIfAlone": false,
+      "onTimeout": "nothing",
+      "trace": "twoPlatesTurned",
+      "traceText": "Two plates have been turned."
+    },
+    {
+      "order": 7,
+      "role": "sot",
+      "seconds": 10,
+      "seeEachOther": false,
+      "acts": [{ "act": "onub.swapDead", "picks": 1 }],
+      "onlyIfAlone": false,
+      "onTimeout": "seededPick",
+      "trace": "ledgeScuff",
+      "traceText": "Flour is scuffed on the oven ledge."
+    },
+    {
+      "order": 8,
+      "role": "lamplighter",
+      "seconds": 8,
+      "seeEachOther": false,
+      "acts": [{ "act": "onub.check", "picks": 1 }],
+      "onlyIfAlone": false,
+      "onTimeout": "nothing",
+      "trace": "plateTurned",
+      "traceText": "A plate has been turned."
+    }
+  ],
+  "vote": {
+    "skipAllowed": false,
+    "selfVoteAllowed": false,
+    "endsWhenAllVoted": true,
+    "minVotesToTurnOut": 2,
+    "tiesTurnOutAll": true,
+    "gamekeeperHops": 1,
+    "gddRef": "3.11"
+  },
+  "winners": [
+    {
+      "id": "debtorAndVillage",
+      "when": { "debtorOut": true, "poisonerOut": true },
+      "winners": ["debtor", "village"],
+      "text": "The Debtor is turned out with a Poisoner: the Debtor and the Village win; the Cabal loses."
+    },
+    {
+      "id": "debtorAlone",
+      "when": { "debtorOut": true, "poisonerOut": false },
+      "winners": ["debtor"],
+      "text": "The Debtor is turned out: the Debtor wins alone; the Cabal loses."
+    },
+    {
+      "id": "poisonerOut",
+      "when": { "debtorOut": false, "poisonerOut": true },
+      "winners": ["village"],
+      "text": "A Poisoner is turned out: every final non-Cabal, non-Debtor loaf wins."
+    },
+    {
+      "id": "cabalSurvives",
+      "when": { "debtorOut": false, "poisonerOut": false, "poisonerAmongMourners": true },
+      "winners": ["cabal"],
+      "text": "No Poisoner is out: the Poisoners and the Hireling win, even a turned-out Hireling."
+    },
+    {
+      "id": "cleanTable",
+      "when": { "poisonerAmongMourners": false, "anyoneOut": false },
+      "winners": ["village"],
+      "text": "No Poisoner among the mourners and nobody turned out: the Village wins."
+    },
+    {
+      "id": "storm",
+      "when": { "debtorOut": false, "poisonerAmongMourners": false, "anyoneOut": true },
+      "winners": ["hirelingIfMourner"],
+      "text": "No Poisoner among the mourners but someone turned out: the Hireling wins if they hold a mourner's plate; otherwise the storm wins."
+    }
+  ]
+}

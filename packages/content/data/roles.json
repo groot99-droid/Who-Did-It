@@ -1,0 +1,352 @@
+{
+  "gddRef": "3.1",
+  "factions": {
+    "village": {
+      "name": "Village",
+      "color": "moon",
+      "icon": "shield",
+      "membersKnowEachOther": false
+    },
+    "cabal": { "name": "Cabal", "color": "blood", "icon": "dagger", "membersKnowEachOther": true },
+    "neutral": {
+      "name": "Neutral",
+      "color": "lantern",
+      "icon": "mask",
+      "membersKnowEachOther": false
+    }
+  },
+  "standIn": "townsfolk",
+  "roles": {
+    "killer": {
+      "id": "killer",
+      "name": "Killer",
+      "faction": "cabal",
+      "ships": "V1",
+      "firstPlayable": true,
+      "goal": "Kill until the Cabal matches the village, and never get voted out.",
+      "winsWith": "cabal",
+      "win": "Parity at 6+ players, living Village at most 1 at 4-5, or the Final Night vote fails.",
+      "parity": "cabal",
+      "startKit": [
+        { "item": "knife", "qty": 1 },
+        { "item": "skeletonKey", "qty": 1 },
+        { "item": "bloodyRag", "qty": 2 },
+        { "item": "bucket", "qty": 1 }
+      ],
+      "abilities": ["kill", "killerLock", "dragBody"],
+      "cardText": "Strike when the room is empty, clean one clue, wash at the well, then be the loudest voice asking who did it.",
+      "beware": "Clues match your traits; Blood is visible within 3 tiles; the Child's silhouette; a Bandaged target voids your kill.",
+      "bellPulls": 1,
+      "gddRef": "3.2"
+    },
+    "accomplice": {
+      "id": "accomplice",
+      "name": "Accomplice",
+      "faction": "cabal",
+      "ships": "V1",
+      "firstPlayable": false,
+      "goal": "Cover for the Killer and take the knife if they fall.",
+      "winsWith": "cabal",
+      "win": "As the Killer.",
+      "parity": "cabal",
+      "startKit": [{ "item": "plantKit", "qty": 3 }, { "item": "crowbar", "qty": 1 }],
+      "abilities": ["plantClue", "crowbar", "inherit"],
+      "cardText": "You never hold the knife, only the alibi. Forge trails, break the right doors, vouch at the right moment.",
+      "beware": "Inspect marks plants Forged; a Forged entry tells the village an Accomplice exists.",
+      "bellPulls": 1,
+      "gddRef": "3.2"
+    },
+    "detective": {
+      "id": "detective",
+      "name": "Detective",
+      "faction": "village",
+      "ships": "V1",
+      "firstPlayable": true,
+      "goal": "Verify the clues that narrow the suspects.",
+      "winsWith": "village",
+      "win": "All Cabal dead or ejected.",
+      "parity": "village",
+      "startKit": [
+        { "item": "magnifier", "qty": 1 },
+        { "item": "notebook", "qty": 1 },
+        { "item": "lens", "qty": 3 },
+        { "item": "fingerprintKit", "qty": 1 }
+      ],
+      "abilities": ["inspect", "dustCompare"],
+      "cardText": "Collect, inspect, cross-reference. Your Verified clues narrow the board; the village does the rest.",
+      "beware": "Prime target; the Rag erases clues; forgeries cost Lenses; Compare never gives a name. If you die the Magnifier drops and anyone can Inspect in 6 s.",
+      "bellPulls": 1,
+      "gddRef": "3.2"
+    },
+    "doctor": {
+      "id": "doctor",
+      "name": "Doctor",
+      "faction": "village",
+      "ships": "V1",
+      "firstPlayable": true,
+      "goal": "Keep people alive and read the dead.",
+      "winsWith": "village",
+      "win": "Village.",
+      "parity": "village",
+      "startKit": [
+        { "item": "medkit", "qty": 2 },
+        { "item": "bandage", "qty": 2 },
+        { "item": "salts", "qty": 1 }
+      ],
+      "abilities": ["bandage", "autopsy", "salts"],
+      "cardText": "Keep people alive and read the dead. Your autopsy says when; that is what breaks alibis.",
+      "beware": "Two-Killer games outpace your bandages.",
+      "bellPulls": 1,
+      "gddRef": "3.2"
+    },
+    "butler": {
+      "id": "butler",
+      "name": "Butler",
+      "faction": "village",
+      "ships": "V1",
+      "firstPlayable": false,
+      "goal": "Control the doors and say who went where.",
+      "winsWith": "village",
+      "win": "Village.",
+      "parity": "village",
+      "startKit": [{ "item": "masterKeyring", "qty": 1 }, { "item": "candle", "qty": 2 }],
+      "abilities": ["lockUnlock", "ledger"],
+      "cardText": "You know every door in Hollowmere. Control the wings, read the ledger, say who went where.",
+      "beware": "Universal access makes you the obvious suspect; Skeleton Key use looks like yours.",
+      "bellPulls": 1,
+      "gddRef": "3.2"
+    },
+    "child": {
+      "id": "child",
+      "name": "Child",
+      "faction": "village",
+      "ships": "V1",
+      "firstPlayable": false,
+      "goal": "Hide, watch, and remember who you saw.",
+      "winsWith": "village",
+      "win": "Village.",
+      "parity": "village",
+      "startKit": [
+        { "item": "slingshot", "qty": 1 },
+        { "item": "chalk", "qty": 1 },
+        { "item": "candle", "qty": 1 }
+      ],
+      "abilities": ["silentHide", "witness", "slingshot"],
+      "cardText": "You are small and quiet. Hide, watch, remember.",
+      "beware": "Top kill target; vision -1 tile; cannot pick up items.",
+      "bellPulls": 1,
+      "gddRef": "3.2"
+    },
+    "townsfolk": {
+      "id": "townsfolk",
+      "name": "Townsfolk",
+      "faction": "village",
+      "ships": "V1",
+      "firstPlayable": true,
+      "goal": "Do your chores in pairs and vote with evidence.",
+      "winsWith": "village",
+      "win": "Village.",
+      "parity": "village",
+      "startKit": [
+        { "item": "lantern", "qty": 1 },
+        { "item": "pocketWatch", "qty": 1 },
+        { "item": "chalk", "qty": 1 },
+        { "item": "rope", "qty": 1 }
+      ],
+      "abilities": ["tasks", "chalk", "rope"],
+      "cardText": "Do your chores with others to build alibis, mark what you see, vote with evidence.",
+      "beware": "Weak alone; strong in pairs.",
+      "bellPulls": 2,
+      "gddRef": "3.2"
+    },
+    "drifter": {
+      "id": "drifter",
+      "name": "Drifter",
+      "faction": "neutral",
+      "ships": "V1",
+      "firstPlayable": false,
+      "goal": "Get yourself voted out.",
+      "winsWith": "self",
+      "win": "Get ejected (solo win; the match continues).",
+      "parity": "nobody",
+      "startKit": [{ "item": "replicaKnife", "qty": 1 }, { "item": "bloodyRag", "qty": 1 }],
+      "abilities": ["actShifty", "fakeBlood"],
+      "cardText": "You want to hang. Be suspicious enough to be voted out, not so obvious they ignore you.",
+      "beware": "A calm village; dying to the Killer is a loss; counts as nobody for parity.",
+      "bellPulls": 1,
+      "gddRef": "3.2"
+    },
+    "ranger": {
+      "id": "ranger",
+      "name": "Ranger",
+      "faction": "village",
+      "ships": "V1.5",
+      "firstPlayable": false,
+      "goal": "Hunt the wolves and make your one arrest count.",
+      "winsWith": "village",
+      "win": "Village.",
+      "parity": "village",
+      "startKit": [
+        { "item": "crossbow", "qty": 1 },
+        { "item": "bolt", "qty": 2 },
+        { "item": "snare", "qty": 2 },
+        { "item": "torch", "qty": 1 }
+      ],
+      "abilities": ["shoot", "arrest", "snare"],
+      "cardText": "You hunt wolves. One arrest per match: be right.",
+      "beware": "Bolts are loud (noise 10).",
+      "bellPulls": 1,
+      "gddRef": "3.2"
+    },
+    "thief": {
+      "id": "thief",
+      "name": "Thief",
+      "faction": "neutral",
+      "ships": "V1.5",
+      "firstPlayable": false,
+      "goal": "Escape by the cave sea exit holding 3 Heirlooms.",
+      "winsWith": "self",
+      "win": "Escape by the cave sea exit holding 3 Heirlooms.",
+      "parity": "village",
+      "startKit": [
+        { "item": "lockpicks", "qty": 5 },
+        { "item": "sack", "qty": 1 },
+        { "item": "smokeBomb", "qty": 1 }
+      ],
+      "abilities": ["pickpocket", "lockpick", "smoke"],
+      "cardText": "Nobody's hero.",
+      "beware": "Thefts look like Killer activity; counts as Village for parity.",
+      "bellPulls": 1,
+      "gddRef": "3.2"
+    },
+    "medium": {
+      "id": "medium",
+      "name": "Medium",
+      "faction": "village",
+      "ships": "V2",
+      "firstPlayable": false,
+      "goal": "Hear the dead.",
+      "winsWith": "village",
+      "win": "Village.",
+      "parity": "village",
+      "startKit": [{ "item": "seanceChalk", "qty": 1 }, { "item": "candle", "qty": 3 }],
+      "abilities": ["seance"],
+      "cardText": "You hear the dead.",
+      "beware": "Cabal ghosts may lie.",
+      "bellPulls": 1,
+      "gddRef": "3.2"
+    }
+  },
+  "rosters": {
+    "4": {
+      "practice": true,
+      "deal": ["killer", "detective", "townsfolk", "townsfolk"],
+      "planned": ["killer", "detective", "townsfolk", "townsfolk"],
+      "gddRef": "3.1"
+    },
+    "5": {
+      "practice": false,
+      "deal": ["killer", "detective", "doctor", "townsfolk", "townsfolk"],
+      "planned": ["killer", "detective", "doctor", "townsfolk", "townsfolk"],
+      "gddRef": "3.1"
+    },
+    "6": {
+      "practice": false,
+      "deal": ["killer", "detective", "doctor", "butler", "townsfolk", "townsfolk"],
+      "planned": ["killer", "detective", "doctor", "butler", "townsfolk", "townsfolk"],
+      "gddRef": "3.1"
+    },
+    "7": {
+      "practice": false,
+      "deal": ["killer", "accomplice", "detective", "doctor", "butler", "townsfolk", "townsfolk"],
+      "planned": [
+        "killer",
+        "accomplice",
+        "detective",
+        "doctor",
+        "butler",
+        "townsfolk",
+        "townsfolk"
+      ],
+      "gddRef": "3.1"
+    },
+    "8": {
+      "practice": false,
+      "deal": [
+        "killer",
+        "accomplice",
+        "detective",
+        "doctor",
+        "butler",
+        "child",
+        "townsfolk",
+        "townsfolk"
+      ],
+      "planned": [
+        "killer",
+        "accomplice",
+        "detective",
+        "doctor",
+        "butler",
+        "child",
+        "townsfolk",
+        "townsfolk"
+      ],
+      "gddRef": "3.1"
+    },
+    "9": {
+      "practice": false,
+      "deal": [
+        "killer",
+        "accomplice",
+        "detective",
+        "doctor",
+        "butler",
+        "child",
+        "townsfolk",
+        "townsfolk",
+        "townsfolk"
+      ],
+      "planned": [
+        "killer",
+        "accomplice",
+        "detective",
+        "doctor",
+        "butler",
+        "child",
+        "ranger",
+        "townsfolk",
+        "townsfolk"
+      ],
+      "gddRef": "3.1"
+    },
+    "10": {
+      "practice": false,
+      "deal": [
+        "killer",
+        "killer",
+        "accomplice",
+        "detective",
+        "doctor",
+        "butler",
+        "child",
+        "townsfolk",
+        "drifter",
+        "townsfolk"
+      ],
+      "planned": [
+        "killer",
+        "killer",
+        "accomplice",
+        "detective",
+        "doctor",
+        "butler",
+        "child",
+        "ranger",
+        "drifter",
+        "townsfolk"
+      ],
+      "gddRef": "3.1"
+    }
+  }
+}

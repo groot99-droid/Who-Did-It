@@ -1,6 +1,6 @@
 # Game Design Document
 
-> Generated from `docs/MASTER_PLAN.md` (v0.1, 2026-10-10). Owns every rule and number together with `packages/content/data/balance.json`. A behaviour change is not done until this file changes with it.
+> Generated from `docs/MASTER_PLAN.md` (v0.1, 2026-10-10). Owns every rule and number together with `packages/content/data/` (`@wdi/content`): `balance.json` holds the global and per-player-count values, and each role, ability, item, clue and task record holds its own (a cast time, a charge count), so no number lives in two files. A behaviour change is not done until this file changes with it.
 
 ## 1. Vision & pillars
 
@@ -33,7 +33,7 @@ Who Did It is a 5-10 player (4 = practice) hidden-role game played from a link. 
 
 Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accomplice know each other), **Neutral** (amber, mask). Clients never receive another player's role.
 
-**Traits.** Each player is dealt a unique triple from 27 combinations: **Height** S/M/T (sprite scale 0.9/1.0/1.1, feet-anchored), **Scarf** red/green/blue (tinted overlay; the nameplate repeats it as a shape: diamond/circle/square), **Hat** cap/bowler/bare (overlay sheet, silhouette-readable from above). The boot trait from the earlier draft is dropped because a boot is 6 px at shipping scale. Traits appear on the role card, the HUD chip tooltip and the meeting roster.
+**Traits.** Each player is dealt a unique triple from 27 combinations: **Height** S/M/T (sprite scale 0.9/1.0/1.1, feet-anchored), **Scarf** red/green/blue (tinted overlay in the palette tokens blood/teal/moon; the nameplate repeats it as a shape: diamond/circle/square), **Hat** cap/bowler/bare (overlay sheet, silhouette-readable from above). The boot trait from the earlier draft is dropped because a boot is 6 px at shipping scale. Traits appear on the role card, the HUD chip tooltip and the meeting roster.
 
 | Players | Cabal | Village specials | Neutral | Townsfolk | Note |
 |---|---|---|---|---|---|
@@ -45,7 +45,7 @@ Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accompl
 | 9 | Killer, Accomplice | Detective, Doctor, Butler, Child, Ranger* | – | 2 | *Townsfolk until the Ranger ships (V1.5) |
 | 10 | Killer x2, Accomplice | Detective, Doctor, Butler, Child, Ranger* | Drifter | 1 | |
 
-Townsfolk never fall below 1. The table is `roles.json`; the rules engine reads it, no document restates it. Lobby toggles (Thief, Medium, faction-only reveal) are V1.5.
+Townsfolk never fall below 1. The table is `roles.json` (`rosters["4".."10"]`, with `deal` for what V1 deals and `planned` for the row above); the rules engine reads it, no document restates it. Lobby toggles (Thief, Medium, faction-only reveal) are V1.5.
 
 ### 3.2 Role cards
 
@@ -62,6 +62,8 @@ Townsfolk never fall below 1. The table is `roles.json`; the rules engine reads 
 | **Ranger** (Village, V1.5) | Village | Crossbow + 2 Bolts, Snare x2, Torch | **Shoot** a wolf: it dies. **Arrest** (1 bolt on a player): the target is cuffed and dragged to the square; the next meeting opens with them as a Case Closed suspect. **Snare**: holds 4 s and logs the name. | You hunt wolves. One arrest per match: be right. | Bolts are loud (noise 10). |
 | **Thief** (Neutral, V1.5) | Escape by the cave sea exit holding 3 Heirlooms | Lockpicks x5, Sack, Smoke Bomb | Pickpocket (40 s CD), Lockpick (2 s, noise 5), Smoke (4 s). | Nobody's hero. | Thefts look like Killer activity; counts as Village for parity. |
 | **Medium** (Village, V2) | Village | Seance Chalk, Candle x3 | Seance at a body (8 s): the ghost picks 1 of 8 phrases. | You hear the dead. | Cabal ghosts may lie. |
+
+Values the table leaves open (decided 2026-10-10, Session C): Kill, Bandage, Salts, Medkit and Rope reach 1.5 tiles; Bandage is instant and knocks both players back 1 tile; Plant Clue takes 2 s; Dust takes 2 s; the Slingshot reaches 5 tiles; Act Shifty's fake rings use the run radius. Universal verbs: Report and the Bell reach 2 tiles; Collect is a 2 s hold. `abilities.json` holds every verb with a number; an item's `use` points at its verb.
 
 ### 3.3 Match loop
 
@@ -101,13 +103,13 @@ A knife kill spawns, server-side: the Body; **2 of the 3 trait clues** (seeded c
 | Ledger | Last house entered per player | Per meeting | Butler |
 | Dropped items | The dead player's inventory | Never | Anyone |
 
-Wolf kills spawn Fur and Claw Marks, no footprints. Collecting: stand on a clue, hold E 2 s; it enters the Notebook with trait, scene and time. The Rag erases 1 clue (3 s, noise 4). Plants are indistinguishable until Inspected. When two different players collect the same physical clue it becomes **Corroborated** and counts as Verified for the suspect set; Townsfolk therefore have a deduction verb.
+Wolf kills spawn Fur and Claw Marks (decay 1 cycle), no footprints. Collecting: stand on a clue, hold E 2 s; it enters the Notebook with trait, scene and time. The Rag erases 1 clue (3 s, noise 4). Washing needs the Bucket and water (the well or a basin). A Wounded player's drips fade after 20 s; a one-way drop leaves a 90 s footprint trail (height) at the landing. Each scene keeps at most 40 clues; past that the oldest Claimed clue is collected first. Plants are indistinguishable until Inspected. When two different players collect the same physical clue it becomes **Corroborated** and counts as Verified for the suspect set; Townsfolk therefore have a deduction verb.
 
 **Case Board.** Verified and Corroborated entries are posted automatically; each living player may Present one Claimed entry. The board renders a per-player summary row (fits n/m known traits, Claimed count, last house) rather than raw entries. The server intersects the Verified traits of each body against living players' traits and shows **Suspects: A, B** when the set is 3 or fewer. A suspect's own vote is void and a tie ejects them only when the set is exactly one player and was built from two bodies, or from a Child silhouette plus one Verified trait. Forged entries discredit nobody; they display "Forged: an Accomplice is in play".
 
 ### 3.5 Items and tasks
 
-Inventory: 5 slots, Q drops, everything drops on death; role-bound items never drop except the Magnifier (drops as a 6 s Inspect for anyone); an ejected Village role's kit goes to a chest at the square.
+Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife, Replica Knife, Master Keyring, Magnifier, Notebook, Slingshot; V1.5 Crossbow) never drop except the Magnifier (drops as a 6 s Inspect for anyone); an ejected Village role's kit goes to a chest at the square.
 
 | Item | Effect | Ships |
 |---|---|---|
@@ -118,10 +120,10 @@ Inventory: 5 slots, Q drops, everything drops on death; role-bound items never d
 | Medkit, Bandage, Salts | Heal 1 HP; kill immunity 60 s; cure status | V1 |
 | Lantern, Candle | Carried light radius 4 / 2; wolves flee light within 4 tiles; off = stealthier | V1 |
 | Pocket Watch, Chalk, Rope | Time; floor marks; free a snared player | V1 |
-| Oil, Wrench, Planks, Letter, Log | Task deliverables fetched from other scenes | V1 |
+| Oil, Wrench, Planks, Letter, Flour | Task deliverables fetched from other scenes | V1 |
 | Forged Alibi, Handcuffs, Crossbow kit, Lockpicks, Smoke Bomb, Heirlooms | V1.5 kits | V1.5 |
 
-**Tasks.** Village players get 3-5 tasks; the global bar at 100% wins. Each needs a tool from another scene: Light the lanterns (Oil from the tavern back room, night only), Fix the well pump (Wrench from the apothecary loft), Deliver a letter (house to house), Mend the fence (2 Planks from the forest edge on the overworld side of the fence; while mended, wolves cannot enter the village). Co-op task (Shutter the windows): both players within 2 tiles of the node holding E for 4 s; progress pauses when one releases. Two-player carrying is V1.5. Completing a task writes a Claimed alibi entry (time + scene). Cabal see a fake list that writes entries but never fills the bar. Ghost task completion counts 100% but ghost contribution is capped at 25% of the bar.
+**Tasks.** Village players get 3-5 tasks; the global bar at 100% wins. Each needs a tool from another scene and a 2 s hold at the node: Light the lanterns (Oil from the tavern back room to a square lantern post, night only), Fix the well pump (Wrench from the apothecary bench), Deliver a letter (from the widow's letter box to the tavern dartboard), Mend the fence (2 Planks from the edge of Gallows Wood by the gate to the NE fence; while mended, wolves cannot enter the village), Fetch the flour (from Crumb's Ovens to the tavern). Co-op task (Shutter the windows, in the tavern): both players within 2 tiles of the node holding E for 4 s; progress pauses when one releases. Two-player carrying is V1.5. Completing a task writes a Claimed alibi entry (time + scene). Cabal see a fake list that writes entries but never fills the bar. Ghost task completion counts 100% but ghost contribution is capped at 25% of the bar.
 
 **Communication.** No voice in V1. Global text chat in meetings. Outside meetings: an 8-phrase quick-chat wheel (Follow me / Where were you? / I saw something / Help! / Clear / Suspicious / Wait / Go) as speech bubbles within 5 tiles, plus world pings. Cabal channel and ghost channel are sent per-recipient by the server; the client never chooses a channel. Proximity text chat is a V1.5 toggle.
 
@@ -131,7 +133,7 @@ Players have 2 HP, regenerating 1 per 90 s; the Knife does 2. At 1 HP you are **
 
 ### 3.7 Stealth, hiding and doors
 
-Vision 7 tiles by day, 3.5 at night, Child -1; sneaking (Shift) is silent at 60% speed. Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10; noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene; the darkness radius is a client-side mask. Radius + occluder visibility is V1.5 (same `Visibility.ts` policy, different predicate).
+Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2; noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene; the darkness radius is a client-side mask. Radius + occluder visibility is V1.5 (same `Visibility.ts` policy, different predicate).
 
 **Hiding spots** (wardrobe, hay pile, under bed, barrel; crawlspaces for the Child) hold one player; **body spots** (cellar dump, crypt niche, hay pile) are separate objects. Entering takes 1 s, noise 2; the hidden player sees a slit view and keeps one action, **Burst Out** (E): instant, stuns the Checker 1 s, noise 6. **Check** (E, 2 s) opens a spot; a Check on an occupied spot writes a Verified Notebook entry for the hider ("X opened my wardrobe at 3:12"), so checking is evidence.
 
@@ -165,7 +167,7 @@ Snowball guard: when living Village <= Cabal + 2, kill CD +10 s and the next kil
 
 **First playable (M3, "Mafia with walking")**: lobby, 5-char codes, reconnection in lobby; roles Killer / Detective / Doctor / Townsfolk; traits height + scarf; overworld 40x30 greybox + tavern (2 rooms) + widow cottage (2 rooms) + forest + cave entry; kill, body, Blood tint, two clues, Notebook, Detective auto-Verified; report / bell; meeting with portraits, chat, secret vote, eject + reveal; checkWin; ghosts with ghost chat.
 
-**V1 (beta)**: everything in 3.1-3.9 marked V1: Butler, Child, Accomplice, Drifter; Lens charges, Dust / Compare, Autopsy, Bandage, Ledger, Witness, Plant Clue, Rag, Bucket; Case Board with suspect sets and Corroborated; 4 task types incl. 1 co-op; wolves, fence; hiding spots, Burst Out, Check; door states, Skeleton Key, Crowbar; Hunger, Final Night vote, missing-person roll-call; quick-chat, Cabal and ghost channels; scene profiles Small / Medium / Large; 10-player rules.
+**V1 (beta)**: everything in 3.1-3.9 marked V1: Butler, Child, Accomplice, Drifter; Lens charges, Dust / Compare, Autopsy, Bandage, Ledger, Witness, Plant Clue, Rag, Bucket; Case Board with suspect sets and Corroborated; 6 task types incl. 1 co-op; wolves, fence; hiding spots, Burst Out, Check; door states, Skeleton Key, Crowbar; Hunger, Final Night vote, missing-person roll-call; quick-chat, Cabal and ghost channels; scene profiles Small / Medium / Large; 10-player rules.
 
 **V1.5**: Ranger (Arrest), Thief, Heirlooms, cave sea exit, Handcuffs, Forged Alibi, Candles for all, Wisp, Butler Bell, lit-window silhouettes, proximity chat toggle, faction-only reveal, fisher cottage, lighthouse, lobby role toggles, radius + occluder visibility, Lottie reveal, Light2D experiment, spectator mode.
 
@@ -173,7 +175,7 @@ Snowball guard: when living Village <= Cabal + 2, kill CD +10 s and the next kil
 
 ### 3.11 One Night Ultimate Baguette (quick mode)
 
-Origin: the owner's friend first framed the whole game as "One Night Ultimate Baguette", a wrapper around the one-night hidden-role card game. This section is an original ruleset with original wording, built from the lobby, role card, world, meeting and vote systems above. Lobby setting `mode = onub`. Target length 6-9 minutes. Knobs live in `balance.onub.json`; the deck table is `roles.onub.json`.
+Origin: the owner's friend first framed the whole game as "One Night Ultimate Baguette", a wrapper around the one-night hidden-role card game. This section is an original ruleset with original wording, built from the lobby, role card, world, meeting and vote systems above. Lobby setting `mode = onub`. Target length 6-9 minutes; the numbers below give about 5-7 (see the match table). The role table is `roles.onub.json`; the decks, night windows, timers, vote and winner table are `balance.onub.json`.
 
 **Fiction.** The night before Lord Vane's will is read, Hollowmere keeps the wake-loaf custom: Tamsin Crumb, the baker, bakes one loaf per mourner plus three for the dead, and bakes a wax-sealed crumb token into each. Your token is your secret. At dusk every mourner sets their loaf on a named plate on the Wake Table in Crumb's Ovens; the dead's three loaves sit on the oven ledge. Vane's poisoners are among the mourners, and the will names "whoever remains when the last lantern goes out", so by dawn the village must turn one person out into the storm. During the night people creep down from the bakery loft and tamper with the loaves. What you hold at dawn is what you are.
 
@@ -203,14 +205,14 @@ Origin: the owner's friend first framed the whole game as "One Night Ultimate Ba
 | 9 | 12 | + Pallbearer x2 (V1: Mourner x2), Mourner x2 becomes x1 |
 | 10 | 13 | + Gamekeeper (V1: Mourner) |
 
-Both Poisoners sit among the dead's loaves in 3 / C(N+3, 2) of deals: 14% at 4 players, 7% at 6, 4% at 10. Those games are won by the village only if nobody is turned out.
+Both Poisoners sit among the dead's loaves in 3 / C(N+3, 2) of deals: 14% at 4 players, 8% at 6, 4% at 10. Those games are won by the village only if nobody is turned out.
 
 **Night.** After the 12 s role card (your dealt token) and a 10 s Dusk in which everyone walks into the bakery and sets their loaf (hold E on your own plate, 1 s), every client goes to a black "you sleep in the loft" screen with storm ambience and no clock. Sleepers are moved to a `loft` pseudo-scene so the server encodes no presence to them. The server runs a Conductor: a fixed list of windows built from the deck. Every window runs even when its role sits among the dead's loaves, so night length never leaks the deal. Only players whose **dealt** role matches the open window are spawned at the bakery door for that window; they act as what they were dealt, not as what they may now hold, then fade back to black. Windows carry a seeded 0-4 s jitter.
 
 | # | Window | Who wakes | Physical act (object, hold time) | Trace at dawn |
 |---|---|---|---|---|
 | 1 | 12 s | Poisoners | Each other's nameplates glow red at the Wake Table. If alone: E on one of the dead's loaves (2 s) shows its token | Oven-ledge flour scuff |
-| 2 | 8 s | Hireling | E on the Baker's ledger (2 s): the Poisoners' names | Ledger left open |
+| 2 | 8 s | Hireling | E on the Baker's ledger (2 s, act `onub.readLedger`): the Poisoners' names | Ledger left open |
 | 3 | 8 s | Pallbearers (V1.1) | See each other at the table | none |
 | 4 | 14 s | Sin-Eater | E on one mourner's plate (2 s) shows its token, or E on two of the dead's loaves in turn | Plate turned |
 | 5 | 12 s | Cutpurse | E on another's plate (2 s): the loaves swap; your new token is shown | Two plates turned |
@@ -218,15 +220,15 @@ Both Poisoners sit among the dead's loaves in 3 / C(N+3, 2) of deals: 14% at 4 p
 | 7 | 10 s | Sot | E on one of the dead's loaves (2 s): swaps with your own, unseen; if the window expires the server picks by seed | Ledge scuff |
 | 8 | 8 s | Lamplighter | E on your own plate (2 s) shows your current token | Plate turned |
 
-Night length is the sum of the windows present plus 2 s fades: about 62 s at 4 players, 86 s at 6, 124 s at 10. Traces are cosmetic in V1 ("something moved here"); trait-bearing flour footprints (height, as in the main mode) are a V1.1 lobby toggle `floury`. Every act arrives as `act.ability` through the command queue and is accepted only if the phase is night, the open window matches the actor's dealt role, the actor has not acted this window, the actor is within 2 tiles of the target prop, and the target is legal for the role (never your own plate for Sin-Eater, Cutpurse or Busybody; only the dead's loaves for the Sot). "May" roles that time out do nothing.
+Night length is the sum of the windows present plus a 2 s fade per window, before jitter: 60 s at 4-5 players, 70 s at 6, 80 s at 7, 92 s at 8-10 in V1 (102 s at 9-10 once the Pallbearers ship); jitter adds up to 4 s per window. Traces are cosmetic in V1 ("something moved here"); trait-bearing flour footprints (height, as in the main mode) are a V1.1 lobby toggle `floury`. Every act arrives as `act.ability` through the command queue and is accepted only if the phase is night, the open window matches the actor's dealt role, the actor has not acted this window, the actor is within 2 tiles of the target prop, and the target is legal for the role (never your own plate for Sin-Eater, Cutpurse or Busybody; only the dead's loaves for the Sot). "May" roles that time out do nothing.
 
 **Dawn, discussion and vote.** A 10 s dawn fade leads straight into the Meeting scene with the trace lines on the board. One discussion with global text chat, portraits and trait icons. Claims are structured: tap a role chip to post "I was the Sin-Eater: Y's loaf was Mourner", and the board lists them per player as Claimed.
 
 | Players | Discussion | Vote | Whole match |
 |---|---|---|---|
-| 4-5 | 150 s | 25 s, ends early when everyone has voted | 5-6 min |
-| 6-7 | 180 s | 25 s | 6-7 min |
-| 8-10 | 210 s | 25 s | 7-9 min |
+| 4-5 | 150 s | 25 s, ends early when everyone has voted | about 5 min |
+| 6-7 | 180 s | 25 s | 5.5-6 min |
+| 8-10 | 210 s | 25 s | 6.5-7 min |
 
 Vote: no Skip, no self-vote; a missing vote is an abstention and is flagged in the reveal. Resolution (`resolveDawn`): everyone holding the most votes is **turned out**, ties included; if nobody holds two or more votes, nobody is turned out. A turned-out Gamekeeper takes their own target with them (one hop). Winners are judged by **final** loaves.
 
@@ -256,7 +258,7 @@ Reveal (20 s): every plate cracks open. The end screen shows dealt and final rol
 | Gamekeeper | If the village turns you out, you take your vote with you. Point carefully. |
 | Mourner | You came for the bread and the will. Listen, count the claims, and vote. |
 
-**Balance.** At 4-5 the deal is swap chaos with the Debtor as the first bluff; 150 s of text discussion is enough. At 6-7 the Hireling punishes "no Poisoner here, vote in a circle" play and the Lamplighter gives the first verifiable late claim. At 8-10 three verified-claim sources (Sin-Eater, Lamplighter, Pallbearers) face two liars and a Hireling, and the Gamekeeper makes mass-voting costly. The 6-9 minute target holds at every count (card 12 + dusk 10 + night 62-124 + dawn 10 + discussion 150-210 + vote up to 25 + reveal 20). Replayability comes from the deal and the swaps reshuffling identity every match and the swap log teaching the table at the end. The mode has no ranking.
+**Balance.** At 4-5 the deal is swap chaos with the Debtor as the first bluff; 150 s of text discussion is enough. At 6-7 the Hireling punishes "no Poisoner here, vote in a circle" play and the Lamplighter gives the first verifiable late claim. At 8-10 three verified-claim sources (Sin-Eater, Lamplighter, Pallbearers) face two liars and a Hireling, and the Gamekeeper makes mass-voting costly. Every count lands at about 5-7 minutes (card 12 + dusk 10 + night 60-102 plus jitter + dawn 10 + discussion 150-210 + vote up to 25 + reveal 20), short of the 6-9 minute target at 4-7 players; raising discussion is the knob if playtests want the longer match. Replayability comes from the deal and the swaps reshuffling identity every match and the swap log teaching the table at the end. The mode has no ranking.
 
 **V1 cut.** Ships: mode toggle; decks for 4-10 with the Pallbearers and Gamekeeper replaced by Mourners (nine roles); bakery greybox with plates, ledge and ledger; sleep screen and Conductor; dusk plate-setting; Meeting reuse with no Skip and claim chips; `resolveDawn` and the winner table; the reveal with the swap log. V1.1: Pallbearers, Gamekeeper, a dawn walk in the bakery before the meeting, flour footprints, eleven role portraits, lobby role picks.
 

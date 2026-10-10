@@ -1,0 +1,36 @@
+{
+  "name": "@wdi/content",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Who Did It content: rosters, balance, scenes and palette as JSON, validated by zod.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./data/*": "./data/*"
+  },
+  "files": [
+    "data",
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "node scripts/lint-data.mjs",
+    "format": "node scripts/lint-data.mjs --write",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "~5.9.3",
+    "vitest": "^5.0.3"
+  }
+}

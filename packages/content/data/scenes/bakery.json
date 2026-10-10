@@ -1,0 +1,75 @@
+{
+  "id": "bakery",
+  "prefix": "bk",
+  "name": "Crumb's Ovens",
+  "zoneId": "bakery",
+  "profile": "small",
+  "kind": "interior",
+  "size": { "w": 18, "h": 11 },
+  "notes": "Wake Table with up to 10 named plates, oven ledge with the dead's three loaves, the Baker's ledger, cold oven, flour floor. Hub of the quick mode (GDD 3.11); in the main match a task node (Fetch the flour) and a Blood-wash basin.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "bk.door",
+      "from": "bakery",
+      "x": 8,
+      "y": 10,
+      "kind": "door",
+      "to": "overworld",
+      "toSpawn": "bakery",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [{ "id": "door", "x": 8, "y": 9, "z": 0, "facing": "n" }],
+  "spots": [
+    {
+      "id": "bk.behind_counter",
+      "kind": "hide",
+      "variant": "behindCounter",
+      "x": 15,
+      "y": 1,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    { "id": "bk.wake_table", "kind": "wakeTable", "x": 8, "y": 4 },
+    { "id": "bk.plate_0", "kind": "plate", "x": 6, "y": 4 },
+    { "id": "bk.plate_5", "kind": "plate", "x": 6, "y": 5 },
+    { "id": "bk.plate_1", "kind": "plate", "x": 7, "y": 4 },
+    { "id": "bk.plate_6", "kind": "plate", "x": 7, "y": 5 },
+    { "id": "bk.plate_2", "kind": "plate", "x": 8, "y": 4 },
+    { "id": "bk.plate_7", "kind": "plate", "x": 8, "y": 5 },
+    { "id": "bk.plate_3", "kind": "plate", "x": 9, "y": 4 },
+    { "id": "bk.plate_8", "kind": "plate", "x": 9, "y": 5 },
+    { "id": "bk.plate_4", "kind": "plate", "x": 10, "y": 4 },
+    { "id": "bk.plate_9", "kind": "plate", "x": 10, "y": 5 },
+    { "id": "bk.deadloaf_0", "kind": "deadLoaf", "x": 3, "y": 1 },
+    { "id": "bk.deadloaf_1", "kind": "deadLoaf", "x": 3, "y": 2 },
+    { "id": "bk.deadloaf_2", "kind": "deadLoaf", "x": 3, "y": 3 },
+    { "id": "bk.ledger", "kind": "ledger", "x": 15, "y": 7 },
+    { "id": "bk.oven", "kind": "oven", "x": 2, "y": 2 },
+    { "id": "bk.flour_sacks", "kind": "taskSource", "x": 0, "y": 8, "item": "flour" },
+    { "id": "bk.basin", "kind": "basin", "x": 17, "y": 5 }
+  ],
+  "gates": [],
+  "paths": [],
+  "grid": [
+    "##################",
+    "####...........H.#",
+    "####.............#",
+    "#..#.........#####",
+    "#....#######.....#",
+    "#....#######.....#",
+    "#................#",
+    "#..............###",
+    "#..............###",
+    "#.......S........#",
+    "########D#########"
+  ]
+}
