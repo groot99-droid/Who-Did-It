@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Notebook tab">
+  <title>Notebook tab</title>
+  <path d="M8 13 C8 10.5 10 8.5 12.5 8.5 H29 L40 19.5 V39.5 C40 42 38 44 35.5 44 H12.5 C10 44 8 42 8 39.5 Z" fill="#D9D2C2"/>
+  <path d="M29 8.5 V19.5 H40" fill="#6F7A8C"/>
+  <path d="M14 26 H34 M14 32 H34 M14 38 H26" stroke="#6F7A8C"/>
+  <path d="M18 8.5 V2.5 H24 V8.5" fill="#B3121F"/>
+</svg>

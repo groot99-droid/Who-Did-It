@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Emergency bell">
+  <title>Emergency bell</title>
+  <path d="M24 5 V9" />
+  <path d="M12 31 C12 31 14 28 14 20 C14 13.5 18.5 9 24 9 C29.5 9 34 13.5 34 20 C34 28 36 31 36 31 Z" fill="#F2B33D"/>
+  <path d="M9 31 H39 V35 H9 Z" fill="#F2B33D"/>
+  <path d="M19.5 35 C19.5 38.5 21.5 41 24 41 C26.5 41 28.5 38.5 28.5 35" fill="#2C3240"/>
+</svg>

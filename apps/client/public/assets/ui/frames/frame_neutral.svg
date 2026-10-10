@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="288" viewBox="0 0 192 288" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Neutral card frame" data-slice="24">
+  <title>Neutral card frame</title>
+  <rect x="1" y="1" width="190" height="286" rx="2" stroke="#12141C"/>
+  <g stroke="#F2B33D">
+  <rect x="7" y="7" width="178" height="274" rx="1"/>
+  <path d="M11 21A10 10 0 0 1 21 11M16 21A5 5 0 0 1 21 16"/>
+  <path d="M11 21A10 10 0 0 1 21 11M16 21A5 5 0 0 1 21 16" transform="translate(192 0) scale(-1 1)"/>
+  <path d="M11 21A10 10 0 0 1 21 11M16 21A5 5 0 0 1 21 16" transform="translate(0 288) scale(1 -1)"/>
+  <path d="M11 21A10 10 0 0 1 21 11M16 21A5 5 0 0 1 21 16" transform="translate(192 288) scale(-1 -1)"/>
+  </g>
+</svg>
