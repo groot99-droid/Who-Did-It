@@ -1,0 +1,56 @@
+# Builds the client and deploys it to GitHub Pages (docs/ARCHITECTURE.md 5.10).
+#
+# One-time setup by the owner (Settings of the repository):
+#   1. Pages > Build and deployment > Source = GitHub Actions
+#   2. Secrets and variables > Actions > Variables > VITE_SERVER_URL = https://<the Render Free service>.onrender.com
+name: pages
+
+on:
+  push:
+    # The repo's default branch is claude/zen-turing-m1jnw0 until the owner renames it to main.
+    branches: [main, claude/zen-turing-m1jnw0]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Enable pnpm
+        run: corepack enable
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Build client
+        env:
+          VITE_SERVER_URL: ${{ vars.VITE_SERVER_URL }}
+        run: |
+          export VITE_BUILD_VERSION="${GITHUB_SHA::8}"
+          pnpm --filter @wdi/client build
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: apps/client/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
