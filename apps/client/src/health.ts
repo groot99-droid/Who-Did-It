@@ -4,8 +4,8 @@ export interface Health {
   [key: string]: unknown;
 }
 
-export const SERVER_URL: string = (import.meta.env.VITE_SERVER_URL ?? "http://localhost:2567").replace(/\/+$/, "");
-export const BUILD_VERSION: string = import.meta.env.VITE_BUILD_VERSION ?? "dev";
+export const SERVER_URL: string = (import.meta.env.VITE_SERVER_URL || "http://localhost:2567").replace(/\/+$/, "");
+export const BUILD_VERSION: string = import.meta.env.VITE_BUILD_VERSION || "dev";
 
 const POLL_MS = 2000;
 const TIMEOUT_MS = 6000;
