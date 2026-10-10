@@ -1,0 +1,438 @@
+@font-face {
+  font-family: Oswald;
+  font-weight: 200 700;
+  font-display: swap;
+  src: url("../assets/fonts/oswald-latin-wght-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: Inter;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../assets/fonts/inter-latin-wght-normal.woff2") format("woff2");
+}
+
+:root {
+  --ink: #14110f;
+  --panel: #211c18;
+  --panel-edge: #3a322a;
+  --parchment: #efe4cc;
+  --dim: #a89a7c;
+  --accent: #e0b04a;
+  --village: #4f8a5b;
+  --cabal: #b8483f;
+  --neutral: #8a8f98;
+  --font-head: Oswald, "Arial Narrow", sans-serif;
+  --font-body: Inter, system-ui, sans-serif;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--ink);
+  color: var(--parchment);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+#game {
+  position: fixed;
+  inset: 0;
+}
+
+/* The overlay never blocks the canvas; only its controls take pointer events. */
+#overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+#overlay :is(button, input, a, textarea, .panel, .rolecard, .scrim) {
+  pointer-events: auto;
+}
+
+h1,
+h2 {
+  font-family: var(--font-head);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+
+h1 {
+  font-size: 28px;
+}
+
+h2 {
+  font-size: 18px;
+  margin-top: 18px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 10px;
+  padding: 24px;
+  width: min(420px, 100%);
+  box-sizing: border-box;
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  color: var(--dim);
+  margin-bottom: 6px;
+}
+
+input {
+  font: inherit;
+  font-size: 16px; /* 16px stops iOS zooming on focus */
+  color: var(--parchment);
+  background: var(--ink);
+  border: 1px solid var(--panel-edge);
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+input#code {
+  width: 7.5em;
+  flex: none;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-family: var(--font-head);
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  color: var(--parchment);
+  background: var(--panel-edge);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 10px 16px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+button.primary {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.row > button.primary:first-child:last-child {
+  flex: 1;
+}
+
+.row.center {
+  justify-content: space-between;
+}
+
+.hint,
+.dim {
+  color: var(--dim);
+  font-size: 13px;
+}
+
+.hint {
+  margin: 6px 0 0;
+}
+
+.msg {
+  min-height: 1.4em;
+  margin: 14px 0 0;
+  color: var(--accent);
+}
+
+.divider {
+  margin: 18px 0 0;
+  text-align: center;
+  color: var(--dim);
+  font-size: 13px;
+}
+
+.code {
+  font-family: var(--font-head);
+  font-size: 44px;
+  letter-spacing: 0.18em;
+}
+
+.players {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.players li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--panel-edge);
+}
+
+.players li.away {
+  opacity: 0.55;
+}
+
+.pname {
+  font-weight: 600;
+}
+
+.count {
+  color: var(--dim);
+  font-weight: 400;
+}
+
+.tag {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--panel-edge);
+  color: var(--dim);
+}
+
+.tag.lead {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 0.55);
+}
+
+.dialog p {
+  color: var(--dim);
+  margin: 0;
+}
+
+/* Role card */
+.rolecard {
+  width: min(400px, 100%);
+  max-height: calc(100dvh - 32px);
+  perspective: 1200px;
+}
+
+.rolecard .inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+.rolecard .inner.no-motion {
+  transition: none;
+}
+
+.rolecard .inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.rolecard .face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-sizing: border-box;
+  background: var(--panel);
+  border: 1px solid var(--panel-edge);
+  border-radius: 10px;
+  padding: 0 20px 20px;
+  overflow: auto;
+}
+
+.rolecard .back {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: 20px;
+}
+
+/* The front sets the card height and starts rotated so the flip lands it face-up. */
+.rolecard .front {
+  position: relative;
+  inset: auto;
+  transform: rotateY(180deg);
+}
+
+.rolecard .stripe {
+  margin: 0 -20px 14px;
+  padding: 6px 20px;
+  font-family: var(--font-head);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 13px;
+  color: #fff;
+}
+
+.team-village .stripe {
+  background: var(--village);
+}
+
+.team-cabal .stripe {
+  background: var(--cabal);
+}
+
+.team-neutral .stripe {
+  background: var(--neutral);
+}
+
+.role-name {
+  font-size: 34px;
+  margin: 0;
+}
+
+.look {
+  margin: 4px 0 12px;
+  color: var(--accent);
+  font-size: 14px;
+}
+
+.goal {
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.abilities,
+.inventory {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+}
+
+.abilities li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.abilities .grow {
+  flex: 1;
+}
+
+kbd {
+  font-family: var(--font-head);
+  background: var(--ink);
+  border: 1px solid var(--panel-edge);
+  border-radius: 4px;
+  padding: 1px 8px;
+}
+
+.inventory {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.inventory li {
+  background: var(--ink);
+  border: 1px solid var(--panel-edge);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 13px;
+}
+
+.text,
+.beware,
+.mates {
+  font-size: 14px;
+  line-height: 1.45;
+  margin: 8px 0;
+}
+
+.beware {
+  color: var(--accent);
+}
+
+.timer {
+  height: 4px;
+  background: var(--ink);
+  border-radius: 2px;
+  margin: 14px 0 0;
+  overflow: hidden;
+}
+
+.timer-bar {
+  height: 100%;
+  width: 100%;
+  background: var(--accent);
+}
+
+.hint-key {
+  margin-left: auto;
+}
+
+.chip {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  min-height: 36px;
+  padding: 6px 12px;
+  font-size: 13px;
+  background: var(--panel);
+  border-color: var(--panel-edge);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rolecard .inner {
+    transition: none;
+  }
+
+  .timer-bar {
+    transition: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .panel {
+    padding: 18px;
+  }
+
+  .code {
+    font-size: 36px;
+  }
+}
