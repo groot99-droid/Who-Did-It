@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#12141C" />
+    <title>Who Did It mockup: Lobby</title>
+    <!-- Static mockup built from the theme only; served by the dev server (src/ui/theme/README.md). -->
+    <link rel="stylesheet" href="/Who-Did-It/src/ui/theme/tokens.css" />
+    <link rel="stylesheet" href="/Who-Did-It/src/ui/theme/components.css" />
+    <style>
+      body {
+        margin: 0;
+        min-height: 100dvh;
+      }
+      #overlay {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--wdi-space-4);
+      }
+      .world {
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(circle at 62% 58%, rgb(var(--wdi-lantern-rgb) / 0.22), transparent 26%),
+          radial-gradient(circle at 20% 15%, rgb(var(--wdi-moon-rgb) / 0.16), transparent 40%),
+          repeating-linear-gradient(90deg, transparent 0 63px, rgb(var(--wdi-slate-rgb) / 0.5) 63px 64px),
+          repeating-linear-gradient(0deg, transparent 0 63px, rgb(var(--wdi-slate-rgb) / 0.5) 63px 64px),
+          var(--wdi-slate);
+      }
+      .world::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgb(var(--wdi-ink-rgb) / 0.55);
+      }
+      .house {
+        position: absolute;
+        background: var(--wdi-ink);
+        border: var(--wdi-stroke-w) solid var(--wdi-ink);
+        box-shadow: inset 0 0 0 2px var(--wdi-fog);
+      }
+      .fog {
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(ellipse at 50% 110%, rgb(var(--wdi-fog-rgb) / 0.35), transparent 60%),
+          radial-gradient(ellipse at 10% 0%, rgb(var(--wdi-moon-rgb) / 0.18), transparent 50%), var(--wdi-ink);
+      }
+      .wdi-scrim {
+        animation: none;
+      }
+    </style>
+  </head>
+  <body class="wdi-root">
+    <div class="fog"></div>
+    <div id="overlay">
+      <section class="wdi-panel wdi-stack" aria-labelledby="t">
+        <p class="wdi-eyebrow">Party code</p>
+        <div class="wdi-row wdi-row--between">
+          <span class="wdi-display wdi-display--xl" style="letter-spacing: var(--wdi-tracking-code)"
+            >K7PQX</span
+          >
+          <button class="wdi-btn wdi-btn--sm">
+            <img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_link.svg" alt="" />Copy invite link
+          </button>
+        </div>
+        <div class="wdi-row wdi-row--between">
+          <h2 class="wdi-subtitle" id="t">Players <span class="wdi-muted">5 / 10</span></h2>
+          <span class="wdi-hint">Best with 6 to 8</span>
+        </div>
+        <ul class="wdi-roster">
+          <li class="wdi-roster__row">
+            <span class="wdi-seat">T</span
+            ><span class="wdi-grow"><span class="wdi-roster__name">Tamsin</span></span
+            ><span class="wdi-roster__tags"
+              ><span class="wdi-chip">you</span><span class="wdi-chip wdi-chip--lead">leader</span></span
+            >
+          </li>
+          <li class="wdi-roster__row">
+            <span class="wdi-seat">M</span
+            ><span class="wdi-grow"><span class="wdi-roster__name">Marlow</span></span
+            ><span class="wdi-roster__tags"
+              ><span class="wdi-chip wdi-chip--ready"
+                ><img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_check.svg" alt="" />ready</span
+              ></span
+            >
+          </li>
+          <li class="wdi-roster__row">
+            <span class="wdi-seat">O</span
+            ><span class="wdi-grow"><span class="wdi-roster__name">Osric</span></span
+            ><span class="wdi-roster__tags"
+              ><span class="wdi-chip wdi-chip--ready"
+                ><img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_check.svg" alt="" />ready</span
+              ></span
+            >
+          </li>
+          <li class="wdi-roster__row is-away">
+            <span class="wdi-seat">P</span
+            ><span class="wdi-grow"
+              ><span class="wdi-roster__name">Pell</span
+              ><span class="wdi-roster__meta">reconnecting</span></span
+            ><span class="wdi-roster__tags"
+              ><span class="wdi-chip wdi-chip--quiet"
+                ><img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_clock.svg" alt="" />away</span
+              ></span
+            >
+          </li>
+          <li class="wdi-roster__row">
+            <span class="wdi-seat">W</span
+            ><span class="wdi-grow"><span class="wdi-roster__name">Wren</span></span
+            ><span class="wdi-roster__tags"></span>
+          </li>
+        </ul>
+        <p class="wdi-hint" aria-live="polite">Everyone in? Start when the party is ready.</p>
+        <div class="wdi-row">
+          <button class="wdi-btn wdi-btn--primary wdi-grow">Start</button>
+          <button class="wdi-btn wdi-btn--ghost">Leave</button>
+        </div>
+      </section>
+      <div class="wdi-scrim">
+        <div class="wdi-panel wdi-dialog" role="dialog" aria-modal="true" aria-labelledby="d">
+          <h2 class="wdi-display wdi-display--md wdi-dialog__title" id="d">Start with 5 players?</h2>
+          <p class="wdi-dialog__body">
+            Roles are dealt at once and the party locks. Nobody can join after this. Pell and Wren are not
+            ready.
+          </p>
+          <div class="wdi-dialog__actions">
+            <button class="wdi-btn wdi-btn--primary">Deal the roles</button
+            ><button class="wdi-btn wdi-btn--ghost">Not yet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
