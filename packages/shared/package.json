@@ -1,0 +1,24 @@
+{
+  "name": "@wdi/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Schema, protocol, pure rules and constants shared by the server and the clients.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts",
+    "./protocol": "./src/protocol/index.ts",
+    "./rules": "./src/rules/index.ts",
+    "./constants": "./src/constants.ts",
+    "./metrics": "./src/metrics.ts",
+    "./version": "./src/version.ts",
+    "./direction": "./src/direction.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config ../../vitest.config.ts"
+  },
+  "dependencies": {
+    "@colyseus/schema": "^5.0.36"
+  }
+}

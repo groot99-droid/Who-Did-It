@@ -30,6 +30,12 @@ importers:
         specifier: ^5.0.3
         version: 5.0.3(vite@8.3.4)
 
+  packages/shared:
+    dependencies:
+      '@colyseus/schema':
+        specifier: ^5.0.36
+        version: 5.0.36(typescript@5.9.3)
+
 packages:
 
   '@cacheable/memory@2.2.0':
@@ -37,6 +43,15 @@ packages:
 
   '@cacheable/utils@2.5.0':
     resolution: {integrity: sha512-buipgOVDkkPXNR5+xBpDw7Zk2n1EvU7qBJCNUcL7rhQ//kfpOXPAvQ511Os0vpLYJ1pZnvudNytkQt2hst3wqA==}
+
+  '@colyseus/schema@5.0.36':
+    resolution: {integrity: sha512-x2pknfJnJaYIrv7se4AI5x1KW+2whaNjX6u71cLpbQxLvCmBuB/dqnav4Se12cp2DWv0XCstsgMHKefaQX0QFA==}
+    hasBin: true
+    peerDependencies:
+      typescript: '>=5.0.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   '@eslint-community/eslint-utils@4.10.1':
     resolution: {integrity: sha512-cuadcxVFE8sDK6iWJbs8Sn0av2Nrh2QSGQhVlBW9AaAHqHwjWsZHT8LJ4hFGPh7ASBV2deFdM7H/DPjulmh8rg==}
@@ -819,6 +834,10 @@ snapshots:
     dependencies:
       hashery: 1.5.1
       keyv: 5.6.0
+
+  '@colyseus/schema@5.0.36(typescript@5.9.3)':
+    optionalDependencies:
+      typescript: 5.9.3
 
   '@eslint-community/eslint-utils@4.10.1(eslint@10.12.0)':
     dependencies:
