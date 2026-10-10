@@ -1,0 +1,25 @@
+:root {
+  --ink: #14110f;
+  --parchment: #efe4cc;
+  --dim: #a89a7c;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--ink);
+  color: var(--parchment);
+  overflow: hidden;
+}
+
+#game {
+  position: fixed;
+  inset: 0;
+}
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}

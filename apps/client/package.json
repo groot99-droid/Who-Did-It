@@ -1,0 +1,26 @@
+{
+  "name": "@wdi/client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Who Did It browser client: Phaser 4 canvas plus a DOM overlay.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@colyseus/sdk": "^0.18.5",
+    "mitt": "^3.0.1",
+    "phaser": "4.2.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "typescript": "~5.9.2",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.0"
+  }
+}
