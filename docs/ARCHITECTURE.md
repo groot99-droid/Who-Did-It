@@ -12,6 +12,7 @@
 | Phaser | 4.2.1 (owner decision 2026-10-10) | Official Vite + TypeScript template; lighting via `setLighting(true)`, tint fill via `setTintMode`, filters for vignette and bloom; `pixelArt: false` globally; the GPU tilemap layer is optional (orthographic, single tileset) |
 | Colyseus | `colyseus ^0.18.9`, `@colyseus/core ^0.18.18`, `@colyseus/schema ^5.0.36`, `@colyseus/sdk ^0.18.5`, `@colyseus/testing ^0.18.6` | Never `colyseus.js` |
 | Vite / Vitest / Playwright | ^8.3 / ^5.0 / ^1.64 | |
+| zod | `zod ^4.6.5` | `@wdi/content` validators (Session C, 2026-10-10) |
 | TypeScript | ~5.9 | 7.x breaks typescript-eslint until 7.1 |
 | Blender / Tiled / Audacity | 5.2 LTS / 1.11 / 4.0.1 | Tiled only from M6 |
 
