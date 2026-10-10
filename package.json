@@ -16,7 +16,8 @@
     "test": "pnpm -r --if-present test",
     "format": "prettier --write .",
     "assets:render": "pnpm --filter @wdi/blender render:smoke",
-    "grid:export": "pnpm --filter @wdi/grid export"
+    "grid:export": "pnpm --filter @wdi/grid export",
+    "bots:soak": "pnpm --filter @wdi/bots soak"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

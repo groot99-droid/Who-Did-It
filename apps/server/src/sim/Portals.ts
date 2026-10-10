@@ -1,5 +1,6 @@
 import { balance, profileFor, scenes, type Portal, type SceneId } from '@wdi/content';
 import {
+  DIRECTIONS,
   ErrorCode,
   MAX_PLAYERS,
   MIN_PLAYERS_TO_START,
@@ -95,6 +96,7 @@ export function enterScene(
   presence.x = Math.round(x);
   presence.y = Math.round(y);
   presence.animId = 0;
+  presence.yaw = (Math.max(0, DIRECTIONS.indexOf(spawn.facing)) * Math.PI) / 4;
   if (transit) {
     const until = tick + ticks(balance.doors.transitS);
     p.busyUntilTick = until;

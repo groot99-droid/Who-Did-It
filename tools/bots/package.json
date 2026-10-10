@@ -1,0 +1,24 @@
+{
+  "name": "@wdi/bots",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Load bots: random-walk movement clients and the 30 minute soak (no tasks or reports).",
+  "scripts": {
+    "walk": "tsx --conditions=development walk.ts",
+    "soak": "tsx --conditions=development soak.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@colyseus/sdk": "^0.18.5",
+    "@wdi/content": "workspace:*",
+    "@wdi/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.0",
+    "typescript": "~5.9.3",
+    "vitest": "^5.0.3"
+  }
+}
