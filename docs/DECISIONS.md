@@ -31,8 +31,8 @@
 1. **Engine line.** The plan pins Phaser 3.90.0 as decided and uses no 4-only features. Phaser 4.2.1 is now the maintained line and the official guidance is to start new projects on it; the switch costs about one M0 day (lighting and tint API names differ) and nothing else in this plan changes. Keep 3.90.0 or move to 4.2.1? **Resolved 2026-10-10: Phaser 4.2.1 (A5).**
 2. **Hosting from day 3.** Railway Hobby needs a card and $5 per month from M0; Render Free is enough for M1-M3 tests if you accept a one-minute wake. Which do you want first? **Resolved 2026-10-10: Render Free until the M3 exit, then Railway Hobby (A6).**
 3. **Hat replaces boots as the third trait** (cap / bowler / bare), with Felt on the door frame as its clue. Approve? **Resolved 2026-10-10: approved (A1).**
-4. **Practice at 4.** 4 players is labelled practice (Cabal needs 3 kills, no ranking) and 5 is the real minimum. Approve, or do you want 4 treated as a full match with the weaker balance?
-5. **Higgsfield plan tier.** All generated assets must come from a paid, watermark-free plan; confirm the account tier before the first asset is committed.
+4. **Practice at 4.** 4 players is labelled practice (Cabal needs 3 kills, no ranking) and 5 is the real minimum. Approve, or do you want 4 treated as a full match with the weaker balance? **Reframed 2026-10-10 by A16:** 4 stays practice; below 4 the seats fill with NPCs (open question 15).
+5. **Higgsfield plan tier.** All generated assets must come from a paid, watermark-free plan; confirm the account tier before the first asset is committed. **Resolved 2026-10-10: the account is the paid Plus tier (read from the connector by Session D).**
 6. **Original art licence.** `LICENSE-ASSETS`: All Rights Reserved (safest for a public repo) or CC BY-NC-SA 4.0?
 7. **Where masters live.** Creative Cloud or Drive for `.ai`, `.aep`, `.psd` and character `.blend` files (the repo holds only exports and the rig)? **Resolved 2026-10-10: the ROSW checkout on the owner's laptop (A2).**
 8. **Final Night.** The bell channel is replaced by a 90 s hunt and a forced vote that Cabal wins on a tie. Approve this ending?
@@ -64,6 +64,8 @@ Open questions 1, 2, 3 and 7 above are closed. Still open: 4 (practice at 4), 5 
 | A11 | Interior minimum (WORLD 4.2) | Interiors are **at least 12x9 tiles**; the 20x11 figure was never met by the loft and bedroom rooms of 4.3. |
 | A12 | Roster interface (ARCHITECTURE 5.8) | `assignRoles(ids, settings, rng, roster)` reads `roster[String(n)].deal`, the exact row shape of `roles.json`; rules numbers (vision, noise, radii) were removed from `@wdi/shared/constants.ts` and live only in `balance.json`. |
 | A13 | Matchmake throttle (ARCHITECTURE 5.3) | The per-IP bucket keys on the **last** `x-forwarded-for` hop (`clientIp`), since `AuthContext.ip` is the forgeable first hop and Express's `trust proxy` does not reach the route; `maxMessagesPerSecond = 100` is now applied on the room (5.11). |
+| A15 | Quick mode length (open question 12) | **Accepted as it plays**: the target in `GDD.md` 3.11 and the M3b exit gate are 5-7 minutes; timers in `balance.onub.json` unchanged. |
+| A16 | NPC fill (owner request 2026-10-10) | **Approved in principle**: below 4 humans the server fills seats with NPC villagers dealt from the same roster. `GDD.md` 3.12 holds the proposed rules, `ROADMAP.md` adds M3c (3 days) after M3b, `ARCHITECTURE.md` 5.3 gates Start on 1 human. The role policy and numbers are open question 15. |
 | A14 | Higgsfield concepts (ASSETS 6.5) | The two generated concept images stay on branch `claude/art-pipeline` and are **held out of the integrated tree** until a dated copy of Higgsfield's terms is saved in `LICENSES/vendors/` (open question 13). Their `CREDITS.md` and `MANIFEST.md` rows remain. |
 
 ## Spike results (M0)
@@ -81,6 +83,7 @@ Run 2026-10-10 against the pinned `colyseus 0.18.9`, `@colyseus/core 0.18.18`, `
 
 ## Open questions added at integration (2026-10-10)
 
-12. **Quick mode length.** With the timers in `balance.onub.json` a match runs about 5-7 minutes, under the 6-9 minute target of `GDD.md` 3.11. Raise the discussion timers to meet the target, or accept the shorter match and change the target?
+12. **Quick mode length.** With the timers in `balance.onub.json` a match runs about 5-7 minutes, under the 6-9 minute target of `GDD.md` 3.11. Raise the discussion timers to meet the target, or accept the shorter match and change the target? **Resolved 2026-10-10: the owner likes the mode as it plays; the target is now 5-7 minutes (A15).**
 13. **Higgsfield terms.** Save a dated copy of Higgsfield's terms of service into `LICENSES/vendors/` (Session D could not fetch them; the account is the paid Plus tier, which settles open question 5). The two concept images then return from branch `claude/art-pipeline` into `assets/source/concepts/`.
 14. **Calibration sheet.** Look at `apps/client/public/assets/calibration/calibration_sheet.png` and confirm A9 (key light 225°, `die` in 256 px cells) or ask for a re-render.
+15. **NPC fill policy (A16, GDD 3.12).** Recommended: fill to 4 automatically, leader may add NPCs up to 6 players, NPCs can hold any role including Killer with the scripted behaviour in 3.12, NPC matches count as practice. The simpler alternative is Village-only NPCs, which makes a 2-human party trivial (the Detective knows the other human is the Killer). Approve the recommendation, or choose Village-only?
