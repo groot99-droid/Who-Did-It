@@ -13,6 +13,7 @@
 | Colyseus | `colyseus ^0.18.9`, `@colyseus/core ^0.18.18`, `@colyseus/schema ^5.0.36`, `@colyseus/sdk ^0.18.5`, `@colyseus/testing ^0.18.6` | Never `colyseus.js` |
 | Vite / Vitest / Playwright | ^8.3 / ^5.0 / ^1.64 | |
 | TypeScript | ~5.9 | 7.x breaks typescript-eslint until 7.1 |
+| Tooling (Session A, caret pins) | `eslint ^10.12`, `typescript-eslint ^8.71`, `@eslint/js ^10.0.1`, `globals ^17.13`, `prettier ^3.9`, `tsup ^8.5` (server bundle), `tsx ^4.23` (dev) | Added 2026-10-10 |
 | Blender / Tiled / Audacity | 5.2 LTS / 1.11 / 4.0.1 | Tiled only from M6 |
 
 ### 5.2 Monorepo
@@ -49,8 +50,8 @@ export const Private = schema({ role: Role, inventory: Inventory, notebook: t.ar
 export const Player = schema({
   id: t.string(), name: t.string(), traits: Traits, alive: t.boolean(), connected: t.boolean(),
   ready: t.boolean(), hasVoted: t.boolean(), sceneId: t.uint8(),          // Public roster
-  presence: Presence.view(),                                             // SceneScoped (V1) / Proximity (V1.5)
-  priv: Private.view(),                                                  // Own client only
+  presence: t.ref(Presence).view(),                                      // SceneScoped (V1) / Proximity (V1.5)
+  priv: t.ref(Private).view(),                                           // Own client only
 }, "Player");
 export const Door = schema({ id: t.string(), state: t.uint8() /*0 open 1 closed 2 locked 3 broken*/, swingUntilTick: t.uint32() }, "Door");
 export const SceneState = schema({ doors: t.map(Door), spots: t.map(Spot), bodies: t.map(Body), clues: t.map(Clue), props: t.map(Prop) }, "SceneState");
@@ -76,6 +77,7 @@ export const GameState = schema({ schemaVersion: t.uint8(), phase: t.uint8(), ph
 | C->S | `meeting.vote` | `{targetId \| "skip"}` | 2/s |
 | C->S | `chat.say` / `chat.quick` / `world.ping` | `{text}` / `{phraseId}` / `{x, y}` (channel derived server-side) | 2/s |
 | C->S | `role.ready`, `net.ping` | `{}` / `{t}` | – |
+| C->S | `lobby.start`, `lobby.ready` | `{}` / `{ready}` (leader-only Start; Ready is advisory) | 2/s |
 | S->C private | `roleReveal` | `{roleId, team, goal, abilities[{id,name,key,cooldown,uses}], inventory[{defId,qty,tooltip}], cardText, beware, teammates[], traits}` | |
 | S->C private | `sceneEnter`, `clueFound`, `killed`, `chat.msg` | `{sceneId, spawn, facing}` / entry / `{sceneId}` / `{from, text, channel}` | |
 | S->C | `phaseChange`, `meetingStart`, `voteResult`, `gameOver`, `noise`, `error` | `{phase, endsTick}` / `{reason, callerId, bodyOf?, missing[]}` / `{tally, ejectedId?, role?}` / `{winner, roles, summary}` / `{sceneId, x, y, kind}` / `{code, msg}` | |
