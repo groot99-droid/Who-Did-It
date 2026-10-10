@@ -1,7 +1,7 @@
 # Vendor terms
 
-A dated copy of each vendor's terms is saved here **before the first asset from that vendor lands**
-(`docs/ASSETS.md` 6.5). File name: `<vendor>-<document>-<YYYY-MM-DD>.md` (or `.pdf`), the date being
+Each vendor's terms are recorded here as a dated link, with a saved copy when practical, **before the
+first asset from that vendor lands** (`docs/ASSETS.md` 6.5, relaxed by `docs/DECISIONS.md` A17). File name: `<vendor>-<document>-<YYYY-MM-DD>.md` (or `.pdf`), the date being
 the day it was saved, plus the source URL on the first line. When terms change, add a new dated copy;
 never overwrite an old one, since an asset is governed by the terms in force when it was made.
 
@@ -19,3 +19,9 @@ never overwrite an old one, since an asset is governed by the terms in force whe
 | OpenGameArt | the licence of each entry (CC0 only) | the first OpenGameArt asset | no |
 
 Fonts (OFL) live in `LICENSES/fonts/`, owned by Session B.
+
+## Recorded links
+
+| Vendor | Document | Date checked | Link | What it says |
+|---|---|---|---|---|
+| Higgsfield | Terms of Use, section 4.4 (summarised by the help center) | 2026-10-10 | https://higgsfield.ai/creator-hub/help-center/account-and-privacy/who-owns-my-generations-and-can-i-use-them-commercially | Higgsfield claims no ownership of inputs or outputs and does not restrict commercial use on any plan; paid plans are watermark-free. A terms update is announced for late August 2026 (https://higgsfield.ai/blog/terms-of-use-privacy-policy-update). |
