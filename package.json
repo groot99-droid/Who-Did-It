@@ -15,7 +15,8 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "format": "prettier --write .",
-    "assets:render": "pnpm --filter @wdi/blender render:smoke"
+    "assets:render": "pnpm --filter @wdi/blender render:smoke",
+    "grid:export": "pnpm --filter @wdi/grid export"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

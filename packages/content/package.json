@@ -11,7 +11,12 @@
       "development": "./src/index.ts",
       "default": "./dist/src/index.js"
     },
-    "./data/*": "./data/*"
+    "./data/*": "./data/*",
+    "./nav": {
+      "types": "./src/nav.ts",
+      "development": "./src/nav.ts",
+      "default": "./dist/src/nav.js"
+    }
   },
   "files": [
     "data",
