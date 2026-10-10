@@ -239,6 +239,35 @@ def setup_pass(pass_name: str, parts, overrides, saved) -> None:
                 slot.material = mat if (mat and not keep) else original
 
 
+def write_manifest(path: str, manifest: dict) -> None:
+    """Merge into an existing manifest under a lock, so runs split by --anims, --dirs or --passes
+    (sequential or parallel into the same --out) add up to one manifest."""
+    import fcntl
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "a+") as fh:
+        fcntl.flock(fh, fcntl.LOCK_EX)
+        fh.seek(0)
+        text = fh.read()
+        if text.strip():
+            old = json.loads(text)
+            if old.get("body") != manifest["body"]:
+                raise SystemExit(f"{path}: manifest is for body {old.get('body')!r}")
+            body_rendered = "body" in manifest["passes"]
+            for name, entry in manifest["frames"].items():
+                # The clipped flag comes from the body pass; overlay-only runs keep the old one.
+                if body_rendered:
+                    old["frames"][name] = entry
+                else:
+                    old["frames"].setdefault(name, {}).update(entry)
+            old["passes"] = [p for p in rc.PASSES if p in set(old.get("passes", [])) | set(manifest["passes"])]
+            manifest = old
+        fh.seek(0)
+        fh.truncate()
+        json.dump(manifest, fh, indent=2, sort_keys=True)
+        fh.write("\n")
+
+
 def render_character(scene, args) -> None:
     if not rc.BODY_RE.match(args.body):
         raise SystemExit(f"body id {args.body!r} must match {rc.BODY_RE.pattern}")
@@ -288,17 +317,17 @@ def render_character(scene, args) -> None:
                     name = rc.frame_name(args.body, anim, rc.DIRECTIONS[d_index], n)
                     path = os.path.join(out_root, pass_name, name + ".png")
                     render_to(scene, path)
-                    if pass_name == "body":
-                        manifest["frames"][name] = {"feet": feet_px(scene, feet, cell)}
-                        if cell != rc.CELL_PX:
-                            manifest["frames"][name]["cell"] = cell
-                        if touches_border(path):
-                            manifest["frames"][name]["clipped"] = True
-                            clipped.append(name)
+                    # Every pass records the pivot, so a run that renders only overlays still writes
+                    # a complete manifest; all passes of a frame project the same Feet.
+                    entry = manifest["frames"].setdefault(name, {})
+                    entry["feet"] = feet_px(scene, feet, cell)
+                    if cell != rc.CELL_PX:
+                        entry["cell"] = cell
+                    if pass_name == "body" and touches_border(path):
+                        entry["clipped"] = True
+                        clipped.append(name)
 
-    with open(os.path.join(out_root, "manifest.json"), "w") as fh:
-        json.dump(manifest, fh, indent=2, sort_keys=True)
-        fh.write("\n")
+    write_manifest(os.path.join(out_root, "manifest.json"), manifest)
     scene.camera.data.shift_y = 0.0
     scene.camera.data.ortho_scale = rc.CAMERA_ORTHO_SCALE
     scene.render.resolution_x = scene.render.resolution_y = rc.CELL_PX
