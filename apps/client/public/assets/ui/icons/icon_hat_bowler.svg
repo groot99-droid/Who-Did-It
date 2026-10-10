@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Hat: bowler">
+  <title>Hat: bowler</title>
+  <path d="M5 32 C5 28.5 14 27 24 27 C34 27 43 28.5 43 32 C43 35 34 36 24 36 C14 36 5 35 5 32 Z" fill="#12141C"/>
+  <path d="M12 29 C12 17 17 11 24 11 C31 11 36 17 36 29 Z" fill="#12141C"/>
+  <rect x="12.5" y="23" width="23" height="4" fill="#6F7A8C" stroke="none"/>
+</svg>

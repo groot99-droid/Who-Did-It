@@ -1,0 +1,68 @@
+{
+  "blender": "5.2.0 LTS",
+  "cell": 128,
+  "cubeHeightPx": 93,
+  "expected": {
+    "cubeHeightPx": 90,
+    "feet": [
+      64.0,
+      88.0
+    ]
+  },
+  "frames": {
+    "char_calib_idle_e_000": {
+      "feet": [
+        64.0,
+        88.0
+      ]
+    },
+    "char_calib_idle_n_000": {
+      "feet": [
+        64.0,
+        88.0
+      ],
+      "opaqueRows": [
+        21,
+        113
+      ]
+    },
+    "char_calib_idle_ne_000": {
+      "feet": [
+        64.0,
+        88.0
+      ]
+    },
+    "char_calib_idle_nw_000": {
+      "feet": [
+        64.0,
+        88.0
+      ]
+    },
+    "char_calib_idle_s_000": {
+      "feet": [
+        64.0,
+        88.0
+      ]
+    },
+    "char_calib_idle_se_000": {
+      "feet": [
+        64.0,
+        88.0
+      ]
+    },
+    "char_calib_idle_sw_000": {
+      "feet": [
+        64.0,
+        88.0
+      ]
+    },
+    "char_calib_idle_w_000": {
+      "feet": [
+        64.0,
+        88.0
+      ]
+    }
+  },
+  "tile": 64,
+  "version": 1
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@wdi/blender",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Blender 5.2 render rig, batch renderer and palettizer (Python; run inside Blender or the bpy wheel).",
+  "scripts": {
+    "test": "python3 -m unittest discover -s tests",
+    "rig": "blender -b --factory-startup -P build_rig.py -- --out build/render_rig.blend",
+    "render:smoke": "blender -b --factory-startup -P batch_render.py -- --smoke --out ../../apps/client/public/assets/calibration"
+  }
+}
