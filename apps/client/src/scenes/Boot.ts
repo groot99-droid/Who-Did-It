@@ -1,10 +1,9 @@
 import Phaser from "phaser";
 import { type Flags, readFlags } from "../flags";
 import { type Health, waitForHealth } from "../health";
+import { createNetwork } from "../net";
 import { Backdrop } from "../view/Backdrop";
-
-export const REG_FLAGS = "flags";
-export const REG_HEALTH = "health";
+import { REG_FLAGS, REG_HEALTH, REG_NET } from "./registry";
 
 export class Boot extends Phaser.Scene {
   constructor() {
@@ -14,6 +13,7 @@ export class Boot extends Phaser.Scene {
   create(): void {
     const flags: Flags = readFlags(location.search, location.hash);
     this.registry.set(REG_FLAGS, flags);
+    this.registry.set(REG_NET, createNetwork(flags));
     const backdrop = new Backdrop(this);
 
     if (flags.mock) {

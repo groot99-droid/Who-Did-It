@@ -11,9 +11,9 @@ export class Backdrop {
     const { width, height } = scene.scale;
     scene.cameras.main.setBackgroundColor(COLORS.ink);
     scene.add
-      .text(width / 2, height * 0.18, "WHO DID IT", {
+      .text(width / 2, 60, "WHO DID IT", {
         fontFamily: "Oswald, sans-serif",
-        fontSize: "64px",
+        fontSize: "44px",
         color: COLORS.parchment,
       })
       .setOrigin(0.5);

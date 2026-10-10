@@ -49,6 +49,8 @@ export class JoinError extends Error {
 export interface NetworkService {
   readonly bus: Emitter<NetEvents>;
   readonly code: string | null;
+  /** Latest roster, so a scene that mounts after the first event still renders at once. */
+  readonly snapshot: LobbySnapshot | null;
   create(name: string): Promise<string>;
   join(code: string, name: string): Promise<string>;
   /** Re-enter a room with the stored token; resolves false when there is none or it is stale. */
@@ -86,10 +88,15 @@ export class ColyseusNetwork implements NetworkService {
   private room: Room | null = null;
   private players = new Map<string, PlayerState>();
   private leaderId = "";
+  private last: LobbySnapshot | null = null;
   private disposers: Array<() => void> = [];
 
   get code(): string | null {
     return this.room?.roomId ?? null;
+  }
+
+  get snapshot(): LobbySnapshot | null {
+    return this.last;
   }
 
   async create(name: string): Promise<string> {
@@ -170,6 +177,7 @@ export class ColyseusNetwork implements NetworkService {
 
     this.players = new Map();
     this.leaderId = "";
+    this.last = null;
     const cb = Callbacks.get(room) as unknown as LobbyCallbacks;
     const emit = () => this.emitLobby(room);
     this.disposers.push(
@@ -187,6 +195,7 @@ export class ColyseusNetwork implements NetworkService {
         emit();
       }),
     );
+    emit();
   }
 
   private emitLobby(room: Room): void {
@@ -196,7 +205,8 @@ export class ColyseusNetwork implements NetworkService {
       ready: p.ready,
       connected: p.connected,
     }));
-    this.bus.emit("lobby", { code: room.roomId, selfId: room.sessionId, leaderId: this.leaderId, players });
+    this.last = { code: room.roomId, selfId: room.sessionId, leaderId: this.leaderId, players };
+    this.bus.emit("lobby", this.last);
   }
 
   private detach(): void {
