@@ -1,0 +1,128 @@
+{
+  "gddRef": "3.11",
+  "cardLine": "The loaf you were handed at dusk may not be the loaf on your plate at dawn. Argue for who you think you are.",
+  "standIn": "mourner",
+  "roles": {
+    "poisoner": {
+      "id": "poisoner",
+      "name": "Poisoner",
+      "faction": "cabal",
+      "ships": "V1",
+      "winsWith": "cabal",
+      "wakes": true,
+      "nightAct": "Wake together and see each other. A lone Poisoner may peek one of the dead's loaves.",
+      "cardText": "You and your partner finished Lord Vane; the other plates must never learn it. Survive the dawn vote and the manor is yours.",
+      "gddRef": "3.11"
+    },
+    "hireling": {
+      "id": "hireling",
+      "name": "Hireling",
+      "faction": "cabal",
+      "ships": "V1",
+      "winsWith": "cabal",
+      "wakes": true,
+      "nightAct": "Reads the Baker's ledger: it names the Poisoners. They do not know the Hireling.",
+      "cardText": "You carried the poison and know who used it. They do not know you; take the blame if it saves them.",
+      "gddRef": "3.11"
+    },
+    "sinEater": {
+      "id": "sinEater",
+      "name": "Sin-Eater",
+      "faction": "village",
+      "ships": "V1",
+      "winsWith": "village",
+      "wakes": true,
+      "nightAct": "Tastes one mourner's loaf, or two of the dead's.",
+      "cardText": "By custom you taste the bread of the guilty. Tonight you may taste one mourner's loaf, or two of the dead's.",
+      "gddRef": "3.11"
+    },
+    "cutpurse": {
+      "id": "cutpurse",
+      "name": "Cutpurse",
+      "faction": "village",
+      "ships": "V1",
+      "winsWith": "village",
+      "wakes": true,
+      "nightAct": "Takes another mourner's loaf, leaves their own, reads the one taken.",
+      "cardText": "Old habits: you take someone's loaf and leave your own. You learn what you stole, not what you left.",
+      "gddRef": "3.11"
+    },
+    "busybody": {
+      "id": "busybody",
+      "name": "Busybody",
+      "faction": "village",
+      "ships": "V1",
+      "winsWith": "village",
+      "wakes": true,
+      "nightAct": "Swaps two other mourners' loaves without looking.",
+      "cardText": "You cannot leave other people's plates alone. Swap two mourners' loaves and tell no one, not even yourself.",
+      "gddRef": "3.11"
+    },
+    "sot": {
+      "id": "sot",
+      "name": "Sot",
+      "faction": "village",
+      "ships": "V1",
+      "winsWith": "village",
+      "wakes": true,
+      "nightAct": "Must swap their own loaf with one of the dead's, unseen.",
+      "cardText": "You drank the wake dry and knocked your loaf onto the oven ledge. Take one of the dead's instead; you will not remember which.",
+      "gddRef": "3.11"
+    },
+    "lamplighter": {
+      "id": "lamplighter",
+      "name": "Lamplighter",
+      "faction": "village",
+      "ships": "V1",
+      "winsWith": "village",
+      "wakes": true,
+      "nightAct": "Last to wake; cracks their own loaf and reads it.",
+      "cardText": "You rise before dawn to light the square. Crack your own loaf and know what you truly hold.",
+      "gddRef": "3.11"
+    },
+    "pallbearer": {
+      "id": "pallbearer",
+      "name": "Pallbearer",
+      "faction": "village",
+      "ships": "V1.1",
+      "winsWith": "village",
+      "wakes": true,
+      "nightAct": "Wake together and see each other. Neither is a Poisoner.",
+      "cardText": "You and your fellow carried the coffin and can vouch for each other. Neither of you is a Poisoner.",
+      "gddRef": "3.11"
+    },
+    "debtor": {
+      "id": "debtor",
+      "name": "Debtor",
+      "faction": "neutral",
+      "ships": "V1",
+      "winsWith": "self",
+      "wakes": false,
+      "nightAct": "No night act. Wins only if turned out.",
+      "cardText": "Vane held your note; if the village turns you out it dies with you. Be suspicious enough to hang, not so loud they ignore you.",
+      "gddRef": "3.11"
+    },
+    "gamekeeper": {
+      "id": "gamekeeper",
+      "name": "Gamekeeper",
+      "faction": "village",
+      "ships": "V1.1",
+      "winsWith": "village",
+      "wakes": false,
+      "nightAct": "No night act. If turned out, the player they voted for is turned out too.",
+      "cardText": "If the village turns you out, you take your vote with you. Point carefully.",
+      "gddRef": "3.11"
+    },
+    "mourner": {
+      "id": "mourner",
+      "name": "Mourner",
+      "faction": "village",
+      "ships": "V1",
+      "winsWith": "village",
+      "wakes": false,
+      "nightAct": "No night act.",
+      "cardText": "You came for the bread and the will. Listen, count the claims, and vote.",
+      "gddRef": "3.11"
+    }
+  }
+}
