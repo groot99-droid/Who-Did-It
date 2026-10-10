@@ -7,8 +7,8 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 | File | Does |
 |---|---|
 | `rig_common.py` | Directions, frame regex, cells, palette, light and outline constants; pure Python |
-| `build_rig.py` | Builds the rig: `SpriteCam` (ortho, X 40°, Z 0°, 64 px/m), `TileCam` (straight down, one 64 px tile per metre), turntable `TT`, camera-parented key sun and area fill, slate world at 0.15, the `WDI_Toon` node group, `OutlineInk`, the `Outline` Solidify preset, a 1 m checker cube with a facing marker, a 4 m grid plane with 1 m lines, a `Feet` empty, EEVEE settings |
-| `batch_render.py` | `--smoke` calibration sheet, or character passes with the per-frame `Feet` manifest |
+| `build_rig.py` | Builds the rig: `SpriteCam` (ortho, X 40°, Z 0°, 64 px/m), `TileCam` (straight down, one 64 px tile per metre), turntable `TT`, camera-parented key sun and area fill, slate world at 0.15, the `WDI_Toon` node group, `OutlineInk`, the `Outline` Solidify preset, a 1 m checker cube with a facing marker, a 4 m grid plane with 1 m lines, a hidden 1.7 m `FallenProxy` for the `die` cell check, a `Feet` empty, EEVEE settings |
+| `batch_render.py` | `--smoke` calibration sheet (8 cube views, the ground tile, one 256 px `die` frame), or character passes with the per-frame `Feet` manifest |
 | `palettize.py` | Snaps materials to the palette; fails on untextured PBR |
 | `tests/test_rig_common.py` | Unit tests (`pnpm --filter @wdi/blender test`, no Blender needed) |
 | `tests/make_dummy_char.py` | Builds a capsule character that follows the contract below, for pipeline tests |
@@ -62,5 +62,11 @@ owner's laptop should match it pixel for pixel or within anti-aliasing noise.
   ramp-stop splits across flat faces.
 - The key sun has `angle = 0`; the checker texture is offset 1 mm because the cube's faces sat on its
   square boundaries and TAA flipped between colours.
+- Toon ramp stops are **0.30 / 0.70**, not 0.42 / 0.78. The ramp sees the luma of the lit diffuse:
+  about 0.87 x N·L of the key (3/π for a strength-3 sun times the key colour's luma) plus a little
+  fill. Measured on the rig: camera-facing faces 0.35, the lit diagonal side 0.49, the far side 0.02,
+  top faces and the ground 0.77. At 0.42 / 0.78 the front faces sat in the shadow band and the tops
+  and ground in the mid band (the ground read flat slate); the new stops leave at least 0.05 margin.
 - `die` renders 256 px cells with the feet at the centre (`rig_common.CLIP_CELL`): a 1.7 m body
-  falling towards the camera spans about 90 px below the feet, which no 128 px cell can hold.
+  falling towards the camera spans about 90 px below the feet, which no 128 px cell can hold. The smoke sheet renders a fallen 1.7 m proxy in that cell: feet at
+  (128, 128), the body reaching 85 px below them.

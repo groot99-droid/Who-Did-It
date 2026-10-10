@@ -95,7 +95,8 @@ def _opaque_rows(cell) -> tuple[int, int]:
 
 
 def smoke(scene: bpy.types.Scene, out_dir: str) -> None:
-    """Checker cube in 8 directions (row 1) and the straight-down tile tiled 2x2 (row 2)."""
+    """Checker cube in 8 directions (row 1); row 2 holds the straight-down tile tiled 2x2 and one `die`
+    frame of a fallen 1.7 m proxy in its 256 px cell with the feet at the centre."""
     import numpy as np
 
     tmp = os.path.join(out_dir, "_frames")
@@ -104,8 +105,9 @@ def smoke(scene: bpy.types.Scene, out_dir: str) -> None:
     plane, cube = bpy.data.objects["GridPlane"], bpy.data.objects["CheckerCube"]
     sprite_cam, tile_cam = bpy.data.objects["SpriteCam"], bpy.data.objects["TileCam"]
     cell, tile = rc.CELL_PX, rc.TILE_PX
+    die_cell, die_feet_row = rc.clip_cell("die")
 
-    sheet = np.zeros((2 * cell, 8 * cell, 4), dtype=np.float32)  # top-down while composing
+    sheet = np.zeros((cell + die_cell, 8 * cell, 4), dtype=np.float32)  # top-down while composing
     frames: dict[str, dict] = {}
     plane.hide_render = True
     # A 1 m cube turned 45 deg is deeper than a character, so the smoke sheet lifts the frame by
@@ -125,7 +127,25 @@ def smoke(scene: bpy.types.Scene, out_dir: str) -> None:
             frames[name]["opaqueRows"] = [top, bottom]
 
     tt.rotation_euler.z = 0.0
-    marker = bpy.data.objects["FacingMarker"]
+    marker, fallen = bpy.data.objects["FacingMarker"], bpy.data.objects["FallenProxy"]
+
+    # One die frame: the proxy lies from the feet towards the camera, as a body falling south would.
+    cube.hide_render = marker.hide_render = True
+    fallen.hide_render = False
+    scene.render.resolution_x = scene.render.resolution_y = die_cell
+    sprite_cam.data.ortho_scale = die_cell / tile
+    sprite_cam.data.shift_y = rc.camera_shift_y(die_feet_row, die_cell)
+    bpy.context.view_layer.update()
+    die_name = rc.frame_name("calib", "die", "s", 0)
+    die_path = os.path.join(tmp, die_name + ".png")
+    render_to(scene, die_path)
+    sheet[cell : cell + die_cell, cell : cell + die_cell] = _pixels(die_path)[::-1]
+    frames[die_name] = {"feet": feet_px(scene, feet, die_cell), "cell": die_cell}
+    if touches_border(die_path):
+        frames[die_name]["clipped"] = True
+    fallen.hide_render = True
+    sprite_cam.data.ortho_scale = rc.CAMERA_ORTHO_SCALE
+
     plane.hide_render, cube.hide_render, marker.hide_render = False, True, True
     scene.camera = tile_cam
     scene.render.resolution_x = scene.render.resolution_y = tile
@@ -140,7 +160,7 @@ def smoke(scene: bpy.types.Scene, out_dir: str) -> None:
     sprite_cam.data.shift_y = 0.0
     cube.hide_render = marker.hide_render = False
 
-    out = bpy.data.images.new("calibration_sheet", 8 * cell, 2 * cell, alpha=True)
+    out = bpy.data.images.new("calibration_sheet", 8 * cell, cell + die_cell, alpha=True)
     out.pixels.foreach_set(sheet[::-1].ravel())
     out.filepath_raw = os.path.abspath(os.path.join(out_dir, "calibration_sheet.png"))
     out.file_format = "PNG"
@@ -152,7 +172,8 @@ def smoke(scene: bpy.types.Scene, out_dir: str) -> None:
         "cell": cell,
         "tile": tile,
         "blender": bpy.app.version_string,
-        "expected": {"feet": [cell / 2, float(rc.FEET_ROW_PX - SMOKE_LIFT_PX)], "cubeHeightPx": 90},
+        "expected": {"feet": [cell / 2, float(rc.FEET_ROW_PX - SMOKE_LIFT_PX)], "cubeHeightPx": 90,
+                     "dieFeet": [die_cell / 2, float(die_feet_row)]},
         "frames": frames,
         "cubeHeightPx": n["opaqueRows"][1] - n["opaqueRows"][0] + 1,
     }
@@ -163,7 +184,9 @@ def smoke(scene: bpy.types.Scene, out_dir: str) -> None:
         os.remove(os.path.join(tmp, f))
     os.rmdir(tmp)
     print(f"smoke: feet {n['feet']} (expected {report['expected']['feet']}), "
-          f"cube {report['cubeHeightPx']} px tall (expected ~90 incl. outline)")
+          f"cube {report['cubeHeightPx']} px tall (expected ~90 incl. outline); "
+          f"die feet {frames[die_name]['feet']} (expected {report['expected']['dieFeet']})"
+          f"{', CLIPPED' if frames[die_name].get('clipped') else ''}")
 
 
 # ---------------------------------------------------------------- character passes

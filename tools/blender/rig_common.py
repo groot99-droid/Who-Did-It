@@ -41,8 +41,11 @@ CLIP_CELL = {"die": (256, 128)}
 # Inverted-hull outline thickness per asset class, metres (Solidify thickness).
 OUTLINE_PRESETS = {"character": -0.02, "prop64": -0.035}
 
-# Toon ramp (Constant interpolation) and rim (Layer Weight blend).
-TOON_RAMP_STOPS = (0.42, 0.78)
+# Toon ramp (Constant interpolation) and rim (Layer Weight blend). The ramp sees the luma of the lit
+# diffuse, about 0.87 x N.L of the key (3 / pi for a strength-3 sun, times the key colour's luma) plus a
+# little fill: measured 0.35 on a camera-facing face and 0.77 on a top face or the ground. At 0.42 / 0.78
+# both sat just under a stop (front faces in the shadow band, tops and ground in the mid band).
+TOON_RAMP_STOPS = (0.30, 0.70)
 TOON_RIM_BLEND = 0.35
 
 # Azimuth is clockwise from world +Y (screen up). The key comes from the camera side, screen left

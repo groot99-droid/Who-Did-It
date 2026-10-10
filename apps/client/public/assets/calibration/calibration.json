@@ -4,12 +4,23 @@
   "cubeHeightPx": 93,
   "expected": {
     "cubeHeightPx": 90,
+    "dieFeet": [
+      128.0,
+      128.0
+    ],
     "feet": [
       64.0,
       88.0
     ]
   },
   "frames": {
+    "char_calib_die_s_000": {
+      "cell": 256,
+      "feet": [
+        128.0,
+        128.0
+      ]
+    },
     "char_calib_idle_e_000": {
       "feet": [
         64.0,

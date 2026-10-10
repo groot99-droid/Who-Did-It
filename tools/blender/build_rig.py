@@ -94,7 +94,7 @@ def _greater(nodes, links, value, threshold: float):
 
 
 def make_toon_group() -> bpy.types.ShaderNodeTree:
-    """Diffuse -> Shader to RGB -> ColorRamp (Constant, 0.42 / 0.78) -> three palette bands -> Emission.
+    """Diffuse -> Shader to RGB -> ColorRamp (Constant, rc.TOON_RAMP_STOPS) -> three palette bands -> Emission.
 
     Rim: Layer Weight (blend 0.35) facing, thresholded, mixed towards the Rim colour by Rim Amount.
     """
@@ -362,6 +362,20 @@ def make_calibration(col, turntable) -> None:
     plane.name = "GridPlane"
     plane.location = (0.0, 0.0, 0.0)
     plane.data.materials.append(grid_material())
+
+    # A 1.7 m body fallen flat towards the camera, the worst case for the 256 px die cell. Smoke only.
+    bpy.ops.mesh.primitive_cube_add(size=1.0)
+    fallen = bpy.context.active_object
+    for c in fallen.users_collection:
+        c.objects.unlink(fallen)
+    col.objects.link(fallen)
+    fallen.name = "FallenProxy"
+    fallen.scale = (0.4, 1.7, 0.25)
+    fallen.location = (0.0, -0.85, 0.125)
+    fallen.data.materials.append(toon_material("CalibFallen", "bone", "fog", "slate"))
+    add_outline(fallen, "character")
+    fallen.parent = turntable
+    fallen.hide_render = True
 
     feet = _link(col, bpy.data.objects.new("Feet", None))
     feet.empty_display_type = "PLAIN_AXES"
