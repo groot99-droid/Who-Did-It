@@ -199,3 +199,31 @@ integrated tree, and fixed the seams in one commit on top of the merges:
    shows `t.array(t.string())`; `/health.patchBytes` is not fed yet.
 5. **Owner**: open questions 12 to 14 in `docs/DECISIONS.md`; GitHub Pages source = GitHub Actions and the
    `VITE_SERVER_URL` Actions variable; the Render Free service for `apps/server`.
+
+## Round 2 (started 2026-10-10, after PRs #1 to #6 merged)
+
+Five sessions, one track each, same rules as round 1 (draft PRs against `claude/zen-turing-m1jnw0`,
+under 400 lines where the work allows, lint + typecheck + test clean before every push, pinned
+versions only, no model identifiers in committed files). Code and tooling run on Sonnet 5.5; design
+and art run on Opus 5.5 or Fable 5.1.
+
+| Session | Model | Track | Branch | Owns |
+|---|---|---|---|---|
+| **F. M1 finish** | Sonnet 5.5 | Code | `claude/m1-finish` | `packages/shared/src/protocol/**`, `packages/shared/src/rules/roles.ts`, `apps/server/src/rooms/PartyRoom.ts` (lobby, Start, roleReveal, phase machine), `apps/server/src/rooms/handlers/lobby.ts` (new), `apps/server/test/lobby*.test.ts`, `apps/client/src/net/**`, `apps/client/src/ui/**` (except `theme/`), `apps/client/src/scenes/{Boot,Landing,Lobby,RoleReveal}.ts`, `apps/client/e2e/**`, `tools/bots/**`, `docs/PROTOCOL.md` (generated), `docs/ARCHITECTURE.md` 5.3 to 5.5 and 5.8, the Accomplice kit in `packages/content/data/roles.json` with `docs/GDD.md` 3.2 |
+| **G. M2 movement + one house** | Sonnet 5.5 | Code | `claude/m2-movement` | `apps/server/src/sim/**`, `apps/server/src/rooms/handlers/movement.ts` (new), `apps/server/test/sim*.test.ts`, `packages/shared/src/{collision,nav}/**` (new), `apps/client/src/scenes/{Preload,World}.ts` (new), `apps/client/src/view/**`, `apps/client/src/input/**` (new), `apps/client/src/net/mock/**` (extend the `?mock=1` fixture only), `tools/grid/**`, `packages/content/src/nav*` (new), `docs/ARCHITECTURE.md` 5.6 to 5.7. Scene, portal and spawn ids in `packages/content/data/scenes/*.json` stay frozen; G may add a `nav` export contract beside them. |
+| **H. Character art** | Opus 5.5 | Art | `claude/art-villager` | `assets/source/**`, `apps/client/public/assets/**` except `ui/` and `calibration/`, `tools/blender/**` (render and pipeline scripts; rig constants only with a `docs/DECISIONS.md` row), `tools/sprites/**`, `CREDITS.md`, `assets/source/MANIFEST.md`, `docs/ASSETS.md` 6.3, 6.4, 6.7 |
+| **I. UI design system** | Fable 5.1 | Design | `claude/ui-design-system` | `docs/UI.md` (new), `apps/client/public/assets/ui/**`, `apps/client/src/ui/theme/**` (new: tokens and component CSS, a README), `packages/content/data/style.json` and its schema, the UI paragraph of `docs/ASSETS.md` 6.1 |
+| **J. ROSW studio project** | Sonnet 5.5 | Process | `claude/rosw-studio` here; a branch in `groot99-droid/Pipelines-Plugin` | In this repo only `docs/ASSETS.md` 6.10 (status) and `assets/source/MANIFEST.md`; everything else lives in the ROSW repo and needs push access there (`add_repo` with push; stop and report if refused) |
+
+### Seams in round 2
+
+| From | To | Contract |
+|---|---|---|
+| F | G | When every player is Ready on the role card (or its 12 s elapse), F sets `phase = PLAY` and sends each client `sceneEnter {sceneId: "overworld", spawn, facing}` (ARCHITECTURE 5.5). G's `World` scene starts on `sceneEnter`; until F merges, G drives `World` from the `?mock=1` fixture, which G extends with `sceneEnter` and presence updates. |
+| G | F | `PartyRoom` already queues every C->S message into `CommandQueue`; G consumes `input.move` and `act.enterPortal` inside `sim/Step.ts` and never adds message handlers to `PartyRoom`. If G needs one line in `PartyRoom` (an import and a `registerMovement(this)` call), it is the only line G touches there. |
+| I | F | `apps/client/src/ui/theme/tokens.css` (palette, type scale, spacing, the Art-Deco card frame classes) is importable by F's DOM screens. F does not wait for it; I's README says how to swap it in. |
+| H | G | `docs/SPRITES.md` keys stay. H replaces the content behind `char_villager` (and overlays) with real renders under the same keys and `manifest.json` layout; G loads by key and never by path. |
+| H | tools | H fixes the `tools/sprites` engines field (`>= 22.12`, no unflagged type stripping at runtime) and makes `batch_render.py` write `Feet` pivots on every pass, not only `body`. |
+| J | H | J's studio notes and `higgsfield-library-sync` catalog ids are what H cites in `CREDITS.md` rows once J exists; until then H cites generation ids as D did. |
+
+Suggested merge order: F, G, I, H, J.
