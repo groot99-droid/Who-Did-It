@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+coverage/
+.turbo/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+# Blender and Mixamo sources never land in git (docs/ASSETS.md 6.5, 6.6)
+assets/external/
+*.blend1

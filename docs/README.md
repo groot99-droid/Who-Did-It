@@ -10,5 +10,6 @@
 | [ROADMAP.md](ROADMAP.md) | Milestones M0-M7, parallel tracks, placeholder strategy, risk register, playtest plan, day 1-14 schedule, V2 outline. |
 | [DECISIONS.md](DECISIONS.md) | Decisions locked with the owner, changes from review, open questions. |
 | [RESEARCH.md](RESEARCH.md) | Sourced facts behind the version pins, hosting choice and licensing rules. |
+| [SESSIONS.md](SESSIONS.md) | The four parallel build sessions: path ownership, branches, PR base, interfaces and briefs. |
 
 Rule: a mechanic change updates `GDD.md` in the same pull request. Numbers never live in two documents.

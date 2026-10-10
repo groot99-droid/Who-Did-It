@@ -7,7 +7,8 @@ GitHub Pages and an authoritative Colyseus server. V1 is top-down 2.5D with pre-
 Blender sprites; V2 is first-person 3D on the same server, rules and world data. It also
 ships a 6-9 minute quick mode, One Night Ultimate Baguette.
 
-Nothing is implemented yet. `docs/` is the whole project until code lands.
+Implementation started 2026-10-10 in four parallel sessions; `docs/SESSIONS.md` says which paths
+each session owns. Until their PRs merge, `docs/` and the root scaffold are the whole project.
 
 ## Read first
 
@@ -17,6 +18,8 @@ Nothing is implemented yet. `docs/` is the whole project until code lands.
   request. No other document restates a number; it references `GDD.md`.
 - `docs/DECISIONS.md` logs every decision with the owner, the changes made during review,
   and the open questions. Resolve an open question there before building on it.
+- `docs/SESSIONS.md` is the coordination contract between parallel sessions: read it before
+  writing any file and stay inside your session's paths.
 - `docs/ROADMAP.md` carries the milestones and the definition of done for each one. One
   branch and one session per milestone task, pull requests under 400 lines, tests for
   every rules change.

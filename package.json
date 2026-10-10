@@ -1,0 +1,17 @@
+{
+  "name": "who-did-it",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Browser multiplayer hidden-role game: static Phaser client on GitHub Pages, authoritative Colyseus server.",
+  "license": "MIT",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "build": "pnpm -r --if-present build",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test"
+  }
+}
