@@ -3,7 +3,7 @@
 | File | What it owns |
 |---|---|
 | [MASTER_PLAN.md](MASTER_PLAN.md) | The full v0.1 master plan (frozen snapshot). Start here. |
-| [GDD.md](GDD.md) | Game design: pillars, first ten minutes, roles, match loop, clues, items, PvE, stealth, meetings, balance, cut list. The only source of numbers together with `balance.json`. |
+| [GDD.md](GDD.md) | Game design: pillars, first ten minutes, roles, match loop, clues, items, PvE, stealth, meetings, balance, cut list, and the One Night Ultimate Baguette quick mode (3.11). The only source of numbers together with `balance.json`. |
 | [WORLD.md](WORLD.md) | World bible: Hollowmere, scene graph with ids and exits, overworld sketch, portal rules, bestiary, lighting. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Stack, monorepo layout, lobby and join codes, state schema and role secrecy, protocol, netcode, deployment, security, testing, V2 path. |
 | [ASSETS.md](ASSETS.md) | Palette, Blender 8-direction rig, per-asset pipelines, Higgsfield tool map, Adobe usage, licensing policy, backlog, budgets. |

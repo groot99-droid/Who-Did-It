@@ -130,3 +130,19 @@ Vitest (shared): property tests for roles, traits, votes, suspects, win checks, 
 ### 5.13 V2 migration path
 
 Stays: server, `@wdi/shared`, `@wdi/content`, lobby, CI, hosting. Changes: renderer (Three.js or Babylon.js), input gains `yaw` (field already reserved), `ISceneCollider` gets a capsule-vs-navmesh implementation, `Visibility.ts` gets a cone + occlusion predicate (the policy hook already exists), `zoneId` diverges from `sceneId` for merged volumes. Gate: V2 starts only when V1 rules tests are green and content JSON is frozen behind `schemaVersion`.
+
+### 5.14 Quick mode deltas (One Night Ultimate Baguette, GDD 3.11)
+
+| Area | Delta |
+|---|---|
+| Settings | `Settings.mode: uint8` (0 main, 1 onub); `floury` toggle (V1.1). The lobby chip reads "One Night Ultimate Baguette, 6-9 min, 4-10". |
+| Phases | lobby -> roleReveal -> dusk -> night -> dawn -> meetingDiscussion -> meetingVote -> reveal. Unused: grace, day, immunity, finalNight. The night Conductor is a server-side window list; `phaseEndsTick` is public, the open window is not. |
+| Rules (pure, `packages/shared/src/rules/onub.ts`) | `buildOnubDeck(count)`, `dealOnub(ids, deck, rng)` -> `{dealt, center[3]}`, `nightScript(deck)` -> windows (every role's window runs even when it sits in the center), `applyNightAct(night, act)` -> `{next, reveal}`, `tallyNoSkip(votes)`, `resolveDawn(tally, finals, gamekeeperVote)`, `onubWinners(outs, finals, center)`. Property tests: deck size is count + 3 for every row, every swap is a permutation, the winner table is exhaustive. |
+| Reused rules | seeded PRNG, `dealTraits` (cosmetic), the vote tally helper, the roster loader. |
+| Schema | `Private.dealtRole`, `Private.nightReveal: array<{slot, roleId}>`; `cabalMates` reused for Poisoners, Hireling and Pallbearers. Bakery `SceneState.props` holds `plate_<playerId>` and `deadloaf_0..2` with a `turned` bit. Server memory only: `finalRoles`, `center`, `swapLog`, the Conductor. `winner` enum adds `debtor` and `nobody`. |
+| Privacy | Sleepers are moved to a `loft` pseudo-scene with no presence encoding; only the players woken for a window share the `bakery` view, so a sleeper's client never receives who is awake. The woken set is derived from the DEALT role, never the current one. |
+| Messages | `act.ability` ids `onub.peekPlate`, `onub.peekDead`, `onub.take`, `onub.swapPlates {targetId, targetId2}`, `onub.swapDead`, `onub.check`; `meeting.vote` rejects `"skip"` with 422 in this mode; S->C private `nightWake {windowRole, endsTick, spawn}`, `nightReveal {entries}`, `nightSleep`; `gameOver` adds `dealt`, `final`, `center`, `swapLog`, `votes`, `outs`. |
+| Unchanged | codes, join, reconnection, the RoleReveal card, the World scene, movement, portals, the Meeting scene (chat, secret vote, early end, reveal), traits and nameplates, rate limits, the privacy views. |
+| Tests | `@colyseus/testing`: a 6-bot deal has 9 loaves; the Hireling's `nightReveal` names both Poisoners; a sleeper receives no `presence` during any window; a vote of `"skip"` is refused; the swap log replays to the final roles. |
+
+**V2 note.** The owner's ROSW repo (`groot99-droid/Pipelines-Plugin`, `writing-museum/`) holds a Three.js r160 first-person viewer with one resident scene at a time, door leaves that load the next room, an 8-light pool, a floor-plan HUD, touch and gamepad input and localStorage resume. Its scene manager and door model map onto this project's scene graph and portals; evaluate it as the V2 renderer seed before writing a new one.

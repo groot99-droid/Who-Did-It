@@ -8,6 +8,8 @@
 
 **Hollowmere**, a fog-bound harbour hamlet on a northern coast, autumn 1931. The storm closed the only road; the fog hides the sea. Lord Aldous Vane, owner of the shuttered tin mine, died three nights ago and his will names "whoever remains when the last lantern goes out". The flooded lowest gallery leaks "mere-rot" into the marsh, which makes the wolves bold and wakes something in the sea cave (the Beast, V2). Tone: toon-noir, chunky villagers in trench coats and wool caps, wet cobbles, amber lantern light against slate-blue dusk. Landmark NPCs (Mrs Grieves the tavern keeper, Old Fennick at the light, Father Bray, Doc Mallory, Tuck the ferry boy) are environmental storytelling and shop signage in V1; a Grieves tab book that mirrors the Ledger is V1.5. One bell stands on the square: it is the Emergency Bell, the Final Night object and the Butler's remote pull (V1.5). The chapel rope is decoration.
 
+**The wake-loaf custom.** Tamsin Crumb runs Crumb's Ovens on the east lane between the square and the apothecary. The night before a will is read she bakes one loaf per mourner and three for the dead, each with a wax-sealed crumb token inside; the quick mode One Night Ultimate Baguette (GDD 3.11) is played entirely around her Wake Table. In the main match the bakery is an ordinary Small-profile house with a fetch task, and Tamsin joins the landmark NPCs as signage and ledger flavour.
+
 ### 4.2 Metrics
 
 `TILE_PX = 64`; 1 tile = 1 m; character render cell 128 px; max standing silhouette 90 px; interiors are authored at 20x11 tiles or larger with camera follow (no whole-room fit). The exporter fails on any tileset whose `tilewidth` is not 64. All radii in rules are in tiles and live in `@wdi/shared/constants.ts`.
@@ -18,7 +20,7 @@ Profiles are gated by player count: **Small** (4-6), **Medium** (7-8, adds manor
 
 | id | Name | Profile | Size (tiles) | Exits (portal id -> target.spawn) | Player spots / body spots | Notes |
 |---|---|---|---|---|---|---|
-| `overworld` | Hollowmere | Small (64x48 authored; NW Manor Rise and NE paddock gated shut below Medium) | 64x48 | `ov.tavern_front` -> `tavern_bar.front`; `ov.tavern_alley` -> `tavern_bar.alley`; `ov.apoth` -> `apoth_shop.door`; `ov.widow` -> `widow_parlour.door`; `ov.forest_gate` -> `forest.gate`; `ov.manor_front` / `ov.manor_back` -> `manor_hall.*` [M]; `ov.barn` -> `barn.door` [M]; `ov.chapel` -> `chapel.door` [L]; `ov.well` -> `cellar.well` [L] | hedges, cart, dock crates / – | Square with bell and well; 4 lantern posts; fence line NE |
+| `overworld` | Hollowmere | Small (64x48 authored; NW Manor Rise and NE paddock gated shut below Medium) | 64x48 | `ov.tavern_front` -> `tavern_bar.front`; `ov.tavern_alley` -> `tavern_bar.alley`; `ov.apoth` -> `apoth_shop.door`; `ov.bakery` -> `bakery.door`; `ov.widow` -> `widow_parlour.door`; `ov.forest_gate` -> `forest.gate`; `ov.manor_front` / `ov.manor_back` -> `manor_hall.*` [M]; `ov.barn` -> `barn.door` [M]; `ov.chapel` -> `chapel.door` [L]; `ov.well` -> `cellar.well` [L] | hedges, cart, dock crates / – | Square with bell and well; 4 lantern posts; fence line NE |
 | `tavern_bar` | The Drowned Lantern | Small | 20x12 | `tb.front`, `tb.alley` -> overworld; `tb.back` -> `tavern_back.door` | behind bar, keg stack / – | Warmest light; task: dartboard letter drop |
 | `tavern_back` | Tavern back room | Small | 12x10 | `tk.door` -> `tavern_bar.back`; `tk.trap` -> `cellar.trap` [L, boarded below] | wardrobe / crate pile | Oil barrel (task tool) |
 | `apoth_shop` | Mallory Apothecary | Small | 18x11 | `as.door` -> overworld; `as.stairs` -> `apoth_loft.stairs` | behind counter / – | Basin (Blood wash); Wrench on the bench |
@@ -26,6 +28,7 @@ Profiles are gated by player count: **Small** (4-6), **Medium** (7-8, adds manor
 | `widow_parlour` | Widow Vane's parlour | Small | 16x11 | `wp.door` -> overworld; `wp.bedroom` -> `widow_bedroom.door` | pantry / – | Portrait turned to the wall; letter box |
 | `widow_bedroom` | Widow's bedroom | Small | 12x9 | `wb.door` -> `widow_parlour.bedroom` | wardrobe, under bed / wardrobe | Single candle |
 | `forest` | Gallows Wood | Small | 40x30 | `fo.gate` -> overworld; `fo.log` -> `overworld.forest_back` (one-way crawl); `fo.cave` -> `cave_entry.mouth` | hollow trees, brush / – | 3 wolf loops away from the gate; 6-tile clearing; Planks at the edge |
+| `bakery` | Crumb's Ovens | Small | 18x11 | `bk.door` -> `overworld.bakery` | behind the counter / – | Wake Table with up to 10 named plates, oven ledge with the dead's three loaves, the Baker's ledger, cold oven, flour floor. Hub of the quick mode (GDD 3.11); in the main match a task node (Fetch flour) and a Blood-wash basin alternative |
 | `cave_entry` | Tin Gallery mouth | Small | 20x14 | `ce.mouth` -> `forest.cave_side`; `ce.sea` boarded (V1.5 Thief exit, low tide on Nights 2 and 4) | stalagmites / pool niche | Bioluminescent moss gives a 2-tile ambient radius |
 | `manor_hall` | Vane Manor, hall | Medium | 28x16 | `mh.front`, `mh.back` -> overworld; `mh.stairs` -> `manor_upper.stairs` | wardrobes x2, curtain alcove (off the main sightline) / – | Stopped clock at 11:47; safe |
 | `manor_upper` | Vane Manor, upstairs | Medium | 24x12 | `mu.stairs` -> `manor_hall.stairs`; `mu.balcony` -> `overworld.balcony_drop` (one-way, noise 9, 90 s footprints at landing) | under beds, attic hatch / – | Locked study (`key_study` in the cellar [L] or the loft [M]) |
@@ -52,7 +55,7 @@ V1.5: `cottage_fisher`, `lighthouse` (3 stacked rooms), cave `sea_exit`. All ids
  S └──────────────── sea / fog ───────────────────── (lighthouse V1.5)┘
 ```
 
-Chokepoints: manor lane, tavern alley, cliff path, forest gate. Loops: square -> alley -> dock -> cliff -> chapel -> square (outer); manor <-> cellar <-> tavern (Large). LOS breakers (hedges, headstones, cart, crates) are occluder tiles in the nav bitmap from V1.5. Layout rule: no walkable tile within 2 tiles north of a building footprint except the door approach; any building sprite overlapping a visible player auto-fades.
+Crumb's Ovens (`bakery`) stands on the east lane between the square and the apothecary, one door, lit window. Chokepoints: manor lane, tavern alley, cliff path, forest gate. Loops: square -> alley -> dock -> cliff -> chapel -> square (outer); manor <-> cellar <-> tavern (Large). LOS breakers (hedges, headstones, cart, crates) are occluder tiles in the nav bitmap from V1.5. Layout rule: no walkable tile within 2 tiles north of a building footprint except the door approach; any building sprite overlapping a visible player auto-fades.
 
 ### 4.5 Portal rules
 

@@ -44,7 +44,7 @@ Style suffix on every prompt: "stylized toon-noir, chunky low-poly 3-heads-tall 
 
 ### 6.6 Folder and LFS plan
 
-Day 1 commits `.gitattributes` before any binary: LFS for `*.blend *.psd *.ai *.aep *.fbx *.glb *.wav`, limited to `render_rig.blend` and small rig sources; every master (`.ai`, `.aep`, `.psd`, character `.blend`) lives in Creative Cloud or Drive and is listed in `assets/source/MANIFEST.md` with hash and date. Exports (`apps/client/public/assets/**`) are committed in plain git in batched "art drop" PRs; the deterministic packer keeps unchanged pages byte-identical; CI warns when a PR adds more than 25 MB of binaries. `ci.yml` checks out with `lfs: false`.
+Day 1 commits `.gitattributes` before any binary: LFS for `*.blend *.psd *.ai *.aep *.fbx *.glb *.wav`, limited to `render_rig.blend` and small rig sources; every master (`.ai`, `.aep`, `.psd`, character `.blend`, source `.glb`) lives on the owner's laptop in the ROSW checkout under `studio/assets/who-did-it/<kind>/<slug>/` (git-ignored there, recorded by a studio note; see 6.10) and is listed in `assets/source/MANIFEST.md` with hash and date. Exports (`apps/client/public/assets/**`) are committed in plain git in batched "art drop" PRs; the deterministic packer keeps unchanged pages byte-identical; CI warns when a PR adds more than 25 MB of binaries. `ci.yml` checks out with `lfs: false`.
 
 ### 6.7 V1 asset backlog
 
@@ -66,7 +66,10 @@ Day 1 commits `.gitattributes` before any binary: LFS for `*.blend *.psd *.ai *.
 | B | Role portraits x9 + static card states | 9 | Higgsfield + Illustrator | 8 |
 | B | VFX sheets | 7 | After Effects | 8 |
 | B | Packing, anims JSON, contact sheet QA | – | Node tools | 8 |
-| | **Total** | | | **60 + 119 = 179** |
+| B | Bakery interior tileset; Wake Table; 10 plates (shut / cracked / turned); 3 dead loaves (shut / open); ledger (shut / open); cold oven; flour-floor decal | 1 scene + 6 props | Blender + Tiled | 10 |
+| B | Loaf and crumb-token icons; mode chip; sleep screen; swap-log timeline | 4 | Illustrator | 4 |
+| B | SFX crust crack, bread thud, oven creak; storm-loft ambience loop | 4 | Freesound CC0, Audacity | 2 |
+| | **Total** | | | **60 + 135 = 195** |
 
 ### 6.8 Budgets
 
@@ -90,3 +93,30 @@ The pipelines in 6.3 and 6.4 use these concrete tools. Credits quoted are Higgsf
 **Style contract.** The style suffix in 6.4 is the project's STYLE FORMULA. It is frozen in `packages/content/data/style.json` with a STYLE TOKEN (at most 120 characters) for length-limited fields such as `texture_prompt`, and inserted byte-identical into every image, texture and 3D prompt. Changing it reopens the art approval gate and invalidates generated assets.
 
 **Why this matters for V2.** The GLB that Higgsfield or Blender produces for a character is rendered to sprites for V1 and loaded directly by the first-person renderer in V2. Keep every source GLB (outside the repo, listed in `assets/source/MANIFEST.md`).
+
+### 6.10 Connection to the owner's ROSW repo (groot99-droid/Pipelines-Plugin)
+
+The owner's plugins repo ("ROSW") is the studio behind this game. What lives where:
+
+| Thing | Lives in | Versioned |
+|---|---|---|
+| Masters: `.ai`, `.aep`, `.psd`, character and building `.blend`, source `.glb` | ROSW checkout on the owner's laptop, `studio/assets/who-did-it/<kind>/<slug>/` (kinds: character, design, audio, video, 3d, ui, world) | No (git-ignored there); mirrored by path, hash and date in this repo's `assets/source/MANIFEST.md` |
+| The record of how each master was made (brief, context, recipe, execute log, review) | ROSW `studio/vault/who-did-it/<kind>/<slug>.md`, written only by the studio pipeline (`studio-pipeline` skill, six checkpointed stages) | Yes |
+| Every Higgsfield generation (prompt, model, settings, inputs, link) | ROSW `studio/library/catalog.json` + `thumbs/`, kept current with the `higgsfield-library-sync` skill | Yes (public: prompts and links become public when pushed) |
+| Exports the game loads (atlases, tiles, icons, audio) | This repo, `apps/client/public/assets/**`, in batched art-drop PRs | Yes |
+| The render rig `.blend` and small rig sources | This repo via Git LFS | Yes |
+
+Studio pipelines already implemented in ROSW that this project uses: `still-image` (Higgsfield concepts, portraits, decals), `video-shot` (landing loop, trailer plates), `music-cue` (stems), `edit-2d` (Adobe connector: cleanup, defringe, atlas passes), `scene-blender` (Higgsfield scene builder in Blender 5.2 for block-outs), `scene-3d` (walkable Three.js rooms). The brand gates in ROSW scope the studio's own surfaces, not product work: this game's palette (6.1), fonts and style formula are its own Decisions in Force and are stated at a run's context stage, never filled from the gates.
+
+The `ui-design` plugin from the same marketplace is registered for this repo by adding this `.claude/settings.json` (pending the owner's approval; a session may not write Claude Code settings on its own):
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "rosw": { "source": { "source": "github", "repo": "groot99-droid/Pipelines-Plugin" } }
+  },
+  "enabledPlugins": { "ui-design@rosw": true }
+}
+```
+
+Contributors accept the folder trust dialog once and the plugin installs at the next session start. Alternatively run `claude plugin marketplace add groot99-droid/Pipelines-Plugin` and `claude plugin install ui-design@rosw --scope project`. Use its catalog search and contrast-checked design-system generator to turn `palette.json` into the DOM theme tokens and to review the Landing, Lobby and Meeting screens. The `rosw` plugin (creative-writing and studio) runs only from the ROSW checkout and is not enabled here.

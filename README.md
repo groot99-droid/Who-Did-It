@@ -10,6 +10,10 @@ It crosses Among Us (tasks, bodies, emergency meetings), Mafia / Werewolf (hidde
 a vote as the climax), a whodunit (physical clues with hidden traits and a Detective who verifies
 them) and Hello Neighbor (enterable houses, locked doors, hiding spots, wolves in the woods).
 
+It also ships **One Night Ultimate Baguette**, a 6-9 minute quick mode played around the baker's
+wake loaves: one night of peeking and swapping, one vote, and the loaf on your plate at dawn is
+who you are. The owner's friend invented it as a wrapper of the one-night hidden-role card game.
+
 ## Status
 
 Planning complete, implementation not started. Everything about the game lives in
@@ -30,6 +34,12 @@ packages/content/ roles, traits, items, clues, tasks, balance and scene data (JS
 tools/            Blender render rig and batch script, sprite packer, grid exporter, bot swarm
 docs/             game design, world bible, architecture, asset pipeline, roadmap, decisions
 ```
+
+## Related repo
+
+Art masters, studio notes and the Higgsfield generations library live in the owner's ROSW repo,
+[Pipelines-Plugin](https://github.com/groot99-droid/Pipelines-Plugin); see `docs/ASSETS.md` 6.10.
+`docs/ASSETS.md` 6.10 has the one-file settings change that registers that marketplace here and enables its `ui-design` plugin.
 
 ## Documents
 

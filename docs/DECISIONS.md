@@ -30,9 +30,25 @@
 
 1. **Engine line.** The plan pins Phaser 3.90.0 as decided and uses no 4-only features. Phaser 4.2.1 is now the maintained line and the official guidance is to start new projects on it; the switch costs about one M0 day (lighting and tint API names differ) and nothing else in this plan changes. Keep 3.90.0 or move to 4.2.1?
 2. **Hosting from day 3.** Railway Hobby needs a card and $5 per month from M0; Render Free is enough for M1-M3 tests if you accept a one-minute wake. Which do you want first?
-3. **Hat replaces boots as the third trait** (cap / bowler / bare), with Felt on the door frame as its clue. Approve?
+3. **Hat replaces boots as the third trait** (cap / bowler / bare), with Felt on the door frame as its clue. Approve? **Resolved 2026-10-10: approved (A1).**
 4. **Practice at 4.** 4 players is labelled practice (Cabal needs 3 kills, no ranking) and 5 is the real minimum. Approve, or do you want 4 treated as a full match with the weaker balance?
 5. **Higgsfield plan tier.** All generated assets must come from a paid, watermark-free plan; confirm the account tier before the first asset is committed.
 6. **Original art licence.** `LICENSE-ASSETS`: All Rights Reserved (safest for a public repo) or CC BY-NC-SA 4.0?
-7. **Where masters live.** Creative Cloud or Drive for `.ai`, `.aep`, `.psd` and character `.blend` files (the repo holds only exports and the rig)?
+7. **Where masters live.** Creative Cloud or Drive for `.ai`, `.aep`, `.psd` and character `.blend` files (the repo holds only exports and the rig)? **Resolved 2026-10-10: the ROSW checkout on the owner's laptop (A2).**
 8. **Final Night.** The bell channel is replaced by a 90 s hunt and a forced vote that Cabal wins on a tie. Approve this ending?
+
+## Amendments (2026-10-10)
+
+| # | Item | Decision |
+|---|---|---|
+| A1 | Open question 3 (hat replaces boots as the third trait) | **Approved by the owner.** Traits are Height, Scarf, Hat; clue mapping Footprints = height, Thread = scarf, Felt = hat. |
+| A2 | Open question 7 (where masters live) | **Answered:** masters live on the owner's laptop in the ROSW checkout (`groot99-droid/Pipelines-Plugin`) under `studio/assets/who-did-it/<kind>/<slug>/`, git-ignored there, with a studio note per made thing. `ASSETS.md` 6.6 and 6.10 updated. |
+| A3 | Theme addition: One Night Ultimate Baguette | **Added** as a lobby-selectable quick mode (GDD 3.11) with the wake-loaf fiction, Crumb's Ovens (`bakery`) in the world, rules and schema deltas (ARCHITECTURE 5.14), milestone M3b (ROADMAP) and three asset rows. The owner's friend invented the game as a wrapper of the one-night hidden-role card game; the ruleset and wording here are original. Trademark caution recorded in GDD 3.11 and CLAUDE.md. |
+| A4 | Connection to the ROSW repo | A `.claude/settings.json` that registers the `rosw` marketplace and enables `ui-design@rosw` is specified in `ASSETS.md` 6.10 and waits for the owner's approval (a session may not write Claude Code settings on its own); `CLAUDE.md` documents where masters, studio notes and the Higgsfield library live; ROSW `writing-museum/` noted as the V2 renderer candidate. The ROSW repo itself was not changed (read access only). |
+
+Open questions 3 and 7 above are closed. Still open: 1 (Phaser line), 2 (hosting), 4 (practice at 4), 5 (Higgsfield plan tier), 6 (asset licence). New since v0.1:
+
+8. **Which playable first?** M3 (kill, body, clues, vote; "Mafia with walking") or M3b (the quick mode, no kills or clues, 4 days). Recommendation: M3b first if the friend group wants to play soon; M3 first if the deduction loop is the priority.
+9. **Quick-mode sleep model.** Black "asleep in the loft" screen (no leaks, recommended) or sleepers standing in the dark loft hearing muffled noise pulses (more atmosphere, leaks window timing).
+10. **Public name if the game is ever sold.** Keep the parody title private and ship as "The Wake Loaves", or pick another neutral name now.
+11. **A `who-did-it` project in ROSW.** Creating the studio project folder, its first notes and a render-pipeline skill in Pipelines-Plugin needs push access to that repo; say so and the next session can open a pull request there.

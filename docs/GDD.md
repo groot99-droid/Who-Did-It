@@ -170,3 +170,94 @@ Snowball guard: when living Village <= Cabal + 2, kill CD +10 s and the next kil
 **V1.5**: Ranger (Arrest), Thief, Heirlooms, cave sea exit, Handcuffs, Forged Alibi, Candles for all, Wisp, Butler Bell, lit-window silhouettes, proximity chat toggle, faction-only reveal, fisher cottage, lighthouse, lobby role toggles, radius + occluder visibility, Lottie reveal, Light2D experiment, spectator mode.
 
 **V2**: Medium, the Beast and Cave Gate, bats, bog lurker, crows, poison, voice chat, cosmetics; first-person renderer.
+
+### 3.11 One Night Ultimate Baguette (quick mode)
+
+Origin: the owner's friend first framed the whole game as "One Night Ultimate Baguette", a wrapper around the one-night hidden-role card game. This section is an original ruleset with original wording, built from the lobby, role card, world, meeting and vote systems above. Lobby setting `mode = onub`. Target length 6-9 minutes. Knobs live in `balance.onub.json`; the deck table is `roles.onub.json`.
+
+**Fiction.** The night before Lord Vane's will is read, Hollowmere keeps the wake-loaf custom: Tamsin Crumb, the baker, bakes one loaf per mourner plus three for the dead, and bakes a wax-sealed crumb token into each. Your token is your secret. At dusk every mourner sets their loaf on a named plate on the Wake Table in Crumb's Ovens; the dead's three loaves sit on the oven ledge. Vane's poisoners are among the mourners, and the will names "whoever remains when the last lantern goes out", so by dawn the village must turn one person out into the storm. During the night people creep down from the bakery loft and tamper with the loaves. What you hold at dawn is what you are.
+
+**Roles** (always player count + 3 loaves; three stay on the oven ledge):
+
+| Role (faction) | Night act |
+|---|---|
+| **Poisoner** x2 (Cabal) | Wake together and see each other. A lone Poisoner may peek one of the dead's loaves. |
+| **Hireling** (Cabal) | Reads the Baker's ledger: it names the Poisoners. They do not know the Hireling. |
+| **Sin-Eater** (Village) | Tastes one mourner's loaf, or two of the dead's. |
+| **Cutpurse** (Village) | Takes another mourner's loaf, leaves their own, reads the one taken. |
+| **Busybody** (Village) | Swaps two other mourners' loaves without looking. |
+| **Sot** (Village) | Must swap their own loaf with one of the dead's, unseen. |
+| **Lamplighter** (Village) | Last to wake; cracks their own loaf and reads it. |
+| **Pallbearer** x2 (Village, V1.1) | Wake together and see each other. Neither is a Poisoner. |
+| **Debtor** (Neutral) | Wins only if turned out. |
+| **Gamekeeper** (Village, V1.1) | If turned out, the player they voted for is turned out too. |
+| **Mourner** (Village) | No night act. |
+
+| Players | Loaves | Deck |
+|---|---|---|
+| 4 | 7 | Poisoner x2, Sin-Eater, Cutpurse, Busybody, Mourner x2 |
+| 5 | 8 | + Debtor |
+| 6 | 9 | + Hireling |
+| 7 | 10 | + Lamplighter |
+| 8 | 11 | + Sot |
+| 9 | 12 | + Pallbearer x2 (V1: Mourner x2), Mourner x2 becomes x1 |
+| 10 | 13 | + Gamekeeper (V1: Mourner) |
+
+Both Poisoners sit among the dead's loaves in 3 / C(N+3, 2) of deals: 14% at 4 players, 7% at 6, 4% at 10. Those games are won by the village only if nobody is turned out.
+
+**Night.** After the 12 s role card (your dealt token) and a 10 s Dusk in which everyone walks into the bakery and sets their loaf (hold E on your own plate, 1 s), every client goes to a black "you sleep in the loft" screen with storm ambience and no clock. Sleepers are moved to a `loft` pseudo-scene so the server encodes no presence to them. The server runs a Conductor: a fixed list of windows built from the deck. Every window runs even when its role sits among the dead's loaves, so night length never leaks the deal. Only players whose **dealt** role matches the open window are spawned at the bakery door for that window; they act as what they were dealt, not as what they may now hold, then fade back to black. Windows carry a seeded 0-4 s jitter.
+
+| # | Window | Who wakes | Physical act (object, hold time) | Trace at dawn |
+|---|---|---|---|---|
+| 1 | 12 s | Poisoners | Each other's nameplates glow red at the Wake Table. If alone: E on one of the dead's loaves (2 s) shows its token | Oven-ledge flour scuff |
+| 2 | 8 s | Hireling | E on the Baker's ledger (2 s): the Poisoners' names | Ledger left open |
+| 3 | 8 s | Pallbearers (V1.1) | See each other at the table | none |
+| 4 | 14 s | Sin-Eater | E on one mourner's plate (2 s) shows its token, or E on two of the dead's loaves in turn | Plate turned |
+| 5 | 12 s | Cutpurse | E on another's plate (2 s): the loaves swap; your new token is shown | Two plates turned |
+| 6 | 14 s | Busybody | E on two other plates in turn (1 s each): they swap; nothing is shown | Two plates turned |
+| 7 | 10 s | Sot | E on one of the dead's loaves (2 s): swaps with your own, unseen; if the window expires the server picks by seed | Ledge scuff |
+| 8 | 8 s | Lamplighter | E on your own plate (2 s) shows your current token | Plate turned |
+
+Night length is the sum of the windows present plus 2 s fades: about 62 s at 4 players, 86 s at 6, 124 s at 10. Traces are cosmetic in V1 ("something moved here"); trait-bearing flour footprints (height, as in the main mode) are a V1.1 lobby toggle `floury`. Every act arrives as `act.ability` through the command queue and is accepted only if the phase is night, the open window matches the actor's dealt role, the actor has not acted this window, the actor is within 2 tiles of the target prop, and the target is legal for the role (never your own plate for Sin-Eater, Cutpurse or Busybody; only the dead's loaves for the Sot). "May" roles that time out do nothing.
+
+**Dawn, discussion and vote.** A 10 s dawn fade leads straight into the Meeting scene with the trace lines on the board. One discussion with global text chat, portraits and trait icons. Claims are structured: tap a role chip to post "I was the Sin-Eater: Y's loaf was Mourner", and the board lists them per player as Claimed.
+
+| Players | Discussion | Vote | Whole match |
+|---|---|---|---|
+| 4-5 | 150 s | 25 s, ends early when everyone has voted | 5-6 min |
+| 6-7 | 180 s | 25 s | 6-7 min |
+| 8-10 | 210 s | 25 s | 7-9 min |
+
+Vote: no Skip, no self-vote; a missing vote is an abstention and is flagged in the reveal. Resolution (`resolveDawn`): everyone holding the most votes is **turned out**, ties included; if nobody holds two or more votes, nobody is turned out. A turned-out Gamekeeper takes their own target with them (one hop). Winners are judged by **final** loaves.
+
+| Outcome | Who wins |
+|---|---|
+| The Debtor is turned out | The Debtor. The Cabal loses. The Village wins only if a Poisoner is also out. |
+| A Poisoner is turned out (no Debtor) | Village: every final non-Cabal, non-Debtor loaf. |
+| No Poisoner out, a Poisoner among the mourners | Cabal: Poisoners and Hireling, even a Hireling who was turned out. |
+| No Poisoner among the mourners, nobody turned out | Village. |
+| No Poisoner among the mourners, someone turned out | The Hireling if they hold a mourner's plate; otherwise nobody ("the storm wins"). |
+
+Reveal (20 s): every plate cracks open. The end screen shows dealt and final roles, the dead's three loaves, the swap log as a timeline ("The Cutpurse took the Poisoner's loaf; the Busybody swapped A and B") and the vote arrows, then returns to the lobby with the same code.
+
+**Role cards.** Every card carries the line: "The loaf you were handed at dusk may not be the loaf on your plate at dawn. Argue for who you think you are."
+
+| Role | Card text |
+|---|---|
+| Poisoner | You and your partner finished Lord Vane; the other plates must never learn it. Survive the dawn vote and the manor is yours. |
+| Hireling | You carried the poison and know who used it. They do not know you; take the blame if it saves them. |
+| Sin-Eater | By custom you taste the bread of the guilty. Tonight you may taste one mourner's loaf, or two of the dead's. |
+| Cutpurse | Old habits: you take someone's loaf and leave your own. You learn what you stole, not what you left. |
+| Busybody | You cannot leave other people's plates alone. Swap two mourners' loaves and tell no one, not even yourself. |
+| Sot | You drank the wake dry and knocked your loaf onto the oven ledge. Take one of the dead's instead; you will not remember which. |
+| Lamplighter | You rise before dawn to light the square. Crack your own loaf and know what you truly hold. |
+| Pallbearer | You and your fellow carried the coffin and can vouch for each other. Neither of you is a Poisoner. |
+| Debtor | Vane held your note; if the village turns you out it dies with you. Be suspicious enough to hang, not so loud they ignore you. |
+| Gamekeeper | If the village turns you out, you take your vote with you. Point carefully. |
+| Mourner | You came for the bread and the will. Listen, count the claims, and vote. |
+
+**Balance.** At 4-5 the deal is swap chaos with the Debtor as the first bluff; 150 s of text discussion is enough. At 6-7 the Hireling punishes "no Poisoner here, vote in a circle" play and the Lamplighter gives the first verifiable late claim. At 8-10 three verified-claim sources (Sin-Eater, Lamplighter, Pallbearers) face two liars and a Hireling, and the Gamekeeper makes mass-voting costly. The 6-9 minute target holds at every count (card 12 + dusk 10 + night 62-124 + dawn 10 + discussion 150-210 + vote up to 25 + reveal 20). Replayability comes from the deal and the swaps reshuffling identity every match and the swap log teaching the table at the end. The mode has no ranking.
+
+**V1 cut.** Ships: mode toggle; decks for 4-10 with the Pallbearers and Gamekeeper replaced by Mourners (nine roles); bakery greybox with plates, ledge and ledger; sleep screen and Conductor; dusk plate-setting; Meeting reuse with no Skip and claim chips; `resolveDawn` and the winner table; the reveal with the swap log. V1.1: Pallbearers, Gamekeeper, a dawn walk in the bakery before the meeting, flour footprints, eleven role portraits, lobby role picks.
+
+**Trademark note.** The mechanics of the one-night card game are not protected, but its name and its card art and text belong to its publisher. The parody title is fine for a free game among friends; if Who Did It is ever sold, ship the mode under a neutral label (suggested: "The Wake Loaves") and never reuse the card game's text or art.
