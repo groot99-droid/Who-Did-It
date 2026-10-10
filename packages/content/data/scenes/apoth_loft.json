@@ -1,0 +1,63 @@
+{
+  "id": "apoth_loft",
+  "prefix": "al",
+  "name": "Apothecary loft",
+  "zoneId": "apoth_loft",
+  "profile": "small",
+  "kind": "interior",
+  "size": { "w": 12, "h": 9 },
+  "notes": "Near-dark, one green lamp.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "al.stairs",
+      "from": "apoth_loft",
+      "x": 1,
+      "y": 1,
+      "kind": "stairs",
+      "to": "apoth_shop",
+      "toSpawn": "stairs",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": -3,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [{ "id": "stairs", "x": 2, "y": 1, "z": 0, "facing": "e" }],
+  "spots": [
+    {
+      "id": "al.herb_loft",
+      "kind": "hide",
+      "variant": "herbLoft",
+      "x": 10,
+      "y": 1,
+      "childOnly": false
+    },
+    {
+      "id": "al.under_bed",
+      "kind": "hide",
+      "variant": "underBed",
+      "x": 9,
+      "y": 6,
+      "childOnly": false
+    },
+    { "id": "al.trunk", "kind": "body", "variant": "trunk", "x": 2, "y": 7, "childOnly": false }
+  ],
+  "props": [{ "id": "al.green_lamp", "kind": "lamp", "x": 6, "y": 0 }],
+  "gates": [],
+  "paths": [],
+  "grid": [
+    "############",
+    "#DS.......H#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#........H.#",
+    "#.B........#",
+    "############"
+  ]
+}

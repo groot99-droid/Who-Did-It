@@ -1,0 +1,119 @@
+{
+  "id": "cellar",
+  "prefix": "cl",
+  "name": "The Undercroft",
+  "zoneId": "cellar",
+  "profile": "large",
+  "kind": "interior",
+  "size": { "w": 28, "h": 16 },
+  "ambientLightTiles": 2,
+  "notes": "Pitch dark with a small ambient radius; gas pockets in marked side alcoves (V1.5).",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "cl.well",
+      "from": "cellar",
+      "x": 14,
+      "y": 0,
+      "kind": "hatch",
+      "to": "overworld",
+      "toSpawn": "well",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 4,
+      "minProfile": "large",
+      "ships": "V1"
+    },
+    {
+      "id": "cl.trap",
+      "from": "cellar",
+      "x": 27,
+      "y": 8,
+      "kind": "hatch",
+      "to": "tavern_back",
+      "toSpawn": "trap",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 3,
+      "minProfile": "large",
+      "ships": "V1"
+    },
+    {
+      "id": "cl.crypt",
+      "from": "cellar",
+      "x": 0,
+      "y": 8,
+      "kind": "stairs",
+      "to": "chapel",
+      "toSpawn": "crypt",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 3,
+      "minProfile": "large",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "well", "x": 14, "y": 1, "z": 0, "facing": "s" },
+    { "id": "trap", "x": 26, "y": 8, "z": 0, "facing": "w" },
+    { "id": "crypt", "x": 1, "y": 8, "z": 0, "facing": "e" }
+  ],
+  "spots": [
+    {
+      "id": "cl.wine_rack_n",
+      "kind": "hide",
+      "variant": "wineRack",
+      "x": 8,
+      "y": 3,
+      "childOnly": false
+    },
+    {
+      "id": "cl.wine_rack_s",
+      "kind": "hide",
+      "variant": "wineRack",
+      "x": 19,
+      "y": 12,
+      "childOnly": false
+    },
+    { "id": "cl.dump", "kind": "body", "variant": "dumpSpot", "x": 5, "y": 13, "childOnly": false }
+  ],
+  "props": [
+    {
+      "id": "cl.study_key",
+      "kind": "keyCache",
+      "x": 25,
+      "y": 14,
+      "item": "studyKey",
+      "profiles": ["large"],
+      "ships": "V1.5"
+    },
+    { "id": "cl.gas_alcove_n", "kind": "gasPocket", "x": 3, "y": 2, "ships": "V1.5" },
+    { "id": "cl.gas_alcove_s", "kind": "gasPocket", "x": 24, "y": 13, "ships": "V1.5" }
+  ],
+  "gates": [],
+  "paths": [],
+  "grid": [
+    "##############D#############",
+    "#.............S............#",
+    "#..........................#",
+    "#.......H..................#",
+    "#.....#......#......#......#",
+    "#.....#......#......#......#",
+    "#.....#......#......#......#",
+    "#.....#......#......#......#",
+    "DS....#......#......#.....SD",
+    "#.....#......#......#......#",
+    "#.....#......#......#......#",
+    "#.....#......#......#......#",
+    "#..................H.......#",
+    "#....B.....................#",
+    "#..........................#",
+    "############################"
+  ]
+}

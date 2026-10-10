@@ -1,0 +1,116 @@
+{
+  "id": "manor_hall",
+  "prefix": "mh",
+  "name": "Vane Manor, hall",
+  "zoneId": "manor_hall",
+  "profile": "medium",
+  "kind": "interior",
+  "size": { "w": 28, "h": 16 },
+  "notes": "Stopped clock at 11:47; safe; muddy bootprints on the carpet (static red herring).",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "mh.front",
+      "from": "manor_hall",
+      "x": 20,
+      "y": 15,
+      "kind": "door",
+      "to": "overworld",
+      "toSpawn": "manor_front",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "medium",
+      "ships": "V1"
+    },
+    {
+      "id": "mh.back",
+      "from": "manor_hall",
+      "x": 6,
+      "y": 15,
+      "kind": "door",
+      "to": "overworld",
+      "toSpawn": "manor_back",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "medium",
+      "ships": "V1"
+    },
+    {
+      "id": "mh.stairs",
+      "from": "manor_hall",
+      "x": 14,
+      "y": 0,
+      "kind": "stairs",
+      "to": "manor_upper",
+      "toSpawn": "stairs",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 3,
+      "minProfile": "medium",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "front", "x": 20, "y": 14, "z": 0, "facing": "n" },
+    { "id": "back", "x": 6, "y": 14, "z": 0, "facing": "n" },
+    { "id": "stairs", "x": 14, "y": 1, "z": 0, "facing": "s" }
+  ],
+  "spots": [
+    {
+      "id": "mh.wardrobe_w",
+      "kind": "hide",
+      "variant": "wardrobe",
+      "x": 1,
+      "y": 3,
+      "childOnly": false
+    },
+    {
+      "id": "mh.wardrobe_e",
+      "kind": "hide",
+      "variant": "wardrobe",
+      "x": 26,
+      "y": 3,
+      "childOnly": false
+    },
+    {
+      "id": "mh.curtain_alcove",
+      "kind": "hide",
+      "variant": "curtain",
+      "x": 26,
+      "y": 10,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    { "id": "mh.clock", "kind": "decor", "x": 10, "y": 0 },
+    { "id": "mh.safe", "kind": "decor", "x": 18, "y": 0 }
+  ],
+  "gates": [],
+  "paths": [],
+  "grid": [
+    "##############D#############",
+    "#.............S............#",
+    "#..........................#",
+    "#H........................H#",
+    "#..........................#",
+    "#..........................#",
+    "#........##########........#",
+    "#..........................#",
+    "#.......................#..#",
+    "#.......................#..#",
+    "#........##########.....#.H#",
+    "#.......................#..#",
+    "#.......................#..#",
+    "#..........................#",
+    "#.....S.............S......#",
+    "######D#############D#######"
+  ]
+}

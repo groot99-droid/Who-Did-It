@@ -1,0 +1,79 @@
+{
+  "id": "apoth_shop",
+  "prefix": "as",
+  "name": "Mallory Apothecary",
+  "zoneId": "apoth_shop",
+  "profile": "small",
+  "kind": "interior",
+  "size": { "w": 18, "h": 11 },
+  "notes": "Basin (Blood wash); Wrench on the bench; the NOT FOR SALE shelf with one empty slot.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "as.door",
+      "from": "apoth_shop",
+      "x": 0,
+      "y": 5,
+      "kind": "door",
+      "to": "overworld",
+      "toSpawn": "apoth",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "as.stairs",
+      "from": "apoth_shop",
+      "x": 16,
+      "y": 1,
+      "kind": "stairs",
+      "to": "apoth_loft",
+      "toSpawn": "stairs",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 3,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "door", "x": 1, "y": 5, "z": 0, "facing": "e" },
+    { "id": "stairs", "x": 15, "y": 1, "z": 0, "facing": "w" }
+  ],
+  "spots": [
+    {
+      "id": "as.behind_counter",
+      "kind": "hide",
+      "variant": "behindCounter",
+      "x": 12,
+      "y": 8,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    { "id": "as.basin", "kind": "basin", "x": 8, "y": 0 },
+    { "id": "as.bench", "kind": "taskSource", "x": 17, "y": 8, "item": "wrench" },
+    { "id": "as.shelf", "kind": "decor", "x": 4, "y": 0 }
+  ],
+  "gates": [],
+  "paths": [],
+  "grid": [
+    "##################",
+    "#..............SD#",
+    "#................#",
+    "#................#",
+    "#................#",
+    "DS...............#",
+    "#.........#####..#",
+    "#................#",
+    "#...........H....#",
+    "#................#",
+    "##################"
+  ]
+}

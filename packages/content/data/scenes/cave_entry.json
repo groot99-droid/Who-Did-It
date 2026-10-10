@@ -1,0 +1,92 @@
+{
+  "id": "cave_entry",
+  "prefix": "ce",
+  "name": "Tin Gallery mouth",
+  "zoneId": "cave_entry",
+  "profile": "small",
+  "kind": "interior",
+  "size": { "w": 20, "h": 14 },
+  "ambientLightTiles": 2,
+  "notes": "Bioluminescent moss gives an ambient light radius; the sea passage is boarded until the Thief ships (V1.5).",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "ce.mouth",
+      "from": "cave_entry",
+      "x": 10,
+      "y": 13,
+      "kind": "cave_mouth",
+      "to": "forest",
+      "toSpawn": "cave_side",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "ce.sea",
+      "from": "cave_entry",
+      "x": 19,
+      "y": 4,
+      "kind": "cave_mouth",
+      "to": null,
+      "toSpawn": null,
+      "oneWay": false,
+      "lock": null,
+      "window": "lowTide",
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1.5"
+    }
+  ],
+  "spawns": [{ "id": "mouth", "x": 10, "y": 12, "z": 0, "facing": "n" }],
+  "spots": [
+    {
+      "id": "ce.stalagmites",
+      "kind": "hide",
+      "variant": "stalagmite",
+      "x": 5,
+      "y": 4,
+      "childOnly": false
+    },
+    {
+      "id": "ce.stalagmites_e",
+      "kind": "hide",
+      "variant": "stalagmite",
+      "x": 15,
+      "y": 8,
+      "childOnly": false
+    },
+    {
+      "id": "ce.pool_niche",
+      "kind": "body",
+      "variant": "poolNiche",
+      "x": 2,
+      "y": 10,
+      "childOnly": false
+    }
+  ],
+  "props": [],
+  "gates": [],
+  "paths": [],
+  "grid": [
+    "####################",
+    "#..................#",
+    "#..................#",
+    "#..................#",
+    "#....H.##..........D",
+    "#......##..........#",
+    "#..#...............#",
+    "#..#...............#",
+    "#..#........###H...#",
+    "#..................#",
+    "#.B................#",
+    "#..................#",
+    "#.........S........#",
+    "##########D#########"
+  ]
+}

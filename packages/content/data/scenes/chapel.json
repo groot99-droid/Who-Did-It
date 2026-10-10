@@ -1,0 +1,85 @@
+{
+  "id": "chapel",
+  "prefix": "ch",
+  "name": "St Brannock's",
+  "zoneId": "chapel",
+  "profile": "large",
+  "kind": "interior",
+  "size": { "w": 18, "h": 12 },
+  "silent": true,
+  "notes": "Silent zone: no footstep noise. The bell rope with a torn glove in it is decoration.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "ch.door",
+      "from": "chapel",
+      "x": 17,
+      "y": 6,
+      "kind": "door",
+      "to": "overworld",
+      "toSpawn": "chapel",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "large",
+      "ships": "V1"
+    },
+    {
+      "id": "ch.crypt",
+      "from": "chapel",
+      "x": 2,
+      "y": 11,
+      "kind": "stairs",
+      "to": "cellar",
+      "toSpawn": "crypt",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": -3,
+      "minProfile": "large",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "door", "x": 16, "y": 6, "z": 0, "facing": "w" },
+    { "id": "crypt", "x": 2, "y": 10, "z": 0, "facing": "n" }
+  ],
+  "spots": [
+    {
+      "id": "ch.confessional",
+      "kind": "hide",
+      "variant": "confessional",
+      "x": 1,
+      "y": 2,
+      "childOnly": false
+    },
+    {
+      "id": "ch.crypt_niche",
+      "kind": "body",
+      "variant": "cryptNiche",
+      "x": 16,
+      "y": 1,
+      "childOnly": false
+    }
+  ],
+  "props": [{ "id": "ch.rope", "kind": "decor", "x": 9, "y": 0 }],
+  "gates": [],
+  "paths": [],
+  "grid": [
+    "##################",
+    "#...............B#",
+    "#H...............#",
+    "#....####.####...#",
+    "#................#",
+    "#....####.####...#",
+    "#...............SD",
+    "#....####.####...#",
+    "#................#",
+    "#................#",
+    "#.S..............#",
+    "##D###############"
+  ]
+}

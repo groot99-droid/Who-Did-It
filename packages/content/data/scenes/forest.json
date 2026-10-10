@@ -1,0 +1,155 @@
+{
+  "id": "forest",
+  "prefix": "fo",
+  "name": "Gallows Wood",
+  "zoneId": "forest",
+  "profile": "small",
+  "kind": "exterior",
+  "size": { "w": 40, "h": 30 },
+  "notes": "3 wolf loops away from the gate; 6-tile clearing at the gate; Planks at the edge.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "fo.gate",
+      "from": "forest",
+      "x": 20,
+      "y": 29,
+      "kind": "forest_gate",
+      "to": "overworld",
+      "toSpawn": "forest_gate",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "fo.log",
+      "from": "forest",
+      "x": 39,
+      "y": 20,
+      "kind": "crawl",
+      "to": "overworld",
+      "toSpawn": "forest_back",
+      "oneWay": true,
+      "lock": null,
+      "window": null,
+      "noise": null,
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "fo.cave",
+      "from": "forest",
+      "x": 6,
+      "y": 0,
+      "kind": "cave_mouth",
+      "to": "cave_entry",
+      "toSpawn": "mouth",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "gate", "x": 20, "y": 28, "z": 0, "facing": "n" },
+    { "id": "cave_side", "x": 6, "y": 1, "z": 0, "facing": "s" }
+  ],
+  "spots": [
+    {
+      "id": "fo.hollow_tree_n",
+      "kind": "hide",
+      "variant": "hollowTree",
+      "x": 12,
+      "y": 7,
+      "childOnly": false
+    },
+    {
+      "id": "fo.hollow_tree_e",
+      "kind": "hide",
+      "variant": "hollowTree",
+      "x": 30,
+      "y": 7,
+      "childOnly": false
+    },
+    {
+      "id": "fo.hollow_tree_s",
+      "kind": "hide",
+      "variant": "hollowTree",
+      "x": 23,
+      "y": 19,
+      "childOnly": false
+    },
+    { "id": "fo.brush_w", "kind": "hide", "variant": "brush", "x": 6, "y": 26, "childOnly": false },
+    { "id": "fo.brush_e", "kind": "hide", "variant": "brush", "x": 36, "y": 20, "childOnly": false }
+  ],
+  "props": [{ "id": "fo.planks", "kind": "taskSource", "x": 16, "y": 29, "item": "planks" }],
+  "gates": [],
+  "paths": [
+    {
+      "id": "fo.wolf_loop_w",
+      "kind": "wolfLoop",
+      "points": [
+        { "x": 6, "y": 6 },
+        { "x": 8, "y": 6 },
+        { "x": 8, "y": 13 },
+        { "x": 2, "y": 13 },
+        { "x": 2, "y": 6 }
+      ]
+    },
+    {
+      "id": "fo.wolf_loop_n",
+      "kind": "wolfLoop",
+      "points": [{ "x": 21, "y": 6 }, { "x": 29, "y": 6 }, { "x": 29, "y": 9 }, { "x": 21, "y": 9 }]
+    },
+    {
+      "id": "fo.wolf_loop_e",
+      "kind": "wolfLoop",
+      "points": [
+        { "x": 30, "y": 12 },
+        { "x": 37, "y": 12 },
+        { "x": 37, "y": 19 },
+        { "x": 30, "y": 19 }
+      ]
+    }
+  ],
+  "grid": [
+    "######D#################################",
+    "#.....S................................#",
+    "#.###.........####.............##......#",
+    "#.###....##...####......###....##......#",
+    "#.###....##.............###....##......#",
+    "#........##.............###....##......#",
+    "#........##....................##......#",
+    "#...........H.................H........#",
+    "#..................##..............###.#",
+    "#..####............##..............###.#",
+    "#..####....###.....##.....####.........#",
+    "#..........###............####.........#",
+    "#..........###.........................#",
+    "#......................................#",
+    "#................................###...#",
+    "#....##..........................###...#",
+    "#....##......###.................###...#",
+    "#....##......###...........##..........#",
+    "#....##....................##..........#",
+    "#......................H...##..........#",
+    "#...................................H..D",
+    "#.......##.............................#",
+    "#.###...##.....................###.....#",
+    "#.###...##.....................###.....#",
+    "#......................................#",
+    "#..................................##..#",
+    "#.....H............................##..#",
+    "#......................................#",
+    "#...................S..................#",
+    "####################D###################"
+  ]
+}

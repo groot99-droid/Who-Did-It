@@ -1,0 +1,106 @@
+{
+  "id": "tavern_bar",
+  "prefix": "tb",
+  "name": "The Drowned Lantern",
+  "zoneId": "tavern_bar",
+  "profile": "small",
+  "kind": "interior",
+  "size": { "w": 20, "h": 12 },
+  "notes": "Warmest light; drowned-sailor photos; task: dartboard letter drop.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "tb.front",
+      "from": "tavern_bar",
+      "x": 0,
+      "y": 6,
+      "kind": "door",
+      "to": "overworld",
+      "toSpawn": "tavern_front",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "tb.alley",
+      "from": "tavern_bar",
+      "x": 19,
+      "y": 6,
+      "kind": "door",
+      "to": "overworld",
+      "toSpawn": "tavern_alley",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "tb.back",
+      "from": "tavern_bar",
+      "x": 10,
+      "y": 11,
+      "kind": "door",
+      "to": "tavern_back",
+      "toSpawn": "door",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "front", "x": 1, "y": 6, "z": 0, "facing": "e" },
+    { "id": "alley", "x": 18, "y": 6, "z": 0, "facing": "w" },
+    { "id": "back", "x": 10, "y": 10, "z": 0, "facing": "n" }
+  ],
+  "spots": [
+    {
+      "id": "tb.behind_bar",
+      "kind": "hide",
+      "variant": "behindCounter",
+      "x": 15,
+      "y": 1,
+      "childOnly": false
+    },
+    {
+      "id": "tb.keg_stack",
+      "kind": "hide",
+      "variant": "kegStack",
+      "x": 2,
+      "y": 9,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    { "id": "tb.dartboard", "kind": "dartboard", "x": 6, "y": 0 },
+    { "id": "tb.shutters", "kind": "window", "x": 14, "y": 11 },
+    { "id": "tb.flour_bin", "kind": "flourBin", "x": 19, "y": 2 },
+    { "id": "tb.photos", "kind": "decor", "x": 3, "y": 0 }
+  ],
+  "gates": [],
+  "paths": [],
+  "grid": [
+    "####################",
+    "#..............H...#",
+    "#..................#",
+    "#..........######..#",
+    "#..................#",
+    "#..................#",
+    "DS..##............SD",
+    "#...........##.....#",
+    "#..................#",
+    "#.H................#",
+    "#.........S........#",
+    "##########D#########"
+  ]
+}

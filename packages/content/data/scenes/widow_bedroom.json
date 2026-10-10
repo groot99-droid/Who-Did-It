@@ -1,0 +1,70 @@
+{
+  "id": "widow_bedroom",
+  "prefix": "wb",
+  "name": "Widow's bedroom",
+  "zoneId": "widow_bedroom",
+  "profile": "small",
+  "kind": "interior",
+  "size": { "w": 12, "h": 9 },
+  "notes": "Single candle.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "wb.door",
+      "from": "widow_bedroom",
+      "x": 3,
+      "y": 8,
+      "kind": "door",
+      "to": "widow_parlour",
+      "toSpawn": "bedroom",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [{ "id": "door", "x": 3, "y": 7, "z": 0, "facing": "n" }],
+  "spots": [
+    {
+      "id": "wb.wardrobe",
+      "kind": "hide",
+      "variant": "wardrobe",
+      "x": 1,
+      "y": 1,
+      "childOnly": false
+    },
+    {
+      "id": "wb.under_bed",
+      "kind": "hide",
+      "variant": "underBed",
+      "x": 8,
+      "y": 3,
+      "childOnly": false
+    },
+    {
+      "id": "wb.wardrobe_body",
+      "kind": "body",
+      "variant": "wardrobe",
+      "x": 10,
+      "y": 1,
+      "childOnly": false
+    }
+  ],
+  "props": [{ "id": "wb.candle", "kind": "lamp", "x": 6, "y": 0 }],
+  "gates": [],
+  "paths": [],
+  "grid": [
+    "############",
+    "#H........B#",
+    "#..........#",
+    "#.......H..#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..S.......#",
+    "###D########"
+  ]
+}
