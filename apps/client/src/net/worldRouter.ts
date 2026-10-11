@@ -29,7 +29,13 @@ export function installWorldRouter(
     feed?.dispose();
     feed = next;
     game.registry.set(REG_WORLD, next);
-    const onEnter = (data: SceneEnter) => game.scene.start('World', data);
+    const onEnter = (data: SceneEnter) => {
+      // The lobby screens are done once the world starts; stopping them removes their DOM.
+      for (const key of ['Landing', 'Lobby', 'RoleReveal']) {
+        if (game.scene.isActive(key) || game.scene.isSleeping(key)) game.scene.stop(key);
+      }
+      game.scene.start('World', data);
+    };
     next.bus.on('sceneEnter', onEnter);
     stops.push(() => next.bus.off('sceneEnter', onEnter));
   };
@@ -60,13 +66,16 @@ export function installWorldRouter(
     }) as NetworkService['send'];
   } else {
     // A real room appears after create/join; follow it (and any reconnect) until a feed is attached.
-    const timer = window.setInterval(() => {
+    // The lobby event fires as soon as the room is wired, the timer covers reconnects.
+    const attach = () => {
       const room = roomOf(net);
       if (room === null) return;
       if (feed !== null && (feed as ColyseusWorldFeed).sessionRoom === room) return;
-      const next = new ColyseusWorldFeed(room);
-      publish(next);
-    }, 250);
+      publish(new ColyseusWorldFeed(room));
+    };
+    net.bus.on('lobby', attach);
+    stops.push(() => net.bus.off('lobby', attach));
+    const timer = window.setInterval(attach, 250);
     stops.push(() => window.clearInterval(timer));
   }
   return () => stops.forEach((s) => s());

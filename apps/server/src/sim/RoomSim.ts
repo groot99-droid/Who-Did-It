@@ -83,6 +83,8 @@ export class RoomSim {
   profile: Profile = 'small';
   /** Raised by the WDI_DEBUG `debug.play` message, consumed by the step. */
   debugPlay = false;
+  /** Set when a view must change before the next 5 Hz pass (a transit just ended). */
+  viewsDirty = false;
   private ordinals = 0;
 
   ensure(sessionId: string): PlayerSim {

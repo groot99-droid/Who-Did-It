@@ -34,6 +34,10 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   runCommands(room);
   runPortals(room);
   runAiAndHazards(room);
-  if (room.state.tick % VIEW_RECONCILE_EVERY_TICKS === 0) reconcileViews(room);
+  const sim = simOf(room);
+  if (room.state.tick % VIEW_RECONCILE_EVERY_TICKS === 0 || sim.viewsDirty) {
+    sim.viewsDirty = false;
+    reconcileViews(room);
+  }
   checkPhaseAndWin(room);
 }

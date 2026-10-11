@@ -74,6 +74,11 @@ export function moveAndCollide(room: PartyRoom): void {
   for (const [sessionId, p] of sim.players) {
     const player = room.state.players.get(sessionId);
     if (!player || !p.placed) continue;
+    if (p.transitFrom !== -1 && tick >= p.busyUntilTick) {
+      // The crossing is over: the scene they left stops seeing them on this very tick.
+      p.transitFrom = -1;
+      sim.viewsDirty = true;
+    }
     const moved = p.vx !== 0 || p.vy !== 0;
     if (moved) {
       const grid = navGrid(sceneKey(player.sceneId), sim.profile);
