@@ -1,5 +1,5 @@
 // Placeholder art for every key in docs/SPRITES.md 8, so playtests run before real art (ROADMAP 7.3).
-// node tools/sprites/placeholder.ts [out dir]   (default apps/client/public/assets/placeholder)
+// tsx tools/sprites/placeholder.ts [out dir]   (default apps/client/public/assets/placeholder)
 import { createRequire } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

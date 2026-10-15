@@ -9,6 +9,7 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 | `rig_common.py` | Directions, frame regex, cells, palette, light and outline constants; pure Python |
 | `build_rig.py` | Builds the rig: `SpriteCam` (ortho, X 40°, Z 0°, 64 px/m), `TileCam` (straight down, one 64 px tile per metre), turntable `TT`, camera-parented key sun and area fill, slate world at 0.15, the `WDI_Toon` node group, `OutlineInk`, the `Outline` Solidify preset, a 1 m checker cube with a facing marker, a 4 m grid plane with 1 m lines, a hidden 1.7 m `FallenProxy` for the `die` cell check, a `Feet` empty, EEVEE settings |
 | `batch_render.py` | `--smoke` calibration sheet (8 cube views, the ground tile, one 256 px `die` frame), or character passes with the per-frame `Feet` manifest |
+| `build_villager.py` | Builds the V1 `villager` body from code: a 1,388-triangle block-out of chamfered boxes, 3 heads tall, with the overlay parts, an 8-bone armature and the four V1 actions; writes the `.blend` (and optionally the source GLB) to `assets/external/villager/`, never into git |
 | `palettize.py` | Snaps materials to the palette; fails on untextured PBR |
 | `tests/test_rig_common.py` | Unit tests (`pnpm --filter @wdi/blender test`, no Blender needed) |
 | `tests/make_dummy_char.py` | Builds a capsule character that follows the contract below, for pipeline tests |
@@ -22,10 +23,19 @@ blender -b --factory-startup -P tools/blender/batch_render.py -- --smoke --out a
 # The rig file, for opening in the UI
 blender -b --factory-startup -P tools/blender/build_rig.py -- --out tools/blender/build/render_rig.blend
 
+# The V1 villager body (git-ignored master; copy to the ROSW checkout, assets/source/MANIFEST.md)
+python tools/blender/build_villager.py -- --out assets/external/villager/villager.blend \
+  --glb assets/external/villager/villager.glb
+
 # Character passes: build/render/<body>/<pass>/char_<body>_<anim>_<dir>_<nnn>.png + manifest.json
 blender -b --factory-startup -P tools/blender/batch_render.py -- \
   --char ~/ROSW/studio/assets/who-did-it/character/villager/villager.blend --body villager --out build/render
 # options: --anims idle,walk --dirs n,se --passes body,scarf --rig tools/blender/build/render_rig.blend
+
+# The full V1 set in four parallel runs (about an hour on Mesa llvmpipe, 4 cores; minutes on a GPU)
+for d in n,ne e,se s,sw w,nw; do
+  python tools/blender/batch_render.py -- --char assets/external/villager/villager.blend --out build/render --dirs $d &
+done; wait
 
 # Palettize a character file in place
 blender -b villager.blend -P tools/blender/palettize.py -- --save
@@ -47,6 +57,11 @@ owner's laptop should match it pixel for pixel or within anti-aliasing noise.
 - One action per clip, named `idle`, `walk`, `swing`, `die`, at a scene rate that is a whole multiple
   of 12 fps (24 by default). Looping clips (`idle`, `walk`) end on a copy of their first pose, which
   is not rendered; one-shot clips render their last frame.
+- `manifest.json` gets the `Feet` pivot from every pass, so a run of overlay passes alone still writes
+  complete entries. Runs merge into an existing `manifest.json` under a file lock, so a set split by
+  `--anims`, `--dirs` or `--passes`, sequential or in parallel into one `--out`, adds up to one
+  manifest; a body-pass run replaces a frame's entry (and its `clipped` flag), an overlay-only run only
+  updates the pivot.
 - The renderer palettizes materials, adds the `Outline` hull to every part except `blood`, and warns
   when a clip does not sample to the V1 frame count or a body frame touches the cell edge.
 

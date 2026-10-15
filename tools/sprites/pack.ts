@@ -3,6 +3,7 @@ import { readdirSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { packAsync } from 'free-tex-packer-core';
+import { alphaBleed } from './bleed.ts';
 import { applyPivots, buildAnims, type FeetManifest } from './gen-anims.ts';
 import { PASSES, frameKey, parseFrameFileName, textureKey, type Pass } from './keys.ts';
 
@@ -131,7 +132,11 @@ export async function packCharacter(
   return out;
 }
 
-/** Read batch_render output (<dir>/<pass>/char_*.png + manifest.json) into pack inputs. */
+/**
+ * Read batch_render output (<dir>/<pass>/char_*.png + manifest.json) into pack inputs. Every frame is
+ * alpha-bled first (bleed.ts): the packer trims the transparent border and extrudes the edge, and the
+ * bleed covers the transparent pixels left inside the trim rectangle (between legs, under arms).
+ */
 export function readRender(dir: string): { manifest: FeetManifest; framesByPass: Map<Pass, PackInput[]> } {
   const manifest = JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8')) as FeetManifest;
   const framesByPass = new Map<Pass, PackInput[]>();
@@ -145,7 +150,7 @@ export function readRender(dir: string): { manifest: FeetManifest; framesByPass:
       files.map((f) => {
         const id = parseFrameFileName(f.slice(0, -4));
         if (id.body !== manifest.body) throw new Error(`${f} is not body ${manifest.body}`);
-        return { name: frameKey(pass, id), png: readFileSync(join(dir, pass, f)) };
+        return { name: frameKey(pass, id), png: alphaBleed(readFileSync(join(dir, pass, f))) };
       }),
     );
   }
@@ -157,11 +162,11 @@ export function writeFiles(outDir: string, files: Map<string, Buffer>): void {
   for (const [name, bytes] of files) writeFileSync(join(outDir, name), bytes);
 }
 
-// CLI: node tools/sprites/pack.ts <render dir, e.g. build/render/villager> <out dir>
+// CLI: tsx tools/sprites/pack.ts <render dir, e.g. build/render/villager> <out dir>
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const [renderDir, outDir] = process.argv.slice(2);
   if (!renderDir || !outDir) {
-    console.error('usage: node pack.ts <render dir> <out dir>');
+    console.error('usage: tsx pack.ts <render dir> <out dir>');
     process.exit(2);
   }
   const { manifest, framesByPass } = readRender(renderDir);

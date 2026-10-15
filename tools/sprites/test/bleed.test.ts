@@ -1,0 +1,37 @@
+import { createCanvas } from '@napi-rs/canvas';
+import { describe, expect, it } from 'vitest';
+import { alphaBleed, bleed, decodePng, encodePng } from '../bleed.ts';
+
+describe('bleed', () => {
+  it('decodes what canvas encodes and round-trips through its own encoder', () => {
+    const c = createCanvas(5, 4);
+    const g = c.getContext('2d');
+    g.fillStyle = '#12141C';
+    g.fillRect(1, 1, 2, 2);
+    const img = decodePng(c.toBuffer('image/png'));
+    expect([img.width, img.height]).toEqual([5, 4]);
+    expect([...img.data.subarray((1 * 5 + 1) * 4, (1 * 5 + 1) * 4 + 4)]).toEqual([0x12, 0x14, 0x1c, 255]);
+    expect(decodePng(encodePng(img)).data).toEqual(img.data);
+  });
+
+  it('colours transparent neighbours, keeps their alpha at 0 and leaves the sprite unchanged', () => {
+    const data = new Uint8Array(5 * 5 * 4);
+    data.set([200, 100, 50, 255], (2 * 5 + 2) * 4);
+    const out = bleed({ width: 5, height: 5, data }, 1);
+    expect([...out.data.subarray((2 * 5 + 2) * 4, (2 * 5 + 2) * 4 + 4)]).toEqual([200, 100, 50, 255]);
+    expect([...out.data.subarray((1 * 5 + 1) * 4, (1 * 5 + 1) * 4 + 4)]).toEqual([200, 100, 50, 0]);
+    // one ring deep only
+    expect([...out.data.subarray(0, 4)]).toEqual([0, 0, 0, 0]);
+    const two = bleed({ width: 5, height: 5, data }, 2);
+    expect([...two.data.subarray(0, 4)]).toEqual([200, 100, 50, 0]);
+  });
+
+  it('is deterministic', () => {
+    const c = createCanvas(16, 16);
+    const g = c.getContext('2d');
+    g.fillStyle = '#B3121F';
+    g.fillRect(4, 4, 6, 7);
+    const png = c.toBuffer('image/png');
+    expect(alphaBleed(png).equals(alphaBleed(png))).toBe(true);
+  });
+});
