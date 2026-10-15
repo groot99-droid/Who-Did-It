@@ -12,7 +12,9 @@
     "./constants": "./src/constants.ts",
     "./metrics": "./src/metrics.ts",
     "./version": "./src/version.ts",
-    "./direction": "./src/direction.ts"
+    "./direction": "./src/direction.ts",
+    "./nav": "./src/nav/index.ts",
+    "./collision": "./src/collision/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

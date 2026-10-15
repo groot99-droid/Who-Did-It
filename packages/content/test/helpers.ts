@@ -6,7 +6,7 @@ export const dataDir = fileURLToPath(new URL('../data/', import.meta.url));
 
 export function sceneFiles(): string[] {
   return readdirSync(new URL('../data/scenes/', import.meta.url))
-    .filter((f) => f.endsWith('.json'))
+    .filter((f) => f.endsWith('.json') && !f.endsWith('.nav.json'))
     .map((f) => f.slice(0, -'.json'.length))
     .sort();
 }

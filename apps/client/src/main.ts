@@ -4,6 +4,7 @@ import { Landing } from './scenes/Landing';
 import { Lobby } from './scenes/Lobby';
 import { Preload } from './scenes/Preload';
 import { RoleReveal } from './scenes/RoleReveal';
+import { World } from './scenes/World';
 import './ui/styles.css';
 
 new Phaser.Game({
@@ -17,5 +18,5 @@ new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Boot, Preload, Landing, Lobby, RoleReveal],
+  scene: [Boot, Preload, Landing, Lobby, RoleReveal, World],
 });

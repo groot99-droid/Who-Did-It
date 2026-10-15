@@ -1,6 +1,7 @@
 import type { Client } from '@colyseus/core';
 import { C2S } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { queuePortal } from './PortalQueue';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
 export interface QueuedCommand {
@@ -11,9 +12,24 @@ export interface QueuedCommand {
 
 export class CommandQueue {
   private items: QueuedCommand[] = [];
+  /** `input.move` keeps only the newest per client: one is applied per tick, newest wins (5.6). */
+  private moves = new Map<string, unknown>();
 
   push(client: Client, type: string, payload: unknown): void {
-    this.items.push({ sessionId: client.sessionId, type, payload });
+    if (type === C2S.move) this.moves.set(client.sessionId, payload);
+    else this.items.push({ sessionId: client.sessionId, type, payload });
+  }
+
+  /** The newest queued `input.move` of every client; consumed by `applyInputs`. */
+  takeMoves(): Map<string, unknown> {
+    const out = this.moves;
+    this.moves = new Map();
+    return out;
+  }
+
+  /** Drops a client's pending move (a portal crossing clears inputs). */
+  clearMove(sessionId: string): void {
+    this.moves.delete(sessionId);
   }
 
   /** Hands over everything queued so far in arrival order. */
@@ -33,6 +49,9 @@ export function runCommands(room: PartyRoom): void {
     switch (cmd.type) {
       case C2S.lobbyReady:
         if (room.state.phase === 0 && typeof payload.ready === 'boolean') player.ready = payload.ready;
+        break;
+      case C2S.enterPortal:
+        queuePortal(room, cmd.sessionId, payload);
         break;
       default:
         // act.*, meeting.*, chat.* arrive in M2+; queued and ignored until their stage exists.

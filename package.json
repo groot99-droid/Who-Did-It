@@ -17,7 +17,9 @@
     "format": "prettier --write .",
     "assets:render": "pnpm --filter @wdi/blender render:smoke",
     "docs:protocol": "pnpm --filter @wdi/shared docs:protocol",
-    "bots": "pnpm --filter @wdi/bots start"
+    "bots": "pnpm --filter @wdi/bots start",
+    "grid:export": "pnpm --filter @wdi/grid export",
+    "bots:soak": "pnpm --filter @wdi/bots soak"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

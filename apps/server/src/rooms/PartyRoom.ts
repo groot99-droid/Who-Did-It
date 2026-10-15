@@ -28,6 +28,7 @@ import { genericJoinError } from '../services/matchmakeGuard';
 import { metrics } from '../services/Metrics';
 import { registerDebugHandlers } from './handlers/debug';
 import { isLobbyCommand, runLobbyCommands, runLobbyPhase } from './handlers/lobby';
+import { registerMovement } from './handlers/movement';
 
 const codeRegistries = new WeakMap<object, CodeRegistry>();
 
@@ -99,6 +100,7 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
       metrics.recordTick(performance.now() - t0);
     }, TICK_RATE);
 
+    registerMovement(this);
     if (process.env.WDI_DEBUG === '1') registerDebugHandlers(this);
     metrics.addRoom(1);
   }

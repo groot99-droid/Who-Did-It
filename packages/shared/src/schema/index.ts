@@ -125,9 +125,9 @@ export const Player = schema(
     hasVoted: bool(),
     sceneId: u8(),
     // SceneScoped (V1) / Proximity (V1.5)
-    presence: t.ref(Presence).view(),
+    presence: t.ref(Presence).view(1),
     // Own client only
-    priv: t.ref(Private).view(),
+    priv: t.ref(Private).view(2),
   },
   'Player',
 );

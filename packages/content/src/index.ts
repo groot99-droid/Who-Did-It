@@ -59,6 +59,7 @@ export * from './schemas/scene.js';
 export * from './schemas/onubRoles.js';
 export * from './schemas/onubBalance.js';
 export { validateContent, type Content } from './validate.js';
+export { navs, NavFile } from './nav.js';
 
 const sceneJson: Record<SceneId, unknown> = {
   overworld: overworldJson,
