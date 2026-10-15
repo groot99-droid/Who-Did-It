@@ -108,6 +108,8 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
   override onJoin(client: Client, options: JoinOptions) {
     const name = cleanName(options.name);
     if (name === null) throw genericJoinError();
+    // A seat reserved just before Start would otherwise join after the deal with no role and no card.
+    if (this.state.phase !== Phase.lobby) throw genericJoinError();
 
     const player = new Player();
     player.id = client.sessionId;

@@ -16,7 +16,7 @@ export class TouchControls implements InputSource {
 
   constructor(parent: HTMLElement, onUse: () => void) {
     this.knob = h('i');
-    const stick = h('div', { class: 'wdi-stick' }, this.knob);
+    const stick = h('div', { class: 'wdi-world-stick' }, this.knob);
     const hold = (label: string, set: (on: boolean) => void) => {
       const b = h('button', { type: 'button' }, label);
       const down = (e: PointerEvent) => {
@@ -41,11 +41,11 @@ export class TouchControls implements InputSource {
     });
     this.root = h(
       'div',
-      { class: 'wdi-touch' },
+      { class: 'wdi-world-touch' },
       stick,
       h(
         'div',
-        { class: 'wdi-btns' },
+        { class: 'wdi-world-btns' },
         hold('Run', (on) => (this.run = on)),
         hold('Sneak', (on) => (this.sneakOn = on)),
         use,

@@ -47,9 +47,6 @@ export function runCommands(room: PartyRoom): void {
     if (!player) continue;
     const payload = (cmd.payload ?? {}) as Record<string, unknown>;
     switch (cmd.type) {
-      case C2S.lobbyReady:
-        if (room.state.phase === 0 && typeof payload.ready === 'boolean') player.ready = payload.ready;
-        break;
       case C2S.enterPortal:
         queuePortal(room, cmd.sessionId, payload);
         break;

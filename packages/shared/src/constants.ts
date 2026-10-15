@@ -11,7 +11,7 @@ export const PATCH_RATE_MS = 50;
 export const VIEW_RECONCILE_EVERY_TICKS = 4;
 
 export const MAX_PLAYERS = 10;
-/** Start needs this many players in the lobby (ARCHITECTURE 5.3). */
+/** Lower bound of the party size used for the scene profile (balance.json `players.min`, GDD 3.9); Start itself needs one human (A28). */
 export const MIN_PLAYERS_TO_START = 4;
 export const NAME_MIN_LENGTH = 2;
 export const NAME_MAX_LENGTH = 16;

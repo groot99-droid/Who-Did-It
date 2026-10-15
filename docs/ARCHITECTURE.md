@@ -96,15 +96,18 @@ Error codes: 422 cannot, 423 locked, 424 cooldown, 425 wrong phase, 426 busy, 42
 ### 5.6 Movement, actions and netcode
 
 ```ts
-// apps/server/src/sim/Step.ts — fixed order inside setFixedTimestep(step, 20, { subSteps: 2 })
+// apps/server/src/sim/Step.ts — fixed order inside setFixedTimestep(step, 20); PartyRoom drains the lobby
+// queue and runs the lobby phase timers right after step() (rooms/handlers/lobby.ts)
 export function step(room: PartyRoom, ctx: StepContext) {
   room.state.tick++;
+  runDebugStart(room);        // WDI_DEBUG=1 only: a debug.play flag raised in a callback, consumed here
+  syncRoster(room);           // one PlayerSim per seat; placeNewPlayers spreads newcomers on square_<n> once the phase is a world phase and sends their one sceneEnter
   applyInputs(room);          // exactly one input per client, newest wins, server-normalised, speed table by sprint/sneak/wounded
   moveAndCollide(room);       // swept AABB vs nav bitmap; 250 ms position ring per player
   runCommands(room);          // queued act.* in arrival order: kill, interact, hold, hide/check, present
   runPortals(room);           // synchronous; sets busy/transit, clears inputs, bumps lastInputSeq
   runAiAndHazards(room);      // wolves, decay, clue GC (cap 40 clues per scene, oldest Claimed first)
-  if (room.state.tick % 4 === 0) reconcileViews(room);   // Visibility.ts at 5 Hz
+  if (room.state.tick % 4 === 0 || sim.viewsDirty) reconcileViews(room);   // Visibility.ts at 5 Hz, at once after a crossing or placement
   checkPhaseAndWin(room);
 }
 ```
@@ -127,6 +130,7 @@ Scenes: `Boot` (flags, `/health` poll) -> `Preload` -> `Landing` (DOM) -> `Lobby
 
 ### 5.10 Deployment
 
+- The server bundles `@wdi/shared` and `@wdi/content` from source with tsup (both are devDependencies resolved with the `development` export condition), so `node build/index.js` needs no workspace package at runtime (A28).
 - `ci.yml` (push / PR): checkout@v7, setup-node@v7 (22), pnpm via corepack, `pnpm lint && pnpm typecheck && pnpm test`, a dist size report.
 - `pages.yml` (main): build the client with `VITE_SERVER_URL` and `VITE_BUILD_VERSION=${GITHUB_SHA::8}` from Actions variables, configure-pages@v6, upload-pages-artifact@v5 (`apps/client/dist`), deploy-pages@v5; Pages source = GitHub Actions; `base: '/Who-Did-It/'`; hash routing.
 - **Server host, two steps (owner decision 2026-10-10).** M0 to M3: **Render Free** web service built from the GitHub repo (same build and start commands), accepting the 15-minute idle spin-down and the one-minute wake; the landing page polls `/health` and shows "Waking the village..." until the server answers. From the first playtest with friends (M3 exit): **Railway Hobby ($5/month, always-on, managed wss)** through Railway's GitHub integration with Nixpacks (build `pnpm --filter @wdi/server build`, start `node apps/server/build/index.js`, `NODE_ENV=production`, `WDI_DEBUG` unset); only `VITE_SERVER_URL` changes. No Dockerfile, no deploy workflow, no staging server, no PR previews. Single process; no Redis.

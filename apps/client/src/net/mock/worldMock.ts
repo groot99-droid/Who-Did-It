@@ -1,5 +1,6 @@
 import mitt, { type Emitter } from 'mitt';
 import balanceJson from '@wdi/content/data/balance.json';
+import metricsJson from '@wdi/content/data/metrics.json';
 import { type NavData, NavGrid, TICK_RATE, TILE_PX, moveAabb } from '@wdi/shared';
 import type {
   DoorSnap,
@@ -15,8 +16,8 @@ import type {
 // the same collision (`@wdi/shared`) and the same speed table (balance.json) as apps/server/src/sim, with
 // six random-walking bots, so the World scene is exercised without a network.
 
-const FOOT_HALF_PX = 16;
-const PORTAL_REACH_TILES = 1.5;
+const FOOT_HALF_PX = (metricsJson.collisionBoxTiles * TILE_PX) / 2;
+const PORTAL_REACH_TILES = balanceJson.doors.reachTiles;
 const TRANSIT_TICKS = Math.round(balanceJson.doors.transitS * TICK_RATE);
 const SWING_TICKS = Math.round(balanceJson.doors.swingS * TICK_RATE);
 const DIRS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
@@ -108,7 +109,20 @@ export class MockWorldFeed implements WorldFeed {
   /** Starts the 20 Hz loop and tells the World scene to begin, like the server's first `sceneEnter`. */
   start(): void {
     if (this.timer !== null) return;
-    this.timer = window.setInterval(() => this.step(), 1000 / TICK_RATE);
+    // A plain interval runs late when the tab is busy drawing; stepping until the due time keeps the
+    // simulated distance per wall-clock second right, like the server's fixed timestep.
+    const period = 1000 / TICK_RATE;
+    let due = performance.now();
+    this.timer = window.setInterval(() => {
+      const now = performance.now();
+      let steps = 0;
+      while (due <= now && steps < 8) {
+        this.step();
+        due += period;
+        steps++;
+      }
+      if (due < now) due = now;
+    }, period / 2);
     const me = this.bodies.get(this.selfId);
     const spawn = this.content.scenes.overworld?.spawns.find((s) => s.id === 'square_0');
     if (me && spawn)

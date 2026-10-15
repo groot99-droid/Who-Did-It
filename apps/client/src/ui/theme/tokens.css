@@ -55,7 +55,7 @@
   --wdi-surface-sunken: var(--wdi-ink); /* wells inside a panel: timers, code boxes */
   --wdi-paper: var(--wdi-bone); /* everything you touch: cards, inputs, chips */
   --wdi-text: var(--wdi-bone); /* on bg and surface: 12.21 / 8.52 */
-  --wdi-text-muted: rgb(var(--wdi-bone-rgb) / 0.72); /* on surface 5.5, on bg 7.6 */
+  --wdi-text-muted: rgb(var(--wdi-bone-rgb) / 0.72); /* on surface 5.23, on bg 6.80 (docs/UI.md 10) */
   --wdi-text-on-paper: var(--wdi-ink); /* 12.21 */
   --wdi-text-on-paper-muted: var(--wdi-slate); /* 8.52 */
   --wdi-stroke: var(--wdi-ink); /* the 2 px ink stroke of every paper element */

@@ -122,6 +122,7 @@ export function placeNewPlayers(room: PartyRoom): void {
     sim.profile = profileFor(Math.min(MAX_PLAYERS, Math.max(MIN_PLAYERS_TO_START, room.state.players.size)));
     applyProfileToDoors(room);
   }
+  let placedAny = false;
   for (const [sessionId, p] of sim.players) {
     if (p.placed) continue;
     const player = room.state.players.get(sessionId);
@@ -130,8 +131,11 @@ export function placeNewPlayers(room: PartyRoom): void {
     if (enterScene(room, player, p, 'overworld', spawn, false)) {
       p.placed = true;
       player.alive = true;
+      placedAny = true;
     }
   }
+  // Views follow the placement in the same step, so nobody's presence arrives before its sceneEnter.
+  if (placedAny) sim.viewsDirty = true;
 }
 
 /**

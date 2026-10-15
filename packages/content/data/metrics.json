@@ -15,5 +15,6 @@
   },
   "render": { "fps": 12, "overscan": 0.03, "propCellPx": { "min": 64, "max": 128 } },
   "overworldTiles": { "w": 64, "h": 48 },
-  "interiorCameraFollow": true
+  "interiorCameraFollow": true,
+  "collisionBoxTiles": 0.5
 }

@@ -182,6 +182,15 @@ describe('role card to play', () => {
     expect(room.state.phase).toBe(Phase.grace);
     expect(received(bots[2] as Bot, S2C.sceneEnter)).toHaveLength(1);
   });
+
+  it('refuses a seat whose join completes after Start', async () => {
+    const { bots, room } = await party(4);
+    bots[0]?.room.send(C2S.lobbyStart, {});
+    await sleep(300);
+    expect(room.state.phase).toBe(Phase.roleReveal);
+    expect(() => room.onJoin({ sessionId: 'late-seat' } as never, opts('Late'))).toThrow();
+    expect(room.state.players.has('late-seat')).toBe(false);
+  });
 });
 
 describe('privacy after Start', () => {

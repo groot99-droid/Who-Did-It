@@ -12,8 +12,8 @@ import { sceneMapKey, sceneMapUrl } from '../view/assets';
 import { isTouchDevice, readDevFlags } from '../view/devFlags';
 import { getNet } from './registry';
 
-/** How close a player must stand to a door to use it, in tiles (mirrors the server's PORTAL_REACH_TILES). */
-const PORTAL_REACH_TILES = 1.5;
+/** How close a player must stand to a door to use it, in tiles (balance.json `doors.reachTiles`, GDD 3.7). */
+const PORTAL_REACH_TILES = balance.doors.reachTiles;
 /** The World scene shows about this many tiles top to bottom whatever the window size. */
 const VIEW_TILES_HIGH = 11;
 const REG_INPUT = 'worldInput';

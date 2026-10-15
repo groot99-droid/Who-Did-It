@@ -22,5 +22,7 @@ export const MetricsFile = z.strictObject({
   }),
   overworldTiles: z.strictObject({ w: z.number().int(), h: z.number().int() }),
   interiorCameraFollow: z.literal(true),
+  /** Side of the square collision box under a player's feet, in tiles (WORLD 4.2). */
+  collisionBoxTiles: z.number().positive().max(1),
 });
 export type MetricsFile = z.infer<typeof MetricsFile>;

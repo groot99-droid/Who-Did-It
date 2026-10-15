@@ -33,16 +33,16 @@ export class Hud {
 
   constructor(parent: HTMLElement, base = import.meta.env.BASE_URL) {
     this.chipIcon = h('img', {
-      class: 'wdi-chip-icon',
+      class: 'wdi-world-chip-icon',
       alt: '',
       src: `${base}assets/ui/icons/${ICON.village}.svg`,
     });
     this.chipText = h('span');
-    this.chip = h('div', { class: 'wdi-chip', hidden: true }, this.chipIcon, this.chipText);
-    this.timer = h('div', { class: 'wdi-timer' }, '--:--');
-    this.toast = h('div', { class: 'wdi-toast', role: 'status' });
-    this.fps = h('div', { class: 'wdi-fps', hidden: true });
-    this.root = h('div', { class: 'wdi-hud' }, this.chip, this.timer, this.toast, this.fps);
+    this.chip = h('div', { class: 'wdi-world-chip', hidden: true }, this.chipIcon, this.chipText);
+    this.timer = h('div', { class: 'wdi-world-timer' }, '--:--');
+    this.toast = h('div', { class: 'wdi-world-toast', role: 'status' });
+    this.fps = h('div', { class: 'wdi-world-fps', hidden: true });
+    this.root = h('div', { class: 'wdi-world-hud' }, this.chip, this.timer, this.toast, this.fps);
     parent.append(this.root);
   }
 

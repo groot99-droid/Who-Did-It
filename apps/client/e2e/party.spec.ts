@@ -52,6 +52,9 @@ test('create, join by deep link, start with 4 bots, both browsers get a role car
     await guest.getByTestId('ready').click();
     await expect(host.getByTestId('entered')).toContainText('overworld');
     await expect(guest.getByTestId('entered')).toContainText('overworld');
+    // The World scene starts from the same sceneEnter (M2): its HUD timer is the proof of entry.
+    await expect(host.locator('.wdi-world-timer')).toBeVisible();
+    await expect(guest.locator('.wdi-world-timer')).toBeVisible();
     await expect(host.getByTestId('rolecard')).toBeHidden();
     await host.keyboard.press('Tab');
     await expect(host.getByTestId('role-name')).toHaveText(hostRole);

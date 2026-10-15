@@ -12,3 +12,4 @@ packages/content/data
 apps/client/public/assets
 assets/source
 docs/PROTOCOL.md
+apps/client/test-results

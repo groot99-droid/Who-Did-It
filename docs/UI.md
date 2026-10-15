@@ -309,7 +309,7 @@ the classes. Today's selectors map as follows:
 | `.team-*` + `.stripe` | `.wdi-card--village/--cabal/--neutral` + `.wdi-card__stripe` |
 | `.role-name`, `.look`, `.goal`, `.abilities li`, `kbd`, `.inventory li`, `.text`, `.beware`, `.mates` | `.wdi-card__title`, `__look`, `__goal`, `__ability`, `.wdi-kbd`, `__inventory` > `.wdi-chip`, `__text`, `__beware`, `__mates` |
 | `.timer`, `.timer-bar` | `.wdi-timer`, `.wdi-timer__bar.is-running` (set `--wdi-timer-duration` or rely on `--wdi-card-hold`) |
-| `.chip` (HUD) | `.wdi-hud-chip` inside `.wdi-hud > .wdi-hud__tl` |
+| `.wdi-world-chip` (the World HUD in `view/hud.css` keeps a `wdi-world-*` namespace until it adopts the theme) | `.wdi-hud-chip` inside `.wdi-hud > .wdi-hud__tl` |
 
 The `h()` factory needs no change. The role card's `no-motion` class becomes unnecessary: the
 flip's transition is zero under `prefers-reduced-motion` already.

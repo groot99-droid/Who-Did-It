@@ -142,6 +142,8 @@ export const BalanceFile = z.strictObject({
     swingS: Seconds,
     transitS: Seconds,
     sceneFadeS: Seconds,
+    /** A door is usable from this many tiles of its tile centre (GDD 3.7). */
+    reachTiles: z.number().positive(),
   }),
   tasks: Section({
     cabalFakeList: z.boolean(),

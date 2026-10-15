@@ -7,7 +7,8 @@ import { getHealth, getNet } from './registry';
 
 /**
  * Shows the player's own private card. The payload is held in the net service (for Tab) and the card
- * DOM only. When the server sends `sceneEnter` the match has begun; the World scene starts from it.
+ * DOM only. When the server sends `sceneEnter` the match has begun: the world router starts the World
+ * scene from it, and this scene sleeps so its card DOM (and Tab) survive into play.
  */
 export class RoleReveal extends Phaser.Scene {
   private card: RoleCardScreen | null = null;
@@ -30,14 +31,23 @@ export class RoleReveal extends Phaser.Scene {
 
     const banner = h('p', { class: 'hint', role: 'status', 'data-testid': 'entered' });
     overlayRoot().append(banner);
+    let hideBanner = 0;
     const onEnter = (enter: SceneEnterPayload) => {
       banner.textContent = `The village wakes: ${enter.sceneId}, ${enter.spawn}.`;
-      // World arrives with M2; start it as soon as the scene is registered.
-      if (this.scene.manager.keys['World'] !== undefined) this.scene.start('World', { enter });
+      banner.hidden = false;
+      window.clearTimeout(hideBanner);
+      hideBanner = window.setTimeout(() => (banner.hidden = true), 2500);
+      // The world router (net/worldRouter.ts) starts the World scene; this scene only steps aside, once.
+      net.bus.off('sceneEnter', onEnter);
+      if (this.scene.isActive()) this.scene.sleep();
     };
+    const onLeft = () => this.scene.stop();
     net.bus.on('sceneEnter', onEnter);
+    net.bus.on('left', onLeft);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       net.bus.off('sceneEnter', onEnter);
+      net.bus.off('left', onLeft);
+      window.clearTimeout(hideBanner);
       banner.remove();
       this.card?.destroy();
       this.card = null;

@@ -1,5 +1,5 @@
 import { randomInt } from 'node:crypto';
-import { abilities, balance, items, roles, scenes } from '@wdi/content';
+import { abilities, balance, items, roles } from '@wdi/content';
 import {
   ABILITY_KEYS,
   C2S,
@@ -10,7 +10,6 @@ import {
   S2C,
   Team,
   TICK_RATE,
-  TILE_PX,
   TRAIT_IDS,
   assignRoles,
   dealTraits,
@@ -189,26 +188,14 @@ export function startMatch(room: PartyRoom): void {
   }
 }
 
-/** roleReveal -> first play phase: everyone enters the overworld at a square spawn. */
+/**
+ * roleReveal -> first play phase. Placement is the sim's job: once the phase is a world phase,
+ * `placeNewPlayers` (sim/Portals.ts) spreads everyone over the `square_<n>` spawns inside the next
+ * step and sends the one `sceneEnter`; nothing here touches positions or scenes.
+ */
 export function beginPlay(room: PartyRoom): void {
   setPhase(room, Phase.grace, balance.phases.graceS);
-  const overworld = scenes.overworld;
-  const square = overworld.spawns.filter((s) => s.id.startsWith('square_'));
-  const spawns = square.length > 0 ? square : overworld.spawns;
-  let seat = 0;
-  room.state.players.forEach((player: PlayerState, id: string) => {
-    const spawn = spawns[seat++ % spawns.length] as (typeof spawns)[number];
+  room.state.players.forEach((player: PlayerState) => {
     player.ready = false;
-    player.sceneId = 0;
-    if (player.presence) {
-      player.presence.x = spawn.x * TILE_PX + TILE_PX / 2;
-      player.presence.y = spawn.y * TILE_PX + TILE_PX / 2;
-      player.presence.z = spawn.z;
-    }
-    room.clients.getById(id)?.send(S2C.sceneEnter, {
-      sceneId: overworld.id,
-      spawn: spawn.id,
-      facing: spawn.facing,
-    });
   });
 }

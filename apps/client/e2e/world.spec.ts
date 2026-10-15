@@ -11,13 +11,13 @@ async function toWorld(page: import('@playwright/test').Page, query = '') {
   await page.getByTestId('start').click();
   await page.getByTestId('confirm-start').click();
   await page.getByTestId('ready').click();
-  await expect(page.locator('.wdi-timer')).toBeVisible();
+  await expect(page.locator('.wdi-world-timer')).toBeVisible();
 }
 
 test('the village shows the HUD, six bots in view, and the player can walk', async ({ page }, info) => {
   await toWorld(page, '&fps=1');
-  await expect(page.locator('.wdi-fps')).toContainText('7 in view');
-  await expect(page.locator('.wdi-fps')).toContainText('overworld');
+  await expect(page.locator('.wdi-world-fps')).toContainText('7 in view');
+  await expect(page.locator('.wdi-world-fps')).toContainText('overworld');
   await page.waitForTimeout(800);
   await page.screenshot({ path: info.outputPath('village.png') });
   await page.keyboard.down('KeyS');
@@ -28,7 +28,7 @@ test('the village shows the HUD, six bots in view, and the player can walk', asy
 
 test('the touch controls appear with ?touch=1', async ({ page }) => {
   await toWorld(page, '&touch=1');
-  await expect(page.locator('.wdi-stick')).toBeVisible();
+  await expect(page.locator('.wdi-world-stick')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Use' })).toBeVisible();
 });
 
@@ -36,7 +36,7 @@ test('walking to the tavern door and pressing E enters the bar, and back out aga
   page,
 }, info) => {
   await toWorld(page, '&fps=1');
-  const fps = page.locator('.wdi-fps');
+  const fps = page.locator('.wdi-world-fps');
   // From the first square spawn straight south to the lane in front of the tavern door, then use it.
   await page.keyboard.down('Space');
   await page.keyboard.down('KeyA'); // one tile west: the square spawn column is walled in lower down
@@ -46,6 +46,11 @@ test('walking to the tavern door and pressing E enters the bar, and back out aga
   await page.waitForTimeout(3000);
   await page.keyboard.up('KeyS');
   await page.keyboard.up('Space');
+  // Back onto the door's column so the use check is not a diagonal at the edge of reach.
+  await page.keyboard.down('KeyD');
+  await page.waitForTimeout(220);
+  await page.keyboard.up('KeyD');
+  await page.waitForTimeout(300);
   await page.screenshot({ path: info.outputPath('at-door.png') });
   await page.keyboard.press('KeyE');
   await expect(fps).toContainText('tavern_bar', { timeout: 5000 });

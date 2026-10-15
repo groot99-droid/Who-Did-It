@@ -30,8 +30,9 @@ export function installWorldRouter(
     feed = next;
     game.registry.set(REG_WORLD, next);
     const onEnter = (data: SceneEnter) => {
-      // The lobby screens are done once the world starts; stopping them removes their DOM.
-      for (const key of ['Landing', 'Lobby', 'RoleReveal']) {
+      // The lobby screens are done once the world starts; stopping them removes their DOM. RoleReveal
+      // is not stopped: it sleeps itself and keeps the card's DOM so Tab can reopen it during play.
+      for (const key of ['Landing', 'Lobby']) {
         if (game.scene.isActive(key) || game.scene.isSleeping(key)) game.scene.stop(key);
       }
       game.scene.start('World', data);
@@ -47,12 +48,14 @@ export function installWorldRouter(
   stops.push(() => net.bus.off('roleReveal', onReveal as never));
 
   if (options.mock) {
-    // The mock lobby has no world; start one when the player confirms the role card.
+    // The mock lobby has no world; start one when the player confirms the role card (the card's
+    // Ready sends `lobby.ready {ready: true}` while a card is held; the lobby's toggle has no card yet).
     const send = net.send.bind(net);
     let started = false;
     net.send = ((type, payload) => {
       send(type, payload);
-      if (type === 'role.ready' && !started) {
+      const ready = (payload as { ready?: boolean } | undefined)?.ready === true;
+      if (type === 'lobby.ready' && ready && net.roleCard !== null && !started) {
         started = true;
         void import('./mock/worldMock').then(async (m) => {
           const feedMock = new m.MockWorldFeed(

@@ -231,3 +231,41 @@ Suggested merge order: F, G, I, H, J.
 ### Round 2 log: F (M1 finish)
 
 Done on `claude/m1-finish`: follow-ups 1 to 3 and the 5.4 excerpt of item 4 above. For G: lobby and role-card messages (`lobby.start`, `lobby.ready`, `role.ready`) go to `PartyRoom.lobbyCommands`, not `commands`, so `sim/Commands.ts` never sees them and its `lobby.ready` case is dead code you can delete. `PartyRoom` calls `runLobbyCommands` and `runLobbyPhase` after `step()`. `net.roleCard` keeps the player's own card for Tab in any scene; `RoleReveal` starts a `World` scene (if registered) on `sceneEnter`. The server runs from source with `pnpm --filter @wdi/server serve` (tsx needs `--conditions=development` to read `@wdi/content` source).
+
+## Integration log, round 2 (2026-10-15)
+
+All five sessions finished their briefs; H and I were cut off by the org usage limit after their PRs
+were up and resumed on 2026-10-15. The orchestrator merged F, G, I, H, J in that order (conflicts: the
+F/G union in `apps/client/package.json`, `PartyRoom.ts` imports, `tsup.config.ts`, root scripts and
+`tools/bots/package.json`; the H/J union in `CREDITS.md` and `MANIFEST.md`; the lockfile), ran the
+unit suites, the Playwright suites against the real server, and a review pass, then fixed the seams in
+one commit (DECISIONS A29):
+
+- One first `sceneEnter` per player (the sim places; the lobby handler only switches the phase).
+- One starter of the World scene (the router); the role card sleeps so Tab still reopens it in play;
+  the mock world triggers on the card's `lobby.ready`; its loop keeps wall-clock time under load.
+- A seat that completes its join after Start is refused (test added).
+- Door reach and the collision box moved from code into `balance.json` and `metrics.json` (GDD 3.7,
+  WORLD 4.2); the dead `lobby.ready` branch left `sim/Commands.ts`; placement marks views dirty.
+- The default asset manifest's stand-in paths no longer climb above `assets/`.
+- The World HUD classes are namespaced `wdi-world-*` so the theme's opt-in cannot restyle them.
+- Credits rows for the two self-hosted OFL fonts; `docs/UI.md` in the docs index; the 5.6 step
+  excerpt and the tsup bundling note in ARCHITECTURE.
+
+### Follow-ups for round 3
+
+1. **Client room exposure**: `net/worldRouter.ts` still reads `NetworkService`'s private room through a
+   cast and polls it every 250 ms, and `sceneEnter` is registered on the room twice; expose the room (a
+   getter or event) and attach the world feed from there.
+2. **HUD adopts the theme**: replace `view/hud.css` with the `wdi-hud-*` components of `docs/UI.md`
+   (the `wdi-world-*` namespace then disappears), and wire the lobby, card and landing screens to
+   `ui/theme/` per its README.
+3. **M3 first playable**: kill -> body -> clues -> report -> meeting -> vote -> win, per ROADMAP M3; then
+   M3b quick mode, M3c NPC fill.
+4. **Art**: the owner's sign-off on the villager block-out contact sheet; the real buildings, tiles and
+   clue sprites still point at placeholder stand-ins in the default manifest.
+5. **Small**: `placeNewPlayers` scans every sim player each tick to see whether the profile is fixed
+   (keep a flag); `assets/source/MANIFEST.md` is not prettier-formatted (ignored by lint).
+6. **Owner**: GitHub Pages source and `VITE_SERVER_URL`; the Render service; a 2022 mid-range Android
+   frame-rate check and the first 2-4 person playtest (M2 exit); run the studio pipeline from the ROSW
+   checkout for the notes PR groot99-droid/Pipelines-Plugin#10 lists.
