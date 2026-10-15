@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Last house">
+  <title>Last house</title>
+  <path d="M11 42 V8 H37 V42" />
+  <path d="M15 42 V12 H33 V42 Z" fill="#D9D2C2"/>
+  <circle cx="28" cy="27" r="1.5" fill="#12141C"/>
+  <path d="M7 42 H41" />
+</svg>

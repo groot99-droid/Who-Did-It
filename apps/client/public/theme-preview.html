@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#12141C" />
+    <title>Who Did It: theme preview</title>
+    <!-- Served by the Vite dev server (pnpm --filter @wdi/client dev); see src/ui/theme/README.md. -->
+    <link rel="stylesheet" href="/Who-Did-It/src/ui/theme/tokens.css" />
+    <link rel="stylesheet" href="/Who-Did-It/src/ui/theme/components.css" />
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        padding: var(--wdi-space-5) var(--wdi-space-4) 120px;
+      }
+      .demo {
+        max-width: 960px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: var(--wdi-space-6);
+      }
+      .demo > section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--wdi-space-3);
+      }
+      .demo h2 {
+        padding-bottom: var(--wdi-space-2);
+        border-bottom: var(--wdi-stroke-w) solid var(--wdi-hairline);
+      }
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: var(--wdi-space-2);
+      }
+      .swatch {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: var(--wdi-space-2);
+        border-radius: var(--wdi-radius-sm);
+        border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+        font-size: var(--wdi-text-xs);
+        font-family: var(--wdi-font-display);
+        letter-spacing: var(--wdi-tracking-caps);
+        text-transform: uppercase;
+      }
+      .swatch span {
+        font-family: var(--wdi-font-text);
+        letter-spacing: 0;
+        text-transform: none;
+      }
+      .scale li {
+        display: flex;
+        gap: var(--wdi-space-3);
+        align-items: baseline;
+      }
+      .scale code {
+        flex: none;
+        width: 11em;
+        font-size: var(--wdi-text-xs);
+        color: var(--wdi-text-muted);
+      }
+      .cards {
+        display: flex;
+        gap: var(--wdi-space-4);
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .static {
+        position: static;
+        transform: none;
+        left: auto;
+        width: auto;
+      }
+      .relative {
+        position: relative;
+        height: 220px;
+        border-radius: var(--wdi-radius-md);
+        background: var(--wdi-surface);
+        box-shadow: inset 0 0 0 1px var(--wdi-hairline);
+      }
+      .relative .wdi-hud {
+        position: absolute;
+      }
+      ul.plain {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body class="wdi-root">
+    <main class="demo">
+      <header class="wdi-stack wdi-stack--tight">
+        <p class="wdi-eyebrow">Who Did It: design system</p>
+        <h1 class="wdi-display wdi-display--xl">Theme preview</h1>
+        <p class="wdi-muted">
+          Every component of <code>src/ui/theme</code> in night mode. The design is written up in
+          <code>docs/UI.md</code>. Resize to 390 px and zoom to 200% to check the floor.
+        </p>
+      </header>
+
+      <section>
+        <h2 class="wdi-subtitle">Palette</h2>
+        <div class="swatches">
+          <div class="swatch" style="background: var(--wdi-ink); color: var(--wdi-bone)">
+            ink<span>#12141C</span>
+          </div>
+          <div class="swatch" style="background: var(--wdi-slate); color: var(--wdi-bone)">
+            slate<span>#2C3240</span>
+          </div>
+          <div class="swatch" style="background: var(--wdi-fog); color: var(--wdi-ink)">
+            fog<span>#6F7A8C</span>
+          </div>
+          <div class="swatch" style="background: var(--wdi-bone); color: var(--wdi-ink)">
+            bone<span>#D9D2C2</span>
+          </div>
+          <div class="swatch" style="background: var(--wdi-mustard); color: var(--wdi-ink)">
+            mustard<span>#F2B33D</span>
+          </div>
+          <div class="swatch" style="background: var(--wdi-teal); color: var(--wdi-ink)">
+            teal<span>#2EC4B6</span>
+          </div>
+          <div class="swatch" style="background: var(--wdi-magenta); color: var(--wdi-ink)">
+            magenta<span>#E04E9A</span>
+          </div>
+          <div class="swatch" style="background: var(--wdi-blood); color: var(--wdi-bone)">
+            blood<span>#B3121F</span>
+          </div>
+          <div class="swatch" style="background: var(--wdi-lantern); color: var(--wdi-ink)">
+            lantern<span>#FFB457</span>
+          </div>
+          <div class="swatch" style="background: var(--wdi-moon); color: var(--wdi-ink)">
+            moon<span>#7FA8FF</span>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="wdi-subtitle">Type scale</h2>
+        <ul class="plain scale wdi-stack wdi-stack--tight">
+          <li><code>display-xl 44 Oswald</code><span class="wdi-display wdi-display--xl">K7PQX</span></li>
+          <li>
+            <code>display-lg 32 Oswald</code
+            ><span class="wdi-display wdi-display--lg">Gather your party</span>
+          </li>
+          <li>
+            <code>display-md 24 Oswald</code><span class="wdi-display wdi-display--md">Players 5 / 10</span>
+          </li>
+          <li>
+            <code>display-sm 18 Oswald</code><span class="wdi-display wdi-display--sm">Create party</span>
+          </li>
+          <li>
+            <code>text-lg 18 Inter</code
+            ><span class="wdi-text wdi-text--lg">Collect, inspect, cross-reference.</span>
+          </li>
+          <li>
+            <code>text-md 16 Inter</code
+            ><span class="wdi-text">Roles are dealt at once and the party locks.</span>
+          </li>
+          <li>
+            <code>text-sm 14 Inter</code
+            ><span class="wdi-text wdi-text--sm">Need at least 4 players to start.</span>
+          </li>
+          <li><code>text-xs 12 caps</code><span class="wdi-eyebrow">Best with 6 to 8 players</span></li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="wdi-subtitle">Buttons</h2>
+        <div class="wdi-row wdi-row--wrap">
+          <button class="wdi-btn wdi-btn--primary">Create party</button>
+          <button class="wdi-btn">Join party</button>
+          <button class="wdi-btn wdi-btn--ghost">Leave</button>
+          <button class="wdi-btn wdi-btn--danger">Vote to eject</button>
+          <button class="wdi-btn wdi-btn--primary" disabled>Waking the village...</button>
+          <button class="wdi-btn" aria-busy="true">Connecting</button>
+        </div>
+        <div class="wdi-row wdi-row--wrap">
+          <button class="wdi-btn wdi-btn--sm">Copy invite link</button>
+          <button class="wdi-btn wdi-btn--lg wdi-btn--primary">Ready</button>
+          <button class="wdi-btn wdi-btn--icon" aria-label="Close">
+            <img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_close.svg" alt="" />
+          </button>
+          <button class="wdi-btn">
+            <img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_link.svg" alt="" /> Copy link
+          </button>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="wdi-subtitle">Inputs</h2>
+        <div class="wdi-panel wdi-stack">
+          <div class="wdi-field">
+            <label class="wdi-label" for="name">Your name</label>
+            <input class="wdi-input" id="name" value="Tamsin" />
+            <p class="wdi-field__msg">2 to 16 characters</p>
+          </div>
+          <div class="wdi-row">
+            <input class="wdi-input wdi-input--code" value="K7PQX" aria-label="Party code" />
+            <button class="wdi-btn wdi-grow">Join party</button>
+          </div>
+          <div class="wdi-field">
+            <input class="wdi-input" aria-invalid="true" value="X" aria-label="Name with an error" />
+            <p class="wdi-field__msg wdi-field__msg--error" role="alert">
+              <img
+                class="wdi-icon wdi-icon--sm"
+                src="/Who-Did-It/assets/ui/glyphs/glyph_warning.svg"
+                alt=""
+              />
+              Name must be 2 to 16 characters.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="wdi-subtitle">Chips</h2>
+        <div class="wdi-row wdi-row--wrap">
+          <span class="wdi-chip">you</span>
+          <span class="wdi-chip wdi-chip--lead">leader</span>
+          <span class="wdi-chip wdi-chip--ready"
+            ><img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_check.svg" alt="" />ready</span
+          >
+          <span class="wdi-chip wdi-chip--quiet"
+            ><img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_clock.svg" alt="" />away</span
+          >
+          <span class="wdi-chip wdi-chip--verified"
+            ><img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_lens.svg" alt="" />verified</span
+          >
+          <span class="wdi-chip"
+            ><img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_eye.svg" alt="" />claimed</span
+          >
+          <span class="wdi-chip wdi-chip--danger"
+            ><img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_warning.svg" alt="" />forged</span
+          >
+          <span class="wdi-chip wdi-chip--vote"
+            ><img class="wdi-icon" src="/Who-Did-It/assets/ui/marks/mark_vote_stamp.svg" alt="votes" />3</span
+          >
+        </div>
+        <div class="wdi-quick">
+          <button class="wdi-chip wdi-chip--claim">I saw Marlow at the Apothecary around 3:40</button>
+          <button class="wdi-chip wdi-chip--claim is-selected">
+            I was the Sin-Eater: Pell's loaf was Mourner
+          </button>
+          <button class="wdi-chip wdi-chip--claim">Where were you?</button>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="wdi-subtitle">Icons on dark: the paper disc</h2>
+        <div class="wdi-row wdi-row--wrap">
+          <span class="wdi-icon-disc"
+            ><img class="wdi-icon" src="/Who-Did-It/assets/ui/icons/icon_hat_bowler.svg" alt="Bowler hat"
+          /></span>
+          <span class="wdi-icon-disc"
+            ><img class="wdi-icon" src="/Who-Did-It/assets/ui/icons/icon_scarf_green.svg" alt="Green scarf"
+          /></span>
+          <span class="wdi-icon-disc"
+            ><img class="wdi-icon" src="/Who-Did-It/assets/ui/icons/icon_height_tall.svg" alt="Tall"
+          /></span>
+          <span class="wdi-icon-disc wdi-icon-disc--lg"
+            ><img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/marks/mark_bell.svg" alt="Bell"
+          /></span>
+          <span class="wdi-icon-disc wdi-icon-disc--lg"
+            ><img
+              class="wdi-icon wdi-icon--lg"
+              src="/Who-Did-It/assets/ui/marks/mark_notebook_tab.svg"
+              alt="Notebook"
+          /></span>
+          <span class="wdi-icon-disc wdi-icon-disc--lg"
+            ><img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/marks/mark_plate.svg" alt="Plate"
+          /></span>
+          <span class="wdi-icon-disc wdi-icon-disc--lg"
+            ><img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/marks/mark_loaf.svg" alt="Loaf"
+          /></span>
+          <span class="wdi-icon-disc wdi-icon-disc--lg"
+            ><img
+              class="wdi-icon wdi-icon--lg"
+              src="/Who-Did-It/assets/ui/marks/mark_vote_stamp.svg"
+              alt="Vote stamp"
+          /></span>
+          <kbd class="wdi-kbd">E</kbd>
+          <kbd class="wdi-kbd">Shift</kbd>
+          <kbd class="wdi-kbd">Tab</kbd>
+        </div>
+        <div class="wdi-row wdi-row--wrap">
+          <img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/glyphs/glyph_check.svg" alt="check" />
+          <img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/glyphs/glyph_close.svg" alt="close" />
+          <img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/glyphs/glyph_copy.svg" alt="copy" />
+          <img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/glyphs/glyph_link.svg" alt="link" />
+          <img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/glyphs/glyph_clock.svg" alt="clock" />
+          <img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/glyphs/glyph_chat.svg" alt="chat" />
+          <img
+            class="wdi-icon wdi-icon--lg"
+            src="/Who-Did-It/assets/ui/glyphs/glyph_chevron.svg"
+            alt="chevron"
+          />
+          <img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/glyphs/glyph_skip.svg" alt="skip" />
+          <img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/glyphs/glyph_ghost.svg" alt="ghost" />
+          <img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/glyphs/glyph_lock.svg" alt="lock" />
+          <img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/glyphs/glyph_eye.svg" alt="eye" />
+          <img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/glyphs/glyph_lens.svg" alt="lens" />
+          <img
+            class="wdi-icon wdi-icon--lg"
+            src="/Who-Did-It/assets/ui/glyphs/glyph_warning.svg"
+            alt="warning"
+          />
+          <img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/glyphs/glyph_door.svg" alt="door" />
+          <img class="wdi-icon wdi-icon--lg" src="/Who-Did-It/assets/ui/glyphs/glyph_hand.svg" alt="hand" />
+        </div>
+        <p class="wdi-hint">Ink-stroked glyphs vanish on slate; the disc is the rule (SPRITES.md 9).</p>
+      </section>
+
+      <section>
+        <h2 class="wdi-subtitle">Roster</h2>
+        <div class="wdi-panel">
+          <ul class="wdi-roster">
+            <li class="wdi-roster__row">
+              <span class="wdi-seat">T</span>
+              <span class="wdi-grow"
+                ><span class="wdi-roster__name">Tamsin</span
+                ><span class="wdi-roster__meta">joined first</span></span
+              >
+              <span class="wdi-roster__tags"
+                ><span class="wdi-chip">you</span><span class="wdi-chip wdi-chip--lead">leader</span></span
+              >
+            </li>
+            <li class="wdi-roster__row">
+              <span class="wdi-seat">M</span>
+              <span class="wdi-grow"><span class="wdi-roster__name">Marlow</span></span>
+              <span class="wdi-roster__tags"
+                ><span class="wdi-chip wdi-chip--ready"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/glyphs/glyph_check.svg"
+                    alt=""
+                  />ready</span
+                ></span
+              >
+            </li>
+            <li class="wdi-roster__row is-away">
+              <span class="wdi-seat">P</span>
+              <span class="wdi-grow"
+                ><span class="wdi-roster__name">Pell</span
+                ><span class="wdi-roster__meta">reconnecting</span></span
+              >
+              <span class="wdi-roster__tags"
+                ><span class="wdi-chip wdi-chip--quiet"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/glyphs/glyph_clock.svg"
+                    alt=""
+                  />away</span
+                ></span
+              >
+            </li>
+            <li class="wdi-roster__row is-dead">
+              <span class="wdi-seat"
+                ><img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_ghost.svg" alt=""
+              /></span>
+              <span class="wdi-grow"
+                ><span class="wdi-roster__name">Osric</span
+                ><span class="wdi-roster__meta"
+                  >fits 1/1 known traits, claimed 0, last house: Apothecary</span
+                ></span
+              >
+              <span class="wdi-roster__tags"
+                ><span class="wdi-chip wdi-chip--quiet"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/glyphs/glyph_ghost.svg"
+                    alt=""
+                  />dead</span
+                ></span
+              >
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="wdi-subtitle">Cards: faction frames (own card and reveal only) and the back</h2>
+        <div class="cards">
+          <article class="wdi-card wdi-card--village" aria-label="Your role card">
+            <div class="wdi-card__stripe">
+              <img
+                class="wdi-icon"
+                src="/Who-Did-It/assets/ui/icons/icon_faction_village.svg"
+                alt=""
+              />Village
+            </div>
+            <h3 class="wdi-display wdi-card__title">Detective</h3>
+            <p class="wdi-card__look">
+              You look like
+              <span class="wdi-card__trait"
+                ><img
+                  class="wdi-icon"
+                  src="/Who-Did-It/assets/ui/icons/icon_height_tall.svg"
+                  alt=""
+                />Tall</span
+              >
+              <span class="wdi-card__trait"
+                ><img class="wdi-icon" src="/Who-Did-It/assets/ui/icons/icon_scarf_green.svg" alt="" />Green
+                scarf</span
+              >
+              <span class="wdi-card__trait"
+                ><img class="wdi-icon" src="/Who-Did-It/assets/ui/icons/icon_hat_bowler.svg" alt="" />Bowler
+                hat</span
+              >
+            </p>
+            <p class="wdi-card__goal">Find every Cabal member before they find you.</p>
+            <ul class="wdi-card__abilities">
+              <li class="wdi-card__ability">
+                <kbd class="wdi-kbd">Q</kbd><span>Inspect a clue (1 Lens)</span
+                ><span class="wdi-card__cooldown">3 s</span>
+              </li>
+              <li class="wdi-card__ability">
+                <kbd class="wdi-kbd">F</kbd><span>Dust for a print</span
+                ><span class="wdi-card__cooldown">2 charges</span>
+              </li>
+              <li class="wdi-card__ability">
+                <kbd class="wdi-kbd">C</kbd><span>Compare two prints</span
+                ><span class="wdi-card__cooldown"></span>
+              </li>
+            </ul>
+            <ul class="wdi-card__inventory">
+              <li class="wdi-chip">Magnifier</li>
+              <li class="wdi-chip">Notebook</li>
+              <li class="wdi-chip">Lens x3</li>
+              <li class="wdi-chip">Fingerprint kit</li>
+            </ul>
+            <p class="wdi-card__text">
+              Collect, inspect, cross-reference. Your Verified clues narrow the board; the village does the
+              rest.
+            </p>
+            <p class="wdi-card__beware">
+              <img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_warning.svg" alt="Beware" /><span
+                ><strong>Beware:</strong> prime target; the Rag erases clues; forgeries cost Lenses.</span
+              >
+            </p>
+            <div class="wdi-timer" aria-hidden="true"><div class="wdi-timer__bar is-running"></div></div>
+            <div class="wdi-card__footer">
+              <button class="wdi-btn wdi-btn--primary wdi-grow">Ready</button>
+              <span class="wdi-hint">Tab reopens</span>
+            </div>
+          </article>
+          <div class="wdi-stack">
+            <article class="wdi-card wdi-card--cabal" style="width: 280px">
+              <div class="wdi-card__stripe">
+                <img class="wdi-icon" src="/Who-Did-It/assets/ui/icons/icon_faction_cabal.svg" alt="" />Cabal
+              </div>
+              <h3 class="wdi-display wdi-card__title">Killer</h3>
+              <p class="wdi-card__goal">Reach parity.</p>
+              <p class="wdi-card__mates"><strong>Your Cabal:</strong> Marlow</p>
+            </article>
+            <article class="wdi-card wdi-card--neutral" style="width: 280px">
+              <div class="wdi-card__stripe">
+                <img
+                  class="wdi-icon"
+                  src="/Who-Did-It/assets/ui/icons/icon_faction_neutral.svg"
+                  alt=""
+                />Neutral
+              </div>
+              <h3 class="wdi-display wdi-card__title">Drifter</h3>
+              <p class="wdi-card__goal">Get yourself ejected.</p>
+            </article>
+            <article class="wdi-card wdi-card--back" style="width: 280px; min-height: 160px">
+              <p class="wdi-eyebrow">Your role</p>
+              <h3 class="wdi-display wdi-card__title">Who Did It</h3>
+              <p class="wdi-muted">Keep your screen to yourself.</p>
+            </article>
+            <article class="wdi-card" style="width: 280px">
+              <p class="wdi-eyebrow">Plain frame</p>
+              <p class="wdi-card__text">
+                Panels that are cards but not roles: the case file, a clue, a loaf.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="wdi-subtitle">HUD over the world</h2>
+        <div class="relative">
+          <div class="wdi-hud">
+            <div class="wdi-hud__tl">
+              <button class="wdi-hud-chip">
+                <span class="wdi-icon-disc"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/marks/mark_notebook_tab.svg"
+                    alt="" /></span
+                ><span class="wdi-hud-chip__text"
+                  ><span class="wdi-hud-chip__role">Your goal</span
+                  ><span class="wdi-hud-chip__goal">Find every Cabal member before they find you.</span></span
+                >
+              </button>
+            </div>
+            <div class="wdi-hud__tc">
+              <div class="wdi-hud-clock wdi-hud-clock--night">
+                <span class="wdi-hud-clock__phase">Night 1</span>0:48
+              </div>
+            </div>
+            <div class="wdi-hud__tr">
+              <div class="wdi-log">
+                <p class="wdi-log__line">A scream from the north</p>
+                <p class="wdi-log__line">Shift to sneak</p>
+              </div>
+            </div>
+            <div class="wdi-hud__bl">
+              <div class="wdi-stick"><div class="wdi-stick__knob"></div></div>
+            </div>
+            <div class="wdi-hud__br">
+              <div class="wdi-touch-cluster">
+                <button class="wdi-touch-btn"><span class="wdi-touch-btn__key">B</span>bell</button>
+                <button class="wdi-touch-btn wdi-touch-btn--primary">
+                  <span class="wdi-touch-btn__key">E</span>use
+                </button>
+                <button class="wdi-touch-btn"><span class="wdi-touch-btn__key">Shift</span>sneak</button>
+                <button class="wdi-touch-btn"><span class="wdi-touch-btn__key">Tab</span>card</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="wdi-subtitle">Portraits and the vote</h2>
+        <ul class="wdi-portraits">
+          <li>
+            <button class="wdi-portrait is-self">
+              <span class="wdi-portrait__pic"></span><span class="wdi-portrait__name">Tamsin</span
+              ><span class="wdi-portrait__traits"
+                ><img
+                  class="wdi-icon"
+                  src="/Who-Did-It/assets/ui/icons/icon_height_tall.svg"
+                  alt="Tall" /><img
+                  class="wdi-icon"
+                  src="/Who-Did-It/assets/ui/icons/icon_scarf_green.svg"
+                  alt="Green scarf" /><img
+                  class="wdi-icon"
+                  src="/Who-Did-It/assets/ui/icons/icon_hat_bowler.svg"
+                  alt="Bowler"
+              /></span>
+            </button>
+          </li>
+          <li>
+            <button class="wdi-portrait is-selected" aria-pressed="true">
+              <span class="wdi-portrait__pic"></span><span class="wdi-portrait__name">Marlow</span
+              ><span class="wdi-portrait__traits"
+                ><img
+                  class="wdi-icon"
+                  src="/Who-Did-It/assets/ui/icons/icon_height_short.svg"
+                  alt="Short" /><img
+                  class="wdi-icon"
+                  src="/Who-Did-It/assets/ui/icons/icon_scarf_red.svg"
+                  alt="Red scarf" /><img
+                  class="wdi-icon"
+                  src="/Who-Did-It/assets/ui/icons/icon_hat_cap.svg"
+                  alt="Cap" /></span
+              ><span class="wdi-chip wdi-chip--vote wdi-portrait__votes"
+                ><img
+                  class="wdi-icon"
+                  src="/Who-Did-It/assets/ui/marks/mark_vote_stamp.svg"
+                  alt="votes"
+                />3</span
+              >
+            </button>
+          </li>
+          <li>
+            <button class="wdi-portrait is-dead" disabled>
+              <img
+                class="wdi-icon wdi-portrait__ghost"
+                src="/Who-Did-It/assets/ui/glyphs/glyph_ghost.svg"
+                alt="Dead"
+              /><span class="wdi-portrait__pic"></span><span class="wdi-portrait__name">Osric</span
+              ><span class="wdi-portrait__traits"
+                ><img
+                  class="wdi-icon"
+                  src="/Who-Did-It/assets/ui/icons/icon_scarf_blue.svg"
+                  alt="Blue scarf" /><img
+                  class="wdi-icon"
+                  src="/Who-Did-It/assets/ui/icons/icon_hat_bare.svg"
+                  alt="Bare"
+              /></span>
+            </button>
+          </li>
+          <li>
+            <button class="wdi-portrait">
+              <span class="wdi-portrait__pic"></span><span class="wdi-portrait__name">Pell</span
+              ><span class="wdi-portrait__traits"
+                ><img
+                  class="wdi-icon"
+                  src="/Who-Did-It/assets/ui/icons/icon_scarf_blue.svg"
+                  alt="Blue scarf" /></span
+              ><img class="wdi-stamp" src="/Who-Did-It/assets/ui/marks/mark_vote_stamp.svg" alt="Ejected" />
+            </button>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="wdi-subtitle">Toasts, dialog, tabs</h2>
+        <div class="wdi-toasts static">
+          <div class="wdi-toast wdi-toast--interact" role="status">
+            <span class="wdi-icon-disc"
+              ><img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_hand.svg" alt="" /></span
+            >Hold E on a glowing clue<kbd class="wdi-kbd wdi-toast__kbd">E</kbd>
+          </div>
+          <div class="wdi-toast wdi-toast--hazard" role="alert">
+            <span class="wdi-icon-disc"
+              ><img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_warning.svg" alt="" /></span
+            >A scream from the north
+          </div>
+          <div class="wdi-toast wdi-toast--warm" role="status">
+            <span class="wdi-icon-disc"
+              ><img class="wdi-icon" src="/Who-Did-It/assets/ui/marks/mark_bell.svg" alt="" /></span
+            >B at the bell calls a meeting<kbd class="wdi-kbd wdi-toast__kbd">B</kbd>
+          </div>
+        </div>
+        <div class="wdi-panel wdi-dialog" role="dialog" aria-labelledby="d1">
+          <h3 class="wdi-display wdi-display--md wdi-dialog__title" id="d1">Start with 5 players?</h3>
+          <p class="wdi-dialog__body">
+            Roles are dealt at once and the party locks. Nobody can join after this. Pell is not ready.
+          </p>
+          <div class="wdi-dialog__actions">
+            <button class="wdi-btn wdi-btn--primary">Deal the roles</button
+            ><button class="wdi-btn wdi-btn--ghost">Not yet</button>
+          </div>
+        </div>
+        <div class="wdi-tabs" role="tablist">
+          <button class="wdi-tab" role="tab" aria-selected="true">Board</button>
+          <button class="wdi-tab" role="tab" aria-selected="false">Notebook</button>
+          <button class="wdi-tab" role="tab" aria-selected="false">Chat</button>
+        </div>
+        <div class="wdi-notebook" style="width: min(360px, 100%)">
+          <p class="wdi-eyebrow">Notebook</p>
+          <div class="wdi-notebook__entry">
+            <img class="wdi-icon" src="/Who-Did-It/assets/ui/icons/icon_height_tall.svg" alt="" /><span
+              >Footprints, long stride: Tall</span
+            ><span class="wdi-chip wdi-chip--verified">verified</span>
+          </div>
+          <div class="wdi-notebook__entry">
+            <img class="wdi-icon" src="/Who-Did-It/assets/ui/icons/icon_scarf_red.svg" alt="" /><span
+              >Thread on the wardrobe: Red scarf</span
+            ><span class="wdi-chip wdi-chip--quiet">claimed</span>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="wdi-subtitle">Timer and the 12 s hold</h2>
+        <div class="wdi-timer">
+          <div class="wdi-timer__bar is-running" style="--wdi-timer-duration: 12s"></div>
+        </div>
+        <p class="wdi-hint">
+          The bar drains over the card hold; the flip itself is skipped under reduced motion, the drain is
+          not.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

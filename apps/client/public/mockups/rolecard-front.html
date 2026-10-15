@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#12141C" />
+    <title>Who Did It mockup: Role card, front</title>
+    <!-- Static mockup built from the theme only; served by the dev server (src/ui/theme/README.md). -->
+    <link rel="stylesheet" href="/Who-Did-It/src/ui/theme/tokens.css" />
+    <link rel="stylesheet" href="/Who-Did-It/src/ui/theme/components.css" />
+    <style>
+      body {
+        margin: 0;
+        min-height: 100dvh;
+      }
+      #overlay {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--wdi-space-4);
+      }
+      .world {
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(circle at 62% 58%, rgb(var(--wdi-lantern-rgb) / 0.22), transparent 26%),
+          radial-gradient(circle at 20% 15%, rgb(var(--wdi-moon-rgb) / 0.16), transparent 40%),
+          repeating-linear-gradient(90deg, transparent 0 63px, rgb(var(--wdi-slate-rgb) / 0.5) 63px 64px),
+          repeating-linear-gradient(0deg, transparent 0 63px, rgb(var(--wdi-slate-rgb) / 0.5) 63px 64px),
+          var(--wdi-slate);
+      }
+      .world::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgb(var(--wdi-ink-rgb) / 0.55);
+      }
+      .house {
+        position: absolute;
+        background: var(--wdi-ink);
+        border: var(--wdi-stroke-w) solid var(--wdi-ink);
+        box-shadow: inset 0 0 0 2px var(--wdi-fog);
+      }
+      .fog {
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(ellipse at 50% 110%, rgb(var(--wdi-fog-rgb) / 0.35), transparent 60%),
+          radial-gradient(ellipse at 10% 0%, rgb(var(--wdi-moon-rgb) / 0.18), transparent 50%), var(--wdi-ink);
+      }
+    </style>
+  </head>
+  <body class="wdi-root">
+    <div class="fog"></div>
+    <div id="overlay">
+      <div class="wdi-flip">
+        <div class="wdi-flip__inner is-flipped">
+          <article
+            class="wdi-card wdi-card--village wdi-flip__face wdi-flip__face--front"
+            role="dialog"
+            aria-modal="false"
+            aria-label="Your role card"
+          >
+            <div class="wdi-card__stripe">
+              <img
+                class="wdi-icon"
+                src="/Who-Did-It/assets/ui/icons/icon_faction_village.svg"
+                alt=""
+              />Village
+            </div>
+            <h1 class="wdi-display wdi-card__title">Detective</h1>
+            <p class="wdi-card__look">
+              You look like
+              <span class="wdi-card__trait"
+                ><img
+                  class="wdi-icon"
+                  src="/Who-Did-It/assets/ui/icons/icon_height_tall.svg"
+                  alt=""
+                />Tall</span
+              >
+              <span class="wdi-card__trait"
+                ><img class="wdi-icon" src="/Who-Did-It/assets/ui/icons/icon_scarf_green.svg" alt="" />Green
+                scarf</span
+              >
+              <span class="wdi-card__trait"
+                ><img class="wdi-icon" src="/Who-Did-It/assets/ui/icons/icon_hat_bowler.svg" alt="" />Bowler
+                hat</span
+              >
+            </p>
+            <p class="wdi-card__goal">Find every Cabal member before they find you.</p>
+            <ul class="wdi-card__abilities">
+              <li class="wdi-card__ability">
+                <kbd class="wdi-kbd">Q</kbd><span>Inspect a clue (1 Lens)</span
+                ><span class="wdi-card__cooldown"
+                  ><img
+                    class="wdi-icon wdi-icon--sm"
+                    src="/Who-Did-It/assets/ui/glyphs/glyph_clock.svg"
+                    alt="takes"
+                  />3 s</span
+                >
+              </li>
+              <li class="wdi-card__ability">
+                <kbd class="wdi-kbd">F</kbd><span>Dust for a print</span
+                ><span class="wdi-card__cooldown">2 charges</span>
+              </li>
+              <li class="wdi-card__ability">
+                <kbd class="wdi-kbd">C</kbd><span>Compare two prints</span
+                ><span class="wdi-card__cooldown"></span>
+              </li>
+            </ul>
+            <ul class="wdi-card__inventory">
+              <li class="wdi-chip">Magnifier</li>
+              <li class="wdi-chip">Notebook</li>
+              <li class="wdi-chip">Lens x3</li>
+              <li class="wdi-chip">Fingerprint kit</li>
+            </ul>
+            <p class="wdi-card__text">
+              Collect, inspect, cross-reference. Your Verified clues narrow the board; the village does the
+              rest.
+            </p>
+            <p class="wdi-card__beware">
+              <img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_warning.svg" alt="Beware" /><span
+                ><strong>Beware:</strong> prime target; the Rag erases clues; forgeries cost Lenses; Compare
+                never gives a name.</span
+              >
+            </p>
+            <div class="wdi-timer" aria-hidden="true">
+              <div class="wdi-timer__bar" style="transform: scaleX(0.6)"></div>
+            </div>
+            <div class="wdi-card__footer">
+              <button class="wdi-btn wdi-btn--primary wdi-grow">Ready</button
+              ><span class="wdi-hint">Tab reopens</span>
+            </div>
+          </article>
+          <article class="wdi-card wdi-card--back wdi-flip__face wdi-flip__face--back">
+            <p class="wdi-eyebrow">Your role</p>
+            <h1 class="wdi-display wdi-card__title">Who Did It</h1>
+            <p class="wdi-muted">Keep your screen to yourself.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

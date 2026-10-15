@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Locked">
+  <title>Locked</title>
+  <rect x="10" y="21" width="28" height="21" rx="3" fill="#D9D2C2"/>
+  <path d="M16 21 V15 C16 10.5 19.5 7 24 7 C28.5 7 32 10.5 32 15 V21" />
+  <circle cx="24" cy="31" r="2.5" fill="#12141C"/>
+</svg>

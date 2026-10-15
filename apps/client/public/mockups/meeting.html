@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#12141C" />
+    <title>Who Did It mockup: Meeting</title>
+    <!-- Static mockup built from the theme only; served by the dev server (src/ui/theme/README.md). -->
+    <link rel="stylesheet" href="/Who-Did-It/src/ui/theme/tokens.css" />
+    <link rel="stylesheet" href="/Who-Did-It/src/ui/theme/components.css" />
+    <style>
+      body {
+        margin: 0;
+        min-height: 100dvh;
+      }
+      #overlay {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--wdi-space-4);
+      }
+      .world {
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(circle at 62% 58%, rgb(var(--wdi-lantern-rgb) / 0.22), transparent 26%),
+          radial-gradient(circle at 20% 15%, rgb(var(--wdi-moon-rgb) / 0.16), transparent 40%),
+          repeating-linear-gradient(90deg, transparent 0 63px, rgb(var(--wdi-slate-rgb) / 0.5) 63px 64px),
+          repeating-linear-gradient(0deg, transparent 0 63px, rgb(var(--wdi-slate-rgb) / 0.5) 63px 64px),
+          var(--wdi-slate);
+      }
+      .world::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgb(var(--wdi-ink-rgb) / 0.55);
+      }
+      .house {
+        position: absolute;
+        background: var(--wdi-ink);
+        border: var(--wdi-stroke-w) solid var(--wdi-ink);
+        box-shadow: inset 0 0 0 2px var(--wdi-fog);
+      }
+      .fog {
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(ellipse at 50% 110%, rgb(var(--wdi-fog-rgb) / 0.35), transparent 60%),
+          radial-gradient(ellipse at 10% 0%, rgb(var(--wdi-moon-rgb) / 0.18), transparent 50%), var(--wdi-ink);
+      }
+      .meet {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: var(--wdi-space-4);
+        width: min(1180px, 100%);
+        max-height: calc(100dvh - 32px);
+      }
+      .meet > * {
+        min-height: 0;
+      }
+      @media (max-width: 900px) {
+        .meet {
+          grid-template-columns: 1fr;
+          max-height: none;
+        }
+        #overlay {
+          align-items: flex-start;
+          overflow: auto;
+        }
+      }
+      .side {
+        display: flex;
+        flex-direction: column;
+        gap: var(--wdi-space-3);
+      }
+      .wdi-chat__log {
+        max-height: 180px;
+      }
+    </style>
+  </head>
+  <body class="wdi-root">
+    <div class="fog"></div>
+    <div id="overlay">
+      <div class="meet">
+        <section class="wdi-panel wdi-panel--wide wdi-stack" style="width: 100%" aria-labelledby="t">
+          <div class="wdi-row wdi-row--between wdi-row--wrap">
+            <div>
+              <p class="wdi-eyebrow">Meeting 1: a body in the apothecary loft</p>
+              <h1 class="wdi-display wdi-display--md" id="t">Who did it?</h1>
+            </div>
+            <div class="wdi-hud-clock"><span class="wdi-hud-clock__phase">Vote</span>0:41</div>
+          </div>
+          <ul class="wdi-portraits">
+            <li>
+              <button class="wdi-portrait is-self">
+                <span class="wdi-portrait__pic"></span><span class="wdi-portrait__name">Tamsin</span
+                ><span class="wdi-portrait__traits"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_height_tall.svg"
+                    alt="Tall" /><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_scarf_green.svg"
+                    alt="Green scarf" /><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_hat_bowler.svg"
+                    alt="Bowler"
+                /></span>
+              </button>
+            </li>
+            <li>
+              <button class="wdi-portrait is-selected" aria-pressed="true">
+                <span class="wdi-portrait__pic"></span><span class="wdi-portrait__name">Marlow</span
+                ><span class="wdi-portrait__traits"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_height_short.svg"
+                    alt="Short" /><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_scarf_red.svg"
+                    alt="Red scarf" /><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_hat_cap.svg"
+                    alt="Cap" /></span
+                ><span class="wdi-chip wdi-chip--vote wdi-portrait__votes"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/marks/mark_vote_stamp.svg"
+                    alt="votes"
+                  />3</span
+                >
+              </button>
+            </li>
+            <li>
+              <button class="wdi-portrait is-dead" disabled>
+                <span class="wdi-portrait__pic"></span><span class="wdi-portrait__name">Osric</span
+                ><span class="wdi-portrait__traits"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_scarf_blue.svg"
+                    alt="Blue scarf" /><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_hat_bare.svg"
+                    alt="Bare head" /></span
+                ><img
+                  class="wdi-icon wdi-portrait__ghost"
+                  src="/Who-Did-It/assets/ui/glyphs/glyph_ghost.svg"
+                  alt="Dead"
+                />
+              </button>
+            </li>
+            <li>
+              <button class="wdi-portrait">
+                <span class="wdi-portrait__pic"></span><span class="wdi-portrait__name">Pell</span
+                ><span class="wdi-portrait__traits"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_height_tall.svg"
+                    alt="Tall" /><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_scarf_blue.svg"
+                    alt="Blue scarf" /><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_hat_cap.svg"
+                    alt="Cap" /></span
+                ><span class="wdi-chip wdi-chip--vote wdi-portrait__votes"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/marks/mark_vote_stamp.svg"
+                    alt="votes"
+                  />1</span
+                >
+              </button>
+            </li>
+            <li>
+              <button class="wdi-portrait">
+                <span class="wdi-portrait__pic"></span><span class="wdi-portrait__name">Wren</span
+                ><span class="wdi-portrait__traits"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_scarf_red.svg"
+                    alt="Red scarf" /><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_hat_bowler.svg"
+                    alt="Bowler"
+                /></span>
+              </button>
+            </li>
+            <li>
+              <button class="wdi-portrait">
+                <span class="wdi-portrait__pic"></span><span class="wdi-portrait__name">Hob</span
+                ><span class="wdi-portrait__traits"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_height_short.svg"
+                    alt="Short" /><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_scarf_green.svg"
+                    alt="Green scarf" /><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_hat_bare.svg"
+                    alt="Bare head"
+                /></span>
+              </button>
+            </li>
+            <li>
+              <button class="wdi-portrait">
+                <span class="wdi-portrait__pic"></span><span class="wdi-portrait__name">Ida</span
+                ><span class="wdi-portrait__traits"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_height_tall.svg"
+                    alt="Tall" /><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_scarf_red.svg"
+                    alt="Red scarf" /><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_hat_bowler.svg"
+                    alt="Bowler" /></span
+                ><span class="wdi-chip wdi-chip--vote wdi-portrait__votes"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/marks/mark_vote_stamp.svg"
+                    alt="votes"
+                  />1</span
+                >
+              </button>
+            </li>
+            <li>
+              <button class="wdi-portrait">
+                <span class="wdi-portrait__pic"></span><span class="wdi-portrait__name">Garth</span
+                ><span class="wdi-portrait__traits"
+                  ><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_scarf_green.svg"
+                    alt="Green scarf" /><img
+                    class="wdi-icon"
+                    src="/Who-Did-It/assets/ui/icons/icon_hat_cap.svg"
+                    alt="Cap"
+                /></span>
+              </button>
+            </li>
+          </ul>
+          <div class="wdi-row wdi-row--between wdi-row--wrap">
+            <span class="wdi-hint">Your vote is secret until the reveal. Tap a portrait, then confirm.</span>
+            <div class="wdi-row">
+              <button class="wdi-btn wdi-btn--ghost">
+                <img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_skip.svg" alt="" />Skip</button
+              ><button class="wdi-btn wdi-btn--danger">Vote Marlow</button>
+            </div>
+          </div>
+        </section>
+        <aside class="wdi-panel side" style="width: 100%">
+          <div class="wdi-tabs" role="tablist">
+            <button class="wdi-tab" role="tab" aria-selected="true">Chat</button
+            ><button class="wdi-tab" role="tab" aria-selected="false">Board</button
+            ><button class="wdi-tab" role="tab" aria-selected="false">Notebook</button>
+          </div>
+          <div class="wdi-chat">
+            <div class="wdi-chat__log" role="log">
+              <p class="wdi-chat__line wdi-chat__line--system">Osric was found in the apothecary loft.</p>
+              <p class="wdi-chat__line">
+                <span class="wdi-chat__who">Wren</span>I saw Marlow at the Apothecary around 3:40
+              </p>
+              <p class="wdi-chat__line">
+                <span class="wdi-chat__who">Marlow</span>I was washing at the well, ask Hob
+              </p>
+              <p class="wdi-chat__line">
+                <span class="wdi-chat__who">Tamsin</span>Footprints by the loft: long stride, tall
+              </p>
+              <p class="wdi-chat__line wdi-chat__line--system">The Child saw it: tall, red scarf.</p>
+            </div>
+            <form class="wdi-chat__form">
+              <input class="wdi-input" aria-label="Say something" placeholder="Say something" /><button
+                class="wdi-btn wdi-btn--icon"
+                aria-label="Send"
+              >
+                <img class="wdi-icon" src="/Who-Did-It/assets/ui/glyphs/glyph_chat.svg" alt="" />
+              </button>
+            </form>
+          </div>
+          <p class="wdi-eyebrow">Present a notebook entry</p>
+          <div class="wdi-quick">
+            <button class="wdi-chip wdi-chip--claim is-selected">Footprints by the loft: Tall</button>
+            <button class="wdi-chip wdi-chip--claim">Thread on the wardrobe: Red scarf</button>
+            <button class="wdi-chip wdi-chip--claim">Where were you?</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>

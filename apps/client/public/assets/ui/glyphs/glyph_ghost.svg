@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Ghost">
+  <title>Ghost</title>
+  <path d="M11 44 V22 C11 14.5 16.5 8 24 8 C31.5 8 37 14.5 37 22 V44 L32.5 39.5 L28 44 L24 39.5 L20 44 L15.5 39.5 Z" fill="#D9D2C2"/>
+  <circle cx="19" cy="22" r="1.5" fill="#12141C"/>
+  <circle cx="29" cy="22" r="1.5" fill="#12141C"/>
+</svg>
