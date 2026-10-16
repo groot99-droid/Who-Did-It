@@ -87,4 +87,47 @@ describe('world router', () => {
     expect(active.has('GameOver')).toBe(false);
     expect(calls.at(-1)).toBe('start Lobby');
   });
+
+  it('registers the quick-mode night events once', () => {
+    const { room } = setup();
+    expect(room.count('nightSleep')).toBe(1);
+    expect(room.count('nightWake')).toBe(1);
+  });
+
+  it('a nightSleep stops the world and starts the loft; a nightWake or a bakery sceneEnter brings the world back', () => {
+    const { room, calls, active } = setup();
+    room.emit('sceneEnter', { sceneId: 'bakery', spawn: 'door', facing: 'n' });
+    expect(active.has('World')).toBe(true);
+    room.emit('nightSleep', {});
+    expect(active.has('World')).toBe(false);
+    expect(active.has('Loft')).toBe(true);
+    room.emit('nightWake', { windowRole: 'sinEater', endsTick: 99, spawn: 'door' });
+    expect(active.has('Loft')).toBe(false);
+    expect(active.has('World')).toBe(true);
+    expect(calls.at(-1)).toBe('start World');
+    room.emit('nightSleep', {});
+    room.emit('sceneEnter', { sceneId: 'bakery', spawn: 'door', facing: 'n' });
+    expect(active.has('Loft')).toBe(false);
+    expect(active.has('World')).toBe(true);
+  });
+
+  it('a meeting or the return to the lobby stops the loft', () => {
+    const { room, active } = setup();
+    room.emit('nightSleep', {});
+    room.emit('meetingStart', { reason: 'dawn', callerId: '', missing: [] });
+    expect(active.has('Loft')).toBe(false);
+    expect(active.has('Meeting')).toBe(true);
+    room.emit('nightSleep', {});
+    expect(active.has('Loft')).toBe(false);
+    room.emit('gameOver', { winner: 1, roles: {}, summary: '' });
+    room.emit('phaseChange', { phase: 0, endsTick: 0 });
+    expect(active.has('Loft')).toBe(false);
+  });
+
+  it('a nightSleep before the lobby return does not outlive it', () => {
+    const { room, active } = setup();
+    room.emit('nightSleep', {});
+    room.emit('phaseChange', { phase: 0, endsTick: 0 });
+    expect(active.has('Loft')).toBe(false);
+  });
 });

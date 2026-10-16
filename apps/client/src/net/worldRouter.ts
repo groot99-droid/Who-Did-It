@@ -4,7 +4,14 @@ import { ColyseusMeetingFeed } from './meetingColyseus';
 import type { MockNetwork } from './mock';
 import type { MockMeetingRequest } from './mock/meetingMock';
 import type { NetworkService, Room } from './NetworkService';
-import { REG_ROLE_CHIP, REG_WORLD, type SceneEnter, type WorldFeed } from './world';
+import {
+  REG_INPUT,
+  REG_ROLE_CHIP,
+  REG_WORLD,
+  type NightWindow,
+  type SceneEnter,
+  type WorldFeed,
+} from './world';
 import { ColyseusWorldFeed } from './worldColyseus';
 
 // Glue between the network (NetworkService, the world feed, the meeting feed) and the scenes. The router is
@@ -13,14 +20,23 @@ import { ColyseusWorldFeed } from './worldColyseus';
 //   sceneEnter while no meeting is open   -> (re)start World for that scene
 //   meetingStart                          -> sleep World, launch Meeting
 //   sceneEnter after meetingStart         -> stop Meeting, start World (the reveal is over)
-//   gameOver                              -> stop World and Meeting, start GameOver
+//   gameOver                              -> stop World, Loft and Meeting, start GameOver
 //   phase back to lobby                   -> start Lobby
+//
+// Quick mode (GDD 3.11, A39) adds the loft:
+//
+//   nightSleep                            -> stop World, start Loft (the seat sleeps)
+//   nightWake                             -> stop Loft, start World in the bakery (no sceneEnter comes with it)
+//   meetingStart                          -> also stops Loft, as it sleeps World
 
 export interface RouterOptions {
   mock: boolean;
 }
 
 const LOBBY_SCREENS = ['Landing', 'Lobby'];
+
+/** The quick-mode bakery: every window wakes a seat at its `door` spawn, facing north (scenes/bakery.json). */
+const BAKERY = 'bakery';
 
 /** `Phase.lobby` of the schema; the client does not import the schema runtime, so the one id it needs is here. */
 const PHASE_LOBBY = 0;
@@ -43,6 +59,9 @@ export function installWorldRouter(
     }
   };
 
+  /** The 20 Hz move timer only runs while the World is up; every screen that replaces it stops it. */
+  const stopInput = () => (game.registry.get?.(REG_INPUT) as { stop(): void } | undefined)?.stop();
+
   const onWorldEnter = (data: SceneEnter) => {
     if (meetingOpen) {
       // The first sceneEnter after meetingStart is the server's "the meeting is over" (A30): back to the world.
@@ -53,13 +72,16 @@ export function installWorldRouter(
     // is not stopped: it sleeps itself and keeps the card's DOM so Tab can reopen it during play.
     for (const key of LOBBY_SCREENS) stopScene(key);
     stopScene('GameOver');
+    stopScene('Loft');
     game.scene.start('World', data);
     net.bus.emit('sceneEnter', data);
   };
 
   const onMeetingStart = () => {
     meetingOpen = true;
+    stopInput();
     if (game.scene.isActive('World')) game.scene.sleep('World');
+    stopScene('Loft');
     stopScene('Meeting');
     game.scene.start('Meeting');
   };
@@ -68,19 +90,35 @@ export function installWorldRouter(
     meetingOpen = false;
     stopScene('Meeting');
     stopScene('World');
+    stopScene('Loft');
     stopScene('RoleReveal');
     game.scene.start('GameOver');
+  };
+
+  const onNightSleep = () => {
+    if (meetingOpen) return;
+    stopInput();
+    stopScene('World');
+    stopScene('Loft');
+    game.scene.start('Loft');
+  };
+
+  const onNightWake = (data: NightWindow) => {
+    if (meetingOpen) return;
+    stopScene('Loft');
+    game.scene.start('World', { sceneId: BAKERY, spawn: data.spawn, facing: 'n' } satisfies SceneEnter);
   };
 
   const onPhaseChange = ({ phase }: { phase: number }) => {
     if (phase !== PHASE_LOBBY || net.code === null) return;
     meetingOpen = false;
+    stopInput();
     if (options.mock) {
       mockStarted = false;
       world?.dispose();
       world = null;
     }
-    for (const key of ['Meeting', 'GameOver', 'World', 'RoleReveal']) stopScene(key);
+    for (const key of ['Meeting', 'GameOver', 'World', 'Loft', 'RoleReveal']) stopScene(key);
     if (!game.scene.isActive('Lobby') && !game.scene.isActive('Landing')) game.scene.start('Lobby');
   };
 
@@ -89,6 +127,8 @@ export function installWorldRouter(
     world = next;
     game.registry.set(REG_WORLD, next);
     next.bus.on('sceneEnter', onWorldEnter);
+    next.bus.on('nightSleep', onNightSleep);
+    next.bus.on('nightWake', onNightWake);
   };
 
   const publishMeeting = (next: MeetingFeed) => {
@@ -118,7 +158,7 @@ export function installWorldRouter(
   const onLeft = () => {
     if (game.scene.isActive('Lobby') || game.scene.isActive('Landing')) return;
     dropFeeds();
-    for (const key of ['Meeting', 'GameOver', 'World', 'RoleReveal']) stopScene(key);
+    for (const key of ['Meeting', 'GameOver', 'World', 'Loft', 'RoleReveal']) stopScene(key);
     game.scene.start('Landing');
   };
   net.bus.on('left', onLeft);
