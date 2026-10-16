@@ -40,6 +40,7 @@ export class PlayerView {
   private anim = '';
   private hatPass: string | null = null;
   private bloodOn = false;
+  private mateOn = false;
   private readonly plateColor: string;
 
   constructor(
@@ -117,10 +118,27 @@ export class PlayerView {
     if (on === this.bloodOn) return;
     this.bloodOn = on;
     this.blood.setVisible(on && this.hasArt);
-    this.plate.setColor(on ? palette.colors.lantern : this.plateColor);
+    this.paintPlate();
     if (on && this.anim !== '') {
       this.play(this.blood, `blood/${this.anim}`, (this.body.anims.currentFrame?.index ?? 1) - 1);
     }
+  }
+
+  /**
+   * Quick mode: a Poisoner's partner glows red (GDD 3.11). Only the Poisoner's own client is told who
+   * its partner is (`priv.cabalMates`); nothing a client draws about anyone else depends on a role.
+   */
+  setMate(on: boolean): void {
+    if (on === this.mateOn) return;
+    this.mateOn = on;
+    this.paintPlate();
+  }
+
+  private paintPlate(): void {
+    this.plate.setColor(
+      this.mateOn ? palette.colors.blood : this.bloodOn ? palette.colors.lantern : this.plateColor,
+    );
+    this.plate.setStroke(this.mateOn ? palette.colors.bone : palette.colors.ink, 4);
   }
 
   /** A ghost is drawn translucent (to its own player and to other ghosts). */

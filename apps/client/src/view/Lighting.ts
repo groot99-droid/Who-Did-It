@@ -6,7 +6,7 @@ import { h } from '../ui/dom';
 const ALPHA_DAY = 0.4;
 const ALPHA_NIGHT = 0.9;
 
-const PHASE = { grace: 2, day: 3, dusk: 4, night: 5, finalNight: 11 } as const;
+const PHASE = { grace: 2, day: 3, dusk: 4, night: 5, dawn: 6, finalNight: 11 } as const;
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * Math.min(1, Math.max(0, t));
 
@@ -23,11 +23,14 @@ export class Lighting {
     parent.append(this.root);
   }
 
-  /** 0 in full day, 1 at night; dusk eases between them over its length. */
-  static darkness(phase: number, ticksLeft: number): number {
+  /**
+   * 0 in full day, 1 at night; dusk (and quick mode's dawn, eased the same way) goes between them over its
+   * length. `duskTicks` is that length: `balance.phases.duskS` unless the quick-mode dusk is meant.
+   */
+  static darkness(phase: number, ticksLeft: number, duskTicks = balance.phases.duskS * TICK_RATE): number {
     if (phase === PHASE.night || phase === PHASE.finalNight) return 1;
-    if (phase === PHASE.dusk)
-      return 1 - Math.min(1, Math.max(0, ticksLeft / (balance.phases.duskS * TICK_RATE)));
+    if (phase === PHASE.dusk || phase === PHASE.dawn)
+      return 1 - Math.min(1, Math.max(0, ticksLeft / duskTicks));
     return 0;
   }
 

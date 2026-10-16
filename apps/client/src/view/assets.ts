@@ -79,3 +79,29 @@ export function applyFilters(textures: Phaser.Textures.TextureManager, manifest:
 /** Where the grid exporter writes a scene's tilemap (tools/grid/export.ts). */
 export const sceneMapUrl = (base: string, sceneId: string) => `${base}assets/scenes/${sceneId}/tilemap.json`;
 export const sceneMapKey = (sceneId: string) => `map_${sceneId}`;
+
+const manifests = new Map<string, Promise<LoadedManifest | null>>();
+
+/**
+ * The urls of manifest entries of `type: image` by key, for DOM screens that set them as CSS backgrounds
+ * (the loft's backdrop and bedrolls). A key the manifest lacks is simply absent: the caller keeps its CSS
+ * fallback. The manifest is fetched once per art mode.
+ */
+export async function manifestImageUrls(
+  art: 'default' | 'placeholder',
+  base: string,
+  keys: readonly string[],
+): Promise<Record<string, string>> {
+  const id = `${art}|${base}`;
+  let pending = manifests.get(id);
+  if (!pending) {
+    pending = resolveManifest(art, base).catch(() => null);
+    manifests.set(id, pending);
+  }
+  const manifest = await pending;
+  const out: Record<string, string> = {};
+  for (const e of manifest?.entries ?? []) {
+    if (e.type === 'image' && keys.includes(e.key)) out[e.key] = join(manifest!.root, e.url);
+  }
+  return out;
+}
