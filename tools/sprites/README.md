@@ -9,9 +9,12 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `pack.ts` | `packFrames` on free-tex-packer-core with the `ASSETS.md` 6.3 settings (`Phaser3` exporter, no rotation, trim, detect identical, power of two, padding 2, extrude 1, 2048 max, sorted inputs); pages are always named `<key>-<n>.png` and merged into one multiatlas JSON. `packCharacter` packs `char_<body>` and `ovl_<body>`; the CLI packs a `batch_render.py` output folder |
 | `gen-anims.ts` | Writes each frame's Feet pivot (feet / untrimmed cell) into the atlas and builds Phaser `load.animation` JSON: 12 fps, loops repeat, one-shot clips hold the last frame |
 | `bleed.ts` | Alpha bleed: transparent pixels next to the sprite take their neighbours' colour (alpha stays 0) so linear filtering never pulls in black and draws an ink halo; reads and writes 8-bit RGBA PNG through `node:zlib` because canvas libraries premultiply and would zero that colour. `readRender` bleeds every rendered frame before packing; the placeholder art is not bled and stays byte-identical |
+| `pack-static.ts` | Packs a static sheet render (`clues`, `props`, `vfx`) with the same settings: frame names must equal the `docs/SPRITES.md` 8 keys in `keys.ts`, pivots from the render manifest (props and vfx), and `vfx.anims.json` (12 fps, played once) for the vfx |
+| `body-contact.ts` | Review sheet of the body on the floor: the last `die` frame in 8 directions, one row per trait look plus a Bloody row |
 | `contact.ts` | Contact sheet for review: every clip x direction with the scarf (tinted teal) and cap composited, plus one strip of each pass alone |
 | `placeholder.ts` | Generates every placeholder key of `SPRITES.md` 8 into `apps/client/public/assets/placeholder/` with its `manifest.json` |
 | `test/pack.test.ts` | Synthetic frame set: trim and source sizes, determinism, detectIdentical, pivots, anim keys |
+| `test/pack-static.test.ts` | Static keys against the placeholder clues, props pivots, centred clues, determinism, vfx anims, refusal of a wrong key set |
 | `test/bleed.test.ts` | PNG round trip, one and two bleed rings, determinism |
 
 ```sh
@@ -19,6 +22,8 @@ pnpm --filter @wdi/sprites test
 pnpm --filter @wdi/sprites placeholder            # regenerate the placeholder art (byte-identical when unchanged)
 pnpm --filter @wdi/sprites pack ../../build/render/villager ../../apps/client/public/assets/chars
 pnpm --filter @wdi/sprites contact ../../build/render/villager ../../assets/source/review/villager-contact.png
+pnpm --filter @wdi/sprites pack:static ../../build/render/props ../../apps/client/public/assets/props
+pnpm --filter @wdi/sprites contact:body ../../build/render/villager ../../assets/source/review/villager-body-contact.png
 ```
 
 Placeholder labels use Inter (OFL) from `@fontsource/inter`; no other font is used. New dependencies

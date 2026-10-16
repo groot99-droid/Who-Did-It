@@ -47,7 +47,10 @@ export function staticAnims(texture: string, frameNames: string[]): { anims: Pha
 }
 
 /** Pack a static sheet; the frame set must match the keys of docs/SPRITES.md 8 exactly. */
-export async function packStatic(manifest: StaticManifest, inputs: PackInput[]): Promise<Map<string, Buffer>> {
+export async function packStatic(
+  manifest: StaticManifest,
+  inputs: PackInput[],
+): Promise<Map<string, Buffer>> {
   const want = staticFrameNames(manifest.atlas);
   const got = inputs.map((i) => i.name).sort();
   const missing = want.filter((n) => !got.includes(n));

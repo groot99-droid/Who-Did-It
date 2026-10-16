@@ -31,7 +31,11 @@ describe('static keys', () => {
   it('lists the SPRITES 8 keys, matching the placeholder clues', () => {
     expect(CLUE_KEYS).toHaveLength(21);
     expect(new Set(CLUE_KEYS).size).toBe(21);
-    expect([...CLUE_KEYS].sort()).toEqual(clueFrames().map((f) => f.name).sort());
+    expect([...CLUE_KEYS].sort()).toEqual(
+      clueFrames()
+        .map((f) => f.name)
+        .sort(),
+    );
     expect(PROP_KEYS).toContain('prop_lanternPost_lit');
     expect(staticFrameNames('vfx')).toHaveLength(Object.values(VFX_CLIPS).reduce((a, b) => a + b, 0));
     expect(staticFrameNames('vfx')).toContain('vfx_vote_stamp/009');
@@ -66,7 +70,9 @@ describe('packStatic', () => {
   it('builds one once-only 12 fps anim per vfx clip', async () => {
     const { manifest, inputs } = sheet('vfx', 128, true);
     const files = await packStatic(manifest, inputs);
-    const { anims } = JSON.parse(files.get('vfx.anims.json')!.toString('utf8')) as ReturnType<typeof staticAnims>;
+    const { anims } = JSON.parse(files.get('vfx.anims.json')!.toString('utf8')) as ReturnType<
+      typeof staticAnims
+    >;
     expect(anims.map((a) => a.key)).toEqual(Object.keys(VFX_CLIPS).sort());
     for (const a of anims) {
       expect(a.frames).toHaveLength(VFX_CLIPS[a.key]!);

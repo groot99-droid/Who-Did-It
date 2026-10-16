@@ -29,9 +29,13 @@ Tokens in `packages/content/data/palette.json` are the only colours allowed in m
 
 **Props, items, clues.** World sprites through the rig at 64-128 px, multi-state props as `_open/_closed/_locked/_broken` and spots as `_shut/_open`. Clue variants: footprints x3 heights x3 mud tints, thread x3, felt x3, smear, print, wet bucket, fur, claw, drag smear. Higgsfield 2D output is restricted to UI-only images (notebook pages, portraits, inventory icons) with background removal and a Photoshop defringe; the calibration cube render is attached to every prompt as a reference. Icons: Illustrator 48 px grid, Export for Screens PNG @1x/@2x + SVG.
 
+*What shipped for M3 (Session P, 2026-10-16).* No Higgsfield or kit asset: like the villager, every prop and clue is modelled from code in palette colours (`tools/blender/build_props.py`) and rendered through the rig with the character outline (-0.02 m), since they sit at the characters' 64 px per metre. The five square props (`prop_bell`, `prop_pump`, `prop_noticeBoard`, `prop_kitChest`, `prop_lanternPost_lit` / `_unlit`) render by `SpriteCam` in 192 px cells with the ground point 148 px down, which becomes each frame's pivot; one 128 x 1024 page. The 21 clues render one per 64 px cell: ground marks straight down by `TileCam` (they lie on straight-down tiles), the wet bucket by `SpriteCam`; thread and felt sit on a pale splinter and footprints carry a lighter mud lip, because `ink` and `slate` marks vanished on the dark ground without one; footprints and the drag segment point screen-up for the client to rotate, and the drag segment has no outline so segments chain; one 256 x 512 page. Review the sheets by rendering and packing them (`tools/blender/README.md`).
+
 **UI and role cards.** `WhoDidIt_UI.ai` with artboards per component; nine-slice panels with 24 px margins; one card frame per faction; a static card artboard for the Tab reopen; role portraits 384x576 WebP lazy-loaded by `roleId` after `roleReveal`, upscaled from 512 to 1024 with Higgsfield before downsampling. Reveal animation: CSS flip in V1; After Effects comp (shapes and solid fills only, no mattes or gradients) exported to dotLottie and played by `@lottiefiles/dotlottie-web` at DPR 1, 450x675, with `game.loop.sleep()` while the card is up, in V1.5.
 
 **VFX and audio.** After Effects shape layers to PNG sequences (blood splat 12f, blood pool 8f, smoke 16f, lantern glow 8f, hit flash 4f, dust step 6f, vote stamp 10f) in one 2048² page; rain, fog and embers as 8 px particle emitters. Audio: OGG q5 + M4A 128 kbps, SFX -16 LUFS, music -18 LUFS, Audacity chain Normalize -> Loudness Normalization -> Export. V1: 8 SFX (footstep, door open/close/locked, pickup, scream, bell, vote) from Kenney and Freesound CC0, one ambient loop from a CC0 source; the 30-SFX list, 5 music stems and voice lines are post-beta. Premiere cuts playtest recordings into `PLAYTESTS/` notes and the beta trailer; Higgsfield video makes a 6 s landing loop (WebM <= 2 MB).
+
+*What shipped for M3 (Session P, 2026-10-16).* After Effects is not available to the cloud sessions, so the four VFX the M3 loop needs are animated in code through the rig (`tools/blender/build_vfx.py`), frame by frame at 12 fps, palette colours only: `vfx_blood_pool` 8 f (straight down, 128 px), `vfx_blood_splat` 12 f (drops on a fixed seed falling from chest height to specks, 128 px), `vfx_vote_stamp` 10 f (a straight-down stamp that slams and lifts off a `blood` seal with a cross, 256 px; frames 0 and 5 clip on purpose as the handle enters and leaves) and `vfx_dust_step` 6 f (64 px, ends nearly empty). One 512 x 2048 page plus `vfx.anims.json`. Smoke, lantern glow and hit flash remain for the M6 pass, in After Effects or the same script.
 
 ### 6.4 Higgsfield prompt guide
 
@@ -62,11 +66,11 @@ Day 1 commits `.gitattributes` before any binary: LFS rules for `*.blend *.psd *
 | B | Building exteriors: tavern, apothecary, widow cottage, manor, barn, chapel | 6 | Kenney kit-bash -> rig | 18 |
 | B | Interior tilesets and decor for 13 interior rooms | 13 | Blender + Tiled | 24 |
 | B | Forest, cave, remaining ground tile sets | 3 | Blender + Photoshop | 12 |
-| B | Props incl. 4-state doors, 2-state spots, task props (6) | 30 | Blender | 15 |
-| B | Clue variants (footprints 9, thread 3, felt 3, smear, print, bucket, fur, claw, drag) | 21 | Blender / Illustrator | 8 |
+| B | Props incl. 4-state doors, 2-state spots, task props (6) | 30 | Blender | 15 (the 5 square props, 6 frames, shipped for M3 in code, 2026-10-16) |
+| B | Clue variants (footprints 9, thread 3, felt 3, smear, print, bucket, fur, claw, drag) | 21 | Blender / Illustrator | 8 (shipped for M3 in code through the rig, 2026-10-16) |
 | B | Wolf (idle, walk, bite, die) | 1 | Higgsfield 3D -> Blender | 8 |
 | B | Role portraits x9 + static card states | 9 | Higgsfield + Illustrator | 8 |
-| B | VFX sheets | 7 | After Effects | 8 |
+| B | VFX sheets | 7 | After Effects | 8 (4 shipped for M3 in Blender code: blood pool, blood splat, vote stamp, dust step; 2026-10-16) |
 | B | Packing, anims JSON, contact sheet QA | – | Node tools | 8 |
 | B | Bakery interior tileset; Wake Table; 10 plates (shut / cracked / turned); 3 dead loaves (shut / open); ledger (shut / open); cold oven; flour-floor decal | 1 scene + 6 props | Blender + Tiled | 10 |
 | B | Loaf and crumb-token icons; mode chip; dark-loft backdrop with bedrolls; swap-log timeline | 4 | Illustrator | 4 |

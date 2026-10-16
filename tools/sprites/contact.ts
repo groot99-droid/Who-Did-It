@@ -21,7 +21,7 @@ import { PALETTE } from './placeholder.ts';
 const LABEL_W = 96;
 const SCARF_TINT = PALETTE.teal;
 
-async function load(dir: string, pass: Pass, stem: string): Promise<Image | null> {
+export async function load(dir: string, pass: Pass, stem: string): Promise<Image | null> {
   try {
     return await loadImage(readFileSync(join(dir, pass, `${stem}.png`)));
   } catch {
@@ -30,7 +30,7 @@ async function load(dir: string, pass: Pass, stem: string): Promise<Image | null
 }
 
 /** Draw a grey overlay tinted by multiply, clipped to its own alpha. */
-function drawTinted(g: SKRSContext2D, img: Image, x: number, y: number, tint: string): void {
+export function drawTinted(g: SKRSContext2D, img: Image, x: number, y: number, tint: string): void {
   const c = createCanvas(img.width, img.height);
   const cg = c.getContext('2d');
   cg.drawImage(img, 0, 0);

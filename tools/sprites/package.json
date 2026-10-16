@@ -10,7 +10,8 @@
     "placeholder": "tsx placeholder.ts",
     "pack": "tsx pack.ts",
     "contact": "tsx contact.ts",
-    "pack:static": "tsx pack-static.ts"
+    "pack:static": "tsx pack-static.ts",
+    "contact:body": "tsx body-contact.ts"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
