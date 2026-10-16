@@ -1,0 +1,169 @@
+{
+ "textures": [
+  {
+   "image": "props-0.png",
+   "format": "RGBA8888",
+   "size": {
+    "w": 128,
+    "h": 1024
+   },
+   "scale": 1,
+   "frames": [
+    {
+     "filename": "prop_bell",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 192,
+      "h": 192
+     },
+     "spriteSourceSize": {
+      "x": 49,
+      "y": 52,
+      "w": 94,
+      "h": 109
+     },
+     "frame": {
+      "x": 3,
+      "y": 3,
+      "w": 94,
+      "h": 109
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_kitChest",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 192,
+      "h": 192
+     },
+     "spriteSourceSize": {
+      "x": 64,
+      "y": 105,
+      "w": 64,
+      "h": 60
+     },
+     "frame": {
+      "x": 53,
+      "y": 232,
+      "w": 64,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_lanternPost_lit",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 192,
+      "h": 192
+     },
+     "spriteSourceSize": {
+      "x": 83,
+      "y": 56,
+      "w": 44,
+      "h": 102
+     },
+     "frame": {
+      "x": 3,
+      "y": 232,
+      "w": 44,
+      "h": 102
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_lanternPost_unlit",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 192,
+      "h": 192
+     },
+     "spriteSourceSize": {
+      "x": 83,
+      "y": 56,
+      "w": 44,
+      "h": 102
+     },
+     "frame": {
+      "x": 3,
+      "y": 340,
+      "w": 44,
+      "h": 102
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_noticeBoard",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 192,
+      "h": 192
+     },
+     "spriteSourceSize": {
+      "x": 46,
+      "y": 63,
+      "w": 100,
+      "h": 90
+     },
+     "frame": {
+      "x": 3,
+      "y": 448,
+      "w": 100,
+      "h": 90
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_pump",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 192,
+      "h": 192
+     },
+     "spriteSourceSize": {
+      "x": 65,
+      "y": 61,
+      "w": 62,
+      "h": 108
+     },
+     "frame": {
+      "x": 3,
+      "y": 118,
+      "w": 62,
+      "h": 108
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7708
+     }
+    }
+   ]
+  }
+ ],
+ "meta": {
+  "app": "http://github.com/odrick/free-tex-packer-core",
+  "version": "0.3.9"
+ }
+}

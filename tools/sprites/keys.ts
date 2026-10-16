@@ -66,3 +66,52 @@ export function frameKey(pass: Pass, f: FrameId): string {
 export function textureKey(pass: Pass, body: string): string {
   return pass === 'body' ? `char_${body}` : `ovl_${body}`;
 }
+
+// ---------------------------------------------------------------- static sheets (docs/SPRITES.md 8)
+
+const HEIGHT_CODES = ['s', 'm', 't'] as const;
+const MUD_TINTS = ['dark', 'mid', 'light'] as const;
+
+/** The 21 clue keys of the `clues` texture, one frame each. */
+export const CLUE_KEYS: readonly string[] = [
+  ...HEIGHT_CODES.flatMap((h) => MUD_TINTS.map((t) => `clue_footprint_${h}_${t}`)),
+  ...['red', 'green', 'blue'].map((c) => `clue_thread_${c}`),
+  ...['cap', 'bowler', 'bare'].map((k) => `clue_felt_${k}`),
+  'clue_smear',
+  'clue_print',
+  'clue_bucket_wet',
+  'clue_fur',
+  'clue_claw',
+  'clue_drag',
+];
+
+/** The `props` texture: `prop_<kind>` of overworld.json, plus the lantern states. */
+export const PROP_KEYS: readonly string[] = [
+  'prop_bell',
+  'prop_pump',
+  'prop_noticeBoard',
+  'prop_kitChest',
+  'prop_lanternPost_lit',
+  'prop_lanternPost_unlit',
+];
+
+/** The `vfx` texture: anim key -> frame count; frames are `<anim>/<nnn>`, 12 fps, played once. */
+export const VFX_CLIPS: Readonly<Record<string, number>> = {
+  vfx_blood_pool: 8,
+  vfx_blood_splat: 12,
+  vfx_vote_stamp: 10,
+  vfx_dust_step: 6,
+};
+
+/** Every frame name a static atlas must contain, in sorted order. */
+export function staticFrameNames(atlas: 'clues' | 'props' | 'vfx'): string[] {
+  const names =
+    atlas === 'clues'
+      ? [...CLUE_KEYS]
+      : atlas === 'props'
+        ? [...PROP_KEYS]
+        : Object.entries(VFX_CLIPS).flatMap(([anim, n]) =>
+            Array.from({ length: n }, (_, i) => `${anim}/${String(i).padStart(3, '0')}`),
+          );
+  return names.sort();
+}
