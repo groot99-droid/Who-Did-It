@@ -40,7 +40,9 @@ jobs:
         run: |
           if [ -z "$VITE_SERVER_URL" ]; then echo "::warning::Actions variable VITE_SERVER_URL is not set; the page will poll localhost"; fi
           export VITE_BUILD_VERSION="${GITHUB_SHA::8}"
-          pnpm --filter @wdi/client build
+          # The client's production build resolves @wdi/content to its dist, so build the workspace
+          # dependencies first (the "..." selector); CI's `pnpm build` does the same across every package.
+          pnpm --filter "@wdi/client..." build
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
