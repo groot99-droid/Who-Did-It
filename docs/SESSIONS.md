@@ -785,3 +785,44 @@ the build matches on both sides; do a solo smoke run the day before; build the G
     `villageAtMostOne` (GDD 3.8).
   - The match-log field names are described from K's brief; README 4 says the log line wins if they
     differ.
+
+## Integration log, round 3 (2026-10-16)
+
+All seven sessions finished their briefs inside half an hour and opened green draft PRs (#12 to #18),
+none of them asking for a missing contract. The orchestrator merged L, K, N, M, O, P, Q in that order
+(conflicts only in `docs/DECISIONS.md` and `docs/SESSIONS.md`, both appended by every session and kept
+as unions), ran lint, typecheck, the unit suites, the build and every Playwright flow, including O's
+real-server match test with `WDI_E2E_MATCH=1`: the kill -> body -> report -> meeting -> vote -> win
+loop ran end to end on the first merged tree, Village win and Cabal win. Fixes made at integration
+(DECISIONS A38):
+
+- Footprints spawn one tile along the trail from the kill tile, never on the body's tile, since the
+  client's prompt prefers the body there and the clue could not be collected (L's `Clues.ts`, test).
+- The meeting's Notebook tab mounts N's `NotebookPanel` on the world feed (M's `Meeting` scene).
+- L's report and bell tests return to a world phase beside the target after each accepted request,
+  because K's meeting now really opens on the first request and moves everyone to the square.
+- Wording: the Killer's card goal names the 4-5 player rule, the UI.md 6 toast example reads "E at
+  the bell", `docs/README.md` indexes `docs/PLAYTESTS/`.
+
+### Follow-ups for round 4
+
+1. **M3 exit (owner)**: Railway Hobby service, `VITE_SERVER_URL`, Pages source (Q's
+   `docs/PLAYTESTS/README.md` 1), then three 5-player sessions with the scorecard and the
+   fun-or-stop decision recorded in `docs/PLAYTESTS/`.
+2. **M3b quick mode** and **M3c NPC fill** (ROADMAP), in that order, as the next build round.
+3. **Copy deck adoption**: N's toasts and prompts and M's `ui/meetingText.ts` still carry the GDD 2
+   lines; replace them with the ids of `docs/UI.md` 14.
+4. **Placeholder manifest**: `?art=placeholder` has no `props` or `vfx` entries (greybox marks show);
+   the four `bld_*_ext` exteriors and six `tiles_*` sets are still stand-ins in the real manifest.
+5. **Client small**: `InputController` stays in the registry across a second `?mock=1` match and keeps
+   the old feed; the `stamp` sound at the reveal is not played yet (M has no `AudioBus`); the ghost
+   chat form is covered by unit reads only; `view/hud.css` sets HUD corner offsets because the theme's
+   `.wdi-hud__*` anchors ignore the safe area (fix in the theme, drop the block).
+6. **Server small**: Kill does not require the Knife item (the role list decides); no ack for Bandage;
+   the missing-person roll-call, suspect sets, `meeting.board`, the anti-stall rules and the
+   wrong-ejection bonus are M4; in-play reconnection and the vanished body are M7.
+7. **Soak**: run the full 30-minute `pnpm bots:soak` with the merged server (kills and meetings now
+   occur); O ran 30 s against the base only.
+8. **Art masters**: copy the rebuilt `villager.blend` and `villager.glb` from `assets/external/villager/`
+   into the ROSW checkout (`studio/assets/who-did-it/character/villager/`); the two Freesound files
+   are HQ previews, swap in the originals if a cleaner master is wanted.

@@ -95,9 +95,23 @@ export function removeClue(room: PartyRoom, id: string): void {
   sim.clueMeta.delete(id);
 }
 
+/** Tile step for a `DIRECTIONS` index (n, ne, e, se, s, sw, w, nw). */
+const STEP: ReadonlyArray<readonly [number, number]> = [
+  [0, -1],
+  [1, -1],
+  [1, 0],
+  [1, 1],
+  [0, 1],
+  [-1, 1],
+  [-1, 0],
+  [-1, -1],
+];
+
 /**
- * A kill leaves Footprints at the kill tile pointing at the nearest portal (the killer's height) and a
- * Thread on the walkable tile beside that portal (the killer's scarf); the 2-of-3 choice is M4(a).
+ * A kill leaves Footprints one tile along the trail from the kill tile toward the nearest portal (the
+ * killer's height; on the kill tile itself when that step is solid) and a Thread on the walkable tile
+ * beside that portal (the killer's scarf); the 2-of-3 choice is M4(a). The prints leave the body's
+ * tile because the client's prompt prefers the body there (A38).
  */
 export function spawnKillClues(
   room: PartyRoom,
@@ -107,14 +121,17 @@ export function spawnKillClues(
   traits: { height: number; scarf: number },
 ): void {
   const portal = nearestPortalTile(sceneId, tx, ty);
+  const grid = navGrid(sceneId, simOf(room).profile);
+  const dir = portal ? trailDir(tx, ty, portal.x, portal.y) : 4;
+  const [sx, sy] = STEP[dir] ?? [0, 1];
+  const step = grid.solidAt(tx + sx, ty + sy) ? { x: tx, y: ty } : { x: tx + sx, y: ty + sy };
   spawnClue(room, sceneId, {
     kind: ClueKind.footprints,
     value: traits.height,
-    dir: portal ? trailDir(tx, ty, portal.x, portal.y) : 4,
-    tx,
-    ty,
+    dir,
+    tx: step.x,
+    ty: step.y,
   });
-  const grid = navGrid(sceneId, simOf(room).profile);
   const beside = portal
     ? besideTile(portal, { x: tx, y: ty }, (x, y) => !grid.solidAt(x, y))
     : { x: tx, y: ty };

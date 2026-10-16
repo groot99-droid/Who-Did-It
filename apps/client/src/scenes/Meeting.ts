@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import palette from '@wdi/content/data/palette.json';
 import { type MeetingFeed, REG_MEETING } from '../net/meeting';
+import { REG_WORLD, type WorldFeed } from '../net/world';
+import { NotebookPanel } from '../view/NotebookPanel';
 import { mountMeeting, type MeetingScreen } from '../ui/Meeting';
 import { overlayRoot } from '../ui/dom';
 import { drawPortrait } from '../ui/portrait';
@@ -17,7 +19,7 @@ export class Meeting extends Phaser.Scene {
     super('Meeting');
   }
 
-  /** The Notebook tab is wired here at integration: `screen.addTab('notebook', 'Notebook', (el) => new NotebookPanel(el, worldFeed))`. */
+  /** The screen, so a test can reach its tabs. */
   get tabs(): MeetingScreen | null {
     return this.screen;
   }
@@ -33,6 +35,9 @@ export class Meeting extends Phaser.Scene {
       feed,
       drawPortrait: (canvas, look, name) => drawPortrait(canvas, this.textures, look, name),
     });
+    // The Notebook tab shows this player's own entries from the world feed (M | N seam, A38).
+    const world = this.registry.get(REG_WORLD) as WorldFeed | undefined;
+    if (world) this.screen.addTab('notebook', 'Notebook', (panel) => new NotebookPanel(panel, world));
     const refresh = () => this.screen?.update();
     feed.bus.on('voteResult', refresh);
     feed.bus.on('chat.msg', refresh);

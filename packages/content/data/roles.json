@@ -23,7 +23,7 @@
       "faction": "cabal",
       "ships": "V1",
       "firstPlayable": true,
-      "goal": "Kill until the Cabal matches the village, and never get voted out.",
+      "goal": "Kill until the Cabal matches the village (one villager left at 4-5), and never get voted out.",
       "winsWith": "cabal",
       "win": "Parity at 6+ players, living Village at most 1 at 4-5, or the Final Night vote fails.",
       "parity": "cabal",

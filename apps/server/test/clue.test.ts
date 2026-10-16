@@ -52,7 +52,7 @@ describe('kill clues', () => {
     expect(m.room.state.scenes.get('overworld')!.clues.size).toBe(1);
   });
 
-  it('puts Footprints on the kill tile toward the nearest portal and a Thread beside it', async () => {
+  it('puts Footprints one tile along the trail toward the nearest portal and a Thread beside it', async () => {
     const m = await party();
     const traits = playerOf(m, m.bots[0]!).traits;
     kill(m, 1, 'tavern_bar', 4, 4);
@@ -60,12 +60,20 @@ describe('kill clues', () => {
     expect([...scene.clues.keys()].sort()).toEqual(['clue_tavern_bar_1', 'clue_tavern_bar_2']);
     const prints = scene.clues.get('clue_tavern_bar_1')!;
     const thread = scene.clues.get('clue_tavern_bar_2')!;
-    expect(prints).toMatchObject({
-      kind: ClueKind.footprints,
-      value: traits.height,
-      x: Math.round(tilePx(5)),
-      y: Math.round(tilePx(4)),
-    });
+    expect(prints).toMatchObject({ kind: ClueKind.footprints, value: traits.height });
+    // One tile off the body's tile (5,4) along `dir` (n, ne, e, ... clockwise), so the body never hides it.
+    const STEP = [
+      [0, -1],
+      [1, -1],
+      [1, 0],
+      [1, 1],
+      [0, 1],
+      [-1, 1],
+      [-1, 0],
+      [-1, -1],
+    ] as const;
+    const [sx, sy] = STEP[prints.dir]!;
+    expect([Math.floor(prints.x / TILE_PX), Math.floor(prints.y / TILE_PX)]).toEqual([5 + sx, 4 + sy]);
     expect(thread).toMatchObject({ kind: ClueKind.thread, value: traits.scarf });
 
     const portals = scenes.tavern_bar.portals;

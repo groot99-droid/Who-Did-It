@@ -62,6 +62,10 @@ describe('report', () => {
     const [a, b] = [m.bots[2]!, m.bots[3]!];
     const body = `body_${m.bots[1]!.id}`;
     await act(a, 'act.reportBody', { bodyId: body });
+    // The first request opened the meeting (K) and moved everyone to the square: back to a world phase
+    // beside the body, so the second refusal is "already reported", not "wrong phase".
+    setPhase(m, Phase.day);
+    teleport(m, b, 'overworld', 32, 22);
     await act(b, 'act.reportBody', { bodyId: body });
     expect(rec.requests).toEqual([{ reason: 'body', callerId: a.id, bodyOf: m.bots[1]!.id }]);
     expect(errorCodes(a)).toEqual([]);
@@ -108,12 +112,20 @@ describe('bell', () => {
     const m = await party();
     const rec = record(m);
     const [t, d] = [m.bots[1]!, m.bots[3]!];
-    teleport(m, t, 'overworld', BELL.x, BELL.y + 1);
-    teleport(m, d, 'overworld', BELL.x + 1, BELL.y + 1);
+    // Every accepted pull opens a meeting (K) and moves everyone to the square, so each pull starts
+    // again from a world phase within reach of the bell.
+    const atBell = (phase: number) => {
+      setPhase(m, phase);
+      teleport(m, t, 'overworld', BELL.x, BELL.y + 1);
+      teleport(m, d, 'overworld', BELL.x + 1, BELL.y + 1);
+    };
+    atBell(Phase.day);
     await act(t, 'act.bell', {});
-    setPhase(m, Phase.night);
+    atBell(Phase.night);
     await act(t, 'act.bell', {});
+    atBell(Phase.dusk);
     await act(d, 'act.bell', {});
+    atBell(Phase.night);
     await act(d, 'act.bell', {});
     // Townsfolk pull twice, the Detective once (roles.json bellPulls).
     expect(rec.requests.map((r) => [r.reason, r.callerId])).toEqual([

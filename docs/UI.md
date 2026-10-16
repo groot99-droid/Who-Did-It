@@ -149,7 +149,7 @@ widest. Escape and the ghost button close.
 
 **Toasts** (`.wdi-toasts`, `.wdi-toast`). Bottom centre above the touch cluster, paper, a
 6 px left rule in teal (`--interact`: "Hold E on a glowing clue"), magenta (`--hazard`: "A
-scream from the north") or lantern (`--warm`: "B at the bell calls a meeting"), the matching
+scream from the north") or lantern (`--warm`: "E at the bell calls a meeting"), the matching
 glyph on a disc, and the key as a keycap on the right. Text stays ink; the rule and glyph
 carry the kind.
 
