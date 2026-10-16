@@ -2,9 +2,21 @@ import { describe, expect, it } from 'vitest';
 import * as content from '../src/index.js';
 import { names, validateNames } from '../src/server.js';
 
-// The cast of WORLD.md 1 and GDD 3.11: an NPC seat that took one of these names would read as the
-// landmark itself, so the pool never borrows a word from them.
-const CAST = ['Aldous', 'Vane', 'Tamsin', 'Crumb', 'Grieves', 'Fennick', 'Bray', 'Mallory', 'Tuck'];
+// The cast and the named places of WORLD.md and GDD 3.11: an NPC seat that took one of these names
+// would read as the landmark itself, so the pool never borrows a word from them.
+const CAST = [
+  'Aldous',
+  'Vane',
+  'Tamsin',
+  'Crumb',
+  'Grieves',
+  'Fennick',
+  'Bray',
+  'Mallory',
+  'Tuck',
+  'Hale',
+  'Brannock',
+];
 
 describe('the NPC name pool (GDD 3.12, A39)', () => {
   it('is valid: lobby-legal, unique, free of role tokens, enough for a full party', () => {
