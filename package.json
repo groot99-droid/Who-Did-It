@@ -19,7 +19,8 @@
     "docs:protocol": "pnpm --filter @wdi/shared docs:protocol",
     "bots": "pnpm --filter @wdi/bots start",
     "grid:export": "pnpm --filter @wdi/grid export",
-    "bots:soak": "pnpm --filter @wdi/bots soak"
+    "bots:soak": "pnpm --filter @wdi/bots soak",
+    "bots:live": "pnpm --filter @wdi/bots live"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

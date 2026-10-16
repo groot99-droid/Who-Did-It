@@ -38,12 +38,17 @@ is done by a build session.
    `.github/workflows/pages.yml`.)
 4. **Pages source.** Settings > Pages > Build and deployment > Source = **GitHub Actions**.
 5. **Same build on both sides.** The `build` on `/health` equals the first 8 characters of the commit
-   the `pages` run deployed. A mismatch makes every join fail with "refresh to update"
-   (ARCHITECTURE 5.10); redeploy whichever side is behind.
-6. **Smoke run, alone, the day before.** Open `https://groot99-droid.github.io/Who-Did-It/` in two
-   browsers (one a phone), create a party, join it, start, walk through a door. If the landing shows
-   "Waking the village..." for more than a moment, the page still points at Render Free: step 3 did
-   not take.
+   the `pages` run deployed. Every push to the default branch redeploys both (Railway follows the
+   branch, Pages runs on the push), so after a push wait for both to finish before testing. A
+   mismatch makes every join fail with "refresh to update" (ARCHITECTURE 5.10); redeploy whichever
+   side is behind.
+6. **Smoke run, alone, the day before.** First from a terminal in the repo:
+   `pnpm bots:live -- --url https://who-did-it-production.up.railway.app` creates a party on the live
+   server with five bots, starts it and reports the role cards and the overworld entry (exit code 1
+   on any failure). Then open `https://groot99-droid.github.io/Who-Did-It/` in two browsers (one a
+   phone), create a party, join it, start, walk through a door. If the landing shows "Waking the
+   village..." for more than a moment, the page is not reaching the server: check step 3 and the
+   service's logs.
 7. **Server logs.** Railway > the service > Logs open in a tab. Each finished match prints one JSON
    line (the match log, 4); the scorecard needs it.
 8. **The form.** Build the Google Form from `FORM.md` and keep its link ready to paste.

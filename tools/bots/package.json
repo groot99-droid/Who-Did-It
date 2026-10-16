@@ -9,7 +9,8 @@
     "walk": "tsx --conditions=development walk.ts",
     "soak": "tsx --conditions=development soak.ts",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "live": "tsx live.ts"
   },
   "dependencies": {
     "@colyseus/sdk": "^0.18.5",
