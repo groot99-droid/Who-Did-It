@@ -1,12 +1,15 @@
 import Phaser from 'phaser';
 import abilitiesJson from '@wdi/content/data/abilities.json';
 import balance from '@wdi/content/data/balance.json';
+import onubBalance from '@wdi/content/data/balance.onub.json';
 import palette from '@wdi/content/data/palette.json';
 import { Phase } from '@wdi/shared';
-import { TILE_PX } from '@wdi/shared/constants';
+import { ONUB_SET_PLATE, TICK_RATE, TILE_PX } from '@wdi/shared/constants';
+import { dirFromVector } from '@wdi/shared/direction';
 import { InputController } from '../input/InputController';
 import { TouchControls } from '../input/TouchControls';
 import {
+  REG_INPUT,
   REG_ROLE_CHIP,
   REG_WORLD,
   type BodySnap,
@@ -14,7 +17,9 @@ import {
   type NoisePulse,
   type SceneEnter,
   type WorldFeed,
+  type WorldFeedEvents,
 } from '../net/world';
+import { WORLD_COPY as C, fill } from '../ui/copy';
 import { overlayRoot } from '../ui/dom';
 import { AudioBus } from '../view/AudioBus';
 import { BodyView } from '../view/BodyView';
@@ -26,6 +31,17 @@ import { NotebookSheet } from '../view/NotebookPanel';
 import { PropView, overworldProps } from '../view/PropView';
 import { sceneMapKey, sceneMapUrl } from '../view/assets';
 import { isTouchDevice, readDevFlags } from '../view/devFlags';
+import {
+  ACT_RANGE_PX,
+  PLATE_HOLD_MS,
+  bakerySpots,
+  pickAct,
+  promptFor,
+  revealLine,
+  roleName,
+  type ActChoice,
+} from '../view/quickMode';
+import { loadSceneName } from '../view/sceneNames';
 import { REG_AUDIO, getNet } from './registry';
 
 /** How close a player must stand to a door to use it, in tiles (balance.json `doors.reachTiles`, GDD 3.7). */
@@ -41,13 +57,22 @@ const TARGET_SLACK_TILES = 1;
 const ABILITY_DEFS = A as unknown as Record<string, { kind: string; target: string; rangeTiles?: number }>;
 const ABILITY_SLOTS: Record<string, string> = { KeyQ: 'Q', KeyR: 'R', KeyF: 'F' };
 const PHASE_LABEL: Record<number, string> = {
-  [Phase.grace]: 'Grace',
-  [Phase.day]: 'Day',
-  [Phase.dusk]: 'Dusk',
-  [Phase.night]: 'Night',
-  [Phase.dawn]: 'Dawn',
-  [Phase.immunity]: 'Immunity',
-  [Phase.finalNight]: 'Final night',
+  [Phase.grace]: C['phase.grace'],
+  [Phase.day]: C['phase.day'],
+  [Phase.dusk]: C['phase.dusk'],
+  [Phase.night]: C['phase.night'],
+  [Phase.dawn]: C['phase.dawn'],
+  [Phase.immunity]: C['phase.immunity'],
+  [Phase.finalNight]: C['phase.finalNight'],
+};
+/** Refusal codes of ARCHITECTURE 5.5 to their deck lines (UI.md 14.3). */
+const REFUSAL: Record<number, string> = {
+  424: C['refuse.cooldown'],
+  425: C['refuse.notNow'],
+  426: C['refuse.busy'],
+  427: C['refuse.reach'],
+  423: C['refuse.locked'],
+  428: C['refuse.closed'],
 };
 const WORLD_PHASES = new Set<number>([
   Phase.grace,
@@ -64,13 +89,16 @@ type Target =
   | { kind: 'body'; id: string; x: number; y: number }
   | { kind: 'clue'; id: string; x: number; y: number }
   | { kind: 'bell'; x: number; y: number }
-  | { kind: 'door'; id: string; x: number; y: number; boarded: boolean };
+  | { kind: 'door'; id: string; x: number; y: number; boarded: boolean }
+  /** Quick mode, dusk: the own plate, held to set it. */
+  | { kind: 'plate'; id: string; x: number; y: number }
+  /** Quick mode, a night window: the act the nearest prop in reach offers. */
+  | { kind: 'act'; choice: ActChoice; x: number; y: number };
 
 /** Clue ids this client has already collected, per feed: the prompt does not offer them again. */
 const collectedBy = new WeakMap<WorldFeed, Set<string>>();
 /** The World scene shows about this many tiles top to bottom whatever the window size. */
 const VIEW_TILES_HIGH = 11;
-const REG_INPUT = 'worldInput';
 
 interface PortalSpot {
   id: string;
@@ -111,6 +139,16 @@ export class World extends Phaser.Scene {
   private hold: { clueId: string; since: number; x: number; y: number } | null = null;
   private focusEntry: { had: number; until: number } | null = null;
   private wasDead = false;
+  /** Quick mode (GDD 3.11): this run is the bakery of a quick-mode match. */
+  private quick = false;
+  /** Quick mode: a hold that finishes on the client (the plate, a night act) and sends one `act.ability`. */
+  private local: { since: number; x: number; y: number; ms: number; done: () => void } | null = null;
+  /** Quick mode: the first pick of a `picks: 2` act, held until the second. */
+  private firstPick: { act: string; targetId: string } | null = null;
+  private plateSet = false;
+  private revealLines: string[] = [];
+  /** What the last verb was, so a bare 422 reads as the deck's line for that verb. */
+  private lastVerb: 'kill' | 'report' | 'other' = 'other';
   private lastPhase = -1;
   private stepAt = 0;
   private lit = { visible: false, x: 0, y: 0, darkness: 0 };
@@ -128,6 +166,11 @@ export class World extends Phaser.Scene {
     this.hold = null;
     this.focusEntry = null;
     this.wasDead = false;
+    this.local = null;
+    this.firstPick = null;
+    this.plateSet = false;
+    this.revealLines = [];
+    this.lastVerb = 'other';
   }
 
   preload(): void {
@@ -145,13 +188,14 @@ export class World extends Phaser.Scene {
 
     this.buildMap();
     this.swing = this.add.graphics().setDepth(1);
-    this.propView = new PropView(this, this.sceneId);
+    this.quick = this.sceneId === 'bakery' && feed.mode() === 'onub';
+    this.propView = new PropView(this, this.sceneId, this.quick);
     this.clueView = new ClueView(this);
     this.entities = new EntityView(this, feed.selfId);
 
     this.hud = new Hud(overlayRoot());
     this.hud.setChip((this.registry.get(REG_ROLE_CHIP) as HudChip | undefined) ?? null);
-    this.hud.say(`Hollowmere: ${this.sceneId}`, 1500);
+    void loadSceneName(this.sceneId).then((scene) => this.hud.say(fill(C['hud.scene'], { scene }), 1500));
     this.hud.onNotebook(() => this.sheet.toggle());
     this.lighting = new Lighting(overlayRoot());
     this.sheet = new NotebookSheet(overlayRoot(), feed);
@@ -163,11 +207,9 @@ export class World extends Phaser.Scene {
     this.lastPhase = feed.clock().phase;
 
     const input: InputController = this.registry.get(REG_INPUT) ?? new InputController(feed);
-    if (!this.registry.has(REG_INPUT)) {
-      this.registry.set(REG_INPUT, input);
-      input.start();
-    }
+    this.registry.set(REG_INPUT, input);
     input.setSink(feed);
+    input.start();
     this.input_ = input;
     this.bindKeys();
     if (flags.touch || isTouchDevice()) {
@@ -181,12 +223,14 @@ export class World extends Phaser.Scene {
     const net = getNet(this);
     const onNoise = (n: NoisePulse) => this.ring(n);
     const onError = (e: { code?: number; msg: string }) => {
-      this.hud.say(e.msg);
+      this.hud.say(this.refusal(e));
       if (e.code === 423 || e.code === 428) this.audio.play('door_locked');
     };
     const onFound = () => this.clueFound();
     const onKilled = () => this.refreshGhost();
+    const onReveal = ({ entries }: WorldFeedEvents['nightReveal']) => this.showReveals(entries, true);
     feed.bus.on('noise', onNoise);
+    feed.bus.on('nightReveal', onReveal);
     feed.bus.on('error', onError);
     feed.bus.on('clueFound', onFound);
     feed.bus.on('killed', onKilled);
@@ -196,6 +240,7 @@ export class World extends Phaser.Scene {
       () => feed.bus.off('error', onError),
       () => feed.bus.off('clueFound', onFound),
       () => feed.bus.off('killed', onKilled),
+      () => feed.bus.off('nightReveal', onReveal),
       () => net.bus.off('error', onError as never),
     );
 
@@ -245,6 +290,8 @@ export class World extends Phaser.Scene {
       this.touch = null;
     });
     this.graceToasts();
+    this.entryToasts();
+    if (this.quick && feed.wake() !== null) this.showReveals(feed.nightReveal(), false);
   }
 
   override update(): void {
@@ -258,8 +305,20 @@ export class World extends Phaser.Scene {
       this.cameras.main.centerOn(self.x, self.y);
     }
     const clock = feed.clock();
-    this.hud.setTimer(clock.phaseEndsTick > 0 ? clock.phaseEndsTick - clock.tick : null);
-    const darkness = Lighting.darkness(clock.phase, clock.phaseEndsTick - clock.tick);
+    // A quick-mode window has its own end; the night's end covers every window.
+    const win = this.quick ? feed.wake() : null;
+    const endsTick = win ? win.endsTick : clock.phaseEndsTick;
+    this.hud.setTimer(endsTick > 0 ? endsTick - clock.tick : null);
+    this.hud.setBanner(win ? fill(C['quick.window'], { role: roleName(win.windowRole) }) : null);
+    if (this.quick) {
+      this.entities.setMates(new Set(feed.mates()));
+      this.propView.update(feed.props(), (id) => this.nameOf(id), feed.selfId);
+    }
+    const darkness = Lighting.darkness(
+      clock.phase,
+      clock.phaseEndsTick - clock.tick,
+      this.quick ? onubBalance.timers.duskS * TICK_RATE : undefined,
+    );
     this.hud.setPhase(PHASE_LABEL[clock.phase] ?? '', darkness >= 1);
     this.watchPhase(clock.phase);
     this.refreshGhost();
@@ -318,10 +377,21 @@ export class World extends Phaser.Scene {
   /** E / Use pressed: act on the nearest target. A clue starts a hold that ends with `endUse`. */
   private startUse(): void {
     const t = this.target;
-    if (!t) return this.hud.say('Nothing to use here');
+    if (!t) return this.hud.toast(C['toast.nothing'], 'interact');
     switch (t.kind) {
       case 'body':
+        this.lastVerb = 'report';
         this.feed.reportBody(t.id);
+        break;
+      case 'plate':
+        this.beginLocal(t, PLATE_HOLD_MS, () => {
+          this.plateSet = true;
+          this.feed.ability(ONUB_SET_PLATE, t.id);
+          this.hud.toast(C['quick.plate.set'], 'interact');
+        });
+        break;
+      case 'act':
+        this.beginLocal(t, t.choice.act.holdS * 1000, () => this.sendAct(t.choice));
         break;
       case 'bell':
         this.feed.bell();
@@ -341,11 +411,37 @@ export class World extends Phaser.Scene {
 
   /** E / Use released: a hold that has not reached `castS` is a cancelled hold. */
   private endUse(): void {
+    this.cancelLocal();
     const h = this.hold;
     if (!h) return;
     this.hold = null;
     this.clueView?.setHold(null);
     this.feed.hold('collect', h.clueId, false);
+    this.hud.toast(C['toast.collect.cancel'], 'interact');
+  }
+
+  /** Quick mode: starts a client-side hold at a prop; `done` runs when the ring is full. */
+  private beginLocal(at: { x: number; y: number }, ms: number, done: () => void): void {
+    if (this.local) return;
+    this.local = { since: this.time.now, x: at.x, y: at.y, ms, done };
+  }
+
+  private cancelLocal(): void {
+    if (!this.local) return;
+    this.local = null;
+    this.clueView?.setHold(null);
+    this.hud?.toast(C['toast.collect.cancel'], 'interact');
+  }
+
+  /** A finished act hold: one pick sends at once, the first of two is kept until the second. */
+  private sendAct({ act, prop, second }: ActChoice): void {
+    if (act.picks === 2 && !second) {
+      this.firstPick = { act: act.act, targetId: prop.id };
+      this.hud.toast(C['quick.pick.first'], 'interact');
+    } else if (act.picks === 2 && this.firstPick) {
+      this.feed.ability(act.act, this.firstPick.targetId, prop.id);
+      this.firstPick = null;
+    } else this.feed.ability(act.act, prop.id);
   }
 
   /** Q, R or F: the card's ability on that key, aimed at the nearest living player in reach. */
@@ -359,9 +455,11 @@ export class World extends Phaser.Scene {
       return;
     }
     const near = this.nearestPlayer((def.rangeTiles ?? PORTAL_REACH_TILES) + TARGET_SLACK_TILES);
-    if (!near) return this.hud.say('Nobody close enough');
-    if (row.id === 'kill') this.feed.kill(near);
-    else this.feed.ability(row.id, near);
+    if (!near) return this.hud.say(C['refuse.nobody']);
+    if (row.id === 'kill') {
+      this.lastVerb = 'kill';
+      this.feed.kill(near);
+    } else this.feed.ability(row.id, near);
   }
 
   private nearestPlayer(reachTiles: number): string | null {
@@ -391,6 +489,7 @@ export class World extends Phaser.Scene {
   ): void {
     this.target = null;
     if (!self) return this.hud.setPrompt(null);
+    if (this.quick) return this.updateQuickTarget(self);
     const ghost = this.feed.dead();
     let best = Infinity;
     const consider = (t: Target, reach: number) => {
@@ -422,19 +521,69 @@ export class World extends Phaser.Scene {
       t === null
         ? null
         : t.kind === 'body'
-          ? 'Report'
+          ? C['prompt.report']
           : t.kind === 'clue'
-            ? 'Hold E to collect'
+            ? C['prompt.collect']
             : t.kind === 'bell'
-              ? 'Ring the bell'
-              : t.boarded
-                ? 'Boarded up'
-                : 'Enter',
+              ? C['prompt.bell']
+              : t.kind === 'door'
+                ? t.boarded
+                  ? C['prompt.door.boarded']
+                  : C['prompt.door']
+                : null,
     );
+  }
+
+  /**
+   * Quick mode (GDD 3.11): no doors, bodies or clues here. In dusk the own plate offers "Set your plate";
+   * in a night window the nearest prop in reach offers the window's act for it (`pickAct`).
+   */
+  private updateQuickTarget(self: Phaser.GameObjects.Container): void {
+    const feed = this.feed;
+    const spots = bakerySpots(feed.props());
+    const win = feed.wake();
+    if (win) {
+      const seen = new Set(feed.snapshot().flatMap((p) => (p.presence ? [p.id] : [])));
+      const choice = pickAct({
+        role: win.windowRole,
+        spots,
+        selfId: feed.selfId,
+        self,
+        first: this.firstPick,
+        alone: !feed.mates().some((id) => seen.has(id)),
+      });
+      if (choice) {
+        this.target = { kind: 'act', choice, x: choice.prop.x, y: choice.prop.y };
+        return this.hud.setPrompt(promptFor(choice));
+      }
+    } else if (feed.clock().phase === Phase.dusk && !this.plateSet) {
+      const own = spots.find((p) => p.kind === 'plate' && p.of === feed.selfId);
+      if (own && Math.hypot(self.x - own.x, self.y - own.y) <= ACT_RANGE_PX) {
+        this.target = { kind: 'plate', id: own.id, x: own.x, y: own.y };
+        return this.hud.setPrompt(C['prompt.plate.set']);
+      }
+    }
+    this.hud.setPrompt(null);
   }
 
   /** Draws the collect ring and drops the hold when the server has surely cancelled it. */
   private updateHold(self: Phaser.GameObjects.Container | null, clues: ClueSnap[]): void {
+    const l = this.local;
+    if (l) {
+      const moving = this.input_.current();
+      if (
+        !self ||
+        Math.hypot(self.x - l.x, self.y - l.y) > ACT_RANGE_PX + 8 ||
+        moving.dx !== 0 ||
+        moving.dy !== 0
+      )
+        return this.cancelLocal();
+      const progress = (this.time.now - l.since) / l.ms;
+      if (progress < 1) return this.clueView.setHold({ x: l.x, y: l.y }, progress);
+      this.local = null;
+      this.clueView.setHold(null);
+      return l.done();
+    }
     const h = this.hold;
     if (!h) return;
     const moving = this.input_.current();
@@ -444,6 +593,7 @@ export class World extends Phaser.Scene {
       // Moving or leaving cancels the hold on the server too (GDD 3.4); nothing more to send.
       this.hold = null;
       this.clueView.setHold(null);
+      this.hud.toast(C['toast.collect.cancel'], 'interact');
       return;
     }
     this.clueView.setHold({ x: h.x, y: h.y }, (this.time.now - h.since) / COLLECT_MS);
@@ -459,6 +609,7 @@ export class World extends Phaser.Scene {
     this.hold = null;
     this.clueView.setHold(null);
     this.audio.play('pickup');
+    this.hud.toast(C['toast.clue.found'], 'interact');
     // The Notebook opens on the new entry (GDD 2 step 5); the entry may trail the message by a patch.
     this.focusEntry = { had: this.feed.notebook().length, until: this.time.now + 3000 };
     this.sheet.open();
@@ -503,15 +654,21 @@ export class World extends Phaser.Scene {
     this.touch?.setActEnabled(!dead);
     if (dead) {
       this.endUse();
-      this.hud.say('You are a ghost', 5000);
+      this.hud.toast(C['toast.ghost'], 'hazard', undefined, 5000);
       this.audio.play('scream');
     }
   }
 
   private watchPhase(phase: number): void {
     if (phase === this.lastPhase) return;
+    const was = this.lastPhase;
     this.lastPhase = phase;
-    if (phase === Phase.dusk) this.hud.toast('Night falls', 'warm', undefined, 5000);
+    if (phase === Phase.dusk) {
+      const duskS = this.quick ? onubBalance.timers.duskS : balance.phases.duskS;
+      this.hud.toast(fill(C['toast.dusk'], { duskS }), 'warm', undefined, 5000);
+    } else if (phase === Phase.night) this.hud.toast(C['toast.night'], 'warm', undefined, 5000);
+    else if (phase === Phase.day && was === Phase.night)
+      this.hud.toast(C['toast.day'], 'warm', undefined, 5000);
   }
 
   /** The three hints of GDD 2 step 5, once per match (the key includes the match start). */
@@ -519,9 +676,43 @@ export class World extends Phaser.Scene {
     const clock = this.feed.clock();
     if (clock.phase !== Phase.grace) return;
     const tag = `grace:${clock.startTick}`;
-    this.hud.toast('Shift to sneak', 'interact', 'Shift', 7000, `${tag}:sneak`);
-    this.hud.toast('Hold E on a glowing clue', 'interact', 'E', 7000, `${tag}:clue`);
-    this.hud.toast('E at the bell calls a meeting', 'warm', 'E', 7000, `${tag}:bell`);
+    this.hud.toast(C['toast.grace.sneak'], 'interact', 'Shift', 7000, `${tag}:sneak`);
+    this.hud.toast(C['toast.grace.collect'], 'interact', 'E', 7000, `${tag}:clue`);
+    this.hud.toast(C['toast.grace.bell'], 'warm', 'E', 7000, `${tag}:bell`);
+  }
+
+  /** What a fresh World run should say about where it starts: back from a meeting, a ghost, the quick-mode dusk. */
+  private entryToasts(): void {
+    const clock = this.feed.clock();
+    if (clock.phase === Phase.immunity)
+      this.hud.toast(C['toast.immunity'], 'warm', undefined, 4000, `immunity:${clock.phaseEndsTick}`);
+    if (this.feed.dead()) this.hud.say(C['ghost.walk'], 5000);
+    if (this.quick && clock.phase === Phase.dusk)
+      this.hud.toast(C['quick.dusk'], 'interact', undefined, 6000, `dusk:${clock.startTick}`);
+  }
+
+  /** A seat's public name for the plate labels and the reveal lines. */
+  private nameOf(seatId: string): string {
+    return this.feed.snapshot().find((p) => p.id === seatId)?.name ?? '?';
+  }
+
+  /** Quick mode: shows what a night act revealed, as a toast each (`toasts`) and a HUD line until the window ends. */
+  private showReveals(entries: Array<{ slot: string; of: string; roleId: string }>, toasts: boolean): void {
+    this.revealLines = entries.map((e) => revealLine(e, (id) => this.nameOf(id)));
+    this.hud.setReveals(this.revealLines);
+    if (toasts) for (const line of this.revealLines) this.hud.toast(line, 'warm', undefined, 6000);
+  }
+
+  /** The deck's line for a refusal code; a bare 422 reads by the last verb (UI.md 14.3). */
+  private refusal(e: { code?: number; msg: string }): string {
+    if (e.code === undefined) return e.msg;
+    if (e.code === 422)
+      return this.lastVerb === 'kill'
+        ? C['refuse.nothing']
+        : this.lastVerb === 'report'
+          ? C['refuse.reported']
+          : C['refuse.generic'];
+    return REFUSAL[e.code] ?? C['refuse.generic'];
   }
 
   private footsteps(now: number): void {
@@ -590,7 +781,16 @@ export class World extends Phaser.Scene {
     const col = colorOf(scream ? palette.colors.magenta : palette.colors.lantern);
     const g = this.add.circle(n.x, n.y, 8).setStrokeStyle(4, col).setDepth(1);
     this.tweens.add({ targets: g, scale: 8, alpha: 0, duration: 700, onComplete: () => g.destroy() });
-    const label = scream ? 'A scream' : n.kind === 'doorMuffled' ? 'A door, muffled' : 'A door creaks';
+    const me = this.entities.objectOf(this.feed.selfId);
+    const dir = me ? dirFromVector(n.x - me.x, n.y - me.y) : null;
+    const line = /bell/i.test(n.kind)
+      ? C['log.bell']
+      : scream
+        ? C['log.scream']
+        : /run|step/i.test(n.kind)
+          ? C['log.steps']
+          : C['log.door'];
+    const label = fill(line, { dir: dir === null ? '' : C[`dir.${dir}` as keyof typeof C] });
     this.hud.say(label);
     if (scream) this.audio.play('scream');
     const cam = this.cameras.main;

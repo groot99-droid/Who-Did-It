@@ -116,7 +116,7 @@ test('kill -> body -> collect -> one Notebook entry', async ({ page }, info) => 
     await page.keyboard.up('KeyD');
     await page.waitForTimeout(60);
   }
-  await expect(prompt).toContainText('Hold E to collect');
+  await expect(prompt).toContainText('Hold to collect');
   await page.keyboard.down('KeyE');
   await page.waitForTimeout(2300);
   await page.keyboard.up('KeyE');
@@ -138,4 +138,57 @@ test('a ghost is told so and loses every prompt but doors', async ({ page }, inf
   await expect(page.getByTestId('hud')).toContainText('You are a ghost');
   await page.waitForTimeout(400);
   await page.screenshot({ path: info.outputPath('ghost.png') });
+});
+
+// Quick mode (GDD 3.11) against the ?mock=1 world: dusk at the bakery, the loft, one night window, the dawn.
+
+test('quick mode: dusk at the bakery offers the own plate, held to set it', async ({ page }, info) => {
+  // A slow script (dusk lasts a quarter of a minute more) so a slow software-GL frame rate cannot miss it.
+  await toWorld(page, '&mode=onub&bots=still&fps=1&speed=0.25');
+  await expect(page.getByTestId('hud-fps')).toContainText('bakery');
+  await expect(page.getByTestId('hud-clock')).toContainText('Dusk');
+  await expect(page.getByTestId('hud').getByText('Set your plate before dark')).toBeVisible();
+  // No door prompts in quick mode: the spawn stands beside the bakery door and the prompt stays empty.
+  await expect(page.getByTestId('prompt')).toBeHidden();
+  // The own plate is bk.plate_0, on the wake table north-west of the door: up to the table's edge, then west.
+  await page.keyboard.down('KeyW');
+  await page.waitForTimeout(1500);
+  await page.keyboard.up('KeyW');
+  await walkUntilPrompt(page, ['KeyA'], 'Set your plate');
+  await page.screenshot({ path: info.outputPath('plate-prompt.png') });
+  await page.keyboard.down('KeyE');
+  await page.waitForTimeout(1500);
+  await page.keyboard.up('KeyE');
+  await expect(page.getByText('Plate set')).toBeVisible();
+  await expect(page.getByTestId('prompt')).toBeHidden();
+});
+
+test('quick mode: the loft, one window with a reveal, the loft again, then the dawn meeting', async ({
+  page,
+}, info) => {
+  test.setTimeout(120_000);
+  await toWorld(page, '&mode=onub&bots=still&window=cutpurse');
+  // Dusk ends: everyone sleeps. The loft has no clock and no HUD and one occupied bedroll per seat.
+  const loft = page.getByTestId('loft');
+  await expect(loft).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId('hud-clock')).toBeHidden();
+  await expect(page.locator('[data-testid^="bedroll-"]')).toHaveCount(7);
+  await expect(page.getByTestId('bedroll-mock-me')).toHaveClass(/is-self/);
+  await page.screenshot({ path: info.outputPath('loft.png') });
+  // The window opens: back in the bakery with the window banner and its timer.
+  const banner = page.getByTestId('night-wake');
+  await expect(banner).toBeVisible({ timeout: 30_000 });
+  await expect(banner).toContainText('Cutpurse');
+  await expect(loft).toBeHidden();
+  // Walk toward the plates until the take is offered, hold it, and read what it showed.
+  await walkUntilPrompt(page, ['KeyW'], "Take a mourner's loaf");
+  await page.keyboard.down('KeyE');
+  await page.waitForTimeout(2600);
+  await page.keyboard.up('KeyE');
+  await expect(page.getByTestId('night-reveal')).toContainText(':');
+  await page.screenshot({ path: info.outputPath('reveal.png') });
+  // The window ends: the loft again, then the dawn hands over to the meeting.
+  await expect(loft).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId('meeting-reason')).toBeVisible({ timeout: 40_000 });
+  await expect(loft).toBeHidden();
 });
