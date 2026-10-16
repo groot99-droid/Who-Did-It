@@ -126,25 +126,6 @@
   z-index: 1;
 }
 
-/* The theme anchors the corner groups with `inherit`, which ignores the safe-area padding; set it here. */
-.wdi-hud .wdi-hud__tl,
-.wdi-hud .wdi-hud__tc,
-.wdi-hud .wdi-hud__tr {
-  top: calc(var(--wdi-space-3) + env(safe-area-inset-top));
-}
-.wdi-hud .wdi-hud__tl,
-.wdi-hud-touch .wdi-hud__bl {
-  left: calc(var(--wdi-space-3) + env(safe-area-inset-left));
-}
-.wdi-hud .wdi-hud__tr,
-.wdi-hud-touch .wdi-hud__br {
-  right: calc(var(--wdi-space-3) + env(safe-area-inset-right));
-}
-.wdi-hud-touch .wdi-hud__bl,
-.wdi-hud-touch .wdi-hud__br {
-  bottom: calc(var(--wdi-space-3) + env(safe-area-inset-bottom));
-}
-
 .wdi-hud > .wdi-edge-cue {
   margin: -28px 0 0 -28px;
   pointer-events: none;
