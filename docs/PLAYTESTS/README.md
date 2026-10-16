@@ -38,10 +38,12 @@ is done by a build session.
    `.github/workflows/pages.yml`.)
 4. **Pages source.** Settings > Pages > Build and deployment > Source = **GitHub Actions**.
 5. **Same build on both sides.** The `build` on `/health` equals the first 8 characters of the commit
-   the `pages` run deployed. Every push to the default branch redeploys both (Railway follows the
-   branch, Pages runs on the push), so after a push wait for both to finish before testing. A
-   mismatch makes every join fail with "refresh to update" (ARCHITECTURE 5.10); redeploy whichever
-   side is behind.
+   the `pages` run deployed. Every push to the default branch redeploys both, at different speeds:
+   Pages is live about a minute after the push, while Railway waits for that commit's CI run to pass
+   and then builds, about seven minutes in all. Until the server catches up every join fails with
+   "refresh to update" (ARCHITECTURE 5.10), so after a push wait for `/health` to show the new
+   commit before testing. A red CI run leaves the server on the previous commit until the next green
+   push; do not push to the default branch during a session.
 6. **Smoke run, alone, the day before.** First from a terminal in the repo:
    `pnpm bots:live -- --url https://who-did-it-production.up.railway.app` creates a party on the live
    server with five bots, starts it and reports the role cards and the overworld entry (exit code 1
