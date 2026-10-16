@@ -159,6 +159,20 @@ export class MockWorldFeed implements WorldFeed {
       const spawn = this.content.scenes.overworld?.spawns.find((s) => s.id === `square_${i}`);
       if (spawn) this.place(body, 'overworld', spawn);
     });
+    const teach = this.content.scenes.overworld?.props?.find((p) => p.id === 'ov.teaching_clue');
+    if (teach) {
+      // GDD 2 step 5: the grace clue beside the well, Footprints with a tall stride.
+      this.clueMap.set('clue_teaching', {
+        id: 'clue_teaching',
+        scene: 'overworld',
+        kind: ClueKind.footprints,
+        value: 2,
+        dir: 4,
+        x: (teach.x + 0.5) * TILE_PX,
+        y: (teach.y + 0.5) * TILE_PX,
+        claimed: false,
+      });
+    }
   }
 
   /** Starts the 20 Hz loop and tells the World scene to begin, like the server's first `sceneEnter`. */
@@ -180,25 +194,16 @@ export class MockWorldFeed implements WorldFeed {
     }, period / 2);
     const me = this.actors.get(this.selfId);
     const spawn = this.content.scenes.overworld?.spawns.find((s) => s.id === 'square_0');
-    const teach = this.content.scenes.overworld?.props?.find((p) => p.id === 'ov.teaching_clue');
-    if (teach) {
-      // GDD 2 step 5: the grace clue beside the well, Footprints with a tall stride.
-      this.clueMap.set('clue_teaching', {
-        id: 'clue_teaching',
-        scene: 'overworld',
-        kind: ClueKind.footprints,
-        value: 2,
-        dir: 4,
-        x: (teach.x + 0.5) * TILE_PX,
-        y: (teach.y + 0.5) * TILE_PX,
-        claimed: false,
-      });
-    }
     if (me && spawn)
       this.bus.emit('sceneEnter', { sceneId: 'overworld', spawn: spawn.id, facing: spawn.facing });
     if (this.ghost)
       window.setTimeout(
-        () => this.bus.emit('killed', { sceneId: 'overworld', cause: 'knife', roles: { [this.selfId]: 'killer' } }),
+        () =>
+          this.bus.emit('killed', {
+            sceneId: 'overworld',
+            cause: 'knife',
+            roles: { [this.selfId]: 'killer' },
+          }),
         0,
       );
   }
@@ -296,7 +301,12 @@ export class MockWorldFeed implements WorldFeed {
       hidden: false,
     });
     this.spawnTrail(victim);
-    this.bus.emit('noise', { sceneId: victim.scene, x: Math.round(victim.x), y: Math.round(victim.y), kind: 'killScream' });
+    this.bus.emit('noise', {
+      sceneId: victim.scene,
+      x: Math.round(victim.x),
+      y: Math.round(victim.y),
+      kind: 'killScream',
+    });
   }
 
   hold(action: HoldAction, targetId: string, on: boolean): void {
@@ -308,7 +318,8 @@ export class MockWorldFeed implements WorldFeed {
     const me = this.actors.get(this.selfId);
     const clue = this.clueMap.get(targetId);
     if (!me || this.ghost || !clue || clue.scene !== me.scene) return this.fail(422, 'nothing to collect');
-    if (this.book.some((e) => e.id === `entry_${targetId}`)) return this.fail(422, 'already in your notebook');
+    if (this.book.some((e) => e.id === `entry_${targetId}`))
+      return this.fail(422, 'already in your notebook');
     if (Math.hypot(clue.x - me.x, clue.y - me.y) > COLLECT_REACH_PX) return this.fail(427, 'too far');
     this.holding = { clueId: targetId, since: this.tick };
   }
@@ -518,7 +529,8 @@ export class MockWorldFeed implements WorldFeed {
       y: Math.round(b.y),
       yaw: b.yaw,
       animId: b.moving ? 1 : 0,
-      statusBits: (this.tick < b.busyUntil ? 1 : 0) | (b.id === this.selfId && this.tick < this.bloodyUntil ? 2 : 0),
+      statusBits:
+        (this.tick < b.busyUntil ? 1 : 0) | (b.id === this.selfId && this.tick < this.bloodyUntil ? 2 : 0),
       transitUntilTick: b.busyUntil,
     };
   }

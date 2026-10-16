@@ -627,3 +627,44 @@ win; the win check runs after deaths and ejections only; after game over the roo
 with the same code; a disconnected player is a ghost at once (M7 adds reconnection and the body) and a
 lobby seat survives a dropped connection for the disconnect window; `WDI_DEBUG=1` adds `debug.deal`
 and `debug.clock` beside `debug.play`.
+
+### Round 3 log: N (World actions, client)
+
+**Landed** on `claude/m3-world` (one draft PR; it is over 400 lines because the HUD move, the feeds and
+the views only make sense together): `net/world.ts` and both feeds with `bodies()`, `clues()`,
+`notebook()`, `dead()`, `kill`, `ability`, `hold`, `reportBody`, `bell` and the `killed`, `clueFound`,
+`phaseChange` events (`clock()` also returns `startTick`; `PlayerSnap` gains the roster `alive`);
+`World` with the one prompt (`data-testid="prompt"`), E, Q/R/F, N and the touch Use and Act discs, the
+2 s collect ring, `BodyView`, `ClueView`, `PropView`, the Blood pass, `Lighting`, ghost mode, the grace
+toasts and the Night falls toast, `NotebookPanel` (+ the `NotebookSheet` that opens it over the world),
+`AudioBus`, and the HUD on the theme (`.wdi-hud`, `.wdi-log`, `.wdi-toast`, `.wdi-edge-cue`,
+`.wdi-stick`, `.wdi-touch-*`; the `wdi-world-*` namespace is gone). `InputController` gained `bind`,
+`unbindAll` and `setSink`. Unit tests for the mock verbs and the pure view helpers; `world.spec.ts`
+keeps the door flow (now polling the prompt instead of fixed sleeps, and asserting no page errors) and
+adds kill -> body -> collect -> one Notebook entry, the night mask and the ghost. DECISIONS A34.
+
+**For L (server).** The client breaks a tie between a body and a clue in reach in favour of the body
+("Report"), so Footprints must not sit on the victim's own tile or the clue cannot be collected; the
+mock puts them one tile along the trail. `NotebookEntry.sceneId` is read as an index into `SCENE_IDS`.
+A hold ends client-side without a message when the player moves or leaves reach, and `on: false` is sent
+only for a release. `noise` kinds are matched loosely: anything containing "scream" is the scream
+(magenta ring, log line, edge cue, sound), `doorMuffled` is the muffled door, the rest a creaking door.
+
+**For M and the orchestrator.** `World` hides its HUD, the prompt, the night mask and the touch cluster on
+`SLEEP`, closes the Notebook sheet and releases its keys, and restores them on `WAKE`; it never starts a
+scene. The mock's `resume()` re-emits `sceneEnter` for the current scene; it emits `meetingRequest` for
+the report and the bell and nothing from the meeting. The mock reads `?phase=day|dusk|night`,
+`?bots=still` and `?ghost=1` (documented in A34); the `?fps=1` readout now also prints `at x,y`,
+`bodies n` and `clues n`, which the e2e and the bots can read. Importing the theme CSS from `Hud.ts` is
+enough for the fonts; the theme's `.wdi-hud__*` groups anchor with `inherit`, which ignores the
+safe-area padding, so `view/hud.css` sets the offsets itself (M may fix the theme and drop that block).
+`NotebookPanel` (`new NotebookPanel(parent, feed)`, `update()`, `destroy()`) takes the same `WorldFeed`
+the Meeting gets from the router.
+
+**Not done.** Toast and prompt ids from `docs/UI.md` 14 (it did not exist; the GDD 2 lines are used,
+with the bell hint reading "E at the bell" as briefed, while GDD 2 step 5 still says "B", which is Q's
+wording to fix). The real `props`, `vfx` and audio files are P's and Q's: until then props draw as
+labelled greybox blocks and the game is silent. Hold abilities (`inspect`, `dragBody`, `autopsy`) and
+the passive rows are M4. The night mask is a DOM vignette with one soft edge; line-of-sight shadows are
+not attempted. Not run: a real-server kill (L's server was not on the base), so the real feed's
+`bodies()`/`clues()`/`notebook()` reads are covered by types and review only.

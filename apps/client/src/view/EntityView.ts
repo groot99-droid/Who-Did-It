@@ -3,6 +3,10 @@ import type { PlayerSnap } from '../net/world';
 import { type PlayerLook, PlayerView, dirFromYaw } from './PlayerView';
 import { REMOTE_DELAY_MS, SELF_DELAY_MS, SampleBuffer } from './interpolation';
 import { StatusBit } from './animIds';
+import cluesJson from '@wdi/content/data/clues.json';
+import { TILE_PX } from '@wdi/shared/constants';
+
+const BLOOD_SIGHT_PX = cluesJson.clues.blood.params.visibleTiles * TILE_PX;
 
 interface Tracked {
   view: PlayerView;
@@ -17,6 +21,7 @@ interface Tracked {
  */
 export class EntityView {
   private readonly tracked = new Map<string, Tracked>();
+  private ghost = false;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -31,9 +36,15 @@ export class EntityView {
     return this.tracked.size;
   }
 
+  /** Draws the viewer's own sprite translucent once they are a ghost. */
+  setGhost(on: boolean): void {
+    this.ghost = on;
+  }
+
   /** Feeds one snapshot taken at wall time `now` (ms) and redraws everybody. */
   update(snaps: PlayerSnap[], now: number): void {
     const present = new Set<string>();
+    const selfPr = snaps.find((s) => s.id === this.selfId)?.presence ?? null;
     for (const snap of snaps) {
       const pr = snap.presence;
       if (pr === null) continue;
@@ -48,6 +59,12 @@ export class EntityView {
         };
         this.tracked.set(snap.id, t);
       }
+      const bloody = (pr.statusBits & StatusBit.bloody) !== 0;
+      const near =
+        snap.id === this.selfId ||
+        (selfPr !== null && Math.hypot(pr.x - selfPr.x, pr.y - selfPr.y) <= BLOOD_SIGHT_PX);
+      t.view.setBlood(bloody && near);
+      if (snap.id === this.selfId) t.view.setGhost(this.ghost);
       t.samples.push({ t: now, x: pr.x, y: pr.y, yaw: pr.yaw, animId: pr.animId });
       const delay = snap.id === this.selfId ? SELF_DELAY_MS : REMOTE_DELAY_MS;
       const s = t.samples.at(now - delay);

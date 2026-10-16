@@ -1,140 +1,87 @@
-/* World HUD and touch controls. Colours are the palette tokens (packages/content/data/palette.json). */
-.wdi-world-hud,
-.wdi-world-touch {
-  --ink: #12141c;
-  --slate: #2c3240;
-  --fog: #6f7a8c;
-  --bone: #d9d2c2;
-  --mustard: #f2b33d;
-  --teal: #2ec4b6;
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  font-family: Inter, sans-serif;
-  color: var(--bone);
-  z-index: 5;
+/* World HUD on the theme (docs/UI.md 6). The theme's tokens.css and components.css load first (Hud.ts
+   imports them), so these rules are the World-only overrides and additions. */
+
+/* The theme root paints the page ink; the HUD sits over the canvas and must stay see-through. */
+.wdi-root.wdi-hud,
+.wdi-root.wdi-hud-touch {
+  background: none;
 }
-.wdi-world-chip {
-  position: absolute;
-  top: max(12px, env(safe-area-inset-top));
-  left: max(12px, env(safe-area-inset-left));
+
+.wdi-hud > .wdi-toasts {
+  pointer-events: none;
+}
+
+.wdi-hud__tl {
   display: flex;
   align-items: center;
-  gap: 8px;
-  max-width: min(60vw, 420px);
-  padding: 6px 12px 6px 6px;
-  background: var(--slate);
-  border: 2px solid var(--ink);
-  border-radius: 10px;
-  font-size: 14px;
+  gap: var(--wdi-space-2);
 }
-.wdi-world-chip .wdi-world-chip-icon {
-  width: 32px;
-  height: 32px;
-  padding: 2px;
-  background: var(--bone);
-  border-radius: 6px;
-  flex: none;
+
+.wdi-hud-clock__time {
+  min-width: 3ch;
+  text-align: center;
 }
-.wdi-world-chip[hidden] {
-  display: none;
-}
-.wdi-world-timer {
-  position: absolute;
-  top: max(12px, env(safe-area-inset-top));
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 4px 14px;
-  background: var(--slate);
-  border: 2px solid var(--ink);
-  border-radius: 10px;
-  font-family: Oswald, sans-serif;
-  font-size: 22px;
-  letter-spacing: 0.06em;
-}
-.wdi-world-toast {
-  position: absolute;
-  bottom: 22%;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 6px 14px;
-  background: var(--ink);
-  border: 2px solid var(--mustard);
-  border-radius: 10px;
-  font-size: 15px;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.wdi-world-toast.on {
-  opacity: 1;
-}
-.wdi-world-fps {
-  position: absolute;
-  top: max(12px, env(safe-area-inset-top));
-  right: max(12px, env(safe-area-inset-right));
-  padding: 4px 8px;
-  background: var(--ink);
-  border-radius: 6px;
+
+.wdi-hud-fps {
+  margin: var(--wdi-space-2) 0 0;
+  padding: var(--wdi-space-1) var(--wdi-space-2);
   font:
     12px/1.3 ui-monospace,
     monospace;
+  color: var(--wdi-text);
+  background: var(--wdi-scrim);
+  border-radius: var(--wdi-radius-sm);
   white-space: pre;
 }
-.wdi-world-touch .wdi-world-stick {
-  position: absolute;
-  left: max(24px, env(safe-area-inset-left));
-  bottom: max(24px, env(safe-area-inset-bottom));
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--slate) 55%, transparent);
-  border: 2px solid var(--ink);
+
+.wdi-log__line {
+  margin: 0;
+}
+
+/* The prompt is the one toast that stays while a target is in reach. */
+.wdi-hud-prompt {
+  animation: none;
+}
+
+/* ---- night mask: a screen-space vignette centred on you (Lighting.ts sets --lx, --ly, --lr) ---- */
+.wdi-night-mask {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--wdi-z-hud) - 1);
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--lx, 50%) var(--ly, 50%),
+    transparent calc(var(--lr, 400px) * 0.55),
+    rgb(var(--wdi-ink-rgb) / var(--la, 0.6)) var(--lr, 400px)
+  );
+}
+
+.wdi-night-mask[hidden] {
+  display: none;
+}
+
+/* ---- touch cluster: the stick bottom-left, Use / Act / Run / Sneak bottom-right ---- */
+.wdi-hud-touch {
+  position: fixed;
+  inset: 0;
+  z-index: var(--wdi-z-hud);
+  padding: calc(var(--wdi-space-3) + env(safe-area-inset-top))
+    calc(var(--wdi-space-3) + env(safe-area-inset-right))
+    calc(var(--wdi-space-3) + env(safe-area-inset-bottom))
+    calc(var(--wdi-space-3) + env(safe-area-inset-left));
+  pointer-events: none;
+}
+
+.wdi-hud-touch .wdi-stick,
+.wdi-hud-touch .wdi-touch-btn {
   pointer-events: auto;
-  touch-action: none;
-}
-.wdi-world-touch .wdi-world-stick i {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 56px;
-  height: 56px;
-  margin: -28px 0 0 -28px;
-  border-radius: 50%;
-  background: var(--bone);
-  border: 2px solid var(--ink);
-}
-.wdi-world-touch .wdi-world-btns {
-  position: absolute;
-  right: max(24px, env(safe-area-inset-right));
-  bottom: max(24px, env(safe-area-inset-bottom));
-  display: grid;
-  grid-template-columns: 76px 76px;
-  gap: 12px;
-}
-.wdi-world-touch button {
-  height: 76px;
-  border-radius: 50%;
-  border: 2px solid var(--ink);
-  background: var(--slate);
-  color: var(--bone);
-  font:
-    600 15px Oswald,
-    sans-serif;
-  pointer-events: auto;
-  touch-action: none;
   user-select: none;
+  -webkit-user-select: none;
 }
-.wdi-world-touch button.use {
-  grid-column: 1 / span 2;
-  justify-self: center;
-  width: 96px;
-  height: 96px;
-  background: var(--mustard);
-  color: var(--ink);
-}
-.wdi-world-touch button.on {
-  background: var(--teal);
-  color: var(--ink);
+
+.wdi-touch-btn.is-on {
+  background-color: var(--wdi-interact);
+  background-image: none;
 }
 
 /* While the World scene runs the canvas host fills the window; the scene switches Phaser to RESIZE. */
@@ -146,4 +93,59 @@
   width: 100% !important;
   height: 100% !important;
   margin: 0 !important;
+}
+
+/* ---- the Notebook sheet that opens over the world (N or the HUD button) ---- */
+.wdi-notebook-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: var(--wdi-z-panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--wdi-space-4);
+  background: var(--wdi-scrim);
+  pointer-events: auto;
+}
+
+.wdi-notebook-sheet[hidden] {
+  display: none;
+}
+
+.wdi-notebook-sheet__page {
+  width: min(480px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  position: relative;
+}
+
+.wdi-notebook-sheet__close {
+  position: absolute;
+  top: var(--wdi-space-2);
+  right: var(--wdi-space-2);
+  z-index: 1;
+}
+
+/* The theme anchors the corner groups with `inherit`, which ignores the safe-area padding; set it here. */
+.wdi-hud .wdi-hud__tl,
+.wdi-hud .wdi-hud__tc,
+.wdi-hud .wdi-hud__tr {
+  top: calc(var(--wdi-space-3) + env(safe-area-inset-top));
+}
+.wdi-hud .wdi-hud__tl,
+.wdi-hud-touch .wdi-hud__bl {
+  left: calc(var(--wdi-space-3) + env(safe-area-inset-left));
+}
+.wdi-hud .wdi-hud__tr,
+.wdi-hud-touch .wdi-hud__br {
+  right: calc(var(--wdi-space-3) + env(safe-area-inset-right));
+}
+.wdi-hud-touch .wdi-hud__bl,
+.wdi-hud-touch .wdi-hud__br {
+  bottom: calc(var(--wdi-space-3) + env(safe-area-inset-bottom));
+}
+
+.wdi-hud > .wdi-edge-cue {
+  margin: -28px 0 0 -28px;
+  pointer-events: none;
 }
