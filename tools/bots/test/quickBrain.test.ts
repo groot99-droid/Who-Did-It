@@ -13,10 +13,10 @@ function fakeRoom(selfId: string) {
   const players = new Map<string, Record<string, unknown>>();
   const bakery = { bodies: new Map(), props: new Map<string, unknown>() };
   const state = {
-    phase: Phase.lobby,
+    phase: Phase.lobby as number,
     tick: 0,
     leaderId: selfId,
-    settings: { mode: GameMode.onub },
+    settings: { mode: GameMode.onub as number },
     players: {
       forEach: (cb: (p: never, id: string) => void) => players.forEach((p, id) => cb(p as never, id)),
       get: (id: string) => players.get(id) as never,
@@ -30,7 +30,14 @@ function fakeRoom(selfId: string) {
     send: (type: string, payload: Record<string, unknown>) => sent.push({ type, payload }),
   } as unknown as Room;
   const player = (id: string, extra: Record<string, unknown> = {}) => {
-    const p = { id, name: id, alive: true, hasVoted: false, sceneId: 0, ...extra };
+    const p: Record<string, unknown> & { presence?: unknown } = {
+      id,
+      name: id,
+      alive: true,
+      hasVoted: false,
+      sceneId: 0,
+      ...extra,
+    };
     players.set(id, p);
     return p;
   };
