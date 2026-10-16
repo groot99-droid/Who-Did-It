@@ -627,3 +627,35 @@ win; the win check runs after deaths and ejections only; after game over the roo
 with the same code; a disconnected player is a ghost at once (M7 adds reconnection and the body) and a
 lobby seat survives a dropped connection for the disconnect window; `WDI_DEBUG=1` adds `debug.deal`
 and `debug.clock` beside `debug.play`.
+
+### Round 3 log: Q
+
+**Landed** (PR #14, `claude/m3-playtest`): nine CC0 OGG Vorbis q5 files under
+`apps/client/public/assets/audio/`, one per key (`footstep`, `door_open`, `door_close`,
+`door_locked`, `pickup`, `scream`, `bell`, `stamp`, `ambient`). Seven are from Kenney's RPG Audio and
+Impact Sounds; the scream and the wind loop are from Freesound CC0. `audio/manifest.json` is
+`{version: 1, entries: [{key, url, gain}]}`, the art manifest's wrapper (A37), so N's `AudioBus`
+reads `entries`. `CREDITS.md` has one row per file. `docs/UI.md` 14 is the M3 copy deck: every line
+has an id, and values are placeholders. GDD 2 step 5 now has the E bell toast. `docs/PLAYTESTS/`
+holds the run sheet, the form, the scorecard, the notes template and the M2 stub. ROADMAP 7.5 has one
+paragraph pointing to the kit, and DECISIONS A37 records the choices.
+
+**Owner, before the first M3 playtest** (`docs/PLAYTESTS/README.md` 1): merge round 3; create the
+Railway Hobby service with `WDI_DEBUG` unset and check `/health`; set the Actions variable
+`VITE_SERVER_URL` to the Railway URL and re-run `pages`; set Pages source = GitHub Actions; confirm
+the build matches on both sides; do a solo smoke run the day before; build the Google Form from
+`FORM.md`; write the two bars at the top of `SCORECARD.md` before anyone plays.
+
+**Not done or left open:**
+- The Freesound pair are the site's HQ previews rather than the originals, because downloading
+  originals needs an account. They are CC0 either way; swap in the originals if a cleaner master is
+  ever wanted.
+- The sharp-attack SFX land below -16 LUFS, because the limiter allows at most 6 dB of gain
+  reduction. The manifest gains balance them; tune them by ear at the first session.
+- Four things outside Q's paths for the orchestrator:
+  - `docs/UI.md` 6 still uses "B at the bell calls a meeting" as its toast example.
+  - `docs/README.md` does not index `docs/PLAYTESTS/`.
+  - The Killer's `goal` in `roles.json` speaks of parity, while at 4-5 players the win is
+    `villageAtMostOne` (GDD 3.8).
+  - The match-log field names are described from K's brief; README 4 says the log line wins if they
+    differ.
