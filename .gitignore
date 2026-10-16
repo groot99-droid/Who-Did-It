@@ -11,3 +11,6 @@ coverage/
 # Blender and Mixamo sources never land in git (docs/ASSETS.md 6.5, 6.6)
 assets/external/
 *.blend1
+
+# The published client's server URL is deliberately committed (ARCHITECTURE 5.10).
+!apps/client/.env.production

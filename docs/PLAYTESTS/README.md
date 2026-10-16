@@ -32,9 +32,10 @@ is done by a build session.
    handlers must not exist on a server friends play on; CLAUDE.md). Generate a public domain under
    Networking, open `https://<service>.up.railway.app/health` and check it answers
    `{ok: true, build: ...}`.
-3. **`VITE_SERVER_URL`.** GitHub: Settings > Secrets and variables > Actions > Variables, set
-   `VITE_SERVER_URL` to the Railway service's `https://` URL (the comment at the top of
-   `.github/workflows/pages.yml`). Then run the `pages` workflow (Actions > pages > Run workflow).
+3. **The server URL in the client.** `apps/client/.env.production` holds the Railway service's
+   `https://` URL and every `pages` run builds with it; change the file and push if the service ever
+   moves. (An Actions variable `VITE_SERVER_URL` overrides it, see the comment at the top of
+   `.github/workflows/pages.yml`.)
 4. **Pages source.** Settings > Pages > Build and deployment > Source = **GitHub Actions**.
 5. **Same build on both sides.** The `build` on `/health` equals the first 8 characters of the commit
    the `pages` run deployed. A mismatch makes every join fail with "refresh to update"

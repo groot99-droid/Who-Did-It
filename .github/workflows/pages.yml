@@ -2,7 +2,8 @@
 #
 # One-time setup by the owner (Settings of the repository):
 #   1. Pages > Build and deployment > Source = GitHub Actions
-#   2. Secrets and variables > Actions > Variables > VITE_SERVER_URL = https://<the Render Free service>.onrender.com
+#   2. (optional) Secrets and variables > Actions > Variables > VITE_SERVER_URL overrides the server URL in
+#      apps/client/.env.production, which is what the build uses when the variable is absent.
 name: pages
 
 on:
@@ -36,9 +37,11 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build client
         env:
-          VITE_SERVER_URL: ${{ vars.VITE_SERVER_URL }}
+          SERVER_URL_OVERRIDE: ${{ vars.VITE_SERVER_URL }}
         run: |
-          if [ -z "$VITE_SERVER_URL" ]; then echo "::warning::Actions variable VITE_SERVER_URL is not set; the page will poll localhost"; fi
+          # An empty exported VITE_SERVER_URL would override apps/client/.env.production with nothing,
+          # so the variable is exported only when it is set.
+          if [ -n "$SERVER_URL_OVERRIDE" ]; then export VITE_SERVER_URL="$SERVER_URL_OVERRIDE"; echo "server URL from the Actions variable"; else echo "server URL from apps/client/.env.production"; fi
           export VITE_BUILD_VERSION="${GITHUB_SHA::8}"
           # The client's production build resolves @wdi/content to its dist, so build the workspace
           # dependencies first (the "..." selector); CI's `pnpm build` does the same across every package.
