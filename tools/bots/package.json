@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Load bots: join-only swarm (Playwright and lobby runs), random-walk clients and the 30 minute soak (no tasks or reports).",
+  "description": "Bots: lobby swarm (Playwright and lobby runs), walkers that report, vote and strike, and the 30 minute match soak (no tasks).",
   "scripts": {
     "start": "tsx swarm.ts",
     "walk": "tsx --conditions=development walk.ts",

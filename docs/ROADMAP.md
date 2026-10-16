@@ -62,7 +62,7 @@ Characters: a generated placeholder atlas (`tools/sprites/placeholder.ts`) with 
 
 | Tier | When | Setup | Goal |
 |---|---|---|---|
-| Bot-only | every PR from M2 | `pnpm bots --n 9` | crashes, tick p95, patch size, memory over 1 h |
+| Bot-only | every PR from M2 | `pnpm bots --n 9`; from M3 `pnpm bots:soak` (6 walkers, one Killer, reporters and random voters play matches back to back) | crashes, tick p95, patch size, memory over 1 h; bodies, clues and meetings occur |
 | 2-person | M1, M2 | owner + 1 friend, one on a phone | onboarding, controls, portal feel |
 | 4-5 humans | M3, each M4 sub-goal | friends via Discord | is the vote fun; clue readability; meeting length |
 | 6-8 humans | M5, M6 | friends + bots as load only | stealth, night, PvE |

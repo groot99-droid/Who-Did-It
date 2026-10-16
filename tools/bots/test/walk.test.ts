@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DIR_VECTORS, mulberry } from '../walk';
+import { DIR_VECTORS, mulberry, pickVote } from '../walk';
 
 describe('walk helpers', () => {
   it('reproduces a run from its seed', () => {
@@ -14,5 +14,32 @@ describe('walk helpers', () => {
     expect(DIR_VECTORS[0]).toEqual({ dx: 0, dy: -1 });
     expect(DIR_VECTORS[2]).toEqual({ dx: 1, dy: 0 });
     for (const v of DIR_VECTORS) expect(Math.hypot(v.dx, v.dy)).toBeCloseTo(1, 2);
+  });
+});
+
+describe('pickVote', () => {
+  const roster = [
+    { id: 'a', name: 'Hana', alive: true },
+    { id: 'b', name: 'Gus', alive: true },
+    { id: 'c', name: 'Mo', alive: false },
+  ];
+
+  it('casts Skip, the leader, or a player by name', () => {
+    expect(pickVote('skip', 'b', 'a', roster, mulberry(1))).toBe('skip');
+    expect(pickVote('leader', 'b', 'a', roster, mulberry(1))).toBe('a');
+    expect(pickVote('Gus', 'a', 'a', roster, mulberry(1))).toBe('b');
+  });
+
+  it('falls back to Skip for a dead or unknown target', () => {
+    expect(pickVote('Mo', 'a', 'a', roster, mulberry(1))).toBe('skip');
+    expect(pickVote('Nobody', 'a', 'a', roster, mulberry(1))).toBe('skip');
+    expect(pickVote('leader', 'a', 'c', roster, mulberry(1))).toBe('skip');
+  });
+
+  it('random picks a living player other than itself, or Skip', () => {
+    const rng = mulberry(3);
+    const seen = new Set<string>();
+    for (let i = 0; i < 60; i++) seen.add(pickVote('random', 'a', 'a', roster, rng));
+    expect([...seen].sort()).toEqual(['b', 'skip']);
   });
 });
