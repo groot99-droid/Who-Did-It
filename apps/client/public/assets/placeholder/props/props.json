@@ -1,0 +1,344 @@
+{
+ "textures": [
+  {
+   "image": "props-0.png",
+   "format": "RGBA8888",
+   "size": {
+    "w": 1024,
+    "h": 512
+   },
+   "scale": 1,
+   "frames": [
+    {
+     "filename": "prop_basin",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 39,
+      "y": 40,
+      "w": 50,
+      "h": 53
+     },
+     "frame": {
+      "x": 67,
+      "y": 239,
+      "w": 50,
+      "h": 53
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7188
+     }
+    },
+    {
+     "filename": "prop_bell",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 192,
+      "h": 192
+     },
+     "spriteSourceSize": {
+      "x": 55,
+      "y": 17,
+      "w": 82,
+      "h": 132
+     },
+     "frame": {
+      "x": 517,
+      "y": 3,
+      "w": 82,
+      "h": 132
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_deadLoaf",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 35,
+      "y": 21,
+      "w": 58,
+      "h": 100
+     },
+     "frame": {
+      "x": 3,
+      "y": 167,
+      "w": 58,
+      "h": 100
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.6563
+     }
+    },
+    {
+     "filename": "prop_flour_sacks",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 160,
+      "h": 160
+     },
+     "spriteSourceSize": {
+      "x": 49,
+      "y": 65,
+      "w": 72,
+      "h": 65
+     },
+     "frame": {
+      "x": 425,
+      "y": 119,
+      "w": 72,
+      "h": 65
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_kitChest",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 192,
+      "h": 192
+     },
+     "spriteSourceSize": {
+      "x": 65,
+      "y": 93,
+      "w": 62,
+      "h": 56
+     },
+     "frame": {
+      "x": 321,
+      "y": 159,
+      "w": 62,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_lanternPost_lit",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 192,
+      "h": 192
+     },
+     "spriteSourceSize": {
+      "x": 86,
+      "y": 17,
+      "w": 20,
+      "h": 132
+     },
+     "frame": {
+      "x": 389,
+      "y": 159,
+      "w": 20,
+      "h": 132
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_lanternPost_unlit",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 192,
+      "h": 192
+     },
+     "spriteSourceSize": {
+      "x": 86,
+      "y": 17,
+      "w": 20,
+      "h": 132
+     },
+     "frame": {
+      "x": 193,
+      "y": 167,
+      "w": 20,
+      "h": 132
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_ledger",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 36,
+      "y": 31,
+      "w": 56,
+      "h": 70
+     },
+     "frame": {
+      "x": 131,
+      "y": 167,
+      "w": 56,
+      "h": 70
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7813
+     }
+    },
+    {
+     "filename": "prop_noticeBoard",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 192,
+      "h": 192
+     },
+     "spriteSourceSize": {
+      "x": 53,
+      "y": 39,
+      "w": 86,
+      "h": 110
+     },
+     "frame": {
+      "x": 425,
+      "y": 3,
+      "w": 86,
+      "h": 110
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_oven",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 256,
+      "h": 256
+     },
+     "spriteSourceSize": {
+      "x": 79,
+      "y": 47,
+      "w": 98,
+      "h": 150
+     },
+     "frame": {
+      "x": 321,
+      "y": 3,
+      "w": 98,
+      "h": 150
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7656
+     }
+    },
+    {
+     "filename": "prop_plate",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 96,
+      "h": 96
+     },
+     "spriteSourceSize": {
+      "x": 28,
+      "y": 13,
+      "w": 40,
+      "h": 27
+     },
+     "frame": {
+      "x": 3,
+      "y": 273,
+      "w": 40,
+      "h": 27
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_pump",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 192,
+      "h": 192
+     },
+     "spriteSourceSize": {
+      "x": 67,
+      "y": 83,
+      "w": 58,
+      "h": 66
+     },
+     "frame": {
+      "x": 67,
+      "y": 167,
+      "w": 58,
+      "h": 66
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_wakeTable",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 384,
+      "h": 384
+     },
+     "spriteSourceSize": {
+      "x": 36,
+      "y": 116,
+      "w": 312,
+      "h": 158
+     },
+     "frame": {
+      "x": 3,
+      "y": 3,
+      "w": 312,
+      "h": 158
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.4583
+     }
+    }
+   ]
+  }
+ ],
+ "meta": {
+  "app": "http://github.com/odrick/free-tex-packer-core",
+  "version": "0.3.9"
+ }
+}
