@@ -627,3 +627,33 @@ win; the win check runs after deaths and ejections only; after game over the roo
 with the same code; a disconnected player is a ghost at once (M7 adds reconnection and the body) and a
 lobby seat survives a dropped connection for the disconnect window; `WDI_DEBUG=1` adds `debug.deal`
 and `debug.clock` beside `debug.play`.
+
+### Round 3 log: P (art)
+
+Done on `claude/m3-art` (PR #12). Blender runs headless here as the `bpy` 5.2.0 wheel with Mesa EGL
+(`tools/blender/README.md`); the calibration sheet re-renders byte-identical to the committed one.
+Higgsfield was not used, so every new asset is CC BY 4.0 hand-made art (DECISIONS A36).
+
+- **Villager masters** rebuilt by `build_villager.py` into git-ignored `assets/external/villager/`:
+  the GLB matches Session H's hash byte for byte, the `.blend` differs only by save-time data, and
+  a `die` render from the rebuilt `.blend` matches all 320 shipped `die` frames exactly. Hashes are in
+  `assets/source/MANIFEST.md`, now prettier-formatted with its `.prettierignore` line removed
+  (follow-up 5). Copy both files to ROSW `studio/assets/who-did-it/character/villager/` on the
+  owner's laptop; the studio note is still to be written by the studio pipeline.
+- **Real keys** in `apps/client/public/assets/manifest.json`: `clues` (all 21 keys, now real art at
+  `clues/`), `props` (`prop_bell`, `prop_pump`, `prop_noticeBoard`, `prop_kitChest`,
+  `prop_lanternPost_lit` / `_unlit`, base pivots), `vfx` with `anims_vfx` (`vfx_blood_pool` 8,
+  `vfx_blood_splat` 12, `vfx_vote_stamp` 10, `vfx_dust_step` 6; 12 fps, played once). Each is one
+  page. The body is the last `die` frame (no new key); review sheet
+  `assets/source/review/villager-body-contact.png`.
+- **Still placeholder** in the real manifest: the four `bld_*_ext` exteriors and the six `tiles_*`
+  sets. The placeholder manifest has no `props` or `vfx`, so `?art=placeholder` shows N's greybox
+  marks for them.
+- **For N**: props are placed at the tile centre and their frame pivot puts the base there;
+  footprints and the drag segment point screen-up, so rotate by `Clue.dir`; drag segments chain
+  top to bottom; the stamp's frames 0 and 5 run off the cell on purpose.
+- **Rebuild**: `python tools/blender/build_props.py -- --out build/render`, `python
+  tools/blender/build_vfx.py -- --out build/render`, then `pnpm --filter @wdi/sprites pack:static
+  ../../build/render/<atlas> ../../apps/client/public/assets/<atlas>` for `clues`, `props`, `vfx`; the
+  atlases rebuild byte-identical. The body sheet: a `batch_render.py --anims die` run, then
+  `pnpm --filter @wdi/sprites contact:body`.
