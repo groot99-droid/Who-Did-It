@@ -39,7 +39,7 @@ export class Hud {
     });
     this.chipText = h('span');
     this.chip = h('div', { class: 'wdi-world-chip', hidden: true }, this.chipIcon, this.chipText);
-    this.timer = h('div', { class: 'wdi-world-timer' }, '--:--');
+    this.timer = h('div', { class: 'wdi-world-timer', 'data-testid': 'hud-clock' }, '--:--');
     this.toast = h('div', { class: 'wdi-world-toast', role: 'status' });
     this.fps = h('div', { class: 'wdi-world-fps', hidden: true });
     this.root = h('div', { class: 'wdi-world-hud' }, this.chip, this.timer, this.toast, this.fps);

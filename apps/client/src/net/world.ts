@@ -53,6 +53,8 @@ export type WorldFeedEvents = {
   sceneEnter: SceneEnter;
   noise: NoisePulse;
   error: { code: number; msg: string };
+  /** Mock only: the mock world's report or bell asks the mock network to open a meeting (round 3, M | N seam). */
+  meetingRequest: { reason: 'body' | 'bell'; callerId: string; bodyOf?: string };
 };
 
 export interface WorldFeed {
@@ -65,6 +67,8 @@ export interface WorldFeed {
   clock(): { tick: number; phase: number; phaseEndsTick: number };
   sendMove(cmd: MoveCmd): void;
   enterPortal(portalId: string): void;
+  /** Mock only: re-emits `sceneEnter` for the current scene after a mock meeting (round 3, M | N seam). */
+  resume?(): void;
   dispose(): void;
 }
 

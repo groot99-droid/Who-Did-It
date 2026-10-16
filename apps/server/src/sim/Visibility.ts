@@ -44,14 +44,16 @@ export function reconcileViews(room: PartyRoom): void {
   for (const client of room.clients) {
     const view = client.view;
     const viewer = room.state.players.get(client.sessionId);
-    if (!view || !viewer) continue;
+    const viewerSim = sim.players.get(client.sessionId);
+    if (!view || !viewer || !viewerSim) continue;
     let held = sim.views.get(client.sessionId);
     if (!held) {
       held = { scene: null, presences: new Set() };
       sim.views.set(client.sessionId, held);
     }
 
-    const want = sceneKey(viewer.sceneId);
+    // The sim's scene, never the public one: a ghost's public scene is frozen until its death is public.
+    const want = sceneKey(viewerSim.sceneIdx);
     if (held.scene !== want) {
       const old = held.scene === null ? undefined : room.state.scenes.get(held.scene);
       if (old) view.remove(old);
@@ -66,8 +68,8 @@ export function reconcileViews(room: PartyRoom): void {
         if (id === client.sessionId) continue;
         const p = sim.players.get(id);
         if (!p?.placed) continue;
-        const sameScene = other.sceneId === viewer.sceneId;
-        const justLeft = p.transitFrom === viewer.sceneId && tick < other.presence.transitUntilTick;
+        const sameScene = p.sceneIdx === viewerSim.sceneIdx;
+        const justLeft = p.transitFrom === viewerSim.sceneIdx && tick < other.presence.transitUntilTick;
         if (sameScene || justLeft) wanted.add(id);
       }
     }

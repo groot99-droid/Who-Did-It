@@ -281,199 +281,306 @@ where the work allows (split by step), `pnpm lint && pnpm typecheck && pnpm test
 push, pinned versions only, no model identifiers in committed files, `docs/GDD.md` changes in the same
 PR as a behaviour change. Code and tooling run on Sonnet 5.5; art and design run on Opus 5.5.
 
-The orchestrator pre-seeded every shared contract before the sessions started (DECISIONS A30): the
-schema fields, protocol payloads, shared constants (`ClueKind`, `NotebookStatus`, `DeathCause`,
-`StatusBit.bloody`), the `RoomSim` seam fields (`dead`, `bloodyUntilTick`, `bandagedUntilTick`,
-`hold`, `meetingRequests`, `deaths`, `profileFixed`), the two stage stubs `sim/Clues.ts` (`runDecay`)
-and `sim/Phases.ts` (`runPhases`) that `sim/Step.ts` already calls, the flow-command routing of
-`meeting.vote` and `chat.say` to `PartyRoom.lobbyCommands`, and the two new numbers in `balance.json`
-(`phases.gameOverS`, `chat.maxChars`). No session edits `packages/shared/src/schema/index.ts`,
-`packages/shared/src/protocol/index.ts`, `apps/server/src/sim/Step.ts` or `balance.json`: if a
-contract is missing, the session writes what it needs in its PR description and the orchestrator adds
-it to the base branch.
+**Pre-seeded on the base branch** (commit "Round 3 contract" and its follow-up, DECISIONS A30), so no
+two sessions add the same thing: the schema fields `Body.of`, `Clue.value`, `Clue.dir`,
+`GameState.startTick` and `NotebookEntry.status` 4 (`teaching`); the shared constants `ClueKind` and
+`NotebookStatus` (`@wdi/shared/constants`); the protocol types `DeathCause`, `MeetingReason`,
+`ChatChannel` and the `killed`, `meetingStart`, `chat.msg`, `voteResult` payloads
+(`@wdi/shared/protocol`, `docs/PROTOCOL.md` regenerated); `StatusBit.bloody` = 2 in both mirrors
+(`apps/server/src/sim/constants.ts`, L, and `apps/client/src/view/animIds.ts`, N); the `RoomSim` seam
+fields (`PlayerSim.dead`, `sceneIdx`, `bloodyUntilTick`, `bandagedUntilTick`, `hold`,
+`resetForLobby()`; `RoomSim.meetingRequests`, `deaths`, `profileFixed`, `clueSeq` per scene,
+`resetForLobby()`); `enterScene(..., transit, announce = true)` in `Portals.ts`, which mirrors
+`PlayerSim.sceneIdx` and writes the public `Player.sceneId` only while the player is alive or their
+death is public; `Visibility.ts` keyed on `sceneIdx`; the stage stubs `sim/Clues.ts` (`runDecay`, L)
+and `sim/Phases.ts` (`runPhases`, K) already called by `sim/Step.ts`; `meeting.vote` and `chat.say`
+routed to `PartyRoom.lobbyCommands` (the flow queue K drains); the four empty rules modules
+`packages/shared/src/rules/{votes,win,kill,clues}.ts` already exported by `rules/index.ts`;
+`apps/server/test/simHelpers.ts` recording every server message and taking white-box roles by bot
+name; the `meetingRequest` event and optional `resume()` on the client `WorldFeed`; the
+`data-testid="hud-clock"` hook the three e2e suites locate the HUD by; the two numbers
+`phases.gameOverS` and `chat.maxChars` in `balance.json` with their GDD 3.3 and 3.5 lines. **Nobody
+edits** `packages/shared/src/{schema,protocol,rules}/index.ts`, `packages/shared/src/index.ts`,
+`apps/server/src/sim/Step.ts`, `apps/server/test/simHelpers.ts`, `balance.json` or its schema: a
+session that needs another contract writes it in its PR description and carries on with a local
+stand-in; the orchestrator adds it to the base branch. Every `*Tick` field is in ticks: a seconds value
+from content is multiplied by `TICK_RATE` at the write, as `secondsToTicks` in `handlers/lobby.ts`
+does. Content paths are the whole file: `clues.clues.blood.decay.seconds`,
+`clues.clues.footprints.decay.seconds`, `clues.clues.blood.params.visibleTiles`,
+`abilities.abilities.kill.rangeTiles`, `roles.roles[id].bellPulls`.
 
 | Session | Model | Track | Branch | Owns |
 |---|---|---|---|---|
-| **K. Match flow** | Sonnet 5.5 | Code | `claude/m3-flow` | `apps/server/src/rooms/**` (PartyRoom, `handlers/{lobby,debug,movement}.ts`), `apps/server/src/sim/{Phases,Meeting,Chat,Win,Visibility}.ts`, `apps/server/src/services/MatchLog.ts` (new), `apps/server/test/{flow,meeting,chat,win,lobby,party,visibility}*.test.ts`, `packages/shared/src/rules/{votes,win}.ts` (new) and their tests, `docs/ARCHITECTURE.md` 5.7 (the meeting path) and 5.8 (the rules list) |
-| **L. Kill, bodies, clues, Notebook** | Sonnet 5.5 | Code | `claude/m3-kill` | `apps/server/src/sim/{Commands,Movement,Portals,PortalQueue,RoomSim,World,constants,Clues}.ts`, new `apps/server/src/sim/{Actions,Kill,Death,Bodies,Hold,Noise}.ts`, `apps/server/test/{sim,kill,clue,hold,report,ghost}*.test.ts`, `packages/shared/src/rules/{kill,clues}.ts` (new) and their tests, `docs/ARCHITECTURE.md` 5.6 (the action stages) |
-| **M. Screens: meeting, game over, chat, theme** | Sonnet 5.5 | Code | `claude/m3-meeting` | `apps/client/src/ui/**` (the theme's `tokens.css`/`components.css` only for fixes, noted in the PR), `apps/client/src/net/{NetworkService,mock,fixtures,protocol,worldRouter}.ts`, new `apps/client/src/net/{meeting,meetingColyseus}.ts` and `net/mock/meetingMock.ts`, `apps/client/src/scenes/{Boot,Preload,Landing,Lobby,RoleReveal,registry}.ts`, new `scenes/{Meeting,GameOver}.ts`, `apps/client/src/main.ts`, `apps/client/index.html`, `apps/client/e2e/{party,smoke}.spec.ts`, new `e2e/meeting.spec.ts`, `apps/client/public/mockups/**`, `docs/UI.md` 11 and 12, `docs/ARCHITECTURE.md` 5.9 |
-| **N. World actions** | Sonnet 5.5 | Code | `claude/m3-world` | `apps/client/src/scenes/World.ts`, `apps/client/src/view/**` (Hud, hud.css, EntityView, PlayerView, animIds, assets, greybox; new `BodyView`, `ClueView`, `Lighting`, `NotebookPanel`, `AudioBus`), `apps/client/src/input/**`, `apps/client/src/net/{world,worldColyseus}.ts`, `apps/client/src/net/mock/worldMock.ts`, `apps/client/e2e/world.spec.ts`, `docs/SPRITES.md` 5 (loading notes only) |
-| **O. Bots, match e2e, soak** | Sonnet 5.5 | Code | `claude/m3-bots` | `tools/bots/**`, `tools/grid/test/**`, new `apps/client/e2e/match.spec.ts`, `apps/client/e2e/env.ts`, `apps/client/playwright.config.ts`, root `package.json` scripts, `docs/ARCHITECTURE.md` 5.12, `docs/ROADMAP.md` 7.5 (the bot-only row) |
-| **P. Art: props, clues, VFX, body** | Opus 5.5 | Art | `claude/m3-art` | `assets/**`, `apps/client/public/assets/**` except `ui/`, `audio/` and `calibration/` (so `manifest.json`, `chars/`, `clues/`, new `props/`, `vfx/`), `tools/blender/**`, `tools/sprites/**`, `CREDITS.md` (rows), `assets/source/MANIFEST.md`, `docs/ASSETS.md` 6.3 and 6.7, `docs/SPRITES.md` 8 |
-| **Q. Playtest kit, audio, copy** | Opus 5.5 | Design | `claude/m3-playtest` | new `docs/PLAYTESTS/**`, new `apps/client/public/assets/audio/**` (files plus its own `audio/manifest.json`), `LICENSES/**` (new licence texts only), `CREDITS.md` (audio rows), `docs/UI.md` 14 (new: the M3 copy deck), `docs/ROADMAP.md` 7.5 (the feedback form paragraph), `docs/GDD.md` 2 (wording only, no rule or number) |
+| **K. Match flow** | Sonnet 5.5 | Code | `claude/m3-flow` | `apps/server/src/rooms/**` (PartyRoom, `handlers/{lobby,debug,movement}.ts`), `apps/server/src/sim/{Phases,Meeting,Chat,Win,Visibility}.ts`, `apps/server/src/services/MatchLog.ts` (new), `apps/server/test/flowHelpers.ts` (new) and `apps/server/test/{flow,meeting,chat,win,lobby,party,visibility}*.test.ts`, `packages/shared/src/rules/{votes,win}.ts` and their tests, `docs/GDD.md` 3.3, 3.5 (the chat lines), 3.7 (the ghost lines) and 3.8 (one sentence each, only where the PR changes behaviour, marked "(M3)"), `docs/ARCHITECTURE.md` 5.7 and 5.8 |
+| **L. Kill, bodies, clues, Notebook** | Sonnet 5.5 | Code | `claude/m3-kill` | `apps/server/src/sim/{Commands,Movement,Portals,PortalQueue,RoomSim,World,constants,Clues}.ts`, new `apps/server/src/sim/{Actions,Kill,Death,Bodies,Hold,Noise}.ts`, `apps/server/test/killHelpers.ts` (new) and `apps/server/test/{sim,kill,clue,hold,report,ghost}*.test.ts`, `packages/shared/src/rules/{kill,clues}.ts` and their tests, `docs/GDD.md` 3.2 (the Kill and Bandage rows) and 3.4 (one sentence each, marked "(M3)"), `docs/ARCHITECTURE.md` 5.6 |
+| **M. Screens: meeting, game over, chat, theme** | Sonnet 5.5 | Code | `claude/m3-meeting` | `apps/client/src/ui/**` (the theme's `tokens.css` and `components.css` only for fixes noted in the PR, never the `.wdi-hud*`, `.wdi-log*`, `.wdi-edge-cue*`, `.wdi-toast*`, `.wdi-stick*`, `.wdi-touch-*` or `.wdi-notebook*` rules), `apps/client/src/net/{NetworkService,mock,fixtures,protocol,worldRouter}.ts`, new `apps/client/src/net/{meeting,meetingColyseus}.ts` and `net/mock/meetingMock.ts`, `apps/client/src/scenes/{Boot,Preload,Landing,Lobby,RoleReveal,registry}.ts`, new `scenes/{Meeting,GameOver}.ts`, `apps/client/src/main.ts`, `apps/client/index.html`, `apps/client/e2e/{party,smoke}.spec.ts`, new `e2e/meeting.spec.ts`, `apps/client/public/mockups/**`, `docs/UI.md` 11 and 12, `docs/ARCHITECTURE.md` 5.9 |
+| **N. World actions** | Sonnet 5.5 | Code | `claude/m3-world` | `apps/client/src/scenes/World.ts`, `apps/client/src/view/**` (Hud, hud.css, EntityView, PlayerView, animIds, assets, greybox; new `BodyView`, `ClueView`, `PropView`, `Lighting`, `NotebookPanel`, `AudioBus`), `apps/client/src/input/**`, `apps/client/src/net/{world,worldColyseus}.ts`, `apps/client/src/net/mock/worldMock.ts`, `apps/client/e2e/world.spec.ts`, `docs/SPRITES.md` 5 (loading notes only) |
+| **O. Bots, match e2e, soak** | Sonnet 5.5 | Code | `claude/m3-bots` | `tools/bots/**`, `tools/grid/test/**`, new `apps/client/e2e/match.spec.ts`, `apps/client/e2e/env.ts`, `apps/client/playwright.config.ts`, root `package.json` scripts, `docs/ARCHITECTURE.md` 5.12, `docs/ROADMAP.md` 7.5 (the Bot-only row only) |
+| **P. Art: props, clues, VFX, body** | Opus 5.5 | Art | `claude/m3-art` | `assets/**`, `apps/client/public/assets/**` except `ui/`, `audio/` and `calibration/` (so `manifest.json`, `chars/`, `clues/`, new `props/`, `vfx/`), `tools/blender/**`, `tools/sprites/**`, `CREDITS.md` (rows appended at the end of the "Generated assets" and "Hand-made original art" tables), `assets/source/MANIFEST.md`, the `assets/source` line of `.prettierignore` (the one root file P edits), `docs/ASSETS.md` 6.3 and 6.7, `docs/SPRITES.md` 8 |
+| **Q. Playtest kit, audio, copy** | Opus 5.5 | Design | `claude/m3-playtest` | new `docs/PLAYTESTS/**`, new `apps/client/public/assets/audio/**` (files plus its own `audio/manifest.json`), `LICENSES/**` (new licence texts only), `CREDITS.md` (rows appended at the end of the "Third-party assets" table), `docs/UI.md` 14 (new: the M3 copy deck), `docs/ROADMAP.md` 7.5 (the feedback form, a new paragraph after the metrics paragraph), `docs/GDD.md` 2 (wording only, no rule or number) |
 
-Suggested merge order: L, K, N, M, O, P, Q. Every session may add rows to `docs/DECISIONS.md` for a
-decision it had to make (a new amendment number, never editing an older row).
+Suggested merge order: L, K, N, M, O, P, Q. Shared documents: edits stay inside the named section
+with no renumbering or reflow, and the orchestrator keeps both sides of any conflict. Decisions a
+session has to make go to `docs/DECISIONS.md` under its reserved number (K A31, L A32, M A33, N A34,
+O A35, P A36, Q A37; a second row takes the number plus 10), never editing an older row. Nobody else
+touches GDD 3.x. Owner, before the first M3 playtest: the Railway Hobby service and `VITE_SERVER_URL`
+(ROADMAP M3, A6) and the Pages source; Q's `docs/PLAYTESTS/README.md` lists them as prerequisites.
 
 ### Briefs
 
 **K. Match flow (server).** Build the loop around the kill: phases, meetings, votes, chat, win, game
-over, ghosts' views, the debug helpers tests need, and the match log. Everything runs inside the fixed
-step: `runPhases(room)` in `sim/Phases.ts` is called by `step()` last; the flow commands (`lobby.*`,
-`meeting.vote`, `chat.say`) arrive in `PartyRoom.lobbyCommands` and are drained by `runLobbyCommands`.
-Phases (GDD 3.3, A30): `beginPlay` sets `GameState.startTick`; grace -> day -> dusk -> night -> day...
-with `round` + 1 on every entry into day; every length from `balance.phases`. Meetings: drain
-`simOf(room).meetingRequests` (pushed by L's report and bell); on the first request move every player,
-living or dead, with `enterScene(room, player, p, 'overworld', 'square_<ordinal % 10>', false)`, flip
-`alive = false` for every `PlayerSim.dead`, fill `MeetingState` (`phase`, `reason`, `callerId`,
-`bodyOf`, `endsTick`; `missing` and `board` stay empty until M4), broadcast `meetingStart`, set
-`meetingDiscussion` with `byCount[n].discussionS` (n = max(4, seats)). Votes (`sim/Meeting.ts`): from
-living players in `meetingDiscussion` and `meetingVote`, `targetId` a living player's id or `"skip"`,
-changeable until the vote closes, `priv.myVote` private and `hasVoted` public; when every living player
-has voted go to `reveal` at once, else after `voteS`. `resolveVotes(votes, living)` in
+over, ghosts' views, lobby reconnection, the debug helpers tests need, and the match log. Everything
+runs inside the fixed step: `runPhases(room)` in `sim/Phases.ts` is called by `step()` last; the flow
+commands (`lobby.*`, `meeting.vote`, `chat.say`) arrive in `PartyRoom.lobbyCommands` and are drained
+by `runLobbyCommands`. Phases (GDD 3.3, A30): `beginPlay` and `runDebugStart` both set
+`GameState.startTick`; grace -> day -> dusk -> night -> day... with `round` + 1 on every entry into
+day; every length from `balance.phases`. On the grace -> day transition `runPhases` sets
+`priv.cooldownEndTick.set("kill", tick + byCount[n].killCooldownS * TICK_RATE)` for every seat whose
+role lists `kill` (the Knife's first cooldown; L's `validateKill` reads only `cooldownEndTick`).
+Meetings: drain `simOf(room).meetingRequests` (pushed by L's report and bell); on the first request
+move every player, living or dead, with `enterScene(room, player, p, 'overworld', 'square_<ordinal %
+10>', false, false)` (the seventh argument suppresses the `sceneEnter`; L keeps the default), set
+`sim.viewsDirty = true`, flip `alive = false` for every `PlayerSim.dead`, reset `hasVoted = false` and
+`priv.myVote = ""` on every seat, fill `MeetingState` (`phase`, `reason`, `callerId`, `bodyOf`,
+`endsTick`; `missing` and `board` stay empty until M4), then broadcast `meetingStart` and set
+`meetingDiscussion` with `byCount[n].discussionS` (n = max(4, seats)), in that order. `MeetingState.phase`
+holds the same `Phase` id as `GameState.phase` (0 outside a meeting) and `MeetingState.endsTick`
+mirrors `phaseEndsTick`, which every meeting `setPhase` sets and broadcasts as `phaseChange`. Votes
+(`sim/Meeting.ts`): from living players in `meetingDiscussion` and `meetingVote`, `targetId` a living
+player's id or `"skip"`; a repeated vote replaces `priv.myVote` without any reply and `hasVoted` stays
+true (no retraction); a vote in `reveal` or outside a meeting is refused 425, from a dead player 422,
+with an unknown or dead target 422; when every living player has voted go to `reveal` at once (in
+`meetingDiscussion` too), else after `voteS`. `resolveVotes(votes, living)` in
 `packages/shared/src/rules/votes.ts` is pure: plurality, a tie or a Skip plurality ejects nobody; the
 anti-stall rules of GDD 3.8 stay off (their arguments exist, default off). `reveal` lasts `revealS`:
 broadcast `voteResult {tally, ejectedId?, role?}` (counts per target and `skip`; voters never
 revealed); an ejected player gets `dead = true`, `alive = false`, private `killed {sceneId, cause:
-"ejected", roles}`. Then `checkWin` (`rules/win.ts`, pure, GDD 3.8: Village when no Cabal lives; Cabal
-at `byCount[n].cabalWin`, `parity` at 6+, `villageAtMostOne` at 4-5; neutral roles count for nobody;
-tasks and Final Night are M4), run after every death (drain `sim.deaths`) and ejection, never on a bare
-tick. No winner: `immunity` (`immunityS`, a world phase in which L refuses kills) then `day`. Winner:
-phase `gameOver`, `winner`, broadcast `gameOver {winner, roles, summary}`, one match-log line
-(`services/MatchLog.ts`: JSON to stdout with players, duration, winner, kills, meetings, each
-ejection's correctness, vote accuracy per meeting, clues collected per player; ROADMAP 7.5), and after
-`phases.gameOverS` `resetToLobby`: phase `lobby`, `room.unlock()`, every seat kept with `alive`,
-`ready`, `hasVoted`, traits, `sceneId`, `presence` and `priv` cleared, bodies and clues cleared, every
-`PlayerSim` back to `placed = false, dead = false`, `sim.profileFixed = false`. Chat (`sim/Chat.ts`):
-`chat.say` text trimmed to `balance.chat.maxChars`; from a living player only during a meeting, sent to
-every client as channel `meeting`; from a dead player in any phase, sent to dead players only as
-channel `ghost`; the Cabal channel and quick chat are M4. Visibility: a living viewer receives the
-presence of living, placed players in its scene; a dead viewer receives everyone in its scene; in the
-meeting, reveal and gameOver phases no presence is encoded (`isWorldPhase` is false). Disconnect during
-play: the seat stays, `connected = false`, the player is dead at once (no body, no reconnection; both are
-M7); the leader passes as today. Debug (`WDI_DEBUG=1` only, flags consumed in the step): `debug.deal
-{roles: {sessionId: roleId}}` fixes the next deal, `debug.clock {phase?, clearCooldowns?}` jumps the
-phase and clears every cooldown and bandage. Tests with `@colyseus/testing`: the phase loop; a report
-moves everyone to the square and sends `meetingStart`; a vote from a dead player is refused; early end
-when all have voted; tie ejects nobody; the ejected role is revealed; Village and Cabal wins at 4, 5 and
-6 seats; ghost chat reaches only the dead; a living client never receives a dead player's presence; the
-lobby reset keeps the seats and clears the private state; the match log line. Do not touch
-`sim/Commands.ts`, `Portals.ts`, `Movement.ts` or the schema.
+"ejected", roles}`. `checkWin` (`rules/win.ts`, pure, GDD 3.8: Village when no Cabal lives; Cabal at
+`byCount[n].cabalWin`, `parity` at 6+, `villageAtMostOne` at 4-5; neutral roles count for nobody;
+tasks and Final Night are M4) runs on the tick a `DeathEvent` is drained from `sim.deaths` and, for an
+ejection, when the reveal phase ends, so the stamp and the role line show for the whole reveal; never
+on a bare tick. No winner: on entering `immunity` (`immunityS`, a world phase in which L refuses
+kills) call `enterScene(room, player, p, 'overworld', 'square_<ordinal % 10>', false)` again for every
+player, living or dead, and set `sim.viewsDirty = true`: this announced `sceneEnter` is the client's
+cue to leave the meeting; then `day`. Winner: phase `gameOver`, `winner`, broadcast `gameOver
+{winner, roles, summary}` (no `sceneEnter`), one match-log line (`services/MatchLog.ts`: JSON to
+stdout with players, duration, winner, kills, meetings, each ejection's correctness, vote accuracy per
+meeting, clues collected per player; ROADMAP 7.5), and after `phases.gameOverS` `resetToLobby`:
+phase `lobby`, `room.unlock()`, every seat kept with `alive`, `ready`, `hasVoted`, traits, `sceneId`,
+`presence` and `priv` cleared, bodies and clues cleared, `simOf(room).resetForLobby()` (which resets
+every `PlayerSim`). Chat (`sim/Chat.ts`): `chat.say` text trimmed to `balance.chat.maxChars`, empty
+refused 422; from a living player only in `meetingDiscussion`, `meetingVote` and `reveal` (425
+otherwise), sent to every client as channel `meeting`; from a dead player in any phase, sent to dead
+players only as channel `ghost`; the Cabal channel and quick chat are M4. Visibility: a living viewer
+receives the presence of living (`!dead`), placed players in its scene; a dead viewer receives
+everyone in its scene; scene tests use `PlayerSim.sceneIdx`, never the public `sceneId`; in the
+meeting, reveal and gameOver phases no presence is encoded (`isWorldPhase` is false). Blood is the one
+presence field that correlates with a role in M3 (only the Killer gains it): it is encoded to every
+client in the scene, so a modified client reads it beyond 3 tiles; V1 accepts this (A30, like
+darkness). Disconnect: in phase `lobby`, `onLeave` keeps the seat with `connected = false` through
+`this.allowReconnection(client, balance.disconnect.deathAfterS)` and frees it when the window lapses
+or the player left consented (GDD 3.10 "reconnection in lobby"); during play `onLeave` only sets
+`connected = false` and pushes `{playerId, cause: "vanished", tick}` to `sim.deaths`, and the next
+`runPhases` sets `PlayerSim.dead` and runs `checkWin` from the drain (no body, no reconnection; both
+M7); the leader passes as today. Debug (`WDI_DEBUG=1` only, flags consumed in the step; `debug.play`
+stays exactly as today): `debug.deal {roles: {sessionId: roleId}}` (any client; a test maps names to
+ids through the public roster) fixes the next deal: at Start the fixed seats take their roles, each
+such role is removed once from the roster row, and `assignRoles` deals the remaining roles to the
+remaining ids, so the roster counts hold; `debug.clock {phase?, clearCooldowns?}` with `phase` a name
+among `grace`, `day`, `dusk`, `night`, `immunity` (else 422) jumps first (a fresh `phaseEndsTick`,
+`round` unchanged), then `clearCooldowns: true` zeroes every `cooldownEndTick` entry and every
+`bandagedUntilTick`. Tests with `@colyseus/testing` (helpers in `test/flowHelpers.ts`, importing
+`simHelpers` unchanged): the phase loop and the Knife cooldown at day; a report moves everyone to
+the square, sends `meetingStart` after the placements and no `sceneEnter`; after the reveal every
+client receives a second `sceneEnter`; a vote from a dead player is refused; early end when all have
+voted; a second meeting starts with `hasVoted` false; tie ejects nobody; the ejected role is revealed
+and `gameOver` arrives only after `revealS`; Village and Cabal wins at 4, 5 and 6 seats; ghost chat
+reaches only the dead; a living client never receives a dead player's presence and never sees a
+ghost's `sceneId` change before the meeting; Blood state absent from the meeting roster (no public
+`Player` field changes with the Blood timer); a dropped lobby bot that reconnects within the window
+keeps its seat and name; the lobby reset keeps the seats and clears the private state; the match log
+line. K calls only the existing `enterScene` (Portals.ts) and `isWorldPhase` / `sceneKey` (World.ts),
+whose signatures L keeps. Do not touch `sim/Commands.ts`, `Portals.ts`, `Movement.ts`, `RoomSim.ts`
+or the schema.
 
 **L. Kill, bodies, clues, Notebook (server).** The verbs. `sim/Commands.ts` keeps its switch and
 dispatches `act.ability`, `act.hold`, `act.reportBody` and `act.bell` to `sim/Actions.ts`; every
-payload is untrusted. Kill (`sim/Kill.ts`, GDD 3.2 and A30): `act.ability {abilityId: "kill",
-targetId}` from a player whose `priv.role.roleId` has `kill` (Killer); refused unless the phase is
-day, dusk or night (425), the actor is alive, placed, not busy (426) and past
-`priv.cooldownEndTick.get("kill")` (424); the target is alive, in the same scene, not in transit, within
-`abilities.kill.rangeTiles` plus the distance the target moved in the last 250 ms (`positionAt`, 427),
-with no solid tile on the straight line between them; a Bandaged target (`bandagedUntilTick > tick`)
-refuses with 422 "nothing happens", spends the bandage, and the attacker still gains Blood and restarts
-the cooldown. `validateKill` in `packages/shared/src/rules/kill.ts` is pure over plain numbers and a
-`solidBetween` callback, with property tests. On a kill: the victim's `PlayerSim.dead = true` (the
-public `alive` stays true until the next meeting, A30), push `{playerId, cause: "knife", killerId,
-tick}` to `sim.deaths`, send the victim private `killed {sceneId, cause: "knife", roles}` (every seat's
-roleId; ghosts see all roles), spawn the `Body` (`id: "body_<playerId>"`, `of`, the victim's tile,
-`hidden: false`) in that scene's `bodies`, give the killer `bloodyUntilTick = tick +
-clues.blood.decay.seconds` (OR `StatusBit.bloody` into `presence.statusBits` where `Movement.ts` writes
-them), reset `cooldownEndTick.kill` from `byCount[n].killCooldownS`, and emit the scream
-(`sim/Noise.ts`, `emitNoise` moved out of `Portals.ts`, radius `noise.killScream`). The Knife's first
-cooldown starts when grace ends. Clues (`rules/clues.ts` pure, `sim/Clues.ts`): every kill spawns
-Footprints (`ClueKind.footprints`, `value` = the killer's height index) at the kill tile with `dir`
-toward the nearest portal of the scene, and a Thread (`ClueKind.thread`, `value` = the killer's scarf
-index) on the walkable tile beside that portal; the 2-of-3 choice, felt and prints come with M4(a).
-Footprints decay after `clues.footprints.decay.seconds` (`runDecay`, the stub in `sim/Clues.ts`),
+payload is untrusted. "Alive" below always means `!PlayerSim.dead`, never the public `alive`, which
+stays true for a ghost until the meeting. Kill (`sim/Kill.ts`, GDD 3.2 and A30): `act.ability
+{abilityId: "kill", targetId}` from a player whose `priv.role.roleId` lists `kill`; refused unless the
+phase is day, dusk or night (425), the actor is alive, placed, not busy (426) and past
+`priv.cooldownEndTick.get("kill")` (424, the entry K writes at day); the target is alive, in the same
+scene (`sceneIdx`), not in transit, within `abilities.abilities.kill.rangeTiles` plus the distance the
+target moved in the last 250 ms (`positionAt`, 427), with no solid tile on the straight line between
+them; a Bandaged target (`bandagedUntilTick > tick`) refuses with 422 "nothing happens", spends the
+bandage, and the attacker still gains Blood and restarts the cooldown. `validateKill` in
+`packages/shared/src/rules/kill.ts` is pure over plain numbers and a `solidBetween` callback, with
+property tests. On a kill: the victim's `PlayerSim.dead = true` (the public `alive` stays true until
+the next meeting, A30), `sim.viewsDirty = true` so the living stop receiving the victim's presence on
+that tick, push `{playerId, cause: "knife", killerId, tick}` to `sim.deaths`, send the victim private
+`killed {sceneId, cause: "knife", roles}` (every seat's roleId; ghosts see all roles), spawn the `Body`
+(`id: "body_<playerId>"`, `of`, `hidden: false`) in that scene's `bodies`, give the killer
+`bloodyUntilTick = tick + clues.clues.blood.decay.seconds * TICK_RATE` (OR `StatusBit.bloody` into
+`presence.statusBits` where `Movement.ts` writes them), reset `cooldownEndTick.kill` from
+`byCount[n].killCooldownS * TICK_RATE`, and emit the scream (`sim/Noise.ts`, `emitNoise` moved out of
+`Portals.ts`, radius `noise.killScream`). `Body.x/y` and `Clue.x/y` are pixel centres of their tile
+(`tileCentre(tx, TILE_PX)`), the same units as `Presence.x/y`. Clues (`rules/clues.ts` pure,
+`sim/Clues.ts`): every kill spawns Footprints (`ClueKind.footprints`, `value` = the killer's height
+index) at the kill tile with `dir` toward the nearest portal of the scene, and a Thread
+(`ClueKind.thread`, `value` = the killer's scarf index) on the walkable tile beside that portal; the
+2-of-3 choice, felt and prints come with M4(a). Ids: the teaching clue is `clue_teaching`; every other
+clue is `clue_<sceneId>_<n>` from `sim.clueSeq` (one counter per scene, so an id never counts kills
+elsewhere); a `NotebookEntry.id` is `entry_<n>` counted per player and `clueFound.entryId` carries it.
+Footprints decay after `clues.clues.footprints.decay.seconds` (`runDecay`, the stub in `sim/Clues.ts`),
 Thread never; above `balance.clues.capPerScene` the oldest claimed clue goes first. At the first
-placement spawn the teaching clue at the `ov.teaching_clue` prop (Footprints, value tall) and mark
-`sim.profileFixed` (follow-up 5). Collect (`sim/Hold.ts`): `act.hold {action: "collect", targetId, on}`
-starts a hold kept in `PlayerSim.hold`, re-validated every tick (alive, same scene, within
-`balance.doors.reachTiles` of the clue, not busy); after `abilities.collect.castS` the clue is
+placement spawn the teaching clue at the `ov.teaching_clue` prop (Footprints, value tall). Collect
+(`sim/Hold.ts`): `act.hold {action: "collect", targetId, on}` starts a hold kept in `PlayerSim.hold`,
+re-validated every tick (a world phase, alive, same scene, within `balance.doors.reachTiles` of the
+clue, not busy; leaving a world phase cancels it); after `abilities.abilities.collect.castS` the clue is
 `claimed`, a `NotebookEntry` is pushed to the collector's `priv.notebook` (`clueKind`, `value`,
-`sceneId`, `tick`, `status`: `verified` for a role with `inspect`, `teaching` for the teaching clue,
+`sceneId`, `tick`, `status`: `verified` for a role with `inspect`, `teaching` for `clue_teaching`,
 else `claimed`) and private `clueFound {entryId}` is sent; several players may collect the same clue;
 releasing or moving cancels. Report and bell push `{reason, callerId, bodyOf}` to
 `sim.meetingRequests` (K drains): `act.reportBody {bodyId}` from a living player within
-`abilities.report.rangeTiles` of a body in its scene during a world phase; `act.bell` from a living
-player on the overworld within `abilities.bell.rangeTiles` of `ov.bell` during day, dusk or night, at
-most `roles[role].bellPulls` times per match. Bandage (`act.ability {abilityId: "bandage",
-targetId}`): a role with `bandage`, target alive, not self, same scene, within its `rangeTiles`,
-cooldown `cooldownS`, consumes one `bandage` from the inventory, sets the target's
-`bandagedUntilTick` for `params.protectS`; knockback, blackout and witness entries are M4(c). Ghosts
-(`dead`): move at walk speed, skip collision and the lock and busy checks of portals, make no noise,
-and every verb refuses them (422). Death by ejection is K's; L exports nothing K needs beyond the seam
-fields. Tests: kill range with and without the ring slack; grace, immunity and cooldown refusals; the
-bandaged target; the body and both clues appear in the scene state and nowhere else; a client outside
-the scene never receives the body or the clue; collect timing, cancel, Detective `verified`; report
-and bell push a request, the bell count; a ghost walks through a locked door. Do not touch
-`rooms/**`, `sim/Visibility.ts`, `sim/Phases.ts` or the schema.
+`abilities.abilities.report.rangeTiles` of a body in its scene during a world phase and not yet
+reported (L keeps `RoomSim.reportedBodies` and refuses a second report with 422); `act.bell` from a
+living player on the overworld within `abilities.abilities.bell.rangeTiles` of `ov.bell` during day,
+dusk or night, at most `roles.roles[role].bellPulls` times per match (room memory). Bandage
+(`act.ability {abilityId: "bandage", targetId}`): a role with `bandage`, target alive, not self, same
+scene, within its `rangeTiles`, cooldown `cooldownS`, consumes one `bandage` from the inventory, sets
+the target's `bandagedUntilTick` for `params.protectS`; knockback, blackout and witness entries are
+M4(c). Ghosts (`dead`): move at walk speed, skip collision and the lock and busy checks of portals; a
+ghost's crossing updates only `PlayerSim.sceneIdx` (the base `enterScene` already freezes the public
+`sceneId` while the death is private), swings no door and emits no noise; every verb refuses a ghost
+(422). Fill `PlayerSim.resetForLobby()` and `RoomSim.resetForLobby()` with every field you add
+(`reportedBodies`, bell pulls, collectors per clue, the teaching flag). Death by ejection is K's.
+Tests (helpers in `test/killHelpers.ts`, importing `simHelpers` unchanged, with its white-box roles):
+kill range with and without the ring slack; grace, immunity and cooldown refusals; the bandaged
+target; the body and both clues appear in the scene state and nowhere else; a client outside the
+scene never receives the body or the clue; the ARCHITECTURE 5.4 fuzz test scoped to M3 (over a
+scripted kill a non-Cabal client outside the kill scene receives no field change at all, and a client
+inside the scene receives only the `bodies` and `clues` additions of that scene and `statusBits` bit 2
+on the killer); collect timing, cancel on move and on phase change, Detective `verified`; report and
+bell push a request, a second report of the same body is refused, the bell count; a ghost walks
+through a locked door, leaves `Door.swingUntilTick` untouched and sends no `noise`. Do not touch
+`rooms/**`, `sim/Visibility.ts`, `sim/Phases.ts`, `test/simHelpers.ts` or the schema.
 
 **M. Screens: meeting, game over, chat, theme (client).** Follow-up 1 first: give `NetworkService` a
 `room` getter (null until wired) and a `room` bus event; the router attaches both feeds from it with no
-cast and no interval, and registers `sceneEnter` once. Then the theme (follow-up 2, screens part):
+cast and no interval. The room's `sceneEnter` handler stays in N's `ColyseusWorldFeed`: remove
+`sceneEnter` from `NetworkService.SERVER_MESSAGES` and let the router re-emit the feed's `sceneEnter`
+on `net.bus` for `RoleReveal`, so it is registered once. Then the theme (follow-up 2, screens part):
 import `ui/theme/tokens.css` and `components.css` once in `main.ts`, `class="wdi-root"` on `#overlay`,
 and move Landing, Lobby and the role card to the theme classes per `docs/UI.md` 11, keeping every
 `data-testid`. Meeting feed (`net/meeting.ts`, `meetingColyseus.ts`, `mock/meetingMock.ts`): the
-public roster (`id`, `name`, `traits`, `alive`, `hasVoted`), `MeetingState`, the clock, own vote,
-chat lines, events `meetingStart`, `voteResult`, `gameOver`, `chat.msg`, `phaseChange`; `vote(target)`
-sends `meeting.vote {targetId}` (`"skip"` for Skip), `say(text)` sends `chat.say`. Router: on
-`meetingStart` sleep `World` and launch `Meeting`; on `sceneEnter` stop `Meeting` and start `World`
-(as today); on `gameOver` stop both and start `GameOver`; when the phase returns to `lobby` start
-`Lobby` (the roster still flows from `NetworkService`). `Meeting` (DOM, `docs/UI.md` 6 and the
-`mockups/meeting.html`): the reason line ("Hana reported Gus's body", "Hana rang the bell"), the
-portrait grid (name, trait icons, `is-dead`, `is-self`, the vote chip from `hasVoted`, `is-selected`
-for own vote; the picture is the villager atlas drawn to a canvas from the public traits, an initial on
-slate when the atlas is absent), tap a portrait or Skip to vote (living only; a ghost sees the grid and
-the chat but cannot vote), the discussion and vote timers from `phaseEndsTick`, tabs Report and Chat
-(the Notebook tab is wired at integration from N's panel), the chat log and form (a ghost's form posts
-to the ghost channel; `chat.msg` lines show their channel), and the reveal: tally numbers on the
-portraits, the stamp on the ejected portrait, the role line. The scene stays until `sceneEnter`.
-`GameOver` (DOM): winner banner, every seat's role and faction, the summary, a countdown to the lobby.
-Mock: `?mock=1` must reach the meeting, the reveal, game over and back to the lobby without a server.
-e2e (`meeting.spec.ts`, mock): vote, early end, stamp, game over, lobby. `party.spec.ts` keeps passing
-against the real server. Do not touch `scenes/World.ts`, `view/**`, `input/**` or `net/world*.ts`.
+public roster (`id`, `name`, `traits`, `alive`, `hasVoted`), `MeetingState`, the clock, own vote, chat
+lines, events `meetingStart`, `voteResult`, `gameOver`, `chat.msg`, `phaseChange`; `vote(target)`
+sends `meeting.vote {targetId}` (`"skip"` for Skip), `say(text)` sends `chat.say`. Router: a
+`sceneEnter` that arrives while no `Meeting` is active is today's World restart; on `meetingStart`
+sleep `World` and launch `Meeting`; only a `sceneEnter` received after `meetingStart` stops `Meeting`
+and starts `World`; on `gameOver` stop both and start `GameOver`; when the phase returns to `lobby`
+start `Lobby` (the roster still flows from `NetworkService`). In mock mode only, the router forwards
+the world feed's `meetingRequest` event to `MockNetwork.openMeeting(req)`, which emits `meetingStart`,
+runs discussion -> vote -> reveal (bots vote at random, the player's vote counts), emits `voteResult`
+and then either `gameOver` or calls `resume()` on the published world feed, which re-emits
+`sceneEnter`. `Meeting` (DOM, `docs/UI.md` 6 and the `mockups/meeting.html`): the reason line ("Hana
+reported Gus's body", "Hana rang the bell"), the portrait grid (name, trait icons, `is-dead`,
+`is-self`, the vote chip from `hasVoted`, `is-selected` for own vote; the picture is the villager
+atlas drawn to a canvas from the public traits, an initial on slate when the atlas is absent), tap a
+portrait or Skip to vote (living only; a ghost sees the grid and the chat but cannot vote), the
+discussion and vote timers from `phaseEndsTick`, tabs Report and Chat (the Notebook tab is wired at
+integration with `new NotebookPanel(tabElement, feed)` from N, `update()` and `destroy()`), the chat
+log and form (a ghost's form posts to the ghost channel; `chat.msg` lines show their channel), and the
+reveal: tally numbers on the portraits, the stamp on the ejected portrait, the role line. The scene
+stays until the `sceneEnter` that follows the reveal. `GameOver` (DOM): winner banner, every seat's
+role and faction, the summary, a countdown to the lobby. Frozen `data-testid`s for O: `meeting`,
+`meeting-reason`, `portrait-<playerId>`, `vote-skip`, `vote-count-<playerId>`, `stamp`, `reveal-role`,
+`chat-log`, `chat-input`, `gameover`, `gameover-winner`, `gameover-role-<playerId>`. Mock: `?mock=1`
+must reach the meeting, the reveal, game over and back to the lobby without a server. e2e
+(`meeting.spec.ts`, mock): vote, early end, stamp, game over, lobby. `party.spec.ts` keeps passing
+against the real server (it locates the HUD by `hud-clock`). Do not touch `scenes/World.ts`,
+`view/**`, `input/**`, `net/world*.ts` or `net/mock/worldMock.ts`.
 
 **N. World actions (client).** Extend `net/world.ts` (and both feeds) with `bodies()`, `clues()`,
 `notebook()` (own entries), `dead()`, `kill(targetId)`, `ability(id, targetId)`, `hold(action,
 targetId, on)`, `reportBody(bodyId)`, `bell()`, and the events `killed`, `clueFound`, `phaseChange`.
-In `World`: a prompt and the E key act on the nearest target in reach (a body: "Report", a clue:
-"Hold E to collect" with a 2 s ring, the bell on the overworld: "Ring the bell", a door: "Enter"), the
-Q/R/F keys send `act.ability` for the card's ability rows (`ABILITY_KEYS`, `net.roleCard.abilities`)
-with the nearest living player as target; a hold starts on keydown and ends on keyup. Draw bodies
-(`BodyView`: the last `die` frame of `char_villager` with the dead player's overlays from the public
-traits), clues (`ClueView`: `clue_footprint_<s|m|t>_mid` five times along `dir` from the tile,
-`clue_thread_<red|green|blue>`; keys from `docs/SPRITES.md` 8, a greybox mark when the atlas lacks a
-key), the Blood overlay (`PlayerView` shows the `blood` pass while `statusBits & StatusBit.bloody` and
-the player is within `clues.blood.params.visibleTiles` of you), the night mask (`Lighting`: a radius of
-`vision.dayTiles` by day and `vision.nightTiles` at night around you, a "Night falls" toast at dusk),
-the phase on the HUD clock, and ghost mode after `killed` (your sprite translucent, "You are a
-ghost", prompts hidden except doors, movement kept). The HUD adopts the theme (follow-up 2, World
-part): `view/Hud.ts` and `hud.css` move to `.wdi-hud` with `__tl/__tc/__tr/__bl/__br`,
-`.wdi-hud-chip`, `.wdi-hud-clock` (`--night`), `.wdi-log` lines, `.wdi-toast` and `.wdi-edge-cue`
-for noise (import the theme CSS from the module; the global import lands with M); the `wdi-world-*`
-namespace disappears, and the touch cluster uses `.wdi-stick`, `.wdi-touch-cluster` and
-`.wdi-touch-btn` with Use (E), Act (Q), Run and Sneak; the Notebook opens from the N key and a button
-beside the chip. `NotebookPanel` (`.wdi-notebook`): one row per entry with the clue icon, the trait
-value, the scene name and `m:ss` from `tick - startTick`, and the status chip (claimed, verified,
-teaching). `AudioBus`: loads `assets/audio/manifest.json` when it exists and plays `footstep`, `door`,
-`pickup`, `scream`, `bell` by key, silent otherwise (Q supplies the files). Mock: `?mock=1` lets the
-player kill the nearest bot (body and both clues appear), collect, open the Notebook, and see the night
-mask. e2e (`world.spec.ts`): the existing door flow plus kill -> body -> collect -> one Notebook entry
-on the mock. Do not touch `ui/**` except reading `ui/dom.ts`, `net/{NetworkService,worldRouter}.ts`,
-`main.ts` or `manifest.json`.
+`dead()` turns true on `killed` or when your own roster `alive` is false, is held in the feed (never in
+the scene) so it survives World restarts, and resets when `clock().phase` returns to `lobby`. In
+`World`: a prompt (`data-testid="prompt"`) and the E key act on the nearest target in reach (a body:
+"Report", a clue: "Hold E to collect" with a 2 s ring, the bell on the overworld: "Ring the bell", a
+door: "Enter"); the Q/R/F keys send `act.ability` for the card's ability rows (`ABILITY_KEYS`,
+`getNet(this).roleCard.abilities`; `REG_ROLE_CHIP` stays `{team, goal}`) with the nearest living
+player as target; a hold starts on keydown and ends on keyup, and on touch the Use disc sends `on:
+true` on `pointerdown` and `on: false` on `pointerup` or `pointercancel`, Report, Enter and Ring the
+bell fire on `pointerdown`, a release before `castS` is a cancelled hold. Draw bodies (`BodyView`: the
+last `die` frame of `char_villager` with the dead player's overlays from the public traits), clues
+(`ClueView`: `clue_footprint_<s|m|t>_mid` five times along `dir` from the tile,
+`clue_thread_<red|green|blue>`; keys from `docs/SPRITES.md` 8), the overworld props of
+`scenes/overworld.json` (`PropView`: `ov.bell`, `ov.pump`, `ov.board`, `ov.chest`, the lantern posts
+by key `prop_<kind>` from the `props` atlas), the Blood overlay (`PlayerView` shows the `blood` pass
+while `statusBits & StatusBit.bloody` and the player is within `clues.clues.blood.params.visibleTiles`
+of you), the night mask (`Lighting`: a radius of `vision.dayTiles` by day and `vision.nightTiles` at
+night around you, a "Night falls" toast at dusk), the phase on the HUD clock, and ghost mode after
+`killed` (your sprite translucent, "You are a ghost", prompts hidden except doors, movement kept). A
+greybox mark stands in for any key the manifest lacks (`textures.exists`). `Body.x/y` and `Clue.x/y`
+are pixel centres, used unscaled. On `clueFound` the Notebook opens on the new entry (GDD 2 step 5);
+during grace show the three toasts of GDD 2 step 5 (the bell one reads "E at the bell calls a
+meeting"; ids from UI.md 14 once it exists, the GDD lines until then). The HUD adopts the theme
+(follow-up 2, World part): `view/Hud.ts` and `hud.css` move to `.wdi-hud` with
+`__tl/__tc/__tr/__bl/__br`, `.wdi-hud-chip`, `.wdi-hud-clock` (`--night`), `.wdi-log` lines,
+`.wdi-toast` and `.wdi-edge-cue` for noise; import the theme CSS from the module (`hud.css` after it,
+so N's overrides win; the global import lands with M) and put `wdi-root` on the HUD root element so
+the fonts apply before M's `#overlay` change; the `wdi-world-*` namespace disappears; the touch
+cluster uses `.wdi-stick`, `.wdi-touch-cluster` and `.wdi-touch-btn` with Use (E), Act (Q), Run and
+Sneak; the Notebook opens from the N key and a button beside the chip. Frozen `data-testid`s:
+`hud`, `hud-clock` (already on the clock), `hud-fps`, `prompt`, `notebook`, `notebook-entry`,
+`touch-use`, `touch-act`. `World` hides the HUD, the prompt and the touch cluster on
+`Phaser.Scenes.Events.SLEEP` and shows them on `WAKE`, so M's `Meeting` never touches `view/**`.
+`NotebookPanel` (`new NotebookPanel(parent, feed)`, `update()`, `destroy()`, `.wdi-notebook`): one
+row per entry with the clue icon, the trait value, the scene name and `m:ss` from `tick -
+startTick`, and the status chip (claimed, verified, teaching). `AudioBus`: loads
+`assets/audio/manifest.json` when it exists and plays `footstep`, `door_open`, `door_close`,
+`door_locked` (error 423 or 428), `pickup`, `scream`, `bell` and `ambient` by key, silent otherwise (Q
+supplies the files). Mock (`MockWorldFeed`): the player kills the nearest bot (body and both clues
+appear), collects, opens the Notebook, sees the night mask; `reportBody` and `bell` emit the
+`meetingRequest` event on the feed bus; `resume()` re-emits `sceneEnter` for the current scene; the
+mock never emits `meetingStart`, `voteResult` or `gameOver`. e2e (`world.spec.ts`): the existing door
+flow plus kill -> body -> collect -> one Notebook entry on the mock. Do not touch `ui/**` except
+reading `ui/dom.ts` and the theme CSS, `net/{NetworkService,worldRouter,mock}.ts`,
+`net/mock/meetingMock.ts`, `main.ts` or `manifest.json`.
 
 **O. Bots, match e2e, soak (tooling).** `tools/bots`: `swarm.ts` gains `vote: "skip" | "leader" |
-"random"` (cast as soon as a meeting starts), `report: boolean` (report a body in reach), and keeps
-auto-Ready; `walk.ts` walkers step toward a body they see and report it, vote per option, and, when
-their own card holds `kill` and `--killer` is set (a debug deal fixes it), strike the nearest player in
-reach once the cooldown allows; `soak.ts` runs 6 walkers with one killer and reporters so bodies,
-clues and meetings exist during the 30 minutes, still failing on a presence leak, a dropped bot, a
-protocol error beyond refusals or p95 tick above 15 ms. `apps/client/e2e/match.spec.ts` against the
-real server (the Playwright `webServer` runs the server with `WDI_DEBUG=1` on port 2570): host and
-guest in two browsers plus three bots, `debug.deal` makes the host the Killer, `debug.clock` skips
-grace and the cooldown, the host kills the guest and reports the body, everyone votes the host, the
-stamp lands, Village wins, the game-over screen shows every role, and the lobby comes back with the
-same code; a second test ends in a Cabal win. `tools/grid/test/reach.test.ts` adds the widow cottage
+"random" | <player name>` (cast as soon as a meeting starts), `report: boolean` (report a body in
+reach), `walk: boolean` (default true for walkers, false keeps a bot on its spawn), and keeps
+`SwarmOptions` `code`, `count`, `url` and `ready` with today's defaults so `party.spec.ts` runs
+unchanged; `walk.ts` walkers step toward a body they see and report it, vote per option, and, when
+their own card holds `kill` and `--killer` is set, strike the nearest player in reach once the
+cooldown allows; `soak.ts` reaches play through `debug.deal` from the leader bot and `lobby.start`
+(every bot sends `lobby.ready {ready: true}` on `roleReveal` as `swarm.ts` does; `debug.play` stays
+for L's tests) and runs 6 walkers with one killer and reporters so bodies, clues and meetings exist
+during the 30 minutes, still failing on a presence leak, a dropped bot, a protocol error beyond
+refusals or p95 tick above 15 ms. `apps/client/e2e/match.spec.ts` against the real server (the
+Playwright `webServer` runs the server with `WDI_DEBUG=1` on port 2570; `e2e/env.ts` keeps exporting
+`E2E_SERVER_PORT` and `E2E_SERVER_URL`): host and guest in two browsers plus three bots, `debug.deal`
+makes the host the Killer, `debug.clock {phase: "day", clearCooldowns: true}`, the host walks to the
+guest and presses Q, reports the body with E, everyone votes the host, the stamp lands, Village wins,
+the game-over screen shows every role, and the lobby comes back with the same code; a second test at 4
+seats (host, guest, two bots with `walk: false` standing on `square_2` and `square_3`): the host is the
+Killer, kills the first bot, reports it, the host and the guest vote the second bot while the bots
+vote skip, and the Cabal game-over screen shows. The spec locates screens by the frozen ids in M's and
+N's briefs and the lobby ids that exist today. `tools/grid/test/reach.test.ts` adds the widow cottage
 (both rooms), the forest and the cave entry. `docs/ARCHITECTURE.md` 5.12 and ROADMAP 7.5's bot row
 describe the new bots. Write the spec against the contracts in this file and A30; run it once K, L, M
-and N have merged (the orchestrator will re-run it at integration).
+and N have merged (the orchestrator re-runs it at integration).
 
 **P. Art: props, clues, VFX, body (Opus).** Rebuild the villager masters from
-`tools/blender/build_villager.py` (they existed only in Session H's container) and record their hashes
-in `assets/source/MANIFEST.md` (and format that file so prettier passes, follow-up 5). Through the rig:
-the real clue sprites under the existing `clues` atlas keys (SPRITES 8: footprints x3 heights x3 mud,
-thread x3, felt x3, smear, print, wet bucket, fur, claw, drag) replacing the placeholder entry in the
-real manifest; the square props as a `props` atlas (`prop_bell`, `prop_well`, `prop_lantern_post`,
-`prop_board`, `prop_chest`, each `_lit`/`_unlit` where it applies, origin at the base); a `vfx` atlas
+`tools/blender/build_villager.py` (they existed only in Session H's container), record their hashes in
+`assets/source/MANIFEST.md`, run `prettier --write` on it and remove the `assets/source` line from
+`.prettierignore` (follow-up 5). Through the rig: the real clue sprites under the existing `clues`
+atlas keys (SPRITES 8: footprints x3 heights x3 mud, thread x3, felt x3, smear, print, wet bucket,
+fur, claw, drag) replacing the placeholder entry in the real manifest; the square props as a `props`
+atlas (`prop_bell`, `prop_pump`, `prop_noticeBoard`, `prop_kitChest`, `prop_lanternPost` with `_lit`
+and `_unlit`, keyed by the `kind` of `scenes/overworld.json`, origin at the base); a `vfx` atlas
 (`vfx_blood_pool` 8 f, `vfx_blood_splat` 12 f, `vfx_vote_stamp` 10 f, `vfx_dust_step` 6 f); and a
 contact sheet of the `die` clip's last frame in all 8 directions with the hat and scarf overlays, since
 it is the body sprite. New keys go to `docs/SPRITES.md` 8 and `manifest.json`; CC0 rows in
@@ -481,38 +588,42 @@ it is the body sprite. New keys go to `docs/SPRITES.md` 8 and `manifest.json`; C
 code: N draws a greybox mark for any key the manifest lacks.
 
 **Q. Playtest kit, audio, copy (Opus).** `docs/PLAYTESTS/`: `README.md` (how a session runs: the Pages
-link, the server, Discord, the host's script for a 5-player M3 session, three matches, timing),
-`FORM.md` (the ROADMAP 7.5 feedback form, ready to paste into a Google Form), `SCORECARD.md` (the
-fun-or-stop sheet for the M3 exit: three 5-player matches end in a Village or Cabal win in 10-18 min,
-vote accuracy from the match log, "would play again" 1-10, the decision line), `TEMPLATE.md` for one
-session's notes, and `2026-xx-xx-m2.md` as the M2 playtest entry stub. Audio: eight CC0 SFX (footstep,
-door open, door close, door locked, pickup, scream, bell, vote stamp) and one ambient loop from Kenney
-or Freesound CC0, OGG q5 under `apps/client/public/assets/audio/` with `audio/manifest.json` (`{key,
-url, gain}`), their `CREDITS.md` rows, and any licence text under `LICENSES/`; N's `AudioBus` plays
-them by key. Copy: `docs/UI.md` 14, the M3 copy deck: every toast, prompt, meeting line, ghost line,
-reveal and game-over line with an id, consistent with GDD 2; M and N paste from it, and GDD 2 is
-touched only for wording.
+link, the server, Discord, the host's script for a 5-player M3 session, three matches, timing, and the
+owner prerequisites above), `FORM.md` (the ROADMAP 7.5 feedback form, ready to paste into a Google
+Form), `SCORECARD.md` (the fun-or-stop sheet for the M3 exit: three 5-player matches end in a Village
+or Cabal win in 10-18 min, vote accuracy from the match log, "would play again" 1-10, the decision
+line), `TEMPLATE.md` for one session's notes, and `2026-xx-xx-m2.md` as the M2 playtest entry stub.
+Audio: eight CC0 SFX and one ambient loop from Kenney or Freesound CC0, OGG q5 under
+`apps/client/public/assets/audio/` with `audio/manifest.json` entries `{key, url, gain}` (`url`
+relative to `assets/audio/`, keys exactly `footstep`, `door_open`, `door_close`, `door_locked`,
+`pickup`, `scream`, `bell`, `stamp`, `ambient`), their `CREDITS.md` rows, and any licence text under
+`LICENSES/`; N plays them by key and M plays `stamp` at the reveal. Copy: `docs/UI.md` 14, the M3 copy
+deck: every toast, prompt, meeting line, ghost line, reveal and game-over line with an id, consistent
+with GDD 2 (the bell toast reads "E at the bell calls a meeting", since the bell is the E prompt); M and
+N paste from it, and GDD 2 is touched only for wording.
 
 ### Seams in round 3
 
 | From | To | Contract |
 |---|---|---|
-| L | K | L pushes `{reason: "body" \| "bell", callerId, bodyOf?}` to `simOf(room).meetingRequests` and `{playerId, cause, killerId?, tick}` to `simOf(room).deaths`; K drains both in `runPhases`. L sets `PlayerSim.dead`; K flips the public `alive` at meeting start and on ejection and reads `dead` in `Visibility.ts`. Neither imports a function from the other. |
-| K | L | K keeps `isWorldPhase` as the gate for movement and portals; L refuses kills outside day, dusk and night and every verb in `immunity`. `debug.clock` clears `cooldownEndTick` and `bandagedUntilTick` through the seam fields. |
-| K, L | M, N | The wire: the pre-seeded schema fields and payloads (A30). `killed {sceneId, cause, roles}` is the ghost switch on the client; `clueFound {entryId}` points at a `priv.notebook` entry; `meetingStart` precedes the first meeting `phaseChange`; after the reveal the server sends `sceneEnter` again, which is the client's cue to leave the meeting. |
-| M | N | The router (M) constructs N's `ColyseusWorldFeed(room)` and `MockWorldFeed` unchanged, publishes them under `REG_WORLD`, and starts, sleeps and stops `World`; N never starts a scene. M mounts N's `NotebookPanel` on the meeting's Notebook tab at integration (one line). The HUD (N) and the screens (M) adopt the theme separately; the touch cluster is N's. |
+| L | K | L pushes `{reason: "body" \| "bell", callerId, bodyOf?}` to `simOf(room).meetingRequests` and `{playerId, cause, killerId?, tick}` to `simOf(room).deaths`; K drains both in `runPhases`. L sets `PlayerSim.dead` and keeps `sceneIdx` through `enterScene`; K flips the public `alive` at meeting start and on ejection and keys `Visibility.ts` on `dead` and `sceneIdx`. Neither imports a function the other adds in round 3; the exports that exist at the base (`enterScene`, `placeNewPlayers`, `reconcileViews`, `isWorldPhase`, `sceneKey`, `simOf`) keep their signatures. |
+| K | L | K keeps `isWorldPhase` as the gate for movement and portals and writes the Knife's first `cooldownEndTick` at day; L refuses kills outside day, dusk and night and every verb in `immunity`. `debug.clock` clears cooldowns and bandages through the seam fields. |
+| K, L | M, N | The wire: the pre-seeded schema fields and payloads (A30). `killed {sceneId, cause, roles}` is the ghost switch on the client; `clueFound {entryId}` points at a `priv.notebook` entry; at meeting start the placements send no `sceneEnter` and `meetingStart` follows them; at the start of `immunity` K re-places everyone with an announced `enterScene`, and that `sceneEnter` is the router's cue to stop `Meeting`; on a winner `gameOver` comes with no `sceneEnter`. |
+| M | N | The router (M) constructs N's `ColyseusWorldFeed(room)` and `MockWorldFeed` unchanged, publishes them under `REG_WORLD`, and starts, sleeps and stops `World`; N never starts a scene; `World` hides its DOM on SLEEP. Mock handoff: N's mock emits `meetingRequest` and exposes `resume()`; M's `MockNetwork.openMeeting` runs the meeting and calls `resume()`; `meetingMock.ts` never edits `worldMock.ts` and vice versa. M mounts N's `NotebookPanel(parent, feed)` on the meeting's Notebook tab at integration. The HUD (N) and the screens (M) adopt the theme separately: M's theme fixes never touch the HUD, log, edge-cue, toast, stick, touch or notebook rules; N overrides those only in `view/hud.css`. N reads the card from `getNet(this).roleCard`; `REG_ROLE_CHIP` stays `{team, goal}`. The e2e suites locate the HUD by `hud-clock`, never by class. |
 | N | P | Keys only, never paths: `clues`, `props`, `vfx` atlas keys from `docs/SPRITES.md` 8; N draws a greybox mark when `textures.exists(key)` is false. |
-| N | Q | `assets/audio/manifest.json` entries `{key, url, gain}`; N's `AudioBus` is silent when the file is missing. M and N paste copy from `docs/UI.md` 14 once it exists; until then the GDD 2 lines. |
-| O | K | `debug.deal` and `debug.clock` (K) are what the bots and `match.spec.ts` drive; O writes against the A30 contract and runs after the merges. |
+| N, M | Q | `assets/audio/manifest.json` entries `{key, url, gain}` with the nine keys above; a missing key is silent. M and N paste copy from `docs/UI.md` 14 once it exists; until then the GDD 2 lines. |
+| O | K | `debug.deal`, `debug.clock` and the unchanged `debug.play` (K) are what the bots and `match.spec.ts` drive; the soak and the spec start play through `debug.deal` then `lobby.start`; `runDebugStart` sets `startTick` like `beginPlay`. O writes against the A30 contract and the frozen ids and runs after the merges. |
 
 ### Clarifications recorded before the round (DECISIONS A30)
 
 See the A30 row; in short: death is private until the next meeting (`alive` flips there, the victim
-gets `killed`); ghosts walk, see everyone in their scene, are seen only by other ghosts, and chat on
-their own channel; M3 spawns Footprints toward the nearest portal and a Thread beside it, both readable
-in the world and logged on collect; Blood is a presence bit with a client-side 3-tile mask; kills only
-in day, dusk and night, with the ring slack and a straight-line check; a meeting moves everyone to the
-square, votes are secret counts, plain plurality with Skip; the win check runs after deaths and
-ejections only; after game over the room returns to the lobby with the same code; a disconnected
-player is a ghost at once (M7 adds reconnection and the body); `WDI_DEBUG=1` adds `debug.deal` and
-`debug.clock`.
+gets `killed`, a ghost's public `sceneId` is frozen); ghosts walk, see everyone in their scene, are
+seen only by other ghosts, and chat on their own channel; M3 spawns Footprints toward the nearest
+portal and a Thread beside it, both readable in the world and logged on collect; Blood is a presence
+bit with a client-side 3-tile mask and is the one role-correlated field V1 accepts; kills only in day,
+dusk and night, with the ring slack and a straight-line check; a meeting moves everyone to the square
+silently, votes are secret counts, plain plurality with Skip, the reveal lasts its full time before a
+win; the win check runs after deaths and ejections only; after game over the room returns to the lobby
+with the same code; a disconnected player is a ghost at once (M7 adds reconnection and the body) and a
+lobby seat survives a dropped connection for the disconnect window; `WDI_DEBUG=1` adds `debug.deal`
+and `debug.clock` beside `debug.play`.

@@ -11,7 +11,7 @@ async function toWorld(page: import('@playwright/test').Page, query = '') {
   await page.getByTestId('start').click();
   await page.getByTestId('confirm-start').click();
   await page.getByTestId('ready').click();
-  await expect(page.locator('.wdi-world-timer')).toBeVisible();
+  await expect(page.getByTestId('hud-clock')).toBeVisible();
 }
 
 test('the village shows the HUD, six bots in view, and the player can walk', async ({ page }, info) => {

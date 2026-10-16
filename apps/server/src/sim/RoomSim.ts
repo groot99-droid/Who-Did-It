@@ -21,6 +21,11 @@ export class PlayerSim {
   vx = 0;
   vy = 0;
   placed = false;
+  /**
+   * Scene index the sim moves the player in. The public `Player.sceneId` mirrors it only while the
+   * player is alive or their death is public, so a ghost's crossings never show on the roster (A30).
+   */
+  sceneIdx = 0;
   /** Order in which the player was first seen, picks the `square_<n>` spawn. */
   readonly ordinal: number;
   input: MoveInput | null = null;
@@ -47,6 +52,23 @@ export class PlayerSim {
 
   constructor(ordinal: number) {
     this.ordinal = ordinal;
+  }
+
+  /** Back to a lobby seat after game over (K calls it; L adds every field L adds to this class). */
+  resetForLobby(): void {
+    this.x = this.y = this.vx = this.vy = 0;
+    this.placed = false;
+    this.sceneIdx = 0;
+    this.input = null;
+    this.lastSeq = -1;
+    this.busyUntilTick = 0;
+    this.transitFrom = -1;
+    this.dead = false;
+    this.bloodyUntilTick = 0;
+    this.bandagedUntilTick = 0;
+    this.hold = null;
+    this.head = -1;
+    this.filled = 0;
   }
 
   /** Forgets history and records a fresh position (spawn, portal arrival). */
@@ -113,13 +135,25 @@ export class RoomSim {
   profile: Profile = 'small';
   /** Set by the first placement; `placeNewPlayers` then skips the profile scan (round-3 follow-up 5). */
   profileFixed = false;
-  /** Counter for clue ids (`clue_<n>`), reset with the room. */
-  clueSeq = 0;
+  /** Clue id counters per scene (`clue_<sceneId>_<n>`), so an id never counts kills elsewhere (A30). */
+  readonly clueSeq = new Map<string, number>();
   /** Raised by the WDI_DEBUG `debug.play` message, consumed by the step. */
   debugPlay = false;
   /** Set when a view must change before the next 5 Hz pass (a transit just ended). */
   viewsDirty = false;
   private ordinals = 0;
+
+  /** Back to the lobby after game over (K calls it; L adds every field L adds to this class). */
+  resetForLobby(): void {
+    for (const p of this.players.values()) p.resetForLobby();
+    this.portalRequests = [];
+    this.meetingRequests = [];
+    this.deaths = [];
+    this.profile = 'small';
+    this.profileFixed = false;
+    this.viewsDirty = true;
+    this.clueSeq.clear();
+  }
 
   ensure(sessionId: string): PlayerSim {
     let sim = this.players.get(sessionId);

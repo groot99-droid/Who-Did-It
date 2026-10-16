@@ -38,7 +38,7 @@ function emitNoise(
   for (const client of room.clients) {
     const player = room.state.players.get(client.sessionId);
     const p = sim.players.get(client.sessionId);
-    if (!player || !p?.placed || client.sessionId === exceptId || player.sceneId !== idx) continue;
+    if (!player || !p?.placed || client.sessionId === exceptId || p.sceneIdx !== idx) continue;
     if (Math.hypot(p.x - x, p.y - y) <= reach) {
       client.send(S2C.noise, { sceneId, x: Math.round(x), y: Math.round(y), kind });
     }
@@ -67,7 +67,8 @@ function swingDoor(room: PartyRoom, sceneId: SceneId, portalId: string): void {
 /**
  * Puts a player on a spawn of a scene: position, ring, scene id, `sceneEnter`. With `transit` the
  * 0.6 s crossing starts (busy, inputs cleared, encoded to both scenes); without it the move is a plain
- * placement (the start of the match).
+ * placement (the start of the match). With `announce` false no `sceneEnter` is sent: the meeting move
+ * uses it, so the client's cue to leave the meeting is the announced placement at immunity (A30).
  */
 export function enterScene(
   room: PartyRoom,
@@ -76,6 +77,7 @@ export function enterScene(
   sceneId: SceneId,
   spawnId: string,
   transit: boolean,
+  announce = true,
 ): boolean {
   const spawn = scenes[sceneId].spawns.find((s) => s.id === spawnId);
   if (!spawn) return false;
@@ -84,14 +86,16 @@ export function enterScene(
   const y = tileCentre(spawn.y, TILE_PX);
   if (overlapsSolid(navGrid(sceneId, sim.profile), x, y, FOOT_HALF_PX, FOOT_HALF_PX)) return false;
   const tick = room.state.tick;
-  const fromScene = player.sceneId;
+  const fromScene = p.sceneIdx;
   p.x = x;
   p.y = y;
   p.vx = p.vy = 0;
   p.input = null;
   room.commands.clearMove(player.id);
   p.resetRing();
-  player.sceneId = sceneIndex(sceneId);
+  p.sceneIdx = sceneIndex(sceneId);
+  // A ghost whose death is not yet public keeps its public scene, or the roster would show it moving.
+  if (!p.dead || !player.alive) player.sceneId = p.sceneIdx;
   const presence = player.presence;
   presence.x = Math.round(x);
   presence.y = Math.round(y);
@@ -109,7 +113,9 @@ export function enterScene(
     presence.transitUntilTick = 0;
     presence.statusBits = 0;
   }
-  room.clients.getById(player.id)?.send(S2C.sceneEnter, { sceneId, spawn: spawn.id, facing: spawn.facing });
+  if (announce) {
+    room.clients.getById(player.id)?.send(S2C.sceneEnter, { sceneId, spawn: spawn.id, facing: spawn.facing });
+  }
   return true;
 }
 
@@ -117,10 +123,11 @@ export function enterScene(
 export function placeNewPlayers(room: PartyRoom): void {
   const sim = simOf(room);
   if (!isWorldPhase(room.state.phase)) return;
-  if (![...sim.players.values()].some((p) => p.placed)) {
+  if (!sim.profileFixed) {
     // The first placement fixes the profile for the match from the party size (GDD 3.9).
     sim.profile = profileFor(Math.min(MAX_PLAYERS, Math.max(MIN_PLAYERS_TO_START, room.state.players.size)));
     applyProfileToDoors(room);
+    sim.profileFixed = true;
   }
   let placedAny = false;
   for (const [sessionId, p] of sim.players) {
@@ -161,7 +168,7 @@ export function runPortals(room: PartyRoom): void {
       reject(room, req.sessionId, ErrorCode.busy, 'busy');
       continue;
     }
-    const from = sceneKey(player.sceneId);
+    const from = sceneKey(p.sceneIdx);
     const portal = scenes[from].portals.find((q) => q.id === req.portalId);
     if (!portal) {
       reject(room, req.sessionId, ErrorCode.cannot, 'no such door');

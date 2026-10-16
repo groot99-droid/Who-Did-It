@@ -78,7 +78,7 @@ The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 star
 | Meeting: discussion | Body report, Emergency Bell, or missing-person roll-call | 60 / 75 / 90 s (4-5 / 6-7 / 8-10) |
 | Meeting: vote | Open from the first second; ends early when all living players have voted | 25 s after discussion |
 | Reveal | Tally with names; ejected role revealed | 8 s |
-| Immunity | No kills, no noise; everyone spread at the square; phase resumes | 15 s |
+| Immunity | No kills, no noise; everyone spread at the square; then a new day (M3: the day restarts in full and the cycle count rises) | 15 s |
 | Final Night | End of cycle 5 without a winner | 90 s hunt + forced vote |
 | Game over | Winner, every role, the summary; then the lobby again with the same code and seats | 20 s |
 
@@ -149,7 +149,7 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
 - **Final Night** (cycle 5 without a winner): night lighting, wolves roam the village, Cabal kill CD 20 s, 90 s hunt with clues still spawning, then a forced vote with no Skip and the Case Board open; a tie ejects nobody and Cabal wins.
 - Tie or Skip majority: nobody ejected. After two consecutive no-ejection meetings (Drifter ejections count as none) the next vote has Skip disabled and ejects only a player holding at least ceil(living/3) votes; otherwise nobody is ejected and the next cycle has no grace.
 - **Hunger**: a Killer with no kill in 2 full cycles leaves glowing footprints until they kill.
-- Disconnect over 60 s = death with cause "vanished" and a body at the last position; reconnection within 60 s resumes the same role.
+- Disconnect over 60 s = death with cause "vanished" and a body at the last position; reconnection within 60 s resumes the same role. (M3: a player who leaves during play becomes a ghost at once with no body; the window and the body arrive with reconnection in M7, A30.)
 - No Clue Surge. A wrong ejection adds 15 s to the next discussion instead.
 
 ### 3.9 Balance by player count

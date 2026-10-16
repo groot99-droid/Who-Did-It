@@ -1,7 +1,8 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { TILE_PX } from '@wdi/shared';
 import { BUILD_VERSION, type GameStateType } from '@wdi/shared';
-import { scenes } from '@wdi/content';
+import { roles, scenes } from '@wdi/content';
+import { Team } from '@wdi/shared';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { simOf } from '../src/sim/RoomSim';
 
@@ -23,19 +24,36 @@ export interface Match {
 
 export const stateOf = (bot: Bot) => bot.room.state as unknown as GameStateType;
 
-/** Creates a party of `n` bots, starts the world with the debug helper and waits until all are placed. */
-export async function startMatch(colyseus: ColyseusTestServer, n: number): Promise<Match> {
+/**
+ * Creates a party of `n` bots, starts the world with the debug helper and waits until all are placed.
+ * Every server message is recorded (`lastEvent`). `roles` writes a role white-box per bot name (the
+ * debug start deals none): `priv.role.roleId` and `team`, so a Killer or a Detective can be tested.
+ * Round 3: nobody edits this file; K's helpers live in flowHelpers.ts, L's in killHelpers.ts.
+ */
+export async function startMatch(
+  colyseus: ColyseusTestServer,
+  n: number,
+  roleByName: Record<string, string> = {},
+): Promise<Match> {
   const leader = await colyseus.sdk.create('party', opts('Bot0'));
   const rooms = [leader];
   for (let i = 1; i < n; i++) rooms.push(await colyseus.sdk.joinById(leader.roomId, opts(`Bot${i}`)));
   const bots: Bot[] = rooms.map((room) => {
     const events: Bot['events'] = [];
-    for (const type of ['sceneEnter', 'noise', 'error']) {
-      room.onMessage(type, (payload: unknown) => events.push({ type, payload }));
-    }
+    room.onMessage('*', (type: string | number | object, payload: unknown) =>
+      events.push({ type: String(type), payload }),
+    );
     return { room, id: room.sessionId, events };
   });
   const room = colyseus.getRoomById(leader.roomId) as unknown as PartyRoom;
+  for (const [name, roleId] of Object.entries(roleByName)) {
+    const i = Number(name.replace('Bot', ''));
+    const priv = room.state.players.get(bots[i]?.id ?? '')?.priv;
+    const role = roles.roles[roleId];
+    if (!priv || !role) throw new Error(`no seat ${name} or role ${roleId}`);
+    priv.role.roleId = roleId;
+    priv.role.team = Team[role.faction];
+  }
   leader.send('debug.play', {});
   for (let i = 0; i < 100; i++) {
     const sim = simOf(room);
