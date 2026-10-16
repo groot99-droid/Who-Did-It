@@ -647,4 +647,43 @@ and `debug.clock` beside `debug.play`.
 **Landed** (`claude/m3-flow`): `resolveVotes` and `checkWin` in `@wdi/shared` rules with tests (property loop over seeded votes); `sim/{Flow,Phases,Meeting,Chat,Win}.ts` and `services/MatchLog.ts`: the phase loop (grace -> day -> dusk -> night -> day, `round` + 1 on every day, Knife first cooldown at day), meetings (square placement without `sceneEnter`, `meetingStart`, discussion, vote, early end, reveal, announced `sceneEnter` at immunity), secret plurality votes, the win check on a drained death and at the end of an ejection's reveal, `gameOver` with one match-log JSON line, the reset to the lobby, chat by channel, ghost-aware reconcile, lobby reconnection (`onDrop`, `onReconnect`, `onLeave`), the vanished death during play, and `debug.deal` / `debug.clock`. Tests: `flow`, `meeting`, `win`, `chat`, `visibility` and the new reconnection block of `lobby`, with helpers in `flowHelpers.ts`. Choices are in DECISIONS A31.
 
 **For the orchestrator and the next sessions.** L's `report` and `bell` only need to push to `sim.meetingRequests` and the kill to `sim.deaths`; my tests stand in for both white-box (`request`, `murder` in `flowHelpers.ts`), so run K's and L's suites together after the merge. `debug.play` now broadcasts `phaseChange` and stamps the grace clock, so a debug match leaves grace after `graceS` seconds like a real one: tests that need a day call `debug.clock {phase: "day"}`. Ghost presence is hidden by `PlayerSim.dead`, which L sets on a kill; nothing else changes the view code. A bot or e2e that leaves during play ends the match for the Cabal when the Village falls to its limit, because a leaver is a ghost at once. **Not done:** the missing-person roll-call, the suspect set and `meeting.board` (M4), the anti-stall rules and the wrong-ejection bonus (off in M3), reconnection and the body for a player who drops during play (M7).
+### Round 3 log: N (World actions, client)
 
+**Landed** on `claude/m3-world` (one draft PR; it is over 400 lines because the HUD move, the feeds and
+the views only make sense together): `net/world.ts` and both feeds with `bodies()`, `clues()`,
+`notebook()`, `dead()`, `kill`, `ability`, `hold`, `reportBody`, `bell` and the `killed`, `clueFound`,
+`phaseChange` events (`clock()` also returns `startTick`; `PlayerSnap` gains the roster `alive`);
+`World` with the one prompt (`data-testid="prompt"`), E, Q/R/F, N and the touch Use and Act discs, the
+2 s collect ring, `BodyView`, `ClueView`, `PropView`, the Blood pass, `Lighting`, ghost mode, the grace
+toasts and the Night falls toast, `NotebookPanel` (+ the `NotebookSheet` that opens it over the world),
+`AudioBus`, and the HUD on the theme (`.wdi-hud`, `.wdi-log`, `.wdi-toast`, `.wdi-edge-cue`,
+`.wdi-stick`, `.wdi-touch-*`; the `wdi-world-*` namespace is gone). `InputController` gained `bind`,
+`unbindAll` and `setSink`. Unit tests for the mock verbs and the pure view helpers; `world.spec.ts`
+keeps the door flow (now polling the prompt instead of fixed sleeps, and asserting no page errors) and
+adds kill -> body -> collect -> one Notebook entry, the night mask and the ghost. DECISIONS A34.
+
+**For L (server).** The client breaks a tie between a body and a clue in reach in favour of the body
+("Report"), so Footprints must not sit on the victim's own tile or the clue cannot be collected; the
+mock puts them one tile along the trail. `NotebookEntry.sceneId` is read as an index into `SCENE_IDS`.
+A hold ends client-side without a message when the player moves or leaves reach, and `on: false` is sent
+only for a release. `noise` kinds are matched loosely: anything containing "scream" is the scream
+(magenta ring, log line, edge cue, sound), `doorMuffled` is the muffled door, the rest a creaking door.
+
+**For M and the orchestrator.** `World` hides its HUD, the prompt, the night mask and the touch cluster on
+`SLEEP`, closes the Notebook sheet and releases its keys, and restores them on `WAKE`; it never starts a
+scene. The mock's `resume()` re-emits `sceneEnter` for the current scene; it emits `meetingRequest` for
+the report and the bell and nothing from the meeting. The mock reads `?phase=day|dusk|night`,
+`?bots=still` and `?ghost=1` (documented in A34); the `?fps=1` readout now also prints `at x,y`,
+`bodies n` and `clues n`, which the e2e and the bots can read. Importing the theme CSS from `Hud.ts` is
+enough for the fonts; the theme's `.wdi-hud__*` groups anchor with `inherit`, which ignores the
+safe-area padding, so `view/hud.css` sets the offsets itself (M may fix the theme and drop that block).
+`NotebookPanel` (`new NotebookPanel(parent, feed)`, `update()`, `destroy()`) takes the same `WorldFeed`
+the Meeting gets from the router.
+
+**Not done.** Toast and prompt ids from `docs/UI.md` 14 (it did not exist; the GDD 2 lines are used,
+with the bell hint reading "E at the bell" as briefed, while GDD 2 step 5 still says "B", which is Q's
+wording to fix). The real `props`, `vfx` and audio files are P's and Q's: until then props draw as
+labelled greybox blocks and the game is silent. Hold abilities (`inspect`, `dragBody`, `autopsy`) and
+the passive rows are M4. The night mask is a DOM vignette with one soft edge; line-of-sight shadows are
+not attempted. Not run: a real-server kill (L's server was not on the base), so the real feed's
+`bodies()`/`clues()`/`notebook()` reads are covered by types and review only.

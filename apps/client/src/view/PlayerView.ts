@@ -11,12 +11,12 @@ import { AnimId } from './animIds';
 export const BODY = 'villager';
 const BODY_TEXTURE = `char_${BODY}`;
 const OVERLAY_TEXTURE = `ovl_${BODY}`;
-const HATS = ['hat_cap', 'hat_bowler', null] as const;
-const SCARF_TINT = traits.axes.scarf.values.map((v) =>
+export const HATS = ['hat_cap', 'hat_bowler', null] as const;
+export const SCARF_TINT = traits.axes.scarf.values.map((v) =>
   Number.parseInt(palette.colors[v.tint as keyof typeof palette.colors].slice(1), 16),
 );
 const SCARF_SHAPE = ['◆', '●', '■']; // diamond, circle, square (nameplateShape)
-const HEIGHT_SCALE = traits.axes.height.values.map((v) => v.spriteScale);
+export const HEIGHT_SCALE = traits.axes.height.values.map((v) => v.spriteScale);
 
 /** Facing as a direction name from the server's yaw (clockwise from screen up). */
 export function dirFromYaw(yaw: number): Direction {
@@ -34,10 +34,13 @@ export class PlayerView {
   private readonly body: Phaser.GameObjects.Sprite;
   private readonly scarf: Phaser.GameObjects.Sprite;
   private readonly hat: Phaser.GameObjects.Sprite;
+  private readonly blood: Phaser.GameObjects.Sprite;
   private readonly plate: Phaser.GameObjects.Text;
   private readonly hasArt: boolean;
   private anim = '';
   private hatPass: string | null = null;
+  private bloodOn = false;
+  private readonly plateColor: string;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -46,6 +49,7 @@ export class PlayerView {
     isSelf: boolean,
   ) {
     this.hasArt = scene.textures.exists(BODY_TEXTURE);
+    this.plateColor = isSelf ? palette.colors.mustard : palette.colors.bone;
     const shadow = scene.add.ellipse(0, 0, 38, 14, 0x12141c, 0.4);
     this.body = scene.add.sprite(0, 0, this.hasArt ? BODY_TEXTURE : '__DEFAULT');
     this.scarf = scene.add.sprite(
@@ -54,6 +58,12 @@ export class PlayerView {
       scene.textures.exists(OVERLAY_TEXTURE) ? OVERLAY_TEXTURE : '__DEFAULT',
     );
     this.hat = scene.add.sprite(0, 0, scene.textures.exists(OVERLAY_TEXTURE) ? OVERLAY_TEXTURE : '__DEFAULT');
+    this.blood = scene.add.sprite(
+      0,
+      0,
+      scene.textures.exists(OVERLAY_TEXTURE) ? OVERLAY_TEXTURE : '__DEFAULT',
+    );
+    this.blood.setVisible(false);
     this.body.setVisible(this.hasArt);
     this.scarf.setTint(SCARF_TINT[look.scarf] ?? SCARF_TINT[0]);
     this.hatPass = HATS[look.hat] ?? null;
@@ -63,12 +73,12 @@ export class PlayerView {
       .text(0, -Math.round(130 * scale), `${shape} ${name}`, {
         fontFamily: 'Inter, sans-serif',
         fontSize: '15px',
-        color: isSelf ? palette.colors.mustard : palette.colors.bone,
+        color: this.plateColor,
         stroke: palette.colors.ink,
         strokeThickness: 4,
       })
       .setOrigin(0.5, 1);
-    const art = scene.add.container(0, 0, [this.body, this.scarf, this.hat]).setScale(scale);
+    const art = scene.add.container(0, 0, [this.body, this.scarf, this.hat, this.blood]).setScale(scale);
     this.root = scene.add.container(0, 0, [shadow, art, this.plate]);
     if (!this.hasArt) {
       // No texture at all: a bare capsule keeps the game playable.
@@ -96,6 +106,26 @@ export class PlayerView {
     this.play(this.scarf, `scarf/${tail}`, keep);
     this.hat.setVisible(this.hatPass !== null);
     if (this.hatPass !== null) this.play(this.hat, `${this.hatPass}/${tail}`, keep);
+    if (this.bloodOn) this.play(this.blood, `blood/${tail}`, keep);
+  }
+
+  /**
+   * The `blood` pass (torso and hands) while the Blood status is up and the viewer is within range
+   * (docs/SPRITES.md 6). Without the art the player gets a red mark on the nameplate instead.
+   */
+  setBlood(on: boolean): void {
+    if (on === this.bloodOn) return;
+    this.bloodOn = on;
+    this.blood.setVisible(on && this.hasArt);
+    this.plate.setColor(on ? palette.colors.lantern : this.plateColor);
+    if (on && this.anim !== '') {
+      this.play(this.blood, `blood/${this.anim}`, (this.body.anims.currentFrame?.index ?? 1) - 1);
+    }
+  }
+
+  /** A ghost is drawn translucent (to its own player and to other ghosts). */
+  setGhost(on: boolean): void {
+    this.root.setAlpha(on ? 0.45 : 1);
   }
 
   private play(sprite: Phaser.GameObjects.Sprite, key: string, startFrame: number): void {

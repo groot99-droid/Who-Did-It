@@ -25,17 +25,31 @@ export class InputController {
   private lastKey = '';
   private lastSentAt = 0;
   private touch: InputSource | null = null;
-  private onInteract: (() => void) | null = null;
+  /** Key code -> handler(down). Held keys get a final `false` when focus is lost. */
+  private readonly bindings = new Map<string, (down: boolean) => void>();
+  private readonly down = new Set<string>();
 
-  constructor(private readonly sink: MoveSink) {}
+  constructor(private sink: MoveSink) {}
+
+  /** A new match brings a new feed; the controller outlives the World scene, so repoint it. */
+  setSink(sink: MoveSink): void {
+    this.sink = sink;
+  }
 
   /** Adds the touch controls' state to the keyboard's. */
   attachTouch(source: InputSource): void {
     this.touch = source;
   }
 
-  onUse(handler: () => void): void {
-    this.onInteract = handler;
+  /** Calls `handler(true)` on keydown (never on auto-repeat) and `handler(false)` on keyup or blur. */
+  bind(code: string, handler: (down: boolean) => void): void {
+    this.bindings.set(code, handler);
+  }
+
+  /** Drops every binding (a held key is released first); the World scene rebinds on each start. */
+  unbindAll(): void {
+    this.releaseBound();
+    this.bindings.clear();
   }
 
   start(): void {
@@ -86,7 +100,11 @@ export class InputController {
 
   private readonly keydown = (e: KeyboardEvent): void => {
     if (isTyping(e.target)) return;
-    if (e.code === 'KeyE' && !e.repeat) this.onInteract?.();
+    const bound = this.bindings.get(e.code);
+    if (bound && !e.repeat && !this.down.has(e.code) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      this.down.add(e.code);
+      bound(true);
+    }
     if (/^(Key[WASD]|Arrow(Up|Down|Left|Right)|Space|Shift(Left|Right))$/.test(e.code)) {
       this.pressed.add(e.code);
       e.preventDefault();
@@ -95,11 +113,18 @@ export class InputController {
 
   private readonly keyup = (e: KeyboardEvent): void => {
     this.pressed.delete(e.code);
+    if (this.down.delete(e.code)) this.bindings.get(e.code)?.(false);
   };
+
+  private releaseBound(): void {
+    for (const code of this.down) this.bindings.get(code)?.(false);
+    this.down.clear();
+  }
 
   /** Lose focus or hide the tab: let go of everything, tell the server once, and do not catch up. */
   private readonly release = (): void => {
     this.pressed.clear();
+    this.releaseBound();
   };
 
   private readonly visibility = (): void => {
