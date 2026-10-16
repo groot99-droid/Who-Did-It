@@ -1,39 +1,95 @@
-// Random-walk movement bots (ARCHITECTURE 5.12: load clients only, no tasks or reports). Each bot walks
-// in a random direction for a second or two, sometimes runs, sometimes stands, and when it stands next
-// to a door it sometimes walks through it.
+// Bot brain shared by the swarm, the walkers and the soak (ARCHITECTURE 5.12). A bot walks at random
+// (or stands on its spawn), reports bodies in reach, votes in meetings per `vote`, and, when its own card
+// holds `kill` and `killer` is set, hunts and strikes the nearest player in reach once the cooldown allows.
+// It never reads anything a real client would not receive.
 //
 //   pnpm --filter @wdi/bots walk -- --code ABCDE --count 6 [--url http://localhost:2567]
+//        [--vote skip|leader|random|<name>] [--no-report] [--killer] [--no-walk]
 //
-// The server must run with WDI_DEBUG=1 for `--play` (the debug.play start used by the soak); against a
-// real lobby the bots just join and walk once the match starts.
+// Against a real lobby the bots just join and act once the match starts.
 import { Client, type Room } from '@colyseus/sdk';
-import { scenes } from '@wdi/content';
-import { BUILD_VERSION, DIRECTIONS, type JoinOptions, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { abilities, balance, scenes } from '@wdi/content';
+import {
+  BUILD_VERSION,
+  DIRECTIONS,
+  ErrorCode,
+  type JoinOptions,
+  Phase,
+  type RoleRevealPayload,
+  TICK_RATE,
+  TILE_PX,
+} from '@wdi/shared';
 import { fileURLToPath } from 'node:url';
 
 export const DEFAULT_URL = 'http://localhost:2567';
 const SCENE_IDS = Object.keys(scenes) as Array<keyof typeof scenes>;
-/** Scene ids by `Player.sceneId` index; same order as @wdi/content. */
-const REACH_PX = 1.5 * TILE_PX;
+const REACH_PX = balance.doors.reachTiles * TILE_PX;
+function rangePx(id: string): number {
+  const tiles = abilities.abilities[id]?.rangeTiles;
+  if (tiles === undefined) throw new Error(`abilities.json: ${id} has no rangeTiles`);
+  return tiles * TILE_PX;
+}
+const REPORT_PX = rangePx('report');
+/** A little inside the server's reach so a strike is not refused by a rounding step. */
+const KILL_PX = rangePx('kill') * 0.9;
+const SEE_PX = balance.vision.dayTiles * TILE_PX;
+const REFUSALS: ReadonlySet<number> = new Set(Object.values(ErrorCode));
+const isWorld = (phase: number) => phase >= Phase.grace && phase <= Phase.night;
+const isMeeting = (phase: number) => phase === Phase.meetingDiscussion || phase === Phase.meetingVote;
+
+/** What a bot casts at a meeting: Skip, the leader, a random living player (or Skip), or a player by name. */
+export type VoteMode = 'skip' | 'leader' | 'random' | (string & {});
+
+export interface BotBehavior {
+  /** Random-walk (and steer to bodies and prey). False keeps the bot on its spawn. Default true. */
+  walk?: boolean;
+  /** Default `skip`. */
+  vote?: VoteMode;
+  /** Report a body in reach; a walking bot also steps toward a body it sees. Default false. */
+  report?: boolean;
+  /** Strike with the Knife when the card holds `kill`. Default false. */
+  killer?: boolean;
+}
 
 export interface WalkerStats {
   ticksSent: number;
   portals: number;
+  /** Refusals (422 to 428), which a soak expects. */
   errors: number;
+  /** Error codes outside the refusal set: a protocol error. Must stay 0. */
+  protocolErrors: number;
   /** Players seen with a presence in a scene other than the bot's own, outside a transit. Must stay 0. */
   leaks: number;
+  kills: number;
+  reports: number;
+  votes: number;
+  meetings: number;
 }
 
+interface BodyLike {
+  id: string;
+  x: number;
+  y: number;
+  hidden: boolean;
+}
 interface PlayerLike {
   id: string;
+  name: string;
+  alive: boolean;
+  hasVoted: boolean;
   sceneId: number;
   presence?: { x: number; y: number; statusBits: number };
+  priv?: { cooldownEndTick: { get(key: string): number | undefined } };
 }
 interface StateLike {
+  phase: number;
+  tick: number;
+  leaderId: string;
   players: {
     forEach(cb: (p: PlayerLike, id: string) => void): void;
     get(id: string): PlayerLike | undefined;
   };
+  scenes?: { get(key: string): { bodies: { forEach(cb: (b: BodyLike) => void): void } } | undefined };
 }
 
 /** Deterministic PRNG so a soak run can be reproduced from its seed. */
@@ -54,34 +110,179 @@ export const DIR_VECTORS = DIRECTIONS.map((_, i) => {
   return { dx: Math.round(Math.sin(a) * 1000) / 1000 + 0, dy: Math.round(-Math.cos(a) * 1000) / 1000 + 0 };
 });
 
-export function startWalker(room: Room, rng: () => number): { stats: WalkerStats; stop(): void } {
-  const stats: WalkerStats = { ticksSent: 0, portals: 0, errors: 0, leaks: 0 };
+/** The id a vote of `mode` names, or "skip". Pure over the roster so it can be tested. */
+export function pickVote(
+  mode: VoteMode,
+  selfId: string,
+  leaderId: string,
+  roster: Array<{ id: string; name: string; alive: boolean }>,
+  rng: () => number,
+): string {
+  const living = roster.filter((p) => p.alive);
+  if (mode === 'skip') return 'skip';
+  if (mode === 'leader') return living.find((p) => p.id === leaderId)?.id ?? 'skip';
+  if (mode === 'random') {
+    const others = living.filter((p) => p.id !== selfId);
+    const i = Math.floor(rng() * (others.length + 1));
+    return others[i]?.id ?? 'skip';
+  }
+  return living.find((p) => p.name === mode)?.id ?? 'skip';
+}
+
+export interface Bot {
+  stats: WalkerStats;
+  /** Resolves with the bot's own role card. */
+  card: Promise<RoleRevealPayload>;
+  stop(): void;
+}
+
+export function startWalker(room: Room, rng: () => number, behavior: BotBehavior = {}): Bot {
+  const stats: WalkerStats = {
+    ticksSent: 0,
+    portals: 0,
+    errors: 0,
+    protocolErrors: 0,
+    leaks: 0,
+    kills: 0,
+    reports: 0,
+    votes: 0,
+    meetings: 0,
+  };
+  const walk = behavior.walk !== false;
+  const holdsKnife = () => !!behavior.killer && !!card?.abilities.some((a) => a.id === 'kill');
   let seq = 0;
   let dir = DIR_VECTORS[Math.floor(rng() * 8)]!;
   let moving = true;
   let sprint = false;
   let decideAt = 0;
-  room.onMessage('error', () => stats.errors++);
+  let card: RoleRevealPayload | undefined;
+  let dead = false;
+  let lastVoteAt = 0;
+  let lastReportAt = 0;
+  let lastKillAt = 0;
+  const reported = new Set<string>();
+  let resolveCard!: (c: RoleRevealPayload) => void;
+  const cardPromise = new Promise<RoleRevealPayload>((r) => (resolveCard = r));
+
+  room.onMessage('error', (e: { code?: number }) => {
+    if (e && REFUSALS.has(e.code ?? 0)) stats.errors++;
+    else stats.protocolErrors++;
+  });
   room.onMessage('sceneEnter', () => undefined);
   room.onMessage('noise', () => undefined);
+  room.onMessage('roleReveal', (c: RoleRevealPayload) => {
+    card = c;
+    // The card is the bot's own; dismissing it counts as Ready.
+    room.send('lobby.ready', { ready: true });
+    resolveCard(c);
+  });
+  room.onMessage('killed', () => (dead = true));
+  room.onMessage('meetingStart', (m: { bodyOf?: string }) => {
+    stats.meetings++;
+    if (m?.bodyOf) reported.add(`body_${m.bodyOf}`);
+  });
 
   const timer = setInterval(() => {
     const state = room.state as unknown as StateLike | undefined;
     const me = state?.players.get(room.sessionId);
-    if (!state || !me?.presence) return;
+    if (!state || !me) return;
     const now = Date.now();
+
+    if (state.phase === Phase.lobby) {
+      // A new match starts from a clean slate.
+      dead = false;
+      reported.clear();
+    }
+
+    // Meetings: vote as soon as one opens, again if the server has not recorded it.
+    if (isMeeting(state.phase)) {
+      if (!dead && !me.hasVoted && now - lastVoteAt > 700) {
+        lastVoteAt = now;
+        const roster: Array<{ id: string; name: string; alive: boolean }> = [];
+        state.players.forEach((p) => roster.push({ id: p.id, name: p.name, alive: p.alive }));
+        const targetId = pickVote(behavior.vote ?? 'skip', room.sessionId, state.leaderId, roster, rng);
+        room.send('meeting.vote', { targetId });
+        stats.votes++;
+      }
+      return;
+    }
+    if (!me.presence || !isWorld(state.phase)) return;
+
+    const sceneKey = SCENE_IDS[me.sceneId] ?? 'overworld';
+    const scene = scenes[sceneKey];
+    const { x, y } = me.presence;
+    let steer: { dx: number; dy: number } | undefined;
+    let standStill = false;
+
+    // Report a body in reach; a walking bot steps toward one it sees.
+    // A Killer never reports its own work.
+    if (behavior.report && !dead && !holdsKnife()) {
+      let best: BodyLike | undefined;
+      let bestD = Infinity;
+      state.scenes?.get(sceneKey)?.bodies.forEach((b) => {
+        if (b.hidden || reported.has(b.id)) return;
+        const d = Math.hypot(b.x - x, b.y - y);
+        if (d < bestD && d <= SEE_PX) {
+          best = b;
+          bestD = d;
+        }
+      });
+      if (best) {
+        if (bestD <= REPORT_PX * 0.9) {
+          standStill = true;
+          if (now - lastReportAt > 600) {
+            lastReportAt = now;
+            reported.add(best.id);
+            room.send('act.reportBody', { bodyId: best.id });
+            stats.reports++;
+          }
+        } else if (walk) steer = unit(best.x - x, best.y - y, bestD);
+      }
+    }
+
+    // The Knife: nearest living player in my scene; hunt it when the cooldown is up, strike in reach.
+    const knifeReady =
+      holdsKnife() &&
+      !dead &&
+      state.phase >= Phase.day &&
+      (me.priv?.cooldownEndTick.get('kill') ?? 0) <= state.tick;
+    if (knifeReady && !standStill) {
+      const mates = new Set(card?.teammates.map((t) => t.id));
+      let prey: PlayerLike | undefined;
+      let preyD = Infinity;
+      state.players.forEach((p, id) => {
+        if (id === room.sessionId || mates.has(id) || !p.presence || p.sceneId !== me.sceneId) return;
+        if ((p.presence.statusBits & 1) !== 0) return;
+        const d = Math.hypot(p.presence.x - x, p.presence.y - y);
+        if (d < preyD) {
+          prey = p;
+          preyD = d;
+        }
+      });
+      if (prey) {
+        if (preyD <= KILL_PX) {
+          if (now - lastKillAt > 500) {
+            lastKillAt = now;
+            room.send('act.ability', { abilityId: 'kill', targetId: prey.id });
+            stats.kills++;
+          }
+        } else if (walk && !steer) steer = unit(prey.presence!.x - x, prey.presence!.y - y, preyD);
+      }
+    }
+
+    if (!walk) return;
+
     if (now >= decideAt) {
       decideAt = now + 1000 + rng() * 2000;
       dir = DIR_VECTORS[Math.floor(rng() * 8)]!;
       moving = rng() > 0.2;
       sprint = rng() < 0.3;
-      const scene = scenes[SCENE_IDS[me.sceneId] ?? 'overworld'];
       if (rng() < 0.25) {
         // Head for the nearest door now and then so a soak crosses portals often.
         let best = Infinity;
         for (const p of scene.portals) {
-          const vx = (p.x + 0.5) * TILE_PX - me.presence.x;
-          const vy = (p.y + 0.5) * TILE_PX - me.presence.y;
+          const vx = (p.x + 0.5) * TILE_PX - x;
+          const vy = (p.y + 0.5) * TILE_PX - y;
           const d = Math.hypot(vx, vy);
           if (d < best && d > 1) {
             best = d;
@@ -91,38 +292,44 @@ export function startWalker(room: Room, rng: () => number): { stats: WalkerStats
         moving = true;
       }
       const door = scene.portals.find(
-        (p) =>
-          Math.hypot(me.presence!.x - (p.x + 0.5) * TILE_PX, me.presence!.y - (p.y + 0.5) * TILE_PX) <=
-          REACH_PX,
+        (p) => Math.hypot(x - (p.x + 0.5) * TILE_PX, y - (p.y + 0.5) * TILE_PX) <= REACH_PX,
       );
-      if (door && rng() < 0.4) {
+      if (door && !steer && rng() < 0.4) {
         room.send('act.enterPortal', { portalId: door.id });
         stats.portals++;
       }
     }
+    const go = steer ?? dir;
+    const on = !standStill && (steer !== undefined || moving);
     room.send('input.move', {
       seq: ++seq,
-      dx: moving ? dir.dx : 0,
-      dy: moving ? dir.dy : 0,
-      sprint,
+      dx: on ? go.dx : 0,
+      dy: on ? go.dy : 0,
+      sprint: steer ? false : sprint,
       sneak: false,
     });
     stats.ticksSent++;
-    // Leak monitor: a presence outside my scene is only legitimate during that player's transit.
-    state.players.forEach((p, id) => {
-      if (
-        id !== room.sessionId &&
-        p.presence &&
-        p.sceneId !== me.sceneId &&
-        (p.presence.statusBits & 1) === 0
-      )
-        stats.leaks++;
-    });
+    // Leak monitor: a presence outside my scene is only legitimate during that player's transit. A ghost
+    // sees through its own scene's view, so it does not check.
+    if (!dead)
+      state.players.forEach((p, id) => {
+        if (
+          id !== room.sessionId &&
+          p.presence &&
+          p.sceneId !== me.sceneId &&
+          (p.presence.statusBits & 1) === 0
+        )
+          stats.leaks++;
+      });
   }, 1000 / TICK_RATE);
-  return { stats, stop: () => clearInterval(timer) };
+  return { stats, card: cardPromise, stop: () => clearInterval(timer) };
 }
 
-export interface WalkOptions {
+function unit(dx: number, dy: number, d: number): { dx: number; dy: number } {
+  return d > 0 ? { dx: dx / d, dy: dy / d } : { dx: 0, dy: 0 };
+}
+
+export interface WalkOptions extends BotBehavior {
   code: string;
   count: number;
   url?: string;
@@ -133,8 +340,10 @@ export interface WalkOptions {
 export async function joinWalkers(opts: WalkOptions) {
   const client = new Client(opts.url ?? DEFAULT_URL);
   const rooms: Room[] = [];
-  const walkers: Array<ReturnType<typeof startWalker>> = [];
+  const walkers: Bot[] = [];
   const rng = mulberry(opts.seed ?? 1);
+  // Walkers report and strike when asked; they stand still only with `walk: false`.
+  const behavior: BotBehavior = { ...opts, report: opts.report ?? true };
   for (let i = 0; i < opts.count; i++) {
     const options: JoinOptions = {
       name: `${opts.prefix ?? 'Walk'}${i + 1}`,
@@ -144,7 +353,7 @@ export async function joinWalkers(opts: WalkOptions) {
     const room = await client.joinById(opts.code.toUpperCase(), options);
     room.onMessage('*', () => undefined);
     rooms.push(room);
-    walkers.push(startWalker(room, mulberry(Math.floor(rng() * 2 ** 31))));
+    walkers.push(startWalker(room, mulberry(Math.floor(rng() * 2 ** 31)), behavior));
   }
   return {
     rooms,
@@ -158,13 +367,20 @@ export async function joinWalkers(opts: WalkOptions) {
 
 function main(): void {
   const argv = process.argv.slice(2);
-  const get = (f: string) => argv[argv.indexOf(f) + 1];
+  const get = (f: string) => (argv.includes(f) ? argv[argv.indexOf(f) + 1] : undefined);
   const code = get('--code');
-  if (!code) throw new Error('usage: walk --code ABCDE [--count 6] [--url http://localhost:2567]');
+  if (!code)
+    throw new Error(
+      'usage: walk --code ABCDE [--count 6] [--url URL] [--vote skip|leader|random|NAME] [--no-report] [--killer] [--no-walk]',
+    );
   void joinWalkers({
     code,
     count: Number(get('--count') ?? 6),
     ...(get('--url') ? { url: get('--url') as string } : {}),
+    ...(get('--vote') ? { vote: get('--vote') as string } : {}),
+    walk: !argv.includes('--no-walk'),
+    report: !argv.includes('--no-report'),
+    killer: argv.includes('--killer'),
   }).then((swarm) => {
     console.log(`[walk] ${swarm.rooms.length} bots walking; Ctrl+C to stop`);
     process.on('SIGINT', () => void swarm.stop().then(() => process.exit(0)));

@@ -3,7 +3,8 @@ import { NavGrid } from '@wdi/shared';
 import { type SceneJson, loadScenes, navFor } from '../export';
 
 // The M2 greybox: the overworld and the tavern's two rooms must be walkable end to end, so a player can
-// reach every door at the Small profile (4-6 players) from the first square spawn.
+// reach every door at the Small profile (4-6 players) from the first square spawn. M3 adds the widow's
+// cottage (both rooms), the forest and the cave entry.
 const scenes = loadScenes();
 const byId = (id: string) => scenes.find((s) => s.id === id) as SceneJson;
 
@@ -55,5 +56,27 @@ describe('greybox reachability at the Small profile', () => {
     const door = back.spawns.find((s) => s.id === 'door') as { x: number; y: number };
     const inBack = reach(back, door.x, door.y);
     for (const p of back.portals) expect(touches(inBack, p.x, p.y), p.id).toBe(true);
+  });
+});
+
+/** Every door of a scene is usable from the floor reachable from one of its spawns. */
+function expectDoorsReachable(sceneId: string, spawnId: string): void {
+  const scene = byId(sceneId);
+  const sp = scene.spawns.find((s) => s.id === spawnId) as { x: number; y: number };
+  expect(sp, `${sceneId}.${spawnId}`).toBeDefined();
+  const seen = reach(scene, sp.x, sp.y);
+  for (const p of scene.portals) expect(touches(seen, p.x, p.y), p.id).toBe(true);
+  for (const s of scene.spawns) expect(seen.has(`${s.x},${s.y}`), `${sceneId}.${s.id}`).toBe(true);
+}
+
+describe('greybox reachability of the M3 interiors and outdoor scenes', () => {
+  it('reaches both doors of the widow parlour and the bedroom door', () => {
+    expectDoorsReachable('widow_parlour', 'door');
+    expectDoorsReachable('widow_bedroom', 'door');
+  });
+
+  it('reaches the forest gate, log and cave from the gate, and the cave mouth and sea in the cave entry', () => {
+    expectDoorsReachable('forest', 'gate');
+    expectDoorsReachable('cave_entry', 'mouth');
   });
 });

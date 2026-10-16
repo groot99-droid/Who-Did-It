@@ -28,7 +28,8 @@ export default defineConfig({
     {
       // The real authoritative server, from source (tsx), for the specs that create and start a party.
       command: 'pnpm --filter @wdi/server serve',
-      env: { PORT: String(E2E_SERVER_PORT) },
+      // WDI_DEBUG=1 registers debug.play, debug.deal and debug.clock, which the bots and match.spec use.
+      env: { PORT: String(E2E_SERVER_PORT), WDI_DEBUG: '1' },
       url: `${E2E_SERVER_URL}/health`,
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,
