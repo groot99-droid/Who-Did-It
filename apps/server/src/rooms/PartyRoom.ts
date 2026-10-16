@@ -20,7 +20,9 @@ import {
   Traits,
   type JoinOptions,
 } from '@wdi/shared';
+import { balance } from '@wdi/content';
 import { CommandQueue } from '../sim/Commands';
+import { simOf } from '../sim/RoomSim';
 import { step } from '../sim/Step';
 import { SCENE_KEYS, createPlayerView } from '../sim/Visibility';
 import { CodeRegistry } from '../services/CodeRegistry';
@@ -127,12 +129,48 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
     client.view = createPlayerView(this, client.sessionId);
   }
 
+  /**
+   * A dropped connection (not a consented leave). In the lobby the seat survives `disconnect.deathAfterS`
+   * for a reconnection (GDD 3.10); during play there is no window, so `onLeave` runs at once (M7).
+   */
+  override onDrop(client: Client) {
+    const player = this.state.players.get(client.sessionId);
+    if (!player || this.state.phase !== Phase.lobby) return;
+    player.connected = false;
+    this.passLeader(client.sessionId);
+    void this.allowReconnection(client, balance.disconnect.deathAfterS).catch(() => undefined);
+  }
+
+  override onReconnect(client: Client) {
+    const player = this.state.players.get(client.sessionId);
+    if (player) player.connected = true;
+  }
+
+  /** The seat is gone for good: the window lapsed, or the player left on purpose. */
   override onLeave(client: Client) {
-    // Lobby: a leaving player frees the seat. In-play "vanished" bodies arrive with M3.
-    this.state.players.delete(client.sessionId);
-    if (this.state.leaderId === client.sessionId) {
-      this.state.leaderId = this.state.players.keys().next().value ?? '';
+    const player = this.state.players.get(client.sessionId);
+    if (!player) return;
+    if (this.state.phase === Phase.lobby) {
+      this.state.players.delete(client.sessionId);
+      this.passLeader(client.sessionId);
+      return;
     }
+    // During play the seat stays and becomes a ghost with no body (A30); the next step records the death.
+    player.connected = false;
+    simOf(this).deaths.push({ playerId: client.sessionId, cause: 'vanished', tick: this.state.tick });
+    this.passLeader(client.sessionId);
+  }
+
+  /** The leader role moves to the first connected seat when the leader drops or leaves. */
+  private passLeader(leaverId: string): void {
+    if (this.state.leaderId !== leaverId) return;
+    for (const [id, p] of this.state.players) {
+      if (id !== leaverId && p.connected) {
+        this.state.leaderId = id;
+        return;
+      }
+    }
+    if (!this.state.players.has(leaverId)) this.state.leaderId = '';
   }
 
   override onDispose() {

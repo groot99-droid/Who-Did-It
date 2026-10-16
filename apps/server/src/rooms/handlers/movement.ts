@@ -1,5 +1,7 @@
+import { balance } from '@wdi/content';
 import { Door, Phase } from '@wdi/shared';
 import type { PartyRoom } from '../PartyRoom';
+import { setPhase } from '../../sim/Flow';
 import { simOf } from '../../sim/RoomSim';
 import { SCENE_KEYS, sceneDef } from '../../sim/World';
 
@@ -32,5 +34,8 @@ export function runDebugStart(room: PartyRoom): void {
   const sim = simOf(room);
   if (!sim.debugPlay) return;
   sim.debugPlay = false;
-  if (room.state.phase < Phase.grace) room.state.phase = Phase.grace;
+  if (room.state.phase >= Phase.grace) return;
+  room.state.round = 0;
+  room.state.startTick = room.state.tick;
+  setPhase(room, Phase.grace, balance.phases.graceS);
 }
