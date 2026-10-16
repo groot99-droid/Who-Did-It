@@ -1323,3 +1323,17 @@ goes in the PR description. Not in scope: code.
   `bedroll-<id>`, `night-wake`, `claim-<roleId>`, `swaplog`, `gameover-final-<id>`; `vote-skip` is
   absent in quick mode.
 - Reserved DECISIONS rows: R A40, S A41, T A42, U A43, V A44, W A45, X A46, Y A47.
+
+### Round 4 log: S (NPC fill, server)
+
+Landed: NPC seats (`newSeat`, `addNpcSeat`, fill at Start, `lobby.addNpc/removeNpc/settings`, a human takes the
+newest NPC seat), the `runNpcs` brain (`sim/npc/*`: role-card ready delay, wander with path-followed portal
+headings, reports, suspicion votes, Killer strike and flee, quick-mode plate and night-act branches), `debug.npc`,
+shared decision helpers in `rules/npc.ts`, GDD 3.12 (M3c), ARCHITECTURE 5.3/5.4 and DECISIONS A41.
+
+For the next session: the quick-mode branches (`sim/npc/onub.ts`) idle until R's `plateOf` and `onubNpcPlan`
+return values; the two promised post-R tests (1 human + 3 NPCs through the Conductor, a human Poisoner seeing an NPC
+partner) are not written, merge R and add them. `test/npcSlow.test.ts` (`WDI_SLOW=1`) has never been run: the
+Killer-wins-one-of-five test depends on the wandering NPC finding a lone human and may need tuning. `Win.ts`
+(not mine) hands the lead to the first player after a reset if the leader left; `resetNpcsForLobby` corrects it.
+No contract was missing from the base branch.
