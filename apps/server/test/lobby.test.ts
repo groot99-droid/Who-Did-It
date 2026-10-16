@@ -1,5 +1,5 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
-import { roles } from '@wdi/content';
+import { balance, roles } from '@wdi/content';
 import {
   BUILD_VERSION,
   C2S,
@@ -311,5 +311,68 @@ describe('role card content', () => {
     const { traits } = await import('@wdi/content');
     for (const axis of ['height', 'scarf', 'hat'] as const)
       expect(traits.axes[axis].values.map((v) => v.id)).toEqual([...TRAIT_IDS[axis]]);
+  });
+});
+
+describe('reconnection in the lobby (GDD 3.10)', () => {
+  const drop = async (bot: Bot): Promise<string> => {
+    bot.room.reconnection.enabled = false; // the test reconnects by hand
+    const token = bot.room.reconnectionToken;
+    await bot.room.leave(false);
+    return token;
+  };
+
+  it('keeps the seat and name of a dropped bot through the window and hands it back on reconnect', async () => {
+    const { bots, room } = await party(3);
+    const id = bots[1]!.room.sessionId;
+    const token = await drop(bots[1]!);
+    await sleep(250);
+    const seat = room.state.players.get(id);
+    expect(seat).toBeDefined();
+    expect([seat?.name, seat?.connected]).toEqual(['Bot1', false]);
+    expect(room.state.players.size).toBe(3);
+
+    const back = await colyseus.sdk.reconnect(token);
+    await sleep(250);
+    expect(back.sessionId).toBe(id);
+    expect([room.state.players.get(id)?.name, room.state.players.get(id)?.connected]).toEqual(['Bot1', true]);
+    expect(room.state.leaderId).toBe(bots[0]!.room.sessionId);
+    // The reconnected client still sees its own private state.
+    expect((back.state as unknown as GameStateType).players.get(id)?.priv).toBeDefined();
+  });
+
+  it('passes the lead to a connected seat while the leader is away', async () => {
+    const { bots, room } = await party(3);
+    const [leader, second] = [bots[0]!.room.sessionId, bots[1]!.room.sessionId];
+    await drop(bots[0]!);
+    await sleep(250);
+    expect(room.state.leaderId).toBe(second);
+    expect(room.state.players.get(leader)?.connected).toBe(false);
+  });
+
+  it('frees the seat when the window lapses', async () => {
+    const window = balance.disconnect as { deathAfterS: number };
+    const saved = window.deathAfterS;
+    window.deathAfterS = 0.4;
+    try {
+      const { bots, room } = await party(3);
+      const id = bots[2]!.room.sessionId;
+      await drop(bots[2]!);
+      await sleep(250);
+      expect(room.state.players.has(id)).toBe(true);
+      await sleep(600);
+      expect(room.state.players.has(id)).toBe(false);
+      expect(room.state.players.size).toBe(2);
+    } finally {
+      window.deathAfterS = saved;
+    }
+  });
+
+  it('a consented leave frees the seat at once', async () => {
+    const { bots, room } = await party(3);
+    const id = bots[1]!.room.sessionId;
+    await bots[1]!.room.leave();
+    await sleep(250);
+    expect(room.state.players.has(id)).toBe(false);
   });
 });

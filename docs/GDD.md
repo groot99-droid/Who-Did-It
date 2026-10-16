@@ -82,7 +82,7 @@ The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 star
 | Final Night | End of cycle 5 without a winner | 90 s hunt + forced vote |
 | Game over | Winner, every role, the summary; then the lobby again with the same code and seats | 20 s |
 
-A cycle is 200 s; a 12-18 minute match is 3-5 cycles with meetings. Doors, locks, bodies and clues persist across phases. All timers are tick-based (20 Hz) in state and rendered through a server-time offset.
+(M3) The match clock starts when grace begins; the Knife's first cooldown starts when grace ends, and a meeting that opens during a world phase restarts the cycle at a full day once immunity ends. A cycle is 200 s; a 12-18 minute match is 3-5 cycles with meetings. Doors, locks, bodies and clues persist across phases. All timers are tick-based (20 Hz) in state and rendered through a server-time offset.
 
 **Missing-person roll-call.** At each Dusk the server checks for (a) a dead player whose body has been unreported for a full phase, or (b) a living player no other player has shared a scene with for a full cycle. If either holds, a meeting opens with "X has not been seen" on the board. A Killer who hides every body still faces a meeting.
 
@@ -126,7 +126,7 @@ Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife,
 
 **Tasks.** Village players get 3-5 tasks; the global bar at 100% wins. Each needs a tool from another scene and a 2 s hold at the node: Light the lanterns (Oil from the tavern back room to a square lantern post, night only), Fix the well pump (Wrench from the apothecary bench), Deliver a letter (from the widow's letter box to the tavern dartboard), Mend the fence (2 Planks from the edge of Gallows Wood by the gate to the NE fence; while mended, wolves cannot enter the village), Fetch the flour (from Crumb's Ovens to the tavern). Co-op task (Shutter the windows, in the tavern): both players within 2 tiles of the node holding E for 4 s; progress pauses when one releases. Two-player carrying is V1.5. Completing a task writes a Claimed alibi entry (time + scene). Cabal see a fake list that writes entries but never fills the bar. Ghost task completion counts 100% but ghost contribution is capped at 25% of the bar.
 
-**Communication.** No voice in V1. Global text chat in meetings, lines of at most 200 characters. Outside meetings: an 8-phrase quick-chat wheel (Follow me / Where were you? / I saw something / Help! / Clear / Suspicious / Wait / Go) as speech bubbles within 5 tiles, plus world pings. Cabal channel and ghost channel are sent per-recipient by the server; the client never chooses a channel. Proximity text chat is a V1.5 toggle.
+**Communication.** No voice in V1. Global text chat in meetings, lines of at most 200 characters. Outside meetings: an 8-phrase quick-chat wheel (Follow me / Where were you? / I saw something / Help! / Clear / Suspicious / Wait / Go) as speech bubbles within 5 tiles, plus world pings. Cabal channel and ghost channel are sent per-recipient by the server; the client never chooses a channel. (M3) A living player may speak only while a meeting runs (discussion, vote and reveal), to everyone; a ghost may speak in any phase, to the other ghosts only; empty lines are refused and long ones are cut to the limit. Proximity text chat is a V1.5 toggle.
 
 ### 3.6 PvE
 
@@ -140,7 +140,7 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
 
 **Doors** have four server states: open, closed, locked, broken. Any door unlocks from the inside for anyone. Killer locks expire after 45 s. From outside you see the door swing for 3 s; the entering player is in a 0.6 s `transit` state, encoded to both scenes at the door with the nameplate hidden.
 
-**Death and ghosts.** A kill is private until the next meeting: the roster still shows the victim alive, the victim's client learns at once, and the body in the scene is the only sign; a meeting reveals every death so far. Dead and ejected players become ghosts: walk through walls and portals (no lock, phase or alive checks, no noise), see all roles, read the Cabal and ghost channels, finish their own tasks, and once per cycle use a Wisp (flicker a lantern, rattle a door for noise 2, or nudge a clue 1 tile; V1.5). Ghosts are drawn only for other ghosts. Ghosts cast a non-binding ghost vote shown on the end screen.
+**Death and ghosts.** A kill is private until the next meeting: the roster still shows the victim alive, the victim's client learns at once, and the body in the scene is the only sign; a meeting reveals every death so far. Dead and ejected players become ghosts: walk through walls and portals (no lock, phase or alive checks, no noise), see all roles, read the Cabal and ghost channels, finish their own tasks, and once per cycle use a Wisp (flicker a lantern, rattle a door for noise 2, or nudge a clue 1 tile; V1.5). Ghosts are drawn only for other ghosts. Ghosts cast a non-binding ghost vote shown on the end screen. (M3) A living client never receives a ghost's position; a ghost sees every player in its own scene; nobody's position is sent during a meeting, the reveal or the end screen.
 
 ### 3.8 Meetings, voting and win conditions
 
@@ -151,6 +151,7 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
 - **Hunger**: a Killer with no kill in 2 full cycles leaves glowing footprints until they kill.
 - Disconnect over 60 s = death with cause "vanished" and a body at the last position; reconnection within 60 s resumes the same role. (M3: a player who leaves during play becomes a ghost at once with no body; the window and the body arrive with reconnection in M7, A30.)
 - No Clue Surge. A wrong ejection adds 15 s to the next discussion instead.
+- (M3) The win check runs when a death is recorded and, for an ejection, when the reveal ends, so the tally, the stamp and the role line always show first; it never runs on a bare tick. A tied vote, or a Skip plurality, ejects nobody.
 
 ### 3.9 Balance by player count
 
