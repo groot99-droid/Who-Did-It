@@ -76,12 +76,7 @@ export interface NetworkService {
 
 // `sceneEnter` is not here: the world feed (ColyseusWorldFeed) registers it once and the router
 // re-emits it on `bus` for the screens that listen (RoleReveal).
-const SERVER_MESSAGES: readonly NetMessageType[] = [
-  'roleReveal',
-  'phaseChange',
-  'gameOver',
-  'error',
-];
+const SERVER_MESSAGES: readonly NetMessageType[] = ['roleReveal', 'phaseChange', 'gameOver', 'error'];
 
 /** Minimal view of the room state the lobby needs; the real schema arrives with `@wdi/shared`. */
 interface PlayerState {

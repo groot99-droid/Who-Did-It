@@ -29,7 +29,7 @@ export class RoleReveal extends Phaser.Scene {
       onReady: () => net.send('lobby.ready', { ready: true }),
     });
 
-    const banner = h('p', { class: 'hint', role: 'status', 'data-testid': 'entered' });
+    const banner = h('p', { class: 'wdi-hint wdi-banner', role: 'status', 'data-testid': 'entered' });
     overlayRoot().append(banner);
     let hideBanner = 0;
     const onEnter = (enter: SceneEnterPayload) => {

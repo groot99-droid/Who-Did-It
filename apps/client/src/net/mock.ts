@@ -2,7 +2,13 @@ import mitt, { type Emitter } from 'mitt';
 import { MOCK_BOTS, MOCK_ROLE_REVEAL } from './fixtures';
 import type { MeetingFeed } from './meeting';
 import { MockMeetingFeed, type MockMeetingRequest } from './mock/meetingMock';
-import { JoinError, type LobbySnapshot, type NetEvents, type NetworkService, type Room } from './NetworkService';
+import {
+  JoinError,
+  type LobbySnapshot,
+  type NetEvents,
+  type NetworkService,
+  type Room,
+} from './NetworkService';
 import type { WorldFeed } from './world';
 import {
   type ClientMessages,
@@ -117,7 +123,9 @@ export class MockNetwork implements NetworkService {
         onDone: (outcome) => {
           if (outcome === 'resume') {
             this.meeting = null;
-            world.resume?.();
+            // Until the mock world implements `resume()` (Session N), say what it would: the same scene again.
+            if (world.resume) world.resume();
+            else world.bus.emit('sceneEnter', { sceneId: 'overworld', spawn: 'square_0', facing: 's' });
           }
         },
       },

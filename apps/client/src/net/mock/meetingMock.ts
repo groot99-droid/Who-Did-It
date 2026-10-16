@@ -76,14 +76,16 @@ export function mockBotVotes(
     else if (i === 0) {
       const others = bots.filter((o) => o.id !== b.id);
       out[b.id] = others[Math.floor(rand() * others.length)]?.id ?? SKIP;
-    }
-    else out[b.id] = suspect?.id ?? SKIP;
+    } else out[b.id] = suspect?.id ?? SKIP;
   });
   return out;
 }
 
 /** Plurality; a tie or a Skip plurality ejects nobody (GDD 3.8, DECISIONS A30). */
-export function tallyVotes(votes: Record<string, string>): { tally: Record<string, number>; ejectedId?: string } {
+export function tallyVotes(votes: Record<string, string>): {
+  tally: Record<string, number>;
+  ejectedId?: string;
+} {
   const tally: Record<string, number> = {};
   for (const target of Object.values(votes)) tally[target] = (tally[target] ?? 0) + 1;
   const ranked = Object.entries(tally).sort((a, b) => b[1] - a[1]);
@@ -244,7 +246,10 @@ export class MockMeetingFeed implements MeetingFeed {
     this.tally = result;
     if (ejected) ejected.alive = false;
     this.bus.emit('voteResult', result);
-    this.later(() => (ejected ? this.finish(role ?? '') : this.opts.onDone('resume')), balanceJson.phases.revealS * 1000);
+    this.later(
+      () => (ejected ? this.finish(role ?? '') : this.opts.onDone('resume')),
+      balanceJson.phases.revealS * 1000,
+    );
   }
 
   /** The mock ends the match at the first ejection: the village wins if the Cabal took the vote. */

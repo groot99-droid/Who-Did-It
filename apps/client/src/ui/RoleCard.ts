@@ -1,5 +1,5 @@
 import type { RoleRevealPayload, TraitIds } from '../net/protocol';
-import { h, isTyping, type Screen } from './dom';
+import { h, icon, isTyping, type Screen } from './dom';
 
 /** Fallback hold time (`balance.json` phases.roleRevealS); the server's `phaseChange.endsTick` overrides it. */
 export const ROLE_CARD_SECONDS = 12;
@@ -46,58 +46,83 @@ export function mountRoleCard(
   role: RoleRevealPayload,
   opts: RoleCardOptions,
 ): RoleCardScreen {
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  const timerBar = h('div', { class: 'timer-bar' });
-  const ready = h('button', { type: 'button', class: 'primary', 'data-testid': 'ready' }, 'Ready');
+  const timerBar = h('div', { class: 'wdi-timer__bar' });
+  const ready = h(
+    'button',
+    { type: 'button', class: 'wdi-btn wdi-btn--primary wdi-grow', 'data-testid': 'ready' },
+    'Ready',
+  );
 
   const abilities = role.abilities
     .slice(0, 3)
     .map((a) =>
       h(
         'li',
-        {},
-        h('kbd', {}, a.key),
-        h('span', { class: 'grow' }, a.name),
-        a.cooldown > 0 && h('span', { class: 'dim' }, `${a.cooldown}s`),
+        { class: 'wdi-card__ability' },
+        h('kbd', { class: 'wdi-kbd' }, a.key),
+        h('span', {}, a.name),
+        h('span', { class: 'wdi-card__cooldown' }, a.cooldown > 0 && `${a.cooldown}s`),
       ),
     );
   const items = role.inventory.map((i) =>
-    h('li', { title: i.tooltip }, i.qty > 1 ? `${i.name} x${i.qty}` : i.name),
+    h('li', { class: 'wdi-chip', title: i.tooltip }, i.qty > 1 ? `${i.name} x${i.qty}` : i.name),
   );
+  const trait = (axis: keyof TraitIds) => {
+    const id = role.traits[axis];
+    return h(
+      'span',
+      { class: 'wdi-card__trait' },
+      icon(`icons/icon_${axis}_${id}`),
+      (TRAIT_LABELS[axis] as Record<string, string>)[id],
+    );
+  };
 
   const front = h(
-    'div',
-    { class: `face front team-${role.team}` },
-    h('div', { class: 'stripe' }, TEAM_LABEL[role.team]),
-    h('h2', { class: 'role-name', 'data-testid': 'role-name' }, roleTitle(role.roleId)),
-    h('p', { class: 'look' }, lookLine(role.traits)),
-    h('p', { class: 'goal' }, role.goal),
-    abilities.length > 0 && h('ul', { class: 'abilities' }, ...abilities),
-    items.length > 0 && h('ul', { class: 'inventory' }, ...items),
-    h('p', { class: 'text' }, role.cardText),
-    h('p', { class: 'beware' }, h('strong', {}, 'Beware: '), role.beware),
+    'article',
+    { class: `wdi-card wdi-card--${role.team} wdi-flip__face wdi-flip__face--front` },
+    h('div', { class: 'wdi-card__stripe' }, icon(`icons/icon_faction_${role.team}`), TEAM_LABEL[role.team]),
+    h('h1', { class: 'wdi-display wdi-card__title', 'data-testid': 'role-name' }, roleTitle(role.roleId)),
+    h(
+      'p',
+      { class: 'wdi-card__look', 'aria-label': lookLine(role.traits) },
+      'You look like ',
+      trait('height'),
+      ' ',
+      trait('scarf'),
+      ' ',
+      trait('hat'),
+    ),
+    h('p', { class: 'wdi-card__goal' }, role.goal),
+    abilities.length > 0 && h('ul', { class: 'wdi-card__abilities' }, ...abilities),
+    items.length > 0 && h('ul', { class: 'wdi-card__inventory' }, ...items),
+    h('p', { class: 'wdi-card__text' }, role.cardText),
+    h(
+      'p',
+      { class: 'wdi-card__beware' },
+      icon('glyphs/glyph_warning', 'Beware'),
+      h('span', {}, h('strong', {}, 'Beware: '), role.beware),
+    ),
     role.teammates.length > 0 &&
       h(
         'p',
-        { class: 'mates' },
+        { class: 'wdi-card__mates' },
         h('strong', {}, 'Your Cabal: '),
         role.teammates.map((t) => t.name).join(', '),
       ),
-    h('div', { class: 'timer' }, timerBar),
-    h('div', { class: 'row' }, ready, h('span', { class: 'dim hint-key' }, 'Tab reopens this card')),
+    h('div', { class: 'wdi-timer', 'aria-hidden': 'true' }, timerBar),
+    h('div', { class: 'wdi-card__footer' }, ready, h('span', { class: 'wdi-hint' }, 'Tab reopens this card')),
   );
   const back = h(
-    'div',
-    { class: 'face back' },
-    h('p', { class: 'dim' }, 'Your role'),
-    h('p', {}, 'Keep your screen to yourself.'),
+    'article',
+    { class: 'wdi-card wdi-card--back wdi-flip__face wdi-flip__face--back' },
+    h('p', { class: 'wdi-eyebrow' }, 'Your role'),
+    h('p', { class: 'wdi-muted' }, 'Keep your screen to yourself.'),
   );
-  const inner = h('div', { class: 'inner' }, front, back);
+  const inner = h('div', { class: 'wdi-flip__inner' }, front, back);
   const card = h(
     'div',
     {
-      class: 'rolecard',
+      class: 'wdi-flip',
       role: 'dialog',
       'aria-modal': 'false',
       'aria-label': 'Your role card',
@@ -107,7 +132,7 @@ export function mountRoleCard(
   );
   const chip = h(
     'button',
-    { type: 'button', class: 'chip', hidden: true, 'data-testid': 'role-chip' },
+    { type: 'button', class: 'wdi-btn wdi-btn--sm wdi-rolechip', hidden: true, 'data-testid': 'role-chip' },
     'Role card (Tab)',
   );
   root.append(card, chip);
@@ -134,24 +159,20 @@ export function mountRoleCard(
     open = true;
     card.hidden = false;
     chip.hidden = true;
-    inner.classList.toggle('flipped', false);
-    timerBar.style.transition = 'none';
-    timerBar.style.width = withTimer ? '100%' : '0%';
+    inner.classList.remove('is-flipped');
+    timerBar.classList.remove('is-running');
+    timerBar.style.transform = withTimer ? '' : 'scaleX(0)';
     const flip = () => {
-      inner.classList.add('flipped');
+      inner.classList.add('is-flipped');
       if (!withTimer) return;
-      // Force a reflow so the width transition starts from 100%.
+      timerBar.style.setProperty('--wdi-timer-duration', `${ROLE_CARD_SECONDS}s`);
+      // Force a reflow so the drain animation restarts from full.
       void timerBar.offsetWidth;
-      timerBar.style.transition = `width ${ROLE_CARD_SECONDS}s linear`;
-      timerBar.style.width = '0%';
+      timerBar.classList.add('is-running');
       timers.push(window.setTimeout(hide, ROLE_CARD_SECONDS * 1000));
     };
-    if (reduceMotion) {
-      inner.classList.add('no-motion');
-      flip();
-    } else {
-      timers.push(window.setTimeout(flip, FLIP_DELAY_MS));
-    }
+    // Under prefers-reduced-motion the theme zeroes the flip's transition, so flipping at once is safe.
+    timers.push(window.setTimeout(flip, FLIP_DELAY_MS));
   };
 
   const toggle = () => (open ? hide() : show(false));

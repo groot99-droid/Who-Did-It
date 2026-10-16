@@ -1,7 +1,7 @@
 import type { LobbySnapshot } from '../net/NetworkService';
 import { MAX_PLAYERS, MIN_PLAYERS_TO_START } from '../net/protocol';
 import { joinLink } from '../flags';
-import { h, type Screen } from './dom';
+import { h, icon, type Screen } from './dom';
 
 export interface LobbyOptions {
   onStart(): void;
@@ -29,15 +29,23 @@ async function copyText(text: string): Promise<boolean> {
 }
 
 export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
-  const codeText = h('span', { class: 'code', 'data-testid': 'party-code' });
-  const copyBtn = h('button', { type: 'button' }, 'Copy invite link');
-  const list = h('ul', { class: 'players', 'data-testid': 'player-list' });
-  const count = h('span', { class: 'count', 'data-testid': 'player-count' });
-  const hint = h('p', { class: 'hint', 'aria-live': 'polite' });
-  const start = h('button', { type: 'button', class: 'primary', 'data-testid': 'start' }, 'Start');
-  const readyBtn = h('button', { type: 'button', 'data-testid': 'lobby-ready' }, 'Ready');
-  const leave = h('button', { type: 'button' }, 'Leave');
-  const actions = h('div', { class: 'row' }, start, readyBtn, leave);
+  const codeText = h('span', {
+    class: 'wdi-display wdi-display--xl',
+    style: 'letter-spacing: var(--wdi-tracking-code)',
+    'data-testid': 'party-code',
+  });
+  const copyBtn = h('button', { type: 'button', class: 'wdi-btn wdi-btn--sm' }, 'Copy invite link');
+  const list = h('ul', { class: 'wdi-roster', 'data-testid': 'player-list' });
+  const count = h('span', { class: 'wdi-muted', 'data-testid': 'player-count' });
+  const hint = h('p', { class: 'wdi-hint', 'aria-live': 'polite' });
+  const start = h(
+    'button',
+    { type: 'button', class: 'wdi-btn wdi-btn--primary wdi-grow', 'data-testid': 'start' },
+    'Start',
+  );
+  const readyBtn = h('button', { type: 'button', class: 'wdi-btn', 'data-testid': 'lobby-ready' }, 'Ready');
+  const leave = h('button', { type: 'button', class: 'wdi-btn wdi-btn--ghost' }, 'Leave');
+  const actions = h('div', { class: 'wdi-row' }, start, readyBtn, leave);
 
   let snapshot: LobbySnapshot | null = null;
   let dialog: HTMLElement | null = null;
@@ -55,10 +63,10 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
       .map((p) => p.name);
     const confirm = h(
       'button',
-      { type: 'button', class: 'primary', 'data-testid': 'confirm-start' },
+      { type: 'button', class: 'wdi-btn wdi-btn--primary', 'data-testid': 'confirm-start' },
       'Deal the roles',
     );
-    const cancel = h('button', { type: 'button' }, 'Not yet');
+    const cancel = h('button', { type: 'button', class: 'wdi-btn wdi-btn--ghost' }, 'Not yet');
     confirm.addEventListener('click', () => {
       closeDialog();
       opts.onStart();
@@ -66,15 +74,28 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     cancel.addEventListener('click', closeDialog);
     dialog = h(
       'div',
-      { class: 'scrim' },
+      { class: 'wdi-scrim' },
       h(
         'div',
-        { class: 'panel dialog', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'confirm-title' },
-        h('h2', { id: 'confirm-title' }, `Start with ${snapshot.players.length} players?`),
-        h('p', {}, 'Roles are dealt at once and the party locks. Nobody can join after this.'),
+        {
+          class: 'wdi-panel wdi-dialog',
+          role: 'dialog',
+          'aria-modal': 'true',
+          'aria-labelledby': 'confirm-title',
+        },
+        h(
+          'h2',
+          { id: 'confirm-title', class: 'wdi-display wdi-display--md wdi-dialog__title' },
+          `Start with ${snapshot.players.length} players?`,
+        ),
+        h(
+          'p',
+          { class: 'wdi-dialog__body' },
+          'Roles are dealt at once and the party locks. Nobody can join after this.',
+        ),
         waiting.length > 0 &&
-          h('p', { class: 'hint', 'data-testid': 'not-ready' }, `Not ready: ${waiting.join(', ')}`),
-        h('div', { class: 'row' }, confirm, cancel),
+          h('p', { class: 'wdi-hint', 'data-testid': 'not-ready' }, `Not ready: ${waiting.join(', ')}`),
+        h('div', { class: 'wdi-dialog__actions' }, confirm, cancel),
       ),
     );
     root.append(dialog);
@@ -102,10 +123,10 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
 
   const el = h(
     'section',
-    { class: 'panel lobby', 'aria-labelledby': 'lobby-title' },
-    h('h1', { id: 'lobby-title' }, 'Party code'),
-    h('div', { class: 'row center' }, codeText, copyBtn),
-    h('h2', {}, 'Players ', count),
+    { class: 'wdi-panel wdi-stack', 'aria-labelledby': 'lobby-title' },
+    h('p', { class: 'wdi-eyebrow', id: 'lobby-title' }, 'Party code'),
+    h('div', { class: 'wdi-row wdi-row--between' }, codeText, copyBtn),
+    h('h2', { class: 'wdi-subtitle' }, 'Players ', count),
     list,
     hint,
     actions,
@@ -120,12 +141,18 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
       ...next.players.map((p) =>
         h(
           'li',
-          { class: p.connected ? '' : 'away' },
-          h('span', { class: 'pname' }, p.name),
-          p.id === next.selfId && h('span', { class: 'tag' }, 'you'),
-          p.id === next.leaderId && h('span', { class: 'tag lead' }, 'leader'),
-          p.ready && h('span', { class: 'tag' }, 'ready'),
-          !p.connected && h('span', { class: 'tag' }, 'away'),
+          { class: `wdi-roster__row${p.connected ? '' : ' is-away'}` },
+          h('span', { class: 'wdi-seat', 'aria-hidden': 'true' }, p.name.charAt(0).toUpperCase()),
+          h('span', { class: 'wdi-grow' }, h('span', { class: 'wdi-roster__name' }, p.name)),
+          h(
+            'span',
+            { class: 'wdi-roster__tags' },
+            p.id === next.selfId && h('span', { class: 'wdi-chip' }, 'you'),
+            p.id === next.leaderId && h('span', { class: 'wdi-chip wdi-chip--lead' }, 'leader'),
+            p.ready && h('span', { class: 'wdi-chip wdi-chip--ready' }, icon('glyphs/glyph_check'), 'ready'),
+            !p.connected &&
+              h('span', { class: 'wdi-chip wdi-chip--quiet' }, icon('glyphs/glyph_clock'), 'away'),
+          ),
         ),
       ),
     );

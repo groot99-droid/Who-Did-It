@@ -22,9 +22,14 @@ export function validateName(raw: string): string | null {
 }
 
 export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
-  const message = h('p', { class: 'msg', role: 'alert' });
+  const message = h('p', { class: 'wdi-field__msg', role: 'alert' });
+  const say = (text: string, error = true) => {
+    message.textContent = text;
+    message.classList.toggle('wdi-field__msg--error', error && text !== '');
+  };
   const name = h('input', {
     id: 'name',
+    class: 'wdi-input',
     type: 'text',
     autocomplete: 'nickname',
     maxlength: NAME_MAX,
@@ -33,6 +38,7 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
   });
   const code = h('input', {
     id: 'code',
+    class: 'wdi-input wdi-input--code',
     type: 'text',
     inputmode: 'text',
     autocapitalize: 'characters',
@@ -42,19 +48,27 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
     value: opts.joinCode ?? '',
     'aria-label': 'Party code',
   });
-  const create = h('button', { type: 'button', class: 'primary' }, 'Create Party');
-  const join = h('button', { type: 'button', class: opts.joinCode ? 'primary' : '' }, 'Join Party');
+  const create = h(
+    'button',
+    { type: 'button', class: 'wdi-btn wdi-btn--primary wdi-btn--lg wdi-btn--block' },
+    'Create Party',
+  );
+  const join = h(
+    'button',
+    { type: 'button', class: `wdi-btn wdi-grow${opts.joinCode ? ' wdi-btn--primary' : ''}` },
+    'Join Party',
+  );
 
   const setBusy = (busy: boolean) => {
     for (const el of [create, join, name, code]) el.toggleAttribute('disabled', busy);
-    if (busy) message.textContent = 'Connecting...';
+    if (busy) say('Connecting...', false);
   };
 
   const run = async (action: (name: string) => Promise<void>) => {
     const trimmed = name.value.trim();
     const problem = validateName(trimmed);
     if (problem !== null) {
-      message.textContent = problem;
+      say(problem);
       name.focus();
       return;
     }
@@ -63,10 +77,10 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
     try {
       await action(trimmed);
     } catch {
-      message.textContent = JOIN_FAILED_MESSAGE;
+      say(JOIN_FAILED_MESSAGE);
       setBusy(false);
       void opts.explainFailure?.().then((better) => {
-        if (better !== null) message.textContent = better;
+        if (better !== null) say(better);
       });
     }
   };
@@ -74,7 +88,7 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
   create.addEventListener('click', () => void run((n) => opts.onCreate(n)));
   join.addEventListener('click', () => {
     if (!isValidCode(code.value)) {
-      message.textContent = JOIN_FAILED_MESSAGE;
+      say(JOIN_FAILED_MESSAGE);
       code.focus();
       return;
     }
@@ -86,14 +100,23 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
 
   const el = h(
     'section',
-    { class: 'panel landing', 'aria-labelledby': 'landing-title' },
-    h('h1', { id: 'landing-title' }, opts.joinCode ? 'You are invited' : 'Gather your party'),
-    h('label', { for: 'name' }, 'Your name'),
-    name,
-    h('p', { id: 'name-hint', class: 'hint' }, `${NAME_MIN} to ${NAME_MAX} characters`),
-    h('div', { class: 'row' }, create),
-    h('div', { class: 'divider' }, 'or join a friend'),
-    h('div', { class: 'row' }, code, join),
+    { class: 'wdi-panel wdi-stack', 'aria-labelledby': 'landing-title' },
+    h('p', { class: 'wdi-eyebrow' }, 'Hollowmere, after dark'),
+    h(
+      'h1',
+      { id: 'landing-title', class: 'wdi-display wdi-display--lg' },
+      opts.joinCode ? 'You are invited' : 'Gather your party',
+    ),
+    h(
+      'div',
+      { class: 'wdi-field' },
+      h('label', { class: 'wdi-label', for: 'name' }, 'Your name'),
+      name,
+      h('p', { id: 'name-hint', class: 'wdi-field__msg' }, `${NAME_MIN} to ${NAME_MAX} characters`),
+    ),
+    create,
+    h('div', { class: 'wdi-divider' }, 'or join a friend'),
+    h('div', { class: 'wdi-row' }, code, join),
     message,
   );
   root.append(el);

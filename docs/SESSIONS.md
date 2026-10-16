@@ -627,3 +627,36 @@ win; the win check runs after deaths and ejections only; after game over the roo
 with the same code; a disconnected player is a ghost at once (M7 adds reconnection and the body) and a
 lobby seat survives a dropped connection for the disconnect window; `WDI_DEBUG=1` adds `debug.deal`
 and `debug.clock` beside `debug.play`.
+
+### Round 3 log: M
+
+**Landed** (`claude/m3-meeting`): `NetworkService.room` (getter and `room` bus event) with `sceneEnter` removed
+from its message list; the router attaches `ColyseusWorldFeed` and the new `ColyseusMeetingFeed` from the
+room with no cast and no interval, re-emits the feed's `sceneEnter` on `net.bus`, and owns every start of
+`World`, `Meeting`, `GameOver` and the return to `Lobby` (ARCHITECTURE 5.9); the theme on Landing, Lobby and
+the role card with every `data-testid` kept (`ui/styles.css` is page chrome plus five layout classes); the
+`Meeting` and `GameOver` scenes and screens with the frozen test ids (`meeting`, `meeting-reason`,
+`portrait-<id>`, `vote-skip`, `vote-count-<id>`, `stamp`, `reveal-role`, `chat-log`, `chat-input`,
+`gameover`, `gameover-winner`, `gameover-role-<id>`; extras `voted-<id>`, `meeting-clock`,
+`gameover-summary`, `gameover-countdown`); the mock meeting (`net/mock/meetingMock.ts`,
+`MockNetwork.openMeeting`) and `e2e/meeting.spec.ts` (body: vote, early end, stamp, game over, lobby; bell:
+nobody ejected, back to the village). DECISIONS A33.
+
+**For the integration**
+- `World` must hide its DOM on SLEEP (N's side of the seam): until it does, the HUD chip and clock sit on
+  top of the meeting.
+- Notebook tab: `meetingScene.tabs?.addTab('notebook', 'Notebook', (panel) => new NotebookPanel(panel, worldFeed))`
+  (`Meeting.tabs` is the screen; the panel needs `update()` and `destroy()`).
+- The mock world should emit `meetingRequest` itself and implement `resume()`; until it does, `MockNetwork`
+  re-emits the same `sceneEnter` as the stand-in, and the e2e uses the mock-only hook
+  `window.__wdiMock.requestMeeting('body' | 'bell')`, which sends the same event.
+- N's `InputController` is kept in the registry for the whole page and a second mock match (after the mock
+  game over) would reuse it with the old feed; real rooms keep one feed, so only `?mock=1` is affected.
+  Chat keystrokes also reach it while `World` sleeps: it should ignore typing (`isTyping` in `ui/dom.ts`).
+- `phaseChange` and `gameOver` are registered on the room by both `NetworkService` and the meeting feed
+  (the SDK allows several handlers); only `sceneEnter` had to be single.
+
+**Not done**: the `stamp` sound (no `AudioBus` or audio manifest at the base); a real-server meeting e2e
+(O's `match.spec.ts` covers it after the merges); the ghost channel form is exercised by unit-level reading
+only, since the mock has no ghost; the Report tab is a short facts list until the copy deck (UI.md 14)
+lands, and all meeting copy lives in `ui/meetingText.ts` so the deck replaces it in one file.

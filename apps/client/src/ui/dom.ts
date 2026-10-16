@@ -39,3 +39,12 @@ export interface Screen {
 export function isTyping(target: EventTarget | null): boolean {
   return target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement;
 }
+
+/** A theme icon (`assets/ui/<dir>/<name>.svg`) as a decorative `<img>` unless `alt` is given. */
+export function icon(path: string, alt = '', cls = ''): HTMLImageElement {
+  return h('img', {
+    class: `wdi-icon${cls === '' ? '' : ` ${cls}`}`,
+    src: `${import.meta.env.BASE_URL}assets/ui/${path}.svg`,
+    alt,
+  });
+}
