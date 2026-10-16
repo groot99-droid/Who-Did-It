@@ -181,8 +181,8 @@ export interface C2SPayloads {
   'lobby.settings': { mode?: number; npcDifficulty?: number };
   /** Leader only, phase lobby: one NPC seat up to `players.max` (GDD 3.12). */
   'lobby.addNpc': Record<string, never>;
-  /** Leader only, phase lobby: removes that NPC seat; a human seat is refused 422. */
-  'lobby.removeNpc': { playerId: string };
+  /** Leader only, phase lobby: removes that NPC seat, or the most recently added one when `playerId` is absent; a human seat is refused 422. */
+  'lobby.removeNpc': { playerId?: string };
   /** Quick mode, a living player in a meeting phase: replaces the seat's claim (GDD 3.11). */
   'meeting.claim': { roleId: string; targetId?: string; sawRoleId?: string };
 }

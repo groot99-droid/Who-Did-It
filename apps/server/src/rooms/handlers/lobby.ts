@@ -21,7 +21,7 @@ import type { PartyRoom } from '../PartyRoom';
 import { flowOf, refuse, setPhase } from '../../sim/Flow';
 import { handleSay } from '../../sim/Chat';
 import { handleClaim, handleVote } from '../../sim/Meeting';
-import { startOnubMatch } from '../../sim/Onub';
+import { beginOnubPlay, startOnubMatch } from '../../sim/Onub';
 
 /**
  * Flow messages: the lobby and role-card flow plus the meeting vote and chat (consumed by the phase
@@ -239,6 +239,7 @@ export function startMatch(room: PartyRoom): void {
  * step and sends the one `sceneEnter`; nothing here touches positions or scenes.
  */
 export function beginPlay(room: PartyRoom): void {
+  if (beginOnubPlay(room)) return; // quick mode starts at dusk (round 4, R)
   room.state.round = 0;
   room.state.startTick = room.state.tick;
   setPhase(room, Phase.grace, balance.phases.graceS);

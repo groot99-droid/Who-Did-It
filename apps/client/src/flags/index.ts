@@ -5,6 +5,8 @@ export interface Flags {
   art: ArtMode;
   /** `?mock=1` runs the whole lobby flow against in-memory fixtures, no server. */
   mock: boolean;
+  /** `?mode=onub` makes the mocks play quick mode (GDD 3.11); the real server takes the lobby setting. */
+  mode: 'main' | 'onub';
   /** `#/join/CODE` deep link, already upper-cased. */
   joinCode: string | null;
   /** `#/lobby/CODE` lets a reload resume through the stored reconnection token. */
@@ -28,6 +30,7 @@ export function readFlags(search: string, hash: string): Flags {
   return {
     art: params.get('art') === 'placeholder' ? 'placeholder' : 'default',
     mock: params.get('mock') === '1',
+    mode: params.get('mode') === 'onub' ? 'onub' : 'main',
     joinCode: route[0] === 'join' ? code : null,
     resumeCode: route[0] === 'lobby' ? code : null,
   };

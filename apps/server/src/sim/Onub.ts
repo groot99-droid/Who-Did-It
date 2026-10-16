@@ -14,6 +14,14 @@ export function startOnubMatch(room: PartyRoom, _ids: readonly string[], _rng: (
   return isOnub(room) ? notYet(room) : false;
 }
 
+/**
+ * roleReveal -> dusk in quick mode (GDD 3.11): called by `beginPlay` first; returns false outside quick
+ * mode so the main grace phase starts. Round 4: Session R.
+ */
+export function beginOnubPlay(room: PartyRoom): boolean {
+  return isOnub(room) ? notYet(room) : false;
+}
+
 /** `act.ability` with an `onub.*` id (plate-setting at dusk, the night acts). Round 4: Session R. */
 export function handleOnubAbility(
   room: PartyRoom,

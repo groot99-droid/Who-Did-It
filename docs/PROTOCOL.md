@@ -27,7 +27,7 @@
 | `lobby.ready` | `{ ready: boolean }` | 2/s | Lobby: the Ready tick. Role card: dismisses the card; the match begins when all are ready or 12 s pass. |
 | `lobby.settings` | `{ mode?: number; npcDifficulty?: number }` | 2/s | Leader only, phase lobby: `mode` is a `GameMode`, `npcDifficulty` an `NpcLevel` (A39). Refused 422 / 425. |
 | `lobby.addNpc` | `Record<string, never>` | 2/s | Leader only, phase lobby: one NPC seat up to `players.max` (GDD 3.12). |
-| `lobby.removeNpc` | `{ playerId: string }` | 2/s | Leader only, phase lobby: removes that NPC seat; a human seat is refused 422. |
+| `lobby.removeNpc` | `{ playerId?: string }` | 2/s | Leader only, phase lobby: removes that NPC seat, or the most recently added one when `playerId` is absent; a human seat is refused 422. |
 | `meeting.claim` | `{ roleId: string; targetId?: string; sawRoleId?: string }` | 2/s | Quick mode, a living player in a meeting phase: replaces the seat's claim (GDD 3.11). |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.

@@ -3,7 +3,18 @@ import { isValidCode, readFlags } from './index';
 
 describe('readFlags', () => {
   it('defaults to no flags', () => {
-    expect(readFlags('', '')).toEqual({ art: 'default', mock: false, joinCode: null, resumeCode: null });
+    expect(readFlags('', '')).toEqual({
+      art: 'default',
+      mock: false,
+      mode: 'main',
+      joinCode: null,
+      resumeCode: null,
+    });
+  });
+
+  it('reads the quick-mode flag for the mocks', () => {
+    expect(readFlags('?mode=onub', '').mode).toBe('onub');
+    expect(readFlags('?mode=other', '').mode).toBe('main');
   });
 
   it('reads art and mock query flags', () => {
