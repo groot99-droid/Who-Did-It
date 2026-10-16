@@ -37,6 +37,8 @@ describe('static keys', () => {
         .sort(),
     );
     expect(PROP_KEYS).toContain('prop_lanternPost_lit');
+    expect(PROP_KEYS).toEqual(expect.arrayContaining(['prop_plate', 'prop_deadLoaf', 'prop_flour_sacks']));
+    expect(new Set(PROP_KEYS).size).toBe(PROP_KEYS.length);
     expect(staticFrameNames('vfx')).toHaveLength(Object.values(VFX_CLIPS).reduce((a, b) => a + b, 0));
     expect(staticFrameNames('vfx')).toContain('vfx_vote_stamp/009');
   });
@@ -84,7 +86,8 @@ describe('packStatic', () => {
 
   it('refuses a render that misses or adds a key', async () => {
     const { manifest, inputs } = sheet('props', 192, true);
-    await expect(packStatic(manifest, inputs.slice(1))).rejects.toThrow(/missing \[prop_bell\]/);
+    const noBell = inputs.filter((i) => i.name !== 'prop_bell');
+    await expect(packStatic(manifest, noBell)).rejects.toThrow(/missing \[prop_bell\]/);
     const extra = [...inputs, { name: 'prop_cart', png: inputs[0]!.png }];
     await expect(packStatic(manifest, extra)).rejects.toThrow(/unexpected \[prop_cart\]/);
   });
