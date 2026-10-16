@@ -26,9 +26,11 @@ is done by a build session.
    (`claude/zen-turing-m1jnw0` until it is renamed `main`), CI green, and `match.spec.ts` (Session
    O) passing against the real server.
 2. **Railway Hobby service** (DECISIONS A6, ARCHITECTURE 5.10). New project from the GitHub repo,
-   build `pnpm --filter @wdi/server build`, start `node apps/server/build/index.js`, variable
-   `NODE_ENV=production`, and **`WDI_DEBUG` not set** (the debug handlers must not exist on a server
-   friends play on; CLAUDE.md). Open `https://<service>.up.railway.app/health` and check it answers
+   branch `claude/zen-turing-m1jnw0`, root directory left at the repo root; `railway.json` supplies
+   the build and start commands and the `/health` check, so leave those fields empty in the UI. No
+   variables are needed (`PORT` is Railway's), and **`WDI_DEBUG` must not be set** (the debug
+   handlers must not exist on a server friends play on; CLAUDE.md). Generate a public domain under
+   Networking, open `https://<service>.up.railway.app/health` and check it answers
    `{ok: true, build: ...}`.
 3. **`VITE_SERVER_URL`.** GitHub: Settings > Secrets and variables > Actions > Variables, set
    `VITE_SERVER_URL` to the Railway service's `https://` URL (the comment at the top of
