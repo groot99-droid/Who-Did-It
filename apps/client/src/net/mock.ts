@@ -1,6 +1,9 @@
 import mitt, { type Emitter } from 'mitt';
 import { MOCK_BOTS, MOCK_ROLE_REVEAL } from './fixtures';
-import { JoinError, type LobbySnapshot, type NetEvents, type NetworkService } from './NetworkService';
+import type { MeetingFeed } from './meeting';
+import { MockMeetingFeed, type MockMeetingRequest } from './mock/meetingMock';
+import { JoinError, type LobbySnapshot, type NetEvents, type NetworkService, type Room } from './NetworkService';
+import type { WorldFeed } from './world';
 import {
   type ClientMessages,
   type ClientMessageType,
@@ -28,16 +31,24 @@ function randomCode(): string {
  */
 export class MockNetwork implements NetworkService {
   readonly bus: Emitter<NetEvents> = mitt<NetEvents>();
-  private room: LobbySnapshot | null = null;
+  private lobby: LobbySnapshot | null = null;
   private timers: number[] = [];
   private card: RoleRevealPayload | null = null;
+  private world: WorldFeed | null = null;
+  private publishMeeting: ((feed: MeetingFeed) => void) | null = null;
+  private meeting: MockMeetingFeed | null = null;
+
+  /** There is no room behind ?mock=1; the router feeds the screens from the mock feeds instead. */
+  get room(): Room | null {
+    return null;
+  }
 
   get code(): string | null {
-    return this.room?.code ?? null;
+    return this.lobby?.code ?? null;
   }
 
   get snapshot(): LobbySnapshot | null {
-    return this.room;
+    return this.lobby;
   }
 
   get roleCard(): RoleRevealPayload | null {
@@ -48,7 +59,7 @@ export class MockNetwork implements NetworkService {
     const me: LobbyPlayer = { id: 'mock-me', name, ready: false, connected: true };
     this.open(randomCode(), me.id, [me]);
     this.addBots(MOCK_BOTS.slice(0, 3));
-    return this.room?.code ?? '';
+    return this.lobby?.code ?? '';
   }
 
   async join(code: string, name: string): Promise<string> {
@@ -66,7 +77,7 @@ export class MockNetwork implements NetworkService {
   }
 
   send<K extends ClientMessageType>(type: K, payload: ClientMessages[K]): void {
-    const room = this.room;
+    const room = this.lobby;
     if (room === null) return;
     // Mirrors the server: Start is leader-only and needs one human; the rest of the party is Ready.
     if (type === 'lobby.start' && room.leaderId === room.selfId && this.card === null) {
@@ -77,18 +88,56 @@ export class MockNetwork implements NetworkService {
     }
     if (type === 'lobby.ready' && this.card === null) {
       const ready = (payload as ClientMessages['lobby.ready']).ready;
-      this.room = {
+      this.lobby = {
         ...room,
         players: room.players.map((p) => (p.id === room.selfId ? { ...p, ready } : p)),
       };
-      this.bus.emit('lobby', this.room);
+      this.bus.emit('lobby', this.lobby);
     }
-    if (type === 'lobby.ready' && (payload as ClientMessages['lobby.ready']).ready && this.card !== null) {
-      this.later(
-        () => this.bus.emit('sceneEnter', { sceneId: 'overworld', spawn: 'square_0', facing: 's' }),
-        300,
-      );
-    }
+  }
+
+  /** The router hands over the published mock world feed and a way to publish the meeting feed. */
+  bindWorld(world: WorldFeed, publishMeeting: (feed: MeetingFeed) => void): void {
+    this.world = world;
+    this.publishMeeting = publishMeeting;
+    this.meeting = null;
+  }
+
+  /**
+   * The mock world's report or bell asked for a meeting: run discussion -> vote -> reveal on a mock meeting
+   * feed, then either end the match (the router shows game over, then the lobby) or resume the world.
+   */
+  openMeeting(req: MockMeetingRequest): void {
+    const world = this.world;
+    if (world === null || this.meeting !== null) return;
+    const feed = new MockMeetingFeed(
+      world.snapshot().map(({ id, name, traits }) => ({ id, name, traits })),
+      world.selfId,
+      {
+        onDone: (outcome) => {
+          if (outcome === 'resume') {
+            this.meeting = null;
+            world.resume?.();
+          }
+        },
+      },
+    );
+    feed.bus.on('phaseChange', (e) => {
+      if (e.phase === 0) this.backToLobby();
+    });
+    this.meeting = feed;
+    this.publishMeeting?.(feed);
+    feed.begin(req);
+  }
+
+  private backToLobby(): void {
+    this.card = null;
+    this.meeting = null;
+    this.world = null;
+    const room = this.lobby;
+    if (room === null) return;
+    this.lobby = { ...room, players: room.players.map((p) => ({ ...p, ready: false })) };
+    this.bus.emit('lobby', this.lobby);
   }
 
   async request(): Promise<never> {
@@ -102,17 +151,17 @@ export class MockNetwork implements NetworkService {
 
   private open(code: string, leaderId: string, players: LobbyPlayer[]): void {
     this.close();
-    this.room = { code, selfId: 'mock-me', leaderId, players };
+    this.lobby = { code, selfId: 'mock-me', leaderId, players };
   }
 
   private addBots(bots: LobbyPlayer[]): void {
     bots.forEach((bot, i) =>
       this.later(
         () => {
-          const room = this.room;
+          const room = this.lobby;
           if (room === null || room.players.length >= MAX_PLAYERS) return;
-          this.room = { ...room, players: [...room.players, bot] };
-          this.bus.emit('lobby', this.room);
+          this.lobby = { ...room, players: [...room.players, bot] };
+          this.bus.emit('lobby', this.lobby);
         },
         BOT_STEP_MS * (i + 1),
       ),
@@ -126,7 +175,10 @@ export class MockNetwork implements NetworkService {
   private close(): void {
     for (const t of this.timers) window.clearTimeout(t);
     this.timers = [];
-    this.room = null;
+    this.lobby = null;
     this.card = null;
+    this.meeting?.dispose();
+    this.meeting = null;
+    this.world = null;
   }
 }

@@ -117,6 +117,26 @@ describe('ColyseusNetwork', () => {
     expect(hoisted.lastRoom.current?.send).toHaveBeenCalledWith('lobby.ready', { ready: true });
   });
 
+  it('exposes the room and announces it on the bus, then null when it leaves', async () => {
+    const net = new ColyseusNetwork();
+    expect(net.room).toBeNull();
+    const seen: Array<unknown> = [];
+    net.bus.on('room', (r) => seen.push(r));
+    await net.create('Ada');
+    expect(net.room).toBe(hoisted.lastRoom.current);
+    await net.leave();
+    expect(net.room).toBeNull();
+    expect(seen).toEqual([hoisted.lastRoom.current, null]);
+  });
+
+  it('leaves sceneEnter to the world feed', async () => {
+    const net = new ColyseusNetwork();
+    await net.create('Ada');
+    const types = hoisted.lastRoom.current?.onMessage.mock.calls.map((c) => c[0]);
+    expect(types).not.toContain('sceneEnter');
+    expect(types).toContain('gameOver');
+  });
+
   it('clears the token when gameOver arrives', async () => {
     const net = new ColyseusNetwork();
     await net.create('Ada');
