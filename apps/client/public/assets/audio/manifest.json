@@ -9,6 +9,9 @@
     { "key": "scream", "url": "scream.ogg", "gain": 0.9 },
     { "key": "bell", "url": "bell.ogg", "gain": 1 },
     { "key": "stamp", "url": "stamp.ogg", "gain": 1 },
-    { "key": "ambient", "url": "ambient.ogg", "gain": 0.3 }
+    { "key": "ambient", "url": "ambient.ogg", "gain": 0.3 },
+    { "key": "storm", "url": "storm.ogg", "gain": 0.35 },
+    { "key": "creak", "url": "creak.ogg", "gain": 0.5 },
+    { "key": "loaf_crack", "url": "loaf_crack.ogg", "gain": 1 }
   ]
 }
