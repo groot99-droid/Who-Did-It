@@ -45,6 +45,10 @@ export class PlayerSim {
   bandagedUntilTick = 0;
   /** The `act.hold` in progress, re-validated every tick (ARCHITECTURE 5.6). */
   hold: { action: string; targetId: string; startTick: number } | null = null;
+  /** Notebook entries written so far; the next `NotebookEntry.id` is `entry_<n + 1>` (counted per player). */
+  entrySeq = 0;
+  /** Bell pulls spent this match (room memory; the cap is `roles.roles[role].bellPulls`). */
+  bellPulls = 0;
   /** Position ring: the last POSITION_RING_TICKS + 1 positions, newest at `head`. */
   private readonly ring = new Float64Array((POSITION_RING_TICKS + 1) * 2);
   private head = -1;
@@ -67,6 +71,8 @@ export class PlayerSim {
     this.bloodyUntilTick = 0;
     this.bandagedUntilTick = 0;
     this.hold = null;
+    this.entrySeq = 0;
+    this.bellPulls = 0;
     this.head = -1;
     this.filled = 0;
   }
@@ -124,6 +130,16 @@ export interface DeathEvent {
   tick: number;
 }
 
+/** Server-only facts about one clue in a scene: decay, spawn order, who collected it. */
+export interface ClueMeta {
+  sceneId: string;
+  /** Spawn order within the scene (the `clueSeq` counter); the cap drops the smaller first. */
+  seq: number;
+  /** Tick the clue disappears, or null when it never decays. */
+  expiresTick: number | null;
+  collectors: Set<string>;
+}
+
 export class RoomSim {
   readonly players = new Map<string, PlayerSim>();
   readonly views = new Map<string, ViewState>();
@@ -137,6 +153,12 @@ export class RoomSim {
   profileFixed = false;
   /** Clue id counters per scene (`clue_<sceneId>_<n>`), so an id never counts kills elsewhere (A30). */
   readonly clueSeq = new Map<string, number>();
+  /** Server memory of every clue in play, by clue id (the schema carries only what clients may read). */
+  readonly clueMeta = new Map<string, ClueMeta>();
+  /** Body ids already reported; a body starts one meeting only (A30). */
+  readonly reportedBodies = new Set<string>();
+  /** The grace teaching clue is spawned once per match, at the first placement. */
+  teachingSpawned = false;
   /** Raised by the WDI_DEBUG `debug.play` message, consumed by the step. */
   debugPlay = false;
   /** Set when a view must change before the next 5 Hz pass (a transit just ended). */
@@ -153,6 +175,9 @@ export class RoomSim {
     this.profileFixed = false;
     this.viewsDirty = true;
     this.clueSeq.clear();
+    this.clueMeta.clear();
+    this.reportedBodies.clear();
+    this.teachingSpawned = false;
   }
 
   ensure(sessionId: string): PlayerSim {

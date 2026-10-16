@@ -81,14 +81,29 @@ export function moveAndCollide(room: PartyRoom): void {
     }
     const moved = p.vx !== 0 || p.vy !== 0;
     if (moved) {
-      const grid = navGrid(sceneKey(player.sceneId), sim.profile);
-      const r = moveAabb(grid, p.x, p.y, p.vx, p.vy, FOOT_HALF_PX, FOOT_HALF_PX);
-      p.x = r.x;
-      p.y = r.y;
+      // The sim's scene, not the public one: a ghost's public scene stays frozen after its crossings.
+      const grid = navGrid(sceneKey(p.sceneIdx), sim.profile);
+      if (p.dead) {
+        // Ghosts walk through everything; only the edge of the scene stops them (A30).
+        p.x = Math.min(Math.max(p.x + p.vx, 0), grid.w * grid.tile - 1);
+        p.y = Math.min(Math.max(p.y + p.vy, 0), grid.h * grid.tile - 1);
+      } else {
+        const r = moveAabb(grid, p.x, p.y, p.vx, p.vy, FOOT_HALF_PX, FOOT_HALF_PX);
+        p.x = r.x;
+        p.y = r.y;
+      }
     }
     p.pushRing();
     publishPresence(player.presence, p, moved, tick);
   }
+}
+
+/** `Presence.statusBits` of a player at a tick: transit while crossing, Blood while it lasts (GDD 3.4). */
+export function statusBitsOf(p: PlayerSim, tick: number): number {
+  return (
+    (tick < p.busyUntilTick ? StatusBit.transit : 0) |
+    (!p.dead && tick < p.bloodyUntilTick ? StatusBit.bloody : 0)
+  );
 }
 
 /** Writes the rounded position and the shared animation id; unchanged values cost no patch bytes. */
@@ -101,5 +116,5 @@ export function publishPresence(
   presence.x = Math.round(p.x);
   presence.y = Math.round(p.y);
   presence.animId = moving ? AnimId.walk : AnimId.idle;
-  presence.statusBits = tick < p.busyUntilTick ? StatusBit.transit : 0;
+  presence.statusBits = statusBitsOf(p, tick);
 }
