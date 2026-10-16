@@ -1323,3 +1323,30 @@ goes in the PR description. Not in scope: code.
   `bedroll-<id>`, `night-wake`, `claim-<roleId>`, `swaplog`, `gameover-final-<id>`; `vote-skip` is
   absent in quick mode.
 - Reserved DECISIONS rows: R A40, S A41, T A42, U A43, V A44, W A45, X A46, Y A47.
+
+## Round 4 log: Y
+
+Session Y (content, copy, audio, playtest kit), branch `claude/r4-content`, PR #20.
+
+- **Copy.** `docs/UI.md` 14.12 (quick mode) and 14.13 (NPC lobby) are in; T, U and V paste from them.
+  U's provisional ids stay as `meeting.claim.*` and `reveal.outs.*`; the swap log is `over.swap.*`
+  (not `gameover.swap.*`), the night reveal lines are `night.reveal.*`, the dusk prompt is
+  `prompt.plate.set`. A dead loaf's reveal reads "A dead loaf: {role}" rather than the bare role
+  name T's brief suggested. The 14.12 lines never use the parody title outside `lobby.mode.onub`, so
+  the neutral label of GDD 3.11 is a one-line change.
+- **Audio.** `storm` (loop), `creak` and `loaf_crack` ship in `audio/manifest.json`, all CC0 (OpenGameArt
+  and two Kenney packs), with `CREDITS.md` rows and the licence copies in `LICENSES/vendors/`. The
+  vendors table in `LICENSES/vendors/README.md` still reads "no" for Kenney and OpenGameArt; Y only
+  added new licence texts, so the orchestrator or the owner ticks those rows. Freesound refused this
+  container (403), which is why the storm comes from OpenGameArt.
+- **Names.** Three names changed (Jack Tarr, Wally, Bert Hale); the test adds the register and cast
+  rules. Validator and schema unchanged.
+- **Docs.** GDD 2 step 3 wording: its practice line said "Cabal needs 3 kills", which disagrees with
+  3.9 (at four seats the Cabal wins with one villager left, two deaths); the line now cites 3.9 and
+  the copy deck instead of a number, and the settings panel names the mode chip and the NPC
+  controls. WORLD.md bakery row and loft note; ROADMAP 7.5 rows `4-6 humans` and `1-3 humans`.
+- **Playtest kit.** README 8 (quick-mode evening) and 9 (NPC session), SCORECARD 6 and 7, FORM items
+  9 and 10 with item 1's quick-mode options, a TEMPLATE note.
+- **Not done.** DECISIONS row A47 is reserved for Y but `docs/DECISIONS.md` is not in Y's paths; Y's
+  decisions are the ones listed here, for the orchestrator to record. No wording fix was needed in
+  the frozen 3.11 card texts or `roles.onub.json`.
