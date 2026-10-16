@@ -24,15 +24,15 @@ character model sheet of one Hollowmere villager, 1931 fog-bound harbour hamlet,
 
 `generate_3d`, model `meshy_v7_image_to_3d` (fallback `image_to_3d`), on ONE cropped front view:
 
-| Setting | Value |
-|---|---|
-| `pose_mode` | `a-pose` |
-| `should_texture` | `true` |
-| `enable_pbr` | `false` |
-| `enable_rigging` | `true` (humanoid) |
+| Setting            | Value                                                                                                                        |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `pose_mode`        | `a-pose`                                                                                                                     |
+| `should_texture`   | `true`                                                                                                                       |
+| `enable_pbr`       | `false`                                                                                                                      |
+| `enable_rigging`   | `true` (humanoid)                                                                                                            |
 | `enable_animation` | `true`, `animation_action_id` 0 (idle); walk 30 and run 16 as separate `3d_rigging` jobs on the result GLB, one clip per job |
-| Budget | ONE of `model_type: lowpoly` or `target_polycount` 5000-8000 (prefer the budgeted polycount for the body) |
-| `texture_prompt` | the STYLE TOKEN from `packages/content/data/style.json` (120 characters max) |
+| Budget             | ONE of `model_type: lowpoly` or `target_polycount` 5000-8000 (prefer the budgeted polycount for the body)                    |
+| `texture_prompt`   | the STYLE TOKEN from `packages/content/data/style.json` (120 characters max)                                                 |
 
 Merge single-clip GLBs with Higgsfield's `glb_merge_anims.py` or in Blender through NLA tracks. Then
 decimate to 6k tris or fewer, flat-shade, run `tools/blender/palettize.py`, tag parts with `wdi_part`
