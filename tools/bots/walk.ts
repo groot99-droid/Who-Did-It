@@ -4,22 +4,39 @@
 // It never reads anything a real client would not receive.
 //
 //   pnpm --filter @wdi/bots walk -- --code ABCDE --count 6 [--url http://localhost:2567]
-//        [--vote skip|leader|random|<name>] [--no-report] [--killer] [--no-walk]
+//        [--vote skip|leader|random|other|<name>] [--no-report] [--killer] [--no-walk] [--claims]
 //
 // Against a real lobby the bots just join and act once the match starts.
+//
+// Quick mode (GDD 3.11, `state.settings.mode`): the bot never leaves the bakery. At dusk it walks to its own
+// plate (the bakery prop whose `of` is its seat id) and sets it; it sleeps from `nightSleep` to `nightWake`
+// (no input, no portal) and counts anything a sleeper must not receive; in its window it walks to a legal
+// target and sends one `act.ability`; at the dawn meeting it posts a claim (`claims`) and votes for another
+// seat (never Skip, never itself).
 import { Client, type Room } from '@colyseus/sdk';
-import { abilities, balance, scenes } from '@wdi/content';
+import { abilities, balance, onubBalance, scenes } from '@wdi/content';
 import {
   BUILD_VERSION,
   DIRECTIONS,
   ErrorCode,
+  GameMode,
   type JoinOptions,
+  ONUB_SET_PLATE,
   Phase,
   type RoleRevealPayload,
   TICK_RATE,
   TILE_PX,
 } from '@wdi/shared';
 import { fileURLToPath } from 'node:url';
+import {
+  type NightPlan,
+  type PropLike,
+  claimPayload,
+  ownPlate,
+  planNightAct,
+  propPx,
+  standingSpot,
+} from './quick';
 
 export const DEFAULT_URL = 'http://localhost:2567';
 const SCENE_IDS = Object.keys(scenes) as Array<keyof typeof scenes>;
@@ -36,9 +53,20 @@ const SEE_PX = balance.vision.dayTiles * TILE_PX;
 const REFUSALS: ReadonlySet<number> = new Set(Object.values(ErrorCode));
 const isWorld = (phase: number) => phase >= Phase.grace && phase <= Phase.night;
 const isMeeting = (phase: number) => phase === Phase.meetingDiscussion || phase === Phase.meetingVote;
+/** The one scene quick mode is played in (A39: nobody leaves the bakery). */
+const BAKERY = 'bakery';
+/** How close to a prop (tiles) a bot stands before it acts, inside the server's `actRangeTiles`. */
+const ACT_REACH_PX = onubBalance.actRangeTiles * TILE_PX * 0.9;
+/** A sleeper's last patch can trail `nightSleep` by a tick or two; leaks are judged after this settle time. */
+const SLEEP_SETTLE_MS = 1500;
+/** A bot gives a vote up after this many refusals in one meeting (an abstention is legal in quick mode). */
+const MAX_VOTE_REFUSALS = 6;
 
-/** What a bot casts at a meeting: Skip, the leader, a random living player (or Skip), or a player by name. */
-export type VoteMode = 'skip' | 'leader' | 'random' | (string & {});
+/**
+ * What a bot casts at a meeting: Skip, the leader, a random living player (or Skip), a random living
+ * player other than itself and never Skip (`other`, the quick-mode dawn vote), or a player by name.
+ */
+export type VoteMode = 'skip' | 'leader' | 'random' | 'other' | (string & {});
 
 export interface BotBehavior {
   /** Random-walk (and steer to bodies and prey). False keeps the bot on its spawn. Default true. */
@@ -49,6 +77,8 @@ export interface BotBehavior {
   report?: boolean;
   /** Strike with the Knife when the card holds `kill`. Default false. */
   killer?: boolean;
+  /** Quick mode: post "I was <card.roleId>" once per meeting through `meeting.claim`. Default false. */
+  claims?: boolean;
 }
 
 export interface WalkerStats {
@@ -64,6 +94,14 @@ export interface WalkerStats {
   reports: number;
   votes: number;
   meetings: number;
+  /** Quick mode: windows this bot was woken for (`nightWake`). */
+  wakes: number;
+  /** Quick mode: `act.ability` sent, the dusk plate included. */
+  acts: number;
+  /** Quick mode: `meeting.claim` sent. */
+  claims: number;
+  /** Quick mode: a presence, SceneState, `sceneEnter` or `nightWake` that reached a sleeper. Must stay 0. */
+  nightLeaks: number;
 }
 
 interface BodyLike {
@@ -79,17 +117,29 @@ interface PlayerLike {
   hasVoted: boolean;
   sceneId: number;
   presence?: { x: number; y: number; statusBits: number };
-  priv?: { cooldownEndTick: { get(key: string): number | undefined } };
+  priv?: {
+    cooldownEndTick: { get(key: string): number | undefined };
+    nightReveal?: { forEach(cb: (e: { of: string; roleId: string }) => void): void };
+  };
 }
 interface StateLike {
   phase: number;
   tick: number;
   leaderId: string;
+  settings?: { mode: number };
   players: {
     forEach(cb: (p: PlayerLike, id: string) => void): void;
     get(id: string): PlayerLike | undefined;
   };
-  scenes?: { get(key: string): { bodies: { forEach(cb: (b: BodyLike) => void): void } } | undefined };
+  scenes?: {
+    size?: number;
+    get(key: string):
+      | {
+          bodies: { forEach(cb: (b: BodyLike) => void): void };
+          props?: { forEach(cb: (p: PropLike) => void): void };
+        }
+      | undefined;
+  };
 }
 
 /** Deterministic PRNG so a soak run can be reproduced from its seed. */
@@ -121,6 +171,10 @@ export function pickVote(
   const living = roster.filter((p) => p.alive);
   if (mode === 'skip') return 'skip';
   if (mode === 'leader') return living.find((p) => p.id === leaderId)?.id ?? 'skip';
+  if (mode === 'other') {
+    const others = living.filter((p) => p.id !== selfId);
+    return others[Math.floor(rng() * others.length)]?.id ?? 'skip';
+  }
   if (mode === 'random') {
     const others = living.filter((p) => p.id !== selfId);
     const i = Math.floor(rng() * (others.length + 1));
@@ -147,6 +201,10 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
     reports: 0,
     votes: 0,
     meetings: 0,
+    wakes: 0,
+    acts: 0,
+    claims: 0,
+    nightLeaks: 0,
   };
   const walk = behavior.walk !== false;
   const holdsKnife = () => !!behavior.killer && !!card?.abilities.some((a) => a.id === 'kill');
@@ -161,14 +219,66 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
   let lastReportAt = 0;
   let lastKillAt = 0;
   const reported = new Set<string>();
+  // Quick mode: awake in a window (between nightWake and nightSleep), what it means to do there, and when a
+  // sleeper's checks start counting.
+  let awake = false;
+  let sleptAt = 0;
+  let win: { plan: NightPlan | null; at: number; sentAt: number; tries: number } | undefined;
+  let plateAt = 0;
+  let plateTries = 0;
+  let plateSentAt = 0;
+  let pendingWakeAt = 0;
+  let lastErrorAt = 0;
+  let voteRefusals = 0;
+  let claimed = false;
+  const sleeperSeen = new Set<string>();
   let resolveCard!: (c: RoleRevealPayload) => void;
   const cardPromise = new Promise<RoleRevealPayload>((r) => (resolveCard = r));
 
+  const quickNow = () => (room.state as unknown as StateLike | undefined)?.settings?.mode === GameMode.onub;
+  const sleepingNow = () =>
+    quickNow() && (room.state as unknown as StateLike).phase === Phase.night && !awake;
+  const leak = (kind: string) => {
+    if (sleeperSeen.has(kind)) return;
+    sleeperSeen.add(kind);
+    stats.nightLeaks++;
+  };
+
   room.onMessage('error', (e: { code?: number }) => {
-    if (e && REFUSALS.has(e.code ?? 0)) stats.errors++;
-    else stats.protocolErrors++;
+    lastErrorAt = Date.now();
+    if (e && REFUSALS.has(e.code ?? 0)) {
+      stats.errors++;
+      if (isMeeting((room.state as unknown as StateLike | undefined)?.phase ?? 0)) voteRefusals++;
+    } else stats.protocolErrors++;
   });
-  room.onMessage('sceneEnter', () => undefined);
+  room.onMessage('sceneEnter', () => {
+    // A quick-mode sleeper is sent no scene. A waker's sceneEnter comes with its nightWake, so one that is
+    // not followed by a nightWake is a leak (judged by the timer).
+    if (sleepingNow()) pendingWakeAt = Date.now();
+  });
+  room.onMessage('nightWake', (w: { windowRole: string }) => {
+    const state = room.state as unknown as StateLike;
+    // Woken from the dealt role only, and only in the night phase.
+    if (state.phase !== Phase.night || (card && w.windowRole !== card.roleId)) leak('nightWake');
+    awake = true;
+    pendingWakeAt = 0;
+    stats.wakes++;
+    const props: PropLike[] = [];
+    state.scenes?.get(BAKERY)?.props?.forEach((p) => props.push(p));
+    // The other seats holding the same dealt role are the card's teammates.
+    win = {
+      plan: planNightAct(w.windowRole, room.sessionId, props, rng, card?.teammates.length ?? 0),
+      at: Date.now(),
+      sentAt: 0,
+      tries: 0,
+    };
+  });
+  room.onMessage('nightSleep', () => {
+    awake = false;
+    win = undefined;
+    sleptAt = Date.now();
+    sleeperSeen.clear();
+  });
   room.onMessage('noise', () => undefined);
   room.onMessage('roleReveal', (c: RoleRevealPayload) => {
     card = c;
@@ -179,8 +289,64 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
   room.onMessage('killed', () => (dead = true));
   room.onMessage('meetingStart', (m: { bodyOf?: string }) => {
     stats.meetings++;
+    voteRefusals = 0;
+    claimed = false;
     if (m?.bodyOf) reported.add(`body_${m.bodyOf}`);
   });
+
+  const settled = (since: number, now: number) => now - since > SLEEP_SETTLE_MS;
+
+  /** Walk toward a point; true once within reach of it. */
+  const goTo = (me: PlayerLike, to: { x: number; y: number }): boolean => {
+    const { x, y } = me.presence!;
+    const d = Math.hypot(to.x - x, to.y - y);
+    const near = d <= ACT_REACH_PX;
+    const v = near || !walk ? { dx: 0, dy: 0 } : unit(to.x - x, to.y - y, d);
+    room.send('input.move', { seq: ++seq, dx: v.dx, dy: v.dy, sprint: !near, sneak: false });
+    stats.ticksSent++;
+    return near;
+  };
+
+  /** Quick mode, outside meetings: set the plate at dusk, sleep, act in the window (GDD 3.11). */
+  const quickTick = (state: StateLike, me: PlayerLike, now: number): void => {
+    if (dead || !me.presence) return;
+    if (state.phase === Phase.dusk) {
+      const props: PropLike[] = [];
+      state.scenes?.get(BAKERY)?.props?.forEach((p) => props.push(p));
+      const plate = ownPlate(props, room.sessionId);
+      const at = plate ? propPx(plate.id) : undefined;
+      if (!plate || !at) return;
+      if (!goTo(me, at)) {
+        plateAt = 0;
+        return;
+      }
+      // Hold for the plate-setting time, then send; send again (at most twice) after a refusal.
+      plateAt ||= now + onubBalance.timers.plateHoldS * 1000;
+      const again = plateTries < 3 && lastErrorAt > plateSentAt && now - plateSentAt > 800;
+      if (now >= plateAt && (plateTries === 0 || again)) {
+        plateTries++;
+        plateSentAt = now;
+        room.send('act.ability', { abilityId: ONUB_SET_PLATE, targetId: plate.id });
+        stats.acts++;
+      }
+      return;
+    }
+    if (state.phase !== Phase.night || !awake || !win?.plan) return;
+    const plan = win.plan;
+    const spot = standingSpot(plan);
+    if (!spot || !goTo(me, spot)) return;
+    // One act per window; one retry if the server refused it (reach, for instance).
+    const ready = win.sentAt === 0 || (win.tries < 2 && lastErrorAt > win.sentAt && now - win.sentAt > 800);
+    if (!ready || now - win.at < plan.holdS * 1000) return;
+    win.sentAt = now;
+    win.tries++;
+    room.send('act.ability', {
+      abilityId: plan.abilityId,
+      targetId: plan.targetId,
+      ...(plan.targetId2 ? { targetId2: plan.targetId2 } : {}),
+    });
+    stats.acts++;
+  };
 
   const timer = setInterval(() => {
     const state = room.state as unknown as StateLike | undefined;
@@ -192,6 +358,25 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
       // A new match starts from a clean slate.
       dead = false;
       reported.clear();
+      awake = false;
+      win = undefined;
+      plateAt = 0;
+      plateTries = 0;
+      plateSentAt = 0;
+      pendingWakeAt = 0;
+    }
+    const quick = state.settings?.mode === GameMode.onub;
+
+    // A sleeper receives no scene and no presence, and its sceneEnter always comes with a nightWake.
+    if (quick && state.phase === Phase.night && !awake) {
+      if (settled(sleptAt || now - SLEEP_SETTLE_MS * 2, now)) {
+        if (me.presence) leak('presence');
+        if ((state.scenes?.size ?? 0) > 0) leak('scene');
+        state.players.forEach((p, id) => {
+          if (id !== room.sessionId && p.presence) leak('presence');
+        });
+      }
+      if (pendingWakeAt && now - pendingWakeAt > 1500) leak('sceneEnter');
     }
 
     // Meetings: vote as soon as one opens, again if the server has not recorded it.
@@ -200,10 +385,28 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
         lastVoteAt = now;
         const roster: Array<{ id: string; name: string; alive: boolean }> = [];
         state.players.forEach((p) => roster.push({ id: p.id, name: p.name, alive: p.alive }));
-        const targetId = pickVote(behavior.vote ?? 'skip', room.sessionId, state.leaderId, roster, rng);
-        room.send('meeting.vote', { targetId });
-        stats.votes++;
+        // Quick mode has no Skip: a Skip-minded or unknown vote becomes another living seat.
+        const wanted = quick && (behavior.vote ?? 'skip') === 'skip' ? 'other' : (behavior.vote ?? 'skip');
+        let targetId = pickVote(wanted, room.sessionId, state.leaderId, roster, rng);
+        if (quick && targetId === 'skip')
+          targetId = pickVote('other', room.sessionId, state.leaderId, roster, rng);
+        // Refused too often: give the vote up (an abstention is legal in quick mode).
+        if (voteRefusals < MAX_VOTE_REFUSALS && (targetId !== 'skip' || !quick)) {
+          room.send('meeting.vote', { targetId });
+          stats.votes++;
+        }
       }
+      if (quick && behavior.claims && !dead && !claimed && card) {
+        claimed = true;
+        let last: { of: string; roleId: string } | undefined;
+        me.priv?.nightReveal?.forEach((e) => (last = { of: e.of, roleId: e.roleId }));
+        room.send('meeting.claim', claimPayload(card.roleId, last));
+        stats.claims++;
+      }
+      return;
+    }
+    if (quick) {
+      quickTick(state, me, now);
       return;
     }
     if (!me.presence || !isWorld(state.phase)) return;
@@ -371,7 +574,7 @@ function main(): void {
   const code = get('--code');
   if (!code)
     throw new Error(
-      'usage: walk --code ABCDE [--count 6] [--url URL] [--vote skip|leader|random|NAME] [--no-report] [--killer] [--no-walk]',
+      'usage: walk --code ABCDE [--count 6] [--url URL] [--vote skip|leader|random|other|NAME] [--no-report] [--killer] [--no-walk] [--claims]',
     );
   void joinWalkers({
     code,
@@ -381,6 +584,7 @@ function main(): void {
     walk: !argv.includes('--no-walk'),
     report: !argv.includes('--no-report'),
     killer: argv.includes('--killer'),
+    claims: argv.includes('--claims'),
   }).then((swarm) => {
     console.log(`[walk] ${swarm.rooms.length} bots walking; Ctrl+C to stop`);
     process.on('SIGINT', () => void swarm.stop().then(() => process.exit(0)));

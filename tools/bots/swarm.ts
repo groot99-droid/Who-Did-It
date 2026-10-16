@@ -3,7 +3,7 @@
 // what the Playwright match spec and the soak drive (ARCHITECTURE 5.12).
 //
 //   pnpm bots -- --code ABCDE --count 6 [--url http://localhost:2567] [--prefix Bot]
-//        [--vote skip|leader|random|<name>] [--report] [--walk]
+//        [--vote skip|leader|random|other|<name>] [--report] [--walk] [--claims]
 import { Client, type Room } from '@colyseus/sdk';
 import { BUILD_VERSION, type JoinOptions } from '@wdi/shared';
 import { fileURLToPath } from 'node:url';
@@ -20,11 +20,24 @@ export interface SwarmOptions extends BotBehavior {
   seed?: number;
 }
 
+/** The party settings as a bot sees them (`state.settings`), read-only. */
+export interface SwarmSettings {
+  readonly mode: number;
+  readonly npcDifficulty: number;
+  readonly npcSeats: number;
+}
+
 export interface Swarm {
   rooms: Room[];
   bots: Array<ReturnType<typeof startWalker>>;
   /** Resolves once every bot has received its role card. */
   dealt: Promise<void>;
+  /** The party settings read from the first bot's synced state (a snapshot per access). */
+  readonly settings: SwarmSettings;
+  /** Sends `lobby.addNpc` from the first bot; the server accepts it from the party leader only. */
+  addNpc(): void;
+  /** Sends `lobby.removeNpc` from the first bot (the leader only; it drops the newest NPC seat). */
+  removeNpc(): void;
   stop(): Promise<void>;
 }
 
@@ -50,10 +63,17 @@ export async function runSwarm(opts: SwarmOptions): Promise<Swarm> {
     if (opts.ready !== false) room.send('lobby.ready', { ready: true });
     rooms.push(room);
   }
+  const observer = rooms[0];
   return {
     rooms,
     bots,
     dealt: Promise.all(cards).then(() => undefined),
+    get settings(): SwarmSettings {
+      const st = (observer?.state as unknown as { settings?: SwarmSettings } | undefined)?.settings;
+      return { mode: st?.mode ?? 0, npcDifficulty: st?.npcDifficulty ?? 0, npcSeats: st?.npcSeats ?? 0 };
+    },
+    addNpc: () => observer?.send('lobby.addNpc', {}),
+    removeNpc: () => observer?.send('lobby.removeNpc', {}),
     stop: async () => {
       bots.forEach((b) => b.stop());
       await Promise.all(rooms.map((r) => r.leave(true).catch(() => undefined)));
@@ -69,7 +89,7 @@ export function parseArgs(argv: string[]): SwarmOptions {
   const code = get('--code');
   if (!code || !/^[A-Za-z0-9]{5}$/.test(code))
     throw new Error(
-      'usage: --code ABCDE --count 6 [--url URL] [--prefix Bot] [--vote V] [--report] [--walk]',
+      'usage: --code ABCDE --count 6 [--url URL] [--prefix Bot] [--vote V] [--report] [--walk] [--claims]',
     );
   const count = Number(get('--count') ?? 4);
   if (!Number.isInteger(count) || count < 1 || count > 9) throw new Error('--count must be 1 to 9');
@@ -81,6 +101,7 @@ export function parseArgs(argv: string[]): SwarmOptions {
     vote: get('--vote') ?? 'skip',
     report: argv.includes('--report'),
     walk: argv.includes('--walk'),
+    claims: argv.includes('--claims'),
   };
 }
 
