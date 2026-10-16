@@ -1,0 +1,176 @@
+{
+ "anims": [
+  {
+   "key": "vfx_blood_pool",
+   "frames": [
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_pool/000"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_pool/001"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_pool/002"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_pool/003"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_pool/004"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_pool/005"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_pool/006"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_pool/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "vfx_blood_splat",
+   "frames": [
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_splat/000"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_splat/001"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_splat/002"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_splat/003"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_splat/004"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_splat/005"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_splat/006"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_splat/007"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_splat/008"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_splat/009"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_splat/010"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_blood_splat/011"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "vfx_dust_step",
+   "frames": [
+    {
+     "key": "vfx",
+     "frame": "vfx_dust_step/000"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_dust_step/001"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_dust_step/002"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_dust_step/003"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_dust_step/004"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_dust_step/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "vfx_vote_stamp",
+   "frames": [
+    {
+     "key": "vfx",
+     "frame": "vfx_vote_stamp/000"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_vote_stamp/001"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_vote_stamp/002"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_vote_stamp/003"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_vote_stamp/004"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_vote_stamp/005"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_vote_stamp/006"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_vote_stamp/007"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_vote_stamp/008"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_vote_stamp/009"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  }
+ ]
+}

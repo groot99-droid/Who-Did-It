@@ -176,6 +176,14 @@ as flat palette shapes with a direction arrow and a text label, so playtests run
 | `clue_fur`, `clue_claw` (wolf kill) | 2 |
 | `clue_drag` (drag smear segment) | 1 |
 
+Real clue art (M3, `tools/blender/build_props.py`) keeps these 21 keys in the same `clues` texture, one
+64 px cell per key at the world scale of 64 px per metre. Ground marks (footprints, smear, print, fur,
+claw, drag) are rendered by the straight-down `TileCam`, like the ground tiles; the wet bucket, the
+thread and the felt are small objects rendered by the tilted `SpriteCam`. Frames stay centred (no
+pivot). Footprints and the drag segment point screen-up (`n`): rotate the sprite by `Clue.dir`; the
+drag segment fills the cell top to bottom so segments chain along a trail. A footprint frame is one
+left-right pair; the client lays the 5-tile trail (GDD 3.4) from several of them.
+
 **Building exteriors** (single images, rendered with the roof, tilted camera). One per Small-profile
 building of `WORLD.md` 4.3; the id is the stem of its frozen overworld portal id (`ov.<id>`):
 
@@ -191,6 +199,36 @@ grammar in M6.
 
 **Ground tilesets** (straight-down camera, 64 px cells, 4 variants in a row, 256 x 64 px each):
 `tiles_grass`, `tiles_path`, `tiles_cobble`, `tiles_floorboards`, `tiles_caverock`, `tiles_forestfloor`.
+
+**Props** (texture `props`, `props/props.json`, real art only; M3). One frame per key, rendered by the
+tilted `SpriteCam` at 64 px per metre. The key is `prop_<kind>` with the `kind` of
+`packages/content/data/scenes/overworld.json` `props[]`; a stateful prop adds its state. Every frame
+carries a `pivot` at the base (the ground point under the prop's tile centre), so the sprite is placed
+at the tile centre and y-sorted by that point, like a character's feet.
+
+| Key | `kind` | Prop |
+|---|---|---|
+| `prop_bell` | `bell` | Meeting bell on a timber frame (`ov.bell`) |
+| `prop_pump` | `pump` | Well pump on a stone well head (`ov.pump`) |
+| `prop_noticeBoard` | `noticeBoard` | Notice board with pinned papers (`ov.board`) |
+| `prop_kitChest` | `kitChest` | Iron-banded chest for ejected kits (`ov.chest`) |
+| `prop_lanternPost_lit`, `prop_lanternPost_unlit` | `lanternPost` | Lantern post, glass lit (`lantern`) or dark (`ov.lantern_0..3`) |
+
+**VFX** (texture `vfx`, `vfx/vfx.json`; anims `anims_vfx`, `vfx/vfx.anims.json`; real art only; M3).
+Frame names are the anim key plus `/` and the three-digit frame number (`vfx_blood_pool/003`); every
+anim plays at 12 fps once (`repeat: 0`) and Phaser holds its last frame. Every frame carries a
+`pivot`: the ground point of the effect, or the centre for the stamp.
+
+| Anim key | Frames | Camera, cell | Notes |
+|---|---|---|---|
+| `vfx_blood_pool` | 8 | `TileCam`, 128 px | Pool spreading under a body; the last frame is the resting pool |
+| `vfx_blood_splat` | 12 | `SpriteCam`, 128 px | Spray from chest height to specks on the ground, at the kill |
+| `vfx_vote_stamp` | 10 | straight down, 256 px | Stamp slams down and lifts, leaving the `blood` seal (UI, reveal) |
+| `vfx_dust_step` | 6 | `SpriteCam`, 64 px | Puff at a boot; ends empty |
+
+**Body.** The body on the floor is the last frame of `die` (`char/<body>/die/<dir>/007`, with the
+`scarf`, hat and `blood` overlays on the same tail), held by the one-shot anim; no separate key.
+Review sheet: `assets/source/review/villager-body-contact.png`.
 
 ## 9. UI icons
 

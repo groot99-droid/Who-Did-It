@@ -10,6 +10,9 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 | `build_rig.py` | Builds the rig: `SpriteCam` (ortho, X 40°, Z 0°, 64 px/m), `TileCam` (straight down, one 64 px tile per metre), turntable `TT`, camera-parented key sun and area fill, slate world at 0.15, the `WDI_Toon` node group, `OutlineInk`, the `Outline` Solidify preset, a 1 m checker cube with a facing marker, a 4 m grid plane with 1 m lines, a hidden 1.7 m `FallenProxy` for the `die` cell check, a `Feet` empty, EEVEE settings |
 | `batch_render.py` | `--smoke` calibration sheet (8 cube views, the ground tile, one 256 px `die` frame), or character passes with the per-frame `Feet` manifest |
 | `build_villager.py` | Builds the V1 `villager` body from code: a 1,388-triangle block-out of chamfered boxes, 3 heads tall, with the overlay parts, an 8-bone armature and the four V1 actions; writes the `.blend` (and optionally the source GLB) to `assets/external/villager/`, never into git |
+| `static_common.py` | Shared helpers for the static sheets: the rig with calibration hidden, `SpriteCam` / `TileCam` framing, palette materials, shape helpers, and the per-atlas `manifest.json` (`file`, `cell`, `pivot`) |
+| `build_props.py` | Models the square props (`prop_*`) and the 21 clue keys from code and renders them (`docs/SPRITES.md` 8) |
+| `build_vfx.py` | Animates the four M3 VFX frame by frame at 12 fps (`vfx_blood_pool`, `vfx_blood_splat`, `vfx_vote_stamp`, `vfx_dust_step`) |
 | `palettize.py` | Snaps materials to the palette; fails on untextured PBR |
 | `tests/test_rig_common.py` | Unit tests (`pnpm --filter @wdi/blender test`, no Blender needed) |
 | `tests/make_dummy_char.py` | Builds a capsule character that follows the contract below, for pipeline tests |
@@ -36,6 +39,17 @@ blender -b --factory-startup -P tools/blender/batch_render.py -- \
 for d in n,ne e,se s,sw w,nw; do
   python tools/blender/batch_render.py -- --char assets/external/villager/villager.blend --out build/render --dirs $d &
 done; wait
+
+# Props, clues and VFX (minutes on llvmpipe), then pack them (tools/sprites)
+python tools/blender/build_props.py -- --out build/render   # build/render/{props,clues}/
+python tools/blender/build_vfx.py -- --out build/render     # build/render/vfx/
+for a in clues props vfx; do
+  pnpm --filter @wdi/sprites pack:static ../../build/render/$a ../../apps/client/public/assets/$a
+done
+
+# The body review sheet from a die render (all passes)
+python tools/blender/batch_render.py -- --char assets/external/villager/villager.blend --out build/render --anims die
+pnpm --filter @wdi/sprites contact:body ../../build/render/villager ../../assets/source/review/villager-body-contact.png
 
 # Palettize a character file in place
 blender -b villager.blend -P tools/blender/palettize.py -- --save

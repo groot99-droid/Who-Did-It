@@ -24,9 +24,28 @@
     {
       "key": "clues",
       "type": "multiatlas",
-      "url": "placeholder/clues/clues.json",
-      "path": "placeholder/clues/",
+      "url": "clues/clues.json",
+      "path": "clues/",
       "filter": "linear"
+    },
+    {
+      "key": "props",
+      "type": "multiatlas",
+      "url": "props/props.json",
+      "path": "props/",
+      "filter": "linear"
+    },
+    {
+      "key": "vfx",
+      "type": "multiatlas",
+      "url": "vfx/vfx.json",
+      "path": "vfx/",
+      "filter": "linear"
+    },
+    {
+      "key": "anims_vfx",
+      "type": "animation",
+      "url": "vfx/vfx.anims.json"
     },
     {
       "key": "bld_tavern_ext",
