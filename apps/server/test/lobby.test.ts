@@ -16,7 +16,7 @@ import {
   type RoleRevealPayload,
 } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { buildRoleReveal, rosterFor, startRefusal } from '../src/rooms/handlers/lobby';
+import { buildRoleReveal, startRefusal } from '../src/rooms/handlers/lobby';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { createServer } from '../src/server';
 
@@ -87,7 +87,7 @@ describe('Start (leader only, consumed inside the step)', () => {
       expect(card.traits.hat).toBe(TRAIT_IDS.hat[own.traits.hat]);
       dealt.push(card.roleId);
     }
-    expect([...dealt].sort()).toEqual([...rosterFor(6)['6']!.deal].sort());
+    expect([...dealt].sort()).toEqual([...roles.rosters['6'].deal].sort());
     expect(received(bots[1] as Bot, S2C.phaseChange)).toContainEqual({
       phase: Phase.roleReveal,
       endsTick: room.state.phaseEndsTick,
@@ -113,12 +113,16 @@ describe('Start (leader only, consumed inside the step)', () => {
     for (const bot of bots) expect(received(bot, S2C.roleReveal)).toHaveLength(0);
   });
 
-  it('starts with a single human using the first roles of the 4-player row', async () => {
+  it('starts with a single human: three NPC seats fill the party and the 4-player row is dealt', async () => {
     const { bots, room } = await party(1);
     bots[0]?.room.send(C2S.lobbyStart, {});
     await sleep(300);
     expect(room.state.phase).toBe(Phase.roleReveal);
-    expect(received<RoleRevealPayload>(bots[0] as Bot, S2C.roleReveal)[0]?.roleId).toBe('killer');
+    expect(room.state.players.size).toBe(balance.players.min);
+    expect(room.state.settings.npcSeats).toBe(balance.players.min - 1);
+    const dealt = [...room.state.players.values()].map((p) => p.priv.role.roleId).sort();
+    expect(dealt).toEqual([...roles.rosters['4'].deal].sort());
+    expect(received<RoleRevealPayload>(bots[0] as Bot, S2C.roleReveal)).toHaveLength(1);
   });
 
   it('is impossible with no human connected', async () => {
@@ -278,7 +282,7 @@ describe('privacy after Start', () => {
     const sums = { killer: [0, 0, 0, 0], other: [0, 0, 0, 0] };
     for (let seed = 1; seed <= 2000; seed++) {
       const rng = mulberry32(seed);
-      const dealt = assignRoles(ids, { mode: 0 }, rng, rosterFor(6));
+      const dealt = assignRoles(ids, { mode: 0 }, rng, roles.rosters);
       const looks = dealTraits(ids, rng);
       for (const id of ids) {
         const look = looks.get(id)!;

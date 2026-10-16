@@ -1,5 +1,6 @@
 import type { PartyRoom } from '../PartyRoom';
 import { flowOf } from '../../sim/Flow';
+import { pushNpcDebug } from '../../sim/Npc';
 
 /**
  * Registered only when WDI_DEBUG=1 and never in production (ARCHITECTURE 5.11). A CI test asserts that
@@ -14,6 +15,8 @@ export function registerDebugHandlers(room: PartyRoom): void {
   room.onMessage('debug.deal', (client, payload) => {
     flowOf(room).debug.push({ sessionId: client.sessionId, type: 'deal', payload });
   });
+  // `debug.npc {walk: false}` parks every NPC; it only queues, `runNpcs` applies it (sim/Npc.ts).
+  room.onMessage('debug.npc', (_client, payload) => pushNpcDebug(room, payload));
   room.onMessage('debug.clock', (client, payload) => {
     flowOf(room).debug.push({ sessionId: client.sessionId, type: 'clock', payload });
   });
