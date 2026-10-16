@@ -1323,3 +1323,21 @@ goes in the PR description. Not in scope: code.
   `bedroll-<id>`, `night-wake`, `claim-<roleId>`, `swaplog`, `gameover-final-<id>`; `vote-skip` is
   absent in quick mode.
 - Reserved DECISIONS rows: R A40, S A41, T A42, U A43, V A44, W A45, X A46, Y A47.
+
+### Round 4 log: V (lobby, settings, network edge)
+
+Branch `claude/m3c-lobby`. What landed: `LobbySnapshot.settings` kept in sync from `state.settings`
+(`listen('settings')` plus `onChange`), `setMode`, `setNpcDifficulty`, `addNpc`, `removeNpc` on both
+`NetworkService` implementations; the lobby settings block with the frozen hooks `mode-chip`,
+`mode-toggle`, `add-npc`, `remove-npc`, `npc-difficulty` (`ui/Lobby.ts`, `scenes/Lobby.ts`); the mock
+handles the four messages (`MockNetwork(mode)` starts in quick mode with `?mode=onub`, NPC names from
+`MOCK_NPC_NAMES`); `ui/copy/lobby.ts` carries every literal of `Landing.ts` and `Lobby.ts`; the HUD
+anchors carry the safe area and the `hud.css` override block is deleted; DECISIONS A44; UI.md 6.
+Tests: `net/mock.test.ts`, `ui/Lobby.test.ts`, two cases in `NetworkService.test.ts`, a mock e2e case
+in `party.spec.ts` (toggle, add, remove).
+
+For the orchestrator: the copy ids are mine until Y's UI.md 14.13 lands (`lobby.mode.*`, `lobby.npc.*`
+and `lobby.hint.fill`); rename them in `ui/copy/lobby.ts` then. The e2e needs `pnpm --filter
+@wdi/content build` first on a fresh checkout. Not done: the real-server path of the settings
+messages is untested end to end until S lands (the unit test covers the messages sent and the state
+read); `npc-difficulty` shows the default level until the server publishes `npcDifficulty`.

@@ -143,6 +143,14 @@ strikes the name and shows the ghost glyph in the seat. The same row serves the 
 with meta "fits 1/1 known traits, claimed 0, last house: Apothecary". The seat is a paper
 circle with an initial, never a role tint.
 
+**Lobby settings** (`data-testid="lobby-settings"`, between the code row and the roster). The mode
+chip (`mode-chip`) reads "Who Did It" or "One Night Ultimate Baguette, {min}-{max} min, {players}"
+(length from `balance.onub.json`, counts from `balance.json`); the leader sees the toggle
+(`mode-toggle`), "Add NPC" (`add-npc`, hidden when the party is full), "Remove NPC" (`remove-npc`,
+hidden with no NPC seats) and the difficulty select (`npc-difficulty`, disabled below
+`npc.difficultyMinNpcs` NPC seats, with a hint line). Others see the chip only. No seat is ever marked
+as an NPC; Remove drops the most recently added one.
+
 **Dialogs** (`.wdi-scrim`, `.wdi-dialog`). Ink at 72% over the screen, a slate panel at most
 400 px wide, title in display-md, body muted, actions in a row with the primary first and
 widest. Escape and the ghost button close.

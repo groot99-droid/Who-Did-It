@@ -2,7 +2,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const hoisted = vi.hoisted(() => {
   const store = new Map<string, string>();
-  return { store, failConnect: { value: false }, lastRoom: { current: null as FakeRoom | null } };
+  return {
+    store,
+    failConnect: { value: false },
+    lastRoom: { current: null as FakeRoom | null },
+    listeners: new Map<string, (value: unknown) => void>(),
+    changes: [] as Array<() => void>,
+  };
 });
 
 interface FakeRoom {
@@ -48,7 +54,20 @@ vi.mock('@colyseus/sdk', () => {
   const noop = () => () => undefined;
   return {
     Client,
-    Callbacks: { get: () => ({ onAdd: noop, onRemove: noop, onChange: noop, listen: noop }) },
+    Callbacks: {
+      get: () => ({
+        onAdd: noop,
+        onRemove: noop,
+        onChange: (_instance: object, handler: () => void) => {
+          hoisted.changes.push(handler);
+          return () => undefined;
+        },
+        listen: (prop: string, handler: (value: unknown) => void) => {
+          hoisted.listeners.set(prop, handler);
+          return () => undefined;
+        },
+      }),
+    },
   };
 });
 
@@ -59,6 +78,8 @@ import { reconnectTokens } from './storage';
 beforeEach(() => {
   hoisted.store.clear();
   hoisted.failConnect.value = false;
+  hoisted.listeners.clear();
+  hoisted.changes.length = 0;
   vi.stubGlobal('localStorage', {
     getItem: (k: string) => hoisted.store.get(k) ?? null,
     setItem: (k: string, v: string) => void hoisted.store.set(k, v),
@@ -144,5 +165,31 @@ describe('ColyseusNetwork', () => {
     const handler = room?.onMessage.mock.calls.find((c) => c[0] === 'gameOver')?.[1] as (p: unknown) => void;
     handler({ winner: 0, roles: {}, summary: '' });
     expect(reconnectTokens.get('ABCDE')).toBeNull();
+  });
+
+  it('keeps the lobby settings in sync with state.settings', async () => {
+    const net = new ColyseusNetwork();
+    await net.create('Ada');
+    expect(net.snapshot?.settings).toEqual({ mode: 'main', npcDifficulty: 'normal', npcSeats: 0 });
+
+    const settings = { mode: 0, npcDifficulty: 1, npcSeats: 0 };
+    hoisted.listeners.get('settings')?.(settings);
+    Object.assign(settings, { mode: 1, npcDifficulty: 2, npcSeats: 3 });
+    for (const change of hoisted.changes) change();
+    expect(net.snapshot?.settings).toEqual({ mode: 'onub', npcDifficulty: 'hard', npcSeats: 3 });
+  });
+
+  it('sends the settings and NPC messages without naming a seat', async () => {
+    const net = new ColyseusNetwork();
+    await net.create('Ada');
+    const send = hoisted.lastRoom.current?.send;
+    net.setMode('onub');
+    net.setNpcDifficulty('easy');
+    net.addNpc();
+    net.removeNpc();
+    expect(send).toHaveBeenNthCalledWith(1, 'lobby.settings', { mode: 1 });
+    expect(send).toHaveBeenNthCalledWith(2, 'lobby.settings', { npcDifficulty: 0 });
+    expect(send).toHaveBeenNthCalledWith(3, 'lobby.addNpc', {});
+    expect(send).toHaveBeenNthCalledWith(4, 'lobby.removeNpc', {});
   });
 });

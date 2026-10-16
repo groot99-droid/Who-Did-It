@@ -1,8 +1,10 @@
+import balanceJson from '@wdi/content/data/balance.json';
 import mitt, { type Emitter } from 'mitt';
-import { MOCK_BOTS, MOCK_ROLE_REVEAL } from './fixtures';
+import { MOCK_BOTS, MOCK_NPC_NAMES, MOCK_ROLE_REVEAL } from './fixtures';
 import type { MeetingFeed } from './meeting';
 import { MockMeetingFeed, type MockMeetingRequest } from './mock/meetingMock';
 import {
+  defaultSettings,
   JoinError,
   type LobbySnapshot,
   type NetEvents,
@@ -13,8 +15,10 @@ import type { WorldFeed } from './world';
 import {
   type ClientMessages,
   type ClientMessageType,
+  type GameModeId,
   type LobbyPlayer,
   MAX_PLAYERS,
+  type NpcLevelId,
   type RoleRevealPayload,
 } from './protocol';
 
@@ -43,6 +47,11 @@ export class MockNetwork implements NetworkService {
   private world: WorldFeed | null = null;
   private publishMeeting: ((feed: MeetingFeed) => void) | null = null;
   private meeting: MockMeetingFeed | null = null;
+  /** Ids of the NPC seats the leader added, oldest first; `removeNpc` drops the last (like the server). */
+  private npcs: string[] = [];
+
+  /** `?mode=onub` starts the mock lobby in quick mode, so the mocks of both modes agree. */
+  constructor(private readonly initialMode: GameModeId = 'main') {}
 
   /** There is no room behind ?mock=1; the router feeds the screens from the mock feeds instead. */
   get room(): Room | null {
@@ -102,6 +111,50 @@ export class MockNetwork implements NetworkService {
     }
   }
 
+  setMode(mode: GameModeId): void {
+    this.patch((room) => (room.leaderId === room.selfId ? { settings: { ...room.settings, mode } } : {}));
+  }
+
+  setNpcDifficulty(npcDifficulty: NpcLevelId): void {
+    this.patch((room) =>
+      room.leaderId === room.selfId && room.settings.npcSeats >= balanceJson.npc.difficultyMinNpcs
+        ? { settings: { ...room.settings, npcDifficulty } }
+        : {},
+    );
+  }
+
+  addNpc(): void {
+    this.patch((room) => {
+      if (room.leaderId !== room.selfId || room.players.length >= MAX_PLAYERS) return {};
+      const name =
+        MOCK_NPC_NAMES.find((n) => !room.players.some((p) => p.name === n)) ?? `NPC${this.npcs.length}`;
+      const id = `mock-npc-${this.npcs.length}-${name}`;
+      this.npcs.push(id);
+      return {
+        players: [...room.players, { id, name, ready: true, connected: true }],
+        settings: { ...room.settings, npcSeats: this.npcs.length },
+      };
+    });
+  }
+
+  removeNpc(): void {
+    this.patch((room) => {
+      const id = this.npcs.pop();
+      if (room.leaderId !== room.selfId || id === undefined) return {};
+      return {
+        players: room.players.filter((p) => p.id !== id),
+        settings: { ...room.settings, npcSeats: this.npcs.length },
+      };
+    });
+  }
+
+  private patch(change: (room: LobbySnapshot) => Partial<LobbySnapshot>): void {
+    const room = this.lobby;
+    if (room === null || this.card !== null) return;
+    this.lobby = { ...room, ...change(room) };
+    this.bus.emit('lobby', this.lobby);
+  }
+
   /** The router hands over the published mock world feed and a way to publish the meeting feed. */
   bindWorld(world: WorldFeed, publishMeeting: (feed: MeetingFeed) => void): void {
     this.world = world;
@@ -159,7 +212,17 @@ export class MockNetwork implements NetworkService {
 
   private open(code: string, leaderId: string, players: LobbyPlayer[]): void {
     this.close();
-    this.lobby = { code, selfId: 'mock-me', leaderId, players };
+    this.npcs = [];
+    this.lobby = {
+      code,
+      selfId: 'mock-me',
+      leaderId,
+      players,
+      settings: {
+        ...defaultSettings(balanceJson.npc.defaultDifficulty as NpcLevelId),
+        mode: this.initialMode,
+      },
+    };
   }
 
   private addBots(bots: LobbyPlayer[]): void {
@@ -184,6 +247,7 @@ export class MockNetwork implements NetworkService {
     for (const t of this.timers) window.clearTimeout(t);
     this.timers = [];
     this.lobby = null;
+    this.npcs = [];
     this.card = null;
     this.meeting?.dispose();
     this.meeting = null;
