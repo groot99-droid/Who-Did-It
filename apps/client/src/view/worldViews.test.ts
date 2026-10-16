@@ -34,8 +34,8 @@ describe('parseAudioManifest', () => {
 
 describe('Notebook text and HUD time', () => {
   it('names the clue and the trait value', () => {
-    expect(entryText({ clueKind: 0, value: 2 })).toBe('Footprints: Tall');
-    expect(entryText({ clueKind: 1, value: 0 })).toBe('Thread: Red scarf');
+    expect(entryText({ clueKind: 0, value: 2 })).toBe('Footprints, long stride: Tall');
+    expect(entryText({ clueKind: 1, value: 0 })).toBe('Thread, red wool: Red scarf');
   });
   it('formats m:ss from ticks', () => {
     expect(formatTimer(null)).toBe('--:--');

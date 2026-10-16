@@ -1,3 +1,4 @@
+import { WORLD_COPY as C } from '../ui/copy';
 import { h } from '../ui/dom';
 import '../view/hud.css';
 import type { InputSource } from './InputController';
@@ -49,10 +50,10 @@ export class TouchControls implements InputSource {
       b.addEventListener('pointerup', up);
       b.addEventListener('pointercancel', up);
     };
-    this.useBtn = disc('E', 'use', { class: 'wdi-touch-btn--primary', 'data-testid': 'touch-use' });
-    this.actBtn = disc('Q', 'act', { 'data-testid': 'touch-act' });
-    const run = disc('Run', 'hold');
-    const sneak = disc('Shift', 'sneak');
+    this.useBtn = disc('E', C['touch.use'], { class: 'wdi-touch-btn--primary', 'data-testid': 'touch-use' });
+    this.actBtn = disc('Q', C['touch.act'], { 'data-testid': 'touch-act' });
+    const run = disc('Run', C['touch.run']);
+    const sneak = disc('Shift', C['touch.sneak']);
     press(this.useBtn, handlers.onUse);
     press(this.actBtn, (on) => on && handlers.onAct());
     press(run, (on) => (this.run = on));

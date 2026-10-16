@@ -52,7 +52,9 @@ export class InputController {
     this.bindings.clear();
   }
 
+  /** Idempotent: the World scene calls it on every start, the router's `stop()` ends it between screens. */
   start(): void {
+    if (this.timer !== null) return;
     window.addEventListener('keydown', this.keydown);
     window.addEventListener('keyup', this.keyup);
     window.addEventListener('blur', this.release);
