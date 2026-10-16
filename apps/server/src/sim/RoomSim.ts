@@ -1,4 +1,5 @@
 import type { Profile } from '@wdi/content';
+import type { MeetingReason } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { POSITION_RING_TICKS } from './constants';
 
@@ -121,9 +122,9 @@ export interface PortalRequest {
   portalId: string;
 }
 
-/** Pushed by report and bell (sim/Actions), drained by the phase stage (sim/Phases). */
+/** Pushed by report and bell (sim/Actions), drained by the phase stage (sim/Phases); quick mode opens `dawn`. */
 export interface MeetingRequest {
-  reason: 'body' | 'bell' | 'missing';
+  reason: MeetingReason;
   callerId: string;
   bodyOf?: string;
 }

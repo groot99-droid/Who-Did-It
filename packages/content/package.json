@@ -16,6 +16,11 @@
       "types": "./src/nav.ts",
       "development": "./src/nav.ts",
       "default": "./dist/src/nav.js"
+    },
+    "./server": {
+      "types": "./src/server.ts",
+      "development": "./src/server.ts",
+      "default": "./dist/src/server.js"
     }
   },
   "files": [

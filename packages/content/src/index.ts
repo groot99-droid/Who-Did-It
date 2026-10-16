@@ -13,7 +13,6 @@ import tasksJson from '../data/tasks.json' with { type: 'json' };
 import balanceJson from '../data/balance.json' with { type: 'json' };
 import onubRolesJson from '../data/roles.onub.json' with { type: 'json' };
 import onubBalanceJson from '../data/balance.onub.json' with { type: 'json' };
-import namesJson from '../data/names.json' with { type: 'json' };
 import overworldJson from '../data/scenes/overworld.json' with { type: 'json' };
 import tavernBarJson from '../data/scenes/tavern_bar.json' with { type: 'json' };
 import tavernBackJson from '../data/scenes/tavern_back.json' with { type: 'json' };
@@ -35,7 +34,6 @@ import { BalanceFile, type BalanceRow, type Profile } from './schemas/balance.js
 import { CluesFile } from './schemas/clues.js';
 import { ItemsFile } from './schemas/items.js';
 import { MetricsFile } from './schemas/metrics.js';
-import { NamesFile } from './schemas/names.js';
 import { OnubBalanceFile, type OnubCountRow } from './schemas/onubBalance.js';
 import { OnubRolesFile } from './schemas/onubRoles.js';
 import { PaletteFile } from './schemas/palette.js';
@@ -60,7 +58,6 @@ export * from './schemas/balance.js';
 export * from './schemas/scene.js';
 export * from './schemas/onubRoles.js';
 export * from './schemas/onubBalance.js';
-export * from './schemas/names.js';
 export { validateContent, type Content } from './validate.js';
 export { navs, NavFile } from './nav.js';
 
@@ -102,7 +99,6 @@ export function parseContent(raw: {
   balance: unknown;
   onubRoles: unknown;
   onubBalance: unknown;
-  names: unknown;
 }): Omit<Content, 'scenes'> {
   return {
     palette: PaletteFile.parse(raw.palette),
@@ -117,7 +113,6 @@ export function parseContent(raw: {
     balance: BalanceFile.parse(raw.balance),
     onubRoles: OnubRolesFile.parse(raw.onubRoles),
     onubBalance: OnubBalanceFile.parse(raw.onubBalance),
-    names: NamesFile.parse(raw.names),
   };
 }
 
@@ -135,7 +130,6 @@ export const content: Content = {
     balance: balanceJson,
     onubRoles: onubRolesJson,
     onubBalance: onubBalanceJson,
-    names: namesJson,
   }),
   scenes: parseScenes(),
 };
@@ -155,7 +149,6 @@ export const {
   scenes,
   onubRoles,
   onubBalance,
-  names,
 } = content;
 
 function countKey(playerCount: number): `${4 | 5 | 6 | 7 | 8 | 9 | 10}` {

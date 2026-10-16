@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { Boot } from './scenes/Boot';
 import { Landing } from './scenes/Landing';
 import { Lobby } from './scenes/Lobby';
+import { Loft } from './scenes/Loft';
 import { Preload } from './scenes/Preload';
 import { GameOver } from './scenes/GameOver';
 import { Meeting } from './scenes/Meeting';
@@ -22,5 +23,5 @@ new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Boot, Preload, Landing, Lobby, RoleReveal, World, Meeting, GameOver],
+  scene: [Boot, Preload, Landing, Lobby, RoleReveal, World, Loft, Meeting, GameOver],
 });

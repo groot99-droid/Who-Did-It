@@ -31,6 +31,22 @@ export function handleOnubAbility(
   reject(room, sessionId, ErrorCode.cannot, 'cannot do that');
 }
 
+/** The `bk.plate_<slot>` prop of a seat (its index in the deal order, A39), or null outside quick mode. Round 4: R. */
+export function plateOf(_room: PartyRoom, _seatId: string): string | null {
+  return null;
+}
+
+/**
+ * For an NPC seat awake in the bakery: the act it means to make and its targets, chosen by the Conductor at
+ * the window's start, so the NPC brain (S) can walk there and send it; null otherwise. Round 4: R.
+ */
+export function onubNpcPlan(
+  _room: PartyRoom,
+  _seatId: string,
+): { abilityId: string; targetId: string; targetId2?: string } | null {
+  return null;
+}
+
 /** Clears the quick-mode room memory at the lobby reset (`resetToLobby`). Round 4: Session R. */
 export function resetOnubForLobby(_room: PartyRoom): void {}
 

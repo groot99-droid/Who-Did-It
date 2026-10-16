@@ -27,7 +27,7 @@
 | `lobby.ready` | `{ ready: boolean }` | 2/s | Lobby: the Ready tick. Role card: dismisses the card; the match begins when all are ready or 12 s pass. |
 | `lobby.settings` | `{ mode?: number; npcDifficulty?: number }` | 2/s | Leader only, phase lobby: `mode` is a `GameMode`, `npcDifficulty` an `NpcLevel` (A39). Refused 422 / 425. |
 | `lobby.addNpc` | `Record<string, never>` | 2/s | Leader only, phase lobby: one NPC seat up to `players.max` (GDD 3.12). |
-| `lobby.removeNpc` | `{ playerId?: string }` | 2/s | Leader only, phase lobby: removes that NPC seat, or the most recently added one when `playerId` is absent; a human seat is refused 422. |
+| `lobby.removeNpc` | `Record<string, never>` | 2/s | Leader only, phase lobby: removes the most recently added NPC seat; none left is 422. No id, so it never tells a seat apart (A39). |
 | `meeting.claim` | `{ roleId: string; targetId?: string; sawRoleId?: string }` | 2/s | Quick mode, a living player in a meeting phase: replaces the seat's claim (GDD 3.11). |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
@@ -43,7 +43,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `chat.msg` | `{ from: string; text: string; channel: ChatChannel }` | Private: routed per recipient; `from` is a player id. |
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
-| `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string; outs?: string[]; roles?: Record<string, string>; }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). Quick mode: `outs` and their final roles (3.11). |
+| `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string; outs?: string[]; roles?: Record<string, string>; abstained?: string[]; }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). Quick mode: `outs`, their final roles and the seats that did not vote (3.11). |
 | `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; onub?: OnubGameOver }` | `roles` are the final roles; `onub` is present in quick mode only (A39). |
 | `noise` | `{ sceneId: string; x: number; y: number; kind: string }` | - |
 | `error` | `{ code: ErrorCode; msg: string }` | - |
@@ -142,6 +142,8 @@ export interface OnubGameOver {
   votes: Record<string, string>;
   /** Seats turned out, ties included. */
   outs: string[];
+  /** Plate prop id (`bk.plate_<slot>`) -> its owner's seat id, to name the swap log's plates. */
+  plates: Record<string, string>;
   /** The `balance.onub.json` winners row that applied. */
   rowId: string;
   /** The seats that won. */

@@ -166,10 +166,14 @@ export const BalanceFile = z.strictObject({
       normal: NpcDifficultyRow,
       hard: NpcDifficultyRow,
     }),
-    /** An NPC picks a new heading every `stepMinS..stepMaxS` and takes a portal in reach with `portalChance` (GDD 3.12). */
+    /**
+     * An NPC picks a new heading every `stepMinS..stepMaxS`, heads for the nearest portal with
+     * `portalSteerChance` at each new heading, and takes a portal in reach with `portalChance` (GDD 3.12).
+     */
     wander: z.strictObject({
       stepMinS: Seconds,
       stepMaxS: Seconds,
+      portalSteerChance: z.number().min(0).max(1),
       portalChance: z.number().min(0).max(1),
     }),
     /** An NPC casts its vote `delayMinS..delayMaxS` after the discussion opens (GDD 3.12). */

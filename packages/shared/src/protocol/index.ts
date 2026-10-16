@@ -75,7 +75,7 @@ export interface TraitIds {
   hat: HatId;
 }
 
-/** Quick mode: one token a night act showed; `of` is empty for a dead loaf or the ledger (A39). */
+/** Quick mode: one token a night act showed; `of` is the plate's owner, or the named Poisoner for a ledger entry, or empty for a dead loaf (A39). */
 export interface NightRevealEntry {
   slot: string;
   of: string;
@@ -104,6 +104,8 @@ export interface OnubGameOver {
   votes: Record<string, string>;
   /** Seats turned out, ties included. */
   outs: string[];
+  /** Plate prop id (`bk.plate_<slot>`) -> its owner's seat id, to name the swap log's plates. */
+  plates: Record<string, string>;
   /** The `balance.onub.json` winners row that applied. */
   rowId: string;
   /** The seats that won. */
@@ -181,8 +183,8 @@ export interface C2SPayloads {
   'lobby.settings': { mode?: number; npcDifficulty?: number };
   /** Leader only, phase lobby: one NPC seat up to `players.max` (GDD 3.12). */
   'lobby.addNpc': Record<string, never>;
-  /** Leader only, phase lobby: removes that NPC seat, or the most recently added one when `playerId` is absent; a human seat is refused 422. */
-  'lobby.removeNpc': { playerId?: string };
+  /** Leader only, phase lobby: removes the most recently added NPC seat; none left is 422. No id, so it never tells a seat apart (A39). */
+  'lobby.removeNpc': Record<string, never>;
   /** Quick mode, a living player in a meeting phase: replaces the seat's claim (GDD 3.11). */
   'meeting.claim': { roleId: string; targetId?: string; sawRoleId?: string };
 }
@@ -200,13 +202,14 @@ export interface S2CPayloads {
   'chat.msg': { from: string; text: string; channel: ChatChannel };
   phaseChange: { phase: number; endsTick: number };
   meetingStart: { reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] };
-  /** `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). Quick mode: `outs` and their final roles (3.11). */
+  /** `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). Quick mode: `outs`, their final roles and the seats that did not vote (3.11). */
   voteResult: {
     tally: Record<string, number>;
     ejectedId?: string;
     role?: string;
     outs?: string[];
     roles?: Record<string, string>;
+    abstained?: string[];
   };
   /** `roles` are the final roles; `onub` is present in quick mode only (A39). */
   gameOver: { winner: number; roles: Record<string, string>; summary: string; onub?: OnubGameOver };

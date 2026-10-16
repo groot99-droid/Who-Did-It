@@ -10,6 +10,11 @@ export const AUDIO_KEYS = [
   'scream',
   'bell',
   'ambient',
+  // Round 4 (A39): the reveal stamp and the quick-mode loft; silent until audio/manifest.json lists them.
+  'stamp',
+  'storm',
+  'creak',
+  'loaf_crack',
 ] as const;
 export type AudioKey = (typeof AUDIO_KEYS)[number];
 

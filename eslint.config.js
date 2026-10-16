@@ -12,4 +12,14 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     },
   },
+  {
+    // The NPC name pool is server-only: a client holding it could tell an NPC seat by its name (A39).
+    files: ['apps/client/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { paths: [{ name: '@wdi/content/server', message: 'Server-only content (A39).' }] },
+      ],
+    },
+  },
 );

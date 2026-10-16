@@ -63,6 +63,12 @@ export const OnubBalanceFile = z.strictObject({
   gddRef: GddRef,
   /** Loaves left on the oven ledge (the dead's loaves). */
   deadLoaves: z.number().int().positive(),
+  /** The target match length in minutes the lobby chip shows (GDD 3.11, A15). */
+  targetLengthMin: z.strictObject({
+    min: z.number().positive(),
+    max: z.number().positive(),
+    gddRef: GddRef,
+  }),
   byCount: byPlayerCount(OnubCountRow),
   timers: z.strictObject({
     roleCardS: Seconds,

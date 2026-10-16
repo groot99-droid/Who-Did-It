@@ -4,6 +4,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { logMatch } from '../services/MatchLog';
 import { countRow, factionOf, flowOf, resetFlow, roleIdOf, rolesOf, setPhase } from './Flow';
 import { simOf } from './RoomSim';
+import { isNpcSeat, resetNpcsForLobby } from './Npc';
 import { resetOnubForLobby } from './Onub';
 import { SCENE_KEYS } from './World';
 
@@ -40,6 +41,7 @@ export function endMatch(room: PartyRoom, winner: 'village' | 'cabal'): void {
       faction: factionOf(p),
       survived: !sim.players.get(id)?.dead,
       clues: p.priv?.notebook.length ?? 0,
+      ...(isNpcSeat(room, id) && { isNpc: true }),
     });
   });
   logMatch({
@@ -130,6 +132,7 @@ export function resetToLobby(room: PartyRoom): void {
   room.lobbyCommands.drain();
   simOf(room).resetForLobby();
   resetOnubForLobby(room);
+  resetNpcsForLobby(room);
   resetFlow(room);
   room.unlock();
 }

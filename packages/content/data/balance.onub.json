@@ -1,6 +1,7 @@
 {
   "gddRef": "3.11",
   "deadLoaves": 3,
+  "targetLengthMin": { "min": 5, "max": 7, "gddRef": "3.11" },
   "byCount": {
     "4": {
       "loaves": 7,
@@ -396,7 +397,7 @@
       "id": "storm",
       "when": { "debtorOut": false, "poisonerAmongMourners": false, "anyoneOut": true },
       "winners": ["hirelingIfMourner"],
-      "text": "No Poisoner among the mourners but someone turned out: the Hireling wins if they hold a mourner's plate; otherwise the storm wins."
+      "text": "No Poisoner among the mourners but someone turned out: whoever holds the Hireling loaf wins; if it lies with the dead, the storm wins."
     }
   ]
 }

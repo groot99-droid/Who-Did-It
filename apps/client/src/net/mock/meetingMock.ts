@@ -35,7 +35,8 @@ const SELF_ROLE = 'killer';
 const CABAL = new Set(['killer', 'accomplice']);
 
 export interface MockMeetingRequest {
-  reason: 'body' | 'bell';
+  /** `dawn` is the quick-mode meeting; the mock plays quick mode on it (round 4, U). */
+  reason: 'body' | 'bell' | 'dawn';
   callerId: string;
   bodyOf?: string;
 }

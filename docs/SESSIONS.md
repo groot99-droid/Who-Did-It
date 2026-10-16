@@ -830,402 +830,495 @@ loop ran end to end on the first merged tree, Village win and Cabal win. Fixes m
 ## Round 4 (started 2026-10-16, after round 3 landed at 2f829e2)
 
 Eight sessions build **M3b, quick mode** (One Night Ultimate Baguette, GDD 3.11, ARCHITECTURE 5.14,
-ROADMAP M3b) and **M3c, NPC fill** (GDD 3.12, ROADMAP M3c) in one round, plus the round-3 follow-ups
-3 to 7 above (the copy deck in code, the placeholder manifest, the client and server smalls, the
+ROADMAP M3b) and **M3c, NPC fill** (GDD 3.12, ROADMAP M3c) in one round, plus the round-3 follow-ups 3
+to 7 above (the copy deck in code, the placeholder manifest, the client and server smalls, the
 30-minute soak). Follow-ups 1 (the owner's M3 playtests) and 8 (the art masters on the owner's laptop)
 stay the owner's and run beside this round: the site and the server are live. Same rules as rounds 1
 to 3: draft PRs against `claude/zen-turing-m1jnw0`, under 400 lines where the work allows (split by
 step, each PR green), `pnpm lint && pnpm typecheck && pnpm test` clean before every push, pinned
 versions only, no model identifiers in committed files, `docs/GDD.md` changes in the same PR as a
 behaviour change, numbers only in `docs/GDD.md` and `packages/content/data`. Code and tooling run on
-Sonnet 5.5; art, content and design run on Opus 5.5. The decisions of this round are DECISIONS A39;
-a session never re-decides them.
+Sonnet 5.5; art, content and design run on Opus 5.5. The decisions of this round are DECISIONS A39; a
+session never re-decides them.
 
-**Pre-seeded on the base branch** (commit "Round 4 contract", DECISIONS A39), so no two sessions add
-the same thing: the constants `LOFT_SCENE_ID`, `LOFT_SCENE_INDEX` (255), `ONUB_ACT_PREFIX`,
-`ONUB_SET_PLATE` and `NpcLevel` (`@wdi/shared/constants`); the schema `NightReveal {slot, of,
-roleId}` and `Private.nightReveal`, `Claim {from, roleId, targetId, sawRoleId}` with
-`MeetingState.claims` and `MeetingState.traces`, `Settings.npcDifficulty` and `Settings.npcSeats`;
-the protocol `lobby.settings {mode?, npcDifficulty?}`, `lobby.addNpc`, `lobby.removeNpc {playerId}`,
-`meeting.claim {roleId, targetId?, sawRoleId?}` (all 2/s, all routed to `PartyRoom.lobbyCommands`
-and drained by `runLobbyCommands`, `meeting.claim` already calling `handleClaim` in `sim/Meeting.ts`),
-the private `nightWake {windowRole, endsTick, spawn}`, `nightReveal {entries}` and `nightSleep`,
-`MeetingReason` `dawn`, `voteResult.outs` and `voteResult.roles`, `gameOver.onub` (`OnubGameOver`:
-`dealt`, `final`, `center`, `swapLog`, `votes`, `outs`, `rowId`, `winnerIds`), the types
-`NightRevealEntry` and `SwapLogEntry` (`docs/PROTOCOL.md` regenerated); the rules module
+**Pre-seeded on the base branch** (the "Round 4 contract" commits, DECISIONS A39), so no two sessions
+add the same thing. Shared: the constants `LOFT_SCENE_ID`, `LOFT_SCENE_INDEX` (255),
+`ONUB_ACT_PREFIX`, `ONUB_SET_PLATE` and `NpcLevel` (`@wdi/shared/constants`); the schema `Prop.of`
+(the owner's seat id of a quick-mode plate, empty otherwise), `NightReveal {slot, of, roleId}` and
+`Private.nightReveal`, `Claim {from, roleId, targetId, sawRoleId}` with `MeetingState.claims` and
+`MeetingState.traces`, `Settings.npcDifficulty` and `Settings.npcSeats`; the protocol `lobby.settings
+{mode?, npcDifficulty?}`, `lobby.addNpc`, `lobby.removeNpc` (no payload: it removes the most recently
+added NPC seat, so it never tells a seat apart), `meeting.claim {roleId, targetId?, sawRoleId?}` (all
+2/s, all routed to `PartyRoom.lobbyCommands` and drained by `runLobbyCommands`, `meeting.claim`
+already calling `handleClaim` in `sim/Meeting.ts`), the private `nightWake {windowRole, endsTick,
+spawn}`, `nightReveal {entries}` and `nightSleep`, `MeetingReason` `dawn`, `voteResult.outs`,
+`voteResult.roles` and `voteResult.abstained`, `gameOver.onub` (`OnubGameOver`: `dealt`, `final`,
+`center`, `swapLog`, `votes`, `outs`, `plates` (plate prop id -> seat id), `rowId`, `winnerIds`), the
+types `NightRevealEntry` and `SwapLogEntry` (`docs/PROTOCOL.md` regenerated); the rules module
 `packages/shared/src/rules/onub.ts` with the signatures `dealOnub`, `nightScript`, `applyNightAct`,
-`resolveDawn`, `onubWinners` (bodies throw until R fills them) and `rules/npc.ts` with
-`pickNpcNames` (implemented, tested), both exported by `rules/index.ts`; the content file
-`packages/content/data/names.json` (40 names, schema `NamesFile`, validated: lobby-legal, unique, no
-role token, at least `players.max`) exported as `names`; the `balance.json` rows `npc.wander
-{stepMinS, stepMaxS, portalChance}` and `npc.vote {delayMinS, delayMaxS}` with their GDD 3.12 line;
-the server stages `runNpcs(room)` (`sim/Npc.ts`, after `syncRoster`, before `applyInputs`) and
-`runConductor(room)` (`sim/Conductor.ts`, after `runPortals`, before the views reconcile), both
-empty, with `isNpcSeat(room, id)` beside the first; `sim/Onub.ts` with `isOnub(room)`,
-`startOnubMatch(room, ids, rng)` (called by `startMatch` before the main deal) and
-`beginOnubPlay(room)` (called first by `beginPlay`), both returning false outside quick mode,
+`resolveDawn` (`DawnOutcome {tally, outs, abstained}`) and `onubWinners` (bodies throw until R fills
+them) and `rules/npc.ts` with `pickNpcNames` (implemented, tested), both exported by `rules/index.ts`.
+Content: `packages/content/data/names.json` (40 names, schema `NamesFile`, validated: lobby-legal,
+unique, no role token, at least `players.max`) exported as `names` from the server-only entry
+`@wdi/content/server` (`packages/content/src/{names,server}.ts`, tested in
+`packages/content/test/names.test.ts`; an eslint rule forbids that entry under `apps/client`, so the
+pool never ships in the client bundle); the `balance.json` rows `npc.wander {stepMinS, stepMaxS,
+portalSteerChance, portalChance}` and `npc.vote {delayMinS, delayMaxS}` with their GDD 3.12 line;
+`balance.onub.json` `targetLengthMin {min, max}` with its GDD 3.11 line; the `storm` winners row
+reworded to the seat holding the Hireling loaf (GDD 3.11). Server: the stages `runNpcs(room)`
+(`sim/Npc.ts`, after `syncRoster`, before `applyInputs`) and `runConductor(room)` (`sim/Conductor.ts`,
+after `runPortals`, before the views reconcile), both empty, with `isNpcSeat(room, id)` and
+`resetNpcsForLobby(room)` beside the first; `sim/Onub.ts` with `isOnub(room)`, `startOnubMatch(room,
+ids, rng)` (called by `startMatch` before the main deal, with `ids = [...room.state.players.keys()]`)
+and `beginOnubPlay(room)` (called first by `beginPlay`), both returning false outside quick mode,
 `handleOnubAbility` (every `act.ability` whose id starts with `onub.` reaches it from
-`handleAbility`) and `resetOnubForLobby` (called by `resetToLobby`); the loft guards: `isLoft(idx)` in
-`sim/World.ts`, `applyInputs` and `moveAndCollide` skipping loft players, `reconcileViews` giving a
-loft viewer no scene and no presence and never sharing a loft player, `PlayerSim.sceneHidden`
-honoured by `enterScene` and reset for the lobby; `resetToLobby` clearing `nightReveal`, `claims`,
-`traces` and every scene's `props`; `MatchRecord.winner` widened with `mode` and `players[].isNpc`;
-the client `?mode=onub` flag (`flags/index.ts`), `REG_AUDIO` in `scenes/registry.ts`, and the copy
-modules `apps/client/src/ui/copy/{index,world,meeting,lobby}.ts` (one per client session, `fill()`
-for placeholders). **Nobody edits** `packages/shared/src/{schema,protocol,rules}/index.ts`,
-`packages/shared/src/index.ts`, `packages/shared/src/constants.ts`, `apps/server/src/sim/Step.ts`,
-`apps/server/src/sim/Actions.ts`, `apps/server/test/simHelpers.ts`, `balance.json`,
-`balance.onub.json`, `roles.onub.json` or their schemas: a session that needs another contract
-writes it in its PR description and carries on with a local stand-in; the orchestrator adds it to the
-base branch. Every `*Tick` field is in ticks (`secondsToTicks`); content paths are the whole file:
-`onubBalance.timers.duskS`, `onubBalance.acts[id].holdS`, `onubBalance.windows[i].seconds`,
-`onubBalance.vote.minVotesToTurnOut`, `onubFor(n).discussionS`, `balance.npc.difficulty[level]`,
-`balance.npc.wander.portalChance`, `names.pool`.
+`handleAbility`), `plateOf(room, seatId)` and `onubNpcPlan(room, seatId)` (null until R fills them)
+and `resetOnubForLobby`; the loft guards: `isLoft(idx)` in `sim/World.ts`, `applyInputs` and
+`moveAndCollide` skipping loft players, `runPortals`, `livingActor` (every `act.*` verb) and
+`holdProblem` refusing a loft player 425, `reconcileViews` giving a loft viewer no scene and no
+presence and never sharing a loft player, `PlayerSim.sceneHidden` honoured by `enterScene` and reset
+for the lobby; the quick-mode seal: `runPortals` refuses every portal 425 (nobody leaves the bakery,
+GDD 3.11) and `placeNewPlayers` places nobody, so no quick-mode seat ever stands in the overworld;
+`MeetingRequest.reason: MeetingReason` (`sim/RoomSim.ts`); `resetToLobby` clearing `nightReveal`,
+`claims`, `traces` and every scene's `props`, then calling `resetOnubForLobby` and
+`resetNpcsForLobby`; `endMatch` writing `players[].isNpc` from `isNpcSeat`; `MatchRecord.winner`
+widened with `mode` and `players[].isNpc`. Client: the `?mode=onub` flag (`flags/index.ts`),
+`REG_AUDIO` in `scenes/registry.ts`, the copy modules
+`apps/client/src/ui/copy/{index,world,meeting,lobby}.ts` (one per client session, `fill()` for
+placeholders), an empty `Loft` scene (`scenes/Loft.ts`, T's) registered in `main.ts` after `World`,
+the `AUDIO_KEYS` `storm`, `creak`, `stamp` and `loaf_crack` (silent until `audio/manifest.json` lists
+them), and `meetingRequest.reason` accepting `dawn` in `net/world.ts` and `MockMeetingRequest`.
+
+**Nobody edits** `packages/shared/src/{schema,protocol,rules}/index.ts`,
+`packages/shared/src/index.ts`, `packages/shared/src/constants.ts`, `packages/content/src/**` (the
+schemas, `index.ts`, `names.ts`, `server.ts`, `validate.ts`),
+`apps/server/src/sim/{Actions,Bodies,Clues,Commands,Death,Hold,Kill,Movement,Noise,PortalQueue,Portals,RoomSim,Step,Visibility,World,constants}.ts`,
+`apps/server/test/{simHelpers,killHelpers}.ts`, `eslint.config.js`, `balance.json`,
+`balance.onub.json` or `roles.onub.json`: a session that needs another contract writes it in its PR
+description and carries on with a local stand-in; the orchestrator adds it to the base branch. Every
+`*Tick` field is in ticks (`secondsToTicks`); content paths are the whole path:
+`onubBalance.timers.duskS`, `onubBalance.acts[id].holdS`, `onubBalance.windows.find((w) => w.role ===
+role)` (an array), `onubBalance.vote.minVotesToTurnOut`, `onubBalance.targetLengthMin.min`,
+`onubFor(n).discussionS`, `balance.npc.difficulty[level]`, `balance.npc.wander.portalSteerChance`,
+`abilities.abilities.kill.rangeTiles`, `names.pool` (`@wdi/content/server`, the server only).
 
 | Session | Model | Track | Branch | Owns |
 |---|---|---|---|---|
 | **R. Quick mode, server** | Sonnet 5.5 | Code | `claude/m3b-server` | `apps/server/src/sim/{Conductor,Onub,Phases,Meeting,Win,Flow,Chat}.ts`, `apps/server/src/services/MatchLog.ts`, `packages/shared/src/rules/onub.ts` and `packages/shared/test/onub*.test.ts`, new `apps/server/test/onubHelpers.ts` and `apps/server/test/onub*.test.ts`, `apps/server/test/{flowHelpers.ts,flow,meeting,chat,win,visibility}.test.ts` (edits only where the mode branch needs them), `docs/GDD.md` 3.11 (one sentence per behaviour the PR changes, marked "(M3b)"), `docs/ARCHITECTURE.md` 5.14 |
 | **S. NPC fill, server** | Sonnet 5.5 | Code | `claude/m3c-npc` | `apps/server/src/sim/Npc.ts`, new `apps/server/src/sim/npc/**`, `apps/server/src/rooms/PartyRoom.ts`, `apps/server/src/rooms/handlers/{lobby,debug,movement}.ts`, `packages/shared/src/rules/npc.ts` and `packages/shared/test/npc.test.ts`, new `apps/server/test/npcHelpers.ts` and `apps/server/test/npc*.test.ts`, `apps/server/test/{lobby,party,sim-movement,sim-portal,throttle}.test.ts`, `docs/GDD.md` 3.12 (marked "(M3c)"), `docs/ARCHITECTURE.md` 5.3 (the start flow) and 5.4 (the NPC line) |
-| **T. Quick mode, client world** | Sonnet 5.5 | Code | `claude/m3b-world` | `apps/client/src/scenes/{World,RoleReveal}.ts`, new `apps/client/src/scenes/Loft.ts`, `apps/client/src/view/**` (except `hud.css`), `apps/client/src/input/**`, `apps/client/src/flags/**`, `apps/client/src/net/{world,worldColyseus,worldRouter}.ts` and `worldRouter.test.ts`, `apps/client/src/net/mock/worldMock.ts` and its test, `apps/client/src/ui/copy/world.ts`, `apps/client/e2e/world.spec.ts`, `docs/SPRITES.md` 5 (loading notes only) |
+| **T. Quick mode, client world** | Sonnet 5.5 | Code | `claude/m3b-world` | `apps/client/src/scenes/{World,RoleReveal,Loft,registry}.ts`, `apps/client/src/view/**` (except `hud.css`), `apps/client/src/input/**`, `apps/client/src/flags/**`, `apps/client/src/net/{world,worldColyseus,worldRouter}.ts` and `worldRouter.test.ts`, `apps/client/src/net/mock/worldMock.ts` and its test, `apps/client/src/ui/copy/world.ts`, `apps/client/e2e/world.spec.ts`, `docs/SPRITES.md` 5 (loading notes only) |
 | **U. Quick mode, client meeting and end** | Sonnet 5.5 | Code | `claude/m3b-meeting` | `apps/client/src/scenes/{Meeting,GameOver}.ts`, `apps/client/src/ui/{Meeting,GameOver,meetingText,portrait,RoleCard}.ts` and their tests, `apps/client/src/net/{meeting,meetingColyseus}.ts`, `apps/client/src/net/mock/meetingMock.ts` and its test, `apps/client/src/ui/copy/meeting.ts`, `apps/client/src/ui/theme/components.css` (new rules appended at the end under a "Round 4 (U)" comment only), `apps/client/e2e/meeting.spec.ts`, `docs/UI.md` 11 and 12 (the meeting and end rows) |
-| **V. Lobby, settings, network edge** | Sonnet 5.5 | Code | `claude/m3c-lobby` | `apps/client/src/ui/{Lobby,Landing,dom}.ts`, `apps/client/src/scenes/{Lobby,Landing,Boot,Preload}.ts`, `apps/client/src/net/{NetworkService,mock,protocol,storage,index}.ts` and their tests, `apps/client/src/ui/copy/lobby.ts`, `apps/client/src/ui/theme/tokens.css`, the five `.wdi-hud__*` anchor rules of `apps/client/src/ui/theme/components.css` and the lobby rules there, `apps/client/src/view/hud.css` (the safe-area block only), `apps/client/index.html`, `apps/client/src/main.ts`, `apps/client/e2e/{party,smoke}.spec.ts`, `docs/UI.md` 6 (the lobby rows) |
+| **V. Lobby, settings, network edge** | Sonnet 5.5 | Code | `claude/m3c-lobby` | `apps/client/src/ui/{Lobby,Landing,dom}.ts`, `apps/client/src/ui/styles.css`, `apps/client/src/scenes/{Lobby,Landing,Boot,Preload}.ts`, `apps/client/src/net/{NetworkService,mock,protocol,storage,index,fixtures}.ts` and their tests, `apps/client/src/ui/copy/lobby.ts`, `apps/client/src/ui/theme/tokens.css`, the five `.wdi-hud__*` anchor rules of `apps/client/src/ui/theme/components.css` and the lobby rules there, `apps/client/src/view/hud.css` (the safe-area block only), `apps/client/index.html`, `apps/client/src/main.ts`, `apps/client/e2e/{party,smoke}.spec.ts`, `docs/UI.md` 6 (the lobby rows) |
 | **W. Bots, e2e, soak, CI** | Sonnet 5.5 | Code | `claude/r4-bots` | `tools/bots/**`, `tools/grid/test/**`, `apps/client/e2e/{match.spec,env}.ts`, new `apps/client/e2e/{onub,npc}.spec.ts`, `apps/client/playwright.config.ts`, `.github/workflows/ci.yml`, new `.github/workflows/soak.yml`, root `package.json` scripts, `docs/ARCHITECTURE.md` 5.12, `docs/ROADMAP.md` 7.5 (the Bot-only row only) |
 | **X. Art: bakery, loft, placeholder manifest** | Opus 5.5 | Art | `claude/r4-art` | `assets/**`, `apps/client/public/assets/**` except `ui/`, `audio/` and `calibration/`, `tools/blender/**`, `tools/sprites/**`, `CREDITS.md` (rows appended at the end of the "Generated assets" and "Hand-made original art" tables), `assets/source/MANIFEST.md`, `docs/ASSETS.md` 6.3 and 6.7, `docs/SPRITES.md` 8 |
-| **Y. Content, copy, audio, playtest kit** | Opus 5.5 | Design | `claude/r4-content` | `packages/content/data/names.json` and `packages/content/test/content.test.ts` (the names rule), `docs/UI.md` 14 (new 14.12 quick mode and 14.13 NPC lobby lines), `docs/PLAYTESTS/**`, `apps/client/public/assets/audio/**` (files and `audio/manifest.json`), `LICENSES/**` (new licence texts only), `CREDITS.md` (rows appended at the end of the "Third-party assets" table), `docs/GDD.md` 2 and the card-text table of 3.11 (wording only, no rule or number), `docs/WORLD.md` (the bakery row and a loft note), `docs/ROADMAP.md` 7.5 (the 4-6 humans row) |
+| **Y. Content, copy, audio, playtest kit** | Opus 5.5 | Design | `claude/r4-content` | `packages/content/data/names.json` and `packages/content/test/names.test.ts`, `docs/UI.md` 14 (new 14.12 quick mode and 14.13 NPC lobby lines), `docs/PLAYTESTS/**`, `apps/client/public/assets/audio/**` (files and `audio/manifest.json`), `LICENSES/**` (new licence texts only), `CREDITS.md` (rows appended at the end of the "Third-party assets" table), `docs/GDD.md` 2 (wording only, no rule or number), `docs/WORLD.md` (the bakery row and a loft note), `docs/ROADMAP.md` 7.5 (two new rows only: `4-6 humans` for M3b and `1-3 humans` for M3c, after the `4-5 humans` row) |
 
-Suggested merge order: R, S, T, U, V, W, X, Y. Shared documents: edits stay inside the named
-section with no renumbering or reflow, and the orchestrator keeps both sides of any conflict.
-Decisions a session has to make go to `docs/DECISIONS.md` under its reserved number (R A40, S A41,
-T A42, U A43, V A44, W A45, X A46, Y A47; a second row takes the number plus 10), never editing an
-older row. Nobody else touches GDD 3.x. The orchestrator runs the two opt-in e2e suites and the
-30-minute soak at integration.
+Suggested merge order: R, S, T, U, V, W, X, Y. Shared documents: edits stay inside the named section
+with no renumbering or reflow, and the orchestrator keeps both sides of any conflict. Decisions a
+session has to make go to `docs/DECISIONS.md` under its reserved number (R A40, S A41, T A42, U A43, V
+A44, W A45, X A46, Y A47; a second row takes the number plus 10), never editing an older row. GDD 3.x
+is touched only by R (3.11, behaviour sentences) and S (3.12); Y touches GDD 2 only, the 3.11 card
+wording stays frozen this round, and nobody touches another 3.x section. The orchestrator runs the two
+opt-in e2e suites and the 30-minute soak at integration.
 
 ### Briefs
 
 **R. Quick mode, server.** Build the whole quick-mode match on the server: the deal and the cards, the
 dusk, the night Conductor, the acts, the dawn meeting, the vote without Skip, the winners, the end
-screen and the match log, all behind `isOnub(room)` so the main mode is untouched (every existing
-test keeps passing). Rules first (`packages/shared/src/rules/onub.ts`, pure, property-tested with the
+screen and the match log, all behind `isOnub(room)` so the main mode is untouched (every existing test
+keeps passing). Rules first (`packages/shared/src/rules/onub.ts`, pure, property-tested with the
 PRNG): `dealOnub(ids, deck, rng)` shuffles `onubFor(n).deck` (n = seats, 4 to 10; `deck.length ===
-ids.length + 3` or throw) and returns `{dealt, center}`; `nightScript(deck, onubBalance.windows,
-rng, timers.windowJitterMaxS)` keeps every window whose role is in the deck, dealt or among the
-dead's loaves, in `order`, each with a seeded jitter in [0, jitterMaxS], so the night never leaks the
-deal; `applyNightAct(loaves, act)` returns the permuted map and what the actor saw (`reveals: true`
-acts) and is a permutation whatever the act; `resolveDawn(votes, seats, vote)` turns out everyone
-holding the most votes when that is at least `vote.minVotesToTurnOut`, ties included when
-`tiesTurnOutAll`, nobody otherwise; `onubWinners(outs, finals, center, roleFaction)` walks
-`onubBalance.winners` in order and returns the first row whose `when` holds and the seat ids that
-win (`village`: every final non-Cabal, non-Debtor loaf; `cabal`: Poisoners and the Hireling, a
-turned-out Hireling included; `debtor`: the Debtor; `hirelingIfMourner`: the Hireling when its final
-loaf is a village role, else nobody). Tests: every count's deck gives the right loaf count and three
-dead loaves, the script never depends on which seats hold which roles, every act is a permutation,
-the swap log replays from dealt to final, the winners table is exhaustive and `debtorAndVillage`
-beats `debtorAlone`. Deal (`sim/Onub.ts` `startOnubMatch`, called by `startMatch` with the ids and
-the seeded rng): `dealt` and `center` into room memory (a module `WeakMap<PartyRoom, OnubState>`
-holding `dealt`, `loaves: Map<slot, roleId>` with the slots `bk.plate_<ordinal>` of each seat and
-`bk.deadloaf_0..2`, `center`, `swapLog`, `script`, `windowIdx`, `windowEndsTick`, `acted`,
-`plateSet`, `traces`, `votes`), `priv.role.roleId` = dealt role, `priv.role.team` from
-`onubRoles.roles[id].faction`, `priv.cabalMates` = the other Poisoner for a Poisoner (the Hireling
-learns the Poisoners at its window, never on the card), traits as the main deal, `alive = true`,
-`room.lock()`, `setPhase(roleReveal, onubBalance.timers.roleCardS)`, and one `roleReveal` per seat
-built without `buildRoleReveal` (it throws on an onub id): `roleId`, `team`, `goal` =
-`onubRoles.roles[id].nightAct`, `cardText`, `beware` = `onubRoles.cardLine`, `abilities` and
-`inventory` empty, `teammates` the Poisoner partner, `traits`; `runLobbyPhase` then calls
-`beginPlay`, whose first line already hands quick mode to `beginOnubPlay(room)` (`sim/Onub.ts`,
-pre-seeded): fill it to set `round = 0`, `startTick`, clear `ready`, and `setPhase(dusk,
-timers.duskS)` instead of grace. Dusk: the Conductor places every seat in the bakery at the `door`
-spawn (`enterScene(room, player, p, 'bakery', 'door', false)`, announced, stacking allowed), seeds
-`scenes.bakery.props` with one `Prop {id, kind, turned: false}` per plate of a seated ordinal, the
-three dead loaves and the ledger (ids and kinds from `scenes.bakery.props`), and accepts
-`act.ability {abilityId: 'onub.setPlate', targetId: 'bk.plate_<ordinal>'}` from its owner within
-`actRangeTiles` (427 otherwise; 422 for another plate; 425 outside dusk); at the end of dusk every
-unset plate is set by the server. Night: at `dusk -> night` the Conductor sets every seat's public
-`sceneId` to `LOFT_SCENE_INDEX`, `PlayerSim.sceneHidden = true`, `sceneIdx = LOFT_SCENE_INDEX`,
-`input = null`, `room.commands.clearMove(id)`, sends each client `nightSleep`, sets
-`sim.viewsDirty = true`, builds the script and sets `phaseEndsTick` to the whole night (windows plus
-jitter plus `timers.fadeS` per window); per window it moves the seats whose **dealt** role equals the
-window's role (never an NPC seat, `isNpcSeat`: the Conductor resolves an NPC's act at a seeded tick
-inside the window with a seeded legal target, or nothing for a "may" act with `onTimeout: nothing`)
-to the bakery `door` with `enterScene(..., false, false)` plus a private `nightWake {windowRole,
-endsTick, spawn: 'door'}`; `seeEachOther` needs nothing more, both Poisoners share the bakery view;
-a Poisoner alone (`onlyIfAlone`) may peek one dead loaf; at the window's end every waker gets
-`nightSleep` and returns to the loft; `onTimeout: seededPick` (the Sot) applies a seeded dead loaf
-when the window expires without an act. Acts (`handleOnubAbility`): phase night (425), the open
-window's role equals the actor's dealt role (425), not yet acted this window (422), the target prop
-exists and is within `actRangeTiles` of the actor (427), legal for `acts[id].target` (`otherPlate`
+ids.length + 3` or throw) and returns `{dealt, center}`; `nightScript(deck, onubBalance.windows, rng,
+timers.windowJitterMaxS)` keeps every window whose role is in the deck, dealt or among the dead's
+loaves, in `order`, each with a seeded jitter in [0, jitterMaxS], so the night never leaks the deal;
+`applyNightAct(loaves, act)` returns `{next, reveal}`, a permutation whatever the act;
+`resolveDawn(votes, seats, vote)` turns out everyone holding the most votes when that is at least
+`vote.minVotesToTurnOut`, ties included when `tiesTurnOutAll`, nobody otherwise, and lists the living
+seats with no vote in `abstained`; `onubWinners(outs, finals, center, roleFaction)` walks
+`onubBalance.winners` in order and returns the first row whose `when` holds and the seat ids that win,
+every flag judged on **final** loaves: `debtorOut` = some out's final loaf is `debtor`, `poisonerOut`
+= some out's final loaf is `poisoner`, `poisonerAmongMourners` = some seat's final loaf is `poisoner`,
+`anyoneOut` = `outs.length > 0`; the winner tokens: `village` every seat whose final loaf is neither
+Cabal nor the Debtor, `cabal` every seat whose final loaf is a Poisoner or the Hireling (a turned-out
+Hireling included), `debtor` the seat holding the Debtor loaf, `hirelingIfMourner` the seat holding
+the Hireling loaf, or nobody when it lies among the dead's loaves. Tests: every count's deck gives the
+right loaf count and three dead loaves, the script never depends on which seats hold which roles,
+every act is a permutation, the swap log replays from dealt to final, the winners table is exhaustive
+and `debtorAndVillage` beats `debtorAlone`. Deal (`sim/Onub.ts` `startOnubMatch`, called by
+`startMatch` with the ids and the seeded rng, before the main deal and before `startMatch` clears
+`ready`, so it does every step `startMatch` does after the deal itself): consume
+`flowOf(room).fixedDeal` (fixed seats keep their loaf, the rest of the deck is shuffled to the other
+seats and the centre; set it to null); `dealt` and `center` into room memory (a module
+`WeakMap<PartyRoom, OnubState>` holding `dealt`, `plateOf: Map<seatId, slot>` with slot = the seat's
+index in `ids` (the client's `players` map order; a seat that left before the deal is not in `ids`, so
+slots are always 0 to n-1, never `PlayerSim.ordinal`), `loaves: Map<propId, roleId>` over
+`bk.plate_<slot>` and `bk.deadloaf_0..2`, `center`, `swapLog`, `script`, `windowIdx`,
+`windowEndsTick`, `acted`, `plateSet`, `npcPlans`, `traces`, `votes`); `plateOf(room, seatId)` returns
+`bk.plate_<slot>`; `priv.role.roleId` = dealt role, `priv.role.team` from
+`onubRoles.roles[id].faction`, `priv.cabalMates` = the other Poisoner for a Poisoner and nobody else
+(the Hireling learns the Poisoners at its window, never on the card), traits as the main deal, `ready
+= false`, `alive = true`, `room.lock()`, `setPhase(roleReveal, onubBalance.timers.roleCardS)`, and one
+`roleReveal` per seat built without `buildRoleReveal` (it throws on an onub id): `roleId`, `team`,
+`goal` = `onubRoles.roles[id].nightAct`, `cardText`, `beware` = `onubRoles.cardLine`, `abilities` and
+`inventory` empty, `teammates` the Poisoner partner, `traits`. `runLobbyPhase` then calls `beginPlay`,
+whose first line hands quick mode to `beginOnubPlay(room)`: set `round = 0`, `startTick`, clear
+`ready`, fix the profile (`sim.profile = profileFor(n)`, `applyProfileToDoors`, `sim.profileFixed =
+true`), place every seat in the bakery itself (`enterScene(room, player, p, 'bakery', 'door', false)`,
+announced, stacking allowed, `p.placed = true`, `player.alive = true`, `sim.viewsDirty = true`;
+`placeNewPlayers` places nobody in quick mode, so no seat ever gets an overworld `sceneEnter` and no
+teaching clue spawns), seed `scenes.bakery.props` with one `Prop {id, kind, turned: false, of}` per
+seated plate (`of` = the owner's seat id; plates are named in the fiction, so the owner is public) and
+for the three dead loaves and the ledger (`of` empty; ids and kinds from `scenes.bakery.props`), and
+`setPhase(dusk, timers.duskS)` instead of grace. Dusk: accept `act.ability {abilityId:
+'onub.setPlate', targetId: plateOf(actor)}` within `actRangeTiles` (427 otherwise; 422 for another
+plate; 425 outside dusk); at the end of dusk every unset plate is set by the server. Portals are
+refused 425 all match (pre-seeded). Night: at `dusk -> night` the Conductor sets every seat's public
+`sceneId` to `LOFT_SCENE_INDEX`, `PlayerSim.sceneHidden = true`, `sceneIdx = LOFT_SCENE_INDEX`, `input
+= null`, `room.commands.clearMove(id)`, sends each client `nightSleep`, builds the script and sets
+`phaseEndsTick` to the whole night (windows plus jitter plus `timers.fadeS` per window). Every wake
+and every sleep runs in `runConductor` and sets `sim.viewsDirty = true`; `runOnubPhases` (in
+`sim/Conductor.ts`; `runPhases` hands quick mode to it) only advances dusk -> night -> dawn -> meeting
+-> reveal and, every tick, empties `sim.meetingRequests` and `sim.deaths` (the only meeting quick mode
+opens is the dawn one). Per window the Conductor moves the seats whose **dealt** role equals the
+window's role, NPC seats included, to the bakery `door` with `enterScene(..., false, false)` plus a
+private `nightWake {windowRole, endsTick, spawn: 'door'}` (an NPC seat has no client, so nothing is
+sent, but its presence reaches the co-wakers as a human's would); `seeEachOther` needs nothing more,
+both Poisoners share the bakery view; a Poisoner alone (`onlyIfAlone`) may peek one dead loaf. For an
+NPC waker the Conductor picks a seeded legal act and target at the window's start (nothing for a "may"
+act with `onTimeout: nothing` when the seeded draw says so) and returns it from `onubNpcPlan(room,
+seatId)`, so S's brain walks there and sends it; if the NPC has not acted by the window's end the
+Conductor applies the plan itself, before the fade. At the window's end every waker gets `nightSleep`
+and returns to the loft; `onTimeout: seededPick` (the Sot) applies a seeded dead loaf when the window
+expires without an act. Acts (`handleOnubAbility`): phase night (425), the open window's role equals
+the actor's dealt role (425), not yet acted this window (422), the target prop exists and is within
+`actRangeTiles` of the actor (427), legal for `acts[id].target` judged by `plateOf` (`otherPlate`
 never the own plate, `ownPlate` only the own plate, `deadLoaf` only `bk.deadloaf_*`, `ledger` only
 `bk.ledger`; 422), `picks: 2` acts take `targetId` and `targetId2` in one message (`onub.swapPlates`
-two other plates, `onub.peekDead` one or two dead loaves for the Sin-Eater); then `applyNightAct`,
-the swap log row `{order, roleId, act, slots}` for swapping acts, `Private.nightReveal` entries and
-a private `nightReveal {entries}` for revealing acts (`onub.readLedger`: one entry per Poisoner,
-`slot: 'bk.ledger'`, `of` the Poisoner's seat); nothing in a window changes `Prop.turned`. Dawn:
-after the last fade, `dawn` for `timers.dawnS` (everyone still in the loft), then `openMeeting` with
-reason `dawn` (the meeting does not move anyone to the square), `MeetingState.traces` = the
-`traceText` of every window in the script (cosmetic, A39), `setPhase(meetingDiscussion,
-onubFor(n).discussionS)`; the public `sceneId` of every seat stays 255 until the match ends. Votes
-(`handleVote`, mode branch): `"skip"` and the own id refused 422 when `vote.skipAllowed` and
-`vote.selfVoteAllowed` are false, a missing vote abstains, `endsWhenAllVoted` as today, the vote
-phase lasts `timers.voteS`; `startReveal` uses `resolveDawn`, `setPhase(reveal, timers.revealS)`,
-broadcasts `voteResult {tally, outs, roles}` with the final roles of the turned-out only, marks them
-`dead`; `endReveal` goes straight to `endMatch` with `onubWinners`: `state.winner` = `debtor` when
-the Debtor is out, else `village` or `cabal` per the row, else `nobody`; `gameOver {winner, roles:
-final roles, summary: row.text, onub: {dealt, final, center, swapLog, votes, outs, rowId,
-winnerIds}}`; `MatchRecord` with `mode: 'onub'`; then `resetToLobby` after `balance.phases.gameOverS`
-(and `resetOnubForLobby` drops the room memory). Claims (`handleClaim`): a living seat in
-`meetingDiscussion` or `meetingVote` in quick mode, `roleId` an onub role id, `targetId` a seat or
-empty, `sawRoleId` an onub role id or empty; replaces the seat's `MeetingState.claims` row; 422 in the
-main mode, 425 outside those phases. A leaver during a quick-mode match abstains and never ends the
-match (`drainDeaths` is not reached: `runPhases` hands quick mode to `runOnubPhases` in
-`sim/Conductor.ts`, which owns dusk, night, dawn and the meeting clocks). Chat: unchanged (meeting
-channel in the three meeting phases). Debug (`runDebugCommands`): `debug.clock {phase: 'dawn'}`, and
-in quick mode `{window: <roleId>}` to jump the Conductor to that window and `{phase: 'night'}` to
-start the night now; `debug.deal` accepts onub role ids when the mode is onub. Tests
-(`test/onubHelpers.ts`: `startOnub(colyseus, n, dealtByName?)` sets `settings.mode` white-box,
-sends `lobby.start` from the leader, readies every seat and waits for dusk; `openWindow(m, roleId)`
-through `debug.clock`): a 6-seat deal has 9 loaves and 3 dead; the Hireling's `nightReveal` names
-both Poisoners; a sleeper receives no `presence`, no `SceneState` and no `nightWake` during any
-window of another role (diff the view as `visibility.test.ts` does); the public roster shows every
-`sceneId` as 255 all night; each of the Sin-Eater, Cutpurse, Busybody, Sot and Lamplighter acts
-verified (the Sot's timeout included); a second act in one window and an act outside the window are
-refused; `"skip"` and a self-vote are refused 422; a tie turns out both; the swap log replays to the
-final roles; the match log line carries `mode: 'onub'`. Not in scope: the loft view, claims chips and
-the end screen (T, U), NPC seats (S), bots (W). Every number from `balance.onub.json` and
-`balance.json`; a timing the GDD lacks is a DECISIONS A40 row, never a literal.
+two other plates, `onub.peekDead` one or two dead loaves for the Sin-Eater); then `applyNightAct`, the
+swap log row `{order, roleId, act, slots}` for swapping acts, `Private.nightReveal` entries and a
+private `nightReveal {entries}` for revealing acts (`of` = the plate's owner for a plate, empty for a
+dead loaf; `onub.readLedger`: one entry per Poisoner, `slot: 'bk.ledger'`, `of` the Poisoner's seat);
+nothing in a window changes `Prop.turned`. Dawn: after the last fade, `dawn` for `timers.dawnS`
+(everyone still in the loft), then `openMeeting` with reason `dawn` (the meeting does not move anyone
+to the square), `MeetingState.traces` = the `traceText` of every window in the script (cosmetic, A39),
+`setPhase(meetingDiscussion, onubFor(n).discussionS)`; the public `sceneId` of every seat stays 255
+until `resetToLobby` resets it. Votes (`handleVote`, mode branch): `"skip"` and the own id refused 422
+when `vote.skipAllowed` and `vote.selfVoteAllowed` are false, a missing vote abstains, the vote ends
+early when every connected living seat has voted (a leaver, `connected === false`, counts neither for
+`allVoted` nor as a living target), the vote phase lasts `timers.voteS`; `startReveal` uses
+`resolveDawn`, `setPhase(reveal, timers.revealS)`, broadcasts `voteResult {tally, outs, roles,
+abstained}` with the final roles of the turned-out only, and sets `PlayerSim.dead = true` and
+`Player.alive = false` on them directly (quick mode sends no `killed` and pushes no death event:
+`voteResult.outs` is the cue); `endReveal` goes straight to `endMatch` with `onubWinners`:
+`state.winner` = `debtor` when the Debtor is out, else `village` or `cabal` per the row, else
+`nobody`; `gameOver {winner, roles: final roles, summary: row.text, onub: {dealt, final, center,
+swapLog, votes, outs, plates, rowId, winnerIds}}` (`plates` maps every seated `bk.plate_<slot>` to its
+seat id); `MatchRecord` with `mode: 'onub'` (`players[].isNpc` is pre-seeded); then `resetToLobby`
+after `balance.phases.gameOverS` (and `resetOnubForLobby` drops the room memory). Claims
+(`handleClaim`): a living seat in `meetingDiscussion` or `meetingVote` in quick mode, `roleId` an onub
+role id, `targetId` a seat or empty, `sawRoleId` an onub role id or empty; replaces the seat's
+`MeetingState.claims` row; 422 in the main mode, 425 in any other phase (the reveal included). A
+leaver during a quick-mode match abstains and never ends the match. Chat: unchanged (meeting channel
+in the three meeting phases). Debug (`runDebugCommands`): `debug.clock {phase: 'dawn'}`, and in quick
+mode `{window: <roleId>}` to jump the Conductor to that window (the current wakers sleep on the same
+tick the next ones wake) and `{phase: 'night'}` to start the night now; `debug.deal` accepts onub role
+ids when the mode is onub (validated against `roles.onub.json`), consumed by `startOnubMatch`. Tests
+(`test/onubHelpers.ts`: `startOnub(colyseus, n, dealtByName?)` sets `settings.mode` white-box, sends
+`lobby.start` from the leader, readies every seat and waits for dusk; `openWindow(m, roleId)` through
+`debug.clock`): a 6-seat deal has 9 loaves and 3 dead; a room with a leaver and a rejoin still deals
+plates `bk.plate_0` to `bk.plate_<n-1>`, each prop's `of` naming its seat; no `sceneEnter` names the
+overworld and `scenes.overworld.clues` stays empty; the Hireling's `nightReveal` names both Poisoners;
+a sleeper receives no `presence`, no `SceneState`, no `sceneEnter` and no `nightWake` during any
+window of another role (diff the view as `visibility.test.ts` does), once with the windows run in turn
+and once with a `{window}` jump; a sleeper's `act.enterPortal`, `act.hold` and `act.reportBody` are
+refused 425 and its view stays empty; the public roster shows every `sceneId` as 255 all night; each
+of the Sin-Eater, Cutpurse, Busybody, Sot and Lamplighter acts verified (the Sot's timeout included);
+a second act in one window and an act outside the window are refused; `"skip"` and a self-vote are
+refused 422; a tie turns out both; `voteResult.abstained` names a seat that did not vote; nobody
+receives `killed` in a quick-mode match; the swap log replays to the final roles; the match log line
+carries `mode: 'onub'`. Not in scope: the loft view, claims chips and the end screen (T, U), NPC seats
+and the NPC brain (S), bots (W). Every number from `balance.onub.json` and `balance.json`; a timing
+the GDD lacks is a DECISIONS A40 row, never a literal.
 
-**S. NPC fill, server.** Fill the seats below `players.min` with server-side NPC villagers and let
-the leader add more (GDD 3.12, A26, A39), hidden on the wire. Seats: extract the seat constructor of
+**S. NPC fill, server.** Fill the seats below `players.min` with server-side NPC villagers and let the
+leader add more (GDD 3.12, A26, A39), hidden on the wire. Seats: extract the seat constructor of
 `PartyRoom.onJoin` (`Player`, `Traits`, `Presence`, `Private`, `Role`, `Inventory`) into
 `handlers/lobby.ts` `newSeat(room, id, name)` and call it for NPC ids from `generateId()`
-(`@colyseus/core`), `connected = true`, `ready = true`, a name from `pickNpcNames(names.pool, taken,
-count, rng)` (seeded from `room.matchSeed` or `randomInt` at add time), never the leader
-(`passLeader` and the first-seat leader rule skip NPC ids); `isNpcSeat(room, id)` reads a
-`Set<string>` in `sim/Npc.ts` room memory, cleared with the seats it names when the match resets or
-the seat is removed. Humans are counted by `room.clients` (`startRefusal`, `runLobbyPhase` waits on
-human seats only, `resetToLobby` keeps NPC seats as it keeps connected humans, `onLeave` of a human
-is as today). Fill at Start: when `lobby.start` is accepted with fewer than `players.min` seats the
-server adds NPC seats up to `players.min` before `startMatch` deals (remove the A28 cut in
-`rosterFor`: every roster row is now a full row); `lobby.addNpc` (leader, lobby, below
-`players.max`, else 422/425) adds one seat in the lobby, `lobby.removeNpc {playerId?}` (leader,
-lobby; the named NPC seat, or the most recently added one when no id is given; a human id or no NPC
-seat is 422) removes it; a human joining a full party with an NPC seat takes that seat
-(`onJoin`: remove one NPC, then seat the human); `Settings.npcSeats` is the live count;
-`lobby.settings {mode?, npcDifficulty?}` (leader, lobby) writes `Settings.mode` (0 or 1, else 422)
-and `Settings.npcDifficulty` (an `NpcLevel`, accepted only while `npcSeats >= balance.npc.
-difficultyMinNpcs`, else 422; the default is `NpcLevel[balance.npc.defaultDifficulty]`, written at
-room creation and at every reset). Behaviour (`runNpcs`, every tick, before `applyInputs`; a port of
-`tools/bots/walk.ts` `startWalker` into the room): in a world phase an NPC writes `PlayerSim.input
-{seq, dx, dy, sprint: false, sneak: false, tick}` with a new heading every `npc.wander.stepMinS..
-stepMaxS` (seeded `mulberry32` per room), steering to the nearest portal a quarter of the time and
-taking it with `npc.wander.portalChance` when in reach (`queuePortal`), staying inside the nav grid
+(`@colyseus/core`), `connected = true`, `ready = true` in the lobby, a name from
+`pickNpcNames(names.pool, taken, count, rng)` (`names` from `@wdi/content/server`; seeded from
+`room.matchSeed` or `randomInt` at add time), never the leader (`passLeader` and the first-seat leader
+rule skip NPC ids). `isNpcSeat(room, id)` reads a `Set<string>` in `sim/Npc.ts` room memory that lives
+as long as the room: an id leaves it only when `lobby.removeNpc` removes the seat, a human takes the
+seat in `onJoin`, or `syncRoster` drops a seat the roster no longer holds; NPC seats survive
+`resetToLobby` like connected humans, and `resetNpcsForLobby` (pre-seeded hook at the end of
+`resetToLobby`) sets them `ready = true` again and clears the brain state. Humans are counted by
+`room.clients` (`startRefusal`, `onLeave` of a human as today). Ready: `startMatch` clears every
+seat's `ready` as today (in quick mode `startOnubMatch` does it); during the role card `runNpcs`
+readies each NPC seat after a seeded delay drawn from `npc.vote.delayMinS..delayMaxS` (human-paced, so
+the ready ticks never mark a seat; add that clause to GDD 3.12), and `runLobbyPhase` counts NPC seats
+as it counts humans. Fill at Start: when `lobby.start` is accepted with fewer than `players.min` seats
+the server adds NPC seats up to `players.min` before `startMatch` deals (remove the A28 cut in
+`rosterFor`: every roster row is now a full row); `lobby.addNpc` (leader, lobby, below `players.max`,
+else 422/425) adds one seat in the lobby, `lobby.removeNpc` (leader, lobby, no payload) removes the
+most recently added NPC seat (422 when there is none); a human joining a full party with an NPC seat
+takes that seat (`onJoin`: remove one NPC, then seat the human); `Settings.npcSeats` is the live
+count; `lobby.settings {mode?, npcDifficulty?}` (leader, lobby) writes `Settings.mode` (0 or 1, else
+422) and `Settings.npcDifficulty` (an `NpcLevel`, accepted only while `npcSeats >=
+balance.npc.difficultyMinNpcs`, else 422; the default `NpcLevel[balance.npc.defaultDifficulty]` is
+written at room creation, and like `mode` the setting persists through the lobby reset). Behaviour
+(`runNpcs`, every tick, before `applyInputs`; a port of `tools/bots/walk.ts` `startWalker` into the
+room): in a main-mode world phase an NPC writes `PlayerSim.input {seq, dx, dy, sprint: false, sneak:
+false, tick}` with a new heading every `npc.wander.stepMinS..stepMaxS` (seeded `mulberry32` per room),
+aimed at the nearest portal with chance `npc.wander.portalSteerChance` at each new heading and taking
+a portal in reach with chance `npc.wander.portalChance` (`queuePortal`), staying inside the nav grid
 (the sim collides it like a human); it reports the nearest unhidden body it is within
-`abilities.report.rangeTiles` of after the difficulty row's `reportDelayS` (`runAction(room, id,
-'act.reportBody', {bodyId})`; a Killer NPC never reports); it votes `npc.vote.delayMinS..delayMaxS`
-after the discussion opens through `handleVote(room, id, {targetId})`: with probability
-`suspectVoteChance` the seat with the most reports or sightings in its own memory (the Case Board is
-M4; record in A41 what "most Verified clues" means until then), else `"skip"`; in quick mode it votes
-a random living other seat, never itself, never Skip. A Killer NPC with the kill ability, alone with a
-human in its scene at night, strikes with `killChancePer10s` per ten seconds of opportunity
-(`runAction(room, id, 'act.ability', {abilityId: 'kill', targetId})` within `abilities.kill.
-rangeTiles`), then walks to the nearest basin scene and the square and votes with the majority of the
-cast votes at the reveal; `plantsPerNight` waits for M4 (Accomplice). NPC seats hold no Notebook and
-no tasks. In quick mode an NPC is a sleeper: the Conductor (R) checks `isNpcSeat` and resolves its
-acts; `runNpcs` does nothing in dusk and night in that mode except setting the plate at dusk through
-`handleOnubAbility` once R lands (until then a no-op). Debug (`handlers/debug.ts`, `WDI_DEBUG=1`):
-`debug.npc {walk: false}` parks every NPC on its spawn for the e2e. Match log: `players[].isNpc`.
-Tests (`test/npcHelpers.ts`): 1 human + 3 NPCs starts and deals the 4-row (practice label unchanged,
-GDD 3.9); `lobby.addNpc` up to 10 and `removeNpc`; a human join takes an NPC seat; the flattened
-public roster of a 1+3 room and a 4-human room have identical key sets and `connected`, `ready`,
-`hasVoted` shapes (`flatten`/`diffPaths` of `killHelpers.ts`); no `isNpc`, no `npc_` substring and
-no pool-only marker on the wire (`JSON.stringify` of the encoded state); NPCs move and cross portals
-within the grid; an NPC reports a body after `reportDelayS`; NPCs vote inside the window; the NPC
-Killer scripted-match test (one NPC Killer, Normal, five seeded matches with `debug.clock` shortening
-the phases) wins at least one, gated `WDI_SLOW=1`; p95 tick under 15 ms with 1 client and 9 NPCs for
-30 s of day (`metrics` delta), gated `WDI_SLOW=1`. `docs/GDD.md` 3.12 gets one sentence per
+`abilities.abilities.report.rangeTiles` of after the difficulty row's `reportDelayS` (`runAction(room,
+id, 'act.reportBody', {bodyId})`; a Killer NPC never reports); it votes
+`npc.vote.delayMinS..delayMaxS` after the discussion opens through `handleVote(room, id, {targetId})`:
+with probability `suspectVoteChance` the seat with the most reports or sightings in its own memory
+(the Case Board is M4; record in A41 what "most Verified clues" means until then), else `"skip"`; in
+quick mode it votes a random living other seat, never itself, never Skip (`isOnub(room)` from
+`sim/Onub.ts` is the only mode test S uses). A Killer NPC with the kill ability, alone with a human in
+its scene at night, strikes with `killChancePer10s` per ten seconds of opportunity (`runAction(room,
+id, 'act.ability', {abilityId: 'kill', targetId})` within `abilities.abilities.kill.rangeTiles`), then
+walks to the nearest basin scene and the square and votes with the majority of the cast votes at the
+reveal; `plantsPerNight` waits for M4 (Accomplice). NPC seats hold no Notebook and no tasks. Quick
+mode (the hooks return null until R lands, so these branches idle): in dusk an NPC walks to
+`plateOf(room, id)` (writing `PlayerSim.input` toward the plate's tile) and, within reach, calls
+`handleOnubAbility(room, id, {abilityId: ONUB_SET_PLATE, targetId})`; in the loft it does nothing;
+when the Conductor has woken it, it walks to the target of `onubNpcPlan(room, id)` and sends that act
+through `handleOnubAbility` (the Conductor applies the plan itself if it never arrives). Debug
+(`handlers/debug.ts`, `WDI_DEBUG=1`): `debug.npc {walk: false}` parks every NPC on its spawn for the
+e2e; the callback pushes onto a `debugFlags` queue in `sim/Npc.ts` room memory that `runNpcs` drains,
+so nothing changes state in the callback. Tests (`test/npcHelpers.ts`): 1 human + 3 NPCs starts and
+deals the 4-row (practice label unchanged, GDD 3.9); `lobby.addNpc` up to 10 and `removeNpc` down to
+none, then 422; a human join takes an NPC seat; after `resetToLobby` a 1+3 room still reports
+`npcSeats` 3 and its NPCs move in the next match; the flattened public roster of a 1+3 room and a
+4-human room have identical key sets and `connected`, `ready`, `hasVoted` shapes
+(`flatten`/`diffPaths` of `killHelpers.ts`), during the role card before any human readies (every
+`ready` false in both) and in the lobby; no `isNpc`, no `npc_` substring and no pool-only marker on
+the wire (`JSON.stringify` of the encoded state); NPCs move and cross portals within the grid; an NPC
+reports a body after `reportDelayS`; NPCs vote inside the window; the NPC Killer scripted-match test
+(one NPC Killer, Normal, five seeded matches with `debug.clock` shortening the phases) wins at least
+one, gated `WDI_SLOW=1`; p95 tick under 15 ms with 1 client and 9 NPCs for 30 s of day (`metrics`
+delta), gated `WDI_SLOW=1`. Once R has merged (merge the base branch into your branch), add: 1 human +
+3 NPCs completes a quick-mode match through the Conductor, and a human Poisoner whose partner is an
+NPC receives the partner's presence in the Poisoners' window. `docs/GDD.md` 3.12 gets one sentence per
 behaviour the PR fixes ("(M3c)") and A41 the voting stand-in. Not in scope: the lobby UI (V), the
-Conductor (R), bots (W).
+Conductor (R), bots (W), the match log (pre-seeded).
 
 **T. Quick mode, client world.** Everything a quick-mode player sees between the role card and the
 meeting, plus the world side of the follow-ups. Router (`net/worldRouter.ts`): a `nightSleep` event
-starts the new `Loft` scene (stopping `World`), a `nightWake` or a bakery `sceneEnter` starts `World`
-in the bakery (stopping `Loft`), `meetingStart` stops `Loft` as it sleeps `World`, `phaseChange` to
-lobby stops `Loft`; cases in `worldRouter.test.ts`. Feeds (`net/world.ts`, `worldColyseus.ts`): events
-`nightWake`, `nightReveal`, `nightSleep`; `props(): PropSnap[]` (`{id, kind, turned}` from
-`SceneState.props`); `mates(): string[]` from `priv.cabalMates`; `nightReveal(): NightRevealEntry[]`
-from `priv.nightReveal`; `ability(id, targetId?, targetId2?)` sending `targetId2`; `mode(): 'main' |
-'onub'` from `state.settings.mode`. Loft (`scenes/Loft.ts`, DOM in `view/LoftView.ts` from
+starts the `Loft` scene (pre-seeded empty and registered in `main.ts`; stopping `World`), a
+`nightWake` or a bakery `sceneEnter` starts `World` in the bakery (stopping `Loft`), `meetingStart`
+stops `Loft` as it sleeps `World`, `phaseChange` to lobby stops `Loft`; cases in
+`worldRouter.test.ts`. Feeds (`net/world.ts`, `worldColyseus.ts`): events `nightWake`, `nightReveal`,
+`nightSleep`; `props(): PropSnap[]` (`{id, kind, turned, of}` from `SceneState.props`); `mates():
+string[]` from `priv.cabalMates`; `nightReveal(): NightRevealEntry[]` from `priv.nightReveal`;
+`ability(id, targetId?, targetId2?)` sending `targetId2`; `mode(): 'main' | 'onub'` from
+`state.settings.mode`. Loft (`scenes/Loft.ts`, DOM in `view/LoftView.ts` from
 `public/mockups/loft.html` and the theme's `.wdi-loft`, `.wdi-bedrolls`, `.wdi-bedroll(.is-self)`):
 one bedroll per seat of `feed.snapshot()` (`data-testid="bedroll-<id>"`), every one occupied all
-night, the own one marked, storm ambience (`AudioBus` key `storm`) and muffled pulses (`creak`) from a
-random edge every `timers.sleeperPulseMinS..MaxS` with a local RNG (`edgeCue` without a label), no
-clock, no HUD, no input (`InputController.stop()`), `data-testid="loft"`; the Loft never reads the
-roster's `sceneId`. Bakery (`World.ts`, `view/PropView.ts`): props drawn for every scene from the
-feed's `props()` by manifest key `prop_<kind>` (`prop_plate`, `prop_deadLoaf`, `prop_ledger`,
-`prop_wakeTable`, `prop_oven`, `prop_basin`) with the labelled greybox fallback until X lands, the
-plate of each seat labelled with the seat's name (`bk.plate_<ordinal>`; the ordinal is the seat's
-index in `snapshot()` order as the server assigns it, confirm with R in the PR); in dusk the prompt
-on the own plate reads the `prompt.plate.set` line, a hold of `timers.plateHoldS` drawn with the
-collect ring, then `ability('onub.setPlate', plateId)`; in a `nightWake` window the HUD shows the
-window's role name and `setTimer` from `endsTick`, the prompts come from `onubBalance.windows[role].
-acts` and `acts[id].target` and `holdS` (`deadLoaf`, `ledger`, `otherPlate`, `ownPlate`), a `picks:
-2` act holds the first pick in scene state and sends both on the second, the own plate is never
-offered for `otherPlate`, a Poisoner's partner nameplate glows red (`PlayerView.setMate(true)` for
-`mates()`); a `nightReveal` shows the token line (`onubRoles.roles[roleId].name`) as a toast and a
-HUD line until the window ends; `data-testid="night-wake"` on the window banner. Phases: `dawn` in
-`Lighting` as dusk, `dusk` and `night` labels from the copy. Follow-ups: adopt the copy deck
-(`ui/copy/world.ts` from `docs/UI.md` 14.1 to 14.5 and 14.8, every literal in `World.ts`, `Hud.ts`,
-`NotebookPanel.ts` replaced, `world.spec.ts` following `prompt.collect`); stop the
-`InputController` timer on the router's lobby return and on `meetingStart` and guard `start()`
-(follow-up 5); add the audio keys `storm`, `creak`, `stamp`, `loaf_crack` to `AUDIO_KEYS` (silent
-until Y ships them); `?mode=onub` makes `worldMock.ts` play dusk at the bakery, a short night with
-one `nightWake` window for the self seat, a `nightReveal` and `nightSleep`, then `meetingRequest`
-with reason `dawn`, so the Loft and the prompts run without a server (`world.spec.ts` covers the loft
-and the plate prompt in the mock). Not in scope: the meeting, claims, the end screen (U), the lobby
-(V), `hud.css` (V). Numbers from `balance.onub.json` through `@wdi/content`, never literals.
+night, the own one marked, the backdrop and bedroll images from the manifest entries `loft_backdrop`,
+`prop_bedroll` and `prop_bedroll_self` (`type: image`, their `url` read through `view/assets.ts` and
+set as CSS backgrounds; the mockup's CSS bedrolls stay as the fallback when an entry is missing),
+storm ambience (`AudioBus` key `storm`) and muffled pulses (`creak`) from a random edge every
+`timers.sleeperPulseMinS..MaxS` with a local RNG (`edgeCue` without a label), no clock, no HUD, no
+input (`InputController.stop()`), `data-testid="loft"`; the Loft never reads the roster's `sceneId`.
+Bakery (`World.ts`, `view/PropView.ts`): static props come from the content `scenes[sceneId].props` as
+today, and the feed's `props()` overlays the ids it lists (plates, dead loaves, ledger) with their
+`turned` bit and owner; in quick mode a `plate` is drawn only when the feed lists it (seated slots),
+labelled with the name of the seat in its `of`; keys by `prop_<kind>` then `prop_<id tail>` as
+`PropView` does (`prop_plate`, `prop_deadLoaf`, `prop_ledger`, `prop_wakeTable`, `prop_oven`,
+`prop_basin`, `prop_flour_sacks`) with the labelled greybox fallback until X lands. In dusk the prompt
+on the own plate (the prop whose `of` is the own id) reads the `prompt.plate.set` line, a hold of
+`timers.plateHoldS` drawn with the collect ring, then `ability('onub.setPlate', plateId)`; in a
+`nightWake` window the HUD shows the window's role name and `setTimer` from `endsTick`, the prompts
+come from `onubBalance.windows.find((w) => w.role === windowRole)?.acts` and `acts[id].target` and
+`holdS` (`deadLoaf`, `ledger`, `otherPlate`, `ownPlate`), a `picks: 2` act holds the first pick in
+scene state and sends both on the second, the own plate is never offered for `otherPlate`, a
+Poisoner's partner nameplate glows red (`PlayerView.setMate(true)` for `mates()`); a `nightReveal`
+shows each entry as a toast and a HUD line until the window ends, "<seat name>: <role name>" when `of`
+is set, the role name alone for a dead loaf (`onubRoles.roles[roleId].name`);
+`data-testid="night-wake"` on the window banner. Phases: `dawn` in `Lighting` as dusk, `dusk` and
+`night` labels from the copy. Portals: no door prompt in quick mode (the server refuses them).
+Follow-ups: adopt the copy deck (`ui/copy/world.ts` from `docs/UI.md` 14.1 to 14.5 and 14.8, every
+literal in `World.ts`, `Hud.ts`, `NotebookPanel.ts` replaced, `world.spec.ts` following
+`prompt.collect`); stop the `InputController` timer on the router's lobby return and on `meetingStart`
+and guard `start()` (follow-up 5); the audio keys are pre-seeded. `?mode=onub` makes `worldMock.ts`
+play dusk at the bakery (plate props with `of`), a short night with one `nightWake` window for the
+self seat, a `nightReveal` and `nightSleep`, then `meetingRequest` with reason `dawn` (U's meeting
+mock plays quick mode on that reason), so the Loft and the prompts run without a server
+(`world.spec.ts` covers the loft and the plate prompt in the mock). Not in scope: the meeting, claims,
+the end screen (U), the lobby (V), `hud.css` and `main.ts` (V). Numbers from `balance.onub.json`
+through `@wdi/content`, never literals.
 
-**U. Quick mode, client meeting and end.** The dawn meeting, claims, the plural reveal, the end
-screen and the meeting side of the follow-ups. Feeds (`net/meeting.ts`, `meetingColyseus.ts`):
-`mode(): 'main' | 'onub'` (`GameStateLike.settings`), `claims(): Claim[]` and `traces(): string[]`
-from `MeetingState`, `claim(roleId, targetId?, sawRoleId?)` sending `meeting.claim`, `result()`
-carrying `outs` and `roles`, `over()` carrying `onub`. Meeting (`ui/Meeting.ts`): reason `dawn`
+**U. Quick mode, client meeting and end.** The dawn meeting, claims, the plural reveal, the end screen
+and the meeting side of the follow-ups. Feeds (`net/meeting.ts`, `meetingColyseus.ts`): `mode():
+'main' | 'onub'` (`GameStateLike.settings`), `claims(): Claim[]` and `traces(): string[]` from
+`MeetingState`, `claim(roleId, targetId?, sawRoleId?)` sending `meeting.claim`, `result()` carrying
+`outs`, `roles` and `abstained`, `over()` carrying `onub`. Meeting (`ui/Meeting.ts`): reason `dawn`
 (`reasonLine`), the report tab lists `traces()` as the board's trace lines, the vote hides `vote-skip`
 and refuses a self tap when `mode() === 'onub'`, a claim chip strip in the chat panel built from
-`onubRoles.roles` (`.wdi-chip--claim`, `data-testid="claim-<roleId>"`) that posts the seat's claim
-(a role tap, then an optional seat and seen-role pick for the revealing roles) and shows every seat's
-claim under its portrait as "Claimed"; the reveal stamps every id in `result().outs` and the
-`ejectionLine` names them all with their final roles; `factionOf` and `roleTitle` read
-`roles.onub.json` when the mode is onub (`sinEater` is "Sin-Eater" through the role's `name`). Game
-over (`ui/GameOver.ts`): with `over().onub`, one row per seat "dealt -> final" (`gameover-role-<id>`
-keeps the dealt role, new `gameover-final-<id>`), the three dead loaves, the swap log as a timeline
-(`data-testid="swaplog"`, one line per entry from the window's role name and the plate owners' names,
-e.g. "The Cutpurse took Hana's loaf"), the vote arrows as "A voted B" lines, the winner line from
-`summary` and the `winnerIds` marked; the countdown as today. Stamp sound: the Meeting scene plays
-`stamp` on the `REG_AUDIO` bus on a `voteResult` with an ejection or outs (follow-up 5). Copy:
-`ui/copy/meeting.ts` from `docs/UI.md` 14.6, 14.7, 14.9, 14.10 and the quick-mode lines Y adds in
-14.12 (until Y lands, the GDD 3.11 wording with ids `meeting.claim.*`, `reveal.outs`,
-`gameover.swap.*`), every literal in `Meeting.ts`, `GameOver.ts`, `meetingText.ts` replaced.
-`ROLE_CARD_SECONDS` in `RoleCard.ts` reads `balance.phases.roleRevealS`, or `timers.roleCardS` when
-the card is a quick-mode one (the card payload's `beware` equals `onubRoles.cardLine`). Mock
-(`meetingMock.ts`): with the `mode` flag `onub`, a dawn meeting with traces, claims, a vote without
-Skip, a two-seat tie reveal and a `gameOver` with `onub` fixtures (`meeting.spec.ts` covers the claim
-strip, the missing Skip and the swap log). Theme: new rules appended at the end of `components.css`
-under "Round 4 (U)" only. Not in scope: the loft and the world (T), the lobby (V).
+`onubRoles.roles` (`.wdi-chip--claim`, `data-testid="claim-<roleId>"`) that posts the seat's claim (a
+role tap, then an optional seat and seen-role pick for the revealing roles) and shows every seat's
+claim under its portrait as "Claimed"; the reveal stamps every id in `result().outs`, the
+`ejectionLine` names them all with their final roles, and a line names the abstainers; `factionOf` and
+`roleTitle` read `roles.onub.json` when the mode is onub (`sinEater` is "Sin-Eater" through the role's
+`name`). Game over (`ui/GameOver.ts`): with `over().onub`, one row per seat "dealt -> final"
+(`gameover-role-<id>` keeps the dealt role, new `gameover-final-<id>`), the three dead loaves, the
+swap log as a timeline (`data-testid="swaplog"`, one line per entry from the window's role name and
+the plate owners' names, each slot resolved through `onub.plates` (plate id -> seat id) or "a dead
+loaf", e.g. "The Cutpurse took Hana's loaf"), the vote arrows as "A voted B" lines, the winner line
+from `summary` and the `winnerIds` marked; the countdown as today. Stamp sound: the Meeting scene
+plays `stamp` on the `REG_AUDIO` bus on a `voteResult` with an ejection or outs (follow-up 5; the key
+is pre-seeded). Copy: `ui/copy/meeting.ts` from `docs/UI.md` 14.6, 14.7, 14.9, 14.10 and the
+quick-mode lines Y adds in 14.12 (until Y lands, the GDD 3.11 wording with ids `meeting.claim.*`,
+`reveal.outs`, `gameover.swap.*`), every literal in `Meeting.ts`, `GameOver.ts`, `meetingText.ts`
+replaced. `ROLE_CARD_SECONDS` in `RoleCard.ts` reads `balance.phases.roleRevealS`, or
+`timers.roleCardS` when the card is a quick-mode one (the card payload's `beware` equals
+`onubRoles.cardLine`). Mock (`meetingMock.ts`): `MockMeetingFeed` plays quick mode when `req.reason
+=== 'dawn'` (T's world mock sends that with `?mode=onub`; `MockMeetingRequest.reason` already accepts
+it): a dawn meeting with traces, claims, a vote without Skip, a two-seat tie reveal with one abstainer
+and a `gameOver` with `onub` fixtures (`plates` included); `meeting.spec.ts` covers the claim strip,
+the missing Skip and the swap log. Theme: new rules appended at the end of `components.css` under
+"Round 4 (U)" only. Not in scope: the loft and the world (T), the lobby (V).
 
 **V. Lobby, settings, network edge.** The lobby for both milestones and the client edge both server
-sessions talk to. `NetworkService`: `LobbySnapshot.settings {mode, npcDifficulty, npcSeats}` kept
-in sync from `state.settings` (`onChange`), `LobbyPlayer` unchanged (NPC seats look like humans,
-GDD 3.12); `setMode(mode)`, `setNpcDifficulty(level)`, `addNpc()`, `removeNpc(id)` sending
-`lobby.settings`, `lobby.addNpc`, `lobby.removeNpc`. Lobby (`ui/Lobby.ts`, `scenes/Lobby.ts`): a
-settings block between the code row and the roster: the mode chip (`data-testid="mode-chip"`,
-"Who Did It" or "One Night Ultimate Baguette, {length} min, {min}-{max}" with the length and the
-counts from `balance.onub.json` and `balance.json`, A15) with a leader-only toggle
-(`data-testid="mode-toggle"`), the leader-only "Add NPC" (`add-npc`) and "Remove" (`remove-npc`, sends `lobby.removeNpc {}`
-with no id: the server drops the most recently added NPC seat, since nothing on the client marks
-one; both hidden when `settings.npcSeats` is 0 for Remove or the party is full for Add), the
-difficulty select
-(`npc-difficulty`, options from `Object.keys(balance.npc.difficulty)`, default
+sessions talk to. `NetworkService`: `LobbySnapshot.settings {mode, npcDifficulty, npcSeats}` kept in
+sync from `state.settings` (`onChange`), `LobbyPlayer` unchanged (NPC seats look like humans, GDD
+3.12); `setMode(mode)`, `setNpcDifficulty(level)`, `addNpc()`, `removeNpc()` sending `lobby.settings`,
+`lobby.addNpc`, `lobby.removeNpc {}`. Lobby (`ui/Lobby.ts`, `scenes/Lobby.ts`): a settings block
+between the code row and the roster: the mode chip (`data-testid="mode-chip"`, "Who Did It" or "One
+Night Ultimate Baguette, {min}-{max} min, {players}" with the length from
+`onubBalance.targetLengthMin.min` and `.max` and the counts from `balance.players`, A15) with a
+leader-only toggle (`data-testid="mode-toggle"`), the leader-only "Add NPC" (`add-npc`) and "Remove"
+(`remove-npc`; the server drops the most recently added NPC seat, since nothing on the client marks
+one; Remove hidden when `settings.npcSeats` is 0, Add hidden when the party is full), the difficulty
+select (`npc-difficulty`, options from `Object.keys(balance.npc.difficulty)`, default
 `npc.defaultDifficulty`, disabled below `npc.difficultyMinNpcs` NPC seats using `settings.npcSeats`),
-the hint line replaced by the copy deck's (no more "NPC fill is coming"); `player-count` keeps its
-"n / 10" shape (the existing specs assert it). Mock (`net/mock.ts`): the four messages change the
-mock snapshot's settings and roster. Theme (follow-up 5): the five `.wdi-hud__*` anchors use
-`calc(var(--wdi-space-3) + env(safe-area-inset-*))` so the HUD respects the safe area, then the
-override block in `view/hud.css` is deleted (the only `hud.css` edit). Copy: `ui/copy/lobby.ts` from
-`docs/UI.md` 14.11 and Y's 14.13, the literals of `Landing.ts` and `Lobby.ts` replaced. e2e:
-`party.spec.ts` keeps `'6 / 10'`; a new case toggles the mode chip and sees the chip text change
-(mock); `smoke.spec.ts` unchanged. Not in scope: the server side (S), the match screens (T, U).
+the hint line replaced by the copy deck's (no more "NPC fill is coming"); `player-count` keeps its "n
+/ 10" shape (the existing specs assert it). Mock (`net/mock.ts`, `net/fixtures.ts`): the four messages
+change the mock snapshot's settings and roster; the mock passes T's `meetingRequest` through
+unchanged. Theme (follow-up 5): the five `.wdi-hud__*` anchors use `calc(var(--wdi-space-3) +
+env(safe-area-inset-*))` so the HUD respects the safe area, then the override block in `view/hud.css`
+is deleted (the only `hud.css` edit). Copy: `ui/copy/lobby.ts` from `docs/UI.md` 14.11 and Y's 14.13,
+the literals of `Landing.ts` and `Lobby.ts` replaced. e2e: `party.spec.ts` keeps `'6 / 10'`; a new
+case toggles the mode chip and sees the chip text change (mock); `smoke.spec.ts` unchanged. Not in
+scope: the server side (S), the match screens (T, U).
 
-**W. Bots, e2e, soak, CI.** Make every bot and harness play both modes and run the long checks.
-Brain (`tools/bots/walk.ts`): read `state.settings.mode`; in quick mode a bot walks to its own plate
-in dusk (`bk.plate_<ordinal>`, the ordinal from the roster order) and sends `act.ability
-{abilityId: 'onub.setPlate', targetId}`, sleeps between `nightSleep` and `nightWake` (no `input.
-move`, no portal), and in its window picks a legal act from `onubBalance.windows[role].acts` and a
-target of `acts[id].target` among the scene's `props` (never its own plate for `otherPlate`,
-`targetId2` for `picks: 2`), counts `wakes`, `acts`, `claims` and `nightLeaks` (any `presence`,
-`SceneState` or `nightWake` received while asleep); `VoteMode` gains `other` (a random living other
-seat, never self, never Skip), chosen automatically in quick mode, with a cap on repeated refusals;
-`claims: true` posts "I was <card.roleId>" once per meeting through `meeting.claim`. `swarm.ts`
-exposes `settings` and `addNpc`/`removeNpc` on the observer for the specs. Soak (`soak.ts`):
-`--mode onub` sets the mode through `lobby.settings` from the leader, skips `debug.deal`, idles when
-`meetings === 0 || acts === 0`, reports matches; the main-mode run unchanged; `pnpm bots:soak` runs
-the full 30 minutes against the built server (follow-up 7) and the result goes in the round-4 log
-with the p95; a new `.github/workflows/soak.yml` (`workflow_dispatch` plus a weekly cron,
-`timeout-minutes: 45`, never on push) runs both modes. Live (`live.ts`): `--mode onub` plays through
-the role cards and dusk. e2e: `onub.spec.ts` (two real browsers plus swarm bots, opt-in
-`WDI_E2E_ONUB=1`, `test.setTimeout(300_000)`): the observer sets the mode, the host starts, both
-pages see the quick-mode card line, dusk at the bakery with the plate prompt, the loft (`loft`,
-`bedroll-<id>`), a `night-wake` on the page whose dealt role (`debug.deal` with onub ids) has a
-window, `debug.clock {phase: 'dawn'}` after one window, the dawn meeting with `claim-<roleId>` and
-no `vote-skip`, a vote, the reveal, `gameover` with `swaplog` and `gameover-final-<id>`, the lobby
-return; `npc.spec.ts` (one browser, opt-in `WDI_E2E_NPC=1`): the host alone presses Start, sees
-`'4 / 10'` with pool names, `debug.npc {walk: false}`, kills and reports as `match.spec.ts` does, the
-meeting opens with three NPC votes inside the window, the match ends; a quick-mode variant with 1
-human + 3 NPCs through the Conductor. CI: `timeout-minutes: 15` on the check job; the server suite in
-its own job if the wall clock passes 4 minutes; the opt-in suites documented in ARCHITECTURE 5.12.
-Not in scope: server behaviour (R, S), client screens (T, U, V).
+**W. Bots, e2e, soak, CI.** Make every bot and harness play both modes and run the long checks. Brain
+(`tools/bots/walk.ts`): read `state.settings.mode`; in quick mode a bot walks to its own plate in dusk
+(the bakery prop whose `of` is its own id) and sends `act.ability {abilityId: 'onub.setPlate',
+targetId}`, sleeps between `nightSleep` and `nightWake` (no `input.move`, no portal: the server
+refuses portals in quick mode), and in its window picks a legal act from `onubBalance.windows.find((w)
+=> w.role === windowRole)?.acts` and a target of `acts[id].target` among the scene's `props` (never
+its own plate for `otherPlate`, `targetId2` for `picks: 2`), counts `wakes`, `acts`, `claims` and
+`nightLeaks` (any `presence`, `SceneState`, `sceneEnter` or `nightWake` received while asleep);
+`VoteMode` gains `other` (a random living other seat, never self, never Skip), chosen automatically in
+quick mode, with a cap on repeated refusals; `claims: true` posts "I was <card.roleId>" once per
+meeting through `meeting.claim`. `swarm.ts` exposes `settings` as a read-only accessor and
+`addNpc`/`removeNpc` on the observer for the specs. Soak (`soak.ts`): `--mode onub` sets the mode
+through `lobby.settings` from the leader (a bot there), skips `debug.deal`, idles when `meetings === 0
+|| acts === 0`, reports matches; the main-mode run unchanged; `pnpm bots:soak` runs the full 30
+minutes against the built server (follow-up 7) and the result goes in the round-4 log with the p95; a
+new `.github/workflows/soak.yml` (`workflow_dispatch` plus a weekly cron, `timeout-minutes: 45`, never
+on push) runs both modes. Live (`live.ts`): `--mode onub` plays through the role cards and dusk. e2e:
+`onub.spec.ts` (two real browsers plus swarm bots, opt-in `WDI_E2E_ONUB=1`,
+`test.setTimeout(300_000)`): the host page toggles `mode-toggle` (V's frozen hook) and the chip reads
+the quick-mode text, the observer only reads `state.settings.mode`, the host starts, both pages see
+the quick-mode card line, dusk at the bakery with the plate prompt, the loft (`loft`, `bedroll-<id>`),
+a `night-wake` on the page whose dealt role (`debug.deal` with onub ids, consumed by R's deal) has a
+window, `debug.clock {phase: 'dawn'}` after one window, the dawn meeting with `claim-<roleId>` and no
+`vote-skip`, a vote, the reveal, `gameover` with `swaplog` and `gameover-final-<id>`, the lobby
+return; `npc.spec.ts` (one browser, opt-in `WDI_E2E_NPC=1`): the host presses `add-npc` three times
+and sees `'4 / 10'` with three names that are not the host's, presses Start, `debug.npc {walk:
+false}`, kills and reports as `match.spec.ts` does, the meeting opens with three NPC votes inside the
+window, the match ends; a second case presses Start alone and sees four portraits in the meeting (the
+fill at Start); a quick-mode variant with 1 human + 3 NPCs through the Conductor. The pool is
+server-only: no spec imports `@wdi/content/server`. CI: `timeout-minutes: 15` on the check job; the
+server suite in its own job if the wall clock passes 4 minutes; the opt-in suites documented in
+ARCHITECTURE 5.12. Not in scope: server behaviour (R, S), client screens (T, U, V).
 
 **X. Art: bakery, loft, placeholder manifest.** The bakery props, the loft and the stand-ins the
 playtests still show. Props atlas (`props/`), keys `prop_plate`, `prop_deadLoaf`, `prop_ledger`,
-`prop_wakeTable`, `prop_oven`, `prop_basin`, `prop_flourSacks`, each a top-down 2.5D render at the
-`metrics.json` cell from Blender masters (CC BY 4.0 hand-made, masters to ROSW per ASSETS 6.6,
-`MANIFEST.md` rows) or a CC0 source with a `CREDITS.md` row, never Synty, never raw Mixamo or
-Quaternius; a `prop_plate_named` variant is not needed (the client draws the name). Loft: a dark
-backdrop `loft_backdrop` (one image, the bakery loft at night, storm light at the window) and
-`prop_bedroll` plus `prop_bedroll_self`, sized for the `.wdi-bedrolls` grid of `mockups/loft.html`.
-Placeholder manifest (follow-up 4): `?art=placeholder` gains `props` and `vfx` entries that point at
-greybox marks so no greybox label shows in a playtest; the four `bld_*_ext` exteriors and the six
-`tiles_*` sets get real stand-ins where the hours allow, in this order. `manifest.json` keys
-contract: T draws by these keys with a greybox fallback, so land the manifest entries first and the
-images after. Docs: ASSETS 6.3 (the new rows), 6.7, SPRITES 8. Not in scope: UI art, audio (Y).
+`prop_wakeTable`, `prop_oven`, `prop_basin`, `prop_flour_sacks` (the id-tail key `PropView` falls back
+to, since `bk.flour_sacks` has kind `taskSource`), each a top-down 2.5D render at the `metrics.json`
+cell from Blender masters (CC BY 4.0 hand-made, masters to ROSW per ASSETS 6.6, `MANIFEST.md` rows) or
+a CC0 source with a `CREDITS.md` row, never Synty, never raw Mixamo or Quaternius; a
+`prop_plate_named` variant is not needed (the client draws the name). Loft: `loft_backdrop` (one
+image, the bakery loft at night, storm light at the window), `prop_bedroll` and `prop_bedroll_self`,
+added as `type: image` manifest entries (T sets them as CSS backgrounds in the DOM loft) and sized for
+the `.wdi-bedrolls` grid of `mockups/loft.html`. Placeholder manifest (follow-up 4):
+`?art=placeholder` gains `props` and `vfx` entries that point at greybox marks so no greybox label
+shows in a playtest; the four `bld_*_ext` exteriors and the six `tiles_*` sets get real stand-ins
+where the hours allow, in this order. `manifest.json` keys contract: T draws by these keys with a
+greybox fallback, so land the manifest entries first and the images after. Docs: ASSETS 6.3 (the new
+rows), 6.7, SPRITES 8. Not in scope: UI art, audio (Y).
 
-**Y. Content, copy, audio, playtest kit.** The words, sounds and run sheets of both milestones.
-Names: review `packages/content/data/names.json` (40 names today) for the 1931 Hollowmere register
-and the house style, keep every name lobby-legal and free of role tokens, extend
-`content.test.ts` with the names rule. Copy: `docs/UI.md` 14.12 "Quick mode" (the lobby chip, the
-dusk plate prompt, the loft, the window banner, every act prompt and reveal line, the claim chip
-lines, the dawn reason, the plural reveal, the swap-log sentence patterns, the winner lines per
-`balance.onub.json` winners row) and 14.13 "NPC lobby" (Add NPC, Remove, difficulty, the hint,
-the practice line), ids in the 14.x style, no numbers; T, U and V paste them. Audio: `storm` (loop),
-`creak`, `loaf_crack`, `stamp` is already shipped; CC0 or CC BY with `LICENSES/` texts and
-`CREDITS.md` rows, listed in `audio/manifest.json`. Playtest kit: `docs/PLAYTESTS/README.md` gets
+**Y. Content, copy, audio, playtest kit.** The words, sounds and run sheets of both milestones. Names:
+review `packages/content/data/names.json` (40 names today; server-only, read through
+`@wdi/content/server`) for the 1931 Hollowmere register and the house style, keep every name
+lobby-legal and free of role tokens, and extend `packages/content/test/names.test.ts` if the review
+adds a rule (the schema and validator are frozen: a new rule they need goes in the PR description).
+Copy: `docs/UI.md` 14.12 "Quick mode" (the lobby chip, the dusk plate prompt, the loft, the window
+banner, every act prompt and reveal line, the claim chip lines, the dawn reason, the plural reveal and
+the abstainers line, the swap-log sentence patterns, the winner lines per `balance.onub.json` winners
+row) and 14.13 "NPC lobby" (Add NPC, Remove, difficulty, the hint, the practice line), ids in the 14.x
+style, no numbers; T, U and V paste them. Audio: `storm` (loop), `creak`, `loaf_crack` (`stamp` is
+already shipped); CC0 or CC BY with `LICENSES/` texts and `CREDITS.md` rows, listed in
+`audio/manifest.json` under the pre-seeded `AUDIO_KEYS`. Playtest kit: `docs/PLAYTESTS/README.md` gets
 the M3b and M3c rows (prerequisites unchanged; the session plan for a 6-player quick-mode evening and
 for a 1-3 human NPC session), `SCORECARD.md` the M3b lines of ROADMAP (three 6-player matches in 5-7
-minutes, players naming their final role at the reveal in half the matches, "would play again"
-against M3) and the M3c lines (1 human + 3 NPCs completes a match, the NPC Killer wins), `FORM.md`
-two questions, a `TEMPLATE.md` note. Docs: GDD 2 and the card-text table of 3.11 (wording only),
-WORLD.md (the bakery row's plates and the loft note), ROADMAP 7.5 (the 4-6 humans row). Not in
-scope: code.
+minutes, players naming their final role at the reveal in half the matches, "would play again" against
+M3) and the M3c lines (1 human + 3 NPCs completes a match, the NPC Killer wins), `FORM.md` two
+questions, a `TEMPLATE.md` note. Docs: GDD 2 (wording only), WORLD.md (the bakery row's plates and the
+loft note), ROADMAP 7.5 (two new rows after `4-5 humans`: `4-6 humans` for M3b and `1-3 humans` for
+M3c, no other change). The 3.11 card texts and `roles.onub.json` stay frozen this round; a wording fix
+goes in the PR description. Not in scope: code.
 
 ### Seams in round 4
 
 | Producer -> consumer | Contract | Until it lands |
 |---|---|---|
-| R -> T, U | `nightWake`, `nightReveal`, `nightSleep`, `MeetingState.claims` and `traces`, `voteResult.outs` and `roles`, `gameOver.onub`, `Settings.mode` (all pre-seeded) | T and U build on `?mode=onub` mocks of their own files and test against R's branch at integration |
-| R -> S | `startOnubMatch` and `beginOnubPlay` (`sim/Onub.ts`, pre-seeded hooks in `startMatch` and `beginPlay`) deal and start quick mode; S never edits those two lines | the hooks return false until R lands, so S's fill and settings run in the main mode |
-| S -> R | `isNpcSeat(room, id)` (pre-seeded, false until S lands); in quick mode the Conductor resolves NPC acts | R treats every seat as human until S lands |
-| R -> W | `debug.clock {phase: 'dawn' \| 'night', window}` and `debug.deal` with onub ids; the quick-mode message flow | W's `onub.spec.ts` and `--mode onub` are opt-in and run at integration |
-| S -> V, W | `lobby.settings`, `lobby.addNpc`, `lobby.removeNpc` accepted; `Settings.npcSeats` and `npcDifficulty` written; `debug.npc` | V tests on its mock; W's `npc.spec.ts` is opt-in |
-| T -> U | the router starts `Meeting` on `meetingStart` from `World` or `Loft` alike | nothing to stub: U's scene is started as today |
-| X -> T | manifest keys `prop_plate`, `prop_deadLoaf`, `prop_ledger`, `prop_wakeTable`, `prop_oven`, `prop_basin`, `prop_bedroll`, `prop_bedroll_self`, `loft_backdrop` | T draws a labelled greybox for a missing key |
-| Y -> T, U, V | `docs/UI.md` 14.12 and 14.13 ids and lines; audio keys `storm`, `creak`, `loaf_crack` | the sessions use the GDD 3.11 wording under ids of the 14.x shape and rename when Y lands; audio is silent until the manifest lists a key |
+| R -> T, U | `nightWake`, `nightReveal`, `nightSleep`, `Prop.of`, `MeetingState.claims` and `traces`, `voteResult.outs`, `roles` and `abstained`, `gameOver.onub` with `plates`, `Settings.mode` (all pre-seeded); one bakery `sceneEnter` at dusk and never an overworld one in quick mode | T and U build on `?mode=onub` mocks of their own files and test against R's branch at integration |
+| R -> U | the quick-mode `roleReveal`: `beware = onubRoles.cardLine`, `goal = roles[id].nightAct`, `cardText = roles[id].cardText`, empty `abilities` and `inventory` | U detects the quick-mode card by `beware` |
+| R -> S | `startOnubMatch` and `beginOnubPlay` (pre-seeded hooks in `startMatch` and `beginPlay`) deal, place and start quick mode; S never edits those two lines; `isOnub(room)` is the only mode test S uses; `plateOf` and `onubNpcPlan` drive the NPC brain in quick mode | the hooks return false and null until R lands, so S's fill and settings run in the main mode and the quick-mode brain idles |
+| S -> R | `isNpcSeat(room, id)` (pre-seeded, false until S lands): the Conductor plans an NPC waker's act and applies it if the brain never sends it; `endMatch` reads it for `players[].isNpc` and `resetToLobby` calls `resetNpcsForLobby` (both pre-seeded) | R treats every seat as human until S lands |
+| R -> W | `debug.clock {phase: 'dawn' \| 'night', window}` and `debug.deal` with onub ids (consumed by `startOnubMatch`); the quick-mode message flow; plates found by `Prop.of` | W's `onub.spec.ts` and `--mode onub` are opt-in and run at integration |
+| S -> V, W | `lobby.settings`, `lobby.addNpc`, `lobby.removeNpc {}` accepted; `Settings.npcSeats` and `npcDifficulty` written; `debug.npc` | V tests on its mock; W's `npc.spec.ts` is opt-in |
+| V -> W | the frozen hooks `mode-toggle`, `mode-chip`, `add-npc` | W's specs are opt-in and run at integration |
+| T -> U | the router starts `Meeting` on `meetingStart` from `World` or `Loft` alike; in the mocks `meetingRequest {reason: 'dawn'}` is the quick-mode signal, and V's `mock.ts` passes it through unchanged | nothing to stub: U's scene is started as today |
+| X -> T | manifest keys `prop_plate`, `prop_deadLoaf`, `prop_ledger`, `prop_wakeTable`, `prop_oven`, `prop_basin`, `prop_flour_sacks`; `loft_backdrop`, `prop_bedroll`, `prop_bedroll_self` as `type: image` entries; static props stay content, the feed overlays plates, dead loaves and the ledger | T draws a labelled greybox for a missing key and the mockup's CSS bedrolls for a missing image |
+| Y -> T, U, V | `docs/UI.md` 14.12 and 14.13 ids and lines; audio files for the pre-seeded keys `storm`, `creak`, `loaf_crack` | the sessions use the GDD 3.11 wording under ids of the 14.x shape and rename when Y lands; audio is silent until the manifest lists a key |
 | V -> T, U | `LobbySnapshot.settings` | not needed by T or U: both read `state.settings.mode` through their own feeds |
 
 ### Clarifications recorded before the round (DECISIONS A39)
 
-- The loft is a pseudo-scene (`LOFT_SCENE_INDEX` 255), never a sixteenth content scene; sleepers
-  get no SceneState and no presence, and every public `sceneId` reads 255 all night.
-- Plates are the frozen `bk.plate_<ordinal>` props; `Prop.turned` stays false in V1; the dawn traces
-  list every window the night ran, so they are cosmetic.
+- The loft is a pseudo-scene (`LOFT_SCENE_INDEX` 255), never a sixteenth content scene; sleepers get
+  no SceneState and no presence, every public `sceneId` reads 255 from night start until the lobby
+  reset, and a loft player is refused every portal, hold and verb.
+- Quick mode never leaves the bakery: `beginOnubPlay` places every seat at the `door` spawn,
+  `placeNewPlayers` places nobody, and every portal is refused 425.
+- Plates are the frozen `bk.plate_<slot>` props, slot = the seat's index in the deal order, owner in
+  `Prop.of`; `Prop.turned` stays false in V1; the dawn traces list every window the night ran, so they
+  are cosmetic.
 - Every quick-mode act, the dusk plate set included, is one `act.ability` after a client-side hold;
   the server validates once (phase, window, actor, reach, target).
-- `Private.role` is the dealt role all match (no `Private.dealtRole`); final roles, the loaves and
-  the swap log are room memory until the reveal and the end screen.
-- The dawn vote has no Skip and no self-vote, abstentions are allowed, ties turn out everyone at
-  the top when the count reaches `minVotesToTurnOut`; `winner` is one `Winner`, `gameOver.onub`
-  carries the rest.
-- NPC seats are ordinary `Player` rows with session-shaped ids, connected and ready, named from the
-  pool, never the leader; humans are counted by `room.clients`; the fill happens at Start, "Add NPC"
-  in the lobby; `Settings.npcSeats` publishes a count only.
+- `Private.role` is the dealt role all match (no `Private.dealtRole`); `cabalMates` is the Poisoner
+  pair only; final roles, the loaves and the swap log are room memory until the reveal and the end
+  screen.
+- The dawn vote has no Skip and no self-vote, abstentions are allowed and named in
+  `voteResult.abstained`, ties turn out everyone at the top when the count reaches
+  `minVotesToTurnOut`; the turned-out are marked dead without a `killed` message; `winner` is one
+  `Winner`, `gameOver.onub` carries the rest; the winners table is judged on final loaves.
+- NPC seats are ordinary `Player` rows with session-shaped ids, connected, ready in the lobby and
+  readied at a human pace on the role card, named from the server-only pool, never the leader; humans
+  are counted by `room.clients`; the fill happens at Start, "Add NPC" in the lobby;
+  `Settings.npcSeats` publishes a count only and `lobby.removeNpc` names no seat.
 - `runNpcs` writes inputs and calls the verbs directly inside the step; its numbers are the
-  `balance.json` `npc` rows.
+  `balance.json` `npc` rows. In quick mode the Conductor wakes NPC seats like humans and plans their
+  acts.
 - Frozen e2e hooks: `mode-chip`, `mode-toggle`, `add-npc`, `remove-npc`, `npc-difficulty`, `loft`,
   `bedroll-<id>`, `night-wake`, `claim-<roleId>`, `swaplog`, `gameover-final-<id>`; `vote-skip` is
   absent in quick mode.

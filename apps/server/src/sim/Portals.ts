@@ -15,7 +15,9 @@ import { FOOT_HALF_PX, PORTAL_REACH_TILES, StatusBit } from './constants';
 import { statusBitsOf } from './Movement';
 import { emitNoise } from './Noise';
 import { type PlayerSim, simOf } from './RoomSim';
+import { isOnub } from './Onub';
 import {
+  isLoft,
   isSceneId,
   isWorldPhase,
   navGrid,
@@ -109,6 +111,8 @@ export function enterScene(
 export function placeNewPlayers(room: PartyRoom): void {
   const sim = simOf(room);
   if (!isWorldPhase(room.state.phase)) return;
+  // Quick mode places its own seats in the bakery (`beginOnubPlay`, A39): no square, no teaching clue.
+  if (isOnub(room)) return;
   if (!sim.profileFixed) {
     // The first placement fixes the profile for the match from the party size (GDD 3.9).
     sim.profile = profileFor(Math.min(MAX_PLAYERS, Math.max(MIN_PLAYERS_TO_START, room.state.players.size)));
@@ -147,7 +151,8 @@ export function runPortals(room: PartyRoom): void {
     const player = room.state.players.get(req.sessionId);
     const p = sim.players.get(req.sessionId);
     if (!player || !p) continue;
-    if (!isWorldPhase(room.state.phase) || !p.placed) {
+    // Nobody leaves the bakery in quick mode, and a sleeper in the loft is in no scene at all (A39).
+    if (!isWorldPhase(room.state.phase) || !p.placed || isLoft(p.sceneIdx) || isOnub(room)) {
       reject(room, req.sessionId, ErrorCode.wrongPhase, 'not now');
       continue;
     }

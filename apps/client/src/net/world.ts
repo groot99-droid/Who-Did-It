@@ -93,7 +93,7 @@ export type WorldFeedEvents = {
   clueFound: { entryId: string };
   phaseChange: { phase: number; endsTick: number };
   /** Mock only: the mock world's report or bell asks the mock network to open a meeting (round 3, M | N seam). */
-  meetingRequest: { reason: 'body' | 'bell'; callerId: string; bodyOf?: string };
+  meetingRequest: { reason: 'body' | 'bell' | 'dawn'; callerId: string; bodyOf?: string };
 };
 
 export interface WorldFeed {

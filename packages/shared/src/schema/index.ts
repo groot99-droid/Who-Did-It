@@ -75,7 +75,8 @@ export const Clue = schema(
   { id: str(), kind: u8(), value: u8(), dir: u8(), x: i16(), y: i16(), claimed: bool() },
   'Clue',
 );
-export const Prop = schema({ id: str(), kind: str(), turned: bool() }, 'Prop');
+/** `of` is the owner's seat id for a quick-mode plate (plates are named, GDD 3.11), else empty (A39). */
+export const Prop = schema({ id: str(), kind: str(), turned: bool(), of: str() }, 'Prop');
 
 export const SceneState = schema(
   {
@@ -107,8 +108,9 @@ export const NotebookEntry = schema(
 export const TaskEntry = schema({ id: str(), done: bool(), fake: bool() }, 'TaskEntry');
 /**
  * Quick mode (A39): what a night act showed its actor. `slot` is the prop id (`bk.plate_<n>`,
- * `bk.deadloaf_<n>`, `bk.ledger`), `of` the owning seat's id (empty for a dead loaf or the ledger),
- * `roleId` the token read. Private, so a reconnecting client can re-read it.
+ * `bk.deadloaf_<n>`, `bk.ledger`); `of` is the seat the token belongs to: the plate's owner for a
+ * plate, the named Poisoner for a ledger entry, empty for a dead loaf; `roleId` the token read.
+ * Private, so a reconnecting client can re-read it.
  */
 export const NightReveal = schema({ slot: str(), of: str(), roleId: str() }, 'NightReveal');
 export const LedgerLine = schema({ sceneId: u8(), tick: u32() }, 'LedgerLine');

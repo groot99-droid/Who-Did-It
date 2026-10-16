@@ -5,7 +5,7 @@ import { handleHold } from './Hold';
 import { handleKill } from './Kill';
 import { handleOnubAbility } from './Onub';
 import { type PlayerSim, simOf } from './RoomSim';
-import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
+import { isLoft, isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
 const BELL = scenes.overworld.props.find((q) => q.id === 'ov.bell');
 
@@ -37,7 +37,8 @@ function livingActor(room: PartyRoom, sessionId: string, needBellPhase = false):
   const phaseOk = needBellPhase
     ? phase === Phase.day || phase === Phase.dusk || phase === Phase.night
     : isVerbPhase(phase);
-  if (p.dead || !p.placed) reject(room, sessionId, ErrorCode.cannot, 'not now');
+  // A sleeper in the quick-mode loft is in no scene and acts on nothing (A39).
+  if (p.dead || !p.placed || isLoft(p.sceneIdx)) reject(room, sessionId, ErrorCode.cannot, 'not now');
   else if (!phaseOk) reject(room, sessionId, ErrorCode.wrongPhase, 'not now');
   else if (room.state.tick < p.busyUntilTick) reject(room, sessionId, ErrorCode.busy, 'busy');
   else return p;

@@ -23,6 +23,8 @@ export interface DawnOutcome {
   tally: Record<string, number>;
   /** Everyone holding the most votes when that is at least `minVotesToTurnOut`, ties included. */
   outs: string[];
+  /** Living seats with no vote in `votes`, for `voteResult.abstained`. */
+  abstained: string[];
 }
 
 /** Deals `deck` (ids.length + 3 loaves) to `ids`; the three left over are the dead's loaves. */

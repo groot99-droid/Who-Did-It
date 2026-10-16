@@ -187,7 +187,7 @@
         "suspectVoteChance": 1
       }
     },
-    "wander": { "stepMinS": 1, "stepMaxS": 3, "portalChance": 0.4 },
+    "wander": { "stepMinS": 1, "stepMaxS": 3, "portalSteerChance": 0.25, "portalChance": 0.4 },
     "vote": { "delayMinS": 3, "delayMaxS": 12 },
     "gddRef": "3.12"
   },

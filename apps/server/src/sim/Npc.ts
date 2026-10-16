@@ -7,6 +7,12 @@ import type { PartyRoom } from '../rooms/PartyRoom';
  */
 export function runNpcs(_room: PartyRoom): void {}
 
+/**
+ * Called by `resetToLobby` after every field is cleared: NPC seats stay seated, are readied again and keep
+ * their mark (A39). Round 4: Session S.
+ */
+export function resetNpcsForLobby(_room: PartyRoom): void {}
+
 /** Whether `id` is an NPC seat of this room (room memory, never on the wire). Session S keeps the set. */
 export function isNpcSeat(_room: PartyRoom, _id: string): boolean {
   return false;
