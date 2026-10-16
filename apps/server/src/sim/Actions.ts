@@ -1,0 +1,146 @@
+import { abilities, roles, scenes } from '@wdi/content';
+import { ErrorCode, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
+import type { PartyRoom } from '../rooms/PartyRoom';
+import { handleHold } from './Hold';
+import { handleKill } from './Kill';
+import { type PlayerSim, simOf } from './RoomSim';
+import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
+
+const BELL = scenes.overworld.props.find((q) => q.id === 'ov.bell');
+
+/** Dispatches the `act.*` verbs of the Round 3 brief; every payload is untrusted. */
+export function runAction(
+  room: PartyRoom,
+  sessionId: string,
+  type: string,
+  payload: Record<string, unknown>,
+): void {
+  switch (type) {
+    case 'act.ability':
+      return handleAbility(room, sessionId, payload);
+    case 'act.hold':
+      return handleHold(room, sessionId, payload);
+    case 'act.reportBody':
+      return handleReport(room, sessionId, payload);
+    case 'act.bell':
+      return handleBell(room, sessionId);
+    default:
+  }
+}
+
+/** A living, placed player in a phase where verbs work, else the refusal is sent and null returned. */
+function livingActor(room: PartyRoom, sessionId: string, needBellPhase = false): PlayerSim | null {
+  const p = simOf(room).players.get(sessionId);
+  if (!p) return null;
+  const phase = room.state.phase;
+  const phaseOk = needBellPhase
+    ? phase === Phase.day || phase === Phase.dusk || phase === Phase.night
+    : isVerbPhase(phase);
+  if (p.dead || !p.placed) reject(room, sessionId, ErrorCode.cannot, 'not now');
+  else if (!phaseOk) reject(room, sessionId, ErrorCode.wrongPhase, 'not now');
+  else if (room.state.tick < p.busyUntilTick) reject(room, sessionId, ErrorCode.busy, 'busy');
+  else return p;
+  return null;
+}
+
+function handleAbility(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
+  switch (payload.abilityId) {
+    case 'kill':
+      return handleKill(room, sessionId, payload);
+    case 'bandage':
+      return handleBandage(room, sessionId, payload);
+    default:
+      reject(room, sessionId, ErrorCode.cannot, 'cannot do that');
+  }
+}
+
+/** Bandage (GDD 3.2): consumes one from the kit, protects the target from the next strike for `protectS`. */
+function handleBandage(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
+  const def = abilities.abilities.bandage;
+  const player = room.state.players.get(sessionId);
+  if (!def || !player) return;
+  if (!roles.roles[player.priv.role.roleId]?.abilities.includes('bandage')) {
+    reject(room, sessionId, ErrorCode.cannot, 'no bandage');
+    return;
+  }
+  const actor = livingActor(room, sessionId);
+  if (!actor) return;
+  const tick = room.state.tick;
+  if (tick < (player.priv.cooldownEndTick.get('bandage') ?? 0)) {
+    reject(room, sessionId, ErrorCode.cooldown, 'not ready');
+    return;
+  }
+  const targetId = payload.targetId;
+  const target =
+    typeof targetId === 'string' && targetId !== sessionId ? simOf(room).players.get(targetId) : undefined;
+  if (!target || target.dead || !target.placed || target.sceneIdx !== actor.sceneIdx) {
+    reject(room, sessionId, ErrorCode.cannot, 'no target');
+    return;
+  }
+  if (Math.hypot(target.x - actor.x, target.y - actor.y) > (def.rangeTiles ?? 0) * TILE_PX) {
+    reject(room, sessionId, ErrorCode.outOfRange, 'too far');
+    return;
+  }
+  const slots = player.priv.inventory.slots;
+  const at = slots.findIndex((s) => s.defId === (def.consumes ?? 'bandage') && s.qty > 0);
+  const stack = slots[at];
+  if (!stack) {
+    reject(room, sessionId, ErrorCode.cannot, 'no bandages left');
+    return;
+  }
+  if (stack.qty <= 1) slots.splice(at, 1);
+  else stack.qty -= 1;
+  target.bandagedUntilTick = tick + Math.round((def.params?.protectS ?? 0) * TICK_RATE);
+  player.priv.cooldownEndTick.set('bandage', tick + Math.round((def.cooldownS ?? 0) * TICK_RATE));
+}
+
+/** `act.reportBody {bodyId}`: a living player near an unreported body in its scene asks for a meeting. */
+function handleReport(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
+  const actor = livingActor(room, sessionId);
+  if (!actor) return;
+  const sim = simOf(room);
+  const bodyId = payload.bodyId;
+  const body =
+    typeof bodyId === 'string'
+      ? room.state.scenes.get(sceneKey(actor.sceneIdx))?.bodies.get(bodyId)
+      : undefined;
+  if (typeof bodyId !== 'string' || !body) {
+    reject(room, sessionId, ErrorCode.cannot, 'no body there');
+    return;
+  }
+  if (
+    Math.hypot(body.x - actor.x, body.y - actor.y) >
+    (abilities.abilities.report?.rangeTiles ?? 0) * TILE_PX
+  ) {
+    reject(room, sessionId, ErrorCode.outOfRange, 'too far');
+    return;
+  }
+  if (sim.reportedBodies.has(bodyId)) {
+    reject(room, sessionId, ErrorCode.cannot, 'already reported');
+    return;
+  }
+  sim.reportedBodies.add(bodyId);
+  sim.meetingRequests.push({ reason: 'body', callerId: sessionId, bodyOf: body.of });
+}
+
+/** `act.bell`: on the overworld within reach of `ov.bell`, at most the role's `bellPulls` per match. */
+function handleBell(room: PartyRoom, sessionId: string): void {
+  const player = room.state.players.get(sessionId);
+  const actor = livingActor(room, sessionId, true);
+  if (!player || !actor || !BELL) return;
+  if (actor.sceneIdx !== 0) {
+    reject(room, sessionId, ErrorCode.outOfRange, 'too far');
+    return;
+  }
+  const reach = (abilities.abilities.bell?.rangeTiles ?? 0) * TILE_PX;
+  if (Math.hypot(actor.x - tileCentre(BELL.x, TILE_PX), actor.y - tileCentre(BELL.y, TILE_PX)) > reach) {
+    reject(room, sessionId, ErrorCode.outOfRange, 'too far');
+    return;
+  }
+  if (actor.bellPulls >= (roles.roles[player.priv.role.roleId]?.bellPulls ?? 0)) {
+    reject(room, sessionId, ErrorCode.cannot, 'the rope is spent');
+    return;
+  }
+  actor.bellPulls++;
+  simOf(room).meetingRequests.push({ reason: 'bell', callerId: sessionId });
+}

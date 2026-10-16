@@ -12,38 +12,23 @@ import {
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { FOOT_HALF_PX, PORTAL_REACH_TILES, StatusBit } from './constants';
+import { statusBitsOf } from './Movement';
+import { emitNoise } from './Noise';
 import { type PlayerSim, simOf } from './RoomSim';
-import { isSceneId, isWorldPhase, navGrid, profileOpen, sceneIndex, sceneKey, tileCentre } from './World';
+import {
+  isSceneId,
+  isWorldPhase,
+  navGrid,
+  profileOpen,
+  reject,
+  sceneIndex,
+  sceneKey,
+  tileCentre,
+} from './World';
+import { spawnTeachingClue } from './Clues';
 import { reconcileViews } from './Visibility';
 
 const ticks = (seconds: number): number => Math.round(seconds * TICK_RATE);
-
-function reject(room: PartyRoom, sessionId: string, code: number, msg: string): void {
-  room.clients.getById(sessionId)?.send(S2C.error, { code, msg });
-}
-
-/** Sends `noise` to everyone in `sceneId` within `radiusTiles` of (x, y), except `exceptId`. */
-function emitNoise(
-  room: PartyRoom,
-  sceneId: SceneId,
-  x: number,
-  y: number,
-  radiusTiles: number,
-  kind: string,
-  exceptId: string,
-): void {
-  const sim = simOf(room);
-  const reach = radiusTiles * TILE_PX;
-  const idx = sceneIndex(sceneId);
-  for (const client of room.clients) {
-    const player = room.state.players.get(client.sessionId);
-    const p = sim.players.get(client.sessionId);
-    if (!player || !p?.placed || client.sessionId === exceptId || p.sceneIdx !== idx) continue;
-    if (Math.hypot(p.x - x, p.y - y) <= reach) {
-      client.send(S2C.noise, { sceneId, x: Math.round(x), y: Math.round(y), kind });
-    }
-  }
-}
 
 /** The portal of `sceneId` nearest to a tile; the other half of a pair, used for the arrival swing. */
 function nearestPortal(sceneId: SceneId, tx: number, ty: number): Portal | null {
@@ -106,12 +91,12 @@ export function enterScene(
     p.busyUntilTick = until;
     p.transitFrom = fromScene;
     presence.transitUntilTick = until;
-    presence.statusBits = StatusBit.transit;
+    presence.statusBits = StatusBit.transit | (statusBitsOf(p, tick) & StatusBit.bloody);
   } else {
     p.busyUntilTick = 0;
     p.transitFrom = -1;
     presence.transitUntilTick = 0;
-    presence.statusBits = 0;
+    presence.statusBits = statusBitsOf(p, tick);
   }
   if (announce) {
     room.clients.getById(player.id)?.send(S2C.sceneEnter, { sceneId, spawn: spawn.id, facing: spawn.facing });
@@ -129,6 +114,7 @@ export function placeNewPlayers(room: PartyRoom): void {
     applyProfileToDoors(room);
     sim.profileFixed = true;
   }
+  spawnTeachingClue(room);
   let placedAny = false;
   for (const [sessionId, p] of sim.players) {
     if (p.placed) continue;
@@ -164,7 +150,8 @@ export function runPortals(room: PartyRoom): void {
       reject(room, req.sessionId, ErrorCode.wrongPhase, 'not now');
       continue;
     }
-    if (tick < p.busyUntilTick) {
+    // A ghost has no busy state and no lock to respect (A30).
+    if (!p.dead && tick < p.busyUntilTick) {
       reject(room, req.sessionId, ErrorCode.busy, 'busy');
       continue;
     }
@@ -183,16 +170,18 @@ export function runPortals(room: PartyRoom): void {
       reject(room, req.sessionId, ErrorCode.closed, 'boarded up');
       continue;
     }
-    if (portal.lock !== null) {
+    if (portal.lock !== null && !p.dead) {
       // Keys are inventory items and arrive with M5; until then a keyed door stays locked.
       reject(room, req.sessionId, ErrorCode.locked, 'locked');
       continue;
     }
-    if (!isSceneId(portal.to) || !enterScene(room, player, p, portal.to, portal.toSpawn, true)) {
+    // A ghost's crossing is a plain move: no transit, no door swing, no noise (A30).
+    if (!isSceneId(portal.to) || !enterScene(room, player, p, portal.to, portal.toSpawn, !p.dead)) {
       reject(room, req.sessionId, ErrorCode.cannot, 'no way through');
       continue;
     }
     crossed = true;
+    if (p.dead) continue;
     swingDoor(room, from, portal.id);
     const arrival = nearestPortal(portal.to, p.x / TILE_PX, p.y / TILE_PX);
     if (arrival) swingDoor(room, portal.to, arrival.id);

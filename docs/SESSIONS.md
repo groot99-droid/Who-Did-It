@@ -627,3 +627,19 @@ win; the win check runs after deaths and ejections only; after game over the roo
 with the same code; a disconnected player is a ghost at once (M7 adds reconnection and the body) and a
 lobby seat survives a dropped connection for the disconnect window; `WDI_DEBUG=1` adds `debug.deal`
 and `debug.clock` beside `debug.play`.
+
+### Round 3 log: L
+
+**Landed** (`claude/m3-kill`): `validateKill`, `segmentBlocked`, `trailDir`, `besideTile`, `evictOverCap` in `packages/shared/src/rules/{kill,clues}.ts` (pure, randomized property tests in `packages/shared/test/kill.test.ts`); on the server `sim/{Actions,Kill,Death,Bodies,Hold,Noise}.ts`, the filled `Clues.ts` (`spawnClue`, `spawnKillClues`, `spawnTeachingClue`, `runDecay`), ghosts in `Movement.ts` and `Portals.ts`, the new fields in `RoomSim.ts` (all reset in both `resetForLobby()`), and `reject`, `isKillPhase`, `isVerbPhase` in `World.ts`. Tests: `test/killHelpers.ts` and `test/{kill,clue,hold,report,ghost}.test.ts`, including the ARCHITECTURE 5.4 diff test scoped to M3. GDD 3.2 and 3.4 got their "(M3)" sentences, ARCHITECTURE 5.6 a note, DECISIONS A32 the small calls.
+
+**For K and the orchestrator.**
+
+- The tests set `room.state.phase` white-box through `setPhase`, which also pushes `phaseEndsTick` out an hour. If K's `runPhases` derives a phase from `startTick`, `debug.play` and the cooldown rather than from `phaseEndsTick`, those tests need `debug.clock` instead.
+- `record()` in `killHelpers.ts` wraps `sim.meetingRequests` and `sim.deaths` so the report and bell tests still see requests once K drains them. The kill test reads `sim.deaths` through it too.
+- The fuzz test tolerates the victim's presence disappearing from a witness view (K's `Visibility.ts` change); it does not require it. After the merge, add an assertion that the living stop receiving the victim.
+- The kill cooldown is read from `priv.cooldownEndTick.kill` only; with no entry (a `debug.play` match before K's day transition) the Knife is ready but the grace phase still refuses (425).
+- Death by ejection, flipping the public `alive`, and clearing `scenes.*.bodies/clues` at the lobby reset are K's; `RoomSim.resetForLobby()` clears `clueMeta`, `reportedBodies` and the teaching flag, so K only has to delete the schema entries.
+- The Killer's scream is not sent to the Killer; every other placed player in the scene within `noise.killScream` hears it, ghosts included.
+
+**Not done.** Kill does not require the Knife item in the inventory (the Knife is bound; the role list decides). No ack message exists for Bandage; the Doctor sees the stock and cooldown change in the private state. Felt, prints, the 2-of-3 choice, knockback, blackout and witness entries are M4.
+

@@ -1,6 +1,8 @@
 import type { Client } from '@colyseus/core';
 import { C2S } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { runAction } from './Actions';
+import { runHolds } from './Hold';
 import { queuePortal } from './PortalQueue';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
@@ -50,9 +52,16 @@ export function runCommands(room: PartyRoom): void {
       case C2S.enterPortal:
         queuePortal(room, cmd.sessionId, payload);
         break;
+      case C2S.ability:
+      case C2S.hold:
+      case C2S.reportBody:
+      case C2S.bell:
+        runAction(room, cmd.sessionId, cmd.type, payload);
+        break;
       default:
-        // act.*, meeting.*, chat.* arrive in M2+; queued and ignored until their stage exists.
+        // act.interact, hide, check, burst, present arrive with M4+; queued and ignored until then.
         break;
     }
   }
+  runHolds(room);
 }
