@@ -70,6 +70,8 @@ Characters: a generated placeholder atlas (`tools/sprites/placeholder.ts`) with 
 
 Metrics per match (server JSON lines): phase durations; kill -> report time; unreported bodies; clues collected per player; Inspect / Compare uses; vote accuracy; suspect-set correctness; chat lines per player; disconnects and reconnect success; FPS percentiles by device class; match length and winner by player count. Feedback form after each session: role played; "understood my role in 20 s" 1-5; "I knew where to go"; "the vote felt fair"; most confusing moment; phone or desktop; would play again 1-10; one thing to add, one to remove.
 
+The playtest kit lives in `docs/PLAYTESTS/`: `README.md` is the run sheet (owner prerequisites, the session plan, the host's script), `FORM.md` is the feedback form above built question by question for Google Forms, `SCORECARD.md` is the M3 fun-or-stop sheet with the decision line, and `TEMPLATE.md` is one session's notes, copied to `YYYY-MM-DD-<milestone>.md`.
+
 ### 7.6 Workflow
 
 `main` is always deployable and protected by CI. One branch per milestone task (`m4a/clues-and-lenses`), one AI session per branch scoped to a single task prompt from `ROADMAP.md`, PRs under 400 lines with tests for rules changes and a GDD note when behaviour changes. Squash-merge; tag `v0.<milestone>.<n>` at milestone exit. `pnpm docs:balance` regenerates `BALANCE.md` from `balance.json` and the PR template has a "docs updated" checkbox; there is no CI grep gate, no changelog automation and no preview deployments until a second contributor exists. Sessions never upgrade dependencies.
