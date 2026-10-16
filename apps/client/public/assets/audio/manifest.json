@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "entries": [
+    { "key": "footstep", "url": "footstep.ogg", "gain": 0.4 },
+    { "key": "door_open", "url": "door_open.ogg", "gain": 0.8 },
+    { "key": "door_close", "url": "door_close.ogg", "gain": 0.8 },
+    { "key": "door_locked", "url": "door_locked.ogg", "gain": 0.9 },
+    { "key": "pickup", "url": "pickup.ogg", "gain": 1 },
+    { "key": "scream", "url": "scream.ogg", "gain": 0.9 },
+    { "key": "bell", "url": "bell.ogg", "gain": 1 },
+    { "key": "stamp", "url": "stamp.ogg", "gain": 1 },
+    { "key": "ambient", "url": "ambient.ogg", "gain": 0.3 }
+  ]
+}

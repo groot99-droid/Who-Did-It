@@ -351,3 +351,206 @@ faction is shown for other players.
   area for them and the portrait slot on the meeting tile is slate until then.
 - The loaf and plate marks are the chip-sized versions; the Wake Table props are world sprites
   and belong to the art pipeline.
+
+## 14. Copy deck (M3)
+
+Session Q, 2026-10-16. Every line the M3 screens show during a match, with an id. Sessions M and N
+paste from here; a later change edits the line here first, then the code. The deck describes the
+rules of `docs/GDD.md` and DECISIONS A30 and never changes them. It holds no number: a value in
+braces is filled at run time, from state (`{name}`, `{scene}`) or from content (`{duskS}` is
+`balance.phases.duskS`, `{maxChars}` is `balance.chat.maxChars`). `{name}` is a seat's public name,
+`{scene}` a scene's `name` from `scenes/*.json` ("The Drowned Lantern"), `{role}` a role's `name`
+from `roles.json`, `{key}` the bound key shown as a keycap. Lines on the landing, lobby and role
+card already exist in `ui/{Landing,Lobby,RoleCard}.ts` and are listed in 14.11 so the deck is whole.
+
+House style: sentence case; no exclamation marks; the second person for the player ("You are a
+ghost"); the past tense for what happened ("Hana rang the bell"); the village's own words over game
+words where both are clear ("body", not "corpse"; "the bell", not "the emergency button"). A toast,
+prompt or log line fits one row at 390 px (UI 1.1) with its placeholders filled. Never put a role, a faction or a death that is still private into a line
+another player sees (UI 1.6, A30): a living player's screen says nothing about a kill until the
+body is reported or the meeting opens.
+
+### 14.1 Toasts (`.wdi-toast`, N)
+
+| Id | Kind | Text | When |
+|---|---|---|---|
+| `toast.grace.sneak` | `--interact` | Shift to sneak | grace, first of three (GDD 2 step 5) |
+| `toast.grace.collect` | `--interact` | Hold E on a glowing clue | grace, second |
+| `toast.grace.bell` | `--warm` | E at the bell calls a meeting | grace, third |
+| `toast.dusk` | `--warm` | Night falls in {duskS} s | on entering dusk (GDD 3.3) |
+| `toast.night` | `--warm` | Night falls | on entering night |
+| `toast.day` | `--warm` | Morning | on entering day after a night |
+| `toast.immunity` | `--warm` | Back to the square | on the `sceneEnter` that ends a meeting |
+| `toast.ghost` | `--hazard` | You are a ghost | on `killed`, and on entering a World as a ghost |
+| `toast.clue.found` | `--interact` | Clue in your Notebook | on `clueFound`, while the Notebook opens |
+| `toast.collect.cancel` | `--interact` | Collect cancelled | a hold released or broken before it ends |
+| `toast.nothing` | `--interact` | Nothing to use here | E or Use with no target in reach (today's line) |
+
+### 14.2 Prompts (`data-testid="prompt"`, N)
+
+The keycap comes first and is drawn by the prompt, not typed into the text; on touch the Use or Act
+disc carries the key instead.
+
+| Id | Key | Text | Target |
+|---|---|---|---|
+| `prompt.report` | E | Report the body | a body in reach |
+| `prompt.collect` | E (hold) | Hold to collect | a clue in reach; the ring fills over the cast time |
+| `prompt.bell` | E | Ring the bell | `ov.bell` on the overworld in reach |
+| `prompt.bell.spent` | – | The bell is spent for you | the bell in reach and no pulls left |
+| `prompt.door` | E | Enter | a door in reach (today's line) |
+| `prompt.door.boarded` | – | Boarded up | a portal closed at this profile (today's line) |
+| `prompt.ability` | Q / R / F | {ability} {target} | an ability row of the card with a living player in reach; `{ability}` is the card row's `name` ("Kill", "Bandage") |
+| `prompt.ability.cooldown` | – | {ability} in {s} s | the same row while its cooldown runs; `{s}` is the remaining seconds |
+
+Touch labels (`.wdi-touch-btn`): `touch.use` Use, `touch.act` Act, `touch.run` Run, `touch.sneak`
+Sneak.
+
+### 14.3 Refusals (a toast after a refused action, N)
+
+The server's refusal codes (ARCHITECTURE 5.5) map to one line each. A refusal never says why in
+terms another player could learn from: "Too far" is safe; "They are protected" is not, so the
+Bandage refusal reads exactly like a missed strike that the GDD calls "nothing happens".
+
+| Id | Code | Text |
+|---|---|---|
+| `refuse.notNow` | 425 | Not now |
+| `refuse.busy` | 426 | Your hands are full |
+| `refuse.cooldown` | 424 | Not ready yet |
+| `refuse.reach` | 427 | Too far |
+| `refuse.nothing` | 422 on `kill` | Nothing happens |
+| `refuse.reported` | 422 on `reportBody` | Someone already reported this body |
+| `refuse.bell` | a refused `bell` | The bell is spent for you |
+| `refuse.locked` | 423 | Locked (and `door_locked` plays) |
+| `refuse.closed` | 428 | Boarded up (and `door_locked` plays) |
+| `refuse.generic` | other 4xx | That did not work |
+
+### 14.4 HUD and log (N)
+
+| Id | Text | Notes |
+|---|---|---|
+| `hud.goal` | Your goal | caps label on the chip |
+| `hud.card` | Role card (Tab) | the chip's button (today's line) |
+| `hud.notebook` | Notebook (N) | the button beside the chip |
+| `phase.grace` | Grace | clock caption |
+| `phase.day` | Day | |
+| `phase.dusk` | Dusk | |
+| `phase.night` | Night | `--night` clock |
+| `phase.meetingDiscussion` | Discuss | |
+| `phase.meetingVote` | Vote | |
+| `phase.reveal` | Reveal | |
+| `phase.immunity` | Calm | kills are off; the word avoids promising more than that |
+| `phase.gameOver` | Over | |
+| `log.scream` | A scream from the {dir} | `{dir}` from `dir.*` below; also `scream` plays |
+| `log.door` | A door to the {dir} | a door noise from another player |
+| `log.steps` | Footsteps to the {dir} | a run noise |
+| `log.bell` | The bell rings | the bell noise, before the meeting opens |
+
+Directions (`dirFromVector` ids): `dir.n` north, `dir.ne` north-east, `dir.e` east, `dir.se`
+south-east, `dir.s` south, `dir.sw` south-west, `dir.w` west, `dir.nw` north-west.
+
+### 14.5 Notebook (N)
+
+| Id | Text | Notes |
+|---|---|---|
+| `notebook.title` | Notebook | panel title |
+| `notebook.empty` | No clues yet. Hold E on a glowing clue. | no entries |
+| `notebook.entry.footprints` | Footprints, {stride}: {height} | `{height}` is the `traits.json` label |
+| `notebook.entry.thread` | Thread, {wool} wool: {scarf} | `{scarf}` is the `traits.json` label |
+| `notebook.meta` | {scene}, {time} | `{time}` is `m:ss` from `tick - startTick` |
+| `notebook.status.claimed` | Claimed | `--quiet` chip: you saw it, nobody checked it |
+| `notebook.status.verified` | Verified | `--verified` chip: a Detective's entry |
+| `notebook.status.teaching` | Practice | the grace clue; it says nothing about anyone |
+
+Stride words by height: `stride.short` short stride, `stride.mid` even stride, `stride.tall` long
+stride. Wool words by scarf: `wool.red` red, `wool.green` green, `wool.blue` blue. So the teaching
+clue reads "Footprints, long stride: Tall", as in GDD 2 step 5.
+
+### 14.6 Meeting (M)
+
+| Id | Text | Notes |
+|---|---|---|
+| `meeting.title` | Meeting | header |
+| `meeting.reason.body` | {caller} reported {victim}'s body | `meeting-reason`; `{victim}` is `bodyOf`'s name |
+| `meeting.reason.bell` | {caller} rang the bell | `meeting-reason` |
+| `meeting.dead.one` | {names} was found dead | system line, at the start; every death since the last meeting (A30) |
+| `meeting.dead.many` | {names} were found dead | `{names}` joined with commas and "and" |
+| `meeting.vanished` | {name} has vanished | a seat that left during play (cause `vanished`) |
+| `meeting.discuss` | Talk it over | caption beside the discussion timer |
+| `meeting.vote.open` | Votes are secret until the reveal | caption beside the vote timer; voting is open in both phases |
+| `meeting.vote.hint` | Tap a portrait to vote, or Skip | living players only |
+| `meeting.vote.skip` | Skip | `vote-skip` button |
+| `meeting.vote.mine` | Your vote: {name} | after a vote; may change until the vote closes |
+| `meeting.vote.mineSkip` | Your vote: Skip | |
+| `meeting.vote.change` | Tap another portrait to change it | under `meeting.vote.mine` |
+| `meeting.chip.voted` | Voted | the `hasVoted` chip on a portrait |
+| `meeting.chip.dead` | Dead | `--quiet` chip with the ghost glyph |
+| `meeting.chip.you` | You | the self tile |
+| `meeting.allVoted` | Everyone has voted | system line when the reveal starts early |
+| `meeting.tab.report` | Report | tab |
+| `meeting.tab.notebook` | Notebook | tab |
+| `meeting.tab.chat` | Chat | tab |
+
+### 14.7 Chat (M)
+
+| Id | Text | Notes |
+|---|---|---|
+| `chat.placeholder` | Say something | `chat-input` placeholder |
+| `chat.send` | Send | button |
+| `chat.limit` | {n} / {maxChars} | counter, shown once the text nears the limit |
+| `chat.channel.meeting` | Meeting | channel tag on a `meeting` line |
+| `chat.channel.ghost` | Ghosts | channel tag on a `ghost` line |
+| `chat.closed` | Chat opens at the next meeting | a living player's form outside a meeting |
+| `chat.empty` | Nothing said yet | empty log |
+
+### 14.8 Ghost (N in the world, M in the meeting)
+
+| Id | Text | Notes |
+|---|---|---|
+| `ghost.killed` | You were killed in {scene} | on `killed` with cause `knife` |
+| `ghost.ejected` | The village voted you out | on `killed` with cause `ejected` |
+| `ghost.vanished` | You left the match | cause `vanished`, if the client is still up |
+| `ghost.secret` | Nobody knows yet. Your body is the only sign. | after `ghost.killed`, until the next meeting |
+| `ghost.roles` | You can see every role now | the roles from `killed` |
+| `ghost.walk` | Walk anywhere. Only ghosts can see you. | the first World after death |
+| `ghost.noVote` | Ghosts cannot vote | in the meeting, in place of `meeting.vote.hint` |
+| `ghost.chat` | Only the dead read this | caption on a ghost's chat form |
+
+### 14.9 Reveal (M)
+
+| Id | Text | Notes |
+|---|---|---|
+| `reveal.title` | The tally | header over the counts |
+| `reveal.skip` | Skip: {n} | the Skip count |
+| `reveal.ejected` | {name} is ejected | the stamp lands; `stamp` plays |
+| `reveal.role` | {name} was the {role} | `reveal-role`; the faction colour appears here only (UI 1.6) |
+| `reveal.none.tie` | A tie. Nobody is ejected. | |
+| `reveal.none.skip` | The village skipped. Nobody is ejected. | Skip plurality |
+| `reveal.none.empty` | No votes. Nobody is ejected. | nobody voted |
+
+### 14.10 Game over (M)
+
+| Id | Text | Notes |
+|---|---|---|
+| `over.village` | The village wins | `gameover-winner` |
+| `over.cabal` | The Cabal wins | `gameover-winner` |
+| `over.why.cabalOut` | Every Cabal member is dead or ejected | Village win (GDD 3.8) |
+| `over.why.parity` | The Cabal matches the living village | Cabal win by `parity` (GDD 3.8) |
+| `over.why.lastVillager` | One villager is left standing | Cabal win by `villageAtMostOne` (GDD 3.8) |
+| `over.roles` | Who was who | header of the role list |
+| `over.row` | {name}: {role} | `gameover-role-<playerId>`, with the faction chip and the ghost glyph for the dead |
+| `over.you.won` | You won | own row's tag |
+| `over.you.lost` | You lost | own row's tag |
+| `over.lobby` | Back to the lobby in {s} | countdown from `phases.gameOverS` |
+
+### 14.11 Lines that exist today (for reference)
+
+Landing: "Gather your party", "You are invited", "Your name", "{min} to {max} characters", "Create
+Party", "Join Party", "or join a friend", "Party code", "Connecting...", "Waking the village..."
+(GDD 2 step 1), "Name must be {min} to {max} characters.". Lobby: "Party code", "Copy invite link",
+"Link copied", "Copy failed", "Players {n} / {max}", "you", "leader", "ready", "away", "Ready",
+"Not ready", "Leave", "Waiting for the leader to start.", "Everyone in? Start when the party is
+ready.", the confirm "Start with {n} players?", "Roles are dealt at once and the party locks. Nobody
+can join after this.", "Deal the roles", "Not yet". Role card: "Village", "Cabal", "Neutral", "You
+look like: {height} / {scarf} / {hat}", "Beware:", "Your Cabal:", "Tab reopens this card", "Your
+role", "Keep your screen to yourself.", "Ready - role card (Tab)". The role name, goal, card text,
+Beware line and ability names come from `roles.json` and `abilities.json`, never from this deck.
