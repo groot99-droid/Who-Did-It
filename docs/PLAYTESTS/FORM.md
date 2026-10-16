@@ -62,3 +62,17 @@ the full list of 7 (every answer, not only the mean, since a few low scores matt
 theme per answer to 5; and the 8a and 8b answers grouped where they repeat. 1 and 6 are context
 for the other answers: a low 2 from someone who played the Killer reads differently from the same
 score from a Townsfolk player.
+
+## Questions for the later milestones
+
+Add these after item 8 for the sessions that need them; items 1 to 8 stay as they are. For an M3b
+session, item 1's options are the V1 role names of `roles.onub.json` (Poisoner, Hireling, Sin-Eater,
+Cutpurse, Busybody, Sot, Lamplighter, Debtor, Mourner), meaning the role dealt.
+
+**9. "At the reveal I knew which loaf I held."** [Linear scale] Required in an M3b session.
+1 to 5, label 1 "No idea", label 5 "I was sure, and right". Description: the loaf at dawn, not the
+card you were dealt.
+
+**10. Which seats do you think were NPCs?** [Checkboxes] Required in an M3c session with two or more
+humans. One option per seat name of the session, plus "None" and "I could not tell". The host fills
+the options before sending the link and keeps the real answer for the scorecard (`SCORECARD.md` 7).

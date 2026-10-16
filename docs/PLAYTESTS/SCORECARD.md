@@ -93,3 +93,51 @@ Fixes or the rethink, in one paragraph:
 >
 
 Signed: `owner`, date `____`. Recorded in `docs/DECISIONS.md` row `A__`.
+
+## 6. M3b, quick mode
+
+Copy this section with 0 to 4 to `YYYY-MM-DD-m3b-scorecard.md` for each of the two M3b sessions (run
+sheet `README.md` 8). The lines are ROADMAP 7.1, the M3b row.
+
+| Line | Bar | Set by, date |
+|---|---|---|
+| Match length | a finished match in the `targetLengthMin` range of `balance.onub.json` (GDD 3.11), three 6-player matches in a row | ROADMAP 7.1 |
+| Final role named at the reveal | at least half the players right in a match, in at least half the valid matches | ROADMAP 7.1, read per match |
+| Would play again (form item 7) | the session mean against both M3 sessions' means; no lower | ROADMAP 7.1 |
+
+| # | Players | Length (m:ss) | Winners row (`rowId`) | Turned out | In range? | Right guesses (of players) | Half or more? | Void? | Notes |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | | | | | | | | | |
+| 2 | | | | | | | | | |
+| 3 | | | | | | | | | |
+| 4 | | | | | | | | | |
+| 5 | | | | | | | | | |
+
+A guess is the role a player DM'd the host when the vote closed (README 8), right when it equals
+their final role on the end screen. Form item 9 is the players' own view of the same thing.
+
+**Exit test:** three valid 6-player matches in a row in range: **pass / fail / not reached**;
+half or more of the valid matches with half or more right guesses: **pass / fail**; would play again,
+this session `__` against M3 `__` and `__`: **at or above / below**.
+
+## 7. M3c, NPC fill
+
+Copy this section with 1 and 4 to `YYYY-MM-DD-m3c-scorecard.md` for each M3c session (run sheet
+`README.md` 9). The lines are ROADMAP 7.1, the M3c row; the field and tick lines of that row are
+server tests and the soak, not the session.
+
+| Line | Result | Evidence |
+|---|---|---|
+| One human and three NPCs finish a main match | yes / no | the match-log line |
+| One human and three NPCs finish a quick-mode match | yes / no | the match-log line |
+| The NPC Killer wins at least one of five scripted matches at Normal | `__` of 5 | the five match-log lines |
+| Humans who named every NPC seat (form item 10, session 2 only) | `__` of `__` | |
+
+Each match row: mode, humans, NPC seats, difficulty, length, winner, and whether an NPC held the
+Killer. A main match that stalls is not a pass: write when it stopped and why.
+
+| # | Mode | Humans | NPC seats | Difficulty | Length (m:ss) | Winner | NPC Killer? | Void? | Notes |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | | | | | | | | | |
+| 2 | | | | | | | | | |
+| 3 | | | | | | | | | |
