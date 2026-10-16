@@ -176,7 +176,9 @@ export function onubWinners(
     anyoneOut: outs.length > 0,
   };
   const row = rows.find((r) =>
-    (Object.keys(flags) as (keyof typeof flags)[]).every((k) => r.when[k] === undefined || r.when[k] === flags[k]),
+    (Object.keys(flags) as (keyof typeof flags)[]).every(
+      (k) => r.when[k] === undefined || r.when[k] === flags[k],
+    ),
   );
   if (!row) throw new Error('the winners table has no row for this dawn');
   const seats = [...finals.keys()];

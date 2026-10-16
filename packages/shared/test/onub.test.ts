@@ -9,7 +9,17 @@ import {
   resolveDawn,
 } from '../src/rules';
 
-const DECK = ['poisoner', 'poisoner', 'sinEater', 'cutpurse', 'busybody', 'mourner', 'mourner', 'debtor', 'hireling'];
+const DECK = [
+  'poisoner',
+  'poisoner',
+  'sinEater',
+  'cutpurse',
+  'busybody',
+  'mourner',
+  'mourner',
+  'debtor',
+  'hireling',
+];
 const seatIds = (n: number) => Array.from({ length: n }, (_, i) => `s${i}`);
 const sorted = (xs: Iterable<string>) => [...xs].sort();
 
@@ -116,8 +126,12 @@ describe('applyNightAct', () => {
 
   it('refuses an unknown act, a missing slot and a swap with itself', () => {
     expect(() => applyNightAct(loaves(), { roleId: 'x', act: 'onub.nope', slots: [] })).toThrow();
-    expect(() => applyNightAct(loaves(), { roleId: 'x', act: 'onub.swapPlates', slots: ['bk.plate_0', 'bk.plate_9'] })).toThrow();
-    expect(() => applyNightAct(loaves(), { roleId: 'x', act: 'onub.swapPlates', slots: ['bk.plate_0', 'bk.plate_0'] })).toThrow();
+    expect(() =>
+      applyNightAct(loaves(), { roleId: 'x', act: 'onub.swapPlates', slots: ['bk.plate_0', 'bk.plate_9'] }),
+    ).toThrow();
+    expect(() =>
+      applyNightAct(loaves(), { roleId: 'x', act: 'onub.swapPlates', slots: ['bk.plate_0', 'bk.plate_0'] }),
+    ).toThrow();
   });
 
   it('replays: a random chain of swaps keeps the multiset and the swap log reproduces the final map', () => {
@@ -134,7 +148,8 @@ describe('applyNightAct', () => {
       log.push([a, b]);
     }
     let replay = new Map(dealt);
-    for (const slots of log) replay = applyNightAct(replay, { roleId: 'busybody', act: 'onub.swapPlates', slots }).next;
+    for (const slots of log)
+      replay = applyNightAct(replay, { roleId: 'busybody', act: 'onub.swapPlates', slots }).next;
     expect([...replay]).toEqual([...cur]);
     expect(sorted(cur.values())).toEqual(sorted(dealt.values()));
   });
@@ -175,14 +190,23 @@ describe('resolveDawn', () => {
 });
 
 describe('onubWinners', () => {
-  const faction = (r: string) => (r === 'poisoner' || r === 'hireling' ? 'cabal' : r === 'debtor' ? 'neutral' : 'village');
+  const faction = (r: string) =>
+    r === 'poisoner' || r === 'hireling' ? 'cabal' : r === 'debtor' ? 'neutral' : 'village';
   const rows: WinnerRowLike[] = [
     { id: 'debtorAndVillage', when: { debtorOut: true, poisonerOut: true }, winners: ['debtor', 'village'] },
     { id: 'debtorAlone', when: { debtorOut: true, poisonerOut: false }, winners: ['debtor'] },
     { id: 'poisonerOut', when: { debtorOut: false, poisonerOut: true }, winners: ['village'] },
-    { id: 'cabalSurvives', when: { debtorOut: false, poisonerOut: false, poisonerAmongMourners: true }, winners: ['cabal'] },
+    {
+      id: 'cabalSurvives',
+      when: { debtorOut: false, poisonerOut: false, poisonerAmongMourners: true },
+      winners: ['cabal'],
+    },
     { id: 'cleanTable', when: { poisonerAmongMourners: false, anyoneOut: false }, winners: ['village'] },
-    { id: 'storm', when: { debtorOut: false, poisonerAmongMourners: false, anyoneOut: true }, winners: ['hirelingIfMourner'] },
+    {
+      id: 'storm',
+      when: { debtorOut: false, poisonerAmongMourners: false, anyoneOut: true },
+      winners: ['hirelingIfMourner'],
+    },
   ];
   const finals = (...roles: string[]) => new Map(roles.map((r, i) => [`s${i}`, r]));
 
@@ -196,7 +220,13 @@ describe('onubWinners', () => {
   });
 
   it('a turned-out Poisoner hands the village the win', () => {
-    const r = onubWinners(['s1'], finals('mourner', 'poisoner', 'cutpurse', 'hireling', 'debtor'), [], faction, rows);
+    const r = onubWinners(
+      ['s1'],
+      finals('mourner', 'poisoner', 'cutpurse', 'hireling', 'debtor'),
+      [],
+      faction,
+      rows,
+    );
     expect(r.rowId).toBe('poisonerOut');
     expect(r.winnerIds).toEqual(['s0', 's2']); // the Hireling and the Debtor do not win
   });
@@ -228,7 +258,9 @@ describe('onubWinners', () => {
     const roles = ['poisoner', 'hireling', 'debtor', 'mourner', 'cutpurse', 'sinEater'];
     for (let i = 0; i < 2000; i++) {
       const n = 4 + Math.floor(rng() * 7);
-      const f = new Map(Array.from({ length: n }, (_, k) => [`s${k}`, roles[Math.floor(rng() * roles.length)]!]));
+      const f = new Map(
+        Array.from({ length: n }, (_, k) => [`s${k}`, roles[Math.floor(rng() * roles.length)]!]),
+      );
       const outs = [...f.keys()].filter(() => rng() < 0.3);
       expect(() => onubWinners(outs, f, [], faction, rows)).not.toThrow();
     }

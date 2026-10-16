@@ -20,6 +20,8 @@ export interface MatchRecord {
     faction: string;
     survived: boolean;
     clues: number;
+    /** Quick mode: the loaf on the plate at dawn (`role` is the card dealt). */
+    finalRole?: string;
     /** NPC seat (GDD 3.12); stdout only, never on the wire. */
     isNpc?: boolean;
   }[];
@@ -32,7 +34,11 @@ export interface MatchRecord {
     ejectedId?: string;
     ejectedRole?: string;
     ejectionCorrect?: boolean;
+    /** Quick mode: every seat turned out, ties included (`ejectedId` names the first). */
+    outs?: string[];
   }[];
+  /** Quick mode: the winners row that applied and the seats that won (stdout only). */
+  onub?: { rowId: string; winnerIds: string[] };
 }
 
 export const matchLog = {
