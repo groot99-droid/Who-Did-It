@@ -46,5 +46,21 @@ export const NotebookStatus = {
   teaching: 4,
 } as const;
 
+/**
+ * Quick mode (GDD 3.11, A39): sleepers are moved to the `loft` pseudo-scene, index 255 in
+ * `Player.sceneId`, which has no SceneState and encodes no presence. It is not a content scene.
+ */
+export const LOFT_SCENE_ID = 'loft';
+export const LOFT_SCENE_INDEX = 255;
+
+/** Quick-mode act ids (`act.ability`) start with this prefix (ARCHITECTURE 5.14). */
+export const ONUB_ACT_PREFIX = 'onub.';
+/** The dusk plate-setting act (GDD 3.11): not a night window act, so not in `balance.onub.json` acts. */
+export const ONUB_SET_PLATE = 'onub.setPlate';
+
+/** `Settings.npcDifficulty` values, in the order of balance.json `npc.difficulty` (GDD 3.12). */
+export const NpcLevel = { easy: 0, normal: 1, hard: 2 } as const;
+export type NpcLevelId = (typeof NpcLevel)[keyof typeof NpcLevel];
+
 // Gameplay radii, light, noise and timers are rules numbers: they live once, in
 // packages/content/data/balance.json (GDD 3.x), and are read through @wdi/content.

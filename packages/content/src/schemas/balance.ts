@@ -166,6 +166,14 @@ export const BalanceFile = z.strictObject({
       normal: NpcDifficultyRow,
       hard: NpcDifficultyRow,
     }),
+    /** An NPC picks a new heading every `stepMinS..stepMaxS` and takes a portal in reach with `portalChance` (GDD 3.12). */
+    wander: z.strictObject({
+      stepMinS: Seconds,
+      stepMaxS: Seconds,
+      portalChance: z.number().min(0).max(1),
+    }),
+    /** An NPC casts its vote `delayMinS..delayMaxS` after the discussion opens (GDD 3.12). */
+    vote: z.strictObject({ delayMinS: Seconds, delayMaxS: Seconds }),
   }),
   ghosts: Section({ wispsPerCycle: z.number().int().nonnegative() }),
   chat: Section({

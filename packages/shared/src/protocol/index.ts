@@ -20,6 +20,10 @@ export const C2S = {
   netPing: 'net.ping',
   lobbyStart: 'lobby.start',
   lobbyReady: 'lobby.ready',
+  lobbySettings: 'lobby.settings',
+  lobbyAddNpc: 'lobby.addNpc',
+  lobbyRemoveNpc: 'lobby.removeNpc',
+  claim: 'meeting.claim',
 } as const;
 
 export const S2C = {
@@ -34,14 +38,17 @@ export const S2C = {
   gameOver: 'gameOver',
   noise: 'noise',
   error: 'error',
+  nightWake: 'nightWake',
+  nightReveal: 'nightReveal',
+  nightSleep: 'nightSleep',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
 export type S2CType = (typeof S2C)[keyof typeof S2C];
 
 export type HoldAction = 'drag' | 'collect' | 'task' | 'inspect' | 'autopsy';
-/** Why a meeting opened (GDD 3.3); `missing` is the roll-call of M4. */
-export type MeetingReason = 'body' | 'bell' | 'missing';
+/** Why a meeting opened (GDD 3.3); `missing` is the roll-call of M4; `dawn` is the quick-mode meeting (3.11). */
+export type MeetingReason = 'body' | 'bell' | 'missing' | 'dawn';
 /** How a player died; `vanished` is the disconnect death of GDD 3.8 (M7). */
 export type DeathCause = 'knife' | 'ejected' | 'vanished';
 /** Chat channels the server derives (GDD 3.5); the client never chooses one. */
@@ -66,6 +73,41 @@ export interface TraitIds {
   height: HeightId;
   scarf: ScarfId;
   hat: HatId;
+}
+
+/** Quick mode: one token a night act showed; `of` is empty for a dead loaf or the ledger (A39). */
+export interface NightRevealEntry {
+  slot: string;
+  of: string;
+  roleId: string;
+}
+
+/** Quick mode: one swap of the night, in window order; `slots` are the prop ids moved (GDD 3.11). */
+export interface SwapLogEntry {
+  order: number;
+  /** The acting window's role id (the actor's dealt role), never the actor's seat. */
+  roleId: string;
+  act: string;
+  slots: string[];
+}
+
+/** Quick mode: the end-screen facts of GDD 3.11, sent only with `gameOver` (A39). */
+export interface OnubGameOver {
+  /** Seat id -> dealt role id. */
+  dealt: Record<string, string>;
+  /** Seat id -> final role id (the loaf on the plate at dawn). */
+  final: Record<string, string>;
+  /** The dead's three loaves at dawn, `bk.deadloaf_0..2` order. */
+  center: string[];
+  swapLog: SwapLogEntry[];
+  /** Voter id -> target id; an abstention is absent. */
+  votes: Record<string, string>;
+  /** Seats turned out, ties included. */
+  outs: string[];
+  /** The `balance.onub.json` winners row that applied. */
+  rowId: string;
+  /** The seats that won. */
+  winnerIds: string[];
 }
 
 /** Card keys for the ability rows in card order. A UI binding, not a rules number. */
@@ -135,6 +177,14 @@ export interface C2SPayloads {
   'lobby.start': Record<string, never>;
   /** Lobby: the Ready tick. Role card: dismisses the card; the match begins when all are ready or 12 s pass. */
   'lobby.ready': { ready: boolean };
+  /** Leader only, phase lobby: `mode` is a `GameMode`, `npcDifficulty` an `NpcLevel` (A39). Refused 422 / 425. */
+  'lobby.settings': { mode?: number; npcDifficulty?: number };
+  /** Leader only, phase lobby: one NPC seat up to `players.max` (GDD 3.12). */
+  'lobby.addNpc': Record<string, never>;
+  /** Leader only, phase lobby: removes that NPC seat; a human seat is refused 422. */
+  'lobby.removeNpc': { playerId: string };
+  /** Quick mode, a living player in a meeting phase: replaces the seat's claim (GDD 3.11). */
+  'meeting.claim': { roleId: string; targetId?: string; sawRoleId?: string };
 }
 
 export interface S2CPayloads {
@@ -150,11 +200,24 @@ export interface S2CPayloads {
   'chat.msg': { from: string; text: string; channel: ChatChannel };
   phaseChange: { phase: number; endsTick: number };
   meetingStart: { reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] };
-  /** `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). */
-  voteResult: { tally: Record<string, number>; ejectedId?: string; role?: string };
-  gameOver: { winner: number; roles: Record<string, string>; summary: string };
+  /** `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). Quick mode: `outs` and their final roles (3.11). */
+  voteResult: {
+    tally: Record<string, number>;
+    ejectedId?: string;
+    role?: string;
+    outs?: string[];
+    roles?: Record<string, string>;
+  };
+  /** `roles` are the final roles; `onub` is present in quick mode only (A39). */
+  gameOver: { winner: number; roles: Record<string, string>; summary: string; onub?: OnubGameOver };
   noise: { sceneId: string; x: number; y: number; kind: string };
   error: { code: ErrorCode; msg: string };
+  /** Private, quick mode: your window opened; you stand at `spawn` in the bakery until `endsTick` (GDD 3.11). */
+  nightWake: { windowRole: string; endsTick: number; spawn: string };
+  /** Private, quick mode: what your act showed. */
+  nightReveal: { entries: NightRevealEntry[] };
+  /** Private, quick mode: back to the loft. */
+  nightSleep: Record<string, never>;
 }
 
 export type ErrorPayload = S2CPayloads['error'];
@@ -178,6 +241,10 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'world.ping': 2,
   'lobby.start': 2,
   'lobby.ready': 2,
+  'lobby.settings': 2,
+  'lobby.addNpc': 2,
+  'lobby.removeNpc': 2,
+  'meeting.claim': 2,
 };
 
 export const ErrorCode = {

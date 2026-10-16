@@ -4,6 +4,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { logMatch } from '../services/MatchLog';
 import { countRow, factionOf, flowOf, resetFlow, roleIdOf, rolesOf, setPhase } from './Flow';
 import { simOf } from './RoomSim';
+import { resetOnubForLobby } from './Onub';
 import { SCENE_KEYS } from './World';
 
 /** `checkWin` over the living seats (GDD 3.8). Called after a death or an ejection, never on a bare tick. */
@@ -81,6 +82,8 @@ export function resetToLobby(room: PartyRoom): void {
   m.missing.clear();
   m.board.clear();
   m.suspects.clear();
+  m.claims.clear();
+  m.traces.clear();
 
   const gone: string[] = [];
   state.players.forEach((p: PlayerState, id: string) => {
@@ -108,6 +111,7 @@ export function resetToLobby(room: PartyRoom): void {
     priv.ledger.clear();
     priv.lensCharges = 0;
     priv.myVote = '';
+    priv.nightReveal.clear();
   });
   for (const id of gone) state.players.delete(id);
   if (!state.players.has(state.leaderId)) state.leaderId = state.players.keys().next().value ?? '';
@@ -117,6 +121,7 @@ export function resetToLobby(room: PartyRoom): void {
     if (!scene) continue;
     scene.bodies.clear();
     scene.clues.clear();
+    scene.props.clear();
     scene.doors.forEach((door) => {
       door.swingUntilTick = 0;
     });
@@ -124,6 +129,7 @@ export function resetToLobby(room: PartyRoom): void {
   room.commands.drain();
   room.lobbyCommands.drain();
   simOf(room).resetForLobby();
+  resetOnubForLobby(room);
   resetFlow(room);
   room.unlock();
 }

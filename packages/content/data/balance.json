@@ -187,6 +187,8 @@
         "suspectVoteChance": 1
       }
     },
+    "wander": { "stepMinS": 1, "stepMaxS": 3, "portalChance": 0.4 },
+    "vote": { "delayMinS": 3, "delayMaxS": 12 },
     "gddRef": "3.12"
   },
   "ghosts": { "wispsPerCycle": 1, "gddRef": "3.7" },

@@ -1,11 +1,16 @@
 import { PROFILE_RANK, SCENE_IDS, type Profile, type SceneId, navs, scenes } from '@wdi/content';
-import { ErrorCode, NavGrid, Phase, S2C } from '@wdi/shared';
+import { ErrorCode, LOFT_SCENE_INDEX, NavGrid, Phase, S2C } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 
 /** Scene ids by `Player.sceneId` index; the order is the frozen id list of @wdi/content. */
 export const SCENE_KEYS: readonly SceneId[] = SCENE_IDS;
 
 export const sceneKey = (sceneIndex: number): SceneId => SCENE_KEYS[sceneIndex] ?? 'overworld';
+/**
+ * The quick-mode loft (A39): a `PlayerSim.sceneIdx` of `LOFT_SCENE_INDEX` is in no content scene; the
+ * sim neither moves nor encodes such a player and their view holds no scene and no presence.
+ */
+export const isLoft = (sceneIndex: number): boolean => sceneIndex === LOFT_SCENE_INDEX;
 export const sceneIndex = (id: string): number => SCENE_KEYS.indexOf(id as SceneId);
 export const isSceneId = (id: string): id is SceneId => sceneIndex(id) >= 0;
 

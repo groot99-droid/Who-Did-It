@@ -20,13 +20,24 @@ import {
 import type { PartyRoom } from '../PartyRoom';
 import { flowOf, refuse, setPhase } from '../../sim/Flow';
 import { handleSay } from '../../sim/Chat';
-import { handleVote } from '../../sim/Meeting';
+import { handleClaim, handleVote } from '../../sim/Meeting';
+import { startOnubMatch } from '../../sim/Onub';
 
 /**
  * Flow messages: the lobby and role-card flow plus the meeting vote and chat (consumed by the phase
  * stage's owner, Session K). Everything else is a world verb and goes to `sim/Commands`.
  */
-const LOBBY_TYPES: readonly string[] = [C2S.lobbyStart, C2S.lobbyReady, C2S.roleReady, C2S.vote, C2S.say];
+const LOBBY_TYPES: readonly string[] = [
+  C2S.lobbyStart,
+  C2S.lobbyReady,
+  C2S.roleReady,
+  C2S.vote,
+  C2S.say,
+  C2S.lobbySettings,
+  C2S.lobbyAddNpc,
+  C2S.lobbyRemoveNpc,
+  C2S.claim,
+];
 export const isLobbyCommand = (type: string): boolean => LOBBY_TYPES.includes(type);
 
 /**
@@ -116,6 +127,10 @@ export function runLobbyCommands(room: PartyRoom): void {
       case C2S.say:
         handleSay(room, cmd.sessionId, payload);
         break;
+      case C2S.claim:
+        handleClaim(room, cmd.sessionId, payload);
+        break;
+      // lobby.settings, lobby.addNpc and lobby.removeNpc: round 4, Session S.
     }
   }
 }
@@ -168,6 +183,7 @@ export function startMatch(room: PartyRoom): void {
   const ids = [...room.state.players.keys()];
   room.matchSeed = randomInt(2 ** 32);
   const rng = mulberry32(room.matchSeed);
+  if (startOnubMatch(room, ids, rng)) return; // quick mode deals its own loaves (round 4, R)
   const dealt = dealRoles(room, ids, rng);
   const looks = dealTraits(ids, rng);
   const factionOf = (id: string) => roles.roles[dealt.get(id) as string]?.faction;

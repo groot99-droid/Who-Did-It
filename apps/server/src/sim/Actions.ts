@@ -1,8 +1,9 @@
 import { abilities, roles, scenes } from '@wdi/content';
-import { ErrorCode, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { ErrorCode, ONUB_ACT_PREFIX, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { handleHold } from './Hold';
 import { handleKill } from './Kill';
+import { handleOnubAbility } from './Onub';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
@@ -50,6 +51,9 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
     case 'bandage':
       return handleBandage(room, sessionId, payload);
     default:
+      if (typeof payload.abilityId === 'string' && payload.abilityId.startsWith(ONUB_ACT_PREFIX)) {
+        return handleOnubAbility(room, sessionId, payload);
+      }
       reject(room, sessionId, ErrorCode.cannot, 'cannot do that');
   }
 }

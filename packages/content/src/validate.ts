@@ -6,6 +6,7 @@ import type { CluesFile } from './schemas/clues.js';
 import { PLAYER_COUNTS } from './schemas/common.js';
 import type { ItemsFile } from './schemas/items.js';
 import type { MetricsFile } from './schemas/metrics.js';
+import type { NamesFile } from './schemas/names.js';
 import type { OnubBalanceFile } from './schemas/onubBalance.js';
 import type { OnubRolesFile } from './schemas/onubRoles.js';
 import type { PaletteFile } from './schemas/palette.js';
@@ -29,6 +30,7 @@ export interface Content {
   scenes: Record<SceneId, Scene>;
   onubRoles: OnubRolesFile;
   onubBalance: OnubBalanceFile;
+  names: NamesFile;
 }
 
 const maxProfile = (a: Profile, b: Profile): Profile => (PROFILE_RANK[a] >= PROFILE_RANK[b] ? a : b);
@@ -47,7 +49,7 @@ function sameMultiset(a: readonly string[], b: readonly string[]): boolean {
 export function validateContent(c: Content): string[] {
   const errors: string[] = [];
   const err = (msg: string) => errors.push(msg);
-  const { roles, abilities, items, clues, tasks, balance, onubRoles, onubBalance } = c;
+  const { roles, abilities, items, clues, tasks, balance, onubRoles, onubBalance, names } = c;
   const scenes: Record<string, Scene | undefined> = c.scenes;
 
   keyedById('roles.json', roles.roles, errors);
@@ -195,6 +197,23 @@ export function validateContent(c: Content): string[] {
     const expected: Profile = count <= 6 ? 'small' : count <= 8 ? 'medium' : 'large';
     if (profile !== expected) err(`balance ${n}: profile ${profile}, WORLD 4.3 says ${expected}`);
   }
+
+  // NPC name pool (GDD 3.12): lobby-legal, unique, enough for a full party, no role token.
+  const seen = new Set<string>();
+  const roleTokens = [...Object.keys(roles.roles), ...Object.keys(onubRoles.roles)].map((r) =>
+    r.toLowerCase(),
+  );
+  for (const name of names.pool) {
+    const key = name.trim().toLowerCase();
+    if (name !== name.trim() || key.length < balance.lobby.nameMin || key.length > balance.lobby.nameMax)
+      err(`names.json: "${name}" is not a legal lobby name`);
+    if (seen.has(key)) err(`names.json: "${name}" twice`);
+    seen.add(key);
+    for (const token of roleTokens)
+      if (key.includes(token)) err(`names.json: "${name}" carries the role token ${token}`);
+  }
+  if (names.pool.length < balance.players.max)
+    err(`names.json: ${names.pool.length} names, at least ${balance.players.max} needed`);
 
   // Quick mode: decks, windows and acts.
   const onubRole = (id: string) => onubRoles.roles[id];

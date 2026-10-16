@@ -43,6 +43,11 @@ export class PlayerSim {
   bloodyUntilTick = 0;
   /** A Bandage protects this player until this tick (GDD 3.2). */
   bandagedUntilTick = 0;
+  /**
+   * Quick mode: while true `enterScene` leaves the public `Player.sceneId` alone, so the Conductor's
+   * bakery visits never show on the roster (A39). Room memory.
+   */
+  sceneHidden = false;
   /** The `act.hold` in progress, re-validated every tick (ARCHITECTURE 5.6). */
   hold: { action: string; targetId: string; startTick: number } | null = null;
   /** Notebook entries written so far; the next `NotebookEntry.id` is `entry_<n + 1>` (counted per player). */
@@ -70,6 +75,7 @@ export class PlayerSim {
     this.dead = false;
     this.bloodyUntilTick = 0;
     this.bandagedUntilTick = 0;
+    this.sceneHidden = false;
     this.hold = null;
     this.entrySeq = 0;
     this.bellPulls = 0;

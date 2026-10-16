@@ -153,3 +153,8 @@ export function runMeeting(room: PartyRoom): void {
     setPhase(room, Phase.meetingVote, balance.phases.voteS);
   }
 }
+
+/** Quick mode (GDD 3.11): replaces the seat's claim on the meeting board. Round 4: Session R. */
+export function handleClaim(room: PartyRoom, sessionId: string, _payload: Record<string, unknown>): void {
+  refuse(room, sessionId, ErrorCode.cannot, 'cannot claim');
+}

@@ -6,7 +6,10 @@ export interface MatchRecord {
   code: string;
   seats: number;
   durationS: number;
-  winner: 'village' | 'cabal';
+  /** A `Winner` name: `village` or `cabal` in the main mode; quick mode adds `debtor` and `nobody` (A39). */
+  winner: 'village' | 'cabal' | 'debtor' | 'nobody';
+  /** `main` or `onub` (round 4). */
+  mode?: 'main' | 'onub';
   rounds: number;
   kills: number;
   vanished: number;
@@ -17,6 +20,8 @@ export interface MatchRecord {
     faction: string;
     survived: boolean;
     clues: number;
+    /** NPC seat (GDD 3.12); stdout only, never on the wire. */
+    isNpc?: boolean;
   }[];
   meetings: {
     round: number;

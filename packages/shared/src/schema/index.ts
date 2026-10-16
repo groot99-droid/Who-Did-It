@@ -105,6 +105,12 @@ export const NotebookEntry = schema(
   'NotebookEntry',
 );
 export const TaskEntry = schema({ id: str(), done: bool(), fake: bool() }, 'TaskEntry');
+/**
+ * Quick mode (A39): what a night act showed its actor. `slot` is the prop id (`bk.plate_<n>`,
+ * `bk.deadloaf_<n>`, `bk.ledger`), `of` the owning seat's id (empty for a dead loaf or the ledger),
+ * `roleId` the token read. Private, so a reconnecting client can re-read it.
+ */
+export const NightReveal = schema({ slot: str(), of: str(), roleId: str() }, 'NightReveal');
 export const LedgerLine = schema({ sceneId: u8(), tick: u32() }, 'LedgerLine');
 
 export const Private = schema(
@@ -118,6 +124,8 @@ export const Private = schema(
     ledger: t.array(LedgerLine),
     lensCharges: u8(),
     myVote: str(),
+    /** Quick mode only; empty in the main mode (A39). */
+    nightReveal: t.array(NightReveal),
   },
   'Private',
 );
@@ -143,8 +151,18 @@ export const Player = schema(
 
 // --- Game ------------------------------------------------------------------------------------
 
-/** `mode` is 0 main, 1 onub (ARCHITECTURE 5.14). `revealMode` 0 is full, locked in V1 (GDD 2). */
-export const Settings = schema({ map: str('hollowmere'), revealMode: u8(), mode: u8() }, 'Settings');
+/**
+ * `mode` is 0 main, 1 onub (ARCHITECTURE 5.14). `revealMode` 0 is full, locked in V1 (GDD 2).
+ * `npcDifficulty` is an `NpcLevel` index and `npcSeats` the number of NPC seats in the party, a count
+ * only: no seat is ever marked (GDD 3.12, A39).
+ */
+export const Settings = schema(
+  { map: str('hollowmere'), revealMode: u8(), mode: u8(), npcDifficulty: u8(), npcSeats: u8() },
+  'Settings',
+);
+
+/** A quick-mode claim (GDD 3.11): "I was the {roleId}: {targetId}'s loaf was {sawRoleId}"; one per seat. */
+export const Claim = schema({ from: str(), roleId: str(), targetId: str(), sawRoleId: str() }, 'Claim');
 
 export const BoardRow = schema(
   { playerId: str(), fits: u8(), known: u8(), claimed: u8(), lastSceneId: u8() },
@@ -161,6 +179,9 @@ export const MeetingState = schema(
     missing: t.array('string'),
     board: t.array(BoardRow),
     suspects: t.array('string'),
+    /** Quick mode: the structured claims, latest per seat, and the dawn trace lines (A39). */
+    claims: t.array(Claim),
+    traces: t.array('string'),
   },
   'MeetingState',
 );

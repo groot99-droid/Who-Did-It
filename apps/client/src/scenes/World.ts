@@ -26,7 +26,7 @@ import { NotebookSheet } from '../view/NotebookPanel';
 import { PropView, overworldProps } from '../view/PropView';
 import { sceneMapKey, sceneMapUrl } from '../view/assets';
 import { isTouchDevice, readDevFlags } from '../view/devFlags';
-import { getNet } from './registry';
+import { REG_AUDIO, getNet } from './registry';
 
 /** How close a player must stand to a door to use it, in tiles (balance.json `doors.reachTiles`, GDD 3.7). */
 const PORTAL_REACH_TILES = balance.doors.reachTiles;
@@ -58,7 +58,6 @@ const WORLD_PHASES = new Set<number>([
   Phase.immunity,
   Phase.finalNight,
 ]);
-const REG_AUDIO = 'audioBus';
 
 /** What `E` would do right now. */
 type Target =

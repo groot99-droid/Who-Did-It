@@ -79,8 +79,9 @@ export function enterScene(
   room.commands.clearMove(player.id);
   p.resetRing();
   p.sceneIdx = sceneIndex(sceneId);
-  // A ghost whose death is not yet public keeps its public scene, or the roster would show it moving.
-  if (!p.dead || !player.alive) player.sceneId = p.sceneIdx;
+  // A ghost whose death is not yet public keeps its public scene, or the roster would show it moving;
+  // a quick-mode seat keeps it all night, so the roster never shows who woke (A39).
+  if ((!p.dead || !player.alive) && !p.sceneHidden) player.sceneId = p.sceneIdx;
   const presence = player.presence;
   presence.x = Math.round(x);
   presence.y = Math.round(y);

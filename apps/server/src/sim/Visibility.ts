@@ -1,7 +1,7 @@
 import { StateView } from '@colyseus/schema';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { simOf } from './RoomSim';
-import { SCENE_KEYS, isWorldPhase, sceneKey } from './World';
+import { SCENE_KEYS, isLoft, isWorldPhase, sceneKey } from './World';
 
 export { SCENE_KEYS, sceneKey };
 
@@ -53,11 +53,11 @@ export function reconcileViews(room: PartyRoom): void {
     }
 
     // The sim's scene, never the public one: a ghost's public scene is frozen until its death is public.
-    const want = sceneKey(viewerSim.sceneIdx);
+    const want = isLoft(viewerSim.sceneIdx) ? null : sceneKey(viewerSim.sceneIdx);
     if (held.scene !== want) {
       const old = held.scene === null ? undefined : room.state.scenes.get(held.scene);
       if (old) view.remove(old);
-      const next = room.state.scenes.get(want);
+      const next = want === null ? undefined : room.state.scenes.get(want);
       if (next) view.add(next);
       held.scene = want;
     }
@@ -68,6 +68,8 @@ export function reconcileViews(room: PartyRoom): void {
         if (id === client.sessionId) continue;
         const p = sim.players.get(id);
         if (!p?.placed) continue;
+        // A sleeper in the loft is encoded to nobody, and sees nobody (A39).
+        if (isLoft(p.sceneIdx) || isLoft(viewerSim.sceneIdx)) continue;
         // A living viewer never receives a ghost; a ghost sees everyone in its scene (A30).
         if (p.dead && !viewerSim.dead) continue;
         const sameScene = p.sceneIdx === viewerSim.sceneIdx;

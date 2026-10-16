@@ -67,6 +67,9 @@ export function renderProtocolDoc(): string {
     'RoleRevealItem',
     'RoleRevealTeammate',
     'RoleRevealPayload',
+    'NightRevealEntry',
+    'SwapLogEntry',
+    'OnubGameOver',
     'JoinOptions',
   ]
     .map((n) => '```ts\n' + declarationText(source, n) + '\n```')

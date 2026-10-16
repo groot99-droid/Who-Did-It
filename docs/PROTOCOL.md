@@ -25,6 +25,10 @@
 | `net.ping` | `{ t: number }` | - | - |
 | `lobby.start` | `Record<string, never>` | 2/s | Leader only, phase lobby, at least 1 human (GDD 3.12). Refused with error 422 otherwise. |
 | `lobby.ready` | `{ ready: boolean }` | 2/s | Lobby: the Ready tick. Role card: dismisses the card; the match begins when all are ready or 12 s pass. |
+| `lobby.settings` | `{ mode?: number; npcDifficulty?: number }` | 2/s | Leader only, phase lobby: `mode` is a `GameMode`, `npcDifficulty` an `NpcLevel` (A39). Refused 422 / 425. |
+| `lobby.addNpc` | `Record<string, never>` | 2/s | Leader only, phase lobby: one NPC seat up to `players.max` (GDD 3.12). |
+| `lobby.removeNpc` | `{ playerId: string }` | 2/s | Leader only, phase lobby: removes that NPC seat; a human seat is refused 422. |
+| `meeting.claim` | `{ roleId: string; targetId?: string; sawRoleId?: string }` | 2/s | Quick mode, a living player in a meeting phase: replaces the seat's claim (GDD 3.11). |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
 
@@ -39,10 +43,13 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `chat.msg` | `{ from: string; text: string; channel: ChatChannel }` | Private: routed per recipient; `from` is a player id. |
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
-| `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). |
-| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string }` | - |
+| `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string; outs?: string[]; roles?: Record<string, string>; }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). Quick mode: `outs` and their final roles (3.11). |
+| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; onub?: OnubGameOver }` | `roles` are the final roles; `onub` is present in quick mode only (A39). |
 | `noise` | `{ sceneId: string; x: number; y: number; kind: string }` | - |
 | `error` | `{ code: ErrorCode; msg: string }` | - |
+| `nightWake` | `{ windowRole: string; endsTick: number; spawn: string }` | Private, quick mode: your window opened; you stand at `spawn` in the bakery until `endsTick` (GDD 3.11). |
+| `nightReveal` | `{ entries: NightRevealEntry[] }` | Private, quick mode: what your act showed. |
+| `nightSleep` | `Record<string, never>` | Private, quick mode: back to the loft. |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 
@@ -101,6 +108,44 @@ export interface RoleRevealPayload {
   beware: string;
   teammates: RoleRevealTeammate[];
   traits: TraitIds;
+}
+```
+
+```ts
+export interface NightRevealEntry {
+  slot: string;
+  of: string;
+  roleId: string;
+}
+```
+
+```ts
+export interface SwapLogEntry {
+  order: number;
+  /** The acting window's role id (the actor's dealt role), never the actor's seat. */
+  roleId: string;
+  act: string;
+  slots: string[];
+}
+```
+
+```ts
+export interface OnubGameOver {
+  /** Seat id -> dealt role id. */
+  dealt: Record<string, string>;
+  /** Seat id -> final role id (the loaf on the plate at dawn). */
+  final: Record<string, string>;
+  /** The dead's three loaves at dawn, `bk.deadloaf_0..2` order. */
+  center: string[];
+  swapLog: SwapLogEntry[];
+  /** Voter id -> target id; an abstention is absent. */
+  votes: Record<string, string>;
+  /** Seats turned out, ties included. */
+  outs: string[];
+  /** The `balance.onub.json` winners row that applied. */
+  rowId: string;
+  /** The seats that won. */
+  winnerIds: string[];
 }
 ```
 

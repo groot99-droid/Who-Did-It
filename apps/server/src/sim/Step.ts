@@ -4,6 +4,8 @@ import { VIEW_RECONCILE_EVERY_TICKS } from '@wdi/shared';
 import { runDebugStart } from '../rooms/handlers/movement';
 import { runDecay } from './Clues';
 import { runCommands } from './Commands';
+import { runConductor } from './Conductor';
+import { runNpcs } from './Npc';
 import { applyInputs, moveAndCollide } from './Movement';
 import { runPhases } from './Phases';
 import { placeNewPlayers, runPortals } from './Portals';
@@ -30,10 +32,12 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   room.state.tick++;
   runDebugStart(room);
   syncRoster(room);
+  runNpcs(room); // M3c: NPC brains write their inputs and verbs (round 4, S)
   applyInputs(room);
   moveAndCollide(room);
   runCommands(room);
   runPortals(room);
+  runConductor(room); // M3b: the quick-mode night (round 4, R)
   runAiAndHazards(room);
   const sim = simOf(room);
   if (room.state.tick % VIEW_RECONCILE_EVERY_TICKS === 0 || sim.viewsDirty) {
