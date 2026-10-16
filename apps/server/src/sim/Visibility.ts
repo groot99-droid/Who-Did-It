@@ -68,6 +68,8 @@ export function reconcileViews(room: PartyRoom): void {
         if (id === client.sessionId) continue;
         const p = sim.players.get(id);
         if (!p?.placed) continue;
+        // A living viewer never receives a ghost; a ghost sees everyone in its scene (A30).
+        if (p.dead && !viewerSim.dead) continue;
         const sameScene = p.sceneIdx === viewerSim.sceneIdx;
         const justLeft = p.transitFrom === viewerSim.sceneIdx && tick < other.presence.transitUntilTick;
         if (sameScene || justLeft) wanted.add(id);

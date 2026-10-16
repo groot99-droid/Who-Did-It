@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { assignRoles, dealTraits, mulberry32, shuffle, type Roster } from '../src/rules';
+import {
+  assignRoles,
+  checkWin,
+  dealTraits,
+  mulberry32,
+  resolveVotes,
+  shuffle,
+  type Roster,
+} from '../src/rules';
 
 // Inline fixture copying GDD 3.1; `packages/content/data/roles.json` carries the same `deal` shape.
 const rosterCounts: Record<string, Record<string, number>> = {
@@ -110,5 +118,65 @@ describe('dealTraits', () => {
     expect([...dealTraits(idsFor(6), mulberry32(3))]).toEqual([...dealTraits(idsFor(6), mulberry32(3))]);
     expect(dealTraits(idsFor(27), mulberry32(1)).size).toBe(27);
     expect(() => dealTraits(idsFor(28), mulberry32(1))).toThrow();
+  });
+});
+
+describe('resolveVotes (GDD 3.8)', () => {
+  const living = ['a', 'b', 'c', 'd'];
+  it('ejects the plurality target and names no voter', () => {
+    const out = resolveVotes({ a: 'c', b: 'c', c: 'a', d: 'skip' }, living);
+    expect(out).toEqual({ tally: { c: 2, a: 1, skip: 1 }, ejectedId: 'c' });
+  });
+  it('a tie for first ejects nobody', () => {
+    expect(resolveVotes({ a: 'c', b: 'd', c: 'c', d: 'd' }, living).ejectedId).toBeUndefined();
+  });
+  it('a Skip plurality or a Skip tie ejects nobody', () => {
+    expect(resolveVotes({ a: 'skip', b: 'skip', c: 'd' }, living).ejectedId).toBeUndefined();
+    expect(resolveVotes({ a: 'skip', b: 'c', c: 'skip', d: 'c' }, living).ejectedId).toBeUndefined();
+  });
+  it('abstentions, dead voters and dead targets are discarded', () => {
+    expect(resolveVotes({ a: 'b', z: 'b', c: 'ghost' }, living)).toEqual({ tally: { b: 1 }, ejectedId: 'b' });
+    expect(resolveVotes({}, living)).toEqual({ tally: {} });
+  });
+  it('the anti-stall arguments are off by default and work when passed', () => {
+    const votes = { a: 'skip', b: 'c', c: 'd', d: 'c' };
+    expect(resolveVotes(votes, living).ejectedId).toBe('c');
+    expect(resolveVotes(votes, living, { skipAllowed: false }).tally.skip).toBeUndefined();
+    expect(resolveVotes(votes, living, { minVotes: 3 }).ejectedId).toBeUndefined();
+  });
+  it('property: at most one ejection, it holds a strict plurality and the tally sums to the valid votes', () => {
+    const rng = mulberry32(7);
+    for (let n = 0; n < 500; n++) {
+      const ids = Array.from({ length: 4 + Math.floor(rng() * 7) }, (_, i) => `p${i}`);
+      const votes: Record<string, string> = {};
+      for (const id of ids) {
+        const r = rng();
+        if (r < 0.2) continue;
+        votes[id] = r < 0.4 ? 'skip' : (ids[Math.floor(rng() * ids.length)] as string);
+      }
+      const { tally, ejectedId } = resolveVotes(votes, ids);
+      expect(Object.values(tally).reduce((a, b) => a + b, 0)).toBe(Object.keys(votes).length);
+      if (ejectedId === undefined) continue;
+      for (const [t, c] of Object.entries(tally))
+        if (t !== ejectedId) expect(c).toBeLessThan(tally[ejectedId] as number);
+    }
+  });
+});
+
+describe('checkWin (GDD 3.8)', () => {
+  it('Village wins when no Cabal lives, whatever else is alive', () => {
+    expect(checkWin(['village', 'neutral'], 'parity')).toBe('village');
+    expect(checkWin([], 'villageAtMostOne')).toBe('village');
+  });
+  it('4-5 players: Cabal wins when at most one Village lives', () => {
+    expect(checkWin(['cabal', 'village', 'village'], 'villageAtMostOne')).toBeNull();
+    expect(checkWin(['cabal', 'village'], 'villageAtMostOne')).toBe('cabal');
+    expect(checkWin(['cabal', 'cabal', 'village', 'neutral'], 'villageAtMostOne')).toBe('cabal');
+  });
+  it('6+ players: Cabal wins at parity, neutral roles count for nobody', () => {
+    expect(checkWin(['cabal', 'village', 'village'], 'parity')).toBeNull();
+    expect(checkWin(['cabal', 'village'], 'parity')).toBe('cabal');
+    expect(checkWin(['cabal', 'village', 'village', 'neutral', 'neutral'], 'parity')).toBeNull();
+    expect(checkWin(['cabal', 'cabal', 'village', 'neutral'], 'parity')).toBe('cabal');
   });
 });
