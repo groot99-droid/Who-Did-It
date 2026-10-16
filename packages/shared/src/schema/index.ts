@@ -64,8 +64,17 @@ export const Presence = schema(
 
 export const Door = schema({ id: str(), state: u8(), swingUntilTick: u32() }, 'Door');
 export const Spot = schema({ id: str(), occupied: bool() }, 'Spot');
-export const Body = schema({ id: str(), x: i16(), y: i16(), hidden: bool() }, 'Body');
-export const Clue = schema({ id: str(), kind: u8(), x: i16(), y: i16(), claimed: bool() }, 'Clue');
+/** `of` is the dead player's id: a body is recognised by the victim's public traits (A30). */
+export const Body = schema({ id: str(), of: str(), x: i16(), y: i16(), hidden: bool() }, 'Body');
+/**
+ * `kind` is a `ClueKind` index and `value` the trait index it shows (a Thread's colour, a Footprint's
+ * stride): both are readable in the world by anyone in the scene (GDD 3.4). `dir` is the trail's
+ * direction (0-7, `DIRECTIONS` order) for kinds that draw a trail.
+ */
+export const Clue = schema(
+  { id: str(), kind: u8(), value: u8(), dir: u8(), x: i16(), y: i16(), claimed: bool() },
+  'Clue',
+);
 export const Prop = schema({ id: str(), kind: str(), turned: bool() }, 'Prop');
 
 export const SceneState = schema(
@@ -91,7 +100,7 @@ export const NotebookEntry = schema(
     value: u8(),
     sceneId: u8(),
     tick: u32(),
-    status: u8() /* 0 claimed 1 verified 2 corroborated 3 forged */,
+    status: u8() /* NotebookStatus: 0 claimed 1 verified 2 corroborated 3 forged 4 teaching */,
   },
   'NotebookEntry',
 );
@@ -124,7 +133,7 @@ export const Player = schema(
     ready: bool(),
     hasVoted: bool(),
     sceneId: u8(),
-    // SceneScoped (V1) / Proximity (V1.5)
+    // SceneScoped (V1) / Proximity (V1.5). `alive` flips only at a meeting or an ejection (A30).
     presence: t.ref(Presence).view(1),
     // Own client only
     priv: t.ref(Private).view(2),
@@ -162,6 +171,8 @@ export const GameState = schema(
     phase: u8(),
     phaseEndsTick: u32(),
     tick: u32(),
+    /** Tick the grace phase began; clients show match time as `tick - startTick` (A30). */
+    startTick: u32(),
     round: u8(),
     leaderId: str(),
     settings: Settings,

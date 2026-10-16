@@ -29,6 +29,17 @@ export class PlayerSim {
   busyUntilTick = 0;
   /** Scene index the player just left while the transit window is open, else -1. */
   transitFrom = -1;
+  /**
+   * Killed or ejected: walks as a ghost. Set by the kill (L) and the ejection (K); the public `alive`
+   * flips only at the next meeting start or the ejection (A30). Room memory, never on the wire.
+   */
+  dead = false;
+  /** Blood shows on the presence until this tick (GDD 3.4; room memory, the bit is on the wire). */
+  bloodyUntilTick = 0;
+  /** A Bandage protects this player until this tick (GDD 3.2). */
+  bandagedUntilTick = 0;
+  /** The `act.hold` in progress, re-validated every tick (ARCHITECTURE 5.6). */
+  hold: { action: string; targetId: string; startTick: number } | null = null;
   /** Position ring: the last POSITION_RING_TICKS + 1 positions, newest at `head`. */
   private readonly ring = new Float64Array((POSITION_RING_TICKS + 1) * 2);
   private head = -1;
@@ -76,11 +87,34 @@ export interface PortalRequest {
   portalId: string;
 }
 
+/** Pushed by report and bell (sim/Actions), drained by the phase stage (sim/Phases). */
+export interface MeetingRequest {
+  reason: 'body' | 'bell' | 'missing';
+  callerId: string;
+  bodyOf?: string;
+}
+
+/** Pushed by every death (sim/Kill, the ejection), drained by the phase stage for checkWin and the log. */
+export interface DeathEvent {
+  playerId: string;
+  cause: 'knife' | 'ejected' | 'vanished';
+  killerId?: string;
+  tick: number;
+}
+
 export class RoomSim {
   readonly players = new Map<string, PlayerSim>();
   readonly views = new Map<string, ViewState>();
   portalRequests: PortalRequest[] = [];
+  /** Seam L -> K: a meeting is requested here and opened in `runPhases` (ARCHITECTURE 5.7). */
+  meetingRequests: MeetingRequest[] = [];
+  /** Seam L -> K: deaths to run `checkWin` and the match log against. */
+  deaths: DeathEvent[] = [];
   profile: Profile = 'small';
+  /** Set by the first placement; `placeNewPlayers` then skips the profile scan (round-3 follow-up 5). */
+  profileFixed = false;
+  /** Counter for clue ids (`clue_<n>`), reset with the room. */
+  clueSeq = 0;
   /** Raised by the WDI_DEBUG `debug.play` message, consumed by the step. */
   debugPlay = false;
   /** Set when a view must change before the next 5 Hz pass (a transit just ended). */

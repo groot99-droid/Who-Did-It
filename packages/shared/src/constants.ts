@@ -23,5 +23,28 @@ export const ROOM_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 /** Hard cap on messages per second per client (ARCHITECTURE 5.11). */
 export const MAX_MESSAGES_PER_SECOND = 100;
 
+/** `Clue.kind` indices, frozen; the ids are the keys of `clues.json` (GDD 3.4). */
+export const ClueKind = {
+  footprints: 0,
+  thread: 1,
+  felt: 2,
+  fingerprint: 3,
+  smear: 4,
+  wetBucket: 5,
+  dragSmear: 6,
+  fur: 7,
+  clawMarks: 8,
+} as const;
+export type ClueKindId = (typeof ClueKind)[keyof typeof ClueKind];
+
+/** `NotebookEntry.status` values (GDD 3.4; `teaching` is the grace-phase clue of GDD 2 step 5). */
+export const NotebookStatus = {
+  claimed: 0,
+  verified: 1,
+  corroborated: 2,
+  forged: 3,
+  teaching: 4,
+} as const;
+
 // Gameplay radii, light, noise and timers are rules numbers: they live once, in
 // packages/content/data/balance.json (GDD 3.x), and are read through @wdi/content.

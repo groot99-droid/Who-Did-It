@@ -16,4 +16,4 @@ export const PORTAL_REACH_TILES = balance.doors.reachTiles;
 /** `Presence.animId` values. One shared `swing` id covers every strike so it never discriminates a role. */
 export const AnimId = { idle: 0, walk: 1, swing: 2, die: 3 } as const;
 /** `Presence.statusBits`. */
-export const StatusBit = { transit: 1 } as const;
+export const StatusBit = { transit: 1, bloody: 2 } as const;

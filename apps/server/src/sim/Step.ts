@@ -2,15 +2,16 @@ import type { StepContext } from '@colyseus/core';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { VIEW_RECONCILE_EVERY_TICKS } from '@wdi/shared';
 import { runDebugStart } from '../rooms/handlers/movement';
+import { runDecay } from './Clues';
 import { runCommands } from './Commands';
 import { applyInputs, moveAndCollide } from './Movement';
+import { runPhases } from './Phases';
 import { placeNewPlayers, runPortals } from './Portals';
 import { simOf } from './RoomSim';
 import { reconcileViews } from './Visibility';
 
 // Fixed order inside setFixedTimestep (ARCHITECTURE 5.6). Stages without a milestone yet are empty.
-const runAiAndHazards = (_room: PartyRoom): void => {}; // M5: wolves, decay, clue GC
-const checkPhaseAndWin = (_room: PartyRoom): void => {}; // M3: phase timers, checkWin
+const runAiAndHazards = (room: PartyRoom): void => runDecay(room); // M3: clue decay and cap; M5: wolves
 
 /** Keeps one PlayerSim per seated player and places newcomers when the match is on. */
 function syncRoster(room: PartyRoom): void {
@@ -39,5 +40,5 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
     sim.viewsDirty = false;
     reconcileViews(room);
   }
-  checkPhaseAndWin(room);
+  runPhases(room);
 }

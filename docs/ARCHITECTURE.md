@@ -65,7 +65,7 @@ export const GameState = schema({ schemaVersion: t.uint8(), phase: t.uint8(), ph
   players: t.map(Player), scenes: t.map(SceneState).view(), meeting: MeetingState, winner: t.uint8() }, "GameState");
 ```
 
-`Settings` also carries `npcDifficulty: uint8` (0 easy, 1 normal, 2 hard; GDD 3.12). `onJoin` sets `client.view = new StateView()` and adds the player's own `Player` (so `priv` arrives) and the `SceneState` of its scene. `Visibility.ts` moves `scenes` entries and other players' `presence` in and out of views on scene change (V1) and, in V1.5, by radius + occluder raycast at 5-10 Hz with a +1 tile hysteresis so a sprite has history before it is visible. Role, inventory, notebook and cooldowns are therefore never on the wire for other clients; `animId` uses one shared `swing` id for Kill, Crowbar and Check so the animation never discriminates. Fingerprint toucher logs, Blood timers and Case Board intersections stay in room memory. Votes are stored in `priv.myVote`; only `hasVoted` is public; the tally is published in `voteResult`. The meeting phase, board rows and missing list are in `MeetingState` so a reconnecting client rebuilds the UI from state. A fuzz test diffs the state a non-Cabal bot receives over a scripted kill and asserts no field change correlates uniquely with the killer.
+`Settings` also carries `npcDifficulty: uint8` (0 easy, 1 normal, 2 hard; GDD 3.12). `onJoin` sets `client.view = new StateView()` and adds the player's own `Player` (so `priv` arrives) and the `SceneState` of its scene. `Visibility.ts` moves `scenes` entries and other players' `presence` in and out of views on scene change (V1) and, in V1.5, by radius + occluder raycast at 5-10 Hz with a +1 tile hysteresis so a sprite has history before it is visible. Role, inventory, notebook and cooldowns are therefore never on the wire for other clients; `animId` uses one shared `swing` id for Kill, Crowbar and Check so the animation never discriminates. Fingerprint toucher logs, Blood timers and Case Board intersections stay in room memory. `Player.alive` is public but a kill does not flip it: the server keeps `PlayerSim.dead` in room memory, tells the victim with the private `killed`, and flips `alive` for every dead player when the next meeting opens (or at the ejection), so an unreported kill is known only to its victim and to whoever finds the body (GDD 3.7, A30). A dead viewer's view receives every presence in its scene; a living viewer's never receives a dead player's. Votes are stored in `priv.myVote`; only `hasVoted` is public; the tally is published in `voteResult`. The meeting phase, board rows and missing list are in `MeetingState` so a reconnecting client rebuilds the UI from state. A fuzz test diffs the state a non-Cabal bot receives over a scripted kill and asserts no field change correlates uniquely with the killer.
 
 ### 5.5 Message protocol
 
@@ -106,9 +106,9 @@ export function step(room: PartyRoom, ctx: StepContext) {
   moveAndCollide(room);       // swept AABB vs nav bitmap; 250 ms position ring per player
   runCommands(room);          // queued act.* in arrival order: kill, interact, hold, hide/check, present
   runPortals(room);           // synchronous; sets busy/transit, clears inputs, bumps lastInputSeq
-  runAiAndHazards(room);      // wolves, decay, clue GC (cap 40 clues per scene, oldest Claimed first)
+  runAiAndHazards(room);      // sim/Clues.ts runDecay: clue decay and the per-scene cap (M3); wolves (M5)
   if (room.state.tick % 4 === 0 || sim.viewsDirty) reconcileViews(room);   // Visibility.ts at 5 Hz, at once after a crossing or placement
-  checkPhaseAndWin(room);
+  runPhases(room);            // sim/Phases.ts: phase timers, meeting requests, deaths -> checkWin, game over (M3)
 }
 ```
 

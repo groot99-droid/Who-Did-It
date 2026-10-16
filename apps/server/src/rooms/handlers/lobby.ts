@@ -20,8 +20,11 @@ import {
 } from '@wdi/shared';
 import type { PartyRoom } from '../PartyRoom';
 
-/** Messages that belong to the lobby and role-card flow; everything else goes to `sim/Commands`. */
-const LOBBY_TYPES: readonly string[] = [C2S.lobbyStart, C2S.lobbyReady, C2S.roleReady];
+/**
+ * Flow messages: the lobby and role-card flow plus the meeting vote and chat (consumed by the phase
+ * stage's owner, Session K). Everything else is a world verb and goes to `sim/Commands`.
+ */
+const LOBBY_TYPES: readonly string[] = [C2S.lobbyStart, C2S.lobbyReady, C2S.roleReady, C2S.vote, C2S.say];
 export const isLobbyCommand = (type: string): boolean => LOBBY_TYPES.includes(type);
 
 const secondsToTicks = (s: number): number => Math.round(s * TICK_RATE);

@@ -20,6 +20,7 @@
     "voteS": 25,
     "revealS": 8,
     "immunityS": 15,
+    "gameOverS": 20,
     "gddRef": "3.3"
   },
   "byCount": {
@@ -190,6 +191,7 @@
   },
   "ghosts": { "wispsPerCycle": 1, "gddRef": "3.7" },
   "chat": {
+    "maxChars": 200,
     "quickChatRadiusTiles": 5,
     "quickChat": [
       { "id": "followMe", "text": "Follow me" },

@@ -75,6 +75,8 @@ export const BalanceFile = z.strictObject({
     voteS: Seconds,
     revealS: Seconds,
     immunityS: Seconds,
+    /** The end screen holds this long, then the room returns to the lobby with the same code (A30). */
+    gameOverS: Seconds,
   }),
   /** Keyed "4".."10". Cabal size and which specials play come from roles.json rosters. */
   byCount: byPlayerCount(BalanceRow),
@@ -167,6 +169,8 @@ export const BalanceFile = z.strictObject({
   }),
   ghosts: Section({ wispsPerCycle: z.number().int().nonnegative() }),
   chat: Section({
+    /** A `chat.say` line is cut to this many characters (GDD 3.5). */
+    maxChars: z.number().int().positive(),
     quickChatRadiusTiles: Tiles,
     quickChat: z.array(z.strictObject({ id: Id, text: z.string().min(1) })).length(8),
   }),

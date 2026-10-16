@@ -40,6 +40,12 @@ export type C2SType = (typeof C2S)[keyof typeof C2S];
 export type S2CType = (typeof S2C)[keyof typeof S2C];
 
 export type HoldAction = 'drag' | 'collect' | 'task' | 'inspect' | 'autopsy';
+/** Why a meeting opened (GDD 3.3); `missing` is the roll-call of M4. */
+export type MeetingReason = 'body' | 'bell' | 'missing';
+/** How a player died; `vanished` is the disconnect death of GDD 3.8 (M7). */
+export type DeathCause = 'knife' | 'ejected' | 'vanished';
+/** Chat channels the server derives (GDD 3.5); the client never chooses one. */
+export type ChatChannel = 'meeting' | 'ghost' | 'cabal' | 'system';
 
 /** Colyseus room name registered by the server (ARCHITECTURE 5.3). */
 export const ROOM_NAME = 'party';
@@ -117,6 +123,7 @@ export interface C2SPayloads {
   'act.reportBody': { bodyId: string };
   'act.bell': Record<string, never>;
   'act.present': { entryId: string };
+  /** A living player's id, or `"skip"`; changeable until the vote closes (A30). */
   'meeting.vote': { targetId: string };
   'chat.say': { text: string };
   'chat.quick': { phraseId: string };
@@ -137,12 +144,13 @@ export interface S2CPayloads {
   sceneEnter: { sceneId: string; spawn: string; facing: string };
   /** Private. */
   clueFound: { entryId: string };
-  /** Private. */
-  killed: { sceneId: string };
-  /** Private. */
-  'chat.msg': { from: string; text: string; channel: string };
+  /** Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). */
+  killed: { sceneId: string; cause: DeathCause; roles: Record<string, string> };
+  /** Private: routed per recipient; `from` is a player id. */
+  'chat.msg': { from: string; text: string; channel: ChatChannel };
   phaseChange: { phase: number; endsTick: number };
-  meetingStart: { reason: string; callerId: string; bodyOf?: string; missing: string[] };
+  meetingStart: { reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] };
+  /** `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). */
   voteResult: { tally: Record<string, number>; ejectedId?: string; role?: string };
   gameOver: { winner: number; roles: Record<string, string>; summary: string };
   noise: { sceneId: string; x: number; y: number; kind: string };

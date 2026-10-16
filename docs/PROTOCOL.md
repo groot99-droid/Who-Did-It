@@ -17,7 +17,7 @@
 | `act.reportBody` | `{ bodyId: string }` | 2/s | - |
 | `act.bell` | `Record<string, never>` | 2/s | - |
 | `act.present` | `{ entryId: string }` | 2/s | - |
-| `meeting.vote` | `{ targetId: string }` | 2/s | - |
+| `meeting.vote` | `{ targetId: string }` | 2/s | A living player's id, or `"skip"`; changeable until the vote closes (A30). |
 | `chat.say` | `{ text: string }` | 2/s | - |
 | `chat.quick` | `{ phraseId: string }` | 2/s | - |
 | `world.ping` | `{ x: number; y: number }` | 2/s | - |
@@ -35,11 +35,11 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `roleReveal` | `RoleRevealPayload` | Private. |
 | `sceneEnter` | `{ sceneId: string; spawn: string; facing: string }` | Private. |
 | `clueFound` | `{ entryId: string }` | Private. |
-| `killed` | `{ sceneId: string }` | Private. |
-| `chat.msg` | `{ from: string; text: string; channel: string }` | Private. |
+| `killed` | `{ sceneId: string; cause: DeathCause; roles: Record<string, string> }` | Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). |
+| `chat.msg` | `{ from: string; text: string; channel: ChatChannel }` | Private: routed per recipient; `from` is a player id. |
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
-| `meetingStart` | `{ reason: string; callerId: string; bodyOf?: string; missing: string[] }` | - |
-| `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string }` | - |
+| `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
+| `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). |
 | `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string }` | - |
 | `noise` | `{ sceneId: string; x: number; y: number; kind: string }` | - |
 | `error` | `{ code: ErrorCode; msg: string }` | - |
