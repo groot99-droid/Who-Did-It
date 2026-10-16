@@ -18,7 +18,7 @@ import {
 import { deviceId, reconnectTokens } from './storage';
 
 /** The state schema arrives with `@wdi/shared`; until then the room is dynamically typed. */
-type Room = ColyseusRoom;
+export type Room = ColyseusRoom;
 
 export interface LobbySnapshot {
   code: string;
@@ -34,12 +34,14 @@ export type NetEvents = {
   sceneEnter: SceneEnterPayload;
   gameOver: GameOverPayload;
   error: ErrorPayload;
+  /** The live room after a create, join or resume; `null` once it is gone. The router attaches its feeds here. */
+  room: Room | null;
   /** The connection to the room ended; `consented` is true when the player chose to leave. */
   left: { consented: boolean };
 };
 
 /** The server messages the bus forwards as events. */
-type NetMessageType = Exclude<keyof NetEvents, 'lobby' | 'left'>;
+type NetMessageType = Exclude<keyof NetEvents, 'lobby' | 'left' | 'room' | 'sceneEnter'>;
 
 /** Thrown by create/join/resume; the UI shows `JOIN_FAILED_MESSAGE` for every cause. */
 export class JoinError extends Error {
@@ -53,6 +55,8 @@ export class JoinError extends Error {
 export interface NetworkService {
   readonly bus: Emitter<NetEvents>;
   readonly code: string | null;
+  /** The connected room, or null until one is wired (always null in mock mode). */
+  readonly room: Room | null;
   /** Latest roster, so a scene that mounts after the first event still renders at once. */
   readonly snapshot: LobbySnapshot | null;
   /** This player's own card, kept for the whole match so Tab can reopen it in any scene. */
@@ -70,13 +74,9 @@ export interface NetworkService {
   leave(): Promise<void>;
 }
 
-const SERVER_MESSAGES: readonly NetMessageType[] = [
-  'roleReveal',
-  'phaseChange',
-  'sceneEnter',
-  'gameOver',
-  'error',
-];
+// `sceneEnter` is not here: the world feed (ColyseusWorldFeed) registers it once and the router
+// re-emits it on `bus` for the screens that listen (RoleReveal).
+const SERVER_MESSAGES: readonly NetMessageType[] = ['roleReveal', 'phaseChange', 'gameOver', 'error'];
 
 /** Minimal view of the room state the lobby needs; the real schema arrives with `@wdi/shared`. */
 interface PlayerState {
@@ -97,7 +97,7 @@ interface LobbyCallbacks {
 export class ColyseusNetwork implements NetworkService {
   readonly bus: Emitter<NetEvents> = mitt<NetEvents>();
   private readonly client = new Client(SERVER_URL);
-  private room: Room | null = null;
+  private current: Room | null = null;
   private players = new Map<string, PlayerState>();
   private leaderId = '';
   private last: LobbySnapshot | null = null;
@@ -105,7 +105,11 @@ export class ColyseusNetwork implements NetworkService {
   private disposers: Array<() => void> = [];
 
   get code(): string | null {
-    return this.room?.roomId ?? null;
+    return this.current?.roomId ?? null;
+  }
+
+  get room(): Room | null {
+    return this.current;
   }
 
   get snapshot(): LobbySnapshot | null {
@@ -139,7 +143,7 @@ export class ColyseusNetwork implements NetworkService {
   }
 
   send<K extends ClientMessageType>(type: K, payload: ClientMessages[K]): void {
-    this.room?.send(type, payload);
+    this.current?.send(type, payload);
   }
 
   async request<Res = unknown, K extends ClientMessageType = ClientMessageType>(
@@ -147,15 +151,16 @@ export class ColyseusNetwork implements NetworkService {
     payload: ClientMessages[K],
     timeoutMs = 5000,
   ): Promise<Res> {
-    if (this.room === null) throw new Error('not connected');
-    return this.room.request<ClientMessages[K], Res>(type as never, payload, { timeout: timeoutMs });
+    if (this.current === null) throw new Error('not connected');
+    return this.current.request<ClientMessages[K], Res>(type as never, payload, { timeout: timeoutMs });
   }
 
   async leave(): Promise<void> {
-    const room = this.room;
+    const room = this.current;
     if (room === null) return;
     reconnectTokens.clear(room.roomId);
     this.detach();
+    this.bus.emit('room', null);
     await room.leave(true);
     this.bus.emit('left', { consented: true });
   }
@@ -168,9 +173,10 @@ export class ColyseusNetwork implements NetworkService {
       throw new JoinError();
     }
     this.detach();
-    this.room = room;
+    this.current = room;
     reconnectTokens.set(room.roomId, room.reconnectionToken);
     this.wire(room);
+    this.bus.emit('room', room);
     return room.roomId;
   }
 
@@ -185,7 +191,10 @@ export class ColyseusNetwork implements NetworkService {
     room.onLeave((code) => {
       const consented = code === CloseCode.CONSENTED;
       if (consented) reconnectTokens.clear(room.roomId);
-      if (this.room === room) this.room = null;
+      if (this.current === room) {
+        this.current = null;
+        this.bus.emit('room', null);
+      }
       this.bus.emit('left', { consented });
     });
     room.onError((_code, message) => {
@@ -231,7 +240,7 @@ export class ColyseusNetwork implements NetworkService {
   private detach(): void {
     for (const dispose of this.disposers) dispose();
     this.disposers = [];
-    this.room = null;
+    this.current = null;
     this.card = null;
   }
 }

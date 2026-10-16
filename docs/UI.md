@@ -311,6 +311,12 @@ the classes. Today's selectors map as follows:
 | `.timer`, `.timer-bar` | `.wdi-timer`, `.wdi-timer__bar.is-running` (set `--wdi-timer-duration` or rely on `--wdi-card-hold`) |
 | `.wdi-world-chip` (the World HUD in `view/hud.css` keeps a `wdi-world-*` namespace until it adopts the theme) | `.wdi-hud-chip` inside `.wdi-hud > .wdi-hud__tl` |
 
+Landing, Lobby and the role card use these classes since round 3 (Session M); every `data-testid` is
+unchanged. `ui/styles.css` is down to the page chrome (`#game`, `#overlay`, the pointer-events rule) and
+five small layout classes the theme does not have: `.wdi-meet` (the meeting's board beside its side
+panel), `.wdi-over` (the game-over panel), `.wdi-rolechip` (the card's reopen button), `.wdi-banner` (the
+"village wakes" line) and the overlay's transparent background over the canvas.
+
 The `h()` factory needs no change. The role card's `no-motion` class becomes unnecessary: the
 flip's transition is zero under `prefers-reduced-motion` already.
 
@@ -330,6 +336,12 @@ screenshots at 1280 x 720 and 390 x 844 in `docs/ui/`:
 | `loft` | the dark loft with eight occupied bedrolls and a creak cue | 3.11 |
 
 Owner sign-off requested on the role card and the meeting screen before the frames are final.
+
+The meeting and game-over screens are built from the mockup (`ui/Meeting.ts`, `ui/GameOver.ts`): the
+reason line, the portrait grid (the villager atlas drawn to a canvas from the public traits, an initial
+on slate when the atlas is absent), Report and Chat tabs with room for the Notebook, and the reveal with
+tally chips, the stamp and the role line. The faction chips on the game-over rows are the one place a
+faction is shown for other players.
 
 ## 13. Open points
 

@@ -3,8 +3,12 @@ import { Boot } from './scenes/Boot';
 import { Landing } from './scenes/Landing';
 import { Lobby } from './scenes/Lobby';
 import { Preload } from './scenes/Preload';
+import { GameOver } from './scenes/GameOver';
+import { Meeting } from './scenes/Meeting';
 import { RoleReveal } from './scenes/RoleReveal';
 import { World } from './scenes/World';
+import './ui/theme/tokens.css';
+import './ui/theme/components.css';
 import './ui/styles.css';
 
 new Phaser.Game({
@@ -18,5 +22,5 @@ new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Boot, Preload, Landing, Lobby, RoleReveal, World],
+  scene: [Boot, Preload, Landing, Lobby, RoleReveal, World, Meeting, GameOver],
 });
