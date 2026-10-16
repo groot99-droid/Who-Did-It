@@ -6,6 +6,9 @@ import { NotebookPanel } from '../view/NotebookPanel';
 import { mountMeeting, type MeetingScreen } from '../ui/Meeting';
 import { overlayRoot } from '../ui/dom';
 import { drawPortrait } from '../ui/portrait';
+import { outsOf } from '../ui/meetingText';
+import type { AudioBus } from '../view/AudioBus';
+import { REG_AUDIO } from './registry';
 
 /**
  * The meeting: a DOM screen over a plain canvas. Started by the router on `meetingStart`, left standing
@@ -39,11 +42,17 @@ export class Meeting extends Phaser.Scene {
     const world = this.registry.get(REG_WORLD) as WorldFeed | undefined;
     if (world) this.screen.addTab('notebook', 'Notebook', (panel) => new NotebookPanel(panel, world));
     const refresh = () => this.screen?.update();
-    feed.bus.on('voteResult', refresh);
+    // The stamp lands with the reveal: one sound for an ejection or any turned-out seat (silent until the
+    // audio manifest lists `stamp`, and when the World scene has not published its bus).
+    const onResult = (result: Parameters<typeof outsOf>[0]) => {
+      if (outsOf(result).length > 0) (this.registry.get(REG_AUDIO) as AudioBus | undefined)?.play('stamp');
+      refresh();
+    };
+    feed.bus.on('voteResult', onResult);
     feed.bus.on('chat.msg', refresh);
     feed.bus.on('phaseChange', refresh);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      feed.bus.off('voteResult', refresh);
+      feed.bus.off('voteResult', onResult);
       feed.bus.off('chat.msg', refresh);
       feed.bus.off('phaseChange', refresh);
       this.screen?.destroy();

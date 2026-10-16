@@ -1674,3 +1674,72 @@
     max-height: 110px;
   }
 }
+
+/* Round 4 (U): quick-mode meeting and end screen. Tokens only. */
+.wdi-claims {
+  display: grid;
+  gap: var(--wdi-space-2);
+  padding-bottom: var(--wdi-space-2);
+  border-bottom: 1px solid var(--wdi-stroke);
+}
+
+.wdi-claims[hidden],
+.wdi-claims__form[hidden] {
+  display: none;
+}
+
+.wdi-claims__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-claims__form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-claims__form label {
+  display: grid;
+  gap: var(--wdi-space-1);
+}
+
+.wdi-portrait__claim {
+  max-width: 100%;
+  font-family: var(--wdi-font-text);
+  font-size: var(--wdi-text-xs);
+  font-weight: var(--wdi-weight-strong);
+  line-height: 1.2;
+  color: var(--wdi-text-on-paper);
+  text-align: center;
+}
+
+.wdi-portrait__claim[hidden] {
+  display: none;
+}
+
+.wdi-chat__count {
+  text-align: right;
+}
+
+.wdi-timeline {
+  display: grid;
+  gap: var(--wdi-space-1);
+  margin: 0;
+  padding-left: var(--wdi-space-5);
+}
+
+.wdi-timeline > li::marker {
+  color: var(--wdi-text-muted);
+}
+
+.wdi-over__onub {
+  margin-top: var(--wdi-space-2);
+}
+
+.wdi-roster__row.is-winner {
+  border-color: var(--wdi-interact);
+  box-shadow: var(--wdi-glow-interact);
+}

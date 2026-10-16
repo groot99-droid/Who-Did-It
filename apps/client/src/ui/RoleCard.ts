@@ -1,8 +1,23 @@
+import balance from '@wdi/content/data/balance.json';
+import onubBalance from '@wdi/content/data/balance.onub.json';
+import onubRoles from '@wdi/content/data/roles.onub.json';
 import type { RoleRevealPayload, TraitIds } from '../net/protocol';
 import { h, icon, isTyping, type Screen } from './dom';
 
 /** Fallback hold time (`balance.json` phases.roleRevealS); the server's `phaseChange.endsTick` overrides it. */
-export const ROLE_CARD_SECONDS = 12;
+export const ROLE_CARD_SECONDS = balance.phases.roleRevealS;
+
+type OnubRoleRow = { name: string; faction: string };
+const onubRow = (roleId: string): OnubRoleRow | undefined =>
+  (onubRoles.roles as Record<string, OnubRoleRow | undefined>)[roleId];
+
+/** A quick-mode card carries the quick-mode card line as its `beware` (R -> U seam). */
+export const isOnubCard = (role: Pick<RoleRevealPayload, 'beware'>): boolean =>
+  role.beware === onubRoles.cardLine;
+
+/** How long the card holds: `timers.roleCardS` for a quick-mode card, else `phases.roleRevealS`. */
+export const roleCardSeconds = (role: Pick<RoleRevealPayload, 'beware'>): number =>
+  isOnubCard(role) ? onubBalance.timers.roleCardS : ROLE_CARD_SECONDS;
 
 const FLIP_DELAY_MS = 650;
 
@@ -25,7 +40,12 @@ export function lookLine(t: TraitIds): string {
   return `You look like: ${TRAIT_LABELS.height[t.height]} / ${TRAIT_LABELS.scarf[t.scarf]} / ${TRAIT_LABELS.hat[t.hat]}`;
 }
 
-export function roleTitle(roleId: string): string {
+/** The role's display name; quick mode reads `roles.onub.json` (`sinEater` is "Sin-Eater"). */
+export function roleTitle(roleId: string, mode: 'main' | 'onub' = 'main'): string {
+  if (mode === 'onub') {
+    const row = onubRow(roleId);
+    if (row !== undefined) return row.name;
+  }
   return roleId.split(/[_-]/).map(cap).join(' ');
 }
 
@@ -46,6 +66,8 @@ export function mountRoleCard(
   role: RoleRevealPayload,
   opts: RoleCardOptions,
 ): RoleCardScreen {
+  const quick = isOnubCard(role);
+  const holdS = roleCardSeconds(role);
   const timerBar = h('div', { class: 'wdi-timer__bar' });
   const ready = h(
     'button',
@@ -81,7 +103,11 @@ export function mountRoleCard(
     'article',
     { class: `wdi-card wdi-card--${role.team} wdi-flip__face wdi-flip__face--front` },
     h('div', { class: 'wdi-card__stripe' }, icon(`icons/icon_faction_${role.team}`), TEAM_LABEL[role.team]),
-    h('h1', { class: 'wdi-display wdi-card__title', 'data-testid': 'role-name' }, roleTitle(role.roleId)),
+    h(
+      'h1',
+      { class: 'wdi-display wdi-card__title', 'data-testid': 'role-name' },
+      roleTitle(role.roleId, quick ? 'onub' : 'main'),
+    ),
     h(
       'p',
       { class: 'wdi-card__look', 'aria-label': lookLine(role.traits) },
@@ -165,11 +191,11 @@ export function mountRoleCard(
     const flip = () => {
       inner.classList.add('is-flipped');
       if (!withTimer) return;
-      timerBar.style.setProperty('--wdi-timer-duration', `${ROLE_CARD_SECONDS}s`);
+      timerBar.style.setProperty('--wdi-timer-duration', `${holdS}s`);
       // Force a reflow so the drain animation restarts from full.
       void timerBar.offsetWidth;
       timerBar.classList.add('is-running');
-      timers.push(window.setTimeout(hide, ROLE_CARD_SECONDS * 1000));
+      timers.push(window.setTimeout(hide, holdS * 1000));
     };
     // Under prefers-reduced-motion the theme zeroes the flip's transition, so flipping at once is safe.
     timers.push(window.setTimeout(flip, FLIP_DELAY_MS));
