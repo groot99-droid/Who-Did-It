@@ -36,6 +36,7 @@ import { handleSay } from '../../sim/Chat';
 import { handleClaim, handleVote } from '../../sim/Meeting';
 import { newestNpcSeat, isNpcSeat, registerNpcSeat, releaseNpcSeat } from '../../sim/Npc';
 import { beginOnubPlay, startOnubMatch } from '../../sim/Onub';
+import { MatchSeeds } from '../../sim/seeds';
 
 /**
  * Flow messages: the lobby and role-card flow plus the meeting vote and chat (consumed by the phase
@@ -263,19 +264,19 @@ function dealRoles(room: PartyRoom, ids: string[], rng: () => number): Map<strin
   return dealt;
 }
 
-/** XOR mask that gives the NPC name draw its own stream off the match seed. */
-const NPC_NAME_STREAM = 0x6e70633a;
-
 /** lobby -> roleReveal: deal roles and traits, write the private state, send each card to its owner. */
 export function startMatch(room: PartyRoom): void {
+  // Every draw gets its own crypto-seeded stream, so the public traits and NPC names say nothing about the
+  // deal (round-4 review, DECISIONS A49).
+  room.seeds = new MatchSeeds();
   room.matchSeed = randomInt(2 ** 32);
   // The party fills to `players.min` with NPC seats, named from a stream apart from the deal's (GDD 3.12).
-  fillNpcSeats(room, mulberry32(room.matchSeed ^ NPC_NAME_STREAM));
+  fillNpcSeats(room, room.seeds.get('npcNames'));
   const ids = [...room.state.players.keys()];
-  const rng = mulberry32(room.matchSeed);
+  const rng = room.seeds.get('deal');
   if (startOnubMatch(room, ids, rng)) return; // quick mode deals its own loaves (round 4, R)
   const dealt = dealRoles(room, ids, rng);
-  const looks = dealTraits(ids, rng);
+  const looks = dealTraits(ids, room.seeds.get('traits'));
   const factionOf = (id: string) => roles.roles[dealt.get(id) as string]?.faction;
 
   for (const id of ids) {

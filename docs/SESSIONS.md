@@ -1568,3 +1568,52 @@ Session Y (content, copy, audio, playtest kit), branch `claude/r4-content`, PR #
 - **Not done.** DECISIONS row A47 is reserved for Y but `docs/DECISIONS.md` is not in Y's paths; Y's
   decisions are the ones listed here, for the orchestrator to record. No wording fix was needed in
   the frozen 3.11 card texts or `roles.onub.json`.
+
+## Integration log, round 4 (2026-10-17)
+
+All eight sessions opened draft PRs (#19 to #26). The orchestrator merged them in the order R, S, T,
+U, V, W, X, Y (`b3495d2`). Conflicts came only in the appended docs (`docs/DECISIONS.md`,
+`docs/SESSIONS.md`, `CREDITS.md`, `docs/ROADMAP.md`, `docs/UI.md`, `docs/GDD.md`,
+`docs/ARCHITECTURE.md`), and each was kept as a union. Lint, typecheck and every unit suite passed on
+the merged tree (the server suite takes about 300 s now). The opt-in specs `onub.spec.ts` and
+`npc.spec.ts` were written against mocks and had never run against a server, so their first real run
+was at integration. Fixes made at integration (DECISIONS A48):
+
+- **Integration commit 1.** Rows A45 (W) and A47 (Y) recorded, because neither session could write
+  `docs/DECISIONS.md`. The Kenney and OpenGameArt rows of `LICENSES/vendors/README.md` ticked. Y's log
+  heading moved to the session-log level.
+- **Integration fix 2 (`a0850ba`), specs.**
+  - `npc.spec.ts` reads row names with `textContent`, because CSS uppercases `innerText`.
+  - It waits for `reveal-role` instead of a stamp, because an all-Skip vote stamps nobody.
+  - It counts kills by bodies, because a kill stays secret until a meeting opens.
+  - It waits for the report prompt before pressing E.
+  - `onub.spec.ts` checks dusk by the bakery and its plate toast.
+  - Both specs treat `vote-skip` as hidden (`toBeHidden()`), not removed.
+  - Both accept several stamps on a tie (`.first()`).
+- **Integration fix 2, client.** `World.watchPhase` raises the quick-mode dusk toast, which the
+  entry toasts missed because the bakery `sceneEnter` arrives before the phase turns to dusk.
+- **Result.** Both `npc.spec.ts` lobby cases pass. `onub.spec.ts` runs card, dusk, loft, a window,
+  dawn claims, vote, game over and the lobby return, then fails its last check: 3 bot night leaks.
+  The review below traced this to the bot monitor counting the sleeper's own presence
+  (`tools/bots/walk.ts:373`), not to a server leak.
+- **Review.** A five-dimension review (privacy, server seam, wire seam, client seam, conventions)
+  found these on the merged tree:
+  - one major privacy finding: the deal can be recovered from public traits and NPC names, all drawn
+    from the 32-bit match seed;
+  - the bots plan their night act before the bakery props arrive;
+  - PropView overrides X's frame pivots;
+  - the quick-mode match log drops vanished seats;
+  - `debug.deal` across a mode change crashes the debug server;
+  - two NPC tells: an early vote, and only NPC seats ready at the lobby return;
+  - copy ids drifted between Y's UI.md 14.12 and the T, U and V modules.
+  Round 5 takes them over; most quick-mode ones retire with the ONUB v2 rebuild.
+
+Not run at integration: the `npc.spec.ts` quick-mode case, the quick-mode soaks, the 30-minute
+soak, `WDI_SLOW=1`. On 2026-10-17 the owner asked for round 5 instead (below), which carries them.
+
+### Follow-ups for round 5
+
+1. Fix the review's findings above (round 5, Session 5I and the ONUB v2 sessions).
+2. Close M3b and M3c: the quick-mode soak, the real-NPC-seat quick-mode server test, `WDI_SLOW=1`.
+3. M3 exit (owner): three 5-player playtests with the scorecard, recorded in `docs/PLAYTESTS/`.
+4. Art masters to the owner's ROSW checkout (rounds 3 and 4 items, owner).

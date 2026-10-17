@@ -33,6 +33,7 @@ import {
 } from './handlers/lobby';
 import { isNpcSeat } from '../sim/Npc';
 import { registerMovement } from './handlers/movement';
+import { MatchSeeds } from '../sim/seeds';
 
 const codeRegistries = new WeakMap<object, CodeRegistry>();
 
@@ -55,6 +56,8 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
   readonly lobbyCommands = new CommandQueue();
   /** Room memory only: never sent to clients, kept for reproducing a deal while debugging. */
   matchSeed = 0;
+  /** The match's independent random streams (`sim/seeds.ts`); replaced at every Start. */
+  seeds = new MatchSeeds();
   private code = '';
 
   /**

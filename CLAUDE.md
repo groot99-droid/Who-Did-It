@@ -3,9 +3,10 @@
 ## What this repo is
 
 A browser multiplayer hidden-role game for 4 to 10 players: a static Phaser client on
-GitHub Pages and an authoritative Colyseus server. V1 is top-down 2.5D with pre-rendered
-Blender sprites; V2 is first-person 3D on the same server, rules and world data. It also
-ships a short quick mode, One Night Ultimate Baguette (length in `GDD.md` 3.11).
+GitHub Pages and an authoritative Colyseus server. V1 is isometric 2.5D (since round 5,
+DECISIONS A49) with pre-rendered and generated sprites; V2 is first-person 3D on the same
+server, rules and world data. It also ships a short quick mode, One Night Ultimate Baguette
+(length in `GDD.md` 3.11).
 
 Implementation started 2026-10-10 in four parallel sessions; `docs/SESSIONS.md` says which paths
 each session owns. Until their PRs merge, `docs/` and the root scaffold are the whole project.
@@ -39,15 +40,23 @@ Versions are pinned in `docs/ARCHITECTURE.md` 5.1. Sessions never upgrade depend
 
 ## Conventions that must not drift
 
-- Role secrecy: a player's role, inventory, notebook and cooldowns live only in that
-  player's private view. Nothing a client receives about another player may correlate
-  with their role. Debug handlers register only with `WDI_DEBUG=1`.
+- Role secrecy: a player's role card, inventory, notebook and cooldowns live only in that
+  player's private view. In the main mode a seat's public look is its card's character
+  (owner decision, 2026-10-17, DECISIONS A49), except for the cover roles, which wear another
+  card's look: nothing a client receives may reveal that a seat wears a cover, a
+  cover-wearer's true role, or who walks under an impersonation beyond what the drawn figure
+  shows. In the quick mode nothing a client receives about another seat may correlate with
+  its role. Nothing secret shares a random stream with anything public (`sim/seeds.ts`).
+  Debug handlers register only with `WDI_DEBUG=1`.
 - Every client action is queued and consumed inside the server `step()`; nothing mutates
   state in a message callback.
 - Scene, portal, spawn and clue ids in `packages/content/data/scenes/*.json` are frozen;
-  V2 reads the same graph.
-- Atlas keys are `char/<body>/<anim>/<dir>` with non-role body ids; the direction table
-  lives once in `@wdi/shared` (`dirFromVector`).
+  V2 reads the same graph. `SCENE_IDS` is append-only; a new map adds new ids with new
+  prefixes and never renames or reuses one (GDD 3.13, WORLD 4.3).
+- Atlas keys are `char/<lookId>/<anim>/<dir>` with the look ids of `looks.json` (plus
+  `villager` for figures that are not seats); cover cards have no world character. Both modes
+  present isometrically on the client only: data, wire and facing are world frame, an atlas
+  `<dir>` is screen frame, and the direction table lives once in `@wdi/shared` (`dirFromVector`).
 - Assets: CC0 by default, CC-BY only with a `CREDITS.md` row, never Synty, never raw
   Mixamo or Quaternius sources in the repo. See `docs/ASSETS.md` 6.5.
 
