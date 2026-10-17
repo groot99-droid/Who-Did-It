@@ -112,6 +112,24 @@ export const PROP_KEYS: readonly string[] = [...SQUARE_PROP_KEYS, ...BAKERY_PROP
 /** The dark-loft images (`type: image`, DOM backgrounds of the quick-mode loft; GDD 3.11). */
 export const LOFT_KEYS: readonly string[] = ['loft_backdrop', 'prop_bedroll', 'prop_bedroll_self'];
 
+/** The Small-profile building exteriors (`type: image`, origin at the front wall's base). */
+export const BUILDING_KEYS: readonly string[] = [
+  'bld_tavern_ext',
+  'bld_apoth_ext',
+  'bld_widow_ext',
+  'bld_bakery_ext',
+];
+
+/** The ground tilesets (`type: image`, four 64 px variants in a 256 x 64 row). */
+export const TILESET_KEYS: readonly string[] = [
+  'tiles_grass',
+  'tiles_path',
+  'tiles_cobble',
+  'tiles_floorboards',
+  'tiles_caverock',
+  'tiles_forestfloor',
+];
+
 /** The `vfx` texture: anim key -> frame count; frames are `<anim>/<nnn>`, 12 fps, played once. */
 export const VFX_CLIPS: Readonly<Record<string, number>> = {
   vfx_blood_pool: 8,

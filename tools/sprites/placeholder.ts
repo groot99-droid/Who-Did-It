@@ -19,7 +19,7 @@ import {
   type Pass,
 } from './keys.ts';
 import { LOFT_KEYS, PROP_KEYS, VFX_CLIPS, staticFrameNames } from './keys.ts';
-import { LOFT_SIZES } from './loft.ts';
+import { IMAGE_SIZES } from './images.ts';
 import { atlasJson, packCharacter, packFrames, writeFiles, type PackInput } from './pack.ts';
 import { packStatic, type StaticManifest } from './pack-static.ts';
 
@@ -555,7 +555,7 @@ export function vfxFrames(): { manifest: StaticManifest; inputs: PackInput[] } {
 export function loftImages(): Map<string, Buffer> {
   const out = new Map<string, Buffer>();
   for (const key of LOFT_KEYS) {
-    const [w, h] = LOFT_SIZES[key]!;
+    const [w, h] = IMAGE_SIZES[key]!;
     const c = createCanvas(w, h);
     const g = c.getContext('2d');
     if (key === 'loft_backdrop') {
