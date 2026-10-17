@@ -4,11 +4,36 @@
    "image": "props-0.png",
    "format": "RGBA8888",
    "size": {
-    "w": 128,
-    "h": 1024
+    "w": 1024,
+    "h": 512
    },
    "scale": 1,
    "frames": [
+    {
+     "filename": "prop_basin",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 38,
+      "y": 36,
+      "w": 62,
+      "h": 64
+     },
+     "frame": {
+      "x": 570,
+      "y": 3,
+      "w": 62,
+      "h": 64
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7188
+     }
+    },
     {
      "filename": "prop_bell",
      "rotated": false,
@@ -24,14 +49,64 @@
       "h": 109
      },
      "frame": {
-      "x": 3,
-      "y": 3,
+      "x": 109,
+      "y": 163,
       "w": 94,
       "h": 109
      },
      "pivot": {
       "x": 0.5,
       "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_deadLoaf",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 32,
+      "y": 20,
+      "w": 64,
+      "h": 98
+     },
+     "frame": {
+      "x": 209,
+      "y": 163,
+      "w": 64,
+      "h": 98
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.6563
+     }
+    },
+    {
+     "filename": "prop_flour_sacks",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 160,
+      "h": 160
+     },
+     "spriteSourceSize": {
+      "x": 49,
+      "y": 71,
+      "w": 69,
+      "h": 78
+     },
+     "frame": {
+      "x": 3,
+      "y": 259,
+      "w": 69,
+      "h": 78
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -49,8 +124,8 @@
       "h": 60
      },
      "frame": {
-      "x": 53,
-      "y": 232,
+      "x": 432,
+      "y": 3,
       "w": 64,
       "h": 60
      },
@@ -74,8 +149,8 @@
       "h": 102
      },
      "frame": {
-      "x": 3,
-      "y": 232,
+      "x": 638,
+      "y": 3,
       "w": 44,
       "h": 102
      },
@@ -99,14 +174,39 @@
       "h": 102
      },
      "frame": {
-      "x": 3,
-      "y": 340,
+      "x": 570,
+      "y": 73,
       "w": 44,
       "h": 102
      },
      "pivot": {
       "x": 0.5,
       "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_ledger",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 33,
+      "y": 36,
+      "w": 62,
+      "h": 79
+     },
+     "frame": {
+      "x": 432,
+      "y": 69,
+      "w": 62,
+      "h": 79
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7813
      }
     },
     {
@@ -125,13 +225,63 @@
      },
      "frame": {
       "x": 3,
-      "y": 448,
+      "y": 163,
       "w": 100,
       "h": 90
      },
      "pivot": {
       "x": 0.5,
       "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_oven",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 256,
+      "h": 256
+     },
+     "spriteSourceSize": {
+      "x": 78,
+      "y": 66,
+      "w": 101,
+      "h": 159
+     },
+     "frame": {
+      "x": 325,
+      "y": 3,
+      "w": 101,
+      "h": 159
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.7656
+     }
+    },
+    {
+     "filename": "prop_plate",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 96,
+      "h": 96
+     },
+     "spriteSourceSize": {
+      "x": 27,
+      "y": 22,
+      "w": 42,
+      "h": 35
+     },
+     "frame": {
+      "x": 500,
+      "y": 117,
+      "w": 42,
+      "h": 35
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -149,14 +299,39 @@
       "h": 108
      },
      "frame": {
-      "x": 3,
-      "y": 118,
+      "x": 502,
+      "y": 3,
       "w": 62,
       "h": 108
      },
      "pivot": {
       "x": 0.5,
       "y": 0.7708
+     }
+    },
+    {
+     "filename": "prop_wakeTable",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 384,
+      "h": 384
+     },
+     "spriteSourceSize": {
+      "x": 34,
+      "y": 113,
+      "w": 316,
+      "h": 154
+     },
+     "frame": {
+      "x": 3,
+      "y": 3,
+      "w": 316,
+      "h": 154
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.4583
      }
     }
    ]

@@ -17,6 +17,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import static_common as sc  # noqa: E402
+from bakery_props import BAKERY_PROPS  # noqa: E402
 from static_common import blob, box, cylinder, flat, frustum, mesh, slab, stroke, toon  # noqa: E402
 
 PROP_CELL = (192, 148)  # cell px, ground row px: 148 px of height above the base, 44 px in front
@@ -299,6 +300,11 @@ def main() -> None:
     props = sc.Sheet(out, "props")
     sc.sprite_cam(scene, *PROP_CELL)
     for name, build in PROPS.items():
+        objs = build()
+        props.render(scene, name)
+        sc.clear(objs)
+    for name, (build, cell, ground) in BAKERY_PROPS.items():
+        sc.sprite_cam(scene, cell, ground)
         objs = build()
         props.render(scene, name)
         sc.clear(objs)

@@ -29,6 +29,43 @@
       "filter": "linear"
     },
     {
+      "key": "props",
+      "type": "multiatlas",
+      "url": "props/props.json",
+      "path": "props/",
+      "filter": "linear"
+    },
+    {
+      "key": "vfx",
+      "type": "multiatlas",
+      "url": "vfx/vfx.json",
+      "path": "vfx/",
+      "filter": "linear"
+    },
+    {
+      "key": "anims_vfx",
+      "type": "animation",
+      "url": "vfx/vfx.anims.json"
+    },
+    {
+      "key": "loft_backdrop",
+      "type": "image",
+      "url": "loft/loft_backdrop.png",
+      "filter": "linear"
+    },
+    {
+      "key": "prop_bedroll",
+      "type": "image",
+      "url": "loft/prop_bedroll.png",
+      "filter": "linear"
+    },
+    {
+      "key": "prop_bedroll_self",
+      "type": "image",
+      "url": "loft/prop_bedroll_self.png",
+      "filter": "linear"
+    },
+    {
       "key": "bld_tavern_ext",
       "type": "image",
       "url": "buildings/bld_tavern_ext.png",

@@ -18,7 +18,10 @@ import {
   type Dir,
   type Pass,
 } from './keys.ts';
+import { LOFT_KEYS, PROP_KEYS, VFX_CLIPS, staticFrameNames } from './keys.ts';
+import { IMAGE_SIZES } from './images.ts';
 import { atlasJson, packCharacter, packFrames, writeFiles, type PackInput } from './pack.ts';
+import { packStatic, type StaticManifest } from './pack-static.ts';
 
 // docs/ASSETS.md 6.1. TODO: read packages/content/data/palette.json once @wdi/content merges.
 export const PALETTE = {
@@ -327,6 +330,259 @@ export function tilesetImage(biome: string): Buffer {
   return c.toBuffer('image/png');
 }
 
+// ---------------------------------------------------------------- props, vfx, loft (greybox marks)
+
+/**
+ * A greybox prop: a block (front face, lighter top) standing on the frame's pivot, sized like the real
+ * render (docs/SPRITES.md 8), with one accent so the bakery props tell apart without a text label.
+ * `w` and `h` are the front face in px, `top` the depth of the top face, `lift` raises the block (a plate
+ * sits on the table's top, 33 px up), `back` moves the pivot row towards the front edge (the Wake
+ * Table's pivot is its back row).
+ */
+interface GreyProp {
+  cell: number;
+  ground: number;
+  w: number;
+  h: number;
+  top: number;
+  fill: Token;
+  lift?: number;
+  back?: number;
+  accent?: (g: SKRSContext2D, cx: number, topY: number, w: number) => void;
+}
+
+const loafMark = (g: SKRSContext2D, cx: number, y: number) =>
+  shape(g, 'mustard', () => g.ellipse(cx, y, 11, 6, 0, 0, 2 * Math.PI));
+
+const GREY_PROPS: Record<string, GreyProp> = {
+  prop_bell: {
+    cell: 192,
+    ground: 148,
+    w: 80,
+    h: 112,
+    top: 18,
+    fill: 'slate',
+    accent: (g, cx, y) => shape(g, 'mustard', () => g.arc(cx, y + 50, 14, 0, 2 * Math.PI)),
+  },
+  prop_pump: {
+    cell: 192,
+    ground: 148,
+    w: 56,
+    h: 24,
+    top: 40,
+    fill: 'fog',
+    accent: (g, cx, y) => shape(g, 'moon', () => g.ellipse(cx, y + 20, 20, 12, 0, 0, 2 * Math.PI)),
+  },
+  prop_noticeBoard: {
+    cell: 192,
+    ground: 148,
+    w: 84,
+    h: 100,
+    top: 8,
+    fill: 'slate',
+    accent: (g, cx, y) => shape(g, 'bone', () => g.rect(cx - 28, y + 18, 56, 34)),
+  },
+  prop_kitChest: {
+    cell: 192,
+    ground: 148,
+    w: 60,
+    h: 28,
+    top: 26,
+    fill: 'slate',
+    accent: (g, cx, y) => shape(g, 'mustard', () => g.rect(cx - 5, y + 30, 10, 10)),
+  },
+  prop_lanternPost_lit: {
+    cell: 192,
+    ground: 148,
+    w: 10,
+    h: 120,
+    top: 6,
+    fill: 'slate',
+    accent: (g, cx, y) => shape(g, 'lantern', () => g.rect(cx - 9, y - 4, 18, 22)),
+  },
+  prop_lanternPost_unlit: {
+    cell: 192,
+    ground: 148,
+    w: 10,
+    h: 120,
+    top: 6,
+    fill: 'slate',
+    accent: (g, cx, y) => shape(g, 'ink', () => g.rect(cx - 9, y - 4, 18, 22)),
+  },
+  prop_wakeTable: { cell: 384, ground: 176, w: 310, h: 32, top: 120, fill: 'slate', back: 93 },
+  prop_plate: {
+    cell: 96,
+    ground: 72,
+    w: 38,
+    h: 3,
+    top: 22,
+    fill: 'bone',
+    lift: 33,
+    accent: (g, cx, y) => loafMark(g, cx, y + 11),
+  },
+  prop_deadLoaf: {
+    cell: 128,
+    ground: 84,
+    w: 56,
+    h: 30,
+    top: 64,
+    fill: 'fog',
+    back: 32,
+    accent: (g, cx, y) => {
+      loafMark(g, cx, y + 32);
+      g.fillStyle = PALETTE.ink;
+      g.fillRect(cx - 2, y + 25, 4, 14);
+    },
+  },
+  prop_ledger: {
+    cell: 128,
+    ground: 100,
+    w: 54,
+    h: 40,
+    top: 28,
+    fill: 'slate',
+    accent: (g, cx, y) => shape(g, 'ink', () => g.rect(cx - 16, y + 6, 32, 18)),
+  },
+  prop_oven: {
+    cell: 256,
+    ground: 196,
+    w: 96,
+    h: 64,
+    top: 60,
+    fill: 'fog',
+    accent: (g, cx, y, w) => {
+      shape(g, 'fog', () => g.ellipse(cx, y + 10, w / 2 - 8, 34, 0, Math.PI, 2 * Math.PI));
+      shape(g, 'ink', () => g.rect(cx - 20, y + 74, 40, 26));
+    },
+  },
+  prop_basin: {
+    cell: 128,
+    ground: 92,
+    w: 22,
+    h: 26,
+    top: 10,
+    fill: 'slate',
+    accent: (g, cx, y) => shape(g, 'moon', () => g.ellipse(cx, y - 2, 24, 13, 0, 0, 2 * Math.PI)),
+  },
+  prop_flour_sacks: {
+    cell: 160,
+    ground: 120,
+    w: 60,
+    h: 40,
+    top: 14,
+    fill: 'bone',
+    accent: (g, cx, y) => shape(g, 'bone', () => g.ellipse(cx + 22, y + 56, 18, 7, 0, 0, 2 * Math.PI)),
+  },
+};
+
+export function propFrames(): { manifest: StaticManifest; inputs: PackInput[] } {
+  const manifest: StaticManifest = { version: 1, atlas: 'props', frames: {} };
+  const inputs: PackInput[] = [];
+  for (const key of PROP_KEYS) {
+    const p = GREY_PROPS[key];
+    if (!p) throw new Error(`placeholder: no greybox for ${key}`);
+    const c = createCanvas(p.cell, p.cell);
+    const g = c.getContext('2d');
+    const cx = p.cell / 2;
+    const base = p.ground - (p.lift ?? 0) + (p.back ?? 0);
+    const front = base - p.h;
+    const topY = front - p.top;
+    if (p.back) {
+      for (const sx of [-1, 1]) shape(g, 'ink', () => g.rect(cx + sx * (p.w / 2 - 8) - 4, front, 8, p.h + 4));
+    }
+    shape(g, p.fill, () => g.rect(cx - p.w / 2, front, p.w, p.back ? p.h / 2 : p.h));
+    shape(g, p.fill === 'slate' ? 'fog' : p.fill === 'fog' ? 'bone' : p.fill, () =>
+      g.rect(cx - p.w / 2, topY, p.w, p.top),
+    );
+    p.accent?.(g, cx, topY, p.w);
+    manifest.frames[key] = { file: `${key}.png`, cell: p.cell, pivot: [cx, p.ground] };
+    inputs.push({ name: key, png: c.toBuffer('image/png') });
+  }
+  return { manifest, inputs };
+}
+
+/** A centred palette mark per VFX frame that grows or fades over the clip, so the timing reads. */
+export function vfxFrames(): { manifest: StaticManifest; inputs: PackInput[] } {
+  const look: Record<string, { cell: number; fill: Token }> = {
+    vfx_blood_pool: { cell: 128, fill: 'blood' },
+    vfx_blood_splat: { cell: 128, fill: 'blood' },
+    vfx_vote_stamp: { cell: 256, fill: 'blood' },
+    vfx_dust_step: { cell: 64, fill: 'fog' },
+  };
+  const manifest: StaticManifest = { version: 1, atlas: 'vfx', frames: {} };
+  const inputs: PackInput[] = [];
+  for (const name of staticFrameNames('vfx')) {
+    const anim = name.slice(0, name.lastIndexOf('/'));
+    const i = Number(name.slice(name.lastIndexOf('/') + 1));
+    const t = (i + 1) / VFX_CLIPS[anim]!;
+    const { cell, fill } = look[anim]!;
+    const c = createCanvas(cell, cell);
+    const g = c.getContext('2d');
+    const m = cell / 2;
+    if (anim === 'vfx_blood_pool')
+      shape(g, fill, () => g.ellipse(m, m, m * 0.7 * t, m * 0.45 * t, 0, 0, 2 * Math.PI));
+    else if (anim === 'vfx_blood_splat') {
+      for (let k = 0; k < 6; k++) {
+        const a = (k / 6) * 2 * Math.PI;
+        shape(
+          g,
+          fill,
+          () =>
+            g.arc(
+              m + Math.cos(a) * m * 0.7 * t,
+              m + Math.sin(a) * m * 0.4 * t,
+              5 * (1 - t) + 2,
+              0,
+              2 * Math.PI,
+            ),
+          false,
+        );
+      }
+    } else if (anim === 'vfx_vote_stamp') {
+      const r = m * (0.9 - 0.4 * Math.min(1, t * 2));
+      shape(g, fill, () => g.rect(m - r / 2, m - r / 2, r, r));
+    } else {
+      g.globalAlpha = 1 - t * 0.85;
+      shape(g, fill, () => g.arc(m, m, m * (0.3 + 0.5 * t), 0, 2 * Math.PI), false);
+    }
+    manifest.frames[name] = { file: `${name.replace('/', '_')}.png`, cell };
+    inputs.push({ name, png: c.toBuffer('image/png') });
+  }
+  return { manifest, inputs };
+}
+
+/** The dark-loft images as flat marks at the real sizes: the loft's floor and window, and bedrolls. */
+export function loftImages(): Map<string, Buffer> {
+  const out = new Map<string, Buffer>();
+  for (const key of LOFT_KEYS) {
+    const [w, h] = IMAGE_SIZES[key]!;
+    const c = createCanvas(w, h);
+    const g = c.getContext('2d');
+    if (key === 'loft_backdrop') {
+      g.fillStyle = PALETTE.ink;
+      g.fillRect(0, 0, w, h);
+      g.fillStyle = PALETTE.slate;
+      g.fillRect(0, h * 0.3, w, h * 0.7);
+      for (let y = h * 0.3; y < h; y += 24) {
+        g.fillStyle = PALETTE.ink;
+        g.fillRect(0, y, w, 2);
+      }
+      shape(g, 'moon', () => g.ellipse(w * 0.58, h * 0.17, 60, 46, 0, 0, 2 * Math.PI));
+      shape(g, 'lantern', () => g.rect(w * 0.15, h * 0.72, 80, 64));
+    } else {
+      shape(g, 'slate', () => g.roundRect(6, 6, w - 12, h - 12, 18));
+      shape(g, 'bone', () => g.arc(w / 2, 34, 18, 0, 2 * Math.PI));
+      shape(g, 'fog', () => g.roundRect(14, 64, w - 28, h - 80, 12));
+      if (key === 'prop_bedroll_self') {
+        g.fillStyle = PALETTE.moon;
+        g.fillRect(14, 80, w - 28, 8);
+      }
+    }
+    out.set(`${key}.png`, c.toBuffer('image/png'));
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------- manifest
 
 export interface ManifestEntry {
@@ -373,6 +629,29 @@ export async function generate(): Promise<Map<string, Buffer>> {
     path: 'clues/',
     filter: 'linear',
   });
+
+  const props = propFrames();
+  for (const [name, bytes] of await packStatic(props.manifest, props.inputs))
+    files.set(`props/${name}`, bytes);
+  entries.push({
+    key: 'props',
+    type: 'multiatlas',
+    url: 'props/props.json',
+    path: 'props/',
+    filter: 'linear',
+  });
+
+  const vfx = vfxFrames();
+  for (const [name, bytes] of await packStatic(vfx.manifest, vfx.inputs)) files.set(`vfx/${name}`, bytes);
+  entries.push(
+    { key: 'vfx', type: 'multiatlas', url: 'vfx/vfx.json', path: 'vfx/', filter: 'linear' },
+    { key: 'anims_vfx', type: 'animation', url: 'vfx/vfx.anims.json' },
+  );
+
+  for (const [name, bytes] of loftImages()) {
+    files.set(`loft/${name}`, bytes);
+    entries.push({ key: name.replace('.png', ''), type: 'image', url: `loft/${name}`, filter: 'linear' });
+  }
 
   for (const b of BUILDINGS) {
     const key = `bld_${b.id}_ext`;

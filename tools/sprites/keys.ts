@@ -85,14 +85,49 @@ export const CLUE_KEYS: readonly string[] = [
   'clue_drag',
 ];
 
-/** The `props` texture: `prop_<kind>` of overworld.json, plus the lantern states. */
-export const PROP_KEYS: readonly string[] = [
+/** The square props of the `props` texture: `prop_<kind>` of overworld.json, plus the lantern states. */
+export const SQUARE_PROP_KEYS: readonly string[] = [
   'prop_bell',
   'prop_pump',
   'prop_noticeBoard',
   'prop_kitChest',
   'prop_lanternPost_lit',
   'prop_lanternPost_unlit',
+];
+
+/** The bakery props of the `props` texture: `prop_<kind>` of bakery.json, the flour sacks by id tail. */
+export const BAKERY_PROP_KEYS: readonly string[] = [
+  'prop_wakeTable',
+  'prop_plate',
+  'prop_deadLoaf',
+  'prop_ledger',
+  'prop_oven',
+  'prop_basin',
+  'prop_flour_sacks',
+];
+
+/** Every frame of the `props` texture. */
+export const PROP_KEYS: readonly string[] = [...SQUARE_PROP_KEYS, ...BAKERY_PROP_KEYS];
+
+/** The dark-loft images (`type: image`, DOM backgrounds of the quick-mode loft; GDD 3.11). */
+export const LOFT_KEYS: readonly string[] = ['loft_backdrop', 'prop_bedroll', 'prop_bedroll_self'];
+
+/** The Small-profile building exteriors (`type: image`, origin at the front wall's base). */
+export const BUILDING_KEYS: readonly string[] = [
+  'bld_tavern_ext',
+  'bld_apoth_ext',
+  'bld_widow_ext',
+  'bld_bakery_ext',
+];
+
+/** The ground tilesets (`type: image`, four 64 px variants in a 256 x 64 row). */
+export const TILESET_KEYS: readonly string[] = [
+  'tiles_grass',
+  'tiles_path',
+  'tiles_cobble',
+  'tiles_floorboards',
+  'tiles_caverock',
+  'tiles_forestfloor',
 ];
 
 /** The `vfx` texture: anim key -> frame count; frames are `<anim>/<nnn>`, 12 fps, played once. */

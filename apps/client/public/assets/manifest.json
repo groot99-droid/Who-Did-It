@@ -48,9 +48,27 @@
       "url": "vfx/vfx.anims.json"
     },
     {
+      "key": "loft_backdrop",
+      "type": "image",
+      "url": "loft/loft_backdrop.png",
+      "filter": "linear"
+    },
+    {
+      "key": "prop_bedroll",
+      "type": "image",
+      "url": "loft/prop_bedroll.png",
+      "filter": "linear"
+    },
+    {
+      "key": "prop_bedroll_self",
+      "type": "image",
+      "url": "loft/prop_bedroll_self.png",
+      "filter": "linear"
+    },
+    {
       "key": "bld_tavern_ext",
       "type": "image",
-      "url": "placeholder/buildings/bld_tavern_ext.png",
+      "url": "buildings/bld_tavern_ext.png",
       "filter": "linear",
       "origin": [
         0.5,
@@ -60,7 +78,7 @@
     {
       "key": "bld_apoth_ext",
       "type": "image",
-      "url": "placeholder/buildings/bld_apoth_ext.png",
+      "url": "buildings/bld_apoth_ext.png",
       "filter": "linear",
       "origin": [
         0.5,
@@ -70,7 +88,7 @@
     {
       "key": "bld_widow_ext",
       "type": "image",
-      "url": "placeholder/buildings/bld_widow_ext.png",
+      "url": "buildings/bld_widow_ext.png",
       "filter": "linear",
       "origin": [
         0.5,
@@ -80,7 +98,7 @@
     {
       "key": "bld_bakery_ext",
       "type": "image",
-      "url": "placeholder/buildings/bld_bakery_ext.png",
+      "url": "buildings/bld_bakery_ext.png",
       "filter": "linear",
       "origin": [
         0.5,
@@ -90,37 +108,37 @@
     {
       "key": "tiles_grass",
       "type": "image",
-      "url": "placeholder/tiles/tiles_grass.png",
+      "url": "tiles/tiles_grass.png",
       "filter": "linear"
     },
     {
       "key": "tiles_path",
       "type": "image",
-      "url": "placeholder/tiles/tiles_path.png",
+      "url": "tiles/tiles_path.png",
       "filter": "linear"
     },
     {
       "key": "tiles_cobble",
       "type": "image",
-      "url": "placeholder/tiles/tiles_cobble.png",
+      "url": "tiles/tiles_cobble.png",
       "filter": "linear"
     },
     {
       "key": "tiles_floorboards",
       "type": "image",
-      "url": "placeholder/tiles/tiles_floorboards.png",
+      "url": "tiles/tiles_floorboards.png",
       "filter": "linear"
     },
     {
       "key": "tiles_caverock",
       "type": "image",
-      "url": "placeholder/tiles/tiles_caverock.png",
+      "url": "tiles/tiles_caverock.png",
       "filter": "linear"
     },
     {
       "key": "tiles_forestfloor",
       "type": "image",
-      "url": "placeholder/tiles/tiles_forestfloor.png",
+      "url": "tiles/tiles_forestfloor.png",
       "filter": "linear"
     }
   ]
