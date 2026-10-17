@@ -1323,3 +1323,56 @@ goes in the PR description. Not in scope: code.
   `bedroll-<id>`, `night-wake`, `claim-<roleId>`, `swaplog`, `gameover-final-<id>`; `vote-skip` is
   absent in quick mode.
 - Reserved DECISIONS rows: R A40, S A41, T A42, U A43, V A44, W A45, X A46, Y A47.
+
+### Round 4 log: W (bots, e2e, soak, CI)
+
+PR `claude/r4-bots`. **Landed.** The bot brain plays both modes (`tools/bots/walk.ts`, pure choices in
+the new `quick.ts`): in quick mode a bot sets its own plate at dusk, sends no input between `nightSleep`
+and `nightWake`, acts once in its window, claims (`claims`) and votes `other`; `WalkerStats` gained
+`wakes`, `acts`, `claims` and `nightLeaks`. `swarm.ts` exposes `settings`, `addNpc()` and `removeNpc()`.
+`soak.ts --mode onub` and `live.ts --mode onub` exist; `.github/workflows/soak.yml` runs both modes on
+`workflow_dispatch` and weekly. `onub.spec.ts` (`WDI_E2E_ONUB=1`) and `npc.spec.ts` (`WDI_E2E_NPC=1`) are
+in. CI has `timeout-minutes: 15`. `tools/grid` has a test that the bakery's plates, dead loaves and ledger
+are within act range of the `door` spawn. ARCHITECTURE 5.12 and the ROADMAP 7.5 Bot-only row are updated;
+the root `package.json` has `bots:soak:onub`, `bots:live:onub` and `e2e`.
+
+**The 30-minute soak (follow-up 7), main mode, built server, this container:** `pnpm bots:soak` passed.
+Worst tick p95 **0.303 ms** (limit 15 ms; typically 0.17 to 0.30 ms), 6 matches, 24 kills, 7 reports, 7
+meetings, 0 presence leaks, 0 protocol errors, 0 dropped bots. The quick-mode soak could not run: on the
+base branch `startOnubMatch` still throws.
+
+**Checked here:** lint, typecheck and the unit suites are clean; `CI=1 pnpm --filter @wdi/client
+test:e2e` passes (15, with the 6 opt-in specs skipped); `WDI_E2E_MATCH=1` `match.spec.ts` passes (2) with
+the changed brain; main-mode `bots:live` and a 1-minute `bots:soak` pass. The quick-mode brain is
+covered by a scripted-room suite (`tools/bots/test/quickBrain.test.ts`) and a pure-choice suite
+(`quick.test.ts`), not by a real server.
+
+**For the orchestrator at integration.**
+- Run, in this order, with R, S, V, T and U merged: `pnpm bots:live:onub -- --url ...`, a 2-minute
+  `pnpm bots:soak:onub -- --minutes 2`, then `WDI_E2E_ONUB=1 WDI_E2E_NPC=1 CI=1 pnpm --filter @wdi/client
+  test:e2e`, then the 30-minute quick-mode soak (`soak.yml` or `pnpm bots:soak:onub`). None of these has
+  run against a real quick-mode server.
+- What the bots and specs assume of the other sessions (a mismatch shows up as a leak or a timeout, not as a
+  bot bug): the bakery `props` reach the bot at dusk (`Prop.of` set, `bk.plate_<slot>` ids); a window act
+  needs the bot within `actRangeTiles` of its targets (the bot stops at 0.9 of it, standing between a pair
+  for `picks: 2`) and only needs `holdS` of waiting, with no client-side hold message; a sleeper's `scenes`
+  map is empty and its roster has no presence from `nightSleep` to `nightWake` (the bot allows 1.5 s of
+  patch lag before it counts a leak); a waker's `sceneEnter` is followed by a `nightWake` for the same role
+  as `roleReveal.roleId`; `meeting.vote` with another seat's id is accepted in the discussion phase;
+  `meeting.claim` accepts `{roleId}` and `{roleId, targetId, sawRoleId}`.
+- `onub.spec.ts` deals the host `cutpurse` and the guest `mourner` through `debug.deal` and ends the night
+  with `debug.clock {phase: 'dawn'}` after the host's window. `npc.spec.ts` needs `debug.npc {walk:
+  false}` to keep parked NPCs on their spawns after the first kill and report (it re-sends `debug.clock
+  {phase: 'day', clearCooldowns: true}` after the meeting); if S's park does not survive a meeting, the
+  third kill in the first case needs a retry. The first case ends the match by three kills (the watcher
+  bot, then two NPCs), because NPCs vote Skip without Verified clues, so a vote cannot end it.
+- `swarm.addNpc()` and `removeNpc()` send from the first bot, which is not the leader in the specs; the
+  specs use the host page's buttons instead. They are there for a swarm whose first bot creates the room.
+- The CI server job is not split: the server suite is 2m40s here and the whole `pnpm test` 2m45s, under
+  the 4-minute trigger. R and S add suites; if a run passes 4 minutes, move `pnpm --filter @wdi/server test`
+  into its own job in `ci.yml`.
+
+**Not done.** No DECISIONS row A45 (the session's paths do not include `docs/DECISIONS.md`, and nothing
+here changed a decision). No quick-mode soak or e2e results, for the reason above. Playwright is not in
+CI (as before this round: it needs a Chromium and a built client); the specs run in the cloud image, where
+`PLAYWRIGHT_BROWSERS_PATH` is set.
