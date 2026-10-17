@@ -37,7 +37,7 @@ async function createParty(page: Page): Promise<string> {
 
 /** One entry per roster row of the lobby list, host first as the page shows them. */
 async function rows(page: Page): Promise<string[]> {
-  return (await page.getByTestId('player-list').locator('li').allInnerTexts()).map((t) => t.trim());
+  return (await page.getByTestId('player-list').locator('li').allTextContents()).map((t) => t.trim());
 }
 
 /** A standing bot that stays outside the count the page asserts: it joins after them. */
@@ -140,10 +140,10 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
     await page.keyboard.press('KeyE');
     await expect(page.getByTestId('meeting')).toBeVisible();
 
-    // The host votes Skip; the meeting ends early only once all three NPCs have voted, so the stamp inside the
-    // NPC vote window proves they did.
+    // The host votes Skip; the meeting ends early only once all three NPCs have voted, so the reveal inside the
+    // NPC vote window proves they did. NPCs without clues vote Skip, so nobody is stamped: read the reveal line.
     await page.getByTestId('vote-skip').click();
-    await expect(page.getByTestId('stamp')).toBeVisible({ timeout: voteWindowMs });
+    await expect(page.getByTestId('reveal-role')).toBeVisible({ timeout: voteWindowMs });
 
     // The Killer finishes it: with the watcher gone, two more kills leave the Village at one (GDD 3.8).
     await expect(page.getByTestId('hud-clock')).toBeVisible({
@@ -157,11 +157,17 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
       );
       return out;
     };
+    // A kill stays secret until a meeting (the public `alive` flips when one opens), so each kill is counted
+    // by the body it leaves, as the first one was.
+    const bodies = () => w.view().scenes.get('overworld')?.bodies.size ?? 0;
+    const downed = new Set<string>();
     for (let i = 0; i < 2; i++) {
-      const prey = alive()[0]!;
+      const prey = alive().find((n) => !downed.has(n))!;
+      const before = bodies();
       await approach(page, w.view, prey);
       await page.keyboard.press('KeyQ');
-      await expect.poll(() => !alive().includes(prey), { message: `${prey} is down` }).toBe(true);
+      await expect.poll(bodies, { message: `kill ${i + 2} leaves a body` }).toBe(before + 1);
+      downed.add(prey);
       w.swarm.rooms[0]!.send('debug.clock', { phase: 'day', clearCooldowns: true });
     }
     await expect(page.getByTestId('gameover')).toBeVisible({ timeout: (balance.phases.revealS + 30) * 1000 });
@@ -192,6 +198,7 @@ test('Start alone fills the party: four portraits in the meeting', async ({ brow
     await approach(page, w.view, 'Watch1');
     await page.keyboard.press('KeyQ');
     await expect.poll(() => w.view().scenes.get('overworld')?.bodies.size ?? 0).toBe(1);
+    await expect(page.getByTestId('prompt')).toContainText(/report/i);
     await page.keyboard.press('KeyE');
     await expect(page.getByTestId('meeting')).toBeVisible();
     await expect(page.locator('[data-testid^="portrait-"]')).toHaveCount(balance.players.min);
@@ -220,7 +227,7 @@ test('quick mode, one human and three NPCs: the Conductor runs the night to the 
   // The humans sleep through the night whatever they hold; the NPCs wake and act inside the Conductor.
   await expect(page.getByTestId('loft')).toBeVisible({ timeout: 60_000 });
   await expect(page.getByTestId('meeting')).toBeVisible({ timeout: 240_000 });
-  await expect(page.getByTestId('vote-skip')).toHaveCount(0);
+  await expect(page.getByTestId('vote-skip')).toBeHidden();
   await expect(page.locator('[data-testid^="portrait-"]')).toHaveCount(balance.players.min);
 
   // Vote for the first other seat; the NPCs vote in their delay window and the vote ends early.

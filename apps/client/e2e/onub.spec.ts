@@ -114,10 +114,11 @@ test('a 5-seat quick match: card, dusk, loft, a night window, dawn claims and vo
     await q.host.getByTestId('ready').click();
     await q.guest.getByTestId('ready').click();
 
-    // Dusk is spent at the bakery with the plate prompt; nobody is in the overworld.
+    // Dusk is spent at the bakery with the plate toast; nobody is in the overworld. The plate prompt itself
+    // needs a walk to the own plate (world.spec covers the hold); unset plates are set by the server.
     for (const page of [q.host, q.guest]) {
       await expect(page.getByTestId('entered')).toContainText('bakery');
-      await expect(page.getByTestId('prompt')).toBeVisible();
+      await expect(page.locator('.wdi-toasts')).toContainText(/set your plate/i);
     }
 
     // Night: the loft, one bedroll per seat on every page. Only the page whose dealt role has the open window
@@ -137,16 +138,17 @@ test('a 5-seat quick match: card, dusk, loft, a night window, dawn claims and vo
     for (const page of [q.host, q.guest]) {
       await expect(page.getByTestId('meeting')).toBeVisible({ timeout: 30_000 });
       await expect(page.getByTestId('meeting-reason')).toContainText(/dawn/i);
-      await expect(page.getByTestId('vote-skip')).toHaveCount(0);
+      await expect(page.getByTestId('vote-skip')).toBeHidden();
       await expect(page.getByTestId('claim-cutpurse')).toBeVisible();
     }
     await q.host.getByTestId('claim-cutpurse').click();
 
-    // Both humans vote for a bot; the bots have voted already, so the vote ends early and stamps.
+    // Both humans vote for a bot; the bots have voted already, so the vote ends early and stamps (a tie
+    // turns out every seat at the top, so there may be more than one stamp).
     const bot = q.ids().get('Bot1')!;
     await q.host.getByTestId(`portrait-${bot}`).click();
     await q.guest.getByTestId(`portrait-${bot}`).click();
-    await expect(q.host.getByTestId('stamp')).toBeVisible({
+    await expect(q.host.getByTestId('stamp').first()).toBeVisible({
       timeout: (onubBalance.timers.voteS + 20) * 1000,
     });
 

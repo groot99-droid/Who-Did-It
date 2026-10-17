@@ -666,6 +666,9 @@ export class World extends Phaser.Scene {
     if (phase === Phase.dusk) {
       const duskS = this.quick ? onubBalance.timers.duskS : balance.phases.duskS;
       this.hud.toast(fill(C['toast.dusk'], { duskS }), 'warm', undefined, 5000);
+      // The bakery sceneEnter arrives before the phase turns to dusk, so `entryToasts` may have missed it.
+      if (this.quick)
+        this.hud.toast(C['quick.dusk'], 'interact', undefined, 6000, `dusk:${this.feed.clock().startTick}`);
     } else if (phase === Phase.night) this.hud.toast(C['toast.night'], 'warm', undefined, 5000);
     else if (phase === Phase.day && was === Phase.night)
       this.hud.toast(C['toast.day'], 'warm', undefined, 5000);
