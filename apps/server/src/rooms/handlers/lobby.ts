@@ -1,18 +1,31 @@
 import { randomInt } from 'node:crypto';
+import { generateId } from '@colyseus/core';
 import { abilities, balance, items, roles } from '@wdi/content';
+import { names } from '@wdi/content/server';
 import {
   ABILITY_KEYS,
   C2S,
   ErrorCode,
+  GameMode,
+  Inventory,
   ItemStack,
+  MAX_PLAYERS,
+  NpcLevel,
   Phase,
+  Player,
   type PlayerState,
+  Presence,
+  Private,
+  Role,
+  Traits,
+  type Rng,
   S2C,
   Team,
   TRAIT_IDS,
   assignRoles,
   dealTraits,
   mulberry32,
+  pickNpcNames,
   type Roster,
   type RoleRevealPayload,
   type TeamId,
@@ -21,6 +34,7 @@ import type { PartyRoom } from '../PartyRoom';
 import { flowOf, refuse, setPhase } from '../../sim/Flow';
 import { handleSay } from '../../sim/Chat';
 import { handleClaim, handleVote } from '../../sim/Meeting';
+import { newestNpcSeat, isNpcSeat, registerNpcSeat, releaseNpcSeat } from '../../sim/Npc';
 import { beginOnubPlay, startOnubMatch } from '../../sim/Onub';
 
 /**
@@ -39,16 +53,6 @@ const LOBBY_TYPES: readonly string[] = [
   C2S.claim,
 ];
 export const isLobbyCommand = (type: string): boolean => LOBBY_TYPES.includes(type);
-
-/**
- * Roster for a party of `count`. Rows exist for 4 to 10; a smaller party (NPC fill, GDD 3.12, is M3c)
- * deals the first `count` roles of the 4-player row so the Killer and Detective stay in the game.
- */
-export function rosterFor(count: number): Roster {
-  const row = count < balance.players.min ? roles.rosters[String(balance.players.min) as '4'] : undefined;
-  if (!row) return roles.rosters;
-  return { [String(count)]: { deal: row.deal.slice(0, count) } };
-}
 
 /** The private card for one player, built from `roles.json`, `abilities.json` and `items.json`. */
 export function buildRoleReveal(
@@ -95,8 +99,8 @@ export function startRefusal(room: PartyRoom, sessionId: string): ErrorCode | nu
   if (room.state.leaderId !== sessionId) return ErrorCode.cannot;
   if (room.state.phase !== Phase.lobby) return ErrorCode.wrongPhase;
   let humans = 0;
-  room.state.players.forEach((p: PlayerState) => {
-    if (p.connected) humans++;
+  room.state.players.forEach((p: PlayerState, id: string) => {
+    if (p.connected && !isNpcSeat(room, id)) humans++;
   });
   if (humans < balance.lobby.startMinHumans) return ErrorCode.cannot;
   return null;
@@ -130,9 +134,90 @@ export function runLobbyCommands(room: PartyRoom): void {
       case C2S.claim:
         handleClaim(room, cmd.sessionId, payload);
         break;
-      // lobby.settings, lobby.addNpc and lobby.removeNpc: round 4, Session S.
+      case C2S.lobbySettings:
+        handleSettings(room, cmd.sessionId, payload);
+        break;
+      case C2S.lobbyAddNpc:
+        handleAddNpc(room, cmd.sessionId);
+        break;
+      case C2S.lobbyRemoveNpc:
+        handleRemoveNpc(room, cmd.sessionId);
+        break;
     }
   }
+}
+
+/** The seat constructor shared by `PartyRoom.onJoin` and the NPC seats: a connected, empty lobby seat. */
+export function newSeat(room: PartyRoom, id: string, name: string): PlayerState {
+  const player = new Player();
+  player.id = id;
+  player.name = name;
+  player.connected = true;
+  player.traits = new Traits();
+  player.presence = new Presence();
+  player.priv = new Private();
+  player.priv.role = new Role();
+  player.priv.inventory = new Inventory();
+  room.state.players.set(id, player);
+  return player;
+}
+
+/** Adds one NPC seat in the lobby: a session-shaped id, connected, ready, a pool name (GDD 3.12). */
+export function addNpcSeat(room: PartyRoom, rng: Rng): string | null {
+  if (room.state.players.size >= MAX_PLAYERS) return null;
+  const taken = [...room.state.players.values()].map((p: PlayerState) => p.name);
+  const [name] = pickNpcNames(names.pool, taken, 1, rng);
+  const id = generateId();
+  newSeat(room, id, name as string).ready = true;
+  registerNpcSeat(room, id);
+  return id;
+}
+
+/** Drops the most recently added NPC seat; false when there is none. */
+export function removeNewestNpcSeat(room: PartyRoom): boolean {
+  const id = newestNpcSeat(room);
+  if (id === undefined) return false;
+  room.state.players.delete(id);
+  releaseNpcSeat(room, id);
+  return true;
+}
+
+/** Fills the party up to `players.min` with NPC seats; called by `startMatch` before the deal. */
+function fillNpcSeats(room: PartyRoom, rng: Rng): void {
+  while (room.state.players.size < balance.players.min) if (addNpcSeat(room, rng) === null) break;
+}
+
+/** `lobby.settings {mode?, npcDifficulty?}`: leader, lobby; all or nothing (GDD 3.12, A39). */
+function handleSettings(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
+  if (room.state.leaderId !== sessionId)
+    return refuse(room, sessionId, ErrorCode.cannot, 'cannot change settings');
+  if (room.state.phase !== Phase.lobby) return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
+  const { mode, npcDifficulty } = payload;
+  const modes: unknown[] = Object.values(GameMode);
+  const levels: unknown[] = Object.values(NpcLevel);
+  const badMode = mode !== undefined && !modes.includes(mode);
+  const badLevel =
+    npcDifficulty !== undefined &&
+    (!levels.includes(npcDifficulty) || room.state.settings.npcSeats < balance.npc.difficultyMinNpcs);
+  if (badMode || badLevel) return refuse(room, sessionId, ErrorCode.cannot, 'bad setting');
+  if (typeof mode === 'number') room.state.settings.mode = mode;
+  if (typeof npcDifficulty === 'number') room.state.settings.npcDifficulty = npcDifficulty;
+}
+
+/** `lobby.addNpc`: leader, lobby, below `players.max`. */
+function handleAddNpc(room: PartyRoom, sessionId: string): void {
+  if (room.state.leaderId !== sessionId) return refuse(room, sessionId, ErrorCode.cannot, 'cannot add');
+  if (room.state.phase !== Phase.lobby) return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
+  if (addNpcSeat(room, mulberry32(randomInt(2 ** 32))) === null) {
+    refuse(room, sessionId, ErrorCode.cannot, 'party is full');
+  }
+}
+
+/** `lobby.removeNpc`: leader, lobby; removes the most recently added NPC seat (it never names one). */
+function handleRemoveNpc(room: PartyRoom, sessionId: string): void {
+  if (room.state.leaderId !== sessionId) return refuse(room, sessionId, ErrorCode.cannot, 'cannot remove');
+  if (room.state.phase !== Phase.lobby) return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
+  if (!removeNewestNpcSeat(room)) refuse(room, sessionId, ErrorCode.cannot, 'no NPC seats');
 }
 
 const isReadyPhase = (room: PartyRoom): boolean =>
@@ -157,7 +242,7 @@ function dealRoles(room: PartyRoom, ids: string[], rng: () => number): Map<strin
   const flow = flowOf(room);
   const fixed = flow.fixedDeal;
   flow.fixedDeal = null;
-  const roster = rosterFor(ids.length);
+  const roster: Roster = roles.rosters;
   if (!fixed) return assignRoles(ids, room.state.settings, rng, roster);
   const deck = [...(roster[String(ids.length)]?.deal ?? [])];
   const dealt = new Map<string, string>();
@@ -178,10 +263,15 @@ function dealRoles(room: PartyRoom, ids: string[], rng: () => number): Map<strin
   return dealt;
 }
 
+/** XOR mask that gives the NPC name draw its own stream off the match seed. */
+const NPC_NAME_STREAM = 0x6e70633a;
+
 /** lobby -> roleReveal: deal roles and traits, write the private state, send each card to its owner. */
 export function startMatch(room: PartyRoom): void {
-  const ids = [...room.state.players.keys()];
   room.matchSeed = randomInt(2 ** 32);
+  // The party fills to `players.min` with NPC seats, named from a stream apart from the deal's (GDD 3.12).
+  fillNpcSeats(room, mulberry32(room.matchSeed ^ NPC_NAME_STREAM));
+  const ids = [...room.state.players.keys()];
   const rng = mulberry32(room.matchSeed);
   if (startOnubMatch(room, ids, rng)) return; // quick mode deals its own loaves (round 4, R)
   const dealt = dealRoles(room, ids, rng);

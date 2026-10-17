@@ -9,15 +9,10 @@ import {
   NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
   PATCH_RATE_MS,
+  NpcLevel,
   Phase,
-  Player,
-  Presence,
-  Private,
-  Role,
   SceneState,
-  Inventory,
   TICK_RATE,
-  Traits,
   type JoinOptions,
 } from '@wdi/shared';
 import { balance } from '@wdi/content';
@@ -29,7 +24,14 @@ import { CodeRegistry } from '../services/CodeRegistry';
 import { genericJoinError } from '../services/matchmakeGuard';
 import { metrics } from '../services/Metrics';
 import { registerDebugHandlers } from './handlers/debug';
-import { isLobbyCommand, runLobbyCommands, runLobbyPhase } from './handlers/lobby';
+import {
+  isLobbyCommand,
+  newSeat,
+  removeNewestNpcSeat,
+  runLobbyCommands,
+  runLobbyPhase,
+} from './handlers/lobby';
+import { isNpcSeat } from '../sim/Npc';
 import { registerMovement } from './handlers/movement';
 
 const codeRegistries = new WeakMap<object, CodeRegistry>();
@@ -85,6 +87,7 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
 
     const state = new GameState();
     state.phase = Phase.lobby;
+    state.settings.npcDifficulty = NpcLevel[balance.npc.defaultDifficulty as keyof typeof NpcLevel];
     for (const key of SCENE_KEYS) state.scenes.set(key, new SceneState());
     this.setState(state);
 
@@ -113,16 +116,9 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
     // A seat reserved just before Start would otherwise join after the deal with no role and no card.
     if (this.state.phase !== Phase.lobby) throw genericJoinError();
 
-    const player = new Player();
-    player.id = client.sessionId;
-    player.name = name;
-    player.connected = true;
-    player.traits = new Traits();
-    player.presence = new Presence();
-    player.priv = new Private();
-    player.priv.role = new Role();
-    player.priv.inventory = new Inventory();
-    this.state.players.set(client.sessionId, player);
+    // A human joining a full party takes an NPC seat (GDD 3.12).
+    if (this.state.players.size >= MAX_PLAYERS) removeNewestNpcSeat(this);
+    newSeat(this, client.sessionId, name);
     if (this.state.leaderId === '') this.state.leaderId = client.sessionId;
 
     // Only this player's own Player (so `priv` arrives) and their scene are in the view.
@@ -165,7 +161,7 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
   private passLeader(leaverId: string): void {
     if (this.state.leaderId !== leaverId) return;
     for (const [id, p] of this.state.players) {
-      if (id !== leaverId && p.connected) {
+      if (id !== leaverId && p.connected && !isNpcSeat(this, id)) {
         this.state.leaderId = id;
         return;
       }
