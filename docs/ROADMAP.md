@@ -65,6 +65,8 @@ Characters: a generated placeholder atlas (`tools/sprites/placeholder.ts`) with 
 | Bot-only | every PR from M2 | `pnpm bots --n 9`; from M3 `pnpm bots:soak` (6 walkers, one Killer, reporters and random voters play matches back to back) and, from M3b, `pnpm bots:soak:onub` (the same 6 bots in quick mode: plates, windows, claims, dawn votes); the `soak` workflow runs both for 30 minutes by hand and weekly, never on push | crashes, tick p95, patch size, memory over 1 h; bodies, clues and meetings occur; no presence or night leak |
 | 2-person | M1, M2 | owner + 1 friend, one on a phone | onboarding, controls, portal feel |
 | 4-5 humans | M3, each M4 sub-goal | friends via Discord | is the vote fun; clue readability; meeting length |
+| 4-6 humans | M3b | friends via Discord, two sessions of quick mode | does one night and one vote land in the target length; do players know their final role at the reveal; "would play again" against M3 |
+| 1-3 humans | M3c | the owner alone, then with one or two friends; NPCs fill the party | does a match finish with NPC seats in both modes; do the NPC seats pass as villagers; does the NPC Killer threaten |
 | 6-8 humans | M5, M6 | friends + bots as load only | stealth, night, PvE |
 | 10-person | M7 | 6 humans + 4 bots, then 10 humans | suspect sets in 2-Killer games, chat spam, load |
 

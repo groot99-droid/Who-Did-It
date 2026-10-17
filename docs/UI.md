@@ -574,3 +574,196 @@ can join after this.", "Deal the roles", "Not yet". Role card: "Village", "Cabal
 look like: {height} / {scarf} / {hat}", "Beware:", "Your Cabal:", "Tab reopens this card", "Your
 role", "Keep your screen to yourself.", "Ready - role card (Tab)". The role name, goal, card text,
 Beware line and ability names come from `roles.json` and `abilities.json`, never from this deck.
+
+### 14.12 Quick mode (T in the world and the loft, U in the meeting and the end, V on the lobby chip)
+
+Session Y, 2026-10-16. Every line a One Night Ultimate Baguette match shows (GDD 3.11, DECISIONS
+A39), in the house style above. In this section `{role}` is a role's `name` from `roles.onub.json`
+("Sin-Eater"), never from `roles.json`; `{name}` is a seat's public name; `{trace}` is a window's
+`traceText` from `balance.onub.json`. The role card's shared line is `roles.onub.json` `cardLine`,
+its goal the role's `nightAct` and its text the role's `cardText` (GDD 3.11); this deck never
+restates them. The fiction's words stay put: a **loaf** holds a **token**, a **plate** stands on the
+Wake Table, the dead's three loaves lie on the **oven ledge**, a seat is **turned out**, never
+"ejected" or "killed". No line names the seat that woke in a window, and no line seen in the dark
+tells a sleeper anything (A21, A39).
+
+**Lobby chip** (V, `data-testid="mode-chip"`; the length is `targetLengthMin`, the counts
+`balance.players`, A15).
+
+| Id | Text | Notes |
+|---|---|---|
+| `lobby.mode.main` | Who Did It | the chip in the main mode |
+| `lobby.mode.onub` | One Night Ultimate Baguette, {min}-{max} min, {players} | `{players}` is `lobby.mode.players` |
+| `lobby.mode.players` | {min}-{max} players | |
+| `lobby.mode.toggle` | Change mode | leader-only `mode-toggle` |
+| `lobby.mode.leaderOnly` | The leader picks the mode | under the chip for everyone else |
+| `lobby.mode.onub.hint` | One night, one vote. What you hold at dawn is what you are. | under the chip in quick mode |
+
+If the game is ever sold, `lobby.mode.onub` becomes the neutral label of GDD 3.11 (A22) and no other
+line of this section changes: none of them uses the parody title.
+
+**Dusk** (T, in the bakery).
+
+| Id | Kind or key | Text | When |
+|---|---|---|---|
+| `toast.onub.dusk` | `--warm` | Set your loaf on your plate | on entering dusk in quick mode, in place of `toast.dusk` |
+| `prompt.plate.set` | E (hold) | Hold to set your loaf | the own plate (`of` is the own id) in reach; the collect ring fills over `plateHoldS` |
+| `prompt.plate.other` | – | {name}'s plate | another seat's plate in reach at dusk |
+| `toast.plate.set` | `--interact` | Your loaf is on the table | the set is accepted |
+| `phase.dawn` | – | Dawn | clock caption |
+
+**The loft** (T, `data-testid="loft"`; no HUD, no clock, no input).
+
+| Id | Text | Notes |
+|---|---|---|
+| `loft.caption` | The loft is dark. Lie still. | the one line on screen, top centre, `--quiet` |
+| `loft.self` | Your bedroll | `aria-label` of the own bedroll (`bedroll-<id>`) |
+| `loft.bedroll` | A bedroll | `aria-label` of every other bedroll; it never names its seat |
+| `loft.back` | Back to your bedroll | toast on `nightSleep`, as the fade starts |
+
+**The window banner** (T, `data-testid="night-wake"`, from `nightWake` until `nightSleep`). The banner
+names the dealt role that woke, which the waker already knows; the HUD timer runs from `endsTick`.
+
+| Id | Text | Notes |
+|---|---|---|
+| `night.wake` | You wake as the {role} | banner title; `{role}` is the window's role |
+| `night.wake.mates` | Your partner's nameplate glows red | Poisoner window with `mates()` in the bakery |
+| `night.wake.alone` | You woke alone. You may peek at one dead loaf. | Poisoner window with nobody else awake |
+| `night.wake.done` | Done. Wait for the lamp to dim. | once the window's acts are spent |
+
+**Act prompts** (T, keyed by the act id of `balance.onub.json` `acts`; the hold is the act's
+`holdS`). A `picks: 2` act shows its first line until the first pick, then its second.
+
+| Id | Key | Text | Target |
+|---|---|---|---|
+| `prompt.act.peekDead` | E (hold) | Hold to peek at this loaf | a dead loaf; the Poisoner alone, or the Sin-Eater's first pick |
+| `prompt.act.peekDead.second` | E (hold) | Hold to taste a second dead loaf | the Sin-Eater's second pick |
+| `prompt.act.readLedger` | E (hold) | Hold to read the ledger | `bk.ledger` |
+| `prompt.act.peekPlate` | E (hold) | Hold to taste {name}'s loaf | another seat's plate |
+| `prompt.act.take` | E (hold) | Hold to take {name}'s loaf | another seat's plate |
+| `prompt.act.swapPlates` | E (hold) | Hold to pick {name}'s loaf | the Busybody's first plate |
+| `prompt.act.swapPlates.second` | E (hold) | Hold to swap it with {name}'s loaf | the second plate; never the first |
+| `prompt.act.swapDead` | E (hold) | Hold to take this loaf for your own | a dead loaf |
+| `prompt.act.check` | E (hold) | Hold to crack your own loaf | the own plate |
+| `prompt.act.own` | – | Your own plate | the own plate when the act wants another's (`otherPlate`) |
+| `refuse.onub` | 422 on an `onub.*` act | Not that loaf | a wrong target or an act already spent; one line for both, so it says nothing more |
+
+**Night reveal lines** (T, a toast and a HUD line per `nightReveal` entry until the window ends).
+
+| Id | Text | Entry |
+|---|---|---|
+| `night.reveal.plate` | {name}'s loaf: {role} | `of` is another seat |
+| `night.reveal.own` | Your loaf: {role} | `of` is the own seat (the Cutpurse's new token, the Lamplighter) |
+| `night.reveal.dead` | A dead loaf: {role} | `of` is empty |
+| `night.reveal.ledger` | The ledger names {name} | an `onub.readLedger` entry; `{name}` is the Poisoner it names |
+| `night.reveal.ledgerEmpty` | The ledger names nobody at the table | `onub.readLedger` accepted with no entry |
+| `night.swapped` | Done. You did not look. | `onub.swapPlates` accepted (it shows nothing) |
+| `night.swappedDead` | Done. You will not remember which. | `onub.swapDead` accepted |
+
+**The dawn meeting** (U; 14.6 holds everywhere this table is silent).
+
+| Id | Text | Notes |
+|---|---|---|
+| `meeting.reason.dawn` | Dawn at the Wake Table | `meeting-reason` for reason `dawn` |
+| `meeting.traces.title` | What the night left | heading over the trace lines on the report tab; each line is a `{trace}` |
+| `meeting.traces.note` | Marks like these turn up every night | caption under the lines; the traces are cosmetic in V1 (A39) |
+| `meeting.vote.hint.onub` | Tap a portrait to turn them out | living players, in place of `meeting.vote.hint`; there is no Skip |
+| `meeting.vote.self` | You cannot vote for yourself | a tap on the self tile |
+| `meeting.vote.abstain` | You may hold your vote. The reveal names who did. | under the hint until a vote is cast |
+| `meeting.vote.mine.onub` | Your vote: {name} | as `meeting.vote.mine`; there is no Skip line |
+
+**Claims** (U, the chip strip in the chat panel, `.wdi-chip--claim`, `data-testid="claim-<roleId>"`;
+each chip's label is the role's `name`). A claim posts one chat line and sets the portrait's chip; a
+second claim replaces the first.
+
+| Id | Text | Notes |
+|---|---|---|
+| `meeting.claim.title` | Claim a role | label over the strip |
+| `meeting.claim.pickSeat` | Whose loaf? | the second step for a role whose act names a target |
+| `meeting.claim.pickDead` | A dead loaf | the option beside the seats when the claimed role may touch the dead's loaves (Sin-Eater, Poisoner) |
+| `meeting.claim.pickSaw` | What was in it? | the third step for a role whose act shows a token; the choices are role names |
+| `meeting.claim.skipStep` | Leave it out | skips the step |
+| `meeting.claim.post` | Claim | the button that sends `meeting.claim` |
+| `meeting.claim.line` | I was the {role} | no target, no seen role |
+| `meeting.claim.line.target` | I was the {role}. I went to {name}'s plate. | a target, no seen role |
+| `meeting.claim.line.saw` | I was the {role}: {name}'s loaf was {saw} | the GDD 3.11 example; `{saw}` is the seen role's `name` |
+| `meeting.claim.line.own` | I was the {role}: my loaf was {saw} | the target is the claimant's own seat (Lamplighter) |
+| `meeting.claim.line.dead` | I was the {role}: a dead loaf was {saw} | seen role, no target |
+| `meeting.chip.claimed` | Claimed: {role} | under the portrait, `--quiet` |
+
+**Reveal** (U; several seats can be turned out at once).
+
+| Id | Text | Notes |
+|---|---|---|
+| `reveal.outs.one` | {name} is turned out | the stamp lands; `stamp` plays |
+| `reveal.outs.many` | {names} are turned out | `{names}` joined with commas and "and", as `meeting.dead.many` |
+| `reveal.outs.tie` | A tie at the top. Everyone on it goes. | above the outs line when more than one seat is out |
+| `reveal.outs.role` | {name} held the {role} | one line per seat out; the final role (`voteResult.roles`) |
+| `reveal.none.few` | Nobody has enough votes. Nobody is turned out. | the top count is below `minVotesToTurnOut` |
+| `reveal.none.empty.onub` | No votes. Nobody is turned out. | nobody voted |
+| `reveal.abstained` | {names} did not vote | `voteResult.abstained`, every name; hidden when empty |
+| `reveal.crack` | Every plate cracks open | caption as the reveal ends; `loaf_crack` plays |
+
+**Game over** (U, with `gameOver.onub`; 14.10 holds where this table is silent). The headline is the
+`rowId`'s line; `summary` (the winners row's `text`) stands under it as today's `over.why.*` does.
+
+| Id | Text | Notes |
+|---|---|---|
+| `over.onub.debtorAndVillage` | The Debtor and the village win | `gameover-winner` |
+| `over.onub.debtorAlone` | The Debtor wins alone | |
+| `over.onub.poisonerOut` | The village wins | |
+| `over.onub.cabalSurvives` | The Poisoners win | the Hireling wins with them |
+| `over.onub.cleanTable` | The village wins | |
+| `over.onub.storm` | {name} wins with the Hireling loaf | `storm` with a winner in `winnerIds` |
+| `over.onub.stormNobody` | The storm wins | `storm` with no winner |
+| `over.onub.roles` | Who held what | header of the seat rows |
+| `over.onub.row` | {name}: dealt {dealt}, woke {final} | `gameover-role-<id>` and `gameover-final-<id>` |
+| `over.onub.row.same` | {name}: {final} all night | dealt and final are the same role |
+| `over.onub.center` | The dead's loaves | header over the three `center` role names |
+| `over.onub.out` | Turned out | `--hazard` chip on a seat in `outs` |
+| `over.onub.votes` | The votes | header of the vote lines |
+| `over.onub.vote` | {voter} voted for {name} | one line per `votes` entry |
+| `over.onub.abstained` | {name} did not vote | a seat absent from `votes` |
+
+**Swap log** (U, `data-testid="swaplog"`, one line per `swapLog` entry in `order`). A slot is a prop
+id: a plate resolves through `onub.plates` to `over.swap.slot.plate`, a dead loaf to
+`over.swap.slot.dead`. `{role}` is the entry's `roleId` (the dealt role that acted); the end screen
+already shows every dealt role, so naming it here leaks nothing.
+
+| Id | Text | Entry |
+|---|---|---|
+| `over.swap.title` | The night, in order | header |
+| `over.swap.slot.plate` | {name}'s loaf | |
+| `over.swap.slot.dead` | a dead loaf | |
+| `over.swap.take` | The {role} took {slot} | `onub.take`; `{slot}` is the slot that is not the actor's own plate |
+| `over.swap.swapPlates` | The {role} swapped {a} and {b} | `onub.swapPlates`, the slots in order |
+| `over.swap.swapDead` | The {role} traded their loaf for {slot} | `onub.swapDead`; `{slot}` is the dead loaf |
+| `over.swap.none` | Nobody moved a loaf | an empty swap log |
+
+So a whole log reads "The Cutpurse took Hana's loaf", "The Busybody swapped Wilf's loaf and Hana's
+loaf", "The Sot traded their loaf for a dead loaf".
+
+### 14.13 NPC lobby (V)
+
+Session Y, 2026-10-16. The lobby lines of GDD 3.12 and DECISIONS A39. NPC seats look like every other
+seat on the roster, so no line names, counts or tags a seat as an NPC except the leader's own
+controls, and they only count (`Settings.npcSeats`, which is public). `{min}` is `balance.players.min`,
+`{need}` is `npc.difficultyMinNpcs`, `{level}` a difficulty's label below.
+
+| Id | Text | Notes |
+|---|---|---|
+| `lobby.npc.add` | Add NPC | leader-only `add-npc`; hidden when the party is full |
+| `lobby.npc.remove` | Remove NPC | leader-only `remove-npc`; hidden when `npcSeats` is 0 |
+| `lobby.npc.remove.hint` | Removes the NPC added last | `title` of `remove-npc` |
+| `lobby.npc.difficulty` | NPC skill | label of `npc-difficulty` |
+| `npc.level.easy` | Easy | option |
+| `npc.level.normal` | Normal | option |
+| `npc.level.hard` | Hard | option |
+| `lobby.npc.difficulty.locked` | Skill opens with {need} NPC seats. Until then they play {level}. | the select disabled; `{level}` is the default's label |
+| `lobby.hint.fill` | Short of players? NPC villagers take the empty seats at Start. | leader, when the party is below `{min}` |
+| `lobby.confirm.fill` | NPC villagers fill the party up to {min}. | the Start confirm, under its question, when the party is below `{min}` |
+| `lobby.practice` | Practice party: roles on, the Cabal wins with one villager left | at the practice size of GDD 3.9, NPC seats included (GDD 2 step 3) |
+
+The difficulty labels are the keys of `balance.json` `npc.difficulty` in sentence case; a level the
+deck does not list shows its key. `lobby.hint.fill` replaces the interim "NPC fill is coming" line
+(A28, removed by A39).

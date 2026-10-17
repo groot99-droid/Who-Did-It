@@ -13,9 +13,11 @@ player meets is in `docs/GDD.md` and `packages/content/data/balance.json`; this 
 | `SCORECARD.md` | The fun-or-stop sheet for the M3 exit, one per M3 session, with the decision line |
 | `TEMPLATE.md` | One session's notes; copy it to `YYYY-MM-DD-<milestone>.md` |
 | `2026-xx-xx-m2.md` | The M2 playtest entry (a stub until that session is written up) |
+| `README.md` 8 and 9 | The M3b quick-mode evening and the M3c NPC session: who, the session plan and the script for each |
 
 One file per session, named `YYYY-MM-DD-<milestone>.md` (`2026-11-02-m3.md`; a second session the
-same day adds `-b`). The scorecard is filled in a copy too: `YYYY-MM-DD-m3-scorecard.md`.
+same day adds `-b`). The scorecard is filled in a copy too: `YYYY-MM-DD-m3-scorecard.md`, and for
+the later milestones `-m3b-scorecard.md` and `-m3c-scorecard.md` (`SCORECARD.md` 6 and 7).
 
 ## 1. Owner prerequisites (before inviting anyone)
 
@@ -200,3 +202,87 @@ Within a day: copy `TEMPLATE.md` to the dated notes file and fill it, copy `SCOR
 dated copy and fill it, export the form responses into the notes (a summary, not names), and commit
 both on a branch with a pull request. After the second M3 session the owner signs the decision line
 and records the decision as a row in `docs/DECISIONS.md`; ROADMAP 7.6 tags the milestone exit.
+
+## 8. Quick mode evening (M3b)
+
+The M3b exit (ROADMAP 7.1, the M3b row; the tier is ROADMAP 7.5 `4-6 humans`): three 6-player
+quick-mode matches in a row finish in the target length, players name their final role at the reveal
+in at least half the matches, and "would play again" is compared with M3. The rules are GDD 3.11 and
+`balance.onub.json`; the lines on screen are `docs/UI.md` 14.12. Two sessions on different days.
+
+**Prerequisites.** Section 1 unchanged, with "Round 4 merged" in place of round 3 in step 1 and a
+quick-mode smoke run in step 6 (two browsers, the mode chip toggled, one match through to the end
+screen; with fewer than four humans the NPCs fill the rest, so this needs no friends).
+
+**Who.** Six players, the host among them (the 6-player row of GDD 3.11: two Poisoners, the
+Hireling, the Sin-Eater, the Cutpurse, the Busybody, two Mourners and the Debtor among nine loaves).
+A seventh friend changes the deck: they watch the host's screen for a match, then swap in, and the
+scorecard notes it. Four or five is a valid evening but not the exit test.
+
+| From | Step | Who |
+|---|---|---|
+| -0:30 | Prerequisites checked; `/health` answers; logs tab open | Host |
+| 0:00 | Discord voice, sound check, the Pages link in the text channel | All |
+| 0:05 | The party created, everyone joined; the leader toggles the mode chip to quick mode | All |
+| 0:10 | The script, part A (below) | Host |
+| 0:15 | Match 1; at the vote, each player DMs the host the role they think they hold | All |
+| after each match | Part B; the match-log line copied; the scorecard row (`SCORECARD.md` 6) | Host |
+| | Matches 2 to 5 (a short match leaves time for more; the test needs three valid in a row) | All |
+| then | The form (`FORM.md`, item 9 included); then the debrief, part C below | All |
+
+**Voice rule.** Mics off from the role card until the dawn meeting opens: a sleeper who hears "oh,
+I'm up" learns who woke. Mics on in the dawn meeting and on the end screen. The in-game chat and
+claim chips stay the record; say a claim out loud and tap it too.
+
+**Part A, before match 1.**
+
+> Tonight is the short game: one night, one vote, done in minutes. The night before the will is
+> read, the baker bakes a loaf for each of you and three for the dead, with a token inside. Your
+> role card shows the token you were handed. At dusk you walk into the bakery and hold E on your
+> plate to set your loaf down. Then everyone goes to sleep in the loft. You cannot move and there is
+> no clock; just listen to the storm.
+>
+> Some roles get woken up, one at a time, and come down to the bakery to tamper: peek at a loaf,
+> take one, swap two, read the ledger. You act as the role you were dealt, even if someone has
+> already swapped your loaf. So by morning you may not be what your card said.
+>
+> At dawn there is one meeting. Use the claim chips to say what you were and what you saw, argue,
+> then vote. No Skip, and you cannot vote for yourself. Whoever gets the most votes is turned out;
+> a tie turns them all out. Winners are judged on the loaf you hold at dawn, not the card. The two
+> Poisoners want nobody of theirs turned out; the Debtor wants to be turned out. When the vote
+> closes, DM me the role you think you hold now. Then the end screen shows what really happened.
+
+**Part B, between matches.** As in 5, plus: read the end screen's swap log aloud once ("the Cutpurse
+took Hana's loaf ...") and tick each DM'd guess right or wrong against the final roles.
+
+**Part C, the debrief.** Five questions: (1) Was the night tense or just a wait? (2) Did you
+believe your own card at dawn, and why? (3) Did the claim chips help, or did you talk past them? (4)
+Did the swap log on the end screen make sense of the match? (5) Would you play this before or
+instead of the long game?
+
+## 9. NPC session (M3c)
+
+The M3c exit (ROADMAP 7.1, the M3c row; the tier is ROADMAP 7.5 `1-3 humans`): one human with three
+NPCs finishes a main match and a quick-mode match, and the NPC Killer wins at least one of five
+scripted matches at Normal. The rules are GDD 3.12 and `balance.json` `npc`; the lobby lines are
+`docs/UI.md` 14.13. Two sessions on different days.
+
+**Prerequisites.** Section 1 unchanged ("Round 4 merged" in step 1). The scripted matches are the
+bot harness's (ARCHITECTURE 5.12), run from a terminal and logged by the host before session 1.
+
+**Who.** Session 1 is the owner alone; session 2 the owner with one or two friends. Nobody is told
+which seats are NPCs; with two or three humans each guesses on the form (item 10).
+
+| From | Step | Who |
+|---|---|---|
+| -0:30 | Prerequisites checked; the five scripted Normal matches run and logged (`SCORECARD.md` 7) | Host |
+| 0:00 | The party created; NPCs fill at Start, or the leader adds them with Add NPC | Host |
+| 0:05 | Main match, one human with three NPCs (session 1) or the humans with NPCs to four (session 2) | All |
+| after it | The match-log line copied; the scorecard row | Host |
+| | The mode chip to quick mode; one quick-mode match the same way | All |
+| | Optional: the difficulty at Hard with enough NPC seats, one more main match | All |
+| then | The form (item 10 included); notes within a day | All |
+
+**Script.** Part A of 5 for the main match and part A of 8 for quick mode, minus the Discord rule
+when the owner plays alone. Add once: "Some seats may be computer villagers. They never chat. Play
+everyone the same."
