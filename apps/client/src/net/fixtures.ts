@@ -30,3 +30,6 @@ export const MOCK_BOTS: LobbyPlayer[] = [
   { id: 'mock-bo', name: 'Bo', ready: false, connected: true },
   { id: 'mock-cy', name: 'Cy', ready: false, connected: true },
 ];
+
+/** Names the mock gives the NPC seats the leader adds (the real pool is server-only, A39). */
+export const MOCK_NPC_NAMES = ['Edda', 'Finn', 'Gil', 'Hob', 'Ivy', 'Jory', 'Kit', 'Lark'];

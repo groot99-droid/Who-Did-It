@@ -1,6 +1,7 @@
 import { isValidCode, normalizeCode } from '../flags';
 import { JOIN_FAILED_MESSAGE, NAME_MAX, NAME_MIN } from '../net/protocol';
 import { getItem, setItem } from '../net/storage';
+import { LOBBY_COPY as C, fill } from './copy';
 import { h, type Screen } from './dom';
 
 export interface LandingOptions {
@@ -17,7 +18,7 @@ const NAME_KEY = 'wdi:name';
 export function validateName(raw: string): string | null {
   const name = raw.trim();
   if (name.length < NAME_MIN || name.length > NAME_MAX)
-    return `Name must be ${NAME_MIN} to ${NAME_MAX} characters.`;
+    return fill(C['landing.name.error'], { min: NAME_MIN, max: NAME_MAX });
   return null;
 }
 
@@ -44,24 +45,24 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
     autocapitalize: 'characters',
     autocomplete: 'off',
     maxlength: 5,
-    placeholder: 'CODE',
+    placeholder: C['landing.code.placeholder'],
     value: opts.joinCode ?? '',
-    'aria-label': 'Party code',
+    'aria-label': C['landing.code.label'],
   });
   const create = h(
     'button',
     { type: 'button', class: 'wdi-btn wdi-btn--primary wdi-btn--lg wdi-btn--block' },
-    'Create Party',
+    C['landing.create'],
   );
   const join = h(
     'button',
     { type: 'button', class: `wdi-btn wdi-grow${opts.joinCode ? ' wdi-btn--primary' : ''}` },
-    'Join Party',
+    C['landing.join'],
   );
 
   const setBusy = (busy: boolean) => {
     for (const el of [create, join, name, code]) el.toggleAttribute('disabled', busy);
-    if (busy) say('Connecting...', false);
+    if (busy) say(C['landing.connecting'], false);
   };
 
   const run = async (action: (name: string) => Promise<void>) => {
@@ -101,21 +102,25 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
   const el = h(
     'section',
     { class: 'wdi-panel wdi-stack', 'aria-labelledby': 'landing-title' },
-    h('p', { class: 'wdi-eyebrow' }, 'Hollowmere, after dark'),
+    h('p', { class: 'wdi-eyebrow' }, C['landing.eyebrow']),
     h(
       'h1',
       { id: 'landing-title', class: 'wdi-display wdi-display--lg' },
-      opts.joinCode ? 'You are invited' : 'Gather your party',
+      opts.joinCode ? C['landing.title.invited'] : C['landing.title'],
     ),
     h(
       'div',
       { class: 'wdi-field' },
-      h('label', { class: 'wdi-label', for: 'name' }, 'Your name'),
+      h('label', { class: 'wdi-label', for: 'name' }, C['landing.name.label']),
       name,
-      h('p', { id: 'name-hint', class: 'wdi-field__msg' }, `${NAME_MIN} to ${NAME_MAX} characters`),
+      h(
+        'p',
+        { id: 'name-hint', class: 'wdi-field__msg' },
+        fill(C['landing.name.hint'], { min: NAME_MIN, max: NAME_MAX }),
+      ),
     ),
     create,
-    h('div', { class: 'wdi-divider' }, 'or join a friend'),
+    h('div', { class: 'wdi-divider' }, C['landing.divider']),
     h('div', { class: 'wdi-row' }, code, join),
     message,
   );

@@ -1034,33 +1034,33 @@
 
 .wdi-hud__tl {
   position: absolute;
-  top: inherit;
-  left: inherit;
+  top: calc(var(--wdi-space-3) + env(safe-area-inset-top));
+  left: calc(var(--wdi-space-3) + env(safe-area-inset-left));
 }
 
 .wdi-hud__tc {
   position: absolute;
-  top: inherit;
+  top: calc(var(--wdi-space-3) + env(safe-area-inset-top));
   left: 50%;
   transform: translateX(-50%);
 }
 
 .wdi-hud__tr {
   position: absolute;
-  top: inherit;
-  right: inherit;
+  top: calc(var(--wdi-space-3) + env(safe-area-inset-top));
+  right: calc(var(--wdi-space-3) + env(safe-area-inset-right));
 }
 
 .wdi-hud__bl {
   position: absolute;
-  bottom: inherit;
-  left: inherit;
+  bottom: calc(var(--wdi-space-3) + env(safe-area-inset-bottom));
+  left: calc(var(--wdi-space-3) + env(safe-area-inset-left));
 }
 
 .wdi-hud__br {
   position: absolute;
-  bottom: inherit;
-  right: inherit;
+  bottom: calc(var(--wdi-space-3) + env(safe-area-inset-bottom));
+  right: calc(var(--wdi-space-3) + env(safe-area-inset-right));
 }
 
 /* The HUD chip: your goal, top-left, a paper button that reopens the card (Tab). */
@@ -1649,7 +1649,7 @@
 
   .wdi-hud__tc {
     left: auto;
-    right: inherit;
+    right: calc(var(--wdi-space-3) + env(safe-area-inset-right));
     transform: none;
   }
 

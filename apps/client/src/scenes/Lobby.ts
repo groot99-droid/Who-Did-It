@@ -21,6 +21,10 @@ export class Lobby extends Phaser.Scene {
       onStart: () => net.send('lobby.start', {}),
       onReady: (ready) => net.send('lobby.ready', { ready }),
       onLeave: () => void net.leave(),
+      onMode: (mode) => net.setMode(mode),
+      onNpcDifficulty: (level) => net.setNpcDifficulty(level),
+      onAddNpc: () => net.addNpc(),
+      onRemoveNpc: () => net.removeNpc(),
     });
     if (net.snapshot !== null) this.screen.update(net.snapshot);
 

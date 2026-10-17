@@ -6,9 +6,16 @@ import {
   type ClientMessageType,
   type ErrorPayload,
   type GameOverPayload,
+  gameModeId,
+  GameMode,
+  type GameModeId,
   JOIN_FAILED_MESSAGE,
   type JoinOptions,
   type LobbyPlayer,
+  type LobbySettings,
+  NpcLevel,
+  npcLevelId,
+  type NpcLevelId,
   type PhaseChangePayload,
   ROOM_NAME,
   type RoleRevealPayload,
@@ -25,6 +32,12 @@ export interface LobbySnapshot {
   selfId: string;
   leaderId: string;
   players: LobbyPlayer[];
+  settings: LobbySettings;
+}
+
+/** The settings a fresh room shows before its state arrives (mode main, the default level, no NPC seats). */
+export function defaultSettings(defaultLevel: NpcLevelId = 'normal'): LobbySettings {
+  return { mode: 'main', npcDifficulty: defaultLevel, npcSeats: 0 };
 }
 
 export type NetEvents = {
@@ -72,6 +85,14 @@ export interface NetworkService {
     timeoutMs?: number,
   ): Promise<Res>;
   leave(): Promise<void>;
+  /** Leader only (the server refuses anyone else): `lobby.settings {mode}`. */
+  setMode(mode: GameModeId): void;
+  /** Leader only: `lobby.settings {npcDifficulty}`; the server accepts it with enough NPC seats. */
+  setNpcDifficulty(level: NpcLevelId): void;
+  /** Leader only: `lobby.addNpc`. */
+  addNpc(): void;
+  /** Leader only: `lobby.removeNpc`; the server drops the most recently added NPC seat. */
+  removeNpc(): void;
 }
 
 // `sceneEnter` is not here: the world feed (ColyseusWorldFeed) registers it once and the router
@@ -86,12 +107,20 @@ interface PlayerState {
   connected: boolean;
 }
 
+/** `state.settings` as the lobby reads it (numbers: `GameMode`, `NpcLevel`, a seat count). */
+interface SettingsState {
+  mode: number;
+  npcDifficulty: number;
+  npcSeats: number;
+}
+
 /** The slice of the `Callbacks` API the lobby uses, typed for the dynamic state above. */
 interface LobbyCallbacks {
   onAdd(prop: 'players', handler: (player: PlayerState, key: string) => void): () => void;
   onRemove(prop: 'players', handler: (player: PlayerState, key: string) => void): () => void;
   onChange(instance: object, handler: () => void): () => void;
   listen(prop: 'leaderId', handler: (value: string) => void): () => void;
+  listen(prop: 'settings', handler: (value: SettingsState) => void): () => void;
 }
 
 export class ColyseusNetwork implements NetworkService {
@@ -100,6 +129,7 @@ export class ColyseusNetwork implements NetworkService {
   private current: Room | null = null;
   private players = new Map<string, PlayerState>();
   private leaderId = '';
+  private settings: LobbySettings = defaultSettings();
   private last: LobbySnapshot | null = null;
   private card: RoleRevealPayload | null = null;
   private disposers: Array<() => void> = [];
@@ -155,6 +185,22 @@ export class ColyseusNetwork implements NetworkService {
     return this.current.request<ClientMessages[K], Res>(type as never, payload, { timeout: timeoutMs });
   }
 
+  setMode(mode: GameModeId): void {
+    this.send('lobby.settings', { mode: GameMode[mode] });
+  }
+
+  setNpcDifficulty(level: NpcLevelId): void {
+    this.send('lobby.settings', { npcDifficulty: NpcLevel[level] });
+  }
+
+  addNpc(): void {
+    this.send('lobby.addNpc', {});
+  }
+
+  removeNpc(): void {
+    this.send('lobby.removeNpc', {});
+  }
+
   async leave(): Promise<void> {
     const room = this.current;
     if (room === null) return;
@@ -204,6 +250,7 @@ export class ColyseusNetwork implements NetworkService {
 
     this.players = new Map();
     this.leaderId = '';
+    this.settings = defaultSettings();
     this.last = null;
     this.card = null;
     const cb = Callbacks.get(room) as unknown as LobbyCallbacks;
@@ -222,6 +269,18 @@ export class ColyseusNetwork implements NetworkService {
         this.leaderId = value;
         emit();
       }),
+      cb.listen('settings', (value: SettingsState) => {
+        const read = () => {
+          this.settings = {
+            mode: gameModeId(value.mode),
+            npcDifficulty: npcLevelId(value.npcDifficulty),
+            npcSeats: value.npcSeats,
+          };
+          emit();
+        };
+        this.disposers.push(cb.onChange(value, read));
+        read();
+      }),
     );
     emit();
   }
@@ -233,7 +292,13 @@ export class ColyseusNetwork implements NetworkService {
       ready: p.ready,
       connected: p.connected,
     }));
-    this.last = { code: room.roomId, selfId: room.sessionId, leaderId: this.leaderId, players };
+    this.last = {
+      code: room.roomId,
+      selfId: room.sessionId,
+      leaderId: this.leaderId,
+      players,
+      settings: this.settings,
+    };
     this.bus.emit('lobby', this.last);
   }
 

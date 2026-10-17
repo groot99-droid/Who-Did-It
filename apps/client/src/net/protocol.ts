@@ -1,11 +1,13 @@
 // The wire protocol lives once, in @wdi/shared (docs/PROTOCOL.md is generated from it). This module
 // re-exports it under the names the client uses, plus the roster row the lobby draws.
 import {
+  GameMode,
   JOIN_ERROR_MESSAGE,
   MAX_PLAYERS as SHARED_MAX_PLAYERS,
   MIN_PLAYERS_TO_START as SHARED_MIN_PLAYERS,
   NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
+  NpcLevel,
 } from '@wdi/shared';
 import type { S2CPayloads } from '@wdi/shared/protocol';
 
@@ -40,3 +42,17 @@ export interface LobbyPlayer {
   ready: boolean;
   connected: boolean;
 }
+
+/** The lobby settings the server publishes (`state.settings`, GDD 3.11, 3.12); `npcSeats` is a count only. */
+export type GameModeId = keyof typeof GameMode;
+export type NpcLevelId = keyof typeof NpcLevel;
+export interface LobbySettings {
+  mode: GameModeId;
+  npcDifficulty: NpcLevelId;
+  npcSeats: number;
+}
+
+export const gameModeId = (n: number): GameModeId => (n === GameMode.onub ? 'onub' : 'main');
+export const npcLevelId = (n: number): NpcLevelId =>
+  (Object.keys(NpcLevel) as NpcLevelId[]).find((k) => NpcLevel[k] === n) ?? 'normal';
+export { GameMode, NpcLevel };
