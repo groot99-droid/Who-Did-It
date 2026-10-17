@@ -91,6 +91,20 @@ describe('the quick-mode deal (GDD 3.11)', () => {
     expect(all).toHaveLength(8);
   });
 
+  it('validates debug.deal against roles.onub.json in quick mode', async () => {
+    const m = await joinParty(colyseus, 4);
+    m.room.state.settings.mode = 1;
+    const l = m.bots[0]!;
+    l.room.send('debug.deal', { roles: { [l.id]: 'killer' } });
+    await sleep(250);
+    expect(codes(l)).toEqual([422]);
+    l.room.send('debug.deal', { roles: { [l.id]: 'sinEater' } });
+    await sleep(250);
+    expect(codes(l)).toEqual([422]);
+    await beginParty(m);
+    expect(onub(m).dealt.get(l.id)).toBe('sinEater');
+  });
+
   it('numbers the plates 0 to n-1 even when a seat left before the deal, each prop naming its owner', async () => {
     const m = await joinParty(colyseus, 5);
     m.room.state.settings.mode = 1;
