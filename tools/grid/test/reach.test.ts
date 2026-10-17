@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import onubBalance from '../../../packages/content/data/balance.onub.json' with { type: 'json' };
 import { NavGrid } from '@wdi/shared';
 import { type SceneJson, loadScenes, navFor } from '../export';
 
@@ -78,5 +79,28 @@ describe('greybox reachability of the M3 interiors and outdoor scenes', () => {
   it('reaches the forest gate, log and cave from the gate, and the cave mouth and sea in the cave entry', () => {
     expectDoorsReachable('forest', 'gate');
     expectDoorsReachable('cave_entry', 'mouth');
+  });
+});
+
+describe('quick-mode bakery reachability (GDD 3.11)', () => {
+  // The bots, and a player, stand within `actRangeTiles` of a prop to act on it. Every plate, dead loaf and
+  // the ledger must have a walkable tile near enough, reachable on foot from the `door` spawn where the
+  // Conductor puts each waker. The bots stop at 0.9 of the range, so the check keeps that margin.
+  it('reaches every plate, dead loaf and the ledger from the door spawn within act range', () => {
+    const bakery = byId('bakery') as SceneJson & {
+      props: Array<{ id: string; kind: string; x: number; y: number }>;
+    };
+    const door = bakery.spawns.find((s) => s.id === 'door') as { x: number; y: number };
+    const seen = reach(bakery, door.x, door.y);
+    const range = onubBalance.actRangeTiles * 0.9;
+    const acted = bakery.props.filter((p) => ['plate', 'deadLoaf', 'ledger'].includes(p.kind));
+    expect(acted).toHaveLength(10 + onubBalance.deadLoaves + 1);
+    for (const p of acted) {
+      const near = [...seen].some((k) => {
+        const [x, y] = k.split(',').map(Number) as [number, number];
+        return Math.hypot(x - p.x, y - p.y) <= range;
+      });
+      expect(near, p.id).toBe(true);
+    }
   });
 });
