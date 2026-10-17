@@ -1,0 +1,52 @@
+# The long match soak (ARCHITECTURE 5.12): 6 walking bots play matches back to back for 30 minutes against the
+# built server, once in the main mode and once in quick mode (GDD 3.11), and fail on a presence or night leak,
+# a dropped bot, a protocol error, a p95 tick above 15 ms, or a run in which nothing happened. It never runs
+# on push or pull request: it is started by hand (Actions > soak > Run workflow) and weekly.
+name: soak
+
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: Minutes per mode
+        default: '30'
+  schedule:
+    # Mondays 04:17 UTC.
+    - cron: '17 4 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  soak:
+    name: soak (${{ matrix.mode }})
+    runs-on: ubuntu-latest
+    # 30 minutes of play plus install and build; the two modes run side by side, not one after the other.
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [main, onub]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @wdi/server build
+      - name: Soak
+        shell: bash
+        run: pnpm bots:soak -- --mode ${{ matrix.mode }} --minutes ${{ inputs.minutes || '30' }} | tee soak.log
+      - name: Result
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### soak (${{ matrix.mode }})"
+            echo '```'
+            tail -n 12 soak.log || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

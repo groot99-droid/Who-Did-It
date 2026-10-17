@@ -20,7 +20,10 @@
     "bots": "pnpm --filter @wdi/bots start",
     "grid:export": "pnpm --filter @wdi/grid export",
     "bots:soak": "pnpm --filter @wdi/bots soak",
-    "bots:live": "pnpm --filter @wdi/bots live"
+    "bots:soak:onub": "pnpm --filter @wdi/bots soak -- --mode onub",
+    "bots:live": "pnpm --filter @wdi/bots live",
+    "bots:live:onub": "pnpm --filter @wdi/bots live -- --mode onub",
+    "e2e": "pnpm --filter @wdi/client test:e2e"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
