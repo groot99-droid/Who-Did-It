@@ -1323,3 +1323,41 @@ goes in the PR description. Not in scope: code.
   `bedroll-<id>`, `night-wake`, `claim-<roleId>`, `swaplog`, `gameover-final-<id>`; `vote-skip` is
   absent in quick mode.
 - Reserved DECISIONS rows: R A40, S A41, T A42, U A43, V A44, W A45, X A46, Y A47.
+
+### Round 4 log: X (art)
+
+Done on `claude/r4-art`. Blender runs headless as the `bpy` 5.2.0 wheel with Mesa EGL, as in round 3;
+the existing props and clues re-render byte-identical. No Higgsfield or kit asset, so everything new is
+CC BY 4.0 hand-made art (DECISIONS A46).
+
+- **Manifest keys for T** (the X -> T seam): the `props` atlas now holds `prop_wakeTable`, `prop_plate`,
+  `prop_deadLoaf`, `prop_ledger`, `prop_oven`, `prop_basin`, `prop_flour_sacks` beside the six square
+  props (one 1024 x 512 page); `loft_backdrop`, `prop_bedroll`, `prop_bedroll_self` are `type: image`
+  entries under `loft/`. Both manifests carry every key.
+- **Placing the bakery props (T)**: put each sprite at its tile centre and keep the frame's own pivot
+  (do not `setOrigin(0.5, 1)` as `PropView` does for the square): the Wake Table's pivot is
+  `bk.wake_table`'s tile, its back row's middle, and the table covers x 6-10, y 4-5; a plate's pivot is
+  33 px below the plate so it sits on the table's top; three `prop_deadLoaf` at x 3, y 1-3 form the
+  oven ledge. Draw plates above the table where they share its depth (row 4). A check composite of
+  all bakery props at their `bakery.json` tiles lined up on the 64 px grid.
+- **Loft (T)**: `loft_backdrop` is 1280 x 720 and opaque, for `background-size: cover` behind
+  `.wdi-loft` (its centre is dark and empty); the bedrolls are 112 x 184, twice the mockup's 56 x 92
+  `.wdi-bedroll__blanket`, transparent, for `background-size: contain`; the self roll differs only by
+  moon stripes, so keep the CSS glow.
+- **Placeholder manifest** (follow-up 4): `?art=placeholder` gains `props`, `vfx` with `anims_vfx`
+  and the three loft images, as unlabelled greybox marks on the real cells and pivots.
+- **Stand-ins**: the four `bld_*_ext` exteriors (`buildings/`) and the six `tiles_*` sets (`tiles/`) are
+  rendered from code (`build_buildings.py`, `build_tiles.py`); the real manifest no longer points into
+  `placeholder/`. The client draws neither yet.
+- **Rebuild**: `python tools/blender/build_props.py -- --out build/render` then `pack:static` for
+  `props`; `build_loft.py`, `build_buildings.py`, `build_tiles.py`, then `pnpm --filter @wdi/sprites
+  images ../../build/render ../../apps/client/public/assets`; `pnpm --filter @wdi/sprites placeholder`.
+  Everything rebuilds byte-identical.
+- **Owner**: copy `assets/external/bakery/bakery_props.blend` and `assets/external/loft/loft.blend`
+  (built by `python tools/blender/save_masters.py -- --out assets/external`) to ROSW
+  `studio/assets/who-did-it/world/{bakery,loft}/`; the studio notes are still to be written by the
+  studio pipeline. A re-save changes the hash, so update `MANIFEST.md` from the copy you keep.
+- **Not done**: the plate, dead-loaf and ledger states (cracked, turned, open) and the flour decal
+  wait for V1.1 traces; UI art and audio were out of scope. `e2e/world.spec.ts` "kill -> body ->
+  collect -> one Notebook entry" fails now and then under the full parallel run on the base manifest
+  too (it passes alone every time); W owns the spec.
