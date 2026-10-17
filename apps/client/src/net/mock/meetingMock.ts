@@ -1,14 +1,19 @@
 import mitt, { type Emitter } from 'mitt';
 import balanceJson from '@wdi/content/data/balance.json';
+import onubBalance from '@wdi/content/data/balance.onub.json';
+import onubRoles from '@wdi/content/data/roles.onub.json';
 import { TICK_RATE } from '@wdi/shared';
 import {
   type ChatLine,
+  type ClaimRow,
   type GameOver,
+  type MatchMode,
   type MeetingFeed,
   type MeetingFeedEvents,
   type MeetingInfo,
   type MeetingPlayer,
   type MeetingStart,
+  type OnubGameOver,
   SKIP,
   type VoteResult,
 } from '../meeting';
@@ -95,6 +100,96 @@ export function tallyVotes(votes: Record<string, string>): {
   return { tally, ejectedId: top[0] };
 }
 
+// --- quick mode (reason `dawn`), a stand-in for R's rules until they land -----------------------------------
+
+/** The mock deal: dealt role per seat index (the first six seats of the 6-seat deck, GDD 3.11) and the dead's loaves. */
+const MOCK_DEALT = ['cutpurse', 'poisoner', 'busybody', 'mourner', 'sinEater', 'debtor'];
+const MOCK_CENTER = ['poisoner', 'hireling', 'mourner'];
+/** The mock night: the Cutpurse (seat 0) takes seat 1's loaf, then the Busybody (seat 2) swaps seats 3 and 5. */
+const MOCK_SWAPS: Array<{ roleId: string; act: string; seats: [number, number] }> = [
+  { roleId: 'cutpurse', act: 'onub.take', seats: [0, 1] },
+  { roleId: 'busybody', act: 'onub.swapPlates', seats: [3, 5] },
+];
+/** The first seat index that never votes (it and any seat after it), so the reveal names abstainers. */
+const MOCK_ABSTAINER = 5;
+
+export interface MockDeal {
+  dealt: string[];
+  final: string[];
+  center: string[];
+  swapLog: OnubGameOver['swapLog'];
+}
+
+/** Replays the mock night from the dealt loaves; the log's slots are plate ids (`bk.plate_<slot>`). */
+export function mockOnubDeal(seats: number): MockDeal {
+  const dealt = Array.from({ length: seats }, (_, i) => MOCK_DEALT[i] ?? 'mourner');
+  const final = [...dealt];
+  const swapLog: OnubGameOver['swapLog'] = [];
+  MOCK_SWAPS.forEach((sw, i) => {
+    const [a, b] = sw.seats;
+    if (a >= seats || b >= seats) return;
+    [final[a], final[b]] = [final[b] ?? '', final[a] ?? ''];
+    swapLog.push({ order: i + 1, roleId: sw.roleId, act: sw.act, slots: [`bk.plate_${a}`, `bk.plate_${b}`] });
+  });
+  return { dealt, final, center: MOCK_CENTER, swapLog };
+}
+
+/**
+ * The dawn bots' votes: two seats end in a tie whatever the player does about the rest, the last seat
+ * abstains, nobody votes Skip or themselves.
+ */
+export function mockDawnVotes(roster: readonly MeetingPlayer[]): Record<string, string> {
+  const ids = roster.map((p) => p.id);
+  const at = (i: number) => ids[i % ids.length] ?? '';
+  const out: Record<string, string> = {};
+  out[at(1)] = at(2);
+  out[at(2)] = at(1);
+  out[at(3)] = at(1);
+  out[at(4)] = at(2);
+  return out;
+}
+
+/** Quick-mode resolution: everyone holding the most votes, if that is at least the minimum; ties included. */
+export function tallyDawn(votes: Record<string, string>): { tally: Record<string, number>; outs: string[] } {
+  const tally: Record<string, number> = {};
+  for (const target of Object.values(votes)) tally[target] = (tally[target] ?? 0) + 1;
+  const top = Math.max(0, ...Object.values(tally));
+  const outs =
+    top >= onubBalance.vote.minVotesToTurnOut ? Object.keys(tally).filter((id) => tally[id] === top) : [];
+  return { tally, outs };
+}
+
+/** The winners table of `balance.onub.json`, judged on the final loaves (a mock stand-in for `onubWinners`). */
+export function mockWinners(
+  outsRoles: readonly string[],
+  finals: readonly string[],
+  center: readonly string[],
+): { rowId: string; winnerSeats: number[] } {
+  const flags = {
+    debtorOut: outsRoles.includes('debtor'),
+    poisonerOut: outsRoles.includes('poisoner'),
+    poisonerAmongMourners: finals.includes('poisoner'),
+    anyoneOut: outsRoles.length > 0,
+  };
+  const row =
+    onubBalance.winners.find((w) =>
+      Object.entries(w.when).every(([k, v]) => flags[k as keyof typeof flags] === v),
+    ) ?? onubBalance.winners[0];
+  const faction = (r: string) => (onubRoles.roles as Record<string, { faction: string }>)[r]?.faction;
+  const seats = finals.map((_, i) => i);
+  const winnerSeats = new Set<number>();
+  for (const token of row?.winners ?? []) {
+    for (const i of seats) {
+      const r = finals[i] ?? '';
+      if (token === 'village' && faction(r) !== 'cabal' && r !== 'debtor') winnerSeats.add(i);
+      if (token === 'cabal' && faction(r) === 'cabal') winnerSeats.add(i);
+      if (token === 'debtor' && r === 'debtor') winnerSeats.add(i);
+      if (token === 'hirelingIfMourner' && r === 'hireling' && !center.includes(r)) winnerSeats.add(i);
+    }
+  }
+  return { rowId: row?.id ?? '', winnerSeats: [...winnerSeats] };
+}
+
 export interface MockMeetingOptions {
   /** Called when the mock meeting is over and the world should carry on (`resume`) or the match ended. */
   onDone(outcome: MockMeetingOutcome): void;
@@ -114,6 +209,9 @@ export class MockMeetingFeed implements MeetingFeed {
   private startedAt = performance.now();
   private phase: number = PHASE.lobby;
   private endsAt = 0;
+  private quick = false;
+  private claimRows = new Map<string, ClaimRow>();
+  private dealt: MockDeal = mockOnubDeal(0);
 
   constructor(
     roster: ReadonlyArray<Pick<MeetingPlayer, 'id' | 'name' | 'traits'>>,
@@ -123,8 +221,28 @@ export class MockMeetingFeed implements MeetingFeed {
     this.players = roster.map((p) => ({ ...p, alive: true, hasVoted: false }));
   }
 
+  mode(): MatchMode {
+    return this.quick ? 'onub' : 'main';
+  }
+
   roster(): MeetingPlayer[] {
     return this.players.map((p) => ({ ...p }));
+  }
+
+  claims(): readonly ClaimRow[] {
+    return [...this.claimRows.values()];
+  }
+
+  traces(): readonly string[] {
+    if (!this.quick) return [];
+    return [...new Set(onubBalance.windows.map((w) => w.traceText).filter((t) => t !== ''))];
+  }
+
+  claim(roleId: string, targetId = '', sawRoleId = ''): void {
+    const me = this.players.find((p) => p.id === this.selfId);
+    if (!this.quick || !me?.alive || (this.phase !== PHASE.discussion && this.phase !== PHASE.vote)) return;
+    if (!(roleId in onubRoles.roles)) return;
+    this.claimRows.set(this.selfId, { from: this.selfId, roleId, targetId, sawRoleId });
   }
 
   meeting(): MeetingInfo {
@@ -160,6 +278,8 @@ export class MockMeetingFeed implements MeetingFeed {
     if (!me?.alive || (this.phase !== PHASE.discussion && this.phase !== PHASE.vote)) return;
     const living = this.players.some((p) => p.alive && p.id === targetId);
     if (targetId !== SKIP && !living) return;
+    // Quick mode has no Skip and no vote for yourself (GDD 3.11).
+    if (this.quick && (targetId === SKIP || targetId === this.selfId)) return;
     this.mine = targetId;
     this.votes[this.selfId] = targetId;
     me.hasVoted = true;
@@ -182,6 +302,9 @@ export class MockMeetingFeed implements MeetingFeed {
     this.votes = {};
     this.mine = '';
     this.tally = null;
+    this.quick = req.reason === 'dawn';
+    this.claimRows = new Map();
+    this.dealt = mockOnubDeal(this.players.length);
     for (const p of this.players) p.hasVoted = false;
     const dead = req.bodyOf === undefined ? undefined : this.players.find((p) => p.id === req.bodyOf);
     if (dead) dead.alive = false;
@@ -201,10 +324,16 @@ export class MockMeetingFeed implements MeetingFeed {
     };
     this.bus.emit('meetingStart', start);
     const n = Math.min(10, Math.max(4, this.players.length));
-    const row = balanceJson.byCount[String(n) as keyof typeof balanceJson.byCount];
+    const row = this.quick
+      ? onubBalance.byCount[String(n) as keyof typeof onubBalance.byCount]
+      : balanceJson.byCount[String(n) as keyof typeof balanceJson.byCount];
+    const voteS = this.quick ? onubBalance.timers.voteS : balanceJson.phases.voteS;
     this.setPhase(PHASE.discussion, row.discussionS);
 
-    const botVotes = mockBotVotes(this.roster(), this.selfId, req.reason);
+    if (this.quick) this.scheduleClaims();
+    const botVotes = this.quick
+      ? mockDawnVotes(this.roster())
+      : mockBotVotes(this.roster(), this.selfId, req.reason as MeetingStart['reason']);
     Object.entries(botVotes).forEach(([id, target], i) =>
       this.later(
         () => {
@@ -217,8 +346,8 @@ export class MockMeetingFeed implements MeetingFeed {
         BOT_VOTE_FIRST_MS + BOT_VOTE_STEP_MS * i,
       ),
     );
-    this.later(() => this.setPhase(PHASE.vote, balanceJson.phases.voteS), row.discussionS * 1000);
-    this.later(() => this.reveal(), (row.discussionS + balanceJson.phases.voteS) * 1000);
+    this.later(() => this.setPhase(PHASE.vote, voteS), row.discussionS * 1000);
+    this.later(() => this.reveal(), (row.discussionS + voteS) * 1000);
   }
 
   dispose(): void {
@@ -229,12 +358,26 @@ export class MockMeetingFeed implements MeetingFeed {
 
   private checkAllVoted(): void {
     if (this.phase !== PHASE.discussion && this.phase !== PHASE.vote) return;
-    if (this.players.filter((p) => p.alive).every((p) => this.votes[p.id] !== undefined)) this.reveal();
+    // The mock abstainer never votes, so quick mode ends once everyone else has (a mock-only shortcut: the
+    // real server waits out the vote timer for a seat that does not vote).
+    const voters = this.players.filter((p, i) => p.alive && !(this.quick && i >= MOCK_ABSTAINER));
+    if (voters.every((p) => this.votes[p.id] !== undefined)) this.reveal();
+  }
+
+  /** The bots speak up a few seconds into the discussion; one of them lies. */
+  private scheduleClaims(): void {
+    const seat = (i: number) => this.players[i]?.id ?? '';
+    const post = (i: number, row: Omit<ClaimRow, 'from'>, ms: number) =>
+      this.later(() => this.claimRows.set(seat(i), { from: seat(i), ...row }), ms);
+    post(2, { roleId: 'busybody', targetId: '', sawRoleId: '' }, 1500);
+    post(4, { roleId: 'sinEater', targetId: seat(1), sawRoleId: 'cutpurse' }, 2500);
+    post(1, { roleId: 'mourner', targetId: '', sawRoleId: '' }, 3500);
   }
 
   private reveal(): void {
     if (this.phase === PHASE.reveal || this.phase === PHASE.gameOver) return;
     this.clearTimers();
+    if (this.quick) return this.revealDawn();
     const { tally, ejectedId } = tallyVotes(this.votes);
     const ejected = ejectedId === undefined ? undefined : this.players.find((p) => p.id === ejectedId);
     const role = ejected === undefined ? undefined : this.roleOf(ejected);
@@ -251,6 +394,54 @@ export class MockMeetingFeed implements MeetingFeed {
       () => (ejected ? this.finish(role ?? '') : this.opts.onDone('resume')),
       balanceJson.phases.revealS * 1000,
     );
+  }
+
+  /** Quick mode: the plural reveal (ties turn out everyone), the abstainers named, then the match ends. */
+  private revealDawn(): void {
+    const { tally, outs } = tallyDawn(this.votes);
+    const idx = (id: string) => this.players.findIndex((p) => p.id === id);
+    const roles: Record<string, string> = {};
+    for (const id of outs) roles[id] = this.dealt.final[idx(id)] ?? '';
+    const abstained = this.players.filter((p) => p.alive && this.votes[p.id] === undefined).map((p) => p.id);
+    this.setPhase(PHASE.reveal, onubBalance.timers.revealS);
+    const result: VoteResult = { tally, outs, roles, abstained };
+    this.tally = result;
+    for (const p of this.players) if (outs.includes(p.id)) p.alive = false;
+    this.bus.emit('voteResult', result);
+    this.later(() => this.finishDawn(outs), onubBalance.timers.revealS * 1000);
+  }
+
+  private finishDawn(outs: string[]): void {
+    const { dealt, final, center, swapLog } = this.dealt;
+    const outsRoles = outs.map((id) => final[this.players.findIndex((p) => p.id === id)] ?? '');
+    const { rowId, winnerSeats } = mockWinners(outsRoles, final, center);
+    const row = onubBalance.winners.find((w) => w.id === rowId);
+    const seatMap = <T>(values: T[]): Record<string, T> =>
+      Object.fromEntries(this.players.map((p, i) => [p.id, values[i] as T]));
+    const onub: OnubGameOver = {
+      dealt: seatMap(dealt),
+      final: seatMap(final),
+      center: [...center],
+      swapLog,
+      votes: { ...this.votes },
+      outs,
+      plates: Object.fromEntries(this.players.map((p, i) => [`bk.plate_${i}`, p.id])),
+      rowId,
+      winnerIds: winnerSeats.map((i) => this.players[i]?.id ?? ''),
+    };
+    const winner = outsRoles.includes('debtor')
+      ? 4
+      : rowId.startsWith('cabal')
+        ? 2
+        : rowId === 'storm'
+          ? 5
+          : 1;
+    const over: GameOver = { winner, roles: seatMap(final), summary: row?.text ?? '', onub };
+    this.final = over;
+    this.setPhase(PHASE.gameOver, MOCK_GAME_OVER_MS / 1000);
+    this.bus.emit('gameOver', over);
+    this.opts.onDone('gameOver');
+    this.later(() => this.setPhase(PHASE.lobby, 0), MOCK_GAME_OVER_MS);
   }
 
   /** The mock ends the match at the first ejection: the village wins if the Cabal took the vote. */

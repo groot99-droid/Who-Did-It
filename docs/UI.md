@@ -310,6 +310,8 @@ the classes. Today's selectors map as follows:
 | `.role-name`, `.look`, `.goal`, `.abilities li`, `kbd`, `.inventory li`, `.text`, `.beware`, `.mates` | `.wdi-card__title`, `__look`, `__goal`, `__ability`, `.wdi-kbd`, `__inventory` > `.wdi-chip`, `__text`, `__beware`, `__mates` |
 | `.timer`, `.timer-bar` | `.wdi-timer`, `.wdi-timer__bar.is-running` (set `--wdi-timer-duration` or rely on `--wdi-card-hold`) |
 | `.wdi-world-chip` (the World HUD in `view/hud.css` keeps a `wdi-world-*` namespace until it adopts the theme) | `.wdi-hud-chip` inside `.wdi-hud > .wdi-hud__tl` |
+| the meeting's claim strip (quick mode, round 4) | `.wdi-claims` > `.wdi-claims__chips` of `.wdi-chip.wdi-chip--claim` (`data-testid="claim-<roleId>"`) and `.wdi-claims__form` (`claim-target`, `claim-saw`, `claim-post`); a seat's claim under its portrait is `.wdi-portrait__claim` |
+| the end screen's quick-mode extras | `.wdi-over__onub`: the dead's loaves as `.wdi-chip`, the swap log as `.wdi-timeline` (`data-testid="swaplog"`), the vote lines; a winning row is `.wdi-roster__row.is-winner` |
 
 Landing, Lobby and the role card use these classes since round 3 (Session M); every `data-testid` is
 unchanged. `ui/styles.css` is down to the page chrome (`#game`, `#overlay`, the pointer-events rule) and
@@ -342,6 +344,16 @@ reason line, the portrait grid (the villager atlas drawn to a canvas from the pu
 on slate when the atlas is absent), Report and Chat tabs with room for the Notebook, and the reveal with
 tally chips, the stamp and the role line. The faction chips on the game-over rows are the one place a
 faction is shown for other players.
+
+Quick mode (round 4, DECISIONS A43) changes the same two screens and adds nothing else: the reason line
+reads the dawn line, the report tab lists the dawn traces and every claim, the `vote-skip` button is
+hidden and your own portrait is disabled, the chat panel gets the claim strip (a role chip posts a
+role that shows nothing at once; a role that looks at a loaf opens a seat and seen-role pick first) and
+each portrait shows "Claimed: <role>" under the name. The reveal stamps every seat in `outs`, names each
+with the final role and lists the abstainers. The end screen keeps one row per seat with the dealt role
+(`gameover-role-<id>`) and the final one beside it (`gameover-final-<id>`), then the dead's three loaves,
+the swap log as a timeline and one "A voted B" line per seat; winners carry the winner mark. Every line
+comes from `ui/copy/meeting.ts`.
 
 ## 13. Open points
 

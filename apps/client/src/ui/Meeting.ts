@@ -1,9 +1,24 @@
 import balance from '@wdi/content/data/balance.json';
 import { TRAIT_IDS } from '@wdi/shared/protocol';
 import { type MeetingFeed, type MeetingPlayer, SKIP } from '../net/meeting';
+import { fill } from './copy';
+import { MEETING_COPY as C } from './copy/meeting';
 import { h, icon, type Screen } from './dom';
-import { chatTag, clockText, ejectionLine, MEETING_PHASE, PHASE_LABEL, reasonLine } from './meetingText';
+import {
+  abstainedLine,
+  chatTag,
+  claimLine,
+  claimRoleIds,
+  clockText,
+  ejectionLines,
+  isRevealingRole,
+  MEETING_PHASE,
+  outsOf,
+  PHASE_LABEL,
+  reasonLine,
+} from './meetingText';
 import type { PortraitLook } from './portrait';
+import { roleTitle } from './RoleCard';
 
 /** An extra tab (the Notebook, wired at integration): `update` runs with every refresh. */
 export interface MeetingTab {
@@ -31,6 +46,7 @@ interface Seat {
   count: HTMLElement;
   stamp: HTMLElement;
   ghost: HTMLElement;
+  claimed: HTMLElement;
 }
 
 const traitIcons = (look: PortraitLook): HTMLImageElement[] => {
@@ -57,6 +73,7 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
   const grid = h('ul', { class: 'wdi-portraits' });
   const hint = h('span', { class: 'wdi-hint', 'aria-live': 'polite' });
   const revealRole = h('p', { class: 'wdi-subtitle', hidden: true, 'data-testid': 'reveal-role' });
+  const revealAbstained = h('p', { class: 'wdi-hint', hidden: true, 'data-testid': 'reveal-abstained' });
   const skipCount = h('span', {
     class: 'wdi-chip wdi-chip--vote',
     hidden: true,
@@ -66,7 +83,7 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     'button',
     { type: 'button', class: 'wdi-btn wdi-btn--ghost', 'data-testid': 'vote-skip' },
     icon('glyphs/glyph_skip'),
-    'Skip',
+    C['meeting.vote.skip'],
     skipCount,
   );
 
@@ -82,12 +99,13 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
         'div',
         {},
         reason,
-        h('h1', { id: 'meeting-title', class: 'wdi-display wdi-display--md' }, 'Who did it?'),
+        h('h1', { id: 'meeting-title', class: 'wdi-display wdi-display--md' }, C['meeting.title']),
       ),
       clock,
     ),
     grid,
     revealRole,
+    revealAbstained,
     h('div', { class: 'wdi-row wdi-row--between wdi-row--wrap' }, hint, h('div', { class: 'wdi-row' }, skip)),
   );
 
@@ -125,28 +143,100 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     type: 'text',
     maxlength: balance.chat.maxChars,
     autocomplete: 'off',
-    'aria-label': 'Say something',
+    'aria-label': C['chat.placeholder'],
     'data-testid': 'chat-input',
   });
   const send = h(
     'button',
-    { type: 'submit', class: 'wdi-btn wdi-btn--icon', 'aria-label': 'Send' },
+    { type: 'submit', class: 'wdi-btn wdi-btn--icon', 'aria-label': C['chat.send'] },
     icon('glyphs/glyph_chat'),
   );
+  const counter = h('span', { class: 'wdi-hint wdi-chat__count', hidden: true, 'data-testid': 'chat-count' });
   const form = h('form', { class: 'wdi-chat__form' }, input, send);
-  const chat = h('div', { class: 'wdi-chat' }, log, form);
+  const claimStrip = h('div', { class: 'wdi-claims', hidden: true, 'data-testid': 'claims' });
+  const chat = h('div', { class: 'wdi-chat' }, claimStrip, log, form, counter);
+  input.addEventListener('input', () => {
+    const near = input.value.length >= Math.floor(balance.chat.maxChars * 0.8);
+    counter.hidden = !near;
+    if (near)
+      counter.textContent = fill(C['chat.limit'], { n: input.value.length, maxChars: balance.chat.maxChars });
+  });
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const text = input.value.trim();
     if (text === '') return;
     feed.say(text);
     input.value = '';
+    counter.hidden = true;
   });
 
   const side = h('aside', { class: 'wdi-panel wdi-stack wdi-meet__side' }, tabBar);
-  addPanel('report', 'Report', h('div', { class: 'wdi-stack' }, reportBody));
-  addPanel('chat', 'Chat', chat);
+  addPanel('report', C['meeting.tab.report'], h('div', { class: 'wdi-stack' }, reportBody));
+  addPanel('chat', C['meeting.tab.chat'], chat);
   select(selected);
+
+  // --- quick mode: the claim strip (GDD 3.11) ------------------------------------------------------
+  // A role tap posts at once for a role that shows nothing; for the revealing roles it opens an optional
+  // seat and seen-role pick first. The draft lives here, the posted claim lives on the server.
+  const draft = { roleId: '', target: '', saw: '' };
+  const chips = new Map<string, HTMLButtonElement>();
+  const option = (value: string, label: string) => h('option', { value }, label);
+  const targetSel = h('select', {
+    class: 'wdi-input',
+    'aria-label': C['meeting.claim.pickSeat'],
+    'data-testid': 'claim-target',
+  });
+  const sawSel = h(
+    'select',
+    { class: 'wdi-input', 'aria-label': C['meeting.claim.pickSaw'], 'data-testid': 'claim-saw' },
+    option('', C['meeting.claim.noSaw']),
+    ...claimRoleIds().map((id) => option(id, roleTitle(id, 'onub'))),
+  );
+  const postClaim = h(
+    'button',
+    { type: 'button', class: 'wdi-btn wdi-btn--sm wdi-btn--primary', 'data-testid': 'claim-post' },
+    C['meeting.claim.post'],
+  );
+  const claimForm = h(
+    'div',
+    { class: 'wdi-claims__form', hidden: true, 'data-testid': 'claim-form' },
+    h('label', { class: 'wdi-hint' }, C['meeting.claim.pickSeat'], targetSel),
+    h('label', { class: 'wdi-hint' }, C['meeting.claim.pickSaw'], sawSel),
+    postClaim,
+  );
+  const chipRow = h('div', { class: 'wdi-claims__chips' });
+  for (const id of claimRoleIds()) {
+    const chip = h(
+      'button',
+      {
+        type: 'button',
+        class: 'wdi-chip wdi-chip--claim',
+        'data-testid': `claim-${id}`,
+        'aria-pressed': 'false',
+      },
+      roleTitle(id, 'onub'),
+    );
+    chip.addEventListener('click', () => {
+      draft.roleId = id;
+      if (isRevealingRole(id)) {
+        claimForm.hidden = false;
+        return;
+      }
+      claimForm.hidden = true;
+      draft.target = '';
+      draft.saw = '';
+      feed.claim(id);
+    });
+    chips.set(id, chip);
+    chipRow.append(chip);
+  }
+  postClaim.addEventListener('click', () => {
+    if (draft.roleId === '') return;
+    feed.claim(draft.roleId, targetSel.value, sawSel.value);
+    claimForm.hidden = true;
+  });
+  claimStrip.append(h('p', { class: 'wdi-hint' }, C['meeting.claim.hint']), chipRow, claimForm);
+  let targetsFor = '';
 
   const el = h('div', { class: 'wdi-meet wdi-screen', 'data-testid': 'meeting' }, board, side);
   root.append(el);
@@ -171,7 +261,7 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
           'data-testid': `voted-${p.id}`,
         },
         icon('glyphs/glyph_check'),
-        'voted',
+        C['meeting.chip.voted'],
       );
       const count = h('span', {
         class: 'wdi-chip wdi-chip--vote wdi-portrait__votes',
@@ -181,23 +271,29 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
       const stamp = h('img', {
         class: 'wdi-stamp',
         src: `${import.meta.env.BASE_URL}assets/ui/marks/mark_vote_stamp.svg`,
-        alt: 'Ejected',
+        alt: fill(C['reveal.ejected'], { name: p.name }),
         'data-testid': 'stamp',
       });
-      const ghost = icon('glyphs/glyph_ghost', 'Dead', 'wdi-portrait__ghost');
+      const ghost = icon('glyphs/glyph_ghost', C['meeting.chip.dead'], 'wdi-portrait__ghost');
       ghost.hidden = true;
+      const claimed = h('span', {
+        class: 'wdi-portrait__claim',
+        hidden: true,
+        'data-testid': `claimed-${p.id}`,
+      });
       const button = h(
         'button',
         { type: 'button', class: 'wdi-portrait', 'data-testid': `portrait-${p.id}` },
         h('span', { class: 'wdi-portrait__pic' }, canvas),
         h('span', { class: 'wdi-portrait__name' }, p.name),
+        claimed,
         h('span', { class: 'wdi-portrait__traits' }, ...traitIcons(look)),
         voted,
         count,
         ghost,
       );
       button.addEventListener('click', () => feed.vote(p.id));
-      seats.set(p.id, { player: p, button, voted, count, stamp, ghost });
+      seats.set(p.id, { player: p, button, voted, count, stamp, ghost, claimed });
       return h('li', {}, button);
     });
     grid.replaceChildren(...items);
@@ -212,17 +308,25 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     const voted = roster.filter((p) => p.alive && p.hasVoted).length;
     const living = roster.filter((p) => p.alive).length;
     const victim = roster.find((p) => p.id === info.bodyOf);
-    const row = (term: string, text: string) =>
+    const row = (term: string, ...lines: string[]) =>
       h(
         'div',
         {},
         h('dt', { class: 'wdi-eyebrow' }, term),
-        h('dd', { class: 'wdi-muted', style: 'margin:0' }, text),
+        ...lines.map((text) => h('dd', { class: 'wdi-muted', style: 'margin:0' }, text)),
       );
+    const traces = feed.traces();
+    const claims = feed.mode() === 'onub' ? feed.claims() : [];
     const rows = [
-      row('Called', reasonLine(feed.started(), nameOf)),
-      victim !== undefined ? row('Found', `${victim.name} is dead.`) : null,
-      row('Still here', `${living} alive, ${voted} voted`),
+      row(C['meeting.report.called'], reasonLine(feed.started(), nameOf)),
+      victim !== undefined
+        ? row(C['meeting.report.found'], fill(C['meeting.report.found.line'], { name: victim.name }))
+        : null,
+      traces.length > 0 ? row(C['meeting.report.traces'], ...traces) : null,
+      claims.length > 0
+        ? row(C['meeting.report.claims'], ...claims.map((c) => `${nameOf(c.from)}: ${claimLine(c, nameOf)}`))
+        : null,
+      row(C['meeting.report.here'], fill(C['meeting.report.here.line'], { living, voted })),
     ].filter((r): r is HTMLDivElement => r !== null);
     const key = rows.map((r) => r.textContent).join('|');
     if (reportBody.dataset.key !== key) {
@@ -245,14 +349,19 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
           'p',
           { class: `wdi-chat__line${line.channel === 'system' ? ' wdi-chat__line--system' : ''}` },
           line.channel === 'system' ? null : h('span', { class: 'wdi-chat__who' }, nameOf(line.from)),
-          tag !== '' && h('span', { class: 'wdi-hint' }, `(${tag}) `),
+          tag !== '' &&
+            h(
+              'span',
+              { class: 'wdi-hint' },
+              `(${tag === 'ghost' ? C['chat.channel.ghost'] : C['chat.channel.cabal']}) `,
+            ),
           line.text,
         ),
       );
     }
     rendered = lines.length;
     if (stick) log.scrollTop = log.scrollHeight;
-    const placeholder = me !== undefined && !me.alive ? 'Talk with the other ghosts' : 'Say something';
+    const placeholder = me !== undefined && !me.alive ? C['ghost.chat'] : C['chat.placeholder'];
     if (placeholder !== lastPlaceholder) {
       lastPlaceholder = placeholder;
       input.placeholder = placeholder;
@@ -273,16 +382,17 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     const phase = info.phase !== 0 ? info.phase : clockNow.phase;
     const result = feed.result();
     const revealing = result !== null;
-    const canVote =
-      me?.alive === true &&
-      !revealing &&
-      (phase === MEETING_PHASE.discussion || phase === MEETING_PHASE.vote);
+    const quick = feed.mode() === 'onub';
+    const inTalk = phase === MEETING_PHASE.discussion || phase === MEETING_PHASE.vote;
+    const canVote = me?.alive === true && !revealing && inTalk;
 
     setText(reason, reasonLine(feed.started(), nameOf));
     setText(clockPhase, revealing ? (PHASE_LABEL[MEETING_PHASE.reveal] ?? '') : (PHASE_LABEL[phase] ?? ''));
     const endsTick = clockNow.phaseEndsTick > 0 ? clockNow.phaseEndsTick : info.endsTick;
     setText(clockTime, clockText(endsTick > 0 ? endsTick - clockNow.tick : null));
 
+    const outs = result === null ? [] : outsOf(result);
+    const claims = quick ? feed.claims() : [];
     for (const [id, seat] of seats) {
       const p = roster.find((q) => q.id === id) ?? seat.player;
       seat.player = p;
@@ -291,17 +401,25 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
       b.classList.toggle('is-dead', !p.alive);
       b.classList.toggle('is-selected', mine === id);
       b.setAttribute('aria-pressed', String(mine === id));
-      b.disabled = !canVote || !p.alive;
+      // Quick mode refuses a vote for yourself (GDD 3.11).
+      b.disabled = !canVote || !p.alive || (quick && id === feed.selfId);
       seat.ghost.hidden = p.alive;
       const votes = result?.tally[id] ?? 0;
       seat.voted.hidden = revealing || !p.hasVoted || !p.alive;
       seat.count.hidden = !revealing || votes === 0;
       if (!seat.count.hidden) setText(seat.count, `${votes}`);
-      // The stamp exists only on the ejected portrait.
-      if (result?.ejectedId === id) {
+      const claim = claims.find((c) => c.from === id);
+      seat.claimed.hidden = claim === undefined;
+      if (claim !== undefined) {
+        setText(seat.claimed, fill(C['meeting.claim.chip'], { role: roleTitle(claim.roleId, 'onub') }));
+        seat.claimed.title = claimLine(claim, nameOf);
+      }
+      // A stamp lands on every seat the vote turned out.
+      if (outs.includes(id)) {
         if (!seat.stamp.isConnected) b.append(seat.stamp);
       } else seat.stamp.remove();
     }
+    skip.hidden = quick;
     skip.disabled = !canVote;
     skip.classList.toggle('is-selected', mine === SKIP);
     skip.setAttribute('aria-pressed', String(mine === SKIP));
@@ -310,15 +428,37 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     if (!skipCount.hidden) setText(skipCount, `${skips}`);
 
     revealRole.hidden = result === null;
-    if (result !== null) setText(revealRole, ejectionLine(result, nameOf));
-    setText(
-      hint,
-      revealing
-        ? ''
-        : me?.alive === false
-          ? 'You are a ghost: you can watch and chat, but not vote.'
-          : 'Your vote is secret until the reveal. Tap a portrait or Skip; tap another to change it.',
-    );
+    if (result !== null) setText(revealRole, ejectionLines(result, nameOf, feed.mode()).join(' '));
+    const abstained = result === null || !quick ? null : abstainedLine(result, nameOf);
+    revealAbstained.hidden = abstained === null;
+    if (abstained !== null) setText(revealAbstained, abstained);
+    const voteLine = (() => {
+      if (mine === '')
+        return `${C['meeting.vote.open']}. ${quick ? C['meeting.vote.hintNoSkip'] : C['meeting.vote.hint']}`;
+      const who =
+        mine === SKIP ? C['meeting.vote.mineSkip'] : fill(C['meeting.vote.mine'], { name: nameOf(mine) });
+      return `${who}. ${C['meeting.vote.change']}`;
+    })();
+    setText(hint, revealing ? '' : me?.alive === false ? C['ghost.noVote'] : voteLine);
+
+    // The claim strip: quick mode, a living seat, while the talk is open.
+    const claimOpen = quick && canVote;
+    claimStrip.hidden = !quick;
+    const own = claims.find((c) => c.from === feed.selfId);
+    for (const [id, chip] of chips) {
+      chip.disabled = !claimOpen;
+      const on = own?.roleId === id;
+      chip.classList.toggle('is-selected', on);
+      chip.setAttribute('aria-pressed', String(on));
+    }
+    if (!claimOpen) claimForm.hidden = true;
+    if (quick && targetsFor !== key) {
+      targetsFor = key;
+      targetSel.replaceChildren(
+        option('', C['meeting.claim.noSeat']),
+        ...roster.filter((p) => p.id !== feed.selfId).map((p) => option(p.id, p.name)),
+      );
+    }
 
     renderReport(roster);
     renderChat(me);

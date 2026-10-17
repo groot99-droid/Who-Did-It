@@ -1398,3 +1398,37 @@ Not done: the `prompt.ability` lines (14.2) and `ghost.secret`/`ghost.roles` (no
 them), the `prop_wakeTable` greybox (deliberately blank, the plates stand on it), and a real-server e2e
 (W's `onub.spec.ts` is opt-in). (5) The PR is larger than 400 lines (about 1.2k added, over half of it
 tests, the mock and the copy deck); the commits are split by layer.
+
+### Round 4 log: U
+
+**Landed** (branch `claude/m3b-meeting`, one PR): the meeting feeds (`mode()`, `claims()`, `traces()`,
+`claim()` on `MeetingFeed`, `ColyseusMeetingFeed` and `MockMeetingFeed`); the dawn meeting in
+`ui/Meeting.ts` (dawn reason line, traces and claims in the report tab, `vote-skip` hidden and the own
+portrait disabled when `mode() === 'onub'`, the claim strip with `claim-<roleId>`, `claim-target`,
+`claim-saw`, `claim-post`, "Claimed: <role>" under each portrait as `claimed-<id>`, a stamp on every
+seat in `outs`, the plural reveal line and `reveal-abstained`); the quick-mode end screen in
+`ui/GameOver.ts` (dealt and final role per seat, `gameover-final-<id>`, the dead's loaves, `swaplog`,
+the vote lines, `is-winner` rows, "You won" and "You lost" tags); the `stamp` sound on the `REG_AUDIO`
+bus in `scenes/Meeting.ts`; `RoleCard.ts` reading `balance.phases.roleRevealS`, or `timers.roleCardS` for
+a card whose `beware` is `onubRoles.cardLine`, and naming quick-mode roles through `roles.onub.json`
+(`roleTitle(id, mode)`, `factionOf(id, mode)`); the copy deck in `ui/copy/meeting.ts` with every literal
+of `Meeting.ts`, `GameOver.ts` and `meetingText.ts` replaced; the `dawn` mock in `meetingMock.ts`
+(traces, claims, no Skip, a two-seat tie, an abstainer, a `gameOver` with `onub` and `plates`);
+`meeting.spec.ts` gained the dawn case and follows the deck's reveal wording; DECISIONS A43; UI.md 11
+and 12; "Round 4 (U)" rules at the end of `components.css`.
+
+**For the orchestrator and the next session**
+- Y's UI.md 14.12 ids: `meeting.claim.*`, `reveal.outs*`, `reveal.abstained`, `over.swap.*`,
+  `over.votes.*`, `over.row.arrow` and `over.winner.mark` in `copy/meeting.ts` carry GDD 3.11 wording and
+  are renamed when 14.12 lands. Adopting the deck changed three existing lines (A43).
+- The swap log names no actor, so the end screen finds the actor's plate through `onub.dealt`
+  (A43). If R's `swapLog.slots` for `onub.take` or `onub.swapDead` ever drops the actor's own plate, the
+  sentence falls back to the first plate slot; check once at integration with a real quick-mode match.
+- To check against R's branch: `voteResult.roles` carries the final roles of `outs` only, as the
+  contract says; `MeetingState.claims` rows with an empty `targetId` or `sawRoleId` read as absent.
+- The vote ends early only when every connected living seat voted (R); the mock's abstainer shortcut
+  is mock-only (A43).
+- The `stamp` key is silent until `audio/manifest.json` lists it (Y).
+- Not done: nothing in the brief. The real-server paths (`ColyseusMeetingFeed` reading
+  `state.settings.mode`, `meeting.claims`, `meeting.traces`) are covered by typecheck only; W's
+  `onub.spec.ts` exercises them at integration.
