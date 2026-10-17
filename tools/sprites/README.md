@@ -10,16 +10,19 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `gen-anims.ts` | Writes each frame's Feet pivot (feet / untrimmed cell) into the atlas and builds Phaser `load.animation` JSON: 12 fps, loops repeat, one-shot clips hold the last frame |
 | `bleed.ts` | Alpha bleed: transparent pixels next to the sprite take their neighbours' colour (alpha stays 0) so linear filtering never pulls in black and draws an ink halo; reads and writes 8-bit RGBA PNG through `node:zlib` because canvas libraries premultiply and would zero that colour. `readRender` bleeds every rendered frame before packing; the placeholder art is not bled and stays byte-identical |
 | `pack-static.ts` | Packs a static sheet render (`clues`, `props`, `vfx`) with the same settings: frame names must equal the `docs/SPRITES.md` 8 keys in `keys.ts`, pivots from the render manifest (props and vfx), and `vfx.anims.json` (12 fps, played once) for the vfx |
+| `images.ts` | Finishes the single-image keys rendered by `tools/blender` (`build_loft.py`, `build_buildings.py`, `build_tiles.py`): checks each key's size, alpha-bleeds and re-encodes it (dropping the render's date stamp, so files are byte-identical across renders) and joins each tileset's four 64 px variants into its 256 x 64 row |
 | `body-contact.ts` | Review sheet of the body on the floor: the last `die` frame in 8 directions, one row per trait look plus a Bloody row |
 | `contact.ts` | Contact sheet for review: every clip x direction with the scarf (tinted teal) and cap composited, plus one strip of each pass alone |
 | `placeholder.ts` | Generates every placeholder key of `SPRITES.md` 8 into `apps/client/public/assets/placeholder/` with its `manifest.json` |
 | `test/pack.test.ts` | Synthetic frame set: trim and source sizes, determinism, detectIdentical, pivots, anim keys |
 | `test/pack-static.test.ts` | Static keys against the placeholder clues, props pivots, centred clues, determinism, vfx anims, refusal of a wrong key set |
+| `test/images.test.ts`, `test/manifest.test.ts` | Image sizes, determinism and the tileset join; the real and placeholder manifests carry the same keys |
 | `test/bleed.test.ts` | PNG round trip, one and two bleed rings, determinism |
 
 ```sh
 pnpm --filter @wdi/sprites test
 pnpm --filter @wdi/sprites placeholder            # regenerate the placeholder art (byte-identical when unchanged)
+pnpm --filter @wdi/sprites images ../../build/render ../../apps/client/public/assets   # loft, buildings, tiles
 pnpm --filter @wdi/sprites pack ../../build/render/villager ../../apps/client/public/assets/chars
 pnpm --filter @wdi/sprites contact ../../build/render/villager ../../assets/source/review/villager-contact.png
 pnpm --filter @wdi/sprites pack:static ../../build/render/props ../../apps/client/public/assets/props

@@ -195,12 +195,16 @@ building of `WORLD.md` 4.3; the id is the stem of its frozen overworld portal id
 | `bld_bakery_ext` | Crumb's Ovens | `bakery` |
 
 Medium and Large buildings (`bld_manor_ext`, `bld_barn_ext`, `bld_chapel_ext`) follow the same
-grammar in M6.
+grammar in M6. The real manifest's four exteriors are rendered stand-ins (`buildings/`,
+`tools/blender/build_buildings.py`, M3b) at the placeholder's geometry, so both sets place the same.
 
 **Ground tilesets** (straight-down camera, 64 px cells, 4 variants in a row, 256 x 64 px each):
 `tiles_grass`, `tiles_path`, `tiles_cobble`, `tiles_floorboards`, `tiles_caverock`, `tiles_forestfloor`.
+The real sets are rendered stand-ins (`tiles/`, `tools/blender/build_tiles.py`, M3b); every variant tiles
+with every other.
 
-**Props** (texture `props`, `props/props.json`, real art only; M3). One frame per key, rendered by the
+**Props** (texture `props`, `props/props.json`; M3, the bakery keys M3b; the placeholder set draws each key
+as an unlabelled greybox block on the same cell and pivot). One frame per key, rendered by the
 tilted `SpriteCam` at 64 px per metre. The key is `prop_<kind>` with the `kind` of
 `packages/content/data/scenes/overworld.json` `props[]`; a stateful prop adds its state. Every frame
 carries a `pivot` at the base (the ground point under the prop's tile centre), so the sprite is placed
@@ -214,7 +218,32 @@ at the tile centre and y-sorted by that point, like a character's feet.
 | `prop_kitChest` | `kitChest` | Iron-banded chest for ejected kits (`ov.chest`) |
 | `prop_lanternPost_lit`, `prop_lanternPost_unlit` | `lanternPost` | Lantern post, glass lit (`lantern`) or dark (`ov.lantern_0..3`) |
 
-**VFX** (texture `vfx`, `vfx/vfx.json`; anims `anims_vfx`, `vfx/vfx.anims.json`; real art only; M3).
+The bakery keys use the `kind` of `packages/content/data/scenes/bakery.json` `props[]`, or the id tail
+when the kind is not a prop name (`bk.flour_sacks` is a `taskSource`). A prop spanning several tiles is
+modelled with its depth stretched to the 64 px grid, so it lines up with the props placed on its tiles.
+
+| Key | `kind` (id) | Prop |
+|---|---|---|
+| `prop_wakeTable` | `wakeTable` (`bk.wake_table`) | The Wake Table, 5 x 2 tiles; the pivot is its back row's middle tile, so it covers the ten plate tiles |
+| `prop_plate` | `plate` (`bk.plate_0..9`) | A plate with a loaf, drawn at the table's top (0.78 m, 33 px above its pivot); the client draws the owner's name |
+| `prop_deadLoaf` | `deadLoaf` (`bk.deadloaf_0..2`) | One tile of the oven ledge with one of the dead's loaves (mourning band); three stack into the ledge |
+| `prop_ledger` | `ledger` (`bk.ledger`) | The Baker's ledger, shut, on a sloped desk with an inkwell |
+| `prop_oven` | `oven` (`bk.oven`) | The cold bread oven: stone base, dome, dark mouth, flue, a peel |
+| `prop_basin` | `basin` (`bk.basin`) | Stone wash basin with water, a rag and a jug |
+| `prop_flour_sacks` | `taskSource` (`bk.flour_sacks`) | Three flour sacks and a spill |
+
+**Loft images** (`type: image`, `loft/`; M3b). The quick mode's dark loft is DOM, not a Phaser scene, so
+its art is plain images the client sets as CSS backgrounds; rendered by `tools/blender/build_loft.py` and
+finished by `tools/sprites/images.ts`.
+
+| Key | Size | Use |
+|---|---|---|
+| `loft_backdrop` | 1280 x 720, opaque | Behind the whole loft view: the bakery loft at night, storm light at the gable window, lantern glow at the hatch; the middle is kept dark for the grid and the copy (`background-size: cover`) |
+| `prop_bedroll` | 112 x 184 | One seat's bedroll in the `.wdi-bedrolls` grid, at twice the 56 x 92 px blanket of `mockups/loft.html`; always occupied |
+| `prop_bedroll_self` | 112 x 184 | The viewer's own bedroll: the same with moon blanket stripes |
+
+**VFX** (texture `vfx`, `vfx/vfx.json`; anims `anims_vfx`, `vfx/vfx.anims.json`; M3; the placeholder set
+has the same frames as flat marks that grow or fade).
 Frame names are the anim key plus `/` and the three-digit frame number (`vfx_blood_pool/003`); every
 anim plays at 12 fps once (`repeat: 0`) and Phaser holds its last frame. Every frame carries a
 `pivot`: the ground point of the effect, or the centre for the stamp.
