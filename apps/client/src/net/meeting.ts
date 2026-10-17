@@ -34,16 +34,6 @@ export type VoteResult = S2CPayloads['voteResult'];
 export type GameOver = S2CPayloads['gameOver'];
 export type OnubGameOver = NonNullable<GameOver['onub']>;
 
-/** One seat's quick-mode claim (`MeetingState.claims`): "I was {roleId}: {targetId}'s loaf was {sawRoleId}". */
-export interface ClaimRow {
-  from: string;
-  roleId: string;
-  /** A seat id, or empty. */
-  targetId: string;
-  /** A role id, or empty. */
-  sawRoleId: string;
-}
-
 /** `Settings.mode` as the screens see it. */
 export type MatchMode = 'main' | 'onub';
 
@@ -58,7 +48,7 @@ export type MeetingFeedEvents = {
 export interface MeetingFeed {
   readonly bus: Emitter<MeetingFeedEvents>;
   readonly selfId: string;
-  /** `state.settings.mode`: quick mode (`onub`) hides Skip, shows claims and the plural reveal. */
+  /** `state.settings.mode`: quick mode (`onub`) hides Skip and mounts the Rush panel (claims live on the OnubFeed). */
   mode(): MatchMode;
   /** Everyone seated, public fields only. */
   roster(): MeetingPlayer[];
@@ -71,17 +61,11 @@ export interface MeetingFeed {
   result(): VoteResult | null;
   /** The last `gameOver`, kept for the GameOver screen. */
   over(): GameOver | null;
-  /** Quick mode: every seat's latest claim (public, `MeetingState.claims`). */
-  claims(): readonly ClaimRow[];
-  /** Quick mode: the dawn board's trace lines (`MeetingState.traces`). */
-  traces(): readonly string[];
   /** Chat lines since the meeting opened. */
   lines(): readonly ChatLine[];
-  /** `targetId` is a living player's id or `"skip"`. */
+  /** `targetId` is a living player's id or `"skip"`; quick mode: another seat in play or `"pantry"`. */
   vote(targetId: string): void;
   say(text: string): void;
-  /** Quick mode: replaces this seat's claim; `targetId` and `sawRoleId` are optional. */
-  claim(roleId: string, targetId?: string, sawRoleId?: string): void;
   dispose(): void;
 }
 

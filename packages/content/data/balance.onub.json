@@ -1,403 +1,634 @@
 {
   "gddRef": "3.11",
-  "deadLoaves": 3,
-  "targetLengthMin": { "min": 5, "max": 7, "gddRef": "3.11" },
+  "targetLengthMin": { "min": 9, "max": 12, "gddRef": "3.11" },
+  "pantry": { "roles": 3, "locations": 3, "gddRef": "3.11" },
   "byCount": {
     "4": {
-      "loaves": 7,
-      "deck": ["poisoner", "poisoner", "sinEater", "cutpurse", "busybody", "mourner", "mourner"],
-      "planned": ["poisoner", "poisoner", "sinEater", "cutpurse", "busybody", "mourner", "mourner"],
-      "discussionS": 150,
+      "deck": ["champignon", "champignon", "chef", "aboyeur", "sousChef", "plongeur", "inspecteur"],
       "gddRef": "3.11"
     },
     "5": {
-      "loaves": 8,
       "deck": [
-        "poisoner",
-        "poisoner",
-        "sinEater",
-        "cutpurse",
-        "busybody",
-        "mourner",
-        "mourner",
-        "debtor"
+        "champignon",
+        "champignon",
+        "chef",
+        "aboyeur",
+        "sousChef",
+        "plongeur",
+        "inspecteur",
+        "croissant"
       ],
-      "planned": [
-        "poisoner",
-        "poisoner",
-        "sinEater",
-        "cutpurse",
-        "busybody",
-        "mourner",
-        "mourner",
-        "debtor"
-      ],
-      "discussionS": 150,
       "gddRef": "3.11"
     },
     "6": {
-      "loaves": 9,
       "deck": [
-        "poisoner",
-        "poisoner",
-        "sinEater",
-        "cutpurse",
-        "busybody",
-        "mourner",
-        "mourner",
-        "debtor",
-        "hireling"
+        "champignon",
+        "champignon",
+        "chef",
+        "aboyeur",
+        "sousChef",
+        "plongeur",
+        "inspecteur",
+        "croissant",
+        "levain"
       ],
-      "planned": [
-        "poisoner",
-        "poisoner",
-        "sinEater",
-        "cutpurse",
-        "busybody",
-        "mourner",
-        "mourner",
-        "debtor",
-        "hireling"
-      ],
-      "discussionS": 180,
       "gddRef": "3.11"
     },
     "7": {
-      "loaves": 10,
       "deck": [
-        "poisoner",
-        "poisoner",
-        "sinEater",
-        "cutpurse",
-        "busybody",
-        "mourner",
-        "mourner",
-        "debtor",
-        "hireling",
-        "lamplighter"
+        "champignon",
+        "champignon",
+        "chef",
+        "aboyeur",
+        "sousChef",
+        "plongeur",
+        "inspecteur",
+        "croissant",
+        "levain",
+        "ratDeCave"
       ],
-      "planned": [
-        "poisoner",
-        "poisoner",
-        "sinEater",
-        "cutpurse",
-        "busybody",
-        "mourner",
-        "mourner",
-        "debtor",
-        "hireling",
-        "lamplighter"
-      ],
-      "discussionS": 180,
       "gddRef": "3.11"
     },
     "8": {
-      "loaves": 11,
       "deck": [
-        "poisoner",
-        "poisoner",
-        "sinEater",
-        "cutpurse",
-        "busybody",
-        "mourner",
-        "mourner",
-        "debtor",
-        "hireling",
-        "lamplighter",
-        "sot"
+        "champignon",
+        "champignon",
+        "chef",
+        "aboyeur",
+        "sousChef",
+        "plongeur",
+        "inspecteur",
+        "croissant",
+        "levain",
+        "ratDeCave",
+        "gardeManger"
       ],
-      "planned": [
-        "poisoner",
-        "poisoner",
-        "sinEater",
-        "cutpurse",
-        "busybody",
-        "mourner",
-        "mourner",
-        "debtor",
-        "hireling",
-        "lamplighter",
-        "sot"
-      ],
-      "discussionS": 210,
       "gddRef": "3.11"
     },
     "9": {
-      "loaves": 12,
       "deck": [
-        "poisoner",
-        "poisoner",
-        "sinEater",
-        "cutpurse",
-        "busybody",
-        "mourner",
-        "debtor",
-        "hireling",
-        "lamplighter",
-        "sot",
-        "mourner",
-        "mourner"
+        "champignon",
+        "champignon",
+        "chef",
+        "aboyeur",
+        "sousChef",
+        "plongeur",
+        "inspecteur",
+        "croissant",
+        "levain",
+        "ratDeCave",
+        "gardeManger",
+        "boulanger"
       ],
-      "planned": [
-        "poisoner",
-        "poisoner",
-        "sinEater",
-        "cutpurse",
-        "busybody",
-        "mourner",
-        "debtor",
-        "hireling",
-        "lamplighter",
-        "sot",
-        "pallbearer",
-        "pallbearer"
-      ],
-      "discussionS": 210,
       "gddRef": "3.11"
     },
     "10": {
-      "loaves": 13,
       "deck": [
-        "poisoner",
-        "poisoner",
-        "sinEater",
-        "cutpurse",
-        "busybody",
-        "mourner",
-        "debtor",
-        "hireling",
-        "lamplighter",
-        "sot",
-        "mourner",
-        "mourner",
-        "mourner"
+        "champignon",
+        "champignon",
+        "chef",
+        "aboyeur",
+        "sousChef",
+        "plongeur",
+        "inspecteur",
+        "croissant",
+        "levain",
+        "ratDeCave",
+        "gardeManger",
+        "boulanger",
+        "tourrier"
       ],
-      "planned": [
-        "poisoner",
-        "poisoner",
-        "sinEater",
-        "cutpurse",
-        "busybody",
-        "mourner",
-        "debtor",
-        "hireling",
-        "lamplighter",
-        "sot",
-        "pallbearer",
-        "pallbearer",
-        "gamekeeper"
-      ],
-      "discussionS": 210,
       "gddRef": "3.11"
     }
   },
   "timers": {
     "roleCardS": 12,
-    "duskS": 10,
-    "plateHoldS": 1,
+    "prepS": 60,
+    "stationTransitionS": 0.6,
+    "minigameAssistS": 20,
+    "prepRevealS": 15,
     "fadeS": 2,
-    "windowJitterMaxS": 4,
-    "dawnS": 10,
-    "voteS": 25,
-    "revealS": 20,
+    "windowJitterMaxS": 3,
+    "dawnS": 5,
+    "rushS": 300,
+    "voteS": 20,
+    "revealS": 30,
     "sleeperPulseMinS": 6,
     "sleeperPulseMaxS": 14,
     "gddRef": "3.11"
   },
-  "actRangeTiles": 2,
+  "prep": { "endsWhenAllCommitted": true, "gddRef": "3.11" },
+  "stations": [
+    {
+      "id": "fridge",
+      "name": "La Chambre Froide",
+      "gloss": "The Walk-In Fridge",
+      "good": ["pureDairy", "activeYeast"],
+      "sabotage": ["spoiledMilk", "unpasteurizedMold", "thermostat"],
+      "weight": 1,
+      "minigame": { "kind": "crates", "steps": 3, "bandFrac": 0.2 }
+    },
+    {
+      "id": "mixer",
+      "name": "Le Pétrin",
+      "gloss": "The Industrial Mixer",
+      "good": ["t55Flour", "seaSalt"],
+      "sabotage": ["sawdust", "plaster", "floorSweepings"],
+      "weight": 1,
+      "underMixBelow": 2,
+      "underMixWeight": 1,
+      "minigame": { "kind": "pour", "steps": 2, "ratePerS": 0.35, "bandFrac": 0.12 }
+    },
+    {
+      "id": "proofing",
+      "name": "La Chambre de Pousse",
+      "gloss": "The Proofing Drawer",
+      "good": ["warmSteam", "time"],
+      "sabotage": ["coldDraft", "overProofing"],
+      "weight": 1,
+      "perk": "peekPantryLoc",
+      "minigame": { "kind": "slide", "steps": 4 }
+    },
+    {
+      "id": "oven",
+      "name": "Le Four à Pain",
+      "gloss": "The Brick Oven",
+      "good": ["oakFirewood", "steamInjection"],
+      "sabotage": ["charcoalAsh", "wetWood"],
+      "weight": 2,
+      "minigame": {
+        "kind": "stoke",
+        "stokePerTap": 0.15,
+        "ratePerS": 0.08,
+        "bandFrac": 0.18,
+        "holdS": 3
+      }
+    }
+  ],
+  "cards": {
+    "pureDairy": {
+      "id": "pureDairy",
+      "name": "Pure Dairy",
+      "station": "fridge",
+      "kind": "good",
+      "effect": "none",
+      "text": "Cold butter and fresh milk, straight off the frosted shelf."
+    },
+    "activeYeast": {
+      "id": "activeYeast",
+      "name": "Active Yeast",
+      "station": "fridge",
+      "kind": "good",
+      "effect": "none",
+      "text": "Wild yeast, harvested and bubbling."
+    },
+    "spoiledMilk": {
+      "id": "spoiledMilk",
+      "name": "Spoiled Milk",
+      "station": "fridge",
+      "kind": "sabotage",
+      "effect": "none",
+      "text": "It smelled fine in the dark."
+    },
+    "unpasteurizedMold": {
+      "id": "unpasteurizedMold",
+      "name": "Unpasteurized Mold",
+      "station": "fridge",
+      "kind": "sabotage",
+      "effect": "none",
+      "text": "A green bloom in the cream."
+    },
+    "thermostat": {
+      "id": "thermostat",
+      "name": "Thermostat Flip",
+      "station": "fridge",
+      "kind": "sabotage",
+      "effect": "discardRandomOther",
+      "text": "Flip the switch. One other card in this pile thaws away unseen."
+    },
+    "t55Flour": {
+      "id": "t55Flour",
+      "name": "T55 Flour",
+      "station": "mixer",
+      "kind": "good",
+      "effect": "none",
+      "text": "A heavy sack of farine, sifted fine."
+    },
+    "seaSalt": {
+      "id": "seaSalt",
+      "name": "Sea Salt",
+      "station": "mixer",
+      "kind": "good",
+      "effect": "none",
+      "text": "Grey salt from the coast, measured true."
+    },
+    "sawdust": {
+      "id": "sawdust",
+      "name": "Sawdust",
+      "station": "mixer",
+      "kind": "sabotage",
+      "effect": "none",
+      "text": "It is almost the same colour."
+    },
+    "plaster": {
+      "id": "plaster",
+      "name": "Plaster",
+      "station": "mixer",
+      "kind": "sabotage",
+      "effect": "none",
+      "text": "A scoop from the cracked wall."
+    },
+    "floorSweepings": {
+      "id": "floorSweepings",
+      "name": "Floor Sweepings",
+      "station": "mixer",
+      "kind": "sabotage",
+      "effect": "none",
+      "text": "Whatever was under the bench."
+    },
+    "warmSteam": {
+      "id": "warmSteam",
+      "name": "Warm Steam",
+      "station": "proofing",
+      "kind": "good",
+      "effect": "none",
+      "text": "The glass fogs and the dough rises."
+    },
+    "time": {
+      "id": "time",
+      "name": "Time",
+      "station": "proofing",
+      "kind": "good",
+      "effect": "none",
+      "text": "Leave it alone. It knows what to do."
+    },
+    "coldDraft": {
+      "id": "coldDraft",
+      "name": "Cold Draft",
+      "station": "proofing",
+      "kind": "sabotage",
+      "effect": "none",
+      "text": "Prop the cabinet door open a crack."
+    },
+    "overProofing": {
+      "id": "overProofing",
+      "name": "Over-Proofing",
+      "station": "proofing",
+      "kind": "sabotage",
+      "effect": "none",
+      "text": "Just a little longer. Then a little longer."
+    },
+    "oakFirewood": {
+      "id": "oakFirewood",
+      "name": "Oak Firewood",
+      "station": "oven",
+      "kind": "good",
+      "effect": "none",
+      "text": "Dry oak, split thin, for a fierce clean heat."
+    },
+    "steamInjection": {
+      "id": "steamInjection",
+      "name": "Steam Injection",
+      "station": "oven",
+      "kind": "good",
+      "effect": "none",
+      "text": "The coup de buée: one burst of steam for the crust."
+    },
+    "charcoalAsh": {
+      "id": "charcoalAsh",
+      "name": "Charcoal Ash",
+      "station": "oven",
+      "kind": "sabotage",
+      "effect": "none",
+      "text": "Smothers the flame from underneath."
+    },
+    "wetWood": {
+      "id": "wetWood",
+      "name": "Wet Wood",
+      "station": "oven",
+      "kind": "sabotage",
+      "effect": "none",
+      "text": "Hisses, smokes and never catches."
+    }
+  },
+  "ruin": { "weight": 3, "goodCancels": 1, "gddRef": "3.11" },
   "acts": {
-    "onub.peekDead": {
-      "id": "onub.peekDead",
-      "target": "deadLoaf",
-      "holdS": 2,
-      "swap": "none",
-      "reveals": true,
-      "description": "Shows the token in one of the dead's loaves."
+    "onub.cloche": {
+      "id": "onub.cloche",
+      "targets": ["anySeatCard"],
+      "picks": 1,
+      "effect": "cloche",
+      "reveal": "none",
+      "description": "Put the Iron Cloche on one player's Role or Location card, your own included; nobody else can peek at or swap it tonight."
     },
-    "onub.readLedger": {
-      "id": "onub.readLedger",
-      "target": "ledger",
-      "holdS": 2,
-      "swap": "none",
-      "reveals": true,
-      "description": "The Baker's ledger names the Poisoners."
+    "onub.sporePeek": {
+      "id": "onub.sporePeek",
+      "targets": ["pantryRole"],
+      "picks": 1,
+      "effect": "peek",
+      "reveal": "picked",
+      "description": "Peek at one Pantry Role card."
     },
-    "onub.peekPlate": {
-      "id": "onub.peekPlate",
-      "target": "otherPlate",
-      "holdS": 2,
-      "swap": "none",
-      "reveals": true,
-      "description": "Shows the token in another mourner's loaf."
+    "onub.peekLoc": {
+      "id": "onub.peekLoc",
+      "targets": ["otherSeatLoc"],
+      "picks": 1,
+      "effect": "peek",
+      "reveal": "picked",
+      "description": "Peek at one other player's Location card."
     },
-    "onub.take": {
-      "id": "onub.take",
-      "target": "otherPlate",
-      "holdS": 2,
-      "swap": "withOwn",
-      "reveals": true,
-      "description": "The loaves swap; your new token is shown."
+    "onub.vent": {
+      "id": "onub.vent",
+      "targets": ["pantryLoc", "otherSeatLoc"],
+      "picks": 1,
+      "effect": "swapWithOwn",
+      "reveal": "ownAfter",
+      "description": "Swap your Location card with a Pantry Location card or another player's; you see the one you now hold."
     },
-    "onub.swapPlates": {
-      "id": "onub.swapPlates",
-      "target": "otherPlate",
-      "holdS": 1,
-      "swap": "pair",
-      "reveals": false,
-      "description": "Two other mourners' loaves swap; nothing is shown."
+    "onub.peekRole": {
+      "id": "onub.peekRole",
+      "targets": ["otherSeatRole"],
+      "picks": 1,
+      "effect": "peek",
+      "reveal": "picked",
+      "description": "Peek at one other player's Role card."
     },
-    "onub.swapDead": {
-      "id": "onub.swapDead",
-      "target": "deadLoaf",
-      "holdS": 2,
-      "swap": "withOwn",
-      "reveals": false,
-      "description": "One of the dead's loaves swaps with your own, unseen."
+    "onub.peekPantry": {
+      "id": "onub.peekPantry",
+      "targets": ["pantryRole"],
+      "picks": 2,
+      "effect": "peek",
+      "reveal": "picked",
+      "description": "Peek at two Pantry Role cards."
     },
-    "onub.check": {
-      "id": "onub.check",
-      "target": "ownPlate",
-      "holdS": 2,
-      "swap": "none",
-      "reveals": true,
-      "description": "Shows your current token."
+    "onub.peekLocs": {
+      "id": "onub.peekLocs",
+      "targets": ["otherSeatLoc"],
+      "picks": 2,
+      "effect": "peek",
+      "reveal": "picked",
+      "description": "Look at two other players' Location cards."
+    },
+    "onub.rob": {
+      "id": "onub.rob",
+      "targets": ["otherSeatRole"],
+      "picks": 1,
+      "effect": "swapWithOwn",
+      "reveal": "ownAfter",
+      "description": "Swap your Role card with another player's and look at your new card."
+    },
+    "onub.laminatePeek": {
+      "id": "onub.laminatePeek",
+      "targets": ["pantryRole"],
+      "picks": 1,
+      "effect": "peek",
+      "reveal": "picked",
+      "then": "onub.laminateSwap",
+      "description": "Look at one Pantry Role card; you must then swap it into the line."
+    },
+    "onub.laminateSwap": {
+      "id": "onub.laminateSwap",
+      "targets": ["anySeatRole"],
+      "picks": 1,
+      "effect": "swapWithPeeked",
+      "reveal": "none",
+      "description": "Swap the Pantry card you looked at with any player's Role card, your own included."
+    },
+    "onub.drunk": {
+      "id": "onub.drunk",
+      "targets": ["pantryRole"],
+      "picks": 1,
+      "effect": "swapWithOwn",
+      "reveal": "none",
+      "description": "Swap your Role card with a Pantry Role card without looking."
+    },
+    "onub.dishRoles": {
+      "id": "onub.dishRoles",
+      "targets": ["otherSeatRole"],
+      "picks": 2,
+      "effect": "swapPair",
+      "reveal": "none",
+      "description": "Swap two other players' Role cards without looking."
+    },
+    "onub.dishLocs": {
+      "id": "onub.dishLocs",
+      "targets": ["otherSeatLoc"],
+      "picks": 2,
+      "effect": "swapPair",
+      "reveal": "none",
+      "description": "Swap two other players' Location cards without looking."
+    },
+    "onub.inspect": {
+      "id": "onub.inspect",
+      "targets": [],
+      "picks": 0,
+      "effect": "peek",
+      "reveal": "ownCards",
+      "description": "Look at your own Role and Location cards."
     }
   },
   "windows": [
     {
       "order": 1,
-      "role": "poisoner",
-      "seconds": 12,
-      "seeEachOther": true,
-      "acts": [{ "act": "onub.peekDead", "picks": 1 }],
-      "onlyIfAlone": true,
-      "onTimeout": "nothing",
-      "trace": "ledgeScuff",
-      "traceText": "Flour is scuffed on the oven ledge."
+      "role": "boulanger",
+      "seconds": 10,
+      "seeEachOther": false,
+      "sees": [],
+      "acts": ["onub.cloche"],
+      "onlyIfAlone": false,
+      "onTimeout": "nothing"
     },
     {
       "order": 2,
-      "role": "hireling",
-      "seconds": 8,
-      "seeEachOther": false,
-      "acts": [{ "act": "onub.readLedger", "picks": 1 }],
-      "onlyIfAlone": false,
-      "onTimeout": "nothing",
-      "trace": "ledgerOpen",
-      "traceText": "The Baker's ledger lies open."
+      "role": "champignon",
+      "seconds": 12,
+      "seeEachOther": true,
+      "sees": [],
+      "acts": ["onub.sporePeek"],
+      "onlyIfAlone": true,
+      "onTimeout": "nothing"
     },
     {
       "order": 3,
-      "role": "pallbearer",
+      "role": "levain",
       "seconds": 8,
-      "seeEachOther": true,
+      "seeEachOther": false,
+      "sees": ["champignon"],
       "acts": [],
       "onlyIfAlone": false,
-      "onTimeout": "nothing",
-      "trace": "none",
-      "traceText": ""
+      "onTimeout": "nothing"
     },
     {
       "order": 4,
-      "role": "sinEater",
-      "seconds": 14,
+      "role": "apprenti",
+      "seconds": 10,
       "seeEachOther": false,
-      "acts": [{ "act": "onub.peekPlate", "picks": 1 }, { "act": "onub.peekDead", "picks": 2 }],
+      "sees": [],
+      "acts": ["onub.peekLoc"],
       "onlyIfAlone": false,
-      "onTimeout": "nothing",
-      "trace": "plateTurned",
-      "traceText": "A plate has been turned."
+      "onTimeout": "nothing"
     },
     {
       "order": 5,
-      "role": "cutpurse",
-      "seconds": 12,
+      "role": "ratDeCave",
+      "seconds": 10,
       "seeEachOther": false,
-      "acts": [{ "act": "onub.take", "picks": 1 }],
+      "sees": [],
+      "acts": ["onub.vent"],
       "onlyIfAlone": false,
-      "onTimeout": "nothing",
-      "trace": "twoPlatesTurned",
-      "traceText": "Two plates have been turned."
+      "onTimeout": "nothing"
     },
     {
       "order": 6,
-      "role": "busybody",
-      "seconds": 14,
-      "seeEachOther": false,
-      "acts": [{ "act": "onub.swapPlates", "picks": 2 }],
+      "role": "commis",
+      "seconds": 8,
+      "seeEachOther": true,
+      "sees": [],
+      "acts": [],
       "onlyIfAlone": false,
-      "onTimeout": "nothing",
-      "trace": "twoPlatesTurned",
-      "traceText": "Two plates have been turned."
+      "onTimeout": "nothing"
     },
     {
       "order": 7,
-      "role": "sot",
-      "seconds": 10,
+      "role": "chef",
+      "seconds": 12,
       "seeEachOther": false,
-      "acts": [{ "act": "onub.swapDead", "picks": 1 }],
+      "sees": [],
+      "acts": ["onub.peekRole", "onub.peekPantry"],
       "onlyIfAlone": false,
-      "onTimeout": "seededPick",
-      "trace": "ledgeScuff",
-      "traceText": "Flour is scuffed on the oven ledge."
+      "onTimeout": "nothing"
     },
     {
       "order": 8,
-      "role": "lamplighter",
+      "role": "aboyeur",
+      "seconds": 12,
+      "seeEachOther": false,
+      "sees": [],
+      "acts": ["onub.peekLocs"],
+      "onlyIfAlone": false,
+      "onTimeout": "nothing"
+    },
+    {
+      "order": 9,
+      "role": "sousChef",
+      "seconds": 10,
+      "seeEachOther": false,
+      "sees": [],
+      "acts": ["onub.rob"],
+      "onlyIfAlone": false,
+      "onTimeout": "nothing"
+    },
+    {
+      "order": 10,
+      "role": "tourrier",
+      "seconds": 14,
+      "seeEachOther": false,
+      "sees": [],
+      "acts": ["onub.laminatePeek"],
+      "onlyIfAlone": false,
+      "onTimeout": "seededPick"
+    },
+    {
+      "order": 11,
+      "role": "plongeur",
+      "seconds": 12,
+      "seeEachOther": false,
+      "sees": [],
+      "acts": ["onub.dishRoles", "onub.dishLocs"],
+      "onlyIfAlone": false,
+      "onTimeout": "nothing"
+    },
+    {
+      "order": 12,
+      "role": "gardeManger",
       "seconds": 8,
       "seeEachOther": false,
-      "acts": [{ "act": "onub.check", "picks": 1 }],
+      "sees": [],
+      "acts": ["onub.drunk"],
       "onlyIfAlone": false,
-      "onTimeout": "nothing",
-      "trace": "plateTurned",
-      "traceText": "A plate has been turned."
+      "onTimeout": "seededPick"
+    },
+    {
+      "order": 13,
+      "role": "inspecteur",
+      "seconds": 8,
+      "seeEachOther": false,
+      "sees": [],
+      "acts": ["onub.inspect"],
+      "onlyIfAlone": false,
+      "onTimeout": "nothing"
     }
   ],
+  "rules": { "critiqueCopies": false, "gddRef": "3.11" },
   "vote": {
     "skipAllowed": false,
+    "pantryTarget": true,
     "selfVoteAllowed": false,
     "endsWhenAllVoted": true,
     "minVotesToTurnOut": 2,
     "tiesTurnOutAll": true,
-    "gamekeeperHops": 1,
+    "critiqueHops": 1,
     "gddRef": "3.11"
   },
+  "claims": { "maxSaw": 2, "gddRef": "3.11" },
   "winners": [
     {
-      "id": "debtorAndVillage",
-      "when": { "debtorOut": true, "poisonerOut": true },
-      "winners": ["debtor", "village"],
-      "text": "The Debtor is turned out with a Poisoner: the Debtor and the Village win; the Cabal loses."
+      "id": "croissantAndBakers",
+      "when": { "croissantOut": true, "sporeOut": true, "ruined": false },
+      "winners": ["croissant", "baker"],
+      "text": "The Stale Croissant and a Mold Spore both went in the oven and the dough held: the Croissant and the Loyal Bakers win."
     },
     {
-      "id": "debtorAlone",
-      "when": { "debtorOut": true, "poisonerOut": false },
-      "winners": ["debtor"],
-      "text": "The Debtor is turned out: the Debtor wins alone; the Cabal loses."
+      "id": "croissant",
+      "when": { "croissantOut": true },
+      "winners": ["croissant"],
+      "text": "The Stale Croissant went in the oven: it wins alone, even over a ruined dough."
     },
     {
-      "id": "poisonerOut",
-      "when": { "debtorOut": false, "poisonerOut": true },
-      "winners": ["village"],
-      "text": "A Poisoner is turned out: every final non-Cabal, non-Debtor loaf wins."
+      "id": "ruined",
+      "when": { "ruined": true },
+      "winners": ["mold"],
+      "text": "The Mother Dough was ruined at prep: Team Mold wins."
     },
     {
-      "id": "cabalSurvives",
-      "when": { "debtorOut": false, "poisonerOut": false, "poisonerAmongMourners": true },
-      "winners": ["cabal"],
-      "text": "No Poisoner is out: the Poisoners and the Hireling win, even a turned-out Hireling."
+      "id": "sporeOut",
+      "when": { "sporeOut": true },
+      "winners": ["baker"],
+      "text": "A Mold Spore went in the oven: the Loyal Bakers win."
+    },
+    {
+      "id": "sporesHide",
+      "when": { "sporeAmongPlayers": true },
+      "winners": ["mold"],
+      "text": "No Mold Spore went in the oven: Team Mold wins, even those who were baked."
     },
     {
       "id": "cleanTable",
-      "when": { "poisonerAmongMourners": false, "anyoneOut": false },
-      "winners": ["village"],
-      "text": "No Poisoner among the mourners and nobody turned out: the Village wins."
+      "when": { "anyoneOut": false },
+      "winners": ["baker"],
+      "text": "Every Mold Spore was in the Pantry and nobody went in the oven: the Loyal Bakers win."
     },
     {
-      "id": "storm",
-      "when": { "debtorOut": false, "poisonerAmongMourners": false, "anyoneOut": true },
-      "winners": ["hirelingIfMourner"],
-      "text": "No Poisoner among the mourners but someone turned out: whoever holds the Hireling loaf wins; if it lies with the dead, the storm wins."
+      "id": "moldOut",
+      "when": { "moldOut": true },
+      "winners": ["baker"],
+      "text": "No Spore was at the table and Team Mold went in the oven: the Loyal Bakers win."
+    },
+    {
+      "id": "wrongOven",
+      "when": { "anyoneOut": true },
+      "winners": ["mold"],
+      "text": "No Spore was at the table but the oven took someone else: whoever holds a Team Mold card wins; if nobody does, nobody wins."
     }
-  ]
+  ],
+  "npc": {
+    "sabotageChance": { "easy": 0.4, "normal": 0.6, "hard": 0.8 },
+    "smartVoteChance": { "easy": 0.3, "normal": 0.6, "hard": 0.9 },
+    "claimTruthChance": { "baker": 1, "mold": 0, "croissant": 0 },
+    "commitS": { "min": 12, "max": 40 },
+    "actFrac": { "min": 0.25, "max": 0.75 },
+    "claimFrac": { "min": 0.05, "max": 0.4 },
+    "voteFrac": { "min": 0.3, "max": 0.9 },
+    "gddRef": "3.11"
+  }
 }

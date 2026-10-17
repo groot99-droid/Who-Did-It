@@ -80,16 +80,16 @@ describe('validateContent rejects', () => {
       broken((c) => {
         c.onubBalance.byCount['5'].deck.pop();
       }),
-    ).toEqual(expect.arrayContaining([expect.stringContaining('onub 5: deck has 7 loaves')]));
+    ).toEqual(expect.arrayContaining([expect.stringContaining('onub 5: deck has 7 cards, expected 8')]));
   });
 
   it('a waking quick-mode role without a window', () => {
     expect(
       broken((c) => {
-        c.onubBalance.windows = c.onubBalance.windows.filter((w) => w.role !== 'sot');
+        c.onubBalance.windows = c.onubBalance.windows.filter((w) => w.role !== 'inspecteur');
       }),
     ).toEqual(
-      expect.arrayContaining([expect.stringContaining('onub role sot: wakes=true but has no window')]),
+      expect.arrayContaining([expect.stringContaining('onub role inspecteur: wakes=true but has no window')]),
     );
   });
 

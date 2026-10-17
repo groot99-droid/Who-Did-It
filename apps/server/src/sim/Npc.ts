@@ -4,7 +4,7 @@ import { npcMemory, syncNpcCount, type NpcDebugCommand } from './npc/memory';
 import { readyOnRoleCard, runMeetingVotes } from './npc/meeting';
 import { runOnubNpc } from './npc/onub';
 import { runWorldNpc } from './npc/world';
-import { isOnub } from './Onub';
+import { isOnub } from './onub/state';
 import { simOf } from './RoomSim';
 import { isWorldPhase } from './World';
 
@@ -41,13 +41,12 @@ export function runNpcs(room: PartyRoom): void {
     const p = sim.players.get(id);
     if (!p) continue;
     const brain = mem.brain(id);
+    // Quick mode hands every phase but the role card to its own brain (round 5, 5E).
     if (state.phase === Phase.roleReveal) readyOnRoleCard(room, mem, brain, player);
+    else if (quick) runOnubNpc(room, mem, brain, player, p);
     else if (state.phase === Phase.meetingDiscussion || state.phase === Phase.meetingVote) {
-      runMeetingVotes(room, mem, brain, player, p, quick);
-    } else if (isWorldPhase(state.phase)) {
-      if (quick) runOnubNpc(room, mem, brain, player, p);
-      else runWorldNpc(room, mem, brain, player, p);
-    }
+      runMeetingVotes(room, mem, brain, player, p, false);
+    } else if (isWorldPhase(state.phase)) runWorldNpc(room, mem, brain, player, p);
   }
 }
 

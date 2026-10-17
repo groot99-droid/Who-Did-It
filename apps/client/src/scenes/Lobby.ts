@@ -4,7 +4,7 @@ import type { LobbySnapshot } from '../net/NetworkService';
 import { type LobbyScreen, mountLobby } from '../ui/Lobby';
 import { overlayRoot } from '../ui/dom';
 import { Backdrop } from '../view/Backdrop';
-import { getHealth, getNet } from './registry';
+import { getFlags, getHealth, getNet } from './registry';
 
 export class Lobby extends Phaser.Scene {
   private screen: LobbyScreen | null = null;
@@ -16,8 +16,11 @@ export class Lobby extends Phaser.Scene {
   create(): void {
     new Backdrop(this).setHealth(getHealth(this));
     const net = getNet(this);
+    const flags = getFlags(this);
 
     this.screen = mountLobby(overlayRoot(), {
+      net,
+      offerOnub: flags.onub || flags.mock,
       onStart: () => net.send('lobby.start', {}),
       onReady: (ready) => net.send('lobby.ready', { ready }),
       onLeave: () => void net.leave(),

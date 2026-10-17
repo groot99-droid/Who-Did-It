@@ -1,24 +1,21 @@
 import balance from '@wdi/content/data/balance.json';
 import { TRAIT_IDS } from '@wdi/shared/protocol';
 import { type MeetingFeed, type MeetingPlayer, SKIP } from '../net/meeting';
+import type { OnubFeed } from '../net/onub';
 import { fill } from './copy';
 import { MEETING_COPY as C } from './copy/meeting';
 import { h, icon, type Screen } from './dom';
 import {
-  abstainedLine,
   chatTag,
-  claimLine,
-  claimRoleIds,
   clockText,
   ejectionLines,
-  isRevealingRole,
   MEETING_PHASE,
   outsOf,
   PHASE_LABEL,
   reasonLine,
 } from './meetingText';
+import { mountRush, type RushPanel } from './onub/rush';
 import type { PortraitLook } from './portrait';
-import { roleTitle } from './RoleCard';
 
 /** An extra tab (the Notebook, wired at integration): `update` runs with every refresh. */
 export interface MeetingTab {
@@ -28,6 +25,8 @@ export interface MeetingTab {
 
 export interface MeetingOptions {
   feed: MeetingFeed;
+  /** Quick mode: the ONUB feed the Rush panel reads (board, claims); absent in the main mode. */
+  onub?: OnubFeed;
   /** Paints a portrait into the canvas (the scene owns the texture manager). */
   drawPortrait(canvas: HTMLCanvasElement, look: PortraitLook, name: string): void;
 }
@@ -46,7 +45,6 @@ interface Seat {
   count: HTMLElement;
   stamp: HTMLElement;
   ghost: HTMLElement;
-  claimed: HTMLElement;
 }
 
 const traitIcons = (look: PortraitLook): HTMLImageElement[] => {
@@ -73,7 +71,8 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
   const grid = h('ul', { class: 'wdi-portraits' });
   const hint = h('span', { class: 'wdi-hint', 'aria-live': 'polite' });
   const revealRole = h('p', { class: 'wdi-subtitle', hidden: true, 'data-testid': 'reveal-role' });
-  const revealAbstained = h('p', { class: 'wdi-hint', hidden: true, 'data-testid': 'reveal-abstained' });
+  // Quick mode: the Rush panel (claims, the board, the Pantry vote, the reveal lines) mounts here.
+  const rushRoot = h('div', { class: 'wdi-stack', hidden: true });
   const skipCount = h('span', {
     class: 'wdi-chip wdi-chip--vote',
     hidden: true,
@@ -105,7 +104,7 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     ),
     grid,
     revealRole,
-    revealAbstained,
+    rushRoot,
     h('div', { class: 'wdi-row wdi-row--between wdi-row--wrap' }, hint, h('div', { class: 'wdi-row' }, skip)),
   );
 
@@ -153,8 +152,7 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
   );
   const counter = h('span', { class: 'wdi-hint wdi-chat__count', hidden: true, 'data-testid': 'chat-count' });
   const form = h('form', { class: 'wdi-chat__form' }, input, send);
-  const claimStrip = h('div', { class: 'wdi-claims', hidden: true, 'data-testid': 'claims' });
-  const chat = h('div', { class: 'wdi-chat' }, claimStrip, log, form, counter);
+  const chat = h('div', { class: 'wdi-chat' }, log, form, counter);
   input.addEventListener('input', () => {
     const near = input.value.length >= Math.floor(balance.chat.maxChars * 0.8);
     counter.hidden = !near;
@@ -175,68 +173,8 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
   addPanel('chat', C['meeting.tab.chat'], chat);
   select(selected);
 
-  // --- quick mode: the claim strip (GDD 3.11) ------------------------------------------------------
-  // A role tap posts at once for a role that shows nothing; for the revealing roles it opens an optional
-  // seat and seen-role pick first. The draft lives here, the posted claim lives on the server.
-  const draft = { roleId: '', target: '', saw: '' };
-  const chips = new Map<string, HTMLButtonElement>();
-  const option = (value: string, label: string) => h('option', { value }, label);
-  const targetSel = h('select', {
-    class: 'wdi-input',
-    'aria-label': C['meeting.claim.pickSeat'],
-    'data-testid': 'claim-target',
-  });
-  const sawSel = h(
-    'select',
-    { class: 'wdi-input', 'aria-label': C['meeting.claim.pickSaw'], 'data-testid': 'claim-saw' },
-    option('', C['meeting.claim.noSaw']),
-    ...claimRoleIds().map((id) => option(id, roleTitle(id, 'onub'))),
-  );
-  const postClaim = h(
-    'button',
-    { type: 'button', class: 'wdi-btn wdi-btn--sm wdi-btn--primary', 'data-testid': 'claim-post' },
-    C['meeting.claim.post'],
-  );
-  const claimForm = h(
-    'div',
-    { class: 'wdi-claims__form', hidden: true, 'data-testid': 'claim-form' },
-    h('label', { class: 'wdi-hint' }, C['meeting.claim.pickSeat'], targetSel),
-    h('label', { class: 'wdi-hint' }, C['meeting.claim.pickSaw'], sawSel),
-    postClaim,
-  );
-  const chipRow = h('div', { class: 'wdi-claims__chips' });
-  for (const id of claimRoleIds()) {
-    const chip = h(
-      'button',
-      {
-        type: 'button',
-        class: 'wdi-chip wdi-chip--claim',
-        'data-testid': `claim-${id}`,
-        'aria-pressed': 'false',
-      },
-      roleTitle(id, 'onub'),
-    );
-    chip.addEventListener('click', () => {
-      draft.roleId = id;
-      if (isRevealingRole(id)) {
-        claimForm.hidden = false;
-        return;
-      }
-      claimForm.hidden = true;
-      draft.target = '';
-      draft.saw = '';
-      feed.claim(id);
-    });
-    chips.set(id, chip);
-    chipRow.append(chip);
-  }
-  postClaim.addEventListener('click', () => {
-    if (draft.roleId === '') return;
-    feed.claim(draft.roleId, targetSel.value, sawSel.value);
-    claimForm.hidden = true;
-  });
-  claimStrip.append(h('p', { class: 'wdi-hint' }, C['meeting.claim.hint']), chipRow, claimForm);
-  let targetsFor = '';
+  // --- quick mode: the Rush panel (GDD 3.11, Session 5D) ------------------------------------------
+  let rush: RushPanel | null = null;
 
   const el = h('div', { class: 'wdi-meet wdi-screen', 'data-testid': 'meeting' }, board, side);
   root.append(el);
@@ -276,24 +214,18 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
       });
       const ghost = icon('glyphs/glyph_ghost', C['meeting.chip.dead'], 'wdi-portrait__ghost');
       ghost.hidden = true;
-      const claimed = h('span', {
-        class: 'wdi-portrait__claim',
-        hidden: true,
-        'data-testid': `claimed-${p.id}`,
-      });
       const button = h(
         'button',
         { type: 'button', class: 'wdi-portrait', 'data-testid': `portrait-${p.id}` },
         h('span', { class: 'wdi-portrait__pic' }, canvas),
         h('span', { class: 'wdi-portrait__name' }, p.name),
-        claimed,
         h('span', { class: 'wdi-portrait__traits' }, ...traitIcons(look)),
         voted,
         count,
         ghost,
       );
       button.addEventListener('click', () => feed.vote(p.id));
-      seats.set(p.id, { player: p, button, voted, count, stamp, ghost, claimed });
+      seats.set(p.id, { player: p, button, voted, count, stamp, ghost });
       return h('li', {}, button);
     });
     grid.replaceChildren(...items);
@@ -315,16 +247,10 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
         h('dt', { class: 'wdi-eyebrow' }, term),
         ...lines.map((text) => h('dd', { class: 'wdi-muted', style: 'margin:0' }, text)),
       );
-    const traces = feed.traces();
-    const claims = feed.mode() === 'onub' ? feed.claims() : [];
     const rows = [
       row(C['meeting.report.called'], reasonLine(feed.started(), nameOf)),
       victim !== undefined
         ? row(C['meeting.report.found'], fill(C['meeting.report.found.line'], { name: victim.name }))
-        : null,
-      traces.length > 0 ? row(C['meeting.report.traces'], ...traces) : null,
-      claims.length > 0
-        ? row(C['meeting.report.claims'], ...claims.map((c) => `${nameOf(c.from)}: ${claimLine(c, nameOf)}`))
         : null,
       row(C['meeting.report.here'], fill(C['meeting.report.here.line'], { living, voted })),
     ].filter((r): r is HTMLDivElement => r !== null);
@@ -392,7 +318,6 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     setText(clockTime, clockText(endsTick > 0 ? endsTick - clockNow.tick : null));
 
     const outs = result === null ? [] : outsOf(result);
-    const claims = quick ? feed.claims() : [];
     for (const [id, seat] of seats) {
       const p = roster.find((q) => q.id === id) ?? seat.player;
       seat.player = p;
@@ -408,12 +333,6 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
       seat.voted.hidden = revealing || !p.hasVoted || !p.alive;
       seat.count.hidden = !revealing || votes === 0;
       if (!seat.count.hidden) setText(seat.count, `${votes}`);
-      const claim = claims.find((c) => c.from === id);
-      seat.claimed.hidden = claim === undefined;
-      if (claim !== undefined) {
-        setText(seat.claimed, fill(C['meeting.claim.chip'], { role: roleTitle(claim.roleId, 'onub') }));
-        seat.claimed.title = claimLine(claim, nameOf);
-      }
       // A stamp lands on every seat the vote turned out.
       if (outs.includes(id)) {
         if (!seat.stamp.isConnected) b.append(seat.stamp);
@@ -427,11 +346,9 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     skipCount.hidden = !revealing || skips === 0;
     if (!skipCount.hidden) setText(skipCount, `${skips}`);
 
-    revealRole.hidden = result === null;
-    if (result !== null) setText(revealRole, ejectionLines(result, nameOf, feed.mode()).join(' '));
-    const abstained = result === null || !quick ? null : abstainedLine(result, nameOf);
-    revealAbstained.hidden = abstained === null;
-    if (abstained !== null) setText(revealAbstained, abstained);
+    // Quick mode's reveal lines are the Rush panel's.
+    revealRole.hidden = result === null || quick;
+    if (result !== null && !quick) setText(revealRole, ejectionLines(result, nameOf).join(' '));
     const voteLine = (() => {
       if (mine === '')
         return `${C['meeting.vote.open']}. ${quick ? C['meeting.vote.hintNoSkip'] : C['meeting.vote.hint']}`;
@@ -441,24 +358,10 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     })();
     setText(hint, revealing ? '' : me?.alive === false ? C['ghost.noVote'] : voteLine);
 
-    // The claim strip: quick mode, a living seat, while the talk is open.
-    const claimOpen = quick && canVote;
-    claimStrip.hidden = !quick;
-    const own = claims.find((c) => c.from === feed.selfId);
-    for (const [id, chip] of chips) {
-      chip.disabled = !claimOpen;
-      const on = own?.roleId === id;
-      chip.classList.toggle('is-selected', on);
-      chip.setAttribute('aria-pressed', String(on));
-    }
-    if (!claimOpen) claimForm.hidden = true;
-    if (quick && targetsFor !== key) {
-      targetsFor = key;
-      targetSel.replaceChildren(
-        option('', C['meeting.claim.noSeat']),
-        ...roster.filter((p) => p.id !== feed.selfId).map((p) => option(p.id, p.name)),
-      );
-    }
+    // Quick mode: the Rush panel, once the ONUB feed is there (it is published before the dawn meeting).
+    if (quick && rush === null && opts.onub !== undefined) rush = mountRush(rushRoot, feed, opts.onub);
+    rushRoot.hidden = rush === null;
+    rush?.update();
 
     renderReport(roster);
     renderChat(me);
@@ -477,6 +380,8 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     destroy: () => {
       for (const tab of extras) tab.destroy();
       extras.length = 0;
+      rush?.destroy();
+      rush = null;
       el.remove();
     },
   };

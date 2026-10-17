@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import balanceJson from '@wdi/content/data/balance.json';
+import onubRoles from '@wdi/content/data/roles.onub.json';
 import { MockNetwork } from './mock';
 import type { LobbySnapshot } from './NetworkService';
 
@@ -25,7 +26,12 @@ async function lobby(net: MockNetwork): Promise<LobbySnapshot> {
 describe('MockNetwork lobby settings', () => {
   it('starts in the main mode with the default level and no NPC seats', async () => {
     const snap = await lobby(new MockNetwork());
-    expect(snap.settings).toEqual({ mode: 'main', npcDifficulty: defaultDifficulty, npcSeats: 0 });
+    expect(snap.settings).toEqual({
+      mode: 'main',
+      npcDifficulty: defaultDifficulty,
+      npcSeats: 0,
+      onubDeck: [],
+    });
     expect((await lobby(new MockNetwork('onub'))).settings.mode).toBe('onub');
   });
 
@@ -79,6 +85,38 @@ describe('MockNetwork lobby settings', () => {
     vi.advanceTimersByTime(5000);
     net.setMode('onub');
     net.addNpc();
-    expect(net.snapshot?.settings).toEqual({ mode: 'main', npcDifficulty: defaultDifficulty, npcSeats: 0 });
+    net.setOnubDeck(['chef']);
+    expect(net.snapshot?.settings).toEqual({
+      mode: 'main',
+      npcDifficulty: defaultDifficulty,
+      npcSeats: 0,
+      onubDeck: [],
+    });
+  });
+
+  it('keeps a custom quick-mode deck from the leader', async () => {
+    const net = new MockNetwork('onub');
+    await lobby(net);
+    net.setOnubDeck(['chef', 'aboyeur']);
+    expect(net.snapshot?.settings.onubDeck).toEqual(['chef', 'aboyeur']);
+  });
+});
+
+describe('MockNetwork Start', () => {
+  it('deals a quick-mode card in quick mode and the main-mode card otherwise', async () => {
+    const quick = new MockNetwork('onub');
+    await lobby(quick);
+    quick.send('lobby.start', {});
+    vi.advanceTimersByTime(1000);
+    expect(quick.roleCard?.beware).toBe(onubRoles.cardLine);
+    expect(quick.roleCard?.roleId).toBe('chef');
+    expect(quick.roleCard?.teamName).toBe(onubRoles.teams.baker.name);
+    expect(quick.roleCard?.abilities).toEqual([]);
+
+    const main = new MockNetwork();
+    await lobby(main);
+    main.send('lobby.start', {});
+    vi.advanceTimersByTime(1000);
+    expect(main.roleCard?.roleId).toBe('killer');
   });
 });

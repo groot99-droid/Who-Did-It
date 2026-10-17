@@ -1,197 +1,183 @@
 import { describe, expect, it } from 'vitest';
-import { onubBalance, onubFor, onubRoles, PLAYER_COUNTS, type WinnerRow } from '../src/index.js';
-import { binomial } from './helpers.js';
+import { onubBalance, onubFor, onubRoles, PLAYER_COUNTS } from '../src/index.js';
+
+// ONUB v2 (GDD 3.11): the tables of the GDD, held against roles.onub.json and balance.onub.json.
 
 const counts = PLAYER_COUNTS.map(Number);
-const tally = (deck: readonly string[], role: string) => deck.filter((r) => r === role).length;
 
-describe('quick-mode decks (GDD 3.11)', () => {
-  it('deals N + 3 loaves at every count', () => {
-    for (const n of counts) {
-      expect(onubFor(n).loaves, `${n}`).toBe(n + 3);
-      expect(onubFor(n).deck, `${n}`).toHaveLength(n + 3);
-      expect(onubFor(n).planned, `${n}`).toHaveLength(n + 3);
-    }
+/** The cards deck(n) holds beyond deck(n - 1). */
+function added(n: number): string[] {
+  const prev = [...onubFor(n - 1).deck];
+  return onubFor(n).deck.filter((r) => {
+    const i = prev.indexOf(r);
+    if (i < 0) return true;
+    prev.splice(i, 1);
+    return false;
+  });
+}
+
+describe('ONUB v2 decks (GDD 3.11)', () => {
+  it('holds the player count plus the Pantry roles at every count', () => {
+    for (const n of counts) expect(onubFor(n).deck, `${n}`).toHaveLength(n + onubBalance.pantry.roles);
   });
 
   it('follows the deck table', () => {
     expect([...onubFor(4).deck].sort()).toEqual(
-      ['poisoner', 'poisoner', 'sinEater', 'cutpurse', 'busybody', 'mourner', 'mourner'].sort(),
+      ['champignon', 'champignon', 'chef', 'aboyeur', 'sousChef', 'plongeur', 'inspecteur'].sort(),
     );
-    const added = (n: number) => {
-      const prev = [...onubFor(n - 1).planned];
-      return onubFor(n).planned.filter((r) => {
-        const i = prev.indexOf(r);
-        if (i < 0) return true;
-        prev.splice(i, 1);
-        return false;
-      });
-    };
-    expect(added(5)).toEqual(['debtor']);
-    expect(added(6)).toEqual(['hireling']);
-    expect(added(7)).toEqual(['lamplighter']);
-    expect(added(8)).toEqual(['sot']);
-    expect(added(9).sort()).toEqual(['pallbearer', 'pallbearer']);
-    expect(tally(onubFor(9).planned, 'mourner')).toBe(1);
-    expect(added(10)).toEqual(['gamekeeper']);
+    expect(added(5)).toEqual(['croissant']);
+    expect(added(6)).toEqual(['levain']);
+    expect(added(7)).toEqual(['ratDeCave']);
+    expect(added(8)).toEqual(['gardeManger']);
+    expect(added(9)).toEqual(['boulanger']);
+    expect(added(10)).toEqual(['tourrier']);
   });
 
-  it('deals Mourners for the V1.1 roles in V1 (nine roles)', () => {
-    expect(tally(onubFor(9).deck, 'mourner')).toBe(3);
-    expect(tally(onubFor(10).deck, 'mourner')).toBe(4);
-    const v1 = new Set(counts.flatMap((n) => onubFor(n).deck));
-    expect(v1.size).toBe(9);
-    for (const id of v1) expect(onubRoles.roles[id]?.ships).toBe('V1');
-  });
-
-  it('always has exactly two Poisoners', () => {
-    for (const n of counts) expect(tally(onubFor(n).deck, 'poisoner')).toBe(2);
-  });
-
-  it('puts both Poisoners on the ledge in 3 / C(N+3, 2) of deals, as GDD 3.11 rounds it', () => {
-    const pct = (n: number) => Math.round((100 * 3) / binomial(n + 3, 2));
-    expect([pct(4), pct(6), pct(10)]).toEqual([14, 8, 4]);
-  });
-
-  it('gives the Village and Cabal the discussion times of the table', () => {
-    expect(counts.map((n) => onubFor(n).discussionS)).toEqual([150, 150, 180, 180, 210, 210, 210]);
+  it('leaves the Apprenti, the Commis and the Critique to the deck editor', () => {
+    for (const n of counts) {
+      for (const id of ['apprenti', 'commis', 'critique']) expect(onubFor(n).deck).not.toContain(id);
+    }
+    for (const id of ['apprenti', 'commis', 'critique']) expect(onubRoles.roles[id]?.ships).toBe('V1');
   });
 });
 
-describe('night windows (GDD 3.11)', () => {
-  it('gives every waking role exactly one window and the others none', () => {
-    for (const role of Object.values(onubRoles.roles)) {
-      const windows = onubBalance.windows.filter((w) => w.role === role.id);
-      expect(windows, role.id).toHaveLength(role.wakes ? 1 : 0);
-    }
+describe('ONUB v2 roles (GDD 3.11)', () => {
+  it('has the fifteen roles', () => {
+    expect(Object.keys(onubRoles.roles).sort()).toEqual(
+      [
+        'boulanger',
+        'champignon',
+        'levain',
+        'apprenti',
+        'ratDeCave',
+        'commis',
+        'chef',
+        'aboyeur',
+        'sousChef',
+        'tourrier',
+        'plongeur',
+        'gardeManger',
+        'inspecteur',
+        'croissant',
+        'critique',
+      ].sort(),
+    );
+  });
+
+  it('makes Le Champignon the only Spore and every Team Mold card a saboteur', () => {
+    const roles = Object.values(onubRoles.roles);
+    expect(roles.filter((r) => r.spore).map((r) => r.id)).toEqual(['champignon']);
     expect(
-      Object.values(onubRoles.roles)
-        .filter((r) => !r.wakes)
+      roles
+        .filter((r) => r.team === 'mold')
         .map((r) => r.id)
         .sort(),
-    ).toEqual(['debtor', 'gamekeeper', 'mourner']);
+    ).toEqual(['apprenti', 'champignon', 'levain', 'ratDeCave'].sort());
+    for (const r of roles) expect(r.sabotages, r.id).toBe(r.team === 'mold');
+    expect(roles.filter((r) => r.team === 'croissant').map((r) => r.id)).toEqual(['croissant']);
+    expect(roles.filter((r) => r.onOut === 'dragVote').map((r) => r.id)).toEqual(['critique']);
   });
 
-  it('gives every role dealt at any count a window or no night act', () => {
-    for (const n of counts) {
-      for (const id of new Set(onubFor(n).planned)) {
-        const role = onubRoles.roles[id]!;
-        expect(role.wakes || /^No night act/.test(role.nightAct), id).toBe(true);
-      }
+  it('allows one or two Spores, two Commis or none, one of every other role', () => {
+    for (const r of Object.values(onubRoles.roles)) {
+      const expected = r.id === 'champignon' ? [1, 2] : r.id === 'commis' ? [2] : [1];
+      expect(r.copies, r.id).toEqual(expected);
+      expect(r.required, r.id).toBe(r.id === 'champignon');
     }
   });
 
-  it('orders the windows and their lengths as the table', () => {
+  it('maps the teams onto the wire factions', () => {
+    expect(onubRoles.teams.baker.faction).toBe('village');
+    expect(onubRoles.teams.mold.faction).toBe('cabal');
+    expect(onubRoles.teams.croissant.faction).toBe('neutral');
+  });
+});
+
+describe('ONUB v2 stations and cards (GDD 3.11)', () => {
+  it('has four stations in overview order, eight good and ten sabotage cards', () => {
+    expect(onubBalance.stations.map((s) => s.id)).toEqual(['fridge', 'mixer', 'proofing', 'oven']);
+    const cards = Object.values(onubBalance.cards);
+    expect(cards.filter((c) => c.kind === 'good')).toHaveLength(8);
+    expect(cards.filter((c) => c.kind === 'sabotage')).toHaveLength(10);
+  });
+
+  it('weighs the Oven double, flags a lone Mixer card and gives the Proofing Drawer its perk', () => {
+    const at = (id: string) => onubBalance.stations.find((s) => s.id === id)!;
+    expect(at('oven').weight).toBe(2);
+    for (const id of ['fridge', 'mixer', 'proofing']) expect(at(id).weight).toBe(1);
+    expect(at('mixer').underMixBelow).toBe(2);
+    expect(at('mixer').underMixWeight).toBe(1);
+    expect(at('proofing').perk).toBe('peekPantryLoc');
+    expect(onubBalance.ruin).toMatchObject({ weight: 3, goodCancels: 1 });
+  });
+
+  it('gives only the Thermostat Flip an effect', () => {
+    const effects = Object.values(onubBalance.cards).filter((c) => c.effect !== 'none');
+    expect(effects.map((c) => [c.id, c.station, c.effect])).toEqual([
+      ['thermostat', 'fridge', 'discardRandomOther'],
+    ]);
+  });
+});
+
+describe('ONUB v2 night (GDD 3.11)', () => {
+  it('wakes in the GDD order for the GDD seconds', () => {
     expect(onubBalance.windows.map((w) => [w.role, w.seconds])).toEqual([
-      ['poisoner', 12],
-      ['hireling', 8],
-      ['pallbearer', 8],
-      ['sinEater', 14],
-      ['cutpurse', 12],
-      ['busybody', 14],
-      ['sot', 10],
-      ['lamplighter', 8],
+      ['boulanger', 10],
+      ['champignon', 12],
+      ['levain', 8],
+      ['apprenti', 10],
+      ['ratDeCave', 10],
+      ['commis', 8],
+      ['chef', 12],
+      ['aboyeur', 12],
+      ['sousChef', 10],
+      ['tourrier', 14],
+      ['plongeur', 12],
+      ['gardeManger', 8],
+      ['inspecteur', 8],
     ]);
   });
 
-  it('makes night length the windows present plus a fade each', () => {
-    const night = (deck: readonly string[]) =>
-      onubBalance.windows
-        .filter((w) => deck.includes(w.role))
-        .reduce((s, w) => s + w.seconds + onubBalance.timers.fadeS, 0);
-    expect(counts.map((n) => night(onubFor(n).deck))).toEqual([60, 60, 70, 80, 92, 92, 92]);
-    expect(night(onubFor(10).planned)).toBe(102);
+  it('makes only the Tourrier and the Garde Manger act by seed on timeout', () => {
+    const must = onubBalance.windows.filter((w) => w.onTimeout === 'seededPick').map((w) => w.role);
+    expect(must).toEqual(['tourrier', 'gardeManger']);
   });
 
-  it('keeps whole matches inside the GDD 3.11 table, jitter included', () => {
-    const t = onubBalance.timers;
-    const match = (n: number, jitter: number) => {
-      const row = onubFor(n);
-      const windows = onubBalance.windows.filter((w) => row.planned.includes(w.role));
-      const night = windows.reduce((s, w) => s + w.seconds + t.fadeS + jitter, 0);
-      return t.roleCardS + t.duskS + night + t.dawnS + row.discussionS + t.voteS + t.revealS;
+  it('runs the night lengths of GDD 3.11 with the default decks', () => {
+    const night = (n: number) => {
+      const deck = new Set(onubFor(n).deck);
+      const ws = onubBalance.windows.filter((w) => deck.has(w.role));
+      return ws.reduce((s, w) => s + w.seconds + onubBalance.timers.fadeS, 0);
     };
-    const bounds: Record<number, [number, number]> = {
-      4: [4.5, 5.5],
-      5: [4.5, 5.5],
-      6: [5, 6.5],
-      7: [5, 6.5],
-      8: [6, 7.5],
-      9: [6, 7.5],
-      10: [6, 7.5],
-    };
-    for (const n of counts) {
-      const [lo, hi] = bounds[n]!;
-      expect(match(n, 0) / 60, `${n} min`).toBeGreaterThanOrEqual(lo);
-      expect(match(n, t.windowJitterMaxS) / 60, `${n} max`).toBeLessThanOrEqual(hi);
-    }
-  });
-
-  it('fires several sleeper pulses in even the shortest night', () => {
-    const { sleeperPulseMinS, sleeperPulseMaxS } = onubBalance.timers;
-    const shortest = Math.min(
-      ...counts.map((n) =>
-        onubBalance.windows
-          .filter((w) => onubFor(n).deck.includes(w.role))
-          .reduce((s, w) => s + w.seconds + onubBalance.timers.fadeS, 0),
-      ),
-    );
-    expect(sleeperPulseMinS).toBeGreaterThan(0);
-    expect(sleeperPulseMinS).toBeLessThan(sleeperPulseMaxS);
-    expect(Math.floor(shortest / sleeperPulseMaxS)).toBeGreaterThanOrEqual(3);
-  });
-
-  it("references only defined acts and makes the Sot's swap mandatory", () => {
-    for (const w of onubBalance.windows)
-      for (const a of w.acts) expect(onubBalance.acts[a.act]).toBeDefined();
-    expect(onubBalance.windows.find((w) => w.role === 'sot')?.onTimeout).toBe('seededPick');
-    expect(onubBalance.windows.find((w) => w.role === 'poisoner')?.onlyIfAlone).toBe(true);
+    expect(counts.map(night)).toEqual([78, 78, 88, 100, 110, 122, 138]);
   });
 });
 
-describe('dawn winner table (GDD 3.11)', () => {
-  const matches = (row: WinnerRow, s: Record<keyof WinnerRow['when'], boolean>) =>
-    (Object.keys(row.when) as Array<keyof WinnerRow['when']>).every((k) => row.when[k] === s[k]);
-
-  it('matches exactly one row for every consistent dawn', () => {
-    let consistent = 0;
-    for (let bits = 0; bits < 16; bits++) {
-      const s = {
-        debtorOut: Boolean(bits & 1),
-        poisonerOut: Boolean(bits & 2),
-        poisonerAmongMourners: Boolean(bits & 4),
-        anyoneOut: Boolean(bits & 8),
-      };
-      const possible =
-        (!s.poisonerOut || (s.poisonerAmongMourners && s.anyoneOut)) && (!s.debtorOut || s.anyoneOut);
-      const hits = onubBalance.winners.filter((r) => matches(r, s));
-      if (possible) {
-        consistent++;
-        expect(
-          hits.map((h) => h.id),
-          JSON.stringify(s),
-        ).toHaveLength(1);
-      }
-    }
-    expect(consistent).toBe(8);
-  });
-
-  it('lets a turned-out Debtor beat the Cabal', () => {
-    for (const row of onubBalance.winners.filter((r) => r.when.debtorOut === true)) {
-      expect(row.winners).toContain('debtor');
-      expect(row.winners).not.toContain('cabal');
-    }
-  });
-});
-
-describe('dawn vote', () => {
-  it('has no Skip, no self-vote and needs two votes to turn anyone out', () => {
+describe('ONUB v2 vote and winners (GDD 3.11)', () => {
+  it('has no Skip, no self-vote and a Pantry target', () => {
     expect(onubBalance.vote).toMatchObject({
       skipAllowed: false,
       selfVoteAllowed: false,
+      pantryTarget: true,
       minVotesToTurnOut: 2,
       tiesTurnOutAll: true,
-      gamekeeperHops: 1,
+      critiqueHops: 1,
     });
+  });
+
+  it('ends with rows that catch every dawn', () => {
+    const rows = onubBalance.winners;
+    expect(rows.map((r) => r.id)).toEqual([
+      'croissantAndBakers',
+      'croissant',
+      'ruined',
+      'sporeOut',
+      'sporesHide',
+      'cleanTable',
+      'moldOut',
+      'wrongOven',
+    ]);
+    expect(rows.at(-3)?.when).toEqual({ anyoneOut: false });
+    expect(rows.at(-1)?.when).toEqual({ anyoneOut: true });
   });
 });

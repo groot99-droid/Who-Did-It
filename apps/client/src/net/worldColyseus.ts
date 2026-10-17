@@ -1,17 +1,15 @@
 import mitt, { type Emitter } from 'mitt';
 import type { Room } from '@colyseus/sdk';
-import type { HoldAction, NightRevealEntry } from '@wdi/shared/protocol';
+import type { HoldAction } from '@wdi/shared/protocol';
 import type {
   BodySnap,
   ClueSnap,
   DoorSnap,
-  NightWindow,
   NotebookSnap,
   MoveCmd,
   NoisePulse,
   PlayerSnap,
   PresenceSnap,
-  PropSnap,
   SceneEnter,
   WorldFeed,
   WorldFeedEvents,
@@ -29,8 +27,6 @@ interface PlayerState {
   presence?: PresenceState;
   priv?: {
     notebook?: { forEach(cb: (e: NotebookSnap) => void): void };
-    cabalMates?: { forEach(cb: (id: string) => void): void };
-    nightReveal?: { forEach(cb: (e: NightRevealEntry) => void): void };
   };
 }
 interface Collection<T> {
@@ -40,7 +36,6 @@ interface SceneStateLike {
   doors: Collection<DoorSnap>;
   bodies?: Collection<BodySnap>;
   clues?: Collection<ClueSnap>;
-  props?: Collection<PropSnap>;
 }
 interface GameStateLike {
   tick: number;
@@ -63,24 +58,8 @@ export class ColyseusWorldFeed implements WorldFeed {
       this.bus.emit('killed', m);
     });
     room.onMessage('clueFound', (m: WorldFeedEvents['clueFound']) => this.bus.emit('clueFound', m));
-    room.onMessage('phaseChange', (m: WorldFeedEvents['phaseChange']) => {
-      // The night's windows live in the Conductor; a phase change ends any window this feed still holds.
-      this.window = null;
-      this.bus.emit('phaseChange', m);
-    });
-    room.onMessage('nightWake', (m: NightWindow) => {
-      this.window = m;
-      this.bus.emit('nightWake', m);
-    });
-    room.onMessage('nightReveal', (m: WorldFeedEvents['nightReveal']) => this.bus.emit('nightReveal', m));
-    room.onMessage('nightSleep', () => {
-      this.window = null;
-      this.bus.emit('nightSleep', {});
-    });
+    room.onMessage('phaseChange', (m: WorldFeedEvents['phaseChange']) => this.bus.emit('phaseChange', m));
   }
-
-  /** The open night window (quick mode); set by `nightWake`, cleared by `nightSleep` and a phase change. */
-  private window: NightWindow | null = null;
 
   /** Set by the private `killed` message or a false roster `alive`; cleared when the lobby returns. */
   private ghost = false;
@@ -133,32 +112,6 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   mode(): 'main' | 'onub' {
     return this.state.settings?.mode === 1 ? 'onub' : 'main';
-  }
-
-  props(): PropSnap[] {
-    const out: PropSnap[] = [];
-    this.state.scenes.forEach((scene) =>
-      scene.props?.forEach((p) => out.push({ id: p.id, kind: p.kind, turned: p.turned, of: p.of })),
-    );
-    return out;
-  }
-
-  mates(): string[] {
-    const out: string[] = [];
-    this.state.players.get(this.selfId)?.priv?.cabalMates?.forEach((id) => out.push(id));
-    return out;
-  }
-
-  nightReveal(): NightRevealEntry[] {
-    const out: NightRevealEntry[] = [];
-    this.state.players
-      .get(this.selfId)
-      ?.priv?.nightReveal?.forEach((e) => out.push({ slot: e.slot, of: e.of, roleId: e.roleId }));
-    return out;
-  }
-
-  wake(): NightWindow | null {
-    return this.window;
   }
 
   bodies(): BodySnap[] {
@@ -218,12 +171,8 @@ export class ColyseusWorldFeed implements WorldFeed {
     this.ability('kill', targetId);
   }
 
-  ability(id: string, targetId?: string, targetId2?: string): void {
-    this.room.send('act.ability', {
-      abilityId: id,
-      ...(targetId === undefined ? {} : { targetId }),
-      ...(targetId2 === undefined ? {} : { targetId2 }),
-    });
+  ability(id: string, targetId?: string): void {
+    this.room.send('act.ability', { abilityId: id, ...(targetId === undefined ? {} : { targetId }) });
   }
 
   hold(action: HoldAction, targetId: string, on: boolean): void {

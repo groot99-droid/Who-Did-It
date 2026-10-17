@@ -1,4 +1,3 @@
-import { WORLD_COPY as C } from '../ui/copy';
 import { h } from '../ui/dom';
 import '../ui/theme/tokens.css';
 import '../ui/theme/components.css';
@@ -7,7 +6,16 @@ import { edgeCue } from './Hud';
 // The quick-mode loft (GDD 3.11, A21, A39) as DOM, built from public/mockups/loft.html and the theme's
 // `.wdi-loft`, `.wdi-bedrolls` and `.wdi-bedroll`. It shows one occupied bedroll per seat of the roster and
 // nothing about where anyone is: no clock, no HUD, no input. The art is optional: the manifest's backdrop and
-// bedroll images replace the CSS bedrolls when present.
+// bedroll images replace the CSS bedrolls when present. Unregistered since round 5 and deleted by 5D, so its
+// lines live here rather than in `ui/copy`.
+
+const C = {
+  'loft.eyebrow': "Crumb's Ovens, the loft",
+  'loft.title': 'The village sleeps',
+  'loft.text': 'You lie still in your bedroll. Somewhere below, something creaks.',
+  'loft.hint': 'No clock. No moving. What you hold at dawn is what you are.',
+  'loft.bedroll': "{name}'s bedroll",
+} as const;
 
 export interface LoftSeat {
   id: string;

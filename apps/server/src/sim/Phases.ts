@@ -4,7 +4,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { countRow, flowOf, isMeetingPhase, refuse, setPhase } from './Flow';
 import { onubClock, runOnubPhases } from './Conductor';
 import { enterImmunity, openMeeting, runMeeting } from './Meeting';
-import { isOnub } from './Onub';
+import { isOnub } from './onub/state';
 import { simOf } from './RoomSim';
 import { endMatch, evaluateWin, resetToLobby } from './Win';
 import { isWorldPhase } from './World';

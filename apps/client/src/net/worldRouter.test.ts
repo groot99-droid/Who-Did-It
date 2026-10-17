@@ -88,46 +88,25 @@ describe('world router', () => {
     expect(calls.at(-1)).toBe('start Lobby');
   });
 
-  it('registers the quick-mode night events once', () => {
+  it('leaves the night messages to the ONUB feed: the world feed registers none', () => {
     const { room } = setup();
-    expect(room.count('nightSleep')).toBe(1);
-    expect(room.count('nightWake')).toBe(1);
+    expect(room.count('nightSleep')).toBe(0);
+    expect(room.count('nightWake')).toBe(0);
   });
 
-  it('a nightSleep stops the world and starts the loft; a nightWake or a bakery sceneEnter brings the world back', () => {
-    const { room, calls, active } = setup();
-    room.emit('sceneEnter', { sceneId: 'bakery', spawn: 'door', facing: 'n' });
-    expect(active.has('World')).toBe(true);
-    room.emit('nightSleep', {});
-    expect(active.has('World')).toBe(false);
-    expect(active.has('Loft')).toBe(true);
-    room.emit('nightWake', { windowRole: 'sinEater', endsTick: 99, spawn: 'door' });
-    expect(active.has('Loft')).toBe(false);
-    expect(active.has('World')).toBe(true);
-    expect(calls.at(-1)).toBe('start World');
-    room.emit('nightSleep', {});
-    room.emit('sceneEnter', { sceneId: 'bakery', spawn: 'door', facing: 'n' });
-    expect(active.has('Loft')).toBe(false);
-    expect(active.has('World')).toBe(true);
-  });
-
-  it('a meeting or the return to the lobby stops the loft', () => {
+  it('a meeting, game over or the return to the lobby stops Kitchen and Night', () => {
     const { room, active } = setup();
-    room.emit('nightSleep', {});
+    active.add('Kitchen');
     room.emit('meetingStart', { reason: 'dawn', callerId: '', missing: [] });
-    expect(active.has('Loft')).toBe(false);
+    expect(active.has('Kitchen')).toBe(false);
     expect(active.has('Meeting')).toBe(true);
-    room.emit('nightSleep', {});
-    expect(active.has('Loft')).toBe(false);
-    room.emit('gameOver', { winner: 1, roles: {}, summary: '' });
+    active.add('Night');
+    room.emit('gameOver', { winner: 5, roles: {}, summary: '' });
+    expect(active.has('Night')).toBe(false);
+    expect(active.has('GameOver')).toBe(true);
+    active.add('Kitchen');
     room.emit('phaseChange', { phase: 0, endsTick: 0 });
-    expect(active.has('Loft')).toBe(false);
-  });
-
-  it('a nightSleep before the lobby return does not outlive it', () => {
-    const { room, active } = setup();
-    room.emit('nightSleep', {});
-    room.emit('phaseChange', { phase: 0, endsTick: 0 });
-    expect(active.has('Loft')).toBe(false);
+    expect(active.has('Kitchen')).toBe(false);
+    expect(active.has('Lobby')).toBe(true);
   });
 });

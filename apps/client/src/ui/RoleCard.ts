@@ -7,7 +7,7 @@ import { h, icon, isTyping, type Screen } from './dom';
 /** Fallback hold time (`balance.json` phases.roleRevealS); the server's `phaseChange.endsTick` overrides it. */
 export const ROLE_CARD_SECONDS = balance.phases.roleRevealS;
 
-type OnubRoleRow = { name: string; faction: string };
+type OnubRoleRow = { name: string };
 const onubRow = (roleId: string): OnubRoleRow | undefined =>
   (onubRoles.roles as Record<string, OnubRoleRow | undefined>)[roleId];
 
@@ -40,7 +40,7 @@ export function lookLine(t: TraitIds): string {
   return `You look like: ${TRAIT_LABELS.height[t.height]} / ${TRAIT_LABELS.scarf[t.scarf]} / ${TRAIT_LABELS.hat[t.hat]}`;
 }
 
-/** The role's display name; quick mode reads `roles.onub.json` (`sinEater` is "Sin-Eater"). */
+/** The role's display name; quick mode reads `roles.onub.json` (`sousChef` is "Le Sous-Chef"). */
 export function roleTitle(roleId: string, mode: 'main' | 'onub' = 'main'): string {
   if (mode === 'onub') {
     const row = onubRow(roleId);
@@ -102,7 +102,13 @@ export function mountRoleCard(
   const front = h(
     'article',
     { class: `wdi-card wdi-card--${role.team} wdi-flip__face wdi-flip__face--front` },
-    h('div', { class: 'wdi-card__stripe' }, icon(`icons/icon_faction_${role.team}`), TEAM_LABEL[role.team]),
+    // Quick mode names the card's team (`teamName`, roles.onub.json) in place of the faction label.
+    h(
+      'div',
+      { class: 'wdi-card__stripe' },
+      icon(`icons/icon_faction_${role.team}`),
+      role.teamName || TEAM_LABEL[role.team],
+    ),
     h(
       'h1',
       { class: 'wdi-display wdi-card__title', 'data-testid': 'role-name' },

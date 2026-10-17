@@ -43,3 +43,23 @@ describe('pickVote', () => {
     expect([...seen].sort()).toEqual(['b', 'skip']);
   });
 });
+
+describe('pickVote other', () => {
+  const roster = [
+    { id: 'a', name: 'Hana', alive: true },
+    { id: 'b', name: 'Gus', alive: true },
+    { id: 'c', name: 'Mo', alive: false },
+    { id: 'd', name: 'Ola', alive: true },
+  ];
+
+  it('is a random living seat other than itself and never Skip', () => {
+    const rng = mulberry(5);
+    const seen = new Set<string>();
+    for (let i = 0; i < 80; i++) seen.add(pickVote('other', 'a', 'a', roster, rng));
+    expect([...seen].sort()).toEqual(['b', 'd']);
+  });
+
+  it('falls back to Skip only when nobody else lives', () => {
+    expect(pickVote('other', 'a', 'a', [roster[0]!], mulberry(1))).toBe('skip');
+  });
+});

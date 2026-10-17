@@ -1,6 +1,6 @@
 // UI.md 14 meeting, reveal and game-over lines (Session U, round 4). Ids are the deck's (14.6, 14.7, 14.9,
-// 14.10); the quick-mode ids (`meeting.claim.*`, `reveal.outs*`, `over.swap.*`, ...) carry the GDD 3.11
-// wording until 14.12 lands and are renamed then. `{key}` values are filled by the caller with `fill()`.
+// 14.10). Quick mode's Rush, reveal and end-screen lines live in `onubNight.ts` (5D) from round 5. `{key}`
+// values are filled by the caller with `fill()`.
 export const MEETING_COPY = {
   // 14.6 Meeting
   'meeting.title': 'Who did it?',
@@ -34,8 +34,6 @@ export const MEETING_COPY = {
   'meeting.report.found.line': '{name} is dead.',
   'meeting.report.here': 'Still here',
   'meeting.report.here.line': '{living} alive, {voted} voted',
-  'meeting.report.traces': 'Traces',
-  'meeting.report.claims': 'Claims',
 
   // 14.8 Ghost, meeting side
   'ghost.noVote': 'Ghosts cannot vote',
@@ -50,21 +48,6 @@ export const MEETING_COPY = {
   'chat.channel.cabal': 'Cabal',
   'chat.empty': 'Nothing said yet',
 
-  // Quick mode, claims (GDD 3.11: "I was the Sin-Eater: Y's loaf was Mourner")
-  'meeting.claim.title': 'Claim a role',
-  'meeting.claim.hint': 'Tap the loaf you say you were. Others see it under your portrait.',
-  'meeting.claim.pickSeat': 'Whose loaf?',
-  'meeting.claim.pickSaw': 'It was',
-  'meeting.claim.noSeat': 'No one in particular',
-  'meeting.claim.noSaw': 'Nothing in particular',
-  'meeting.claim.post': 'Post claim',
-  'meeting.claim.clear': 'Cleared',
-  'meeting.claim.line': 'I was the {role}',
-  'meeting.claim.line.saw': "I was the {role}: {name}'s loaf was {saw}",
-  'meeting.claim.line.sawDead': 'I was the {role}: I saw {saw}',
-  'meeting.claim.chip': 'Claimed: {role}',
-  'meeting.claim.none': 'No claims yet',
-
   // 14.9 Reveal
   'reveal.title': 'The tally',
   'reveal.skip': 'Skip: {n}',
@@ -73,17 +56,12 @@ export const MEETING_COPY = {
   'reveal.none.tie': 'A tie. Nobody is ejected.',
   'reveal.none.skip': 'The village skipped. Nobody is ejected.',
   'reveal.none.empty': 'No votes. Nobody is ejected.',
-  'reveal.outs': '{names} are turned out',
-  'reveal.outs.one': '{names} is turned out',
-  'reveal.outs.none': 'Nobody is turned out.',
-  'reveal.abstained': 'Did not vote: {names}',
 
   // 14.10 Game over
   'over.title': 'Game over',
   'over.village': 'The village wins',
   'over.cabal': 'The Cabal wins',
   'over.drifter': 'The Drifter wins',
-  'over.debtor': 'The Debtor wins',
   'over.nobody': 'Nobody wins',
   'over.none': 'The match ended',
   'over.roles': 'Who was who',
@@ -96,23 +74,6 @@ export const MEETING_COPY = {
   'over.faction.village': 'Village',
   'over.faction.cabal': 'Cabal',
   'over.faction.neutral': 'Neutral',
-
-  // Quick mode, end screen (GDD 3.11 "Reveal")
-  'over.dealt': 'Dealt',
-  'over.final': 'Final',
-  'over.row.arrow': '\u2192',
-  'over.center': 'The dead’s loaves',
-  'over.swap.title': 'The night',
-  'over.swap.none': 'Nobody touched a loaf.',
-  'over.swap.take': "The {role} took {name}'s loaf",
-  'over.swap.swap': "The {role} swapped {a}'s and {b}'s loaves",
-  'over.swap.swapDead': "The {role} swapped {name}'s loaf with a dead loaf",
-  'over.swap.other': 'The {role} swapped {a} and {b}',
-  'over.swap.deadLoaf': 'a dead loaf',
-  'over.votes.title': 'The vote',
-  'over.votes.line': '{from} voted {to}',
-  'over.votes.abstained': '{from} did not vote',
-  'over.winner.mark': 'Winner',
 } as const satisfies Record<string, string>;
 
 export type MeetingCopyId = keyof typeof MEETING_COPY;

@@ -1,102 +1,215 @@
 import { z } from 'zod';
-import { GddRef, Id, Seconds, Tiles, byPlayerCount } from './common.js';
+import { GddRef, Id, Seconds, byPlayerCount } from './common.js';
 import { OnubActId } from './onubRoles.js';
 
-export const OnubAct = z.strictObject({
-  id: OnubActId,
-  target: z.enum(['deadLoaf', 'otherPlate', 'ownPlate', 'ledger']),
-  /** Hold E per pick. */
-  holdS: Seconds,
-  /** `withOwn`: the picked loaf trades places with the actor's; `pair`: two picks trade places. */
-  swap: z.enum(['none', 'withOwn', 'pair']),
-  /** The actor is shown the token of what they picked (or now hold). */
-  reveals: z.boolean(),
-  description: z.string().min(1),
+// ONUB v2 balance (GDD 3.11): decks, stations, ingredient cards, mini-games, night acts and windows,
+// timers, the vote, the winners table and the NPC numbers. Every number of the mode lives here or in GDD 3.11.
+
+/** A fraction of a gauge, a band or a window: (0, 1]. */
+const Frac = z.number().gt(0).lte(1);
+const Count = z.number().int().positive();
+const Range = z.strictObject({ min: z.number().nonnegative(), max: z.number().nonnegative() });
+const ByLevel = z.strictObject({
+  easy: z.number().min(0).max(1),
+  normal: z.number().min(0).max(1),
+  hard: z.number().min(0).max(1),
 });
+
+/** The station mini-game (client-side skill only; its result never reaches the wire). */
+export const OnubMinigame = z.discriminatedUnion('kind', [
+  /** Drag `steps` crates to the cart, then release the thermostat needle inside a `bandFrac` band. */
+  z.strictObject({ kind: z.literal('crates'), steps: Count, bandFrac: Frac }),
+  /** `steps` pours: hold to fill at `ratePerS` of the bowl a second, release inside a `bandFrac` band. */
+  z.strictObject({ kind: z.literal('pour'), steps: Count, ratePerS: Frac, bandFrac: Frac }),
+  /** Slide `steps` bannetons into the cabinet slots. */
+  z.strictObject({ kind: z.literal('slide'), steps: Count }),
+  /** Each tap adds `stokePerTap` heat, heat falls `ratePerS` a second; hold inside `bandFrac` for `holdS`. */
+  z.strictObject({
+    kind: z.literal('stoke'),
+    stokePerTap: Frac,
+    ratePerS: Frac,
+    bandFrac: Frac,
+    holdS: Seconds,
+  }),
+]);
+export type OnubMinigame = z.infer<typeof OnubMinigame>;
+
+export const OnubStation = z.strictObject({
+  id: Id,
+  /** French room name ("Le Pétrin"); `gloss` is the English line under it. */
+  name: z.string().min(1),
+  gloss: z.string().min(1),
+  /** Ingredient card ids of `cards`, in hand order. */
+  good: z.array(Id).min(1),
+  sabotage: z.array(Id).min(1),
+  /** What one sabotage card here adds to the station's net weight. */
+  weight: Count,
+  /** A pile of at least one and fewer than this many cards is under-mixed: a flag worth `underMixWeight`. */
+  underMixBelow: Count.optional(),
+  underMixWeight: Count.optional(),
+  /** `peekPantryLoc`: with visitors and no sabotage card here, each visitor sees one Pantry Location card. */
+  perk: z.enum(['peekPantryLoc']).optional(),
+  minigame: OnubMinigame,
+});
+export type OnubStation = z.infer<typeof OnubStation>;
+
+export const OnubCard = z.strictObject({
+  id: Id,
+  name: z.string().min(1),
+  /** The station whose hand holds this card. */
+  station: Id,
+  kind: z.enum(['good', 'sabotage']),
+  /** `discardRandomOther`: at the reveal, one other card of the pile is discarded by seed, unseen. */
+  effect: z.enum(['none', 'discardRandomOther']),
+  text: z.string().min(1),
+});
+export type OnubCard = z.infer<typeof OnubCard>;
+
+/** Where one pick of an act may come from; `other*` never names the actor's own seat. */
+export const OnubTargetKind = z.enum([
+  'anySeatCard',
+  'anySeatRole',
+  'otherSeatRole',
+  'otherSeatLoc',
+  'pantryRole',
+  'pantryLoc',
+]);
+export type OnubTargetKind = z.infer<typeof OnubTargetKind>;
+
+export const OnubAct = z
+  .strictObject({
+    id: OnubActId,
+    /** Each pick comes from any of these kinds. Empty for an act without picks (`onub.inspect`). */
+    targets: z.array(OnubTargetKind),
+    /** Distinct targets the act names in `act.ability.targets`. */
+    picks: z.number().int().min(0).max(2),
+    /**
+     * `cloche` covers the pick; `peek` moves nothing; `swapWithOwn` swaps the pick with the actor's own card of
+     * the same kind; `swapWithPeeked` swaps the pick with the Pantry slot the actor peeked in the first step;
+     * `swapPair` swaps the two picks.
+     */
+    effect: z.enum(['cloche', 'peek', 'swapWithOwn', 'swapWithPeeked', 'swapPair']),
+    /** What the actor is shown: the picks before the act, their own card after it, both own cards, or nothing. */
+    reveal: z.enum(['picked', 'ownAfter', 'ownCards', 'none']),
+    /** A second step the actor must take in the same window (the Tourrier's swap). */
+    then: OnubActId.optional(),
+    description: z.string().min(1),
+  })
+  .refine((a) => (a.picks === 0) === (a.targets.length === 0), {
+    message: 'an act with picks names target kinds, and an act without picks names none',
+  });
 export type OnubAct = z.infer<typeof OnubAct>;
 
 export const OnubWindow = z.strictObject({
   order: z.number().int().positive(),
   role: Id,
+  /** Window length before its seeded jitter and its fade. */
   seconds: Seconds,
-  /** Players of this role see each other's nameplates during the window. */
+  /** Seats dealt this role see each other (the Spores, the Commis). */
   seeEachOther: z.boolean(),
-  /** Alternative acts; `picks` is how many targets the act takes. Empty: no act. */
-  acts: z.array(z.strictObject({ act: OnubActId, picks: z.number().int().positive() })),
-  /** The acts are allowed only when exactly one player holds this dealt role. */
+  /** Role ids whose dealt seats this window is shown (the Levain sees `champignon`). */
+  sees: z.array(Id),
+  /** Alternative acts; empty: the window only shows. */
+  acts: z.array(OnubActId),
+  /** The acts are allowed only when no other seat was dealt this role (the lone Spore). */
   onlyIfAlone: z.boolean(),
-  /** `seededPick`: a mandatory act the server completes by seed when the window expires. */
+  /** `seededPick`: a mandatory act the server completes by seed when the window ends. */
   onTimeout: z.enum(['nothing', 'seededPick']),
-  trace: z.enum(['none', 'ledgeScuff', 'ledgerOpen', 'plateTurned', 'twoPlatesTurned']),
-  traceText: z.string(),
 });
 export type OnubWindow = z.infer<typeof OnubWindow>;
 
 export const OnubCountRow = z.strictObject({
-  loaves: z.number().int().positive(),
-  /** Roles V1 deals: one per player plus the dead's loaves. `dealOnub` shuffles this list. */
-  deck: z.array(Id),
-  /** The GDD 3.11 deck including roles that ship later (dealt as the stand-in in V1). */
-  planned: z.array(Id),
-  discussionS: Seconds,
+  /** The default deck: player count + `pantry.roles` cards. `Settings.onubDeck` replaces it when set. */
+  deck: z.array(Id).min(1),
   gddRef: GddRef,
 });
 export type OnubCountRow = z.infer<typeof OnubCountRow>;
 
 const Flag = z.boolean().optional();
-export const WinnerRow = z.strictObject({
+export const OnubWinnerRow = z.strictObject({
   id: Id,
-  /** Conditions over the dawn result; an omitted condition matches either value. */
+  /** Conditions over the final cards after the Critique's drag; an omitted condition matches either value. */
   when: z.strictObject({
-    debtorOut: Flag,
-    poisonerOut: Flag,
-    poisonerAmongMourners: Flag,
+    ruined: Flag,
+    croissantOut: Flag,
+    sporeOut: Flag,
+    sporeAmongPlayers: Flag,
+    moldOut: Flag,
     anyoneOut: Flag,
   }),
-  /** `hirelingIfMourner`: the Hireling wins if they hold a mourner's plate, else nobody. */
-  winners: z.array(z.enum(['debtor', 'village', 'cabal', 'hirelingIfMourner', 'nobody'])).min(1),
+  /** Teams whose final cards win; `nobody` wins no seat. */
+  winners: z.array(z.enum(['baker', 'mold', 'croissant', 'nobody'])).min(1),
   text: z.string().min(1),
 });
-export type WinnerRow = z.infer<typeof WinnerRow>;
+export type OnubWinnerRow = z.infer<typeof OnubWinnerRow>;
 
 export const OnubBalanceFile = z.strictObject({
   gddRef: GddRef,
-  /** Loaves left on the oven ledge (the dead's loaves). */
-  deadLoaves: z.number().int().positive(),
   /** The target match length in minutes the lobby chip shows (GDD 3.11, A15). */
-  targetLengthMin: z.strictObject({
-    min: z.number().positive(),
-    max: z.number().positive(),
-    gddRef: GddRef,
-  }),
+  targetLengthMin: z.strictObject({ min: z.number().positive(), max: z.number().positive(), gddRef: GddRef }),
+  /** Cards in the Pantry: Role cards left from the deal, Location cards drawn over the stations. */
+  pantry: z.strictObject({ roles: Count, locations: Count, gddRef: GddRef }),
   byCount: byPlayerCount(OnubCountRow),
   timers: z.strictObject({
     roleCardS: Seconds,
-    duskS: Seconds,
-    plateHoldS: Seconds,
+    prepS: Seconds,
+    /** Client-side: the baker walking into a station room. */
+    stationTransitionS: Seconds,
+    /** Client-side: a Done control appears after this long in a mini-game. */
+    minigameAssistS: Seconds,
+    prepRevealS: Seconds,
     fadeS: Seconds,
     windowJitterMaxS: Seconds,
     dawnS: Seconds,
+    rushS: Seconds,
     voteS: Seconds,
     revealS: Seconds,
-    /** Sleepers in the loft hear a fake noise pulse every min..max s, generated client-side. */
+    /** The lights-out screen plays a muffled noise every min..max s, generated client-side. */
     sleeperPulseMinS: Seconds,
     sleeperPulseMaxS: Seconds,
     gddRef: GddRef,
   }),
-  actRangeTiles: Tiles,
+  prep: z.strictObject({ endsWhenAllCommitted: z.boolean(), gddRef: GddRef }),
+  /** The four stations in overview order. */
+  stations: z.array(OnubStation).min(1),
+  cards: z.record(Id, OnubCard),
+  ruin: z.strictObject({ weight: Count, goodCancels: z.number().int().nonnegative(), gddRef: GddRef }),
   acts: z.record(OnubActId, OnubAct),
   windows: z.array(OnubWindow).min(1),
+  rules: z.strictObject({ critiqueCopies: z.boolean(), gddRef: GddRef }),
   vote: z.strictObject({
     skipAllowed: z.boolean(),
+    pantryTarget: z.boolean(),
     selfVoteAllowed: z.boolean(),
+    /** In the vote phase (CRUST) only: the Rush always runs `rushS`. */
     endsWhenAllVoted: z.boolean(),
-    /** Nobody is turned out unless the top count reaches this. */
-    minVotesToTurnOut: z.number().int().positive(),
+    /** Nobody goes in unless the top count reaches this. */
+    minVotesToTurnOut: Count,
     tiesTurnOutAll: z.boolean(),
-    gamekeeperHops: z.number().int().nonnegative(),
+    /** Seats a `dragVote` card in the oven pulls in after it. */
+    critiqueHops: z.number().int().nonnegative(),
     gddRef: GddRef,
   }),
-  winners: z.array(WinnerRow).min(1),
+  claims: z.strictObject({ maxSaw: z.number().int().nonnegative(), gddRef: GddRef }),
+  /** First row that holds wins; the last row must match every dawn the earlier rows leave. */
+  winners: z.array(OnubWinnerRow).min(1),
+  npc: z.strictObject({
+    sabotageChance: ByLevel,
+    smartVoteChance: ByLevel,
+    claimTruthChance: z.strictObject({
+      baker: z.number().min(0).max(1),
+      mold: z.number().min(0).max(1),
+      croissant: z.number().min(0).max(1),
+    }),
+    /** Seconds after prep opens. */
+    commitS: Range,
+    /** Fractions of the NPC's own window. */
+    actFrac: Range,
+    /** Fractions of `rushS`. */
+    claimFrac: Range,
+    /** Fractions of `rushS + voteS`. */
+    voteFrac: Range,
+    gddRef: GddRef,
+  }),
 });
 export type OnubBalanceFile = z.infer<typeof OnubBalanceFile>;

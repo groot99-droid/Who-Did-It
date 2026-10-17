@@ -58,8 +58,10 @@ vi.mock('@colyseus/sdk', () => {
       get: () => ({
         onAdd: noop,
         onRemove: noop,
-        onChange: (_instance: object, handler: () => void) => {
-          hoisted.changes.push(handler);
+        // `onChange(instance, handler)` or, for a collection field, `onChange(instance, prop, handler)`.
+        onChange: (_instance: object, a: string | (() => void), b?: () => void) => {
+          const handler = typeof a === 'function' ? a : b;
+          if (handler) hoisted.changes.push(handler);
           return () => undefined;
         },
         listen: (prop: string, handler: (value: unknown) => void) => {
@@ -170,13 +172,23 @@ describe('ColyseusNetwork', () => {
   it('keeps the lobby settings in sync with state.settings', async () => {
     const net = new ColyseusNetwork();
     await net.create('Ada');
-    expect(net.snapshot?.settings).toEqual({ mode: 'main', npcDifficulty: 'normal', npcSeats: 0 });
+    expect(net.snapshot?.settings).toEqual({
+      mode: 'main',
+      npcDifficulty: 'normal',
+      npcSeats: 0,
+      onubDeck: [],
+    });
 
-    const settings = { mode: 0, npcDifficulty: 1, npcSeats: 0 };
+    const settings = { mode: 0, npcDifficulty: 1, npcSeats: 0, onubDeck: [] as string[] };
     hoisted.listeners.get('settings')?.(settings);
-    Object.assign(settings, { mode: 1, npcDifficulty: 2, npcSeats: 3 });
+    Object.assign(settings, { mode: 1, npcDifficulty: 2, npcSeats: 3, onubDeck: ['chef', 'aboyeur'] });
     for (const change of hoisted.changes) change();
-    expect(net.snapshot?.settings).toEqual({ mode: 'onub', npcDifficulty: 'hard', npcSeats: 3 });
+    expect(net.snapshot?.settings).toEqual({
+      mode: 'onub',
+      npcDifficulty: 'hard',
+      npcSeats: 3,
+      onubDeck: ['chef', 'aboyeur'],
+    });
   });
 
   it('sends the settings and NPC messages without naming a seat', async () => {
@@ -187,9 +199,11 @@ describe('ColyseusNetwork', () => {
     net.setNpcDifficulty('easy');
     net.addNpc();
     net.removeNpc();
+    net.setOnubDeck(['chef']);
     expect(send).toHaveBeenNthCalledWith(1, 'lobby.settings', { mode: 1 });
     expect(send).toHaveBeenNthCalledWith(2, 'lobby.settings', { npcDifficulty: 0 });
     expect(send).toHaveBeenNthCalledWith(3, 'lobby.addNpc', {});
     expect(send).toHaveBeenNthCalledWith(4, 'lobby.removeNpc', {});
+    expect(send).toHaveBeenNthCalledWith(5, 'lobby.settings', { onubDeck: ['chef'] });
   });
 });

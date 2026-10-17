@@ -3,15 +3,11 @@ import { REG_MEETING, type MeetingFeed } from './meeting';
 import { ColyseusMeetingFeed } from './meetingColyseus';
 import type { MockNetwork } from './mock';
 import type { MockMeetingRequest } from './mock/meetingMock';
+import { MockOnubFeed } from './mock/onubMock';
 import type { NetworkService, Room } from './NetworkService';
-import {
-  REG_INPUT,
-  REG_ROLE_CHIP,
-  REG_WORLD,
-  type NightWindow,
-  type SceneEnter,
-  type WorldFeed,
-} from './world';
+import type { OnubFeed } from './onub';
+import { installOnubRouter } from './onubRouter';
+import { REG_INPUT, REG_ROLE_CHIP, REG_WORLD, type SceneEnter, type WorldFeed } from './world';
 import { ColyseusWorldFeed } from './worldColyseus';
 
 // Glue between the network (NetworkService, the world feed, the meeting feed) and the scenes. The router is
@@ -20,26 +16,32 @@ import { ColyseusWorldFeed } from './worldColyseus';
 //   sceneEnter while no meeting is open   -> (re)start World for that scene
 //   meetingStart                          -> sleep World, launch Meeting
 //   sceneEnter after meetingStart         -> stop Meeting, start World (the reveal is over)
-//   gameOver                              -> stop World, Loft and Meeting, start GameOver
+//   gameOver                              -> stop World, Kitchen, Night and Meeting, start GameOver
 //   phase back to lobby                   -> start Lobby
 //
-// Quick mode (GDD 3.11, A39) adds the loft:
-//
-//   nightSleep                            -> stop World, start Loft (the seat sleeps)
-//   nightWake                             -> stop Loft, start World in the bakery (no sceneEnter comes with it)
-//   meetingStart                          -> also stops Loft, as it sleeps World
+// Quick mode (GDD 3.11, round-5 contract 5.2) never starts World: a quick-mode feed gets the ONUB routes of
+// `onubRouter.ts` (Kitchen in dusk and prepReveal, Night in the night and dawn), published under `REG_ONUB`;
+// meetingStart also stops Kitchen and Night, and the meeting, game over and lobby routes above stay as they are.
 
 export interface RouterOptions {
   mock: boolean;
 }
 
 const LOBBY_SCREENS = ['Landing', 'Lobby'];
-
-/** The quick-mode bakery: every window wakes a seat at its `door` spawn, facing north (scenes/bakery.json). */
-const BAKERY = 'bakery';
+/** Every in-match scene, taken down at the return to the lobby or a lost connection. */
+const MATCH_SCENES = ['Meeting', 'GameOver', 'World', 'Kitchen', 'Night', 'RoleReveal'];
 
 /** `Phase.lobby` of the schema; the client does not import the schema runtime, so the one id it needs is here. */
 const PHASE_LOBBY = 0;
+/** `GameMode.onub` of the schema (`state.settings.mode`). */
+const MODE_ONUB = 1;
+
+/**
+ * The live quick-mode feed of a room. Session 5D's `ColyseusOnubFeed` (`net/onubColyseus.ts`) is wired here at
+ * integration (`new ColyseusOnubFeed(room)`); until then a live room has no ONUB feed, the lobby offers the
+ * mode only with `?onub=1`, and the server refuses a quick-mode Start.
+ */
+const liveOnubFeed = (_room: Room): OnubFeed | null => null;
 
 export function installWorldRouter(
   game: Phaser.Game,
@@ -49,6 +51,7 @@ export function installWorldRouter(
   const stops: Array<() => void> = [];
   let world: WorldFeed | null = null;
   let meeting: MeetingFeed | null = null;
+  let onub: { feed: OnubFeed; uninstall: () => void } | null = null;
   let meetingOpen = false;
   /** Mock only: the mock world is dealt once per match; the return to the lobby clears this. */
   let mockStarted = false;
@@ -72,7 +75,6 @@ export function installWorldRouter(
     // is not stopped: it sleeps itself and keeps the card's DOM so Tab can reopen it during play.
     for (const key of LOBBY_SCREENS) stopScene(key);
     stopScene('GameOver');
-    stopScene('Loft');
     game.scene.start('World', data);
     net.bus.emit('sceneEnter', data);
   };
@@ -81,7 +83,8 @@ export function installWorldRouter(
     meetingOpen = true;
     stopInput();
     if (game.scene.isActive('World')) game.scene.sleep('World');
-    stopScene('Loft');
+    stopScene('Kitchen');
+    stopScene('Night');
     stopScene('Meeting');
     game.scene.start('Meeting');
   };
@@ -90,23 +93,10 @@ export function installWorldRouter(
     meetingOpen = false;
     stopScene('Meeting');
     stopScene('World');
-    stopScene('Loft');
+    stopScene('Kitchen');
+    stopScene('Night');
     stopScene('RoleReveal');
     game.scene.start('GameOver');
-  };
-
-  const onNightSleep = () => {
-    if (meetingOpen) return;
-    stopInput();
-    stopScene('World');
-    stopScene('Loft');
-    game.scene.start('Loft');
-  };
-
-  const onNightWake = (data: NightWindow) => {
-    if (meetingOpen) return;
-    stopScene('Loft');
-    game.scene.start('World', { sceneId: BAKERY, spawn: data.spawn, facing: 'n' } satisfies SceneEnter);
   };
 
   const onPhaseChange = ({ phase }: { phase: number }) => {
@@ -117,8 +107,9 @@ export function installWorldRouter(
       mockStarted = false;
       world?.dispose();
       world = null;
+      dropOnub();
     }
-    for (const key of ['Meeting', 'GameOver', 'World', 'Loft', 'RoleReveal']) stopScene(key);
+    for (const key of MATCH_SCENES) stopScene(key);
     if (!game.scene.isActive('Lobby') && !game.scene.isActive('Landing')) game.scene.start('Lobby');
   };
 
@@ -127,8 +118,18 @@ export function installWorldRouter(
     world = next;
     game.registry.set(REG_WORLD, next);
     next.bus.on('sceneEnter', onWorldEnter);
-    next.bus.on('nightSleep', onNightSleep);
-    next.bus.on('nightWake', onNightWake);
+  };
+
+  /** A quick-mode feed: its routes run while `quick()` holds (always for the mock, the room's mode when live). */
+  const publishOnub = (next: OnubFeed, quick: () => boolean) => {
+    dropOnub();
+    onub = { feed: next, uninstall: installOnubRouter(game, next, { quick }) };
+  };
+
+  const dropOnub = () => {
+    onub?.uninstall();
+    onub?.feed.dispose();
+    onub = null;
   };
 
   const publishMeeting = (next: MeetingFeed) => {
@@ -143,6 +144,7 @@ export function installWorldRouter(
   const dropFeeds = () => {
     world?.dispose();
     meeting?.dispose();
+    dropOnub();
     world = null;
     meeting = null;
     meetingOpen = false;
@@ -158,7 +160,7 @@ export function installWorldRouter(
   const onLeft = () => {
     if (game.scene.isActive('Lobby') || game.scene.isActive('Landing')) return;
     dropFeeds();
-    for (const key of ['Meeting', 'GameOver', 'World', 'Loft', 'RoleReveal']) stopScene(key);
+    for (const key of MATCH_SCENES) stopScene(key);
     game.scene.start('Landing');
   };
   net.bus.on('left', onLeft);
@@ -166,6 +168,19 @@ export function installWorldRouter(
 
   if (options.mock) {
     const mock = net as unknown as MockNetwork;
+    const selfName = () => net.snapshot?.players.find((p) => p.id === net.snapshot?.selfId)?.name;
+    // Quick mode: the scripted ONUB match (in the bundle already, the mock network deals its card); its dawn
+    // opens the mock Morning Rush on the mock meeting feed.
+    const startOnub = () => {
+      const feedMock = new MockOnubFeed({
+        selfName: selfName(),
+        onRefuse: (code, msg) => net.bus.emit('error', { code, msg }),
+        onDawnEnd: () => mock.openMeeting({ reason: 'dawn', callerId: '' }),
+      });
+      publishOnub(feedMock, () => true);
+      mock.bindOnub(feedMock, publishMeeting);
+      feedMock.start();
+    };
     // The mock lobby has no world; start one when the player confirms the role card (the card's
     // Ready sends `lobby.ready {ready: true}` while a card is held; the lobby's toggle has no card yet).
     const send = net.send.bind(net);
@@ -174,11 +189,9 @@ export function installWorldRouter(
       const ready = (payload as { ready?: boolean } | undefined)?.ready === true;
       if (type === 'lobby.ready' && ready && net.roleCard !== null && !mockStarted) {
         mockStarted = true;
+        if (net.snapshot?.settings.mode === 'onub') return startOnub();
         void import('./mock/worldMock').then(async (m) => {
-          const feedMock = new m.MockWorldFeed(
-            await m.loadMockContent(),
-            net.snapshot?.players.find((p) => p.id === net.snapshot?.selfId)?.name,
-          );
+          const feedMock = new m.MockWorldFeed(await m.loadMockContent(), selfName());
           publishWorld(feedMock);
           mock.bindWorld(feedMock, publishMeeting);
           feedMock.bus.on('meetingRequest', (req) => mock.openMeeting(req));
@@ -202,6 +215,14 @@ export function installWorldRouter(
       if ((world as ColyseusWorldFeed | null)?.sessionRoom === room) return;
       publishWorld(new ColyseusWorldFeed(room));
       publishMeeting(new ColyseusMeetingFeed(room));
+      // Built with the room, like the other feeds, so it hears every message; it routes only in quick mode.
+      const live = liveOnubFeed(room);
+      if (live === null) dropOnub();
+      else
+        publishOnub(
+          live,
+          () => (room.state as { settings?: { mode?: number } }).settings?.mode === MODE_ONUB,
+        );
     };
     net.bus.on('room', attach);
     stops.push(() => net.bus.off('room', attach));

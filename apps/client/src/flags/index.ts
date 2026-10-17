@@ -7,6 +7,11 @@ export interface Flags {
   mock: boolean;
   /** `?mode=onub` makes the mocks play quick mode (GDD 3.11); the real server takes the lobby setting. */
   mode: 'main' | 'onub';
+  /**
+   * `?onub=1` offers the quick-mode toggle in a live lobby. Until ONUB v2 lands (round 5) the live lobby does
+   * not offer the mode without it; the mock lobby (`?mock=1`) always does.
+   */
+  onub: boolean;
   /** `#/join/CODE` deep link, already upper-cased. */
   joinCode: string | null;
   /** `#/lobby/CODE` lets a reload resume through the stored reconnection token. */
@@ -31,6 +36,7 @@ export function readFlags(search: string, hash: string): Flags {
     art: params.get('art') === 'placeholder' ? 'placeholder' : 'default',
     mock: params.get('mock') === '1',
     mode: params.get('mode') === 'onub' ? 'onub' : 'main',
+    onub: params.get('onub') === '1',
     joinCode: route[0] === 'join' ? code : null,
     resumeCode: route[0] === 'lobby' ? code : null,
   };

@@ -1,18 +1,9 @@
-import { balance, onubBalance, onubFor, onubRoles } from '@wdi/content';
-import {
-  Claim,
-  ErrorCode,
-  Phase,
-  type PlayerState,
-  S2C,
-  SKIP_VOTE,
-  resolveDawn,
-  resolveVotes,
-} from '@wdi/shared';
+import { balance, onubBalance } from '@wdi/content';
+import { ErrorCode, Phase, type PlayerState, S2C, SKIP_VOTE, resolveVotes } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { enterScene } from './Portals';
 import { countRow, factionOf, flowOf, refuse, roleIdOf, rolesOf, setPhase } from './Flow';
-import { finalRoleOf, isOnub, onubOf } from './Onub';
+import { isOnub } from './onub/state';
 import { type MeetingRequest, simOf } from './RoomSim';
 import { evaluateWin, endMatch, endOnubMatch } from './Win';
 
@@ -51,8 +42,6 @@ export function openMeeting(room: PartyRoom, req: MeetingRequest): void {
   m.missing.clear();
   m.board.clear();
   m.claims.clear();
-  m.traces.clear();
-  for (const line of onubOf(room)?.traces ?? []) m.traces.push(line);
   const flow = flowOf(room);
   flow.current = { round: state.round, reason: req.reason, votes: 0, correctVotes: 0 };
   flow.meetings.push(flow.current);
@@ -65,7 +54,7 @@ export function openMeeting(room: PartyRoom, req: MeetingRequest): void {
   setPhase(
     room,
     Phase.meetingDiscussion,
-    isOnub(room) ? onubFor(state.players.size).discussionS : countRow(state.players.size).discussionS,
+    isOnub(room) ? onubBalance.timers.rushS : countRow(state.players.size).discussionS,
   );
 }
 
@@ -153,49 +142,12 @@ function startReveal(room: PartyRoom): void {
 }
 
 /**
- * Quick mode (GDD 3.11): `resolveDawn` turns out everyone at the top, ties included; the turned-out are marked
- * dead with no `killed` message (`voteResult.outs` is the cue) and their final roles are named.
+ * Quick mode (GDD 3.11): the CRUST tally, the oven and the Critique's drag, `voteResult` with `outs`, `hop`,
+ * `pantryOut`, the final roles of `outs` and `abstained`, then `Phase.reveal` for `revealS` (5B). Stub until 5B
+ * lands: straight to the end of the match.
  */
 function startOnubReveal(room: PartyRoom): void {
-  const state = room.state;
-  const sim = simOf(room);
-  const flow = flowOf(room);
-  const o = onubOf(room);
-  const living = livingIds(room);
-  const cast: Record<string, string> = {};
-  for (const id of living) {
-    const vote = state.players.get(id)?.priv?.myVote ?? '';
-    if (vote !== '') cast[id] = vote;
-  }
-  const { tally, outs, abstained } = resolveDawn(cast, living, onubBalance.vote);
-  const counted = living.filter((id) => !abstained.includes(id));
-  const roles: Record<string, string> = {};
-  for (const id of outs) roles[id] = finalRoleOf(room, id);
-  if (o) {
-    o.votes = Object.fromEntries(counted.map((id) => [id, cast[id] as string]));
-    o.outs = outs;
-  }
-  const stat = flow.current;
-  if (stat) {
-    stat.votes = counted.length;
-    stat.correctVotes = counted.filter(
-      (id) => onubRoles.roles[finalRoleOf(room, cast[id] as string)]?.faction === 'cabal',
-    ).length;
-    const [first] = outs;
-    if (first !== undefined) {
-      stat.ejectedId = first;
-      stat.ejectedRole = roles[first] ?? '';
-      stat.ejectionCorrect = onubRoles.roles[roles[first] ?? '']?.faction === 'cabal';
-    }
-  }
-  setPhase(room, Phase.reveal, onubBalance.timers.revealS);
-  room.broadcast(S2C.voteResult, { tally, outs, roles, abstained });
-  for (const id of outs) {
-    const ps = sim.players.get(id);
-    if (ps) ps.dead = true;
-    const seat = state.players.get(id);
-    if (seat) seat.alive = false;
-  }
+  endOnubMatch(room);
 }
 
 /** After the reveal: the win check for an ejection, else the announced return to the square, immunity. */
@@ -230,32 +182,10 @@ export function runMeeting(room: PartyRoom): void {
 }
 
 /**
- * Quick mode (GDD 3.11): `meeting.claim` from a living seat in the discussion or the vote replaces the
- * seat's row on the meeting board. 422 in the main mode and for a claim naming an unknown role or seat,
- * 425 in any other phase (the reveal included).
+ * Quick mode (GDD 3.11): `meeting.claim` from a seat in play in the Rush or CRUST replaces the seat's claim on
+ * the meeting board (5B, contract 4.6). 422 in the main mode. Stub until 5B lands: refused 422 in quick mode too.
  */
 export function handleClaim(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
-  if (!isOnub(room)) return refuse(room, sessionId, ErrorCode.cannot, 'cannot claim');
-  const phase = room.state.phase;
-  if (phase !== Phase.meetingDiscussion && phase !== Phase.meetingVote) {
-    return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
-  }
-  const { roleId, targetId = '', sawRoleId = '' } = payload;
-  const known = (id: unknown): id is string => typeof id === 'string' && onubRoles.roles[id] !== undefined;
-  const valid =
-    isLiving(room, sessionId) &&
-    known(roleId) &&
-    typeof targetId === 'string' &&
-    (targetId === '' || room.state.players.has(targetId)) &&
-    (sawRoleId === '' || known(sawRoleId));
-  if (!valid) return refuse(room, sessionId, ErrorCode.cannot, 'bad claim');
-  const claim = new Claim();
-  claim.from = sessionId;
-  claim.roleId = roleId;
-  claim.targetId = targetId;
-  claim.sawRoleId = sawRoleId as string;
-  const claims = room.state.meeting.claims;
-  const at = claims.findIndex((c) => c.from === sessionId);
-  if (at >= 0) claims[at] = claim;
-  else claims.push(claim);
+  void payload;
+  refuse(room, sessionId, ErrorCode.cannot, 'cannot claim');
 }

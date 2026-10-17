@@ -2,7 +2,6 @@ import mitt, { type Emitter } from 'mitt';
 import type { Room } from '@colyseus/sdk';
 import type {
   ChatLine,
-  ClaimRow,
   MatchMode,
   GameOver,
   MeetingFeed,
@@ -32,10 +31,7 @@ interface GameStateLike {
     forEach(cb: (p: PlayerState, id: string) => void): void;
     get(id: string): PlayerState | undefined;
   };
-  meeting?: MeetingInfo & {
-    claims?: { forEach(cb: (c: ClaimRow) => void): void };
-    traces?: { forEach(cb: (line: string) => void): void };
-  };
+  meeting?: MeetingInfo;
   settings?: { mode?: number };
 }
 
@@ -138,20 +134,6 @@ export class ColyseusMeetingFeed implements MeetingFeed {
     return this.final;
   }
 
-  claims(): readonly ClaimRow[] {
-    const out: ClaimRow[] = [];
-    this.state.meeting?.claims?.forEach((c) =>
-      out.push({ from: c.from, roleId: c.roleId, targetId: c.targetId, sawRoleId: c.sawRoleId }),
-    );
-    return out;
-  }
-
-  traces(): readonly string[] {
-    const out: string[] = [];
-    this.state.meeting?.traces?.forEach((line) => out.push(line));
-    return out;
-  }
-
   lines(): readonly ChatLine[] {
     return this.log;
   }
@@ -162,14 +144,6 @@ export class ColyseusMeetingFeed implements MeetingFeed {
 
   say(text: string): void {
     this.room.send('chat.say', { text });
-  }
-
-  claim(roleId: string, targetId?: string, sawRoleId?: string): void {
-    this.room.send('meeting.claim', {
-      roleId,
-      ...(targetId === undefined || targetId === '' ? {} : { targetId }),
-      ...(sawRoleId === undefined || sawRoleId === '' ? {} : { sawRoleId }),
-    });
   }
 
   dispose(): void {

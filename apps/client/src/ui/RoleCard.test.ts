@@ -46,7 +46,7 @@ describe('quick-mode card', () => {
   });
 
   it('names a quick-mode role through roles.onub.json', () => {
-    expect(roleTitle('sinEater', 'onub')).toBe('Sin-Eater');
-    expect(roleTitle('sinEater')).toBe('SinEater');
+    expect(roleTitle('sousChef', 'onub')).toBe(onubRoles.roles.sousChef.name);
+    expect(roleTitle('sousChef')).toBe('SousChef');
   });
 });

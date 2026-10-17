@@ -1,10 +1,11 @@
 import balanceJson from '@wdi/content/data/balance.json';
 import onubBalanceJson from '@wdi/content/data/balance.onub.json';
-import type { LobbySnapshot } from '../net/NetworkService';
+import type { LobbySnapshot, NetworkService } from '../net/NetworkService';
 import { type GameModeId, MAX_PLAYERS, MIN_PLAYERS_TO_START, type NpcLevelId } from '../net/protocol';
 import { joinLink } from '../flags';
 import { LOBBY_COPY as C, fill } from './copy';
 import { h, icon, type Screen } from './dom';
+import { mountDeckEditor } from './lobby/DeckEditor';
 
 const { npc, players: seatRange } = balanceJson;
 const { min: lengthMin, max: lengthMax } = onubBalanceJson.targetLengthMin;
@@ -27,6 +28,13 @@ export function modeChipText(mode: GameModeId): string {
 }
 
 export interface LobbyOptions {
+  /** The network the deck editor sends `lobby.settings {onubDeck}` through. */
+  net: NetworkService;
+  /**
+   * Offer the leader the quick-mode toggle. Until ONUB v2 lands (round 5) a live lobby offers it only with
+   * `?onub=1`; the mock lobby always does.
+   */
+  offerOnub: boolean;
   onStart(): void;
   onReady(ready: boolean): void;
   onLeave(): void;
@@ -115,6 +123,8 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     ),
     difficultyHint,
   );
+  // The quick-mode deck editor (GDD 3.11, Session 5C) under the settings.
+  const deckEditor = mountDeckEditor(settingsBlock, opts.net);
   const actions = h('div', { class: 'wdi-row' }, start, readyBtn, leave);
 
   let snapshot: LobbySnapshot | null = null;
@@ -254,7 +264,8 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     start.hidden = !isLeader;
     const { mode, npcSeats, npcDifficulty } = next.settings;
     modeChip.textContent = modeChipText(mode);
-    modeToggle.hidden = !isLeader;
+    // Without the offer the toggle still shows in quick mode, so a leader can always return to the main mode.
+    modeToggle.hidden = !isLeader || (!opts.offerOnub && mode !== 'onub');
     modeToggle.textContent = mode === 'onub' ? C['lobby.mode.toMain'] : C['lobby.mode.toOnub'];
     addNpc.hidden = !isLeader || next.players.length >= MAX_PLAYERS;
     removeNpc.hidden = !isLeader || npcSeats === 0;
@@ -267,6 +278,7 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
       : next.players.length < MIN_PLAYERS_TO_START
         ? fill(C['lobby.hint.fill'], { min: MIN_PLAYERS_TO_START })
         : C['lobby.hint.go'];
+    deckEditor.update(next);
   };
 
   return {
@@ -274,6 +286,7 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     destroy: () => {
       document.removeEventListener('keydown', onKey);
       dialog?.remove();
+      deckEditor.destroy();
       el.remove();
     },
   };

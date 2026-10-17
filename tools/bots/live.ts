@@ -4,7 +4,8 @@
 // sceneEnter. Exits 1 on any failure, so it can gate a playtest.
 //
 // `--mode onub` plays quick mode through the role cards and into dusk: the leader sets the mode, and every
-// seat must get its card, the bakery sceneEnter and the dusk phase (GDD 3.11).
+// seat must get its card and the dusk phase (GDD 3.11). Quick mode sends no sceneEnter: every seat sits in the
+// loft pseudo-scene from dusk on.
 //
 //   pnpm bots:live -- --url https://who-did-it-production.up.railway.app [--count 5] [--timeout 30]
 //        [--mode main|onub]
@@ -24,7 +25,7 @@ export interface LiveResult {
   code: string;
   seats: number;
   cards: number;
-  /** Seats that entered the first scene of the mode: the overworld, or the bakery in quick mode. */
+  /** Seats that entered the overworld; 0 in quick mode, which sends no sceneEnter. */
   entered: number;
   /** Quick mode: seats that saw the dusk phase. Equals `seats` when the run is complete; 0 otherwise. */
   dusk: number;
@@ -100,23 +101,23 @@ export async function runLive(opts: LiveOptions): Promise<LiveResult> {
   }
   leader.send('lobby.start', {});
 
-  const first = quick ? 'bakery' : 'overworld';
   let cards = 0;
   let entered = 0;
   let dusk = 0;
   try {
     await withTimeout(Promise.all(seats.map((s) => s.card.then(() => cards++))), ms, 'every role card');
-    await withTimeout(
-      Promise.all(
-        seats.map((s) =>
-          s.entered.then((sceneId) => {
-            if (sceneId === first) entered++;
-          }),
+    if (!quick)
+      await withTimeout(
+        Promise.all(
+          seats.map((s) =>
+            s.entered.then((sceneId) => {
+              if (sceneId === 'overworld') entered++;
+            }),
+          ),
         ),
-      ),
-      ms,
-      'every sceneEnter',
-    );
+        ms,
+        'every sceneEnter',
+      );
     if (quick)
       await withTimeout(
         Promise.all(
@@ -157,11 +158,10 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     const r = await runLive(opts);
     const quick = opts.mode === 'onub';
     const ok =
-      r.cards === r.seats && r.entered === r.seats && (!quick || r.dusk === r.seats) && r.errors.length === 0;
+      r.cards === r.seats && (quick ? r.dusk === r.seats : r.entered === r.seats) && r.errors.length === 0;
     console.log(
       `[live] ${opts.url} build ${r.build}: party ${r.code}, ${r.seats} seats, ${r.cards} role cards, ` +
-        `${r.entered} entered the ${quick ? 'bakery' : 'overworld'}` +
-        (quick ? `, ${r.dusk} in dusk` : '') +
+        (quick ? `${r.dusk} in dusk` : `${r.entered} entered the overworld`) +
         (r.errors.length ? `, errors: ${r.errors.join('; ')}` : ''),
     );
     process.exit(ok ? 0 : 1);

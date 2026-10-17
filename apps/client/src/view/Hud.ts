@@ -80,8 +80,6 @@ export class Hud {
   private readonly promptText: HTMLElement;
   private readonly promptKey: HTMLElement;
   private readonly fps: HTMLElement;
-  private readonly banner: HTMLElement;
-  private readonly reveals: HTMLElement;
   private readonly timers = new Set<number>();
 
   constructor(
@@ -115,8 +113,6 @@ export class Hud {
       this.clockPhase,
     );
     this.log = h('div', { class: 'wdi-log', role: 'log' });
-    this.banner = h('div', { class: 'wdi-toast wdi-toast--warm', 'data-testid': 'night-wake', hidden: true });
-    this.reveals = h('div', { class: 'wdi-log', 'data-testid': 'night-reveal' });
     this.fps = h('pre', { class: 'wdi-hud-fps', 'data-testid': 'hud-fps', hidden: true });
     this.promptText = h('span');
     this.promptKey = h('kbd', { class: 'wdi-kbd wdi-toast__kbd' }, 'E');
@@ -131,8 +127,8 @@ export class Hud {
       'div',
       { class: 'wdi-root wdi-hud', 'data-testid': 'hud' },
       h('div', { class: 'wdi-hud__tl' }, this.chip, this.notebookBtn),
-      h('div', { class: 'wdi-hud__tc' }, this.clock, this.banner),
-      h('div', { class: 'wdi-hud__tr' }, this.log, this.reveals, this.fps),
+      h('div', { class: 'wdi-hud__tc' }, this.clock),
+      h('div', { class: 'wdi-hud__tr' }, this.log, this.fps),
       this.toasts,
     );
     parent.append(this.root);
@@ -199,17 +195,6 @@ export class Hud {
   edgeCue(x: number, y: number, angle: number, label: string, ms = 1800): void {
     const cue = edgeCue(this.root, this.base, x, y, angle, label);
     this.later(() => cue.remove(), ms);
-  }
-
-  /** Quick mode: the open window's banner ("Your watch: Sin-Eater"); `null` hides it. */
-  setBanner(text: string | null): void {
-    this.banner.hidden = text === null;
-    if (text !== null && this.banner.textContent !== text) this.banner.textContent = text;
-  }
-
-  /** Quick mode: what the night act showed, kept on screen until the window ends. */
-  setReveals(lines: string[]): void {
-    this.reveals.replaceChildren(...lines.map((l) => h('p', { class: 'wdi-log__line' }, l)));
   }
 
   setFps(text: string | null): void {

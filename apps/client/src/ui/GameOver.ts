@@ -1,8 +1,9 @@
-import type { GameOver, MeetingPlayer, OnubGameOver } from '../net/meeting';
+import type { GameOver, MeetingPlayer } from '../net/meeting';
 import { fill } from './copy';
 import { MEETING_COPY as C } from './copy/meeting';
 import { h, icon, type Screen } from './dom';
-import { FACTION_LABEL, factionOf, swapLogLine, voteLines, winnerLine } from './meetingText';
+import { FACTION_LABEL, factionOf, winnerLine } from './meetingText';
+import { renderOnubOver } from './onub/over';
 import { roleTitle } from './RoleCard';
 
 export interface GameOverOptions {
@@ -26,57 +27,14 @@ function won(over: GameOver, id: string, roleId: string): boolean {
   return (
     (over.winner === 1 && faction === 'village') ||
     (over.winner === 2 && faction === 'cabal') ||
-    (over.winner === 3 && roleId === 'drifter') ||
-    (over.winner === 4 && roleId === 'debtor')
-  );
-}
-
-/** The quick-mode extras under the role list: the dead's loaves, the night as a timeline, the vote arrows. */
-function onubDetails(onub: OnubGameOver, seatIds: string[], nameOf: (id: string) => string): HTMLElement {
-  const swaps =
-    onub.swapLog.length === 0
-      ? [h('li', { class: 'wdi-muted' }, C['over.swap.none'])]
-      : [...onub.swapLog]
-          .sort((a, b) => a.order - b.order)
-          .map((e) => h('li', {}, swapLogLine(e, onub, nameOf)));
-  return h(
-    'div',
-    { class: 'wdi-stack wdi-over__onub' },
-    h(
-      'section',
-      { class: 'wdi-stack wdi-stack--tight', 'data-testid': 'gameover-center' },
-      h('h2', { class: 'wdi-eyebrow' }, C['over.center']),
-      h(
-        'ul',
-        { class: 'wdi-row wdi-row--wrap' },
-        ...onub.center.map((roleId, i) =>
-          h('li', { class: 'wdi-chip', 'data-testid': `gameover-center-${i}` }, roleTitle(roleId, 'onub')),
-        ),
-      ),
-    ),
-    h(
-      'section',
-      { class: 'wdi-stack wdi-stack--tight' },
-      h('h2', { class: 'wdi-eyebrow' }, C['over.swap.title']),
-      h('ol', { class: 'wdi-timeline', 'data-testid': 'swaplog' }, ...swaps),
-    ),
-    h(
-      'section',
-      { class: 'wdi-stack wdi-stack--tight' },
-      h('h2', { class: 'wdi-eyebrow' }, C['over.votes.title']),
-      h(
-        'ul',
-        { class: 'wdi-stack wdi-stack--tight', 'data-testid': 'gameover-votes' },
-        ...voteLines(onub, seatIds, nameOf).map((line) => h('li', {}, line)),
-      ),
-    ),
+    (over.winner === 3 && roleId === 'drifter')
   );
 }
 
 /**
  * The end-of-match reveal: the winner, every seat's role and faction, the server's summary. This is the one
- * place a faction is shown for other players (theme README, "Faction secrecy"). Quick mode adds the dealt
- * and final role of every seat, the dead's loaves, the swap log and the vote.
+ * place a faction is shown for other players (theme README, "Faction secrecy"). Quick mode adds the end panel
+ * of `ui/onub/over.ts` (Session 5D) under the role list.
  */
 export function mountGameOver(root: HTMLElement, opts: GameOverOptions): GameOverScreen {
   const { over } = opts;
@@ -86,8 +44,6 @@ export function mountGameOver(root: HTMLElement, opts: GameOverOptions): GameOve
   const countdown = h('p', { class: 'wdi-hint', 'data-testid': 'gameover-countdown', role: 'timer' });
   const rows = Object.entries(over.roles).map(([id, finalRole]) => {
     const player = opts.roster.find((p) => p.id === id);
-    // Quick mode: the row keeps the dealt role (`gameover-role-<id>`) and adds the final one beside it.
-    const shown = onub?.dealt[id] ?? finalRole;
     const faction = factionOf(finalRole, mode);
     const winner = won(over, id, finalRole);
     const tag = id === opts.selfId ? (winner ? C['over.you.won'] : C['over.you.lost']) : null;
@@ -108,28 +64,20 @@ export function mountGameOver(root: HTMLElement, opts: GameOverOptions): GameOve
           player?.name ?? 'Someone',
           id === opts.selfId && ` ${C['over.you']}`,
         ),
-        h('span', { class: 'wdi-roster__meta' }, roleTitle(shown, mode)),
-        onub !== undefined &&
-          h(
-            'span',
-            { class: 'wdi-roster__meta wdi-over__final', 'data-testid': `gameover-final-${id}` },
-            `${C['over.row.arrow']} ${roleTitle(finalRole, mode)}`,
-          ),
+        h('span', { class: 'wdi-roster__meta' }, roleTitle(finalRole, mode)),
       ),
       h(
         'span',
         { class: 'wdi-roster__tags' },
         tag !== null &&
           h('span', { class: `wdi-chip ${winner ? 'wdi-chip--ready' : 'wdi-chip--quiet'}` }, tag),
-        onub !== undefined &&
-          winner &&
-          tag === null &&
-          h('span', { class: 'wdi-chip wdi-chip--ready' }, C['over.winner.mark']),
         h('span', { class: 'wdi-chip' }, icon(`icons/icon_faction_${faction}`), FACTION_LABEL[faction]),
       ),
     );
   });
   const leave = h('button', { type: 'button', class: 'wdi-btn wdi-btn--ghost' }, C['over.leave']);
+  const onubPanel = h('div', { class: 'wdi-stack wdi-over__onub' });
+  if (onub !== undefined) renderOnubOver(onubPanel, onub, nameOf);
   leave.addEventListener('click', opts.onLeave);
 
   const el = h(
@@ -148,7 +96,7 @@ export function mountGameOver(root: HTMLElement, opts: GameOverOptions): GameOve
     over.summary !== '' && h('p', { class: 'wdi-muted', 'data-testid': 'gameover-summary' }, over.summary),
     h('h2', { class: 'wdi-eyebrow' }, C['over.roles']),
     h('ul', { class: 'wdi-roster' }, ...rows),
-    onub !== undefined && onubDetails(onub, Object.keys(over.roles), nameOf),
+    onub !== undefined && onubPanel,
     h('div', { class: 'wdi-row wdi-row--between' }, countdown, leave),
   );
   root.append(el);

@@ -3,7 +3,7 @@
 // what the Playwright match spec and the soak drive (ARCHITECTURE 5.12).
 //
 //   pnpm bots -- --code ABCDE --count 6 [--url http://localhost:2567] [--prefix Bot]
-//        [--vote skip|leader|random|other|<name>] [--report] [--walk] [--claims]
+//        [--vote skip|leader|random|other|<name>] [--report] [--walk]
 import { Client, type Room } from '@colyseus/sdk';
 import { BUILD_VERSION, type JoinOptions } from '@wdi/shared';
 import { fileURLToPath } from 'node:url';
@@ -89,7 +89,7 @@ export function parseArgs(argv: string[]): SwarmOptions {
   const code = get('--code');
   if (!code || !/^[A-Za-z0-9]{5}$/.test(code))
     throw new Error(
-      'usage: --code ABCDE --count 6 [--url URL] [--prefix Bot] [--vote V] [--report] [--walk] [--claims]',
+      'usage: --code ABCDE --count 6 [--url URL] [--prefix Bot] [--vote V] [--report] [--walk]',
     );
   const count = Number(get('--count') ?? 4);
   if (!Number.isInteger(count) || count < 1 || count > 9) throw new Error('--count must be 1 to 9');
@@ -101,7 +101,6 @@ export function parseArgs(argv: string[]): SwarmOptions {
     vote: get('--vote') ?? 'skip',
     report: argv.includes('--report'),
     walk: argv.includes('--walk'),
-    claims: argv.includes('--claims'),
   };
 }
 

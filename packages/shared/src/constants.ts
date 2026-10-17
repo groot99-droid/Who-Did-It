@@ -47,16 +47,43 @@ export const NotebookStatus = {
 } as const;
 
 /**
- * Quick mode (GDD 3.11, A39): sleepers are moved to the `loft` pseudo-scene, index 255 in
- * `Player.sceneId`, which has no SceneState and encodes no presence. It is not a content scene.
+ * Quick mode (GDD 3.11): every ONUB seat sits in the `loft` pseudo-scene, index 255 in `Player.sceneId`, from
+ * prep to the lobby reset, so the server encodes no presence for anyone; it has no SceneState and is not a
+ * content scene. The name is the round-4 one; nothing in ONUB v2 draws a loft.
  */
 export const LOFT_SCENE_ID = 'loft';
 export const LOFT_SCENE_INDEX = 255;
 
 /** Quick-mode act ids (`act.ability`) start with this prefix (ARCHITECTURE 5.14). */
 export const ONUB_ACT_PREFIX = 'onub.';
-/** The dusk plate-setting act (GDD 3.11): not a night window act, so not in `balance.onub.json` acts. */
-export const ONUB_SET_PLATE = 'onub.setPlate';
+/**
+ * The Evening Prep commit (GDD 3.11): `act.ability {abilityId: ONUB_PREP, targets: [stationId, cardId]}`, once
+ * per seat in `Phase.dusk`. Not a night act, so not in `balance.onub.json` `acts`.
+ */
+export const ONUB_PREP = 'onub.prep';
+/**
+ * The night act ids of GDD 3.11, exactly the keys of `balance.onub.json` `acts` (a server test asserts it).
+ * Each window's acts and their rules are content; these names exist so code can switch on them.
+ */
+export const ONUB_ACTS = {
+  cloche: 'onub.cloche',
+  sporePeek: 'onub.sporePeek',
+  peekLoc: 'onub.peekLoc',
+  vent: 'onub.vent',
+  peekRole: 'onub.peekRole',
+  peekPantry: 'onub.peekPantry',
+  peekLocs: 'onub.peekLocs',
+  rob: 'onub.rob',
+  laminatePeek: 'onub.laminatePeek',
+  laminateSwap: 'onub.laminateSwap',
+  drunk: 'onub.drunk',
+  dishRoles: 'onub.dishRoles',
+  dishLocs: 'onub.dishLocs',
+  inspect: 'onub.inspect',
+} as const;
+export type OnubActName = (typeof ONUB_ACTS)[keyof typeof ONUB_ACTS];
+/** The Pantry as a `meeting.vote` target and a claim target (GDD 3.11); never a seat id. */
+export const PANTRY_VOTE = 'pantry';
 
 /** `Settings.npcDifficulty` values, in the order of balance.json `npc.difficulty` (GDD 3.12). */
 export const NpcLevel = { easy: 0, normal: 1, hard: 2 } as const;

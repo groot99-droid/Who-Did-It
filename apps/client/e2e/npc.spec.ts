@@ -8,7 +8,7 @@ import { E2E_SERVER_URL } from './env';
 // lets Start fill the party; nothing on the page marks a seat as an NPC, so the specs read names from the
 // player list and positions from a standing bot's state (never the server-only name pool). It needs the
 // NPC server (S), the lobby (V) and the match flow, so it runs only with WDI_E2E_NPC=1; the quick-mode
-// case also needs R, T and U. The server runs with WDI_DEBUG=1 (playwright.config.ts).
+// case is skipped until Session 5E rewrites it. The server runs with WDI_DEBUG=1 (playwright.config.ts).
 test.skip(
   process.env.WDI_E2E_NPC !== '1',
   'needs the M3b/M3c sessions R, S, T, U and V merged (WDI_E2E_NPC=1)',
@@ -28,8 +28,8 @@ interface StateView {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const voteWindowMs = (balance.npc.vote.delayMaxS + 10) * 1000;
 
-async function createParty(page: Page): Promise<string> {
-  await page.goto('/Who-Did-It/');
+async function createParty(page: Page, query = ''): Promise<string> {
+  await page.goto(`/Who-Did-It/${query}`);
   await page.getByLabel('Your name').fill('Hana');
   await page.getByRole('button', { name: 'Create Party' }).click();
   return ((await page.getByTestId('party-code').textContent()) ?? '').trim();
@@ -208,12 +208,14 @@ test('Start alone fills the party: four portraits in the meeting', async ({ brow
   }
 });
 
-test('quick mode, one human and three NPCs: the Conductor runs the night to the swap log', async ({
+// Session 5E rewrites this case for ONUB v2 (round-5 contract section 9); the loft and the swap log are gone.
+test.skip('quick mode, one human and three NPCs: the Conductor runs the night to the swap log', async ({
   browser,
 }) => {
   test.setTimeout(300_000);
   const page = await (await browser.newContext()).newPage();
-  await createParty(page);
+  // The live lobby offers the mode toggle only with ?onub=1.
+  await createParty(page, '?onub=1');
   await page.getByTestId('mode-toggle').click();
   await expect(page.getByTestId('mode-chip')).toContainText(/One Night Ultimate Baguette/i);
   for (let i = 0; i < 3; i++) await page.getByTestId('add-npc').click();

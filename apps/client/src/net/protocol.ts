@@ -43,13 +43,17 @@ export interface LobbyPlayer {
   connected: boolean;
 }
 
-/** The lobby settings the server publishes (`state.settings`, GDD 3.11, 3.12); `npcSeats` is a count only. */
+/**
+ * The lobby settings the server publishes (`state.settings`, GDD 3.11, 3.12); `npcSeats` is a count only.
+ * `onubDeck` is the leader's custom quick-mode deck (role ids), empty for the default deck of the party size.
+ */
 export type GameModeId = keyof typeof GameMode;
 export type NpcLevelId = keyof typeof NpcLevel;
 export interface LobbySettings {
   mode: GameModeId;
   npcDifficulty: NpcLevelId;
   npcSeats: number;
+  onubDeck: string[];
 }
 
 export const gameModeId = (n: number): GameModeId => (n === GameMode.onub ? 'onub' : 'main');

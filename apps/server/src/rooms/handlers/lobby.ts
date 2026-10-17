@@ -35,7 +35,7 @@ import { flowOf, refuse, setPhase } from '../../sim/Flow';
 import { handleSay } from '../../sim/Chat';
 import { handleClaim, handleVote } from '../../sim/Meeting';
 import { newestNpcSeat, isNpcSeat, registerNpcSeat, releaseNpcSeat } from '../../sim/Npc';
-import { beginOnubPlay, startOnubMatch } from '../../sim/Onub';
+import { beginOnubPlay, onubDeckSetting, startOnubMatch } from '../../sim/Onub';
 import { MatchSeeds } from '../../sim/seeds';
 
 /**
@@ -188,21 +188,34 @@ function fillNpcSeats(room: PartyRoom, rng: Rng): void {
   while (room.state.players.size < balance.players.min) if (addNpcSeat(room, rng) === null) break;
 }
 
-/** `lobby.settings {mode?, npcDifficulty?}`: leader, lobby; all or nothing (GDD 3.12, A39). */
+/**
+ * `lobby.settings {mode?, npcDifficulty?, onubDeck?}`: leader, lobby; every field is checked before any is
+ * written, all or nothing (GDD 3.11, 3.12, A39, A41). A mode change drops a pending `debug.deal`, whose role ids
+ * belong to the other mode.
+ */
 function handleSettings(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   if (room.state.leaderId !== sessionId)
     return refuse(room, sessionId, ErrorCode.cannot, 'cannot change settings');
   if (room.state.phase !== Phase.lobby) return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
-  const { mode, npcDifficulty } = payload;
+  const { mode, npcDifficulty, onubDeck } = payload;
+  const settings = room.state.settings;
   const modes: unknown[] = Object.values(GameMode);
   const levels: unknown[] = Object.values(NpcLevel);
   const badMode = mode !== undefined && !modes.includes(mode);
   const badLevel =
     npcDifficulty !== undefined &&
-    (!levels.includes(npcDifficulty) || room.state.settings.npcSeats < balance.npc.difficultyMinNpcs);
-  if (badMode || badLevel) return refuse(room, sessionId, ErrorCode.cannot, 'bad setting');
-  if (typeof mode === 'number') room.state.settings.mode = mode;
-  if (typeof npcDifficulty === 'number') room.state.settings.npcDifficulty = npcDifficulty;
+    (!levels.includes(npcDifficulty) || settings.npcSeats < balance.npc.difficultyMinNpcs);
+  const deck = onubDeck === undefined ? undefined : onubDeckSetting(onubDeck);
+  if (badMode || badLevel || deck === null) return refuse(room, sessionId, ErrorCode.cannot, 'bad setting');
+  if (typeof mode === 'number' && mode !== settings.mode) {
+    settings.mode = mode;
+    flowOf(room).fixedDeal = null;
+  }
+  if (typeof npcDifficulty === 'number') settings.npcDifficulty = npcDifficulty;
+  if (deck !== undefined) {
+    settings.onubDeck.clear();
+    for (const id of deck) settings.onubDeck.push(id);
+  }
 }
 
 /** `lobby.addNpc`: leader, lobby, below `players.max`. */
@@ -273,9 +286,8 @@ export function startMatch(room: PartyRoom): void {
   // The party fills to `players.min` with NPC seats, named from a stream apart from the deal's (GDD 3.12).
   fillNpcSeats(room, room.seeds.get('npcNames'));
   const ids = [...room.state.players.keys()];
-  const rng = room.seeds.get('deal');
-  if (startOnubMatch(room, ids, rng)) return; // quick mode deals its own loaves (round 4, R)
-  const dealt = dealRoles(room, ids, rng);
+  if (startOnubMatch(room, ids)) return; // quick mode deals its own cards from `room.seeds` (round 5, 5A)
+  const dealt = dealRoles(room, ids, room.seeds.get('deal'));
   const looks = dealTraits(ids, room.seeds.get('traits'));
   const factionOf = (id: string) => roles.roles[dealt.get(id) as string]?.faction;
 
@@ -330,7 +342,7 @@ export function startMatch(room: PartyRoom): void {
  * step and sends the one `sceneEnter`; nothing here touches positions or scenes.
  */
 export function beginPlay(room: PartyRoom): void {
-  if (beginOnubPlay(room)) return; // quick mode starts at dusk (round 4, R)
+  if (beginOnubPlay(room)) return; // quick mode starts at Evening Prep (round 5, 5A)
   room.state.round = 0;
   room.state.startTick = room.state.tick;
   setPhase(room, Phase.grace, balance.phases.graceS);

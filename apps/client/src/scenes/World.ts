@@ -1,10 +1,9 @@
 import Phaser from 'phaser';
 import abilitiesJson from '@wdi/content/data/abilities.json';
 import balance from '@wdi/content/data/balance.json';
-import onubBalance from '@wdi/content/data/balance.onub.json';
 import palette from '@wdi/content/data/palette.json';
 import { Phase } from '@wdi/shared';
-import { ONUB_SET_PLATE, TICK_RATE, TILE_PX } from '@wdi/shared/constants';
+import { TILE_PX } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
 import { InputController } from '../input/InputController';
 import { TouchControls } from '../input/TouchControls';
@@ -17,7 +16,6 @@ import {
   type NoisePulse,
   type SceneEnter,
   type WorldFeed,
-  type WorldFeedEvents,
 } from '../net/world';
 import { WORLD_COPY as C, fill } from '../ui/copy';
 import { overlayRoot } from '../ui/dom';
@@ -31,16 +29,6 @@ import { NotebookSheet } from '../view/NotebookPanel';
 import { PropView, overworldProps } from '../view/PropView';
 import { sceneMapKey, sceneMapUrl } from '../view/assets';
 import { isTouchDevice, readDevFlags } from '../view/devFlags';
-import {
-  ACT_RANGE_PX,
-  PLATE_HOLD_MS,
-  bakerySpots,
-  pickAct,
-  promptFor,
-  revealLine,
-  roleName,
-  type ActChoice,
-} from '../view/quickMode';
 import { loadSceneName } from '../view/sceneNames';
 import { REG_AUDIO, getNet } from './registry';
 
@@ -89,11 +77,7 @@ type Target =
   | { kind: 'body'; id: string; x: number; y: number }
   | { kind: 'clue'; id: string; x: number; y: number }
   | { kind: 'bell'; x: number; y: number }
-  | { kind: 'door'; id: string; x: number; y: number; boarded: boolean }
-  /** Quick mode, dusk: the own plate, held to set it. */
-  | { kind: 'plate'; id: string; x: number; y: number }
-  /** Quick mode, a night window: the act the nearest prop in reach offers. */
-  | { kind: 'act'; choice: ActChoice; x: number; y: number };
+  | { kind: 'door'; id: string; x: number; y: number; boarded: boolean };
 
 /** Clue ids this client has already collected, per feed: the prompt does not offer them again. */
 const collectedBy = new WeakMap<WorldFeed, Set<string>>();
@@ -139,14 +123,6 @@ export class World extends Phaser.Scene {
   private hold: { clueId: string; since: number; x: number; y: number } | null = null;
   private focusEntry: { had: number; until: number } | null = null;
   private wasDead = false;
-  /** Quick mode (GDD 3.11): this run is the bakery of a quick-mode match. */
-  private quick = false;
-  /** Quick mode: a hold that finishes on the client (the plate, a night act) and sends one `act.ability`. */
-  private local: { since: number; x: number; y: number; ms: number; done: () => void } | null = null;
-  /** Quick mode: the first pick of a `picks: 2` act, held until the second. */
-  private firstPick: { act: string; targetId: string } | null = null;
-  private plateSet = false;
-  private revealLines: string[] = [];
   /** What the last verb was, so a bare 422 reads as the deck's line for that verb. */
   private lastVerb: 'kill' | 'report' | 'other' = 'other';
   private lastPhase = -1;
@@ -166,10 +142,6 @@ export class World extends Phaser.Scene {
     this.hold = null;
     this.focusEntry = null;
     this.wasDead = false;
-    this.local = null;
-    this.firstPick = null;
-    this.plateSet = false;
-    this.revealLines = [];
     this.lastVerb = 'other';
   }
 
@@ -188,8 +160,7 @@ export class World extends Phaser.Scene {
 
     this.buildMap();
     this.swing = this.add.graphics().setDepth(1);
-    this.quick = this.sceneId === 'bakery' && feed.mode() === 'onub';
-    this.propView = new PropView(this, this.sceneId, this.quick);
+    this.propView = new PropView(this, this.sceneId);
     this.clueView = new ClueView(this);
     this.entities = new EntityView(this, feed.selfId);
 
@@ -228,9 +199,7 @@ export class World extends Phaser.Scene {
     };
     const onFound = () => this.clueFound();
     const onKilled = () => this.refreshGhost();
-    const onReveal = ({ entries }: WorldFeedEvents['nightReveal']) => this.showReveals(entries, true);
     feed.bus.on('noise', onNoise);
-    feed.bus.on('nightReveal', onReveal);
     feed.bus.on('error', onError);
     feed.bus.on('clueFound', onFound);
     feed.bus.on('killed', onKilled);
@@ -240,7 +209,6 @@ export class World extends Phaser.Scene {
       () => feed.bus.off('error', onError),
       () => feed.bus.off('clueFound', onFound),
       () => feed.bus.off('killed', onKilled),
-      () => feed.bus.off('nightReveal', onReveal),
       () => net.bus.off('error', onError as never),
     );
 
@@ -291,7 +259,6 @@ export class World extends Phaser.Scene {
     });
     this.graceToasts();
     this.entryToasts();
-    if (this.quick && feed.wake() !== null) this.showReveals(feed.nightReveal(), false);
   }
 
   override update(): void {
@@ -305,20 +272,9 @@ export class World extends Phaser.Scene {
       this.cameras.main.centerOn(self.x, self.y);
     }
     const clock = feed.clock();
-    // A quick-mode window has its own end; the night's end covers every window.
-    const win = this.quick ? feed.wake() : null;
-    const endsTick = win ? win.endsTick : clock.phaseEndsTick;
+    const endsTick = clock.phaseEndsTick;
     this.hud.setTimer(endsTick > 0 ? endsTick - clock.tick : null);
-    this.hud.setBanner(win ? fill(C['quick.window'], { role: roleName(win.windowRole) }) : null);
-    if (this.quick) {
-      this.entities.setMates(new Set(feed.mates()));
-      this.propView.update(feed.props(), (id) => this.nameOf(id), feed.selfId);
-    }
-    const darkness = Lighting.darkness(
-      clock.phase,
-      clock.phaseEndsTick - clock.tick,
-      this.quick ? onubBalance.timers.duskS * TICK_RATE : undefined,
-    );
+    const darkness = Lighting.darkness(clock.phase, clock.phaseEndsTick - clock.tick);
     this.hud.setPhase(PHASE_LABEL[clock.phase] ?? '', darkness >= 1);
     this.watchPhase(clock.phase);
     this.refreshGhost();
@@ -383,16 +339,6 @@ export class World extends Phaser.Scene {
         this.lastVerb = 'report';
         this.feed.reportBody(t.id);
         break;
-      case 'plate':
-        this.beginLocal(t, PLATE_HOLD_MS, () => {
-          this.plateSet = true;
-          this.feed.ability(ONUB_SET_PLATE, t.id);
-          this.hud.toast(C['quick.plate.set'], 'interact');
-        });
-        break;
-      case 'act':
-        this.beginLocal(t, t.choice.act.holdS * 1000, () => this.sendAct(t.choice));
-        break;
       case 'bell':
         this.feed.bell();
         this.audio.play('bell');
@@ -411,37 +357,12 @@ export class World extends Phaser.Scene {
 
   /** E / Use released: a hold that has not reached `castS` is a cancelled hold. */
   private endUse(): void {
-    this.cancelLocal();
     const h = this.hold;
     if (!h) return;
     this.hold = null;
     this.clueView?.setHold(null);
     this.feed.hold('collect', h.clueId, false);
     this.hud.toast(C['toast.collect.cancel'], 'interact');
-  }
-
-  /** Quick mode: starts a client-side hold at a prop; `done` runs when the ring is full. */
-  private beginLocal(at: { x: number; y: number }, ms: number, done: () => void): void {
-    if (this.local) return;
-    this.local = { since: this.time.now, x: at.x, y: at.y, ms, done };
-  }
-
-  private cancelLocal(): void {
-    if (!this.local) return;
-    this.local = null;
-    this.clueView?.setHold(null);
-    this.hud?.toast(C['toast.collect.cancel'], 'interact');
-  }
-
-  /** A finished act hold: one pick sends at once, the first of two is kept until the second. */
-  private sendAct({ act, prop, second }: ActChoice): void {
-    if (act.picks === 2 && !second) {
-      this.firstPick = { act: act.act, targetId: prop.id };
-      this.hud.toast(C['quick.pick.first'], 'interact');
-    } else if (act.picks === 2 && this.firstPick) {
-      this.feed.ability(act.act, this.firstPick.targetId, prop.id);
-      this.firstPick = null;
-    } else this.feed.ability(act.act, prop.id);
   }
 
   /** Q, R or F: the card's ability on that key, aimed at the nearest living player in reach. */
@@ -489,7 +410,6 @@ export class World extends Phaser.Scene {
   ): void {
     this.target = null;
     if (!self) return this.hud.setPrompt(null);
-    if (this.quick) return this.updateQuickTarget(self);
     const ghost = this.feed.dead();
     let best = Infinity;
     const consider = (t: Target, reach: number) => {
@@ -534,56 +454,8 @@ export class World extends Phaser.Scene {
     );
   }
 
-  /**
-   * Quick mode (GDD 3.11): no doors, bodies or clues here. In dusk the own plate offers "Set your plate";
-   * in a night window the nearest prop in reach offers the window's act for it (`pickAct`).
-   */
-  private updateQuickTarget(self: Phaser.GameObjects.Container): void {
-    const feed = this.feed;
-    const spots = bakerySpots(feed.props());
-    const win = feed.wake();
-    if (win) {
-      const seen = new Set(feed.snapshot().flatMap((p) => (p.presence ? [p.id] : [])));
-      const choice = pickAct({
-        role: win.windowRole,
-        spots,
-        selfId: feed.selfId,
-        self,
-        first: this.firstPick,
-        alone: !feed.mates().some((id) => seen.has(id)),
-      });
-      if (choice) {
-        this.target = { kind: 'act', choice, x: choice.prop.x, y: choice.prop.y };
-        return this.hud.setPrompt(promptFor(choice));
-      }
-    } else if (feed.clock().phase === Phase.dusk && !this.plateSet) {
-      const own = spots.find((p) => p.kind === 'plate' && p.of === feed.selfId);
-      if (own && Math.hypot(self.x - own.x, self.y - own.y) <= ACT_RANGE_PX) {
-        this.target = { kind: 'plate', id: own.id, x: own.x, y: own.y };
-        return this.hud.setPrompt(C['prompt.plate.set']);
-      }
-    }
-    this.hud.setPrompt(null);
-  }
-
   /** Draws the collect ring and drops the hold when the server has surely cancelled it. */
   private updateHold(self: Phaser.GameObjects.Container | null, clues: ClueSnap[]): void {
-    const l = this.local;
-    if (l) {
-      const moving = this.input_.current();
-      if (
-        !self ||
-        Math.hypot(self.x - l.x, self.y - l.y) > ACT_RANGE_PX + 8 ||
-        moving.dx !== 0 ||
-        moving.dy !== 0
-      )
-        return this.cancelLocal();
-      const progress = (this.time.now - l.since) / l.ms;
-      if (progress < 1) return this.clueView.setHold({ x: l.x, y: l.y }, progress);
-      this.local = null;
-      this.clueView.setHold(null);
-      return l.done();
-    }
     const h = this.hold;
     if (!h) return;
     const moving = this.input_.current();
@@ -664,11 +536,7 @@ export class World extends Phaser.Scene {
     const was = this.lastPhase;
     this.lastPhase = phase;
     if (phase === Phase.dusk) {
-      const duskS = this.quick ? onubBalance.timers.duskS : balance.phases.duskS;
-      this.hud.toast(fill(C['toast.dusk'], { duskS }), 'warm', undefined, 5000);
-      // The bakery sceneEnter arrives before the phase turns to dusk, so `entryToasts` may have missed it.
-      if (this.quick)
-        this.hud.toast(C['quick.dusk'], 'interact', undefined, 6000, `dusk:${this.feed.clock().startTick}`);
+      this.hud.toast(fill(C['toast.dusk'], { duskS: balance.phases.duskS }), 'warm', undefined, 5000);
     } else if (phase === Phase.night) this.hud.toast(C['toast.night'], 'warm', undefined, 5000);
     else if (phase === Phase.day && was === Phase.night)
       this.hud.toast(C['toast.day'], 'warm', undefined, 5000);
@@ -684,26 +552,12 @@ export class World extends Phaser.Scene {
     this.hud.toast(C['toast.grace.bell'], 'warm', 'E', 7000, `${tag}:bell`);
   }
 
-  /** What a fresh World run should say about where it starts: back from a meeting, a ghost, the quick-mode dusk. */
+  /** What a fresh World run should say about where it starts: back from a meeting, or a ghost. */
   private entryToasts(): void {
     const clock = this.feed.clock();
     if (clock.phase === Phase.immunity)
       this.hud.toast(C['toast.immunity'], 'warm', undefined, 4000, `immunity:${clock.phaseEndsTick}`);
     if (this.feed.dead()) this.hud.say(C['ghost.walk'], 5000);
-    if (this.quick && clock.phase === Phase.dusk)
-      this.hud.toast(C['quick.dusk'], 'interact', undefined, 6000, `dusk:${clock.startTick}`);
-  }
-
-  /** A seat's public name for the plate labels and the reveal lines. */
-  private nameOf(seatId: string): string {
-    return this.feed.snapshot().find((p) => p.id === seatId)?.name ?? '?';
-  }
-
-  /** Quick mode: shows what a night act revealed, as a toast each (`toasts`) and a HUD line until the window ends. */
-  private showReveals(entries: Array<{ slot: string; of: string; roleId: string }>, toasts: boolean): void {
-    this.revealLines = entries.map((e) => revealLine(e, (id) => this.nameOf(id)));
-    this.hud.setReveals(this.revealLines);
-    if (toasts) for (const line of this.revealLines) this.hud.toast(line, 'warm', undefined, 6000);
   }
 
   /** The deck's line for a refusal code; a bare 422 reads by the last verb (UI.md 14.3). */

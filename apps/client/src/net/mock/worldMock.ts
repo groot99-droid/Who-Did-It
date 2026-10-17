@@ -2,23 +2,19 @@ import mitt, { type Emitter } from 'mitt';
 import balanceJson from '@wdi/content/data/balance.json';
 import metricsJson from '@wdi/content/data/metrics.json';
 import abilitiesJson from '@wdi/content/data/abilities.json';
-import onubBalance from '@wdi/content/data/balance.onub.json';
 import cluesJson from '@wdi/content/data/clues.json';
 import { type NavData, NavGrid, TICK_RATE, TILE_PX, moveAabb } from '@wdi/shared';
-import { ClueKind, NotebookStatus, ONUB_SET_PLATE } from '@wdi/shared/constants';
+import { ClueKind, NotebookStatus } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
-import type { HoldAction, NightRevealEntry } from '@wdi/shared/protocol';
-import { ACT_RANGE_PX, bakerySpots, legalTarget, windowActs } from '../../view/quickMode';
+import type { HoldAction } from '@wdi/shared/protocol';
 import type {
   BodySnap,
   ClueSnap,
   DoorSnap,
   MoveCmd,
-  NightWindow,
   NotebookSnap,
   PlayerSnap,
   PresenceSnap,
-  PropSnap,
   SceneEnter,
   WorldFeed,
   WorldFeedEvents,
@@ -42,11 +38,6 @@ const COLLECT_TICKS = Math.round(A.collect.castS * TICK_RATE);
 const BLOOD_TICKS = Math.round(cluesJson.clues.blood.decay.seconds * TICK_RATE);
 const KILL_COOLDOWN_TICKS = Math.round(balanceJson.byCount['6'].killCooldownS * TICK_RATE);
 const P = balanceJson.phases;
-/** Mock quick-mode phase ids, as `Phase` in @wdi/shared: dusk 4, night 5, dawn 6. */
-const Q_PHASE = { dusk: 4, night: 5, dawn: 6 } as const;
-const O = onubBalance;
-/** The mock seats seven (you and six bots): the 7-seat deck is ten loaves, seven plates and the three dead's. */
-const MOCK_DECK = O.byCount['7'].deck;
 const PHASE_NAMES = ['grace', 'day', 'dusk', 'night'];
 /** Mock phase ids, as `Phase` in @wdi/shared: grace 2, day 3, dusk 4, night 5. */
 const PHASE_ORDER = [
@@ -131,16 +122,6 @@ export class MockWorldFeed implements WorldFeed {
   private ghost = false;
   private still = false;
   private clueSeq = 0;
-  /** Quick mode (`?mode=onub`): dusk at the bakery, one window for the self seat, then the dawn meeting. */
-  private readonly quick: boolean;
-  private qStage: 'dusk' | 'lead' | 'window' | 'fade' | 'dawn' = 'dusk';
-  private qEndsTick = 0;
-  /** `?speed=N` runs the quick-mode script N times faster (below 1: slower, for slow test machines). */
-  private readonly speed: number;
-  private readonly windowRole: string;
-  private readonly loaves = new Map<string, string>();
-  private reveal: NightRevealEntry[] = [];
-  private acted = false;
 
   constructor(
     private readonly content: MockContent,
@@ -148,10 +129,8 @@ export class MockWorldFeed implements WorldFeed {
   ) {
     const q = new URLSearchParams(typeof location === 'undefined' ? '' : location.search);
     // ?phase=day|dusk|night starts there (kills are refused in grace like the server), ?bots=still
-    // parks the bots, ?ghost=1 starts as a ghost: all three exist so tests reach those states fast.
-    this.quick = q.get('mode') === 'onub';
-    this.speed = Math.max(0.05, Number(q.get('speed') ?? 1) || 1);
-    this.windowRole = q.get('window') ?? 'cutpurse';
+    // parks the bots, ?ghost=1 starts as a ghost: all three exist so tests reach those states fast. Quick mode
+    // never reaches this feed: `?mode=onub` plays `MockOnubFeed` (net/mock/onubMock.ts).
     this.phaseIdx = Math.max(0, PHASE_NAMES.indexOf(q.get('phase') ?? ''));
     this.phaseEndsTick = PHASE_ORDER[this.phaseIdx]!.ticks;
     this.still = q.get('bots') === 'still';
@@ -178,16 +157,9 @@ export class MockWorldFeed implements WorldFeed {
         dead: false,
       };
       this.actors.set(id, body);
-      const scene = this.quick ? 'bakery' : 'overworld';
-      const spawn = this.content.scenes[scene]?.spawns.find(
-        (s) => s.id === (this.quick ? 'door' : `square_${i}`),
-      );
-      if (spawn) this.place(body, scene, spawn);
+      const spawn = this.content.scenes.overworld?.spawns.find((s) => s.id === `square_${i}`);
+      if (spawn) this.place(body, 'overworld', spawn);
     });
-    if (this.quick) {
-      this.deal(names.length);
-      this.qEndsTick = this.secs(O.timers.duskS);
-    }
     const teach = this.content.scenes.overworld?.props?.find((p) => p.id === 'ov.teaching_clue');
     if (teach) {
       // GDD 2 step 5: the grace clue beside the well, Footprints with a tall stride.
@@ -222,9 +194,9 @@ export class MockWorldFeed implements WorldFeed {
       if (due < now) due = now;
     }, period / 2);
     const me = this.actors.get(this.selfId);
-    const scene = this.quick ? 'bakery' : 'overworld';
-    const spawn = this.content.scenes[scene]?.spawns.find((s) => s.id === (this.quick ? 'door' : 'square_0'));
-    if (me && spawn) this.bus.emit('sceneEnter', { sceneId: scene, spawn: spawn.id, facing: spawn.facing });
+    const spawn = this.content.scenes.overworld?.spawns.find((s) => s.id === 'square_0');
+    if (me && spawn)
+      this.bus.emit('sceneEnter', { sceneId: 'overworld', spawn: spawn.id, facing: spawn.facing });
     if (this.ghost)
       window.setTimeout(
         () =>
@@ -250,11 +222,10 @@ export class MockWorldFeed implements WorldFeed {
     const out: PlayerSnap[] = [];
     for (const b of this.actors.values()) {
       const visible =
-        !this.sleeping() &&
-        (b.id === this.selfId ||
-          (!b.dead &&
-            me !== undefined &&
-            (b.scene === me.scene || (b.from === me.scene && this.tick < b.busyUntil))));
+        b.id === this.selfId ||
+        (!b.dead &&
+          me !== undefined &&
+          (b.scene === me.scene || (b.from === me.scene && this.tick < b.busyUntil)));
       out.push({
         id: b.id,
         name: b.name,
@@ -277,11 +248,6 @@ export class MockWorldFeed implements WorldFeed {
   }
 
   clock() {
-    if (this.quick) {
-      const phase =
-        this.qStage === 'dusk' ? Q_PHASE.dusk : this.qStage === 'dawn' ? Q_PHASE.dawn : Q_PHASE.night;
-      return { tick: this.tick, phase, phaseEndsTick: this.qEndsTick, startTick: 0 };
-    }
     return {
       tick: this.tick,
       phase: PHASE_ORDER[this.phaseIdx]!.id,
@@ -291,36 +257,7 @@ export class MockWorldFeed implements WorldFeed {
   }
 
   mode(): 'main' | 'onub' {
-    return this.quick ? 'onub' : 'main';
-  }
-
-  /** Quick mode: the plates of the seated seats, the dead's three loaves and the ledger, as the server lists them. */
-  props(): PropSnap[] {
-    if (!this.quick) return [];
-    const seats = [...this.actors.keys()];
-    return (this.content.scenes.bakery?.props ?? []).flatMap((p) => {
-      if (p.kind === 'plate') {
-        const owner = seats[Number(p.id.split('_')[1])];
-        return owner === undefined ? [] : [{ id: p.id, kind: p.kind, turned: false, of: owner }];
-      }
-      return p.kind === 'deadLoaf' || p.kind === 'ledger'
-        ? [{ id: p.id, kind: p.kind, turned: false, of: '' }]
-        : [];
-    });
-  }
-
-  mates(): string[] {
-    return [];
-  }
-
-  nightReveal(): NightRevealEntry[] {
-    return this.reveal.slice();
-  }
-
-  wake(): NightWindow | null {
-    return this.qStage === 'window'
-      ? { windowRole: this.windowRole, endsTick: this.qEndsTick, spawn: 'door' }
-      : null;
+    return 'main';
   }
 
   bodies(): BodySnap[] {
@@ -345,9 +282,8 @@ export class MockWorldFeed implements WorldFeed {
     this.ability('kill', targetId);
   }
 
-  ability(id: string, targetId?: string, targetId2?: string): void {
+  ability(id: string, targetId?: string): void {
     const me = this.actors.get(this.selfId);
-    if (this.quick && id.startsWith('onub.')) return this.onubAct(id, targetId, targetId2);
     if (!me || this.ghost) return this.fail(422, 'ghosts cannot do that');
     if (id !== 'kill') return this.fail(422, 'not in the mock');
     if (this.clock().phase === 2) return this.fail(425, 'not now');
@@ -443,108 +379,6 @@ export class MockWorldFeed implements WorldFeed {
     if (this.timer !== null) window.clearInterval(this.timer);
     this.timer = null;
     this.bus.all.clear();
-  }
-
-  private secs(s: number): number {
-    return Math.max(1, Math.round((s * TICK_RATE) / this.speed));
-  }
-
-  /** In the loft: nobody is in view, as when the server sends a sleeper no presence. */
-  private sleeping(): boolean {
-    return this.quick && (this.qStage === 'lead' || this.qStage === 'fade' || this.qStage === 'dawn');
-  }
-
-  /** Seat 0 is the self seat and holds the window's role; the other loaves are the rest of the deck in order. */
-  private deal(seats: number): void {
-    const rest = [...MOCK_DECK];
-    const own = rest.indexOf(this.windowRole);
-    const ordered = [this.windowRole, ...(own >= 0 ? rest.filter((_, i) => i !== own) : rest.slice(1))];
-    for (let i = 0; i < seats; i++) this.loaves.set(`bk.plate_${i}`, ordered[i] ?? 'mourner');
-    for (let i = 0; i < O.deadLoaves; i++)
-      this.loaves.set(`bk.deadloaf_${i}`, ordered[seats + i] ?? 'mourner');
-  }
-
-  /** The server's checks for a quick-mode act, in its order: phase 425, window 425, repeat 422, target 422/427. */
-  private onubAct(id: string, targetId?: string, targetId2?: string): void {
-    const me = this.actors.get(this.selfId);
-    const spots = bakerySpots(this.props());
-    const spotOf = (t?: string) => spots.find((p) => p.id === t);
-    const reach = (t?: string) => {
-      const sp = spotOf(t);
-      return sp !== undefined && me !== undefined && Math.hypot(me.x - sp.x, me.y - sp.y) <= ACT_RANGE_PX;
-    };
-    if (id === ONUB_SET_PLATE) {
-      if (this.qStage !== 'dusk') return this.fail(425, 'not now');
-      const own = spotOf(targetId);
-      if (!own || own.kind !== 'plate' || own.of !== this.selfId) return this.fail(422, 'not your plate');
-      if (!reach(targetId)) return this.fail(427, 'too far');
-      return;
-    }
-    const act = windowActs(this.windowRole).find((a) => a.act === id);
-    if (this.qStage !== 'window' || !act) return this.fail(425, 'not now');
-    if (this.acted) return this.fail(422, 'already done');
-    const picks = act.picks === 2 ? [targetId, targetId2] : [targetId];
-    for (const t of picks) {
-      const sp = spotOf(t);
-      if (!sp || !legalTarget(act.target, sp, this.selfId)) return this.fail(422, 'no such loaf');
-      if (!reach(t)) return this.fail(427, 'too far');
-    }
-    this.acted = true;
-    const swap = O.acts[id as keyof typeof O.acts].swap;
-    if (swap === 'withOwn' && targetId !== undefined) {
-      const mine = 'bk.plate_0';
-      const a = this.loaves.get(mine);
-      this.loaves.set(mine, this.loaves.get(targetId) ?? 'mourner');
-      this.loaves.set(targetId, a ?? 'mourner');
-    } else if (swap === 'pair' && targetId !== undefined && targetId2 !== undefined) {
-      const a = this.loaves.get(targetId);
-      this.loaves.set(targetId, this.loaves.get(targetId2) ?? 'mourner');
-      this.loaves.set(targetId2, a ?? 'mourner');
-    }
-    if (!O.acts[id as keyof typeof O.acts].reveals) return;
-    // A take shows the new token in your own plate; a peek shows the token at the target.
-    const shown = swap === 'withOwn' ? ['bk.plate_0'] : picks.flatMap((t) => (t === undefined ? [] : [t]));
-    this.reveal = shown.map((slot) => ({
-      slot,
-      of: spotOf(slot)?.of ?? '',
-      roleId: this.loaves.get(slot) ?? 'mourner',
-    }));
-    this.bus.emit('nightReveal', { entries: this.reveal });
-  }
-
-  /** The quick-mode script: dusk -> loft -> the self seat's window -> fade -> loft until dawn -> the dawn meeting. */
-  private stepQuick(): void {
-    if (this.tick < this.qEndsTick) return;
-    switch (this.qStage) {
-      case 'dusk':
-        this.qStage = 'lead';
-        this.qEndsTick = this.tick + this.secs(O.timers.windowJitterMaxS);
-        this.bus.emit('phaseChange', { phase: Q_PHASE.night, endsTick: this.qEndsTick });
-        this.bus.emit('nightSleep', {});
-        break;
-      case 'lead': {
-        this.qStage = 'window';
-        this.acted = false;
-        this.reveal = [];
-        const seconds = O.windows.find((w) => w.role === this.windowRole)?.seconds ?? 8;
-        this.qEndsTick = this.tick + this.secs(seconds);
-        this.bus.emit('nightWake', { windowRole: this.windowRole, endsTick: this.qEndsTick, spawn: 'door' });
-        break;
-      }
-      case 'window':
-        this.qStage = 'fade';
-        this.qEndsTick = this.tick + this.secs(O.timers.fadeS);
-        break;
-      case 'fade':
-        this.qStage = 'dawn';
-        this.qEndsTick = this.tick + this.secs(O.timers.dawnS);
-        this.bus.emit('nightSleep', {});
-        break;
-      case 'dawn':
-        this.qEndsTick = Infinity;
-        this.bus.emit('meetingRequest', { reason: 'dawn', callerId: this.selfId });
-        break;
-    }
   }
 
   private fail(code: number, msg: string): void {
@@ -652,8 +486,7 @@ export class MockWorldFeed implements WorldFeed {
 
   private step(): void {
     this.tick++;
-    if (this.quick) this.stepQuick();
-    else this.advancePhase();
+    this.advancePhase();
     const m = balanceJson.movement;
     for (const b of this.actors.values()) {
       b.vx = b.vy = 0;

@@ -6,8 +6,8 @@ export interface MatchRecord {
   code: string;
   seats: number;
   durationS: number;
-  /** A `Winner` name: `village` or `cabal` in the main mode; quick mode adds `debtor` and `nobody` (A39). */
-  winner: 'village' | 'cabal' | 'debtor' | 'nobody';
+  /** A `Winner` name: `village` or `cabal` in the main mode; quick mode adds `croissant` and `nobody` (GDD 3.11). */
+  winner: 'village' | 'cabal' | 'croissant' | 'nobody';
   /** `main` or `onub` (round 4). */
   mode?: 'main' | 'onub';
   rounds: number;
@@ -20,7 +20,7 @@ export interface MatchRecord {
     faction: string;
     survived: boolean;
     clues: number;
-    /** Quick mode: the loaf on the plate at dawn (`role` is the card dealt). */
+    /** Quick mode: the Role card held at dawn (`role` is the card dealt). */
     finalRole?: string;
     /** NPC seat (GDD 3.12); stdout only, never on the wire. */
     isNpc?: boolean;

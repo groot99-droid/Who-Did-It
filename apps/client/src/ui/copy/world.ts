@@ -1,6 +1,6 @@
 // UI.md 14.1 toasts, 14.2 prompts, 14.3 refusals, 14.4 HUD and log, 14.5 Notebook, 14.8 Ghost (Session T,
-// round 4), plus the quick-mode lines the world shows (the `quick.*`, `loft.*` and `prompt.act.*` ids);
-// those wait for the deck's 14.12 and follow it once it lands. Values in braces are filled with `fill()`.
+// round 4). Quick mode's lines live in `onubPrep.ts` (5C) and `onubNight.ts` (5D) from round 5. Values in
+// braces are filled with `fill()`.
 export const WORLD_COPY = {
   // 14.1 Toasts
   'toast.grace.sneak': 'Shift to sneak',
@@ -91,30 +91,4 @@ export const WORLD_COPY = {
   // 14.8 Ghost (the world side)
   'ghost.label': 'You are a ghost',
   'ghost.walk': 'Walk anywhere. Only ghosts can see you.',
-
-  // Quick mode (GDD 3.11): the bakery, the windows and the loft
-  'prompt.plate.set': 'Set your plate',
-  'prompt.act.onub.peekDead': 'Peek at a dead loaf',
-  'prompt.act.onub.readLedger': 'Read the ledger',
-  'prompt.act.onub.peekPlate': "Taste a mourner's loaf",
-  'prompt.act.onub.take': "Take a mourner's loaf",
-  'prompt.act.onub.swapPlates': 'Pick a loaf to swap',
-  'prompt.act.onub.swapDead': 'Swap with a dead loaf',
-  'prompt.act.onub.check': 'Check your loaf',
-  'quick.plate.of': "{name}'s plate",
-  'quick.plate.set': 'Plate set',
-  'quick.dusk': 'Set your plate before dark',
-  'quick.window': 'Your watch: {role}',
-  'quick.window.line': 'Your watch',
-  'quick.pick.first': 'First loaf chosen. Pick the second.',
-  'quick.pick.second': 'Pick the second loaf',
-  'quick.reveal.plate': '{name}: {role}',
-  'quick.reveal.dead': '{role}',
-  'quick.mate': 'Your partner glows red',
-  'loft.eyebrow': "Crumb's Ovens, the loft",
-  'loft.title': 'The village sleeps',
-  'loft.text': 'You lie still in your bedroll. Somewhere below, something creaks.',
-  'loft.hint': 'No clock. No moving. What you hold at dawn is what you are.',
-  'loft.creak': 'A creak from the {dir}',
-  'loft.bedroll': "{name}'s bedroll",
 } as const satisfies Record<string, string>;

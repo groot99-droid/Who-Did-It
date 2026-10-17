@@ -3,6 +3,7 @@ import mitt, { type Emitter } from 'mitt';
 import { MOCK_BOTS, MOCK_NPC_NAMES, MOCK_ROLE_REVEAL } from './fixtures';
 import type { MeetingFeed } from './meeting';
 import { MockMeetingFeed, type MockMeetingRequest } from './mock/meetingMock';
+import { onubMockRoleCard } from './mock/onubMock';
 import {
   defaultSettings,
   JoinError,
@@ -11,6 +12,7 @@ import {
   type NetworkService,
   type Room,
 } from './NetworkService';
+import type { OnubFeed } from './onub';
 import type { WorldFeed } from './world';
 import {
   type ClientMessages,
@@ -45,6 +47,7 @@ export class MockNetwork implements NetworkService {
   private timers: number[] = [];
   private card: RoleRevealPayload | null = null;
   private world: WorldFeed | null = null;
+  private onub: OnubFeed | null = null;
   private publishMeeting: ((feed: MeetingFeed) => void) | null = null;
   private meeting: MockMeetingFeed | null = null;
   /** Ids of the NPC seats the leader added, oldest first; `removeNpc` drops the last (like the server). */
@@ -94,11 +97,13 @@ export class MockNetwork implements NetworkService {
   send<K extends ClientMessageType>(type: K, payload: ClientMessages[K]): void {
     const room = this.lobby;
     if (room === null) return;
-    // Mirrors the server: Start is leader-only and needs one human; the rest of the party is Ready.
+    // Mirrors the server: Start is leader-only and needs one human; the rest of the party is Ready. Quick mode
+    // deals the self seat's quick-mode card from the mock ONUB deal (bugs.md: never the main-mode Killer card).
     if (type === 'lobby.start' && room.leaderId === room.selfId && this.card === null) {
       this.later(() => {
-        this.card = MOCK_ROLE_REVEAL;
-        this.bus.emit('roleReveal', MOCK_ROLE_REVEAL);
+        const self = room.players.find((p) => p.id === room.selfId)?.name;
+        this.card = room.settings.mode === 'onub' ? onubMockRoleCard(self) : MOCK_ROLE_REVEAL;
+        this.bus.emit('roleReveal', this.card);
       }, 300);
     }
     if (type === 'lobby.ready' && this.card === null) {
@@ -137,6 +142,12 @@ export class MockNetwork implements NetworkService {
     });
   }
 
+  setOnubDeck(deck: readonly string[]): void {
+    this.patch((room) =>
+      room.leaderId === room.selfId ? { settings: { ...room.settings, onubDeck: [...deck] } } : {},
+    );
+  }
+
   removeNpc(): void {
     this.patch((room) => {
       const id = this.npcs.pop();
@@ -158,31 +169,47 @@ export class MockNetwork implements NetworkService {
   /** The router hands over the published mock world feed and a way to publish the meeting feed. */
   bindWorld(world: WorldFeed, publishMeeting: (feed: MeetingFeed) => void): void {
     this.world = world;
+    this.onub = null;
+    this.publishMeeting = publishMeeting;
+    this.meeting = null;
+  }
+
+  /** Quick mode: the router hands over the published mock ONUB feed instead of a world. */
+  bindOnub(onub: OnubFeed, publishMeeting: (feed: MeetingFeed) => void): void {
+    this.onub = onub;
+    this.world = null;
     this.publishMeeting = publishMeeting;
     this.meeting = null;
   }
 
   /**
-   * The mock world's report or bell asked for a meeting: run discussion -> vote -> reveal on a mock meeting
-   * feed, then either end the match (the router shows game over, then the lobby) or resume the world.
+   * The mock world's report or bell asked for a meeting, or the mock ONUB dawn ended: run discussion -> vote ->
+   * reveal on a mock meeting feed, then either end the match (the router shows game over, then the lobby) or
+   * resume the world.
    */
   openMeeting(req: MockMeetingRequest): void {
     const world = this.world;
-    if (world === null || this.meeting !== null) return;
-    const feed = new MockMeetingFeed(
-      world.snapshot().map(({ id, name, traits }) => ({ id, name, traits })),
-      world.selfId,
-      {
-        onDone: (outcome) => {
-          if (outcome === 'resume') {
-            this.meeting = null;
-            // Until the mock world implements `resume()` (Session N), say what it would: the same scene again.
-            if (world.resume) world.resume();
-            else world.bus.emit('sceneEnter', { sceneId: 'overworld', spawn: 'square_0', facing: 's' });
-          }
-        },
+    const onub = this.onub;
+    if ((world === null && onub === null) || this.meeting !== null) return;
+    // The ONUB seats carry no look: every seat shows the same neutral portrait (GDD 3.11).
+    const roster =
+      world !== null
+        ? world.snapshot().map(({ id, name, traits }) => ({ id, name, traits }))
+        : (onub?.seats() ?? []).map(({ id, name }) => ({
+            id,
+            name,
+            traits: { height: 1, scarf: 0, hat: 0 },
+          }));
+    const feed = new MockMeetingFeed(roster, world?.selfId ?? onub?.selfId ?? '', {
+      onDone: (outcome) => {
+        if (outcome === 'resume' && world !== null) {
+          this.meeting = null;
+          // Until the mock world implements `resume()` (Session N), say what it would: the same scene again.
+          if (world.resume) world.resume();
+          else world.bus.emit('sceneEnter', { sceneId: 'overworld', spawn: 'square_0', facing: 's' });
+        }
       },
-    );
+    });
     feed.bus.on('phaseChange', (e) => {
       if (e.phase === 0) this.backToLobby();
     });
@@ -195,6 +222,7 @@ export class MockNetwork implements NetworkService {
     this.card = null;
     this.meeting = null;
     this.world = null;
+    this.onub = null;
     const room = this.lobby;
     if (room === null) return;
     this.lobby = { ...room, players: room.players.map((p) => ({ ...p, ready: false })) };
@@ -252,5 +280,6 @@ export class MockNetwork implements NetworkService {
     this.meeting?.dispose();
     this.meeting = null;
     this.world = null;
+    this.onub = null;
   }
 }

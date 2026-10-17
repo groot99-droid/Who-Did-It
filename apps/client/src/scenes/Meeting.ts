@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import palette from '@wdi/content/data/palette.json';
 import { type MeetingFeed, REG_MEETING } from '../net/meeting';
+import { type OnubFeed, REG_ONUB } from '../net/onub';
 import { REG_WORLD, type WorldFeed } from '../net/world';
 import { NotebookPanel } from '../view/NotebookPanel';
 import { mountMeeting, type MeetingScreen } from '../ui/Meeting';
@@ -34,8 +35,11 @@ export class Meeting extends Phaser.Scene {
       return;
     }
     this.cameras.main.setBackgroundColor(palette.colors.ink);
+    // Quick mode: the ONUB feed the router published feeds the Rush panel.
+    const onub = feed.mode() === 'onub' ? (this.registry.get(REG_ONUB) as OnubFeed | undefined) : undefined;
     this.screen = mountMeeting(overlayRoot(), {
       feed,
+      ...(onub === undefined ? {} : { onub }),
       drawPortrait: (canvas, look, name) => drawPortrait(canvas, this.textures, look, name),
     });
     // The Notebook tab shows this player's own entries from the world feed (M | N seam, A38).

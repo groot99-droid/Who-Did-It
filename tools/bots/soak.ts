@@ -5,8 +5,8 @@
 // (exit 1) on a presence leak, a dropped bot, a protocol error beyond refusals, or a p95 tick above 15 ms.
 //
 // `--mode onub` plays quick mode instead (GDD 3.11): the leader bot sets the mode through `lobby.settings`,
-// the deal is the server's (no `debug.deal`), and the run fails on a night leak as well, or when no window
-// act or no meeting ever happened. Matches are about five to seven minutes, so a 30 minute run plays several.
+// the deal is the server's (no `debug.deal`), and the run fails when no meeting ever happened. Session 5E adds
+// the ONUB v2 prep, act and claim counts and the night leak monitor.
 //
 //   pnpm --filter @wdi/bots soak -- [--minutes 30] [--bots 6] [--mode main|onub] [--url http://localhost:2567]
 //
@@ -77,7 +77,7 @@ async function main(): Promise<void> {
     r.onLeave(() => !ending && dropped++);
   });
   // Every bot walks, reports what it finds, votes at random and strikes when its card holds the Knife; in
-  // quick mode it sets its plate, acts in its window, claims and votes for another seat.
+  // quick mode it votes for another seat.
   const rng = mulberry(20261010);
   const walkers: Bot[] = rooms.map((r) =>
     startWalker(r, mulberry(Math.floor(rng() * 2 ** 31)), {
@@ -85,7 +85,6 @@ async function main(): Promise<void> {
       report: true,
       killer: true,
       vote: quick ? 'other' : 'random',
-      claims: quick,
     }),
   );
 
@@ -126,9 +125,6 @@ async function main(): Promise<void> {
       `[soak] t=${Math.round((minutes * 60_000 - (deadline - Date.now())) / 1000)}s tickP95=${h.tickP95}ms ` +
         `patchBytes=${h.patchBytes} matches=${matches} kills=${total('kills')} reports=${total('reports')} ` +
         `meetings=${meetings()} portals=${total('portals')} leaks=${total('leaks')} ` +
-        (quick
-          ? `wakes=${total('wakes')} acts=${total('acts')} claims=${total('claims')} nightLeaks=${total('nightLeaks')} `
-          : '') +
         `refusals=${total('errors')} protocolErrors=${total('protocolErrors')} dropped=${dropped}`,
     );
   }
@@ -138,22 +134,19 @@ async function main(): Promise<void> {
   child?.kill();
 
   const worst = Math.max(0, ...samples.map((s) => s.tickP95));
-  const leaks = total('leaks') + total('nightLeaks');
+  const leaks = total('leaks');
   const protocolErrors = total('protocolErrors');
-  // A long run must have played: a kill and a meeting in the main mode, a window act and a meeting in quick.
+  // A long run must have played: a kill and a meeting in the main mode, a meeting in quick.
   const idle =
-    minutes >= EXERCISE_AFTER_MIN &&
-    (quick ? meetings() === 0 || total('acts') === 0 : total('kills') === 0 || meetings() === 0);
+    minutes >= EXERCISE_AFTER_MIN && (quick ? meetings() === 0 : total('kills') === 0 || meetings() === 0);
   console.log(
     `[soak] done (${mode}): worst tickP95 ${worst} ms, leaks ${leaks}, protocol errors ${protocolErrors}, ` +
-      `dropped bots ${dropped}, matches ${matches}, meetings ${meetings()}, ` +
-      (quick
-        ? `wakes ${total('wakes')}, acts ${total('acts')}, claims ${total('claims')}`
-        : `kills ${total('kills')}`),
+      `dropped bots ${dropped}, matches ${matches}, meetings ${meetings()}` +
+      (quick ? '' : `, kills ${total('kills')}`),
   );
   if (idle)
     console.error(
-      `[soak] the match loop never ran: ${quick ? 'no window act or no meeting' : 'no kill or no meeting'} happened`,
+      `[soak] the match loop never ran: ${quick ? 'no meeting' : 'no kill or no meeting'} happened`,
     );
   if (leaks > 0 || dropped > 0 || protocolErrors > 0 || worst > P95_LIMIT_MS || idle) process.exit(1);
 }

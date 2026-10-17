@@ -37,7 +37,7 @@ export interface LobbySnapshot {
 
 /** The settings a fresh room shows before its state arrives (mode main, the default level, no NPC seats). */
 export function defaultSettings(defaultLevel: NpcLevelId = 'normal'): LobbySettings {
-  return { mode: 'main', npcDifficulty: defaultLevel, npcSeats: 0 };
+  return { mode: 'main', npcDifficulty: defaultLevel, npcSeats: 0, onubDeck: [] };
 }
 
 export type NetEvents = {
@@ -93,6 +93,8 @@ export interface NetworkService {
   addNpc(): void;
   /** Leader only: `lobby.removeNpc`; the server drops the most recently added NPC seat. */
   removeNpc(): void;
+  /** Leader only: `lobby.settings {onubDeck}`, a custom quick-mode deck (`[]` for the default, GDD 3.11). */
+  setOnubDeck(deck: readonly string[]): void;
 }
 
 // `sceneEnter` is not here: the world feed (ColyseusWorldFeed) registers it once and the router
@@ -107,11 +109,12 @@ interface PlayerState {
   connected: boolean;
 }
 
-/** `state.settings` as the lobby reads it (numbers: `GameMode`, `NpcLevel`, a seat count). */
+/** `state.settings` as the lobby reads it (numbers: `GameMode`, `NpcLevel`, a seat count; the deck's role ids). */
 interface SettingsState {
   mode: number;
   npcDifficulty: number;
   npcSeats: number;
+  onubDeck?: Iterable<string>;
 }
 
 /** The slice of the `Callbacks` API the lobby uses, typed for the dynamic state above. */
@@ -119,6 +122,9 @@ interface LobbyCallbacks {
   onAdd(prop: 'players', handler: (player: PlayerState, key: string) => void): () => void;
   onRemove(prop: 'players', handler: (player: PlayerState, key: string) => void): () => void;
   onChange(instance: object, handler: () => void): () => void;
+  /** A collection field of `instance` (the deck): an item added or changed. */
+  onChange(instance: object, prop: 'onubDeck', handler: () => void): () => void;
+  onRemove(instance: object, prop: 'onubDeck', handler: () => void): () => void;
   listen(prop: 'leaderId', handler: (value: string) => void): () => void;
   listen(prop: 'settings', handler: (value: SettingsState) => void): () => void;
 }
@@ -201,6 +207,10 @@ export class ColyseusNetwork implements NetworkService {
     this.send('lobby.removeNpc', {});
   }
 
+  setOnubDeck(deck: readonly string[]): void {
+    this.send('lobby.settings', { onubDeck: [...deck] });
+  }
+
   async leave(): Promise<void> {
     const room = this.current;
     if (room === null) return;
@@ -275,10 +285,16 @@ export class ColyseusNetwork implements NetworkService {
             mode: gameModeId(value.mode),
             npcDifficulty: npcLevelId(value.npcDifficulty),
             npcSeats: value.npcSeats,
+            onubDeck: [...(value.onubDeck ?? [])],
           };
           emit();
         };
-        this.disposers.push(cb.onChange(value, read));
+        // The deck is a collection: its items change without a change of `settings` itself.
+        this.disposers.push(
+          cb.onChange(value, read),
+          cb.onChange(value, 'onubDeck', read),
+          cb.onRemove(value, 'onubDeck', read),
+        );
         read();
       }),
     );

@@ -32,10 +32,6 @@ export class Brain {
   /** A Killer that rolled its strike chance and is closing on its prey. */
   striking = false;
   path: PathPlan | null = null;
-  /** Quick mode: sends of the dusk plate act, and the night act already sent for this plan key. */
-  plateSends = 0;
-  lastPlateSendTick = -1;
-  sentPlan = '';
 }
 
 /** A `debug.npc` payload waiting for the step (WDI_DEBUG only). */

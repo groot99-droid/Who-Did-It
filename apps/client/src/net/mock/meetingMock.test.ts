@@ -2,15 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import balance from '@wdi/content/data/balance.json';
 import { SKIP, type MeetingPlayer } from '../meeting';
 import onubBalance from '@wdi/content/data/balance.onub.json';
-import {
-  MockMeetingFeed,
-  mockBotVotes,
-  mockDawnVotes,
-  mockOnubDeal,
-  mockWinners,
-  tallyDawn,
-  tallyVotes,
-} from './meetingMock';
+import { MockMeetingFeed, mockBotVotes, tallyVotes } from './meetingMock';
 
 const look = { height: 0, scarf: 0, hat: 0 };
 const roster = ['me', 'a', 'b', 'c', 'd', 'e', 'f'].map((id) => ({
@@ -105,42 +97,6 @@ describe('MockMeetingFeed', () => {
   });
 });
 
-describe('quick-mode stand-ins', () => {
-  it('replays the mock night from the dealt loaves to the final ones', () => {
-    const deal = mockOnubDeal(6);
-    expect(deal.dealt).toHaveLength(6);
-    expect(deal.center).toHaveLength(onubBalance.deadLoaves);
-    // The log permutes the dealt loaves into the final ones.
-    expect([...deal.final].sort()).toEqual([...deal.dealt].sort());
-    expect(deal.final).not.toEqual(deal.dealt);
-    expect(deal.swapLog.map((e) => e.order)).toEqual([1, 2]);
-  });
-
-  it('turns out everyone at the top when it reaches the minimum, and nobody below it', () => {
-    expect(tallyDawn({ a: 'x', b: 'x', c: 'y', d: 'y' }).outs.sort()).toEqual(['x', 'y']);
-    expect(tallyDawn({ a: 'x', b: 'y' }).outs).toEqual([]);
-    expect(tallyDawn({ a: 'x', b: 'x', c: 'y' }).outs).toEqual(['x']);
-  });
-
-  it('leaves a two-seat tie and an abstainer in the bots votes', () => {
-    const votes = mockDawnVotes(living());
-    expect(Object.keys(votes)).toHaveLength(4);
-    expect(Object.values(votes)).not.toContain(SKIP);
-    expect(Object.entries(votes).every(([from, to]) => from !== to)).toBe(true);
-    expect(tallyDawn(votes).outs).toHaveLength(2);
-  });
-
-  it('judges the winners on the final loaves', () => {
-    const finals = ['poisoner', 'cutpurse', 'debtor', 'mourner'];
-    expect(mockWinners(['poisoner'], finals, []).rowId).toBe('poisonerOut');
-    expect(mockWinners(['debtor', 'poisoner'], finals, []).rowId).toBe('debtorAndVillage');
-    expect(mockWinners(['debtor'], finals, []).rowId).toBe('debtorAlone');
-    expect(mockWinners([], finals, []).rowId).toBe('cabalSurvives');
-    expect(mockWinners([], finals, []).winnerSeats).toEqual([0]);
-    expect(mockWinners(['poisoner'], finals, []).winnerSeats).toEqual([1, 3]);
-  });
-});
-
 describe('MockMeetingFeed, dawn', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -151,33 +107,31 @@ describe('MockMeetingFeed, dawn', () => {
     vi.unstubAllGlobals();
   });
 
-  it('plays quick mode: traces, claims, no Skip, a plural reveal with an abstainer, then game over', () => {
+  it('plays the quick-mode stand-in: no Skip, no self vote, the Pantry, a plurality reveal, then game over', () => {
     const done = vi.fn();
+    const phases: number[] = [];
     const feed = new MockMeetingFeed(roster, 'me', { onDone: done });
-    feed.begin({ reason: 'dawn', callerId: 'me' });
+    feed.bus.on('phaseChange', (e) => phases.push(e.phase));
+    feed.begin({ reason: 'dawn', callerId: '' });
     expect(feed.mode()).toBe('onub');
-    expect(feed.traces().length).toBeGreaterThan(0);
 
     feed.vote(SKIP);
     feed.vote('me');
     expect(feed.myVote()).toBe('');
-    feed.claim('cutpurse', 'a', 'poisoner');
-    expect(feed.claims().find((c) => c.from === 'me')).toMatchObject({ roleId: 'cutpurse', targetId: 'a' });
-    vi.advanceTimersByTime(5000);
-    expect(feed.claims().length).toBeGreaterThan(1);
-
+    feed.vote('pantry');
+    expect(feed.myVote()).toBe('pantry');
     feed.vote('d');
-    vi.advanceTimersByTime(5000);
-    const result = feed.result();
-    expect(result?.outs).toHaveLength(2);
-    expect(result?.abstained).toEqual(['e', 'f']);
-    expect(Object.keys(result?.roles ?? {}).sort()).toEqual([...(result?.outs ?? [])].sort());
+    expect(feed.myVote()).toBe('d');
+    // The Rush never ends early.
+    vi.advanceTimersByTime((onubBalance.timers.rushS - 1) * 1000);
+    expect(phases).toEqual([7]);
+    vi.advanceTimersByTime((1 + onubBalance.timers.voteS) * 1000);
+    expect(phases).toEqual([7, 8, 9]);
+    expect(feed.result()?.outs).toEqual(['d']);
 
     vi.advanceTimersByTime(onubBalance.timers.revealS * 1000);
-    const over = feed.over();
-    expect(over?.onub?.outs).toEqual(result?.outs);
-    expect(Object.keys(over?.onub?.plates ?? {})).toHaveLength(roster.length);
-    expect(over?.onub?.winnerIds.length).toBeGreaterThan(0);
+    expect(feed.over()).toMatchObject({ winner: 5, roles: {} });
+    expect(feed.over()?.onub).toBeUndefined();
     expect(done).toHaveBeenCalledWith('gameOver');
     feed.dispose();
   });
@@ -186,8 +140,8 @@ describe('MockMeetingFeed, dawn', () => {
     const feed = new MockMeetingFeed(roster, 'me', { onDone: vi.fn() });
     feed.begin({ reason: 'body', callerId: 'me', bodyOf: 'b' });
     expect(feed.mode()).toBe('main');
-    expect(feed.claims()).toEqual([]);
-    expect(feed.traces()).toEqual([]);
+    feed.vote('pantry');
+    expect(feed.myVote()).toBe('');
     feed.dispose();
   });
 });
