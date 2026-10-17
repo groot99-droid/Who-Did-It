@@ -22,6 +22,7 @@ interface Tracked {
 export class EntityView {
   private readonly tracked = new Map<string, Tracked>();
   private ghost = false;
+  private mates: ReadonlySet<string> = new Set();
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -39,6 +40,11 @@ export class EntityView {
   /** Draws the viewer's own sprite translucent once they are a ghost. */
   setGhost(on: boolean): void {
     this.ghost = on;
+  }
+
+  /** Quick mode: the ids whose nameplates glow red (the Poisoner's partner); empty otherwise. */
+  setMates(ids: ReadonlySet<string>): void {
+    this.mates = ids;
   }
 
   /** Feeds one snapshot taken at wall time `now` (ms) and redraws everybody. */
@@ -64,6 +70,7 @@ export class EntityView {
         snap.id === this.selfId ||
         (selfPr !== null && Math.hypot(pr.x - selfPr.x, pr.y - selfPr.y) <= BLOOD_SIGHT_PX);
       t.view.setBlood(bloody && near);
+      t.view.setMate(this.mates.has(snap.id));
       if (snap.id === this.selfId) t.view.setGhost(this.ghost);
       t.samples.push({ t: now, x: pr.x, y: pr.y, yaw: pr.yaw, animId: pr.animId });
       const delay = snap.id === this.selfId ? SELF_DELAY_MS : REMOTE_DELAY_MS;

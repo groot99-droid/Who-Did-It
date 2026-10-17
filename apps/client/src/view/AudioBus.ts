@@ -43,6 +43,8 @@ export function parseAudioManifest(raw: unknown): UrlMap {
 export class AudioBus {
   private sounds: UrlMap = {};
   private ambient: HTMLAudioElement | null = null;
+  /** Looping keys other than `ambient` (the loft's `storm`), by key. */
+  private readonly loops = new Map<string, HTMLAudioElement>();
   private unlocked = false;
   private muted = false;
 
@@ -62,6 +64,7 @@ export class AudioBus {
       window.removeEventListener('pointerdown', unlock);
       window.removeEventListener('keydown', unlock);
       if (this.ambient) void this.ambient.play().catch(() => undefined);
+      for (const a of this.loops.values()) void a.play().catch(() => undefined);
     };
     window.addEventListener('pointerdown', unlock);
     window.addEventListener('keydown', unlock);
@@ -74,6 +77,24 @@ export class AudioBus {
   setMuted(muted: boolean): void {
     this.muted = muted;
     if (this.ambient) this.ambient.muted = muted;
+    for (const a of this.loops.values()) a.muted = muted;
+  }
+
+  /** Starts a looping bed under the other sounds (the loft's storm); a missing key stays silent. */
+  playLoop(key: AudioKey): void {
+    const s = this.sounds[key];
+    if (!s || this.loops.has(key)) return;
+    const a = new Audio(`${this.base}assets/audio/${s.url}`);
+    a.loop = true;
+    a.muted = this.muted;
+    a.volume = Math.min(1, Math.max(0, s.gain)) * 0.5;
+    this.loops.set(key, a);
+    if (this.unlocked) void a.play().catch(() => undefined);
+  }
+
+  stopLoop(key: AudioKey): void {
+    this.loops.get(key)?.pause();
+    this.loops.delete(key);
   }
 
   play(key: AudioKey): void {

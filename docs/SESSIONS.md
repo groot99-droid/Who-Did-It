@@ -1370,3 +1370,31 @@ partner) are not written, merge R and add them. `test/npcSlow.test.ts` (`WDI_SLO
 Killer-wins-one-of-five test depends on the wandering NPC finding a lone human and may need tuning. `Win.ts`
 (not mine) hands the lead to the first player after a reset if the leader left; `resetNpcsForLobby` corrects it.
 No contract was missing from the base branch.
+
+### Round 4 log: T
+
+Quick mode, client world (`claude/m3b-world`). **What landed:** the router starts the `Loft` on
+`nightSleep`, the bakery `World` on `nightWake` (no `sceneEnter` comes with a wake, so the router starts
+it at the message's `spawn`) or on a bakery `sceneEnter`, and stops the loft on a meeting, the game over
+and the lobby return; the feeds carry `nightWake`, `nightReveal`, `nightSleep`, `props()`, `mates()`,
+`nightReveal()`, `mode()`, `wake()` (new, A42) and `ability(id, targetId?, targetId2?)`; the loft
+(`scenes/Loft.ts`, `view/LoftView.ts`: bedrolls, manifest backdrop and bedroll images with the CSS
+fallback, `storm` loop, unlabelled `creak` cues, no HUD, `InputController.stop()`); the bakery (`PropView`
+draws plates only for listed seats with the owner's name, `view/quickMode.ts` picks the act a window
+offers where, the plate and act holds draw the collect ring and send one `act.ability`, the window banner
+`night-wake`, `night-reveal` lines and toasts, the partner's red nameplate, dawn in `Lighting`); the copy
+deck of UI 14.1 to 14.5 and 14.8 in `ui/copy/world.ts` and every literal of `World`, `Hud`,
+`NotebookPanel` and `TouchControls` replaced; the `InputController` timer stops between screens and
+`start()` is idempotent; `?mode=onub` makes the world mock play dusk, a window (`&window=<role>`,
+`&speed=N`), a reveal, the loft and the dawn `meetingRequest`; `world.spec.ts` covers the plate prompt and
+the whole loft cycle in the mock. **Next session or the orchestrator:** (1) the whole client was built
+against the pre-seeded contracts and the mock only; nothing here has run against R's server, so at
+integration run `?mode=onub` against it and check that a `nightWake` really arrives without a
+`sceneEnter` (the router depends on it) and that `Private.cabalMates` is empty outside the Poisoners. (2)
+The quick-mode copy ids (`prompt.act.onub.*`, `quick.*`, `loft.*`) are stand-ins: when Y's UI.md 14.12
+lands, change the strings in `ui/copy/world.ts`. (3) The loft cues use `Math.random` and the manifest
+keys `loft_backdrop`, `prop_bedroll`, `prop_bedroll_self`; until X ships them the CSS bedrolls show. (4)
+Not done: the `prompt.ability` lines (14.2) and `ghost.secret`/`ghost.roles` (no round-4 screen shows
+them), the `prop_wakeTable` greybox (deliberately blank, the plates stand on it), and a real-server e2e
+(W's `onub.spec.ts` is opt-in). (5) The PR is larger than 400 lines (about 1.2k added, over half of it
+tests, the mock and the copy deck); the commits are split by layer.

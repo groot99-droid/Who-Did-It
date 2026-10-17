@@ -1,6 +1,7 @@
 import traits from '@wdi/content/data/traits.json';
 import { ClueKind, NotebookStatus } from '@wdi/shared/constants';
 import type { NotebookSnap, WorldFeed } from '../net/world';
+import { WORLD_COPY as C, fill } from '../ui/copy';
 import { h } from '../ui/dom';
 import { formatClock } from './Hud';
 import { loadSceneNames } from './sceneNames';
@@ -10,20 +11,32 @@ const icon = (path: string) => h('img', { class: 'wdi-icon', alt: '', src: `${BA
 
 const HEIGHT_ICON = ['icon_height_short', null, 'icon_height_tall'];
 const STATUS: Record<number, { label: string; cls: string }> = {
-  [NotebookStatus.claimed]: { label: 'Claimed', cls: '' },
-  [NotebookStatus.verified]: { label: 'Verified', cls: ' wdi-chip--verified' },
-  [NotebookStatus.corroborated]: { label: 'Corroborated', cls: ' wdi-chip--verified' },
-  [NotebookStatus.forged]: { label: 'Forged', cls: ' wdi-chip--danger' },
-  [NotebookStatus.teaching]: { label: 'Teaching', cls: '' },
+  [NotebookStatus.claimed]: { label: C['notebook.status.claimed'], cls: '' },
+  [NotebookStatus.verified]: { label: C['notebook.status.verified'], cls: ' wdi-chip--verified' },
+  [NotebookStatus.corroborated]: { label: C['notebook.status.corroborated'], cls: ' wdi-chip--verified' },
+  [NotebookStatus.forged]: { label: C['notebook.status.forged'], cls: ' wdi-chip--danger' },
+  [NotebookStatus.teaching]: { label: C['notebook.status.teaching'], cls: '' },
 };
+/** Stride words by height index and wool words by scarf index (UI.md 14.5). */
+const STRIDE = [C['stride.short'], C['stride.mid'], C['stride.tall']];
+const WOOL = [C['wool.red'], C['wool.green'], C['wool.blue']];
 
-/** "Footprints: Tall", "Thread: Red scarf" - the clue kind and the trait value it shows. */
+/** "Footprints, long stride: Tall", "Thread, red wool: Red scarf" - the clue kind and the trait value it shows. */
 export function entryText(e: Pick<NotebookSnap, 'clueKind' | 'value'>): string {
+  const { height, scarf, hat } = traits.axes;
   if (e.clueKind === ClueKind.footprints)
-    return `Footprints: ${traits.axes.height.values[e.value]?.label ?? '?'}`;
-  if (e.clueKind === ClueKind.thread) return `Thread: ${traits.axes.scarf.values[e.value]?.label ?? '?'}`;
-  if (e.clueKind === ClueKind.felt) return `Felt: ${traits.axes.hat.values[e.value]?.label ?? '?'}`;
-  return 'Clue';
+    return fill(C['notebook.entry.footprints'], {
+      stride: STRIDE[e.value] ?? '?',
+      height: height.values[e.value]?.label ?? '?',
+    });
+  if (e.clueKind === ClueKind.thread)
+    return fill(C['notebook.entry.thread'], {
+      wool: WOOL[e.value] ?? '?',
+      scarf: scarf.values[e.value]?.label ?? '?',
+    });
+  if (e.clueKind === ClueKind.felt)
+    return fill(C['notebook.entry.felt'], { hat: hat.values[e.value]?.label ?? '?' });
+  return C['notebook.entry.other'];
 }
 
 function entryIcon(e: NotebookSnap): HTMLElement {
@@ -58,8 +71,8 @@ export class NotebookPanel {
     this.list = h('div', { class: 'wdi-notebook__list' });
     this.root = h(
       'section',
-      { class: 'wdi-notebook', 'data-testid': 'notebook', 'aria-label': 'Notebook' },
-      h('h2', { class: 'wdi-eyebrow' }, 'Notebook'),
+      { class: 'wdi-notebook', 'data-testid': 'notebook', 'aria-label': C['notebook.title'] },
+      h('h2', { class: 'wdi-eyebrow' }, C['notebook.title']),
       this.list,
     );
     parent.append(this.root);
@@ -79,7 +92,7 @@ export class NotebookPanel {
     this.signature = sig;
     this.list.replaceChildren(
       ...(entries.length === 0
-        ? [h('p', { class: 'wdi-muted' }, 'Nothing yet. Hold E on a glowing clue to collect it.')]
+        ? [h('p', { class: 'wdi-muted' }, C['notebook.empty'])]
         : entries.map((e) => this.row(e, start))),
     );
   }
@@ -103,7 +116,7 @@ export class NotebookPanel {
       h(
         'span',
         {},
-        `${entryText(e)}${where ? ` · ${where}` : ''} · ${formatClock(Math.max(0, e.tick - start))}`,
+        `${entryText(e)} · ${fill(C['notebook.meta'], { scene: where || '...', time: formatClock(Math.max(0, e.tick - start)) })}`,
       ),
       h('span', { class: `wdi-chip${status.cls}` }, status.label),
     );
@@ -128,7 +141,7 @@ export class NotebookSheet {
       {
         type: 'button',
         class: 'wdi-btn wdi-btn--icon wdi-btn--ghost wdi-notebook-sheet__close',
-        'aria-label': 'Close notebook',
+        'aria-label': C['hud.notebook.close'],
       },
       icon('glyphs/glyph_close'),
     );

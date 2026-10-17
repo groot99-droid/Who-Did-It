@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import onubBalance from '@wdi/content/data/balance.onub.json';
+import bakeryJson from '@wdi/content/data/scenes/bakery.json';
 import { TICK_RATE, TILE_PX } from '@wdi/shared/constants';
 import { MockWorldFeed } from './worldMock';
 
@@ -109,5 +111,86 @@ describe('MockWorldFeed verbs', () => {
   it('ghost mode is held in the feed', () => {
     expect(make('?ghost=1').feed.dead()).toBe(true);
     expect(make().feed.dead()).toBe(false);
+  });
+});
+
+describe('MockWorldFeed quick mode (?mode=onub)', () => {
+  const bakery = {
+    id: 'bakery',
+    portals: [],
+    spawns: [{ id: 'door', x: 8, y: 9, facing: 'n' }],
+    props: bakeryJson.props,
+  };
+  const qcontent = { ...content, scenes: { ...content.scenes, bakery } };
+  function quick(search = '') {
+    (globalThis as { location?: unknown }).location = { search: `?mode=onub&bots=still${search}` };
+    const feed = new MockWorldFeed(qcontent as never);
+    const events: string[] = [];
+    for (const type of ['nightWake', 'nightSleep', 'nightReveal', 'meetingRequest', 'error'] as const)
+      feed.bus.on(type, () => events.push(type));
+    const me = (feed as unknown as Internals).actors.get(feed.selfId)!;
+    return { feed, events, me };
+  }
+  const spot = (id: string) => bakeryJson.props.find((p) => p.id === id)!;
+  const stand = (me: { x: number; y: number }, id: string) => {
+    me.x = (spot(id).x + 0.5) * TILE_PX;
+    me.y = (spot(id).y + 0.5) * TILE_PX;
+  };
+
+  it('reports the mode, lists seven plates with their owners and the dead loaves', () => {
+    const { feed } = quick();
+    expect(feed.mode()).toBe('onub');
+    const plates = feed.props().filter((p) => p.kind === 'plate');
+    expect(plates).toHaveLength(7);
+    expect(plates[0]).toMatchObject({ id: 'bk.plate_0', of: feed.selfId });
+    expect(feed.props().filter((p) => p.kind === 'deadLoaf')).toHaveLength(onubBalance.deadLoaves);
+    expect(make().feed.mode()).toBe('main');
+  });
+
+  it('plays dusk, sleep, one window with a reveal, sleep and then the dawn meeting request', () => {
+    const { feed, events, me } = quick('&window=cutpurse');
+    expect(feed.clock().phase).toBe(4);
+    expect(feed.snapshot().filter((p) => p.presence !== null)).toHaveLength(7);
+    tickN(feed, onubBalance.timers.duskS * TICK_RATE);
+    expect(events).toEqual(['nightSleep']);
+    expect(feed.snapshot().every((p) => p.presence === null)).toBe(true);
+    expect(feed.wake()).toBeNull();
+    tickN(feed, onubBalance.timers.windowJitterMaxS * TICK_RATE);
+    expect(events).toEqual(['nightSleep', 'nightWake']);
+    expect(feed.wake()?.windowRole).toBe('cutpurse');
+    stand(me, 'bk.plate_2');
+    feed.ability('onub.take', 'bk.plate_2');
+    expect(events).toContain('nightReveal');
+    expect(feed.nightReveal()).toHaveLength(1);
+    expect(feed.nightReveal()[0]).toMatchObject({ slot: 'bk.plate_0', of: feed.selfId });
+    feed.ability('onub.take', 'bk.plate_3');
+    expect(events).toContain('error'); // a second act in one window is refused
+    tickN(feed, 60 * TICK_RATE);
+    expect(events.at(-1)).toBe('meetingRequest');
+    expect(events.filter((e) => e === 'nightSleep')).toHaveLength(2);
+  });
+
+  it('refuses an act outside its window or out of reach, and a take of the own plate', () => {
+    const { feed, events, me } = quick();
+    feed.ability('onub.take', 'bk.plate_1');
+    expect(events).toEqual(['error']); // not in a window (425)
+    tickN(feed, (onubBalance.timers.duskS + onubBalance.timers.windowJitterMaxS) * TICK_RATE);
+    me.x = 0;
+    me.y = 0;
+    feed.ability('onub.take', 'bk.plate_1');
+    expect(events.filter((e) => e === 'error')).toHaveLength(2); // too far (427)
+    stand(me, 'bk.plate_0');
+    feed.ability('onub.take', 'bk.plate_0');
+    expect(events.filter((e) => e === 'error')).toHaveLength(3); // the own plate is never a target (422)
+    expect(feed.nightReveal()).toHaveLength(0);
+  });
+
+  it('sets the own plate at dusk only', () => {
+    const { feed, events, me } = quick();
+    stand(me, 'bk.plate_0');
+    feed.ability('onub.setPlate', 'bk.plate_0');
+    expect(events).toEqual([]);
+    feed.ability('onub.setPlate', 'bk.plate_1');
+    expect(events).toEqual(['error']);
   });
 });

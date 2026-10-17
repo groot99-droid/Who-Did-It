@@ -1,5 +1,5 @@
 import type { Emitter } from 'mitt';
-import type { HoldAction } from '@wdi/shared/protocol';
+import type { HoldAction, NightRevealEntry } from '@wdi/shared/protocol';
 
 // What the World scene needs from the network. `ColyseusWorldFeed` reads the room state, the mock feed
 // (?mock=1) simulates the same data locally; the scene cannot tell them apart. Kept apart from
@@ -56,6 +56,21 @@ export interface NotebookSnap {
   status: number;
 }
 
+/** A bakery prop the server lists (quick mode, A39): `of` is the owner's seat id of a plate, empty otherwise. */
+export interface PropSnap {
+  id: string;
+  kind: string;
+  turned: boolean;
+  of: string;
+}
+
+/** Quick mode: the night window this seat is awake in (the private `nightWake`). */
+export interface NightWindow {
+  windowRole: string;
+  endsTick: number;
+  spawn: string;
+}
+
 export interface DoorSnap {
   id: string;
   state: number;
@@ -93,6 +108,12 @@ export type WorldFeedEvents = {
   clueFound: { entryId: string };
   phaseChange: { phase: number; endsTick: number };
   /** Mock only: the mock world's report or bell asks the mock network to open a meeting (round 3, M | N seam). */
+  /** Private, quick mode: this seat's window opened; the World starts in the bakery. */
+  nightWake: NightWindow;
+  /** Private, quick mode: what the act showed. */
+  nightReveal: { entries: NightRevealEntry[] };
+  /** Private, quick mode: back to the loft (the window ended, or the night began). */
+  nightSleep: Record<string, never>;
   meetingRequest: { reason: 'body' | 'bell' | 'dawn'; callerId: string; bodyOf?: string };
 };
 
@@ -104,6 +125,16 @@ export interface WorldFeed {
   /** Doors of the scene this client is in. */
   doors(): DoorSnap[];
   clock(): { tick: number; phase: number; phaseEndsTick: number; startTick: number };
+  /** `main` or `onub` (quick mode, GDD 3.11), from the lobby setting. */
+  mode(): 'main' | 'onub';
+  /** Quick mode: the props the server lists for the bakery (plates, dead loaves, ledger). Empty in the main mode. */
+  props(): PropSnap[];
+  /** Quick mode: the Poisoner partner's id for a Poisoner, empty for everyone else. */
+  mates(): string[];
+  /** Quick mode: what this seat's night act showed, oldest first. */
+  nightReveal(): NightRevealEntry[];
+  /** Quick mode: the open window of this seat, or null while it sleeps or outside the night. */
+  wake(): NightWindow | null;
   /** Bodies of the scene this client is in. */
   bodies(): BodySnap[];
   /** Clues of the scene this client is in. */
@@ -118,7 +149,8 @@ export interface WorldFeed {
   sendMove(cmd: MoveCmd): void;
   enterPortal(portalId: string): void;
   kill(targetId: string): void;
-  ability(id: string, targetId?: string): void;
+  /** `targetId2` is the second pick of a `picks: 2` act (quick mode). */
+  ability(id: string, targetId?: string, targetId2?: string): void;
   /** Starts (`on`) or ends a hold; the server re-validates it every tick. */
   hold(action: HoldAction, targetId: string, on: boolean): void;
   reportBody(bodyId: string): void;
@@ -131,3 +163,5 @@ export interface WorldFeed {
 /** Phaser registry key under which the router publishes the active feed. */
 export const REG_WORLD = 'worldFeed';
 export const REG_ROLE_CHIP = 'roleChip';
+/** Phaser registry key of the World's `InputController`; the router stops it between screens. */
+export const REG_INPUT = 'worldInput';

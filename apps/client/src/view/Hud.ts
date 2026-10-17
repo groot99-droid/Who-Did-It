@@ -1,4 +1,5 @@
 import { TICK_RATE } from '@wdi/shared/constants';
+import { WORLD_COPY as C } from '../ui/copy';
 import { h } from '../ui/dom';
 import '../ui/theme/tokens.css';
 import '../ui/theme/components.css';
@@ -20,6 +21,38 @@ export function formatTimer(ticksLeft: number | null): string {
 
 /** Elapsed match time as m:ss from ticks (the Notebook's time column). */
 export const formatClock = formatTimer;
+
+/**
+ * A pulsing ring at a screen edge, `angle` radians clockwise from screen-up. Shared by the HUD (noise cues)
+ * and the quick-mode loft (muffled creaks, with no `label` so a cue says nothing about where or what).
+ */
+export function edgeCue(
+  parent: HTMLElement,
+  base: string,
+  x: number,
+  y: number,
+  angle: number,
+  label?: string,
+  cool = false,
+): HTMLElement {
+  const cue = h(
+    'div',
+    {
+      class: cool ? 'wdi-edge-cue wdi-edge-cue--cool' : 'wdi-edge-cue',
+      'aria-label': label,
+      'aria-hidden': label === undefined ? 'true' : null,
+      style: `left:${x}px;top:${y}px`,
+    },
+    h('img', {
+      class: 'wdi-icon',
+      alt: '',
+      src: `${base}assets/ui/glyphs/glyph_chevron.svg`,
+      style: `transform: rotate(${angle + Math.PI}rad)`,
+    }),
+  );
+  parent.append(cue);
+  return cue;
+}
 
 /** One-time toast keys already shown this page load (the grace hints must not repeat per scene). */
 const shownToasts = new Set<string>();
@@ -47,6 +80,8 @@ export class Hud {
   private readonly promptText: HTMLElement;
   private readonly promptKey: HTMLElement;
   private readonly fps: HTMLElement;
+  private readonly banner: HTMLElement;
+  private readonly reveals: HTMLElement;
   private readonly timers = new Set<number>();
 
   constructor(
@@ -54,7 +89,7 @@ export class Hud {
     private readonly base = import.meta.env.BASE_URL,
   ) {
     this.chipGoal = h('span', { class: 'wdi-hud-chip__goal' });
-    this.chipRole = h('span', { class: 'wdi-hud-chip__role' }, 'Your goal');
+    this.chipRole = h('span', { class: 'wdi-hud-chip__role' }, C['hud.goal']);
     this.chip = h(
       'div',
       { class: 'wdi-hud-chip', hidden: true },
@@ -66,7 +101,7 @@ export class Hud {
       {
         type: 'button',
         class: 'wdi-btn wdi-btn--icon',
-        'aria-label': 'Notebook (N)',
+        'aria-label': C['hud.notebook'],
         'data-testid': 'notebook-open',
       },
       icon(base, 'marks/mark_notebook_tab'),
@@ -80,6 +115,8 @@ export class Hud {
       this.clockPhase,
     );
     this.log = h('div', { class: 'wdi-log', role: 'log' });
+    this.banner = h('div', { class: 'wdi-toast wdi-toast--warm', 'data-testid': 'night-wake', hidden: true });
+    this.reveals = h('div', { class: 'wdi-log', 'data-testid': 'night-reveal' });
     this.fps = h('pre', { class: 'wdi-hud-fps', 'data-testid': 'hud-fps', hidden: true });
     this.promptText = h('span');
     this.promptKey = h('kbd', { class: 'wdi-kbd wdi-toast__kbd' }, 'E');
@@ -94,8 +131,8 @@ export class Hud {
       'div',
       { class: 'wdi-root wdi-hud', 'data-testid': 'hud' },
       h('div', { class: 'wdi-hud__tl' }, this.chip, this.notebookBtn),
-      h('div', { class: 'wdi-hud__tc' }, this.clock),
-      h('div', { class: 'wdi-hud__tr' }, this.log, this.fps),
+      h('div', { class: 'wdi-hud__tc' }, this.clock, this.banner),
+      h('div', { class: 'wdi-hud__tr' }, this.log, this.reveals, this.fps),
       this.toasts,
     );
     parent.append(this.root);
@@ -108,7 +145,7 @@ export class Hud {
 
   /** The line under "Your goal"; a ghost reads "You are a ghost" here as well as in the log. */
   setGhost(on: boolean): void {
-    this.chipRole.textContent = on ? 'You are a ghost' : 'Your goal';
+    this.chipRole.textContent = on ? C['ghost.label'] : C['hud.goal'];
   }
 
   onNotebook(handler: () => void): void {
@@ -158,20 +195,21 @@ export class Hud {
     if (this.promptKey.textContent !== key) this.promptKey.textContent = key;
   }
 
-  /** A pulsing ring at the screen edge, `angle` radians clockwise from screen-up, `at` in 0..1 of the edge box. */
+  /** A pulsing ring at the screen edge, `angle` radians clockwise from screen-up. */
   edgeCue(x: number, y: number, angle: number, label: string, ms = 1800): void {
-    const cue = h(
-      'div',
-      { class: 'wdi-edge-cue', 'aria-label': label, style: `left:${x}px;top:${y}px` },
-      h('img', {
-        class: 'wdi-icon',
-        alt: '',
-        src: `${this.base}assets/ui/glyphs/glyph_chevron.svg`,
-        style: `transform: rotate(${angle + Math.PI}rad)`,
-      }),
-    );
-    this.root.append(cue);
+    const cue = edgeCue(this.root, this.base, x, y, angle, label);
     this.later(() => cue.remove(), ms);
+  }
+
+  /** Quick mode: the open window's banner ("Your watch: Sin-Eater"); `null` hides it. */
+  setBanner(text: string | null): void {
+    this.banner.hidden = text === null;
+    if (text !== null && this.banner.textContent !== text) this.banner.textContent = text;
+  }
+
+  /** Quick mode: what the night act showed, kept on screen until the window ends. */
+  setReveals(lines: string[]): void {
+    this.reveals.replaceChildren(...lines.map((l) => h('p', { class: 'wdi-log__line' }, l)));
   }
 
   setFps(text: string | null): void {

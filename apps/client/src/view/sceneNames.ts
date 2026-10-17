@@ -7,7 +7,16 @@ let loaded: Promise<(index: number) => string> | null = null;
 export function loadSceneNames(): Promise<(index: number) => string> {
   loaded ??= import('@wdi/content').then(({ SCENE_IDS, scenes }) => (index: number) => {
     const id = SCENE_IDS[index];
-    return id === undefined ? 'Somewhere' : (scenes[id]?.name ?? id.replaceAll('_', ' '));
+    return id === undefined
+      ? 'Somewhere'
+      : ((scenes as Record<string, { name?: string }>)[id]?.name ?? id.replaceAll('_', ' '));
   });
   return loaded;
+}
+
+/** The display name of a scene by its id ("The Drowned Lantern"); the id with underscores spelled out until it loads. */
+export function loadSceneName(id: string): Promise<string> {
+  return import('@wdi/content').then(
+    ({ scenes }) => (scenes as Record<string, { name?: string }>)[id]?.name ?? id.replaceAll('_', ' '),
+  );
 }
