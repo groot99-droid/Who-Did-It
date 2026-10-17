@@ -1,11 +1,11 @@
-import { balance } from '@wdi/content';
-import { Phase, type PlayerState, S2C, TICK_RATE, Winner, checkWin } from '@wdi/shared';
+import { balance, onubBalance, onubRoles } from '@wdi/content';
+import { Phase, type PlayerState, S2C, TICK_RATE, Winner, checkWin, onubWinners } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { logMatch } from '../services/MatchLog';
 import { countRow, factionOf, flowOf, resetFlow, roleIdOf, rolesOf, setPhase } from './Flow';
 import { simOf } from './RoomSim';
 import { isNpcSeat, resetNpcsForLobby } from './Npc';
-import { resetOnubForLobby } from './Onub';
+import { DEAD_PREFIX, finalRoleOf, onubOf, resetOnubForLobby } from './Onub';
 import { SCENE_KEYS } from './World';
 
 /** `checkWin` over the living seats (GDD 3.8). Called after a death or an ejection, never on a bare tick. */
@@ -64,6 +64,100 @@ export function endMatch(room: PartyRoom, winner: 'village' | 'cabal'): void {
         ejectionCorrect: m.ejectionCorrect,
       }),
     })),
+  });
+}
+
+/**
+ * Quick mode (GDD 3.11): the winners table judged on the final loaves, then game over with the end-screen
+ * facts. `state.winner` is one `Winner`: the Debtor when turned out, else the Village or the Cabal per the
+ * row, else nobody ("the storm wins").
+ */
+export function endOnubMatch(room: PartyRoom): void {
+  const o = onubOf(room);
+  if (!o) return;
+  const state = room.state;
+  const sim = simOf(room);
+  const flow = flowOf(room);
+  const final: Record<string, string> = {};
+  state.players.forEach((_p: PlayerState, id: string) => {
+    final[id] = finalRoleOf(room, id);
+  });
+  const faction = (roleId: string) => onubRoles.roles[roleId]?.faction ?? 'village';
+  const center = Array.from(
+    { length: onubBalance.deadLoaves },
+    (_, i) => o.loaves.get(`${DEAD_PREFIX}${i}`) ?? '',
+  );
+  const { rowId, winnerIds } = onubWinners(
+    o.outs,
+    new Map(Object.entries(final)),
+    center,
+    faction,
+    onubBalance.winners,
+  );
+  const row = onubBalance.winners.find((r) => r.id === rowId);
+  const debtorOut = o.outs.some((id) => final[id] === 'debtor');
+  const winner = debtorOut
+    ? 'debtor'
+    : winnerIds.length === 0
+      ? 'nobody'
+      : winnerIds.some((id) => faction(final[id] ?? '') === 'cabal')
+        ? 'cabal'
+        : 'village';
+  state.winner = Winner[winner];
+  setPhase(room, Phase.gameOver, balance.phases.gameOverS);
+  room.broadcast(S2C.gameOver, {
+    winner: state.winner,
+    roles: final,
+    summary: row?.text ?? '',
+    onub: {
+      dealt: Object.fromEntries(o.dealt),
+      final,
+      center,
+      swapLog: o.swapLog,
+      votes: o.votes,
+      outs: o.outs,
+      plates: Object.fromEntries(o.owners),
+      rowId,
+      winnerIds,
+    },
+  });
+
+  const players: Parameters<typeof logMatch>[0]['players'] = [];
+  state.players.forEach((p: PlayerState, id: string) => {
+    players.push({
+      id,
+      name: p.name,
+      role: o.dealt.get(id) ?? '',
+      finalRole: final[id] ?? '',
+      faction: faction(final[id] ?? ''),
+      survived: !sim.players.get(id)?.dead,
+      clues: 0,
+      ...(isNpcSeat(room, id) && { isNpc: true }),
+    });
+  });
+  logMatch({
+    code: room.roomId,
+    seats: state.players.size,
+    durationS: (state.tick - state.startTick) / TICK_RATE,
+    winner,
+    mode: 'onub',
+    rounds: state.round,
+    kills: 0,
+    vanished: flow.vanished,
+    players,
+    meetings: flow.meetings.map((m) => ({
+      round: m.round,
+      reason: m.reason,
+      votes: m.votes,
+      accuracy: m.votes === 0 ? 0 : m.correctVotes / m.votes,
+      outs: o.outs,
+      ...(m.ejectedId !== undefined && {
+        ejectedId: m.ejectedId,
+        ejectedRole: m.ejectedRole,
+        ejectionCorrect: m.ejectionCorrect,
+      }),
+    })),
+    onub: { rowId, winnerIds },
   });
 }
 

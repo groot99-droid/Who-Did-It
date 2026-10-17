@@ -1323,3 +1323,36 @@ goes in the PR description. Not in scope: code.
   `bedroll-<id>`, `night-wake`, `claim-<roleId>`, `swaplog`, `gameover-final-<id>`; `vote-skip` is
   absent in quick mode.
 - Reserved DECISIONS rows: R A40, S A41, T A42, U A43, V A44, W A45, X A46, Y A47.
+
+### Round 4 log: R (quick mode, server)
+
+**Landed** (branch `claude/m3b-server`, DECISIONS A40): the pure rules `dealOnub`, `nightScript`,
+`applyNightAct`, `resolveDawn` and `onubWinners` (`packages/shared/src/rules/onub.ts`, property tests in
+`packages/shared/test/onub.test.ts` and against the real content in `apps/server/test/onubRules.test.ts`);
+the deal and role cards, dusk with plate-setting, the acts and the NPC plans (`sim/Onub.ts`); the night
+Conductor, `runOnubPhases` and the quick-mode `debug.clock` (`sim/Conductor.ts`, `sim/Phases.ts`); the dawn
+meeting, the vote without Skip, the plural reveal and claims (`sim/Meeting.ts`); the winners, `gameOver.onub`
+and the match log (`sim/Win.ts`, `services/MatchLog.ts`). Server tests: `onubDeal`, `onubNight`, `onubMeeting`,
+`onubNpc` (helpers in `onubHelpers.ts`); the main-mode suites pass unchanged. GDD 3.11 and ARCHITECTURE 5.14
+carry the "(M3b)" sentences and the module map.
+
+**For the next session and the orchestrator**
+- This PR is far over 400 lines (about 1000 lines of source, the rest tests) because the deal, the Conductor,
+  the meeting branch and the end screen only make sense together; the rules commit stands alone if it needs
+  splitting at review.
+- `onubWinners` takes the winners table as a fifth argument (`@wdi/shared` cannot import `@wdi/content`); callers
+  pass `onubBalance.winners`.
+- S: `isNpcSeat` is the only NPC test the Conductor makes. It wakes NPC seats at the `door` spawn, calls
+  `planNpcAct`, and applies the plan itself at the window's end; `onubNpcPlan(room, id)` returns it while the
+  window is open and the seat has not acted. `onubNpcPlan` returns `{abilityId, targetId, targetId2?}`; the brain
+  sends it through `handleOnubAbility` (reach is checked, so it must walk there: one pick within 2 tiles for a
+  two-pick act). `onubNpcPlan` is null when the draw chose nothing. `onubNpc.test.ts` stubs `isNpcSeat` with
+  `vi.mock`; replace the stub by a real NPC seat once S has merged. A quick-mode Start with fewer than
+  `players.min` seats is refused 422 until S's fill exists.
+- T, U, W: a sleeper's `act.hold` and `act.reportBody` answer 422, only the portal answers 425 (the pre-seeded
+  guards; the brief said 425). The hold time of an act is the client's: the server validates once.
+- The night's `phaseEndsTick` is the nominal total; the dawn starts when the Conductor finishes, so a client
+  clock must not assume the two agree after a `debug.clock {window}` jump.
+
+**Not done**: nothing in the brief is open. The Gamekeeper hop and the Pallbearers stay V1.1 (`onubBalance.winners`
+needs no change).
