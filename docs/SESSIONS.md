@@ -1542,7 +1542,7 @@ CC BY 4.0 hand-made art (DECISIONS A46).
   collect -> one Notebook entry" fails now and then under the full parallel run on the base manifest
   too (it passes alone every time); W owns the spec.
 
-## Round 4 log: Y
+### Round 4 log: Y (content, copy, audio, playtest kit)
 
 Session Y (content, copy, audio, playtest kit), branch `claude/r4-content`, PR #20.
 

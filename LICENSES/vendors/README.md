@@ -11,12 +11,12 @@ never overwrite an old one, since an asset is governed by the terms in force whe
 | Meshy (via Higgsfield `generate_3d`) | Terms of Service and output licence, if Higgsfield's terms do not cover models it routes to | the first generated GLB or render from one | no |
 | Adobe | General Terms of Use; Generative AI User Guidelines; Firefly / generative-feature terms (non-beta features only) | the first Adobe generative edit (Photoshop defringe with Generative Fill, Firefly) | no |
 | Adobe (Mixamo) | Mixamo FAQ and the Adobe terms that cover Mixamo characters and animations | the first sheet rendered from Mixamo clips | no |
-| Kenney | the CC0 licence file shipped in each pack used | the first Kenney-derived render or sound | no |
+| Kenney | the CC0 licence file shipped in each pack used | the first Kenney-derived render or sound | yes, 2026-10-16: `kenney-rpg-audio-license-2026-10-16.txt`, `kenney-impact-sounds-license-2026-10-16.txt` (the two packs the M3 and M3b sounds come from) |
 | KayKit | the CC0 licence file shipped in each pack used | the first KayKit-derived render | no |
 | Poly Haven | the CC0 licence page | the first Poly Haven texture or HDRI in a render | no |
 | Freesound | the CC0 licence of each sound (one row per sound in `CREDITS.md`) | the first Freesound SFX | no |
 | Quaternius | the Quaternius Asset License (QAL) | the first sprite rendered from a Quaternius model | no |
-| OpenGameArt | the licence of each entry (CC0 only) | the first OpenGameArt asset | no |
+| OpenGameArt | the licence of each entry (CC0 only) | the first OpenGameArt asset | yes, 2026-10-16: `opengameart-rain-long-thunder-license-2026-10-16.md` (the `storm` loop) |
 
 Fonts (OFL) live in `LICENSES/fonts/`, owned by Session B.
 
