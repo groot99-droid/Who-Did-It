@@ -10,6 +10,10 @@ export interface ManifestEntry {
   path?: string;
   filter?: 'linear' | 'nearest';
   origin?: [number, number];
+  /** Map ids: the entry loads with the match's map, not at boot (SPRITES 5, 10.13). */
+  maps?: string[];
+  /** Modes: the entry loads at match start when the match's mode is listed, whatever the client's card. */
+  modes?: Array<'main' | 'onub'>;
 }
 
 export interface Manifest {
@@ -30,6 +34,19 @@ const join = (root: string, rel: string) => `${root}${rel}`;
  * art session ships it the fetch 404s and the placeholder set keeps playtests running.
  */
 export async function resolveManifest(art: 'default' | 'placeholder', base: string): Promise<LoadedManifest> {
+  const resolved = await fetchManifest(art, base);
+  resolvedManifests.set(`${art}|${base}`, resolved);
+  return resolved;
+}
+
+/** The manifest `resolveManifest` already fetched, for code that cannot wait (a scene's `preload`). */
+export function peekManifest(art: 'default' | 'placeholder', base: string): LoadedManifest | null {
+  return resolvedManifests.get(`${art}|${base}`) ?? null;
+}
+
+const resolvedManifests = new Map<string, LoadedManifest>();
+
+async function fetchManifest(art: 'default' | 'placeholder', base: string): Promise<LoadedManifest> {
   const candidates = art === 'placeholder' ? ['placeholder/'] : ['', 'placeholder/'];
   for (const dir of candidates) {
     const root = `${base}assets/${dir}`;
@@ -45,8 +62,41 @@ export async function resolveManifest(art: 'default' | 'placeholder', base: stri
   throw new Error('no asset manifest found');
 }
 
+/** Entries with neither `maps` nor `modes` load at boot (SPRITES 10.13). */
+export const loadsAtBoot = (e: ManifestEntry): boolean => e.maps === undefined && e.modes === undefined;
+
+/** Whether an entry loads with this match: its map or its mode is listed. */
+export const loadsWithMatch = (e: ManifestEntry, mapId: string, mode: 'main' | 'onub'): boolean =>
+  (e.maps?.includes(mapId) ?? false) || (e.modes?.includes(mode) ?? false);
+
 export function queueManifest(load: Phaser.Loader.LoaderPlugin, manifest: LoadedManifest): void {
-  for (const e of manifest.entries) {
+  queueEntries(load, manifest, manifest.entries.filter(loadsAtBoot));
+}
+
+/**
+ * Queues the entries a match adds to the boot set: those listing the match's map or mode, and not loaded yet. The
+ * World's `preload` calls it; a `key` already in the texture manager, the animation cache or the JSON cache is skipped.
+ */
+export function queueMatchEntries(
+  load: Phaser.Loader.LoaderPlugin,
+  scene: Phaser.Scene,
+  manifest: LoadedManifest,
+  mapId: string,
+  mode: 'main' | 'onub',
+): void {
+  const missing = manifest.entries.filter((e) => {
+    if (!loadsWithMatch(e, mapId, mode)) return false;
+    return e.type === 'animation' ? !scene.cache.json.exists(e.key) : !scene.textures.exists(e.key);
+  });
+  queueEntries(load, manifest, missing);
+}
+
+function queueEntries(
+  load: Phaser.Loader.LoaderPlugin,
+  manifest: LoadedManifest,
+  entries: ManifestEntry[],
+): void {
+  for (const e of entries) {
     switch (e.type) {
       case 'multiatlas':
         load.multiatlas(e.key, join(manifest.root, e.url), join(manifest.root, e.path ?? ''));

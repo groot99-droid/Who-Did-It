@@ -27,14 +27,18 @@ import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
 import { NotebookSheet } from '../view/NotebookPanel';
-import { PropView, overworldProps } from '../view/PropView';
+import { GroundView } from '../view/GroundView';
+import { bellSpot, propObjects } from '../view/PropView';
 import { StaticView } from '../view/StaticView';
-import { sceneMapKey, sceneMapUrl } from '../view/assets';
+import { applyFilters, peekManifest, queueMatchEntries, sceneMapKey, sceneMapUrl } from '../view/assets';
+import { dayPartOf, isLit } from '../view/dayPart';
+import { mapStatics } from '../view/mapDefs';
 import { isTouchDevice, readDevFlags } from '../view/devFlags';
 import { DEPTH, cameraBounds, decalHolder, isoZoom, sceneDiamond, tileDiamond } from '../view/iso';
 import { type SceneMap, type TiledMap, readSceneMap } from '../view/sceneMap';
 import { loadSceneName } from '../view/sceneNames';
-import { REG_AUDIO, getNet } from './registry';
+import { DEFAULT_MAP_ID } from '../net/protocol';
+import { REG_AUDIO, getFlags, getNet } from './registry';
 
 /** How close a player must stand to a door to use it, in tiles (balance.json `doors.reachTiles`, GDD 3.7). */
 const PORTAL_REACH_TILES = balance.doors.reachTiles;
@@ -110,7 +114,8 @@ export class World extends Phaser.Scene {
   private sceneId = 'overworld';
   private entities!: EntityView;
   private clueView!: ClueView;
-  private propView!: PropView;
+  private ground: GroundView | null = null;
+  private bell: { x: number; y: number } | null = null;
   private statics!: StaticView;
   private readonly bodyViews = new Map<string, BodyView>();
   private hud!: Hud;
@@ -154,10 +159,20 @@ export class World extends Phaser.Scene {
   }
 
   preload(): void {
+    const base = import.meta.env.BASE_URL;
     const key = sceneMapKey(this.sceneId);
-    if (!this.cache.tilemap.exists(key)) {
-      this.load.tilemapTiledJSON(key, sceneMapUrl(import.meta.env.BASE_URL, this.sceneId));
-    }
+    if (!this.cache.tilemap.exists(key)) this.load.tilemapTiledJSON(key, sceneMapUrl(base, this.sceneId));
+    // The match's map art (SPRITES 10.13): entries listing its map or mode that the boot did not load.
+    const manifest = peekManifest(getFlags(this).art, base);
+    if (manifest) queueMatchEntries(this.load, this, manifest, this.matchMap(), this.matchMode());
+  }
+
+  private matchMap(): string {
+    return getNet(this).snapshot?.settings.map ?? DEFAULT_MAP_ID;
+  }
+
+  private matchMode(): 'main' | 'onub' {
+    return getNet(this).snapshot?.settings.mode ?? 'main';
   }
 
   create(): void {
@@ -168,8 +183,15 @@ export class World extends Phaser.Scene {
 
     this.buildMap();
     this.swing = this.add.graphics().setDepth(DEPTH.decal);
-    this.propView = new PropView(this, this.sceneId);
     this.statics = new StaticView(this);
+    this.statics.set(
+      mapStatics(this.map, {
+        mapId: this.map.mapId ?? this.matchMap(),
+        theme: this.map.theme ?? '',
+        hasFrame: (atlas, frame) => this.textures.exists(atlas) && this.textures.get(atlas).has(frame),
+      }),
+    );
+    this.statics.setLit(isLit(dayPartOf(feed.clock().phase)));
     this.clueView = new ClueView(this);
     this.entities = new EntityView(this, feed.selfId);
 
@@ -257,7 +279,8 @@ export class World extends Phaser.Scene {
       input.unbindAll();
       this.entities.destroy();
       this.clueView.destroy();
-      this.propView.destroy();
+      this.ground?.destroy();
+      this.ground = null;
       this.statics.destroy();
       for (const b of this.bodyViews.values()) b.destroy();
       this.bodyViews.clear();
@@ -439,9 +462,7 @@ export class World extends Phaser.Scene {
       for (const c of clues) {
         if (!collected?.has(c.id)) consider({ kind: 'clue', id: c.id, x: c.x, y: c.y }, COLLECT_REACH_PX);
       }
-      const bell =
-        this.sceneId === 'overworld' ? overworldProps().find((p) => p.id === 'ov.bell') : undefined;
-      if (bell) consider({ kind: 'bell', x: bell.x, y: bell.y }, BELL_REACH_PX);
+      if (this.bell) consider({ kind: 'bell', x: this.bell.x, y: this.bell.y }, BELL_REACH_PX);
     }
     const doors = this.feed.doors();
     for (const p of this.portals) {
@@ -548,6 +569,7 @@ export class World extends Phaser.Scene {
     if (phase === this.lastPhase) return;
     const was = this.lastPhase;
     this.lastPhase = phase;
+    this.statics.setLit(isLit(dayPartOf(phase)));
     if (phase === Phase.dusk) {
       this.hud.toast(fill(C['toast.dusk'], { duskS: balance.phases.duskS }), 'warm', undefined, 5000);
     } else if (phase === Phase.night) this.hud.toast(C['toast.night'], 'warm', undefined, 5000);
@@ -600,18 +622,17 @@ export class World extends Phaser.Scene {
     this.lighting.update(l.visible, sx, sy, cam.zoom, l.darkness);
   }
 
-  /**
-   * The scene's ground. SPRITES 10.12's isometric tilemap reader lands in the next step; until then the ground is
-   * the scene's diamond in one flat colour, and the portals come from the file's own object layer.
-   */
+  /** Reads the scene's tilemap, draws its ground and sets the void colour; the statics follow in `create`. */
   private buildMap(): void {
-    const json = this.cache.tilemap.get(sceneMapKey(this.sceneId)).data as TiledMap;
-    this.map = readSceneMap(json);
+    const key = sceneMapKey(this.sceneId);
+    this.map = readSceneMap(this.cache.tilemap.get(key).data as TiledMap);
     this.portals = this.map.portals;
-    const { w, h } = this.map;
-    const g = this.add.graphics().setDepth(DEPTH.ground);
-    g.fillStyle(colorOf(palette.colors.slate), 1);
-    g.fillPoints(poly(sceneDiamond(w, h)), true);
+    this.bell = bellSpot(propObjects(this.map, this.sceneId));
+    this.ground = new GroundView(this, key, this.map);
+    applyFilters(
+      this.textures,
+      peekManifest(getFlags(this).art, import.meta.env.BASE_URL) ?? { version: 1, art: '', entries: [] },
+    );
     this.cameras.main.setBackgroundColor(colorOf(palette.colors[this.map.voidColour]));
   }
 
@@ -630,7 +651,10 @@ export class World extends Phaser.Scene {
   /** A door swings for 3 s (GDD 3.7): pulse its tile while the server says it is swinging. */
   private drawDoors(tick: number): void {
     this.swing.clear();
-    for (const d of this.feed.doors()) {
+    const doors = this.feed.doors();
+    for (const p of this.portals)
+      this.statics.setShown(`${p.id}~boarded`, doors.find((d) => d.id === p.id)?.state === 1);
+    for (const d of doors) {
       if (tick >= d.swingUntilTick) continue;
       const p = this.portals.find((q) => q.id === d.id);
       if (!p) continue;

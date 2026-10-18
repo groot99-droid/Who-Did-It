@@ -3,6 +3,7 @@
 import metrics from '@wdi/content/data/metrics.json';
 import { TILE_PX } from '@wdi/shared/constants';
 import { ISO_TILE_H, ISO_TILE_W, toScreen } from '@wdi/shared/iso';
+import { type PaletteToken } from './greyboxColours';
 import { BIAS, type Rect, depthAt } from './iso';
 
 /** One static world sprite: a kit piece, a building slice, a one-tile prop or a spot. */
@@ -27,6 +28,14 @@ export interface StaticDef {
   occluder: boolean;
   /** Label of the greybox block, for interactable props. */
   label?: string;
+  /** Palette token of the greybox block (default: slate for an occluder, ink otherwise). */
+  colour?: PaletteToken;
+  /** The frame drawn while the light is off (`setLit(false)`): `frame` is the lit one (lantern posts). */
+  frameAlt?: string;
+  /** The art decides whether it hides you: true when its frame rises more than `TALL_PROP_PX` above its pivot. */
+  autoOccluder?: boolean;
+  /** Not drawn until `setShown(id, true)` (the boarded overlay of a portal). */
+  hidden?: boolean;
 }
 
 export type KitKind = 'wall' | 'tree' | 'boulder' | 'cliff' | 'fence' | 'stack';
