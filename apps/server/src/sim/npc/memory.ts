@@ -43,7 +43,7 @@ export class Brain {
   /**
    * Card-blind draws made for every NPC (npc.md 6; Session 5H draws them, 5G reads them): the night-power tick
    * (drawn on the first tick of each dusk and each Final Night hunt) and pick (a uniform in [0, 1)), and the Last
-   * Shot delay in ticks (drawn on the first tick the seat is seen dead; 5G adds it to the tick its aim starts);
+   * Shot tick (the first tick the seat is seen dead plus a `lastShotS` delay, so `lastShotS` after its aim starts);
    * -1 when none.
    */
   nightPowerAtTick = -1;

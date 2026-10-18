@@ -1,6 +1,6 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { abilities } from '@wdi/content';
+import { abilities, balance } from '@wdi/content';
 import { ErrorCode, NoteKind, Phase, TICK_RATE } from '@wdi/shared';
 import { createServer } from '../src/server';
 import { flowOf } from '../src/sim/Flow';
@@ -182,6 +182,27 @@ describe('Last Shot (GDD 3.2)', () => {
     expect(simOf(m.room).players.get(id(m, 0))!.dead).toBe(true);
     expect(notes(m, m.bots[1]!)).toHaveLength(1);
     expect(notes(m, m.bots[1]!)[0]!.tick).toBe(brain.lastShotAtTick);
+  });
+
+  it('draws the NPC shot tick itself: lastShotS after the aim starts, at brain.lastShotAtTick', async () => {
+    const span = balance.npc.nightPower.lastShotS;
+    const saved = { ...span };
+    Object.assign(span, { min: 0.5, max: 1 }); // a short draw keeps the test fast; the bounds follow the row
+    try {
+      const m = await party();
+      registerNpcSeat(m.room, id(m, 1));
+      target.value = id(m, 0);
+      await knife(m);
+      expect(await until(() => notes(m, m.bots[1]!).length === 1)).toBe(true);
+      const aimStart = (events(m.bots[1]!, 'aim')[0]!.endsTick as number) - AIM_TICKS;
+      const shotTick = notes(m, m.bots[1]!)[0]!.tick;
+      expect(shotTick).toBe(npcMemory(m.room).brain(id(m, 1)).lastShotAtTick);
+      expect(shotTick - aimStart).toBeGreaterThanOrEqual(span.min * TICK_RATE - 1);
+      expect(shotTick - aimStart).toBeLessThanOrEqual(span.max * TICK_RATE + 1);
+      expect(simOf(m.room).players.get(id(m, 0))!.dead).toBe(true);
+    } finally {
+      Object.assign(span, saved);
+    }
   });
 
   it('holds its fire when the NPC has nobody to vote for', async () => {

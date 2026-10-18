@@ -68,14 +68,17 @@ export function runNpcs(room: PartyRoom): void {
     const p = sim.players.get(id);
     if (!p) continue;
     const brain = mem.brain(id);
-    // The Last Shot delay is drawn once, on the first tick the seat is seen dead (every NPC, whatever its card).
+    // The Last Shot tick is drawn once, on the first tick the seat is seen dead (every NPC, whatever its card): that
+    // tick plus a `lastShotS` delay, the tick an aiming NPC Gamekeeper fires at (npc.md 6, 9).
     if (p.dead && brain.lastShotAtTick < 0 && !quick) {
-      brain.lastShotAtTick = npcDelayTicks(
-        timingRng(room, id),
-        balance.npc.nightPower.lastShotS.min,
-        balance.npc.nightPower.lastShotS.max,
-        TICK_RATE,
-      );
+      brain.lastShotAtTick =
+        state.tick +
+        npcDelayTicks(
+          timingRng(room, id),
+          balance.npc.nightPower.lastShotS.min,
+          balance.npc.nightPower.lastShotS.max,
+          TICK_RATE,
+        );
     }
     // Quick mode hands every phase but the role card to its own brain (round 5, 5E).
     if (state.phase === Phase.lobby) readyInLobby(room, brain, player);

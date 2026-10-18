@@ -33,7 +33,7 @@ export function startAim(room: PartyRoom, seat: string, cause: DeathCause): bool
   if (!player.connected && !isNpcSeat(room, seat)) return false;
   const aimS = abilities.abilities.lastShot?.params?.aimS ?? 0;
   const untilTick = room.state.tick + Math.round(aimS * TICK_RATE);
-  nightOf(room).aims.set(seat, { cause, sceneId: sceneKey(p.sceneIdx), untilTick, shot: false });
+  nightOf(room).aims.set(seat, { cause, sceneId: sceneKey(p.sceneIdx), untilTick, shot: false, held: false });
   room.clients.getById(seat)?.send(S2C.aim, { endsTick: untilTick });
   simOf(room).viewsDirty = true;
   return true;
@@ -110,6 +110,7 @@ export function runNpcShots(room: PartyRoom): void {
       !isNpcSeat(room, seat) ||
       !brain ||
       aim.shot ||
+      aim.held ||
       brain.lastShotAtTick < 0 ||
       tick < brain.lastShotAtTick
     ) {
@@ -118,6 +119,7 @@ export function runNpcShots(room: PartyRoom): void {
     const target = npcVoteTarget(room, seat);
     const legal = target !== null && room.state.players.get(target)?.alive === true && target !== seat;
     if (legal) fire(room, seat, target);
-    else brain.lastShotAtTick = -1; // nobody to shoot: it holds its fire
+    // Nobody to shoot: it holds its fire. The aim keeps that, since 5H redraws a cleared `lastShotAtTick`.
+    else aim.held = true;
   }
 }

@@ -13,6 +13,8 @@ export interface Aim {
   untilTick: number;
   /** A seat that cannot be told (no client) never blocks; an NPC shoots at `brain.lastShotAtTick`. */
   shot: boolean;
+  /** An NPC with nobody to shoot holds its fire until the aim runs out. */
+  held: boolean;
 }
 
 export class NightMemory {
