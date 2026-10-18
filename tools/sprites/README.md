@@ -24,6 +24,10 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `slice.ts` | Cuts `build_buildings.py` renders into one slice per footprint tile (`SPRITES.md` 10.5): pixel-finishes the frame, assigns each packed pixel to the tile most of its 2 x 2 source block stands over in the raw tile map (the nearest coded pixel at uncoded edges, overhangs clamped to the footprint), and writes full-canvas slices `<art>#<dx>_<dy>` with a static-sheet manifest; CLI `slice <render dir> <out dir> [--finish on\|off]` |
 | `world.ts` | Every 5K key in every `style.json` `artStyles` style (DECISIONS A79): tilesets, kits, props, clues, sliced props and buildings and thumbnails from the raw renders, finished per `pixelFinish` and packed into `<assets>/<style.root>`; a style other than the root one gets those keys in its own `manifest.json` with its `filter`. CLI `world <render dir> <assets dir> [--work <dir>] [--style <id>]` |
 | `refs.ts` | Writes every `style.json` `references` entry, cropped, to `build/refs/<composition>-<index>-<stem>.png` (the Higgsfield `image_references` inputs) |
+| `onub.ts` | The ONUB images (`SPRITES.md` 11): the batch prompts and references (`prompts`), the proofing mask (`mask`), every room, the kitchen, cloche and portraits, then the cards and atlas and the real manifest's ONUB block (`build`), and the review sheets (`review`) |
+| `onub-cards.ts` | The code-drawn card template (frame, window, blank band, Sabotage mark), the Ingredient and Location faces and both backs |
+| `onub-mini.ts` | The `onub_mini` frames (generated objects, code-drawn dials, needle, fills, streams, glow, the fire loop) and their one-page shelf pack |
+| `onub-fixes.json`, `batches/5M.json` | The room crop, label fills, proofing mask and card boxes; every 5M generation with its prompt fields, jobs and pick |
 | `test/pack.test.ts` | Synthetic frame set: trim and source sizes, determinism, detectIdentical, pivots, anim keys |
 | `test/pack-static.test.ts` | Static keys against the placeholder clues, props pivots, centred clues, determinism, vfx anims, refusal of a wrong key set |
 | `test/images.test.ts` | Image sizes, determinism and the tileset join |
@@ -42,6 +46,7 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `test/slice.test.ts` | Tile assignment by majority, edge fallback and footprint clamp on a fixture; the shipped `bld_<mapId>` atlases hold only slices that share their building's pivot, on pages within 2048 x 1024, under the finish in world colours |
 | `test/refs.test.ts` | Every reference file exists, every crop lies inside its image, output names are unique |
 | `test/world.test.ts` | Each shipped style manifest holds every 5K key with the 8-bit URL, frame names, source sizes and pivots, pages within their caps, full ground sheets and thumbnails under 100 kB |
+| `test/onub.test.ts` | ONUB keys in both manifests with `modes`, file sizes, palette, the 2.5 MB cap, the atlas frames, the card band, the batch file |
 | `test/bleed.test.ts` | PNG round trip, one and two bleed rings, determinism |
 
 ```sh

@@ -2215,3 +2215,33 @@ Branch `claude/r5-char-art`, PR #33 (the L1-L5 split as commits on one branch). 
   saturated cap as applying to every page (A63 exempts the overlay masks).
 
 ### Round 5 log: 5M (ONUB art)
+
+- **Done (2026-10-18), one draft PR from `claude/r5-onub-art`, commits grouped M1 to M4.** Every key of
+  `onub-contract.md` 5.4 plus `onub_mini` in both manifests with `modes: ['onub']`; 13 owner rooms finished; the
+  proofing clean-up; the kitchen overview; 24 card faces and backs; the cloche; 15 role portraits and `onub_baker`;
+  the mini-game atlas; the placeholder twins; the loft images out of both manifests and `LEGACY`. Calls in DECISIONS
+  A64; keys and layout in SPRITES 11; ASSETS 6.3 "What shipped, ONUB v2".
+- **Generation**: 78 images and 33 background removals, 357 credits; every shipped pick has a CREDITS "Generated"
+  row and a MANIFEST row (catalog id pending `higgsfield-library-sync`). Raw generations stay out of git.
+- **Waiting on the owner**: Gate C, the Brick Oven pick (greybox until then), and the provenance of the 13 images.
+- **For other sessions**: the client's `queueManifest` loads every manifest entry today and ignores `modes`, so until
+  the client filters by mode (5C, 5D, 5I) the ONUB images would load in the main mode too; 5C and 5D draw
+  `mini_fire` from `mini_oven/0..3`. 5K: please move `frame` from `build_loft.py` into `static_common.py` and drop the
+  loft step of `save_masters.py`, after which `build_loft.py` can be deleted.
+- **Retakes (2026-10-18, on the orchestrator's round-5 budget of 300 credits for 5M)**: 6 more images and 1 more
+  background removal, 16 credits (balance 3010.31 to 2994.31). The Champignon and Commis portraits sat on a grey or
+  blue panel against the other portraits' navy void, and `mini_cart` had come out as a three-shelf rack; the new picks
+  (`retryNote` and `retrySubject` in `batches/5M.json`) replace their CREDITS and MANIFEST rows. Every other pick held
+  up on the review sheets, so the rest of the share stays unspent; the oven waits on the owner's pick.
+- **Low-poly style (2026-10-18, A79, art plan 1.9)**:
+  - Base merged at 2aa57ac.
+  - `onub.ts build` now writes both styles. The low-poly set is every ONUB key and `onub_mini` under
+    `assets/lowpoly/onub/` with `assets/lowpoly/manifest.json`, 3.9 MiB, and the 8-bit set is byte-identical to
+    before. Calls are in A64, layout in SPRITES 11.
+  - Gate C is answered (the pixel finish is the 8-bit style), and so is the provenance (Nano Banana Pro). Google's
+    terms rows are in `LICENSES/vendors/README.md`.
+  - Still open: the Brick Oven pick.
+- **Brick Oven (2026-10-18)**: the owner picked D (`99cad74c`). `pick` and the oven's `locBoxes` and `floorBoxes`
+  are set, and `onub_station_oven`, its kitchen quadrant, `onub_loc_oven` and the oven's Ingredient cards are rebuilt
+  in both styles; no greybox is left. The real oven pushed the low-poly set past 4 MiB, so the
+  generated and composed art goes to quality 82 (3.85 MiB; A64). The three retake MANIFEST rows now cite their new generation ids.

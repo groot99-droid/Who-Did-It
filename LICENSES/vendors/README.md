@@ -17,6 +17,7 @@ never overwrite an old one, since an asset is governed by the terms in force whe
 | Freesound | the CC0 licence of each sound (one row per sound in `CREDITS.md`) | the first Freesound SFX | no |
 | Quaternius | the Quaternius Asset License (QAL) | the first sprite rendered from a Quaternius model | no |
 | OpenGameArt | the licence of each entry (CC0 only) | the first OpenGameArt asset | yes, 2026-10-16: `opengameart-rain-long-thunder-license-2026-10-16.md` (the `storm` loop); 2026-10-18: `opengameart-ambience-license-2026-10-18.md` (the four `amb_*` loops) |
+| Google (Nano Banana Pro, Gemini app, Google AI Pro) | Terms of Service; Generative AI Prohibited Use Policy | the 13 ONUB room images the owner made (`assets/source/concepts/onub/`, DECISIONS A79) | no copy saved; links checked 2026-10-18 (Session 5M), below |
 
 Fonts (OFL) live in `LICENSES/fonts/`, owned by Session B.
 
@@ -25,3 +26,5 @@ Fonts (OFL) live in `LICENSES/fonts/`, owned by Session B.
 | Vendor | Document | Date checked | Link | What it says |
 |---|---|---|---|---|
 | Higgsfield | Terms of Use, section 4.4 (summarised by the help center) | 2026-10-10 | https://higgsfield.ai/creator-hub/help-center/account-and-privacy/who-owns-my-generations-and-can-i-use-them-commercially | Higgsfield claims no ownership of inputs or outputs and does not restrict commercial use on any plan; paid plans are watermark-free. A terms update is announced for late August 2026 (https://higgsfield.ai/blog/terms-of-use-privacy-policy-update). |
+| Google | Terms of Service ("Effective July 30, 2026" on the page) | 2026-10-18 | https://policies.google.com/terms | "Some of our services allow you to generate original content. Google won't claim ownership over that content." Nothing on the page restricts commercial use of generated content. Among the abuses it lists: "using AI-generated content from our services to develop machine learning models or related AI technology" and "misleading others into thinking that generative AI content was created by a human". It points to service-specific additional terms such as the Prohibited Use Policy. This is the version checked on 2026-10-18; the 13 images were made before 2026-10-17, under the version then in force. |
+| Google | Generative AI Prohibited Use Policy ("Last Modified: December 17, 2024") | 2026-10-18 | https://policies.google.com/terms/generative-ai/use-policy | Lists prohibited uses: dangerous or illegal activity, compromising security, sexually explicit, violent or hateful content, harassment, misinformation, impersonation and fraud. Nothing in the ONUB rooms falls under it. |

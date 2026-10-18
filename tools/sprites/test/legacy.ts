@@ -12,8 +12,4 @@ export const LEGACY: readonly string[] = [
   'tiles_floorboards',
   'tiles_caverock',
   'tiles_forestfloor',
-  // M1 (5M): leave both manifests with the loft
-  'loft_backdrop',
-  'prop_bedroll',
-  'prop_bedroll_self',
 ];
