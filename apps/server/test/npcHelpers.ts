@@ -116,7 +116,7 @@ export function placeSeat(party: Party, id: string, sceneId: SceneId, tx: number
   const player = party.room.state.players.get(id);
   if (!p || !player) throw new Error(`no seat ${id}`);
   p.sceneIdx = sceneIndex(sceneId);
-  player.sceneId = p.sceneIdx;
+  player.priv.sceneId = p.sceneIdx;
   p.x = (tx + 0.5) * TILE_PX;
   p.y = (ty + 0.5) * TILE_PX;
   p.input = null;

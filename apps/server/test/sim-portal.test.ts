@@ -3,7 +3,9 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { balance } from '@wdi/content';
 import { ErrorCode, TICK_RATE } from '@wdi/shared';
 import { createServer } from '../src/server';
+import { avatarMemory } from '../src/sim/Avatars';
 import { simOf } from '../src/sim/RoomSim';
+import { avatarsHeld } from './avatarHelpers';
 import { type Match, lastEvent, move, sleep, spawnOf, standAt, startMatch, stateOf } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -19,14 +21,11 @@ beforeEach(async () => colyseus.cleanup());
 
 const front = spawnOf('overworld', 'tavern_front');
 const sceneKeys = (m: Match, i: number) => [...stateOf(m.bots[i]!).scenes.keys()];
-/** Players whose presence the bot's client holds (other than itself). */
-const seenPresence = (m: Match, i: number) => {
-  const out: string[] = [];
-  stateOf(m.bots[i]!).players.forEach((p, id) => {
-    if (id !== m.bots[i]!.id && p.presence !== undefined) out.push(id);
-  });
-  return out;
-};
+/** The seats whose avatar the bot's client holds (other than itself): the handles resolved in room memory. */
+const seenPresence = (m: Match, i: number) =>
+  avatarsHeld(m.bots[i]!)
+    .map((a) => avatarMemory(m.room).seatOf.get(a.handle) as string)
+    .filter((id) => id !== m.bots[i]!.id);
 
 describe('scene-scoped views on the wire', () => {
   let m: Match;
@@ -41,7 +40,7 @@ describe('scene-scoped views on the wire', () => {
     }
   });
 
-  it('gives an outsider no presence of the tavern and no tavern SceneState, and vice versa', async () => {
+  it('gives an outsider no avatar of the tavern and no tavern SceneState, and vice versa', async () => {
     const [a, b, c, d] = m.bots as [Match['bots'][0], Match['bots'][0], Match['bots'][0], Match['bots'][0]];
     standAt(m, a, front.x, front.y);
     a.room.send('act.enterPortal', { portalId: 'ov.tavern_front' });
@@ -49,12 +48,12 @@ describe('scene-scoped views on the wire', () => {
 
     const sceneA = lastEvent(a, 'sceneEnter');
     expect(sceneA).toMatchObject({ sceneId: 'tavern_bar', spawn: 'front' });
-    expect(m.room.state.players.get(a.id)?.sceneId).toBe(1);
+    expect(m.room.state.players.get(a.id)?.priv.sceneId).toBe(1);
 
     // The bot inside the tavern: its own scene only, nobody from the overworld.
     expect(sceneKeys(m, 0)).toEqual(['tavern_bar']);
     expect(seenPresence(m, 0)).toEqual([]);
-    // The bots outside: no tavern SceneState, no presence of the tavern bot.
+    // The bots outside: no tavern SceneState, no avatar of the tavern bot.
     for (const i of [1, 2, 3]) {
       expect(sceneKeys(m, i)).toEqual(['overworld']);
       expect(seenPresence(m, i)).not.toContain(a.id);
@@ -82,17 +81,17 @@ describe('scene-scoped views on the wire', () => {
     expect(seenPresence(m, 1)).toEqual([]);
   }, 20000);
 
-  it('encodes the traveller to both scenes during the transit, nameplate hidden, then only to the new one', async () => {
+  it('encodes the traveller avatar to both scenes during the transit, nameplate hidden, then only to the new one', async () => {
     const [a, b] = m.bots as [Match['bots'][0], Match['bots'][0]];
     standAt(m, a, front.x, front.y);
     a.room.send('act.enterPortal', { portalId: 'ov.tavern_front' });
     await sleep(350);
-    const seen = stateOf(b).players.get(a.id)?.presence;
+    const seen = avatarsHeld(b).find((x) => avatarMemory(m.room).seatOf.get(x.handle) === a.id)?.avatar;
     expect(seen).toBeDefined();
     expect(seen!.statusBits & 1).toBe(1);
     expect(seen!.transitUntilTick).toBeGreaterThan(m.room.state.tick - 1);
     await sleep(1200);
-    expect(stateOf(b).players.get(a.id)?.presence).toBeUndefined();
+    expect(avatarsHeld(b).some((x) => avatarMemory(m.room).seatOf.get(x.handle) === a.id)).toBe(false);
   });
 
   it('swings the door on both sides for the swing time and sends the noise to nearby ears only', async () => {
@@ -130,14 +129,14 @@ describe('scene-scoped views on the wire', () => {
     a.room.send('act.enterPortal', { portalId: 'ov.manor_front' });
     await sleep(200);
     expect(code()).toBe(ErrorCode.closed);
-    expect(m.room.state.players.get(a.id)?.sceneId).toBe(0);
+    expect(m.room.state.players.get(a.id)?.priv.sceneId).toBe(0);
     expect(m.room.state.scenes.get('overworld')?.doors.get('ov.manor_front')?.state).toBe(1);
 
     standAt(m, a, front.x, front.y);
     a.room.send('act.enterPortal', { portalId: 'ov.tavern_front' });
     a.room.send('act.enterPortal', { portalId: 'ov.tavern_front' }); // second one lands in the transit
     await sleep(300);
-    expect(m.room.state.players.get(a.id)?.sceneId).toBe(1);
+    expect(m.room.state.players.get(a.id)?.priv.sceneId).toBe(1);
     expect(code()).toBe(ErrorCode.busy); // the second request landed inside the 0.6 s transit
   });
 

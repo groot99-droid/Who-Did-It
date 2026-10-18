@@ -143,6 +143,7 @@ export function rehandle(room: PartyRoom, seat: string, transit: boolean, settle
     const avatar = avatarOf(room, old);
     if (transit && avatar && !isLoft(p.sceneIdx)) {
       avatar.statusBits |= StatusBit.transit;
+      avatar.transitUntilTick = player.presence.transitUntilTick;
       avatar.animId = 0;
       memory.handleOf.delete(seat);
       memory.leaving.set(old, {

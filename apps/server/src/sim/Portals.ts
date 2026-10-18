@@ -83,10 +83,7 @@ export function enterScene(
   room.commands.clearMove(player.id);
   p.resetRing();
   p.sceneIdx = sceneIndex(sceneId);
-  // A ghost whose death is not yet public keeps its public scene, or the roster would show it moving;
-  // a quick-mode seat keeps it all night, so the roster never shows who woke (A39).
-  if ((!p.dead || !player.alive) && !p.sceneHidden) player.sceneId = p.sceneIdx;
-  // The private scene index, for every seat, living or dead (round 5; the only one after 5F's contract phase).
+  // The private scene index, for every seat, living or dead: no public field carries a scene (GDD 3.17).
   player.priv.sceneId = p.sceneIdx;
   const presence = player.presence;
   presence.x = Math.round(x);

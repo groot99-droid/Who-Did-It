@@ -49,7 +49,7 @@ describe('server movement', () => {
   it('places everyone on a square spawn and publishes int16 pixel positions', () => {
     for (const bot of match.bots) {
       const player = match.room.state.players.get(bot.id);
-      expect(player?.sceneId).toBe(0);
+      expect(player?.priv.sceneId).toBe(0);
       expect(player?.alive).toBe(true);
       expect(Number.isInteger(player?.presence.x)).toBe(true);
       expect(player?.presence.x).toBeGreaterThan(0);

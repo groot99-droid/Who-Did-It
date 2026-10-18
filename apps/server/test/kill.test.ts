@@ -1,5 +1,5 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
-import { handleOf as h } from './avatarHelpers';
+import { avatarsHeld, handleOf as h } from './avatarHelpers';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { abilities, balance, clues } from '@wdi/content';
 import { ErrorCode, ItemStack, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
@@ -321,7 +321,9 @@ describe('what a kill leaks (ARCHITECTURE 5.4, scoped to M3)', () => {
       new RegExp(`^players\\.${v.id}\\.presence`), // the ghost's presence may stop arriving (K, Visibility)
     ];
     expect(dWitness.filter((p) => !allowed.some((re) => re.test(p)))).toEqual([]);
-    expect(stateOf(witness).players.get(k.id)?.presence?.statusBits).toBe(StatusBit.bloody);
+    expect(avatarsHeld(witness).find((a) => a.avatar.lookOf === k.id)?.avatar.statusBits).toBe(
+      StatusBit.bloody,
+    );
     const body = stateOf(witness).scenes.get('tavern_bar')!.bodies.get(`body_${v.id}`);
     expect(body?.of).toBe(v.id);
     expect(stateOf(witness).scenes.get('tavern_bar')!.clues.size).toBe(2);

@@ -40,10 +40,10 @@ export function createPlayerView(room: PartyRoom, sessionId: string): StateView 
   view.add(player);
   view.add(player, PRESENCE_TAG);
   view.add(player, PRIV_TAG);
-  const scene = room.state.scenes.get(sceneKey(player.sceneId));
+  const scene = room.state.scenes.get(sceneKey(player.priv.sceneId));
   if (scene) {
     view.add(scene);
-    simOf(room).views.set(sessionId, { scene: sceneKey(player.sceneId), presences: new Set() });
+    simOf(room).views.set(sessionId, { scene: sceneKey(player.priv.sceneId) });
   }
   heldAvatars.get(room)?.delete(sessionId); // a fresh view holds nothing yet
   return view;
@@ -51,13 +51,12 @@ export function createPlayerView(room: PartyRoom, sessionId: string): StateView 
 
 /**
  * V1 scene-scoped reconcile, run every 4th tick (5 Hz) and right after a portal crossing. Each client's
- * view holds the SceneState of its own scene and the presence of the other placed players who share it.
- * A player mid-crossing is also encoded to the scene they just left until the transit ends, so the
- * sprite is seen stepping through the door from both sides (GDD 3.7).
+ * view holds the SceneState of its own scene and the avatars of the placed players who share it (`reconcileAvatars`);
+ * no other seat's `presence` or `priv` is ever added. A player mid-crossing stays in the scene it left as a transit
+ * tail until the transit ends, so the figure is seen stepping through the door from both sides (GDD 3.7).
  */
 export function reconcileViews(room: PartyRoom): void {
   const sim = simOf(room);
-  const tick = room.state.tick;
   const world = isWorldPhase(room.state.phase);
   for (const client of room.clients) {
     const view = client.view;
@@ -66,11 +65,10 @@ export function reconcileViews(room: PartyRoom): void {
     if (!view || !viewer || !viewerSim) continue;
     let held = sim.views.get(client.sessionId);
     if (!held) {
-      held = { scene: null, presences: new Set() };
+      held = { scene: null };
       sim.views.set(client.sessionId, held);
     }
 
-    // The sim's scene, never the public one: a ghost's public scene is frozen until its death is public.
     const want = isLoft(viewerSim.sceneIdx) ? null : sceneKey(viewerSim.sceneIdx);
     if (held.scene !== want) {
       const old = held.scene === null ? undefined : room.state.scenes.get(held.scene);
@@ -80,36 +78,7 @@ export function reconcileViews(room: PartyRoom): void {
       held.scene = want;
     }
 
-    const wanted = new Set<string>();
-    // A Gamekeeper aiming its Last Shot sees nobody until the aim closes (GDD 3.2; 5G's `isAiming`).
-    if (world && !isAiming(room, client.sessionId)) {
-      for (const [id, other] of room.state.players) {
-        if (id === client.sessionId) continue;
-        const p = sim.players.get(id);
-        if (!p?.placed) continue;
-        // A sleeper in the loft is encoded to nobody, and sees nobody (A39).
-        if (isLoft(p.sceneIdx) || isLoft(viewerSim.sceneIdx)) continue;
-        // A living viewer never receives a ghost; a ghost sees everyone in its scene (A30).
-        if (p.dead && !viewerSim.dead) continue;
-        const sameScene = p.sceneIdx === viewerSim.sceneIdx;
-        const justLeft = p.transitFrom === viewerSim.sceneIdx && tick < other.presence.transitUntilTick;
-        if (sameScene || justLeft) wanted.add(id);
-      }
-    }
     reconcileAvatars(room, client.sessionId, view, viewerSim, world);
-
-    for (const id of held.presences) {
-      if (wanted.has(id)) continue;
-      const other = room.state.players.get(id);
-      if (other) view.remove(other, PRESENCE_TAG);
-      held.presences.delete(id);
-    }
-    for (const id of wanted) {
-      if (held.presences.has(id)) continue;
-      const other = room.state.players.get(id);
-      if (other) view.add(other, PRESENCE_TAG);
-      held.presences.add(id);
-    }
   }
 }
 

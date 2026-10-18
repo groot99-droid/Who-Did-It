@@ -60,6 +60,13 @@ describe('avatars by scene (P1, P2, P4)', () => {
       const scenes = new Set(avatarsHeld(m.bots[i]!).map((a) => a.scene));
       expect(scenes.size).toBe(1);
     }
+    // No other seat's Presence or Private ever arrives (the own do), and no Player row carries a scene.
+    for (const i of all)
+      stateOf(m.bots[i]!).players.forEach((p, id) => {
+        expect('sceneId' in p.toJSON()).toBe(false);
+        if (id === idOf(m, i)) expect(p.presence).toBeDefined();
+        else expect(p.presence).toBeUndefined();
+      });
     // No other seat's Private ever arrives; the own does.
     for (const i of all)
       stateOf(m.bots[i]!).players.forEach((p, id) => {

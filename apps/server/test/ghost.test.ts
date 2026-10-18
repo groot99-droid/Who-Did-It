@@ -110,7 +110,7 @@ describe('ghosts', () => {
       await act(ghost, 'act.enterPortal', { portalId: portal.id }, 700);
       expect(errorCodes(ghost)).toEqual([]);
       expect(simOfBot(m, ghost).sceneIdx).toBe(1); // tavern_bar
-      expect(playerOf(m, ghost).sceneId).toBe(0); // the public scene stays frozen (A30)
+      expect(playerOf(m, ghost).priv.sceneId).toBe(1); // the ghost's own scene; no public field carries it
       expect(simOfBot(m, ghost).busyUntilTick).toBe(0);
       expect(swings()).toEqual(before);
       expect(eventsOf(living, 'noise').length).toBe(noiseBefore);
