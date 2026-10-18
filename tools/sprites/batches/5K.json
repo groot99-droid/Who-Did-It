@@ -1,0 +1,89 @@
+{
+  "session": "5K",
+  "model": "flux_3_image",
+  "settings": {
+    "resolution": "2k",
+    "quality": "highest offered (the model has no quality setting)"
+  },
+  "items": [
+    {
+      "key": "boards-harbour-square",
+      "template": "T2",
+      "aspect": "16:9",
+      "count": 2,
+      "subject": "The square of Hollowmere, a fog-bound Cornish harbour hamlet in autumn 1931, at night: granite cobbles around a timber-framed meeting bell and a stone well pump, four iron lantern posts throwing warm pools, plaster-and-slate cottages with lit windows, a tarred net loft and the dock beyond, sea fog rolling in cold blue",
+      "extraRefs": [],
+      "keyColor": null,
+      "crop": null,
+      "replace": null,
+      "jobs": ["b1eeec75-d66a-4f21-859b-3040febf17ce", "1055fbb4-bf47-49fe-bbf9-92f0ee184f8c"],
+      "pick": "b1eeec75-d66a-4f21-859b-3040febf17ce"
+    },
+    {
+      "key": "boards-harbour-tavern",
+      "template": "T2",
+      "aspect": "16:9",
+      "count": 2,
+      "subject": "The Drowned Lantern's bar room as a cutaway room: a long oak bar with kegs, a stone hearth blazing, two oil lamps, low beams hung with nets and floats, scuffed floorboards, plaster over brick, empty tables with tankards",
+      "extraRefs": [],
+      "keyColor": null,
+      "crop": null,
+      "replace": null,
+      "jobs": ["fb1df5a4-cce2-45d8-8e5d-bffd9b07efb9", "0783940b-b5f9-4fed-ad23-fbc27d04eca0"],
+      "pick": "fb1df5a4-cce2-45d8-8e5d-bffd9b07efb9"
+    },
+    {
+      "key": "boards-gallows-wood",
+      "template": "T2",
+      "aspect": "16:9",
+      "count": 2,
+      "subject": "Gallows Wood at night: a trail two tiles wide through dense oaks and silver birches, bracken and fallen leaves, a small clearing in moonlight, a lantern on a gate post at the wood's edge",
+      "extraRefs": [],
+      "keyColor": null,
+      "crop": null,
+      "replace": null,
+      "jobs": ["bcbe3898-eb33-4656-a99e-2cb2b966b4ec", "e1881b69-f315-49a3-bfdc-696b939a3fc1"],
+      "pick": "bcbe3898-eb33-4656-a99e-2cb2b966b4ec"
+    },
+    {
+      "key": "boards-flooded-gallery",
+      "template": "T2",
+      "aspect": "16:9",
+      "count": 2,
+      "subject": "Vane's flooded tin gallery: timber cribs and wet granite, a broken beam pumping engine under a shaft of grey daylight, black water glowing faint teal with mould, an ore cart on rails, one oil lamp",
+      "extraRefs": [],
+      "keyColor": null,
+      "crop": null,
+      "replace": null,
+      "jobs": ["b946f1ef-28b5-429e-a28c-0071c2f87fe2", "ee7dd455-cd0f-4063-b661-419d8843e2e9"],
+      "pick": "b946f1ef-28b5-429e-a28c-0071c2f87fe2"
+    },
+    {
+      "key": "boards-blackpine-camp",
+      "template": "T2",
+      "aspect": "16:9",
+      "count": 2,
+      "subject": "A 1931 logging camp in a black-pine valley at night: a long log bunkhouse with a porch, a plank sawmill with a waterwheel, a yard with a shift bell under a pole gallows and a pump, lantern posts, mud and sawdust, a cliff with a timbered mine adit behind",
+      "extraRefs": [],
+      "keyColor": null,
+      "crop": null,
+      "replace": null,
+      "jobs": ["8bb58519-651a-4cc8-9ca2-d600a7fb5958", "577d6e2d-06b5-41d8-a58c-618df6b7ed5d"],
+      "pick": "8bb58519-651a-4cc8-9ca2-d600a7fb5958"
+    },
+    {
+      "key": "boards-blackpine-workings",
+      "template": "T2",
+      "aspect": "16:9",
+      "count": 2,
+      "subject": "The Blackpine tin workings: a timbered adit with tram rails, an ore chamber lit by candles stuck to the rock and one lamp by a chalked tally board, powder kegs, rust ore streaks in grey rock",
+      "extraRefs": [],
+      "keyColor": null,
+      "crop": null,
+      "replace": null,
+      "jobs": ["f783c269-6de7-43ab-a604-62439bfc625c", "210f4836-e5ac-4226-8f27-fd00049e0dac"],
+      "pick": "f783c269-6de7-43ab-a604-62439bfc625c"
+    }
+  ],
+  "notes": "Generated 2026-10-18 as 2k, 16:9, with the three `style.references.level` crops (build/refs/level-*) as image_references; each board item was two count-1 requests of generate_image_batch. Failed and retried: bd9b8867-979f-41fe-87f9-1e4e8e4b1c15 (flooded gallery, no image, replaced by ee7dd455). 3 credits per image, 39 credits in all."
+}

@@ -2155,6 +2155,39 @@ before it, and each PR description says which commit to review. Decisions: A61.
 
 ### Round 5 log: 5K (world art)
 
+Session 5K, `claude/r5-world-art`, PR #40 against `claude/zen-turing-m1jnw0`, 2026-10-18. Decisions in
+DECISIONS A62.
+
+- **K1, ground**: `iso_ground_harbour` and `iso_ground_timber` (1280 x 1792, gid = 1 + 20 m + c), 14
+  materials in four variants each, from Poly Haven textures under IsoCam (`build_ground.py`), joined and
+  finished by `tools/sprites/tileset.ts`. The CC0 packs are fetched by `env/kits.py` into git-ignored
+  `assets/external/kits/`, with their licence files.
+- **K2, kits**: `iso_kit_<theme>`, 44 frames named `<kind>/<height>/<v>`, pivot (w/2, h - 16) art px
+  (`build_kit.py`, `kit_import.py`); `review-world.ts` composites the review sheets; six T2 style boards
+  (12 Higgsfield images of 5K's 12, one retry) in `assets/source/review/boards-*.png` and
+  `batches/5K.json`. Gate A: `assets/source/review/gate-a-world-{on,off}.png`, in the PR description.
+- **K3, props**: `props` (shared props, 8 spots, 20 portal frames), `props_hollowmere` (33 props, 22
+  spots) and the 24 `clues` keys, Hunger's glowing footprints new.
+- **K4, buildings**: `bld_hollowmere` from `build_buildings.py` recipes at the `world.md` footprints,
+  rendered with a raw tile-code pass that `tools/sprites/slice.ts` cuts into `<art>#dx_dy` slices sharing
+  their building's pivot; the multi-tile props are sliced the same way.
+- **K5, Blackpine**: `props_blackpine` (18 props, 14 spots) and `bld_blackpine`.
+- **K6**: `thumb_<mapId>.webp` (480 x 270), the four `amb_*` loops (`env/ambience.py`, CREDITS rows),
+  the world masters (`save_masters.py`, `assets/source/MANIFEST.md`), placeholder twins for every new
+  key, ASSETS and SPRITES notes.
+- **Rebuild**: the commands in `tools/blender/README.md` ("World art (round 5)" onwards) and
+  `tools/sprites/README.md`; every sheet passes the palette audit (no off-palette or partial-alpha pixel,
+  saturated share under the cap) when the finish is on.
+- **A79, both styles**: `tools/sprites/world.ts` rebuilds every 5K key per art style from the raw renders
+  (8-bit at the root, unchanged byte for byte; low poly into `assets/lowpoly/` with its `manifest.json`);
+  `test/world.test.ts` checks the low-poly keys, frames, pivots and page caps against the 8-bit ones.
+- **Owner**: copy `assets/external/world/<mapId>/{buildings,props}_<mapId>.blend` and
+  `assets/external/loft/loft.blend` to ROSW `studio/assets/who-did-it/world/` (hashes in MANIFEST change on
+  every re-save); sync the 12 board generations into the ROSW catalog (CREDITS says "pending
+  higgsfield-library-sync").
+- **Not done**: the `tiles_*` keys stay until 5J's tilemaps no longer read them; `LEGACY` is not asserted
+  empty yet, which waits on L4, L5 and M1 at integration. `bld_hollowmere` takes two pages (A62).
+
 ### Round 5 log: 5L (character art)
 
 ### Round 5 log: 5M (ONUB art)

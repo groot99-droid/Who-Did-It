@@ -1,0 +1,523 @@
+{
+ "textures": [
+  {
+   "image": "clues-0.png",
+   "format": "RGBA8888",
+   "size": {
+    "w": 512,
+    "h": 256
+   },
+   "scale": 1,
+   "frames": [
+    {
+     "filename": "clue_bucket_wet",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 9,
+      "y": 1,
+      "w": 50,
+      "h": 51
+     },
+     "frame": {
+      "x": 2,
+      "y": 35,
+      "w": 50,
+      "h": 51
+     }
+    },
+    {
+     "filename": "clue_claw",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 10,
+      "w": 36,
+      "h": 41
+     },
+     "frame": {
+      "x": 158,
+      "y": 35,
+      "w": 36,
+      "h": 41
+     }
+    },
+    {
+     "filename": "clue_drag",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 0,
+      "w": 28,
+      "h": 64
+     },
+     "frame": {
+      "x": 2,
+      "y": 90,
+      "w": 28,
+      "h": 64
+     }
+    },
+    {
+     "filename": "clue_felt_bare",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 4,
+      "y": 21,
+      "w": 47,
+      "h": 35
+     },
+     "frame": {
+      "x": 56,
+      "y": 35,
+      "w": 47,
+      "h": 35
+     }
+    },
+    {
+     "filename": "clue_felt_bowler",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 4,
+      "y": 21,
+      "w": 47,
+      "h": 35
+     },
+     "frame": {
+      "x": 107,
+      "y": 35,
+      "w": 47,
+      "h": 35
+     }
+    },
+    {
+     "filename": "clue_felt_cap",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 4,
+      "y": 21,
+      "w": 47,
+      "h": 35
+     },
+     "frame": {
+      "x": 56,
+      "y": 74,
+      "w": 47,
+      "h": 35
+     }
+    },
+    {
+     "filename": "clue_footprint_m_dark",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 12,
+      "w": 24,
+      "h": 41
+     },
+     "frame": {
+      "x": 226,
+      "y": 38,
+      "w": 24,
+      "h": 41
+     }
+    },
+    {
+     "filename": "clue_footprint_m_glow",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 11,
+      "w": 24,
+      "h": 42
+     },
+     "frame": {
+      "x": 198,
+      "y": 38,
+      "w": 24,
+      "h": 42
+     }
+    },
+    {
+     "filename": "clue_footprint_m_light",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 12,
+      "w": 24,
+      "h": 41
+     },
+     "frame": {
+      "x": 144,
+      "y": 80,
+      "w": 24,
+      "h": 41
+     }
+    },
+    {
+     "filename": "clue_footprint_m_mid",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 12,
+      "w": 24,
+      "h": 41
+     },
+     "frame": {
+      "x": 98,
+      "y": 117,
+      "w": 24,
+      "h": 41
+     }
+    },
+    {
+     "filename": "clue_footprint_s_dark",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 15,
+      "w": 20,
+      "h": 34
+     },
+     "frame": {
+      "x": 172,
+      "y": 80,
+      "w": 20,
+      "h": 34
+     }
+    },
+    {
+     "filename": "clue_footprint_s_glow",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 15,
+      "w": 20,
+      "h": 34
+     },
+     "frame": {
+      "x": 98,
+      "y": 196,
+      "w": 20,
+      "h": 34
+     }
+    },
+    {
+     "filename": "clue_footprint_s_light",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 15,
+      "w": 20,
+      "h": 34
+     },
+     "frame": {
+      "x": 34,
+      "y": 165,
+      "w": 20,
+      "h": 34
+     }
+    },
+    {
+     "filename": "clue_footprint_s_mid",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 15,
+      "w": 20,
+      "h": 34
+     },
+     "frame": {
+      "x": 58,
+      "y": 165,
+      "w": 20,
+      "h": 34
+     }
+    },
+    {
+     "filename": "clue_footprint_t_dark",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 8,
+      "w": 28,
+      "h": 48
+     },
+     "frame": {
+      "x": 34,
+      "y": 113,
+      "w": 28,
+      "h": 48
+     }
+    },
+    {
+     "filename": "clue_footprint_t_glow",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 8,
+      "w": 28,
+      "h": 48
+     },
+     "frame": {
+      "x": 2,
+      "y": 158,
+      "w": 28,
+      "h": 48
+     }
+    },
+    {
+     "filename": "clue_footprint_t_light",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 8,
+      "w": 28,
+      "h": 48
+     },
+     "frame": {
+      "x": 66,
+      "y": 113,
+      "w": 28,
+      "h": 48
+     }
+    },
+    {
+     "filename": "clue_footprint_t_mid",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 8,
+      "w": 28,
+      "h": 48
+     },
+     "frame": {
+      "x": 261,
+      "y": 2,
+      "w": 28,
+      "h": 48
+     }
+    },
+    {
+     "filename": "clue_fur",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 18,
+      "w": 24,
+      "h": 30
+     },
+     "frame": {
+      "x": 98,
+      "y": 162,
+      "w": 24,
+      "h": 30
+     }
+    },
+    {
+     "filename": "clue_print",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 13,
+      "w": 33,
+      "h": 39
+     },
+     "frame": {
+      "x": 107,
+      "y": 74,
+      "w": 33,
+      "h": 39
+     }
+    },
+    {
+     "filename": "clue_smear",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 7,
+      "y": 15,
+      "w": 51,
+      "h": 32
+     },
+     "frame": {
+      "x": 206,
+      "y": 2,
+      "w": 51,
+      "h": 32
+     }
+    },
+    {
+     "filename": "clue_thread_blue",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 20,
+      "w": 64,
+      "h": 29
+     },
+     "frame": {
+      "x": 2,
+      "y": 2,
+      "w": 64,
+      "h": 29
+     }
+    },
+    {
+     "filename": "clue_thread_green",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 20,
+      "w": 64,
+      "h": 29
+     },
+     "frame": {
+      "x": 70,
+      "y": 2,
+      "w": 64,
+      "h": 29
+     }
+    },
+    {
+     "filename": "clue_thread_red",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 20,
+      "w": 64,
+      "h": 29
+     },
+     "frame": {
+      "x": 138,
+      "y": 2,
+      "w": 64,
+      "h": 29
+     }
+    }
+   ]
+  }
+ ],
+ "meta": {
+  "app": "http://github.com/odrick/free-tex-packer-core",
+  "version": "0.3.9"
+ }
+}

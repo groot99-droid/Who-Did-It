@@ -17,6 +17,7 @@
     "refs": "tsx refs.ts",
     "tileset": "tsx tileset.ts",
     "slice": "tsx slice.ts",
+    "world": "tsx world.ts",
     "review:world": "tsx review-world.ts",
     "lineup": "tsx lineup.ts",
     "onub": "tsx onub.ts",

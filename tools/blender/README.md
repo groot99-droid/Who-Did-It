@@ -10,13 +10,18 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 | `build_rig.py` | Builds the rig: `SpriteCam` (ortho, X 40°, Z 0°, 64 px/m), `TileCam` (straight down, one 64 px tile per metre), turntable `TT`, camera-parented key sun and area fill, slate world at 0.15, the `WDI_Toon` node group, `OutlineInk`, the `Outline` Solidify preset, a 1 m checker cube with a facing marker, a 4 m grid plane with 1 m lines, a hidden 1.7 m `FallenProxy` for the `die` cell check, a `Feet` empty, EEVEE settings |
 | `batch_render.py` | `--smoke` calibration sheet (8 cube views, the ground tile, one 256 px `die` frame), or character passes with the per-frame `Feet` manifest |
 | `build_villager.py` | Builds the V1 `villager` body from code: a 1,388-triangle block-out of chamfered boxes, 3 heads tall, with the overlay parts, an 8-bone armature and the four V1 actions; writes the `.blend` (and optionally the source GLB) to `assets/external/villager/`, never into git |
-| `static_common.py` | Shared helpers for the static sheets: the rig with calibration hidden, `SpriteCam` / `TileCam` framing, palette materials, shape helpers, and the per-atlas `manifest.json` (`file`, `cell`, `pivot`) |
-| `build_props.py` | Models the square props (`prop_*`) and the 21 clue keys from code and renders them (`docs/SPRITES.md` 8) |
-| `bakery_props.py` | Models the seven bakery props of the quick mode (`prop_wakeTable`, `prop_plate`, `prop_deadLoaf`, `prop_ledger`, `prop_oven`, `prop_basin`, `prop_flour_sacks`), each with its own cell; `build_props.py` renders them into the `props` sheet |
+| `static_common.py` | Shared helpers for the static sheets: the rig with calibration hidden, `SpriteCam` / `TileCam` framing, palette materials, shape helpers, the per-atlas `manifest.json` (`file`, `cell`, `pivot`); since round 5 also `IsoCam` (`iso_frame`, `iso_px`; built here until 5L's rig carries it), the 0.75 environment root and world-palette toon, flat and textured materials |
+| `build_props.py` | Renders the round-5 prop atlases (`props`, `props_<mapId>`) through IsoCam and the 24 clue keys (the 15 ground decals through TileCam, the thread, felt and bucket through IsoCam, Hunger's glowing footprints new) |
 | `build_loft.py` | Renders the dark-loft images `loft_backdrop` (1280 x 720) and `prop_bedroll` / `prop_bedroll_self` (112 x 184) through a non-square `SpriteCam` framing |
-| `build_buildings.py` | Renders the four Small-profile exteriors (`bld_<id>_ext`) with the image's bottom middle on the front wall's base |
+| `build_buildings.py` | Renders each map's buildings (`bld_<mapId>`) from recipes at their footprints (the scene's `buildings[]`, else art plan 3.4) and the multi-tile props, each twice through IsoCam: the beauty and a raw tile map that `tools/sprites/slice.ts` cuts slices with |
+| `build_ground.py` | Renders the isometric ground cells (art plan 3.2): each of the 14 materials of both themes in four variants, one metre under IsoCam at 128 x 64 display px, from a Poly Haven texture pulled towards its world-palette colour and a seeded scatter; the variants blend to one shared mapping at the tile edge, so all four tile with each other. `tools/sprites/tileset.ts` joins them |
+| `env/kitbash.py`, `env/shared_props.py`, `env/hollowmere_props.py`, `env/blackpine_props.py` | The modelling vocabulary (world-palette toon `T`, unlit `F`, box, prism and outline shapes, fitted Kenney meshes) and the frames of `props` (shared props, 8 spots, 20 portal frames), `props_hollowmere` (33 props, 22 spots) and `props_blackpine` (18 props, 14 spots); the multi-tile props are in `build_buildings.py` |
+| `build_kit.py` | Renders the 44 kit frames of each theme (`<wall\|cliff\|tree\|boulder\|fence\|stack>/<full\|half\|stub>/<0-3>`, art plan 3.3) under IsoCam at twice their art cell, pivoted on the tile centre's ground point; walls and cliffs from code with Poly Haven textures, trees, rocks and stacks from Kenney |
+| `kit_import.py` | Imports a CC0 kit mesh (GLB, glTF, FBX, OBJ), joins it, tags it (`wdi_part`) and re-materials it through `WDI_Toon` in the world palette |
+| `env/kits.py` | The CC0 packs and textures of the world art (Kenney URLs, the Poly Haven ids per theme and material) and their fetch into git-ignored `assets/external/kits/`, saving the licence files; pure Python |
 | `build_tiles.py` | Renders four seamless 64 px straight-down variants of each of the six ground sets (`tiles_<biome>_<v>`) |
-| `save_masters.py` | Saves `bakery_props.blend` and `loft.blend` into git-ignored `assets/external/` as the masters for the ROSW checkout |
+| `save_masters.py` | Saves the world masters `buildings_<mapId>.blend` and `props_<mapId>.blend` (round 5) and `loft.blend` into git-ignored `assets/external/` for the ROSW checkout; the round-4 `bakery_props.py` and its master are retired (DECISIONS A62) |
+| `env/ambience.py` | Fetches the four CC0 OpenGameArt ambient sources and masters `amb_village`, `amb_house`, `amb_forest`, `amb_cave` with ffmpeg (loop, mono, -18 LUFS, 2 s crossfade seam, Vorbis q5); pure Python, no `bpy` |
 | `build_vfx.py` | Animates the four M3 VFX frame by frame at 12 fps (`vfx_blood_pool`, `vfx_blood_splat`, `vfx_vote_stamp`, `vfx_dust_step`) |
 | `palettize.py` | Snaps materials to the palette; fails on untextured PBR |
 | `tests/test_rig_common.py` | Unit tests (`pnpm --filter @wdi/blender test`, no Blender needed) |
@@ -54,11 +59,46 @@ done
 
 # Loft images, building exteriors and tilesets (minutes on llvmpipe), then finish them (tools/sprites)
 python tools/blender/build_loft.py -- --out build/render        # build/render/loft/
-python tools/blender/build_buildings.py -- --out build/render   # build/render/buildings/
-python tools/blender/build_tiles.py -- --out build/render       # build/render/tiles/
+python tools/blender/build_tiles.py -- --out build/render       # build/render/tiles/ (until K6)
 pnpm --filter @wdi/sprites images ../../build/render ../../apps/client/public/assets
 
-# The bakery and loft masters (git-ignored; copy to the ROSW checkout, assets/source/MANIFEST.md)
+# World art (round 5): fetch the CC0 packs once, then the isometric ground tilesets
+python3 tools/blender/env/kits.py --out assets/external/kits --licences LICENSES/vendors
+python tools/blender/build_ground.py -- --out build/render   # build/render/ground/<theme>/
+pnpm --filter @wdi/sprites tileset ../../build/render/ground ../../apps/client/public/assets/ground
+
+# The kits: render, pixel-finish, pack; then the review sheets
+python tools/blender/build_kit.py -- --out build/render     # build/render/iso_kit_<theme>/
+for t in harbour timber; do
+  pnpm --filter @wdi/sprites pixel ../../build/render/iso_kit_$t ../../build/finished/iso_kit_$t
+  pnpm --filter @wdi/sprites pack:static ../../build/finished/iso_kit_$t ../../apps/client/public/assets/kit
+  pnpm --filter @wdi/sprites review:world kit ../../apps/client/public/assets $t ../../assets/source/review/kit-$t.png
+done
+
+# Buildings and the multi-tile props: render, then finish and slice, then pack
+python tools/blender/build_buildings.py -- --out build/render   # build/render/bld_<map>/, props_<map>_sliced/
+pnpm --filter @wdi/sprites slice ../../build/render/bld_hollowmere ../../build/finished/bld_hollowmere
+pnpm --filter @wdi/sprites slice ../../build/render/props_hollowmere_sliced ../../build/finished/props_hollowmere
+pnpm --filter @wdi/sprites pack:static ../../build/finished/bld_hollowmere ../../apps/client/public/assets/buildings
+
+# Gate A (art plan 3.10): the same raw renders finished on (the shipped assets) and off (build/gate-off)
+pnpm --filter @wdi/sprites tileset ../../build/render/ground ../../build/gate-off/ground --finish off
+for a in iso_kit_harbour props props_hollowmere; do
+  pnpm --filter @wdi/sprites pixel ../../build/render/$a ../../build/finished-off/$a --finish off; done
+pnpm --filter @wdi/sprites slice ../../build/render/props_hollowmere_sliced ../../build/finished-off/props_hollowmere --finish off
+pnpm --filter @wdi/sprites slice ../../build/render/bld_hollowmere ../../build/finished-off/bld_hollowmere --finish off
+# pack each finished-off folder into build/gate-off/{kit,props,buildings} with pack:static, copy chars/, then
+pnpm --filter @wdi/sprites review:world gate ../../apps/client/public/assets ../../assets/source/review/gate-a-world-on.png
+pnpm --filter @wdi/sprites review:world gate ../../build/gate-off ../../assets/source/review/gate-a-world-off.png --finish off
+
+# Both art styles (DECISIONS A79) in one go from the raw renders above: 8-bit at the root, low poly in lowpoly/
+pnpm --filter @wdi/sprites world ../../build/render ../../apps/client/public/assets
+
+# Map thumbnails (480 x 270 WebP, composited from the shipped atlases) and the ambient loops
+pnpm --filter @wdi/sprites review:world thumbs ../../apps/client/public/assets ../../apps/client/public/assets/thumbs
+python3 tools/blender/env/ambience.py --out apps/client/public/assets/audio --licences LICENSES/vendors
+
+# The world and loft masters (git-ignored; copy to the ROSW checkout, assets/source/MANIFEST.md)
 python tools/blender/save_masters.py -- --out assets/external
 
 # The body review sheet from a die render (all passes)

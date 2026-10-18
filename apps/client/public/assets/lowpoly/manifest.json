@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "art": "lowpoly",
+  "entries": [
+    {
+      "key": "clues",
+      "type": "multiatlas",
+      "url": "clues/clues.json",
+      "path": "clues/",
+      "filter": "linear"
+    },
+    {
+      "key": "props",
+      "type": "multiatlas",
+      "url": "props/props.json",
+      "path": "props/",
+      "filter": "linear"
+    },
+    {
+      "key": "props_hollowmere",
+      "type": "multiatlas",
+      "url": "props/props_hollowmere.json",
+      "path": "props/",
+      "filter": "linear",
+      "maps": [
+        "hollowmere"
+      ]
+    },
+    {
+      "key": "props_blackpine",
+      "type": "multiatlas",
+      "url": "props/props_blackpine.json",
+      "path": "props/",
+      "filter": "linear",
+      "maps": [
+        "blackpine"
+      ]
+    },
+    {
+      "key": "bld_hollowmere",
+      "type": "multiatlas",
+      "url": "buildings/bld_hollowmere.json",
+      "path": "buildings/",
+      "filter": "linear",
+      "maps": [
+        "hollowmere"
+      ]
+    },
+    {
+      "key": "bld_blackpine",
+      "type": "multiatlas",
+      "url": "buildings/bld_blackpine.json",
+      "path": "buildings/",
+      "filter": "linear",
+      "maps": [
+        "blackpine"
+      ]
+    },
+    {
+      "key": "thumb_hollowmere",
+      "type": "image",
+      "url": "thumbs/thumb_hollowmere.webp"
+    },
+    {
+      "key": "thumb_blackpine",
+      "type": "image",
+      "url": "thumbs/thumb_blackpine.webp"
+    },
+    {
+      "key": "iso_ground_harbour",
+      "type": "image",
+      "url": "ground/iso_ground_harbour.png",
+      "filter": "linear",
+      "maps": [
+        "hollowmere"
+      ]
+    },
+    {
+      "key": "iso_ground_timber",
+      "type": "image",
+      "url": "ground/iso_ground_timber.png",
+      "filter": "linear",
+      "maps": [
+        "blackpine"
+      ]
+    },
+    {
+      "key": "iso_kit_harbour",
+      "type": "multiatlas",
+      "url": "kit/iso_kit_harbour.json",
+      "path": "kit/",
+      "filter": "linear",
+      "maps": [
+        "hollowmere"
+      ]
+    },
+    {
+      "key": "iso_kit_timber",
+      "type": "multiatlas",
+      "url": "kit/iso_kit_timber.json",
+      "path": "kit/",
+      "filter": "linear",
+      "maps": [
+        "blackpine"
+      ]
+    }
+  ]
+}
