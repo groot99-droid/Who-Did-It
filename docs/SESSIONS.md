@@ -2030,3 +2030,16 @@ tracks that none of them holds.
 ### Round 5 log: 5L (character art)
 
 ### Round 5 log: 5M (ONUB art)
+
+- **Done (2026-10-18), one draft PR from `claude/r5-onub-art`, commits grouped M1 to M4.** Every key of
+  `onub-contract.md` 5.4 plus `onub_mini` in both manifests with `modes: ['onub']`; 13 owner rooms finished; the
+  proofing clean-up; the kitchen overview; 24 card faces and backs; the cloche; 15 role portraits and `onub_baker`;
+  the mini-game atlas; the placeholder twins; the loft images out of both manifests and `LEGACY`. Calls in DECISIONS
+  A64; keys and layout in SPRITES 11; ASSETS 6.3 "What shipped, ONUB v2".
+- **Generation**: 78 images and 33 background removals, 357 credits; every shipped pick has a CREDITS "Generated"
+  row and a MANIFEST row (catalog id pending `higgsfield-library-sync`). Raw generations stay out of git.
+- **Waiting on the owner**: Gate C, the Brick Oven pick (greybox until then), and the provenance of the 13 images.
+- **For other sessions**: the client's `queueManifest` loads every manifest entry today and ignores `modes`, so until
+  the client filters by mode (5C, 5D, 5I) the ONUB images would load in the main mode too; 5C and 5D draw
+  `mini_fire` from `mini_oven/0..3`. 5K: please move `frame` from `build_loft.py` into `static_common.py` and drop the
+  loft step of `save_masters.py`, after which `build_loft.py` can be deleted.

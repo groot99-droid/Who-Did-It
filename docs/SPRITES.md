@@ -940,3 +940,52 @@ world texture except `clues` (linear)", while the main mode's pixel finish is on
 
 **WORLD 4.2** carries the metrics of this section. ARCHITECTURE gets no change from this section: the server stays
 on the square grid.
+
+## 11. ONUB images (Session 5M, round 5)
+
+The art of the quick mode (GDD 3.11). The keys are `docs/round5/onub-contract.md` 5.4 plus `onub_mini` (art plan
+5.7); every entry carries `modes: ['onub']` in both manifests, so it loads at ONUB match start whatever the client's
+card and never in the main mode. All of it is pixel art on the world palette, finished whatever the main mode's
+switch says (ASSETS 6.11), and built by one command:
+
+```
+pnpm --filter @wdi/sprites onub build     # images, cards, atlas, the real manifest's ONUB block
+pnpm --filter @wdi/sprites onub review    # assets/source/review/{gate-c-*,onub-*}.png
+pnpm --filter @wdi/sprites placeholder    # the greybox twins in assets/placeholder/onub/
+```
+
+The build reads the picked generations from git-ignored `assets/external/generated/5M/<id>.png` (a T5 cutout from
+`<id>.cut.png`, the `remove_background` result); a key whose pick is missing there gets its labelled greybox, so a
+fresh checkout rebuilds only what it has. The output is byte-identical across runs.
+
+| Key | File (under `assets/onub/`) | Art size | File size | Drawn |
+|---|---|---|---|---|
+| `onub_station_<stationId>` (4), `onub_scene_<sceneId>` (10), `onub_kitchen` | `rooms/<key>.webp` | 640 x 360 | 1920 x 1080 | DOM, `image-rendering: pixelated` |
+| `onub_card_<cardId>` (18), `onub_loc_<stationId>` (4), `onub_card_back_role`, `onub_card_back_loc` | `cards/<key>.webp` | 80 x 112 | 240 x 336 | DOM |
+| `onub_cloche` | `misc/onub_cloche.webp` | 64 x 64 | 192 x 192 | DOM |
+| `onub_portrait_<roleId>` (15), `onub_baker` | `portraits/<key>.webp` | 128 x 192 | 384 x 576 | DOM |
+| `onub_mini` | `onub_mini.json`, `onub_mini-0.png` (multiatlas, one 512² page) | art size | – | Phaser, x3, `nearest` |
+
+**The kitchen.** `onub_kitchen` is four 320 x 180 quadrants, fridge and mixer on top, proofing and oven below, with
+the pass (96 x 64) centred at (320, 180). Each quadrant is that station's tap target; the DOM writes the names.
+
+**The cards.** A 1 px ink border, a 3 px frame in the station's ramp (fridge `moon`, mixer `plaster`, proofing
+`brass`, oven `brick`; Sabotage cards `moss` with a crack and a rot blot at the top-right corner), the window
+(4, 4) to (76, 68) and the blank text band (4, 72) to (76, 108) in art pixels: bone paper `#D9D2C2` under a 1 px
+`#B2AA99` rule, where the client writes the card's name and text. An Ingredient card's window is its object
+(56 x 48) over a darkened crop of its station's floor; a Location card's is the station room (`onub-fixes.json`
+`locBoxes`).
+
+**`onub_mini` frames.** `mini_crate_butter`, `mini_crate_milk`, `mini_crate_eggs` (24 x 18), `mini_cart` (48 x 32),
+`mini_dial`, `mini_gauge` (48 x 48), `mini_needle` (4 x 20, pivot (0.5, 0.9), pointing up), `mini_sack` (28 x 32),
+`mini_bucket` (24 x 24), `mini_bowl` (64 x 48, its inner window (8, 8) to (56, 44) transparent for the fill),
+`mini_fill_flour`, `mini_fill_water` (8 x 8, tiling), `mini_stream_flour`, `mini_stream_water` (4 x 8, tiling),
+`mini_banneton` (28 x 16), `mini_cabinet` (72 x 88), `mini_slot_glow` (28 x 12), `mini_log` (24 x 10) and
+`mini_oven/0` to `/3` (72 x 48). The fire loop has no animation key, since a manifest key starting `onub_` must be an
+ONUB entry and an `anims_*` one may not list `onub`: the client builds `mini_fire` from `mini_oven/0..3` at 8 fps,
+looping. No frame carries a target band (GDD 3.11).
+
+**Tests.** `tools/sprites/test/onub.test.ts`: every key in both manifests with its type and `modes`, no loft key,
+every image at its file size and on the world palette with alpha 0 or 255, the ONUB set within 2.5 MB, every atlas
+frame at its art box on one page, the blank band and the Sabotage mark, and the batch file's jobs, picks, prompts
+and references.
