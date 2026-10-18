@@ -1,5 +1,6 @@
 import { ErrorCode, type PlayerState, type RoleRevealPayload } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { resetAvatarsForLobby } from './Avatars';
 import { refuse } from './Flow';
 
 // The role card in both modes, the cover pick and the public look (GDD 3.17, round-5 `deck/wire.md` 4.4).
@@ -70,5 +71,5 @@ export function publishLooks(room: PartyRoom): void {
  * avatar and disguise, the hints and `flow.cardReady`. Pre-seed stub: no-op.
  */
 export function resetCoversForLobby(room: PartyRoom): void {
-  void room;
+  resetAvatarsForLobby(room);
 }

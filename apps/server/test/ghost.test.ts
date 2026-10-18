@@ -1,4 +1,5 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
+import { handleOf as h } from './avatarHelpers';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { navs, scenes } from '@wdi/content';
 import { ErrorCode, NavGrid, TILE_PX } from '@wdi/shared';
@@ -39,7 +40,7 @@ async function ghostParty(): Promise<{ m: Match; ghost: Match['bots'][0] }> {
   teleport(m, m.bots[2]!, 'overworld', 26, 18);
   teleport(m, m.bots[3]!, 'overworld', 30, 21);
   readyKnife(m, k);
-  handleKill(m.room, k.id, { abilityId: 'kill', targetId: g.id });
+  handleKill(m.room, k.id, { abilityId: 'kill', targetId: h(m, g) });
   expect(simOfBot(m, g).dead).toBe(true);
   await sleep(300);
   return { m, ghost: g };
@@ -76,13 +77,13 @@ describe('ghosts', () => {
     await act(ghost, 'act.hold', { action: 'collect', targetId: 'clue_teaching', on: true });
     await act(ghost, 'act.reportBody', { bodyId: body });
     await act(ghost, 'act.bell', {});
-    await act(ghost, 'act.ability', { abilityId: 'kill', targetId: m.bots[2]!.id });
-    await act(ghost, 'act.ability', { abilityId: 'bandage', targetId: m.bots[2]!.id });
+    await act(ghost, 'act.ability', { abilityId: 'kill', targetId: h(m, m.bots[2]!) });
+    await act(ghost, 'act.ability', { abilityId: 'bandage', targetId: h(m, m.bots[2]!) });
     expect(errorCodes(ghost)).toEqual(Array(5).fill(ErrorCode.cannot));
     // A ghost Doctor cannot bandage either.
     const doc = m.bots[3]!;
     simOfBot(m, doc).dead = true;
-    await act(doc, 'act.ability', { abilityId: 'bandage', targetId: m.bots[2]!.id });
+    await act(doc, 'act.ability', { abilityId: 'bandage', targetId: h(m, m.bots[2]!) });
     expect(errorCodes(doc)).toEqual([ErrorCode.cannot]);
   });
 
