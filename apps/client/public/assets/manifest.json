@@ -33,7 +33,17 @@
       "type": "multiatlas",
       "url": "props/props.json",
       "path": "props/",
-      "filter": "linear"
+      "filter": "nearest"
+    },
+    {
+      "key": "props_hollowmere",
+      "type": "multiatlas",
+      "url": "props/props_hollowmere.json",
+      "path": "props/",
+      "filter": "nearest",
+      "maps": [
+        "hollowmere"
+      ]
     },
     {
       "key": "vfx",

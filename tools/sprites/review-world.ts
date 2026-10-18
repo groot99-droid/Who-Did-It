@@ -4,6 +4,7 @@
 //   tsx review-world.ts gate <assets dir> <out.png> [--finish on|off] [--look baker]
 //   tsx review-world.ts ground <assets dir> <theme> <out.png>
 //   tsx review-world.ts kit <assets dir> <theme> <out.png>
+//   tsx review-world.ts atlas <assets dir> <atlas json, e.g. props/props.json> <out.png>
 //
 // `gate` is Gate A's Hollowmere square vignette: ground with blends, kit walls, a tree line, boulders, the
 // hedge-wall, the tavern's slices, the bell, the pump, two lantern posts and a look idling in 8 directions,
@@ -380,7 +381,20 @@ export async function groundSheet(assets: string, theme: string): Promise<Buffer
 /** Every frame of a kit in its grid order, drawn standing on a ground diamond, at 2x (the draw scale). */
 export async function kitSheet(assets: string, theme: string): Promise<Buffer> {
   const a = await loadAtlases(assets, theme, 'none', 'none');
-  const names = [...a.kit.keys()].sort();
+  return frameSheet(a, a.kit, theme === 'harbour' ? 'c' : 'p', ART_SCALE);
+}
+
+/**
+ * Every frame of one atlas (`props/props.json`, `clues/clues.json`) in name order, each on a ground cell of
+ * the harbour cobble; packed atlases are drawn at 2x, the display-size clue page at 1x.
+ */
+export async function atlasSheet(assets: string, rel: string): Promise<Buffer> {
+  const a = await loadAtlases(assets, 'harbour', 'none', 'none');
+  return frameSheet(a, await readAtlas(join(assets, rel)), 'c', rel.startsWith('clues') ? 1 : ART_SCALE);
+}
+
+function frameSheet(a: Atlases, frames: Map<string, Sprite>, floor: string, scale: number): Buffer {
+  const names = [...frames.keys()].sort();
   const cols = 8;
   const out = createCanvas(cols * 200, Math.ceil(names.length / cols) * 300);
   const g = out.getContext('2d');
@@ -390,8 +404,8 @@ export async function kitSheet(assets: string, theme: string): Promise<Buffer> {
   names.forEach((name, i) => {
     const x = (i % cols) * 200 + 100;
     const y = Math.floor(i / cols) * 300 + 270;
-    groundCell(g, a, theme === 'harbour' ? 'c' : 'p', 0, x, y - 32);
-    draw(g, a.kit.get(name)!, x, y, ART_SCALE);
+    groundCell(g, a, floor, 0, x, y - 32);
+    draw(g, frames.get(name)!, x, scale === 1 ? y - 32 : y, scale);
   });
   return out.toBuffer('image/png');
 }
@@ -410,6 +424,9 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   if (mode === 'gate' && assets) {
     out = more[0];
     png = await gateSheet(assets, smooth, look);
+  } else if (mode === 'atlas' && assets && more[0]) {
+    out = more[1];
+    png = await atlasSheet(assets, more[0]);
   } else if ((mode === 'ground' || mode === 'kit') && assets && more[0]) {
     out = more[1];
     png = mode === 'ground' ? await groundSheet(assets, more[0]) : await kitSheet(assets, more[0]);

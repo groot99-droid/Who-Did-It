@@ -1,10 +1,17 @@
 // Placeholder stand-ins owned by Session 5K (art plan 1.2 item 6): clues, props, the building exteriors
 // and the tilesets. placeholder.ts collects `placeholderEntries()`; 5K adds its keys' greybox stand-ins
 // here and removes its retired keys.
-import { createCanvas, type SKRSContext2D } from '@napi-rs/canvas';
-import { PROP_KEYS } from './keys.ts';
+import { createCanvas } from '@napi-rs/canvas';
 import { atlasJson, packFrames, type PackInput } from './pack.ts';
-import { KIT_CELLS, KIT_FRAMES, KIT_THEMES, packStatic, type StaticManifest } from './pack-static.ts';
+import {
+  KIT_CELLS,
+  KIT_FRAMES,
+  KIT_THEMES,
+  MAP_PROPS_FRAMES,
+  PROPS_FRAMES,
+  packStatic,
+  type StaticManifest,
+} from './pack-static.ts';
 import {
   CELL_H,
   CELL_W,
@@ -71,6 +78,7 @@ export function clueFrames(): PackInput[] {
   for (const h of ['s', 'm', 't'] as const) {
     for (const [tint, token] of Object.entries(MUD))
       add(`clue_footprint_${h}_${tint}`, token, 'F', radius[h]);
+    add(`clue_footprint_${h}_glow`, 'moon', 'F', radius[h]);
   }
   for (const [colour, token] of Object.entries(SCARF)) add(`clue_thread_${colour}`, token, 'T');
   add('clue_felt_cap', 'slate', 'H');
@@ -272,171 +280,94 @@ export function kitFrames(theme: string): { manifest: StaticManifest; inputs: Pa
 
 // ---------------------------------------------------------------- props, vfx, loft (greybox marks)
 
-/**
- * A greybox prop: a block (front face, lighter top) standing on the frame's pivot, sized like the real
- * render (docs/SPRITES.md 8), with one accent so the bakery props tell apart without a text label.
- * `w` and `h` are the front face in px, `top` the depth of the top face, `lift` raises the block (a plate
- * sits on the table's top, 33 px up), `back` moves the pivot row towards the front edge (the Wake
- * Table's pivot is its back row).
- */
-interface GreyProp {
-  cell: number;
-  ground: number;
-  w: number;
-  h: number;
-  top: number;
-  fill: Token;
-  lift?: number;
-  back?: number;
-  accent?: (g: SKRSContext2D, cx: number, topY: number, w: number) => void;
+/** The art cell of a round-5 prop, spot or portal frame (art plan 3.5-3.7), as `build_props.py` renders it. */
+export function propCell(name: string): [number, number] {
+  if (name.endsWith('_sill') || ['portal_hatch', 'portal_drop'].includes(name)) return [64, 48];
+  if (name.startsWith('portal_')) return [64, 112];
+  return PROP_CELLS[name] ?? [64, 64];
 }
 
-const loafMark = (g: SKRSContext2D, cx: number, y: number) =>
-  shape(g, 'mustard', () => g.ellipse(cx, y, 11, 6, 0, 0, 2 * Math.PI));
-
-const GREY_PROPS: Record<string, GreyProp> = {
-  prop_bell: {
-    cell: 192,
-    ground: 148,
-    w: 80,
-    h: 112,
-    top: 18,
-    fill: 'slate',
-    accent: (g, cx, y) => shape(g, 'mustard', () => g.arc(cx, y + 50, 14, 0, 2 * Math.PI)),
-  },
-  prop_pump: {
-    cell: 192,
-    ground: 148,
-    w: 56,
-    h: 24,
-    top: 40,
-    fill: 'fog',
-    accent: (g, cx, y) => shape(g, 'moon', () => g.ellipse(cx, y + 20, 20, 12, 0, 0, 2 * Math.PI)),
-  },
-  prop_noticeBoard: {
-    cell: 192,
-    ground: 148,
-    w: 84,
-    h: 100,
-    top: 8,
-    fill: 'slate',
-    accent: (g, cx, y) => shape(g, 'bone', () => g.rect(cx - 28, y + 18, 56, 34)),
-  },
-  prop_kitChest: {
-    cell: 192,
-    ground: 148,
-    w: 60,
-    h: 28,
-    top: 26,
-    fill: 'slate',
-    accent: (g, cx, y) => shape(g, 'mustard', () => g.rect(cx - 5, y + 30, 10, 10)),
-  },
-  prop_lanternPost_lit: {
-    cell: 192,
-    ground: 148,
-    w: 10,
-    h: 120,
-    top: 6,
-    fill: 'slate',
-    accent: (g, cx, y) => shape(g, 'lantern', () => g.rect(cx - 9, y - 4, 18, 22)),
-  },
-  prop_lanternPost_unlit: {
-    cell: 192,
-    ground: 148,
-    w: 10,
-    h: 120,
-    top: 6,
-    fill: 'slate',
-    accent: (g, cx, y) => shape(g, 'ink', () => g.rect(cx - 9, y - 4, 18, 22)),
-  },
-  prop_wakeTable: { cell: 384, ground: 176, w: 310, h: 32, top: 120, fill: 'slate', back: 93 },
-  prop_plate: {
-    cell: 96,
-    ground: 72,
-    w: 38,
-    h: 3,
-    top: 22,
-    fill: 'bone',
-    lift: 33,
-    accent: (g, cx, y) => loafMark(g, cx, y + 11),
-  },
-  prop_deadLoaf: {
-    cell: 128,
-    ground: 84,
-    w: 56,
-    h: 30,
-    top: 64,
-    fill: 'fog',
-    back: 32,
-    accent: (g, cx, y) => {
-      loafMark(g, cx, y + 32);
-      g.fillStyle = PALETTE.ink;
-      g.fillRect(cx - 2, y + 25, 4, 14);
-    },
-  },
-  prop_ledger: {
-    cell: 128,
-    ground: 100,
-    w: 54,
-    h: 40,
-    top: 28,
-    fill: 'slate',
-    accent: (g, cx, y) => shape(g, 'ink', () => g.rect(cx - 16, y + 6, 32, 18)),
-  },
-  prop_oven: {
-    cell: 256,
-    ground: 196,
-    w: 96,
-    h: 64,
-    top: 60,
-    fill: 'fog',
-    accent: (g, cx, y, w) => {
-      shape(g, 'fog', () => g.ellipse(cx, y + 10, w / 2 - 8, 34, 0, Math.PI, 2 * Math.PI));
-      shape(g, 'ink', () => g.rect(cx - 20, y + 74, 40, 26));
-    },
-  },
-  prop_basin: {
-    cell: 128,
-    ground: 92,
-    w: 22,
-    h: 26,
-    top: 10,
-    fill: 'slate',
-    accent: (g, cx, y) => shape(g, 'moon', () => g.ellipse(cx, y - 2, 24, 13, 0, 0, 2 * Math.PI)),
-  },
-  prop_flour_sacks: {
-    cell: 160,
-    ground: 120,
-    w: 60,
-    h: 40,
-    top: 14,
-    fill: 'bone',
-    accent: (g, cx, y) => shape(g, 'bone', () => g.ellipse(cx + 22, y + 56, 18, 7, 0, 0, 2 * Math.PI)),
-  },
+const PROP_CELLS: Record<string, [number, number]> = {
+  prop_noticeBoard: [64, 96],
+  prop_pump: [64, 96],
+  prop_lanternPost_lit: [64, 128],
+  prop_lanternPost_unlit: [64, 128],
+  prop_bell: [64, 128],
+  prop_oven: [64, 96],
+  prop_deadLoaf: [64, 80],
+  prop_ledger: [64, 80],
+  prop_dartboard: [64, 96],
+  prop_lockedDoor: [64, 112],
+  prop_window: [64, 112],
+  prop_fence: [64, 56],
+  prop_letter_box: [64, 80],
+  prop_shelf: [64, 112],
+  prop_rope: [64, 112],
+  prop_clock: [64, 128],
+  prop_safe: [64, 80],
+  prop_crepe: [64, 112],
+  prop_scarecrow: [64, 112],
+  prop_photos: [64, 96],
+  prop_portrait: [64, 112],
+  prop_drowned_lantern: [64, 80],
+  prop_den: [64, 96],
+  spot_wardrobe: [64, 128],
+  spot_behindCounter: [64, 96],
+  spot_underBed: [64, 80],
+  spot_brush: [64, 80],
+  spot_hollowTree: [64, 112],
+  spot_timberCrib: [64, 96],
+  spot_sump: [64, 48],
+  spot_cratePile: [64, 96],
+  spot_crates: [64, 80],
+  spot_cryptNiche: [64, 112],
+  spot_dumpSpot: [64, 48],
+  spot_hayPile: [64, 80],
+  spot_poolNiche: [64, 48],
+  spot_atticHatch: [64, 48],
+  spot_cart: [64, 96],
+  spot_confessional: [64, 128],
+  spot_curtain: [64, 112],
+  spot_hedge: [64, 80],
+  spot_herbLoft: [64, 112],
+  spot_kegStack: [64, 96],
+  spot_pantry: [64, 112],
+  spot_stalagmite: [64, 96],
+  spot_wineRack: [64, 112],
+  spot_reeds: [64, 96],
+  spot_bog: [64, 48],
+  spot_charcoalPit: [64, 48],
+  spot_oreChute: [64, 96],
 };
 
-export function propFrames(): { manifest: StaticManifest; inputs: PackInput[] } {
-  const manifest: StaticManifest = { version: 1, atlas: 'props', frames: {} };
+/**
+ * Greybox props (SPRITES 10.13): a block on the frame's pivot, the ground point under the tile centre,
+ * (w / 2, h - 16) of the real art cell; props slate, spots fog, portals teal, floor features flat.
+ */
+export function propFrames(
+  atlas = 'props',
+  names: readonly string[] = PROPS_FRAMES,
+): {
+  manifest: StaticManifest;
+  inputs: PackInput[];
+} {
+  const manifest: StaticManifest = { version: 1, atlas: atlas as StaticManifest['atlas'], frames: {} };
   const inputs: PackInput[] = [];
-  for (const key of PROP_KEYS) {
-    const p = GREY_PROPS[key];
-    if (!p) throw new Error(`placeholder: no greybox for ${key}`);
-    const c = createCanvas(p.cell, p.cell);
+  for (const name of names) {
+    const [w, h] = propCell(name);
+    const c = createCanvas(w, h);
     const g = c.getContext('2d');
-    const cx = p.cell / 2;
-    const base = p.ground - (p.lift ?? 0) + (p.back ?? 0);
-    const front = base - p.h;
-    const topY = front - p.top;
-    if (p.back) {
-      for (const sx of [-1, 1]) shape(g, 'ink', () => g.rect(cx + sx * (p.w / 2 - 8) - 4, front, 8, p.h + 4));
+    const px = w / 2;
+    const py = h - 16;
+    const fill: Token = name.startsWith('portal_') ? 'teal' : name.startsWith('spot_') ? 'fog' : 'slate';
+    const tall = h - 16 - 24;
+    if (h <= 48) shape(g, fill, () => g.ellipse(px, py, 22, 11, 0, 0, 2 * Math.PI));
+    else {
+      shape(g, fill, () => g.rect(px - 16, py - tall, 32, tall));
+      shape(g, fill === 'slate' ? 'fog' : 'bone', () => g.rect(px - 16, py - tall - 8, 32, 8));
     }
-    shape(g, p.fill, () => g.rect(cx - p.w / 2, front, p.w, p.back ? p.h / 2 : p.h));
-    shape(g, p.fill === 'slate' ? 'fog' : p.fill === 'fog' ? 'bone' : p.fill, () =>
-      g.rect(cx - p.w / 2, topY, p.w, p.top),
-    );
-    p.accent?.(g, cx, topY, p.w);
-    manifest.frames[key] = { file: `${key}.png`, cell: p.cell, pivot: [cx, p.ground] };
-    inputs.push({ name: key, png: c.toBuffer('image/png') });
+    manifest.frames[name] = { file: `${name}.png`, cell: [w, h], pivot: [px, py] };
+    inputs.push({ name, png: c.toBuffer('image/png') });
   }
   return { manifest, inputs };
 }
@@ -460,13 +391,30 @@ export function placeholderEntries(): PlaceholderEntry[] {
     {
       order: 30,
       entries: [
-        { key: 'props', type: 'multiatlas', url: 'props/props.json', path: 'props/', filter: 'linear' },
+        { key: 'props', type: 'multiatlas', url: 'props/props.json', path: 'props/', filter: 'nearest' },
       ],
       files: async () => {
         const props = propFrames();
         return inFolder('props/', await packStatic(props.manifest, props.inputs));
       },
     },
+    ...Object.entries(MAP_PROPS_FRAMES).map(([key, names]): PlaceholderEntry => ({
+      order: 31,
+      entries: [
+        {
+          key,
+          type: 'multiatlas',
+          url: `props/${key}.json`,
+          path: 'props/',
+          filter: 'nearest',
+          maps: [key.slice('props_'.length)],
+        } as ManifestEntry,
+      ],
+      files: async () => {
+        const props = propFrames(key, names);
+        return inFolder('props/', await packStatic(props.manifest, props.inputs));
+      },
+    })),
     ...BUILDINGS.map((b): PlaceholderEntry => {
       const key = `bld_${b.id}_ext`;
       return {

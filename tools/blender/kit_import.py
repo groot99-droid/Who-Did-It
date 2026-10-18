@@ -137,8 +137,14 @@ def retoon(mat: bpy.types.Material, override: str | None = None, ramp: list[str]
             links.new(colour_out, g.inputs[0])
             links.new(g.outputs["Vector"], group.inputs[sock])
     else:
-        hx = override or nearest_world(tuple(round(rc.linear_to_srgb(c) * 255) for c in colour[:3]))
-        for sock, band in zip(("Light", "Mid", "Shadow"), ramp_bands(hx)):
+        srgb = tuple(round(rc.linear_to_srgb(c) * 255) for c in (colour or (0.5, 0.5, 0.5))[:3])
+        if ramp and override is None:  # by luminance into the given ramp, its neighbours as the bands
+            lum = (0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2]) / 255
+            i = min(len(ramp) - 1, int(lum * len(ramp)))
+            bands = (ramp[min(i + 1, len(ramp) - 1)], ramp[i], ramp[max(i - 1, 0)])
+        else:
+            bands = ramp_bands(override or nearest_world(srgb))
+        for sock, band in zip(("Light", "Mid", "Shadow"), bands):
             group.inputs[sock].default_value = rc.hex_to_linear(band)
     o = nodes.new("ShaderNodeOutputMaterial")
     links.new(group.outputs["Shader"], o.inputs["Surface"])
@@ -182,24 +188,25 @@ def import_part(path: str, tag: str | None = None, colours: dict[str, str] | Non
     """
     new = _import(path)
     meshes = [o for o in new if o.type == "MESH"]
+    others = [o.name for o in new if o.type != "MESH"]
     if not meshes:
         raise ValueError(f"kit_import: {path} has no mesh")
-    for o in new:
-        if o.type != "MESH":
-            for child in o.children:
-                child.matrix_parent_inverse = o.matrix_world.inverted() @ child.matrix_parent_inverse
+    bpy.context.view_layer.update()
     bpy.ops.object.select_all(action="DESELECT")
     for o in meshes:
-        o.select_set(True)
+        world = o.matrix_world.copy()
         o.parent = None
+        o.matrix_world = world
+        o.select_set(True)
     bpy.context.view_layer.objects.active = meshes[0]
     if len(meshes) > 1:
         bpy.ops.object.join()
     obj = bpy.context.view_layer.objects.active
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
-    for o in new:
-        if o is not obj and o.name in bpy.data.objects:
-            bpy.data.objects.remove(o, do_unlink=True)
+    keep = obj.name
+    for name in others:
+        if name != keep and name in bpy.data.objects:
+            bpy.data.objects.remove(bpy.data.objects[name], do_unlink=True)
     for slot in obj.material_slots:
         if slot.material is not None:
             slot.material = retoon(slot.material, (colours or {}).get(base_name(slot.material.name)), ramp)

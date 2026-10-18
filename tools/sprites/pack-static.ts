@@ -20,7 +20,7 @@ import {
   type PackResult,
 } from './pack.ts';
 
-export type StaticAtlas = 'clues' | 'props' | 'vfx' | `iso_kit_${string}`;
+export type StaticAtlas = 'clues' | 'props' | 'vfx' | `iso_kit_${string}` | `props_${string}`;
 
 /** The kit frame families of SPRITES 10.13 that a theme ships (art plan 3.3): 11, four variants each. */
 export const KIT_FRAMES: ReadonlyArray<readonly [string, string]> = [
@@ -57,9 +57,114 @@ export function kitFrameNames(): string[] {
   return KIT_FRAMES.flatMap(([k, h]) => [0, 1, 2, 3].map((v) => `${k}/${h}/${v}`)).sort();
 }
 
+/** The boot atlas `props` since round 5 (art plan 3.5-3.7): shared props, spots and the 20 portal frames. */
+export const PROPS_FRAMES: readonly string[] = [
+  'portal_boarded_e',
+  'portal_boarded_s',
+  'portal_boarded_sill',
+  'portal_cave_mouth_e',
+  'portal_cave_mouth_s',
+  'portal_cave_mouth_sill',
+  'portal_crawl_e',
+  'portal_crawl_s',
+  'portal_crawl_sill',
+  'portal_door_e',
+  'portal_door_s',
+  'portal_door_sill',
+  'portal_drop',
+  'portal_forest_gate_e',
+  'portal_forest_gate_s',
+  'portal_forest_gate_sill',
+  'portal_hatch',
+  'portal_stairs_e',
+  'portal_stairs_s',
+  'portal_stairs_sill',
+  'prop_kitChest',
+  'prop_lanternPost_lit',
+  'prop_lanternPost_unlit',
+  'prop_noticeBoard',
+  'prop_pump',
+  'spot_behindCounter',
+  'spot_brush',
+  'spot_crawlspace',
+  'spot_hollowTree',
+  'spot_sump',
+  'spot_timberCrib',
+  'spot_underBed',
+  'spot_wardrobe',
+];
+
+/** Each map's own atlas `props_<mapId>` (art plan 3.5, 3.6). */
+export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
+  props_hollowmere: [
+    'prop_basin',
+    'prop_bell',
+    'prop_bench',
+    'prop_candle',
+    'prop_clock',
+    'prop_crepe',
+    'prop_dartboard',
+    'prop_deadLoaf',
+    'prop_den',
+    'prop_drowned_lantern',
+    'prop_fence',
+    'prop_flourBin',
+    'prop_flour_sacks',
+    'prop_gasPocket',
+    'prop_goat',
+    'prop_green_lamp',
+    'prop_keyCache',
+    'prop_ledger',
+    'prop_letter_box',
+    'prop_lockedDoor',
+    'prop_oil_barrel',
+    'prop_ore_cart',
+    'prop_oven',
+    'prop_photos',
+    'prop_planks',
+    'prop_plate',
+    'prop_portrait',
+    'prop_rope',
+    'prop_safe',
+    'prop_scarecrow',
+    'prop_shelf',
+    'prop_tin_crate',
+    'prop_window',
+    'spot_atticHatch',
+    'spot_bog',
+    'spot_cart',
+    'spot_charcoalPit',
+    'spot_confessional',
+    'spot_cratePile',
+    'spot_crates',
+    'spot_cryptNiche',
+    'spot_curtain',
+    'spot_dumpSpot',
+    'spot_hayPile',
+    'spot_hedge',
+    'spot_herbLoft',
+    'spot_hollowLog',
+    'spot_kegStack',
+    'spot_oreChute',
+    'spot_pantry',
+    'spot_poolNiche',
+    'spot_reeds',
+    'spot_stalagmite',
+    'spot_trunk',
+    'spot_wineRack',
+  ],
+};
+
+/** The clue keys of SPRITES 8 plus Hunger's glowing footprints (art plan 3.8): 24 frames. */
+export function clueFrameNames(): string[] {
+  const glow = ['s', 'm', 't'].map((h) => `clue_footprint_${h}_glow`);
+  return [...staticFrameNames('clues'), ...glow].sort();
+}
+
 /** Page caps (px) of the round-5 world atlases (art plan 1.4, SPRITES 10.14). */
 export function pageCap(atlas: StaticAtlas): readonly [number, number] | null {
-  if (atlas.startsWith('iso_kit_')) return [1024, 1024];
+  if (atlas.startsWith('iso_kit_') || atlas.startsWith('props')) return [1024, 1024];
+  if (atlas === 'clues') return [512, 512];
   return null;
 }
 
@@ -107,7 +212,10 @@ export async function packCapped(
 /** The frame names a static atlas must hold exactly. */
 export function expectedFrames(atlas: StaticAtlas): string[] {
   if (atlas.startsWith('iso_kit_')) return kitFrameNames();
-  return staticFrameNames(atlas as 'clues' | 'props' | 'vfx');
+  if (atlas === 'props') return [...PROPS_FRAMES].sort();
+  if (atlas === 'clues') return clueFrameNames();
+  if (atlas.startsWith('props_')) return [...(MAP_PROPS_FRAMES[atlas] ?? [])].sort();
+  return staticFrameNames(atlas as 'vfx');
 }
 
 export interface StaticManifest {

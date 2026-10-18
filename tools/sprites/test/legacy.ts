@@ -5,9 +5,6 @@
  * empty. One key per line, so the three art sessions' deletions merge cleanly.
  */
 export const LEGACY: readonly string[] = [
-  // K3 (5K): re-rendered under the same keys
-  'props',
-  'clues',
   // K4 (5K): leave both manifests when bld_hollowmere lands
   'bld_tavern_ext',
   'bld_apoth_ext',

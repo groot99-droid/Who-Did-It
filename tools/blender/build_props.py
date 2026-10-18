@@ -1,12 +1,16 @@
-"""Render the square props and the clue sprites through the rig (docs/SPRITES.md 8).
+"""Render the world props, spots, portals and clues (docs/SPRITES.md 8, 10.13; art plan 3.5-3.8).
 
-    python tools/blender/build_props.py -- --out build/render
-    # -> build/render/props/*.png + manifest.json, build/render/clues/*.png + manifest.json
+    python tools/blender/build_props.py -- --out build/render [--atlases props,props_hollowmere,clues]
+    # -> build/render/<atlas>/*.png + manifest.json (display px)
+    pnpm --filter @wdi/sprites pixel ../../build/render/props ../../build/finished/props
+    pnpm --filter @wdi/sprites pixel ../../build/render/clues ../../build/finished/clues --display
+    pnpm --filter @wdi/sprites pack:static ../../build/finished/props ../../apps/client/public/assets/props
 
-Every item is modelled here from chamfered boxes and prisms in palette colours (no imported mesh),
-like build_villager.py. Props face the camera (-Y) and stand on the origin, which becomes the frame
-pivot. Clues lie on the ground: marks are rendered straight down (TileCam, as the ground tiles),
-the bucket by the tilted SpriteCam; both at 64 px per metre in 64 px cells.
+Props, spots and portals (env/shared_props.py for `props`, env/hollowmere_props.py for `props_hollowmere`)
+render through IsoCam at the display scale into twice their art cell, pivoted on the ground point under the
+tile centre, (w / 2, h - 16) art px, under the 0.75 environment root. Clues stay in 64 px display cells:
+the ground decals straight down through TileCam (the client projects them, SPRITES 10.5), the thread, felt
+and wet bucket through IsoCam; `pixel --display` finishes them at half size and doubles them back.
 """
 
 from __future__ import annotations
@@ -17,137 +21,10 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import static_common as sc  # noqa: E402
-from bakery_props import BAKERY_PROPS  # noqa: E402
-from static_common import blob, box, cylinder, flat, frustum, mesh, slab, stroke, toon  # noqa: E402
+from env import hollowmere_props, shared_props  # noqa: E402
+from static_common import blob, box, cylinder, flat, mesh, slab, stroke, toon  # noqa: E402
 
-PROP_CELL = (192, 148)  # cell px, ground row px: 148 px of height above the base, 44 px in front
-
-
-# ---------------------------------------------------------------- props
-
-
-def prop_bell():
-    objs = [
-        mesh("BellBase", toon("fog"), [(box, dict(center=(0, 0, 0.06), size=(1.25, 0.46, 0.12)))], bevel=0.02),
-        mesh("BellPosts", toon("slate"), [
-            (box, dict(center=(sx * 0.48, 0, 1.06), size=(0.15, 0.15, 1.9))) for sx in (1, -1)
-        ] + [(box, dict(center=(0, 0, 1.96), size=(1.2, 0.17, 0.14)))], bevel=0.02),
-        mesh("BellBraces", toon("slate"), [
-            (frustum, dict(z0=1.55, z1=1.9, bottom=(0.06, 0.08), top=(0.06, 0.08), offset=(sx * 0.42, 0),
-                           top_offset=(sx * 0.24, 0))) for sx in (1, -1)
-        ]),
-        mesh("BellRoof", toon("ink"), [
-            (frustum, dict(z0=2.03, z1=2.2, bottom=(1.4, 0.42), top=(1.1, 0.06))),
-        ], bevel=0.01),
-        mesh("Bell", toon("mustard"), [
-            (cylinder, dict(center=(0, 0, 1.38), radius=0.25, depth=0.12, segments=10)),
-            (cylinder, dict(center=(0, 0, 1.5), radius=0.22, radius_top=0.13, depth=0.34, segments=10)),
-            (box, dict(center=(0, 0, 1.88), size=(0.08, 0.08, 0.06))),
-        ]),
-        mesh("BellRope", toon("bone"), [(box, dict(center=(0.04, -0.02, 1.06), size=(0.035, 0.035, 0.66)))]),
-    ]
-    return objs
-
-
-def prop_pump():
-    return [
-        mesh("WellHead", toon("fog"), [
-            (cylinder, dict(center=(0, 0.05, 0), radius=0.44, depth=0.48, segments=10)),
-        ], bevel=0.02),
-        mesh("WellRim", toon("bone"), [
-            (cylinder, dict(center=(0, 0.05, 0.48), radius=0.47, depth=0.07, segments=10)),
-        ]),
-        mesh("WellWater", flat("ink"), [
-            (cylinder, dict(center=(0, 0.05, 0.5), radius=0.36, depth=0.06, segments=10)),
-        ], outline=False),
-        mesh("PumpBody", toon("slate"), [
-            (cylinder, dict(center=(0, 0.18, 0.5), radius=0.1, depth=0.8, segments=8)),
-            (cylinder, dict(center=(0, 0.18, 1.3), radius=0.13, radius_top=0.05, depth=0.12, segments=8)),
-        ]),
-        mesh("PumpSpout", toon("slate"), [
-            (frustum, dict(z0=0.98, z1=1.06, bottom=(0.07, 0.3), top=(0.07, 0.3), offset=(0, 0.02))),
-            (box, dict(center=(0, -0.12, 0.96), size=(0.07, 0.07, 0.1))),
-        ]),
-        mesh("PumpHandle", toon("ink"), [
-            (frustum, dict(z0=1.24, z1=1.3, bottom=(0.05, 0.05), top=(0.05, 0.05), offset=(0, 0.2),
-                           top_offset=(0, 0.2))),
-            (frustum, dict(z0=1.26, z1=1.52, bottom=(0.05, 0.05), top=(0.05, 0.05), offset=(0.06, 0.24),
-                           top_offset=(0.36, 0.42))),
-        ]),
-    ]
-
-
-def prop_noticeBoard():  # noqa: N802 (key follows the scene kind)
-    papers = [((-0.36, 1.46), (0.26, 0.32), "bone"), ((-0.02, 1.52), (0.24, 0.2), "bone"),
-              ((0.3, 1.38), (0.28, 0.36), "bone"), ((0.02, 1.18), (0.22, 0.2), "mustard"),
-              ((-0.34, 1.12), (0.22, 0.18), "bone")]
-    objs = [
-        mesh("BoardPosts", toon("slate"), [
-            (box, dict(center=(sx * 0.62, 0, 0.95), size=(0.12, 0.12, 1.9))) for sx in (1, -1)
-        ], bevel=0.02),
-        mesh("Board", toon("fog"), [(box, dict(center=(0, 0, 1.35), size=(1.24, 0.07, 0.72)))], bevel=0.015),
-        mesh("BoardFrame", toon("slate"), [
-            (box, dict(center=(0, -0.01, 1.73), size=(1.36, 0.1, 0.07))),
-            (box, dict(center=(0, -0.01, 0.97), size=(1.36, 0.1, 0.07))),
-        ]),
-        mesh("BoardRoof", toon("ink"), [
-            (frustum, dict(z0=1.77, z1=1.96, bottom=(1.5, 0.36), top=(1.3, 0.06))),
-        ], bevel=0.01),
-    ]
-    for i, ((x, z), (w, h), token) in enumerate(papers):
-        objs.append(mesh(f"Paper{i}", toon(token), [(box, dict(center=(x, -0.045, z), size=(w, 0.012, h)))],
-                         outline=False))
-        objs.append(mesh(f"Pin{i}", flat("blood"), [(box, dict(center=(x, -0.055, z + h / 2 - 0.04),
-                                                               size=(0.035, 0.02, 0.035)))], outline=False))
-    return objs
-
-
-def prop_kitChest():  # noqa: N802
-    return [
-        mesh("ChestBody", toon("slate"), [(box, dict(center=(0, 0, 0.23), size=(0.92, 0.56, 0.46)))], bevel=0.02),
-        mesh("ChestLid", toon("fog"), [
-            (frustum, dict(z0=0.46, z1=0.62, bottom=(0.94, 0.58), top=(0.86, 0.36))),
-        ], bevel=0.02),
-        mesh("ChestBands", toon("ink"), [
-            (box, dict(center=(sx * 0.3, 0, 0.32), size=(0.07, 0.6, 0.62))) for sx in (1, -1)
-        ]),
-        mesh("ChestLock", toon("mustard"), [(box, dict(center=(0, -0.29, 0.42), size=(0.14, 0.04, 0.16)))]),
-    ]
-
-
-def prop_lanternPost(lit: bool):  # noqa: N802
-    glass = flat("lantern") if lit else toon("slate")
-    objs = [
-        mesh("PostBase", toon("fog"), [(box, dict(center=(0, 0, 0.1), size=(0.34, 0.34, 0.2)))], bevel=0.02),
-        mesh("Post", toon("slate"), [
-            (box, dict(center=(0, 0, 1.15), size=(0.11, 0.11, 1.95))),
-            (box, dict(center=(0.17, 0, 2.06), size=(0.36, 0.07, 0.07))),
-            (box, dict(center=(0.3, 0, 2.0), size=(0.03, 0.03, 0.12))),
-        ]),
-        mesh("LanternFrame", toon("ink"), [
-            (frustum, dict(z0=1.9, z1=1.94, bottom=(0.32, 0.32), top=(0.32, 0.32), offset=(0.3, 0))),
-            (frustum, dict(z0=1.56, z1=1.6, bottom=(0.26, 0.26), top=(0.3, 0.3), offset=(0.3, 0))),
-            (frustum, dict(z0=1.94, z1=1.99, bottom=(0.26, 0.26), top=(0.1, 0.1), offset=(0.3, 0))),
-        ]),
-        mesh("LanternGlass", glass, [
-            (frustum, dict(z0=1.6, z1=1.9, bottom=(0.24, 0.24), top=(0.28, 0.28), offset=(0.3, 0))),
-        ]),
-    ]
-    if lit:
-        objs.append(mesh("Flame", flat("bone"), [(box, dict(center=(0.3, -0.13, 1.72), size=(0.06, 0.02, 0.1)))],
-                         outline=False))
-    return objs
-
-
-PROPS = {
-    "prop_bell": prop_bell,
-    "prop_pump": prop_pump,
-    "prop_noticeBoard": prop_noticeBoard,
-    "prop_kitChest": prop_kitChest,
-    "prop_lanternPost_lit": lambda: prop_lanternPost(True),
-    "prop_lanternPost_unlit": lambda: prop_lanternPost(False),
-}
-
+ATLASES = {"props": shared_props.PROPS, "props_hollowmere": hollowmere_props.PROPS}
 
 # ---------------------------------------------------------------- clues (1 m = one 64 px cell)
 
@@ -174,6 +51,18 @@ def clue_footprint(height, tint):
     lip = [s for x, y, m in pair for s in boot_print(x, y, k, m, grow=0.014)]
     fill = [s for x, y, m in pair for s in boot_print(x, y, k, m, z0=0.01, z1=0.02)]
     return [mesh("FootprintLip", flat(LIP[tint]), lip), mesh("Footprints", flat(MUD[tint]), fill, outline=False)]
+
+
+def clue_footprint_glow(height):
+    """Hunger's prints (`ClueKind.hungerPrints`): the moon ramp's light steps with a one-pixel #7FA8FF rim."""
+    k = HEIGHTS[height]
+    pair = ((-0.09 * k, -0.15 * k, False), (0.09 * k, 0.15 * k, True))
+    rim = [s for x, y, m in pair for s in boot_print(x, y, k, m, grow=0.03)]
+    core = [s for x, y, m in pair for s in boot_print(x, y, k, m, grow=0.005, z0=0.01, z1=0.02)]
+    heart = [s for x, y, m in pair for s in boot_print(x, y, k * 0.7, m, z0=0.02, z1=0.03)]
+    return [mesh("GlowRim", sc.hex_flat("Clue_glow_rim", "#7FA8FF"), rim, outline=False),
+            mesh("GlowCore", sc.hex_flat("Clue_glow_core", "#93C2E0"), core, outline=False),
+            mesh("GlowHeart", sc.hex_flat("Clue_glow_heart", "#C3EAF2"), heart, outline=False)]
 
 
 def clue_thread(colour):
@@ -207,8 +96,11 @@ def clue_felt(kind):
 def clue_smear():
     body = blob(0.0, 0.0, 0.3, 0.13, [(0.18, 2, 0.5), (0.1, 5, 2.0)], n=26, rotation=0.35)
     drops = [blob(x, y, r, r, [], n=8) for x, y, r in ((0.33, 0.2, 0.035), (-0.32, -0.16, 0.03), (0.2, -0.18, 0.025))]
-    return [mesh("Smear", flat("blood"), [(slab, dict(points=body))] + [(slab, dict(points=d)) for d in drops]),
-            mesh("SmearStreaks", flat("ink"), [
+    # The body in the dark blood step and only the streaks bright: the world palette's saturated share cap
+    # (10%, palette.json) holds for the clue page too.
+    return [mesh("Smear", sc.hex_flat("Clue_blood_dark", "#4A0D12"),
+                 [(slab, dict(points=body))] + [(slab, dict(points=d)) for d in drops]),
+            mesh("SmearStreaks", flat("blood"), [
                 (slab, dict(points=stroke(dx, dy, 0.32, 0.025, 0.35), z0=0.01, z1=0.015))
                 for dx, dy in ((-0.02, 0.03), (0.04, -0.03))], outline=False)]
 
@@ -229,7 +121,8 @@ def clue_print():
 
 def clue_bucket_wet():
     return [
-        mesh("Puddle", flat("moon"), [(slab, dict(points=blob(0.04, -0.04, 0.3, 0.18, [(0.12, 3, 0.4)], n=22)))]),
+        mesh("Puddle", sc.hex_flat("Clue_puddle", "#6A8EAD"),
+             [(slab, dict(points=blob(0.04, -0.04, 0.3, 0.18, [(0.12, 3, 0.4)], n=22)))]),
         mesh("PuddleGlint", flat("bone"), [(slab, dict(points=stroke(-0.12, -0.13, 0.12, 0.03, 0.2), z0=0.01,
                                                        z1=0.015))], outline=False),
         mesh("Bucket", toon("slate"), [(cylinder, dict(center=(0.0, 0.05, 0.0), radius=0.13, radius_top=0.16,
@@ -237,7 +130,7 @@ def clue_bucket_wet():
         mesh("BucketBands", toon("ink"), [
             (cylinder, dict(center=(0.0, 0.05, z), radius=0.136 + z * 0.1, depth=0.035, segments=10))
             for z in (0.05, 0.22)]),
-        mesh("BucketWater", flat("moon"), [(cylinder, dict(center=(0.0, 0.05, 0.27), radius=0.14, depth=0.02,
+        mesh("BucketWater", sc.hex_flat("Clue_puddle", "#6A8EAD"), [(cylinder, dict(center=(0.0, 0.05, 0.27), radius=0.14, depth=0.02,
                                                            segments=10))], outline=False),
     ]
 
@@ -257,7 +150,7 @@ def clue_claw():
               for i in range(3)]
     cores = [(slab, dict(points=stroke(-0.12 + 0.12 * i, 0.02 * i, 0.44, 0.018, 1.1, taper=0.2), z0=0.01, z1=0.015))
              for i in range(3)]
-    return [mesh("Claw", flat("ink"), gouges), mesh("ClawCore", flat("magenta"), cores, outline=False)]
+    return [mesh("Claw", flat("ink"), gouges), mesh("ClawCore", flat("blood"), cores, outline=False)]
 
 
 def clue_drag():
@@ -272,8 +165,8 @@ def clue_drag():
     band = right + list(reversed(left))
     streaks = [(slab, dict(points=[(x - 0.012, -0.5), (x + 0.012, -0.5), (x + 0.008, 0.5), (x - 0.008, 0.5)],
                            z0=0.01, z1=0.015)) for x in (-0.09, 0.02, 0.1)]
-    return [mesh("Drag", flat("blood"), [(slab, dict(points=band))], outline=False),
-            mesh("DragStreaks", flat("ink"), streaks, outline=False)]
+    return [mesh("Drag", sc.hex_flat("Clue_blood_dark", "#4A0D12"), [(slab, dict(points=band))], outline=False),
+            mesh("DragStreaks", flat("blood"), streaks, outline=False)]
 
 
 def clues():
@@ -281,6 +174,8 @@ def clues():
     for h in HEIGHTS:
         for tint in MUD:
             out[f"clue_footprint_{h}_{tint}"] = (lambda h=h, tint=tint: clue_footprint(h, tint))
+    for h in HEIGHTS:
+        out[f"clue_footprint_{h}_glow"] = (lambda h=h: clue_footprint_glow(h))
     for colour in SCARF:
         out[f"clue_thread_{colour}"] = lambda colour=colour: clue_thread(colour)
     for kind in FELT:
@@ -290,36 +185,53 @@ def clues():
     return out
 
 
-TILTED_CLUES = {"clue_bucket_wet"}
+ISO_CLUES = {"clue_bucket_wet", "clue_thread_red", "clue_thread_green", "clue_thread_blue", "clue_felt_cap",
+             "clue_felt_bowler", "clue_felt_bare"}
 
 
-def main() -> None:
-    out = sc.args_out(sys.argv, "build_props.py")
-    scene = sc.setup()
-
-    props = sc.Sheet(out, "props")
-    sc.sprite_cam(scene, *PROP_CELL)
-    for name, build in PROPS.items():
+def render_props(scene, out: str, atlas: str) -> None:
+    sheet = sc.Sheet(out, atlas)
+    for name, (aw, ah, build) in sorted(ATLASES[atlas].items()):
+        w, h, pivot = 2 * aw, 2 * ah, (aw, 2 * (ah - 16))
+        sc.iso_frame(scene, w, h, pivot)
+        root = sc.env_root(f"Root_{name}")
         objs = build()
-        props.render(scene, name)
-        sc.clear(objs)
-    for name, (build, cell, ground) in BAKERY_PROPS.items():
-        sc.sprite_cam(scene, cell, ground)
-        objs = build()
-        props.render(scene, name)
-        sc.clear(objs)
-    props.write()
+        for o in objs:
+            if o.parent is None:
+                o.parent = root
+        sheet.render(scene, name, pivot=False)
+        sheet.frames[name].update(cell=[w, h], pivot=list(pivot))
+        sc.clear(objs + [root])
+    sheet.write()
 
+
+def render_clues(scene, out: str) -> None:
     sheet = sc.Sheet(out, "clues")
     for name, build in clues().items():
-        if name in TILTED_CLUES:
-            sc.sprite_cam(scene, 64, 40)
+        if name in ISO_CLUES:
+            sc.iso_frame(scene, 64, 64, (32, 36))
         else:
             sc.tile_cam(scene, 64)
         objs = build()
         sheet.render(scene, name, pivot=False)
         sc.clear(objs)
     sheet.write()
+
+
+def main() -> None:
+    import argparse
+
+    argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    p = argparse.ArgumentParser(prog="build_props.py")
+    p.add_argument("--out", required=True)
+    p.add_argument("--atlases", default=",".join([*ATLASES, "clues"]))
+    a = p.parse_args(argv)
+    scene = sc.setup()
+    for atlas in a.atlases.split(","):
+        if atlas == "clues":
+            render_clues(scene, a.out)
+        else:
+            render_props(scene, a.out, atlas)
 
 
 if __name__ == "__main__":
