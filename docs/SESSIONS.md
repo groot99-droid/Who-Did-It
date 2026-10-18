@@ -2011,6 +2011,21 @@ tracks that none of them holds.
 
 ### Round 5 log: 5C (ONUB v2 client prep, mini-games, deck editor)
 
+- Done: `scenes/Kitchen.ts` over `view/onub/{PrepView,StationView,PilesView}.ts`; the four mini-games in
+  `view/onub/minigames/` as pure models with a canvas layer; `ui/lobby/DeckEditor.ts`; `net/mock/onubPrepMock.ts`;
+  `ui/copy/onubPrep.ts`; the "Round 5 (5C)" block of `components.css`; bug #126 (copy ids and the Start confirm's
+  fill line); `e2e/kitchen.spec.ts` (mock only, run green against `vite preview`); UI.md 14.12 replaced.
+- Tests: one per mini-game (success, bands, the assist time, nothing sent but `onub.prep`), `PrepModel`, the
+  editor's five problem lines, the frozen hooks of `onub-contract.md` 7 (`view/onub/hooks.test.ts` reads the
+  sources, as the client unit tests run without a DOM).
+- Stand-ins to delete or check at integration: `localDeckProblem` (falls back only while 5A's body throws), the
+  mock's local pile resolution (5A's `resolvePrep`), the greybox mini-game drawing (5M's `onub_mini`), the
+  `onub_kitchen` background (greybox quadrants until 5M).
+- Not touched, per the brief: `onubMock.ts`, `net/onub.ts`, the mount hooks, other lines of `Lobby.ts` and `lobby.ts`.
+- The e2e needs `pnpm --filter @wdi/content build` first (the preview build resolves `@wdi/content` through `dist`).
+- The full-repo `pnpm test` showed one failure of `apps/server/test/npc.test.ts` ("1 human + 3 NPCs ... deals the
+  4-row") that did not repeat in isolation, on base or on this branch.
+
 ### Round 5 log: 5D (ONUB v2 client night, morning and results)
 
 ### Round 5 log: 5E (ONUB v2 bots, NPC brains, e2e and soak)

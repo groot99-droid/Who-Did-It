@@ -198,7 +198,6 @@ export function mountPrep(
     h('h2', { class: 'wdi-display wdi-display--md' }, C['onub.kitchen.title']),
     caption,
     grid,
-    donePanel,
   );
   const roomSlot = h('div', { class: 'wdi-kitchen__roomslot', hidden: true });
   const boardSlot = h('div', {
@@ -213,6 +212,7 @@ export function mountPrep(
     { class: 'wdi-kitchen', 'data-testid': 'kitchen' },
     top,
     overview,
+    donePanel,
     roomSlot,
     boardSlot,
     perkCard,

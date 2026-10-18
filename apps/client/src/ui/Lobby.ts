@@ -188,6 +188,12 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
           fill(C['lobby.confirm.title'], { n: snapshot.players.length }),
         ),
         h('p', { class: 'wdi-dialog__body' }, C['lobby.confirm.body']),
+        snapshot.players.length < MIN_PLAYERS_TO_START &&
+          h(
+            'p',
+            { class: 'wdi-hint', 'data-testid': 'confirm-fill' },
+            fill(C['lobby.confirm.fill'], { min: MIN_PLAYERS_TO_START }),
+          ),
         waiting.length > 0 &&
           h(
             'p',
