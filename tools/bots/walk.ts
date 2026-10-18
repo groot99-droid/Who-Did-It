@@ -8,9 +8,9 @@
 //
 // Against a real lobby the bots just join and act once the match starts.
 //
-// Quick mode (GDD 3.11, `state.settings.mode`): the bot readies on its role card and votes for another seat
-// in the morning meeting (never Skip, never itself); it sends nothing at dusk or at night. Session 5E adds the
-// ONUB v2 prep commit, night acts, claims and the night leak monitor (quick.ts).
+// Quick mode (GDD 3.11, `state.settings.mode`): the bot readies on its role card and hands every phase to the
+// ONUB v2 player of quick.ts: the prep commit, the night act from `nightWake.view`, one claim and the vote
+// (never Skip, never itself), and the night leak monitor. It never walks.
 import { Client, type Room } from '@colyseus/sdk';
 import { abilities, balance, scenes } from '@wdi/content';
 import {
@@ -25,6 +25,7 @@ import {
   TILE_PX,
 } from '@wdi/shared';
 import { fileURLToPath } from 'node:url';
+import { QuickPlayer, type QuickBehavior, type QuickState } from './quick';
 
 export const DEFAULT_URL = 'http://localhost:2567';
 const SCENE_IDS = Object.keys(scenes) as Array<keyof typeof scenes>;
@@ -41,7 +42,7 @@ const SEE_PX = balance.vision.dayTiles * TILE_PX;
 const REFUSALS: ReadonlySet<number> = new Set(Object.values(ErrorCode));
 const isWorld = (phase: number) => phase >= Phase.grace && phase <= Phase.night;
 const isMeeting = (phase: number) => phase === Phase.meetingDiscussion || phase === Phase.meetingVote;
-/** A bot gives a vote up after this many refusals in one meeting (an abstention is legal in quick mode). */
+/** A bot gives a vote up after this many refusals in one meeting. */
 const MAX_VOTE_REFUSALS = 6;
 
 /**
@@ -59,6 +60,8 @@ export interface BotBehavior {
   report?: boolean;
   /** Strike with the Knife when the card holds `kill`. Default false. */
   killer?: boolean;
+  /** Quick mode only: how the bot preps, votes and paces itself (quick.ts). */
+  quick?: QuickBehavior;
 }
 
 export interface WalkerStats {
@@ -74,6 +77,14 @@ export interface WalkerStats {
   reports: number;
   votes: number;
   meetings: number;
+  /** Quick mode (quick.ts): prep commits, windows woken for, night acts, claims. */
+  preps: number;
+  wakes: number;
+  acts: number;
+  claims: number;
+  pantryVotes: number;
+  /** Quick mode: a presence, or a `nightWake` or `nightReveal` that reached a sleeper. Must stay 0. */
+  nightLeaks: number;
 }
 
 interface BodyLike {
@@ -162,7 +173,14 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
     reports: 0,
     votes: 0,
     meetings: 0,
+    preps: 0,
+    wakes: 0,
+    acts: 0,
+    claims: 0,
+    pantryVotes: 0,
+    nightLeaks: 0,
   };
+  const quickPlayer = new QuickPlayer(room, () => room.sessionId, rng, behavior.quick);
   const walk = behavior.walk !== false;
   const holdsKnife = () => !!behavior.killer && !!card?.abilities.some((a) => a.id === 'kill');
   let seq = 0;
@@ -189,11 +207,18 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
   room.onMessage('noise', () => undefined);
   room.onMessage('roleReveal', (c: RoleRevealPayload) => {
     card = c;
+    quickPlayer.onCard(c.roleId);
     // The card is the bot's own; dismissing it counts as Ready.
     room.send('lobby.ready', { ready: true });
     resolveCard(c);
   });
   room.onMessage('killed', () => (dead = true));
+  const tickNow = () => (room.state as unknown as StateLike | undefined)?.tick ?? 0;
+  room.onMessage('nightWake', (m: Parameters<QuickPlayer['onWake']>[0]) => quickPlayer.onWake(m, tickNow()));
+  room.onMessage('nightReveal', (m: { entries: Parameters<QuickPlayer['onReveal']>[0] }) =>
+    quickPlayer.onReveal(m.entries),
+  );
+  room.onMessage('nightSleep', () => quickPlayer.onSleep());
   room.onMessage('meetingStart', (m: { bodyOf?: string }) => {
     stats.meetings++;
     voteRefusals = 0;
@@ -211,7 +236,12 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
       dead = false;
       reported.clear();
     }
-    const quick = state.settings?.mode === GameMode.onub;
+    // Quick mode never walks: the ONUB player of quick.ts plays prep, the night, the claim and the vote.
+    if (state.settings?.mode === GameMode.onub) {
+      quickPlayer.tick(state as unknown as QuickState);
+      Object.assign(stats, quickPlayer.stats);
+      return;
+    }
 
     // Meetings: vote as soon as one opens, again if the server has not recorded it.
     if (isMeeting(state.phase)) {
@@ -219,21 +249,15 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
         lastVoteAt = now;
         const roster: Array<{ id: string; name: string; alive: boolean }> = [];
         state.players.forEach((p) => roster.push({ id: p.id, name: p.name, alive: p.alive }));
-        // Quick mode has no Skip: a Skip-minded or unknown vote becomes another living seat.
-        const wanted = quick && (behavior.vote ?? 'skip') === 'skip' ? 'other' : (behavior.vote ?? 'skip');
-        let targetId = pickVote(wanted, room.sessionId, state.leaderId, roster, rng);
-        if (quick && targetId === 'skip')
-          targetId = pickVote('other', room.sessionId, state.leaderId, roster, rng);
-        // Refused too often: give the vote up (an abstention is legal in quick mode).
-        if (voteRefusals < MAX_VOTE_REFUSALS && (targetId !== 'skip' || !quick)) {
+        const targetId = pickVote(behavior.vote ?? 'skip', room.sessionId, state.leaderId, roster, rng);
+        // Refused too often: give the vote up.
+        if (voteRefusals < MAX_VOTE_REFUSALS) {
           room.send('meeting.vote', { targetId });
           stats.votes++;
         }
       }
       return;
     }
-    // Quick mode sends nothing outside the meeting until Session 5E's prep and night planner lands.
-    if (quick) return;
     if (!me.presence || !isWorld(state.phase)) return;
 
     const sceneKey = SCENE_IDS[me.sceneId] ?? 'overworld';
