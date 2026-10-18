@@ -2042,7 +2042,7 @@ before it, and each PR description says which commit to review. Decisions: A61.
    - Every `tilemap.json` regenerated; navs byte-identical.
    - The quadrant reading of the shells (A61.2).
    - `tools/grid` now depends on `@wdi/content` (`workspace:*`).
-4. **`claude/r5-maps-4`: the map choice.**
+4. **#44 `claude/r5-maps-4`: the map choice.**
    - Server: `mapIdOfRoom` reads `Settings.map`, and `handleSettings` has its map branch.
    - Client: `MapPicker.ts` (frozen `map-select`), `ui/copy/maps.ts` (UI.md 14.17), the "Round 5 (5J)" CSS block.
    - Docs: ARCHITECTURE 5.3.
