@@ -118,6 +118,7 @@ LOOKS: dict[str, dict] = {
         "boots": ("wood", 1),
         "cape": ("slate", 1),
         "interact": "raise",
+        "raise_deg": 85,  # the raised hand stays inside the cell facing away
         "parts": ["hair_short", "oilskin_cape", "lighting_pole"],
     },
     # bone / fog / mustard; skin 2, wood hair under the toque. Works at her waist.

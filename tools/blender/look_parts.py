@@ -347,13 +347,13 @@ def fedora(b: Builder, spec: dict) -> None:
 
 @piece
 def magnifier(b: Builder, spec: dict) -> None:
-    """A brass magnifier in the right hand, its lens a lantern glint (the accent)."""
-    b.part("MagHandle", "body", ("brass", 1), "prop.R", [
-        (rod, dict(a=(0.215, 0.03, 0.62), b=(0.215, 0.09, 0.50), width=0.025)),
-        (frustum, dict(z0=0.42, z1=0.54, bottom=(0.03, 0.12), top=(0.03, 0.12), offset=(0.215, 0.12))),
+    """A brass magnifier in the left hand (the right hand swings), its lens a lantern glint (the accent)."""
+    b.part("MagHandle", "body", ("brass", 1), "prop.L", [
+        (rod, dict(a=(-0.215, 0.03, 0.62), b=(-0.215, 0.09, 0.50), width=0.025)),
+        (frustum, dict(z0=0.42, z1=0.54, bottom=(0.03, 0.12), top=(0.03, 0.12), offset=(-0.215, 0.12))),
     ], bevel=0)
-    b.part("MagLens", "body", ("lantern", 3), "prop.R", [
-        (frustum, dict(z0=0.44, z1=0.52, bottom=(0.04, 0.08), top=(0.04, 0.08), offset=(0.215, 0.12))),
+    b.part("MagLens", "body", ("lantern", 3), "prop.L", [
+        (frustum, dict(z0=0.44, z1=0.52, bottom=(0.04, 0.08), top=(0.04, 0.08), offset=(-0.215, 0.12))),
     ], bevel=0, glow=True)
 
 

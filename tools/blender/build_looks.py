@@ -200,12 +200,12 @@ def interact_keys(base: str, raise_deg: float = 95) -> list[tuple[int, dict]]:
     `raise_deg` is how far `raise` lifts the left arm: a look whose left hand holds a pole lifts it less,
     so the prop stays inside the cell."""
     if base == "kneel":
-        # A low crouch on the right knee, the left shin upright with the foot on the ground, both hands working
+        # A low crouch on the right knee, the left knee bent so the boot stays on the ground, both hands working
         # low, the hips shifted 0.08 m back. The pose stays compact: the left foot ends 0.19 m forward (9 px
         # down the screen facing the camera) and the right shin slopes back, so the figure keeps inside the
         # 128 px cell in every direction.
         body = {"root": (0, 0, 0, 0, -0.14, 0.08), "spine": (-15, 0, 0), "chest": (-8, 0, 0), "head": (-12, 0, 0),
-                "thigh.L": (20, 0, 0), "shin.L": (-20, 0, 0), "thigh.R": (20, 0, 0), "shin.R": (-65, 0, 0),
+                "thigh.L": (45, 0, 0), "shin.L": (-68, 0, 0), "thigh.R": (20, 0, 0), "shin.R": (-65, 0, 0),
                 "foot.R": (30, 0, 0)}
         work = lambda t: {"upper_arm.R": (30 + 8 * t, 0, -5), "upper_arm.L": (28 - 8 * t, 0, 5),  # noqa: E731
                           "forearm.R": (35 - 10 * t, 0, 0), "forearm.L": (35 + 10 * t, 0, 0)}
@@ -254,7 +254,7 @@ def make_actions(arm, spec: dict) -> None:
     _action(arm, "swing", [
         (1, {**arms()}),
         (3, {**arms(-10, 5), "upper_arm.R": (65, 0, -12), "forearm.R": (60, 0, 0), "chest": (4, -18, 0)}),
-        (5, {**arms(-15, 10), "upper_arm.R": (72, 0, -10), "forearm.R": (65, 0, 0), "chest": (8, -25, 0)}),
+        (5, {**arms(-15, 10), "upper_arm.R": (66, 0, -10), "forearm.R": (65, 0, 0), "chest": (8, -25, 0)}),
         (7, {**arms(15, -10), "upper_arm.R": (45, 0, -5), "forearm.R": (10, 0, 0), "chest": (-14, 15, 0),
              "spine": (-6, 0, 0), "head": (-6, 0, 0)}),
         (9, {**arms(5, 0), "upper_arm.R": (25, 0, -6), "forearm.R": (15, 0, 0), "chest": (-6, 6, 0)}),
