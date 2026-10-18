@@ -2,6 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance, roles } from '@wdi/content';
 import { C2S, ErrorCode, MAX_PLAYERS, NpcLevel, Phase, S2C, type RoleRevealPayload } from '@wdi/shared';
+import { flowOf } from '../src/sim/Flow';
 import { resetToLobby } from '../src/sim/Win';
 import { flatten } from './killHelpers';
 import { simOf } from '../src/sim/RoomSim';
@@ -236,11 +237,16 @@ describe('the wire never marks an NPC seat', () => {
     const party = await lobbyOf(colyseus, 1);
     await start(party);
     const seats = npcSeats(party.room);
-    expect(seats.every((p) => !p.ready)).toBe(true);
+    // Ready on the card is private (5F, `flow.cardReady`): the public tick stays clear all card long.
+    const cardReady = flowOf(party.room).cardReady;
+    expect(seats.every((p) => !p.ready && !cardReady.has(p.id))).toBe(true);
     const began = party.room.state.tick;
     const readyAt = new Map<string, number>();
     await until(() => {
-      for (const p of seats) if (p.ready && !readyAt.has(p.id)) readyAt.set(p.id, party.room.state.tick);
+      for (const p of seats) {
+        expect(p.ready).toBe(false);
+        if (cardReady.has(p.id) && !readyAt.has(p.id)) readyAt.set(p.id, party.room.state.tick);
+      }
       return readyAt.size === seats.length;
     }, 20_000);
     expect(readyAt.size).toBe(seats.length);
