@@ -1,13 +1,15 @@
 // Review sheets and portraits of Session 5L (art plan 4.4-4.5, 7):
 //
 //   tsx lineup.ts sheets <finished root> <review dir>    looks-lineup.png and looks-silhouettes.png
-//   tsx lineup.ts portrait <generated image> <lookId> <assets dir>   portraits/portrait_<lookId>.webp
+//   tsx lineup.ts portrait <generated image> <lookId> <assets dir> [--style <id>]   <root>portraits/portrait_<lookId>.webp
 //   tsx lineup.ts portraits <assets dir> <review dir>    portraits-main.png (every portrait at 1x)
 //   tsx lineup.ts gate-b <finished root> <assets dir> <review dir>   gate-b-character.png
 //
 // The lineup puts every world look side by side in `s` and `ne` idle, at 1x and 2x, with each scarf tint;
 // the silhouettes sheet fills the same lineup solid ink, so every look must read by shape alone. A portrait
-// is a T4 generation finished to 128 x 192 art (`finishIllustration`), x3 nearest, lossless WebP.
+// is a T4 generation finished to 128 x 192 art (`finishIllustration`), x3 nearest, lossless WebP; in the low-poly
+// style (DECISIONS A79) the same generation is cropped and smooth-downscaled to 384 x 576 without the snap,
+// lossy WebP at `offWebpQuality`.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,8 +17,8 @@ import { createCanvas, loadImage, type Image, type SKRSContext2D } from '@napi-r
 import type { Rgba } from './bleed.ts';
 import { contactSheet, drawTinted, drawZoomed, load } from './contact.ts';
 import { frameFileName } from './keys.ts';
-import { pixelSettings } from './palette.ts';
-import { finishIllustration, upscaleNearest, writeWebp } from './pixel.ts';
+import { artStyle, defaultArtStyle, pixelSettings, type ArtStyle } from './palette.ts';
+import { boxResize, crop, finishIllustration, offWebpQuality, upscaleNearest, writeWebp } from './pixel.ts';
 import { worldLooks } from './placeholder-chars.ts';
 import { PALETTE } from './placeholder.ts';
 
@@ -41,11 +43,25 @@ function toRgba(img: Image): Rgba {
   return { width: d.width, height: d.height, data: new Uint8Array(d.data.buffer) };
 }
 
-/** Finish one T4 generation into `portraits/portrait_<lookId>.webp` (lossless, x3). */
-export async function finishPortrait(src: string, lookId: string, assets: string): Promise<string> {
-  const art = finishIllustration(toRgba(await loadImage(readFileSync(src))), PORTRAIT.w, PORTRAIT.h);
-  const out = join(assets, 'portraits', `portrait_${lookId}.webp`);
-  await writeWebp(upscaleNearest(art, pixelSettings.illustrationScale), out);
+/** Finish one T4 generation into `<style root>portraits/portrait_<lookId>.webp` (8-bit: lossless, x3). */
+export async function finishPortrait(
+  src: string,
+  lookId: string,
+  assets: string,
+  style: ArtStyle = defaultArtStyle(),
+): Promise<string> {
+  const img = toRgba(await loadImage(readFileSync(src)));
+  const out = join(assets, style.root, 'portraits', `portrait_${lookId}.webp`);
+  if (style.pixelFinish) {
+    const art = finishIllustration(img, PORTRAIT.w, PORTRAIT.h);
+    await writeWebp(upscaleNearest(art, pixelSettings.illustrationScale), out);
+  } else {
+    const [w, h] = [
+      PORTRAIT.w * pixelSettings.illustrationScale,
+      PORTRAIT.h * pixelSettings.illustrationScale,
+    ];
+    await writeWebp(boxResize(crop(img, undefined, w, h), w, h), out, offWebpQuality);
+  }
   return out;
 }
 
@@ -144,7 +160,10 @@ export async function gateBSheet(root: string, assets: string): Promise<Buffer> 
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const [cmd, a, b, c] = process.argv.slice(2);
+  const args = process.argv.slice(2);
+  const at = args.indexOf('--style');
+  const style = at >= 0 ? artStyle(args.splice(at, 2)[1] ?? '') : defaultArtStyle();
+  const [cmd, a, b, c] = args;
   const write = (dir: string, name: string, bytes: Buffer) => {
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, name), bytes);
@@ -154,14 +173,14 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     write(b, 'looks-lineup.png', await lineupSheet(a));
     write(b, 'looks-silhouettes.png', await lineupSheet(a, true));
   } else if (cmd === 'portrait' && a && b && c) {
-    console.log(`lineup: ${await finishPortrait(a, b, c)}`);
+    console.log(`lineup: ${await finishPortrait(a, b, c, style)}`);
   } else if (cmd === 'portraits' && a && b) {
     write(b, 'portraits-main.png', await portraitsSheet(a));
   } else if (cmd === 'gate-b' && a && b && c) {
     write(c, 'gate-b-character.png', await gateBSheet(a, b));
   } else {
     console.error(
-      'usage: tsx lineup.ts sheets <finished root> <review dir> | portrait <image> <lookId> <assets dir> |' +
+      'usage: tsx lineup.ts sheets <finished root> <review dir> | portrait <image> <lookId> <assets dir> [--style <id>] |' +
         ' portraits <assets dir> <review dir> | gate-b <finished root> <assets dir> <review dir>',
     );
     process.exit(2);

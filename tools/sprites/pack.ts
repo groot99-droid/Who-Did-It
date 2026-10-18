@@ -6,7 +6,7 @@ import { packAsync } from 'free-tex-packer-core';
 import { alphaBleed, decodePng, type Rgba } from './bleed.ts';
 import { applyPivots, buildAnims, type FeetManifest } from './gen-anims.ts';
 import { CHAR_PAGE, OVL_PAGE, PASSES, frameKey, parseFrameFileName, textureKey, type Pass } from './keys.ts';
-import { finishEnabled } from './palette.ts';
+import { artStyle, defaultArtStyle, finishEnabled } from './palette.ts';
 
 /** The packer settings fixed by ASSETS.md 6.3. */
 export const PACK_OPTIONS = {
@@ -196,14 +196,19 @@ export function writeFiles(outDir: string, files: Map<string, Buffer>): void {
   for (const [name, bytes] of files) writeFileSync(join(outDir, name), bytes);
 }
 
-// CLI: tsx tools/sprites/pack.ts <finished render dir, e.g. build/finished/baker> <out dir>
+// CLI: tsx tools/sprites/pack.ts <finished render dir, e.g. build/finished/baker> <out dir> [--style <id>]
+// Each art style (style.json `artStyles`, DECISIONS A79) packs its own `pixel` output: the 8-bit style's
+// finished frames as they are, the low-poly style's unfinished frames alpha-bled.
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const [renderDir, outDir] = process.argv.slice(2);
+  const args = process.argv.slice(2);
+  const at = args.indexOf('--style');
+  const style = at >= 0 ? artStyle(args.splice(at, 2)[1] ?? '') : defaultArtStyle();
+  const [renderDir, outDir] = args;
   if (!renderDir || !outDir) {
-    console.error('usage: tsx pack.ts <render dir> <out dir>');
+    console.error('usage: tsx pack.ts <render dir> <out dir> [--style <id>]');
     process.exit(2);
   }
-  const { manifest, framesByPass } = readRender(renderDir);
+  const { manifest, framesByPass } = readRender(renderDir, !style.pixelFinish);
   const files = await packCharacter(manifest.body, framesByPass, manifest);
   writeFiles(outDir, files);
   console.log(`pack: ${[...files.keys()].join(', ')} -> ${outDir}`);
