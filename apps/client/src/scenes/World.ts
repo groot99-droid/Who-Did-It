@@ -28,6 +28,7 @@ import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
 import { NotebookSheet } from '../view/NotebookPanel';
 import { PropView, overworldProps } from '../view/PropView';
+import { StaticView } from '../view/StaticView';
 import { sceneMapKey, sceneMapUrl } from '../view/assets';
 import { isTouchDevice, readDevFlags } from '../view/devFlags';
 import { DEPTH, cameraBounds, decalHolder, isoZoom, sceneDiamond, tileDiamond } from '../view/iso';
@@ -110,6 +111,7 @@ export class World extends Phaser.Scene {
   private entities!: EntityView;
   private clueView!: ClueView;
   private propView!: PropView;
+  private statics!: StaticView;
   private readonly bodyViews = new Map<string, BodyView>();
   private hud!: Hud;
   private lighting!: Lighting;
@@ -167,6 +169,7 @@ export class World extends Phaser.Scene {
     this.buildMap();
     this.swing = this.add.graphics().setDepth(DEPTH.decal);
     this.propView = new PropView(this, this.sceneId);
+    this.statics = new StaticView(this);
     this.clueView = new ClueView(this);
     this.entities = new EntityView(this, feed.selfId);
 
@@ -255,6 +258,7 @@ export class World extends Phaser.Scene {
       this.entities.destroy();
       this.clueView.destroy();
       this.propView.destroy();
+      this.statics.destroy();
       for (const b of this.bodyViews.values()) b.destroy();
       this.bodyViews.clear();
       this.hud.destroy();
@@ -267,7 +271,7 @@ export class World extends Phaser.Scene {
     this.entryToasts();
   }
 
-  override update(): void {
+  override update(_time: number, delta: number): void {
     const now = performance.now();
     const feed = this.feed;
     this.entities.update(feed.snapshot(), now);
@@ -295,6 +299,7 @@ export class World extends Phaser.Scene {
     this.footsteps(now);
     this.sheet.update();
     this.focusNewEntry();
+    this.statics.update(self ? worldOf(self) : null, delta / 1000, this.cameras.main.worldView);
 
     this.lit = {
       visible: WORLD_PHASES.has(clock.phase) && self !== null,
