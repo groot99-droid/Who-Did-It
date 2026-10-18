@@ -1,20 +1,10 @@
 import Phaser from 'phaser';
+import { type ManifestEntry, loadsAtBoot, loadsWithMatch } from './manifestRules';
+
+export { type ManifestEntry, loadsAtBoot, loadsWithMatch } from './manifestRules';
 
 // Loads the asset manifest of docs/SPRITES.md 5 by key. Code never names a texture path: it asks for
 // `char_villager`, `ovl_villager`, `tiles_cobble` and the manifest says where those live.
-
-export interface ManifestEntry {
-  key: string;
-  type: 'multiatlas' | 'atlas' | 'image' | 'animation';
-  url: string;
-  path?: string;
-  filter?: 'linear' | 'nearest';
-  origin?: [number, number];
-  /** Map ids: the entry loads with the match's map, not at boot (SPRITES 5, 10.13). */
-  maps?: string[];
-  /** Modes: the entry loads at match start when the match's mode is listed, whatever the client's card. */
-  modes?: Array<'main' | 'onub'>;
-}
 
 export interface Manifest {
   version: number;
@@ -61,13 +51,6 @@ async function fetchManifest(art: 'default' | 'placeholder', base: string): Prom
   }
   throw new Error('no asset manifest found');
 }
-
-/** Entries with neither `maps` nor `modes` load at boot (SPRITES 10.13). */
-export const loadsAtBoot = (e: ManifestEntry): boolean => e.maps === undefined && e.modes === undefined;
-
-/** Whether an entry loads with this match: its map or its mode is listed. */
-export const loadsWithMatch = (e: ManifestEntry, mapId: string, mode: 'main' | 'onub'): boolean =>
-  (e.maps?.includes(mapId) ?? false) || (e.modes?.includes(mode) ?? false);
 
 export function queueManifest(load: Phaser.Loader.LoaderPlugin, manifest: LoadedManifest): void {
   queueEntries(load, manifest, manifest.entries.filter(loadsAtBoot));

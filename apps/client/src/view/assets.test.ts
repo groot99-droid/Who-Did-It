@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type ManifestEntry, loadsAtBoot, loadsWithMatch } from './assets';
+import { type ManifestEntry, loadsAtBoot, loadsWithMatch } from './manifestRules';
 
 const e = (extra: Partial<ManifestEntry>): ManifestEntry => ({
   key: 'k',
