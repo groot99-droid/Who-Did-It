@@ -2025,6 +2025,38 @@ tracks that none of them holds.
 
 ### Round 5 log: 5J (maps)
 
+Session 5J, 2026-10-18. Four draft PRs against `claude/zen-turing-m1jnw0`. They stack: each branch holds the one
+before it, and each PR description says which commit to review. Decisions: A61.
+
+1. **#32 `claude/r5-maps`: Hollowmere.**
+   - The Fenwood (`forest_deep`) and the Flooded Gallery (`cave_gallery`), both Medium; `fo.deep` and `ce.gallery`.
+   - The four moved doors, the overworld buildings and the Wake Table footprint.
+   - `material` and `lights` on all 15 old scenes, and the Gallows Wood wolf spawners.
+   - Fixture updates forced by the moved doors: `tools/grid/test/export.test.ts` and
+     `apps/server/test/sim-portal.test.ts` (stand at `tavern_bar.front` instead of a hard-coded tile).
+2. **#38 `claude/r5-maps-2`: Blackpine.**
+   - The eight `bp_*` scenes and `maps/blackpine.json`; `SCENE_IDS` +8, `MAP_IDS` + `blackpine`.
+   - The Blackpine cases of `world.test.ts`; `mapSites.test.ts` pins Hollowmere's 17 scenes.
+   - One PR rather than two (A61.1).
+3. **#41 `claude/r5-maps-3`: the isometric exporter** (SPRITES 10.12, with exporter notes there).
+   - Every `tilemap.json` regenerated; navs byte-identical.
+   - The quadrant reading of the shells (A61.2).
+   - `tools/grid` now depends on `@wdi/content` (`workspace:*`).
+4. **`claude/r5-maps-4`: the map choice.**
+   - Server: `mapIdOfRoom` reads `Settings.map`, and `handleSettings` has its map branch.
+   - Client: `MapPicker.ts` (frozen `map-select`), `ui/copy/maps.ts` (UI.md 14.17), the "Round 5 (5J)" CSS block.
+   - Docs: ARCHITECTURE 5.3.
+   - Tests: `apps/server/test/maps.test.ts` (the setting: leader, unknown id, all or nothing, kept through the
+     lobby; a Blackpine start on the yard spawns, the meeting spread, the Bell only at `bc.bell`, the teaching
+     clue at `bc.teaching_clue`) and `ui/lobby/MapPicker.test.ts`.
+
+**For other sessions.**
+- 5I: until your isometric World lands, the top-down `World.ts` cannot draw the new tilemaps. `world.spec.ts` walks
+  west to `tb.front`, which is now on the south wall.
+- 5K: `thumb_<mapId>` shows in the map row as soon as the manifest has it; until then the row shows names and
+  blurbs.
+- No new prop kind, so `routines.json` is unchanged.
+
 ### Round 5 log: 5K (world art)
 
 ### Round 5 log: 5L (character art)

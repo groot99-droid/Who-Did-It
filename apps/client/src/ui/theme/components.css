@@ -1743,3 +1743,53 @@
   border-color: var(--wdi-interact);
   box-shadow: var(--wdi-glow-interact);
 }
+
+/* Round 5 (5J): the lobby's map row (GDD 3.13). One option per map: thumbnail, name, blurb. */
+.wdi-map {
+  display: grid;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-map__list {
+  display: grid;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-map__option {
+  display: flex;
+  align-items: center;
+  gap: var(--wdi-space-3);
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  border: 1px solid rgb(var(--wdi-bone-rgb) / 0.2);
+  border-radius: var(--wdi-radius-md);
+  background: var(--wdi-surface-sunken);
+  color: var(--wdi-text);
+  font: inherit;
+  text-align: left;
+}
+
+button.wdi-map__option {
+  cursor: pointer;
+}
+
+.wdi-map__option.is-selected {
+  border-color: var(--wdi-interact);
+  box-shadow: var(--wdi-glow-interact);
+}
+
+.wdi-map__thumb {
+  flex: none;
+  width: 96px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--wdi-radius-sm);
+  object-fit: cover;
+}
+
+.wdi-map__text {
+  display: grid;
+  gap: var(--wdi-space-1);
+}
+
+.wdi-map__name {
+  font-weight: 600;
+}

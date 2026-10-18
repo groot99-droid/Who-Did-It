@@ -767,3 +767,16 @@ controls, and they only count (`Settings.npcSeats`, which is public). `{min}` is
 The difficulty labels are the keys of `balance.json` `npc.difficulty` in sentence case; a level the
 deck does not list shows its key. `lobby.hint.fill` replaces the interim "NPC fill is coming" line
 (A28, removed by A39).
+
+### 14.17 Map row (5J)
+
+Session 5J, round 5. The lobby's map row of GDD 3.13 (`ui/lobby/MapPicker.ts`, module `ui/copy/maps.ts`). It
+shows only in the main mode (`showsMapRow`), under the frozen test id `map-select`, whose `data-map` is the
+map shown as chosen. Each map shows its `name` and `blurb` from `maps/<id>.json` (data, not copy) and its
+`thumb_<mapId>` image once the manifest has it. `{name}` is a map's `name`.
+
+| Id | Text | Notes |
+|---|---|---|
+| `lobby.map.label` | Map | leader only: label of the radio group, one option per map (`role="radio"`, `aria-checked`) |
+| `lobby.map.pick` | Play on {name} | `aria-label` of each option; picking sends `lobby.settings {map}` |
+| `lobby.map.current` | Map: {name} | everyone but the leader: the one read-only line, with the blurb under it |
