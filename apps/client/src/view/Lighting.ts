@@ -58,6 +58,8 @@ export class Lighting {
   readonly root: HTMLElement;
   private readonly dark: Phaser.Textures.DynamicTexture;
   private readonly image: Phaser.GameObjects.Image;
+  /** Kept: the scene's camera manager is gone by the time the scene shuts down. */
+  private readonly cam: Phaser.Cameras.Scene2D.Camera;
   private glows: Glow[] = [];
   private state: LightState = { visible: false, viewer: null, darkness: 0, part: 'day' };
   private inDarkScene = false;
@@ -74,6 +76,7 @@ export class Lighting {
     parent.append(this.root);
     ensureLightTexture(scene.textures);
     const cam = scene.cameras.main;
+    this.cam = cam;
     const dark = scene.textures.addDynamicTexture(DARK_KEY, Math.max(2, cam.width), Math.max(2, cam.height));
     if (!dark) throw new Error('no dynamic texture for the darkness layer');
     this.dark = dark;
@@ -193,9 +196,8 @@ export class Lighting {
   }
 
   destroy(): void {
-    const cam = this.scene.cameras.main;
-    cam.off(Phaser.Cameras.Scene2D.Events.FOLLOW_UPDATE, this.redraw, this);
-    cam.off(Phaser.Cameras.Scene2D.Events.PRE_RENDER, this.preRender, this);
+    this.cam.off(Phaser.Cameras.Scene2D.Events.FOLLOW_UPDATE, this.redraw, this);
+    this.cam.off(Phaser.Cameras.Scene2D.Events.PRE_RENDER, this.preRender, this);
     for (const g of this.glows) g.image.destroy();
     this.glows = [];
     this.image.destroy();

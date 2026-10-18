@@ -125,6 +125,8 @@ base. Atlas pages are always named `<key>-<n>.png`. Clue frames are centred (no 
 
 **Loading notes (M3).** The `World` scene never names a path: bodies use the last frame of `char/villager/die/s` (and its `scarf` and `hat_*` twins) from `char_villager` and `ovl_villager`; clues use frames of the `clues` atlas (`clue_footprint_<s|m|t>_mid`, `clue_thread_<red|green|blue>`); the overworld props use `prop_<kind>` frames of a `props` atlas (`prop_bell`, `prop_pump`, `prop_noticeBoard`, `prop_kitChest`, `prop_lanternPost`; the id suffix, e.g. `prop_board`, is tried second). Any key the manifest lacks draws a labelled greybox mark (`textures.exists`), so the game plays before the art lands. Sound is separate: `assets/audio/manifest.json` (`{key, url, gain}`) is fetched once by `AudioBus` and a missing file leaves the game silent.
 
+**Loading notes (M5a).** `queueManifest` queues only the entries with neither `maps` nor `modes`; the World's `preload` calls `queueMatchEntries` with the match's `Settings.map` and mode for the rest, reading the manifest that `resolveManifest` remembered (`peekManifest`), and skips what is already loaded. A texture a map adds gets its filter from `applyFilters` once it is loaded.
+
 **Loading notes (M3b, quick mode).** The bakery draws its props from the same `props` atlas by `prop_<kind>` then `prop_<id tail>` (`prop_plate`, `prop_deadLoaf`, `prop_ledger`, `prop_wakeTable`, `prop_oven`, `prop_basin`, `prop_flour_sacks`); a plate appears only for a seat the server lists and wears the owner's name over its frame, and a prop whose key is missing draws a labelled greybox (the wake table draws nothing without its art, since the plates stand on it). The loft is DOM, not a Phaser scene: `loft_backdrop`, `prop_bedroll` and `prop_bedroll_self` are `type: image` entries whose `url` the loft reads through `manifestImageUrls` (`view/assets.ts`) and sets as CSS backgrounds (the backdrop `cover`, a bedroll `contain` in a 56 x 92 px box); a missing entry keeps the theme's CSS bedroll. Loop beds such as the loft's `storm` come from `AudioBus.playLoop`.
 
 ## 6. Overlay passes
@@ -679,7 +681,7 @@ Nameplates stay with their character, under the darkness.
 
 - `full`, `half` and `stub` are `iso.wallHeightM` 2.5, 1.2 and 0.3 m for walls. Cliffs have full, half and a 0.4 m
   ledge. Trees have full and a stump.
-- Boulders, fences and stacks have one height and use it everywhere.
+- Boulders, fences and stacks have one height and use it everywhere. They are occluders by the tall-prop rule below, not by their height name (DECISIONS A60).
 - A covered tile (`P`) draws nothing of its own.
 - This is the cutaway rule of GDD 3.13: back walls stand, front walls are sills, inner walls are half height.
 
@@ -687,8 +689,9 @@ Nameplates stay with their character, under the darkness.
 draws nothing at all, ground included. The void shows there in the scene's void colour: `slate` for exteriors,
 `ink` for interiors and caves (the camera background).
 
-**Occluders** are kit pieces at full or half height, trees, cliffs, building slices, and props whose frame rises
-more than 96 px (displayed) above its pivot.
+**Occluders** are walls, trees and cliffs at full or half height, building slices, and props (multi-tile prop slices included)
+whose frame rises more than 96 px (displayed) above its pivot, which the client reads from the loaded frame. Boulders, fences and
+stacks are props of that rule. A greybox block is an occluder when it is taller than 96 px.
 
 **Fade.** When an occluder is drawn in front of **your own character** (its depth is greater) and its bounds
 overlap your character's frame, it tweens to `lighting.occluderFadeAlpha` (0.35) over `occluderFadeS` (0.15 s).
@@ -746,7 +749,8 @@ The darkness layer replaces the DOM `.wdi-night-mask` (GDD 3.13, WORLD 4.7).
    opaque white out to `lighting.lightCore` (0.55) of the radius, then linear to 0 at the edge. It is not art, and
    it is in no manifest.
 2. **The darkness texture.** One `DynamicTexture` the size of the game canvas is drawn by an `Image` at
-   `setScrollFactor(0)`, depth 900 000. It is redrawn on the camera's `FOLLOW_UPDATE`, or on `PRE_RENDER` while it
+   `setScrollFactor(0)`, depth 900 000, centred on the canvas and scaled by 1 / zoom (the camera zooms a scroll-factor-0
+   object too, so this draws it 1:1). It is redrawn on the camera's `FOLLOW_UPDATE`, or on `PRE_RENDER` while it
    is not following, so it never trails the camera by a frame. Each redraw:
    1. `clear()`, then `fill(ambient colour, ambient alpha)`. Outside dark scenes the ambient is
       `lighting.ambient.day` lerped to `night` by darkness. In a dark scene it is `lighting.ambient.dark` in every
@@ -765,7 +769,7 @@ The darkness layer replaces the DOM `.wdi-night-mask` (GDD 3.13, WORLD 4.7).
    light (GDD 3.13). The API keeps a slot, `Lighting.setCarried(avatarHandle, rTiles | null)`, which nothing calls
    in M5a.
 5. **Hidden.** The layer hides outside world phases and while the World sleeps for a meeting, as today.
-6. **Test hook.** A 1 x 1 px DOM element `data-testid="night-mask"` with `data-darkness="<0..1>"` stays visible
+6. **Test hook.** A 1 x 1 px DOM element `data-testid="night-mask"` with `data-darkness="<0..1>"` (1.00 in a dark scene) stays visible
    while the layer draws. `world.spec`'s `toBeVisible()` keeps working, and specs can read the level.
 
 ### 10.12 The tilemap the exporter writes (5J writes it, 5I reads it)
@@ -840,7 +844,7 @@ door) but still takes the boarded overlay `portal_boarded_<face>` when closed.
 - It creates the three tile layers with `map.createLayer(name, tileset, -64, 0)`, an offset of
   -`ISO_TILE_W`/2: Phaser places an isometric tile's image at its left edge, and the projection puts the top vertex
   at x.
-- It builds every object group from the tilemap alone, so `PropView` stops importing scene JSON.
+- It builds every object group from the tilemap alone, so `PropView` stops importing scene JSON. Until the isometric files merge, an orthogonal file has no `props` group, so `propObjects` falls back to the old overworld stand-ins; the closed-profile gate fence is not drawn yet (DECISIONS A60).
 - Phaser 4's GPU tile layer is orthographic-only, so the standard tile layer stays (RESEARCH.md).
 
 **Exporter checks.**

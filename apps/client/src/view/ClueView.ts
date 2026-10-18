@@ -13,6 +13,7 @@ const SCARF_ID = traits.axes.scarf.values.map((v) => v.id);
 const PRINTS = 5;
 const PRINT_STEP = 34;
 const teal = Number.parseInt(palette.colors.teal.slice(1), 16);
+const lantern = Number.parseInt(palette.colors.lantern.slice(1), 16);
 
 /** World unit vector of a `DIRECTIONS` index (0 = n = -y, then clockwise; SPRITES 10.4). */
 export function dirVector(dir: number): { x: number; y: number } {
@@ -65,7 +66,10 @@ export class ClueView {
         d.claimed = c.claimed;
         d.root.setAlpha(c.claimed ? 0.55 : 1);
       }
-      d.glow.setVisible(!c.claimed).setAlpha(0.2 + 0.15 * Math.sin(now / 260));
+      // A Hungry Killer's footprints are not collectible: they carry their own glow and no teal ring (GDD 3.3).
+      d.glow
+        .setVisible(!c.claimed && c.kind !== ClueKind.hungerPrints)
+        .setAlpha(0.2 + 0.15 * Math.sin(now / 260));
     }
     for (const [id, d] of this.drawn) {
       if (present.has(id)) continue;
@@ -108,6 +112,20 @@ export class ClueView {
         const py = v.y * PRINT_STEP * i + v.x * side;
         inner.add(this.mark(key, px, py, theta));
       }
+    } else if (c.kind === ClueKind.hungerPrints) {
+      // One glowing print on the tile, showing the Killer's height; without the glow frame, the plain print in light.
+      const size = HEIGHT_CODE[c.value] ?? 'm';
+      const glowKey = `clue_footprint_${size}_glow`;
+      const own = this.frame(glowKey);
+      inner.add(
+        this.mark(
+          own ? glowKey : `clue_footprint_${size}_mid`,
+          0,
+          0,
+          (c.dir * Math.PI) / 4,
+          own ? null : lantern,
+        ),
+      );
     } else if (c.kind === ClueKind.thread) {
       inner.add(this.mark(`clue_thread_${SCARF_ID[c.value] ?? 'red'}`, 0, 0, 0));
     } else {
@@ -117,8 +135,17 @@ export class ClueView {
     return { root, glow, claimed: false };
   }
 
-  private mark(key: string, x: number, y: number, rotation: number): Phaser.GameObjects.GameObject {
-    if (key !== '' && this.frame(key)) return this.scene.add.sprite(x, y, ATLAS, key).setRotation(rotation);
+  private mark(
+    key: string,
+    x: number,
+    y: number,
+    rotation: number,
+    tint: number | null = null,
+  ): Phaser.GameObjects.GameObject {
+    if (key !== '' && this.frame(key)) {
+      const sprite = this.scene.add.sprite(x, y, ATLAS, key).setRotation(rotation);
+      return tint === null ? sprite : sprite.setTint(tint);
+    }
     return this.scene.add.circle(x, y, 7, teal, 0.9).setStrokeStyle(2, 0x12141c);
   }
 
