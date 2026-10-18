@@ -51,6 +51,20 @@
     "webpQuality": 100
   },
   "pixelFinish": { "enabled": { "main": true, "onub": true }, "offWebpQuality": 90 },
+  "artStyles": {
+    "default": "8bit",
+    "reserved": ["hd"],
+    "styles": [
+      { "id": "8bit", "pixelFinish": true, "filter": "nearest", "drawScale": 2, "root": "" },
+      {
+        "id": "lowpoly",
+        "pixelFinish": false,
+        "filter": "linear",
+        "drawScale": 2,
+        "root": "lowpoly/"
+      }
+    ]
+  },
   "ui": {
     "source": "docs/UI.md",
     "fonts": { "display": "Oswald", "text": "Inter" },

@@ -1482,73 +1482,6 @@
   font-size: var(--wdi-text-sm);
 }
 
-/* ---------------------------------------------------------------- quick mode: the dark loft */
-
-.wdi-loft {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--wdi-space-5);
-  padding: var(--wdi-space-5);
-  color: var(--wdi-text-muted);
-  background:
-    radial-gradient(ellipse at 50% 20%, rgb(var(--wdi-moon-rgb) / 0.12), transparent 60%), var(--wdi-bg);
-}
-
-.wdi-bedrolls {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, 72px);
-  justify-content: center;
-  gap: var(--wdi-space-3);
-  width: min(560px, 100%);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-/* Every seat's bedroll is drawn occupied all night (GDD 3.11, A21). */
-.wdi-bedroll {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--wdi-space-1);
-  font-family: var(--wdi-font-display);
-  font-size: var(--wdi-text-xs);
-  letter-spacing: var(--wdi-tracking-caps);
-  text-transform: uppercase;
-}
-
-.wdi-bedroll__blanket {
-  width: 56px;
-  height: 92px;
-  background: var(--wdi-surface);
-  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
-  border-radius: 14px 14px 10px 10px;
-  box-shadow:
-    inset 0 18px 0 rgb(var(--wdi-bone-rgb) / 0.35),
-    inset 0 0 0 1px var(--wdi-hairline);
-}
-
-.wdi-bedroll__blanket::before {
-  content: '';
-  display: block;
-  width: 24px;
-  height: 24px;
-  margin: 8px auto 0;
-  background: rgb(var(--wdi-bone-rgb) / 0.6);
-  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
-  border-radius: 50%;
-}
-
-.wdi-bedroll.is-self .wdi-bedroll__blanket {
-  box-shadow:
-    inset 0 18px 0 rgb(var(--wdi-bone-rgb) / 0.35),
-    var(--wdi-glow-moon);
-}
-
 /* ---------------------------------------------------------------- motion */
 
 @keyframes wdi-spin {
@@ -1675,37 +1608,7 @@
   }
 }
 
-/* Round 4 (U): quick-mode meeting and end screen. Tokens only. */
-.wdi-claims {
-  display: grid;
-  gap: var(--wdi-space-2);
-  padding-bottom: var(--wdi-space-2);
-  border-bottom: 1px solid var(--wdi-stroke);
-}
-
-.wdi-claims[hidden],
-.wdi-claims__form[hidden] {
-  display: none;
-}
-
-.wdi-claims__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--wdi-space-2);
-}
-
-.wdi-claims__form {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: var(--wdi-space-2);
-}
-
-.wdi-claims__form label {
-  display: grid;
-  gap: var(--wdi-space-1);
-}
-
+/* Round 4 (U): quick-mode meeting and end screen, kept by round 5 (5D). Tokens only. */
 .wdi-portrait__claim {
   max-width: 100%;
   font-family: var(--wdi-font-text);
@@ -1742,6 +1645,430 @@
 .wdi-roster__row.is-winner {
   border-color: var(--wdi-interact);
   box-shadow: var(--wdi-glow-interact);
+}
+
+/* Round 5 (5G): the main-mode deck list and chip, the look tag on a meeting portrait, the Last Shot toast. */
+.wdi-deck {
+  display: grid;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-deck__cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wdi-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wdi-deck__card {
+  padding: var(--wdi-space-1) var(--wdi-space-3);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-sm);
+  background: var(--wdi-paper);
+  color: var(--wdi-text-on-paper);
+  font-size: var(--wdi-text-sm);
+}
+
+.wdi-deck__cards[hidden] {
+  display: none;
+}
+
+.wdi-deck--chip {
+  max-width: 20rem;
+}
+
+.wdi-deck__toggle {
+  min-height: var(--wdi-touch);
+}
+
+.wdi-look-tag {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 0 var(--wdi-space-1);
+  background: var(--wdi-slate);
+  color: var(--wdi-bone);
+  font-size: var(--wdi-text-xs);
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.wdi-look-tag--ink {
+  background: var(--wdi-ink);
+}
+
+.wdi-look-tag--fog {
+  background: var(--wdi-fog);
+  color: var(--wdi-ink);
+}
+
+.wdi-look-tag--bone {
+  background: var(--wdi-bone);
+  color: var(--wdi-ink);
+}
+
+.wdi-toast--shot {
+  border-left-color: var(--wdi-danger);
+}
+
+.wdi-portrait__pic[data-look] {
+  position: relative;
+}
+
+.wdi-over__list {
+  margin: 0;
+  padding-left: var(--wdi-space-5);
+}
+
+/* Round 5 (5J): the lobby's map row (GDD 3.13). One option per map: thumbnail, name, blurb. */
+.wdi-map {
+  display: grid;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-map__list {
+  display: grid;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-map__option {
+  display: flex;
+  align-items: center;
+  gap: var(--wdi-space-3);
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  border: 1px solid rgb(var(--wdi-bone-rgb) / 0.2);
+  border-radius: var(--wdi-radius-md);
+  background: var(--wdi-surface-sunken);
+  color: var(--wdi-text);
+  font: inherit;
+  text-align: left;
+}
+
+button.wdi-map__option {
+  cursor: pointer;
+}
+
+.wdi-map__option.is-selected {
+  border-color: var(--wdi-interact);
+  box-shadow: var(--wdi-glow-interact);
+}
+
+.wdi-map__thumb {
+  flex: none;
+  width: 96px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--wdi-radius-sm);
+  object-fit: cover;
+}
+
+.wdi-map__text {
+  display: grid;
+  gap: var(--wdi-space-1);
+}
+
+.wdi-map__name {
+  font-weight: 600;
+}
+
+/* Round 5 (5C): the quick-mode kitchen, the station rooms, the hand and the prep board (GDD 3.11). */
+.wdi-kitchen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-3);
+  padding: var(--wdi-space-4);
+  pointer-events: none;
+}
+
+.wdi-kitchen > * {
+  pointer-events: auto;
+}
+
+.wdi-kitchen__overview {
+  flex: 1;
+  min-height: 0;
+}
+
+.wdi-kitchen__grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: var(--wdi-space-3);
+  min-height: 0;
+}
+
+.wdi-kitchen__room {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  background: rgb(var(--wdi-ink-rgb) / 0.35);
+  border: 2px solid var(--wdi-hairline);
+  color: var(--wdi-text);
+  text-align: left;
+}
+
+.wdi-kitchen__room:not(:disabled):hover,
+.wdi-kitchen__room:not(:disabled):focus-visible {
+  border-color: var(--wdi-interact);
+  box-shadow: var(--wdi-glow-interact);
+}
+
+.wdi-kitchen__room:disabled {
+  opacity: 0.6;
+}
+
+.wdi-kitchen__name {
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-display-md);
+}
+
+.wdi-kitchen__gloss {
+  color: var(--wdi-text-muted);
+}
+
+.wdi-kitchen__roomslot {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.wdi-kitchen__roomslot:not([hidden]) {
+  animation: wdi-kitchen-enter var(--wdi-station-enter, 0.6s) ease-out;
+}
+
+@keyframes wdi-kitchen-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-kitchen__roomslot:not([hidden]) {
+    animation: none;
+  }
+}
+
+.wdi-station {
+  background: rgb(var(--wdi-ink-rgb) / 0.82);
+  padding: var(--wdi-space-4);
+  border: 2px solid var(--wdi-hairline);
+}
+
+.wdi-station__game {
+  min-height: 12rem;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+  user-select: none;
+}
+
+.wdi-station__game canvas {
+  max-width: 100%;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+.wdi-hand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wdi-space-3);
+}
+
+.wdi-hand__card {
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 14rem;
+  text-align: left;
+  white-space: normal;
+}
+
+.wdi-hand__card[aria-pressed='true'] {
+  outline: 3px solid var(--wdi-primary);
+}
+
+.wdi-hand__card--sabotage {
+  border-style: dashed;
+}
+
+.wdi-kitchen__board {
+  flex: 1;
+  overflow: auto;
+}
+
+.wdi-pile__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--wdi-space-3);
+}
+
+.wdi-pile {
+  display: grid;
+  gap: var(--wdi-space-2);
+  align-content: start;
+}
+
+.wdi-pile__name {
+  margin: 0;
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-display-sm);
+}
+
+.wdi-pile__cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wdi-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wdi-pile__card--sabotage {
+  border-style: dashed;
+}
+
+.wdi-pile--compact .wdi-pile__net {
+  display: none;
+}
+
+[hidden].wdi-pile__flag,
+[hidden].wdi-pile__ruin {
+  display: none;
+}
+
+/* Round 5 (5D): quick-mode night, morning and end. Tokens only. */
+.wdi-night {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--wdi-space-4);
+  padding: var(--wdi-space-5);
+  overflow-y: auto;
+  background:
+    radial-gradient(ellipse at 50% 20%, rgb(var(--wdi-moon-rgb) / 0.12), transparent 60%), var(--wdi-bg);
+}
+
+.wdi-night [hidden] {
+  display: none;
+}
+
+.wdi-narrator {
+  margin: 0;
+  max-width: 48ch;
+  min-height: 2.4em;
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-text-lg);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-align: center;
+  color: var(--wdi-text);
+}
+
+.wdi-lights-out {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--wdi-text-muted);
+}
+
+.wdi-night-wake,
+.wdi-night-dawn {
+  width: min(960px, 100%);
+  background-size: cover;
+  background-position: center;
+}
+
+.wdi-card-table {
+  display: grid;
+  gap: var(--wdi-space-3);
+}
+
+.wdi-seat-row,
+.wdi-pantry-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wdi-space-3);
+}
+
+.wdi-seat-cards {
+  display: grid;
+  gap: var(--wdi-space-1);
+  padding: var(--wdi-space-2);
+  border: 1px solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-md);
+}
+
+.wdi-seat-cards.is-self {
+  border-color: var(--wdi-interact);
+}
+
+.wdi-seat-cards.is-glow {
+  box-shadow: var(--wdi-glow-moon);
+}
+
+.wdi-seat-cards__name {
+  margin: 0;
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-text-xs);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+}
+
+.wdi-slot {
+  position: relative;
+  display: grid;
+  gap: var(--wdi-space-1);
+  min-width: 96px;
+  min-height: 72px;
+  padding: var(--wdi-space-2);
+  font-size: var(--wdi-text-xs);
+  color: var(--wdi-text);
+  background: var(--wdi-surface-sunken);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-sm);
+}
+
+.wdi-slot.is-dealt,
+.wdi-slot.is-seen {
+  color: var(--wdi-text-on-paper);
+  background: var(--wdi-paper);
+}
+
+.wdi-slot.is-seen {
+  border-color: var(--wdi-moon);
+}
+
+.wdi-slot.is-selectable:not(:disabled) {
+  cursor: pointer;
+  border-color: var(--wdi-interact);
+}
+
+.wdi-slot.is-picked {
+  box-shadow: var(--wdi-glow-interact);
+}
+
+.wdi-slot.is-covered {
+  border-style: dashed;
+}
+
+.wdi-slot__face {
+  font-weight: var(--wdi-weight-strong);
+}
+
+.wdi-claim-form {
+  padding: var(--wdi-space-3);
+  border: 1px solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-md);
+}
+
+.wdi-claim-form[hidden] {
+  display: none;
 }
 
 /* Round 5 (5F): the role card's deck strip and cover picker, and the seat picker. Tokens only. */

@@ -1,13 +1,27 @@
+import type { StepContext } from '@colyseus/core';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { boot } from '@colyseus/testing';
 import { type SceneId, roles } from '@wdi/content';
-import { BUILD_VERSION, C2S, Phase, TILE_PX, Team, type GameStateType, type PlayerState } from '@wdi/shared';
+import {
+  BUILD_VERSION,
+  C2S,
+  Phase,
+  TICK_RATE,
+  TILE_PX,
+  Team,
+  type GameStateType,
+  type PlayerState,
+} from '@wdi/shared';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
+import { runLobbyCommands, runLobbyPhase } from '../src/rooms/handlers/lobby';
 import { createServer } from '../src/server';
 import { isNpcSeat } from '../src/sim/Npc';
+import { addNpcSeat } from '../src/sim/npc/seats';
 import { simOf } from '../src/sim/RoomSim';
+import { step } from '../src/sim/Step';
 import { sceneIndex } from '../src/sim/World';
 import { until } from './flowHelpers';
+import { fixSeeds } from './seedHelpers';
 import { sleep } from './simHelpers';
 
 type Room = Awaited<ReturnType<ColyseusTestServer['sdk']['create']>>;
@@ -124,4 +138,55 @@ export function placeSeat(party: Party, id: string, sceneId: SceneId, tx: number
   player.presence.x = Math.round(p.x);
   player.presence.y = Math.round(p.y);
   sim.viewsDirty = true;
+}
+
+/**
+ * Runs `ticks` server steps synchronously (no sleeps), calling `onTick` after each: the room's own fixed step
+ * (`PartyRoom.setFixedTimestep`) without the clock, so a test covers minutes of play in milliseconds.
+ */
+export function advance(party: Party, ticks: number, onTick?: (tick: number) => void): void {
+  const ctx = {} as StepContext;
+  for (let i = 0; i < ticks; i++) {
+    step(party.room, ctx);
+    runLobbyCommands(party.room);
+    runLobbyPhase(party.room);
+    onTick?.(party.room.state.tick);
+  }
+}
+
+/** White-box: puts the room in `phase` until `seconds` from now. */
+export function holdPhase(party: Party, phase: number, seconds: number): void {
+  party.room.state.phase = phase;
+  party.room.state.phaseEndsTick = party.room.state.tick + Math.round(seconds * TICK_RATE);
+}
+
+/** The four fixed seed sets of the NPC tests (npc.md part 2, section 1). */
+export type SeedSet = 'S1' | 'S2' | 'S3' | 'S4';
+export const SEED_SETS: Record<SeedSet, readonly [number, number, number, number]> = {
+  S1: [0x2f6b1a3d, 0x91c4e7f2, 0x5ad38e01, 0xc7709b44],
+  S2: [0x13579bdf, 0x2468ace0, 0xfdb97531, 0x0eca8642],
+  S3: [0xdeadbeef, 0x0badf00d, 0xfeedface, 0xcafebabe],
+  S4: [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a],
+};
+
+/** The nine NPC seat ids of a seed set: `s1npc0001` to `s1npc0009`. */
+export const npcIdsOf = (set: SeedSet): string[] =>
+  Array.from({ length: 9 }, (_, i) => `${set.toLowerCase()}npc000${i + 1}`);
+
+/**
+ * A 1 human + 9 NPC party at the large profile, seeds and NPC seat ids fixed to `set`; stops on the role card when
+ * `onCard`, else in its first world phase. The human never sends input, never readies and never votes.
+ */
+export async function standardParty(
+  colyseus: ColyseusTestServer,
+  set: SeedSet,
+  onCard = false,
+): Promise<Party> {
+  const party = await lobbyOf(colyseus, 1);
+  const words = SEED_SETS[set];
+  fixSeeds(party.room, { deal: words, npcTiming: words, npcPlay: words });
+  for (const id of npcIdsOf(set)) addNpcSeat(party.room, party.room.seeds.get('npcNames'), id);
+  await start(party);
+  if (!onCard) await toWorld(party);
+  return party;
 }

@@ -7,7 +7,8 @@ import { createServer } from '../src/server';
 import { spawnClue } from '../src/sim/Clues';
 import { handleKill } from '../src/sim/Kill';
 import { simOf } from '../src/sim/RoomSim';
-import { playerOf, prop, readyKnife, sleep, teleport, tilePx, toDay } from './killHelpers';
+import { playerOf, prop, readyKnife, sleep, teleport, tilePx } from './killHelpers';
+import { toNight } from './phaseHelpers';
 import { type Match, startMatch } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -23,7 +24,7 @@ beforeEach(async () => colyseus.cleanup());
 
 async function party(): Promise<Match> {
   const m = await startMatch(colyseus, 5, { Bot0: 'killer' });
-  toDay(m);
+  toNight(m);
   return m;
 }
 

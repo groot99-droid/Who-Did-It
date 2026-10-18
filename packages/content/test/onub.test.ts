@@ -151,6 +151,11 @@ describe('ONUB v2 night (GDD 3.11)', () => {
     ]);
   });
 
+  it("spaces an NPC Tourrier's two steps by npc.stepS, 0.5-1.5 s", () => {
+    expect(onubBalance.npc.stepS).toEqual({ min: 0.5, max: 1.5 });
+    expect(onubBalance.windows.find((w) => w.role === 'tourrier')).toBeDefined();
+  });
+
   it('makes only the Tourrier and the Garde Manger act by seed on timeout', () => {
     const must = onubBalance.windows.filter((w) => w.onTimeout === 'seededPick').map((w) => w.role);
     expect(must).toEqual(['tourrier', 'gardeManger']);

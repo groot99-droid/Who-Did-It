@@ -6,6 +6,7 @@ import { ErrorCode, ItemStack, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import { createServer } from '../src/server';
 import { handleKill } from '../src/sim/Kill';
 import { StatusBit } from '../src/sim/constants';
+import { isKillPhase } from '../src/sim/World';
 import {
   act,
   diffPaths,
@@ -21,8 +22,8 @@ import {
   sleep,
   teleport,
   tilePx,
-  toDay,
 } from './killHelpers';
+import { toNight } from './phaseHelpers';
 import { type Match, startMatch, stateOf } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -47,7 +48,7 @@ async function party(n = 5): Promise<Match> {
     Bot2: 'detective',
     Bot3: 'doctor',
   });
-  toDay(m);
+  toNight(m);
   readyKnife(m, m.bots[0]!);
   teleport(m, m.bots[0]!, 'overworld', 30, ROW);
   teleport(m, m.bots[1]!, 'overworld', 31, ROW);
@@ -139,18 +140,19 @@ describe('kill', () => {
     expect(simOfBot(m, v).dead).toBe(false);
   });
 
-  it('refuses in grace and immunity (425), keeps day, dusk and night open', async () => {
+  it('refuses in grace, day and immunity (425), keeps dusk, night and the Final Night open', async () => {
     const m = await party();
     const k = m.bots[0]!;
-    for (const phase of [Phase.grace, Phase.immunity, Phase.meetingDiscussion]) {
+    for (const phase of [Phase.grace, Phase.day, Phase.immunity, Phase.meetingDiscussion]) {
       setPhase(m, phase);
       await strike(m);
     }
-    expect(errorCodes(k)).toEqual([ErrorCode.wrongPhase, ErrorCode.wrongPhase, ErrorCode.wrongPhase]);
+    expect(errorCodes(k)).toEqual(Array(4).fill(ErrorCode.wrongPhase));
     expect(simOfBot(m, m.bots[1]!).dead).toBe(false);
     for (const [phase, i] of [
       [Phase.dusk, 1],
       [Phase.night, 2],
+      [Phase.finalNight, 3],
     ] as const) {
       setPhase(m, phase);
       readyKnife(m, k);
@@ -158,6 +160,13 @@ describe('kill', () => {
       await strike(m, i);
       expect(simOfBot(m, m.bots[i]!).dead).toBe(true);
     }
+  });
+
+  it('takes its phases from abilities.json kill.phases', () => {
+    const named = new Set<number>((abilities.abilities.kill?.phases ?? []).map((name) => Phase[name]));
+    expect(named.size).toBeGreaterThan(0);
+    for (const phase of Object.values(Phase))
+      expect(isKillPhase(phase), `phase ${phase}`).toBe(named.has(phase));
   });
 
   it('refuses a busy actor (426), a cooldown (424), and a target in transit', async () => {
@@ -283,7 +292,7 @@ describe('what a kill leaks (ARCHITECTURE 5.4, scoped to M3)', () => {
       Bot2: 'detective',
       Bot3: 'doctor',
     });
-    toDay(m);
+    toNight(m);
     const [k, v, witness, out1, out2] = m.bots as [
       Match['bots'][0],
       Match['bots'][0],

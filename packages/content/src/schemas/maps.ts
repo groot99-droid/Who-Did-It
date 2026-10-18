@@ -6,7 +6,7 @@ import { SCENE_IDS } from './scene.js';
  * Map ids in lobby order, append-only (WORLD 4.3); `Settings.map` holds one of them. A new map's id goes at the
  * end in the same pull request as its file.
  */
-export const MAP_IDS = ['hollowmere'] as const;
+export const MAP_IDS = ['hollowmere', 'blackpine'] as const;
 export const MapId = z.enum(MAP_IDS);
 export type MapId = z.infer<typeof MapId>;
 /** `Settings.map` of a new party (the schema default, GDD 3.13). */

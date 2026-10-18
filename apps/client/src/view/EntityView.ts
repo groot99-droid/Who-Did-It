@@ -97,9 +97,10 @@ export class EntityView {
         height: mine?.height ?? selfSnap.traits.height,
         scarf: face.traits.scarf,
         hat: face.traits.hat,
+        ...(face.look ? { lookId: face.look } : {}),
       };
       present.add(this.selfId);
-      const t = this.ensure(this.selfId, `${face.id}:${look.height}`, face.name, look, true);
+      const t = this.ensure(this.selfId, `${face.id}:${face.look}:${look.height}`, face.name, look, true);
       t.view.setBlood((selfPr.statusBits & StatusBit.bloody) !== 0);
       t.view.setGhost(this.ghost);
       this.pose(t, selfPr, now, SELF_DELAY_MS);
@@ -113,8 +114,13 @@ export class EntityView {
       const true_ = this.ghost && a.seat !== undefined ? roster.get(a.seat) : undefined;
       const masked = true_ !== undefined && a.seat !== a.lookOf;
       const name = true_ ? `${masked ? `${MASK_GLYPH} ` : ''}${true_.name}` : shown.name;
-      const look = { height: a.height, scarf: shown.traits.scarf, hat: shown.traits.hat };
-      const t = this.ensure(a.handle, `${a.lookOf}:${a.height}:${name}`, name, look, false);
+      const look = {
+        height: a.height,
+        scarf: shown.traits.scarf,
+        hat: shown.traits.hat,
+        ...(shown.look ? { lookId: shown.look } : {}),
+      };
+      const t = this.ensure(a.handle, `${a.lookOf}:${shown.look}:${a.height}:${name}`, name, look, false);
       const bloody = (a.statusBits & StatusBit.bloody) !== 0;
       const near = selfPr !== null && Math.hypot(a.x - selfPr.x, a.y - selfPr.y) <= BLOOD_SIGHT_PX;
       t.view.setBlood(bloody && near);

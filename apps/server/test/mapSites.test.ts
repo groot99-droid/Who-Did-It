@@ -25,6 +25,7 @@ describe('map sites (GDD 3.13, round 5 X5)', () => {
     expect(bellOf(room)?.id).toBe('ov.bell');
     expect(teachingClueOf(room)?.id).toBe('ov.teaching_clue');
     expect(kitChestOf(room)?.id).toBe('ov.chest');
-    expect([...mapScenesOf(room)]).toEqual([...SCENE_IDS]);
+    // The 15 scenes of 2026-10-10, then the Fenwood and the Flooded Gallery; Blackpine's are not Hollowmere's.
+    expect([...mapScenesOf(room)]).toEqual(SCENE_IDS.slice(0, 17));
   });
 });

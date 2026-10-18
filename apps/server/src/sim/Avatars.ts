@@ -3,7 +3,6 @@ import { AVATAR_HANDLE_BYTES, Avatar, type AvatarState, type PlayerState } from 
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { StatusBit } from './constants';
 import { settleDisguise } from './Impersonate';
-import { isNpcSeat } from './Npc';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isLoft, sceneKey } from './World';
 
@@ -217,13 +216,7 @@ export function resolveHandle(room: PartyRoom, actorSeat: string, handle: unknow
   const seat = memory.seatOf.get(handle);
   const actor = simOf(room).players.get(actorSeat);
   if (!actor) return null;
-  if (seat === undefined) {
-    // An NPC brain runs on the server and names its prey by seat id (5H switches it to `priv.avatar`); a seat id
-    // sent over the wire is never a target (P12). Remove with 5H's switch.
-    return isNpcSeat(room, actorSeat) && room.state.players.has(handle) && handle !== actorSeat
-      ? handle
-      : null;
-  }
+  if (seat === undefined) return null;
   if (seat === actorSeat) return null;
   return memory.sceneOf.get(handle) === sceneKey(actor.sceneIdx) ? seat : null;
 }

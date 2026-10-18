@@ -1,13 +1,29 @@
-import { balance } from '@wdi/content';
-import { Phase, type PlayerState, S2C, TICK_RATE, Winner, checkWin } from '@wdi/shared';
+import { balance, onubBalance, onubRoles } from '@wdi/content';
+import {
+  type OnubGameOver,
+  Phase,
+  type PlayerState,
+  S2C,
+  TICK_RATE,
+  Winner,
+  checkWin,
+  onubWinFlags,
+  onubWinnerName,
+  onubWinners,
+  pantrySlot,
+  seatSlot,
+} from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { logMatch } from '../services/MatchLog';
 import { resetCoversForLobby } from './Covers';
+import { gameOverExtras } from './Deck';
 import { countRow, factionOf, flowOf, resetFlow, roleIdOf, rolesOf, setPhase } from './Flow';
 import { resetNightForLobby } from './NightPowers';
 import { simOf } from './RoomSim';
 import { isNpcSeat, resetNpcsForLobby } from './Npc';
 import { resetOnubForLobby } from './Onub';
+import { finalRoles } from './onub/Acts';
+import { onubOf } from './onub/state';
 import { SCENE_KEYS } from './World';
 
 /** `checkWin` over the living seats (GDD 3.8). Called after a death or an ejection, never on a bare tick. */
@@ -32,7 +48,12 @@ export function endMatch(room: PartyRoom, winner: 'village' | 'cabal'): void {
   const flow = flowOf(room);
   state.winner = Winner[winner];
   setPhase(room, Phase.gameOver, balance.phases.gameOverS);
-  room.broadcast(S2C.gameOver, { winner: state.winner, roles: rolesOf(room), summary: SUMMARY[winner] });
+  room.broadcast(S2C.gameOver, {
+    winner: state.winner,
+    roles: rolesOf(room),
+    summary: SUMMARY[winner],
+    ...gameOverExtras(room),
+  });
 
   const players: Parameters<typeof logMatch>[0]['players'] = [];
   state.players.forEach((p: PlayerState, id: string) => {
@@ -71,14 +92,107 @@ export function endMatch(room: PartyRoom, winner: 'village' | 'cabal'): void {
 
 /**
  * Quick mode (GDD 3.11): the winners table judged on the final cards (`onubWinFlags`, `onubWinners`), then game
- * over with the end-screen facts (`OnubGameOver`) and the match-log line (5B). Stub until 5B lands: game over
- * with nobody winning and no `onub` facts.
+ * over with the end-screen facts (`OnubGameOver`) and the match-log line.
  */
 export function endOnubMatch(room: PartyRoom): void {
   const state = room.state;
-  state.winner = Winner.nobody;
+  const o = onubOf(room);
+  if (!o) {
+    state.winner = Winner.nobody;
+    setPhase(room, Phase.gameOver, balance.phases.gameOverS);
+    room.broadcast(S2C.gameOver, { winner: state.winner, roles: {}, summary: '' });
+    return;
+  }
+  const sim = simOf(room);
+  const finals = finalRoles(o);
+  const info = (roleId: string) => {
+    const role = onubRoles.roles[roleId];
+    if (!role) throw new Error(`unknown quick-mode role ${roleId}`);
+    return { team: role.team, spore: role.spore, onOut: role.onOut };
+  };
+  const outs = o.dawn?.outs ?? [];
+  const ruined = o.prep?.ruined ?? state.onub.ruined;
+  const flags = onubWinFlags(outs, finals, ruined, info);
+  const { rowId, winnerIds } = onubWinners(flags, finals, info, onubBalance.winners);
+  const row = onubBalance.winners.find((r) => r.id === rowId);
+  if (!row) throw new Error(`no winners row ${rowId}`);
+  const name = onubWinnerName(row, winnerIds);
+  state.winner = Winner[name];
   setPhase(room, Phase.gameOver, balance.phases.gameOverS);
-  room.broadcast(S2C.gameOver, { winner: state.winner, roles: {}, summary: '' });
+
+  const bySeat = <T>(pick: (id: string, i: number) => T): Record<string, T> =>
+    Object.fromEntries(o.seats.map((id, i) => [id, pick(id, i)]));
+  const slotRange = (n: number): number[] => Array.from({ length: n }, (_, k) => k);
+  const piles: OnubGameOver['piles'] = {};
+  for (const [station, pile] of Object.entries(o.prep?.piles ?? {})) piles[station] = { ...pile };
+  const onub: OnubGameOver = {
+    seats: [...o.seats],
+    deck: [...o.deck],
+    dealt: bySeat((id) => o.dealt.get(id) ?? ''),
+    final: bySeat((id) => finals.get(id) ?? ''),
+    dealtLoc: bySeat((id) => o.commits.get(id)?.station ?? ''),
+    finalLoc: bySeat((_, i) => o.cards.locs.get(seatSlot(i, 'loc')) ?? ''),
+    prepCards: bySeat((id) => o.commits.get(id)?.card ?? ''),
+    prepAuto: [...o.prepAuto],
+    pantryRolesDealt: [...o.pantryRolesDealt],
+    pantryRoles: slotRange(o.pantryRolesDealt.length).map(
+      (k) => o.cards.roles.get(pantrySlot('role', k)) ?? '',
+    ),
+    pantryLocsDealt: [...o.pantryLocsDealt],
+    pantryLocs: slotRange(o.pantryLocsDealt.length).map((k) => o.cards.locs.get(pantrySlot('loc', k)) ?? ''),
+    piles,
+    ruinWeight: o.prep?.ruinWeight ?? state.onub.ruinWeight,
+    ruined,
+    cloche: o.cloche,
+    actLog: o.actLog.map((e) => ({ ...e, slots: [...e.slots] })),
+    votes: { ...o.votes },
+    outs: [...outs],
+    hop: o.dawn?.hop ?? '',
+    pantryOut: o.dawn?.pantryOut ?? false,
+    rowId,
+    winnerIds,
+  };
+  room.broadcast(S2C.gameOver, {
+    winner: state.winner,
+    roles: Object.fromEntries(finals),
+    summary: row.text,
+    onub,
+  });
+
+  const flow = flowOf(room);
+  const players: Parameters<typeof logMatch>[0]['players'] = [];
+  state.players.forEach((p: PlayerState, id: string) => {
+    const dealt = o.dealt.get(id) ?? '';
+    players.push({
+      id,
+      name: p.name,
+      role: dealt,
+      faction: onubRoles.teams[onubRoles.roles[dealt]?.team ?? 'baker'].faction,
+      survived: !sim.players.get(id)?.dead,
+      clues: 0,
+      finalRole: finals.get(id) ?? '',
+      ...(isNpcSeat(room, id) && { isNpc: true }),
+    });
+  });
+  logMatch({
+    code: room.roomId,
+    seats: state.players.size,
+    durationS: (state.tick - state.startTick) / TICK_RATE,
+    winner: name,
+    mode: 'onub',
+    rounds: state.round,
+    kills: 0,
+    vanished: flow.vanished,
+    players,
+    meetings: flow.meetings.map((m) => ({
+      round: m.round,
+      reason: m.reason,
+      votes: m.votes,
+      accuracy: m.votes === 0 ? 0 : m.correctVotes / m.votes,
+      ...(outs[0] !== undefined && { ejectedId: outs[0], outs: [...outs] }),
+    })),
+    onub: { rowId, winnerIds: [...winnerIds] },
+  });
 }
 
 /**

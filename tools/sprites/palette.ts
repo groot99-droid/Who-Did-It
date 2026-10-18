@@ -29,6 +29,7 @@ interface StyleJson {
   keyColors: string[];
   pixel: PixelSettings;
   pixelFinish: { enabled: Record<Mode, boolean>; offWebpQuality: number };
+  artStyles: { default: string; reserved: string[]; styles: ArtStyle[] };
   references: Record<string, Array<{ file: string; crop?: [number, number, number, number] }>>;
 }
 
@@ -41,6 +42,35 @@ export const pixelSettings: PixelSettings = styleFile.pixel;
 /** Whether a mode's art takes the pixel finish (style.json `pixelFinish.enabled`; ONUB is always on). */
 export function finishEnabled(mode: Mode): boolean {
   return styleFile.pixelFinish.enabled[mode];
+}
+
+/**
+ * One art style a player can pick in the client (style.json `artStyles`, DECISIONS A79, SPRITES 5). Each style
+ * ships the same keys, frame names, cells and pivots under `apps/client/public/assets/<root>manifest.json`.
+ */
+export interface ArtStyle {
+  id: string;
+  pixelFinish: boolean;
+  filter: 'nearest' | 'linear';
+  drawScale: number;
+  root: string;
+}
+
+/** Every shipped art style, in file order (the 8-bit style first). */
+export function artStyles(): readonly ArtStyle[] {
+  return styleFile.artStyles.styles;
+}
+
+/** The style with this id; throws on an unknown or reserved id. */
+export function artStyle(id: string): ArtStyle {
+  const s = styleFile.artStyles.styles.find((x) => x.id === id);
+  if (!s) throw new Error(`unknown art style ${id} (style.json artStyles)`);
+  return s;
+}
+
+/** The style a new player starts with. */
+export function defaultArtStyle(): ArtStyle {
+  return artStyle(styleFile.artStyles.default);
 }
 
 export interface WorldColour {

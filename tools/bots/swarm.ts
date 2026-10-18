@@ -3,7 +3,9 @@
 // what the Playwright match spec and the soak drive (ARCHITECTURE 5.12).
 //
 //   pnpm bots -- --code ABCDE --count 6 [--url http://localhost:2567] [--prefix Bot]
-//        [--vote skip|leader|random|other|<name>] [--report] [--walk]
+//        [--vote skip|leader|random|other|<name>] [--report] [--walk] [--sabotage 0.6] [--pace human|fast]
+//
+// `--sabotage` and `--pace` shape the bots' ONUB v2 play (tools/bots/quick.ts).
 import { Client, type Room } from '@colyseus/sdk';
 import { BUILD_VERSION, type JoinOptions } from '@wdi/shared';
 import { fileURLToPath } from 'node:url';
@@ -101,6 +103,12 @@ export function parseArgs(argv: string[]): SwarmOptions {
     vote: get('--vote') ?? 'skip',
     report: argv.includes('--report'),
     walk: argv.includes('--walk'),
+    quick: {
+      ...(get('--sabotage') ? { sabotage: Number(get('--sabotage')) } : {}),
+      ...(get('--pace') === 'fast' || get('--pace') === 'human'
+        ? { pace: get('--pace') as 'fast' | 'human' }
+        : {}),
+    },
   };
 }
 

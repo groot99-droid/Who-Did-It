@@ -1,8 +1,8 @@
 // GDD 3.13 and WORLD 4.3: the places of the room's map that the server uses, in one file (round 5, X5). Every
 // site that named 'overworld', a `square_<n>` spawn, `ov.bell` or `ov.teaching_clue` calls these instead.
-// The pre-seed plays Hollowmere in every room; Session 5J owns the bodies (and makes `mapIdOfRoom` read
-// `Settings.map`). No other file names a map's hub, spawns or props.
-import { MAP_IDS, maps, scenes, type MapId, type Prop, type SceneId } from '@wdi/content';
+// The room plays the leader's pick, `Settings.map`; Session 5J owns the bodies. No other file names a map's hub,
+// spawns or props.
+import { MAP_IDS, mapIdOf, maps, scenes, type MapId, type Prop, type SceneId } from '@wdi/content';
 import type { PartyRoom } from '../rooms/PartyRoom';
 
 /** A spawn of a map: the scene and the spawn id inside it. */
@@ -48,9 +48,9 @@ const SITES = new Map<MapId, Sites>(
 
 const sitesOf = (room: PartyRoom): Sites => SITES.get(mapIdOfRoom(room))!;
 
-/** The map the room plays (GDD 3.13). Pre-seed: Hollowmere; 5J reads `room.state.settings.map`. */
-export function mapIdOfRoom(_room: PartyRoom): MapId {
-  return 'hollowmere';
+/** The map the room plays (GDD 3.13): `Settings.map`, or the default map when it names none. */
+export function mapIdOfRoom(room: PartyRoom): MapId {
+  return mapIdOf(room.state.settings.map);
 }
 
 /** The hub: the exterior with the Emergency Bell, where the seats start and meetings spread everyone. */

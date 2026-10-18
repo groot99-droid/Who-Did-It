@@ -15,8 +15,8 @@ import {
   sleep,
   teleport,
   tilePx,
-  toDay,
 } from './killHelpers';
+import { toNight } from './phaseHelpers';
 import { type Match, move, startMatch } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -33,7 +33,7 @@ beforeEach(async () => colyseus.cleanup());
 /** Bot0 kills Bot1 at (30,22); Bot2 is a living bystander; Bot3 the Doctor. Returns the ghost. */
 async function ghostParty(): Promise<{ m: Match; ghost: Match['bots'][0] }> {
   const m = await startMatch(colyseus, 4, { Bot0: 'killer', Bot3: 'doctor' });
-  toDay(m);
+  toNight(m);
   const [k, g] = [m.bots[0]!, m.bots[1]!];
   teleport(m, k, 'overworld', 29, 22);
   teleport(m, g, 'overworld', 30, 22);

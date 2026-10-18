@@ -1,0 +1,307 @@
+{
+  "id": "bp_woods",
+  "prefix": "bw",
+  "name": "Blackpine Woods",
+  "zoneId": "bp_woods",
+  "profile": "small",
+  "kind": "exterior",
+  "biome": "forest",
+  "dark": false,
+  "size": { "w": 52, "h": 40 },
+  "notes": "Skid road in from the camp, west to the ford and the drowned adit [L]; vent trail north to the Workings. Felling slope NE with stumps, the log chute head (one-way drop to the camp), lantern and moonlight; the hollow pine on the wolf loop below. Kiln clearing with two brick charcoal kilns. The ford: shingle, shallows, stepping boulders, the ford pool (body spot) and the log jam. Boar glade west, second wolf loop south.",
+  "worldRef": "4.10",
+  "portals": [
+    {
+      "id": "bw.camp",
+      "from": "bp_woods",
+      "x": 51,
+      "y": 22,
+      "kind": "forest_gate",
+      "to": "bp_camp",
+      "toSpawn": "woods",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "bw.vent",
+      "from": "bp_woods",
+      "x": 30,
+      "y": 0,
+      "kind": "cave_mouth",
+      "to": "bp_mine",
+      "toSpawn": "vent",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "bw.chute",
+      "from": "bp_woods",
+      "x": 44,
+      "y": 9,
+      "kind": "drop",
+      "to": "bp_camp",
+      "toSpawn": "chute_foot",
+      "oneWay": true,
+      "lock": null,
+      "window": null,
+      "noise": "oneWayDrop",
+      "elevationDelta": -4,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "bw.old_adit",
+      "from": "bp_woods",
+      "x": 0,
+      "y": 30,
+      "kind": "cave_mouth",
+      "to": "bp_deep",
+      "toSpawn": "old_adit",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "large",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "camp", "x": 50, "y": 22, "z": 0, "facing": "w" },
+    { "id": "vent", "x": 30, "y": 1, "z": 0, "facing": "s" },
+    { "id": "old_adit", "x": 1, "y": 30, "z": 0, "facing": "e" }
+  ],
+  "spots": [
+    {
+      "id": "bw.hollow_pine",
+      "kind": "hide",
+      "variant": "hollowTree",
+      "x": 34,
+      "y": 18,
+      "childOnly": false
+    },
+    { "id": "bw.brush_n", "kind": "hide", "variant": "brush", "x": 28, "y": 8, "childOnly": false },
+    {
+      "id": "bw.log_jam",
+      "kind": "hide",
+      "variant": "logPile",
+      "x": 12,
+      "y": 27,
+      "childOnly": false
+    },
+    {
+      "id": "bw.ford_pool",
+      "kind": "body",
+      "variant": "pool",
+      "x": 15,
+      "y": 33,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    {
+      "id": "bw.kiln_0",
+      "kind": "decor",
+      "x": 22,
+      "y": 26,
+      "footprint": { "x": 22, "y": 26, "w": 2, "h": 2 }
+    },
+    {
+      "id": "bw.kiln_1",
+      "kind": "decor",
+      "x": 26,
+      "y": 26,
+      "footprint": { "x": 26, "y": 26, "w": 2, "h": 2 }
+    }
+  ],
+  "gates": [],
+  "paths": [
+    {
+      "id": "bw.wolf_loop_n",
+      "kind": "wolfLoop",
+      "points": [
+        { "x": 33, "y": 15 },
+        { "x": 46, "y": 15 },
+        { "x": 46, "y": 19 },
+        { "x": 33, "y": 19 }
+      ]
+    },
+    {
+      "id": "bw.wolf_loop_s",
+      "kind": "wolfLoop",
+      "points": [
+        { "x": 32, "y": 32 },
+        { "x": 46, "y": 32 },
+        { "x": 46, "y": 37 },
+        { "x": 32, "y": 37 }
+      ]
+    }
+  ],
+  "lights": [
+    { "id": "bw.lt_kiln_0", "kind": "fire", "x": 23, "y": 28, "radiusTiles": 2.5 },
+    { "id": "bw.lt_kiln_1", "kind": "fire", "x": 27, "y": 28, "radiusTiles": 2.5 },
+    {
+      "id": "bw.lt_chute_lantern",
+      "kind": "lantern",
+      "x": 43,
+      "y": 10,
+      "radiusTiles": 2.5,
+      "phases": ["dusk", "night"]
+    },
+    {
+      "id": "bw.lt_moon_ford",
+      "kind": "moon",
+      "x": 13,
+      "y": 30,
+      "radiusTiles": 4,
+      "phases": ["night"]
+    },
+    {
+      "id": "bw.lt_moon_slope",
+      "kind": "moon",
+      "x": 40,
+      "y": 7,
+      "radiusTiles": 4,
+      "phases": ["night"]
+    }
+  ],
+  "nodes": [
+    { "id": "bw.nd_timber_0", "resource": "timber", "x": 35, "y": 13, "pool": "pineTimber" },
+    { "id": "bw.nd_timber_1", "resource": "timber", "x": 47, "y": 15, "pool": "pineTimber" },
+    { "id": "bw.nd_timber_2", "resource": "timber", "x": 19, "y": 20, "pool": "pineTimber" },
+    { "id": "bw.nd_timber_3", "resource": "timber", "x": 31, "y": 25, "pool": "pineTimber" },
+    { "id": "bw.nd_timber_4", "resource": "timber", "x": 13, "y": 25, "pool": "pineTimber" },
+    { "id": "bw.nd_timber_5", "resource": "timber", "x": 24, "y": 32, "pool": "pineTimber" },
+    { "id": "bw.nd_resin_0", "resource": "resin", "x": 28, "y": 15, "pool": "pineResin" },
+    { "id": "bw.nd_resin_1", "resource": "resin", "x": 41, "y": 24, "pool": "pineResin" },
+    { "id": "bw.nd_herb_0", "resource": "herb", "x": 21, "y": 24, "pool": "woodHerbs" },
+    { "id": "bw.nd_herb_1", "resource": "herb", "x": 16, "y": 26, "pool": "woodHerbs" },
+    { "id": "bw.nd_mush_0", "resource": "mushroom", "x": 30, "y": 29, "pool": "woodMush" },
+    { "id": "bw.nd_mush_1", "resource": "mushroom", "x": 6, "y": 31, "pool": "woodMush" },
+    { "id": "bw.nd_stone_0", "resource": "stone", "x": 11, "y": 31, "pool": "fordStone" },
+    { "id": "bw.nd_stone_1", "resource": "stone", "x": 17, "y": 29, "pool": "fordStone" }
+  ],
+  "spawners": [
+    {
+      "id": "bw.sp_wolf_n",
+      "mob": "wolf",
+      "x": 38,
+      "y": 19,
+      "leashTiles": 6,
+      "phases": ["dusk", "night"],
+      "pathId": "bw.wolf_loop_n"
+    },
+    {
+      "id": "bw.sp_wolf_s",
+      "mob": "wolf",
+      "x": 38,
+      "y": 32,
+      "leashTiles": 6,
+      "phases": ["dusk", "night"],
+      "pathId": "bw.wolf_loop_s"
+    },
+    {
+      "id": "bw.sp_boar",
+      "mob": "boar",
+      "x": 10,
+      "y": 22,
+      "leashTiles": 5,
+      "phases": ["day", "dusk"]
+    }
+  ],
+  "givers": [{ "id": "bw.gv_collier", "npc": "collier", "x": 24, "y": 30, "facing": "n" }],
+  "grid": [
+    "##############################D#####################",
+    "#############################.S.####################",
+    "#############################...####################",
+    "#############################...######.#############",
+    "############################....####.............###",
+    "############################....####......#......###",
+    "#############################....###..#..........###",
+    "############################....####..............##",
+    "############################H...###..............###",
+    "############################.....###........D....###",
+    "#############################...###..............###",
+    "############################....####.............###",
+    "#############################...####.............###",
+    "#############################.#.####.............###",
+    "#############################...##.#..............##",
+    "#############################...#..............#####",
+    "#############################...#.##.###...###..####",
+    "#############################...#.######...###.#####",
+    "#############################...#.H#.###...###.#####",
+    "########.#..#.###############...#..............#####",
+    "#######.......####.######.###...########...#########",
+    "########...........................................#",
+    "########.................................#........SD",
+    "########...........................................#",
+    "########.........##............##.####.#####.#######",
+    "##############....#............#####################",
+    "#############....##...##..##...#####################",
+    "############H#...##...##..##...#####################",
+    "########.......................#####################",
+    "#................#...............###################",
+    "DS...............................###################",
+    "#........###....###..............#######.#.##.######",
+    "########.##.....##############..................####",
+    "###########.###B################.#..##########.#####",
+    "################################..############.#####",
+    "################################.############..#####",
+    "################################.######.######.#####",
+    "################################...............#####",
+    "####################################.#.##.##########",
+    "####################################################"
+  ],
+  "material": [
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllTTTTTTTTTTTTTTTTTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllTTTTTTTTTTTTTTTTTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllTTTTTTgTTTTTTTTTTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTllllTTTTgggggggguggggTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTllllTTTTggggggTggggggTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTulllTTTggTggggggggggTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTulllTTTTggugggggggggggTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTuluTTTggggggggggggggTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTlllluTTTgggggggggggggTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllTTTggggggggggggggTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTllllTTTTgggggggggggggTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlulTTTTgggggggggggggTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlTlTTTTgggggggggggggTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllTTlTgggglllgggggggTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllTllllllllllllllTTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllTlTTlTTTlllTTTllTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllTlTTTTTTuluTTTlTTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllTlTTlTTTlllTTTlTTTTT",
+    "TTTTTTTTgTggTgTTTTTTTTTTTTTTTlllTllllllllllllllTTTTT",
+    "TTTTTTTgggggggTTTTpTTTTTTpTTTlllTTTTTTTTlllTTTTTTTTT",
+    "TTTTTTTTggggggppppppppppppppplllpppppppplllppppppppT",
+    "TTTTTTTTggggggpppppppppppppppppppppppppppRpppppppppT",
+    "TTTTTTTTggggggpppppppppppppppppppppppppppppppppppppT",
+    "TTTTTTTTggggggpppTTddddddddddddTTpTTTTpTTTTTpTTTTTTT",
+    "TTTTTTTTTTTTTTppppTddddddddddddTTTTTTTTTTTTTTTTTTTTT",
+    "TTTTTTTTTTTTTppppTTdddPPddPPdddTTTTTTTTTTTTTTTTTTTTT",
+    "TTTTTTTTTTTTTTpppTTdddPPddPPdddTTTTTTTTTTTTTTTTTTTTT",
+    "TTTTTTTTsssssssssssddddddddddddTTTTTTTTTTTTTTTTTTTTT",
+    "TppppppppssssssssRsdddddddddddlllTTTTTTTTTTTTTTTTTTT",
+    "Tpppppppp~~~~~~~~~~dddddddddddlllTTTTTTTTTTTTTTTTTTT",
+    "TppppppppOORssssOOOdddddddddddlllTTTTTTTuTlTTlTTTTTT",
+    "TTTTTTTTsOOsssssOOOTTTTTTTTTTTllllllllllllllllllTTTT",
+    "TTTTTTTTTTTsTTTTTTTTTTTTTTTTTTTTlTllTTTTTTTTTTlTTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTllTTTTTTTTTTTTlTTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTlTTTTTTTTTTTTllTTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTlTTTTTTlTTTTTTlTTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllllllllllllllTTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTlTlTTlTTTTTTTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+  ]
+}

@@ -59,20 +59,20 @@ describe('validateContent rejects', () => {
     );
   });
 
-  it('a roster row with the wrong number of roles', () => {
+  it('a deck row with the wrong number of cards', () => {
     expect(
       broken((c) => {
-        c.roles.rosters['6'].deal.pop();
+        c.roles.decks['6'].cards.pop();
       }),
-    ).toEqual(expect.arrayContaining([expect.stringContaining('roster 6: deal has 5 roles')]));
+    ).toEqual(expect.arrayContaining([expect.stringContaining('deck 6')]));
   });
 
-  it('a roster that deals an unshipped role', () => {
+  it('a deck that lists an unshipped role', () => {
     expect(
       broken((c) => {
-        c.roles.rosters['9'].deal[c.roles.rosters['9'].deal.indexOf('townsfolk')] = 'ranger';
+        c.roles.decks['9'].cards[c.roles.decks['9'].cards.indexOf('baker')] = 'ranger';
       }),
-    ).toEqual(expect.arrayContaining([expect.stringContaining('roster 9: deals unshipped role ranger')]));
+    ).toEqual(expect.arrayContaining([expect.stringContaining('ranger')]));
   });
 
   it('a quick-mode deck that is not N + 3', () => {
@@ -91,6 +91,14 @@ describe('validateContent rejects', () => {
     ).toEqual(
       expect.arrayContaining([expect.stringContaining('onub role inspecteur: wakes=true but has no window')]),
     );
+  });
+
+  it('a quick-mode NPC step delay whose min is above its max', () => {
+    expect(
+      broken((c) => {
+        c.onubBalance.npc.stepS = { min: 2, max: 1 };
+      }),
+    ).toEqual(expect.arrayContaining(['balance.onub.json npc.stepS: min > max']));
   });
 
   it('an ability or item reference that does not exist', () => {

@@ -37,6 +37,17 @@ export const SCENE_IDS = [
   'barn',
   'chapel',
   'cellar',
+  // Round 5 (A50): Hollowmere's new forest and cave, then Blackpine.
+  'forest_deep',
+  'cave_gallery',
+  'bp_camp',
+  'bp_lodge',
+  'bp_mill',
+  'bp_woods',
+  'bp_mine',
+  'bp_office',
+  'bp_smithy',
+  'bp_deep',
 ] as const;
 export type SceneId = (typeof SCENE_IDS)[number];
 

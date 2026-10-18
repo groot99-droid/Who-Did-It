@@ -1,6 +1,6 @@
 import { TICK_RATE } from '@wdi/shared/constants';
 import type { MoveCmd } from '../net/world';
-import { keyVector } from './vectors';
+import { keyVector, worldMove } from './vectors';
 
 // Sends `input.move` at 20 Hz from a timer, not from the render loop, so a slow frame or a background tab
 // cannot starve or flood the server. The newest state wins on the server; here we only report it.
@@ -72,12 +72,9 @@ export class InputController {
     this.release();
   }
 
-  /** The command for the current input state. */
+  /** The command for the current input state: screen-axis keys and stick turned into the world frame (SPRITES 10.8). */
   current(): Omit<MoveCmd, 'seq'> {
-    const k = keyVector(this.pressed);
-    const t = this.touch?.vector() ?? { dx: 0, dy: 0 };
-    const dx = k.dx + t.dx;
-    const dy = k.dy + t.dy;
+    const { dx, dy } = worldMove(keyVector(this.pressed), this.touch?.vector() ?? { dx: 0, dy: 0 });
     return {
       dx,
       dy,

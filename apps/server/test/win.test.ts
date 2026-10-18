@@ -2,6 +2,7 @@ import type { ColyseusTestServer } from '@colyseus/testing';
 import { Body, C2S, Clue, NotebookEntry, Phase, Winner } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { matchLog } from '../src/services/MatchLog';
+import { flowOf } from '../src/sim/Flow';
 import { simOf } from '../src/sim/RoomSim';
 import {
   bootFlowServer,
@@ -16,7 +17,7 @@ import {
   until,
   voteAll,
 } from './flowHelpers';
-import { type Match, sleep } from './simHelpers';
+import { type Match, sleep, startMatch } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -72,6 +73,40 @@ describe.each([4, 5, 6])('win conditions at %i seats', (n) => {
     expect(m.room.state.winner).toBe(Winner.cabal);
     await sleep(150);
     expect(gameOver(m)).toMatchObject({ winner: Winner.cabal });
+  });
+});
+
+describe('gameOver end-screen extras (GDD 3.1, 3.8)', () => {
+  it('sends the undealt cards and no alsoWon when no Drifter was ejected', async () => {
+    const m = await startParty(colyseus, 4);
+    flowOf(m.room).undealt = ['vicar', 'baker'];
+    await skipPhase(m);
+    await openMeeting(m, 1);
+    await voteAll(m, everyone(4), (i) => idOf(m, i === 0 ? 1 : 0));
+    await skipPhase(m);
+    expect(await until(() => gameOver(m) !== undefined)).toBe(true);
+    expect(gameOver(m)).toMatchObject({ winner: Winner.village, undealt: ['vicar', 'baker'] });
+    expect(gameOver(m)!.alsoWon).toBeUndefined();
+  });
+
+  it('lists an ejected Drifter in alsoWon whichever faction then wins', async () => {
+    const m = await startMatch(colyseus, 5, {
+      Bot0: 'killer',
+      Bot1: 'drifter',
+      Bot2: 'detective',
+      Bot3: 'doctor',
+      Bot4: 'townsfolk',
+    });
+    await skipPhase(m);
+    await openMeeting(m, 2);
+    await voteAll(m, everyone(5), (i) => idOf(m, i === 1 ? 0 : 1));
+    expect(events(m.bots[0]!, 'voteResult').at(-1)).toMatchObject({ ejectedId: idOf(m, 1), role: 'drifter' });
+    await skipPhase(m);
+    expect(m.room.state.phase).not.toBe(Phase.gameOver); // the Drifter's win does not end the match
+    murder(m, 4);
+    murder(m, 3); // the Detective alone against the Killer: the Cabal wins at 5 seats
+    expect(await until(() => gameOver(m) !== undefined)).toBe(true);
+    expect(gameOver(m)).toMatchObject({ winner: Winner.cabal, alsoWon: [idOf(m, 1)] });
   });
 });
 

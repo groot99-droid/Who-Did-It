@@ -1,6 +1,8 @@
 import mitt from 'mitt';
 import { describe, expect, it, vi } from 'vitest';
 import type { NetEvents, NetworkService } from './NetworkService';
+import { REG_ONUB } from './onub';
+import { ColyseusOnubFeed } from './onubColyseus';
 import { installWorldRouter } from './worldRouter';
 
 type Handler = (payload: unknown) => void;
@@ -17,6 +19,7 @@ function fakeRoom() {
       return () => undefined;
     },
     send: vi.fn(),
+    onStateChange: Object.assign(vi.fn(), { remove: vi.fn() }),
     emit: (type: string, payload: unknown) => handlers.get(type)?.forEach((fn) => fn(payload)),
     count: (type: string) => handlers.get(type)?.length ?? 0,
   };
@@ -88,10 +91,17 @@ describe('world router', () => {
     expect(calls.at(-1)).toBe('start Lobby');
   });
 
-  it('leaves the night messages to the ONUB feed: the world feed registers none', () => {
+  it('leaves the night messages to the ONUB feed: one handler each, and the world feed registers none', () => {
     const { room } = setup();
-    expect(room.count('nightSleep')).toBe(0);
-    expect(room.count('nightWake')).toBe(0);
+    expect(room.count('nightSleep')).toBe(1);
+    expect(room.count('nightWake')).toBe(1);
+    expect(room.count('nightReveal')).toBe(1);
+  });
+
+  it("publishes the room's live ONUB feed (5D's ColyseusOnubFeed) for the quick-mode scenes", () => {
+    const { game } = setup();
+    const onub = game.registry.set.mock.calls.find(([key]) => key === REG_ONUB);
+    expect(onub?.[1]).toBeInstanceOf(ColyseusOnubFeed);
   });
 
   it('a meeting, game over or the return to the lobby stops Kitchen and Night', () => {

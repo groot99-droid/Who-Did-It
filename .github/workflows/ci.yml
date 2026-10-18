@@ -19,7 +19,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
-      - run: pnpm test
+      # The server suite runs in its own job below: it is the long one (npc.md part 2, section 1).
+      - run: pnpm --filter '!@wdi/server' -r --if-present test
       - name: Build and dist size report
         run: |
           pnpm build
@@ -27,3 +28,17 @@ jobs:
             [ -d "$d" ] && du -sh "$d" | tee -a "$GITHUB_STEP_SUMMARY"
           done
           true
+
+  server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @wdi/server test

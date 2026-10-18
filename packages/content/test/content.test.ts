@@ -7,6 +7,7 @@ import {
   balanceFor,
   clues,
   content,
+  deckFor,
   items,
   metrics,
   onubRoles,
@@ -14,7 +15,6 @@ import {
   PLAYER_COUNTS,
   profileFor,
   roles,
-  rosterFor,
   scenes,
   style,
   tasks,
@@ -34,7 +34,7 @@ describe('content package', () => {
       ...Object.values(items.items),
       ...Object.values(clues.clues),
       ...Object.values(tasks.tasks),
-      ...Object.values(roles.rosters),
+      ...Object.values(roles.decks),
       ...Object.values(balance.byCount),
       ...Object.values(onubRoles.roles),
     ];
@@ -147,6 +147,17 @@ describe('the style formula and the pixel finish (ASSETS 6.4, 6.11)', () => {
   it('proposes the pixel finish for the main mode and keeps it for ONUB (ruling F15)', () => {
     expect(style.pixelFinish.enabled).toEqual({ main: true, onub: true });
   });
+
+  it('ships the 8-bit and low-poly art styles, 8-bit by default, HD reserved (A79)', () => {
+    const a = style.artStyles;
+    expect(a.default).toBe('8bit');
+    expect(a.reserved).toEqual(['hd']);
+    expect(a.styles.map((s) => [s.id, s.pixelFinish, s.filter, s.root])).toEqual([
+      ['8bit', true, 'nearest', ''],
+      ['lowpoly', false, 'linear', 'lowpoly/'],
+    ]);
+    for (const s of a.styles) expect(s.drawScale, s.id).toBe(metrics.iso.artScale);
+  });
 });
 
 describe('traits (GDD 3.1)', () => {
@@ -165,47 +176,42 @@ describe('traits (GDD 3.1)', () => {
   });
 });
 
-describe('rosters (GDD 3.1)', () => {
-  const cabal = (n: number) => rosterFor(n).deal.filter((r) => roles.roles[r]?.faction === 'cabal').length;
-  const count = (n: number, role: string) => rosterFor(n).deal.filter((r) => r === role).length;
+describe('decks (GDD 3.1, 3.9)', () => {
+  const cards = (n: number) => deckFor(n).cards;
+  const cabal = (n: number) => cards(n).filter((r) => roles.roles[r]?.faction === 'cabal').length;
+  const count = (n: number, role: string) => cards(n).filter((r) => r === role).length;
 
-  it('has a row for every count from 4 to 10 that deals exactly one role per player', () => {
-    for (const n of PLAYER_COUNTS) expect(rosterFor(Number(n)).deal).toHaveLength(Number(n));
-    expect(() => rosterFor(3)).toThrow(RangeError);
-    expect(() => rosterFor(11)).toThrow(RangeError);
+  it('has a row for every count from 4 to 10 with player count + 2 cards', () => {
+    for (const n of PLAYER_COUNTS) expect(deckFor(Number(n)).cards).toHaveLength(Number(n) + 2);
+    expect(() => deckFor(3)).toThrow(RangeError);
+    expect(() => deckFor(11)).toThrow(RangeError);
   });
 
-  it('matches the Cabal column of GDD 3.9', () => {
-    expect([4, 5, 6, 7, 8, 9, 10].map(cabal)).toEqual([1, 1, 1, 2, 2, 2, 3]);
+  it('holds the Cabal cards of GDD 3.9 (the Accomplice and Drifter may stay in the box)', () => {
+    expect([4, 5, 6, 7, 8, 9, 10].map(cabal)).toEqual([1, 1, 1, 2, 2, 2, 2]);
     expect(count(10, 'killer')).toBe(2);
-  });
-
-  it('always has a Detective and a Killer, and at least one Townsfolk', () => {
-    for (let n = 4; n <= 10; n++) {
-      expect(count(n, 'detective')).toBe(1);
-      expect(count(n, 'killer')).toBeGreaterThanOrEqual(1);
-      expect(count(n, 'townsfolk')).toBeGreaterThanOrEqual(1);
-    }
+    for (let n = 4; n <= 10; n++) expect(count(n, 'killer')).toBeGreaterThanOrEqual(1);
   });
 
   it('adds specials at the GDD counts', () => {
     const first = (role: string) => [4, 5, 6, 7, 8, 9, 10].find((n) => count(n, role) > 0);
+    expect(first('vicar')).toBe(4);
+    expect(first('drifter')).toBe(5);
     expect(first('doctor')).toBe(5);
-    expect(first('butler')).toBe(6);
+    expect(first('watchman')).toBe(6);
     expect(first('accomplice')).toBe(7);
-    expect(first('child')).toBe(8);
-    expect(first('drifter')).toBe(10);
+    expect(first('herbalist')).toBe(8);
+    expect(first('gamekeeper')).toBe(9);
+    expect(first('tinner')).toBe(10);
   });
 
-  it('deals Townsfolk where the Ranger is planned until it ships', () => {
-    expect(rosterFor(9).planned).toContain('ranger');
-    expect(rosterFor(9).deal).not.toContain('ranger');
-    expect(count(9, 'townsfolk')).toBe(3);
-    expect(count(10, 'townsfolk')).toBe(2);
+  it('never lists the Townsfolk class row, only its professions', () => {
+    for (let n = 4; n <= 10; n++) expect(count(n, 'townsfolk')).toBe(0);
+    expect(count(5, 'lamplighter') + count(5, 'baker')).toBe(2);
   });
 
   it('marks only 4 as practice', () => {
-    expect(PLAYER_COUNTS.filter((n) => rosterFor(Number(n)).practice)).toEqual(['4']);
+    expect(PLAYER_COUNTS.filter((n) => deckFor(Number(n)).practice)).toEqual(['4']);
   });
 
   it('gives every card at most 3 abilities and Townsfolk two bell pulls', () => {
