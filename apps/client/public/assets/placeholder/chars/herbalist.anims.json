@@ -1,0 +1,4492 @@
+{
+ "anims": [
+  {
+   "key": "blood/herbalist/die/e",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/e/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/e/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/e/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/e/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/e/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/e/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/e/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/die/n",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/n/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/n/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/n/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/n/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/n/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/n/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/n/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/die/ne",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/ne/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/ne/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/ne/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/ne/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/ne/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/ne/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/ne/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/die/nw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/nw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/nw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/nw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/nw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/nw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/nw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/nw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/die/s",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/s/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/s/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/s/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/s/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/s/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/s/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/s/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/die/se",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/se/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/se/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/se/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/se/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/se/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/se/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/se/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/die/sw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/sw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/sw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/sw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/sw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/sw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/sw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/sw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/die/w",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/w/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/w/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/w/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/w/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/w/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/w/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/w/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/idle/e",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/e/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/e/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/e/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/e/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/e/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/e/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/e/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/idle/n",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/n/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/n/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/n/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/n/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/n/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/n/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/n/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/idle/ne",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/ne/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/ne/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/ne/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/ne/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/ne/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/ne/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/ne/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/idle/nw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/nw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/nw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/nw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/nw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/nw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/nw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/nw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/idle/s",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/s/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/s/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/s/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/s/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/s/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/s/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/s/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/idle/se",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/se/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/se/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/se/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/se/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/se/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/se/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/se/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/idle/sw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/sw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/sw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/sw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/sw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/sw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/sw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/sw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/idle/w",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/w/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/w/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/w/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/w/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/w/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/w/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/w/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/interact/e",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/e/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/e/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/e/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/e/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/e/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/e/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/e/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/interact/n",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/n/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/n/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/n/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/n/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/n/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/n/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/n/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/interact/ne",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/ne/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/ne/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/ne/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/ne/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/ne/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/ne/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/ne/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/interact/nw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/nw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/nw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/nw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/nw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/nw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/nw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/nw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/interact/s",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/s/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/s/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/s/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/s/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/s/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/s/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/s/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/interact/se",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/se/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/se/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/se/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/se/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/se/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/se/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/se/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/interact/sw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/sw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/sw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/sw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/sw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/sw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/sw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/sw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/interact/w",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/w/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/w/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/w/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/w/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/w/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/w/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/w/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/swing/e",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/e/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/e/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/e/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/e/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/e/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/swing/n",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/n/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/n/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/n/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/n/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/n/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/swing/ne",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/ne/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/ne/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/ne/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/ne/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/ne/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/swing/nw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/nw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/nw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/nw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/nw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/nw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/swing/s",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/s/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/s/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/s/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/s/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/s/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/swing/se",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/se/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/se/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/se/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/se/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/se/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/swing/sw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/sw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/sw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/sw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/sw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/sw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/swing/w",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/w/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/w/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/w/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/w/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/w/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/herbalist/walk/e",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/e/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/e/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/e/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/e/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/e/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/e/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/e/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/walk/n",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/n/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/n/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/n/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/n/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/n/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/n/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/n/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/walk/ne",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/ne/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/ne/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/ne/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/ne/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/ne/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/ne/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/ne/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/walk/nw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/nw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/nw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/nw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/nw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/nw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/nw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/nw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/walk/s",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/s/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/s/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/s/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/s/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/s/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/s/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/s/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/walk/se",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/se/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/se/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/se/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/se/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/se/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/se/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/se/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/walk/sw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/sw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/sw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/sw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/sw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/sw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/sw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/sw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/herbalist/walk/w",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/w/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/w/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/w/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/w/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/w/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/w/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/w/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "blood/herbalist/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/die/e",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/e/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/e/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/e/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/e/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/e/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/e/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/e/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/die/n",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/n/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/n/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/n/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/n/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/n/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/n/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/n/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/die/ne",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/ne/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/ne/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/ne/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/ne/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/ne/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/ne/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/ne/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/die/nw",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/nw/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/nw/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/nw/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/nw/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/nw/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/nw/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/nw/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/die/s",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/s/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/s/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/s/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/s/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/s/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/s/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/s/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/die/se",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/se/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/se/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/se/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/se/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/se/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/se/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/se/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/die/sw",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/sw/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/sw/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/sw/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/sw/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/sw/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/sw/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/sw/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/die/w",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/w/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/w/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/w/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/w/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/w/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/w/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/w/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/idle/e",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/e/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/e/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/e/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/e/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/e/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/e/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/e/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/idle/n",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/n/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/n/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/n/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/n/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/n/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/n/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/n/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/idle/ne",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/ne/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/ne/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/ne/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/ne/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/ne/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/ne/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/ne/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/idle/nw",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/nw/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/nw/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/nw/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/nw/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/nw/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/nw/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/nw/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/idle/s",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/s/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/s/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/s/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/s/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/s/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/s/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/s/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/idle/se",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/se/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/se/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/se/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/se/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/se/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/se/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/se/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/idle/sw",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/sw/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/sw/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/sw/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/sw/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/sw/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/sw/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/sw/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/idle/w",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/w/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/w/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/w/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/w/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/w/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/w/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/w/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/interact/e",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/e/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/e/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/e/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/e/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/e/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/e/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/e/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/interact/n",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/n/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/n/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/n/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/n/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/n/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/n/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/n/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/interact/ne",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/ne/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/ne/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/ne/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/ne/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/ne/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/ne/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/ne/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/interact/nw",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/nw/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/nw/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/nw/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/nw/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/nw/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/nw/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/nw/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/interact/s",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/s/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/s/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/s/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/s/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/s/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/s/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/s/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/interact/se",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/se/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/se/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/se/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/se/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/se/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/se/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/se/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/interact/sw",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/sw/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/sw/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/sw/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/sw/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/sw/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/sw/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/sw/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/interact/w",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/w/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/w/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/w/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/w/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/w/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/w/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/w/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/swing/e",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/e/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/e/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/e/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/e/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/e/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/swing/n",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/n/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/n/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/n/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/n/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/n/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/swing/ne",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/ne/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/ne/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/ne/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/ne/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/ne/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/swing/nw",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/nw/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/nw/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/nw/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/nw/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/nw/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/swing/s",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/s/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/s/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/s/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/s/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/s/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/swing/se",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/se/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/se/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/se/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/se/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/se/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/swing/sw",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/sw/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/sw/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/sw/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/sw/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/sw/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/swing/w",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/w/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/w/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/w/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/w/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/w/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/herbalist/walk/e",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/e/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/e/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/e/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/e/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/e/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/e/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/e/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/walk/n",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/n/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/n/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/n/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/n/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/n/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/n/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/n/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/walk/ne",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/ne/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/ne/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/ne/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/ne/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/ne/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/ne/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/ne/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/walk/nw",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/nw/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/nw/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/nw/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/nw/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/nw/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/nw/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/nw/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/walk/s",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/s/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/s/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/s/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/s/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/s/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/s/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/s/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/walk/se",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/se/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/se/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/se/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/se/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/se/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/se/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/se/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/walk/sw",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/sw/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/sw/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/sw/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/sw/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/sw/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/sw/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/sw/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/herbalist/walk/w",
+   "frames": [
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/w/000"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/w/001"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/w/002"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/w/003"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/w/004"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/w/005"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/w/006"
+    },
+    {
+     "key": "char_herbalist",
+     "frame": "char/herbalist/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/die/e",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/e/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/e/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/e/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/e/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/e/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/e/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/e/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/die/n",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/n/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/n/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/n/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/n/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/n/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/n/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/n/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/die/ne",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/ne/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/ne/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/ne/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/ne/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/ne/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/ne/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/ne/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/die/nw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/nw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/nw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/nw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/nw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/nw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/nw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/nw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/die/s",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/s/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/s/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/s/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/s/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/s/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/s/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/s/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/die/se",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/se/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/se/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/se/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/se/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/se/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/se/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/se/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/die/sw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/sw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/sw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/sw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/sw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/sw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/sw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/sw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/die/w",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/w/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/w/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/w/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/w/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/w/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/w/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/w/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/idle/e",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/e/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/e/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/e/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/e/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/e/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/e/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/e/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/idle/n",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/n/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/n/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/n/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/n/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/n/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/n/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/n/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/idle/ne",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/ne/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/ne/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/ne/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/ne/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/ne/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/ne/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/ne/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/idle/nw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/nw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/nw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/nw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/nw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/nw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/nw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/nw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/idle/s",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/s/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/s/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/s/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/s/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/s/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/s/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/s/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/idle/se",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/se/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/se/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/se/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/se/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/se/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/se/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/se/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/idle/sw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/sw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/sw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/sw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/sw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/sw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/sw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/sw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/idle/w",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/w/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/w/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/w/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/w/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/w/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/w/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/w/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/interact/e",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/e/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/e/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/e/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/e/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/e/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/e/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/e/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/interact/n",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/n/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/n/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/n/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/n/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/n/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/n/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/n/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/interact/ne",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/ne/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/ne/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/ne/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/ne/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/ne/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/ne/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/ne/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/interact/nw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/nw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/nw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/nw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/nw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/nw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/nw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/nw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/interact/s",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/s/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/s/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/s/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/s/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/s/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/s/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/s/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/interact/se",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/se/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/se/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/se/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/se/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/se/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/se/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/se/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/interact/sw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/sw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/sw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/sw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/sw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/sw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/sw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/sw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/interact/w",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/w/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/w/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/w/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/w/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/w/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/w/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/w/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/swing/e",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/e/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/e/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/e/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/e/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/e/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/swing/n",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/n/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/n/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/n/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/n/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/n/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/swing/ne",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/ne/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/ne/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/ne/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/ne/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/ne/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/swing/nw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/nw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/nw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/nw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/nw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/nw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/swing/s",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/s/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/s/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/s/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/s/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/s/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/swing/se",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/se/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/se/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/se/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/se/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/se/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/swing/sw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/sw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/sw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/sw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/sw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/sw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/swing/w",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/w/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/w/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/w/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/w/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/w/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/herbalist/walk/e",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/e/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/e/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/e/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/e/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/e/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/e/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/e/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/walk/n",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/n/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/n/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/n/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/n/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/n/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/n/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/n/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/walk/ne",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/ne/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/ne/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/ne/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/ne/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/ne/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/ne/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/ne/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/walk/nw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/nw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/nw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/nw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/nw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/nw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/nw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/nw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/walk/s",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/s/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/s/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/s/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/s/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/s/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/s/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/s/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/walk/se",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/se/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/se/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/se/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/se/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/se/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/se/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/se/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/walk/sw",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/sw/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/sw/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/sw/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/sw/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/sw/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/sw/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/sw/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/herbalist/walk/w",
+   "frames": [
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/w/000"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/w/001"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/w/002"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/w/003"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/w/004"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/w/005"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/w/006"
+    },
+    {
+     "key": "ovl_herbalist",
+     "frame": "scarf/herbalist/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  }
+ ]
+}

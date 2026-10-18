@@ -1,0 +1,7619 @@
+{
+ "textures": [
+  {
+   "image": "char_detective-0.png",
+   "format": "RGBA8888",
+   "size": {
+    "w": 512,
+    "h": 1024
+   },
+   "scale": 1,
+   "frames": [
+    {
+     "filename": "char/detective/die/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 16,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 57,
+      "y": 443,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 57,
+      "y": 18,
+      "w": 24,
+      "h": 48
+     },
+     "frame": {
+      "x": 82,
+      "y": 57,
+      "w": 24,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 58,
+      "y": 22,
+      "w": 33,
+      "h": 45
+     },
+     "frame": {
+      "x": 276,
+      "y": 165,
+      "w": 33,
+      "h": 45
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 60,
+      "y": 28,
+      "w": 40,
+      "h": 40
+     },
+     "frame": {
+      "x": 315,
+      "y": 54,
+      "w": 40,
+      "h": 40
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 61,
+      "y": 37,
+      "w": 45,
+      "h": 33
+     },
+     "frame": {
+      "x": 407,
+      "y": 49,
+      "w": 45,
+      "h": 33
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 62,
+      "y": 47,
+      "w": 48,
+      "h": 24
+     },
+     "frame": {
+      "x": 3,
+      "y": 993,
+      "w": 48,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/e/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 63,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 85,
+      "y": 968,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/e/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 63,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 85,
+      "y": 968,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 16,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 57,
+      "y": 498,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 57,
+      "y": 18,
+      "w": 24,
+      "h": 48
+     },
+     "frame": {
+      "x": 82,
+      "y": 111,
+      "w": 24,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 58,
+      "y": 22,
+      "w": 33,
+      "h": 45
+     },
+     "frame": {
+      "x": 254,
+      "y": 3,
+      "w": 33,
+      "h": 45
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 60,
+      "y": 28,
+      "w": 40,
+      "h": 40
+     },
+     "frame": {
+      "x": 315,
+      "y": 156,
+      "w": 40,
+      "h": 40
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 61,
+      "y": 37,
+      "w": 45,
+      "h": 33
+     },
+     "frame": {
+      "x": 417,
+      "y": 3,
+      "w": 45,
+      "h": 33
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 62,
+      "y": 47,
+      "w": 48,
+      "h": 24
+     },
+     "frame": {
+      "x": 57,
+      "y": 993,
+      "w": 48,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/n/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 63,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 182,
+      "y": 689,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/n/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 63,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 182,
+      "y": 689,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 16,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 57,
+      "y": 553,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 57,
+      "y": 18,
+      "w": 24,
+      "h": 48
+     },
+     "frame": {
+      "x": 103,
+      "y": 165,
+      "w": 24,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 58,
+      "y": 22,
+      "w": 33,
+      "h": 45
+     },
+     "frame": {
+      "x": 291,
+      "y": 216,
+      "w": 33,
+      "h": 45
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 60,
+      "y": 28,
+      "w": 40,
+      "h": 40
+     },
+     "frame": {
+      "x": 321,
+      "y": 100,
+      "w": 40,
+      "h": 40
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 61,
+      "y": 37,
+      "w": 45,
+      "h": 33
+     },
+     "frame": {
+      "x": 85,
+      "y": 773,
+      "w": 45,
+      "h": 33
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 62,
+      "y": 47,
+      "w": 48,
+      "h": 24
+     },
+     "frame": {
+      "x": 111,
+      "y": 990,
+      "w": 48,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/ne/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 63,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 211,
+      "y": 635,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/ne/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 63,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 211,
+      "y": 635,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 16,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 57,
+      "y": 608,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 47,
+      "y": 18,
+      "w": 24,
+      "h": 48
+     },
+     "frame": {
+      "x": 103,
+      "y": 219,
+      "w": 24,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 37,
+      "y": 22,
+      "w": 33,
+      "h": 45
+     },
+     "frame": {
+      "x": 262,
+      "y": 54,
+      "w": 33,
+      "h": 45
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 28,
+      "y": 28,
+      "w": 40,
+      "h": 40
+     },
+     "frame": {
+      "x": 361,
+      "y": 54,
+      "w": 40,
+      "h": 40
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 37,
+      "w": 45,
+      "h": 33
+     },
+     "frame": {
+      "x": 85,
+      "y": 812,
+      "w": 45,
+      "h": 33
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 47,
+      "w": 48,
+      "h": 24
+     },
+     "frame": {
+      "x": 136,
+      "y": 773,
+      "w": 48,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/nw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 236,
+      "y": 657,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/nw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 236,
+      "y": 657,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 16,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 79,
+      "y": 608,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 57,
+      "y": 18,
+      "w": 24,
+      "h": 48
+     },
+     "frame": {
+      "x": 112,
+      "y": 57,
+      "w": 24,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 58,
+      "y": 22,
+      "w": 33,
+      "h": 45
+     },
+     "frame": {
+      "x": 293,
+      "y": 3,
+      "w": 33,
+      "h": 45
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 60,
+      "y": 28,
+      "w": 40,
+      "h": 40
+     },
+     "frame": {
+      "x": 371,
+      "y": 3,
+      "w": 40,
+      "h": 40
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 61,
+      "y": 37,
+      "w": 45,
+      "h": 33
+     },
+     "frame": {
+      "x": 85,
+      "y": 851,
+      "w": 45,
+      "h": 33
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 62,
+      "y": 47,
+      "w": 48,
+      "h": 24
+     },
+     "frame": {
+      "x": 171,
+      "y": 713,
+      "w": 48,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/s/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 63,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 256,
+      "y": 543,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/s/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 63,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 256,
+      "y": 543,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 16,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 101,
+      "y": 608,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 57,
+      "y": 18,
+      "w": 24,
+      "h": 48
+     },
+     "frame": {
+      "x": 113,
+      "y": 3,
+      "w": 24,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 58,
+      "y": 22,
+      "w": 33,
+      "h": 45
+     },
+     "frame": {
+      "x": 332,
+      "y": 3,
+      "w": 33,
+      "h": 45
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 60,
+      "y": 28,
+      "w": 40,
+      "h": 40
+     },
+     "frame": {
+      "x": 330,
+      "y": 202,
+      "w": 40,
+      "h": 40
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 61,
+      "y": 37,
+      "w": 45,
+      "h": 33
+     },
+     "frame": {
+      "x": 85,
+      "y": 890,
+      "w": 45,
+      "h": 33
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 62,
+      "y": 47,
+      "w": 48,
+      "h": 24
+     },
+     "frame": {
+      "x": 171,
+      "y": 743,
+      "w": 48,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/se/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 63,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 256,
+      "y": 565,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/se/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 63,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 256,
+      "y": 565,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 16,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 123,
+      "y": 608,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 47,
+      "y": 18,
+      "w": 24,
+      "h": 48
+     },
+     "frame": {
+      "x": 112,
+      "y": 111,
+      "w": 24,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 37,
+      "y": 22,
+      "w": 33,
+      "h": 45
+     },
+     "frame": {
+      "x": 307,
+      "y": 267,
+      "w": 33,
+      "h": 45
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 28,
+      "y": 28,
+      "w": 40,
+      "h": 40
+     },
+     "frame": {
+      "x": 361,
+      "y": 146,
+      "w": 40,
+      "h": 40
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 37,
+      "w": 45,
+      "h": 33
+     },
+     "frame": {
+      "x": 85,
+      "y": 929,
+      "w": 45,
+      "h": 33
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 47,
+      "w": 48,
+      "h": 24
+     },
+     "frame": {
+      "x": 182,
+      "y": 659,
+      "w": 48,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/sw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 265,
+      "y": 587,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/sw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 265,
+      "y": 587,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 16,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 61,
+      "y": 663,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 47,
+      "y": 18,
+      "w": 24,
+      "h": 48
+     },
+     "frame": {
+      "x": 142,
+      "y": 111,
+      "w": 24,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 37,
+      "y": 22,
+      "w": 33,
+      "h": 45
+     },
+     "frame": {
+      "x": 282,
+      "y": 105,
+      "w": 33,
+      "h": 45
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 28,
+      "y": 28,
+      "w": 40,
+      "h": 40
+     },
+     "frame": {
+      "x": 367,
+      "y": 100,
+      "w": 40,
+      "h": 40
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 37,
+      "w": 45,
+      "h": 33
+     },
+     "frame": {
+      "x": 165,
+      "y": 968,
+      "w": 45,
+      "h": 33
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 47,
+      "w": 48,
+      "h": 24
+     },
+     "frame": {
+      "x": 211,
+      "y": 605,
+      "w": 48,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/w/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 265,
+      "y": 609,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/die/w/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 56,
+      "w": 49,
+      "h": 16
+     },
+     "frame": {
+      "x": 265,
+      "y": 609,
+      "w": 49,
+      "h": 16
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/detective/idle/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 61,
+      "y": 718,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 188,
+      "y": 3,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 188,
+      "y": 3,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 188,
+      "y": 3,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 61,
+      "y": 718,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 210,
+      "y": 3,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/e/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 210,
+      "y": 3,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/e/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 210,
+      "y": 3,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 83,
+      "y": 663,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 172,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 172,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 172,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 83,
+      "y": 663,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 188,
+      "y": 165,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/n/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 188,
+      "y": 165,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/n/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 188,
+      "y": 165,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 83,
+      "y": 718,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 194,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 194,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 194,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 83,
+      "y": 718,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 210,
+      "y": 165,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/ne/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 210,
+      "y": 165,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/ne/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 210,
+      "y": 165,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 105,
+      "y": 718,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 196,
+      "y": 57,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 196,
+      "y": 57,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 196,
+      "y": 57,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 105,
+      "y": 718,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 216,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/nw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 216,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/nw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 216,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 127,
+      "y": 718,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 232,
+      "y": 165,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 232,
+      "y": 165,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 232,
+      "y": 165,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 127,
+      "y": 718,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 218,
+      "y": 57,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/s/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 218,
+      "y": 57,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/s/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 218,
+      "y": 57,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 149,
+      "y": 718,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 238,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 238,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 238,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 149,
+      "y": 718,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 254,
+      "y": 165,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/se/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 254,
+      "y": 165,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/se/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 254,
+      "y": 165,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 105,
+      "y": 663,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 269,
+      "y": 219,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 269,
+      "y": 219,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 269,
+      "y": 219,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 105,
+      "y": 663,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 232,
+      "y": 3,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/sw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 232,
+      "y": 3,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/sw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 232,
+      "y": 3,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 127,
+      "y": 663,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 240,
+      "y": 57,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 240,
+      "y": 57,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 240,
+      "y": 57,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 127,
+      "y": 663,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 260,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/w/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 260,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/idle/w/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 9,
+      "w": 16,
+      "h": 48
+     },
+     "frame": {
+      "x": 260,
+      "y": 111,
+      "w": 16,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 25,
+      "h": 48
+     },
+     "frame": {
+      "x": 190,
+      "y": 496,
+      "w": 25,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 23,
+      "h": 48
+     },
+     "frame": {
+      "x": 133,
+      "y": 165,
+      "w": 23,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 22,
+      "h": 48
+     },
+     "frame": {
+      "x": 133,
+      "y": 219,
+      "w": 22,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 23,
+      "h": 48
+     },
+     "frame": {
+      "x": 133,
+      "y": 165,
+      "w": 23,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 25,
+      "h": 48
+     },
+     "frame": {
+      "x": 190,
+      "y": 496,
+      "w": 25,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 145,
+      "y": 605,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/e/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 149,
+      "y": 659,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/e/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 145,
+      "y": 605,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 21,
+      "h": 48
+     },
+     "frame": {
+      "x": 161,
+      "y": 219,
+      "w": 21,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 24,
+      "h": 48
+     },
+     "frame": {
+      "x": 142,
+      "y": 57,
+      "w": 24,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 24,
+      "h": 48
+     },
+     "frame": {
+      "x": 143,
+      "y": 3,
+      "w": 24,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 24,
+      "h": 48
+     },
+     "frame": {
+      "x": 142,
+      "y": 57,
+      "w": 24,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 21,
+      "h": 48
+     },
+     "frame": {
+      "x": 161,
+      "y": 219,
+      "w": 21,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 154,
+      "y": 327,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/n/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 179,
+      "y": 327,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/n/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 154,
+      "y": 327,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 157,
+      "y": 443,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 28,
+      "h": 48
+     },
+     "frame": {
+      "x": 168,
+      "y": 388,
+      "w": 28,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 28,
+      "h": 48
+     },
+     "frame": {
+      "x": 123,
+      "y": 443,
+      "w": 28,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 28,
+      "h": 48
+     },
+     "frame": {
+      "x": 168,
+      "y": 388,
+      "w": 28,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 157,
+      "y": 443,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 157,
+      "y": 497,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/ne/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 26,
+      "h": 48
+     },
+     "frame": {
+      "x": 190,
+      "y": 442,
+      "w": 26,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/ne/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 157,
+      "y": 497,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 182,
+      "y": 273,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 202,
+      "y": 381,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 204,
+      "y": 327,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 202,
+      "y": 381,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 182,
+      "y": 273,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 7,
+      "w": 21,
+      "h": 48
+     },
+     "frame": {
+      "x": 188,
+      "y": 219,
+      "w": 21,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/nw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 7,
+      "w": 22,
+      "h": 48
+     },
+     "frame": {
+      "x": 154,
+      "y": 273,
+      "w": 22,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/nw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 7,
+      "w": 21,
+      "h": 48
+     },
+     "frame": {
+      "x": 188,
+      "y": 219,
+      "w": 21,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 207,
+      "y": 273,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 21,
+      "h": 48
+     },
+     "frame": {
+      "x": 215,
+      "y": 219,
+      "w": 21,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 21,
+      "h": 48
+     },
+     "frame": {
+      "x": 242,
+      "y": 219,
+      "w": 21,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 21,
+      "h": 48
+     },
+     "frame": {
+      "x": 215,
+      "y": 219,
+      "w": 21,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 207,
+      "y": 273,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 222,
+      "y": 435,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/s/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 227,
+      "y": 381,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/s/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 222,
+      "y": 435,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 229,
+      "y": 327,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 232,
+      "y": 273,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 257,
+      "y": 273,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 232,
+      "y": 273,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 229,
+      "y": 327,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 282,
+      "y": 273,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/se/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 20,
+      "h": 48
+     },
+     "frame": {
+      "x": 162,
+      "y": 165,
+      "w": 20,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/se/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 19,
+      "h": 48
+     },
+     "frame": {
+      "x": 282,
+      "y": 273,
+      "w": 19,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 157,
+      "y": 551,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 190,
+      "y": 551,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 7,
+      "w": 28,
+      "h": 48
+     },
+     "frame": {
+      "x": 123,
+      "y": 497,
+      "w": 28,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 190,
+      "y": 551,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 157,
+      "y": 551,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 7,
+      "w": 25,
+      "h": 48
+     },
+     "frame": {
+      "x": 221,
+      "y": 496,
+      "w": 25,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/sw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 7,
+      "w": 24,
+      "h": 48
+     },
+     "frame": {
+      "x": 124,
+      "y": 273,
+      "w": 24,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/sw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 7,
+      "w": 25,
+      "h": 48
+     },
+     "frame": {
+      "x": 221,
+      "y": 496,
+      "w": 25,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 223,
+      "y": 551,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 7,
+      "w": 25,
+      "h": 48
+     },
+     "frame": {
+      "x": 82,
+      "y": 3,
+      "w": 25,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 7,
+      "w": 24,
+      "h": 48
+     },
+     "frame": {
+      "x": 124,
+      "y": 327,
+      "w": 24,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 7,
+      "w": 25,
+      "h": 48
+     },
+     "frame": {
+      "x": 82,
+      "y": 3,
+      "w": 25,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 223,
+      "y": 551,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 178,
+      "y": 605,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/w/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 7,
+      "w": 28,
+      "h": 48
+     },
+     "frame": {
+      "x": 123,
+      "y": 551,
+      "w": 28,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/interact/w/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 7,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 178,
+      "y": 605,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 79,
+      "y": 443,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 21,
+      "h": 49
+     },
+     "frame": {
+      "x": 32,
+      "y": 773,
+      "w": 21,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 24,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 223,
+      "w": 24,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 24,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 278,
+      "w": 24,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 21,
+      "h": 49
+     },
+     "frame": {
+      "x": 32,
+      "y": 828,
+      "w": 21,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 79,
+      "y": 498,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 8,
+      "w": 24,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 333,
+      "w": 24,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 8,
+      "w": 20,
+      "h": 49
+     },
+     "frame": {
+      "x": 59,
+      "y": 773,
+      "w": 20,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 79,
+      "y": 553,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 101,
+      "y": 553,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 20,
+      "h": 49
+     },
+     "frame": {
+      "x": 59,
+      "y": 828,
+      "w": 20,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 24,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 388,
+      "w": 24,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 80,
+      "y": 278,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 81,
+      "y": 168,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 17,
+      "h": 49
+     },
+     "frame": {
+      "x": 58,
+      "y": 168,
+      "w": 17,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 23,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 663,
+      "w": 23,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 25,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 3,
+      "w": 25,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 23,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 718,
+      "w": 23,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 8,
+      "w": 23,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 773,
+      "w": 23,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 8,
+      "w": 25,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 58,
+      "w": 25,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 8,
+      "w": 23,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 828,
+      "w": 23,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 23,
+      "y": 8,
+      "w": 17,
+      "h": 49
+     },
+     "frame": {
+      "x": 57,
+      "y": 278,
+      "w": 17,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 81,
+      "y": 223,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 80,
+      "y": 333,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 24,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 443,
+      "w": 24,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 20,
+      "h": 49
+     },
+     "frame": {
+      "x": 59,
+      "y": 883,
+      "w": 20,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 80,
+      "y": 388,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 101,
+      "y": 443,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 8,
+      "w": 20,
+      "h": 49
+     },
+     "frame": {
+      "x": 59,
+      "y": 938,
+      "w": 20,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 8,
+      "w": 24,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 498,
+      "w": 24,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 23,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 883,
+      "w": 23,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 25,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 113,
+      "w": 25,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 23,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 938,
+      "w": 23,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 17,
+      "h": 49
+     },
+     "frame": {
+      "x": 57,
+      "y": 333,
+      "w": 17,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 101,
+      "y": 498,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 102,
+      "y": 278,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 102,
+      "y": 333,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 102,
+      "y": 388,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 23,
+      "y": 8,
+      "w": 17,
+      "h": 49
+     },
+     "frame": {
+      "x": 57,
+      "y": 388,
+      "w": 17,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 8,
+      "w": 23,
+      "h": 49
+     },
+     "frame": {
+      "x": 32,
+      "y": 663,
+      "w": 23,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 8,
+      "w": 25,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 168,
+      "w": 25,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 8,
+      "w": 23,
+      "h": 49
+     },
+     "frame": {
+      "x": 32,
+      "y": 718,
+      "w": 23,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 124,
+      "y": 388,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 8,
+      "w": 21,
+      "h": 49
+     },
+     "frame": {
+      "x": 32,
+      "y": 883,
+      "w": 21,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 8,
+      "w": 24,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 553,
+      "w": 24,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 8,
+      "w": 24,
+      "h": 49
+     },
+     "frame": {
+      "x": 3,
+      "y": 608,
+      "w": 24,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 8,
+      "w": 21,
+      "h": 49
+     },
+     "frame": {
+      "x": 32,
+      "y": 938,
+      "w": 21,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/swing/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 16,
+      "h": 49
+     },
+     "frame": {
+      "x": 146,
+      "y": 388,
+      "w": 16,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 223,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 34,
+      "y": 3,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 247,
+      "y": 435,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 34,
+      "y": 3,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 223,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 34,
+      "y": 3,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/e/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 247,
+      "y": 435,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/e/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 34,
+      "y": 3,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 34,
+      "y": 58,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 34,
+      "y": 113,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 252,
+      "y": 381,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 34,
+      "y": 113,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 34,
+      "y": 58,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 34,
+      "y": 113,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/n/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 252,
+      "y": 381,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/n/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 34,
+      "y": 113,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 34,
+      "y": 168,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 278,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 271,
+      "y": 327,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 278,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 34,
+      "y": 168,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 278,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/ne/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 271,
+      "y": 327,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/ne/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 278,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 333,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 388,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 295,
+      "y": 327,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 388,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 333,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 388,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/nw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 295,
+      "y": 327,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/nw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 388,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 443,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 498,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 252,
+      "y": 489,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 498,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 443,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 498,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/s/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 252,
+      "y": 489,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/s/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 498,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 553,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 608,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 271,
+      "y": 435,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 608,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 553,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 608,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/se/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 271,
+      "y": 435,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/se/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 33,
+      "y": 608,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 57,
+      "y": 223,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 58,
+      "y": 3,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 276,
+      "y": 381,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 58,
+      "y": 3,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 57,
+      "y": 223,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 58,
+      "y": 3,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/sw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 276,
+      "y": 381,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/sw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 58,
+      "y": 3,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 58,
+      "y": 58,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 58,
+      "y": 113,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 172,
+      "y": 57,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 58,
+      "y": 113,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 8,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 58,
+      "y": 58,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 58,
+      "y": 113,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/w/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 48
+     },
+     "frame": {
+      "x": 172,
+      "y": 57,
+      "w": 18,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/detective/walk/w/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 7,
+      "w": 18,
+      "h": 49
+     },
+     "frame": {
+      "x": 58,
+      "y": 113,
+      "w": 18,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    }
+   ]
+  }
+ ],
+ "meta": {
+  "app": "http://github.com/odrick/free-tex-packer-core",
+  "version": "0.3.9"
+ }
+}

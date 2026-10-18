@@ -10,6 +10,8 @@ Rules, per material slot:
 - Principled BSDF with an image on Base Color: the image's pixels snap to the nearest world colour in
   OKLab (alpha kept, image packed) and the material becomes a two-tone toon (lit = texture, shadow =
   slate);
+- a flat Emission material (glowing glass, flames, the blood mask): its colour snaps to the nearest
+  world colour;
 - anything else fails, including "untextured PBR": a Principled BSDF whose look depends on metallic,
   roughness or normal maps with no base-colour source, which no single token can stand for.
 
@@ -151,7 +153,13 @@ def palettize_material(mat: bpy.types.Material, report: dict) -> bpy.types.Mater
         report[mat.name] = "toon"
         return mat
 
+    emit = _find(nodes, "ShaderNodeEmission")
     bsdf = _find(nodes, "ShaderNodeBsdfPrincipled")
+    if bsdf is None and emit is not None and not emit.inputs["Color"].is_linked:
+        # A flat glow (lantern glass, a flame, the blood mask): its colour snaps like a toon input.
+        emit.inputs["Color"].default_value = rc.hex_to_linear(_linear_to_world(emit.inputs["Color"].default_value))
+        report[mat.name] = "emission"
+        return mat
     if bsdf is None:
         raise PaletteError(f"{mat.name}: no toon group and no Principled BSDF")
     base = bsdf.inputs["Base Color"]

@@ -32,7 +32,7 @@ import build_rig  # noqa: E402
 import palettize  # noqa: E402
 import rig_common as rc  # noqa: E402
 
-LOOPING = {"idle", "walk", "run", "carry"}
+LOOPING = {"idle", "walk", "interact", "run", "carry"}
 SMOKE_LIFT_PX = 24
 
 
@@ -255,9 +255,10 @@ def _parts(col) -> dict[str, list[bpy.types.Object]]:
 
 
 def _override_materials() -> dict[str, bpy.types.Material]:
+    # The scarf is drawn on the bone ramp and tinted at runtime; blood is the flat blood mask (S3.3).
     return {
-        "scarf": build_rig.toon_material("PassScarf", "bone", "fog", "slate"),
-        "blood": build_rig.flat_material("PassBlood", "blood"),
+        "scarf": build_rig.ramp_material("PassScarf", rc.ramp_step("bone", 2), "bone"),
+        "blood": build_rig.flat_material("PassBlood", rc.ramp_step("blood", 2)),
     }
 
 
@@ -319,7 +320,7 @@ def render_character(scene, args) -> None:
         print(f"palettize: {name}: {how}")
     for part, objs in parts.items():
         for obj in objs:
-            if part != "blood":
+            if part != "blood" and not obj.get("wdi_glow"):
                 build_rig.add_outline(obj, "character")
     saved = {(o.name, i): s.material for objs in parts.values() for o in objs for i, s in enumerate(o.material_slots)}
     overrides = _override_materials()
