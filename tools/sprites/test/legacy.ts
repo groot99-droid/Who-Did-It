@@ -21,8 +21,6 @@ export const LEGACY: readonly string[] = [
   'tiles_caverock',
   'tiles_forestfloor',
   // L3 (5L): the looks point at their placeholder twins until they are packed
-  'char_detective',
-  'ovl_detective',
   'char_doctor',
   'ovl_doctor',
   'char_vicar',

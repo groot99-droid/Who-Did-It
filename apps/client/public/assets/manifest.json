@@ -24,21 +24,21 @@
     {
       "key": "char_detective",
       "type": "multiatlas",
-      "url": "placeholder/chars/char_detective.json",
-      "path": "placeholder/chars/",
+      "url": "chars/char_detective.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "ovl_detective",
       "type": "multiatlas",
-      "url": "placeholder/chars/ovl_detective.json",
-      "path": "placeholder/chars/",
+      "url": "chars/ovl_detective.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "anims_detective",
       "type": "animation",
-      "url": "placeholder/chars/detective.anims.json"
+      "url": "chars/detective.anims.json"
     },
     {
       "key": "char_doctor",
