@@ -16,6 +16,7 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 | `build_loft.py` | Renders the dark-loft images `loft_backdrop` (1280 x 720) and `prop_bedroll` / `prop_bedroll_self` (112 x 184) through a non-square `SpriteCam` framing |
 | `build_buildings.py` | Renders the four Small-profile exteriors (`bld_<id>_ext`) with the image's bottom middle on the front wall's base |
 | `build_ground.py` | Renders the isometric ground cells (art plan 3.2): each of the 14 materials of both themes in four variants, one metre under IsoCam at 128 x 64 display px, from a Poly Haven texture pulled towards its world-palette colour and a seeded scatter; the variants blend to one shared mapping at the tile edge, so all four tile with each other. `tools/sprites/tileset.ts` joins them |
+| `build_kit.py` | Renders the 44 kit frames of each theme (`<wall\|cliff\|tree\|boulder\|fence\|stack>/<full\|half\|stub>/<0-3>`, art plan 3.3) under IsoCam at twice their art cell, pivoted on the tile centre's ground point; walls and cliffs from code with Poly Haven textures, trees, rocks and stacks from Kenney |
 | `kit_import.py` | Imports a CC0 kit mesh (GLB, glTF, FBX, OBJ), joins it, tags it (`wdi_part`) and re-materials it through `WDI_Toon` in the world palette |
 | `env/kits.py` | The CC0 packs and textures of the world art (Kenney URLs, the Poly Haven ids per theme and material) and their fetch into git-ignored `assets/external/kits/`, saving the licence files; pure Python |
 | `build_tiles.py` | Renders four seamless 64 px straight-down variants of each of the six ground sets (`tiles_<biome>_<v>`) |
@@ -65,6 +66,14 @@ pnpm --filter @wdi/sprites images ../../build/render ../../apps/client/public/as
 python3 tools/blender/env/kits.py --out assets/external/kits --licences LICENSES/vendors
 python tools/blender/build_ground.py -- --out build/render   # build/render/ground/<theme>/
 pnpm --filter @wdi/sprites tileset ../../build/render/ground ../../apps/client/public/assets/ground
+
+# The kits: render, pixel-finish, pack; then the review sheets
+python tools/blender/build_kit.py -- --out build/render     # build/render/iso_kit_<theme>/
+for t in harbour timber; do
+  pnpm --filter @wdi/sprites pixel ../../build/render/iso_kit_$t ../../build/finished/iso_kit_$t
+  pnpm --filter @wdi/sprites pack:static ../../build/finished/iso_kit_$t ../../apps/client/public/assets/kit
+  pnpm --filter @wdi/sprites review:world kit ../../apps/client/public/assets $t ../../assets/source/review/kit-$t.png
+done
 
 # The bakery and loft masters (git-ignored; copy to the ROSW checkout, assets/source/MANIFEST.md)
 python tools/blender/save_masters.py -- --out assets/external

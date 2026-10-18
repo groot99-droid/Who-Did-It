@@ -124,6 +124,26 @@
       ]
     },
     {
+      "key": "iso_kit_harbour",
+      "type": "multiatlas",
+      "url": "kit/iso_kit_harbour.json",
+      "path": "kit/",
+      "filter": "nearest",
+      "maps": [
+        "hollowmere"
+      ]
+    },
+    {
+      "key": "iso_kit_timber",
+      "type": "multiatlas",
+      "url": "kit/iso_kit_timber.json",
+      "path": "kit/",
+      "filter": "nearest",
+      "maps": [
+        "blackpine"
+      ]
+    },
+    {
       "key": "tiles_grass",
       "type": "image",
       "url": "tiles/tiles_grass.png",

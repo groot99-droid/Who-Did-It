@@ -92,10 +92,21 @@ def _base_colour_source(mat):
     return None, tuple(sock.default_value)
 
 
-def retoon(mat: bpy.types.Material, override: str | None = None) -> bpy.types.Material:
-    """A world-palette toon copy of an imported material (`override`: force the mid colour)."""
+def base_name(name: str) -> str:
+    """An imported material's name without Blender's `.001` suffix."""
+    head, _, tail = name.rpartition(".")
+    return head if head and tail.isdigit() else name
+
+
+def retoon(mat: bpy.types.Material, override: str | None = None, ramp: list[str] | None = None) -> bpy.types.Material:
+    """A world-palette toon copy of an imported material.
+
+    `override` forces the mid colour (its ramp gives light and shadow). `ramp` (world hex, dark to light)
+    recolours an image material by luminance: Kenney's colour-map atlases are bright and saturated, and
+    a ramp keeps their shading while moving them into the world's colours.
+    """
     image_node, colour = _base_colour_source(mat)
-    name = f"WT_{mat.name}" + (f"_{override}" if override else "")
+    name = f"WT_{mat.name}" + (f"_{override}" if override else "") + ("_" + "".join(ramp) if ramp else "")
     if name in bpy.data.materials:
         return bpy.data.materials[name]
     out = build_rig._new_material(name)
@@ -107,11 +118,23 @@ def retoon(mat: bpy.types.Material, override: str | None = None) -> bpy.types.Ma
         tex = nodes.new("ShaderNodeTexImage")
         tex.image, tex.interpolation = image_node.image, "Closest"
         links.new(uv.outputs["UV"], tex.inputs["Vector"])
+        colour_out = tex.outputs["Color"]
+        if ramp:
+            bw = nodes.new("ShaderNodeRGBToBW")
+            links.new(colour_out, bw.inputs["Color"])
+            cr = nodes.new("ShaderNodeValToRGB")
+            elems = cr.color_ramp.elements
+            for i, hx in enumerate(ramp):
+                e = elems[i] if i < len(elems) else elems.new(0.0)
+                e.position = i / max(1, len(ramp) - 1)
+                e.color = rc.hex_to_linear(hx)
+            links.new(bw.outputs["Val"], cr.inputs["Fac"])
+            colour_out = cr.outputs["Color"]
         for sock, gain in zip(("Light", "Mid", "Shadow"), TEX_GAINS):
             g = nodes.new("ShaderNodeVectorMath")
             g.operation = "SCALE"
             g.inputs["Scale"].default_value = gain
-            links.new(tex.outputs["Color"], g.inputs[0])
+            links.new(colour_out, g.inputs[0])
             links.new(g.outputs["Vector"], group.inputs[sock])
     else:
         hx = override or nearest_world(tuple(round(rc.linear_to_srgb(c) * 255) for c in colour[:3]))
@@ -151,11 +174,11 @@ def _import(path: str) -> list[bpy.types.Object]:
 
 
 def import_part(path: str, tag: str | None = None, colours: dict[str, str] | None = None,
-                outline: bool = True, name: str | None = None) -> bpy.types.Object:
+                outline: bool = True, name: str | None = None, ramp: list[str] | None = None) -> bpy.types.Object:
     """One joined, re-materialed object from a kit file, its transforms applied, at the world origin.
 
-    `colours` maps an imported material name to a world colour that replaces it (the kit's red banner
-    becomes a brick red, say).
+    `colours` maps an imported material's base name (`leafsGreen`, no `.001`) to the world colour that
+    replaces it; `ramp` recolours its image materials (`retoon`).
     """
     new = _import(path)
     meshes = [o for o in new if o.type == "MESH"]
@@ -179,7 +202,7 @@ def import_part(path: str, tag: str | None = None, colours: dict[str, str] | Non
             bpy.data.objects.remove(o, do_unlink=True)
     for slot in obj.material_slots:
         if slot.material is not None:
-            slot.material = retoon(slot.material, (colours or {}).get(slot.material.name))
+            slot.material = retoon(slot.material, (colours or {}).get(base_name(slot.material.name)), ramp)
     obj.name = name or os.path.splitext(os.path.basename(path))[0]
     obj["wdi_part"] = tag or os.path.relpath(path, KITS)
     if obj.users_collection and bpy.context.scene.collection not in obj.users_collection:

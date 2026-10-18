@@ -14,7 +14,7 @@ function cell(size: number, base: [number, number], shade: string): Buffer {
   return c.toBuffer('image/png');
 }
 
-function sheet(atlas: StaticManifest['atlas'], size: number, pivot: boolean) {
+function sheet(atlas: 'clues' | 'props' | 'vfx', size: number, pivot: boolean) {
   const manifest: StaticManifest = { version: 1, atlas, frames: {} };
   const inputs: PackInput[] = staticFrameNames(atlas).map((name, i) => {
     const base: [number, number] = [size / 2 + (i % 5), size - 20];

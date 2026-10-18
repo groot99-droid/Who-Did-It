@@ -1,0 +1,424 @@
+// Review sheets of the world art (art plan 1.6, 3.10), composited from the packed atlases by the projection of
+// docs/SPRITES.md 10.2 (sx = x - y, sy = (x + y) / 2 on 64 px world tiles), as the client draws them:
+//
+//   tsx review-world.ts gate <assets dir> <out.png> [--finish on|off] [--look baker]
+//   tsx review-world.ts ground <assets dir> <theme> <out.png>
+//   tsx review-world.ts kit <assets dir> <theme> <out.png>
+//
+// `gate` is Gate A's Hollowmere square vignette: ground with blends, kit walls, a tree line, boulders, the
+// hedge-wall, the tavern's slices, the bell, the pump, two lantern posts and a look idling in 8 directions,
+// as a day frame and a night frame (a simulated darkness layer with the lantern pools), each at zoom 1
+// and a zoom-2 crop. Its two runs differ only in the assets folder they read (the same raw renders finished
+// on and off) and the texture filter. Missing frames draw the greybox of SPRITES 10.13.
+import { readFileSync, existsSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createCanvas, loadImage, type Canvas, type Image, type SKRSContext2D } from '@napi-rs/canvas';
+import type { MultiAtlas } from './pack.ts';
+import { CELL_H, CELL_W, COLUMNS, GROUND_ROWS } from './tileset.ts';
+import { KIT_CELLS } from './pack-static.ts';
+
+const BLEND_RANK = 'O~r=wfcdpslmgu'; // packages/content/src/schemas/scene.ts
+const KIT_OF: Record<string, string> = {
+  W: 'wall',
+  T: 'tree',
+  R: 'boulder',
+  X: 'cliff',
+  F: 'fence',
+  K: 'stack',
+};
+const ART_SCALE = 2; // metrics.json iso.artScale
+const INK = '#12141C';
+
+export const toScreen = (wx: number, wy: number) => ({ x: wx - wy, y: (wx + wy) / 2 });
+export const tileCentre = (tx: number, ty: number) => toScreen((tx + 0.5) * 64, (ty + 0.5) * 64);
+
+interface Sprite {
+  img: Image;
+  sx: number;
+  sy: number;
+  sw: number;
+  sh: number;
+  /** Offset of the trimmed frame from the anchor, at scale 1. */
+  dx: number;
+  dy: number;
+}
+
+/** Every frame of a packed multiatlas, keyed by name, positioned against its pivot. */
+export async function readAtlas(json: string): Promise<Map<string, Sprite>> {
+  const out = new Map<string, Sprite>();
+  if (!existsSync(json)) return out;
+  const atlas = JSON.parse(readFileSync(json, 'utf8')) as MultiAtlas;
+  for (const t of atlas.textures) {
+    const img = await loadImage(readFileSync(join(json, '..', t.image)));
+    for (const f of t.frames) {
+      const px = (f.pivot?.x ?? 0.5) * f.sourceSize.w;
+      const py = (f.pivot?.y ?? 0.5) * f.sourceSize.h;
+      out.set(f.filename, {
+        img,
+        sx: f.frame.x,
+        sy: f.frame.y,
+        sw: f.frame.w,
+        sh: f.frame.h,
+        dx: f.spriteSourceSize.x - px,
+        dy: f.spriteSourceSize.y - py,
+      });
+    }
+  }
+  return out;
+}
+
+function draw(g: SKRSContext2D, s: Sprite, x: number, y: number, scale: number): void {
+  g.drawImage(s.img, s.sx, s.sy, s.sw, s.sh, x + s.dx * scale, y + s.dy * scale, s.sw * scale, s.sh * scale);
+}
+
+/** A labelled greybox block standing on (x, y), for a frame the atlases do not have yet. */
+function greybox(g: SKRSContext2D, x: number, y: number, h: number, w = 40): void {
+  g.fillStyle = '#5E6C84';
+  g.fillRect(x - w / 2, y - h, w, h);
+  g.fillStyle = '#8892A2';
+  g.fillRect(x - w / 2, y - h - 10, w, 10);
+}
+
+// ---------------------------------------------------------------- the vignette
+
+/** Hollowmere's square in miniature: ground chars, solid chars (`.` = none) and objects. */
+export const VIGNETTE = {
+  ground: [
+    'gggggggggggggggggg',
+    'ggggggggggggggggpg',
+    'ggcccccccccccccpgg',
+    'ggccccccccccccppgg',
+    'ggcccccccccccppggg',
+    'ggccccccfffccpgggg',
+    'ggccccccfffccpgggg',
+    'ggccccccfffccpppgg',
+    'ggcccccccccccccpgg',
+    'ggcccccccccccccpgg',
+    'ggccccccccccccppgg',
+    'ggggggggggggpppggg',
+    'gggggggggggggppggg',
+    'ggggggggggggggpppg',
+  ],
+  solids: [
+    'TTTT.TTTTT.TTTT.TT',
+    'R...............R.',
+    'F...............F.',
+    'F.......WWWWW...F.',
+    'F.......WWWWW....R',
+    'F................T',
+    '..................',
+    '..................',
+    'F................K',
+    'F................K',
+    'R.................',
+    '..................',
+    'TT.R..........T..T',
+    'TTT.FFFFFFFF...TTT',
+  ],
+  tavern: { x: 2, y: 3, w: 12, h: 7, art: 'tavern' },
+  props: [
+    { frame: 'prop_bell', x: 9, y: 6 },
+    { frame: 'prop_pump', x: 10, y: 8 },
+    { frame: 'prop_lanternPost_lit', x: 6, y: 11 },
+    { frame: 'prop_lanternPost_lit', x: 13, y: 5 },
+  ],
+  /** The look idling in 8 directions on a row south of the square. */
+  people: { x0: 3, y: 12, dirs: ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] },
+};
+
+interface Atlases {
+  ground: Image | null;
+  kit: Map<string, Sprite>;
+  props: Map<string, Sprite>;
+  bld: Map<string, Sprite>;
+  look: Map<string, Sprite>;
+  lookId: string;
+}
+
+async function loadAtlases(assets: string, theme: string, map: string, look: string): Promise<Atlases> {
+  const ground = join(assets, 'ground', `iso_ground_${theme}.png`);
+  const props = await readAtlas(join(assets, 'props', 'props.json'));
+  for (const [k, v] of await readAtlas(join(assets, 'props', `props_${map}.json`))) props.set(k, v);
+  const lookFile = join(assets, 'chars', `char_${look}.json`);
+  const lookId = existsSync(lookFile) ? look : 'villager';
+  return {
+    ground: existsSync(ground) ? await loadImage(readFileSync(ground)) : null,
+    kit: await readAtlas(join(assets, 'kit', `iso_kit_${theme}.json`)),
+    props,
+    bld: await readAtlas(join(assets, 'buildings', `bld_${map}.json`)),
+    look: await readAtlas(join(assets, 'chars', `char_${lookId}.json`)),
+    lookId,
+  };
+}
+
+/** Ground cell of material `char`, cell c, drawn with its top vertex at (x, y). */
+function groundCell(g: SKRSContext2D, a: Atlases, char: string, c: number, x: number, y: number): void {
+  const m = GROUND_ROWS.indexOf(char);
+  if (!a.ground) return;
+  const col = c % COLUMNS;
+  const row = 2 * m + Math.floor(c / COLUMNS);
+  g.drawImage(a.ground, col * CELL_W, row * CELL_H, CELL_W, CELL_H, x - CELL_W / 2, y, CELL_W, CELL_H);
+}
+
+/** The ground layer and the two blend layers of SPRITES 10.12 for a grid of material chars. */
+export function drawGround(g: SKRSContext2D, a: Atlases, grid: string[], ox: number, oy: number): void {
+  const at = (x: number, y: number) => grid[y]?.[x];
+  const variant = (x: number, y: number) => {
+    if (at(x, y) !== '=') return (x * 7 + y * 13) % 4;
+    if (at(x - 1, y) === '=' || at(x + 1, y) === '=') return (x * 7 + y * 13) % 2;
+    if (at(x, y - 1) === '=' || at(x, y + 1) === '=') return 2 + ((x * 7 + y * 13) % 2);
+    return 0;
+  };
+  for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[y]!.length; x++) {
+      const t = toScreen(x * 64, y * 64);
+      groundCell(g, a, at(x, y)!, variant(x, y), ox + t.x, oy + t.y);
+    }
+  }
+  for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[y]!.length; x++) {
+      const own = at(x, y)!;
+      const masks = new Map<string, number>();
+      const sides: Array<[number, number, number]> = [
+        [1, 0, -1],
+        [2, 1, 0],
+        [4, 0, 1],
+        [8, -1, 0],
+      ];
+      for (const [bit, dx, dy] of sides) {
+        const n = at(x + dx, y + dy);
+        if (n && BLEND_RANK.indexOf(n) > BLEND_RANK.indexOf(own)) masks.set(n, (masks.get(n) ?? 0) | bit);
+      }
+      const order = [...masks.keys()]
+        .sort((p, q) => BLEND_RANK.indexOf(q) - BLEND_RANK.indexOf(p))
+        .slice(0, 2);
+      const t = toScreen(x * 64, y * 64);
+      for (const n of order) groundCell(g, a, n, 3 + masks.get(n)!, ox + t.x, oy + t.y);
+    }
+  }
+}
+
+interface Placed {
+  depth: number;
+  paint: () => void;
+}
+
+function vignette(a: Atlases, smooth: boolean): { canvas: Canvas; lights: { x: number; y: number }[] } {
+  const v = VIGNETTE;
+  const w = v.ground[0]!.length;
+  const h = v.ground.length;
+  const ox = h * 64 + 64;
+  const oy = 220;
+  const canvas = createCanvas((w + h) * 64 + 128, ((w + h) * 64) / 2 + oy + 64);
+  const g = canvas.getContext('2d');
+  g.imageSmoothingEnabled = smooth;
+  g.fillStyle = INK;
+  g.fillRect(0, 0, canvas.width, canvas.height);
+  drawGround(g, a, v.ground, ox, oy);
+
+  const placed: Placed[] = [];
+  const at = (tx: number, ty: number) => {
+    const c = tileCentre(tx, ty);
+    return { x: ox + c.x, y: oy + c.y, depth: c.y };
+  };
+  const inTavern = (x: number, y: number) =>
+    x >= v.tavern.x && x < v.tavern.x + v.tavern.w && y >= v.tavern.y && y < v.tavern.y + v.tavern.h;
+  v.solids.forEach((row, y) =>
+    [...row].forEach((ch, x) => {
+      const kind = KIT_OF[ch];
+      if (!kind || inTavern(x, y)) return;
+      const p = at(x, y);
+      const frame = `${kind}/full/${(x * 7 + y * 13) % 4}`;
+      const s = a.kit.get(frame);
+      const cell = KIT_CELLS[`${kind}/full`]!;
+      placed.push({
+        depth: p.depth,
+        paint: () => (s ? draw(g, s, p.x, p.y, ART_SCALE) : greybox(g, p.x, p.y, cell[1] * 1.5)),
+      });
+    }),
+  );
+  for (let dy = 0; dy < v.tavern.h; dy++) {
+    for (let dx = 0; dx < v.tavern.w; dx++) {
+      const p = at(v.tavern.x + dx, v.tavern.y + dy);
+      const s = a.bld.get(`${v.tavern.art}#${dx}_${dy}`);
+      const anchor = toScreen((v.tavern.x + v.tavern.w / 2) * 64, (v.tavern.y + v.tavern.h / 2) * 64);
+      placed.push({
+        depth: p.depth,
+        paint: () =>
+          s
+            ? draw(g, s, ox + anchor.x, oy + anchor.y, ART_SCALE)
+            : dx === 0 || dy === 0
+              ? undefined
+              : greybox(g, p.x, p.y, 150, 128),
+      });
+    }
+  }
+  const lights: { x: number; y: number }[] = [];
+  for (const pr of v.props) {
+    const p = at(pr.x, pr.y);
+    const s = a.props.get(pr.frame);
+    if (pr.frame.startsWith('prop_lanternPost')) lights.push({ x: p.x, y: p.y - 100 });
+    placed.push({
+      depth: p.depth,
+      paint: () => (s ? draw(g, s, p.x, p.y, ART_SCALE) : greybox(g, p.x, p.y, 90, 24)),
+    });
+  }
+  v.people.dirs.forEach((dir, i) => {
+    const p = at(v.people.x0 + i, v.people.y);
+    const s = a.look.get(`char/${a.lookId}/idle/${dir}/000`);
+    placed.push({
+      depth: p.depth + 0.5,
+      paint: () => (s ? draw(g, s, p.x, p.y, ART_SCALE) : greybox(g, p.x, p.y, 100, 30)),
+    });
+  });
+  placed.sort((p, q) => p.depth - q.depth);
+  for (const p of placed) p.paint();
+  return { canvas, lights };
+}
+
+/** The night frame: the darkness ambient (ink 0.9, metrics.json lighting) with soft lantern pools and glows. */
+function night(src: Canvas, lights: { x: number; y: number }[]): Canvas {
+  const out = createCanvas(src.width, src.height);
+  const g = out.getContext('2d');
+  g.drawImage(src, 0, 0);
+  const dark = createCanvas(src.width, src.height);
+  const d = dark.getContext('2d');
+  d.fillStyle = 'rgba(18,20,28,0.9)';
+  d.fillRect(0, 0, dark.width, dark.height);
+  d.globalCompositeOperation = 'destination-out';
+  for (const l of lights) {
+    const r = 260;
+    const grad = d.createRadialGradient(l.x, l.y + 100, 0, l.x, l.y + 100, r);
+    grad.addColorStop(0, 'rgba(0,0,0,1)');
+    grad.addColorStop(0.55, 'rgba(0,0,0,0.8)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    d.fillStyle = grad;
+    d.beginPath();
+    d.ellipse(l.x, l.y + 100, r, r / 2, 0, 0, 2 * Math.PI);
+    d.fill();
+  }
+  g.drawImage(dark, 0, 0);
+  g.globalCompositeOperation = 'lighter';
+  for (const l of lights) {
+    const grad = g.createRadialGradient(l.x, l.y, 0, l.x, l.y, 180);
+    grad.addColorStop(0, 'rgba(255,180,87,0.25)');
+    grad.addColorStop(1, 'rgba(255,180,87,0)');
+    g.fillStyle = grad;
+    g.fillRect(l.x - 180, l.y - 180, 360, 360);
+  }
+  return out;
+}
+
+/** Gate A: day and night at zoom 1 above, a zoom-2 crop of each below. */
+export async function gateSheet(assets: string, smooth: boolean, look = 'baker'): Promise<Buffer> {
+  const a = await loadAtlases(assets, 'harbour', 'hollowmere', look);
+  const { canvas: day, lights } = vignette(a, smooth);
+  const nightC = night(day, lights);
+  const cw = 760;
+  const ch = 420;
+  const out = createCanvas(day.width * 2 + 32, day.height + ch * 2 + 48);
+  const g = out.getContext('2d');
+  g.imageSmoothingEnabled = smooth;
+  g.fillStyle = INK;
+  g.fillRect(0, 0, out.width, out.height);
+  g.drawImage(day, 0, 0);
+  g.drawImage(nightC, day.width + 32, 0);
+  const cx = day.width / 2 - cw / 4;
+  const cy = day.height / 2 - ch / 4 - 40;
+  g.drawImage(day, cx, cy, cw / 2, ch / 2, 0, day.height + 32, cw, ch);
+  g.drawImage(nightC, cx, cy, cw / 2, ch / 2, day.width + 32, day.height + 32, cw, ch);
+  return out.toBuffer('image/png');
+}
+
+/** A test patch of one theme's ground at zoom 1, with a zoom-2 crop. */
+export async function groundSheet(assets: string, theme: string): Promise<Buffer> {
+  const a = await loadAtlases(assets, theme, theme === 'harbour' ? 'hollowmere' : 'blackpine', 'none');
+  const grid = [
+    'gggggggggggggg',
+    'gggggppppggggg',
+    'ggcccccccpgggg',
+    'ggcccccccpglll',
+    'gccccffcccplll',
+    'gccccffccccpll',
+    'ggcccccccgggll',
+    'gggccccggguull',
+    'sssssggg==guul',
+    '~~~ssssg==ssuu',
+    'OO~~~sss==ss~~',
+    'OOOO~~~~=====~',
+    'OOOOOO~~~~~~OO',
+    'OOOOOOOOOOOOOO',
+  ];
+  const n = grid.length;
+  const day = createCanvas(n * 128 + 128, n * 64 + 64);
+  const g = day.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  g.fillStyle = INK;
+  g.fillRect(0, 0, day.width, day.height);
+  drawGround(g, a, grid, n * 64 + 64, 32);
+  const out = createCanvas(day.width, day.height + 640);
+  const o = out.getContext('2d');
+  o.imageSmoothingEnabled = false;
+  o.fillStyle = INK;
+  o.fillRect(0, 0, out.width, out.height);
+  o.drawImage(day, 0, 0);
+  o.drawImage(
+    day,
+    day.width / 2 - 320,
+    day.height / 2 - 160,
+    640,
+    320,
+    day.width / 2 - 640,
+    day.height,
+    1280,
+    640,
+  );
+  return out.toBuffer('image/png');
+}
+
+/** Every frame of a kit in its grid order, drawn standing on a ground diamond, at 2x (the draw scale). */
+export async function kitSheet(assets: string, theme: string): Promise<Buffer> {
+  const a = await loadAtlases(assets, theme, 'none', 'none');
+  const names = [...a.kit.keys()].sort();
+  const cols = 8;
+  const out = createCanvas(cols * 200, Math.ceil(names.length / cols) * 300);
+  const g = out.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  g.fillStyle = '#2C3240';
+  g.fillRect(0, 0, out.width, out.height);
+  names.forEach((name, i) => {
+    const x = (i % cols) * 200 + 100;
+    const y = Math.floor(i / cols) * 300 + 270;
+    groundCell(g, a, theme === 'harbour' ? 'c' : 'p', 0, x, y - 32);
+    draw(g, a.kit.get(name)!, x, y, ART_SCALE);
+  });
+  return out.toBuffer('image/png');
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const args = process.argv.slice(2);
+  const fi = args.indexOf('--finish');
+  const li = args.indexOf('--look');
+  const smooth = fi >= 0 && args[fi + 1] === 'off';
+  const look = li >= 0 ? args[li + 1]! : 'baker';
+  const flags = new Set([fi, li].filter((i) => i >= 0).flatMap((i) => [i, i + 1]));
+  const rest = args.filter((_, i) => !flags.has(i));
+  const [mode, assets, ...more] = rest;
+  let png: Buffer;
+  let out: string | undefined;
+  if (mode === 'gate' && assets) {
+    out = more[0];
+    png = await gateSheet(assets, smooth, look);
+  } else if ((mode === 'ground' || mode === 'kit') && assets && more[0]) {
+    out = more[1];
+    png = mode === 'ground' ? await groundSheet(assets, more[0]) : await kitSheet(assets, more[0]);
+  } else {
+    console.error('usage: tsx review-world.ts gate <assets> <out.png> [--finish on|off] [--look id]');
+    console.error('       tsx review-world.ts ground|kit <assets> <theme> <out.png>');
+    process.exit(2);
+  }
+  if (!out) process.exit(2);
+  writeFileSync(out, png);
+  console.log(`review-world: ${mode} -> ${out}`);
+}

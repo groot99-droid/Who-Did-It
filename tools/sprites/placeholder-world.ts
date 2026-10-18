@@ -4,7 +4,7 @@
 import { createCanvas, type SKRSContext2D } from '@napi-rs/canvas';
 import { PROP_KEYS } from './keys.ts';
 import { atlasJson, packFrames, type PackInput } from './pack.ts';
-import { packStatic, type StaticManifest } from './pack-static.ts';
+import { KIT_CELLS, KIT_FRAMES, KIT_THEMES, packStatic, type StaticManifest } from './pack-static.ts';
 import {
   CELL_H,
   CELL_W,
@@ -207,6 +207,67 @@ export function groundTilesetImage(theme: string): Buffer {
   });
   g.putImageData(img, 0, 0);
   return c.toBuffer('image/png');
+}
+
+// ---------------------------------------------------------------- isometric kits (art plan 3.3)
+
+/** Greybox height (art px above the ground point) and tones of each kit family. */
+const KIT_GREY: Record<string, { h: number; side: Token; top: Token; w: number }> = {
+  'wall/full': { h: 74, side: 'fog', top: 'bone', w: 32 },
+  'wall/half': { h: 35, side: 'fog', top: 'bone', w: 32 },
+  'wall/stub': { h: 9, side: 'fog', top: 'bone', w: 32 },
+  'cliff/full': { h: 74, side: 'slate', top: 'fog', w: 32 },
+  'cliff/half': { h: 35, side: 'slate', top: 'fog', w: 32 },
+  'cliff/stub': { h: 12, side: 'slate', top: 'fog', w: 32 },
+  'tree/full': { h: 90, side: 'slate', top: 'teal', w: 10 },
+  'tree/stub': { h: 10, side: 'slate', top: 'mustard', w: 9 },
+  'boulder/full': { h: 30, side: 'slate', top: 'fog', w: 16 },
+  'fence/full': { h: 22, side: 'slate', top: 'teal', w: 28 },
+  'stack/full': { h: 34, side: 'mustard', top: 'bone', w: 20 },
+};
+
+/**
+ * A greybox kit (SPRITES 10.13): every frame a block on its tile's ground point, half a diamond `w` px wide,
+ * the real frame's art cell and pivot; trees get a crown. Variant v is marked with v + 1 ink ticks.
+ */
+export function kitFrames(theme: string): { manifest: StaticManifest; inputs: PackInput[] } {
+  const manifest: StaticManifest = { version: 1, atlas: `iso_kit_${theme}`, frames: {} };
+  const inputs: PackInput[] = [];
+  for (const [kind, height] of KIT_FRAMES) {
+    const fam = `${kind}/${height}`;
+    const [cw, chh] = KIT_CELLS[fam]!;
+    const grey = KIT_GREY[fam]!;
+    for (let v = 0; v < 4; v++) {
+      const c = createCanvas(cw, chh);
+      const g = c.getContext('2d');
+      const px = cw / 2;
+      const py = chh - 16;
+      const w = grey.w;
+      const top = py - grey.h;
+      shape(g, grey.side, () => {
+        g.moveTo(px - w, py - w / 2);
+        g.lineTo(px, py);
+        g.lineTo(px + w, py - w / 2);
+        g.lineTo(px + w, top - w / 2);
+        g.lineTo(px - w, top - w / 2);
+        g.closePath();
+      });
+      shape(g, grey.top, () => {
+        g.moveTo(px - w, top - w / 2);
+        g.lineTo(px, top);
+        g.lineTo(px + w, top - w / 2);
+        g.lineTo(px, top - w);
+        g.closePath();
+      });
+      if (fam === 'tree/full') shape(g, 'teal', () => g.ellipse(px, top - 18, 30, 26, 0, 0, 2 * Math.PI));
+      g.fillStyle = PALETTE.ink;
+      for (let k = 0; k <= v; k++) g.fillRect(px - 6 + k * 4, py - 6, 2, 3);
+      const name = `${fam}/${v}`;
+      manifest.frames[name] = { file: `${name}.png`, cell: [cw, chh], pivot: [px, py] };
+      inputs.push({ name, png: c.toBuffer('image/png') });
+    }
+  }
+  return { manifest, inputs };
 }
 
 // ---------------------------------------------------------------- props, vfx, loft (greybox marks)
@@ -429,6 +490,26 @@ export function placeholderEntries(): PlaceholderEntry[] {
           } as ManifestEntry,
         ],
         files: () => new Map([[`ground/${key}.png`, groundTilesetImage(theme)]]),
+      };
+    }),
+    ...KIT_THEMES.map((theme): PlaceholderEntry => {
+      const key = `iso_kit_${theme}`;
+      return {
+        order: 66,
+        entries: [
+          {
+            key,
+            type: 'multiatlas',
+            url: `kit/${key}.json`,
+            path: 'kit/',
+            filter: 'nearest',
+            maps: [GROUND_MAPS[theme]],
+          } as ManifestEntry,
+        ],
+        files: async () => {
+          const kit = kitFrames(theme);
+          return inFolder('kit/', await packStatic(kit.manifest, kit.inputs));
+        },
       };
     }),
     ...Object.keys(TILESETS).map((biome): PlaceholderEntry => {

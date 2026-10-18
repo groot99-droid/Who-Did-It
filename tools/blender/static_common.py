@@ -306,7 +306,7 @@ def hex_flat(name: str, hx: str) -> bpy.types.Material:
 
 
 def tex_toon(name: str, image_path: str, metres: float = 2.0, gains=(1.15, 0.85, 0.55), tint=None):
-    """Textured toon: the image (one repeat per `metres` in object XY) through the toon bands.
+    """Textured toon: the image (box-projected, one repeat per `metres` of object space) through the toon bands.
 
     The three bands are the texture times `gains` (light, mid, shadow), so a lit face, a side face and a
     face turned away read as the toon's three tones of the same surface. `tint` (hex) multiplies it.
@@ -324,6 +324,7 @@ def tex_toon(name: str, image_path: str, metres: float = 2.0, gains=(1.15, 0.85,
     tex = nodes.new("ShaderNodeTexImage")
     tex.image = bpy.data.images.load(os.path.abspath(image_path), check_existing=True)
     tex.interpolation = "Cubic"
+    tex.projection, tex.projection_blend = "BOX", 0.1  # walls and tops alike, no stretched sides
     links.new(scale.outputs["Vector"], tex.inputs["Vector"])
     colour = tex.outputs["Color"]
     if tint:
