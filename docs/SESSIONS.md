@@ -2021,6 +2021,28 @@ tracks that none of them holds.
 
 ### Round 5 log: 5H (NPC routines and fixes)
 
+Branch `claude/r5-npc`, one draft PR (the brief's five steps are five commits of it; the work did not split into PRs under
+400 lines because `routine.ts`, `world.ts` and their tests are one piece). What landed:
+- **Streams**: every NPC draw is from `npcPlay:<seatId>` or `npcTiming:<seatId>` (`playRng`, `timingRng` in
+  `sim/npc/memory.ts`); `NpcMemory.rng` and the `quick` branch of `runMeetingVotes` are gone; the card-blind draws
+  (strike roll, the vote's four uniforms and the per-second tie roll, the night-power tick and pick at each dusk and
+  Final Night hunt, the Last Shot delay) are made by every NPC.
+- **Routine** (`sim/npc/routine.ts`, `world.ts`, `walk.ts`): persona, stations by kind from `routines.json`, work, strolls,
+  idles, scene dwell, the 12 s walking cap, stuck goals, Collect on clues, the startle and report at a body for every NPC,
+  the placement idle, the lit-scenes-at-night rule with the seeded leave delay and the walk home, the Killer's hunt.
+- **Meetings, ready**: the vote tick over `npc.vote.windowFrac`, `npcVoteTarget` (confession, plurality, suspect,
+  forced random), NPC seats Ready after `npc.ready.delayS` on the role card, after Add NPC and after the lobby return.
+- **Tests**: `npcRoutine` (P1-P4, R1-R18), `npcBrain` (M1-M7 and the walking, report and Killer cases), `npc` (D1-D4),
+  `presence` (A1-A5), `npcTells` (E1-E3, four seed sets under `WDI_SLOW=1`), the helpers `advance`, `holdPhase`,
+  `standardParty`. The whole NPC suite runs in about 40 s of wall time, none of it asleep.
+- **CI**: the server suite in its own job. **Docs**: GDD 3.12 (one-door trips, pause and resume, stuck by movement, the
+  hunt), ARCHITECTURE 5.12, DECISIONS A59.
+- **For the orchestrator** (contract changes, not made here): `isKillPhase` in `sim/World.ts` should read
+  `abilities.json` `kill.phases` once 5G lands (the Final Night strike test of `npcBrain.test.ts` is `skipIf` until then);
+  the Final Night itself is 5G's, so E1 ends its match white-box at round 5 until it exists; 5G adds
+  `brain.lastShotAtTick` (a delay in ticks) to the tick its Last Shot aim starts; the NPC Killer sends
+  `priv.avatar || seatId` as its Kill target, so it follows 5F with no change.
+
 ### Round 5 log: 5I (isometric client and lighting)
 
 ### Round 5 log: 5J (maps)

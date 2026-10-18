@@ -263,20 +263,22 @@ export function runWorldNpc(
     return stand(p);
   }
 
-  // A placement: stand before the routine resumes.
-  if (tick < brain.placementIdleUntilTick) return stand(p);
-
-  // Night: keep to lit scenes (GDD 3.12 "Night").
+  // Night: keep to lit scenes (GDD 3.12 "Night"). The leave delay is drawn on the first such tick, even while a
+  // placement idle still holds the seat.
   const cls = phaseClassOf(room.state.phase);
   let restrict = false;
+  let goHome = false;
   if (cls === 'night' && !litAtNight(sceneKey(p.sceneIdx))) {
     if (brain.leaveAtTick < 0) {
       brain.leaveAtTick = tick + spanTicks(playRng(room, id), balance.npc.night.leaveDelayS);
     }
-    if (tick >= brain.leaveAtTick) {
-      if (runHome(room, brain, player, p)) return;
-    } else restrict = true;
+    if (tick >= brain.leaveAtTick) goHome = true;
+    else restrict = true;
   } else brain.leaveAtTick = -1;
+
+  // A placement: stand before the routine resumes.
+  if (tick < brain.placementIdleUntilTick) return stand(p);
+  if (goHome && runHome(room, brain, player, p)) return;
 
   if (!mem.routine) {
     brain.mode = 'fallback';
