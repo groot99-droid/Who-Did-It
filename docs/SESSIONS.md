@@ -2056,3 +2056,7 @@ tracks that none of them holds.
   - Gate C is answered (the pixel finish is the 8-bit style), and so is the provenance (Nano Banana Pro). Google's
     terms rows are in `LICENSES/vendors/README.md`.
   - Still open: the Brick Oven pick.
+- **Brick Oven (2026-10-18)**: the owner picked D (`99cad74c`). `pick` and the oven's `locBoxes` and `floorBoxes`
+  are set, and `onub_station_oven`, its kitchen quadrant, `onub_loc_oven` and the oven's Ingredient cards are rebuilt
+  in both styles; no greybox is left. The real oven pushed the low-poly set past 4 MiB, so the
+  generated and composed art goes to quality 82 (3.85 MiB; A64). The three retake MANIFEST rows now cite their new generation ids.

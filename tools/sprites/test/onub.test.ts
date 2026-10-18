@@ -171,11 +171,11 @@ describe('ONUB cards (art plan 5.5)', () => {
 describe('the 5M batch (art plan 2.2, 2.3)', () => {
   const batch = readBatch();
 
-  it('record jobs for every item and a pick for all but the owner-picked oven', () => {
+  it("record jobs and a pick for every item (the oven is the owner's pick D)", () => {
     for (const item of batch.items) {
       expect(item.jobs.length, item.key).toBeGreaterThanOrEqual(item.count);
-      if (item.key === 'onub_station_oven') expect(item.pick).toBeNull();
-      else expect(item.jobs, item.key).toContain(item.pick);
+      expect(item.jobs, item.key).toContain(item.pick);
+      if (item.key === 'onub_station_oven') expect(item.pick).toBe(item.jobs[3]);
       if (item.template === 'T5') expect(item.cutout, item.key).toMatch(/^[0-9a-f-]{36}$/);
     }
     expect(batch.items.reduce((n, i) => n + i.jobs.length, 0)).toBeLessThanOrEqual(100);

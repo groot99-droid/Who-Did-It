@@ -408,21 +408,24 @@ export function quadrant(img: Rgba, box?: Box, k = 1): Rgba {
 export { encodePng, encodeWebp, hexToRgb, upscaleNearest };
 
 /**
- * The lossy quality of the low-poly style's generated art (cards, cloche, portraits). The rooms keep
- * `offWebpQuality` (art plan 1.9); at that quality the whole set came to 4.30 MB, so the smaller generated
- * images give a little to keep it within the 4 MiB of 1.9 (DECISIONS A64).
+ * The lossy quality of the low-poly style's generated and composed art (cards, cloche, portraits, the
+ * generated rooms and the kitchen). The owner's 13 rooms keep `offWebpQuality` (art plan 1.9); with
+ * everything at that quality the set came to 4.30 MB, over the 4 MiB of 1.9 (DECISIONS A64).
  */
-export const LOWPOLY_ART_QUALITY = 85;
+export const LOWPOLY_ART_QUALITY = 82;
 
 /**
  * One image of a style: the 8-bit style's art-size image x`SCALE` nearest as lossless WebP; the low-poly
- * style's image, already at the shipped size, as lossy WebP (`offWebpQuality` for rooms/, else
- * `LOWPOLY_ART_QUALITY`).
+ * style's image, already at the shipped size, as lossy WebP at `quality`.
  */
-export async function writeImage(path: string, art: Rgba, style: ArtStyle = artStyles()[0]!): Promise<void> {
+export async function writeImage(
+  path: string,
+  art: Rgba,
+  style: ArtStyle = artStyles()[0]!,
+  quality = LOWPOLY_ART_QUALITY,
+): Promise<void> {
   const file = join(styleOut(style), `${path}.webp`);
   mkdirSync(dirname(file), { recursive: true });
-  const quality = path.startsWith('rooms/') ? offWebpQuality : LOWPOLY_ART_QUALITY;
   writeFileSync(
     file,
     style.pixelFinish ? await encodeWebp(upscaleNearest(art, SCALE)) : await encodeWebp(art, quality),
@@ -532,7 +535,8 @@ async function buildStyle(l: Look, o: { only?: 'cards' | 'mini' }, inp: BuildInp
   const out = styleOut(l.style);
   const write = async (path: string, art: Rgba, isGrey: boolean, key: string) => {
     if (isGrey) greyboxed.add(key);
-    await writeImage(path, art, l.style);
+    // an owner's room (the only source with a crop) keeps offWebpQuality in low poly
+    await writeImage(path, art, l.style, sources.get(key)?.crop ? offWebpQuality : LOWPOLY_ART_QUALITY);
   };
   const fitted = async (key: string, w: number, h: number): Promise<Rgba> => {
     const cut = await cutout(key);

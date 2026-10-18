@@ -999,9 +999,9 @@ ONUB block to `assets/lowpoly/manifest.json` (`"art": "lowpoly"`, the atlas `lin
 outlined. The owner's rooms are cropped and box-downscaled straight to 1920 x 1080. The generated portraits are
 treated the same way at 384 x 576, and cutouts are fitted at three times their art box, keeping their soft edges.
 The kitchen, the cards and the backs are composed at the shipped size: their code-drawn frames, bands and fields
-are enlarged with nearest, and the room window, floor and object are pasted in smooth. Rooms are lossy WebP at
-`offWebpQuality` (90). Cards, the cloche and portraits are at `LOWPOLY_ART_QUALITY` (85), which keeps the set within
-4 MiB (3.9 MiB). `onub_mini` keeps its 512 page and art-size frames, packed from smooth objects. Its fire loop finds
+are enlarged with nearest, and the room window, floor and object are pasted in smooth. The owner's 13 rooms are lossy WebP
+at `offWebpQuality` (90). The generated rooms, the kitchen, cards, the cloche and portraits are at
+`LOWPOLY_ART_QUALITY` (82), which keeps the set within 4 MiB (3.85 MiB). `onub_mini` keeps its 512 page and art-size frames, packed from smooth objects. Its fire loop finds
 the lantern pixels on a snapped copy and scales each pixel's own colour.
 
 **Tests.** `tools/sprites/test/onub.test.ts`: every key in both manifests with its type and `modes`, no loft key,

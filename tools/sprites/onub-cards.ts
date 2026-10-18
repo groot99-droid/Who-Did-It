@@ -117,7 +117,7 @@ function overlay(sabotage: boolean, k: number): Rgba {
   return upscaleNearest(img, k);
 }
 
-/** A code-drawn floor for a station without a room yet (the oven until its pick): brick tiles, at scale `k`. */
+/** A code-drawn floor for a station whose room is missing (a pick not downloaded): brick tiles, at scale `k`. */
 export function tileFloor(rampName = 'brick', k = 1): Rgba {
   return upscaleNearest(tiles(rampName), k);
 }
