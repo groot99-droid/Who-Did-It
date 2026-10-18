@@ -1,6 +1,6 @@
 import onubBalance from '@wdi/content/data/balance.onub.json';
 import type { NightRevealEntry, OnubLegalAct, OnubWakeView, S2CPayloads } from '@wdi/shared/protocol';
-import { pantrySlot, seatSlot } from '../../ui/onub/slots';
+import { pantrySlot, parseSlot, seatSlot } from '../../ui/onub/slots';
 import type { OnubClaimView } from '../onub';
 import { ONUB_PHASE } from '../onubRouter';
 import type { MockOnubContext, MockOnubNightHalf } from './onubMock';
@@ -9,7 +9,15 @@ import type { MockOnubContext, MockOnubNightHalf } from './onubMock';
 // Morning Rush claims, on the composer's fixed 5-seat deal. The windows of the deck run in order with their
 // fades and no jitter; the self seat wakes in the window of its dealt role. The bots never act.
 
-type Window = (typeof onubBalance.windows)[number];
+interface Window {
+  role: string;
+  seconds: number;
+  seeEachOther: boolean;
+  sees: readonly string[];
+  acts: readonly string[];
+  onlyIfAlone: boolean;
+  onTimeout: string;
+}
 type Act = (typeof onubBalance.acts)[keyof typeof onubBalance.acts];
 
 /** The Pantry Location cards of the mock deal (stations, repeats allowed). */
@@ -24,7 +32,43 @@ export function createNightMock(ctx: MockOnubContext): MockOnubNightHalf {
   let open = '';
   let wake: S2CPayloads['nightWake'] | null = null;
   let reveals: NightRevealEntry[] = [];
-  const cloche = '';
+  let cloche = '';
+
+  // The table as dealt: Role cards from the deal, Location cards cycling the stations, the Pantry's from the deal.
+  const stationIds = onubBalance.stations.map((st) => st.id);
+  const roles = new Map<string, string>();
+  const locs = new Map<string, string>();
+  const reset = () => {
+    roles.clear();
+    locs.clear();
+    ctx.deal.seats.forEach((st, i) => {
+      roles.set(seatSlot(i, 'role'), ctx.deal.dealt[st.id] ?? '');
+      locs.set(seatSlot(i, 'loc'), stationIds[i % stationIds.length] ?? '');
+    });
+    ctx.deal.pantryRoles.forEach((r, k) => roles.set(pantrySlot(k, 'role'), r));
+    PANTRY_LOCS.forEach((l, k) => locs.set(pantrySlot(k, 'loc'), l));
+    cloche = '';
+  };
+  reset();
+  const store = (slot: string) => (parseSlot(slot)?.card === 'loc' ? locs : roles);
+  const ownerOf = (slot: string) => {
+    const ref = parseSlot(slot);
+    return ref?.kind === 'seat' ? (ctx.deal.seats[ref.index]?.id ?? '') : '';
+  };
+  const swap = (a: string, b: string) => {
+    const m = store(a);
+    const va = m.get(a) ?? '';
+    m.set(a, m.get(b) ?? '');
+    m.set(b, va);
+  };
+  const row = (slot: string): NightRevealEntry => ({
+    slot,
+    kind: parseSlot(slot)?.card === 'loc' ? 'loc' : 'role',
+    value: store(slot).get(slot) ?? '',
+    of: ownerOf(slot),
+  });
+  const ownRole = seatSlot(selfIndex, 'role');
+  const ownLoc = seatSlot(selfIndex, 'loc');
 
   const pantryRoles = ctx.deal.pantryRoles;
 
@@ -57,7 +101,7 @@ export function createNightMock(ctx: MockOnubContext): MockOnubNightHalf {
       ? others.filter((s) => ctx.deal.dealt[s.id] === w.role).map((s) => s.id)
       : [];
     const seen = others
-      .filter((s) => (w.sees as string[]).includes(ctx.deal.dealt[s.id] ?? ''))
+      .filter((s) => w.sees.includes(ctx.deal.dealt[s.id] ?? ''))
       .map((s) => ({ seat: s.id, roleId: ctx.deal.dealt[s.id] ?? '' }));
     const alone = w.seeEachOther && mates.length === 0;
     return { mates, seen, alone, cloche, legal: legalOf(w, alone), must: w.onTimeout === 'seededPick' };
@@ -82,6 +126,50 @@ export function createNightMock(ctx: MockOnubContext): MockOnubNightHalf {
     }
   };
 
+  /** Resends the wake with a new legal list: empty once the seat has acted (the 5-seat deck has no two-step act). */
+  const rewake = (legal: OnubLegalAct[]) => {
+    if (wake === null) return;
+    wake = { ...wake, view: { ...wake.view, cloche, legal } };
+    ctx.bus.emit('nightWake', wake);
+  };
+
+  const answer = (entries: NightRevealEntry[]) => {
+    reveals = [...reveals, ...entries];
+    ctx.bus.emit('nightReveal', { entries });
+  };
+
+  const doAct = (abilityId: string, targets: readonly string[]) => {
+    const legal = wake?.view.legal.find((a) => a.act === abilityId);
+    if (wake === null || legal === undefined) return ctx.refuse(425, 'not your window');
+    if (
+      targets.length !== legal.picks ||
+      new Set(targets).size !== targets.length ||
+      targets.some((t) => !legal.slots.includes(t))
+    )
+      return ctx.refuse(422, 'cannot do that');
+    const [a, b] = targets;
+    const effect = (onubBalance.acts[abilityId as keyof typeof onubBalance.acts] as Act).effect;
+    const act = abilityId.replace(/^onub\./, '');
+    if (act === 'cloche' && a !== undefined) {
+      cloche = a;
+      answer([]);
+    } else if (act === 'inspect') answer([row(ownRole), row(ownLoc)]);
+    else if (act === 'vent' && a !== undefined) {
+      swap(ownLoc, a);
+      answer([row(ownLoc)]);
+    } else if (act === 'rob' && a !== undefined) {
+      swap(ownRole, a);
+      answer([row(ownRole)]);
+    } else if (act === 'drunk' && a !== undefined) {
+      swap(ownRole, a);
+      answer([]);
+    } else if (effect === 'swapPair' && a !== undefined && b !== undefined) {
+      swap(a, b);
+      answer([]);
+    } else answer(targets.map(row));
+    rewake([]);
+  };
+
   const closeWindow = () => {
     open = '';
     ctx.boardChanged();
@@ -92,7 +180,7 @@ export function createNightMock(ctx: MockOnubContext): MockOnubNightHalf {
   };
 
   return {
-    act: () => ctx.refuse(425, 'not your window'),
+    act: doAct,
     wake: () => wake,
     reveals: () => reveals,
     claims: () => [...claims.values()],
@@ -113,6 +201,7 @@ export function createNightMock(ctx: MockOnubContext): MockOnubNightHalf {
     // The nominal night: every window of a role in the deck, each with its fade; the half schedules them.
     beginNight() {
       reveals = [];
+      reset();
       let t = 0;
       for (const w of onubBalance.windows.filter((x) => ctx.deal.deck.includes(x.role))) {
         ctx.later(() => openWindow(w), t);

@@ -1787,3 +1787,80 @@
   background-size: cover;
   background-position: center;
 }
+
+.wdi-card-table {
+  display: grid;
+  gap: var(--wdi-space-3);
+}
+
+.wdi-seat-row,
+.wdi-pantry-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wdi-space-3);
+}
+
+.wdi-seat-cards {
+  display: grid;
+  gap: var(--wdi-space-1);
+  padding: var(--wdi-space-2);
+  border: 1px solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-md);
+}
+
+.wdi-seat-cards.is-self {
+  border-color: var(--wdi-interact);
+}
+
+.wdi-seat-cards.is-glow {
+  box-shadow: var(--wdi-glow-moon);
+}
+
+.wdi-seat-cards__name {
+  margin: 0;
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-text-xs);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+}
+
+.wdi-slot {
+  position: relative;
+  display: grid;
+  gap: var(--wdi-space-1);
+  min-width: 96px;
+  min-height: 72px;
+  padding: var(--wdi-space-2);
+  font-size: var(--wdi-text-xs);
+  color: var(--wdi-text);
+  background: var(--wdi-surface-sunken);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-sm);
+}
+
+.wdi-slot.is-dealt,
+.wdi-slot.is-seen {
+  color: var(--wdi-text-on-paper);
+  background: var(--wdi-paper);
+}
+
+.wdi-slot.is-seen {
+  border-color: var(--wdi-moon);
+}
+
+.wdi-slot.is-selectable:not(:disabled) {
+  cursor: pointer;
+  border-color: var(--wdi-interact);
+}
+
+.wdi-slot.is-picked {
+  box-shadow: var(--wdi-glow-interact);
+}
+
+.wdi-slot.is-covered {
+  border-style: dashed;
+}
+
+.wdi-slot__face {
+  font-weight: var(--wdi-weight-strong);
+}

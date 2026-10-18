@@ -52,3 +52,52 @@ describe('mock night', () => {
     feed.dispose();
   });
 });
+
+describe('mock night acts', () => {
+  const run = (role: string) => {
+    const feed = new MockOnubFeed({ search: `?role=${role}` });
+    const refusals: number[] = [];
+    (feed as unknown as { opts: { onRefuse: (c: number) => void } }).opts.onRefuse = (c) => refusals.push(c);
+    const reveals: unknown[][] = [];
+    const wakes: unknown[] = [];
+    feed.bus.on('nightReveal', (r) => reveals.push(r.entries));
+    feed.bus.on('nightWake', (w) => wakes.push(w));
+    toNight(feed);
+    return { feed, refusals, reveals, wakes };
+  };
+  const into = (role: string) => {
+    const r = run(role);
+    // advance until the self window is open
+    for (let i = 0; i < 200 && r.feed.wake() === null; i++) vi.advanceTimersByTime(1000);
+    return r;
+  };
+
+  it('answers a peek with the card and closes the act list', () => {
+    const { feed, reveals } = into('chef');
+    const legal = feed.wake()?.view.legal.find((a) => a.act === 'onub.peekRole');
+    expect(legal?.slots.length).toBe(4);
+    expect(legal?.slots).not.toContain('seat.0.role');
+    feed.act('onub.peekRole', ['seat.1.role']);
+    expect(reveals.at(-1)).toMatchObject([{ slot: 'seat.1.role', kind: 'role' }]);
+    expect(feed.wake()?.view.legal).toEqual([]);
+    feed.dispose();
+  });
+
+  it('refuses a slot outside the pool with 422 and an act without a window with 425', () => {
+    const a = into('chef');
+    a.feed.act('onub.peekRole', ['seat.0.role']);
+    expect(a.refusals).toEqual([422]);
+    a.feed.dispose();
+    const b = run('chef');
+    b.feed.act('onub.peekRole', ['seat.1.role']);
+    expect(b.refusals).toEqual([425]);
+    b.feed.dispose();
+  });
+
+  it("swaps the Sous-Chef's Role card and shows the new one", () => {
+    const { feed, reveals } = into('sousChef');
+    feed.act('onub.rob', ['seat.1.role']);
+    expect(reveals.at(-1)).toMatchObject([{ slot: 'seat.0.role', kind: 'role' }]);
+    feed.dispose();
+  });
+});

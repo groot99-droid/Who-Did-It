@@ -833,6 +833,68 @@ the caller. The narrator's lines are the same on every page and name only the wi
 | `onub.narrator.inspecteur.wake` | L'Inspecteur Sanitaire, réveillez-vous… dernière tournée. |
 | `onub.narrator.inspecteur.sleep` | L'Inspecteur Sanitaire, rendormez-vous. |
 
+**Night acts, one label and two pick prompts per act of balance.onub.json**
+
+| Id | Text |
+|---|---|
+| `onub.act.cloche.label` | Set the Iron Cloche |
+| `onub.act.cloche.pick` | Pick the card to cover |
+| `onub.act.cloche.pick2` | Pick the card to cover |
+| `onub.act.sporePeek.label` | Peek at the Pantry |
+| `onub.act.sporePeek.pick` | Pick a Pantry Role card |
+| `onub.act.sporePeek.pick2` | Pick a Pantry Role card |
+| `onub.act.peekLoc.label` | Read the shift log |
+| `onub.act.peekLoc.pick` | Pick another player's Location card |
+| `onub.act.peekLoc.pick2` | Pick another player's Location card |
+| `onub.act.vent.label` | Swap through the grate |
+| `onub.act.vent.pick` | Pick the Location card to take: a player's or the Pantry's |
+| `onub.act.vent.pick2` | Pick the Location card to take |
+| `onub.act.peekRole.label` | Audit one file |
+| `onub.act.peekRole.pick` | Pick another player's Role card |
+| `onub.act.peekRole.pick2` | Pick another player's Role card |
+| `onub.act.peekPantry.label` | Audit the Pantry |
+| `onub.act.peekPantry.pick` | Pick a Pantry Role card |
+| `onub.act.peekPantry.pick2` | Pick a second Pantry Role card |
+| `onub.act.peekLocs.label` | Check the monitor |
+| `onub.act.peekLocs.pick` | Pick another player's Location card |
+| `onub.act.peekLocs.pick2` | Pick a second Location card |
+| `onub.act.rob.label` | Ring the bell |
+| `onub.act.rob.pick` | Pick the player whose Role card you take |
+| `onub.act.rob.pick2` | Pick the player whose Role card you take |
+| `onub.act.laminatePeek.label` | Fold in the recipe |
+| `onub.act.laminatePeek.pick` | Pick a Pantry Role card to look at |
+| `onub.act.laminatePeek.pick2` | Pick a Pantry Role card to look at |
+| `onub.act.laminateSwap.label` | Fold it into the line |
+| `onub.act.laminateSwap.pick` | Pick the player whose Role card takes it |
+| `onub.act.laminateSwap.pick2` | Pick the player whose Role card takes it |
+| `onub.act.drunk.label` | Stumble back |
+| `onub.act.drunk.pick` | Pick a Pantry Role card to swap with yours |
+| `onub.act.drunk.pick2` | Pick a Pantry Role card to swap with yours |
+| `onub.act.dishRoles.label` | Swap two Role cards |
+| `onub.act.dishRoles.pick` | Pick the first player's Role card |
+| `onub.act.dishRoles.pick2` | Pick the second player's Role card |
+| `onub.act.dishLocs.label` | Swap two Location cards |
+| `onub.act.dishLocs.pick` | Pick the first player's Location card |
+| `onub.act.dishLocs.pick2` | Pick the second player's Location card |
+| `onub.act.inspect.label` | Sweep your own cards |
+| `onub.act.inspect.pick` | Nothing to pick |
+| `onub.act.inspect.pick2` | Nothing to pick |
+| `onub.act.confirm` | Do it |
+| `onub.act.picked` | {n} of {total} picked |
+
+**What a peek, a swap or a sighting showed (nightReveal rows)**
+
+| Id | Text |
+|---|---|
+| `onub.reveal.title` | What you learned |
+| `onub.reveal.role` | {card} is {value} |
+| `onub.reveal.loc` | {card} is {value} |
+| `onub.reveal.own` | You now hold {value} |
+| `onub.reveal.mate` | {name} was dealt {value} |
+| `onub.reveal.face.dealt` | As dealt |
+| `onub.reveal.face.seen` | Seen |
+| `onub.cloche.token` | Iron Cloche |
+
 **Dawn**
 
 | Id | Text |
