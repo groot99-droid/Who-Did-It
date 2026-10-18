@@ -2062,6 +2062,29 @@ Branch `claude/r5-npc`, one draft PR (the brief's five steps are five commits of
 
 ### Round 5 log: 5I (isometric client and lighting)
 
+Branch `claude/r5-iso`, draft PR #29 (the brief's five steps are five commits on it, since the session has one branch; each commit passes
+`pnpm lint && pnpm typecheck && pnpm test` on its own). Decisions: DECISIONS A60.
+
+- **Step 1, projection, input, camera.** `view/iso.ts` (depth bands and biases, `isoZoom`, `cameraBounds`, the decal transform and
+  `decalHolder`, tile and scene diamonds); `PlayerView`, `BodyView`, `ClueView`, `PropView` take world px; `input/vectors.ts` `worldMove`;
+  `World.ts` keeps targets, reach and the noise words in the world and screen frames they belong to.
+- **Step 2, depth and occlusion.** `view/statics.ts` (kit frame names, occluder rules, slices, the fade and the cull) and `StaticView`.
+- **Step 3, tilemap reader.** `view/sceneMap.ts`, `mapDefs.ts` (objects to statics with the SPRITES 10.13 lookup order), `GroundView`,
+  `greyboxColours.ts`, the `maps` and `modes` fields (`manifestRules.ts`, `assets.ts`), `dayPart.ts`.
+- **Step 4, lighting.** `Lighting` and `lightMath.ts`, the 1 x 1 px `night-mask` hook, scene lights by part of the day with flicker and
+  glows, `setCarried` as an unused slot.
+- **Step 5, poses and the rest.** `interact` clip with the greybox teal tick, `PlayerLook.lookId` (for 5F's `EntityView`; the plain
+  villager body when the look's atlas is not loaded), `hungerPrints` in `ClueView`, `world.spec.ts` rewritten (world directions are two
+  keys, sent together by one page call; the darkness hook cases).
+- **Checked.** The 5I rows of SPRITES 10.15: `vectors.test.ts`, `iso.test.ts` (zoom snapping, the decal transform), `statics.test.ts` (depth
+  against building slices), `lightMath.test.ts` (ambient for day, night and a dark scene; lights by phase), `poses.test.ts`; and all of
+  `world.spec.ts` against `?mock=1` in Chromium. The 45 fps check of ROADMAP M5a waits for the isometric maps and the art (integration).
+- **For others.** 5F: pass `lookId` in the `PlayerLook` you give `PlayerView`, and the look's `interact` and the other clips are looked up
+  as `char/<lookId>/<clip>/<dir>`; the deck looks wear their scarf and hat baked in, so the villager overlays are hidden for them. 5J:
+  the client reads `theme`, `map`, `kind`, `dark`, `void` and the object groups of SPRITES 10.12 and falls back to a flat diamond for an
+  orthogonal file; delete the legacy props fallback in `view/PropView.ts` with your tilemaps. 5K: the pivots come from the frames
+  themselves (`customPivot`), with `(0.5, 1)` for a frame without one.
+
 ### Round 5 log: 5J (maps)
 
 Session 5J, 2026-10-18. Four draft PRs against `claude/zen-turing-m1jnw0`. They stack: each branch holds the one

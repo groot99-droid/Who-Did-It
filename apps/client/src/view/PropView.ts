@@ -1,20 +1,9 @@
-import type Phaser from 'phaser';
-import palette from '@wdi/content/data/palette.json';
 import overworld from '@wdi/content/data/scenes/overworld.json';
 import { TILE_PX } from '@wdi/shared/constants';
+import type { MapObject, SceneMap } from './sceneMap';
 
-const ATLAS = 'props';
-/** The props that stand in the village square; the rest of overworld.json's props are decor art (P). */
-const SHOWN: Record<string, string> = {
-  'ov.bell': 'Bell',
-  'ov.pump': 'Pump',
-  'ov.board': 'Board',
-  'ov.chest': 'Chest',
-  'ov.lantern_0': 'Lamp',
-  'ov.lantern_1': 'Lamp',
-  'ov.lantern_2': 'Lamp',
-  'ov.lantern_3': 'Lamp',
-};
+// Props are drawn by `StaticView` from the tilemap's `props` group (SPRITES 10.12, `mapDefs.ts`). What stays here is
+// what the rest of the World asks of them: where the bell stands, and the old orthogonal files' stand-in props.
 
 export interface PropSpot {
   id: string;
@@ -24,70 +13,48 @@ export interface PropSpot {
   y: number;
 }
 
+/** The props that stood in the old overworld square, which the orthogonal tilemaps never carried. */
+const LEGACY_SHOWN = new Set([
+  'ov.bell',
+  'ov.pump',
+  'ov.board',
+  'ov.chest',
+  'ov.lantern_0',
+  'ov.lantern_1',
+  'ov.lantern_2',
+  'ov.lantern_3',
+]);
+
 const spotsOf = (props: Array<{ id: string; kind: string; x: number; y: number }>): PropSpot[] =>
   props.map((p) => ({ id: p.id, kind: p.kind, x: (p.x + 0.5) * TILE_PX, y: (p.y + 0.5) * TILE_PX }));
 
-/** The overworld's props with their pixel centres (the bell's reach is measured from here). */
+/** The overworld's props with their pixel centres. */
 export function overworldProps(): PropSpot[] {
   return spotsOf(overworld.props);
 }
 
-const colorOf = (hex: string) => Number.parseInt(hex.slice(1), 16);
-
 /**
- * Draws a scene's props by key `prop_<kind>` then `prop_<id tail>` from the `props` atlas; a labelled greybox
- * block stands in for any frame the manifest lacks (P ships the art, N ships the verbs). The square draws its
- * fixed set; no other scene draws props.
+ * The scene's props as map objects. An isometric file carries its own `props` group; an orthogonal file (before
+ * the round-5 maps land) has none, so the overworld falls back to its square's stand-ins from the scene data.
+ * Remove the fallback, and the scene import, once every tilemap is isometric.
  */
-export class PropView {
-  private readonly objects: Phaser.GameObjects.GameObject[] = [];
+export function propObjects(map: SceneMap, sceneId: string): MapObject[] {
+  if (map.isometric || sceneId !== 'overworld') return map.props;
+  return overworld.props
+    .filter((p) => LEGACY_SHOWN.has(p.id))
+    .map((p) => ({
+      name: p.id,
+      type: p.kind,
+      x: p.x * TILE_PX,
+      y: p.y * TILE_PX,
+      width: TILE_PX,
+      height: TILE_PX,
+      props: {},
+    }));
+}
 
-  constructor(
-    private readonly scene: Phaser.Scene,
-    sceneId: string,
-  ) {
-    if (sceneId === 'overworld') {
-      for (const p of overworldProps()) {
-        const label = SHOWN[p.id];
-        if (label !== undefined) this.draw(p, label);
-      }
-    }
-  }
-
-  private draw(p: PropSpot, label: string): void {
-    const scene = this.scene;
-    const tex = scene.textures.exists(ATLAS) ? scene.textures.get(ATLAS) : null;
-    const frame = [`prop_${p.kind}`, `prop_${p.id.split('.')[1]}`].find((k) => tex?.has(k));
-    if (frame) {
-      // A prop with art is named by its art.
-      this.objects.push(
-        scene.add
-          .sprite(p.x, p.y + TILE_PX / 2, ATLAS, frame)
-          .setOrigin(0.5, 1)
-          .setDepth(p.y + TILE_PX / 2),
-      );
-      return;
-    }
-    this.objects.push(
-      scene.add
-        .rectangle(p.x, p.y, TILE_PX * 0.7, TILE_PX * 0.7, colorOf(palette.colors.slate))
-        .setStrokeStyle(3, colorOf(palette.colors.lantern))
-        .setDepth(p.y),
-      scene.add
-        .text(p.x, p.y, label, {
-          fontFamily: 'Oswald, sans-serif',
-          fontSize: '14px',
-          color: palette.colors.bone,
-          align: 'center',
-          wordWrap: { width: TILE_PX * 0.9 },
-        })
-        .setOrigin(0.5)
-        .setDepth(p.y + 1),
-    );
-  }
-
-  destroy(): void {
-    for (const o of this.objects) o.destroy();
-    this.objects.length = 0;
-  }
+/** Pixel centre of the scene's bell, or null when it has none. */
+export function bellSpot(props: MapObject[]): { x: number; y: number } | null {
+  const b = props.find((p) => p.type === 'bell');
+  return b ? { x: b.x + TILE_PX / 2, y: b.y + TILE_PX / 2 } : null;
 }
