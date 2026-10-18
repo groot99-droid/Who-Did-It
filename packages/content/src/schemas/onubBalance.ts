@@ -218,6 +218,8 @@ export const OnubBalanceFile = z.strictObject({
     claimFrac: Range,
     /** Fractions of `rushS + voteS`. */
     voteFrac: Range,
+    /** Seconds from the Tourrier's first step to its second. */
+    stepS: Range,
     gddRef: GddRef,
   }),
 });

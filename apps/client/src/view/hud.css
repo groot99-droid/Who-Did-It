@@ -43,17 +43,14 @@
   animation: none;
 }
 
-/* ---- night mask: a screen-space vignette centred on you (Lighting.ts sets --lx, --ly, --lr) ---- */
+/* ---- the darkness layer is drawn by Phaser (Lighting.ts); this 1 x 1 px element is its test hook ---- */
 .wdi-night-mask {
   position: fixed;
-  inset: 0;
-  z-index: calc(var(--wdi-z-hud) - 1);
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
   pointer-events: none;
-  background: radial-gradient(
-    circle at var(--lx, 50%) var(--ly, 50%),
-    transparent calc(var(--lr, 400px) * 0.55),
-    rgb(var(--wdi-ink-rgb) / var(--la, 0.6)) var(--lr, 400px)
-  );
 }
 
 .wdi-night-mask[hidden] {

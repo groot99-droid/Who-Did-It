@@ -1,10 +1,10 @@
-import type { NightRevealEntry, OnubWakeView } from '../protocol/index';
-import type { OnubCards } from './onub';
+import { PANTRY_VOTE } from '../constants';
+import type { NightRevealEntry, OnubLegalAct, OnubWakeView } from '../protocol/index';
+import { type OnubCards, type SlotKind, pantrySlot, parseSlot, seatSlot } from './onub';
 import type { Rng } from './prng';
 
 // Quick mode rules, ONUB v2 (GDD 3.11): the night acts on the card table, the wake view, the vote and the winners.
-// Pure functions over plain data; Session 5B fills them. Slots and the table are `onub.ts`. Every body throws
-// until 5B fills it.
+// Pure functions over plain data. Slots and the table are `onub.ts`.
 
 /** Where one pick of an act may come from (`balance.onub.json` `acts[id].targets`). */
 export type OnubTargetKindLike =
@@ -49,11 +49,29 @@ export type OnubReveal = Omit<NightRevealEntry, 'of'>;
  * Pantry; for `anySeatCard` each seat's Role slot before its Location slot.
  */
 export function targetPool(act: OnubActLike, actor: number, size: TableSize, cloche: string): string[] {
-  void act;
-  void actor;
-  void size;
-  void cloche;
-  throw new Error('targetPool: not implemented (Session 5B)');
+  if (act.picks === 0) return [];
+  const kinds = new Set(act.targets);
+  const any = kinds.has('anySeatCard');
+  const roleOwn = any || kinds.has('anySeatRole');
+  const roleOther = kinds.has('otherSeatRole');
+  const locOwn = any;
+  const locOther = kinds.has('otherSeatLoc');
+  if (act.effect === 'swapWithOwn') {
+    // The actor's own card of the target's kind must be free to move.
+    const ownKind: SlotKind = roleOwn || roleOther || kinds.has('pantryRole') ? 'role' : 'loc';
+    if (seatSlot(actor, ownKind) === cloche) return [];
+  }
+  const pool: string[] = [];
+  const add = (slot: string): void => {
+    if (slot !== cloche) pool.push(slot);
+  };
+  for (let i = 0; i < size.seats; i++) {
+    if (roleOwn || (roleOther && i !== actor)) add(seatSlot(i, 'role'));
+    if (locOwn || (locOther && i !== actor)) add(seatSlot(i, 'loc'));
+  }
+  if (kinds.has('pantryRole')) for (let k = 0; k < size.pantryRoles; k++) add(pantrySlot('role', k));
+  if (kinds.has('pantryLoc')) for (let k = 0; k < size.pantryLocs; k++) add(pantrySlot('loc', k));
+  return pool;
 }
 
 /**
@@ -69,13 +87,11 @@ export function actTargetsProblem(
   targets: readonly string[],
   peeked: string,
 ): 'count' | 'duplicate' | 'slot' | 'step' | null {
-  void act;
-  void actor;
-  void size;
-  void cloche;
-  void targets;
-  void peeked;
-  throw new Error('actTargetsProblem: not implemented (Session 5B)');
+  if (act.effect === 'swapWithPeeked' ? peeked === '' : peeked !== '') return 'step';
+  if (targets.length !== act.picks) return 'count';
+  if (new Set(targets).size !== targets.length) return 'duplicate';
+  const pool = new Set(targetPool(act, actor, size, cloche));
+  return targets.every((slot) => pool.has(slot)) ? null : 'slot';
 }
 
 export interface CardActResult {
@@ -101,12 +117,64 @@ export function applyCardAct(
   targets: readonly string[],
   peeked: string,
 ): CardActResult {
-  void cards;
-  void act;
-  void actor;
-  void targets;
-  void peeked;
-  throw new Error('applyCardAct: not implemented (Session 5B)');
+  const roles = new Map(cards.roles);
+  const locs = new Map(cards.locs);
+  const table = (slot: string): Map<string, string> => {
+    const kind = parseSlot(slot)?.kind;
+    if (kind === 'role') return roles;
+    if (kind === 'loc') return locs;
+    throw new Error(`not a card slot: ${slot}`);
+  };
+  const read = (slot: string): string => {
+    const v = table(slot).get(slot);
+    if (v === undefined) throw new Error(`no card at ${slot}`);
+    return v;
+  };
+  const row = (slot: string): OnubReveal => ({
+    slot,
+    kind: parseSlot(slot)?.kind === 'role' ? 'role' : 'loc',
+    value: read(slot),
+  });
+  const swap = (a: string, b: string): void => {
+    const t = table(a);
+    if (t !== table(b)) throw new Error(`cannot swap ${a} with ${b}: different kinds`);
+    const va = read(a);
+    t.set(a, read(b));
+    t.set(b, va);
+  };
+  const picked = targets.map(row);
+  let cloche = '';
+  let logSlots = [...targets];
+  switch (act.effect) {
+    case 'cloche':
+      cloche = targets[0] ?? '';
+      break;
+    case 'peek':
+      if (act.reveal === 'ownCards') logSlots = [seatSlot(actor, 'role'), seatSlot(actor, 'loc')];
+      break;
+    case 'swapWithOwn': {
+      const target = targets[0] ?? '';
+      const own = seatSlot(actor, parseSlot(target)?.kind === 'role' ? 'role' : 'loc');
+      swap(own, target);
+      logSlots = [own, target];
+      break;
+    }
+    case 'swapWithPeeked': {
+      const target = targets[0] ?? '';
+      swap(peeked, target);
+      logSlots = [peeked, target];
+      break;
+    }
+    case 'swapPair':
+      swap(targets[0] ?? '', targets[1] ?? '');
+      break;
+  }
+  const next: OnubCards = { roles, locs };
+  let reveal: OnubReveal[] = [];
+  if (act.reveal === 'picked') reveal = picked;
+  else if (act.reveal === 'ownCards') reveal = [seatSlot(actor, 'role'), seatSlot(actor, 'loc')].map(row);
+  else if (act.reveal === 'ownAfter') reveal = [row(logSlots[0] ?? '')];
+  return { next, reveal, cloche, logSlots };
 }
 
 /**
@@ -127,15 +195,29 @@ export function wakeView(
   cloche: string,
   state: { acted: boolean; peeked: string },
 ): OnubWakeView {
-  void window;
-  void actor;
-  void dealt;
-  void seats;
-  void acts;
-  void size;
-  void cloche;
-  void state;
-  throw new Error('wakeView: not implemented (Session 5B)');
+  const sameRole = (i: number): boolean => dealt[i] === window.role;
+  const mates = window.seeEachOther ? seats.filter((_, i) => i !== actor && sameRole(i)) : [];
+  const seen = seats.flatMap((seat, i) => {
+    const roleId = dealt[i];
+    return roleId !== undefined && window.sees.includes(roleId) ? [{ seat, roleId }] : [];
+  });
+  const alone = window.seeEachOther && mates.length === 0;
+  let open: OnubActLike[] = [];
+  if (!state.acted) {
+    if (state.peeked !== '') {
+      const followUp = window.acts.map((id) => acts[id]?.then).find((id) => id !== undefined);
+      const next = followUp === undefined ? undefined : acts[followUp];
+      open = next ? [next] : [];
+    } else if (!window.onlyIfAlone || alone) {
+      open = window.acts.flatMap((id) => (acts[id] ? [acts[id]] : []));
+    }
+  }
+  const legal: OnubLegalAct[] = [];
+  for (const act of open) {
+    const slots = targetPool(act, actor, size, cloche);
+    if (slots.length >= act.picks) legal.push({ act: act.id, picks: act.picks, slots });
+  }
+  return { mates, seen, alone, cloche, legal, must: window.onTimeout === 'seededPick' };
 }
 
 /**
@@ -149,12 +231,14 @@ export function seededTargets(
   cloche: string,
   rng: Rng,
 ): string[] | null {
-  void act;
-  void actor;
-  void size;
-  void cloche;
-  void rng;
-  throw new Error('seededTargets: not implemented (Session 5B)');
+  const pool = targetPool(act, actor, size, cloche);
+  if (pool.length < act.picks) return null;
+  const picks: string[] = [];
+  for (let n = 0; n < act.picks; n++) {
+    const j = Math.floor(rng() * pool.length);
+    picks.push(pool.splice(j, 1)[0] as string);
+  }
+  return picks;
 }
 
 // --- The vote and the winners -----------------------------------------------------------------------------
@@ -202,12 +286,41 @@ export function resolveDawn(
   roleInfo: (roleId: string) => OnubRoleInfo,
   rule: OnubVoteRule,
 ): DawnOutcome {
-  void votes;
-  void seats;
-  void finals;
-  void roleInfo;
-  void rule;
-  throw new Error('resolveDawn: not implemented (Session 5B)');
+  const inPlay = new Set(seats);
+  const valid = (voter: string, target: string | undefined): target is string =>
+    target !== undefined &&
+    inPlay.has(voter) &&
+    target !== voter &&
+    (inPlay.has(target) || (rule.pantryTarget && target === PANTRY_VOTE));
+  const tally: Record<string, number> = {};
+  const counted = new Set<string>();
+  for (const voter of seats) {
+    const target = votes[voter];
+    if (!valid(voter, target)) continue;
+    counted.add(voter);
+    tally[target] = (tally[target] ?? 0) + 1;
+  }
+  const abstained = seats.filter((seat) => !counted.has(seat));
+  const top = Math.max(0, ...Object.values(tally));
+  const leaders = Object.keys(tally).filter((id) => tally[id] === top);
+  const turnsOut = top >= rule.minVotesToTurnOut && (leaders.length === 1 || rule.tiesTurnOutAll);
+  const out = new Set(turnsOut ? leaders.filter((id) => id !== PANTRY_VOTE) : []);
+  const pantryOut = turnsOut && leaders.includes(PANTRY_VOTE);
+  let hop = '';
+  for (let n = 0; n < rule.critiqueHops; n++) {
+    const pulled: string[] = [];
+    for (const seat of seats) {
+      if (!out.has(seat)) continue;
+      const finalRole = finals.get(seat);
+      if (finalRole === undefined || roleInfo(finalRole).onOut !== 'dragVote') continue;
+      const target = votes[seat];
+      if (valid(seat, target) && target !== PANTRY_VOTE && !out.has(target)) pulled.push(target);
+    }
+    if (pulled.length === 0) break;
+    for (const id of pulled) out.add(id);
+    hop ||= pulled[0] as string;
+  }
+  return { tally, outs: seats.filter((seat) => out.has(seat)), hop, pantryOut, abstained };
 }
 
 /** One row of `balance.onub.json` `winners`: every `when` flag that is present must match. */
@@ -245,11 +358,19 @@ export function onubWinFlags(
   ruined: boolean,
   roleInfo: (roleId: string) => OnubRoleInfo,
 ): OnubWinFlags {
-  void outs;
-  void finals;
-  void ruined;
-  void roleInfo;
-  throw new Error('onubWinFlags: not implemented (Session 5B)');
+  const held = [...finals.values()].map(roleInfo);
+  const heldOut = outs.flatMap((seat) => {
+    const roleId = finals.get(seat);
+    return roleId === undefined ? [] : [roleInfo(roleId)];
+  });
+  return {
+    ruined,
+    croissantOut: heldOut.some((r) => r.team === 'croissant'),
+    sporeOut: heldOut.some((r) => r.spore),
+    sporeAmongPlayers: held.some((r) => r.spore),
+    moldOut: heldOut.some((r) => r.team === 'mold'),
+    anyoneOut: outs.length > 0,
+  };
 }
 
 /**
@@ -263,11 +384,19 @@ export function onubWinners(
   roleInfo: (roleId: string) => OnubRoleInfo,
   rows: readonly OnubWinnerRowLike[],
 ): { rowId: string; winnerIds: string[] } {
-  void flags;
-  void finals;
-  void roleInfo;
-  void rows;
-  throw new Error('onubWinners: not implemented (Session 5B)');
+  const row = rows.find((r) =>
+    (Object.keys(r.when) as (keyof OnubWinFlags)[]).every(
+      (key) => r.when[key] === undefined || r.when[key] === flags[key],
+    ),
+  );
+  if (!row) throw new Error('no winners row holds');
+  const winnerIds = [...finals.entries()]
+    .filter(([, roleId]) => {
+      const team = roleInfo(roleId).team;
+      return row.winners.some((w) => w === team);
+    })
+    .map(([seat]) => seat);
+  return { rowId: row.id, winnerIds };
 }
 
 /**
@@ -278,7 +407,7 @@ export function onubWinnerName(
   row: OnubWinnerRowLike,
   winnerIds: readonly string[],
 ): 'croissant' | 'village' | 'cabal' | 'nobody' {
-  void row;
-  void winnerIds;
-  throw new Error('onubWinnerName: not implemented (Session 5B)');
+  if (winnerIds.length === 0) return 'nobody';
+  if (row.winners.includes('croissant')) return 'croissant';
+  return row.winners.includes('mold') ? 'cabal' : 'village';
 }

@@ -1,11 +1,10 @@
-import type { Rng } from './prng';
+import { shuffle, type Rng } from './prng';
 
 // Quick mode rules, ONUB v2 (GDD 3.11, ARCHITECTURE 5.14): pure functions over plain data. The decks, stations,
 // cards, windows, vote rule and winners table are `balance.onub.json`, the roles `roles.onub.json`; the caller
 // passes in what a function needs, since `@wdi/shared` cannot import `@wdi/content`. This file is the table
-// (slots), the deal, the deck check, Evening Prep and the night script: Session 5A fills it. The night acts, the
-// wake view, the vote and the winners are `onubNight.ts` (Session 5B). The slot helpers, `tableAtNight` and
-// `nightScript` are implemented in the pre-seed; every other body throws until 5A fills it.
+// (slots), the deal, the deck check, Evening Prep and the night script. The night acts, the
+// wake view, the vote and the winners are `onubNight.ts` (Session 5B).
 
 // --- Slots ----------------------------------------------------------------------------------------------
 
@@ -79,10 +78,13 @@ export function dealOnub(
   deck: readonly string[],
   rng: Rng,
 ): { dealt: Map<string, string>; pantry: string[] } {
-  void seats;
-  void deck;
-  void rng;
-  throw new Error('dealOnub: not implemented (Session 5A)');
+  if (deck.length <= seats.length) {
+    throw new Error(`${deck.length} cards leave no Pantry for ${seats.length} seats`);
+  }
+  const order = shuffle(deck, rng);
+  const dealt = new Map<string, string>();
+  seats.forEach((seat, i) => dealt.set(seat, order[i] as string));
+  return { dealt, pantry: order.slice(seats.length) };
 }
 
 /**
@@ -90,10 +92,8 @@ export function dealOnub(
  * on the `deal` stream right after `dealOnub`.
  */
 export function dealPantryLocs(stationIds: readonly string[], count: number, rng: Rng): string[] {
-  void stationIds;
-  void count;
-  void rng;
-  throw new Error('dealPantryLocs: not implemented (Session 5A)');
+  if (stationIds.length === 0) throw new Error('no stations to draw a Pantry Location card from');
+  return Array.from({ length: count }, () => stationIds[Math.floor(rng() * stationIds.length)] as string);
 }
 
 /** What the deck check reads of a `roles.onub.json` role. */
@@ -118,10 +118,17 @@ export function onubDeckProblem(
   roles: Readonly<Record<string, OnubDeckRole | undefined>>,
   size?: number,
 ): OnubDeckProblem | null {
-  void deck;
-  void roles;
-  void size;
-  throw new Error('onubDeckProblem: not implemented (Session 5A)');
+  const counts = new Map<string, number>();
+  for (const id of deck) counts.set(id, (counts.get(id) ?? 0) + 1);
+  const rows = [...counts.keys()].map((id) => ({ id, role: roles[id] }));
+  if (rows.some((r) => !r.role)) return 'unknownRole';
+  if (rows.some((r) => r.role?.ships !== 'V1')) return 'notShipped';
+  if (rows.some((r) => !r.role?.copies.includes(counts.get(r.id) as number))) return 'copies';
+  for (const [id, role] of Object.entries(roles)) {
+    if (role?.required && !counts.has(id)) return 'missingRequired';
+  }
+  if (size !== undefined && deck.length !== size) return 'size';
+  return null;
 }
 
 // --- Evening Prep -----------------------------------------------------------------------------------------
@@ -158,10 +165,10 @@ export function prepCommitProblem(
   stations: readonly OnubStationLike[],
   sabotages: boolean,
 ): 'station' | 'card' | null {
-  void commit;
-  void stations;
-  void sabotages;
-  throw new Error('prepCommitProblem: not implemented (Session 5A)');
+  const station = stations.find((s) => s.id === commit.station);
+  if (!station) return 'station';
+  if (station.good.includes(commit.card)) return null;
+  return sabotages && station.sabotage.includes(commit.card) ? null : 'card';
 }
 
 /**
@@ -169,9 +176,9 @@ export function prepCommitProblem(
  * `stations`, then a good card uniform over that station's `good` (the `prepTimeout` stream).
  */
 export function timeoutCommit(stations: readonly OnubStationLike[], rng: Rng): OnubCommit {
-  void stations;
-  void rng;
-  throw new Error('timeoutCommit: not implemented (Session 5A)');
+  const station = stations[Math.floor(rng() * stations.length)];
+  if (!station || station.good.length === 0) throw new Error('no station with a good card');
+  return { station: station.id, card: station.good[Math.floor(rng() * station.good.length)] as string };
 }
 
 /** One resolved pile: the cards left face up in seeded order, the cards the thaw discarded, the net and the flag. */
@@ -236,15 +243,57 @@ export function resolvePrep(
   pantryLocs: number,
   rngs: OnubPrepStreams,
 ): PrepOutcome {
-  void commits;
-  void seats;
-  void stations;
-  void cards;
-  void rule;
-  void pantryLocs;
-  void rngs;
-  throw new Error('resolvePrep: not implemented (Session 5A)');
+  const known = new Set(stations.map((s) => s.id));
+  for (const c of commits.values()) {
+    if (!known.has(c.station)) throw new Error(`commit at unknown station ${c.station}`);
+    if (!cards[c.card]) throw new Error(`commit of unknown card ${c.card}`);
+  }
+  const piles: Record<string, PrepPile> = {};
+  const visitors = new Map<string, number>();
+  const sabotaged = new Set<string>();
+  let ruinWeight = 0;
+  // Step 1: every pile's order first, so the `piles` stream is read before any other draw.
+  const shuffled = new Map<string, string[]>();
+  for (const st of stations) {
+    const ids = [...commits.values()].filter((c) => c.station === st.id).map((c) => c.card);
+    visitors.set(st.id, ids.length);
+    if (ids.some((id) => cards[id]?.kind === 'sabotage')) sabotaged.add(st.id);
+    shuffled.set(st.id, shuffle(ids.sort(byId), rngs.piles));
+  }
+  for (const st of stations) {
+    const order = shuffled.get(st.id) as string[];
+    // Step 2: the thaw. Positions, not ids: two seats may play the same card.
+    const gone = new Array<boolean>(order.length).fill(false);
+    const lost: string[] = [];
+    order.forEach((id, i) => {
+      if (gone[i] || cards[id]?.effect !== 'discardRandomOther') return;
+      const others = order.map((_, j) => j).filter((j) => j !== i && !gone[j]);
+      if (others.length === 0) return;
+      const j = others[Math.floor(rngs.thaw() * others.length)] as number;
+      gone[j] = true;
+      lost.push(order[j] as string);
+    });
+    const left = order.filter((_, i) => !gone[i]);
+    // Step 3: the net weight and the Mixer's flag.
+    const bad = left.filter((id) => cards[id]?.kind === 'sabotage').length;
+    const net = Math.max(0, bad * st.weight - (left.length - bad) * rule.goodCancels);
+    const n = visitors.get(st.id) as number;
+    const underMixed = st.underMixBelow !== undefined && n > 0 && n < st.underMixBelow;
+    ruinWeight += net + (underMixed ? (st.underMixWeight ?? 0) : 0);
+    piles[st.id] = { cards: left, lost, net, underMixed };
+  }
+  // Step 4: ruin.
+  const ruined = ruinWeight >= (rule.weightByCount?.[String(seats.length)] ?? rule.weight);
+  // Step 5: the proofing perk.
+  let perk: PrepOutcome['perk'] = null;
+  const perkStation = stations.find((s) => s.perk !== undefined);
+  if (perkStation && (visitors.get(perkStation.id) as number) > 0 && !sabotaged.has(perkStation.id)) {
+    perk = { station: perkStation.id, slot: pantrySlot('loc', Math.floor(rngs.perk() * pantryLocs)) };
+  }
+  return { piles, ruinWeight, ruined, perk };
 }
+
+const byId = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
 
 // --- The night script ---------------------------------------------------------------------------------------
 

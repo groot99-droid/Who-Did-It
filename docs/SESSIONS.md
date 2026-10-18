@@ -2007,23 +2007,151 @@ tracks that none of them holds.
 
 ### Round 5 log: 5A (ONUB v2 rules, server deal and prep)
 
+Done 2026-10-18 on `claude/r5-onub-rules` (PR #27, three commits, one per brief step):
+1. `rules/onub.ts` bodies and `packages/shared/test/onubPrep.test.ts` (unit cases and O2).
+2. `startOnubMatch`, `beginOnubPlay`, `onubDeckSetting`, `onubDeckInPlay` and `onubRoleReveal` in `sim/Onub.ts`, with `test/onubDeal.test.ts` and `test/onubPrepHelpers.ts`.
+3. `handlePrep`, `runPrep`, `endPrep` in `sim/onub/Prep.ts`, with `test/onubPrep.test.ts` and `test/onubContract.test.ts` (O1, O3), then the GDD, ARCHITECTURE 5.14 and DECISIONS A52 lines.
+
+Notes for the next sessions: 5B finds `OnubState.dealt`, `.commits`, `.prep`, `.cards`, `.prepAuto` filled and `Phase.prepReveal` running for `prepRevealS`; `handleOnubAct` is still its stub. 5E can commit through `handleOnubAbility` with `onub.prep` as any seat id. No contract changes were needed. The GDD carried no "(5A)" markers, so the one sentence added (commit refusals, departed seats) ends with one.
+
 ### Round 5 log: 5B (ONUB v2 server night and morning)
+
+**Branch** `claude/r5-onub-night`, one draft PR against `claude/zen-turing-m1jnw0` (the branch rule leaves one branch, so the three steps of the brief are three commits of one PR). **Done**: (1) `rules/onubNight.ts` bodies with `packages/shared/test/onubNight.test.ts` (48 tests over the real `balance.onub.json` and `roles.onub.json`); (2) `sim/Conductor.ts` (`enterNight`, `runConductor`, `onubClock`), `sim/onub/Acts.ts` (`handleOnubAct`, `onubWakeView`, `finalRoles`, the act log and reveals) with `apps/server/test/onubNight.test.ts` (29 tests: O4 to O8 and the acts, Cloche, must-acts and `debug.clock`) and `onubNightHelpers.ts`; (3) the quick branches of `Meeting.ts` (`handleVote` with the Pantry, `runMeeting`, `startOnubReveal`, `handleClaim`; `openMeeting` for `dawn` needed no change) and `Win.ts` (`endOnubMatch`; the quick lines of `resetToLobby` were already right) with `onubMorning.test.ts` (22 tests), the GDD 3.11 sentence on window length, ARCHITECTURE 5.14 rows "Rules (night, vote)", "Messages", "Privacy" and "Server modules (night, morning)", and DECISIONS A53.
+
+**For the next sessions.** 5A: my tests build a match white-box at `Phase.prepReveal` (`createOnubState`, `tableAtNight`, `onubNightHelpers.ts`) and set `Player.alive = true` themselves; the real Start must do the same. `endOnubMatch` reads `o.commits`, `o.prepAuto`, `o.prep` and `o.cards` and degrades to empty facts when they are missing. 5D: `nightWake` is re-sent after each accepted act (the latest wins), `nightReveal` answers every accepted act (empty entries for a blind swap), sightings arrive as `mate` rows at the window's opening, `voteResult` has `outs`, `hop`, `pantryOut`, `roles` (of `outs` only) and `abstained`, and `gameOver.onub` is the whole end-screen record. 5E: `onubWakeView(room, seatId)` is the NPC brain's view; NPC acts go through `handleOnubAct` like a human's, and a must-act an NPC leaves undone is completed by seed at the window's end. Debug: `debug.clock` takes `{phase: 'prepReveal' | 'night' | 'dawn'}` and `{window: roleId}` in quick mode.
+
+**Tests I could not write here.** The prep half of the flow (Start through the role card and Evening Prep to `Phase.prepReveal`) is 5A's; the full Start-to-game-over path runs at integration (`WDI_E2E_ONUB=1`). Server suites are timing-sensitive on a loaded machine: the new files wait on the messages they assert (`until`) rather than on the step alone.
 
 ### Round 5 log: 5C (ONUB v2 client prep, mini-games, deck editor)
 
+- Done: `scenes/Kitchen.ts` over `view/onub/{PrepView,StationView,PilesView}.ts`; the four mini-games in
+  `view/onub/minigames/` as pure models with a canvas layer; `ui/lobby/DeckEditor.ts`; `net/mock/onubPrepMock.ts`;
+  `ui/copy/onubPrep.ts`; the "Round 5 (5C)" block of `components.css`; bug #126 (copy ids and the Start confirm's
+  fill line); `e2e/kitchen.spec.ts` (mock only, run green against `vite preview`); UI.md 14.12 replaced.
+- Tests: one per mini-game (success, bands, the assist time, nothing sent but `onub.prep`), `PrepModel`, the
+  editor's five problem lines, the frozen hooks of `onub-contract.md` 7 (`view/onub/hooks.test.ts` reads the
+  sources, as the client unit tests run without a DOM).
+- Stand-ins to delete or check at integration: `localDeckProblem` (falls back only while 5A's body throws), the
+  mock's local pile resolution (5A's `resolvePrep`), the greybox mini-game drawing (5M's `onub_mini`), the
+  `onub_kitchen` background (greybox quadrants until 5M).
+- Not touched, per the brief: `onubMock.ts`, `net/onub.ts`, the mount hooks, other lines of `Lobby.ts` and `lobby.ts`.
+- The e2e needs `pnpm --filter @wdi/content build` first (the preview build resolves `@wdi/content` through `dist`).
+- The full-repo `pnpm test` showed one failure of `apps/server/test/npc.test.ts` ("1 human + 3 NPCs ... deals the
+  4-row") that did not repeat in isolation, on base or on this branch.
+
 ### Round 5 log: 5D (ONUB v2 client night, morning and results)
 
+Four stacked draft PRs (#31 Night scene, lights-out and narrator; #36 card table and acts; #39 Rush, claims and CRUST; this one the end screen, `ColyseusOnubFeed`, `night.spec.ts` and the deletions). Decisions: DECISIONS A55.
+
+- **Built.** `scenes/Night.ts` over `view/onub/{NightView,CardTableView,LightsOutView,NightSound}.ts`; `ui/onub/{rush,claim,over,actlog,actflow,slots,rushModel}.ts`; `net/onubColyseus.ts` (prep, night and Rush reads, `board`/`claims` events on state patches); the night half of the mock (windows, acts on a fixed table); `ui/copy/onubNight.ts` (UI.md 14.14, generated from it); the "Round 5 (5D)" CSS block; round-4 `Loft`, `LoftView`, `.wdi-loft*`, `.wdi-bedroll*` and `.wdi-claims*` deleted.
+- **Bugs closed.** The end headline reads the winners row; `loaf_crack` plays at the quick-mode reveal (a two-line edit in `scenes/Meeting.ts`, outside the brief's list but named by it).
+- **Tests.** O9 in `NightView.test.ts`; `actflow`, `rushModel`, `actlog` and the mock's acts; the Colyseus feed on a fake room; `e2e/night.spec.ts` (mock, passes locally after building `@wdi/shared` and `@wdi/content`).
+- **For the orchestrator.** (1) `net/worldRouter.ts` `liveOnubFeed` must become `new ColyseusOnubFeed(room)` at integration. (2) The mock meeting has no quick-mode tally with roles or `OnubGameOver`, so the reveal and end screen are covered by unit tests only. (3) The Tourrier's two-step path is not reachable in the 5-seat mock deck. (4) `OnubBoardView` has no per-window `endsTick`; the waker's clock reads `nightWake.endsTick`.
+
 ### Round 5 log: 5E (ONUB v2 bots, NPC brains, e2e and soak)
+
+**Done** (branch `claude/r5-onub-bots`; decisions in DECISIONS A56):
+- `sim/npc/onub.ts`: the NPC seat's pure planners and `runOnubNpc` (prep at `commitS`, the act at `actFrac` of its window from `onubWakeView`, one claim at `claimFrac`, the vote at `voteFrac` of the Rush plus CRUST); `test/onubNpc.test.ts` (30 tests: timing windows, one send, fixed draw counts, claim and vote logic per team, the two-step Tourrier, a sleeper's view never computed). The verbs are mocked there, since 5A and 5B were stubs on the base.
+- `tools/bots/quick.ts` and the quick branch of `walk.ts`: the bots' prep, night act, claim and vote (Pantry included), the night leak monitor (`WalkerStats.nightLeaks`), `soak.ts --mode onub` with `--sizes`, `--sabotage` and `--pace`, the ruin report per size, `ruin.ts` (`pnpm bots:ruin`, Monte Carlo over the real prep rules); `test/quick.test.ts`, `test/ruin.test.ts`.
+- `apps/client/e2e/onub.spec.ts` (rewritten on the frozen hooks) and the quick case of `npc.spec.ts`; both opt-in (`WDI_E2E_ONUB=1`, `WDI_E2E_NPC=1`) and not run here.
+- `.github/workflows/soak.yml` (quick leg with `--sizes 4,6,8,10` and the Monte Carlo), GDD 3.11 "NPC seats" (the draw of the picks, the Tourrier's step delay), ARCHITECTURE 5.12.
+
+**Not done / for integration.**
+- PR 4 of the brief, the main-mode bot reads after 5F's contract phase (prey from `SceneState.avatars` by handle, Kill by handle, the leak monitor counting any other seat's `presence` and any avatar outside the own scene): 5F had not merged. `walk.ts` keeps `Player.sceneId` and presence reads until then.
+- The real-seat-through-a-full-quick-match test, the specs and the soaks need 5A to 5D merged: run `WDI_E2E_ONUB=1 WDI_E2E_NPC=1 pnpm --filter @wdi/client test:e2e`, `pnpm bots:soak:onub -- --bots 4 --sizes 4,6,8,10` and `pnpm bots:ruin`, and read the ruin table against the 20-30% target.
+- Contract request: `balance.onub.json` `npc.stepS` for the Tourrier's second-step delay (now `STEP_DELAY_S` in the code; DECISIONS A56).
+- Unverified against the real rules: whether a second `nightWake` follows a first step (the bot rebuilds the Tourrier's second step itself when it does not; the server NPC reads `onubWakeView` fresh each tick).
 
 ### Round 5 log: 5F (avatars, public looks, covers, Impersonate)
 
 ### Round 5 log: 5G (main deck and Werewolf roles)
 
+Branch `claude/r5-deck`, one draft PR (#34) carrying the six steps of the brief as commits: (1) `dealMainDeck`, `dealDeck` tests, deck-aware `debug.deal`; (2) the Knife after dark (`isKillPhase`), the Bell in grace and day, the Final Night hunt and forced meeting (`sim/FinalNight.ts`, `Phases.ts`); (3) night powers, protections and Nightshade (`sim/NightPowers.ts`, `sim/nightMemory.ts`); (4) Last Shot (`sim/LastShot.ts`), Inherit (`sim/Inherit.ts`, the `heir` card) and Hunger (`sim/Hunger.ts`); (5) the `ui/main` screens, `ui/copy/deck.ts`, UI.md 14.16; (6) the contract phase (`rosters`, `standIn`, `assignRoles`, `rosterFor`, `dealRoles` removed; `cover` and `look` required). Tests: `dealDeck`, `nightPowers`, `lastShot`, `inherit` (with Hunger), the Final Night cases of `flow.test.ts`, `ui/main/main.test.ts`. Decisions: DECISIONS A58.
+
+Open for the orchestrator: the two contract requests of A58 (`startReveal` aim for an ejected Gamekeeper; `gameOverExtras` in `endMatch`); the NPC night-power and Last Shot draws are 5H's (`Brain.nightPowerAtTick`, `nightPowerPick`, `lastShotAtTick` stay -1 until it lands, so NPCs use no power until then); the night-power picker and aim list wait for 5F's `SeatPicker` and a HUD mount point; the soak gate (median 12-18 min, at most a third reaching the Final Night) needs 5E's swarm and runs at integration.
+
 ### Round 5 log: 5H (NPC routines and fixes)
+
+Branch `claude/r5-npc`, one draft PR (the brief's five steps are five commits of it; the work did not split into PRs under
+400 lines because `routine.ts`, `world.ts` and their tests are one piece). What landed:
+- **Streams**: every NPC draw is from `npcPlay:<seatId>` or `npcTiming:<seatId>` (`playRng`, `timingRng` in
+  `sim/npc/memory.ts`); `NpcMemory.rng` and the `quick` branch of `runMeetingVotes` are gone; the card-blind draws
+  (strike roll, the vote's four uniforms and the per-second tie roll, the night-power tick and pick at each dusk and
+  Final Night hunt, the Last Shot delay) are made by every NPC.
+- **Routine** (`sim/npc/routine.ts`, `world.ts`, `walk.ts`): persona, stations by kind from `routines.json`, work, strolls,
+  idles, scene dwell, the 12 s walking cap, stuck goals, Collect on clues, the startle and report at a body for every NPC,
+  the placement idle, the lit-scenes-at-night rule with the seeded leave delay and the walk home, the Killer's hunt.
+- **Meetings, ready**: the vote tick over `npc.vote.windowFrac`, `npcVoteTarget` (confession, plurality, suspect,
+  forced random), NPC seats Ready after `npc.ready.delayS` on the role card, after Add NPC and after the lobby return.
+- **Tests**: `npcRoutine` (P1-P4, R1-R18), `npcBrain` (M1-M7 and the walking, report and Killer cases), `npc` (D1-D4),
+  `presence` (A1-A5), `npcTells` (E1-E3, four seed sets under `WDI_SLOW=1`), the helpers `advance`, `holdPhase`,
+  `standardParty`. The whole NPC suite runs in about 40 s of wall time, none of it asleep.
+- **CI**: the server suite in its own job. **Docs**: GDD 3.12 (one-door trips, pause and resume, stuck by movement, the
+  hunt), ARCHITECTURE 5.12, DECISIONS A59.
+- **For the orchestrator** (contract changes, not made here): `isKillPhase` in `sim/World.ts` should read
+  `abilities.json` `kill.phases` once 5G lands (the Final Night strike test of `npcBrain.test.ts` is `skipIf` until then);
+  the Final Night itself is 5G's, so E1 ends its match white-box at round 5 until it exists; 5G adds
+  `brain.lastShotAtTick` (a delay in ticks) to the tick its Last Shot aim starts; the NPC Killer sends
+  `priv.avatar || seatId` as its Kill target, so it follows 5F with no change.
 
 ### Round 5 log: 5I (isometric client and lighting)
 
+Branch `claude/r5-iso`, draft PR #29 (the brief's five steps are five commits on it, since the session has one branch; each commit passes
+`pnpm lint && pnpm typecheck && pnpm test` on its own). Decisions: DECISIONS A60.
+
+- **Step 1, projection, input, camera.** `view/iso.ts` (depth bands and biases, `isoZoom`, `cameraBounds`, the decal transform and
+  `decalHolder`, tile and scene diamonds); `PlayerView`, `BodyView`, `ClueView`, `PropView` take world px; `input/vectors.ts` `worldMove`;
+  `World.ts` keeps targets, reach and the noise words in the world and screen frames they belong to.
+- **Step 2, depth and occlusion.** `view/statics.ts` (kit frame names, occluder rules, slices, the fade and the cull) and `StaticView`.
+- **Step 3, tilemap reader.** `view/sceneMap.ts`, `mapDefs.ts` (objects to statics with the SPRITES 10.13 lookup order), `GroundView`,
+  `greyboxColours.ts`, the `maps` and `modes` fields (`manifestRules.ts`, `assets.ts`), `dayPart.ts`.
+- **Step 4, lighting.** `Lighting` and `lightMath.ts`, the 1 x 1 px `night-mask` hook, scene lights by part of the day with flicker and
+  glows, `setCarried` as an unused slot.
+- **Step 5, poses and the rest.** `interact` clip with the greybox teal tick, `PlayerLook.lookId` (for 5F's `EntityView`; the plain
+  villager body when the look's atlas is not loaded), `hungerPrints` in `ClueView`, `world.spec.ts` rewritten (world directions are two
+  keys, sent together by one page call; the darkness hook cases).
+- **Checked.** The 5I rows of SPRITES 10.15: `vectors.test.ts`, `iso.test.ts` (zoom snapping, the decal transform), `statics.test.ts` (depth
+  against building slices), `lightMath.test.ts` (ambient for day, night and a dark scene; lights by phase), `poses.test.ts`; and all of
+  `world.spec.ts` against `?mock=1` in Chromium. The 45 fps check of ROADMAP M5a waits for the isometric maps and the art (integration).
+- **For others.** 5F: pass `lookId` in the `PlayerLook` you give `PlayerView`, and the look's `interact` and the other clips are looked up
+  as `char/<lookId>/<clip>/<dir>`; the deck looks wear their scarf and hat baked in, so the villager overlays are hidden for them. 5J:
+  the client reads `theme`, `map`, `kind`, `dark`, `void` and the object groups of SPRITES 10.12 and falls back to a flat diamond for an
+  orthogonal file; delete the legacy props fallback in `view/PropView.ts` with your tilemaps. 5K: the pivots come from the frames
+  themselves (`customPivot`), with `(0.5, 1)` for a frame without one.
+
 ### Round 5 log: 5J (maps)
+
+Session 5J, 2026-10-18. Four draft PRs against `claude/zen-turing-m1jnw0`. They stack: each branch holds the one
+before it, and each PR description says which commit to review. Decisions: A61.
+
+1. **#32 `claude/r5-maps`: Hollowmere.**
+   - The Fenwood (`forest_deep`) and the Flooded Gallery (`cave_gallery`), both Medium; `fo.deep` and `ce.gallery`.
+   - The four moved doors, the overworld buildings and the Wake Table footprint.
+   - `material` and `lights` on all 15 old scenes, and the Gallows Wood wolf spawners.
+   - Fixture updates forced by the moved doors: `tools/grid/test/export.test.ts` and
+     `apps/server/test/sim-portal.test.ts` (stand at `tavern_bar.front` instead of a hard-coded tile).
+2. **#38 `claude/r5-maps-2`: Blackpine.**
+   - The eight `bp_*` scenes and `maps/blackpine.json`; `SCENE_IDS` +8, `MAP_IDS` + `blackpine`.
+   - The Blackpine cases of `world.test.ts`; `mapSites.test.ts` pins Hollowmere's 17 scenes.
+   - One PR rather than two (A61.1).
+3. **#41 `claude/r5-maps-3`: the isometric exporter** (SPRITES 10.12, with exporter notes there).
+   - Every `tilemap.json` regenerated; navs byte-identical.
+   - The quadrant reading of the shells (A61.2).
+   - `tools/grid` now depends on `@wdi/content` (`workspace:*`).
+4. **#44 `claude/r5-maps-4`: the map choice.**
+   - Server: `mapIdOfRoom` reads `Settings.map`, and `handleSettings` has its map branch.
+   - Client: `MapPicker.ts` (frozen `map-select`), `ui/copy/maps.ts` (UI.md 14.17), the "Round 5 (5J)" CSS block.
+   - Docs: ARCHITECTURE 5.3.
+   - Tests: `apps/server/test/maps.test.ts` (the setting: leader, unknown id, all or nothing, kept through the
+     lobby; a Blackpine start on the yard spawns, the meeting spread, the Bell only at `bc.bell`, the teaching
+     clue at `bc.teaching_clue`) and `ui/lobby/MapPicker.test.ts`.
+
+**For other sessions.**
+- 5I: until your isometric World lands, the top-down `World.ts` cannot draw the new tilemaps. `world.spec.ts` walks
+  west to `tb.front`, which is now on the south wall.
+- 5K: `thumb_<mapId>` shows in the map row as soon as the manifest has it; until then the row shows names and
+  blurbs.
+- No new prop kind, so `routines.json` is unchanged.
 
 ### Round 5 log: 5K (world art)
 

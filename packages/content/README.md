@@ -6,9 +6,9 @@ Every roster, number and scene id that `docs/GDD.md` and `docs/WORLD.md` describ
 edit fails the first test, the server boot and the client build alike.
 
 ```ts
-import { rosterFor, balanceFor, scenes, onubFor, abilities } from "@wdi/content";
+import { deckFor, balanceFor, scenes, onubFor, abilities } from "@wdi/content";
 
-rosterFor(7).deal;            // ["killer", "accomplice", "detective", ...] one role per player
+deckFor(7).cards;            // ["killer", "accomplice", "detective", ...] player count + 2 public cards
 balanceFor(7).killCooldownS;  // 35
 scenes.tavern_bar.portals;    // [{ id: "tb.front", to: "overworld", toSpawn: "tavern_front", ... }]
 onubFor(6).deck;              // 9 loaves for 6 players
@@ -20,7 +20,7 @@ onubFor(6).deck;              // 9 loaves for 6 players
 |---|---|---|
 | `palette.json`, `metrics.json`, `style.json` | colour tokens, tile and render metrics, the STYLE FORMULA | ASSETS 6.1-6.4, 6.9; WORLD 4.2 |
 | `traits.json` | height / scarf / hat values, overlay passes, body ids | GDD 3.1 |
-| `roles.json` | factions, role cards, `rosters["4".."10"]` (`deal` = what V1 deals, `planned` = the GDD row) | GDD 3.1, 3.2 |
+| `roles.json` | factions, role cards, `decks["4".."10"]` (`cards` = the public deck, player count + 2) | GDD 3.1, 3.2 |
 | `abilities.json` | every verb with a number: role abilities, item uses, universal verbs | GDD 3.2-3.7 |
 | `items.json`, `clues.json`, `tasks.json` | items, clue types (frozen ids, sprite key `clue_<id>`), task templates | GDD 3.4, 3.5 |
 | `balance.json` | phases, the per-count table `byCount["4".."10"]`, noise, health, vision, meeting rules | GDD 3.3-3.9 |

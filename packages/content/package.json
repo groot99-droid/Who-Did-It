@@ -2,7 +2,7 @@
   "name": "@wdi/content",
   "version": "0.0.0",
   "private": true,
-  "description": "Who Did It content: rosters, balance, scenes and palette as JSON, validated by zod.",
+  "description": "Who Did It content: roles and decks, balance, scenes and palette as JSON, validated by zod.",
   "license": "MIT",
   "type": "module",
   "exports": {

@@ -51,6 +51,9 @@
   "props": [{ "id": "al.green_lamp", "kind": "lamp", "x": 6, "y": 0 }],
   "gates": [],
   "paths": [],
+  "lights": [
+    { "id": "al.lt_green_lamp", "kind": "lamp", "x": 6, "y": 1, "radiusTiles": 2, "color": "teal" }
+  ],
   "grid": [
     "############",
     "#DS.......H#",
@@ -61,5 +64,16 @@
     "#........H.#",
     "#.B........#",
     "############"
+  ],
+  "material": [
+    "WWWWWWPWWWWW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WWWWWWWWWWWW"
   ]
 }

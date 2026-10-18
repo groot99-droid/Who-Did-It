@@ -14,8 +14,8 @@ import {
   simOfBot,
   sleep,
   teleport,
-  toDay,
 } from './killHelpers';
+import { toNight } from './phaseHelpers';
 import { type Match, startMatch } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -38,7 +38,7 @@ async function party(): Promise<Match> {
     Bot2: 'townsfolk',
     Bot3: 'detective',
   });
-  toDay(m);
+  toNight(m); // the strikes of `murder` need the dark; reports and the Bell set their own phase
   return m;
 }
 
@@ -108,7 +108,7 @@ describe('report', () => {
 });
 
 describe('bell', () => {
-  it('pushes a bell request within reach in day, dusk and night, once per pull of the role', async () => {
+  it('pushes a bell request within reach in grace and day only, once per pull of the role', async () => {
     const m = await party();
     const rec = record(m);
     const [t, d] = [m.bots[1]!, m.bots[3]!];
@@ -121,11 +121,16 @@ describe('bell', () => {
     };
     atBell(Phase.day);
     await act(t, 'act.bell', {});
+    atBell(Phase.grace);
+    await act(t, 'act.bell', {});
+    // After dark only a body report opens a meeting (GDD 3.3, M5a): 425, and the pull is not spent.
     atBell(Phase.night);
+    await act(t, 'act.bell', {});
+    atBell(Phase.finalNight);
     await act(t, 'act.bell', {});
     atBell(Phase.dusk);
     await act(d, 'act.bell', {});
-    atBell(Phase.night);
+    atBell(Phase.day);
     await act(d, 'act.bell', {});
     // Townsfolk pull twice, the Detective once (roles.json bellPulls).
     expect(rec.requests.map((r) => [r.reason, r.callerId])).toEqual([
@@ -133,20 +138,20 @@ describe('bell', () => {
       ['bell', t.id],
       ['bell', d.id],
     ]);
+    atBell(Phase.day);
     await act(t, 'act.bell', {});
-    expect(errorCodes(t)).toEqual([ErrorCode.cannot]);
-    expect(errorCodes(d)).toEqual([ErrorCode.cannot]);
+    await act(d, 'act.bell', {});
+    expect(errorCodes(t)).toEqual([ErrorCode.wrongPhase, ErrorCode.wrongPhase, ErrorCode.cannot]);
+    expect(errorCodes(d)).toEqual([ErrorCode.wrongPhase, ErrorCode.cannot]);
     expect(simOfBot(m, t).bellPulls).toBe(2);
   });
 
-  it('refuses grace, immunity, distance, other scenes and ghosts', async () => {
+  it('refuses immunity, distance, other scenes and ghosts', async () => {
     const m = await party();
     const rec = record(m);
     const [a, b] = [m.bots[1]!, m.bots[2]!];
     teleport(m, a, 'overworld', BELL.x, BELL.y + 1);
     teleport(m, b, 'overworld', BELL.x + 6, BELL.y + 1);
-    setPhase(m, Phase.grace);
-    await act(a, 'act.bell', {});
     setPhase(m, Phase.immunity);
     await act(a, 'act.bell', {});
     setPhase(m, Phase.day);
@@ -156,12 +161,7 @@ describe('bell', () => {
     teleport(m, a, 'overworld', BELL.x, BELL.y + 1);
     simOfBot(m, a).dead = true;
     await act(a, 'act.bell', {});
-    expect(errorCodes(a)).toEqual([
-      ErrorCode.wrongPhase,
-      ErrorCode.wrongPhase,
-      ErrorCode.outOfRange,
-      ErrorCode.cannot,
-    ]);
+    expect(errorCodes(a)).toEqual([ErrorCode.wrongPhase, ErrorCode.outOfRange, ErrorCode.cannot]);
     expect(errorCodes(b)).toEqual([ErrorCode.outOfRange]);
     expect(rec.requests).toEqual([]);
     expect(playerOf(m, a).alive).toBe(true);

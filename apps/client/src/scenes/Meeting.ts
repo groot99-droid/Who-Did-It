@@ -49,7 +49,10 @@ export class Meeting extends Phaser.Scene {
     // The stamp lands with the reveal: one sound for an ejection or any turned-out seat (silent until the
     // audio manifest lists `stamp`, and when the World scene has not published its bus).
     const onResult = (result: Parameters<typeof outsOf>[0]) => {
-      if (outsOf(result).length > 0) (this.registry.get(REG_AUDIO) as AudioBus | undefined)?.play('stamp');
+      const audio = this.registry.get(REG_AUDIO) as AudioBus | undefined;
+      if (outsOf(result).length > 0) audio?.play('stamp');
+      // Quick mode: the oven door cracks at the Final Bake (GDD 3.11, round-4 bug).
+      if (feed.mode() === 'onub') audio?.play('loaf_crack');
       refresh();
     };
     feed.bus.on('voteResult', onResult);

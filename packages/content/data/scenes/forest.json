@@ -58,11 +58,28 @@
       "elevationDelta": 0,
       "minProfile": "small",
       "ships": "V1"
+    },
+    {
+      "id": "fo.deep",
+      "from": "forest",
+      "x": 0,
+      "y": 16,
+      "kind": "forest_gate",
+      "to": "forest_deep",
+      "toSpawn": "wood_side",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "medium",
+      "ships": "V1"
     }
   ],
   "spawns": [
     { "id": "gate", "x": 20, "y": 28, "z": 0, "facing": "n" },
-    { "id": "cave_side", "x": 6, "y": 1, "z": 0, "facing": "s" }
+    { "id": "cave_side", "x": 6, "y": 1, "z": 0, "facing": "s" },
+    { "id": "deep_side", "x": 1, "y": 16, "z": 0, "facing": "e" }
   ],
   "spots": [
     {
@@ -122,6 +139,53 @@
       ]
     }
   ],
+  "lights": [
+    {
+      "id": "fo.lt_gate_lantern",
+      "kind": "lantern",
+      "x": 21,
+      "y": 28,
+      "radiusTiles": 2.5,
+      "phases": ["dusk", "night"]
+    },
+    {
+      "id": "fo.lt_moon_clearing",
+      "kind": "moon",
+      "x": 20,
+      "y": 24,
+      "radiusTiles": 4,
+      "phases": ["night"]
+    }
+  ],
+  "spawners": [
+    {
+      "id": "fo.sp_wolf_w",
+      "mob": "wolf",
+      "x": 8,
+      "y": 9,
+      "leashTiles": 6,
+      "phases": ["dusk", "night"],
+      "pathId": "fo.wolf_loop_w"
+    },
+    {
+      "id": "fo.sp_wolf_n",
+      "mob": "wolf",
+      "x": 25,
+      "y": 6,
+      "leashTiles": 6,
+      "phases": ["dusk", "night"],
+      "pathId": "fo.wolf_loop_n"
+    },
+    {
+      "id": "fo.sp_wolf_e",
+      "mob": "wolf",
+      "x": 33,
+      "y": 12,
+      "leashTiles": 6,
+      "phases": ["dusk", "night"],
+      "pathId": "fo.wolf_loop_e"
+    }
+  ],
   "grid": [
     "######D#################################",
     "#.....S................................#",
@@ -139,7 +203,7 @@
     "#......................................#",
     "#................................###...#",
     "#....##..........................###...#",
-    "#....##......###.................###...#",
+    "DS...##......###.................###...#",
     "#....##......###...........##..........#",
     "#....##....................##..........#",
     "#......................H...##..........#",
@@ -153,5 +217,37 @@
     "#......................................#",
     "#...................S..................#",
     "####################D###################"
+  ],
+  "material": [
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    "TmmmmmpmmmlllllllllllllllllllllllllllllT",
+    "TmTTTmpmmmllllTTTTlllllllllllllTTllllllT",
+    "TmTTTmpmmTTlllTTTTllllllTTTllllTTllllllT",
+    "TlTTTlpllTTlllllllllllllTTTllllTTllllllT",
+    "TlllllpllTTlllllllllllllTTTllllTTllllllT",
+    "TlllllpllTTllllllllllllllllllllTTllllllT",
+    "TlllllpllllllllllllllllllllllllllllllllT",
+    "TlllllpllllllllllllTTllllllllllllllTTTlT",
+    "TllTTTTllllllllllllTTllllllllllllllTTTlT",
+    "TllTTTTllllTTTlllllTTlllllTTTTlllllllllT",
+    "TlllllpllllTTTllllllllllllTTTTlllllllllT",
+    "TlllllpllllTTTlllllllllllllllllllllllllT",
+    "TlllllpppppppppppppppppppppppppppppppplT",
+    "TlllllllllllllllllllpllllllllllllTTTlllT",
+    "TllllTTlllllllllllllpllllllllllllTTTlllT",
+    "TppppTTllllllTTTllllpllllllllllllTTTlllT",
+    "TllllTTllllllTTTllllpllllllTTllllllllllT",
+    "TllllTTlllllllllllllpllllllTTllllllllllT",
+    "TlllllllllllllllllllpllllllTTlllllluuulT",
+    "TlllllllllllllllllllplllllllllllllluuulT",
+    "TlllllllTTlllllllllgggllllllllllllluuulT",
+    "TlTTTlllTTllllllllgggggllllllllTTTlllllT",
+    "TlTTTlllTTlllllllggggggglllllllTTTlllllT",
+    "TllllllllllllllllggggggglllllllllllllllT",
+    "TlllluuulllllllllggggggglllllllllllTTllT",
+    "TlllluuullllllllllgggggllllllllllllTTllT",
+    "TlllluuullllllllllgggggllllllllllllllllT",
+    "TllllllllllllllllggggggglllllllllllllllT",
+    "TTTTTTTTTTTTTTTTPTTTTTTTTTTTTTTTTTTTTTTT"
   ]
 }

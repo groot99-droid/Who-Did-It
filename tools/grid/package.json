@@ -3,14 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "ASCII scene grids to Phaser tilemaps and the .nav.json collision bitmap (docs/ASSETS.md 6.3).",
+  "description": "Scene grids and material layers to isometric Phaser tilemaps and the .nav.json collision bitmap (docs/SPRITES.md 10.12).",
   "scripts": {
-    "export": "tsx export.ts",
-    "check": "tsx export.ts --check",
+    "export": "tsx --conditions=development export.ts",
+    "check": "tsx --conditions=development export.ts --check",
     "typecheck": "tsc -p .",
     "test": "vitest run"
   },
   "dependencies": {
+    "@wdi/content": "workspace:*",
     "@wdi/shared": "workspace:*"
   },
   "devDependencies": {

@@ -32,7 +32,6 @@ import {
   registerFont,
   seedOf,
   shape,
-  type ManifestEntry,
   type PlaceholderEntry,
   type Token,
 } from './placeholder-kit.ts';
@@ -507,7 +506,7 @@ export function placeholderEntries(): PlaceholderEntry[] {
           path: 'props/',
           filter: 'nearest',
           maps: [key.slice('props_'.length)],
-        } as ManifestEntry,
+        },
       ],
       files: async () => {
         const props = propFrames(key, names);
@@ -529,7 +528,7 @@ export function placeholderEntries(): PlaceholderEntry[] {
           path: 'buildings/',
           filter: 'nearest',
           maps: [map],
-        } as ManifestEntry,
+        },
       ],
       files: async () => {
         const manifest: StaticManifest = { version: 1, atlas: `bld_${map}`, frames: {} };
@@ -551,7 +550,6 @@ export function placeholderEntries(): PlaceholderEntry[] {
       const key = `iso_ground_${theme}`;
       return {
         order: 65,
-        // `maps` (SPRITES 10.13) is not in the core's ManifestEntry yet; the cast keeps the row as written.
         entries: [
           {
             key,
@@ -559,7 +557,7 @@ export function placeholderEntries(): PlaceholderEntry[] {
             url: `ground/${key}.png`,
             filter: 'nearest',
             maps: [GROUND_MAPS[theme]],
-          } as ManifestEntry,
+          },
         ],
         files: () => new Map([[`ground/${key}.png`, groundTilesetImage(theme)]]),
       };
@@ -576,7 +574,7 @@ export function placeholderEntries(): PlaceholderEntry[] {
             path: 'kit/',
             filter: 'nearest',
             maps: [GROUND_MAPS[theme]],
-          } as ManifestEntry,
+          },
         ],
         files: async () => {
           const kit = kitFrames(theme);

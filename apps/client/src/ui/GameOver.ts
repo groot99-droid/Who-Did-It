@@ -4,7 +4,7 @@ import { MEETING_COPY as C } from './copy/meeting';
 import { h, icon, type Screen } from './dom';
 import { renderMainOver } from './main/overMain';
 import { FACTION_LABEL, factionOf, winnerLine } from './meetingText';
-import { renderOnubOver } from './onub/over';
+import { overHeadline, renderOnubOver } from './onub/over';
 import { roleTitle } from './RoleCard';
 
 export interface GameOverOptions {
@@ -95,7 +95,8 @@ export function mountGameOver(root: HTMLElement, opts: GameOverOptions): GameOve
     h(
       'h1',
       { id: 'gameover-title', class: 'wdi-display wdi-display--lg', 'data-testid': 'gameover-winner' },
-      winnerLine(over.winner),
+      // Quick mode: the headline is the winners row's own line, never the `Winner` enum (round-4 bug).
+      onub === undefined ? winnerLine(over.winner) : overHeadline(onub.rowId),
     ),
     over.summary !== '' && h('p', { class: 'wdi-muted', 'data-testid': 'gameover-summary' }, over.summary),
     h('h2', { class: 'wdi-eyebrow' }, C['over.roles']),

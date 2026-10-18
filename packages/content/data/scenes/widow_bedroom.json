@@ -58,6 +58,7 @@
   "props": [{ "id": "wb.candle", "kind": "lamp", "x": 6, "y": 0 }],
   "gates": [],
   "paths": [],
+  "lights": [{ "id": "wb.lt_candle", "kind": "lamp", "x": 6, "y": 1, "radiusTiles": 1.5 }],
   "grid": [
     "############",
     "#H........B#",
@@ -68,5 +69,16 @@
     "#..........#",
     "#..S.......#",
     "###D########"
+  ],
+  "material": [
+    "WWWWWWPWWWWW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WWWWWWWWWWWW"
   ]
 }

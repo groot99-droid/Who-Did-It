@@ -42,9 +42,28 @@
       "elevationDelta": 0,
       "minProfile": "small",
       "ships": "V1.5"
+    },
+    {
+      "id": "ce.gallery",
+      "from": "cave_entry",
+      "x": 10,
+      "y": 0,
+      "kind": "cave_mouth",
+      "to": "cave_gallery",
+      "toSpawn": "upper",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "medium",
+      "ships": "V1"
     }
   ],
-  "spawns": [{ "id": "mouth", "x": 10, "y": 12, "z": 0, "facing": "n" }],
+  "spawns": [
+    { "id": "mouth", "x": 10, "y": 12, "z": 0, "facing": "n" },
+    { "id": "gallery", "x": 10, "y": 1, "z": 0, "facing": "s" }
+  ],
   "spots": [
     {
       "id": "ce.stalagmites",
@@ -74,9 +93,22 @@
   "props": [],
   "gates": [],
   "paths": [],
+  "lights": [
+    { "id": "ce.lt_moss_0", "kind": "moss", "x": 3, "y": 2, "radiusTiles": 2 },
+    { "id": "ce.lt_moss_1", "kind": "moss", "x": 16, "y": 5, "radiusTiles": 2 },
+    { "id": "ce.lt_moss_2", "kind": "moss", "x": 4, "y": 11, "radiusTiles": 2 },
+    {
+      "id": "ce.lt_mouth",
+      "kind": "shaft",
+      "x": 10,
+      "y": 12,
+      "radiusTiles": 3,
+      "phases": ["day", "dusk"]
+    }
+  ],
   "grid": [
-    "####################",
-    "#..................#",
+    "##########D#########",
+    "#.........S........#",
     "#..................#",
     "#..................#",
     "#....H.##..........D",
@@ -89,5 +121,21 @@
     "#..................#",
     "#.........S........#",
     "##########D#########"
+  ],
+  "material": [
+    "XXXXXXXXXXXXXXXXXXXX",
+    "XrmmmrrrrrrrrrrrrrrX",
+    "XrmmmrrrrrrrrrrrrrrX",
+    "XrmmmrrrrrrrrrrrrrrX",
+    "XrrrrrrRRrrrrrrmmmrX",
+    "XrrrrrrRRrrrrrrmmmrX",
+    "XrrRrrrrrrrrrrrmmmrX",
+    "XrrRrrrrrrrrrrrrrrrX",
+    "XrrRrrrrrrrrRRRrrrrX",
+    "X~~~rrrrrrrrrrrrrrrX",
+    "X~~~mmrrrrrrrrrrrrrX",
+    "X~~~mmrrsssssrrrrrrX",
+    "XrrmmmrrsssssrrrrrrX",
+    "XXXXXXXXXXXXXXXXXXXX"
   ]
 }

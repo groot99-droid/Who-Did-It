@@ -15,7 +15,6 @@
       "membersKnowEachOther": false
     }
   },
-  "standIn": "townsfolk",
   "roles": {
     "killer": {
       "id": "killer",
@@ -57,6 +56,29 @@
       "abilities": ["plantClue", "crowbar", "inherit"],
       "cardText": "You never hold the knife, only the alibi. Forge trails, break the right doors, vouch at the right moment.",
       "beware": "Inspect marks plants Forged; a Forged entry tells the village an Accomplice exists; your cover is a claim someone may test.",
+      "bellPulls": 1,
+      "gddRef": "3.2"
+    },
+    "heir": {
+      "id": "heir",
+      "name": "Accomplice, Knife-bearer",
+      "faction": "cabal",
+      "cover": false,
+      "look": null,
+      "ships": "V1",
+      "firstPlayable": false,
+      "goal": "Carry on the Killer's work alone: strike after dark, keep your cover.",
+      "winsWith": "cabal",
+      "win": "As the Killer.",
+      "parity": "cabal",
+      "startKit": [
+        { "item": "plantKit", "qty": 3 },
+        { "item": "crowbar", "qty": 1 },
+        { "item": "knife", "qty": 1 }
+      ],
+      "abilities": ["kill", "plantClue", "crowbar"],
+      "cardText": "The Knife has passed to you. The Killer is gone and the village does not know it yet; finish what they started.",
+      "beware": "Your Hunger clock starts in the round you inherit; your cover is still a claim someone may test.",
       "bellPulls": 1,
       "gddRef": "3.2"
     },
@@ -437,118 +459,6 @@
       "beware": "Weak alone; strong in pairs.",
       "bellPulls": 2,
       "gddRef": "3.2"
-    }
-  },
-  "rosters": {
-    "4": {
-      "practice": true,
-      "deal": ["killer", "detective", "townsfolk", "townsfolk"],
-      "planned": ["killer", "detective", "townsfolk", "townsfolk"],
-      "gddRef": "3.1"
-    },
-    "5": {
-      "practice": false,
-      "deal": ["killer", "detective", "doctor", "townsfolk", "townsfolk"],
-      "planned": ["killer", "detective", "doctor", "townsfolk", "townsfolk"],
-      "gddRef": "3.1"
-    },
-    "6": {
-      "practice": false,
-      "deal": ["killer", "detective", "doctor", "butler", "townsfolk", "townsfolk"],
-      "planned": ["killer", "detective", "doctor", "butler", "townsfolk", "townsfolk"],
-      "gddRef": "3.1"
-    },
-    "7": {
-      "practice": false,
-      "deal": ["killer", "accomplice", "detective", "doctor", "butler", "townsfolk", "townsfolk"],
-      "planned": [
-        "killer",
-        "accomplice",
-        "detective",
-        "doctor",
-        "butler",
-        "townsfolk",
-        "townsfolk"
-      ],
-      "gddRef": "3.1"
-    },
-    "8": {
-      "practice": false,
-      "deal": [
-        "killer",
-        "accomplice",
-        "detective",
-        "doctor",
-        "butler",
-        "child",
-        "townsfolk",
-        "townsfolk"
-      ],
-      "planned": [
-        "killer",
-        "accomplice",
-        "detective",
-        "doctor",
-        "butler",
-        "child",
-        "townsfolk",
-        "townsfolk"
-      ],
-      "gddRef": "3.1"
-    },
-    "9": {
-      "practice": false,
-      "deal": [
-        "killer",
-        "accomplice",
-        "detective",
-        "doctor",
-        "butler",
-        "child",
-        "townsfolk",
-        "townsfolk",
-        "townsfolk"
-      ],
-      "planned": [
-        "killer",
-        "accomplice",
-        "detective",
-        "doctor",
-        "butler",
-        "child",
-        "ranger",
-        "townsfolk",
-        "townsfolk"
-      ],
-      "gddRef": "3.1"
-    },
-    "10": {
-      "practice": false,
-      "deal": [
-        "killer",
-        "killer",
-        "accomplice",
-        "detective",
-        "doctor",
-        "butler",
-        "child",
-        "townsfolk",
-        "drifter",
-        "townsfolk"
-      ],
-      "planned": [
-        "killer",
-        "killer",
-        "accomplice",
-        "detective",
-        "doctor",
-        "butler",
-        "child",
-        "ranger",
-        "drifter",
-        "townsfolk"
-      ],
-      "gddRef": "3.1"
     }
   },
   "decks": {
