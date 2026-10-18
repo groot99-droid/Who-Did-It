@@ -3,7 +3,7 @@ import { readdirSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { packAsync } from 'free-tex-packer-core';
-import { alphaBleed } from './bleed.ts';
+import { alphaBleed, decodePng, type Rgba } from './bleed.ts';
 import { applyPivots, buildAnims, type FeetManifest } from './gen-anims.ts';
 import { CHAR_PAGE, OVL_PAGE, PASSES, frameKey, parseFrameFileName, textureKey, type Pass } from './keys.ts';
 import { finishEnabled } from './palette.ts';
@@ -80,10 +80,12 @@ export async function packFrames(
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .map((i) => ({ path: `${i.name}.png`, contents: i.png }));
   // The packer's extrude resizes edge strips bilinearly, which adds partial alpha and off-palette colours.
-  // With the pixel finish on, frames are drawn with nearest filtering and the padding alone keeps them apart.
+  // Finished frames (the pixel finish on: alpha 0 or 255, drawn with nearest filtering) pack without it;
+  // the padding alone keeps them apart. Unfinished art keeps the extrude, byte for byte as before.
+  const finished = finishEnabled('main') && inputs.every((i) => !hasPartialAlpha(decodePng(i.png)));
   const out = await packAsync(files, {
     ...PACK_OPTIONS,
-    extrude: finishEnabled('main') ? 0 : PACK_OPTIONS.extrude,
+    extrude: finished ? 0 : PACK_OPTIONS.extrude,
     width: page.w,
     height: page.h,
     textureName,
@@ -115,6 +117,11 @@ export async function packFrames(
 
 export function atlasJson(atlas: MultiAtlas): string {
   return `${JSON.stringify(atlas, null, 1)}\n`;
+}
+
+function hasPartialAlpha(img: Rgba): boolean {
+  for (let i = 3; i < img.data.length; i += 4) if (img.data[i] !== 0 && img.data[i] !== 255) return true;
+  return false;
 }
 
 /** Page sizes for a body's two textures; a look's caps are one 1024² body page and one 1024 x 512 overlay page. */
