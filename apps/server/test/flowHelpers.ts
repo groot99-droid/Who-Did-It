@@ -1,6 +1,5 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { boot } from '@colyseus/testing';
-import { roles } from '@wdi/content';
 import { Phase, type PlayerState } from '@wdi/shared';
 import { createServer } from '../src/server';
 import { simOf } from '../src/sim/RoomSim';
@@ -31,11 +30,44 @@ export async function until(cond: () => boolean, ms = 5000): Promise<boolean> {
   return cond();
 }
 
-/** The role names of the roster row for `n`, in deal order: Bot0 is the Killer, Bot1 the Detective. */
+/**
+ * The roles of a test party of `n`, in seat order (white-box: the debug start deals none): Bot0 is the Killer, Bot1
+ * the Detective. A fixed fixture; the real deal is the public deck's (`dealMainDeck`, `dealDeck.test.ts`).
+ */
+const PARTY: Record<number, string[]> = {
+  4: ['killer', 'detective', 'townsfolk', 'townsfolk'],
+  5: ['killer', 'detective', 'doctor', 'townsfolk', 'townsfolk'],
+  6: ['killer', 'detective', 'doctor', 'butler', 'townsfolk', 'townsfolk'],
+  7: ['killer', 'accomplice', 'detective', 'doctor', 'butler', 'townsfolk', 'townsfolk'],
+  8: ['killer', 'accomplice', 'detective', 'doctor', 'butler', 'child', 'townsfolk', 'townsfolk'],
+  9: [
+    'killer',
+    'accomplice',
+    'detective',
+    'doctor',
+    'butler',
+    'child',
+    'townsfolk',
+    'townsfolk',
+    'townsfolk',
+  ],
+  10: [
+    'killer',
+    'killer',
+    'accomplice',
+    'detective',
+    'doctor',
+    'butler',
+    'child',
+    'townsfolk',
+    'drifter',
+    'townsfolk',
+  ],
+};
 export const rolesFor = (n: number): Record<string, string> =>
-  Object.fromEntries((roles.rosters[String(n) as '4']?.deal ?? []).map((r, i) => [`Bot${i}`, r]));
+  Object.fromEntries((PARTY[n] ?? []).map((r, i) => [`Bot${i}`, r]));
 
-/** A started match with the roster roles written white-box (debug start deals none). */
+/** A started match with the party's roles written white-box (debug start deals none). */
 export const startParty = (colyseus: ColyseusTestServer, n: number): Promise<Match> =>
   startMatch(colyseus, n, rolesFor(n));
 

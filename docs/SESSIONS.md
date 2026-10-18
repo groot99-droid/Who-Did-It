@@ -2032,6 +2032,10 @@ Notes for the next sessions: 5B finds `OnubState.dealt`, `.commits`, `.prep`, `.
 
 ### Round 5 log: 5G (main deck and Werewolf roles)
 
+Branch `claude/r5-deck`, one draft PR (#34) carrying the six steps of the brief as commits: (1) `dealMainDeck`, `dealDeck` tests, deck-aware `debug.deal`; (2) the Knife after dark (`isKillPhase`), the Bell in grace and day, the Final Night hunt and forced meeting (`sim/FinalNight.ts`, `Phases.ts`); (3) night powers, protections and Nightshade (`sim/NightPowers.ts`, `sim/nightMemory.ts`); (4) Last Shot (`sim/LastShot.ts`), Inherit (`sim/Inherit.ts`, the `heir` card) and Hunger (`sim/Hunger.ts`); (5) the `ui/main` screens, `ui/copy/deck.ts`, UI.md 14.16; (6) the contract phase (`rosters`, `standIn`, `assignRoles`, `rosterFor`, `dealRoles` removed; `cover` and `look` required). Tests: `dealDeck`, `nightPowers`, `lastShot`, `inherit` (with Hunger), the Final Night cases of `flow.test.ts`, `ui/main/main.test.ts`. Decisions: DECISIONS A58.
+
+Open for the orchestrator: the two contract requests of A58 (`startReveal` aim for an ejected Gamekeeper; `gameOverExtras` in `endMatch`); the NPC night-power and Last Shot draws are 5H's (`Brain.nightPowerAtTick`, `nightPowerPick`, `lastShotAtTick` stay -1 until it lands, so NPCs use no power until then); the night-power picker and aim list wait for 5F's `SeatPicker` and a HUD mount point; the soak gate (median 12-18 min, at most a third reaching the Final Night) needs 5E's swarm and runs at integration.
+
 ### Round 5 log: 5H (NPC routines and fixes)
 
 ### Round 5 log: 5I (isometric client and lighting)

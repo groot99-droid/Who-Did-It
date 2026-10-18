@@ -48,9 +48,9 @@ export const sceneDef = (id: SceneId) => scenes[id];
 /** Centre of a tile in pixels. */
 export const tileCentre = (t: number, tilePx: number): number => (t + 0.5) * tilePx;
 
-/** Phases in which the Knife works (GDD 3.2, A30): grace and immunity refuse. */
+/** Phases in which the Knife works (GDD 3.3, M5a): after dark only; grace, day and immunity refuse. */
 export const isKillPhase = (phase: number): boolean =>
-  phase === Phase.day || phase === Phase.dusk || phase === Phase.night;
+  phase === Phase.dusk || phase === Phase.night || phase === Phase.finalNight;
 
 /** Phases in which a verb works: the world phases but the immunity window after a meeting (A30). */
 export const isVerbPhase = (phase: number): boolean => isWorldPhase(phase) && phase !== Phase.immunity;

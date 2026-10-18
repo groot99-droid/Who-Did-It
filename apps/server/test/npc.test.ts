@@ -1,7 +1,8 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { balance, roles } from '@wdi/content';
+import { balance, deckFor } from '@wdi/content';
 import { C2S, ErrorCode, MAX_PLAYERS, NpcLevel, Phase, S2C, type RoleRevealPayload } from '@wdi/shared';
+import { flowOf } from '../src/sim/Flow';
 import { resetToLobby } from '../src/sim/Win';
 import { flatten } from './killHelpers';
 import { simOf } from '../src/sim/RoomSim';
@@ -18,7 +19,7 @@ afterAll(async () => release());
 beforeEach(async () => colyseus.cleanup());
 
 describe('NPC fill at Start (GDD 3.12)', () => {
-  it('1 human + 3 NPCs starts and deals the 4-row', async () => {
+  it('1 human + 3 NPCs starts and deals the 4-player deck', async () => {
     const party = await lobbyOf(colyseus, 1);
     expect(party.room.state.players.size).toBe(1);
     await start(party);
@@ -26,7 +27,7 @@ describe('NPC fill at Start (GDD 3.12)', () => {
     expect(party.room.state.settings.npcSeats).toBe(balance.players.min - 1);
     expect(npcSeats(party.room)).toHaveLength(3);
     const dealt = [...party.room.state.players.values()].map((p) => p.priv.role.roleId).sort();
-    expect(dealt).toEqual([...roles.rosters['4'].deal].sort());
+    expect([...dealt, ...flowOf(party.room).undealt].sort()).toEqual([...deckFor(4).cards].sort());
     const cards = party.humans[0]?.log.filter((m) => m.type === S2C.roleReveal) ?? [];
     expect(cards).toHaveLength(1);
     expect((cards[0]?.payload as RoleRevealPayload).teammates.length).toBeLessThanOrEqual(0);

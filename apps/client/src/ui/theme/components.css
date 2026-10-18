@@ -1743,3 +1743,77 @@
   border-color: var(--wdi-interact);
   box-shadow: var(--wdi-glow-interact);
 }
+
+/* Round 5 (5G): the main-mode deck list and chip, the look tag on a meeting portrait, the Last Shot toast. */
+.wdi-deck {
+  display: grid;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-deck__cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wdi-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wdi-deck__card {
+  padding: var(--wdi-space-1) var(--wdi-space-3);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-sm);
+  background: var(--wdi-paper);
+  color: var(--wdi-text-on-paper);
+  font-size: var(--wdi-text-sm);
+}
+
+.wdi-deck__cards[hidden] {
+  display: none;
+}
+
+.wdi-deck--chip {
+  max-width: 20rem;
+}
+
+.wdi-deck__toggle {
+  min-height: var(--wdi-touch);
+}
+
+.wdi-look-tag {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 0 var(--wdi-space-1);
+  background: var(--wdi-slate);
+  color: var(--wdi-bone);
+  font-size: var(--wdi-text-xs);
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.wdi-look-tag--ink {
+  background: var(--wdi-ink);
+}
+
+.wdi-look-tag--fog {
+  background: var(--wdi-fog);
+  color: var(--wdi-ink);
+}
+
+.wdi-look-tag--bone {
+  background: var(--wdi-bone);
+  color: var(--wdi-ink);
+}
+
+.wdi-toast--shot {
+  border-left-color: var(--wdi-danger);
+}
+
+.wdi-portrait__pic[data-look] {
+  position: relative;
+}
+
+.wdi-over__list {
+  margin: 0;
+  padding-left: var(--wdi-space-5);
+}

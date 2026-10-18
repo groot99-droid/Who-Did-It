@@ -1,9 +1,22 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { balance } from '@wdi/content';
-import { C2S, ErrorCode, Phase, TICK_RATE } from '@wdi/shared';
+import { balance, deckFor } from '@wdi/content';
+import { C2S, ErrorCode, Phase, SKIP_VOTE, TICK_RATE, Winner } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { bootFlowServer, clock, events, idOf, seat, skipPhase, startParty, until } from './flowHelpers';
+import {
+  bootFlowServer,
+  clock,
+  events,
+  idOf,
+  request,
+  seat,
+  skipPhase,
+  startParty,
+  until,
+  vote,
+  voteAll,
+} from './flowHelpers';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
+import { flowOf } from '../src/sim/Flow';
 import { simOf } from '../src/sim/RoomSim';
 import { opts, sleep } from './simHelpers';
 
@@ -100,7 +113,7 @@ describe('debug.clock and debug.deal (WDI_DEBUG only)', () => {
     expect(m.room.state.phase).toBe(Phase.day);
   });
 
-  it('debug.deal fixes seats for the next deal and the roster counts hold', async () => {
+  it('debug.deal fixes seats for the next deal and the deck counts hold', async () => {
     const leader = await colyseus.sdk.create('party', opts('Bot0'));
     const rooms = [leader];
     for (let i = 1; i < 5; i++) rooms.push(await colyseus.sdk.joinById(leader.roomId, opts(`Bot${i}`)));
@@ -113,6 +126,117 @@ describe('debug.clock and debug.deal (WDI_DEBUG only)', () => {
     const dealt = ids.map((id) => room.state.players.get(id)!.priv!.role.roleId);
     expect(dealt[3]).toBe('killer');
     expect(dealt[4]).toBe('doctor');
-    expect([...dealt].sort()).toEqual(['detective', 'doctor', 'killer', 'townsfolk', 'townsfolk']);
+    const flow = flowOf(room);
+    expect(flow.deck).toEqual(deckFor(5).cards);
+    expect(flow.undealt).toHaveLength(2);
+    expect([...dealt, ...flow.undealt].sort()).toEqual([...deckFor(5).cards].sort());
+  });
+
+  it('debug.deal refuses a card the deck does not hold, or holds fewer times', async () => {
+    const leader = await colyseus.sdk.create('party', opts('Bot0'));
+    const rooms = [leader];
+    for (let i = 1; i < 5; i++) rooms.push(await colyseus.sdk.joinById(leader.roomId, opts(`Bot${i}`)));
+    const room = colyseus.getRoomById(leader.roomId) as unknown as PartyRoom;
+    const ids = rooms.map((r) => r.sessionId);
+    leader.send('debug.deal', { roles: { [ids[0]!]: 'townsfolk' } }); // the class row is in no deck
+    leader.send('debug.deal', { roles: { [ids[0]!]: 'killer', [ids[1]!]: 'killer' } }); // one Killer at 5
+    await sleep(150);
+    expect(flowOf(room).fixedDeal).toBeNull();
+  });
+});
+
+describe('the Final Night (GDD 3.3, 3.8)', () => {
+  /** Grace ends into the Final Night: the day that would start round 5 (`finalNight.afterCycle` 4). */
+  async function toFinalNight(n = 5) {
+    const m = await startParty(colyseus, n);
+    m.room.state.round = balance.finalNight.afterCycle;
+    await skipPhase(m);
+    return m;
+  }
+
+  it('replaces the day of round 5 with a hunt of finalNight.huntS', async () => {
+    const m = await toFinalNight();
+    const s = m.room.state;
+    expect(s.phase).toBe(Phase.finalNight);
+    expect(s.round).toBe(balance.finalNight.afterCycle + 1);
+    expect(Math.abs(s.phaseEndsTick - s.tick - balance.finalNight.huntS * TICK_RATE)).toBeLessThanOrEqual(4);
+  });
+
+  it('comes after the night or the immunity of round 4, never after round 3', async () => {
+    const m = await startParty(colyseus, 5);
+    m.room.state.round = balance.finalNight.afterCycle - 1;
+    await skipPhase(m); // grace -> day of round 4
+    expect(m.room.state.phase).toBe(Phase.day);
+    await skipPhase(m);
+    await skipPhase(m);
+    await skipPhase(m); // night -> the Final Night
+    expect(m.room.state.phase).toBe(Phase.finalNight);
+  });
+
+  it('cuts every Knife cooldown to finalNight.killCooldownS and leaves a shorter one alone', async () => {
+    const m = await startParty(colyseus, 5);
+    m.room.state.round = balance.finalNight.afterCycle;
+    seat(m, 0).priv!.cooldownEndTick.set('kill', m.room.state.tick + 5000);
+    await skipPhase(m);
+    const left = seat(m, 0).priv!.cooldownEndTick.get('kill')! - m.room.state.tick;
+    expect(left).toBeLessThanOrEqual(balance.finalNight.killCooldownS * TICK_RATE);
+    expect(left).toBeGreaterThan(0);
+    m.room.state.round = 0;
+  });
+
+  it('opens the forced meeting with reason final when the hunt runs out', async () => {
+    const m = await toFinalNight();
+    await skipPhase(m);
+    expect(m.room.state.phase).toBe(Phase.meetingDiscussion);
+    expect(m.room.state.meeting.reason).toBe('final');
+    expect(events(m.bots[1]!, 'meetingStart').at(-1)).toMatchObject({ reason: 'final' });
+  });
+
+  it('ends the hunt at once on a body report (finalNight.reportEndsHunt)', async () => {
+    const m = await toFinalNight();
+    request(m, 1, 2);
+    expect(await until(() => m.room.state.phase === Phase.meetingDiscussion)).toBe(true);
+    expect(m.room.state.meeting.reason).toBe('final');
+    expect(m.room.state.meeting.callerId).toBe(idOf(m, 1));
+  });
+
+  it('refuses a Skip vote in the forced meeting and keeps the seat unvoted', async () => {
+    const m = await toFinalNight();
+    await skipPhase(m);
+    const before = events(m.bots[1]!, 'error').length;
+    vote(m, 1, SKIP_VOTE);
+    expect(await until(() => events(m.bots[1]!, 'error').length > before)).toBe(true);
+    expect(events(m.bots[1]!, 'error').at(-1)).toMatchObject({ code: ErrorCode.cannot });
+    expect(seat(m, 1).hasVoted).toBe(false);
+    vote(m, 1, idOf(m, 2));
+    expect(await until(() => seat(m, 1).hasVoted)).toBe(true);
+  });
+
+  it('ends the match for the Cabal when the vote ties or nobody votes', async () => {
+    const m = await toFinalNight();
+    await skipPhase(m); // the hunt ends: the forced meeting opens
+    await skipPhase(m); // discussion -> vote
+    await skipPhase(m); // vote ends with no ballots: nobody ejected
+    expect(m.room.state.phase).toBe(Phase.reveal);
+    await skipPhase(m);
+    expect(m.room.state.phase).toBe(Phase.gameOver);
+    expect(m.room.state.winner).toBe(Winner.cabal);
+  });
+
+  it('ends the match for the Village when the vote ejects a Cabal member', async () => {
+    const m = await toFinalNight();
+    await skipPhase(m);
+    await voteAll(m, [0, 1, 2, 3, 4], (i) => idOf(m, i === 0 ? 1 : 0));
+    await skipPhase(m);
+    expect(m.room.state.phase).toBe(Phase.gameOver);
+    expect(m.room.state.winner).toBe(Winner.village);
+  });
+
+  it('ends the match for the Cabal when the vote ejects a villager', async () => {
+    const m = await toFinalNight();
+    await skipPhase(m);
+    await voteAll(m, [0, 1, 2, 3, 4], () => idOf(m, 2));
+    await skipPhase(m);
+    expect(m.room.state.winner).toBe(Winner.cabal);
   });
 });

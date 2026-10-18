@@ -135,9 +135,8 @@ describe('decks (GDD 3.1, 3.9)', () => {
     for (const look of Object.values(looks.looks)) expect(dealt.has(look.role)).toBe(true);
   });
 
-  it('keeps the roster rows beside the decks until the contract phase (DECISIONS X1)', () => {
-    expect(roles.standIn).toBe('townsfolk');
-    for (const n of PLAYER_COUNTS) expect(roles.rosters[n].deal).toHaveLength(Number(n));
+  it('has no roster rows or stand-in any more (the decks and professions replaced them)', () => {
+    expect(Object.keys(roles).sort()).toEqual(['decks', 'factions', 'gddRef', 'roles']);
   });
 });
 

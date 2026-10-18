@@ -767,3 +767,33 @@ controls, and they only count (`Settings.npcSeats`, which is public). `{min}` is
 The difficulty labels are the keys of `balance.json` `npc.difficulty` in sentence case; a level the
 deck does not list shows its key. `lobby.hint.fill` replaces the interim "NPC fill is coming" line
 (A28, removed by A39).
+
+### 14.16 Main deck, looks and the night roles (5G)
+
+Session 5G, round 5. The main-mode screens of GDD 3.1, 3.2, 3.8 and 3.17, in `apps/client/src/ui/main/` with their
+lines in `ui/copy/deck.ts` (`DECK_COPY`). The deck is public by design: every line below reads only the cards and
+looks of `roles.json` and `looks.json`, never a deal. `{cards}` and `{players}` are counts, `{look}` a look's name with
+its article ("the Baker"), `{name}` a seat's name.
+
+| Id | Text | Where |
+|---|---|---|
+| `deck.title` | The deck | header of `lobby-deck` |
+| `deck.size` | {cards} cards for {players} players | `lobby-deck-size`, the party filled to four at least |
+| `deck.note` | Every Killer card is dealt. Two other cards stay in the box, and which two is secret. | under the lobby list |
+| `deck.practice` | Practice party: the Cabal wins with one villager left. | `lobby-deck-practice`, at the practice size |
+| `deck.twice` | {name} x2 | a repeated card (the ten-seat deck's second Killer) |
+| `deck.chip.label` | Deck: {cards} cards | `hud-deck-toggle` |
+| `deck.chip.open` / `deck.chip.close` | Show the deck / Hide the deck | `aria-label` of the toggle; the list is `hud-deck-list` |
+| `look.badge` | Walks as {look} | `title` of the look tag on a meeting portrait (`look-<seatId>`) |
+| `reveal.look` | Walking as {look}. | appended to the ejection line of a main-mode reveal |
+| `shot.line` | {from} fired the Last Shot: {target} was the {role}. | `shot-toast`, during a reveal, for 7 s |
+| `over.looks` | Who walked as who | header of `gameover-looks` |
+| `over.looks.row` | {name} walked as {look} | `gameover-look-<seatId>` |
+| `over.undealt` | The cards left in the box | header of `gameover-undealt` |
+| `over.undealt.none` | No card was left in the box. | when `undealt` is empty |
+| `over.alsoWon` | Also won | header of `gameover-alsowon`, from `gameOver.alsoWon` |
+| `over.alsoWon.row` | {name} was ejected as the Drifter | an ejected Drifter's win beside the winning faction |
+
+The lobby list shows nothing in the quick mode. The look tag takes the look's own base colour (`looks.json`
+`palette.base`), and the trait portrait (height, scarf, hat) stays under it. The night-power picker and the Last Shot
+aim list wait for 5F's `ui/SeatPicker.ts` and a mount point in the world HUD (5I's files).
