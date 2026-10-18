@@ -60,6 +60,29 @@
       "bellPulls": 1,
       "gddRef": "3.2"
     },
+    "heir": {
+      "id": "heir",
+      "name": "Accomplice, Knife-bearer",
+      "faction": "cabal",
+      "cover": false,
+      "look": null,
+      "ships": "V1",
+      "firstPlayable": false,
+      "goal": "Carry on the Killer's work alone: strike after dark, keep your cover.",
+      "winsWith": "cabal",
+      "win": "As the Killer.",
+      "parity": "cabal",
+      "startKit": [
+        { "item": "plantKit", "qty": 3 },
+        { "item": "crowbar", "qty": 1 },
+        { "item": "knife", "qty": 1 }
+      ],
+      "abilities": ["kill", "plantClue", "crowbar"],
+      "cardText": "The Knife has passed to you. The Killer is gone and the village does not know it yet; finish what they started.",
+      "beware": "Your Hunger clock starts in the round you inherit; your cover is still a claim someone may test.",
+      "bellPulls": 1,
+      "gddRef": "3.2"
+    },
     "detective": {
       "id": "detective",
       "name": "Detective",
