@@ -2,11 +2,15 @@
 // station rooms (R4), shipped x3 as lossless WebP in assets/onub/cards/. The text band is left blank: the
 // client writes each card's name and text (balance.onub.json `cards`) over it.
 //
+// Each builder takes a scale `k`: 1 is the 8-bit style (art size, finished; the build upscales it), and the
+// low-poly style (art plan 1.9) passes 3, drawing the code-drawn parts at art size and enlarging them with
+// nearest while the window, floor and object arrive smooth at k times their box, never snapped.
+//
 //   tsx tools/sprites/onub-cards.ts      every card face and both backs (also run by `onub.ts build`)
 import { type Rgba } from './bleed.ts';
 import { hexToRgb } from './oklab.ts';
 import { paletteFile } from './palette.ts';
-import { boxResize, crop, snap } from './pixel.ts';
+import { boxResize, crop, snap, upscaleNearest } from './pixel.ts';
 import { BALANCE, blankRgba, build, isMain, paste, type Box } from './onub.ts';
 
 /** The card's art grid (onub.ts `ART.card`; the module cycle keeps it a literal here). */
@@ -91,21 +95,33 @@ function rot(img: Rgba): void {
   for (const [x, y, t] of blot) set(img, x, y, moss[t]!);
 }
 
-/** Every pixel darkened (the floor behind an object), then snapped back onto the palette. */
-export function darken(img: Rgba, k = 0.45): Rgba {
+/** Every pixel darkened (the floor behind an object), then snapped back onto the palette when `finish`. */
+export function darken(img: Rgba, k = 0.45, finish = true): Rgba {
   const out: Rgba = { width: img.width, height: img.height, data: new Uint8Array(img.data) };
   for (let i = 0; i < out.data.length; i += 4)
     for (let c = 0; c < 3; c++) out.data[i + c] = Math.round(out.data[i + c]! * k);
-  return snap(out);
+  return finish ? snap(out) : out;
 }
 
-/** A window-sized crop of a room source, box-resized to 72 x 64 and snapped (`box` in source pixels). */
-export function windowOf(source: Rgba, box: Box): Rgba {
-  return snap(boxResize(crop(source, box, 1, 1), WINDOW[2], WINDOW[3]));
+/** A crop of a room source box-resized to the window at scale `k` (`box` in source pixels); snapped at 1. */
+export function windowOf(source: Rgba, box: Box, k = 1): Rgba {
+  const out = boxResize(crop(source, box, 1, 1), WINDOW[2] * k, WINDOW[3] * k);
+  return k === 1 ? snap(out) : out;
 }
 
-/** A code-drawn floor for a station without a room yet (the oven until its pick): brick tiles. */
-export function tileFloor(rampName = 'brick'): Rgba {
+/** The blank band, and a Sabotage card's rot, on a transparent art-size layer at scale `k`. */
+function overlay(sabotage: boolean, k: number): Rgba {
+  const img = blankRgba(CARD_W, CARD_H);
+  band(img);
+  if (sabotage) rot(img);
+  return upscaleNearest(img, k);
+}
+
+/** A code-drawn floor for a station without a room yet (the oven until its pick): brick tiles, at scale `k`. */
+export function tileFloor(rampName = 'brick', k = 1): Rgba {
+  return upscaleNearest(tiles(rampName), k);
+}
+function tiles(rampName: string): Rgba {
   const img = blankRgba(WINDOW[2], WINDOW[3]);
   const r = ramp(rampName);
   for (let y = 0; y < img.height; y++)
@@ -118,26 +134,28 @@ export function tileFloor(rampName = 'brick'): Rgba {
 }
 
 /** An Ingredient card: frame, the darkened floor of its station, the object centred in the window. */
-export function ingredientCard(cardId: string, floor: Rgba, object: Rgba | null): Rgba {
+export function ingredientCard(cardId: string, floor: Rgba, object: Rgba | null, k = 1): Rgba {
   const card = BALANCE.cards[cardId];
   if (!card) throw new Error(`onub-cards: no card ${cardId}`);
   const sabotage = card.kind === 'sabotage';
-  let img = cardFrame(sabotage ? 'moss' : STATION_RAMP[card.station]!);
-  img = paste(img, darken(floor), WINDOW[0], WINDOW[1]);
+  let img = upscaleNearest(cardFrame(sabotage ? 'moss' : STATION_RAMP[card.station]!), k);
+  img = paste(img, darken(floor, 0.45, k === 1), WINDOW[0] * k, WINDOW[1] * k);
   if (object) {
-    const [ow, oh] = OBJECT_BOX;
-    img = paste(img, object, WINDOW[0] + (WINDOW[2] - ow) / 2, WINDOW[1] + (WINDOW[3] - oh) / 2);
+    const x = WINDOW[0] * k + Math.floor((WINDOW[2] * k - object.width) / 2);
+    img = paste(img, object, x, WINDOW[1] * k + Math.floor((WINDOW[3] * k - object.height) / 2), k > 1);
   }
-  band(img);
-  if (sabotage) rot(img);
-  return img;
+  return paste(img, overlay(sabotage, k), 0, 0);
 }
 
 /** A Location card: the station frame and the station room in the window. */
-export function locationCard(stationId: string, room: Rgba): Rgba {
-  const img = paste(cardFrame(STATION_RAMP[stationId]!), room, WINDOW[0], WINDOW[1]);
-  band(img);
-  return img;
+export function locationCard(stationId: string, room: Rgba, k = 1): Rgba {
+  const img = paste(
+    upscaleNearest(cardFrame(STATION_RAMP[stationId]!), k),
+    room,
+    WINDOW[0] * k,
+    WINDOW[1] * k,
+  );
+  return paste(img, overlay(false, k), 0, 0);
 }
 
 /** The inside of a back: everything within the ink border and a 1 px brass inner border. */
@@ -158,7 +176,7 @@ function backBase(field: (x: number, y: number) => string): Rgba {
 }
 
 /** `onub_card_back_role`: a wood parquet field and the emblem (a greybox medallion until it lands). */
-export function roleBack(emblem: Rgba | null): Rgba {
+export function roleBack(emblem: Rgba | null, k = 1): Rgba {
   const wood = ramp('wood');
   const img = backBase((x, y) => {
     const block = (Math.floor(x / 8) + Math.floor(y / 8)) % 2;
@@ -168,18 +186,21 @@ export function roleBack(emblem: Rgba | null): Rgba {
   const [ew, eh] = EMBLEM_BOX;
   const ex = (CARD_W - ew) / 2;
   const ey = (CARD_H - eh) / 2;
-  if (emblem) return paste(img, emblem, ex, ey);
+  if (emblem) return paste(upscaleNearest(img, k), emblem, ex * k, ey * k, k > 1);
   const brass = ramp('brass');
   for (let y = 0; y < eh; y++)
     for (let x = 0; x < ew; x++) {
       const d = Math.hypot(x - ew / 2 + 0.5, y - eh / 2 + 0.5);
       if (d < ew / 2 - 1) set(img, ex + x, ey + y, d > ew / 2 - 3 ? brass[2]! : brass[0]!);
     }
-  return img;
+  return upscaleNearest(img, k);
 }
 
-/** `onub_card_back_loc`: stone flags and a brass glyph of four rooms round a square. */
-export function locationBack(): Rgba {
+/** `onub_card_back_loc`: stone flags and a brass glyph of four rooms round a square, at scale `k`. */
+export function locationBack(k = 1): Rgba {
+  return upscaleNearest(locationGlyph(), k);
+}
+function locationGlyph(): Rgba {
   const stone = ramp('stone');
   const img = backBase((x, y) => {
     const row = Math.floor(y / 12);

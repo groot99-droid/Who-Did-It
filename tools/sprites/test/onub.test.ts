@@ -13,12 +13,14 @@ import {
   STATION_IDS,
   assemblePrompt,
   decodeAny,
+  styleOut,
   onubImages,
   ownerSource,
   readBatch,
   referenceNames,
   shipped,
 } from '../onub.ts';
+import { artStyle } from '../palette.ts';
 import { audit } from '../pixel.ts';
 
 const ASSETS = join(import.meta.dirname, '../../../apps/client/public/assets');
@@ -99,6 +101,44 @@ describe('ONUB art keys (contract 5.4, art plan 5.9)', () => {
     for (const f of MINI_FRAMES)
       expect(frames.get(f.name), f.name).toEqual(expect.objectContaining({ w: f.w, h: f.h }));
     expect(frames.size).toBe(MINI_FRAMES.length);
+  });
+});
+
+describe('ONUB low-poly style (art plan 1.9, DECISIONS A79)', () => {
+  const LOW = styleOut(artStyle('lowpoly'));
+  const size = (dir: string): number =>
+    readdirSync(dir).reduce((n, f) => {
+      const p = join(dir, f);
+      return n + (statSync(p).isDirectory() ? size(p) : statSync(p).size);
+    }, 0);
+
+  it('lists every key of the 8-bit block with the same url and modes, the atlas linear', () => {
+    const base = new Map(manifest('manifest.json').entries.map((e) => [e.key, e]));
+    const low = manifest('lowpoly/manifest.json').entries.filter((e) => e.key.startsWith('onub_'));
+    expect(low.map((e) => e.key)).toEqual([...CONTRACT, 'onub_mini']);
+    for (const e of low)
+      expect([e.url, e.modes], e.key).toEqual([base.get(e.key)!.url, base.get(e.key)!.modes]);
+    expect(low.at(-1)).toMatchObject({ key: 'onub_mini', filter: 'linear' });
+  });
+
+  it('ships every image at the 8-bit size, smooth and unsnapped', async () => {
+    let offPalette = 0;
+    for (const i of onubImages()) {
+      const img = await decodeAny(readFileSync(join(LOW, `${i.path}.webp`)));
+      const [w, h] = ART[i.kind];
+      expect([img.width, img.height], i.key).toEqual([w * SCALE, h * SCALE]);
+      if (i.kind === 'portrait') offPalette += audit(img).offPalette;
+    }
+    expect(offPalette).toBeGreaterThan(0);
+  });
+
+  it('packs onub_mini with the 8-bit frame names and rectangles', () => {
+    const frames = (dir: string) => readFileSync(join(dir, 'onub_mini.json'), 'utf8');
+    expect(frames(LOW)).toBe(frames(OUT));
+  });
+
+  it('keeps the low-poly ONUB set within 4 MiB', () => {
+    expect(size(LOW)).toBeLessThanOrEqual(4 * 1024 * 1024);
   });
 });
 

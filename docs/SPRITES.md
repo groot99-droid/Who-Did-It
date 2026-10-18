@@ -993,7 +993,19 @@ the pass (96 x 64) centred at (320, 180). Each quadrant is that station's tap ta
 ONUB entry and an `anims_*` one may not list `onub`: the client builds `mini_fire` from `mini_oven/0..3` at 8 fps,
 looping. No frame carries a target band (GDD 3.11).
 
+**The low-poly style** (art plan 1.9, DECISIONS A79). The same build writes every key a second time, for
+`artStyle('lowpoly')`, to `assets/lowpoly/onub/` with the same paths, file sizes, frame names and `modes`, and its
+ONUB block to `assets/lowpoly/manifest.json` (`"art": "lowpoly"`, the atlas `linear`). Nothing is snapped or
+outlined. The owner's rooms are cropped and box-downscaled straight to 1920 x 1080. The generated portraits are
+treated the same way at 384 x 576, and cutouts are fitted at three times their art box, keeping their soft edges.
+The kitchen, the cards and the backs are composed at the shipped size: their code-drawn frames, bands and fields
+are enlarged with nearest, and the room window, floor and object are pasted in smooth. Rooms are lossy WebP at
+`offWebpQuality` (90). Cards, the cloche and portraits are at `LOWPOLY_ART_QUALITY` (85), which keeps the set within
+4 MiB (3.9 MiB). `onub_mini` keeps its 512 page and art-size frames, packed from smooth objects. Its fire loop finds
+the lantern pixels on a snapped copy and scales each pixel's own colour.
+
 **Tests.** `tools/sprites/test/onub.test.ts`: every key in both manifests with its type and `modes`, no loft key,
 every image at its file size and on the world palette with alpha 0 or 255, the ONUB set within 2.5 MB, every atlas
 frame at its art box on one page, the blank band and the Sabotage mark, and the batch file's jobs, picks, prompts
-and references.
+and references. For the low-poly style: the same keys, URLs and `modes`, every image at the 8-bit size and off the
+snap, the same atlas frames, and the set within 4 MiB (`styles.test.ts` checks the manifest is a re-skin).

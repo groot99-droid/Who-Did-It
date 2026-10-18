@@ -1,0 +1,481 @@
+{
+ "textures": [
+  {
+   "image": "onub_mini-0.png",
+   "format": "RGBA8888",
+   "size": {
+    "w": 512,
+    "h": 512
+   },
+   "scale": 1,
+   "frames": [
+    {
+     "filename": "mini_banneton",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 28,
+      "h": 16
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 28,
+      "h": 16
+     },
+     "frame": {
+      "x": 233,
+      "y": 90,
+      "w": 28,
+      "h": 16
+     }
+    },
+    {
+     "filename": "mini_bowl",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 64,
+      "h": 48
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 64,
+      "h": 48
+     },
+     "frame": {
+      "x": 366,
+      "y": 1,
+      "w": 64,
+      "h": 48
+     }
+    },
+    {
+     "filename": "mini_bucket",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 24,
+      "h": 24
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 24,
+      "h": 24
+     },
+     "frame": {
+      "x": 128,
+      "y": 90,
+      "w": 24,
+      "h": 24
+     }
+    },
+    {
+     "filename": "mini_cabinet",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 72,
+      "h": 88
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 72,
+      "h": 88
+     },
+     "frame": {
+      "x": 1,
+      "y": 1,
+      "w": 72,
+      "h": 88
+     }
+    },
+    {
+     "filename": "mini_cart",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 48,
+      "h": 32
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 48,
+      "h": 32
+     },
+     "frame": {
+      "x": 50,
+      "y": 90,
+      "w": 48,
+      "h": 32
+     }
+    },
+    {
+     "filename": "mini_crate_butter",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 24,
+      "h": 18
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 24,
+      "h": 18
+     },
+     "frame": {
+      "x": 158,
+      "y": 90,
+      "w": 24,
+      "h": 18
+     }
+    },
+    {
+     "filename": "mini_crate_eggs",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 24,
+      "h": 18
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 24,
+      "h": 18
+     },
+     "frame": {
+      "x": 183,
+      "y": 90,
+      "w": 24,
+      "h": 18
+     }
+    },
+    {
+     "filename": "mini_crate_milk",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 24,
+      "h": 18
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 24,
+      "h": 18
+     },
+     "frame": {
+      "x": 208,
+      "y": 90,
+      "w": 24,
+      "h": 18
+     }
+    },
+    {
+     "filename": "mini_dial",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 48,
+      "h": 48
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 48,
+      "h": 48
+     },
+     "frame": {
+      "x": 431,
+      "y": 1,
+      "w": 48,
+      "h": 48
+     }
+    },
+    {
+     "filename": "mini_fill_flour",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 8,
+      "h": 8
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 8,
+      "h": 8
+     },
+     "frame": {
+      "x": 316,
+      "y": 90,
+      "w": 8,
+      "h": 8
+     }
+    },
+    {
+     "filename": "mini_fill_water",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 8,
+      "h": 8
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 8,
+      "h": 8
+     },
+     "frame": {
+      "x": 325,
+      "y": 90,
+      "w": 8,
+      "h": 8
+     }
+    },
+    {
+     "filename": "mini_gauge",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 48,
+      "h": 48
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 48,
+      "h": 48
+     },
+     "frame": {
+      "x": 1,
+      "y": 90,
+      "w": 48,
+      "h": 48
+     }
+    },
+    {
+     "filename": "mini_log",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 24,
+      "h": 10
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 24,
+      "h": 10
+     },
+     "frame": {
+      "x": 291,
+      "y": 90,
+      "w": 24,
+      "h": 10
+     }
+    },
+    {
+     "filename": "mini_needle",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 4,
+      "h": 20
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 4,
+      "h": 20
+     },
+     "frame": {
+      "x": 153,
+      "y": 90,
+      "w": 4,
+      "h": 20
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.9
+     }
+    },
+    {
+     "filename": "mini_oven/0",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 72,
+      "h": 48
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 72,
+      "h": 48
+     },
+     "frame": {
+      "x": 74,
+      "y": 1,
+      "w": 72,
+      "h": 48
+     }
+    },
+    {
+     "filename": "mini_oven/1",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 72,
+      "h": 48
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 72,
+      "h": 48
+     },
+     "frame": {
+      "x": 147,
+      "y": 1,
+      "w": 72,
+      "h": 48
+     }
+    },
+    {
+     "filename": "mini_oven/2",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 72,
+      "h": 48
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 72,
+      "h": 48
+     },
+     "frame": {
+      "x": 220,
+      "y": 1,
+      "w": 72,
+      "h": 48
+     }
+    },
+    {
+     "filename": "mini_oven/3",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 72,
+      "h": 48
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 72,
+      "h": 48
+     },
+     "frame": {
+      "x": 293,
+      "y": 1,
+      "w": 72,
+      "h": 48
+     }
+    },
+    {
+     "filename": "mini_sack",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 28,
+      "h": 32
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 28,
+      "h": 32
+     },
+     "frame": {
+      "x": 99,
+      "y": 90,
+      "w": 28,
+      "h": 32
+     }
+    },
+    {
+     "filename": "mini_slot_glow",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 28,
+      "h": 12
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 28,
+      "h": 12
+     },
+     "frame": {
+      "x": 262,
+      "y": 90,
+      "w": 28,
+      "h": 12
+     }
+    },
+    {
+     "filename": "mini_stream_flour",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 4,
+      "h": 8
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 4,
+      "h": 8
+     },
+     "frame": {
+      "x": 334,
+      "y": 90,
+      "w": 4,
+      "h": 8
+     }
+    },
+    {
+     "filename": "mini_stream_water",
+     "rotated": false,
+     "trimmed": false,
+     "sourceSize": {
+      "w": 4,
+      "h": 8
+     },
+     "spriteSourceSize": {
+      "x": 0,
+      "y": 0,
+      "w": 4,
+      "h": 8
+     },
+     "frame": {
+      "x": 339,
+      "y": 90,
+      "w": 4,
+      "h": 8
+     }
+    }
+   ]
+  }
+ ]
+}

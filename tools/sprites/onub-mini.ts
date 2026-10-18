@@ -2,11 +2,13 @@
 // style.pixel.illustrationScale (3) with `nearest`. Generated objects are T5 cutouts fitted to their art box;
 // dials, needles, fills, streams and glows are drawn in code; the fire loop cycles the oven mouth's flame
 // pixels through the lantern ramp. No frame carries a target band: the client draws it (GDD 3.11).
+// The low-poly style (art plan 1.9) packs the same frames from smooth, unsnapped objects.
 //
 //   tsx tools/sprites/onub-mini.ts      the atlas (also run by `onub.ts build`)
 import { type Rgba } from './bleed.ts';
 import { hexToRgb } from './oklab.ts';
 import { indexOfRgb, paletteFile } from './palette.ts';
+import { snap } from './pixel.ts';
 import { blankRgba, build, isMain, paste } from './onub.ts';
 
 /** Every frame of the atlas with its art box; `item` names the batch item of a generated frame. */
@@ -137,25 +139,41 @@ export function clearBowl(bowl: Rgba): Rgba {
   return out;
 }
 
-/** The fire loop: frame f moves every lantern-ramp pixel f steps up its ramp, wrapping (R5 over R3). */
-export function fireFrames(oven: Rgba): Rgba[] {
-  const lantern = R.lantern!.map((h) => indexOfRgb(...hexToRgb(h)));
+/**
+ * The fire loop: frame f moves every lantern-ramp pixel f steps up its ramp, wrapping (R5 over R3). An
+ * unfinished oven (low poly) finds those pixels on its snapped copy and scales each one's own colour by the
+ * ratio of the two ramp colours, so the smooth shading survives.
+ */
+export function fireFrames(oven: Rgba, finished = true): Rgba[] {
+  const ramp = R.lantern!.map((h) => hexToRgb(h));
+  const lantern = ramp.map((c) => indexOfRgb(...c));
+  const key = finished ? oven : snap(oven);
   return Array.from({ length: FIRE_FRAMES }, (_, f) => {
     const out: Rgba = { width: oven.width, height: oven.height, data: new Uint8Array(oven.data) };
     for (let i = 0; i < out.data.length; i += 4) {
       if (out.data[i + 3] === 0) continue;
-      const at = lantern.indexOf(indexOfRgb(out.data[i]!, out.data[i + 1]!, out.data[i + 2]!));
+      const at = lantern.indexOf(indexOfRgb(key.data[i]!, key.data[i + 1]!, key.data[i + 2]!));
       if (at < 0) continue;
-      out.data.set(hexToRgb(R.lantern![(at + f) % lantern.length]!), i);
+      const to = ramp[(at + f) % lantern.length]!;
+      if (finished) out.data.set(to, i);
+      else
+        for (let c = 0; c < 3; c++)
+          out.data[i + c] = Math.min(
+            255,
+            Math.round((out.data[i + c]! * to[c]!) / Math.max(1, ramp[at]![c]!)),
+          );
     }
     return out;
   });
 }
 
 /** Every frame's pixels; `objects` maps a batch item to its fitted cutout (or null for a greybox). */
-export function miniPixels(objects: (item: string, w: number, h: number) => Rgba): Map<string, Rgba> {
+export function miniPixels(
+  objects: (item: string, w: number, h: number) => Rgba,
+  finished = true,
+): Map<string, Rgba> {
   const out = new Map<string, Rgba>();
-  const fire = fireFrames(objects('onub_mini#mini_oven', 72, 48));
+  const fire = fireFrames(objects('onub_mini#mini_oven', 72, 48), finished);
   for (const f of MINI_FRAMES) {
     if (f.name.startsWith('mini_oven/')) out.set(f.name, fire[Number(f.name.slice(10))]!);
     else if (f.item)
@@ -198,7 +216,7 @@ export function packMini(
       shelf = 0;
     }
     if (y + img.height + 1 > PAGE) throw new Error('onub-mini: the frames do not fit one page');
-    page = paste(page, img, x, y);
+    page = paste(page, img, x, y, true);
     const meta = MINI_FRAMES.find((f) => f.name === name)!;
     out.push({
       filename: name,

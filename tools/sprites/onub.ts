@@ -3,6 +3,11 @@
 // lossless WebP at x3 in apps/client/public/assets/onub/. The cards are onub-cards.ts, the mini-game atlas
 // onub-mini.ts. Every key carries `modes: ['onub']` (ruling C7).
 //
+// The build runs once per art style of `artStyles()` (art plan 1.9, DECISIONS A79). The 8-bit style is the
+// above; the low-poly style writes the same keys and sizes to apps/client/public/assets/lowpoly/onub/ from the
+// same sources, smooth-downscaled straight to the shipped size and never snapped or outlined, as lossy WebP at
+// `offWebpQuality` (the atlas stays PNG), with its own manifest at assets/lowpoly/manifest.json.
+//
 //   tsx tools/sprites/onub.ts prompts            the batch prompts and references, as JSON (art plan 2.3)
 //   tsx tools/sprites/onub.ts mask               build/onub/proofing-mask.png for the masked edit (5.2)
 //   tsx tools/sprites/onub.ts build              every ONUB image, the cards and the atlas; the real manifest
@@ -16,13 +21,14 @@ import { fileURLToPath } from 'node:url';
 import { createCanvas, ImageData, loadImage } from '@napi-rs/canvas';
 import { encodePng, type Rgba } from './bleed.ts';
 import { hexToRgb } from './oklab.ts';
-import { styleFile } from './palette.ts';
+import { artStyles, styleFile, type ArtStyle } from './palette.ts';
 import {
   boxResize,
   cleanCutout,
   crop,
   encodeWebp,
   finishIllustration,
+  offWebpQuality,
   snap,
   upscaleNearest,
 } from './pixel.ts';
@@ -33,7 +39,12 @@ import { REPO, referenceList } from './refs.ts';
 export const SCALE = styleFile.pixel.illustrationScale;
 export const CONCEPTS = 'assets/source/concepts/onub';
 export const GENERATED = join(REPO, 'assets/external/generated/5M');
-export const OUT = join(REPO, 'apps/client/public/assets/onub');
+export const ASSETS = join(REPO, 'apps/client/public/assets');
+/** The 8-bit style's ONUB folder; `styleOut` gives any style's. */
+export const OUT = join(ASSETS, 'onub');
+export function styleOut(style: ArtStyle): string {
+  return join(ASSETS, style.root, 'onub');
+}
 
 // ---------------------------------------------------------------- the batch file (art plan 2.2, 2.3)
 
@@ -265,12 +276,37 @@ export function fitCutout(cut: Rgba, w: number, h: number): Rgba {
   return finishIllustration(paste(blankRgba(w, h), done, 1, 1), w, h, { outline: true });
 }
 
+/**
+ * The low-poly fit of a cleaned cutout (art plan 1.9): trimmed and padded as `fitCutout`, then box-resized
+ * smooth into a w x h box less `margin` each side, with no snap and no outline.
+ */
+export function smoothCutout(cut: Rgba, w: number, h: number, margin: number): Rgba {
+  const box = alphaBox(cut);
+  if (!box) throw new Error('onub: the cutout is empty');
+  const sub = crop(cut, box, 1, 1);
+  const iw = w - 2 * margin;
+  const ih = h - 2 * margin;
+  const pw = Math.max(sub.width, Math.ceil((sub.height * iw) / ih));
+  const ph = Math.max(sub.height, Math.ceil((sub.width * ih) / iw));
+  const padded = paste(
+    blankRgba(pw, ph),
+    sub,
+    Math.floor((pw - sub.width) / 2),
+    Math.floor((ph - sub.height) / 2),
+    true,
+  );
+  return paste(blankRgba(w, h), boxResize(padded, iw, ih), margin, margin, true);
+}
+
 export function blankRgba(width: number, height: number): Rgba {
   return { width, height, data: new Uint8Array(width * height * 4) };
 }
 
-/** `top` drawn over `base` at (x, y): opaque pixels replace, transparent ones keep the base. */
-export function paste(base: Rgba, top: Rgba, x: number, y: number): Rgba {
+/**
+ * `top` drawn over `base` at (x, y): pixels of alpha 128 and up replace, the rest keep the base. `soft` (the
+ * low-poly style's partial-alpha edges) composites every pixel source-over instead.
+ */
+export function paste(base: Rgba, top: Rgba, x: number, y: number, soft = false): Rgba {
   const out: Rgba = { width: base.width, height: base.height, data: new Uint8Array(base.data) };
   for (let r = 0; r < top.height; r++)
     for (let c = 0; c < top.width; c++) {
@@ -278,8 +314,19 @@ export function paste(base: Rgba, top: Rgba, x: number, y: number): Rgba {
       const ty = y + r;
       if (tx < 0 || ty < 0 || tx >= base.width || ty >= base.height) continue;
       const i = (r * top.width + c) * 4;
-      if (top.data[i + 3]! < 128) continue;
-      out.data.set(top.data.subarray(i, i + 4), (ty * base.width + tx) * 4);
+      const a = top.data[i + 3]!;
+      if (soft ? a === 0 : a < 128) continue;
+      const o = (ty * base.width + tx) * 4;
+      if (!soft || a === 255) {
+        out.data.set(top.data.subarray(i, i + 4), o);
+        continue;
+      }
+      const sa = a / 255;
+      const da = (out.data[o + 3]! / 255) * (1 - sa);
+      const oa = sa + da;
+      for (let ch = 0; ch < 3; ch++)
+        out.data[o + ch] = Math.round((top.data[i + ch]! * sa + out.data[o + ch]! * da) / oa);
+      out.data[o + 3] = Math.round(oa * 255);
     }
   return out;
 }
@@ -337,9 +384,9 @@ export async function pickedCutout(item: BatchItem): Promise<Rgba | null> {
 
 // ---------------------------------------------------------------- the kitchen overview (art plan 5.4)
 
-/** The four rooms in quadrants (fridge, mixer / proofing, oven) and the pass centred at (320, 180). */
-export function composeKitchen(rooms: Record<string, Rgba>, pass: Rgba): Rgba {
-  const [w, h] = ART.room;
+/** The four rooms in quadrants (fridge, mixer / proofing, oven) and the pass centred, at scale `k`. */
+export function composeKitchen(rooms: Record<string, Rgba>, pass: Rgba, k = 1): Rgba {
+  const [w, h] = [ART.room[0] * k, ART.room[1] * k];
   let out = blankRgba(w, h);
   const order = ['fridge', 'mixer', 'proofing', 'oven'];
   order.forEach((s, i) => {
@@ -348,21 +395,38 @@ export function composeKitchen(rooms: Record<string, Rgba>, pass: Rgba): Rgba {
       throw new Error(`onub: kitchen quadrant ${s}`);
     out = paste(out, room, (i % 2) * (w / 2), Math.floor(i / 2) * (h / 2));
   });
-  return paste(out, pass, Math.round(w / 2 - pass.width / 2), Math.round(h / 2 - pass.height / 2));
+  return paste(out, pass, Math.round(w / 2 - pass.width / 2), Math.round(h / 2 - pass.height / 2), k > 1);
 }
 
-/** A room source cropped to 16:9 and box-resized straight to a 320 x 180 quadrant, snapped. */
-export function quadrant(img: Rgba, box?: Box): Rgba {
+/** A room source cropped to 16:9 and box-resized straight to a 320 x 180 quadrant at scale `k`; snapped at 1. */
+export function quadrant(img: Rgba, box?: Box, k = 1): Rgba {
   const [w, h] = ART.room;
-  return snap(boxResize(crop(img, box, 16, 9), w / 2, h / 2));
+  const out = boxResize(crop(img, box, 16, 9), (w / 2) * k, (h / 2) * k);
+  return k === 1 ? snap(out) : out;
 }
 
 export { encodePng, encodeWebp, hexToRgb, upscaleNearest };
 
-export async function writeImage(path: string, art: Rgba): Promise<void> {
-  const file = join(OUT, `${path}.webp`);
+/**
+ * The lossy quality of the low-poly style's generated art (cards, cloche, portraits). The rooms keep
+ * `offWebpQuality` (art plan 1.9); at that quality the whole set came to 4.30 MB, so the smaller generated
+ * images give a little to keep it within the 4 MiB of 1.9 (DECISIONS A64).
+ */
+export const LOWPOLY_ART_QUALITY = 85;
+
+/**
+ * One image of a style: the 8-bit style's art-size image x`SCALE` nearest as lossless WebP; the low-poly
+ * style's image, already at the shipped size, as lossy WebP (`offWebpQuality` for rooms/, else
+ * `LOWPOLY_ART_QUALITY`).
+ */
+export async function writeImage(path: string, art: Rgba, style: ArtStyle = artStyles()[0]!): Promise<void> {
+  const file = join(styleOut(style), `${path}.webp`);
   mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, await encodeWebp(upscaleNearest(art, SCALE)));
+  const quality = path.startsWith('rooms/') ? offWebpQuality : LOWPOLY_ART_QUALITY;
+  writeFileSync(
+    file,
+    style.pixelFinish ? await encodeWebp(upscaleNearest(art, SCALE)) : await encodeWebp(art, quality),
+  );
 }
 
 /** Whether the module at `url` is the CLI entry (a function, so the card and atlas modules may call it mid-cycle). */
@@ -387,25 +451,56 @@ async function roomSource(key: string, batch: Batch, fixes: Fixes): Promise<Room
   return { img: await decodeAny(readFileSync(join(REPO, file))), crop: fixes.roomCrop };
 }
 
-async function fitted(batch: Batch, key: string, w: number, h: number): Promise<Rgba> {
-  const cut = await pickedCutout(batchItem(key, batch));
-  return cut ? fitCutout(cut, w, h) : greybox(w, h, key.slice(key.indexOf('#') + 1).replace(/^onub_/, ''));
-}
-
 export interface BuildResult {
   /** Keys whose art is the labelled greybox (a generation not yet picked or not downloaded). */
   greybox: string[];
 }
 
-/** Every ONUB image, the cards and the atlas, then the ONUB block of the real manifest. */
+/**
+ * How one art style turns a source into art: `k` is 1 for the 8-bit style (art size, finished, enlarged on
+ * write) and `SCALE` for the low-poly style (the shipped size, smooth, never snapped).
+ */
+interface Look {
+  style: ArtStyle;
+  k: number;
+  room(src: RoomSource, fills: Fixes['fills'][string]): Rgba;
+  fit(cut: Rgba, w: number, h: number): Rgba;
+  portrait(gen: Rgba): Rgba;
+  grey(w: number, h: number, text: string): Rgba;
+}
+
+function look(style: ArtStyle): Look {
+  if (style.pixelFinish)
+    return {
+      style,
+      k: 1,
+      room: (src, fills) => finishRoom(src.img, { ...(src.crop ? { crop: src.crop } : {}), fills }),
+      fit: fitCutout,
+      portrait: (gen) => finishIllustration(gen, ...ART.portrait),
+      grey: greybox,
+    };
+  const k = SCALE;
+  return {
+    style,
+    k,
+    room: (src, fills) =>
+      boxResize(
+        crop(fills.length ? applyFills(src.img, fills) : src.img, src.crop, 16, 9),
+        ART.room[0] * k,
+        ART.room[1] * k,
+      ),
+    fit: (cut, w, h) => smoothCutout(cut, w * k, h * k, k),
+    portrait: (gen) =>
+      boxResize(crop(gen, undefined, ...ART.portrait), ART.portrait[0] * k, ART.portrait[1] * k),
+    grey: (w, h, text) => upscaleNearest(greybox(w, h, text), k),
+  };
+}
+
+/** Every ONUB image, the cards and the atlas, in every art style, then the ONUB block of each style's manifest. */
 export async function build(o: { only?: 'cards' | 'mini' } = {}): Promise<BuildResult> {
   const batch = readBatch();
   const fixes = readFixes();
-  const greyboxed: string[] = [];
-  const write = async (path: string, art: Rgba, isGrey: boolean, key: string) => {
-    if (isGrey) greyboxed.push(key);
-    await writeImage(path, art);
-  };
+  const greyboxed = new Set<string>();
   const sources = new Map<string, RoomSource | null>();
   for (const key of [
     ...STATION_IDS.map((s) => `onub_station_${s}`),
@@ -413,44 +508,66 @@ export async function build(o: { only?: 'cards' | 'mini' } = {}): Promise<BuildR
   ]) {
     sources.set(key, await roomSource(key, batch, fixes));
   }
+  const cutouts = new Map<string, Rgba | null>();
+  const cutout = async (key: string): Promise<Rgba | null> => {
+    if (!cutouts.has(key)) cutouts.set(key, await pickedCutout(batchItem(key, batch)));
+    return cutouts.get(key)!;
+  };
+  for (const style of artStyles())
+    await buildStyle(look(style), o, { batch, fixes, sources, cutout, greyboxed });
+  return { greybox: [...greyboxed] };
+}
+
+interface BuildInputs {
+  batch: Batch;
+  fixes: Fixes;
+  sources: Map<string, RoomSource | null>;
+  cutout: (key: string) => Promise<Rgba | null>;
+  greyboxed: Set<string>;
+}
+
+async function buildStyle(l: Look, o: { only?: 'cards' | 'mini' }, inp: BuildInputs): Promise<void> {
+  const { batch, fixes, sources, cutout, greyboxed } = inp;
+  const { k } = l;
+  const out = styleOut(l.style);
+  const write = async (path: string, art: Rgba, isGrey: boolean, key: string) => {
+    if (isGrey) greyboxed.add(key);
+    await writeImage(path, art, l.style);
+  };
+  const fitted = async (key: string, w: number, h: number): Promise<Rgba> => {
+    const cut = await cutout(key);
+    return cut ? l.fit(cut, w, h) : l.grey(w, h, key.slice(key.indexOf('#') + 1).replace(/^onub_/, ''));
+  };
 
   if (!o.only) {
     for (const [key, src] of sources) {
-      const art = src
-        ? finishRoom(src.img, { ...(src.crop ? { crop: src.crop } : {}), fills: fixes.fills[key] ?? [] })
-        : greybox(...ART.room, key);
+      const art = src ? l.room(src, fixes.fills[key] ?? []) : l.grey(...ART.room, key);
       await write(`rooms/${key}`, art, !src, key);
     }
     const quads: Record<string, Rgba> = {};
     for (const s of STATION_IDS) {
       const src = sources.get(`onub_station_${s}`);
       quads[s] = src
-        ? quadrant(src.img, src.crop)
-        : greybox(ART.room[0] / 2, ART.room[1] / 2, `onub_station_${s}`);
+        ? quadrant(src.img, src.crop, k)
+        : l.grey(ART.room[0] / 2, ART.room[1] / 2, `onub_station_${s}`);
     }
-    const passItem = batchItem('onub_kitchen#pass', batch);
-    const pass = await fitted(batch, passItem.key, 96, 64);
+    const pass = await fitted('onub_kitchen#pass', 96, 64);
     await write(
       'rooms/onub_kitchen',
-      composeKitchen(quads, pass),
+      composeKitchen(quads, pass, k),
       !sources.get('onub_station_oven'),
       'onub_kitchen',
     );
-    const cloche = await pickedCutout(batchItem('onub_cloche', batch));
+    const cloche = await cutout('onub_cloche');
     await write(
       'misc/onub_cloche',
-      cloche ? fitCutout(cloche, ...ART.cloche) : greybox(...ART.cloche, 'cloche'),
+      cloche ? l.fit(cloche, ...ART.cloche) : l.grey(...ART.cloche, 'cloche'),
       !cloche,
       'onub_cloche',
     );
     for (const key of [...ROLE_IDS.map((r) => `onub_portrait_${r}`), 'onub_baker']) {
       const gen = await loadGenerated(batchItem(key, batch).pick);
-      await write(
-        `portraits/${key}`,
-        gen ? finishIllustration(gen, ...ART.portrait) : greybox(...ART.portrait, key),
-        !gen,
-        key,
-      );
+      await write(`portraits/${key}`, gen ? l.portrait(gen) : l.grey(...ART.portrait, key), !gen, key);
     }
   }
 
@@ -458,48 +575,58 @@ export async function build(o: { only?: 'cards' | 'mini' } = {}): Promise<BuildR
     for (const s of STATION_IDS) {
       const src = sources.get(`onub_station_${s}`);
       const floorBox = fixes.floorBoxes[s];
-      const floor = src && floorBox ? cards.windowOf(src.img, floorBox) : cards.tileFloor();
+      const floor = src && floorBox ? cards.windowOf(src.img, floorBox, k) : cards.tileFloor('brick', k);
       for (const id of CARD_IDS.filter((c) => BALANCE.cards[c]!.station === s)) {
-        const cut = await pickedCutout(batchItem(`onub_card_${id}`, batch));
-        const object = cut ? fitCutout(cut, ...cards.OBJECT_BOX) : greybox(...cards.OBJECT_BOX, id);
+        const cut = await cutout(`onub_card_${id}`);
+        const object = cut ? l.fit(cut, ...cards.OBJECT_BOX) : l.grey(...cards.OBJECT_BOX, id);
         await write(
           `cards/onub_card_${id}`,
-          cards.ingredientCard(id, floor, object),
+          cards.ingredientCard(id, floor, object, k),
           !cut,
           `onub_card_${id}`,
         );
       }
       const locBox = fixes.locBoxes[s];
-      const room = src && locBox ? cards.windowOf(src.img, locBox) : null;
-      const window = room ?? greybox(cards.WINDOW[2], cards.WINDOW[3], s);
-      await write(`cards/onub_loc_${s}`, cards.locationCard(s, window), !room, `onub_loc_${s}`);
+      const room = src && locBox ? cards.windowOf(src.img, locBox, k) : null;
+      const window = room ?? l.grey(cards.WINDOW[2], cards.WINDOW[3], s);
+      await write(`cards/onub_loc_${s}`, cards.locationCard(s, window, k), !room, `onub_loc_${s}`);
     }
-    const emblem = await pickedCutout(batchItem('onub_card_back_role#emblem', batch));
+    const emblem = await cutout('onub_card_back_role#emblem');
     await write(
       'cards/onub_card_back_role',
-      cards.roleBack(emblem ? fitCutout(emblem, ...cards.EMBLEM_BOX) : null),
+      cards.roleBack(emblem ? l.fit(emblem, ...cards.EMBLEM_BOX) : null, k),
       !emblem,
       'onub_card_back_role',
     );
-    await write('cards/onub_card_back_loc', cards.locationBack(), false, 'onub_card_back_loc');
+    await write('cards/onub_card_back_loc', cards.locationBack(k), false, 'onub_card_back_loc');
   }
 
   if (!o.only || o.only === 'mini') {
+    // the atlas keeps its art-size frames in both styles (same packed sizes, art plan 1.9)
     const objects = new Map<string, Rgba>();
     for (const f of mini.MINI_FRAMES) {
       if (!f.item || objects.has(f.item)) continue;
-      const cut = await pickedCutout(batchItem(f.item, batch));
-      if (!cut) greyboxed.push(f.item);
-      objects.set(f.item, cut ? fitCutout(cut, f.w, f.h) : greybox(f.w, f.h, f.name.replace(/\/\d$/, '')));
+      const cut = await cutout(f.item);
+      if (!cut) greyboxed.add(f.item);
+      const name = f.name.replace(/\/\d$/, '');
+      objects.set(
+        f.item,
+        cut
+          ? l.style.pixelFinish
+            ? fitCutout(cut, f.w, f.h)
+            : smoothCutout(cut, f.w, f.h, 1)
+          : greybox(f.w, f.h, name),
+      );
     }
-    const { page, json } = mini.packMini(mini.miniPixels((item) => objects.get(item)!));
-    mkdirSync(OUT, { recursive: true });
-    writeFileSync(join(OUT, 'onub_mini-0.png'), encodePng(page));
-    writeFileSync(join(OUT, 'onub_mini.json'), `${JSON.stringify(json, null, 1)}\n`);
+    const frames = mini.miniPixels((item) => objects.get(item)!, l.style.pixelFinish);
+    const { page, json } = mini.packMini(frames);
+    mkdirSync(out, { recursive: true });
+    writeFileSync(join(out, 'onub_mini-0.png'), encodePng(page));
+    writeFileSync(join(out, 'onub_mini.json'), `${JSON.stringify(json, null, 1)}\n`);
   }
 
-  if (!o.only) writeManifest(join(REPO, 'apps/client/public/assets/manifest.json'), onubManifest('webp'));
-  return { greybox: greyboxed };
+  if (!o.only)
+    writeManifest(join(ASSETS, l.style.root, 'manifest.json'), onubManifest('webp', l.style), l.style);
 }
 
 // ---------------------------------------------------------------- review sheets (art plan 1.6, 7)
@@ -663,12 +790,15 @@ export interface OnubManifestEntry {
   type: 'image' | 'multiatlas';
   url: string;
   path?: string;
-  filter?: 'nearest';
+  filter?: 'nearest' | 'linear';
   modes: ['onub'];
 }
 
-/** The ONUB block of a manifest: every image key, then `onub_mini`; `ext` is webp (real) or png (placeholder). */
-export function onubManifest(ext: 'webp' | 'png'): OnubManifestEntry[] {
+/**
+ * The ONUB block of a manifest: every image key, then `onub_mini`; `ext` is webp (real) or png (placeholder).
+ * A style's block differs only in the atlas filter (URLs are relative to the style's folder).
+ */
+export function onubManifest(ext: 'webp' | 'png', style: ArtStyle = artStyles()[0]!): OnubManifestEntry[] {
   return [
     ...onubImages().map((i) => ({
       key: i.key,
@@ -681,15 +811,24 @@ export function onubManifest(ext: 'webp' | 'png'): OnubManifestEntry[] {
       type: 'multiatlas',
       url: 'onub/onub_mini.json',
       path: 'onub/',
-      filter: 'nearest',
+      filter: style.filter,
       modes: ['onub'],
     },
   ];
 }
 
-/** Replace the ONUB block (and any loft key) of a manifest file with `block`, appended at the end. */
-export function writeManifest(file: string, block: OnubManifestEntry[]): void {
-  const doc = JSON.parse(readFileSync(file, 'utf8')) as { entries: Array<{ key: string }> };
+/**
+ * Replace the ONUB block (and any loft key) of a manifest file with `block`, appended at the end. A style
+ * manifest that does not exist yet starts as `{ version, art: style id, entries: [] }`.
+ */
+export function writeManifest(file: string, block: OnubManifestEntry[], style?: ArtStyle): void {
+  const fresh = () => {
+    const root = JSON.parse(readFileSync(join(ASSETS, 'manifest.json'), 'utf8')) as { version: unknown };
+    return { version: root.version, art: style!.id, entries: [] };
+  };
+  const doc = (existsSync(file) || !style ? JSON.parse(readFileSync(file, 'utf8')) : fresh()) as {
+    entries: Array<{ key: string }>;
+  };
   const gone = new Set(['loft_backdrop', 'prop_bedroll', 'prop_bedroll_self']);
   doc.entries = [...doc.entries.filter((e) => !e.key.startsWith('onub_') && !gone.has(e.key)), ...block];
   writeFileSync(file, `${JSON.stringify(doc, null, 2)}\n`);
@@ -716,7 +855,9 @@ if (isMain(import.meta.url)) {
   } else if (cmd === 'build') {
     const { greybox: g } = await build();
     console.log(
-      `onub: built ${onubImages().length} images and onub_mini; greybox: ${g.join(', ') || 'none'}`,
+      `onub: built ${onubImages().length} images and onub_mini in ${artStyles()
+        .map((st) => st.id)
+        .join(' and ')}; greybox: ${g.join(', ') || 'none'}`,
     );
   } else if (cmd === 'review') {
     await review();

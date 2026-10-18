@@ -2048,3 +2048,11 @@ tracks that none of them holds.
   blue panel against the other portraits' navy void, and `mini_cart` had come out as a three-shelf rack; the new picks
   (`retryNote` and `retrySubject` in `batches/5M.json`) replace their CREDITS and MANIFEST rows. Every other pick held
   up on the review sheets, so the rest of the share stays unspent; the oven waits on the owner's pick.
+- **Low-poly style (2026-10-18, A79, art plan 1.9)**:
+  - Base merged at 2aa57ac.
+  - `onub.ts build` now writes both styles. The low-poly set is every ONUB key and `onub_mini` under
+    `assets/lowpoly/onub/` with `assets/lowpoly/manifest.json`, 3.9 MiB, and the 8-bit set is byte-identical to
+    before. Calls are in A64, layout in SPRITES 11.
+  - Gate C is answered (the pixel finish is the 8-bit style), and so is the provenance (Nano Banana Pro). Google's
+    terms rows are in `LICENSES/vendors/README.md`.
+  - Still open: the Brick Oven pick.
