@@ -77,6 +77,7 @@ export class ColyseusWorldFeed implements WorldFeed {
     });
     room.onMessage('clueFound', (m: WorldFeedEvents['clueFound']) => this.bus.emit('clueFound', m));
     room.onMessage('phaseChange', (m: WorldFeedEvents['phaseChange']) => this.bus.emit('phaseChange', m));
+    room.onMessage('aim', (m: WorldFeedEvents['aim']) => this.bus.emit('aim', m));
     room.onMessage('vfx', (m: WorldFeedEvents['vfx']) => this.bus.emit('vfx', m));
   }
 

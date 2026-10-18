@@ -181,4 +181,27 @@ describe('MockWorldFeed avatars and Impersonate (GDD 3.17)', () => {
     feed.kill(handleOf(feed, 'mock-bot-3')); // the knife rests: refused, and no second puff
     expect(puffs).toHaveLength(1);
   });
+
+  it('a Last Shot aim opens one shot on a seat id and closes with its window', () => {
+    const { feed } = make('?phase=day&bots=still');
+    const aims: Array<{ endsTick: number }> = [];
+    const errors: unknown[] = [];
+    feed.bus.on('aim', (m) => aims.push(m));
+    feed.bus.on('error', (e) => errors.push(e));
+    feed.ability('lastShot', 'mock-bot-1'); // no aim open: refused
+    expect(errors).toHaveLength(1);
+    feed.openAim(1);
+    expect(aims).toHaveLength(1);
+    feed.ability('lastShot', feed.selfId); // not yourself
+    expect(errors).toHaveLength(2);
+    feed.ability('lastShot', 'mock-bot-1');
+    feed.ability('lastShot', 'mock-bot-2'); // one shot only
+    expect(errors).toHaveLength(3);
+    feed.openAim(1);
+    feed.ability('lastShot', 'mock-bot-1'); // already shot
+    expect(errors).toHaveLength(4);
+    tickN(feed, TICK_RATE + 1);
+    feed.ability('lastShot', 'mock-bot-2'); // the window ran out
+    expect(errors).toHaveLength(5);
+  });
 });

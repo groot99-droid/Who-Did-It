@@ -1030,6 +1030,7 @@ walk line show in the main mode only (`RoleRevealPayload.deck`, `look`); a quick
 | `card.cover.mate` | Worn by {name} | note of a look a Cabal mate wears; the choice is disabled |
 | `card.cover.pick` | Wear {look} | `title` of a choice; a click sends `role.cover {lookId}` |
 | `seats.title.impersonate` | Whose face? | title of `seat-picker` for Impersonate; a night power uses its own name |
+| `seats.title.aim` | Take your Last Shot | title of `seat-picker` while a dying Gamekeeper's `aim` window is open; it closes when the window ends |
 | `seats.empty` | Nobody to pick | the list holds no publicly living seat |
 | `seats.cancel` | Cancel | `seat-cancel`; Escape does the same |
 | `toast.disguise.wait` | Waiting for a moment unseen | after Impersonate is sent: the face changes only unseen (GDD 3.17) |

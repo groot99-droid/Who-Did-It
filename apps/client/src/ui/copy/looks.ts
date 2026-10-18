@@ -14,6 +14,7 @@ export const LOOKS_COPY = {
 
   // The seat picker (Impersonate, the night powers, the aim)
   'seats.title.impersonate': 'Whose face?',
+  'seats.title.aim': 'Take your Last Shot',
   'seats.empty': 'Nobody to pick',
   'seats.cancel': 'Cancel',
 

@@ -128,6 +128,8 @@ export class MockWorldFeed implements WorldFeed {
   private readonly book: NotebookSnap[] = [];
   private holding: { clueId: string; since: number } | null = null;
   private killReadyTick = 0;
+  /** The tick the open Last Shot aim ends; -1 when none is open. */
+  private aimEndsTick = -1;
   private bloodyUntil = 0;
   private ghost = false;
   private still = false;
@@ -332,7 +334,25 @@ export class MockWorldFeed implements WorldFeed {
     this.ability('kill', targetId);
   }
 
+  /** Opens a Last Shot aim for `seconds` (the server sends `aim` to a knifed Gamekeeper; the mock has no such role). */
+  openAim(seconds = 10): void {
+    this.aimEndsTick = this.tick + Math.round(seconds * TICK_RATE);
+    this.bus.emit('aim', { endsTick: this.aimEndsTick });
+  }
+
+  /** `act.ability {abilityId: 'lastShot', targetId: <seat id>}`: one shot while the aim is open (GDD 3.2). */
+  private lastShot(targetId?: string): void {
+    if (this.tick >= this.aimEndsTick) return this.fail(422, 'cannot do that');
+    const victim = targetId === undefined ? undefined : this.actors.get(targetId);
+    if (!victim || victim.id === this.selfId || victim.dead) return this.fail(422, 'no target');
+    victim.dead = true;
+    victim.vx = victim.vy = 0;
+    victim.handle = this.nextHandle();
+    this.aimEndsTick = -1;
+  }
+
   ability(id: string, targetId?: string): void {
+    if (id === 'lastShot') return this.lastShot(targetId);
     const me = this.actors.get(this.selfId);
     if (!me || this.ghost) return this.fail(422, 'ghosts cannot do that');
     if (id === 'impersonate') return this.impersonate(me, targetId);

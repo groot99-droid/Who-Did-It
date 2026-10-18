@@ -122,6 +122,8 @@ export type WorldFeedEvents = {
   phaseChange: { phase: number; endsTick: number };
   /** The puff of a disguise a Knife strike dropped, at (x, y) in `sceneId`; it names no handle or seat (GDD 3.17). */
   vfx: { sceneId: string; x: number; y: number; kind: 'disguise' };
+  /** Private, a dying Gamekeeper: pick a seat with `ability('lastShot', seatId)` before `endsTick` (GDD 3.2). */
+  aim: { endsTick: number };
   /** Mock only: the mock world's report or bell asks the mock network to open a meeting (round 3, M | N seam). */
   meetingRequest: { reason: 'body' | 'bell' | 'dawn'; callerId: string; bodyOf?: string };
 };
