@@ -157,6 +157,7 @@ describe('Last Shot (GDD 3.2)', () => {
     await skipPhase(m);
     await voteAll(m, [0, 1, 2, 3, 4], () => id(m, 1));
     expect(await until(() => events(m.bots[1]!, 'aim').length === 1)).toBe(true);
+    expect(events(m.bots[1]!, 'killed')).toHaveLength(0); // no role reaches the aiming seat before its shot
     m.room.state.phaseEndsTick = m.room.state.tick; // the reveal's 8 s are up
     await sleep(300);
     expect(m.room.state.phase).toBe(Phase.reveal);
@@ -164,6 +165,8 @@ describe('Last Shot (GDD 3.2)', () => {
     expect(await until(() => events(m.bots[2]!, 'shot').length === 1)).toBe(true);
     expect(events(m.bots[2]!, 'shot')[0]).toEqual({ fromId: id(m, 1), targetId: id(m, 0), role: 'killer' });
     expect(playerOf(m, m.bots[0]!).alive).toBe(false);
+    expect(await until(() => events(m.bots[1]!, 'killed').length === 1)).toBe(true);
+    expect(events(m.bots[1]!, 'killed')[0]).toMatchObject({ cause: 'ejected' });
     await sleep(300);
     expect(m.room.state.phase).toBe(Phase.gameOver); // both the Gamekeeper and the Killer are out: the Village wins
   });

@@ -61,3 +61,18 @@ export function dealMainDeck(room: PartyRoom, ids: readonly string[]): Map<strin
   flow.undealt = deal.undealt;
   return dealt;
 }
+
+/** The card that wins alone when the vote ejects it (GDD 3.1, 3.8). */
+const EJECTION_WINNER = 'drifter';
+
+/**
+ * Main mode's end-screen facts beside the winner (GDD 3.1, 3.8; `gameOver.undealt`, `.alsoWon`): the cards nobody
+ * held, and every seat the vote ejected as the Drifter, who wins whichever faction ends the match.
+ */
+export function gameOverExtras(room: PartyRoom): { undealt: string[]; alsoWon?: string[] } {
+  const flow = flowOf(room);
+  const alsoWon = flow.meetings
+    .filter((m) => m.ejectedRole === EJECTION_WINNER)
+    .flatMap((m) => (m.ejectedId === undefined ? [] : [m.ejectedId]));
+  return { undealt: [...flow.undealt], ...(alsoWon.length > 0 && { alsoWon }) };
+}

@@ -16,6 +16,7 @@ import {
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { logMatch } from '../services/MatchLog';
 import { resetCoversForLobby } from './Covers';
+import { gameOverExtras } from './Deck';
 import { countRow, factionOf, flowOf, resetFlow, roleIdOf, rolesOf, setPhase } from './Flow';
 import { resetNightForLobby } from './NightPowers';
 import { simOf } from './RoomSim';
@@ -47,7 +48,12 @@ export function endMatch(room: PartyRoom, winner: 'village' | 'cabal'): void {
   const flow = flowOf(room);
   state.winner = Winner[winner];
   setPhase(room, Phase.gameOver, balance.phases.gameOverS);
-  room.broadcast(S2C.gameOver, { winner: state.winner, roles: rolesOf(room), summary: SUMMARY[winner] });
+  room.broadcast(S2C.gameOver, {
+    winner: state.winner,
+    roles: rolesOf(room),
+    summary: SUMMARY[winner],
+    ...gameOverExtras(room),
+  });
 
   const players: Parameters<typeof logMatch>[0]['players'] = [];
   state.players.forEach((p: PlayerState, id: string) => {

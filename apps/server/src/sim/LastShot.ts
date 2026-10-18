@@ -4,7 +4,7 @@ import type { DeathCause } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { spawnBody } from './Bodies';
 import { markDead } from './Death';
-import { flowOf, isMeetingPhase, rolesOf } from './Flow';
+import { isMeetingPhase, rolesOf } from './Flow';
 import { emitNoise } from './Noise';
 import { isNpcSeat } from './Npc';
 import { npcMemory } from './npc/memory';
@@ -22,7 +22,7 @@ import { isLoft, isWorldPhase, reject, sceneKey } from './World';
 const DYING: readonly DeathCause[] = ['knife', 'poison', 'ejected'];
 
 /** `markDead` of a Gamekeeper (via `beginAim`): opens the aim; true defers `killed`. */
-export function startAim(room: PartyRoom, seat: string, cause: DeathCause, deferred = true): boolean {
+export function startAim(room: PartyRoom, seat: string, cause: DeathCause): boolean {
   const player = room.state.players.get(seat);
   const p = simOf(room).players.get(seat);
   if (!player?.priv || !p || !DYING.includes(cause)) return false;
@@ -33,7 +33,7 @@ export function startAim(room: PartyRoom, seat: string, cause: DeathCause, defer
   if (!player.connected && !isNpcSeat(room, seat)) return false;
   const aimS = abilities.abilities.lastShot?.params?.aimS ?? 0;
   const untilTick = room.state.tick + Math.round(aimS * TICK_RATE);
-  nightOf(room).aims.set(seat, { cause, sceneId: sceneKey(p.sceneIdx), untilTick, shot: false, deferred });
+  nightOf(room).aims.set(seat, { cause, sceneId: sceneKey(p.sceneIdx), untilTick, shot: false });
   room.clients.getById(seat)?.send(S2C.aim, { endsTick: untilTick });
   simOf(room).viewsDirty = true;
   return true;
@@ -120,18 +120,4 @@ export function runNpcShots(room: PartyRoom): void {
     if (legal) fire(room, seat, target);
     else brain.lastShotAtTick = -1; // nobody to shoot: it holds its fire
   }
-}
-
-/**
- * Stand-in for a seam the pre-seed lacks (`startReveal` ejects without `markDead`, so `beginAim` never sees an
- * ejection): the tick after a reveal ejects a Gamekeeper its aim opens here, and the reveal waits for it
- * (`holdReveal`). `startReveal` has already sent that seat its `killed`, so the aim defers nothing. The contract
- * request in the PR description has `startReveal` call `beginAim(room, id, 'ejected')` and withhold `killed`.
- */
-export function aimEjected(room: PartyRoom): void {
-  const id = flowOf(room).pendingEjection;
-  const mem = nightOf(room);
-  if (room.state.phase !== Phase.reveal || id === null || mem.ejectAimed.has(id) || mem.aims.has(id)) return;
-  mem.ejectAimed.add(id);
-  startAim(room, id, 'ejected', false);
 }

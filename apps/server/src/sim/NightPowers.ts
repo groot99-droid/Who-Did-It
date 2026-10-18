@@ -18,7 +18,7 @@ import { spawnBody } from './Bodies';
 import { markDead } from './Death';
 import { finishFinalNight } from './FinalNight';
 import { factionOf, flowOf } from './Flow';
-import { aimEjected, closeAims, handleLastShot, runNpcShots, startAim } from './LastShot';
+import { closeAims, handleLastShot, runNpcShots, startAim } from './LastShot';
 import { runInherit } from './Inherit';
 import { dropNightMemory, nightOf } from './nightMemory';
 import { npcMemory } from './npc/memory';
@@ -248,7 +248,6 @@ export function runNightPowers(room: PartyRoom): void {
     if (was === Phase.night && phase === Phase.day) resolvePoison(room); // the night turned to day
   }
   runNpcPowers(room);
-  aimEjected(room);
   runNpcShots(room);
   closeAims(room);
   runInherit(room);

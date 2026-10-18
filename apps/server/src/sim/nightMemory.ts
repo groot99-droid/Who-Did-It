@@ -13,8 +13,6 @@ export interface Aim {
   untilTick: number;
   /** A seat that cannot be told (no client) never blocks; an NPC shoots at `brain.lastShotAtTick`. */
   shot: boolean;
-  /** Whether `killed` still has to be sent when the aim closes (false for an ejection: `startReveal` sent it). */
-  deferred: boolean;
 }
 
 export class NightMemory {
@@ -34,8 +32,6 @@ export class NightMemory {
   readonly lastStrikeRound = new Map<string, number>();
   /** Seat -> its open Last Shot window. */
   readonly aims = new Map<string, Aim>();
-  /** Ejected seats whose Last Shot window was already offered, so a closed aim never reopens. */
-  readonly ejectAimed = new Set<string>();
   /** Accomplice seats that already inherited the Knife. */
   readonly inherited = new Set<string>();
   /** Hungry Killer seat -> the round whose day start made it Hungry (Hunger, GDD 3.3); a later strike ends it. */

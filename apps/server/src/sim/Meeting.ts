@@ -16,7 +16,7 @@ import { enterScene } from './Portals';
 import { countRow, factionOf, flowOf, refuse, roleIdOf, rolesOf, secondsToTicks, setPhase } from './Flow';
 import { hubOf, meetingSpawnsOf } from './MapSites';
 import { onMeetingOpenDisguise } from './Impersonate';
-import { holdReveal, onMeetingOpenNight } from './NightPowers';
+import { beginAim, holdReveal, onMeetingOpenNight } from './NightPowers';
 import { finalRoles } from './onub/Acts';
 import { isOnub, onubOf } from './onub/state';
 import { type MeetingRequest, simOf } from './RoomSim';
@@ -164,6 +164,8 @@ function startReveal(room: PartyRoom): void {
     stat.ejectedRole = roleIdOf(ejected);
     stat.ejectionCorrect = factionOf(ejected) === 'cabal';
   }
+  // An ejected Gamekeeper aims its Last Shot first (5G, `deck/wire.md` 5): its `killed` waits for the aim to close.
+  if (beginAim(room, ejectedId, 'ejected')) return;
   room.clients
     .getById(ejectedId)
     ?.send(S2C.killed, { sceneId: hubOf(room), cause: 'ejected', roles: rolesOf(room) });

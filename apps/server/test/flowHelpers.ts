@@ -129,18 +129,25 @@ export const vote = (m: Match, i: number, target: string): void =>
 
 /**
  * Everyone alive casts `pick(i)`; resolves once the room reaches the reveal and every client
- * has received the `voteResult` broadcast (and the ejected seat its private `killed`), which
- * arrive a moment after the step that moved the phase.
+ * has received the `voteResult` broadcast (and the ejected seat its private `killed`, or its `aim`
+ * for an ejected Gamekeeper, whose `killed` waits for the aim), which arrive a moment after the
+ * step that moved the phase.
  */
 export async function voteAll(m: Match, living: number[], pick: (i: number) => string): Promise<void> {
   const results = m.bots.map((b) => events(b, 'voteResult').length);
   const kills = m.bots.map((b) => events(b, 'killed').length);
+  const aims = m.bots.map((b) => events(b, 'aim').length);
   for (const i of living) vote(m, i, pick(i));
   await until(() => m.room.state.phase === Phase.reveal);
   await until(() => m.bots.every((b, i) => events(b, 'voteResult').length > (results[i] ?? 0)));
   const ejectedId = events(m.bots[0] as Bot, 'voteResult').at(-1)?.ejectedId;
   const j = m.bots.findIndex((b) => b.id === ejectedId);
-  if (j >= 0) await until(() => events(m.bots[j] as Bot, 'killed').length > (kills[j] ?? 0));
+  if (j >= 0) {
+    const bot = m.bots[j] as Bot;
+    await until(
+      () => events(bot, 'killed').length > (kills[j] ?? 0) || events(bot, 'aim').length > (aims[j] ?? 0),
+    );
+  }
 }
 
 export const phaseOf = (m: Match) => stateOf(m.bots[0] as Bot).phase;
