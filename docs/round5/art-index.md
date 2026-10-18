@@ -18,4 +18,4 @@
 | scene_front_of_house.jpg | Front of House | Le Croissant Rassis, Le Critique Gastronomique |
 
 Notes: text is baked into the art (chalkboards, signs), with some garbled glyphs (e.g. "YERST" in the fridge,
-"REFESY" jars in the mixer room). Made with another AI image tool, not this Higgsfield account (owner, 2026-10-17; DECISIONS A49); the owner names the tool in `CREDITS.md`. The originals (2576x1438 JPEG) are committed unchanged in `assets/source/concepts/onub/` under these file names; Session 5M exports them for the client.
+"REFESY" jars in the mixer room). Made by the owner with Nano Banana Pro (Google's Gemini image model) on the owner's Google AI Pro subscription, not with this Higgsfield account (owner, 2026-10-18; DECISIONS A79; terms cited in `CREDITS.md`). The originals (2576x1438 JPEG) are committed unchanged in `assets/source/concepts/onub/` under these file names; Session 5M exports them for the client.

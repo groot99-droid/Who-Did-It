@@ -221,7 +221,7 @@ Every rendered or generated image passes through `tools/sprites/pixel.ts` before
 
 **Pages drawn at display size.** The ground tileset (doubled into its 128 x 64 cells, SPRITES 10.12), `clues` and `vfx` are finished and then doubled with nearest scaling, so they are drawn at scale 1.
 
-**The switch** (`style.json` `pixelFinish.enabled`, one value per mode). The owner's Gate A answer sets `main`; `onub` is always on.
+**The switch** (`style.json` `pixelFinish.enabled`, one value per mode). It is the finish of the **8-bit** art style. The owner answered Gates A and C with both styles (A79): every asset ships finished in `8bit` and unfinished in `lowpoly` (`style.json` `artStyles`, SPRITES 5). The bullets below describe the unfinished output, which is the `lowpoly` style. In `lowpoly`, generated pixel art and the ONUB owner images ship unfinished too: key-removed and smooth-scaled, the owner images from their originals.
 
 - **What it covers.** Off, it changes only the main mode's rig renders: the world atlases, the ground tileset, `clues`, `vfx` and the lobby thumbnails. Generated pixel art (portraits, cards, the ONUB images) always takes the finish, because the snap is what puts a generation on one grid and one palette.
 - **Renders with the finish off.** The same raw renders are box-downscaled 2 x 2 instead of snapped and mode-halved. Partial alpha is kept and alpha-bled (`bleed.ts`), and the client draws those textures with `linear` filtering. Pages drawn at display size ship the display-scale render, alpha-bled.
