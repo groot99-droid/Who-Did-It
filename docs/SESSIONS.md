@@ -2050,7 +2050,10 @@ DECISIONS A62.
 - **Rebuild**: the commands in `tools/blender/README.md` ("World art (round 5)" onwards) and
   `tools/sprites/README.md`; every sheet passes the palette audit (no off-palette or partial-alpha pixel,
   saturated share under the cap) when the finish is on.
-- **Owner**: answer Gate A; copy `assets/external/world/<mapId>/{buildings,props}_<mapId>.blend` and
+- **A79, both styles**: `tools/sprites/world.ts` rebuilds every 5K key per art style from the raw renders
+  (8-bit at the root, unchanged byte for byte; low poly into `assets/lowpoly/` with its `manifest.json`);
+  `test/world.test.ts` checks the low-poly keys, frames, pivots and page caps against the 8-bit ones.
+- **Owner**: copy `assets/external/world/<mapId>/{buildings,props}_<mapId>.blend` and
   `assets/external/loft/loft.blend` to ROSW `studio/assets/who-did-it/world/` (hashes in MANIFEST change on
   every re-save); sync the 12 board generations into the ROSW catalog (CREDITS says "pending
   higgsfield-library-sync").

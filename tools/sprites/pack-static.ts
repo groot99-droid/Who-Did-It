@@ -210,21 +210,24 @@ export function pageCap(atlas: StaticAtlas): readonly [number, number] | null {
 /**
  * `packFrames` (pack.ts, the ASSETS.md 6.3 settings) with a smaller page: the packer picks the smallest
  * power-of-two page up to `w` x `h`, so a world atlas never grows past its budget cap in one dimension.
- * With the pixel finish on there is no extrude ring.
+ * With the pixel finish on (`on`, the art style's finish) there is no extrude ring.
  */
 export async function packCapped(
   textureName: string,
   inputs: PackInput[],
   w: number,
   h: number,
+  on: boolean = finishEnabled('main'),
 ): Promise<PackResult> {
   const files = [...inputs]
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .map((i) => ({ path: `${i.name}.png`, contents: i.png }));
   // Extrude guards linear filtering only, and the packer blends its ring: a finished page drawn with
-  // nearest filtering keeps every pixel a world colour without it.
-  const extrude = finishEnabled('main') ? 0 : PACK_OPTIONS.extrude;
-  const options = { ...PACK_OPTIONS, width: w, height: h, textureName, extrude };
+  // nearest filtering keeps every pixel a world colour without it. Unfinished (the low-poly style), the
+  // ring takes one pixel of the padding, so a frame costs the same room in both styles (art plan 1.4, 1.9).
+  const extrude = on ? 0 : PACK_OPTIONS.extrude;
+  const padding = PACK_OPTIONS.padding - extrude;
+  const options = { ...PACK_OPTIONS, width: w, height: h, textureName, extrude, padding };
   const out = await packAsync(files, options as Parameters<typeof packAsync>[1]);
   const raw = new Map(out.filter((f) => f.name.endsWith('.png')).map((f) => [f.name, f.buffer]));
   const textures: AtlasTexture[] = [];
@@ -300,6 +303,7 @@ export function staticAnims(texture: string, frameNames: string[]): { anims: Pha
 export async function packStatic(
   manifest: StaticManifest,
   inputs: PackInput[],
+  on: boolean = finishEnabled('main'),
 ): Promise<Map<string, Buffer>> {
   // Slices are whatever the footprints cut (slice.ts): a building atlas holds only slices, a map's prop
   // atlas its frame list plus the slices of its multi-tile props.
@@ -313,7 +317,7 @@ export async function packStatic(
   }
   const cap = pageCap(manifest.atlas);
   const { atlas, pages } = cap
-    ? await packCapped(manifest.atlas, inputs, cap[0], cap[1])
+    ? await packCapped(manifest.atlas, inputs, cap[0], cap[1], on)
     : await packFrames(manifest.atlas, inputs);
   applyStaticPivots(atlas, manifest);
   const out = new Map<string, Buffer>(pages);

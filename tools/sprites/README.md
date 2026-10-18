@@ -9,7 +9,7 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `pack.ts` | `packFrames` on free-tex-packer-core with the `ASSETS.md` 6.3 settings (`Phaser3` exporter, no rotation, trim, detect identical, power of two, padding 2, extrude 1, 2048 max, sorted inputs); pages are always named `<key>-<n>.png` and merged into one multiatlas JSON. `packCharacter` packs `char_<body>` and `ovl_<body>`; the CLI packs a `batch_render.py` output folder |
 | `gen-anims.ts` | Writes each frame's Feet pivot (feet / untrimmed cell) into the atlas and builds Phaser `load.animation` JSON: 12 fps, loops repeat, one-shot clips hold the last frame |
 | `bleed.ts` | Alpha bleed: transparent pixels next to the sprite take their neighbours' colour (alpha stays 0) so linear filtering never pulls in black and draws an ink halo; reads and writes 8-bit RGBA PNG through `node:zlib` because canvas libraries premultiply and would zero that colour. `readRender` bleeds every rendered frame before packing; the placeholder art is not bled and stays byte-identical |
-| `pack-static.ts` | Packs a static sheet render (`clues`, `props`, `vfx`, and since round 5 the `iso_kit_<theme>` atlases after the pixel finish, capped to their budget page with `packCapped`) with the same settings: frame names must equal the `docs/SPRITES.md` 8 keys in `keys.ts`, pivots from the render manifest (props and vfx), and `vfx.anims.json` (12 fps, played once) for the vfx |
+| `pack-static.ts` | Packs a static sheet render (`clues`, `props`, `vfx`, and since round 5 the `iso_kit_<theme>` atlases after the pixel finish, capped to their budget page with `packCapped`; both take the finish switch `on`, extrude 0 when on and padding 1 + extrude 1 when off) with the same settings: frame names must equal the `docs/SPRITES.md` 8 keys in `keys.ts`, pivots from the render manifest (props and vfx), and `vfx.anims.json` (12 fps, played once) for the vfx |
 | `images.ts` | Finishes the single-image keys rendered by `tools/blender` (`build_loft.py`, `build_tiles.py`): checks each key's size, alpha-bleeds and re-encodes it (dropping the render's date stamp, so files are byte-identical across renders) and joins each tileset's four 64 px variants into its 256 x 64 row |
 | `body-contact.ts` | Review sheet of the body on the floor: the last `die` frame in 8 directions, one row per trait look plus a Bloody row |
 | `contact.ts` | Contact sheet for review: every clip x direction with the scarf (tinted teal) and cap composited, plus one strip of each pass alone |
@@ -22,6 +22,7 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `tileset.ts` | The isometric ground tilesets `iso_ground_<theme>` (`SPRITES.md` 10.12): masks each `build_ground.py` render to its diamond, pixel-finishes it (or, with the switch off, bleeds the display render), draws the 15 edge overlays (a periodic noise fringe reaching about 30% in, rimmed one ramp step darker) and joins the 1280 x 1792 sheet; CLI `tileset <render dir> <out dir> [--finish on\|off]` |
 | `review-world.ts` | Review sheets composited from the packed atlases by the `SPRITES.md` 10.2 projection: `gate` (Gate A's Hollowmere square by day and night, zoom 1 and 2, with `--finish on\|off` filtering), `ground` (a test patch with blends), `kit` (every kit frame on a ground cell), `atlas` and `buildings` (every frame of a packed sheet), and `thumbs`, which writes the shipped `thumb_<mapId>.webp` (480 x 270, a 160 x 90 art grid tripled) |
 | `slice.ts` | Cuts `build_buildings.py` renders into one slice per footprint tile (`SPRITES.md` 10.5): pixel-finishes the frame, assigns each packed pixel to the tile most of its 2 x 2 source block stands over in the raw tile map (the nearest coded pixel at uncoded edges, overhangs clamped to the footprint), and writes full-canvas slices `<art>#<dx>_<dy>` with a static-sheet manifest; CLI `slice <render dir> <out dir> [--finish on\|off]` |
+| `world.ts` | Every 5K key in every `style.json` `artStyles` style (DECISIONS A79): tilesets, kits, props, clues, sliced props and buildings and thumbnails from the raw renders, finished per `pixelFinish` and packed into `<assets>/<style.root>`; a style other than the root one gets those keys in its own `manifest.json` with its `filter`. CLI `world <render dir> <assets dir> [--work <dir>] [--style <id>]` |
 | `refs.ts` | Writes every `style.json` `references` entry, cropped, to `build/refs/<composition>-<index>-<stem>.png` (the Higgsfield `image_references` inputs) |
 | `test/pack.test.ts` | Synthetic frame set: trim and source sizes, determinism, detectIdentical, pivots, anim keys |
 | `test/pack-static.test.ts` | Static keys against the placeholder clues, props pivots, centred clues, determinism, vfx anims, refusal of a wrong key set |
@@ -34,6 +35,7 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `test/kit.test.ts` | Both manifests' `iso_kit_<theme>` atlases hold the 44 frames with their art cells and tile-centre pivots on pages within 1024²; the shipped pages are world colours with hard alpha under the finish |
 | `test/slice.test.ts` | Tile assignment by majority, edge fallback and footprint clamp on a fixture; the shipped `bld_<mapId>` atlases hold only slices that share their building's pivot, on pages within 2048 x 1024, under the finish in world colours |
 | `test/refs.test.ts` | Every reference file exists, every crop lies inside its image, output names are unique |
+| `test/world.test.ts` | Each shipped style manifest holds every 5K key with the 8-bit URL, frame names, source sizes and pivots, pages within their caps, full ground sheets and thumbnails under 100 kB |
 | `test/bleed.test.ts` | PNG round trip, one and two bleed rings, determinism |
 
 ```sh
@@ -45,6 +47,7 @@ pnpm --filter @wdi/sprites contact ../../build/render/villager ../../assets/sour
 pnpm --filter @wdi/sprites pack:static ../../build/render/props ../../apps/client/public/assets/props
 pnpm --filter @wdi/sprites contact:body ../../build/render/villager ../../assets/source/review/villager-body-contact.png
 pnpm --filter @wdi/sprites refs ../../build/refs  # style.json reference crops (default out dir: build/refs)
+pnpm --filter @wdi/sprites world ../../build/render ../../apps/client/public/assets   # every 5K key, each art style
 pnpm --filter @wdi/sprites pixel <raw> <out> [--display] [--finish on|off]   # finish a render folder to packed size
 ```
 

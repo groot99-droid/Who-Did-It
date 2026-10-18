@@ -91,6 +91,9 @@ pnpm --filter @wdi/sprites slice ../../build/render/bld_hollowmere ../../build/f
 pnpm --filter @wdi/sprites review:world gate ../../apps/client/public/assets ../../assets/source/review/gate-a-world-on.png
 pnpm --filter @wdi/sprites review:world gate ../../build/gate-off ../../assets/source/review/gate-a-world-off.png --finish off
 
+# Both art styles (DECISIONS A79) in one go from the raw renders above: 8-bit at the root, low poly in lowpoly/
+pnpm --filter @wdi/sprites world ../../build/render ../../apps/client/public/assets
+
 # Map thumbnails (480 x 270 WebP, composited from the shipped atlases) and the ambient loops
 pnpm --filter @wdi/sprites review:world thumbs ../../apps/client/public/assets ../../apps/client/public/assets/thumbs
 python3 tools/blender/env/ambience.py --out apps/client/public/assets/audio --licences LICENSES/vendors
