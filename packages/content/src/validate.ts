@@ -548,6 +548,7 @@ function checkOnub(onubRoles: OnubRolesFile, onubBalance: OnubBalanceFile, err: 
     ['npc.actFrac', npc.actFrac],
     ['npc.claimFrac', npc.claimFrac],
     ['npc.voteFrac', npc.voteFrac],
+    ['npc.stepS', npc.stepS],
     ['timers.sleeperPulse', { min: timers.sleeperPulseMinS, max: timers.sleeperPulseMaxS }],
     ['timers.crustCountdownS (inside voteS)', { min: timers.crustCountdownS, max: timers.voteS }],
     ['targetLengthMin', targetLengthMin],

@@ -476,7 +476,8 @@ describe('runOnubNpc: the night', () => {
       tickOnce(f, brain);
     }
     expect(mocks.ability).toHaveBeenCalledTimes(2);
-    expect(waited).toBeLessThanOrEqual(1.5 * TICK_RATE + 1);
+    expect(waited).toBeGreaterThanOrEqual(onubBalance.npc.stepS.min * TICK_RATE - 1);
+    expect(waited).toBeLessThanOrEqual(onubBalance.npc.stepS.max * TICK_RATE + 1);
     expect((mocks.ability.mock.calls[1] as [unknown, string, { abilityId: string }])[2].abilityId).toBe(
       'onub.laminateSwap',
     );

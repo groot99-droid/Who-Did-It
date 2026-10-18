@@ -280,8 +280,6 @@ const brainOf = (brain: Brain): OnubBrain => {
 
 /** A night act may take three goes (the Tourrier's two steps, and one refused try). */
 const MAX_ACT_SENDS = 3;
-/** The Tourrier's second step follows its first by this long (seconds). */
-const STEP_DELAY_S = { min: 0.5, max: 1.5 } as const;
 
 /** The difficulty level the NPCs play (3.12, same rule as the main mode's `difficultyRow`). */
 function levelOf(room: PartyRoom): Level {
@@ -349,7 +347,7 @@ function runNightStage(room: PartyRoom, player: PlayerState, b: OnubBrain): void
   } else {
     if (b.stepAt < 0) {
       b.stepAt = Math.min(
-        tick + npcDelayTicks(timing, STEP_DELAY_S.min, STEP_DELAY_S.max, TICK_RATE),
+        tick + npcDelayTicks(timing, onubBalance.npc.stepS.min, onubBalance.npc.stepS.max, TICK_RATE),
         o.stageEndsTick - 1,
       );
     }

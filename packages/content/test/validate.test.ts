@@ -93,6 +93,14 @@ describe('validateContent rejects', () => {
     );
   });
 
+  it('a quick-mode NPC step delay whose min is above its max', () => {
+    expect(
+      broken((c) => {
+        c.onubBalance.npc.stepS = { min: 2, max: 1 };
+      }),
+    ).toEqual(expect.arrayContaining(['balance.onub.json npc.stepS: min > max']));
+  });
+
   it('an ability or item reference that does not exist', () => {
     expect(
       broken((c) => {
