@@ -191,26 +191,50 @@ export interface PrepOutcome {
   perk: { station: string; slot: string } | null;
 }
 
+/** `balance.onub.json` `ruin`, as `resolvePrep` reads it. */
+export interface OnubRuinRule {
+  /** The ruin threshold for a party size `weightByCount` does not list. */
+  weight: number;
+  /** Party size (a `PLAYER_COUNTS` key) -> the ruin threshold at that size (GDD 3.11). */
+  weightByCount?: Readonly<Record<string, number>> | undefined;
+  /** What one good card takes off its station's net. */
+  goodCancels: number;
+}
+
 /**
- * Resolves every pile (GDD 3.11 "The crime scenes"). The rng is the `piles` stream and is drawn in this order:
- * 1. per station in `stations` order: the pile is the commits there in `seats` order, then `shuffle`d;
+ * The streams `resolvePrep` draws from (`sim/seeds.ts`), one per kind of draw, so nothing secret shares a stream
+ * with anything public: `piles` the public order of each pile, `thaw` which card a Thermostat Flip discards (never
+ * shown before game over), `perk` the Pantry Location card the proofing visitors see (private to them).
+ */
+export interface OnubPrepStreams {
+  piles: Rng;
+  thaw: Rng;
+  perk: Rng;
+}
+
+/**
+ * Resolves every pile (GDD 3.11 "The crime scenes"), drawing in this order:
+ * 1. per station in `stations` order: the pile is the card ids committed there, sorted by id, then `shuffle`d
+ *    (`rngs.piles`), so its order says nothing about who committed which card or when;
  * 2. per station, for each `discardRandomOther` card in pile order that is still in the pile while another card
- *    is: one other card, uniform over the rest of the pile, moves to `lost`;
+ *    is: one other card, uniform over the rest of the pile (`rngs.thaw`), moves to `lost`;
  * 3. per station: net = max(0, sabotage cards x `weight` - good cards x `rule.goodCancels`) over the cards left;
  *    `underMixed` when the station has `underMixBelow` and 0 < its visitors < `underMixBelow`;
- * 4. ruinWeight = the nets plus `underMixWeight` per flag; ruined when ruinWeight >= `rule.ruinWeight`;
+ * 4. ruinWeight = the nets plus `underMixWeight` per flag; ruined when ruinWeight >=
+ *    `rule.weightByCount[seats.length] ?? rule.weight`;
  * 5. for the first station with `perk`: when it had a visitor and no sabotage card was committed there, one
- *    Pantry Location position `k` uniform over `pantryLocs`, and `perk.slot` is `pantry.loc.<k>`.
- * Throws on a commit naming an unknown station or card (the handler refused those).
+ *    Pantry Location position `k` uniform over `pantryLocs` (`rngs.perk`), and `perk.slot` is `pantry.loc.<k>`.
+ * `seats` is every seat of the match (the party size is `seats.length`). Throws on a commit naming an unknown
+ * station or card (the handler refused those).
  */
 export function resolvePrep(
   commits: ReadonlyMap<string, OnubCommit>,
   seats: readonly string[],
   stations: readonly OnubStationLike[],
   cards: Readonly<Record<string, OnubCardLike | undefined>>,
-  rule: { ruinWeight: number; goodCancels: number },
+  rule: OnubRuinRule,
   pantryLocs: number,
-  rng: Rng,
+  rngs: OnubPrepStreams,
 ): PrepOutcome {
   void commits;
   void seats;
@@ -218,7 +242,7 @@ export function resolvePrep(
   void cards;
   void rule;
   void pantryLocs;
-  void rng;
+  void rngs;
   throw new Error('resolvePrep: not implemented (Session 5A)');
 }
 

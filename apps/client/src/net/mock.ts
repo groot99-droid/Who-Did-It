@@ -148,6 +148,11 @@ export class MockNetwork implements NetworkService {
     );
   }
 
+  /** Leader only, in the lobby, whatever the mode (GDD 3.13). The mock keeps the id the map row sends. */
+  setMap(map: string): void {
+    this.patch((room) => (room.leaderId === room.selfId ? { settings: { ...room.settings, map } } : {}));
+  }
+
   removeNpc(): void {
     this.patch((room) => {
       const id = this.npcs.pop();

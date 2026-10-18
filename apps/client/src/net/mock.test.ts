@@ -31,6 +31,7 @@ describe('MockNetwork lobby settings', () => {
       npcDifficulty: defaultDifficulty,
       npcSeats: 0,
       onubDeck: [],
+      map: 'hollowmere',
     });
     expect((await lobby(new MockNetwork('onub'))).settings.mode).toBe('onub');
   });
@@ -86,11 +87,13 @@ describe('MockNetwork lobby settings', () => {
     net.setMode('onub');
     net.addNpc();
     net.setOnubDeck(['chef']);
+    net.setMap('blackpine');
     expect(net.snapshot?.settings).toEqual({
       mode: 'main',
       npcDifficulty: defaultDifficulty,
       npcSeats: 0,
       onubDeck: [],
+      map: 'hollowmere',
     });
   });
 
@@ -99,6 +102,16 @@ describe('MockNetwork lobby settings', () => {
     await lobby(net);
     net.setOnubDeck(['chef', 'aboyeur']);
     expect(net.snapshot?.settings.onubDeck).toEqual(['chef', 'aboyeur']);
+  });
+
+  it('keeps the map the leader picks and announces it', async () => {
+    const net = new MockNetwork();
+    await lobby(net);
+    const seen: string[] = [];
+    net.bus.on('lobby', (s) => seen.push(s.settings.map));
+    net.setMap('blackpine');
+    expect(net.snapshot?.settings.map).toBe('blackpine');
+    expect(seen).toEqual(['blackpine']);
   });
 });
 

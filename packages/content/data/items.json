@@ -407,6 +407,39 @@
       "tooltip": "Hold a seance at a body.",
       "ships": "V2",
       "gddRef": "3.5"
+    },
+    "remedy": {
+      "id": "remedy",
+      "name": "Remedy",
+      "kind": "medical",
+      "roleBound": true,
+      "onDeath": "kept",
+      "use": "remedy",
+      "tooltip": "One seat survives the next knife before the next meeting.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "nightshade": {
+      "id": "nightshade",
+      "name": "Nightshade",
+      "kind": "charge",
+      "roleBound": true,
+      "onDeath": "kept",
+      "use": "poison",
+      "tooltip": "One seat dies when the night ends.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "fowlingPiece": {
+      "id": "fowlingPiece",
+      "name": "Fowling Piece",
+      "kind": "weapon",
+      "roleBound": true,
+      "onDeath": "kept",
+      "use": "lastShot",
+      "tooltip": "Your last shot, when you fall.",
+      "ships": "V1",
+      "gddRef": "3.5"
     }
   }
 }

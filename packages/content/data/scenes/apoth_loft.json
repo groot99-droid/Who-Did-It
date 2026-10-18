@@ -5,6 +5,8 @@
   "zoneId": "apoth_loft",
   "profile": "small",
   "kind": "interior",
+  "biome": "house",
+  "dark": true,
   "size": { "w": 12, "h": 9 },
   "notes": "Near-dark, one green lamp.",
   "worldRef": "4.3",

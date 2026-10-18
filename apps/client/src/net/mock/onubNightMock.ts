@@ -34,6 +34,7 @@ export function createNightMock(ctx: MockOnubContext): MockOnubNightHalf {
         .filter((w) => ctx.deal.deck.includes(w.role))
         .reduce((s, w) => s + w.seconds + onubBalance.timers.fadeS, 0),
     cloche: () => '',
+    window: () => '',
     dispose: () => undefined,
   };
 }

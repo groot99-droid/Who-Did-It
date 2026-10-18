@@ -1,20 +1,32 @@
 import { balance, roles } from '@wdi/content';
 import { SKIP_VOTE, TICK_RATE, npcDelayTicks, pickSuspect, pluralityOf, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
+import { markCardReady } from '../Covers';
 import { handleVote } from '../Meeting';
 import type { PlayerSim } from '../RoomSim';
 import { simOf } from '../RoomSim';
 import { difficultyRow } from './difficulty';
 import type { Brain, NpcMemory } from './memory';
 
-/** On the role card an NPC readies after a delay from the `npc.vote` range, so its tick looks human. */
+/** On the role card an NPC readies after a delay from the `npc.ready` range, so its tick looks human. */
 export function readyOnRoleCard(room: PartyRoom, mem: NpcMemory, brain: Brain, player: PlayerState): void {
   const tick = room.state.tick;
-  const v = balance.npc.vote;
+  const d = balance.npc.ready.delayS;
   if (brain.readyAtTick < 0) {
-    brain.readyAtTick = tick + npcDelayTicks(mem.rng, v.delayMinS, v.delayMaxS, TICK_RATE);
+    brain.readyAtTick = tick + npcDelayTicks(mem.rng, d.min, d.max, TICK_RATE);
   }
-  if (!player.ready && tick >= brain.readyAtTick) player.ready = true;
+  // 5F's `markCardReady` (locked call site, both modes): the public tick until 5F makes card Ready private.
+  if (!player.ready && tick >= brain.readyAtTick) markCardReady(room, player.id);
+}
+
+/**
+ * The seat an NPC votes for, or null for Skip (GDD 3.12): a Cabal confession first, then its suspicion; 5G's NPC
+ * Last Shot aims here, holding its fire on null. Session 5H fills it (npc/data.md 7). Pre-seed stub: null.
+ */
+export function npcVoteTarget(room: PartyRoom, id: string): string | null {
+  void room;
+  void id;
+  return null;
 }
 
 /** Living seats other than `selfId`, in roster order. */
@@ -27,7 +39,8 @@ const holdsKnife = (player: PlayerState): boolean =>
   roles.roles[player.priv.role.roleId]?.abilities.includes('kill') ?? false;
 
 /**
- * An NPC casts its vote `npc.vote.delayMinS..delayMaxS` after the discussion opens (GDD 3.12). Main mode:
+ * An NPC casts its vote at an `npc.vote.windowFrac` fraction of the discussion plus the vote time, from the
+ * discussion's first tick (GDD 3.12). Main mode:
  * with `suspectVoteChance` the seat that was most often in its sight at a body (A41), else Skip. A Killer
  * follows the plurality of the votes already cast and re-reads it every second, so it ends with the
  * majority. Quick mode: a random living other seat, never itself, never Skip.
@@ -42,9 +55,11 @@ export function runMeetingVotes(
 ): void {
   if (p.dead) return;
   const tick = room.state.tick;
-  const v = balance.npc.vote;
-  if (brain.voteAtTick < 0)
-    brain.voteAtTick = tick + npcDelayTicks(mem.rng, v.delayMinS, v.delayMaxS, TICK_RATE);
+  if (brain.voteAtTick < 0) {
+    const f = balance.npc.vote.windowFrac;
+    const span = Math.max(0, room.state.phaseEndsTick - tick) + balance.phases.voteS * TICK_RATE;
+    brain.voteAtTick = tick + Math.round(span * (f.min + mem.rng() * (f.max - f.min)));
+  }
   if (tick < brain.voteAtTick) return;
   const others = livingOthers(room, player.id);
 

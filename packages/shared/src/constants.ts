@@ -34,6 +34,8 @@ export const ClueKind = {
   dragSmear: 6,
   fur: 7,
   clawMarks: 8,
+  /** A Hungry Killer's glowing footprints (GDD 3.3): `value` the height index, `dir` the facing. */
+  hungerPrints: 9,
 } as const;
 export type ClueKindId = (typeof ClueKind)[keyof typeof ClueKind];
 
@@ -45,6 +47,25 @@ export const NotebookStatus = {
   forged: 3,
   teaching: 4,
 } as const;
+
+/** `NotebookEntry.note` values (GDD 3.2): 0 is a clue entry, the others a night-power entry about `of`. */
+export const NoteKind = {
+  clue: 0,
+  confession: 1,
+  watching: 2,
+  watchHeld: 3,
+  remedyGiven: 4,
+  remedyHeld: 5,
+  poisonGiven: 6,
+  shot: 7,
+} as const;
+export type NoteKindId = (typeof NoteKind)[keyof typeof NoteKind];
+
+/** Sent in `Private.cooldownEndTick[abilityId]` while a night power is spent for the current night (GDD 3.2). */
+export const SPENT_TONIGHT = 0xffffffff;
+
+/** Avatar handles: 6 random bytes in base64url, 8 characters (GDD 3.17); never drawn from a seeded stream. */
+export const AVATAR_HANDLE_BYTES = 6;
 
 /**
  * Quick mode (GDD 3.11): every ONUB seat sits in the `loft` pseudo-scene, index 255 in `Player.sceneId`, from

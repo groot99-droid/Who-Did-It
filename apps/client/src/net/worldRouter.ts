@@ -150,9 +150,14 @@ export function installWorldRouter(
     meetingOpen = false;
   };
 
-  // The role card text feeds the HUD chip. Held in memory only, shown to this player only.
-  const onReveal = (payload: { team: string; goal: string }) =>
-    game.registry.set(REG_ROLE_CHIP, { team: payload.team, goal: payload.goal });
+  // The role card text feeds the HUD chip (and, main mode, the deck chip). Held in memory only, shown to this
+  // player only.
+  const onReveal = (payload: { team: string; goal: string; deck?: string[] }) =>
+    game.registry.set(REG_ROLE_CHIP, {
+      team: payload.team,
+      goal: payload.goal,
+      ...(payload.deck !== undefined && { deck: payload.deck }),
+    });
   net.bus.on('roleReveal', onReveal as never);
   stops.push(() => net.bus.off('roleReveal', onReveal as never));
 

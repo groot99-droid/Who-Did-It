@@ -1617,3 +1617,416 @@ soak, `WDI_SLOW=1`. On 2026-10-17 the owner asked for round 5 instead (below), w
 2. Close M3b and M3c: the quick-mode soak, the real-NPC-seat quick-mode server test, `WDI_SLOW=1`.
 3. M3 exit (owner): three 5-player playtests with the scorecard, recorded in `docs/PLAYTESTS/`.
 4. Art masters to the owner's ROSW checkout (rounds 3 and 4 items, owner).
+
+## Round 5 (started 2026-10-17, after round 4 landed at a0850ba)
+
+Thirteen sessions build **M5a, Living World** (GDD 3.1-3.3, 3.8, 3.9, 3.12, 3.13, 3.17; ROADMAP M5a) and
+**ONUB v2** (GDD 3.11; ROADMAP ONUB v2), the owner's round-5 brief (`docs/round5/owner-brief.md`, quoted word
+for word), plus the round-4 review findings (docs/SESSIONS.md "Integration log, round 4"). Round 6 (M5b:
+resources and crafting, mobs, quests, the main-mode mini-games) builds on it. Same rules as rounds 1 to 4:
+- draft PRs against `claude/zen-turing-m1jnw0`, under 400 lines where the work allows (split by step, each PR
+  green);
+- `pnpm lint && pnpm typecheck && pnpm test` clean before every push;
+- pinned versions only, and no model identifiers in committed files;
+- `docs/GDD.md` changes in the same PR as a behaviour change;
+- numbers only in `docs/GDD.md` and `packages/content/data`.
+
+Code and tooling run on Sonnet 5.5; art, content and maps run on Opus 5.5. The decisions of this round are
+DECISIONS A49 (the owner's answers), A50 (the contract) and A51 (the quick-mode Start below the minimum); a
+session never re-decides them.
+
+**What changed for everyone.**
+- **Public role looks (main mode).** Every seat walks the world as its card's character. Only the cover roles
+  (Killer, Accomplice, Drifter) wear another card's look. CLAUDE.md's secrecy convention is rewritten for
+  this.
+- **Isometric presentation.** Both modes present isometrically on the client; the server stays cartesian
+  (`docs/SPRITES.md` 10, the projection contract).
+- **ONUB v2 replaces the round-4 quick mode.** The pre-seed cut the round-4 quick-mode code to compiling
+  stubs. The lobby's mode toggle shows only with `?onub=1` until ONUB v2 lands at integration.
+- **Independent random streams.** Every match stream is `sfc32` with four crypto words (`sim/seeds.ts`);
+  nothing secret shares a stream with anything public, each NPC seat draws only from its own keyed streams,
+  and `fixSeeds` lives only in `apps/server/test/seedHelpers.ts` (`deck-wire.md` 2.2).
+
+**The contract documents** (`docs/round5/`) carry everything a session needs beyond this section:
+- `seams.md`: every pre-seeded hook, its owner, its locked call site and its stub body;
+- `onub-contract.md`: ONUB v2 wire, state, hooks, frozen hooks, copy ids, the compile cut;
+- `deck-wire.md` and `deck-data.md`: the deck, covers, avatars and Impersonate;
+- `world.md`: maps, scene fields, `MapSites.ts`, the new scenes; the projection, the tilemap and the lighting
+  layer are `docs/SPRITES.md` 10;
+- `npc.md`: routines and tests;
+- `art-plan.md`: style, asset lists, keys, routes, Higgsfield prompt templates;
+- `owner-brief.md` and `art-index.md`.
+
+Read your brief below, then `seams.md`, then the sections of those documents it names. The docs already carry
+the round's rules (GDD 3.11 replaced, the "(M5a)" sentences of 3.1-3.3, 3.8, 3.9, 3.12, 3.13 and 3.17, SPRITES
+10, WORLD 4, ARCHITECTURE 5.4 and 5.14, ASSETS 6.11): a session edits them only where what it builds differs,
+in the same PR.
+
+**Round-4 findings and follow-ups.** The pre-seed fixed the deal stream, the cross-mode `debug.deal` crash and
+the vanished count; the quick-mode findings retire with ONUB v2 (`onub-contract.md` 9). PropView's pivots go
+to 5I, the two NPC tells and `WDI_SLOW=1` to 5H, the lobby copy ids to 5C (bug #126), the quick-mode soak and
+the real NPC seat through quick mode to 5E. Follow-ups 3 (the owner's M3 playtests) and 4 (the art masters)
+stay the owner's.
+
+**Pre-seeded on the base branch** (265bda9 and the A50 contract commit on top of it), additively: nothing the
+code at 265bda9 reads was removed or made required. `seams.md` lists every hook with its owner, its locked
+call site and its stub body. In short: the ONUB v2 contract and the compile cut of the round-4 quick mode
+(`onub-contract.md` 2-5, 9 and 13); the streams (`sfc32` in `rules/prng.ts`, `MatchSeeds.get(name, key?)` in
+`sim/seeds.ts`, `PartyRoom.fixedSeeds` with `fixSeeds` in the test helper, `prepStreams(room)` in
+`sim/onub/Prep.ts`); the wire, content and server and client hooks of the deck, looks, covers, avatars and
+Impersonate (`deck-wire.md` 1-3 and 8, `deck-data.md`), with `Private.sceneId` beside `Player.sceneId` and
+`SceneState.avatars` still empty; the scene fields, `maps/hollowmere.json`, `@wdi/shared/iso`,
+`sim/MapSites.ts` with every map site routed through it, the `map` lobby setting and the empty
+`ui/lobby/MapPicker.ts` (`world.md` 1 and 9.1); `routines.json`, the `balance.json` `npc` rows and
+`AnimId.interact` (`npc.md` 1-6); and the art code and data (`style.json` with `pixelFinish`, `palette.json`
+`world`, `tools/sprites/{oklab,palette,pixel,refs}.ts`, `LEGACY`, the replaced `manifest.test.ts`, the package
+scripts and the placeholder split: `placeholder.ts` and `placeholder-kit.ts` core, one
+`placeholder-{world,chars,onub}.ts` module per art session; `art-plan.md` 1.2 and 9).
+
+**Nobody edits** `packages/shared/src/**` except the rule bodies a brief names (`rules/onub.ts` 5A,
+`rules/onubNight.ts` 5B, `rules/deck.ts` `coverHints` 5F and `dealDeck` 5G), `packages/content/src/**` and the
+content data except the lines a brief names,
+`apps/server/src/sim/{seeds,Flow,Step,Death,Kill,Movement,RoomSim,constants}.ts`, `sim/onub/state.ts`,
+`apps/server/test/{simHelpers,killHelpers,seedHelpers}.ts`, the pre-seeded call sites in
+`rooms/handlers/lobby.ts`, `rooms/PartyRoom.ts`,
+`sim/{Actions,Clues,Meeting,Phases,Portals,Visibility,Win,Npc}.ts` and `sim/npc/{world,walk}.ts` (the other
+lines of those files belong to the owners in the table), the client contract files
+(`net/{onub,onubRouter,meeting,meetingColyseus,protocol,NetworkService,mock}.ts`,
+`net/mock/{onubMock,meetingMock}.ts`, `view/animIds.ts` and every pre-seeded mount line in
+`ui/{Lobby,Meeting,GameOver}.ts` and `view/Hud.ts`),
+`tools/sprites/{placeholder,placeholder-kit,oklab,palette,pixel,refs}.ts`,
+`tools/sprites/test/manifest.test.ts` and `eslint.config.js`. A session that needs another contract writes it
+in its PR description and carries on with a local stand-in; the orchestrator adds it to the base branch. The
+exceptions are the contract phases of 5F and 5G (`deck-wire.md` 10): each is one commit in the session's last
+PR, edits only the files its table lists (other sessions' files included; they keep the edit when they merge
+the base branch), and leaves the locked ONUB mock (`onubMockRoleCard`) typechecking.
+
+| Session | Model | Track | Branch | Owns |
+|---|---|---|---|---|
+| **5A. ONUB v2 rules, server deal and prep** | Sonnet 5.5 | Code | `claude/r5-onub-rules` | `rules/onub.ts` bodies; `sim/Onub.ts`, `sim/onub/Prep.ts`; their tests |
+| **5B. ONUB v2 server night and morning** | Sonnet 5.5 | Code | `claude/r5-onub-night` | `rules/onubNight.ts` bodies; `sim/Conductor.ts`, `sim/onub/Acts.ts`; the quick branches of `Meeting.ts` and `Win.ts`; their tests |
+| **5C. ONUB v2 client prep, mini-games, deck editor** | Sonnet 5.5 | Code | `claude/r5-onub-prep-ui` | `scenes/Kitchen.ts`, `view/onub/` prep views and the four mini-games, `ui/lobby/DeckEditor.ts`, `onubPrepMock.ts`, bug #126 |
+| **5D. ONUB v2 client night, morning and results** | Sonnet 5.5 | Code | `claude/r5-onub-night-ui` | `scenes/Night.ts`, `view/onub/` night views, `ui/onub/**`, `net/onubColyseus.ts`, `onubNightMock.ts`, the quick paths of `ui/Meeting.ts` and `ui/GameOver.ts` |
+| **5E. ONUB v2 bots, NPC brains, e2e and soak** | Sonnet 5.5 | Code | `claude/r5-onub-bots` | `sim/npc/onub.ts`, the quick-mode bots, `onub.spec.ts`, the quick case of `npc.spec.ts`, the soaks |
+| **5F. Avatars, public looks, covers, Impersonate** | Sonnet 5.5 | Code | `claude/r5-avatars` | `sim/{Avatars,Impersonate,Covers,Visibility}.ts`, `coverHints`, the world feed, `EntityView.ts`, `RoleCard.ts`, `SeatPicker.ts`; the wire contract phase |
+| **5G. Main deck and Werewolf roles** | Sonnet 5.5 | Code | `claude/r5-deck` | `sim/{Deck,NightPowers,Hunger}.ts`, `dealDeck`, `Phases.ts` main lines, Knife and Bell phases, `ui/main/**`; the deck contract phase |
+| **5H. NPC routines and fixes** | Sonnet 5.5 | Code | `claude/r5-npc` | `sim/Npc.ts`, `sim/npc/**` but `onub.ts`, the NPC tests, the CI split |
+| **5I. Isometric client and lighting** | Sonnet 5.5 | Code | `claude/r5-iso` | `view/**` but `EntityView.ts` and `view/onub/**`, `input/**`, `scenes/World.ts`, `world.spec.ts` |
+| **5J. Maps** | Opus 5.5 | Maps | `claude/r5-maps` | `data/maps/**`, the new and changed scenes, `tools/grid/**`, `MapSites.ts` bodies, the map setting, `MapPicker.ts` |
+| **5K. World art** | Opus 5.5 | Art | `claude/r5-world-art` | the 5K list of `art-plan.md` 1.1 (ground, kits, buildings, props, clues, thumbnails, ambience) |
+| **5L. Character art** | Opus 5.5 | Art | `claude/r5-char-art` | the 5L list of `art-plan.md` 1.1 (IsoCam rig, looks, portraits, VFX, ability icons) |
+| **5M. ONUB art** | Opus 5.5 | Art | `claude/r5-onub-art` | the 5M list of `art-plan.md` 1.1 (the owner's images, the Brick Oven, cards, portraits, `onub_mini`) |
+
+Suggested merge order: 5A, 5B, 5F, 5G, 5H, 5J, 5I, 5C, 5D, 5E, 5K, 5L, 5M: rules and servers before the
+clients that draw them, the wire (avatars, the deck) before the world that walks on it, and art last because
+it swaps keys the code already loads as placeholders. Shared documents: edits stay inside the named section
+with no renumbering or reflow, and the orchestrator keeps both sides of any conflict. Copy: the ONUB lines go
+in `docs/UI.md` 14.12 (5C) and 14.14 (5D); a main-mode session that needs new lines adds a 14 subsection of
+its own (5F 14.15, 5G 14.16, 5J 14.17) and a copy module of its own under `ui/copy/`. Theme: new rules are
+appended at the end of `ui/theme/components.css` under a "Round 5 (5X)" comment, one block per session.
+Decisions a session has to make go to `docs/DECISIONS.md` under its reserved row, which every session may fill
+(5A A52, 5B A53, 5C A54, 5D A55, 5E A56, 5F A57, 5G A58, 5H A59, 5I A60, 5J A61, 5K A62, 5L A63, 5M A64;
+integration A65). A second row takes the number plus 14 (A66 to A78, appended after A65, so it never meets the
+integration row); nobody edits an older row. The orchestrator runs the opt-in e2e suites (`WDI_E2E_ONUB=1`,
+`WDI_E2E_NPC=1`, `WDI_E2E_LOOKS=1`), `WDI_SLOW=1` and the 30-minute soaks of both modes at integration, and
+takes the `?onub=1` gate off the mode toggle once ONUB v2 has merged.
+
+### Briefs
+
+Every brief names the session's paths, the sections it reads, its PR split, its tests and what it leaves
+alone. Every session reads `docs/round5/seams.md` before writing code and records its round-5 log under its
+reserved "Round 5 log" heading at the end of this section.
+
+**5A. ONUB v2 rules, server deal and prep.** Fill the pure prep rules and run a quick match on the server from
+Start through the role card, Evening Prep and the crime-scene board to the night. Everything stays behind
+`isOnub(room)`, so the main mode is untouched. **Owns** `packages/shared/src/rules/onub.ts` (the bodies), new
+`packages/shared/test/onubPrep.test.ts`, `apps/server/src/sim/Onub.ts` (the `handleOnubAbility` dispatcher
+stays as pre-seeded), `apps/server/src/sim/onub/Prep.ts`, new
+`apps/server/test/{onubDeal,onubPrep,onubContract}.test.ts` and `onubPrepHelpers.ts`, the GDD 3.11 sentences
+marked "(5A)" in "Two cards each", "Decks", "Evening Prep" and "The crime scenes", and ARCHITECTURE 5.14 rows
+"Rules (prep)" and "Server modules (deal, prep)". **Reads** `onub-contract.md` 1, 2.4, 4.1-4.6, 6 (O1-O3), 9,
+10, 12 and 13; `deck-wire.md` 2.2; GDD 3.11; DECISIONS A51 (no below-minimum refusal: the only Start refusal
+is the deck check). `beginOnubPlay` writes `LOFT_SCENE_INDEX` to both `Player.sceneId` and `Private.sceneId`;
+Ready on the role card goes through 5F's `markCardReady` and `allCardReady`; `endPrep` makes the exact
+`resolvePrep(..., prepStreams(room))` call written in its doc comment; `debug.deal` drops ids unknown to
+`roles.onub.json`. **PRs**: (1) the rule bodies with `onubPrep.test.ts`; (2) the deal, the role card,
+`onubDeckSetting` and `resetOnubForLobby` with `onubDeal.test.ts`; (3) `handlePrep`, `runPrep`, `endPrep` and
+the prep reveal with `onubPrep.test.ts` and `onubContract.test.ts`, then the GDD and ARCHITECTURE lines.
+**Tests**: the property tests of 2.4 and O1 to O3. **Not**: `rules/onubNight.ts`, `sim/Conductor.ts` and the
+night (5B); the locked list of `onub-contract.md` 1. Before code, `seams.md`; log under "Round 5 log: 5A".
+
+**5B. ONUB v2 server night and morning.** Fill the pure night rules (acts, wake view, vote, winners), then run
+the night (the windows, the public narrator, the Iron Cloche, must-act timeouts), dawn, the Morning Rush with
+structured claims, CRUST with the Pantry vote and Restaurant Shutdown, the reveal and game over. The night
+moves nobody: every seat already sits in the loft. **Owns** `packages/shared/src/rules/onubNight.ts` (the
+bodies), new `packages/shared/test/onubNight.test.ts`, `apps/server/src/sim/Conductor.ts`, new
+`apps/server/src/sim/onub/Acts.ts`, the quick-mode branches of `apps/server/src/sim/Meeting.ts` (`openMeeting`
+for `dawn`, `handleVote`, `startOnubReveal`, `endReveal`, `runMeeting`, `handleClaim`) and of
+`apps/server/src/sim/Win.ts` (`endOnubMatch`, the quick lines of `resetToLobby`), new
+`apps/server/test/{onubNight,onubMorning}.test.ts` and `onubNightHelpers.ts`, the GDD 3.11 sentences marked
+"(5B)" in "The Baking Cycle", "The Iron Cloche", "Must and may", "Dawn and the Morning Rush", "The vote" and
+"Reveal and game over", and ARCHITECTURE 5.14 rows "Rules (night, vote)", "Messages", "Privacy" and "Server
+modules (night, morning)". **Reads** `onub-contract.md` 1, 2.5, 4.3-4.6, 6 (O4-O8), 9, 10, 12 and 13; GDD
+3.11. The hand-off lines of `runOnubPhases` and its vanished count stay as pre-seeded; CRUST never ends before
+`timers.crustCountdownS` and the Rush never ends early. **PRs**: (1) the `onubNight.ts` bodies with
+`onubNight.test.ts` (shared); (2) the Conductor, `Acts.ts` and `onubClock` with the server
+`onubNight.test.ts`; (3) the meeting, vote, reveal and `endOnubMatch` branches with `onubMorning.test.ts`,
+then the docs. **Tests**: the cases of 2.5 and O4 to O8. **Not**: the main-mode lines of `Meeting.ts` and
+`Win.ts` and the 5F and 5G hooks there; 5A's files. Before code, `seams.md`; log under "Round 5 log: 5B".
+
+**5C. ONUB v2 client prep, mini-games, deck editor.** Build the client from the role card's end to the prep
+reveal: the kitchen overview, the four station rooms with their mini-games, the hand and the commit, the
+waiting panel and the crime-scene board; and the lobby deck editor. Fix bug #126 (the lobby copy ids and the
+Start confirm's fill line). **Owns** `apps/client/src/scenes/Kitchen.ts` (pre-seeded empty),
+`apps/client/src/view/onub/{PrepView,StationView,PilesView}.ts` and
+`view/onub/minigames/{crates,pour,slide,stoke}.ts` with tests, `apps/client/src/ui/lobby/DeckEditor.ts` with
+its test, `apps/client/src/net/mock/onubPrepMock.ts` with its test, new `apps/client/src/ui/copy/onubPrep.ts`,
+the "Round 5 (5C)" block of `components.css`, new `apps/client/e2e/kitchen.spec.ts` (mock only,
+`?mock=1&mode=onub`), for bug #126 only the lobby-chip and 14.13 ids in `ui/copy/lobby.ts` and the fill line
+of `openDialog` in `ui/Lobby.ts`, and `docs/UI.md` 14.12 (replaced wholesale). **Reads** `onub-contract.md` 1
+(bug #126), 2.2-2.4, 5, 6, 7, 8 and 10; GDD 3.11 "Decks", "Evening Prep" and "The crime scenes"; `art-plan.md`
+5.4 and 5.7 (the kitchen quadrants, `onub_mini`). The mini-game result never reaches the wire; the Done
+control appears after `timers.minigameAssistS`; until 5A lands, the editor uses a local stand-in of
+`onubDeckProblem`. **PRs**: (1) the kitchen, the station room, the hand and the commit on the mock, with the
+copy; (2) the crates and pour mini-games; (3) the slide and stoke mini-games; (4) `PilesView`, `DeckEditor`,
+bug #126, `kitchen.spec.ts` and UI.md 14.12. **Tests**: one per mini-game (success, the assist, nothing sent
+but `onub.prep`), the editor's five problem lines, the frozen hooks of `onub-contract.md` 7. **Not**: the
+composer `onubMock.ts`, `net/onub.ts`, the mount hooks, any other line of `ui/Lobby.ts` or `ui/copy/lobby.ts`,
+5D's half. Before code, `seams.md`; log under "Round 5 log: 5C".
+
+**5D. ONUB v2 client night, morning and results.** Build everything from the night to game over: the
+lights-out screen with the narrator, a waker's role scene with the card table and the Cloche, dawn, the
+Morning Rush board and claim form, CRUST and its countdown, the reveal and the end screen with the act
+timeline. Write the real `ColyseusOnubFeed`, which serves 5C's prep half too. **Owns**
+`apps/client/src/scenes/Night.ts` (pre-seeded empty), `view/onub/{NightView,CardTableView,LightsOutView}.ts`
+with tests, `ui/onub/{rush,claim,over,actlog}.ts` with tests, new `net/onubColyseus.ts` with its test,
+`net/mock/onubNightMock.ts` with its test, new `ui/copy/onubNight.ts`, the "Round 5 (5D)" block of
+`components.css` plus deleting the round-4 `.wdi-loft*`, `.wdi-bedroll*` and `.wdi-claims*` rules, deleting
+`scenes/Loft.ts` and `view/LoftView.ts`, new `e2e/night.spec.ts` (mock only), the quick-mode paths of
+`ui/Meeting.ts` and `ui/GameOver.ts`, and new `docs/UI.md` 14.14. **Reads** `onub-contract.md` 2.2, 2.3, 2.5,
+5, 6 (O9 and the night audio), 7, 8, 9, 10 and 13; GDD 3.11 from "The Baking Cycle"; `art-plan.md` 5.5 and
+5.6. The headline comes from the winners row and `loaf_crack` plays at the reveal (both round-4 bugs).
+**PRs**: (1) the Night scene, lights-out and the narrator with `NightView.test.ts` (O9); (2) the card table,
+the acts and the reveals; (3) the Rush, claims and CRUST; (4) the end screen, the act log, `onubColyseus.ts`,
+`night.spec.ts`, the deletions and UI.md 14.14. **Tests**: O9, each view's unit tests on the mock, the frozen
+hooks of 7. **Not**: the main-mode lines and 5G mounts of `ui/Meeting.ts` and `ui/GameOver.ts`;
+`net/{meeting,meetingColyseus}.ts` and `meetingMock.ts`; 5C's half. Before code, `seams.md`; log under "Round
+5 log: 5D".
+
+**5E. ONUB v2 bots, NPC brains, e2e and soak.** Make NPC seats and bots play ONUB v2 without walking: prep
+commits, night acts, claims and votes, each NPC from its own keyed streams. Rewrite the quick-mode e2e and run
+the soaks, reporting the ruin rate per party size against the 20-30% target. **Owns**
+`apps/server/src/sim/npc/onub.ts`, new `apps/server/test/onubNpc.test.ts`, the quick-mode parts of
+`tools/bots/{quick,walk,soak,live}.ts` and `tools/bots/test/quick*.test.ts`, the main-mode reads of
+`tools/bots/walk.ts` after 5F's contract phase (prey and Kill by avatar handle),
+`apps/client/e2e/onub.spec.ts` (rewritten), the quick-mode case of `apps/client/e2e/npc.spec.ts`,
+`.github/workflows/soak.yml`, the GDD 3.11 sentences marked "(5E)" in "NPC seats", and ARCHITECTURE 5.12 (the
+quick-mode bot rows). **Reads** `onub-contract.md` 1, 4.3, 6, 7, 10, 11 and 12 (item 13, the NPC numbers);
+`deck-wire.md` 2.2, 8.3 and 10.1. **PRs**: (1) the NPC planner (pure) and `runOnubNpc` with `onubNpc.test.ts`;
+(2) the bot planner and its tests, the leak monitor (a sleeper never receives `nightWake` or `nightReveal`,
+nobody receives a presence); (3) `onub.spec.ts`, the `npc.spec.ts` quick case and the soak report; (4) after
+merging 5F's branch, the main-mode bot reads. **Tests**: a real NPC seat through a full quick match (bugs.md),
+NPC ticks inside `commitS`, `actFrac`, `claimFrac` and `voteFrac`, the sabotage roll drawn by every NPC.
+**Not**: 5A's and 5B's server files, `sim/Npc.ts` routing, the main-mode brain (5H). Before code, `seams.md`;
+log under "Round 5 log: 5E".
+
+**5F. Avatars, public looks, covers, Impersonate.** Put the secrecy model of A49 and A50 on the wire: other
+seats walk as scene-scoped avatars under opaque handles, `Player.look` goes public in one tick when the card
+closes, cover roles pick a look from their hints, Ready on the card is private in both modes, and Impersonate
+changes the face only unseen. Then remove the public scene index and other seats' presence (contract phase).
+**Owns** `apps/server/src/sim/{Avatars,Impersonate,Covers,Visibility}.ts`, the `coverHints` body in
+`packages/shared/src/rules/deck.ts`, new `apps/server/test/{avatars,coverPick,impersonate}.test.ts` and the
+updates of `visibility.test.ts` and `lobby.test.ts`; in `apps/client/src`: `net/{world,worldColyseus}.ts`,
+`net/mock/worldMock.ts` and its test, `view/EntityView.ts` and its test, new `view/targets.ts` and its test,
+`ui/RoleCard.ts` and its test, `ui/portrait.ts`, new `ui/SeatPicker.ts`, a new `ui/copy/` module, and in
+`scenes/World.ts` (5I's) only the target of the Kill and Bandage prompts (`nearestAvatar`, which the pre-seed
+could not land); new `apps/client/e2e/looks.spec.ts` (opt-in `WDI_E2E_LOOKS=1`); GDD 3.17 and the secrecy
+sentence of 3.1; ARCHITECTURE 5.4 and 5.5 (the text of `deck-wire.md` 9, checked against what lands); UI.md
+14.15. **Reads** `deck-wire.md` 1, 3, 4, 6, 7.1, 8 and 10.1; `deck-data.md` 6; GDD 3.1 and 3.17. **PRs**: (1)
+`Avatars.ts` and the avatar views beside presence, with `avatars.test.ts`; (2) `Covers.ts` (the cover pick,
+card-ready for both modes, `publishLooks`, the reset) and `coverHints`, with `coverPick.test.ts`; (3)
+`Impersonate.ts` with `impersonate.test.ts`; (4) the client feed, `EntityView`, `targets.ts`, the World prompt
+target, the role-card picker, `SeatPicker` and portraits by look; (5) the contract phase (`deck-wire.md` 10.1:
+`Player.sceneId` and others' presence, with every file it lists) and `looks.spec.ts`. **Tests**:
+`deck-wire.md` 7.1, each privacy invariant of 6 that is 5F's. **Not**: the locked call sites in `lobby.ts`,
+`Meeting.ts`, `Win.ts`, `Step.ts`, `Death.ts` and `Kill.ts`; `Flow.ts`; 5G's `Deck`, `NightPowers` and
+`Hunger`; the shared schema outside the contract-phase commit. Before code, `seams.md`; log under "Round 5
+log: 5F".
+
+**5G. Main deck and Werewolf roles.** Deal the public n+2 deck with professions, move the Knife to dusk, night
+and the Final Night, and build Hunger, the Final Night, the four night roles (Vicar, Watchman, Herbalist,
+Gamekeeper), Inherit and the Bell phases, so every match ends. Build the main-mode screens (the lobby deck
+list, the HUD deck chip, portraits and the reveal line by look, the end screen, the shot toast), then remove
+the roster deal (contract phase). **Owns** `apps/server/src/sim/{Deck,NightPowers,Hunger}.ts`, the main-mode
+lines of `sim/Phases.ts` (the ONUB hand-off and the `isAiming` call stay), `isKillPhase` in `sim/World.ts` and
+the phase check of `handleBell` in `sim/Actions.ts` (those lines only), the `dealDeck` body in
+`packages/shared/src/rules/deck.ts`, new `apps/server/test/{nightPowers,lastShot,inherit}.test.ts` and the
+update of `flow.test.ts`; `apps/client/src/ui/main/**`, a new `ui/copy/` module, the "Round 5 (5G)" block of
+`components.css`; the rows of `roles.json`, `abilities.json`, `items.json` and `clues.json` (the pre-seed
+landed them; 5G retunes); GDD 3.2, 3.3, 3.8, 3.9 and the deck paragraphs of 3.1; UI.md 14.16. **Reads**
+`deck-wire.md` 2.1, 4.3, 4.4 (the deal), 5, 6, 7.2, 8 and 10.2; `deck-data.md` 1-5 and 7; `npc.md` 7 and 8
+(the `Brain` draws, `npcVoteTarget`); GDD 3.1-3.3, 3.8, 3.9 and 3.17. **PRs**: (1) `dealMainDeck`, `dealDeck`
+and `debug.deal`; (2) the Knife phases, the Bell, the clock and the Final Night in `Phases.ts`, with
+`flow.test.ts`; (3) the night powers, protections and Nightshade with `nightPowers.test.ts`; (4) Last Shot,
+Inherit and Hunger with their tests; (5) the `ui/main` screens; (6) the contract phase (`deck-wire.md` 10.2:
+`rosters`, `standIn`, `assignRoles`, `rosterFor`, with every file it lists). **Tests**: `deck-wire.md` 7.2;
+the soak gate (median match 12-18 min, at most a third reaching the Final Night). **Not**: the locked call
+sites; `Flow.ts`; 5F's files and `ui/SeatPicker.ts` (5G plugs into it); `net/{meeting,meetingColyseus}.ts`,
+`meetingMock.ts`; the quick paths of `ui/Meeting.ts` and `ui/GameOver.ts` (5D). Before code, `seams.md`; log
+under "Round 5 log: 5G".
+
+**5H. NPC routines and fixes.** Replace the endless wander with routines (travel, work, idle, stroll, react),
+keep NPCs to lit scenes at night, and remove the two round-4 NPC tells (the early vote, the lobby-return
+ready). Every NPC draws only from its own keyed streams, and the server suite moves to its own CI job.
+**Owns** `apps/server/src/sim/Npc.ts`, `apps/server/src/sim/npc/{routine,world,walk,meeting,memory,seats}.ts`,
+`apps/server/test/{npcHelpers,npcTells}.ts`, new `apps/server/test/{npcRoutine,npcTells,presence}.test.ts`,
+`npc.test.ts`, `npcBrain.test.ts`, `npcSlow.test.ts`, `packages/content/test/routines.test.ts`, the main-mode
+case of `apps/client/e2e/npc.spec.ts`, `.github/workflows/ci.yml` (the server suite in its own job), GDD 3.12
+(main mode), and ARCHITECTURE 5.3 (the start flow's last sentence), 5.6 (the presence write) and 5.12 (the CI
+line). **Reads** `npc.md` 1-8 and its tests part; `deck-wire.md` 2.2; GDD 3.12. The `quick` branch of
+`runMeetingVotes` and `NpcMemory.rng` go; the NPC Killer sends the prey's avatar handle once 5F lands.
+**PRs**: (1) the keyed streams, the `Brain` fields, the persona and `routine.ts`; (2) work, strolls and idles
+with `npcRoutine.test.ts`; (3) reactions, the night and the placement idle; (4) the vote window,
+`npcVoteTarget`, the lobby ready, `npcTells.test.ts` and `presence.test.ts`; (5) the CI split. **Tests**: the
+tests part of `npc.md`; gates: a 2-minute main-mode soak with no presence leak and a meeting, `WDI_SLOW=1`,
+and the `WDI_E2E_NPC=1` main case against 5F's merged branch. **Not**: `lobby.ts` (its calls are locked),
+`Movement.ts`, `constants.ts`, `animIds.ts`, `routines.json`, `balance.json`, `sim/npc/onub.ts` (5E). Before
+code, `seams.md`; log under "Round 5 log: 5H".
+
+**5I. Isometric client and lighting.** Present the world isometrically on the client (projection, depth,
+occlusion, input, camera, the vision ellipse) and add the darkness layer with data lights; the server stays
+cartesian. Fix the round-4 client finding that survives the rebuild (PropView's frame pivots). **Owns**
+`apps/client/src/view/**` except `EntityView.ts` (5F), `LoftView.ts` (5D deletes it), `view/onub/**` (5C, 5D)
+and `animIds.ts`; `apps/client/src/input/**`; `apps/client/src/scenes/World.ts` (5F writes the Kill and
+Bandage prompt target there); `apps/client/e2e/world.spec.ts`; GDD 3.13 from "Isometric presentation" to "Dark
+scenes"; SPRITES 5 (loading notes, the manifest `modes` field) and 10 (only where what lands differs);
+ARCHITECTURE 5.9 (one sentence on the isometric view). **Reads** SPRITES 10.1-10.11 and 10.13-10.15, and 5;
+`world.md` 2 (`buildings`, `lights`, `dark`, `material`) and 9.2; `art-plan.md` 1.3 and 6; `npc.md` 4
+(`AnimId.interact`). **PRs**: (1) the projection from `@wdi/shared/iso`, input (`keysToWorld`,
+`stickToWorld`), the camera and zoom snapping; (2) depth and occlusion (slices, shells, deep cull, fade); (3)
+the isometric tilemap reader with the greybox fallback of SPRITES 10.13; (4) the lighting layer, the darkness
+ambient and lights by phase; (5) `screenDirOfYaw` and the `interact` pose in `PlayerView`, PropView's pivots,
+the `modes` filter in `view/assets.ts`, `hungerPrints` in `ClueView`, and `world.spec.ts`. **Tests**: the 5I
+rows of SPRITES 10.15; the 45 fps check of ROADMAP M5a at integration. **Not**: `EntityView.ts`; the server;
+`tools/grid` (5J); art files. Before code, `seams.md`; log under "Round 5 log: 5I".
+
+**5J. Maps.** Make Hollowmere a manifest map with the new Fenwood and Flooded Gallery, add Blackpine (logging
+camp, woods, tin mine), let the leader choose the map in the lobby, and write the isometric tilemap exporter.
+Every map has a forest and a dark cave, and no frozen id is renamed or reused. **Owns**
+`packages/content/data/maps/**`; the new scenes `forest_deep`, `cave_gallery`, `bp_camp`, `bp_lodge`,
+`bp_mill`, `bp_woods`, `bp_mine`, `bp_office`, `bp_smithy` and `bp_deep` (`packages/content/data/scenes/`)
+with their navs, and the edits to the existing scenes that `world.md` 1 and 7 list; the appends to `SCENE_IDS`
+(`schemas/scene.ts`) and `MAP_IDS` (`schemas/maps.ts`) and their imports in
+`packages/content/src/{index,nav}.ts` (those lines only); a `routines.json` row for any new prop kind, in the
+same PR; `packages/content/test/{scenes,world}.test.ts`; `tools/grid/**`; the bodies of
+`apps/server/src/sim/MapSites.ts`, the map branch of `handleSettings` in `rooms/handlers/lobby.ts` and the
+scene creation in `rooms/PartyRoom.ts`; `apps/server/test/mapSites.test.ts` and a lobby case for the map
+setting; `apps/client/src/ui/lobby/MapPicker.ts` (frozen hook `map-select`) and a new `ui/copy/` module; GDD
+3.13 from "Choosing a map" to "Biomes"; WORLD 4 (the maps and the new scenes); SPRITES 10.12 (exporter notes);
+ARCHITECTURE 5.3 (the map setting); UI.md 14.17. **Reads** `world.md` 1-10; SPRITES 10.12, 10.13 and 10.15;
+`npc.md` 8 (5J -> 5H); `art-plan.md` 6 (`thumb_<mapId>`, the themes); GDD 3.13. **PRs** as `world.md` 1: (1)
+Hollowmere's forest, cave and door moves; (2, 3) Blackpine, split by data file; (4) the exporter; (5) the map
+choice. A scene file is data: split by file rather than held under 400 lines. **Tests**: `world.md` 10 and the
+exporter row of SPRITES 10.15; `pnpm grid:export --check` clean. **Not**: `npc/world.ts`, `npc/walk.ts`,
+`Meeting.ts`, `Actions.ts`, `Portals.ts` and `Clues.ts` (they reach the map only through `MapSites.ts`);
+`ui/Lobby.ts`, `net/protocol.ts`, `net/NetworkService.ts`, `net/mock.ts`. Before code, `seams.md`; log under
+"Round 5 log: 5J".
+
+**Art sessions (5K, 5L, 5M).** Each owns exactly its list in `art-plan.md` 1.1 and keeps the shared-file rules
+there: its own block in both manifests, rows appended to `CREDITS.md`, `assets/source/MANIFEST.md` and
+`LICENSES/vendors/README.md`, only its own lines of `tools/sprites/test/legacy.ts` removed, PR by PR.
+`placeholder-kit.ts` is core and owned by no session. Generation uses the Higgsfield MCP tools on the owner's
+account (`art-plan.md` 2: `balance`, one model chosen with `models_explore`, the `style.json` references
+uploaded, a cost preflight in the first PR description, the committed batch file
+`tools/sprites/batches/<session>.json`), within the generation cap of `art-plan.md` 2.7 (about 138 images, cap
+160; a session that would pass its line by more than 25% stops and asks through its PR). Every shipped
+generation gets a `CREDITS.md` "Generated" row with its generation id and the catalog id
+`pending higgsfield-library-sync` (A49, `art-plan.md` 2.5). If the Higgsfield tools are not available in the
+session, it writes the batch prompt files of `art-plan.md` 2.2 (every item with its template, subject,
+references and key colour, `jobs` empty), finishes every route that needs no generation, and stops for the
+orchestrator. Gates A, B and C and the Brick Oven pick go to the owner through the orchestrator (`art-plan.md`
+7); an art PR whose gate is unanswered waits. The orchestrator writes the Gate A answer into `style.json`
+`pixelFinish.enabled.main`; if it flips, 5K and 5L re-run their batch scripts (`art-plan.md` 1.8).
+
+**5K. World art.** Make the isometric environment of both maps: ground sets, kits, sliced buildings, props,
+spots, portals, clues, thumbnails and ambient loops, every one built so the pixel finish is one switch. Gate A
+(the Hollowmere square with the finish on and off) goes to the owner with K2. **Owns** the 5K list of
+`art-plan.md` 1.1 (the `tools/blender` static and kit scripts,
+`tools/sprites/{pack-static,images,tileset,slice,review-world,placeholder-world}.ts` and their tests,
+`apps/client/public/assets/{ground,kit,buildings,props,clues,thumbs}/**` with their placeholder twins, the
+`amb_*` loops, the Kenney, KayKit and Poly Haven licence files, `batches/5K.json`, the review sheets), ASSETS
+6.3 Buildings and environment and Props, and SPRITES 8. **Reads** `art-plan.md` 1, 2, 3, 6 and 7; SPRITES
+10.3, 10.5 and 10.12-10.14; `world.md` 2 (`material`, `lights`) and 6-8; ASSETS 6.9 and 6.11. **PRs**: K1 to
+K6 of `art-plan.md` 3.11; K1-K3 start before Gate A is answered and their art merges after it; K6 asserts
+`LEGACY` empty and integrates after L4, L5 and M1. **Tests**: `art-plan.md` 1.7 and the 3.11 tests. **Not**:
+code outside its list, 5L's and 5M's keys. Higgsfield: the paragraph above. Before code, `seams.md`; log under
+"Round 5 log: 5K".
+
+**5L. Character art.** Build the IsoCam rig and one character per look id of `looks.json` in 8 directions with
+idle, walk, interact, swing and die, then the main-game portraits, `vfx_disguise` and the six new ability
+icons. Gate B (the Baker's contact sheet and lineup beside `portrait_baker`) goes to the owner with L3.
+**Owns** the 5L list of `art-plan.md` 1.1 (the rig and look scripts in `tools/blender`, `build_villager.py`
+deleted, `tools/sprites/{keys,pack,gen-anims,contact,body-contact,lineup,placeholder-chars}.ts` and their
+tests, `apps/client/public/assets/{chars,portraits,vfx,calibration}/**` with their placeholder twins, the
+`icon_ability_*.svg` icons and their `icons.test.ts` rows, `batches/5L.json`, the review sheets), ASSETS 6.2
+rig notes and 6.3 Characters and VFX, and SPRITES 1-4, 6 and 9. **Reads** `art-plan.md` 1, 2, 4, 6 and 7;
+`deck-data.md` 6 and 9; SPRITES 1-4, 10.3 and 10.4; `npc.md` 4. **PRs**: L1 to L5 of `art-plan.md` 4.7, L1
+(the rig) first, since every other render waits on it. **Tests**: `art-plan.md` 1.7, `palette.test.ts`,
+`budget.test.ts`, `looks.test.ts`. **Not**: 5K's and 5M's keys; the client code that draws the keys (5F, 5I).
+Higgsfield: the paragraph above. Before code, `seams.md`; log under "Round 5 log: 5L".
+
+**5M. ONUB art.** Ingest and finish the owner's 13 ONUB images, generate the Brick Oven for the owner to pick,
+and make the kitchen overview, the ingredient and location cards, the cloche, the ONUB portraits and the
+mini-game atlas `onub_mini`. Gate C goes to the owner with M1. **Owns** the 5M list of `art-plan.md` 1.1
+(`tools/sprites/{onub,onub-cards,onub-mini,placeholder-onub}.ts`, `onub-fixes.json`, `test/onub.test.ts`,
+`batches/5M.json`, `apps/client/public/assets/onub/**` with its placeholder twin, the loft removal, the review
+sheets), ASSETS 6.3 UI and role cards, and the new SPRITES 11. **Reads** `art-plan.md` 1, 2, 5, 6 and 7;
+`onub-contract.md` 5.4; `art-index.md`; GDD 3.11. **PRs**: M1 to M4 of `art-plan.md` 5.9, the Gate C test
+render first; every key carries `modes: ['onub']`. The merge of the room exports and their derivatives waits
+on the owner's provenance answer for the 13 images (`art-plan.md` 7, item 1); the work does not. **Tests**:
+`art-plan.md` 1.7 and the 5.9 assertions of `onub.test.ts`. **Not**: the bakery frames (5K moves them to
+`props_hollowmere`), the client code (5C, 5D). Higgsfield: the paragraph above. Before code, `seams.md`; log
+under "Round 5 log: 5M".
+
+### Seams in round 5
+
+The detailed seam tables are in the contract documents; this table names them and adds the seams between
+tracks that none of them holds.
+
+| Producer -> consumer | Contract | Until it lands |
+|---|---|---|
+| ONUB: 5A, 5B, 5C, 5D, 5E, 5F, 5M | `onub-contract.md` 10 | as that table says |
+| Deck and avatars: 5F, 5G, 5H, 5A, 5B, 5D, 5E, 5I, 5L | `deck-wire.md` 8.3 | as that table says |
+| NPC: 5H with 5F, 5G, 5J, 5E, 5I | `npc.md` 8 | as that table says |
+| Art: 5K, 5L, 5M with 5I, 5J, 5F, 5G, 5C, 5D | `art-plan.md` 6 | as that table says |
+| 5I -> 5F | `PlayerView` takes world-frame positions and yaw and projects them itself (`@wdi/shared/iso`, SPRITES 10.2 and 10.4), so `EntityView` stays in the world frame | the top-down drawing |
+| 5F -> 5I | the Kill and Bandage prompts in `scenes/World.ts` send `nearestAvatar(...)` from `view/targets.ts`; 5F writes those lines in 5I's file, and 5I keeps them | the prompts send the seat id, which the pre-seeded `resolveHandle` accepts |
+| 5J -> 5I | the isometric tilemaps of `tools/grid` (SPRITES 10.12); the map's art loaded per SPRITES 10.13 | the greybox of SPRITES 10.13 |
+| 5G -> 5I | `ClueKind.hungerPrints` (9) clues, which 5I's `ClueView` draws with 5K's `clue_footprint_<s\|m\|t>_glow` | the footprint frame in its light tint |
+| 5F, 5G -> later sessions | the contract-phase commits (`deck-wire.md` 10) edit files of 5H, 5E and others | each later session merges the base branch and keeps the edit |
+
+### Round 5 log: 5A (ONUB v2 rules, server deal and prep)
+
+### Round 5 log: 5B (ONUB v2 server night and morning)
+
+### Round 5 log: 5C (ONUB v2 client prep, mini-games, deck editor)
+
+### Round 5 log: 5D (ONUB v2 client night, morning and results)
+
+### Round 5 log: 5E (ONUB v2 bots, NPC brains, e2e and soak)
+
+### Round 5 log: 5F (avatars, public looks, covers, Impersonate)
+
+### Round 5 log: 5G (main deck and Werewolf roles)
+
+### Round 5 log: 5H (NPC routines and fixes)
+
+### Round 5 log: 5I (isometric client and lighting)
+
+### Round 5 log: 5J (maps)
+
+### Round 5 log: 5K (world art)
+
+### Round 5 log: 5L (character art)
+
+### Round 5 log: 5M (ONUB art)

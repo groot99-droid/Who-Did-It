@@ -11,7 +11,7 @@ const roster = ['me', 'a', 'b', 'c', 'd', 'e', 'f'].map((id) => ({
   traits: look,
 }));
 const living = (dead: string[] = []): MeetingPlayer[] =>
-  roster.map((p) => ({ ...p, alive: !dead.includes(p.id), hasVoted: false }));
+  roster.map((p) => ({ ...p, look: '', alive: !dead.includes(p.id), hasVoted: false }));
 
 describe('tallyVotes', () => {
   it('ejects the plurality, and nobody on a tie or a Skip plurality', () => {

@@ -1,6 +1,6 @@
 import balance from '@wdi/content/data/balance.json';
 import { TRAIT_IDS } from '@wdi/shared/protocol';
-import { type MeetingFeed, type MeetingPlayer, SKIP } from '../net/meeting';
+import { type MeetingFeed, type MeetingFeedEvents, type MeetingPlayer, SKIP } from '../net/meeting';
 import type { OnubFeed } from '../net/onub';
 import { fill } from './copy';
 import { MEETING_COPY as C } from './copy/meeting';
@@ -14,6 +14,8 @@ import {
   PHASE_LABEL,
   reasonLine,
 } from './meetingText';
+import { renderLookPortrait, revealLookLine } from './main/lookPortraits';
+import { showShotToast } from './main/shotToast';
 import { mountRush, type RushPanel } from './onub/rush';
 import type { PortraitLook } from './portrait';
 
@@ -187,10 +189,14 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
 
   const build = (roster: MeetingPlayer[]) => {
     seats = new Map();
+    const main = feed.mode() === 'main';
     const items = roster.map((p) => {
       const look: PortraitLook = p.traits;
       const canvas = h('canvas', { width: 128, height: 192, 'aria-hidden': 'true' });
       opts.drawPortrait(canvas, look, p.name);
+      const pic = h('span', { class: 'wdi-portrait__pic' }, canvas);
+      // Main mode: the portrait by public look (GDD 3.17, Session 5G's `ui/main/lookPortraits.ts`).
+      if (main) renderLookPortrait(pic, p);
       const voted = h(
         'span',
         {
@@ -217,7 +223,7 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
       const button = h(
         'button',
         { type: 'button', class: 'wdi-portrait', 'data-testid': `portrait-${p.id}` },
-        h('span', { class: 'wdi-portrait__pic' }, canvas),
+        pic,
         h('span', { class: 'wdi-portrait__name' }, p.name),
         h('span', { class: 'wdi-portrait__traits' }, ...traitIcons(look)),
         voted,
@@ -348,7 +354,13 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
 
     // Quick mode's reveal lines are the Rush panel's.
     revealRole.hidden = result === null || quick;
-    if (result !== null && !quick) setText(revealRole, ejectionLines(result, nameOf).join(' '));
+    if (result !== null && !quick) {
+      // Main mode: "walking as the Baker" after the ejection line (GDD 3.17, Session 5G).
+      const ejectedLook = roster.find((p) => p.id === result.ejectedId)?.look ?? '';
+      const lookLine = result.ejectedId === undefined ? '' : revealLookLine(ejectedLook);
+      const lines = [...ejectionLines(result, nameOf), lookLine].filter((line) => line !== '');
+      setText(revealRole, lines.join(' '));
+    }
     const voteLine = (() => {
       if (mine === '')
         return `${C['meeting.vote.open']}. ${quick ? C['meeting.vote.hintNoSkip'] : C['meeting.vote.hint']}`;
@@ -368,6 +380,12 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     for (const tab of extras) tab.update();
   };
 
+  // Main mode, during a reveal: the ejected Gamekeeper's Last Shot (GDD 3.2, Session 5G's `ui/main/shotToast.ts`).
+  const onShot = (shot: MeetingFeedEvents['shot']) => {
+    if (feed.mode() === 'main') showShotToast(board, shot, nameOf);
+  };
+  feed.bus.on('shot', onShot);
+
   update();
   return {
     update,
@@ -378,6 +396,7 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
       select(selected);
     },
     destroy: () => {
+      feed.bus.off('shot', onShot);
       for (const tab of extras) tab.destroy();
       extras.length = 0;
       rush?.destroy();

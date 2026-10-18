@@ -44,6 +44,14 @@ export class FlowState {
   vanished = 0;
   readonly meetings: MeetingStat[] = [];
   current: MeetingStat | null = null;
+  /** Main mode: the match's deck, card role ids in deck order (`deckFor(n).cards`); Session 5G writes it. */
+  deck: string[] = [];
+  /** Main mode: the cards nobody holds, in the deal's shuffled order; Session 5G writes it. */
+  undealt: string[] = [];
+  /** Both modes: the seats that dismissed their role card (private Ready, GDD 3.17); Session 5F fills it. */
+  readonly cardReady = new Set<string>();
+  /** Main mode: the seats Nightshade will kill when it resolves (GDD 3.2); Session 5G fills it. */
+  readonly poisoned = new Set<string>();
 }
 
 const flows = new WeakMap<PartyRoom, FlowState>();

@@ -11,6 +11,7 @@
       "castS": 0,
       "rangeTiles": 1.5,
       "noise": "killScream",
+      "phases": ["dusk", "night", "finalNight"],
       "effect": "Resolved on the validated tick; cooldown by player count (balance.json); spawns the kill clues and gives the killer Blood.",
       "ships": "V1",
       "gddRef": "3.2"
@@ -26,7 +27,7 @@
       "minPlayers": 6,
       "params": { "expiresS": 45 },
       "effect": "Locks a house door from the outside only; the lock expires. Any door unlocks from the inside.",
-      "ships": "V1",
+      "ships": "V1.5",
       "gddRef": "3.2"
     },
     "dragBody": {
@@ -73,7 +74,7 @@
       "kind": "passive",
       "target": "none",
       "params": { "killCooldownBonusS": 10 },
-      "effect": "When the last Killer dies or is ejected the Knife passes to you with a longer kill cooldown; Hunger starts at once.",
+      "effect": "When the last Killer dies or is ejected the Knife passes to you with a longer kill cooldown; your Hunger clock starts in the round you inherit.",
       "ships": "V1",
       "gddRef": "3.2"
     },
@@ -127,7 +128,7 @@
       "target": "body",
       "castS": 8,
       "params": { "timeOfDeathErrorS": 45 },
-      "effect": "Posts time of death (within the error) and cause (knife / wolf) as Verified.",
+      "effect": "Posts time of death (within the error) and cause (knife / wolf / poison / shot) as Verified.",
       "ships": "V1",
       "gddRef": "3.2"
     },
@@ -442,6 +443,7 @@
       "kind": "active",
       "target": "none",
       "rangeTiles": 2,
+      "phases": ["grace", "day"],
       "effect": "Rings the bell on the square to call a meeting; pulls per match come from the role.",
       "ships": "V1",
       "gddRef": "3.3"
@@ -491,6 +493,86 @@
       "effect": "Shift: silent footsteps at reduced speed.",
       "ships": "V1",
       "gddRef": "3.7"
+    },
+    "impersonate": {
+      "id": "impersonate",
+      "name": "Impersonate",
+      "scope": "role",
+      "kind": "active",
+      "target": "seat",
+      "castS": 0,
+      "phases": ["dusk", "night", "finalNight"],
+      "effect": "Your character shows a living seat's name, look, scarf and hat glyph at your own height for balance.json impersonate.durationS. The face changes only unseen: at once if no other living seat is in your scene, otherwise at your next door; cancelled at no cost if it has not changed within impersonate.applyWindowS or when it is used again or day breaks first. A Knife strike drops it in place with a puff; a meeting or your death ends it; using it again, the time running out or daybreak drop it the next time you are alone in your scene or pass a door. The cooldown runs from the drop. Not self.",
+      "ships": "V1",
+      "gddRef": "3.17"
+    },
+    "confession": {
+      "id": "confession",
+      "name": "Hear Confession",
+      "scope": "role",
+      "kind": "active",
+      "target": "seat",
+      "castS": 0,
+      "phases": ["dusk", "night", "finalNight"],
+      "nightPower": true,
+      "effect": "Your Notebook gets the seat's faction (Village, Cabal or Neutral) as Verified. Not self.",
+      "ships": "V1",
+      "gddRef": "3.2"
+    },
+    "keepWatch": {
+      "id": "keepWatch",
+      "name": "Keep Watch",
+      "scope": "role",
+      "kind": "active",
+      "target": "seat",
+      "castS": 0,
+      "phases": ["dusk", "night", "finalNight"],
+      "nightPower": true,
+      "effect": "The seat survives the first Knife strike before the night ends; the strike fails as on a Bandaged target and your Notebook records it. Not self, and not the seat you watched the night before (balance.json nightPowers.watchRepeatAllowed).",
+      "ships": "V1",
+      "gddRef": "3.2"
+    },
+    "remedy": {
+      "id": "remedy",
+      "name": "Remedy",
+      "scope": "role",
+      "kind": "active",
+      "target": "seat",
+      "castS": 0,
+      "consumes": "remedy",
+      "phases": ["dusk", "night", "finalNight"],
+      "nightPower": true,
+      "allowSelf": true,
+      "effect": "The seat survives the first Knife strike before the next meeting opens; your Notebook records it when it holds. It does not stop Nightshade or a shot.",
+      "ships": "V1",
+      "gddRef": "3.2"
+    },
+    "poison": {
+      "id": "poison",
+      "name": "Nightshade",
+      "scope": "role",
+      "kind": "active",
+      "target": "seat",
+      "castS": 0,
+      "consumes": "nightshade",
+      "phases": ["dusk", "night", "finalNight"],
+      "nightPower": true,
+      "effect": "The seat dies when the night ends, a meeting opens or the Final Night hunt ends, wherever it stands; its body lies there with no trait clue. Not self.",
+      "ships": "V1",
+      "gddRef": "3.2"
+    },
+    "lastShot": {
+      "id": "lastShot",
+      "name": "Last Shot",
+      "scope": "role",
+      "kind": "passive",
+      "target": "seat",
+      "requires": "fowlingPiece",
+      "noise": "shot",
+      "params": { "aimS": 10 },
+      "effect": "When you are killed, poisoned or ejected you may pick one living seat within the aim time, before you learn any role; it dies too. Accepted only while you aim. Not self.",
+      "ships": "V1",
+      "gddRef": "3.2"
     }
   }
 }

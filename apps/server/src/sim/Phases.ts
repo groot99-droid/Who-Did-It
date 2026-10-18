@@ -4,6 +4,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { countRow, flowOf, isMeetingPhase, refuse, setPhase } from './Flow';
 import { onubClock, runOnubPhases } from './Conductor';
 import { enterImmunity, openMeeting, runMeeting } from './Meeting';
+import { isAiming } from './NightPowers';
 import { isOnub } from './onub/state';
 import { simOf } from './RoomSim';
 import { endMatch, evaluateWin, resetToLobby } from './Win';
@@ -56,6 +57,9 @@ function drainDeaths(room: PartyRoom): boolean {
       if (p) p.dead = true;
     }
   }
+  // Round 5, 5G: a batch that holds a Gamekeeper aiming its Last Shot waits for the shot before its win check;
+  // the phase clock never waits (deck/wire.md 5). 5G runs the held check when the aim closes.
+  if (events.some((e) => isAiming(room, e.playerId))) return false;
   const winner = evaluateWin(room);
   if (!winner) return false;
   endMatch(room, winner);

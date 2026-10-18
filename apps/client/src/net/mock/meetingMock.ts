@@ -126,11 +126,11 @@ export class MockMeetingFeed implements MeetingFeed {
   private quick = false;
 
   constructor(
-    roster: ReadonlyArray<Pick<MeetingPlayer, 'id' | 'name' | 'traits'>>,
+    roster: ReadonlyArray<Pick<MeetingPlayer, 'id' | 'name' | 'traits'> & { look?: string }>,
     readonly selfId: string,
     private readonly opts: MockMeetingOptions,
   ) {
-    this.players = roster.map((p) => ({ ...p, alive: true, hasVoted: false }));
+    this.players = roster.map((p) => ({ ...p, look: p.look ?? '', alive: true, hasVoted: false }));
   }
 
   mode(): MatchMode {

@@ -245,8 +245,8 @@ describe('the wire never marks an NPC seat', () => {
     }, 20_000);
     expect(readyAt.size).toBe(seats.length);
     for (const tick of readyAt.values()) {
-      expect(tick - began).toBeGreaterThanOrEqual(balance.npc.vote.delayMinS * 20 - 3);
-      expect(tick - began).toBeLessThanOrEqual(balance.npc.vote.delayMaxS * 20 + 3);
+      expect(tick - began).toBeGreaterThanOrEqual(balance.npc.ready.delayS.min * 20 - 3);
+      expect(tick - began).toBeLessThanOrEqual(balance.npc.ready.delayS.max * 20 + 3);
     }
     party.humans[0]?.room.send(C2S.lobbyReady, { ready: true });
     await until(() => party.room.state.phase === Phase.grace);

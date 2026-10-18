@@ -5,6 +5,8 @@
   "zoneId": "chapel",
   "profile": "large",
   "kind": "interior",
+  "biome": "house",
+  "dark": false,
   "size": { "w": 18, "h": 12 },
   "silent": true,
   "notes": "Silent zone: no footstep noise. The bell rope with a torn glove in it is decoration.",

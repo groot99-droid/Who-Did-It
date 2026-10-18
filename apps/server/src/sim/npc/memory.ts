@@ -18,7 +18,10 @@ export class Brain {
   heading = { dx: 0, dy: -1 };
   /** The portal the current heading is aimed at (empty when it is a plain compass heading). */
   steerPortal = '';
-  /** The role card ready tick and the meeting vote tick (`npc.vote` delays), -1 until drawn. */
+  /**
+   * The role card ready tick (`npc.ready.delayS`) and the meeting vote tick (`npc.vote.windowFrac`), -1 until
+   * drawn.
+   */
   readyAtTick = -1;
   voteAtTick = -1;
   nextRevoteTick = 0;
@@ -32,6 +35,13 @@ export class Brain {
   /** A Killer that rolled its strike chance and is closing on its prey. */
   striking = false;
   path: PathPlan | null = null;
+  /**
+   * Card-blind draws made for every NPC (round 5, npc/data.md 6; Session 5H draws them, 5G reads them): the
+   * night-power tick and pick, and the Last Shot tick; -1 when none.
+   */
+  nightPowerAtTick = -1;
+  nightPowerPick = 0;
+  lastShotAtTick = -1;
 }
 
 /** A `debug.npc` payload waiting for the step (WDI_DEBUG only). */

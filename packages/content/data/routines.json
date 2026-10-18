@@ -1,0 +1,28 @@
+{
+  "gddRef": "3.12",
+  "phaseClasses": { "day": ["grace", "day", "immunity"], "night": ["dusk", "night", "finalNight"] },
+  "activities": {
+    "work": {
+      "phases": ["day"],
+      "kinds": ["taskSource", "pump", "flourBin", "oven", "basin", "goat", "fence", "window"]
+    },
+    "social": {
+      "phases": ["day", "night"],
+      "kinds": ["noticeBoard", "dartboard", "bell", "lamp", "decor"]
+    },
+    "rest": { "phases": ["night"], "kinds": ["lanternPost"] }
+  },
+  "holds": {},
+  "ignore": [
+    "kitChest",
+    "teachingClue",
+    "keyCache",
+    "gasPocket",
+    "lockedDoor",
+    "wakeTable",
+    "plate",
+    "deadLoaf",
+    "ledger"
+  ],
+  "lightKinds": ["lanternPost"]
+}

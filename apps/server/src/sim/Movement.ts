@@ -79,8 +79,11 @@ export function moveAndCollide(room: PartyRoom): void {
       p.transitFrom = -1;
       sim.viewsDirty = true;
     }
-    const moved = p.vx !== 0 || p.vy !== 0;
-    if (moved) {
+    // Remember where the body stood, so `walk` follows the real displacement, not the command (no walking in
+    // place against a wall, GDD 3.12 "Animation").
+    const x0 = p.x;
+    const y0 = p.y;
+    if (p.vx !== 0 || p.vy !== 0) {
       // The sim's scene, not the public one: a ghost's public scene stays frozen after its crossings.
       const grid = navGrid(sceneKey(p.sceneIdx), sim.profile);
       if (p.dead) {
@@ -94,7 +97,7 @@ export function moveAndCollide(room: PartyRoom): void {
       }
     }
     p.pushRing();
-    publishPresence(player.presence, p, moved, tick);
+    publishPresence(player.presence, p, p.x !== x0 || p.y !== y0, tick);
   }
 }
 
@@ -106,7 +109,10 @@ export function statusBitsOf(p: PlayerSim, tick: number): number {
   );
 }
 
-/** Writes the rounded position and the shared animation id; unchanged values cost no patch bytes. */
+/**
+ * Writes the rounded position and the shared animation id; unchanged values cost no patch bytes. A running hold
+ * shows `interact`, whoever holds and whatever the hold; `walk` only on a tick the position actually changed.
+ */
 export function publishPresence(
   presence: { x: number; y: number; animId: number; statusBits: number; transitUntilTick: number },
   p: PlayerSim,
@@ -115,6 +121,6 @@ export function publishPresence(
 ): void {
   presence.x = Math.round(p.x);
   presence.y = Math.round(p.y);
-  presence.animId = moving ? AnimId.walk : AnimId.idle;
+  presence.animId = p.hold !== null ? AnimId.interact : moving ? AnimId.walk : AnimId.idle;
   presence.statusBits = statusBitsOf(p, tick);
 }

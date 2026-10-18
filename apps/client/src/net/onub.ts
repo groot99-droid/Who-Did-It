@@ -23,6 +23,8 @@ export interface OnubBoardView {
   ruined: boolean;
   perk: boolean;
   cloche: string;
+  /** The open night window's role id (the narrator's call, the same on every page); '' during fades. */
+  window: string;
 }
 
 /** One seat's latest claim (`MeetingState.claims`); empty strings are parts left out. */

@@ -5,6 +5,8 @@
   "zoneId": "manor_hall",
   "profile": "medium",
   "kind": "interior",
+  "biome": "house",
+  "dark": false,
   "size": { "w": 28, "h": 16 },
   "notes": "Stopped clock at 11:47; safe; muddy bootprints on the carpet (static red herring).",
   "worldRef": "4.3",

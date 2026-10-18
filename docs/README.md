@@ -13,6 +13,7 @@
 | [UI.md](UI.md) | DOM design system: palette roles, type and spacing scale, components, card frames, measured contrast, screen mockups, the M3 copy deck. |
 | [PLAYTESTS/](PLAYTESTS/README.md) | How a playtest session runs, the feedback form, the fun-or-stop scorecard, the notes template and one entry per session. |
 | [RESEARCH.md](RESEARCH.md) | Sourced facts behind the version pins, hosting choice and licensing rules. |
+| [round5/](round5/README.md) | The round-5 contract documents: the owner's brief, the ONUB v2 contract, the deck wire and data, the world and maps, the NPC routines, the art plan, and the seams of the pre-seed (every hook and its locked call site). |
 | [SESSIONS.md](SESSIONS.md) | The parallel build sessions, round by round: path ownership, branches, PR base, seams, briefs and the integration logs. |
 
 Rule: a mechanic change updates `GDD.md` in the same pull request. Numbers never live in two documents.

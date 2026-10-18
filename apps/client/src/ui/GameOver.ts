@@ -2,6 +2,7 @@ import type { GameOver, MeetingPlayer } from '../net/meeting';
 import { fill } from './copy';
 import { MEETING_COPY as C } from './copy/meeting';
 import { h, icon, type Screen } from './dom';
+import { renderMainOver } from './main/overMain';
 import { FACTION_LABEL, factionOf, winnerLine } from './meetingText';
 import { renderOnubOver } from './onub/over';
 import { roleTitle } from './RoleCard';
@@ -78,6 +79,9 @@ export function mountGameOver(root: HTMLElement, opts: GameOverOptions): GameOve
   const leave = h('button', { type: 'button', class: 'wdi-btn wdi-btn--ghost' }, C['over.leave']);
   const onubPanel = h('div', { class: 'wdi-stack wdi-over__onub' });
   if (onub !== undefined) renderOnubOver(onubPanel, onub, nameOf);
+  // Main mode: looks, the undealt cards and `alsoWon` (GDD 3.1, 3.17, Session 5G's `ui/main/overMain.ts`).
+  const mainPanel = h('div', { class: 'wdi-stack wdi-over__main', 'data-testid': 'gameover-main' });
+  if (onub === undefined) renderMainOver(mainPanel, over, (id) => opts.roster.find((p) => p.id === id));
   leave.addEventListener('click', opts.onLeave);
 
   const el = h(
@@ -97,6 +101,8 @@ export function mountGameOver(root: HTMLElement, opts: GameOverOptions): GameOve
     h('h2', { class: 'wdi-eyebrow' }, C['over.roles']),
     h('ul', { class: 'wdi-roster' }, ...rows),
     onub !== undefined && onubPanel,
+    // Empty (the pre-seed stub) the panel stays out, so it adds no gap to the stack.
+    onub === undefined && mainPanel.childElementCount > 0 && mainPanel,
     h('div', { class: 'wdi-row wdi-row--between' }, countdown, leave),
   );
   root.append(el);

@@ -6,7 +6,7 @@
 
 A storm has closed the road and fog hides the sea. Hollowmere is cut off, Lord Vane is dead, and someone among you is still killing. Find them before the last lantern goes out.
 
-Who Did It is a 5-10 player (4 = practice; NPCs fill the seats below 4, see 3.12) hidden-role game played from a link. It crosses Among Us (tasks, bodies, emergency meetings), Mafia (hidden factions, a vote as the climax), a whodunit (physical clues with hidden attributes, a Detective who verifies them) and Hello Neighbor (houses you enter, doors that lock, hiding spots). V1 is top-down 2.5D in Phaser with pre-rendered Blender sprites; V2 is first-person 3D on the same server, rules and world data.
+Who Did It is a 5-10 player (4 = practice; NPCs fill the seats below 4, see 3.12) hidden-role game played from a link. It crosses Among Us (tasks, bodies, emergency meetings), Mafia (hidden factions, a vote as the climax), a whodunit (physical clues with hidden attributes, a Detective who verifies them) and Hello Neighbor (houses you enter, doors that lock, hiding spots). V1 is isometric 2.5D in Phaser with pre-rendered Blender sprites (3.13); V2 is first-person 3D on the same server, rules and world data.
 
 | Pillar | Design rule |
 |---|---|
@@ -19,72 +19,83 @@ Who Did It is a 5-10 player (4 = practice; NPCs fill the seats below 4, see 3.12
 
 1. **Landing (0:00).** `https://groot99-droid.github.io/Who-Did-It/` shows the title over a looping fog plate and two buttons: **Create Party** and **Join Party**. While the server is polled on `/health` the buttons read "Waking the village..." (Render Free fallback) or are live at once (Railway). A name field (2-16 characters) sits above the buttons. Clicking either button unlocks the AudioContext.
 2. **Create / Join (0:20).** The leader gets a 5-character code such as `K7PQX` (alphabet `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`, no 0/O/1/I) plus a share button that copies `.../Who-Did-It/#/join/K7PQX`. Friends paste the code or open the link; the code field is prefilled from the hash.
-3. **Lobby (0:40-2:00).** Roster of names with a Ready tick, player count "5/10", a line "Best with 6-8 players" and, at 4, the practice line (the Cabal wins with one villager left, 3.9; copy in `docs/UI.md` 14.13). Start is enabled with at least 1 human (NPCs fill the seats below 4, see 3.12); if someone is not Ready the leader sees a confirm dialog listing them. The settings panel holds the mode chip (Who Did It, or One Night Ultimate Baguette, 3.11), the leader's Add NPC and Remove NPC and the NPC difficulty (3.12), `map` (Hollowmere) and `revealMode` (full, locked in V1).
-4. **Start and role card (2:00-2:15).** The server deals roles and traits, locks the room and sends each client its private card. The card shows: faction stripe and icon, role name, your sprite with your traits and the line "You look like: Tall / Green scarf / Bowler hat", a one-line goal, up to 3 ability rows with key and cooldown, the inventory strip, 2-3 sentences of card text, a Beware line, and for Cabal the teammate names. It holds 12 s; Ready dismisses it; Tab reopens it; a HUD chip (icon + goal) stays top-left.
-5. **Grace (2:15-2:45).** Everyone spawns spread around the square. Kills are disabled for 30 s. One pre-placed static clue glows beside the well: holding E for 2 s collects it and the Notebook opens with "Footprints, long stride: Tall", teaching the collect verb and the trait icon. Toasts: "Shift to sneak", "Hold E on a glowing clue", "E at the bell calls a meeting" (copy ids in `docs/UI.md` 14).
+3. **Lobby (0:40-2:00).** Roster of names with a Ready tick, player count "5/10", a line "Best with 6-8 players" and, at 4, the practice line (the Cabal wins with one villager left, 3.9; copy in `docs/UI.md` 14.13). Start is enabled with at least 1 human (NPCs fill the seats below 4, see 3.12); if someone is not Ready the leader sees a confirm dialog listing them. The settings panel holds the mode chip (Who Did It, or One Night Ultimate Baguette, 3.11), the leader's Add NPC and Remove NPC and the NPC difficulty (3.12), `map` (Hollowmere or Blackpine, 3.13; hidden in the quick mode) and `revealMode` (full, locked in V1).
+4. **Start and role card (2:00-2:23).** The server deals roles and traits, locks the room and sends each client its private card. The card shows: faction stripe and icon, role name, your character with your traits and the line "You walk as the Baker: Tall / Green scarf / Bowler hat" (a cover role picks the look here instead, 3.17), the deck list, a one-line goal, up to 3 ability rows with key and cooldown, the inventory strip, 2-3 sentences of card text, a Beware line, and for Cabal the teammate names. It holds 20 s; Ready dismisses it; Tab reopens it; a HUD chip (icon + goal) stays top-left.
+5. **Grace (2:23-2:53).** Everyone spawns spread around the map's hub (3.13). Kills are disabled for 30 s. One pre-placed static clue glows beside the well: holding E for 2 s collects it and the Notebook opens with "Footprints, long stride: Tall", teaching the collect verb and the trait icon. Toasts: "Shift to sneak", "Hold E on a glowing clue", "E at the bell calls a meeting" (copy ids in `docs/UI.md` 14).
 6. **First house (3:00).** You walk to The Drowned Lantern. Others see the door swing for 3 s and your sprite step in; the scene fades 0.4 s to the bar interior with camera follow. A second door leads to the back room, another scene, with a wardrobe (hiding spot) and a trapdoor that is boarded at this party size. Outside the lane you can see the forest gate and, beyond the gate, the forest scene with the cave mouth.
-7. **First body (4:30).** Night falls (10 s vignette, then an 80 s night with a 3.5-tile light radius). Somewhere a scream pulses at your screen edge with a direction arrow and a log line "A scream from the north". The Killer carries Blood for 60 s and walks to the well to wash. You find the body in the apothecary loft: E reports it; everyone teleports to the square; the body stays where it was.
-8. **First vote (4:45-6:30).** The meeting shows portraits and trait icons, not world sprites. The board already lists every Verified entry (none yet, unless the Detective was first on the scene) and a per-player row: "fits 1/1 known traits, Claimed 0, last house: Apothecary". You can Present one Claimed Notebook entry. Tapping a portrait offers "I saw [X] at [Apothecary] around [3:40]" posted as one chat line. Discussion is 60 s at 5 players; voting opens immediately; the meeting ends early once everyone has voted. Votes are secret until the reveal. The tally shows names; an ejected player's role is revealed; 15 s of immunity follow, everyone spread around the square, and the phase resumes.
+7. **First body (4:30).** Night falls (10 s vignette, then a 100 s night with a 3.5-tile light radius). Somewhere a scream pulses at your screen edge with a direction arrow and a log line "A scream from the north". The Killer carries Blood for 60 s and walks to the well to wash. You find the body in the apothecary loft: E reports it; everyone teleports to the square; the body stays where it was.
+8. **First vote (4:45-6:30).** The meeting shows portraits and trait icons, not world sprites (each seat's portrait is its public look, 3.17). The board already lists every Verified entry (none yet, unless the Detective was first on the scene) and a per-player row: "fits 1/1 known traits, Claimed 0, last house: Apothecary". You can Present one Claimed Notebook entry. Tapping a portrait offers "I saw [X] at [Apothecary] around [3:40]" posted as one chat line. Discussion is 60 s at 5 players; voting opens immediately; the meeting ends early once everyone has voted. Votes are secret until the reveal. The tally shows names; an ejected player's role is revealed; 15 s of immunity follow, everyone spread around the square, and the phase resumes.
 9. **The rest of the match (6:30-16:00).** Two to four more cycles of day, night, bodies and meetings; typical match 12-18 minutes. Ghosts see every role, read the Cabal and ghost channels, finish their own tasks and vote a non-binding "ghost suspect" shown on the end screen.
 
 ## 3. Game design
 
-### 3.1 Factions, traits and roster
+### 3.1 Factions, traits and the deck
 
-Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accomplice know each other), **Neutral** (amber, mask). Clients never receive another player's role.
+Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accomplice know each other), **Neutral** (amber, mask). In the main mode every seat walks the world as the character of its card, so a role is public by sight, except for the three **cover roles** (Killer, Accomplice, Drifter), which always wear the look of another card of the deck (3.17). A client never receives another seat's role card, inventory, Notebook or cooldowns, and nothing it receives tells a cover look from a real one. In the quick mode (3.11) every role stays hidden.
 
-**Traits.** Each player is dealt a unique triple from 27 combinations: **Height** S/M/T (sprite scale 0.9/1.0/1.1, feet-anchored), **Scarf** red/green/blue (tinted overlay in the palette tokens blood/teal/moon; the nameplate repeats it as a shape: diamond/circle/square), **Hat** cap/bowler/bare (overlay sheet, silhouette-readable from above). The boot trait from the earlier draft is dropped because a boot is 6 px at shipping scale. Traits appear on the role card, the HUD chip tooltip and the meeting roster.
+**Traits.** Each player is dealt a unique triple from 27 combinations, from a random stream of its own (never the deal's): **Height** S/M/T (sprite scale 0.9/1.0/1.1, feet-anchored), **Scarf** red/green/blue (every character wears a storm scarf, a tinted overlay in the palette tokens blood/teal/moon; the nameplate repeats it as a shape: diamond/circle/square), **Hat** cap/bowler/bare. The boot trait from the earlier draft is dropped because a boot is 6 px at shipping scale. (M5a) Height and scarf are drawn on the character in the world; the hat is not, since every character keeps its own headgear, and it shows as a glyph on the nameplate, on the role card and in the meeting roster. Traits are dealt apart from the cards, so they still say nothing about a role, and a kill leaves the killer's own traits whatever look they wear (3.4, 3.17). Traits appear on the role card, the HUD chip tooltip and the meeting roster.
 
-| Players | Cabal | Village specials | Neutral | Townsfolk | Note |
-|---|---|---|---|---|---|
-| 4 | Killer | Detective | – | 2 | Practice: lobby warning, no ranking |
-| 5 | Killer | Detective, Doctor | – | 2 | Real minimum |
-| 6 | Killer | Detective, Doctor, Butler | – | 2 | |
-| 7 | Killer, Accomplice | Detective, Doctor, Butler | – | 2 | |
-| 8 | Killer, Accomplice | Detective, Doctor, Butler, Child | – | 2 | |
-| 9 | Killer, Accomplice | Detective, Doctor, Butler, Child, Ranger* | – | 2 | *Townsfolk until the Ranger ships (V1.5) |
-| 10 | Killer x2, Accomplice | Detective, Doctor, Butler, Child, Ranger* | Drifter | 1 | |
-
-Townsfolk never fall below 1. The table is `roles.json` (`rosters["4".."10"]`, with `deal` for what V1 deals and `planned` for the row above); the rules engine reads it, no document restates it. Lobby toggles (Thief, Medium, faction-only reveal) are V1.5.
+**The deck.** A match deals from a public deck of player count + 2 character cards (table in 3.9). Every card is a different character, so two seats share a look only when a cover role chooses to (3.17); the one repeated card is the second Killer of the 10-seat deck, which never walks as itself (Killers always wear a cover). Every Killer card is always dealt; the other cards are shuffled, and two of them stay **undealt**. Which two is secret; the deck list itself is public, in the lobby (for the current party size), on the role card and in the HUD. Townsfolk are dealt as **professions** (Lamplighter, Baker, Fisher, Tinner): each is one card, the Townsfolk card with a character of its own. The deck rows are `roles.json` `decks["4".."10"]`; the rules engine reads them, and no document restates them. The Butler and the Child stay out of the decks until their abilities ship (M4); the Ranger (V1.5), the Thief (V1.5) and the Medium (V2) join when they ship. Lobby toggles (Thief, Medium, faction-only reveal) are V1.5.
 
 ### 3.2 Role cards
 
-| Role | Win | Start kit | Abilities (max 3) | Card text | Beware |
-|---|---|---|---|---|---|
-| **Killer** (Cabal) | Parity (6+), or living Village <= 1 (4-5), or Final Night vote fails | Knife (bound), Skeleton Key, Bloody Rag x2, Bucket | **Kill** (CD by table; resolved on the validated tick; spawns clues; you gain Blood 60 s) (M3: only in day, dusk and night; reach 1.5 tiles plus what the target moved in the last 250 ms, with a clear straight line; a Bandaged target voids the strike, spends the bandage, and you still gain Blood and rest the Knife; the victim becomes a ghost at once, the body and both clues appear in the scene, a scream rings within 8 tiles.) **Lock door** (6+ players only; outside only; 3 s; expires after 45 s; 20 s CD). **Drag body** (hold E, 50% speed; into a body spot = hidden; leaves a drag smear). | Strike when the room is empty, clean one clue, wash at the well, then be the loudest voice asking who did it. | Clues match your traits; Blood is visible within 3 tiles; the Child's silhouette; a Bandaged target voids your kill. |
-| **Accomplice** (Cabal) | As Killer | Plant Kit x3, Crowbar | **Plant Clue** (60 s CD): a footprint or thread with chosen traits. **Crowbar**: break a locked door (5 s, noise 10). **Inherit**: when the last Killer dies or is ejected the Knife passes to you (kill CD +10 s, Hunger starts at once). | You never hold the knife, only the alibi. Forge trails, break the right doors, vouch at the right moment. | Inspect marks plants Forged; a Forged entry tells the village an Accomplice exists. |
-| **Detective** (Village) | All Cabal dead or ejected | Magnifier, Notebook, Lens x3, Fingerprint Kit | **Inspect** (3 s, 1 Lens; +1 Lens per meeting, max 3): reveals a clue's hidden attribute, exposes forgeries, marks it Verified. **Dust / Compare**: lift a print (2 charges) and compare any two: Match / No match. | Collect, inspect, cross-reference. Your Verified clues narrow the board; the village does the rest. | Prime target; the Rag erases clues; forgeries cost Lenses; Compare never gives a name. If you die the Magnifier drops and anyone can Inspect in 6 s. |
-| **Doctor** (Village) | Village | Medkit x2, Bandage x2, Salts x1 | **Bandage** (60 s CD, not self): (M3: instant, 1.5 tiles, one Bandage from the kit; the knockback, blackout and witness entries come with M4.) the target survives the next kill attempt within 60 s; both are knocked back, the target's screen blacks out 1.5 s and gets the attacker's height as a Claimed entry; witnesses within 3 tiles get height + scarf as Claimed; the attacker still gains Blood. **Autopsy** (8 s): time of death +/-45 s and cause (knife / wolf), posts Verified. **Salts**: cure Wounded or Snare. | Keep people alive and read the dead. Your autopsy says when; that is what breaks alibis. | Two-Killer games outpace your bandages. |
-| **Butler** (Village) | Village | Master Keyring, Candle x2 | **Lock / Unlock** any house door instantly (10 s CD; locks keep people out, never in). **Ledger**: at each meeting, privately lists for each living player the last house they entered this cycle (house only, no time). | You know every door in Hollowmere. Control the wings, read the ledger, say who went where. | Universal access makes you the obvious suspect; Skeleton Key use looks like yours. |
-| **Child** (Village) | Village | Slingshot, Chalk, Candle | **Silent hide** (instant, no noise; adults cannot Check a crawlspace). **Witness** (passive): with line of sight within 6 tiles of a kill, "The Child saw it" posts height + scarf as Verified at the next meeting. **Slingshot**: 1 s stun (30 s CD). | You are small and quiet. Hide, watch, remember. | Top kill target; vision -1 tile; cannot pick up items. |
-| **Townsfolk** (Village) | Village | Lantern, Pocket Watch, Chalk, Rope | **Tasks**. **Chalk**: floor marks visible to all. **Rope**: free a snared player. Two Emergency Bell pulls per match (others have one). | Do your chores with others to build alibis, mark what you see, vote with evidence. | Weak alone; strong in pairs. |
-| **Drifter** (Neutral) | Get ejected (solo win; match continues) | Replica Knife, Bloody Rag x1 | **Act Shifty**: fake noise rings (20 s CD). **Fake Blood**: 30 s (1 use, world only; meetings show portraits). | You want to hang. Be suspicious enough to be voted out, not so obvious they ignore you. | A calm village; dying to the Killer is a loss; counts as nobody for parity. |
-| **Ranger** (Village, V1.5) | Village | Crossbow + 2 Bolts, Snare x2, Torch | **Shoot** a wolf: it dies. **Arrest** (1 bolt on a player): the target is cuffed and dragged to the square; the next meeting opens with them as a Case Closed suspect. **Snare**: holds 4 s and logs the name. | You hunt wolves. One arrest per match: be right. | Bolts are loud (noise 10). |
-| **Thief** (Neutral, V1.5) | Escape by the cave sea exit holding 3 Heirlooms | Lockpicks x5, Sack, Smoke Bomb | Pickpocket (40 s CD), Lockpick (2 s, noise 5), Smoke (4 s). | Nobody's hero. | Thefts look like Killer activity; counts as Village for parity. |
-| **Medium** (Village, V2) | Village | Seance Chalk, Candle x3 | Seance at a body (8 s): the ghost picks 1 of 8 phrases. | You hear the dead. | Cabal ghosts may lie. |
+"Cover" says whether the role wears another card's look (3.17). Every card's character, portrait and world look are `looks.json`.
+
+| Role | Cover | Win | Start kit | Abilities (max 3) | Card text | Beware |
+|---|---|---|---|---|---|---|
+| **Killer** (Cabal) | Yes | Parity (6+), or living Village <= 1 (4-5), or the Final Night vote fails | Knife (bound), Skeleton Key, Bloody Rag x2, Bucket | **Kill** (CD by table; resolved on the validated tick; spawns clues; you gain Blood 60 s) (M3: reach 1.5 tiles plus what the target moved in the last 250 ms, with a clear straight line; a protected target voids the strike, spends the protection, and you still gain Blood and rest the Knife; the victim becomes a ghost at once, the body and both clues appear in the scene, a scream rings within 8 tiles.) (M5a: only at dusk, at night and in the Final Night hunt.) **Impersonate** (dusk, night and the Final Night hunt; 45 s CD from the drop): for 15 s your character shows one living seat's name, look, scarf and hat glyph, at your own height; the face changes and drops only out of sight, except that your next Knife strike drops it in place with a puff (3.17). **Drag body** (hold E, 50% speed; into a body spot = hidden; leaves a drag smear). | Walk in a borrowed character. Strike after dark when the room is empty, clean one clue, wash at the well, then be the loudest voice asking who did it. | Clues match your own traits whatever face you wear; your height never changes; Blood shows within 3 tiles; a guarded target voids your kill. |
+| **Accomplice** (Cabal) | Yes | As Killer | Plant Kit x3, Crowbar | **Plant Clue** (60 s CD): a footprint or thread with chosen traits. **Crowbar**: break a locked door (5 s, noise 10). (M5a) **Inherit**: when the last Killer dies or is ejected the Knife passes to you (kill CD +10 s; your Hunger clock starts in the round you inherit). | You never hold the knife, only the alibi. Forge trails, break the right doors, vouch at the right moment. | Inspect marks plants Forged; a Forged entry tells the village an Accomplice exists; your cover is a claim someone may test. |
+| **Detective** (Village) | No | All Cabal dead or ejected | Magnifier, Notebook, Lens x3, Fingerprint Kit | **Inspect** (3 s, 1 Lens; +1 Lens per meeting, max 3): reveals a clue's hidden attribute, exposes forgeries, marks it Verified. **Dust / Compare**: lift a print (2 charges) and compare any two: Match / No match. | Collect, inspect, cross-reference. Your Verified clues narrow the board; the village does the rest. | Prime target; the Rag erases clues; forgeries cost Lenses; Compare never gives a name. If you die the Magnifier drops and anyone can Inspect in 6 s. |
+| **Doctor** (Village) | No | Village | Medkit x2, Bandage x2, Salts x1 | **Bandage** (60 s CD, not self): (M3: instant, 1.5 tiles, one Bandage from the kit; the knockback, blackout and witness entries come with M4.) the target survives the next kill attempt within 60 s; both are knocked back, the target's screen blacks out 1.5 s and gets the attacker's height as a Claimed entry; witnesses within 3 tiles get height + scarf as Claimed; the attacker still gains Blood. **Autopsy** (8 s): time of death +/-45 s and cause (knife / wolf / poison / shot), posts Verified. **Salts**: cure Wounded or Snare. | Keep people alive and read the dead. Your autopsy says when; that is what breaks alibis. | Two-Killer games outpace your bandages. |
+| **Vicar** (Village) | No | Village | Candle x2, Pocket Watch | (M5a) **Hear Confession** (night power, once per night, not self): pick a seat from the list; your Notebook gets its faction (Village, Cabal or Neutral) as Verified. | Everyone in Hollowmere confesses to you sooner or later. Each night, learn where one soul stands, then choose how much to say. | Everyone can see you are the Vicar, the Cabal first among them; if your card was not dealt, a Cabal player may wear your face and lie in your name. |
+| **Watchman** (Village) | No | Village | Lantern, Pocket Watch | (M5a) **Keep Watch** (night power, once per night; not self, and never the seat you watched the night before): the seat survives the first Knife strike before the night ends; the strike fails as on a Bandaged target, and your Notebook gets "Your watch held" as Verified. | You walk the lanes after dark. Each night, choose one door to stand by; if a blade comes for that soul tonight, it fails. | You cannot watch yourself or the same soul two nights running; poison and the Gamekeeper's shot go past you. |
+| **Herbalist** (Village) | No | Village | Remedy x1, Nightshade x1, Candle | (M5a) **Remedy** (night power, once per match, self allowed): the seat survives the first Knife strike before the next meeting opens; your Notebook records it when it holds. **Nightshade** (night power, once per match, not self): the seat dies when the night ends, wherever it stands, and leaves no trait clues. | One bottle saves, one bottle ends. Pour the first where the knife will fall and the second only where you are certain. | Nightshade kills a villager as readily as a killer, and a Remedy cannot stop it. |
+| **Gamekeeper** (Village) | No | Village | Fowling Piece (bound), Lantern | (M5a) **Last Shot** (passive): when you are killed, poisoned or ejected you have 10 s, before you learn any role, to pick one living seat from the list; it dies too (a shot rings 10 tiles where it stands). You may hold your fire. (M5a) A Knife strike blacks out your screen at once, as a Bandaged target's does: you aim from the list on what you saw before the blow. | Vane paid you to keep the wood. If they come for you, you will not go alone; make sure the one you take is the one who came. | You never see the blow that fells you, and the face that walked up may have been borrowed; a wasted shot kills a friend. |
+| **Butler** (Village; not dealt until M4) | No | Village | Master Keyring, Candle x2 | **Lock / Unlock** any house door instantly (10 s CD; locks keep people out, never in). **Ledger**: at each meeting, privately lists for each living player the last house they entered this cycle (house only, no time). | You know every door in Hollowmere. Control the wings, read the ledger, say who went where. | Universal access makes you the obvious suspect; Skeleton Key use looks like yours. |
+| **Child** (Village; not dealt until M4) | No | Village | Slingshot, Chalk, Candle | **Silent hide** (instant, no noise; adults cannot Check a crawlspace). **Witness** (passive): with line of sight within 6 tiles of a kill, "The Child saw it" posts height + scarf as Verified at the next meeting. **Slingshot**: 1 s stun (30 s CD). | You are small and quiet. Hide, watch, remember. | Top kill target; vision -1 tile; cannot pick up items. |
+| **Townsfolk** (Village), dealt as the professions below | No | Village | Lantern, Pocket Watch, Chalk, Rope | **Tasks**. **Chalk**: floor marks visible to all. **Rope**: free a snared player. Two Emergency Bell pulls per match (others have one). | Do your chores with others to build alibis, mark what you see, vote with evidence. | Weak alone; strong in pairs. |
+| **Lamplighter**, **Baker**, **Fisher**, **Tinner** (Village, professions) | No | Village | As Townsfolk | As Townsfolk | Lamplighter: You light the lanterns that keep the wolves off the square. Work beside others, mark what you see, vote with evidence. Baker: Up before anyone, flour to the elbows. Do your chores in company, mark what you see, vote with evidence. Fisher: The fog keeps the boats in. Mend the nets beside a neighbour, mark what you see, vote with evidence. Tinner: The mine is shut; your hands are not. Work in pairs, mark what you see, vote with evidence. | As Townsfolk |
+| **Drifter** (Neutral) | Yes | Get ejected (solo win; the match continues and the end screen lists you among the winners). | Replica Knife, Bloody Rag x1 | **Act Shifty**: fake noise rings (20 s CD). **Fake Blood**: 30 s (1 use, world only; meetings show portraits). | You want to hang. Be suspicious enough to be voted out, not so obvious they ignore you. | A calm village; dying to the Killer is a loss; counts as nobody for parity; you wear a cover like the Cabal, but alone. |
+| **Ranger** (Village, V1.5) | No | Village | Crossbow + 2 Bolts, Snare x2, Torch | **Shoot** a wolf: it dies. **Arrest** (1 bolt on a player): the target is cuffed and dragged to the square; the next meeting opens with them as a Case Closed suspect. **Snare**: holds 4 s and logs the name. | You hunt wolves. One arrest per match: be right. | Bolts are loud (noise 10). |
+| **Thief** (Neutral, V1.5) | Decided when it ships | Escape by the cave sea exit holding 3 Heirlooms | Lockpicks x5, Sack, Smoke Bomb | Pickpocket (40 s CD), Lockpick (2 s, noise 5), Smoke (4 s). | Nobody's hero. | Thefts look like Killer activity; counts as Village for parity. |
+| **Medium** (Village, V2) | No | Village | Seance Chalk, Candle x3 | Seance at a body (8 s): the ghost picks 1 of 8 phrases. | You hear the dead. | Cabal ghosts may lie. |
 
 The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 start kit. Values the table leaves open (decided 2026-10-10, Session C): Kill, Bandage, Salts, Medkit and Rope reach 1.5 tiles; Bandage is instant and knocks both players back 1 tile; Plant Clue takes 2 s; Dust takes 2 s; the Slingshot reaches 5 tiles; Act Shifty's fake rings use the run radius. Universal verbs: Report and the Bell reach 2 tiles; Collect is a 2 s hold. `abilities.json` holds every verb with a number; an item's `use` points at its verb.
+
+**Lock door** leaves the Killer's card to make room for Impersonate (a card shows at most 3 abilities); it returns with the Butler's doors in V1.5 (`abilities.json` keeps the row, `ships: V1.5`).
+
+**Night powers** (M5a). Hear Confession, Keep Watch, Remedy, Nightshade and Last Shot pick a seat from a list of the seats the roster shows alive, never a figure in the world, so they need no walking and leave nothing in the world. All but Last Shot work from the start of dusk to the end of the night, and in the Final Night hunt, at most `balance.json` `nightPowers.perNight` (1) use of each per night; Remedy and Nightshade are also spent from the kit, one bottle each per match. Results go only to the actor's Notebook, as Verified entries. A power used on a seat that is dead but not yet public works, as far as its user can tell, as on a living seat (a refusal or a missing entry would tell the actor about the death): Hear Confession still writes the seat's faction; Keep Watch and Remedy write their pick entry and never hold; Nightshade is spent and skipped when it resolves. A Knife strike on a protected seat fails and spends one protection, Bandage first, then the Watch, then the Remedy, and the holder of the spent protection gets a Notebook entry; protections stop only the Knife. Nightshade resolves for every poisoned seat at once when the night ends, when a meeting opens, or when the Final Night hunt ends: the seat becomes a ghost (cause poison) and its body lies where it stood, with no clue beside it. **Last Shot**: until the Gamekeeper shoots or the 10 s run out, the dying Gamekeeper sees no figure, no role and no ghost view (a Knife strike blacks its screen out at once), and aims from the list. Meeting requests and phase changes never wait for an aim. If a meeting opens while a Gamekeeper aims, the aim runs on until `aimUntilTick`. A shot then kills its target at once (`alive` false, cause shot, no role shown). Only that batch's win check and `endReveal` wait. An ejected Gamekeeper aims during the reveal, which holds until the shot; that shot is announced with its target's role. A shot in the world is as private as a kill: the target becomes a ghost (cause shot), the body lies where it stood, and the shot rings like a scream (`noise.shot`, 10 tiles) in that scene.
+
+**NPC night powers** (M5a). An NPC (3.12) holding a night power uses it at a seeded moment between dusk and the end of the night: the Vicar on a seat it has not heard yet, the Watchman on a random other living seat it did not watch the night before, the Herbalist its Remedy on itself on its first night and Nightshade never, the Gamekeeper on the seat it would vote for (3.12), or on nobody when it has none. An NPC Killer does not Impersonate in M5a. An NPC cover role never picks, so it wears its first hint (3.17).
 
 ### 3.3 Match loop
 
 | Phase | Trigger | Duration |
 |---|---|---|
 | Lobby | Leader creates party; Start with >= 1 human (NPCs fill to 4, 3.12) | – |
-| Role reveal | Server deals roles and traits | 12 s, then 3-2-1 |
-| Grace | Spawn spread around the square; kills disabled; guided clue | 30 s |
-| Day | Free roam, tasks; light radius 7 tiles | 110 s |
-| Dusk | Vignette, "Night falls in 10 s"; missing-person check | 10 s |
-| Night | Light radius 3.5 tiles; wolves active | 80 s |
+| Role reveal | Server deals the deck and the traits; cover roles pick a look (3.17) | 20 s, then 3-2-1 |
+| Grace | Spawn spread around the hub (3.13); kills disabled; guided clue | 30 s |
+| Day | Free roam; light radius 7 tiles; the Knife is sheathed | 60 s |
+| Dusk | Vignette, "Night falls in 10 s"; the Knife, Impersonate and the night powers wake; missing-person check | 10 s |
+| Night | Light radius 3.5 tiles; wolves active; the hunt | 100 s |
 | Meeting: discussion | Body report, Emergency Bell, or missing-person roll-call | 60 / 75 / 90 s (4-5 / 6-7 / 8-10) |
 | Meeting: vote | Open from the first second; ends early when all living players have voted | 25 s after discussion |
-| Reveal | Tally with names; ejected role revealed | 8 s |
-| Immunity | No kills, no noise; everyone spread at the square; then a new day (M3: the day restarts in full and the cycle count rises) | 15 s |
-| Final Night | End of cycle 5 without a winner | 90 s hunt + forced vote |
-| Game over | Winner, every role, the summary; then the lobby again with the same code and seats | 20 s |
+| Reveal | Tally with names; ejected role revealed | 8 s (held for an ejected Gamekeeper's Last Shot) |
+| Immunity | No kills, no noise; everyone spread at the hub; then a new day (M3: the day restarts in full and the cycle count rises) | 15 s |
+| Final Night | The day that would start cycle 5 begins with no winner yet | 90 s hunt + forced meeting |
+| Game over | Winner, every role and look, the undealt cards, the summary; then the lobby again with the same code and seats | 20 s |
 
-(M3) The match clock starts when grace begins; the Knife's first cooldown starts when grace ends, and a meeting that opens during a world phase restarts the cycle at a full day once immunity ends. A cycle is 200 s; a 12-18 minute match is 3-5 cycles with meetings. Doors, locks, bodies and clues persist across phases. All timers are tick-based (20 Hz) in state and rendered through a server-time offset.
+(M3) The match clock starts when grace begins; the Knife's first cooldown starts when grace ends, and a meeting that opens during a world phase restarts the cycle at a full day once immunity ends. A cycle (day, dusk and night) is 170 s; a 12-18 minute match is 3-4 cycles with meetings. Doors, locks, bodies and clues persist across phases. All timers are tick-based (20 Hz) in state and rendered through a server-time offset.
+
+(M5a) **The Knife works only after dark**: at dusk, at night and in the Final Night hunt, never in grace, day or immunity. Until tasks (M4d) and quests (M5b) give the day work, the day is short and the night long. Impersonate and the night powers follow the same clock (3.2, 3.17).
+
+(M5a) The Emergency Bell rings only in grace and day; after dark only a body report or the missing-person roll-call opens a meeting.
 
 **Missing-person roll-call.** At each Dusk the server checks for (a) a dead player whose body has been unreported for a full phase, or (b) a living player no other player has shared a scene with for a full cycle. If either holds, a meeting opens with "X has not been seen" on the board. A Killer who hides every body still faces a meeting.
+
+**Hunger** (M5a). A day starts a new round (`round` + 1). When a day starts round r, a living Killer whose last Knife strike was in round r − 1 − `hunger.cyclesWithoutKill` or earlier (round 0 when they never struck) is **Hungry**: from then on, every `hunger.trailEveryS` (1 s) in which they move, a glowing footprint (`hungerPrints`, showing their own height, gone after 30 s) appears on their tile, in every phase and whatever look they wear. With the default of 2, a Killer who never strikes is Hungry from the day of round 3. Any accepted strike, a voided one included, ends Hunger; an Accomplice who inherits the Knife counts as having struck in that round (3.2). Glowing footprints cannot be collected; anyone in the scene sees them.
+
+**Final Night** (M5a). When the server would start a day whose round is above `finalNight.afterCycle` (4), after a night or after the immunity of a meeting, and nobody has won, the Final Night begins instead of that day. Everyone stays where they stand under night lighting; every Knife's cooldown is cut to at most `finalNight.killCooldownS` (20 s) and the Knife rests that long after each strike; the night powers wake for one more use; clues keep spawning. The hunt lasts `finalNight.huntS` (90 s); a body report ends it at once (`finalNight.reportEndsHunt`; the Bell is silent after dark). Then Nightshade resolves, everyone moves to the square and the forced meeting opens (reason `final`): the discussion of the party size, then a vote with no Skip (`finalNight.skipAllowed`) and the Case Board open. The plurality is ejected and revealed; a tie ejects nobody (`finalNight.tieEjectsNobody`). The match always ends there (3.8). A death during the hunt runs the win check as usual, so parity can still end the match first.
 
 ### 3.4 Investigation and clues
 
@@ -110,7 +121,7 @@ Wolf kills spawn Fur and Claw Marks (decay 1 cycle), no footprints. Collecting: 
 
 ### 3.5 Items and tasks
 
-Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife, Replica Knife, Master Keyring, Magnifier, Notebook, Slingshot; V1.5 Crossbow) never drop except the Magnifier (drops as a 6 s Inspect for anyone); an ejected Village role's kit goes to a chest at the square.
+Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife, Replica Knife, Master Keyring, Magnifier, Notebook, Slingshot, Remedy, Nightshade, Fowling Piece; V1.5 Crossbow) never drop except the Magnifier (drops as a 6 s Inspect for anyone); an ejected Village role's kit goes to a chest at the square.
 
 | Item | Effect | Ships |
 |---|---|---|
@@ -119,6 +130,7 @@ Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife,
 | Plant Kit, Crowbar | Fake trait clue; break a locked door (door stays broken) | V1 |
 | Magnifier, Notebook, Lens, Fingerprint Kit | Inspect; auto-log; charges; Dust and Compare | V1 |
 | Medkit, Bandage, Salts | Heal 1 HP; kill immunity 60 s; cure status | V1 |
+| Remedy, Nightshade, Fowling Piece | Herbalist's save and poison (one each); the Gamekeeper's Last Shot | V1 |
 | Lantern, Candle | Carried light radius 4 / 2; wolves flee light within 4 tiles; off = stealthier | V1 |
 | Pocket Watch, Chalk, Rope | Time; floor marks; free a snared player | V1 |
 | Oil, Wrench, Planks, Letter, Flour | Task deliverables fetched from other scenes | V1 |
@@ -134,7 +146,7 @@ Players have 2 HP, regenerating 1 per 90 s; the Knife does 2. At 1 HP you are **
 
 ### 3.7 Stealth, hiding and doors
 
-Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2; noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene; the darkness radius is a client-side mask. Radius + occluder visibility is V1.5 (same `Visibility.ts` policy, different predicate).
+Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2; noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene, as an avatar under a random handle (3.17); the darkness radius is a client-side mask, drawn as the lighting layer of 3.13; a dark scene uses the night radius in every phase. Radius + occluder visibility is V1.5 (same `Visibility.ts` policy, different predicate).
 
 **Hiding spots** (wardrobe, hay pile, under bed, barrel; crawlspaces for the Child) hold one player; **body spots** (cellar dump, crypt niche, hay pile) are separate objects. Entering takes 1 s, noise 2; the hidden player sees a slit view and keeps one action, **Burst Out** (E): instant, stuns the Checker 1 s, noise 6. **Check** (E, 2 s) opens a spot; a Check on an occupied spot writes a Verified Notebook entry for the hider ("X opened my wardrobe at 3:12"), so checking is evidence.
 
@@ -146,143 +158,365 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
 
 - **Village** wins when all Cabal are dead or ejected, tasks reach 100%, or the Final Night vote ejects a Cabal member.
 - **Cabal** wins at parity (living Cabal >= living Village; Thief counts as Village, Drifter as nobody) at 6+ players; at 4-5 when living Village <= 1; or when the Final Night vote ejects nobody or a non-Cabal player.
-- **Final Night** (cycle 5 without a winner): night lighting, wolves roam the village, Cabal kill CD 20 s, 90 s hunt with clues still spawning, then a forced vote with no Skip and the Case Board open; a tie ejects nobody and Cabal wins.
+- **Drifter** wins alone when ejected, and the match goes on. (M5a) The end screen lists an ejected Drifter among the winners (`gameOver.alsoWon`) whichever faction then wins; a Drifter who is killed, poisoned or shot loses. A Drifter ejected by the Final Night vote wins beside the Cabal.
+- **Final Night** (the day that would start cycle 5 begins without a winner, 3.3): night lighting, wolves roam the village, Cabal kill CD 20 s, a 90 s hunt with clues still spawning, then a forced vote with no Skip and the Case Board open; a tie ejects nobody and the Cabal wins.
 - Tie or Skip majority: nobody ejected. After two consecutive no-ejection meetings (Drifter ejections count as none) the next vote has Skip disabled and ejects only a player holding at least ceil(living/3) votes; otherwise nobody is ejected and the next cycle has no grace.
-- **Hunger**: a Killer with no kill in 2 full cycles leaves glowing footprints until they kill.
+- **Hunger**: a Killer with no Knife strike in 2 full rounds leaves glowing footprints until they strike (3.3).
+- **Last Shot** (M5a): an ejected Gamekeeper shoots during the reveal (3.2); the win check runs after the shot, with both seats out.
 - Disconnect over 60 s = death with cause "vanished" and a body at the last position; reconnection within 60 s resumes the same role. (M3: a player who leaves during play becomes a ghost at once with no body; the window and the body arrive with reconnection in M7, A30.)
 - No Clue Surge. A wrong ejection adds 15 s to the next discussion instead.
-- (M3) The win check runs when a death is recorded and, for an ejection, when the reveal ends, so the tally, the stamp and the role line always show first; it never runs on a bare tick. A tied vote, or a Skip plurality, ejects nobody.
+- (M3) The win check runs when a death is recorded and, for an ejection, when the reveal ends, so the tally, the stamp and the role line always show first; it never runs on a bare tick. A tied vote, or a Skip plurality, ejects nobody. (M5a) A Nightshade death and a Last Shot are deaths like a kill; the win check of a batch that holds a dying Gamekeeper waits until its aim closes, then runs once for every death of the batch. Meeting requests and phase changes never wait for an aim (3.2).
+- (M5a) **What a meeting reveals.** An ejection reveals the ejected seat's role card and the look it wore ("Bo was the Killer, walking as the Baker"); a shot fired at the reveal reveals its target's role too. A death in the world (Knife, Nightshade, a shot) only flips `alive` when the next meeting opens; it reveals no role until game over, which shows every seat's role, the look it wore and the two undealt cards (3.17).
 
 ### 3.9 Balance by player count
 
-| Players | Cabal | Kill CD | Discussion | Tasks each | Extra rules |
-|---|---|---|---|---|---|
-| 4 (practice) | 1 | 60 s | 60 s | 3 | No Killer Lock; Cabal needs living Village <= 1 |
-| 5 | 1 | 60 s | 60 s | 3 | As above; Doctor added |
-| 6-7 | 1 (+Accomplice at 7) | 35 s | 75 s | 4 | Butler on; Lock on |
-| 8-9 | 2 | 30 s | 90 s | 4 | Child silhouettes |
-| 10 | 3 (2 Killers + Accomplice) | 40 s each, 15 s global lock | 90 s | 5 | Suspect sets decide |
+**The deck by player count** (`roles.json` `decks`; player count + 2 cards; every Killer card is always dealt, two of the other cards stay undealt):
 
-Snowball guard: when living Village <= Cabal + 2, kill CD +10 s and the next kill spawns all 3 trait clues; when only one Killer remains with >= 6 alive, kill CD -5 s. All of these are `balance.json` values; the first playable ships plain plurality with Skip and enables the anti-stall rules one per playtest.
+| Players | Cards | Cover cards | Village specials | Professions |
+|---|---|---|---|---|
+| 4 (practice) | 6 | Killer | Detective, Vicar | Lamplighter, Baker, Fisher |
+| 5 | 7 | Killer, Drifter | Detective, Vicar, Doctor | Lamplighter, Baker |
+| 6 | 8 | Killer, Drifter | Detective, Vicar, Doctor, Watchman | Lamplighter, Baker |
+| 7 | 9 | Killer, Accomplice | Detective, Vicar, Doctor, Watchman | Lamplighter, Baker, Fisher |
+| 8 | 10 | Killer, Accomplice | Detective, Vicar, Doctor, Watchman, Herbalist | Lamplighter, Baker, Fisher |
+| 9 | 11 | Killer, Accomplice | Detective, Vicar, Doctor, Watchman, Herbalist, Gamekeeper | Lamplighter, Baker, Fisher |
+| 10 | 12 | Killer x2 | Detective, Vicar, Doctor, Watchman, Herbalist, Gamekeeper | Lamplighter, Baker, Fisher, Tinner |
+
+The Drifter and the Accomplice may be among the two undealt cards; a Killer never is. **Why no deck holds more than two cover cards:** with every Killer dealt, the dealt cover roles minus the undealt non-cover cards always equals the cover cards in the deck minus 2. With at most two, every cover role is always shown an undealt card it can wear (3.17), and from 5 players up the roster shows each non-cover character of the deck exactly once, so the roster alone never tells who wears a cover. At 4 one character of the deck is unworn, and everybody knows its card is undealt. A third cover card would force a visible duplicate every match. (The 10-seat deck's Cabal is two Killers, not two Killers and an Accomplice, for that reason.)
+
+| Players | Cabal in play | Kill CD | Discussion | Tasks each | Extra rules |
+|---|---|---|---|---|---|
+| 4 (practice) | Killer | 60 s | 60 s | 3 | Cabal needs living Village <= 1 |
+| 5 | Killer | 60 s | 60 s | 3 | As above; Doctor added; the Drifter may be dealt |
+| 6-7 | Killer (+ Accomplice at 7, if dealt) | 35 s | 75 s | 4 | Parity; Watchman added; the Drifter may be dealt at 6 |
+| 8-9 | Killer (+ Accomplice, if dealt) | 30 s | 90 s | 4 | Herbalist at 8, Gamekeeper at 9 |
+| 10 | 2 Killers | 40 s each, 15 s global lock | 90 s | 5 | Suspect sets decide |
+
+The Knife works only after dark (3.3), about 110 s of each 170 s cycle, so a cooldown buys at most two strikes per Killer per night at 4-5, four at 6-9 and three at 10. (M5a) The soak checks these values: the median match length is 12-18 min and at most one third of matches reach the Final Night (`phases.dayS`, `phases.nightS` and `finalNight.afterCycle` are the M5a values, revisited in M5b). Snowball guard: when living Village <= Cabal + 2, kill CD +10 s and the next kill spawns all 3 trait clues; when only one Killer remains with >= 6 alive, kill CD -5 s. All of these are `balance.json` values; the first playable ships plain plurality with Skip and enables the anti-stall rules one per playtest.
 
 ### 3.10 V1 cut list
 
 **First playable (M3, "Mafia with walking")**: lobby, 5-char codes, reconnection in lobby; roles Killer / Detective / Doctor / Townsfolk; traits height + scarf; overworld 40x30 greybox + tavern (2 rooms) + widow cottage (2 rooms) + forest + cave entry; kill, body, Blood tint, two clues, Notebook, Detective auto-Verified; report / bell; meeting with portraits, chat, secret vote, eject + reveal; checkWin; ghosts with ghost chat.
 
-**V1 (beta)**: everything in 3.1-3.9 marked V1: Butler, Child, Accomplice, Drifter; Lens charges, Dust / Compare, Autopsy, Bandage, Ledger, Witness, Plant Clue, Rag, Bucket; Case Board with suspect sets and Corroborated; 6 task types incl. 1 co-op; wolves, fence; hiding spots, Burst Out, Check; door states, Skeleton Key, Crowbar; Hunger, Final Night vote, missing-person roll-call; quick-chat, Cabal and ghost channels; scene profiles Small / Medium / Large; 10-player rules.
+**V1 (beta)**: everything in 3.1-3.9 marked V1: Butler, Child, Accomplice, Drifter; Lens charges, Dust / Compare, Autopsy, Bandage, Ledger, Witness, Plant Clue, Rag, Bucket; Case Board with suspect sets and Corroborated; 6 task types incl. 1 co-op; wolves, fence; hiding spots, Burst Out, Check; door states, Skeleton Key, Crowbar; Hunger, Final Night vote, missing-person roll-call; quick-chat, Cabal and ghost channels; scene profiles Small / Medium / Large; 10-player rules; the n+2 deck, professions, public looks and covers, Impersonate, the Vicar, Watchman, Herbalist and Gamekeeper (M5a).
 
-**V1.5**: Ranger (Arrest), Thief, Heirlooms, cave sea exit, Handcuffs, Forged Alibi, Candles for all, Wisp, Butler Bell, lit-window silhouettes, proximity chat toggle, faction-only reveal, fisher cottage, lighthouse, lobby role toggles, radius + occluder visibility, Lottie reveal, Light2D experiment, spectator mode.
+**V1.5**: Ranger (Arrest), Thief, Heirlooms, cave sea exit, Handcuffs, Forged Alibi, the Killer's Lock door, Candles for all, Wisp, Butler Bell, lit-window silhouettes, proximity chat toggle, faction-only reveal, fisher cottage, lighthouse, lobby role toggles, radius + occluder visibility (dark scenes first, M5b; 3.13), Lottie reveal, Light2D experiment, spectator mode.
 
 **V2**: Medium, the Beast and Cave Gate, bats, bog lurker, crows, poison, voice chat, cosmetics; first-person renderer.
 
 ### 3.11 One Night Ultimate Baguette (quick mode)
 
-Origin: the owner's friend first framed the whole game as "One Night Ultimate Baguette", a wrapper around the one-night hidden-role card game. This section is an original ruleset with original wording, built from the lobby, role card, world, meeting and vote systems above. Lobby setting `mode = onub`. Target length 5-7 minutes (`targetLengthMin` in `balance.onub.json`, which the lobby chip reads); the numbers below give about 5-7 (see the match table). The role table is `roles.onub.json`; the decks, night windows, timers, vote and winner table are `balance.onub.json`.
+Origin: the owner's friend first framed the whole game as "One Night Ultimate Baguette", a wrapper around the one-night hidden-role card game; on 2026-10-17 the owner supplied the full mode (two cards per player, four prep stations, night roles, a 5-minute Morning Rush, one vote) and its art. This section is **ONUB v2**, an original ruleset with original wording that replaces the round-4 wake-loaf mode; the round-4 bakery scene stays frozen and unused. Lobby setting `mode = onub`. Target length 8-10 minutes (`targetLengthMin` in `balance.onub.json`, which the lobby chip reads; "Balance and length" below gives 8.7 to 9.7 minutes plus jitter, less when prep ends early). The roles, teams, scenes and card texts are `roles.onub.json`; the decks, stations, ingredient cards, mini-games, acts, night windows, timers, vote rule, winners table and NPC numbers are `balance.onub.json`.
 
-**Fiction.** The night before Lord Vane's will is read, Hollowmere keeps the wake-loaf custom: Tamsin Crumb, the baker, bakes one loaf per mourner plus three for the dead, and bakes a wax-sealed crumb token into each. Your token is your secret. At dusk every mourner sets their loaf on a named plate on the Wake Table in Crumb's Ovens; the dead's three loaves sit on the oven ledge. Vane's poisoners are among the mourners, and the will names "whoever remains when the last lantern goes out", so by dawn the village must turn one person out into the storm. During the night people creep down from the bakery loft and tamper with the loaves. What you hold at dawn is what you are.
+**Fiction.** Paris, the graveyard shift before the Bake-Off. You are French bakers keeping the Mother Dough alive through the night; hidden among you are Mold Spores who want it ruined. Nobody leaves the kitchen and nobody is eliminated during the night: the whole match comes down to one argument at dawn and one vote on who goes into the brick oven. **Nobody walks in this mode**: every screen is a card table or a kitchen room over the owner's art, and the server never places a seat in a scene.
 
-**Roles** (always player count + 3 loaves; three stay on the oven ledge):
+**Two cards each.** Every player holds a **Role card** (who you are) and a **Location card** (the station you worked at during prep). The **Pantry** in the middle of the table holds `pantry.roles` (3) Role cards and `pantry.locations` (3) Location cards. Role cards are dealt with the role card; a player's Location card is the station they pick at prep; each Pantry Location card is drawn uniformly over the four stations, repeats allowed. Cards move at night. **You play for the team of the Role card in front of you at dawn**, never the one you were dealt, and after the night nobody may look at their own cards: the client only ever shows what you were dealt, where you chose to work and what your own act showed, as memory.
 
-| Role (faction) | Night act |
-|---|---|
-| **Poisoner** x2 (Cabal) | Wake together and see each other. A lone Poisoner may peek one of the dead's loaves. |
-| **Hireling** (Cabal) | Reads the Baker's ledger: it names the Poisoners. They do not know the Hireling. |
-| **Sin-Eater** (Village) | Tastes one mourner's loaf, or two of the dead's. |
-| **Cutpurse** (Village) | Takes another mourner's loaf, leaves their own, reads the one taken. |
-| **Busybody** (Village) | Swaps two other mourners' loaves without looking. |
-| **Sot** (Village) | Must swap their own loaf with one of the dead's, unseen. |
-| **Lamplighter** (Village) | Last to wake; cracks their own loaf and reads it. |
-| **Pallbearer** x2 (Village, V1.1) | Wake together and see each other. Neither is a Poisoner. |
-| **Debtor** (Neutral) | Wins only if turned out. |
-| **Gamekeeper** (Village, V1.1) | If turned out, the player they voted for is turned out too. |
-| **Mourner** (Village) | No night act. |
+**Teams** (`roles.onub.json` `teams`).
 
-| Players | Loaves | Deck |
+| Team | Cards | Wins (the winners table below) |
 |---|---|---|
-| 4 | 7 | Poisoner x2, Sin-Eater, Cutpurse, Busybody, Mourner x2 |
-| 5 | 8 | + Debtor |
-| 6 | 9 | + Hireling |
-| 7 | 10 | + Lamplighter |
-| 8 | 11 | + Sot |
-| 9 | 12 | + Pallbearer x2 (V1: Mourner x2), Mourner x2 becomes x1 |
-| 10 | 13 | + Gamekeeper (V1: Mourner) |
+| Loyal Bakers | every baker role, the Critique included | at least one Mold Spore goes in the oven; with every Spore in the Pantry, the oven stays empty or takes a Team Mold card |
+| Team Mold | Le Champignon (the only **Mold Spore**), Le Levain, L'Apprenti, Le Rat de Cave | the Mother Dough is ruined at prep, or no Spore goes in the oven |
+| On your own | Le Croissant Rassis | goes in the oven |
 
-Both Poisoners sit among the dead's loaves in 3 / C(N+3, 2) of deals: 14% at 4 players, 8% at 6, 4% at 10. Those games are won by the village only if nobody is turned out.
+**The match.**
 
-**Night.** After the 12 s role card (your dealt token) and a 10 s Dusk in which everyone walks into the bakery and sets their loaf (hold E on your own plate, 1 s), every client goes to the dark loft (owner decision A21): you lie still in your bedroll, with no movement and no clock, under storm ambience. The client draws one bedroll per seat, every one of them occupied all night, including those whose players are awake, so nobody can see who gets up. Muffled noise pulses (a creak, footsteps below) come from a random direction at random intervals between `timers.sleeperPulseMinS` and `timers.sleeperPulseMaxS`; the client generates them on its own, with no link to the windows, so they leak nothing. Sleepers are moved to a `loft` pseudo-scene so the server encodes no presence to them. Nobody leaves the bakery by its door in quick mode, at dusk or at night (A39). The server runs a Conductor: a fixed list of windows built from the deck. Every window runs even when its role sits among the dead's loaves, so night length never leaks the deal. Only players whose **dealt** role matches the open window are spawned at the bakery door for that window; they act as what they were dealt, not as what they may now hold, then fade back to the loft. Windows carry a seeded 0-4 s jitter.
+| Phase (value) | Time | What happens |
+|---|---|---|
+| Role card (`roleReveal`, 1) | `timers.roleCardS` 12 s, ends early when all are ready | your dealt Role card; nobody learns a teammate here, and nobody sees who is ready |
+| Evening Prep (`dusk`, 4) | `timers.prepS` 60 s, ends early when every seat has committed (`prep.endsWhenAllCommitted`) | pick a station, play its mini-game, play one Ingredient card into its pile |
+| The crime scenes (`prepReveal`, 13) | `timers.prepRevealS` 15 s | every pile is shuffled and flipped; flags, net weight and ruin are announced |
+| The Baking Cycle (`night`, 5) | the windows of the deck plus `timers.fadeS` 2 s each | the roles wake one by one and tamper with the cards |
+| Dawn (`dawn`, 6) | `timers.dawnS` 5 s | the Iron Cloche is shown |
+| Morning Rush (`meetingDiscussion`, 7) | `timers.rushS` 300 s, never shortened | everyone argues; structured claims; votes may be cast and changed |
+| "Un, deux, trois, CRUST!" (`meetingVote`, 8) | `timers.voteS` 20 s, opening with the `timers.crustCountdownS` 3 s countdown; ends early when every seat in play has voted, never before the countdown has played | the last chance to point |
+| The Final Bake (`reveal`, 9) | `timers.revealS` 30 s | who goes in the oven, and what they hold |
+| Game over (12) | `balance.phases.gameOverS` | every card, pile and act of the night; back to the lobby with the same code |
 
-| # | Window | Who wakes | Physical act (object, hold time) | Trace at dawn |
-|---|---|---|---|---|
-| 1 | 12 s | Poisoners | Each other's nameplates glow red at the Wake Table. If alone: E on one of the dead's loaves (2 s) shows its token | Oven-ledge flour scuff |
-| 2 | 8 s | Hireling | E on the Baker's ledger (2 s, act `onub.readLedger`): the Poisoners' names | Ledger left open |
-| 3 | 8 s | Pallbearers (V1.1) | See each other at the table | none |
-| 4 | 14 s | Sin-Eater | E on one mourner's plate (2 s) shows its token, or E on two of the dead's loaves in turn | Plate turned |
-| 5 | 12 s | Cutpurse | E on another's plate (2 s): the loaves swap; your new token is shown | Two plates turned |
-| 6 | 14 s | Busybody | E on two other plates in turn (1 s each): they swap; nothing is shown | Two plates turned |
-| 7 | 10 s | Sot | E on one of the dead's loaves (2 s): swaps with your own, unseen; if the window expires the server picks by seed | Ledge scuff |
-| 8 | 8 s | Lamplighter | E on your own plate (2 s) shows your current token | Plate turned |
+**Roles** (15 role ids; the wake order is the night table below).
 
-Night length is the sum of the windows present plus a 2 s fade per window, before jitter: 60 s at 4-5 players, 70 s at 6, 80 s at 7, 92 s at 8-10 in V1 (102 s at 9-10 once the Pallbearers ship); jitter adds up to 4 s per window. Traces are cosmetic in V1: the board at dawn lists the trace line of every window the night ran, whether or not its role was dealt or acted, so the lines carry no information (A39); trait-bearing flour footprints (height, as in the main mode) are a V1.1 lobby toggle `floury`. Every act arrives as `act.ability` through the command queue and is accepted only if the phase is night, the open window matches the actor's dealt role, the actor has not acted this window, the actor is within 2 tiles of the target prop, and the target is legal for the role (never your own plate for Sin-Eater, Cutpurse or Busybody; only the dead's loaves for the Sot). "May" roles that time out do nothing. (M3b) A two-pick act is held pick by pick and sent on its second pick, and one of its picks must be within reach; the Sin-Eater's dead-loaf act takes one or two picks, the Busybody's swap exactly two. (M3b) The ledger names the Poisoners as they were dealt, whatever they hold at dawn. (M3b) An NPC waker (3.12) makes a flat seeded draw at its window's start over its legal acts, plus doing nothing for an act that may be skipped, and the Conductor applies the pick when the window ends if the NPC has not acted; the Sot's act is never skipped.
-
-**Dawn, discussion and vote.** A 10 s dawn fade leads straight into the Meeting scene with the trace lines on the board. One discussion with global text chat, portraits and trait icons. Claims are structured: tap a role chip to post "I was the Sin-Eater: Y's loaf was Mourner", and the board lists them per player as Claimed.
-
-| Players | Discussion | Vote | Whole match |
+| Wake | Role | Team | Night act |
 |---|---|---|---|
-| 4-5 | 150 s | 25 s, ends early when everyone has voted | about 5 min |
-| 6-7 | 180 s | 25 s | 5.5-6 min |
-| 8-10 | 210 s | 25 s | 6.5-7 min |
+| 1 | **Le Boulanger** (Head Baker) | Bakers | Puts the Iron Cloche on any player's Role or Location card, their own included. |
+| 2 | **Le Champignon** (The Mold Spore) x1-2 | Mold, a Spore | The Spores see each other. A Spore who is alone at the table may peek at one Pantry Role card. |
+| 3 | **Le Levain** (The Sourdough Starter) | Mold | Sees which players were dealt Le Champignon. The Spores never learn who the Levain is. |
+| 4 | **L'Apprenti** (The Unpaid Intern) | Mold | Peeks at one other player's Location card. Sees no teammate. |
+| 5 | **Le Rat de Cave** (The Cellar Rat) | Mold | Swaps their own Location card with a Pantry Location card or another player's, and sees the one they now hold. Sees no teammate. |
+| 6 | **Le Commis** (The Line Cook) x0 or x2 | Bakers | The two Commis see each other; a lone Commis knows the other is in the Pantry. |
+| 7 | **Le Chef de Cuisine** (Executive Chef) | Bakers | Peeks at one other player's Role card, or at two Pantry Role cards. |
+| 8 | **L'Aboyeur** (The Expediter) | Bakers | Looks at two other players' Location cards. |
+| 9 | **Le Sous-Chef** (Second-in-Command) | Bakers | Swaps their Role card with another player's and looks at their new card. |
+| 10 | **Le Tourrier** (Dough Sheeter) | Bakers | Must look at one Pantry Role card, then swap it with any player's Role card, their own included. |
+| 11 | **Le Plongeur** (The Dishwasher) | Bakers | Swaps two other players' Role cards, or two other players' Location cards, without looking. |
+| 12 | **Le Garde Manger** (The Larder Cook) | Bakers | Must swap their Role card with a Pantry Role card without looking. |
+| 13 | **L'Inspecteur Sanitaire** (The Health Inspector) | Bakers | Looks at their own Role and Location cards. |
+| – | **Le Croissant Rassis** (The Stale Croissant) | On your own | No night act. Wins alone if put in the oven. |
+| – | **Le Critique Gastronomique** (The Food Critic) | Bakers | No night act (Restaurant Shutdown): if put in the oven, the player they voted for goes in too. |
 
-Vote: no Skip, no self-vote; a missing vote is an abstention, and the reveal names the abstainers (`voteResult.abstained`). Resolution (`resolveDawn`): everyone holding the most votes is **turned out**, ties included; if nobody holds two or more votes, nobody is turned out. A turned-out Gamekeeper takes their own target with them (one hop). Winners are judged by **final** loaves. (M3b) A seat that leaves during a quick-mode match abstains, is no target, and never ends the match; the match winner is the Debtor when the Debtor is out, else the Cabal when any winning seat holds a Cabal loaf (a lone Hireling included), else the Village, and nobody when no seat wins.
+Every Team Mold card may sabotage at prep (`sabotages`); only Le Champignon is a Mold Spore for the winners table (`spore`). The Critique's copy variant (wake first and copy another player's role) is V1.1 behind `rules.critiqueCopies`, false in V1; when it ships it wakes between the Boulanger and the Spores.
 
-| Outcome | Who wins |
+**Decks** (always player count + 3 cards; `byCount[n].deck`).
+
+| Players | Default deck |
 |---|---|
-| The Debtor is turned out | The Debtor. The Cabal loses. The Village wins only if a Poisoner is also out. |
-| A Poisoner is turned out (no Debtor) | Village: every final non-Cabal, non-Debtor loaf. |
-| No Poisoner out, a Poisoner among the mourners | Cabal: Poisoners and Hireling, even a Hireling who was turned out. |
-| No Poisoner among the mourners, nobody turned out | Village. |
-| No Poisoner among the mourners, someone turned out | The seat holding the Hireling loaf at dawn; if the Hireling loaf lies with the dead, nobody ("the storm wins"). |
+| 4 | Champignon x2, Chef de Cuisine, Aboyeur, Sous-Chef, Plongeur, Inspecteur Sanitaire |
+| 5 | + Croissant Rassis |
+| 6 | + Levain |
+| 7 | + Rat de Cave |
+| 8 | + Garde Manger |
+| 9 | + Boulanger |
+| 10 | + Tourrier |
 
-Reveal (20 s): every plate cracks open. The end screen shows dealt and final roles, the dead's three loaves, the swap log as a timeline ("The Cutpurse took the Poisoner's loaf; the Busybody swapped A and B") and the vote arrows, then returns to the lobby with the same code.
+L'Apprenti, the two Commis and the Critique enter only through the leader's **deck editor** in the lobby (`Settings.onubDeck`, public; empty means the default deck for the party size). The server accepts a custom deck in `lobby.settings` only if every card is a V1 role of `roles.onub.json`, each role appears a number of times listed in its `copies` (Champignon 1 or 2, Commis exactly 2, every other role once) and every `required` role (Champignon) is present; at Start the deck must hold the party size (after the NPC fill) plus `pantry.roles` cards, or Start is refused 422 and the editor shows why. The deck in play is public all match (`OnubBoard.deck`), as is every window it runs, so the night's length leaks nothing.
 
-**Role cards.** Every card carries the line: "The loaf you were handed at dusk may not be the loaf on your plate at dawn. Argue for who you think you are."
+**Evening Prep** (the Among Us phase, owner decision for round 5). The screen is the kitchen overview: four station rooms around the pass, drawn over the owner's station art (`onub_station_<id>`). You tap a room; your baker goes in (a client-side transition of `timers.stationTransitionS`), and you play that station's **mini-game**. The mini-game is the gate: the hand opens only when it is done. Then you pick one **Ingredient card** from your hand and commit: one `act.ability {abilityId: 'onub.prep', targets: [stationId, cardId]}`, accepted once (a repeat is 422). Your hand at a station is that station's good cards, plus its sabotage cards if the role you were dealt is Team Mold; Team Mold may play good to blend in. Before you commit you may back out to the overview and choose another room (the mini-game restarts); the commit is final. Mini-games are client-side skill only: their result never reaches the wire and nothing on the server depends on it; after `timers.minigameAssistS` 20 s in a mini-game a Done control appears, so no one is ever stuck. No other player is ever shown during prep, and nothing public changes when a seat commits (no ready tick, no count). When the prep timer ends, the server commits a seeded station and a seeded good card of that station for every seat that has not committed (`prepTimeout` stream). Your own committed station and card are private to you (`Private.onubLoc`, `Private.onubCard`); your station becomes your Location card.
+
+| Station | Mini-game (`stations[].minigame`) | Good cards | Sabotage cards | Weight | Special |
+|---|---|---|---|---|---|
+| **La Chambre Froide** (The Walk-In Fridge) | Cold check: drag 3 crates from the frosted shelves to the cart, then release the thermostat needle inside the cold band (20% of the dial) | Pure Dairy, Active Yeast | Spoiled Milk, Unpasteurized Mold, Thermostat Flip | 1 | Thermostat Flip discards one other card of this pile, unseen |
+| **Le Pétrin** (The Industrial Mixer) | Pour to the line: hold to pour flour, release with the level inside the line band (12% of the bowl), then the same for water; the bowl fills at 35% a second and an over-pour empties it | T55 Flour, Sea Salt | Sawdust, Plaster, Floor Sweepings | 1 | exactly 1 card: under-mixed, a caution flag worth 1 ruin |
+| **La Chambre de Pousse** (The Proofing Drawer) | Into the warm: slide 4 bannetons into the cabinet's glowing slots | Warm Steam, Time | Cold Draft, Over-Proofing | 1 | no sabotage card here: its visitors peek at one Pantry Location card |
+| **Le Four à Pain** (The Brick Oven) | Stoke: tap to feed oak (15% heat a tap) against an 8%-a-second cool-down and hold the needle in the band (18%) for 3 s | Oak Firewood, Steam Injection | Charcoal Ash, Wet Wood | 2 | a sabotage card here counts double |
+
+The client draws the bands at a random height each time with a local RNG; the band widths, rates and counts are `stations[].minigame`. The frosty footprints of the owner's spec are flavour only.
+
+**The crime scenes** (`prepReveal`). Each station's pile, its cards sorted by id, is shuffled (`piles` stream) and flipped face up on the public board (`OnubBoard.piles`), showing where sabotage happened but never who played it. The pile resolution (`resolvePrep`):
+
+- **Thermostat Flip.** For each Thermostat Flip in the shuffled Fridge pile, while it is still in the pile and the pile holds another card, one other card of the pile is discarded by seed (`thaw` stream), unseen. The board reads "1 card lost to the thaw" per card lost, so cards shown plus cards lost always equals the station's visitors. A discarded card counts for nothing.
+- **Net weight.** Per station, net = max(0, sabotage cards x the station's `weight` - good cards x `ruin.goodCancels`), over the cards still in the pile. The Oven's weight is 2, every other station's 1.
+- **Under-mixed.** A Mixer pile of exactly one card (`underMixBelow` 2) raises the public caution flag and adds `underMixWeight` 1 to the ruin weight. An empty Mixer is idle: no flag.
+- **Ruin.** The ruin weight is the sum of the nets plus the flags. At the party size's ruin weight (`ruin.weightByCount`: 3 at 4-5, 4 at 6, 5 at 7-10) or more the Mother Dough is **ruined**: the board says so at once and the match goes on, since the Stale Croissant can still steal the win (winners table).
+- **The proofing perk.** If the Proofing Drawer had at least one visitor and no sabotage card was played there, each of its visitors privately sees the same Pantry Location card, picked by seed (`perk` stream; a `nightReveal` entry). Visitors are not told who else proofed. The board shows only that the perk happened.
+
+**The Baking Cycle** (the One Night Werewolf phase). The night is played over the owner's role-scene art: when your window opens, your role's room fills the screen (`onub_scene_<scene>`) with a card table on it: one Role and one Location card face down per seat in deal order, the Pantry's six cards, and the Iron Cloche if it is out. Everyone else sees the same lights-out screen all night, with the narrator: as each window opens and closes, every seat sees and hears its call ('Le Sous-Chef, réveillez-vous…', copy `onub.narrator.<roleId>.wake` and `.sleep`). The open window is public (`OnubBoard.window`, a role id, '' during fades), because every window of the deck runs whatever was dealt. Under the narrator plays the sleepers' sound bed, muffled kitchen noises at random every `timers.sleeperPulseMinS` to `sleeperPulseMaxS` s, generated client-side with no link to the windows. A waker's client plays exactly the sleepers' sound bed plus the narrator: no wake cue, no role-scene audio. A waker goes back to the lights-out screen when the window ends. The server runs a Conductor over a fixed list of windows built from the deck: every window whose role is in the deck runs, dealt or in the Pantry, in `order`, each with a seeded 0-`timers.windowJitterMaxS` 3 s jitter (`script` stream) and a `fadeS` 2 s fade after it, so the night's length says nothing about the deal. Only players whose **dealt** role matches the open window are woken; they act as what they were dealt.
+
+| # | Window | Seconds | You see | You may do |
+|---|---|---|---|---|
+| 1 | Le Boulanger | 10 | the table | put the Iron Cloche on any player's Role or Location card, your own included |
+| 2 | Le Champignon | 12 | the other Spore (the cards of the seats dealt it glow) | alone at the table: peek at one Pantry Role card |
+| 3 | Le Levain | 8 | the seats dealt Le Champignon | nothing |
+| 4 | L'Apprenti | 10 | the table | peek at one other player's Location card |
+| 5 | Le Rat de Cave | 10 | the table | swap your Location card with a Pantry Location card or another player's; you see your new one |
+| 6 | Le Commis | 8 | the other Commis, or that you are alone | nothing |
+| 7 | Le Chef de Cuisine | 12 | the table | peek at one other player's Role card, or at two Pantry Role cards |
+| 8 | L'Aboyeur | 12 | the table | look at two other players' Location cards |
+| 9 | Le Sous-Chef | 10 | the table | swap your Role card with another player's; you see your new one |
+| 10 | Le Tourrier | 14 | the table | must look at one Pantry Role card, then swap it with any player's Role card, your own included |
+| 11 | Le Plongeur | 12 | the table | swap two other players' Role cards, or two other players' Location cards; nothing is shown |
+| 12 | Le Garde Manger | 8 | the table | must swap your Role card with a Pantry Role card; nothing is shown |
+| 13 | L'Inspecteur Sanitaire | 8 | the table | look at your own Role and Location cards |
+
+**The Iron Cloche.** It may cover the Boulanger's own card. For the rest of the night nobody can peek at or swap the covered card, except that the Inspecteur still reads their own cards; an act that would move a player's own covered card (the Sous-Chef's, the Rat's or the Garde Manger's own) cannot be made at all, and the Garde Manger's must-act is then skipped. Every later waker sees where it lies, and it becomes public at dawn (`OnubBoard.cloche`). It never covers a Pantry card.
+
+**Must and may.** The Tourrier and the Garde Manger must act: if their window ends first, the server completes the act by seed (`nightTimeout` stream), and the actor's reveal is still written. Every other act may be skipped. Every act arrives as one `act.ability {abilityId, targets}` through the command queue (the Tourrier's two steps as two messages, the second naming the seat whose Role card takes the peeked Pantry card) and is accepted only if the phase is night, the open window's role is the actor's dealt role, the act belongs to that window (a lone-Spore act only when no other seat was dealt Le Champignon), the actor has not acted this window, and every target is legal: the right kind and owner of card, distinct, never under the Cloche. Refusals: 425 outside the actor's window, 422 for anything else. Every accepted act answers its actor with `nightReveal` (empty for an act that shows nothing), so the client always knows it went through.
+
+**Dawn and the Morning Rush.** A 5 s dawn shows where the Iron Cloche lay, then the Morning Rush opens: one 300 s argument with global text chat, the portraits, and the public board (the piles, their flags, the ruin line, the Cloche and the deck in play). **Claims** are structured and public, one per seat, replaced by the next (`meeting.claim`): the role you say you were dealt, optionally the station you say you worked at and the card you say you played, and up to `claims.maxSaw` (2) things you say you saw, each a player or the Pantry with a role or a station ("I was L'Aboyeur, I worked the Oven and played Oak Firewood: Hana's Location card was the Fridge, Bo's was the Mixer"). Claims are claims: the server checks only that the ids exist and that the claimed role is in the deck. Votes may be cast and changed during the Rush and during CRUST; who has voted is public, for whom is secret.
+
+**The vote.** When the Rush ends, CRUST gives everyone `voteS` 20 s to point: at another player, or at the Pantry (`"pantry"`). It always opens with the countdown, "Un, deux, trois, CRUST!" (`timers.crustCountdownS` 3 s), and its early end, once every seat in play has voted, applies only after the countdown has played. There is no Skip and no self-vote (422); a missing vote is an abstention and the reveal names the abstainers. Resolution (`resolveDawn`): everyone holding the most votes goes in the oven, ties included, if that count is at least `vote.minVotesToTurnOut` 2; if the Pantry is among them it "goes in" too, which removes nobody. **Restaurant Shutdown:** if a player whose final card is Le Critique Gastronomique goes in, the player that seat voted for goes in with them (`vote.critiqueHops` 1 hop; nothing for a vote at the Pantry or an abstention). A seat that leaves during the match abstains and is no target, but keeps its cards: they still move at night and still win or lose. Winners are judged on the **final** cards after the hop; the first row that holds applies.
+
+| Row (`winners[].id`) | When | Who wins |
+|---|---|---|
+| `croissantAndBakers` | the Croissant and a Spore both go in, the dough not ruined | the Croissant and every Loyal Baker card |
+| `croissant` | the Croissant goes in | the Croissant alone; the Croissant beats ruin |
+| `ruined` | the dough was ruined at prep | every Team Mold card |
+| `sporeOut` | a Spore goes in | every Loyal Baker card |
+| `sporesHide` | a Spore is at the table and none goes in | every Team Mold card, those in the oven included |
+| `cleanTable` | no Spore at the table and nobody goes in (pointing at the Pantry, or votes too spread) | every Loyal Baker card |
+| `moldOut` | no Spore at the table and a Team Mold card goes in | every Loyal Baker card |
+| `wrongOven` | no Spore at the table and someone else goes in | every Team Mold card at the table; nobody if no player holds one |
+
+`GameState.winner` is `croissant` when the Croissant wins (with or without the Bakers), `village` for the Bakers, `cabal` for Team Mold, `nobody` when no seat wins; the end screen's headline is the row's own line, never the enum.
+
+**Reveal and game over.** The reveal names everyone who went in (with the Critique's drag shown apart), the final Role card each held, whether the Pantry was pointed at, and the abstainers; those in the oven are marked out. The end screen shows, per seat, the Role card dealt and held at dawn, the station chosen and the Location card held at dawn, and the card played at prep; the Pantry's cards dealt and at dawn; every pile with its lost cards named; the Cloche; the night as a timeline of every accepted act in window order ("Le Sous-Chef took Hana's card", "Le Plongeur swapped Bo's and Kit's Location cards", "Le Garde Manger swapped with a Pantry card, without looking"), marking acts the server completed by seed; and the vote arrows. Then the room returns to the lobby with the same code and the same mode and deck.
+
+**Role cards.** Every card carries the line (`cardLine`): "You play for the card in front of you at dawn, not the card you were dealt. Argue for who you think you are." The card shows the French name, the English gloss under it, the team's name (`teams[team].name`, sent as `RoleRevealPayload.teamName`), the night act and the text below.
 
 | Role | Card text |
 |---|---|
-| Poisoner | You and your partner finished Lord Vane; the other plates must never learn it. Survive the dawn vote and the manor is yours. |
-| Hireling | You carried the poison and know who used it. They do not know you; take the blame if it saves them. |
-| Sin-Eater | By custom you taste the bread of the guilty. Tonight you may taste one mourner's loaf, or two of the dead's. |
-| Cutpurse | Old habits: you take someone's loaf and leave your own. You learn what you stole, not what you left. |
-| Busybody | You cannot leave other people's plates alone. Swap two mourners' loaves and tell no one, not even yourself. |
-| Sot | You drank the wake dry and knocked your loaf onto the oven ledge. Take one of the dead's instead; you will not remember which. |
-| Lamplighter | You rise before dawn to light the square. Crack your own loaf and know what you truly hold. |
-| Pallbearer | You and your fellow carried the coffin and can vouch for each other. Neither of you is a Poisoner. |
-| Debtor | Vane held your note; if the village turns you out it dies with you. Be suspicious enough to hang, not so loud they ignore you. |
-| Gamekeeper | If the village turns you out, you take your vote with you. Point carefully. |
-| Mourner | You came for the bread and the will. Listen, count the claims, and vote. |
+| Le Boulanger | Your dough, your bench, your cloche. Slam the Iron Cloche over the one card you trust; nothing touches it until dawn. |
+| Le Champignon | You crawled out from behind the damp bricks to ruin the Mother Dough. Ruin it at prep, or keep every Spore out of the oven. |
+| Le Levain | Your jar bubbles over to feed the spores. You know who they are and they do not know you: lie for them, even into the oven. |
+| L'Apprenti | Sixteen hours on a stool and nobody pays you. You read one line of the shift log; use it to cover for Team Mold, whoever they are. |
+| Le Rat de Cave | You pry up the floor grate and leave flour prints in someone else's room. Trade your alibi for a better one. |
+| Le Commis | You chopped side by side all shift. Vouch for each other, unless the night moved one of you. |
+| Le Chef de Cuisine | Under the green banker's lamp you audit the personnel files. Find the rot before the bake. |
+| L'Aboyeur | The grainy green monitor shows every room. You know where two people really worked; catch the one lying about it. |
+| Le Sous-Chef | You ring the brass bell and reassign the staff. Whatever card you take is who you are now, even if it is mold. |
+| Le Tourrier | You fold an unused recipe back into the line. Someone wakes up as somebody else, and only you know what went in. |
+| Le Plongeur | Soapsuds, steam and wet-floor cones: you put the pans back in the wrong places, and nobody, you included, knows which. |
+| Le Garde Manger | One glass of cooking wine too many. You wandered off and came back wearing someone else's apron. |
+| L'Inspecteur Sanitaire | Clipboard, thermometer, UV torch: you make the last sweep before opening. You alone know what you hold at dawn. |
+| Le Croissant Rassis | Hard as a rock under the display-case spotlight, you pray for the oven. Act just guilty enough; if they bake you, you win alone. |
+| Le Critique Gastronomique | Behind the velvet rope with an empty plate and a fountain pen, you judge the kitchen. If they bake you by mistake, your pen drags your vote in with you. |
 
-**Balance.** At 4-5 the deal is swap chaos with the Debtor as the first bluff; 150 s of text discussion is enough. At 6-7 the Hireling punishes "no Poisoner here, vote in a circle" play and the Lamplighter gives the first verifiable late claim. At 8-10 three verified-claim sources (Sin-Eater, Lamplighter, Pallbearers) face two liars and a Hireling, and the Gamekeeper makes mass-voting costly. Every count lands inside the 5-7 minute target (card 12 + dusk 10 + night 60-102 plus jitter + dawn 10 + discussion 150-210 + vote up to 25 + reveal 20); discussion is the knob if playtests want a longer match. Replayability comes from the deal and the swaps reshuffling identity every match and the swap log teaching the table at the end. The mode has no ranking.
+**Privacy.** Nothing a client receives before game over tells it another seat's station, card played, night act, current card or whether it woke; every seat sits in the `loft` pseudo-scene (`LOFT_SCENE_INDEX`) from prep to the lobby, so the server encodes no presence for anyone; prep commits change nothing public; the Pantry's contents reach only a peeker; the open window is public, since every window of the deck runs whatever was dealt; the deal, the pile order, the thaw, the perk, the night script and the timeouts each draw from their own crypto-seeded stream, and every NPC seat from its own `npcPlay:<seatId>` and `npcTiming:<seatId>` streams (`sim/seeds.ts`), so nothing public correlates with the deal.
 
-**V1 cut.** Ships: mode toggle; decks for 4-10 with the Pallbearers and Gamekeeper replaced by Mourners (nine roles); bakery greybox with plates, ledge and ledger; dark loft view and Conductor; dusk plate-setting; Meeting reuse with no Skip and claim chips; `resolveDawn` and the winner table; the reveal with the swap log. V1.1: Pallbearers, Gamekeeper, a dawn walk in the bakery before the meeting, flour footprints, eleven role portraits, lobby role picks.
+**NPC seats** (3.12 seats them; their numbers are `balance.onub.json` `npc`, the row chosen by `Settings.npcDifficulty`). An NPC readies on the role card like everyone (3.12). At prep it commits after a delay drawn from `npc.commitS` (12-40 s), at a station drawn uniformly whatever its role, with a seeded good card, or, if its dealt role is Team Mold, a sabotage card with chance `sabotageChance` (0.4 / 0.6 / 0.8). Each NPC seat draws only from its own streams, `npcPlay:<seatId>` and `npcTiming:<seatId>`; the prep sabotage roll is drawn by every NPC and ignored unless its card sabotages. Woken, it acts at a tick drawn from `actFrac` (0.25-0.75) of its window, a flat seeded draw over the legal acts of its wake view plus "nothing" for an act that may be skipped; the Tourrier's second step follows its first. In the Rush it posts one claim at `claimFrac` (0.05-0.4) of the Rush: the truth for a Baker card (`claimTruthChance.baker` 1: its dealt role, station, card and what it saw); for Team Mold a seeded Baker role of the deck, the lone Spore preferring the Pantry role it peeked, with a station whose pile is clean when it sabotaged; the Croissant claims a seeded Baker role with a station whose pile holds sabotage, to look guilty. It votes at a tick drawn from `voteFrac` (0.3-0.9) of the Rush plus CRUST: with chance `smartVoteChance` (0.3 / 0.6 / 0.9) the seat it has the best evidence against (a seat its own peek showed holding a Team Mold card, else a seat whose claimed station has net sabotage and is not a known teammate), otherwise a seeded other seat; never the Pantry, never itself. NPCs never chat (3.12).
 
-**Trademark note.** The mechanics of the one-night card game are not protected, but its name and its card art and text belong to its publisher. The parody title is fine for a free game among friends; if Who Did It is ever sold, ship the mode under a neutral label and never reuse the card game's text or art. The label is chosen only if a sale happens (A22); "The Wake Loaves" is the working suggestion.
+**Balance and length.** Night length is the windows of the deck plus 2 s per window, before jitter: 78 s at 4-5 players, 88 s at 6, 100 s at 7, 110 s at 8, 122 s at 9, 138 s at 10 with the default decks (jitter adds up to 3 s per window). The whole match is card 12 + prep up to 60 + crime scenes 15 + night + dawn 5 + Rush 300 + CRUST up to 20 + reveal 30: about 8.7 minutes at 4 players to 9.7 at 10, plus jitter, and less when prep or CRUST ends early, so the lobby chip reads 8-10 (`targetLengthMin`) and the Rush is the knob if playtests want longer. At 4-5 the deck is two Spores against an investigator, a camera and two swappers, with the Croissant as the first bluff; at 6-8 the Levain, the Rat and the Garde Manger make every alibi and every identity doubtful; at 9-10 the Cloche and the Tourrier give the Bakers a protected fact and a new piece of chaos. The soak reports the ruin rate per party size; the target is 20-30% of matches with a Team Mold card at the table, tuned with `ruin.weightByCount`, the Oven's `weight` and `underMixWeight`. Replayability comes from the deal, the free choice of stations and the night reshuffling both identities and alibis; the end screen's timeline teaches the table. The mode has no ranking.
+
+**V1 cut.** Ships: the mode toggle and the deck editor; the 15 roles of `roles.onub.json` with the Critique as Restaurant Shutdown; the kitchen overview, the four station rooms and their mini-games over the owner's art (the Brick Oven generated to match, A17); the crime-scene board; the night as role scenes with the card table and the lights-out screen; the Morning Rush with structured claims, the Pantry vote and CRUST; the winners table; the reveal and the end screen with the act timeline. V1.1: the Critique's copy variant (`rules.critiqueCopies`), lobby role picks beyond the deck editor, animated card moves at the end screen.
+
+**Naming caution.** The mechanics of the one-night card game are not protected, but its name and its card art and text belong to its publisher; nothing here reuses them. The parody title is an in-joke for a free game among friends and appears only in the lobby chip's `lobby.mode.onub` line. If Who Did It is ever sold, the mode ships under the neutral label **"The Night Shift"** (the working label of A22, in place of "The Wake Loaves"), and no other line changes.
 
 ### 3.12 NPC fill (below the minimum)
 
-**Decision (owner, 2026-10-10, A16 and A26):** a party may start with fewer than `players.min` humans; the server fills the empty seats with NPC villagers so the full roster is dealt.
+**Decision (owner, 2026-10-10, A16 and A26):** a party may start with fewer than `players.min` humans; the server fills the empty seats with NPC villagers so the full deck is dealt (3.1).
 
-- **Seats.** Start is enabled with at least 1 human. With fewer than `players.min` players the server adds NPCs up to `players.min` when Start is accepted, before it deals, so the full roster row is always dealt (M3c; the A28 cut row is gone); the leader may add NPCs by hand in the lobby with "Add NPC" up to `players.max` and remove them again, the newest seat first (M3c). A human joining a full lobby takes an NPC's seat, the newest first (M3c).
-- **Same game.** NPCs are dealt from the same roster row and can hold any role, the Killer included; their roles are as secret as a human's. Rules, the practice label at 4 (3.1, 3.9) and any ranking depend only on the total player count, never on how many seats are NPCs.
-- **Hidden seats.** Nothing a client receives marks a seat as an NPC: `isNpc` lives in room memory only, and NPCs take human-style names from a name pool, are never the party leader, and carry an id of the same shape as a session id; the party publishes only how many seats are NPCs, never which (M3c). NPCs never chat, which a table that knows each other will notice; nothing on the wire confirms it.
+- **Seats.** Start is enabled with at least 1 human. With fewer than `players.min` players the server adds NPCs up to `players.min` when Start is accepted, before it deals, so the full deck row is always dealt (M3c; the A28 cut row is gone); the leader may add NPCs by hand in the lobby with "Add NPC" up to `players.max` and remove them again, the newest seat first (M3c). A human joining a full lobby takes an NPC's seat, the newest first (M3c). (M5a) An NPC seat is never Ready the moment it appears: a seat added with Add NPC, and every NPC seat when a match returns to the lobby, turns Ready 2-9 s later (`npc.ready.delayS`), each on its own draw, the way a human clicks.
+- **Same game.** NPCs are dealt from the same deck and can hold any card, the Killer included; their cards are as secret as a human's. Rules, the practice label at 4 (3.1, 3.9) and any ranking depend only on the total player count, never on how many seats are NPCs. (M5a) In the main mode an NPC walks as its card's character like every seat; an NPC cover role wears the look it was shown and never Impersonates (3.17); an NPC holding a night power uses it as 3.2 says, at the moment "Meetings, the role card and night powers" below gives.
+- **Hidden seats.** Nothing a client receives marks a seat as an NPC: `isNpc` lives in room memory only, and NPCs take human-style names from a name pool, are never the party leader, and carry an id of the same shape as a session id; the party publishes only how many seats are NPCs, never which (M3c). (M5a) **Everything an NPC shows is something a human can do the same way in the same place.** It walks at walking speed and never runs or sneaks. It never turns on the spot: it faces where it last stepped, and it ends every approach to a station with a step toward the station. It starts a hold only with the verb a human uses (`act.hold`), so it plays the `interact` animation only while a hold the server accepted from it runs, and it works with that animation only at stations where a human could start the same hold (`routines.json` `holds`; there are none in M5a, so at every station it simply stands, idle). Its ready and vote ticks are spread over the spans a human uses (below). NPCs never chat, which a table that knows each other will notice; nothing on the wire confirms it.
+- **Animation (M5a, every seat).** A seat shows `interact` (`Presence.animId` 4) on every tick an `act.hold` of its own runs, whatever the hold, human or NPC; it shows `walk` only on a tick its body actually moved, so a seat pushing against a wall stands idle instead of walking in place; `idle` otherwise. One `interact` id serves every hold, as one `swing` serves every strike, so the animation never tells one action or role from another.
 - **Difficulty.** A lobby setting, Easy / Normal / Hard, default `npc.defaultDifficulty`. It is enabled only when the party holds at least `npc.difficultyMinNpcs` NPC seats; with fewer, NPCs play the default. The setting and the mode survive the return to the lobby after a match (M3c). Each level is a row of `balance.json` `npc.difficulty`:
 
 | Value | Meaning |
 |---|---|
-| `killChancePer10s` | A Killer NPC strikes a human alone in its scene at night with this chance per 10 s of opportunity |
+| `killChancePer10s` | A Killer NPC strikes a human alone in its scene after dark with this chance per 10 s of opportunity |
 | `reportDelayS` | Delay before an NPC reports a body it sees |
 | `plantsPerNight` | False clues an Accomplice NPC plants per night |
 | `suspectVoteChance` | Chance an NPC votes for the player with the most Verified clues on the Case Board instead of Skip |
 
-- **Behaviour (V1, scripted, server-side, no client).** Wander between scenes through the portal graph; perform tasks at nodes at a slow pace; at night prefer lit scenes and hiding spots; report a body on sight; vote as the difficulty row says. A Killer NPC washes at the nearest basin after a kill, returns to the square and votes with the majority. The walk is the bot walkers' (ARCHITECTURE 5.12): a new heading every `npc.wander.stepMinS` to `npc.wander.stepMaxS`, aimed at the nearest portal with chance `npc.wander.portalSteerChance`, a portal in reach taken with chance `npc.wander.portalChance`; an NPC casts its vote `npc.vote.delayMinS` to `npc.vote.delayMaxS` after the discussion opens, and readies on the role card after a delay drawn from the same range, so its ready tick looks human (M3c; tasks and hiding wait for M4 and M5). NPC seats hold no Notebook and do no tasks until then.
+- **Routines (M5a, main mode).** In a world phase an NPC runs a routine instead of the M3c wander.
+  - **Persona.** When the match is dealt, each NPC draws a **home**, one interior scene of the map that is open at the party's size and lit at night (see Night; no two NPCs share a home while the map has enough), and **3 favourite stations** (`npc.routine.favouriteStations`), in 3 different scenes where the map allows.
+  - **Stations.** A station is a prop whose kind `routines.json` lists under an activity: **work** (the task benches and sources, the pump, the flour bin, the oven, the basins, the goat, the fence, the shutters) by day; **social** (the notice board, the dartboard, the bell, the lamps, the furniture and decorations) by day and by night; **rest** (the lantern posts) by night. Grace, day and immunity are the **day** class of phases; dusk, night and the Final Night hunt the **night** class (`routines.json` `phaseClasses`). Props of any other kind (the kit chest, the teaching clue, keys, gas pockets, locked doors, the frozen round-4 bakery props) are never stations.
+  - **Choosing.** Whenever an activity ends, the NPC draws the next one from its phase class's weights:
 
-- **Rules of the scripted brain (M3c).** A heading aimed at a portal follows the real path to it, so a wall between never pins the seat (M3c). An NPC reports the nearest body it is within reporting reach of, `reportDelayS` after it first stands there, and a Killer NPC never reports (M3c). A Killer NPC strikes only at night with the Knife ready, and only when exactly one other living seat shares its scene and that seat is a human, not its Cabal partner; the chance `killChancePer10s` is spread evenly over those ten seconds, and after a kill it walks to the nearest scene with a basin and then to the square (M3c). Until the Case Board ships (M4) "the player with the most Verified clues" is the seat the NPC had most often in sight when it came across a body; an NPC with no such memory votes Skip, and a Killer NPC votes with the plurality of the votes already cast (M3c). In quick mode (3.11) an NPC votes for a random living seat other than itself and never Skip (M3c).
-- **Scope.** NPCs ship in M3c (ROADMAP 7.1) after the first playable, reusing the bot movement of `tools/bots/swarm.ts` inside the room as entities rather than clients. In quick mode (3.11) NPCs are sleepers with a bedroll like everyone else, and the Conductor resolves their acts at random within their window.
+    | Class | work | stroll | idle |
+    |---|---|---|---|
+    | Day (`npc.routine.weights.day`) | 0.5 | 0.3 | 0.2 |
+    | Night (`npc.routine.weights.night`) | 0.2 | 0.3 | 0.5 |
+
+  - **Work.** The NPC walks to a station and stays 12-30 s (`npc.routine.stationDwellS`): about 2 stations in a 60 s day. A station qualifies when its activity is open in the phase class, its prop and scene are present and open at the party's size, its scene belongs to the map and is reachable, at night its scene is lit, it is not the station the NPC just left, and no other NPC is at it or heading for it. Until the NPC's **scene dwell** has run (30-90 s, `npc.routine.sceneDwellS`, drawn at every scene entry and at every placement on the square) only stations of its own scene qualify; once it has run, only stations of other scenes do, so the NPC moves on. It takes a favourite when one qualifies, else a qualifying station at random; when no station of another scene qualifies it falls back to its own scene's, and when none qualifies at all it strolls instead. It stands at the centre of a floor tile orthogonally next to the station, inside the verb reach (1.5 tiles, 3.7), and takes one last step toward the station, so it faces it. If another seat already stands on that tile when it arrives, it idles where it is and picks again. Where `routines.json` `holds` names a hold for that kind of prop, it works in cycles: it starts that hold with the human verb and, when the hold ends, pauses 1-3 s (`npc.routine.workPauseS`) before the next; a refused hold ends the cycles for that visit and it just stands. Where `holds` names none (every station in M5a), it stands there, idle, for the whole dwell.
+  - **Stroll.** The NPC walks to a random floor tile of its own scene 3-10 tiles away along a path (`npc.routine.strollTiles`).
+  - **Idle.** The NPC stands still 2-8 s (`npc.routine.idleS`), facing where it last walked.
+  - **Legs and pauses.** A walk inside one scene that ends at a portal, and a stroll, is a **leg**; after a leg the NPC idles 2-8 s with chance 0.6 (`npc.routine.idleChanceAfterLeg`); the last walk to a station ends in work, not in an idle. An NPC that has walked 12 s (`npc.routine.maxWalkS`) without standing still for 2 s (`idleS` minimum) stops at the next tile and idles. A goal it has no path to, whose crossing is refused, or toward which it gains less than a quarter tile in 2 s (`npc.routine.stuckS`) is dropped: it idles and picks again, never the same station.
+  - **Clues.** The first time an NPC sees a clue it has not collected (inside its vision radius, 3.7), it decides with chance 0.5 (`npc.react.collectChance`) to collect it; at its next choice, if it is still in the clue's scene and the clue is still there, it walks to the clue and holds Collect exactly as a human does (2 s, 3.4), and the entry goes to a Notebook nothing reads. It never tries during immunity, when no verb works.
+  - **Fallback.** In a scene with neither a qualifying station nor a stroll tile, the NPC walks as in M3c: a new heading every 1-3 s (`npc.wander.stepMinS` to `npc.wander.stepMaxS`), aimed at the nearest portal with chance 0.25 (`npc.wander.portalSteerChance`), a portal in reach taken with chance 0.4 (`npc.wander.portalChance`), until it reaches a scene with somewhere to go.
+  - **Targets.** An NPC walks for about a third of a day. The server tests hold every NPC to walking at most 60% and at least 10% of a day, to a still stretch of at least 2 s in every 20 s of day, and to no portal crossing before its scene dwell has run (outside the exceptions below).
+- **Night (M5a).** A scene is **lit at night** when it is not dark (no `dark: true`, its `biome` neither `forest` nor `cave`) and it is an interior, or it holds a light that shines at night: a scene `lights` entry with no `phases` or with `night` among them, or a prop of a `routines.json` `lightKinds` kind (the lantern posts of a square). Whenever an NPC stands in a scene that is not lit during the night class (so at once when dusk or the Final Night hunt begins), it waits 0-15 s (`npc.night.leaveDelayS`, a fresh draw each time), its routine going on inside that scene (it takes no station and crosses no portal meanwhile, so it strolls and idles), then walks to its home with its usual leg pauses (Legs and pauses) and whatever its scene dwell, or to the nearest lit scene when its home is out of reach. Through the night class it keeps to lit scenes: its stations are the ones open at night in lit scenes, it strolls only inside its scene, and it crosses a portal only toward a lit scene. A Killer NPC whose scene dwell has run picks, when one qualifies, a station in a lit scene where exactly one living seat stands and that seat is a human who is not its Cabal mate, so it hunts the way the strike rule below kills.
+- **Reactions (M5a).** A reaction interrupts the routine and ignores the scene dwell and the walking pause. **A body**: the first time an NPC sees a body it did not make (inside its vision radius), it freezes 0.5-1.5 s (`npc.react.startleS`), then walks to the body and reports it `reportDelayS` after it first stands in report reach (the difficulty row). A Killer NPC reacts to a body it did not make exactly as any NPC does: it freezes, walks to it and reports it `reportDelayS` after it stands in reach. It never startles at its own. **A placement**: put on the square at grace or at immunity, an NPC stands 3-8 s (`npc.react.afterPlacementIdleS`) before its routine resumes, with a fresh scene dwell. **The Knife and the flee** follow the brain's rules below.
+- **Meetings, the role card and night powers (M5a).** An NPC casts its vote at a tick drawn uniformly over 0.3-0.9 (`npc.vote.windowFrac`) of the meeting's discussion time (as set when the meeting opens, a wrong-ejection bonus included) plus the vote time (`phases.voteS`, 25 s), counted from the start of the discussion: 26-77 s in with a 60 s discussion, 30-90 s with 75 s, 35-104 s with 90 s. On the role card an NPC readies 2-9 s (`npc.ready.delayS`) after the card opens; in the lobby it readies as the Seats bullet says. An NPC holding a night power (3.2) uses it at a tick drawn uniformly over 0.1-0.8 (`npc.nightPower.windowFrac`) of the time from the start of dusk to the end of the night (11-88 s with the 10 s dusk and 100 s night), or of the Final Night hunt (9-72 s of 90 s); an NPC Gamekeeper fires its Last Shot 2-8 s into its aim (`npc.nightPower.lastShotS`), or holds its fire when it has nobody to vote for. Each NPC seat draws only from its own streams, `npcPlay:<seatId>` and `npcTiming:<seatId>` (`sim/seeds.ts`), never from the deal's or another seat's: the ready, vote and night-power ticks and the Last Shot delay from `npcTiming`, every other choice (persona, activity, station, stroll tile, durations, the leave delay, clue, strike roll, night-power pick, vote target) from `npcPlay`. A draw that only some cards use is made by every NPC at the same moment and ignored when its card does not use it (the strike roll on every check, below; the vote's draws; the night-power tick and pick; the Last Shot delay), so no card changes how far a seat's streams move.
+- **Rules of the scripted brain.** (M5a) A Killer NPC is any NPC that holds `kill`: a Killer, or an Accomplice after Inherit (3.2). Every NPC walk follows a tile path, so a wall between never pins the seat (M3c). An NPC reports the nearest body it is within reporting reach of, `reportDelayS` after it first stands there (M3c); (M5a) a Killer NPC never reports a body it made and reports any other as every NPC does (Reactions). A Killer NPC strikes only in a phase the Knife works in (`abilities.json` `kill.phases`: dusk, night and the Final Night hunt, 3.3) with the Knife ready, and only when exactly one other living seat shares its scene and that seat is a human, not its Cabal partner; the chance `killChancePer10s` is spread evenly over those ten seconds. (M5a) The strike roll is drawn by every NPC on each check, a tick of such a phase on which exactly one other living seat shares its scene and that seat is a human not crossing a door, and is ignored unless the NPC holds `kill`, its Knife is ready and that seat is not its Cabal partner. After a kill a Killer NPC walks to the nearest scene with a basin and then to the map's hub (the map manifest's `hub`, the overworld square in Hollowmere), there being no wash verb yet (M3c). Until the Case Board ships (M4) "the player with the most Verified clues" is the seat the NPC had most often in sight when it came across a body; an NPC with no such memory votes Skip, and a Killer NPC first votes at its drawn tick with the plurality of the votes already cast and re-reads it every second (M3c). (M5a) When Skip is disabled (the forced vote of 3.8 and the Final Night vote), an NPC with no suspect, and a Killer NPC with no plurality to follow, votes for a random living seat other than itself. (M5a) An NPC whose Notebook holds a Cabal confession (Hear Confession, 3.2) votes for that seat and aims its Last Shot at it, ahead of every rule above (the confession heard first, while that seat lives).
+- **Scope.** NPCs ship in M3c (ROADMAP 7.1) after the first playable, inside the room as entities rather than clients. (M5a) The routines replace the M3c wander, which stays only as the fallback above. In quick mode NPC seats follow 3.11 "NPC seats". NPC seats keep a Notebook only for the clues they collect and do no tasks until M4d; when a human station hold ships, its row in `routines.json` `holds` turns NPC work at those stations into the same hold, with no change to the brain.
+
+### 3.13 Maps and presentation
+
+**Decision (owner, 2026-10-17, A49; round-5 contract A50):** the leader picks the map in the lobby; every map has at least one forest and one cave; both modes present the world isometrically. The projection belongs to the client alone: the server, the rules and the data stay on the square grid.
+
+**Choosing a map (M5a).** The lobby's settings panel has a map row: each map whose `modes` lists the chosen mode shows its name, a one-line blurb and a thumbnail. The leader picks; everyone else sees the pick. The default is Hollowmere. The pick is `Settings.map`: the server takes a known map id from the leader in the lobby, refuses any other id like a bad setting, and keeps the pick through mode changes and the return to the lobby, like the mode and the NPC difficulty (3.12). The quick mode does not walk (3.11), so it ignores the map and the map row is hidden while it is chosen. At Start the seats are placed on the chosen map's hub, and no door leads off the map, so a match only ever uses the chosen map's scenes. The party size still picks the profile (Small 4-6, Medium 7-8, Large 9-10; WORLD 4.3), and a door to a scene above the profile stays boarded and refuses with `CLOSED`.
+
+**What a map is.** A map (`packages/content/data/maps/<id>.json`) is a closed graph of scenes. Every scene belongs to exactly one map, and every portal leads inside its own map. The map names:
+
+- a **hub**: an exterior open at every party size, holding the Emergency Bell (`bell`) and the kit chest (`kitChest`);
+- 10 **start spawns** on the hub, over which the first placement spreads the seats in seat order (M3);
+- 10 **meeting spawns**, over which everyone is spread when a meeting ends;
+- the grace-phase **teaching clue** (`teachingClue`, 2 step 5).
+
+A rule that says "the square" or "the overworld" means the map's hub and these spawns.
+
+**The maps (M5a).**
+
+| Map | Setting | Small (4-6) | Medium adds | Large adds |
+|---|---|---|---|---|
+| **Hollowmere** | Fog-bound harbour hamlet, autumn 1931 (WORLD 4.1) | the village; the tavern and its back room; the apothecary and its loft; the widow's parlour and bedroom; Crumb's Ovens; Gallows Wood (forest); the Tin Gallery mouth (cave) | **the Fenwood** (forest) and **the Flooded Gallery** (cave); Vane Manor (hall, upstairs); Hale Barn | St Brannock's; the Undercroft |
+| **Blackpine** | The Vane company's logging camp and tin mine up the valley, the same night (WORLD 4.10) | the camp; the bunkhouse; the sawmill; Blackpine Woods (forest); the Workings (cave) | the Company Office; the Forge | the Deep Level (cave) |
+
+Hollowmere's new forest and cave close a loop from the Medium profile up: the village, Gallows Wood, the Fenwood, the Flooded Gallery, the Tin Gallery mouth and back to Gallows Wood. A one-way sinkhole also drops from the Fenwood into the Gallery. Below Medium their doors stay boarded, so a small party keeps the old, tighter Hollowmere with one forest and one cave. Blackpine is the tighter and wilder map. Its loop runs from the camp through the woods, in at the Workings' vent drift and back out of the adit. A one-way log chute drops from the woods to the camp. The Large profile adds a second way under the hill: the woods' drowned adit to the Deep Level, and the Deep Level's ladder up to the Workings.
+
+**Biomes.** Every scene has a biome: `village` (a settlement exterior), `house` (rooms), `forest` or `cave`. The biome picks the scene's default ground and walls, its ambient sound bed and its look. It changes no rule except the darkness of caves (below). **Every map has at least one forest and one cave open at the Small profile**, so every party size has both. In M5a they are where hiding is easiest and the night is darkest:
+
+- Forests are trails 2-3 tiles wide through dense trees, opening into clearings, with loops and chokepoints.
+- Caves are corridors 2-3 tiles wide between chambers and flooded galleries. Shallow water is walked through at the normal speed in M5a; deep water is solid.
+
+Forest and cave scenes already carry the places where M5b puts resource nodes, creature spawners and quest givers (`nodes`, `spawners`, `givers` in the scene files). No code reads them in M5a, and none of them depends on a role.
+
+**Isometric presentation (M5a).** Both modes show the world in a 2:1 dimetric isometric view, seen from the south-east (SPRITES 10, WORLD 4.2):
+
+- A tile is a 128 x 64 px diamond. World north points to the upper right of the screen, and straight up is world north-west.
+- Characters, props, buildings and ground are pre-rendered from that one camera, with a pixel-art finish. For the main world the finish is one switch (`style.json` `pixelFinish.enabled.main`), set from the owner's answer at art Gate A (A50); the quick mode always keeps it.
+- Only the picture changes. The server, every rule, distance and radius in this document, the collision box and every id stay on the square 64 px grid.
+
+**Interiors are cutaways.** The north and west walls stand at full height, the south and east walls are drawn as low sills, and inner walls are drawn at half height, so a room can always be read.
+
+**Occlusion outside.** A tall thing (a building, a wall, a tree, a cliff) hides what stands north or west of it. It turns translucent (35%, `metrics.json` `lighting.occluderFadeAlpha`) while it is in front of your own character. It never turns translucent for anyone else. Standing behind the barn therefore hides you from other players' eyes, though not from the wire (3.7).
+
+Doors into buildings sit on a south or east face, so they are always in sight. M5a moves `ov.tavern_front` and `ov.apoth` to the south faces of their houses; their ids do not change.
+
+**Controls.**
+
+- The keys W, A, S and D (or the arrows) walk straight up, left, down and right on the screen. Two keys together walk along the grid.
+- A touch stick walks where the thumb points.
+- The speed in tiles is unchanged (3.7).
+
+The quick mode does not walk (3.11). Its kitchen and night rooms are isometric illustrations drawn in the same projection.
+
+**Lighting by phase and scene (M5a).** The world is drawn under a darkness layer that follows the phase (`metrics.json` `lighting.ambient`):
+
+| Phase | Darkness |
+|---|---|
+| Grace, day, immunity | `slate` at 40% |
+| Night, Final Night | `ink` at 90% |
+| Dusk, dawn | Eased between the two |
+
+Light cuts pools out of the darkness, at full strength out to 55% of the light's radius and fading to nothing at its edge:
+
+- **Your vision**: the radius of 3.7 (7 tiles by day, 3.5 at night, eased through dusk). On screen a circle of r tiles is an ellipse twice as wide as it is tall.
+- **The scene's lights** (`lights` in the scene file). Each light has its own radius in tiles and burns in its own parts of the day:
+  - lantern posts and lit windows from dusk to dawn;
+  - lamps, hearths, stoves, forges and charcoal kilns always;
+  - torches in the mines, the cellar and at the adit;
+  - cave moss and the mere-rot glow, in `teal`;
+  - moonlight in clearings at night;
+  - shafts of daylight at cave mouths by day.
+
+  Torches and fires flicker.
+
+**Dark scenes** (`dark: true`: every cave, the Undercroft and the apothecary loft) are night in every phase. Their darkness is `ink` at 94%, and your vision there is the night radius. A cave at noon is as dark as the village at midnight, except where its lights burn.
+
+Darkness stays a client-side picture in M5a, as 3.7 says. The server still sends every position in your scene, so a light shows nothing the wire does not already carry. Lights make the dark readable and the lit places worth standing in.
+
+In M5a nobody carries a light that anyone else can see. Your vision is drawn for you alone, so no glow on another character can say what card they hold. If M5b adds a light that others can see (a crafted lantern), it goes to whoever holds the item, never by role. M5b also moves dark scenes to the radius-plus-line-of-sight visibility of 3.7 on the server, together with the creatures.
+
+**Explored fog and the minimap** are M5b. M5a draws no memory of where you have been and no map overlay.
+
+### 3.14 Resources and crafting
+
+Round 6 (ROADMAP M5b); data fields are pre-seeded in round 5 (3.13).
+
+### 3.15 Mobs
+
+Round 6 (ROADMAP M5b); data fields are pre-seeded in round 5 (3.13).
+
+### 3.16 Quests and mini-games
+
+Round 6 (ROADMAP M5b); data fields are pre-seeded in round 5 (3.13).
+
+### 3.17 Characters and disguise
+
+**Decision (owner, 2026-10-17, A49):** every seat walks the main-mode world as its card's character, so roles are public by sight, except the cover roles, which always wear another card's look; the Killer can also borrow a living seat's face for a few seconds. In the quick mode (3.11) role art is private (your own card and night scene) and public only at game over.
+
+**Looks.** Every card of a deck is a character, a row of `looks.json`: a portrait (the role card, the meeting roster, the reveals, the end screen) and, for a non-cover card, a world character drawn in the 8 directions under `char/<lookId>/<anim>/<dir>` at the seat's height scale with its scarf tinted. The three cover cards (Killer, Accomplice, Drifter) have portraits only and no world character: nobody ever walks as a Killer. Look ids are public and name the character (`vicar`, `baker`), and every client loads the characters and portraits of the match's whole deck before the role card closes, so what a client loads never depends on its own card.
+
+**The public look.** `Player.look` holds each seat's look id. It is empty for every seat during the role card and is written for every seat in the same tick when the card closes: a non-cover seat's look is its card's, a cover seat's is the look it picked. From then on the roster, the nameplate, the meeting portraits and a seat's body all show that look, for the whole match.
+
+**The cover pick.** On the role card every seat sees the deck list and the look it will walk as. A cover role sees, instead of its own look, a picker whose **hints** are undealt cards, the first one selected from the start. Each cover role is shown every undealt non-cover card that no other cover role needs. A lone cover role sees them all (both, at 4 players); Cabal mates share theirs and pick in turn (the server refuses a look a mate wears); the Drifter sees only its own. A cover role that never picks wears its first hint. Every cover role always has at least one (3.9), and wearing a hint doubles nobody. The picker also offers the deck's other non-cover characters: wearing a dealt character's look is allowed and puts two seats in the same look, which the table will read as a counter-claim: one of the two is a cover. A cover role may change its pick as often as it likes until the card closes; Cabal members see each other's picks live. The cover is fixed for the match. While the card is up, Ready is held privately (the roster's Ready ticks stay clear), so a long pick tells nobody anything; the card ends when every seat is Ready or after 20 s (`phases.roleRevealS`).
+
+**Playing a cover.** The look is a claim, not a power: a cover role keeps its own card's abilities, kit and Bell pulls. A Killer who walks as the Vicar has no confessions to report and must invent them. (M5a) Nothing on the wire proves a claim. Notebooks are private and the Case Board is M4, so a fake Vicar's word stands against the real one's, as in Werewolf. The village tests a cover's story against the kill clues, the sightings and what each ejection reveals.
+
+**Impersonate** (Killer; dusk, night and the Final Night hunt; `balance.json` `impersonate`). Pick any seat the roster shows alive, other than yourself. For 15 s your character shows that seat's name, look, scarf and hat glyph; your height stays your own, the one on-screen tell. Your face changes only unseen: at once if no other living seat is in your scene, otherwise as you next pass a door, so the figure that arrives wears the borrowed face. If it has not changed within 10 s it is cancelled and costs no cooldown. Using Impersonate again, or daybreak, before it has changed cancels it the same way. It drops in place, with a puff, on your next Knife strike (a witness sees your cover). It also ends when a meeting opens or you die. Using Impersonate again while disguised, the 15 s running out, or daybreak each ask it to drop: it drops the next time you are alone in your scene or pass a door (the cooldown runs from the drop). The 10 s, the 15 s and the 45 s cooldown are `balance.json` `impersonate.applyWindowS`, `impersonate.durationS` and `impersonate.cooldownS`. The strike drops it whether the strike is voided or not, and a disguise carries through doors. You see yourself in the borrowed look. Everything else stays yours: kill clues show your own height and scarf, Blood shows on the borrowed figure, and Hunger's glowing footprints follow it. Night powers name seats, so they see through it. Ghosts see the true name over every borrowed face.
+
+**What each client sees** (M5a):
+
+| Who | In the world | In the roster and the meetings |
+|---|---|---|
+| Your own client | Yourself from your own position, in your look (or the borrowed one); others in your scene as avatars | Your card, your kit, your Notebook; every seat's name, traits and public look |
+| A living player, about others in the same scene | Each living seat as an avatar: the name, look, scarf and hat glyph of the seat it shows, its own height, its position, under an opaque handle that changes on every scene entry and death, and when an impersonation applies or drops (only when no other living seat is in the scene, at a door, or at a strike) | Names, traits, public looks; never a role, a scene or a position |
+| A living player, about seats elsewhere | Nothing: no position, no scene | As above |
+| A ghost | Every avatar of its scene, the living and the other ghosts, each with its true seat | Every role (3.7) |
+| A Gamekeeper aiming its Last Shot | No avatar at all (its screen is black until the aim closes) | As a living player |
+| Anyone, during a meeting, the reveal or game over | No avatar at all | As above, plus what the reveal shows (3.8) |
+
+**Reveals.** An ejection shows the ejected seat's role portrait beside the look it wore. A death in the world shows nothing until the next meeting flips `alive`, and no role until game over. The end screen shows, for every seat, the role card, the look it wore, and the two undealt cards.
+
+**(M5a) On the wire.** The look is the public `Player.look`; others are drawn from scene-scoped avatars keyed by random handles, and the Kill and the Bandage name a handle, which the server resolves to a seat; list acts (Impersonate, the night powers) name a seat. There is no cover flag and no disguise flag anywhere: a cover look is sent exactly like a real one, and an impersonation is an avatar like any other. Schema, messages and the privacy tests are ARCHITECTURE 5.4 and 5.5.

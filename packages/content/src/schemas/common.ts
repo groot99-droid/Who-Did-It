@@ -3,6 +3,12 @@ import { z } from 'zod';
 /** A camelCase record id such as `killer`, `sinEater` or `skeletonKey`. */
 export const Id = z.string().regex(/^[a-z][A-Za-z0-9]*$/, 'ids are camelCase');
 
+/**
+ * A look id from looks.json (GDD 3.17): the atlas body id of `char/<lookId>/<anim>/<dir>`, so lowercase letters and
+ * digits only.
+ */
+export const LookId = z.string().regex(/^[a-z][a-z0-9]*$/, 'look ids are lowercase letters and digits');
+
 /** A snake_case world id such as `tavern_bar` or `cave_side` (scenes, spawns). */
 export const WorldId = z.string().regex(/^[a-z][a-z0-9_]*$/, 'world ids are snake_case');
 

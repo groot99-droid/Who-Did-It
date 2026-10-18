@@ -5,6 +5,8 @@
   "zoneId": "bakery",
   "profile": "small",
   "kind": "interior",
+  "biome": "house",
+  "dark": false,
   "size": { "w": 18, "h": 11 },
   "notes": "Wake Table with up to 10 named plates, oven ledge with the dead's three loaves, the Baker's ledger, cold oven, flour floor. Hub of the quick mode (GDD 3.11); in the main match a task node (Fetch the flour) and a Blood-wash basin.",
   "worldRef": "4.3",

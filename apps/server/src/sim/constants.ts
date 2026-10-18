@@ -13,7 +13,10 @@ export const FOOT_HALF_PX = (metrics.collisionBoxTiles * TILE_PX) / 2;
 export const INPUT_STALE_TICKS = 5;
 /** How close a player must stand to a portal tile centre to use it (balance.json `doors.reachTiles`, GDD 3.7). */
 export const PORTAL_REACH_TILES = balance.doors.reachTiles;
-/** `Presence.animId` values. One shared `swing` id covers every strike so it never discriminates a role. */
-export const AnimId = { idle: 0, walk: 1, swing: 2, die: 3 } as const;
-/** `Presence.statusBits`. */
-export const StatusBit = { transit: 1, bloody: 2 } as const;
+/**
+ * `Presence.animId` values. One shared `swing` id covers every strike and one shared `interact` id every hold,
+ * so neither tells a role or an action apart (GDD 3.12 "Animation").
+ */
+export const AnimId = { idle: 0, walk: 1, swing: 2, die: 3, interact: 4 } as const;
+/** `Presence.statusBits` and `Avatar.statusBits`; `ghost` marks a dead seat's avatar (GDD 3.17, Session 5F). */
+export const StatusBit = { transit: 1, bloody: 2, ghost: 4 } as const;

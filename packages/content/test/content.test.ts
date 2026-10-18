@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   abilities,
@@ -59,7 +61,9 @@ describe('palette and metrics (ASSETS 6.1, WORLD 4.2)', () => {
   it('locks the tile and character metrics', () => {
     expect(metrics.tilePx).toBe(64);
     expect(metrics.characterCellPx).toBe(128);
-    expect(metrics.maxStandingSilhouettePx).toBe(90);
+    expect(metrics.maxStandingSilhouettePx).toBe(112);
+    expect(metrics.maxSilhouetteTiles).toBe(1.75);
+    expect(metrics.characterHeadsTall).toBe(5);
     expect(metrics.overworldTiles).toEqual({ w: 64, h: 48 });
     expect(Math.round(Math.cos((metrics.camera.tiltXDeg * Math.PI) / 180) * 100) / 100).toBe(
       metrics.camera.verticalSquash,
@@ -68,9 +72,80 @@ describe('palette and metrics (ASSETS 6.1, WORLD 4.2)', () => {
 
   it("keeps the style token short and inside the formula's palette", () => {
     expect(style.styleToken.length).toBeLessThanOrEqual(120);
-    for (const hex of style.styleFormula.match(/#[0-9A-F]{6}/g) ?? []) {
-      expect(Object.values(palette.colors)).toContain(hex);
+    for (const text of [style.styleFormula, ...Object.values(style.compositions)]) {
+      for (const hex of text.match(/#[0-9A-F]{6}/gi) ?? []) {
+        expect(Object.values(palette.colors)).toContain(hex);
+      }
     }
+  });
+});
+
+/** 8-bit sRGB '#RRGGBB' to OKLab [L, a, b] (Björn Ottosson, 2020), for the palette spacing check. */
+function oklab(hex: string): [number, number, number] {
+  const n = Number.parseInt(hex.slice(1), 16);
+  const lin = (c: number) => {
+    const v = c / 255;
+    return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  };
+  const [r, g, b] = [lin((n >> 16) & 0xff), lin((n >> 8) & 0xff), lin(n & 0xff)];
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  return [
+    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+  ];
+}
+
+describe('the world palette (ASSETS 6.1)', () => {
+  const ramps = Object.values(palette.world.ramps);
+  const world = [...new Set(ramps.flat())];
+
+  it('is the union of the ramps: 64 distinct colours', () => {
+    expect(world).toHaveLength(64);
+  });
+
+  it('holds every token but magenta, which is in no ramp', () => {
+    const { magenta, ...rest } = palette.colors;
+    for (const [token, hex] of Object.entries(rest)) expect(world, token).toContain(hex);
+    expect(world).not.toContain(magenta);
+  });
+
+  it('lists only ramp colours as saturated', () => {
+    for (const hex of palette.world.saturated) expect(world).toContain(hex);
+  });
+
+  it('keeps every two colours at least 0.02 apart in OKLab', () => {
+    const labs = world.map((hex) => [hex, oklab(hex)] as const);
+    for (let i = 0; i < labs.length; i++) {
+      for (let j = i + 1; j < labs.length; j++) {
+        const [p, q] = [labs[i]![1], labs[j]![1]];
+        const d = Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+        expect(d, `${labs[i]![0]} ${labs[j]![0]}`).toBeGreaterThanOrEqual(0.02);
+      }
+    }
+  });
+});
+
+describe('the style formula and the pixel finish (ASSETS 6.4, 6.11)', () => {
+  const repo = fileURLToPath(new URL('../../../', import.meta.url));
+
+  it('keys only the object and figure compositions', () => {
+    const keyed = Object.entries(style.compositions)
+      .filter(([, text]) => text.includes('{KEY}'))
+      .map(([c]) => c);
+    expect(keyed.sort()).toEqual(['figure', 'object']);
+  });
+
+  it('points every reference at an owner image on disk', () => {
+    for (const refs of Object.values(style.references)) {
+      for (const r of refs) expect(existsSync(repo + r.file), r.file).toBe(true);
+    }
+  });
+
+  it('proposes the pixel finish for the main mode and keeps it for ONUB (ruling F15)', () => {
+    expect(style.pixelFinish.enabled).toEqual({ main: true, onub: true });
   });
 });
 
@@ -151,9 +226,9 @@ describe('balance (GDD 3.3, 3.9)', () => {
     expect(col('cabalWin')).toEqual(['villageAtMostOne', 'villageAtMostOne', ...Array(5).fill('parity')]);
   });
 
-  it('makes a cycle of 200 s from day, dusk and night', () => {
+  it('makes a cycle of 170 s from day, dusk and night', () => {
     const { dayS, duskS, nightS } = balance.phases;
-    expect(dayS + duskS + nightS).toBe(200);
+    expect(dayS + duskS + nightS).toBe(170);
   });
 
   it('gates the Killer Lock at 6+ players', () => {

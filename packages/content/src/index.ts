@@ -13,6 +13,8 @@ import tasksJson from '../data/tasks.json' with { type: 'json' };
 import balanceJson from '../data/balance.json' with { type: 'json' };
 import onubRolesJson from '../data/roles.onub.json' with { type: 'json' };
 import onubBalanceJson from '../data/balance.onub.json' with { type: 'json' };
+import looksJson from '../data/looks.json' with { type: 'json' };
+import routinesJson from '../data/routines.json' with { type: 'json' };
 import overworldJson from '../data/scenes/overworld.json' with { type: 'json' };
 import tavernBarJson from '../data/scenes/tavern_bar.json' with { type: 'json' };
 import tavernBackJson from '../data/scenes/tavern_back.json' with { type: 'json' };
@@ -28,20 +30,24 @@ import manorUpperJson from '../data/scenes/manor_upper.json' with { type: 'json'
 import barnJson from '../data/scenes/barn.json' with { type: 'json' };
 import chapelJson from '../data/scenes/chapel.json' with { type: 'json' };
 import cellarJson from '../data/scenes/cellar.json' with { type: 'json' };
+import hollowmereJson from '../data/maps/hollowmere.json' with { type: 'json' };
 
 import { AbilitiesFile } from './schemas/abilities.js';
 import { BalanceFile, type BalanceRow, type Profile } from './schemas/balance.js';
 import { CluesFile } from './schemas/clues.js';
 import { ItemsFile } from './schemas/items.js';
+import { LooksFile, type Look } from './schemas/looks.js';
 import { MetricsFile } from './schemas/metrics.js';
 import { OnubBalanceFile, type OnubCountRow } from './schemas/onubBalance.js';
 import { OnubRolesFile } from './schemas/onubRoles.js';
 import { PaletteFile } from './schemas/palette.js';
-import { RolesFile, type RosterRow } from './schemas/roles.js';
+import { RolesFile, type DeckRow, type RosterRow } from './schemas/roles.js';
+import { RoutinesFile } from './schemas/routines.js';
 import { SCENE_IDS, Scene, type SceneId } from './schemas/scene.js';
 import { StyleFile } from './schemas/style.js';
 import { TasksFile } from './schemas/tasks.js';
 import { TraitsFile } from './schemas/traits.js';
+import { DEFAULT_MAP, MAP_IDS, MapFile, type MapId } from './schemas/maps.js';
 import { assertValid, type Content } from './validate.js';
 
 export * from './schemas/common.js';
@@ -52,12 +58,15 @@ export * from './schemas/traits.js';
 export * from './schemas/roles.js';
 export * from './schemas/abilities.js';
 export * from './schemas/items.js';
+export * from './schemas/looks.js';
 export * from './schemas/clues.js';
 export * from './schemas/tasks.js';
 export * from './schemas/balance.js';
 export * from './schemas/scene.js';
 export * from './schemas/onubRoles.js';
 export * from './schemas/onubBalance.js';
+export * from './schemas/maps.js';
+export * from './schemas/routines.js';
 export { validateContent, type Content } from './validate.js';
 export { navs, NavFile } from './nav.js';
 
@@ -79,6 +88,14 @@ const sceneJson: Record<SceneId, unknown> = {
   cellar: cellarJson,
 };
 
+const mapJson: Record<MapId, unknown> = { hollowmere: hollowmereJson };
+
+function parseMaps(): Record<MapId, MapFile> {
+  const out = {} as Record<MapId, MapFile>;
+  for (const id of MAP_IDS) out[id] = MapFile.parse(mapJson[id]);
+  return out;
+}
+
 function parseScenes(): Record<SceneId, Scene> {
   const out = {} as Record<SceneId, Scene>;
   for (const id of SCENE_IDS) out[id] = Scene.parse(sceneJson[id]);
@@ -99,7 +116,9 @@ export function parseContent(raw: {
   balance: unknown;
   onubRoles: unknown;
   onubBalance: unknown;
-}): Omit<Content, 'scenes'> {
+  looks: unknown;
+  routines: unknown;
+}): Omit<Content, 'scenes' | 'maps'> {
   return {
     palette: PaletteFile.parse(raw.palette),
     metrics: MetricsFile.parse(raw.metrics),
@@ -113,6 +132,8 @@ export function parseContent(raw: {
     balance: BalanceFile.parse(raw.balance),
     onubRoles: OnubRolesFile.parse(raw.onubRoles),
     onubBalance: OnubBalanceFile.parse(raw.onubBalance),
+    looks: LooksFile.parse(raw.looks),
+    routines: RoutinesFile.parse(raw.routines),
   };
 }
 
@@ -130,8 +151,11 @@ export const content: Content = {
     balance: balanceJson,
     onubRoles: onubRolesJson,
     onubBalance: onubBalanceJson,
+    looks: looksJson,
+    routines: routinesJson,
   }),
   scenes: parseScenes(),
+  maps: parseMaps(),
 };
 assertValid(content);
 
@@ -147,8 +171,11 @@ export const {
   tasks,
   balance,
   scenes,
+  maps,
   onubRoles,
   onubBalance,
+  looks,
+  routines,
 } = content;
 
 function countKey(playerCount: number): `${4 | 5 | 6 | 7 | 8 | 9 | 10}` {
@@ -158,9 +185,20 @@ function countKey(playerCount: number): `${4 | 5 | 6 | 7 | 8 | 9 | 10}` {
   return String(playerCount) as `${4 | 5 | 6 | 7 | 8 | 9 | 10}`;
 }
 
-/** The roles.json row for a party size; `.deal` is what V1 deals. */
+/** The roles.json row for a party size; `.deal` is what V1 deals. Session 5G removes it in its contract phase. */
 export function rosterFor(playerCount: number): RosterRow {
   return roles.rosters[countKey(playerCount)];
+}
+
+/** The main-mode deck for a party size (GDD 3.1, 3.9): `cards` is player count + 2 card role ids, public. */
+export function deckFor(playerCount: number): DeckRow {
+  return roles.decks[countKey(playerCount)];
+}
+
+/** The look (looks.json) on a role's card, or null for a row with no character (GDD 3.17). */
+export function lookOf(roleId: string): Look | null {
+  const id = roles.roles[roleId]?.look;
+  return id === undefined || id === null ? null : (looks.looks[id] ?? null);
 }
 
 /** The balance.json row for a party size. */
@@ -176,4 +214,20 @@ export function profileFor(playerCount: number): Profile {
 /** The balance.onub.json row (deck, loaves, discussion) for a party size. */
 export function onubFor(playerCount: number): OnubCountRow {
   return onubBalance.byCount[countKey(playerCount)];
+}
+
+const sceneMap = new Map<SceneId, MapId>(
+  MAP_IDS.flatMap((id) => maps[id].scenes.map((s) => [s, id] as const)),
+);
+
+/** The map a scene belongs to (every scene belongs to exactly one, GDD 3.13). */
+export function mapOf(sceneId: SceneId): MapId {
+  const id = sceneMap.get(sceneId);
+  if (id === undefined) throw new Error(`scene ${sceneId} belongs to no map`);
+  return id;
+}
+
+/** A map id from `Settings.map`, or the default map when the value is not one (GDD 3.13). */
+export function mapIdOf(value: string): MapId {
+  return (MAP_IDS as readonly string[]).includes(value) ? (value as MapId) : DEFAULT_MAP;
 }

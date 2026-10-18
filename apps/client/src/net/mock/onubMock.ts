@@ -110,7 +110,7 @@ export interface MockOnubContext {
 export interface MockOnubPrepHalf {
   prep(stationId: string, cardId: string): void;
   myPrep(): { station: string; card: string } | null;
-  /** The board; the composer puts the night half's `cloche` on it. */
+  /** The board; the composer puts the night half's `cloche` and `window` on it. */
   board(): OnubBoardView;
   /** Dusk is over: the half completes missing commits and resolves the piles for prepReveal. */
   endPrep(): void;
@@ -131,6 +131,8 @@ export interface MockOnubNightHalf {
   beginNight(): number;
   /** The Iron Cloche's slot from dawn on, else empty. */
   cloche(): string;
+  /** The open window's role id (the narrator), '' during fades and outside the night. */
+  window(): string;
   dispose(): void;
 }
 
@@ -194,7 +196,7 @@ export class MockOnubFeed implements OnubFeed {
   }
 
   board(): OnubBoardView {
-    return { ...this.prepHalf.board(), cloche: this.nightHalf.cloche() };
+    return { ...this.prepHalf.board(), cloche: this.nightHalf.cloche(), window: this.nightHalf.window() };
   }
 
   dealtRole(): string {

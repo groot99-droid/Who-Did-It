@@ -1,13 +1,15 @@
-import { abilities, roles, scenes } from '@wdi/content';
+import { abilities, roles } from '@wdi/content';
 import { ErrorCode, ONUB_ACT_PREFIX, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { resolveHandle } from './Avatars';
 import { handleHold } from './Hold';
+import { handleImpersonate } from './Impersonate';
 import { handleKill } from './Kill';
+import { bellOf, hubOf } from './MapSites';
+import { handleNightPower } from './NightPowers';
 import { handleOnubAbility } from './Onub';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isLoft, isVerbPhase, reject, sceneKey, tileCentre } from './World';
-
-const BELL = scenes.overworld.props.find((q) => q.id === 'ov.bell');
 
 /** Dispatches the `act.*` verbs of the Round 3 brief; every payload is untrusted. */
 export function runAction(
@@ -51,6 +53,15 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
       return handleKill(room, sessionId, payload);
     case 'bandage':
       return handleBandage(room, sessionId, payload);
+    // Round 5 (locked dispatch): Impersonate is 5F's, the night powers and the Last Shot are 5G's.
+    case 'impersonate':
+      return handleImpersonate(room, sessionId, payload);
+    case 'confession':
+    case 'keepWatch':
+    case 'remedy':
+    case 'poison':
+    case 'lastShot':
+      return handleNightPower(room, sessionId, payload);
     default:
       if (typeof payload.abilityId === 'string' && payload.abilityId.startsWith(ONUB_ACT_PREFIX)) {
         return handleOnubAbility(room, sessionId, payload);
@@ -75,9 +86,9 @@ function handleBandage(room: PartyRoom, sessionId: string, payload: Record<strin
     reject(room, sessionId, ErrorCode.cooldown, 'not ready');
     return;
   }
-  const targetId = payload.targetId;
-  const target =
-    typeof targetId === 'string' && targetId !== sessionId ? simOf(room).players.get(targetId) : undefined;
+  // `target: 'player'`: an avatar handle, resolved to a seat (round 5, 5F's `resolveHandle`).
+  const targetId = resolveHandle(room, sessionId, payload.targetId);
+  const target = targetId !== null && targetId !== sessionId ? simOf(room).players.get(targetId) : undefined;
   if (!target || target.dead || !target.placed || target.sceneIdx !== actor.sceneIdx) {
     reject(room, sessionId, ErrorCode.cannot, 'no target');
     return;
@@ -128,17 +139,18 @@ function handleReport(room: PartyRoom, sessionId: string, payload: Record<string
   sim.meetingRequests.push({ reason: 'body', callerId: sessionId, bodyOf: body.of });
 }
 
-/** `act.bell`: on the overworld within reach of `ov.bell`, at most the role's `bellPulls` per match. */
+/** `act.bell`: on the hub within reach of the map's bell (`bellOf`), at most the role's `bellPulls` per match. */
 function handleBell(room: PartyRoom, sessionId: string): void {
   const player = room.state.players.get(sessionId);
   const actor = livingActor(room, sessionId, true);
-  if (!player || !actor || !BELL) return;
-  if (actor.sceneIdx !== 0) {
+  const bell = bellOf(room);
+  if (!player || !actor || !bell) return;
+  if (sceneKey(actor.sceneIdx) !== hubOf(room)) {
     reject(room, sessionId, ErrorCode.outOfRange, 'too far');
     return;
   }
   const reach = (abilities.abilities.bell?.rangeTiles ?? 0) * TILE_PX;
-  if (Math.hypot(actor.x - tileCentre(BELL.x, TILE_PX), actor.y - tileCentre(BELL.y, TILE_PX)) > reach) {
+  if (Math.hypot(actor.x - tileCentre(bell.x, TILE_PX), actor.y - tileCentre(bell.y, TILE_PX)) > reach) {
     reject(room, sessionId, ErrorCode.outOfRange, 'too far');
     return;
   }

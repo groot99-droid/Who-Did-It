@@ -68,4 +68,5 @@ export function resetOnubForLobby(room: PartyRoom): void {
   board.ruined = false;
   board.perk = false;
   board.cloche = '';
+  board.window = '';
 }

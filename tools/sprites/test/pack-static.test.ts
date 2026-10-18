@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { CLUE_KEYS, PROP_KEYS, VFX_CLIPS, staticFrameNames } from '../keys.ts';
 import { packStatic, staticAnims, type StaticManifest } from '../pack-static.ts';
 import type { MultiAtlas, PackInput } from '../pack.ts';
-import { clueFrames } from '../placeholder.ts';
+import { clueFrames } from '../placeholder-world.ts';
 
 /** A transparent cell with one block whose bottom centre sits on `base`. */
 function cell(size: number, base: [number, number], shade: string): Buffer {

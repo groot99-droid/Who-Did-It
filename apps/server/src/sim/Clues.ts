@@ -10,6 +10,7 @@ import {
   trailDir,
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { hubOf, teachingClueOf } from './MapSites';
 import { simOf } from './RoomSim';
 import { navGrid, tileCentre } from './World';
 
@@ -144,15 +145,16 @@ export function spawnKillClues(
   });
 }
 
-/** The grace-phase clue at `ov.teaching_clue`: Footprints, tall (GDD 2 step 5). Spawned once per match. */
+/** The grace-phase clue at the map's teaching-clue prop: Footprints, tall (GDD 2 step 5). Spawned once per match. */
 export function spawnTeachingClue(room: PartyRoom): void {
   const sim = simOf(room);
   if (sim.teachingSpawned) return;
   sim.teachingSpawned = true;
-  const prop = scenes.overworld.props.find((q) => q.id === 'ov.teaching_clue');
+  const prop = teachingClueOf(room);
   if (!prop) return;
-  const portal = nearestPortalTile('overworld', prop.x, prop.y);
-  spawnClue(room, 'overworld', {
+  const hub = hubOf(room);
+  const portal = nearestPortalTile(hub, prop.x, prop.y);
+  spawnClue(room, hub, {
     id: 'clue_teaching',
     kind: ClueKind.footprints,
     value: TRAIT_IDS.height.indexOf('tall'),

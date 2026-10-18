@@ -164,31 +164,39 @@ describe('NPC reports', () => {
 });
 
 describe('NPC votes', () => {
-  it('votes inside npc.vote.delayMinS..delayMaxS after the discussion opens', async () => {
+  // Round-5 pre-seed (npc/data.md 5): 5H replaces this with its fast-forward version (npc/tests.md M1).
+  it('votes inside npc.vote.windowFrac of discussion plus vote', async () => {
     const party = await world();
     const npcs = npcSeats(party.room);
     const human = party.humans[0]!.id;
     simOf(party.room).meetingRequests.push({ reason: 'bell', callerId: human });
     await until(() => party.room.state.phase === Phase.meetingDiscussion);
     const opened = party.room.state.tick;
+    const w = party.room.state.phaseEndsTick - opened + balance.phases.voteS * TICK_RATE;
+    const f = balance.npc.vote.windowFrac;
     const votedAt = new Map<string, number>();
     await until(() => {
       for (const p of npcs) if (p.hasVoted && !votedAt.has(p.id)) votedAt.set(p.id, party.room.state.tick);
       return votedAt.size === npcs.length;
-    }, 20_000);
+    }, 120_000);
     expect(votedAt.size).toBe(npcs.length);
+    // `opened` is polled every 25 ms, so it can trail the discussion's first tick (the NPC's draw) by a tick or two.
     for (const tick of votedAt.values()) {
-      expect(tick - opened).toBeGreaterThanOrEqual(balance.npc.vote.delayMinS * TICK_RATE - 3);
-      expect(tick - opened).toBeLessThanOrEqual(balance.npc.vote.delayMaxS * TICK_RATE + 3);
+      expect(tick - opened).toBeGreaterThanOrEqual(Math.floor(f.min * w) - 3);
+      expect(tick - opened).toBeLessThanOrEqual(Math.ceil(f.max * w) + 1);
     }
     const living = new Set([...party.room.state.players.keys(), 'skip']);
     for (const p of npcs) expect(living.has(p.priv.myVote)).toBe(true);
-  }, 40_000);
+  }, 150_000);
 
   it('votes for the seat it saw at a body when suspectVoteChance is 1', async () => {
     const row = balance.npc.difficulty.normal as { suspectVoteChance: number };
     const saved = row.suspectVoteChance;
     row.suspectVoteChance = 1;
+    // The vote early in the window, so the test waits seconds rather than most of a meeting (npc.vote.windowFrac).
+    const frac = balance.npc.vote.windowFrac;
+    const savedFrac = { ...frac };
+    Object.assign(frac, { min: 0, max: 0.05 });
     try {
       const party = await world();
       const [a, b, c] = npcSeats(party.room).map((p) => p.id) as [string, string, string];
@@ -205,6 +213,7 @@ describe('NPC votes', () => {
       expect(party.room.state.players.get(a)?.priv.myVote).toBe(c);
     } finally {
       row.suspectVoteChance = saved;
+      Object.assign(frac, savedFrac);
     }
   }, 60_000);
 });

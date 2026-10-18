@@ -13,9 +13,11 @@ import {
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { FOOT_HALF_PX, PORTAL_REACH_TILES, StatusBit } from './constants';
 import { statusBitsOf } from './Movement';
+import { rehandle } from './Avatars';
 import { emitNoise } from './Noise';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isOnub } from './onub/state';
+import { startSpawnsOf } from './MapSites';
 import {
   isLoft,
   isSceneId,
@@ -84,6 +86,8 @@ export function enterScene(
   // A ghost whose death is not yet public keeps its public scene, or the roster would show it moving;
   // a quick-mode seat keeps it all night, so the roster never shows who woke (A39).
   if ((!p.dead || !player.alive) && !p.sceneHidden) player.sceneId = p.sceneIdx;
+  // The private scene index, for every seat, living or dead (round 5; the only one after 5F's contract phase).
+  player.priv.sceneId = p.sceneIdx;
   const presence = player.presence;
   presence.x = Math.round(x);
   presence.y = Math.round(y);
@@ -101,13 +105,14 @@ export function enterScene(
     presence.transitUntilTick = 0;
     presence.statusBits = statusBitsOf(p, tick);
   }
+  rehandle(room, player.id, transit); // round 5, 5F: a new avatar handle on every scene entry (locked call site)
   if (announce) {
     room.clients.getById(player.id)?.send(S2C.sceneEnter, { sceneId, spawn: spawn.id, facing: spawn.facing });
   }
   return true;
 }
 
-/** First placement of every player when the match starts: spread on the `square_<n>` spawns. */
+/** First placement of every player when the match starts: spread on the map's start spawns (`startSpawnsOf`). */
 export function placeNewPlayers(room: PartyRoom): void {
   const sim = simOf(room);
   if (!isWorldPhase(room.state.phase)) return;
@@ -120,13 +125,14 @@ export function placeNewPlayers(room: PartyRoom): void {
     sim.profileFixed = true;
   }
   spawnTeachingClue(room);
+  const starts = startSpawnsOf(room);
   let placedAny = false;
   for (const [sessionId, p] of sim.players) {
     if (p.placed) continue;
     const player = room.state.players.get(sessionId);
     if (!player) continue;
-    const spawn = `square_${p.ordinal % 10}`;
-    if (enterScene(room, player, p, 'overworld', spawn, false)) {
+    const site = starts[p.ordinal % starts.length]!;
+    if (enterScene(room, player, p, site.sceneId, site.spawn, false)) {
       p.placed = true;
       player.alive = true;
       placedAny = true;

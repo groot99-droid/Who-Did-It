@@ -5,6 +5,13 @@ import { onubBalance, onubFor, onubRoles, PLAYER_COUNTS } from '../src/index.js'
 
 const counts = PLAYER_COUNTS.map(Number);
 
+/** The night of the default deck for `n` players, in seconds: its windows plus a fade each, before jitter. */
+function night(n: number): number {
+  const deck = new Set(onubFor(n).deck);
+  const ws = onubBalance.windows.filter((w) => deck.has(w.role));
+  return ws.reduce((s, w) => s + w.seconds + onubBalance.timers.fadeS, 0);
+}
+
 /** The cards deck(n) holds beyond deck(n - 1). */
 function added(n: number): string[] {
   const prev = [...onubFor(n - 1).deck];
@@ -111,6 +118,12 @@ describe('ONUB v2 stations and cards (GDD 3.11)', () => {
     expect(onubBalance.ruin).toMatchObject({ weight: 3, goodCancels: 1 });
   });
 
+  it('ruins the dough at 3 points for 4-5 players, 4 at 6, 5 at 7-10', () => {
+    expect(counts.map((n) => onubBalance.ruin.weightByCount?.[String(n)] ?? onubBalance.ruin.weight)).toEqual(
+      [3, 3, 4, 5, 5, 5, 5],
+    );
+  });
+
   it('gives only the Thermostat Flip an effect', () => {
     const effects = Object.values(onubBalance.cards).filter((c) => c.effect !== 'none');
     expect(effects.map((c) => [c.id, c.station, c.effect])).toEqual([
@@ -144,12 +157,18 @@ describe('ONUB v2 night (GDD 3.11)', () => {
   });
 
   it('runs the night lengths of GDD 3.11 with the default decks', () => {
-    const night = (n: number) => {
-      const deck = new Set(onubFor(n).deck);
-      const ws = onubBalance.windows.filter((w) => deck.has(w.role));
-      return ws.reduce((s, w) => s + w.seconds + onubBalance.timers.fadeS, 0);
-    };
     expect(counts.map(night)).toEqual([78, 78, 88, 100, 110, 122, 138]);
+  });
+
+  it('keeps the whole match, before jitter, inside the lobby chip at every count', () => {
+    const t = onubBalance.timers;
+    const minutes = (n: number) =>
+      (t.roleCardS + t.prepS + t.prepRevealS + night(n) + t.dawnS + t.rushS + t.voteS + t.revealS) / 60;
+    expect(onubBalance.targetLengthMin).toMatchObject({ min: 8, max: 10 });
+    for (const n of counts) {
+      expect(minutes(n), `${n}`).toBeGreaterThanOrEqual(onubBalance.targetLengthMin.min);
+      expect(minutes(n), `${n}`).toBeLessThanOrEqual(onubBalance.targetLengthMin.max);
+    }
   });
 });
 
@@ -163,6 +182,11 @@ describe('ONUB v2 vote and winners (GDD 3.11)', () => {
       tiesTurnOutAll: true,
       critiqueHops: 1,
     });
+  });
+
+  it('opens CRUST with a 3 s countdown inside its 20 s', () => {
+    expect(onubBalance.timers.voteS).toBe(20);
+    expect(onubBalance.timers.crustCountdownS).toBe(3);
   });
 
   it('ends with rows that catch every dawn', () => {

@@ -44,8 +44,9 @@ export interface LobbyPlayer {
 }
 
 /**
- * The lobby settings the server publishes (`state.settings`, GDD 3.11, 3.12); `npcSeats` is a count only.
+ * The lobby settings the server publishes (`state.settings`, GDD 3.11, 3.12, 3.13); `npcSeats` is a count only.
  * `onubDeck` is the leader's custom quick-mode deck (role ids), empty for the default deck of the party size.
+ * `map` is the map id the main mode plays (`MAP_IDS` of `@wdi/content`); the quick mode never reads it.
  */
 export type GameModeId = keyof typeof GameMode;
 export type NpcLevelId = keyof typeof NpcLevel;
@@ -54,7 +55,14 @@ export interface LobbySettings {
   npcDifficulty: NpcLevelId;
   npcSeats: number;
   onubDeck: string[];
+  map: string;
 }
+
+/**
+ * `Settings.map` of a new party: the schema default, the same id as `DEFAULT_MAP` in `@wdi/content` (a test pins
+ * the two together). The client reads the content data files, not the content module, so it keeps this copy.
+ */
+export const DEFAULT_MAP_ID = 'hollowmere';
 
 export const gameModeId = (n: number): GameModeId => (n === GameMode.onub ? 'onub' : 'main');
 export const npcLevelId = (n: number): NpcLevelId =>

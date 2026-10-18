@@ -4,6 +4,7 @@ import { BUILD_VERSION, SERVER_URL } from '../health';
 import {
   type ClientMessages,
   type ClientMessageType,
+  DEFAULT_MAP_ID,
   type ErrorPayload,
   type GameOverPayload,
   gameModeId,
@@ -35,9 +36,12 @@ export interface LobbySnapshot {
   settings: LobbySettings;
 }
 
-/** The settings a fresh room shows before its state arrives (mode main, the default level, no NPC seats). */
+/**
+ * The settings a fresh room shows before its state arrives (mode main, the default level, no NPC seats, the
+ * default map).
+ */
 export function defaultSettings(defaultLevel: NpcLevelId = 'normal'): LobbySettings {
-  return { mode: 'main', npcDifficulty: defaultLevel, npcSeats: 0, onubDeck: [] };
+  return { mode: 'main', npcDifficulty: defaultLevel, npcSeats: 0, onubDeck: [], map: DEFAULT_MAP_ID };
 }
 
 export type NetEvents = {
@@ -95,6 +99,11 @@ export interface NetworkService {
   removeNpc(): void;
   /** Leader only: `lobby.settings {onubDeck}`, a custom quick-mode deck (`[]` for the default, GDD 3.11). */
   setOnubDeck(deck: readonly string[]): void;
+  /**
+   * Leader only: `lobby.settings {map}`, a map id of `MAP_IDS` (GDD 3.13). The lobby's map row calls it; the
+   * server ignores the field until Session 5J reads it.
+   */
+  setMap(mapId: string): void;
 }
 
 // `sceneEnter` is not here: the world feed (ColyseusWorldFeed) registers it once and the router
@@ -109,12 +118,16 @@ interface PlayerState {
   connected: boolean;
 }
 
-/** `state.settings` as the lobby reads it (numbers: `GameMode`, `NpcLevel`, a seat count; the deck's role ids). */
+/**
+ * `state.settings` as the lobby reads it (numbers: `GameMode`, `NpcLevel`, a seat count; the deck's role ids;
+ * the map id).
+ */
 interface SettingsState {
   mode: number;
   npcDifficulty: number;
   npcSeats: number;
   onubDeck?: Iterable<string>;
+  map?: string;
 }
 
 /** The slice of the `Callbacks` API the lobby uses, typed for the dynamic state above. */
@@ -211,6 +224,10 @@ export class ColyseusNetwork implements NetworkService {
     this.send('lobby.settings', { onubDeck: [...deck] });
   }
 
+  setMap(mapId: string): void {
+    this.send('lobby.settings', { map: mapId });
+  }
+
   async leave(): Promise<void> {
     const room = this.current;
     if (room === null) return;
@@ -286,6 +303,7 @@ export class ColyseusNetwork implements NetworkService {
             npcDifficulty: npcLevelId(value.npcDifficulty),
             npcSeats: value.npcSeats,
             onubDeck: [...(value.onubDeck ?? [])],
+            map: value.map || DEFAULT_MAP_ID,
           };
           emit();
         };

@@ -16,6 +16,7 @@ export const NOISE_KEYS = [
   'oneWayDrop',
   'goat',
   'wispRattle',
+  'shot',
 ] as const;
 export const NoiseKey = z.enum(NOISE_KEYS);
 export type NoiseKey = z.infer<typeof NoiseKey>;
@@ -52,6 +53,14 @@ export const NpcDifficultyRow = z.strictObject({
   suspectVoteChance: Chance,
 });
 export type NpcDifficultyRow = z.infer<typeof NpcDifficultyRow>;
+/** A `{min, max}` span drawn uniformly (GDD 3.12); `validate.ts` checks min <= max. */
+const Span = z.strictObject({ min: z.number().nonnegative(), max: z.number().nonnegative() });
+/** A `{min, max}` span of whole tiles. */
+const TileSpan = z.strictObject({ min: z.number().int().positive(), max: z.number().int().positive() });
+/** A `{min, max}` span of fractions of a phase. */
+const FracSpan = z.strictObject({ min: Chance, max: Chance });
+/** The next activity's weights in one phase class; each row sums to 1 (validate.ts). */
+const RoutineWeights = z.strictObject({ work: Chance, stroll: Chance, idle: Chance });
 
 export const BalanceFile = z.strictObject({
   gddRef: GddRef,
@@ -99,7 +108,16 @@ export const BalanceFile = z.strictObject({
     killCooldownS: Seconds,
     skipAllowed: z.boolean(),
     tieEjectsNobody: z.boolean(),
+    /** A body report ends the Final Night hunt at once (GDD 3.3; the Bell is silent after dark). */
+    reportEndsHunt: z.boolean(),
   }),
+  /**
+   * Impersonate (GDD 3.17): how long a requested face may wait to change unseen before it is cancelled, how long a
+   * borrowed face lasts, and the cooldown from its drop.
+   */
+  impersonate: Section({ applyWindowS: Seconds, durationS: Seconds, cooldownS: Seconds }),
+  /** Night powers (GDD 3.2): uses of each per night; whether the Watchman may watch one seat two nights running. */
+  nightPowers: Section({ perNight: z.number().int().positive(), watchRepeatAllowed: z.boolean() }),
   snowball: Section({
     /** Applies when living Village <= living Cabal + margin. */
     villageMargin: z.number().int().nonnegative(),
@@ -109,7 +127,11 @@ export const BalanceFile = z.strictObject({
     lastKillerMinAlive: z.number().int().positive(),
     lastKillerCooldownDeltaS: z.number(),
   }),
-  hunger: Section({ cyclesWithoutKill: z.number().int().positive() }),
+  hunger: Section({
+    cyclesWithoutKill: z.number().int().positive(),
+    /** A Hungry Killer who moves leaves one glowing footprint per this many seconds (GDD 3.3). */
+    trailEveryS: z.number().positive(),
+  }),
   disconnect: Section({ deathAfterS: Seconds }),
   clues: Section({
     traitCluesPerKill: z.number().int().positive(),
@@ -167,17 +189,41 @@ export const BalanceFile = z.strictObject({
       hard: NpcDifficultyRow,
     }),
     /**
-     * An NPC picks a new heading every `stepMinS..stepMaxS`, heads for the nearest portal with
-     * `portalSteerChance` at each new heading, and takes a portal in reach with `portalChance` (GDD 3.12).
+     * The M3c walk, now only the fallback in a scene with no station and no stroll tile: a new heading every
+     * `stepMinS..stepMaxS`, aimed at the nearest portal with `portalSteerChance`, a portal in reach taken with
+     * `portalChance` (GDD 3.12).
      */
     wander: z.strictObject({
       stepMinS: Seconds,
       stepMaxS: Seconds,
-      portalSteerChance: z.number().min(0).max(1),
-      portalChance: z.number().min(0).max(1),
+      portalSteerChance: Chance,
+      portalChance: Chance,
     }),
-    /** An NPC casts its vote `delayMinS..delayMaxS` after the discussion opens (GDD 3.12). */
-    vote: z.strictObject({ delayMinS: Seconds, delayMaxS: Seconds }),
+    /** The routine (GDD 3.12 "Routines"). */
+    routine: z.strictObject({
+      weights: z.strictObject({ day: RoutineWeights, night: RoutineWeights }),
+      stationDwellS: Span,
+      workPauseS: Span,
+      idleS: Span,
+      idleChanceAfterLeg: Chance,
+      strollTiles: TileSpan,
+      sceneDwellS: Span,
+      favouriteStations: z.number().int().positive(),
+      /** Walking this long without a still stretch of `idleS.min` forces an idle. */
+      maxWalkS: z.number().positive(),
+      /** A goal with no quarter-tile of progress in this time is dropped. */
+      stuckS: z.number().positive(),
+    }),
+    /** Reactions (GDD 3.12): the startle at a body, the idle after a placement, the clue roll. */
+    react: z.strictObject({ startleS: Span, afterPlacementIdleS: Span, collectChance: Chance }),
+    /** The night rule (GDD 3.12 "Night"): the wait in an unlit scene before the walk home. */
+    night: z.strictObject({ leaveDelayS: Span }),
+    /** The vote tick: this fraction of the discussion plus the vote time, from the discussion's start. */
+    vote: z.strictObject({ windowFrac: FracSpan }),
+    /** The ready delay on the role card and in the lobby. */
+    ready: z.strictObject({ delayS: Span }),
+    /** NPC night powers (GDD 3.2, 3.12): the use tick over dusk plus night, and the Last Shot delay. */
+    nightPower: z.strictObject({ windowFrac: FracSpan, lastShotS: Span }),
   }),
   ghosts: Section({ wispsPerCycle: z.number().int().nonnegative() }),
   chat: Section({

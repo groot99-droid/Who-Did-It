@@ -5,6 +5,8 @@
   "zoneId": "widow_parlour",
   "profile": "small",
   "kind": "interior",
+  "biome": "house",
+  "dark": false,
   "size": { "w": 16, "h": 11 },
   "notes": "Portrait turned to the wall; letter box.",
   "worldRef": "4.3",

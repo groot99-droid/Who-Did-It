@@ -1,6 +1,7 @@
 import { TICK_RATE } from '@wdi/shared/constants';
 import { WORLD_COPY as C } from '../ui/copy';
 import { h } from '../ui/dom';
+import { mountDeckChip, type DeckChip } from '../ui/main/deckChip';
 import '../ui/theme/tokens.css';
 import '../ui/theme/components.css';
 import './hud.css';
@@ -8,6 +9,8 @@ import './hud.css';
 export interface HudChip {
   team: string;
   goal: string;
+  /** Main mode: the match's deck from `roleReveal.deck` (GDD 3.1); absent in the quick mode. */
+  deck?: readonly string[];
 }
 
 export type ToastKind = 'interact' | 'hazard' | 'warm';
@@ -80,6 +83,8 @@ export class Hud {
   private readonly promptText: HTMLElement;
   private readonly promptKey: HTMLElement;
   private readonly fps: HTMLElement;
+  private readonly deckSlot: HTMLElement;
+  private deckChip: DeckChip | null = null;
   private readonly timers = new Set<number>();
 
   constructor(
@@ -123,10 +128,11 @@ export class Hud {
       this.promptKey,
     );
     this.toasts = h('div', { class: 'wdi-toasts', role: 'status' }, this.promptEl);
+    this.deckSlot = h('div', { class: 'wdi-hud__deck', 'data-testid': 'hud-deck', hidden: true });
     this.root = h(
       'div',
       { class: 'wdi-root wdi-hud', 'data-testid': 'hud' },
-      h('div', { class: 'wdi-hud__tl' }, this.chip, this.notebookBtn),
+      h('div', { class: 'wdi-hud__tl' }, this.chip, this.notebookBtn, this.deckSlot),
       h('div', { class: 'wdi-hud__tc' }, this.clock),
       h('div', { class: 'wdi-hud__tr' }, this.log, this.fps),
       this.toasts,
@@ -137,6 +143,12 @@ export class Hud {
   setChip(chip: HudChip | null): void {
     this.chip.hidden = chip === null;
     if (chip !== null) this.chipGoal.textContent = chip.goal;
+    // Main mode: the deck chip (Session 5G's `ui/main/deckChip.ts`), mounted once the card's deck is known.
+    if (chip?.deck !== undefined && this.deckChip === null) {
+      this.deckChip = mountDeckChip(this.deckSlot, chip.deck);
+      // Empty (the pre-seed stub) the slot stays hidden, so it adds no gap beside the Notebook button.
+      this.deckSlot.hidden = this.deckSlot.childElementCount === 0;
+    }
   }
 
   /** The line under "Your goal"; a ghost reads "You are a ghost" here as well as in the log. */
@@ -207,6 +219,8 @@ export class Hud {
   }
 
   destroy(): void {
+    this.deckChip?.destroy();
+    this.deckChip = null;
     for (const t of this.timers) window.clearTimeout(t);
     this.timers.clear();
     this.root.remove();

@@ -3,17 +3,25 @@ import { ErrorCode, Phase, type PlayerState, S2C, SKIP_VOTE, resolveVotes } from
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { enterScene } from './Portals';
 import { countRow, factionOf, flowOf, refuse, roleIdOf, rolesOf, setPhase } from './Flow';
+import { hubOf, meetingSpawnsOf } from './MapSites';
+import { onMeetingOpenDisguise } from './Impersonate';
+import { holdReveal, onMeetingOpenNight } from './NightPowers';
 import { isOnub } from './onub/state';
 import { type MeetingRequest, simOf } from './RoomSim';
 import { evaluateWin, endMatch, endOnubMatch } from './Win';
 
-/** Everyone, living or dead, goes to the square without a `sceneEnter`; the placements come first. */
+/**
+ * Everyone, living or dead, goes to the map's meeting spawns on the hub (`meetingSpawnsOf`) without a
+ * `sceneEnter`; the placements come first.
+ */
 function placeAtSquare(room: PartyRoom, announce: boolean): void {
   const sim = simOf(room);
+  const spread = meetingSpawnsOf(room);
   room.state.players.forEach((player: PlayerState, id: string) => {
     const p = sim.players.get(id);
     if (!p?.placed) return;
-    enterScene(room, player, p, 'overworld', `square_${p.ordinal % 10}`, false, announce);
+    const site = spread[p.ordinal % spread.length]!;
+    enterScene(room, player, p, site.sceneId, site.spawn, false, announce);
   });
   sim.viewsDirty = true;
 }
@@ -26,11 +34,17 @@ function placeAtSquare(room: PartyRoom, announce: boolean): void {
 export function openMeeting(room: PartyRoom, req: MeetingRequest): void {
   const state = room.state;
   const sim = simOf(room);
+  // Round 5, main mode (locked call sites): Nightshade resolves before `alive` flips (5G), and every disguise ends
+  // before the placements (5F).
+  if (!isOnub(room)) onMeetingOpenNight(room);
   state.players.forEach((player: PlayerState, id: string) => {
     if (sim.players.get(id)?.dead) player.alive = false;
   });
   // The dawn meeting moves nobody: everyone is still in the loft (A39).
-  if (!isOnub(room)) placeAtSquare(room, false);
+  if (!isOnub(room)) {
+    onMeetingOpenDisguise(room);
+    placeAtSquare(room, false);
+  }
   state.players.forEach((player: PlayerState) => {
     player.hasVoted = false;
     if (player.priv) player.priv.myVote = '';
@@ -138,7 +152,7 @@ function startReveal(room: PartyRoom): void {
   }
   room.clients
     .getById(ejectedId)
-    ?.send(S2C.killed, { sceneId: 'overworld', cause: 'ejected', roles: rolesOf(room) });
+    ?.send(S2C.killed, { sceneId: hubOf(room), cause: 'ejected', roles: rolesOf(room) });
 }
 
 /**
@@ -152,6 +166,7 @@ function startOnubReveal(room: PartyRoom): void {
 
 /** After the reveal: the win check for an ejection, else the announced return to the square, immunity. */
 function endReveal(room: PartyRoom): void {
+  if (holdReveal(room)) return; // round 5, 5G: an ejected Gamekeeper's shot holds the reveal (locked call site)
   if (isOnub(room)) return endOnubMatch(room);
   const flow = flowOf(room);
   if (flow.pendingEjection !== null) {

@@ -24,6 +24,8 @@ export const C2S = {
   lobbyAddNpc: 'lobby.addNpc',
   lobbyRemoveNpc: 'lobby.removeNpc',
   claim: 'meeting.claim',
+  /** Main mode, role card, a cover role: the look it will walk as (GDD 3.17). */
+  coverPick: 'role.cover',
 } as const;
 
 export const S2C = {
@@ -41,16 +43,26 @@ export const S2C = {
   nightWake: 'nightWake',
   nightReveal: 'nightReveal',
   nightSleep: 'nightSleep',
+  vfx: 'vfx',
+  aim: 'aim',
+  shot: 'shot',
+  inherit: 'inherit',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
 export type S2CType = (typeof S2C)[keyof typeof S2C];
 
 export type HoldAction = 'drag' | 'collect' | 'task' | 'inspect' | 'autopsy';
-/** Why a meeting opened (GDD 3.3); `missing` is the roll-call of M4; `dawn` is the quick-mode meeting (3.11). */
-export type MeetingReason = 'body' | 'bell' | 'missing' | 'dawn';
-/** How a player died; `vanished` is the disconnect death of GDD 3.8 (M7). */
-export type DeathCause = 'knife' | 'ejected' | 'vanished';
+/**
+ * Why a meeting opened (GDD 3.3); `missing` is the roll-call of M4; `dawn` is the quick-mode meeting (3.11);
+ * `final` is the forced meeting after the Final Night hunt.
+ */
+export type MeetingReason = 'body' | 'bell' | 'missing' | 'dawn' | 'final';
+/**
+ * How a player died; `vanished` is the disconnect death of GDD 3.8 (M7); `poison` is Nightshade, `shot` the
+ * Gamekeeper's Last Shot (GDD 3.2).
+ */
+export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot';
 /** Chat channels the server derives (GDD 3.5); the client never chooses one. */
 export type ChatChannel = 'meeting' | 'ghost' | 'cabal' | 'system';
 
@@ -233,6 +245,20 @@ export interface RoleRevealPayload {
   traits: TraitIds;
   /** Quick mode: the card's team name (`roles.onub.json` `teams[team].name`), shown in place of the faction. */
   teamName?: string;
+  /** Main mode only. The match's deck, card role ids in deck order; identical for every seat (GDD 3.1). */
+  deck?: string[];
+  /** Main mode only. The look this seat walks as: its card's, or a cover role's first hint (GDD 3.17). */
+  look?: string;
+  /**
+   * Main mode only. Manifest key of this seat's card portrait (`portrait_<card's look>`; a cover role's own card
+   * art).
+   */
+  portrait?: string;
+  /**
+   * Main mode only, cover roles only: the hints, undealt card role ids, first hint first (GDD 3.17, `coverHints`
+   * in `rules/deck.ts`). Absent for every other seat.
+   */
+  coverHints?: string[];
 }
 
 export interface C2SPayloads {
@@ -240,8 +266,9 @@ export interface C2SPayloads {
   'input.move': { seq: number; dx: number; dy: number; sprint: boolean; sneak: boolean };
   'act.interact': { targetId: string };
   /**
-   * Main mode: `targetId` names the target. Quick mode: `targets` names every pick, in order: `[stationId, cardId]`
-   * for `onub.prep`, card slots for a night act (none for `onub.inspect`).
+   * Main mode: `targetId` names the target per the ability's `target`: `player` (Kill, Bandage) an avatar handle,
+   * `seat` (Impersonate, the night powers, Last Shot) a seat id. Quick mode: `targets` names every pick, in order:
+   * `[stationId, cardId]` for `onub.prep`, card slots for a night act (none for `onub.inspect`).
    */
   'act.ability': { abilityId: string; targetId?: string; targets?: string[] };
   /** Re-validated every tick. */
@@ -264,20 +291,28 @@ export interface C2SPayloads {
   'net.ping': { t: number };
   /** Leader only, phase lobby, at least 1 human (GDD 3.12). Refused with error 422 otherwise. */
   'lobby.start': Record<string, never>;
-  /** Lobby: the Ready tick. Role card: dismisses the card; the match begins when all are ready or 12 s pass. */
+  /**
+   * Lobby: the Ready tick. Role card: dismisses the card; the match begins when all are ready or
+   * `phases.roleRevealS` passes.
+   */
   'lobby.ready': { ready: boolean };
   /**
    * Leader only, phase lobby: `mode` is a `GameMode`, `npcDifficulty` an `NpcLevel` (A39); `onubDeck` a custom
-   * quick-mode deck (role ids, `[]` for the default), checked by `onubDeckProblem` without the size (GDD 3.11).
-   * All or nothing; refused 422 / 425.
+   * quick-mode deck (role ids, `[]` for the default), checked by `onubDeckProblem` without the size (GDD 3.11);
+   * `map` a map id of `MAP_IDS` (GDD 3.13; ignored until Session 5J reads it). All or nothing; refused 422 / 425.
    */
-  'lobby.settings': { mode?: number; npcDifficulty?: number; onubDeck?: string[] };
+  'lobby.settings': { mode?: number; npcDifficulty?: number; onubDeck?: string[]; map?: string };
   /** Leader only, phase lobby: one NPC seat up to `players.max` (GDD 3.12). */
   'lobby.addNpc': Record<string, never>;
   /** Leader only, phase lobby: removes the most recently added NPC seat; none left is 422. No id, so it never tells a seat apart (A39). */
   'lobby.removeNpc': Record<string, never>;
   /** Quick mode, a seat in play in the Rush or CRUST: replaces the seat's claim (GDD 3.11). */
   'meeting.claim': OnubClaimPayload;
+  /**
+   * Main mode, role card only, a cover role: picks the look it will walk as (a look of a non-cover card of the
+   * deck); changeable until the card closes (GDD 3.17). Refused 425 outside the card, 422 otherwise.
+   */
+  'role.cover': { lookId: string };
 }
 
 export interface S2CPayloads {
@@ -309,8 +344,18 @@ export interface S2CPayloads {
     roles?: Record<string, string>;
     abstained?: string[];
   };
-  /** `roles` are the final roles; `onub` is present in quick mode only (GDD 3.11). */
-  gameOver: { winner: number; roles: Record<string, string>; summary: string; onub?: OnubGameOver };
+  /**
+   * `roles` are the final roles; `onub` is present in quick mode only (GDD 3.11). Main mode: `alsoWon` lists an
+   * ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8).
+   */
+  gameOver: {
+    winner: number;
+    roles: Record<string, string>;
+    summary: string;
+    onub?: OnubGameOver;
+    alsoWon?: string[];
+    undealt?: string[];
+  };
   noise: { sceneId: string; x: number; y: number; kind: string };
   error: { code: ErrorCode; msg: string };
   /**
@@ -325,6 +370,17 @@ export interface S2CPayloads {
   nightReveal: { entries: NightRevealEntry[] };
   /** Private, quick mode: your window closed; back to the lights-out screen. */
   nightSleep: Record<string, never>;
+  /**
+   * To every client whose view holds that scene: the puff of a disguise a Knife strike dropped, at (x, y). Names no
+   * handle or seat. Sent only from `handleKill` (GDD 3.17).
+   */
+  vfx: { sceneId: string; x: number; y: number; kind: 'disguise' };
+  /** Private, a dying Gamekeeper: pick a seat with `act.ability {abilityId: 'lastShot'}` before `endsTick` (GDD 3.2). */
+  aim: { endsTick: number };
+  /** Private, an Accomplice: the Knife passed to you (GDD 3.2 Inherit); nothing public changes. */
+  inherit: Record<string, never>;
+  /** Public, only during a reveal: the ejected Gamekeeper shot `targetId`, whose role was `role` (GDD 3.2). */
+  shot: { fromId: string; targetId: string; role: string };
 }
 
 export type ErrorPayload = S2CPayloads['error'];
@@ -352,6 +408,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'lobby.addNpc': 2,
   'lobby.removeNpc': 2,
   'meeting.claim': 2,
+  'role.cover': 4,
 };
 
 export const ErrorCode = {

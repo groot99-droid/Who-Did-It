@@ -1,9 +1,10 @@
-import { SCENE_IDS, abilities, balance, roles, scenes, type SceneId } from '@wdi/content';
+import { abilities, balance, roles, scenes, type SceneId } from '@wdi/content';
 import { Phase, TICK_RATE, TILE_PX, chancePerTick, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { runAction } from '../Actions';
 import { type PlayerSim, simOf } from '../RoomSim';
 import { isLoft, sceneKey } from '../World';
+import { hubOf, mapScenesOf } from '../MapSites';
 import { difficultyRow } from './difficulty';
 import type { Brain, NpcMemory } from './memory';
 import { drive, firstPortalToward, stand, walkThrough, wander } from './walk';
@@ -11,9 +12,17 @@ import { drive, firstPortalToward, stand, walkThrough, wander } from './walk';
 /** A strike is made a little inside the server's reach so a rounding step never refuses it. */
 const STRIKE_MARGIN = 0.9;
 
-const BASIN_SCENES: ReadonlySet<SceneId> = new Set(
-  SCENE_IDS.filter((id) => scenes[id].props.some((q) => q.kind === 'basin')),
-);
+/** The scenes of a map that hold a basin (a Blood wash), built once per map's scene list. */
+const basinCache = new WeakMap<readonly SceneId[], ReadonlySet<SceneId>>();
+function basinScenesOf(room: PartyRoom): ReadonlySet<SceneId> {
+  const list = mapScenesOf(room);
+  let set = basinCache.get(list);
+  if (!set) {
+    set = new Set(list.filter((id) => scenes[id].props.some((q) => q.kind === 'basin')));
+    basinCache.set(list, set);
+  }
+  return set;
+}
 
 const rangePx = (abilityId: string): number => (abilities.abilities[abilityId]?.rangeTiles ?? 0) * TILE_PX;
 
@@ -137,17 +146,18 @@ export function runWorldNpc(
 }
 
 /**
- * A Killer's run after a strike (GDD 3.12): to the nearest scene with a basin, then to the overworld
- * square. Returns whether it drove the seat this tick.
+ * A Killer's run after a strike (GDD 3.12): to the nearest scene with a basin, then to the map's hub
+ * (`hubOf`). Returns whether it drove the seat this tick.
  */
 function runFlee(room: PartyRoom, brain: Brain, p: PlayerSim, id: string): boolean {
   const here = sceneKey(p.sceneIdx);
-  if (brain.flee === 'basin' && BASIN_SCENES.has(here)) brain.flee = 'square';
-  if (brain.flee === 'square' && here === 'overworld') brain.flee = null;
+  const hub = hubOf(room);
+  const basins = basinScenesOf(room);
+  if (brain.flee === 'basin' && basins.has(here)) brain.flee = 'square';
+  if (brain.flee === 'square' && here === hub) brain.flee = null;
   if (brain.flee === null) return false;
-  const goal =
-    brain.flee === 'basin' ? (s: SceneId) => BASIN_SCENES.has(s) : (s: SceneId) => s === 'overworld';
-  const portal = firstPortalToward(here, simOf(room).profile, goal);
+  const goal = brain.flee === 'basin' ? (s: SceneId) => basins.has(s) : (s: SceneId) => s === hub;
+  const portal = firstPortalToward(here, simOf(room).profile, goal, mapScenesOf(room));
   if (!portal || walkThrough(room, brain, p, id, portal) === 'stuck') {
     brain.flee = null;
     return false;

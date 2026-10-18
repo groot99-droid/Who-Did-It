@@ -1,10 +1,13 @@
 import { abilities, balance, clues, roles } from '@wdi/content';
-import { ErrorCode, TICK_RATE, TILE_PX, segmentBlocked, validateKill } from '@wdi/shared';
+import { ErrorCode, S2C, TICK_RATE, TILE_PX, segmentBlocked, validateKill } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { POSITION_RING_TICKS } from './constants';
+import { resolveHandle } from './Avatars';
 import { spawnBody } from './Bodies';
 import { spawnKillClues } from './Clues';
 import { markDead } from './Death';
+import { endImpersonation } from './Impersonate';
+import { spendProtection } from './NightPowers';
 import { emitNoise } from './Noise';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isKillPhase, navGrid, reject, sceneKey } from './World';
@@ -22,8 +25,28 @@ function movedLast250ms(p: PlayerSim): number {
 }
 
 /**
+ * The puff of a disguise a Knife strike dropped (GDD 3.17): `vfx` at the striker's position to every client whose
+ * view holds that scene, ghosts included. It names no handle and no seat; `handleKill` is its only sender.
+ */
+function sendDisguisePuff(room: PartyRoom, actor: PlayerSim): void {
+  const sim = simOf(room);
+  const msg = {
+    sceneId: sceneKey(actor.sceneIdx),
+    x: Math.round(actor.x),
+    y: Math.round(actor.y),
+    kind: 'disguise' as const,
+  };
+  for (const client of room.clients) {
+    const p = sim.players.get(client.sessionId);
+    if (p?.placed && p.sceneIdx === actor.sceneIdx) client.send(S2C.vfx, msg);
+  }
+}
+
+/**
  * `act.ability {abilityId: "kill", targetId}`, resolved on the validated tick (GDD 3.2). The payload is
- * untrusted: the role card, the phase, the cooldown, the reach and the line are all checked here.
+ * untrusted: the role card, the phase, the cooldown, the reach and the line are all checked here. Round 5
+ * (locked call sites): `targetId` is resolved through `resolveHandle` (5F); an accepted strike ends a disguise
+ * (5F, with the puff) and may spend a protection (5G) before the Bandage check.
  */
 export function handleKill(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   const sim = simOf(room);
@@ -35,9 +58,9 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
     reject(room, sessionId, ErrorCode.cannot, 'no knife');
     return;
   }
-  const targetId = payload.targetId;
-  const target = typeof targetId === 'string' ? sim.players.get(targetId) : undefined;
-  if (typeof targetId !== 'string' || !target || targetId === sessionId) {
+  const targetId = resolveHandle(room, sessionId, payload.targetId);
+  const target = targetId === null ? undefined : sim.players.get(targetId);
+  if (targetId === null || !target || targetId === sessionId) {
     reject(room, sessionId, ErrorCode.cannot, 'no target');
     return;
   }
@@ -66,12 +89,19 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
     reject(room, sessionId, verdict.code as ErrorCode, verdict.msg);
     return;
   }
+  // A strike drops the striker's disguise in place, voided or not (GDD 3.17).
+  if (endImpersonation(room, sessionId)) sendDisguisePuff(room, actor);
 
   // Either way the strike was made: the attacker is bloody and the Knife rests.
   const bloodDecay = clues.clues.blood?.decay;
   actor.bloodyUntilTick = tick + (bloodDecay?.kind === 'seconds' ? bloodDecay.seconds : 0) * TICK_RATE;
   player.priv.cooldownEndTick.set('kill', tick + killCooldownTicks(room));
   const sceneId = sceneKey(actor.sceneIdx);
+  // A Watch or a Remedy voids the strike exactly as a Bandage does (GDD 3.2, 5G).
+  if (spendProtection(room, targetId, sessionId)) {
+    reject(room, sessionId, ErrorCode.cannot, 'nothing happens');
+    return;
+  }
   if (target.bandagedUntilTick > tick) {
     target.bandagedUntilTick = 0;
     reject(room, sessionId, ErrorCode.cannot, 'nothing happens');

@@ -163,6 +163,8 @@ export const OnubBalanceFile = z.strictObject({
     dawnS: Seconds,
     rushS: Seconds,
     voteS: Seconds,
+    /** "Un, deux, trois, CRUST!": the opening countdown of the vote; CRUST never ends early before it has played. */
+    crustCountdownS: Seconds,
     revealS: Seconds,
     /** The lights-out screen plays a muffled noise every min..max s, generated client-side. */
     sleeperPulseMinS: Seconds,
@@ -173,7 +175,14 @@ export const OnubBalanceFile = z.strictObject({
   /** The four stations in overview order. */
   stations: z.array(OnubStation).min(1),
   cards: z.record(Id, OnubCard),
-  ruin: z.strictObject({ weight: Count, goodCancels: z.number().int().nonnegative(), gddRef: GddRef }),
+  ruin: z.strictObject({
+    /** The ruin threshold for a party size `weightByCount` does not list. */
+    weight: Count,
+    /** Party size -> the ruin threshold at that size (GDD 3.11); `resolvePrep` uses `weightByCount[n] ?? weight`. */
+    weightByCount: z.record(z.string(), z.number().int().min(1)).optional(),
+    goodCancels: z.number().int().nonnegative(),
+    gddRef: GddRef,
+  }),
   acts: z.record(OnubActId, OnubAct),
   windows: z.array(OnubWindow).min(1),
   rules: z.strictObject({ critiqueCopies: z.boolean(), gddRef: GddRef }),

@@ -5,6 +5,8 @@
   "zoneId": "forest",
   "profile": "small",
   "kind": "exterior",
+  "biome": "forest",
+  "dark": false,
   "size": { "w": 40, "h": 30 },
   "notes": "3 wolf loops away from the gate; 6-tile clearing at the gate; Planks at the edge.",
   "worldRef": "4.3",

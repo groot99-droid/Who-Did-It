@@ -19,6 +19,7 @@ interface PlayerState {
   id: string;
   name: string;
   traits?: { height: number; scarf: number; hat: number };
+  look?: string;
   alive: boolean;
   hasVoted: boolean;
   priv?: { myVote?: string };
@@ -68,6 +69,7 @@ export class ColyseusMeetingFeed implements MeetingFeed {
       room.onMessage('phaseChange', (m: { phase: number; endsTick: number }) =>
         this.bus.emit('phaseChange', m),
       ),
+      room.onMessage('shot', (m: MeetingFeedEvents['shot']) => this.bus.emit('shot', m)),
     );
   }
 
@@ -95,6 +97,7 @@ export class ColyseusMeetingFeed implements MeetingFeed {
         id: p.id,
         name: p.name,
         traits: { height: p.traits?.height ?? 0, scarf: p.traits?.scarf ?? 0, hat: p.traits?.hat ?? 0 },
+        look: p.look ?? '',
         alive: p.alive,
         hasVoted: p.hasVoted,
       }),

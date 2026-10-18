@@ -1,7 +1,5 @@
 import { randomInt } from 'node:crypto';
-import { generateId } from '@colyseus/core';
 import { abilities, balance, items, roles } from '@wdi/content';
-import { names } from '@wdi/content/server';
 import {
   ABILITY_KEYS,
   C2S,
@@ -9,7 +7,6 @@ import {
   GameMode,
   Inventory,
   ItemStack,
-  MAX_PLAYERS,
   NpcLevel,
   Phase,
   Player,
@@ -18,34 +15,46 @@ import {
   Private,
   Role,
   Traits,
-  type Rng,
   S2C,
   Team,
   TRAIT_IDS,
   assignRoles,
   dealTraits,
-  mulberry32,
-  pickNpcNames,
   type Roster,
   type RoleRevealPayload,
   type TeamId,
 } from '@wdi/shared';
 import type { PartyRoom } from '../PartyRoom';
+import {
+  allCardReady,
+  assignCovers,
+  handleCoverPick,
+  mainRevealFields,
+  markCardReady,
+  publishLooks,
+} from '../../sim/Covers';
+import { dealMainDeck } from '../../sim/Deck';
 import { flowOf, refuse, setPhase } from '../../sim/Flow';
 import { handleSay } from '../../sim/Chat';
 import { handleClaim, handleVote } from '../../sim/Meeting';
-import { newestNpcSeat, isNpcSeat, registerNpcSeat, releaseNpcSeat } from '../../sim/Npc';
+import { newestNpcSeat, isNpcSeat, releaseNpcSeat } from '../../sim/Npc';
+import { addNpcSeat, fillNpcSeats } from '../../sim/npc/seats';
 import { beginOnubPlay, onubDeckSetting, startOnubMatch } from '../../sim/Onub';
 import { MatchSeeds } from '../../sim/seeds';
 
 /**
  * Flow messages: the lobby and role-card flow plus the meeting vote and chat (consumed by the phase
- * stage's owner, Session K). Everything else is a world verb and goes to `sim/Commands`.
+ * stage's owner, Session K). Everything else is a world verb and goes to `sim/Commands`. Round 5: the role
+ * card's cover pick (`role.cover`, 5F) is a lobby command too.
+ *
+ * Round 5 (DECISIONS X5): every call in this file to `sim/Covers.ts` (5F), `sim/Deck.ts` (5G) and
+ * `sim/npc/seats.ts` (5H) is a locked call site; the sessions fill the bodies in their own files.
  */
 const LOBBY_TYPES: readonly string[] = [
   C2S.lobbyStart,
   C2S.lobbyReady,
   C2S.roleReady,
+  C2S.coverPick,
   C2S.vote,
   C2S.say,
   C2S.lobbySettings,
@@ -121,10 +130,19 @@ export function runLobbyCommands(room: PartyRoom): void {
         break;
       }
       case C2S.lobbyReady:
-        if (typeof payload.ready === 'boolean' && isReadyPhase(room)) player.ready = payload.ready;
+        // On the role card Ready only dismisses the card, privately once 5F lands (`markCardReady`, GDD 3.17).
+        if (room.state.phase === Phase.roleReveal) {
+          if (payload.ready === true) markCardReady(room, cmd.sessionId);
+        } else if (typeof payload.ready === 'boolean' && room.state.phase === Phase.lobby) {
+          player.ready = payload.ready;
+        }
         break;
       case C2S.roleReady:
-        if (isReadyPhase(room)) player.ready = true;
+        if (room.state.phase === Phase.roleReveal) markCardReady(room, cmd.sessionId);
+        else if (room.state.phase === Phase.lobby) player.ready = true;
+        break;
+      case C2S.coverPick:
+        handleCoverPick(room, cmd.sessionId, payload);
         break;
       case C2S.vote:
         handleVote(room, cmd.sessionId, payload);
@@ -163,17 +181,6 @@ export function newSeat(room: PartyRoom, id: string, name: string): PlayerState 
   return player;
 }
 
-/** Adds one NPC seat in the lobby: a session-shaped id, connected, ready, a pool name (GDD 3.12). */
-export function addNpcSeat(room: PartyRoom, rng: Rng): string | null {
-  if (room.state.players.size >= MAX_PLAYERS) return null;
-  const taken = [...room.state.players.values()].map((p: PlayerState) => p.name);
-  const [name] = pickNpcNames(names.pool, taken, 1, rng);
-  const id = generateId();
-  newSeat(room, id, name as string).ready = true;
-  registerNpcSeat(room, id);
-  return id;
-}
-
 /** Drops the most recently added NPC seat; false when there is none. */
 export function removeNewestNpcSeat(room: PartyRoom): boolean {
   const id = newestNpcSeat(room);
@@ -181,11 +188,6 @@ export function removeNewestNpcSeat(room: PartyRoom): boolean {
   room.state.players.delete(id);
   releaseNpcSeat(room, id);
   return true;
-}
-
-/** Fills the party up to `players.min` with NPC seats; called by `startMatch` before the deal. */
-function fillNpcSeats(room: PartyRoom, rng: Rng): void {
-  while (room.state.players.size < balance.players.min) if (addNpcSeat(room, rng) === null) break;
 }
 
 /**
@@ -222,7 +224,7 @@ function handleSettings(room: PartyRoom, sessionId: string, payload: Record<stri
 function handleAddNpc(room: PartyRoom, sessionId: string): void {
   if (room.state.leaderId !== sessionId) return refuse(room, sessionId, ErrorCode.cannot, 'cannot add');
   if (room.state.phase !== Phase.lobby) return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
-  if (addNpcSeat(room, mulberry32(randomInt(2 ** 32))) === null) {
+  if (addNpcSeat(room, room.seeds.get('npcNames')) === null) {
     refuse(room, sessionId, ErrorCode.cannot, 'party is full');
   }
 }
@@ -234,17 +236,10 @@ function handleRemoveNpc(room: PartyRoom, sessionId: string): void {
   if (!removeNewestNpcSeat(room)) refuse(room, sessionId, ErrorCode.cannot, 'no NPC seats');
 }
 
-const isReadyPhase = (room: PartyRoom): boolean =>
-  room.state.phase === Phase.lobby || room.state.phase === Phase.roleReveal;
-
 /** Phase timers owned by the lobby flow: the role card ends when all are Ready or the card time elapses. */
 export function runLobbyPhase(room: PartyRoom): void {
   if (room.state.phase !== Phase.roleReveal) return;
-  let everyoneReady = true;
-  room.state.players.forEach((p: PlayerState) => {
-    if (p.alive && p.connected && !p.ready) everyoneReady = false;
-  });
-  if (everyoneReady || room.state.tick >= room.state.phaseEndsTick) beginPlay(room);
+  if (allCardReady(room) || room.state.tick >= room.state.phaseEndsTick) beginPlay(room);
 }
 
 /**
@@ -281,13 +276,14 @@ function dealRoles(room: PartyRoom, ids: string[], rng: () => number): Map<strin
 export function startMatch(room: PartyRoom): void {
   // Every draw gets its own crypto-seeded stream, so the public traits and NPC names say nothing about the
   // deal (round-4 review, DECISIONS A49).
-  room.seeds = new MatchSeeds();
+  room.seeds = new MatchSeeds(room.fixedSeeds); // `fixedSeeds` is undefined outside tests (`fixSeeds`)
   room.matchSeed = randomInt(2 ** 32);
   // The party fills to `players.min` with NPC seats, named from a stream apart from the deal's (GDD 3.12).
   fillNpcSeats(room, room.seeds.get('npcNames'));
   const ids = [...room.state.players.keys()];
   if (startOnubMatch(room, ids)) return; // quick mode deals its own cards from `room.seeds` (round 5, 5A)
-  const dealt = dealRoles(room, ids, room.seeds.get('deal'));
+  // Round 5: the deck deal (5G) once it lands; until then `dealMainDeck` returns null and the roster deal runs.
+  const dealt = dealMainDeck(room, ids) ?? dealRoles(room, ids, room.seeds.get('deal'));
   const looks = dealTraits(ids, room.seeds.get('traits'));
   const factionOf = (id: string) => roles.roles[dealt.get(id) as string]?.faction;
 
@@ -320,6 +316,8 @@ export function startMatch(room: PartyRoom): void {
       priv.inventory.slots.push(stack);
     }
   }
+  // Round 5, 5F: the cover hints, each cover seat's preset `coverLook` and the Cabal mates' `mateLooks`.
+  assignCovers(room, dealt);
 
   void room.lock();
   setPhase(room, Phase.roleReveal, balance.phases.roleRevealS);
@@ -330,21 +328,24 @@ export function startMatch(room: PartyRoom): void {
       name: room.state.players.get(m)?.name ?? '',
     }));
     const look = looks.get(id) as { height: number; scarf: number; hat: number };
-    room.clients
-      .getById(id)
-      ?.send(S2C.roleReveal, buildRoleReveal(dealt.get(id) as string, look, ids.length, mates));
+    // Round 5, 5F: the main-mode card fields (deck, look, portrait, cover hints) beside the card.
+    room.clients.getById(id)?.send(S2C.roleReveal, {
+      ...buildRoleReveal(dealt.get(id) as string, look, ids.length, mates),
+      ...mainRevealFields(room, id),
+    });
   }
 }
 
 /**
  * roleReveal -> first play phase. Placement is the sim's job: once the phase is a world phase,
- * `placeNewPlayers` (sim/Portals.ts) spreads everyone over the `square_<n>` spawns inside the next
+ * `placeNewPlayers` (sim/Portals.ts) spreads everyone over the map's start spawns inside the next
  * step and sends the one `sceneEnter`; nothing here touches positions or scenes.
  */
 export function beginPlay(room: PartyRoom): void {
   if (beginOnubPlay(room)) return; // quick mode starts at Evening Prep (round 5, 5A)
   room.state.round = 0;
   room.state.startTick = room.state.tick;
+  publishLooks(room); // round 5, 5F: every seat's public look in one tick, before grace
   setPhase(room, Phase.grace, balance.phases.graceS);
   room.state.players.forEach((player: PlayerState) => {
     player.ready = false;

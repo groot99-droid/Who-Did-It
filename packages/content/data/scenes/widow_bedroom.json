@@ -5,6 +5,8 @@
   "zoneId": "widow_bedroom",
   "profile": "small",
   "kind": "interior",
+  "biome": "house",
+  "dark": false,
   "size": { "w": 12, "h": 9 },
   "notes": "Single candle.",
   "worldRef": "4.3",

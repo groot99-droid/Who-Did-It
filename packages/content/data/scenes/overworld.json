@@ -5,6 +5,8 @@
   "zoneId": "overworld",
   "profile": "small",
   "kind": "exterior",
+  "biome": "village",
+  "dark": false,
   "size": { "w": 64, "h": 48 },
   "notes": "Square with bell and well; 4 lantern posts; fence line NE. NW Manor Rise and NE paddock are gated shut below Medium.",
   "worldRef": "4.3",

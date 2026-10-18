@@ -26,7 +26,11 @@ interface StateView {
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const voteWindowMs = (balance.npc.vote.delayMaxS + 10) * 1000;
+const voteWindowMs =
+  (balance.npc.vote.windowFrac.max *
+    (Math.max(...Object.values(balance.byCount).map((r) => r.discussionS)) + balance.phases.voteS) +
+    10) *
+  1000;
 
 async function createParty(page: Page, query = ''): Promise<string> {
   await page.goto(`/Who-Did-It/${query}`);

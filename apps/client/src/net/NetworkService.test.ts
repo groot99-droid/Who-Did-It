@@ -73,8 +73,9 @@ vi.mock('@colyseus/sdk', () => {
   };
 });
 
+import { DEFAULT_MAP } from '@wdi/content';
 import { ColyseusNetwork, JoinError } from './NetworkService';
-import { JOIN_FAILED_MESSAGE } from './protocol';
+import { DEFAULT_MAP_ID, JOIN_FAILED_MESSAGE } from './protocol';
 import { reconnectTokens } from './storage';
 
 beforeEach(() => {
@@ -177,18 +178,34 @@ describe('ColyseusNetwork', () => {
       npcDifficulty: 'normal',
       npcSeats: 0,
       onubDeck: [],
+      map: 'hollowmere',
     });
 
-    const settings = { mode: 0, npcDifficulty: 1, npcSeats: 0, onubDeck: [] as string[] };
+    const settings = { mode: 0, npcDifficulty: 1, npcSeats: 0, onubDeck: [] as string[], map: 'hollowmere' };
     hoisted.listeners.get('settings')?.(settings);
-    Object.assign(settings, { mode: 1, npcDifficulty: 2, npcSeats: 3, onubDeck: ['chef', 'aboyeur'] });
+    Object.assign(settings, {
+      mode: 1,
+      npcDifficulty: 2,
+      npcSeats: 3,
+      onubDeck: ['chef', 'aboyeur'],
+      map: 'blackpine',
+    });
     for (const change of hoisted.changes) change();
     expect(net.snapshot?.settings).toEqual({
       mode: 'onub',
       npcDifficulty: 'hard',
       npcSeats: 3,
       onubDeck: ['chef', 'aboyeur'],
+      map: 'blackpine',
     });
+  });
+
+  it('starts on the default map of the content and keeps it when the state has none yet', async () => {
+    expect(DEFAULT_MAP_ID).toBe(DEFAULT_MAP);
+    const net = new ColyseusNetwork();
+    await net.create('Ada');
+    hoisted.listeners.get('settings')?.({ mode: 0, npcDifficulty: 1, npcSeats: 0, onubDeck: [] });
+    expect(net.snapshot?.settings.map).toBe(DEFAULT_MAP);
   });
 
   it('sends the settings and NPC messages without naming a seat', async () => {
@@ -200,10 +217,12 @@ describe('ColyseusNetwork', () => {
     net.addNpc();
     net.removeNpc();
     net.setOnubDeck(['chef']);
+    net.setMap('hollowmere');
     expect(send).toHaveBeenNthCalledWith(1, 'lobby.settings', { mode: 1 });
     expect(send).toHaveBeenNthCalledWith(2, 'lobby.settings', { npcDifficulty: 0 });
     expect(send).toHaveBeenNthCalledWith(3, 'lobby.addNpc', {});
     expect(send).toHaveBeenNthCalledWith(4, 'lobby.removeNpc', {});
     expect(send).toHaveBeenNthCalledWith(5, 'lobby.settings', { onubDeck: ['chef'] });
+    expect(send).toHaveBeenNthCalledWith(6, 'lobby.settings', { map: 'hollowmere' });
   });
 });

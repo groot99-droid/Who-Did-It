@@ -1,6 +1,6 @@
 {
   "gddRef": "3.11",
-  "targetLengthMin": { "min": 9, "max": 12, "gddRef": "3.11" },
+  "targetLengthMin": { "min": 8, "max": 10, "gddRef": "3.11" },
   "pantry": { "roles": 3, "locations": 3, "gddRef": "3.11" },
   "byCount": {
     "4": {
@@ -112,6 +112,7 @@
     "dawnS": 5,
     "rushS": 300,
     "voteS": 20,
+    "crustCountdownS": 3,
     "revealS": 30,
     "sleeperPulseMinS": 6,
     "sleeperPulseMaxS": 14,
@@ -311,7 +312,12 @@
       "text": "Hisses, smokes and never catches."
     }
   },
-  "ruin": { "weight": 3, "goodCancels": 1, "gddRef": "3.11" },
+  "ruin": {
+    "weight": 3,
+    "weightByCount": { "4": 3, "5": 3, "6": 4, "7": 5, "8": 5, "9": 5, "10": 5 },
+    "goodCancels": 1,
+    "gddRef": "3.11"
+  },
   "acts": {
     "onub.cloche": {
       "id": "onub.cloche",

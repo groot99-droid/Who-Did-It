@@ -13,10 +13,20 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `images.ts` | Finishes the single-image keys rendered by `tools/blender` (`build_loft.py`, `build_buildings.py`, `build_tiles.py`): checks each key's size, alpha-bleeds and re-encodes it (dropping the render's date stamp, so files are byte-identical across renders) and joins each tileset's four 64 px variants into its 256 x 64 row |
 | `body-contact.ts` | Review sheet of the body on the floor: the last `die` frame in 8 directions, one row per trait look plus a Bloody row |
 | `contact.ts` | Contact sheet for review: every clip x direction with the scarf (tinted teal) and cap composited, plus one strip of each pass alone |
-| `placeholder.ts` | Generates every placeholder key of `SPRITES.md` 8 into `apps/client/public/assets/placeholder/` with its `manifest.json` |
+| `placeholder.ts` | The core: generates every placeholder key of `SPRITES.md` 8 into `apps/client/public/assets/placeholder/` with its `manifest.json`, collecting the stand-ins of the three modules below (sorted by each stand-in's `order`) |
+| `placeholder-kit.ts` | Core too: the palette, font, PRNG and drawing helpers, and the `PlaceholderEntry` contract (`order`, manifest `entries`, `files()`) |
+| `placeholder-world.ts`, `placeholder-chars.ts`, `placeholder-onub.ts` | One module per art session (5K, 5L, 5M), each exporting `placeholderEntries()`: today the clues, props, building exteriors and tilesets; the villager and vfx; the loft images. A session edits only its own module |
+| `oklab.ts` | sRGB to OKLab, the `#RRGGBB` helpers, and the HSV hue and saturation of the cutout spill test |
+| `palette.ts` | Reads `packages/content/data/palette.json` and `style.json` directly (no `@wdi/content` dependency): `WORLD` (the 64 world-palette colours, file order), `worldPalette`, `nearestIndex` (cached, ties to the darker), `DARK_RANK`, `SATURATED`, `finishEnabled` (`style.json` `pixelFinish.enabled`), `outlineRgb` |
+| `pixel.ts` | The pixel finish of `ASSETS.md` 6.11: alpha cut, snap to the world palette in OKLab, 2 x 2 mode halve (ties to the darkest), box resize, `finishRender` / `finishDisplay` (both follow the main-mode switch), `cleanCutout`, `outline`, `finishIllustration` (always finished), lossless WebP, `audit`; the CLI finishes a render folder and halves its manifest's `cell`, `feet` and `pivot` |
+| `refs.ts` | Writes every `style.json` `references` entry, cropped, to `build/refs/<composition>-<index>-<stem>.png` (the Higgsfield `image_references` inputs) |
 | `test/pack.test.ts` | Synthetic frame set: trim and source sizes, determinism, detectIdentical, pivots, anim keys |
 | `test/pack-static.test.ts` | Static keys against the placeholder clues, props pivots, centred clues, determinism, vfx anims, refusal of a wrong key set |
-| `test/images.test.ts`, `test/manifest.test.ts` | Image sizes, determinism and the tileset join; the real and placeholder manifests carry the same keys |
+| `test/images.test.ts` | Image sizes, determinism and the tileset join |
+| `test/manifest.test.ts` | The real and placeholder manifests carry the same keys, types, `maps` and `modes` (the villager placeholder-only once it leaves `LEGACY`); `modes: ['onub']` on every `onub_*` key and no other; round-5 world textures filter by the pixel-finish switch, `clues` linear |
+| `test/legacy.ts`, `test/legacy.test.ts` | The `LEGACY` allowlist (art plan 1.7): real-manifest keys whose art predates the round-5 style, skipped by the palette and budget tests; each key listed once and still in the real manifest |
+| `test/pixel.test.ts` | Snap, mode halve with the darkest tie, box resize, alpha cut, both settings of the switch, cutout key, spill and outline, lossless WebP, manifest halving, determinism |
+| `test/refs.test.ts` | Every reference file exists, every crop lies inside its image, output names are unique |
 | `test/bleed.test.ts` | PNG round trip, one and two bleed rings, determinism |
 
 ```sh
@@ -27,6 +37,8 @@ pnpm --filter @wdi/sprites pack ../../build/render/villager ../../apps/client/pu
 pnpm --filter @wdi/sprites contact ../../build/render/villager ../../assets/source/review/villager-contact.png
 pnpm --filter @wdi/sprites pack:static ../../build/render/props ../../apps/client/public/assets/props
 pnpm --filter @wdi/sprites contact:body ../../build/render/villager ../../assets/source/review/villager-body-contact.png
+pnpm --filter @wdi/sprites refs ../../build/refs  # style.json reference crops (default out dir: build/refs)
+pnpm --filter @wdi/sprites pixel <raw> <out> [--display] [--finish on|off]   # finish a render folder to packed size
 ```
 
 Placeholder labels use Inter (OFL) from `@fontsource/inter`; no other font is used. New dependencies

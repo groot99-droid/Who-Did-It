@@ -8,7 +8,7 @@
 |---|---|---|---|
 | `input.move` | `{ seq: number; dx: number; dy: number; sprint: boolean; sneak: boolean }` | 25/s | 20 Hz; one applied per tick, newest wins; the vector is normalised server-side. |
 | `act.interact` | `{ targetId: string }` | 5/s | - |
-| `act.ability` | `{ abilityId: string; targetId?: string; targets?: string[] }` | 5/s | Main mode: `targetId` names the target. Quick mode: `targets` names every pick, in order: `[stationId, cardId]` for `onub.prep`, card slots for a night act (none for `onub.inspect`). |
+| `act.ability` | `{ abilityId: string; targetId?: string; targets?: string[] }` | 5/s | Main mode: `targetId` names the target per the ability's `target`: `player` (Kill, Bandage) an avatar handle, `seat` (Impersonate, the night powers, Last Shot) a seat id. Quick mode: `targets` names every pick, in order: `[stationId, cardId]` for `onub.prep`, card slots for a night act (none for `onub.inspect`). |
 | `act.hold` | `{ action: HoldAction; targetId: string; on: boolean }` | 5/s | Re-validated every tick. |
 | `act.hide` | `{ spotId: string }` | 5/s | - |
 | `act.check` | `{ spotId: string }` | 5/s | - |
@@ -24,11 +24,12 @@
 | `role.ready` | `Record<string, never>` | - | Deprecated alias of `lobby.ready {ready: true}`. |
 | `net.ping` | `{ t: number }` | - | - |
 | `lobby.start` | `Record<string, never>` | 2/s | Leader only, phase lobby, at least 1 human (GDD 3.12). Refused with error 422 otherwise. |
-| `lobby.ready` | `{ ready: boolean }` | 2/s | Lobby: the Ready tick. Role card: dismisses the card; the match begins when all are ready or 12 s pass. |
-| `lobby.settings` | `{ mode?: number; npcDifficulty?: number; onubDeck?: string[] }` | 2/s | Leader only, phase lobby: `mode` is a `GameMode`, `npcDifficulty` an `NpcLevel` (A39); `onubDeck` a custom quick-mode deck (role ids, `[]` for the default), checked by `onubDeckProblem` without the size (GDD 3.11). All or nothing; refused 422 / 425. |
+| `lobby.ready` | `{ ready: boolean }` | 2/s | Lobby: the Ready tick. Role card: dismisses the card; the match begins when all are ready or `phases.roleRevealS` passes. |
+| `lobby.settings` | `{ mode?: number; npcDifficulty?: number; onubDeck?: string[]; map?: string }` | 2/s | Leader only, phase lobby: `mode` is a `GameMode`, `npcDifficulty` an `NpcLevel` (A39); `onubDeck` a custom quick-mode deck (role ids, `[]` for the default), checked by `onubDeckProblem` without the size (GDD 3.11); `map` a map id of `MAP_IDS` (GDD 3.13; ignored until Session 5J reads it). All or nothing; refused 422 / 425. |
 | `lobby.addNpc` | `Record<string, never>` | 2/s | Leader only, phase lobby: one NPC seat up to `players.max` (GDD 3.12). |
 | `lobby.removeNpc` | `Record<string, never>` | 2/s | Leader only, phase lobby: removes the most recently added NPC seat; none left is 422. No id, so it never tells a seat apart (A39). |
 | `meeting.claim` | `OnubClaimPayload` | 2/s | Quick mode, a seat in play in the Rush or CRUST: replaces the seat's claim (GDD 3.11). |
+| `role.cover` | `{ lookId: string }` | 4/s | Main mode, role card only, a cover role: picks the look it will walk as (a look of a non-cover card of the deck); changeable until the card closes (GDD 3.17). Refused 425 outside the card, 422 otherwise. |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
 
@@ -44,12 +45,16 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
 | `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string; outs?: string[]; hop?: string; pantryOut?: boolean; roles?: Record<string, string>; abstained?: string[]; }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). Quick mode (3.11): `tally` counts `"pantry"` instead of `"skip"`; `outs` are the seats in the oven (the drag included), `hop` the seat the Critique dragged in, `pantryOut` whether the Pantry was at the top, `roles` the final Role cards of `outs`, `abstained` the seats in play that did not vote. |
-| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; onub?: OnubGameOver }` | `roles` are the final roles; `onub` is present in quick mode only (GDD 3.11). |
+| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; onub?: OnubGameOver; alsoWon?: string[]; undealt?: string[]; }` | `roles` are the final roles; `onub` is present in quick mode only (GDD 3.11). Main mode: `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). |
 | `noise` | `{ sceneId: string; x: number; y: number; kind: string }` | - |
 | `error` | `{ code: ErrorCode; msg: string }` | - |
 | `nightWake` | `{ windowRole: string; endsTick: number; view: OnubWakeView }` | Private, quick mode: your window is open until `endsTick` (GDD 3.11). Sent again inside the window when `view.legal` changes (the Tourrier's second step); the latest one wins. Never sent to a sleeper. |
 | `nightReveal` | `{ entries: NightRevealEntry[] }` | Private, quick mode: what you learned, the same rows `Private.nightReveal` gains. Sent for every accepted act (empty for an act that shows nothing), for the sightings at a window's opening and for the proofing perk. |
 | `nightSleep` | `Record<string, never>` | Private, quick mode: your window closed; back to the lights-out screen. |
+| `vfx` | `{ sceneId: string; x: number; y: number; kind: 'disguise' }` | To every client whose view holds that scene: the puff of a disguise a Knife strike dropped, at (x, y). Names no handle or seat. Sent only from `handleKill` (GDD 3.17). |
+| `aim` | `{ endsTick: number }` | Private, a dying Gamekeeper: pick a seat with `act.ability {abilityId: 'lastShot'}` before `endsTick` (GDD 3.2). |
+| `inherit` | `Record<string, never>` | Private, an Accomplice: the Knife passed to you (GDD 3.2 Inherit); nothing public changes. |
+| `shot` | `{ fromId: string; targetId: string; role: string }` | Public, only during a reveal: the ejected Gamekeeper shot `targetId`, whose role was `role` (GDD 3.2). |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 
@@ -110,6 +115,20 @@ export interface RoleRevealPayload {
   traits: TraitIds;
   /** Quick mode: the card's team name (`roles.onub.json` `teams[team].name`), shown in place of the faction. */
   teamName?: string;
+  /** Main mode only. The match's deck, card role ids in deck order; identical for every seat (GDD 3.1). */
+  deck?: string[];
+  /** Main mode only. The look this seat walks as: its card's, or a cover role's first hint (GDD 3.17). */
+  look?: string;
+  /**
+   * Main mode only. Manifest key of this seat's card portrait (`portrait_<card's look>`; a cover role's own card
+   * art).
+   */
+  portrait?: string;
+  /**
+   * Main mode only, cover roles only: the hints, undealt card role ids, first hint first (GDD 3.17, `coverHints`
+   * in `rules/deck.ts`). Absent for every other seat.
+   */
+  coverHints?: string[];
 }
 ```
 

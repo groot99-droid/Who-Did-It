@@ -1,17 +1,43 @@
 {
-  "source": "docs/WORLD.md 4.2, docs/ASSETS.md 6.1-6.3",
+  "source": "docs/WORLD.md 4.2, 4.7, docs/ASSETS.md 6.1-6.3, docs/SPRITES.md 10",
   "tilePx": 64,
   "metersPerTile": 1,
   "characterCellPx": 128,
-  "maxStandingSilhouettePx": 90,
-  "maxSilhouetteTiles": 1.4,
-  "characterHeadsTall": 3,
+  "maxStandingSilhouettePx": 112,
+  "maxSilhouetteTiles": 1.75,
+  "characterHeadsTall": 5,
   "camera": {
-    "tiltXDeg": 40,
-    "yawZDeg": 0,
-    "verticalSquash": 0.77,
-    "wallPxPerMeter": 41,
-    "groundTileTiltXDeg": 0
+    "tiltXDeg": 60,
+    "yawZDeg": 45,
+    "verticalSquash": 0.5,
+    "wallPxPerMeter": 59,
+    "groundTileTiltXDeg": 60
+  },
+  "iso": {
+    "tileW": 128,
+    "tileH": 64,
+    "pxPerMeter": 90.51,
+    "zScale": 0.75,
+    "artScale": 2,
+    "packedCharacterCellPx": 64,
+    "packedDieCellPx": 128,
+    "wallHeightM": { "full": 2.5, "half": 1.2, "stub": 0.3 },
+    "deepCullTiles": 2,
+    "topPadPx": 320,
+    "viewTilesHigh": 11,
+    "zoomStep": 0.5
+  },
+  "lighting": {
+    "ambient": {
+      "day": { "color": "slate", "alpha": 0.4 },
+      "night": { "color": "ink", "alpha": 0.9 },
+      "dark": { "color": "ink", "alpha": 0.94 }
+    },
+    "lightCore": 0.55,
+    "glowAlpha": 0.25,
+    "flicker": { "hz": 1.7, "amp": 0.06 },
+    "occluderFadeAlpha": 0.35,
+    "occluderFadeS": 0.15
   },
   "render": { "fps": 12, "overscan": 0.03, "propCellPx": { "min": 64, "max": 128 } },
   "overworldTiles": { "w": 64, "h": 48 },

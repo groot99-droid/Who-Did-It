@@ -33,7 +33,7 @@ import {
 } from './handlers/lobby';
 import { isNpcSeat } from '../sim/Npc';
 import { registerMovement } from './handlers/movement';
-import { MatchSeeds } from '../sim/seeds';
+import { type FixedSeeds, MatchSeeds } from '../sim/seeds';
 
 const codeRegistries = new WeakMap<object, CodeRegistry>();
 
@@ -58,6 +58,11 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
   matchSeed = 0;
   /** The match's independent random streams (`sim/seeds.ts`); replaced at every Start. */
   seeds = new MatchSeeds();
+  /**
+   * Room memory only, tests only: the seed words the test helper `fixSeeds` stores, read by every Start's
+   * `new MatchSeeds(...)`. Always undefined in production; no message or debug handler sets it.
+   */
+  fixedSeeds: FixedSeeds | undefined = undefined;
   private code = '';
 
   /**

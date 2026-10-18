@@ -1,4 +1,4 @@
-import { SCENE_IDS, balance, scenes, type Portal, type SceneId } from '@wdi/content';
+import { balance, scenes, type Portal, type SceneId } from '@wdi/content';
 import { HEADINGS, TICK_RATE, TILE_PX, npcDelayTicks, tilePath } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { PORTAL_REACH_TILES } from '../constants';
@@ -155,11 +155,15 @@ export function walkThrough(
   return result;
 }
 
-/** The first portal on a shortest route from `from` to any scene `goal` accepts; null when already there. */
+/**
+ * The first portal on a shortest route from `from` to any scene `goal` accepts, through the scenes of `inMap`
+ * (the room's map, `mapScenesOf`); null when already there.
+ */
 export function firstPortalToward(
   from: SceneId,
   profile: ReturnType<typeof simOf>['profile'],
   goal: (scene: SceneId) => boolean,
+  inMap: readonly SceneId[],
 ): Portal | null {
   if (goal(from)) return null;
   const seen = new Set<SceneId>([from]);
@@ -169,7 +173,7 @@ export function firstPortalToward(
       if (q.to === null || q.toSpawn === null || q.lock !== null || !profileOpen(q.minProfile, profile))
         continue;
       const to = q.to as SceneId;
-      if (seen.has(to) || !SCENE_IDS.includes(to)) continue;
+      if (seen.has(to) || !inMap.includes(to)) continue;
       seen.add(to);
       if (goal(to)) return first ?? q;
       queue.push({ scene: to, first: first ?? q });

@@ -1,4 +1,4 @@
-import { ErrorCode } from '@wdi/shared';
+import { ErrorCode, type OnubPrepStreams } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { refuse } from '../Flow';
 
@@ -23,9 +23,19 @@ export function runPrep(room: PartyRoom): void {
 }
 
 /**
- * The end of prep (`runPrep`, `onubClock`): timeout commits, `resolvePrep`, `o.cards = tableAtNight(...)`, the
- * board's piles, ruin and perk, the perk's `nightReveal` to each proofing visitor, then `Phase.prepReveal` for
- * `prepRevealS`.
+ * The three match streams `resolvePrep` draws from (contract 4.1, `deck/wire.md` 2.2): `piles` the public order
+ * of each pile, `thaw` the card each Thermostat Flip discards (secret until game over), `perk` the Pantry Location
+ * the proofing visitors see (private to them). Pre-seeded and implemented; `endPrep` passes it to `resolvePrep`.
+ */
+export function prepStreams(room: PartyRoom): OnubPrepStreams {
+  return { piles: room.seeds.get('piles'), thaw: room.seeds.get('thaw'), perk: room.seeds.get('perk') };
+}
+
+/**
+ * The end of prep (`runPrep`, `onubClock`): timeout commits (`prepTimeout` stream), `resolvePrep(commits, seats,
+ * onubBalance.stations, onubBalance.cards, onubBalance.ruin, onubBalance.pantry.locations, prepStreams(room))`,
+ * `o.cards = tableAtNight(...)`, the board's piles, ruin and perk, the perk's `nightReveal` to each proofing
+ * visitor, then `Phase.prepReveal` for `prepRevealS`.
  */
 export function endPrep(room: PartyRoom): void {
   void room; // stub until 5A lands

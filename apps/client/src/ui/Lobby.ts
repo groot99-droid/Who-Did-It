@@ -6,6 +6,8 @@ import { joinLink } from '../flags';
 import { LOBBY_COPY as C, fill } from './copy';
 import { h, icon, type Screen } from './dom';
 import { mountDeckEditor } from './lobby/DeckEditor';
+import { mountDeckList } from './main/deckList';
+import { mountMapPicker } from './lobby/MapPicker';
 
 const { npc, players: seatRange } = balanceJson;
 const { min: lengthMin, max: lengthMax } = onubBalanceJson.targetLengthMin;
@@ -25,6 +27,11 @@ export function modeChipText(mode: GameModeId): string {
         players: fill(C['lobby.mode.players'], { min: seatRange.min, max: seatRange.max }),
       })
     : C['lobby.mode.main'];
+}
+
+/** The map row shows in the main mode only: the quick mode never walks a map (GDD 3.11, 3.13). */
+export function showsMapRow(mode: GameModeId): boolean {
+  return mode !== 'onub';
 }
 
 export interface LobbyOptions {
@@ -123,6 +130,14 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     ),
     difficultyHint,
   );
+  // The main mode's map row (GDD 3.13, Session 5J) in its own slot under the settings, hidden in the quick mode.
+  const mapSlot = h('div', { 'data-testid': 'lobby-map', hidden: true });
+  settingsBlock.append(mapSlot);
+  const mapPicker = mountMapPicker(mapSlot, opts.net);
+  // The main mode's deck list (GDD 3.1, Session 5G) in its own slot under the settings, hidden in the quick mode.
+  const deckListSlot = h('div', { 'data-testid': 'lobby-deck-list', hidden: true });
+  settingsBlock.append(deckListSlot);
+  const deckList = mountDeckList(deckListSlot, opts.net);
   // The quick-mode deck editor (GDD 3.11, Session 5C) under the settings.
   const deckEditor = mountDeckEditor(settingsBlock, opts.net);
   const actions = h('div', { class: 'wdi-row' }, start, readyBtn, leave);
@@ -278,6 +293,12 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
       : next.players.length < MIN_PLAYERS_TO_START
         ? fill(C['lobby.hint.fill'], { min: MIN_PLAYERS_TO_START })
         : C['lobby.hint.go'];
+    mapPicker.update(next);
+    // Empty (the pre-seed stub) the slot stays hidden too, so it adds no gap to the settings stack.
+    mapSlot.hidden = !showsMapRow(mode) || mapSlot.childElementCount === 0;
+    deckList.update(next);
+    // Empty (the pre-seed stub) the slot stays hidden too, so it adds no gap to the settings stack.
+    deckListSlot.hidden = mode === 'onub' || deckListSlot.childElementCount === 0;
     deckEditor.update(next);
   };
 
@@ -286,6 +307,8 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     destroy: () => {
       document.removeEventListener('keydown', onKey);
       dialog?.remove();
+      mapPicker.destroy();
+      deckList.destroy();
       deckEditor.destroy();
       el.remove();
     },

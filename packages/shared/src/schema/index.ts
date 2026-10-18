@@ -1,13 +1,21 @@
 import { schema, t } from '@colyseus/schema';
 
 // Builder style, no decorators (ARCHITECTURE 5.4). Four privacy classes:
-//   Public roster   plain fields on Player
-//   SceneScoped     Presence and the `scenes` map, tagged .view()
+//   Public roster   plain fields on Player, the look included (GDD 3.17)
+//   SceneScoped     Presence, the `scenes` map and each avatar, tagged .view()
 //   Own client only Private, tagged .view()
-//   Server memory   never in a schema (fingerprint logs, Blood timers, finalRoles, ...)
-// Every Schema stays under 63 fields.
+//   Server memory   never in a schema (fingerprint logs, Blood timers, finalRoles, handles' owners, covers,
+//                   disguises, protections, poison, ...)
+// Every Schema stays under 63 fields. Round 5 pre-seed (DECISIONS X1): additive only; Session 5F removes
+// `Player.sceneId` and makes `presence` self-only in its contract phase (deck/wire.md 10.1).
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
+
+/**
+ * View tags (Visibility.ts): `presence` and `priv` are the numeric tags 1 and 2, granted one by one; `ghost`
+ * reveals an avatar's true seat to a ghost's view only (GDD 3.17).
+ */
+export const VIEW_TAG = { presence: 1, priv: 2, ghost: 3 } as const;
 
 // Every primitive carries a default so a fresh instance never encodes `undefined`.
 const u8 = (v = 0) => t.uint8().default(v);
@@ -83,6 +91,30 @@ export const Clue = schema(
 /** `of` names a seat a prop belongs to, empty otherwise (round 4's quick-mode plates; ONUB v2 uses no props). */
 export const Prop = schema({ id: str(), kind: str(), turned: bool(), of: str() }, 'Prop');
 
+/**
+ * A walking figure in a scene, keyed in `SceneState.avatars` by an opaque handle that is re-rolled on every scene
+ * entry and every death, and when an impersonation applies or drops (GDD 3.17). There is no cover flag and no
+ * disguise flag: an impersonation is an avatar like any other. Empty until Session 5F fills it.
+ */
+export const Avatar = schema(
+  {
+    /** Seat whose name, look and scarf are drawn: the walker's own, or the seat it impersonates. */
+    lookOf: str(),
+    /** Height trait index drawn: always the walker's own. */
+    height: u8(),
+    x: i16(),
+    y: i16(),
+    z: i8(),
+    yaw: f32(),
+    animId: u8(),
+    statusBits: u16(),
+    transitUntilTick: u32(),
+    /** The walker's true seat; only a ghost's view receives it. */
+    seat: t.string().default('').view(VIEW_TAG.ghost),
+  },
+  'Avatar',
+);
+
 export const SceneState = schema(
   {
     doors: t.map(Door),
@@ -90,6 +122,8 @@ export const SceneState = schema(
     bodies: t.map(Body),
     clues: t.map(Clue),
     props: t.map(Prop),
+    /** Each entry is added to a view one by one (Visibility.ts), never with the scene. */
+    avatars: t.map(Avatar).view(),
   },
   'SceneState',
 );
@@ -107,6 +141,10 @@ export const NotebookEntry = schema(
     sceneId: u8(),
     tick: u32(),
     status: u8() /* NotebookStatus: 0 claimed 1 verified 2 corroborated 3 forged 4 teaching */,
+    /** `NoteKind`: 0 a clue entry as before; 1-7 a night-power entry (GDD 3.2). */
+    note: u8(),
+    /** The seat a night-power entry is about; '' for a clue entry. */
+    of: str(),
   },
   'NotebookEntry',
 );
@@ -138,6 +176,17 @@ export const Private = schema(
     onubLoc: str(),
     /** Quick mode: the Ingredient card this seat committed at prep, empty before. */
     onubCard: str(),
+    /**
+     * Own scene index in SCENE_IDS order (LOFT_SCENE_INDEX in the quick-mode loft). Written beside the public
+     * `Player.sceneId` by the pre-seed; the only scene index once Session 5F removes the public one.
+     */
+    sceneId: u8(),
+    /** Own avatar handle in the own scene; '' while not placed. */
+    avatar: str(),
+    /** A cover role's current pick, preset to its first hint's look at the deal ('' for everyone else). */
+    coverLook: str(),
+    /** A Cabal cover role's view of each Cabal mate's current pick, by seat id (empty for everyone else). */
+    mateLooks: t.map('string'),
   },
   'Private',
 );
@@ -152,11 +201,16 @@ export const Player = schema(
     connected: bool(),
     ready: bool(),
     hasVoted: bool(),
+    /** Kept by the pre-seed (DECISIONS X1); Session 5F removes it in its contract phase (deck/wire.md 10.1). */
     sceneId: u8(),
-    // SceneScoped (V1) / Proximity (V1.5). `alive` flips only at a meeting or an ejection (A30).
-    presence: t.ref(Presence).view(1),
+    /** Public look id (looks.json): '' for every seat until the role card closes, then fixed (GDD 3.17). */
+    look: str(),
+    // SceneScoped (V1) / Proximity (V1.5). `alive` flips only at a meeting or an ejection (A30). Pre-seed: the
+    // visibility tags of today (granted to same-scene viewers); after Session 5F: own client only (others are
+    // avatars).
+    presence: t.ref(Presence).view(VIEW_TAG.presence),
     // Own client only
-    priv: t.ref(Private).view(2),
+    priv: t.ref(Private).view(VIEW_TAG.priv),
   },
   'Player',
 );
@@ -226,7 +280,9 @@ export const OnubPile = schema(
 /**
  * The public quick-mode board (GDD 3.11). `seats` is the deal order (slot index `i` of `seat.<i>.*` is
  * `seats[i]`) and `deck` the cards in play, both from the role card on; `piles`, `ruinWeight`, `ruined` and
- * `perk` from `prepReveal`; `cloche` (a slot id) from dawn. Cleared at the lobby reset; empty in the main mode.
+ * `perk` from `prepReveal`; `cloche` (a slot id) from dawn. `window` is the open night window's role id, the
+ * narrator's call, '' during fades and outside the night: public, since every window of the deck runs whatever
+ * was dealt. Cleared at the lobby reset; empty in the main mode.
  */
 export const OnubBoard = schema(
   {
@@ -237,6 +293,7 @@ export const OnubBoard = schema(
     ruined: bool(),
     perk: bool(),
     cloche: str(),
+    window: str(),
   },
   'OnubBoard',
 );
@@ -266,4 +323,5 @@ export const GameState = schema(
 export type PlayerState = InstanceType<typeof Player>;
 export type PrivateState = InstanceType<typeof Private>;
 export type SceneStateType = InstanceType<typeof SceneState>;
+export type AvatarState = InstanceType<typeof Avatar>;
 export type GameStateType = InstanceType<typeof GameState>;

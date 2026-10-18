@@ -5,8 +5,9 @@
   "zoneId": "cellar",
   "profile": "large",
   "kind": "interior",
+  "biome": "house",
+  "dark": true,
   "size": { "w": 28, "h": 16 },
-  "ambientLightTiles": 2,
   "notes": "Pitch dark with a small ambient radius; gas pockets in marked side alcoves (V1.5).",
   "worldRef": "4.3",
   "portals": [

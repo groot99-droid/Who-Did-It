@@ -25,5 +25,38 @@
     "hazardToken": "magenta",
     "primaryButtonToken": "mustard",
     "uiStrokePx": 2
+  },
+  "world": {
+    "source": "docs/ASSETS.md 6.1; built from assets/source/concepts/onub/*.jpg (A-style)",
+    "ramps": {
+      "ink": ["#12141C", "#1A1D29"],
+      "slate": ["#2C3240", "#3A4356", "#4D5A70", "#5E6C84"],
+      "fog": ["#6F7A8C", "#8892A2", "#A6AEBA"],
+      "moon": ["#24374F", "#466784", "#6A8EAD", "#7FA8FF", "#93C2E0", "#C3EAF2"],
+      "bone": ["#8E8676", "#B2AA99", "#D9D2C2", "#FFF1DC"],
+      "plaster": ["#9A9083", "#BFA27E", "#DCC4A1", "#F0DEB3"],
+      "stone": ["#2E2A2D", "#453E3F", "#5E5553", "#7A7067", "#9A9083", "#B2AA99"],
+      "wood": ["#24171A", "#3A231F", "#55332A", "#744733", "#94603F", "#B57F54"],
+      "brick": ["#4E2620", "#6A3426", "#8A4630", "#AA5A39", "#C8744A", "#DE9767"],
+      "lantern": ["#B06A35", "#DA9348", "#FFB457", "#FFD48A", "#FFF1DC"],
+      "brass": ["#6E5428", "#A07C36", "#F2B33D"],
+      "moss": ["#1B261B", "#26361F", "#3A5A33", "#4F8A4A", "#5FC266", "#A8F09A"],
+      "litter": ["#3A2F1E", "#5C4A2A", "#80683A"],
+      "teal": ["#1C504D", "#2EC4B6", "#9DF2E6"],
+      "blood": ["#4A0D12", "#7E1119", "#B3121F"],
+      "skin": ["#55332A", "#744733", "#94603F", "#C08A66", "#DDB08E", "#F2D3B8"]
+    },
+    "saturated": [
+      "#7FA8FF",
+      "#DA9348",
+      "#FFB457",
+      "#F2B33D",
+      "#5FC266",
+      "#A8F09A",
+      "#2EC4B6",
+      "#9DF2E6",
+      "#7E1119",
+      "#B3121F"
+    ]
   }
 }

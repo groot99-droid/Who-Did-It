@@ -181,7 +181,7 @@ describe('role card to play', () => {
     bots[0]?.room.send(C2S.lobbyStart, {});
     await sleep(300);
     expect(room.state.phase).toBe(Phase.roleReveal);
-    room.state.phaseEndsTick = room.state.tick + 1; // fast-forward the 12 s
+    room.state.phaseEndsTick = room.state.tick + 1; // fast-forward the card time (`phases.roleRevealS`)
     await sleep(300);
     expect(room.state.phase).toBe(Phase.grace);
     expect(received(bots[2] as Bot, S2C.sceneEnter)).toHaveLength(1);
@@ -305,8 +305,19 @@ describe('role card content', () => {
   it('only shows abilities enabled at the party size and uses the kill cooldown of that size', () => {
     const at4 = buildRoleReveal('killer', { height: 0, scarf: 0, hat: 0 }, 4, []);
     const at6 = buildRoleReveal('killer', { height: 0, scarf: 0, hat: 0 }, 6, []);
-    expect(at4.abilities.map((a) => a.id)).toEqual(['kill', 'dragBody']); // Lock door needs 6+
-    expect(at6.abilities.map((a) => a.id)).toEqual(['kill', 'killerLock', 'dragBody']);
+    // Round 5: Impersonate replaced the Lock door (V1.5, 6+) on the Killer's card (GDD 3.2, 3.17).
+    expect(at4.abilities.map((a) => a.id)).toEqual(['kill', 'impersonate', 'dragBody']);
+    expect(at6.abilities.map((a) => a.id)).toEqual(['kill', 'impersonate', 'dragBody']);
+    const gated = { ...roles.roles.killer!, abilities: ['kill', 'killerLock', 'dragBody'] };
+    roles.roles.gatedKiller = { ...gated, id: 'gatedKiller' };
+    try {
+      const lockAt4 = buildRoleReveal('gatedKiller', { height: 0, scarf: 0, hat: 0 }, 4, []);
+      const lockAt6 = buildRoleReveal('gatedKiller', { height: 0, scarf: 0, hat: 0 }, 6, []);
+      expect(lockAt4.abilities.map((a) => a.id)).toEqual(['kill', 'dragBody']); // Lock door needs 6+
+      expect(lockAt6.abilities.map((a) => a.id)).toEqual(['kill', 'killerLock', 'dragBody']);
+    } finally {
+      delete roles.roles.gatedKiller;
+    }
     expect(at4.abilities[0]?.cooldown).toBeGreaterThan(at6.abilities[0]?.cooldown ?? 99);
     expect(at6.abilities.every((a) => a.uses === null)).toBe(true);
   });

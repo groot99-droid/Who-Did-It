@@ -1,7 +1,56 @@
 {
-  "source": "docs/ASSETS.md 6.4, 6.9",
-  "styleFormula": "stylized toon-noir, chunky low-poly 3-heads-tall proportions, flat two-tone cel shading, thick dark ink outlines, moody night lighting with warm lantern orange and cool moonlight blue, palette #12141C #2C3240 #6F7A8C #D9D2C2 #F2B33D #2EC4B6 #E04E9A, clean solid background, no text.",
-  "styleToken": "toon-noir low-poly 3-heads-tall, flat 2-tone cel, thick ink outlines, lantern orange vs moon blue, plain bg, no text",
+  "source": "docs/ASSETS.md 6.4, 6.9, 6.11",
+  "styleFormula": "Art style: the isometric pixel-art cutaway dioramas of the reference images. Chunky visible pixels on a strict grid, crisp one-pixel near-black outlines, flat three-tone cel shading with a few hand-placed highlight pixels, small dither patterns on plaster, stone and wood grain; no smooth gradients, blur or airbrush. Warm amber lamplight #FFB457 pooling against cold blue night shadow #7FA8FF; shadows lean blue and are never black; the deepest tone is navy #12141C. Dense, lived-in detail: shelves of jars, sacks, crates, hanging tools, pipes along the walls, and worn surfaces of terracotta tile, scuffed planks, chipped plaster over brick and damp stone. Figures are small, about five heads tall, with simple faces and no drawn eyes. No text, letters, numbers, logos or watermark.",
+  "styleToken": "isometric pixel-art cutaway diorama, 1px dark outlines, 3-tone cel, warm lamplight vs cold blue, dense props, no text",
+  "styleAvoid": "Avoid: photorealism, a 3D-render look, smooth gradients, soft airbrush, lens blur, depth of field, bloom haze, painterly brush strokes, flat vector art, anime or chibi proportions, a perspective camera, legible signage or lettering.",
+  "compositions": {
+    "diorama": "Composition: one room as an isometric cutaway diorama at a true 2:1 dimetric angle seen from the south-east, exactly like the reference images: the two back walls stand at full height, the front walls are removed, the floor is a thick slab with its cut edge showing, and the room floats centred on a flat dark navy void (#12141C) with an even margin and nothing else in frame.",
+    "level": "Composition: a slice of an isometric game level at the same true 2:1 dimetric angle seen from the south-east: ground laid as 2:1 diamond tiles, buildings and trees standing, the slice cut clean at its edges like a diorama base and floating on a flat dark navy void (#12141C).",
+    "object": "Composition: one single object, whole and centred, seen from the same 2:1 isometric angle as the reference images, filling about 70% of a square frame, on a perfectly flat pure {KEY} background, with no floor, no cast shadow and nothing else in frame.",
+    "figure": "Composition: a character turnaround sheet of one person in a relaxed A-pose, four full-body views left to right (front, front three-quarter, side, back), feet on one baseline, evenly spaced, on a perfectly flat pure {KEY} background, with no floor and no cast shadow.",
+    "portrait": "Composition: a half-length portrait of one person in a three-quarter view from slightly above eye level, filling the lower two thirds of a 2:3 frame; behind them a small cutaway corner of their place, lit by one warm lamp, its edges falling off into the flat dark navy void (#12141C)."
+  },
+  "keyColors": ["#FF00FF", "#00FF00", "#0000FF"],
+  "references": {
+    "diorama": [
+      { "file": "assets/source/concepts/onub/station_mixer.jpg" },
+      { "file": "assets/source/concepts/onub/scene_cellar.jpg" },
+      { "file": "assets/source/concepts/onub/station_fridge.jpg" },
+      { "file": "assets/source/concepts/onub/scene_front_of_house.jpg" }
+    ],
+    "level": [
+      { "file": "assets/source/concepts/onub/station_mixer.jpg" },
+      { "file": "assets/source/concepts/onub/scene_cellar.jpg" },
+      { "file": "assets/source/concepts/onub/scene_front_of_house.jpg" }
+    ],
+    "object": [
+      { "file": "assets/source/concepts/onub/station_mixer.jpg", "crop": [700, 560, 540, 620] },
+      {
+        "file": "assets/source/concepts/onub/scene_cold_pantry.jpg",
+        "crop": [1100, 380, 800, 620]
+      },
+      { "file": "assets/source/concepts/onub/station_fridge.jpg", "crop": [300, 380, 560, 680] }
+    ],
+    "figure": [
+      { "file": "assets/source/concepts/onub/scene_expediter.jpg", "crop": [1820, 500, 220, 590] },
+      { "file": "assets/source/concepts/onub/scene_hygiene.jpg", "crop": [1060, 500, 220, 490] },
+      { "file": "assets/source/concepts/onub/scene_hygiene.jpg", "crop": [1400, 610, 240, 500] }
+    ],
+    "portrait": [
+      { "file": "assets/source/concepts/onub/scene_expediter.jpg", "crop": [1820, 500, 220, 590] },
+      { "file": "assets/source/concepts/onub/scene_hygiene.jpg", "crop": [1400, 610, 240, 500] }
+    ]
+  },
+  "pixel": {
+    "illustrationScale": 3,
+    "alphaCut": 0.5,
+    "match": "oklab",
+    "tieBreak": "darkest",
+    "keyTolerance": 0.15,
+    "cutoutOutline": "ink",
+    "webpQuality": 100
+  },
+  "pixelFinish": { "enabled": { "main": true, "onub": true }, "offWebpQuality": 90 },
   "ui": {
     "source": "docs/UI.md",
     "fonts": { "display": "Oswald", "text": "Inter" },

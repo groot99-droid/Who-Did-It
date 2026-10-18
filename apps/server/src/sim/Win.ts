@@ -2,7 +2,9 @@ import { balance } from '@wdi/content';
 import { Phase, type PlayerState, S2C, TICK_RATE, Winner, checkWin } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { logMatch } from '../services/MatchLog';
+import { resetCoversForLobby } from './Covers';
 import { countRow, factionOf, flowOf, resetFlow, roleIdOf, rolesOf, setPhase } from './Flow';
+import { resetNightForLobby } from './NightPowers';
 import { simOf } from './RoomSim';
 import { isNpcSeat, resetNpcsForLobby } from './Npc';
 import { resetOnubForLobby } from './Onub';
@@ -145,6 +147,8 @@ export function resetToLobby(room: PartyRoom): void {
   room.lobbyCommands.drain();
   simOf(room).resetForLobby();
   resetOnubForLobby(room);
+  resetCoversForLobby(room); // round 5, 5F: looks, avatars, disguises, card Ready (locked call site)
+  resetNightForLobby(room); // round 5, 5G: deck, undealt, night powers, poison (locked call site)
   resetNpcsForLobby(room);
   resetFlow(room);
   room.unlock();

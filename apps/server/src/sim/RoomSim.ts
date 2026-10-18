@@ -1,5 +1,5 @@
 import type { Profile } from '@wdi/content';
-import type { MeetingReason } from '@wdi/shared';
+import type { DeathCause, MeetingReason } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { POSITION_RING_TICKS } from './constants';
 
@@ -132,7 +132,7 @@ export interface MeetingRequest {
 /** Pushed by every death (sim/Kill, the ejection), drained by the phase stage for checkWin and the log. */
 export interface DeathEvent {
   playerId: string;
-  cause: 'knife' | 'ejected' | 'vanished';
+  cause: DeathCause;
   killerId?: string;
   tick: number;
 }

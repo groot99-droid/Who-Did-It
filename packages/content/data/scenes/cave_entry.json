@@ -5,8 +5,9 @@
   "zoneId": "cave_entry",
   "profile": "small",
   "kind": "interior",
+  "biome": "cave",
+  "dark": true,
   "size": { "w": 20, "h": 14 },
-  "ambientLightTiles": 2,
   "notes": "Bioluminescent moss gives an ambient light radius; the sea passage is boarded until the Thief ships (V1.5).",
   "worldRef": "4.3",
   "portals": [

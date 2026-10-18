@@ -225,11 +225,11 @@
       "reveals": "hunger",
       "inWorld": true,
       "collectible": false,
-      "decay": { "kind": "never" },
+      "decay": { "kind": "seconds", "seconds": 30 },
       "reader": "anyone",
       "plantable": false,
       "source": "hunger",
-      "description": "A starving Killer leaves glowing footprints until they kill.",
+      "description": "A Hungry Killer leaves a glowing footprint showing their own height on the tiles they cross, until they strike.",
       "ships": "V1",
       "gddRef": "3.4"
     },

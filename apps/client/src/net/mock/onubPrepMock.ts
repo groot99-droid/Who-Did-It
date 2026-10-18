@@ -27,6 +27,7 @@ export function createPrepMock(ctx: MockOnubContext): MockOnubPrepHalf {
       ruined: false,
       perk: false,
       cloche: '',
+      window: '',
     }),
     endPrep() {
       // The server's timeout commit, simplified: the first station's first good card.

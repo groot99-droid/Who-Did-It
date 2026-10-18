@@ -5,6 +5,8 @@
   "zoneId": "manor_upper",
   "profile": "medium",
   "kind": "interior",
+  "biome": "house",
+  "dark": false,
   "size": { "w": 24, "h": 12 },
   "notes": "Locked study (Study Key in the barn [M] or the cellar [L]; V1.5).",
   "worldRef": "4.3",

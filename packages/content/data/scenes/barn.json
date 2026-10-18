@@ -5,6 +5,8 @@
   "zoneId": "barn",
   "profile": "medium",
   "kind": "interior",
+  "biome": "house",
+  "dark": false,
   "size": { "w": 20, "h": 12 },
   "entryNoise": "goat",
   "notes": "Goat bleats when anyone enters; wolf pelt on the door.",

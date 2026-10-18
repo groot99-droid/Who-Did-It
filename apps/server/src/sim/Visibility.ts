@@ -1,5 +1,7 @@
 import { StateView } from '@colyseus/schema';
+import { VIEW_TAG } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { isAiming } from './NightPowers';
 import { simOf } from './RoomSim';
 import { SCENE_KEYS, isLoft, isWorldPhase, sceneKey } from './World';
 
@@ -9,8 +11,8 @@ export { SCENE_KEYS, sceneKey };
  * `Player.presence` and `Player.priv` carry their own view tags so each can be granted alone: adding a
  * Player with the presence tag reveals where it stands and nothing else (not even an empty `priv`).
  */
-export const PRESENCE_TAG = 1;
-export const PRIV_TAG = 2;
+export const PRESENCE_TAG = VIEW_TAG.presence;
+export const PRIV_TAG = VIEW_TAG.priv;
 
 /**
  * First view for a joining client: their own Player (so `priv` and `presence` arrive) and the
@@ -63,7 +65,8 @@ export function reconcileViews(room: PartyRoom): void {
     }
 
     const wanted = new Set<string>();
-    if (world) {
+    // A Gamekeeper aiming its Last Shot sees nobody until the aim closes (GDD 3.2; 5G's `isAiming`).
+    if (world && !isAiming(room, client.sessionId)) {
       for (const [id, other] of room.state.players) {
         if (id === client.sessionId) continue;
         const p = sim.players.get(id);

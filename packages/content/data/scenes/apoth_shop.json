@@ -5,6 +5,8 @@
   "zoneId": "apoth_shop",
   "profile": "small",
   "kind": "interior",
+  "biome": "house",
+  "dark": false,
   "size": { "w": 18, "h": 11 },
   "notes": "Basin (Blood wash); Wrench on the bench; the NOT FOR SALE shelf with one empty slot.",
   "worldRef": "4.3",

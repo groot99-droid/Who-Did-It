@@ -13,6 +13,7 @@
     "./metrics": "./src/metrics.ts",
     "./version": "./src/version.ts",
     "./direction": "./src/direction.ts",
+    "./iso": "./src/iso.ts",
     "./nav": "./src/nav/index.ts",
     "./collision": "./src/collision/index.ts"
   },

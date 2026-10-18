@@ -10,6 +10,8 @@ export interface MeetingPlayer {
   name: string;
   /** Trait indices as dealt (height S/M/T, scarf red/green/blue, hat cap/bowler/bare, GDD 3.1). */
   traits: { height: number; scarf: number; hat: number };
+  /** Public look id (`Player.look`, looks.json): '' until the role card closes, and in the quick mode (GDD 3.17). */
+  look: string;
   alive: boolean;
   hasVoted: boolean;
 }
@@ -43,6 +45,8 @@ export type MeetingFeedEvents = {
   gameOver: GameOver;
   'chat.msg': S2CPayloads['chat.msg'];
   phaseChange: S2CPayloads['phaseChange'];
+  /** Main mode, during a reveal: the ejected Gamekeeper's Last Shot (GDD 3.2). */
+  shot: S2CPayloads['shot'];
 };
 
 export interface MeetingFeed {

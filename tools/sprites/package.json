@@ -12,7 +12,16 @@
     "contact": "tsx contact.ts",
     "pack:static": "tsx pack-static.ts",
     "contact:body": "tsx body-contact.ts",
-    "images": "tsx images.ts"
+    "images": "tsx images.ts",
+    "pixel": "tsx pixel.ts",
+    "refs": "tsx refs.ts",
+    "tileset": "tsx tileset.ts",
+    "slice": "tsx slice.ts",
+    "review:world": "tsx review-world.ts",
+    "lineup": "tsx lineup.ts",
+    "onub": "tsx onub.ts",
+    "onub:cards": "tsx onub-cards.ts",
+    "onub:mini": "tsx onub-mini.ts"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
