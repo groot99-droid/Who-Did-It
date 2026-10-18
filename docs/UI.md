@@ -797,3 +797,16 @@ its article ("the Baker"), `{name}` a seat's name.
 The lobby list shows nothing in the quick mode. The look tag takes the look's own base colour (`looks.json`
 `palette.base`), and the trait portrait (height, scarf, hat) stays under it. The night-power picker and the Last Shot
 aim list wait for 5F's `ui/SeatPicker.ts` and a mount point in the world HUD (5I's files).
+
+### 14.17 Map row (5J)
+
+Session 5J, round 5. The lobby's map row of GDD 3.13 (`ui/lobby/MapPicker.ts`, module `ui/copy/maps.ts`). It
+shows only in the main mode (`showsMapRow`), under the frozen test id `map-select`, whose `data-map` is the
+map shown as chosen. Each map shows its `name` and `blurb` from `maps/<id>.json` (data, not copy) and its
+`thumb_<mapId>` image once the manifest has it. `{name}` is a map's `name`.
+
+| Id | Text | Notes |
+|---|---|---|
+| `lobby.map.label` | Map | leader only: label of the radio group, one option per map (`role="radio"`, `aria-checked`) |
+| `lobby.map.pick` | Play on {name} | `aria-label` of each option; picking sends `lobby.settings {map}` |
+| `lobby.map.current` | Map: {name} | everyone but the leader: the one read-only line, with the blurb under it |

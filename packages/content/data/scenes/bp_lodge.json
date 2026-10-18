@@ -1,0 +1,146 @@
+{
+  "id": "bp_lodge",
+  "prefix": "bl",
+  "name": "The Bunkhouse",
+  "zoneId": "bp_lodge",
+  "profile": "small",
+  "kind": "interior",
+  "biome": "house",
+  "dark": false,
+  "size": { "w": 24, "h": 12 },
+  "notes": "One room split by a half wall. Mess hall: long table, iron range (fire), wash basin (Blood wash), coat pegs, wood box. Bunk room: two bunk rows with a hiding spot under each end bunk, root cellar hatch (body spot). Front door south, side door east.",
+  "worldRef": "4.10",
+  "portals": [
+    {
+      "id": "bl.front",
+      "from": "bp_lodge",
+      "x": 6,
+      "y": 11,
+      "kind": "door",
+      "to": "bp_camp",
+      "toSpawn": "lodge",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "bl.side",
+      "from": "bp_lodge",
+      "x": 23,
+      "y": 5,
+      "kind": "door",
+      "to": "bp_camp",
+      "toSpawn": "lodge_side",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "front", "x": 6, "y": 10, "z": 0, "facing": "n" },
+    { "id": "side", "x": 22, "y": 5, "z": 0, "facing": "w" }
+  ],
+  "spots": [
+    {
+      "id": "bl.wood_box",
+      "kind": "hide",
+      "variant": "woodBox",
+      "x": 1,
+      "y": 1,
+      "childOnly": false
+    },
+    {
+      "id": "bl.under_bunk_n",
+      "kind": "hide",
+      "variant": "underBed",
+      "x": 21,
+      "y": 1,
+      "childOnly": false
+    },
+    {
+      "id": "bl.under_bunk_s",
+      "kind": "hide",
+      "variant": "underBed",
+      "x": 21,
+      "y": 10,
+      "childOnly": false
+    },
+    {
+      "id": "bl.root_cellar",
+      "kind": "body",
+      "variant": "rootCellar",
+      "x": 10,
+      "y": 9,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    { "id": "bl.stove", "kind": "oven", "x": 0, "y": 3 },
+    { "id": "bl.basin", "kind": "basin", "x": 9, "y": 0 },
+    {
+      "id": "bl.mess_table",
+      "kind": "decor",
+      "x": 6,
+      "y": 4,
+      "footprint": { "x": 4, "y": 4, "w": 6, "h": 2 }
+    },
+    {
+      "id": "bl.bunks_n",
+      "kind": "decor",
+      "x": 17,
+      "y": 2,
+      "footprint": { "x": 14, "y": 1, "w": 7, "h": 2 }
+    },
+    {
+      "id": "bl.bunks_s",
+      "kind": "decor",
+      "x": 17,
+      "y": 9,
+      "footprint": { "x": 14, "y": 9, "w": 7, "h": 2 }
+    },
+    { "id": "bl.pegs", "kind": "decor", "x": 11, "y": 0 }
+  ],
+  "gates": [],
+  "paths": [],
+  "lights": [
+    { "id": "bl.lt_stove", "kind": "fire", "x": 1, "y": 3, "radiusTiles": 2.5 },
+    { "id": "bl.lt_lamp_mess", "kind": "lamp", "x": 7, "y": 7, "radiusTiles": 2.5 },
+    { "id": "bl.lt_lamp_bunks", "kind": "lamp", "x": 17, "y": 5, "radiusTiles": 2 }
+  ],
+  "grid": [
+    "########################",
+    "#H..........#.#######H.#",
+    "#...........#.#######..#",
+    "#...........#..........#",
+    "#...######..#..........#",
+    "#...######..#.........SD",
+    "#...........#..........#",
+    "#...........#..........#",
+    "#......................#",
+    "#.........B...#######..#",
+    "#.....S.......#######H.#",
+    "######D#################"
+  ],
+  "material": [
+    "WWWWWWWWWPWPWWWWWWWWWWWW",
+    "WWwwwwwwwwwwWwPPPPPPPWwW",
+    "WwwwwwwwwwwwWwPPPPPPPwwW",
+    "PwwwwwwwwwwwWwwwwwwwwwwW",
+    "WwwwPPPPPPwwWwwwwwwwwwwW",
+    "WwwwPPPPPPwwWwwwwwwwwwwW",
+    "WwwwwwwwwwwwWwwwwwwwwwwW",
+    "WwwwwwwwwwwwWwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwPPPPPPPwwW",
+    "WwwwwwwwwwwwwwPPPPPPPWwW",
+    "WWWWWWWWWWWWWWWWWWWWWWWW"
+  ]
+}

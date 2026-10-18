@@ -1,5 +1,5 @@
 import { randomInt } from 'node:crypto';
-import { abilities, balance, items, roles } from '@wdi/content';
+import { MAP_IDS, abilities, balance, items, roles } from '@wdi/content';
 import {
   ABILITY_KEYS,
   C2S,
@@ -189,15 +189,15 @@ export function removeNewestNpcSeat(room: PartyRoom): boolean {
 }
 
 /**
- * `lobby.settings {mode?, npcDifficulty?, onubDeck?}`: leader, lobby; every field is checked before any is
- * written, all or nothing (GDD 3.11, 3.12, A39, A41). A mode change drops a pending `debug.deal`, whose role ids
- * belong to the other mode.
+ * `lobby.settings {mode?, npcDifficulty?, onubDeck?, map?}`: leader, lobby; every field is checked before any is
+ * written, all or nothing (GDD 3.11, 3.12, 3.13, A39, A41). A mode change drops a pending `debug.deal`, whose role
+ * ids belong to the other mode. `map` is a map id of `MAP_IDS` in either mode; the quick mode ignores it.
  */
 function handleSettings(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   if (room.state.leaderId !== sessionId)
     return refuse(room, sessionId, ErrorCode.cannot, 'cannot change settings');
   if (room.state.phase !== Phase.lobby) return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
-  const { mode, npcDifficulty, onubDeck } = payload;
+  const { mode, npcDifficulty, onubDeck, map } = payload;
   const settings = room.state.settings;
   const modes: unknown[] = Object.values(GameMode);
   const levels: unknown[] = Object.values(NpcLevel);
@@ -206,12 +206,15 @@ function handleSettings(room: PartyRoom, sessionId: string, payload: Record<stri
     npcDifficulty !== undefined &&
     (!levels.includes(npcDifficulty) || settings.npcSeats < balance.npc.difficultyMinNpcs);
   const deck = onubDeck === undefined ? undefined : onubDeckSetting(onubDeck);
-  if (badMode || badLevel || deck === null) return refuse(room, sessionId, ErrorCode.cannot, 'bad setting');
+  const badMap = map !== undefined && !(MAP_IDS as readonly unknown[]).includes(map);
+  if (badMode || badLevel || deck === null || badMap)
+    return refuse(room, sessionId, ErrorCode.cannot, 'bad setting');
   if (typeof mode === 'number' && mode !== settings.mode) {
     settings.mode = mode;
     flowOf(room).fixedDeal = null;
   }
   if (typeof npcDifficulty === 'number') settings.npcDifficulty = npcDifficulty;
+  if (typeof map === 'string') settings.map = map;
   if (deck !== undefined) {
     settings.onubDeck.clear();
     for (const id of deck) settings.onubDeck.push(id);

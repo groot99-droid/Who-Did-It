@@ -14,8 +14,8 @@
     {
       "id": "tb.front",
       "from": "tavern_bar",
-      "x": 0,
-      "y": 6,
+      "x": 4,
+      "y": 11,
       "kind": "door",
       "to": "overworld",
       "toSpawn": "tavern_front",
@@ -61,7 +61,7 @@
     }
   ],
   "spawns": [
-    { "id": "front", "x": 1, "y": 6, "z": 0, "facing": "e" },
+    { "id": "front", "x": 4, "y": 10, "z": 0, "facing": "n" },
     { "id": "alley", "x": 18, "y": 6, "z": 0, "facing": "w" },
     { "id": "back", "x": 10, "y": 10, "z": 0, "facing": "n" }
   ],
@@ -91,6 +91,11 @@
   ],
   "gates": [],
   "paths": [],
+  "lights": [
+    { "id": "tb.lt_hearth", "kind": "fire", "x": 1, "y": 3, "radiusTiles": 3 },
+    { "id": "tb.lt_lamp_bar", "kind": "lamp", "x": 15, "y": 2, "radiusTiles": 2.5 },
+    { "id": "tb.lt_lamp_room", "kind": "lamp", "x": 7, "y": 8, "radiusTiles": 2.5 }
+  ],
   "grid": [
     "####################",
     "#..............H...#",
@@ -98,11 +103,25 @@
     "#..........######..#",
     "#..................#",
     "#..................#",
-    "DS..##............SD",
+    "#...##............SD",
     "#...........##.....#",
     "#..................#",
     "#.H................#",
-    "#.........S........#",
-    "##########D#########"
+    "#...S.....S........#",
+    "####D#####D#########"
+  ],
+  "material": [
+    "WWWPWWPWWWWWWWWWWWWW",
+    "WwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwwwwwP",
+    "WwwwwwwwwwwKKKKKKwwW",
+    "WwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwwwwwW",
+    "WwwwKKwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwKKwwwwwW",
+    "WwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwwwwwW",
+    "WWWWWWWWWWWWWWPWWWWW"
   ]
 }

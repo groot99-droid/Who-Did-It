@@ -1,0 +1,168 @@
+{
+  "id": "bp_deep",
+  "prefix": "bd",
+  "name": "The Deep Level",
+  "zoneId": "bp_deep",
+  "profile": "large",
+  "kind": "interior",
+  "biome": "cave",
+  "dark": true,
+  "size": { "w": 40, "h": 28 },
+  "notes": "Dark. Winze landing at the top, the flooded stope with two plank walkways and the sump, the old workings east (ore pillars, tin, a VANE TIN CO crate, a pillar to hide behind, a rat run), the miners' refuge SW (table, bunk, a dead man's lamp still burning), and the drowned adit west to the woods with a torch at its mouth.",
+  "worldRef": "4.10",
+  "portals": [
+    {
+      "id": "bd.winze",
+      "from": "bp_deep",
+      "x": 20,
+      "y": 0,
+      "kind": "hatch",
+      "to": "bp_mine",
+      "toSpawn": "winze",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 8,
+      "minProfile": "large",
+      "ships": "V1"
+    },
+    {
+      "id": "bd.old_adit",
+      "from": "bp_deep",
+      "x": 0,
+      "y": 20,
+      "kind": "cave_mouth",
+      "to": "bp_woods",
+      "toSpawn": "old_adit",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "large",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "winze", "x": 20, "y": 1, "z": 0, "facing": "s" },
+    { "id": "old_adit", "x": 1, "y": 20, "z": 0, "facing": "e" }
+  ],
+  "spots": [
+    {
+      "id": "bd.refuge_bunk",
+      "kind": "hide",
+      "variant": "bunk",
+      "x": 3,
+      "y": 24,
+      "childOnly": false
+    },
+    {
+      "id": "bd.ore_pillar",
+      "kind": "hide",
+      "variant": "orePillar",
+      "x": 34,
+      "y": 12,
+      "childOnly": false
+    },
+    { "id": "bd.sump", "kind": "body", "variant": "sump", "x": 24, "y": 19, "childOnly": false }
+  ],
+  "props": [
+    { "id": "bd.refuge_table", "kind": "decor", "x": 6, "y": 22 },
+    { "id": "bd.tin_crate", "kind": "decor", "x": 34, "y": 6 }
+  ],
+  "gates": [],
+  "paths": [
+    {
+      "id": "bd.rat_run",
+      "kind": "patrol",
+      "points": [
+        { "x": 32, "y": 7 },
+        { "x": 37, "y": 7 },
+        { "x": 37, "y": 19 },
+        { "x": 32, "y": 19 }
+      ]
+    }
+  ],
+  "lights": [
+    { "id": "bd.lt_refuge_lamp", "kind": "lamp", "x": 6, "y": 23, "radiusTiles": 2 },
+    { "id": "bd.lt_moss_0", "kind": "moss", "x": 14, "y": 9, "radiusTiles": 2 },
+    { "id": "bd.lt_moss_1", "kind": "moss", "x": 28, "y": 16, "radiusTiles": 2 },
+    { "id": "bd.lt_torch_adit", "kind": "torch", "x": 3, "y": 20, "radiusTiles": 2 },
+    { "id": "bd.lt_moss_workings", "kind": "moss", "x": 36, "y": 8, "radiusTiles": 2 }
+  ],
+  "nodes": [
+    { "id": "bd.nd_tin_0", "resource": "tinOre", "x": 32, "y": 5, "pool": "deepTin" },
+    { "id": "bd.nd_tin_1", "resource": "tinOre", "x": 39, "y": 10, "pool": "deepTin" },
+    { "id": "bd.nd_tin_2", "resource": "tinOre", "x": 33, "y": 16, "pool": "deepTin" },
+    { "id": "bd.nd_tin_3", "resource": "tinOre", "x": 39, "y": 18, "pool": "deepTin" },
+    { "id": "bd.nd_stone_0", "resource": "stone", "x": 35, "y": 14, "pool": "deepStone" },
+    { "id": "bd.nd_stone_1", "resource": "stone", "x": 31, "y": 21, "pool": "deepStone" },
+    { "id": "bd.nd_mush_0", "resource": "mushroom", "x": 5, "y": 25, "pool": "deepMush" },
+    { "id": "bd.nd_mush_1", "resource": "mushroom", "x": 9, "y": 21, "pool": "deepMush" }
+  ],
+  "spawners": [
+    { "id": "bd.sp_bats", "mob": "bat", "x": 20, "y": 12, "leashTiles": 8 },
+    { "id": "bd.sp_rats", "mob": "rat", "x": 34, "y": 10, "leashTiles": 6, "pathId": "bd.rat_run" }
+  ],
+  "grid": [
+    "####################D###################",
+    "##################..S..#################",
+    "##################......################",
+    "##################.....############.##.#",
+    "##################.....########........#",
+    "#################......#######..#......#",
+    "###################...########....#....#",
+    "###################...#.####..#........#",
+    "##########.............................#",
+    "##########.#########.#########.........#",
+    "##########.#########.#########.........#",
+    "##########.#########.#########.........#",
+    "##########........................H....#",
+    "##########.#########.#########.........#",
+    "##########.#########.#########.....#...#",
+    "##########.#########.#########.........#",
+    "#########..#########.#########...#.....#",
+    "########.#.#########.#########.........#",
+    "########...............................#",
+    "#..........##.###.######B######........#",
+    "DS.........####################........#",
+    "#..........#########################..##",
+    "###...#....#############################",
+    "###.........############################",
+    "###H.......#############################",
+    "###........#############################",
+    "########################################",
+    "########################################"
+  ],
+  "material": [
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXrrrrrXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXrrrrrrXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXrrrrrXXXXXXXXXXXXrXXrX",
+    "XXXXXXXXXXXXXXXXXXrrrrrXXXXXXXXrrrrrrrrX",
+    "XXXXXXXXXXXXXXXXXrrrrrrXXXXXXXrrRrrrrrrX",
+    "XXXXXXXXXXXXXXXXXXXrrrXXXXXXXXrrrrPrrrrX",
+    "XXXXXXXXXXXXXXXXXXXrrrXrXXXXrrXrrrrrrrrX",
+    "XXXXXXXXXX~~~~~~~~~~w~~~~~~~~~~rrrrrrrrX",
+    "XXXXXXXXXX~OOOOOOOOOwOOOOOOOOO~rrrrrrrrX",
+    "XXXXXXXXXX~OOOOOOOOOwOOOOOOOOO~rrrrrrrrX",
+    "XXXXXXXXXX~OOOOOOOOOwOOOOOOOOO~rrrrrrrrX",
+    "XXXXXXXXXXwwwwwwwwwwwwwwwwwwwwwrrrrrrrrX",
+    "XXXXXXXXXX~OOOOOOOOOwOOOOOOOOO~rrrrrrrrX",
+    "XXXXXXXXXX~OOOOOOOOOwOOOOOOOOO~rrrrRrrrX",
+    "XXXXXXXXXX~OOOOOOOOOwOOOOOOOOO~rrrrrrrrX",
+    "XXXXXXXXXr~OOOOOOOOOwOOOOOOOOO~rrRrrrrrX",
+    "XXXXXXXXrX~OOOOOOOOOwOOOOOOOOO~rrrrrrrrX",
+    "XXXXXXXXrrr~~~~~~~~~w~~~~~~~~~~rrrrrrrrX",
+    "X~~~~~~~~rrXXrXXXrXXXXXXXXXXXXXrrrrrrrrX",
+    "X~~~~~~~~rrXXXXXXXXXXXXXXXXXXXXrrrrrrrrX",
+    "X~~~~~~~~rrXXXXXXXXXXXXXXXXXXXXXXXXXrrXX",
+    "XXXfffPffffXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXfffffffffXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXfffffffXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXffffffffXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  ]
+}

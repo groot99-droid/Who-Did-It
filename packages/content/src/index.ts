@@ -30,7 +30,18 @@ import manorUpperJson from '../data/scenes/manor_upper.json' with { type: 'json'
 import barnJson from '../data/scenes/barn.json' with { type: 'json' };
 import chapelJson from '../data/scenes/chapel.json' with { type: 'json' };
 import cellarJson from '../data/scenes/cellar.json' with { type: 'json' };
+import forestDeepJson from '../data/scenes/forest_deep.json' with { type: 'json' };
+import caveGalleryJson from '../data/scenes/cave_gallery.json' with { type: 'json' };
+import bpCampJson from '../data/scenes/bp_camp.json' with { type: 'json' };
+import bpLodgeJson from '../data/scenes/bp_lodge.json' with { type: 'json' };
+import bpMillJson from '../data/scenes/bp_mill.json' with { type: 'json' };
+import bpWoodsJson from '../data/scenes/bp_woods.json' with { type: 'json' };
+import bpMineJson from '../data/scenes/bp_mine.json' with { type: 'json' };
+import bpOfficeJson from '../data/scenes/bp_office.json' with { type: 'json' };
+import bpSmithyJson from '../data/scenes/bp_smithy.json' with { type: 'json' };
+import bpDeepJson from '../data/scenes/bp_deep.json' with { type: 'json' };
 import hollowmereJson from '../data/maps/hollowmere.json' with { type: 'json' };
+import blackpineJson from '../data/maps/blackpine.json' with { type: 'json' };
 
 import { AbilitiesFile } from './schemas/abilities.js';
 import { BalanceFile, type BalanceRow, type Profile } from './schemas/balance.js';
@@ -86,9 +97,22 @@ const sceneJson: Record<SceneId, unknown> = {
   barn: barnJson,
   chapel: chapelJson,
   cellar: cellarJson,
+  forest_deep: forestDeepJson,
+  cave_gallery: caveGalleryJson,
+  bp_camp: bpCampJson,
+  bp_lodge: bpLodgeJson,
+  bp_mill: bpMillJson,
+  bp_woods: bpWoodsJson,
+  bp_mine: bpMineJson,
+  bp_office: bpOfficeJson,
+  bp_smithy: bpSmithyJson,
+  bp_deep: bpDeepJson,
 };
 
-const mapJson: Record<MapId, unknown> = { hollowmere: hollowmereJson };
+const mapJson: Record<MapId, unknown> = {
+  hollowmere: hollowmereJson,
+  blackpine: blackpineJson,
+};
 
 function parseMaps(): Record<MapId, MapFile> {
   const out = {} as Record<MapId, MapFile>;

@@ -99,6 +99,11 @@
   ],
   "gates": [],
   "paths": [],
+  "lights": [
+    { "id": "cl.lt_torch_well", "kind": "torch", "x": 14, "y": 2, "radiusTiles": 2.5 },
+    { "id": "cl.lt_torch_trap", "kind": "torch", "x": 25, "y": 8, "radiusTiles": 2.5 },
+    { "id": "cl.lt_torch_crypt", "kind": "torch", "x": 2, "y": 8, "radiusTiles": 2.5 }
+  ],
   "grid": [
     "##############D#############",
     "#.............S............#",
@@ -116,5 +121,23 @@
     "#....B.....................#",
     "#..........................#",
     "############################"
+  ],
+  "material": [
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WffffffffffffffffffffffffffW",
+    "WffffffffffffffffffffffffffW",
+    "WffffffffffffffffffffffffffW",
+    "WfffffWffffffWffffffWffffffW",
+    "WfffffWffffffWffffffWffffffW",
+    "WfffffWffffffWffffffWffffffW",
+    "WfffffWffffffWffffffWffffffW",
+    "WfffffWffffffWffffffWffffffW",
+    "WfffffWffffffWffffffWffffffW",
+    "WfffffWffffffWffffffWffffffW",
+    "WfffffWffffffWffffffWffffffW",
+    "WffffffffffffffffffffffffffW",
+    "WffffffffffffffffffffffffffW",
+    "WffffffffffffffffffffffffffW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
   ]
 }

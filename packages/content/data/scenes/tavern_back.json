@@ -69,6 +69,7 @@
   "props": [{ "id": "tk.oil_barrel", "kind": "taskSource", "x": 0, "y": 7, "item": "oil" }],
   "gates": [],
   "paths": [],
+  "lights": [{ "id": "tk.lt_lamp", "kind": "lamp", "x": 6, "y": 4, "radiusTiles": 2 }],
   "grid": [
     "######D#####",
     "#.....S....#",
@@ -80,5 +81,17 @@
     "#..........#",
     "#.........B#",
     "############"
+  ],
+  "material": [
+    "WWWWWWWWWWWW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "PwwwwwwwwwwW",
+    "WwwwwwwwwwwW",
+    "WWWWWWWWWWWW"
   ]
 }

@@ -1,0 +1,272 @@
+{
+  "id": "forest_deep",
+  "prefix": "fd",
+  "name": "The Fenwood",
+  "zoneId": "forest_deep",
+  "profile": "medium",
+  "kind": "exterior",
+  "biome": "forest",
+  "dark": false,
+  "size": { "w": 48, "h": 36 },
+  "notes": "Marsh-edge wood west of Gallows Wood (WORLD 4.1): east trail with the hollow log, the Hanging Oak clearing (moonlit at night), north trail past the sinkhole glade and the wolf den to the adit, Mother Moll's charcoal clearing with her hut, clamp and pit, the fen with its boardwalk, bog and the drowned lantern (WORLD 4.8), and the pine loop with a boar wallow. Shut below Medium.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "fd.wood",
+      "from": "forest_deep",
+      "x": 47,
+      "y": 18,
+      "kind": "forest_gate",
+      "to": "forest",
+      "toSpawn": "deep_side",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "medium",
+      "ships": "V1"
+    },
+    {
+      "id": "fd.adit",
+      "from": "forest_deep",
+      "x": 8,
+      "y": 0,
+      "kind": "cave_mouth",
+      "to": "cave_gallery",
+      "toSpawn": "fen",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "medium",
+      "ships": "V1"
+    },
+    {
+      "id": "fd.sinkhole",
+      "from": "forest_deep",
+      "x": 16,
+      "y": 7,
+      "kind": "drop",
+      "to": "cave_gallery",
+      "toSpawn": "sink_landing",
+      "oneWay": true,
+      "lock": null,
+      "window": null,
+      "noise": "oneWayDrop",
+      "elevationDelta": -6,
+      "minProfile": "medium",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "wood_side", "x": 46, "y": 18, "z": 0, "facing": "w" },
+    { "id": "adit_side", "x": 8, "y": 1, "z": 0, "facing": "s" }
+  ],
+  "spots": [
+    {
+      "id": "fd.hollow_log",
+      "kind": "hide",
+      "variant": "hollowLog",
+      "x": 32,
+      "y": 16,
+      "childOnly": false
+    },
+    { "id": "fd.reeds", "kind": "hide", "variant": "reeds", "x": 6, "y": 26, "childOnly": false },
+    {
+      "id": "fd.bramble",
+      "kind": "hide",
+      "variant": "brush",
+      "x": 45,
+      "y": 27,
+      "childOnly": false
+    },
+    { "id": "fd.bog", "kind": "body", "variant": "bog", "x": 14, "y": 31, "childOnly": false },
+    {
+      "id": "fd.charcoal_pit",
+      "kind": "body",
+      "variant": "charcoalPit",
+      "x": 34,
+      "y": 9,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    {
+      "id": "fd.hanging_oak",
+      "kind": "decor",
+      "x": 24,
+      "y": 16,
+      "footprint": { "x": 23, "y": 15, "w": 2, "h": 2 }
+    },
+    {
+      "id": "fd.clamp",
+      "kind": "decor",
+      "x": 37,
+      "y": 7,
+      "footprint": { "x": 36, "y": 6, "w": 2, "h": 2 }
+    },
+    { "id": "fd.drowned_lantern", "kind": "decor", "x": 10, "y": 30 },
+    { "id": "fd.den", "kind": "decor", "x": 4, "y": 7 }
+  ],
+  "gates": [],
+  "paths": [
+    {
+      "id": "fd.wolf_loop_n",
+      "kind": "wolfLoop",
+      "points": [{ "x": 3, "y": 4 }, { "x": 13, "y": 4 }, { "x": 13, "y": 11 }, { "x": 3, "y": 11 }]
+    },
+    {
+      "id": "fd.wolf_loop_s",
+      "kind": "wolfLoop",
+      "points": [
+        { "x": 28, "y": 24 },
+        { "x": 44, "y": 24 },
+        { "x": 44, "y": 32 },
+        { "x": 28, "y": 32 }
+      ]
+    }
+  ],
+  "buildings": [
+    { "id": "fd.bld_moll_hut", "art": "mollHut", "footprint": { "x": 39, "y": 3, "w": 4, "h": 3 } }
+  ],
+  "lights": [
+    { "id": "fd.lt_clamp", "kind": "fire", "x": 37, "y": 8, "radiusTiles": 3 },
+    {
+      "id": "fd.lt_drowned",
+      "kind": "lantern",
+      "x": 10,
+      "y": 29,
+      "radiusTiles": 2,
+      "phases": ["dusk", "night"]
+    },
+    {
+      "id": "fd.lt_moon_oak",
+      "kind": "moon",
+      "x": 24,
+      "y": 19,
+      "radiusTiles": 4,
+      "phases": ["night"]
+    },
+    { "id": "fd.lt_moss_den", "kind": "moss", "x": 6, "y": 8, "radiusTiles": 1.5 },
+    { "id": "fd.lt_rot_fen", "kind": "moss", "x": 16, "y": 27, "radiusTiles": 2 }
+  ],
+  "nodes": [
+    { "id": "fd.nd_timber_0", "resource": "timber", "x": 27, "y": 12, "pool": "fenTimber" },
+    { "id": "fd.nd_timber_1", "resource": "timber", "x": 30, "y": 14, "pool": "fenTimber" },
+    { "id": "fd.nd_timber_2", "resource": "timber", "x": 42, "y": 20, "pool": "fenTimber" },
+    { "id": "fd.nd_timber_3", "resource": "timber", "x": 26, "y": 25, "pool": "fenTimber" },
+    { "id": "fd.nd_herb_0", "resource": "herb", "x": 21, "y": 15, "pool": "fenHerbs" },
+    { "id": "fd.nd_herb_1", "resource": "herb", "x": 18, "y": 24, "pool": "fenHerbs" },
+    { "id": "fd.nd_herb_2", "resource": "herb", "x": 35, "y": 11, "pool": "fenHerbs" },
+    { "id": "fd.nd_mush_0", "resource": "mushroom", "x": 10, "y": 9, "pool": "fenMush" },
+    { "id": "fd.nd_mush_1", "resource": "mushroom", "x": 35, "y": 29, "pool": "fenMush" },
+    { "id": "fd.nd_stone_0", "resource": "stone", "x": 4, "y": 9 }
+  ],
+  "spawners": [
+    {
+      "id": "fd.sp_wolf_den",
+      "mob": "wolf",
+      "x": 6,
+      "y": 9,
+      "leashTiles": 6,
+      "phases": ["dusk", "night"],
+      "pathId": "fd.wolf_loop_n"
+    },
+    {
+      "id": "fd.sp_wolf_south",
+      "mob": "wolf",
+      "x": 28,
+      "y": 28,
+      "leashTiles": 6,
+      "phases": ["dusk", "night"],
+      "pathId": "fd.wolf_loop_s"
+    },
+    {
+      "id": "fd.sp_boar",
+      "mob": "boar",
+      "x": 36,
+      "y": 28,
+      "leashTiles": 5,
+      "phases": ["day", "dusk"]
+    }
+  ],
+  "givers": [{ "id": "fd.gv_moll", "npc": "moll", "x": 40, "y": 7, "facing": "sw" }],
+  "grid": [
+    "########D#######################################",
+    "#######.S.######################################",
+    "#######...######################################",
+    "#######...######################################",
+    "##............##################################",
+    "###.#......#..########################.#########",
+    "###.#..............#############....##.....#####",
+    "###.#...........D..##############...##.....#####",
+    "###.#..............##############..........#####",
+    "###.#..............##.##########..B.........####",
+    "###.#..................##########..........#####",
+    "###.................#..##########..........#####",
+    "#######................######.###.#####...######",
+    "########.########.#...........#########...######",
+    "###################...........########....######",
+    "###################....##.....#########...######",
+    "###################....##.....#.H#.#.##...######",
+    "###################............................#",
+    "###################..#.........#..............SD",
+    "###################............................#",
+    "##################..........#.##.##########.####",
+    "##########.#.######...........##################",
+    "#......................#.....###################",
+    "##..#...........#......#.....##.#.#####.########",
+    "#......................#.....................###",
+    "##.....................##.##.####..##.####.#.###",
+    "##....H................#####.######.########.###",
+    "##.....................#####.#####.....#####.H##",
+    "#..#####...............####............#####.###",
+    "##.#####...............#####.#####.....#####.###",
+    "##.#####..#............#####..##############..##",
+    "##.#####......B######..#####.###########.#.#..##",
+    "##.#####.......######..#####.................###",
+    "#..............######..######.####..############",
+    "##.....................#########################",
+    "################################################"
+  ],
+  "material": [
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    "TTTTTTTlllTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    "TTTTTTTlllTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    "TTTTTTTlllTTTTTTTTTTTTTTTTTTTTTTTTTTTTTPPPPTTTTT",
+    "TTllllllllllllTTTTTTTTTTTTTTTTTTTTTTTTTPPPPTTTTT",
+    "TTTlXllllllRllTTTTTTTTTTTTTTTTTTTTTTTTdPPPPTTTTT",
+    "TTTlXllllllllllllllTTTTTTTTTTTTTddddPPdddddTTTTT",
+    "TTTlPllllllllllllllTTTTTTTTTTTTTTdddPPdddddTTTTT",
+    "TTTlXllllllllllllllTTTTTTTTTTTTTTddddddddddTTTTT",
+    "TTTlXllllllllllllllTTuTTTTTTTTTTddddddddddddTTTT",
+    "TTTlTllllllllllllllulluTTTTTTTTTTddddddddddTTTTT",
+    "TTTlllllllllllllllllRluTTTTTTTTTTddddddllldTTTTT",
+    "TTTTTTTlllllllluullllluTTTTTTgTTTdTTTTTlllTTTTTT",
+    "TTTTTTTTlTTTTTTTTlTglllgggguggTTTTTTTTTullTTTTTT",
+    "TTTTTTTTTTTTTTTTTTTgggggggggggTTTTTTTTllllTTTTTT",
+    "TTTTTTTTTTTTTTTTTTTugggPPgggggTTTTTTTTTullTTTTTT",
+    "TTTTTTTTTTTTTTTTTTTggggPPgggggTlTTlTlTTullTTTTTT",
+    "TTTTTTTTTTTTTTTTTTTggggggggggglllllllllllluulllT",
+    "TTTTTTTTTTTTTTTTTTTugRgggggggglTlllllllllllllllT",
+    "TTTTTTTTTTTTTTTTTTTggggggggggglllllllllllllllllT",
+    "TTTTTTTTTTTTTTTTTTggggggggggTgTTlTTTTTTTTTTlTTTT",
+    "TTTTTTTTTTuTgTTTTTTgwwgglllllgTTTTTTTTTTTTTTTTTT",
+    "TgggggggggggguguggggwwgTlllllTTTTTTTTTTTTTTTTTTT",
+    "TTugTgggggggggggTuggwwgTlllllTTlTlTTTTTlTTTTTTTT",
+    "Tl~~~~~~~~~~~~~~~~uuuuuTullllllllllllllllllllTTT",
+    "TT~~~~~~~~~~~~~~~~uuuuuTTlTTlTTTTluTTlTTTTlTlTTT",
+    "TT~~~~~~wwwwwwwwwwwwww~TTTTTlTTTTTTdTTTTTTTTlTTT",
+    "TT~~~~~~wwwwwwwwwwwwww~TTTTTlTTTTTdddddTTTTTlTTT",
+    "Tl~OOOOO~www~~~~~~~~~~~TTTTllllllldddddTTTTTlTTT",
+    "TT~OOOOO~www~~~~~~~~~~~TTTTTlTTTTTdddddTTTTTlTTT",
+    "TT~OOOOO~~P~~~~~~~~~~~~TTTTTllTTTTTTTTTTTTTTllTT",
+    "TT~OOOOO~~~~~~OOOOOOO~~TTTTTlTTTTTTTTTTTuTlTllTT",
+    "TT~OOOOO~~~~~~~OOOOOO~~TTTTTlllllllllllllllllTTT",
+    "Tuuuuuu~~~~~~~~OOOOOO~~TTTTTTlTTTTllTTTTTTTTTTTT",
+    "TTuuuuu~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTTTTTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+  ]
+}

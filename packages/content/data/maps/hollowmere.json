@@ -19,7 +19,9 @@
     "manor_upper",
     "barn",
     "chapel",
-    "cellar"
+    "cellar",
+    "forest_deep",
+    "cave_gallery"
   ],
   "hub": "overworld",
   "startSpawns": [

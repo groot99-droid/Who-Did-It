@@ -40,7 +40,13 @@
     }
   ],
   "props": [
-    { "id": "bk.wake_table", "kind": "wakeTable", "x": 8, "y": 4 },
+    {
+      "id": "bk.wake_table",
+      "kind": "wakeTable",
+      "x": 8,
+      "y": 4,
+      "footprint": { "x": 6, "y": 4, "w": 5, "h": 2 }
+    },
     { "id": "bk.plate_0", "kind": "plate", "x": 6, "y": 4 },
     { "id": "bk.plate_5", "kind": "plate", "x": 6, "y": 5 },
     { "id": "bk.plate_1", "kind": "plate", "x": 7, "y": 4 },
@@ -61,6 +67,10 @@
   ],
   "gates": [],
   "paths": [],
+  "lights": [
+    { "id": "bk.lt_lamp_table", "kind": "lamp", "x": 8, "y": 6, "radiusTiles": 2.5 },
+    { "id": "bk.lt_lamp_counter", "kind": "lamp", "x": 14, "y": 6, "radiusTiles": 2 }
+  ],
   "grid": [
     "##################",
     "####...........H.#",
@@ -73,5 +83,18 @@
     "#..............###",
     "#.......S........#",
     "########D#########"
+  ],
+  "material": [
+    "WWWWWWWWWWWWWWWWWW",
+    "WWWPwwwwwwwwwwwwwW",
+    "WWPPwwwwwwwwwwwwwW",
+    "WwwPwwwwwwwwwWWWWW",
+    "WwwwwKPPPPPKwwwwwW",
+    "WwwwwKPPPPPKwwwwwP",
+    "WwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwPWW",
+    "PwwwwwwwwwwwwwwWWW",
+    "WwwwwwwwwwwwwwwwwW",
+    "WWWWWWWWWWWWWWWWWW"
   ]
 }
