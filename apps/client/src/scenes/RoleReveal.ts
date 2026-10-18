@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import type { SceneEnterPayload } from '../net/protocol';
 import { h, overlayRoot } from '../ui/dom';
 import { mountRoleCard, type RoleCardScreen } from '../ui/RoleCard';
+import { REG_WORLD, type WorldFeed } from '../net/world';
 import { Backdrop } from '../view/Backdrop';
 import { getHealth, getNet } from './registry';
 
@@ -25,8 +26,14 @@ export class RoleReveal extends Phaser.Scene {
       this.scene.start('Lobby');
       return;
     }
+    // Main mode (GDD 3.17): a cover role picks its look here, and sees its Cabal mates' picks live from the feed
+    // the world router publishes with the room; the quick mode's card has no picker.
+    const feed = () => this.registry.get(REG_WORLD) as WorldFeed | undefined;
     this.card = mountRoleCard(overlayRoot(), payload, {
       onReady: () => net.send('lobby.ready', { ready: true }),
+      onPickCover: (lookId) => net.send('role.cover', { lookId }),
+      cover: () => feed()?.coverState() ?? { look: '', mates: {} },
+      textures: this.textures,
     });
 
     const banner = h('p', { class: 'wdi-hint wdi-banner', role: 'status', 'data-testid': 'entered' });

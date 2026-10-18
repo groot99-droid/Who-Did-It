@@ -17,8 +17,9 @@ import {
   type SceneEnter,
   type WorldFeed,
 } from '../net/world';
-import { WORLD_COPY as C, fill } from '../ui/copy';
+import { LOOKS_COPY, WORLD_COPY as C, fill } from '../ui/copy';
 import { overlayRoot } from '../ui/dom';
+import { mountSeatPicker } from '../ui/SeatPicker';
 import { AudioBus } from '../view/AudioBus';
 import { BodyView } from '../view/BodyView';
 import { ClueView } from '../view/ClueView';
@@ -30,6 +31,7 @@ import { PropView, overworldProps } from '../view/PropView';
 import { sceneMapKey, sceneMapUrl } from '../view/assets';
 import { isTouchDevice, readDevFlags } from '../view/devFlags';
 import { loadSceneName } from '../view/sceneNames';
+import { nearestAvatar } from '../view/targets';
 import { REG_AUDIO, getNet } from './registry';
 
 /** How close a player must stand to a door to use it, in tiles (balance.json `doors.reachTiles`, GDD 3.7). */
@@ -245,6 +247,8 @@ export class World extends Phaser.Scene {
       this.scale.refresh();
       this.offs.forEach((off) => off());
       this.endUse();
+      this.seatPicker?.destroy();
+      this.seatPicker = null;
       input.unbindAll();
       this.entities.destroy();
       this.clueView.destroy();
@@ -371,6 +375,7 @@ export class World extends Phaser.Scene {
     const row = getNet(this).roleCard?.abilities.find((a) => a.key === slot);
     const def = row ? ABILITY_DEFS[row.id] : undefined;
     if (!row || !def || def.kind !== 'active') return;
+    if (def.target === 'seat') return this.pickSeat(row.id, row.name);
     if (def.target !== 'player') {
       this.feed.ability(row.id);
       return;
@@ -383,21 +388,32 @@ export class World extends Phaser.Scene {
     } else this.feed.ability(row.id, near);
   }
 
+  /** The handle of the avatar nearest to the own in reach: the Kill and the Bandage name a handle (GDD 3.17). */
   private nearestPlayer(reachTiles: number): string | null {
-    const snaps = this.feed.snapshot();
-    const me = snaps.find((s) => s.id === this.feed.selfId)?.presence;
-    if (!me) return null;
-    let best: string | null = null;
-    let bestD = reachTiles * TILE_PX;
-    for (const s of snaps) {
-      if (s.id === this.feed.selfId || s.presence === null) continue;
-      const d = Math.hypot(s.presence.x - me.x, s.presence.y - me.y);
-      if (d <= bestD) {
-        bestD = d;
-        best = s.id;
-      }
-    }
-    return best;
+    return nearestAvatar(this.feed.avatars(), this.feed.selfHandle(), reachTiles * TILE_PX);
+  }
+
+  private seatPicker: { destroy(): void } | null = null;
+
+  /** A `target: 'seat'` ability names a seat id: pick one from the publicly living seats (GDD 3.17). */
+  private pickSeat(abilityId: string, name: string): void {
+    if (this.seatPicker) return;
+    const seats = this.feed
+      .snapshot()
+      .filter((s) => s.alive && s.id !== this.feed.selfId)
+      .map((s) => ({ id: s.id, name: s.name, look: s.look, traits: s.traits }));
+    const done = () => (this.seatPicker = null);
+    this.seatPicker = mountSeatPicker(overlayRoot(), {
+      title: abilityId === 'impersonate' ? LOOKS_COPY['seats.title.impersonate'] : name,
+      seats,
+      textures: this.textures,
+      onPick: (id) => {
+        done();
+        this.feed.ability(abilityId, id);
+        if (abilityId === 'impersonate') this.hud.toast(LOOKS_COPY['toast.disguise.wait'], 'interact');
+      },
+      onCancel: done,
+    });
   }
 
   // ---- targets and the prompt ---------------------------------------------------------------------

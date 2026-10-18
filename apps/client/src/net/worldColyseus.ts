@@ -2,7 +2,9 @@ import mitt, { type Emitter } from 'mitt';
 import type { Room } from '@colyseus/sdk';
 import type { HoldAction } from '@wdi/shared/protocol';
 import type {
+  AvatarSnap,
   BodySnap,
+  CoverState,
   ClueSnap,
   DoorSnap,
   NotebookSnap,
@@ -24,10 +26,25 @@ interface PlayerState {
   name: string;
   traits: { height: number; scarf: number; hat: number };
   alive: boolean;
+  look?: string;
   presence?: PresenceState;
   priv?: {
     notebook?: { forEach(cb: (e: NotebookSnap) => void): void };
+    avatar?: string;
+    coverLook?: string;
+    mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
   };
+}
+interface AvatarState {
+  lookOf: string;
+  height: number;
+  x: number;
+  y: number;
+  yaw: number;
+  animId: number;
+  statusBits: number;
+  transitUntilTick: number;
+  seat?: string;
 }
 interface Collection<T> {
   forEach(cb: (item: T, id: string) => void): void;
@@ -36,6 +53,7 @@ interface SceneStateLike {
   doors: Collection<DoorSnap>;
   bodies?: Collection<BodySnap>;
   clues?: Collection<ClueSnap>;
+  avatars?: Collection<AvatarState>;
 }
 interface GameStateLike {
   tick: number;
@@ -59,6 +77,7 @@ export class ColyseusWorldFeed implements WorldFeed {
     });
     room.onMessage('clueFound', (m: WorldFeedEvents['clueFound']) => this.bus.emit('clueFound', m));
     room.onMessage('phaseChange', (m: WorldFeedEvents['phaseChange']) => this.bus.emit('phaseChange', m));
+    room.onMessage('vfx', (m: WorldFeedEvents['vfx']) => this.bus.emit('vfx', m));
   }
 
   /** Set by the private `killed` message or a false roster `alive`; cleared when the lobby returns. */
@@ -80,12 +99,14 @@ export class ColyseusWorldFeed implements WorldFeed {
   snapshot(): PlayerSnap[] {
     const out: PlayerSnap[] = [];
     this.state.players.forEach((p) => {
-      const pr = p.presence;
+      // Others arrive as avatars (round 5); a presence on any other row is never read.
+      const pr = p.id === this.selfId ? p.presence : undefined;
       out.push({
         id: p.id,
         name: p.name,
         traits: { height: p.traits?.height ?? 0, scarf: p.traits?.scarf ?? 0, hat: p.traits?.hat ?? 0 },
         alive: p.alive,
+        look: p.look ?? '',
         presence: pr
           ? {
               x: pr.x,
@@ -99,6 +120,39 @@ export class ColyseusWorldFeed implements WorldFeed {
       });
     });
     return out;
+  }
+
+  avatars(): AvatarSnap[] {
+    const out: AvatarSnap[] = [];
+    // The view holds the avatars of one scene only: the one this client is standing in.
+    this.state.scenes.forEach((scene) =>
+      scene.avatars?.forEach((a, handle) =>
+        out.push({
+          handle,
+          lookOf: a.lookOf,
+          height: a.height,
+          x: a.x,
+          y: a.y,
+          yaw: a.yaw,
+          animId: a.animId,
+          statusBits: a.statusBits,
+          transitUntilTick: a.transitUntilTick,
+          ...(a.seat ? { seat: a.seat } : {}),
+        }),
+      ),
+    );
+    return out;
+  }
+
+  selfHandle(): string {
+    return this.state.players.get(this.selfId)?.priv?.avatar ?? '';
+  }
+
+  coverState(): CoverState {
+    const priv = this.state.players.get(this.selfId)?.priv;
+    const mates: Record<string, string> = {};
+    priv?.mateLooks?.forEach((look, seat) => (mates[seat] = look));
+    return { look: priv?.coverLook ?? '', mates };
   }
 
   doors(): DoorSnap[] {

@@ -21,8 +21,36 @@ export interface PlayerSnap {
   traits: { height: number; scarf: number; hat: number };
   /** Public roster flag; it flips for a victim only when the next meeting opens (A30). */
   alive: boolean;
-  /** Null while the player is outside this client's view: nothing is known about where they are. */
+  /** Public look id (`looks.json`): '' until the role card closes, then fixed for the match (GDD 3.17). */
+  look: string;
+  /** Set for this client's own seat only (round 5): every other seat walks as an avatar, see `avatars()`. */
   presence: PresenceSnap | null;
+}
+
+/**
+ * A walking figure in this client's scene (GDD 3.17), keyed by an opaque handle that is re-rolled on every scene
+ * entry and death, and when an impersonation applies or drops. `lookOf` is the seat whose name, look, scarf and hat
+ * glyph are drawn; `height` is always the walker's own. `seat` (the true seat) is set for a ghost viewer only.
+ */
+export interface AvatarSnap {
+  handle: string;
+  lookOf: string;
+  height: number;
+  x: number;
+  y: number;
+  yaw: number;
+  animId: number;
+  statusBits: number;
+  transitUntilTick: number;
+  seat?: string;
+}
+
+/** A cover role's own pick and its Cabal mates' picks, read live from the private view (empty for everyone else). */
+export interface CoverState {
+  /** The look this seat will walk as; '' for a seat that is not a cover role. */
+  look: string;
+  /** Cabal mate seat id -> the look it currently has picked. */
+  mates: Record<string, string>;
 }
 
 /** A body in the scene this client stands in. `x`/`y` are pixel centres, used unscaled. */
@@ -92,6 +120,8 @@ export type WorldFeedEvents = {
   /** Private: a collect finished; the entry is in `notebook()`. */
   clueFound: { entryId: string };
   phaseChange: { phase: number; endsTick: number };
+  /** The puff of a disguise a Knife strike dropped, at (x, y) in `sceneId`; it names no handle or seat (GDD 3.17). */
+  vfx: { sceneId: string; x: number; y: number; kind: 'disguise' };
   /** Mock only: the mock world's report or bell asks the mock network to open a meeting (round 3, M | N seam). */
   meetingRequest: { reason: 'body' | 'bell' | 'dawn'; callerId: string; bodyOf?: string };
 };
@@ -99,8 +129,14 @@ export type WorldFeedEvents = {
 export interface WorldFeed {
   readonly bus: Emitter<WorldFeedEvents>;
   readonly selfId: string;
-  /** Everyone on the roster; `presence` is set only for those in view. Cheap enough to call per frame. */
+  /** Everyone on the roster; `presence` is set for the own seat only. Cheap enough to call per frame. */
   snapshot(): PlayerSnap[];
+  /** Every avatar of the scene this client stands in, its own included (empty outside the world phases). */
+  avatars(): AvatarSnap[];
+  /** This client's own avatar handle in its scene; '' while it is not placed. */
+  selfHandle(): string;
+  /** A cover role's pick and its mates' picks; `{look: '', mates: {}}` for any other seat. */
+  coverState(): CoverState;
   /** Doors of the scene this client is in. */
   doors(): DoorSnap[];
   clock(): { tick: number; phase: number; phaseEndsTick: number; startTick: number };
@@ -119,7 +155,9 @@ export interface WorldFeed {
   dead(): boolean;
   sendMove(cmd: MoveCmd): void;
   enterPortal(portalId: string): void;
+  /** `targetId` is an avatar handle (GDD 3.17); the server resolves it to a seat. */
   kill(targetId: string): void;
+  /** `targetId` is an avatar handle for a `target: 'player'` ability (Bandage), a seat id for `target: 'seat'`. */
   ability(id: string, targetId?: string): void;
   /** Starts (`on`) or ends a hold; the server re-validates it every tick. */
   hold(action: HoldAction, targetId: string, on: boolean): void;
