@@ -6,9 +6,9 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 
 | File | Does |
 |---|---|
-| `rig_common.py` | Directions, frame regex, cells, palette, light and outline constants; pure Python |
-| `build_rig.py` | Builds the rig: `SpriteCam` (ortho, X 40°, Z 0°, 64 px/m), `TileCam` (straight down, one 64 px tile per metre), turntable `TT`, camera-parented key sun and area fill, slate world at 0.15, the `WDI_Toon` node group, `OutlineInk`, the `Outline` Solidify preset, a 1 m checker cube with a facing marker, a 4 m grid plane with 1 m lines, a hidden 1.7 m `FallenProxy` for the `die` cell check, a `Feet` empty, EEVEE settings |
-| `batch_render.py` | `--smoke` calibration sheet (8 cube views, the ground tile, one 256 px `die` frame), or character passes with the per-frame `Feet` manifest |
+| `rig_common.py` | Directions, frame regex, cells, the IsoCam and display-scale constants, the turntable, the world palette (OKLab snap, ramp neighbours), light and outline constants; pure Python |
+| `build_rig.py` | Builds the rig: `IsoCam` (ortho, X 60°, Y 0°, Z 45°, 90.51 px per ground metre; SPRITES 10.3), `TileCam` (straight down, one 64 px tile per metre, for decals), the root empties `EnvRoot` (1, 1, 0.75) and `CharRoot` (0.75 on every axis) with the turntable `TT` under `CharRoot`, camera-parented key sun and area fill, slate world at 0.15, the `WDI_Toon` node group, `OutlineInk`, the `Outline` Solidify preset, a 1 m checker cube with a facing marker, a 1 m tile plane, a 4 m grid plane with 1 m lines, a hidden 1.7 m `FallenProxy` for the `die` cell check, a `Feet` empty, EEVEE settings |
+| `batch_render.py` | `--smoke` IsoCam calibration sheet at the display scale (8 cube views with their facing markers, one 1 m tile diamond, the `TileCam` grid, one 256 px `die` frame), or character passes with the per-frame `Feet` manifest; `tools/sprites` `pixel` finishes either |
 | `build_villager.py` | Builds the V1 `villager` body from code: a 1,388-triangle block-out of chamfered boxes, 3 heads tall, with the overlay parts, an 8-bone armature and the four V1 actions; writes the `.blend` (and optionally the source GLB) to `assets/external/villager/`, never into git |
 | `static_common.py` | Shared helpers for the static sheets: the rig with calibration hidden, `SpriteCam` / `TileCam` framing, palette materials, shape helpers, and the per-atlas `manifest.json` (`file`, `cell`, `pivot`) |
 | `build_props.py` | Models the square props (`prop_*`) and the 21 clue keys from code and renders them (`docs/SPRITES.md` 8) |
@@ -18,15 +18,17 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 | `build_tiles.py` | Renders four seamless 64 px straight-down variants of each of the six ground sets (`tiles_<biome>_<v>`) |
 | `save_masters.py` | Saves `bakery_props.blend` and `loft.blend` into git-ignored `assets/external/` as the masters for the ROSW checkout |
 | `build_vfx.py` | Animates the four M3 VFX frame by frame at 12 fps (`vfx_blood_pool`, `vfx_blood_splat`, `vfx_vote_stamp`, `vfx_dust_step`) |
-| `palettize.py` | Snaps materials to the palette; fails on untextured PBR |
+| `palettize.py` | Snaps materials to the 64-colour world palette (OKLab), light and shadow from the ramp neighbours; fails on untextured PBR |
 | `tests/test_rig_common.py` | Unit tests (`pnpm --filter @wdi/blender test`, no Blender needed) |
 | `tests/make_dummy_char.py` | Builds a capsule character that follows the contract below, for pipeline tests |
 
 ## Commands
 
 ```sh
-# Calibration sheet (M0): writes apps/client/public/assets/calibration/{calibration_sheet.png,calibration.json}
-blender -b --factory-startup -P tools/blender/batch_render.py -- --smoke --out apps/client/public/assets/calibration
+# IsoCam calibration sheet (round 5): render at the display scale, then finish it to packed size into
+# apps/client/public/assets/calibration/{calibration_sheet.png,calibration.json} (the JSON stays in display px)
+blender -b --factory-startup -P tools/blender/batch_render.py -- --smoke --out build/calib-raw
+pnpm --filter @wdi/sprites pixel ../../build/calib-raw ../../apps/client/public/assets/calibration
 
 # The rig file, for opening in the UI
 blender -b --factory-startup -P tools/blender/build_rig.py -- --out tools/blender/build/render_rig.blend
@@ -93,7 +95,28 @@ owner's laptop should match it pixel for pixel or within anti-aliasing noise.
 - The renderer palettizes materials, adds the `Outline` hull to every part except `blood`, and warns
   when a clip does not sample to the V1 frame count or a body frame touches the cell edge.
 
-## Calibration results and rig decisions (2026-10-10)
+## IsoCam calibration (round 5, 2026-10-18)
+
+Measured with the `bpy` 5.2.0 wheel on Mesa llvmpipe (`calibration.json`, display px):
+
+- `Feet` at the origin projects to (64, 112) in a 128 px cell (the smoke sheet lifts it 24 px to (64, 88)
+  so the turned cube fits) and to (128, 128) in the 256 px `die` cell. The facing marker of the `n` frame
+  points straight up the screen (`marker` (0, -15)), and every direction's marker falls in its 45° sector
+  (`tests/test_rig_common.py`).
+- A 1 m tile renders as a 128 x 64 diamond (126 px of opaque width after anti-aliasing). The 1 m cube
+  under the character root (0.75 m tall) is 96 px tall turned square to the camera, outline included.
+- The lights keep their camera-frame azimuths (key 225°, fill 45°) and stay parented to the camera, so
+  under IsoCam the key comes from world south (`rig_common.world_azimuth`).
+- **Toon ramp stops 0.25 / 0.65** (were 0.30 / 0.70). The ramp luma under IsoCam: tops and ground 0.77;
+  the wall the key reaches, square to the camera (world south face, screen lower left), 0.49; both walls
+  of a cube turned 45° (square to the camera) 0.35; the wall turned from the key (world east face, screen
+  lower right) 0.02. So tops and ground fall in the light band, lit walls in the mid band and faces
+  turned from the key in the shadow band, each at least 0.10 from a stop. The screen-right wall of an
+  axis-aligned building is in the shadow band: the classic three-tone iso read, with the lights unchanged.
+- EEVEE filter size 1.0 (was 1.5); the character outline is -0.022 m, one art pixel after the finish.
+- The finished sheet is world-palette only, alpha 0 or 255 (`tools/sprites/test/palette.test.ts`).
+
+## Calibration results and rig decisions (2026-10-10, SpriteCam, retired in round 5)
 
 - `Feet` at the origin projects to (64, 112) in a 128 px cell; the 1 m cube is 93 px tall
   (90 px plus the outline). The smoke sheet lifts the frame 24 px so a cube turned 45° fits.

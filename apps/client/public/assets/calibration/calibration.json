@@ -1,9 +1,9 @@
 {
   "blender": "5.2.0 LTS",
+  "camera": "IsoCam",
   "cell": 128,
-  "cubeHeightPx": 93,
+  "cubeHeightPx": 96,
   "expected": {
-    "cubeHeightPx": 90,
     "dieFeet": [
       128.0,
       128.0
@@ -11,10 +11,14 @@
     "feet": [
       64.0,
       88.0
+    ],
+    "tileDiamond": [
+      128,
+      64
     ]
   },
   "frames": {
-    "char_calib_die_s_000": {
+    "char_calib_die_e_000": {
       "cell": 256,
       "feet": [
         128.0,
@@ -25,6 +29,10 @@
       "feet": [
         64.0,
         88.0
+      ],
+      "marker": [
+        30.55,
+        0.0
       ]
     },
     "char_calib_idle_n_000": {
@@ -32,48 +40,81 @@
         64.0,
         88.0
       ],
+      "marker": [
+        0.0,
+        -15.28
+      ],
       "opaqueRows": [
-        21,
-        113
+        10,
+        105
       ]
     },
     "char_calib_idle_ne_000": {
       "feet": [
         64.0,
         88.0
+      ],
+      "marker": [
+        21.6,
+        -10.8
       ]
     },
     "char_calib_idle_nw_000": {
       "feet": [
         64.0,
         88.0
+      ],
+      "marker": [
+        -21.6,
+        -10.8
       ]
     },
     "char_calib_idle_s_000": {
       "feet": [
         64.0,
         88.0
+      ],
+      "marker": [
+        0.0,
+        15.27
       ]
     },
     "char_calib_idle_se_000": {
       "feet": [
         64.0,
         88.0
+      ],
+      "marker": [
+        21.6,
+        10.8
       ]
     },
     "char_calib_idle_sw_000": {
       "feet": [
         64.0,
         88.0
+      ],
+      "marker": [
+        -21.6,
+        10.8
       ]
     },
     "char_calib_idle_w_000": {
       "feet": [
         64.0,
         88.0
+      ],
+      "marker": [
+        -30.55,
+        0.0
       ]
     }
   },
-  "tile": 64,
-  "version": 1
+  "pxPerMetre": 90.51,
+  "scale": "display",
+  "tileDiamond": [
+    126,
+    64
+  ],
+  "version": 2
 }

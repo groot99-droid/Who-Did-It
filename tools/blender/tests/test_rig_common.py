@@ -1,5 +1,6 @@
 """Plain-Python tests for rig_common (no bpy): python3 -m unittest discover -s tests -t ."""
 
+import json
 import math
 import os
 import sys
@@ -24,15 +25,82 @@ class FrameNames(unittest.TestCase):
     def test_every_v1_frame_is_valid(self):
         names = {rc.frame_name("villager", a, d, i)
                  for a, n in rc.V1_CLIPS.items() for d in rc.DIRECTIONS for i in range(n)}
-        self.assertEqual(len(names), 240)  # docs/ASSETS.md 6.3: 240 frames per pass
+        self.assertEqual(len(names), 304)  # docs/ASSETS.md 6.3, round 5: 304 frames per pass
+
+    def test_round5_clips_and_passes(self):
+        self.assertEqual(rc.V1_CLIPS, {"idle": 8, "walk": 8, "swing": 6, "interact": 8, "die": 8})
+        self.assertEqual(rc.PASSES, ("body", "scarf", "blood"))
 
 
 class Directions(unittest.TestCase):
     def test_order_and_turntable(self):
+        # SPRITES 10.3: TT.rotation_euler.z = 45 deg - i * 45 deg; +Y (world north) renders as ne.
         self.assertEqual(rc.DIRECTIONS, ("n", "ne", "e", "se", "s", "sw", "w", "nw"))
-        self.assertEqual(rc.turntable_z(0), 0.0)
-        self.assertAlmostEqual(rc.turntable_z(2), -math.pi / 2)
-        self.assertAlmostEqual(rc.turntable_z(7), math.radians(-315))
+        self.assertAlmostEqual(rc.turntable_z(0), math.pi / 4)
+        self.assertEqual(rc.turntable_z(1), 0.0)
+        self.assertAlmostEqual(rc.turntable_z(2), -math.pi / 4)
+        self.assertAlmostEqual(rc.turntable_z(4), math.radians(-135))
+        self.assertAlmostEqual(rc.turntable_z(7), math.radians(-270))
+
+
+class IsoCam(unittest.TestCase):
+    def test_constants(self):
+        self.assertEqual((rc.CAMERA_TILT_DEG, rc.CAMERA_YAW_DEG), (60.0, 45.0))
+        self.assertEqual((rc.CELL_PX, rc.FEET_ROW_PX, rc.CLIP_CELL), (128, 112, {"die": (256, 128)}))
+        self.assertEqual(rc.Z_SCALE, 0.75)
+        self.assertEqual(rc.ENV_ROOT_SCALE, (1.0, 1.0, 0.75))
+        self.assertEqual(rc.CHAR_ROOT_SCALE, (0.75, 0.75, 0.75))
+        self.assertEqual(rc.OUTLINE_PRESETS["character"], -0.022)
+
+    def test_display_scale(self):
+        # A 1 m tile is a 128 x 64 diamond: its diagonal, sqrt(2) m, spans 128 px.
+        self.assertAlmostEqual(math.sqrt(2) * rc.DISPLAY_PX_PER_M, 128.0, delta=0.01)
+        self.assertAlmostEqual(rc.ortho_scale(128), 128 / 90.51)
+        # 59 display px per vertical metre; a 1.7 m figure about 100 px, under the 112 px cap.
+        self.assertAlmostEqual(rc.display_px_per_vertical_m(), 58.79, places=2)
+        self.assertLess(1.7 * rc.display_px_per_vertical_m(), 112)
+
+    def test_lights_turn_with_the_camera(self):
+        self.assertEqual(rc.world_azimuth(rc.KEY_LIGHT["azimuth"]), 180.0)  # screen left = world south
+        self.assertEqual(rc.world_azimuth(rc.FILL_LIGHT["azimuth"]), 0.0)
+        lo, hi = rc.TOON_RAMP_STOPS
+        for lit_wall in (0.35, 0.49):  # README: the measured lumas
+            self.assertTrue(lo + 0.1 <= lit_wall <= hi - 0.1)
+        self.assertGreaterEqual(0.77, hi + 0.1)
+
+
+class Calibration(unittest.TestCase):
+    """The committed calibration sheet (apps/client/public/assets/calibration, art plan 4.1)."""
+
+    @classmethod
+    def setUpClass(cls):
+        path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "apps", "client", "public", "assets",
+                            "calibration", "calibration.json")
+        with open(path, encoding="utf-8") as fh:
+            cls.report = json.load(fh)
+
+    def test_isocam(self):
+        self.assertEqual(self.report["camera"], "IsoCam")
+        self.assertEqual(self.report["tileDiamond"][1], 64)
+        self.assertAlmostEqual(self.report["tileDiamond"][0], 128, delta=2)
+
+    def test_n_marker_points_screen_up(self):
+        dx, dy = self.report["frames"]["char_calib_idle_n_000"]["marker"]
+        self.assertAlmostEqual(dx, 0.0, places=1)
+        self.assertLess(dy, -5)
+
+    def test_markers_turn_clockwise(self):
+        for i, d in enumerate(rc.DIRECTIONS):
+            dx, dy = self.report["frames"][f"char_calib_idle_{d}_000"]["marker"]
+            # The marker's screen bearing, clockwise from up, falls in its direction's 45 deg sector.
+            bearing = math.degrees(math.atan2(dx, -dy)) % 360
+            self.assertLess(min(abs(bearing - 45 * i), 360 - abs(bearing - 45 * i)), 22.5, d)
+
+    def test_feet_and_cells(self):
+        for name, frame in self.report["frames"].items():
+            self.assertNotIn("clipped", frame, name)
+            expected = self.report["expected"]["dieFeet" if "_die_" in name else "feet"]
+            self.assertEqual(frame["feet"], expected, name)
 
 
 class Sampling(unittest.TestCase):
@@ -45,6 +113,28 @@ class Sampling(unittest.TestCase):
 
     def test_sample_frames(self):
         self.assertEqual(rc.sample_frames(1, 17, 2), [1, 3, 5, 7, 9, 11, 13, 15])
+
+
+class WorldPalette(unittest.TestCase):
+    def test_sixty_four_colours_without_magenta(self):
+        self.assertEqual(len(rc.WORLD), 64)
+        self.assertNotIn(rc.PALETTE["magenta"].upper(), rc.WORLD)
+        self.assertIn(rc.PALETTE["ink"].upper(), rc.WORLD)
+
+    def test_nearest_world(self):
+        for c in rc.WORLD:
+            self.assertEqual(rc.nearest_world(rc.hex_to_rgb(c)), c)
+        self.assertEqual(rc.nearest_world((0.0, 0.0, 0.0)), "#12141C")
+
+    def test_ramp_shades(self):
+        self.assertEqual(rc.ramp_shades("#6F7A8C"), ("#8892A2", "#2C3240"))  # fog's lowest: into slate
+        self.assertEqual(rc.ramp_shades("#2C3240"), ("#3A4356", "#12141C"))  # slate's lowest: into ink
+        self.assertEqual(rc.ramp_shades("#12141C"), ("#1A1D29", "#12141C"))
+        self.assertEqual(rc.ramp_shades("#B2AA99"), ("#D9D2C2", "#8E8676"))
+        self.assertEqual(rc.ramp_shades("#F2B33D"), ("#F2B33D", "#A07C36"))  # top step lights to itself
+        self.assertEqual(rc.ramp_shades("#9A9083", "stone"), ("#B2AA99", "#7A7067"))
+        with self.assertRaises(ValueError):
+            rc.ramp_shades("#E04E9A")
 
 
 class Palette(unittest.TestCase):
@@ -72,6 +162,7 @@ class Geometry(unittest.TestCase):
     def test_camera_shift(self):
         self.assertEqual(rc.camera_shift_y(rc.FEET_ROW_PX), 0.0)
         self.assertAlmostEqual(rc.camera_shift_y(88), -24 / 128)
+        self.assertAlmostEqual(rc.camera_shift_y(32, 64), -48 / 64)  # the tile diamond's frame
         cell, row = rc.clip_cell("die")
         # 256 px cell: the unshifted origin sits 48 px below the centre, at row 176.
         self.assertAlmostEqual(rc.camera_shift_y(row, cell), -(176 - row) / 256)
@@ -81,9 +172,9 @@ class Geometry(unittest.TestCase):
         self.assertEqual(rc.feet_pixels(0.5, 0.125), (64.0, 112.0))
 
     def test_light_direction_is_unit(self):
-        d = rc.light_direction(rc.KEY_LIGHT["azimuth"], rc.KEY_LIGHT["elevation"])
+        d = rc.light_direction(rc.world_azimuth(rc.KEY_LIGHT["azimuth"]), rc.KEY_LIGHT["elevation"])
         self.assertAlmostEqual(sum(c * c for c in d), 1.0)
-        self.assertLess(d[1], 0)  # the key sits on the camera side (world -Y)
+        self.assertLess(d[1], 0)  # the key sits on the camera side (IsoCam looks north-west from the south-east)
 
 
 if __name__ == "__main__":

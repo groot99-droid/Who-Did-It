@@ -25,6 +25,9 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `test/images.test.ts` | Image sizes, determinism and the tileset join |
 | `test/manifest.test.ts` | The real and placeholder manifests carry the same keys, types, `maps` and `modes` (the villager placeholder-only once it leaves `LEGACY`); `modes: ['onub']` on every `onub_*` key and no other; round-5 world textures filter by the pixel-finish switch, `clues` linear |
 | `test/legacy.ts`, `test/legacy.test.ts` | The `LEGACY` allowlist (art plan 1.7): real-manifest keys whose art predates the round-5 style, skipped by the palette and budget tests; each key listed once and still in the real manifest |
+| `test/realAssets.ts` | The real manifest's non-`LEGACY` images and atlas pages with their sizes and bytes (PNG and WebP headers), for the two tests below |
+| `test/palette.test.ts` | Every page of the real manifest is world-palette colours with alpha 0 or 255 and at most 10% saturated (art plan 1.7), skipping `LEGACY` keys and, while the main finish is off, the main-mode rig renders; the IsoCam calibration sheet is finished |
+| `test/budget.test.ts` | The page caps of art plan 1.4, one body and one overlay page per look, each map's environment plus the boot atlases plus the 10 largest looks within 6 pages, and the DOM byte caps (portraits 0.8 MB, thumbnails 0.2 MB, ONUB 2.5 MB) |
 | `test/pixel.test.ts` | Snap, mode halve with the darkest tie, box resize, alpha cut, both settings of the switch, cutout key, spill and outline, lossless WebP, manifest halving, determinism |
 | `test/refs.test.ts` | Every reference file exists, every crop lies inside its image, output names are unique |
 | `test/bleed.test.ts` | PNG round trip, one and two bleed rings, determinism |

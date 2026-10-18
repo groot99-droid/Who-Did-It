@@ -1,13 +1,15 @@
-"""Snap every material on imported meshes to the palette (docs/ASSETS.md 6.1, 6.2).
+"""Snap every material on imported meshes to the world palette (docs/ASSETS.md 6.1, 6.2; art plan S3).
 
     blender -b char.blend --factory-startup -P tools/blender/palettize.py -- --save
 
 Rules, per material slot:
-- toon material (uses the WDI_Toon group): each colour input snaps to its nearest palette token;
-- Principled BSDF with a flat Base Color: replaced by a toon material whose Mid is the nearest token
-  and whose Light and Shadow come from rig_common.SHADES;
-- Principled BSDF with an image on Base Color: the image's pixels snap to the nearest token (alpha
-  kept, image packed) and the material becomes a two-tone toon (lit = texture, shadow = slate);
+- toon material (uses the WDI_Toon group): each colour input snaps to its nearest world colour;
+- Principled BSDF with a flat Base Color: replaced by a toon material whose Mid is the nearest world
+  colour and whose Light and Shadow are its ramp neighbours (rig_common.ramp_shades: below a ramp's
+  lowest step the shadow falls into slate, then ink);
+- Principled BSDF with an image on Base Color: the image's pixels snap to the nearest world colour in
+  OKLab (alpha kept, image packed) and the material becomes a two-tone toon (lit = texture, shadow =
+  slate);
 - anything else fails, including "untextured PBR": a Principled BSDF whose look depends on metallic,
   roughness or normal maps with no base-colour source, which no single token can stand for.
 
@@ -33,9 +35,9 @@ class PaletteError(RuntimeError):
     pass
 
 
-def _linear_to_token(colour) -> str:
+def _linear_to_world(colour) -> str:
     srgb = tuple(rc.linear_to_srgb(c) for c in colour[:3])
-    return rc.nearest_palette(srgb)  # type: ignore[arg-type]
+    return rc.nearest_world(srgb)  # type: ignore[arg-type]
 
 
 def _toon_group():
@@ -70,35 +72,50 @@ def _is_untextured_pbr(bsdf) -> bool:
     return maps or metallic.is_linked or metallic.default_value > 0.5
 
 
+def _oklab(rgb):
+    """Vectorised rig_common.srgb_to_oklab over an (n, 3) sRGB 0..1 array."""
+    import numpy as np
+
+    lin = np.where(rgb <= 0.04045, rgb / 12.92, ((rgb + 0.055) / 1.055) ** 2.4)
+    m1 = np.array([[0.4122214708, 0.5363325363, 0.0514459929], [0.2119034982, 0.6806995451, 0.1073969566],
+                   [0.0883024619, 0.2817188376, 0.6299787005]])
+    m2 = np.array([[0.2104542553, 0.7936177850, -0.0040720468], [1.9779984951, -2.4285922050, 0.4505937099],
+                   [0.0259040371, 0.7827717662, -0.8086757660]])
+    return np.cbrt(lin @ m1.T) @ m2.T
+
+
 def snap_image(image: bpy.types.Image) -> int:
-    """Snap every pixel to its nearest palette colour in place; returns the pixel count."""
+    """Snap every pixel to its nearest world colour in OKLab, in place; returns the pixel count."""
     import numpy as np
 
     w, h = image.size
     px = np.empty(w * h * 4, dtype=np.float32)
     image.pixels.foreach_get(px)
     px = px.reshape(-1, 4)
-    pal = np.array([rc.hex_to_rgb(v) for v in rc.PALETTE.values()], dtype=np.float32)
-    if image.is_float:  # float buffers hold linear values; byte buffers hold sRGB
-        pal = np.vectorize(rc.srgb_to_linear)(pal).astype(np.float32)
-    d = ((px[:, None, :3] - pal[None, :, :]) ** 2).sum(axis=2)
-    px[:, :3] = pal[d.argmin(axis=1)]
+    pal = np.array([rc.hex_to_rgb(v) for v in rc.WORLD], dtype=np.float64)
+    # float buffers hold linear values; byte buffers hold sRGB
+    src = np.vectorize(rc.linear_to_srgb)(px[:, :3]) if image.is_float else px[:, :3].astype(np.float64)
+    d = ((_oklab(src)[:, None, :] - _oklab(pal)[None, :, :]) ** 2).sum(axis=2)
+    out = pal[d.argmin(axis=1)]
+    if image.is_float:
+        out = np.vectorize(rc.srgb_to_linear)(out)
+    px[:, :3] = out
     image.pixels.foreach_set(px.ravel())
     image.update()
     image.pack()
     return w * h
 
 
-def _toon_from_tokens(name: str, mid: str) -> bpy.types.Material:
-    light, shadow = rc.SHADES[mid]
+def _toon_from_world(name: str, mid: str) -> bpy.types.Material:
+    light, shadow = rc.ramp_shades(mid)
     mat = bpy.data.materials.new(name)
     mat.surface_render_method = "DITHERED"
     nodes, links = mat.node_tree.nodes, mat.node_tree.links
     nodes.clear()
     group = nodes.new("ShaderNodeGroup")
     group.node_tree = _toon_group()
-    for sock, token in (("Light", light), ("Mid", mid), ("Shadow", shadow)):
-        group.inputs[sock].default_value = rc.hex_to_linear(rc.PALETTE[token])
+    for sock, value in (("Light", light), ("Mid", mid), ("Shadow", shadow)):
+        group.inputs[sock].default_value = rc.hex_to_linear(value)
     out = nodes.new("ShaderNodeOutputMaterial")
     links.new(group.outputs["Shader"], out.inputs["Surface"])
     return mat
@@ -115,7 +132,7 @@ def _toon_from_image(name: str, image_node) -> bpy.types.Material:
     group.node_tree = _toon_group()
     links.new(tex.outputs["Color"], group.inputs["Light"])
     links.new(tex.outputs["Color"], group.inputs["Mid"])
-    group.inputs["Shadow"].default_value = rc.hex_to_linear(rc.PALETTE["slate"])
+    group.inputs["Shadow"].default_value = rc.hex_to_linear(rc.ramp_step("slate", 0))
     out = nodes.new("ShaderNodeOutputMaterial")
     links.new(group.outputs["Shader"], out.inputs["Surface"])
     return mat
@@ -130,8 +147,7 @@ def palettize_material(mat: bpy.types.Material, report: dict) -> bpy.types.Mater
         for sock in ("Light", "Mid", "Shadow", "Rim"):
             inp = group.inputs[sock]
             if not inp.is_linked:
-                token = _linear_to_token(inp.default_value)
-                inp.default_value = rc.hex_to_linear(rc.PALETTE[token])
+                inp.default_value = rc.hex_to_linear(_linear_to_world(inp.default_value))
         report[mat.name] = "toon"
         return mat
 
@@ -146,9 +162,9 @@ def palettize_material(mat: bpy.types.Material, report: dict) -> bpy.types.Mater
         return _toon_from_image(f"{mat.name}.toon", image_node)
     if base.is_linked or _is_untextured_pbr(bsdf):
         raise PaletteError(f"{mat.name}: untextured PBR (no base-colour image, PBR inputs drive the look)")
-    token = _linear_to_token(base.default_value)
-    report[mat.name] = f"flat -> {token}"
-    return _toon_from_tokens(f"{mat.name}.toon", token)
+    mid = _linear_to_world(base.default_value)
+    report[mat.name] = f"flat -> {mid}"
+    return _toon_from_world(f"{mat.name}.toon", mid)
 
 
 def palettize_objects(objects) -> dict:

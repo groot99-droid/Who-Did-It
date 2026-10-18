@@ -11,8 +11,9 @@ Character passes:
         --char path/to/villager.blend --body villager --out build/render
 
 The character .blend holds a collection `Export` with the armature, mesh parts tagged by the custom
-property `wdi_part` (body, scarf, hat_cap, hat_bowler, blood), an empty named `Feet` between the
-feet, and one action per clip named after it (`idle`, `walk`, `swing`, `die`).
+property `wdi_part` (body, scarf, blood), an empty named `Feet` between the feet, and one action per
+clip named after it (`idle`, `walk`, `swing`, `interact`, `die`). Every frame renders through IsoCam at
+the display scale; `pnpm --filter @wdi/sprites pixel` finishes the folder to packed size (SPRITES 10.3).
 Without `--rig` the rig is built in memory by build_rig.py.
 """
 
@@ -94,25 +95,40 @@ def _opaque_rows(cell) -> tuple[int, int]:
     return (int(h - 1 - rows.max()), int(h - 1 - rows.min()))  # top, bottom from the top edge
 
 
+def _place(scene, cam, cell: int, feet_row: float, width: int | None = None) -> None:
+    """IsoCam at the display scale with the world origin on `feet_row` of a `cell` px square (or a
+    `width` x `cell` frame)."""
+    w = width or cell
+    scene.render.resolution_x, scene.render.resolution_y = w, cell
+    cam.data.ortho_scale = rc.ortho_scale(max(w, cell))
+    cam.data.shift_y = rc.camera_shift_y(feet_row, cell) * cell / max(w, cell)
+
+
 def smoke(scene: bpy.types.Scene, out_dir: str) -> None:
-    """Checker cube in 8 directions (row 1); row 2 holds the straight-down tile tiled 2x2 and one `die`
-    frame of a fallen 1.7 m proxy in its 256 px cell with the feet at the centre."""
+    """The IsoCam calibration sheet at the display scale (finish it with tools/sprites `pixel`).
+
+    Row 1: the checker cube in 8 directions with its facing marker. Row 2: one 1 m tile diamond
+    (128 x 64), the TileCam grid tiled 2 x 2, and one `die` frame of a fallen 1.7 m proxy lying to
+    screen right (the widest fall) in its 256 px cell with the feet at the centre."""
     import numpy as np
 
     tmp = os.path.join(out_dir, "_frames")
     os.makedirs(tmp, exist_ok=True)
     tt, feet = bpy.data.objects["TT"], bpy.data.objects["Feet"]
+    tail, tip = bpy.data.objects["MarkerTail"], bpy.data.objects["MarkerTip"]
     plane, cube = bpy.data.objects["GridPlane"], bpy.data.objects["CheckerCube"]
-    sprite_cam, tile_cam = bpy.data.objects["SpriteCam"], bpy.data.objects["TileCam"]
+    tile_plane = bpy.data.objects["TilePlane"]
+    iso_cam, tile_cam = bpy.data.objects["IsoCam"], bpy.data.objects["TileCam"]
+    marker, fallen = bpy.data.objects["FacingMarker"], bpy.data.objects["FallenProxy"]
     cell, tile = rc.CELL_PX, rc.TILE_PX
     die_cell, die_feet_row = rc.clip_cell("die")
 
     sheet = np.zeros((cell + die_cell, 8 * cell, 4), dtype=np.float32)  # top-down while composing
     frames: dict[str, dict] = {}
     plane.hide_render = True
-    # A 1 m cube turned 45 deg is deeper than a character, so the smoke sheet lifts the frame by
-    # SMOKE_LIFT_PX; the feet check expects the origin that much higher.
-    sprite_cam.data.shift_y = rc.camera_shift_y(rc.FEET_ROW_PX - SMOKE_LIFT_PX)
+    # The turned cube reaches about 24 px below its feet (its front corner), so the smoke sheet lifts
+    # the frame by SMOKE_LIFT_PX; the feet check expects the origin that much higher.
+    _place(scene, iso_cam, cell, rc.FEET_ROW_PX - SMOKE_LIFT_PX)
     for i, direction in enumerate(rc.DIRECTIONS):
         tt.rotation_euler.z = rc.turntable_z(i)
         bpy.context.view_layer.update()
@@ -121,32 +137,45 @@ def smoke(scene: bpy.types.Scene, out_dir: str) -> None:
         render_to(scene, path)
         px = _pixels(path)
         sheet[0:cell, i * cell : (i + 1) * cell] = px[::-1]
-        frames[name] = {"feet": feet_px(scene, feet)}
+        a, b = feet_px(scene, tail), feet_px(scene, tip)
+        frames[name] = {"feet": feet_px(scene, feet), "marker": [round(b[0] - a[0], 2), round(b[1] - a[1], 2)]}
+        if touches_border(path):
+            frames[name]["clipped"] = True
         if direction == "n":
             top, bottom = _opaque_rows(px)
             frames[name]["opaqueRows"] = [top, bottom]
 
-    tt.rotation_euler.z = 0.0
-    marker, fallen = bpy.data.objects["FacingMarker"], bpy.data.objects["FallenProxy"]
-
-    # One die frame: the proxy lies from the feet towards the camera, as a body falling south would.
+    # The 1 m tile diamond under the environment root, origin at the cell centre.
     cube.hide_render = marker.hide_render = True
-    fallen.hide_render = False
-    scene.render.resolution_x = scene.render.resolution_y = die_cell
-    sprite_cam.data.ortho_scale = die_cell / tile
-    sprite_cam.data.shift_y = rc.camera_shift_y(die_feet_row, die_cell)
+    tile_plane.hide_render = False
+    tt.rotation_euler.z = 0.0
+    _place(scene, iso_cam, tile, tile / 2, width=cell)
     bpy.context.view_layer.update()
-    die_name = rc.frame_name("calib", "die", "s", 0)
+    diamond_path = os.path.join(tmp, "tile_diamond.png")
+    render_to(scene, diamond_path)
+    d = _pixels(diamond_path)
+    sheet[cell + (cell - tile) // 2 : cell + (cell + tile) // 2, 0:cell] = d[::-1]
+    cols = np.nonzero(d[:, :, 3].max(axis=0) > 0.5)[0]
+    rows = np.nonzero(d[:, :, 3].max(axis=1) > 0.5)[0]
+    diamond = [int(cols.max() - cols.min() + 1), int(rows.max() - rows.min() + 1)]
+    tile_plane.hide_render = True
+
+    # One die frame: the proxy lies along the facing; facing `e` puts it along screen right.
+    fallen.hide_render = False
+    tt.rotation_euler.z = rc.turntable_z(rc.DIRECTIONS.index("e"))
+    _place(scene, iso_cam, die_cell, die_feet_row)
+    bpy.context.view_layer.update()
+    die_name = rc.frame_name("calib", "die", "e", 0)
     die_path = os.path.join(tmp, die_name + ".png")
     render_to(scene, die_path)
-    sheet[cell : cell + die_cell, cell : cell + die_cell] = _pixels(die_path)[::-1]
+    sheet[cell : cell + die_cell, 7 * cell - die_cell : 7 * cell] = _pixels(die_path)[::-1]
     frames[die_name] = {"feet": feet_px(scene, feet, die_cell), "cell": die_cell}
     if touches_border(die_path):
         frames[die_name]["clipped"] = True
     fallen.hide_render = True
-    sprite_cam.data.ortho_scale = rc.CAMERA_ORTHO_SCALE
 
-    plane.hide_render, cube.hide_render, marker.hide_render = False, True, True
+    # The straight-down TileCam grid (decals), 2 x 2.
+    plane.hide_render = False
     scene.camera = tile_cam
     scene.render.resolution_x = scene.render.resolution_y = tile
     tile_path = os.path.join(tmp, "tile_grid.png")
@@ -154,10 +183,12 @@ def smoke(scene: bpy.types.Scene, out_dir: str) -> None:
     t = _pixels(tile_path)[::-1]
     for r in range(2):
         for c in range(2):
-            sheet[cell + r * tile : cell + (r + 1) * tile, c * tile : (c + 1) * tile] = t
-    scene.camera = sprite_cam
-    scene.render.resolution_x = scene.render.resolution_y = cell
-    sprite_cam.data.shift_y = 0.0
+            y0, x0 = cell + r * tile, 2 * cell + c * tile
+            sheet[y0 : y0 + tile, x0 : x0 + tile] = t
+    plane.hide_render = True
+    scene.camera = iso_cam
+    _place(scene, iso_cam, cell, rc.FEET_ROW_PX)
+    tt.rotation_euler.z = 0.0
     cube.hide_render = marker.hide_render = False
 
     out = bpy.data.images.new("calibration_sheet", 8 * cell, cell + die_cell, alpha=True)
@@ -168,13 +199,16 @@ def smoke(scene: bpy.types.Scene, out_dir: str) -> None:
 
     n = frames[rc.frame_name("calib", "idle", "n", 0)]
     report = {
-        "version": 1,
+        "version": 2,
+        "camera": "IsoCam",
+        "scale": "display",
+        "pxPerMetre": rc.DISPLAY_PX_PER_M,
         "cell": cell,
-        "tile": tile,
         "blender": bpy.app.version_string,
-        "expected": {"feet": [cell / 2, float(rc.FEET_ROW_PX - SMOKE_LIFT_PX)], "cubeHeightPx": 90,
+        "expected": {"feet": [cell / 2, float(rc.FEET_ROW_PX - SMOKE_LIFT_PX)], "tileDiamond": [128, 64],
                      "dieFeet": [die_cell / 2, float(die_feet_row)]},
         "frames": frames,
+        "tileDiamond": diamond,
         "cubeHeightPx": n["opaqueRows"][1] - n["opaqueRows"][0] + 1,
     }
     with open(os.path.join(out_dir, "calibration.json"), "w") as fh:
@@ -183,10 +217,11 @@ def smoke(scene: bpy.types.Scene, out_dir: str) -> None:
     for f in os.listdir(tmp):
         os.remove(os.path.join(tmp, f))
     os.rmdir(tmp)
-    print(f"smoke: feet {n['feet']} (expected {report['expected']['feet']}), "
-          f"cube {report['cubeHeightPx']} px tall (expected ~90 incl. outline); "
+    clipped = [k for k, v in frames.items() if v.get("clipped")]
+    print(f"smoke: feet {n['feet']} (expected {report['expected']['feet']}), marker n {n['marker']}, "
+          f"cube {report['cubeHeightPx']} px tall, tile diamond {diamond} (expected [128, 64]); "
           f"die feet {frames[die_name]['feet']} (expected {report['expected']['dieFeet']})"
-          f"{', CLIPPED' if frames[die_name].get('clipped') else ''}")
+          f"{', CLIPPED ' + ','.join(clipped) if clipped else ''}")
 
 
 # ---------------------------------------------------------------- character passes
@@ -300,9 +335,7 @@ def render_character(scene, args) -> None:
             raise SystemExit(f"missing action {anim!r} or armature")
         arm.animation_data_create().action = action
         cell, feet_row = rc.clip_cell(anim)
-        scene.render.resolution_x = scene.render.resolution_y = cell
-        scene.camera.data.ortho_scale = cell / rc.TILE_PX
-        scene.camera.data.shift_y = rc.camera_shift_y(feet_row, cell)
+        _place(scene, scene.camera, cell, feet_row)
         start, end = (int(round(f)) for f in action.frame_range)
         frames = rc.sample_frames(start, end if anim in LOOPING else end + 1, step)
         expected = rc.V1_CLIPS.get(anim)
@@ -328,9 +361,7 @@ def render_character(scene, args) -> None:
                         clipped.append(name)
 
     write_manifest(os.path.join(out_root, "manifest.json"), manifest)
-    scene.camera.data.shift_y = 0.0
-    scene.camera.data.ortho_scale = rc.CAMERA_ORTHO_SCALE
-    scene.render.resolution_x = scene.render.resolution_y = rc.CELL_PX
+    _place(scene, scene.camera, rc.CELL_PX, rc.FEET_ROW_PX)
     if clipped:
         print(f"warning: {len(clipped)} body frames touch the cell edge, e.g. {clipped[0]}")
     print(f"batch_render: {len(manifest['frames'])} frames x {len(manifest['passes'])} passes -> {out_root}")
