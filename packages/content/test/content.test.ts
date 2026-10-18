@@ -147,6 +147,17 @@ describe('the style formula and the pixel finish (ASSETS 6.4, 6.11)', () => {
   it('proposes the pixel finish for the main mode and keeps it for ONUB (ruling F15)', () => {
     expect(style.pixelFinish.enabled).toEqual({ main: true, onub: true });
   });
+
+  it('ships the 8-bit and low-poly art styles, 8-bit by default, HD reserved (A79)', () => {
+    const a = style.artStyles;
+    expect(a.default).toBe('8bit');
+    expect(a.reserved).toEqual(['hd']);
+    expect(a.styles.map((s) => [s.id, s.pixelFinish, s.filter, s.root])).toEqual([
+      ['8bit', true, 'nearest', ''],
+      ['lowpoly', false, 'linear', 'lowpoly/'],
+    ]);
+    for (const s of a.styles) expect(s.drawScale, s.id).toBe(metrics.iso.artScale);
+  });
 });
 
 describe('traits (GDD 3.1)', () => {

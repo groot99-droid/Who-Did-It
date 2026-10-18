@@ -338,6 +338,33 @@ is one switch, `style.json` `pixelFinish.enabled.main` (S5.7, "The switch"):
 - Generated pixel art (portraits, cards, the ONUB images) always takes the finish. The ONUB art keeps it whatever
   the main answer is.
 
+### 1.9 Both art styles ship (owner, 2026-10-18; DECISIONS A79)
+
+The owner answered Gates A and C with both finishes: players pick **8-bit** or **Low poly** at the click of a button,
+and HD comes later. Section 1.8's switch is now a second output, not a choice:
+
+- **Two manifests, same keys.** The 8-bit style stays where every key lives today: `apps/client/public/assets/`,
+  `manifest.json`, finished, `nearest`. The low-poly style is `apps/client/public/assets/lowpoly/manifest.json`
+  (`"art": "lowpoly"`), with its files under `assets/lowpoly/` and its URLs relative to that folder: unfinished,
+  `linear`. It uses the same keys, frame names, cells, pivots, packed sizes, `maps` and `modes`.
+  `tools/sprites/test/styles.test.ts` checks it once the file exists.
+- **Every session packs both.** Each packer and finisher runs once per style of `artStyles()` (`tools/sprites/palette.ts`).
+  `style.pixelFinish` picks the finish, `style.filter` the manifest filter, and `style.root` the output folder.
+  The raw renders and generations are made once; only the finish step and the pack differ.
+- **What `lowpoly` is for each kind of art.** Rig renders (world, characters, props, VFX, clues, thumbnails) take the
+  finish-off path of ASSETS 6.11. Generated pixel art (portraits, cards, the cloche, mini-game objects) is the
+  key-removed generation, smooth-downscaled to the same size without the snap. The 13 ONUB owner images are the
+  originals, smooth-downscaled to 1920 x 1080 and written as lossy WebP at `offWebpQuality`.
+- **Budgets.** GPU pages: 1.4's caps hold for each style separately, and only one style is resident at a time.
+  DOM bytes: the low-poly ONUB set may take up to 4 MB, since unfinished images compress worse; the other byte caps
+  are unchanged.
+- **Fallback while art lands.** A key missing from the low-poly manifest loads its 8-bit entry, so each session
+  can land its low-poly keys in its own PRs, in any order. A session's last PR should leave none of its keys missing.
+- **Placeholders** stay one set (`?art=placeholder` overrides every style).
+- **HD** (`artStyles.reserved`) gets no art in round 5.
+- **The client switch** (the button in the lobby and in the in-match menu, the per-player pick kept in
+  `localStorage`, the texture swap mid-match) is a 5I follow-up, not the art sessions' work.
+
 ---
 
 ## 2. Higgsfield workflow and prompt templates
