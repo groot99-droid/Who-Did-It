@@ -1,5 +1,5 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
-import { balance, roles } from '@wdi/content';
+import { balance, deckFor, roles } from '@wdi/content';
 import {
   BUILD_VERSION,
   C2S,
@@ -19,6 +19,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { buildRoleReveal, startRefusal } from '../src/rooms/handlers/lobby';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { createServer } from '../src/server';
+import { flowOf } from '../src/sim/Flow';
 
 const opts = (name: string) => ({ name, build: BUILD_VERSION, deviceId: `dev-${name}` });
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -87,7 +88,9 @@ describe('Start (leader only, consumed inside the step)', () => {
       expect(card.traits.hat).toBe(TRAIT_IDS.hat[own.traits.hat]);
       dealt.push(card.roleId);
     }
-    expect([...dealt].sort()).toEqual([...roles.rosters['6'].deal].sort());
+    const flow = flowOf(room);
+    expect(flow.deck).toEqual(deckFor(6).cards);
+    expect([...dealt, ...flow.undealt].sort()).toEqual([...deckFor(6).cards].sort());
     expect(received(bots[1] as Bot, S2C.phaseChange)).toContainEqual({
       phase: Phase.roleReveal,
       endsTick: room.state.phaseEndsTick,
@@ -113,7 +116,7 @@ describe('Start (leader only, consumed inside the step)', () => {
     for (const bot of bots) expect(received(bot, S2C.roleReveal)).toHaveLength(0);
   });
 
-  it('starts with a single human: three NPC seats fill the party and the 4-player row is dealt', async () => {
+  it('starts with a single human: three NPC seats fill the party and the 4-player deck is dealt', async () => {
     const { bots, room } = await party(1);
     bots[0]?.room.send(C2S.lobbyStart, {});
     await sleep(300);
@@ -121,7 +124,7 @@ describe('Start (leader only, consumed inside the step)', () => {
     expect(room.state.players.size).toBe(balance.players.min);
     expect(room.state.settings.npcSeats).toBe(balance.players.min - 1);
     const dealt = [...room.state.players.values()].map((p) => p.priv.role.roleId).sort();
-    expect(dealt).toEqual([...roles.rosters['4'].deal].sort());
+    expect([...dealt, ...flowOf(room).undealt].sort()).toEqual([...deckFor(4).cards].sort());
     expect(received<RoleRevealPayload>(bots[0] as Bot, S2C.roleReveal)).toHaveLength(1);
   });
 
@@ -237,7 +240,7 @@ describe('privacy after Start', () => {
       const mates = [...(own.priv?.cabalMates ?? [])];
       if (card.team === 'cabal') {
         cabal++;
-        expect(mates).toHaveLength(2); // two Killers and an Accomplice deal at 10
+        expect(mates).toHaveLength(1); // two Killers deal at 10
         expect(card.teammates.map((t) => t.id).sort()).toEqual([...mates].sort());
         for (const t of card.teammates) {
           expect(t.name).toBe(room.state.players.get(t.id)?.name);
@@ -248,7 +251,7 @@ describe('privacy after Start', () => {
         expect(card.teammates).toHaveLength(0);
       }
     }
-    expect(cabal).toBe(3);
+    expect(cabal).toBe(2);
   });
 
   it('fuzz: no public field change at Start correlates with the Killer', async () => {

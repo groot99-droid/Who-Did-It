@@ -1,7 +1,7 @@
 import { shuffle, type Rng } from './prng';
 
-// The main-mode deck (GDD 3.1, 3.17; round-5 `deck/wire.md` 2.1). Pre-seeded with stub bodies: Session 5G owns
-// `dealDeck` (it replaces the stub with the tested version), Session 5F owns `coverHints`. `assignRoles` and
+// The main-mode deck (GDD 3.1, 3.17; round-5 `deck/wire.md` 2.1). Session 5G owns `dealDeck` (tested in
+// `apps/server/test/dealDeck.test.ts`), Session 5F owns `coverHints`. `assignRoles` and
 // `Roster` (`rules/roles.ts`) stay beside them until 5G's contract phase.
 
 export interface DeckDeal {
@@ -15,7 +15,7 @@ export interface DeckDeal {
  * GDD 3.1: every card for which `alwaysDealt` holds is dealt; the other cards are shuffled and the first
  * `ids.length - always` of them join the hand, the rest are `undealt` in shuffled order; the hand is shuffled
  * onto the seats. Throws when more cards must be dealt than there are seats or there are fewer cards than seats.
- * Pre-seed stub (untested): Session 5G replaces it with the tested version. The rng is the `deal` stream.
+ * The rng is the `deal` stream.
  */
 export function dealDeck(
   ids: readonly string[],

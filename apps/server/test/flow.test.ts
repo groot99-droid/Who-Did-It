@@ -1,9 +1,10 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { balance } from '@wdi/content';
+import { balance, deckFor } from '@wdi/content';
 import { C2S, ErrorCode, Phase, TICK_RATE } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { bootFlowServer, clock, events, idOf, seat, skipPhase, startParty, until } from './flowHelpers';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
+import { flowOf } from '../src/sim/Flow';
 import { simOf } from '../src/sim/RoomSim';
 import { opts, sleep } from './simHelpers';
 
@@ -100,7 +101,7 @@ describe('debug.clock and debug.deal (WDI_DEBUG only)', () => {
     expect(m.room.state.phase).toBe(Phase.day);
   });
 
-  it('debug.deal fixes seats for the next deal and the roster counts hold', async () => {
+  it('debug.deal fixes seats for the next deal and the deck counts hold', async () => {
     const leader = await colyseus.sdk.create('party', opts('Bot0'));
     const rooms = [leader];
     for (let i = 1; i < 5; i++) rooms.push(await colyseus.sdk.joinById(leader.roomId, opts(`Bot${i}`)));
@@ -113,6 +114,21 @@ describe('debug.clock and debug.deal (WDI_DEBUG only)', () => {
     const dealt = ids.map((id) => room.state.players.get(id)!.priv!.role.roleId);
     expect(dealt[3]).toBe('killer');
     expect(dealt[4]).toBe('doctor');
-    expect([...dealt].sort()).toEqual(['detective', 'doctor', 'killer', 'townsfolk', 'townsfolk']);
+    const flow = flowOf(room);
+    expect(flow.deck).toEqual(deckFor(5).cards);
+    expect(flow.undealt).toHaveLength(2);
+    expect([...dealt, ...flow.undealt].sort()).toEqual([...deckFor(5).cards].sort());
+  });
+
+  it('debug.deal refuses a card the deck does not hold, or holds fewer times', async () => {
+    const leader = await colyseus.sdk.create('party', opts('Bot0'));
+    const rooms = [leader];
+    for (let i = 1; i < 5; i++) rooms.push(await colyseus.sdk.joinById(leader.roomId, opts(`Bot${i}`)));
+    const room = colyseus.getRoomById(leader.roomId) as unknown as PartyRoom;
+    const ids = rooms.map((r) => r.sessionId);
+    leader.send('debug.deal', { roles: { [ids[0]!]: 'townsfolk' } }); // the class row is in no deck
+    leader.send('debug.deal', { roles: { [ids[0]!]: 'killer', [ids[1]!]: 'killer' } }); // one Killer at 5
+    await sleep(150);
+    expect(flowOf(room).fixedDeal).toBeNull();
   });
 });

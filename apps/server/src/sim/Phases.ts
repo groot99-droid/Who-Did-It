@@ -1,6 +1,7 @@
 import { balance, onubRoles, roles } from '@wdi/content';
 import { ErrorCode, Phase, type PlayerState, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { fixedDealFits } from './Deck';
 import { countRow, flowOf, isMeetingPhase, refuse, setPhase } from './Flow';
 import { onubClock, runOnubPhases } from './Conductor';
 import { enterImmunity, openMeeting, runMeeting } from './Meeting';
@@ -111,12 +112,15 @@ function runDebugCommands(room: PartyRoom): void {
     const payload = (cmd.payload ?? {}) as Record<string, unknown>;
     if (cmd.type === 'deal') {
       const fixed = payload.roles;
-      // In quick mode the fixed cards are validated against roles.onub.json (GDD 3.11).
+      // In quick mode the fixed cards are validated against roles.onub.json (GDD 3.11); in the main mode against
+      // the deck of the party (only its cards, each as often as it holds it; `deck/wire.md` 5).
       const known = isOnub(room) ? onubRoles.roles : roles.roles;
-      const valid =
+      const strings =
         fixed !== null &&
         typeof fixed === 'object' &&
         Object.values(fixed).every((r) => typeof r === 'string' && known[r] !== undefined);
+      const valid =
+        strings && (isOnub(room) || fixedDealFits(fixed as Record<string, string>, room.state.players.size));
       if (valid) flow.fixedDeal = { ...(fixed as Record<string, string>) };
       else refuse(room, cmd.sessionId, ErrorCode.cannot, 'bad deal');
       continue;
