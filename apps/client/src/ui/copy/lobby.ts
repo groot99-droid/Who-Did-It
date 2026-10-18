@@ -39,8 +39,6 @@ export const LOBBY_COPY = {
   'lobby.mode.main': 'Who Did It',
   'lobby.mode.onub': 'One Night Ultimate Baguette, {min}-{max} min, {players}',
   'lobby.mode.players': '{min}-{max} players',
-  'lobby.mode.toMain': 'Play Who Did It',
-  'lobby.mode.toOnub': 'Play the quick mode',
   'lobby.mode.toggle': 'Change mode',
   'lobby.mode.leaderOnly': 'The leader picks the mode',
   'lobby.mode.onub.hint': 'One night, one vote. What you hold at dawn is what you are.',
@@ -53,8 +51,4 @@ export const LOBBY_COPY = {
   'npc.level.normal': 'Normal',
   'npc.level.hard': 'Hard',
   'lobby.practice': 'Practice party: roles on, the Cabal wins with one villager left',
-  'lobby.npc.level.easy': 'Easy',
-  'lobby.npc.level.normal': 'Normal',
-  'lobby.npc.level.hard': 'Hard',
-  'lobby.npc.difficultyHint': 'Difficulty applies with {n} or more NPC seats.',
 } as const satisfies Record<string, string>;

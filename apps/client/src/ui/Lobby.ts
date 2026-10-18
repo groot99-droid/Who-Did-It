@@ -12,11 +12,21 @@ import { mountMapPicker } from './lobby/MapPicker';
 const { npc, players: seatRange } = balanceJson;
 const { min: lengthMin, max: lengthMax } = onubBalanceJson.targetLengthMin;
 const LEVELS = Object.keys(npc.difficulty) as NpcLevelId[];
-const LEVEL_LABELS: Record<NpcLevelId, string> = {
-  easy: C['lobby.npc.level.easy'],
-  normal: C['lobby.npc.level.normal'],
-  hard: C['lobby.npc.level.hard'],
+/** The skill labels (UI.md 14.13): one per key of `balance.json` `npc.difficulty`. */
+export const LEVEL_LABELS: Record<NpcLevelId, string> = {
+  easy: C['npc.level.easy'],
+  normal: C['npc.level.normal'],
+  hard: C['npc.level.hard'],
 };
+
+/** The line under the disabled skill select (UI.md 14.13): the seats it needs, and the default level until then. */
+export function difficultyLockedText(): string {
+  const level = npc.defaultDifficulty as NpcLevelId;
+  return fill(C['lobby.npc.difficulty.locked'], {
+    need: npc.difficultyMinNpcs,
+    level: LEVEL_LABELS[level] ?? level,
+  });
+}
 
 /** The mode chip text (UI.md 14.13): the quick mode names its length and party size (A15). */
 export function modeChipText(mode: GameModeId): string {
@@ -92,11 +102,11 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
   );
   const leave = h('button', { type: 'button', class: 'wdi-btn wdi-btn--ghost' }, C['lobby.leave']);
   const modeChip = h('span', { class: 'wdi-chip', 'data-testid': 'mode-chip' });
-  const modeToggle = h('button', {
-    type: 'button',
-    class: 'wdi-btn wdi-btn--sm',
-    'data-testid': 'mode-toggle',
-  });
+  const modeToggle = h(
+    'button',
+    { type: 'button', class: 'wdi-btn wdi-btn--sm', 'data-testid': 'mode-toggle' },
+    C['lobby.mode.toggle'],
+  );
   const addNpc = h(
     'button',
     { type: 'button', class: 'wdi-btn wdi-btn--sm', 'data-testid': 'add-npc' },
@@ -112,11 +122,7 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     { id: 'npc-difficulty', class: 'wdi-input', 'data-testid': 'npc-difficulty' },
     ...LEVELS.map((level) => h('option', { value: level }, LEVEL_LABELS[level])),
   );
-  const difficultyHint = h(
-    'p',
-    { class: 'wdi-hint' },
-    fill(C['lobby.npc.difficultyHint'], { n: npc.difficultyMinNpcs }),
-  );
+  const difficultyHint = h('p', { class: 'wdi-hint' }, difficultyLockedText());
   const settingsBlock = h(
     'div',
     { class: 'wdi-stack', 'aria-label': C['lobby.settings'], 'data-testid': 'lobby-settings' },
@@ -287,7 +293,6 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     modeChip.textContent = modeChipText(mode);
     // Without the offer the toggle still shows in quick mode, so a leader can always return to the main mode.
     modeToggle.hidden = !isLeader || (!opts.offerOnub && mode !== 'onub');
-    modeToggle.textContent = mode === 'onub' ? C['lobby.mode.toMain'] : C['lobby.mode.toOnub'];
     addNpc.hidden = !isLeader || next.players.length >= MAX_PLAYERS;
     removeNpc.hidden = !isLeader || npcSeats === 0;
     difficulty.value = npcDifficulty;
