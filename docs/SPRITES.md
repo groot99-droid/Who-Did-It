@@ -850,6 +850,23 @@ door) but still takes the boarded overlay `portal_boarded_<face>` when closed.
 - The exporter fails a scene with more than **1 200 static world sprites** (solids, slices, props and spots).
   The largest outline, the Fenwood, draws about 600 solids.
 
+**Exporter notes (5J, round 5).**
+
+- The exporter reads the validated scenes and maps from `@wdi/content` (scene order of `SCENE_IDS`), so a scene
+  that fails the validator never exports. The map and its theme come from `mapOf(sceneId)`.
+- **Shells, as built.** A tile is in the front shell when no walkable tile lies at or past both its x and its y (the
+  quadrant south-east of it). It is in the back shell when none lies at or before both (north-west). Read
+  literally, "every tile toward the east edge is solid" makes a whole north wall row a front shell, because the
+  wall itself runs east to the edge. The quadrant reading gives the same heights for every straight wall and keeps
+  the north-west corner full (DECISIONS A61).
+- Trees draw `full` or `stub` (the stump); a tree that would be `half` draws `full`. Boulders, fences and stacks
+  always draw `full`.
+- `occluder` is true for walls, trees and cliffs at `full` or `half`. Boulders, fences and stacks never occlude.
+- `void` is `slate` for an exterior that is not a cave, otherwise `ink`.
+- A solid tile whose material is a floor letter (the ground under a door or a spot) or `O` draws that material
+  on the ground layer. Other solid tiles take the material of their first walkable neighbour, as above.
+- Lights carry `radiusTiles` as a float property, and `phases` as an empty string when the light always burns.
+
 ### 10.13 Manifest keys
 
 | Key | Type | Content | Loaded |

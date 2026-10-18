@@ -162,6 +162,9 @@ importers:
 
   tools/grid:
     dependencies:
+      '@wdi/content':
+        specifier: workspace:*
+        version: link:../../packages/content
       '@wdi/shared':
         specifier: workspace:*
         version: link:../../packages/shared
