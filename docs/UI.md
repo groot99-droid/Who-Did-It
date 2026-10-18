@@ -969,3 +969,61 @@ the caller. The narrator's lines are the same on every page and name only the wi
 | `onub.out.none` | Nobody goes in the oven. |
 | `onub.out.abstained` | Did not point: {names} |
 | `onub.out.votes` | Votes: {tally} |
+
+**The end screen**
+
+| Id | Text |
+|---|---|
+| `onub.over.row.croissantAndBakers` | The Croissant and the Bakers win |
+| `onub.over.row.croissant` | The Stale Croissant wins alone |
+| `onub.over.row.ruined` | The Mother Dough is ruined: Team Mold wins |
+| `onub.over.row.sporeOut` | A Mold Spore goes in the oven: the Loyal Bakers win |
+| `onub.over.row.sporesHide` | The Spores stay out of the oven: Team Mold wins |
+| `onub.over.row.cleanTable` | A clean table: the Loyal Bakers win |
+| `onub.over.row.moldOut` | Team Mold goes in the oven: the Loyal Bakers win |
+| `onub.over.row.wrongOven` | The wrong oven: Team Mold wins |
+| `onub.over.nobody` | Nobody wins |
+| `onub.over.seats` | Every card |
+| `onub.over.seat.role` | Role: dealt {dealt}, held at dawn {final} |
+| `onub.over.seat.loc` | Location: worked {dealt}, held at dawn {final} |
+| `onub.over.seat.card` | Played {card} |
+| `onub.over.seat.auto` | The kitchen chose for them |
+| `onub.over.seat.won` | Won |
+| `onub.over.pantry` | The Pantry |
+| `onub.over.pantry.role` | Role card {n}: dealt {dealt}, at dawn {final} |
+| `onub.over.pantry.loc` | Location card {n}: dealt {dealt}, at dawn {final} |
+| `onub.over.piles` | The piles |
+| `onub.over.pile` | {station}: {cards} |
+| `onub.over.pile.lost` | lost to the thaw: {cards} |
+| `onub.over.pile.empty` | no cards |
+| `onub.over.pile.net` | net weight {net} |
+| `onub.over.ruin` | Ruin weight {weight}: {state} |
+| `onub.over.ruin.yes` | ruined |
+| `onub.over.ruin.no` | the dough held |
+| `onub.over.cloche` | The Iron Cloche lay on {card} |
+| `onub.over.votes` | Who pointed at whom |
+| `onub.over.vote` | {from} pointed at {to} |
+| `onub.over.vote.pantry` | the Pantry |
+| `onub.over.vote.none` | Nobody pointed at anyone. |
+
+**The night as a timeline**
+
+| Id | Text |
+|---|---|
+| `onub.log.title` | The night, window by window |
+| `onub.log.empty` | Nobody did anything all night. |
+| `onub.log.auto` | (the kitchen chose for them) |
+| `onub.log.cloche` | {role} set the Iron Cloche on {a} |
+| `onub.log.sporePeek` | {role} peeked at {a} |
+| `onub.log.peekLoc` | {role} peeked at {a} |
+| `onub.log.vent` | {role} swapped their Location card with {a} |
+| `onub.log.peekRole` | {role} peeked at {a} |
+| `onub.log.peekPantry` | {role} peeked at {a} and {b} |
+| `onub.log.peekLocs` | {role} looked at {a} and {b} |
+| `onub.log.rob` | {role} took {a} |
+| `onub.log.laminatePeek` | {role} looked at {a} |
+| `onub.log.laminateSwap` | {role} swapped the Pantry card with {a} |
+| `onub.log.drunk` | {role} swapped with {a}, without looking |
+| `onub.log.dishRoles` | {role} swapped {a} and {b}, without looking |
+| `onub.log.dishLocs` | {role} swapped {a} and {b}, without looking |
+| `onub.log.inspect` | {role} checked their own cards |

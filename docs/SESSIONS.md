@@ -2013,6 +2013,13 @@ tracks that none of them holds.
 
 ### Round 5 log: 5D (ONUB v2 client night, morning and results)
 
+Four stacked draft PRs (#31 Night scene, lights-out and narrator; #36 card table and acts; #39 Rush, claims and CRUST; this one the end screen, `ColyseusOnubFeed`, `night.spec.ts` and the deletions). Decisions: DECISIONS A55.
+
+- **Built.** `scenes/Night.ts` over `view/onub/{NightView,CardTableView,LightsOutView,NightSound}.ts`; `ui/onub/{rush,claim,over,actlog,actflow,slots,rushModel}.ts`; `net/onubColyseus.ts` (prep, night and Rush reads, `board`/`claims` events on state patches); the night half of the mock (windows, acts on a fixed table); `ui/copy/onubNight.ts` (UI.md 14.14, generated from it); the "Round 5 (5D)" CSS block; round-4 `Loft`, `LoftView`, `.wdi-loft*`, `.wdi-bedroll*` and `.wdi-claims*` deleted.
+- **Bugs closed.** The end headline reads the winners row; `loaf_crack` plays at the quick-mode reveal (a two-line edit in `scenes/Meeting.ts`, outside the brief's list but named by it).
+- **Tests.** O9 in `NightView.test.ts`; `actflow`, `rushModel`, `actlog` and the mock's acts; the Colyseus feed on a fake room; `e2e/night.spec.ts` (mock, passes locally after building `@wdi/shared` and `@wdi/content`).
+- **For the orchestrator.** (1) `net/worldRouter.ts` `liveOnubFeed` must become `new ColyseusOnubFeed(room)` at integration. (2) The mock meeting has no quick-mode tally with roles or `OnubGameOver`, so the reveal and end screen are covered by unit tests only. (3) The Tourrier's two-step path is not reachable in the 5-seat mock deck. (4) `OnubBoardView` has no per-window `endsTick`; the waker's clock reads `nightWake.endsTick`.
+
 ### Round 5 log: 5E (ONUB v2 bots, NPC brains, e2e and soak)
 
 ### Round 5 log: 5F (avatars, public looks, covers, Impersonate)

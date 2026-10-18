@@ -105,7 +105,7 @@ All fifteen open questions were closed on 2026-10-10 in the decisions round (A18
 | A52 | Round 5 Session 5A (reserved) | |
 | A53 | Round 5 Session 5B (reserved) | |
 | A54 | Round 5 Session 5C (reserved) | |
-| A55 | Round 5 Session 5D (reserved) | |
+| A55 | Round 5 Session 5D (ONUB v2 client night, morning and results; 2026-10-18) | Narrator audio: V1 has no voice assets, so the narrator's call is text (`onub.narrator.<roleId>.wake` / `.sleep`) plus the existing `door_open` (window opens) and `door_close` (window closes) cues, derived from `OnubBoard.window` only, so a waker's page and a sleeper's page start identical keys (O9). The sleepers' bed is the `storm` loop and `creak` pulses from a local RNG at `sleeperPulseMinS` to `sleeperPulseMaxS`. Open: dedicated narrator recordings from the audio session. Night acts: a waker picks from `view.legal` only (the server removes cloche and illegal slots); the done state shows after the `nightReveal` that answers the act, except after the Tourrier's first step, which waits for the second `nightWake`. Own cards show the dealt Role and the chosen station as memory, replaced by what an act showed. The end screen headline is one line per winners row id (`onub.over.row.<rowId>`), with the server's row text as the summary. `loaf_crack` plays at the quick-mode reveal (scene `Meeting`). The claim form was split into `ui/onub/claim.ts`; the Colyseus feed is built but wired in `net/worldRouter.ts` (`liveOnubFeed`) at integration. |
 | A56 | Round 5 Session 5E (reserved) | |
 | A57 | Round 5 Session 5F (reserved) | |
 | A58 | Round 5 Session 5G (reserved) | |
