@@ -40,7 +40,7 @@ export function runNpcs(room: PartyRoom): void {
     if (state.phase === Phase.roleReveal) {
       mem.brains.clear();
       mem.claims.clear();
-      drawPersonas(room, mem);
+      if (!isOnub(room)) drawPersonas(room, mem);
     }
     if (state.phase === Phase.meetingDiscussion) {
       for (const [id, brain] of mem.brains) {
@@ -56,7 +56,9 @@ export function runNpcs(room: PartyRoom): void {
     if (state.phase === Phase.grace || state.phase === Phase.immunity) {
       for (const brain of mem.brains.values()) brain.placementPending = true;
     }
-    if (state.phase === Phase.dusk || state.phase === Phase.finalNight) drawNightPowerTicks(room, mem);
+    if ((state.phase === Phase.dusk || state.phase === Phase.finalNight) && !isOnub(room)) {
+      drawNightPowerTicks(room, mem);
+    }
   }
 
   const sim = simOf(room);
