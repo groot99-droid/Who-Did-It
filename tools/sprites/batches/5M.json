@@ -398,9 +398,15 @@
       "keyColor": "#FF00FF",
       "crop": null,
       "replace": null,
-      "jobs": ["a72d341d-19c1-4e77-b6ec-02e8169f62de"],
-      "pick": "a72d341d-19c1-4e77-b6ec-02e8169f62de",
-      "cutout": "ddcf95a8-b24d-49d2-a5fe-792c6348487e"
+      "jobs": [
+        "a72d341d-19c1-4e77-b6ec-02e8169f62de",
+        "72e2a5ff-35c5-4e26-b7c8-8d77612f725c",
+        "9b8f28aa-10bb-4e85-b654-1ff16c7e6dd9"
+      ],
+      "pick": "9b8f28aa-10bb-4e85-b654-1ff16c7e6dd9",
+      "cutout": "c25a5114-7b6d-4ade-af72-e2fc1b90037b",
+      "retrySubject": "one freestanding low stainless-steel kitchen trolley, not a shelf unit and not a room: two flat steel trays one above the other on four short legs, a small black caster wheel under each leg, a bent tube push handle at one end, empty",
+      "retryNote": "the first job came out as a three-shelf rack; the retakes use retrySubject"
     },
     {
       "key": "onub_mini#mini_sack",
@@ -526,8 +532,14 @@
       "keyColor": null,
       "crop": null,
       "replace": null,
-      "jobs": ["a80e75e5-1cfb-4bf1-a970-9393261c892e", "7520c8b9-0e98-41c9-b7c5-84c513f8b7da"],
-      "pick": "a80e75e5-1cfb-4bf1-a970-9393261c892e"
+      "jobs": [
+        "a80e75e5-1cfb-4bf1-a970-9393261c892e",
+        "7520c8b9-0e98-41c9-b7c5-84c513f8b7da",
+        "f9b96301-5a3d-4ee4-8b5a-0f319498af99",
+        "197566f2-b759-491f-a57b-970881121c79"
+      ],
+      "pick": "197566f2-b759-491f-a57b-970881121c79",
+      "retryNote": "retake: the first pick read as a grey or blue panel beside the other portraits; the retake adds \"Everything outside the cutaway corner is one flat dark navy #12141C, edge to edge: no grey, blue or lighter backdrop panel.\" to the composition"
     },
     {
       "key": "onub_portrait_levain",
@@ -578,8 +590,14 @@
       "keyColor": null,
       "crop": null,
       "replace": null,
-      "jobs": ["c9954325-e3f9-437f-a9c7-f51b1ff6847f", "3178245d-f3ef-470f-be65-c3cb1701d8a4"],
-      "pick": "3178245d-f3ef-470f-be65-c3cb1701d8a4"
+      "jobs": [
+        "c9954325-e3f9-437f-a9c7-f51b1ff6847f",
+        "3178245d-f3ef-470f-be65-c3cb1701d8a4",
+        "a0c6fc1d-3f53-4bc9-8827-83e07fa34aae",
+        "db231e42-0ce7-47ce-9dae-96a5c37c6399"
+      ],
+      "pick": "a0c6fc1d-3f53-4bc9-8827-83e07fa34aae",
+      "retryNote": "retake: the first pick read as a grey or blue panel beside the other portraits; the retake adds \"Everything outside the cutaway corner is one flat dark navy #12141C, edge to edge: no grey, blue or lighter backdrop panel.\" to the composition (db231e42 failed on the server)"
     },
     {
       "key": "onub_portrait_chef",

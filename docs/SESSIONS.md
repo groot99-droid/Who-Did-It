@@ -2043,3 +2043,8 @@ tracks that none of them holds.
   the client filters by mode (5C, 5D, 5I) the ONUB images would load in the main mode too; 5C and 5D draw
   `mini_fire` from `mini_oven/0..3`. 5K: please move `frame` from `build_loft.py` into `static_common.py` and drop the
   loft step of `save_masters.py`, after which `build_loft.py` can be deleted.
+- **Retakes (2026-10-18, on the orchestrator's round-5 budget of 300 credits for 5M)**: 6 more images and 1 more
+  background removal, 16 credits (balance 3010.31 to 2994.31). The Champignon and Commis portraits sat on a grey or
+  blue panel against the other portraits' navy void, and `mini_cart` had come out as a three-shelf rack; the new picks
+  (`retryNote` and `retrySubject` in `batches/5M.json`) replace their CREDITS and MANIFEST rows. Every other pick held
+  up on the review sheets, so the rest of the share stays unspent; the oven waits on the owner's pick.
