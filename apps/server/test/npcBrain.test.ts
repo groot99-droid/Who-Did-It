@@ -6,7 +6,7 @@ import { spawnBody } from '../src/sim/Bodies';
 import { npcMemory } from '../src/sim/npc/memory';
 import { npcVoteTarget } from '../src/sim/npc/meeting';
 import { simOf, type MeetingRequest } from '../src/sim/RoomSim';
-import { isKillPhase, sceneIndex, sceneKey } from '../src/sim/World';
+import { sceneIndex, sceneKey } from '../src/sim/World';
 import { openRun } from './killHelpers';
 import {
   type Party,
@@ -386,8 +386,7 @@ describe('NPC Killer', () => {
     }
   });
 
-  // `isKillPhase` (sim/World.ts, locked) does not list the Final Night until 5G's deck lands (seams.md, 5G -> 5H).
-  it.skipIf(!isKillPhase(Phase.finalNight))('M3: the Final Night strikes too', async () => {
+  it('M3: the Final Night strikes too', async () => {
     const row = balance.npc.difficulty.normal as { killChancePer10s: number };
     const saved = row.killChancePer10s;
     row.killChancePer10s = 1;

@@ -5,6 +5,7 @@ import { ErrorCode, ItemStack, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import { createServer } from '../src/server';
 import { handleKill } from '../src/sim/Kill';
 import { StatusBit } from '../src/sim/constants';
+import { isKillPhase } from '../src/sim/World';
 import {
   act,
   diffPaths,
@@ -158,6 +159,13 @@ describe('kill', () => {
       await strike(m, i);
       expect(simOfBot(m, m.bots[i]!).dead).toBe(true);
     }
+  });
+
+  it('takes its phases from abilities.json kill.phases', () => {
+    const named = new Set<number>((abilities.abilities.kill?.phases ?? []).map((name) => Phase[name]));
+    expect(named.size).toBeGreaterThan(0);
+    for (const phase of Object.values(Phase))
+      expect(isKillPhase(phase), `phase ${phase}`).toBe(named.has(phase));
   });
 
   it('refuses a busy actor (426), a cooldown (424), and a target in transit', async () => {
