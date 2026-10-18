@@ -5,8 +5,8 @@
     #    build/render/props_<mapId>_sliced/... for the multi-tile props, the same way
     pnpm --filter @wdi/sprites slice ../../build/render/bld_hollowmere ../../build/finished/bld_hollowmere
 
-Each building is built from a recipe at its footprint: the scene file's `buildings[]` entry when the scene
-has one (5J's data), else the footprint of art plan 3.4 / world.md 7-8. Walls stand 3 m and the roof sits
+Each building is built from a recipe at its footprint, the scene file's `buildings[]` entry (5J's data, the
+only source since the round-5 integration). Walls stand 3 m and the roof sits
 on top, all under the 0.75 environment root; eaves stay within 0.25 tile of the south and east faces; doors
 are modelled where the scene's portals are (south or east faces); windows are painted lit in the lantern
 ramp. The building renders whole through IsoCam at the display scale with the footprint's centre on the
@@ -50,47 +50,47 @@ def tex(name: str, metres: float = 1.0):
 
 
 # ---------------------------------------------------------------- recipes (art plan 3.4)
-# scene, building id, art, footprint (x, y, w, h) as world.md 7-8, doors [(x, y, face)], and the look.
+# scene and building id (the footprint comes from the scene file), doors [(x, y, face)] in map tiles, the look.
 
 RECIPES = {
     "hollowmere": {
-        "manor": dict(scene="overworld", id="ov.bld_manor", fp=(3, 6, 13, 6), doors=[(13, 11, "s"), (6, 11, "s")],
+        "manor": dict(scene="overworld", id="ov.bld_manor", doors=[(13, 11, "s"), (6, 11, "s")],
                       wall="granite", roof="slate_roof", storeys=2, chimneys=[(0.2, 0.5), (0.8, 0.5)],
                       lit=[(0, 2)], dormers=3, details="manor"),
-        "barn": dict(scene="overworld", id="ov.bld_barn", fp=(47, 6, 10, 5), doors=[(51, 10, "s")],
+        "barn": dict(scene="overworld", id="ov.bld_barn", doors=[(51, 10, "s")],
                      wall="boards", roof="slate_roof", storeys=1, chimneys=[], lit=[], details="barn",
                      plinth="granite"),
-        "bakery": dict(scene="overworld", id="ov.bld_bakery", fp=(40, 16, 6, 4), doors=[(42, 19, "s")],
+        "bakery": dict(scene="overworld", id="ov.bld_bakery", doors=[(42, 19, "s")],
                        wall="plaster", roof="slate_roof", storeys=1, chimneys=[(0.75, 0.6)], lit="all",
                        details="bakery"),
-        "apoth": dict(scene="overworld", id="ov.bld_apoth", fp=(47, 17, 10, 8), doors=[(50, 24, "s")],
+        "apoth": dict(scene="overworld", id="ov.bld_apoth", doors=[(50, 24, "s")],
                       wall="plaster", roof="slate_roof", storeys=2, chimneys=[(0.3, 0.4)], lit="half",
                       details="apoth"),
-        "widow": dict(scene="overworld", id="ov.bld_widow", fp=(2, 17, 8, 7), doors=[(9, 20, "e")],
+        "widow": dict(scene="overworld", id="ov.bld_widow", doors=[(9, 20, "e")],
                       wall="granite", roof="slate_roof", storeys=1, chimneys=[(0.25, 0.5)], lit=[], details="widow"),
-        "tavern": dict(scene="overworld", id="ov.bld_tavern", fp=(25, 28, 12, 7),
+        "tavern": dict(scene="overworld", id="ov.bld_tavern",
                        doors=[(28, 34, "s"), (36, 31, "e")], wall="plaster", roof="slate_roof", storeys=2,
                        chimneys=[(0.15, 0.5), (0.7, 0.4)], lit="all", details="tavern"),
-        "chapel": dict(scene="overworld", id="ov.bld_chapel", fp=(2, 28, 9, 8), doors=[(10, 32, "e")],
+        "chapel": dict(scene="overworld", id="ov.bld_chapel", doors=[(10, 32, "e")],
                        wall="granite", roof="slate_roof", storeys=1, chimneys=[], lit="half", details="chapel"),
-        "netloft": dict(scene="overworld", id="ov.bld_netloft", fp=(40, 28, 5, 9), doors=[],
+        "netloft": dict(scene="overworld", id="ov.bld_netloft", doors=[],
                         wall="boards", roof="slate_roof", storeys=2, chimneys=[], lit=[], details="netloft",
                         tar=True),
-        "mollHut": dict(scene="forest_deep", id="fd.bld_moll_hut", fp=(0, 0, 4, 3), doors=[], wall="logs",
+        "mollHut": dict(scene="forest_deep", id="fd.bld_moll_hut", doors=[], wall="logs",
                         roof="sod", storeys=1, chimneys=[], lit=[], details="mollhut"),
     },
     "blackpine": {
-        "lodge": dict(scene="bp_camp", id="bc.bld_lodge", fp=(8, 13, 14, 7), doors=[(12, 19, "s"), (21, 16, "e")],
+        "lodge": dict(scene="bp_camp", id="bc.bld_lodge", doors=[(12, 19, "s"), (21, 16, "e")],
                       wall="logs", roof="shakes", storeys=1, chimneys=[(0.25, 0.5), (0.6, 0.5), (0.85, 0.5)],
                       lit="all", details="lodge", chimney_ramp="slate"),
-        "mill": dict(scene="bp_camp", id="bc.bld_mill", fp=(34, 24, 12, 7), doors=[(45, 27, "e"), (38, 30, "s")],
+        "mill": dict(scene="bp_camp", id="bc.bld_mill", doors=[(45, 27, "e"), (38, 30, "s")],
                      wall="boards", roof="shakes", storeys=2, chimneys=[], lit="half", details="mill"),
-        "office": dict(scene="bp_camp", id="bc.bld_office", fp=(44, 6, 8, 6), doors=[(47, 11, "s")],
+        "office": dict(scene="bp_camp", id="bc.bld_office", doors=[(47, 11, "s")],
                        wall="boards", wall_tint="#DCC4A1", roof="shakes", storeys=1, chimneys=[(0.7, 0.4)],
                        lit="half", details="office"),
-        "smithy": dict(scene="bp_camp", id="bc.bld_smithy", fp=(29, 7, 7, 5), doors=[(32, 11, "s")],
+        "smithy": dict(scene="bp_camp", id="bc.bld_smithy", doors=[(32, 11, "s")],
                        wall="granite", roof="shakes", storeys=1, chimneys=[(0.2, 0.5)], lit=[], details="smithy"),
-        "woodshed": dict(scene="bp_camp", id="bc.bld_woodshed", fp=(4, 26, 5, 3), doors=[], wall="logs",
+        "woodshed": dict(scene="bp_camp", id="bc.bld_woodshed", doors=[], wall="logs",
                          roof="shakes", storeys=1, chimneys=[], lit=[], details="woodshed"),
     },
 }
@@ -118,15 +118,13 @@ SLICED_PROPS = {
 
 
 def footprint_of(recipe: dict) -> tuple[int, int, int, int]:
-    """The scene file's footprint for this building when 5J's data has it, else the recipe's."""
-    path = os.path.join(SCENES, f"{recipe['scene']}.json")
-    if os.path.exists(path):
-        with open(path) as fh:
-            for b in json.load(fh).get("buildings", []):
-                if b["id"] == recipe["id"]:
-                    f = b["footprint"]
-                    return f["x"], f["y"], f["w"], f["h"]
-    return recipe["fp"]
+    """The building's footprint from its scene file's `buildings[]` (5J's data)."""
+    with open(os.path.join(SCENES, f"{recipe['scene']}.json")) as fh:
+        for b in json.load(fh)["buildings"]:
+            if b["id"] == recipe["id"]:
+                f = b["footprint"]
+                return f["x"], f["y"], f["w"], f["h"]
+    raise KeyError(f"{recipe['id']} is not in {recipe['scene']}.json buildings[]")
 
 
 # ---------------------------------------------------------------- the shell
