@@ -8,8 +8,10 @@ import { ClueKind, NotebookStatus } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
 import type { HoldAction } from '@wdi/shared/protocol';
 import type {
+  AvatarSnap,
   BodySnap,
   ClueSnap,
+  CoverState,
   DoorSnap,
   MoveCmd,
   NotebookSnap,
@@ -72,6 +74,12 @@ interface Actor {
   id: string;
   name: string;
   traits: PlayerSnap['traits'];
+  /** The public look id of the roster (`looks.json`), fixed for the match. */
+  look: string;
+  /** Opaque avatar handle, re-rolled on every scene entry and when a disguise applies or drops (GDD 3.17). */
+  handle: string;
+  /** The seat whose face the avatar shows: its own, or the one it impersonates. */
+  lookOf: string;
   scene: string;
   x: number;
   y: number;
@@ -100,6 +108,8 @@ interface MockCorpse extends BodySnap {
 const dirName = (dx: number, dy: number) => dirFromVector(dx, dy);
 const SPEED = (tilesPerS: number) => (tilesPerS * TILE_PX) / TICK_RATE;
 const BOT_NAMES = ['Ada', 'Bo', 'Cy', 'Dee', 'Eli', 'Fay'];
+/** Public looks of the mock roster, own seat first (all non-cover characters of `looks.json`). */
+const MOCK_LOOKS = ['tinner', 'detective', 'vicar', 'doctor', 'baker', 'fisher', 'lamplighter'];
 
 export class MockWorldFeed implements WorldFeed {
   readonly bus: Emitter<WorldFeedEvents> = mitt<WorldFeedEvents>();
@@ -118,10 +128,15 @@ export class MockWorldFeed implements WorldFeed {
   private readonly book: NotebookSnap[] = [];
   private holding: { clueId: string; since: number } | null = null;
   private killReadyTick = 0;
+  /** The tick the open Last Shot aim ends; -1 when none is open. */
+  private aimEndsTick = -1;
   private bloodyUntil = 0;
   private ghost = false;
   private still = false;
   private clueSeq = 0;
+  private handleSeq = 0;
+  /** The own seat's disguise, applied at once in the mock (the server waits until the seat is unseen). */
+  private disguised = false;
 
   constructor(
     private readonly content: MockContent,
@@ -142,6 +157,9 @@ export class MockWorldFeed implements WorldFeed {
         id,
         name,
         traits: { height: i % 3, scarf: (i + 1) % 3, hat: (i + 2) % 3 },
+        look: MOCK_LOOKS[i] ?? 'baker',
+        handle: this.nextHandle(),
+        lookOf: id,
         scene: 'overworld',
         x: 0,
         y: 0,
@@ -231,10 +249,44 @@ export class MockWorldFeed implements WorldFeed {
         name: b.name,
         traits: b.traits,
         alive: true,
-        presence: visible ? this.presenceOf(b) : null,
+        look: b.look,
+        presence: b.id === this.selfId && visible ? this.presenceOf(b) : null,
       });
     }
     return out;
+  }
+
+  avatars(): AvatarSnap[] {
+    const me = this.actors.get(this.selfId);
+    if (!me) return [];
+    const out: AvatarSnap[] = [];
+    for (const b of this.actors.values()) {
+      const visible =
+        b.id === this.selfId ||
+        (!b.dead && (b.scene === me.scene || (b.from === me.scene && this.tick < b.busyUntil)));
+      if (!visible) continue;
+      const pr = this.presenceOf(b);
+      out.push({
+        handle: b.handle,
+        lookOf: b.lookOf,
+        height: b.traits.height,
+        x: pr.x,
+        y: pr.y,
+        yaw: pr.yaw,
+        animId: pr.animId,
+        statusBits: pr.statusBits,
+        transitUntilTick: pr.transitUntilTick,
+      });
+    }
+    return out;
+  }
+
+  selfHandle(): string {
+    return this.actors.get(this.selfId)?.handle ?? '';
+  }
+
+  coverState(): CoverState {
+    return { look: '', mates: {} };
   }
 
   doors(): DoorSnap[] {
@@ -282,19 +334,43 @@ export class MockWorldFeed implements WorldFeed {
     this.ability('kill', targetId);
   }
 
+  /** Opens a Last Shot aim for `seconds` (the server sends `aim` to a knifed Gamekeeper; the mock has no such role). */
+  openAim(seconds = 10): void {
+    this.aimEndsTick = this.tick + Math.round(seconds * TICK_RATE);
+    this.bus.emit('aim', { endsTick: this.aimEndsTick });
+  }
+
+  /** `act.ability {abilityId: 'lastShot', targetId: <seat id>}`: one shot while the aim is open (GDD 3.2). */
+  private lastShot(targetId?: string): void {
+    if (this.tick >= this.aimEndsTick) return this.fail(422, 'cannot do that');
+    const victim = targetId === undefined ? undefined : this.actors.get(targetId);
+    if (!victim || victim.id === this.selfId || victim.dead) return this.fail(422, 'no target');
+    victim.dead = true;
+    victim.vx = victim.vy = 0;
+    victim.handle = this.nextHandle();
+    this.aimEndsTick = -1;
+  }
+
   ability(id: string, targetId?: string): void {
+    if (id === 'lastShot') return this.lastShot(targetId);
     const me = this.actors.get(this.selfId);
     if (!me || this.ghost) return this.fail(422, 'ghosts cannot do that');
+    if (id === 'impersonate') return this.impersonate(me, targetId);
     if (id !== 'kill') return this.fail(422, 'not in the mock');
     if (this.clock().phase === 2) return this.fail(425, 'not now');
     if (this.tick < me.busyUntil) return this.fail(426, 'busy');
     if (this.tick < this.killReadyTick) return this.fail(424, 'the knife is not ready');
-    const victim = targetId === undefined ? undefined : this.actors.get(targetId);
+    // `target: 'player'`: an avatar handle in the own scene, never a seat id (GDD 3.17).
+    const victim = [...this.actors.values()].find(
+      (a) => a.handle === targetId && a.id !== me.id && a.scene === me.scene,
+    );
     if (!victim || victim.id === me.id || victim.dead || victim.scene !== me.scene)
       return this.fail(422, 'no one there');
     if (Math.hypot(victim.x - me.x, victim.y - me.y) > KILL_REACH_PX) return this.fail(427, 'too far');
+    if (this.disguised) this.dropDisguise(me, true);
     victim.dead = true;
     victim.vx = victim.vy = 0;
+    victim.handle = this.nextHandle();
     this.killReadyTick = this.tick + KILL_COOLDOWN_TICKS;
     this.bloodyUntil = this.tick + BLOOD_TICKS;
     this.corpses.set(`body_${victim.id}`, {
@@ -381,6 +457,29 @@ export class MockWorldFeed implements WorldFeed {
     this.bus.all.clear();
   }
 
+  private nextHandle(): string {
+    return `av${++this.handleSeq}`;
+  }
+
+  /** Mock Impersonate: `targetId` is a seat id; the face applies at once and the handle is re-rolled. */
+  private impersonate(me: Actor, targetId: string | undefined): void {
+    if (this.disguised) return this.dropDisguise(me, false);
+    const target = targetId === undefined ? undefined : this.actors.get(targetId);
+    if (!target || target.id === me.id || target.dead) return this.fail(422, 'no target');
+    this.disguised = true;
+    me.lookOf = target.id;
+    me.handle = this.nextHandle();
+  }
+
+  /** The face drops and the handle is re-rolled; a strike's drop also puffs (`vfx`, naming nobody). */
+  private dropDisguise(me: Actor, puff: boolean): void {
+    this.disguised = false;
+    me.lookOf = me.id;
+    me.handle = this.nextHandle();
+    if (puff)
+      this.bus.emit('vfx', { sceneId: me.scene, x: Math.round(me.x), y: Math.round(me.y), kind: 'disguise' });
+  }
+
   private fail(code: number, msg: string): void {
     this.bus.emit('error', { code, msg });
   }
@@ -392,6 +491,7 @@ export class MockWorldFeed implements WorldFeed {
     b.yaw = (Math.max(0, DIRS.indexOf(spawn.facing)) * Math.PI) / 4;
     b.vx = b.vy = 0;
     b.from = null;
+    b.handle = this.nextHandle(); // a new handle on every scene entry
   }
 
   private grid(scene: string): NavGrid | null {

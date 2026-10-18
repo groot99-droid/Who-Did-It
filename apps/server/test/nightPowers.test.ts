@@ -19,6 +19,7 @@ import {
   teleport,
 } from './killHelpers';
 import { act } from './killHelpers';
+import { handleOf, settle } from './avatarHelpers';
 import { errorCodes, giveKit, nightfall, notes, power, refusals, toPhase } from './nightHelpers';
 import { type Match, startMatch, stateOf } from './simHelpers';
 
@@ -194,7 +195,8 @@ describe('protections and Nightshade (GDD 3.2)', () => {
   }
   const strike = async (m: Match) => {
     readyKnife(m, m.bots[0]!);
-    await act(m.bots[0]!, 'act.ability', { abilityId: 'kill', targetId: id(m, 5) });
+    settle(m, m.bots[0]!, m.bots[5]!);
+    await act(m.bots[0]!, 'act.ability', { abilityId: 'kill', targetId: handleOf(m, m.bots[5]!) });
   };
 
   it('spends a Bandage, then a Watch, then a Remedy, each refused "nothing happens", then kills', async () => {

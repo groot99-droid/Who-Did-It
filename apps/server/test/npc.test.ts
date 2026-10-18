@@ -260,11 +260,16 @@ describe('the wire never marks an NPC seat', () => {
   it('D1: readies NPCs on the role card 2-9 s after it opens, each on its own draw, and the card still ends', async () => {
     const party = await standardParty(colyseus, 'S1', true);
     const seats = npcSeats(party.room);
-    expect(seats.every((p) => !p.ready)).toBe(true);
+    // Ready on the card is private (5F, `flow.cardReady`): the public tick stays clear all card long.
+    const cardReady = flowOf(party.room).cardReady;
+    expect(seats.every((p) => !p.ready && !cardReady.has(p.id))).toBe(true);
     const open = party.room.state.phaseEndsTick - balance.phases.roleRevealS * TICK_RATE;
     const readyAt = new Map<string, number>();
     advance(party, balance.phases.roleRevealS * TICK_RATE - 5, (tick) => {
-      for (const p of seats) if (p.ready && !readyAt.has(p.id)) readyAt.set(p.id, tick);
+      for (const p of seats) {
+        expect(p.ready).toBe(false);
+        if (cardReady.has(p.id) && !readyAt.has(p.id)) readyAt.set(p.id, tick);
+      }
     });
     expect(readyAt.size).toBe(seats.length);
     const d = balance.npc.ready.delayS;

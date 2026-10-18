@@ -1,4 +1,5 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
+import { handleOf as h } from './avatarHelpers';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { ErrorCode, Phase } from '@wdi/shared';
 import { createServer } from '../src/server';
@@ -51,7 +52,7 @@ function murder(m: Match): void {
   teleport(m, m.bots[2]!, 'overworld', 32, 22);
   teleport(m, m.bots[3]!, 'overworld', 33, 22);
   teleport(m, m.bots[4]!, 'overworld', 38, 17);
-  handleKill(m.room, k.id, { abilityId: 'kill', targetId: v.id });
+  handleKill(m.room, k.id, { abilityId: 'kill', targetId: h(m, v) });
 }
 
 describe('report', () => {

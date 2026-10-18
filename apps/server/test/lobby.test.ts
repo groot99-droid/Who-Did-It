@@ -64,7 +64,6 @@ const publicOf = (p: PlayerState) => ({
   connected: p.connected,
   ready: p.ready,
   hasVoted: p.hasVoted,
-  sceneId: p.sceneId,
 });
 
 describe('Start (leader only, consumed inside the step)', () => {

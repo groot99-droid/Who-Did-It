@@ -2070,3 +2070,117 @@ button.wdi-map__option {
 .wdi-claim-form[hidden] {
   display: none;
 }
+
+/* Round 5 (5F): the role card's deck strip and cover picker, and the seat picker. Tokens only. */
+.wdi-card__deck {
+  display: grid;
+  gap: var(--wdi-space-1);
+}
+
+.wdi-card__deckcards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wdi-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wdi-card__deckcard.is-cover {
+  --_stroke: var(--wdi-blood);
+}
+
+.wdi-coverpicker {
+  display: grid;
+  gap: var(--wdi-space-2);
+  padding: var(--wdi-space-2);
+  background-color: var(--wdi-surface-sunken);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-md);
+}
+
+.wdi-coverpicker__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: var(--wdi-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wdi-coverpicker__look,
+.wdi-seat {
+  display: grid;
+  justify-items: center;
+  gap: var(--wdi-space-1);
+  width: 100%;
+  padding: var(--wdi-space-1);
+  font: inherit;
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-sm);
+  cursor: pointer;
+}
+
+.wdi-coverpicker__look.is-picked {
+  border-color: var(--wdi-primary);
+  box-shadow: var(--wdi-glow-interact);
+}
+
+.wdi-coverpicker__look:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wdi-coverpicker__look:focus-visible,
+.wdi-seat:focus-visible {
+  outline: var(--wdi-stroke-w) solid var(--wdi-primary);
+  outline-offset: var(--wdi-stroke-w);
+}
+
+.wdi-coverpicker__portrait,
+.wdi-seat__portrait {
+  width: 48px;
+  height: 72px;
+  background-color: var(--wdi-slate);
+  border-radius: var(--wdi-radius-xs);
+}
+
+.wdi-coverpicker__name,
+.wdi-seat__name {
+  font-size: var(--wdi-text-sm);
+  font-weight: var(--wdi-weight-strong);
+  text-align: center;
+}
+
+.wdi-coverpicker__note {
+  font-size: var(--wdi-text-xs);
+  color: var(--wdi-text-on-paper-muted);
+}
+
+.wdi-seatpicker {
+  position: fixed;
+  inset: auto 0 var(--wdi-space-5);
+  z-index: 30;
+  display: grid;
+  gap: var(--wdi-space-2);
+  max-width: 480px;
+  margin-inline: auto;
+  padding: var(--wdi-space-3);
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-lg);
+  box-shadow: var(--wdi-shadow-3);
+}
+
+.wdi-seatpicker__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: var(--wdi-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

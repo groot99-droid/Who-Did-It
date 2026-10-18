@@ -254,7 +254,6 @@ describe('role card to Evening Prep', () => {
     expect(timer).toBeGreaterThan(0);
     expect(timer).toBeLessThanOrEqual(onubBalance.timers.prepS * 20);
     m.room.state.players.forEach((p: PlayerState) => {
-      expect(p.sceneId).toBe(LOFT_SCENE_INDEX);
       expect(p.priv.sceneId).toBe(LOFT_SCENE_INDEX);
       expect(p.ready).toBe(false);
     });

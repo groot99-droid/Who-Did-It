@@ -11,7 +11,8 @@ import { simOf } from '../src/sim/RoomSim';
 import { events, skipPhase, until, voteAll } from './flowHelpers';
 import { act, errorCodes, playerOf, readyKnife, record, setPhase, sleep, teleport } from './killHelpers';
 import { giveKit, notes, nightfall, power, toPhase } from './nightHelpers';
-import { type Match, startMatch, stateOf } from './simHelpers';
+import { avatarsHeld, handleOf, settle } from './avatarHelpers';
+import { type Match, startMatch } from './simHelpers';
 
 // The npc vote target is 5H's; these tests stand in for it.
 const target = vi.hoisted(() => ({ value: null as string | null }));
@@ -56,10 +57,12 @@ async function party(): Promise<Match> {
 }
 const knife = async (m: Match, victim = 1) => {
   readyKnife(m, m.bots[0]!);
-  await act(m.bots[0]!, 'act.ability', { abilityId: 'kill', targetId: id(m, victim) });
+  settle(m, m.bots[0]!, m.bots[victim]!);
+  await act(m.bots[0]!, 'act.ability', { abilityId: 'kill', targetId: handleOf(m, m.bots[victim]!) });
 };
+// Other seats are avatars now (5F): a viewer sees a seat when it holds an avatar drawn as that seat's face.
 const sees = (m: Match, viewer: number, other: number): boolean =>
-  stateOf(m.bots[viewer]!).players.get(id(m, other))?.presence !== undefined;
+  avatarsHeld(m.bots[viewer]!).some((a) => a.avatar.lookOf === id(m, other));
 
 describe('Last Shot (GDD 3.2)', () => {
   it('blacks out a knifed Gamekeeper, defers its killed message and opens the ghost view when the aim closes (P5)', async () => {

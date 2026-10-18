@@ -40,11 +40,10 @@ describe('shared basics', () => {
     expect(s.players.get('a')?.name).toBe('Ada');
   });
 
-  it('adds the round-5 fields empty (pre-seed, deck/wire.md 1)', () => {
+  it('adds the round-5 fields empty (deck/wire.md 1)', () => {
     expect(VIEW_TAG).toEqual({ presence: 1, priv: 2, ghost: 3 });
     const p = new Player();
     expect(p.look).toBe('');
-    expect(p.sceneId).toBe(0);
     const priv = new Private();
     expect([priv.sceneId, priv.avatar, priv.coverLook, priv.mateLooks.size]).toEqual([0, '', '', 0]);
     expect(new SceneState().avatars.size).toBe(0);

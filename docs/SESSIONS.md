@@ -2064,6 +2064,29 @@ Four stacked draft PRs (#31 Night scene, lights-out and narrator; #36 card table
 
 ### Round 5 log: 5F (avatars, public looks, covers, Impersonate)
 
+Branch `claude/r5-avatars`, one draft PR (#35) with one green commit per step of the brief's split (the branch is the
+only one the session may push to). Decisions: DECISIONS A57.
+
+- **Step 1, avatars.** `sim/Avatars.ts` (handles, transit tails, `publishAvatars`, `resolveHandle`), the avatar half of
+  `Visibility.ts`, `avatars.test.ts` (P2, P4, P5, P6, P12). Kill and Bandage tests name handles (`avatarHelpers.ts`).
+- **Step 2, covers.** `sim/Covers.ts` (cover pick, private card Ready for both modes, `assignCovers`, `mainRevealFields`,
+  `publishLooks`, the reset) and the `coverHints` body; `coverPick.test.ts` (P7, P8, P13, P14, P16).
+- **Step 3, Impersonate.** `sim/Impersonate.ts`; `impersonate.test.ts` (P6, P9, P10, P11 and the 4.5 rules).
+- **Step 4, client.** World feed (`avatars()`, `selfHandle()`, `coverState()`, `vfx`), `EntityView`, `targets.ts`, the
+  World prompt target and seat picker branch, `RoleCard` (deck strip, walk line, cover picker), `SeatPicker`,
+  `portrait.ts` by look, `ui/copy/looks.ts`, UI.md 14.15, the mock feed.
+- **Step 5, contract phase.** `Player.sceneId` and every other seat's `presence` are gone from the wire; `Private.sceneId`
+  is the only scene index. `PlayerSim.sceneHidden` and `ViewState.presences` removed; the tests of 10.1 updated;
+  `looks.spec.ts` (opt-in `WDI_E2E_LOOKS=1`); ARCHITECTURE 5.4; `docs/PROTOCOL.md` regenerated.
+- **Hand-offs.** 5A: `beginOnubPlay` writes `priv.sceneId` only now (no public field exists). 5H: send
+  `priv.avatar` for the NPC Kill, then drop the NPC branch of `resolveHandle`. 5E: `tools/bots/walk.ts` still reads
+  `p.sceneId` and others' `presence`, which no longer arrive; switch it to avatars by handle. 5G: delete the
+  `dealMainDeck` stand-in in `coverPick.test.ts`; plug night powers into `SeatPicker` through the `target: 'seat'`
+  branch of `World.ts` `abilityKey`. 5I: `EntityView.playVfx` and the look id (`players[lookOf].look`) are ready for
+  the iso `PlayerView`.
+- **Not run here:** `pnpm test:e2e` (the looks spec needs 5G's deal) and the 2-minute soak (the bot swarm still sends
+  seat ids, see 5E).
+
 ### Round 5 log: 5G (main deck and Werewolf roles)
 
 Branch `claude/r5-deck`, one draft PR (#34) carrying the six steps of the brief as commits: (1) `dealMainDeck`, `dealDeck` tests, deck-aware `debug.deal`; (2) the Knife after dark (`isKillPhase`), the Bell in grace and day, the Final Night hunt and forced meeting (`sim/FinalNight.ts`, `Phases.ts`); (3) night powers, protections and Nightshade (`sim/NightPowers.ts`, `sim/nightMemory.ts`); (4) Last Shot (`sim/LastShot.ts`), Inherit (`sim/Inherit.ts`, the `heir` card) and Hunger (`sim/Hunger.ts`); (5) the `ui/main` screens, `ui/copy/deck.ts`, UI.md 14.16; (6) the contract phase (`rosters`, `standIn`, `assignRoles`, `rosterFor`, `dealRoles` removed; `cover` and `look` required). Tests: `dealDeck`, `nightPowers`, `lastShot`, `inherit` (with Hunger), the Final Night cases of `flow.test.ts`, `ui/main/main.test.ts`. Decisions: DECISIONS A58.
