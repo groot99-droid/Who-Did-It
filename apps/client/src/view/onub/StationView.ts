@@ -4,6 +4,8 @@ import { fill } from '../../ui/copy';
 import { ONUB_PREP_COPY as C } from '../../ui/copy/onubPrep';
 import { h } from '../../ui/dom';
 import type { PrepModel } from './PrepView';
+import { cratesGame } from './minigames/crates';
+import { pourGame } from './minigames/pour';
 
 export type StationSpec = (typeof onubBalance.stations)[number];
 export type MiniGameSpec = StationSpec['minigame'];
@@ -29,7 +31,10 @@ export type MiniGameFactory = (host: MiniGameHost) => MiniGame;
  * Every mini-game by kind. The four files of `view/onub/minigames/` register themselves here; a kind with no
  * entry gets the plain tap below, so a room can always be played through.
  */
-export const MINIGAMES: Partial<Record<MiniKind, MiniGameFactory>> = {};
+export const MINIGAMES: Partial<Record<MiniKind, MiniGameFactory>> = { crates: cratesGame, pour: pourGame };
+
+/** The Done control shows once a seat has spent `timers.minigameAssistS` in a room (GDD 3.11). */
+export const assistReady = (elapsedS: number): boolean => elapsedS >= onubBalance.timers.minigameAssistS;
 
 const tapFactory: MiniGameFactory = (host) => {
   const button = h(

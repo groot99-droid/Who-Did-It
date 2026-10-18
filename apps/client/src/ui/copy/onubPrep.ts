@@ -27,6 +27,7 @@ export const ONUB_PREP_COPY = {
   'onub.mini.crates.hint': 'Drag {steps} crates onto the cart, then stop the needle inside the cold band.',
   'onub.mini.crates.crate': 'Crate {n} of {steps}',
   'onub.mini.crates.dial': 'Stop the needle',
+  'onub.mini.crates.load': 'Load a crate',
   'onub.mini.crates.stop': 'Stop',
   'onub.mini.pour.hint': 'Hold to pour. Let go with the level inside the line.',
   'onub.mini.pour.flour': 'Flour',
