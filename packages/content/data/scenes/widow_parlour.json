@@ -65,6 +65,7 @@
   ],
   "gates": [],
   "paths": [],
+  "lights": [{ "id": "wp.lt_lamp", "kind": "lamp", "x": 8, "y": 5, "radiusTiles": 2 }],
   "grid": [
     "###D############",
     "#..S.........H.#",
@@ -77,5 +78,18 @@
     "#..............#",
     "#H.............#",
     "################"
+  ],
+  "material": [
+    "WWWWWWWWPWWWWWWW",
+    "WwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwP",
+    "WwwwwwwwwwwwwwwW",
+    "WWWWWWWWWWWWWWWW"
   ]
 }

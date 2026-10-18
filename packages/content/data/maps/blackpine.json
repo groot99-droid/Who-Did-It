@@ -1,0 +1,48 @@
+{
+  "id": "blackpine",
+  "name": "Blackpine",
+  "blurb": "Storm-cut logging camp: bunkhouse, sawmill, pine woods and the company's tin workings under the hill.",
+  "modes": ["main"],
+  "theme": "timber",
+  "scenes": [
+    "bp_camp",
+    "bp_lodge",
+    "bp_mill",
+    "bp_woods",
+    "bp_mine",
+    "bp_office",
+    "bp_smithy",
+    "bp_deep"
+  ],
+  "hub": "bp_camp",
+  "startSpawns": [
+    "bp_camp.yard_0",
+    "bp_camp.yard_1",
+    "bp_camp.yard_2",
+    "bp_camp.yard_3",
+    "bp_camp.yard_4",
+    "bp_camp.yard_5",
+    "bp_camp.yard_6",
+    "bp_camp.yard_7",
+    "bp_camp.yard_8",
+    "bp_camp.yard_9"
+  ],
+  "meetingSpawns": [
+    "bp_camp.yard_0",
+    "bp_camp.yard_1",
+    "bp_camp.yard_2",
+    "bp_camp.yard_3",
+    "bp_camp.yard_4",
+    "bp_camp.yard_5",
+    "bp_camp.yard_6",
+    "bp_camp.yard_7",
+    "bp_camp.yard_8",
+    "bp_camp.yard_9"
+  ],
+  "bell": "bc.bell",
+  "teachingClue": "bc.teaching_clue",
+  "kitChest": "bc.chest",
+  "thumbnail": "thumb_blackpine",
+  "worldRef": "4.10",
+  "gddRef": "3.13"
+}

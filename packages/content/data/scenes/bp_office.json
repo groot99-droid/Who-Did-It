@@ -1,0 +1,103 @@
+{
+  "id": "bp_office",
+  "prefix": "bo",
+  "name": "Company Office",
+  "zoneId": "bp_office",
+  "profile": "medium",
+  "kind": "interior",
+  "biome": "house",
+  "dark": false,
+  "size": { "w": 18, "h": 11 },
+  "notes": "Two rooms split by a wall. Company store: counter with a hiding spot behind it, empty shelves. Manager's office: payroll ledger open at a torn page, the safe, the map table, the dead telephone, a wardrobe, the strongroom door (body spot). Door south.",
+  "worldRef": "4.10",
+  "portals": [
+    {
+      "id": "bo.door",
+      "from": "bp_office",
+      "x": 8,
+      "y": 10,
+      "kind": "door",
+      "to": "bp_camp",
+      "toSpawn": "office",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "medium",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [{ "id": "door", "x": 8, "y": 9, "z": 0, "facing": "n" }],
+  "spots": [
+    {
+      "id": "bo.behind_counter",
+      "kind": "hide",
+      "variant": "behindCounter",
+      "x": 7,
+      "y": 4,
+      "childOnly": false
+    },
+    {
+      "id": "bo.wardrobe",
+      "kind": "hide",
+      "variant": "wardrobe",
+      "x": 16,
+      "y": 8,
+      "childOnly": false
+    },
+    {
+      "id": "bo.strongroom",
+      "kind": "body",
+      "variant": "strongroom",
+      "x": 12,
+      "y": 1,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    { "id": "bo.shelves", "kind": "decor", "x": 3, "y": 0 },
+    { "id": "bo.ledger_desk", "kind": "decor", "x": 13, "y": 3 },
+    { "id": "bo.safe", "kind": "decor", "x": 16, "y": 1 },
+    {
+      "id": "bo.map_table",
+      "kind": "decor",
+      "x": 11,
+      "y": 6,
+      "footprint": { "x": 11, "y": 6, "w": 2, "h": 2 }
+    },
+    { "id": "bo.telephone", "kind": "decor", "x": 10, "y": 0 }
+  ],
+  "gates": [],
+  "paths": [],
+  "lights": [
+    { "id": "bo.lt_desk_lamp", "kind": "lamp", "x": 13, "y": 4, "radiusTiles": 2 },
+    { "id": "bo.lt_store_lamp", "kind": "lamp", "x": 5, "y": 6, "radiusTiles": 2 }
+  ],
+  "grid": [
+    "##################",
+    "#........#..B...##",
+    "#........#.......#",
+    "#........#...#...#",
+    "#.#####H.#.......#",
+    "#........#.......#",
+    "#........#.##....#",
+    "#..........##....#",
+    "#...............H#",
+    "#.......S........#",
+    "########D#########"
+  ],
+  "material": [
+    "WWWPWWWWWWPWWWWWWW",
+    "WwwwwwwwwWwwWwwwPW",
+    "WwwwwwwwwWwwwwwwwW",
+    "WwwwwwwwwWwwwPwwwW",
+    "WwKKKKKKwWwwwwwwwW",
+    "WwwwwwwwwWwwwwwwwW",
+    "WwwwwwwwwWwPPwwwwW",
+    "WwwwwwwwwwwPPwwwwW",
+    "WwwwwwwwwwwwwwwwWW",
+    "WwwwwwwwwwwwwwwwwW",
+    "WWWWWWWWWWWWWWWWWW"
+  ]
+}

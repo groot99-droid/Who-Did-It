@@ -17,14 +17,13 @@ export const Role = z.strictObject({
   faction: Faction,
   /**
    * Wears the look of another card of the deck instead of its own (GDD 3.17): Killer, Accomplice, Drifter.
-   * Optional in the pre-seed (every row carries it); Session 5G makes it required in its contract phase.
    */
-  cover: z.boolean().optional(),
+  cover: z.boolean(),
   /**
-   * The character on this card (looks.json). Null for a row no deck deals: the Townsfolk class row and unshipped
-   * roles. Optional in the pre-seed (every row carries it); Session 5G makes it required in its contract phase.
+   * The character on this card (looks.json). Null for a row no deck deals: the Townsfolk class row, the heir and
+   * unshipped roles.
    */
-  look: LookId.nullable().optional(),
+  look: LookId.nullable(),
   /** A profession names the class row it plays as; every rules field equals that row's (validate.ts). */
   plays: Id.optional(),
   ships: Ships,
@@ -48,18 +47,7 @@ export const Role = z.strictObject({
 });
 export type Role = z.infer<typeof Role>;
 
-export const RosterRow = z.strictObject({
-  /** Practice party: lobby warning, no ranking (GDD 3.1). */
-  practice: z.boolean(),
-  /** The roles V1 deals at this count, one per player. `assignRoles` shuffles this list. */
-  deal: z.array(Id).min(4).max(10),
-  /** The GDD 3.1 row including roles that ship later; each later role is dealt as `stand-in`. */
-  planned: z.array(Id).min(4).max(10),
-  gddRef: GddRef,
-});
-export type RosterRow = z.infer<typeof RosterRow>;
-
-/** One deck row (GDD 3.1, 3.9). Sits beside `RosterRow` until Session 5G's contract phase removes it. */
+/** One deck row (GDD 3.1, 3.9). */
 export const DeckRow = z.strictObject({
   /** Practice party: lobby warning, no ranking (GDD 3.1). */
   practice: z.boolean(),
@@ -75,15 +63,8 @@ export type DeckRow = z.infer<typeof DeckRow>;
 export const RolesFile = z.strictObject({
   gddRef: GddRef,
   factions: z.strictObject({ village: FactionInfo, cabal: FactionInfo, neutral: FactionInfo }),
-  /**
-   * Role that stands in for a planned role that has not shipped yet. Kept by the pre-seed; Session 5G removes it in
-   * its contract phase (the professions replace the stand-in).
-   */
-  standIn: Id,
   roles: z.record(Id, Role),
-  /** Keyed "4".."10": `rosters[String(ids.length)].deal`. Kept by the pre-seed; 5G removes it in its contract phase. */
-  rosters: byPlayerCount(RosterRow),
-  /** Keyed "4".."10": `decks[String(n)].cards`. Replaces `rosters` and `standIn` once 5G's contract phase lands. */
+  /** Keyed "4".."10": `decks[String(n)].cards`. */
   decks: byPlayerCount(DeckRow),
 });
 export type RolesFile = z.infer<typeof RolesFile>;

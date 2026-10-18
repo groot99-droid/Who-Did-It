@@ -1,4 +1,5 @@
 // Pure input maths, kept apart from the DOM so it is unit-tested.
+import { keysToWorld, stickToWorld } from '@wdi/shared/iso';
 
 /** Keyboard state to a movement vector in screen space (x right, y down); diagonals are not shortened. */
 export function keyVector(pressed: ReadonlySet<string>): { dx: number; dy: number } {
@@ -19,4 +20,17 @@ export function stickVector(
   const amount = Math.min(1, len / radius);
   if (amount < deadZone || len === 0) return { dx: 0, dy: 0 };
   return { dx: (ox / len) * amount, dy: (oy / len) * amount };
+}
+
+/**
+ * The key and stick vectors, both in screen axes, as one world-frame move (SPRITES 10.8): keys through
+ * `keysToWorld`, the stick through its exact inverse projection, then summed. The server normalises the length.
+ */
+export function worldMove(
+  key: { dx: number; dy: number },
+  stick: { dx: number; dy: number },
+): { dx: number; dy: number } {
+  const k = keysToWorld(key.dx, key.dy);
+  const s = stickToWorld(stick.dx, stick.dy);
+  return { dx: k.x + s.x, dy: k.y + s.y };
 }

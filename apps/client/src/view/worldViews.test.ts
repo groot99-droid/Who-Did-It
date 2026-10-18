@@ -1,17 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { parseAudioManifest } from './AudioBus';
 import { formatTimer } from './Hud';
-import { Lighting } from './Lighting';
+import { darknessOf } from './lightMath';
 import { entryText } from './NotebookPanel';
 import { dirVector } from './ClueView';
 
-describe('Lighting.darkness', () => {
+describe('darknessOf', () => {
   it('is 0 by day, 1 at night and eases through dusk', () => {
-    expect(Lighting.darkness(3, 100)).toBe(0);
-    expect(Lighting.darkness(5, 100)).toBe(1);
-    expect(Lighting.darkness(4, 10_000)).toBe(0);
-    expect(Lighting.darkness(4, 0)).toBe(1);
-    const mid = Lighting.darkness(4, 100);
+    expect(darknessOf(3, 100)).toBe(0);
+    expect(darknessOf(5, 100)).toBe(1);
+    expect(darknessOf(4, 10_000)).toBe(0);
+    expect(darknessOf(4, 0)).toBe(1);
+    const mid = darknessOf(4, 100);
     expect(mid).toBeGreaterThan(0);
     expect(mid).toBeLessThan(1);
   });

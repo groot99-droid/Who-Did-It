@@ -1,15 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { NavGrid } from '@wdi/shared';
-import { type SceneJson, loadScenes, navFor } from '../export';
+import type { Scene } from '@wdi/content';
+import { loadScenes, navFor } from '../export';
 
 // The M2 greybox: the overworld and the tavern's two rooms must be walkable end to end, so a player can
 // reach every door at the Small profile (4-6 players) from the first square spawn. M3 adds the widow's
 // cottage (both rooms), the forest and the cave entry.
 const scenes = loadScenes();
-const byId = (id: string) => scenes.find((s) => s.id === id) as SceneJson;
+const byId = (id: string) => scenes.find((s) => s.id === id) as Scene;
 
 /** Tiles reachable on foot (4-connected floor) from a tile. */
-function reach(scene: SceneJson, sx: number, sy: number): Set<string> {
+function reach(scene: Scene, sx: number, sy: number): Set<string> {
   const grid = new NavGrid(navFor(scene), 'small');
   const seen = new Set<string>();
   const stack: Array<[number, number]> = [[sx, sy]];

@@ -72,6 +72,7 @@
   ],
   "gates": [],
   "paths": [],
+  "lights": [{ "id": "ba.lt_lantern", "kind": "lantern", "x": 10, "y": 6, "radiusTiles": 2.5 }],
   "grid": [
     "####################",
     "#................D.#",
@@ -85,5 +86,19 @@
     "#................#.#",
     "#.........S........#",
     "##########D#########"
+  ],
+  "material": [
+    "WWWWWWWWWWWWWWWWWWWW",
+    "WwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwKwwwwwwKwwwwwW",
+    "WwwwwwKwwwwwwKwwwwwW",
+    "WwwwwwKwwwwwwKwwwwwW",
+    "WwwwwwKwwwwwwKwwwwwW",
+    "WwwwwwKwwwwwwKwwwwwW",
+    "WwwwwwwwwwwwwwwwwPwW",
+    "WwwwwwwwwwwwwwwwwwwW",
+    "WWWWWWWWWWWWWWWWWWWW"
   ]
 }

@@ -1,6 +1,11 @@
-import { randomInt } from 'node:crypto';
-import { type Rng, mulberry32 } from '@wdi/shared';
+import type { Rng } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
+import type { Persona } from './routine';
+
+/** This seat's choices stream (`npcPlay:<seatId>`, GDD 3.12): persona, activities, durations, strikes, votes. */
+export const playRng = (room: PartyRoom, id: string): Rng => room.seeds.get('npcPlay', id);
+/** This seat's timing stream (`npcTiming:<seatId>`): the ready, vote and night-power ticks, the Last Shot delay. */
+export const timingRng = (room: PartyRoom, id: string): Rng => room.seeds.get('npcTiming', id);
 
 /** A path over one scene's tiles toward a goal, followed for about a second before it is rebuilt. */
 export interface PathPlan {
@@ -36,17 +41,87 @@ export class Brain {
   striking = false;
   path: PathPlan | null = null;
   /**
-   * Card-blind draws made for every NPC (round 5, npc/data.md 6; Session 5H draws them, 5G reads them): the
-   * night-power tick and pick, and the Last Shot tick; -1 when none.
+   * Card-blind draws made for every NPC (npc.md 6; Session 5H draws them, 5G reads them): the night-power tick
+   * (drawn on the first tick of each dusk and each Final Night hunt) and pick (a uniform in [0, 1)), and the Last
+   * Shot tick (the first tick the seat is seen dead plus a `lastShotS` delay, so `lastShotS` after its aim starts);
+   * -1 when none.
    */
   nightPowerAtTick = -1;
   nightPowerPick = 0;
   lastShotAtTick = -1;
+
+  /** What drives the seat now; tests read it to exempt reactions and the fallback (the walk home is not exempt). */
+  mode: 'routine' | 'react' | 'home' | 'fallback' = 'routine';
+  /** Night class in an unlit scene: the tick the walk home starts (`npc.night.leaveDelayS`); -1 when none. */
+  leaveAtTick = -1;
+  /** A home and favourite stations, drawn at the role card (GDD 3.12 "Persona"). */
+  persona: Persona | null = null;
+  /** The current activity; null when the next must be chosen. */
+  act: Act | null = null;
+  /** Scene bookkeeping: the scene seen last tick, when it was entered, when its dwell runs out. */
+  sceneIdx = -1;
+  sceneEnteredTick = 0;
+  sceneDwellUntilTick = 0;
+  /** The station left last, never picked straight again. */
+  lastStationId = '';
+  /** Moving ticks since the last still stretch of `idleS.min`, and the current still run. */
+  walkTicks = 0;
+  stillTicks = 0;
+  lastX = 0;
+  lastY = 0;
+  /** A forced or leg pause: the seat stands until this tick and then resumes its activity. */
+  pauseUntilTick = -1;
+  /** Progress watch for `stuckS`: where the seat last gained a quarter tile, and when. */
+  anchorX = 0;
+  anchorY = 0;
+  anchorTick = 0;
+  goalKey = '';
+  /** A portal walk of this seat ended in a crossing queued until this tick (a leg that may be followed by a pause). */
+  crossingUntil = -1;
+  /** The M3c wander runs until this tick when no station and no stroll tile qualified. */
+  fallbackUntilTick = -1;
+  /** The uniforms of the vote tick (suspect roll, suspect tie, fallback seat), drawn once per meeting. */
+  voteRolls: readonly [number, number, number] | null = null;
+  /** Clues sighted (and rolled for), and the one chosen for collecting with the scene it lies in. */
+  readonly seenClues = new Set<string>();
+  pendingClue = '';
+  pendingClueScene = -1;
+  /** Bodies this seat made with its own strikes: never startled at, never reported. */
+  readonly ownBodies = new Set<string>();
+  startleUntilTick = -1;
+  /** A grace or immunity placement happened and has not been handled yet. */
+  placementPending = false;
+  placementIdleUntilTick = -1;
+  /** Hold attempts at the current station visit (a refusal ends the cycles; tests count them). */
+  holdTries = 0;
+  /** The next lobby ready (after Add NPC and after the return to the lobby); -1 when none. */
+  lobbyReadyAtTick = -1;
+  /** A body approach that found no path is retried after this tick. */
+  bodyRetryTick = -1;
+}
+
+/** One activity of a routine (GDD 3.12 "Choosing"). */
+export interface Act {
+  kind: 'work' | 'stroll' | 'idle' | 'collect' | 'travel';
+  untilTick: number;
+  /** The station prop id (travel, work) or the clue id (collect). */
+  stationId: string;
+  /** Where the walk ends: a point of `scene` in pixels. */
+  goal: { scene: number; x: number; y: number } | null;
+  /** Travel: a Killer NPC's hunt for a lone human, which may cross several scenes (GDD 3.12 "Night"). */
+  hunt?: boolean;
+  /** Work: the step toward the prop was made. */
+  faced?: boolean;
+  /** Work with a hold: a hold of ours is running, the next cycle starts after `holdAgainTick`, the server refused. */
+  holding?: boolean;
+  holdAgainTick?: number;
+  refused?: boolean;
 }
 
 /** A `debug.npc` payload waiting for the step (WDI_DEBUG only). */
 export interface NpcDebugCommand {
   walk?: boolean;
+  routine?: boolean;
 }
 
 /** Room memory of the NPC stage; lives as long as the room (A39). */
@@ -55,9 +130,12 @@ export class NpcMemory {
   readonly ids = new Set<string>();
   readonly order: string[] = [];
   readonly brains = new Map<string, Brain>();
-  readonly rng: Rng = mulberry32(randomInt(2 ** 32));
+  /** Station prop id -> the NPC at it or heading for it; released when the visit ends (GDD 3.12 "Work"). */
+  readonly claims = new Map<string, string>();
   /** False parks every NPC on its spawn (`debug.npc`). */
   walk = true;
+  /** False sends every NPC back to the M3c wander (`debug.npc`, the detector self-check). */
+  routine = true;
   /** The phase last seen, so a brain resets when a new one begins. */
   phase = -1;
   readonly debug: NpcDebugCommand[] = [];

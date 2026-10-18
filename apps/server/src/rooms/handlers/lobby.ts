@@ -1,5 +1,5 @@
 import { randomInt } from 'node:crypto';
-import { abilities, balance, items, roles } from '@wdi/content';
+import { MAP_IDS, abilities, balance, items, roles } from '@wdi/content';
 import {
   ABILITY_KEYS,
   C2S,
@@ -18,9 +18,7 @@ import {
   S2C,
   Team,
   TRAIT_IDS,
-  assignRoles,
   dealTraits,
-  type Roster,
   type RoleRevealPayload,
   type TeamId,
 } from '@wdi/shared';
@@ -191,15 +189,15 @@ export function removeNewestNpcSeat(room: PartyRoom): boolean {
 }
 
 /**
- * `lobby.settings {mode?, npcDifficulty?, onubDeck?}`: leader, lobby; every field is checked before any is
- * written, all or nothing (GDD 3.11, 3.12, A39, A41). A mode change drops a pending `debug.deal`, whose role ids
- * belong to the other mode.
+ * `lobby.settings {mode?, npcDifficulty?, onubDeck?, map?}`: leader, lobby; every field is checked before any is
+ * written, all or nothing (GDD 3.11, 3.12, 3.13, A39, A41). A mode change drops a pending `debug.deal`, whose role
+ * ids belong to the other mode. `map` is a map id of `MAP_IDS` in either mode; the quick mode ignores it.
  */
 function handleSettings(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   if (room.state.leaderId !== sessionId)
     return refuse(room, sessionId, ErrorCode.cannot, 'cannot change settings');
   if (room.state.phase !== Phase.lobby) return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
-  const { mode, npcDifficulty, onubDeck } = payload;
+  const { mode, npcDifficulty, onubDeck, map } = payload;
   const settings = room.state.settings;
   const modes: unknown[] = Object.values(GameMode);
   const levels: unknown[] = Object.values(NpcLevel);
@@ -208,12 +206,15 @@ function handleSettings(room: PartyRoom, sessionId: string, payload: Record<stri
     npcDifficulty !== undefined &&
     (!levels.includes(npcDifficulty) || settings.npcSeats < balance.npc.difficultyMinNpcs);
   const deck = onubDeck === undefined ? undefined : onubDeckSetting(onubDeck);
-  if (badMode || badLevel || deck === null) return refuse(room, sessionId, ErrorCode.cannot, 'bad setting');
+  const badMap = map !== undefined && !(MAP_IDS as readonly unknown[]).includes(map);
+  if (badMode || badLevel || deck === null || badMap)
+    return refuse(room, sessionId, ErrorCode.cannot, 'bad setting');
   if (typeof mode === 'number' && mode !== settings.mode) {
     settings.mode = mode;
     flowOf(room).fixedDeal = null;
   }
   if (typeof npcDifficulty === 'number') settings.npcDifficulty = npcDifficulty;
+  if (typeof map === 'string') settings.map = map;
   if (deck !== undefined) {
     settings.onubDeck.clear();
     for (const id of deck) settings.onubDeck.push(id);
@@ -242,36 +243,6 @@ export function runLobbyPhase(room: PartyRoom): void {
   if (allCardReady(room) || room.state.tick >= room.state.phaseEndsTick) beginPlay(room);
 }
 
-/**
- * The deal: `debug.deal` can fix some seats for the next match (WDI_DEBUG only). Each fixed role leaves
- * the roster row once (a role the row lacks takes a Townsfolk's place, else the last card), and the
- * rest is dealt to the remaining seats, so the roster counts hold.
- */
-function dealRoles(room: PartyRoom, ids: string[], rng: () => number): Map<string, string> {
-  const flow = flowOf(room);
-  const fixed = flow.fixedDeal;
-  flow.fixedDeal = null;
-  const roster: Roster = roles.rosters;
-  if (!fixed) return assignRoles(ids, room.state.settings, rng, roster);
-  const deck = [...(roster[String(ids.length)]?.deal ?? [])];
-  const dealt = new Map<string, string>();
-  for (const id of ids) {
-    const roleId = fixed[id];
-    if (roleId === undefined) continue;
-    dealt.set(id, roleId);
-    const at = deck.includes(roleId)
-      ? deck.indexOf(roleId)
-      : deck.includes('townsfolk')
-        ? deck.indexOf('townsfolk')
-        : deck.length - 1;
-    deck.splice(at, 1);
-  }
-  const rest = ids.filter((id) => !dealt.has(id));
-  const dealtRest = assignRoles(rest, room.state.settings, rng, { [String(rest.length)]: { deal: deck } });
-  for (const [id, roleId] of dealtRest) dealt.set(id, roleId);
-  return dealt;
-}
-
 /** lobby -> roleReveal: deal roles and traits, write the private state, send each card to its owner. */
 export function startMatch(room: PartyRoom): void {
   // Every draw gets its own crypto-seeded stream, so the public traits and NPC names say nothing about the
@@ -282,8 +253,8 @@ export function startMatch(room: PartyRoom): void {
   fillNpcSeats(room, room.seeds.get('npcNames'));
   const ids = [...room.state.players.keys()];
   if (startOnubMatch(room, ids)) return; // quick mode deals its own cards from `room.seeds` (round 5, 5A)
-  // Round 5: the deck deal (5G) once it lands; until then `dealMainDeck` returns null and the roster deal runs.
-  const dealt = dealMainDeck(room, ids) ?? dealRoles(room, ids, room.seeds.get('deal'));
+  // The main-mode deal from the public deck (GDD 3.1); the quick mode returned above, so it is never null here.
+  const dealt = dealMainDeck(room, ids) as Map<string, string>;
   const looks = dealTraits(ids, room.seeds.get('traits'));
   const factionOf = (id: string) => roles.roles[dealt.get(id) as string]?.faction;
 

@@ -37,7 +37,7 @@ function livingActor(room: PartyRoom, sessionId: string, needBellPhase = false):
   if (!p) return null;
   const phase = room.state.phase;
   const phaseOk = needBellPhase
-    ? phase === Phase.day || phase === Phase.dusk || phase === Phase.night
+    ? phase === Phase.grace || phase === Phase.day // the Bell is silent after dark (GDD 3.3, M5a)
     : isVerbPhase(phase);
   // A sleeper in the quick-mode loft is in no scene and acts on nothing (A39).
   if (p.dead || !p.placed || isLoft(p.sceneIdx)) reject(room, sessionId, ErrorCode.cannot, 'not now');

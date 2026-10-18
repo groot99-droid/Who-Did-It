@@ -5,6 +5,7 @@ import palette from '@wdi/content/data/palette.json';
 import { Phase } from '@wdi/shared';
 import { TILE_PX } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
+import { toScreen, toWorld } from '@wdi/shared/iso';
 import { InputController } from '../input/InputController';
 import { TouchControls } from '../input/TouchControls';
 import {
@@ -25,12 +26,20 @@ import { ClueView } from '../view/ClueView';
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
+import { darknessOf, sceneLights } from '../view/lightMath';
 import { NotebookSheet } from '../view/NotebookPanel';
-import { PropView, overworldProps } from '../view/PropView';
-import { sceneMapKey, sceneMapUrl } from '../view/assets';
+import { GroundView } from '../view/GroundView';
+import { bellSpot } from '../view/PropView';
+import { StaticView } from '../view/StaticView';
+import { applyFilters, peekManifest, queueMatchEntries, sceneMapKey, sceneMapUrl } from '../view/assets';
+import { dayPartOf, isLit } from '../view/dayPart';
+import { mapStatics } from '../view/mapDefs';
 import { isTouchDevice, readDevFlags } from '../view/devFlags';
+import { DEPTH, cameraBounds, decalHolder, isoZoom, sceneDiamond, tileDiamond } from '../view/iso';
+import { type SceneMap, type TiledMap, readSceneMap } from '../view/sceneMap';
 import { loadSceneName } from '../view/sceneNames';
-import { REG_AUDIO, getNet } from './registry';
+import { DEFAULT_MAP_ID } from '../net/protocol';
+import { REG_AUDIO, getFlags, getNet } from './registry';
 
 /** How close a player must stand to a door to use it, in tiles (balance.json `doors.reachTiles`, GDD 3.7). */
 const PORTAL_REACH_TILES = balance.doors.reachTiles;
@@ -81,8 +90,6 @@ type Target =
 
 /** Clue ids this client has already collected, per feed: the prompt does not offer them again. */
 const collectedBy = new WeakMap<WorldFeed, Set<string>>();
-/** The World scene shows about this many tiles top to bottom whatever the window size. */
-const VIEW_TILES_HIGH = 11;
 
 interface PortalSpot {
   id: string;
@@ -91,6 +98,12 @@ interface PortalSpot {
 }
 
 const colorOf = (hex: string) => Number.parseInt(hex.slice(1), 16);
+
+/** Phaser polygon points from plain ones. */
+const poly = (pts: Array<{ x: number; y: number }>) => pts.map((p) => new Phaser.Math.Vector2(p.x, p.y));
+
+/** Where a drawn object stands in the world: the inverse of the projection its view applied. */
+const worldOf = (o: { x: number; y: number }) => toWorld(o.x, o.y);
 
 /**
  * The village and its interiors. Restarted by the router for every `sceneEnter`, so each run knows one
@@ -102,7 +115,9 @@ export class World extends Phaser.Scene {
   private sceneId = 'overworld';
   private entities!: EntityView;
   private clueView!: ClueView;
-  private propView!: PropView;
+  private ground: GroundView | null = null;
+  private bell: { x: number; y: number } | null = null;
+  private statics!: StaticView;
   private readonly bodyViews = new Map<string, BodyView>();
   private hud!: Hud;
   private lighting!: Lighting;
@@ -112,8 +127,7 @@ export class World extends Phaser.Scene {
   private touch: TouchControls | null = null;
   private portals: PortalSpot[] = [];
   private swing!: Phaser.GameObjects.Graphics;
-  private mapW = 0;
-  private mapH = 0;
+  private map!: SceneMap;
   private followed = false;
   private fpsAt = 0;
   private showFps = false;
@@ -127,7 +141,6 @@ export class World extends Phaser.Scene {
   private lastVerb: 'kill' | 'report' | 'other' = 'other';
   private lastPhase = -1;
   private stepAt = 0;
-  private lit = { visible: false, x: 0, y: 0, darkness: 0 };
 
   constructor() {
     super('World');
@@ -146,10 +159,20 @@ export class World extends Phaser.Scene {
   }
 
   preload(): void {
+    const base = import.meta.env.BASE_URL;
     const key = sceneMapKey(this.sceneId);
-    if (!this.cache.tilemap.exists(key)) {
-      this.load.tilemapTiledJSON(key, sceneMapUrl(import.meta.env.BASE_URL, this.sceneId));
-    }
+    if (!this.cache.tilemap.exists(key)) this.load.tilemapTiledJSON(key, sceneMapUrl(base, this.sceneId));
+    // The match's map art (SPRITES 10.13): entries listing its map or mode that the boot did not load.
+    const manifest = peekManifest(getFlags(this).art, base);
+    if (manifest) queueMatchEntries(this.load, this, manifest, this.matchMap(), this.matchMode());
+  }
+
+  private matchMap(): string {
+    return getNet(this).snapshot?.settings.map ?? DEFAULT_MAP_ID;
+  }
+
+  private matchMode(): 'main' | 'onub' {
+    return getNet(this).snapshot?.settings.mode ?? 'main';
   }
 
   create(): void {
@@ -159,8 +182,16 @@ export class World extends Phaser.Scene {
     const flags = readDevFlags(location.search);
 
     this.buildMap();
-    this.swing = this.add.graphics().setDepth(1);
-    this.propView = new PropView(this, this.sceneId);
+    this.swing = this.add.graphics().setDepth(DEPTH.decal);
+    this.statics = new StaticView(this);
+    this.statics.set(
+      mapStatics(this.map, {
+        mapId: this.map.mapId ?? this.matchMap(),
+        theme: this.map.theme ?? '',
+        hasFrame: (atlas, frame) => this.textures.exists(atlas) && this.textures.get(atlas).has(frame),
+      }),
+    );
+    this.statics.setLit(isLit(dayPartOf(feed.clock().phase)));
     this.clueView = new ClueView(this);
     this.entities = new EntityView(this, feed.selfId);
 
@@ -168,7 +199,8 @@ export class World extends Phaser.Scene {
     this.hud.setChip((this.registry.get(REG_ROLE_CHIP) as HudChip | undefined) ?? null);
     void loadSceneName(this.sceneId).then((scene) => this.hud.say(fill(C['hud.scene'], { scene }), 1500));
     this.hud.onNotebook(() => this.sheet.toggle());
-    this.lighting = new Lighting(overlayRoot());
+    this.lighting = new Lighting(this, overlayRoot());
+    this.lighting.setScene(sceneLights(this.map.lights), this.map.dark);
     this.sheet = new NotebookSheet(overlayRoot(), feed);
     this.audio = this.registry.get(REG_AUDIO) ?? new AudioBus();
     if (!this.registry.has(REG_AUDIO)) {
@@ -223,10 +255,6 @@ export class World extends Phaser.Scene {
     this.scale.on(Phaser.Scale.Events.RESIZE, this.fitCamera, this);
     this.fitCamera();
     this.cameras.main.fadeIn(balance.doors.sceneFadeS * 1000);
-    // The mask is placed after the camera has followed you, or it would trail a frame behind.
-    const cam = this.cameras.main;
-    cam.on(Phaser.Cameras.Scene2D.Events.POST_RENDER, this.placeMask, this);
-
     if (flags.navDebug) this.drawNavDebug();
     this.showFps = flags.fps;
 
@@ -236,7 +264,6 @@ export class World extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.events.off(Phaser.Scenes.Events.SLEEP, this.onSleep, this);
       this.events.off(Phaser.Scenes.Events.WAKE, this.onWake, this);
-      cam.off(Phaser.Cameras.Scene2D.Events.POST_RENDER, this.placeMask, this);
       this.scale.off(Phaser.Scale.Events.RESIZE, this.fitCamera, this);
       this.scale.scaleMode = this.prevScaleMode;
       this.scale.displaySize.setAspectMode(this.prevScaleMode);
@@ -248,7 +275,9 @@ export class World extends Phaser.Scene {
       input.unbindAll();
       this.entities.destroy();
       this.clueView.destroy();
-      this.propView.destroy();
+      this.ground?.destroy();
+      this.ground = null;
+      this.statics.destroy();
       for (const b of this.bodyViews.values()) b.destroy();
       this.bodyViews.clear();
       this.hud.destroy();
@@ -261,7 +290,7 @@ export class World extends Phaser.Scene {
     this.entryToasts();
   }
 
-  override update(): void {
+  override update(_time: number, delta: number): void {
     const now = performance.now();
     const feed = this.feed;
     this.entities.update(feed.snapshot(), now);
@@ -269,12 +298,13 @@ export class World extends Phaser.Scene {
     if (self && !this.followed) {
       this.followed = true;
       this.cameras.main.startFollow(self, true, 0.1, 0.1);
+      this.lighting.setFollowing(true);
       this.cameras.main.centerOn(self.x, self.y);
     }
     const clock = feed.clock();
     const endsTick = clock.phaseEndsTick;
     this.hud.setTimer(endsTick > 0 ? endsTick - clock.tick : null);
-    const darkness = Lighting.darkness(clock.phase, clock.phaseEndsTick - clock.tick);
+    const darkness = darknessOf(clock.phase, clock.phaseEndsTick - clock.tick);
     this.hud.setPhase(PHASE_LABEL[clock.phase] ?? '', darkness >= 1);
     this.watchPhase(clock.phase);
     this.refreshGhost();
@@ -289,18 +319,19 @@ export class World extends Phaser.Scene {
     this.footsteps(now);
     this.sheet.update();
     this.focusNewEntry();
+    this.statics.update(self ? worldOf(self) : null, delta / 1000, this.cameras.main.worldView);
 
-    this.lit = {
+    this.lighting.set({
       visible: WORLD_PHASES.has(clock.phase) && self !== null,
-      x: self?.x ?? 0,
-      y: self?.y ?? 0,
+      viewer: self ? worldOf(self) : null,
       darkness,
-    };
+      part: dayPartOf(clock.phase),
+    });
     if (this.showFps && now - this.fpsAt > 500) {
       this.fpsAt = now;
       const loop = this.game.loop;
       this.hud.setFps(
-        `${Math.round(loop.actualFps)} fps\n${this.entities.count} in view\n${this.sceneId}\nat ${self ? `${(self.x / TILE_PX).toFixed(1)},${(self.y / TILE_PX).toFixed(1)}` : '-'}\nbodies ${bodies.length}\nclues ${clues.length}`,
+        `${Math.round(loop.actualFps)} fps\n${this.entities.count} in view\n${this.sceneId}\nat ${self ? `${(worldOf(self).x / TILE_PX).toFixed(1)},${(worldOf(self).y / TILE_PX).toFixed(1)}` : '-'}\nbodies ${bodies.length}\nclues ${clues.length}`,
       );
     }
   }
@@ -410,10 +441,11 @@ export class World extends Phaser.Scene {
   ): void {
     this.target = null;
     if (!self) return this.hud.setPrompt(null);
+    const me = worldOf(self);
     const ghost = this.feed.dead();
     let best = Infinity;
     const consider = (t: Target, reach: number) => {
-      const d = Math.hypot(self.x - t.x, self.y - t.y);
+      const d = Math.hypot(me.x - t.x, me.y - t.y);
       // Strictly nearer wins, so a tie keeps the earlier kind: body, clue, bell, door.
       if (d <= reach && d < best - 1) {
         best = d;
@@ -427,9 +459,7 @@ export class World extends Phaser.Scene {
       for (const c of clues) {
         if (!collected?.has(c.id)) consider({ kind: 'clue', id: c.id, x: c.x, y: c.y }, COLLECT_REACH_PX);
       }
-      const bell =
-        this.sceneId === 'overworld' ? overworldProps().find((p) => p.id === 'ov.bell') : undefined;
-      if (bell) consider({ kind: 'bell', x: bell.x, y: bell.y }, BELL_REACH_PX);
+      if (this.bell) consider({ kind: 'bell', x: this.bell.x, y: this.bell.y }, BELL_REACH_PX);
     }
     const doors = this.feed.doors();
     for (const p of this.portals) {
@@ -460,7 +490,8 @@ export class World extends Phaser.Scene {
     if (!h) return;
     const moving = this.input_.current();
     const clue = clues.find((c) => c.id === h.clueId);
-    const away = !self || !clue || Math.hypot(self.x - clue.x, self.y - clue.y) > COLLECT_REACH_PX + 8;
+    const me = self ? worldOf(self) : null;
+    const away = !me || !clue || Math.hypot(me.x - clue.x, me.y - clue.y) > COLLECT_REACH_PX + 8;
     if (away || moving.dx !== 0 || moving.dy !== 0) {
       // Moving or leaving cancels the hold on the server too (GDD 3.4); nothing more to send.
       this.hold = null;
@@ -535,6 +566,7 @@ export class World extends Phaser.Scene {
     if (phase === this.lastPhase) return;
     const was = this.lastPhase;
     this.lastPhase = phase;
+    this.statics.setLit(isLit(dayPartOf(phase)));
     if (phase === Phase.dusk) {
       this.hud.toast(fill(C['toast.dusk'], { duskS: balance.phases.duskS }), 'warm', undefined, 5000);
     } else if (phase === Phase.night) this.hud.toast(C['toast.night'], 'warm', undefined, 5000);
@@ -579,55 +611,46 @@ export class World extends Phaser.Scene {
     this.audio.play('footstep');
   }
 
-  /** Positions the night mask over you once the camera has moved (camera POST_RENDER). */
-  private placeMask(cam: Phaser.Cameras.Scene2D.Camera): void {
-    const l = this.lit;
-    const sx = (l.x - cam.worldView.x) * cam.zoom;
-    const sy = (l.y - cam.worldView.y) * cam.zoom;
-    this.lighting.update(l.visible, sx, sy, cam.zoom, l.darkness);
-  }
-
+  /** Reads the scene's tilemap, draws its ground and sets the void colour; the statics follow in `create`. */
   private buildMap(): void {
     const key = sceneMapKey(this.sceneId);
-    const map = this.make.tilemap({ key });
-    this.mapW = map.widthInPixels;
-    this.mapH = map.heightInPixels;
-    const data = this.cache.tilemap.get(key).data as { tilesets: Array<{ name: string }> };
-    const sets = data.tilesets
-      .map((t) => map.addTilesetImage(t.name, t.name, TILE_PX, TILE_PX))
-      .filter((t): t is Phaser.Tilemaps.Tileset => t !== null);
-    map.createLayer('ground', sets, 0, 0)?.setDepth(0);
-    this.portals = (map.getObjectLayer('portals')?.objects ?? []).map((o) => ({
-      id: o.name,
-      x: (o.x ?? 0) + TILE_PX / 2,
-      y: (o.y ?? 0) + TILE_PX / 2,
-    }));
+    this.map = readSceneMap(this.cache.tilemap.get(key).data as TiledMap);
+    this.portals = this.map.portals;
+    this.bell = bellSpot(this.map.props);
+    this.ground = new GroundView(this, key, this.map);
+    applyFilters(
+      this.textures,
+      peekManifest(getFlags(this).art, import.meta.env.BASE_URL) ?? { version: 1, art: '', entries: [] },
+    );
+    this.cameras.main.setBackgroundColor(colorOf(palette.colors[this.map.voidColour]));
   }
 
-  /** Camera zoom keeps ~11 tiles on screen high; bounds centre a scene smaller than the view. */
+  /** Camera zoom snaps to a multiple of 0.5 (SPRITES 10.9); bounds hold the scene's diamond, centred if smaller. */
   private fitCamera(): void {
     const cam = this.cameras.main;
     const { width, height } = this.scale;
     cam.setSize(width, height);
-    const zoom = Phaser.Math.Clamp(height / (VIEW_TILES_HIGH * TILE_PX), 0.3, 2);
+    const zoom = isoZoom(height);
     cam.setZoom(zoom);
-    const viewW = width / zoom;
-    const viewH = height / zoom;
-    const padX = Math.max(0, (viewW - this.mapW) / 2);
-    const padY = Math.max(0, (viewH - this.mapH) / 2);
-    cam.setBounds(-padX, -padY, this.mapW + padX * 2, this.mapH + padY * 2);
+    cam.setRoundPixels(true);
+    this.lighting?.resize();
+    const b = cameraBounds(this.map.w, this.map.h, width / zoom, height / zoom);
+    cam.setBounds(b.x, b.y, b.width, b.height);
   }
 
   /** A door swings for 3 s (GDD 3.7): pulse its tile while the server says it is swinging. */
   private drawDoors(tick: number): void {
     this.swing.clear();
-    for (const d of this.feed.doors()) {
+    const doors = this.feed.doors();
+    for (const p of this.portals)
+      this.statics.setShown(`${p.id}~boarded`, doors.find((d) => d.id === p.id)?.state === 1);
+    for (const d of doors) {
       if (tick >= d.swingUntilTick) continue;
       const p = this.portals.find((q) => q.id === d.id);
       if (!p) continue;
       const pulse = 0.35 + 0.25 * Math.sin(this.time.now / 120);
       this.swing.fillStyle(colorOf(palette.colors.lantern), pulse);
-      this.swing.fillRect(p.x - TILE_PX / 2, p.y - TILE_PX / 2, TILE_PX, TILE_PX);
+      this.swing.fillPoints(poly(tileDiamond(Math.floor(p.x / TILE_PX), Math.floor(p.y / TILE_PX))), true);
     }
   }
 
@@ -636,10 +659,16 @@ export class World extends Phaser.Scene {
     if (n.sceneId !== this.sceneId) return;
     const scream = /scream/i.test(n.kind);
     const col = colorOf(scream ? palette.colors.magenta : palette.colors.lantern);
-    const g = this.add.circle(n.x, n.y, 8).setStrokeStyle(4, col).setDepth(1);
-    this.tweens.add({ targets: g, scale: 8, alpha: 0, duration: 700, onComplete: () => g.destroy() });
-    const me = this.entities.objectOf(this.feed.selfId);
-    const dir = me ? dirFromVector(n.x - me.x, n.y - me.y) : null;
+    // A ring on the ground: an ellipse on the screen, above the darkness (SPRITES 10.6).
+    const { root, inner } = decalHolder(this, n.x, n.y);
+    const g = this.add.circle(0, 0, 8).setStrokeStyle(4, col);
+    inner.add(g);
+    root.setDepth(DEPTH.marks);
+    this.tweens.add({ targets: g, scale: 8, alpha: 0, duration: 700, onComplete: () => root.destroy() });
+    const meObj = this.entities.objectOf(this.feed.selfId);
+    const at = toScreen(n.x, n.y);
+    // HUD words are screen frame: "from the north" is up on the screen (SPRITES 10.4).
+    const dir = meObj ? dirFromVector(at.x - meObj.x, at.y - meObj.y) : null;
     const line = /bell/i.test(n.kind)
       ? C['log.bell']
       : scream
@@ -652,8 +681,8 @@ export class World extends Phaser.Scene {
     if (scream) this.audio.play('scream');
     const cam = this.cameras.main;
     const { width, height } = this.scale;
-    const sx = (n.x - cam.worldView.x) * cam.zoom;
-    const sy = (n.y - cam.worldView.y) * cam.zoom;
+    const sx = (at.x - cam.worldView.x) * cam.zoom;
+    const sy = (at.y - cam.worldView.y) * cam.zoom;
     if (sx >= 0 && sx <= width && sy >= 0 && sy <= height) return;
     const dx = sx - width / 2;
     const dy = sy - height / 2;
@@ -663,8 +692,9 @@ export class World extends Phaser.Scene {
 
   /** ?navdebug=1: outline every solid tile from the tilemap's ground layer for collision debugging. */
   private drawNavDebug(): void {
-    const g = this.add.graphics().setDepth(999_999);
+    const g = this.add.graphics().setDepth(DEPTH.marks);
     g.lineStyle(1, colorOf(palette.colors.magenta), 0.6);
-    g.strokeRect(0, 0, this.mapW, this.mapH);
+    const { w, h } = this.map;
+    g.strokePoints(poly(sceneDiamond(w, h)), true);
   }
 }

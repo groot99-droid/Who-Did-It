@@ -17,6 +17,16 @@ import manorUpper from '../data/scenes/manor_upper.nav.json' with { type: 'json'
 import barn from '../data/scenes/barn.nav.json' with { type: 'json' };
 import chapel from '../data/scenes/chapel.nav.json' with { type: 'json' };
 import cellar from '../data/scenes/cellar.nav.json' with { type: 'json' };
+import forestDeep from '../data/scenes/forest_deep.nav.json' with { type: 'json' };
+import caveGallery from '../data/scenes/cave_gallery.nav.json' with { type: 'json' };
+import bpCamp from '../data/scenes/bp_camp.nav.json' with { type: 'json' };
+import bpLodge from '../data/scenes/bp_lodge.nav.json' with { type: 'json' };
+import bpMill from '../data/scenes/bp_mill.nav.json' with { type: 'json' };
+import bpWoods from '../data/scenes/bp_woods.nav.json' with { type: 'json' };
+import bpMine from '../data/scenes/bp_mine.nav.json' with { type: 'json' };
+import bpOffice from '../data/scenes/bp_office.nav.json' with { type: 'json' };
+import bpSmithy from '../data/scenes/bp_smithy.nav.json' with { type: 'json' };
+import bpDeep from '../data/scenes/bp_deep.nav.json' with { type: 'json' };
 import { Profile } from './schemas/balance.js';
 import { SCENE_IDS, type SceneId } from './schemas/scene.js';
 
@@ -61,6 +71,16 @@ const navJson: Record<SceneId, unknown> = {
   barn,
   chapel,
   cellar,
+  forest_deep: forestDeep,
+  cave_gallery: caveGallery,
+  bp_camp: bpCamp,
+  bp_lodge: bpLodge,
+  bp_mill: bpMill,
+  bp_woods: bpWoods,
+  bp_mine: bpMine,
+  bp_office: bpOffice,
+  bp_smithy: bpSmithy,
+  bp_deep: bpDeep,
 };
 
 function parseNavs(): Record<SceneId, NavFile> {

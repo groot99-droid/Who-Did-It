@@ -1,8 +1,18 @@
-import { Phase, type PlayerState } from '@wdi/shared';
+import { balance } from '@wdi/content';
+import { Phase, TICK_RATE, npcDelayTicks, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
-import { npcMemory, syncNpcCount, type NpcDebugCommand } from './npc/memory';
+import {
+  type Brain,
+  type NpcDebugCommand,
+  type NpcMemory,
+  npcMemory,
+  playRng,
+  syncNpcCount,
+  timingRng,
+} from './npc/memory';
 import { readyOnRoleCard, runMeetingVotes } from './npc/meeting';
 import { runOnubNpc } from './npc/onub';
+import { drawPersonas, releaseClaims } from './npc/routine';
 import { runWorldNpc } from './npc/world';
 import { isOnub } from './onub/state';
 import { simOf } from './RoomSim';
@@ -17,20 +27,37 @@ export function runNpcs(room: PartyRoom): void {
   const mem = npcMemory(room);
   const state = room.state;
   for (const id of [...mem.ids]) if (!state.players.has(id)) releaseNpcSeat(room, id);
-  for (const cmd of mem.debug.splice(0)) if (typeof cmd.walk === 'boolean') mem.walk = cmd.walk;
+  for (const cmd of mem.debug.splice(0)) {
+    if (typeof cmd.walk === 'boolean') mem.walk = cmd.walk;
+    if (typeof cmd.routine === 'boolean') mem.routine = cmd.routine;
+  }
   if (mem.ids.size === 0) return;
 
   if (state.phase !== mem.phase) {
     mem.phase = state.phase;
-    // A new role card starts a match; a new discussion draws a fresh vote delay. Memory of bodies and
-    // suspicion lasts the match.
-    if (state.phase === Phase.roleReveal) mem.brains.clear();
+    // A new role card starts a match: the brains are forgotten and each seat draws its persona. A new discussion
+    // draws a fresh vote delay and ends every visit. Memory of bodies and suspicion lasts the match.
+    if (state.phase === Phase.roleReveal) {
+      mem.brains.clear();
+      mem.claims.clear();
+      if (!isOnub(room)) drawPersonas(room, mem);
+    }
     if (state.phase === Phase.meetingDiscussion) {
-      for (const brain of mem.brains.values()) {
+      for (const [id, brain] of mem.brains) {
         brain.voteAtTick = -1;
+        brain.voteRolls = null;
         brain.flee = null;
         brain.path = null;
+        brain.act = null;
+        brain.striking = false;
+        releaseClaims(mem, id);
       }
+    }
+    if (state.phase === Phase.grace || state.phase === Phase.immunity) {
+      for (const brain of mem.brains.values()) brain.placementPending = true;
+    }
+    if ((state.phase === Phase.dusk || state.phase === Phase.finalNight) && !isOnub(room)) {
+      drawNightPowerTicks(room, mem);
     }
   }
 
@@ -41,11 +68,24 @@ export function runNpcs(room: PartyRoom): void {
     const p = sim.players.get(id);
     if (!p) continue;
     const brain = mem.brain(id);
+    // The Last Shot tick is drawn once, on the first tick the seat is seen dead (every NPC, whatever its card): that
+    // tick plus a `lastShotS` delay, the tick an aiming NPC Gamekeeper fires at (npc.md 6, 9).
+    if (p.dead && brain.lastShotAtTick < 0 && !quick) {
+      brain.lastShotAtTick =
+        state.tick +
+        npcDelayTicks(
+          timingRng(room, id),
+          balance.npc.nightPower.lastShotS.min,
+          balance.npc.nightPower.lastShotS.max,
+          TICK_RATE,
+        );
+    }
     // Quick mode hands every phase but the role card to its own brain (round 5, 5E).
-    if (state.phase === Phase.roleReveal) readyOnRoleCard(room, mem, brain, player);
+    if (state.phase === Phase.lobby) readyInLobby(room, brain, player);
+    else if (state.phase === Phase.roleReveal) readyOnRoleCard(room, mem, brain, player);
     else if (quick) runOnubNpc(room, mem, brain, player, p);
     else if (state.phase === Phase.meetingDiscussion || state.phase === Phase.meetingVote) {
-      runMeetingVotes(room, mem, brain, player, p, false);
+      runMeetingVotes(room, mem, brain, player, p);
     } else if (isWorldPhase(state.phase)) runWorldNpc(room, mem, brain, player, p);
   }
 }
@@ -57,16 +97,52 @@ export function runNpcs(room: PartyRoom): void {
 export function resetNpcsForLobby(room: PartyRoom): void {
   const mem = npcMemory(room);
   mem.brains.clear();
+  mem.claims.clear();
   mem.phase = -1;
   for (const id of mem.ids) {
     const player = room.state.players.get(id);
-    if (player) player.ready = true;
+    if (!player) continue;
+    // Like a human, an NPC seat turns Ready a moment after the lobby appears (GDD 3.12 "Seats").
+    player.ready = false;
+    scheduleLobbyReady(room, id);
   }
   if (mem.ids.has(room.state.leaderId)) {
     const human = [...room.clients][0]?.sessionId;
     room.state.leaderId = human && room.state.players.has(human) ? human : '';
   }
   syncNpcCount(room);
+}
+
+/** Draws the tick an NPC seat in the lobby turns Ready: `npc.ready.delayS` after now, from its own timing stream. */
+export function scheduleLobbyReady(room: PartyRoom, id: string): void {
+  const d = balance.npc.ready.delayS;
+  npcMemory(room).brain(id).lobbyReadyAtTick =
+    room.state.tick + npcDelayTicks(timingRng(room, id), d.min, d.max, TICK_RATE);
+}
+
+function readyInLobby(room: PartyRoom, brain: Brain, player: PlayerState): void {
+  if (player.ready) return;
+  if (brain.lobbyReadyAtTick < 0) scheduleLobbyReady(room, player.id);
+  if (room.state.tick >= brain.lobbyReadyAtTick) player.ready = true;
+}
+
+/**
+ * The night-power tick and pick, drawn by every NPC on the first tick of each dusk and each Final Night hunt
+ * (npc.md 6): 5G's NPC night powers read them. The tick is `npc.nightPower.windowFrac` of dusk plus night (or of the
+ * hunt) after the phase starts; the pick is a uniform in [0, 1).
+ */
+function drawNightPowerTicks(room: PartyRoom, mem: NpcMemory): void {
+  const f = balance.npc.nightPower.windowFrac;
+  const span =
+    (room.state.phase === Phase.finalNight
+      ? balance.finalNight.huntS
+      : balance.phases.duskS + balance.phases.nightS) * TICK_RATE;
+  for (const id of mem.order) {
+    const brain = mem.brain(id);
+    brain.nightPowerAtTick =
+      room.state.tick + Math.round(span * (f.min + timingRng(room, id)() * (f.max - f.min)));
+    brain.nightPowerPick = playRng(room, id)();
+  }
 }
 
 /** Whether `id` is an NPC seat of this room (room memory, never on the wire). */
@@ -101,7 +177,9 @@ export function newestNpcSeat(room: PartyRoom): string | undefined {
 /** `debug.npc` (WDI_DEBUG only): queued by the message callback, applied by the next `runNpcs`. */
 export function pushNpcDebug(room: PartyRoom, payload: unknown): void {
   if (payload === null || typeof payload !== 'object') return;
-  const walk = (payload as Record<string, unknown>).walk;
-  const cmd: NpcDebugCommand = typeof walk === 'boolean' ? { walk } : {};
+  const { walk, routine } = payload as Record<string, unknown>;
+  const cmd: NpcDebugCommand = {};
+  if (typeof walk === 'boolean') cmd.walk = walk;
+  if (typeof routine === 'boolean') cmd.routine = routine;
   npcMemory(room).debug.push(cmd);
 }

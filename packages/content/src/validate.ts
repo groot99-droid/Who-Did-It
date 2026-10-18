@@ -46,10 +46,6 @@ function keyedById(file: string, map: Record<string, { id: string }>, errors: st
   }
 }
 
-function sameMultiset(a: readonly string[], b: readonly string[]): boolean {
-  return a.length === b.length && [...a].sort().join() === [...b].sort().join();
-}
-
 /** Returns every problem found; an empty list means the content is consistent. */
 export function validateContent(c: Content): string[] {
   const errors: string[] = [];
@@ -68,7 +64,7 @@ export function validateContent(c: Content): string[] {
   const isItem = (id: string) => id in items.items;
   const isAbility = (id: string) => id in abilities.abilities;
 
-  // Roles: kits, abilities and rosters.
+  // Roles: kits and abilities.
   const cardAbilities = new Set<string>();
   for (const role of Object.values(roles.roles)) {
     for (const k of role.startKit) if (!isItem(k.item)) err(`role ${role.id}: unknown item ${k.item}`);
@@ -79,24 +75,7 @@ export function validateContent(c: Content): string[] {
     }
     if ((role.faction === 'cabal') !== (role.winsWith === 'cabal')) err(`role ${role.id}: faction/winsWith`);
   }
-  const standIn = roles.roles[roles.standIn];
-  if (!standIn || standIn.ships !== 'V1') err(`roles.json: stand-in ${roles.standIn} must be a V1 role`);
-  for (const n of PLAYER_COUNTS) {
-    const row = roles.rosters[n];
-    const count = Number(n);
-    if (row.deal.length !== count) err(`roster ${n}: deal has ${row.deal.length} roles`);
-    if (row.planned.length !== count) err(`roster ${n}: planned has ${row.planned.length} roles`);
-    for (const id of [...row.deal, ...row.planned])
-      if (!roles.roles[id]) err(`roster ${n}: unknown role ${id}`);
-    for (const id of row.deal) {
-      if (roles.roles[id] && roles.roles[id].ships !== 'V1') err(`roster ${n}: deals unshipped role ${id}`);
-    }
-    const expected = row.planned.map((id) => (roles.roles[id]?.ships === 'V1' ? id : roles.standIn));
-    if (!sameMultiset(expected, row.deal)) err(`roster ${n}: deal is not planned with stand-ins`);
-    if (!row.deal.includes(roles.standIn)) err(`roster ${n}: no ${roles.standIn} (never fewer than 1)`);
-    if (row.practice !== (count === 4)) err(`roster ${n}: only 4 is a practice party`);
-  }
-  // The main deck, covers, professions and looks (GDD 3.1, 3.9, 3.17), beside the roster block above.
+  // The main deck, covers, professions and looks (GDD 3.1, 3.9, 3.17).
   checkDecksAndLooks(c, err);
 
   // Abilities and items refer to each other.
@@ -569,6 +548,7 @@ function checkOnub(onubRoles: OnubRolesFile, onubBalance: OnubBalanceFile, err: 
     ['npc.actFrac', npc.actFrac],
     ['npc.claimFrac', npc.claimFrac],
     ['npc.voteFrac', npc.voteFrac],
+    ['npc.stepS', npc.stepS],
     ['timers.sleeperPulse', { min: timers.sleeperPulseMinS, max: timers.sleeperPulseMaxS }],
     ['timers.crustCountdownS (inside voteS)', { min: timers.crustCountdownS, max: timers.voteS }],
     ['targetLengthMin', targetLengthMin],

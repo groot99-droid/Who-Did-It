@@ -6,6 +6,7 @@ import type { MockMeetingRequest } from './mock/meetingMock';
 import { MockOnubFeed } from './mock/onubMock';
 import type { NetworkService, Room } from './NetworkService';
 import type { OnubFeed } from './onub';
+import { ColyseusOnubFeed } from './onubColyseus';
 import { installOnubRouter } from './onubRouter';
 import { REG_INPUT, REG_ROLE_CHIP, REG_WORLD, type SceneEnter, type WorldFeed } from './world';
 import { ColyseusWorldFeed } from './worldColyseus';
@@ -36,12 +37,8 @@ const PHASE_LOBBY = 0;
 /** `GameMode.onub` of the schema (`state.settings.mode`). */
 const MODE_ONUB = 1;
 
-/**
- * The live quick-mode feed of a room. Session 5D's `ColyseusOnubFeed` (`net/onubColyseus.ts`) is wired here at
- * integration (`new ColyseusOnubFeed(room)`); until then a live room has no ONUB feed, the lobby offers the
- * mode only with `?onub=1`, and the server refuses a quick-mode Start.
- */
-const liveOnubFeed = (_room: Room): OnubFeed | null => null;
+/** The live quick-mode feed of a room: Session 5D's `ColyseusOnubFeed` (`net/onubColyseus.ts`). */
+const liveOnubFeed = (room: Room): OnubFeed | null => new ColyseusOnubFeed(room);
 
 export function installWorldRouter(
   game: Phaser.Game,
