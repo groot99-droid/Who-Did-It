@@ -767,3 +767,77 @@ controls, and they only count (`Settings.npcSeats`, which is public). `{min}` is
 The difficulty labels are the keys of `balance.json` `npc.difficulty` in sentence case; a level the
 deck does not list shows its key. `lobby.hint.fill` replaces the interim "NPC fill is coming" line
 (A28, removed by A39).
+
+### 14.14 Quick mode: night, morning and end (5D)
+
+Round 5, Session 5D (GDD 3.11, DECISIONS A49, A55). Every line the ONUB v2 night, dawn, Morning Rush, CRUST,
+reveal and end screen show, in the house style above; `ui/copy/onubNight.ts` carries them verbatim. Names come
+from content (`roles.onub.json`, `balance.onub.json`) and are never restated here. `{key}` values are filled by
+the caller. The narrator's lines are the same on every page and name only the window's role (invariant O9).
+
+
+**The night**
+
+| Id | Text |
+|---|---|
+| `onub.night.caption` | The kitchen is dark. Keep your eyes shut. |
+| `onub.night.waiting` | The night shift has not been called yet. |
+| `onub.night.clock` | Window closes in {s} s |
+| `onub.night.slot.seatRole` | {name}'s Role card |
+| `onub.night.slot.seatLoc` | {name}'s Location card |
+| `onub.night.slot.pantryRole` | Pantry Role card {n} |
+| `onub.night.slot.pantryLoc` | Pantry Location card {n} |
+| `onub.night.slot.you` | You |
+
+**The role scene**
+
+| Id | Text |
+|---|---|
+| `onub.wake.title` | You wake as {role} |
+| `onub.wake.mates` | You see: {names} |
+| `onub.wake.seen` | The Spores are: {names} |
+| `onub.wake.alone.champignon` | You are the only Spore at the table. The other card lies in the Pantry. |
+| `onub.wake.alone.commis` | You are the only Commis at the table. The other lies in the Pantry. |
+| `onub.wake.nothing` | Nothing to do but remember. |
+| `onub.wake.must` | You must act before the lamp dims. |
+| `onub.wake.done` | Done. Wait for the lamp to dim. |
+
+**The narrator, one pair per waking role**
+
+| Id | Text |
+|---|---|
+| `onub.narrator.boulanger.wake` | Le Boulanger, réveillez-vous… posez la cloche de fonte. |
+| `onub.narrator.boulanger.sleep` | Le Boulanger, rendormez-vous. |
+| `onub.narrator.champignon.wake` | Les Champignons, réveillez-vous… reconnaissez-vous dans le noir. |
+| `onub.narrator.champignon.sleep` | Les Champignons, rendormez-vous. |
+| `onub.narrator.levain.wake` | Le Levain, réveillez-vous… comptez les spores. |
+| `onub.narrator.levain.sleep` | Le Levain, rendormez-vous. |
+| `onub.narrator.apprenti.wake` | L'Apprenti, réveillez-vous… lisez le registre du poste. |
+| `onub.narrator.apprenti.sleep` | L'Apprenti, rendormez-vous. |
+| `onub.narrator.ratDeCave.wake` | Le Rat de Cave, réveillez-vous… soulevez la grille. |
+| `onub.narrator.ratDeCave.sleep` | Le Rat de Cave, rendormez-vous. |
+| `onub.narrator.commis.wake` | Les Commis, réveillez-vous… cherchez votre vis-à-vis. |
+| `onub.narrator.commis.sleep` | Les Commis, rendormez-vous. |
+| `onub.narrator.chef.wake` | Le Chef de Cuisine, réveillez-vous… ouvrez les dossiers. |
+| `onub.narrator.chef.sleep` | Le Chef de Cuisine, rendormez-vous. |
+| `onub.narrator.aboyeur.wake` | L'Aboyeur, réveillez-vous… regardez l'écran vert. |
+| `onub.narrator.aboyeur.sleep` | L'Aboyeur, rendormez-vous. |
+| `onub.narrator.sousChef.wake` | Le Sous-Chef, réveillez-vous… sonnez la cloche de laiton. |
+| `onub.narrator.sousChef.sleep` | Le Sous-Chef, rendormez-vous. |
+| `onub.narrator.tourrier.wake` | Le Tourrier, réveillez-vous… repliez la recette. |
+| `onub.narrator.tourrier.sleep` | Le Tourrier, rendormez-vous. |
+| `onub.narrator.plongeur.wake` | Le Plongeur, réveillez-vous… rangez les casseroles. |
+| `onub.narrator.plongeur.sleep` | Le Plongeur, rendormez-vous. |
+| `onub.narrator.gardeManger.wake` | Le Garde Manger, réveillez-vous… rentrez du bon pied. |
+| `onub.narrator.gardeManger.sleep` | Le Garde Manger, rendormez-vous. |
+| `onub.narrator.inspecteur.wake` | L'Inspecteur Sanitaire, réveillez-vous… dernière tournée. |
+| `onub.narrator.inspecteur.sleep` | L'Inspecteur Sanitaire, rendormez-vous. |
+
+**Dawn**
+
+| Id | Text |
+|---|---|
+| `onub.dawn.title` | Dawn |
+| `onub.dawn.text` | Grey light under the door. The night shift is over. |
+| `onub.dawn.cloche` | The Iron Cloche lies on {card}. |
+| `onub.dawn.noCloche` | No Iron Cloche was set down. |
