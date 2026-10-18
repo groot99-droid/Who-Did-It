@@ -26,6 +26,7 @@ import { ClueView } from '../view/ClueView';
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
+import { darknessOf, sceneLights } from '../view/lightMath';
 import { NotebookSheet } from '../view/NotebookPanel';
 import { GroundView } from '../view/GroundView';
 import { bellSpot, propObjects } from '../view/PropView';
@@ -140,7 +141,6 @@ export class World extends Phaser.Scene {
   private lastVerb: 'kill' | 'report' | 'other' = 'other';
   private lastPhase = -1;
   private stepAt = 0;
-  private lit = { visible: false, x: 0, y: 0, darkness: 0 };
 
   constructor() {
     super('World');
@@ -199,7 +199,8 @@ export class World extends Phaser.Scene {
     this.hud.setChip((this.registry.get(REG_ROLE_CHIP) as HudChip | undefined) ?? null);
     void loadSceneName(this.sceneId).then((scene) => this.hud.say(fill(C['hud.scene'], { scene }), 1500));
     this.hud.onNotebook(() => this.sheet.toggle());
-    this.lighting = new Lighting(overlayRoot());
+    this.lighting = new Lighting(this, overlayRoot());
+    this.lighting.setScene(sceneLights(this.map.lights), this.map.dark);
     this.sheet = new NotebookSheet(overlayRoot(), feed);
     this.audio = this.registry.get(REG_AUDIO) ?? new AudioBus();
     if (!this.registry.has(REG_AUDIO)) {
@@ -254,10 +255,6 @@ export class World extends Phaser.Scene {
     this.scale.on(Phaser.Scale.Events.RESIZE, this.fitCamera, this);
     this.fitCamera();
     this.cameras.main.fadeIn(balance.doors.sceneFadeS * 1000);
-    // The mask is placed after the camera has followed you, or it would trail a frame behind.
-    const cam = this.cameras.main;
-    cam.on(Phaser.Cameras.Scene2D.Events.POST_RENDER, this.placeMask, this);
-
     if (flags.navDebug) this.drawNavDebug();
     this.showFps = flags.fps;
 
@@ -267,7 +264,6 @@ export class World extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.events.off(Phaser.Scenes.Events.SLEEP, this.onSleep, this);
       this.events.off(Phaser.Scenes.Events.WAKE, this.onWake, this);
-      cam.off(Phaser.Cameras.Scene2D.Events.POST_RENDER, this.placeMask, this);
       this.scale.off(Phaser.Scale.Events.RESIZE, this.fitCamera, this);
       this.scale.scaleMode = this.prevScaleMode;
       this.scale.displaySize.setAspectMode(this.prevScaleMode);
@@ -302,12 +298,13 @@ export class World extends Phaser.Scene {
     if (self && !this.followed) {
       this.followed = true;
       this.cameras.main.startFollow(self, true, 0.1, 0.1);
+      this.lighting.setFollowing(true);
       this.cameras.main.centerOn(self.x, self.y);
     }
     const clock = feed.clock();
     const endsTick = clock.phaseEndsTick;
     this.hud.setTimer(endsTick > 0 ? endsTick - clock.tick : null);
-    const darkness = Lighting.darkness(clock.phase, clock.phaseEndsTick - clock.tick);
+    const darkness = darknessOf(clock.phase, clock.phaseEndsTick - clock.tick);
     this.hud.setPhase(PHASE_LABEL[clock.phase] ?? '', darkness >= 1);
     this.watchPhase(clock.phase);
     this.refreshGhost();
@@ -324,12 +321,12 @@ export class World extends Phaser.Scene {
     this.focusNewEntry();
     this.statics.update(self ? worldOf(self) : null, delta / 1000, this.cameras.main.worldView);
 
-    this.lit = {
+    this.lighting.set({
       visible: WORLD_PHASES.has(clock.phase) && self !== null,
-      x: self?.x ?? 0,
-      y: self?.y ?? 0,
+      viewer: self ? worldOf(self) : null,
       darkness,
-    };
+      part: dayPartOf(clock.phase),
+    });
     if (this.showFps && now - this.fpsAt > 500) {
       this.fpsAt = now;
       const loop = this.game.loop;
@@ -614,14 +611,6 @@ export class World extends Phaser.Scene {
     this.audio.play('footstep');
   }
 
-  /** Positions the night mask over you once the camera has moved (camera POST_RENDER). */
-  private placeMask(cam: Phaser.Cameras.Scene2D.Camera): void {
-    const l = this.lit;
-    const sx = (l.x - cam.worldView.x) * cam.zoom;
-    const sy = (l.y - cam.worldView.y) * cam.zoom;
-    this.lighting.update(l.visible, sx, sy, cam.zoom, l.darkness);
-  }
-
   /** Reads the scene's tilemap, draws its ground and sets the void colour; the statics follow in `create`. */
   private buildMap(): void {
     const key = sceneMapKey(this.sceneId);
@@ -644,6 +633,7 @@ export class World extends Phaser.Scene {
     const zoom = isoZoom(height);
     cam.setZoom(zoom);
     cam.setRoundPixels(true);
+    this.lighting?.resize();
     const b = cameraBounds(this.map.w, this.map.h, width / zoom, height / zoom);
     cam.setBounds(b.x, b.y, b.width, b.height);
   }
