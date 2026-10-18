@@ -169,3 +169,58 @@ describe('scene world fields (GDD 3.13)', () => {
     }
   });
 });
+
+describe('Blackpine (GDD 3.13, WORLD 4.10)', () => {
+  it('ships second, with the camp as its hub', () => {
+    expect(MAP_IDS).toEqual(['hollowmere', 'blackpine']);
+    expect(maps.blackpine.hub).toBe('bp_camp');
+    expect(mapOf('bp_deep')).toBe('blackpine');
+    expect(mapIdOf('blackpine')).toBe('blackpine');
+  });
+
+  it('refuses a portal that leaves the map', () => {
+    expect(
+      broken((c) => {
+        const woods = c.scenes.bp_camp.portals.find((p) => p.id === 'bc.woods')!;
+        woods.to = 'forest';
+        woods.toSpawn = 'gate';
+      }),
+    ).toEqual(hit('portal bc.woods leaves the map for forest'));
+  });
+
+  it('refuses a scene unreachable from the hub', () => {
+    expect(
+      broken((c) => {
+        c.scenes.bp_camp.portals = c.scenes.bp_camp.portals.filter(
+          (p) => p.id !== 'bc.mill' && p.id !== 'bc.mill_yard',
+        );
+      }),
+    ).toEqual(hit('bp_mill is unreachable from the hub at small'));
+  });
+
+  it('refuses a duplicate prefix', () => {
+    expect(broken((c) => (c.scenes.bp_deep.prefix = 'bm'))).toEqual(hit('prefix bm is also'));
+  });
+
+  it('checks the material layer of the real scenes', () => {
+    const put = (s: Scene, x: number, y: number, ch: string) => {
+      const m = [...s.material!];
+      m[y] = m[y]!.slice(0, x) + ch + m[y]!.slice(x + 1);
+      s.material = m;
+    };
+    expect(broken((c) => put(c.scenes.forest_deep, 40, 18, 'T'))).toEqual(
+      hit('material "T" at 40,18 is solid on a walkable tile'),
+    );
+    expect(broken((c) => put(c.scenes.bp_camp, 28, 20, 'W'))).toEqual(hit('material at 28,20 must be "P"'));
+  });
+
+  it('keeps spawners on known paths and lights prefixed', () => {
+    const errors = broken((c) => {
+      const woods = c.scenes.bp_woods;
+      woods.spawners!.find((s) => s.id === 'bw.sp_wolf_n')!.pathId = 'bw.nowhere';
+      woods.lights![0]!.id = 'zz.lt_stray';
+    });
+    expect(errors).toEqual(hit('spawner bw.sp_wolf_n walks unknown path bw.nowhere'));
+    expect(errors).toEqual(hit('light zz.lt_stray lacks prefix bw.'));
+  });
+});

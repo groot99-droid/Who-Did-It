@@ -130,6 +130,69 @@ const WORLD: Record<string, { profile: Profile; w: number; h: number; portals: s
     h: 28,
     portals: ['cg.upper -> cave_entry.gallery', 'cg.fen -> forest_deep.adit_side'],
   },
+  // Blackpine (A50, docs/round5/world.md 6.2 and 8.3-8.10).
+  bp_camp: {
+    profile: 'small',
+    w: 56,
+    h: 40,
+    portals: [
+      'bc.lodge -> bp_lodge.front',
+      'bc.lodge_side -> bp_lodge.side',
+      'bc.mill -> bp_mill.door',
+      'bc.mill_yard -> bp_mill.yard',
+      'bc.office -> bp_office.door',
+      'bc.smithy -> bp_smithy.door',
+      'bc.woods -> bp_woods.camp',
+      'bc.adit -> bp_mine.adit',
+    ],
+  },
+  bp_lodge: {
+    profile: 'small',
+    w: 24,
+    h: 12,
+    portals: ['bl.front -> bp_camp.lodge', 'bl.side -> bp_camp.lodge_side'],
+  },
+  bp_mill: {
+    profile: 'small',
+    w: 24,
+    h: 14,
+    portals: ['bs.door -> bp_camp.mill', 'bs.yard -> bp_camp.mill_yard'],
+  },
+  bp_woods: {
+    profile: 'small',
+    w: 52,
+    h: 40,
+    portals: [
+      'bw.camp -> bp_camp.woods',
+      'bw.vent -> bp_mine.vent',
+      'bw.chute -> bp_camp.chute_foot',
+      'bw.old_adit -> bp_deep.old_adit',
+    ],
+  },
+  bp_mine: {
+    profile: 'small',
+    w: 44,
+    h: 30,
+    portals: ['bm.adit -> bp_camp.adit', 'bm.vent -> bp_woods.vent', 'bm.winze -> bp_deep.winze'],
+  },
+  bp_office: {
+    profile: 'medium',
+    w: 18,
+    h: 11,
+    portals: ['bo.door -> bp_camp.office'],
+  },
+  bp_smithy: {
+    profile: 'medium',
+    w: 16,
+    h: 11,
+    portals: ['bf.door -> bp_camp.smithy'],
+  },
+  bp_deep: {
+    profile: 'large',
+    w: 40,
+    h: 28,
+    portals: ['bd.winze -> bp_mine.winze', 'bd.old_adit -> bp_woods.old_adit'],
+  },
 };
 
 const PROFILES: Profile[] = ['small', 'medium', 'large'];
@@ -178,7 +241,7 @@ describe('scene graph (WORLD 4.3)', () => {
 
   it('marks one-way drops, the hollow log and the boarded sea passage', () => {
     const oneWay = all.flatMap((s) => s.portals.filter((p) => p.oneWay).map((p) => p.id));
-    expect(oneWay.sort()).toEqual(['ba.loft', 'fd.sinkhole', 'fo.log', 'mu.balcony']);
+    expect(oneWay.sort()).toEqual(['ba.loft', 'bw.chute', 'fd.sinkhole', 'fo.log', 'mu.balcony']);
     const sea = scenes.cave_entry.portals.find((p) => p.id === 'ce.sea');
     expect(sea).toMatchObject({ window: 'lowTide', ships: 'V1.5' });
   });

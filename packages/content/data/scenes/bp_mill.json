@@ -1,0 +1,126 @@
+{
+  "id": "bp_mill",
+  "prefix": "bs",
+  "name": "Vane Sawmill",
+  "zoneId": "bp_mill",
+  "profile": "small",
+  "kind": "interior",
+  "biome": "house",
+  "dark": false,
+  "size": { "w": 24, "h": 14 },
+  "notes": "Head saw beside the log carriage rails along y 7, the waterwheel gearing on the north wall, the plank stack (task source of planks), the sawdust pile, the log chute down to the race (body spot). Main door east, yard door south where daylight falls in.",
+  "worldRef": "4.10",
+  "portals": [
+    {
+      "id": "bs.door",
+      "from": "bp_mill",
+      "x": 23,
+      "y": 7,
+      "kind": "door",
+      "to": "bp_camp",
+      "toSpawn": "mill",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "bs.yard",
+      "from": "bp_mill",
+      "x": 6,
+      "y": 13,
+      "kind": "door",
+      "to": "bp_camp",
+      "toSpawn": "mill_yard",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "door", "x": 22, "y": 7, "z": 0, "facing": "w" },
+    { "id": "yard", "x": 6, "y": 12, "z": 0, "facing": "n" }
+  ],
+  "spots": [
+    {
+      "id": "bs.sawdust",
+      "kind": "hide",
+      "variant": "sawdustPile",
+      "x": 3,
+      "y": 2,
+      "childOnly": false
+    },
+    {
+      "id": "bs.log_chute",
+      "kind": "body",
+      "variant": "logChute",
+      "x": 1,
+      "y": 11,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    {
+      "id": "bs.head_saw",
+      "kind": "decor",
+      "x": 11,
+      "y": 5,
+      "footprint": { "x": 10, "y": 5, "w": 3, "h": 2 }
+    },
+    { "id": "bs.gearing", "kind": "decor", "x": 12, "y": 0 },
+    { "id": "bs.plank_stack", "kind": "taskSource", "x": 18, "y": 12, "item": "planks" }
+  ],
+  "gates": [],
+  "paths": [],
+  "lights": [
+    { "id": "bs.lt_lamp_saw", "kind": "lamp", "x": 11, "y": 8, "radiusTiles": 2.5 },
+    { "id": "bs.lt_lamp_door", "kind": "lamp", "x": 20, "y": 7, "radiusTiles": 2 },
+    {
+      "id": "bs.lt_daylight",
+      "kind": "shaft",
+      "x": 6,
+      "y": 11,
+      "radiusTiles": 2.5,
+      "phases": ["day", "dusk"]
+    }
+  ],
+  "grid": [
+    "########################",
+    "#......................#",
+    "#..H...................#",
+    "#......................#",
+    "#......................#",
+    "#.........###..........#",
+    "#.........###..........#",
+    "#.....................SD",
+    "#......................#",
+    "#......................#",
+    "#......................#",
+    "#B.....................#",
+    "#.....S...........#....#",
+    "######D#################"
+  ],
+  "material": [
+    "WWWWWWWWWWWWPWWWWWWWWWWW",
+    "WwwwwwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwPPPwwwwwwwwwwW",
+    "WwwwwwwwwwPPPwwwwwwwwwwW",
+    "Ww===================wwW",
+    "WwwwwwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwwwwwwwwwW",
+    "WWwwwwwwwwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwwwwPwwwwW",
+    "WWWWWWWWWWWWWWWWWWWWWWWW"
+  ]
+}

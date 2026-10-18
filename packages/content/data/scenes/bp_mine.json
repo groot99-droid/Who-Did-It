@@ -1,0 +1,204 @@
+{
+  "id": "bp_mine",
+  "prefix": "bm",
+  "name": "Blackpine Workings",
+  "zoneId": "bp_mine",
+  "profile": "small",
+  "kind": "interior",
+  "biome": "cave",
+  "dark": true,
+  "size": { "w": 44, "h": 30 },
+  "notes": "Dark: torches and lamps, daylight at the adit by day. Timbered adit with tram rails up into the ore chamber (tin lodes, ore carts, the old stope, the last shift's tally board, a rat run). Planked vent drift west to the woods with moss and a timber crib. Winze gallery east: deep water round the ladder shaft down to the Deep Level [L]; powder kegs in the niche beyond.",
+  "worldRef": "4.10",
+  "portals": [
+    {
+      "id": "bm.adit",
+      "from": "bp_mine",
+      "x": 22,
+      "y": 29,
+      "kind": "cave_mouth",
+      "to": "bp_camp",
+      "toSpawn": "adit",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "bm.vent",
+      "from": "bp_mine",
+      "x": 0,
+      "y": 8,
+      "kind": "cave_mouth",
+      "to": "bp_woods",
+      "toSpawn": "vent",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "bm.winze",
+      "from": "bp_mine",
+      "x": 36,
+      "y": 10,
+      "kind": "hatch",
+      "to": "bp_deep",
+      "toSpawn": "winze",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": -8,
+      "minProfile": "large",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [
+    { "id": "adit", "x": 22, "y": 28, "z": 0, "facing": "n" },
+    { "id": "vent", "x": 1, "y": 8, "z": 0, "facing": "e" },
+    { "id": "winze", "x": 36, "y": 11, "z": 0, "facing": "n" }
+  ],
+  "spots": [
+    {
+      "id": "bm.ore_cart",
+      "kind": "hide",
+      "variant": "oreCart",
+      "x": 25,
+      "y": 14,
+      "childOnly": false
+    },
+    {
+      "id": "bm.timber_crib",
+      "kind": "hide",
+      "variant": "timberCrib",
+      "x": 6,
+      "y": 6,
+      "childOnly": false
+    },
+    {
+      "id": "bm.stope",
+      "kind": "body",
+      "variant": "oldStope",
+      "x": 30,
+      "y": 19,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    { "id": "bm.tally_board", "kind": "decor", "x": 20, "y": 9 },
+    { "id": "bm.powder_kegs", "kind": "decor", "x": 39, "y": 3 },
+    { "id": "bm.ore_cart_0", "kind": "decor", "x": 16, "y": 14 }
+  ],
+  "gates": [],
+  "paths": [
+    {
+      "id": "bm.rat_run",
+      "kind": "patrol",
+      "points": [
+        { "x": 14, "y": 11 },
+        { "x": 30, "y": 11 },
+        { "x": 30, "y": 18 },
+        { "x": 14, "y": 18 }
+      ]
+    }
+  ],
+  "lights": [
+    { "id": "bm.lt_adit_torch", "kind": "torch", "x": 23, "y": 26, "radiusTiles": 2.5 },
+    { "id": "bm.lt_lamp_chamber", "kind": "lamp", "x": 18, "y": 13, "radiusTiles": 2.5 },
+    { "id": "bm.lt_lamp_tally", "kind": "lamp", "x": 20, "y": 10, "radiusTiles": 2 },
+    { "id": "bm.lt_moss_vent", "kind": "moss", "x": 4, "y": 8, "radiusTiles": 2 },
+    { "id": "bm.lt_torch_winze", "kind": "torch", "x": 35, "y": 9, "radiusTiles": 2.5 },
+    {
+      "id": "bm.lt_daylight",
+      "kind": "shaft",
+      "x": 22,
+      "y": 27,
+      "radiusTiles": 3,
+      "phases": ["day", "dusk"]
+    }
+  ],
+  "nodes": [
+    { "id": "bm.nd_tin_0", "resource": "tinOre", "x": 11, "y": 12, "pool": "mineTin" },
+    { "id": "bm.nd_tin_1", "resource": "tinOre", "x": 15, "y": 9, "pool": "mineTin" },
+    { "id": "bm.nd_tin_2", "resource": "tinOre", "x": 27, "y": 9, "pool": "mineTin" },
+    { "id": "bm.nd_tin_3", "resource": "tinOre", "x": 33, "y": 16, "pool": "mineTin" },
+    { "id": "bm.nd_tin_4", "resource": "tinOre", "x": 9, "y": 6, "pool": "mineTin" },
+    { "id": "bm.nd_stone_0", "resource": "stone", "x": 31, "y": 20, "pool": "mineStone" },
+    { "id": "bm.nd_stone_1", "resource": "stone", "x": 13, "y": 20, "pool": "mineStone" }
+  ],
+  "spawners": [
+    { "id": "bm.sp_bats", "mob": "bat", "x": 28, "y": 12, "leashTiles": 8 },
+    { "id": "bm.sp_rats", "mob": "rat", "x": 16, "y": 17, "leashTiles": 6, "pathId": "bm.rat_run" }
+  ],
+  "grid": [
+    "############################################",
+    "############################################",
+    "####################################......##",
+    "###################################....#..##",
+    "####################################......##",
+    "####################################......##",
+    "####.#H#########################......#..###",
+    "#............####################.........##",
+    "DS...........####################....###.###",
+    "#............####.###.######.#.##....###..##",
+    "####.###.###........................D###.###",
+    "############........................S###.###",
+    "############..........#..............###.###",
+    "############.............................###",
+    "############.#..#....#...H...............###",
+    "############.....................##...##.###",
+    "############............#........###########",
+    "############.....................###########",
+    "############.....................###########",
+    "###########...................B...##########",
+    "##################.##...#.######.###########",
+    "#####################...####################",
+    "#####################....###################",
+    "####################....####################",
+    "#####################...####################",
+    "#####################...####################",
+    "#####################...####################",
+    "#####################...####################",
+    "#####################.S.####################",
+    "######################D#####################"
+  ],
+  "material": [
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXrrrrrrXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXrrrrPrrXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXrrrrrrXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXrrrrrrXX",
+    "XXXXwXXXXXXXXXXXXXXXXXXXXXXXXXXXrrrrrrRrrXXX",
+    "XwwwwwwwwwwwwXXXXXXXXXXXXXXXXXXXXrrrrrrrrrXX",
+    "XwwwwwwwwwwwwXXXXXXXXXXXXXXXXXXXXrrrrOOOrXXX",
+    "XwwwwwwwwwwwwXXXXrXXPrXXXXXXrXrXXrrrrOOOrrXX",
+    "XXXXwXXXwXXXrrrrrrrrrrrrrrrrrrrrrrrrOOOOrXXX",
+    "XXXXXXXXXXXXrrrrrrrrrrrrrrrrrrrrrrrrrOOOrXXX",
+    "XXXXXXXXXXXXrrrrrrrrrrRrrrrrrrrrrrrrrOOOrXXX",
+    "XXXXXXXXXXXXrrrrrrrrrrrrrrrrrrrrrrrrrrrrrXXX",
+    "XXXXXXXXXXXXrRrrPrrrrRrrrrrrrrrrrrrrrrrrrXXX",
+    "XXXXXXXXXXXXrrrrrrrrrrrrrrrrrrrrrXXrrrXXrXXX",
+    "XXXXXXXXXXXXrrrrrrrrrrrrRrrrrrrrrXXXXXXXXXXX",
+    "XXXXXXXXXXXXrrrrrrrrrrrrrrrrrrrrrXXXXXXXXXXX",
+    "XXXXXXXXXXXXrrrrrrrrrrrrrrrrrrrrrXXXXXXXXXXX",
+    "XXXXXXXXXXXrrrrrrrrrrrrrrrrrrrXrrrXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXrXXw=wXrXXXXXXrXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXw=wXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXw=wwXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXww=wXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXw=wXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXw=wXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXw=wXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXw=wXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXwwwXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  ]
+}
