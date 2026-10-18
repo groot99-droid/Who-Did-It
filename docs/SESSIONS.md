@@ -2029,4 +2029,28 @@ tracks that none of them holds.
 
 ### Round 5 log: 5L (character art)
 
+Branch `claude/r5-char-art`, PR #33 (the L1-L5 split as commits on one branch). Decisions in DECISIONS A63.
+
+- **L1, rig.** IsoCam (ortho, X 60 / Z 45, 90.51 px per ground metre), the environment and character roots
+  (`Z_SCALE` 0.75), lights keeping their camera-frame azimuths, toon stops 0.25 / 0.65, the calibration sheet and
+  `calibration.json` (feet, marker vectors, the 128 x 64 tile diamond). `palettize.py` snaps to the world palette in
+  OKLab. `palette.test.ts` and `budget.test.ts` over the real manifests.
+- **L2, base and clips.** `build_looks.py` (one five-heads-tall base, 22 bones, rigid parts, five clips keyed in code),
+  `looks_spec.py`, `look_parts.py`; `keys.ts` (`interact`, the `blood` pass), `pack.ts` (look pages, extrude only on
+  frames with partial alpha), `placeholder-chars.ts` (every look and portrait has a greybox twin).
+- **L3 / L4, looks.** All ten world looks rendered in 8 directions, finished and packed (304 frames per pass, one
+  1024 x 1024 body page and one overlay page each); the real villager left the real manifest (ruling C11). Every
+  posed vertex of every look stays within 110 px above and 10 px below the feet row; four rounds of fixes got there
+  (the kneel, the lamplighter's raise, the detective's magnifier moved to the left hand, the toque).
+- **L5.** 13 portraits (T4), `vfx` re-rendered through IsoCam plus `vfx_disguise`, the six ability icons, and the
+  low-poly style of every 5L key under `assets/lowpoly/` (art plan 1.9, A79), packed from the same renders.
+- **Higgsfield.** 36 images (20 T3, 16 T4), 108 credits, inside the 400-credit share; nothing generated for low poly.
+- **For 5K.** `build_villager.py` is a shim re-exporting `look_parts.py`'s shapes until `static_common.py` imports
+  them from there; SpriteCam is gone (`IsoCam`, `TileCam` remain); `packFrames` skips the extrude only when every
+  frame is finished; `palette.test.ts` exempts the `ovl_` mask pages from the saturated cap (A63).
+- **For 5F / 5I.** Atlas keys `char/<lookId>/<anim>/<dir>` for the ten looks (no hat passes); the villager loads
+  only with `?art=placeholder`; a style manifest lacking a key falls back to the 8-bit entry.
+- **Open.** Gate B (`assets/source/review/gate-b-character.png`) for the owner; ASSETS 6.1 still words the 10%
+  saturated cap as applying to every page (A63 exempts the overlay masks).
+
 ### Round 5 log: 5M (ONUB art)
