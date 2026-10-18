@@ -2007,6 +2007,13 @@ tracks that none of them holds.
 
 ### Round 5 log: 5A (ONUB v2 rules, server deal and prep)
 
+Done 2026-10-18 on `claude/r5-onub-rules` (PR #27, three commits, one per brief step):
+1. `rules/onub.ts` bodies and `packages/shared/test/onubPrep.test.ts` (unit cases and O2).
+2. `startOnubMatch`, `beginOnubPlay`, `onubDeckSetting`, `onubDeckInPlay` and `onubRoleReveal` in `sim/Onub.ts`, with `test/onubDeal.test.ts` and `test/onubPrepHelpers.ts`.
+3. `handlePrep`, `runPrep`, `endPrep` in `sim/onub/Prep.ts`, with `test/onubPrep.test.ts` and `test/onubContract.test.ts` (O1, O3), then the GDD, ARCHITECTURE 5.14 and DECISIONS A52 lines.
+
+Notes for the next sessions: 5B finds `OnubState.dealt`, `.commits`, `.prep`, `.cards`, `.prepAuto` filled and `Phase.prepReveal` running for `prepRevealS`; `handleOnubAct` is still its stub. 5E can commit through `handleOnubAbility` with `onub.prep` as any seat id. No contract changes were needed. The GDD carried no "(5A)" markers, so the one sentence added (commit refusals, departed seats) ends with one.
+
 ### Round 5 log: 5B (ONUB v2 server night and morning)
 
 ### Round 5 log: 5C (ONUB v2 client prep, mini-games, deck editor)
