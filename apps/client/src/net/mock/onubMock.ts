@@ -160,6 +160,8 @@ export class MockOnubFeed implements OnubFeed {
   private phaseEndsTick = 0;
   private phaseTimer: number | null = null;
   private timers: number[] = [];
+  /** What the prep half revealed to the self seat (the proofing perk), kept like `Private.nightReveal`. */
+  private prepReveals: NightRevealEntry[] = [];
 
   constructor(private readonly opts: MockOnubOptions = {}) {
     const search = opts.search ?? (typeof location === 'undefined' ? '' : location.search);
@@ -178,7 +180,16 @@ export class MockOnubFeed implements OnubFeed {
       boardChanged: () => this.bus.emit('board', this.board()),
       refuse: (code, msg) => this.opts.onRefuse?.(code, msg),
     };
-    this.prepHalf = createPrepMock(ctx);
+    // The prep half emits the proofing perk as a `nightReveal` bus event; the composer keeps it, so `reveals()`
+    // holds it the way the server's `Private.nightReveal` does (5C's ask, A54).
+    const prepBus: Emitter<OnubFeedEvents> = {
+      ...this.bus,
+      emit: ((type: keyof OnubFeedEvents, event?: unknown) => {
+        if (type === 'nightReveal') this.prepReveals.push(...(event as S2CPayloads['nightReveal']).entries);
+        this.bus.emit(type, event as never);
+      }) as Emitter<OnubFeedEvents>['emit'],
+    };
+    this.prepHalf = createPrepMock({ ...ctx, bus: prepBus });
     this.nightHalf = createNightMock(ctx);
   }
 
@@ -208,7 +219,7 @@ export class MockOnubFeed implements OnubFeed {
   }
 
   reveals(): readonly NightRevealEntry[] {
-    return this.nightHalf.reveals();
+    return [...this.prepReveals, ...this.nightHalf.reveals()];
   }
 
   wake(): S2CPayloads['nightWake'] | null {
@@ -236,6 +247,7 @@ export class MockOnubFeed implements OnubFeed {
     this.phaseTimer = null;
     for (const t of this.timers) window.clearTimeout(t);
     this.timers = [];
+    this.prepReveals = [];
     this.prepHalf.dispose();
     this.nightHalf.dispose();
     this.bus.all.clear();

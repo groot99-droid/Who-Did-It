@@ -111,6 +111,23 @@ describe('MockOnubFeed', () => {
     feed.dispose();
   });
 
+  it('keeps the proofing perk the prep half reveals, as the server keeps it in Private.nightReveal', () => {
+    const feed = new MockOnubFeed({ search: '' });
+    const emitted = vi.fn();
+    feed.bus.on('nightReveal', emitted);
+    feed.start();
+    feed.prep('proofing', 'warmSteam');
+    vi.advanceTimersByTime(T.prepS * 1000);
+    expect(feed.board().perk).toBe(true);
+    const perk = feed.reveals().filter((r) => r.kind === 'loc' && r.slot.startsWith('pantry.loc.'));
+    expect(perk).toHaveLength(1);
+    expect(emitted).toHaveBeenCalledWith({ entries: perk });
+    vi.advanceTimersByTime(T.prepRevealS * 1000);
+    expect(feed.reveals()).toEqual(expect.arrayContaining(perk));
+    feed.dispose();
+    expect(feed.reveals()).toEqual([]);
+  });
+
   it('stops its script on dispose', () => {
     const onDawnEnd = vi.fn();
     const feed = new MockOnubFeed({ onDawnEnd, search: '' });
