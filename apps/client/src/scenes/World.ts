@@ -5,6 +5,7 @@ import palette from '@wdi/content/data/palette.json';
 import { Phase } from '@wdi/shared';
 import { TILE_PX } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
+import { toScreen, toWorld } from '@wdi/shared/iso';
 import { InputController } from '../input/InputController';
 import { TouchControls } from '../input/TouchControls';
 import {
@@ -29,6 +30,8 @@ import { NotebookSheet } from '../view/NotebookPanel';
 import { PropView, overworldProps } from '../view/PropView';
 import { sceneMapKey, sceneMapUrl } from '../view/assets';
 import { isTouchDevice, readDevFlags } from '../view/devFlags';
+import { DEPTH, cameraBounds, decalHolder, isoZoom, sceneDiamond, tileDiamond } from '../view/iso';
+import { type SceneMap, type TiledMap, readSceneMap } from '../view/sceneMap';
 import { loadSceneName } from '../view/sceneNames';
 import { REG_AUDIO, getNet } from './registry';
 
@@ -81,8 +84,6 @@ type Target =
 
 /** Clue ids this client has already collected, per feed: the prompt does not offer them again. */
 const collectedBy = new WeakMap<WorldFeed, Set<string>>();
-/** The World scene shows about this many tiles top to bottom whatever the window size. */
-const VIEW_TILES_HIGH = 11;
 
 interface PortalSpot {
   id: string;
@@ -91,6 +92,12 @@ interface PortalSpot {
 }
 
 const colorOf = (hex: string) => Number.parseInt(hex.slice(1), 16);
+
+/** Phaser polygon points from plain ones. */
+const poly = (pts: Array<{ x: number; y: number }>) => pts.map((p) => new Phaser.Math.Vector2(p.x, p.y));
+
+/** Where a drawn object stands in the world: the inverse of the projection its view applied. */
+const worldOf = (o: { x: number; y: number }) => toWorld(o.x, o.y);
 
 /**
  * The village and its interiors. Restarted by the router for every `sceneEnter`, so each run knows one
@@ -112,8 +119,7 @@ export class World extends Phaser.Scene {
   private touch: TouchControls | null = null;
   private portals: PortalSpot[] = [];
   private swing!: Phaser.GameObjects.Graphics;
-  private mapW = 0;
-  private mapH = 0;
+  private map!: SceneMap;
   private followed = false;
   private fpsAt = 0;
   private showFps = false;
@@ -159,7 +165,7 @@ export class World extends Phaser.Scene {
     const flags = readDevFlags(location.search);
 
     this.buildMap();
-    this.swing = this.add.graphics().setDepth(1);
+    this.swing = this.add.graphics().setDepth(DEPTH.decal);
     this.propView = new PropView(this, this.sceneId);
     this.clueView = new ClueView(this);
     this.entities = new EntityView(this, feed.selfId);
@@ -300,7 +306,7 @@ export class World extends Phaser.Scene {
       this.fpsAt = now;
       const loop = this.game.loop;
       this.hud.setFps(
-        `${Math.round(loop.actualFps)} fps\n${this.entities.count} in view\n${this.sceneId}\nat ${self ? `${(self.x / TILE_PX).toFixed(1)},${(self.y / TILE_PX).toFixed(1)}` : '-'}\nbodies ${bodies.length}\nclues ${clues.length}`,
+        `${Math.round(loop.actualFps)} fps\n${this.entities.count} in view\n${this.sceneId}\nat ${self ? `${(worldOf(self).x / TILE_PX).toFixed(1)},${(worldOf(self).y / TILE_PX).toFixed(1)}` : '-'}\nbodies ${bodies.length}\nclues ${clues.length}`,
       );
     }
   }
@@ -410,10 +416,11 @@ export class World extends Phaser.Scene {
   ): void {
     this.target = null;
     if (!self) return this.hud.setPrompt(null);
+    const me = worldOf(self);
     const ghost = this.feed.dead();
     let best = Infinity;
     const consider = (t: Target, reach: number) => {
-      const d = Math.hypot(self.x - t.x, self.y - t.y);
+      const d = Math.hypot(me.x - t.x, me.y - t.y);
       // Strictly nearer wins, so a tie keeps the earlier kind: body, clue, bell, door.
       if (d <= reach && d < best - 1) {
         best = d;
@@ -460,7 +467,8 @@ export class World extends Phaser.Scene {
     if (!h) return;
     const moving = this.input_.current();
     const clue = clues.find((c) => c.id === h.clueId);
-    const away = !self || !clue || Math.hypot(self.x - clue.x, self.y - clue.y) > COLLECT_REACH_PX + 8;
+    const me = self ? worldOf(self) : null;
+    const away = !me || !clue || Math.hypot(me.x - clue.x, me.y - clue.y) > COLLECT_REACH_PX + 8;
     if (away || moving.dx !== 0 || moving.dy !== 0) {
       // Moving or leaving cancels the hold on the server too (GDD 3.4); nothing more to send.
       this.hold = null;
@@ -587,35 +595,31 @@ export class World extends Phaser.Scene {
     this.lighting.update(l.visible, sx, sy, cam.zoom, l.darkness);
   }
 
+  /**
+   * The scene's ground. SPRITES 10.12's isometric tilemap reader lands in the next step; until then the ground is
+   * the scene's diamond in one flat colour, and the portals come from the file's own object layer.
+   */
   private buildMap(): void {
-    const key = sceneMapKey(this.sceneId);
-    const map = this.make.tilemap({ key });
-    this.mapW = map.widthInPixels;
-    this.mapH = map.heightInPixels;
-    const data = this.cache.tilemap.get(key).data as { tilesets: Array<{ name: string }> };
-    const sets = data.tilesets
-      .map((t) => map.addTilesetImage(t.name, t.name, TILE_PX, TILE_PX))
-      .filter((t): t is Phaser.Tilemaps.Tileset => t !== null);
-    map.createLayer('ground', sets, 0, 0)?.setDepth(0);
-    this.portals = (map.getObjectLayer('portals')?.objects ?? []).map((o) => ({
-      id: o.name,
-      x: (o.x ?? 0) + TILE_PX / 2,
-      y: (o.y ?? 0) + TILE_PX / 2,
-    }));
+    const json = this.cache.tilemap.get(sceneMapKey(this.sceneId)).data as TiledMap;
+    this.map = readSceneMap(json);
+    this.portals = this.map.portals;
+    const { w, h } = this.map;
+    const g = this.add.graphics().setDepth(DEPTH.ground);
+    g.fillStyle(colorOf(palette.colors.slate), 1);
+    g.fillPoints(poly(sceneDiamond(w, h)), true);
+    this.cameras.main.setBackgroundColor(colorOf(palette.colors[this.map.voidColour]));
   }
 
-  /** Camera zoom keeps ~11 tiles on screen high; bounds centre a scene smaller than the view. */
+  /** Camera zoom snaps to a multiple of 0.5 (SPRITES 10.9); bounds hold the scene's diamond, centred if smaller. */
   private fitCamera(): void {
     const cam = this.cameras.main;
     const { width, height } = this.scale;
     cam.setSize(width, height);
-    const zoom = Phaser.Math.Clamp(height / (VIEW_TILES_HIGH * TILE_PX), 0.3, 2);
+    const zoom = isoZoom(height);
     cam.setZoom(zoom);
-    const viewW = width / zoom;
-    const viewH = height / zoom;
-    const padX = Math.max(0, (viewW - this.mapW) / 2);
-    const padY = Math.max(0, (viewH - this.mapH) / 2);
-    cam.setBounds(-padX, -padY, this.mapW + padX * 2, this.mapH + padY * 2);
+    cam.setRoundPixels(true);
+    const b = cameraBounds(this.map.w, this.map.h, width / zoom, height / zoom);
+    cam.setBounds(b.x, b.y, b.width, b.height);
   }
 
   /** A door swings for 3 s (GDD 3.7): pulse its tile while the server says it is swinging. */
@@ -627,7 +631,7 @@ export class World extends Phaser.Scene {
       if (!p) continue;
       const pulse = 0.35 + 0.25 * Math.sin(this.time.now / 120);
       this.swing.fillStyle(colorOf(palette.colors.lantern), pulse);
-      this.swing.fillRect(p.x - TILE_PX / 2, p.y - TILE_PX / 2, TILE_PX, TILE_PX);
+      this.swing.fillPoints(poly(tileDiamond(Math.floor(p.x / TILE_PX), Math.floor(p.y / TILE_PX))), true);
     }
   }
 
@@ -636,10 +640,16 @@ export class World extends Phaser.Scene {
     if (n.sceneId !== this.sceneId) return;
     const scream = /scream/i.test(n.kind);
     const col = colorOf(scream ? palette.colors.magenta : palette.colors.lantern);
-    const g = this.add.circle(n.x, n.y, 8).setStrokeStyle(4, col).setDepth(1);
-    this.tweens.add({ targets: g, scale: 8, alpha: 0, duration: 700, onComplete: () => g.destroy() });
-    const me = this.entities.objectOf(this.feed.selfId);
-    const dir = me ? dirFromVector(n.x - me.x, n.y - me.y) : null;
+    // A ring on the ground: an ellipse on the screen, above the darkness (SPRITES 10.6).
+    const { root, inner } = decalHolder(this, n.x, n.y);
+    const g = this.add.circle(0, 0, 8).setStrokeStyle(4, col);
+    inner.add(g);
+    root.setDepth(DEPTH.marks);
+    this.tweens.add({ targets: g, scale: 8, alpha: 0, duration: 700, onComplete: () => root.destroy() });
+    const meObj = this.entities.objectOf(this.feed.selfId);
+    const at = toScreen(n.x, n.y);
+    // HUD words are screen frame: "from the north" is up on the screen (SPRITES 10.4).
+    const dir = meObj ? dirFromVector(at.x - meObj.x, at.y - meObj.y) : null;
     const line = /bell/i.test(n.kind)
       ? C['log.bell']
       : scream
@@ -652,8 +662,8 @@ export class World extends Phaser.Scene {
     if (scream) this.audio.play('scream');
     const cam = this.cameras.main;
     const { width, height } = this.scale;
-    const sx = (n.x - cam.worldView.x) * cam.zoom;
-    const sy = (n.y - cam.worldView.y) * cam.zoom;
+    const sx = (at.x - cam.worldView.x) * cam.zoom;
+    const sy = (at.y - cam.worldView.y) * cam.zoom;
     if (sx >= 0 && sx <= width && sy >= 0 && sy <= height) return;
     const dx = sx - width / 2;
     const dy = sy - height / 2;
@@ -663,8 +673,9 @@ export class World extends Phaser.Scene {
 
   /** ?navdebug=1: outline every solid tile from the tilemap's ground layer for collision debugging. */
   private drawNavDebug(): void {
-    const g = this.add.graphics().setDepth(999_999);
+    const g = this.add.graphics().setDepth(DEPTH.marks);
     g.lineStyle(1, colorOf(palette.colors.magenta), 0.6);
-    g.strokeRect(0, 0, this.mapW, this.mapH);
+    const { w, h } = this.map;
+    g.strokePoints(poly(sceneDiamond(w, h)), true);
   }
 }

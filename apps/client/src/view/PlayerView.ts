@@ -1,8 +1,10 @@
 import Phaser from 'phaser';
 import palette from '@wdi/content/data/palette.json';
 import traits from '@wdi/content/data/traits.json';
-import { type Direction, dirFromVector } from '@wdi/shared/direction';
+import type { Direction } from '@wdi/shared/direction';
+import { isoDepth, screenDirOfYaw, toScreen } from '@wdi/shared/iso';
 import { AnimId } from './animIds';
+import { BIAS } from './iso';
 
 // One player: a body sprite with scarf and hat overlays (docs/SPRITES.md 3), a shadow and a nameplate.
 // Animation keys are `<pass>/<body>/<anim>/<dir>`; every layer plays the same tail so they stay in step.
@@ -18,9 +20,9 @@ export const SCARF_TINT = traits.axes.scarf.values.map((v) =>
 const SCARF_SHAPE = ['◆', '●', '■']; // diamond, circle, square (nameplateShape)
 export const HEIGHT_SCALE = traits.axes.height.values.map((v) => v.spriteScale);
 
-/** Facing as a direction name from the server's yaw (clockwise from screen up). */
+/** Atlas direction (screen frame) of the server's yaw (radians clockwise from world north; SPRITES 10.4). */
 export function dirFromYaw(yaw: number): Direction {
-  return dirFromVector(Math.sin(yaw), -Math.cos(yaw));
+  return screenDirOfYaw(yaw);
 }
 
 export interface PlayerLook {
@@ -50,7 +52,7 @@ export class PlayerView {
   ) {
     this.hasArt = scene.textures.exists(BODY_TEXTURE);
     this.plateColor = isSelf ? palette.colors.mustard : palette.colors.bone;
-    const shadow = scene.add.ellipse(0, 0, 38, 14, 0x12141c, 0.4);
+    const shadow = scene.add.ellipse(0, 0, 40, 20, 0x12141c, 0.4);
     this.body = scene.add.sprite(0, 0, this.hasArt ? BODY_TEXTURE : '__DEFAULT');
     this.scarf = scene.add.sprite(
       0,
@@ -137,8 +139,10 @@ export class PlayerView {
     if (this.scene.anims.exists(key)) sprite.play({ key, startFrame });
   }
 
+  /** `x`, `y` are the feet in world px; the sprite stands at their projection and sorts by its screen y. */
   setPosition(x: number, y: number): void {
-    this.root.setPosition(x, y).setDepth(y);
+    const s = toScreen(x, y);
+    this.root.setPosition(s.x, s.y).setDepth(isoDepth(x, y) + BIAS.character);
   }
 
   destroy(): void {

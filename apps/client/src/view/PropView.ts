@@ -2,6 +2,8 @@ import type Phaser from 'phaser';
 import palette from '@wdi/content/data/palette.json';
 import overworld from '@wdi/content/data/scenes/overworld.json';
 import { TILE_PX } from '@wdi/shared/constants';
+import { toScreen } from '@wdi/shared/iso';
+import { BIAS, depthAt } from './iso';
 
 const ATLAS = 'props';
 /** The props that stand in the village square; the rest of overworld.json's props are decor art (P). */
@@ -56,25 +58,27 @@ export class PropView {
 
   private draw(p: PropSpot, label: string): void {
     const scene = this.scene;
+    // The ground point under the tile centre; frame pivots arrive with the art (SPRITES 10.5).
+    const at = toScreen(p.x, p.y);
     const tex = scene.textures.exists(ATLAS) ? scene.textures.get(ATLAS) : null;
     const frame = [`prop_${p.kind}`, `prop_${p.id.split('.')[1]}`].find((k) => tex?.has(k));
     if (frame) {
       // A prop with art is named by its art.
       this.objects.push(
         scene.add
-          .sprite(p.x, p.y + TILE_PX / 2, ATLAS, frame)
+          .sprite(at.x, at.y, ATLAS, frame)
           .setOrigin(0.5, 1)
-          .setDepth(p.y + TILE_PX / 2),
+          .setDepth(depthAt(p.x, p.y, BIAS.kit)),
       );
       return;
     }
     this.objects.push(
       scene.add
-        .rectangle(p.x, p.y, TILE_PX * 0.7, TILE_PX * 0.7, colorOf(palette.colors.slate))
+        .rectangle(at.x, at.y - TILE_PX / 2, TILE_PX * 0.7, TILE_PX * 0.7, colorOf(palette.colors.slate))
         .setStrokeStyle(3, colorOf(palette.colors.lantern))
-        .setDepth(p.y),
+        .setDepth(depthAt(p.x, p.y, BIAS.kit)),
       scene.add
-        .text(p.x, p.y, label, {
+        .text(at.x, at.y - TILE_PX / 2, label, {
           fontFamily: 'Oswald, sans-serif',
           fontSize: '14px',
           color: palette.colors.bone,
@@ -82,7 +86,7 @@ export class PropView {
           wordWrap: { width: TILE_PX * 0.9 },
         })
         .setOrigin(0.5)
-        .setDepth(p.y + 1),
+        .setDepth(depthAt(p.x, p.y, BIAS.kit) + 0.01),
     );
   }
 

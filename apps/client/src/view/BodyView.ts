@@ -1,5 +1,7 @@
 import type Phaser from 'phaser';
 import palette from '@wdi/content/data/palette.json';
+import { isoDepth, toScreen } from '@wdi/shared/iso';
+import { BIAS } from './iso';
 import { BODY, HATS, HEIGHT_SCALE, type PlayerLook, SCARF_TINT } from './PlayerView';
 
 const BODY_TEXTURE = `char_${BODY}`;
@@ -15,13 +17,13 @@ function lastFrame(scene: Phaser.Scene, animKey: string): [string, string] | nul
 /**
  * A body lying where a player was killed: the last `die` frame of the villager facing south, wearing the
  * victim's scarf and hat from their public traits (a body is recognised by its traits, A30). Without the
- * art it is a flat mark so the verb stays playable. `x`/`y` are the server's pixel centre, unscaled.
+ * art it is a flat mark so the verb stays playable. `x`/`y` are the server's world pixel centre, projected here.
  */
 export class BodyView {
   readonly root: Phaser.GameObjects.Container;
 
   constructor(scene: Phaser.Scene, x: number, y: number, look: PlayerLook) {
-    const shadow = scene.add.ellipse(0, 0, 54, 18, 0x12141c, 0.45);
+    const shadow = scene.add.ellipse(0, 0, 54, 27, 0x12141c, 0.45);
     const parts: Phaser.GameObjects.GameObject[] = [shadow];
     const base = scene.textures.exists(BODY_TEXTURE) ? lastFrame(scene, 'char/villager/die/s') : null;
     const art = scene.add.container(0, 0).setScale(HEIGHT_SCALE[look.height] ?? 1);
@@ -49,7 +51,8 @@ export class BodyView {
       );
     }
     parts.push(art);
-    this.root = scene.add.container(x, y, parts).setDepth(y - 1);
+    const s = toScreen(x, y);
+    this.root = scene.add.container(s.x, s.y, parts).setDepth(isoDepth(x, y) + BIAS.body);
   }
 
   destroy(): void {
