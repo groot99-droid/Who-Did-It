@@ -1,6 +1,7 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { C2S, GameMode, Phase, type GameStateType } from '@wdi/shared';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
+import { flowOf } from '../src/sim/Flow';
 import { onubOf, type OnubState } from '../src/sim/onub/state';
 import { type Bot, opts, sleep } from './simHelpers';
 
@@ -52,13 +53,25 @@ export async function startOnub(m: OnubParty): Promise<void> {
   await until(() => phaseOf(m) === Phase.roleReveal, 1500);
 }
 
+/** What a test fixes about the deal: roles by bot index (`debug.deal`, white-box) and a custom deck. */
+export interface DealOpts {
+  roles?: Record<number, string>;
+  deck?: string[];
+}
+
 /** A party in the role card phase. */
 export async function onubRoleCard(
   colyseus: ColyseusTestServer,
   n: number,
-  onubDeck?: string[],
+  opt: DealOpts | string[] = {},
 ): Promise<OnubParty> {
-  const m = await onubLobby(colyseus, n, onubDeck);
+  const { roles, deck } = Array.isArray(opt) ? { roles: undefined, deck: opt } : opt;
+  const m = await onubLobby(colyseus, n, deck);
+  if (roles) {
+    flowOf(m.room).fixedDeal = Object.fromEntries(
+      Object.entries(roles).map(([i, r]) => [(m.bots[Number(i)] as Bot).id, r]),
+    );
+  }
   await startOnub(m);
   return m;
 }
@@ -73,9 +86,9 @@ export async function toPrep(m: OnubParty): Promise<void> {
 export async function onubPrep(
   colyseus: ColyseusTestServer,
   n: number,
-  onubDeck?: string[],
+  opt: DealOpts | string[] = {},
 ): Promise<OnubParty> {
-  const m = await onubRoleCard(colyseus, n, onubDeck);
+  const m = await onubRoleCard(colyseus, n, opt);
   await toPrep(m);
   return m;
 }
@@ -93,3 +106,8 @@ export function commit(bot: Bot, station: string, card: string): void {
 
 export const errorsOf = (bot: Bot): { code: number; msg: string }[] =>
   bot.events.filter((e) => e.type === 'error').map((e) => e.payload as { code: number; msg: string });
+
+/** Ends prep on the next tick, as the timer would. */
+export function runOutPrep(m: OnubParty): void {
+  m.room.state.phaseEndsTick = m.room.state.tick + 1;
+}
