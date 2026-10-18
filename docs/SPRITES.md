@@ -100,6 +100,14 @@ origin when the frame is set, so the feet stay put while the trimmed size change
 `apps/client/public/assets/manifest.json` (real art) and `apps/client/public/assets/placeholder/
 manifest.json` (generated placeholders) have the same keys; `?art=placeholder` picks the second.
 
+**Art styles (A79).** The real art ships in each style of `style.json` `artStyles`. The 8-bit style is
+`assets/manifest.json` (`"art": "real"`). The low-poly style is `assets/lowpoly/manifest.json`
+(`"art": "lowpoly"`), with its files under `assets/lowpoly/` and its URLs relative to that folder. A style
+manifest re-skins keys of the 8-bit manifest only: same type, frame names, cells, pivots, `maps` and
+`modes`, and the style's `filter` on every filtered texture (`tools/sprites/test/styles.test.ts`). The client
+loads the player's style and falls back key by key to the 8-bit entry for any key the style lacks. Switching
+style mid-match swaps the textures in place, by key. `?art=placeholder` overrides every style.
+
 ```json
 {
   "version": 1,

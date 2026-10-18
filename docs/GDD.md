@@ -434,7 +434,7 @@ Forest and cave scenes already carry the places where M5b puts resource nodes, c
 **Isometric presentation (M5a).** Both modes show the world in a 2:1 dimetric isometric view, seen from the south-east (SPRITES 10, WORLD 4.2):
 
 - A tile is a 128 x 64 px diamond. World north points to the upper right of the screen, and straight up is world north-west.
-- Characters, props, buildings and ground are pre-rendered from that one camera, with a pixel-art finish. For the main world the finish is one switch (`style.json` `pixelFinish.enabled.main`), set from the owner's answer at art Gate A (A50); the quick mode always keeps it.
+- Characters, props, buildings and ground are pre-rendered from that one camera. Each player picks an **art style** at the click of a button, in the lobby or the in-match menu, without leaving the match: **8-bit** (the default, a pixel-art finish) or **Low poly** (the same renders without the finish, smooth-filtered). HD comes later. The pick is the player's own, kept in the browser and never sent to the server, so two players at one table may see different styles (`style.json` `artStyles`, A79).
 - Only the picture changes. The server, every rule, distance and radius in this document, the collision box and every id stay on the square 64 px grid.
 
 **Interiors are cutaways.** The north and west walls stand at full height, the south and east walls are drawn as low sills, and inner walls are drawn at half height, so a room can always be read.

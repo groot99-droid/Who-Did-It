@@ -30,6 +30,50 @@ export const UiStyle = z.strictObject({
 });
 export type UiStyle = z.infer<typeof UiStyle>;
 
+/**
+ * One art style a player can pick at the click of a button (owner, 2026-10-18; DECISIONS A79; docs/SPRITES.md 5).
+ * Every style ships the same keys, frame names, cells and pivots; `root` is its manifest folder under
+ * `apps/client/public/assets/`, and a key its manifest lacks falls back to the 8-bit entry.
+ */
+export const ArtStyle = z.strictObject({
+  id: z.string().regex(/^[a-z0-9]+$/),
+  /** Whether the style's art takes the pixel finish (docs/ASSETS.md 6.11). */
+  pixelFinish: z.boolean(),
+  /** The texture filter of the style's world textures. */
+  filter: z.enum(['nearest', 'linear']),
+  /** The draw scale of a packed world frame (`iso.artScale` for both round-5 styles; HD may ship at 1). */
+  drawScale: z.number().int().min(1).max(4),
+  root: z.string().regex(/^([a-z0-9]+\/)?$/),
+});
+export type ArtStyle = z.infer<typeof ArtStyle>;
+
+export const ArtStyles = z
+  .strictObject({
+    default: z.string(),
+    /** Style ids promised for later (HD); no art or manifest yet. */
+    reserved: z.array(z.string().regex(/^[a-z0-9]+$/)),
+    styles: z.array(ArtStyle).min(1),
+  })
+  .superRefine((a, ctx) => {
+    const ids = a.styles.map((s) => s.id);
+    if (new Set(ids).size !== ids.length)
+      ctx.addIssue({ code: 'custom', message: 'artStyles: duplicate style id' });
+    if (!ids.includes(a.default))
+      ctx.addIssue({ code: 'custom', message: `artStyles: default ${a.default} is not a style` });
+    for (const r of a.reserved)
+      if (ids.includes(r))
+        ctx.addIssue({ code: 'custom', message: `artStyles: ${r} is both shipped and reserved` });
+    const roots = a.styles.map((s) => s.root);
+    if (new Set(roots).size !== roots.length)
+      ctx.addIssue({ code: 'custom', message: 'artStyles: two styles share a root' });
+    if (!a.styles.some((s) => s.root === '' && s.pixelFinish))
+      ctx.addIssue({
+        code: 'custom',
+        message: 'artStyles: the style at the root manifest must take the pixel finish',
+      });
+  });
+export type ArtStyles = z.infer<typeof ArtStyles>;
+
 /** An owner image uploaded as a Higgsfield `image_references` input (docs/ASSETS.md 6.4). */
 const Reference = z.strictObject({
   file: z.string().regex(/^assets\/source\/concepts\/.+\.(jpg|png)$/),
@@ -59,11 +103,15 @@ export const StyleFile = z.strictObject({
     cutoutOutline: z.literal('ink'),
     webpQuality: z.literal(100),
   }),
-  /** Ruling F15: the main mode's finish is the owner's Gate A answer; ONUB always keeps it. */
+  /**
+   * The finish of the 8-bit art style, per mode (ruling F15). The owner answered Gate A with both styles (A79):
+   * `artStyles` says which style takes the finish; the low-poly style never does.
+   */
   pixelFinish: z.strictObject({
     enabled: z.strictObject({ main: z.boolean(), onub: z.literal(true) }),
     offWebpQuality: z.number().int().min(1).max(99),
   }),
+  artStyles: ArtStyles,
   ui: UiStyle,
 });
 export type StyleFile = z.infer<typeof StyleFile>;
