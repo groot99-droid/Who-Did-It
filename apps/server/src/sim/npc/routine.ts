@@ -332,6 +332,41 @@ function occupied(room: PartyRoom, selfId: string, scene: number, x: number, y: 
   return false;
 }
 
+function openStations(
+  room: PartyRoom,
+  mem: NpcMemory,
+  brain: Brain,
+  player: PlayerState,
+  p: PlayerSim,
+  cls: PhaseClass,
+): Station[] {
+  const sim = simOf(room);
+  const map = mapScenesOf(room);
+  const litOnly = cls === 'night';
+  const reach = reachableScenes(sceneKey(p.sceneIdx), sim.profile, map, litOnly);
+  return stationsOf(map, sim.profile).filter((st) => {
+    if (!routines.activities[st.activity]?.phases.includes(cls)) return false;
+    if (st.propId === brain.lastStationId) return false;
+    const owner = mem.claims.get(st.propId);
+    if (owner !== undefined && owner !== player.id) return false;
+    return reach.has(st.scene) && (!litOnly || litAtNight(st.scene));
+  });
+}
+
+/** The stations of lit scenes where exactly one living seat stands and it is a human: a Killer NPC's prey (no draw). */
+function preyStations(
+  room: PartyRoom,
+  mem: NpcMemory,
+  brain: Brain,
+  player: PlayerState,
+  p: PlayerSim,
+): Station[] {
+  const here = sceneKey(p.sceneIdx);
+  return openStations(room, mem, brain, player, p, 'night').filter(
+    (st) => st.scene !== here && soleHumanIn(room, mem, player, sceneIndex(st.scene)),
+  );
+}
+
 function pickStation(
   room: PartyRoom,
   mem: NpcMemory,
@@ -347,25 +382,16 @@ function pickStation(
   const map = mapScenesOf(room);
   const here = sceneKey(p.sceneIdx);
   const litOnly = cls === 'night';
-  const reach = reachableScenes(here, sim.profile, map, litOnly);
-  const base = stationsOf(map, sim.profile).filter((st) => {
-    if (!routines.activities[st.activity]?.phases.includes(cls)) return false;
-    if (st.propId === brain.lastStationId) return false;
-    const owner = mem.claims.get(st.propId);
-    if (owner !== undefined && owner !== player.id) return false;
-    return reach.has(st.scene) && (!litOnly || litAtNight(st.scene));
-  });
-  // One hop at a time: a trip never passes through a scene without its dwell (the hunt below is the exception).
+  const base = openStations(room, mem, brain, player, p, cls);
+  // One hop at a time: a trip never passes through a scene without its dwell (the hunt below is the exception: it ignores the dwell).
   const adjacent = adjacentScenes(here, sim.profile, map, litOnly);
   const own = base.filter((st) => st.scene === here);
   const other = base.filter((st) => st.scene !== here && adjacent.has(st.scene));
   const dwellRun = tick >= brain.sceneDwellUntilTick;
   let pool = dwellRun ? (other.length > 0 ? other : own) : own;
   let hunt = false;
-  if (killer && dwellRun && litOnly) {
-    const prey = base.filter(
-      (st) => st.scene !== here && soleHumanIn(room, mem, player, sceneIndex(st.scene)),
-    );
+  if (killer && litOnly) {
+    const prey = preyStations(room, mem, brain, player, p);
     if (prey.length > 0) {
       pool = prey;
       hunt = true;
@@ -451,6 +477,8 @@ function choose(
   const w = balance.npc.routine.weights[cls];
   const u = rng();
   let kind: 'work' | 'stroll' | 'idle' = u < w.work ? 'work' : u < w.work + w.stroll ? 'stroll' : 'idle';
+  // A Killer NPC with prey in sight of the map goes hunting at once, whatever the weights drew.
+  if (killer && cls === 'night' && preyStations(room, mem, brain, player, p).length > 0) kind = 'work';
   if (restrict && kind === 'work') kind = 'stroll';
   if (kind === 'work') {
     const trip = pickStation(room, mem, brain, player, p, cls, killer);
