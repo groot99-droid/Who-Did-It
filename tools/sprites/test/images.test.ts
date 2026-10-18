@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { decodePng, encodePng } from '../bleed.ts';
 import { finishImages, IMAGE_SETS, IMAGE_SIZES, TILE_VARIANTS } from '../images.ts';
-import { BUILDING_KEYS, LOFT_KEYS, TILESET_KEYS } from '../keys.ts';
+import { LOFT_KEYS, TILESET_KEYS } from '../keys.ts';
 
 function image(w: number, h: number, shade = 217): Buffer {
   const data = new Uint8Array(w * h * 4);
@@ -12,10 +12,8 @@ function image(w: number, h: number, shade = 217): Buffer {
 const flat = (keys: readonly string[]) => new Map(keys.map((k) => [k, image(...IMAGE_SIZES[k]!)]));
 
 describe('finishImages', () => {
-  it('sizes every loft, building and tileset key', () => {
-    expect(IMAGE_SETS.flatMap((s) => s.keys).sort()).toEqual(
-      [...LOFT_KEYS, ...BUILDING_KEYS, ...TILESET_KEYS].sort(),
-    );
+  it('sizes every loft and tileset key', () => {
+    expect(IMAGE_SETS.flatMap((s) => s.keys).sort()).toEqual([...LOFT_KEYS, ...TILESET_KEYS].sort());
     for (const s of IMAGE_SETS) for (const k of s.keys) expect(IMAGE_SIZES[k]).toBeDefined();
   });
 

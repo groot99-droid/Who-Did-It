@@ -5,11 +5,6 @@
  * empty. One key per line, so the three art sessions' deletions merge cleanly.
  */
 export const LEGACY: readonly string[] = [
-  // K4 (5K): leave both manifests when bld_hollowmere lands
-  'bld_tavern_ext',
-  'bld_apoth_ext',
-  'bld_widow_ext',
-  'bld_bakery_ext',
   // K6 (5K): leave both manifests once 5J's isometric tilemaps have landed
   'tiles_grass',
   'tiles_path',

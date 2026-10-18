@@ -86,46 +86,50 @@ function greybox(g: SKRSContext2D, x: number, y: number, h: number, w = 40): voi
 /** Hollowmere's square in miniature: ground chars, solid chars (`.` = none) and objects. */
 export const VIGNETTE = {
   ground: [
-    'gggggggggggggggggg',
-    'ggggggggggggggggpg',
-    'ggcccccccccccccpgg',
-    'ggccccccccccccppgg',
-    'ggcccccccccccppggg',
-    'ggccccccfffccpgggg',
-    'ggccccccfffccpgggg',
-    'ggccccccfffccpppgg',
-    'ggcccccccccccccpgg',
-    'ggcccccccccccccpgg',
-    'ggccccccccccccppgg',
-    'ggggggggggggpppggg',
-    'gggggggggggggppggg',
-    'ggggggggggggggpppg',
+    'gggggggggggggggggggggg',
+    'gggccccccccccccccggggg',
+    'gggccccccccccccccggggg',
+    'gggccccccccccccccggggg',
+    'gggccccccccccccccggggg',
+    'gggccccccccccccccggggg',
+    'gggccccccccccccccggggg',
+    'gggccccccccccccccggggg',
+    'gggcccccccccccccccpppg',
+    'ggccccccccccccccccpggg',
+    'ggcccccccfffccccccpggg',
+    'ggcccccccfffccccccpggg',
+    'ggccccccccccccccccpggg',
+    'gggcccccccccccccccpggg',
+    'ggggggggggggggggppgggg',
+    'gggggggggggggggggggggg',
   ],
   solids: [
-    'TTTT.TTTTT.TTTT.TT',
-    'R...............R.',
-    'F...............F.',
-    'F.......WWWWW...F.',
-    'F.......WWWWW....R',
-    'F................T',
-    '..................',
-    '..................',
-    'F................K',
-    'F................K',
-    'R.................',
-    '..................',
-    'TT.R..........T..T',
-    'TTT.FFFFFFFF...TTT',
+    'TT.T.TT.TT.TT.TT.T.TTT',
+    'F....................T',
+    'F....................R',
+    'F...................TT',
+    'F.....................',
+    'F...................TT',
+    'F....................R',
+    'F.....................',
+    '......................',
+    'R.....................',
+    '......................',
+    '...................K..',
+    'F..................K..',
+    'F.....................',
+    'R.....................',
+    'TTT.TRT..FFFFFFF.TT.TT',
   ],
-  tavern: { x: 2, y: 3, w: 12, h: 7, art: 'tavern' },
+  tavern: { x: 3, y: 1, w: 12, h: 7, art: 'tavern' },
   props: [
-    { frame: 'prop_bell', x: 9, y: 6 },
-    { frame: 'prop_pump', x: 10, y: 8 },
-    { frame: 'prop_lanternPost_lit', x: 6, y: 11 },
-    { frame: 'prop_lanternPost_lit', x: 13, y: 5 },
+    { frame: 'prop_bell', x: 10, y: 10 },
+    { frame: 'prop_pump', x: 7, y: 11 },
+    { frame: 'prop_lanternPost_lit', x: 5, y: 9 },
+    { frame: 'prop_lanternPost_lit', x: 15, y: 12 },
   ],
-  /** The look idling in 8 directions on a row south of the square. */
-  people: { x0: 3, y: 12, dirs: ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] },
+  /** The look idling in 8 directions on a row across the square. */
+  people: { x0: 5, y: 13, dirs: ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] },
 };
 
 interface Atlases {
@@ -205,7 +209,10 @@ interface Placed {
   paint: () => void;
 }
 
-function vignette(a: Atlases, smooth: boolean): { canvas: Canvas; lights: { x: number; y: number }[] } {
+function vignette(
+  a: Atlases,
+  smooth: boolean,
+): { canvas: Canvas; lights: { x: number; y: number }[]; focus: { x: number; y: number } } {
   const v = VIGNETTE;
   const w = v.ground[0]!.length;
   const h = v.ground.length;
@@ -268,14 +275,17 @@ function vignette(a: Atlases, smooth: boolean): { canvas: Canvas; lights: { x: n
   v.people.dirs.forEach((dir, i) => {
     const p = at(v.people.x0 + i, v.people.y);
     const s = a.look.get(`char/${a.lookId}/idle/${dir}/000`);
+    // A round-5 look is packed at half size; the round-4 villager atlas is still at display size.
+    const scale = a.lookId === 'villager' ? 1 : ART_SCALE;
     placed.push({
       depth: p.depth + 0.5,
-      paint: () => (s ? draw(g, s, p.x, p.y, ART_SCALE) : greybox(g, p.x, p.y, 100, 30)),
+      paint: () => (s ? draw(g, s, p.x, p.y, scale) : greybox(g, p.x, p.y, 100, 30)),
     });
   });
   placed.sort((p, q) => p.depth - q.depth);
   for (const p of placed) p.paint();
-  return { canvas, lights };
+  const f = at(8, 9); // between the tavern door and the bell: the zoom-2 crop's centre
+  return { canvas, lights, focus: { x: f.x, y: f.y - 60 } };
 }
 
 /** The night frame: the darkness ambient (ink 0.9, metrics.json lighting) with soft lantern pools and glows. */
@@ -314,19 +324,19 @@ function night(src: Canvas, lights: { x: number; y: number }[]): Canvas {
 /** Gate A: day and night at zoom 1 above, a zoom-2 crop of each below. */
 export async function gateSheet(assets: string, smooth: boolean, look = 'baker'): Promise<Buffer> {
   const a = await loadAtlases(assets, 'harbour', 'hollowmere', look);
-  const { canvas: day, lights } = vignette(a, smooth);
+  const { canvas: day, lights, focus } = vignette(a, smooth);
   const nightC = night(day, lights);
-  const cw = 760;
-  const ch = 420;
-  const out = createCanvas(day.width * 2 + 32, day.height + ch * 2 + 48);
+  const cw = 1280;
+  const ch = 720;
+  const out = createCanvas(day.width * 2 + 32, day.height + ch + 48);
   const g = out.getContext('2d');
   g.imageSmoothingEnabled = smooth;
   g.fillStyle = INK;
   g.fillRect(0, 0, out.width, out.height);
   g.drawImage(day, 0, 0);
   g.drawImage(nightC, day.width + 32, 0);
-  const cx = day.width / 2 - cw / 4;
-  const cy = day.height / 2 - ch / 4 - 40;
+  const cx = focus.x - cw / 4;
+  const cy = focus.y - ch / 4;
   g.drawImage(day, cx, cy, cw / 2, ch / 2, 0, day.height + 32, cw, ch);
   g.drawImage(nightC, cx, cy, cw / 2, ch / 2, day.width + 32, day.height + 32, cw, ch);
   return out.toBuffer('image/png');

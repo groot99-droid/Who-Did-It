@@ -6,6 +6,7 @@ import type { MultiAtlas } from '../pack.ts';
 import { MAP_PROPS_FRAMES, PROPS_FRAMES, clueFrameNames } from '../pack-static.ts';
 import { finishEnabled, paletteFile } from '../palette.ts';
 import { audit } from '../pixel.ts';
+import { MAP_SLICED_PROPS, sliceNames } from '../placeholder-world.ts';
 
 const ROOT = join(import.meta.dirname, '../../..');
 const ASSETS = join(ROOT, 'apps/client/public/assets');
@@ -23,9 +24,6 @@ const frames = (rel: string): Set<string> => {
   const atlas = JSON.parse(readFileSync(file, 'utf8')) as MultiAtlas;
   return new Set(atlas.textures.flatMap((t) => t.frames.map((f) => f.filename)));
 };
-
-/** Multi-tile props sliced with the buildings in K4 (art plan 3.5); their slices land with `bld_hollowmere`. */
-const SLICED_IN_K4 = new Set(['wakeTable', 'hanging_oak', 'clamp', 'pump_beam']);
 
 const maps = ['hollowmere', 'blackpine'].filter((m) => existsSync(join(DATA, 'maps', `${m}.json`)));
 
@@ -47,7 +45,7 @@ describe.each(maps)('the props of %s resolve to frames (SPRITES 10.13, art plan 
   it.each(scenes)('%s', (sceneId) => {
     const scene = JSON.parse(readFileSync(join(DATA, 'scenes', `${sceneId}.json`), 'utf8')) as Scene;
     for (const p of scene.props ?? []) {
-      if (p.kind === 'teachingClue' || SLICED_IN_K4.has(p.kind)) continue;
+      if (p.kind === 'teachingClue') continue;
       expect(resolves(p.kind, p.id), `${p.id} (${p.kind})`).toBe(true);
     }
     for (const s of scene.spots ?? [])
@@ -66,7 +64,10 @@ describe('the prop and clue atlases', () => {
     for (const dir of ['', 'placeholder/']) {
       expect([...frames(`${dir}props/props.json`)].sort(), `${dir}props`).toEqual([...PROPS_FRAMES].sort());
       for (const [key, names] of Object.entries(MAP_PROPS_FRAMES)) {
-        expect([...frames(`${dir}props/${key}.json`)].sort(), `${dir}${key}`).toEqual([...names].sort());
+        const slices = (MAP_SLICED_PROPS[key] ?? []).flatMap((p) => sliceNames(p.art, p.w, p.h));
+        expect([...frames(`${dir}props/${key}.json`)].sort(), `${dir}${key}`).toEqual(
+          [...names, ...slices].sort(),
+        );
       }
       expect([...frames(`${dir}clues/clues.json`)].sort(), `${dir}clues`).toEqual(clueFrameNames());
     }

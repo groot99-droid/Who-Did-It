@@ -41,13 +41,86 @@ import {
 const SCARF: Record<string, Token> = { red: 'blood', green: 'teal', blue: 'moon' };
 const MUD: Record<string, Token> = { dark: 'ink', mid: 'slate', light: 'fog' };
 
-/** Small-profile buildings (SPRITES.md 8): id, label, footprint in tiles (w, d). */
-export const BUILDINGS = [
-  { id: 'tavern', label: 'The Drowned Lantern', w: 8, d: 5 },
-  { id: 'apoth', label: 'Mallory Apothecary', w: 6, d: 4 },
-  { id: 'widow', label: 'Widow Vane', w: 6, d: 4 },
-  { id: 'bakery', label: "Crumb's Ovens", w: 6, d: 4 },
-] as const;
+/**
+ * Each map's buildings (art plan 3.4, world.md 7-8): art id and footprint in tiles, as
+ * tools/blender/build_buildings.py RECIPES; and the multi-tile props sliced the same way (3.5).
+ */
+export const MAP_BUILDINGS: Record<string, ReadonlyArray<{ art: string; w: number; h: number }>> = {
+  hollowmere: [
+    { art: 'manor', w: 13, h: 6 },
+    { art: 'barn', w: 10, h: 5 },
+    { art: 'bakery', w: 6, h: 4 },
+    { art: 'apoth', w: 10, h: 8 },
+    { art: 'widow', w: 8, h: 7 },
+    { art: 'tavern', w: 12, h: 7 },
+    { art: 'chapel', w: 9, h: 8 },
+    { art: 'netloft', w: 5, h: 9 },
+    { art: 'mollHut', w: 4, h: 3 },
+  ],
+};
+export const MAP_SLICED_PROPS: Record<string, ReadonlyArray<{ art: string; w: number; h: number }>> = {
+  props_hollowmere: [
+    { art: 'prop_wakeTable', w: 5, h: 2 },
+    { art: 'prop_hanging_oak', w: 2, h: 2 },
+    { art: 'prop_clamp', w: 2, h: 2 },
+    { art: 'prop_pump_beam', w: 2, h: 3 },
+  ],
+};
+
+/** The slice names `<art>#<dx>_<dy>` of a footprint. */
+export function sliceNames(art: string, w: number, h: number): string[] {
+  const out: string[] = [];
+  for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < w; dx++) out.push(`${art}#${dx}_${dy}`);
+  return out;
+}
+
+/**
+ * Greybox slices of one footprint (SPRITES 10.5, 10.13): every tile a prism `tall` art px high on the packed
+ * canvas build_buildings.py renders ((w + h) * 32 + 32 by (w + h) * 16 + 216), all slices pivoted on the
+ * footprint centre.
+ */
+export function greyboxSlices(
+  art: string,
+  w: number,
+  h: number,
+  tall: number,
+  fill: Token,
+): { frames: StaticManifest['frames']; inputs: PackInput[] } {
+  const cw = (w + h) * 32 + 32;
+  const ch = (w + h) * 16 + 216;
+  const pivot: [number, number] = [cw / 2, 200 + (w + h) * 8];
+  const frames: StaticManifest['frames'] = {};
+  const inputs: PackInput[] = [];
+  for (let dy = 0; dy < h; dy++) {
+    for (let dx = 0; dx < w; dx++) {
+      const c = createCanvas(cw, ch);
+      const g = c.getContext('2d');
+      const ox = (dx + 0.5 - w / 2) * 32;
+      const oy = (dy + 0.5 - h / 2) * 32;
+      const x = pivot[0] + (ox - oy);
+      const y = pivot[1] + (ox + oy) / 2;
+      shape(g, fill, () => {
+        g.moveTo(x - 32, y);
+        g.lineTo(x, y + 16);
+        g.lineTo(x + 32, y);
+        g.lineTo(x + 32, y - tall);
+        g.lineTo(x - 32, y - tall);
+        g.closePath();
+      });
+      shape(g, fill === 'fog' ? 'bone' : 'fog', () => {
+        g.moveTo(x - 32, y - tall);
+        g.lineTo(x, y + 16 - tall);
+        g.lineTo(x + 32, y - tall);
+        g.lineTo(x, y - 16 - tall);
+        g.closePath();
+      });
+      const name = `${art}#${dx}_${dy}`;
+      frames[name] = { file: `${name.replace('#', '__')}.png`, cell: [cw, ch], pivot };
+      inputs.push({ name, png: c.toBuffer('image/png') });
+    }
+  }
+  return { frames, inputs };
+}
 
 export const TILESETS: Record<string, { base: Token; fleck: Token; kind: 'specks' | 'stones' | 'planks' }> = {
   grass: { base: 'slate', fleck: 'teal', kind: 'specks' },
@@ -91,29 +164,6 @@ export function clueFrames(): PackInput[] {
   add('clue_claw', 'magenta', 'C');
   add('clue_drag', 'blood', 'D');
   return out;
-}
-
-/** Exterior with roof from the 40-degree camera: roof depth d * 49 px over a 3 m (123 px) wall. */
-export function buildingImage(b: (typeof BUILDINGS)[number]): Buffer {
-  registerFont();
-  const w = b.w * 64;
-  const roof = Math.round(b.d * 49);
-  const wall = 123;
-  const c = createCanvas(w, roof + wall);
-  const g = c.getContext('2d');
-  shape(g, 'fog', () => g.rect(1, roof, w - 2, wall - 1));
-  shape(g, 'slate', () => {
-    g.moveTo(1, roof + 6);
-    g.lineTo(24, 1);
-    g.lineTo(w - 24, 1);
-    g.lineTo(w - 1, roof + 6);
-    g.closePath();
-  });
-  const doorX = w / 2 - 20;
-  shape(g, 'teal', () => g.rect(doorX, roof + wall - 70, 40, 69));
-  for (const x of [32, w - 72]) shape(g, 'lantern', () => g.rect(x, roof + 30, 40, 34));
-  label(g, b.label, w / 2, Math.round(roof / 2) + 6, 14);
-  return c.toBuffer('image/png');
 }
 
 /** Four 64 px variants in a row; flecks wrap so every variant tiles with every other. */
@@ -412,17 +462,37 @@ export function placeholderEntries(): PlaceholderEntry[] {
       ],
       files: async () => {
         const props = propFrames(key, names);
+        for (const p of MAP_SLICED_PROPS[key] ?? []) {
+          const sl = greyboxSlices(p.art, p.w, p.h, 24, 'slate');
+          Object.assign(props.manifest.frames, sl.frames);
+          props.inputs.push(...sl.inputs);
+        }
         return inFolder('props/', await packStatic(props.manifest, props.inputs));
       },
     })),
-    ...BUILDINGS.map((b): PlaceholderEntry => {
-      const key = `bld_${b.id}_ext`;
-      return {
-        order: 60,
-        entries: [{ key, type: 'image', url: `buildings/${key}.png`, filter: 'linear', origin: [0.5, 1] }],
-        files: () => new Map([[`buildings/${key}.png`, buildingImage(b)]]),
-      };
-    }),
+    ...Object.entries(MAP_BUILDINGS).map(([map, buildings]): PlaceholderEntry => ({
+      order: 60,
+      entries: [
+        {
+          key: `bld_${map}`,
+          type: 'multiatlas',
+          url: `buildings/bld_${map}.json`,
+          path: 'buildings/',
+          filter: 'nearest',
+          maps: [map],
+        } as ManifestEntry,
+      ],
+      files: async () => {
+        const manifest: StaticManifest = { version: 1, atlas: `bld_${map}`, frames: {} };
+        const inputs: PackInput[] = [];
+        for (const b of buildings) {
+          const s = greyboxSlices(b.art, b.w, b.h, 88, 'fog');
+          Object.assign(manifest.frames, s.frames);
+          inputs.push(...s.inputs);
+        }
+        return inFolder('buildings/', await packStatic(manifest, inputs));
+      },
+    })),
     ...GROUND_THEMES.map((theme): PlaceholderEntry => {
       const key = `iso_ground_${theme}`;
       return {

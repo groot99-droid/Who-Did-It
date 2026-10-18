@@ -76,43 +76,13 @@
       "filter": "linear"
     },
     {
-      "key": "bld_tavern_ext",
-      "type": "image",
-      "url": "buildings/bld_tavern_ext.png",
-      "filter": "linear",
-      "origin": [
-        0.5,
-        1
-      ]
-    },
-    {
-      "key": "bld_apoth_ext",
-      "type": "image",
-      "url": "buildings/bld_apoth_ext.png",
-      "filter": "linear",
-      "origin": [
-        0.5,
-        1
-      ]
-    },
-    {
-      "key": "bld_widow_ext",
-      "type": "image",
-      "url": "buildings/bld_widow_ext.png",
-      "filter": "linear",
-      "origin": [
-        0.5,
-        1
-      ]
-    },
-    {
-      "key": "bld_bakery_ext",
-      "type": "image",
-      "url": "buildings/bld_bakery_ext.png",
-      "filter": "linear",
-      "origin": [
-        0.5,
-        1
+      "key": "bld_hollowmere",
+      "type": "multiatlas",
+      "url": "buildings/bld_hollowmere.json",
+      "path": "buildings/",
+      "filter": "nearest",
+      "maps": [
+        "hollowmere"
       ]
     },
     {

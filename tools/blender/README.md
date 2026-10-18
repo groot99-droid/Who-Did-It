@@ -14,7 +14,7 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 | `build_props.py` | Renders the round-5 prop atlases (`props`, `props_<mapId>`) through IsoCam and the 24 clue keys (the 15 ground decals through TileCam, the thread, felt and bucket through IsoCam, Hunger's glowing footprints new) |
 | `bakery_props.py` | Models the seven bakery props of the quick mode (`prop_wakeTable`, `prop_plate`, `prop_deadLoaf`, `prop_ledger`, `prop_oven`, `prop_basin`, `prop_flour_sacks`), each with its own cell; `build_props.py` renders them into the `props` sheet |
 | `build_loft.py` | Renders the dark-loft images `loft_backdrop` (1280 x 720) and `prop_bedroll` / `prop_bedroll_self` (112 x 184) through a non-square `SpriteCam` framing |
-| `build_buildings.py` | Renders the four Small-profile exteriors (`bld_<id>_ext`) with the image's bottom middle on the front wall's base |
+| `build_buildings.py` | Renders each map's buildings (`bld_<mapId>`) from recipes at their footprints (the scene's `buildings[]`, else art plan 3.4) and the multi-tile props, each twice through IsoCam: the beauty and a raw tile map that `tools/sprites/slice.ts` cuts slices with |
 | `build_ground.py` | Renders the isometric ground cells (art plan 3.2): each of the 14 materials of both themes in four variants, one metre under IsoCam at 128 x 64 display px, from a Poly Haven texture pulled towards its world-palette colour and a seeded scatter; the variants blend to one shared mapping at the tile edge, so all four tile with each other. `tools/sprites/tileset.ts` joins them |
 | `env/kitbash.py`, `env/shared_props.py`, `env/hollowmere_props.py` | The modelling vocabulary (world-palette toon `T`, unlit `F`, box, prism and outline shapes, fitted Kenney meshes) and the frames of `props` (shared props, 8 spots, 20 portal frames) and `props_hollowmere` (33 props, 22 spots) |
 | `build_kit.py` | Renders the 44 kit frames of each theme (`<wall\|cliff\|tree\|boulder\|fence\|stack>/<full\|half\|stub>/<0-3>`, art plan 3.3) under IsoCam at twice their art cell, pivoted on the tile centre's ground point; walls and cliffs from code with Poly Haven textures, trees, rocks and stacks from Kenney |
@@ -59,7 +59,6 @@ done
 
 # Loft images, building exteriors and tilesets (minutes on llvmpipe), then finish them (tools/sprites)
 python tools/blender/build_loft.py -- --out build/render        # build/render/loft/
-python tools/blender/build_buildings.py -- --out build/render   # build/render/buildings/
 python tools/blender/build_tiles.py -- --out build/render       # build/render/tiles/ (until K6)
 pnpm --filter @wdi/sprites images ../../build/render ../../apps/client/public/assets
 
@@ -75,6 +74,22 @@ for t in harbour timber; do
   pnpm --filter @wdi/sprites pack:static ../../build/finished/iso_kit_$t ../../apps/client/public/assets/kit
   pnpm --filter @wdi/sprites review:world kit ../../apps/client/public/assets $t ../../assets/source/review/kit-$t.png
 done
+
+# Buildings and the multi-tile props: render, then finish and slice, then pack
+python tools/blender/build_buildings.py -- --out build/render   # build/render/bld_<map>/, props_<map>_sliced/
+pnpm --filter @wdi/sprites slice ../../build/render/bld_hollowmere ../../build/finished/bld_hollowmere
+pnpm --filter @wdi/sprites slice ../../build/render/props_hollowmere_sliced ../../build/finished/props_hollowmere
+pnpm --filter @wdi/sprites pack:static ../../build/finished/bld_hollowmere ../../apps/client/public/assets/buildings
+
+# Gate A (art plan 3.10): the same raw renders finished on (the shipped assets) and off (build/gate-off)
+pnpm --filter @wdi/sprites tileset ../../build/render/ground ../../build/gate-off/ground --finish off
+for a in iso_kit_harbour props props_hollowmere; do
+  pnpm --filter @wdi/sprites pixel ../../build/render/$a ../../build/finished-off/$a --finish off; done
+pnpm --filter @wdi/sprites slice ../../build/render/props_hollowmere_sliced ../../build/finished-off/props_hollowmere --finish off
+pnpm --filter @wdi/sprites slice ../../build/render/bld_hollowmere ../../build/finished-off/bld_hollowmere --finish off
+# pack each finished-off folder into build/gate-off/{kit,props,buildings} with pack:static, copy chars/, then
+pnpm --filter @wdi/sprites review:world gate ../../apps/client/public/assets ../../assets/source/review/gate-a-world-on.png
+pnpm --filter @wdi/sprites review:world gate ../../build/gate-off ../../assets/source/review/gate-a-world-off.png --finish off
 
 # The bakery and loft masters (git-ignored; copy to the ROSW checkout, assets/source/MANIFEST.md)
 python tools/blender/save_masters.py -- --out assets/external

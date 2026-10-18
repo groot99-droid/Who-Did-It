@@ -20,7 +20,11 @@ import {
   type PackResult,
 } from './pack.ts';
 
-export type StaticAtlas = 'clues' | 'props' | 'vfx' | `iso_kit_${string}` | `props_${string}`;
+export type StaticAtlas =
+  'clues' | 'props' | 'vfx' | `iso_kit_${string}` | `props_${string}` | `bld_${string}`;
+
+/** A building or multi-tile prop slice (SPRITES 10.5): `<stem>#<dx>_<dy>`. */
+export const SLICE_RE = /^[A-Za-z_]+#\d+_\d+$/;
 
 /** The kit frame families of SPRITES 10.13 that a theme ships (art plan 3.3): 11, four variants each. */
 export const KIT_FRAMES: ReadonlyArray<readonly [string, string]> = [
@@ -164,6 +168,7 @@ export function clueFrameNames(): string[] {
 /** Page caps (px) of the round-5 world atlases (art plan 1.4, SPRITES 10.14). */
 export function pageCap(atlas: StaticAtlas): readonly [number, number] | null {
   if (atlas.startsWith('iso_kit_') || atlas.startsWith('props')) return [1024, 1024];
+  if (atlas.startsWith('bld_')) return [2048, 1024];
   if (atlas === 'clues') return [512, 512];
   return null;
 }
@@ -262,10 +267,13 @@ export async function packStatic(
   manifest: StaticManifest,
   inputs: PackInput[],
 ): Promise<Map<string, Buffer>> {
-  const want = expectedFrames(manifest.atlas);
+  // Slices are whatever the footprints cut (slice.ts): a building atlas holds only slices, a map's prop
+  // atlas its frame list plus the slices of its multi-tile props.
   const got = inputs.map((i) => i.name).sort();
+  const sliced = manifest.atlas.startsWith('bld_') || manifest.atlas.startsWith('props_');
+  const want = manifest.atlas.startsWith('bld_') ? [] : expectedFrames(manifest.atlas);
   const missing = want.filter((n) => !got.includes(n));
-  const extra = got.filter((n) => !want.includes(n));
+  const extra = got.filter((n) => !want.includes(n) && !(sliced && SLICE_RE.test(n)));
   if (missing.length || extra.length) {
     throw new Error(`${manifest.atlas}: missing [${missing.join(', ')}], unexpected [${extra.join(', ')}]`);
   }
