@@ -1,7 +1,16 @@
 import { createCanvas } from '@napi-rs/canvas';
 import { describe, expect, it } from 'vitest';
 import { applyPivots, buildAnims, fileStemOf, type FeetManifest } from '../gen-anims.ts';
-import { animKey, frameFileName, frameKey, parseFrameFileName, type Dir } from '../keys.ts';
+import {
+  DIRECTIONS,
+  PASSES,
+  V1_CLIPS,
+  animKey,
+  frameFileName,
+  frameKey,
+  parseFrameFileName,
+  type Dir,
+} from '../keys.ts';
 import { packCharacter, packFrames, type MultiAtlas, type PackInput } from '../pack.ts';
 
 /** A 128 px cell, transparent except a w x h block whose bottom centre is the feet point. */
@@ -52,7 +61,11 @@ describe('keys', () => {
     expect(id).toEqual({ body: 'villager', anim: 'walk', dir: 'se', index: 3 });
     expect(frameFileName(id)).toBe('char_villager_walk_se_003');
     expect(frameKey('body', id)).toBe('char/villager/walk/se/003');
-    expect(frameKey('hat_cap', id)).toBe('hat_cap/villager/walk/se/003');
+    expect(frameKey('scarf', id)).toBe('scarf/villager/walk/se/003');
+    expect(PASSES).toEqual(['body', 'scarf', 'blood']);
+    expect(Object.keys(V1_CLIPS)).toEqual(['idle', 'walk', 'swing', 'interact', 'die']);
+    const perPass = Object.values(V1_CLIPS).reduce((n, c) => n + c.frames, 0) * DIRECTIONS.length;
+    expect(perPass).toBe(304);
     expect(animKey('blood', 'villager', 'die', 'nw')).toBe('blood/villager/die/nw');
     expect(fileStemOf('scarf/villager/walk/se/003')).toBe('char_villager_walk_se_003');
   });
@@ -138,6 +151,19 @@ describe('gen-anims', () => {
       [0, 1, 2].map((i) => ({ key: 'char_tester', frame: `char/tester/walk/n/00${i}` })),
     );
     expect(anims[2]!.frames[0]!.key).toBe('ovl_tester');
+  });
+
+  it('keeps a look on one page per texture, or spills to a second when it does not fit', async () => {
+    const { frames } = synthetic();
+    const small = await packFrames('char_tester', frames.get('body')!, { w: 1024, h: 512 });
+    expect(small.atlas.textures).toHaveLength(1);
+    expect(small.atlas.textures[0]!.size.w).toBeLessThanOrEqual(1024);
+    expect(small.atlas.textures[0]!.size.h).toBeLessThanOrEqual(512);
+  });
+
+  it('loops interact and plays swing once', () => {
+    expect(V1_CLIPS.interact.loop).toBe(true);
+    expect(V1_CLIPS.swing.loop).toBe(false);
   });
 
   it('plays one-shot clips once', () => {

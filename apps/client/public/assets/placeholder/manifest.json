@@ -7,19 +7,274 @@
       "type": "multiatlas",
       "url": "chars/char_villager.json",
       "path": "chars/",
-      "filter": "linear"
+      "filter": "nearest"
     },
     {
       "key": "ovl_villager",
       "type": "multiatlas",
       "url": "chars/ovl_villager.json",
       "path": "chars/",
-      "filter": "linear"
+      "filter": "nearest"
     },
     {
       "key": "anims_villager",
       "type": "animation",
       "url": "chars/villager.anims.json"
+    },
+    {
+      "key": "char_detective",
+      "type": "multiatlas",
+      "url": "chars/char_detective.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_detective",
+      "type": "multiatlas",
+      "url": "chars/ovl_detective.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_detective",
+      "type": "animation",
+      "url": "chars/detective.anims.json"
+    },
+    {
+      "key": "char_doctor",
+      "type": "multiatlas",
+      "url": "chars/char_doctor.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_doctor",
+      "type": "multiatlas",
+      "url": "chars/ovl_doctor.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_doctor",
+      "type": "animation",
+      "url": "chars/doctor.anims.json"
+    },
+    {
+      "key": "char_vicar",
+      "type": "multiatlas",
+      "url": "chars/char_vicar.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_vicar",
+      "type": "multiatlas",
+      "url": "chars/ovl_vicar.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_vicar",
+      "type": "animation",
+      "url": "chars/vicar.anims.json"
+    },
+    {
+      "key": "char_watchman",
+      "type": "multiatlas",
+      "url": "chars/char_watchman.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_watchman",
+      "type": "multiatlas",
+      "url": "chars/ovl_watchman.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_watchman",
+      "type": "animation",
+      "url": "chars/watchman.anims.json"
+    },
+    {
+      "key": "char_herbalist",
+      "type": "multiatlas",
+      "url": "chars/char_herbalist.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_herbalist",
+      "type": "multiatlas",
+      "url": "chars/ovl_herbalist.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_herbalist",
+      "type": "animation",
+      "url": "chars/herbalist.anims.json"
+    },
+    {
+      "key": "char_gamekeeper",
+      "type": "multiatlas",
+      "url": "chars/char_gamekeeper.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_gamekeeper",
+      "type": "multiatlas",
+      "url": "chars/ovl_gamekeeper.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_gamekeeper",
+      "type": "animation",
+      "url": "chars/gamekeeper.anims.json"
+    },
+    {
+      "key": "char_lamplighter",
+      "type": "multiatlas",
+      "url": "chars/char_lamplighter.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_lamplighter",
+      "type": "multiatlas",
+      "url": "chars/ovl_lamplighter.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_lamplighter",
+      "type": "animation",
+      "url": "chars/lamplighter.anims.json"
+    },
+    {
+      "key": "char_baker",
+      "type": "multiatlas",
+      "url": "chars/char_baker.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_baker",
+      "type": "multiatlas",
+      "url": "chars/ovl_baker.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_baker",
+      "type": "animation",
+      "url": "chars/baker.anims.json"
+    },
+    {
+      "key": "char_fisher",
+      "type": "multiatlas",
+      "url": "chars/char_fisher.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_fisher",
+      "type": "multiatlas",
+      "url": "chars/ovl_fisher.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_fisher",
+      "type": "animation",
+      "url": "chars/fisher.anims.json"
+    },
+    {
+      "key": "char_tinner",
+      "type": "multiatlas",
+      "url": "chars/char_tinner.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_tinner",
+      "type": "multiatlas",
+      "url": "chars/ovl_tinner.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_tinner",
+      "type": "animation",
+      "url": "chars/tinner.anims.json"
+    },
+    {
+      "key": "portrait_detective",
+      "type": "image",
+      "url": "portraits/portrait_detective.webp"
+    },
+    {
+      "key": "portrait_doctor",
+      "type": "image",
+      "url": "portraits/portrait_doctor.webp"
+    },
+    {
+      "key": "portrait_vicar",
+      "type": "image",
+      "url": "portraits/portrait_vicar.webp"
+    },
+    {
+      "key": "portrait_watchman",
+      "type": "image",
+      "url": "portraits/portrait_watchman.webp"
+    },
+    {
+      "key": "portrait_herbalist",
+      "type": "image",
+      "url": "portraits/portrait_herbalist.webp"
+    },
+    {
+      "key": "portrait_gamekeeper",
+      "type": "image",
+      "url": "portraits/portrait_gamekeeper.webp"
+    },
+    {
+      "key": "portrait_lamplighter",
+      "type": "image",
+      "url": "portraits/portrait_lamplighter.webp"
+    },
+    {
+      "key": "portrait_baker",
+      "type": "image",
+      "url": "portraits/portrait_baker.webp"
+    },
+    {
+      "key": "portrait_fisher",
+      "type": "image",
+      "url": "portraits/portrait_fisher.webp"
+    },
+    {
+      "key": "portrait_tinner",
+      "type": "image",
+      "url": "portraits/portrait_tinner.webp"
+    },
+    {
+      "key": "portrait_killer",
+      "type": "image",
+      "url": "portraits/portrait_killer.webp"
+    },
+    {
+      "key": "portrait_accomplice",
+      "type": "image",
+      "url": "portraits/portrait_accomplice.webp"
+    },
+    {
+      "key": "portrait_drifter",
+      "type": "image",
+      "url": "portraits/portrait_drifter.webp"
     },
     {
       "key": "clues",
@@ -60,7 +315,7 @@
       "type": "multiatlas",
       "url": "vfx/vfx.json",
       "path": "vfx/",
-      "filter": "linear"
+      "filter": "nearest"
     },
     {
       "key": "anims_vfx",

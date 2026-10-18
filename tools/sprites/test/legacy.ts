@@ -12,11 +12,6 @@ export const LEGACY: readonly string[] = [
   'tiles_floorboards',
   'tiles_caverock',
   'tiles_forestfloor',
-  // L4 (5L): the real villager leaves the real manifest (placeholder only in round 5)
-  'char_villager',
-  'ovl_villager',
-  // L5 (5L): re-rendered under the same key
-  'vfx',
   // M1 (5M): leave both manifests with the loft
   'loft_backdrop',
   'prop_bedroll',

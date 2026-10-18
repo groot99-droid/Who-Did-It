@@ -95,6 +95,45 @@
    "repeat": 0
   },
   {
+   "key": "vfx_disguise",
+   "frames": [
+    {
+     "key": "vfx",
+     "frame": "vfx_disguise/000"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_disguise/001"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_disguise/002"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_disguise/003"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_disguise/004"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_disguise/005"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_disguise/006"
+    },
+    {
+     "key": "vfx",
+     "frame": "vfx_disguise/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
    "key": "vfx_dust_step",
    "frames": [
     {

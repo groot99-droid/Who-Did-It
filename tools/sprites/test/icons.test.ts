@@ -18,6 +18,11 @@ describe('UI icons (docs/SPRITES.md 9)', () => {
     expect(files.map((f) => f.slice(0, -4))).toEqual(listed);
   });
 
+  it('include the six round-5 ability icons (art plan 4.6, ruling C15)', () => {
+    const abilities = ['impersonate', 'confession', 'keepwatch', 'remedy', 'poison', 'lastshot'];
+    for (const a of abilities) expect(files, a).toContain(`icon_ability_${a}.svg`);
+  });
+
   for (const f of files) {
     it(`${f} is on the 48 px grid with 2 px ink strokes and palette colours only`, () => {
       const svg = readFileSync(join(ICONS, f), 'utf8');

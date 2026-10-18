@@ -1,25 +1,26 @@
 // Review sheet for the body on the floor (docs/SPRITES.md 8): the last frame of `die` in all 8
-// directions, one row per trait look (scarf tint and hat), plus a Bloody row, in the 256 px die cells.
+// directions, one row per scarf tint plus a Bloody row, in the die cells (2x for a finished folder).
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createCanvas } from '@napi-rs/canvas';
-import { drawTinted, load } from './contact.ts';
+import { ZOOM, cellOf, drawTinted, drawZoomed, load } from './contact.ts';
 import type { FeetManifest } from './gen-anims.ts';
-import { CLIP_CELL, DIRECTIONS, V1_CLIPS, frameFileName } from './keys.ts';
+import { DIRECTIONS, V1_CLIPS, frameFileName } from './keys.ts';
 import { PALETTE } from './placeholder.ts';
 
 const LABEL_W = 160;
 const ROWS = [
-  { label: 'red scarf, bare', tint: PALETTE.blood, hat: null, blood: false },
-  { label: 'green scarf, cap', tint: PALETTE.teal, hat: 'hat_cap', blood: false },
-  { label: 'blue scarf, bowler', tint: PALETTE.moon, hat: 'hat_bowler', blood: false },
-  { label: 'bloody, cap', tint: PALETTE.blood, hat: 'hat_cap', blood: true },
+  { label: 'red scarf', tint: PALETTE.blood, blood: false },
+  { label: 'green scarf', tint: PALETTE.teal, blood: false },
+  { label: 'blue scarf', tint: PALETTE.moon, blood: false },
+  { label: 'bloody, red scarf', tint: PALETTE.blood, blood: true },
 ] as const;
 
-export async function bodyContactSheet(dir: string): Promise<Buffer> {
-  const { body } = JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8')) as FeetManifest;
-  const cell = CLIP_CELL.die?.[0] ?? 256;
+export async function bodyContactSheet(dir: string, zoom = ZOOM): Promise<Buffer> {
+  const manifest = JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8')) as FeetManifest;
+  const body = manifest.body;
+  const cell = cellOf(manifest, 'die') * zoom;
   const last = V1_CLIPS.die.frames - 1;
   const canvas = createCanvas(LABEL_W + DIRECTIONS.length * cell, (ROWS.length + 0.25) * cell);
   const g = canvas.getContext('2d');
@@ -37,17 +38,13 @@ export async function bodyContactSheet(dir: string): Promise<Buffer> {
       const x = LABEL_W + i * cell;
       const base = await load(dir, 'body', stem);
       if (!base) throw new Error(`missing body frame ${stem}`);
-      g.drawImage(base, x, y);
+      drawZoomed(g, base, x, y, zoom);
       if (row.blood) {
         const blood = await load(dir, 'blood', stem);
-        if (blood) g.drawImage(blood, x, y);
+        if (blood) drawZoomed(g, blood, x, y, zoom);
       }
       const scarf = await load(dir, 'scarf', stem);
-      if (scarf) drawTinted(g, scarf, x, y, row.tint);
-      if (row.hat) {
-        const hat = await load(dir, row.hat, stem);
-        if (hat) g.drawImage(hat, x, y);
-      }
+      if (scarf) drawTinted(g, scarf, x, y, row.tint, zoom);
     }
   }
   return canvas.toBuffer('image/png');

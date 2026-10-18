@@ -3,20 +3,26 @@
 export const DIRECTIONS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
 export type Dir = (typeof DIRECTIONS)[number];
 
-export const PASSES = ['body', 'scarf', 'hat_cap', 'hat_bowler', 'blood'] as const;
+/** Round 5: hats are nameplate glyphs, so the hat passes are gone (art plan 4.2). */
+export const PASSES = ['body', 'scarf', 'blood'] as const;
 export type Pass = (typeof PASSES)[number];
 
-/** V1 clips: frame count and whether the anim loops (docs/SPRITES.md 3). */
+/** V1 clips: frame count and whether the anim loops (docs/SPRITES.md 3); 304 frames per pass. */
 export const V1_CLIPS = {
   idle: { frames: 8, loop: true },
   walk: { frames: 8, loop: true },
   swing: { frames: 6, loop: false },
+  interact: { frames: 8, loop: true },
   die: { frames: 8, loop: false },
 } as const;
 export type Anim = keyof typeof V1_CLIPS;
 
+/** Render cells at the display scale; the pixel finish halves them (64 px packed, feet at 56; SPRITES 10.3). */
 export const CELL_PX = 128;
 export const FEET_ROW_PX = 112;
+/** Page caps of a look (art plan 1.4): one body page and one overlay page. */
+export const CHAR_PAGE = { w: 1024, h: 1024 } as const;
+export const OVL_PAGE = { w: 1024, h: 512 } as const;
 export const FPS = 12;
 /** Clips rendered in a larger cell, as [cell px, feet row px] (tools/blender/rig_common.py CLIP_CELL). */
 export const CLIP_CELL: Partial<Record<Anim, readonly [number, number]>> = { die: [256, 128] };
@@ -136,6 +142,7 @@ export const VFX_CLIPS: Readonly<Record<string, number>> = {
   vfx_blood_splat: 12,
   vfx_vote_stamp: 10,
   vfx_dust_step: 6,
+  vfx_disguise: 8,
 };
 
 /** Every frame name a static atlas must contain, in sorted order. */

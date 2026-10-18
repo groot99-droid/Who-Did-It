@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Last Shot">
+  <title>Last Shot</title>
+  <circle cx="24" cy="22" r="15" stroke="#B3121F"/>
+  <path d="M24 3 V11 M24 33 V41 M5 22 H13 M35 22 H43" stroke="#B3121F"/>
+  <path d="M15 46 L21 46 L27 25 L22 24 Z" fill="#2C3240"/>
+  <ellipse cx="24.5" cy="24" rx="3.5" ry="2.5" fill="#6F7A8C"/>
+  <circle cx="24.5" cy="24" r="1" fill="#12141C"/>
+</svg>
