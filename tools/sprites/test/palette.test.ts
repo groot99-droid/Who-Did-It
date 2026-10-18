@@ -10,6 +10,9 @@ import { ASSETS, realPages } from './realAssets.ts';
 /** Main-mode rig renders keep the rig's colours and partial alpha while the main finish is off (S3.1). */
 const RIG_PREFIXES = ['iso_ground_', 'iso_kit_', 'bld_', 'props', 'clues', 'char_', 'ovl_', 'vfx'];
 const SATURATED_CAP = 0.1;
+/** Overlay pages are masks (the bone scarf, tinted at runtime, and the flat blood mask shown while Bloody,
+ * SPRITES 3): they keep the world colours and hard alpha, and the cap applies to the drawn `char_` pages. */
+const MASK_PREFIXES = ['ovl_'];
 
 function decode(file: string): Rgba {
   const buf = readFileSync(file);
@@ -31,7 +34,8 @@ describe('world palette on every exported image (docs/ASSETS.md 6.1, art plan 1.
       const a = audit(decode(p.file));
       expect(a.offPalette, 'pixels off the world palette').toBe(0);
       expect(a.partialAlpha, 'pixels with partial alpha').toBe(0);
-      expect(a.saturatedShare).toBeLessThanOrEqual(SATURATED_CAP);
+      if (!MASK_PREFIXES.some((x) => p.key.startsWith(x)))
+        expect(a.saturatedShare).toBeLessThanOrEqual(SATURATED_CAP);
     });
   }
 
