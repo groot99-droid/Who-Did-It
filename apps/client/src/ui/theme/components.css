@@ -1867,3 +1867,172 @@ button.wdi-map__option {
 .wdi-map__name {
   font-weight: 600;
 }
+
+/* Round 5 (5C): the quick-mode kitchen, the station rooms, the hand and the prep board (GDD 3.11). */
+.wdi-kitchen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-3);
+  padding: var(--wdi-space-4);
+  pointer-events: none;
+}
+
+.wdi-kitchen > * {
+  pointer-events: auto;
+}
+
+.wdi-kitchen__overview {
+  flex: 1;
+  min-height: 0;
+}
+
+.wdi-kitchen__grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: var(--wdi-space-3);
+  min-height: 0;
+}
+
+.wdi-kitchen__room {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  background: rgb(var(--wdi-ink-rgb) / 0.35);
+  border: 2px solid var(--wdi-hairline);
+  color: var(--wdi-text);
+  text-align: left;
+}
+
+.wdi-kitchen__room:not(:disabled):hover,
+.wdi-kitchen__room:not(:disabled):focus-visible {
+  border-color: var(--wdi-interact);
+  box-shadow: var(--wdi-glow-interact);
+}
+
+.wdi-kitchen__room:disabled {
+  opacity: 0.6;
+}
+
+.wdi-kitchen__name {
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-display-md);
+}
+
+.wdi-kitchen__gloss {
+  color: var(--wdi-text-muted);
+}
+
+.wdi-kitchen__roomslot {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.wdi-kitchen__roomslot:not([hidden]) {
+  animation: wdi-kitchen-enter var(--wdi-station-enter, 0.6s) ease-out;
+}
+
+@keyframes wdi-kitchen-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-kitchen__roomslot:not([hidden]) {
+    animation: none;
+  }
+}
+
+.wdi-station {
+  background: rgb(var(--wdi-ink-rgb) / 0.82);
+  padding: var(--wdi-space-4);
+  border: 2px solid var(--wdi-hairline);
+}
+
+.wdi-station__game {
+  min-height: 12rem;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+  user-select: none;
+}
+
+.wdi-station__game canvas {
+  max-width: 100%;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+.wdi-hand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wdi-space-3);
+}
+
+.wdi-hand__card {
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 14rem;
+  text-align: left;
+  white-space: normal;
+}
+
+.wdi-hand__card[aria-pressed='true'] {
+  outline: 3px solid var(--wdi-primary);
+}
+
+.wdi-hand__card--sabotage {
+  border-style: dashed;
+}
+
+.wdi-kitchen__board {
+  flex: 1;
+  overflow: auto;
+}
+
+.wdi-pile__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--wdi-space-3);
+}
+
+.wdi-pile {
+  display: grid;
+  gap: var(--wdi-space-2);
+  align-content: start;
+}
+
+.wdi-pile__name {
+  margin: 0;
+  font-family: var(--wdi-font-display);
+  font-size: var(--wdi-display-sm);
+}
+
+.wdi-pile__cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wdi-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wdi-pile__card--sabotage {
+  border-style: dashed;
+}
+
+.wdi-pile--compact .wdi-pile__net {
+  display: none;
+}
+
+[hidden].wdi-pile__flag,
+[hidden].wdi-pile__ruin {
+  display: none;
+}

@@ -575,20 +575,15 @@ look like: {height} / {scarf} / {hat}", "Beware:", "Your Cabal:", "Tab reopens t
 role", "Keep your screen to yourself.", "Ready - role card (Tab)". The role name, goal, card text,
 Beware line and ability names come from `roles.json` and `abilities.json`, never from this deck.
 
-### 14.12 Quick mode (T in the world and the loft, U in the meeting and the end, V on the lobby chip)
+### 14.12 Quick mode: lobby chip, deck editor, Evening Prep and the prep board (5C)
 
-Session Y, 2026-10-16. Every line a One Night Ultimate Baguette match shows (GDD 3.11, DECISIONS
-A39), in the house style above. In this section `{role}` is a role's `name` from `roles.onub.json`
-("Sin-Eater"), never from `roles.json`; `{name}` is a seat's public name; `{trace}` is a window's
-`traceText` from `balance.onub.json`. The role card's shared line is `roles.onub.json` `cardLine`,
-its goal the role's `nightAct` and its text the role's `cardText` (GDD 3.11); this deck never
-restates them. The fiction's words stay put: a **loaf** holds a **token**, a **plate** stands on the
-Wake Table, the dead's three loaves lie on the **oven ledge**, a seat is **turned out**, never
-"ejected" or "killed". No line names the seat that woke in a window, and no line seen in the dark
-tells a sleeper anything (A21, A39).
+Session 5C, 2026-10-18 (replaces the round-4 section; the night, the Rush, the claim form, the reveal and
+the end screen are 14.14, 5D). Every line Evening Prep shows (GDD 3.11, DECISIONS A49). Names come from
+content and are never restated here: station `name` and `gloss`, card `name` and `text`, role `name` and
+`gloss`. No line shows another seat during prep, and nothing here changes when someone else commits (A21, A39).
+The fiction's words stay put: a **pile**, the **thaw**, the **Mother Dough**, the **Pantry**.
 
-**Lobby chip** (V, `data-testid="mode-chip"`; the length is `targetLengthMin`, the counts
-`balance.players`, A15).
+**Lobby chip** (V, `data-testid="mode-chip"`; the length is `targetLengthMin`, the counts `balance.players`).
 
 | Id | Text | Notes |
 |---|---|---|
@@ -599,149 +594,95 @@ tells a sleeper anything (A21, A39).
 | `lobby.mode.leaderOnly` | The leader picks the mode | under the chip for everyone else |
 | `lobby.mode.onub.hint` | One night, one vote. What you hold at dawn is what you are. | under the chip in quick mode |
 
-If the game is ever sold, `lobby.mode.onub` becomes the neutral label of GDD 3.11 (A22) and no other
-line of this section changes: none of them uses the parody title.
+If the game is ever sold, `lobby.mode.onub` becomes the neutral label of GDD 3.11 (A22) and no other line uses
+the parody title.
 
-**Dusk** (T, in the bakery).
-
-| Id | Kind or key | Text | When |
-|---|---|---|---|
-| `toast.onub.dusk` | `--warm` | Set your loaf on your plate | on entering dusk in quick mode, in place of `toast.dusk` |
-| `prompt.plate.set` | E (hold) | Hold to set your loaf | the own plate (`of` is the own id) in reach; the collect ring fills over `plateHoldS` |
-| `prompt.plate.other` | – | {name}'s plate | another seat's plate in reach at dusk |
-| `toast.plate.set` | `--interact` | Your loaf is on the table | the set is accepted |
-| `phase.dawn` | – | Dawn | clock caption |
-
-**The loft** (T, `data-testid="loft"`; no HUD, no clock, no input).
+**Deck editor** (`deck-editor`; the leader toggles `deck-role-<roleId>`, `deck-reset` is leader-only,
+`deck-problem` shows the first problem of `onubDeckProblem`; `{need}` is the party size after the NPC fill plus
+`pantry.roles`).
 
 | Id | Text | Notes |
 |---|---|---|
-| `loft.caption` | The loft is dark. Lie still. | the one line on screen, top centre, `--quiet` |
-| `loft.self` | Your bedroll | `aria-label` of the own bedroll (`bedroll-<id>`) |
-| `loft.bedroll` | A bedroll | `aria-label` of every other bedroll; it never names its seat |
-| `loft.back` | Back to your bedroll | toast on `nightSleep`, as the fade starts |
+| `onub.deck.title` | Quick-mode deck |  |
+| `onub.deck.hint` | Pick the roles in play. The deck holds the party size plus {pantry} cards for the Pantry. |  |
+| `onub.deck.count` | {n} cards, {need} needed |  |
+| `onub.deck.reset` | Default deck |  |
+| `onub.deck.copies` | x{n} |  |
+| `onub.deck.problem.unknownRole` | The deck names a role that does not exist. | problem id `unknownRole` |
+| `onub.deck.problem.notShipped` | The deck holds a role that is not in this version. | `notShipped` |
+| `onub.deck.problem.copies` | A role appears too many or too few times. | `copies` |
+| `onub.deck.problem.missingRequired` | The deck needs at least one Mold Spore. | `missingRequired` |
+| `onub.deck.problem.size` | The deck needs {need} cards for this party; it has {n}. | `size` |
 
-**The window banner** (T, `data-testid="night-wake"`, from `nightWake` until `nightSleep`). The banner
-names the dealt role that woke, which the waker already knows; the HUD timer runs from `endsTick`.
-
-| Id | Text | Notes |
-|---|---|---|
-| `night.wake` | You wake as the {role} | banner title; `{role}` is the window's role |
-| `night.wake.mates` | Your partner's nameplate glows red | Poisoner window with `mates()` in the bakery |
-| `night.wake.alone` | You woke alone. You may peek at one dead loaf. | Poisoner window with nobody else awake |
-| `night.wake.done` | Done. Wait for the lamp to dim. | once the window's acts are spent |
-
-**Act prompts** (T, keyed by the act id of `balance.onub.json` `acts`; the hold is the act's
-`holdS`). A `picks: 2` act shows its first line until the first pick, then its second.
-
-| Id | Key | Text | Target |
-|---|---|---|---|
-| `prompt.act.peekDead` | E (hold) | Hold to peek at this loaf | a dead loaf; the Poisoner alone, or the Sin-Eater's first pick |
-| `prompt.act.peekDead.second` | E (hold) | Hold to taste a second dead loaf | the Sin-Eater's second pick |
-| `prompt.act.readLedger` | E (hold) | Hold to read the ledger | `bk.ledger` |
-| `prompt.act.peekPlate` | E (hold) | Hold to taste {name}'s loaf | another seat's plate |
-| `prompt.act.take` | E (hold) | Hold to take {name}'s loaf | another seat's plate |
-| `prompt.act.swapPlates` | E (hold) | Hold to pick {name}'s loaf | the Busybody's first plate |
-| `prompt.act.swapPlates.second` | E (hold) | Hold to swap it with {name}'s loaf | the second plate; never the first |
-| `prompt.act.swapDead` | E (hold) | Hold to take this loaf for your own | a dead loaf |
-| `prompt.act.check` | E (hold) | Hold to crack your own loaf | the own plate |
-| `prompt.act.own` | – | Your own plate | the own plate when the act wants another's (`otherPlate`) |
-| `refuse.onub` | 422 on an `onub.*` act | Not that loaf | a wrong target or an act already spent; one line for both, so it says nothing more |
-
-**Night reveal lines** (T, a toast and a HUD line per `nightReveal` entry until the window ends).
-
-| Id | Text | Entry |
-|---|---|---|
-| `night.reveal.plate` | {name}'s loaf: {role} | `of` is another seat |
-| `night.reveal.own` | Your loaf: {role} | `of` is the own seat (the Cutpurse's new token, the Lamplighter) |
-| `night.reveal.dead` | A dead loaf: {role} | `of` is empty |
-| `night.reveal.ledger` | The ledger names {name} | an `onub.readLedger` entry; `{name}` is the Poisoner it names |
-| `night.reveal.ledgerEmpty` | The ledger names nobody at the table | `onub.readLedger` accepted with no entry |
-| `night.swapped` | Done. You did not look. | `onub.swapPlates` accepted (it shows nothing) |
-| `night.swappedDead` | Done. You will not remember which. | `onub.swapDead` accepted |
-
-**The dawn meeting** (U; 14.6 holds everywhere this table is silent).
+**Kitchen** (`kitchen`, `onub-clock`, `station-<stationId>`, `station-room`, `station-back`).
 
 | Id | Text | Notes |
 |---|---|---|
-| `meeting.reason.dawn` | Dawn at the Wake Table | `meeting-reason` for reason `dawn` |
-| `meeting.traces.title` | What the night left | heading over the trace lines on the report tab; each line is a `{trace}` |
-| `meeting.traces.note` | Marks like these turn up every night | caption under the lines; the traces are cosmetic in V1 (A39) |
-| `meeting.vote.hint.onub` | Tap a portrait to turn them out | living players, in place of `meeting.vote.hint`; there is no Skip |
-| `meeting.vote.self` | You cannot vote for yourself | a tap on the self tile |
-| `meeting.vote.abstain` | You may hold your vote. The reveal names who did. | under the hint until a vote is cast |
-| `meeting.vote.mine.onub` | Your vote: {name} | as `meeting.vote.mine`; there is no Skip line |
+| `onub.kitchen.title` | Evening Prep |  |
+| `onub.kitchen.caption` | Pick a station. Play its game, then play one card. |  |
+| `onub.kitchen.clock` | {s} s |  |
+| `onub.kitchen.clock.label` | Time left in the kitchen |  |
+| `onub.kitchen.room.label` | {station}, {gloss} |  |
+| `onub.station.back` | Back to the kitchen |  |
+| `onub.station.room` | In {station} |  |
 
-**Claims** (U, the chip strip in the chat panel, `.wdi-chip--claim`, `data-testid="claim-<roleId>"`;
-each chip's label is the role's `name`). A claim posts one chat line and sets the portrait's chip; a
-second claim replaces the first.
-
-| Id | Text | Notes |
-|---|---|---|
-| `meeting.claim.title` | Claim a role | label over the strip |
-| `meeting.claim.pickSeat` | Whose loaf? | the second step for a role whose act names a target |
-| `meeting.claim.pickDead` | A dead loaf | the option beside the seats when the claimed role may touch the dead's loaves (Sin-Eater, Poisoner) |
-| `meeting.claim.pickSaw` | What was in it? | the third step for a role whose act shows a token; the choices are role names |
-| `meeting.claim.skipStep` | Leave it out | skips the step |
-| `meeting.claim.post` | Claim | the button that sends `meeting.claim` |
-| `meeting.claim.line` | I was the {role} | no target, no seen role |
-| `meeting.claim.line.target` | I was the {role}. I went to {name}'s plate. | a target, no seen role |
-| `meeting.claim.line.saw` | I was the {role}: {name}'s loaf was {saw} | the GDD 3.11 example; `{saw}` is the seen role's `name` |
-| `meeting.claim.line.own` | I was the {role}: my loaf was {saw} | the target is the claimant's own seat (Lamplighter) |
-| `meeting.claim.line.dead` | I was the {role}: a dead loaf was {saw} | seen role, no target |
-| `meeting.chip.claimed` | Claimed: {role} | under the portrait, `--quiet` |
-
-**Reveal** (U; several seats can be turned out at once).
+**Mini-games** (`minigame-<stationId>`, `minigame-assist` after `timers.minigameAssistS`; the result never
+reaches the wire).
 
 | Id | Text | Notes |
 |---|---|---|
-| `reveal.outs.one` | {name} is turned out | the stamp lands; `stamp` plays |
-| `reveal.outs.many` | {names} are turned out | `{names}` joined with commas and "and", as `meeting.dead.many` |
-| `reveal.outs.tie` | A tie at the top. Everyone on it goes. | above the outs line when more than one seat is out |
-| `reveal.outs.role` | {name} held the {role} | one line per seat out; the final role (`voteResult.roles`) |
-| `reveal.none.few` | Nobody has enough votes. Nobody is turned out. | the top count is below `minVotesToTurnOut` |
-| `reveal.none.empty.onub` | No votes. Nobody is turned out. | nobody voted |
-| `reveal.abstained` | {names} did not vote | `voteResult.abstained`, every name; hidden when empty |
-| `reveal.crack` | Every plate cracks open | caption as the reveal ends; `loaf_crack` plays |
+| `onub.mini.crates.hint` | Drag {steps} crates onto the cart, then stop the needle inside the cold band. |  |
+| `onub.mini.crates.dial` | Stop the needle |  |
+| `onub.mini.crates.load` | Load a crate |  |
+| `onub.mini.crates.stop` | Stop |  |
+| `onub.mini.pour.hint` | Hold to pour. Let go with the level inside the line. |  |
+| `onub.mini.pour.flour` | Flour |  |
+| `onub.mini.pour.water` | Water |  |
+| `onub.mini.pour.spilled` | Too much. The bowl is empty again. |  |
+| `onub.mini.pour.hold` | Hold to pour |  |
+| `onub.mini.slide.hint` | Slide {steps} bannetons into the glowing slots. |  |
+| `onub.mini.slide.next` | Slide in the next banneton |  |
+| `onub.mini.stoke.hint` | Tap to feed the fire. Hold the needle in the band for {holdS} s. |  |
+| `onub.mini.stoke.tap` | Feed oak |  |
+| `onub.mini.stoke.progress` | {s} s held |  |
+| `onub.mini.done` | Done. Choose a card. |  |
+| `onub.mini.assist` | Done |  |
+| `onub.mini.assist.hint` | Stuck? Skip the game. |  |
 
-**Game over** (U, with `gameOver.onub`; 14.10 holds where this table is silent). The headline is the
-`rowId`'s line; `summary` (the winners row's `text`) stands under it as today's `over.why.*` does.
+**Hand and commit** (`hand`, `card-<cardId>`, `prep-commit`, `prep-done`).
 
 | Id | Text | Notes |
 |---|---|---|
-| `over.onub.debtorAndVillage` | The Debtor and the village win | `gameover-winner` |
-| `over.onub.debtorAlone` | The Debtor wins alone | |
-| `over.onub.poisonerOut` | The village wins | |
-| `over.onub.cabalSurvives` | The Poisoners win | the Hireling wins with them |
-| `over.onub.cleanTable` | The village wins | |
-| `over.onub.storm` | {name} wins with the Hireling loaf | `storm` with a winner in `winnerIds` |
-| `over.onub.stormNobody` | The storm wins | `storm` with no winner |
-| `over.onub.roles` | Who held what | header of the seat rows |
-| `over.onub.row` | {name}: dealt {dealt}, woke {final} | `gameover-role-<id>` and `gameover-final-<id>` |
-| `over.onub.row.same` | {name}: {final} all night | dealt and final are the same role |
-| `over.onub.center` | The dead's loaves | header over the three `center` role names |
-| `over.onub.out` | Turned out | `--hazard` chip on a seat in `outs` |
-| `over.onub.votes` | The votes | header of the vote lines |
-| `over.onub.vote` | {voter} voted for {name} | one line per `votes` entry |
-| `over.onub.abstained` | {name} did not vote | a seat absent from `votes` |
+| `onub.hand.title` | Your hand |  |
+| `onub.hand.hint` | Play one card into the pile. It cannot be taken back. |  |
+| `onub.hand.sabotage` | Sabotage |  |
+| `onub.hand.good` | Good |  |
+| `onub.prep.commit` | Play this card |  |
+| `onub.prep.pick` | Pick a card |  |
+| `onub.prep.done` | Your card is in the pile. |  |
+| `onub.prep.wait` | Waiting for the kitchen to close. |  |
+| `onub.prep.auto` | The kitchen chose for you. | the server committed at the timeout |
+| `onub.prep.yours` | You worked {station} and played {card}. |  |
+| `onub.refuse.prep` | That card cannot be played here. | a 422 on `onub.prep` (the commit went unanswered) |
 
-**Swap log** (U, `data-testid="swaplog"`, one line per `swapLog` entry in `order`). A slot is a prop
-id: a plate resolves through `onub.plates` to `over.swap.slot.plate`, a dead loaf to
-`over.swap.slot.dead`. `{role}` is the entry's `roleId` (the dealt role that acted); the end screen
-already shows every dealt role, so naming it here leaks nothing.
+**The crime scenes** (`prep-board`, `pile-<stationId>`, `ruin-banner`, `under-mix-flag`, `perk-card`; 5D reuses
+these through `renderPiles` on the Rush board).
 
-| Id | Text | Entry |
+| Id | Text | Notes |
 |---|---|---|
-| `over.swap.title` | The night, in order | header |
-| `over.swap.slot.plate` | {name}'s loaf | |
-| `over.swap.slot.dead` | a dead loaf | |
-| `over.swap.take` | The {role} took {slot} | `onub.take`; `{slot}` is the slot that is not the actor's own plate |
-| `over.swap.swapPlates` | The {role} swapped {a} and {b} | `onub.swapPlates`, the slots in order |
-| `over.swap.swapDead` | The {role} traded their loaf for {slot} | `onub.swapDead`; `{slot}` is the dead loaf |
-| `over.swap.none` | Nobody moved a loaf | an empty swap log |
-
-So a whole log reads "The Cutpurse took Hana's loaf", "The Busybody swapped Wilf's loaf and Hana's
-loaf", "The Sot traded their loaf for a dead loaf".
+| `onub.board.pile` | {station} |  |
+| `onub.board.empty` | Nobody came here. |  |
+| `onub.board.lost` | {count} card lost to the thaw |  |
+| `onub.board.lost.many` | {count} cards lost to the thaw |  |
+| `onub.board.net` | Sabotage weight {net} |  |
+| `onub.board.underMix` | Under-mixed: one card is not a dough. |  |
+| `onub.board.ruin` | The Mother Dough is ruined. |  |
+| `onub.board.ruin.weight` | Ruin weight {n} |  |
+| `onub.board.ok` | The Mother Dough holds, for now. |  |
+| `onub.board.perk` | Someone proofed in peace and peeked at the Pantry. |  |
+| `onub.board.perk.card` | The Pantry showed you {station}. | `perk-card`, a proofing visitor only |
+| `onub.board.card.sabotage` | Sabotage | screen-reader suffix on a sabotage card, public by design after prep |
+| `onub.board.card.good` | Good |  |
 
 ### 14.13 NPC lobby (V)
 
