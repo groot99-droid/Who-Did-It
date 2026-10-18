@@ -63,6 +63,8 @@ export async function startNightMatch(colyseus: ColyseusTestServer, t: NightTabl
   seats.forEach((id, i) => {
     const priv = room.state.players.get(id)?.priv;
     if (!priv) throw new Error('no private view');
+    const player = room.state.players.get(id);
+    if (player) player.alive = true;
     priv.role.roleId = t.roles[i] as string;
     priv.onubLoc = t.locs[i] as string;
     priv.onubCard = 'pureDairy';
