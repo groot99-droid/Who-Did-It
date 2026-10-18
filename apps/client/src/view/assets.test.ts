@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { type ManifestEntry, loadsAtBoot, loadsWithMatch } from './manifestRules';
+import { readFileSync } from 'node:fs';
+import { type ManifestEntry, QUICK_MATCH_MAP, loadsAtBoot, loadsWithMatch } from './manifestRules';
 
 const e = (extra: Partial<ManifestEntry>): ManifestEntry => ({
   key: 'k',
@@ -24,5 +25,19 @@ describe('manifest map and mode fields (SPRITES 5, 10.13)', () => {
   });
   it('does not load a boot entry again with the match', () => {
     expect(loadsWithMatch(e({}), 'hollowmere', 'main')).toBe(false);
+  });
+});
+
+describe('quick-mode match art (SPRITES 10.13)', () => {
+  it('loads the onub entries and no map entry, since the quick mode walks no map', () => {
+    expect(loadsWithMatch(e({ modes: ['onub'] }), QUICK_MATCH_MAP, 'onub')).toBe(true);
+    expect(loadsWithMatch(e({ modes: ['main'] }), QUICK_MATCH_MAP, 'onub')).toBe(false);
+    expect(loadsWithMatch(e({ maps: ['hollowmere'] }), QUICK_MATCH_MAP, 'onub')).toBe(false);
+    expect(loadsWithMatch(e({}), QUICK_MATCH_MAP, 'onub')).toBe(false);
+  });
+
+  it('is queued by the Kitchen, the first quick-mode scene after the role card', () => {
+    const kitchen = readFileSync(new URL('../scenes/Kitchen.ts', import.meta.url), 'utf8');
+    expect(kitchen).toContain("queueMatchEntries(this.load, this, manifest, QUICK_MATCH_MAP, 'onub')");
   });
 });

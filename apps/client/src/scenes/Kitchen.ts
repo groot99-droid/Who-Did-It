@@ -2,7 +2,9 @@ import Phaser from 'phaser';
 import palette from '@wdi/content/data/palette.json';
 import { type OnubFeed, REG_ONUB } from '../net/onub';
 import { overlayRoot } from '../ui/dom';
+import { QUICK_MATCH_MAP, applyFilters, peekManifest, queueMatchEntries } from '../view/assets';
 import { mountPrep, type PrepScreen } from '../view/onub/PrepView';
+import { getFlags } from './registry';
 
 const colorOf = (hex: string) => Number.parseInt(hex.slice(1), 16);
 const KITCHEN_KEY = 'onub_kitchen';
@@ -20,12 +22,20 @@ export class Kitchen extends Phaser.Scene {
     super('Kitchen');
   }
 
+  preload(): void {
+    // The quick match's art (SPRITES 10.13): the entries listing `onub` that are not loaded yet, and no map's.
+    const manifest = peekManifest(getFlags(this).art, import.meta.env.BASE_URL);
+    if (manifest) queueMatchEntries(this.load, this, manifest, QUICK_MATCH_MAP, 'onub');
+  }
+
   create(): void {
     const feed = this.registry.get(REG_ONUB) as OnubFeed | undefined;
     if (feed === undefined) {
       this.scene.stop();
       return;
     }
+    const manifest = peekManifest(getFlags(this).art, import.meta.env.BASE_URL);
+    if (manifest) applyFilters(this.textures, manifest);
     const { width, height } = this.scale;
     this.cameras.main.setBackgroundColor(palette.colors.ink);
     if (this.textures.exists(KITCHEN_KEY)) {

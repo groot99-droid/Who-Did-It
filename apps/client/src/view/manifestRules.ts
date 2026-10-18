@@ -19,3 +19,6 @@ export const loadsAtBoot = (e: ManifestEntry): boolean => e.maps === undefined &
 /** Whether an entry loads with this match: its map or its mode is listed. */
 export const loadsWithMatch = (e: ManifestEntry, mapId: string, mode: 'main' | 'onub'): boolean =>
   (e.maps?.includes(mapId) ?? false) || (e.modes?.includes(mode) ?? false);
+
+/** The map id a quick match loads art for: none, as the quick mode walks no map (GDD 3.11), so only `modes` entries. */
+export const QUICK_MATCH_MAP = '';

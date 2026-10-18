@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { type ManifestEntry, loadsAtBoot, loadsWithMatch } from './manifestRules';
 
-export { type ManifestEntry, loadsAtBoot, loadsWithMatch } from './manifestRules';
+export { type ManifestEntry, QUICK_MATCH_MAP, loadsAtBoot, loadsWithMatch } from './manifestRules';
 
 // Loads the asset manifest of docs/SPRITES.md 5 by key. Code never names a texture path: it asks for
 // `char_villager`, `ovl_villager`, `tiles_cobble` and the manifest says where those live.
