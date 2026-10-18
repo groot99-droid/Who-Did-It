@@ -20,6 +20,10 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `palette.ts` | Reads `packages/content/data/palette.json` and `style.json` directly (no `@wdi/content` dependency): `WORLD` (the 64 world-palette colours, file order), `worldPalette`, `nearestIndex` (cached, ties to the darker), `DARK_RANK`, `SATURATED`, `finishEnabled` (`style.json` `pixelFinish.enabled`), `outlineRgb` |
 | `pixel.ts` | The pixel finish of `ASSETS.md` 6.11: alpha cut, snap to the world palette in OKLab, 2 x 2 mode halve (ties to the darkest), box resize, `finishRender` / `finishDisplay` (both follow the main-mode switch), `cleanCutout`, `outline`, `finishIllustration` (always finished), lossless WebP, `audit`; the CLI finishes a render folder and halves its manifest's `cell`, `feet` and `pivot` |
 | `refs.ts` | Writes every `style.json` `references` entry, cropped, to `build/refs/<composition>-<index>-<stem>.png` (the Higgsfield `image_references` inputs) |
+| `onub.ts` | The ONUB images (`SPRITES.md` 11): the batch prompts and references (`prompts`), the proofing mask (`mask`), every room, the kitchen, cloche and portraits, then the cards and atlas and the real manifest's ONUB block (`build`), and the review sheets (`review`) |
+| `onub-cards.ts` | The code-drawn card template (frame, window, blank band, Sabotage mark), the Ingredient and Location faces and both backs |
+| `onub-mini.ts` | The `onub_mini` frames (generated objects, code-drawn dials, needle, fills, streams, glow, the fire loop) and their one-page shelf pack |
+| `onub-fixes.json`, `batches/5M.json` | The room crop, label fills, proofing mask and card boxes; every 5M generation with its prompt fields, jobs and pick |
 | `test/pack.test.ts` | Synthetic frame set: trim and source sizes, determinism, detectIdentical, pivots, anim keys |
 | `test/pack-static.test.ts` | Static keys against the placeholder clues, props pivots, centred clues, determinism, vfx anims, refusal of a wrong key set |
 | `test/images.test.ts` | Image sizes, determinism and the tileset join |
@@ -27,6 +31,7 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `test/legacy.ts`, `test/legacy.test.ts` | The `LEGACY` allowlist (art plan 1.7): real-manifest keys whose art predates the round-5 style, skipped by the palette and budget tests; each key listed once and still in the real manifest |
 | `test/pixel.test.ts` | Snap, mode halve with the darkest tie, box resize, alpha cut, both settings of the switch, cutout key, spill and outline, lossless WebP, manifest halving, determinism |
 | `test/refs.test.ts` | Every reference file exists, every crop lies inside its image, output names are unique |
+| `test/onub.test.ts` | ONUB keys in both manifests with `modes`, file sizes, palette, the 2.5 MB cap, the atlas frames, the card band, the batch file |
 | `test/bleed.test.ts` | PNG round trip, one and two bleed rings, determinism |
 
 ```sh

@@ -25,8 +25,4 @@ export const LEGACY: readonly string[] = [
   'ovl_villager',
   // L5 (5L): re-rendered under the same key
   'vfx',
-  // M1 (5M): leave both manifests with the loft
-  'loft_backdrop',
-  'prop_bedroll',
-  'prop_bedroll_self',
 ];
