@@ -80,19 +80,23 @@ test('walking to the tavern door and pressing E enters the bar, and back out aga
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   const fps = page.getByTestId('hud-fps');
-  // From the first square spawn one tile west (the spawn column is walled in lower down), then south to
-  // the lane in front of the tavern door until the prompt offers it.
+  // The tavern's front door is on its south wall (Session 5J moved it). From the first square spawn one tile west
+  // (the spawn column is walled in lower down by the tavern), south past the tavern to the village's south wall,
+  // then north-east (screen right) until the tavern's south wall stops the climb and the walk slides east along
+  // the lane in front of the door until the prompt offers it.
   await hold(page, WORLD_KEYS.west, 250);
-  await walkUntilPrompt(page, ['Space', ...WORLD_KEYS.south], 'Enter');
+  await hold(page, ['Space', ...WORLD_KEYS.south], 6000);
+  await walkUntilPrompt(page, ['KeyD'], 'Enter');
   await page.waitForTimeout(250);
   await page.screenshot({ path: info.outputPath('at-door.png') });
   await page.keyboard.press('KeyE');
   await expect(fps).toContainText('tavern_bar', { timeout: 5000 });
   await page.waitForTimeout(800);
   await page.screenshot({ path: info.outputPath('in-bar.png') });
-  // Arrives beside tb.front on the west wall; the door is one step west, so walk into it and use it.
+  // Arrives beside tb.front on the south wall (Session 5J moved it); the door is one step south, so walk into it
+  // and use it.
   await page.waitForTimeout(700);
-  await walkUntilPrompt(page, WORLD_KEYS.west, 'Enter');
+  await walkUntilPrompt(page, WORLD_KEYS.south, 'Enter');
   await page.keyboard.press('KeyE');
   await expect(fps).toContainText('overworld', { timeout: 5000 });
   expect(errors).toEqual([]);

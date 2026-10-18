@@ -29,7 +29,7 @@ import { Lighting } from '../view/Lighting';
 import { darknessOf, sceneLights } from '../view/lightMath';
 import { NotebookSheet } from '../view/NotebookPanel';
 import { GroundView } from '../view/GroundView';
-import { bellSpot, propObjects } from '../view/PropView';
+import { bellSpot } from '../view/PropView';
 import { StaticView } from '../view/StaticView';
 import { applyFilters, peekManifest, queueMatchEntries, sceneMapKey, sceneMapUrl } from '../view/assets';
 import { dayPartOf, isLit } from '../view/dayPart';
@@ -616,7 +616,7 @@ export class World extends Phaser.Scene {
     const key = sceneMapKey(this.sceneId);
     this.map = readSceneMap(this.cache.tilemap.get(key).data as TiledMap);
     this.portals = this.map.portals;
-    this.bell = bellSpot(propObjects(this.map, this.sceneId));
+    this.bell = bellSpot(this.map.props);
     this.ground = new GroundView(this, key, this.map);
     applyFilters(
       this.textures,

@@ -844,7 +844,7 @@ door) but still takes the boarded overlay `portal_boarded_<face>` when closed.
 - It creates the three tile layers with `map.createLayer(name, tileset, -64, 0)`, an offset of
   -`ISO_TILE_W`/2: Phaser places an isometric tile's image at its left edge, and the projection puts the top vertex
   at x.
-- It builds every object group from the tilemap alone, so `PropView` stops importing scene JSON. Until the isometric files merge, an orthogonal file has no `props` group, so `propObjects` falls back to the old overworld stand-ins; the closed-profile gate fence is not drawn yet (DECISIONS A60).
+- It builds every object group from the tilemap alone, so `PropView` stops importing scene JSON. Every scene's isometric file carries its `props` group, so the old overworld stand-ins (`propObjects`) went at the round-5 integration; the closed-profile gate fence is not drawn yet (DECISIONS A60).
 - Phaser 4's GPU tile layer is orthographic-only, so the standard tile layer stays (RESEARCH.md).
 
 **Exporter checks.**
