@@ -283,14 +283,14 @@ def gloves(b: Builder, spec: dict) -> None:
 
 @piece
 def toque(b: Builder, spec: dict) -> None:
-    """A tall pleated toque: a band and a puffed crown 0.055 m above the head; with the crown's depth it tops
+    """A tall pleated toque: a band and a puffed crown 0.04 m above the head; with the crown's depth it tops
     out just under the 112 px silhouette cap (SPRITES 10.3)."""
     white = ("bone", 2)
     b.part("ToqueBand", "body", white, "head", [
         (cylinder, dict(z0=H1 - 0.07, z1=H1 + 0.02, r0=0.128, r1=0.13, segments=10)),
     ], bevel=0.006)
     b.part("ToqueCrown", "body", ("bone", 3), "head", [
-        (cylinder, dict(z0=H1 + 0.01, z1=H1 + 0.055, r0=0.13, r1=0.14, segments=10)),
+        (cylinder, dict(z0=H1 + 0.01, z1=H1 + 0.04, r0=0.13, r1=0.14, segments=10)),
     ], bevel=0.02)
 
 
