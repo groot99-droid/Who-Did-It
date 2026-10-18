@@ -6,6 +6,17 @@ import { PROP_KEYS } from './keys.ts';
 import { atlasJson, packFrames, type PackInput } from './pack.ts';
 import { packStatic, type StaticManifest } from './pack-static.ts';
 import {
+  CELL_H,
+  CELL_W,
+  COLUMNS,
+  GROUND_ROWS,
+  GROUND_THEMES,
+  SHEET_H,
+  SHEET_W,
+  cellUv,
+  underFringe,
+} from './tileset.ts';
+import {
   FONT,
   PALETTE,
   inFolder,
@@ -14,6 +25,7 @@ import {
   registerFont,
   seedOf,
   shape,
+  type ManifestEntry,
   type PlaceholderEntry,
   type Token,
 } from './placeholder-kit.ts';
@@ -130,6 +142,70 @@ export function tilesetImage(biome: string): Buffer {
     }
     g.restore();
   }
+  return c.toBuffer('image/png');
+}
+
+// ---------------------------------------------------------------- isometric ground (art plan 3.2)
+
+/** The map each ground theme belongs to (maps/<id>.json `theme`). */
+export const GROUND_MAPS: Record<(typeof GROUND_THEMES)[number], string> = {
+  harbour: 'hollowmere',
+  timber: 'blackpine',
+};
+
+/** Greybox colour of each ground material (GROUND_ROWS order), and a mark colour for its variants. */
+const GROUND_GREY: Record<string, [Token, Token]> = {
+  g: ['slate', 'teal'],
+  l: ['slate', 'mustard'],
+  m: ['slate', 'teal'],
+  p: ['fog', 'slate'],
+  d: ['ink', 'slate'],
+  c: ['fog', 'bone'],
+  f: ['fog', 'ink'],
+  w: ['fog', 'mustard'],
+  r: ['ink', 'fog'],
+  s: ['fog', 'moon'],
+  '~': ['moon', 'bone'],
+  u: ['slate', 'mustard'],
+  '=': ['ink', 'bone'],
+  O: ['ink', 'moon'],
+};
+
+/**
+ * The greybox ground tileset (SPRITES 10.12 layout): flat diamonds in the material's grey, variant v
+ * marked with v + 1 dots, and each edge overlay drawn under the real overlay's fringe (`underFringe`).
+ */
+export function groundTilesetImage(theme: string): Buffer {
+  const c = createCanvas(SHEET_W, SHEET_H);
+  const g = c.getContext('2d');
+  const img = g.createImageData(SHEET_W, SHEET_H);
+  const rnd = mulberry32(seedOf(`ground:${theme}`));
+  [...GROUND_ROWS].forEach((char, m) => {
+    const [base, mark] = GROUND_GREY[char]!;
+    const rgb = (t: Token) => [1, 3, 5].map((i) => parseInt(PALETTE[t].slice(i, i + 2), 16));
+    const fill = rgb(base);
+    for (let cell = 0; cell < 19; cell++) {
+      const ox = (cell % COLUMNS) * CELL_W;
+      const oy = (2 * m + Math.floor(cell / COLUMNS)) * CELL_H;
+      for (let y = 0; y < CELL_H; y++) {
+        for (let x = 0; x < CELL_W; x++) {
+          const [u, v] = cellUv(x, y, CELL_W, CELL_H);
+          if (u < 0 || u > 1 || v < 0 || v > 1) continue;
+          if (cell > 3 && !underFringe(cell - 3, u, v)) continue;
+          img.data.set([...fill, 255], ((oy + y) * SHEET_W + ox + x) * 4);
+        }
+      }
+      if (cell < 4) {
+        const dot = rgb(mark);
+        for (let k = 0; k <= cell; k++) {
+          const dx = 52 + k * 8 + Math.floor(rnd() * 2);
+          for (let y = 30; y < 34; y++)
+            for (let x = dx; x < dx + 4; x++) img.data.set([...dot, 255], ((oy + y) * SHEET_W + ox + x) * 4);
+        }
+      }
+    }
+  });
+  g.putImageData(img, 0, 0);
   return c.toBuffer('image/png');
 }
 
@@ -336,6 +412,23 @@ export function placeholderEntries(): PlaceholderEntry[] {
         order: 60,
         entries: [{ key, type: 'image', url: `buildings/${key}.png`, filter: 'linear', origin: [0.5, 1] }],
         files: () => new Map([[`buildings/${key}.png`, buildingImage(b)]]),
+      };
+    }),
+    ...GROUND_THEMES.map((theme): PlaceholderEntry => {
+      const key = `iso_ground_${theme}`;
+      return {
+        order: 65,
+        // `maps` (SPRITES 10.13) is not in the core's ManifestEntry yet; the cast keeps the row as written.
+        entries: [
+          {
+            key,
+            type: 'image',
+            url: `ground/${key}.png`,
+            filter: 'nearest',
+            maps: [GROUND_MAPS[theme]],
+          } as ManifestEntry,
+        ],
+        files: () => new Map([[`ground/${key}.png`, groundTilesetImage(theme)]]),
       };
     }),
     ...Object.keys(TILESETS).map((biome): PlaceholderEntry => {

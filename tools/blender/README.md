@@ -10,11 +10,14 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 | `build_rig.py` | Builds the rig: `SpriteCam` (ortho, X 40°, Z 0°, 64 px/m), `TileCam` (straight down, one 64 px tile per metre), turntable `TT`, camera-parented key sun and area fill, slate world at 0.15, the `WDI_Toon` node group, `OutlineInk`, the `Outline` Solidify preset, a 1 m checker cube with a facing marker, a 4 m grid plane with 1 m lines, a hidden 1.7 m `FallenProxy` for the `die` cell check, a `Feet` empty, EEVEE settings |
 | `batch_render.py` | `--smoke` calibration sheet (8 cube views, the ground tile, one 256 px `die` frame), or character passes with the per-frame `Feet` manifest |
 | `build_villager.py` | Builds the V1 `villager` body from code: a 1,388-triangle block-out of chamfered boxes, 3 heads tall, with the overlay parts, an 8-bone armature and the four V1 actions; writes the `.blend` (and optionally the source GLB) to `assets/external/villager/`, never into git |
-| `static_common.py` | Shared helpers for the static sheets: the rig with calibration hidden, `SpriteCam` / `TileCam` framing, palette materials, shape helpers, and the per-atlas `manifest.json` (`file`, `cell`, `pivot`) |
+| `static_common.py` | Shared helpers for the static sheets: the rig with calibration hidden, `SpriteCam` / `TileCam` framing, palette materials, shape helpers, the per-atlas `manifest.json` (`file`, `cell`, `pivot`); since round 5 also `IsoCam` (`iso_frame`, `iso_px`; built here until 5L's rig carries it), the 0.75 environment root and world-palette toon, flat and textured materials |
 | `build_props.py` | Models the square props (`prop_*`) and the 21 clue keys from code and renders them (`docs/SPRITES.md` 8) |
 | `bakery_props.py` | Models the seven bakery props of the quick mode (`prop_wakeTable`, `prop_plate`, `prop_deadLoaf`, `prop_ledger`, `prop_oven`, `prop_basin`, `prop_flour_sacks`), each with its own cell; `build_props.py` renders them into the `props` sheet |
 | `build_loft.py` | Renders the dark-loft images `loft_backdrop` (1280 x 720) and `prop_bedroll` / `prop_bedroll_self` (112 x 184) through a non-square `SpriteCam` framing |
 | `build_buildings.py` | Renders the four Small-profile exteriors (`bld_<id>_ext`) with the image's bottom middle on the front wall's base |
+| `build_ground.py` | Renders the isometric ground cells (art plan 3.2): each of the 14 materials of both themes in four variants, one metre under IsoCam at 128 x 64 display px, from a Poly Haven texture pulled towards its world-palette colour and a seeded scatter; the variants blend to one shared mapping at the tile edge, so all four tile with each other. `tools/sprites/tileset.ts` joins them |
+| `kit_import.py` | Imports a CC0 kit mesh (GLB, glTF, FBX, OBJ), joins it, tags it (`wdi_part`) and re-materials it through `WDI_Toon` in the world palette |
+| `env/kits.py` | The CC0 packs and textures of the world art (Kenney URLs, the Poly Haven ids per theme and material) and their fetch into git-ignored `assets/external/kits/`, saving the licence files; pure Python |
 | `build_tiles.py` | Renders four seamless 64 px straight-down variants of each of the six ground sets (`tiles_<biome>_<v>`) |
 | `save_masters.py` | Saves `bakery_props.blend` and `loft.blend` into git-ignored `assets/external/` as the masters for the ROSW checkout |
 | `build_vfx.py` | Animates the four M3 VFX frame by frame at 12 fps (`vfx_blood_pool`, `vfx_blood_splat`, `vfx_vote_stamp`, `vfx_dust_step`) |
@@ -55,8 +58,13 @@ done
 # Loft images, building exteriors and tilesets (minutes on llvmpipe), then finish them (tools/sprites)
 python tools/blender/build_loft.py -- --out build/render        # build/render/loft/
 python tools/blender/build_buildings.py -- --out build/render   # build/render/buildings/
-python tools/blender/build_tiles.py -- --out build/render       # build/render/tiles/
+python tools/blender/build_tiles.py -- --out build/render       # build/render/tiles/ (until K6)
 pnpm --filter @wdi/sprites images ../../build/render ../../apps/client/public/assets
+
+# World art (round 5): fetch the CC0 packs once, then the isometric ground tilesets
+python3 tools/blender/env/kits.py --out assets/external/kits --licences LICENSES/vendors
+python tools/blender/build_ground.py -- --out build/render   # build/render/ground/<theme>/
+pnpm --filter @wdi/sprites tileset ../../build/render/ground ../../apps/client/public/assets/ground
 
 # The bakery and loft masters (git-ignored; copy to the ROSW checkout, assets/source/MANIFEST.md)
 python tools/blender/save_masters.py -- --out assets/external

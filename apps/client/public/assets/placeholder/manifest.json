@@ -106,6 +106,24 @@
       ]
     },
     {
+      "key": "iso_ground_harbour",
+      "type": "image",
+      "url": "ground/iso_ground_harbour.png",
+      "filter": "nearest",
+      "maps": [
+        "hollowmere"
+      ]
+    },
+    {
+      "key": "iso_ground_timber",
+      "type": "image",
+      "url": "ground/iso_ground_timber.png",
+      "filter": "nearest",
+      "maps": [
+        "blackpine"
+      ]
+    },
+    {
       "key": "tiles_grass",
       "type": "image",
       "url": "tiles/tiles_grass.png",

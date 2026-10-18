@@ -19,6 +19,7 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `oklab.ts` | sRGB to OKLab, the `#RRGGBB` helpers, and the HSV hue and saturation of the cutout spill test |
 | `palette.ts` | Reads `packages/content/data/palette.json` and `style.json` directly (no `@wdi/content` dependency): `WORLD` (the 64 world-palette colours, file order), `worldPalette`, `nearestIndex` (cached, ties to the darker), `DARK_RANK`, `SATURATED`, `finishEnabled` (`style.json` `pixelFinish.enabled`), `outlineRgb` |
 | `pixel.ts` | The pixel finish of `ASSETS.md` 6.11: alpha cut, snap to the world palette in OKLab, 2 x 2 mode halve (ties to the darkest), box resize, `finishRender` / `finishDisplay` (both follow the main-mode switch), `cleanCutout`, `outline`, `finishIllustration` (always finished), lossless WebP, `audit`; the CLI finishes a render folder and halves its manifest's `cell`, `feet` and `pivot` |
+| `tileset.ts` | The isometric ground tilesets `iso_ground_<theme>` (`SPRITES.md` 10.12): masks each `build_ground.py` render to its diamond, pixel-finishes it (or, with the switch off, bleeds the display render), draws the 15 edge overlays (a periodic noise fringe reaching about 30% in, rimmed one ramp step darker) and joins the 1280 x 1792 sheet; CLI `tileset <render dir> <out dir> [--finish on\|off]` |
 | `refs.ts` | Writes every `style.json` `references` entry, cropped, to `build/refs/<composition>-<index>-<stem>.png` (the Higgsfield `image_references` inputs) |
 | `test/pack.test.ts` | Synthetic frame set: trim and source sizes, determinism, detectIdentical, pivots, anim keys |
 | `test/pack-static.test.ts` | Static keys against the placeholder clues, props pivots, centred clues, determinism, vfx anims, refusal of a wrong key set |
@@ -26,6 +27,7 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `test/manifest.test.ts` | The real and placeholder manifests carry the same keys, types, `maps` and `modes` (the villager placeholder-only once it leaves `LEGACY`); `modes: ['onub']` on every `onub_*` key and no other; round-5 world textures filter by the pixel-finish switch, `clues` linear |
 | `test/legacy.ts`, `test/legacy.test.ts` | The `LEGACY` allowlist (art plan 1.7): real-manifest keys whose art predates the round-5 style, skipped by the palette and budget tests; each key listed once and still in the real manifest |
 | `test/pixel.test.ts` | Snap, mode halve with the darkest tie, box resize, alpha cut, both settings of the switch, cutout key, spill and outline, lossless WebP, manifest halving, determinism |
+| `test/tileset.test.ts` | The diamond mapping, the sheet layout and gids, base cells filling their diamond, cell 19 empty, each overlay on its sides only, palette and alpha with the finish on, determinism, and the shipped sheets' size and audit |
 | `test/refs.test.ts` | Every reference file exists, every crop lies inside its image, output names are unique |
 | `test/bleed.test.ts` | PNG round trip, one and two bleed rings, determinism |
 
