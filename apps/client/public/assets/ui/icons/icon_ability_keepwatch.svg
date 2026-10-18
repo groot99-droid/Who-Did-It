@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Keep Watch">
+  <title>Keep Watch</title>
+  <path d="M12 44 V20" />
+  <path d="M8 8 H16 L18 11 V24 H6 V11 Z" fill="#2C3240"/>
+  <rect x="9" y="12" width="6" height="9" fill="#FFB457"/>
+  <path d="M22 26 C26 19 30 17 34 17 C38 17 42 19 46 26 C42 33 38 35 34 35 C30 35 26 33 22 26 Z" fill="#D9D2C2"/>
+  <circle cx="34" cy="26" r="4" fill="#12141C"/>
+</svg>

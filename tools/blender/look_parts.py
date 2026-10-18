@@ -283,14 +283,14 @@ def gloves(b: Builder, spec: dict) -> None:
 
 @piece
 def toque(b: Builder, spec: dict) -> None:
-    """A tall pleated toque: a band and a puffed crown 0.07 m above the head; with the crown's depth it tops
+    """A tall pleated toque: a band and a puffed crown 0.055 m above the head; with the crown's depth it tops
     out just under the 112 px silhouette cap (SPRITES 10.3)."""
     white = ("bone", 2)
     b.part("ToqueBand", "body", white, "head", [
         (cylinder, dict(z0=H1 - 0.07, z1=H1 + 0.02, r0=0.128, r1=0.13, segments=10)),
     ], bevel=0.006)
     b.part("ToqueCrown", "body", ("bone", 3), "head", [
-        (cylinder, dict(z0=H1 + 0.02, z1=H1 + 0.07, r0=0.13, r1=0.14, segments=10)),
+        (cylinder, dict(z0=H1 + 0.01, z1=H1 + 0.055, r0=0.13, r1=0.14, segments=10)),
     ], bevel=0.02)
 
 
@@ -336,9 +336,9 @@ def basket(b: Builder, spec: dict) -> None:
 @piece
 def fedora(b: Builder, spec: dict) -> None:
     c = spec["hat"]
-    _hat_brim(b, "FedoraBrim", c, H1 - 0.07, 0.36, 0.38)
+    _hat_brim(b, "FedoraBrim", c, H1 - 0.07, 0.33, 0.35)
     b.part("FedoraCrown", "body", c, "head", [
-        (frustum, dict(z0=H1 - 0.06, z1=H1 + 0.08, bottom=(0.24, 0.26), top=(0.20, 0.19))),
+        (frustum, dict(z0=H1 - 0.06, z1=H1 + 0.05, bottom=(0.24, 0.26), top=(0.20, 0.19))),
     ], bevel=0.012)
     b.part("FedoraBand", "body", ("ink", 0), "head", [
         (frustum, dict(z0=H1 - 0.05, z1=H1 - 0.02, bottom=(0.245, 0.265), top=(0.24, 0.26))),
@@ -365,7 +365,7 @@ def top_hat(b: Builder, spec: dict) -> None:
     c = spec["hat"]
     _hat_brim(b, "TopHatBrim", c, H1 - 0.06, 0.32, 0.34)
     b.part("TopHatCrown", "body", c, "head", [
-        (cylinder, dict(z0=H1 - 0.05, z1=H1 + 0.08, r0=0.115, r1=0.12, segments=10, squash=1.05)),
+        (cylinder, dict(z0=H1 - 0.05, z1=H1 + 0.05, r0=0.115, r1=0.12, segments=10, squash=1.05)),
     ], bevel=0.008)
 
 
@@ -469,4 +469,302 @@ def prayer_book(b: Builder, spec: dict) -> None:
     ], bevel=0)
     b.part("BookClasp", "body", ("brass", 2), "chest", [
         (box, dict(center=(0.11, 0.15, 1.12), size=(0.02, 0.055, 0.04))),
+    ], bevel=0)
+
+
+# ---------------------------------------------------------------- the Watchman
+
+
+@piece
+def moustache(b: Builder, spec: dict) -> None:
+    b.part("Moustache", "body", spec["hair"], "head", [
+        (box, dict(center=(0.0, 0.13, H0 + 0.085), size=(0.14, 0.03, 0.035))),
+    ], bevel=0.006)
+
+
+@piece
+def shoulder_cape(b: Builder, spec: dict) -> None:
+    """A short cape over the shoulders, to the elbows."""
+    b.part("ShoulderCape", "body", spec["cape"], "chest", [
+        (frustum, dict(z0=1.06, z1=CHEST[1] + 0.02, bottom=(0.56, 0.34), top=(0.30, 0.22))),
+    ], bevel=0.01)
+
+
+@piece
+def helmet(b: Builder, spec: dict) -> None:
+    """A domed watchman's helmet with a short brim."""
+    c = spec["hat"]
+    _hat_brim(b, "HelmetBrim", c, H1 - 0.10, 0.30, 0.34, thick=0.02)
+    b.part("HelmetDome", "body", c, "head", [
+        (cylinder, dict(z0=H1 - 0.09, z1=H1 + 0.02, r0=0.13, r1=0.11, segments=10)),
+        (cylinder, dict(z0=H1 + 0.02, z1=H1 + 0.04, r0=0.11, r1=0.05, segments=10)),
+    ], bevel=0.01)
+
+
+@piece
+def rattle(b: Builder, spec: dict) -> None:
+    b.part("Rattle", "body", ("wood", 3), "hips", [
+        (box, dict(center=(0.19, 0.06, 0.92), size=(0.04, 0.08, 0.14))),
+    ], bevel=0.006)
+
+
+@piece
+def pole_lantern(b: Builder, spec: dict) -> None:
+    """A lantern on a tall pole in the left hand, beside the head (as high as the 112 px cap allows); its glass glows in every frame (the accent)."""
+    x = -0.215
+    b.part("LanternPole", "body", ("wood", 2), "prop.L", [
+        (rod, dict(a=(x, 0.06, 0.12), b=(x, 0.06, 1.52), width=0.03)),
+    ], bevel=0)
+    b.part("LanternFrame", "body", ("ink", 1), "prop.L", [
+        (box, dict(center=(x, 0.06, 1.54), size=(0.12, 0.12, 0.02))),
+        (box, dict(center=(x, 0.06, 1.67), size=(0.10, 0.10, 0.03))),
+    ], bevel=0)
+    b.part("LanternGlass", "body", ("lantern", 3), "prop.L", [
+        (box, dict(center=(x, 0.06, 1.605), size=(0.09, 0.09, 0.11))),
+    ], bevel=0, glow=True)
+
+
+# ---------------------------------------------------------------- the Herbalist
+
+
+@piece
+def hair_wisps(b: Builder, spec: dict) -> None:
+    b.part("Wisps", "body", spec["hair"], "head", [
+        (box, dict(center=(0.09, 0.09, H0 + 0.24), size=(0.05, 0.04, 0.06))),
+        (box, dict(center=(-0.09, 0.09, H0 + 0.24), size=(0.05, 0.04, 0.06))),
+    ], bevel=0.004)
+
+
+@piece
+def hood_shawl(b: Builder, spec: dict) -> None:
+    """A hooded shawl, hood up: the hood frames the face, the shawl covers the shoulders."""
+    c = spec["hood"]
+    b.part("Hood", "body", c, "head", [
+        (frustum, dict(z0=H0 - 0.02, z1=H1 + 0.04, bottom=(0.29, 0.30), top=(0.22, 0.24), offset=(0, -0.025))),
+    ], bevel=0.02)
+    b.part("Shawl", "body", c, "chest", [
+        (frustum, dict(z0=1.08, z1=CHEST[1] + 0.03, bottom=(0.50, 0.30), top=(0.30, 0.24))),
+    ], bevel=0.012)
+
+
+@piece
+def skirt_long(b: Builder, spec: dict) -> None:
+    b.part("Skirt", "body", spec["coat"], "hips", [
+        (frustum, dict(z0=0.16, z1=HIPS[1], bottom=(0.44, 0.34), top=(0.33, 0.23))),
+    ])
+
+
+@piece
+def apron_pockets(b: Builder, spec: dict) -> None:
+    c = spec["apron"]
+    b.part("Apron", "body", c, "hips", [
+        (frustum, dict(z0=0.36, z1=HIPS[1] - 0.02, bottom=(0.44, 0.03), top=(0.36, 0.03), offset=(0, 0.18),
+                       top_offset=(0, 0.125))),
+    ], bevel=0.004)
+    b.part("Pockets", "body", ("bone", 0), "hips", [
+        (box, dict(center=(0.10, 0.165, 0.72), size=(0.10, 0.03, 0.09))),
+        (box, dict(center=(-0.10, 0.165, 0.72), size=(0.10, 0.03, 0.09))),
+    ], bevel=0)
+
+
+@piece
+def herbs(b: Builder, spec: dict) -> None:
+    b.part("Herbs", "body", ("wood", 4), "hips", [
+        (frustum, dict(z0=0.56, z1=0.72, bottom=(0.03, 0.03), top=(0.09, 0.05), offset=(0.13, 0.18))),
+        (frustum, dict(z0=0.58, z1=0.72, bottom=(0.03, 0.03), top=(0.08, 0.05), offset=(-0.12, 0.18))),
+    ], bevel=0)
+
+
+@piece
+def satchel(b: Builder, spec: dict) -> None:
+    b.part("Satchel", "body", ("wood", 3), "hips", [
+        (box, dict(center=(-0.24, -0.02, 0.86), size=(0.08, 0.20, 0.16))),
+    ], bevel=0.01)
+
+
+@piece
+def vials(b: Builder, spec: dict) -> None:
+    """Two small vials at the belt, brass stoppers (the accent)."""
+    b.part("Vials", "body", ("bone", 1), "hips", [
+        (box, dict(center=(0.20, 0.08, 0.93), size=(0.035, 0.035, 0.07))),
+        (box, dict(center=(0.20, 0.00, 0.93), size=(0.035, 0.035, 0.07))),
+    ], bevel=0)
+    b.part("Stoppers", "body", ("brass", 2), "hips", [
+        (box, dict(center=(0.20, 0.08, 0.98), size=(0.04, 0.04, 0.025))),
+        (box, dict(center=(0.20, 0.00, 0.98), size=(0.04, 0.04, 0.025))),
+    ], bevel=0)
+
+
+# ---------------------------------------------------------------- the Gamekeeper
+
+
+@piece
+def beard(b: Builder, spec: dict) -> None:
+    b.part("Beard", "body", spec["hair"], "head", [
+        (frustum, dict(z0=H0 - 0.05, z1=H0 + 0.10, bottom=(0.12, 0.08), top=(0.22, 0.10), offset=(0, 0.08))),
+    ], bevel=0.01)
+
+
+@piece
+def gaiters(b: Builder, spec: dict) -> None:
+    for s, x in (("R", 1), ("L", -1)):
+        b.part(f"Gaiter.{s}", "body", ("wood", 2), f"shin.{s}", [
+            (frustum, dict(z0=0.15, z1=0.42, bottom=(0.115, 0.125), top=(0.13, 0.14), offset=(x * LEG_X, 0))),
+        ], bevel=0.006)
+
+
+@piece
+def deerstalker(b: Builder, spec: dict) -> None:
+    c = spec["hat"]
+    b.part("DeerCrown", "body", c, "head", [
+        (cylinder, dict(z0=H1 - 0.07, z1=H1 + 0.04, r0=0.135, r1=0.10, segments=10)),
+    ], bevel=0.012)
+    b.part("DeerPeaks", "body", c, "head", [
+        (frustum, dict(z0=H1 - 0.07, z1=H1 - 0.05, bottom=(0.14, 0.12), top=(0.12, 0.10), offset=(0, 0.17))),
+        (frustum, dict(z0=H1 - 0.07, z1=H1 - 0.05, bottom=(0.14, 0.12), top=(0.12, 0.10), offset=(0, -0.17))),
+        (box, dict(center=(0.0, 0.0, H1 + 0.045), size=(0.05, 0.05, 0.02))),  # the tied flaps
+    ], bevel=0.004)
+
+
+@piece
+def game_bag(b: Builder, spec: dict) -> None:
+    b.part("GameBag", "body", ("wood", 3), "hips", [
+        (box, dict(center=(-0.22, 0.05, 0.84), size=(0.08, 0.22, 0.18))),
+    ], bevel=0.012)
+    b.part("BagStrap", "body", ("wood", 2), "chest", [
+        (rod, dict(a=(0.16, 0.12, 1.30), b=(-0.18, 0.12, 1.02), width=0.03)),
+        (rod, dict(a=(0.16, -0.12, 1.30), b=(-0.18, -0.12, 1.02), width=0.03)),
+    ], bevel=0)
+
+
+@piece
+def fowling_piece(b: Builder, spec: dict) -> None:
+    """A long fowling piece slung barrel-up over the right shoulder: ink barrel, brass fittings, wood stock."""
+    b.part("GunStock", "body", ("wood", 3), "chest", [
+        (rod, dict(a=(0.17, -0.15, 0.82), b=(0.18, -0.13, 1.12), width=0.06)),
+    ], bevel=0)
+    b.part("GunBarrel", "body", ("ink", 1), "chest", [
+        (rod, dict(a=(0.18, -0.13, 1.12), b=(0.20, -0.09, 1.66), width=0.035)),
+    ], bevel=0)
+    b.part("GunFittings", "body", ("brass", 1), "chest", [
+        (box, dict(center=(0.18, -0.13, 1.13), size=(0.06, 0.06, 0.04))),
+    ], bevel=0)
+
+
+# ---------------------------------------------------------------- the Lamplighter
+
+
+@piece
+def oilskin_cape(b: Builder, spec: dict) -> None:
+    """A short oilskin cape, hood down."""
+    c = spec["cape"]
+    b.part("Cape", "body", c, "chest", [
+        (frustum, dict(z0=0.98, z1=CHEST[1] + 0.02, bottom=(0.54, 0.34), top=(0.30, 0.22))),
+    ], bevel=0.01)
+    b.part("HoodDown", "body", c, "chest", [
+        (box, dict(center=(0.0, -0.13, 1.30), size=(0.22, 0.08, 0.10))),
+    ], bevel=0.01)
+
+
+@piece
+def lighting_pole(b: Builder, spec: dict) -> None:
+    """A long brass-hooked pole carried at a forward slant over the right shoulder, a flame at its tip."""
+    b.part("LightPole", "body", ("wood", 2), "chest", [
+        (rod, dict(a=(0.20, -0.42, 0.98), b=(0.21, 0.22, 1.50), width=0.03)),
+    ], bevel=0)
+    b.part("LightHook", "body", ("brass", 2), "chest", [
+        (rod, dict(a=(0.21, 0.22, 1.50), b=(0.21, 0.31, 1.54), width=0.025)),
+        (rod, dict(a=(0.21, 0.31, 1.54), b=(0.21, 0.33, 1.46), width=0.025)),
+    ], bevel=0)
+    b.part("LightFlame", "body", ("lantern", 3), "chest", [
+        (box, dict(center=(0.21, 0.33, 1.42), size=(0.04, 0.04, 0.06))),
+    ], bevel=0, glow=True)
+
+
+# ---------------------------------------------------------------- the Fisher
+
+
+@piece
+def sea_boots(b: Builder, spec: dict) -> None:
+    for s, x in (("R", 1), ("L", -1)):
+        b.part(f"SeaBoot.{s}", "body", ("ink", 0), f"shin.{s}", [
+            (frustum, dict(z0=0.15, z1=0.50, bottom=(0.12, 0.13), top=(0.15, 0.16), offset=(x * LEG_X, 0))),
+        ], bevel=0.006)
+
+
+@piece
+def souwester(b: Builder, spec: dict) -> None:
+    """A small sou'wester, its brim longer at the back (the look's mustard)."""
+    c = spec["hat"]
+    _hat_brim(b, "SouBrim", c, H1 - 0.08, 0.32, 0.40, offset=(0.0, -0.03))
+    b.part("SouCrown", "body", c, "head", [
+        (cylinder, dict(z0=H1 - 0.07, z1=H1 + 0.04, r0=0.125, r1=0.10, segments=10)),
+    ], bevel=0.015)
+
+
+@piece
+def net_coil(b: Builder, spec: dict) -> None:
+    """A coil of net over the left shoulder, a cork float hanging from it."""
+    b.part("Net", "body", ("bone", 0), "chest", [
+        (ring, dict(z=1.22, radius=0.10, tube=0.045, segments=8, center=(-0.20, 0.0), squash=1.4)),
+        (frustum, dict(z0=0.98, z1=1.24, bottom=(0.08, 0.16), top=(0.10, 0.20), offset=(-0.24, 0.0))),
+    ], bevel=0)
+    b.part("Cork", "body", ("wood", 4), "chest", [
+        (box, dict(center=(-0.25, 0.10, 0.98), size=(0.07, 0.07, 0.07))),
+    ], bevel=0.015)
+
+
+# ---------------------------------------------------------------- the Tinner
+
+
+@piece
+def plait(b: Builder, spec: dict) -> None:
+    hair_short(b, spec)
+    b.part("Plait", "body", spec["hair"], "head", [
+        (rod, dict(a=(0.0, -0.13, H0 + 0.12), b=(0.02, -0.16, H0 - 0.20), width=0.05)),
+    ], bevel=0)
+
+
+@piece
+def ore_dust(b: Builder, spec: dict) -> None:
+    for s, x in (("R", 1), ("L", -1)):
+        b.part(f"Ore.{s}", "body", ("stone", 4), f"shin.{s}", [
+            (box, dict(center=(x * LEG_X, 0.055, 0.30), size=(0.08, 0.02, 0.10))),
+        ], bevel=0)
+        b.part(f"Roll.{s}", "body", spec["trousers"], f"shin.{s}", [
+            (frustum, dict(z0=0.17, z1=0.22, bottom=(0.13, 0.14), top=(0.13, 0.14), offset=(x * LEG_X, 0))),
+        ], bevel=0)
+
+
+@piece
+def felt_hat(b: Builder, spec: dict) -> None:
+    c = spec["hat"]
+    _hat_brim(b, "FeltBrim", c, H1 - 0.075, 0.34, 0.36)
+    b.part("FeltCrown", "body", c, "head", [
+        (cylinder, dict(z0=H1 - 0.06, z1=H1 + 0.02, r0=0.125, r1=0.115, segments=10)),
+    ], bevel=0.015)
+
+
+@piece
+def candle(b: Builder, spec: dict) -> None:
+    """A candle stuck to the hat's front in a lump of clay; its flame is the accent."""
+    b.part("Clay", "body", ("stone", 3), "head", [
+        (box, dict(center=(0.0, 0.13, H1 - 0.01), size=(0.06, 0.04, 0.05))),
+    ], bevel=0.006)
+    b.part("Candle", "body", ("bone", 2), "head", [
+        (box, dict(center=(0.0, 0.13, H1 + 0.015), size=(0.025, 0.025, 0.04))),
+    ], bevel=0)
+    b.part("CandleFlame", "body", ("lantern", 3), "head", [
+        (box, dict(center=(0.0, 0.13, H1 + 0.05), size=(0.03, 0.03, 0.035))),
+    ], bevel=0, glow=True)
+
+
+@piece
+def pick(b: Builder, spec: dict) -> None:
+    """A short miner's pick over the right shoulder: a wood haft, a stone head."""
+    b.part("PickHaft", "body", ("wood", 3), "chest", [
+        (rod, dict(a=(0.20, 0.25, 1.00), b=(0.19, -0.20, 1.42), width=0.035)),
+    ], bevel=0)
+    b.part("PickHead", "body", ("stone", 4), "chest", [
+        (rod, dict(a=(0.19, -0.13, 1.52), b=(0.19, -0.26, 1.24), width=0.04)),
     ], bevel=0)

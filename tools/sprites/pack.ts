@@ -79,8 +79,11 @@ export async function packFrames(
   const files = [...inputs]
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .map((i) => ({ path: `${i.name}.png`, contents: i.png }));
+  // The packer's extrude resizes edge strips bilinearly, which adds partial alpha and off-palette colours.
+  // With the pixel finish on, frames are drawn with nearest filtering and the padding alone keeps them apart.
   const out = await packAsync(files, {
     ...PACK_OPTIONS,
+    extrude: finishEnabled('main') ? 0 : PACK_OPTIONS.extrude,
     width: page.w,
     height: page.h,
     textureName,

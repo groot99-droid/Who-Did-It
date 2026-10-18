@@ -26,22 +26,36 @@ import {
 } from './keys.ts';
 import { packCharacter, type PackInput } from './pack.ts';
 import { packStatic, type StaticManifest } from './pack-static.ts';
-import { finishRender } from './pixel.ts';
-import { PALETTE, inFolder, shape, type PlaceholderEntry, type Token } from './placeholder-kit.ts';
+import { encodeWebp, finishRender } from './pixel.ts';
+import {
+  PALETTE,
+  inFolder,
+  label,
+  registerFont,
+  shape,
+  type PlaceholderEntry,
+  type Token,
+} from './placeholder-kit.ts';
 
 export const BODY = 'villager';
 
 interface LookRow {
   id: string;
+  portrait: string;
   bodyAtlas: string | null;
   palette: { base: Token; second: Token; accent: Token };
 }
 const LOOKS_JSON = join(import.meta.dirname, '../../packages/content/data/looks.json');
 
+/** Every look of looks.json, in file order: the world looks and the portrait-only cover cards. */
+export function allLooks(): LookRow[] {
+  const doc = JSON.parse(readFileSync(LOOKS_JSON, 'utf8')) as { looks: Record<string, LookRow> };
+  return Object.values(doc.looks);
+}
+
 /** The world looks (a non-null `bodyAtlas`), in file order; the cover cards have no body. */
 export function worldLooks(): LookRow[] {
-  const doc = JSON.parse(readFileSync(LOOKS_JSON, 'utf8')) as { looks: Record<string, LookRow> };
-  return Object.values(doc.looks).filter((l) => l.bodyAtlas !== null);
+  return allLooks().filter((l) => l.bodyAtlas !== null);
 }
 
 const DIR_VEC: Record<Dir, [number, number]> = {
@@ -176,6 +190,23 @@ export function characterFrames(
   return { manifest, framesByPass };
 }
 
+// ---------------------------------------------------------------- portraits
+
+/** A labelled greybox card, 384 x 576 lossless WebP like the real `portrait_<lookId>` (art plan 4.5). */
+async function portraitPlaceholder(look: LookRow): Promise<Buffer> {
+  registerFont();
+  const c = createCanvas(384, 576);
+  const g = c.getContext('2d');
+  g.fillStyle = PALETTE.ink;
+  g.fillRect(0, 0, 384, 576);
+  shape(g, look.palette.base, () => g.roundRect(96, 220, 192, 356, 40));
+  shape(g, 'bone', () => g.arc(192, 170, 62, 0, 2 * Math.PI));
+  shape(g, look.palette.second, () => g.rect(150, 300, 84, 30));
+  label(g, look.id, 192, 60, 28);
+  const d = g.getImageData(0, 0, 384, 576);
+  return encodeWebp({ width: 384, height: 576, data: new Uint8Array(d.data.buffer) });
+}
+
 // ---------------------------------------------------------------- vfx (greybox marks)
 
 /** A centred palette mark per VFX frame that grows or fades over the clip, so the timing reads. */
@@ -185,6 +216,7 @@ export function vfxFrames(): { manifest: StaticManifest; inputs: PackInput[] } {
     vfx_blood_splat: { cell: 128, fill: 'blood' },
     vfx_vote_stamp: { cell: 256, fill: 'blood' },
     vfx_dust_step: { cell: 64, fill: 'fog' },
+    vfx_disguise: { cell: 128, fill: 'fog' },
   };
   const manifest: StaticManifest = { version: 1, atlas: 'vfx', frames: {} };
   const inputs: PackInput[] = [];
@@ -218,6 +250,11 @@ export function vfxFrames(): { manifest: StaticManifest; inputs: PackInput[] } {
     } else if (anim === 'vfx_vote_stamp') {
       const r = m * (0.9 - 0.4 * Math.min(1, t * 2));
       shape(g, fill, () => g.rect(m - r / 2, m - r / 2, r, r));
+    } else if (anim === 'vfx_disguise') {
+      shape(g, fill, () =>
+        g.ellipse(m, m * 1.75 - m * t, m * 0.35, m * 0.6 * (1 - t * 0.7), 0, 0, 2 * Math.PI),
+      );
+      shape(g, 'mustard', () => g.rect(m - 3, m * 1.6 - m * 1.2 * t, 6, 6), false);
     } else {
       g.globalAlpha = 1 - t * 0.85;
       shape(g, fill, () => g.arc(m, m, m * (0.3 + 0.5 * t), 0, 2 * Math.PI), false);
@@ -274,9 +311,23 @@ export function placeholderEntries(): PlaceholderEntry[] {
       },
     },
     {
+      // Card portraits of every look, world and cover (DOM images, loaded at boot).
+      order: 12,
+      entries: allLooks().map((l) => ({
+        key: l.portrait,
+        type: 'image' as const,
+        url: `portraits/${l.portrait}.webp`,
+      })),
+      files: async () => {
+        const out = new Map<string, Buffer>();
+        for (const l of allLooks()) out.set(`portraits/${l.portrait}.webp`, await portraitPlaceholder(l));
+        return out;
+      },
+    },
+    {
       order: 40,
       entries: [
-        { key: 'vfx', type: 'multiatlas', url: 'vfx/vfx.json', path: 'vfx/', filter: 'linear' },
+        { key: 'vfx', type: 'multiatlas', url: 'vfx/vfx.json', path: 'vfx/', filter: 'nearest' },
         { key: 'anims_vfx', type: 'animation', url: 'vfx/vfx.anims.json' },
       ],
       files: async () => {

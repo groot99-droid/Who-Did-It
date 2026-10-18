@@ -74,6 +74,7 @@ LOOKS: dict[str, dict] = {
         "cape": ("fog", 0),
         "hat": ("slate", 2),
         "interact": "raise",
+        "raise_deg": 12,  # the pole lantern rides the left hand
         "parts": ["hair_short", "moustache", "long_coat", "belt", "collar_up", "shoulder_cape", "helmet", "rattle",
                   "pole_lantern"],
     },

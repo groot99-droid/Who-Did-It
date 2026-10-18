@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Impersonate">
+  <title>Impersonate</title>
+  <path d="M8 40 C8 31 13 27 19 27 C25 27 30 31 30 40 Z" fill="#12141C"/>
+  <circle cx="19" cy="18" r="7" fill="#12141C"/>
+  <path d="M18 42 C18 33 23 29 29 29 C35 29 40 33 40 42 Z" fill="#6F7A8C"/>
+  <circle cx="29" cy="20" r="7" fill="#6F7A8C"/>
+  <path d="M24 6 L25.5 10 L29.5 11.5 L25.5 13 L24 17 L22.5 13 L18.5 11.5 L22.5 10 Z" fill="#F2B33D"/>
+</svg>

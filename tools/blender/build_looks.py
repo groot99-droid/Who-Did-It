@@ -194,15 +194,20 @@ def arms(fr: float = 0, fl: float | None = None, er: float = 8, el: float | None
             "forearm.R": (er, 0, 0), "forearm.L": (el, 0, 0)}
 
 
-def interact_keys(base: str) -> list[tuple[int, dict]]:
-    """Eight looping frames of a hold: hands working, the body still, one of three bases (art plan 4.2)."""
+def interact_keys(base: str, raise_deg: float = 140) -> list[tuple[int, dict]]:
+    """Eight looping frames of a hold: hands working, the body still, one of three bases (art plan 4.2).
+
+    `raise_deg` is how far `raise` lifts the left arm: a look whose left hand holds a pole lifts it less,
+    so the prop stays inside the cell."""
     if base == "kneel":
-        # Down on the right knee, the left foot planted forward, both hands working at the ground.
-        body = {"root": (0, 0, 0, 0, -0.40, 0), "spine": (-25, 0, 0), "chest": (-10, 0, 0), "head": (-10, 0, 0),
-                "thigh.L": (85, 0, 0), "shin.L": (-85, 0, 0), "thigh.R": (10, 0, 0), "shin.R": (-100, 0, 0),
-                "foot.R": (40, 0, 0)}
-        work = lambda t: {"upper_arm.R": (55 + 10 * t, 0, -5), "upper_arm.L": (50 - 10 * t, 0, 5),  # noqa: E731
-                          "forearm.R": (20 - 10 * t, 0, 0), "forearm.L": (20 + 10 * t, 0, 0)}
+        # Down on the right knee, the left foot planted forward, both hands working at the ground. The pose
+        # stays compact: the right shin slopes back at 45 deg and the left foot sits 0.2 m forward and the hands stay close, so the
+        # whole figure keeps inside the 128 px cell in every direction (16 px below the feet row).
+        body = {"root": (0, 0, 0, 0, -0.18, 0), "spine": (-15, 0, 0), "chest": (-8, 0, 0), "head": (-12, 0, 0),
+                "thigh.L": (35, 0, 0), "shin.L": (-35, 0, 0), "thigh.R": (20, 0, 0), "shin.R": (-65, 0, 0),
+                "foot.R": (30, 0, 0)}
+        work = lambda t: {"upper_arm.R": (30 + 8 * t, 0, -5), "upper_arm.L": (28 - 8 * t, 0, 5),  # noqa: E731
+                          "forearm.R": (35 - 10 * t, 0, 0), "forearm.L": (35 + 10 * t, 0, 0)}
     elif base == "waist":
         # Standing, head bowed, hands working at waist height.
         body = {"head": (-18, 0, 0), "neck": (-6, 0, 0), "spine": (-4, 0, 0)}
@@ -211,7 +216,7 @@ def interact_keys(base: str) -> list[tuple[int, dict]]:
     elif base == "raise":
         # The left arm raised high, the head lifted, peering.
         body = {"head": (12, 0, 8), "chest": (4, 0, 0)}
-        work = lambda t: {"upper_arm.L": (140, 0, 8 - 4 * t), "forearm.L": (25, 0, 0),  # noqa: E731
+        work = lambda t: {"upper_arm.L": (raise_deg, 0, 8 - 4 * t), "forearm.L": (25, 0, 0),  # noqa: E731
                           "upper_arm.R": (8, 0, -SPREAD), "forearm.R": (20, 0, 0),
                           "head": (12, 0, 8 - 12 * t)}
     else:
@@ -241,20 +246,20 @@ def make_actions(arm, spec: dict) -> None:
     passing = lambda s: {"thigh.R": (0, 0, 0) if s > 0 else (8, 0, 0),  # noqa: E731
                          "thigh.L": (8, 0, 0) if s > 0 else (0, 0, 0),
                          "shin.R": (0, 0, 0) if s > 0 else (-45, 0, 0), "shin.L": (-45, 0, 0) if s > 0 else (0, 0, 0),
-                         **arms(0, 0, 10, 10), "spine": (-4, 0, 0), "root": (0, 0, 0, 0, 0.01, 0)}
+                         **arms(0, 0, 10, 10), "spine": (-4, 0, 0), "root": (0, 0, 0, 0, 0.0, 0)}
     _action(arm, "walk", [(1, step(1)), (5, passing(1)), (9, step(-1)), (13, passing(-1)), (17, step(1))])
     # Swing (Kill, Crowbar, Check; never role-specific): wind-up, a forward-down strike of the right
     # hand, recovery.
     _action(arm, "swing", [
         (1, {**arms()}),
-        (3, {**arms(-10, 5), "upper_arm.R": (115, 0, -12), "forearm.R": (45, 0, 0), "chest": (4, -18, 0)}),
-        (5, {**arms(-15, 10), "upper_arm.R": (140, 0, -10), "forearm.R": (55, 0, 0), "chest": (8, -25, 0)}),
+        (3, {**arms(-10, 5), "upper_arm.R": (75, 0, -12), "forearm.R": (70, 0, 0), "chest": (4, -18, 0)}),
+        (5, {**arms(-15, 10), "upper_arm.R": (85, 0, -10), "forearm.R": (85, 0, 0), "chest": (8, -25, 0)}),
         (7, {**arms(15, -10), "upper_arm.R": (45, 0, -5), "forearm.R": (10, 0, 0), "chest": (-14, 15, 0),
              "spine": (-6, 0, 0), "head": (-6, 0, 0)}),
         (9, {**arms(5, 0), "upper_arm.R": (25, 0, -6), "forearm.R": (15, 0, 0), "chest": (-6, 6, 0)}),
         (11, {**arms()}),
     ])
-    _action(arm, "interact", interact_keys(spec["interact"]))
+    _action(arm, "interact", interact_keys(spec["interact"], spec.get("raise_deg", 140)))
     # Die: knees buckle, a fall to the back-left, spread-eagled on the last frame so it reads from all
     # 8 directions. The root tips back about X (towards -Y) and turns about the world up (local Y) to the
     # left; it is lifted as it tips so the body lies on the ground.

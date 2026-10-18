@@ -142,6 +142,7 @@ export const VFX_CLIPS: Readonly<Record<string, number>> = {
   vfx_blood_splat: 12,
   vfx_vote_stamp: 10,
   vfx_dust_step: 6,
+  vfx_disguise: 8,
 };
 
 /** Every frame name a static atlas must contain, in sorted order. */

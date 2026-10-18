@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Hear Confession">
+  <title>Hear Confession</title>
+  <path d="M28 14 C35 14 38 19 38 24 C38 29 35 31 33 32 C31 33 31 36 28 37" fill="#D9D2C2"/>
+  <path d="M31 22 C31 20 33 19 34 20" />
+  <rect x="7" y="7" width="20" height="34" rx="3" fill="#2C3240"/>
+  <path d="M7 15 H27 M7 23 H27 M7 31 H27 M14 7 V41 M20 7 V41" />
+</svg>

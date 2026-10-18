@@ -212,6 +212,71 @@
       "url": "placeholder/chars/tinner.anims.json"
     },
     {
+      "key": "portrait_detective",
+      "type": "image",
+      "url": "portraits/portrait_detective.webp"
+    },
+    {
+      "key": "portrait_doctor",
+      "type": "image",
+      "url": "portraits/portrait_doctor.webp"
+    },
+    {
+      "key": "portrait_vicar",
+      "type": "image",
+      "url": "portraits/portrait_vicar.webp"
+    },
+    {
+      "key": "portrait_watchman",
+      "type": "image",
+      "url": "portraits/portrait_watchman.webp"
+    },
+    {
+      "key": "portrait_herbalist",
+      "type": "image",
+      "url": "portraits/portrait_herbalist.webp"
+    },
+    {
+      "key": "portrait_gamekeeper",
+      "type": "image",
+      "url": "portraits/portrait_gamekeeper.webp"
+    },
+    {
+      "key": "portrait_lamplighter",
+      "type": "image",
+      "url": "portraits/portrait_lamplighter.webp"
+    },
+    {
+      "key": "portrait_baker",
+      "type": "image",
+      "url": "portraits/portrait_baker.webp"
+    },
+    {
+      "key": "portrait_fisher",
+      "type": "image",
+      "url": "portraits/portrait_fisher.webp"
+    },
+    {
+      "key": "portrait_tinner",
+      "type": "image",
+      "url": "portraits/portrait_tinner.webp"
+    },
+    {
+      "key": "portrait_killer",
+      "type": "image",
+      "url": "portraits/portrait_killer.webp"
+    },
+    {
+      "key": "portrait_accomplice",
+      "type": "image",
+      "url": "portraits/portrait_accomplice.webp"
+    },
+    {
+      "key": "portrait_drifter",
+      "type": "image",
+      "url": "portraits/portrait_drifter.webp"
+    },
+    {
       "key": "clues",
       "type": "multiatlas",
       "url": "clues/clues.json",
@@ -230,7 +295,7 @@
       "type": "multiatlas",
       "url": "vfx/vfx.json",
       "path": "vfx/",
-      "filter": "linear"
+      "filter": "nearest"
     },
     {
       "key": "anims_vfx",

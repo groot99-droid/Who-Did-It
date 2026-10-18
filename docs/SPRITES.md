@@ -51,10 +51,12 @@ tail on every layer:
 
 | Layer (draw order, bottom to top) | Anim key | Texture key | Pages |
 |---|---|---|---|
-| body | `char/<body>/<anim>/<dir>` | `char_<body>` | <= 2 |
+| body | `char/<body>/<anim>/<dir>` | `char_<body>` | 1 |
 | blood (torso and hands mask, shown while Bloody) | `blood/<body>/<anim>/<dir>` | `ovl_<body>` | 1 shared |
 | scarf (grey, toon-ramped, tinted at runtime) | `scarf/<body>/<anim>/<dir>` | `ovl_<body>` | |
-| hat (one of the two, none when bare) | `hat_cap/<body>/<anim>/<dir>`, `hat_bowler/<body>/<anim>/<dir>` | `ovl_<body>` | |
+
+Round 5: the hat passes are gone (hats are nameplate glyphs, GDD 3.1); a look's body is one 1024² page and its
+overlays one 1024 x 512 page (art plan 1.4).
 
 Frame names inside an atlas are the anim key plus `/` and the three-digit frame number:
 `scarf/villager/walk/se/003`. The packer derives them from the rendered file name and its pass folder.
@@ -81,14 +83,16 @@ The rig projects the `Feet` empty into camera space on every rendered frame and 
   "body": "villager",
   "cell": 128,
   "fps": 12,
-  "passes": ["body", "scarf", "hat_cap", "hat_bowler", "blood"],
+  "passes": ["body", "scarf", "blood"],
   "frames": {
     "char_villager_walk_se_003": { "feet": [64.0, 112.5] }
   }
 }
 ```
 
-`feet` is in cell pixels from the top-left corner of the untrimmed cell; a frame rendered in a
+`feet` is in cell pixels from the top-left corner of the untrimmed cell, at the display scale as rendered;
+the `pixel` CLI halves `cell` and `feet` with the frames (SPRITES 10.3), so a packed look's manifest says
+`"cell": 64`; a frame rendered in a
 larger cell (`die`, 256 px) also carries `"cell": 256`. Every pass of a frame
 shares the body's pivot, so the overlays stay registered. The packer keeps `sourceSize` and
 `spriteSourceSize` (trim is reversible) and `gen-anims.ts` writes the pivot into every atlas frame as
@@ -134,11 +138,9 @@ so every pass has the same frame list and pivots:
 
 | Pass | What is visible | Material |
 |---|---|---|
-| `body` | full character, no scarf, no hat | toon palette materials |
-| `scarf` | scarf only, held out by the body | `bone` toon ramp, tinted at runtime |
-| `hat_cap` | cap only | toon `slate` |
-| `hat_bowler` | bowler only | toon `ink` with a `fog` band |
-| `blood` | torso and hands mask | flat `blood` |
+| `body` | full character, no scarf | toon world-palette materials (ramp neighbours as light and shadow) |
+| `scarf` | scarf only, held out by the body | the world `bone` ramp (`#D9D2C2` mid), tinted at runtime |
+| `blood` | torso and hands mask | flat `blood` (`#B3121F`) |
 
 Held-out geometry renders as a holdout so overlays are occluded correctly by the body.
 
@@ -267,12 +269,13 @@ anim plays at 12 fps once (`repeat: 0`) and Phaser holds its last frame. Every f
 | Anim key | Frames | Camera, cell | Notes |
 |---|---|---|---|
 | `vfx_blood_pool` | 8 | `TileCam`, 128 px | Pool spreading under a body; the last frame is the resting pool |
-| `vfx_blood_splat` | 12 | `SpriteCam`, 128 px | Spray from chest height to specks on the ground, at the kill |
+| `vfx_blood_splat` | 12 | `IsoCam`, 128 px (round 5) | Spray from chest height to specks on the ground, at the kill |
 | `vfx_vote_stamp` | 10 | straight down, 256 px | Stamp slams down and lifts, leaving the `blood` seal (UI, reveal) |
-| `vfx_dust_step` | 6 | `SpriteCam`, 64 px | Puff at a boot; ends empty |
+| `vfx_dust_step` | 6 | `IsoCam`, 64 px (round 5) | Puff at a boot; ends empty |
+| `vfx_disguise` | 8 | `IsoCam`, 128 px, pivot at the feet (round 5) | Fog and slate smoke rising feet to head round one turning mustard spark, gone by frame 7; only where a Knife strike drops a disguise |
 
 **Body.** The body on the floor is the last frame of `die` (`char/<body>/die/<dir>/007`, with the
-`scarf`, hat and `blood` overlays on the same tail), held by the one-shot anim; no separate key.
+`scarf` and `blood` overlays on the same tail), held by the one-shot anim; no separate key.
 Review sheet: `assets/source/review/villager-body-contact.png`.
 
 ## 9. UI icons
@@ -291,6 +294,14 @@ checks this list, the grid, the stroke and the colours.
 | `icon_height_tall`, `icon_height_short` | Height trait (medium has no icon; the HUD shows the bare figure) |
 | `icon_scarf_red`, `icon_scarf_green`, `icon_scarf_blue` | Scarf trait; the nameplate shape (diamond, circle, square) is drawn on the scarf |
 | `icon_hat_cap`, `icon_hat_bowler`, `icon_hat_bare` | Hat trait |
+| `icon_ability_impersonate` | Killer, Impersonate: two head-and-shoulder outlines, the front `fog`, the back `ink`, a `mustard` spark between them |
+| `icon_ability_confession` | Vicar, Hear Confession: a confessional grille with a `bone` ear behind it |
+| `icon_ability_keepwatch` | Watchman, Keep Watch: a pole lantern with `lantern` glass beside an open eye |
+| `icon_ability_remedy` | Herbalist, Remedy: a stoppered bottle with a `moon` cross |
+| `icon_ability_poison` | Herbalist, Nightshade (ability `poison`): a stoppered bottle beside a sprig of three `ink` berries |
+| `icon_ability_lastshot` | Gamekeeper, Last Shot: a barrel's end under a `blood` ring of crosshairs |
+
+The ability keys are `icon_ability_<abilityId>` with the ability id in lower case (round 5, art plan 4.6).
 
 ## 10. Isometric projection
 

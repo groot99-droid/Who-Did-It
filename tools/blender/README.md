@@ -9,7 +9,10 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 | `rig_common.py` | Directions, frame regex, cells, the IsoCam and display-scale constants, the turntable, the world palette (OKLab snap, ramp neighbours), light and outline constants; pure Python |
 | `build_rig.py` | Builds the rig: `IsoCam` (ortho, X 60°, Y 0°, Z 45°, 90.51 px per ground metre; SPRITES 10.3), `TileCam` (straight down, one 64 px tile per metre, for decals), the root empties `EnvRoot` (1, 1, 0.75) and `CharRoot` (0.75 on every axis) with the turntable `TT` under `CharRoot`, camera-parented key sun and area fill, slate world at 0.15, the `WDI_Toon` node group, `OutlineInk`, the `Outline` Solidify preset, a 1 m checker cube with a facing marker, a 1 m tile plane, a 4 m grid plane with 1 m lines, a hidden 1.7 m `FallenProxy` for the `die` cell check, a `Feet` empty, EEVEE settings |
 | `batch_render.py` | `--smoke` IsoCam calibration sheet at the display scale (8 cube views with their facing markers, one 1 m tile diamond, the `TileCam` grid, one 256 px `die` frame), or character passes with the per-frame `Feet` manifest; `tools/sprites` `pixel` finishes either |
-| `build_villager.py` | Builds the V1 `villager` body from code: a 1,388-triangle block-out of chamfered boxes, 3 heads tall, with the overlay parts, an 8-bone armature and the four V1 actions; writes the `.blend` (and optionally the source GLB) to `assets/external/villager/`, never into git |
+| `build_looks.py` | Builds every world look of `looks.json` and the plain `villager` from one five-heads-tall base: rigid chamfered parts on a 22-bone armature, the five clips (`idle`, `walk`, `swing`, `interact` on its `kneel` / `waist` / `raise` base, `die`) keyed in code at 24 fps; writes `<out>/<lookId>.blend` (git-ignored masters) |
+| `look_parts.py` | The shape helpers (`frustum`, `box`, `ring`, `cylinder`, `rod`), the world-ramp toon materials, the part builder and every costume piece (`@piece`) |
+| `looks_spec.py` | Each look's colours (world ramp steps), skin tone, `interact` base and costume pieces; pure Python |
+| `build_villager.py` | Retired: a re-export shim of `look_parts.py`'s shapes for `static_common.py` until it imports them from there |
 | `static_common.py` | Shared helpers for the static sheets: the rig with calibration hidden, `SpriteCam` / `TileCam` framing, palette materials, shape helpers, and the per-atlas `manifest.json` (`file`, `cell`, `pivot`) |
 | `build_props.py` | Models the square props (`prop_*`) and the 21 clue keys from code and renders them (`docs/SPRITES.md` 8) |
 | `bakery_props.py` | Models the seven bakery props of the quick mode (`prop_wakeTable`, `prop_plate`, `prop_deadLoaf`, `prop_ledger`, `prop_oven`, `prop_basin`, `prop_flour_sacks`), each with its own cell; `build_props.py` renders them into the `props` sheet |
@@ -33,9 +36,15 @@ pnpm --filter @wdi/sprites pixel ../../build/calib-raw ../../apps/client/public/
 # The rig file, for opening in the UI
 blender -b --factory-startup -P tools/blender/build_rig.py -- --out tools/blender/build/render_rig.blend
 
-# The V1 villager body (git-ignored master; copy to the ROSW checkout, assets/source/MANIFEST.md)
-python tools/blender/build_villager.py -- --out assets/external/villager/villager.blend \
-  --glb assets/external/villager/villager.glb
+# The round-5 looks (git-ignored masters; copy to the ROSW checkout, assets/source/MANIFEST.md)
+python tools/blender/build_looks.py -- --look all --out assets/external/looks
+# one look end to end: render (4 parallel direction groups), finish, pack, review
+for d in n,ne e,se s,sw w,nw; do
+  python tools/blender/batch_render.py -- --char assets/external/looks/baker.blend --body baker --out build/render --dirs $d &
+done; wait
+pnpm --filter @wdi/sprites pixel ../../build/render/baker ../../build/finished/baker
+pnpm --filter @wdi/sprites pack ../../build/finished/baker ../../apps/client/public/assets/chars
+pnpm --filter @wdi/sprites contact ../../build/finished/baker ../../assets/source/review/looks-contact-baker.png
 
 # Character passes: build/render/<body>/<pass>/char_<body>_<anim>_<dir>_<nnn>.png + manifest.json
 blender -b --factory-startup -P tools/blender/batch_render.py -- \
@@ -49,7 +58,7 @@ done; wait
 
 # Props, clues and VFX (minutes on llvmpipe), then pack them (tools/sprites)
 python tools/blender/build_props.py -- --out build/render   # build/render/{props,clues}/
-python tools/blender/build_vfx.py -- --out build/render     # build/render/vfx/
+python tools/blender/build_vfx.py -- --out build/render     # build/render/vfx/ (round 5: then `pixel --display`)
 for a in clues props vfx; do
   pnpm --filter @wdi/sprites pack:static ../../build/render/$a ../../apps/client/public/assets/$a
 done

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Remedy">
+  <title>Remedy</title>
+  <rect x="19" y="5" width="10" height="6" rx="1" fill="#F2B33D"/>
+  <path d="M20 11 H28 V16 C34 18 37 23 37 29 V40 C37 42 35 43 33 43 H15 C13 43 11 42 11 40 V29 C11 23 14 18 20 16 Z" fill="#D9D2C2"/>
+  <path d="M24 24 V38 M17 31 H31" stroke="#7FA8FF" stroke-width="2"/>
+</svg>
