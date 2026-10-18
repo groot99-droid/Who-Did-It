@@ -57,6 +57,13 @@ export const MAP_BUILDINGS: Record<string, ReadonlyArray<{ art: string; w: numbe
     { art: 'netloft', w: 5, h: 9 },
     { art: 'mollHut', w: 4, h: 3 },
   ],
+  blackpine: [
+    { art: 'lodge', w: 14, h: 7 },
+    { art: 'mill', w: 12, h: 7 },
+    { art: 'office', w: 8, h: 6 },
+    { art: 'smithy', w: 7, h: 5 },
+    { art: 'woodshed', w: 5, h: 3 },
+  ],
 };
 export const MAP_SLICED_PROPS: Record<string, ReadonlyArray<{ art: string; w: number; h: number }>> = {
   props_hollowmere: [
@@ -64,6 +71,17 @@ export const MAP_SLICED_PROPS: Record<string, ReadonlyArray<{ art: string; w: nu
     { art: 'prop_hanging_oak', w: 2, h: 2 },
     { art: 'prop_clamp', w: 2, h: 2 },
     { art: 'prop_pump_beam', w: 2, h: 3 },
+  ],
+  props_blackpine: [
+    { art: 'prop_trestle', w: 3, h: 2 },
+    { art: 'prop_mess_table', w: 6, h: 2 },
+    { art: 'prop_bunks_n', w: 7, h: 2 },
+    { art: 'prop_bunks_s', w: 7, h: 2 },
+    { art: 'prop_head_saw', w: 3, h: 2 },
+    { art: 'prop_kiln_0', w: 2, h: 2 },
+    { art: 'prop_kiln_1', w: 2, h: 2 },
+    { art: 'prop_map_table', w: 2, h: 2 },
+    { art: 'prop_forge', w: 3, h: 1 },
   ],
 };
 
@@ -388,6 +406,26 @@ const PROP_CELLS: Record<string, [number, number]> = {
   spot_bog: [64, 48],
   spot_charcoalPit: [64, 48],
   spot_oreChute: [64, 96],
+  prop_flume: [64, 96],
+  prop_gearing: [64, 112],
+  prop_ledger_desk: [64, 80],
+  prop_pegs: [64, 96],
+  prop_plank_stack: [64, 80],
+  prop_refuge_table: [64, 80],
+  prop_shelves: [64, 112],
+  prop_tally_board: [64, 96],
+  prop_telephone: [64, 96],
+  prop_tool_rack: [64, 112],
+  spot_barrel: [64, 80],
+  spot_bunk: [64, 112],
+  spot_logChute: [64, 96],
+  spot_logPile: [64, 80],
+  spot_oldStope: [64, 80],
+  spot_oreBin: [64, 80],
+  spot_orePillar: [64, 112],
+  spot_pool: [64, 48],
+  spot_rootCellar: [64, 48],
+  spot_strongroom: [64, 112],
 };
 
 /**

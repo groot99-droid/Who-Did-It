@@ -79,6 +79,20 @@ RECIPES = {
         "mollHut": dict(scene="forest_deep", id="fd.bld_moll_hut", fp=(0, 0, 4, 3), doors=[], wall="logs",
                         roof="sod", storeys=1, chimneys=[], lit=[], details="mollhut"),
     },
+    "blackpine": {
+        "lodge": dict(scene="bp_camp", id="bc.bld_lodge", fp=(8, 13, 14, 7), doors=[(12, 19, "s"), (21, 16, "e")],
+                      wall="logs", roof="shakes", storeys=1, chimneys=[(0.25, 0.5), (0.6, 0.5), (0.85, 0.5)],
+                      lit="all", details="lodge", chimney_ramp="slate"),
+        "mill": dict(scene="bp_camp", id="bc.bld_mill", fp=(34, 24, 12, 7), doors=[(45, 27, "e"), (38, 30, "s")],
+                     wall="boards", roof="shakes", storeys=2, chimneys=[], lit="half", details="mill"),
+        "office": dict(scene="bp_camp", id="bc.bld_office", fp=(44, 6, 8, 6), doors=[(47, 11, "s")],
+                       wall="boards", wall_tint="#DCC4A1", roof="shakes", storeys=1, chimneys=[(0.7, 0.4)],
+                       lit="half", details="office"),
+        "smithy": dict(scene="bp_camp", id="bc.bld_smithy", fp=(29, 7, 7, 5), doors=[(32, 11, "s")],
+                       wall="granite", roof="shakes", storeys=1, chimneys=[(0.2, 0.5)], lit=[], details="smithy"),
+        "woodshed": dict(scene="bp_camp", id="bc.bld_woodshed", fp=(4, 26, 5, 3), doors=[], wall="logs",
+                         roof="shakes", storeys=1, chimneys=[], lit=[], details="woodshed"),
+    },
 }
 
 # Multi-tile props sliced like buildings (art plan 3.5): atlas, frame stem, footprint w, h, builder name.
@@ -88,6 +102,17 @@ SLICED_PROPS = {
         "prop_hanging_oak": (2, 2, "hanging_oak"),
         "prop_clamp": (2, 2, "clamp"),
         "prop_pump_beam": (2, 3, "pump_beam"),
+    },
+    "blackpine": {
+        "prop_trestle": (3, 2, "trestle"),
+        "prop_mess_table": (6, 2, "mess_table"),
+        "prop_bunks_n": (7, 2, "bunks"),
+        "prop_bunks_s": (7, 2, "bunks"),
+        "prop_head_saw": (3, 2, "head_saw"),
+        "prop_kiln_0": (2, 2, "kiln"),
+        "prop_kiln_1": (2, 2, "kiln"),
+        "prop_map_table": (2, 2, "map_table"),
+        "prop_forge": (3, 1, "forge"),
     },
 }
 
@@ -174,6 +199,9 @@ def chimney(x, y, top, ramp="brick"):
 def shell(rec: dict, w: int, h: int, doors_local) -> list:
     rnd = random.Random(f"bld:{rec['id']}")
     wall_mat = tex(rec["wall"], 1.0)
+    if rec.get("wall_tint"):  # painted clapboard
+        wall_mat = sc.tex_toon(f"BldTex_{rec['wall']}_{rec['wall_tint']}", texture_path(KITS, SURFACE_TEXTURES[rec["wall"]]),
+                               metres=1.0, gains=(1.1, 0.8, 0.55), tint=rec["wall_tint"])
     objs = [part("Plinth", tex(rec.get("plinth", "granite"), 1.0), B(w / 2, -h / 2, 0.18, w + 0.06, h + 0.06, 0.36),
                  outline=False),
             part("Walls", wall_mat, B(w / 2, -h / 2, WALL / 2, w, h, WALL), outline=True)]
@@ -181,11 +209,13 @@ def shell(rec: dict, w: int, h: int, doors_local) -> list:
         objs[-1].data.materials[0] = sc.hex_toon("Bld_tar", "#2C3240", "#1A1D29", "#12141C")
     if rec["storeys"] == 2:
         objs.append(part("StringCourse", T("stone", 3), B(w / 2, -h / 2, 1.6, w + 0.06, h + 0.06, 0.1), outline=False))
-    roof_mat = tex("slate_roof", 1.0) if rec["roof"] == "slate_roof" else T("moss", 1)
+    roof_mat = {"slate_roof": lambda: tex("slate_roof", 1.0), "sod": lambda: T("moss", 1),
+                "shakes": lambda: sc.tex_toon("BldTex_shakes", texture_path(KITS, SURFACE_TEXTURES["planks"]),
+                                              metres=0.7, gains=(1.0, 0.75, 0.5), tint="#9A9083")}[rec["roof"]]()
     roof, rise = gable(w, h, WALL, w >= h, roof_mat)
     objs.append(roof)
     for fx, fy in rec["chimneys"]:
-        objs.append(chimney(fx * w, -fy * h, WALL + rise + 0.6))
+        objs.append(chimney(fx * w, -fy * h, WALL + rise + 0.6, rec.get("chimney_ramp", "brick")))
     objs += windows_on(w, h, doors_local, rec["storeys"], rec["lit"], rnd)
     objs += doors_on(w, h, doors_local)
     return objs, rise
@@ -243,6 +273,38 @@ def details(name: str, w: int, h: int, rise: float) -> list:
                      outline=False),
                 part("Floats", T("brass", 1), *[C(i + 0.5, -h - 0.1, 1.0, 0.07, 0.07, 6) for i in range(1, w - 1)],
                      outline=False)]
+    if name == "lodge":  # a covered porch along the south front (the Child's crawlspace under it)
+        return [part("Porch", T("wood", 3), B(w / 2, -h + 0.05, 0.12, w - 0.4, 0.3, 0.1)),
+                part("PorchPosts", T("wood", 2), *[B(0.5 + 1.5 * k, -h - 0.12, 1.2, 0.1, 0.1, 2.4)
+                                                   for k in range(int(w / 1.5) + 1)]),
+                part("PorchRoof", T("wood", 2), B(w / 2, -h - 0.05, 2.45, w, 0.4, 0.08)),
+                part("Crawl", F("ink", 0), B(w / 2 + 3, -h - 0.02, 0.15, 1.0, 0.02, 0.18), outline=False)]
+    if name == "mill":  # the waterwheel on the east face, the log carriage ramp, sawdust
+        wheel = part("Wheel", T("wood", 3), S(blob(0, 0, 1.3, 1.3, [], n=14), 0.0, 0.16),
+                     S(blob(0, 0, 0.3, 0.3, [], n=8), 0.16, 0.24), outline=True)
+        for v in wheel.data.vertices:  # stand the disc up against the east face: (u, v, t) -> (x, y, z)
+            u, vv, t = v.co
+            v.co = (w + 0.02 + t, -h / 2 + u, 1.35 + vv)
+        wheel.data.update()
+        return [wheel,
+                part("Ramp", T("wood", 2), (frustum, dict(z0=0.0, z1=1.2, bottom=(1.2, 0.2), top=(1.2, 0.2),
+                                                          offset=(2.0, -h - 0.05), top_offset=(2.0, -h + 0.6)))),
+                part("Sawdust", T("plaster", 2), S(blob(5.0, -h - 0.1, 0.8, 0.12, [], n=12), 0, 0.15), outline=False)]
+    if name == "office":  # a blank false front on the south, a porch, a telephone pole with a cut wire
+        return [part("FalseFront", sc.tex_toon("BldTex_boards_#DCC4A1", texture_path(KITS, SURFACE_TEXTURES["boards"]),
+                                               metres=1.0, gains=(1.1, 0.8, 0.55), tint="#DCC4A1"),
+                     B(w / 2, -h + 0.05, WALL + 0.8, w, 0.1, 1.6)),
+                part("Pole", T("wood", 2), B(w - 0.3, -h - 0.15, 2.6, 0.12, 0.12, 5.2)),
+                part("Arm", T("wood", 2), B(w - 0.3, -h - 0.15, 4.9, 0.8, 0.08, 0.08)),
+                part("Wire", T("ink", 1), B(w - 0.6, -h - 0.15, 4.3, 0.02, 0.02, 1.2), outline=False)]
+    if name == "smithy":  # the wide front glowing
+        return [part("Glow", F("lantern", 1), B(w / 2 + 1.5, -h - 0.02, 0.9, 2.0, 0.04, 1.4), outline=False),
+                part("Timbers", T("wood", 1), *[B(x, -h - 0.04, WALL / 2, 0.16, 0.08, WALL) for x in (0.1, w / 2, w - 0.1)],
+                     outline=False)]
+    if name == "woodshed":  # open-fronted, stacked with split wood
+        return [part("Open", F("ink", 0), B(w / 2, -h - 0.01, 1.3, w - 0.6, 0.02, 2.2), outline=False),
+                part("Wood", T("wood", 4), *[B(0.6 + 0.4 * k, -h - 0.04, 0.2 + 0.25 * (k % 3), 0.35, 0.04, 0.22)
+                                             for k in range(int((w - 1.2) / 0.4))], outline=False)]
     if name == "mollhut":
         return [part("Smoke", F("fog", 1), C(w / 2, -h / 2, WALL + 1.0, 0.18, 0.4, 8, rt=0.3), outline=False)]
     return []
@@ -287,7 +349,60 @@ def pump_beam(w, h):
             part("Broken", T("wood", 3), B(w / 2 + 0.4, -h + 0.4, 0.15, 0.9, 0.2, 0.2))]
 
 
-SLICED_BUILDERS = {"wake_table": wake_table, "hanging_oak": hanging_oak, "clamp": clamp, "pump_beam": pump_beam}
+def trestle(w, h):
+    """The broken trestle standing in the water, a lantern hanging from a snapped beam."""
+    return [part("Bents", T("wood", 2), *[B(x, -h / 2, 1.3, 0.14, h - 0.4, 2.6) for x in (0.5, 1.5)]),
+            part("Deck", T("wood", 3), B(1.0, -h / 2, 2.65, 2.0, 0.8, 0.12)),
+            part("Snapped", T("wood", 3), B(2.4, -h / 2, 2.3, 0.9, 0.2, 0.12)),
+            part("Lantern", F("lantern", 3), B(2.6, -h / 2, 1.9, 0.14, 0.14, 0.2), outline=False)]
+
+
+def mess_table(w, h):
+    return [part("Top", T("wood", 3), B(w / 2, -h / 2, 0.76, w - 0.3, 0.8, 0.08)),
+            part("Legs", T("wood", 2), *[B(x, -h / 2, 0.38, 0.1, 0.6, 0.76) for x in (0.4, w / 2, w - 0.4)]),
+            part("Benches", T("wood", 2), *[B(w / 2, -h / 2 + sy * 0.7, 0.42, w - 0.4, 0.28, 0.08) for sy in (1, -1)])]
+
+
+def bunks(w, h):
+    objs = []
+    for k in range(int(w)):
+        x = k + 0.5
+        objs += [part(f"Frame{k}", T("wood", 2), *[B(x + sx * 0.42, -h / 2, 0.9, 0.07, 0.9, 1.8) for sx in (1, -1)]),
+                 part(f"Beds{k}", T("bone", 1), *[B(x, -h / 2, z, 0.8, 0.9, 0.12) for z in (0.45, 1.35)])]
+    return objs
+
+
+def head_saw(w, h):
+    return [part("Rails", T("slate", 1), *[B(w / 2, -h / 2 + sy * 0.4, 0.05, w - 0.2, 0.08, 0.1) for sy in (1, -1)]),
+            part("Carriage", T("wood", 3), B(1.0, -h / 2, 0.4, 1.2, 1.0, 0.3)),
+            part("Log", T("wood", 2), C(0, -h / 2, 0.55, 0.25, w - 0.4, 10)),
+            part("Blade", T("fog", 2), C(w - 0.8, -h / 2 - 0.5, 0.0, 0.6, 0.04, 16))]
+
+
+def kiln(w, h):
+    return [part("Kiln", tex("brick", 1.0), C(w / 2, -h / 2, 0.0, 0.85, 1.5, 12, rt=0.5), bevel=0.05),
+            part("Vents", F("lantern", 1), *[B(w / 2 + 0.75 * math.cos(a), -h / 2 + 0.75 * math.sin(a), 0.3, 0.14,
+                                               0.14, 0.12) for a in (-1.2, -0.4, 0.4)], outline=False)]
+
+
+def map_table(w, h):
+    return [part("Table", T("wood", 3), B(w / 2, -h / 2, 0.75, w - 0.4, h - 0.6, 0.08),
+                 *[B(w / 2 + sx * (w / 2 - 0.4), -h / 2 + sy * (h / 2 - 0.4), 0.37, 0.08, 0.08, 0.74)
+                   for sx in (1, -1) for sy in (1, -1)]),
+            part("Map", T("plaster", 3), B(w / 2, -h / 2, 0.8, w - 0.8, h - 0.9, 0.01), outline=False)]
+
+
+def forge(w, h):
+    return [part("Hearth", T("stone", 2), B(w / 2, -h / 2, 0.45, w - 0.4, 0.8, 0.9)),
+            part("Coals", F("lantern", 2), B(w / 2, -h / 2, 0.91, 1.0, 0.5, 0.03), outline=False),
+            part("Hood", T("slate", 1), (frustum, dict(z0=1.6, z1=2.6, bottom=(1.6, 0.9), top=(0.4, 0.4),
+                                                       offset=(w / 2, -h / 2)))),
+            part("Bellows", T("litter", 1), B(0.3, -h / 2, 0.7, 0.5, 0.4, 0.3))]
+
+
+SLICED_BUILDERS = {"wake_table": wake_table, "hanging_oak": hanging_oak, "clamp": clamp, "pump_beam": pump_beam,
+                   "trestle": trestle, "mess_table": mess_table, "bunks": bunks, "head_saw": head_saw, "kiln": kiln,
+                   "map_table": map_table, "forge": forge}
 
 
 # ---------------------------------------------------------------- render: beauty and tile map

@@ -24,7 +24,7 @@ export type StaticAtlas =
   'clues' | 'props' | 'vfx' | `iso_kit_${string}` | `props_${string}` | `bld_${string}`;
 
 /** A building or multi-tile prop slice (SPRITES 10.5): `<stem>#<dx>_<dy>`. */
-export const SLICE_RE = /^[A-Za-z_]+#\d+_\d+$/;
+export const SLICE_RE = /^[A-Za-z][A-Za-z0-9_]*#\d+_\d+$/;
 
 /** The kit frame families of SPRITES 10.13 that a theme ships (art plan 3.3): 11, four variants each. */
 export const KIT_FRAMES: ReadonlyArray<readonly [string, string]> = [
@@ -156,6 +156,40 @@ export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
     'spot_stalagmite',
     'spot_trunk',
     'spot_wineRack',
+  ],
+  props_blackpine: [
+    'prop_anvil',
+    'prop_basin',
+    'prop_bell',
+    'prop_flume',
+    'prop_gearing',
+    'prop_ledger_desk',
+    'prop_ore_cart_0',
+    'prop_oven',
+    'prop_pegs',
+    'prop_plank_stack',
+    'prop_powder_kegs',
+    'prop_refuge_table',
+    'prop_safe',
+    'prop_shelves',
+    'prop_tally_board',
+    'prop_telephone',
+    'prop_tin_crate',
+    'prop_tool_rack',
+    'spot_barrel',
+    'spot_bunk',
+    'spot_coalBin',
+    'spot_logChute',
+    'spot_logPile',
+    'spot_oldStope',
+    'spot_oreBin',
+    'spot_oreCart',
+    'spot_orePillar',
+    'spot_pool',
+    'spot_rootCellar',
+    'spot_sawdustPile',
+    'spot_strongroom',
+    'spot_woodBox',
   ],
 };
 

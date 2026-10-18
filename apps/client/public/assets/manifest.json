@@ -46,6 +46,16 @@
       ]
     },
     {
+      "key": "props_blackpine",
+      "type": "multiatlas",
+      "url": "props/props_blackpine.json",
+      "path": "props/",
+      "filter": "nearest",
+      "maps": [
+        "blackpine"
+      ]
+    },
+    {
       "key": "vfx",
       "type": "multiatlas",
       "url": "vfx/vfx.json",
@@ -83,6 +93,16 @@
       "filter": "nearest",
       "maps": [
         "hollowmere"
+      ]
+    },
+    {
+      "key": "bld_blackpine",
+      "type": "multiatlas",
+      "url": "buildings/bld_blackpine.json",
+      "path": "buildings/",
+      "filter": "nearest",
+      "maps": [
+        "blackpine"
       ]
     },
     {

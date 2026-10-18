@@ -21,10 +21,11 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import static_common as sc  # noqa: E402
-from env import hollowmere_props, shared_props  # noqa: E402
+from env import blackpine_props, hollowmere_props, shared_props  # noqa: E402
 from static_common import blob, box, cylinder, flat, mesh, slab, stroke, toon  # noqa: E402
 
-ATLASES = {"props": shared_props.PROPS, "props_hollowmere": hollowmere_props.PROPS}
+ATLASES = {"props": shared_props.PROPS, "props_hollowmere": hollowmere_props.PROPS,
+           "props_blackpine": blackpine_props.PROPS}
 
 # ---------------------------------------------------------------- clues (1 m = one 64 px cell)
 

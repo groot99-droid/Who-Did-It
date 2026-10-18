@@ -5,6 +5,7 @@
 //   tsx review-world.ts ground <assets dir> <theme> <out.png>
 //   tsx review-world.ts kit <assets dir> <theme> <out.png>
 //   tsx review-world.ts atlas <assets dir> <atlas json, e.g. props/props.json> <out.png>
+//   tsx review-world.ts buildings <assets dir> <mapId> <out.png>
 //
 // `gate` is Gate A's Hollowmere square vignette: ground with blends, kit walls, a tree line, boulders, the
 // hedge-wall, the tavern's slices, the bell, the pump, two lantern posts and a look idling in 8 directions,
@@ -403,6 +404,35 @@ export async function atlasSheet(assets: string, rel: string): Promise<Buffer> {
   return frameSheet(a, await readAtlas(join(assets, rel)), 'c', rel.startsWith('clues') ? 1 : ART_SCALE);
 }
 
+/**
+ * Every building of a `bld_<mapId>` atlas reassembled from its slices: each slice drawn at the building's
+ * anchor, back tiles first, as the client y-sorts them (SPRITES 10.5, 10.6).
+ */
+export async function buildingSheet(assets: string, map: string): Promise<Buffer> {
+  const slices = await readAtlas(join(assets, 'buildings', `bld_${map}.json`));
+  const arts = new Map<string, Array<[number, number, Sprite]>>();
+  for (const [name, sprite] of slices) {
+    const [art, tile] = name.split('#') as [string, string];
+    const [dx, dy] = tile.split('_').map(Number) as [number, number];
+    arts.set(art, [...(arts.get(art) ?? []), [dx, dy, sprite]]);
+  }
+  const cols = 3;
+  const cw = 1400;
+  const ch = 1000;
+  const out = createCanvas(cols * cw, Math.ceil(arts.size / cols) * ch);
+  const g = out.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  g.fillStyle = '#2C3240';
+  g.fillRect(0, 0, out.width, out.height);
+  [...arts.keys()].sort().forEach((art, i) => {
+    const x = (i % cols) * cw + cw / 2;
+    const y = Math.floor(i / cols) * ch + ch - 380;
+    const tiles = arts.get(art)!.sort((p, q) => p[0] + p[1] - (q[0] + q[1]));
+    for (const [, , sprite] of tiles) draw(g, sprite, x, y, ART_SCALE);
+  });
+  return out.toBuffer('image/png');
+}
+
 function frameSheet(a: Atlases, frames: Map<string, Sprite>, floor: string, scale: number): Buffer {
   const names = [...frames.keys()].sort();
   const cols = 8;
@@ -434,6 +464,9 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   if (mode === 'gate' && assets) {
     out = more[0];
     png = await gateSheet(assets, smooth, look);
+  } else if (mode === 'buildings' && assets && more[0]) {
+    out = more[1];
+    png = await buildingSheet(assets, more[0]);
   } else if (mode === 'atlas' && assets && more[0]) {
     out = more[1];
     png = await atlasSheet(assets, more[0]);
