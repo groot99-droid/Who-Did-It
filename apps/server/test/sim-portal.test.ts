@@ -73,7 +73,8 @@ describe('scene-scoped views on the wire', () => {
     }
 
     // And back out again.
-    standAt(m, a, 1, 6);
+    const barFront = spawnOf('tavern_bar', 'front');
+    standAt(m, a, barFront.x, barFront.y);
     a.room.send('act.enterPortal', { portalId: 'tb.front' });
     await sleep(1500);
     expect(sceneKeys(m, 0)).toEqual(['overworld']);

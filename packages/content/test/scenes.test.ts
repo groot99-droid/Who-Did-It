@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { balance, PROFILE_RANK, SCENE_IDS, scenes, type Profile, type Scene } from '../src/index.js';
+import {
+  balance,
+  MAP_IDS,
+  maps,
+  PROFILE_RANK,
+  SCENE_IDS,
+  scenes,
+  type Profile,
+  type Scene,
+} from '../src/index.js';
 import { flood, opensAt, sceneFiles, touches } from './helpers.js';
 
 /** WORLD 4.3, copied by hand so a data edit cannot silently move a frozen id, size or profile. */
@@ -60,6 +69,7 @@ const WORLD: Record<string, { profile: Profile; w: number; h: number; portals: s
       'fo.gate -> overworld.forest_gate',
       'fo.log -> overworld.forest_back',
       'fo.cave -> cave_entry.mouth',
+      'fo.deep -> forest_deep.wood_side',
     ],
   },
   bakery: { profile: 'small', w: 18, h: 11, portals: ['bk.door -> overworld.bakery'] },
@@ -67,7 +77,7 @@ const WORLD: Record<string, { profile: Profile; w: number; h: number; portals: s
     profile: 'small',
     w: 20,
     h: 14,
-    portals: ['ce.mouth -> forest.cave_side', 'ce.sea -> null.null'],
+    portals: ['ce.mouth -> forest.cave_side', 'ce.sea -> null.null', 'ce.gallery -> cave_gallery.upper'],
   },
   manor_hall: {
     profile: 'medium',
@@ -103,6 +113,23 @@ const WORLD: Record<string, { profile: Profile; w: number; h: number; portals: s
     h: 16,
     portals: ['cl.well -> overworld.well', 'cl.trap -> tavern_back.trap', 'cl.crypt -> chapel.crypt'],
   },
+  // Round 5 (A50, docs/round5/world.md 8): Hollowmere's second wood and cave, both Medium (F4).
+  forest_deep: {
+    profile: 'medium',
+    w: 48,
+    h: 36,
+    portals: [
+      'fd.wood -> forest.deep_side',
+      'fd.adit -> cave_gallery.fen',
+      'fd.sinkhole -> cave_gallery.sink_landing',
+    ],
+  },
+  cave_gallery: {
+    profile: 'medium',
+    w: 40,
+    h: 28,
+    portals: ['cg.upper -> cave_entry.gallery', 'cg.fen -> forest_deep.adit_side'],
+  },
 };
 
 const PROFILES: Profile[] = ['small', 'medium', 'large'];
@@ -111,7 +138,7 @@ const v1Open = (p: Scene['portals'][number], at: Profile) =>
   p.ships === 'V1' && p.to !== null && opensAt(p.minProfile, at);
 
 describe('scene graph (WORLD 4.3)', () => {
-  it('has exactly the 15 frozen scenes, one file each', () => {
+  it('has exactly the frozen scenes, one file each', () => {
     expect([...SCENE_IDS].sort()).toEqual(Object.keys(WORLD).sort());
     expect(sceneFiles()).toEqual([...SCENE_IDS].sort());
   });
@@ -151,7 +178,7 @@ describe('scene graph (WORLD 4.3)', () => {
 
   it('marks one-way drops, the hollow log and the boarded sea passage', () => {
     const oneWay = all.flatMap((s) => s.portals.filter((p) => p.oneWay).map((p) => p.id));
-    expect(oneWay.sort()).toEqual(['ba.loft', 'fo.log', 'mu.balcony']);
+    expect(oneWay.sort()).toEqual(['ba.loft', 'fd.sinkhole', 'fo.log', 'mu.balcony']);
     const sea = scenes.cave_entry.portals.find((p) => p.id === 'ce.sea');
     expect(sea).toMatchObject({ window: 'lowTide', ships: 'V1.5' });
   });
@@ -242,19 +269,23 @@ describe('profile gating', () => {
             expect(touches(reached, spot.x, spot.y), `${spot.id} at ${profile}`).toBe(true);
         }
       }
-      // Every open scene is reachable from the overworld through open portals.
-      const seen = new Set(['overworld']);
-      const queue = ['overworld'];
-      while (queue.length) {
-        const s = scenes[queue.shift()! as keyof typeof scenes];
-        for (const p of s.portals) {
-          if (v1Open(p, profile) && !seen.has(p.to!)) {
-            seen.add(p.to!);
-            queue.push(p.to!);
+      // Every open scene is reachable from its map's hub through open portals, over that map's scenes.
+      for (const id of MAP_IDS) {
+        const map = maps[id];
+        const seen = new Set<string>([map.hub]);
+        const queue: string[] = [map.hub];
+        while (queue.length) {
+          const s = scenes[queue.shift()! as keyof typeof scenes];
+          for (const p of s.portals) {
+            if (v1Open(p, profile) && !seen.has(p.to!)) {
+              seen.add(p.to!);
+              queue.push(p.to!);
+            }
           }
         }
+        const inMap = open.filter((s) => (map.scenes as readonly string[]).includes(s.id));
+        expect([...seen].sort(), id).toEqual(inMap.map((s) => s.id).sort());
       }
-      expect([...seen].sort()).toEqual(open.map((s) => s.id).sort());
     });
   }
 

@@ -112,9 +112,9 @@ describe('scene world fields (GDD 3.13)', () => {
   it('keeps building doors on the south or east face', () => {
     expect(
       broken((c) => {
-        c.scenes.overworld.buildings = [
-          { id: 'ov.bld_tavern', art: 'tavern', footprint: { x: 25, y: 28, w: 12, h: 7 } },
-        ];
+        // The real tavern grown to 13 x 8: its front door is left inside the footprint, off the south row.
+        const tavern = c.scenes.overworld.buildings!.find((b) => b.id === 'ov.bld_tavern')!;
+        tavern.footprint = { x: 25, y: 28, w: 13, h: 8 };
       }),
     ).toEqual(hit('door ov.tavern_front is not on the south or east face of ov.bld_tavern'));
   });

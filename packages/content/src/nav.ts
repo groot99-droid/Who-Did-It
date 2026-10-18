@@ -17,6 +17,8 @@ import manorUpper from '../data/scenes/manor_upper.nav.json' with { type: 'json'
 import barn from '../data/scenes/barn.nav.json' with { type: 'json' };
 import chapel from '../data/scenes/chapel.nav.json' with { type: 'json' };
 import cellar from '../data/scenes/cellar.nav.json' with { type: 'json' };
+import forestDeep from '../data/scenes/forest_deep.nav.json' with { type: 'json' };
+import caveGallery from '../data/scenes/cave_gallery.nav.json' with { type: 'json' };
 import { Profile } from './schemas/balance.js';
 import { SCENE_IDS, type SceneId } from './schemas/scene.js';
 
@@ -61,6 +63,8 @@ const navJson: Record<SceneId, unknown> = {
   barn,
   chapel,
   cellar,
+  forest_deep: forestDeep,
+  cave_gallery: caveGallery,
 };
 
 function parseNavs(): Record<SceneId, NavFile> {

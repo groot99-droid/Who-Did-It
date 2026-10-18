@@ -1,8 +1,10 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { createNavGrid } from '@wdi/shared';
 import {
   GREYBOX,
+  SCENES_DIR,
   type SceneJson,
   assertTileSize,
   buildOutputs,
@@ -15,8 +17,12 @@ const scenes = loadScenes();
 const byId = (id: string) => scenes.find((s) => s.id === id) as SceneJson;
 
 describe('grid exporter', () => {
-  it('finds all 15 scenes and skips nav files', () => {
-    expect(scenes).toHaveLength(15);
+  it('finds every scene of every map and skips nav files', () => {
+    const mapsDir = join(SCENES_DIR, '../maps');
+    const listed = readdirSync(mapsDir).flatMap(
+      (f) => (JSON.parse(readFileSync(join(mapsDir, f), 'utf8')) as { scenes: string[] }).scenes,
+    );
+    expect(scenes.map((s) => s.id).sort()).toEqual(listed.sort());
   });
 
   it('fails on any tile size other than 64', () => {
@@ -29,8 +35,8 @@ describe('grid exporter', () => {
     const nav = navFor(byId('tavern_bar'));
     const grid = createNavGrid(nav, 'small');
     expect(grid.solidAt(0, 0)).toBe(true); // wall
-    expect(grid.solidAt(0, 6)).toBe(true); // door D
-    expect(grid.solidAt(1, 6)).toBe(false); // spawn S
+    expect(grid.solidAt(4, 11)).toBe(true); // door D
+    expect(grid.solidAt(4, 10)).toBe(false); // spawn S
     expect(grid.solidAt(15, 1)).toBe(true); // hiding spot H
     expect(grid.solidAt(5, 5)).toBe(false); // floor
     const ow = navFor(byId('overworld'));
@@ -59,7 +65,7 @@ describe('grid exporter', () => {
     const ground = map.layers.find((l) => l.name === 'ground')?.data as number[];
     expect(ground).toHaveLength(20 * 12);
     expect(ground[0]).toBe(GREYBOX.wall);
-    expect(ground[6 * 20]).toBe(GREYBOX.door);
+    expect(ground[11 * 20 + 4]).toBe(GREYBOX.door);
     const portals = map.layers.find((l) => l.name === 'portals')?.objects ?? [];
     expect(portals.find((p) => p.name === 'tb.back')).toMatchObject({ x: 10 * 64, y: 11 * 64 });
   });

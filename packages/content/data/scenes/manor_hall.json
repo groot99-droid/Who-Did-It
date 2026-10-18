@@ -97,6 +97,10 @@
   ],
   "gates": [],
   "paths": [],
+  "lights": [
+    { "id": "mh.lt_lamp_w", "kind": "lamp", "x": 7, "y": 7, "radiusTiles": 2.5 },
+    { "id": "mh.lt_lamp_e", "kind": "lamp", "x": 21, "y": 7, "radiusTiles": 2.5 }
+  ],
   "grid": [
     "##############D#############",
     "#.............S............#",
@@ -114,5 +118,23 @@
     "#..........................#",
     "#.....S.............S......#",
     "######D#############D#######"
+  ],
+  "material": [
+    "WWWWWWWWWWPWWWWWWWPWWWWWWWWW",
+    "WffffffffffffffffffffffffffW",
+    "WffffffffffffffffffffffffffW",
+    "WffffffffffffffffffffffffffW",
+    "WffffffffffffffffffffffffffW",
+    "WffffffffffffffffffffffffffW",
+    "WffffffffWWWWWWWWWWffffffffW",
+    "WffffffffffffffffffffffffffW",
+    "WfffffffffffffffffffffffWffW",
+    "WfffffffffffffffffffffffWffW",
+    "WffffffffWWWWWWWWWWfffffWffW",
+    "WfffffffffffffffffffffffWffW",
+    "WfffffffffffffffffffffffWffW",
+    "WffffffffffffffffffffffffffW",
+    "WffffffffffffffffffffffffffW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
   ]
 }

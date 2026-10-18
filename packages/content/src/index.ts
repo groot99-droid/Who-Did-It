@@ -30,6 +30,8 @@ import manorUpperJson from '../data/scenes/manor_upper.json' with { type: 'json'
 import barnJson from '../data/scenes/barn.json' with { type: 'json' };
 import chapelJson from '../data/scenes/chapel.json' with { type: 'json' };
 import cellarJson from '../data/scenes/cellar.json' with { type: 'json' };
+import forestDeepJson from '../data/scenes/forest_deep.json' with { type: 'json' };
+import caveGalleryJson from '../data/scenes/cave_gallery.json' with { type: 'json' };
 import hollowmereJson from '../data/maps/hollowmere.json' with { type: 'json' };
 
 import { AbilitiesFile } from './schemas/abilities.js';
@@ -86,6 +88,8 @@ const sceneJson: Record<SceneId, unknown> = {
   barn: barnJson,
   chapel: chapelJson,
   cellar: cellarJson,
+  forest_deep: forestDeepJson,
+  cave_gallery: caveGalleryJson,
 };
 
 const mapJson: Record<MapId, unknown> = { hollowmere: hollowmereJson };

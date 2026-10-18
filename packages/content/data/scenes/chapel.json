@@ -70,6 +70,17 @@
   "props": [{ "id": "ch.rope", "kind": "decor", "x": 9, "y": 0 }],
   "gates": [],
   "paths": [],
+  "lights": [
+    { "id": "ch.lt_candles", "kind": "lamp", "x": 9, "y": 1, "radiusTiles": 2.5 },
+    {
+      "id": "ch.lt_moon_window",
+      "kind": "moon",
+      "x": 4,
+      "y": 6,
+      "radiusTiles": 2,
+      "phases": ["night"]
+    }
+  ],
   "grid": [
     "##################",
     "#...............B#",
@@ -83,5 +94,19 @@
     "#................#",
     "#.S..............#",
     "##D###############"
+  ],
+  "material": [
+    "WWWWWWWWWPWWWWWWWW",
+    "WffffffffffffffffW",
+    "WffffffffffffffffW",
+    "WffffKKKKfKKKKfffW",
+    "WffffffffffffffffW",
+    "WffffKKKKfKKKKfffW",
+    "WffffffffffffffffW",
+    "WffffKKKKfKKKKfffW",
+    "WffffffffffffffffW",
+    "WffffffffffffffffW",
+    "WffffffffffffffffW",
+    "WWWWWWWWWWWWWWWWWW"
   ]
 }
