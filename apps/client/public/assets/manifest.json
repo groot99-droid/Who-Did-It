@@ -3,25 +3,6 @@
   "art": "real",
   "entries": [
     {
-      "key": "char_villager",
-      "type": "multiatlas",
-      "url": "chars/char_villager.json",
-      "path": "chars/",
-      "filter": "linear"
-    },
-    {
-      "key": "ovl_villager",
-      "type": "multiatlas",
-      "url": "chars/ovl_villager.json",
-      "path": "chars/",
-      "filter": "linear"
-    },
-    {
-      "key": "anims_villager",
-      "type": "animation",
-      "url": "chars/villager.anims.json"
-    },
-    {
       "key": "char_detective",
       "type": "multiatlas",
       "url": "chars/char_detective.json",
@@ -43,116 +24,116 @@
     {
       "key": "char_doctor",
       "type": "multiatlas",
-      "url": "placeholder/chars/char_doctor.json",
-      "path": "placeholder/chars/",
+      "url": "chars/char_doctor.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "ovl_doctor",
       "type": "multiatlas",
-      "url": "placeholder/chars/ovl_doctor.json",
-      "path": "placeholder/chars/",
+      "url": "chars/ovl_doctor.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "anims_doctor",
       "type": "animation",
-      "url": "placeholder/chars/doctor.anims.json"
+      "url": "chars/doctor.anims.json"
     },
     {
       "key": "char_vicar",
       "type": "multiatlas",
-      "url": "placeholder/chars/char_vicar.json",
-      "path": "placeholder/chars/",
+      "url": "chars/char_vicar.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "ovl_vicar",
       "type": "multiatlas",
-      "url": "placeholder/chars/ovl_vicar.json",
-      "path": "placeholder/chars/",
+      "url": "chars/ovl_vicar.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "anims_vicar",
       "type": "animation",
-      "url": "placeholder/chars/vicar.anims.json"
+      "url": "chars/vicar.anims.json"
     },
     {
       "key": "char_watchman",
       "type": "multiatlas",
-      "url": "placeholder/chars/char_watchman.json",
-      "path": "placeholder/chars/",
+      "url": "chars/char_watchman.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "ovl_watchman",
       "type": "multiatlas",
-      "url": "placeholder/chars/ovl_watchman.json",
-      "path": "placeholder/chars/",
+      "url": "chars/ovl_watchman.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "anims_watchman",
       "type": "animation",
-      "url": "placeholder/chars/watchman.anims.json"
+      "url": "chars/watchman.anims.json"
     },
     {
       "key": "char_herbalist",
       "type": "multiatlas",
-      "url": "placeholder/chars/char_herbalist.json",
-      "path": "placeholder/chars/",
+      "url": "chars/char_herbalist.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "ovl_herbalist",
       "type": "multiatlas",
-      "url": "placeholder/chars/ovl_herbalist.json",
-      "path": "placeholder/chars/",
+      "url": "chars/ovl_herbalist.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "anims_herbalist",
       "type": "animation",
-      "url": "placeholder/chars/herbalist.anims.json"
+      "url": "chars/herbalist.anims.json"
     },
     {
       "key": "char_gamekeeper",
       "type": "multiatlas",
-      "url": "placeholder/chars/char_gamekeeper.json",
-      "path": "placeholder/chars/",
+      "url": "chars/char_gamekeeper.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "ovl_gamekeeper",
       "type": "multiatlas",
-      "url": "placeholder/chars/ovl_gamekeeper.json",
-      "path": "placeholder/chars/",
+      "url": "chars/ovl_gamekeeper.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "anims_gamekeeper",
       "type": "animation",
-      "url": "placeholder/chars/gamekeeper.anims.json"
+      "url": "chars/gamekeeper.anims.json"
     },
     {
       "key": "char_lamplighter",
       "type": "multiatlas",
-      "url": "placeholder/chars/char_lamplighter.json",
-      "path": "placeholder/chars/",
+      "url": "chars/char_lamplighter.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "ovl_lamplighter",
       "type": "multiatlas",
-      "url": "placeholder/chars/ovl_lamplighter.json",
-      "path": "placeholder/chars/",
+      "url": "chars/ovl_lamplighter.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "anims_lamplighter",
       "type": "animation",
-      "url": "placeholder/chars/lamplighter.anims.json"
+      "url": "chars/lamplighter.anims.json"
     },
     {
       "key": "char_baker",
@@ -176,40 +157,40 @@
     {
       "key": "char_fisher",
       "type": "multiatlas",
-      "url": "placeholder/chars/char_fisher.json",
-      "path": "placeholder/chars/",
+      "url": "chars/char_fisher.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "ovl_fisher",
       "type": "multiatlas",
-      "url": "placeholder/chars/ovl_fisher.json",
-      "path": "placeholder/chars/",
+      "url": "chars/ovl_fisher.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "anims_fisher",
       "type": "animation",
-      "url": "placeholder/chars/fisher.anims.json"
+      "url": "chars/fisher.anims.json"
     },
     {
       "key": "char_tinner",
       "type": "multiatlas",
-      "url": "placeholder/chars/char_tinner.json",
-      "path": "placeholder/chars/",
+      "url": "chars/char_tinner.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "ovl_tinner",
       "type": "multiatlas",
-      "url": "placeholder/chars/ovl_tinner.json",
-      "path": "placeholder/chars/",
+      "url": "chars/ovl_tinner.json",
+      "path": "chars/",
       "filter": "nearest"
     },
     {
       "key": "anims_tinner",
       "type": "animation",
-      "url": "placeholder/chars/tinner.anims.json"
+      "url": "chars/tinner.anims.json"
     },
     {
       "key": "portrait_detective",

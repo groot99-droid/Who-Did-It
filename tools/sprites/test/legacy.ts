@@ -20,27 +20,6 @@ export const LEGACY: readonly string[] = [
   'tiles_floorboards',
   'tiles_caverock',
   'tiles_forestfloor',
-  // L3 (5L): the looks point at their placeholder twins until they are packed
-  'char_doctor',
-  'ovl_doctor',
-  'char_vicar',
-  'ovl_vicar',
-  // L4 (5L): the looks point at their placeholder twins until they are packed
-  'char_watchman',
-  'ovl_watchman',
-  'char_herbalist',
-  'ovl_herbalist',
-  'char_gamekeeper',
-  'ovl_gamekeeper',
-  'char_lamplighter',
-  'ovl_lamplighter',
-  'char_fisher',
-  'ovl_fisher',
-  'char_tinner',
-  'ovl_tinner',
-  // L4 (5L): the real villager leaves the real manifest (placeholder only in round 5)
-  'char_villager',
-  'ovl_villager',
   // M1 (5M): leave both manifests with the loft
   'loft_backdrop',
   'prop_bedroll',
