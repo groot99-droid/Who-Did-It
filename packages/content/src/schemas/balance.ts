@@ -87,7 +87,7 @@ export const BalanceFile = z.strictObject({
     /** The end screen holds this long, then the room returns to the lobby with the same code (A30). */
     gameOverS: Seconds,
   }),
-  /** Keyed "4".."10". Cabal size and which specials play come from roles.json rosters. */
+  /** Keyed "4".."10". Cabal size and which specials play come from roles.json decks. */
   byCount: byPlayerCount(BalanceRow),
   meeting: Section({
     voteOpensImmediately: z.boolean(),

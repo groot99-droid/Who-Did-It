@@ -1,8 +1,7 @@
 import { shuffle, type Rng } from './prng';
 
 // The main-mode deck (GDD 3.1, 3.17; round-5 `deck/wire.md` 2.1). Session 5G owns `dealDeck` (tested in
-// `apps/server/test/dealDeck.test.ts`), Session 5F owns `coverHints`. `assignRoles` and
-// `Roster` (`rules/roles.ts`) stay beside them until 5G's contract phase.
+// `apps/server/test/dealDeck.test.ts`), Session 5F owns `coverHints`.
 
 export interface DeckDeal {
   /** Seat id -> card role id. */

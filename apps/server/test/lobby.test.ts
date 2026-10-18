@@ -8,7 +8,7 @@ import {
   Phase,
   S2C,
   TRAIT_IDS,
-  assignRoles,
+  dealDeck,
   dealTraits,
   mulberry32,
   type GameStateType,
@@ -285,7 +285,7 @@ describe('privacy after Start', () => {
     const sums = { killer: [0, 0, 0, 0], other: [0, 0, 0, 0] };
     for (let seed = 1; seed <= 2000; seed++) {
       const rng = mulberry32(seed);
-      const dealt = assignRoles(ids, { mode: 0 }, rng, roles.rosters);
+      const dealt = dealDeck(ids, deckFor(6).cards, (c) => c === 'killer', rng).dealt;
       const looks = dealTraits(ids, rng);
       for (const id of ids) {
         const look = looks.get(id)!;

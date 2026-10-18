@@ -41,7 +41,7 @@ import { MetricsFile } from './schemas/metrics.js';
 import { OnubBalanceFile, type OnubCountRow } from './schemas/onubBalance.js';
 import { OnubRolesFile } from './schemas/onubRoles.js';
 import { PaletteFile } from './schemas/palette.js';
-import { RolesFile, type DeckRow, type RosterRow } from './schemas/roles.js';
+import { RolesFile, type DeckRow } from './schemas/roles.js';
 import { RoutinesFile } from './schemas/routines.js';
 import { SCENE_IDS, Scene, type SceneId } from './schemas/scene.js';
 import { StyleFile } from './schemas/style.js';
@@ -183,11 +183,6 @@ function countKey(playerCount: number): `${4 | 5 | 6 | 7 | 8 | 9 | 10}` {
     throw new RangeError(`player count must be 4-10, got ${playerCount}`);
   }
   return String(playerCount) as `${4 | 5 | 6 | 7 | 8 | 9 | 10}`;
-}
-
-/** The roles.json row for a party size; `.deal` is what V1 deals. Session 5G removes it in its contract phase. */
-export function rosterFor(playerCount: number): RosterRow {
-  return roles.rosters[countKey(playerCount)];
 }
 
 /** The main-mode deck for a party size (GDD 3.1, 3.9): `cards` is player count + 2 card role ids, public. */
