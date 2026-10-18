@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { AVATAR_HANDLE_BYTES, Avatar, type AvatarState, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { StatusBit } from './constants';
+import { settleDisguise } from './Impersonate';
 import { isNpcSeat } from './Npc';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isLoft, sceneKey } from './World';
@@ -127,13 +128,16 @@ function faceOf(room: PartyRoom, seat: string): string {
  * A new handle for `seat` in its current scene: from `enterScene` (every crossing and placement; `transit` leaves
  * the old avatar at the door until its transit ends) and from `markDead`. The seat's old avatar is deleted, or with
  * `transit` frozen in the old scene with the transit bit until `Presence.transitUntilTick`; a new `Avatar` is created
- * in the scene of `PlayerSim.sceneIdx` and `Private.avatar` follows. A seat in the loft has no avatar.
+ * in the scene of `PlayerSim.sceneIdx` and `Private.avatar` follows. A seat in the loft has no avatar. `settle`
+ * is false for the re-handles that are not a scene entry or a death (a disguise applying or dropping, a repair).
  */
-export function rehandle(room: PartyRoom, seat: string, transit: boolean): void {
+export function rehandle(room: PartyRoom, seat: string, transit: boolean, settle = true): void {
   const player = room.state.players.get(seat);
   const p = simOf(room).players.get(seat);
   if (!player || !p) return;
   const memory = avatarMemory(room);
+  // A scene entry settles the disguise first (a pending one applies, one asked to drop drops); a death ends it.
+  if (settle) settleDisguise(room, seat);
   const old = memory.handleOf.get(seat);
   if (old !== undefined) {
     const avatar = avatarOf(room, old);
@@ -188,12 +192,12 @@ export function publishAvatars(room: PartyRoom): void {
     if (!player || !p.placed) continue;
     const handle = memory.handleOf.get(seat);
     if (isLoft(p.sceneIdx)) {
-      if (handle !== undefined) rehandle(room, seat, false);
+      if (handle !== undefined) rehandle(room, seat, false, false);
       continue;
     }
     const avatar = handle === undefined ? undefined : avatarOf(room, handle);
     if (!avatar || memory.sceneOf.get(handle as string) !== sceneKey(p.sceneIdx)) {
-      rehandle(room, seat, false);
+      rehandle(room, seat, false, false);
       continue;
     }
     // A strike or a death in transit leaves the door frozen; a plain tick copies the presence.
