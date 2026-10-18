@@ -1,13 +1,34 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance, deckFor } from '@wdi/content';
-import { C2S, ErrorCode, MAX_PLAYERS, NpcLevel, Phase, S2C, type RoleRevealPayload } from '@wdi/shared';
+import {
+  C2S,
+  ErrorCode,
+  MAX_PLAYERS,
+  NpcLevel,
+  Phase,
+  S2C,
+  TICK_RATE,
+  type RoleRevealPayload,
+} from '@wdi/shared';
 import { flowOf } from '../src/sim/Flow';
 import { resetToLobby } from '../src/sim/Win';
 import { flatten } from './killHelpers';
 import { simOf } from '../src/sim/RoomSim';
-import { until } from './flowHelpers';
-import { bootNpcServer, errors, join, lobbyOf, npcSeats, send, start, stateOf, toWorld } from './npcHelpers';
+import { npcMemory } from '../src/sim/npc/memory';
+import {
+  advance,
+  bootNpcServer,
+  errors,
+  join,
+  lobbyOf,
+  npcSeats,
+  send,
+  standardParty,
+  start,
+  stateOf,
+  toWorld,
+} from './npcHelpers';
 import { sleep } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -45,7 +66,8 @@ describe('NPC fill at Start (GDD 3.12)', () => {
     await send(party.humans[0]!, C2S.lobbyAddNpc);
     const [npc] = npcSeats(party.room);
     expect(npc?.connected).toBe(true);
-    expect(npc?.ready).toBe(true);
+    // Never Ready the moment it appears (GDD 3.12); D3 pins the delay.
+    expect(npc?.ready).toBe(false);
     expect(npc?.name.length).toBeGreaterThanOrEqual(2);
     expect(npc?.id).not.toBe(party.room.state.leaderId);
     expect(party.room.state.leaderId).toBe(party.humans[0]?.id);
@@ -160,7 +182,8 @@ describe('NPC seats through the match', () => {
     expect(party.room.state.settings.npcSeats).toBe(3);
     expect(party.room.state.settings.npcDifficulty).toBe(NpcLevel.hard);
     expect(npcSeats(party.room).map((p) => p.id)).toEqual(ids);
-    for (const p of npcSeats(party.room)) expect([p.connected, p.ready]).toEqual([true, true]);
+    // D4: the seats stay seated and connected; Ready is false on the reset tick (D2 pins the delay).
+    for (const p of npcSeats(party.room)) expect([p.connected, p.ready]).toEqual([true, false]);
     expect(party.room.state.leaderId).toBe(party.humans[0]?.id);
   });
 
@@ -173,10 +196,11 @@ describe('NPC seats through the match', () => {
     const sim = simOf(party.room);
     const npcs = npcSeats(party.room).map((p) => sim.players.get(p.id)!);
     const from = npcs.map((p) => ({ x: p.x, y: p.y }));
-    await sleep(2500);
+    // Each NPC stands 3-8 s after its placement (GDD 3.12), then its routine walks it.
+    advance(party, 45 * TICK_RATE);
     const moved = npcs.filter((p, i) => Math.hypot(p.x - from[i]!.x, p.y - from[i]!.y) > 4);
     expect(moved.length).toBeGreaterThanOrEqual(2);
-  }, 30_000);
+  });
 
   it('hands the lead to a human, never to an NPC seat, when the leader leaves', async () => {
     const party = await lobbyOf(colyseus, 2);
@@ -233,24 +257,79 @@ describe('the wire never marks an NPC seat', () => {
     expect(JSON.stringify(party.room.state.toJSON())).not.toMatch(/isNpc|npc_/i);
   });
 
-  it('readies NPCs on the role card at a human pace, and the card still ends', async () => {
-    const party = await lobbyOf(colyseus, 1);
-    await start(party);
+  it('D1: readies NPCs on the role card 2-9 s after it opens, each on its own draw, and the card still ends', async () => {
+    const party = await standardParty(colyseus, 'S1', true);
     const seats = npcSeats(party.room);
     expect(seats.every((p) => !p.ready)).toBe(true);
-    const began = party.room.state.tick;
+    const open = party.room.state.phaseEndsTick - balance.phases.roleRevealS * TICK_RATE;
     const readyAt = new Map<string, number>();
-    await until(() => {
-      for (const p of seats) if (p.ready && !readyAt.has(p.id)) readyAt.set(p.id, party.room.state.tick);
-      return readyAt.size === seats.length;
-    }, 20_000);
+    advance(party, balance.phases.roleRevealS * TICK_RATE - 5, (tick) => {
+      for (const p of seats) if (p.ready && !readyAt.has(p.id)) readyAt.set(p.id, tick);
+    });
     expect(readyAt.size).toBe(seats.length);
+    const d = balance.npc.ready.delayS;
     for (const tick of readyAt.values()) {
-      expect(tick - began).toBeGreaterThanOrEqual(balance.npc.ready.delayS.min * 20 - 3);
-      expect(tick - began).toBeLessThanOrEqual(balance.npc.ready.delayS.max * 20 + 3);
+      expect(tick - open).toBeGreaterThanOrEqual(d.min * TICK_RATE - 1);
+      expect(tick - open).toBeLessThanOrEqual(d.max * TICK_RATE + 1);
     }
-    party.humans[0]?.room.send(C2S.lobbyReady, { ready: true });
-    await until(() => party.room.state.phase === Phase.grace);
+    const ticks = [...readyAt.values()];
+    expect(Math.max(...ticks) - Math.min(...ticks)).toBeGreaterThanOrEqual(20);
+    // The AFK human never readies: the card ends at its timer.
+    expect(party.room.state.phase).toBe(Phase.roleReveal);
+    advance(party, 10);
     expect(party.room.state.phase).toBe(Phase.grace);
-  }, 40_000);
+  });
+
+  it('D2: after the return to the lobby the NPC seats turn Ready 2-9 s later, each on its own draw', async () => {
+    const party = await standardParty(colyseus, 'S1');
+    const human = party.humans[0]!;
+    resetToLobby(party.room);
+    expect(party.room.state.phase).toBe(Phase.lobby);
+    const seats = npcSeats(party.room);
+    expect(seats.every((p) => !p.ready)).toBe(true);
+    await sleep(150);
+    // A client's first patch after the reset shows them all not ready.
+    stateOf(human).players.forEach((p, id) => {
+      if (id !== human.id) expect(p.ready, id).toBe(false);
+    });
+    const resetTick = party.room.state.tick;
+    const readyAt = new Map<string, number>();
+    advance(party, 10 * TICK_RATE, (tick) => {
+      for (const p of seats) if (p.ready && !readyAt.has(p.id)) readyAt.set(p.id, tick);
+    });
+    expect(readyAt.size).toBe(seats.length);
+    const d = balance.npc.ready.delayS;
+    for (const tick of readyAt.values()) {
+      expect(tick - resetTick).toBeGreaterThanOrEqual(d.min * TICK_RATE - 1);
+      expect(tick - resetTick).toBeLessThanOrEqual(d.max * TICK_RATE + 1 + 12);
+    }
+    const ticks = [...readyAt.values()];
+    expect(Math.max(...ticks) - Math.min(...ticks)).toBeGreaterThanOrEqual(20);
+    expect(party.room.state.players.get(human.id)!.ready).toBe(false);
+  });
+
+  it('D3: an NPC added in the lobby arrives not Ready, turns Ready 2-9 s later, and a removed one leaves nothing pending', async () => {
+    const party = await lobbyOf(colyseus, 1);
+    const leader = party.humans[0]!;
+    await send(leader, C2S.lobbyAddNpc, {}, 60);
+    await send(leader, C2S.lobbyAddNpc, {}, 60);
+    const [first, second] = npcSeats(party.room);
+    stateOf(leader).players.forEach((p, id) => {
+      if (id !== leader.id) expect(p.ready, id).toBe(false);
+    });
+    const seated = party.room.state.tick;
+    const mem = npcMemory(party.room);
+    expect(mem.brain(first!.id).lobbyReadyAtTick).toBeGreaterThan(seated - 20);
+    await send(leader, C2S.lobbyRemoveNpc, {}, 60);
+    expect(party.room.state.players.has(second!.id)).toBe(false);
+    expect(mem.brains.has(second!.id)).toBe(false);
+    const d = balance.npc.ready.delayS;
+    let readyAt = -1;
+    advance(party, 12 * TICK_RATE, (tick) => {
+      if (readyAt < 0 && first!.ready) readyAt = tick;
+    });
+    expect(readyAt - seated).toBeGreaterThanOrEqual(d.min * TICK_RATE - 1 - 20);
+    expect(readyAt - seated).toBeLessThanOrEqual(d.max * TICK_RATE + 1 + 20);
+    expect(party.room.state.settings.npcSeats).toBe(1);
+  });
 });

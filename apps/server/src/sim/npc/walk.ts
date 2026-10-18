@@ -5,10 +5,10 @@ import { PORTAL_REACH_TILES } from '../constants';
 import { queuePortal } from '../PortalQueue';
 import { type PlayerSim, simOf } from '../RoomSim';
 import { isLoft, navGrid, profileOpen, sceneKey, tileCentre } from '../World';
-import type { Brain, NpcMemory } from './memory';
+import { type Brain, type NpcMemory, playRng } from './memory';
 
 /** A path goal tile counts as arrived a little inside the reach, so a rounding step never refuses the act. */
-const GOAL_SLACK = 0.8;
+export const GOAL_SLACK = 0.8;
 /** How long a path is followed before it is rebuilt from where the NPC actually stands. */
 const REPLAN_TICKS = TICK_RATE;
 
@@ -50,15 +50,16 @@ export function portalInReach(p: PlayerSim, portals: readonly Portal[]): Portal 
  * nearest portal with chance `portalSteerChance` (and then, in reach, taken with chance `portalChance`).
  * A heading aimed at a portal follows the tile path to it, so a wall between never pins the seat.
  */
-export function wander(room: PartyRoom, mem: NpcMemory, brain: Brain, p: PlayerSim, id: string): void {
+export function wander(room: PartyRoom, _mem: NpcMemory, brain: Brain, p: PlayerSim, id: string): void {
   const tick = room.state.tick;
+  const rng = playRng(room, id);
   const w = balance.npc.wander;
   const portals = openPortals(room, p);
   if (tick >= brain.nextHeadingTick) {
-    brain.nextHeadingTick = tick + npcDelayTicks(mem.rng, w.stepMinS, w.stepMaxS, TICK_RATE);
-    brain.heading = HEADINGS[Math.floor(mem.rng() * HEADINGS.length)] as (typeof HEADINGS)[number];
+    brain.nextHeadingTick = tick + npcDelayTicks(rng, w.stepMinS, w.stepMaxS, TICK_RATE);
+    brain.heading = HEADINGS[Math.floor(rng() * HEADINGS.length)] as (typeof HEADINGS)[number];
     brain.steerPortal = '';
-    if (mem.rng() < w.portalSteerChance) {
+    if (rng() < w.portalSteerChance) {
       let best = Infinity;
       for (const q of portals) {
         const c = portalCentre(q);
@@ -70,7 +71,7 @@ export function wander(room: PartyRoom, mem: NpcMemory, brain: Brain, p: PlayerS
       }
     }
     const door = portalInReach(p, portals);
-    if (door && mem.rng() < w.portalChance) {
+    if (door && rng() < w.portalChance) {
       queuePortal(room, id, { portalId: door.id });
       brain.steerPortal = '';
     }
@@ -81,7 +82,7 @@ export function wander(room: PartyRoom, mem: NpcMemory, brain: Brain, p: PlayerS
     const result = walkTo(room, brain, p, c.x, c.y, PORTAL_REACH_TILES * TILE_PX);
     if (result === 'walking') return;
     // Arrived: the portal in reach is taken with chance `portalChance`; otherwise a fresh heading follows.
-    if (result === 'arrived' && mem.rng() < w.portalChance) queuePortal(room, id, { portalId: aimed.id });
+    if (result === 'arrived' && rng() < w.portalChance) queuePortal(room, id, { portalId: aimed.id });
     brain.steerPortal = '';
     brain.nextHeadingTick = tick;
   }
