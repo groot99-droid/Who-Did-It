@@ -2,6 +2,7 @@ import { balance, onubRoles, roles } from '@wdi/content';
 import { ErrorCode, Phase, type PlayerState, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { fixedDealFits } from './Deck';
+import { beginFinalNight, endHunt, enforceFinalVote, isFinalNightRound } from './FinalNight';
 import { countRow, flowOf, isMeetingPhase, refuse, setPhase } from './Flow';
 import { onubClock, runOnubPhases } from './Conductor';
 import { enterImmunity, openMeeting, runMeeting } from './Meeting';
@@ -31,12 +32,16 @@ export function runPhases(room: PartyRoom): void {
   if (drainDeaths(room)) return;
   if (isMeetingPhase(state.phase)) {
     sim.meetingRequests.length = 0;
+    enforceFinalVote(room); // the forced vote has no Skip (GDD 3.3)
     runMeeting(room);
     return;
   }
   const [request] = sim.meetingRequests;
   sim.meetingRequests.length = 0;
-  if (request && isWorldPhase(state.phase)) return openMeeting(room, request);
+  if (request && state.phase === Phase.finalNight) {
+    // A body report ends the hunt at once and opens the forced meeting (GDD 3.3); nothing else opens one there.
+    if (balance.finalNight.reportEndsHunt) return endHunt(room, request.callerId, request.bodyOf);
+  } else if (request && isWorldPhase(state.phase)) return openMeeting(room, request);
   if (state.tick >= state.phaseEndsTick) advanceWorldPhase(room);
 }
 
@@ -67,7 +72,10 @@ function drainDeaths(room: PartyRoom): boolean {
   return true;
 }
 
-/** grace -> day -> dusk -> night -> day ..., `round` + 1 on every entry into day (GDD 3.3). */
+/**
+ * grace -> day -> dusk -> night -> day ..., `round` + 1 on every entry into day (GDD 3.3). The day that would start
+ * a round above `finalNight.afterCycle` is the Final Night instead; its hunt ends in the forced meeting.
+ */
 function advanceWorldPhase(room: PartyRoom): void {
   const state = room.state;
   const p = balance.phases;
@@ -76,9 +84,12 @@ function advanceWorldPhase(room: PartyRoom): void {
       return setPhase(room, Phase.dusk, p.duskS);
     case Phase.dusk:
       return setPhase(room, Phase.night, p.nightS);
+    case Phase.finalNight:
+      return endHunt(room);
     default: {
       // grace, night, immunity (and the unused dawn) all lead into a new day
       const fromGrace = state.phase === Phase.grace;
+      if (isFinalNightRound(state.round + 1)) return beginFinalNight(room);
       state.round++;
       setPhase(room, Phase.day, p.dayS);
       if (fromGrace) startKnifeCooldowns(room);
@@ -103,6 +114,7 @@ const CLOCK_PHASES: Record<string, { phase: number; seconds: number }> = {
   dusk: { phase: Phase.dusk, seconds: balance.phases.duskS },
   night: { phase: Phase.night, seconds: balance.phases.nightS },
   immunity: { phase: Phase.immunity, seconds: balance.phases.immunityS },
+  finalNight: { phase: Phase.finalNight, seconds: balance.finalNight.huntS },
 };
 
 function runDebugCommands(room: PartyRoom): void {
@@ -138,6 +150,7 @@ function runDebugCommands(room: PartyRoom): void {
         continue;
       }
       if (target.phase === Phase.immunity) enterImmunity(room);
+      else if (target.phase === Phase.finalNight) beginFinalNight(room);
       else setPhase(room, target.phase, target.seconds);
     }
     if (payload.clearCooldowns === true) clearCooldowns(room);

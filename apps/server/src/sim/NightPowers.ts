@@ -1,5 +1,7 @@
 import { type DeathCause, ErrorCode } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { finishFinalNight } from './FinalNight';
+import { isOnub } from './onub/state';
 import { reject } from './World';
 
 // Night powers, protections, Nightshade, the Last Shot and Inherit (GDD 3.2, round-5 `deck/wire.md` 5). Session
@@ -31,7 +33,11 @@ export function onMeetingOpenNight(room: PartyRoom): void {
 
 /** First line of `endReveal`: true keeps the reveal waiting for an ejected Gamekeeper's shot. Stub: false. */
 export function holdReveal(room: PartyRoom): boolean {
-  void room;
+  // The reveal of the forced meeting is the last thing of a match: it ends the match here (FinalNight.ts).
+  if (!isOnub(room) && room.state.meeting.reason === 'final') {
+    finishFinalNight(room);
+    return true;
+  }
   return false;
 }
 
