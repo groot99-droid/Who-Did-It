@@ -22,11 +22,14 @@ const CAPS: Array<[string, number, number]> = [
   ['char_', 1024, 1024],
   ['ovl_', 1024, 512],
 ];
-/** DOM images are not GPU pages; their cap is bytes per set (the low-poly ONUB set may take 4 MB, 1.9). */
+/**
+ * DOM images are not GPU pages; their cap is bytes per set. The ONUB caps are binary, as SPRITES 11 and onub.test.ts
+ * state them: 2.5 MiB, and 4 MiB for the low-poly set (art plan 1.9).
+ */
 const domBytes = (style: string): Array<[string, number]> => [
   ['portrait_', 0.8e6],
   ['thumb_', 0.2e6],
-  ['onub_', style === 'lowpoly' ? 4e6 : 2.5e6],
+  ['onub_', (style === 'lowpoly' ? 4 : 2.5) * 1024 * 1024],
 ];
 
 const isDom = (p: Page) => domBytes('').some(([x]) => p.key.startsWith(x)) && p.entry.type === 'image';
@@ -73,7 +76,7 @@ describe.each(artStyles().filter((s) => hasManifest(s.root)))(
     });
 
     for (const [prefix, cap] of domBytes(style.id)) {
-      it(`keeps the ${prefix}* DOM images within ${cap / 1e6} MB`, () => {
+      it(`keeps the ${prefix}* DOM images within ${cap} bytes`, () => {
         const bytes = pages
           .filter((p) => isDom(p) && p.key.startsWith(prefix))
           .reduce((n, p) => n + p.bytes, 0);
