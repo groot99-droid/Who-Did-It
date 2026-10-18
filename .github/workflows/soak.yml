@@ -1,7 +1,10 @@
 # The long match soak (ARCHITECTURE 5.12): 6 walking bots play matches back to back for 30 minutes against the
 # built server, once in the main mode and once in quick mode (GDD 3.11), and fail on a presence or night leak,
 # a dropped bot, a protocol error, a p95 tick above 15 ms, or a run in which nothing happened. It never runs
-# on push or pull request: it is started by hand (Actions > soak > Run workflow) and weekly.
+# on push or pull request: it is started by hand (Actions > soak > Run workflow) and weekly. The quick-mode leg
+# (ONUB v2) seats 4 bots plus NPCs up to 4, 6, 8 and 10 in turn, fails on a night leak (a sleeper that received a
+# `nightWake` or `nightReveal`, or any presence), and ends with the ruin rate per party size against the 20-30%
+# target, from the matches it played and from the prep Monte Carlo (`pnpm bots:ruin`).
 name: soak
 
 on:
@@ -26,7 +29,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode: [main, onub]
+        include:
+          - mode: main
+            args: ''
+          - mode: onub
+            args: '--bots 4 --sizes 4,6,8,10'
     steps:
       - uses: actions/checkout@v7
         with:
@@ -39,7 +46,11 @@ jobs:
       - run: pnpm --filter @wdi/server build
       - name: Soak
         shell: bash
-        run: pnpm bots:soak -- --mode ${{ matrix.mode }} --minutes ${{ inputs.minutes || '30' }} | tee soak.log
+        run: pnpm bots:soak -- --mode ${{ matrix.mode }} --minutes ${{ inputs.minutes || '30' }} ${{ matrix.args }} | tee soak.log
+      - name: Ruin rate (prep Monte Carlo)
+        if: matrix.mode == 'onub'
+        shell: bash
+        run: pnpm bots:ruin | tee -a soak.log
       - name: Result
         if: always()
         shell: bash
@@ -47,6 +58,6 @@ jobs:
           {
             echo "### soak (${{ matrix.mode }})"
             echo '```'
-            tail -n 12 soak.log || true
+            tail -n 24 soak.log || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
