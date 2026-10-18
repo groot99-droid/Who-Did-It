@@ -1864,3 +1864,13 @@
 .wdi-slot__face {
   font-weight: var(--wdi-weight-strong);
 }
+
+.wdi-claim-form {
+  padding: var(--wdi-space-3);
+  border: 1px solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-md);
+}
+
+.wdi-claim-form[hidden] {
+  display: none;
+}
