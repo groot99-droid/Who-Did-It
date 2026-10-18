@@ -2050,6 +2050,18 @@ Four stacked draft PRs (#31 Night scene, lights-out and narrator; #36 card table
 
 ### Round 5 log: 5E (ONUB v2 bots, NPC brains, e2e and soak)
 
+**Done** (branch `claude/r5-onub-bots`; decisions in DECISIONS A56):
+- `sim/npc/onub.ts`: the NPC seat's pure planners and `runOnubNpc` (prep at `commitS`, the act at `actFrac` of its window from `onubWakeView`, one claim at `claimFrac`, the vote at `voteFrac` of the Rush plus CRUST); `test/onubNpc.test.ts` (30 tests: timing windows, one send, fixed draw counts, claim and vote logic per team, the two-step Tourrier, a sleeper's view never computed). The verbs are mocked there, since 5A and 5B were stubs on the base.
+- `tools/bots/quick.ts` and the quick branch of `walk.ts`: the bots' prep, night act, claim and vote (Pantry included), the night leak monitor (`WalkerStats.nightLeaks`), `soak.ts --mode onub` with `--sizes`, `--sabotage` and `--pace`, the ruin report per size, `ruin.ts` (`pnpm bots:ruin`, Monte Carlo over the real prep rules); `test/quick.test.ts`, `test/ruin.test.ts`.
+- `apps/client/e2e/onub.spec.ts` (rewritten on the frozen hooks) and the quick case of `npc.spec.ts`; both opt-in (`WDI_E2E_ONUB=1`, `WDI_E2E_NPC=1`) and not run here.
+- `.github/workflows/soak.yml` (quick leg with `--sizes 4,6,8,10` and the Monte Carlo), GDD 3.11 "NPC seats" (the draw of the picks, the Tourrier's step delay), ARCHITECTURE 5.12.
+
+**Not done / for integration.**
+- PR 4 of the brief, the main-mode bot reads after 5F's contract phase (prey from `SceneState.avatars` by handle, Kill by handle, the leak monitor counting any other seat's `presence` and any avatar outside the own scene): 5F had not merged. `walk.ts` keeps `Player.sceneId` and presence reads until then.
+- The real-seat-through-a-full-quick-match test, the specs and the soaks need 5A to 5D merged: run `WDI_E2E_ONUB=1 WDI_E2E_NPC=1 pnpm --filter @wdi/client test:e2e`, `pnpm bots:soak:onub -- --bots 4 --sizes 4,6,8,10` and `pnpm bots:ruin`, and read the ruin table against the 20-30% target.
+- Contract request: `balance.onub.json` `npc.stepS` for the Tourrier's second-step delay (now `STEP_DELAY_S` in the code; DECISIONS A56).
+- Unverified against the real rules: whether a second `nightWake` follows a first step (the bot rebuilds the Tourrier's second step itself when it does not; the server NPC reads `onubWakeView` fresh each tick).
+
 ### Round 5 log: 5F (avatars, public looks, covers, Impersonate)
 
 ### Round 5 log: 5G (main deck and Werewolf roles)
