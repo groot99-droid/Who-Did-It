@@ -35,6 +35,7 @@ export const ONUB_PREP_COPY = {
   'onub.mini.pour.spilled': 'Too much. The bowl is empty again.',
   'onub.mini.pour.hold': 'Hold to pour',
   'onub.mini.slide.hint': 'Slide {steps} bannetons into the glowing slots.',
+  'onub.mini.slide.next': 'Slide in the next banneton',
   'onub.mini.slide.slot': 'Slot {n}',
   'onub.mini.slide.banneton': 'Banneton {n}',
   'onub.mini.stoke.hint': 'Tap to feed the fire. Hold the needle in the band for {holdS} s.',
