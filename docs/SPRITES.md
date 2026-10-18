@@ -185,9 +185,12 @@ as flat palette shapes with a direction arrow and a text label, so playtests run
 | `clue_bucket_wet` | 1 |
 | `clue_fur`, `clue_claw` (wolf kill) | 2 |
 | `clue_drag` (drag smear segment) | 1 |
+| `clue_footprint_<s\|m\|t>_glow` (Hunger's glowing prints, `ClueKind.hungerPrints`; round 5) | 3 |
 
-Real clue art (M3, `tools/blender/build_props.py`) keeps these 21 keys in the same `clues` texture, one
-64 px cell per key at the world scale of 64 px per metre. Ground marks (footprints, smear, print, fur,
+Real clue art (M3, `tools/blender/build_props.py`) keeps these keys in the same `clues` texture, one
+64 px cell per key at the world scale of 64 px per metre; round 5 re-finishes them with the pixel finish
+(display size, `linear`, one 256 x 512 page) and adds the three glow frames: the footprint in the moon
+ramp's light steps with a one-pixel `#7FA8FF` rim, drawn like any footprint. Ground marks (footprints, smear, print, fur,
 claw, drag) are rendered by the straight-down `TileCam`, like the ground tiles; the wet bucket, the
 thread and the felt are small objects rendered by `IsoCam` (10.3). Frames stay centred (no
 pivot). Footprints and the drag segment point screen-up (`n`): rotate the sprite by `Clue.dir`; the
@@ -195,8 +198,10 @@ drag segment fills the cell top to bottom so segments chain along a trail. A foo
 left-right pair; the client lays the 5-tile trail (GDD 3.4) from several of them.
 
 **Building exteriors.** From round 5 a building is drawn from its slices `<art>#<dx>_<dy>` in
-`bld_<mapId>` (10.5, 10.13); the `bld_<id>_ext` keys below are the stand-ins (single images, rendered
-with the roof, tilted camera) and leave both manifests when `bld_hollowmere` lands. One per
+`bld_<mapId>` (10.5, 10.13): `bld_hollowmere` holds `manor`, `barn`, `bakery`, `apoth`, `widow`,
+`tavern`, `chapel`, `netloft`, `mollHut`; `bld_blackpine` holds `lodge`, `mill`, `office`, `smithy`,
+`woodshed` (art plan 3.4). The `bld_<id>_ext` stand-ins below left both manifests with `bld_hollowmere`
+(Session 5K); the table is kept as the record of the round-4 keys. One per
 Small-profile building of `WORLD.md` 4.3; the id is the stem of its frozen overworld portal id
 (`ov.<id>`):
 
@@ -219,7 +224,9 @@ The real sets are rendered stand-ins (`tiles/`, `tools/blender/build_tiles.py`, 
 with every other.
 
 **Props** (texture `props`, `props/props.json`; M3, the bakery keys M3b; the placeholder set draws each key
-as an unlabelled greybox block on the same cell and pivot). One frame per key, rendered by
+as an unlabelled greybox block on the same cell and pivot). From round 5 the boot atlas `props` holds the
+shared props, spots and portal frames and each map has `props_<mapId>` (10.13, art plan 3.5-3.7): the bell
+and the bakery keys below now live in `props_hollowmere`. One frame per key, rendered by
 `IsoCam` at the display scale and finished to packed size (10.3). The key is `prop_<kind>` with the `kind` of
 `packages/content/data/scenes/overworld.json` `props[]`; a stateful prop adds its state. Every frame
 carries a `pivot` at the base (the ground point under the prop's tile centre), so the sprite is placed

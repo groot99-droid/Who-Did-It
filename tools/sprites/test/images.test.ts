@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { loadImage } from '@napi-rs/canvas';
 import { describe, expect, it } from 'vitest';
 import { decodePng, encodePng } from '../bleed.ts';
 import { finishImages, IMAGE_SETS, IMAGE_SIZES, TILE_VARIANTS } from '../images.ts';
@@ -43,5 +46,19 @@ describe('finishImages', () => {
     const wrong = flat(LOFT_KEYS);
     wrong.set('prop_bedroll', image(56, 92));
     expect(() => finishImages(LOFT_KEYS, wrong)).toThrow(/56x92, want 112x184/);
+  });
+});
+
+describe('the lobby thumbnails (art plan 3.9, 1.4)', () => {
+  const ASSETS = join(import.meta.dirname, '../../../apps/client/public/assets');
+  it.each(['', 'placeholder/'])('%sthumb_<mapId> are 480 x 270 WebP within 0.2 MB together', async (dir) => {
+    let bytes = 0;
+    for (const map of ['hollowmere', 'blackpine']) {
+      const file = readFileSync(join(ASSETS, dir, 'thumbs', `thumb_${map}.webp`));
+      bytes += file.length;
+      const img = await loadImage(file);
+      expect([img.width, img.height], map).toEqual([480, 270]);
+    }
+    expect(bytes).toBeLessThanOrEqual(200 * 1024);
   });
 });

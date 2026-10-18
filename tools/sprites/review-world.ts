@@ -6,6 +6,7 @@
 //   tsx review-world.ts kit <assets dir> <theme> <out.png>
 //   tsx review-world.ts atlas <assets dir> <atlas json, e.g. props/props.json> <out.png>
 //   tsx review-world.ts buildings <assets dir> <mapId> <out.png>
+//   tsx review-world.ts thumbs <assets dir> <out dir> [--finish on|off]   (thumb_<mapId>.webp, art plan 3.9)
 //
 // `gate` is Gate A's Hollowmere square vignette: ground with blends, kit walls, a tree line, boulders, the
 // hedge-wall, the tavern's slices, the bell, the pump, two lantern posts and a look idling in 8 directions,
@@ -19,6 +20,8 @@ import { createCanvas, loadImage, type Canvas, type Image, type SKRSContext2D } 
 import type { MultiAtlas } from './pack.ts';
 import { CELL_H, CELL_W, COLUMNS, GROUND_ROWS } from './tileset.ts';
 import { KIT_CELLS } from './pack-static.ts';
+import type { Rgba } from './bleed.ts';
+import { boxResize, crop, encodeWebp, finishIllustration, offWebpQuality, upscaleNearest } from './pixel.ts';
 
 const BLEND_RANK = 'O~r=wfcdpslmgu'; // packages/content/src/schemas/scene.ts
 const KIT_OF: Record<string, string> = {
@@ -84,8 +87,19 @@ function greybox(g: SKRSContext2D, x: number, y: number, h: number, w = 40): voi
 
 // ---------------------------------------------------------------- the vignette
 
+/** A test scene: ground chars, solid chars (`.` = none), one building, props and an optional row of a look. */
+export interface Layout {
+  ground: string[];
+  solids: string[];
+  building: { x: number; y: number; w: number; h: number; art: string };
+  props: Array<{ frame: string; x: number; y: number }>;
+  people?: { x0: number; y: number; dirs: string[] };
+  /** The zoom-2 crop's centre tile. */
+  focus?: [number, number];
+}
+
 /** Hollowmere's square in miniature: ground chars, solid chars (`.` = none) and objects. */
-export const VIGNETTE = {
+export const VIGNETTE: Layout = {
   ground: [
     'gggggggggggggggggggggg',
     'gggccccccccccccccggggg',
@@ -122,7 +136,7 @@ export const VIGNETTE = {
     'R.....................',
     'TTT.TRT..FFFFFFF.TT.TT',
   ],
-  tavern: { x: 3, y: 1, w: 12, h: 7, art: 'tavern' },
+  building: { x: 3, y: 1, w: 12, h: 7, art: 'tavern' },
   props: [
     { frame: 'prop_bell', x: 10, y: 10 },
     { frame: 'prop_pump', x: 7, y: 11 },
@@ -131,6 +145,50 @@ export const VIGNETTE = {
   ],
   /** The look idling in 8 directions on a row across the square. */
   people: { x0: 5, y: 13, dirs: ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] },
+};
+
+/** Blackpine's yard in miniature: the Forge behind the shift bell and the pump, pines and the tram rails. */
+export const CAMP: Layout = {
+  ground: [
+    'gggggggggggggggggg',
+    'gggppppppppppppggg',
+    'ggpppppppppppppggg',
+    'ggpppppppppppppggg',
+    'ggpppppppppppppggg',
+    'ggpppppppppppppppg',
+    'ggpppppppdddpppppg',
+    'ggppppppddddpppppg',
+    'ggpppppppdddppppgg',
+    'ggpppppppppppp=ggg',
+    'gggppppppppppp=ggg',
+    'gggggggggggggg=ggg',
+    'gggggggggggggg=ggg',
+    'gggggggggggggg=ggg',
+  ],
+  solids: [
+    'TTTTT.TTTTTTT.TTTT',
+    'T.................',
+    'T................T',
+    'T.................',
+    'T................T',
+    'T.................',
+    '..................',
+    'R................T',
+    '..................',
+    'K................T',
+    'K.................',
+    'T....F.F.F.F......',
+    'TT..............TT',
+    'TTTT.TTTTT.TT..TTT',
+  ],
+  building: { x: 5, y: 1, w: 7, h: 5, art: 'smithy' },
+  props: [
+    { frame: 'prop_bell', x: 9, y: 8 },
+    { frame: 'prop_pump', x: 6, y: 9 },
+    { frame: 'prop_lanternPost_lit', x: 4, y: 7 },
+    { frame: 'prop_lanternPost_lit', x: 13, y: 9 },
+  ],
+  focus: [8, 7],
 };
 
 interface Atlases {
@@ -213,8 +271,8 @@ interface Placed {
 function vignette(
   a: Atlases,
   smooth: boolean,
+  v: Layout = VIGNETTE,
 ): { canvas: Canvas; lights: { x: number; y: number }[]; focus: { x: number; y: number } } {
-  const v = VIGNETTE;
   const w = v.ground[0]!.length;
   const h = v.ground.length;
   const ox = h * 64 + 64;
@@ -232,7 +290,10 @@ function vignette(
     return { x: ox + c.x, y: oy + c.y, depth: c.y };
   };
   const inTavern = (x: number, y: number) =>
-    x >= v.tavern.x && x < v.tavern.x + v.tavern.w && y >= v.tavern.y && y < v.tavern.y + v.tavern.h;
+    x >= v.building.x &&
+    x < v.building.x + v.building.w &&
+    y >= v.building.y &&
+    y < v.building.y + v.building.h;
   v.solids.forEach((row, y) =>
     [...row].forEach((ch, x) => {
       const kind = KIT_OF[ch];
@@ -247,11 +308,11 @@ function vignette(
       });
     }),
   );
-  for (let dy = 0; dy < v.tavern.h; dy++) {
-    for (let dx = 0; dx < v.tavern.w; dx++) {
-      const p = at(v.tavern.x + dx, v.tavern.y + dy);
-      const s = a.bld.get(`${v.tavern.art}#${dx}_${dy}`);
-      const anchor = toScreen((v.tavern.x + v.tavern.w / 2) * 64, (v.tavern.y + v.tavern.h / 2) * 64);
+  for (let dy = 0; dy < v.building.h; dy++) {
+    for (let dx = 0; dx < v.building.w; dx++) {
+      const p = at(v.building.x + dx, v.building.y + dy);
+      const s = a.bld.get(`${v.building.art}#${dx}_${dy}`);
+      const anchor = toScreen((v.building.x + v.building.w / 2) * 64, (v.building.y + v.building.h / 2) * 64);
       placed.push({
         depth: p.depth,
         paint: () =>
@@ -273,8 +334,8 @@ function vignette(
       paint: () => (s ? draw(g, s, p.x, p.y, ART_SCALE) : greybox(g, p.x, p.y, 90, 24)),
     });
   }
-  v.people.dirs.forEach((dir, i) => {
-    const p = at(v.people.x0 + i, v.people.y);
+  (v.people?.dirs ?? []).forEach((dir, i) => {
+    const p = at(v.people!.x0 + i, v.people!.y);
     const s = a.look.get(`char/${a.lookId}/idle/${dir}/000`);
     // A round-5 look is packed at half size; the round-4 villager atlas is still at display size.
     const scale = a.lookId === 'villager' ? 1 : ART_SCALE;
@@ -285,18 +346,18 @@ function vignette(
   });
   placed.sort((p, q) => p.depth - q.depth);
   for (const p of placed) p.paint();
-  const f = at(8, 9); // between the tavern door and the bell: the zoom-2 crop's centre
+  const f = at(...(v.focus ?? [8, 9])); // the zoom-2 crop's centre, by default between the tavern door and the bell
   return { canvas, lights, focus: { x: f.x, y: f.y - 60 } };
 }
 
 /** The night frame: the darkness ambient (ink 0.9, metrics.json lighting) with soft lantern pools and glows. */
-function night(src: Canvas, lights: { x: number; y: number }[]): Canvas {
+function night(src: Canvas, lights: { x: number; y: number }[], alpha = 0.9): Canvas {
   const out = createCanvas(src.width, src.height);
   const g = out.getContext('2d');
   g.drawImage(src, 0, 0);
   const dark = createCanvas(src.width, src.height);
   const d = dark.getContext('2d');
-  d.fillStyle = 'rgba(18,20,28,0.9)';
+  d.fillStyle = `rgba(18,20,28,${alpha})`;
   d.fillRect(0, 0, dark.width, dark.height);
   d.globalCompositeOperation = 'destination-out';
   for (const l of lights) {
@@ -341,6 +402,44 @@ export async function gateSheet(assets: string, smooth: boolean, look = 'baker')
   g.drawImage(day, cx, cy, cw / 2, ch / 2, 0, day.height + 32, cw, ch);
   g.drawImage(nightC, cx, cy, cw / 2, ch / 2, day.width + 32, day.height + 32, cw, ch);
   return out.toBuffer('image/png');
+}
+
+function withoutPeople(v: Layout): Layout {
+  const { people: _people, ...rest } = v;
+  return rest;
+}
+
+/**
+ * The lobby thumbnail of a map (art plan 3.9): its hub vignette at dusk, the lanterns lit, finished like an
+ * illustration to a 160 x 90 art grid and tripled to 480 x 270 lossless WebP; with the main finish off, the
+ * composite box-resized to 480 x 270 at `offWebpQuality`.
+ */
+export async function thumbnail(
+  assets: string,
+  map: 'hollowmere' | 'blackpine',
+  on: boolean,
+): Promise<Buffer> {
+  const theme = map === 'hollowmere' ? 'harbour' : 'timber';
+  const a = await loadAtlases(assets, theme, map, 'none');
+  const { canvas, lights } = vignette(a, !on, map === 'hollowmere' ? withoutPeople(VIGNETTE) : CAMP);
+  const dusk = night(canvas, lights, 0.6);
+  const ctx = dusk.getContext('2d');
+  const img = ctx.getImageData(0, 0, dusk.width, dusk.height);
+  const rgba: Rgba = { width: img.width, height: img.height, data: new Uint8Array(img.data.buffer) };
+  // Crop the diamond's middle at 16:9 so the corners of void stay out.
+  const cw = Math.round(dusk.width * 0.62);
+  const ch = Math.round((cw * 9) / 16);
+  const box: [number, number, number, number] = [
+    Math.round((dusk.width - cw) / 2),
+    Math.round((dusk.height - ch) / 2),
+    cw,
+    ch,
+  ];
+  if (on) {
+    const art = finishIllustration(rgba, 160, 90, { crop: box });
+    return encodeWebp(upscaleNearest(art, 3));
+  }
+  return encodeWebp(boxResize(crop(rgba, box, 16, 9), 480, 270), offWebpQuality);
 }
 
 /** A test patch of one theme's ground at zoom 1, with a zoom-2 crop. */
@@ -464,6 +563,13 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   if (mode === 'gate' && assets) {
     out = more[0];
     png = await gateSheet(assets, smooth, look);
+  } else if (mode === 'thumbs' && assets && more[0]) {
+    for (const map of ['hollowmere', 'blackpine'] as const) {
+      const file = join(more[0], `thumb_${map}.webp`);
+      writeFileSync(file, await thumbnail(assets, map, !smooth));
+      console.log(`review-world: thumb_${map} -> ${file}`);
+    }
+    process.exit(0);
   } else if (mode === 'buildings' && assets && more[0]) {
     out = more[1];
     png = await buildingSheet(assets, more[0]);

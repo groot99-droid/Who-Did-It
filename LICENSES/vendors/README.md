@@ -16,7 +16,7 @@ never overwrite an old one, since an asset is governed by the terms in force whe
 | Poly Haven | the CC0 licence page | the first Poly Haven texture or HDRI in a render | yes, 2026-10-18: `polyhaven-textures-license-2026-10-18.txt` (the licence and the list of textures taken, Session 5K) |
 | Freesound | the CC0 licence of each sound (one row per sound in `CREDITS.md`) | the first Freesound SFX | no |
 | Quaternius | the Quaternius Asset License (QAL) | the first sprite rendered from a Quaternius model | no |
-| OpenGameArt | the licence of each entry (CC0 only) | the first OpenGameArt asset | yes, 2026-10-16: `opengameart-rain-long-thunder-license-2026-10-16.md` (the `storm` loop) |
+| OpenGameArt | the licence of each entry (CC0 only) | the first OpenGameArt asset | yes, 2026-10-16: `opengameart-rain-long-thunder-license-2026-10-16.md` (the `storm` loop); 2026-10-18: `opengameart-ambience-license-2026-10-18.md` (the four `amb_*` loops) |
 
 Fonts (OFL) live in `LICENSES/fonts/`, owned by Session B.
 

@@ -184,6 +184,17 @@ export function clueFrames(): PackInput[] {
   return out;
 }
 
+/** The lobby thumbnail stand-in (art plan 3.9): 480 x 270, the map's name on slate, lossless WebP. */
+export function thumbImage(map: string): Buffer {
+  registerFont();
+  const c = createCanvas(480, 270);
+  const g = c.getContext('2d');
+  g.fillStyle = PALETTE.slate;
+  g.fillRect(0, 0, 480, 270);
+  label(g, map, 240, 140, 24);
+  return c.toBuffer('image/webp', 100);
+}
+
 /** Four 64 px variants in a row; flecks wrap so every variant tiles with every other. */
 export function tilesetImage(biome: string): Buffer {
   const spec = TILESETS[biome]!;
@@ -530,6 +541,11 @@ export function placeholderEntries(): PlaceholderEntry[] {
         }
         return inFolder('buildings/', await packStatic(manifest, inputs));
       },
+    })),
+    ...Object.values(GROUND_MAPS).map((map): PlaceholderEntry => ({
+      order: 64,
+      entries: [{ key: `thumb_${map}`, type: 'image', url: `thumbs/thumb_${map}.webp` }],
+      files: () => new Map([[`thumbs/thumb_${map}.webp`, thumbImage(map)]]),
     })),
     ...GROUND_THEMES.map((theme): PlaceholderEntry => {
       const key = `iso_ground_${theme}`;

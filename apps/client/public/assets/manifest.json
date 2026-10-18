@@ -106,6 +106,16 @@
       ]
     },
     {
+      "key": "thumb_hollowmere",
+      "type": "image",
+      "url": "thumbs/thumb_hollowmere.webp"
+    },
+    {
+      "key": "thumb_blackpine",
+      "type": "image",
+      "url": "thumbs/thumb_blackpine.webp"
+    },
+    {
       "key": "iso_ground_harbour",
       "type": "image",
       "url": "ground/iso_ground_harbour.png",

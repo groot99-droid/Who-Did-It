@@ -12,6 +12,10 @@
     { "key": "ambient", "url": "ambient.ogg", "gain": 0.3 },
     { "key": "storm", "url": "storm.ogg", "gain": 0.35 },
     { "key": "creak", "url": "creak.ogg", "gain": 0.5 },
-    { "key": "loaf_crack", "url": "loaf_crack.ogg", "gain": 1 }
+    { "key": "loaf_crack", "url": "loaf_crack.ogg", "gain": 1 },
+    { "key": "amb_village", "url": "amb_village.ogg", "gain": 0.6 },
+    { "key": "amb_house", "url": "amb_house.ogg", "gain": 0.6 },
+    { "key": "amb_forest", "url": "amb_forest.ogg", "gain": 0.6 },
+    { "key": "amb_cave", "url": "amb_cave.ogg", "gain": 0.6 }
   ]
 }
