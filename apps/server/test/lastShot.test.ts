@@ -140,6 +140,17 @@ describe('Last Shot (GDD 3.2)', () => {
     await toPhase(m, Phase.night);
   });
 
+  it('announces no shot at a reveal unless the Gamekeeper was ejected (GDD 3.8)', async () => {
+    const m = await party();
+    await knife(m);
+    await sleep(100);
+    setPhase(m, Phase.reveal); // everyone voted Skip before the knifed Gamekeeper's aim closed
+    await power(m.bots[1]!, 'lastShot', id(m, 0));
+    expect(simOf(m.room).players.get(id(m, 0))!.dead).toBe(true);
+    await sleep(200);
+    expect(events(m.bots[2]!, 'shot')).toEqual([]);
+  });
+
   it('holds the win check of its batch until the aim closes', async () => {
     const m = await party();
     // Village 3 of 5 once the Gamekeeper falls: not a win. Kill the others so that the Gamekeeper's fall decides.
