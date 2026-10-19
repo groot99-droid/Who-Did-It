@@ -20,9 +20,17 @@ interface PlayerView {
   alive: boolean;
   presence?: { x: number; y: number };
 }
+interface AvatarView {
+  lookOf: string;
+  x: number;
+  y: number;
+}
 interface StateView {
   players: { forEach(cb: (p: PlayerView) => void): void };
-  scenes: { get(key: string): { bodies: { size: number } } | undefined };
+  scenes: {
+    get(key: string): { bodies: { size: number } } | undefined;
+    forEach(cb: (scene: { avatars?: { forEach(cb: (a: AvatarView) => void): void } }) => void): void;
+  };
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -63,23 +71,46 @@ async function watcher(
   };
 }
 
+/**
+ * Where a named seat stands in the watcher's view. Since round 5 (5F) only the own `presence` is on the wire; every
+ * other seat is an avatar of the watcher's scene, drawn as `lookOf` (nobody impersonates in these cases).
+ */
+function positionOf(v: StateView, name: string): { x: number; y: number } | undefined {
+  let id = '';
+  let own: { x: number; y: number } | undefined;
+  v.players.forEach((p) => {
+    if (p.name !== name) return;
+    id = p.id;
+    own = p.presence;
+  });
+  if (own) return own;
+  let at: { x: number; y: number } | undefined;
+  v.scenes.forEach((scene) =>
+    scene.avatars?.forEach((a) => {
+      if (a.lookOf === id) at = { x: a.x, y: a.y };
+    }),
+  );
+  return at;
+}
+
 const tilesBetween = (v: StateView, a: string, b: string): number => {
-  const at = new Map<string, { x: number; y: number }>();
-  v.players.forEach((p) => p.presence && at.set(p.name, p.presence));
-  const pa = at.get(a);
-  const pb = at.get(b);
+  const pa = positionOf(v, a);
+  const pb = positionOf(v, b);
   return pa && pb ? Math.hypot(pa.x - pb.x, pa.y - pb.y) / TILE_PX : Infinity;
 };
 
-/** Walk the host toward a named seat with the arrow keys of the axis that is farthest off, until in reach. */
+// The keys are screen axes on the isometric view (world.spec.ts): each world direction is a pair of them.
+const WORLD_KEYS = {
+  north: ['KeyW', 'KeyD'],
+  east: ['KeyS', 'KeyD'],
+  south: ['KeyA', 'KeyS'],
+  west: ['KeyA', 'KeyW'],
+} as const;
+const OPPOSITE: Record<string, string> = { KeyW: 'KeyS', KeyS: 'KeyW', KeyA: 'KeyD', KeyD: 'KeyA' };
+
+/** Walk the host toward a named seat with the keys of each world axis that is off, until in reach. */
 async function approach(page: Page, v: () => StateView, target: string, ms = 20_000): Promise<void> {
-  const pos = (name: string) => {
-    let at: { x: number; y: number } | undefined;
-    v().players.forEach((p) => {
-      if (p.name === name) at = p.presence;
-    });
-    return at;
-  };
+  const pos = (name: string) => positionOf(v(), name);
   const held = new Set<string>();
   const press = async (key: string, on: boolean) => {
     if (on === held.has(key)) return;
@@ -92,10 +123,14 @@ async function approach(page: Page, v: () => StateView, target: string, ms = 20_
       const a = pos('Hana');
       const b = pos(target);
       if (a && b) {
-        await press('KeyD', b.x - a.x > TILE_PX * 0.4);
-        await press('KeyA', a.x - b.x > TILE_PX * 0.4);
-        await press('KeyS', b.y - a.y > TILE_PX * 0.4);
-        await press('KeyW', a.y - b.y > TILE_PX * 0.4);
+        const want = new Set<string>();
+        const off = TILE_PX * 0.4;
+        if (b.x - a.x > off) WORLD_KEYS.east.forEach((k) => want.add(k));
+        if (a.x - b.x > off) WORLD_KEYS.west.forEach((k) => want.add(k));
+        if (b.y - a.y > off) WORLD_KEYS.south.forEach((k) => want.add(k));
+        if (a.y - b.y > off) WORLD_KEYS.north.forEach((k) => want.add(k));
+        for (const k of ['KeyW', 'KeyA', 'KeyS', 'KeyD'])
+          await press(k, want.has(k) && !want.has(OPPOSITE[k]!));
       }
       await sleep(30);
     }
@@ -132,9 +167,10 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
     await expect(page.getByTestId('role-name')).toHaveText('Killer');
     await page.getByTestId('ready').click();
     await expect(page.getByTestId('hud-clock')).toBeVisible();
-    // Park the NPCs on their spawns so the host can find them, and free the Knife.
+    // Park the NPCs on their spawns so the host can find them, and free the Knife; the Knife works from dusk to the
+    // end of the night (balance.json `kill.phases`, GDD 3.2), so the clock goes to the night.
     w.swarm.rooms[0]!.send('debug.npc', { walk: false });
-    w.swarm.rooms[0]!.send('debug.clock', { phase: 'day', clearCooldowns: true });
+    w.swarm.rooms[0]!.send('debug.clock', { phase: 'night', clearCooldowns: true });
 
     // First kill: the watcher. The host reports the body; three NPCs and the host are still alive.
     await approach(page, w.view, 'Watch1');
@@ -153,7 +189,7 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
     await expect(page.getByTestId('hud-clock')).toBeVisible({
       timeout: (balance.phases.revealS + 30) * 1000,
     });
-    w.swarm.rooms[0]!.send('debug.clock', { phase: 'day', clearCooldowns: true });
+    w.swarm.rooms[0]!.send('debug.clock', { phase: 'night', clearCooldowns: true });
     const alive = () => {
       const out: string[] = [];
       w.view().players.forEach(
@@ -172,7 +208,7 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
       await page.keyboard.press('KeyQ');
       await expect.poll(bodies, { message: `kill ${i + 2} leaves a body` }).toBe(before + 1);
       downed.add(prey);
-      w.swarm.rooms[0]!.send('debug.clock', { phase: 'day', clearCooldowns: true });
+      w.swarm.rooms[0]!.send('debug.clock', { phase: 'night', clearCooldowns: true });
     }
     await expect(page.getByTestId('gameover')).toBeVisible({ timeout: (balance.phases.revealS + 30) * 1000 });
     await expect(page.getByTestId('gameover-winner')).toContainText(/cabal/i);
@@ -198,7 +234,7 @@ test('Start alone fills the party: four portraits in the meeting', async ({ brow
     await page.getByTestId('ready').click();
     await expect(page.getByTestId('hud-clock')).toBeVisible();
     w.swarm.rooms[0]!.send('debug.npc', { walk: false });
-    w.swarm.rooms[0]!.send('debug.clock', { phase: 'day', clearCooldowns: true });
+    w.swarm.rooms[0]!.send('debug.clock', { phase: 'night', clearCooldowns: true });
     await approach(page, w.view, 'Watch1');
     await page.keyboard.press('KeyQ');
     await expect.poll(() => w.view().scenes.get('overworld')?.bodies.size ?? 0).toBe(1);
@@ -253,7 +289,8 @@ test('quick mode, one human and three NPCs: prep, claims and votes by the NPC br
   await expect(page.getByTestId('meeting')).toBeVisible({ timeout: 300_000 });
   await expect(page.getByTestId('vote-skip')).toBeHidden();
   await expect(page.locator('[data-testid^="portrait-"]')).toHaveCount(balance.players.min);
-  await expect(page.locator('[data-testid^="claimed-"]')).toHaveCount(3, {
+  // Every portrait carries its `claimed-<id>` badge, hidden until that seat claims: count the shown ones.
+  await expect(page.locator('[data-testid^="claimed-"]:visible')).toHaveCount(3, {
     timeout: (npc.claimFrac.max * timers.rushS + 15) * 1000,
   });
 

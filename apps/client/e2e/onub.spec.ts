@@ -106,7 +106,8 @@ test('a 5-seat ONUB v2 match: card, prep, crime scenes, night, dawn, Rush, revea
     await expect(q.guest.getByTestId('deck-editor')).toBeVisible();
     await expect(q.host.getByTestId('deck-role-champignon')).toBeEnabled();
     await expect(q.guest.getByTestId('deck-role-champignon')).toBeDisabled();
-    await expect(q.host.getByTestId('deck-reset')).toBeVisible();
+    // Reset shows only when there is a custom deck to drop (5C's DeckEditor), so not on the default deck.
+    await expect(q.host.getByTestId('deck-reset')).toBeHidden();
     await expect(q.guest.getByTestId('deck-reset')).toBeHidden();
     await expect(q.host.getByTestId('deck-problem')).toBeHidden();
 

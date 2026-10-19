@@ -1,3 +1,4 @@
+import { roles } from '@wdi/content';
 import { expect, test, type Page } from '@playwright/test';
 import { runSwarm } from '../../../tools/bots/swarm';
 import { E2E_SERVER_URL } from './env';
@@ -5,7 +6,8 @@ import { E2E_SERVER_URL } from './env';
 // Two real browsers against the real server: create, join by deep link, Start with four swarm bots,
 // and each browser shows its own role card from the server.
 
-const KNOWN_ROLES = ['Killer', 'Detective', 'Townsfolk', 'Doctor', 'Butler', 'Accomplice'];
+// Any card of the main deck (round 5 deals the Werewolf-inspired roles too, GDD 3.2).
+const KNOWN_ROLES = Object.values(roles.roles).map((r) => r.name);
 
 async function cardRole(page: Page): Promise<string> {
   await expect(page.getByTestId('rolecard')).toBeVisible({ timeout: 10_000 });
