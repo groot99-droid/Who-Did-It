@@ -50,7 +50,7 @@ export async function until(cond: () => boolean, ms = 4000): Promise<boolean> {
 /** Start from the leader; resolves once the role cards are out (or the wait ends). */
 export async function startOnub(m: OnubParty): Promise<void> {
   (m.bots[0] as Bot).room.send(C2S.lobbyStart, {});
-  await until(() => phaseOf(m) === Phase.roleReveal, 1500);
+  await until(() => phaseOf(m) === Phase.roleReveal);
 }
 
 /** What a test fixes about the deal: roles by bot index (`debug.deal`, white-box) and a custom deck. */

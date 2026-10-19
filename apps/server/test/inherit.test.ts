@@ -62,9 +62,11 @@ describe('Inherit (GDD 3.2, 3.3)', () => {
       expect(Math.abs(priv.cooldownEndTick.get('kill')! - want)).toBeLessThanOrEqual(8);
       expect(priv.inventory.slots.some((s) => s.defId === 'knife')).toBe(true);
       expect(nightOf(m.room).lastStrikeRound.get(id(m, 1))).toBe(m.room.state.round);
-      // Only the Accomplice hears of it, privately; nothing public changes.
-      m.bots.forEach((b, i) => expect(events(b, 'inherit').length - messages[i]!).toBe(i === 1 ? 1 : 0));
+      // Only the Accomplice hears of it, privately; nothing public changes. The message and the role patch travel
+      // apart, so wait for the message, then give a stray one to any other seat time to arrive.
+      await until(() => events(accomplice, 'inherit').length > messages[1]!, 2000);
       await sleep(200);
+      m.bots.forEach((b, i) => expect(events(b, 'inherit').length - messages[i]!).toBe(i === 1 ? 1 : 0));
       const after = flatten(JSON.parse(JSON.stringify(stateOf(m.bots[4]!))));
       const changed = diffPaths(before, after).filter(
         (p) => !/tick|phase|ends|Tick|alive|look|scenes\.overworld\.(bodies|clues)/i.test(p),
