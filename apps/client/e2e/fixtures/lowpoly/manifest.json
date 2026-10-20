@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "art": "lowpoly",
+  "entries": [
+    { "key": "tiles_grass", "type": "image", "url": "tiles_grass.png", "filter": "linear" },
+    {
+      "key": "onub_kitchen",
+      "type": "image",
+      "url": "onub_kitchen.png",
+      "filter": "linear",
+      "modes": ["onub"]
+    }
+  ]
+}

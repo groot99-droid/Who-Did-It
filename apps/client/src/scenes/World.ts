@@ -31,6 +31,7 @@ import { NotebookSheet } from '../view/NotebookPanel';
 import { GroundView } from '../view/GroundView';
 import { bellSpot } from '../view/PropView';
 import { StaticView } from '../view/StaticView';
+import { ART_STYLE_CHANGED } from '../view/artStyle';
 import { applyFilters, peekManifest, queueMatchEntries, sceneMapKey, sceneMapUrl } from '../view/assets';
 import { dayPartOf, isLit } from '../view/dayPart';
 import { mapStatics } from '../view/mapDefs';
@@ -259,6 +260,13 @@ export class World extends Phaser.Scene {
     this.showFps = flags.fps;
 
     // A meeting sleeps this scene (Meeting never touches view/**): hide every DOM layer, let go of the keys.
+    // A style switch (A79) replaced the textures under the sprites: a restart rebuilds every view, as a door does. A
+    // sleeping World (a meeting is up) is rebuilt by the router when the meeting ends.
+    const onArtStyle = () => {
+      if (this.scene.isActive()) this.scene.restart();
+    };
+    this.game.events.on(ART_STYLE_CHANGED, onArtStyle);
+    this.offs.push(() => this.game.events.off(ART_STYLE_CHANGED, onArtStyle));
     this.events.on(Phaser.Scenes.Events.SLEEP, this.onSleep, this);
     this.events.on(Phaser.Scenes.Events.WAKE, this.onWake, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {

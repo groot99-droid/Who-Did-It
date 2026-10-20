@@ -1,0 +1,95 @@
+/* The art-style switch (UI.md 14.18): a segmented radio group on the theme tokens. */
+.wdi-artstyle {
+  pointer-events: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-artstyle--compact .wdi-artstyle__label,
+.wdi-artstyle--compact .wdi-artstyle__hint {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.wdi-seg {
+  display: inline-flex;
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-pill);
+  overflow: hidden;
+  background: var(--wdi-surface);
+}
+
+.wdi-seg__opt {
+  min-height: var(--wdi-touch);
+  padding: 0 var(--wdi-space-4);
+  border: 0;
+  background: none;
+  color: var(--wdi-text);
+  font: inherit;
+  font-size: var(--wdi-text-sm);
+  cursor: pointer;
+}
+
+.wdi-seg__opt + .wdi-seg__opt {
+  border-left: 1px solid var(--wdi-hairline);
+}
+
+.wdi-seg__opt.is-on {
+  background: var(--wdi-primary);
+  color: var(--wdi-on-primary);
+  font-weight: var(--wdi-weight-strong);
+}
+
+.wdi-seg__opt:disabled {
+  color: var(--wdi-text-muted);
+  cursor: not-allowed;
+}
+
+.wdi-seg__opt:focus-visible {
+  outline: 2px solid var(--wdi-interact);
+  outline-offset: -2px;
+}
+
+.wdi-artcorner {
+  position: fixed;
+  left: var(--wdi-space-3);
+  bottom: var(--wdi-space-3);
+  z-index: var(--wdi-z-hud);
+  pointer-events: auto;
+}
+
+.wdi-artveil {
+  position: fixed;
+  inset: 0;
+  z-index: var(--wdi-z-dialog);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--wdi-scrim);
+  color: var(--wdi-text);
+  font-size: var(--wdi-text-lg);
+}
+
+.wdi-artveil[hidden],
+.wdi-artnotice[hidden] {
+  display: none;
+}
+
+.wdi-artnotice {
+  position: fixed;
+  left: 50%;
+  bottom: var(--wdi-space-5);
+  transform: translateX(-50%);
+  z-index: var(--wdi-z-toast);
+  padding: var(--wdi-space-2) var(--wdi-space-4);
+  border: var(--wdi-stroke-w) solid var(--wdi-hazard);
+  border-radius: var(--wdi-radius-md);
+  background: var(--wdi-surface);
+  color: var(--wdi-text);
+  font-size: var(--wdi-text-sm);
+}

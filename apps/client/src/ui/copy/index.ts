@@ -6,6 +6,7 @@ export { MEETING_COPY } from './meeting';
 export { LOBBY_COPY } from './lobby';
 export { DECK_COPY } from './deck';
 export { ONUB_NIGHT_COPY } from './onubNight';
+export { ART_STYLE_COPY, styleName } from './artStyle';
 
 /** Replaces `{key}` placeholders; a missing key is left as is so the gap shows in a test. */
 export function fill(line: string, values: Record<string, string | number>): string {

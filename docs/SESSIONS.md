@@ -2158,3 +2158,27 @@ before it, and each PR description says which commit to review. Decisions: A61.
 ### Round 5 log: 5L (character art)
 
 ### Round 5 log: 5M (ONUB art)
+
+### Round 5 log: 5N (art-style switch)
+
+**What shipped (client presentation only; no server, shared, content or art change).**
+- `view/artStyle.ts` (Phaser-free): the style list from `style.json`, the guarded `wdi.artStyle` pick, the `?art=<id>`
+  override, `requestArtStyle`, `onArtStyleChanged`.
+- `view/manifestRules.ts`: `mergeStyleManifest` and `changedEntries` (pure, tested). `view/assets.ts`: the merged
+  `resolveManifest`, per-entry roots, and the loaded-url record the swap compares against.
+- `view/artSwap.ts`: the swap (stage under temporary keys, replace by key, filters, animations). Installed by `Preload`.
+- `ui/artStyle/` and `ui/copy/artStyle.ts`: the control, the veil, the notice; UI.md 14.18.
+- Subscriptions to `art-style-changed`: `World` (restart), `Kitchen`, `Night`, `Meeting` (portraits), `MapPicker`.
+- Mounts: one line in `ui/Lobby.ts`, `Hud.ts`, and the quick-mode scenes.
+- Tests: `artStyle.test.ts`, `styleManifest.test.ts`, `e2e/artStyle.spec.ts` with the fixture manifest in
+  `e2e/fixtures/lowpoly/`.
+
+**For other sessions.**
+- 5F: no line is needed in `EntityView` or `RoleCard` today. The World restarts on a switch, so `EntityView` rebuilds
+  from the new textures, and neither file reads a texture or a manifest url yet. If `RoleCard` comes to draw a
+  `portrait_<lookId>` canvas or `<img>`, it should repaint on `art-style-changed` (`onArtStyleChanged` from
+  `view/artStyle.ts`, or `game.events`).
+- 5M: the real `assets/lowpoly/manifest.json` needs no client change. Its files must sit under `assets/lowpoly/` and its
+  urls be relative to that folder.
+- A DOM image that takes its url from `manifestImageUrls` must call it again on `art-style-changed`.
+

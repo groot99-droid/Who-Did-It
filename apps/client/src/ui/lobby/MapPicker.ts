@@ -1,3 +1,4 @@
+import { onArtStyleChanged } from '../../view/artStyle';
 import hollowmere from '@wdi/content/data/maps/hollowmere.json';
 import blackpine from '@wdi/content/data/maps/blackpine.json';
 import { readFlags } from '../../flags';
@@ -45,19 +46,23 @@ export function mountMapPicker(root: HTMLElement, net: NetworkService): MapPicke
   let destroyed = false;
   const flags = readFlags(location.search, location.hash);
   // Loaded on mount, not at import: the asset module brings Phaser, which the DOM-less unit tests cannot load.
-  void import('../../view/assets')
-    .then(({ manifestImageUrls }) =>
-      manifestImageUrls(
-        flags.art,
-        import.meta.env.BASE_URL,
-        MAP_ROWS.map((m) => m.thumbnail),
-      ),
-    )
-    .then((urls) => {
-      if (destroyed) return;
-      thumbs = urls;
-      if (last) render(last);
-    });
+  const loadThumbs = () =>
+    void import('../../view/assets')
+      .then(({ manifestImageUrls }) =>
+        manifestImageUrls(
+          flags.art,
+          import.meta.env.BASE_URL,
+          MAP_ROWS.map((m) => m.thumbnail),
+        ),
+      )
+      .then((urls) => {
+        if (destroyed) return;
+        thumbs = urls;
+        if (last) render(last);
+      });
+  loadThumbs();
+  // A style switch (A79) re-reads the thumbnails from the new style's manifest.
+  const offArt = onArtStyleChanged(loadThumbs);
 
   const thumb = (m: MapRow) =>
     thumbs[m.thumbnail] ? h('img', { class: 'wdi-map__thumb', src: thumbs[m.thumbnail], alt: '' }) : null;
@@ -124,6 +129,7 @@ export function mountMapPicker(root: HTMLElement, net: NetworkService): MapPicke
     },
     destroy() {
       destroyed = true;
+      offArt();
       root.replaceChildren();
     },
   };

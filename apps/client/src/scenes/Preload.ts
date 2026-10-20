@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { installWorldRouter } from '../net/worldRouter';
+import { installArtSwitch } from '../view/artSwap';
 import { applyFilters, queueManifest, resolveManifest } from '../view/assets';
 import { ensureGreybox } from '../view/greybox';
 import { getFlags, getNet } from './registry';
@@ -17,6 +18,7 @@ export class Preload extends Phaser.Scene {
     const flags = getFlags(this);
     const base = import.meta.env.BASE_URL;
     ensureGreybox(this.textures);
+    installArtSwitch(this.game, flags.art, base);
     installWorldRouter(this.game, getNet(this), { mock: flags.mock });
     void resolveManifest(flags.art, base).then(
       (manifest) => {

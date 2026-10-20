@@ -8,6 +8,7 @@ import { h, icon, type Screen } from './dom';
 import { mountDeckEditor } from './lobby/DeckEditor';
 import { mountDeckList } from './main/deckList';
 import { mountMapPicker } from './lobby/MapPicker';
+import { mountArtStyleSwitch } from './artStyle/ArtStyleSwitch';
 
 const { npc, players: seatRange } = balanceJson;
 const { min: lengthMin, max: lengthMax } = onubBalanceJson.targetLengthMin;
@@ -140,6 +141,7 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
   const mapSlot = h('div', { 'data-testid': 'lobby-map', hidden: true });
   settingsBlock.append(mapSlot);
   const mapPicker = mountMapPicker(mapSlot, opts.net);
+  mountArtStyleSwitch(settingsBlock);
   // The main mode's deck list (GDD 3.1, Session 5G) in its own slot under the settings, hidden in the quick mode.
   const deckListSlot = h('div', { 'data-testid': 'lobby-deck-list', hidden: true });
   settingsBlock.append(deckListSlot);

@@ -1,7 +1,16 @@
 import Phaser from 'phaser';
-import { type ManifestEntry, loadsAtBoot, loadsWithMatch } from './manifestRules';
+import { currentStyleId, styleOf } from './artStyle';
+import { type LoadedEntry, loadsAtBoot, loadsWithMatch, mergeStyleManifest } from './manifestRules';
 
-export { type ManifestEntry, QUICK_MATCH_MAP, loadsAtBoot, loadsWithMatch } from './manifestRules';
+export {
+  type LoadedEntry,
+  type ManifestEntry,
+  QUICK_MATCH_MAP,
+  loadsAtBoot,
+  loadsWithMatch,
+  changedEntries,
+  mergeStyleManifest,
+} from './manifestRules';
 
 // Loads the asset manifest of docs/SPRITES.md 5 by key. Code never names a texture path: it asks for
 // `char_villager`, `ovl_villager`, `tiles_cobble` and the manifest says where those live.
@@ -9,7 +18,7 @@ export { type ManifestEntry, QUICK_MATCH_MAP, loadsAtBoot, loadsWithMatch } from
 export interface Manifest {
   version: number;
   art: string;
-  entries: ManifestEntry[];
+  entries: LoadedEntry[];
 }
 
 export interface LoadedManifest extends Manifest {
@@ -20,31 +29,63 @@ export interface LoadedManifest extends Manifest {
 const join = (root: string, rel: string) => `${root}${rel}`;
 
 /**
- * `?art=placeholder` uses the generated placeholder set. The default is the real art manifest; until the
- * art session ships it the fetch 404s and the placeholder set keeps playtests running.
+ * `?art=placeholder` uses the generated placeholder set and overrides every style. Otherwise the real 8-bit manifest
+ * is the base and the player's style (`styleId`, default the current pick) merges over it; a style manifest that is
+ * missing or fails to load leaves the 8-bit set. Until the art session ships the real manifest the fetch 404s and the
+ * placeholder set keeps playtests running.
  */
-export async function resolveManifest(art: 'default' | 'placeholder', base: string): Promise<LoadedManifest> {
-  const resolved = await fetchManifest(art, base);
-  resolvedManifests.set(`${art}|${base}`, resolved);
+export async function resolveManifest(
+  art: 'default' | 'placeholder',
+  base: string,
+  styleId: string = currentStyleId(),
+): Promise<LoadedManifest> {
+  const resolved = await fetchManifest(art, base, styleId);
+  resolvedManifests.set(`${art}|${base}|${styleId}`, resolved);
   return resolved;
 }
 
 /** The manifest `resolveManifest` already fetched, for code that cannot wait (a scene's `preload`). */
-export function peekManifest(art: 'default' | 'placeholder', base: string): LoadedManifest | null {
-  return resolvedManifests.get(`${art}|${base}`) ?? null;
+export function peekManifest(
+  art: 'default' | 'placeholder',
+  base: string,
+  styleId: string = currentStyleId(),
+): LoadedManifest | null {
+  return resolvedManifests.get(`${art}|${base}|${styleId}`) ?? null;
 }
 
 const resolvedManifests = new Map<string, LoadedManifest>();
 
-async function fetchManifest(art: 'default' | 'placeholder', base: string): Promise<LoadedManifest> {
+async function fetchJson(url: string): Promise<unknown> {
+  const res = await fetch(url, { cache: 'no-cache' });
+  if (!res.ok) throw new Error(`${url}: ${res.status}`);
+  return res.json();
+}
+
+async function fetchManifest(
+  art: 'default' | 'placeholder',
+  base: string,
+  styleId: string,
+): Promise<LoadedManifest> {
   const candidates = art === 'placeholder' ? ['placeholder/'] : ['', 'placeholder/'];
   for (const dir of candidates) {
     const root = `${base}assets/${dir}`;
     try {
-      const res = await fetch(`${root}manifest.json`, { cache: 'no-cache' });
-      if (!res.ok) continue;
-      const body = (await res.json()) as Manifest;
-      if (Array.isArray(body.entries)) return { ...body, root };
+      const body = (await fetchJson(`${root}manifest.json`)) as Manifest;
+      if (!Array.isArray(body.entries)) continue;
+      const loaded: LoadedManifest = { ...body, root };
+      const style = styleOf(styleId);
+      if (art === 'placeholder' || dir !== '' || style.root === '') return loaded;
+      try {
+        const styleRoot = `${root}${style.root}`;
+        return mergeStyleManifest(
+          loaded,
+          await fetchJson(`${styleRoot}manifest.json`),
+          styleRoot,
+          style.filter,
+        );
+      } catch {
+        return loaded;
+      }
     } catch {
       // try the next candidate
     }
@@ -74,38 +115,57 @@ export function queueMatchEntries(
   queueEntries(load, manifest, missing);
 }
 
-function queueEntries(
+/** The url each loaded key came from, so a style switch knows which textures actually change. */
+const loadedFrom = new Map<string, string>();
+
+/** The full url of an entry's main file. */
+export const entryUrl = (manifest: LoadedManifest, e: LoadedEntry): string =>
+  join(e.root ?? manifest.root, e.url);
+
+export const loadedSource = (key: string): string | undefined => loadedFrom.get(key);
+
+/** Queues entries; `stageKey` loads them under a temporary key (the style switch) and records nothing yet. */
+export function queueEntries(
   load: Phaser.Loader.LoaderPlugin,
   manifest: LoadedManifest,
-  entries: ManifestEntry[],
+  entries: LoadedEntry[],
+  stageKey?: (key: string) => string,
 ): void {
   for (const e of entries) {
+    const root = e.root ?? manifest.root;
+    const key = stageKey ? stageKey(e.key) : e.key;
+    if (!stageKey) loadedFrom.set(e.key, join(root, e.url));
     switch (e.type) {
       case 'multiatlas':
-        load.multiatlas(e.key, join(manifest.root, e.url), join(manifest.root, e.path ?? ''));
+        load.multiatlas(key, join(root, e.url), join(root, e.path ?? ''));
         break;
       case 'atlas':
-        load.atlas(e.key, join(manifest.root, e.url.replace(/\.json$/, '.png')), join(manifest.root, e.url));
+        load.atlas(key, join(root, e.url.replace(/\.json$/, '.png')), join(root, e.url));
         break;
       case 'image':
-        load.image(e.key, join(manifest.root, e.url));
+        load.image(key, join(root, e.url));
         break;
       case 'animation':
-        load.animation(e.key, join(manifest.root, e.url));
+        load.animation(key, join(root, e.url));
         break;
     }
   }
 }
 
+/** Records that a staged entry now lives under its real key. */
+export const markLoaded = (manifest: LoadedManifest, e: LoadedEntry): void => {
+  loadedFrom.set(e.key, entryUrl(manifest, e));
+};
+
+/** `nearest` or `linear` as Phaser's filter mode. */
+export const filterMode = (f: 'nearest' | 'linear'): Phaser.Textures.FilterMode =>
+  f === 'nearest' ? Phaser.Textures.FilterMode.NEAREST : Phaser.Textures.FilterMode.LINEAR;
+
 /** Sets the per-texture filter the manifest asks for (`nearest` for pixel-art stand-ins). */
 export function applyFilters(textures: Phaser.Textures.TextureManager, manifest: Manifest): void {
   for (const e of manifest.entries) {
     if (e.filter === undefined || e.type === 'animation' || !textures.exists(e.key)) continue;
-    textures
-      .get(e.key)
-      .setFilter(
-        e.filter === 'nearest' ? Phaser.Textures.FilterMode.NEAREST : Phaser.Textures.FilterMode.LINEAR,
-      );
+    textures.get(e.key).setFilter(filterMode(e.filter));
   }
 }
 
@@ -124,17 +184,18 @@ export async function manifestImageUrls(
   art: 'default' | 'placeholder',
   base: string,
   keys: readonly string[],
+  styleId: string = currentStyleId(),
 ): Promise<Record<string, string>> {
-  const id = `${art}|${base}`;
+  const id = `${art}|${base}|${styleId}`;
   let pending = manifests.get(id);
   if (!pending) {
-    pending = resolveManifest(art, base).catch(() => null);
+    pending = resolveManifest(art, base, styleId).catch(() => null);
     manifests.set(id, pending);
   }
   const manifest = await pending;
   const out: Record<string, string> = {};
   for (const e of manifest?.entries ?? []) {
-    if (e.type === 'image' && keys.includes(e.key)) out[e.key] = join(manifest!.root, e.url);
+    if (e.type === 'image' && keys.includes(e.key)) out[e.key] = entryUrl(manifest!, e);
   }
   return out;
 }
