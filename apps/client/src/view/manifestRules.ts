@@ -11,6 +11,8 @@ export interface ManifestEntry {
   maps?: string[];
   /** Modes: the entry loads at match start when the match's mode is listed, whatever the client's card. */
   modes?: Array<'main' | 'onub'>;
+  /** Set by the client when it overlays two manifests: the directory `url` is relative to. */
+  root?: string;
 }
 
 /** Entries with neither `maps` nor `modes` load at boot (SPRITES 10.13). */
@@ -22,3 +24,15 @@ export const loadsWithMatch = (e: ManifestEntry, mapId: string, mode: 'main' | '
 
 /** The map id a quick match loads art for: none, as the quick mode walks no map (GDD 3.11), so only `modes` entries. */
 export const QUICK_MATCH_MAP = '';
+
+/**
+ * The low-poly overlay (DECISIONS A79): `over`'s entries replace `under`'s by key, and each entry keeps the
+ * directory its url is relative to, so a key the low-poly set lacks keeps its 8-bit art.
+ */
+export function overlay<M extends { root: string; entries: ManifestEntry[] }>(over: M, under: M): M {
+  const byKey = new Map(over.entries.map((e) => [e.key, { ...e, root: e.root ?? over.root }]));
+  const entries = under.entries.map((e) => byKey.get(e.key) ?? { ...e, root: e.root ?? under.root });
+  const seen = new Set(under.entries.map((e) => e.key));
+  for (const e of byKey.values()) if (!seen.has(e.key)) entries.push(e);
+  return { ...over, entries, root: under.root };
+}

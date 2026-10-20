@@ -1,6 +1,7 @@
 import hollowmere from '@wdi/content/data/maps/hollowmere.json';
 import blackpine from '@wdi/content/data/maps/blackpine.json';
-import { readFlags } from '../../flags';
+import { ART_KEY, readFlags } from '../../flags';
+import { getItem } from '../../net/storage';
 import type { LobbySnapshot, NetworkService } from '../../net/NetworkService';
 import { MAP_COPY as C } from '../copy/maps';
 import { fill } from '../copy';
@@ -43,7 +44,7 @@ export function mountMapPicker(root: HTMLElement, net: NetworkService): MapPicke
   let last: LobbySnapshot | null = null;
   let thumbs: Record<string, string> = {};
   let destroyed = false;
-  const flags = readFlags(location.search, location.hash);
+  const flags = readFlags(location.search, location.hash, getItem(ART_KEY));
   // Loaded on mount, not at import: the asset module brings Phaser, which the DOM-less unit tests cannot load.
   void import('../../view/assets')
     .then(({ manifestImageUrls }) =>
