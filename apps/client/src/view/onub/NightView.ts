@@ -97,6 +97,15 @@ export class NightView {
     }
   };
   private legalKey = '';
+  /**
+   * Dawn as the `phaseChange` message announced it. The message comes ahead of the state patch and does not
+   * wait for a frame, so a slow device whose patches arrive batched still shows the five-second dawn.
+   */
+  private dawnSeen = false;
+  private readonly onPhase = ({ phase }: S2CPayloads['phaseChange']) => {
+    this.dawnSeen = phase === ONUB_PHASE.dawn;
+    this.update();
+  };
 
   constructor(
     parent: HTMLElement,
@@ -143,6 +152,7 @@ export class NightView {
     );
     feed.bus.on('nightReveal', this.onReveal);
     feed.bus.on('nightWake', this.onWake);
+    feed.bus.on('phaseChange', this.onPhase);
     this.dawnText = h('p', { class: 'wdi-text' });
     this.dawnEl = h(
       'section',
@@ -176,8 +186,8 @@ export class NightView {
     const feed = this.feed;
     const { phase, tick } = feed.clock();
     const board = feed.board();
-    const wake = phase === ONUB_PHASE.night ? feed.wake() : null;
-    const dawn = phase === ONUB_PHASE.dawn;
+    const wake = phase === ONUB_PHASE.night && !this.dawnSeen ? feed.wake() : null;
+    const dawn = phase === ONUB_PHASE.dawn || this.dawnSeen;
 
     const line = dawn ? null : this.narrator.line(board.window);
     this.setText(this.narratorEl, line ?? '');
@@ -357,6 +367,7 @@ export class NightView {
   destroy(): void {
     this.feed.bus.off('nightReveal', this.onReveal);
     this.feed.bus.off('nightWake', this.onWake);
+    this.feed.bus.off('phaseChange', this.onPhase);
     this.root.remove();
   }
 }

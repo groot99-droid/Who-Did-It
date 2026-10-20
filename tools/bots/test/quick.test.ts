@@ -267,6 +267,8 @@ describe('QuickPlayer', () => {
       h.state.tick++;
       h.tick();
       if (h.sent.some((m) => m.type === 'meeting.vote')) h.me.hasVoted = true;
+      if (h.sent.some((m) => m.type === 'meeting.claim') && h.state.meeting.claims.length === 0)
+        h.state.meeting.claims.push({ from: h.me.id, stationId: 'oven' });
     }
     const claims = h.sent.filter((m) => m.type === 'meeting.claim');
     const votes = h.sent.filter((m) => m.type === 'meeting.vote');
@@ -274,6 +276,19 @@ describe('QuickPlayer', () => {
     expect(claims[0]!.payload).toMatchObject({ roleId: 'chef', stationId: 'oven', cardId: 'oakFirewood' });
     expect(votes).toHaveLength(1);
     expect(['b', 'c', 'd', 'pantry']).toContain((votes[0]!.payload as { targetId: string }).targetId);
+  });
+
+  it('resends a claim without its sightings once when the board still lacks it', () => {
+    const h = harness('chef', 5);
+    h.state.phase = Phase.meetingDiscussion;
+    h.state.phaseEndsTick = h.state.tick + 300 * TICK_RATE;
+    for (let i = 0; i < 300 * TICK_RATE; i++) {
+      h.state.tick++;
+      h.tick();
+    }
+    const claims = h.sent.filter((m) => m.type === 'meeting.claim');
+    expect(claims).toHaveLength(2);
+    expect(claims[1]!.payload).not.toHaveProperty('saw');
   });
 
   it('starts a new match at the lobby', () => {
