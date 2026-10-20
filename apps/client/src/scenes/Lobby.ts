@@ -20,7 +20,7 @@ export class Lobby extends Phaser.Scene {
 
     this.screen = mountLobby(overlayRoot(), {
       net,
-      offerOnub: flags.onub || flags.mock,
+      offerOnub: flags.onub || flags.mock || true, // ONUB v2 is merged (round 5): every live lobby offers quick mode
       onStart: () => net.send('lobby.start', {}),
       onReady: (ready) => net.send('lobby.ready', { ready }),
       onLeave: () => void net.leave(),
