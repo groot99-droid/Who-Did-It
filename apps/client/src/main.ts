@@ -13,7 +13,7 @@ import './ui/theme/tokens.css';
 import './ui/theme/components.css';
 import './ui/styles.css';
 
-new Phaser.Game({
+const game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
   width: 1280,
@@ -26,3 +26,8 @@ new Phaser.Game({
   },
   scene: [Boot, Preload, Landing, Lobby, RoleReveal, World, Kitchen, Night, Meeting, GameOver],
 });
+
+// The mock e2e (`?mock=1`) reads textures and scenes through this handle; a real match never sets it.
+if (new URLSearchParams(location.search).get('mock') === '1') {
+  (window as unknown as { __wdiGame?: Phaser.Game }).__wdiGame = game;
+}

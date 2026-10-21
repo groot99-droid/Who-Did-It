@@ -1012,6 +1012,31 @@ map shown as chosen. Each map shows its `name` and `blurb` from `maps/<id>.json`
 | `lobby.map.pick` | Play on {name} | `aria-label` of each option; picking sends `lobby.settings {map}` |
 | `lobby.map.current` | Map: {name} | everyone but the leader: the one read-only line, with the blurb under it |
 
+### 14.18 Art-style switch (5N)
+
+Session 5N, round 5 (DECISIONS A79, A80). The segmented control of `ui/artStyle/ArtStyleSwitch.ts` (module
+`ui/copy/artStyle.ts`). One option per shipped style of `style.json` `artStyles`, then one disabled option per reserved
+id. It is a radio group: the checked option has `aria-checked="true"` and is the only tab stop, the arrow keys move and
+select, and the buttons are at least `--wdi-touch` high. It sits in the lobby settings, in the World HUD's top right
+and, in the DOM-only quick-mode screens, at the bottom left. The pick is per player and never sent. The loading veil
+(`art-veil`, `role="status"`) covers the screen while textures swap; a failed swap shows `art-notice`
+(`role="alert"`) for four seconds. A style name comes from `artStyle.name.<id>`.
+
+| Id | Text | Notes |
+|---|---|---|
+| `artStyle.label` | Art style | group label; hidden visually in the compact placements |
+| `artStyle.name.8bit` | 8-bit | option |
+| `artStyle.name.lowpoly` | Low poly | option |
+| `artStyle.name.hd` | HD | disabled option; `aria-describedby` the hint below |
+| `artStyle.reserved.hint` | Coming later | beside a reserved option and its `title` |
+| `artStyle.pick` | Play in {style} | `aria-label` of each shipped option |
+| `artStyle.loading` | Changing the look... | the veil |
+| `artStyle.changed` | Look: {style} | reserved for a screen-reader announcement |
+| `artStyle.failed` | Could not load {style}. Staying on {current}. | the notice |
+| `artStyle.hint` | Only your own screen changes. | reserved for the lobby hint |
+
+Frozen test ids: `art-style` (the group), `art-style-<id>` (an option), `art-veil`, `art-notice`.
+
 ### 14.15 Looks and covers (5F)
 
 Session 5F, round 5. The lines of GDD 3.17 on the role card and the seat picker; `ui/copy/looks.ts` holds them as

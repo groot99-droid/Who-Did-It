@@ -6,7 +6,9 @@ import { REG_WORLD, type WorldFeed } from '../net/world';
 import { NotebookPanel } from '../view/NotebookPanel';
 import { mountMeeting, type MeetingScreen } from '../ui/Meeting';
 import { overlayRoot } from '../ui/dom';
+import { mountMatchArtSwitch } from '../ui/artStyle/ArtStyleSwitch';
 import { drawPortrait } from '../ui/portrait';
+import { ART_STYLE_CHANGED } from '../view/artStyle';
 import { outsOf } from '../ui/meetingText';
 import type { AudioBus } from '../view/AudioBus';
 import { REG_AUDIO } from './registry';
@@ -55,10 +57,16 @@ export class Meeting extends Phaser.Scene {
       if (feed.mode() === 'onub') audio?.play('loaf_crack');
       refresh();
     };
+    // A style switch (A79): the portraits are drawn from the textures, so paint them again.
+    const onArtStyle = () => this.screen?.repaintPortraits();
+    this.game.events.on(ART_STYLE_CHANGED, onArtStyle);
+    const artSwitch = mountMatchArtSwitch(overlayRoot());
     feed.bus.on('voteResult', onResult);
     feed.bus.on('chat.msg', refresh);
     feed.bus.on('phaseChange', refresh);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.game.events.off(ART_STYLE_CHANGED, onArtStyle);
+      artSwitch.destroy();
       feed.bus.off('voteResult', onResult);
       feed.bus.off('chat.msg', refresh);
       feed.bus.off('phaseChange', refresh);

@@ -1,6 +1,7 @@
 import { TICK_RATE } from '@wdi/shared/constants';
 import { WORLD_COPY as C } from '../ui/copy';
 import { h } from '../ui/dom';
+import { mountArtStyleSwitch, type ArtStyleSwitch } from '../ui/artStyle/ArtStyleSwitch';
 import { mountDeckChip, type DeckChip } from '../ui/main/deckChip';
 import '../ui/theme/tokens.css';
 import '../ui/theme/components.css';
@@ -79,6 +80,7 @@ export class Hud {
   private readonly clockPhase: HTMLElement;
   private readonly log: HTMLElement;
   private readonly toasts: HTMLElement;
+  private readonly artSwitch: ArtStyleSwitch;
   private readonly promptEl: HTMLElement;
   private readonly promptText: HTMLElement;
   private readonly promptKey: HTMLElement;
@@ -138,6 +140,10 @@ export class Hud {
       this.toasts,
     );
     parent.append(this.root);
+    // The art-style switch (A79): the in-match button, over the log's corner.
+    this.artSwitch = mountArtStyleSwitch(this.root.querySelector('.wdi-hud__tr') as HTMLElement, {
+      compact: true,
+    });
   }
 
   setChip(chip: HudChip | null): void {
@@ -219,6 +225,7 @@ export class Hud {
   }
 
   destroy(): void {
+    this.artSwitch.destroy();
     this.deckChip?.destroy();
     this.deckChip = null;
     for (const t of this.timers) window.clearTimeout(t);

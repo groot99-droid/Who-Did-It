@@ -26,25 +26,6 @@ test('the village shows the HUD, six bots in view, and the player can walk', asy
   await page.screenshot({ path: info.outputPath('village-walked.png') });
 });
 
-test('the art-style button switches the village to low poly and back (A79)', async ({ page }, info) => {
-  const lowpoly: string[] = [];
-  page.on('request', (r) => {
-    if (r.url().includes('/assets/lowpoly/')) lowpoly.push(r.url());
-  });
-  await page.goto('/Who-Did-It/?mock=1');
-  await expect(page.getByTestId('art-default')).toHaveAttribute('aria-pressed', 'true');
-  await page.getByTestId('art-lowpoly').click();
-  await expect(page.getByTestId('art-lowpoly')).toHaveAttribute('aria-pressed', 'true');
-  await toWorld(page);
-  await page.waitForTimeout(800);
-  expect(lowpoly.some((u) => u.endsWith('lowpoly/manifest.json'))).toBe(true);
-  expect(lowpoly.some((u) => !u.endsWith('manifest.json'))).toBe(true);
-  await page.screenshot({ path: info.outputPath('village-lowpoly.png') });
-  await page.goto('/Who-Did-It/?mock=1');
-  await page.getByTestId('art-default').click();
-  await expect(page.getByTestId('art-default')).toHaveAttribute('aria-pressed', 'true');
-});
-
 test('the touch controls appear with ?touch=1', async ({ page }) => {
   await toWorld(page, '&touch=1');
   await expect(page.locator('.wdi-stick')).toBeVisible();

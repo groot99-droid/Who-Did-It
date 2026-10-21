@@ -36,13 +36,6 @@ describe('readFlags', () => {
     expect(f.mock).toBe(false);
   });
 
-  it('reads the stored art style, which a query flag overrides', () => {
-    expect(readFlags('', '', 'lowpoly').art).toBe('lowpoly');
-    expect(readFlags('?art=8bit', '', 'lowpoly').art).toBe('default');
-    expect(readFlags('?art=lowpoly', '', null).art).toBe('lowpoly');
-    expect(readFlags('', '', 'bogus').art).toBe('default');
-  });
-
   it('upper-cases the deep link code', () => {
     expect(readFlags('', '#/join/k7m2p').joinCode).toBe('K7M2P');
   });

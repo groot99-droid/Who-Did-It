@@ -1,11 +1,7 @@
-/** `default` is the 8-bit set; `lowpoly` falls back to it per key (DECISIONS A79). */
-export type ArtMode = 'default' | 'placeholder' | 'lowpoly';
-
-/** The storage key of the style the landing screen's toggle picked. */
-export const ART_KEY = 'wdi:art';
+export type ArtMode = 'default' | 'placeholder';
 
 export interface Flags {
-  /** `?art=placeholder|lowpoly|8bit` wins; else the style the landing toggle stored; else 8-bit. */
+  /** `?art=placeholder` keeps playtests running before the real atlas lands. */
   art: ArtMode;
   /** `?mock=1` runs the whole lobby flow against in-memory fixtures, no server. */
   mock: boolean;
@@ -32,23 +28,18 @@ export function isValidCode(raw: string): boolean {
   return CODE_RE.test(raw.trim());
 }
 
-export function readFlags(search: string, hash: string, storedArt: string | null = null): Flags {
+export function readFlags(search: string, hash: string): Flags {
   const params = new URLSearchParams(search);
   const route = hash.replace(/^#\/?/, '').split('/');
   const code = route[1] !== undefined && isValidCode(route[1]) ? normalizeCode(route[1]) : null;
   return {
-    art: readArt(params.get('art') ?? storedArt),
+    art: params.get('art') === 'placeholder' ? 'placeholder' : 'default',
     mock: params.get('mock') === '1',
     mode: params.get('mode') === 'onub' ? 'onub' : 'main',
     onub: params.get('onub') === '1',
     joinCode: route[0] === 'join' ? code : null,
     resumeCode: route[0] === 'lobby' ? code : null,
   };
-}
-
-function readArt(raw: string | null): ArtMode {
-  if (raw === 'placeholder' || raw === 'lowpoly') return raw;
-  return 'default';
 }
 
 export function setRoute(route: '' | `join/${string}` | `lobby/${string}`): void {

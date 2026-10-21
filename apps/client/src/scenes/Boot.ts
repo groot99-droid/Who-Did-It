@@ -1,8 +1,7 @@
 import Phaser from 'phaser';
-import { ART_KEY, type Flags, readFlags } from '../flags';
+import { type Flags, readFlags } from '../flags';
 import { type Health, isStale, REFRESH_MESSAGE, waitForHealth } from '../health';
 import { createNetwork } from '../net';
-import { getItem } from '../net/storage';
 import { Backdrop } from '../view/Backdrop';
 import { REG_FLAGS, REG_HEALTH, REG_NET } from './registry';
 
@@ -12,7 +11,7 @@ export class Boot extends Phaser.Scene {
   }
 
   create(): void {
-    const flags: Flags = readFlags(location.search, location.hash, getItem(ART_KEY));
+    const flags: Flags = readFlags(location.search, location.hash);
     this.registry.set(REG_FLAGS, flags);
     this.registry.set(REG_NET, createNetwork(flags));
     const backdrop = new Backdrop(this);

@@ -3,6 +3,8 @@ import palette from '@wdi/content/data/palette.json';
 import { type OnubFeed, REG_ONUB } from '../net/onub';
 import { overlayRoot } from '../ui/dom';
 import { QUICK_MATCH_MAP, applyFilters, peekManifest, queueMatchEntries } from '../view/assets';
+import { mountMatchArtSwitch } from '../ui/artStyle/ArtStyleSwitch';
+import { ART_STYLE_CHANGED } from '../view/artStyle';
 import { mountPrep, type PrepScreen } from '../view/onub/PrepView';
 import { getFlags } from './registry';
 
@@ -17,6 +19,7 @@ const KITCHEN_KEY = 'onub_kitchen';
  */
 export class Kitchen extends Phaser.Scene {
   private screen: PrepScreen | null = null;
+  private backdrop: Phaser.GameObjects.GameObject[] = [];
 
   constructor() {
     super('Kitchen');
@@ -36,19 +39,20 @@ export class Kitchen extends Phaser.Scene {
     }
     const manifest = peekManifest(getFlags(this).art, import.meta.env.BASE_URL);
     if (manifest) applyFilters(this.textures, manifest);
-    const { width, height } = this.scale;
     this.cameras.main.setBackgroundColor(palette.colors.ink);
-    if (this.textures.exists(KITCHEN_KEY)) {
-      this.add.image(width / 2, height / 2, KITCHEN_KEY).setDisplaySize(width, height);
-    } else {
-      this.drawGreybox(width, height);
-    }
+    this.drawBackdrop();
     this.screen = mountPrep(overlayRoot(), feed);
     const refresh = () => this.screen?.update();
     feed.bus.on('phaseChange', refresh);
     feed.bus.on('board', refresh);
     feed.bus.on('nightReveal', refresh);
+    const artSwitch = mountMatchArtSwitch(overlayRoot());
+    // A style switch (A79) replaced the textures: draw the overview again from the new `onub_kitchen`.
+    const onArtStyle = () => this.drawBackdrop();
+    this.game.events.on(ART_STYLE_CHANGED, onArtStyle);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.game.events.off(ART_STYLE_CHANGED, onArtStyle);
+      artSwitch.destroy();
       feed.bus.off('phaseChange', refresh);
       feed.bus.off('board', refresh);
       feed.bus.off('nightReveal', refresh);
@@ -59,6 +63,22 @@ export class Kitchen extends Phaser.Scene {
 
   override update(): void {
     this.screen?.update();
+  }
+
+  /** The owner's overview art, or the labelled greybox until its key loads; redrawn after a style switch. */
+  private drawBackdrop(): void {
+    for (const o of this.backdrop) o.destroy();
+    const before = this.children.length;
+    const { width, height } = this.scale;
+    if (this.textures.exists(KITCHEN_KEY)) {
+      this.add
+        .image(width / 2, height / 2, KITCHEN_KEY)
+        .setDisplaySize(width, height)
+        .setDepth(-1);
+    } else {
+      this.drawGreybox(width, height);
+    }
+    this.backdrop = this.children.list.slice(before);
   }
 
   /** Four labelled quadrants in the order of the art plan 5.4: fridge, mixer / proofing, oven. */

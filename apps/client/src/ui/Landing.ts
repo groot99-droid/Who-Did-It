@@ -1,4 +1,4 @@
-import { ART_KEY, isValidCode, normalizeCode, readFlags } from '../flags';
+import { isValidCode, normalizeCode } from '../flags';
 import { JOIN_FAILED_MESSAGE, NAME_MAX, NAME_MIN } from '../net/protocol';
 import { getItem, setItem } from '../net/storage';
 import { LOBBY_COPY as C, fill } from './copy';
@@ -123,49 +123,8 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
     h('div', { class: 'wdi-divider' }, C['landing.divider']),
     h('div', { class: 'wdi-row' }, code, join),
     message,
-    styleToggle(),
   );
   root.append(el);
   (opts.joinCode ? name : create).focus();
   return { destroy: () => el.remove() };
-}
-
-/**
- * The art-style switch (DECISIONS A79): the pick is stored and the page reloads, so the boot preload fetches the
- * picked manifest. A `?art=` query flag still wins over the stored pick.
- */
-function styleToggle(): HTMLElement {
-  const current = readFlags(location.search, location.hash, getItem(ART_KEY)).art;
-  const option = (value: 'default' | 'lowpoly', label: string) => {
-    const btn = h(
-      'button',
-      {
-        type: 'button',
-        class: `wdi-btn wdi-grow${current === value ? ' wdi-btn--primary' : ''}`,
-        'aria-pressed': String(current === value),
-        'data-testid': `art-${value}`,
-      },
-      label,
-    );
-    btn.addEventListener('click', () => {
-      if (current === value) return;
-      setItem(ART_KEY, value);
-      const params = new URLSearchParams(location.search);
-      params.delete('art');
-      const search = params.toString();
-      location.replace(`${location.pathname}${search ? `?${search}` : ''}${location.hash}`);
-    });
-    return btn;
-  };
-  return h(
-    'div',
-    { class: 'wdi-field' },
-    h('p', { class: 'wdi-label' }, C['landing.style.label']),
-    h(
-      'div',
-      { class: 'wdi-row', role: 'group', 'aria-label': C['landing.style.label'] },
-      option('default', C['landing.style.8bit']),
-      option('lowpoly', C['landing.style.lowpoly']),
-    ),
-  );
 }

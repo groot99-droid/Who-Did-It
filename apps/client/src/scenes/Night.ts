@@ -2,8 +2,10 @@ import Phaser from 'phaser';
 import palette from '@wdi/content/data/palette.json';
 import onubRoles from '@wdi/content/data/roles.onub.json';
 import { type OnubFeed, REG_ONUB } from '../net/onub';
+import { mountMatchArtSwitch } from '../ui/artStyle/ArtStyleSwitch';
 import { overlayRoot } from '../ui/dom';
 import { AudioBus } from '../view/AudioBus';
+import { ART_STYLE_CHANGED } from '../view/artStyle';
 import { manifestImageUrls } from '../view/assets';
 import { NightSound, NightView } from '../view/onub/NightView';
 import { getFlags, REG_AUDIO } from './registry';
@@ -32,9 +34,14 @@ export class Night extends Phaser.Scene {
     const view = new NightView(overlayRoot(), feed);
     this.view = view;
 
-    void manifestImageUrls(getFlags(this).art, import.meta.env.BASE_URL, SCENE_KEYS).then((scenes) => {
-      if (this.view === view) view.setArt({ scenes });
-    });
+    const loadArt = () =>
+      void manifestImageUrls(getFlags(this).art, import.meta.env.BASE_URL, SCENE_KEYS).then((scenes) => {
+        if (this.view === view) view.setArt({ scenes });
+      });
+    loadArt();
+    // A style switch (A79): the rooms are DOM images, so they take the new style's urls.
+    this.game.events.on(ART_STYLE_CHANGED, loadArt);
+    const artSwitch = mountMatchArtSwitch(overlayRoot());
 
     // The bus may not exist yet (quick mode never starts World): make it, as the Meeting's stamp reads it too.
     let audio = this.registry.get(REG_AUDIO) as AudioBus | undefined;
@@ -45,6 +52,8 @@ export class Night extends Phaser.Scene {
     }
     const sound = new NightSound(feed, audio);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.game.events.off(ART_STYLE_CHANGED, loadArt);
+      artSwitch.destroy();
       sound.destroy();
       view.destroy();
       this.view = null;

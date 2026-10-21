@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { type ManifestEntry, QUICK_MATCH_MAP, loadsAtBoot, loadsWithMatch, overlay } from './manifestRules';
+import { type ManifestEntry, QUICK_MATCH_MAP, loadsAtBoot, loadsWithMatch } from './manifestRules';
 
 const e = (extra: Partial<ManifestEntry>): ManifestEntry => ({
   key: 'k',
@@ -39,31 +39,5 @@ describe('quick-mode match art (SPRITES 10.13)', () => {
   it('is queued by the Kitchen, the first quick-mode scene after the role card', () => {
     const kitchen = readFileSync(new URL('../scenes/Kitchen.ts', import.meta.url), 'utf8');
     expect(kitchen).toContain("queueMatchEntries(this.load, this, manifest, QUICK_MATCH_MAP, 'onub')");
-  });
-});
-
-describe('the low-poly overlay (DECISIONS A79)', () => {
-  it('takes low-poly entries by key and keeps 8-bit ones the set lacks, each with its own root', () => {
-    const under = { root: '/a/', entries: [e({ key: 'x', url: 'x8.png' }), e({ key: 'y', url: 'y8.png' })] };
-    const over = {
-      root: '/a/lowpoly/',
-      entries: [e({ key: 'x', url: 'xl.png' }), e({ key: 'z', url: 'z.png' })],
-    };
-    const m = overlay(over, under);
-    expect(m.entries.map((x) => `${x.root}${x.url}`)).toEqual([
-      '/a/lowpoly/xl.png',
-      '/a/y8.png',
-      '/a/lowpoly/z.png',
-    ]);
-  });
-
-  it('covers every 8-bit key with the shipped manifests', () => {
-    const read = (p: string) =>
-      JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8')) as { entries: ManifestEntry[] };
-    const under = { root: '8/', ...read('../../public/assets/manifest.json') };
-    const over = { root: 'l/', ...read('../../public/assets/lowpoly/manifest.json') };
-    const keys = overlay(over, under).entries.map((x) => x.key);
-    for (const x of under.entries) expect(keys).toContain(x.key);
-    expect(overlay(over, under).entries.filter((x) => x.root === 'l/').length).toBe(over.entries.length);
   });
 });
