@@ -1,4 +1,5 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
+import { handleOf as h, settle } from './avatarHelpers';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { balance, clues, scenes } from '@wdi/content';
 import { ClueKind, DIRECTIONS, TICK_RATE, TILE_PX, trailDir } from '@wdi/shared';
@@ -39,7 +40,8 @@ function kill(
   readyKnife(m, k);
   teleport(m, k, scene, tx, ty);
   teleport(m, victim, scene, tx + 1, ty);
-  handleKill(m.room, k.id, { abilityId: 'kill', targetId: victim.id });
+  settle(m, k, victim);
+  handleKill(m.room, k.id, { abilityId: 'kill', targetId: h(m, victim) });
 }
 
 describe('kill clues', () => {

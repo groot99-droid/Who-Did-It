@@ -1,9 +1,29 @@
+import looksJson from '@wdi/content/data/looks.json';
 import palette from '@wdi/content/data/palette.json';
+import rolesJson from '@wdi/content/data/roles.json';
 import traits from '@wdi/content/data/traits.json';
 
 // Draws a meeting portrait from the villager atlas and the public traits (docs/SPRITES.md 3): the body
 // frame, the scarf overlay multiplied by the scarf colour, the hat overlay. The faction and the role never
 // reach this file. With no atlas loaded the portrait is the name's initial on slate.
+//
+// Round 5 (GDD 3.17): a portrait is drawn by public look id. When the look's card portrait (`portrait_<lookId>`,
+// `looks.json`) is loaded it is drawn whole; until then the trait portrait above stands in, so a screen can call
+// `drawPortrait` with a look id today and gets the art as soon as the key exists.
+
+type RoleRow = { look?: string | null; cover?: boolean; faction?: string };
+type LookRow = { name: string; portrait: string };
+const ROLES = rolesJson.roles as Record<string, RoleRow | undefined>;
+const LOOKS = looksJson.looks as Record<string, LookRow | undefined>;
+
+/** The look id on a role's card (`roles.json`), or '' for a card with no character. */
+export const roleLook = (roleId: string): string => ROLES[roleId]?.look ?? '';
+/** Whether the role wears another card's look (Killer, Accomplice, Drifter; GDD 3.17). */
+export const isCoverRole = (roleId: string): boolean => ROLES[roleId]?.cover === true;
+/** The display name of a look ("the Baker"), or '' for an unknown id. */
+export const lookName = (lookId: string): string => LOOKS[lookId]?.name ?? '';
+/** The manifest key of a look's card portrait (`portrait_baker`), or '' for an unknown id. */
+export const portraitKey = (lookId: string): string => LOOKS[lookId]?.portrait ?? '';
 
 export interface PortraitLook {
   height: number;
@@ -55,11 +75,27 @@ export function drawPortrait(
   textures: PortraitTextures | null,
   look: PortraitLook,
   name: string,
+  lookId = '',
 ): void {
   canvas.width = SIZE.w;
   canvas.height = SIZE.h;
   const ctx = canvas.getContext('2d');
   if (ctx === null) return;
+  const key = portraitKey(lookId);
+  if (key !== '' && textures !== null && textures.exists(key)) {
+    try {
+      const frame = textures.getFrame(key, '__BASE');
+      const image = frame.source.image;
+      if (image !== null) {
+        ctx.fillStyle = css('slate');
+        ctx.fillRect(0, 0, SIZE.w, SIZE.h);
+        ctx.drawImage(image, frame.cutX, frame.cutY, frame.cutWidth, frame.cutHeight, 0, 0, SIZE.w, SIZE.h);
+        return;
+      }
+    } catch {
+      // Fall through to the trait portrait.
+    }
+  }
   const bodyKey = `char_${BODY}`;
   const ovlKey = `ovl_${BODY}`;
   if (textures === null || !textures.exists(bodyKey)) return initial(ctx, name);

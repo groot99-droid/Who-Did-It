@@ -1,0 +1,87 @@
+import { describe, expect, it } from 'vitest';
+import { artStyles } from '../palette.ts';
+import { hasManifest, type Page, realPages } from './realAssets.ts';
+
+/**
+ * Art plan 1.4 (SPRITES 10.14): the page caps, the 6-page resident limit and the DOM byte caps, for each art
+ * style separately (1.9: one style is resident at a time).
+ */
+const PAGE = 2048 * 2048;
+const RESIDENT_CAP = 6.0;
+const LOOKS_COUNTED = 10;
+
+/** [prefix, width cap, height cap]; the first matching prefix wins, so `props_` precedes `props`. */
+const CAPS: Array<[string, number, number]> = [
+  ['iso_ground_', 1280, 1792],
+  ['iso_kit_', 1024, 1024],
+  ['bld_', 2048, 1024],
+  ['props_', 1024, 1024],
+  ['props', 1024, 1024],
+  ['clues', 512, 512],
+  ['vfx', 512, 2048],
+  ['char_', 1024, 1024],
+  ['ovl_', 1024, 512],
+];
+/**
+ * DOM images are not GPU pages; their cap is bytes per set. The ONUB caps are binary, as SPRITES 11 and onub.test.ts
+ * state them: 2.5 MiB, and 4 MiB for the low-poly set (art plan 1.9).
+ */
+const domBytes = (style: string): Array<[string, number]> => [
+  ['portrait_', 0.8e6],
+  ['thumb_', 0.2e6],
+  ['onub_', (style === 'lowpoly' ? 4 : 2.5) * 1024 * 1024],
+];
+
+const isDom = (p: Page) => domBytes('').some(([x]) => p.key.startsWith(x)) && p.entry.type === 'image';
+const equiv = (ps: Page[]) => ps.reduce((n, p) => n + (p.width * p.height) / PAGE, 0);
+const lookOf = (key: string) => /^(?:char|ovl)_([a-z][a-z0-9]*)$/.exec(key)?.[1];
+
+describe.each(artStyles().filter((s) => hasManifest(s.root)))(
+  'texture budget, $id (art plan 1.4, SPRITES 10.14)',
+  (style) => {
+    const pages = realPages(style.root);
+    const gpu = pages.filter((p) => !isDom(p) && !(p.entry.modes ?? []).includes('onub'));
+
+    for (const p of gpu) {
+      const cap = CAPS.find(([x]) => p.key.startsWith(x));
+      if (!cap) continue;
+      it(`${p.key} page ${p.width} x ${p.height} is within ${cap[1]} x ${cap[2]}`, () => {
+        expect(p.width).toBeLessThanOrEqual(cap[1]);
+        expect(p.height).toBeLessThanOrEqual(cap[2]);
+      });
+    }
+
+    it('keeps each look within one body page and one overlay page', () => {
+      const counts = new Map<string, number>();
+      for (const p of gpu) if (lookOf(p.key)) counts.set(p.key, (counts.get(p.key) ?? 0) + 1);
+      for (const [key, n] of counts) expect(n, key).toBe(1);
+    });
+
+    it(`fits each map's environment, the boot atlases and the ${LOOKS_COUNTED} largest looks in ${RESIDENT_CAP} pages`, () => {
+      const looks = new Map<string, number>();
+      for (const p of gpu) {
+        const look = lookOf(p.key);
+        if (look) looks.set(look, (looks.get(look) ?? 0) + equiv([p]));
+      }
+      const lookTotal = [...looks.values()]
+        .sort((a, b) => b - a)
+        .slice(0, LOOKS_COUNTED)
+        .reduce((a, b) => a + b, 0);
+      const boot = equiv(gpu.filter((p) => !lookOf(p.key) && !p.entry.maps && !p.entry.modes));
+      const maps = new Set(gpu.flatMap((p) => p.entry.maps ?? []));
+      for (const map of maps.size ? maps : new Set([''])) {
+        const env = equiv(gpu.filter((p) => p.entry.maps?.includes(map)));
+        expect(env + boot + lookTotal, map || 'no map yet').toBeLessThanOrEqual(RESIDENT_CAP);
+      }
+    });
+
+    for (const [prefix, cap] of domBytes(style.id)) {
+      it(`keeps the ${prefix}* DOM images within ${cap} bytes`, () => {
+        const bytes = pages
+          .filter((p) => isDom(p) && p.key.startsWith(prefix))
+          .reduce((n, p) => n + p.bytes, 0);
+        expect(bytes).toBeLessThanOrEqual(cap);
+      });
+    }
+  },
+);

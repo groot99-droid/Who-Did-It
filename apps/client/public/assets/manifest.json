@@ -3,23 +3,259 @@
   "art": "real",
   "entries": [
     {
-      "key": "char_villager",
+      "key": "char_detective",
       "type": "multiatlas",
-      "url": "chars/char_villager.json",
+      "url": "chars/char_detective.json",
       "path": "chars/",
-      "filter": "linear"
+      "filter": "nearest"
     },
     {
-      "key": "ovl_villager",
+      "key": "ovl_detective",
       "type": "multiatlas",
-      "url": "chars/ovl_villager.json",
+      "url": "chars/ovl_detective.json",
       "path": "chars/",
-      "filter": "linear"
+      "filter": "nearest"
     },
     {
-      "key": "anims_villager",
+      "key": "anims_detective",
       "type": "animation",
-      "url": "chars/villager.anims.json"
+      "url": "chars/detective.anims.json"
+    },
+    {
+      "key": "char_doctor",
+      "type": "multiatlas",
+      "url": "chars/char_doctor.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_doctor",
+      "type": "multiatlas",
+      "url": "chars/ovl_doctor.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_doctor",
+      "type": "animation",
+      "url": "chars/doctor.anims.json"
+    },
+    {
+      "key": "char_vicar",
+      "type": "multiatlas",
+      "url": "chars/char_vicar.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_vicar",
+      "type": "multiatlas",
+      "url": "chars/ovl_vicar.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_vicar",
+      "type": "animation",
+      "url": "chars/vicar.anims.json"
+    },
+    {
+      "key": "char_watchman",
+      "type": "multiatlas",
+      "url": "chars/char_watchman.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_watchman",
+      "type": "multiatlas",
+      "url": "chars/ovl_watchman.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_watchman",
+      "type": "animation",
+      "url": "chars/watchman.anims.json"
+    },
+    {
+      "key": "char_herbalist",
+      "type": "multiatlas",
+      "url": "chars/char_herbalist.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_herbalist",
+      "type": "multiatlas",
+      "url": "chars/ovl_herbalist.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_herbalist",
+      "type": "animation",
+      "url": "chars/herbalist.anims.json"
+    },
+    {
+      "key": "char_gamekeeper",
+      "type": "multiatlas",
+      "url": "chars/char_gamekeeper.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_gamekeeper",
+      "type": "multiatlas",
+      "url": "chars/ovl_gamekeeper.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_gamekeeper",
+      "type": "animation",
+      "url": "chars/gamekeeper.anims.json"
+    },
+    {
+      "key": "char_lamplighter",
+      "type": "multiatlas",
+      "url": "chars/char_lamplighter.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_lamplighter",
+      "type": "multiatlas",
+      "url": "chars/ovl_lamplighter.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_lamplighter",
+      "type": "animation",
+      "url": "chars/lamplighter.anims.json"
+    },
+    {
+      "key": "char_baker",
+      "type": "multiatlas",
+      "url": "chars/char_baker.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_baker",
+      "type": "multiatlas",
+      "url": "chars/ovl_baker.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_baker",
+      "type": "animation",
+      "url": "chars/baker.anims.json"
+    },
+    {
+      "key": "char_fisher",
+      "type": "multiatlas",
+      "url": "chars/char_fisher.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_fisher",
+      "type": "multiatlas",
+      "url": "chars/ovl_fisher.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_fisher",
+      "type": "animation",
+      "url": "chars/fisher.anims.json"
+    },
+    {
+      "key": "char_tinner",
+      "type": "multiatlas",
+      "url": "chars/char_tinner.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_tinner",
+      "type": "multiatlas",
+      "url": "chars/ovl_tinner.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_tinner",
+      "type": "animation",
+      "url": "chars/tinner.anims.json"
+    },
+    {
+      "key": "portrait_detective",
+      "type": "image",
+      "url": "portraits/portrait_detective.webp"
+    },
+    {
+      "key": "portrait_doctor",
+      "type": "image",
+      "url": "portraits/portrait_doctor.webp"
+    },
+    {
+      "key": "portrait_vicar",
+      "type": "image",
+      "url": "portraits/portrait_vicar.webp"
+    },
+    {
+      "key": "portrait_watchman",
+      "type": "image",
+      "url": "portraits/portrait_watchman.webp"
+    },
+    {
+      "key": "portrait_herbalist",
+      "type": "image",
+      "url": "portraits/portrait_herbalist.webp"
+    },
+    {
+      "key": "portrait_gamekeeper",
+      "type": "image",
+      "url": "portraits/portrait_gamekeeper.webp"
+    },
+    {
+      "key": "portrait_lamplighter",
+      "type": "image",
+      "url": "portraits/portrait_lamplighter.webp"
+    },
+    {
+      "key": "portrait_baker",
+      "type": "image",
+      "url": "portraits/portrait_baker.webp"
+    },
+    {
+      "key": "portrait_fisher",
+      "type": "image",
+      "url": "portraits/portrait_fisher.webp"
+    },
+    {
+      "key": "portrait_tinner",
+      "type": "image",
+      "url": "portraits/portrait_tinner.webp"
+    },
+    {
+      "key": "portrait_killer",
+      "type": "image",
+      "url": "portraits/portrait_killer.webp"
+    },
+    {
+      "key": "portrait_accomplice",
+      "type": "image",
+      "url": "portraits/portrait_accomplice.webp"
+    },
+    {
+      "key": "portrait_drifter",
+      "type": "image",
+      "url": "portraits/portrait_drifter.webp"
     },
     {
       "key": "clues",
@@ -33,14 +269,34 @@
       "type": "multiatlas",
       "url": "props/props.json",
       "path": "props/",
-      "filter": "linear"
+      "filter": "nearest"
+    },
+    {
+      "key": "props_hollowmere",
+      "type": "multiatlas",
+      "url": "props/props_hollowmere.json",
+      "path": "props/",
+      "filter": "nearest",
+      "maps": [
+        "hollowmere"
+      ]
+    },
+    {
+      "key": "props_blackpine",
+      "type": "multiatlas",
+      "url": "props/props_blackpine.json",
+      "path": "props/",
+      "filter": "nearest",
+      "maps": [
+        "blackpine"
+      ]
     },
     {
       "key": "vfx",
       "type": "multiatlas",
       "url": "vfx/vfx.json",
       "path": "vfx/",
-      "filter": "linear"
+      "filter": "nearest"
     },
     {
       "key": "anims_vfx",
@@ -48,61 +304,71 @@
       "url": "vfx/vfx.anims.json"
     },
     {
-      "key": "loft_backdrop",
-      "type": "image",
-      "url": "loft/loft_backdrop.png",
-      "filter": "linear"
-    },
-    {
-      "key": "prop_bedroll",
-      "type": "image",
-      "url": "loft/prop_bedroll.png",
-      "filter": "linear"
-    },
-    {
-      "key": "prop_bedroll_self",
-      "type": "image",
-      "url": "loft/prop_bedroll_self.png",
-      "filter": "linear"
-    },
-    {
-      "key": "bld_tavern_ext",
-      "type": "image",
-      "url": "buildings/bld_tavern_ext.png",
-      "filter": "linear",
-      "origin": [
-        0.5,
-        1
+      "key": "bld_hollowmere",
+      "type": "multiatlas",
+      "url": "buildings/bld_hollowmere.json",
+      "path": "buildings/",
+      "filter": "nearest",
+      "maps": [
+        "hollowmere"
       ]
     },
     {
-      "key": "bld_apoth_ext",
-      "type": "image",
-      "url": "buildings/bld_apoth_ext.png",
-      "filter": "linear",
-      "origin": [
-        0.5,
-        1
+      "key": "bld_blackpine",
+      "type": "multiatlas",
+      "url": "buildings/bld_blackpine.json",
+      "path": "buildings/",
+      "filter": "nearest",
+      "maps": [
+        "blackpine"
       ]
     },
     {
-      "key": "bld_widow_ext",
+      "key": "thumb_hollowmere",
       "type": "image",
-      "url": "buildings/bld_widow_ext.png",
-      "filter": "linear",
-      "origin": [
-        0.5,
-        1
+      "url": "thumbs/thumb_hollowmere.webp"
+    },
+    {
+      "key": "thumb_blackpine",
+      "type": "image",
+      "url": "thumbs/thumb_blackpine.webp"
+    },
+    {
+      "key": "iso_ground_harbour",
+      "type": "image",
+      "url": "ground/iso_ground_harbour.png",
+      "filter": "nearest",
+      "maps": [
+        "hollowmere"
       ]
     },
     {
-      "key": "bld_bakery_ext",
+      "key": "iso_ground_timber",
       "type": "image",
-      "url": "buildings/bld_bakery_ext.png",
-      "filter": "linear",
-      "origin": [
-        0.5,
-        1
+      "url": "ground/iso_ground_timber.png",
+      "filter": "nearest",
+      "maps": [
+        "blackpine"
+      ]
+    },
+    {
+      "key": "iso_kit_harbour",
+      "type": "multiatlas",
+      "url": "kit/iso_kit_harbour.json",
+      "path": "kit/",
+      "filter": "nearest",
+      "maps": [
+        "hollowmere"
+      ]
+    },
+    {
+      "key": "iso_kit_timber",
+      "type": "multiatlas",
+      "url": "kit/iso_kit_timber.json",
+      "path": "kit/",
+      "filter": "nearest",
+      "maps": [
+        "blackpine"
       ]
     },
     {
@@ -140,6 +406,464 @@
       "type": "image",
       "url": "tiles/tiles_forestfloor.png",
       "filter": "linear"
+    },
+    {
+      "key": "onub_station_fridge",
+      "type": "image",
+      "url": "onub/rooms/onub_station_fridge.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_station_mixer",
+      "type": "image",
+      "url": "onub/rooms/onub_station_mixer.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_station_proofing",
+      "type": "image",
+      "url": "onub/rooms/onub_station_proofing.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_station_oven",
+      "type": "image",
+      "url": "onub/rooms/onub_station_oven.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_scene_cellar",
+      "type": "image",
+      "url": "onub/rooms/onub_scene_cellar.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_scene_subBasement",
+      "type": "image",
+      "url": "onub/rooms/onub_scene_subBasement.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_scene_shapingBench",
+      "type": "image",
+      "url": "onub/rooms/onub_scene_shapingBench.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_scene_commandDesk",
+      "type": "image",
+      "url": "onub/rooms/onub_scene_commandDesk.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_scene_expediter",
+      "type": "image",
+      "url": "onub/rooms/onub_scene_expediter.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_scene_lamination",
+      "type": "image",
+      "url": "onub/rooms/onub_scene_lamination.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_scene_coldPantry",
+      "type": "image",
+      "url": "onub/rooms/onub_scene_coldPantry.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_scene_dishPit",
+      "type": "image",
+      "url": "onub/rooms/onub_scene_dishPit.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_scene_hygiene",
+      "type": "image",
+      "url": "onub/rooms/onub_scene_hygiene.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_scene_frontOfHouse",
+      "type": "image",
+      "url": "onub/rooms/onub_scene_frontOfHouse.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_kitchen",
+      "type": "image",
+      "url": "onub/rooms/onub_kitchen.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_pureDairy",
+      "type": "image",
+      "url": "onub/cards/onub_card_pureDairy.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_activeYeast",
+      "type": "image",
+      "url": "onub/cards/onub_card_activeYeast.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_spoiledMilk",
+      "type": "image",
+      "url": "onub/cards/onub_card_spoiledMilk.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_unpasteurizedMold",
+      "type": "image",
+      "url": "onub/cards/onub_card_unpasteurizedMold.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_thermostat",
+      "type": "image",
+      "url": "onub/cards/onub_card_thermostat.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_t55Flour",
+      "type": "image",
+      "url": "onub/cards/onub_card_t55Flour.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_seaSalt",
+      "type": "image",
+      "url": "onub/cards/onub_card_seaSalt.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_sawdust",
+      "type": "image",
+      "url": "onub/cards/onub_card_sawdust.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_plaster",
+      "type": "image",
+      "url": "onub/cards/onub_card_plaster.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_floorSweepings",
+      "type": "image",
+      "url": "onub/cards/onub_card_floorSweepings.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_warmSteam",
+      "type": "image",
+      "url": "onub/cards/onub_card_warmSteam.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_time",
+      "type": "image",
+      "url": "onub/cards/onub_card_time.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_coldDraft",
+      "type": "image",
+      "url": "onub/cards/onub_card_coldDraft.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_overProofing",
+      "type": "image",
+      "url": "onub/cards/onub_card_overProofing.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_oakFirewood",
+      "type": "image",
+      "url": "onub/cards/onub_card_oakFirewood.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_steamInjection",
+      "type": "image",
+      "url": "onub/cards/onub_card_steamInjection.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_charcoalAsh",
+      "type": "image",
+      "url": "onub/cards/onub_card_charcoalAsh.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_wetWood",
+      "type": "image",
+      "url": "onub/cards/onub_card_wetWood.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_loc_fridge",
+      "type": "image",
+      "url": "onub/cards/onub_loc_fridge.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_loc_mixer",
+      "type": "image",
+      "url": "onub/cards/onub_loc_mixer.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_loc_proofing",
+      "type": "image",
+      "url": "onub/cards/onub_loc_proofing.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_loc_oven",
+      "type": "image",
+      "url": "onub/cards/onub_loc_oven.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_back_role",
+      "type": "image",
+      "url": "onub/cards/onub_card_back_role.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_card_back_loc",
+      "type": "image",
+      "url": "onub/cards/onub_card_back_loc.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_cloche",
+      "type": "image",
+      "url": "onub/misc/onub_cloche.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_boulanger",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_boulanger.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_champignon",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_champignon.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_levain",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_levain.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_apprenti",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_apprenti.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_ratDeCave",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_ratDeCave.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_commis",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_commis.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_chef",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_chef.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_aboyeur",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_aboyeur.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_sousChef",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_sousChef.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_tourrier",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_tourrier.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_plongeur",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_plongeur.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_gardeManger",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_gardeManger.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_inspecteur",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_inspecteur.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_croissant",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_croissant.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_portrait_critique",
+      "type": "image",
+      "url": "onub/portraits/onub_portrait_critique.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_baker",
+      "type": "image",
+      "url": "onub/portraits/onub_baker.webp",
+      "modes": [
+        "onub"
+      ]
+    },
+    {
+      "key": "onub_mini",
+      "type": "multiatlas",
+      "url": "onub/onub_mini.json",
+      "path": "onub/",
+      "filter": "nearest",
+      "modes": [
+        "onub"
+      ]
     }
   ]
 }

@@ -1,19 +1,272 @@
-// Packs a static sheet (clues, props, vfx) rendered by tools/blender/build_props.py or build_vfx.py
-// (docs/SPRITES.md 8): pivots from the render manifest, and for `vfx` the Phaser anims file.
+// Packs a static sheet rendered by tools/blender: clues, props and vfx (build_props.py, build_vfx.py;
+// docs/SPRITES.md 8) and, since round 5, the world atlases `iso_kit_<theme>` (build_kit.py; SPRITES 10.13)
+// after the pixel finish. Pivots come from the render manifest; `vfx` also gets the Phaser anims file.
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { alphaBleed } from './bleed.ts';
 import type { PhaserAnim } from './gen-anims.ts';
 import { FPS, staticFrameNames } from './keys.ts';
-import { atlasJson, packFrames, writeFiles, type MultiAtlas, type PackInput } from './pack.ts';
+import { finishEnabled } from './palette.ts';
+import { packAsync } from 'free-tex-packer-core';
+import {
+  PACK_OPTIONS,
+  atlasJson,
+  packFrames,
+  writeFiles,
+  type AtlasTexture,
+  type MultiAtlas,
+  type PackInput,
+  type PackResult,
+} from './pack.ts';
 
-export type StaticAtlas = 'clues' | 'props' | 'vfx';
+export type StaticAtlas =
+  'clues' | 'props' | 'vfx' | `iso_kit_${string}` | `props_${string}` | `bld_${string}`;
+
+/** A building or multi-tile prop slice (SPRITES 10.5): `<stem>#<dx>_<dy>`. */
+export const SLICE_RE = /^[A-Za-z][A-Za-z0-9_]*#\d+_\d+$/;
+
+/** The kit frame families of SPRITES 10.13 that a theme ships (art plan 3.3): 11, four variants each. */
+export const KIT_FRAMES: ReadonlyArray<readonly [string, string]> = [
+  ['wall', 'full'],
+  ['wall', 'half'],
+  ['wall', 'stub'],
+  ['cliff', 'full'],
+  ['cliff', 'half'],
+  ['cliff', 'stub'],
+  ['tree', 'full'],
+  ['tree', 'stub'],
+  ['boulder', 'full'],
+  ['fence', 'full'],
+  ['stack', 'full'],
+];
+/** Art cell (packed px, w x h) of each kit family; the pivot is (w / 2, h - 16). */
+export const KIT_CELLS: Readonly<Record<string, readonly [number, number]>> = {
+  'wall/full': [64, 112],
+  'wall/half': [64, 72],
+  'wall/stub': [64, 48],
+  'cliff/full': [64, 112],
+  'cliff/half': [64, 72],
+  'cliff/stub': [64, 48],
+  'tree/full': [96, 144],
+  'tree/stub': [64, 48],
+  'boulder/full': [64, 64],
+  'fence/full': [64, 56],
+  'stack/full': [64, 80],
+};
+export const KIT_THEMES = ['harbour', 'timber'] as const;
+
+/** The 44 frame names of an `iso_kit_<theme>` atlas: `<kind>/<height>/<0-3>`, sorted. */
+export function kitFrameNames(): string[] {
+  return KIT_FRAMES.flatMap(([k, h]) => [0, 1, 2, 3].map((v) => `${k}/${h}/${v}`)).sort();
+}
+
+/** The boot atlas `props` since round 5 (art plan 3.5-3.7): shared props, spots and the 20 portal frames. */
+export const PROPS_FRAMES: readonly string[] = [
+  'portal_boarded_e',
+  'portal_boarded_s',
+  'portal_boarded_sill',
+  'portal_cave_mouth_e',
+  'portal_cave_mouth_s',
+  'portal_cave_mouth_sill',
+  'portal_crawl_e',
+  'portal_crawl_s',
+  'portal_crawl_sill',
+  'portal_door_e',
+  'portal_door_s',
+  'portal_door_sill',
+  'portal_drop',
+  'portal_forest_gate_e',
+  'portal_forest_gate_s',
+  'portal_forest_gate_sill',
+  'portal_hatch',
+  'portal_stairs_e',
+  'portal_stairs_s',
+  'portal_stairs_sill',
+  'prop_kitChest',
+  'prop_lanternPost_lit',
+  'prop_lanternPost_unlit',
+  'prop_noticeBoard',
+  'prop_pump',
+  'spot_behindCounter',
+  'spot_brush',
+  'spot_crawlspace',
+  'spot_hollowTree',
+  'spot_sump',
+  'spot_timberCrib',
+  'spot_underBed',
+  'spot_wardrobe',
+];
+
+/** Each map's own atlas `props_<mapId>` (art plan 3.5, 3.6). */
+export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
+  props_hollowmere: [
+    'prop_basin',
+    'prop_bell',
+    'prop_bench',
+    'prop_candle',
+    'prop_clock',
+    'prop_crepe',
+    'prop_dartboard',
+    'prop_deadLoaf',
+    'prop_den',
+    'prop_drowned_lantern',
+    'prop_fence',
+    'prop_flourBin',
+    'prop_flour_sacks',
+    'prop_gasPocket',
+    'prop_goat',
+    'prop_green_lamp',
+    'prop_keyCache',
+    'prop_ledger',
+    'prop_letter_box',
+    'prop_lockedDoor',
+    'prop_oil_barrel',
+    'prop_ore_cart',
+    'prop_oven',
+    'prop_photos',
+    'prop_planks',
+    'prop_plate',
+    'prop_portrait',
+    'prop_rope',
+    'prop_safe',
+    'prop_scarecrow',
+    'prop_shelf',
+    'prop_tin_crate',
+    'prop_window',
+    'spot_atticHatch',
+    'spot_bog',
+    'spot_cart',
+    'spot_charcoalPit',
+    'spot_confessional',
+    'spot_cratePile',
+    'spot_crates',
+    'spot_cryptNiche',
+    'spot_curtain',
+    'spot_dumpSpot',
+    'spot_hayPile',
+    'spot_hedge',
+    'spot_herbLoft',
+    'spot_hollowLog',
+    'spot_kegStack',
+    'spot_oreChute',
+    'spot_pantry',
+    'spot_poolNiche',
+    'spot_reeds',
+    'spot_stalagmite',
+    'spot_trunk',
+    'spot_wineRack',
+  ],
+  props_blackpine: [
+    'prop_anvil',
+    'prop_basin',
+    'prop_bell',
+    'prop_flume',
+    'prop_gearing',
+    'prop_ledger_desk',
+    'prop_ore_cart_0',
+    'prop_oven',
+    'prop_pegs',
+    'prop_plank_stack',
+    'prop_powder_kegs',
+    'prop_refuge_table',
+    'prop_safe',
+    'prop_shelves',
+    'prop_tally_board',
+    'prop_telephone',
+    'prop_tin_crate',
+    'prop_tool_rack',
+    'spot_barrel',
+    'spot_bunk',
+    'spot_coalBin',
+    'spot_logChute',
+    'spot_logPile',
+    'spot_oldStope',
+    'spot_oreBin',
+    'spot_oreCart',
+    'spot_orePillar',
+    'spot_pool',
+    'spot_rootCellar',
+    'spot_sawdustPile',
+    'spot_strongroom',
+    'spot_woodBox',
+  ],
+};
+
+/** The clue keys of SPRITES 8 plus Hunger's glowing footprints (art plan 3.8): 24 frames. */
+export function clueFrameNames(): string[] {
+  const glow = ['s', 'm', 't'].map((h) => `clue_footprint_${h}_glow`);
+  return [...staticFrameNames('clues'), ...glow].sort();
+}
+
+/** Page caps (px) of the round-5 world atlases (art plan 1.4, SPRITES 10.14). */
+export function pageCap(atlas: StaticAtlas): readonly [number, number] | null {
+  if (atlas.startsWith('iso_kit_') || atlas.startsWith('props')) return [1024, 1024];
+  if (atlas.startsWith('bld_')) return [2048, 1024];
+  if (atlas === 'clues') return [512, 512];
+  return null;
+}
+
+/**
+ * `packFrames` (pack.ts, the ASSETS.md 6.3 settings) with a smaller page: the packer picks the smallest
+ * power-of-two page up to `w` x `h`, so a world atlas never grows past its budget cap in one dimension.
+ * With the pixel finish on (`on`, the art style's finish) there is no extrude ring.
+ */
+export async function packCapped(
+  textureName: string,
+  inputs: PackInput[],
+  w: number,
+  h: number,
+  on: boolean = finishEnabled('main'),
+): Promise<PackResult> {
+  const files = [...inputs]
+    .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+    .map((i) => ({ path: `${i.name}.png`, contents: i.png }));
+  // Extrude guards linear filtering only, and the packer blends its ring: a finished page drawn with
+  // nearest filtering keeps every pixel a world colour without it. Unfinished (the low-poly style), the
+  // ring takes one pixel of the padding, so a frame costs the same room in both styles (art plan 1.4, 1.9).
+  const extrude = on ? 0 : PACK_OPTIONS.extrude;
+  const padding = PACK_OPTIONS.padding - extrude;
+  const options = { ...PACK_OPTIONS, width: w, height: h, textureName, extrude, padding };
+  const out = await packAsync(files, options as Parameters<typeof packAsync>[1]);
+  const raw = new Map(out.filter((f) => f.name.endsWith('.png')).map((f) => [f.name, f.buffer]));
+  const textures: AtlasTexture[] = [];
+  let meta: MultiAtlas['meta'] = { app: '', version: '' };
+  for (const f of out.filter((f) => f.name.endsWith('.json'))) {
+    const page = JSON.parse(f.buffer.toString('utf8')) as MultiAtlas;
+    textures.push(...page.textures);
+    meta = page.meta;
+  }
+  textures.sort((a, b) => (a.image < b.image ? -1 : 1));
+  const pages = new Map<string, Buffer>();
+  textures.forEach((t, i) => {
+    const png = raw.get(t.image);
+    if (!png) throw new Error(`packer page ${t.image} missing`);
+    t.image = `${textureName}-${i}.png`;
+    pages.set(t.image, png);
+    t.frames.sort((a, b) => (a.filename < b.filename ? -1 : 1));
+  });
+  const packed = textures.reduce((n, t) => n + t.frames.length, 0);
+  if (packed !== inputs.length) throw new Error(`packed ${packed} of ${inputs.length} frames`);
+  return { atlas: { textures, meta }, pages };
+}
+
+/** The frame names a static atlas must hold exactly. */
+export function expectedFrames(atlas: StaticAtlas): string[] {
+  if (atlas.startsWith('iso_kit_')) return kitFrameNames();
+  if (atlas === 'props') return [...PROPS_FRAMES].sort();
+  if (atlas === 'clues') return clueFrameNames();
+  if (atlas.startsWith('props_')) return [...(MAP_PROPS_FRAMES[atlas] ?? [])].sort();
+  return staticFrameNames(atlas as 'vfx');
+}
 
 export interface StaticManifest {
   version: number;
   atlas: StaticAtlas;
-  frames: Record<string, { file: string; cell: number; pivot?: [number, number]; clipped?: boolean }>;
+  frames: Record<
+    string,
+    { file: string; cell: number | [number, number]; pivot?: [number, number]; clipped?: boolean }
+  >;
 }
 
 /** Pivot (pivot px / cell) on every frame whose render recorded one; others stay centred. */
@@ -50,15 +303,22 @@ export function staticAnims(texture: string, frameNames: string[]): { anims: Pha
 export async function packStatic(
   manifest: StaticManifest,
   inputs: PackInput[],
+  on: boolean = finishEnabled('main'),
 ): Promise<Map<string, Buffer>> {
-  const want = staticFrameNames(manifest.atlas);
+  // Slices are whatever the footprints cut (slice.ts): a building atlas holds only slices, a map's prop
+  // atlas its frame list plus the slices of its multi-tile props.
   const got = inputs.map((i) => i.name).sort();
+  const sliced = manifest.atlas.startsWith('bld_') || manifest.atlas.startsWith('props_');
+  const want = manifest.atlas.startsWith('bld_') ? [] : expectedFrames(manifest.atlas);
   const missing = want.filter((n) => !got.includes(n));
-  const extra = got.filter((n) => !want.includes(n));
+  const extra = got.filter((n) => !want.includes(n) && !(sliced && SLICE_RE.test(n)));
   if (missing.length || extra.length) {
     throw new Error(`${manifest.atlas}: missing [${missing.join(', ')}], unexpected [${extra.join(', ')}]`);
   }
-  const { atlas, pages } = await packFrames(manifest.atlas, inputs);
+  const cap = pageCap(manifest.atlas);
+  const { atlas, pages } = cap
+    ? await packCapped(manifest.atlas, inputs, cap[0], cap[1], on)
+    : await packFrames(manifest.atlas, inputs);
   applyStaticPivots(atlas, manifest);
   const out = new Map<string, Buffer>(pages);
   out.set(`${manifest.atlas}.json`, Buffer.from(atlasJson(atlas)));

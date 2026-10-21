@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { type LoadedEntry, changedEntries, mergeStyleManifest } from './manifestRules';
 
@@ -122,5 +123,19 @@ describe('changedEntries', () => {
         () => undefined,
       ),
     ).toEqual([]);
+  });
+});
+
+describe('the shipped manifests', () => {
+  const read = (p: string) =>
+    JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8')) as { entries: LoadedEntry[] };
+
+  it('merge to a superset of the 8-bit keys, with every style entry taken from the style root', () => {
+    const under = { root: '8/', ...read('../../public/assets/manifest.json') };
+    const style = read('../../public/assets/lowpoly/manifest.json');
+    const merged = mergeStyleManifest(under, style, 'l/', 'linear');
+    const keys = merged.entries.map((x) => x.key);
+    for (const x of under.entries) expect(keys).toContain(x.key);
+    expect(merged.entries.filter((x) => x.root === 'l/')).toHaveLength(style.entries.length);
   });
 });

@@ -21,7 +21,16 @@ export default defineConfig({
     launchOptions: {
       ...(executablePath ? { executablePath } : {}),
       // Software WebGL so Phaser boots in headless CI.
-      args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+      args: [
+        '--use-gl=angle',
+        '--use-angle=swiftshader',
+        '--enable-unsafe-swiftshader',
+        // Multi-page specs (host and guest): a page not in front must keep its game loop, or a short phase such as
+        // the quick-mode dawn passes unpainted on it.
+        '--disable-renderer-backgrounding',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-background-timer-throttling',
+      ],
     },
   },
   webServer: [

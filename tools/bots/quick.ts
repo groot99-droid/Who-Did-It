@@ -281,6 +281,8 @@ interface MatchMemory {
   lastAct: string;
   claimAt: number;
   claimed: boolean;
+  /** The claim was resent without its sightings after the board still lacked it (a refused sighting). */
+  bareClaim: boolean;
   voteAt: number;
   votedAt: number;
   voteSends: number;
@@ -288,6 +290,8 @@ interface MatchMemory {
 
 const MAX_ACT_SENDS = 3;
 const VOTE_RETRY_TICKS = 2 * TICK_RATE;
+/** A claim the board still lacks after this long is resent without its sightings. */
+const CLAIM_RETRY_TICKS = 2 * TICK_RATE;
 /** A bot gives a vote up after this many sends in one match (an abstention is legal in quick mode). */
 const MAX_VOTE_SENDS = 6;
 
@@ -317,6 +321,7 @@ export class QuickPlayer {
       lastAct: '',
       claimAt: -1,
       claimed: false,
+      bareClaim: false,
       voteAt: -1,
       votedAt: -1,
       voteSends: 0,
@@ -439,6 +444,15 @@ export class QuickPlayer {
       const prep = me.priv?.onubLoc ? { station: me.priv.onubLoc, card: me.priv.onubCard } : null;
       this.stats.claims++;
       this.room.send('meeting.claim', planClaimOf(this.selfId(), m.role, prep, this.rows));
+    } else if (
+      m.claimed &&
+      !m.bareClaim &&
+      state.tick >= m.claimAt + CLAIM_RETRY_TICKS &&
+      !listOf(state.meeting?.claims).some((c) => c.from === this.selfId())
+    ) {
+      m.bareClaim = true;
+      const prep = me.priv?.onubLoc ? { station: me.priv.onubLoc, card: me.priv.onubCard } : null;
+      this.room.send('meeting.claim', planClaimOf(this.selfId(), m.role, prep, []));
     }
     if (me.hasVoted || state.tick < m.voteAt || m.voteSends >= MAX_VOTE_SENDS) return;
     if (m.votedAt >= 0 && state.tick - m.votedAt < VOTE_RETRY_TICKS) return;

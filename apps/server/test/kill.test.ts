@@ -1,4 +1,5 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
+import { avatarsHeld, handleOf as h } from './avatarHelpers';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { abilities, balance, clues } from '@wdi/content';
 import { ErrorCode, ItemStack, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
@@ -56,7 +57,7 @@ async function party(n = 5): Promise<Match> {
 }
 
 const strike = (m: Match, i = 1) =>
-  act(m.bots[0]!, 'act.ability', { abilityId: 'kill', targetId: m.bots[i]!.id });
+  act(m.bots[0]!, 'act.ability', { abilityId: 'kill', targetId: h(m, m.bots[i]!) });
 
 describe('kill', () => {
   it('kills a target in reach: ghost flag, body, clues, Blood, cooldown, scream, private killed', async () => {
@@ -123,7 +124,7 @@ describe('kill', () => {
     const m = await party();
     const [k, v, det] = [m.bots[0]!, m.bots[1]!, m.bots[2]!];
     teleport(m, det, 'overworld', 29, ROW);
-    await act(det, 'act.ability', { abilityId: 'kill', targetId: v.id });
+    await act(det, 'act.ability', { abilityId: 'kill', targetId: h(m, v) });
     expect(errorCodes(det)).toEqual([ErrorCode.cannot]);
     for (const payload of [
       {},
@@ -191,7 +192,7 @@ describe('kill', () => {
     // Standing still, the edge of the reach is exact.
     placeAtPx(m, k, tilePx(30), tilePx(ROW));
     placeAtPx(m, v, tilePx(30) + RANGE + 2, tilePx(ROW));
-    handleKill(m.room, k.id, { abilityId: 'kill', targetId: v.id });
+    handleKill(m.room, k.id, { abilityId: 'kill', targetId: h(m, v) });
     expect(vp.dead).toBe(false);
     placeAtPx(m, v, tilePx(30) + RANGE - 2, tilePx(ROW));
     // The same distance becomes valid after the victim just ran 40 px (the 250 ms ring).
@@ -199,7 +200,7 @@ describe('kill', () => {
     vp.x = tilePx(30) + RANGE + 2;
     vp.pushRing();
     expect(Math.hypot(vp.x - kp.x, vp.y - kp.y)).toBeGreaterThan(RANGE);
-    handleKill(m.room, k.id, { abilityId: 'kill', targetId: v.id });
+    handleKill(m.room, k.id, { abilityId: 'kill', targetId: h(m, v) });
     expect(vp.dead).toBe(true);
     await sleep(200);
     expect(errorCodes(k)).toEqual([ErrorCode.outOfRange]);
@@ -212,7 +213,7 @@ describe('kill', () => {
     // Tile (27,23) is a single solid tile: 10 px either side of it is 84 px, inside the reach.
     placeAtPx(m, k, 27 * TILE_PX - 10, tilePx(23));
     placeAtPx(m, v, 28 * TILE_PX + 10, tilePx(23));
-    handleKill(m.room, k.id, { abilityId: 'kill', targetId: v.id });
+    handleKill(m.room, k.id, { abilityId: 'kill', targetId: h(m, v) });
     await sleep(200);
     expect(simOfBot(m, v).dead).toBe(false);
     expect(errorCodes(k)).toEqual([ErrorCode.cannot]);
@@ -254,7 +255,7 @@ describe('the Doctor bandage', () => {
     const stock = () => playerOf(m, doc).priv.inventory.slots.find((s) => s.defId === 'bandage')?.qty ?? 0;
     expect(stock()).toBe(2);
     const tick = m.room.state.tick;
-    await act(doc, 'act.ability', { abilityId: 'bandage', targetId: v.id });
+    await act(doc, 'act.ability', { abilityId: 'bandage', targetId: h(m, v) });
     expect(errorCodes(doc)).toEqual([]);
     expect(stock()).toBe(1);
     const def = abilities.abilities.bandage!;
@@ -262,7 +263,7 @@ describe('the Doctor bandage', () => {
       (def.params?.protectS ?? 0) * TICK_RATE - 5,
     );
     expect(playerOf(m, doc).priv.cooldownEndTick.get('bandage')).toBeGreaterThan(tick);
-    await act(doc, 'act.ability', { abilityId: 'bandage', targetId: v.id });
+    await act(doc, 'act.ability', { abilityId: 'bandage', targetId: h(m, v) });
     expect(errorCodes(doc)).toEqual([ErrorCode.cooldown]);
     expect(stock()).toBe(1);
   });
@@ -271,13 +272,13 @@ describe('the Doctor bandage', () => {
     const m = await party();
     const [doc, v, det] = [m.bots[3]!, m.bots[1]!, m.bots[2]!];
     teleport(m, doc, 'overworld', 36, ROW);
-    await act(doc, 'act.ability', { abilityId: 'bandage', targetId: doc.id });
-    await act(doc, 'act.ability', { abilityId: 'bandage', targetId: v.id });
-    await act(det, 'act.ability', { abilityId: 'bandage', targetId: v.id });
+    await act(doc, 'act.ability', { abilityId: 'bandage', targetId: h(m, doc) });
+    await act(doc, 'act.ability', { abilityId: 'bandage', targetId: h(m, v) });
+    await act(det, 'act.ability', { abilityId: 'bandage', targetId: h(m, v) });
     expect(errorCodes(doc)).toEqual([ErrorCode.cannot, ErrorCode.outOfRange]);
     expect(errorCodes(det)).toEqual([ErrorCode.cannot]);
     teleport(m, doc, 'overworld', 32, ROW);
-    await act(doc, 'act.ability', { abilityId: 'bandage', targetId: v.id });
+    await act(doc, 'act.ability', { abilityId: 'bandage', targetId: h(m, v) });
     expect(errorCodes(doc)).toEqual([ErrorCode.cannot, ErrorCode.outOfRange, ErrorCode.cannot]);
     expect(simOfBot(m, v).bandagedUntilTick).toBe(0);
   });
@@ -313,7 +314,7 @@ describe('what a kill leaks (ARCHITECTURE 5.4, scoped to M3)', () => {
       return flat;
     };
     const before = [witness, out1, out2].map(snap);
-    await act(k, 'act.ability', { abilityId: 'kill', targetId: v.id }, 1000);
+    await act(k, 'act.ability', { abilityId: 'kill', targetId: h(m, v) }, 1000);
     expect(simOfBot(m, v).dead).toBe(true);
     const [dWitness = [], dOut1, dOut2] = [witness, out1, out2].map((b, i) => diffPaths(before[i]!, snap(b)));
 
@@ -324,11 +325,14 @@ describe('what a kill leaks (ARCHITECTURE 5.4, scoped to M3)', () => {
     const allowed = [
       /^scenes\.tavern_bar\.bodies\./,
       /^scenes\.tavern_bar\.clues\./,
+      /^scenes\.tavern_bar\.avatars\./, // the victim's avatar goes, the Killer's gains Blood
       new RegExp(`^players\\.${k.id}\\.presence\\.statusBits$`),
       new RegExp(`^players\\.${v.id}\\.presence`), // the ghost's presence may stop arriving (K, Visibility)
     ];
     expect(dWitness.filter((p) => !allowed.some((re) => re.test(p)))).toEqual([]);
-    expect(stateOf(witness).players.get(k.id)?.presence?.statusBits).toBe(StatusBit.bloody);
+    expect(avatarsHeld(witness).find((a) => a.avatar.lookOf === k.id)?.avatar.statusBits).toBe(
+      StatusBit.bloody,
+    );
     const body = stateOf(witness).scenes.get('tavern_bar')!.bodies.get(`body_${v.id}`);
     expect(body?.of).toBe(v.id);
     expect(stateOf(witness).scenes.get('tavern_bar')!.clues.size).toBe(2);

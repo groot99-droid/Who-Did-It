@@ -2064,6 +2064,29 @@ Four stacked draft PRs (#31 Night scene, lights-out and narrator; #36 card table
 
 ### Round 5 log: 5F (avatars, public looks, covers, Impersonate)
 
+Branch `claude/r5-avatars`, one draft PR (#35) with one green commit per step of the brief's split (the branch is the
+only one the session may push to). Decisions: DECISIONS A57.
+
+- **Step 1, avatars.** `sim/Avatars.ts` (handles, transit tails, `publishAvatars`, `resolveHandle`), the avatar half of
+  `Visibility.ts`, `avatars.test.ts` (P2, P4, P5, P6, P12). Kill and Bandage tests name handles (`avatarHelpers.ts`).
+- **Step 2, covers.** `sim/Covers.ts` (cover pick, private card Ready for both modes, `assignCovers`, `mainRevealFields`,
+  `publishLooks`, the reset) and the `coverHints` body; `coverPick.test.ts` (P7, P8, P13, P14, P16).
+- **Step 3, Impersonate.** `sim/Impersonate.ts`; `impersonate.test.ts` (P6, P9, P10, P11 and the 4.5 rules).
+- **Step 4, client.** World feed (`avatars()`, `selfHandle()`, `coverState()`, `vfx`), `EntityView`, `targets.ts`, the
+  World prompt target and seat picker branch, `RoleCard` (deck strip, walk line, cover picker), `SeatPicker`,
+  `portrait.ts` by look, `ui/copy/looks.ts`, UI.md 14.15, the mock feed.
+- **Step 5, contract phase.** `Player.sceneId` and every other seat's `presence` are gone from the wire; `Private.sceneId`
+  is the only scene index. `PlayerSim.sceneHidden` and `ViewState.presences` removed; the tests of 10.1 updated;
+  `looks.spec.ts` (opt-in `WDI_E2E_LOOKS=1`); ARCHITECTURE 5.4; `docs/PROTOCOL.md` regenerated.
+- **Hand-offs.** 5A: `beginOnubPlay` writes `priv.sceneId` only now (no public field exists). 5H: send
+  `priv.avatar` for the NPC Kill, then drop the NPC branch of `resolveHandle`. 5E: `tools/bots/walk.ts` still reads
+  `p.sceneId` and others' `presence`, which no longer arrive; switch it to avatars by handle. 5G: delete the
+  `dealMainDeck` stand-in in `coverPick.test.ts`; plug night powers into `SeatPicker` through the `target: 'seat'`
+  branch of `World.ts` `abilityKey`. 5I: `EntityView.playVfx` and the look id (`players[lookOf].look`) are ready for
+  the iso `PlayerView`.
+- **Not run here:** `pnpm test:e2e` (the looks spec needs 5G's deal) and the 2-minute soak (the bot swarm still sends
+  seat ids, see 5E).
+
 ### Round 5 log: 5G (main deck and Werewolf roles)
 
 Branch `claude/r5-deck`, one draft PR (#34) carrying the six steps of the brief as commits: (1) `dealMainDeck`, `dealDeck` tests, deck-aware `debug.deal`; (2) the Knife after dark (`isKillPhase`), the Bell in grace and day, the Final Night hunt and forced meeting (`sim/FinalNight.ts`, `Phases.ts`); (3) night powers, protections and Nightshade (`sim/NightPowers.ts`, `sim/nightMemory.ts`); (4) Last Shot (`sim/LastShot.ts`), Inherit (`sim/Inherit.ts`, the `heir` card) and Hunger (`sim/Hunger.ts`); (5) the `ui/main` screens, `ui/copy/deck.ts`, UI.md 14.16; (6) the contract phase (`rosters`, `standIn`, `assignRoles`, `rosterFor`, `dealRoles` removed; `cover` and `look` required). Tests: `dealDeck`, `nightPowers`, `lastShot`, `inherit` (with Hunger), the Final Night cases of `flow.test.ts`, `ui/main/main.test.ts`. Decisions: DECISIONS A58.
@@ -2155,7 +2178,64 @@ before it, and each PR description says which commit to review. Decisions: A61.
 
 ### Round 5 log: 5K (world art)
 
+Session 5K, `claude/r5-world-art`, PR #40 against `claude/zen-turing-m1jnw0`, 2026-10-18. Decisions in
+DECISIONS A62.
+
+- **K1, ground**: `iso_ground_harbour` and `iso_ground_timber` (1280 x 1792, gid = 1 + 20 m + c), 14
+  materials in four variants each, from Poly Haven textures under IsoCam (`build_ground.py`), joined and
+  finished by `tools/sprites/tileset.ts`. The CC0 packs are fetched by `env/kits.py` into git-ignored
+  `assets/external/kits/`, with their licence files.
+- **K2, kits**: `iso_kit_<theme>`, 44 frames named `<kind>/<height>/<v>`, pivot (w/2, h - 16) art px
+  (`build_kit.py`, `kit_import.py`); `review-world.ts` composites the review sheets; six T2 style boards
+  (12 Higgsfield images of 5K's 12, one retry) in `assets/source/review/boards-*.png` and
+  `batches/5K.json`. Gate A: `assets/source/review/gate-a-world-{on,off}.png`, in the PR description.
+- **K3, props**: `props` (shared props, 8 spots, 20 portal frames), `props_hollowmere` (33 props, 22
+  spots) and the 24 `clues` keys, Hunger's glowing footprints new.
+- **K4, buildings**: `bld_hollowmere` from `build_buildings.py` recipes at the `world.md` footprints,
+  rendered with a raw tile-code pass that `tools/sprites/slice.ts` cuts into `<art>#dx_dy` slices sharing
+  their building's pivot; the multi-tile props are sliced the same way.
+- **K5, Blackpine**: `props_blackpine` (18 props, 14 spots) and `bld_blackpine`.
+- **K6**: `thumb_<mapId>.webp` (480 x 270), the four `amb_*` loops (`env/ambience.py`, CREDITS rows),
+  the world masters (`save_masters.py`, `assets/source/MANIFEST.md`), placeholder twins for every new
+  key, ASSETS and SPRITES notes.
+- **Rebuild**: the commands in `tools/blender/README.md` ("World art (round 5)" onwards) and
+  `tools/sprites/README.md`; every sheet passes the palette audit (no off-palette or partial-alpha pixel,
+  saturated share under the cap) when the finish is on.
+- **A79, both styles**: `tools/sprites/world.ts` rebuilds every 5K key per art style from the raw renders
+  (8-bit at the root, unchanged byte for byte; low poly into `assets/lowpoly/` with its `manifest.json`);
+  `test/world.test.ts` checks the low-poly keys, frames, pivots and page caps against the 8-bit ones.
+- **Owner**: copy `assets/external/world/<mapId>/{buildings,props}_<mapId>.blend` and
+  `assets/external/loft/loft.blend` to ROSW `studio/assets/who-did-it/world/` (hashes in MANIFEST change on
+  every re-save); sync the 12 board generations into the ROSW catalog (CREDITS says "pending
+  higgsfield-library-sync").
+- **Not done**: the `tiles_*` keys stay until 5J's tilemaps no longer read them; `LEGACY` is not asserted
+  empty yet, which waits on L4, L5 and M1 at integration. `bld_hollowmere` takes two pages (A62).
+
 ### Round 5 log: 5L (character art)
+
+Branch `claude/r5-char-art`, PR #33 (the L1-L5 split as commits on one branch). Decisions in DECISIONS A63.
+
+- **L1, rig.** IsoCam (ortho, X 60 / Z 45, 90.51 px per ground metre), the environment and character roots
+  (`Z_SCALE` 0.75), lights keeping their camera-frame azimuths, toon stops 0.25 / 0.65, the calibration sheet and
+  `calibration.json` (feet, marker vectors, the 128 x 64 tile diamond). `palettize.py` snaps to the world palette in
+  OKLab. `palette.test.ts` and `budget.test.ts` over the real manifests.
+- **L2, base and clips.** `build_looks.py` (one five-heads-tall base, 22 bones, rigid parts, five clips keyed in code),
+  `looks_spec.py`, `look_parts.py`; `keys.ts` (`interact`, the `blood` pass), `pack.ts` (look pages, extrude only on
+  frames with partial alpha), `placeholder-chars.ts` (every look and portrait has a greybox twin).
+- **L3 / L4, looks.** All ten world looks rendered in 8 directions, finished and packed (304 frames per pass, one
+  1024 x 1024 body page and one overlay page each); the real villager left the real manifest (ruling C11). Every
+  posed vertex of every look stays within 110 px above and 10 px below the feet row; four rounds of fixes got there
+  (the kneel, the lamplighter's raise, the detective's magnifier moved to the left hand, the toque).
+- **L5.** 13 portraits (T4), `vfx` re-rendered through IsoCam plus `vfx_disguise`, the six ability icons, and the
+  low-poly style of every 5L key under `assets/lowpoly/` (art plan 1.9, A79), packed from the same renders.
+- **Higgsfield.** 36 images (20 T3, 16 T4), 108 credits, inside the 400-credit share; nothing generated for low poly.
+- **For 5K.** `build_villager.py` is a shim re-exporting `look_parts.py`'s shapes until `static_common.py` imports
+  them from there; SpriteCam is gone (`IsoCam`, `TileCam` remain); `packFrames` skips the extrude only when every
+  frame is finished; `palette.test.ts` exempts the `ovl_` mask pages from the saturated cap (A63).
+- **For 5F / 5I.** Atlas keys `char/<lookId>/<anim>/<dir>` for the ten looks (no hat passes); the villager loads
+  only with `?art=placeholder`; a style manifest lacking a key falls back to the 8-bit entry.
+- **Open.** Gate B (`assets/source/review/gate-b-character.png`) for the owner; ASSETS 6.1 still words the 10%
+  saturated cap as applying to every page (A63 exempts the overlay masks).
 
 ### Round 5 log: 5M (ONUB art)
 
@@ -2173,6 +2253,8 @@ before it, and each PR description says which commit to review. Decisions: A61.
 - Tests: `artStyle.test.ts`, `styleManifest.test.ts`, `e2e/artStyle.spec.ts` with the fixture manifest in
   `e2e/fixtures/lowpoly/`.
 
+**Integration note.** This replaces the landing-screen toggle of db8a55f (reload on pick, `ART_KEY` `wdi:art`, `overlay()`): the pick key is now `wdi.artStyle`, the merge is `mergeStyleManifest`, the switch needs no reload, and `flags.art` is back to `default | placeholder`.
+
 **For other sessions.**
 - 5F: no line is needed in `EntityView` or `RoleCard` today. The World restarts on a switch, so `EntityView` rebuilds
   from the new textures, and neither file reads a texture or a manifest url yet. If `RoleCard` comes to draw a
@@ -2182,3 +2264,33 @@ before it, and each PR description says which commit to review. Decisions: A61.
   urls be relative to that folder.
 - A DOM image that takes its url from `manifestImageUrls` must call it again on `art-style-changed`.
 
+
+- **Done (2026-10-18), one draft PR from `claude/r5-onub-art`, commits grouped M1 to M4.** Every key of
+  `onub-contract.md` 5.4 plus `onub_mini` in both manifests with `modes: ['onub']`; 13 owner rooms finished; the
+  proofing clean-up; the kitchen overview; 24 card faces and backs; the cloche; 15 role portraits and `onub_baker`;
+  the mini-game atlas; the placeholder twins; the loft images out of both manifests and `LEGACY`. Calls in DECISIONS
+  A64; keys and layout in SPRITES 11; ASSETS 6.3 "What shipped, ONUB v2".
+- **Generation**: 78 images and 33 background removals, 357 credits; every shipped pick has a CREDITS "Generated"
+  row and a MANIFEST row (catalog id pending `higgsfield-library-sync`). Raw generations stay out of git.
+- **Waiting on the owner**: Gate C, the Brick Oven pick (greybox until then), and the provenance of the 13 images.
+- **For other sessions**: the client's `queueManifest` loads every manifest entry today and ignores `modes`, so until
+  the client filters by mode (5C, 5D, 5I) the ONUB images would load in the main mode too; 5C and 5D draw
+  `mini_fire` from `mini_oven/0..3`. 5K: please move `frame` from `build_loft.py` into `static_common.py` and drop the
+  loft step of `save_masters.py`, after which `build_loft.py` can be deleted.
+- **Retakes (2026-10-18, on the orchestrator's round-5 budget of 300 credits for 5M)**: 6 more images and 1 more
+  background removal, 16 credits (balance 3010.31 to 2994.31). The Champignon and Commis portraits sat on a grey or
+  blue panel against the other portraits' navy void, and `mini_cart` had come out as a three-shelf rack; the new picks
+  (`retryNote` and `retrySubject` in `batches/5M.json`) replace their CREDITS and MANIFEST rows. Every other pick held
+  up on the review sheets, so the rest of the share stays unspent; the oven waits on the owner's pick.
+- **Low-poly style (2026-10-18, A79, art plan 1.9)**:
+  - Base merged at 2aa57ac.
+  - `onub.ts build` now writes both styles. The low-poly set is every ONUB key and `onub_mini` under
+    `assets/lowpoly/onub/` with `assets/lowpoly/manifest.json`, 3.9 MiB, and the 8-bit set is byte-identical to
+    before. Calls are in A64, layout in SPRITES 11.
+  - Gate C is answered (the pixel finish is the 8-bit style), and so is the provenance (Nano Banana Pro). Google's
+    terms rows are in `LICENSES/vendors/README.md`.
+  - Still open: the Brick Oven pick.
+- **Brick Oven (2026-10-18)**: the owner picked D (`99cad74c`). `pick` and the oven's `locBoxes` and `floorBoxes`
+  are set, and `onub_station_oven`, its kitchen quadrant, `onub_loc_oven` and the oven's Ingredient cards are rebuilt
+  in both styles; no greybox is left. The real oven pushed the low-poly set past 4 MiB, so the
+  generated and composed art goes to quality 82 (3.85 MiB; A64). The three retake MANIFEST rows now cite their new generation ids.

@@ -3,7 +3,7 @@ import abilitiesJson from '@wdi/content/data/abilities.json';
 import balance from '@wdi/content/data/balance.json';
 import palette from '@wdi/content/data/palette.json';
 import { Phase } from '@wdi/shared';
-import { TILE_PX } from '@wdi/shared/constants';
+import { TICK_RATE, TILE_PX } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
 import { toScreen, toWorld } from '@wdi/shared/iso';
 import { InputController } from '../input/InputController';
@@ -18,8 +18,9 @@ import {
   type SceneEnter,
   type WorldFeed,
 } from '../net/world';
-import { WORLD_COPY as C, fill } from '../ui/copy';
+import { LOOKS_COPY, WORLD_COPY as C, fill } from '../ui/copy';
 import { overlayRoot } from '../ui/dom';
+import { mountSeatPicker } from '../ui/SeatPicker';
 import { AudioBus } from '../view/AudioBus';
 import { BodyView } from '../view/BodyView';
 import { ClueView } from '../view/ClueView';
@@ -39,6 +40,7 @@ import { isTouchDevice, readDevFlags } from '../view/devFlags';
 import { DEPTH, cameraBounds, decalHolder, isoZoom, sceneDiamond, tileDiamond } from '../view/iso';
 import { type SceneMap, type TiledMap, readSceneMap } from '../view/sceneMap';
 import { loadSceneName } from '../view/sceneNames';
+import { nearestAvatar } from '../view/targets';
 import { DEFAULT_MAP_ID } from '../net/protocol';
 import { REG_AUDIO, getFlags, getNet } from './registry';
 
@@ -232,16 +234,19 @@ export class World extends Phaser.Scene {
     };
     const onFound = () => this.clueFound();
     const onKilled = () => this.refreshGhost();
+    const onAim = (m: { endsTick: number }) => this.openAim(m.endsTick);
     feed.bus.on('noise', onNoise);
     feed.bus.on('error', onError);
     feed.bus.on('clueFound', onFound);
     feed.bus.on('killed', onKilled);
+    feed.bus.on('aim', onAim);
     net.bus.on('error', onError as never);
     this.offs.push(
       () => feed.bus.off('noise', onNoise),
       () => feed.bus.off('error', onError),
       () => feed.bus.off('clueFound', onFound),
       () => feed.bus.off('killed', onKilled),
+      () => feed.bus.off('aim', onAim),
       () => net.bus.off('error', onError as never),
     );
 
@@ -280,6 +285,7 @@ export class World extends Phaser.Scene {
       this.scale.refresh();
       this.offs.forEach((off) => off());
       this.endUse();
+      this.closePicker();
       input.unbindAll();
       this.entities.destroy();
       this.clueView.destroy();
@@ -410,6 +416,7 @@ export class World extends Phaser.Scene {
     const row = getNet(this).roleCard?.abilities.find((a) => a.key === slot);
     const def = row ? ABILITY_DEFS[row.id] : undefined;
     if (!row || !def || def.kind !== 'active') return;
+    if (def.target === 'seat') return this.pickSeat(row.id, row.name);
     if (def.target !== 'player') {
       this.feed.ability(row.id);
       return;
@@ -422,21 +429,55 @@ export class World extends Phaser.Scene {
     } else this.feed.ability(row.id, near);
   }
 
+  /** The handle of the avatar nearest to the own in reach: the Kill and the Bandage name a handle (GDD 3.17). */
   private nearestPlayer(reachTiles: number): string | null {
-    const snaps = this.feed.snapshot();
-    const me = snaps.find((s) => s.id === this.feed.selfId)?.presence;
-    if (!me) return null;
-    let best: string | null = null;
-    let bestD = reachTiles * TILE_PX;
-    for (const s of snaps) {
-      if (s.id === this.feed.selfId || s.presence === null) continue;
-      const d = Math.hypot(s.presence.x - me.x, s.presence.y - me.y);
-      if (d <= bestD) {
-        bestD = d;
-        best = s.id;
-      }
-    }
-    return best;
+    return nearestAvatar(this.feed.avatars(), this.feed.selfHandle(), reachTiles * TILE_PX);
+  }
+
+  private seatPicker: { destroy(): void } | null = null;
+
+  /** A `target: 'seat'` ability names a seat id: pick one from the publicly living seats (GDD 3.17). */
+  private pickSeat(abilityId: string, name: string): void {
+    this.mountPicker(abilityId === 'impersonate' ? LOOKS_COPY['seats.title.impersonate'] : name, (id) => {
+      this.feed.ability(abilityId, id);
+      if (abilityId === 'impersonate') this.hud.toast(LOOKS_COPY['toast.disguise.wait'], 'interact');
+    });
+  }
+
+  /** The dying Gamekeeper's Last Shot (`aim {endsTick}`): the picker opens for the window and closes when it ends. */
+  private openAim(endsTick: number): void {
+    this.closePicker();
+    this.mountPicker(LOOKS_COPY['seats.title.aim'], (id) => this.feed.ability('lastShot', id));
+    const clock = this.feed.clock();
+    const ms = Math.max(0, ((endsTick - clock.tick) / TICK_RATE) * 1000);
+    this.aimTimer = window.setTimeout(() => this.closePicker(), ms);
+  }
+
+  private aimTimer = 0;
+
+  private closePicker(): void {
+    window.clearTimeout(this.aimTimer);
+    this.seatPicker?.destroy();
+    this.seatPicker = null;
+  }
+
+  private mountPicker(title: string, onPickSeat: (id: string) => void): void {
+    if (this.seatPicker) return;
+    const seats = this.feed
+      .snapshot()
+      .filter((s) => s.alive && s.id !== this.feed.selfId)
+      .map((s) => ({ id: s.id, name: s.name, look: s.look, traits: s.traits }));
+    const done = () => (this.seatPicker = null);
+    this.seatPicker = mountSeatPicker(overlayRoot(), {
+      title,
+      seats,
+      textures: this.textures,
+      onPick: (id) => {
+        done();
+        onPickSeat(id);
+      },
+      onCancel: done,
+    });
   }
 
   // ---- targets and the prompt ---------------------------------------------------------------------

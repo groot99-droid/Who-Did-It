@@ -23,6 +23,8 @@ type Internals = { step(): void; actors: Map<string, { x: number; y: number }> }
 const tickN = (feed: MockWorldFeed, n: number) => {
   for (let i = 0; i < n; i++) (feed as unknown as Internals).step();
 };
+/** The avatar handle a seat walks under now: Kill names a handle, never a seat id (GDD 3.17). */
+const handleOf = (feed: MockWorldFeed, seat: string) => feed.avatars().find((a) => a.lookOf === seat)!.handle;
 const near = (feed: MockWorldFeed, id: string) => {
   const a = (feed as unknown as Internals).actors;
   const target = a.get(id)!;
@@ -43,7 +45,7 @@ describe('MockWorldFeed verbs', () => {
   it('refuses a kill in grace, as the server does (425)', () => {
     const { feed, events } = make();
     near(feed, 'mock-bot-1');
-    feed.kill('mock-bot-1');
+    feed.kill(handleOf(feed, 'mock-bot-1'));
     expect(feed.bodies()).toHaveLength(0);
     expect(events).toContain('error');
   });
@@ -51,7 +53,7 @@ describe('MockWorldFeed verbs', () => {
   it('a day-phase kill leaves a body, both trail clues and the Blood bit; the cooldown refuses a second', () => {
     const { feed } = make('?phase=day&bots=still');
     near(feed, 'mock-bot-1');
-    feed.kill('mock-bot-1');
+    feed.kill(handleOf(feed, 'mock-bot-1'));
     expect(feed.bodies()).toHaveLength(1);
     expect(feed.bodies()[0]).toMatchObject({ of: 'mock-bot-1', hidden: false });
     expect(
@@ -63,7 +65,7 @@ describe('MockWorldFeed verbs', () => {
     expect(feed.snapshot().find((p) => p.id === 'mock-bot-1')?.presence).toBeNull();
     expect(feed.snapshot().find((p) => p.id === feed.selfId)?.presence?.statusBits).toBe(2);
     near(feed, 'mock-bot-2');
-    feed.kill('mock-bot-2');
+    feed.kill(handleOf(feed, 'mock-bot-2'));
     expect(feed.bodies()).toHaveLength(1);
   });
 
@@ -117,5 +119,89 @@ describe('MockWorldFeed and quick mode', () => {
     const { feed } = make('?mode=onub');
     expect(feed.mode()).toBe('main');
     expect(feed.clock().phase).toBe(2);
+  });
+});
+
+describe('MockWorldFeed avatars and Impersonate (GDD 3.17)', () => {
+  it('serves the own presence only, avatars for everyone in view, a look per seat and the own handle', () => {
+    const { feed } = make('?bots=still');
+    const snaps = feed.snapshot();
+    expect(snaps.filter((p) => p.presence !== null).map((p) => p.id)).toEqual([feed.selfId]);
+    expect(snaps.every((p) => p.look !== '')).toBe(true);
+    const avatars = feed.avatars();
+    expect(avatars).toHaveLength(7);
+    expect(avatars.map((a) => a.handle)).toContain(feed.selfHandle());
+    expect(new Set(avatars.map((a) => a.handle)).size).toBe(7);
+    for (const a of avatars) expect(snaps.some((p) => p.id === a.handle)).toBe(false);
+    expect(feed.coverState()).toEqual({ look: '', mates: {} });
+  });
+
+  it('refuses a seat id as a Kill target', () => {
+    const { feed, events } = make('?phase=day&bots=still');
+    near(feed, 'mock-bot-1');
+    feed.kill('mock-bot-1');
+    expect(feed.bodies()).toHaveLength(0);
+    expect(events).toContain('error');
+  });
+
+  it('re-rolls the handles of a seat that crosses a door', () => {
+    const { feed } = make('?bots=still');
+    const before = feed.selfHandle();
+    (feed as unknown as { place(b: unknown, scene: string, spawn: unknown): void }).place(
+      (feed as unknown as Internals).actors.get(feed.selfId),
+      'overworld',
+      { x: 4, y: 4, facing: 's' },
+    );
+    expect(feed.selfHandle()).not.toBe(before);
+  });
+
+  it('an impersonation shows the borrowed face on the own avatar and re-rolls the handle', () => {
+    const { feed } = make('?phase=day&bots=still');
+    const before = feed.selfHandle();
+    feed.ability('impersonate', 'mock-bot-2');
+    expect(feed.selfHandle()).not.toBe(before);
+    const mine = feed.avatars().find((a) => a.handle === feed.selfHandle())!;
+    expect(mine.lookOf).toBe('mock-bot-2');
+    expect(mine.height).toBe(feed.snapshot().find((p) => p.id === feed.selfId)!.traits.height);
+    feed.ability('impersonate');
+    expect(feed.avatars().find((a) => a.handle === feed.selfHandle())!.lookOf).toBe(feed.selfId);
+  });
+
+  it('a strike made in disguise drops it with one vfx that names nobody', () => {
+    const { feed } = make('?phase=day&bots=still');
+    const puffs: unknown[] = [];
+    feed.bus.on('vfx', (m) => puffs.push(m));
+    feed.ability('impersonate', 'mock-bot-2');
+    near(feed, 'mock-bot-1');
+    feed.kill(handleOf(feed, 'mock-bot-1'));
+    expect(puffs).toHaveLength(1);
+    expect(Object.keys(puffs[0] as object).sort()).toEqual(['kind', 'sceneId', 'x', 'y']);
+    expect(feed.avatars().find((a) => a.handle === feed.selfHandle())!.lookOf).toBe(feed.selfId);
+    near(feed, 'mock-bot-3');
+    feed.kill(handleOf(feed, 'mock-bot-3')); // the knife rests: refused, and no second puff
+    expect(puffs).toHaveLength(1);
+  });
+
+  it('a Last Shot aim opens one shot on a seat id and closes with its window', () => {
+    const { feed } = make('?phase=day&bots=still');
+    const aims: Array<{ endsTick: number }> = [];
+    const errors: unknown[] = [];
+    feed.bus.on('aim', (m) => aims.push(m));
+    feed.bus.on('error', (e) => errors.push(e));
+    feed.ability('lastShot', 'mock-bot-1'); // no aim open: refused
+    expect(errors).toHaveLength(1);
+    feed.openAim(1);
+    expect(aims).toHaveLength(1);
+    feed.ability('lastShot', feed.selfId); // not yourself
+    expect(errors).toHaveLength(2);
+    feed.ability('lastShot', 'mock-bot-1');
+    feed.ability('lastShot', 'mock-bot-2'); // one shot only
+    expect(errors).toHaveLength(3);
+    feed.openAim(1);
+    feed.ability('lastShot', 'mock-bot-1'); // already shot
+    expect(errors).toHaveLength(4);
+    tickN(feed, TICK_RATE + 1);
+    feed.ability('lastShot', 'mock-bot-2'); // the window ran out
+    expect(errors).toHaveLength(5);
   });
 });

@@ -3,7 +3,11 @@ import { traits } from '@wdi/content';
 import balance from '@wdi/content/data/balance.json';
 import onubBalance from '@wdi/content/data/balance.onub.json';
 import onubRoles from '@wdi/content/data/roles.onub.json';
+import { onubMockRoleCard } from '../net/mock/onubMock';
+import type { RoleRevealPayload } from '../net/protocol';
 import {
+  coverChoices,
+  createCoverModel,
   isOnubCard,
   lookLine,
   ROLE_CARD_SECONDS,
@@ -48,5 +52,73 @@ describe('quick-mode card', () => {
   it('names a quick-mode role through roles.onub.json', () => {
     expect(roleTitle('sousChef', 'onub')).toBe(onubRoles.roles.sousChef.name);
     expect(roleTitle('sousChef')).toBe('SousChef');
+  });
+});
+
+const DECK = ['killer', 'accomplice', 'detective', 'vicar', 'doctor', 'lamplighter', 'baker'];
+const cover = (over: Partial<RoleRevealPayload> = {}): RoleRevealPayload =>
+  ({
+    ...onubMockRoleCard('me'),
+    roleId: 'killer',
+    team: 'cabal',
+    teamName: undefined,
+    deck: DECK,
+    look: 'baker',
+    coverHints: ['baker', 'lamplighter'],
+    teammates: [{ id: 'mate', name: 'Moss' }],
+    ...over,
+  }) as RoleRevealPayload;
+
+describe('cover picker choices (GDD 3.17)', () => {
+  it("lists the hints first, marked safe, then the deck's other non-cover looks, each once", () => {
+    expect(coverChoices(DECK, ['baker', 'lamplighter'])).toEqual([
+      { lookId: 'baker', safe: true },
+      { lookId: 'lamplighter', safe: true },
+      { lookId: 'detective', safe: false },
+      { lookId: 'vicar', safe: false },
+      { lookId: 'doctor', safe: false },
+    ]);
+  });
+
+  it('never offers a cover card, and no choices without a deck', () => {
+    expect(coverChoices(DECK, []).map((c) => c.lookId)).not.toContain('killer');
+    expect(coverChoices([], [])).toEqual([]);
+  });
+});
+
+describe('cover picker model', () => {
+  it('preselects the first hint and sends a click as one pick', () => {
+    const sent: string[] = [];
+    const model = createCoverModel(cover(), (lookId) => sent.push(lookId));
+    expect(model.choices().find((c) => c.picked)?.lookId).toBe('baker');
+    expect(model.pick('baker')).toBe(false); // already picked: nothing to send
+    expect(model.pick('vicar')).toBe(true);
+    expect(model.choices().find((c) => c.picked)?.lookId).toBe('vicar');
+    expect(model.pick('killer')).toBe(false); // not on the list
+    expect(sent).toEqual(['vicar']);
+  });
+
+  it('marks and disables the look a mate wears, by name, and refuses its click', () => {
+    const sent: string[] = [];
+    const model = createCoverModel(cover(), (lookId) => sent.push(lookId));
+    model.sync({ look: 'baker', mates: { mate: 'lamplighter' } });
+    expect(model.choices().find((c) => c.lookId === 'lamplighter')?.wornBy).toBe('Moss');
+    expect(model.choices().filter((c) => c.wornBy !== null)).toHaveLength(1);
+    expect(model.pick('lamplighter')).toBe(false);
+    expect(sent).toEqual([]);
+  });
+
+  it("follows the server's pick over the local one", () => {
+    const model = createCoverModel(cover());
+    model.pick('vicar');
+    model.sync({ look: 'doctor', mates: {} });
+    expect(model.choices().find((c) => c.picked)?.lookId).toBe('doctor');
+  });
+});
+
+describe('the quick-mode card', () => {
+  it('carries no main-mode field, so it has no deck strip, look line or picker', () => {
+    const card = onubMockRoleCard('me');
+    for (const key of ['deck', 'look', 'portrait', 'coverHints'] as const) expect(card[key]).toBeUndefined();
   });
 });

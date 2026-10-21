@@ -1,7 +1,10 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { loadImage } from '@napi-rs/canvas';
 import { describe, expect, it } from 'vitest';
 import { decodePng, encodePng } from '../bleed.ts';
 import { finishImages, IMAGE_SETS, IMAGE_SIZES, TILE_VARIANTS } from '../images.ts';
-import { BUILDING_KEYS, LOFT_KEYS, TILESET_KEYS } from '../keys.ts';
+import { LOFT_KEYS, TILESET_KEYS } from '../keys.ts';
 
 function image(w: number, h: number, shade = 217): Buffer {
   const data = new Uint8Array(w * h * 4);
@@ -12,10 +15,8 @@ function image(w: number, h: number, shade = 217): Buffer {
 const flat = (keys: readonly string[]) => new Map(keys.map((k) => [k, image(...IMAGE_SIZES[k]!)]));
 
 describe('finishImages', () => {
-  it('sizes every loft, building and tileset key', () => {
-    expect(IMAGE_SETS.flatMap((s) => s.keys).sort()).toEqual(
-      [...LOFT_KEYS, ...BUILDING_KEYS, ...TILESET_KEYS].sort(),
-    );
+  it('sizes every loft and tileset key', () => {
+    expect(IMAGE_SETS.flatMap((s) => s.keys).sort()).toEqual([...LOFT_KEYS, ...TILESET_KEYS].sort());
     for (const s of IMAGE_SETS) for (const k of s.keys) expect(IMAGE_SIZES[k]).toBeDefined();
   });
 
@@ -45,5 +46,19 @@ describe('finishImages', () => {
     const wrong = flat(LOFT_KEYS);
     wrong.set('prop_bedroll', image(56, 92));
     expect(() => finishImages(LOFT_KEYS, wrong)).toThrow(/56x92, want 112x184/);
+  });
+});
+
+describe('the lobby thumbnails (art plan 3.9, 1.4)', () => {
+  const ASSETS = join(import.meta.dirname, '../../../apps/client/public/assets');
+  it.each(['', 'placeholder/'])('%sthumb_<mapId> are 480 x 270 WebP within 0.2 MB together', async (dir) => {
+    let bytes = 0;
+    for (const map of ['hollowmere', 'blackpine']) {
+      const file = readFileSync(join(ASSETS, dir, 'thumbs', `thumb_${map}.webp`));
+      bytes += file.length;
+      const img = await loadImage(file);
+      expect([img.width, img.height], map).toEqual([480, 270]);
+    }
+    expect(bytes).toBeLessThanOrEqual(200 * 1024);
   });
 });

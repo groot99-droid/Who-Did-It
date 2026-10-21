@@ -200,3 +200,149 @@ class Sheet:
             json.dump({"version": 1, "atlas": self.atlas, "frames": self.frames}, fh, indent=2, sort_keys=True)
             fh.write("\n")
         print(f"{self.atlas}: {len(self.frames)} frames -> {self.dir}")
+
+
+# ---------------------------------------------------------------- isometric (docs/SPRITES.md 10.3)
+
+ISO_PX_PER_M = 90.51  # display scale: a 1 m tile is a 128 x 64 diamond
+ISO_TILT_DEG, ISO_YAW_DEG = 60.0, 45.0
+ISO_Z_SCALE = 0.75  # environment heights render at 0.75 (metrics.json iso.zScale)
+
+
+def iso_vectors():
+    """IsoCam's right, up and forward unit vectors in Blender space (X 60, Y 0, Z 45)."""
+    from mathutils import Euler, Vector
+
+    rot = Euler((math.radians(ISO_TILT_DEG), 0.0, math.radians(ISO_YAW_DEG))).to_matrix()
+    return rot @ Vector((1, 0, 0)), rot @ Vector((0, 1, 0)), rot @ Vector((0, 0, -1))
+
+
+def iso_setup(scene) -> bpy.types.Object:
+    """IsoCam, and the rig's camera-parented lights turned 45 degrees with it.
+
+    5L's L1 adds `IsoCam` to build_rig.py; until then (and if the rig has none) this builds the same camera
+    here, so the world renders need no rig change. The lights keep their camera-relative azimuths
+    (key from screen-left at 225 degrees, the moon fill): turning them with the camera keeps that.
+    """
+    from mathutils import Matrix
+
+    cam = bpy.data.objects.get("IsoCam")
+    if cam is None:
+        data = bpy.data.cameras.new("IsoCam")
+        data.type = "ORTHO"
+        data.clip_start, data.clip_end = 0.1, 200.0
+        cam = bpy.data.objects.new("IsoCam", data)
+        bpy.context.scene.collection.objects.link(cam)
+        cam.rotation_euler = (math.radians(ISO_TILT_DEG), 0.0, math.radians(ISO_YAW_DEG))
+        turn = Matrix.Rotation(math.radians(ISO_YAW_DEG), 4, "Z")
+        for name in ("Key", "Fill"):
+            light = bpy.data.objects[name]
+            world = light.matrix_world.copy()
+            light.parent = None
+            light.matrix_world = turn @ world
+    scene.camera = cam
+    return cam
+
+
+def iso_frame(scene, w: int, h: int, origin_px: tuple[float, float], target=(0.0, 0.0, 0.0)) -> None:
+    """Frame IsoCam on a w x h px image at the display scale with Blender point `target` at `origin_px`."""
+    from mathutils import Vector
+
+    cam = iso_setup(scene)
+    right, up, forward = iso_vectors()
+    ox, oy = origin_px
+    centre = Vector(target) + right * ((w / 2 - ox) / ISO_PX_PER_M) + up * ((oy - h / 2) / ISO_PX_PER_M)
+    cam.location = centre - forward * 60.0
+    cam.data.ortho_scale = max(w, h) / ISO_PX_PER_M
+    cam.data.shift_x = cam.data.shift_y = 0.0
+    scene.render.resolution_x, scene.render.resolution_y = w, h
+
+
+def iso_px(point, w: int, h: int, origin_px: tuple[float, float], target=(0.0, 0.0, 0.0)) -> tuple[float, float]:
+    """Pixel of a Blender point in an `iso_frame`d image (the inverse of the framing above)."""
+    from mathutils import Vector
+
+    right, up, _ = iso_vectors()
+    d = Vector(point) - Vector(target)
+    return origin_px[0] + d.dot(right) * ISO_PX_PER_M, origin_px[1] - d.dot(up) * ISO_PX_PER_M
+
+
+def env_root(name: str = "EnvRoot") -> bpy.types.Object:
+    """An empty scaled (1, 1, 0.75): environment meshes parented to it render at 0.75 height."""
+    root = bpy.data.objects.get(name)
+    if root is None:
+        root = bpy.data.objects.new(name, None)
+        bpy.context.scene.collection.objects.link(root)
+        root.scale = (1.0, 1.0, ISO_Z_SCALE)
+    return root
+
+
+def hex_toon(name: str, light: str, mid: str, shadow: str) -> bpy.types.Material:
+    """Toon material from three world-palette hex colours (palette.json `world`)."""
+    if name not in _MATS:
+        mat = build_rig._new_material(name)
+        nodes = mat.node_tree.nodes
+        group = nodes.new("ShaderNodeGroup")
+        group.node_tree = bpy.data.node_groups[build_rig.TOON_GROUP]
+        for sock, hx in (("Light", light), ("Mid", mid), ("Shadow", shadow)):
+            group.inputs[sock].default_value = rc.hex_to_linear(hx)
+        out = nodes.new("ShaderNodeOutputMaterial")
+        mat.node_tree.links.new(group.outputs["Shader"], out.inputs["Surface"])
+        _MATS[name] = mat
+    return _MATS[name]
+
+
+def hex_flat(name: str, hx: str) -> bpy.types.Material:
+    """Unlit world-palette colour."""
+    if name not in _MATS:
+        mat = build_rig._new_material(name)
+        nodes = mat.node_tree.nodes
+        emit = nodes.new("ShaderNodeEmission")
+        emit.inputs["Color"].default_value = rc.hex_to_linear(hx)
+        out = nodes.new("ShaderNodeOutputMaterial")
+        mat.node_tree.links.new(emit.outputs["Emission"], out.inputs["Surface"])
+        _MATS[name] = mat
+    return _MATS[name]
+
+
+def tex_toon(name: str, image_path: str, metres: float = 2.0, gains=(1.15, 0.85, 0.55), tint=None):
+    """Textured toon: the image (box-projected, one repeat per `metres` of object space) through the toon bands.
+
+    The three bands are the texture times `gains` (light, mid, shadow), so a lit face, a side face and a
+    face turned away read as the toon's three tones of the same surface. `tint` (hex) multiplies it.
+    Textures go in through the toon colour inputs (docs/round5/art-plan.md 3.1).
+    """
+    if name in _MATS:
+        return _MATS[name]
+    mat = build_rig._new_material(name)
+    nodes, links = mat.node_tree.nodes, mat.node_tree.links
+    coords = nodes.new("ShaderNodeTexCoord")
+    scale = nodes.new("ShaderNodeVectorMath")
+    scale.operation = "SCALE"
+    scale.inputs["Scale"].default_value = 1.0 / metres
+    links.new(coords.outputs["Object"], scale.inputs[0])
+    tex = nodes.new("ShaderNodeTexImage")
+    tex.image = bpy.data.images.load(os.path.abspath(image_path), check_existing=True)
+    tex.interpolation = "Cubic"
+    tex.projection, tex.projection_blend = "BOX", 0.1  # walls and tops alike, no stretched sides
+    links.new(scale.outputs["Vector"], tex.inputs["Vector"])
+    colour = tex.outputs["Color"]
+    if tint:
+        mul = nodes.new("ShaderNodeMix")
+        mul.data_type, mul.blend_type = "RGBA", "MULTIPLY"
+        build_rig._socket(mul.inputs, "Factor_Float").default_value = 1.0
+        links.new(colour, build_rig._socket(mul.inputs, "A_Color"))
+        build_rig._socket(mul.inputs, "B_Color").default_value = rc.hex_to_linear(tint)
+        colour = build_rig._socket(mul.outputs, "Result_Color")
+    group = nodes.new("ShaderNodeGroup")
+    group.node_tree = bpy.data.node_groups[build_rig.TOON_GROUP]
+    for sock, gain in zip(("Light", "Mid", "Shadow"), gains):
+        g = nodes.new("ShaderNodeVectorMath")
+        g.operation = "SCALE"
+        g.inputs["Scale"].default_value = gain
+        links.new(colour, g.inputs[0])
+        links.new(g.outputs["Vector"], group.inputs[sock])
+    out = nodes.new("ShaderNodeOutputMaterial")
+    links.new(group.outputs["Shader"], out.inputs["Surface"])
+    _MATS[name] = mat
+    return mat

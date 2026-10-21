@@ -154,6 +154,8 @@ describe('Start in the quick mode', () => {
     expect(phaseOf(m)).toBe(Phase.roleReveal);
     expect(m.room.state.players.size).toBe(4);
     expect(memory(m).deck).toEqual(onubFor(4).deck);
+    // The phase is read from the server room; the card is a message, which may still be on its way.
+    await until(() => cards(m.bots[0] as Bot).length === 1, 2000);
     expect(cards(m.bots[0] as Bot)).toHaveLength(1);
   });
 
@@ -254,7 +256,6 @@ describe('role card to Evening Prep', () => {
     expect(timer).toBeGreaterThan(0);
     expect(timer).toBeLessThanOrEqual(onubBalance.timers.prepS * 20);
     m.room.state.players.forEach((p: PlayerState) => {
-      expect(p.sceneId).toBe(LOFT_SCENE_INDEX);
       expect(p.priv.sceneId).toBe(LOFT_SCENE_INDEX);
       expect(p.ready).toBe(false);
     });

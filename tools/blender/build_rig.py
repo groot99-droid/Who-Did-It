@@ -14,7 +14,7 @@ import os
 import sys
 
 import bpy
-from mathutils import Vector
+from mathutils import Euler, Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import rig_common as rc  # noqa: E402
@@ -39,7 +39,7 @@ def apply_render_settings(scene: bpy.types.Scene) -> None:
     r.resolution_x = r.resolution_y = rc.CELL_PX
     r.resolution_percentage = 100
     r.film_transparent = True
-    r.filter_size = 1.5
+    r.filter_size = 1.0
     r.dither_intensity = 0.0
     r.fps, r.fps_base = 24, 1.0
     r.image_settings.file_format = "PNG"
@@ -151,25 +151,36 @@ def _new_material(name: str) -> bpy.types.Material:
     return mat
 
 
+def colour(value: str) -> tuple[float, float, float, float]:
+    """Linear RGBA of a UI token (`fog`) or a world-palette hex (`#6F7A8C`)."""
+    return rc.hex_to_linear(value if value.startswith("#") else rc.PALETTE[value])
+
+
 def toon_material(name: str, light: str, mid: str, shadow: str, rim_amount: float = 0.0) -> bpy.types.Material:
-    """A material using the toon group with three palette tokens."""
+    """A material using the toon group with three palette tokens or world-palette hex colours."""
     mat = _new_material(name)
     nodes = mat.node_tree.nodes
     group = nodes.new("ShaderNodeGroup")
     group.node_tree = bpy.data.node_groups[TOON_GROUP]
-    for sock, token in (("Light", light), ("Mid", mid), ("Shadow", shadow)):
-        group.inputs[sock].default_value = rc.hex_to_linear(rc.PALETTE[token])
+    for sock, value in (("Light", light), ("Mid", mid), ("Shadow", shadow)):
+        group.inputs[sock].default_value = colour(value)
     group.inputs["Rim Amount"].default_value = rim_amount
     out = nodes.new("ShaderNodeOutputMaterial")
     mat.node_tree.links.new(group.outputs["Shader"], out.inputs["Surface"])
     return mat
 
 
+def ramp_material(name: str, mid: str, ramp: str | None = None, rim_amount: float = 0.0) -> bpy.types.Material:
+    """Toon material on a world colour, its light and shadow bands the ramp neighbours (S5.3)."""
+    light, shadow = rc.ramp_shades(mid, ramp)
+    return toon_material(name, light, mid, shadow, rim_amount)
+
+
 def flat_material(name: str, token: str) -> bpy.types.Material:
     mat = _new_material(name)
     nodes = mat.node_tree.nodes
     emit = nodes.new("ShaderNodeEmission")
-    emit.inputs["Color"].default_value = rc.hex_to_linear(rc.PALETTE[token])
+    emit.inputs["Color"].default_value = colour(token)
     out = nodes.new("ShaderNodeOutputMaterial")
     mat.node_tree.links.new(emit.outputs["Emission"], out.inputs["Surface"])
     return mat
@@ -207,13 +218,16 @@ def checker_material() -> bpy.types.Material:
     return mat
 
 
-def grid_material() -> bpy.types.Material:
-    """Fog floor with ink lines on every metre, for seam and scale checks."""
-    mat = _new_material("CalibGrid")
+def grid_material(name: str = "CalibGrid", space: str = "Object") -> bpy.types.Material:
+    """Fog floor with ink lines on every metre, for seam and scale checks.
+
+    `space` "Generated" draws the lines on the object's own edges instead (the 1 m tile diamond).
+    """
+    mat = _new_material(name)
     nodes, links = mat.node_tree.nodes, mat.node_tree.links
     coords = nodes.new("ShaderNodeTexCoord")
     sep = nodes.new("ShaderNodeSeparateXYZ")
-    links.new(coords.outputs["Object"], sep.inputs["Vector"])
+    links.new(coords.outputs[space], sep.inputs["Vector"])
     interior = []
     for axis in ("X", "Y"):
         fract = nodes.new("ShaderNodeMath")
@@ -273,19 +287,22 @@ def _link(col, obj):
 
 
 def make_cameras(col) -> tuple[bpy.types.Object, bpy.types.Object]:
-    tilt = math.radians(rc.CAMERA_TILT_DEG)
-    up = Vector((0.0, math.cos(tilt), math.sin(tilt)))
-    forward = Vector((0.0, math.sin(tilt), -math.cos(tilt)))
-    # Put the world origin FEET_ROW_PX from the top of the cell.
-    drop_m = (rc.FEET_ROW_PX - rc.CELL_PX / 2) / rc.TILE_PX
+    """IsoCam (X 60, Y 0, Z 45, display scale, SPRITES 10.3) and the straight-down TileCam for decals."""
+    rot = Euler((math.radians(rc.CAMERA_TILT_DEG), 0.0, math.radians(rc.CAMERA_YAW_DEG)))
+    up = Vector((0.0, 1.0, 0.0))
+    up.rotate(rot)
+    forward = Vector((0.0, 0.0, -1.0))
+    forward.rotate(rot)
+    # Put the world origin FEET_ROW_PX from the top of a CELL_PX cell (48 display px below the centre).
+    drop_m = (rc.FEET_ROW_PX - rc.CELL_PX / 2) / rc.DISPLAY_PX_PER_M
     centre = up * drop_m
 
-    cam_data = bpy.data.cameras.new("SpriteCam")
+    cam_data = bpy.data.cameras.new("IsoCam")
     cam_data.type = "ORTHO"
-    cam_data.ortho_scale = rc.CAMERA_ORTHO_SCALE
+    cam_data.ortho_scale = rc.ortho_scale(rc.CELL_PX)
     cam_data.clip_start, cam_data.clip_end = 0.1, 100.0
-    cam = _link(col, bpy.data.objects.new("SpriteCam", cam_data))
-    cam.rotation_euler = (tilt, 0.0, 0.0)
+    cam = _link(col, bpy.data.objects.new("IsoCam", cam_data))
+    cam.rotation_euler = rot
     cam.location = centre - forward * 30.0
 
     tile_data = bpy.data.cameras.new("TileCam")
@@ -311,7 +328,8 @@ def make_lights(col, camera) -> None:
     key.use_shadow = False
     key.angle = 0.0  # a hard sun; a soft one dithers faces that sit on a ramp stop
     key_obj = _link(col, bpy.data.objects.new("Key", key))
-    _aim(key_obj, rc.light_direction(rc.KEY_LIGHT["azimuth"], rc.KEY_LIGHT["elevation"]), 10.0)
+    # Azimuths are in the camera's frame; parenting below keeps them there (rig_common.world_azimuth).
+    _aim(key_obj, rc.light_direction(rc.world_azimuth(rc.KEY_LIGHT["azimuth"]), rc.KEY_LIGHT["elevation"]), 10.0)
 
     fill = bpy.data.lights.new("Fill", "AREA")
     fill.shape, fill.size = "SQUARE", rc.FILL_LIGHT["size"]
@@ -322,7 +340,8 @@ def make_lights(col, camera) -> None:
     fill.color = rc.hex_to_linear(rc.PALETTE[rc.FILL_LIGHT["color_token"]])[:3]
     fill.use_shadow = False
     fill_obj = _link(col, bpy.data.objects.new("Fill", fill))
-    _aim(fill_obj, rc.light_direction(rc.FILL_LIGHT["azimuth"], rc.FILL_LIGHT["elevation"]), distance)
+    _aim(fill_obj, rc.light_direction(rc.world_azimuth(rc.FILL_LIGHT["azimuth"]), rc.FILL_LIGHT["elevation"]),
+         distance)
 
     bpy.context.view_layer.update()
     for obj in (key_obj, fill_obj):
@@ -330,48 +349,53 @@ def make_lights(col, camera) -> None:
         obj.matrix_parent_inverse = camera.matrix_world.inverted()
 
 
-def make_calibration(col, turntable) -> None:
+def _adopt(col, name: str) -> bpy.types.Object:
+    obj = bpy.context.active_object
+    for c in obj.users_collection:
+        c.objects.unlink(obj)
+    col.objects.link(obj)
+    obj.name = name
+    return obj
+
+
+def make_calibration(col, turntable, env_root) -> None:
+    """The checker cube and its facing marker on the turntable (character root, 0.75 on every axis), a
+    1 m tile under the environment root, a 4 m grid for TileCam, and a fallen 1.7 m proxy for `die`."""
     bpy.ops.mesh.primitive_cube_add(size=1.0)
-    cube = bpy.context.active_object
-    for c in cube.users_collection:
-        c.objects.unlink(cube)
-    col.objects.link(cube)
-    cube.name = "CheckerCube"
+    cube = _adopt(col, "CheckerCube")
     cube.location = (0.0, 0.0, 0.5)
     cube.data.materials.append(checker_material())
     add_outline(cube, "character")
     cube.parent = turntable
 
-    # Teal wedge on the top face pointing along the facing (+Y at direction n).
+    # Teal wedge on the top face pointing along the facing (+Y, world north at TT.z = 0: screen `ne`).
     bpy.ops.mesh.primitive_cone_add(radius1=0.15, depth=0.45, location=(0.0, 0.2, 1.08),
                                     rotation=(math.radians(-90.0), 0.0, 0.0))
-    marker = bpy.context.active_object
-    for c in marker.users_collection:
-        c.objects.unlink(marker)
-    col.objects.link(marker)
-    marker.name = "FacingMarker"
+    marker = _adopt(col, "FacingMarker")
     marker.data.materials.append(toon_material("CalibFacing", "teal", "teal", "slate"))
     add_outline(marker, "character")
     marker.parent = turntable
+    # The marker's tail and tip, for the screen-up check of the `n` frame (calibration.json).
+    for nm, y in (("MarkerTail", -0.025), ("MarkerTip", 0.425)):
+        e = _link(col, bpy.data.objects.new(nm, None))
+        e.location = (0.0, y, 1.08)
+        e.parent = turntable
 
     bpy.ops.mesh.primitive_plane_add(size=4.0)
-    plane = bpy.context.active_object
-    for c in plane.users_collection:
-        c.objects.unlink(plane)
-    col.objects.link(plane)
-    plane.name = "GridPlane"
-    plane.location = (0.0, 0.0, 0.0)
+    plane = _adopt(col, "GridPlane")
     plane.data.materials.append(grid_material())
 
-    # A 1.7 m body fallen flat towards the camera, the worst case for the 256 px die cell. Smoke only.
+    bpy.ops.mesh.primitive_plane_add(size=1.0)
+    tile = _adopt(col, "TilePlane")
+    tile.data.materials.append(grid_material("CalibTile", "Generated"))
+    tile.parent = env_root
+    tile.hide_render = True
+
+    # A 1.7 m body fallen flat along the facing, the worst case for the 256 px die cell. Smoke only.
     bpy.ops.mesh.primitive_cube_add(size=1.0)
-    fallen = bpy.context.active_object
-    for c in fallen.users_collection:
-        c.objects.unlink(fallen)
-    col.objects.link(fallen)
-    fallen.name = "FallenProxy"
+    fallen = _adopt(col, "FallenProxy")
     fallen.scale = (0.4, 1.7, 0.25)
-    fallen.location = (0.0, -0.85, 0.125)
+    fallen.location = (0.0, 0.85, 0.125)
     fallen.data.materials.append(toon_material("CalibFallen", "bone", "fog", "slate"))
     add_outline(fallen, "character")
     fallen.parent = turntable
@@ -381,6 +405,15 @@ def make_calibration(col, turntable) -> None:
     feet.empty_display_type = "PLAIN_AXES"
     feet.empty_display_size = 0.2
     feet.parent = turntable
+
+
+def make_roots(col) -> tuple[bpy.types.Object, bpy.types.Object]:
+    """The two root empties of SPRITES 10.3: environment (1, 1, 0.75) and character (0.75 on every axis)."""
+    env = _link(col, bpy.data.objects.new("EnvRoot", None))
+    env.scale = rc.ENV_ROOT_SCALE
+    char = _link(col, bpy.data.objects.new("CharRoot", None))
+    char.scale = rc.CHAR_ROOT_SCALE
+    return env, char
 
 
 def build(out_path: str | None = None) -> bpy.types.Scene:
@@ -394,10 +427,12 @@ def build(out_path: str | None = None) -> bpy.types.Scene:
     cam, _tile = make_cameras(rig)
     scene.camera = cam
     make_lights(rig, cam)
+    env_root, char_root = make_roots(rig)
     turntable = _link(rig, bpy.data.objects.new("TT", None))
     turntable.empty_display_type = "CIRCLE"
+    turntable.parent = char_root
     _collection(scene, "Character")
-    make_calibration(_collection(scene, "Calibration"), turntable)
+    make_calibration(_collection(scene, "Calibration"), turntable, env_root)
 
     bpy.context.view_layer.update()
     if out_path:

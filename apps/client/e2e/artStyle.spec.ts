@@ -29,8 +29,10 @@ declare global {
 async function fixtures(page: Page, opts: { lowpoly: boolean } = { lowpoly: true }): Promise<void> {
   await page.route('**/assets/manifest.json', async (route) => {
     const body = (await (await route.fetch()).json()) as { entries: unknown[] };
-    // The fixture tile replaces the real tiles_grass entry.
-    body.entries = body.entries.filter((e) => (e as { key: string }).key !== 'tiles_grass');
+    // The fixture images replace the real tiles_grass and onub_kitchen entries.
+    body.entries = body.entries.filter(
+      (e) => !['tiles_grass', 'onub_kitchen'].includes((e as { key: string }).key),
+    );
     body.entries.push(
       { key: 'tiles_grass', type: 'image', url: 'e2e/tiles_grass.png', filter: 'nearest' },
       { key: 'onub_kitchen', type: 'image', url: 'e2e/onub_kitchen.png', filter: 'nearest', modes: ['onub'] },

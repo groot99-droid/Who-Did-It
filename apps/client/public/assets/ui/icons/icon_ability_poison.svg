@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Nightshade">
+  <title>Nightshade</title>
+  <rect x="13" y="13" width="10" height="6" rx="1" fill="#F2B33D"/>
+  <path d="M14 19 H22 V23 C27 25 29 29 29 33 V41 C29 43 27 44 25 44 H11 C9 44 7 43 7 41 V33 C7 29 9 25 14 23 Z" fill="#D9D2C2"/>
+  <path d="M30 6 C33 10 35 14 36 20 M36 20 L41 14 M36 20 L42 24" />
+  <circle cx="41" cy="12" r="3" fill="#12141C"/>
+  <circle cx="43" cy="25" r="3" fill="#12141C"/>
+  <circle cx="35" cy="24" r="3" fill="#12141C"/>
+</svg>

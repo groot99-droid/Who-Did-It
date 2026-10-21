@@ -45,7 +45,7 @@ export function dealDeck(
  * first, then its Cabal mates' cards and every card no cover seat needs; the Drifter is shown only its own. So a
  * lone cover seat sees them all, Cabal mates share one list with different first hints, and no Drifter hint is in
  * a Cabal list. Returns seat -> card ids; throws if a cover seat has no card (never, for a deck that passes
- * validate.ts). Pre-seed stub: returns an empty map (Session 5F fills it).
+ * validate.ts).
  */
 export function coverHints(
   dealt: ReadonlyMap<string, string>,
@@ -54,10 +54,22 @@ export function coverHints(
   isCover: (card: string) => boolean,
   isCabal: (card: string) => boolean,
 ): Map<string, string[]> {
-  void dealt;
-  void undealt;
-  void cards;
-  void isCover;
-  void isCabal;
-  return new Map();
+  const pool = undealt.filter((card) => !isCover(card));
+  const seats = [...dealt]
+    .filter(([, card]) => isCover(card))
+    .map(([seat, card], at) => ({ seat, card, at, rank: cards.indexOf(card) }))
+    .sort((a, b) => a.rank - b.rank || a.at - b.at);
+  const need = seats.map((s, i) => {
+    const card = pool[i];
+    if (card === undefined) throw new Error(`cover seat ${s.seat} (${s.card}) has no undealt card to wear`);
+    return card;
+  });
+  const spare = pool.slice(seats.length);
+  const out = new Map<string, string[]>();
+  seats.forEach((s, i) => {
+    if (!isCabal(s.card)) return void out.set(s.seat, [need[i] as string]);
+    const mates = seats.flatMap((o, j) => (j !== i && isCabal(o.card) ? [need[j] as string] : []));
+    out.set(s.seat, [need[i] as string, ...mates, ...spare]);
+  });
+  return out;
 }

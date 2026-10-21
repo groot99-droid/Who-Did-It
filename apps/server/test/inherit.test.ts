@@ -9,6 +9,7 @@ import { simOf } from '../src/sim/RoomSim';
 import { events, until } from './flowHelpers';
 import { act, diffPaths, errorCodes, flatten, playerOf, sleep, teleport } from './killHelpers';
 import { giveKit, nightfall, toPhase } from './nightHelpers';
+import { handleOf, settle } from './avatarHelpers';
 import { type Match, move, startMatch, stateOf } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -61,9 +62,11 @@ describe('Inherit (GDD 3.2, 3.3)', () => {
       expect(Math.abs(priv.cooldownEndTick.get('kill')! - want)).toBeLessThanOrEqual(8);
       expect(priv.inventory.slots.some((s) => s.defId === 'knife')).toBe(true);
       expect(nightOf(m.room).lastStrikeRound.get(id(m, 1))).toBe(m.room.state.round);
-      // Only the Accomplice hears of it, privately; nothing public changes.
-      m.bots.forEach((b, i) => expect(events(b, 'inherit').length - messages[i]!).toBe(i === 1 ? 1 : 0));
+      // Only the Accomplice hears of it, privately; nothing public changes. The message and the role patch travel
+      // apart, so wait for the message, then give a stray one to any other seat time to arrive.
+      await until(() => events(accomplice, 'inherit').length > messages[1]!, 2000);
       await sleep(200);
+      m.bots.forEach((b, i) => expect(events(b, 'inherit').length - messages[i]!).toBe(i === 1 ? 1 : 0));
       const after = flatten(JSON.parse(JSON.stringify(stateOf(m.bots[4]!))));
       const changed = diffPaths(before, after).filter(
         (p) => !/tick|phase|ends|Tick|alive|look|scenes\.overworld\.(bodies|clues)/i.test(p),
@@ -93,7 +96,8 @@ describe('Inherit (GDD 3.2, 3.3)', () => {
     teleport(m, m.bots[1]!, 'overworld', 30, ROW);
     teleport(m, m.bots[4]!, 'overworld', 31, ROW);
     playerOf(m, m.bots[1]!).priv.cooldownEndTick.set('kill', 0);
-    await act(m.bots[1]!, 'act.ability', { abilityId: 'kill', targetId: id(m, 4) });
+    settle(m, m.bots[1]!, m.bots[4]!);
+    await act(m.bots[1]!, 'act.ability', { abilityId: 'kill', targetId: handleOf(m, m.bots[4]!) });
     expect(errorCodes(m.bots[1]!)).toEqual([]);
     expect(simOf(m.room).players.get(id(m, 4))!.dead).toBe(true);
   });

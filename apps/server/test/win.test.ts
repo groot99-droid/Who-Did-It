@@ -222,7 +222,7 @@ describe('game over', () => {
     expect([s.winner, s.round, s.startTick, s.meeting.phase, s.meeting.reason]).toEqual([0, 0, 0, 0, '']);
     for (const i of [0, 1, 2, 3]) {
       const p = seat(m, i);
-      expect([p.alive, p.ready, p.hasVoted, p.sceneId, p.traits.height, p.traits.hat]).toEqual([
+      expect([p.alive, p.ready, p.hasVoted, p.priv.sceneId, p.traits.height, p.traits.hat]).toEqual([
         false,
         false,
         false,

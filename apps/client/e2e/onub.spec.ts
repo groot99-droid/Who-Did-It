@@ -106,7 +106,8 @@ test('a 5-seat ONUB v2 match: card, prep, crime scenes, night, dawn, Rush, revea
     await expect(q.guest.getByTestId('deck-editor')).toBeVisible();
     await expect(q.host.getByTestId('deck-role-champignon')).toBeEnabled();
     await expect(q.guest.getByTestId('deck-role-champignon')).toBeDisabled();
-    await expect(q.host.getByTestId('deck-reset')).toBeVisible();
+    // Reset shows only when there is a custom deck to drop (5C's DeckEditor), so not on the default deck.
+    await expect(q.host.getByTestId('deck-reset')).toBeHidden();
     await expect(q.guest.getByTestId('deck-reset')).toBeHidden();
     await expect(q.host.getByTestId('deck-problem')).toBeHidden();
 
@@ -193,8 +194,11 @@ test('a 5-seat ONUB v2 match: card, prep, crime scenes, night, dawn, Rush, revea
     await expect(q.host.getByTestId('night-wake')).toBeHidden({ timeout: nightWaitMs });
 
     // Dawn, then the Morning Rush: the board, the Pantry tile and no Skip, claims, and one vote each.
+    // Dawn lasts dawnS on every page at once, so both pages are watched together.
+    await Promise.all(
+      pages.map((page) => expect(page.getByTestId('dawn')).toBeVisible({ timeout: nightWaitMs })),
+    );
     for (const page of pages) {
-      await expect(page.getByTestId('dawn')).toBeVisible({ timeout: nightWaitMs });
       await expect(page.getByTestId('meeting')).toBeVisible({ timeout: seconds(timers.dawnS + 20) });
       await expect(page.getByTestId('rush-board')).toBeVisible();
       await expect(page.getByTestId('vote-pantry')).toBeVisible();

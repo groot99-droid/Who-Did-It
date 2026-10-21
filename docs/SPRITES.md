@@ -51,10 +51,12 @@ tail on every layer:
 
 | Layer (draw order, bottom to top) | Anim key | Texture key | Pages |
 |---|---|---|---|
-| body | `char/<body>/<anim>/<dir>` | `char_<body>` | <= 2 |
+| body | `char/<body>/<anim>/<dir>` | `char_<body>` | 1 |
 | blood (torso and hands mask, shown while Bloody) | `blood/<body>/<anim>/<dir>` | `ovl_<body>` | 1 shared |
 | scarf (grey, toon-ramped, tinted at runtime) | `scarf/<body>/<anim>/<dir>` | `ovl_<body>` | |
-| hat (one of the two, none when bare) | `hat_cap/<body>/<anim>/<dir>`, `hat_bowler/<body>/<anim>/<dir>` | `ovl_<body>` | |
+
+Round 5: the hat passes are gone (hats are nameplate glyphs, GDD 3.1); a look's body is one 1024² page and its
+overlays one 1024 x 512 page (art plan 1.4).
 
 Frame names inside an atlas are the anim key plus `/` and the three-digit frame number:
 `scarf/villager/walk/se/003`. The packer derives them from the rendered file name and its pass folder.
@@ -81,14 +83,16 @@ The rig projects the `Feet` empty into camera space on every rendered frame and 
   "body": "villager",
   "cell": 128,
   "fps": 12,
-  "passes": ["body", "scarf", "hat_cap", "hat_bowler", "blood"],
+  "passes": ["body", "scarf", "blood"],
   "frames": {
     "char_villager_walk_se_003": { "feet": [64.0, 112.5] }
   }
 }
 ```
 
-`feet` is in cell pixels from the top-left corner of the untrimmed cell; a frame rendered in a
+`feet` is in cell pixels from the top-left corner of the untrimmed cell, at the display scale as rendered;
+the `pixel` CLI halves `cell` and `feet` with the frames (SPRITES 10.3), so a packed look's manifest says
+`"cell": 64`; a frame rendered in a
 larger cell (`die`, 256 px) also carries `"cell": 256`. Every pass of a frame
 shares the body's pivot, so the overlays stay registered. The packer keeps `sourceSize` and
 `spriteSourceSize` (trim is reversible) and `gen-anims.ts` writes the pivot into every atlas frame as
@@ -144,11 +148,9 @@ so every pass has the same frame list and pivots:
 
 | Pass | What is visible | Material |
 |---|---|---|
-| `body` | full character, no scarf, no hat | toon palette materials |
-| `scarf` | scarf only, held out by the body | `bone` toon ramp, tinted at runtime |
-| `hat_cap` | cap only | toon `slate` |
-| `hat_bowler` | bowler only | toon `ink` with a `fog` band |
-| `blood` | torso and hands mask | flat `blood` |
+| `body` | full character, no scarf | toon world-palette materials (ramp neighbours as light and shadow) |
+| `scarf` | scarf only, held out by the body | the world `bone` ramp (`#D9D2C2` mid), tinted at runtime |
+| `blood` | torso and hands mask | flat `blood` (`#B3121F`) |
 
 Held-out geometry renders as a holdout so overlays are occluded correctly by the body.
 
@@ -195,9 +197,12 @@ as flat palette shapes with a direction arrow and a text label, so playtests run
 | `clue_bucket_wet` | 1 |
 | `clue_fur`, `clue_claw` (wolf kill) | 2 |
 | `clue_drag` (drag smear segment) | 1 |
+| `clue_footprint_<s\|m\|t>_glow` (Hunger's glowing prints, `ClueKind.hungerPrints`; round 5) | 3 |
 
-Real clue art (M3, `tools/blender/build_props.py`) keeps these 21 keys in the same `clues` texture, one
-64 px cell per key at the world scale of 64 px per metre. Ground marks (footprints, smear, print, fur,
+Real clue art (M3, `tools/blender/build_props.py`) keeps these keys in the same `clues` texture, one
+64 px cell per key at the world scale of 64 px per metre; round 5 re-finishes them with the pixel finish
+(display size, `linear`, one 256 x 512 page) and adds the three glow frames: the footprint in the moon
+ramp's light steps with a one-pixel `#7FA8FF` rim, drawn like any footprint. Ground marks (footprints, smear, print, fur,
 claw, drag) are rendered by the straight-down `TileCam`, like the ground tiles; the wet bucket, the
 thread and the felt are small objects rendered by `IsoCam` (10.3). Frames stay centred (no
 pivot). Footprints and the drag segment point screen-up (`n`): rotate the sprite by `Clue.dir`; the
@@ -205,8 +210,10 @@ drag segment fills the cell top to bottom so segments chain along a trail. A foo
 left-right pair; the client lays the 5-tile trail (GDD 3.4) from several of them.
 
 **Building exteriors.** From round 5 a building is drawn from its slices `<art>#<dx>_<dy>` in
-`bld_<mapId>` (10.5, 10.13); the `bld_<id>_ext` keys below are the stand-ins (single images, rendered
-with the roof, tilted camera) and leave both manifests when `bld_hollowmere` lands. One per
+`bld_<mapId>` (10.5, 10.13): `bld_hollowmere` holds `manor`, `barn`, `bakery`, `apoth`, `widow`,
+`tavern`, `chapel`, `netloft`, `mollHut`; `bld_blackpine` holds `lodge`, `mill`, `office`, `smithy`,
+`woodshed` (art plan 3.4). The `bld_<id>_ext` stand-ins below left both manifests with `bld_hollowmere`
+(Session 5K); the table is kept as the record of the round-4 keys. One per
 Small-profile building of `WORLD.md` 4.3; the id is the stem of its frozen overworld portal id
 (`ov.<id>`):
 
@@ -229,7 +236,9 @@ The real sets are rendered stand-ins (`tiles/`, `tools/blender/build_tiles.py`, 
 with every other.
 
 **Props** (texture `props`, `props/props.json`; M3, the bakery keys M3b; the placeholder set draws each key
-as an unlabelled greybox block on the same cell and pivot). One frame per key, rendered by
+as an unlabelled greybox block on the same cell and pivot). From round 5 the boot atlas `props` holds the
+shared props, spots and portal frames and each map has `props_<mapId>` (10.13, art plan 3.5-3.7): the bell
+and the bakery keys below now live in `props_hollowmere`. One frame per key, rendered by
 `IsoCam` at the display scale and finished to packed size (10.3). The key is `prop_<kind>` with the `kind` of
 `packages/content/data/scenes/overworld.json` `props[]`; a stateful prop adds its state. Every frame
 carries a `pivot` at the base (the ground point under the prop's tile centre), so the sprite is placed
@@ -277,12 +286,13 @@ anim plays at 12 fps once (`repeat: 0`) and Phaser holds its last frame. Every f
 | Anim key | Frames | Camera, cell | Notes |
 |---|---|---|---|
 | `vfx_blood_pool` | 8 | `TileCam`, 128 px | Pool spreading under a body; the last frame is the resting pool |
-| `vfx_blood_splat` | 12 | `SpriteCam`, 128 px | Spray from chest height to specks on the ground, at the kill |
+| `vfx_blood_splat` | 12 | `IsoCam`, 128 px (round 5) | Spray from chest height to specks on the ground, at the kill |
 | `vfx_vote_stamp` | 10 | straight down, 256 px | Stamp slams down and lifts, leaving the `blood` seal (UI, reveal) |
-| `vfx_dust_step` | 6 | `SpriteCam`, 64 px | Puff at a boot; ends empty |
+| `vfx_dust_step` | 6 | `IsoCam`, 64 px (round 5) | Puff at a boot; ends empty |
+| `vfx_disguise` | 8 | `IsoCam`, 128 px, pivot at the feet (round 5) | Fog and slate smoke rising feet to head round one turning mustard spark, gone by frame 7; only where a Knife strike drops a disguise |
 
 **Body.** The body on the floor is the last frame of `die` (`char/<body>/die/<dir>/007`, with the
-`scarf`, hat and `blood` overlays on the same tail), held by the one-shot anim; no separate key.
+`scarf` and `blood` overlays on the same tail), held by the one-shot anim; no separate key.
 Review sheet: `assets/source/review/villager-body-contact.png`.
 
 ## 9. UI icons
@@ -301,6 +311,14 @@ checks this list, the grid, the stroke and the colours.
 | `icon_height_tall`, `icon_height_short` | Height trait (medium has no icon; the HUD shows the bare figure) |
 | `icon_scarf_red`, `icon_scarf_green`, `icon_scarf_blue` | Scarf trait; the nameplate shape (diamond, circle, square) is drawn on the scarf |
 | `icon_hat_cap`, `icon_hat_bowler`, `icon_hat_bare` | Hat trait |
+| `icon_ability_impersonate` | Killer, Impersonate: two head-and-shoulder outlines, the front `fog`, the back `ink`, a `mustard` spark between them |
+| `icon_ability_confession` | Vicar, Hear Confession: a confessional grille with a `bone` ear behind it |
+| `icon_ability_keepwatch` | Watchman, Keep Watch: a pole lantern with `lantern` glass beside an open eye |
+| `icon_ability_remedy` | Herbalist, Remedy: a stoppered bottle with a `moon` cross |
+| `icon_ability_poison` | Herbalist, Nightshade (ability `poison`): a stoppered bottle beside a sprig of three `ink` berries |
+| `icon_ability_lastshot` | Gamekeeper, Last Shot: a barrel's end under a `blood` ring of crosshairs |
+
+The ability keys are `icon_ability_<abilityId>` with the ability id in lower case (round 5, art plan 4.6).
 
 ## 10. Isometric projection
 
@@ -969,3 +987,64 @@ world texture except `clues` (linear)", while the main mode's pixel finish is on
 
 **WORLD 4.2** carries the metrics of this section. ARCHITECTURE gets no change from this section: the server stays
 on the square grid.
+
+## 11. ONUB images (Session 5M, round 5)
+
+The art of the quick mode (GDD 3.11). The keys are `docs/round5/onub-contract.md` 5.4 plus `onub_mini` (art plan
+5.7); every entry carries `modes: ['onub']` in both manifests, so it loads at ONUB match start whatever the client's
+card and never in the main mode. All of it is pixel art on the world palette, finished whatever the main mode's
+switch says (ASSETS 6.11), and built by one command:
+
+```
+pnpm --filter @wdi/sprites onub build     # images, cards, atlas, the real manifest's ONUB block
+pnpm --filter @wdi/sprites onub review    # assets/source/review/{gate-c-*,onub-*}.png
+pnpm --filter @wdi/sprites placeholder    # the greybox twins in assets/placeholder/onub/
+```
+
+The build reads the picked generations from git-ignored `assets/external/generated/5M/<id>.png` (a T5 cutout from
+`<id>.cut.png`, the `remove_background` result); a key whose pick is missing there gets its labelled greybox, so a
+fresh checkout rebuilds only what it has. The output is byte-identical across runs.
+
+| Key | File (under `assets/onub/`) | Art size | File size | Drawn |
+|---|---|---|---|---|
+| `onub_station_<stationId>` (4), `onub_scene_<sceneId>` (10), `onub_kitchen` | `rooms/<key>.webp` | 640 x 360 | 1920 x 1080 | DOM, `image-rendering: pixelated` |
+| `onub_card_<cardId>` (18), `onub_loc_<stationId>` (4), `onub_card_back_role`, `onub_card_back_loc` | `cards/<key>.webp` | 80 x 112 | 240 x 336 | DOM |
+| `onub_cloche` | `misc/onub_cloche.webp` | 64 x 64 | 192 x 192 | DOM |
+| `onub_portrait_<roleId>` (15), `onub_baker` | `portraits/<key>.webp` | 128 x 192 | 384 x 576 | DOM |
+| `onub_mini` | `onub_mini.json`, `onub_mini-0.png` (multiatlas, one 512² page) | art size | – | Phaser, x3, `nearest` |
+
+**The kitchen.** `onub_kitchen` is four 320 x 180 quadrants, fridge and mixer on top, proofing and oven below, with
+the pass (96 x 64) centred at (320, 180). Each quadrant is that station's tap target; the DOM writes the names.
+
+**The cards.** A 1 px ink border, a 3 px frame in the station's ramp (fridge `moon`, mixer `plaster`, proofing
+`brass`, oven `brick`; Sabotage cards `moss` with a crack and a rot blot at the top-right corner), the window
+(4, 4) to (76, 68) and the blank text band (4, 72) to (76, 108) in art pixels: bone paper `#D9D2C2` under a 1 px
+`#B2AA99` rule, where the client writes the card's name and text. An Ingredient card's window is its object
+(56 x 48) over a darkened crop of its station's floor; a Location card's is the station room (`onub-fixes.json`
+`locBoxes`).
+
+**`onub_mini` frames.** `mini_crate_butter`, `mini_crate_milk`, `mini_crate_eggs` (24 x 18), `mini_cart` (48 x 32),
+`mini_dial`, `mini_gauge` (48 x 48), `mini_needle` (4 x 20, pivot (0.5, 0.9), pointing up), `mini_sack` (28 x 32),
+`mini_bucket` (24 x 24), `mini_bowl` (64 x 48, its inner window (8, 8) to (56, 44) transparent for the fill),
+`mini_fill_flour`, `mini_fill_water` (8 x 8, tiling), `mini_stream_flour`, `mini_stream_water` (4 x 8, tiling),
+`mini_banneton` (28 x 16), `mini_cabinet` (72 x 88), `mini_slot_glow` (28 x 12), `mini_log` (24 x 10) and
+`mini_oven/0` to `/3` (72 x 48). The fire loop has no animation key, since a manifest key starting `onub_` must be an
+ONUB entry and an `anims_*` one may not list `onub`: the client builds `mini_fire` from `mini_oven/0..3` at 8 fps,
+looping. No frame carries a target band (GDD 3.11).
+
+**The low-poly style** (art plan 1.9, DECISIONS A79). The same build writes every key a second time, for
+`artStyle('lowpoly')`, to `assets/lowpoly/onub/` with the same paths, file sizes, frame names and `modes`, and its
+ONUB block to `assets/lowpoly/manifest.json` (`"art": "lowpoly"`, the atlas `linear`). Nothing is snapped or
+outlined. The owner's rooms are cropped and box-downscaled straight to 1920 x 1080. The generated portraits are
+treated the same way at 384 x 576, and cutouts are fitted at three times their art box, keeping their soft edges.
+The kitchen, the cards and the backs are composed at the shipped size: their code-drawn frames, bands and fields
+are enlarged with nearest, and the room window, floor and object are pasted in smooth. The owner's 13 rooms are lossy WebP
+at `offWebpQuality` (90). The generated rooms, the kitchen, cards, the cloche and portraits are at
+`LOWPOLY_ART_QUALITY` (82), which keeps the set within 4 MiB (3.85 MiB). `onub_mini` keeps its 512 page and art-size frames, packed from smooth objects. Its fire loop finds
+the lantern pixels on a snapped copy and scales each pixel's own colour.
+
+**Tests.** `tools/sprites/test/onub.test.ts`: every key in both manifests with its type and `modes`, no loft key,
+every image at its file size and on the world palette with alpha 0 or 255, the ONUB set within 2.5 MB, every atlas
+frame at its art box on one page, the blank band and the Sabotage mark, and the batch file's jobs, picks, prompts
+and references. For the low-poly style: the same keys, URLs and `modes`, every image at the 8-bit size and off the
+snap, the same atlas frames, and the set within 4 MiB (`styles.test.ts` checks the manifest is a re-skin).

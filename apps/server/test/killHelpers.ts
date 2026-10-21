@@ -21,7 +21,7 @@ export function teleport(m: Match, bot: Bot, sceneId: SceneId, tx: number, ty: n
   const player = m.room.state.players.get(bot.id);
   if (!p || !player) throw new Error('no seat');
   p.sceneIdx = sceneIndex(sceneId);
-  player.sceneId = p.sceneIdx;
+  player.priv.sceneId = p.sceneIdx;
   standAt(m, bot, tx, ty);
   sim.viewsDirty = true;
 }

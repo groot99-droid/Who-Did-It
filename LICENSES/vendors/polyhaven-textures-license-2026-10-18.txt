@@ -1,0 +1,45 @@
+Poly Haven assets licence (fetched 2026-10-18 from https://polyhaven.com/license)
+
+All assets on Poly Haven are licensed as CC0 1.0 Universal (public domain dedication):
+https://creativecommons.org/publicdomain/zero/1.0/
+
+You may use them for any purpose, commercial or not, without attribution, and redistribute and modify
+them. Who Did It credits Poly Haven anyway (CREDITS.md, "Third-party").
+
+Assets taken (1k diffuse maps, via https://api.polyhaven.com/files/<id>):
+- bark_brown_02
+- brown_mud_02
+- brown_mud_rocks_01
+- brown_planks_05
+- clean_pebbles
+- forest_floor
+- forest_ground_04
+- forest_ground_05
+- forest_leaves_02
+- forrest_ground_01
+- gravel
+- gravel_floor
+- gravel_stones
+- leafy_grass
+- moss_wood
+- mossy_cobblestone
+- mossy_rock
+- mud_forest
+- muddy_tracks
+- old_wood_floor
+- pine_bark
+- red_brick_03
+- river_small_rocks
+- rock_face
+- rock_ground
+- rock_wall_08
+- rocky_gravel
+- rocky_trail
+- roof_slates_02
+- slate_floor_02
+- stone_floor
+- weathered_plank_siding
+- weathered_planks
+- withered_grass
+- wood_trunk_wall
+- worn_mossy_plasterwall

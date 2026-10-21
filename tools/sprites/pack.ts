@@ -3,9 +3,10 @@ import { readdirSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { packAsync } from 'free-tex-packer-core';
-import { alphaBleed } from './bleed.ts';
+import { alphaBleed, decodePng, type Rgba } from './bleed.ts';
 import { applyPivots, buildAnims, type FeetManifest } from './gen-anims.ts';
-import { PASSES, frameKey, parseFrameFileName, textureKey, type Pass } from './keys.ts';
+import { CHAR_PAGE, OVL_PAGE, PASSES, frameKey, parseFrameFileName, textureKey, type Pass } from './keys.ts';
+import { artStyle, defaultArtStyle, finishEnabled } from './palette.ts';
 
 /** The packer settings fixed by ASSETS.md 6.3. */
 export const PACK_OPTIONS = {
@@ -65,7 +66,11 @@ export interface PackResult {
  * Pack frames into `<textureName>-<n>.png` pages and one multiatlas JSON. Inputs are sorted by name
  * so the same frames always produce byte-identical pages.
  */
-export async function packFrames(textureName: string, inputs: PackInput[]): Promise<PackResult> {
+export async function packFrames(
+  textureName: string,
+  inputs: PackInput[],
+  page: { w: number; h: number } = { w: PACK_OPTIONS.width, h: PACK_OPTIONS.height },
+): Promise<PackResult> {
   const names = new Set<string>();
   for (const i of inputs) {
     if (names.has(i.name)) throw new Error(`duplicate frame ${i.name}`);
@@ -74,7 +79,17 @@ export async function packFrames(textureName: string, inputs: PackInput[]): Prom
   const files = [...inputs]
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .map((i) => ({ path: `${i.name}.png`, contents: i.png }));
-  const out = await packAsync(files, { ...PACK_OPTIONS, textureName } as Parameters<typeof packAsync>[1]);
+  // The packer's extrude resizes edge strips bilinearly, which adds partial alpha and off-palette colours.
+  // Finished frames (the pixel finish on: alpha 0 or 255, drawn with nearest filtering) pack without it;
+  // the padding alone keeps them apart. Unfinished art keeps the extrude, byte for byte as before.
+  const finished = finishEnabled('main') && inputs.every((i) => !hasPartialAlpha(decodePng(i.png)));
+  const out = await packAsync(files, {
+    ...PACK_OPTIONS,
+    extrude: finished ? 0 : PACK_OPTIONS.extrude,
+    width: page.w,
+    height: page.h,
+    textureName,
+  } as Parameters<typeof packAsync>[1]);
 
   const raw = new Map(out.filter((f) => f.name.endsWith('.png')).map((f) => [f.name, f.buffer]));
   const textures: AtlasTexture[] = [];
@@ -104,25 +119,39 @@ export function atlasJson(atlas: MultiAtlas): string {
   return `${JSON.stringify(atlas, null, 1)}\n`;
 }
 
+function hasPartialAlpha(img: Rgba): boolean {
+  for (let i = 3; i < img.data.length; i += 4) if (img.data[i] !== 0 && img.data[i] !== 255) return true;
+  return false;
+}
+
+/** Page sizes for a body's two textures; a look's caps are one 1024² body page and one 1024 x 512 overlay page. */
+export interface CharacterPages {
+  body: { w: number; h: number };
+  overlay: { w: number; h: number };
+}
+export const LOOK_PAGES: CharacterPages = { body: CHAR_PAGE, overlay: OVL_PAGE };
+
 /**
  * Pack one body's passes: `char_<body>` (body pass) and `ovl_<body>` (every overlay pass), pivots
- * from the Feet manifest, and `<body>.anims.json`. Returns output file name -> bytes.
+ * from the Feet manifest, and `<body>.anims.json`. Returns output file name -> bytes. A set that
+ * does not fit its page size spills onto a second page, which budget.test.ts refuses for a look.
  */
 export async function packCharacter(
   body: string,
   framesByPass: Map<Pass, PackInput[]>,
   manifest: FeetManifest,
+  pageSizes: CharacterPages = LOOK_PAGES,
 ): Promise<Map<string, Buffer>> {
   const out = new Map<string, Buffer>();
   const bodyFrames = framesByPass.get('body') ?? [];
   const overlayFrames = PASSES.filter((p) => p !== 'body').flatMap((p) => framesByPass.get(p) ?? []);
   const textures: { key: string; atlas: MultiAtlas }[] = [];
-  for (const [key, frames] of [
-    [textureKey('body', body), bodyFrames],
-    [textureKey('scarf', body), overlayFrames],
+  for (const [key, frames, size] of [
+    [textureKey('body', body), bodyFrames, pageSizes.body],
+    [textureKey('scarf', body), overlayFrames, pageSizes.overlay],
   ] as const) {
     if (frames.length === 0) continue;
-    const { atlas, pages } = await packFrames(key, frames);
+    const { atlas, pages } = await packFrames(key, frames, size);
     applyPivots(atlas, manifest);
     textures.push({ key, atlas });
     for (const [name, png] of pages) out.set(name, png);
@@ -133,11 +162,15 @@ export async function packCharacter(
 }
 
 /**
- * Read batch_render output (<dir>/<pass>/char_*.png + manifest.json) into pack inputs. Every frame is
- * alpha-bled first (bleed.ts): the packer trims the transparent border and extrudes the edge, and the
- * bleed covers the transparent pixels left inside the trim rectangle (between legs, under arms).
+ * Read finished batch_render output (<dir>/<pass>/char_*.png + manifest.json, after the `pixel` CLI)
+ * into pack inputs. With the main finish off every frame is alpha-bled first (bleed.ts), so linear
+ * filtering never pulls in black from the transparent pixels inside the trim rectangle; with it on,
+ * alpha is 0 or 255 and frames draw with nearest filtering, so they pack as they are (SPRITES 10.3).
  */
-export function readRender(dir: string): { manifest: FeetManifest; framesByPass: Map<Pass, PackInput[]> } {
+export function readRender(
+  dir: string,
+  bleed: boolean = !finishEnabled('main'),
+): { manifest: FeetManifest; framesByPass: Map<Pass, PackInput[]> } {
   const manifest = JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8')) as FeetManifest;
   const framesByPass = new Map<Pass, PackInput[]>();
   for (const pass of manifest.passes as Pass[]) {
@@ -150,7 +183,8 @@ export function readRender(dir: string): { manifest: FeetManifest; framesByPass:
       files.map((f) => {
         const id = parseFrameFileName(f.slice(0, -4));
         if (id.body !== manifest.body) throw new Error(`${f} is not body ${manifest.body}`);
-        return { name: frameKey(pass, id), png: alphaBleed(readFileSync(join(dir, pass, f))) };
+        const png = readFileSync(join(dir, pass, f));
+        return { name: frameKey(pass, id), png: bleed ? alphaBleed(png) : png };
       }),
     );
   }
@@ -162,14 +196,19 @@ export function writeFiles(outDir: string, files: Map<string, Buffer>): void {
   for (const [name, bytes] of files) writeFileSync(join(outDir, name), bytes);
 }
 
-// CLI: tsx tools/sprites/pack.ts <render dir, e.g. build/render/villager> <out dir>
+// CLI: tsx tools/sprites/pack.ts <finished render dir, e.g. build/finished/baker> <out dir> [--style <id>]
+// Each art style (style.json `artStyles`, DECISIONS A79) packs its own `pixel` output: the 8-bit style's
+// finished frames as they are, the low-poly style's unfinished frames alpha-bled.
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const [renderDir, outDir] = process.argv.slice(2);
+  const args = process.argv.slice(2);
+  const at = args.indexOf('--style');
+  const style = at >= 0 ? artStyle(args.splice(at, 2)[1] ?? '') : defaultArtStyle();
+  const [renderDir, outDir] = args;
   if (!renderDir || !outDir) {
-    console.error('usage: tsx pack.ts <render dir> <out dir>');
+    console.error('usage: tsx pack.ts <render dir> <out dir> [--style <id>]');
     process.exit(2);
   }
-  const { manifest, framesByPass } = readRender(renderDir);
+  const { manifest, framesByPass } = readRender(renderDir, !style.pixelFinish);
   const files = await packCharacter(manifest.body, framesByPass, manifest);
   writeFiles(outDir, files);
   console.log(`pack: ${[...files.keys()].join(', ')} -> ${outDir}`);

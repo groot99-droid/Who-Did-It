@@ -1,0 +1,7619 @@
+{
+ "textures": [
+  {
+   "image": "char_watchman-0.png",
+   "format": "RGBA8888",
+   "size": {
+    "w": 1024,
+    "h": 1024
+   },
+   "scale": 1,
+   "frames": [
+    {
+     "filename": "char/watchman/die/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 57,
+      "y": 9,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 93,
+      "y": 499,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 53,
+      "y": 11,
+      "w": 23,
+      "h": 58
+     },
+     "frame": {
+      "x": 534,
+      "y": 420,
+      "w": 23,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 37,
+      "y": 13,
+      "w": 35,
+      "h": 56
+     },
+     "frame": {
+      "x": 692,
+      "y": 190,
+      "w": 35,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 15,
+      "w": 51,
+      "h": 51
+     },
+     "frame": {
+      "x": 3,
+      "y": 280,
+      "w": 51,
+      "h": 51
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 21,
+      "w": 52,
+      "h": 43
+     },
+     "frame": {
+      "x": 61,
+      "y": 271,
+      "w": 52,
+      "h": 43
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 25,
+      "w": 53,
+      "h": 50
+     },
+     "frame": {
+      "x": 136,
+      "y": 167,
+      "w": 53,
+      "h": 50
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/e/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 34,
+      "w": 59,
+      "h": 32
+     },
+     "frame": {
+      "x": 71,
+      "y": 141,
+      "w": 59,
+      "h": 32
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/e/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 33,
+      "w": 62,
+      "h": 34
+     },
+     "frame": {
+      "x": 399,
+      "y": 3,
+      "w": 62,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 50,
+      "y": 10,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 573,
+      "y": 547,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 50,
+      "y": 15,
+      "w": 26,
+      "h": 51
+     },
+     "frame": {
+      "x": 352,
+      "y": 789,
+      "w": 26,
+      "h": 51
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 50,
+      "y": 24,
+      "w": 24,
+      "h": 45
+     },
+     "frame": {
+      "x": 300,
+      "y": 532,
+      "w": 24,
+      "h": 45
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 40,
+      "y": 34,
+      "w": 32,
+      "h": 53
+     },
+     "frame": {
+      "x": 547,
+      "y": 924,
+      "w": 32,
+      "h": 53
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 23,
+      "y": 45,
+      "w": 48,
+      "h": 55
+     },
+     "frame": {
+      "x": 119,
+      "y": 279,
+      "w": 48,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 47,
+      "w": 53,
+      "h": 61
+     },
+     "frame": {
+      "x": 214,
+      "y": 139,
+      "w": 53,
+      "h": 61
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/n/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 5,
+      "y": 48,
+      "w": 68,
+      "h": 46
+     },
+     "frame": {
+      "x": 325,
+      "y": 3,
+      "w": 68,
+      "h": 46
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/n/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 2,
+      "y": 49,
+      "w": 72,
+      "h": 44
+     },
+     "frame": {
+      "x": 3,
+      "y": 50,
+      "w": 72,
+      "h": 44
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 10,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 488,
+      "y": 356,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 51,
+      "y": 14,
+      "w": 25,
+      "h": 54
+     },
+     "frame": {
+      "x": 565,
+      "y": 741,
+      "w": 25,
+      "h": 54
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 40,
+      "y": 19,
+      "w": 33,
+      "h": 49
+     },
+     "frame": {
+      "x": 384,
+      "y": 789,
+      "w": 33,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 25,
+      "w": 52,
+      "h": 50
+     },
+     "frame": {
+      "x": 121,
+      "y": 223,
+      "w": 52,
+      "h": 50
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 7,
+      "y": 32,
+      "w": 62,
+      "h": 49
+     },
+     "frame": {
+      "x": 165,
+      "y": 55,
+      "w": 62,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 4,
+      "y": 38,
+      "w": 61,
+      "h": 53
+     },
+     "frame": {
+      "x": 467,
+      "y": 3,
+      "w": 61,
+      "h": 53
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/ne/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 3,
+      "y": 45,
+      "w": 61,
+      "h": 38
+     },
+     "frame": {
+      "x": 321,
+      "y": 186,
+      "w": 61,
+      "h": 38
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/ne/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 3,
+      "y": 41,
+      "w": 61,
+      "h": 41
+     },
+     "frame": {
+      "x": 321,
+      "y": 139,
+      "w": 61,
+      "h": 41
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 49,
+      "y": 10,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 440,
+      "y": 423,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 47,
+      "y": 14,
+      "w": 29,
+      "h": 54
+     },
+     "frame": {
+      "x": 569,
+      "y": 130,
+      "w": 29,
+      "h": 54
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 25,
+      "w": 27,
+      "h": 48
+     },
+     "frame": {
+      "x": 235,
+      "y": 532,
+      "w": 27,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 37,
+      "w": 29,
+      "h": 54
+     },
+     "frame": {
+      "x": 537,
+      "y": 804,
+      "w": 29,
+      "h": 54
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 55,
+      "y": 51,
+      "w": 23,
+      "h": 57
+     },
+     "frame": {
+      "x": 557,
+      "y": 678,
+      "w": 23,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 49,
+      "y": 50,
+      "w": 26,
+      "h": 66
+     },
+     "frame": {
+      "x": 3,
+      "y": 724,
+      "w": 26,
+      "h": 66
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/nw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 53,
+      "w": 74,
+      "h": 42
+     },
+     "frame": {
+      "x": 167,
+      "y": 3,
+      "w": 74,
+      "h": 42
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/nw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 54,
+      "w": 76,
+      "h": 41
+     },
+     "frame": {
+      "x": 3,
+      "y": 3,
+      "w": 76,
+      "h": 41
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 10,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 321,
+      "y": 230,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 11,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 190,
+      "y": 719,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 54,
+      "y": 8,
+      "w": 24,
+      "h": 62
+     },
+     "frame": {
+      "x": 205,
+      "y": 386,
+      "w": 24,
+      "h": 62
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 9,
+      "w": 32,
+      "h": 58
+     },
+     "frame": {
+      "x": 499,
+      "y": 127,
+      "w": 32,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 57,
+      "y": 19,
+      "w": 48,
+      "h": 45
+     },
+     "frame": {
+      "x": 60,
+      "y": 320,
+      "w": 48,
+      "h": 45
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 30,
+      "w": 53,
+      "h": 46
+     },
+     "frame": {
+      "x": 62,
+      "y": 206,
+      "w": 53,
+      "h": 46
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/s/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 55,
+      "y": 33,
+      "w": 68,
+      "h": 39
+     },
+     "frame": {
+      "x": 247,
+      "y": 44,
+      "w": 68,
+      "h": 39
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/s/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 54,
+      "y": 33,
+      "w": 72,
+      "h": 35
+     },
+     "frame": {
+      "x": 247,
+      "y": 3,
+      "w": 72,
+      "h": 35
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 10,
+      "w": 27,
+      "h": 59
+     },
+     "frame": {
+      "x": 152,
+      "y": 890,
+      "w": 27,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 10,
+      "w": 29,
+      "h": 61
+     },
+     "frame": {
+      "x": 35,
+      "y": 724,
+      "w": 29,
+      "h": 61
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 45,
+      "y": 9,
+      "w": 27,
+      "h": 61
+     },
+     "frame": {
+      "x": 3,
+      "y": 863,
+      "w": 27,
+      "h": 61
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 43,
+      "y": 9,
+      "w": 29,
+      "h": 56
+     },
+     "frame": {
+      "x": 693,
+      "y": 3,
+      "w": 29,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 50,
+      "y": 14,
+      "w": 23,
+      "h": 49
+     },
+     "frame": {
+      "x": 437,
+      "y": 971,
+      "w": 23,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 53,
+      "y": 23,
+      "w": 26,
+      "h": 45
+     },
+     "frame": {
+      "x": 268,
+      "y": 532,
+      "w": 26,
+      "h": 45
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/se/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 35,
+      "y": 26,
+      "w": 74,
+      "h": 35
+     },
+     "frame": {
+      "x": 85,
+      "y": 46,
+      "w": 74,
+      "h": 35
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/se/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 34,
+      "y": 25,
+      "w": 76,
+      "h": 37
+     },
+     "frame": {
+      "x": 85,
+      "y": 3,
+      "w": 76,
+      "h": 37
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 10,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 375,
+      "y": 846,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 11,
+      "w": 25,
+      "h": 60
+     },
+     "frame": {
+      "x": 331,
+      "y": 466,
+      "w": 25,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 55,
+      "y": 12,
+      "w": 33,
+      "h": 58
+     },
+     "frame": {
+      "x": 393,
+      "y": 230,
+      "w": 33,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 55,
+      "y": 19,
+      "w": 52,
+      "h": 52
+     },
+     "frame": {
+      "x": 3,
+      "y": 222,
+      "w": 52,
+      "h": 52
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 59,
+      "y": 35,
+      "w": 62,
+      "h": 46
+     },
+     "frame": {
+      "x": 3,
+      "y": 100,
+      "w": 62,
+      "h": 46
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 63,
+      "y": 44,
+      "w": 61,
+      "h": 49
+     },
+     "frame": {
+      "x": 399,
+      "y": 43,
+      "w": 61,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/sw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 64,
+      "y": 45,
+      "w": 61,
+      "h": 47
+     },
+     "frame": {
+      "x": 321,
+      "y": 62,
+      "w": 61,
+      "h": 47
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/sw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 64,
+      "y": 45,
+      "w": 61,
+      "h": 44
+     },
+     "frame": {
+      "x": 233,
+      "y": 89,
+      "w": 61,
+      "h": 44
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 10,
+      "w": 15,
+      "h": 57
+     },
+     "frame": {
+      "x": 93,
+      "y": 627,
+      "w": 15,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 12,
+      "w": 23,
+      "h": 57
+     },
+     "frame": {
+      "x": 586,
+      "y": 678,
+      "w": 23,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 19,
+      "w": 35,
+      "h": 53
+     },
+     "frame": {
+      "x": 537,
+      "y": 3,
+      "w": 35,
+      "h": 53
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 33,
+      "w": 50,
+      "h": 51
+     },
+     "frame": {
+      "x": 179,
+      "y": 263,
+      "w": 50,
+      "h": 51
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 57,
+      "y": 49,
+      "w": 52,
+      "h": 51
+     },
+     "frame": {
+      "x": 195,
+      "y": 206,
+      "w": 52,
+      "h": 51
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 46,
+      "w": 53,
+      "h": 64
+     },
+     "frame": {
+      "x": 3,
+      "y": 152,
+      "w": 53,
+      "h": 64
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/w/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 55,
+      "y": 48,
+      "w": 59,
+      "h": 51
+     },
+     "frame": {
+      "x": 149,
+      "y": 110,
+      "w": 59,
+      "h": 51
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/die/w/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 54,
+      "y": 49,
+      "w": 62,
+      "h": 48
+     },
+     "frame": {
+      "x": 81,
+      "y": 87,
+      "w": 62,
+      "h": 48
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/watchman/idle/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 1,
+      "w": 15,
+      "h": 59
+     },
+     "frame": {
+      "x": 300,
+      "y": 89,
+      "w": 15,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 1,
+      "w": 16,
+      "h": 58
+     },
+     "frame": {
+      "x": 299,
+      "y": 167,
+      "w": 16,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 1,
+      "w": 18,
+      "h": 58
+     },
+     "frame": {
+      "x": 563,
+      "y": 420,
+      "w": 18,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 1,
+      "w": 17,
+      "h": 58
+     },
+     "frame": {
+      "x": 577,
+      "y": 356,
+      "w": 17,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 1,
+      "w": 15,
+      "h": 59
+     },
+     "frame": {
+      "x": 300,
+      "y": 89,
+      "w": 15,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 1,
+      "w": 14,
+      "h": 59
+     },
+     "frame": {
+      "x": 253,
+      "y": 206,
+      "w": 14,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/e/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 1,
+      "w": 15,
+      "h": 59
+     },
+     "frame": {
+      "x": 299,
+      "y": 294,
+      "w": 15,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/e/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 1,
+      "w": 14,
+      "h": 59
+     },
+     "frame": {
+      "x": 94,
+      "y": 371,
+      "w": 14,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 597,
+      "y": 483,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 620,
+      "y": 419,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 2,
+      "w": 25,
+      "h": 56
+     },
+     "frame": {
+      "x": 728,
+      "y": 3,
+      "w": 25,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 2,
+      "w": 25,
+      "h": 56
+     },
+     "frame": {
+      "x": 744,
+      "y": 65,
+      "w": 25,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 597,
+      "y": 483,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 605,
+      "y": 546,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/n/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 629,
+      "y": 482,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/n/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 652,
+      "y": 419,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 416,
+      "y": 681,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 437,
+      "y": 616,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 467,
+      "y": 616,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 448,
+      "y": 551,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 416,
+      "y": 681,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 475,
+      "y": 487,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/ne/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 478,
+      "y": 551,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/ne/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 508,
+      "y": 551,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 455,
+      "y": 359,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 28,
+      "h": 58
+     },
+     "frame": {
+      "x": 352,
+      "y": 661,
+      "w": 28,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 28,
+      "h": 58
+     },
+     "frame": {
+      "x": 381,
+      "y": 553,
+      "w": 28,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 28,
+      "h": 58
+     },
+     "frame": {
+      "x": 409,
+      "y": 488,
+      "w": 28,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 455,
+      "y": 359,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 572,
+      "y": 292,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/nw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 500,
+      "y": 191,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/nw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 532,
+      "y": 191,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 537,
+      "y": 126,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 564,
+      "y": 190,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 596,
+      "y": 190,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 25,
+      "h": 58
+     },
+     "frame": {
+      "x": 473,
+      "y": 423,
+      "w": 25,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 537,
+      "y": 126,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 628,
+      "y": 190,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/s/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 660,
+      "y": 190,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/s/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 352,
+      "y": 725,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 27,
+      "h": 59
+     },
+     "frame": {
+      "x": 157,
+      "y": 955,
+      "w": 27,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 28,
+      "h": 60
+     },
+     "frame": {
+      "x": 121,
+      "y": 653,
+      "w": 28,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 28,
+      "h": 60
+     },
+     "frame": {
+      "x": 155,
+      "y": 653,
+      "w": 28,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 28,
+      "h": 60
+     },
+     "frame": {
+      "x": 156,
+      "y": 719,
+      "w": 28,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 27,
+      "h": 59
+     },
+     "frame": {
+      "x": 157,
+      "y": 955,
+      "w": 27,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 190,
+      "y": 784,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/se/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 218,
+      "y": 849,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/se/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 223,
+      "y": 914,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 351,
+      "y": 911,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 381,
+      "y": 911,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 24,
+      "h": 60
+     },
+     "frame": {
+      "x": 205,
+      "y": 454,
+      "w": 24,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 24,
+      "h": 60
+     },
+     "frame": {
+      "x": 205,
+      "y": 520,
+      "w": 24,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 351,
+      "y": 911,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 286,
+      "y": 648,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/sw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 314,
+      "y": 583,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/sw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 286,
+      "y": 713,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 93,
+      "y": 563,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 23,
+      "y": 2,
+      "w": 16,
+      "h": 57
+     },
+     "frame": {
+      "x": 299,
+      "y": 231,
+      "w": 16,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 2,
+      "w": 18,
+      "h": 57
+     },
+     "frame": {
+      "x": 523,
+      "y": 932,
+      "w": 18,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 2,
+      "w": 17,
+      "h": 57
+     },
+     "frame": {
+      "x": 687,
+      "y": 317,
+      "w": 17,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 93,
+      "y": 563,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 3,
+      "w": 14,
+      "h": 57
+     },
+     "frame": {
+      "x": 94,
+      "y": 436,
+      "w": 14,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/w/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 3,
+      "w": 15,
+      "h": 57
+     },
+     "frame": {
+      "x": 710,
+      "y": 317,
+      "w": 15,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/idle/w/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 3,
+      "w": 14,
+      "h": 57
+     },
+     "frame": {
+      "x": 569,
+      "y": 67,
+      "w": 14,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 39,
+      "h": 58
+     },
+     "frame": {
+      "x": 48,
+      "y": 437,
+      "w": 39,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 39,
+      "h": 58
+     },
+     "frame": {
+      "x": 3,
+      "y": 469,
+      "w": 39,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 3,
+      "w": 39,
+      "h": 57
+     },
+     "frame": {
+      "x": 48,
+      "y": 629,
+      "w": 39,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 39,
+      "h": 58
+     },
+     "frame": {
+      "x": 160,
+      "y": 386,
+      "w": 39,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 39,
+      "h": 58
+     },
+     "frame": {
+      "x": 48,
+      "y": 437,
+      "w": 39,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 39,
+      "h": 58
+     },
+     "frame": {
+      "x": 160,
+      "y": 450,
+      "w": 39,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/e/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 39,
+      "h": 58
+     },
+     "frame": {
+      "x": 114,
+      "y": 464,
+      "w": 39,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/e/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 39,
+      "h": 58
+     },
+     "frame": {
+      "x": 48,
+      "y": 501,
+      "w": 39,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 4,
+      "w": 25,
+      "h": 55
+     },
+     "frame": {
+      "x": 701,
+      "y": 129,
+      "w": 25,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 4,
+      "w": 24,
+      "h": 55
+     },
+     "frame": {
+      "x": 732,
+      "y": 129,
+      "w": 24,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 4,
+      "w": 23,
+      "h": 55
+     },
+     "frame": {
+      "x": 720,
+      "y": 252,
+      "w": 23,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 4,
+      "w": 23,
+      "h": 55
+     },
+     "frame": {
+      "x": 733,
+      "y": 190,
+      "w": 23,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 4,
+      "w": 25,
+      "h": 55
+     },
+     "frame": {
+      "x": 701,
+      "y": 129,
+      "w": 25,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 4,
+      "w": 26,
+      "h": 55
+     },
+     "frame": {
+      "x": 637,
+      "y": 129,
+      "w": 26,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/n/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 4,
+      "w": 27,
+      "h": 55
+     },
+     "frame": {
+      "x": 604,
+      "y": 129,
+      "w": 27,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/n/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 4,
+      "w": 26,
+      "h": 55
+     },
+     "frame": {
+      "x": 669,
+      "y": 129,
+      "w": 26,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 3,
+      "w": 32,
+      "h": 57
+     },
+     "frame": {
+      "x": 644,
+      "y": 254,
+      "w": 32,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 3,
+      "w": 32,
+      "h": 57
+     },
+     "frame": {
+      "x": 682,
+      "y": 254,
+      "w": 32,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 3,
+      "w": 32,
+      "h": 57
+     },
+     "frame": {
+      "x": 411,
+      "y": 908,
+      "w": 32,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 3,
+      "w": 32,
+      "h": 57
+     },
+     "frame": {
+      "x": 437,
+      "y": 808,
+      "w": 32,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 3,
+      "w": 32,
+      "h": 57
+     },
+     "frame": {
+      "x": 644,
+      "y": 254,
+      "w": 32,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 3,
+      "w": 31,
+      "h": 57
+     },
+     "frame": {
+      "x": 504,
+      "y": 615,
+      "w": 31,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/ne/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 3,
+      "w": 31,
+      "h": 57
+     },
+     "frame": {
+      "x": 541,
+      "y": 615,
+      "w": 31,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/ne/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 3,
+      "w": 31,
+      "h": 57
+     },
+     "frame": {
+      "x": 578,
+      "y": 615,
+      "w": 31,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 5,
+      "y": 3,
+      "w": 39,
+      "h": 57
+     },
+     "frame": {
+      "x": 3,
+      "y": 661,
+      "w": 39,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 6,
+      "y": 3,
+      "w": 38,
+      "h": 57
+     },
+     "frame": {
+      "x": 600,
+      "y": 356,
+      "w": 38,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 7,
+      "y": 3,
+      "w": 37,
+      "h": 57
+     },
+     "frame": {
+      "x": 644,
+      "y": 356,
+      "w": 37,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 7,
+      "y": 3,
+      "w": 37,
+      "h": 57
+     },
+     "frame": {
+      "x": 423,
+      "y": 745,
+      "w": 37,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 5,
+      "y": 3,
+      "w": 39,
+      "h": 57
+     },
+     "frame": {
+      "x": 3,
+      "y": 661,
+      "w": 39,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 4,
+      "y": 4,
+      "w": 40,
+      "h": 56
+     },
+     "frame": {
+      "x": 114,
+      "y": 340,
+      "w": 40,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/nw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 4,
+      "y": 4,
+      "w": 40,
+      "h": 56
+     },
+     "frame": {
+      "x": 114,
+      "y": 402,
+      "w": 40,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/nw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 5,
+      "y": 4,
+      "w": 39,
+      "h": 56
+     },
+     "frame": {
+      "x": 159,
+      "y": 577,
+      "w": 39,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 25,
+      "h": 59
+     },
+     "frame": {
+      "x": 282,
+      "y": 846,
+      "w": 25,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 286,
+      "y": 778,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 23,
+      "h": 59
+     },
+     "frame": {
+      "x": 411,
+      "y": 294,
+      "w": 23,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 23,
+      "h": 59
+     },
+     "frame": {
+      "x": 440,
+      "y": 294,
+      "w": 23,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 25,
+      "h": 59
+     },
+     "frame": {
+      "x": 282,
+      "y": 846,
+      "w": 25,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 222,
+      "y": 652,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/s/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 27,
+      "h": 59
+     },
+     "frame": {
+      "x": 157,
+      "y": 785,
+      "w": 27,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/s/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 250,
+      "y": 586,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 39,
+      "h": 60
+     },
+     "frame": {
+      "x": 49,
+      "y": 371,
+      "w": 39,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 38,
+      "h": 60
+     },
+     "frame": {
+      "x": 35,
+      "y": 930,
+      "w": 38,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 37,
+      "h": 60
+     },
+     "frame": {
+      "x": 36,
+      "y": 863,
+      "w": 37,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 37,
+      "h": 60
+     },
+     "frame": {
+      "x": 39,
+      "y": 791,
+      "w": 37,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 39,
+      "h": 60
+     },
+     "frame": {
+      "x": 49,
+      "y": 371,
+      "w": 39,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 40,
+      "h": 60
+     },
+     "frame": {
+      "x": 3,
+      "y": 337,
+      "w": 40,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/se/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 40,
+      "h": 60
+     },
+     "frame": {
+      "x": 173,
+      "y": 320,
+      "w": 40,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/se/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 39,
+      "h": 60
+     },
+     "frame": {
+      "x": 3,
+      "y": 403,
+      "w": 39,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 32,
+      "h": 59
+     },
+     "frame": {
+      "x": 235,
+      "y": 271,
+      "w": 32,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 32,
+      "h": 59
+     },
+     "frame": {
+      "x": 235,
+      "y": 336,
+      "w": 32,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 32,
+      "h": 59
+     },
+     "frame": {
+      "x": 235,
+      "y": 401,
+      "w": 32,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 32,
+      "h": 59
+     },
+     "frame": {
+      "x": 320,
+      "y": 294,
+      "w": 32,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 32,
+      "h": 59
+     },
+     "frame": {
+      "x": 235,
+      "y": 271,
+      "w": 32,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 31,
+      "h": 59
+     },
+     "frame": {
+      "x": 353,
+      "y": 359,
+      "w": 31,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/sw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 3,
+      "w": 31,
+      "h": 58
+     },
+     "frame": {
+      "x": 532,
+      "y": 62,
+      "w": 31,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/sw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 31,
+      "h": 59
+     },
+     "frame": {
+      "x": 362,
+      "y": 294,
+      "w": 31,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 7,
+      "y": 3,
+      "w": 39,
+      "h": 57
+     },
+     "frame": {
+      "x": 159,
+      "y": 514,
+      "w": 39,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 7,
+      "y": 2,
+      "w": 39,
+      "h": 58
+     },
+     "frame": {
+      "x": 3,
+      "y": 533,
+      "w": 39,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 7,
+      "y": 2,
+      "w": 39,
+      "h": 58
+     },
+     "frame": {
+      "x": 48,
+      "y": 565,
+      "w": 39,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 7,
+      "y": 2,
+      "w": 39,
+      "h": 58
+     },
+     "frame": {
+      "x": 3,
+      "y": 597,
+      "w": 39,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 7,
+      "y": 3,
+      "w": 39,
+      "h": 57
+     },
+     "frame": {
+      "x": 159,
+      "y": 514,
+      "w": 39,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 7,
+      "y": 4,
+      "w": 39,
+      "h": 56
+     },
+     "frame": {
+      "x": 114,
+      "y": 591,
+      "w": 39,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/w/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 7,
+      "y": 4,
+      "w": 39,
+      "h": 56
+     },
+     "frame": {
+      "x": 589,
+      "y": 67,
+      "w": 39,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/interact/w/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 7,
+      "y": 3,
+      "w": 39,
+      "h": 57
+     },
+     "frame": {
+      "x": 114,
+      "y": 528,
+      "w": 39,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 1,
+      "w": 15,
+      "h": 59
+     },
+     "frame": {
+      "x": 300,
+      "y": 89,
+      "w": 15,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 23,
+      "y": 1,
+      "w": 27,
+      "h": 59
+     },
+     "frame": {
+      "x": 185,
+      "y": 850,
+      "w": 27,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 33,
+      "h": 59
+     },
+     "frame": {
+      "x": 314,
+      "y": 359,
+      "w": 33,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 34,
+      "h": 58
+     },
+     "frame": {
+      "x": 353,
+      "y": 230,
+      "w": 34,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 1,
+      "w": 23,
+      "h": 59
+     },
+     "frame": {
+      "x": 432,
+      "y": 228,
+      "w": 23,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 1,
+      "w": 15,
+      "h": 59
+     },
+     "frame": {
+      "x": 300,
+      "y": 89,
+      "w": 15,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 597,
+      "y": 483,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 3,
+      "w": 25,
+      "h": 56
+     },
+     "frame": {
+      "x": 759,
+      "y": 3,
+      "w": 25,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 3,
+      "w": 26,
+      "h": 56
+     },
+     "frame": {
+      "x": 712,
+      "y": 65,
+      "w": 26,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 0,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 316,
+      "y": 648,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 25,
+      "h": 57
+     },
+     "frame": {
+      "x": 504,
+      "y": 743,
+      "w": 25,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 597,
+      "y": 483,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 416,
+      "y": 681,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 2,
+      "w": 31,
+      "h": 58
+     },
+     "frame": {
+      "x": 578,
+      "y": 3,
+      "w": 31,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 31,
+      "h": 58
+     },
+     "frame": {
+      "x": 615,
+      "y": 3,
+      "w": 31,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 1,
+      "w": 35,
+      "h": 59
+     },
+     "frame": {
+      "x": 273,
+      "y": 398,
+      "w": 35,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 29,
+      "h": 59
+     },
+     "frame": {
+      "x": 462,
+      "y": 98,
+      "w": 29,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 416,
+      "y": 681,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 455,
+      "y": 359,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 2,
+      "w": 30,
+      "h": 58
+     },
+     "frame": {
+      "x": 316,
+      "y": 713,
+      "w": 30,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 1,
+      "w": 31,
+      "h": 59
+     },
+     "frame": {
+      "x": 388,
+      "y": 98,
+      "w": 31,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 1,
+      "w": 25,
+      "h": 59
+     },
+     "frame": {
+      "x": 313,
+      "y": 846,
+      "w": 25,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 23,
+      "h": 58
+     },
+     "frame": {
+      "x": 548,
+      "y": 356,
+      "w": 23,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 455,
+      "y": 359,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 537,
+      "y": 126,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 1,
+      "w": 25,
+      "h": 59
+     },
+     "frame": {
+      "x": 344,
+      "y": 846,
+      "w": 25,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 1,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 222,
+      "y": 717,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 6,
+      "w": 24,
+      "h": 54
+     },
+     "frame": {
+      "x": 537,
+      "y": 864,
+      "w": 24,
+      "h": 54
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 3,
+      "w": 25,
+      "h": 57
+     },
+     "frame": {
+      "x": 526,
+      "y": 678,
+      "w": 25,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 537,
+      "y": 126,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 27,
+      "h": 59
+     },
+     "frame": {
+      "x": 157,
+      "y": 955,
+      "w": 27,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 30,
+      "h": 60
+     },
+     "frame": {
+      "x": 116,
+      "y": 923,
+      "w": 30,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 31,
+      "h": 60
+     },
+     "frame": {
+      "x": 82,
+      "y": 758,
+      "w": 31,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 4,
+      "w": 25,
+      "h": 57
+     },
+     "frame": {
+      "x": 466,
+      "y": 934,
+      "w": 25,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 344,
+      "y": 532,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 27,
+      "h": 59
+     },
+     "frame": {
+      "x": 157,
+      "y": 955,
+      "w": 27,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 351,
+      "y": 911,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 11,
+      "y": 2,
+      "w": 31,
+      "h": 59
+     },
+     "frame": {
+      "x": 388,
+      "y": 163,
+      "w": 31,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 2,
+      "w": 31,
+      "h": 59
+     },
+     "frame": {
+      "x": 425,
+      "y": 98,
+      "w": 31,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 5,
+      "w": 35,
+      "h": 56
+     },
+     "frame": {
+      "x": 652,
+      "y": 3,
+      "w": 35,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 2,
+      "w": 29,
+      "h": 59
+     },
+     "frame": {
+      "x": 497,
+      "y": 62,
+      "w": 29,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 351,
+      "y": 911,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 93,
+      "y": 563,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 473,
+      "y": 292,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 10,
+      "y": 2,
+      "w": 33,
+      "h": 58
+     },
+     "frame": {
+      "x": 461,
+      "y": 228,
+      "w": 33,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 3,
+      "w": 34,
+      "h": 57
+     },
+     "frame": {
+      "x": 604,
+      "y": 254,
+      "w": 34,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 23,
+      "h": 58
+     },
+     "frame": {
+      "x": 535,
+      "y": 484,
+      "w": 23,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/swing/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 93,
+      "y": 563,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 2,
+      "w": 36,
+      "h": 57
+     },
+     "frame": {
+      "x": 446,
+      "y": 680,
+      "w": 36,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 30,
+      "h": 58
+     },
+     "frame": {
+      "x": 316,
+      "y": 777,
+      "w": 30,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 20,
+      "h": 59
+     },
+     "frame": {
+      "x": 273,
+      "y": 139,
+      "w": 20,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 20,
+      "h": 59
+     },
+     "frame": {
+      "x": 273,
+      "y": 204,
+      "w": 20,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 2,
+      "w": 32,
+      "h": 57
+     },
+     "frame": {
+      "x": 466,
+      "y": 743,
+      "w": 32,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 1,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 346,
+      "y": 597,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/e/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 20,
+      "h": 59
+     },
+     "frame": {
+      "x": 273,
+      "y": 269,
+      "w": 20,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/e/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 506,
+      "y": 292,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 27,
+      "h": 60
+     },
+     "frame": {
+      "x": 189,
+      "y": 653,
+      "w": 27,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 222,
+      "y": 782,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 637,
+      "y": 545,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 250,
+      "y": 847,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 60
+     },
+     "frame": {
+      "x": 204,
+      "y": 586,
+      "w": 26,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 255,
+      "y": 912,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/n/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 661,
+      "y": 482,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/n/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 287,
+      "y": 912,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 374,
+      "y": 489,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 384,
+      "y": 725,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 504,
+      "y": 420,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 26,
+      "h": 60
+     },
+     "frame": {
+      "x": 235,
+      "y": 466,
+      "w": 26,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 1,
+      "w": 30,
+      "h": 61
+     },
+     "frame": {
+      "x": 3,
+      "y": 796,
+      "w": 30,
+      "h": 61
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 26,
+      "h": 61
+     },
+     "frame": {
+      "x": 3,
+      "y": 930,
+      "w": 26,
+      "h": 61
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/ne/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 518,
+      "y": 356,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/ne/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 57
+     },
+     "frame": {
+      "x": 481,
+      "y": 869,
+      "w": 24,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 9,
+      "y": 2,
+      "w": 36,
+      "h": 60
+     },
+     "frame": {
+      "x": 79,
+      "y": 692,
+      "w": 36,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 2,
+      "w": 31,
+      "h": 59
+     },
+     "frame": {
+      "x": 425,
+      "y": 163,
+      "w": 31,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 405,
+      "y": 844,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 57
+     },
+     "frame": {
+      "x": 507,
+      "y": 806,
+      "w": 24,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 405,
+      "y": 424,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 27,
+      "h": 57
+     },
+     "frame": {
+      "x": 564,
+      "y": 484,
+      "w": 27,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/nw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 386,
+      "y": 617,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/nw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 2,
+      "w": 31,
+      "h": 59
+     },
+     "frame": {
+      "x": 462,
+      "y": 163,
+      "w": 31,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 3,
+      "w": 27,
+      "h": 59
+     },
+     "frame": {
+      "x": 190,
+      "y": 915,
+      "w": 27,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 3,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 319,
+      "y": 912,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 3,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 684,
+      "y": 419,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 3,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 416,
+      "y": 552,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 3,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 254,
+      "y": 651,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 3,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 282,
+      "y": 583,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/s/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 3,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 449,
+      "y": 871,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/s/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 3,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 443,
+      "y": 487,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 2,
+      "w": 36,
+      "h": 60
+     },
+     "frame": {
+      "x": 79,
+      "y": 857,
+      "w": 36,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 31,
+      "h": 60
+     },
+     "frame": {
+      "x": 119,
+      "y": 758,
+      "w": 31,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 254,
+      "y": 716,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 505,
+      "y": 484,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 3,
+      "w": 29,
+      "h": 57
+     },
+     "frame": {
+      "x": 615,
+      "y": 615,
+      "w": 29,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 539,
+      "y": 292,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/se/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 475,
+      "y": 806,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/se/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 31,
+      "h": 60
+     },
+     "frame": {
+      "x": 79,
+      "y": 923,
+      "w": 31,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 3,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 420,
+      "y": 359,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 254,
+      "y": 781,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 57
+     },
+     "frame": {
+      "x": 535,
+      "y": 741,
+      "w": 24,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 60
+     },
+     "frame": {
+      "x": 267,
+      "y": 466,
+      "w": 26,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 30,
+      "h": 60
+     },
+     "frame": {
+      "x": 121,
+      "y": 824,
+      "w": 30,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 26,
+      "h": 60
+     },
+     "frame": {
+      "x": 299,
+      "y": 466,
+      "w": 26,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/sw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 362,
+      "y": 424,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/sw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 390,
+      "y": 359,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 3,
+      "w": 36,
+      "h": 56
+     },
+     "frame": {
+      "x": 634,
+      "y": 67,
+      "w": 36,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 3,
+      "w": 30,
+      "h": 56
+     },
+     "frame": {
+      "x": 676,
+      "y": 65,
+      "w": 30,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 23,
+      "y": 2,
+      "w": 20,
+      "h": 57
+     },
+     "frame": {
+      "x": 497,
+      "y": 932,
+      "w": 20,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 23,
+      "y": 3,
+      "w": 20,
+      "h": 57
+     },
+     "frame": {
+      "x": 511,
+      "y": 869,
+      "w": 20,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 3,
+      "w": 32,
+      "h": 57
+     },
+     "frame": {
+      "x": 488,
+      "y": 680,
+      "w": 32,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 3,
+      "w": 29,
+      "h": 57
+     },
+     "frame": {
+      "x": 538,
+      "y": 548,
+      "w": 29,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/w/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 23,
+      "y": 2,
+      "w": 20,
+      "h": 58
+     },
+     "frame": {
+      "x": 273,
+      "y": 334,
+      "w": 20,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/watchman/walk/w/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 3,
+      "w": 27,
+      "h": 57
+     },
+     "frame": {
+      "x": 587,
+      "y": 420,
+      "w": 27,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    }
+   ]
+  }
+ ],
+ "meta": {
+  "app": "http://github.com/odrick/free-tex-packer-core",
+  "version": "0.3.9"
+ }
+}

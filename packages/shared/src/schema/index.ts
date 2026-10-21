@@ -6,8 +6,8 @@ import { schema, t } from '@colyseus/schema';
 //   Own client only Private, tagged .view()
 //   Server memory   never in a schema (fingerprint logs, Blood timers, finalRoles, handles' owners, covers,
 //                   disguises, protections, poison, ...)
-// Every Schema stays under 63 fields. Round 5 pre-seed (DECISIONS X1): additive only; Session 5F removes
-// `Player.sceneId` and makes `presence` self-only in its contract phase (deck/wire.md 10.1).
+// Every Schema stays under 63 fields. Round 5 (DECISIONS A50): `Player.sceneId` is gone and `presence` reaches its
+// owner only; every other seat walks as an avatar under a handle (GDD 3.17).
 
 export const SCHEMA_VERSION = 2;
 
@@ -177,8 +177,8 @@ export const Private = schema(
     /** Quick mode: the Ingredient card this seat committed at prep, empty before. */
     onubCard: str(),
     /**
-     * Own scene index in SCENE_IDS order (LOFT_SCENE_INDEX in the quick-mode loft). Written beside the public
-     * `Player.sceneId` by the pre-seed; the only scene index once Session 5F removes the public one.
+     * Own scene index in SCENE_IDS order (LOFT_SCENE_INDEX in the quick-mode loft): the only scene index on the
+     * wire, and only to its owner.
      */
     sceneId: u8(),
     /** Own avatar handle in the own scene; '' while not placed. */
@@ -201,13 +201,9 @@ export const Player = schema(
     connected: bool(),
     ready: bool(),
     hasVoted: bool(),
-    /** Kept by the pre-seed (DECISIONS X1); Session 5F removes it in its contract phase (deck/wire.md 10.1). */
-    sceneId: u8(),
     /** Public look id (looks.json): '' for every seat until the role card closes, then fixed (GDD 3.17). */
     look: str(),
-    // SceneScoped (V1) / Proximity (V1.5). `alive` flips only at a meeting or an ejection (A30). Pre-seed: the
-    // visibility tags of today (granted to same-scene viewers); after Session 5F: own client only (others are
-    // avatars).
+    // Own client only: the own position (others are avatars). `alive` flips only at a meeting or an ejection (A30).
     presence: t.ref(Presence).view(VIEW_TAG.presence),
     // Own client only
     priv: t.ref(Private).view(VIEW_TAG.priv),

@@ -460,6 +460,8 @@ describe('must-acts and the Tourrier', () => {
     expect(m.o.actLog).toHaveLength(1);
     expect(m.o.actLog[0]).toMatchObject({ act: 'onub.drunk', auto: true, roleId: 'gardeManger' });
     expect(m.o.cards.roles.get('seat.1.role')).not.toBe('gardeManger');
+    // The window closes on the server; its empty reveal is a message, which may still be on its way.
+    await until(() => JSON.stringify(msgs(m.bots[1]!, 'nightReveal').at(-1)) === '{"entries":[]}');
     expect(msgs(m.bots[1]!, 'nightReveal').at(-1)).toEqual({ entries: [] });
     expect(seatOf(m, 1).priv!.nightReveal.length).toBe(0);
   });

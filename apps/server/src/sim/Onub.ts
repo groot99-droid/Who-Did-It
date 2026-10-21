@@ -167,7 +167,6 @@ export function beginOnubPlay(room: PartyRoom): boolean {
     const p = sim.ensure(id);
     p.sceneIdx = LOFT_SCENE_INDEX;
     p.placed = true;
-    player.sceneId = LOFT_SCENE_INDEX;
     if (player.priv) player.priv.sceneId = LOFT_SCENE_INDEX;
   });
   sim.viewsDirty = true;

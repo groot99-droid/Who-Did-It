@@ -1036,3 +1036,29 @@ and, in the DOM-only quick-mode screens, at the bottom left. The pick is per pla
 | `artStyle.hint` | Only your own screen changes. | reserved for the lobby hint |
 
 Frozen test ids: `art-style` (the group), `art-style-<id>` (an option), `art-veil`, `art-notice`.
+
+### 14.15 Looks and covers (5F)
+
+Session 5F, round 5. The lines of GDD 3.17 on the role card and the seat picker; `ui/copy/looks.ts` holds them as
+`LOOKS_COPY`. `{look}` is a look's name from `looks.json` ("the Baker"), `{name}` a seat's name. The card's deck strip and
+walk line show in the main mode only (`RoleRevealPayload.deck`, `look`); a quick-mode card has neither.
+
+| Id | Text | Notes |
+|---|---|---|
+| `card.deck` | The deck | eyebrow of `card-deck`; each card is a chip named by its role |
+| `card.deck.hint` | Every character of this match. Two are in nobody’s hands. | `title` of the eyebrow |
+| `card.walk` | You walk as {look} | opens the look line of a non-cover card, before the trait icons |
+| `card.cover.title` | Choose the face you will wear | eyebrow of `cover-picker`, cover roles only |
+| `card.cover.hint` | Everyone will see this character. A safe pick is a card nobody holds. | under the title |
+| `card.cover.safe` | Safe | note of a hint (an undealt card), the first one preselected |
+| `card.cover.dealt` | In play | note of the deck's other non-cover characters (a visible counter-claim) |
+| `card.cover.mate` | Worn by {name} | note of a look a Cabal mate wears; the choice is disabled |
+| `card.cover.pick` | Wear {look} | `title` of a choice; a click sends `role.cover {lookId}` |
+| `seats.title.impersonate` | Whose face? | title of `seat-picker` for Impersonate; a night power uses its own name |
+| `seats.title.aim` | Take your Last Shot | title of `seat-picker` while a dying Gamekeeper's `aim` window is open; it closes when the window ends |
+| `seats.empty` | Nobody to pick | the list holds no publicly living seat |
+| `seats.cancel` | Cancel | `seat-cancel`; Escape does the same |
+| `toast.disguise.wait` | Waiting for a moment unseen | after Impersonate is sent: the face changes only unseen (GDD 3.17) |
+
+`data-testid`s: `card-deck`, `card-look`, `cover-picker`, `cover-look` (with `data-look` and `data-safe`),
+`seat-picker`, `seat-choice` (with `data-seat`), `seat-cancel`.

@@ -223,7 +223,6 @@ export function resetToLobby(room: PartyRoom): void {
     p.alive = false;
     p.ready = false;
     p.hasVoted = false;
-    p.sceneId = 0;
     p.traits.height = p.traits.scarf = p.traits.hat = 0;
     const pr = p.presence;
     pr.x = pr.y = pr.z = pr.animId = pr.statusBits = pr.transitUntilTick = 0;

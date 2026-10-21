@@ -1,0 +1,4492 @@
+{
+ "anims": [
+  {
+   "key": "blood/tinner/die/e",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/e/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/e/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/e/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/e/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/e/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/e/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/e/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/die/n",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/n/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/n/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/n/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/n/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/n/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/n/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/n/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/die/ne",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/ne/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/ne/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/ne/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/ne/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/ne/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/ne/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/ne/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/die/nw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/nw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/nw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/nw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/nw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/nw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/nw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/nw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/die/s",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/s/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/s/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/s/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/s/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/s/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/s/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/s/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/die/se",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/se/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/se/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/se/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/se/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/se/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/se/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/se/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/die/sw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/sw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/sw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/sw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/sw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/sw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/sw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/sw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/die/w",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/w/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/w/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/w/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/w/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/w/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/w/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/w/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/idle/e",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/e/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/e/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/e/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/e/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/e/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/e/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/e/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/idle/n",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/n/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/n/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/n/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/n/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/n/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/n/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/n/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/idle/ne",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/ne/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/ne/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/ne/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/ne/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/ne/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/ne/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/ne/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/idle/nw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/nw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/nw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/nw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/nw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/nw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/nw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/nw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/idle/s",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/s/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/s/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/s/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/s/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/s/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/s/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/s/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/idle/se",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/se/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/se/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/se/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/se/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/se/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/se/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/se/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/idle/sw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/sw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/sw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/sw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/sw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/sw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/sw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/sw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/idle/w",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/w/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/w/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/w/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/w/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/w/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/w/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/w/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/interact/e",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/e/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/e/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/e/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/e/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/e/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/e/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/e/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/interact/n",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/n/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/n/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/n/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/n/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/n/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/n/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/n/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/interact/ne",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/ne/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/ne/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/ne/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/ne/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/ne/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/ne/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/ne/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/interact/nw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/nw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/nw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/nw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/nw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/nw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/nw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/nw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/interact/s",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/s/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/s/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/s/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/s/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/s/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/s/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/s/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/interact/se",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/se/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/se/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/se/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/se/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/se/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/se/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/se/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/interact/sw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/sw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/sw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/sw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/sw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/sw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/sw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/sw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/interact/w",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/w/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/w/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/w/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/w/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/w/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/w/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/w/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/swing/e",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/e/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/e/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/e/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/e/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/e/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/swing/n",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/n/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/n/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/n/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/n/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/n/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/swing/ne",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/ne/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/ne/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/ne/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/ne/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/ne/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/swing/nw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/nw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/nw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/nw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/nw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/nw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/swing/s",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/s/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/s/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/s/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/s/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/s/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/swing/se",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/se/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/se/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/se/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/se/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/se/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/swing/sw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/sw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/sw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/sw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/sw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/sw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/swing/w",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/w/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/w/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/w/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/w/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/w/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/tinner/walk/e",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/e/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/e/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/e/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/e/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/e/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/e/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/e/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/walk/n",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/n/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/n/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/n/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/n/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/n/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/n/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/n/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/walk/ne",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/ne/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/ne/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/ne/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/ne/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/ne/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/ne/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/ne/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/walk/nw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/nw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/nw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/nw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/nw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/nw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/nw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/nw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/walk/s",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/s/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/s/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/s/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/s/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/s/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/s/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/s/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/walk/se",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/se/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/se/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/se/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/se/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/se/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/se/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/se/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/walk/sw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/sw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/sw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/sw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/sw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/sw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/sw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/sw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/tinner/walk/w",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/w/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/w/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/w/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/w/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/w/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/w/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/w/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "blood/tinner/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/die/e",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/e/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/e/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/e/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/e/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/e/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/e/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/e/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/die/n",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/n/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/n/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/n/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/n/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/n/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/n/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/n/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/die/ne",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/ne/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/ne/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/ne/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/ne/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/ne/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/ne/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/ne/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/die/nw",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/nw/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/nw/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/nw/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/nw/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/nw/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/nw/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/nw/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/die/s",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/s/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/s/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/s/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/s/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/s/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/s/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/s/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/die/se",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/se/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/se/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/se/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/se/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/se/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/se/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/se/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/die/sw",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/sw/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/sw/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/sw/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/sw/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/sw/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/sw/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/sw/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/die/w",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/w/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/w/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/w/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/w/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/w/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/w/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/w/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/idle/e",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/e/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/e/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/e/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/e/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/e/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/e/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/e/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/idle/n",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/n/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/n/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/n/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/n/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/n/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/n/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/n/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/idle/ne",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/ne/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/ne/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/ne/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/ne/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/ne/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/ne/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/ne/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/idle/nw",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/nw/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/nw/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/nw/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/nw/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/nw/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/nw/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/nw/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/idle/s",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/s/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/s/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/s/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/s/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/s/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/s/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/s/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/idle/se",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/se/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/se/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/se/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/se/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/se/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/se/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/se/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/idle/sw",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/sw/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/sw/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/sw/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/sw/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/sw/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/sw/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/sw/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/idle/w",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/w/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/w/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/w/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/w/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/w/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/w/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/w/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/interact/e",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/e/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/e/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/e/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/e/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/e/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/e/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/e/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/interact/n",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/n/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/n/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/n/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/n/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/n/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/n/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/n/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/interact/ne",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/ne/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/ne/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/ne/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/ne/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/ne/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/ne/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/ne/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/interact/nw",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/nw/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/nw/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/nw/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/nw/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/nw/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/nw/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/nw/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/interact/s",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/s/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/s/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/s/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/s/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/s/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/s/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/s/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/interact/se",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/se/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/se/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/se/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/se/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/se/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/se/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/se/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/interact/sw",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/sw/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/sw/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/sw/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/sw/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/sw/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/sw/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/sw/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/interact/w",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/w/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/w/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/w/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/w/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/w/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/w/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/w/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/swing/e",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/e/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/e/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/e/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/e/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/e/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/swing/n",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/n/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/n/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/n/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/n/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/n/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/swing/ne",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/ne/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/ne/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/ne/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/ne/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/ne/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/swing/nw",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/nw/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/nw/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/nw/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/nw/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/nw/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/swing/s",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/s/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/s/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/s/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/s/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/s/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/swing/se",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/se/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/se/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/se/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/se/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/se/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/swing/sw",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/sw/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/sw/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/sw/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/sw/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/sw/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/swing/w",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/w/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/w/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/w/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/w/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/w/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/tinner/walk/e",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/e/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/e/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/e/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/e/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/e/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/e/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/e/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/walk/n",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/n/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/n/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/n/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/n/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/n/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/n/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/n/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/walk/ne",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/ne/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/ne/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/ne/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/ne/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/ne/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/ne/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/ne/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/walk/nw",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/nw/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/nw/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/nw/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/nw/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/nw/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/nw/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/nw/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/walk/s",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/s/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/s/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/s/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/s/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/s/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/s/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/s/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/walk/se",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/se/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/se/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/se/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/se/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/se/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/se/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/se/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/walk/sw",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/sw/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/sw/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/sw/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/sw/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/sw/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/sw/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/sw/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/tinner/walk/w",
+   "frames": [
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/w/000"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/w/001"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/w/002"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/w/003"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/w/004"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/w/005"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/w/006"
+    },
+    {
+     "key": "char_tinner",
+     "frame": "char/tinner/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/die/e",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/e/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/e/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/e/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/e/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/e/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/e/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/e/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/die/n",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/n/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/n/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/n/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/n/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/n/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/n/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/n/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/die/ne",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/ne/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/ne/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/ne/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/ne/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/ne/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/ne/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/ne/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/die/nw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/nw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/nw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/nw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/nw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/nw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/nw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/nw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/die/s",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/s/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/s/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/s/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/s/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/s/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/s/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/s/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/die/se",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/se/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/se/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/se/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/se/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/se/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/se/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/se/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/die/sw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/sw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/sw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/sw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/sw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/sw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/sw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/sw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/die/w",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/w/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/w/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/w/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/w/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/w/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/w/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/w/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/idle/e",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/e/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/e/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/e/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/e/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/e/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/e/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/e/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/idle/n",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/n/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/n/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/n/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/n/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/n/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/n/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/n/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/idle/ne",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/ne/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/ne/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/ne/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/ne/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/ne/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/ne/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/ne/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/idle/nw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/nw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/nw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/nw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/nw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/nw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/nw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/nw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/idle/s",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/s/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/s/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/s/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/s/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/s/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/s/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/s/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/idle/se",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/se/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/se/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/se/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/se/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/se/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/se/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/se/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/idle/sw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/sw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/sw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/sw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/sw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/sw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/sw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/sw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/idle/w",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/w/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/w/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/w/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/w/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/w/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/w/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/w/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/interact/e",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/e/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/e/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/e/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/e/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/e/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/e/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/e/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/interact/n",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/n/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/n/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/n/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/n/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/n/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/n/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/n/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/interact/ne",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/ne/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/ne/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/ne/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/ne/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/ne/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/ne/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/ne/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/interact/nw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/nw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/nw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/nw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/nw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/nw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/nw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/nw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/interact/s",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/s/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/s/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/s/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/s/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/s/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/s/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/s/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/interact/se",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/se/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/se/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/se/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/se/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/se/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/se/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/se/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/interact/sw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/sw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/sw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/sw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/sw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/sw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/sw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/sw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/interact/w",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/w/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/w/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/w/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/w/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/w/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/w/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/w/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/swing/e",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/e/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/e/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/e/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/e/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/e/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/swing/n",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/n/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/n/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/n/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/n/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/n/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/swing/ne",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/ne/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/ne/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/ne/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/ne/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/ne/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/swing/nw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/nw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/nw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/nw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/nw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/nw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/swing/s",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/s/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/s/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/s/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/s/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/s/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/swing/se",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/se/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/se/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/se/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/se/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/se/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/swing/sw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/sw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/sw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/sw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/sw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/sw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/swing/w",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/w/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/w/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/w/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/w/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/w/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/tinner/walk/e",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/e/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/e/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/e/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/e/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/e/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/e/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/e/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/walk/n",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/n/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/n/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/n/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/n/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/n/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/n/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/n/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/walk/ne",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/ne/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/ne/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/ne/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/ne/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/ne/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/ne/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/ne/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/walk/nw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/nw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/nw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/nw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/nw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/nw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/nw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/nw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/walk/s",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/s/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/s/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/s/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/s/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/s/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/s/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/s/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/walk/se",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/se/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/se/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/se/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/se/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/se/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/se/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/se/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/walk/sw",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/sw/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/sw/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/sw/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/sw/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/sw/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/sw/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/sw/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/tinner/walk/w",
+   "frames": [
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/w/000"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/w/001"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/w/002"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/w/003"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/w/004"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/w/005"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/w/006"
+    },
+    {
+     "key": "ovl_tinner",
+     "frame": "scarf/tinner/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  }
+ ]
+}

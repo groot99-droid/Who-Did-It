@@ -1,0 +1,4492 @@
+{
+ "anims": [
+  {
+   "key": "blood/fisher/die/e",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/e/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/e/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/e/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/e/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/e/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/e/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/e/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/die/n",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/n/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/n/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/n/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/n/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/n/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/n/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/n/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/die/ne",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/ne/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/ne/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/ne/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/ne/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/ne/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/ne/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/ne/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/die/nw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/nw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/nw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/nw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/nw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/nw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/nw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/nw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/die/s",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/s/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/s/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/s/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/s/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/s/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/s/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/s/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/die/se",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/se/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/se/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/se/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/se/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/se/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/se/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/se/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/die/sw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/sw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/sw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/sw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/sw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/sw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/sw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/sw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/die/w",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/w/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/w/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/w/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/w/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/w/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/w/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/w/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/idle/e",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/e/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/e/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/e/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/e/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/e/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/e/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/e/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/idle/n",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/n/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/n/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/n/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/n/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/n/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/n/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/n/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/idle/ne",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/ne/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/ne/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/ne/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/ne/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/ne/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/ne/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/ne/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/idle/nw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/nw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/nw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/nw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/nw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/nw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/nw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/nw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/idle/s",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/s/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/s/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/s/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/s/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/s/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/s/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/s/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/idle/se",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/se/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/se/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/se/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/se/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/se/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/se/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/se/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/idle/sw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/sw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/sw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/sw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/sw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/sw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/sw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/sw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/idle/w",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/w/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/w/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/w/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/w/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/w/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/w/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/w/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/interact/e",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/e/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/e/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/e/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/e/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/e/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/e/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/e/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/interact/n",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/n/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/n/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/n/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/n/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/n/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/n/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/n/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/interact/ne",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/ne/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/ne/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/ne/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/ne/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/ne/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/ne/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/ne/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/interact/nw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/nw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/nw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/nw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/nw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/nw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/nw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/nw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/interact/s",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/s/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/s/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/s/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/s/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/s/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/s/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/s/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/interact/se",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/se/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/se/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/se/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/se/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/se/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/se/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/se/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/interact/sw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/sw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/sw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/sw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/sw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/sw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/sw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/sw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/interact/w",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/w/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/w/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/w/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/w/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/w/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/w/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/w/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/swing/e",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/e/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/e/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/e/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/e/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/e/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/swing/n",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/n/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/n/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/n/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/n/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/n/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/swing/ne",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/ne/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/ne/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/ne/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/ne/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/ne/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/swing/nw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/nw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/nw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/nw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/nw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/nw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/swing/s",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/s/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/s/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/s/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/s/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/s/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/swing/se",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/se/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/se/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/se/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/se/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/se/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/swing/sw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/sw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/sw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/sw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/sw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/sw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/swing/w",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/w/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/w/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/w/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/w/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/w/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/fisher/walk/e",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/e/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/e/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/e/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/e/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/e/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/e/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/e/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/walk/n",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/n/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/n/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/n/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/n/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/n/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/n/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/n/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/walk/ne",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/ne/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/ne/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/ne/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/ne/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/ne/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/ne/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/ne/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/walk/nw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/nw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/nw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/nw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/nw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/nw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/nw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/nw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/walk/s",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/s/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/s/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/s/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/s/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/s/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/s/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/s/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/walk/se",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/se/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/se/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/se/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/se/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/se/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/se/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/se/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/walk/sw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/sw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/sw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/sw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/sw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/sw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/sw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/sw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/fisher/walk/w",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/w/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/w/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/w/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/w/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/w/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/w/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/w/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "blood/fisher/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/die/e",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/e/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/e/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/e/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/e/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/e/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/e/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/e/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/die/n",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/n/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/n/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/n/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/n/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/n/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/n/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/n/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/die/ne",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/ne/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/ne/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/ne/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/ne/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/ne/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/ne/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/ne/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/die/nw",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/nw/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/nw/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/nw/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/nw/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/nw/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/nw/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/nw/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/die/s",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/s/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/s/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/s/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/s/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/s/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/s/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/s/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/die/se",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/se/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/se/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/se/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/se/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/se/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/se/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/se/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/die/sw",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/sw/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/sw/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/sw/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/sw/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/sw/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/sw/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/sw/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/die/w",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/w/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/w/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/w/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/w/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/w/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/w/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/w/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/idle/e",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/e/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/e/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/e/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/e/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/e/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/e/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/e/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/idle/n",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/n/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/n/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/n/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/n/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/n/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/n/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/n/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/idle/ne",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/ne/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/ne/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/ne/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/ne/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/ne/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/ne/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/ne/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/idle/nw",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/nw/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/nw/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/nw/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/nw/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/nw/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/nw/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/nw/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/idle/s",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/s/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/s/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/s/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/s/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/s/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/s/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/s/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/idle/se",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/se/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/se/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/se/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/se/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/se/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/se/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/se/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/idle/sw",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/sw/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/sw/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/sw/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/sw/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/sw/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/sw/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/sw/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/idle/w",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/w/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/w/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/w/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/w/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/w/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/w/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/w/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/interact/e",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/e/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/e/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/e/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/e/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/e/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/e/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/e/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/interact/n",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/n/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/n/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/n/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/n/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/n/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/n/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/n/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/interact/ne",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/ne/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/ne/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/ne/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/ne/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/ne/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/ne/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/ne/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/interact/nw",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/nw/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/nw/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/nw/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/nw/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/nw/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/nw/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/nw/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/interact/s",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/s/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/s/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/s/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/s/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/s/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/s/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/s/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/interact/se",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/se/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/se/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/se/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/se/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/se/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/se/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/se/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/interact/sw",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/sw/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/sw/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/sw/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/sw/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/sw/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/sw/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/sw/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/interact/w",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/w/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/w/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/w/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/w/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/w/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/w/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/w/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/swing/e",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/e/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/e/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/e/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/e/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/e/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/swing/n",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/n/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/n/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/n/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/n/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/n/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/swing/ne",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/ne/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/ne/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/ne/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/ne/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/ne/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/swing/nw",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/nw/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/nw/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/nw/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/nw/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/nw/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/swing/s",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/s/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/s/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/s/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/s/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/s/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/swing/se",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/se/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/se/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/se/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/se/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/se/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/swing/sw",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/sw/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/sw/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/sw/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/sw/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/sw/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/swing/w",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/w/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/w/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/w/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/w/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/w/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/fisher/walk/e",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/e/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/e/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/e/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/e/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/e/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/e/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/e/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/walk/n",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/n/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/n/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/n/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/n/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/n/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/n/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/n/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/walk/ne",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/ne/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/ne/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/ne/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/ne/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/ne/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/ne/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/ne/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/walk/nw",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/nw/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/nw/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/nw/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/nw/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/nw/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/nw/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/nw/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/walk/s",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/s/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/s/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/s/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/s/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/s/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/s/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/s/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/walk/se",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/se/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/se/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/se/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/se/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/se/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/se/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/se/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/walk/sw",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/sw/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/sw/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/sw/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/sw/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/sw/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/sw/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/sw/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/fisher/walk/w",
+   "frames": [
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/w/000"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/w/001"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/w/002"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/w/003"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/w/004"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/w/005"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/w/006"
+    },
+    {
+     "key": "char_fisher",
+     "frame": "char/fisher/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/die/e",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/e/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/e/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/e/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/e/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/e/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/e/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/e/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/die/n",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/n/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/n/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/n/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/n/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/n/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/n/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/n/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/die/ne",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/ne/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/ne/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/ne/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/ne/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/ne/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/ne/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/ne/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/die/nw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/nw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/nw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/nw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/nw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/nw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/nw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/nw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/die/s",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/s/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/s/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/s/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/s/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/s/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/s/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/s/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/die/se",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/se/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/se/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/se/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/se/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/se/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/se/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/se/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/die/sw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/sw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/sw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/sw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/sw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/sw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/sw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/sw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/die/w",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/w/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/w/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/w/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/w/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/w/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/w/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/w/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/idle/e",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/e/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/e/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/e/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/e/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/e/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/e/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/e/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/idle/n",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/n/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/n/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/n/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/n/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/n/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/n/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/n/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/idle/ne",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/ne/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/ne/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/ne/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/ne/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/ne/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/ne/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/ne/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/idle/nw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/nw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/nw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/nw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/nw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/nw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/nw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/nw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/idle/s",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/s/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/s/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/s/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/s/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/s/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/s/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/s/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/idle/se",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/se/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/se/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/se/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/se/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/se/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/se/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/se/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/idle/sw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/sw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/sw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/sw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/sw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/sw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/sw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/sw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/idle/w",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/w/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/w/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/w/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/w/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/w/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/w/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/w/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/interact/e",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/e/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/e/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/e/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/e/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/e/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/e/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/e/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/interact/n",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/n/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/n/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/n/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/n/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/n/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/n/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/n/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/interact/ne",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/ne/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/ne/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/ne/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/ne/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/ne/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/ne/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/ne/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/interact/nw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/nw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/nw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/nw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/nw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/nw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/nw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/nw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/interact/s",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/s/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/s/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/s/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/s/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/s/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/s/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/s/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/interact/se",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/se/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/se/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/se/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/se/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/se/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/se/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/se/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/interact/sw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/sw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/sw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/sw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/sw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/sw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/sw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/sw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/interact/w",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/w/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/w/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/w/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/w/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/w/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/w/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/w/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/swing/e",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/e/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/e/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/e/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/e/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/e/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/swing/n",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/n/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/n/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/n/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/n/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/n/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/swing/ne",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/ne/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/ne/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/ne/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/ne/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/ne/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/swing/nw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/nw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/nw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/nw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/nw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/nw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/swing/s",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/s/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/s/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/s/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/s/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/s/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/swing/se",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/se/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/se/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/se/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/se/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/se/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/swing/sw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/sw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/sw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/sw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/sw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/sw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/swing/w",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/w/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/w/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/w/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/w/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/w/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/fisher/walk/e",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/e/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/e/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/e/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/e/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/e/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/e/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/e/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/walk/n",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/n/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/n/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/n/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/n/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/n/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/n/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/n/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/walk/ne",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/ne/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/ne/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/ne/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/ne/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/ne/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/ne/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/ne/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/walk/nw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/nw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/nw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/nw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/nw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/nw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/nw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/nw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/walk/s",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/s/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/s/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/s/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/s/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/s/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/s/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/s/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/walk/se",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/se/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/se/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/se/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/se/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/se/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/se/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/se/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/walk/sw",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/sw/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/sw/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/sw/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/sw/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/sw/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/sw/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/sw/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/fisher/walk/w",
+   "frames": [
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/w/000"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/w/001"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/w/002"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/w/003"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/w/004"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/w/005"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/w/006"
+    },
+    {
+     "key": "ovl_fisher",
+     "frame": "scarf/fisher/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  }
+ ]
+}

@@ -1,0 +1,7619 @@
+{
+ "textures": [
+  {
+   "image": "char_herbalist-0.png",
+   "format": "RGBA8888",
+   "size": {
+    "w": 1024,
+    "h": 1024
+   },
+   "scale": 1,
+   "frames": [
+    {
+     "filename": "char/herbalist/die/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 57,
+      "y": 10,
+      "w": 15,
+      "h": 57
+     },
+     "frame": {
+      "x": 543,
+      "y": 122,
+      "w": 15,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 12,
+      "w": 20,
+      "h": 57
+     },
+     "frame": {
+      "x": 457,
+      "y": 355,
+      "w": 20,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 36,
+      "y": 15,
+      "w": 36,
+      "h": 54
+     },
+     "frame": {
+      "x": 263,
+      "y": 129,
+      "w": 36,
+      "h": 54
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 18,
+      "w": 52,
+      "h": 51
+     },
+     "frame": {
+      "x": 204,
+      "y": 214,
+      "w": 52,
+      "h": 51
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 22,
+      "w": 53,
+      "h": 45
+     },
+     "frame": {
+      "x": 342,
+      "y": 138,
+      "w": 53,
+      "h": 45
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 31,
+      "w": 53,
+      "h": 35
+     },
+     "frame": {
+      "x": 204,
+      "y": 132,
+      "w": 53,
+      "h": 35
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/e/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 35,
+      "w": 59,
+      "h": 32
+     },
+     "frame": {
+      "x": 3,
+      "y": 133,
+      "w": 59,
+      "h": 32
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/e/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 35,
+      "w": 62,
+      "h": 32
+     },
+     "frame": {
+      "x": 275,
+      "y": 3,
+      "w": 62,
+      "h": 32
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 10,
+      "w": 24,
+      "h": 57
+     },
+     "frame": {
+      "x": 458,
+      "y": 229,
+      "w": 24,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 15,
+      "w": 24,
+      "h": 51
+     },
+     "frame": {
+      "x": 610,
+      "y": 292,
+      "w": 24,
+      "h": 51
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 50,
+      "y": 28,
+      "w": 24,
+      "h": 41
+     },
+     "frame": {
+      "x": 3,
+      "y": 979,
+      "w": 24,
+      "h": 41
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 40,
+      "y": 44,
+      "w": 32,
+      "h": 32
+     },
+     "frame": {
+      "x": 41,
+      "y": 308,
+      "w": 32,
+      "h": 32
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 51,
+      "w": 47,
+      "h": 37
+     },
+     "frame": {
+      "x": 3,
+      "y": 215,
+      "w": 47,
+      "h": 37
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 47,
+      "w": 53,
+      "h": 49
+     },
+     "frame": {
+      "x": 410,
+      "y": 47,
+      "w": 53,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/n/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 48,
+      "w": 59,
+      "h": 46
+     },
+     "frame": {
+      "x": 138,
+      "y": 133,
+      "w": 59,
+      "h": 46
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/n/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 49,
+      "w": 62,
+      "h": 44
+     },
+     "frame": {
+      "x": 3,
+      "y": 3,
+      "w": 62,
+      "h": 44
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 53,
+      "y": 9,
+      "w": 22,
+      "h": 59
+     },
+     "frame": {
+      "x": 354,
+      "y": 570,
+      "w": 22,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 53,
+      "y": 14,
+      "w": 23,
+      "h": 54
+     },
+     "frame": {
+      "x": 552,
+      "y": 292,
+      "w": 23,
+      "h": 54
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 39,
+      "y": 23,
+      "w": 34,
+      "h": 47
+     },
+     "frame": {
+      "x": 120,
+      "y": 228,
+      "w": 34,
+      "h": 47
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 33,
+      "w": 53,
+      "h": 39
+     },
+     "frame": {
+      "x": 272,
+      "y": 84,
+      "w": 53,
+      "h": 39
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 7,
+      "y": 41,
+      "w": 62,
+      "h": 31
+     },
+     "frame": {
+      "x": 343,
+      "y": 3,
+      "w": 62,
+      "h": 31
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 4,
+      "y": 45,
+      "w": 61,
+      "h": 35
+     },
+     "frame": {
+      "x": 71,
+      "y": 51,
+      "w": 61,
+      "h": 35
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/ne/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 3,
+      "y": 45,
+      "w": 61,
+      "h": 38
+     },
+     "frame": {
+      "x": 411,
+      "y": 3,
+      "w": 61,
+      "h": 38
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/ne/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 3,
+      "y": 45,
+      "w": 61,
+      "h": 37
+     },
+     "frame": {
+      "x": 343,
+      "y": 40,
+      "w": 61,
+      "h": 37
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 53,
+      "y": 9,
+      "w": 21,
+      "h": 59
+     },
+     "frame": {
+      "x": 335,
+      "y": 452,
+      "w": 21,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 14,
+      "w": 23,
+      "h": 54
+     },
+     "frame": {
+      "x": 581,
+      "y": 292,
+      "w": 23,
+      "h": 54
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 55,
+      "y": 26,
+      "w": 28,
+      "h": 44
+     },
+     "frame": {
+      "x": 89,
+      "y": 977,
+      "w": 28,
+      "h": 44
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 45,
+      "w": 29,
+      "h": 31
+     },
+     "frame": {
+      "x": 38,
+      "y": 670,
+      "w": 29,
+      "h": 31
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 55,
+      "y": 51,
+      "w": 22,
+      "h": 41
+     },
+     "frame": {
+      "x": 33,
+      "y": 979,
+      "w": 22,
+      "h": 41
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 53,
+      "y": 50,
+      "w": 22,
+      "h": 51
+     },
+     "frame": {
+      "x": 498,
+      "y": 543,
+      "w": 22,
+      "h": 51
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/nw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 35,
+      "y": 53,
+      "w": 58,
+      "h": 43
+     },
+     "frame": {
+      "x": 68,
+      "y": 143,
+      "w": 58,
+      "h": 43
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/nw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 34,
+      "y": 54,
+      "w": 60,
+      "h": 42
+     },
+     "frame": {
+      "x": 206,
+      "y": 42,
+      "w": 60,
+      "h": 42
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 9,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 256,
+      "y": 440,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 10,
+      "w": 24,
+      "h": 60
+     },
+     "frame": {
+      "x": 166,
+      "y": 632,
+      "w": 24,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 54,
+      "y": 8,
+      "w": 24,
+      "h": 62
+     },
+     "frame": {
+      "x": 3,
+      "y": 710,
+      "w": 24,
+      "h": 62
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 9,
+      "w": 32,
+      "h": 58
+     },
+     "frame": {
+      "x": 120,
+      "y": 281,
+      "w": 32,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 57,
+      "y": 19,
+      "w": 47,
+      "h": 47
+     },
+     "frame": {
+      "x": 67,
+      "y": 192,
+      "w": 47,
+      "h": 47
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 31,
+      "w": 53,
+      "h": 36
+     },
+     "frame": {
+      "x": 204,
+      "y": 90,
+      "w": 53,
+      "h": 36
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/s/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 55,
+      "y": 34,
+      "w": 59,
+      "h": 33
+     },
+     "frame": {
+      "x": 3,
+      "y": 94,
+      "w": 59,
+      "h": 33
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/s/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 54,
+      "y": 34,
+      "w": 62,
+      "h": 33
+     },
+     "frame": {
+      "x": 139,
+      "y": 3,
+      "w": 62,
+      "h": 33
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 54,
+      "y": 9,
+      "w": 21,
+      "h": 60
+     },
+     "frame": {
+      "x": 184,
+      "y": 830,
+      "w": 21,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 53,
+      "y": 11,
+      "w": 23,
+      "h": 60
+     },
+     "frame": {
+      "x": 173,
+      "y": 551,
+      "w": 23,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 45,
+      "y": 9,
+      "w": 28,
+      "h": 61
+     },
+     "frame": {
+      "x": 3,
+      "y": 778,
+      "w": 28,
+      "h": 61
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 43,
+      "y": 8,
+      "w": 29,
+      "h": 57
+     },
+     "frame": {
+      "x": 424,
+      "y": 166,
+      "w": 29,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 51,
+      "y": 14,
+      "w": 22,
+      "h": 50
+     },
+     "frame": {
+      "x": 123,
+      "y": 971,
+      "w": 22,
+      "h": 50
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 53,
+      "y": 24,
+      "w": 22,
+      "h": 39
+     },
+     "frame": {
+      "x": 61,
+      "y": 979,
+      "w": 22,
+      "h": 39
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/se/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 35,
+      "y": 26,
+      "w": 58,
+      "h": 38
+     },
+     "frame": {
+      "x": 3,
+      "y": 171,
+      "w": 58,
+      "h": 38
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/se/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 34,
+      "y": 26,
+      "w": 60,
+      "h": 38
+     },
+     "frame": {
+      "x": 138,
+      "y": 89,
+      "w": 60,
+      "h": 38
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 53,
+      "y": 9,
+      "w": 22,
+      "h": 60
+     },
+     "frame": {
+      "x": 128,
+      "y": 764,
+      "w": 22,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 52,
+      "y": 11,
+      "w": 23,
+      "h": 60
+     },
+     "frame": {
+      "x": 202,
+      "y": 530,
+      "w": 23,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 55,
+      "y": 11,
+      "w": 34,
+      "h": 59
+     },
+     "frame": {
+      "x": 262,
+      "y": 246,
+      "w": 34,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 55,
+      "y": 20,
+      "w": 53,
+      "h": 49
+     },
+     "frame": {
+      "x": 342,
+      "y": 83,
+      "w": 53,
+      "h": 49
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 59,
+      "y": 37,
+      "w": 62,
+      "h": 33
+     },
+     "frame": {
+      "x": 207,
+      "y": 3,
+      "w": 62,
+      "h": 33
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 63,
+      "y": 44,
+      "w": 61,
+      "h": 36
+     },
+     "frame": {
+      "x": 139,
+      "y": 47,
+      "w": 61,
+      "h": 36
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/sw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 64,
+      "y": 45,
+      "w": 61,
+      "h": 37
+     },
+     "frame": {
+      "x": 275,
+      "y": 41,
+      "w": 61,
+      "h": 37
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/sw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 64,
+      "y": 45,
+      "w": 61,
+      "h": 35
+     },
+     "frame": {
+      "x": 3,
+      "y": 53,
+      "w": 61,
+      "h": 35
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 10,
+      "w": 15,
+      "h": 57
+     },
+     "frame": {
+      "x": 564,
+      "y": 122,
+      "w": 15,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 12,
+      "w": 20,
+      "h": 57
+     },
+     "frame": {
+      "x": 495,
+      "y": 59,
+      "w": 20,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 19,
+      "w": 36,
+      "h": 51
+     },
+     "frame": {
+      "x": 263,
+      "y": 189,
+      "w": 36,
+      "h": 51
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 35,
+      "w": 51,
+      "h": 37
+     },
+     "frame": {
+      "x": 132,
+      "y": 185,
+      "w": 51,
+      "h": 37
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 57,
+      "y": 50,
+      "w": 53,
+      "h": 35
+     },
+     "frame": {
+      "x": 204,
+      "y": 173,
+      "w": 53,
+      "h": 35
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 56,
+      "y": 46,
+      "w": 53,
+      "h": 50
+     },
+     "frame": {
+      "x": 478,
+      "y": 3,
+      "w": 53,
+      "h": 50
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/w/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 55,
+      "y": 48,
+      "w": 59,
+      "h": 45
+     },
+     "frame": {
+      "x": 70,
+      "y": 92,
+      "w": 59,
+      "h": 45
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/die/w/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 128,
+      "h": 128
+     },
+     "spriteSourceSize": {
+      "x": 54,
+      "y": 49,
+      "w": 62,
+      "h": 42
+     },
+     "frame": {
+      "x": 71,
+      "y": 3,
+      "w": 62,
+      "h": 42
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 638,
+      "y": 954,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 15,
+      "h": 57
+     },
+     "frame": {
+      "x": 585,
+      "y": 122,
+      "w": 15,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 16,
+      "h": 57
+     },
+     "frame": {
+      "x": 521,
+      "y": 59,
+      "w": 16,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 15,
+      "h": 57
+     },
+     "frame": {
+      "x": 565,
+      "y": 3,
+      "w": 15,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 638,
+      "y": 954,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 659,
+      "y": 954,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/e/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 403,
+      "y": 166,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/e/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 403,
+      "y": 230,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 57
+     },
+     "frame": {
+      "x": 488,
+      "y": 229,
+      "w": 24,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 57
+     },
+     "frame": {
+      "x": 518,
+      "y": 229,
+      "w": 24,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 56
+     },
+     "frame": {
+      "x": 487,
+      "y": 292,
+      "w": 24,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 56
+     },
+     "frame": {
+      "x": 473,
+      "y": 481,
+      "w": 24,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 57
+     },
+     "frame": {
+      "x": 488,
+      "y": 229,
+      "w": 24,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 57
+     },
+     "frame": {
+      "x": 548,
+      "y": 229,
+      "w": 24,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/n/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 2,
+      "w": 25,
+      "h": 57
+     },
+     "frame": {
+      "x": 456,
+      "y": 292,
+      "w": 25,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/n/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 57
+     },
+     "frame": {
+      "x": 459,
+      "y": 165,
+      "w": 24,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 22,
+      "h": 58
+     },
+     "frame": {
+      "x": 452,
+      "y": 634,
+      "w": 22,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 23,
+      "h": 58
+     },
+     "frame": {
+      "x": 374,
+      "y": 189,
+      "w": 23,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 23,
+      "h": 58
+     },
+     "frame": {
+      "x": 401,
+      "y": 102,
+      "w": 23,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 23,
+      "h": 58
+     },
+     "frame": {
+      "x": 374,
+      "y": 253,
+      "w": 23,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 22,
+      "h": 58
+     },
+     "frame": {
+      "x": 452,
+      "y": 634,
+      "w": 22,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 59
+     },
+     "frame": {
+      "x": 304,
+      "y": 700,
+      "w": 22,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/ne/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 59
+     },
+     "frame": {
+      "x": 325,
+      "y": 765,
+      "w": 22,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/ne/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 59
+     },
+     "frame": {
+      "x": 332,
+      "y": 700,
+      "w": 22,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 59
+     },
+     "frame": {
+      "x": 351,
+      "y": 830,
+      "w": 21,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 23,
+      "h": 59
+     },
+     "frame": {
+      "x": 322,
+      "y": 855,
+      "w": 23,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 23,
+      "h": 59
+     },
+     "frame": {
+      "x": 325,
+      "y": 387,
+      "w": 23,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 23,
+      "h": 59
+     },
+     "frame": {
+      "x": 304,
+      "y": 635,
+      "w": 23,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 59
+     },
+     "frame": {
+      "x": 351,
+      "y": 830,
+      "w": 21,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 21,
+      "h": 58
+     },
+     "frame": {
+      "x": 560,
+      "y": 698,
+      "w": 21,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/nw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 21,
+      "h": 58
+     },
+     "frame": {
+      "x": 587,
+      "y": 698,
+      "w": 21,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/nw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 21,
+      "h": 58
+     },
+     "frame": {
+      "x": 506,
+      "y": 762,
+      "w": 21,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 244,
+      "y": 661,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 265,
+      "y": 595,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 1,
+      "w": 25,
+      "h": 59
+     },
+     "frame": {
+      "x": 226,
+      "y": 596,
+      "w": 25,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 275,
+      "y": 505,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 244,
+      "y": 661,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 295,
+      "y": 440,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/s/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 25,
+      "h": 58
+     },
+     "frame": {
+      "x": 382,
+      "y": 570,
+      "w": 25,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/s/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 244,
+      "y": 726,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 1,
+      "w": 21,
+      "h": 60
+     },
+     "frame": {
+      "x": 184,
+      "y": 896,
+      "w": 21,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 1,
+      "w": 22,
+      "h": 60
+     },
+     "frame": {
+      "x": 128,
+      "y": 830,
+      "w": 22,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 23,
+      "h": 60
+     },
+     "frame": {
+      "x": 99,
+      "y": 764,
+      "w": 23,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 1,
+      "w": 22,
+      "h": 60
+     },
+     "frame": {
+      "x": 156,
+      "y": 698,
+      "w": 22,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 1,
+      "w": 21,
+      "h": 60
+     },
+     "frame": {
+      "x": 184,
+      "y": 896,
+      "w": 21,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 1,
+      "w": 21,
+      "h": 60
+     },
+     "frame": {
+      "x": 211,
+      "y": 896,
+      "w": 21,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/se/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 1,
+      "w": 21,
+      "h": 60
+     },
+     "frame": {
+      "x": 238,
+      "y": 896,
+      "w": 21,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/se/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 1,
+      "w": 21,
+      "h": 60
+     },
+     "frame": {
+      "x": 265,
+      "y": 896,
+      "w": 21,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 60
+     },
+     "frame": {
+      "x": 156,
+      "y": 764,
+      "w": 22,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 23,
+      "h": 60
+     },
+     "frame": {
+      "x": 127,
+      "y": 698,
+      "w": 23,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 23,
+      "h": 60
+     },
+     "frame": {
+      "x": 99,
+      "y": 830,
+      "w": 23,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 23,
+      "h": 60
+     },
+     "frame": {
+      "x": 127,
+      "y": 896,
+      "w": 23,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 60
+     },
+     "frame": {
+      "x": 156,
+      "y": 764,
+      "w": 22,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 60
+     },
+     "frame": {
+      "x": 156,
+      "y": 830,
+      "w": 22,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/sw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 60
+     },
+     "frame": {
+      "x": 156,
+      "y": 896,
+      "w": 22,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/sw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 60
+     },
+     "frame": {
+      "x": 184,
+      "y": 698,
+      "w": 22,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 403,
+      "y": 294,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 15,
+      "h": 57
+     },
+     "frame": {
+      "x": 586,
+      "y": 3,
+      "w": 15,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 16,
+      "h": 57
+     },
+     "frame": {
+      "x": 543,
+      "y": 59,
+      "w": 16,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 15,
+      "h": 57
+     },
+     "frame": {
+      "x": 473,
+      "y": 418,
+      "w": 15,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 403,
+      "y": 294,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 415,
+      "y": 358,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/w/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 436,
+      "y": 358,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/idle/w/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 452,
+      "y": 422,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 554,
+      "y": 957,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 342,
+      "y": 189,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 412,
+      "y": 893,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 422,
+      "y": 957,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 554,
+      "y": 957,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 445,
+      "y": 893,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/e/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 478,
+      "y": 893,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/e/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 342,
+      "y": 253,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 58
+     },
+     "frame": {
+      "x": 512,
+      "y": 826,
+      "w": 21,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 58
+     },
+     "frame": {
+      "x": 533,
+      "y": 762,
+      "w": 21,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 58
+     },
+     "frame": {
+      "x": 539,
+      "y": 826,
+      "w": 21,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 58
+     },
+     "frame": {
+      "x": 560,
+      "y": 762,
+      "w": 21,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 58
+     },
+     "frame": {
+      "x": 512,
+      "y": 826,
+      "w": 21,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 58
+     },
+     "frame": {
+      "x": 566,
+      "y": 826,
+      "w": 21,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/n/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 58
+     },
+     "frame": {
+      "x": 587,
+      "y": 762,
+      "w": 21,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/n/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 58
+     },
+     "frame": {
+      "x": 577,
+      "y": 890,
+      "w": 21,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 29,
+      "h": 59
+     },
+     "frame": {
+      "x": 151,
+      "y": 357,
+      "w": 29,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 29,
+      "h": 59
+     },
+     "frame": {
+      "x": 111,
+      "y": 409,
+      "w": 29,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 30,
+      "h": 59
+     },
+     "frame": {
+      "x": 3,
+      "y": 321,
+      "w": 30,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 30,
+      "h": 59
+     },
+     "frame": {
+      "x": 79,
+      "y": 309,
+      "w": 30,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 29,
+      "h": 59
+     },
+     "frame": {
+      "x": 151,
+      "y": 357,
+      "w": 29,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 29,
+      "h": 59
+     },
+     "frame": {
+      "x": 74,
+      "y": 438,
+      "w": 29,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/ne/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 29,
+      "h": 59
+     },
+     "frame": {
+      "x": 38,
+      "y": 477,
+      "w": 29,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/ne/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 29,
+      "h": 59
+     },
+     "frame": {
+      "x": 3,
+      "y": 517,
+      "w": 29,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 1,
+      "w": 28,
+      "h": 59
+     },
+     "frame": {
+      "x": 151,
+      "y": 962,
+      "w": 28,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 1,
+      "w": 28,
+      "h": 59
+     },
+     "frame": {
+      "x": 185,
+      "y": 962,
+      "w": 28,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 1,
+      "w": 28,
+      "h": 59
+     },
+     "frame": {
+      "x": 219,
+      "y": 962,
+      "w": 28,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 1,
+      "w": 28,
+      "h": 59
+     },
+     "frame": {
+      "x": 253,
+      "y": 962,
+      "w": 28,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 1,
+      "w": 28,
+      "h": 59
+     },
+     "frame": {
+      "x": 151,
+      "y": 962,
+      "w": 28,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 1,
+      "w": 29,
+      "h": 59
+     },
+     "frame": {
+      "x": 186,
+      "y": 401,
+      "w": 29,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/nw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 1,
+      "w": 29,
+      "h": 59
+     },
+     "frame": {
+      "x": 146,
+      "y": 422,
+      "w": 29,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/nw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 1,
+      "w": 28,
+      "h": 59
+     },
+     "frame": {
+      "x": 287,
+      "y": 962,
+      "w": 28,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 5,
+      "w": 21,
+      "h": 55
+     },
+     "frame": {
+      "x": 390,
+      "y": 509,
+      "w": 21,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 5,
+      "w": 21,
+      "h": 55
+     },
+     "frame": {
+      "x": 417,
+      "y": 509,
+      "w": 21,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 5,
+      "w": 21,
+      "h": 55
+     },
+     "frame": {
+      "x": 444,
+      "y": 573,
+      "w": 21,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 5,
+      "w": 21,
+      "h": 55
+     },
+     "frame": {
+      "x": 471,
+      "y": 573,
+      "w": 21,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 5,
+      "w": 21,
+      "h": 55
+     },
+     "frame": {
+      "x": 390,
+      "y": 509,
+      "w": 21,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 5,
+      "w": 21,
+      "h": 55
+     },
+     "frame": {
+      "x": 498,
+      "y": 417,
+      "w": 21,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/s/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 5,
+      "w": 21,
+      "h": 55
+     },
+     "frame": {
+      "x": 514,
+      "y": 354,
+      "w": 21,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/s/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 5,
+      "w": 21,
+      "h": 55
+     },
+     "frame": {
+      "x": 525,
+      "y": 292,
+      "w": 21,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 3,
+      "w": 28,
+      "h": 58
+     },
+     "frame": {
+      "x": 378,
+      "y": 830,
+      "w": 28,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 3,
+      "w": 28,
+      "h": 58
+     },
+     "frame": {
+      "x": 380,
+      "y": 765,
+      "w": 28,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 3,
+      "w": 28,
+      "h": 58
+     },
+     "frame": {
+      "x": 378,
+      "y": 894,
+      "w": 28,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 3,
+      "w": 28,
+      "h": 58
+     },
+     "frame": {
+      "x": 388,
+      "y": 958,
+      "w": 28,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 3,
+      "w": 28,
+      "h": 58
+     },
+     "frame": {
+      "x": 378,
+      "y": 830,
+      "w": 28,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 3,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 38,
+      "y": 542,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/se/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 3,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 3,
+      "y": 582,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/se/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 3,
+      "w": 28,
+      "h": 58
+     },
+     "frame": {
+      "x": 412,
+      "y": 829,
+      "w": 28,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 3,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 221,
+      "y": 402,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 3,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 221,
+      "y": 466,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 3,
+      "w": 30,
+      "h": 58
+     },
+     "frame": {
+      "x": 39,
+      "y": 346,
+      "w": 30,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 3,
+      "w": 30,
+      "h": 58
+     },
+     "frame": {
+      "x": 3,
+      "y": 386,
+      "w": 30,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 3,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 221,
+      "y": 402,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 3,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 181,
+      "y": 466,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/sw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 3,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 144,
+      "y": 487,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/sw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 3,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 108,
+      "y": 539,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 342,
+      "y": 317,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 354,
+      "y": 381,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 511,
+      "y": 893,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 544,
+      "y": 893,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 342,
+      "y": 317,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 446,
+      "y": 829,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/w/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 479,
+      "y": 829,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/interact/w/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 2,
+      "w": 26,
+      "h": 58
+     },
+     "frame": {
+      "x": 362,
+      "y": 445,
+      "w": 26,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 638,
+      "y": 954,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 23,
+      "y": 1,
+      "w": 27,
+      "h": 59
+     },
+     "frame": {
+      "x": 355,
+      "y": 962,
+      "w": 27,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 1,
+      "w": 25,
+      "h": 59
+     },
+     "frame": {
+      "x": 244,
+      "y": 530,
+      "w": 25,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 30,
+      "h": 58
+     },
+     "frame": {
+      "x": 115,
+      "y": 345,
+      "w": 30,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 22,
+      "h": 58
+     },
+     "frame": {
+      "x": 480,
+      "y": 634,
+      "w": 22,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 25,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 638,
+      "y": 954,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 57
+     },
+     "frame": {
+      "x": 488,
+      "y": 229,
+      "w": 24,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 24,
+      "h": 57
+     },
+     "frame": {
+      "x": 465,
+      "y": 102,
+      "w": 24,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 3,
+      "w": 25,
+      "h": 56
+     },
+     "frame": {
+      "x": 483,
+      "y": 355,
+      "w": 25,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 0,
+      "w": 22,
+      "h": 59
+     },
+     "frame": {
+      "x": 360,
+      "y": 700,
+      "w": 22,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 23,
+      "h": 58
+     },
+     "frame": {
+      "x": 374,
+      "y": 317,
+      "w": 23,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 57
+     },
+     "frame": {
+      "x": 488,
+      "y": 229,
+      "w": 24,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 22,
+      "h": 58
+     },
+     "frame": {
+      "x": 452,
+      "y": 634,
+      "w": 22,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 32,
+      "h": 58
+     },
+     "frame": {
+      "x": 198,
+      "y": 271,
+      "w": 32,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 31,
+      "h": 58
+     },
+     "frame": {
+      "x": 305,
+      "y": 261,
+      "w": 31,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 0,
+      "w": 31,
+      "h": 60
+     },
+     "frame": {
+      "x": 305,
+      "y": 129,
+      "w": 31,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 28,
+      "h": 59
+     },
+     "frame": {
+      "x": 321,
+      "y": 962,
+      "w": 28,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 22,
+      "h": 58
+     },
+     "frame": {
+      "x": 452,
+      "y": 634,
+      "w": 22,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 59
+     },
+     "frame": {
+      "x": 351,
+      "y": 830,
+      "w": 21,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 25,
+      "h": 58
+     },
+     "frame": {
+      "x": 389,
+      "y": 634,
+      "w": 25,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 1,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 212,
+      "y": 698,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 1,
+      "w": 23,
+      "h": 59
+     },
+     "frame": {
+      "x": 325,
+      "y": 570,
+      "w": 23,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 59
+     },
+     "frame": {
+      "x": 353,
+      "y": 765,
+      "w": 21,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 59
+     },
+     "frame": {
+      "x": 351,
+      "y": 830,
+      "w": 21,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 244,
+      "y": 661,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 1,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 265,
+      "y": 791,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 0,
+      "w": 25,
+      "h": 60
+     },
+     "frame": {
+      "x": 37,
+      "y": 777,
+      "w": 25,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 5,
+      "w": 22,
+      "h": 55
+     },
+     "frame": {
+      "x": 362,
+      "y": 509,
+      "w": 22,
+      "h": 55
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 23,
+      "h": 58
+     },
+     "frame": {
+      "x": 386,
+      "y": 381,
+      "w": 23,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 244,
+      "y": 661,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 1,
+      "w": 21,
+      "h": 60
+     },
+     "frame": {
+      "x": 184,
+      "y": 896,
+      "w": 21,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 25,
+      "h": 60
+     },
+     "frame": {
+      "x": 34,
+      "y": 911,
+      "w": 25,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 0,
+      "w": 26,
+      "h": 61
+     },
+     "frame": {
+      "x": 33,
+      "y": 710,
+      "w": 26,
+      "h": 61
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 4,
+      "w": 23,
+      "h": 57
+     },
+     "frame": {
+      "x": 489,
+      "y": 165,
+      "w": 23,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 1,
+      "w": 21,
+      "h": 60
+     },
+     "frame": {
+      "x": 211,
+      "y": 830,
+      "w": 21,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 1,
+      "w": 21,
+      "h": 60
+     },
+     "frame": {
+      "x": 184,
+      "y": 896,
+      "w": 21,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 60
+     },
+     "frame": {
+      "x": 156,
+      "y": 764,
+      "w": 22,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 11,
+      "y": 1,
+      "w": 32,
+      "h": 60
+     },
+     "frame": {
+      "x": 160,
+      "y": 228,
+      "w": 32,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 1,
+      "w": 31,
+      "h": 60
+     },
+     "frame": {
+      "x": 305,
+      "y": 195,
+      "w": 31,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 5,
+      "w": 31,
+      "h": 56
+     },
+     "frame": {
+      "x": 305,
+      "y": 325,
+      "w": 31,
+      "h": 56
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 1,
+      "w": 28,
+      "h": 60
+     },
+     "frame": {
+      "x": 34,
+      "y": 845,
+      "w": 28,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 60
+     },
+     "frame": {
+      "x": 156,
+      "y": 764,
+      "w": 22,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 403,
+      "y": 294,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 455,
+      "y": 957,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 25,
+      "h": 58
+     },
+     "frame": {
+      "x": 413,
+      "y": 570,
+      "w": 25,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 2,
+      "w": 30,
+      "h": 58
+     },
+     "frame": {
+      "x": 75,
+      "y": 374,
+      "w": 30,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 22,
+      "h": 58
+     },
+     "frame": {
+      "x": 476,
+      "y": 698,
+      "w": 22,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/swing/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 15,
+      "h": 58
+     },
+     "frame": {
+      "x": 403,
+      "y": 294,
+      "w": 15,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/e/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 2,
+      "w": 32,
+      "h": 57
+     },
+     "frame": {
+      "x": 158,
+      "y": 294,
+      "w": 32,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/e/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 28,
+      "h": 58
+     },
+     "frame": {
+      "x": 414,
+      "y": 765,
+      "w": 28,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/e/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 19,
+      "h": 58
+     },
+     "frame": {
+      "x": 604,
+      "y": 890,
+      "w": 19,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/e/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 20,
+      "h": 58
+     },
+     "frame": {
+      "x": 236,
+      "y": 271,
+      "w": 20,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/e/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 2,
+      "w": 32,
+      "h": 57
+     },
+     "frame": {
+      "x": 262,
+      "y": 311,
+      "w": 32,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/e/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 29,
+      "h": 57
+     },
+     "frame": {
+      "x": 430,
+      "y": 102,
+      "w": 29,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/e/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 19,
+      "h": 58
+     },
+     "frame": {
+      "x": 613,
+      "y": 954,
+      "w": 19,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/e/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 21,
+      "h": 58
+     },
+     "frame": {
+      "x": 593,
+      "y": 826,
+      "w": 21,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/n/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 25,
+      "h": 60
+     },
+     "frame": {
+      "x": 65,
+      "y": 911,
+      "w": 25,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/n/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 292,
+      "y": 856,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/n/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 416,
+      "y": 698,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/n/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 274,
+      "y": 660,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/n/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 2,
+      "w": 25,
+      "h": 60
+     },
+     "frame": {
+      "x": 65,
+      "y": 707,
+      "w": 25,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/n/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 274,
+      "y": 725,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/n/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 420,
+      "y": 634,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/n/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 295,
+      "y": 790,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/ne/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 1,
+      "w": 29,
+      "h": 59
+     },
+     "frame": {
+      "x": 109,
+      "y": 474,
+      "w": 29,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/ne/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 1,
+      "w": 26,
+      "h": 59
+     },
+     "frame": {
+      "x": 212,
+      "y": 763,
+      "w": 26,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/ne/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 59
+     },
+     "frame": {
+      "x": 388,
+      "y": 700,
+      "w": 22,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/ne/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 25,
+      "h": 60
+     },
+     "frame": {
+      "x": 73,
+      "y": 632,
+      "w": 25,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/ne/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 1,
+      "w": 29,
+      "h": 61
+     },
+     "frame": {
+      "x": 39,
+      "y": 410,
+      "w": 29,
+      "h": 61
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/ne/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 25,
+      "h": 61
+     },
+     "frame": {
+      "x": 231,
+      "y": 335,
+      "w": 25,
+      "h": 61
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/ne/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 59
+     },
+     "frame": {
+      "x": 333,
+      "y": 635,
+      "w": 22,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/ne/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 23,
+      "h": 58
+     },
+     "frame": {
+      "x": 394,
+      "y": 445,
+      "w": 23,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/nw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 1,
+      "w": 29,
+      "h": 61
+     },
+     "frame": {
+      "x": 3,
+      "y": 450,
+      "w": 29,
+      "h": 61
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/nw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 1,
+      "w": 25,
+      "h": 60
+     },
+     "frame": {
+      "x": 68,
+      "y": 773,
+      "w": 25,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/nw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 21,
+      "h": 59
+     },
+     "frame": {
+      "x": 351,
+      "y": 895,
+      "w": 21,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/nw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 58
+     },
+     "frame": {
+      "x": 478,
+      "y": 762,
+      "w": 22,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/nw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 1,
+      "w": 29,
+      "h": 59
+     },
+     "frame": {
+      "x": 73,
+      "y": 503,
+      "w": 29,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/nw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 1,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 488,
+      "y": 957,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/nw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 59
+     },
+     "frame": {
+      "x": 361,
+      "y": 635,
+      "w": 22,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/nw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 1,
+      "w": 25,
+      "h": 60
+     },
+     "frame": {
+      "x": 68,
+      "y": 839,
+      "w": 25,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/s/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 2,
+      "w": 25,
+      "h": 60
+     },
+     "frame": {
+      "x": 96,
+      "y": 905,
+      "w": 25,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/s/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 60
+     },
+     "frame": {
+      "x": 196,
+      "y": 632,
+      "w": 24,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/s/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 446,
+      "y": 698,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/s/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 295,
+      "y": 570,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/s/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 25,
+      "h": 60
+     },
+     "frame": {
+      "x": 96,
+      "y": 698,
+      "w": 25,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/s/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 60
+     },
+     "frame": {
+      "x": 143,
+      "y": 551,
+      "w": 24,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/s/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 58
+     },
+     "frame": {
+      "x": 448,
+      "y": 762,
+      "w": 24,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/s/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 24,
+      "h": 59
+     },
+     "frame": {
+      "x": 305,
+      "y": 505,
+      "w": 24,
+      "h": 59
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/se/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 2,
+      "w": 29,
+      "h": 60
+     },
+     "frame": {
+      "x": 196,
+      "y": 335,
+      "w": 29,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/se/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 25,
+      "h": 61
+     },
+     "frame": {
+      "x": 3,
+      "y": 845,
+      "w": 25,
+      "h": 61
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/se/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 22,
+      "y": 1,
+      "w": 21,
+      "h": 60
+     },
+     "frame": {
+      "x": 238,
+      "y": 830,
+      "w": 21,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/se/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 23,
+      "h": 58
+     },
+     "frame": {
+      "x": 423,
+      "y": 445,
+      "w": 23,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/se/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 73,
+      "y": 568,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/se/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 27,
+      "h": 58
+     },
+     "frame": {
+      "x": 521,
+      "y": 957,
+      "w": 27,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/se/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 58
+     },
+     "frame": {
+      "x": 504,
+      "y": 698,
+      "w": 22,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/se/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 25,
+      "h": 61
+     },
+     "frame": {
+      "x": 3,
+      "y": 912,
+      "w": 25,
+      "h": 61
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/sw/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 38,
+      "y": 606,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/sw/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 20,
+      "y": 2,
+      "w": 26,
+      "h": 57
+     },
+     "frame": {
+      "x": 424,
+      "y": 292,
+      "w": 26,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/sw/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 58
+     },
+     "frame": {
+      "x": 532,
+      "y": 698,
+      "w": 22,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/sw/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 25,
+      "h": 60
+     },
+     "frame": {
+      "x": 104,
+      "y": 632,
+      "w": 25,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/sw/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 16,
+      "y": 2,
+      "w": 29,
+      "h": 60
+     },
+     "frame": {
+      "x": 262,
+      "y": 374,
+      "w": 29,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/sw/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 2,
+      "w": 25,
+      "h": 60
+     },
+     "frame": {
+      "x": 135,
+      "y": 632,
+      "w": 25,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/sw/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 1,
+      "w": 22,
+      "h": 60
+     },
+     "frame": {
+      "x": 184,
+      "y": 764,
+      "w": 22,
+      "h": 60
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/sw/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 21,
+      "y": 2,
+      "w": 23,
+      "h": 58
+     },
+     "frame": {
+      "x": 444,
+      "y": 509,
+      "w": 23,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/w/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 32,
+      "h": 57
+     },
+     "frame": {
+      "x": 56,
+      "y": 245,
+      "w": 32,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/w/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 2,
+      "w": 28,
+      "h": 57
+     },
+     "frame": {
+      "x": 424,
+      "y": 229,
+      "w": 28,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/w/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 19,
+      "h": 57
+     },
+     "frame": {
+      "x": 518,
+      "y": 122,
+      "w": 19,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/w/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 23,
+      "y": 2,
+      "w": 20,
+      "h": 58
+     },
+     "frame": {
+      "x": 94,
+      "y": 245,
+      "w": 20,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/w/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 2,
+      "w": 32,
+      "h": 57
+     },
+     "frame": {
+      "x": 3,
+      "y": 258,
+      "w": 32,
+      "h": 57
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/w/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 19,
+      "y": 2,
+      "w": 29,
+      "h": 58
+     },
+     "frame": {
+      "x": 3,
+      "y": 646,
+      "w": 29,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/w/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 24,
+      "y": 2,
+      "w": 19,
+      "h": 58
+     },
+     "frame": {
+      "x": 638,
+      "y": 890,
+      "w": 19,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    },
+    {
+     "filename": "char/herbalist/walk/w/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 23,
+      "y": 2,
+      "w": 21,
+      "h": 58
+     },
+     "frame": {
+      "x": 586,
+      "y": 954,
+      "w": 21,
+      "h": 58
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.875
+     }
+    }
+   ]
+  }
+ ],
+ "meta": {
+  "app": "http://github.com/odrick/free-tex-packer-core",
+  "version": "0.3.9"
+ }
+}

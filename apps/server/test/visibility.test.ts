@@ -1,6 +1,7 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { Phase } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { avatarMemory } from '../src/sim/Avatars';
 import { enterScene } from '../src/sim/Portals';
 import { StatusBit } from '../src/sim/constants';
 import {
@@ -14,6 +15,7 @@ import {
   startParty,
   until,
 } from './flowHelpers';
+import { avatarsHeld } from './avatarHelpers';
 import { type Match, sleep, stateOf } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -22,13 +24,19 @@ beforeAll(async () => ({ colyseus, release } = await bootFlowServer()));
 afterAll(async () => release());
 beforeEach(async () => colyseus.cleanup());
 
-/** Ids whose presence this bot's client currently holds. */
-const seen = (m: Match, i: number): string[] => {
-  const out: string[] = [];
+/** The seats whose avatar this bot's client currently holds (its own excluded), by room memory's handle map. */
+const seen = (m: Match, i: number): string[] =>
+  avatarsHeld(m.bots[i]!)
+    .map((a) => avatarMemory(m.room).seatOf.get(a.handle) as string)
+    .filter((id) => id !== m.bots[i]!.id)
+    .sort();
+/** Whether any other seat's presence reached this bot (it never does: others are avatars). */
+const othersPresence = (m: Match, i: number): boolean => {
+  let any = false;
   stateOf(m.bots[i]!).players.forEach((p, id) => {
-    if (id !== m.bots[i]!.id && p.presence !== undefined) out.push(id);
+    if (id !== m.bots[i]!.id && p.presence !== undefined) any = true;
   });
-  return out.sort();
+  return any;
 };
 const ids = (m: Match, ...idx: number[]) => idx.map((i) => idOf(m, i)).sort();
 
@@ -38,6 +46,7 @@ describe('ghost visibility (A30)', () => {
     await skipPhase(m);
     await sleep(500);
     expect(seen(m, 0)).toEqual(ids(m, 1, 2, 3, 4));
+    for (const i of [0, 1, 2, 3, 4]) expect(othersPresence(m, i)).toBe(false);
     murder(m, 3);
     expect(await until(() => !seen(m, 0).includes(idOf(m, 3)))).toBe(true);
     for (const i of [0, 1, 2, 4])
@@ -49,28 +58,39 @@ describe('ghost visibility (A30)', () => {
     expect(seen(m, 0)).toEqual(ids(m, 1, 2));
   });
 
-  it("never shows a ghost's sceneId changing before the meeting", async () => {
+  it('no Player field carries a scene, and a ghost walking elsewhere moves nothing on the roster', async () => {
     const m = await startParty(colyseus, 4);
     await skipPhase(m);
-    const before = seat(m, 2).sceneId;
-    expect(before).toBe(0);
     murder(m, 2);
-    // The ghost walks into the tavern: the sim follows, the public roster does not.
+    const roster = () =>
+      [0, 1, 3].map((i) =>
+        JSON.stringify(
+          [0, 1, 2, 3].map((j) => {
+            const { priv: _p, presence: _r, ...row } = stateOf(m.bots[i]!).players.get(idOf(m, j))!.toJSON();
+            return row;
+          }),
+        ),
+      );
+    for (const i of [0, 1, 2, 3])
+      expect('sceneId' in stateOf(m.bots[i]!).players.get(idOf(m, 1))!.toJSON()).toBe(false);
+    const before = roster();
+    // The ghost walks into the tavern: the sim follows; no public field moves, and its own scene is its own.
     enterScene(m.room, seat(m, 2), sim(m, 2), 'tavern_bar', 'front', false);
     await sleep(400);
     expect(sim(m, 2).sceneIdx).not.toBe(0);
-    for (const i of [0, 1, 2, 3]) expect(stateOf(m.bots[i]!).players.get(idOf(m, 2))!.sceneId).toBe(before);
+    expect(stateOf(m.bots[2]!).players.get(idOf(m, 2))!.priv.sceneId).toBe(sim(m, 2).sceneIdx);
+    expect(roster()).toEqual(before);
     expect(seen(m, 0)).not.toContain(idOf(m, 2));
 
     await openMeeting(m, 1, 2);
     await sleep(300);
     for (const i of [0, 1, 2, 3]) expect(stateOf(m.bots[i]!).players.get(idOf(m, 2))!.alive).toBe(false);
-    expect(seat(m, 2).sceneId).toBe(0); // on the square with everyone, now public
+    expect(stateOf(m.bots[2]!).players.get(idOf(m, 2))!.priv.sceneId).toBe(0); // on the square with everyone
   });
 });
 
 describe('the meeting roster', () => {
-  it('encodes no presence while the meeting, the reveal and game over run', async () => {
+  it('encodes no avatar while the meeting, the reveal and game over run', async () => {
     const m = await startParty(colyseus, 4);
     await skipPhase(m);
     await sleep(400);
@@ -95,7 +115,6 @@ describe('the meeting roster', () => {
         connected: p.connected,
         ready: p.ready,
         hasVoted: p.hasVoted,
-        sceneId: p.sceneId,
       };
     };
     const killerBefore = roster(0);

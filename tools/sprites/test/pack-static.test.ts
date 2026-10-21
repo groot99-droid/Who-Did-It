@@ -1,7 +1,15 @@
 import { createCanvas } from '@napi-rs/canvas';
 import { describe, expect, it } from 'vitest';
-import { CLUE_KEYS, PROP_KEYS, VFX_CLIPS, staticFrameNames } from '../keys.ts';
-import { packStatic, staticAnims, type StaticManifest } from '../pack-static.ts';
+import { CLUE_KEYS, VFX_CLIPS, staticFrameNames } from '../keys.ts';
+import {
+  MAP_PROPS_FRAMES,
+  PROPS_FRAMES,
+  clueFrameNames,
+  expectedFrames,
+  packStatic,
+  staticAnims,
+  type StaticManifest,
+} from '../pack-static.ts';
 import type { MultiAtlas, PackInput } from '../pack.ts';
 import { clueFrames } from '../placeholder-world.ts';
 
@@ -14,9 +22,9 @@ function cell(size: number, base: [number, number], shade: string): Buffer {
   return c.toBuffer('image/png');
 }
 
-function sheet(atlas: StaticManifest['atlas'], size: number, pivot: boolean) {
+function sheet(atlas: 'clues' | 'props' | 'vfx', size: number, pivot: boolean) {
   const manifest: StaticManifest = { version: 1, atlas, frames: {} };
-  const inputs: PackInput[] = staticFrameNames(atlas).map((name, i) => {
+  const inputs: PackInput[] = expectedFrames(atlas).map((name, i) => {
     const base: [number, number] = [size / 2 + (i % 5), size - 20];
     manifest.frames[name] = { file: `${name}.png`, cell: size, ...(pivot ? { pivot: base } : {}) };
     return { name, png: cell(size, base, i % 2 ? '#B3121F' : '#6F7A8C') };
@@ -28,17 +36,21 @@ const atlasOf = (files: Map<string, Buffer>, key: string) =>
   JSON.parse(files.get(`${key}.json`)!.toString('utf8')) as MultiAtlas;
 
 describe('static keys', () => {
-  it('lists the SPRITES 8 keys, matching the placeholder clues', () => {
+  it('lists the SPRITES 8 clue keys and the glow triple, matching the placeholder clues', () => {
     expect(CLUE_KEYS).toHaveLength(21);
-    expect(new Set(CLUE_KEYS).size).toBe(21);
-    expect([...CLUE_KEYS].sort()).toEqual(
+    expect(clueFrameNames()).toHaveLength(24);
+    expect(clueFrameNames()).toEqual(expect.arrayContaining([...CLUE_KEYS, 'clue_footprint_m_glow']));
+    expect(clueFrameNames()).toEqual(
       clueFrames()
         .map((f) => f.name)
         .sort(),
     );
-    expect(PROP_KEYS).toContain('prop_lanternPost_lit');
-    expect(PROP_KEYS).toEqual(expect.arrayContaining(['prop_plate', 'prop_deadLoaf', 'prop_flour_sacks']));
-    expect(new Set(PROP_KEYS).size).toBe(PROP_KEYS.length);
+    expect(PROPS_FRAMES).toContain('prop_lanternPost_lit');
+    expect(PROPS_FRAMES.filter((f) => f.startsWith('portal_'))).toHaveLength(20);
+    expect(MAP_PROPS_FRAMES.props_hollowmere).toEqual(
+      expect.arrayContaining(['prop_plate', 'prop_deadLoaf', 'prop_flour_sacks', 'prop_bell']),
+    );
+    expect(new Set(PROPS_FRAMES).size).toBe(PROPS_FRAMES.length);
     expect(staticFrameNames('vfx')).toHaveLength(Object.values(VFX_CLIPS).reduce((a, b) => a + b, 0));
     expect(staticFrameNames('vfx')).toContain('vfx_vote_stamp/009');
   });
@@ -50,7 +62,7 @@ describe('packStatic', () => {
     const files = await packStatic(manifest, inputs);
     expect([...files.keys()].sort()).toEqual(['props-0.png', 'props.json']);
     const frames = atlasOf(files, 'props').textures.flatMap((t) => t.frames);
-    expect(frames.map((f) => f.filename)).toEqual([...PROP_KEYS].sort());
+    expect(frames.map((f) => f.filename)).toEqual([...PROPS_FRAMES].sort());
     for (const f of frames) {
       const want = manifest.frames[f.filename]!.pivot!;
       expect(f.trimmed).toBe(true);
@@ -86,8 +98,8 @@ describe('packStatic', () => {
 
   it('refuses a render that misses or adds a key', async () => {
     const { manifest, inputs } = sheet('props', 192, true);
-    const noBell = inputs.filter((i) => i.name !== 'prop_bell');
-    await expect(packStatic(manifest, noBell)).rejects.toThrow(/missing \[prop_bell\]/);
+    const noPump = inputs.filter((i) => i.name !== 'prop_pump');
+    await expect(packStatic(manifest, noPump)).rejects.toThrow(/missing \[prop_pump\]/);
     const extra = [...inputs, { name: 'prop_cart', png: inputs[0]!.png }];
     await expect(packStatic(manifest, extra)).rejects.toThrow(/unexpected \[prop_cart\]/);
   });

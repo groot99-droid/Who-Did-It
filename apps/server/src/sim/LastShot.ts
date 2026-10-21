@@ -72,9 +72,11 @@ function fire(room: PartyRoom, shooter: string, targetId: string): void {
   if (target && targetPlayer && !target.dead) {
     markDead(room, targetId, 'shot', shooter);
     if (isMeetingPhase(phase)) {
-      // No role is shown at a meeting's discussion or vote; the reveal announces the shot with the role.
+      // No role is shown at a meeting's discussion or vote. Only an ejected Gamekeeper's shot is announced, with the
+      // role, at its reveal (GDD 3.8); a knifed or poisoned one whose aim runs into a reveal kills unannounced, or
+      // the broadcast would name a death nobody has seen and the shooter's card.
       targetPlayer.alive = false;
-      if (phase === Phase.reveal) {
+      if (phase === Phase.reveal && nightOf(room).aims.get(shooter)?.cause === 'ejected') {
         room.broadcast(S2C.shot, { fromId: shooter, targetId, role: targetPlayer.priv.role.roleId });
       }
     } else if (isWorldPhase(phase) && target.placed && !isLoft(target.sceneIdx)) {
