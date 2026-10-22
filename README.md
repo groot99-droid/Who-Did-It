@@ -41,6 +41,22 @@ Art masters, studio notes and the Higgsfield generations library live in the own
 [Pipelines-Plugin](https://github.com/groot99-droid/Pipelines-Plugin); see `docs/ASSETS.md` 6.10.
 This repo's `.claude/settings.json` registers that marketplace and enables its `ui-design` plugin.
 
+## Owner-only admin page (Railway variables)
+
+The server can serve an admin room, where the owner watches an all-NPC match at up to 10x, signed in with GitHub. It is
+off unless every variable below is set on the server host (Railway: the service's Variables tab); the values are never
+written into this repo. There is no password: GitHub identifies the owner and the login allowlist decides.
+
+| Variable | Value |
+|---|---|
+| `WDI_ADMIN` | `1` |
+| `WDI_ADMIN_GITHUB_CLIENT_ID`, `WDI_ADMIN_GITHUB_CLIENT_SECRET` | from a GitHub OAuth app whose callback URL is `https://<railway host>/auth/github/callback` |
+| `WDI_ADMIN_GITHUB_LOGINS` | the allowed GitHub login, `groot99-droid` (comma-separated for more) |
+| `WDI_ADMIN_SECRET` | `openssl rand -base64 32`, run on your own machine |
+| `WDI_ADMIN_CLIENT_URL` | `https://groot99-droid.github.io/Who-Did-It/` |
+
+Unset any one of them and the room and both routes disappear. Details: [Architecture 5.11](docs/ARCHITECTURE.md).
+
 ## Documents
 
 - [Game design](docs/GDD.md), the only source of rules and numbers together with `balance.json`

@@ -2713,6 +2713,36 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6C (GitHub auth and AdminRoom)
 
+- PR 1 (`claude/r6-admin-server`): `services/adminAuth.ts` filled and pure. `adminConfig` is null unless `WDI_ADMIN=1`
+  and all five variables are set, the key is at least 32 characters and the client URL is http(s). The state and the
+  token are HMAC-SHA256 under the one key with a purpose prefix, so neither verifies as the other; `verifyAdminToken`
+  checks the allowlist again, so dropping a login from the variable locks it out within the token's life. Every
+  callback failure answers the same 403, and the callback is rate limited globally (20 burst) before it spends a
+  GitHub call. `adminAuth.test.ts`: 17 tests with a fake `fetch` and a fake `now`.
+- PR 2: `AdminRoom` and `sim/auto/AdminView.ts`. `onAuth` runs for create and every join: no config, a wrong build
+  or a token that does not verify (absent, forged, expired, off the allowlist) all throw the generic join error.
+  `onJoin` gives no seat and `client.view = createAdminView(room)`; the view holds every `Player` with the `presence`
+  and `priv` tags and every avatar with the `ghost` tag, topped up by `reconcileAdminView` on the shared 5 Hz pass. A
+  second client is refused; a leave or a drop disposes the room (no reconnection window). `isAdminClient` reads a
+  per-room mark that only `AdminRoom` sets, so it is false in every `party` room without `Visibility.ts` importing the
+  room. `adminRoom.test.ts` (8) and the gate test in `adminAuth.test.ts` (2) are one file each because a second
+  `boot` in one process resets its first request (UND_ERR_SOCKET).
+- PR 3: `rooms/handlers/admin.ts`, the per-tick feed in `sim/auto/AdminView.ts` and the docs. The four handlers
+  validate and push `setup`, `start`, `reset` and `clock` onto `autoOf(room).commands` (32 at most), refusing a bad
+  payload with a 422 and no change. `AdminRoom.setFixedTimestep` wraps the room's step: after it, `publishAdmin` sends the new invariant failures, the tick's events and `admin.snapshot`. The snapshot
+  reads the clock through `AdminView.ts` (inside `sim/auto/`, where `auto.test.ts` allows `clockOf(`). `coverOf` is
+  the card's own look, set only for a cover role whose public look differs. Failures are kept (200 at most) until
+  Reset. Docs: ARCHITECTURE 5.11, the README Railway notes, DECISIONS A85. Tests: 6 wire tests in
+  `adminRoom.test.ts`, one a todo (see the contract request below). Mutation check: without the drain step in
+  `stepsThisTick` the paused-Start test fails.
+- **Contract request to 6A** (also in the PR description): `stepsThisTick` returns 0 for a paused clock with no
+  `pendingSteps`, and `PartyRoom` then skips `step`, so `runAuto` never drains `autoOf(room).commands` while paused.
+  After `admin.reset` (which pauses) the next `start`, and the `paused: false` that would follow it, would wait for ever.
+  Answered by 6Z (6A is archived): `stepsThisTick(clock, lastTickMs, queuedCommands)` returns 1 for a paused clock with
+  queued commands and none pending (`PartyRoom` passes `autoOf(this).commands.length`); test in `auto.test.ts`; the
+  local stand-in `grantDrainStep` is gone. The admin feed subscribes per kind (`ADMIN_EVENT_KINDS`: kill death clue meeting vote eject phase start end; 6Z
+  declined the `ANY_SIM` switch) and forwards them as `admin.event`; the test in `adminRoom.test.ts` emits one and reads it on the wire.
+
 ### Round 6 log: 6D (admin client)
 
 ### Round 6 log: 6E (M5b content and GDD 3.14-3.16)
