@@ -12,6 +12,8 @@ export const C2S = {
   reportBody: 'act.reportBody',
   bell: 'act.bell',
   present: 'act.present',
+  /** Round 6 (M5b, GDD 3.15): light or put out the carried light; `sim/mobs/light.ts` (6G) handles it. */
+  light: 'act.light',
   vote: 'meeting.vote',
   say: 'chat.say',
   quick: 'chat.quick',
@@ -294,6 +296,8 @@ export interface C2SPayloads {
   'act.reportBody': { bodyId: string };
   'act.bell': Record<string, never>;
   'act.present': { entryId: string };
+  /** Round 6: `on` lights the carried Lantern or Torch, or puts it out; refused 422 without one. */
+  'act.light': { on: boolean };
   /** A living player's id, or `"skip"`; quick mode: another seat's id or `"pantry"`, never `"skip"`. Changeable until the vote closes (A30). */
   'meeting.vote': { targetId: string };
   'chat.say': { text: string };
@@ -431,6 +435,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.reportBody': 2,
   'act.bell': 2,
   'act.present': 2,
+  'act.light': 5,
   'meeting.vote': 2,
   'chat.say': 2,
   'chat.quick': 2,

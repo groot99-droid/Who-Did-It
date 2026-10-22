@@ -5,6 +5,7 @@ import { runAction } from '../Actions';
 import { type PlayerSim, simOf } from '../RoomSim';
 import { isLoft, sceneKey } from '../World';
 import { hubOf, mapScenesOf } from '../MapSites';
+import { fleeCreature } from '../mobs/flee';
 import { difficultyRow } from './difficulty';
 import type { Brain, NpcMemory } from './memory';
 import { playRng } from './memory';
@@ -231,6 +232,12 @@ export function runWorldNpc(
         return;
       }
     } else brain.striking = false;
+  }
+
+  // Round 6 (6G): a creature of this scene chasing the seat comes before any body (GDD 3.15).
+  if (fleeCreature(room, id, brain, p)) {
+    brain.mode = 'react';
+    return;
   }
 
   // A body it did not make: freeze, walk to it, report it after the difficulty row's delay. A Killer NPC too.

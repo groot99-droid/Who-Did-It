@@ -41,7 +41,7 @@ Bible's Book IV where it fits (the macro-economy itself is round 8, `bible-seams
   ticks; `gather` is a **hold action** (`C2S.hold { action: 'gather', targetId }`, `HoldAction` gains
   `'gather' | 'craft'`, pre-seeded) re-validated every tick like `collect` (`server/sim/Actions.ts`'s hold
   cases, 6F adds `gather` and `craft`). The wire is `SceneState.nodes: t.map(Node)` (pre-seeded schema,
-  `Node { id, x, y, resource, active, carriedTicks }`), public to the scene like props.
+  `Node { id, x, y, resource, active, respawnTick }`), public to the scene like props.
 - `server/sim/Inventory.ts`: `addStack(player, item, qty): boolean`, `take(player, item, qty): boolean`, five
   slots (`items.inventorySlots`), stacks for resources, one slot per tool. Tools from recipes are role-neutral:
   anyone may craft a lantern.

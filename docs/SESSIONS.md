@@ -2910,3 +2910,14 @@ session's goes back to it. Log under "Integration log, round 6".
   every other `errorsOf` read in the file already waited on the count. Verified with the file five times unloaded and five times under eight
   busy-loop processes on four cores, then `pnpm lint`, `pnpm typecheck` and `pnpm test`; the failure itself did not
   reproduce locally, on the unfixed file either. The night tests stay 5B's.
+- **6Z follow-up after 6G and 6H (2026-10-22).** The locked lines the wave-2 PRs requested, in one PR on the
+  orchestrator's branch: `act.light { on }` in `C2S` (`packages/shared/src/protocol`, rate 5/s) dispatched to
+  `handleLight` in `sim/mobs/light.ts` from `sim/Commands.ts`, with `docs/PROTOCOL.md` regenerated; the
+  `fleeCreature` line in `sim/npc/world.ts` `runWorldNpc` before the body reaction (6G's #59 request 2, which 6G's own
+  permission check refused on its locked file); `minigame` in `StreamName` (`sim/seeds.ts`) for 6H's puzzles, keyed by
+  seat; `priv.quests.clear()` in the `Win.ts` reset. `docs/round6/m5b-data.md` 2.1 now names `respawnTick` on the
+  wire `Node`, as 6F built it (#61). Open for the owner and 6P from the wave-2 PRs: the base has no station-task
+  layer (nothing assigns `Private.tasks`, nothing writes `taskBar`, `Win.ts` never checks it), so 6H's mini-games
+  are inert in a live match until an assignment session lands; ROADMAP M5b does not count station tasks as playable
+  before that. 6H switches its puzzle draw from the keyed `contract` stand-in to `seeds.get('minigame', seat)` and
+  drops its lobby clear once this merges.
