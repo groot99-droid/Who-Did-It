@@ -222,7 +222,9 @@ export class World extends Phaser.Scene {
       this.registry.set(REG_AUDIO, this.audio);
       void this.audio.load().then(() => this.audio.play('ambient'));
     }
-    this.cutscenes = new CutscenePlayer(this, overlayRoot(), this.audio);
+    this.cutscenes = new CutscenePlayer(this, overlayRoot(), this.audio, () =>
+      this.entities.objectOf(feed.selfId),
+    );
     this.lastPhase = feed.clock().phase;
 
     const input: InputController = this.registry.get(REG_INPUT) ?? new InputController(feed);

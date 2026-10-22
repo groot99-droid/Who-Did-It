@@ -2184,3 +2184,92 @@ button.wdi-map__option {
   padding: 0;
   list-style: none;
 }
+
+/* ---------------------------------------------------- Round 6 (6J): cutscenes (UI.md 14.20) */
+
+/* The HUD and the touch cluster stay out of a cutscene; the role chip alone comes back on the card slam. */
+body.wdi-cutscene-on .wdi-hud,
+body.wdi-cutscene-on .wdi-rolechip,
+body.wdi-cutscene-on .wdi-stick,
+body.wdi-cutscene-on .wdi-touch-btn {
+  visibility: hidden;
+}
+
+body.wdi-cutscene-slam .wdi-hud-chip {
+  visibility: visible;
+  animation: wdi-chip-slam 420ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+.wdi-cutscene {
+  position: fixed;
+  inset: 0;
+  z-index: var(--wdi-z-panel);
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  padding: var(--wdi-space-6) var(--wdi-space-4) calc(var(--wdi-space-6) + env(safe-area-inset-bottom));
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgb(var(--wdi-ink-rgb) / 0.85) 0, transparent 12%),
+    linear-gradient(to top, rgb(var(--wdi-ink-rgb) / 0.85) 0, transparent 28%);
+}
+
+.wdi-cutscene__skip {
+  position: absolute;
+  top: calc(var(--wdi-space-3) + env(safe-area-inset-top));
+  right: calc(var(--wdi-space-3) + env(safe-area-inset-right));
+  pointer-events: auto;
+}
+
+.wdi-caption {
+  max-width: min(44rem, 100%);
+  text-align: center;
+  color: var(--wdi-text);
+  text-shadow: 0 2px 6px rgb(var(--wdi-ink-rgb) / 0.9);
+  font-family: var(--wdi-font-text);
+  font-size: var(--wdi-text-lg);
+  line-height: 1.35;
+  opacity: 1;
+  transition: opacity 400ms ease;
+}
+
+.wdi-caption[hidden] {
+  display: none;
+}
+
+.wdi-caption--out {
+  opacity: 0;
+}
+
+.wdi-caption[data-style='title'] {
+  font-family: var(--wdi-font-display);
+  font-size: clamp(1.5rem, 5vw, 2.75rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wdi-caption[data-style='whisper'] {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+@keyframes wdi-chip-slam {
+  from {
+    transform: scale(2.2) rotate(-6deg);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-caption {
+    transition: none;
+  }
+
+  body.wdi-cutscene-slam .wdi-hud-chip {
+    animation: none;
+  }
+}

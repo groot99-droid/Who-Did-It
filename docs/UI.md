@@ -1037,6 +1037,25 @@ and, in the DOM-only quick-mode screens, at the bottom left. The pick is per pla
 
 Frozen test ids: `art-style` (the group), `art-style-<id>` (an option), `art-veil`, `art-notice`.
 
+### 14.20 Cutscenes (6J)
+
+Session 6J, round 6 (DECISIONS A92). `view/cutscene/CutscenePlayer.ts` plays a cutscene of
+`packages/content/data/cutscenes/` over the World scene; module `ui/copy/cutscenes.ts`. A caption is one line at the
+bottom of the screen, replaced by the next and faded out when its time is up (`data-style` `narrator`, `title` or
+`whisper`); a caption is at most 90 characters and a content id never carries text. The HUD, the role-card chip and the
+touch cluster are hidden while a cutscene plays (`body.wdi-cutscene-on`); the opening's `cardSlam` step brings only the
+role chip back, slamming in (`body.wdi-cutscene-slam`). Skip is a ghost button at the top right and the Escape key,
+present only when the cutscene is skippable. Reduce-motion turns camera moves into cuts and stops the fades.
+`?cutscene=0` plays none; `?cutscene=1` makes the mock Start send the HollowMere opening.
+
+| Id | Text | Notes |
+|---|---|---|
+| `cutscene.skip` | Skip | the button |
+| `cutscene.skip.label` | Skip the cutscene | its `aria-label` |
+| `cs.hollowmere.<line>` | the opening's captions | `title`, `seven`, `laid`, `own`, `train`, `dusk`, `end`, `vicar`, `letter`, `nobody`, `check`, `miss`; the Bible's Book I.1 trimmed |
+
+Frozen test ids: `cutscene` (the layer, with `data-cutscene`), `cutscene-caption`, `cutscene-skip`.
+
 ### 14.15 Looks and covers (5F)
 
 Session 5F, round 5. The lines of GDD 3.17 on the role card and the seat picker; `ui/copy/looks.ts` holds them as

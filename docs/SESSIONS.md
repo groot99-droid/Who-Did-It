@@ -2690,7 +2690,15 @@ session's goes back to it. Log under "Integration log, round 6".
   Blackpine two-step pan; `checkCutscenes` in `validate.ts` (kinds, maps, scenes, tiles, the opening against
   `openingS`, step kinds, main-track length against `maxS`); `balance.phases.openingS` 50; GDD 3.3 and 3.18 lines;
   DECISIONS A92; `apps/server/test/opening.test.ts` (broadcast and grace length through `beginPlay`). The five
-  death cutscenes and the caption copy land in PR 3. No contract request.
+  death cutscenes land in PR 3. No contract request.
+- **PR 2 (sequencer and player on the mock)** on `claude/r6-cutscenes-player`, stacked on PR 1: `sequencer.ts`
+  (`planTimeline`, `advance` with an optional `prevMs`, `cameraPose`, `ease`) with `sequencer.test.ts`; `Captions.ts`;
+  `CutscenePlayer.ts` (`playId`, `play`, a `followOf` constructor argument the one World.ts constructor line passes,
+  Esc and the Skip button, the hold on the HUD and the move input, the camera back on the own figure at the end);
+  `ui/copy/cutscenes.ts` with its test (every caption resolves, at most 90 characters); `?cutscene=0` in `devFlags.ts`;
+  the mock sends the opening at Start only under `?cutscene=1`, so the other mock specs reach the HUD at once;
+  the "Round 6 (6J)" block of `components.css`; UI.md 14.20; `e2e/cutscene.spec.ts` (caption, Skip, Esc). The e2e run
+  needs `pnpm --filter @wdi/shared build` and `@wdi/content build` first, as for every spec. No contract request.
 
 ### Round 6 log: 6K (loading, transitions, trailer, budgets)
 
