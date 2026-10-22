@@ -1,84 +1,16 @@
-import { balance, items, quests, scenes } from '@wdi/content';
-import { ErrorCode, ItemStack, Phase, QuestState, TILE_PX, type PlayerState } from '@wdi/shared';
+import { balance, quests, scenes } from '@wdi/content';
+import { ErrorCode, Phase, QuestState, TILE_PX, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { addStack, count, restore, snapshot, take } from './standInInventory';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isLoft, isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
 /**
  * Quests (round 6, M5b, GDD 3.16; docs/round6/m5b-data.md 2.3): givers are scene statics; `quest.accept` and
  * `quest.turnIn` go through the command queue; the own `Private.quests` holds the state; rewards go through
- * `sim/Inventory.ts`. A `contract` quest (round 7) refuses. Session 6H.
+ * `sim/Inventory.ts` (until 6F lands, its stand-in `sim/standInInventory.ts`). A `contract` quest (round 7) refuses.
+ * Session 6H.
  */
-
-// ---- Stand-in for 6F's `sim/Inventory.ts` (same names). Delete this block and import `addStack` and `take` from
-// './Inventory' when 6F lands; nothing below depends on the stand-in's body. ----
-
-const stackLimit = (defId: string): number =>
-  items.items[defId]?.kind === 'material' ? balance.resources.stackMax : 1;
-
-/** How many of `defId` the seat carries. */
-function count(player: PlayerState, defId: string): number {
-  let n = 0;
-  for (const s of player.priv.inventory.slots) if (s.defId === defId) n += s.qty;
-  return n;
-}
-
-/** Adds `qty` of `defId`, topping up stacks first; false (and nothing added) when it does not fit. */
-function addStack(player: PlayerState, defId: string, qty: number): boolean {
-  const slots = player.priv.inventory.slots;
-  const limit = stackLimit(defId);
-  let room = 0;
-  for (const s of slots) if (s.defId === defId) room += Math.max(0, limit - s.qty);
-  const free = Math.max(0, items.inventorySlots - slots.length);
-  if (room + free * limit < qty) return false;
-  let left = qty;
-  for (const s of slots) {
-    if (s.defId !== defId || left === 0) continue;
-    const put = Math.min(left, limit - s.qty);
-    s.qty += put;
-    left -= put;
-  }
-  while (left > 0) {
-    const put = Math.min(left, limit);
-    const stack = new ItemStack();
-    stack.defId = defId;
-    stack.qty = put;
-    slots.push(stack);
-    left -= put;
-  }
-  return true;
-}
-
-/** Removes `qty` of `defId`; false (and nothing removed) when the seat carries fewer. */
-function take(player: PlayerState, defId: string, qty: number): boolean {
-  if (count(player, defId) < qty) return false;
-  const slots = player.priv.inventory.slots;
-  let left = qty;
-  for (let i = slots.length - 1; i >= 0 && left > 0; i--) {
-    const s = slots[i]!;
-    if (s.defId !== defId) continue;
-    const out = Math.min(left, s.qty);
-    s.qty -= out;
-    left -= out;
-    if (s.qty === 0) slots.splice(i, 1);
-  }
-  return true;
-}
-
-/** The slots as plain rows, to put back if a turn-in cannot finish. */
-const snapshot = (player: PlayerState): { defId: string; qty: number }[] =>
-  player.priv.inventory.slots.map((s) => ({ defId: s.defId, qty: s.qty }));
-
-function restore(player: PlayerState, rows: { defId: string; qty: number }[]): void {
-  const slots = player.priv.inventory.slots;
-  slots.clear();
-  for (const r of rows) {
-    const stack = new ItemStack();
-    stack.defId = r.defId;
-    stack.qty = r.qty;
-    slots.push(stack);
-  }
-}
 
 // ---- Quests ----
 
