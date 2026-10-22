@@ -1,0 +1,125 @@
+import { readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+import musicJson from '@wdi/content/data/music.json';
+import { MAP_IDS, MUSIC_CLASSES, ONUB_MUSIC_CLASSES } from '@wdi/content';
+import { Phase } from '@wdi/shared';
+import { MusicConductor, mainClassFor, onubClassFor, onubPlaylistFor, playlistFor } from './MusicDirector';
+import { parseMusicManifest } from './MusicBus';
+
+function rig(map = 'hollowmere', mode: 'main' | 'onub' = 'main') {
+  const calls: Array<string | null> = [];
+  const prefetched: string[] = [];
+  const c = new MusicConductor({
+    crossfadeTo: (id) => void calls.push(id),
+    prefetch: (id) => void prefetched.push(id),
+  });
+  c.lobby(map, mode);
+  calls.length = 0;
+  prefetched.length = 0;
+  return { c, calls, prefetched };
+}
+
+describe('music.json and the committed manifest', () => {
+  const manifest = parseMusicManifest(
+    JSON.parse(
+      readFileSync(new URL('../../public/assets/audio/music/manifest.json', import.meta.url), 'utf8'),
+    ),
+  );
+  const ids = new Set(manifest.playlists.map((p) => p.id));
+
+  it('names only playlists the manifest declares', () => {
+    const used = [
+      ...Object.values(musicJson.byMap).flatMap((m) => Object.values(m)),
+      ...Object.values(musicJson.onub),
+    ];
+    expect(used.length).toBeGreaterThan(0);
+    for (const id of used) expect(ids, id).toContain(id);
+  });
+
+  it('maps every class of every map and every quick-mode class', () => {
+    for (const m of MAP_IDS)
+      for (const c of MUSIC_CLASSES) expect(playlistFor(m, c), `${m}/${c}`).not.toBeNull();
+    for (const c of ONUB_MUSIC_CLASSES) expect(onubPlaylistFor(c), c).not.toBeNull();
+  });
+
+  it('lists only tracks that exist, and playlist ids once', () => {
+    const keys = new Set(manifest.tracks.map((t) => t.key));
+    for (const p of manifest.playlists) for (const k of p.tracks) expect(keys, `${p.id}/${k}`).toContain(k);
+    expect(ids.size).toBe(manifest.playlists.length);
+  });
+});
+
+describe('phase to class', () => {
+  it('holds the loading piece through the role card and grace', () => {
+    expect(mainClassFor(Phase.roleReveal)).toBeUndefined();
+    expect(mainClassFor(Phase.grace)).toBeUndefined();
+    expect(mainClassFor(Phase.day)).toBe('day');
+  });
+
+  it('puts every meeting phase on the meeting class', () => {
+    for (const p of [Phase.meetingDiscussion, Phase.meetingVote, Phase.reveal, Phase.immunity])
+      expect(mainClassFor(p)).toBe('meeting');
+  });
+
+  it('maps the quick mode to its four classes', () => {
+    expect(onubClassFor(Phase.dusk)).toBe('kitchen');
+    expect(onubClassFor(Phase.night)).toBe('night');
+    expect(onubClassFor(Phase.meetingDiscussion)).toBe('rush');
+    expect(onubClassFor(Phase.gameOver)).toBe('over');
+  });
+});
+
+describe('MusicConductor', () => {
+  it('plays the lobby playlist and warms the day theme when the map is picked', () => {
+    const { c, calls, prefetched } = rig('hollowmere');
+    c.lobby('blackpine', 'main');
+    expect(calls).toEqual([playlistFor('blackpine', 'lobby')]);
+    expect(prefetched).toEqual([playlistFor('blackpine', 'day')]);
+  });
+
+  it('follows the phases of the chosen map', () => {
+    const { c, calls } = rig('blackpine');
+    c.phase(Phase.day);
+    c.phase(Phase.dusk);
+    c.phase(Phase.night);
+    c.phase(Phase.meetingDiscussion);
+    expect(calls).toEqual(['day', 'dusk', 'night', 'meeting'].map((k) => playlistFor('blackpine', k)));
+  });
+
+  it('keeps the loading piece through the role card', () => {
+    const { c, calls } = rig();
+    c.phase(Phase.roleReveal);
+    c.phase(Phase.grace);
+    expect(calls).toEqual([]);
+  });
+
+  it('does not switch to the lobby class when the roster changes mid-match', () => {
+    const { c, calls } = rig();
+    c.phase(Phase.day);
+    calls.length = 0;
+    c.lobby('hollowmere', 'main');
+    expect(calls).toEqual([]);
+  });
+
+  it('returns to the lobby class after the game is over and goes silent when the room is left', () => {
+    const { c, calls } = rig();
+    c.phase(Phase.day);
+    c.gameOver();
+    c.lobby('hollowmere', 'main');
+    c.left();
+    expect(calls).toEqual([
+      playlistFor('hollowmere', 'day'),
+      playlistFor('hollowmere', 'gameOver'),
+      playlistFor('hollowmere', 'lobby'),
+      null,
+    ]);
+  });
+
+  it('plays the quick mode classes in the quick mode', () => {
+    const { c, calls } = rig('hollowmere', 'onub');
+    c.phase(Phase.dusk);
+    c.phase(Phase.night);
+    c.phase(Phase.dawn);
+    expect(calls).toEqual(['kitchen', 'night', 'rush'].map((k) => onubPlaylistFor(k as 'kitchen')));
+  });
+});

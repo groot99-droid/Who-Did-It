@@ -2694,6 +2694,12 @@ session's goes back to it. Log under "Integration log, round 6".
   `narr_bed_hollowmere` and `sting_*` keys, `ui/SettingsPanel.ts` with `ui/copy/settings.ts`, the "Round 6 (6L)" CSS
   block, UI.md 14.22, and the empty `audio/music/manifest.json` shape. The sound library's release is not up, so no
   bed is fetched yet. The `narr_*` and `sting_*` keys are the ones `media.md` 4 names; 6N adds the files and rows.
+- **PR 2 (2026-10-22): director and mapping.** `view/MusicDirector.ts` (a pure `MusicConductor` driven by the lobby,
+  `phaseChange`, `gameOver` and `left` events; the meeting and the quick mode's four classes come from the phase, so
+  no Kitchen or Night scene needs a call), `music.json` filled for both maps and the quick mode, the manifest's
+  playlist slots declared with no tracks yet, a test that every id `music.json` names is a playlist of the committed
+  manifest, and the GDD 3.18 music paragraph. `playlistFor(map, class)` is exported for 6K: its `LoadingScreen` calls
+  `musicBus.crossfadeTo(playlistFor(mapId, 'loading'))`; a stand-in until it lands is that one line.
 
 ### Round 6 log: 6M (M5b art)
 

@@ -1,4 +1,125 @@
 {
   "tracks": [],
-  "playlists": []
+  "playlists": [
+    {
+      "id": "lobby",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "trailer",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "hollowmere_loading",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "hollowmere_day",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "hollowmere_dusk",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "hollowmere_night",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "hollowmere_meeting",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "hollowmere_finalnight",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "hollowmere_gameover",
+      "tracks": [],
+      "crossfadeS": 3,
+      "shuffle": false
+    },
+    {
+      "id": "blackpine_loading",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "blackpine_day",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "blackpine_dusk",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "blackpine_night",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "blackpine_meeting",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "blackpine_finalnight",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "blackpine_gameover",
+      "tracks": [],
+      "crossfadeS": 3,
+      "shuffle": false
+    },
+    {
+      "id": "onub_kitchen",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "onub_night",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "onub_rush",
+      "tracks": [],
+      "crossfadeS": 2,
+      "shuffle": false
+    },
+    {
+      "id": "onub_over",
+      "tracks": [],
+      "crossfadeS": 3,
+      "shuffle": false
+    }
+  ]
 }
