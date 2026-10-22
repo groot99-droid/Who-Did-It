@@ -2625,7 +2625,20 @@ session's goes back to it. Log under "Integration log, round 6".
   `.claude/settings.json` (`autoCompactWindow` 400000) here and in ROSW, with the `render-pipeline` Kinds line
   there. DECISIONS A80 had been taken by the art-style switch (5N) while this round was planned, so the round's
   rows start at A81.
-- **Pre-seed.** Pending; `seams.md` 1 says "pending" on every row until a step lands.
+- **Pre-seed (2026-10-22), six commits on the same branch and PR**, each green on `pnpm lint && pnpm typecheck &&
+  pnpm test`: f83f419 the wire and schema (`seams.md` 1.1); 128ab5d the content stubs (1.2); b04fc0c the server
+  stubs and locked call sites (1.3); bc21222 the client stubs and mount lines (1.4); e9fee71 `tools/auto` and the
+  harness stubs (1.5); 9ede8c8 the `soak.yml` `auto` job (1.5). The branch rule of this session allowed one
+  branch, so the steps are commits of PR #47 rather than six PRs; `seams.md` 1 now reads as landed, with line
+  numbers. Two deviations from the plan text, recorded in the documents: `transition(kind, ms, then)` takes a
+  callback and runs it synchronously at 0 ms, so the router tests keep their timing; the `nodes` and `mobs`
+  streams already existed in `sim/seeds.ts`, so only `contract` and `events` were added. Nothing the code at
+  a60d855 reads was removed or made required; the one baseline flake seen (`impersonate.test.ts`, a 120 ms sleep
+  under load) passed on every clean run.
+- **For the sessions**: `adminConfig` returns null and `AdminRoom` is unregistered, so no admin surface exists until
+  6C; the quest and mini-game commands and the gather and craft holds refuse 422 until 6F and 6H; the Step stages
+  `runAuto`, `runResources`, `runMobs`, `runQuests` and `runEvents` are no-ops; every new content record is
+  empty; `pnpm auto` exits 2 with its usage.
 
 ### Round 6 log: 6A (time scale, auto mode, headless harness, CLI)
 

@@ -76,8 +76,9 @@ round-8 content (BlackPine ships a two-step camera pan with no narrator in round
   `client/ui/copy/tips.ts` (no role tells: tips describe controls and the world, never a role's powers).
   Mounted in `Preload.ts` (pre-seeded line) and in the match preloads (the map's manifests on Start).
 - **`client/view/Transition.ts`** (pre-seeded no-op, 6K fills): a full-screen DOM layer with `fade`, `iris`
-  and `wipe`; `transition(kind, ms): Promise<void>` resolves on `transitionend` with a timeout fallback, and
-  runs 0 ms under `prefers-reduced-motion`. `worldRouter.ts` wraps its three `scene.start`s (pre-seeded calls:
+  and `wipe`; `transition(kind, ms, then)` runs `then` on `transitionend` or a timeout fallback, synchronously
+  when `ms` is 0 (the pre-seeded value, and every duration under `prefers-reduced-motion`), so the router's
+  scene starts keep their timing until 6K sets the seconds. `worldRouter.ts` wraps its three `scene.start`s (pre-seeded calls:
   `sceneEnter` fade, `meetingStart` iris, `gameOver` wipe at `worldRouter.ts:75`, `:86`, `:96`). Durations
   in `balance.json ui.transitionS { fade, iris, wipe }` (pre-seeded zeros; 6K sets them with the GDD 3.13
   line). `World.ts`'s own camera `fadeIn` stays (6K does not touch it).
