@@ -345,7 +345,7 @@ export class World extends Phaser.Scene {
     const darkness = darknessOf(clock.phase, clock.phaseEndsTick - clock.tick);
     this.hud.setPhase(PHASE_LABEL[clock.phase] ?? '', darkness >= 1);
     this.watchPhase(clock.phase);
-    this.refreshGhost();
+    if (!this.cutscenes.playing) this.refreshGhost();
 
     const clues = feed.clues();
     const bodies = feed.bodies();
