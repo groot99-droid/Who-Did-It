@@ -40,7 +40,7 @@ function named beside each one is the anchor.
 | `resources.json`, `recipes.json`, `mobs.json`, `quests.json`, `minigames.json`, each an empty record, and `schemas/m5b.ts` (`Resource`, `Recipe`, `MobDef`, `QuestNpc`, `Quest`, `MinigameDef` and their files) | the same | landed |
 | `vendettas.json`, `evolutions.json`, `laws.json`, `events.json`, each an empty record with `gddRef` `"3"`, and `schemas/bible.ts` (`Vendetta`, `Evolution`, `LawStage`, `WorldEvent` and their files) | the same | landed |
 | `parseContent`, `Content`, the `content` export and `validateContent` carry the twelve files; `checkM5b(c, err)` (`validate.ts:258`, called at `:244`) checks only the record keys until 6E, 6J and 6L fill it | `content/src/index.ts`, `validate.ts` | landed |
-| `balance.phases.openingS = 0`, `balance.vision.lanternTiles = 0`, `balance.npc.stuckInvariantS = 20`, `balance.resources { poolActiveFrac: 0.5, gatherHoldS: 2 }`, `balance.mobs { maxPerScene: 3, chaseS: 6 }`, `balance.quests { maxActive: 2 }`, `balance.ui.transitionS { fade: 0, iris: 0, wipe: 0 }` (placeholders 6E, 6J, 6K and 6A tune, with their GDD lines) | `content/data/balance.json`, `schemas/balance.ts` | landed |
+| `balance.phases.openingS = 0`, `balance.vision.lanternTiles = 0`, `balance.npc.stuckInvariantS = 20`, `balance.resources { poolActiveFrac: 0.5, stackMax: 5 }` (6E replaced the pre-seeded `gatherHoldS`: each resource carries its own `gatherS`), `balance.mobs { maxPerScene: 3, chaseS: 6 }`, `balance.quests { maxActive: 2 }`, `balance.ui.transitionS { fade: 0, iris: 0, wipe: 0 }` (placeholders 6E, 6J, 6K and 6A tune, with their GDD lines) | `content/data/balance.json`, `schemas/balance.ts` | landed |
 
 ### 1.3 Server (step 3)
 
