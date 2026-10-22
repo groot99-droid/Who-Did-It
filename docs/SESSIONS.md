@@ -2691,6 +2691,26 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6B (event bus and invariants)
 
+- **Three steps on one branch and one draft PR (2026-10-22)**, as 6A did, each commit green on `pnpm lint && pnpm
+  typecheck && pnpm test`: (1) `sim/events/bus.ts` delivers (`ANY_SIM` added), `sim/auto/log.ts` keeps the match's
+  events and `logHash`, the emitters in `Kill.ts`, `Death.ts`, `Clues.ts` and `Meeting.ts`, and the bus tests of
+  `invariants.test.ts`; (2) the seven invariants in `sim/auto/invariants.ts` with `guardStep`, each tested firing on a
+  constructed failure and quiet on clean rooms; (3) `tools/auto/checks`, `tools/auto/report`, the `soak.yml` `auto`
+  leg (guard off, difficulty in the matrix, `--seed` from the run number), DECISIONS A84 and this entry. `log.ts` moved
+  from step 3 to step 1 because the bus delivers into it and `killClues` reads it.
+- **Emitters.** `phase`, `start` and `end` come from the bus watching the phase, so `Phases.ts` and `Win.ts` carry no
+  emitter and the match log's `event: 'auto'` line is written by `log.ts` at an auto room's `end` (DECISIONS A84). The
+  four one-line calls for the orchestrator to confirm: `Kill.ts` before `markDead`, `Death.ts markDead` after the death
+  is queued, `Clues.ts spawnClue` after the clue is set, and `Meeting.ts` in `openMeeting`, `handleVote`, `startReveal`
+  and the quick-mode `outs` loop.
+- **Measured.** 36 probe auto matches (both maps, both modes, three difficulties, 4, 7 and 10 seats) ran with no
+  failure; the main-mode ones had 2 to 4 kills each, so `killClues` runs on real kills; `logHash` and the `auto` line
+  replay identically for the same seeds and seat ids.
+- **For 6A and 6C** (contract requests in the PR): `run.ts` gains `import './checks'`; `AutoResult` can carry
+  `logHash(room)` beside `digest`, read before the room is disconnected; the admin room sends `admin.event` from an
+  `onSim(room, ANY_SIM, ...)` listener and dedupes `admin.invariant` (the pure checks repeat while the state holds;
+  `npcStuck`, `step` and `killClues` report each incident once).
+
 ### Round 6 log: 6C (GitHub auth and AdminRoom)
 
 ### Round 6 log: 6D (admin client)
