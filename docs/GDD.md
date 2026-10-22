@@ -74,7 +74,7 @@ The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 star
 |---|---|---|
 | Lobby | Leader creates party; Start with >= 1 human (NPCs fill to 4, 3.12) | – |
 | Role reveal | Server deals the deck and the traits; cover roles pick a look (3.17) | 20 s, then 3-2-1 |
-| Grace | Spawn spread around the hub (3.13); kills disabled; guided clue | 30 s |
+| Grace | Spawn spread around the hub (3.13); kills disabled; guided clue; the map's opening cutscene plays inside it (3.18) | 30 s, plus `phases.openingS` (50 s) when the map has an opening |
 | Day | Free roam; light radius 7 tiles; the Knife is sheathed | 60 s |
 | Dusk | Vignette, "Night falls in 10 s"; the Knife, Impersonate and the night powers wake; missing-person check | 10 s |
 | Night | Light radius 3.5 tiles; wolves active; the hunt | 100 s |
@@ -524,6 +524,8 @@ Round 6 (ROADMAP M5b); the data fields were pre-seeded in round 5 (3.13). The co
 ### 3.18 Cinematics and music
 
 Round 6 (ROADMAP M5c). Cutscenes are data (`packages/content/data/cutscenes/`) played in-engine: the opening of a map runs inside grace, which `phases.openingS` lengthens for it, and adds no phase; a death plays the cutscene of its cause before the ghost handoff; every cutscene can be skipped, and reduce-motion turns its camera moves into cuts. Music follows the phase class of the map (`music.json`), is loaded after Start under its own budget (ASSETS 6.8) and is never sent by the server. The contract is `docs/round6/cutscene-music.md`; 6J writes the cutscene paragraphs and 6L the music paragraphs here, and the seconds live in `balance.json` (`phases.openingS`, `ui.transitionS`).
+
+**Cutscene openings (6J).** `cutscenes.json` maps each map to an opening cutscene. At the start of grace the server broadcasts `cutscene { id }` to every seat and adds `phases.openingS` to grace; it adds no phase and never waits for a client, so the NPCs walk and the clock runs while the camera pans. HollowMere's opening is a 50 s pan over the square with a narrator caption track ending on the role chip slamming in; Blackpine's is a 12 s two-step pan with no narrator. `openingS` is one number for every map, and every opening is at most that long (the content check enforces it), so a shorter opening leaves the rest of the lengthened grace to play. A seat can skip an opening with Esc or the Skip button and sees the world under the remaining grace.
 
 ### 3.19 Admin auto-mode
 

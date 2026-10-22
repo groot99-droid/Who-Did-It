@@ -129,7 +129,7 @@ All fifteen open questions were closed on 2026-10-10 in the decisions round (A18
 | A89 | Reserved for session 6G (round 6) | |
 | A90 | Reserved for session 6H (round 6) | |
 | A91 | Reserved for session 6I (round 6) | |
-| A92 | Reserved for session 6J (round 6) | |
+| A92 | Cutscene data and timing (Session 6J, 2026-10-22) | Cutscenes stay in the one pre-seeded `cutscenes.json` (index plus a `cutscenes` record), not one file each. `phases.openingS` is one number for every map (50 s, HollowMere's opening); a content check keeps every opening at most that long. A timeline step without `withPrevious` starts when the last such step ended; a `withPrevious` step starts with the entry before it; `hold` and `video` run to `maxS`. Cutscene ids are camelCase because content ids are (`openingHollowmere`). |
 | A93 | Reserved for session 6K (round 6) | |
 | A94 | Reserved for session 6L (round 6) | |
 | A95 | Reserved for session 6M (round 6) | |

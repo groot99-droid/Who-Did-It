@@ -78,7 +78,7 @@ export const BalanceFile = z.strictObject({
     roleRevealS: Seconds,
     countdownS: Seconds,
     graceS: Seconds,
-    /** Round 6 (GDD 3.18): the opening cutscene's seconds, added to grace at `beginPlay`; 0 until Session 6J. */
+    /** Round 6 (GDD 3.18): the opening cutscene's seconds, added to grace at `beginPlay` when the map has an opening. */
     openingS: Seconds,
     dayS: Seconds,
     duskS: Seconds,

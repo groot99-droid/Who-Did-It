@@ -2684,6 +2684,14 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6J (cutscenes)
 
+- **PR 1 (schema, index, rules, server lines, `openingS`)** on `claude/r6-cutscenes`: `rules/cutscenes.ts` bodies with
+  `shared/test/cutscenes.test.ts`; `cutscenes.json` holds the HollowMere opening (50 s, 12 captions by copy id
+  `cs.hollowmere.*`, a five-leg camera pan over the overworld, `storm`, `narr_bed_hollowmere` and `bell`) and the
+  Blackpine two-step pan; `checkCutscenes` in `validate.ts` (kinds, maps, scenes, tiles, the opening against
+  `openingS`, step kinds, main-track length against `maxS`); `balance.phases.openingS` 50; GDD 3.3 and 3.18 lines;
+  DECISIONS A92; `apps/server/test/opening.test.ts` (broadcast and grace length through `beginPlay`). The five
+  death cutscenes and the caption copy land in PR 3. No contract request.
+
 ### Round 6 log: 6K (loading, transitions, trailer, budgets)
 
 ### Round 6 log: 6L (music)
