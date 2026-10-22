@@ -52,4 +52,12 @@ describe('readFlags', () => {
     expect(readFlags('', '#/admin').admin).toBe(true);
     expect(readFlags('', '#/lobby/K7M2P').admin).toBe(false);
   });
+
+  it('reads the admin route with the GitHub callback token in its hash', () => {
+    const f = readFlags('', '#/admin?token=abc');
+    expect(f.admin).toBe(true);
+    expect(f.joinCode).toBeNull();
+    expect(f.resumeCode).toBeNull();
+    expect(readFlags('', '#/adminx').admin).toBe(false);
+  });
 });

@@ -41,7 +41,7 @@ export function readFlags(search: string, hash: string): Flags {
     onub: params.get('onub') === '1',
     joinCode: route[0] === 'join' ? code : null,
     resumeCode: route[0] === 'lobby' ? code : null,
-    admin: route[0] === 'admin',
+    admin: route[0]?.split('?')[0] === 'admin',
   };
 }
 

@@ -107,12 +107,22 @@ test('without a token the live page offers the GitHub sign-in', async ({ page })
   await expect(page.getByTestId('admin-signin')).toBeVisible();
 });
 
-// Blocked by a contract request: `readFlags` takes `admin?token=...` for the route name, so the callback URL never starts
-// the Admin scene (flags/index.ts is locked; the fix is `route[0]?.split('?')[0] === 'admin'`). Un-fixme with that line.
-test.fixme('a callback token moves to session storage and leaves the hash', async ({ page }) => {
+test('a callback token moves to session storage and leaves the hash', async ({ page }) => {
+  // No admin server runs here, so the join is refused and the page clears the token again; record the write.
+  await page.addInitScript(() => {
+    const w = window as unknown as { __wdiStored: string[] };
+    w.__wdiStored = [];
+    const set = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (k: string, v: string) {
+      if (k === 'wdi:adminToken') w.__wdiStored.push(v);
+      return set.call(this, k, v);
+    };
+  });
   await page.goto('/Who-Did-It/#/admin?token=abc.def');
   await expect.poll(() => page.evaluate(() => location.hash)).toBe('#/admin');
-  expect(await page.evaluate(() => sessionStorage.getItem('wdi:adminToken'))).toBe('abc.def');
+  expect(await page.evaluate(() => (window as unknown as { __wdiStored: string[] }).__wdiStored)).toEqual([
+    'abc.def',
+  ]);
 });
 
 test.describe('live room (opt-in)', () => {
