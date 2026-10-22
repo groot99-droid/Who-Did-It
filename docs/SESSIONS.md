@@ -2741,11 +2741,13 @@ session's goes back to it. Log under "Integration log, round 6".
   their copy; `playDeath` stashes the id under `REG_CUTSCENE` when the World is asleep (a vote's ejection) so the rebuilt
   World plays it; `CutscenePlayer.playing`; the mock kills a `?cutscene=1&ghost=1` seat once the World first reads the
   feed; `kill.test.ts` pins `cutsceneId`; `cutscene.spec.ts` covers the death cutscene, Skip and the ghost handoff; GDD
-  3.18 death paragraph. **Contract request (orchestrator, `World.ts`)**: `World.update` calls `this.refreshGhost()` every
-  frame, so a seat turns ghost as soon as the server says it is dead, while its death cutscene is still playing and the
-  HUD (with the "You are a ghost" toast) is held back. To make the handoff wait for the cutscene, guard that call:
-  `if (!this.cutscenes.playing) this.refreshGhost();` (`playing` is in this PR). Until then the ghost view starts under
-  the cutscene and the toast has about a second left when the HUD returns.
+  3.18 death paragraph. The ghost handoff guard (`if (!this.cutscenes.playing) this.refreshGhost();` in `World.update`) is in this PR: the
+  orchestrator ruled it a World.ts play hook inside 6J's Owns.
+- **Also in PR 2 (answered contract request)**: the first line of `World.ts` `preload()` is
+  `mountMatchLoadingScreen(this, overlayRoot(), this.matchMap())`, added after #51 merged.
+- **Done.** PR 1 (#52) is merged; PRs 2 and 3 (#55, #57) are retargeted by the orchestrator. Every PR was green on
+  `pnpm lint && pnpm typecheck && pnpm test` before each push. Open items: none from 6J; the Port-au-Levain opening
+  and the memorial video are round-7 content.
 
 ### Round 6 log: 6K (loading, transitions, trailer, budgets)
 
