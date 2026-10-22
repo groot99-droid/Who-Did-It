@@ -1089,9 +1089,10 @@ a `role="region"` `wdi-m5b__panel` with a Close button, redrawn each tick from t
 high controls.
 
 **Prompt.** A chip (`m5b-prompt`) shows for the nearest thing in reach: a node (`prompt.gather`, or
-`prompt.gather.tool` when a tool is missing) or a giver (`prompt.giver`, key `T`). `G` held (or the chip tapped, a
+`prompt.gather.tool` when a tool is missing) or a giver (`prompt.giver`). `E` held (or the chip tapped, a
 toggle on touch) starts the hold, which sends `act.hold` and shows a progress bar; releasing, moving away or Esc
-stops it with `toast.gather.cancel`. `T` opens the quest log at the giver. A toast (`m5b-toast`, `aria-live="polite"`)
+stops it with `toast.gather.cancel`. `E` at a giver (or `T`) opens the quest log. E falls through to the clue, body, bell and door verbs when no node or
+giver is in reach. A toast (`m5b-toast`, `aria-live="polite"`)
 reports a gather, a craft or a quest for a few seconds.
 
 **Panels.** Pockets lists the stacks with the slot count and, for a light in the pocket, a Light / Douse button
@@ -1102,7 +1103,7 @@ third quest shows `quest.full`.
 
 **Mini-game modal.** `view/minigames/MinigameModal.ts` opens on `S2C.minigameStart` as `role="dialog"` over the world
 (test id `minigame`, `data-kind`, `data-state` play, sent). The ONUB widget of the kind draws in the stage
-(`minigame-stage`); the player's play is reduced to the answer the server checks. After the kind's `assistS` a
+(`minigame-stage`); the widget's `answer()` is the record the server replays, and the Done control sends the server's assist answer. After the kind's `assistS` a
 `mini.assist` button appears (`minigame-assist`), and `mini.cancel` (`minigame-cancel`) steps away at any time. A Cabal
 seat's fake task runs the same board; the wire carries no fake flag, so `mini.fake` titles the dialog only where a
 fixture passes `fake`.
@@ -1112,67 +1113,67 @@ Frozen test ids: `m5b`, `m5b-inv`, `m5b-craft`, `m5b-quests`, `m5b-prompt`, `m5b
 `quest-<id>` (`data-state` offer, taken, done), `quest-accept-<id>`, `quest-turnin-<id>`, `quest-close`, `minigame`,
 `minigame-stage`, `minigame-assist`, `minigame-cancel`, `minigame-status`.
 
-| Id | Text |
-|---|---|
-| `prompt.gather` | Hold G: gather {what} |
-| `prompt.gather.tool` | Needs a {tool} to gather {what} |
-| `prompt.gather.cancel` | Release to stop |
-| `prompt.giver` | Press T: speak to {name} |
-| `toast.gather.cancel` | You stopped gathering. |
-| `toast.craft.cancel` | You stopped crafting. |
-| `toast.gather.done` | Gathered {what}. |
-| `toast.craft.done` | Made {what}. |
-| `toast.quest.taken` | Quest taken: {title} |
-| `toast.quest.done` | Quest done: {title} |
-| `inv.title` | Pockets |
-| `inv.key` | I |
-| `inv.empty` | Nothing in your pockets. |
-| `inv.slots` | {n} of {max} slots |
-| `inv.light.on` | Light |
-| `inv.light.off` | Douse |
-| `inv.close` | Close |
-| `craft.title` | Craft |
-| `craft.key` | C |
-| `craft.station` | At the {station} |
-| `craft.anywhere` | Anywhere |
-| `craft.make` | Make |
-| `craft.stop` | Stop |
-| `craft.need` | Needs {list} |
-| `craft.ready` | Ready to make |
-| `craft.close` | Close |
-| `quest.title` | Quests |
-| `quest.key` | J |
-| `quest.none` | Nobody here has work for you. |
-| `quest.giver` | From {name} |
-| `quest.wants` | Wants {list} |
-| `quest.reward` | Pays {list} |
-| `quest.accept` | Take the work |
-| `quest.turnin` | Hand it in |
-| `quest.taken` | Taken |
-| `quest.done` | Done |
-| `quest.progress` | {have} of {total} |
-| `quest.full` | Your hands are full of work. |
-| `quest.close` | Close |
-| `quest.here` | Here |
-| `quest.log` | Your work |
-| `quest.caulkTheSkiff` | The skiff leaks. Bring me resin and a plank of timber and I will lend you a lantern. |
-| `quest.caulkTheSkiff.done` | Tight as a drum. Mind the dark with that. |
-| `quest.mollsHerbs` | Four sprigs of herb, dear. The fog is in everyone's chest. |
-| `quest.mollsHerbs.done` | There. A bandage for your trouble. |
-| `quest.mollsMushrooms` | Three mushrooms from the deep wood, and I will pay in salts. |
-| `quest.mollsMushrooms.done` | Sharp eyes. Take the salts. |
-| `quest.stackTheYard` | Four lengths of timber for the yard stack, and the crowbar is yours. |
-| `quest.stackTheYard.done` | Square as a church. Pry carefully. |
-| `quest.smithsOre` | Three tin ore from the seam. I will make you a lantern for it. |
-| `quest.smithsOre.done` | Good ore. This burns bright. |
-| `quest.colliersStone` | Three good stones for the clamp, and take a torch with you. |
-| `quest.colliersStone.done` | It will hold. Keep that torch up. |
-| `mini.title` | The work |
-| `mini.fake` | A show of work |
-| `mini.assist` | Done |
-| `mini.assist.hint` | Stuck? Finish up. |
-| `mini.cancel` | Step away |
-| `mini.sent` | Checking your work... |
+| Id                          | Text                                                                                 |
+| --------------------------- | ------------------------------------------------------------------------------------ |
+| `prompt.gather`             | Hold E: gather {what}                                                                |
+| `prompt.gather.tool`        | Needs a {tool} to gather {what}                                                      |
+| `prompt.gather.cancel`      | Release to stop                                                                      |
+| `prompt.giver`              | Press E: speak to {name}                                                             |
+| `toast.gather.cancel`       | You stopped gathering.                                                               |
+| `toast.craft.cancel`        | You stopped crafting.                                                                |
+| `toast.gather.done`         | Gathered {what}.                                                                     |
+| `toast.craft.done`          | Made {what}.                                                                         |
+| `toast.quest.taken`         | Quest taken: {title}                                                                 |
+| `toast.quest.done`          | Quest done: {title}                                                                  |
+| `inv.title`                 | Pockets                                                                              |
+| `inv.key`                   | I                                                                                    |
+| `inv.empty`                 | Nothing in your pockets.                                                             |
+| `inv.slots`                 | {n} of {max} slots                                                                   |
+| `inv.light.on`              | Light                                                                                |
+| `inv.light.off`             | Douse                                                                                |
+| `inv.close`                 | Close                                                                                |
+| `craft.title`               | Craft                                                                                |
+| `craft.key`                 | C                                                                                    |
+| `craft.station`             | At the {station}                                                                     |
+| `craft.anywhere`            | Anywhere                                                                             |
+| `craft.make`                | Make                                                                                 |
+| `craft.stop`                | Stop                                                                                 |
+| `craft.need`                | Needs {list}                                                                         |
+| `craft.ready`               | Ready to make                                                                        |
+| `craft.close`               | Close                                                                                |
+| `quest.title`               | Quests                                                                               |
+| `quest.key`                 | J                                                                                    |
+| `quest.none`                | Nobody here has work for you.                                                        |
+| `quest.giver`               | From {name}                                                                          |
+| `quest.wants`               | Wants {list}                                                                         |
+| `quest.reward`              | Pays {list}                                                                          |
+| `quest.accept`              | Take the work                                                                        |
+| `quest.turnin`              | Hand it in                                                                           |
+| `quest.taken`               | Taken                                                                                |
+| `quest.done`                | Done                                                                                 |
+| `quest.progress`            | {have} of {total}                                                                    |
+| `quest.full`                | Your hands are full of work.                                                         |
+| `quest.close`               | Close                                                                                |
+| `quest.here`                | Here                                                                                 |
+| `quest.log`                 | Your work                                                                            |
+| `quest.caulkTheSkiff`       | The skiff leaks. Bring me resin and a plank of timber and I will lend you a lantern. |
+| `quest.caulkTheSkiff.done`  | Tight as a drum. Mind the dark with that.                                            |
+| `quest.mollsHerbs`          | Four sprigs of herb, dear. The fog is in everyone's chest.                           |
+| `quest.mollsHerbs.done`     | There. A bandage for your trouble.                                                   |
+| `quest.mollsMushrooms`      | Three mushrooms from the deep wood, and I will pay in salts.                         |
+| `quest.mollsMushrooms.done` | Sharp eyes. Take the salts.                                                          |
+| `quest.stackTheYard`        | Four lengths of timber for the yard stack, and the crowbar is yours.                 |
+| `quest.stackTheYard.done`   | Square as a church. Pry carefully.                                                   |
+| `quest.smithsOre`           | Three tin ore from the seam. I will make you a lantern for it.                       |
+| `quest.smithsOre.done`      | Good ore. This burns bright.                                                         |
+| `quest.colliersStone`       | Three good stones for the clamp, and take a torch with you.                          |
+| `quest.colliersStone.done`  | It will hold. Keep that torch up.                                                    |
+| `mini.title`                | The work                                                                             |
+| `mini.fake`                 | A show of work                                                                       |
+| `mini.assist`               | Done                                                                                 |
+| `mini.assist.hint`          | Stuck? Finish up.                                                                    |
+| `mini.cancel`               | Step away                                                                            |
+| `mini.sent`                 | Checking your work...                                                                |
 
 ### 14.15 Looks and covers (5F)
 

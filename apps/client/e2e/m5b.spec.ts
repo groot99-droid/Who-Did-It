@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 // Round 6 (6I) on the ?mock=1 world feed: `?m5b=1` stands the own seat beside the overworld's quest giver with a
-// spade and a kit of nodes at spread distances (the nearest-node prompt walks them in order). The run gathers, crafts a lantern, takes the giver's quest and
+// spade and a kit of nodes at spread distances (the nearest-node prompt walks them in order); E gathers. The run gathers, crafts a lantern, takes the giver's quest and
 // turns it in; a second test opens each mini-game board through the `?minigame=` hook.
 
 async function toWorld(page: Page, query: string) {
@@ -21,15 +21,18 @@ async function pockets(page: Page) {
 }
 
 /**
- * Taps the prompt chip (a toggle that starts the hold on the nearest node) until the pockets hold `qty` of `item`.
- * The kit's nodes sit at spread distances, so the nearest one is next in the order the run needs them.
+ * Holds E (the layer takes it for the nearest node) until the pockets hold `qty` of `item`. The kit's nodes sit at
+ * spread distances, so the nearest one is next in the order the run needs them.
  */
 async function gather(page: Page, item: string, qty: number) {
   await pockets(page);
   await expect(async () => {
-    const prompt = page.getByTestId('m5b-prompt');
-    if (await prompt.isVisible()) await prompt.click();
-    await expect(page.getByTestId(`inventory-item-${item}`)).toContainText(String(qty), { timeout: 9000 });
+    await page.keyboard.down('KeyE');
+    try {
+      await expect(page.getByTestId(`inventory-item-${item}`)).toContainText(String(qty), { timeout: 9000 });
+    } finally {
+      await page.keyboard.up('KeyE');
+    }
   }).toPass({ timeout: 40_000 });
 }
 
@@ -74,4 +77,13 @@ test('opens a mini-game board and judges the answer', async ({ page }) => {
   await expect(page.getByTestId('minigame-stage')).toBeVisible();
   await page.getByTestId('minigame-cancel').click();
   await expect(page.getByTestId('minigame')).toHaveCount(0);
+});
+
+test('E falls through to the World verbs when no node or giver is in reach', async ({ page }) => {
+  await toWorld(page, '');
+  await expect(page.getByTestId('m5b')).toBeVisible();
+  await expect(page.getByTestId('m5b-prompt')).toBeHidden();
+  await page.keyboard.press('KeyE');
+  await expect(page.getByText('Nothing to use here')).toBeVisible();
+  await expect(page.getByTestId('m5b-toast')).toBeHidden();
 });

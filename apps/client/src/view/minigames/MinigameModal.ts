@@ -2,7 +2,7 @@ import onubBalance from '@wdi/content/data/balance.onub.json';
 import { M5B_COPY as C } from '../../ui/copy/m5b';
 import { h } from '../../ui/dom';
 import { MINIGAMES, type MiniGame, type MiniGameFactory, type MiniGameSpec } from '../onub/StationView';
-import { answerOf, bandRng, type MinigameAnswer } from './answers';
+import { bandRng } from './board';
 import type { MinigameKind } from '@wdi/shared/protocol';
 
 export interface MinigameOpen {
@@ -26,13 +26,13 @@ const specOf = (kind: MinigameKind): MiniGameSpec =>
 
 /**
  * The main-mode station mini-game as a DOM modal (UI.md 14.19.6): the ONUB widget of `kind` inside a dialog, fed the
- * server's board, with the assist control after `assistS` and a way to step away. When the widget reports done the
+ * server's board (`bandRng`, `steps`, `holdS`), with the assist control after `assistS` and a way to step away. When the widget reports done the
  * modal sends the answer once through `send` and closes. `factory` is a seam for tests; it defaults to the ONUB widget.
  */
 export function openMinigame(
   parent: HTMLElement,
   open: MinigameOpen,
-  send: (taskId: string, answer: MinigameAnswer) => void,
+  send: (taskId: string, answer: unknown) => void,
   onClose: () => void,
   now: () => number = () => performance.now(),
   factory: MiniGameFactory | undefined = MINIGAMES[open.kind],
@@ -78,12 +78,13 @@ export function openMinigame(
 
   let widget: MiniGame | null = null;
   let finished = false;
-  const finish = () => {
+  const finish = (assisted = false) => {
     if (finished) return;
     finished = true;
     root.dataset.state = 'sent';
     status.textContent = C['mini.sent'];
-    send(open.taskId, answerOf(open.kind, open.public));
+    // The Done control is the server's assist answer (GDD 3.16); a played board sends what the player did.
+    send(open.taskId, assisted ? { assist: true } : (widget?.answer?.() ?? null));
     window.setTimeout(close, 400);
   };
   const close = () => {
@@ -98,13 +99,15 @@ export function openMinigame(
       root: stage,
       spec: specOf(open.kind),
       rng: bandRng(open.kind, open.public),
-      onDone: finish,
+      steps: (open.public as { steps?: number }).steps,
+      holdS: (open.public as { holdS?: number }).holdS,
+      onDone: () => finish(),
     });
   const born = now();
   const timer = window.setInterval(() => {
     assist.hidden = (now() - born) / 1000 < open.assistS || finished;
   }, 500);
-  assist.addEventListener('click', finish);
+  assist.addEventListener('click', () => finish(true));
   cancel.addEventListener('click', () => {
     if (!finished) close();
   });

@@ -2,8 +2,23 @@ import { describe, expect, it } from 'vitest';
 import { TILE_PX } from '@wdi/shared/constants';
 import { recipeRows } from './Crafting';
 import { itemList, itemName, stacksOf } from './Inventory';
-import { nearest, promptFor } from './M5bLayer';
+import { nearest, promptFor, takesUse } from './M5bLayer';
 import { questRows } from './QuestLog';
+
+describe('takesUse (E)', () => {
+  const node = { kind: 'node', id: 'n', resource: 'timber', x: 0, y: 0 } as const;
+  const giver = { kind: 'giver', npc: 'moll', x: 0, y: 0 } as const;
+  it('takes a press for a node or a giver in reach, and falls through when nothing is in reach', () => {
+    expect(takesUse(true, node, null)).toBe(true);
+    expect(takesUse(true, giver, null)).toBe(true);
+    expect(takesUse(true, null, null)).toBe(false);
+  });
+  it('takes a release only to end a gather, so a clue hold keeps its own release', () => {
+    expect(takesUse(false, null, 'gather')).toBe(true);
+    expect(takesUse(false, node, 'craft')).toBe(false);
+    expect(takesUse(false, null, null)).toBe(false);
+  });
+});
 
 describe('Inventory helpers', () => {
   it('drops empty slots and names items from the content', () => {
@@ -84,9 +99,9 @@ describe('hold prompt targets', () => {
   it('asks for the tool a resource needs before it offers the gather', () => {
     const node = { kind: 'node', id: 'n', resource: 'tinOre', x: 0, y: 0 } as const;
     expect(promptFor(node, () => false)).toBe('Needs a Spade to gather Tin Ore');
-    expect(promptFor(node, () => true)).toBe('Hold G: gather Tin Ore');
+    expect(promptFor(node, () => true)).toBe('Hold E: gather Tin Ore');
     expect(promptFor({ kind: 'giver', npc: 'moll', x: 0, y: 0 }, () => true)).toBe(
-      'Press T: speak to Mother Moll',
+      'Press E: speak to Mother Moll',
     );
     expect(promptFor(null, () => true)).toBeNull();
   });

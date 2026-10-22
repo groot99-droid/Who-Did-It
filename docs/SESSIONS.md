@@ -2783,20 +2783,20 @@ session's goes back to it. Log under "Integration log, round 6".
 ### Round 6 log: 6I (M5b client)
 
 - **Steps on one branch and one draft PR (`claude/r6-m5b-client`, 2026-10-22)**, each commit green on `pnpm lint &&
-  pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock and Colyseus readers
+pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock and Colyseus readers
   (`net/mock/m5bMock.ts`, `net/worldColyseus.ts`, `view/{NodeView,MobView,GiverView,m5bFrames}.ts`); (2) the pockets,
   crafting and quest panels, the prompt layer, the mini-game modal, copy and CSS; (3) `e2e/m5b.spec.ts`, UI.md 14.19,
   this log and DECISIONS A91.
-- **Contract requests (for the orchestrator)**, each with a local stand-in:
-  (a) `WorldFeed` gains `inventory()`, `questAccept(id)`, `questTurnIn(id)` and `light(on)` (locked file `net/world.ts`).
-  Stand-in: `net/m5b.ts` defines `M5bFeed`, `asM5b(feed)` narrows a feed to it, and both `ColyseusWorldFeed` and the mock
-  implement it. When the members move into `WorldFeed`, `asM5b` becomes a cast-free pass-through.
-  (b) `World.ts` constructs the M5b layer directly (`mountM5bLayer`) and routes E through it. Stand-in: `NodeView` mounts
-  the layer from its constructor and the layer owns its own G, T, I, C, J and Esc keys.
-  (c) The ONUB widgets of `view/onub/minigames/` expose their `answer()`. Stand-in: `view/minigames/answers.ts` rebuilds
-  the server board from the `public` payload through the same rng bands and synthesizes an answer that
-  `checkMinigame` accepts, so the modal does not read the widget's state. This is a known limitation: a widget that
-  grows a different internal solution would need the real hook.
+- **Contract requests, granted by 6Z on #67 and done in the PR, so no stand-in lands**: (a) `WorldFeed` gained
+  `inventory()`, `questAccept(id)`, `questTurnIn(id)` and `light(on)` with `StackSnap` beside the other snaps in
+  `net/world.ts`; the Colyseus feed and the mock implement them and `net/m5b.ts` is deleted. (b) `World.ts` constructs
+  `mountM5bLayer` beside the three views, destroys it with them and routes E (keyboard and touch) through `useKey`: the
+  layer takes E for a node or a giver in reach (`takesUse`), and the clue, body, bell and door verbs run as before when
+  it does not. `NodeView` no longer mounts the layer. (c) The four ONUB widgets gained `answer()` (what the player did:
+  crates placed and the stop, each pour's hold, the slots in order, the stoke's taps) and `host.steps`/`host.holdS`,
+  so a board with extra difficulty steps is played at the server's size; `view/minigames/answers.ts` is deleted and
+  `board.ts` keeps only `bandRng`, which feeds a widget the server's bands. The Done control sends the server's
+  `{assist: true}` answer.
 - **Gap, for the owner**: the base has no main-mode task layer (see 6H), so `S2C.minigameStart` never fires in a live
   match. The modal is exercised from the mock, the `?minigame=<kind>` hook and fixtures; the live path waits on the
   task layer, which this session did not build.

@@ -8,7 +8,6 @@ import { TILE_PX } from '@wdi/shared/constants';
 import { generateMinigame, mulberry32, checkMinigame, type MinigameBases } from '@wdi/shared/rules';
 import type { MinigameKind } from '@wdi/shared/protocol';
 import type Phaser from 'phaser';
-import { asM5b, type M5bFeed } from '../net/m5b';
 import { REG_WORLD, type NodeSnap, type WorldFeed } from '../net/world';
 import { StatusBit } from '../view/animIds';
 import { openMinigame, type MinigameModal } from '../view/minigames/MinigameModal';
@@ -45,8 +44,17 @@ interface Hold {
   sig: string;
 }
 
+/**
+ * Whether the layer takes E: a press when a node or a giver is in reach, a release only to end a gather. Everything
+ * else (clues, bodies, the bell, doors, an empty spot) falls through to the World's own verbs.
+ */
+export function takesUse(down: boolean, target: Target | null, holding: 'gather' | 'craft' | null): boolean {
+  return down ? target !== null : holding === 'gather';
+}
+
 export interface M5bLayer {
-  tick(nodes: readonly NodeSnap[]): void;
+  /** E pressed or released; true when the layer took the key (a node or a giver in reach, or a gather to end). */
+  use(down: boolean): boolean;
   destroy(): void;
 }
 
@@ -100,17 +108,14 @@ export function devBoard(kind: MinigameKind, seed = 7) {
 }
 
 /**
- * Round 6, Session 6I: the DOM half of M5b on top of the World. `scenes/World.ts` is locked to constructing the three
- * views, so `NodeView` mounts this: it owns the pockets (I), crafting (C) and quest (J, or T at a giver) panels, the
- * hold prompt for gathering (hold G, or tap the prompt) and for crafting, and the mini-game modal opened by
- * `S2C.minigameStart`. CONTRACT REQUEST: `World.ts` constructs this directly and routes E to it; nothing else changes.
- * It reads the feed through `asM5b`; a feed without the M5b members gets no layer.
+ * Round 6, Session 6I: the DOM half of M5b on top of the World. `scenes/World.ts` constructs it beside the three views
+ * and routes E to `use`: it owns the pockets (I), crafting (C) and quest (J, or T at a giver) panels, the hold prompt
+ * for gathering (hold E, or tap the prompt), the crafting hold, and the mini-game modal opened by
+ * `S2C.minigameStart`. It follows the scene's own update, so nothing else in the World calls it.
  */
 export function mountM5bLayer(scene: Phaser.Scene, parent: HTMLElement = overlayRoot()): M5bLayer | null {
-  const base = scene.registry.get(REG_WORLD) as WorldFeed | undefined;
-  const feed = base ? asM5b(base) : null;
-  if (!base || !feed) return null;
-  return new Layer(scene, feed, parent);
+  const feed = scene.registry.get(REG_WORLD) as WorldFeed | undefined;
+  return feed ? new Layer(scene, feed, parent) : null;
 }
 
 class Layer implements M5bLayer {
@@ -134,10 +139,13 @@ class Layer implements M5bLayer {
 
   constructor(
     scene: Phaser.Scene,
-    private readonly feed: WorldFeed & M5bFeed,
+    private readonly feed: WorldFeed,
     parent: HTMLElement,
   ) {
     this.sceneId = (scene as unknown as { sceneId?: string }).sceneId ?? '';
+    const onUpdate = () => this.tick(feed.nodes());
+    scene.events.on('update', onUpdate);
+    this.offs.push(() => scene.events.off('update', onUpdate));
     this.bar = h('i', {});
     this.prompt = h(
       'button',
@@ -184,7 +192,7 @@ class Layer implements M5bLayer {
       accept: (id) => feed.questAccept(id),
       turnIn: (id) => feed.questTurnIn(id),
     });
-    this.prompt.addEventListener('click', () => this.use(true, true));
+    this.prompt.addEventListener('click', () => this.press(true, true));
 
     const keyDown = (e: KeyboardEvent) => this.onKey(e, true);
     const keyUp = (e: KeyboardEvent) => this.onKey(e, false);
@@ -284,17 +292,26 @@ class Layer implements M5bLayer {
       case 'KeyT':
         if (down && this.target?.kind === 'giver') this.questLog.open();
         break;
-      case 'KeyG':
-        this.use(down, false);
-        break;
       case 'Escape':
         if (down) for (const p of [this.inv, this.craft, this.questLog]) p.close();
         break;
     }
   }
 
-  /** G (or the prompt) pressed or released: start a gather on the node in reach, or stop the hold. */
-  private use(down: boolean, toggle: boolean): void {
+  /**
+   * E pressed or released. True when the layer took the key (a node or a giver in reach, or a gather hold to end); false
+   * lets the World act on clues, bodies, the bell and doors as before.
+   */
+  use(down: boolean): boolean {
+    if (this.gone || this.asleep || this.root.hidden) return false;
+    if (!takesUse(down, this.target, this.hold?.action ?? null)) return false;
+    if (down) this.press(true, false);
+    else this.cancelHold(true, 'gather');
+    return true;
+  }
+
+  /** E or the prompt pressed or released: start a gather on the node in reach, or stop the hold. */
+  private press(down: boolean, toggle: boolean): void {
     const t = this.target;
     if (t?.kind === 'giver') {
       if (down) this.questLog.open();
@@ -377,7 +394,7 @@ class Layer implements M5bLayer {
     this.toastUntil = performance.now() + 2500;
   }
 
-  tick(nodes: readonly NodeSnap[]): void {
+  private tick(nodes: readonly NodeSnap[]): void {
     if (this.gone) return;
     const clock = this.feed.clock();
     const live = WORLD_PHASES.has(clock.phase) && !this.feed.dead() && !this.asleep;

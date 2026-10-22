@@ -5,7 +5,7 @@ import recipesJson from '@wdi/content/data/recipes.json';
 import resourcesJson from '@wdi/content/data/resources.json';
 import { TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { HoldAction } from '@wdi/shared/protocol';
-import type { StackSnap } from '../m5b';
+import type { StackSnap } from '../world';
 import type { MobSnap, NodeSnap, QuestSnap } from '../world';
 
 // The mock's half of M5b (round 6, 6I): nodes, gathering, crafting, quests and one wandering creature, with the

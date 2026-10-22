@@ -21,10 +21,15 @@ export interface MiniGameHost {
   rng: () => number;
   /** The mini-game is done: the hand opens. Calling it twice is harmless. */
   onDone(): void;
+  /** The server's board size where it differs from the station's base (`minigames.json` difficulty adds steps). */
+  steps?: number | undefined;
+  holdS?: number | undefined;
 }
 
 export interface MiniGame {
   destroy(): void;
+  /** What the player did, in the record `checkMinigame` replays (main mode); read once `onDone` has fired. */
+  answer?(): unknown;
 }
 
 export type MiniGameFactory = (host: MiniGameHost) => MiniGame;

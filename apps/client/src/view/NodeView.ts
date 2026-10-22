@@ -2,7 +2,6 @@ import type Phaser from 'phaser';
 import metrics from '@wdi/content/data/metrics.json';
 import { toScreen } from '@wdi/shared/iso';
 import type { NodeSnap } from '../net/world';
-import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
 import { BIAS, depthAt } from './iso';
 import { nodeFrame } from './m5bFrames';
 
@@ -16,17 +15,11 @@ interface Drawn {
 
 /**
  * Round 6, Session 6I (docs/round6/m5b-data.md 3): draws the scene's resource nodes from the world feed, one sprite
- * each, ready or spent. A frame the atlas lacks draws a greybox disc, so a scene is playable without art. It also
- * mounts the M5b layer (`ui/M5bLayer.ts`: pockets, crafting, quests, the hold prompts and the mini-game modal), because
- * `scenes/World.ts` constructs only these three views; the layer follows this view's `update` and `destroy`.
+ * each, ready or spent. A frame the atlas lacks draws a greybox disc, so a scene is playable without art.
  */
 export class NodeView {
   private readonly drawn = new Map<string, Drawn>();
-  private readonly layer: M5bLayer | null;
-
-  constructor(private readonly scene: Phaser.Scene) {
-    this.layer = mountM5bLayer(scene);
-  }
+  constructor(private readonly scene: Phaser.Scene) {}
 
   get count(): number {
     return this.drawn.size;
@@ -52,7 +45,6 @@ export class NodeView {
       d.obj.destroy();
       this.drawn.delete(id);
     }
-    this.layer?.tick(items);
   }
 
   private frame(key: string): boolean {
@@ -86,6 +78,5 @@ export class NodeView {
   destroy(): void {
     for (const d of this.drawn.values()) d.obj.destroy();
     this.drawn.clear();
-    this.layer?.destroy();
   }
 }

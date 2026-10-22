@@ -3,10 +3,10 @@
 // `quest.<id>.done`, the thanks). A screen reads its lines from here, never from a literal.
 export const M5B_COPY = {
   // 14.19.1 Hold prompts (beside the Hold E clue prompt of 14.1)
-  'prompt.gather': 'Hold G: gather {what}',
+  'prompt.gather': 'Hold E: gather {what}',
   'prompt.gather.tool': 'Needs a {tool} to gather {what}',
   'prompt.gather.cancel': 'Release to stop',
-  'prompt.giver': 'Press T: speak to {name}',
+  'prompt.giver': 'Press E: speak to {name}',
   'toast.gather.cancel': 'You stopped gathering.',
   'toast.craft.cancel': 'You stopped crafting.',
   'toast.gather.done': 'Gathered {what}.',

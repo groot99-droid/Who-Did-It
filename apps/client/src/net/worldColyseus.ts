@@ -18,8 +18,8 @@ import type {
   MobSnap,
   NodeSnap,
   QuestSnap,
+  StackSnap,
 } from './world';
-import type { M5bFeed, StackSnap } from './m5b';
 
 // Reads the live room. The state is the shared schema of @wdi/shared; the client keeps loose structural
 // types here so it does not pull the schema runtime into the bundle.
@@ -73,7 +73,7 @@ interface GameStateLike {
   settings?: { mode?: number };
 }
 
-export class ColyseusWorldFeed implements WorldFeed, M5bFeed {
+export class ColyseusWorldFeed implements WorldFeed {
   readonly bus: Emitter<WorldFeedEvents> = mitt<WorldFeedEvents>();
 
   constructor(private readonly room: Room) {

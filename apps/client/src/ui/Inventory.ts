@@ -2,7 +2,7 @@ import items from '@wdi/content/data/items.json';
 import { fill } from './copy';
 import { M5B_COPY as C } from './copy/m5b';
 import { h } from './dom';
-import type { StackSnap } from '../net/m5b';
+import type { StackSnap } from '../net/world';
 
 const DEFS = items.items as Record<string, { name: string; kind: string; use?: string; tooltip?: string }>;
 export const INVENTORY_SLOTS = items.inventorySlots;

@@ -4,7 +4,7 @@ import { fill } from './copy';
 import { M5B_COPY as C, questLine } from './copy/m5b';
 import { h } from './dom';
 import { itemList, stacksOf, type Panel } from './Inventory';
-import type { StackSnap } from '../net/m5b';
+import type { StackSnap } from '../net/world';
 import type { QuestSnap } from '../net/world';
 
 interface QuestDef {

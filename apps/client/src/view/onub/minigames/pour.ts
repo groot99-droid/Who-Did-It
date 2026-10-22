@@ -21,6 +21,8 @@ export class PourModel {
   level = 0;
   step = 0;
   holding = false;
+  /** The hold of each pour that landed, in seconds (level over rate); the answer of the main-mode check. */
+  readonly holdsS: number[] = [];
   bandStart: number;
 
   constructor(
@@ -62,6 +64,7 @@ export class PourModel {
     this.holding = false;
     if (this.level >= this.bandStart && this.level <= this.bandStart + this.bandFrac) {
       this.step += 1;
+      this.holdsS.push(this.level / this.ratePerS);
       this.level = 0;
       this.bandStart = this.draw();
       return 'poured';
@@ -75,7 +78,7 @@ export class PourModel {
 }
 
 export const pourGame: MiniGameFactory = (host) => {
-  const model = new PourModel(host.rng);
+  const model = new PourModel(host.rng, host.steps);
   const stage = createStage(host.root);
   const hint = h('p', { class: 'wdi-hint', 'data-testid': 'minigame-pour-hint' }, C['onub.mini.pour.hint']);
   const hold = h(
@@ -136,6 +139,7 @@ export const pourGame: MiniGameFactory = (host) => {
   });
   draw();
   return {
+    answer: () => ({ holdsS: [...model.holdsS] }),
     destroy() {
       halt();
       stage.destroy();

@@ -3,7 +3,7 @@ import { fill } from './copy';
 import { M5B_COPY as C } from './copy/m5b';
 import { h } from './dom';
 import { itemList, itemName, stacksOf, type Panel } from './Inventory';
-import type { StackSnap } from '../net/m5b';
+import type { StackSnap } from '../net/world';
 
 export interface RecipeRow {
   id: string;

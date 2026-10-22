@@ -23,8 +23,8 @@ import type {
   MobSnap,
   NodeSnap,
   QuestSnap,
+  StackSnap,
 } from '../world';
-import type { M5bFeed, StackSnap } from '../m5b';
 import { MockM5b, type MockSceneM5b } from './m5bMock';
 
 // A local stand-in for the server's movement stage, used behind ?mock=1 until a server is attached. It runs
@@ -119,7 +119,7 @@ const BOT_NAMES = ['Ada', 'Bo', 'Cy', 'Dee', 'Eli', 'Fay'];
 /** Public looks of the mock roster, own seat first (all non-cover characters of `looks.json`). */
 const MOCK_LOOKS = ['tinner', 'detective', 'vicar', 'doctor', 'baker', 'fisher', 'lamplighter'];
 
-export class MockWorldFeed implements WorldFeed, M5bFeed {
+export class MockWorldFeed implements WorldFeed {
   readonly bus: Emitter<WorldFeedEvents> = mitt<WorldFeedEvents>();
   readonly selfId = 'mock-me';
   private readonly actors = new Map<string, Actor>();
