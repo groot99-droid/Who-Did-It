@@ -2713,6 +2713,14 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6F (gathering and crafting)
 
+- **One branch, `claude/r6-gather-craft`, three commits (2026-10-22)**: (1) `Inventory.ts` and the node pool with
+  `inventory.test.ts` and `resources.test.ts`; (2) the `gather` hold; (3) `Craft.ts`, the `craft` hold and `craft.test.ts`.
+  For 6H: `addStack(player, item, qty): boolean`, `take(player, item, qty): boolean`, `count(player, item): number`
+  and `exchange(player, takes, gives): boolean` (a turn-in is one `exchange`), all in `sim/Inventory.ts`.
+- **Touched outside Owns**: `sim/Hold.ts` `runHolds` hands `gather`/`craft` holds to `tickGather`/`tickCraft`
+  (without it the clue check cancels them every tick); `test/npcRoutine.test.ts` R17 allows the `nodes` stream beside `npcNames`. `Node` on the wire is `{ id, resource, x, y, active, respawnTick }`
+  (not `carriedTicks` as `m5b-data.md` 2.1 says). GDD 3.14 (6F) sentences corrected. DECISIONS A88.
+
 ### Round 6 log: 6G (mobs and dark visibility)
 
 ### Round 6 log: 6H (quests and mini-games)
