@@ -1,7 +1,7 @@
 // The M5b art (docs/round6/m5b-data.md 4; SPRITES 12): resource nodes in two states, the six tools as held
-// overlays, the lantern and torch glows, and the four mobs in eight directions, in both art styles. Everything is drawn in code on the world ramps
-// at display scale (m5b-draw.ts and m5b-mobs.ts, route R5) and finished like a rig render: snapped and mode-halved for the
-// 8-bit style, box-halved and alpha-bled for low poly. The ids are 6E's (content PR #49, steps 1 and 2).
+// overlays, the lantern and torch glows, and the four mobs in eight directions and the quest givers, in both art styles. Everything is drawn in code on the world ramps
+// at display scale (m5b-draw.ts, m5b-mobs.ts, m5b-givers.ts; route R5) and finished like a rig render: snapped and mode-halved for the
+// 8-bit style, box-halved and alpha-bled for low poly. The ids are 6E's (content PR #49, steps 1 to 3).
 //
 //   tsx tools/sprites/m5b.ts          both styles' atlases and the M5b block of each manifest
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -11,6 +11,7 @@ import { createCanvas, type SKRSContext2D } from '@napi-rs/canvas';
 import { encodePng, type Rgba } from './bleed.ts';
 import { DIRECTIONS, type Dir } from './keys.ts';
 import { drawGlow, drawHeld, drawNode } from './m5b-draw.ts';
+import { GIVER_IDLE, GIVER_IDS, drawGiver } from './m5b-givers.ts';
 import { MOB_ANIM, MOB_ANIMS, MOB_IDS, drawMob, type MobAnim } from './m5b-mobs.ts';
 import { atlasJson, packFrames, type MultiAtlas, type PackInput } from './pack.ts';
 import { artStyles, type ArtStyle } from './palette.ts';
@@ -37,7 +38,7 @@ export const GLOW_CELL = 64;
 /** Mobs share the characters' cell and feet too, so the client places them like an avatar. */
 export const MOB_CELL = 128;
 export const MOB_FEET: readonly [number, number] = [64, 112];
-export { MOB_ANIM, MOB_ANIMS, MOB_IDS };
+export { MOB_ANIM, MOB_ANIMS, MOB_IDS, GIVER_IDLE, GIVER_IDS };
 
 /**
  * Where the right hand sits in a look's idle frame 000, in packed px from the feet pivot, measured on the
@@ -82,13 +83,19 @@ function render(size: number, draw: (g: SKRSContext2D) => void): Rgba {
   return { width: size, height: size, data: new Uint8Array(d.data.buffer.slice(0)) };
 }
 
-export type M5bAtlas = 'nodes' | 'tools' | 'mobs';
-export const M5B_ATLASES: readonly M5bAtlas[] = ['nodes', 'tools', 'mobs'];
+export type M5bAtlas = 'nodes' | 'tools' | 'mobs' | 'givers';
+export const M5B_ATLASES: readonly M5bAtlas[] = ['nodes', 'tools', 'mobs', 'givers'];
 
 /** Every frame of one atlas for one style, finished at packed size. */
 export function m5bFrames(atlas: M5bAtlas, style: ArtStyle): M5bFrame[] {
   const fin = (img: Rgba) => finishRender(img, style.pixelFinish);
   const half = (p: readonly [number, number]) => [p[0] / 2, p[1] / 2] as const;
+  if (atlas === 'givers')
+    return giverFrameList().map(([id, dir, n]) => ({
+      name: giverFrame(id, dir, n),
+      img: fin(render(MOB_CELL, (g) => drawGiver(g, id, dir, n, MOB_FEET))),
+      pivot: half(MOB_FEET),
+    }));
   if (atlas === 'mobs')
     return mobFrameList().map(([mob, anim, dir, n]) => ({
       name: mobFrame(mob, anim, dir, n),
@@ -137,10 +144,26 @@ export function mobFrameList(): Array<[(typeof MOB_IDS)[number], MobAnim, Dir, n
   );
 }
 
-/** Page caps (SPRITES 12): nodes and tools fit one 512² page each, the mobs one 1024² page. */
+/** A giver's idle key, `giver_<npcId>/idle/<dir>`, and its frame `<key>/<nnn>`. */
+export const giverAnim = (npc: string, dir: Dir): string => `giver_${npc}/idle/${dir}`;
+export const giverFrame = (npc: string, dir: Dir, n: number): string =>
+  `${giverAnim(npc, dir)}/${String(n).padStart(3, '0')}`;
+
+/** Every giver frame as `[npc, dir, n]`, in a fixed order. */
+export function giverFrameList(): Array<[(typeof GIVER_IDS)[number], Dir, number]> {
+  return GIVER_IDS.flatMap((npc) =>
+    DIRECTIONS.flatMap((dir) =>
+      Array.from({ length: GIVER_IDLE.frames }, (_, n) => [npc, dir, n] as [typeof npc, Dir, number]),
+    ),
+  );
+}
+
+/** Page caps (SPRITES 12): nodes and tools fit one 512² page each, the givers one 512 x 1024 and the mobs one 1024². */
 export const M5B_PAGE = { w: 512, h: 512 } as const;
 export const MOB_PAGE = { w: 1024, h: 1024 } as const;
-export const pageOf = (atlas: M5bAtlas) => (atlas === 'mobs' ? MOB_PAGE : M5B_PAGE);
+export const GIVER_PAGE = { w: 512, h: 1024 } as const;
+export const pageOf = (atlas: M5bAtlas) =>
+  atlas === 'mobs' ? MOB_PAGE : atlas === 'givers' ? GIVER_PAGE : M5B_PAGE;
 
 /** Pack frames onto one page and set each frame's pivot as a fraction of its source size. */
 export async function packM5b(
@@ -195,6 +218,22 @@ export function mobAnims(texture = 'mobs'): string {
   return `${JSON.stringify({ anims }, null, 1)}\n`;
 }
 
+/** The giver idles (`anims_givers`): one per npc and direction, looping. */
+export function giverAnims(texture = 'givers'): string {
+  const anims = GIVER_IDS.flatMap((npc) =>
+    DIRECTIONS.map((dir) => ({
+      key: giverAnim(npc, dir),
+      frames: Array.from({ length: GIVER_IDLE.frames }, (_, n) => ({
+        key: texture,
+        frame: giverFrame(npc, dir, n),
+      })),
+      frameRate: GIVER_IDLE.fps,
+      repeat: GIVER_IDLE.repeat,
+    })),
+  );
+  return `${JSON.stringify({ anims }, null, 1)}\n`;
+}
+
 /** The files of the M5b folder (`m5b/`) for one style. */
 export async function m5bFiles(style: ArtStyle): Promise<Map<string, Buffer>> {
   const files = new Map<string, Buffer>();
@@ -204,6 +243,7 @@ export async function m5bFiles(style: ArtStyle): Promise<Map<string, Buffer>> {
   }
   files.set('tools.anims.json', Buffer.from(toolAnims()));
   files.set('mobs.anims.json', Buffer.from(mobAnims()));
+  files.set('givers.anims.json', Buffer.from(giverAnims()));
   return files;
 }
 
@@ -223,6 +263,8 @@ export function m5bManifest(filter: 'nearest' | 'linear'): M5bManifestEntry[] {
     { key: 'anims_tools', type: 'animation', url: 'm5b/tools.anims.json' },
     { key: 'mobs', type: 'multiatlas', url: 'm5b/mobs.json', path: 'm5b/', filter },
     { key: 'anims_mobs', type: 'animation', url: 'm5b/mobs.anims.json' },
+    { key: 'givers', type: 'multiatlas', url: 'm5b/givers.json', path: 'm5b/', filter },
+    { key: 'anims_givers', type: 'animation', url: 'm5b/givers.anims.json' },
   ];
 }
 export const M5B_KEYS: readonly string[] = m5bManifest('nearest').map((e) => e.key);

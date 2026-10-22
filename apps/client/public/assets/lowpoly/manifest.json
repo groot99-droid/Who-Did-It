@@ -859,6 +859,18 @@
       "key": "anims_mobs",
       "type": "animation",
       "url": "m5b/mobs.anims.json"
+    },
+    {
+      "key": "givers",
+      "type": "multiatlas",
+      "url": "m5b/givers.json",
+      "path": "m5b/",
+      "filter": "linear"
+    },
+    {
+      "key": "anims_givers",
+      "type": "animation",
+      "url": "m5b/givers.anims.json"
     }
   ]
 }

@@ -2699,7 +2699,10 @@ session's goes back to it. Log under "Integration log, round 6".
   packs them as `mobs` and `anims_mobs` (idle, walk, attack in eight directions) in both styles, with greybox
   twins in `placeholder-m5b.ts`; SPRITES 12, A95 and the CREDITS row extended; `test/m5b.test.ts` covers the
   frames and animations. Green.
-- Next: the givers (#49 step 3: `harbourmaster`, `moll`, `foreman`, `smith`, `collier`).
+- Step 3 (givers): `tools/sprites/m5b-givers.ts` dresses the five quest npcs of #49 step 3 (`harbourmaster`,
+  `moll`, `foreman`, `smith`, `collier`) on the mob rigs (`drawRig`), packed as `givers` and `anims_givers`
+  (idle in eight directions) in both styles, with greybox twins; SPRITES 12, A95, CREDITS and `test/m5b.test.ts`
+  extended. Green. All of the brief's sprites are in; what remains is review and 6I's consumption.
 
 ### Round 6 log: 6N (ROSW media)
 

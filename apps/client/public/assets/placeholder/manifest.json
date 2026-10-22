@@ -458,6 +458,18 @@
       "url": "m5b/mobs.anims.json"
     },
     {
+      "key": "givers",
+      "type": "multiatlas",
+      "url": "m5b/givers.json",
+      "path": "m5b/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_givers",
+      "type": "animation",
+      "url": "m5b/givers.anims.json"
+    },
+    {
       "key": "onub_station_fridge",
       "type": "image",
       "url": "onub/rooms/onub_station_fridge.png",

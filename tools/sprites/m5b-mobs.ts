@@ -7,7 +7,8 @@ import { DIRECTIONS, type Dir } from './keys.ts';
 import { paletteFile } from './palette.ts';
 
 const R = paletteFile.world.ramps as Record<string, string[]>;
-const c = (ramp: string, i: number): string => R[ramp]![i]!;
+export const ramp = (name: string, i: number): string => R[name]![i]!;
+const c = ramp;
 const INK = c('ink', 0);
 
 export const MOB_IDS = ['wolf', 'boar', 'bat', 'rat'] as const;
@@ -21,15 +22,21 @@ export const MOB_ANIM: Readonly<Record<MobAnim, { frames: number; fps: number; r
   attack: { frames: 4, fps: 10, repeat: 0 },
 };
 
-type V3 = readonly [f: number, s: number, h: number];
-type Part =
+export type V3 = readonly [f: number, s: number, h: number];
+export type Part =
   | { kind: 'ball'; at: V3; r: number; fill: string; lit?: string | undefined }
   | { kind: 'cap'; a: V3; b: V3; r: number; fill: string; lit?: string | undefined }
   | { kind: 'wing'; pts: readonly V3[]; fill: string }
   | { kind: 'shadow'; rx: number; ry: number };
 
-const ball = (at: V3, r: number, fill: string, lit?: string): Part => ({ kind: 'ball', at, r, fill, lit });
-const cap = (a: V3, b: V3, r: number, fill: string, lit?: string): Part => ({
+export const ball = (at: V3, r: number, fill: string, lit?: string): Part => ({
+  kind: 'ball',
+  at,
+  r,
+  fill,
+  lit,
+});
+export const cap = (a: V3, b: V3, r: number, fill: string, lit?: string): Part => ({
   kind: 'cap',
   a,
   b,
@@ -37,8 +44,8 @@ const cap = (a: V3, b: V3, r: number, fill: string, lit?: string): Part => ({
   fill,
   lit,
 });
-const mirror = (side: 1 | -1, p: V3): V3 => [p[0], p[1] * side, p[2]];
-const SIDES = [-1, 1] as const;
+export const mirror = (side: 1 | -1, p: V3): V3 => [p[0], p[1] * side, p[2]];
+export const SIDES = [-1, 1] as const;
 
 /** The screen angle of each direction, y down: `e` is 0, `s` a quarter turn. */
 const ANGLE: Readonly<Record<Dir, number>> = Object.fromEntries(
@@ -216,10 +223,7 @@ function rat(anim: MobAnim, t: number): Part[] {
 
 const RIGS: Readonly<Record<MobId, (anim: MobAnim, t: number) => Part[]>> = { wolf, boar, bat, rat };
 
-/**
- * One mob frame at display scale: the rig posed at `n` of the animation's frames, projected for `dir` and drawn
- * back to front with a single ink silhouette under the fills, feet at `feet`.
- */
+/** One mob frame at display scale: the rig posed at `n` of the animation's frames, feet at `feet`. */
 export function drawMob(
   g: SKRSContext2D,
   mob: MobId,
@@ -228,7 +232,16 @@ export function drawMob(
   n: number,
   feet: readonly [number, number],
 ): void {
-  const parts = RIGS[mob](anim, n / MOB_ANIM[anim].frames);
+  drawRig(g, RIGS[mob](anim, n / MOB_ANIM[anim].frames), dir, feet);
+}
+
+/** A rig's parts projected for `dir` and drawn back to front with a single ink silhouette under the fills. */
+export function drawRig(
+  g: SKRSContext2D,
+  parts: readonly Part[],
+  dir: Dir,
+  feet: readonly [number, number],
+): void {
   const th = ANGLE[dir];
   const [cos, sin] = [Math.cos(th), Math.sin(th)];
   const ground = ([f, s]: V3): [number, number] => [f * cos - s * sin, f * sin + s * cos];

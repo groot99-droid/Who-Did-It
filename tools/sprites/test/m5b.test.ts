@@ -5,6 +5,8 @@ import { DIRECTIONS } from '../keys.ts';
 import {
   GLOW_FRAMES,
   GLOWS,
+  GIVER_IDLE,
+  GIVER_IDS,
   M5B_KEYS,
   MOB_ANIM,
   MOB_ANIMS,
@@ -14,6 +16,9 @@ import {
   TOOL_IDS,
   glowFrame,
   heldFrame,
+  giverAnim,
+  giverFrame,
+  giverFrameList,
   m5bFiles,
   mobAnim,
   mobFrame,
@@ -46,6 +51,9 @@ const WANT = {
     ...TOOL_IDS.flatMap((t) => DIRECTIONS.map((d) => heldFrame(t, d))),
     ...GLOWS.flatMap((g) => Array.from({ length: GLOW_FRAMES }, (_, n) => glowFrame(g, n))),
   ].sort(),
+  givers: giverFrameList()
+    .map(([npc, d, n]) => giverFrame(npc, d, n))
+    .sort(),
   mobs: mobFrameList()
     .map(([m, a, d, n]) => mobFrame(m, a, d, n))
     .sort(),
@@ -88,8 +96,17 @@ describe('M5b art (SPRITES 12)', () => {
     expect(WANT.mobs).toHaveLength(MOB_IDS.length * DIRECTIONS.length * 14);
   });
 
+  it('draws every quest npc of quests.json in 8 directions, all in the villager body', () => {
+    const { npcs } = json<{ npcs: Record<string, { look: string }> }>(join(DATA, 'quests.json'));
+    for (const [id, npc] of Object.entries(npcs)) {
+      expect(GIVER_IDS, id).toContain(id);
+      expect(npc.look, id).toBe('villager');
+    }
+    expect(WANT.givers).toHaveLength(GIVER_IDS.length * DIRECTIONS.length * GIVER_IDLE.frames);
+  });
+
   const roots = [...artStyles().map((s) => s.root), 'placeholder/'];
-  for (const atlas of ['nodes', 'tools', 'mobs'] as const) {
+  for (const atlas of ['nodes', 'tools', 'mobs', 'givers'] as const) {
     const base = pivots(json<Atlas>(join(ASSETS, 'm5b', `${atlas}.json`)));
     for (const root of roots) {
       it(`${root || '8bit/'}m5b/${atlas}.json has every frame on one page within its cap, same cells and pivots`, () => {
@@ -141,6 +158,15 @@ describe('M5b art (SPRITES 12)', () => {
     );
     expect(a.anims.map((x) => [x.key, x.repeat, x.frameRate, x.frames.length])).toEqual(want);
     expect(MOB_ANIM.attack.repeat).toBe(0);
+  });
+
+  it('idles each giver in each direction, looping', () => {
+    const a = json<{ anims: Array<{ key: string; repeat: number; frames: unknown[] }> }>(
+      join(ASSETS, 'm5b', 'givers.anims.json'),
+    );
+    expect(a.anims.map((x) => [x.key, x.repeat, x.frames.length])).toEqual(
+      GIVER_IDS.flatMap((npc) => DIRECTIONS.map((d) => [giverAnim(npc, d), -1, GIVER_IDLE.frames])),
+    );
   });
 
   for (const style of artStyles()) {

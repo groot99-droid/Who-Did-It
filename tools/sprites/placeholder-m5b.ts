@@ -10,6 +10,7 @@ import {
   MOB_CELL,
   MOB_FEET,
   MOB_PAGE,
+  GIVER_PAGE,
   NODE_CELL,
   NODE_GROUND,
   NODE_STATES,
@@ -18,6 +19,9 @@ import {
   glowFrame,
   heldFrame,
   m5bManifest,
+  giverAnims,
+  giverFrame,
+  giverFrameList,
   mobAnims,
   mobFrame,
   mobFrameList,
@@ -113,10 +117,27 @@ function mobFrames(): Frame[] {
   });
 }
 
+/** A giver: a fog figure with a bone face over the feet, labelled with the npc id, a tick pointing its way. */
+function giverFrames(): Frame[] {
+  const size = MOB_CELL / 2;
+  const [fx, fy] = [MOB_FEET[0] / 2, MOB_FEET[1] / 2];
+  return giverFrameList().map(([npc, dir, n]) => {
+    const c = createCanvas(size, size);
+    const g = c.getContext('2d');
+    const br = n % 2;
+    shape(g, 'fog', () => g.rect(fx - 7, fy - 34 - br, 14, 34 + br));
+    shape(g, 'bone', () => g.arc(fx, fy - 40 - br, 6, 0, Math.PI * 2));
+    const [ux, uy] = UNIT[dir];
+    shape(g, 'slate', () => g.rect(fx + ux * 5 - 2, fy - 40 - br + uy * 4 - 2, 4, 4), false);
+    label(g, npc.slice(0, 6), fx, fy - 10, 7);
+    return { name: giverFrame(npc, dir, n), png: c.toBuffer('image/png'), pivot: [fx, fy] as const };
+  });
+}
+
 /**
  * Round 6, Session 6M (docs/round6/m5b-data.md 4, SPRITES 12): the stand-ins for the M5b art, under the keys
- * of m5b.ts with the same cells and pivots, `order` 80 so they sort after every round-5 module. The givers
- * join in 6M's next step.
+ * of m5b.ts with the same cells and pivots, `order` 80 so they sort after every round-5 module. Mobs and
+ * givers share the characters' cell and feet.
  */
 export function placeholderEntries(): PlaceholderEntry[] {
   return [
@@ -130,6 +151,8 @@ export function placeholderEntries(): PlaceholderEntry[] {
         files.set('tools.anims.json', Buffer.from(toolAnims()));
         for (const [k, v] of await packM5b('mobs', mobFrames(), MOB_PAGE)) files.set(k, v);
         files.set('mobs.anims.json', Buffer.from(mobAnims()));
+        for (const [k, v] of await packM5b('givers', giverFrames(), GIVER_PAGE)) files.set(k, v);
+        files.set('givers.anims.json', Buffer.from(giverAnims()));
         return inFolder('m5b/', files);
       },
     },
