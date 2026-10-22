@@ -91,3 +91,87 @@ describe('resources and recipes', () => {
     );
   });
 });
+
+describe('mobs', () => {
+  it('has the four mobs, and only the wolf kills', () => {
+    expect(Object.keys(content.mobs.mobs).sort()).toEqual(['bat', 'boar', 'rat', 'wolf']);
+    expect(
+      Object.values(content.mobs.mobs)
+        .filter((m) => m.kills)
+        .map((m) => m.id),
+    ).toEqual(['wolf']);
+  });
+
+  it('rejects a spawner of an unknown mob and a crowded scene', () => {
+    const errors = broken((c) => {
+      c.scenes.bp_mine!.spawners![0]!.mob = 'bear';
+      c.balance.mobs.maxPerScene = 2;
+    });
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('spawner bm.sp_bats unknown mob bear'),
+        expect.stringContaining('scene forest: 3 spawners, above mobs.maxPerScene'),
+      ]),
+    );
+  });
+
+  it('keeps the wolf on the light radius of balance.wolves', () => {
+    expect(
+      broken((c) => {
+        c.mobs.mobs.wolf!.fleeLightTiles = 5;
+      }),
+    ).toEqual(expect.arrayContaining([expect.stringContaining('wolf fleeLightTiles differs')]));
+  });
+});
+
+describe('quests and mini-games', () => {
+  it('gives every npc a place and a quest, and every fetch task a mini-game', () => {
+    const givers = Object.values(content.scenes).flatMap((s) => (s.givers ?? []).map((g) => g.npc));
+    expect(givers.sort()).toEqual(Object.keys(content.quests.npcs).sort());
+    const fetch = Object.values(content.tasks.tasks).filter((t) => t.kind === 'fetch');
+    expect(
+      Object.values(content.minigames.minigames)
+        .map((m) => m.task)
+        .sort(),
+    ).toEqual(fetch.map((t) => t.id).sort());
+  });
+
+  it('rejects a giver of an unknown npc, an npc nowhere and a contract quest', () => {
+    const errors = broken((c) => {
+      c.scenes.bp_smithy!.givers![0]!.npc = 'tallyman';
+      c.quests.quests.mollsHerbs!.kind = 'contract';
+    });
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('giver bf.gv_smith unknown npc tallyman'),
+        expect.stringContaining('npc smith stands nowhere'),
+        expect.stringContaining('mollsHerbs: contract quests wait for round 7'),
+      ]),
+    );
+  });
+
+  it('rejects a quest that wants what its map cannot have or rewards an unshipped item', () => {
+    const errors = broken((c) => {
+      c.quests.quests.caulkTheSkiff!.wants = [{ item: 'oil', qty: 1 }];
+      c.quests.quests.smithsOre!.reward = [{ item: 'crossbow', qty: 1 }];
+    });
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('caulkTheSkiff: wants oil, not to be had on its map'),
+        expect.stringContaining('smithsOre: rewards unshipped crossbow'),
+      ]),
+    );
+  });
+
+  it('rejects a mini-game on a co-op task and a fetch task without one', () => {
+    const errors = broken((c) => {
+      c.minigames.minigames.flourCrates!.task = 'shutterWindows';
+    });
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('flourCrates: task shutterWindows is no fetch task'),
+        expect.stringContaining('fetch task fetchFlour has no mini-game'),
+      ]),
+    );
+  });
+});

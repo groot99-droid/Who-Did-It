@@ -1,1 +1,60 @@
-{ "gddRef": "3.16", "npcs": {}, "quests": {} }
+{
+  "gddRef": "3.16",
+  "npcs": {
+    "harbourmaster": { "id": "harbourmaster", "name": "Harbourmaster Pell", "look": "villager" },
+    "moll": { "id": "moll", "name": "Old Moll", "look": "villager" },
+    "foreman": { "id": "foreman", "name": "Foreman Drury", "look": "villager" },
+    "smith": { "id": "smith", "name": "Smith Hask", "look": "villager" },
+    "collier": { "id": "collier", "name": "The Collier", "look": "villager" }
+  },
+  "quests": {
+    "caulkTheSkiff": {
+      "id": "caulkTheSkiff",
+      "giver": "harbourmaster",
+      "kind": "fetch",
+      "wants": [{ "item": "resin", "qty": 2 }, { "item": "timber", "qty": 1 }],
+      "reward": [{ "item": "lantern", "qty": 1 }],
+      "copyId": "quest.caulkTheSkiff"
+    },
+    "mollsHerbs": {
+      "id": "mollsHerbs",
+      "giver": "moll",
+      "kind": "fetch",
+      "wants": [{ "item": "herb", "qty": 4 }],
+      "reward": [{ "item": "bandage", "qty": 1 }],
+      "copyId": "quest.mollsHerbs"
+    },
+    "mollsMushrooms": {
+      "id": "mollsMushrooms",
+      "giver": "moll",
+      "kind": "fetch",
+      "wants": [{ "item": "mushroom", "qty": 3 }],
+      "reward": [{ "item": "salts", "qty": 1 }],
+      "copyId": "quest.mollsMushrooms"
+    },
+    "stackTheYard": {
+      "id": "stackTheYard",
+      "giver": "foreman",
+      "kind": "fetch",
+      "wants": [{ "item": "timber", "qty": 4 }],
+      "reward": [{ "item": "crowbar", "qty": 1 }],
+      "copyId": "quest.stackTheYard"
+    },
+    "smithsOre": {
+      "id": "smithsOre",
+      "giver": "smith",
+      "kind": "fetch",
+      "wants": [{ "item": "tinOre", "qty": 3 }],
+      "reward": [{ "item": "lantern", "qty": 1 }],
+      "copyId": "quest.smithsOre"
+    },
+    "colliersStone": {
+      "id": "colliersStone",
+      "giver": "collier",
+      "kind": "fetch",
+      "wants": [{ "item": "stone", "qty": 3 }],
+      "reward": [{ "item": "torch", "qty": 1 }],
+      "copyId": "quest.colliersStone"
+    }
+  }
+}

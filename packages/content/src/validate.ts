@@ -251,7 +251,9 @@ export function validateContent(c: Content): string[] {
  * resource is a `material` item and every material a resource, a resource's `tool` is an item, every
  * `scene.nodes[].resource` names a resource; a recipe's `out` and `in[].item` are items, its `station` a
  * `routines.json` station kind, and every recipe is craftable on every map from what that map's nodes yield and its
- * stations offer (`checkCraftable`). Mobs, quests and mini-games are checked from the PRs that fill them. Session 6J
+ * stations offer (`reachable`); every spawner names a mob, the wolf keeps GDD 3.6's light radius, and no scene
+ * has more spawners than `mobs.maxPerScene`; every giver names a quest npc, every npc stands once and gives a quest, a quest
+ * wants what its map can have and rewards V1 items, and every fetch task has one mini-game. Session 6J
  * adds: every index entry of `cutscenes` names a cutscene of the right kind, every `openings` key a map. Session 6L
  * adds: every `music.byMap` key is a map (the playlist ids are checked against the client manifest by a client test).
  */
@@ -298,19 +300,87 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
     if (r.station !== null && !stationKinds.has(r.station))
       err(`${where}: station ${r.station} is no station kind`);
   }
+
+  // Mobs (GDD 3.15): the wolf row keeps 3.6's light rule, and a scene spawns no more than `mobs.maxPerScene`.
+  const wolf = mobs.mobs.wolf;
+  if (wolf === undefined || !wolf.kills) err('mobs.json: the wolf must exist and kill (GDD 3.6)');
+  else if (wolf.fleeLightTiles !== c.balance.wolves.fleeLightTiles) {
+    err('mobs.json: wolf fleeLightTiles differs from balance.wolves.fleeLightTiles');
+  }
+  for (const scene of Object.values(c.scenes)) {
+    const spawners = scene.spawners ?? [];
+    for (const sp of spawners) {
+      if (!Object.hasOwn(mobs.mobs, sp.mob)) err(`scene ${scene.id}: spawner ${sp.id} unknown mob ${sp.mob}`);
+    }
+    if (spawners.length > c.balance.mobs.maxPerScene) {
+      err(`scene ${scene.id}: ${spawners.length} spawners, above mobs.maxPerScene`);
+    }
+  }
+  const inHand = new Map<string, Set<string>>();
   for (const map of Object.values(c.maps)) {
-    const scenes = map.scenes.flatMap((id) => c.scenes[id] ?? []);
-    for (const id of uncraftable(c, scenes))
-      err(`map ${map.id}: recipe ${id} cannot be crafted from its nodes`);
+    const reach = reachable(
+      c,
+      map.scenes.flatMap((id) => c.scenes[id] ?? []),
+    );
+    inHand.set(map.id, reach.have);
+    for (const id of Object.keys(recipes.recipes)) {
+      if (!reach.made.has(id)) err(`map ${map.id}: recipe ${id} cannot be crafted from its nodes`);
+    }
+  }
+
+  // Quests and mini-games (GDD 3.16): each npc stands once, wants what its map can gather or make, rewards V1 items.
+  const looks = new Set(Object.keys(c.looks.looks));
+  const standsOn = new Map<string, string>();
+  for (const map of Object.values(c.maps)) {
+    for (const sceneId of map.scenes) {
+      for (const g of c.scenes[sceneId]?.givers ?? []) {
+        if (!Object.hasOwn(quests.npcs, g.npc)) err(`scene ${sceneId}: giver ${g.id} unknown npc ${g.npc}`);
+        else if (standsOn.has(g.npc)) err(`quests.json: npc ${g.npc} stands in two places`);
+        standsOn.set(g.npc, map.id);
+      }
+    }
+  }
+  for (const npc of Object.values(quests.npcs)) {
+    if (!standsOn.has(npc.id)) err(`quests.json: npc ${npc.id} stands nowhere`);
+    if (npc.look !== 'villager' && !looks.has(npc.look))
+      err(`quests.json: npc ${npc.id} unknown look ${npc.look}`);
+    if (!Object.values(quests.quests).some((q) => q.giver === npc.id))
+      err(`quests.json: npc ${npc.id} gives nothing`);
+  }
+  for (const q of Object.values(quests.quests)) {
+    const where = `quests.json ${q.id}`;
+    if (q.kind === 'contract') err(`${where}: contract quests wait for round 7`);
+    if (!Object.hasOwn(quests.npcs, q.giver)) err(`${where}: unknown giver ${q.giver}`);
+    const have = inHand.get(standsOn.get(q.giver) ?? '');
+    for (const w of q.wants) {
+      if (!isItem(w.item)) err(`${where}: wants unknown item ${w.item}`);
+      else if (have !== undefined && !have.has(w.item))
+        err(`${where}: wants ${w.item}, not to be had on its map`);
+    }
+    for (const r of q.reward) {
+      if (!isItem(r.item)) err(`${where}: rewards unknown item ${r.item}`);
+      else if (items.items[r.item]!.ships !== 'V1') err(`${where}: rewards unshipped ${r.item}`);
+    }
+  }
+  const played = new Set<string>();
+  for (const m of Object.values(minigames.minigames)) {
+    const task = c.tasks.tasks[m.task];
+    if (task?.kind !== 'fetch') err(`minigames.json ${m.id}: task ${m.task} is no fetch task`);
+    if (played.has(m.task)) err(`minigames.json ${m.id}: task ${m.task} has two mini-games`);
+    played.add(m.task);
+  }
+  for (const task of Object.values(c.tasks.tasks)) {
+    if (task.kind === 'fetch' && !played.has(task.id))
+      err(`tasks.json: fetch task ${task.id} has no mini-game`);
   }
 }
 
 /**
- * The recipes that cannot be made in these scenes: start from the resources their nodes yield (a resource whose `tool`
- * is not yet in hand waits for it), add every recipe whose station stands in the scenes and whose inputs are in hand,
- * and repeat until nothing changes.
+ * What can be had in these scenes: start from the resources their nodes yield (a resource whose `tool` is not yet in
+ * hand waits for it), add every recipe whose station stands in the scenes and whose inputs are in hand, and repeat
+ * until nothing changes. `made` holds recipe ids, `have` item ids.
  */
-function uncraftable(c: Content, scenes: readonly Scene[]): string[] {
+function reachable(c: Content, scenes: readonly Scene[]): { made: Set<string>; have: Set<string> } {
   const nodeResources = new Set(scenes.flatMap((s) => (s.nodes ?? []).map((n) => n.resource)));
   const propKinds = new Set(scenes.flatMap((s) => s.props.map((p) => p.kind)));
   const have = new Set<string>();
@@ -333,7 +403,7 @@ function uncraftable(c: Content, scenes: readonly Scene[]): string[] {
       }
     }
   }
-  return Object.keys(c.recipes.recipes).filter((id) => !made.has(id));
+  return { made, have };
 }
 
 const NIGHT_PHASES: ReadonlySet<string> = new Set(['dusk', 'night', 'finalNight']);
