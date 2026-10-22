@@ -5,7 +5,6 @@ import type { ClockScale } from '@wdi/shared';
  * The sim clock (round 6, docs/round6/auto-admin.md 2): how many `step`s the fixed tick runs. The sim is tick-
  * deterministic, so a time scale is a loop count, never a faster timer. A `party` room is always at 1x and nothing
  * in the `C2S` union changes that; only `sim/auto/Auto.ts` writes `scale` or `paused` (a test asserts it).
- * Pre-seeded by 6Z; Session 6A fills `stepsThisTick`.
  */
 export interface SimClock {
   scale: ClockScale;
@@ -16,10 +15,15 @@ export interface SimClock {
   carry: number;
 }
 
-/** The tick stops running extra steps past this many milliseconds; the rest carries over (6A). */
+/** The tick stops running extra steps past this many milliseconds; the rest carries over. */
 export const MAX_SIM_MS_PER_TICK = 40;
 
+/** Ticks `effectiveScale` averages over. */
+export const EFFECTIVE_SCALE_TICKS = 20;
+
 const clocks = new WeakMap<PartyRoom, SimClock>();
+/** Steps actually run by the last `EFFECTIVE_SCALE_TICKS` ticks of each clock, newest last. */
+const history = new WeakMap<SimClock, number[]>();
 
 export function clockOf(room: PartyRoom): SimClock {
   let clock = clocks.get(room);
@@ -30,11 +34,40 @@ export function clockOf(room: PartyRoom): SimClock {
   return clock;
 }
 
+function record(clock: SimClock, steps: number): number {
+  let ring = history.get(clock);
+  if (!ring) {
+    ring = [];
+    history.set(clock, ring);
+  }
+  ring.push(steps);
+  if (ring.length > EFFECTIVE_SCALE_TICKS) ring.shift();
+  return steps;
+}
+
 /**
  * How many steps this tick runs: `scale` plus the carry, capped so `lastTickMs * steps` stays under
- * `MAX_SIM_MS_PER_TICK`; paused returns only the pending single steps. At 1x it returns 1 and touches nothing.
+ * `MAX_SIM_MS_PER_TICK` (at least one step, so a slow sim crawls rather than stalls); the remainder goes back to
+ * the carry, so nothing is skipped. Paused returns only the pending single steps, and clears them. At 1x it returns
+ * 1 and never touches the carry.
  */
-export function stepsThisTick(clock: SimClock, _lastTickMs: number): number {
-  if (clock.scale === 1 && !clock.paused) return 1;
-  return 1; // 6A: the budget guard, the carry and the pause
+export function stepsThisTick(clock: SimClock, lastTickMs: number): number {
+  if (clock.paused) {
+    const n = clock.pendingSteps;
+    clock.pendingSteps = 0;
+    return record(clock, n);
+  }
+  if (clock.scale === 1) return record(clock, 1);
+  const want = clock.scale + clock.carry;
+  const cap = lastTickMs > 0 ? Math.max(1, Math.floor(MAX_SIM_MS_PER_TICK / lastTickMs)) : want;
+  const n = Math.min(want, cap);
+  clock.carry = want - n;
+  return record(clock, n);
+}
+
+/** Steps actually run per tick over the last `EFFECTIVE_SCALE_TICKS` ticks (for `admin.snapshot`). */
+export function effectiveScale(clock: SimClock): number {
+  const ring = history.get(clock);
+  if (!ring || ring.length === 0) return clock.paused ? 0 : clock.scale;
+  return ring.reduce((a, b) => a + b, 0) / EFFECTIVE_SCALE_TICKS;
 }
