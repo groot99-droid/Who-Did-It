@@ -482,6 +482,8 @@ In M5a nobody carries a light that anyone else can see. Your vision is drawn for
 
 **Transitions.** The client covers the screen while the router starts a scene: a fade into the world (`balance.ui.transitionS.fade`, 0.4 s), an iris into a meeting (`iris`, 0.6 s) and a wipe into the end screen (`wipe`, 0.7 s), each the whole cover-and-lift. Under reduced motion every duration is 0 and the scene starts at once. A transition that begins while another runs replaces it. Nothing here touches the sim or the wire.
 
+**Loading.** A load that runs longer than `balance.ui.loading.showAfterS` (0.3 s) shows a progress bar and a tip, which changes every `tipEveryS` (4 s); a shorter load shows nothing. Tips describe the controls and the world and never a role's powers. A match's load also starts the map's `loading` music (3.18).
+
 ### 3.14 Resources and crafting
 
 Round 6 (ROADMAP M5b); the data fields were pre-seeded in round 5 (3.13). The contract is `docs/round6/m5b-data.md` 1 and 2.1 until 6E and 6F write this section; the numbers land in `packages/content/data` with it.
