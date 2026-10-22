@@ -2184,3 +2184,65 @@ button.wdi-map__option {
   padding: 0;
   list-style: none;
 }
+
+/* Round 6 (6L): the sound settings gear and its panel (UI.md 14.22). */
+.wdi-settings {
+  position: relative;
+  display: inline-block;
+}
+
+.wdi-settings__gear {
+  min-width: var(--wdi-touch);
+  min-height: var(--wdi-touch);
+  font: inherit;
+  font-size: var(--wdi-text-lg);
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-lg);
+  cursor: pointer;
+}
+
+.wdi-settings__panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 40;
+  display: grid;
+  gap: var(--wdi-space-2);
+  min-width: 240px;
+  margin-top: var(--wdi-space-1);
+  padding: var(--wdi-space-3);
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-lg);
+  box-shadow: var(--wdi-shadow-3);
+}
+
+.wdi-settings__panel[hidden] {
+  display: none;
+}
+
+.wdi-settings__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--wdi-space-1) var(--wdi-space-2);
+  font-size: var(--wdi-text-sm);
+}
+
+.wdi-settings__row--mute {
+  grid-template-columns: auto 1fr;
+}
+
+.wdi-settings__slider {
+  grid-column: 1 / -1;
+  min-height: var(--wdi-touch);
+  accent-color: var(--wdi-stroke);
+}
+
+.wdi-settings__value {
+  font-variant-numeric: tabular-nums;
+}

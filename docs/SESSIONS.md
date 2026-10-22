@@ -2688,6 +2688,42 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6L (music)
 
+- **PR 1 (2026-10-22): bus, settings, panel.** `view/audioSettings.ts` (`wdi:audio`, a subscribe so a slider moves
+  what is already playing), `view/MusicBus.ts` (two elements, lazy `src`, `crossfadeTo`/`prefetch`/`setVolume`/
+  `setMuted`, a manifest parser; its timing is a `tick(dtMs)` the tests drive), `AudioBus.setSfxVolume` and the
+  `narr_bed_hollowmere` and `sting_*` keys, `ui/SettingsPanel.ts` with `ui/copy/settings.ts`, the "Round 6 (6L)" CSS
+  block, UI.md 14.22, and the empty `audio/music/manifest.json` shape. The sound library's release is not up, so no
+  bed is fetched yet. The `narr_*` and `sting_*` keys are the ones `media.md` 4 names; 6N adds the files and rows.
+- **PR 2 (2026-10-22): director and mapping.** `view/MusicDirector.ts` (a pure `MusicConductor` driven by the lobby,
+  `phaseChange`, `gameOver` and `left` events; the meeting and the quick mode's four classes come from the phase, so
+  no Kitchen or Night scene needs a call), `music.json` filled for both maps and the quick mode, the manifest's
+  playlist slots declared with no tracks yet, a test that every id `music.json` names is a playlist of the committed
+  manifest, and the GDD 3.18 music paragraph. `playlistFor(map, class)` is exported for 6K: its `LoadingScreen` calls
+  `musicBus.crossfadeTo(playlistFor(mapId, 'loading'))`; a stand-in until it lands is that one line.
+- **Step 3 (2026-10-22): the slot list, beds not fetched.** The `sfx-2026-10` release of ROSW is not published, and
+  the cloud proxy refuses its release URLs, so no bed is fetched and `audio/music/manifest.json` keeps its slots
+  with no tracks (a slot with no track is silence). The slots, against the catalog read from a read-only clone of
+  ROSW (candidates by ear are 6N's and the owner's call):
+  - **The owner's tracks fill**: `hollowmere_day` (Railroad Barons), `blackpine_day` (Extraction Camp), the three
+    `*_loading` pieces, `trailer`, and `onub_kitchen` and `onub_rush` (The Baker's Bell, until round 8's map).
+  - **The library can fill, as a looped, cross-faded bed**: `*_meeting` (`tension-builders/heartbeat-tension-builder`,
+    48 s), `*_finalnight` (`tension-builders/tick-tension-builder`, 46 s, or `science-fiction-ambience/deep-scary-ambience`,
+    42 s), `*_night` and `onub_night` (`science-fiction-ambience/tense-ambience`, 42 s, or `deep-scary-ambience`).
+  - **The library cannot fill (it holds no melodic bed)**: `lobby`, and the two `*_gameover` plus `onub_over`
+    (the `sting_win_*` stingers cover the end; a bed after them is optional). Proposed: `*_dusk` reuses the day
+    theme, and the owner says whether they want to record or upload a `lobby` track and an end-screen track, or
+    whether a CC0 bed (ASSETS 6.5, with a CREDITS row) fills them. Nothing is downloaded until that answer.
+  - **Budget**: the owner's seven tracks master to about 9 to 10 MB of the 12 MB, so the library beds must be short
+    loops (about 0.4 MB each at 20 s); `media.test.ts` (6K) enforces 12 MB and 4 MB per map.
+  - **To finish**: when the release is up, `library.py fetch --id <id>` for the ids above, master as `media.md` 1,
+    add the OGG, the manifest rows (tracks and playlist `tracks`), the `CREDITS.md` and `MANIFEST.md` rows (`media.md`
+    7), and run the budget test.
+- **CC0 beds (2026-10-22, owner: "Use a CC0 bed for lobby and the end screen").** `lobby` plays OpenGameArt
+  "Contemplation" (Pro Sensory, CC0, first 60 s, 0.5 MB); `hollowmere_gameover`, `blackpine_gameover` and `onub_over`
+  play "The Fade" (breadman, CC0, 0.8 MB). Mastered at -18 LUFS, Vorbis q3, CREDITS rows with URL, hash and date;
+  no `MANIFEST.md` row, since a CC0 download is not a master. FreePD is closed, so OpenGameArt is the source. Still
+  open: the library beds (release unpublished), and `*_dusk` reusing the day theme.
+
 ### Round 6 log: 6M (M5b art)
 
 ### Round 6 log: 6N (ROSW media)
