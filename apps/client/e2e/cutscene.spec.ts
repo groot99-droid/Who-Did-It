@@ -36,3 +36,18 @@ test('Esc skips too', async ({ page }) => {
   await expect(page.getByTestId('cutscene')).toHaveCount(0);
   await expect(page.getByTestId('hud-clock')).toBeVisible();
 });
+
+test('a kill plays its death cutscene, then hands over to the ghost', async ({ page }) => {
+  await start(page, '&cutscene=1&ghost=1');
+  // The kill lands while the opening plays: the opening ends and the death cutscene takes its place.
+  await expect(page.getByTestId('cutscene-caption')).toContainText('A cold edge', { timeout: 8000 });
+  await expect(page.getByTestId('cutscene')).toHaveCount(0, { timeout: 8000 });
+  await expect(page.getByTestId('hud')).toContainText('You are a ghost');
+});
+
+test('a death cutscene can be skipped, and the ghost handoff follows at once', async ({ page }) => {
+  await start(page, '&cutscene=1&ghost=1');
+  await expect(page.getByTestId('cutscene-caption')).toContainText('A cold edge', { timeout: 8000 });
+  await page.getByTestId('cutscene-skip').click();
+  await expect(page.getByTestId('hud')).toContainText('You are a ghost');
+});

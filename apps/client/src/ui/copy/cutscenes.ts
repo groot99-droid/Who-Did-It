@@ -22,6 +22,13 @@ export const CUTSCENE_COPY = {
     'In HollowMere, nobody kills for nothing. Everyone has a price, a prayer, or a vendetta.',
   'cs.hollowmere.check': 'Check your pockets. Read your mail. Watch the shadows.',
   'cs.hollowmere.miss': "And whatever you do, don't miss the train.",
+
+  // 14.20.2 The death cutscenes, one whisper each
+  'cs.deathKnife.line': 'A cold edge, and the lantern goes out.',
+  'cs.deathPoison.line': 'Something in the cup was not sugar.',
+  'cs.deathShot.line': 'One shot, and the whole square goes quiet.',
+  'cs.deathEjected.line': 'The town has spoken.',
+  'cs.deathWolf.line': 'The pines were not empty.',
 } as const;
 
 export type CutsceneCopyId = keyof typeof CUTSCENE_COPY;

@@ -4,6 +4,7 @@ import type { Cutscene, CutscenesFile } from '@wdi/content';
 import { TILE_PX } from '@wdi/shared/constants';
 import { toScreen } from '@wdi/shared/iso';
 import { REG_INPUT } from '../../net/world';
+import { REG_CUTSCENE } from '../../scenes/registry';
 import { CUTSCENE_COPY, cutsceneLine } from '../../ui/copy/cutscenes';
 import { h } from '../../ui/dom';
 import type { AudioBus, AudioKey } from '../AudioBus';
@@ -48,6 +49,11 @@ export class CutscenePlayer {
     private readonly followOf: () => Phaser.GameObjects.GameObject | null = () => null,
   ) {}
 
+  /** True while a cutscene plays (a seat's ghost handoff can wait on it). */
+  get playing(): boolean {
+    return this.run !== null;
+  }
+
   /** Plays the opening the router left under `REG_CUTSCENE`, if any, and clears it. */
   playPending(registry: Phaser.Data.DataManager, key: string): Promise<CutsceneOutcome> {
     const pending = registry.get(key) as string | undefined;
@@ -57,6 +63,11 @@ export class CutscenePlayer {
 
   /** Plays the death cutscene of a `killed`; resolves at once when it names none. */
   playDeath(cutsceneId: string | undefined): Promise<CutsceneOutcome> {
+    if (cutsceneId !== undefined && !this.scene.scene.isActive()) {
+      // A seat voted out is told while the meeting has the World asleep: the cutscene waits for the rebuilt World.
+      this.scene.registry.set(REG_CUTSCENE, cutsceneId);
+      return Promise.resolve('none');
+    }
     return this.playId(cutsceneId);
   }
 

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { TICK_RATE, TILE_PX } from '@wdi/shared/constants';
 import { MockWorldFeed } from './worldMock';
 
@@ -36,7 +36,15 @@ function make(search = '') {
   (globalThis as { location?: unknown }).location = { search };
   const feed = new MockWorldFeed(content as never);
   const events: string[] = [];
-  for (const type of ['killed', 'clueFound', 'meetingRequest', 'sceneEnter', 'error', 'noise'] as const)
+  for (const type of [
+    'killed',
+    'clueFound',
+    'meetingRequest',
+    'sceneEnter',
+    'error',
+    'noise',
+    'cutscene',
+  ] as const)
     feed.bus.on(type, () => events.push(type));
   return { feed, events };
 }
@@ -111,6 +119,40 @@ describe('MockWorldFeed verbs', () => {
   it('ghost mode is held in the feed', () => {
     expect(make('?ghost=1').feed.dead()).toBe(true);
     expect(make().feed.dead()).toBe(false);
+  });
+});
+
+describe('MockWorldFeed cutscenes (?cutscene=1, GDD 3.18)', () => {
+  // `start` runs the 20 Hz loop on `window.setInterval`; the node test environment has the timers on `globalThis`.
+  beforeAll(() => void vi.stubGlobal('window', globalThis));
+  afterAll(() => void vi.unstubAllGlobals());
+
+  it('sends no opening by default', () => {
+    const { feed, events } = make();
+    feed.start();
+    feed.dispose();
+    expect(events).not.toContain('cutscene');
+  });
+
+  it('sends the HollowMere opening before the first sceneEnter', () => {
+    const { feed, events } = make('?cutscene=1');
+    feed.start();
+    feed.dispose();
+    expect(events.indexOf('cutscene')).toBeGreaterThanOrEqual(0);
+    expect(events.indexOf('cutscene')).toBeLessThan(events.indexOf('sceneEnter'));
+  });
+
+  it('kills a ghost with its cutscene id once the World first reads the feed', () => {
+    const { feed, events } = make('?cutscene=1&ghost=1');
+    const killed: unknown[] = [];
+    feed.bus.on('killed', (k) => killed.push(k));
+    feed.start();
+    expect(feed.dead()).toBe(false);
+    feed.snapshot();
+    feed.dispose();
+    expect(feed.dead()).toBe(true);
+    expect(events).toContain('killed');
+    expect(killed[0]).toMatchObject({ cause: 'knife', cutsceneId: 'deathKnife' });
   });
 });
 

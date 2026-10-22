@@ -2699,6 +2699,16 @@ session's goes back to it. Log under "Integration log, round 6".
   the mock sends the opening at Start only under `?cutscene=1`, so the other mock specs reach the HUD at once;
   the "Round 6 (6J)" block of `components.css`; UI.md 14.20; `e2e/cutscene.spec.ts` (caption, Skip, Esc). The e2e run
   needs `pnpm --filter @wdi/shared build` and `@wdi/content build` first, as for every spec. No contract request.
+- **PR 3 (death cutscenes, spec, GDD)** on `claude/r6-cutscenes-deaths`, stacked on PR 2: `deathKnife`, `deathPoison`,
+  `deathShot`, `deathEjected` and `deathWolf` (a sound, a vfx, one whispered line, a held last frame, `maxS` 4) and
+  their copy; `playDeath` stashes the id under `REG_CUTSCENE` when the World is asleep (a vote's ejection) so the rebuilt
+  World plays it; `CutscenePlayer.playing`; the mock kills a `?cutscene=1&ghost=1` seat once the World first reads the
+  feed; `kill.test.ts` pins `cutsceneId`; `cutscene.spec.ts` covers the death cutscene, Skip and the ghost handoff; GDD
+  3.18 death paragraph. **Contract request (orchestrator, `World.ts`)**: `World.update` calls `this.refreshGhost()` every
+  frame, so a seat turns ghost as soon as the server says it is dead, while its death cutscene is still playing and the
+  HUD (with the "You are a ghost" toast) is held back. To make the handoff wait for the cutscene, guard that call:
+  `if (!this.cutscenes.playing) this.refreshGhost();` (`playing` is in this PR). Until then the ghost view starts under
+  the cutscene and the toast has about a second left when the HUD returns.
 
 ### Round 6 log: 6K (loading, transitions, trailer, budgets)
 
