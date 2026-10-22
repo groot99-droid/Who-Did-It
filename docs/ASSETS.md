@@ -154,6 +154,18 @@ Day 1 commits `.gitattributes` before any binary: LFS rules for `*.blend *.psd *
 
 First load (engine ~1.2 MB gz + lobby UI + own card + overworld + body pages + overlays + UI audio) <= 12 MB, target 8 MB; everything else lazy per scene. Per map <= 1.8 environment page-equivalents of 2048², loaded with the map (SPRITES 10.13, 10.14), plus resident character pages; <= 6 pages resident (~100 MB VRAM uncompressed). PNG only in V1; compressed-texture variants only if M6 profiling shows VRAM pressure. Max texture 2048² (query `getMaxTextureSize()`). Sprites per scene <= 10 players + 30 overlays + 6 creatures + 1 200 static world sprites + 200 particles. Audio <= 6 MB in V1. Site <= 150 MB; CI reports dist size per scene manifest and fails above 120 MB.
 
+**Round 6 (6K, A81, A93).** `tools/sprites/test/media.test.ts` enforces the media budgets from the committed manifests, and fails on an entry over its cap:
+
+| Budget | Cap | Counted from |
+|---|---|---|
+| SFX and ambience | 6 MB | the files of `audio/manifest.json` (the first load carries them) |
+| Music | 12 MB in all, 4 MB per map | `audio/music/manifest.json` (`tracks`, `playlists`) and the playlists `music.json` gives each map; lazy per map after Start, never in the first load |
+| Each video | 2 MB, its poster 60 KB | `video/manifest.json`, `{ version, entries: [{ key, url, poster?, durationS, bytes }] }`, `bytes` equal to the file |
+| First load | 12 MB | every art entry `Preload` queues (no `maps` or `modes`) plus the Hollowmere map's, for the default style; the other styles swap in after boot (art plan 1.9) |
+| Site | 150 MB | every file under `public/assets` |
+
+The first-load figure counts art only, as the brief names it. With the SFX files and the engine bundle added, the default style comes to about 14.4 MB, over the 12 MB the paragraph above states for the whole first load; the lowpoly style's resident set is 16.9 MB. Both are reported to the orchestrator (`docs/SESSIONS.md`, "Round 6 log: 6K") rather than hidden in the test.
+
 ### 6.9 Higgsfield tool map (verified against the live connector on 2026-10-09)
 
 The pipelines in 6.3 and 6.4 use these concrete tools. Credits quoted are Higgsfield's own notes, not measured here.

@@ -3,6 +3,7 @@ import palette from '@wdi/content/data/palette.json';
 import { type OnubFeed, REG_ONUB } from '../net/onub';
 import { overlayRoot } from '../ui/dom';
 import { QUICK_MATCH_MAP, applyFilters, peekManifest, queueMatchEntries } from '../view/assets';
+import { mountMatchLoadingScreen } from '../view/LoadingScreen';
 import { mountMatchArtSwitch } from '../ui/artStyle/ArtStyleSwitch';
 import { ART_STYLE_CHANGED } from '../view/artStyle';
 import { mountPrep, type PrepScreen } from '../view/onub/PrepView';
@@ -26,6 +27,7 @@ export class Kitchen extends Phaser.Scene {
   }
 
   preload(): void {
+    mountMatchLoadingScreen(this, overlayRoot(), QUICK_MATCH_MAP);
     // The quick match's art (SPRITES 10.13): the entries listing `onub` that are not loaded yet, and no map's.
     const manifest = peekManifest(getFlags(this).art, import.meta.env.BASE_URL);
     if (manifest) queueMatchEntries(this.load, this, manifest, QUICK_MATCH_MAP, 'onub');

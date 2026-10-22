@@ -245,8 +245,12 @@ export const BalanceFile = z.strictObject({
   mobs: Section({ maxPerScene: z.number().int().nonnegative(), chaseS: Seconds }),
   /** Round 6 (GDD 3.16): placeholders until Session 6E tunes them. */
   quests: Section({ maxActive: z.number().int().nonnegative() }),
-  /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds; 0 until Session 6K. */
-  ui: Section({ transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }) }),
+  /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
+  ui: Section({
+    transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }),
+    /** The loading screen shows only once a load has run `showAfterS`, and changes its tip every `tipEveryS`. */
+    loading: z.strictObject({ showAfterS: z.number().positive(), tipEveryS: z.number().positive() }),
+  }),
   ghosts: Section({ wispsPerCycle: z.number().int().nonnegative() }),
   chat: Section({
     /** A `chat.say` line is cut to this many characters (GDD 3.5). */
