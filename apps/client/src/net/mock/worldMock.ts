@@ -20,6 +20,9 @@ import type {
   SceneEnter,
   WorldFeed,
   WorldFeedEvents,
+  MobSnap,
+  NodeSnap,
+  QuestSnap,
 } from '../world';
 
 // A local stand-in for the server's movement stage, used behind ?mock=1 until a server is attached. It runs
@@ -449,6 +452,23 @@ export class MockWorldFeed implements WorldFeed {
       spawn: spawn.id,
       facing: spawn.facing,
     } satisfies SceneEnter);
+  }
+
+  // Round 6 (6I adds the mock's nodes, mobs and quests).
+  nodes(): NodeSnap[] {
+    return [];
+  }
+
+  mobs(): MobSnap[] {
+    return [];
+  }
+
+  quests(): QuestSnap[] {
+    return [];
+  }
+
+  minigameResult(_taskId: string, _answer: unknown): void {
+    // 6I
   }
 
   dispose(): void {

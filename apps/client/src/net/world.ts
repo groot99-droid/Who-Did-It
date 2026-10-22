@@ -116,7 +116,7 @@ export type WorldFeedEvents = {
   noise: NoisePulse;
   error: { code: number; msg: string };
   /** Private: this player was killed and is now a ghost. */
-  killed: { sceneId: string; cause: string; roles: Record<string, string> };
+  killed: { sceneId: string; cause: string; roles: Record<string, string>; cutsceneId?: string };
   /** Private: a collect finished; the entry is in `notebook()`. */
   clueFound: { entryId: string };
   phaseChange: { phase: number; endsTick: number };
@@ -126,7 +126,38 @@ export type WorldFeedEvents = {
   aim: { endsTick: number };
   /** Mock only: the mock world's report or bell asks the mock network to open a meeting (round 3, M | N seam). */
   meetingRequest: { reason: 'body' | 'bell' | 'dawn'; callerId: string; bodyOf?: string };
+  /** Round 6 (6J): play a cutscene; the router keeps an opening under `REG_CUTSCENE` for the World. */
+  cutscene: { id: string; scope?: 'all' };
+  /** Private, round 6 (6H, 6I): a station task's mini-game opened; answered with `minigameResult`. */
+  minigameStart: { taskId: string; kind: string; public: unknown };
 };
+
+/** Round 6 (M5b): a resource node of the scene this client is in (`SceneState.nodes`). */
+export interface NodeSnap {
+  id: string;
+  resource: string;
+  x: number;
+  y: number;
+  active: boolean;
+}
+
+/** Round 6 (M5b): a creature of the scene this client is in (`SceneState.mobs`); no seat, no handle. */
+export interface MobSnap {
+  id: string;
+  kind: string;
+  x: number;
+  y: number;
+  yaw: number;
+  animId: number;
+  state: number;
+}
+
+/** Round 6 (M5b): one of this player's own quests (`Private.quests`). */
+export interface QuestSnap {
+  id: string;
+  progress: number;
+  done: boolean;
+}
 
 export interface WorldFeed {
   readonly bus: Emitter<WorldFeedEvents>;
@@ -150,6 +181,12 @@ export interface WorldFeed {
   clues(): ClueSnap[];
   /** This player's own Notebook entries, oldest first. */
   notebook(): NotebookSnap[];
+  /** Round 6 (6I reads them live): the nodes and mobs of the scene this client is in, and its own quests. */
+  nodes(): NodeSnap[];
+  mobs(): MobSnap[];
+  quests(): QuestSnap[];
+  /** Round 6 (6I): the answer to a `minigameStart`. */
+  minigameResult(taskId: string, answer: unknown): void;
   /**
    * True once this player has been killed or their roster `alive` is false. Held here, never in the
    * scene, so it survives World restarts; resets when the phase returns to the lobby.

@@ -16,6 +16,8 @@ export interface Flags {
   joinCode: string | null;
   /** `#/lobby/CODE` lets a reload resume through the stored reconnection token. */
   resumeCode: string | null;
+  /** `#/admin`: the owner's admin page (round 6, docs/round6/auto-admin.md 8); `Preload` starts `Admin` instead of `Landing`. */
+  admin: boolean;
 }
 
 const CODE_RE = /^[A-Za-z0-9]{5}$/;
@@ -39,10 +41,11 @@ export function readFlags(search: string, hash: string): Flags {
     onub: params.get('onub') === '1',
     joinCode: route[0] === 'join' ? code : null,
     resumeCode: route[0] === 'lobby' ? code : null,
+    admin: route[0] === 'admin',
   };
 }
 
-export function setRoute(route: '' | `join/${string}` | `lobby/${string}`): void {
+export function setRoute(route: '' | 'admin' | `join/${string}` | `lobby/${string}`): void {
   const hash = route === '' ? '' : `#/${route}`;
   history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
 }

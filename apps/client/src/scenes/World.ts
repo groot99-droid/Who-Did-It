@@ -24,6 +24,10 @@ import { mountSeatPicker } from '../ui/SeatPicker';
 import { AudioBus } from '../view/AudioBus';
 import { BodyView } from '../view/BodyView';
 import { ClueView } from '../view/ClueView';
+import { CutscenePlayer } from '../view/cutscene/CutscenePlayer';
+import { GiverView } from '../view/GiverView';
+import { MobView } from '../view/MobView';
+import { NodeView } from '../view/NodeView';
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
@@ -42,7 +46,7 @@ import { type SceneMap, type TiledMap, readSceneMap } from '../view/sceneMap';
 import { loadSceneName } from '../view/sceneNames';
 import { nearestAvatar } from '../view/targets';
 import { DEFAULT_MAP_ID } from '../net/protocol';
-import { REG_AUDIO, getFlags, getNet } from './registry';
+import { REG_AUDIO, REG_CUTSCENE, getFlags, getNet } from './registry';
 
 /** How close a player must stand to a door to use it, in tiles (balance.json `doors.reachTiles`, GDD 3.7). */
 const PORTAL_REACH_TILES = balance.doors.reachTiles;
@@ -118,6 +122,11 @@ export class World extends Phaser.Scene {
   private sceneId = 'overworld';
   private entities!: EntityView;
   private clueView!: ClueView;
+  // Round 6 (locked lines): the M5b views (6I) and the cutscene player (6J).
+  private nodeView!: NodeView;
+  private mobView!: MobView;
+  private giverView!: GiverView;
+  private cutscenes!: CutscenePlayer;
   private ground: GroundView | null = null;
   private bell: { x: number; y: number } | null = null;
   private statics!: StaticView;
@@ -196,6 +205,9 @@ export class World extends Phaser.Scene {
     );
     this.statics.setLit(isLit(dayPartOf(feed.clock().phase)));
     this.clueView = new ClueView(this);
+    this.nodeView = new NodeView(this);
+    this.mobView = new MobView(this);
+    this.giverView = new GiverView(this);
     this.entities = new EntityView(this, feed.selfId);
 
     this.hud = new Hud(overlayRoot());
@@ -210,6 +222,7 @@ export class World extends Phaser.Scene {
       this.registry.set(REG_AUDIO, this.audio);
       void this.audio.load().then(() => this.audio.play('ambient'));
     }
+    this.cutscenes = new CutscenePlayer(this, overlayRoot(), this.audio);
     this.lastPhase = feed.clock().phase;
 
     const input: InputController = this.registry.get(REG_INPUT) ?? new InputController(feed);
@@ -233,7 +246,9 @@ export class World extends Phaser.Scene {
       if (e.code === 423 || e.code === 428) this.audio.play('door_locked');
     };
     const onFound = () => this.clueFound();
-    const onKilled = () => this.refreshGhost();
+    // Round 6, 6J (locked): the death cutscene plays, then the ghost handoff as before.
+    const onKilled = (m: { cutsceneId?: string }) =>
+      void this.cutscenes.playDeath(m.cutsceneId).then(() => this.refreshGhost());
     const onAim = (m: { endsTick: number }) => this.openAim(m.endsTick);
     feed.bus.on('noise', onNoise);
     feed.bus.on('error', onError);
@@ -261,6 +276,7 @@ export class World extends Phaser.Scene {
     this.scale.on(Phaser.Scale.Events.RESIZE, this.fitCamera, this);
     this.fitCamera();
     this.cameras.main.fadeIn(balance.doors.sceneFadeS * 1000);
+    void this.cutscenes.playPending(this.registry, REG_CUTSCENE); // round 6, 6J (locked): the opening
     if (flags.navDebug) this.drawNavDebug();
     this.showFps = flags.fps;
 
@@ -289,6 +305,10 @@ export class World extends Phaser.Scene {
       input.unbindAll();
       this.entities.destroy();
       this.clueView.destroy();
+      this.nodeView.destroy();
+      this.mobView.destroy();
+      this.giverView.destroy();
+      this.cutscenes.destroy();
       this.ground?.destroy();
       this.ground = null;
       this.statics.destroy();
@@ -326,6 +346,8 @@ export class World extends Phaser.Scene {
     const clues = feed.clues();
     const bodies = feed.bodies();
     this.clueView.update(clues, this.time.now);
+    this.nodeView.update(feed.nodes(), this.time.now); // round 6, 6I (locked)
+    this.mobView.update(feed.mobs(), this.time.now); // round 6, 6I (locked)
     this.syncBodies(bodies);
     this.drawDoors(clock.tick);
     this.updateTarget(self, clues, bodies);

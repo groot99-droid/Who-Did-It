@@ -4,6 +4,8 @@
 // walking, teleports instead of sliding.
 
 export const REMOTE_DELAY_MS = 150;
+/** Round 6 (docs/round6/auto-admin.md 2): the admin views divide the delay by the sim scale; a match uses 1. */
+export const remoteDelayMs = (scale = 1): number => REMOTE_DELAY_MS / scale;
 export const SELF_DELAY_MS = 100;
 /** A step larger than this many pixels between samples is a portal or a spawn, never a slide (1.5 tiles). */
 export const TELEPORT_PX = 96;

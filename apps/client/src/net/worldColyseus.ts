@@ -15,6 +15,9 @@ import type {
   SceneEnter,
   WorldFeed,
   WorldFeedEvents,
+  MobSnap,
+  NodeSnap,
+  QuestSnap,
 } from './world';
 
 // Reads the live room. The state is the shared schema of @wdi/shared; the client keeps loose structural
@@ -79,6 +82,11 @@ export class ColyseusWorldFeed implements WorldFeed {
     room.onMessage('phaseChange', (m: WorldFeedEvents['phaseChange']) => this.bus.emit('phaseChange', m));
     room.onMessage('aim', (m: WorldFeedEvents['aim']) => this.bus.emit('aim', m));
     room.onMessage('vfx', (m: WorldFeedEvents['vfx']) => this.bus.emit('vfx', m));
+    // Round 6 (locked): the cutscene and mini-game messages reach the bus; 6J and 6I consume them.
+    room.onMessage('cutscene', (m: WorldFeedEvents['cutscene']) => this.bus.emit('cutscene', m));
+    room.onMessage('minigameStart', (m: WorldFeedEvents['minigameStart']) =>
+      this.bus.emit('minigameStart', m),
+    );
   }
 
   /** Set by the private `killed` message or a false roster `alive`; cleared when the lobby returns. */
@@ -240,6 +248,23 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   bell(): void {
     this.room.send('act.bell', {});
+  }
+
+  // Round 6 (6I fills the readers from `SceneState.nodes`, `SceneState.mobs` and `Private.quests`).
+  nodes(): NodeSnap[] {
+    return [];
+  }
+
+  mobs(): MobSnap[] {
+    return [];
+  }
+
+  quests(): QuestSnap[] {
+    return [];
+  }
+
+  minigameResult(taskId: string, answer: unknown): void {
+    this.room.send('minigame.result', { taskId, answer });
   }
 
   dispose(): void {
