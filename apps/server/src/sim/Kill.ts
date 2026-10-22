@@ -6,6 +6,7 @@ import { resolveHandle } from './Avatars';
 import { spawnBody } from './Bodies';
 import { spawnKillClues } from './Clues';
 import { markDead } from './Death';
+import { emitSim } from './events/bus';
 import { endImpersonation } from './Impersonate';
 import { spendProtection } from './NightPowers';
 import { emitNoise } from './Noise';
@@ -110,6 +111,7 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
 
   const tx = Math.floor(target.x / TILE_PX);
   const ty = Math.floor(target.y / TILE_PX);
+  emitSim(room, { tick, kind: 'kill', seat: targetId, sceneId, data: { by: sessionId } }); // round 6, 6B
   markDead(room, targetId, 'knife', sessionId);
   spawnBody(room, sceneId, targetId, tx, ty);
   spawnKillClues(room, sceneId, tx, ty, {
