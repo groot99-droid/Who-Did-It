@@ -81,7 +81,13 @@ export function reconcileViews(room: PartyRoom): void {
       const old = held.scene === null ? undefined : room.state.scenes.get(held.scene);
       if (old) view.remove(old);
       const next = want === null ? undefined : room.state.scenes.get(want);
-      if (next) view.add(next);
+      if (next) {
+        view.add(next);
+        // Round 6, 6G (contract item): `view.add` carries the scene's current avatars in with it; count them as held
+        // so `reconcileAvatars` takes back, in this same pass, every one the viewer may not see (a ghost, the dark).
+        const avatars = heldOf(room, client.sessionId).plain;
+        next.avatars.forEach((_avatar, handle) => avatars.add(handle));
+      }
       held.scene = want;
     }
 

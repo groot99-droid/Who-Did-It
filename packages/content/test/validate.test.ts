@@ -141,3 +141,35 @@ describe('schemas reject', () => {
     expect(() => parseContent(raw as never)).toThrow();
   });
 });
+
+describe('validateContent rejects cutscene data', () => {
+  it('an index entry of the wrong kind or an unknown cutscene', () => {
+    const errors = broken((c) => {
+      c.cutscenes.deaths.knife = 'openingHollowmere';
+      c.cutscenes.openings.blackpine = 'nowhere';
+    });
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('of kind opening, expected death'),
+        expect.stringContaining('unknown cutscene "nowhere"'),
+      ]),
+    );
+  });
+
+  it('a camera step off the scene, an opening longer than openingS, and a step in the wrong kind', () => {
+    const errors = broken((c) => {
+      const open = c.cutscenes.cutscenes.openingHollowmere!;
+      open.maxS = c.balance.phases.openingS + 1;
+      open.steps.push({ t: 'hold' });
+      const cam = open.steps.find((s) => s.t === 'camera');
+      if (cam?.t === 'camera') cam.to = { x: 999, y: 0 };
+    });
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('outside overworld'),
+        expect.stringContaining('longer than phases.openingS'),
+        expect.stringContaining('hold belongs to a death cutscene'),
+      ]),
+    );
+  });
+});

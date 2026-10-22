@@ -2747,11 +2747,55 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6G (mobs and dark visibility)
 
+- **Branch** `claude/r6-mobs`, one draft PR against `claude/zen-turing-m1jnw0` with the brief's three steps as three
+  commits, each green on `pnpm lint && pnpm typecheck && pnpm test`, as 6E and 6K did with one branch.
+- **Step 1-2, creatures, the wolf kill, the NPC flee** (2026-10-22): `sim/Mobs.ts`, `sim/mobs/{ai,spawn,hurt,light,
+  flee}.ts`, `creatureKill` in `Kill.ts` (the `wolf` cause; `Death.ts` needed no change, `DeathCause` already had
+  it), `test/mobs.test.ts` (the FSM, spawn by part of the day, the leash over two minutes, a two-bite wolf kill, a
+  lit lantern, a bat's floor at 1 HP, the NPC flee, 10 seats and the wolves under 15 ms p95).
+- **Step 3, dark sight**: `sim/Sight.ts` `canSee`, the lantern bit line of `publishAvatars`, `test/sight.test.ts`
+  and the dark cases of `visibility.test.ts`; GDD 3.7's lantern line and the (6G) sentences of 3.15; DECISIONS A89.
+- **What the client reads** (6I, 6M): `SceneState.mobs`, keyed by spawner id: `kind` (sprite `mob_<kind>`), `x`, `y`
+  (world px), `yaw` (world frame as `Presence.yaw`; the atlas direction is `dirFromVector(sin yaw, -cos yaw)`
+  through the iso table), `animId` (`AnimId.idle`, `walk`, `swing` = the attack frames); `state` needs no reader.
+  `Avatar.statusBits & StatusBit.lantern` is a lit light, own avatar included.
+- **Contract requests** (in the PR description, each with its stand-in): `act.light { on }` in `C2S` routed to
+  `handleLight` (`sim/mobs/light.ts`); one line in `npc/world.ts` `runWorldNpc` calling `fleeCreature`
+  (`sim/mobs/flee.ts`); the `reconcileViews` fix (applied in the PR: a P5 leak on the base, see A89).
+
 ### Round 6 log: 6H (quests and mini-games)
 
 ### Round 6 log: 6I (M5b client)
 
 ### Round 6 log: 6J (cutscenes)
+
+- **PR 1 (schema, index, rules, server lines, `openingS`)** on `claude/r6-cutscenes`: `rules/cutscenes.ts` bodies with
+  `shared/test/cutscenes.test.ts`; `cutscenes.json` holds the HollowMere opening (50 s, 12 captions by copy id
+  `cs.hollowmere.*`, a five-leg camera pan over the overworld, `storm`, `narr_bed_hollowmere` and `bell`) and the
+  Blackpine two-step pan; `checkCutscenes` in `validate.ts` (kinds, maps, scenes, tiles, the opening against
+  `openingS`, step kinds, main-track length against `maxS`); `balance.phases.openingS` 50; GDD 3.3 and 3.18 lines;
+  DECISIONS A92; `apps/server/test/opening.test.ts` (broadcast and grace length through `beginPlay`). The five
+  death cutscenes land in PR 3. No contract request.
+- **PR 2 (sequencer and player on the mock)** on `claude/r6-cutscenes-player`, stacked on PR 1: `sequencer.ts`
+  (`planTimeline`, `advance` with an optional `prevMs`, `cameraPose`, `ease`) with `sequencer.test.ts`; `Captions.ts`;
+  `CutscenePlayer.ts` (`playId`, `play`, a `followOf` constructor argument the one World.ts constructor line passes,
+  Esc and the Skip button, the hold on the HUD and the move input, the camera back on the own figure at the end);
+  `ui/copy/cutscenes.ts` with its test (every caption resolves, at most 90 characters); `?cutscene=0` in `devFlags.ts`;
+  the mock sends the opening at Start only under `?cutscene=1`, so the other mock specs reach the HUD at once;
+  the "Round 6 (6J)" block of `components.css`; UI.md 14.20; `e2e/cutscene.spec.ts` (caption, Skip, Esc). The e2e run
+  needs `pnpm --filter @wdi/shared build` and `@wdi/content build` first, as for every spec. No contract request.
+- **PR 3 (death cutscenes, spec, GDD)** on `claude/r6-cutscenes-deaths`, stacked on PR 2: `deathKnife`, `deathPoison`,
+  `deathShot`, `deathEjected` and `deathWolf` (a sound, a vfx, one whispered line, a held last frame, `maxS` 4) and
+  their copy; `playDeath` stashes the id under `REG_CUTSCENE` when the World is asleep (a vote's ejection) so the rebuilt
+  World plays it; `CutscenePlayer.playing`; the mock kills a `?cutscene=1&ghost=1` seat once the World first reads the
+  feed; `kill.test.ts` pins `cutsceneId`; `cutscene.spec.ts` covers the death cutscene, Skip and the ghost handoff; GDD
+  3.18 death paragraph. The ghost handoff guard (`if (!this.cutscenes.playing) this.refreshGhost();` in `World.update`) is in this PR: the
+  orchestrator ruled it a World.ts play hook inside 6J's Owns.
+- **Also in PR 2 (answered contract request)**: the first line of `World.ts` `preload()` is
+  `mountMatchLoadingScreen(this, overlayRoot(), this.matchMap())`, added after #51 merged.
+- **Done.** PR 1 (#52) is merged; PRs 2 and 3 (#55, #57) are retargeted by the orchestrator. Every PR was green on
+  `pnpm lint && pnpm typecheck && pnpm test` before each push. Open items: none from 6J; the Port-au-Levain opening
+  and the memorial video are round-7 content.
 
 ### Round 6 log: 6K (loading, transitions, trailer, budgets)
 
@@ -2803,6 +2847,20 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6M (M5b art)
 
+- Step 1 (nodes, held tools, glows, icons): `tools/sprites/m5b.ts` and `m5b-draw.ts` draw the six resource
+  nodes in two states, the six tools as held overlays in eight directions and the lantern and torch glows, in
+  both styles; `placeholder-m5b.ts` carries their greybox twins; six `icon_item_*` SVGs; SPRITES 12; the
+  CREDITS row; DECISIONS A95; `test/m5b.test.ts`. Ids from 6E's step 1 (#49). `pnpm lint && pnpm typecheck &&
+  pnpm test` green.
+- Step 2 (mobs): `tools/sprites/m5b-mobs.ts` rigs the wolf, boar, bat and rat (ids from #49 step 2) and m5b.ts
+  packs them as `mobs` and `anims_mobs` (idle, walk, attack in eight directions) in both styles, with greybox
+  twins in `placeholder-m5b.ts`; SPRITES 12, A95 and the CREDITS row extended; `test/m5b.test.ts` covers the
+  frames and animations. Green.
+- Step 3 (givers): `tools/sprites/m5b-givers.ts` dresses the five quest npcs of #49 step 3 (`harbourmaster`,
+  `moll`, `foreman`, `smith`, `collier`) on the mob rigs (`drawRig`), packed as `givers` and `anims_givers`
+  (idle in eight directions) in both styles, with greybox twins; SPRITES 12, A95, CREDITS and `test/m5b.test.ts`
+  extended. Green. All of the brief's sprites are in; what remains is review and 6I's consumption.
+
 ### Round 6 log: 6N (ROSW media)
 
 ## Integration log, round 6
@@ -2821,3 +2879,16 @@ session's goes back to it. Log under "Integration log, round 6".
   R18 and the NPC suite under sixteen busy-loop processes, and with a throwaway probe of the timeline: the failure
   itself did not reproduce locally, only the tick drift that explains it (the lobby tick varied from 3 to 8, the
   card and grace ticks with it). The NPC tests stay S's and 5H's.
+- **Quick-mode night test flake, wire timing (2026-10-22).** CI failed twice on commits that do not touch the quick
+  mode: `onubNight.test.ts` line 419 (the Tourrier test) saw one refusal where it expected two (`[422]`), and line 521
+  (the Iron Cloche test) saw `[]` where it expected one, right after waiting on `m.o.cloche`. Cause: the server's 422
+  `ErrorCode.cannot` travels over the Colyseus wire after the state change the test waits for, so a synchronous read
+  of `errorsOf` could run before it landed; a state wait is not a message wait. Fix in
+  `apps/server/test/onubNight.test.ts` alone, `apps/server/src`, the rules and every number untouched, no assertion
+  skipped or loosened: each `errorsOf` assertion that followed an act or a `debug.clock` without a wait on the error
+  count now has `await until(() => errorsOf(bot).length >= N)` first, then asserts the exact contents. The audit
+  found four more such reads besides the two reported, all in the `debug.clock` tests (the wrong-phase refusal of
+  `{phase}`, the `{window}` of a role not in the deck, the `{bogus}` one, and the `{window}` outside the night);
+  every other `errorsOf` read in the file already waited on the count. Verified with the file five times unloaded and five times under eight
+  busy-loop processes on four cores, then `pnpm lint`, `pnpm typecheck` and `pnpm test`; the failure itself did not
+  reproduce locally, on the unfixed file either. The night tests stay 5B's.
