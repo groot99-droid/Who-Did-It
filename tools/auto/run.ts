@@ -14,6 +14,7 @@ import {
   runAutoMatch,
 } from '../../apps/server/test/autoHelpers';
 import { npcIdsFor, parseArgs, seedWordsFor } from './args';
+import './checks';
 
 const opts = parseArgs(process.argv.slice(2).filter((a) => a !== '--'));
 if (opts === null) {
