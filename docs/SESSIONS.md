@@ -2693,3 +2693,18 @@ session's goes back to it. Log under "Integration log, round 6".
 ### Round 6 log: 6N (ROSW media)
 
 ## Integration log, round 6
+
+- **NPC test flake, R18 (2026-10-22).** On PR #47's CI run 252 (head ac0409c) `npcRoutine.test.ts` R18 failed
+  with `npcPlay` 1216 against 1226 (paths equal); the push run on the same commit and every local run passed.
+  Cause: `standardParty` reached the world through `until` polls (`start`, `toWorld`) while the room's own clock
+  kept stepping, so the tick the test's `advance` loop started on, and where the brains' tick timers (placement
+  idle, dwell, pauses) fell in the recorded window, depended on wall time; under load the two parties R18
+  compares could start on different ticks. Fix in `apps/server/test/npcHelpers.ts` alone, the sim untouched, no
+  rule or number changed: `standardParty` takes the room off its clock once the lobby exists (`pauseClock`, the
+  Colyseus `setTimestep()` with no callback), advances to a fixed tick, queues Start itself and drives the card,
+  grace and every placement with `advance`, so every run of a seed set has one tick timeline; `resumeClock` puts
+  the same step back on the clock before the party is returned, so a test that still sends over the wire after it
+  is unchanged. R18 now also compares the tick its recording starts on (M7's `voteAt` already did). Verified with
+  R18 and the NPC suite under sixteen busy-loop processes, and with a throwaway probe of the timeline: the failure
+  itself did not reproduce locally, only the tick drift that explains it (the lobby tick varied from 3 to 8, the
+  card and grace ticks with it). The NPC tests stay S's and 5H's.
