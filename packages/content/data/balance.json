@@ -144,7 +144,7 @@
     "dayTiles": 7,
     "nightTiles": 3.5,
     "childDeltaTiles": -1,
-    "lanternTiles": 0,
+    "lanternTiles": 2,
     "gddRef": "3.7"
   },
   "noise": {

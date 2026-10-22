@@ -2674,6 +2674,20 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6E (M5b content and GDD 3.14-3.16)
 
+- **One PR, four commits (2026-10-22)**, #49, each green on `pnpm lint && pnpm typecheck && pnpm test`, as 6Z did
+  with one branch: (1) resources, recipes, the material items and the Spade, `checkM5b`'s craft checks; (2)-(3) mobs,
+  quest npcs and quests, the harbourmaster's giver on the overworld, mini-games and their checks; (4) nodes on
+  Gallows Wood and the Tin Gallery mouth and bats there, the per-profile craft check, `vision.lanternTiles` 2, GDD
+  3.14-3.16, the WORLD 4.6 economy note, DECISIONS A87. Ids for 6F-6I and 6M: resources `timber`, `stone`, `tinOre`,
+  `resin`, `herb`, `mushroom` (sprites `node_<snake>`); recipes = their tool ids `torch`, `snare`, `spade`,
+  `lockpicks`, `lantern`, `crowbar`; mobs `wolf`, `boar`, `bat`, `rat` (sprites `mob_<id>`); npcs `harbourmaster`,
+  `moll`, `foreman`, `smith`, `collier` (all `villager`); quests `caulkTheSkiff`, `mollsHerbs`, `mollsMushrooms`,
+  `stackTheYard`, `smithsOre`, `colliersStone` (copy ids `quest.<id>`); mini-games `lanternPour`, `pumpSlide`,
+  `letterSlide`, `fenceCrates`, `flourCrates`.
+- **Contract notes for the orchestrator**: `seams.md` 1.2 still lists `gatherHoldS` (now `stackMax`);
+  `schemas/items.ts` gained the `material` kind (one line). One baseline flake seen under full-suite load
+  (`onubNight.test.ts`, a 422 not yet received); it passed alone three times and on the rerun.
+
 ### Round 6 log: 6F (gathering and crafting)
 
 ### Round 6 log: 6G (mobs and dark visibility)

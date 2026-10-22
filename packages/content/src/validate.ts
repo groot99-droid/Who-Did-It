@@ -250,8 +250,8 @@ export function validateContent(c: Content): string[] {
  * Round 6 (docs/round6/m5b-data.md 1, cutscene-music.md 1.1 and 3; GDD 3.14 to 3.16). Session 6E's M5b checks: every
  * resource is a `material` item and every material a resource, a resource's `tool` is an item, every
  * `scene.nodes[].resource` names a resource; a recipe's `out` and `in[].item` are items, its `station` a
- * `routines.json` station kind, and every recipe is craftable on every map from what that map's nodes yield and its
- * stations offer (`reachable`); every spawner names a mob, the wolf keeps GDD 3.6's light radius, and no scene
+ * `routines.json` station kind, and every recipe is craftable on every map at every party profile from what the open
+ * scenes' nodes yield and their stations offer (`reachable`); every spawner names a mob, the wolf keeps GDD 3.6's light radius, and no scene
  * has more spawners than `mobs.maxPerScene`; every giver names a quest npc, every npc stands once and gives a quest, a quest
  * wants what its map can have and rewards V1 items, and every fetch task has one mini-game. Session 6J
  * adds: every index entry of `cutscenes` names a cutscene of the right kind, every `openings` key a map. Session 6L
@@ -316,19 +316,24 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
       err(`scene ${scene.id}: ${spawners.length} spawners, above mobs.maxPerScene`);
     }
   }
+  // Per map and per party profile: a small party must be able to make every tool from the scenes open to it.
   const inHand = new Map<string, Set<string>>();
   for (const map of Object.values(c.maps)) {
-    const reach = reachable(
-      c,
-      map.scenes.flatMap((id) => c.scenes[id] ?? []),
-    );
-    inHand.set(map.id, reach.have);
-    for (const id of Object.keys(recipes.recipes)) {
-      if (!reach.made.has(id)) err(`map ${map.id}: recipe ${id} cannot be crafted from its nodes`);
+    for (const [profile, rank] of Object.entries(PROFILE_RANK)) {
+      const open = map.scenes
+        .flatMap((id) => c.scenes[id] ?? [])
+        .filter((s) => PROFILE_RANK[s.profile] <= rank);
+      const reach = reachable(c, open);
+      inHand.set(`${map.id}/${profile}`, reach.have);
+      for (const id of Object.keys(recipes.recipes)) {
+        if (!reach.made.has(id))
+          err(`map ${map.id} (${profile}): recipe ${id} cannot be crafted from its nodes`);
+      }
     }
   }
 
-  // Quests and mini-games (GDD 3.16): each npc stands once, wants what its map can gather or make, rewards V1 items.
+  // Quests and mini-games (GDD 3.16): each npc stands once and wants what the scenes open with its own scene can
+  // yield or make; rewards ship in V1.
   const looks = new Set(Object.keys(c.looks.looks));
   const standsOn = new Map<string, string>();
   for (const map of Object.values(c.maps)) {
@@ -336,7 +341,7 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
       for (const g of c.scenes[sceneId]?.givers ?? []) {
         if (!Object.hasOwn(quests.npcs, g.npc)) err(`scene ${sceneId}: giver ${g.id} unknown npc ${g.npc}`);
         else if (standsOn.has(g.npc)) err(`quests.json: npc ${g.npc} stands in two places`);
-        standsOn.set(g.npc, map.id);
+        standsOn.set(g.npc, `${map.id}/${c.scenes[sceneId]!.profile}`);
       }
     }
   }

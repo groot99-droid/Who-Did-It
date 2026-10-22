@@ -2,9 +2,9 @@
   "gddRef": "3.16",
   "npcs": {
     "harbourmaster": { "id": "harbourmaster", "name": "Harbourmaster Pell", "look": "villager" },
-    "moll": { "id": "moll", "name": "Old Moll", "look": "villager" },
-    "foreman": { "id": "foreman", "name": "Foreman Drury", "look": "villager" },
-    "smith": { "id": "smith", "name": "Smith Hask", "look": "villager" },
+    "moll": { "id": "moll", "name": "Mother Moll", "look": "villager" },
+    "foreman": { "id": "foreman", "name": "Foreman Hask", "look": "villager" },
+    "smith": { "id": "smith", "name": "Ada Kerrow", "look": "villager" },
     "collier": { "id": "collier", "name": "The Collier", "look": "villager" }
   },
   "quests": {

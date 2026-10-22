@@ -72,8 +72,8 @@ describe('resources and recipes', () => {
       }),
     ).toEqual(
       expect.arrayContaining([
-        expect.stringContaining('map blackpine: recipe torch cannot be crafted'),
-        expect.stringContaining('map blackpine: recipe lantern cannot be crafted'),
+        expect.stringContaining('map blackpine (small): recipe torch cannot be crafted'),
+        expect.stringContaining('map blackpine (small): recipe lantern cannot be crafted'),
       ]),
     );
   });
@@ -85,8 +85,8 @@ describe('resources and recipes', () => {
       }),
     ).toEqual(
       expect.arrayContaining([
-        expect.stringContaining('map hollowmere: recipe spade cannot be crafted'),
-        expect.stringContaining('map hollowmere: recipe crowbar cannot be crafted'),
+        expect.stringContaining('map hollowmere (small): recipe spade cannot be crafted'),
+        expect.stringContaining('map hollowmere (small): recipe crowbar cannot be crafted'),
       ]),
     );
   });
