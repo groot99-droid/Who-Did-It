@@ -2331,6 +2331,9 @@ then docs/round6/seams.md, then the sections it names. Branch claude/r6-<slug>."
   grace by `phases.openingS`, and a `killed` carries its cutscene id (`cutscene-music.md` 1).
 - **Music is lazy and has its own budget** (<= 12 MB, <= 4 MB per map, loaded after Start); the 6 MB audio
   budget is SFX and ambience (`media.md` 2, DECISIONS A81).
+- **Every sound comes from the ROSW sound library** by catalog id (the owner's tracks as a release batch, the
+  stingers and ambiences from the catalog); `music-cue` is not used and nothing is copied into `studio/assets/`
+  by hand (`media.md` 1, 4, 7; owner, 2026-10-22).
 - **The Step order** gains `runAuto` (before `runNpcs`), `runResources`, `runMobs`, `runQuests` (in place of
   `runAiAndHazards`, after `runDecay`) and `runEvents` (after `runPhases`).
 
@@ -2389,9 +2392,9 @@ branch.
 | **6I. M5b client** | Sonnet 5.5 | Code | `claude/r6-m5b-client` | `view/{NodeView,MobView,GiverView}.ts`, `ui/{Inventory,Crafting,QuestLog}.ts`, `view/minigames/**`, the lantern glow of `Lighting.ts`, the readers of `worldColyseus.ts` and the mock, `ui/copy/m5b.ts`, `e2e/m5b.spec.ts`, UI.md 14.19 |
 | **6J. Cutscenes** | Sonnet 5.5 | Code | `claude/r6-cutscenes` | `content/data/cutscenes/**` and the schema, `rules/cutscenes.ts`, `view/cutscene/**`, `ui/copy/cutscenes.ts`, the `beginPlay` broadcast and `openingS`, the `markDead` line, the `World.ts` play hooks, `e2e/cutscene.spec.ts`, GDD 3.18 cutscene lines, GDD 3.3 `openingS` line |
 | **6K. Loading, transitions, trailer, budgets** | Sonnet 5.5 | Code | `claude/r6-polish-flow` | `view/{LoadingScreen,Transition}.ts`, `ui/copy/tips.ts`, the Landing video element, the `worldRouter.ts` wrappers' bodies, `tools/sprites/test/media.test.ts`, the video manifest shape, ASSETS 6.8 text, GDD 3.13 `transitionS` line |
-| **6L. Music** | Sonnet 5.5 | Code | `claude/r6-music` | `view/{MusicBus,MusicDirector,audioSettings}.ts`, `ui/SettingsPanel.ts`, `AudioBus.setSfxVolume` and the `narr_*`/`sting_*` keys, `content/data/music.json` and its schema, the music manifest shape, CC0 beds and CREDITS, GDD 3.18 music lines |
+| **6L. Music** | Sonnet 5.5 | Code | `claude/r6-music` | `view/{MusicBus,MusicDirector,audioSettings}.ts`, `ui/SettingsPanel.ts`, `AudioBus.setSfxVolume` and the `narr_*`/`sting_*` keys, `content/data/music.json` and its schema, the music manifest shape, the playlist slots filled from the sound library (CC0 only where it cannot) and their CREDITS, GDD 3.18 music lines |
 | **6M. M5b art** | Opus 5.5 | Art | `claude/r6-m5b-art` | `tools/sprites/placeholder-m5b.ts`, node, mob, giver, tool and light sprites in both styles, manifest keys, SPRITES.md section, CREDITS |
-| **6N. ROSW media (both repos)** | Opus 5.5 | Art | `claude/r6-rosw-media` | ROSW: the `music-cue` and `video-shot` runs, studio notes, library catalog; here: `public/assets/{video,audio/music}/**` binaries, the manifest rows, the mastered owner tracks, `assets/source/MANIFEST.md`, CREDITS rows |
+| **6N. ROSW media (both repos)** | Opus 5.5 | Art | `claude/r6-rosw-media` | ROSW: the `sound-library` ingest of the owner's batch (`catalog.json`), the `video-shot` runs, their studio notes and library entries; here: `public/assets/{video,audio,audio/music}/**` binaries fetched by catalog id and mastered, the manifest rows, `assets/source/MANIFEST.md`, CREDITS rows |
 | **6P. Integration** | Sonnet 5.5 | Code | `claude/r6-integration` | merges, lockfile, `PROTOCOL.md` regen, the 50-match `pnpm auto` soak on both maps and modes, both 30-minute soaks, the opt-in e2e suites, this round's integration log, DECISIONS A97 |
 
 Merge order: 6Z first and alone; then 6A, 6E, 6J, 6K, 6L, 6M in parallel; 6B and 6C after 6A; 6F, 6G, 6H
@@ -2578,14 +2581,16 @@ ms; `media.test.ts` passes on the empty manifests and fails on a constructed ove
 volume, lazy-loaded within its own budget. **Owns** `apps/client/src/view/{MusicBus,MusicDirector,
 audioSettings}.ts` with tests, new `ui/SettingsPanel.ts` with a test, `AudioBus.setSfxVolume` and the `narr_*`
 and `sting_*` keys in `view/AudioBus.ts`, `packages/content/data/music.json` and `schemas/music.ts` with the
-playlist-id test, the shape of `audio/music/manifest.json`, the CC0 beds (files and CREDITS rows), new
+playlist-id test, the shape of `audio/music/manifest.json`, the beds for the playlist slots the owner's tracks
+leave empty (fetched by id from the ROSW sound library with its `sound-library` skill and mastered as `media.md`
+1; a CC0 bed only for a slot the library cannot fill, listed to the owner first) and their CREDITS rows, new
 `ui/copy/settings.ts`, the "Round 6 (6L)" block of `components.css`, UI.md 14.22, the GDD 3.18 music paragraphs.
-**Reads** `cutscene-music.md` 3; `media.md` 2 and 4; `seams.md` 1.4; ASSETS 6.5 (the CC0 sources). The server
-sends no music message; `AUDIO_KEYS` stays an SFX union. **PRs**: (1) `MusicBus.ts` and `audioSettings.ts`
-with the settings panel; (2) `MusicDirector.ts`, `music.json` and the schema; (3) the CC0 beds, the manifest
-rows for them, the GDD lines. **Tests**: the crossfade swaps elements; a class change in the same phase does
-nothing; the settings persist; the budget test (6K's) passes with the beds. **Not**: SFX files, the cutscene
-`audio` steps, 6N's tracks. Before code, `seams.md`; log under "Round 6 log: 6L".
+**Reads** `cutscene-music.md` 3; `media.md` 2, 4 and 7; `seams.md` 1.4; ROSW `sound-library/README.md`; ASSETS
+6.5 (the CC0 sources, as the fallback). The server sends no music message; `AUDIO_KEYS` stays an SFX union.
+**PRs**: (1) `MusicBus.ts` and `audioSettings.ts` with the settings panel; (2) `MusicDirector.ts`, `music.json`
+and the schema; (3) the slot beds, the manifest rows for them, the GDD lines. **Tests**: the crossfade swaps
+elements; a class change in the same phase does nothing; the settings persist; the budget test (6K's) passes
+with the beds. **Not**: SFX files, the cutscene `audio` steps, 6N's tracks and stingers. Before code, `seams.md`; log under "Round 6 log: 6L".
 
 **6M. M5b art.** Make the sprites M5b draws, in both styles: nodes in two states, the four mobs in eight
 directions, the givers, the six tools as icons and held overlays, the lantern and torch glows. **Owns**
@@ -2596,17 +2601,23 @@ manifest entries in both style manifests, SPRITES.md's round-6 section, CREDITS 
 `manifest.test.ts`, `budget.test.ts`, `palette.test.ts` as they stand. **Not**: code outside `tools/sprites`.
 Needs 6E's ids first. Before code, `seams.md`; log under "Round 6 log: 6M".
 
-**6N. ROSW media (both repos).** Master the owner's eleven files, make the stingers with `music-cue` and the
-two videos with `video-shot`, keep every master in the ROSW studio with its note, and land the binaries and
-rows here. **Owns** in ROSW: the `music-cue` and `video-shot` runs under `studio/`, the studio notes the
-pipeline writes, the `studio/library/catalog.json` entries; here: `apps/client/public/assets/video/**`,
-`apps/client/public/assets/audio/music/**`, the owner's SFX under `apps/client/public/assets/audio/`, the rows
-of both media manifests and `audio/manifest.json`, `assets/source/MANIFEST.md`, CREDITS rows. **Reads**
-`media.md` (all); `cutscene-music.md` 2 and 3 (the shapes); ROSW `studio/vault/CLAUDE.md` and the
-`render-pipeline` skill. Never commits an original; never a link to an uploaded input. **PRs**: ROSW: one PR
-per pipeline kind; here: (1) the SFX and the music with their rows; (2) the two videos and the poster with their
-rows. **Tests**: `media.test.ts` passes with every file in place. **Not**: any `.ts`, any JSON under
-`packages/`. Needs the owner's answers of `media.md` 6 and the manifest shapes of 6K and 6L. Before code,
+**6N. ROSW media (both repos).** Ingest the owner's eleven files into the ROSW sound library from the release
+the owner attaches them to, pick the stingers, the narration bed and the ambiences from the catalog by ear,
+fetch every sound by id and master it, make the two videos with `video-shot`, and land the binaries and rows
+here. **Owns** in ROSW: the `sound-library` ingest (the `catalog.json` commit, never a file under
+`sound-library/files/`), the `video-shot` runs under `studio/`, the studio notes the pipeline writes, the
+`studio/library/catalog.json` entries; here: `apps/client/public/assets/video/**`,
+`apps/client/public/assets/audio/music/**`, the SFX, stingers and ambiences under
+`apps/client/public/assets/audio/`, the rows of both media manifests and `audio/manifest.json`,
+`assets/source/MANIFEST.md`, CREDITS rows. **Reads** `media.md` (all); `cutscene-music.md` 2 and 3 (the
+shapes); ROSW `sound-library/README.md` and the `sound-library` skill first, then `studio/vault/CLAUDE.md` and
+the `render-pipeline` skill for the videos. Never commits an original; never a link to an uploaded input;
+never edits `catalog.json` by hand; asks before `--replace`. **PRs**: ROSW: (1) the catalog commit of the
+ingest; (2) the video runs; here: (1) the SFX, stingers and ambiences with their rows; (2) the music with its
+rows; (3) the two videos and the poster with their rows. **Tests**: `media.test.ts` passes with every file in
+place; the library's own tests and `verify` after the ingest. **Not**: any `.ts`, any JSON under `packages/`,
+`music-cue`. Needs the owner's answers of `media.md` 6 (the release tag above all) and the manifest shapes of
+6K and 6L. Before code,
 `seams.md`; log under "Round 6 log: 6N".
 
 **6P. Integration.** Merge in the order above, regenerate `PROTOCOL.md` and the lockfile, run the 50-match
@@ -2635,6 +2646,13 @@ session's goes back to it. Log under "Integration log, round 6".
   streams already existed in `sim/seeds.ts`, so only `contract` and `events` were added. Nothing the code at
   a60d855 reads was removed or made required; the one baseline flake seen (`impersonate.test.ts`, a 120 ms sleep
   under load) passed on every clean run.
+- **Audio route (2026-10-22, after the pre-seed).** The owner: "for the music, SFX and more use the pipeline's
+  new SFX skill". ROSW main had merged its `sound-library` (PR #11: 2,648 owner recordings catalogued, the
+  originals on GitHub Releases, a `sound-library` skill). `media.md` now routes every sound through it (the
+  eleven uploads as a release batch, the stingers and ambiences by catalog id, candidates listed in its
+  section 4, provenance rows in 7), `music-cue` leaves round 6, the 6L and 6N briefs, DECISIONS A81, ROADMAP
+  M5c, `CLAUDE.md`, ASSETS 6.10 and the MANIFEST header follow, and the ROSW branch merges main and points the
+  `sound-library` skill at `media.md`.
 - **For the sessions**: `adminConfig` returns null and `AdminRoom` is unregistered, so no admin surface exists until
   6C; the quest and mini-game commands and the gather and craft holds refuse 422 until 6F and 6H; the Step stages
   `runAuto`, `runResources`, `runMobs`, `runQuests` and `runEvents` are no-ops; every new content record is

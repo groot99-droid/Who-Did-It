@@ -69,6 +69,10 @@ Versions are pinned in `docs/ARCHITECTURE.md` 5.1. Sessions never upgrade depend
   `assets/source/MANIFEST.md` in this repo mirrors every master's path, hash and date.
 - Higgsfield generations are catalogued in ROSW `studio/library/catalog.json`; a
   `CREDITS.md` row for a generated asset cites that catalog id.
+- Sounds come from ROSW `sound-library/` (the owner's own recordings and tracks: `catalog.json`
+  versioned, the originals on that repo's GitHub Releases, fetched by id with the `sound-library`
+  skill, never committed anywhere). A shipped sound's `CREDITS.md` and `MANIFEST.md` rows cite its
+  catalog id; a library sound has no studio note (`docs/round6/media.md` 7).
 - `.claude/settings.json` registers the ROSW marketplace and enables its `ui-design`
   plugin (style catalog, contrast-checked design-system generator); see `docs/ASSETS.md`
   6.10. The `rosw` plugin itself (creative-writing and studio pipelines) only works from

@@ -2,8 +2,9 @@
 
 The owner's request: "dying cutscenes, opening cutscenes, gameplay music playlists, starting screen trailers and
 animations for loading, transitioning and more." The decisions (DECISIONS A81): cutscenes are **in-engine and
-data-driven**, with only two real videos (`media.md` 3); music is **CC0 beds plus the owner's tracks plus ROSW
-`music-cue` stingers**, lazy-loaded per map under its own budget. Sessions: 6J (cutscenes), 6K (loading,
+data-driven**, with only two real videos (`media.md` 3); **every sound comes from the ROSW sound library**
+(the owner's tracks ingested as a batch, the stingers and ambiences picked from the catalog; `media.md` 1 and
+4), with CC0 beds only for a playlist slot the library cannot fill, lazy-loaded per map under its own budget. Sessions: 6J (cutscenes), 6K (loading,
 transitions, the trailer, the media budgets), 6L (music and the settings panel), 6N (the binaries). The rules
 go in GDD 3.18 (6J and 6L write their lines), the seconds in `balance.json`. Paths shorten `apps/client/src/`
 to `client/` and `apps/server/src/` to `server/`.
@@ -111,7 +112,8 @@ round-8 content (BlackPine ships a two-step camera pan with no narrator in round
   mute; `AudioBus.setSfxVolume` (6L's API addition). Music keys are data-driven; `AUDIO_KEYS` (`view/AudioBus.ts:4`)
   stays the SFX union plus the `narr_*` and `sting_*` keys of `media.md` 4.
 - GDD 3.18 gets the music lines (which class plays when, the lazy-load rule); 6N's tracks arrive through
-  `media.md`.
+  `media.md`, from the ROSW sound library by catalog id; 6L fills a slot from the library before any CC0 bed
+  (`media.md` 4).
 
 ## 4. Order and ownership
 
