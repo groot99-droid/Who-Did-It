@@ -39,7 +39,7 @@ const MATCH_SCENES = ['Meeting', 'GameOver', 'World', 'Kitchen', 'Night', 'RoleR
 const PHASE_LOBBY = 0;
 /** `GameMode.onub` of the schema (`state.settings.mode`). */
 const MODE_ONUB = 1;
-/** Round 6 (6K): the transition seconds, 0 until 6K sets them, so every start below stays synchronous. */
+/** Round 6 (6K): `balance.ui.transitionS` in ms; a start runs at once under reduced motion (`view/Transition.ts`). */
 const transitionMs = (kind: keyof typeof balance.ui.transitionS) => balance.ui.transitionS[kind] * 1000;
 
 /** The live quick-mode feed of a room: Session 5D's `ColyseusOnubFeed` (`net/onubColyseus.ts`). */
@@ -77,7 +77,7 @@ export function installWorldRouter(
     // is not stopped: it sleeps itself and keeps the card's DOM so Tab can reopen it during play.
     for (const key of LOBBY_SCREENS) stopScene(key);
     stopScene('GameOver');
-    // Round 6 (locked): the three scene starts run behind a transition (6K); at 0 ms they run at once.
+    // Round 6 (locked): the three scene starts run behind a transition (6K); at 0 ms or reduced motion they run at once.
     transition('fade', transitionMs('fade'), () => game.scene.start('World', data));
     net.bus.emit('sceneEnter', data);
   };

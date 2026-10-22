@@ -2184,3 +2184,59 @@ button.wdi-map__option {
   padding: 0;
   list-style: none;
 }
+
+/* Round 6 (6K): scene transitions (view/Transition.ts), the loading screen, the landing trailer. */
+.wdi-transition {
+  position: fixed;
+  inset: 0;
+  z-index: var(--wdi-z-toast);
+  pointer-events: none;
+  background-color: var(--wdi-ink);
+  transition-duration: var(--wdi-transition-ms, 200ms);
+  transition-timing-function: ease-in-out;
+}
+
+.wdi-transition--fade {
+  opacity: 0;
+  transition-property: opacity;
+}
+
+.wdi-transition--fade.wdi-transition--covered {
+  opacity: 1;
+}
+
+.wdi-transition--fade.wdi-transition--lifted {
+  opacity: 0;
+}
+
+.wdi-transition--iris {
+  clip-path: circle(0% at 50% 50%);
+  transition-property: clip-path;
+}
+
+.wdi-transition--iris.wdi-transition--covered {
+  clip-path: circle(75% at 50% 50%);
+}
+
+.wdi-transition--iris.wdi-transition--lifted {
+  clip-path: circle(0% at 50% 50%);
+}
+
+.wdi-transition--wipe {
+  clip-path: inset(0 100% 0 0);
+  transition-property: clip-path;
+}
+
+.wdi-transition--wipe.wdi-transition--covered {
+  clip-path: inset(0 0 0 0);
+}
+
+.wdi-transition--wipe.wdi-transition--lifted {
+  clip-path: inset(0 0 0 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-transition {
+    display: none;
+  }
+}

@@ -480,6 +480,8 @@ In M5a nobody carries a light that anyone else can see. Your vision is drawn for
 
 **Explored fog and the minimap** are M5b. M5a draws no memory of where you have been and no map overlay.
 
+**Transitions.** The client covers the screen while the router starts a scene: a fade into the world (`balance.ui.transitionS.fade`, 0.4 s), an iris into a meeting (`iris`, 0.6 s) and a wipe into the end screen (`wipe`, 0.7 s), each the whole cover-and-lift. Under reduced motion every duration is 0 and the scene starts at once. A transition that begins while another runs replaces it. Nothing here touches the sim or the wire.
+
 ### 3.14 Resources and crafting
 
 Round 6 (ROADMAP M5b); the data fields were pre-seeded in round 5 (3.13). The contract is `docs/round6/m5b-data.md` 1 and 2.1 until 6E and 6F write this section; the numbers land in `packages/content/data` with it.
