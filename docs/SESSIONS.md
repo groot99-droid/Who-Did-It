@@ -2702,10 +2702,69 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6K (loading, transitions, trailer, budgets)
 
+- **Branch** `claude/r6-polish-flow`, one draft PR against `claude/zen-turing-m1jnw0` (the three steps of the brief, pushed as three commits).
+- **Step 1, transitions**: `view/Transition.ts` (host-injected core, DOM host, supersede rule), `balance.ui.transitionS` set to 0.4 / 0.6 / 0.7, GDD 3.13 "Transitions" paragraph, `.wdi-transition*` CSS, `Transition.test.ts`. The router's three call sites are untouched; only the comments of `transitionMs` and the first call changed. `worldRouter.test.ts` runs unchanged because a node run has no document and so counts as reduced motion.
+- **Step 2, loading**: `view/LoadingScreen.ts` (`startLoading` controller, DOM host, `mountLoadingScreen`, `mountMatchLoadingScreen`, `loadingPlaylistFor`), `ui/copy/tips.ts`, `balance.ui.loading`, GDD 3.13 "Loading" paragraph, `LoadingScreen.test.ts`.
+- **Step 3, trailer and budgets**: `ui/landingTrailer.ts` and its slot in `Landing.ts` (plus an optional `music` field on `LandingOptions`), the empty `assets/video/manifest.json` and `assets/audio/music/manifest.json`, `tools/sprites/test/{media.ts,media.test.ts}`, ASSETS 6.8 round-6 text, UI.md 14.21, DECISIONS A93.
+- **Contract requests, as answered by the orchestrator**: the `scenes/Landing.ts` line (`music`) and the `scenes/Kitchen.ts` `preload()` line (`mountMatchLoadingScreen(this, overlayRoot(), QUICK_MATCH_MAP)`) are in this PR (Landing is inside 6K's Owns; Kitchen has no owner this round). The `scenes/World.ts` `preload()` line (`mountMatchLoadingScreen(this, overlayRoot(), this.matchMap())`) goes to 6J, who owns the World hooks; until it lands a World load shows no loading screen and asks for no loading music. 6L's `music/manifest.json` (merged in #48) replaced the empty stub 6K had written; `media.test.ts` passes on it. 6N: `video/manifest.json` rows are `{ key, url, poster?, durationS, bytes }`, `bytes` equal to the file.
+- **Findings for the orchestrator**: the first-load budget. The art `Preload` queues plus Hollowmere is 10.6 MB (8-bit), under 12 MB; adding the SFX files and about 1.5 MB of engine gives about 14.4 MB, over ASSETS 6.8's wording. The lowpoly style's art set is 16.9 MB; it swaps in after boot, so the test checks the default style only. The test counts art only, as the brief names it.
+- **Tests**: `pnpm lint && pnpm typecheck && pnpm test` green before every push.
+
 ### Round 6 log: 6L (music)
+
+- **PR 1 (2026-10-22): bus, settings, panel.** `view/audioSettings.ts` (`wdi:audio`, a subscribe so a slider moves
+  what is already playing), `view/MusicBus.ts` (two elements, lazy `src`, `crossfadeTo`/`prefetch`/`setVolume`/
+  `setMuted`, a manifest parser; its timing is a `tick(dtMs)` the tests drive), `AudioBus.setSfxVolume` and the
+  `narr_bed_hollowmere` and `sting_*` keys, `ui/SettingsPanel.ts` with `ui/copy/settings.ts`, the "Round 6 (6L)" CSS
+  block, UI.md 14.22, and the empty `audio/music/manifest.json` shape. The sound library's release is not up, so no
+  bed is fetched yet. The `narr_*` and `sting_*` keys are the ones `media.md` 4 names; 6N adds the files and rows.
+- **PR 2 (2026-10-22): director and mapping.** `view/MusicDirector.ts` (a pure `MusicConductor` driven by the lobby,
+  `phaseChange`, `gameOver` and `left` events; the meeting and the quick mode's four classes come from the phase, so
+  no Kitchen or Night scene needs a call), `music.json` filled for both maps and the quick mode, the manifest's
+  playlist slots declared with no tracks yet, a test that every id `music.json` names is a playlist of the committed
+  manifest, and the GDD 3.18 music paragraph. `playlistFor(map, class)` is exported for 6K: its `LoadingScreen` calls
+  `musicBus.crossfadeTo(playlistFor(mapId, 'loading'))`; a stand-in until it lands is that one line.
+- **Step 3 (2026-10-22): the slot list, beds not fetched.** The `sfx-2026-10` release of ROSW is not published, and
+  the cloud proxy refuses its release URLs, so no bed is fetched and `audio/music/manifest.json` keeps its slots
+  with no tracks (a slot with no track is silence). The slots, against the catalog read from a read-only clone of
+  ROSW (candidates by ear are 6N's and the owner's call):
+  - **The owner's tracks fill**: `hollowmere_day` (Railroad Barons), `blackpine_day` (Extraction Camp), the three
+    `*_loading` pieces, `trailer`, and `onub_kitchen` and `onub_rush` (The Baker's Bell, until round 8's map).
+  - **The library can fill, as a looped, cross-faded bed**: `*_meeting` (`tension-builders/heartbeat-tension-builder`,
+    48 s), `*_finalnight` (`tension-builders/tick-tension-builder`, 46 s, or `science-fiction-ambience/deep-scary-ambience`,
+    42 s), `*_night` and `onub_night` (`science-fiction-ambience/tense-ambience`, 42 s, or `deep-scary-ambience`).
+  - **The library cannot fill (it holds no melodic bed)**: `lobby`, and the two `*_gameover` plus `onub_over`
+    (the `sting_win_*` stingers cover the end; a bed after them is optional). Proposed: `*_dusk` reuses the day
+    theme, and the owner says whether they want to record or upload a `lobby` track and an end-screen track, or
+    whether a CC0 bed (ASSETS 6.5, with a CREDITS row) fills them. Nothing is downloaded until that answer.
+  - **Budget**: the owner's seven tracks master to about 9 to 10 MB of the 12 MB, so the library beds must be short
+    loops (about 0.4 MB each at 20 s); `media.test.ts` (6K) enforces 12 MB and 4 MB per map.
+  - **To finish**: when the release is up, `library.py fetch --id <id>` for the ids above, master as `media.md` 1,
+    add the OGG, the manifest rows (tracks and playlist `tracks`), the `CREDITS.md` and `MANIFEST.md` rows (`media.md`
+    7), and run the budget test.
+- **CC0 beds (2026-10-22, owner: "Use a CC0 bed for lobby and the end screen").** `lobby` plays OpenGameArt
+  "Contemplation" (Pro Sensory, CC0, first 60 s, 0.5 MB); `hollowmere_gameover`, `blackpine_gameover` and `onub_over`
+  play "The Fade" (breadman, CC0, 0.8 MB). Mastered at -18 LUFS, Vorbis q3, CREDITS rows with URL, hash and date;
+  no `MANIFEST.md` row, since a CC0 download is not a master. FreePD is closed, so OpenGameArt is the source. Still
+  open: the library beds (release unpublished), and `*_dusk` reusing the day theme.
 
 ### Round 6 log: 6M (M5b art)
 
 ### Round 6 log: 6N (ROSW media)
 
 ## Integration log, round 6
+
+- **NPC test flake, R18 (2026-10-22).** On PR #47's CI run 252 (head ac0409c) `npcRoutine.test.ts` R18 failed
+  with `npcPlay` 1216 against 1226 (paths equal); the push run on the same commit and every local run passed.
+  Cause: `standardParty` reached the world through `until` polls (`start`, `toWorld`) while the room's own clock
+  kept stepping, so the tick the test's `advance` loop started on, and where the brains' tick timers (placement
+  idle, dwell, pauses) fell in the recorded window, depended on wall time; under load the two parties R18
+  compares could start on different ticks. Fix in `apps/server/test/npcHelpers.ts` alone, the sim untouched, no
+  rule or number changed: `standardParty` takes the room off its clock once the lobby exists (`pauseClock`, the
+  Colyseus `setTimestep()` with no callback), advances to a fixed tick, queues Start itself and drives the card,
+  grace and every placement with `advance`, so every run of a seed set has one tick timeline; `resumeClock` puts
+  the same step back on the clock before the party is returned, so a test that still sends over the wire after it
+  is unchanged. R18 now also compares the tick its recording starts on (M7's `voteAt` already did). Verified with
+  R18 and the NPC suite under sixteen busy-loop processes, and with a throwaway probe of the timeline: the failure
+  itself did not reproduce locally, only the tick drift that explains it (the lobby tick varied from 3 to 8, the
+  card and grace ticks with it). The NPC tests stay S's and 5H's.

@@ -480,6 +480,10 @@ In M5a nobody carries a light that anyone else can see. Your vision is drawn for
 
 **Explored fog and the minimap** are M5b. M5a draws no memory of where you have been and no map overlay.
 
+**Transitions.** The client covers the screen while the router starts a scene: a fade into the world (`balance.ui.transitionS.fade`, 0.4 s), an iris into a meeting (`iris`, 0.6 s) and a wipe into the end screen (`wipe`, 0.7 s), each the whole cover-and-lift. Under reduced motion every duration is 0 and the scene starts at once. A transition that begins while another runs replaces it. Nothing here touches the sim or the wire.
+
+**Loading.** A load that runs longer than `balance.ui.loading.showAfterS` (0.3 s) shows a progress bar and a tip, which changes every `tipEveryS` (4 s); a shorter load shows nothing. Tips describe the controls and the world and never a role's powers. A match's load also starts the map's `loading` music (3.18).
+
 ### 3.14 Resources and crafting
 
 Round 6 (ROADMAP M5b); the data fields were pre-seeded in round 5 (3.13). The contract is `docs/round6/m5b-data.md` 1 and 2.1 until 6E and 6F write this section; the numbers land in `packages/content/data` with it.
@@ -526,6 +530,8 @@ Round 6 (ROADMAP M5b); the data fields were pre-seeded in round 5 (3.13). The co
 Round 6 (ROADMAP M5c). Cutscenes are data (`packages/content/data/cutscenes/`) played in-engine: the opening of a map runs inside grace, which `phases.openingS` lengthens for it, and adds no phase; a death plays the cutscene of its cause before the ghost handoff; every cutscene can be skipped, and reduce-motion turns its camera moves into cuts. Music follows the phase class of the map (`music.json`), is loaded after Start under its own budget (ASSETS 6.8) and is never sent by the server. The contract is `docs/round6/cutscene-music.md`; 6J writes the cutscene paragraphs and 6L the music paragraphs here, and the seconds live in `balance.json` (`phases.openingS`, `ui.transitionS`).
 
 **Cutscene openings (6J).** `cutscenes.json` maps each map to an opening cutscene. At the start of grace the server broadcasts `cutscene { id }` to every seat and adds `phases.openingS` to grace; it adds no phase and never waits for a client, so the NPCs walk and the clock runs while the camera pans. HollowMere's opening is a 50 s pan over the square with a narrator caption track ending on the role chip slamming in; Blackpine's is a 12 s two-step pan with no narrator. `openingS` is one number for every map, and every opening is at most that long (the content check enforces it), so a shorter opening leaves the rest of the lengthened grace to play. A seat can skip an opening with Esc or the Skip button and sees the world under the remaining grace.
+
+**Music (6L).** Each map plays one playlist per class, chosen by the phase and mapped in `music.json`: `loading` from the map's load until the first `day`, `lobby` between matches, `day` (dawn included), `dusk`, `night`, `meeting` (the discussion, the vote, the reveal and the immunity beat), `finalNight` and `gameOver`; the quick mode plays `kitchen` (Evening Prep and the crime scenes), `night`, `rush` (dawn to the Final Bake) and `over`. A phase that stays in its class changes nothing, so a track is never restarted, and the role card and grace keep the `loading` piece playing so the opening's speech is heard whole. Playlists cross-fade; their tracks, gains and fade seconds are in `audio/music/manifest.json`. Music is fetched only after Start (the lobby warms the first track of the picked map's day theme, never more) and has its own budget (ASSETS 6.8), separate from effects. Every player has a music slider, an effects slider and a mute (UI 14.22), kept on their own device and never sent; a class with no playlist, or a playlist with no track, is silence. No role, cover or secret is a class: the server sends nothing, and the pick depends only on public phases.
 
 ### 3.19 Admin auto-mode
 

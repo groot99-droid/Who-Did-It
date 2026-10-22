@@ -31,6 +31,7 @@ import { NodeView } from '../view/NodeView';
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
+import { mountMatchLoadingScreen } from '../view/LoadingScreen';
 import { darknessOf, sceneLights } from '../view/lightMath';
 import { NotebookSheet } from '../view/NotebookPanel';
 import { GroundView } from '../view/GroundView';
@@ -171,6 +172,7 @@ export class World extends Phaser.Scene {
   }
 
   preload(): void {
+    mountMatchLoadingScreen(this, overlayRoot(), this.matchMap());
     const base = import.meta.env.BASE_URL;
     const key = sceneMapKey(this.sceneId);
     if (!this.cache.tilemap.exists(key)) this.load.tilemapTiledJSON(key, sceneMapUrl(base, this.sceneId));

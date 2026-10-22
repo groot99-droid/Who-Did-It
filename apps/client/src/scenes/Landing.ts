@@ -4,7 +4,8 @@ import { buildIsStale, REFRESH_MESSAGE } from '../health';
 import { mountLanding } from '../ui/Landing';
 import { overlayRoot, type Screen } from '../ui/dom';
 import { Backdrop } from '../view/Backdrop';
-import { getFlags, getHealth, getNet } from './registry';
+import type { MusicBus } from '../view/MusicBus';
+import { REG_MUSIC, getFlags, getHealth, getNet } from './registry';
 
 export class Landing extends Phaser.Scene {
   private screen: Screen | null = null;
@@ -28,6 +29,7 @@ export class Landing extends Phaser.Scene {
     const show = () => {
       this.screen = mountLanding(overlayRoot(), {
         joinCode: flags.joinCode,
+        music: this.registry.get(REG_MUSIC) as MusicBus | undefined,
         onCreate: async (name) => enterLobby(await net.create(name)),
         onJoin: async (code, name) => enterLobby(await net.join(code, name)),
         explainFailure: async () => (!flags.mock && (await buildIsStale()) ? REFRESH_MESSAGE : null),

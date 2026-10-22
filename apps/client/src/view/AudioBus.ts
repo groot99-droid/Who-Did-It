@@ -1,3 +1,5 @@
+import { onAudioSettings, readAudioSettings } from './audioSettings';
+
 // Plays the M3 sound set by key. Q ships `assets/audio/manifest.json` and the files; until it exists (or for
 // a key it does not list) every call is a silent no-op, so the game never waits on audio.
 
@@ -15,6 +17,13 @@ export const AUDIO_KEYS = [
   'storm',
   'creak',
   'loaf_crack',
+  // Round 6 (docs/round6/media.md 4): the cutscene `audio` steps name these; silent until audio/manifest.json lists them.
+  'narr_bed_hollowmere',
+  'sting_kill',
+  'sting_meeting',
+  'sting_eject',
+  'sting_win_village',
+  'sting_win_cabal',
 ] as const;
 export type AudioKey = (typeof AUDIO_KEYS)[number];
 
@@ -47,8 +56,30 @@ export class AudioBus {
   private readonly loops = new Map<string, HTMLAudioElement>();
   private unlocked = false;
   private muted = false;
+  /** The player's SFX slider (0 to 1), `audioSettings`; every element's volume is its manifest gain times this. */
+  private sfxVolume = 1;
 
-  constructor(private readonly base = import.meta.env.BASE_URL) {}
+  constructor(private readonly base = import.meta.env.BASE_URL) {
+    const s = readAudioSettings();
+    this.sfxVolume = s.sfx;
+    this.muted = s.muted;
+    onAudioSettings((next) => {
+      this.setSfxVolume(next.sfx);
+      this.setMuted(next.muted);
+    });
+  }
+
+  /** The SFX slider of the settings panel (round 6, 6L); running loops follow it at once. */
+  setSfxVolume(v: number): void {
+    this.sfxVolume = Math.min(1, Math.max(0, v));
+    if (this.ambient && this.sounds.ambient) this.ambient.volume = this.gainOf('ambient', 0.5);
+    for (const [key, a] of this.loops) a.volume = this.gainOf(key, 0.5);
+  }
+
+  private gainOf(key: string, scale = 1): number {
+    const g = this.sounds[key]?.gain ?? 1;
+    return Math.min(1, Math.max(0, g)) * scale * this.sfxVolume;
+  }
 
   /** Fetches the manifest once; a missing file leaves the bus silent. */
   async load(): Promise<void> {
@@ -87,7 +118,7 @@ export class AudioBus {
     const a = new Audio(`${this.base}assets/audio/${s.url}`);
     a.loop = true;
     a.muted = this.muted;
-    a.volume = Math.min(1, Math.max(0, s.gain)) * 0.5;
+    a.volume = this.gainOf(key, 0.5);
     this.loops.set(key, a);
     if (this.unlocked) void a.play().catch(() => undefined);
   }
@@ -102,7 +133,7 @@ export class AudioBus {
     if (!s || this.muted) return;
     if (key === 'ambient') return this.startAmbient();
     const a = new Audio(`${this.base}assets/audio/${s.url}`);
-    a.volume = Math.min(1, Math.max(0, s.gain));
+    a.volume = this.gainOf(key);
     void a.play().catch(() => undefined);
   }
 
@@ -111,7 +142,7 @@ export class AudioBus {
     if (!s || this.ambient) return;
     const a = new Audio(`${this.base}assets/audio/${s.url}`);
     a.loop = true;
-    a.volume = Math.min(1, Math.max(0, s.gain)) * 0.5;
+    a.volume = this.gainOf('ambient', 0.5);
     this.ambient = a;
     if (this.unlocked) void a.play().catch(() => undefined);
   }

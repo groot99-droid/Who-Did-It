@@ -1055,6 +1055,24 @@ present only when the cutscene is skippable. Reduce-motion turns camera moves in
 | `cs.hollowmere.<line>` | the opening's captions | `title`, `seven`, `laid`, `own`, `train`, `dusk`, `end`, `vicar`, `letter`, `nobody`, `check`, `miss`; the Bible's Book I.1 trimmed |
 
 Frozen test ids: `cutscene` (the layer, with `data-cutscene`), `cutscene-caption`, `cutscene-skip`.
+### 14.22 Sound settings (6L)
+
+Session 6L, round 6. The gear of `ui/SettingsPanel.ts` (module `ui/copy/settings.ts`), mounted in the landing's
+`settings-slot`, in the lobby's settings block and in the World HUD's top right. A button of at least `--wdi-touch`
+opens a small paper panel with two sliders, music and sound effects (0 to 100, one tab stop each), and a mute
+checkbox; Esc closes it and returns focus to the gear. A change applies at once to the sound that is playing and is
+kept in `localStorage['wdi:audio']`; it is per player and never sent. The panel reads the same on every screen.
+
+| Id | Text | Notes |
+|---|---|---|
+| `settings.open` | Sound settings | `aria-label` of the gear |
+| `settings.title` | Sound | `aria-label` of the panel group |
+| `settings.music` | Music | slider label |
+| `settings.sfx` | Sound effects | slider label |
+| `settings.mute` | Mute all | checkbox label; silences music and effects |
+| `settings.value` | {percent}% | the output beside a slider and its `aria-valuetext` |
+
+Frozen test ids: `settings` (the wrapper), `settings-gear`, `settings-music`, `settings-sfx`, `settings-mute`.
 
 ### 14.15 Looks and covers (5F)
 
@@ -1081,3 +1099,15 @@ walk line show in the main mode only (`RoleRevealPayload.deck`, `look`); a quick
 
 `data-testid`s: `card-deck`, `card-look`, `cover-picker`, `cover-look` (with `data-look` and `data-safe`),
 `seat-picker`, `seat-choice` (with `data-seat`), `seat-cancel`.
+
+### 14.21 Loading, transitions and the trailer (6K)
+
+Lines are in `apps/client/src/ui/copy/tips.ts` (`LOADING_COPY`, `TIPS`); the seconds are `balance.ui` (GDD 3.13).
+
+| Key | Text | Where |
+|---|---|---|
+| `loading.title` | Setting the scene | the loading screen's heading |
+| `loading.tipLabel` | Tip | the eyebrow above the tip |
+| `loading.progress` | Loading | the progress bar's accessible name |
+
+Tips are ten short lines about the controls and the world (hold E on a clue, Tab for the role card, Shift to sneak, locked doors, the Bell, dark places, meetings, clues in pairs, woods and caves); none names a role or what it can do. `data-testid`s: `loading` (the screen, hidden until the load passes `ui.loading.showAfterS`), `transition` (the cover layer), `landing-trailer` (the video's slot; the `<video>` inside it is `muted loop playsinline autoplay preload="none"` with the poster `landing_loop.jpg`, and the slot stays hidden until the poster or a frame arrives). The trailer is skipped under reduced motion, the data saver and `?video=0`.

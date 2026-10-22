@@ -22,7 +22,7 @@ the cross-reference checks. Numbers go in these files and `balance.json`, the ru
 | `content/data/quests.json` | `schemas/quests.ts` `QuestsFile { npcs: Record<Id, { name, look }>, quests: Record<Id, Quest> }`; `Quest { id, giver: Id, kind: 'fetch' \| 'contract', wants: { item, qty }[], reward: { item, qty }[], copyId }` | one giver per hub plus the Blackpine foreman; `contract` rows stay empty (round 7) | every `scene.givers[].npc` names an npc; items exist; `look` is a `looks.json` id |
 | `content/data/minigames.json` | `schemas/minigames.ts` `Minigame { id, kind: 'crates' \| 'pour' \| 'slide' \| 'stoke', task: TaskId, difficulty, assistS }` | one per `tasks.json` row that is a station task | `task` is a `tasks.json` row |
 | `content/data/items.json` | existing | adds lantern, lockpicks, snare, torch, spade (crowbar exists); `inventorySlots` stays 5 | |
-| `content/data/balance.json` | existing | `resources { poolActiveFrac, gatherHoldS }`, `mobs { maxPerScene, chaseS }`, `quests { maxActive }`, `vision.lanternTiles` (pre-seeded `0`), `npc.stuckTicks` (pre-seeded, for the invariant) | |
+| `content/data/balance.json` | existing | `resources { poolActiveFrac, stackMax }` (6E: a resource's hold time is its own `gatherS`), `mobs { maxPerScene, chaseS }`, `quests { maxActive }`, `vision.lanternTiles` (pre-seeded `0`), `npc.stuckTicks` (pre-seeded, for the invariant) | |
 | the scene files | existing | `nodes`, `spawners`, `givers` on every map's scenes; the pools | |
 
 `parseContent` and `Content` (`content/src/index.ts`) gain the five files (pre-seeded); `validateContent` gains
