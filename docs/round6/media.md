@@ -73,9 +73,10 @@ or `.wav` is committed here, and nothing under ROSW `sound-library/files/` is ev
 for byte, in three town folders and under their original names, plus a twelfth, `Who Did It theme.m4a` (3:24,
 Opus 48 kHz, tagged "made with suno", 2026-10-22; library id `who-did-it-music/who-did-it-theme`), the theme of
 the opening cinematic and the start screen (DECISIONS A98). 6N ingests from that asset; the two zips above are
-superseded. The videos travel as `Who_Did_It_Video_Pt1.zip` (26,578,807 bytes, sha256
-`2c74308189cf66f1e23e76f6a90998de61526f0dd8e3749e8e9d6131da4a55a7`), which the owner attaches next: the cinematic
-`copy_A2EDCB60-FF7B-4357-A239-0183004A55FD.MOV` (22.87 s, 1920x1080 HEVC 30 fps, stereo AAC 44.1 kHz, 26 MB), the
+superseded. The videos travel as `Who_Did_It_Video_Pt1.zip` (28,468,377 bytes, sha256
+`417e52a603151961155354830650d969db2208ecbc938dfbae42c1cddc17b9e9`), which the owner attaches next: the cinematic
+`copy_B00D5966-A92F-48A3-90B8-AC49156F3329.MOV` (29.09 s, 1920x1080 HEVC 30 fps, stereo AAC 44.1 kHz, 27.9 MB,
+made with Dreamina on 2026-10-22 per its metadata; it replaces a first upload the owner withdrew), the
 loop `higgsfield-9b7d9b7f-2fa9-4009-abbb-d5a0fcc0d4ca.MP4` (8.04 s, 1920x1080 HEVC 24 fps, silent, 0.6 MB) and its
 still `IMG_2851.WEBP` (640x360).
 
