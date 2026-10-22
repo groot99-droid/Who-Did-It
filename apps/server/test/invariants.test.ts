@@ -1,16 +1,24 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import type { SimEventWire } from '@wdi/shared';
+import { balance } from '@wdi/content';
+import { Phase, type SimEventWire, TICK_RATE, TILE_PX, VIEW_TAG } from '@wdi/shared';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
+import { enableAuto, queueAutoStart } from '../src/sim/auto/Auto';
+import { guardStep, registeredInvariants, runInvariants } from '../src/sim/auto/invariants';
+import { flowOf } from '../src/sim/Flow';
+import { npcMemory } from '../src/sim/npc/memory';
+import { simOf } from '../src/sim/RoomSim';
+import { isWorldPhase } from '../src/sim/World';
 import { logHash, logLine, matchEvents } from '../src/sim/auto/log';
 import { ANY_SIM, type SimEvent, emitSim, onSim, pendingSim, runEvents } from '../src/sim/events/bus';
 import { handleKill } from '../src/sim/Kill';
 import { AUTO_STREAMS, bootAutoServer, captureMatchLog, runAutoMatch } from './autoHelpers';
 import { handleOf, settle } from './avatarHelpers';
 import { readyKnife, teleport } from './killHelpers';
+import { idOf, murder, until } from './flowHelpers';
 import { advance, pauseClock } from './npcHelpers';
 import { toNight } from './phaseHelpers';
-import { startMatch } from './simHelpers';
+import { type Match, sleep, startMatch } from './simHelpers';
 
 // Round 6, 6B (docs/round6/auto-admin.md 5): the sim event bus, the match log, and the invariant registry.
 
@@ -142,5 +150,161 @@ describe('the sim event bus', () => {
     advance(party, 1);
     expect(matchEvents(room).map((e) => e.kind)).toEqual(['start']);
     expect(logHash(room)).not.toBe(before);
+  });
+});
+
+const failing = (room: PartyRoom): string[] => runInvariants(room).map((f) => f.name);
+
+/** An all-NPC room off its clock, advanced into its first day with every seat placed. */
+async function autoDay(mode: 'main' | 'onub' = 'main'): Promise<PartyRoom> {
+  const room = await quietRoom();
+  const party = { humans: [], room };
+  enableAuto(room, {
+    map: 'hollowmere',
+    mode,
+    seats: 6,
+    difficulty: 'normal',
+    seeds: fixedSeeds,
+    npcIds: fixedIds,
+  });
+  queueAutoStart(room);
+  const sim = simOf(room);
+  const ready = () =>
+    (mode === 'onub' ? room.state.phase >= Phase.grace : room.state.phase === Phase.day) &&
+    [...sim.players.values()].every((p) => p.placed);
+  for (let i = 0; i < 400 * TICK_RATE && !ready(); i++) advance(party, 1);
+  if (!ready()) throw new Error('autoDay: no placed day');
+  return room;
+}
+
+const viewOf = (m: Match, i: number) => {
+  const view = m.room.clients.getById(idOf(m, i))?.view;
+  if (!view) throw new Error('no view');
+  return view;
+};
+const avatarsOf = (m: Match) => [...m.room.state.scenes.values()].flatMap((s) => [...s.avatars.values()]);
+
+describe('the round-6 invariants', () => {
+  it('registers the seven checks of auto-admin.md 5', () => {
+    expect(registeredInvariants()).toEqual([
+      'privLeak',
+      'seatLeak',
+      'npcStuck',
+      'phaseOverrun',
+      'step',
+      'matchLength',
+      'killClues',
+    ]);
+  });
+
+  it("privLeak and seatLeak stay quiet through visibility.test.ts's ghost case and fire on a constructed leak", async () => {
+    const m = await startMatch(colyseus, 5);
+    await sleep(300);
+    expect(failing(m.room)).toEqual([]);
+    // A ghost receives every seat of its scene (A30, GDD 3.17); the living never do.
+    murder(m, 3);
+    const ghostHolds = () => avatarsOf(m).some((a) => viewOf(m, 3).hasTag(a, VIEW_TAG.ghost));
+    expect(await until(ghostHolds)).toBe(true);
+    expect(failing(m.room)).toEqual([]);
+
+    const [avatar] = avatarsOf(m);
+    viewOf(m, 0).add(avatar!, VIEW_TAG.ghost);
+    expect(failing(m.room)).toEqual(['seatLeak']);
+    viewOf(m, 0).remove(avatar!, VIEW_TAG.ghost);
+    expect(failing(m.room)).toEqual([]);
+
+    viewOf(m, 1).add(m.room.state.players.get(idOf(m, 2))!, VIEW_TAG.priv);
+    const [leak] = runInvariants(m.room);
+    expect(leak).toMatchObject({ name: 'privLeak', tick: m.room.state.tick });
+    expect(leak?.detail).toContain(idOf(m, 2));
+  });
+
+  it('npcStuck fires once on an NPC held off its goal for longer than npc.stuckInvariantS', async () => {
+    const room = await autoDay();
+    const party = { humans: [], room };
+    const sim = simOf(room);
+    const [id, brain] = [...npcMemory(room).brains].find(([sid]) => sim.players.get(sid)?.placed)!;
+    const p = sim.players.get(id)!;
+    const hold = { x: p.x, y: p.y, scene: p.sceneIdx };
+    const goal = { scene: p.sceneIdx, x: p.x + 6 * TILE_PX, y: p.y };
+    const pin = () => {
+      brain.act = { kind: 'travel', untilTick: room.state.tick + 9999, stationId: '', goal };
+      Object.assign(p, { x: hold.x, y: hold.y });
+      room.state.phaseEndsTick = room.state.tick + 9999;
+    };
+    const limit = balance.npc.stuckInvariantS * TICK_RATE;
+    const names: string[] = [];
+    for (let t = 0; t < limit + 3 * TICK_RATE; t++) {
+      pin();
+      advance(party, 1);
+      pin();
+      if (room.state.tick % 20 === 0) names.push(...failing(room));
+    }
+    expect(isWorldPhase(room.state.phase)).toBe(true);
+    expect(names).toEqual(['npcStuck']);
+  });
+
+  it('phaseOverrun fires on a phase past its end tick and not on time', async () => {
+    const room = await autoDay();
+    expect(failing(room)).toEqual([]);
+    room.state.phaseEndsTick = room.state.tick - 1;
+    expect(failing(room)).toEqual([]);
+    room.state.phaseEndsTick = room.state.tick - 2;
+    expect(failing(room)).toEqual(['phaseOverrun']);
+  });
+
+  it('step reports an exception caught by guardStep once', async () => {
+    const room = await quietRoom();
+    expect(guardStep(room, () => undefined)).toBe(true);
+    expect(failing(room)).toEqual([]);
+    expect(
+      guardStep(room, () => {
+        throw new Error('boom');
+      }),
+    ).toBe(false);
+    const [f] = runInvariants(room);
+    expect(f).toMatchObject({ name: 'step', tick: room.state.tick });
+    expect(f?.detail).toContain('boom');
+    expect(failing(room)).toEqual([]);
+  });
+
+  it('matchLength fires past the Final Night round and on a second quick-mode meeting', async () => {
+    const main = await autoDay();
+    main.state.round = balance.finalNight.afterCycle + 1;
+    expect(failing(main)).toEqual([]);
+    main.state.round++;
+    expect(failing(main)).toEqual(['matchLength']);
+
+    const onub = await autoDay('onub');
+    const flow = flowOf(onub);
+    const stat = { round: 0, reason: 'dawn', votes: 0, correctVotes: 0 };
+    flow.meetings.length = 0;
+    flow.meetings.push({ ...stat });
+    expect(failing(onub)).toEqual([]);
+    flow.meetings.push({ ...stat });
+    expect(failing(onub)).toEqual(['matchLength']);
+  });
+
+  it('killClues fires once on a kill that left no clue in its scene, and not on a knife kill', async () => {
+    const room = await autoDay();
+    const party = { humans: [], room };
+    const t = room.state.tick;
+    emitSim(room, {
+      tick: t,
+      kind: 'kill',
+      seat: 'bus1',
+      sceneId: 'overworld',
+      data: { by: 'bus0' },
+    });
+    emitSim(room, { tick: t, kind: 'clue', sceneId: 'tavern_bar', data: { id: 'c', kind: 0 } });
+    advance(party, 1);
+    const [f] = runInvariants(room);
+    expect(f).toMatchObject({ name: 'killClues' });
+    expect(f?.detail).toContain('bus1');
+    expect(failing(room)).toEqual([]);
+    emitSim(room, { tick: t + 1, kind: 'kill', seat: 'bus2', sceneId: 'overworld' });
+    emitSim(room, { tick: t + 1, kind: 'clue', sceneId: 'overworld', data: { id: 'd', kind: 0 } });
+    advance(party, 1);
+    expect(failing(room)).toEqual([]);
   });
 });
