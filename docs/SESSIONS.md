@@ -2616,9 +2616,9 @@ never edits `catalog.json` by hand; asks before `--replace`. **PRs**: ROSW: (1) 
 ingest; (2) the video runs; here: (1) the SFX, stingers and ambiences with their rows; (2) the music with its
 rows; (3) the two videos and the poster with their rows. **Tests**: `media.test.ts` passes with every file in
 place; the library's own tests and `verify` after the ingest. **Not**: any `.ts`, any JSON under `packages/`,
-`music-cue`. Needs the `sfx-2026-10` release of ROSW published with the two zips (`media.md` 1 and 6) and the manifest shapes of
-6K and 6L. Before code,
-`seams.md`; log under "Round 6 log: 6N".
+`music-cue`. Needs the `SFX_2026_01` release of ROSW (the library zips are on it; the owner's two zips of
+`media.md` 1 and 6 still to attach) and the manifest shapes of 6K and 6L. Before code, `seams.md`; log under
+"Round 6 log: 6N".
 
 **6P. Integration.** Merge in the order above, regenerate `PROTOCOL.md` and the lockfile, run the 50-match
 `pnpm auto` soak on both maps, both modes and every difficulty, the two 30-minute soaks and the opt-in e2e
@@ -2961,3 +2961,12 @@ session's goes back to it. Log under "Integration log, round 6".
   are inert in a live match until an assignment session lands; ROADMAP M5b does not count station tasks as playable
   before that. 6H switches its puzzle draw from the keyed `contract` stand-in to `seeds.get('minigame', seat)` and
   drops its lobby clear once this merges.
+
+- **6Z after the first wave (2026-10-22, 22:40 UTC).** Every session PR of the first wave is in: #63 (6B), #61
+  (6F), #65 (6Z), #64 (the onub wire waits, an owner fix), #60 (6H) and #58 (6C), each merged with a merge commit
+  once both CI runs on its head were green; 6D (#66) and 6I (#67) are open. ROSW: the sound library is on the
+  release `SFX_2026_01` (16 zips, 2,648 sounds) and ROSW #13 points `catalog.json` at it; the owner's two zips of
+  `media.md` 1 are not on it yet, so `media.md` 1 and 6 and the 6N brief now name that tag and that gap, and 6N
+  starts with the library part. Contract answers: 6D edits `flags/index.ts` (`admin: route[0]?.split('?')[0]
+  === 'admin'`) in #66; 6I adds the four `WorldFeed` members, the M5b layer and E routing in `World.ts`, and
+  `answer()` on the four ONUB widgets in #67, so no stand-in lands; 6C kept the per-kind admin feed.
