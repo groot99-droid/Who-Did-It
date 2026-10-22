@@ -6,6 +6,7 @@ import { resolveHandle } from './Avatars';
 import { spawnBody } from './Bodies';
 import { spawnKillClues } from './Clues';
 import { markDead } from './Death';
+import { emitSim } from './events/bus';
 import { endImpersonation } from './Impersonate';
 import { spendProtection } from './NightPowers';
 import { emitNoise } from './Noise';
@@ -110,6 +111,7 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
 
   const tx = Math.floor(target.x / TILE_PX);
   const ty = Math.floor(target.y / TILE_PX);
+  emitSim(room, { tick, kind: 'kill', seat: targetId, sceneId, data: { by: sessionId } }); // round 6, 6B
   markDead(room, targetId, 'knife', sessionId);
   spawnBody(room, sceneId, targetId, tx, ty);
   spawnKillClues(room, sceneId, tx, ty, {
@@ -117,4 +119,17 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
     scarf: player.traits.scarf,
   });
   emitNoise(room, sceneId, target.x, target.y, balance.noise.killScream, 'scream', sessionId);
+}
+
+/**
+ * A wolf's last bite (GDD 3.15, Session 6G): the `wolf` death, the body where the seat fell and the kill scream,
+ * with no clue of a killer (no height, no scarf, no blood on anyone). Called from `mobs/hurt.ts` only.
+ */
+export function creatureKill(room: PartyRoom, victimId: string): void {
+  const victim = simOf(room).players.get(victimId);
+  if (!victim || victim.dead) return;
+  const sceneId = sceneKey(victim.sceneIdx);
+  markDead(room, victimId, 'wolf');
+  spawnBody(room, sceneId, victimId, Math.floor(victim.x / TILE_PX), Math.floor(victim.y / TILE_PX));
+  emitNoise(room, sceneId, victim.x, victim.y, balance.noise.killScream, 'scream', victimId);
 }

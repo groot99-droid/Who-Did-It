@@ -11,9 +11,9 @@ import {
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isLoft, isVerbPhase, reject, sceneKey } from './World';
-import { handleCraft } from './Craft';
+import { handleCraft, tickCraft } from './Craft';
 import { handleTaskHold } from './Minigames';
-import { handleGather } from './Resources';
+import { handleGather, tickGather } from './Resources';
 
 const CLUE_TEACHING = 'clue_teaching';
 
@@ -93,6 +93,12 @@ export function runHolds(room: PartyRoom): void {
     const player = room.state.players.get(sessionId);
     if (!player) {
       p.hold = null;
+      continue;
+    }
+    // Round 6, 6F: gather and craft holds validate and finish in their own files.
+    if (hold.action === 'gather' || hold.action === 'craft') {
+      if (hold.action === 'gather') tickGather(room, sessionId, p);
+      else tickCraft(room, sessionId, p);
       continue;
     }
     // Moving, leaving a verb phase, dying, a crossing or a vanished clue all cancel the hold.

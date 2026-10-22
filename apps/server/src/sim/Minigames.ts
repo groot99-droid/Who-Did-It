@@ -14,7 +14,7 @@ import {
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { type PlayerSim, simOf } from './RoomSim';
-import { count, take } from './standInInventory';
+import { count, take } from './Inventory';
 import { isLoft, isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
 /**

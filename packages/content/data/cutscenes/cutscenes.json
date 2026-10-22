@@ -1,1 +1,225 @@
-{ "gddRef": "3.18", "deaths": {}, "openings": {}, "cutscenes": {} }
+{
+  "gddRef": "3.18",
+  "deaths": {
+    "knife": "deathKnife",
+    "poison": "deathPoison",
+    "shot": "deathShot",
+    "ejected": "deathEjected",
+    "wolf": "deathWolf"
+  },
+  "openings": { "hollowmere": "openingHollowmere", "blackpine": "openingBlackpine" },
+  "cutscenes": {
+    "openingHollowmere": {
+      "id": "openingHollowmere",
+      "kind": "opening",
+      "skippable": true,
+      "maxS": 50,
+      "steps": [
+        { "t": "audio", "key": "narr_bed_hollowmere" },
+        { "t": "audio", "key": "storm", "withPrevious": true },
+        { "t": "caption", "copyId": "cs.hollowmere.title", "durationS": 4, "style": "title" },
+        {
+          "t": "camera",
+          "sceneId": "overworld",
+          "from": { "x": 32, "y": 4 },
+          "to": { "x": 32, "y": 5 },
+          "zoomFrom": 1.3,
+          "zoomTo": 1.2,
+          "durationS": 4,
+          "ease": "linear",
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.hollowmere.seven", "durationS": 4, "style": "narrator" },
+        {
+          "t": "camera",
+          "sceneId": "overworld",
+          "from": { "x": 32, "y": 5 },
+          "to": { "x": 9, "y": 10 },
+          "zoomFrom": 1.2,
+          "zoomTo": 1.1,
+          "durationS": 8,
+          "ease": "sine",
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.hollowmere.laid", "durationS": 4, "style": "narrator" },
+        { "t": "caption", "copyId": "cs.hollowmere.own", "durationS": 4, "style": "narrator" },
+        {
+          "t": "camera",
+          "sceneId": "overworld",
+          "from": { "x": 9, "y": 10 },
+          "to": { "x": 6, "y": 31 },
+          "zoomFrom": 1.1,
+          "zoomTo": 1.1,
+          "durationS": 8,
+          "ease": "sine",
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.hollowmere.train", "durationS": 4, "style": "narrator" },
+        { "t": "caption", "copyId": "cs.hollowmere.dusk", "durationS": 4, "style": "narrator" },
+        {
+          "t": "camera",
+          "sceneId": "overworld",
+          "from": { "x": 6, "y": 31 },
+          "to": { "x": 31, "y": 31 },
+          "zoomFrom": 1.1,
+          "zoomTo": 1.1,
+          "durationS": 8,
+          "ease": "sine",
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.hollowmere.end", "durationS": 4, "style": "narrator" },
+        { "t": "caption", "copyId": "cs.hollowmere.vicar", "durationS": 4.5, "style": "narrator" },
+        {
+          "t": "camera",
+          "sceneId": "overworld",
+          "from": { "x": 31, "y": 31 },
+          "to": { "x": 43, "y": 18 },
+          "zoomFrom": 1.1,
+          "zoomTo": 1.1,
+          "durationS": 9,
+          "ease": "sine",
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.hollowmere.letter", "durationS": 4.5, "style": "narrator" },
+        { "t": "caption", "copyId": "cs.hollowmere.nobody", "durationS": 4.5, "style": "narrator" },
+        {
+          "t": "camera",
+          "sceneId": "overworld",
+          "from": { "x": 43, "y": 18 },
+          "to": { "x": 30, "y": 21 },
+          "zoomFrom": 1.1,
+          "zoomTo": 1.5,
+          "durationS": 13,
+          "ease": "quad",
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.hollowmere.check", "durationS": 4, "style": "narrator" },
+        { "t": "caption", "copyId": "cs.hollowmere.miss", "durationS": 4.5, "style": "whisper" },
+        { "t": "audio", "key": "bell", "withPrevious": true },
+        { "t": "cardSlam" }
+      ]
+    },
+    "openingBlackpine": {
+      "id": "openingBlackpine",
+      "kind": "opening",
+      "skippable": true,
+      "maxS": 12,
+      "steps": [
+        { "t": "audio", "key": "storm" },
+        {
+          "t": "camera",
+          "sceneId": "bp_camp",
+          "from": { "x": 4, "y": 24 },
+          "to": { "x": 28, "y": 20 },
+          "zoomFrom": 1.2,
+          "zoomTo": 1.1,
+          "durationS": 6,
+          "ease": "sine",
+          "withPrevious": true
+        },
+        { "t": "wait", "durationS": 6 },
+        {
+          "t": "camera",
+          "sceneId": "bp_camp",
+          "from": { "x": 28, "y": 20 },
+          "to": { "x": 46, "y": 14 },
+          "zoomFrom": 1.1,
+          "zoomTo": 1.3,
+          "durationS": 6,
+          "ease": "quad"
+        },
+        { "t": "cardSlam" }
+      ]
+    },
+    "deathKnife": {
+      "id": "deathKnife",
+      "kind": "death",
+      "skippable": true,
+      "maxS": 4,
+      "steps": [
+        { "t": "audio", "key": "sting_kill" },
+        {
+          "t": "vfx",
+          "kind": "flash",
+          "sceneId": "overworld",
+          "at": { "x": 0, "y": 0 },
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.deathKnife.line", "durationS": 2.5, "style": "whisper" },
+        { "t": "hold" }
+      ]
+    },
+    "deathPoison": {
+      "id": "deathPoison",
+      "kind": "death",
+      "skippable": true,
+      "maxS": 4,
+      "steps": [
+        { "t": "audio", "key": "sting_kill" },
+        {
+          "t": "vfx",
+          "kind": "fade",
+          "sceneId": "overworld",
+          "at": { "x": 0, "y": 0 },
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.deathPoison.line", "durationS": 2.5, "style": "whisper" },
+        { "t": "hold" }
+      ]
+    },
+    "deathShot": {
+      "id": "deathShot",
+      "kind": "death",
+      "skippable": true,
+      "maxS": 4,
+      "steps": [
+        { "t": "audio", "key": "scream" },
+        {
+          "t": "vfx",
+          "kind": "shake",
+          "sceneId": "overworld",
+          "at": { "x": 0, "y": 0 },
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.deathShot.line", "durationS": 2.5, "style": "whisper" },
+        { "t": "hold" }
+      ]
+    },
+    "deathEjected": {
+      "id": "deathEjected",
+      "kind": "death",
+      "skippable": true,
+      "maxS": 4,
+      "steps": [
+        { "t": "audio", "key": "sting_eject" },
+        {
+          "t": "vfx",
+          "kind": "fade",
+          "sceneId": "overworld",
+          "at": { "x": 0, "y": 0 },
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.deathEjected.line", "durationS": 2.5, "style": "whisper" },
+        { "t": "hold" }
+      ]
+    },
+    "deathWolf": {
+      "id": "deathWolf",
+      "kind": "death",
+      "skippable": true,
+      "maxS": 4,
+      "steps": [
+        { "t": "audio", "key": "scream" },
+        {
+          "t": "vfx",
+          "kind": "shake",
+          "sceneId": "overworld",
+          "at": { "x": 0, "y": 0 },
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.deathWolf.line", "durationS": 2.5, "style": "whisper" },
+        { "t": "hold" }
+      ]
+    }
+  }
+}

@@ -13,6 +13,7 @@ import {
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { enterScene } from './Portals';
+import { emitSim } from './events/bus';
 import { countRow, factionOf, flowOf, refuse, roleIdOf, rolesOf, secondsToTicks, setPhase } from './Flow';
 import { hubOf, meetingSpawnsOf } from './MapSites';
 import { onMeetingOpenDisguise } from './Impersonate';
@@ -71,6 +72,7 @@ export function openMeeting(room: PartyRoom, req: MeetingRequest): void {
   const flow = flowOf(room);
   flow.current = { round: state.round, reason: req.reason, votes: 0, correctVotes: 0 };
   flow.meetings.push(flow.current);
+  emitSim(room, { tick: state.tick, kind: 'meeting', seat: req.callerId, data: { reason: req.reason } }); // 6B
   room.broadcast(S2C.meetingStart, {
     reason: req.reason,
     callerId: req.callerId,
@@ -109,6 +111,7 @@ export function handleVote(room: PartyRoom, sessionId: string, payload: Record<s
   if (!ok) return refuse(room, sessionId, ErrorCode.cannot, 'no such candidate');
   voter.priv.myVote = target;
   voter.hasVoted = true;
+  emitSim(room, { tick: room.state.tick, kind: 'vote', seat: sessionId, data: { target } }); // round 6, 6B
 }
 
 /** A seat in the game: not dead and, in quick mode, still connected (a leaver abstains, never ends the match). */
@@ -159,6 +162,7 @@ function startReveal(room: PartyRoom): void {
   if (ps) ps.dead = true;
   ejected.alive = false;
   flow.pendingEjection = ejectedId;
+  emitSim(room, { tick: state.tick, kind: 'eject', seat: ejectedId, data: { role: roleIdOf(ejected) } }); // 6B
   if (stat) {
     stat.ejectedId = ejectedId;
     stat.ejectedRole = roleIdOf(ejected);
@@ -204,6 +208,7 @@ function startOnubReveal(room: PartyRoom): void {
     }
   }
   for (const id of dawn.outs) {
+    emitSim(room, { tick: room.state.tick, kind: 'eject', seat: id }); // round 6, 6B
     const p = sim.players.get(id);
     if (p) p.dead = true;
     const player = room.state.players.get(id);

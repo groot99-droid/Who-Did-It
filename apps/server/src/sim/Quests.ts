@@ -1,14 +1,14 @@
 import { balance, quests, scenes } from '@wdi/content';
 import { ErrorCode, Phase, QuestState, TILE_PX, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
-import { addStack, count, restore, snapshot, take } from './standInInventory';
+import { count, exchange } from './Inventory';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isLoft, isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
 /**
  * Quests (round 6, M5b, GDD 3.16; docs/round6/m5b-data.md 2.3): givers are scene statics; `quest.accept` and
  * `quest.turnIn` go through the command queue; the own `Private.quests` holds the state; rewards go through
- * `sim/Inventory.ts` (until 6F lands, its stand-in `sim/standInInventory.ts`). A `contract` quest (round 7) refuses.
+ * `sim/Inventory.ts`. A `contract` quest (round 7) refuses.
  * Session 6H.
  */
 
@@ -134,10 +134,7 @@ export function handleQuestTurnIn(
     reject(room, sessionId, ErrorCode.cannot, 'you lack what is wanted');
     return;
   }
-  const before = snapshot(player);
-  for (const w of quest.wants) take(player, w.item, w.qty);
-  if (!quest.reward.every((r) => addStack(player, r.item, r.qty))) {
-    restore(player, before);
+  if (!exchange(player, quest.wants, quest.reward)) {
     reject(room, sessionId, ErrorCode.cannot, 'no room for the reward');
     return;
   }
