@@ -3,6 +3,7 @@ import { cutscenes } from '@wdi/content';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { rehandle } from './Avatars';
 import { beginAim } from './NightPowers';
+import { emitSim } from './events/bus';
 import { simOf } from './RoomSim';
 import { sceneKey } from './World';
 
@@ -25,6 +26,7 @@ export function markDead(room: PartyRoom, victimId: string, cause: DeathCause, k
       : { playerId: victimId, cause, killerId, tick: room.state.tick },
   );
   sim.viewsDirty = true;
+  emitSim(room, { tick: room.state.tick, kind: 'death', seat: victimId, data: { cause, by: killerId } }); // 6B
   rehandle(room, victimId, false);
   if (beginAim(room, victimId, cause)) return;
   const roles: Record<string, string> = {};

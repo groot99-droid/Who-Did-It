@@ -10,6 +10,7 @@ import {
   trailDir,
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { emitSim } from './events/bus';
 import { hubOf, teachingClueOf } from './MapSites';
 import { simOf } from './RoomSim';
 import { navGrid, tileCentre } from './World';
@@ -64,6 +65,7 @@ export function spawnClue(room: PartyRoom, sceneId: SceneId, spec: NewClue): str
   clue.y = Math.round(tileCentre(spec.ty, TILE_PX));
   clue.claimed = false;
   scene.clues.set(id, clue);
+  emitSim(room, { tick: room.state.tick, kind: 'clue', sceneId, data: { id, kind: spec.kind } }); // 6B
   const decayS = spec.decayS === undefined ? decayOfKind(spec.kind) : spec.decayS;
   sim.clueMeta.set(id, {
     sceneId,

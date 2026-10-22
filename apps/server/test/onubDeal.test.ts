@@ -91,6 +91,7 @@ describe('Start in the quick mode', () => {
   it('sends each seat only its own role card, built from roles.onub.json', async () => {
     const m = await onubRoleCard(colyseus, 5);
     const o = memory(m);
+    await until(() => m.bots.every((b) => cards(b).length > 0)); // the cards cross the wire after the phase flips
     for (const bot of m.bots) {
       const got = cards(bot);
       expect(got).toHaveLength(1);
