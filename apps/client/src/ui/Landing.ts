@@ -14,7 +14,7 @@ export interface LandingOptions {
   /** After a failed join: a better message than the generic one, if there is one (stale build). */
   explainFailure?(): Promise<string | null>;
   /** The music bus, so the trailer's soundtrack can start on the first tap (round 6, 6K). */
-  music?: { crossfadeTo(playlistId: string | null): void };
+  music?: { crossfadeTo(playlistId: string | null): void } | undefined;
 }
 
 const NAME_KEY = 'wdi:name';

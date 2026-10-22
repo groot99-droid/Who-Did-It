@@ -8,6 +8,7 @@ export { DECK_COPY } from './deck';
 export { ONUB_NIGHT_COPY } from './onubNight';
 export { ART_STYLE_COPY, styleName } from './artStyle';
 export { LOOKS_COPY } from './looks';
+export { SETTINGS_COPY } from './settings';
 
 /** Replaces `{key}` placeholders; a missing key is left as is so the gap shows in a test. */
 export function fill(line: string, values: Record<string, string | number>): string {
