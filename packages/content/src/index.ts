@@ -15,6 +15,18 @@ import onubRolesJson from '../data/roles.onub.json' with { type: 'json' };
 import onubBalanceJson from '../data/balance.onub.json' with { type: 'json' };
 import looksJson from '../data/looks.json' with { type: 'json' };
 import routinesJson from '../data/routines.json' with { type: 'json' };
+// Round 6 (docs/round6/seams.md 1.2): pre-seeded empty; 6E, 6J and 6L fill them, rounds 7 to 9 the Bible's four.
+import cutscenesJson from '../data/cutscenes/cutscenes.json' with { type: 'json' };
+import musicJson from '../data/music.json' with { type: 'json' };
+import resourcesJson from '../data/resources.json' with { type: 'json' };
+import recipesJson from '../data/recipes.json' with { type: 'json' };
+import mobsJson from '../data/mobs.json' with { type: 'json' };
+import questsJson from '../data/quests.json' with { type: 'json' };
+import minigamesJson from '../data/minigames.json' with { type: 'json' };
+import vendettasJson from '../data/vendettas.json' with { type: 'json' };
+import evolutionsJson from '../data/evolutions.json' with { type: 'json' };
+import lawsJson from '../data/laws.json' with { type: 'json' };
+import eventsJson from '../data/events.json' with { type: 'json' };
 import overworldJson from '../data/scenes/overworld.json' with { type: 'json' };
 import tavernBarJson from '../data/scenes/tavern_bar.json' with { type: 'json' };
 import tavernBackJson from '../data/scenes/tavern_back.json' with { type: 'json' };
@@ -54,6 +66,10 @@ import { OnubRolesFile } from './schemas/onubRoles.js';
 import { PaletteFile } from './schemas/palette.js';
 import { RolesFile, type DeckRow } from './schemas/roles.js';
 import { RoutinesFile } from './schemas/routines.js';
+import { CutscenesFile } from './schemas/cutscenes.js';
+import { MusicFile } from './schemas/music.js';
+import { MinigamesFile, MobsFile, QuestsFile, RecipesFile, ResourcesFile } from './schemas/m5b.js';
+import { EventsFile, EvolutionsFile, LawsFile, VendettasFile } from './schemas/bible.js';
 import { SCENE_IDS, Scene, type SceneId } from './schemas/scene.js';
 import { StyleFile } from './schemas/style.js';
 import { TasksFile } from './schemas/tasks.js';
@@ -78,6 +94,10 @@ export * from './schemas/onubRoles.js';
 export * from './schemas/onubBalance.js';
 export * from './schemas/maps.js';
 export * from './schemas/routines.js';
+export * from './schemas/cutscenes.js';
+export * from './schemas/music.js';
+export * from './schemas/m5b.js';
+export * from './schemas/bible.js';
 export { validateContent, type Content } from './validate.js';
 export { navs, NavFile } from './nav.js';
 
@@ -142,6 +162,17 @@ export function parseContent(raw: {
   onubBalance: unknown;
   looks: unknown;
   routines: unknown;
+  cutscenes: unknown;
+  music: unknown;
+  resources: unknown;
+  recipes: unknown;
+  mobs: unknown;
+  quests: unknown;
+  minigames: unknown;
+  vendettas: unknown;
+  evolutions: unknown;
+  laws: unknown;
+  events: unknown;
 }): Omit<Content, 'scenes' | 'maps'> {
   return {
     palette: PaletteFile.parse(raw.palette),
@@ -158,6 +189,17 @@ export function parseContent(raw: {
     onubBalance: OnubBalanceFile.parse(raw.onubBalance),
     looks: LooksFile.parse(raw.looks),
     routines: RoutinesFile.parse(raw.routines),
+    cutscenes: CutscenesFile.parse(raw.cutscenes),
+    music: MusicFile.parse(raw.music),
+    resources: ResourcesFile.parse(raw.resources),
+    recipes: RecipesFile.parse(raw.recipes),
+    mobs: MobsFile.parse(raw.mobs),
+    quests: QuestsFile.parse(raw.quests),
+    minigames: MinigamesFile.parse(raw.minigames),
+    vendettas: VendettasFile.parse(raw.vendettas),
+    evolutions: EvolutionsFile.parse(raw.evolutions),
+    laws: LawsFile.parse(raw.laws),
+    events: EventsFile.parse(raw.events),
   };
 }
 
@@ -177,6 +219,17 @@ export const content: Content = {
     onubBalance: onubBalanceJson,
     looks: looksJson,
     routines: routinesJson,
+    cutscenes: cutscenesJson,
+    music: musicJson,
+    resources: resourcesJson,
+    recipes: recipesJson,
+    mobs: mobsJson,
+    quests: questsJson,
+    minigames: minigamesJson,
+    vendettas: vendettasJson,
+    evolutions: evolutionsJson,
+    laws: lawsJson,
+    events: eventsJson,
   }),
   scenes: parseScenes(),
   maps: parseMaps(),
@@ -200,6 +253,17 @@ export const {
   onubBalance,
   looks,
   routines,
+  cutscenes,
+  music,
+  resources,
+  recipes,
+  mobs,
+  quests,
+  minigames,
+  vendettas,
+  evolutions,
+  laws,
+  events,
 } = content;
 
 function countKey(playerCount: number): `${4 | 5 | 6 | 7 | 8 | 9 | 10}` {

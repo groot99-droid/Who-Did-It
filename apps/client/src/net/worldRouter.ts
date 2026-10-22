@@ -1,4 +1,6 @@
 import type Phaser from 'phaser';
+import balance from '@wdi/content/data/balance.json';
+import { transition } from '../view/Transition';
 import { REG_MEETING, type MeetingFeed } from './meeting';
 import { ColyseusMeetingFeed } from './meetingColyseus';
 import type { MockNetwork } from './mock';
@@ -9,6 +11,7 @@ import type { OnubFeed } from './onub';
 import { ColyseusOnubFeed } from './onubColyseus';
 import { installOnubRouter } from './onubRouter';
 import { REG_INPUT, REG_ROLE_CHIP, REG_WORLD, type SceneEnter, type WorldFeed } from './world';
+import { REG_CUTSCENE } from '../scenes/registry';
 import { ColyseusWorldFeed } from './worldColyseus';
 
 // Glue between the network (NetworkService, the world feed, the meeting feed) and the scenes. The router is
@@ -36,6 +39,8 @@ const MATCH_SCENES = ['Meeting', 'GameOver', 'World', 'Kitchen', 'Night', 'RoleR
 const PHASE_LOBBY = 0;
 /** `GameMode.onub` of the schema (`state.settings.mode`). */
 const MODE_ONUB = 1;
+/** Round 6 (6K): the transition seconds, 0 until 6K sets them, so every start below stays synchronous. */
+const transitionMs = (kind: keyof typeof balance.ui.transitionS) => balance.ui.transitionS[kind] * 1000;
 
 /** The live quick-mode feed of a room: Session 5D's `ColyseusOnubFeed` (`net/onubColyseus.ts`). */
 const liveOnubFeed = (room: Room): OnubFeed | null => new ColyseusOnubFeed(room);
@@ -72,7 +77,8 @@ export function installWorldRouter(
     // is not stopped: it sleeps itself and keeps the card's DOM so Tab can reopen it during play.
     for (const key of LOBBY_SCREENS) stopScene(key);
     stopScene('GameOver');
-    game.scene.start('World', data);
+    // Round 6 (locked): the three scene starts run behind a transition (6K); at 0 ms they run at once.
+    transition('fade', transitionMs('fade'), () => game.scene.start('World', data));
     net.bus.emit('sceneEnter', data);
   };
 
@@ -83,7 +89,7 @@ export function installWorldRouter(
     stopScene('Kitchen');
     stopScene('Night');
     stopScene('Meeting');
-    game.scene.start('Meeting');
+    transition('iris', transitionMs('iris'), () => game.scene.start('Meeting'));
   };
 
   const onGameOver = () => {
@@ -93,7 +99,7 @@ export function installWorldRouter(
     stopScene('Kitchen');
     stopScene('Night');
     stopScene('RoleReveal');
-    game.scene.start('GameOver');
+    transition('wipe', transitionMs('wipe'), () => game.scene.start('GameOver'));
   };
 
   const onPhaseChange = ({ phase }: { phase: number }) => {
@@ -115,6 +121,10 @@ export function installWorldRouter(
     world = next;
     game.registry.set(REG_WORLD, next);
     next.bus.on('sceneEnter', onWorldEnter);
+    // Round 6, 6J (locked): an opening waits under `REG_CUTSCENE` until the World is up and plays it.
+    next.bus.on('cutscene', (c) => {
+      if (c.scope !== 'all') game.registry.set(REG_CUTSCENE, c.id);
+    });
   };
 
   /** A quick-mode feed: its routes run while `quick()` holds (always for the mock, the room's mode when live). */

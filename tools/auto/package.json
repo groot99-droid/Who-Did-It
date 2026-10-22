@@ -1,0 +1,22 @@
+{
+  "name": "@wdi/auto",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The all-NPC match runner (round 6, docs/round6/auto-admin.md 4): plays matches headless and deterministically, one line per match, exit 1 on an invariant failure.",
+  "scripts": {
+    "start": "tsx --conditions=development run.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@wdi/content": "workspace:*",
+    "@wdi/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.0",
+    "typescript": "~5.9.3",
+    "vitest": "^5.0.3"
+  }
+}

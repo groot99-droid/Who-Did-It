@@ -4,6 +4,8 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { avatarMemory, avatarOf } from './Avatars';
 import { isAiming } from './NightPowers';
 import { type PlayerSim, simOf } from './RoomSim';
+import { isAdminClient, reconcileAdminView } from './auto/AdminView';
+import { canSee } from './Sight';
 import { SCENE_KEYS, isLoft, isWorldPhase, sceneKey } from './World';
 
 export { SCENE_KEYS, sceneKey };
@@ -59,6 +61,11 @@ export function reconcileViews(room: PartyRoom): void {
   const sim = simOf(room);
   const world = isWorldPhase(room.state.phase);
   for (const client of room.clients) {
+    // Round 6, 6C (locked): the admin room's seatless client takes the god view and nothing below.
+    if (isAdminClient(room, client.sessionId)) {
+      reconcileAdminView(room, client);
+      continue;
+    }
     const view = client.view;
     const viewer = room.state.players.get(client.sessionId);
     const viewerSim = sim.players.get(client.sessionId);
@@ -107,6 +114,8 @@ function reconcileAvatars(
       const p = seat === undefined ? undefined : sim.players.get(seat);
       if (!p?.placed || isLoft(p.sceneIdx)) return;
       if (p.dead && !ghostViewer) return;
+      // Round 6, 6G (locked): a living viewer in the dark sees only within its sight; this only ever removes.
+      if (!ghostViewer && !canSee(room, viewerSim, p)) return;
       wanted.add(handle);
     });
   }

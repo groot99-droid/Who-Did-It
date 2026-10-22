@@ -1,10 +1,14 @@
 {
   "extraKnownMarketplaces": {
     "rosw": {
-      "source": { "source": "github", "repo": "groot99-droid/Pipelines-Plugin" }
+      "source": {
+        "source": "github",
+        "repo": "groot99-droid/Pipelines-Plugin"
+      }
     }
   },
   "enabledPlugins": {
     "ui-design@rosw": true
-  }
+  },
+  "autoCompactWindow": 400000
 }

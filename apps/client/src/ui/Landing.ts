@@ -3,6 +3,7 @@ import { JOIN_FAILED_MESSAGE, NAME_MAX, NAME_MIN } from '../net/protocol';
 import { getItem, setItem } from '../net/storage';
 import { LOBBY_COPY as C, fill } from './copy';
 import { h, type Screen } from './dom';
+import { mountSettingsPanel } from './SettingsPanel';
 
 export interface LandingOptions {
   /** Prefilled from the `#/join/CODE` deep link. */
@@ -124,7 +125,18 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
     h('div', { class: 'wdi-row' }, code, join),
     message,
   );
-  root.append(el);
+  // Round 6 (locked slots): the trailer loop (6K) and the settings gear (6L).
+  const trailer = h('div', { class: 'wdi-landing__trailer', 'data-testid': 'landing-trailer', hidden: true });
+  const settingsSlot = h('div', { class: 'wdi-landing__settings', 'data-testid': 'settings-slot' });
+  const settings = mountSettingsPanel(settingsSlot);
+  root.append(trailer, el, settingsSlot);
   (opts.joinCode ? name : create).focus();
-  return { destroy: () => el.remove() };
+  return {
+    destroy: () => {
+      settings.destroy();
+      trailer.remove();
+      settingsSlot.remove();
+      el.remove();
+    },
+  };
 }

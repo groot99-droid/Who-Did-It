@@ -77,9 +77,10 @@ function observe(room: PartyRoom, brain: Brain, player: PlayerState, p: PlayerSi
 
 /**
  * The sole other living seat of the scene when it is a human not in transit (the strike roll's check, card-blind:
- * whether it is a Cabal mate is decided after the roll), else null.
+ * whether it is a Cabal mate is decided after the roll), else null. Round 6 (docs/round6/auto-admin.md 3, Session
+ * 6A owns the body): in an auto match with `npcPrey` an NPC counts as prey too, so the brains play each other.
  */
-function soleHuman(
+export function preyFor(
   room: PartyRoom,
   player: PlayerState,
   p: PlayerSim,
@@ -94,7 +95,7 @@ function soleHuman(
     prey = id;
     if (tick < other.busyUntilTick) return null;
   }
-  return prey === null || isNpc(prey) ? null : prey;
+  return prey === null || (isNpc(prey) && !simOf(room).auto?.npcPrey) ? null : prey;
 }
 
 /** A placement (grace or immunity) puts the seat on the square: the routine starts over with a fresh scene dwell. */
@@ -195,7 +196,7 @@ export function runWorldNpc(
   // The strike roll: one uniform on every check, whatever the card (npc.md 6, "card-blind draws").
   const killPhase =
     abilities.abilities.kill?.phases?.includes(phaseKeyOf(room.state.phase) as never) ?? false;
-  const sole = killPhase ? soleHuman(room, player, p, (x) => mem.ids.has(x)) : null;
+  const sole = killPhase ? preyFor(room, player, p, (x) => mem.ids.has(x)) : null;
   const roll = sole === null ? null : playRng(room, id)();
 
   if (killer) {

@@ -4,6 +4,8 @@ import {
   BUILD_VERSION,
   CHAR_CELL_PX,
   GameState,
+  Mob,
+  Node,
   NotebookEntry,
   Player,
   Private,
@@ -30,7 +32,7 @@ describe('shared basics', () => {
 
   it('builds state with defaults and a mode field', () => {
     const s = new GameState();
-    expect(SCHEMA_VERSION).toBe(2);
+    expect(SCHEMA_VERSION).toBe(3);
     expect(s.schemaVersion).toBe(SCHEMA_VERSION);
     expect(s.settings).toBeInstanceOf(Settings);
     expect(s.settings.mode).toBe(0);
@@ -51,5 +53,18 @@ describe('shared basics', () => {
     expect([a.lookOf, a.height, a.seat, a.statusBits]).toEqual(['', 0, '', 0]);
     const n = new NotebookEntry();
     expect([n.note, n.of]).toEqual([0, '']);
+  });
+
+  it('adds the round-6 fields empty (docs/round6/seams.md 1.1)', () => {
+    const scene = new SceneState();
+    expect([scene.nodes.size, scene.mobs.size]).toEqual([0, 0]);
+    const node = new Node();
+    expect([node.id, node.resource, node.active, node.respawnTick]).toEqual(['', '', false, 0]);
+    const mob = new Mob();
+    expect([mob.kind, mob.state, mob.animId]).toEqual(['', 0, 0]);
+    const priv = new Private();
+    expect(priv.quests.length).toBe(0);
+    expect(priv.role.evolvedFrom).toBe('');
+    expect(new GameState().lawStage).toBe(0);
   });
 });

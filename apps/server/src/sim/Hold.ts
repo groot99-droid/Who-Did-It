@@ -11,6 +11,8 @@ import {
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isLoft, isVerbPhase, reject, sceneKey } from './World';
+import { handleCraft } from './Craft';
+import { handleGather } from './Resources';
 
 const CLUE_TEACHING = 'clue_teaching';
 
@@ -51,6 +53,12 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
   if (typeof on !== 'boolean') return;
   if (!on) {
     p.hold = null;
+    return;
+  }
+  // Round 6 (locked call sites): the M5b holds go to their owners' files (6F); each refuses until it lands.
+  if ((action === 'gather' || action === 'craft') && typeof targetId === 'string' && targetId.length > 0) {
+    if (action === 'gather') handleGather(room, sessionId, targetId);
+    else handleCraft(room, sessionId, targetId);
     return;
   }
   if (action !== 'collect' || typeof targetId !== 'string' || targetId.length === 0 || targetId.length > 64) {

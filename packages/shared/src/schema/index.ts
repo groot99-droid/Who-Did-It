@@ -7,9 +7,11 @@ import { schema, t } from '@colyseus/schema';
 //   Server memory   never in a schema (fingerprint logs, Blood timers, finalRoles, handles' owners, covers,
 //                   disguises, protections, poison, ...)
 // Every Schema stays under 63 fields. Round 5 (DECISIONS A50): `Player.sceneId` is gone and `presence` reaches its
-// owner only; every other seat walks as an avatar under a handle (GDD 3.17).
+// owner only; every other seat walks as an avatar under a handle (GDD 3.17). Round 6 (DECISIONS A81): the M5b
+// maps `nodes` and `mobs`, `Private.quests`, `GameState.lawStage` and `Role.evolvedFrom`, all empty until their
+// sessions fill them (docs/round6/seams.md 1.1).
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 /**
  * View tags (Visibility.ts): `presence` and `priv` are the numeric tags 1 and 2, granted one by one; `ghost`
@@ -90,6 +92,22 @@ export const Clue = schema(
 );
 /** `of` names a seat a prop belongs to, empty otherwise (round 4's quick-mode plates; ONUB v2 uses no props). */
 export const Prop = schema({ id: str(), kind: str(), turned: bool(), of: str() }, 'Prop');
+/**
+ * Round 6 (M5b, GDD 3.14): a resource node of the scene, public like a prop. `resource` is a `resources.json` id,
+ * `active` whether it can be gathered now, `respawnTick` when it comes back. Empty until Session 6F fills it.
+ */
+export const Node = schema(
+  { id: str(), resource: str(), x: i16(), y: i16(), active: bool(), respawnTick: u32() },
+  'Node',
+);
+/**
+ * Round 6 (M5b, GDD 3.15): a creature of the scene, public like a prop, with no seat and no handle. `kind` is a
+ * `mobs.json` id, `state` its FSM state index (`sim/mobs/ai.ts`). Empty until Session 6G fills it.
+ */
+export const Mob = schema(
+  { id: str(), kind: str(), x: i16(), y: i16(), yaw: f32(), animId: u8(), state: u8() },
+  'Mob',
+);
 
 /**
  * A walking figure in a scene, keyed in `SceneState.avatars` by an opaque handle that is re-rolled on every scene
@@ -124,13 +142,21 @@ export const SceneState = schema(
     props: t.map(Prop),
     /** Each entry is added to a view one by one (Visibility.ts), never with the scene. */
     avatars: t.map(Avatar).view(),
+    /** Round 6 (M5b): resource nodes, public to the scene; empty until Session 6F. */
+    nodes: t.map(Node),
+    /** Round 6 (M5b): creatures, public to the scene; empty until Session 6G. */
+    mobs: t.map(Mob),
   },
   'SceneState',
 );
 
 // --- Own client only -------------------------------------------------------------------------
 
-export const Role = schema({ roleId: str(), team: u8() }, 'Role');
+/**
+ * `evolvedFrom` is round 8 (the Bible's evolutions, docs/round6/bible-seams.md 2.2): the role id this card was
+ * before it evolved, '' for every card today. Own view only, like the rest of `Private`.
+ */
+export const Role = schema({ roleId: str(), team: u8(), evolvedFrom: str() }, 'Role');
 export const ItemStack = schema({ defId: str(), qty: u8() }, 'ItemStack');
 export const Inventory = schema({ slots: t.array(ItemStack) }, 'Inventory');
 export const NotebookEntry = schema(
@@ -149,6 +175,8 @@ export const NotebookEntry = schema(
   'NotebookEntry',
 );
 export const TaskEntry = schema({ id: str(), done: bool(), fake: bool() }, 'TaskEntry');
+/** Round 6 (M5b, GDD 3.16): one accepted quest of this seat; `id` a `quests.json` id. Empty until Session 6H. */
+export const QuestState = schema({ id: str(), progress: u8(), done: bool() }, 'QuestState');
 /**
  * Quick mode (GDD 3.11): one thing this seat learned, kept so a reconnecting client can re-read it.
  * `slot` is a card slot (`seat.<i>.role`, `seat.<i>.loc`, `pantry.role.<k>`, `pantry.loc.<k>`, see
@@ -187,6 +215,8 @@ export const Private = schema(
     coverLook: str(),
     /** A Cabal cover role's view of each Cabal mate's current pick, by seat id (empty for everyone else). */
     mateLooks: t.map('string'),
+    /** Round 6 (M5b): the quests this seat holds; empty until Session 6H. */
+    quests: t.array(QuestState),
   },
   'Private',
 );
@@ -312,6 +342,8 @@ export const GameState = schema(
     winner: u8(),
     /** Quick mode only (GDD 3.11). */
     onub: OnubBoard,
+    /** Round 8 (the Bible's law pipeline, docs/round6/bible-seams.md 2.2): 0 until then. Public. */
+    lawStage: u8(),
   },
   'GameState',
 );

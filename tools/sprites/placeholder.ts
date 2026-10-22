@@ -9,13 +9,19 @@ import { fileURLToPath } from 'node:url';
 import { writeFiles } from './pack.ts';
 import { placeholderEntries as charsEntries } from './placeholder-chars.ts';
 import type { ManifestEntry, PlaceholderEntry } from './placeholder-kit.ts';
+import { placeholderEntries as m5bEntries } from './placeholder-m5b.ts';
 import { placeholderEntries as onubEntries } from './placeholder-onub.ts';
 import { placeholderEntries as worldEntries } from './placeholder-world.ts';
 
 export { PALETTE, type ManifestEntry, type PlaceholderEntry, type Token } from './placeholder-kit.ts';
 
 /** The modules, in the order that breaks a tie of `order`. */
-const MODULES: ReadonlyArray<() => PlaceholderEntry[]> = [worldEntries, charsEntries, onubEntries];
+const MODULES: ReadonlyArray<() => PlaceholderEntry[]> = [
+  worldEntries,
+  charsEntries,
+  onubEntries,
+  m5bEntries,
+];
 
 export async function generate(): Promise<Map<string, Buffer>> {
   const files = new Map<string, Buffer>();

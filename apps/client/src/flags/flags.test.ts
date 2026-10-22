@@ -10,6 +10,7 @@ describe('readFlags', () => {
       onub: false,
       joinCode: null,
       resumeCode: null,
+      admin: false,
     });
   });
 
@@ -48,5 +49,7 @@ describe('readFlags', () => {
 
   it('reads the lobby resume route', () => {
     expect(readFlags('', '#/lobby/K7M2P').resumeCode).toBe('K7M2P');
+    expect(readFlags('', '#/admin').admin).toBe(true);
+    expect(readFlags('', '#/lobby/K7M2P').admin).toBe(false);
   });
 });

@@ -34,6 +34,7 @@ import {
 import { isNpcSeat } from '../sim/Npc';
 import { registerMovement } from './handlers/movement';
 import { type FixedSeeds, MatchSeeds } from '../sim/seeds';
+import { clockOf, stepsThisTick } from '../sim/auto/clock';
 
 const codeRegistries = new WeakMap<object, CodeRegistry>();
 
@@ -63,6 +64,8 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
    * `new MatchSeeds(...)`. Always undefined in production; no message or debug handler sets it.
    */
   fixedSeeds: FixedSeeds | undefined = undefined;
+  /** The last tick's wall time per step, for the clock's budget (round 6, `sim/auto/clock.ts`). */
+  private lastStepMs = 0;
   private code = '';
 
   /**
@@ -106,11 +109,18 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
     });
 
     this.setFixedTimestep((ctx) => {
+      // Round 6 (docs/round6/auto-admin.md 2, locked): the clock says how many steps this tick runs; a `party` room
+      // always runs one. The sample recorded is per step, so `tickP95` stays comparable at every scale.
+      const n = stepsThisTick(clockOf(this), this.lastStepMs);
+      if (n === 0) return;
       const t0 = performance.now();
-      step(this, ctx);
-      runLobbyCommands(this);
-      runLobbyPhase(this);
-      metrics.recordTick(performance.now() - t0);
+      for (let i = 0; i < n; i++) {
+        step(this, ctx);
+        runLobbyCommands(this);
+        runLobbyPhase(this);
+      }
+      this.lastStepMs = (performance.now() - t0) / n;
+      metrics.recordTick(this.lastStepMs);
     }, TICK_RATE);
 
     registerMovement(this);

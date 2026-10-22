@@ -1,4 +1,5 @@
-import { S2C, type DeathCause } from '@wdi/shared';
+import { S2C, type DeathCause, deathCutsceneFor } from '@wdi/shared';
+import { cutscenes } from '@wdi/content';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { rehandle } from './Avatars';
 import { beginAim } from './NightPowers';
@@ -28,5 +29,12 @@ export function markDead(room: PartyRoom, victimId: string, cause: DeathCause, k
   if (beginAim(room, victimId, cause)) return;
   const roles: Record<string, string> = {};
   for (const [id, player] of room.state.players) roles[id] = player.priv.role.roleId;
-  room.clients.getById(victimId)?.send(S2C.killed, { sceneId: sceneKey(p.sceneIdx), cause, roles });
+  // Round 6, 6J (locked call site): the death's cutscene id, from the pure rule over the cutscene index.
+  const cutsceneId = deathCutsceneFor(cutscenes, cause);
+  room.clients.getById(victimId)?.send(S2C.killed, {
+    sceneId: sceneKey(p.sceneIdx),
+    cause,
+    roles,
+    ...(cutsceneId === null ? {} : { cutsceneId }),
+  });
 }

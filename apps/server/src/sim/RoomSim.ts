@@ -1,5 +1,6 @@
 import type { Profile } from '@wdi/content';
 import type { DeathCause, MeetingReason } from '@wdi/shared';
+import type { AutoState } from './auto/Auto';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { POSITION_RING_TICKS } from './constants';
 
@@ -163,6 +164,11 @@ export class RoomSim {
   debugPlay = false;
   /** Set when a view must change before the next 5 Hz pass (a transit just ended). */
   viewsDirty = false;
+  /**
+   * Round 6 (docs/round6/auto-admin.md 3): set by `enableAuto` (6A) and never by a `party` message; an auto match
+   * runs with every seat an NPC. Survives `resetForLobby` (a reset re-applies the options).
+   */
+  auto: AutoState | null = null;
   private ordinals = 0;
 
   /** Back to the lobby after game over (K calls it; L adds every field L adds to this class). */

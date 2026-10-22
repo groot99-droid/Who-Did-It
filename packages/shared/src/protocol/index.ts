@@ -26,6 +26,12 @@ export const C2S = {
   claim: 'meeting.claim',
   /** Main mode, role card, a cover role: the look it will walk as (GDD 3.17). */
   coverPick: 'role.cover',
+  /** Round 6 (M5b, GDD 3.16): accept a quest from the giver in reach; Session 6H reads it. */
+  questAccept: 'quest.accept',
+  /** Round 6 (M5b, GDD 3.16): turn a quest in at its giver; Session 6H reads it. */
+  questTurnIn: 'quest.turnIn',
+  /** Round 6 (M5b, GDD 3.16): the answer to a `minigameStart`; Session 6H reads it. */
+  minigameResult: 'minigame.result',
 } as const;
 
 export const S2C = {
@@ -47,12 +53,19 @@ export const S2C = {
   aim: 'aim',
   shot: 'shot',
   inherit: 'inherit',
+  /** Round 6 (M5c, GDD 3.18): play a cutscene; sent by Session 6J, nothing sends it before. */
+  cutscene: 'cutscene',
+  /** Round 6 (M5b, GDD 3.16): a station task's mini-game; sent by Session 6H, nothing sends it before. */
+  minigameStart: 'minigameStart',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
 export type S2CType = (typeof S2C)[keyof typeof S2C];
 
-export type HoldAction = 'drag' | 'collect' | 'task' | 'inspect' | 'autopsy';
+/** `gather` and `craft` are round 6 (M5b, GDD 3.14); the server refuses them until Session 6F lands. */
+export type HoldAction = 'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft';
+/** The main-mode mini-game kinds (GDD 3.16): the four of ONUB v2's Evening Prep, reused at task stations. */
+export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke';
 /**
  * Why a meeting opened (GDD 3.3); `missing` is the roll-call of M4; `dawn` is the quick-mode meeting (3.11);
  * `final` is the forced meeting after the Final Night hunt.
@@ -60,9 +73,9 @@ export type HoldAction = 'drag' | 'collect' | 'task' | 'inspect' | 'autopsy';
 export type MeetingReason = 'body' | 'bell' | 'missing' | 'dawn' | 'final';
 /**
  * How a player died; `vanished` is the disconnect death of GDD 3.8 (M7); `poison` is Nightshade, `shot` the
- * Gamekeeper's Last Shot (GDD 3.2).
+ * Gamekeeper's Last Shot (GDD 3.2); `wolf` is a mob kill in the dark (GDD 3.15, round 6, Session 6G).
  */
-export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot';
+export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf';
 /** Chat channels the server derives (GDD 3.5); the client never chooses one. */
 export type ChatChannel = 'meeting' | 'ghost' | 'cabal' | 'system';
 
@@ -313,6 +326,15 @@ export interface C2SPayloads {
    * deck); changeable until the card closes (GDD 3.17). Refused 425 outside the card, 422 otherwise.
    */
   'role.cover': { lookId: string };
+  /** Round 6 (M5b, GDD 3.16): a `quests.json` id whose giver stands in reach. Refused 422 until Session 6H lands. */
+  'quest.accept': { questId: string };
+  /** Round 6 (M5b, GDD 3.16): an accepted quest whose wants the inventory holds, at its giver. Refused 422 until 6H. */
+  'quest.turnIn': { questId: string };
+  /**
+   * Round 6 (M5b, GDD 3.16): the answer to the `minigameStart` of `taskId`; the server checks it against the
+   * solution it kept and completes the task. Refused 422 until Session 6H lands.
+   */
+  'minigame.result': { taskId: string; answer: unknown };
 }
 
 export interface S2CPayloads {
@@ -323,7 +345,7 @@ export interface S2CPayloads {
   /** Private. */
   clueFound: { entryId: string };
   /** Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). */
-  killed: { sceneId: string; cause: DeathCause; roles: Record<string, string> };
+  killed: { sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string };
   /** Private: routed per recipient; `from` is a player id. */
   'chat.msg': { from: string; text: string; channel: ChatChannel };
   phaseChange: { phase: number; endsTick: number };
@@ -381,6 +403,17 @@ export interface S2CPayloads {
   inherit: Record<string, never>;
   /** Public, only during a reveal: the ejected Gamekeeper shot `targetId`, whose role was `role` (GDD 3.2). */
   shot: { fromId: string; targetId: string; role: string };
+  /**
+   * Round 6 (M5c, GDD 3.18): play the cutscene `id` of `packages/content/data/cutscenes/`. Broadcast once for a
+   * map's opening at `beginPlay`; `scope: 'all'` marks a memorial every client plays (round 7). The server never
+   * waits for a client to finish it. A death's cutscene travels on `killed.cutsceneId` instead.
+   */
+  cutscene: { id: string; scope?: 'all' };
+  /**
+   * Private, round 6 (M5b, GDD 3.16): a station task's hold opened its mini-game; `public` is the puzzle without
+   * its solution (`rules/minigames.ts generate`). Answered with `minigame.result`.
+   */
+  minigameStart: { taskId: string; kind: MinigameKind; public: unknown };
 }
 
 export type ErrorPayload = S2CPayloads['error'];
@@ -409,6 +442,9 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'lobby.removeNpc': 2,
   'meeting.claim': 2,
   'role.cover': 4,
+  'quest.accept': 2,
+  'quest.turnIn': 2,
+  'minigame.result': 2,
 };
 
 export const ErrorCode = {
@@ -432,3 +468,6 @@ export interface JoinOptions {
   build: string;
   deviceId: string;
 }
+
+// Round 6: the admin wire (docs/round6/auto-admin.md 6), accepted by the `admin` room only.
+export * from './admin';

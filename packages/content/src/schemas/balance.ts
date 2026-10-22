@@ -78,6 +78,8 @@ export const BalanceFile = z.strictObject({
     roleRevealS: Seconds,
     countdownS: Seconds,
     graceS: Seconds,
+    /** Round 6 (GDD 3.18): the opening cutscene's seconds, added to grace at `beginPlay`; 0 until Session 6J. */
+    openingS: Seconds,
     dayS: Seconds,
     duskS: Seconds,
     nightS: Seconds,
@@ -154,7 +156,13 @@ export const BalanceFile = z.strictObject({
     runTilesPerS: z.number().positive(),
     sneakFactor: z.number().positive().max(1),
   }),
-  vision: Section({ dayTiles: Tiles, nightTiles: Tiles, childDeltaTiles: z.number() }),
+  vision: Section({
+    dayTiles: Tiles,
+    nightTiles: Tiles,
+    childDeltaTiles: z.number(),
+    /** Round 6 (GDD 3.15): the extra sight radius of a lit lantern or torch, both ways; 0 until Session 6G. */
+    lanternTiles: Tiles,
+  }),
   noise: Section({
     ...(Object.fromEntries(NOISE_KEYS.map((k) => [k, Tiles])) as Record<
       (typeof NOISE_KEYS)[number],
@@ -224,7 +232,21 @@ export const BalanceFile = z.strictObject({
     ready: z.strictObject({ delayS: Span }),
     /** NPC night powers (GDD 3.2, 3.12): the use tick over dusk plus night, and the Last Shot delay. */
     nightPower: z.strictObject({ windowFrac: FracSpan, lastShotS: Span }),
+    /** Round 6 (GDD 3.19): an NPC at one goal and one tile for longer than this fails the stuck invariant. */
+    stuckInvariantS: Seconds,
   }),
+  /** Round 6 (GDD 3.14; docs/round6/m5b-data.md): placeholders until Session 6E tunes them. */
+  resources: Section({
+    /** The share of each node pool that is active in a match. */
+    poolActiveFrac: Chance,
+    gatherHoldS: Seconds,
+  }),
+  /** Round 6 (GDD 3.15): placeholders until Session 6E tunes them. */
+  mobs: Section({ maxPerScene: z.number().int().nonnegative(), chaseS: Seconds }),
+  /** Round 6 (GDD 3.16): placeholders until Session 6E tunes them. */
+  quests: Section({ maxActive: z.number().int().nonnegative() }),
+  /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds; 0 until Session 6K. */
+  ui: Section({ transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }) }),
   ghosts: Section({ wispsPerCycle: z.number().int().nonnegative() }),
   chat: Section({
     /** A `chat.say` line is cut to this many characters (GDD 3.5). */
