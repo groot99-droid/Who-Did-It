@@ -20,7 +20,7 @@ import type { Scene, SceneId } from './schemas/scene.js';
 import type { StyleFile } from './schemas/style.js';
 import type { TasksFile } from './schemas/tasks.js';
 import type { TraitsFile } from './schemas/traits.js';
-import type { MapFile, MapId } from './schemas/maps.js';
+import { MAP_IDS, type MapFile, type MapId } from './schemas/maps.js';
 import { checkMaps, checkSceneWorld } from './validateWorld.js';
 
 export interface Content {
@@ -377,6 +377,53 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
   for (const task of Object.values(c.tasks.tasks)) {
     if (task.kind === 'fetch' && !played.has(task.id))
       err(`tasks.json: fetch task ${task.id} has no mini-game`);
+  }
+  checkCutscenes(c, err);
+}
+
+/** The cutscene index and steps (GDD 3.18): kinds, map ids, scene and tile references, and the opening's length. */
+function checkCutscenes(c: Content, err: (msg: string) => void): void {
+  const { cutscenes, scenes, balance } = c;
+  const named = (what: string, id: string, kind: string): void => {
+    const cs = cutscenes.cutscenes[id];
+    if (!cs) err(`cutscenes.json: ${what} names unknown cutscene "${id}"`);
+    else if (cs.kind !== kind)
+      err(`cutscenes.json: ${what} names "${id}" of kind ${cs.kind}, expected ${kind}`);
+  };
+  for (const [cause, id] of Object.entries(cutscenes.deaths)) named(`deaths.${cause}`, id, 'death');
+  for (const [map, id] of Object.entries(cutscenes.openings)) {
+    if (!(MAP_IDS as readonly string[]).includes(map))
+      err(`cutscenes.json: openings key "${map}" is not a map`);
+    named(`openings.${map}`, id, 'opening');
+    const cs = cutscenes.cutscenes[id];
+    if (cs && cs.maxS > balance.phases.openingS) {
+      err(
+        `cutscenes.json: opening "${id}" runs ${cs.maxS} s, longer than phases.openingS ${balance.phases.openingS}`,
+      );
+    }
+  }
+  for (const cs of Object.values(cutscenes.cutscenes)) {
+    let mainTrack = 0;
+    for (const step of cs.steps) {
+      const where = `cutscenes.json ${cs.id}`;
+      if (step.t === 'camera' || step.t === 'vfx') {
+        const scene = (scenes as Record<string, Scene | undefined>)[step.sceneId];
+        if (!scene) {
+          err(`${where}: ${step.t} step names unknown scene ${step.sceneId}`);
+          continue;
+        }
+        const tiles = step.t === 'camera' ? [step.from, step.to] : [step.at];
+        for (const t of tiles) {
+          if (t.x >= scene.size.w || t.y >= scene.size.h)
+            err(`${where}: tile ${t.x},${t.y} is outside ${step.sceneId}`);
+        }
+      }
+      if (step.t === 'cardSlam' && cs.kind !== 'opening') err(`${where}: cardSlam belongs to an opening`);
+      if (step.t === 'hold' && cs.kind !== 'death') err(`${where}: hold belongs to a death cutscene`);
+      if (step.t === 'video' && cs.kind !== 'memorial') err(`${where}: video belongs to a memorial`);
+      if (!('withPrevious' in step && step.withPrevious) && 'durationS' in step) mainTrack += step.durationS;
+    }
+    if (mainTrack > cs.maxS) err(`cutscenes.json ${cs.id}: steps run ${mainTrack} s, over maxS ${cs.maxS}`);
   }
 }
 

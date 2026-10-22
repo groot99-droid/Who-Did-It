@@ -823,11 +823,14 @@ describe('the hunt, the fallback and the streams (R15 to R18)', () => {
     holdPhase(party, Phase.day, 700);
     advance(party, 600 * TICK_RATE);
     const ids = new Set(npcIdsOf('S1'));
+    const spawners = new Set(Object.values(scenes).flatMap((s) => (s.spawners ?? []).map((sp) => sp.id)));
     expect(asked.some((k) => k.startsWith('deal'))).toBe(false);
     for (const k of new Set(asked)) {
       const [name, key] = k.split(':');
       if (name === 'npcPlay' || name === 'npcTiming') expect(ids.has(key!), k).toBe(true);
-      else expect(['npcNames', 'nodes'], k).toContain(name); // round 6, 6F: the node pool's own stream
+      // Round 6: the creatures draw from their own stream, keyed by spawner; the node pool (6F) from `nodes`.
+      else if (name === 'mobs') expect(spawners.has(key!), k).toBe(true);
+      else expect(['npcNames', 'nodes'], k).toContain(name);
     }
   });
 

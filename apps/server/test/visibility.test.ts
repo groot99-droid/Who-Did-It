@@ -2,6 +2,7 @@ import type { ColyseusTestServer } from '@colyseus/testing';
 import { Phase } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { avatarMemory } from '../src/sim/Avatars';
+import { markDead } from '../src/sim/Death';
 import { enterScene } from '../src/sim/Portals';
 import { StatusBit } from '../src/sim/constants';
 import {
@@ -16,6 +17,7 @@ import {
   until,
 } from './flowHelpers';
 import { avatarsHeld } from './avatarHelpers';
+import { setPhase, teleport } from './killHelpers';
 import { type Match, sleep, stateOf } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -124,5 +126,36 @@ describe('the meeting roster', () => {
     await sleep(300);
     expect(roster(0)).toEqual(killerBefore);
     for (const i of [1, 2, 3]) expect(stateOf(m.bots[i]!).players.get(idOf(m, 0))!.presence).toBeUndefined();
+  });
+});
+
+// Round 6, 6G: the dark cases. `view.add(scene)` carries the scene's avatars in; the same pass must take back the ones
+// the viewer may not hold (sight.test.ts covers the radius, the walls and the lights).
+describe('scene entry and the dark (6G)', () => {
+  it('a living client walking into a scene where a ghost stands never holds the ghost', async () => {
+    const m = await startParty(colyseus, 4);
+    setPhase(m, Phase.day);
+    teleport(m, m.bots[1]!, 'bakery', 3, 3);
+    await sleep(300);
+    markDead(m.room, idOf(m, 1), 'knife');
+    await sleep(300);
+    teleport(m, m.bots[0]!, 'bakery', 4, 4);
+    expect(await until(() => avatarsHeld(m.bots[0]!).some((a) => a.scene === 'bakery'))).toBe(true);
+    await sleep(300);
+    expect(seen(m, 0)).toEqual([]);
+  });
+
+  it('a living client walking into a dark scene holds only the avatars it can see', async () => {
+    const m = await startParty(colyseus, 4);
+    setPhase(m, Phase.night);
+    teleport(m, m.bots[1]!, 'cave_entry', 12, 2);
+    teleport(m, m.bots[2]!, 'cave_entry', 12, 9);
+    teleport(m, m.bots[3]!, 'cave_entry', 6, 4);
+    await sleep(300);
+    teleport(m, m.bots[0]!, 'cave_entry', 10, 2); // bots 2 and 3 are beyond the night radius, in no pool
+    expect(await until(() => avatarsHeld(m.bots[0]!).some((a) => a.scene === 'cave_entry'))).toBe(true);
+    await sleep(300);
+    expect(seen(m, 0)).toEqual(ids(m, 1));
+    expect(seen(m, 1)).toEqual(ids(m, 0));
   });
 });
