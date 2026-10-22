@@ -2761,6 +2761,25 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6H (quests and mini-games)
 
+- **Three steps on one branch and one draft PR (2026-10-22)**, each commit green on `pnpm lint && pnpm typecheck &&
+  pnpm test`: (1) `rules/minigames.ts` and `packages/shared/test/minigames.test.ts` (the four kinds, replayed answers);
+  (2) `sim/Quests.ts` and `test/quests.test.ts`; (3) `sim/Minigames.ts`, the `task` branch in
+  `sim/Hold.ts`, `test/minigames.test.ts`, the GDD 3.16 (6H) sentences and DECISIONS A90. The branch rule of this round
+  allows one branch, so the steps are commits of one PR rather than three.
+- **Contract requests (for the orchestrator)**: (a) done: 6F's `sim/Inventory.ts` landed (#61); the stand-in is deleted and
+  the quest turn-in is one `exchange`. (b) done: the `minigame` stream (#65) is in use, `seeds.get('minigame', seat)`. (c) done: `Win.ts` clears `priv.quests` in the reset and `runQuests` no longer clears in the lobby. (d) The `task` branch of `handleHold` is in `sim/Hold.ts` (the brief says `Actions.ts`, which only dispatches
+  to it); six lines, a call into `Minigames.ts`.
+- **Gap found, for the orchestrator and the owner**: the base has no main-mode task layer. Nothing assigns
+  `Private.tasks` (the `tasksEach` rows of `balance.json` are read by no code), nothing picks a deliverable up at its
+  source prop, `GameState.taskBar` was never written, and `Win.ts` never checks it for the Village win. 6H wrote what
+  its brief names (the hold that opens the mini-game, the check, the completion, the bar's recompute) and tests it on
+  fixtures that give a seat a task and its tool by hand, so in a live match the modules are inert: a seat has no task to
+  open. The assignment (3 to 5 per seat from `tasks.json`, the fake list for the Cabal under `tasks.cabalFakeList`),
+  the pickup at the source and the 100% win line are a session of their own; ROADMAP M5b's definition of done should
+  not count the station tasks as playable until it lands.
+- **Measured / checked**: the new tests are 9 (shared), 9 (quests) and 8 (mini-games); a mutation that accepts any
+  answer fails three of the mini-game tests.
+
 ### Round 6 log: 6I (M5b client)
 
 ### Round 6 log: 6J (cutscenes)

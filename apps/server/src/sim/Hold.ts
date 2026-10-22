@@ -12,6 +12,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isLoft, isVerbPhase, reject, sceneKey } from './World';
 import { handleCraft, tickCraft } from './Craft';
+import { handleTaskHold } from './Minigames';
 import { handleGather, tickGather } from './Resources';
 
 const CLUE_TEACHING = 'clue_teaching';
@@ -59,6 +60,11 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
   if ((action === 'gather' || action === 'craft') && typeof targetId === 'string' && targetId.length > 0) {
     if (action === 'gather') handleGather(room, sessionId, targetId);
     else handleCraft(room, sessionId, targetId);
+    return;
+  }
+  // Round 6 (6H): a station task's hold opens its mini-game (GDD 3.16); the answer arrives as `minigame.result`.
+  if (action === 'task' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
+    handleTaskHold(room, sessionId, targetId);
     return;
   }
   if (action !== 'collect' || typeof targetId !== 'string' || targetId.length === 0 || targetId.length > 64) {

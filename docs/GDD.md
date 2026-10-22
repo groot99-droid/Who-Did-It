@@ -604,8 +604,12 @@ a giver on its hub and others in its wild places:
 (`quests.maxActive`), each private to that seat's view. Turning a quest in at its giver takes the wanted items
 from the inventory and gives the reward through the inventory; with no room for the reward the turn-in is refused
 and nothing is taken. A quest can be done once per seat per match. Every quest is open to every role, and what a
-giver offers never depends on who asks. (6H) Quests of kind `contract` are the round-7 vendetta seam and are
-refused in round 6.
+giver offers never depends on who asks. (6H) Accepting and turning in are commands at a giver of that quest within
+reach of the verb (`doors.reachTiles`), in a verb phase; an accepted quest's progress is the count of wanted units
+the seat carries (each want capped at its quantity) and follows the inventory every step, so it falls when an item is
+dropped. A quest that is done stays on the list and counts as done for the match, and a done quest no longer counts
+against `quests.maxActive`. The lobby and the role card clear every seat's quests. Quests of kind `contract` are the
+round-7 vendetta seam and are refused in round 6.
 
 **Mini-games.** Every fetch task of 3.5 plays a mini-game at its target in place of the plain 2 s hold: the hold
 opens it, the server keeps the solution, and the task completes only when the client's answer checks. The four
@@ -621,7 +625,18 @@ kinds are the quick mode's (3.11): crates, pour, slide and stoke. (6H)
 
 After 20 s the Done control appears, as in the quick mode. A wrong answer completes nothing and may be tried again.
 A Cabal seat's fake task plays the same mini-game, writes the same alibi entry and never moves the task bar (3.5).
-The co-op task keeps its two-player hold.
+The co-op task keeps its two-player hold. (6H) The hold opens the mini-game at once, with no timer, at a target prop of
+the task within reach, in the task's own time of day (Light the lanterns only at night), and only for a task on the
+seat's own list that is not done; a real task also needs its deliverable in the inventory, which completion takes, and
+a fake task needs none. The server draws the puzzle from a stream of its own keyed by seat, sends the client its
+statement (the board it draws: the bands, the lit order) and keeps it; the answer is a record of what the player did
+(crates placed and the needle's stop, how long each pour was held, the slots filled in order, the stoke's taps), which
+the server replays against the puzzle, so a bare "done" completes nothing. The Done control sends an assist answer the
+server accepts only once the puzzle has been open for `assistS`. Each two difficulty levels above 1 add one step (one
+second of hold for the stoke) to the ONUB numbers of `balance.onub.json`. Completion marks the task done, writes the
+alibi entry (the scene and the tick, into the seat's own ledger) and, for a real task, raises the bar to the finished
+real tasks over all real tasks; a ghost's finished tasks count in full up to `tasks.ghostShareCap` of the bar. Leaving
+the node, or a phase where verbs do not work, drops the open puzzle.
 
 ### 3.17 Characters and disguise
 
