@@ -2693,6 +2693,13 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6C (GitHub auth and AdminRoom)
 
+- PR 1 (`claude/r6-admin-server`): `services/adminAuth.ts` filled and pure. `adminConfig` is null unless `WDI_ADMIN=1`
+  and all five variables are set, the key is at least 32 characters and the client URL is http(s). The state and the
+  token are HMAC-SHA256 under the one key with a purpose prefix, so neither verifies as the other; `verifyAdminToken`
+  checks the allowlist again, so dropping a login from the variable locks it out within the token's life. Every
+  callback failure answers the same 403, and the callback is rate limited globally (20 burst) before it spends a
+  GitHub call. `adminAuth.test.ts`: 17 tests with a fake `fetch` and a fake `now`.
+
 ### Round 6 log: 6D (admin client)
 
 ### Round 6 log: 6E (M5b content and GDD 3.14-3.16)
