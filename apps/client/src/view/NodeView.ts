@@ -1,17 +1,91 @@
 import type Phaser from 'phaser';
+import metrics from '@wdi/content/data/metrics.json';
+import { toScreen } from '@wdi/shared/iso';
+import type { NodeSnap } from '../net/world';
+import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
+import { BIAS, depthAt } from './iso';
+import { nodeFrame } from './m5bFrames';
+
+const ATLAS = 'nodes';
+interface Drawn {
+  obj: Phaser.GameObjects.Sprite | Phaser.GameObjects.Ellipse;
+  art: boolean;
+  resource: string;
+  active: boolean;
+}
 
 /**
- * Round 6, Session 6I (docs/round6/m5b-data.md 3): draws the scene's nodes from the world feed. Constructed
- * and destroyed by `scenes/World.ts` beside `ClueView` (locked lines). Pre-seeded by 6Z as a view that draws nothing.
+ * Round 6, Session 6I (docs/round6/m5b-data.md 3): draws the scene's resource nodes from the world feed, one sprite
+ * each, ready or spent. A frame the atlas lacks draws a greybox disc, so a scene is playable without art. It also
+ * mounts the M5b layer (`ui/M5bLayer.ts`: pockets, crafting, quests, the hold prompts and the mini-game modal), because
+ * `scenes/World.ts` constructs only these three views; the layer follows this view's `update` and `destroy`.
  */
 export class NodeView {
-  constructor(private readonly scene: Phaser.Scene) {}
+  private readonly drawn = new Map<string, Drawn>();
+  private readonly layer: M5bLayer | null;
 
-  update(_items: readonly unknown[], _now: number): void {
-    void this.scene; // 6I
+  constructor(private readonly scene: Phaser.Scene) {
+    this.layer = mountM5bLayer(scene);
+  }
+
+  get count(): number {
+    return this.drawn.size;
+  }
+
+  has(id: string): boolean {
+    return this.drawn.has(id);
+  }
+
+  update(items: readonly NodeSnap[], _now: number): void {
+    const present = new Set<string>();
+    for (const n of items) {
+      present.add(n.id);
+      let d = this.drawn.get(n.id);
+      if (!d) {
+        d = this.build(n);
+        this.drawn.set(n.id, d);
+      }
+      if (d.active !== n.active) this.pose(d, n.resource, n.active);
+    }
+    for (const [id, d] of this.drawn) {
+      if (present.has(id)) continue;
+      d.obj.destroy();
+      this.drawn.delete(id);
+    }
+    this.layer?.tick(items);
+  }
+
+  private frame(key: string): boolean {
+    return this.scene.textures.exists(ATLAS) && this.scene.textures.get(ATLAS).has(key);
+  }
+
+  private build(n: NodeSnap): Drawn {
+    const at = toScreen(n.x, n.y);
+    const key = nodeFrame(n.resource, n.active);
+    const depth = depthAt(n.x, n.y, BIAS.kit);
+    if (this.frame(key)) {
+      const sprite = this.scene.add
+        .sprite(at.x, at.y, ATLAS, key)
+        .setScale(metrics.iso.artScale)
+        .setDepth(depth);
+      return { obj: sprite, art: true, resource: n.resource, active: n.active };
+    }
+    const disc = this.scene.add
+      .ellipse(at.x, at.y, 56, 28, n.active ? 0x7a9a5a : 0x4a4f5c, 0.9)
+      .setStrokeStyle(2, 0x12141c)
+      .setDepth(depth);
+    return { obj: disc, art: false, resource: n.resource, active: n.active };
+  }
+
+  private pose(d: Drawn, resource: string, active: boolean): void {
+    d.active = active;
+    if (d.art) (d.obj as Phaser.GameObjects.Sprite).setFrame(nodeFrame(resource, active));
+    else (d.obj as Phaser.GameObjects.Ellipse).setFillStyle(active ? 0x7a9a5a : 0x4a4f5c, 0.9);
   }
 
   destroy(): void {
-    // 6I
+    for (const d of this.drawn.values()) d.obj.destroy();
+    this.drawn.clear();
+    this.layer?.destroy();
   }
 }

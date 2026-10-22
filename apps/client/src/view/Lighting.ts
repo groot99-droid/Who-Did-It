@@ -1,9 +1,13 @@
 import Phaser from 'phaser';
+import balance from '@wdi/content/data/balance.json';
+import items from '@wdi/content/data/items.json';
 import { toScreen } from '@wdi/shared/iso';
+import { REG_WORLD, type WorldFeed } from '../net/world';
 import { h } from '../ui/dom';
 import { type DayPart } from './dayPart';
 import { tokenColour, type PaletteToken } from './greyboxColours';
 import { DEPTH } from './iso';
+import { lanternCarriers, type Carrier } from './m5bFrames';
 import {
   type SceneLight,
   ambientFor,
@@ -18,6 +22,10 @@ import {
 const LIGHT_KEY = 'gen_light';
 const LIGHT_PX = 256;
 const DARK_KEY = 'gen_dark';
+/** Round 6 (6I): a carried light's pool, in tiles, is the lantern item's own radius (GDD 3.5); the carrier's own sight gains `vision.lanternTiles` (GDD 3.7). */
+const CARRIED_TILES = items.items.lantern.lightRadiusTiles;
+const LANTERN_FRAME = 'glow_lantern/0';
+const LANTERN_ANIM = 'glow_lantern';
 
 /** What the layer draws this frame. */
 export interface LightState {
@@ -66,7 +74,7 @@ export class Lighting {
   private hidden = false;
   private following = false;
   private lastDraw = -1;
-  private readonly carried = new Map<string, number>();
+  private readonly carried = new Map<string, Phaser.GameObjects.Image>();
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -117,15 +125,6 @@ export class Lighting {
     this.syncHidden();
   }
 
-  /**
-   * The slot for a carried light (SPRITES 10.11): `rTiles` for an avatar handle, null to take it away. Nothing calls
-   * it in M5a; M5b's lantern does.
-   */
-  setCarried(handle: string, rTiles: number | null): void {
-    if (rTiles === null) this.carried.delete(handle);
-    else this.carried.set(handle, rTiles);
-  }
-
   setHidden(hidden: boolean): void {
     this.hidden = hidden;
     this.syncHidden();
@@ -143,6 +142,7 @@ export class Lighting {
     this.image.setVisible(show);
     this.root.hidden = !show;
     for (const g of this.glows) if (!show) g.image.setVisible(false);
+    for (const img of this.carried.values()) if (!show) img.setVisible(false);
   }
 
   private readonly preRender = (): void => {
@@ -173,7 +173,19 @@ export class Lighting {
         blendMode: Phaser.BlendModes.ERASE,
       });
     };
-    if (s.viewer) cut(s.viewer.x, s.viewer.y, visionTiles(darkness, this.inDarkScene));
+    const feed = this.scene.registry.get(REG_WORLD) as WorldFeed | undefined;
+    const me = feed?.snapshot().find((p) => p.id === feed.selfId)?.presence;
+    const carriers = feed
+      ? lanternCarriers(feed.avatars(), feed.selfHandle(), s.viewer, me?.statusBits ?? 0)
+      : [];
+    const ownLit = carriers.some((c) => c.own);
+    if (s.viewer)
+      cut(
+        s.viewer.x,
+        s.viewer.y,
+        visionTiles(darkness, this.inDarkScene) + (ownLit ? balance.vision.lanternTiles : 0),
+      );
+    for (const c of carriers) if (!c.own) cut(c.x, c.y, CARRIED_TILES);
     const now = this.scene.time.now;
     for (const g of this.glows) {
       const burning = burnsIn(g.light.phases, s.part);
@@ -181,9 +193,43 @@ export class Lighting {
       if (burning) cut(g.light.x, g.light.y, r);
       this.placeGlow(g, burning, r, darkness);
     }
+    this.placeCarried(carriers, darkness);
     t.render();
     this.root.dataset.darkness = darkness.toFixed(2);
   };
+
+  /** The glow over each lit carried light: the lantern's looping frames, added over the world like a scene light. */
+  private placeCarried(carriers: readonly Carrier[], darkness: number): void {
+    const a = glowAlpha(darkness);
+    const keep = new Set<string>();
+    for (const c of carriers) {
+      keep.add(c.key);
+      let img = this.carried.get(c.key);
+      if (!img) {
+        const art =
+          this.scene.textures.exists('tools') && this.scene.textures.get('tools').has(LANTERN_FRAME);
+        img = art
+          ? this.scene.add.sprite(0, 0, 'tools', LANTERN_FRAME)
+          : this.scene.add.image(0, 0, LIGHT_KEY).setTint(tokenColour('lantern'));
+        img.setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.glow);
+        if (art && this.scene.anims.exists(LANTERN_ANIM))
+          (img as Phaser.GameObjects.Sprite).play(LANTERN_ANIM);
+        this.carried.set(c.key, img);
+      }
+      const at = toScreen(c.x, c.y);
+      const p = poolOnScreen(c.x, c.y, CARRIED_TILES, 1, { x: 0, y: 0 });
+      img
+        .setPosition(at.x, at.y)
+        .setDisplaySize(p.width, p.height)
+        .setAlpha(a)
+        .setVisible(a > 0);
+    }
+    for (const [key, img] of this.carried) {
+      if (keep.has(key)) continue;
+      img.destroy();
+      this.carried.delete(key);
+    }
+  }
 
   /** The glow of a lit light: the same ellipse, tinted, added over the world at `glowAlpha` times the darkness. */
   private placeGlow(g: Glow, burning: boolean, rTiles: number, darkness: number): void {
@@ -200,6 +246,8 @@ export class Lighting {
     this.cam.off(Phaser.Cameras.Scene2D.Events.PRE_RENDER, this.preRender, this);
     for (const g of this.glows) g.image.destroy();
     this.glows = [];
+    for (const img of this.carried.values()) img.destroy();
+    this.carried.clear();
     this.image.destroy();
     this.scene.textures.remove(DARK_KEY);
     this.root.remove();
