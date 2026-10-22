@@ -2831,3 +2831,16 @@ session's goes back to it. Log under "Integration log, round 6".
   R18 and the NPC suite under sixteen busy-loop processes, and with a throwaway probe of the timeline: the failure
   itself did not reproduce locally, only the tick drift that explains it (the lobby tick varied from 3 to 8, the
   card and grace ticks with it). The NPC tests stay S's and 5H's.
+- **Quick-mode night test flake, wire timing (2026-10-22).** CI failed twice on commits that do not touch the quick
+  mode: `onubNight.test.ts` line 419 (the Tourrier test) saw one refusal where it expected two (`[422]`), and line 521
+  (the Iron Cloche test) saw `[]` where it expected one, right after waiting on `m.o.cloche`. Cause: the server's 422
+  `ErrorCode.cannot` travels over the Colyseus wire after the state change the test waits for, so a synchronous read
+  of `errorsOf` could run before it landed; a state wait is not a message wait. Fix in
+  `apps/server/test/onubNight.test.ts` alone, `apps/server/src`, the rules and every number untouched, no assertion
+  skipped or loosened: each `errorsOf` assertion that followed an act or a `debug.clock` without a wait on the error
+  count now has `await until(() => errorsOf(bot).length >= N)` first, then asserts the exact contents. The audit
+  found four more such reads besides the two reported, all in the `debug.clock` tests (the wrong-phase refusal of
+  `{phase}`, the `{window}` of a role not in the deck, the `{bogus}` one, and the `{window}` outside the night);
+  every other `errorsOf` read in the file already waited on the count. Verified with the file five times unloaded and five times under eight
+  busy-loop processes on four cores, then `pnpm lint`, `pnpm typecheck` and `pnpm test`; the failure itself did not
+  reproduce locally, on the unfixed file either. The night tests stay 5B's.
