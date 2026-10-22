@@ -28,6 +28,7 @@ import { CutscenePlayer } from '../view/cutscene/CutscenePlayer';
 import { GiverView } from '../view/GiverView';
 import { MobView } from '../view/MobView';
 import { NodeView } from '../view/NodeView';
+import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
@@ -127,6 +128,7 @@ export class World extends Phaser.Scene {
   private nodeView!: NodeView;
   private mobView!: MobView;
   private giverView!: GiverView;
+  private m5b: M5bLayer | null = null;
   private cutscenes!: CutscenePlayer;
   private ground: GroundView | null = null;
   private bell: { x: number; y: number } | null = null;
@@ -210,6 +212,7 @@ export class World extends Phaser.Scene {
     this.nodeView = new NodeView(this);
     this.mobView = new MobView(this);
     this.giverView = new GiverView(this);
+    this.m5b = mountM5bLayer(this);
     this.entities = new EntityView(this, feed.selfId);
 
     this.hud = new Hud(overlayRoot());
@@ -237,7 +240,7 @@ export class World extends Phaser.Scene {
     this.bindKeys();
     if (flags.touch || isTouchDevice()) {
       this.touch = new TouchControls(overlayRoot(), {
-        onUse: (on) => (on ? this.startUse() : this.endUse()),
+        onUse: (on) => this.useKey(on),
         onAct: () => this.abilityKey('Q'),
       });
       input.attachTouch(this.touch);
@@ -312,6 +315,7 @@ export class World extends Phaser.Scene {
       this.nodeView.destroy();
       this.mobView.destroy();
       this.giverView.destroy();
+      this.m5b?.destroy();
       this.cutscenes.destroy();
       this.ground?.destroy();
       this.ground = null;
@@ -380,7 +384,7 @@ export class World extends Phaser.Scene {
 
   private bindKeys(): void {
     const input = this.input_;
-    input.bind('KeyE', (down) => (down ? this.startUse() : this.endUse()));
+    input.bind('KeyE', (down) => this.useKey(down));
     input.bind('KeyN', (down) => down && this.sheet.toggle());
     for (const [code, slot] of Object.entries(ABILITY_SLOTS))
       input.bind(code, (down) => down && this.abilityKey(slot));
@@ -399,6 +403,13 @@ export class World extends Phaser.Scene {
     this.hud.setHidden(false);
     this.touch?.setHidden(false);
     this.bindKeys();
+  }
+
+  /** E / Use: the M5b layer takes it for a node or a giver in reach; otherwise the clue, body, bell and door verbs. */
+  private useKey(down: boolean): void {
+    if (this.m5b?.use(down)) return;
+    if (down) this.startUse();
+    else this.endUse();
   }
 
   /** E / Use pressed: act on the nearest target. A clue starts a hold that ends with `endUse`. */

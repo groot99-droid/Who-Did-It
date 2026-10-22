@@ -2673,3 +2673,192 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   border-radius: var(--wdi-radius-sm);
   margin-bottom: var(--wdi-space-1);
 }
+
+/* Round 6 (6I): gathering, crafting, quests and the station mini-games (UI.md 14.19). */
+.wdi-m5b {
+  position: absolute;
+  inset: 0;
+  z-index: var(--wdi-z-panel);
+  pointer-events: none;
+}
+
+.wdi-m5b[hidden] {
+  display: none;
+}
+
+.wdi-m5b > * {
+  pointer-events: auto;
+}
+
+.wdi-m5b__keys {
+  position: absolute;
+  bottom: var(--wdi-space-3);
+  left: var(--wdi-space-3);
+  display: flex;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-m5b__key kbd {
+  margin-left: var(--wdi-space-1);
+}
+
+.wdi-m5b__prompt {
+  position: absolute;
+  bottom: calc(var(--wdi-touch) + var(--wdi-space-5));
+  left: 50%;
+  display: grid;
+  gap: var(--wdi-space-1);
+  min-width: 220px;
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  font: inherit;
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-text);
+  background-color: var(--wdi-surface);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-md);
+  box-shadow: var(--wdi-shadow-1);
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+.wdi-m5b__prompt[hidden] {
+  display: none;
+}
+
+.wdi-m5b__bar {
+  display: block;
+  height: var(--wdi-space-1);
+  overflow: hidden;
+  background-color: var(--wdi-surface-sunken);
+  border-radius: var(--wdi-radius-xs);
+}
+
+.wdi-m5b__bar > i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background-color: var(--wdi-interact);
+}
+
+.wdi-m5b__toast {
+  position: absolute;
+  bottom: calc(var(--wdi-touch) * 2 + var(--wdi-space-6));
+  left: 50%;
+  margin: 0;
+  padding: var(--wdi-space-1) var(--wdi-space-3);
+  font-size: var(--wdi-text-sm);
+  background-color: var(--wdi-surface);
+  border-radius: var(--wdi-radius-md);
+  transform: translateX(-50%);
+}
+
+.wdi-m5b__toast[hidden] {
+  display: none;
+}
+
+.wdi-m5b__panel {
+  position: absolute;
+  right: var(--wdi-space-3);
+  bottom: calc(var(--wdi-touch) + var(--wdi-space-5));
+  display: grid;
+  gap: var(--wdi-space-2);
+  width: min(360px, calc(100% - var(--wdi-space-5)));
+  max-height: 60%;
+  padding: var(--wdi-space-3);
+  overflow-y: auto;
+  color: var(--wdi-text);
+  background-color: var(--wdi-surface);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-lg);
+  box-shadow: var(--wdi-shadow-2);
+}
+
+.wdi-m5b__panel[hidden] {
+  display: none;
+}
+
+.wdi-m5b__panel--modal {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  width: min(420px, 100%);
+  max-height: 90%;
+}
+
+.wdi-m5b__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-m5b__head h2 {
+  margin: 0;
+  font-size: var(--wdi-text-lg);
+}
+
+.wdi-m5b__list {
+  display: grid;
+  gap: var(--wdi-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wdi-m5b__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wdi-space-2);
+  padding: var(--wdi-space-2);
+  background-color: var(--wdi-surface-sunken);
+  border-radius: var(--wdi-radius-md);
+}
+
+.wdi-m5b__what {
+  display: grid;
+  gap: var(--wdi-space-1);
+}
+
+.wdi-m5b__name {
+  font-weight: var(--wdi-weight-strong);
+}
+
+.wdi-m5b__line {
+  font-size: var(--wdi-text-sm);
+  font-style: italic;
+}
+
+.wdi-m5b__lack {
+  color: var(--wdi-text-muted);
+}
+
+.wdi-m5b__ok,
+.wdi-m5b__done {
+  color: var(--wdi-interact);
+}
+
+.wdi-m5b__empty {
+  color: var(--wdi-text-muted);
+}
+
+.wdi-m5b__modal {
+  position: absolute;
+  inset: 0;
+  z-index: var(--wdi-z-dialog);
+  display: grid;
+  place-items: center;
+  padding: var(--wdi-space-3);
+  background-color: rgb(var(--wdi-slate-rgb) / 0.6);
+}
+
+.wdi-m5b__stage {
+  display: grid;
+  gap: var(--wdi-space-2);
+  justify-items: center;
+}
+
+.wdi-m5b__foot {
+  display: flex;
+  justify-content: flex-end;
+}

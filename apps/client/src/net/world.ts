@@ -152,6 +152,12 @@ export interface MobSnap {
   state: number;
 }
 
+/** Round 6 (M5b): one inventory slot of this player's own pockets (`Private.inventory.slots`). */
+export interface StackSnap {
+  defId: string;
+  qty: number;
+}
+
 /** Round 6 (M5b): one of this player's own quests (`Private.quests`). */
 export interface QuestSnap {
   id: string;
@@ -185,6 +191,14 @@ export interface WorldFeed {
   nodes(): NodeSnap[];
   mobs(): MobSnap[];
   quests(): QuestSnap[];
+  /** Round 6 (6I): this player's own inventory slots, in slot order. */
+  inventory(): StackSnap[];
+  /** Round 6 (6I): `quest.accept { questId }`. */
+  questAccept(questId: string): void;
+  /** Round 6 (6I): `quest.turnIn { questId }`. */
+  questTurnIn(questId: string): void;
+  /** Round 6 (6I): `act.light { on }`, light or douse the carried lantern or torch. */
+  light(on: boolean): void;
   /** Round 6 (6I): the answer to a `minigameStart`. */
   minigameResult(taskId: string, answer: unknown): void;
   /**

@@ -19,6 +19,8 @@ export const slotRect = (i: number): Rect => ({ x: CABINET.x + 16, y: CABINET.y 
 export class SlideModel {
   private readonly order: number[];
   private filled = 0;
+  /** The slots in the order they were filled; the answer of the main-mode check. */
+  readonly slots: number[] = [];
 
   constructor(
     rng: () => number,
@@ -52,13 +54,14 @@ export class SlideModel {
   /** A banneton was released at `(x, y)` in art pixels; true when it went into the glowing slot. */
   drop(x: number, y: number): boolean {
     if (this.done || !inside(slotRect(this.glowing), x, y)) return false;
+    this.slots.push(this.glowing);
     this.filled += 1;
     return true;
   }
 }
 
 export const slideGame: MiniGameFactory = (host) => {
-  const model = new SlideModel(host.rng);
+  const model = new SlideModel(host.rng, host.steps);
   const stage = createStage(host.root);
   const hint = h(
     'p',
@@ -124,6 +127,7 @@ export const slideGame: MiniGameFactory = (host) => {
   const halt = loop(draw);
   draw();
   return {
+    answer: () => ({ slots: [...model.slots] }),
     destroy() {
       halt();
       stage.destroy();

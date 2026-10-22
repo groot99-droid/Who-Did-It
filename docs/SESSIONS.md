@@ -2824,6 +2824,30 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6I (M5b client)
 
+- **Steps on one branch and one draft PR (`claude/r6-m5b-client`, 2026-10-22)**, each commit green on `pnpm lint &&
+pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock and Colyseus readers
+  (`net/mock/m5bMock.ts`, `net/worldColyseus.ts`, `view/{NodeView,MobView,GiverView,m5bFrames}.ts`); (2) the pockets,
+  crafting and quest panels, the prompt layer, the mini-game modal, copy and CSS; (3) `e2e/m5b.spec.ts`, UI.md 14.19,
+  this log and DECISIONS A91.
+- **Contract requests, granted by 6Z on #67 and done in the PR, so no stand-in lands**: (a) `WorldFeed` gained
+  `inventory()`, `questAccept(id)`, `questTurnIn(id)` and `light(on)` with `StackSnap` beside the other snaps in
+  `net/world.ts`; the Colyseus feed and the mock implement them and `net/m5b.ts` is deleted. (b) `World.ts` constructs
+  `mountM5bLayer` beside the three views, destroys it with them and routes E (keyboard and touch) through `useKey`: the
+  layer takes E for a node or a giver in reach (`takesUse`), and the clue, body, bell and door verbs run as before when
+  it does not. `NodeView` no longer mounts the layer. (c) The four ONUB widgets gained `answer()` (what the player did:
+  crates placed and the stop, each pour's hold, the slots in order, the stoke's taps) and `host.steps`/`host.holdS`,
+  so a board with extra difficulty steps is played at the server's size; `view/minigames/answers.ts` is deleted and
+  `board.ts` keeps only `bandRng`, which feeds a widget the server's bands. The Done control sends the server's
+  `{assist: true}` answer.
+- **Gap, for the owner**: the base has no main-mode task layer (see 6H), so `S2C.minigameStart` never fires in a live
+  match. The modal is exercised from the mock, the `?minigame=<kind>` hook and fixtures; the live path waits on the
+  task layer, which this session did not build.
+- **Mock first**: `?mock=1&m5b=1` stands the own seat beside the overworld giver with a spade and five kit nodes
+  (spread distances so the nearest-node prompt walks them in order), one rat, and a station-free craft. The mock mirrors
+  the server rules (reach, hold time, yield and respawn, the spade, five slots, stack size, `quests.maxActive`).
+- **Measured / checked**: client tests 496 (new: views 3 files, panels, answers, mock); `e2e/m5b.spec.ts` gathers, crafts
+  and lights a lantern and turns in `caulkTheSkiff`, then opens a slide board through `?minigame=slide`.
+
 ### Round 6 log: 6J (cutscenes)
 
 - **PR 1 (schema, index, rules, server lines, `openingS`)** on `claude/r6-cutscenes`: `rules/cutscenes.ts` bodies with

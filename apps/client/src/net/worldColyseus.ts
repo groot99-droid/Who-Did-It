@@ -18,6 +18,7 @@ import type {
   MobSnap,
   NodeSnap,
   QuestSnap,
+  StackSnap,
 } from './world';
 
 // Reads the live room. The state is the shared schema of @wdi/shared; the client keeps loose structural
@@ -33,6 +34,8 @@ interface PlayerState {
   presence?: PresenceState;
   priv?: {
     notebook?: { forEach(cb: (e: NotebookSnap) => void): void };
+    inventory?: { slots?: { forEach(cb: (s: StackSnap) => void): void } };
+    quests?: { forEach(cb: (q: QuestSnap) => void): void };
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
@@ -57,6 +60,8 @@ interface SceneStateLike {
   bodies?: Collection<BodySnap>;
   clues?: Collection<ClueSnap>;
   avatars?: Collection<AvatarState>;
+  nodes?: Collection<NodeSnap>;
+  mobs?: Collection<MobSnap>;
 }
 interface GameStateLike {
   tick: number;
@@ -250,17 +255,61 @@ export class ColyseusWorldFeed implements WorldFeed {
     this.room.send('act.bell', {});
   }
 
-  // Round 6 (6I fills the readers from `SceneState.nodes`, `SceneState.mobs` and `Private.quests`).
+  // Round 6 (6I): the scene's nodes and mobs, and this seat's own quests and inventory.
   nodes(): NodeSnap[] {
-    return [];
+    const out: NodeSnap[] = [];
+    this.state.scenes.forEach((scene) =>
+      scene.nodes?.forEach((n, id) =>
+        out.push({ id: n.id || id, resource: n.resource, x: n.x, y: n.y, active: n.active }),
+      ),
+    );
+    return out;
   }
 
   mobs(): MobSnap[] {
-    return [];
+    const out: MobSnap[] = [];
+    this.state.scenes.forEach((scene) =>
+      scene.mobs?.forEach((m, id) =>
+        out.push({
+          id: m.id || id,
+          kind: m.kind,
+          x: m.x,
+          y: m.y,
+          yaw: m.yaw,
+          animId: m.animId,
+          state: m.state,
+        }),
+      ),
+    );
+    return out;
   }
 
   quests(): QuestSnap[] {
-    return [];
+    const out: QuestSnap[] = [];
+    this.state.players
+      .get(this.selfId)
+      ?.priv?.quests?.forEach((q) => out.push({ id: q.id, progress: q.progress, done: q.done }));
+    return out;
+  }
+
+  inventory(): StackSnap[] {
+    const out: StackSnap[] = [];
+    this.state.players
+      .get(this.selfId)
+      ?.priv?.inventory?.slots?.forEach((s) => out.push({ defId: s.defId, qty: s.qty }));
+    return out;
+  }
+
+  questAccept(questId: string): void {
+    this.room.send('quest.accept', { questId });
+  }
+
+  questTurnIn(questId: string): void {
+    this.room.send('quest.turnIn', { questId });
+  }
+
+  light(on: boolean): void {
+    this.room.send('act.light', { on });
   }
 
   minigameResult(taskId: string, answer: unknown): void {

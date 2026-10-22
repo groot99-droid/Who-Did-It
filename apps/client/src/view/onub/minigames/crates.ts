@@ -28,6 +28,8 @@ export function needleAt(t: number): number {
 export class CratesModel {
   private carted = 0;
   private stopped = false;
+  /** Where the needle stopped inside the band; the answer of the main-mode check. */
+  stopPos = 0;
   readonly bandStart: number;
 
   constructor(
@@ -62,13 +64,16 @@ export class CratesModel {
   stop(pos: number): boolean {
     if (!this.dialLive) return false;
     const hit = pos >= this.bandStart && pos <= this.bandStart + this.bandFrac;
-    if (hit) this.stopped = true;
+    if (hit) {
+      this.stopped = true;
+      this.stopPos = pos;
+    }
     return hit;
   }
 }
 
 export const cratesGame: MiniGameFactory = (host) => {
-  const model = new CratesModel(host.rng);
+  const model = new CratesModel(host.rng, host.steps);
   const stage = createStage(host.root);
   const hint = h('p', { class: 'wdi-hint', 'data-testid': 'minigame-crates-hint' });
   const stopBtn = h(
@@ -171,6 +176,7 @@ export const cratesGame: MiniGameFactory = (host) => {
   });
   draw();
   return {
+    answer: () => ({ placed: model.cartCount, stop: model.stopPos }),
     destroy() {
       halt();
       stage.destroy();

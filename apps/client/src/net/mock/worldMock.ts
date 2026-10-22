@@ -23,7 +23,9 @@ import type {
   MobSnap,
   NodeSnap,
   QuestSnap,
+  StackSnap,
 } from '../world';
+import { MockM5b, type MockSceneM5b } from './m5bMock';
 
 // A local stand-in for the server's movement stage, used behind ?mock=1 until a server is attached. It runs
 // the same collision (`@wdi/shared`) and the same speed table (balance.json) as apps/server/src/sim, with
@@ -65,6 +67,9 @@ export interface MockScene {
   portals: MockPortal[];
   spawns: Array<{ id: string; x: number; y: number; facing: string }>;
   props?: Array<{ id: string; kind: string; x: number; y: number }>;
+  /** Round 6 (6I): the scene's M5b statics, as `scenes/*.json` carries them. */
+  nodes?: MockSceneM5b['nodes'];
+  givers?: MockSceneM5b['givers'];
 }
 export interface MockContent {
   navs: Record<string, NavData>;
@@ -143,6 +148,7 @@ export class MockWorldFeed implements WorldFeed {
   private handleSeq = 0;
   /** The own seat's disguise, applied at once in the mock (the server waits until the seat is unseen). */
   private disguised = false;
+  private readonly m5b: MockM5b;
 
   constructor(
     private readonly content: MockContent,
@@ -185,6 +191,22 @@ export class MockWorldFeed implements WorldFeed {
       const spawn = this.content.scenes.overworld?.spawns.find((s) => s.id === `square_${i}`);
       if (spawn) this.place(body, 'overworld', spawn);
     });
+    // Round 6 (6I): `?m5b=1` stands the own seat beside the overworld's quest giver with a spade and a kit of nodes.
+    let kit: { scene: string; x: number; y: number } | null = null;
+    const giver = this.content.scenes.overworld?.givers?.[0];
+    const me0 = this.actors.get(this.selfId);
+    const navGrid = this.grid('overworld');
+    if (q.get('m5b') === '1' && giver && me0 && navGrid) {
+      const free = [-1, 1, 0, 2, -2]
+        .flatMap((dy) => [-1, 1, 0, 2].map((dx) => ({ dx, dy })))
+        .find(({ dx, dy }) => (dx !== 0 || dy !== 0) && !navGrid.solidAt(giver.x + dx, giver.y + dy));
+      if (free) {
+        me0.x = (giver.x + free.dx + 0.5) * TILE_PX;
+        me0.y = (giver.y + free.dy + 0.5) * TILE_PX;
+        kit = { scene: 'overworld', x: me0.x, y: me0.y };
+      }
+    }
+    this.m5b = new MockM5b(this.content.scenes, kit);
     const teach = this.content.scenes.overworld?.props?.find((p) => p.id === 'ov.teaching_clue');
     if (teach) {
       // GDD 2 step 5: the grace clue beside the well, Footprints with a tall stride.
@@ -408,6 +430,13 @@ export class MockWorldFeed implements WorldFeed {
   }
 
   hold(action: HoldAction, targetId: string, on: boolean): void {
+    if (action === 'gather' || action === 'craft') {
+      const me = this.actors.get(this.selfId);
+      if (!me || this.ghost) return;
+      const refusal = this.m5b.startHold(action, targetId, on, me, this.tick);
+      if (refusal) this.fail(refusal.code, refusal.msg);
+      return;
+    }
     if (action !== 'collect') return;
     if (!on) {
       this.holding = null;
@@ -468,21 +497,43 @@ export class MockWorldFeed implements WorldFeed {
     } satisfies SceneEnter);
   }
 
-  // Round 6 (6I adds the mock's nodes, mobs and quests).
+  // Round 6 (6I): the mock's nodes, one creature, quests and pockets (`m5bMock.ts`).
   nodes(): NodeSnap[] {
-    return [];
+    const me = this.actors.get(this.selfId);
+    return me ? this.m5b.nodes(me.scene) : [];
   }
 
   mobs(): MobSnap[] {
-    return [];
+    const me = this.actors.get(this.selfId);
+    return me ? this.m5b.mobs(me.scene, this.tick) : [];
   }
 
   quests(): QuestSnap[] {
-    return [];
+    return this.m5b.quests();
+  }
+
+  inventory(): StackSnap[] {
+    return this.m5b.inventory();
+  }
+
+  questAccept(questId: string): void {
+    const me = this.actors.get(this.selfId);
+    const refusal = me && this.m5b.questAccept(questId, me, this.content.scenes);
+    if (refusal) this.fail(refusal.code, refusal.msg);
+  }
+
+  questTurnIn(questId: string): void {
+    const me = this.actors.get(this.selfId);
+    const refusal = me && this.m5b.questTurnIn(questId, me, this.content.scenes);
+    if (refusal) this.fail(refusal.code, refusal.msg);
+  }
+
+  light(on: boolean): void {
+    this.m5b.light(on);
   }
 
   minigameResult(_taskId: string, _answer: unknown): void {
-    // 6I
+    // The mock has no task layer: `?minigame=<kind>` opens a modal whose result is dropped here.
   }
 
   dispose(): void {
@@ -659,7 +710,11 @@ export class MockWorldFeed implements WorldFeed {
       b.moving = Math.hypot(b.x - before.x, b.y - before.y) > 0.01;
     }
     const me = this.actors.get(this.selfId);
-    if (me) this.runHold(me);
+    if (me) {
+      this.runHold(me);
+      this.m5b.step(this.tick, me, me.moving);
+      this.m5b.refreshQuests();
+    }
   }
 
   private presenceOf(b: Actor): PresenceSnap {
@@ -669,7 +724,9 @@ export class MockWorldFeed implements WorldFeed {
       yaw: b.yaw,
       animId: b.moving ? 1 : 0,
       statusBits:
-        (this.tick < b.busyUntil ? 1 : 0) | (b.id === this.selfId && this.tick < this.bloodyUntil ? 2 : 0),
+        (this.tick < b.busyUntil ? 1 : 0) |
+        (b.id === this.selfId && this.tick < this.bloodyUntil ? 2 : 0) |
+        (b.id === this.selfId && this.m5b.lanternLit ? 8 : 0),
       transitUntilTick: b.busyUntil,
     };
   }

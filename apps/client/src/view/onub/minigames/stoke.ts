@@ -20,6 +20,9 @@ const SPEC = onubBalance.stations.find((s) => s.minigame.kind === 'stoke')!.mini
 export class StokeModel {
   heat = 0;
   held = 0;
+  /** Seconds since the first tick, and the moment of each tap; the answer of the main-mode check. */
+  elapsed = 0;
+  readonly taps: number[] = [];
   readonly bandStart: number;
 
   constructor(
@@ -41,18 +44,21 @@ export class StokeModel {
   }
 
   tap(): void {
-    if (!this.done) this.heat = Math.min(1, this.heat + this.stokePerTap);
+    if (this.done) return;
+    this.heat = Math.min(1, this.heat + this.stokePerTap);
+    this.taps.push(Math.round(this.elapsed * 1000) / 1000);
   }
 
   tick(dt: number): void {
     if (this.done) return;
+    this.elapsed += dt;
     this.heat = Math.max(0, this.heat - this.ratePerS * dt);
     this.held = this.inBand ? this.held + dt : 0;
   }
 }
 
 export const stokeGame: MiniGameFactory = (host) => {
-  const model = new StokeModel(host.rng);
+  const model = new StokeModel(host.rng, undefined, undefined, undefined, host.holdS);
   const stage = createStage(host.root);
   const hint = h(
     'p',
@@ -101,6 +107,7 @@ export const stokeGame: MiniGameFactory = (host) => {
   });
   draw();
   return {
+    answer: () => ({ taps: [...model.taps] }),
     destroy() {
       halt();
       stage.destroy();
