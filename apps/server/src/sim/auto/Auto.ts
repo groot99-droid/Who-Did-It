@@ -63,6 +63,7 @@ const STREAMS = {
   contract: 1,
   events: 1,
 } satisfies Record<StreamName, 1>;
+export const AUTO_STREAMS = Object.keys(STREAMS) as StreamName[];
 
 const SCALES: readonly number[] = [1, 2, 5, 10];
 
@@ -94,7 +95,7 @@ export function autoOf(room: PartyRoom): AutoState | null {
 /** Seeds, settings and seats from the options; the room must be in the lobby. Fills in what was drawn. */
 function applyOptions(room: PartyRoom, opts: AutoOptions): AutoOptions {
   const seeds: FixedSeeds = { ...opts.seeds };
-  for (const name of Object.keys(STREAMS) as StreamName[]) seeds[name] ??= drawWords();
+  for (const name of AUTO_STREAMS) seeds[name] ??= drawWords();
   room.fixedSeeds = seeds;
   room.seeds = new MatchSeeds(seeds);
 

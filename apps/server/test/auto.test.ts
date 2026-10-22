@@ -11,14 +11,16 @@ import { createServer } from '../src/server';
 import { isNpcSeat } from '../src/sim/Npc';
 import { simOf } from '../src/sim/RoomSim';
 import { applyClock, autoOf, enableAuto, queueAutoStart } from '../src/sim/auto/Auto';
-import { clockOf } from '../src/sim/auto/clock';
 import { preyFor } from '../src/sim/npc/world';
 import { runAutoMatch } from './autoHelpers';
+import { BUILD_VERSION } from '@wdi/shared';
+import { sleep } from './simHelpers';
 import { advance } from './npcHelpers';
 import {
   EFFECTIVE_SCALE_TICKS,
   MAX_SIM_MS_PER_TICK,
   type SimClock,
+  clockOf,
   effectiveScale,
   stepsThisTick,
 } from '../src/sim/auto/clock';
@@ -199,4 +201,39 @@ describe('the all-NPC match (GDD 3.19)', () => {
       expect(r.npcIds).toHaveLength(6);
     }, 60_000);
   }
+
+  it('replays the same match from the same seeds and seat ids', async () => {
+    const opts = { map: 'hollowmere', mode: 'main', seats: 6, difficulty: 'hard', maxTicks: oneDay } as const;
+    const a = await runAutoMatch(colyseus, opts);
+    const b = await runAutoMatch(colyseus, { ...opts, seeds: a.seeds, npcIds: a.npcIds });
+    const c = await runAutoMatch(colyseus, opts);
+    expect(b.digest).toBe(a.digest);
+    expect(b.ticks).toBe(a.ticks);
+    expect(c.digest).not.toBe(a.digest);
+  }, 60_000);
+
+  it('disposes an auto room no client ever joined', async () => {
+    const room = await create();
+    const id = room.roomId;
+    enableAuto(room, { map: 'hollowmere', mode: 'main', seats: 4, difficulty: 'normal' });
+    // The seat-reservation timer Colyseus arms after onCreate, shortened: an empty room goes when it fires.
+    (room as unknown as { resetAutoDisposeTimeout(s: number): void }).resetAutoDisposeTimeout(0.05);
+    await sleep(300);
+    expect(colyseus.getRoomById(id)).toBeUndefined();
+  });
+
+  it('keeps a party room at one step per tick', async () => {
+    const human = await colyseus.sdk.create('party', {
+      name: 'Solo',
+      build: BUILD_VERSION,
+      deviceId: 'dev-solo',
+    });
+    const room = colyseus.getRoomById(human.roomId) as unknown as PartyRoom;
+    await sleep(1500);
+    const clock = clockOf(room);
+    expect(autoOf(room)).toBeNull();
+    expect(clock).toMatchObject({ scale: 1, paused: false, carry: 0, pendingSteps: 0 });
+    expect(effectiveScale(clock)).toBe(1);
+    await human.leave();
+  });
 });

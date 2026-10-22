@@ -1,12 +1,14 @@
 import { createHash } from 'node:crypto';
-import type { ColyseusTestServer } from '@colyseus/testing';
+import { type ColyseusTestServer, boot } from '@colyseus/testing';
 import { balance } from '@wdi/content';
 import { type InvariantFailure, MAX_PLAYERS, Phase, type SimEventWire, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
+import { createServer } from '../src/server';
 import type { FixedSeeds } from '../src/sim/seeds';
 import { type AutoOptions, applyClock, autoOf, enableAuto, queueAutoStart } from '../src/sim/auto/Auto';
 import { runInvariants } from '../src/sim/auto/invariants';
 import { onSim } from '../src/sim/events/bus';
+import { matchLog } from '../src/services/MatchLog';
 import { advance } from './npcHelpers';
 
 /**
@@ -34,6 +36,17 @@ export interface AutoResult {
 export interface AutoRunOptions extends AutoOptions {
   maxTicks?: number;
   invariantsEvery?: number;
+}
+
+export { AUTO_STREAMS } from '../src/sim/auto/Auto';
+
+/** A test server with no debug handlers and no rate limits worth hitting, for the harness and `pnpm auto`. */
+export const bootAutoServer = (): Promise<ColyseusTestServer> =>
+  boot(createServer({ ipBurst: 1e5, ipPerMin: 1e8, globalPerMin: 1e8 }));
+
+/** Sends the match-log lines to `sink` instead of stdout (the runner prints them its own way). */
+export function captureMatchLog(sink: (line: string) => void): void {
+  matchLog.write = sink;
 }
 
 /** The sim events the round-6 emitters send (auto-admin.md 5); the harness listens to all of them. */
