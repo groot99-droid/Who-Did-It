@@ -1,1 +1,31 @@
-{ "gddRef": "3.18", "byMap": {}, "onub": {} }
+{
+  "gddRef": "3.18",
+  "byMap": {
+    "hollowmere": {
+      "lobby": "lobby",
+      "loading": "hollowmere_loading",
+      "day": "hollowmere_day",
+      "dusk": "hollowmere_dusk",
+      "night": "hollowmere_night",
+      "meeting": "hollowmere_meeting",
+      "finalNight": "hollowmere_finalnight",
+      "gameOver": "hollowmere_gameover"
+    },
+    "blackpine": {
+      "lobby": "lobby",
+      "loading": "blackpine_loading",
+      "day": "blackpine_day",
+      "dusk": "blackpine_dusk",
+      "night": "blackpine_night",
+      "meeting": "blackpine_meeting",
+      "finalNight": "blackpine_finalnight",
+      "gameOver": "blackpine_gameover"
+    }
+  },
+  "onub": {
+    "kitchen": "onub_kitchen",
+    "night": "onub_night",
+    "rush": "onub_rush",
+    "over": "onub_over"
+  }
+}

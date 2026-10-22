@@ -3,6 +3,7 @@ import { JOIN_FAILED_MESSAGE, NAME_MAX, NAME_MIN } from '../net/protocol';
 import { getItem, setItem } from '../net/storage';
 import { LOBBY_COPY as C, fill } from './copy';
 import { h, type Screen } from './dom';
+import { mountTrailer } from './landingTrailer';
 import { mountSettingsPanel } from './SettingsPanel';
 
 export interface LandingOptions {
@@ -12,6 +13,8 @@ export interface LandingOptions {
   onJoin(code: string, name: string): Promise<void>;
   /** After a failed join: a better message than the generic one, if there is one (stale build). */
   explainFailure?(): Promise<string | null>;
+  /** The music bus, so the trailer's soundtrack can start on the first tap (round 6, 6K). */
+  music?: { crossfadeTo(playlistId: string | null): void } | undefined;
 }
 
 const NAME_KEY = 'wdi:name';
@@ -129,11 +132,13 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
   const trailer = h('div', { class: 'wdi-landing__trailer', 'data-testid': 'landing-trailer', hidden: true });
   const settingsSlot = h('div', { class: 'wdi-landing__settings', 'data-testid': 'settings-slot' });
   const settings = mountSettingsPanel(settingsSlot);
+  const trailerPlayer = mountTrailer(trailer, { base: import.meta.env.BASE_URL, music: opts.music });
   root.append(trailer, el, settingsSlot);
   (opts.joinCode ? name : create).focus();
   return {
     destroy: () => {
       settings.destroy();
+      trailerPlayer.destroy();
       trailer.remove();
       settingsSlot.remove();
       el.remove();

@@ -832,7 +832,7 @@ describe('the hunt, the fallback and the streams (R15 to R18)', () => {
   });
 
   it('R18: a Killer and a Townsfolk NPC draw the same numbers and walk the same path while the Knife rests', async () => {
-    const runs: { play: number; timing: number; path: string }[] = [];
+    const runs: { from: number; play: number; timing: number; path: string }[] = [];
     for (const killer of [true, false]) {
       await colyseus.cleanup();
       const party = await standardParty(colyseus, 'S1');
@@ -863,8 +863,11 @@ describe('the hunt, the fallback and the streams (R15 to R18)', () => {
           return rng();
         };
       }) as typeof seeds.get;
+      // The tick the recording starts on: `standardParty` gives both parties one timeline, whatever the load.
+      const from = party.room.state.tick;
       const rows = record(party, [k], 60 * TICK_RATE).get(k)!;
       runs.push({
+        from,
         play: counts.get(`npcPlay:${k}`) ?? 0,
         timing: counts.get(`npcTiming:${k}`) ?? 0,
         path: rows.map((s) => `${s.x},${s.y}`).join(';'),
