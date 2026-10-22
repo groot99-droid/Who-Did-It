@@ -2927,8 +2927,14 @@ session's goes back to it. Log under "Integration log, round 6".
   `onub_night` playlists. Rows in both manifests, `CREDITS.md` (the two replaced CC0 rows removed) and
   `assets/source/MANIFEST.md`; the picks and the reasons in DECISIONS A96. `media.test.ts` green. No `.ts`, nothing
   under `packages/`.
-- **Waiting**: the owner's `Who_Did_It_Music_Pt1.zip` and `Who_Did_It_SFX_Pt1.zip` on the release (step 2: the ROSW
-  ingest, the owner's tracks and `train_arrive`, `train_brake`, `ferry_horn`, `crows`); the videos (step 3).
+- **Step 2 (2026-10-22): the owner's tracks and field recordings.** The owner attached `Who.Did.It.zip` (one zip, so
+  the ids are `who-did-it/<slug>`) and seven more packs; ROSW #14 ingests them (929 new; `Drones.zip` is damaged and
+  two names collide, both left to the owner) and teaches the library to read an MP3's duration, which its own
+  catalog test needs. Mastered at q3 stereo by 6Z's call: the three day themes as clean loops, the loading pieces
+  and the trailer whole; the playlists `trailer`, `*_loading`, `*_day`, `*_dusk`, `onub_kitchen`, `onub_rush`
+  filled; `train_arrive`, `train_brake`, `ferry_horn`, `crows` in `audio/manifest.json`. Numbers and reasons in A96.
+  Contract requests: the four SFX keys in `AUDIO_KEYS`; the licence and the vendor row of the Flow Music tracks.
+- **Waiting**: the owner's intake and context answers for the two videos (step 3).
 
 ## Integration log, round 6
 
