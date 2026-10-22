@@ -3,6 +3,7 @@ import { AVATAR_HANDLE_BYTES, Avatar, type AvatarState, type PlayerState } from 
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { StatusBit } from './constants';
 import { settleDisguise } from './Impersonate';
+import { lightBurns } from './mobs/light';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isLoft, sceneKey } from './World';
 
@@ -202,6 +203,7 @@ export function publishAvatars(room: PartyRoom): void {
     }
     // A strike or a death in transit leaves the door frozen; a plain tick copies the presence.
     writeAvatar(avatar, seat, player, p, faceOf(room, seat));
+    if (lightBurns(room, seat)) avatar.statusBits |= StatusBit.lantern; // round 6, 6G: a lit light in hand
   }
 }
 

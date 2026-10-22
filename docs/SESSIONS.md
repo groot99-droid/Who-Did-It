@@ -2715,6 +2715,22 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6G (mobs and dark visibility)
 
+- **Branch** `claude/r6-mobs`, one draft PR against `claude/zen-turing-m1jnw0` with the brief's three steps as three
+  commits, each green on `pnpm lint && pnpm typecheck && pnpm test`, as 6E and 6K did with one branch.
+- **Step 1-2, creatures, the wolf kill, the NPC flee** (2026-10-22): `sim/Mobs.ts`, `sim/mobs/{ai,spawn,hurt,light,
+  flee}.ts`, `creatureKill` in `Kill.ts` (the `wolf` cause; `Death.ts` needed no change, `DeathCause` already had
+  it), `test/mobs.test.ts` (the FSM, spawn by part of the day, the leash over two minutes, a two-bite wolf kill, a
+  lit lantern, a bat's floor at 1 HP, the NPC flee, 10 seats and the wolves under 15 ms p95).
+- **Step 3, dark sight**: `sim/Sight.ts` `canSee`, the lantern bit line of `publishAvatars`, `test/sight.test.ts`
+  and the dark cases of `visibility.test.ts`; GDD 3.7's lantern line and the (6G) sentences of 3.15; DECISIONS A89.
+- **What the client reads** (6I, 6M): `SceneState.mobs`, keyed by spawner id: `kind` (sprite `mob_<kind>`), `x`, `y`
+  (world px), `yaw` (world frame as `Presence.yaw`; the atlas direction is `dirFromVector(sin yaw, -cos yaw)`
+  through the iso table), `animId` (`AnimId.idle`, `walk`, `swing` = the attack frames); `state` needs no reader.
+  `Avatar.statusBits & StatusBit.lantern` is a lit light, own avatar included.
+- **Contract requests** (in the PR description, each with its stand-in): `act.light { on }` in `C2S` routed to
+  `handleLight` (`sim/mobs/light.ts`); one line in `npc/world.ts` `runWorldNpc` calling `fleeCreature`
+  (`sim/mobs/flee.ts`); the `reconcileViews` fix (applied in the PR: a P5 leak on the base, see A89).
+
 ### Round 6 log: 6H (quests and mini-games)
 
 ### Round 6 log: 6I (M5b client)
