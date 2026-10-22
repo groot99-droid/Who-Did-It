@@ -8,12 +8,17 @@ import {
   loginUrl,
   type TokenStore,
 } from '../admin/AdminNet';
+import { AdminSceneView } from '../admin/AdminSceneView';
+import { mountLogPane } from '../admin/LogPane';
+import { mountSeatInspector } from '../admin/SeatInspector';
 import { mountControls } from '../admin/Controls';
-import { AdminStore } from '../admin/model';
+import { AdminStore, gridCells } from '../admin/model';
 import { createMockAdmin } from '../admin/mockAdmin';
 import { ADMIN_COPY as C } from '../ui/copy';
 import { h, overlayRoot, type Screen } from '../ui/dom';
 import { getFlags } from './registry';
+
+const viewKey = (sceneId: string) => `AdminView:${sceneId}`;
 
 /** The tab's session storage, or a throwaway object where the browser blocks it. */
 function sessionStore(): TokenStore {
@@ -40,6 +45,8 @@ export class Admin extends Phaser.Scene {
   private link: AdminLink | null = null;
   private screens: Screen[] = [];
   private tokens: TokenStore = sessionStore();
+  /** The viewport scenes added to the game: scene id -> the signature of its cell (position, size). */
+  private views = new Map<string, string>();
 
   constructor() {
     super('Admin');
@@ -71,6 +78,37 @@ export class Admin extends Phaser.Scene {
     );
   }
 
+  override update(): void {
+    if (this.link !== null) this.layout();
+  }
+
+  /** Adds, moves and removes the `AdminView:<scene>` scenes so they match the store's visible scenes. */
+  private layout(): void {
+    const cells = gridCells(this.store.visibleScenes(), this.scale.width, this.scale.height);
+    const want = new Map(cells.map((c) => [c.key, c]));
+    for (const [id, sig] of [...this.views]) {
+      const cell = want.get(id);
+      if (cell === undefined) {
+        // Removal is queued by Phaser while scenes update; the key is free again by the next frame.
+        this.scene.remove(viewKey(id));
+        this.views.delete(id);
+      } else if (sig !== JSON.stringify(cell)) {
+        this.views.set(id, JSON.stringify(cell));
+        (this.scene.get(viewKey(id)) as AdminSceneView | null)?.relayout(cell);
+      }
+    }
+    for (const cell of cells) {
+      if (this.views.has(cell.key)) continue;
+      this.views.set(cell.key, JSON.stringify(cell));
+      this.scene.add(viewKey(cell.key), AdminSceneView, true, { sceneId: cell.key, cell, store: this.store });
+    }
+  }
+
+  private dropViews(): void {
+    for (const id of this.views.keys()) this.scene.remove(viewKey(id));
+    this.views.clear();
+  }
+
   /** Wires a live or scripted link to the store and mounts the panels. */
   private begin(link: AdminLink): void {
     this.link = link;
@@ -81,10 +119,12 @@ export class Admin extends Phaser.Scene {
       if (this.link !== link) return;
       this.link = null;
       this.clearScreens();
+      this.dropViews();
       this.showSignIn(true);
     });
     const root = this.mount(h('div', { class: 'wdi-admin' }));
     const host = root.el;
+    this.screens.push(mountSeatInspector(host, this.store), mountLogPane(host, this.store));
     this.screens.push(
       mountControls(
         host,
@@ -128,6 +168,7 @@ export class Admin extends Phaser.Scene {
     this.link = null;
     link?.close();
     this.clearScreens();
+    this.dropViews();
     this.store.reset();
     this.showSignIn(false);
   }
@@ -146,6 +187,7 @@ export class Admin extends Phaser.Scene {
   }
 
   private teardown(): void {
+    this.dropViews();
     this.link?.close();
     this.link = null;
     this.clearScreens();

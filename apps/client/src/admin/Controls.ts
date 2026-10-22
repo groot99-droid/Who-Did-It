@@ -190,6 +190,7 @@ export function mountControls(
       problem.textContent = fill(C['admin.seeds.invalid'], { line: parsed.line });
       return;
     }
+    store.mapId = map.el.value;
     send(
       'admin.setup',
       setupPayload({

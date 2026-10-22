@@ -45,3 +45,11 @@ describe('SampleBuffer', () => {
     expect(b.length).toBe(1);
   });
 });
+
+describe('remoteDelayMs (round 6)', () => {
+  it('divides the interpolation delay by the sim speed', async () => {
+    const { REMOTE_DELAY_MS, remoteDelayMs } = await import('./interpolation');
+    expect(remoteDelayMs()).toBe(REMOTE_DELAY_MS);
+    expect(remoteDelayMs(10)).toBe(REMOTE_DELAY_MS / 10);
+  });
+});

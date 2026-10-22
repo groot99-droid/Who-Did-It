@@ -2521,6 +2521,10 @@ body.wdi-cutscene-slam .wdi-hud-chip {
 }
 
 .wdi-admin__setup {
+  flex: 0 1 auto;
+}
+
+.wdi-admin__setup[open] {
   flex-basis: 100%;
 }
 
@@ -2571,4 +2575,101 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   padding: var(--wdi-space-5);
   border-radius: var(--wdi-radius-lg);
   box-shadow: var(--wdi-shadow-3);
+}
+
+.wdi-admin__inspector,
+.wdi-admin__log {
+  pointer-events: auto;
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  background-image: var(--wdi-paper-grain);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-lg);
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  overflow: auto;
+}
+
+.wdi-admin__inspector {
+  position: absolute;
+  top: 96px;
+  right: var(--wdi-space-2);
+  width: 20em;
+  max-height: 55vh;
+}
+
+.wdi-admin__log {
+  position: absolute;
+  bottom: 0;
+  left: var(--wdi-space-2);
+  width: min(44em, 60vw);
+  max-height: 22vh;
+}
+
+.wdi-admin h2,
+.wdi-admin h3 {
+  margin: 0 0 var(--wdi-space-1);
+  font-size: var(--wdi-text-md);
+}
+
+.wdi-admin__seats,
+.wdi-admin__log-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wdi-admin__seats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wdi-space-1);
+}
+
+.wdi-admin__seat {
+  min-height: var(--wdi-touch);
+  padding: 0 var(--wdi-space-2);
+  font: inherit;
+  color: var(--wdi-text-on-paper);
+  background-color: var(--wdi-paper);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-lg);
+  cursor: pointer;
+}
+
+.wdi-admin__seat[aria-pressed='true'] {
+  background-color: var(--wdi-mustard);
+  font-weight: 700;
+}
+
+.wdi-admin__detail {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 var(--wdi-space-2);
+  margin: var(--wdi-space-2) 0;
+}
+
+.wdi-admin__detail dt {
+  font-weight: 700;
+}
+
+.wdi-admin__detail dd {
+  margin: 0;
+}
+
+.wdi-admin__queue {
+  display: grid;
+  gap: var(--wdi-space-1);
+  margin-top: var(--wdi-space-2);
+}
+
+.wdi-admin__log-row {
+  padding: 2px 0;
+  font-size: var(--wdi-text-sm);
+}
+
+.wdi-admin__log-row--fail {
+  color: var(--wdi-bone);
+  background-color: var(--wdi-danger);
+  padding: var(--wdi-space-1) var(--wdi-space-2);
+  border-radius: var(--wdi-radius-sm);
+  margin-bottom: var(--wdi-space-1);
 }

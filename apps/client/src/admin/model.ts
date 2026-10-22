@@ -68,6 +68,8 @@ export class AdminStore {
   snapshot: AdminSnapshot | null = null;
   events: SimEventWire[] = [];
   failures: InvariantFailure[] = [];
+  /** The map the next match plays; the viewports load its art. Set by Start. */
+  mapId = '';
   selected: string | null = null;
   followed: string | null = null;
   /** Occupied scenes in viewport order (see `nextOrder`); the first six have a viewport. */

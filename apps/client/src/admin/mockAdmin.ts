@@ -86,7 +86,7 @@ const CAST: Script[] = [
     cy: 460,
     r: 0,
   },
-  { id: 's8', name: 'Lark', roleId: 'child', look: 'child', sceneId: 'manor_hall', cx: 540, cy: 400, r: 0 },
+  { id: 's8', name: 'Lark', roleId: 'child', look: 'child', sceneId: 'barn', cx: 540, cy: 400, r: 0 },
 ];
 
 /** Where a scripted seat stands at `tick`: a slow circle round its centre. */
@@ -181,6 +181,7 @@ export function createMockAdmin(opts: { timer?: boolean } = {}): MockAdmin {
     advance,
     send<K extends AdminC2SType>(type: K, payload: AdminC2SPayloads[K]): void {
       sent.push({ type, payload });
+      (globalThis as { __wdiAdminSent?: MockAdmin['sent'] }).__wdiAdminSent = sent;
       if (type === 'admin.clock') {
         const c = payload as AdminC2SPayloads['admin.clock'];
         if (c.scale !== undefined) scale = c.scale;
