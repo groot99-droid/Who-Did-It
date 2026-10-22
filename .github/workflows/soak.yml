@@ -4,7 +4,9 @@
 # on push or pull request: it is started by hand (Actions > soak > Run workflow) and weekly. The quick-mode leg
 # (ONUB v2) seats 4 bots plus NPCs up to 4, 6, 8 and 10 in turn, fails on a night leak (a sleeper that received a
 # `nightWake` or `nightReveal`, or any presence), and ends with the ruin rate per party size against the 20-30%
-# target, from the matches it played and from the prep Monte Carlo (`pnpm bots:ruin`).
+# target, from the matches it played and from the prep Monte Carlo (`pnpm bots:ruin`). The `auto` job (round 6,
+# docs/round6/auto-admin.md 4) plays all-NPC matches headless with `pnpm auto`; it is `continue-on-error` until
+# Session 6A lands the runner and 6B takes the guard off.
 name: soak
 
 on:
@@ -59,5 +61,38 @@ jobs:
             echo "### soak (${{ matrix.mode }})"
             echo '```'
             tail -n 24 soak.log || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+  auto:
+    name: auto (${{ matrix.map }}, ${{ matrix.mode }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Round 6 pre-seed: the runner exits 2 until Session 6A fills it; 6B removes this line with the `auto` leg's report.
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        map: [hollowmere, blackpine]
+        mode: [main, onub]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Auto matches
+        shell: bash
+        run: pnpm auto -- --matches 20 --map ${{ matrix.map }} --mode ${{ matrix.mode }} --json | tee auto.log
+      - name: Result
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### auto (${{ matrix.map }}, ${{ matrix.mode }})"
+            echo '```'
+            tail -n 24 auto.log || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
