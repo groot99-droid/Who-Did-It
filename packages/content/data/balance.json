@@ -229,7 +229,11 @@
   "resources": { "poolActiveFrac": 0.5, "gatherHoldS": 2, "gddRef": "3.14" },
   "mobs": { "maxPerScene": 3, "chaseS": 6, "gddRef": "3.15" },
   "quests": { "maxActive": 2, "gddRef": "3.16" },
-  "ui": { "transitionS": { "fade": 0, "iris": 0, "wipe": 0 }, "gddRef": "3.13" },
+  "ui": {
+    "transitionS": { "fade": 0.4, "iris": 0.6, "wipe": 0.7 },
+    "loading": { "showAfterS": 0.3, "tipEveryS": 4 },
+    "gddRef": "3.13"
+  },
   "ghosts": { "wispsPerCycle": 1, "gddRef": "3.7" },
   "chat": {
     "maxChars": 200,
