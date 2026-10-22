@@ -864,6 +864,25 @@
       "modes": [
         "onub"
       ]
+    },
+    {
+      "key": "nodes",
+      "type": "multiatlas",
+      "url": "m5b/nodes.json",
+      "path": "m5b/",
+      "filter": "nearest"
+    },
+    {
+      "key": "tools",
+      "type": "multiatlas",
+      "url": "m5b/tools.json",
+      "path": "m5b/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_tools",
+      "type": "animation",
+      "url": "m5b/tools.anims.json"
     }
   ]
 }

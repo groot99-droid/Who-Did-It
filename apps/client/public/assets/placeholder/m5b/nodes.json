@@ -1,0 +1,319 @@
+{
+ "textures": [
+  {
+   "image": "nodes-0.png",
+   "format": "RGBA8888",
+   "size": {
+    "w": 256,
+    "h": 64
+   },
+   "scale": 1,
+   "frames": [
+    {
+     "filename": "node_herb/ready",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 27,
+      "w": 30,
+      "h": 29
+     },
+     "frame": {
+      "x": 3,
+      "y": 3,
+      "w": 30,
+      "h": 29
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_herb/spent",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 44,
+      "w": 30,
+      "h": 12
+     },
+     "frame": {
+      "x": 219,
+      "y": 3,
+      "w": 30,
+      "h": 12
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_mushroom/ready",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 27,
+      "w": 30,
+      "h": 29
+     },
+     "frame": {
+      "x": 39,
+      "y": 3,
+      "w": 30,
+      "h": 29
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_mushroom/spent",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 44,
+      "w": 30,
+      "h": 12
+     },
+     "frame": {
+      "x": 219,
+      "y": 3,
+      "w": 30,
+      "h": 12
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_resin/ready",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 27,
+      "w": 30,
+      "h": 29
+     },
+     "frame": {
+      "x": 75,
+      "y": 3,
+      "w": 30,
+      "h": 29
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_resin/spent",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 44,
+      "w": 30,
+      "h": 12
+     },
+     "frame": {
+      "x": 219,
+      "y": 3,
+      "w": 30,
+      "h": 12
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_stone/ready",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 27,
+      "w": 30,
+      "h": 29
+     },
+     "frame": {
+      "x": 111,
+      "y": 3,
+      "w": 30,
+      "h": 29
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_stone/spent",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 44,
+      "w": 30,
+      "h": 12
+     },
+     "frame": {
+      "x": 219,
+      "y": 3,
+      "w": 30,
+      "h": 12
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_timber/ready",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 27,
+      "w": 30,
+      "h": 29
+     },
+     "frame": {
+      "x": 147,
+      "y": 3,
+      "w": 30,
+      "h": 29
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_timber/spent",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 44,
+      "w": 30,
+      "h": 12
+     },
+     "frame": {
+      "x": 219,
+      "y": 3,
+      "w": 30,
+      "h": 12
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_tin_ore/ready",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 27,
+      "w": 30,
+      "h": 29
+     },
+     "frame": {
+      "x": 183,
+      "y": 3,
+      "w": 30,
+      "h": 29
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_tin_ore/spent",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 17,
+      "y": 44,
+      "w": 30,
+      "h": 12
+     },
+     "frame": {
+      "x": 219,
+      "y": 3,
+      "w": 30,
+      "h": 12
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    }
+   ]
+  }
+ ],
+ "meta": {
+  "app": "http://github.com/odrick/free-tex-packer-core",
+  "version": "0.3.9"
+ }
+}

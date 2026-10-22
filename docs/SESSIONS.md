@@ -2690,6 +2690,13 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6M (M5b art)
 
+- Step 1 (nodes, held tools, glows, icons): `tools/sprites/m5b.ts` and `m5b-draw.ts` draw the six resource
+  nodes in two states, the six tools as held overlays in eight directions and the lantern and torch glows, in
+  both styles; `placeholder-m5b.ts` carries their greybox twins; six `icon_item_*` SVGs; SPRITES 12; the
+  CREDITS row; DECISIONS A95; `test/m5b.test.ts`. Ids from 6E's step 1 (#49). `pnpm lint && pnpm typecheck &&
+  pnpm test` green.
+- Next: the mobs once #49 marks step 2 fixed, then the givers after step 3.
+
 ### Round 6 log: 6N (ROSW media)
 
 ## Integration log, round 6

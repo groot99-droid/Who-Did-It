@@ -427,6 +427,25 @@
       "filter": "linear"
     },
     {
+      "key": "nodes",
+      "type": "multiatlas",
+      "url": "m5b/nodes.json",
+      "path": "m5b/",
+      "filter": "nearest"
+    },
+    {
+      "key": "tools",
+      "type": "multiatlas",
+      "url": "m5b/tools.json",
+      "path": "m5b/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_tools",
+      "type": "animation",
+      "url": "m5b/tools.anims.json"
+    },
+    {
       "key": "onub_station_fridge",
       "type": "image",
       "url": "onub/rooms/onub_station_fridge.png",

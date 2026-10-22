@@ -1048,3 +1048,48 @@ every image at its file size and on the world palette with alpha 0 or 255, the O
 frame at its art box on one page, the blank band and the Sabotage mark, and the batch file's jobs, picks, prompts
 and references. For the low-poly style: the same keys, URLs and `modes`, every image at the 8-bit size and off the
 snap, the same atlas frames, and the set within 4 MiB (`styles.test.ts` checks the manifest is a re-skin).
+
+## 12. M5b art (Session 6M, round 6)
+
+The sprites M5b draws (`docs/round6/m5b-data.md` 4), with 6E's ids (`resources.json`, `recipes.json`; content
+PR #49). Everything is drawn in code on the `palette.json` world ramps at display scale (route R5,
+`tools/sprites/m5b-draw.ts`) and finished like a rig render for each style of `artStyles()`: snapped and
+mode-halved for 8-bit, box-halved and alpha-bled for low poly. One command writes both styles' atlases under
+`assets/<root>m5b/` and the M5b block of each manifest; `pnpm --filter @wdi/sprites placeholder` writes the
+greybox twins (`placeholder-m5b.ts`, `order` 80):
+
+```
+pnpm --filter @wdi/sprites m5b
+```
+
+| Key | Type | Frames | Packed cell, pivot | Loaded |
+|---|---|---|---|---|
+| `nodes` | multiatlas, one page ≤ 512² | `node_<snake id>/ready`, `node_<snake id>/spent` for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`); the stem is the row's `sprite` | 64 x 64, (32, 48): the ground point under the tile centre | boot |
+| `tools` | multiatlas, one page ≤ 512² | `held_<itemId>/<dir>` for `torch`, `snare`, `spade`, `lockpicks`, `lantern`, `crowbar` (8 screen-frame directions); `glow_lantern/<0-3>`, `glow_torch/<0-3>` | held: 64 x 64, (32, 56), the characters' feet; glow: 32 x 32, centred | boot |
+| `anims_tools` | animation | `glow_lantern`, `glow_torch`: 4 frames at 8 fps, looping | | boot |
+
+The filter is `nearest` in the 8-bit manifest and the placeholder, `linear` in the low-poly one. The two
+atlases add under 0.07 page-equivalents to the boot set in either style, well inside the 6-page limit (10.14).
+
+**Held overlays.** A held frame shares the character cell and feet pivot, and draws the tool's grip where
+the right hand sits in a look's idle frame 000 (`HAND` in `m5b.ts`), so the client places it at the feet with
+the body's draw scale, as one more layer. It goes under the body for `n`, `ne` and `nw` (the hand is on the
+far side) and over it otherwise. A glow on a held lantern or torch sits at the feet plus that hand offset.
+Only the lantern has a public signal (`StatusBit.lantern`); what else a client draws in another seat's hand is
+the wire's decision, never the art's (role secrecy, CLAUDE.md).
+
+**Glows** are additive halos in the dim end of the lantern and brick ramps: banded in 8-bit, one radial
+gradient in low poly. The client plays `glow_lantern` or `glow_torch` over the light, in the `ADD` blend mode.
+
+**Icons.** The tools' inventory icons are hand-written SVG under `assets/ui/icons/` on the rules of section 9:
+`icon_item_torch`, `icon_item_snare`, `icon_item_spade`, `icon_item_lockpicks`, `icon_item_lantern`,
+`icon_item_crowbar`.
+
+**Still to come** (6M's next steps, once 6E fixes the ids): the four mobs in eight directions (idle, walk,
+attack) and the quest givers.
+
+**Tests.** `tools/sprites/test/m5b.test.ts`: every resource row has its node and every recipe its held tool;
+each style's and the placeholder's atlases carry exactly these frames, on one page within 512², with the same
+cells and pivots; every manifest lists the keys at boot; the glow loops; and the shipped files equal what the
+build writes today. `manifest.test.ts`, `styles.test.ts`, `budget.test.ts`, `palette.test.ts` and
+`icons.test.ts` cover the rest as they stand.
