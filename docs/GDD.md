@@ -146,7 +146,7 @@ Players have 2 HP, regenerating 1 per 90 s; the Knife does 2. At 1 HP you are **
 
 ### 3.7 Stealth, hiding and doors
 
-Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2; noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene, as an avatar under a random handle (3.17); the darkness radius is a client-side mask, drawn as the lighting layer of 3.13; a dark scene uses the night radius in every phase. Radius + occluder visibility is V1.5 (same `Visibility.ts` policy, different predicate).
+Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2; noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene, as an avatar under a random handle (3.17); the darkness radius is a client-side mask, drawn as the lighting layer of 3.13; a dark scene uses the night radius in every phase. Since M5b a dark scene's radius and occluders hold on the server (3.15): a living seat there receives another avatar only within its night radius and line of sight, and a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both seeing and being seen; lights start out and are lit by their holder.
 
 **Hiding spots** (wardrobe, hay pile, under bed, barrel; crawlspaces for the Child) hold one player; **body spots** (cellar dump, crypt niche, hay pile) are separate objects. Entering takes 1 s, noise 2; the hidden player sees a slit view and keeps one action, **Burst Out** (E): instant, stuns the Checker 1 s, noise 6. **Check** (E, 2 s) opens a spot; a Check on an occupied spot writes a Verified Notebook entry for the hider ("X opened my wardrobe at 3:12"), so checking is evidence.
 
@@ -551,18 +551,32 @@ they are drawn from the scene state for everyone in the scene.
 | Rat | the caves past the Tin Gallery mouth | 2.5 tiles/s | 3 tiles | 2 tiles | after 2 s in reach | no |
 
 **Behaviour.** A creature idles or roams its loop; it chases a living seat it senses and can see (3.7) for at most
-6 s (`mobs.chaseS`), then returns to its spawner; it flees any lit light within its flee radius, carried or
-standing. (6G) Its attack lands 1 damage (3.6's HP) when the seat has stayed in reach for the attack time. A wolf's
-attack can kill, with the death cause `wolf` and the body left where it fell, so the Killer's "blame the wolves"
-cover of WORLD 4.6 has a real alibi; the other creatures wound but never take a seat below 1 HP. (6G) Wolves keep
-3.6: the wolf flee radius is `balance.wolves.fleeLightTiles`, a mended fence stops them, a bolt kills one. An NPC seat
-flees a creature like a frightened player (3.12); ghosts are never sensed. Creatures use the `mobs` random
-stream, keyed per spawner, and never a secret stream.
+6 s (`mobs.chaseS`), then returns to its spawner and starts no new chase for as long; it flees any lit flame within
+its flee radius, carried or standing (a lit carried light, or a burning lantern, torch, lamp or fire of the scene;
+moss, moonlight, daylight shafts and windows are not flames), and walks home once out of its reach. (6G) It walks
+tile paths whose every tile lies inside its leash, so it never strays further; a loop point beyond the leash is
+pulled in to its edge, and at each point it pauses as a wandering NPC does (`npc.wander.stepMinS` to `stepMaxS`). A
+seat in transit or a ghost is never sensed, and nothing it senses depends on a card. (6G) Its attack lands 1 damage
+(`health.wolfDamage`) each time the seat has stayed in reach (1.5 tiles, 3.7) and in sight for its attack time.
+Creature bites are the only damage the server counts in hit points: a seat regains 1 HP every 90 s after its last
+bite, up to 2 (3.6), and Wounded's slower walk and drip trail are not applied yet. A wolf's bite that takes a seat to
+0 HP is a death with the cause `wolf`: the body is left where it fell and the kill scream rings (3.7), with no clue
+of a killer, so the Killer's "blame the wolves" cover of WORLD 4.6 has a real alibi; the other creatures wound but
+never take a seat below 1 HP. (6G) Wolves keep 3.6's flee radius (`balance.wolves.fleeLightTiles`, which their row
+equals) and stay in the woods by their leash; the mended fence and the bolt do not touch them yet. An NPC seat a
+creature chases runs for the nearest open door of its scene and takes it, or straight away from the creature when
+there is none (3.12; live once the NPC brain's call lands, DECISIONS A89). Creatures use the `mobs` random stream,
+keyed per spawner, and never a secret stream.
 
 **Dark scenes on the server.** With creatures, a dark scene's visibility moves to the server (3.13): a living seat
-in a dark scene, or anywhere at night, receives another avatar only within the night radius and a clear line of
-sight over the scene's grid; a lit carried Lantern or Torch adds 2 tiles (`vision.lanternTiles`) to both seeing and
-being seen. Ghosts see everything. (6G; 3.7's lantern line is 6G's.)
+in a dark scene receives another avatar only within the night radius and a clear line of sight over the scene's
+grid (walls, and the `u` ground that is walkable but blocks sight), or when that avatar stands in the pool of a
+scene light burning now; a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both
+seeing and being seen, so two lit seats see each other 4 tiles further. Every light starts out: its holder lights
+it or puts it out (`act.light`), and a lit light shows on its avatar as the lantern bit, never by card. Outside the
+dark scenes the server still sends every position in the scene and the night radius stays the client's picture
+(3.13), so a lantern post's pool on the square shows what it lights. Ghosts see everything. (6G; 3.7's lantern line
+is 6G's.)
 
 ### 3.16 Quests and mini-games
 
