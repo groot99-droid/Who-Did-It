@@ -130,7 +130,7 @@ All fifteen open questions were closed on 2026-10-10 in the decisions round (A18
 | A90 | Reserved for session 6H (round 6) | |
 | A91 | Reserved for session 6I (round 6) | |
 | A92 | Reserved for session 6J (round 6) | |
-| A93 | Reserved for session 6K (round 6) | |
+| A93 | Round 6: loading, transitions, the trailer and the budget test (session 6K) | **Transitions** run in `view/Transition.ts` over an injectable host: the whole duration is `balance.ui.transitionS` (fade 0.4, iris 0.6, wipe 0.7 s), half to cover and half to lift; a transition that starts while another runs replaces it and the older `then` is dropped, because the router's later scene start (the meeting's end after its start, a game over after anything) must win; with no DOM, under reduced motion or at 0 ms `then` runs synchronously, which keeps `worldRouter.test.ts` unchanged. **Loading**: `balance.ui.loading { showAfterS: 0.3, tipEveryS: 4 }` holds the two numbers of `cutscene-music.md` 2; the match preloads mount `mountMatchLoadingScreen(scene, root, mapId)` (a call site the owners of `World.ts` and `Kitchen.ts` add, see the PR), which also asks `MusicBus` for the map's `loading` playlist. **Trailer**: `ui/landingTrailer.ts`; its soundtrack is the playlist id `trailer` of the music manifest, started on the first tap. **Budgets**: `media.test.ts` counts the first load as the default style's art entries `Preload` queues plus the Hollowmere map (about 10.6 MB); with the SFX files and the engine it is about 14.4 MB, over ASSETS 6.8's 12 MB wording, and the lowpoly set is 16.9 MB resident. Open: raise the figure or trim the boot set (owner). |
 | A94 | Reserved for session 6L (round 6) | |
 | A95 | Reserved for session 6M (round 6) | |
 | A96 | Reserved for session 6N (round 6) | |

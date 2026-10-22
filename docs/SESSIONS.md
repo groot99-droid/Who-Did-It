@@ -2686,6 +2686,14 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6K (loading, transitions, trailer, budgets)
 
+- **Branch** `claude/r6-polish-flow`, one draft PR against `claude/zen-turing-m1jnw0` (the three steps of the brief, pushed as three commits).
+- **Step 1, transitions**: `view/Transition.ts` (host-injected core, DOM host, supersede rule), `balance.ui.transitionS` set to 0.4 / 0.6 / 0.7, GDD 3.13 "Transitions" paragraph, `.wdi-transition*` CSS, `Transition.test.ts`. The router's three call sites are untouched; only the comments of `transitionMs` and the first call changed. `worldRouter.test.ts` runs unchanged because a node run has no document and so counts as reduced motion.
+- **Step 2, loading**: `view/LoadingScreen.ts` (`startLoading` controller, DOM host, `mountLoadingScreen`, `mountMatchLoadingScreen`, `loadingPlaylistFor`), `ui/copy/tips.ts`, `balance.ui.loading`, GDD 3.13 "Loading" paragraph, `LoadingScreen.test.ts`.
+- **Step 3, trailer and budgets**: `ui/landingTrailer.ts` and its slot in `Landing.ts` (plus an optional `music` field on `LandingOptions`), the empty `assets/video/manifest.json` and `assets/audio/music/manifest.json`, `tools/sprites/test/{media.ts,media.test.ts}`, ASSETS 6.8 round-6 text, UI.md 14.21, DECISIONS A93.
+- **Contract requests (stand-ins in place)**: (1) `scenes/World.ts` `preload()` and `scenes/Kitchen.ts` `preload()` call `mountMatchLoadingScreen(this, overlayRoot(), this.matchMap())` (World) or `(this, overlayRoot(), QUICK_MATCH_MAP)` (Kitchen) as their first line; until then the match preload shows no loading screen and asks for no loading music, the game plays as before. (2) `scenes/Landing.ts` passes `music: this.registry.get(REG_MUSIC)` to `mountLanding`; until then the trailer plays silent. (3) 6L: the music manifest needs a playlist `trailer` and `music.json` `byMap[map].loading` for the loading piece; both are looked up by id and are silent when absent. (4) 6N: `video/manifest.json` rows are `{ key, url, poster?, durationS, bytes }` and `bytes` must equal the file.
+- **Findings for the orchestrator**: the first-load budget. The art `Preload` queues plus Hollowmere is 10.6 MB (8-bit), under 12 MB; adding the SFX files and about 1.5 MB of engine gives about 14.4 MB, over ASSETS 6.8's wording. The lowpoly style's art set is 16.9 MB; it swaps in after boot, so the test checks the default style only. The test counts art only, as the brief names it.
+- **Tests**: `pnpm lint && pnpm typecheck && pnpm test` green before every push.
+
 ### Round 6 log: 6L (music)
 
 ### Round 6 log: 6M (M5b art)

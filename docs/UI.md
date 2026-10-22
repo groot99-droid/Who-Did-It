@@ -1062,3 +1062,15 @@ walk line show in the main mode only (`RoleRevealPayload.deck`, `look`); a quick
 
 `data-testid`s: `card-deck`, `card-look`, `cover-picker`, `cover-look` (with `data-look` and `data-safe`),
 `seat-picker`, `seat-choice` (with `data-seat`), `seat-cancel`.
+
+### 14.21 Loading, transitions and the trailer (6K)
+
+Lines are in `apps/client/src/ui/copy/tips.ts` (`LOADING_COPY`, `TIPS`); the seconds are `balance.ui` (GDD 3.13).
+
+| Key | Text | Where |
+|---|---|---|
+| `loading.title` | Setting the scene | the loading screen's heading |
+| `loading.tipLabel` | Tip | the eyebrow above the tip |
+| `loading.progress` | Loading | the progress bar's accessible name |
+
+Tips are ten short lines about the controls and the world (hold E on a clue, Tab for the role card, Shift to sneak, locked doors, the Bell, dark places, meetings, clues in pairs, woods and caves); none names a role or what it can do. `data-testid`s: `loading` (the screen, hidden until the load passes `ui.loading.showAfterS`), `transition` (the cover layer), `landing-trailer` (the video's slot; the `<video>` inside it is `muted loop playsinline autoplay preload="none"` with the poster `landing_loop.jpg`, and the slot stays hidden until the poster or a frame arrives). The trailer is skipped under reduced motion, the data saver and `?video=0`.
