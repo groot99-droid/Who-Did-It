@@ -1,5 +1,5 @@
 import { createCanvas } from '@napi-rs/canvas';
-import { DIRECTIONS } from './keys.ts';
+import { DIRECTIONS, type Dir } from './keys.ts';
 import {
   GLOW_CELL,
   GLOW_FRAMES,
@@ -7,6 +7,9 @@ import {
   HAND,
   HELD_CELL,
   HELD_FEET,
+  MOB_CELL,
+  MOB_FEET,
+  MOB_PAGE,
   NODE_CELL,
   NODE_GROUND,
   NODE_STATES,
@@ -15,6 +18,9 @@ import {
   glowFrame,
   heldFrame,
   m5bManifest,
+  mobAnims,
+  mobFrame,
+  mobFrameList,
   nodeFrame,
   packM5b,
   toolAnims,
@@ -73,10 +79,44 @@ function toolFrames(): Frame[] {
   return [...held, ...glows];
 }
 
+/** The screen-frame unit vector of each direction, y down. */
+const UNIT: Record<Dir, readonly [number, number]> = {
+  n: [0, -1],
+  ne: [0.7, -0.7],
+  e: [1, 0],
+  se: [0.7, 0.7],
+  s: [0, 1],
+  sw: [-0.7, 0.7],
+  w: [-1, 0],
+  nw: [-0.7, -0.7],
+};
+
+/** A mob: a slate blob over the feet, labelled with the mob id, a fog tick pointing its way; the attack frames a blood tick. */
+function mobFrames(): Frame[] {
+  const size = MOB_CELL / 2;
+  const [fx, fy] = [MOB_FEET[0] / 2, MOB_FEET[1] / 2];
+  return mobFrameList().map(([mob, anim, dir, n]) => {
+    const c = createCanvas(size, size);
+    const g = c.getContext('2d');
+    const [rx, ry, up] = mob === 'rat' ? [6, 4, 4] : mob === 'bat' ? [7, 5, 20] : [12, 7, 9];
+    const bob = anim === 'walk' ? n % 2 : 0;
+    shape(g, 'slate', () => g.ellipse(fx, fy - up - bob, rx, ry, 0, 0, Math.PI * 2));
+    const [ux, uy] = UNIT[dir];
+    shape(
+      g,
+      anim === 'attack' ? 'blood' : 'fog',
+      () => g.rect(fx + ux * rx - 2, fy - up - bob + uy * ry - 2, 4, 4),
+      false,
+    );
+    label(g, mob, fx, fy - up - ry - 5, 7);
+    return { name: mobFrame(mob, anim, dir, n), png: c.toBuffer('image/png'), pivot: [fx, fy] as const };
+  });
+}
+
 /**
  * Round 6, Session 6M (docs/round6/m5b-data.md 4, SPRITES 12): the stand-ins for the M5b art, under the keys
- * of m5b.ts with the same cells and pivots, `order` 80 so they sort after every round-5 module. The mobs and
- * the givers join when their ids are fixed (6E steps 2 and 3).
+ * of m5b.ts with the same cells and pivots, `order` 80 so they sort after every round-5 module. The givers
+ * join in 6M's next step.
  */
 export function placeholderEntries(): PlaceholderEntry[] {
   return [
@@ -88,6 +128,8 @@ export function placeholderEntries(): PlaceholderEntry[] {
         const files = new Map(await packM5b('nodes', nodeFrames()));
         for (const [k, v] of await packM5b('tools', toolFrames())) files.set(k, v);
         files.set('tools.anims.json', Buffer.from(toolAnims()));
+        for (const [k, v] of await packM5b('mobs', mobFrames(), MOB_PAGE)) files.set(k, v);
+        files.set('mobs.anims.json', Buffer.from(mobAnims()));
         return inFolder('m5b/', files);
       },
     },

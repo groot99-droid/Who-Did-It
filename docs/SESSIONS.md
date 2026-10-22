@@ -2695,7 +2695,11 @@ session's goes back to it. Log under "Integration log, round 6".
   both styles; `placeholder-m5b.ts` carries their greybox twins; six `icon_item_*` SVGs; SPRITES 12; the
   CREDITS row; DECISIONS A95; `test/m5b.test.ts`. Ids from 6E's step 1 (#49). `pnpm lint && pnpm typecheck &&
   pnpm test` green.
-- Next: the mobs once #49 marks step 2 fixed, then the givers after step 3.
+- Step 2 (mobs): `tools/sprites/m5b-mobs.ts` rigs the wolf, boar, bat and rat (ids from #49 step 2) and m5b.ts
+  packs them as `mobs` and `anims_mobs` (idle, walk, attack in eight directions) in both styles, with greybox
+  twins in `placeholder-m5b.ts`; SPRITES 12, A95 and the CREDITS row extended; `test/m5b.test.ts` covers the
+  frames and animations. Green.
+- Next: the givers (#49 step 3: `harbourmaster`, `moll`, `foreman`, `smith`, `collier`).
 
 ### Round 6 log: 6N (ROSW media)
 

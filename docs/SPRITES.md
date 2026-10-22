@@ -1067,9 +1067,12 @@ pnpm --filter @wdi/sprites m5b
 | `nodes` | multiatlas, one page ≤ 512² | `node_<snake id>/ready`, `node_<snake id>/spent` for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`); the stem is the row's `sprite` | 64 x 64, (32, 48): the ground point under the tile centre | boot |
 | `tools` | multiatlas, one page ≤ 512² | `held_<itemId>/<dir>` for `torch`, `snare`, `spade`, `lockpicks`, `lantern`, `crowbar` (8 screen-frame directions); `glow_lantern/<0-3>`, `glow_torch/<0-3>` | held: 64 x 64, (32, 56), the characters' feet; glow: 32 x 32, centred | boot |
 | `anims_tools` | animation | `glow_lantern`, `glow_torch`: 4 frames at 8 fps, looping | | boot |
+| `mobs` | multiatlas, one page ≤ 1024² | `mob_<id>/<anim>/<dir>/<nnn>` for `wolf`, `boar`, `bat`, `rat` (the stem is the row's `sprite`), `idle` 4 frames, `walk` 6, `attack` 4, 8 screen-frame directions | 64 x 64, (32, 56), the characters' feet; the bat hovers over a ground shadow at the feet | boot |
+| `anims_mobs` | animation | `mob_<id>/<anim>/<dir>`: idle 6 fps and walk 10 fps looping, attack 10 fps once | | boot |
 
-The filter is `nearest` in the 8-bit manifest and the placeholder, `linear` in the low-poly one. The two
-atlases add under 0.07 page-equivalents to the boot set in either style, well inside the 6-page limit (10.14).
+The filter is `nearest` in the 8-bit manifest and the placeholder, `linear` in the low-poly one. The nodes
+and tools add under 0.07 page-equivalents to the boot set in either style; the mobs add 0.125 (8-bit, 512 x 1024)
+or 0.25 (low poly, 1024²), inside the 6-page limit (10.14).
 
 **Held overlays.** A held frame shares the character cell and feet pivot, and draws the tool's grip where
 the right hand sits in a look's idle frame 000 (`HAND` in `m5b.ts`), so the client places it at the feet with
@@ -1085,8 +1088,12 @@ gradient in low poly. The client plays `glow_lantern` or `glow_torch` over the l
 `icon_item_torch`, `icon_item_snare`, `icon_item_spade`, `icon_item_lockpicks`, `icon_item_lantern`,
 `icon_item_crowbar`.
 
-**Still to come** (6M's next steps, once 6E fixes the ids): the four mobs in eight directions (idle, walk,
-attack) and the quest givers.
+**Mobs** are small rigs of spheres, capsules and wing polygons in a mob-local frame (`tools/sprites/m5b-mobs.ts`),
+posed per animation and projected onto the iso ground for each direction, back to front, under one ink
+silhouette. The client turns a `MobSnap`'s world-frame yaw into the atlas direction with `dirFromVector`, as for an
+avatar, and plays `mob_<kind>/<walk|idle|attack>/<dir>`.
+
+**Still to come** (6M's next step): the quest givers.
 
 **Tests.** `tools/sprites/test/m5b.test.ts`: every resource row has its node and every recipe its held tool;
 each style's and the placeholder's atlases carry exactly these frames, on one page within 512², with the same

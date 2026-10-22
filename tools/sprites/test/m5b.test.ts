@@ -6,14 +6,20 @@ import {
   GLOW_FRAMES,
   GLOWS,
   M5B_KEYS,
-  M5B_PAGE,
+  MOB_ANIM,
+  MOB_ANIMS,
+  MOB_IDS,
   NODE_STATES,
   RESOURCE_IDS,
   TOOL_IDS,
   glowFrame,
   heldFrame,
   m5bFiles,
+  mobAnim,
+  mobFrame,
+  mobFrameList,
   nodeFrame,
+  pageOf,
   snakeOf,
 } from '../m5b.ts';
 import { artStyles } from '../palette.ts';
@@ -40,6 +46,9 @@ const WANT = {
     ...TOOL_IDS.flatMap((t) => DIRECTIONS.map((d) => heldFrame(t, d))),
     ...GLOWS.flatMap((g) => Array.from({ length: GLOW_FRAMES }, (_, n) => glowFrame(g, n))),
   ].sort(),
+  mobs: mobFrameList()
+    .map(([m, a, d, n]) => mobFrame(m, a, d, n))
+    .sort(),
 };
 
 /** Each frame's pivot in packed px, which every style and the placeholder share. */
@@ -70,15 +79,24 @@ describe('M5b art (SPRITES 12)', () => {
     expect(snakeOf('tinOre')).toBe('tin_ore');
   });
 
+  it("draws every mob of mobs.json in 8 directions under the row's sprite key", () => {
+    const { mobs } = json<{ mobs: Record<string, { sprite: string }> }>(join(DATA, 'mobs.json'));
+    for (const [id, m] of Object.entries(mobs)) {
+      expect(MOB_IDS, id).toContain(id);
+      expect(m.sprite).toBe(`mob_${id}`);
+    }
+    expect(WANT.mobs).toHaveLength(MOB_IDS.length * DIRECTIONS.length * 14);
+  });
+
   const roots = [...artStyles().map((s) => s.root), 'placeholder/'];
-  for (const atlas of ['nodes', 'tools'] as const) {
+  for (const atlas of ['nodes', 'tools', 'mobs'] as const) {
     const base = pivots(json<Atlas>(join(ASSETS, 'm5b', `${atlas}.json`)));
     for (const root of roots) {
-      it(`${root || '8bit/'}m5b/${atlas}.json has every frame on one page within 512², same cells and pivots`, () => {
+      it(`${root || '8bit/'}m5b/${atlas}.json has every frame on one page within its cap, same cells and pivots`, () => {
         const a = json<Atlas>(join(ASSETS, root, 'm5b', `${atlas}.json`));
         expect(a.textures).toHaveLength(1);
-        expect(a.textures[0]!.size.w).toBeLessThanOrEqual(M5B_PAGE.w);
-        expect(a.textures[0]!.size.h).toBeLessThanOrEqual(M5B_PAGE.h);
+        expect(a.textures[0]!.size.w).toBeLessThanOrEqual(pageOf(atlas).w);
+        expect(a.textures[0]!.size.h).toBeLessThanOrEqual(pageOf(atlas).h);
         expect(a.textures[0]!.frames.map((f) => f.filename)).toEqual(WANT[atlas]);
         expect(pivots(a)).toEqual(base);
       });
@@ -105,6 +123,24 @@ describe('M5b art (SPRITES 12)', () => {
     expect(a.anims.map((x) => [x.key, x.repeat, x.frames.length])).toEqual(
       GLOWS.map((g) => [`glow_${g}`, -1, GLOW_FRAMES]),
     );
+  });
+
+  it('plays each mob animation in each direction, looping all but the attack', () => {
+    const a = json<{ anims: Array<{ key: string; repeat: number; frameRate: number; frames: unknown[] }> }>(
+      join(ASSETS, 'm5b', 'mobs.anims.json'),
+    );
+    const want = MOB_IDS.flatMap((m) =>
+      MOB_ANIMS.flatMap((an) =>
+        DIRECTIONS.map((d) => [
+          mobAnim(m, an, d),
+          MOB_ANIM[an].repeat,
+          MOB_ANIM[an].fps,
+          MOB_ANIM[an].frames,
+        ]),
+      ),
+    );
+    expect(a.anims.map((x) => [x.key, x.repeat, x.frameRate, x.frames.length])).toEqual(want);
+    expect(MOB_ANIM.attack.repeat).toBe(0);
   });
 
   for (const style of artStyles()) {
