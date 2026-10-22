@@ -247,18 +247,16 @@ export function validateContent(c: Content): string[] {
 }
 
 /**
- * Round 6 (docs/round6/m5b-data.md 1, cutscene-music.md 1.1 and 3). Session 6E fills the M5b checks: every
- * `scene.nodes[].resource` names a resource, every `spawners[].mob` a mob, every `givers[].npc` a quest npc; a
- * recipe's `out`, `in[].item` and a resource's `tool` are items; a recipe's `station` is a `routines.json` prop
- * kind; a quest's `giver` is an npc and its items exist; a mini-game's `task` is a task. Session 6J adds: every
- * index entry of `cutscenes` names a cutscene of the right kind, every `openings` key a map. Session 6L adds: every
- * `music.byMap` key is a map (the playlist ids are checked against the client manifest by a client test). Until
- * then every record is empty and there is nothing to check.
+ * Round 6 (docs/round6/m5b-data.md 1, cutscene-music.md 1.1 and 3; GDD 3.14 to 3.16). Session 6E's M5b checks: every
+ * resource is a `material` item and every material a resource, a resource's `tool` is an item, every
+ * `scene.nodes[].resource` names a resource; a recipe's `out` and `in[].item` are items, its `station` a
+ * `routines.json` station kind, and every recipe is craftable on every map from what that map's nodes yield and its
+ * stations offer (`checkCraftable`). Mobs, quests and mini-games are checked from the PRs that fill them. Session 6J
+ * adds: every index entry of `cutscenes` names a cutscene of the right kind, every `openings` key a map. Session 6L
+ * adds: every `music.byMap` key is a map (the playlist ids are checked against the client manifest by a client test).
  */
 function checkM5b(c: Content, err: (msg: string) => void): void {
-  const { resources, recipes, mobs, quests, minigames, cutscenes } = c;
-  keyedById('resources.json', resources.resources, [] as string[]);
-  keyedById('recipes.json', recipes.recipes, [] as string[]);
+  const { resources, recipes, mobs, quests, minigames, cutscenes, items } = c;
   for (const [file, map] of [
     ['resources.json', resources.resources],
     ['recipes.json', recipes.recipes],
@@ -272,6 +270,70 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
       if (key !== record.id) err(`${file}: key "${key}" holds record with id "${record.id}"`);
     }
   }
+
+  const isItem = (id: string) => Object.hasOwn(items.items, id);
+  for (const r of Object.values(resources.resources)) {
+    if (items.items[r.id]?.kind !== 'material') err(`resources.json: ${r.id} is not a material item`);
+    if (r.tool !== undefined && !isItem(r.tool)) err(`resources.json: ${r.id} needs unknown tool ${r.tool}`);
+  }
+  for (const item of Object.values(items.items)) {
+    if (item.kind === 'material' && !Object.hasOwn(resources.resources, item.id)) {
+      err(`items.json: material ${item.id} is no resource`);
+    }
+  }
+  for (const scene of Object.values(c.scenes)) {
+    for (const n of scene.nodes ?? []) {
+      if (!Object.hasOwn(resources.resources, n.resource)) {
+        err(`scene ${scene.id}: node ${n.id} unknown resource ${n.resource}`);
+      }
+    }
+  }
+
+  const stationKinds = new Set(Object.values(c.routines.activities).flatMap((a) => a.kinds));
+  for (const r of Object.values(recipes.recipes)) {
+    const where = `recipes.json ${r.id}`;
+    if (!isItem(r.out)) err(`${where}: unknown out ${r.out}`);
+    else if (items.items[r.out]!.kind === 'material') err(`${where}: makes material ${r.out}`);
+    for (const input of r.in) if (!isItem(input.item)) err(`${where}: unknown input ${input.item}`);
+    if (r.station !== null && !stationKinds.has(r.station))
+      err(`${where}: station ${r.station} is no station kind`);
+  }
+  for (const map of Object.values(c.maps)) {
+    const scenes = map.scenes.flatMap((id) => c.scenes[id] ?? []);
+    for (const id of uncraftable(c, scenes))
+      err(`map ${map.id}: recipe ${id} cannot be crafted from its nodes`);
+  }
+}
+
+/**
+ * The recipes that cannot be made in these scenes: start from the resources their nodes yield (a resource whose `tool`
+ * is not yet in hand waits for it), add every recipe whose station stands in the scenes and whose inputs are in hand,
+ * and repeat until nothing changes.
+ */
+function uncraftable(c: Content, scenes: readonly Scene[]): string[] {
+  const nodeResources = new Set(scenes.flatMap((s) => (s.nodes ?? []).map((n) => n.resource)));
+  const propKinds = new Set(scenes.flatMap((s) => s.props.map((p) => p.kind)));
+  const have = new Set<string>();
+  const made = new Set<string>();
+  for (let grew = true; grew;) {
+    grew = false;
+    for (const id of nodeResources) {
+      const tool = c.resources.resources[id]?.tool;
+      if (!have.has(id) && (tool === undefined || have.has(tool))) {
+        have.add(id);
+        grew = true;
+      }
+    }
+    for (const r of Object.values(c.recipes.recipes)) {
+      if (made.has(r.id) || (r.station !== null && !propKinds.has(r.station))) continue;
+      if (r.in.every((input) => have.has(input.item))) {
+        made.add(r.id);
+        have.add(r.out);
+        grew = true;
+      }
+    }
+  }
+  return Object.keys(c.recipes.recipes).filter((id) => !made.has(id));
 }
 
 const NIGHT_PHASES: ReadonlySet<string> = new Set(['dusk', 'night', 'finalNight']);
