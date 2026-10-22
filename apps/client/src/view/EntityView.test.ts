@@ -128,6 +128,29 @@ describe('EntityView (GDD 3.17)', () => {
     ).toEqual(['Kay', 'Me']);
   });
 
+  it('draws the label of the admin views over the roster name, and rebuilds when it changes', () => {
+    const text = { v: 'Ann: killer (as baker)' };
+    const v = new EntityView(
+      scene,
+      SELF,
+      () => undefined,
+      (handle) => (handle === 'h-a' ? text.v : undefined),
+    );
+    v.update(roster, 0, [avatar('h-a', 'a'), avatar('h-k', 'k')], '');
+    expect(
+      live()
+        .map((m) => m.name)
+        .sort(),
+    ).toEqual(['Ann: killer (as baker)', 'Kay', 'Me']);
+    text.v = 'Ann: killer';
+    v.update(roster, 50, [avatar('h-a', 'a'), avatar('h-k', 'k')], '');
+    expect(
+      live()
+        .map((m) => m.name)
+        .sort(),
+    ).toEqual(['Ann: killer', 'Kay', 'Me']);
+  });
+
   it('removes a sprite when its avatar leaves the scene', () => {
     const v = view();
     v.update(roster, 0, [avatar('h-me', SELF), avatar('h-a', 'a')], 'h-me');

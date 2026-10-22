@@ -2745,6 +2745,18 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6D (admin client)
 
+- **Branch `claude/r6-admin-client`, draft PR #66 (2026-10-22)**: (1) the route, scene, sign-in, controls and
+  `mockAdmin.ts`; (2)-(3) the viewport grid with `AdminSceneView`, the label of `EntityView`, the seat inspector, the log
+  pane, `e2e/admin.spec.ts` and UI.md 14.23 as one commit; (4) `AdminNet.ts` on the live room (6C had merged, so
+  `connectAdmin` is written and unit-tested against a fake client with the wire of `protocol/admin.ts`; the live e2e
+  case is opt-in, `WDI_E2E_ADMIN=1` with `WDI_E2E_ADMIN_TOKEN`).
+- **Contract requests**: `readFlags` (`flags/index.ts`) read `route[0]` with its query (`admin?token=...`), so the GitHub
+  callback never started the Admin scene; 6Z granted the one-line edit and 6D made it (with a flags test and the e2e case);
+  UI.md 14.18 was already the art-style switch,
+  so the admin page is 14.23; `AdminSeat` carries no inventory or notebook (open item for round 7: the snapshot is 6C's).
+- **Tests**: `admin/*.test.ts` (model, token capture, the connect wire, controls, panels, the viewport maths), `EntityView`
+  label, `remoteDelayMs`; `e2e/admin.spec.ts` on the mock (8 pass, 1 skipped: the live case is opt-in). The e2e build needs `pnpm --filter @wdi/content build` first in a fresh checkout.
+
 ### Round 6 log: 6E (M5b content and GDD 3.14-3.16)
 
 - **One PR, four commits (2026-10-22)**, #49, each green on `pnpm lint && pnpm typecheck && pnpm test`, as 6Z did
