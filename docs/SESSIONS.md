@@ -2779,6 +2779,20 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6M (M5b art)
 
+- Step 1 (nodes, held tools, glows, icons): `tools/sprites/m5b.ts` and `m5b-draw.ts` draw the six resource
+  nodes in two states, the six tools as held overlays in eight directions and the lantern and torch glows, in
+  both styles; `placeholder-m5b.ts` carries their greybox twins; six `icon_item_*` SVGs; SPRITES 12; the
+  CREDITS row; DECISIONS A95; `test/m5b.test.ts`. Ids from 6E's step 1 (#49). `pnpm lint && pnpm typecheck &&
+  pnpm test` green.
+- Step 2 (mobs): `tools/sprites/m5b-mobs.ts` rigs the wolf, boar, bat and rat (ids from #49 step 2) and m5b.ts
+  packs them as `mobs` and `anims_mobs` (idle, walk, attack in eight directions) in both styles, with greybox
+  twins in `placeholder-m5b.ts`; SPRITES 12, A95 and the CREDITS row extended; `test/m5b.test.ts` covers the
+  frames and animations. Green.
+- Step 3 (givers): `tools/sprites/m5b-givers.ts` dresses the five quest npcs of #49 step 3 (`harbourmaster`,
+  `moll`, `foreman`, `smith`, `collier`) on the mob rigs (`drawRig`), packed as `givers` and `anims_givers`
+  (idle in eight directions) in both styles, with greybox twins; SPRITES 12, A95, CREDITS and `test/m5b.test.ts`
+  extended. Green. All of the brief's sprites are in; what remains is review and 6I's consumption.
+
 ### Round 6 log: 6N (ROSW media)
 
 ## Integration log, round 6

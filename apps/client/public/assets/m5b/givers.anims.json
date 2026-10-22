@@ -1,0 +1,924 @@
+{
+ "anims": [
+  {
+   "key": "giver_harbourmaster/idle/n",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/n/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/n/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/n/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/n/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_harbourmaster/idle/ne",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/ne/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/ne/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/ne/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/ne/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_harbourmaster/idle/e",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/e/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/e/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/e/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/e/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_harbourmaster/idle/se",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/se/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/se/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/se/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/se/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_harbourmaster/idle/s",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/s/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/s/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/s/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/s/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_harbourmaster/idle/sw",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/sw/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/sw/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/sw/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/sw/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_harbourmaster/idle/w",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/w/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/w/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/w/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/w/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_harbourmaster/idle/nw",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/nw/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/nw/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/nw/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_harbourmaster/idle/nw/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_moll/idle/n",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/n/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/n/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/n/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/n/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_moll/idle/ne",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/ne/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/ne/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/ne/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/ne/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_moll/idle/e",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/e/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/e/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/e/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/e/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_moll/idle/se",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/se/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/se/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/se/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/se/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_moll/idle/s",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/s/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/s/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/s/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/s/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_moll/idle/sw",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/sw/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/sw/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/sw/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/sw/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_moll/idle/w",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/w/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/w/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/w/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/w/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_moll/idle/nw",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/nw/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/nw/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/nw/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_moll/idle/nw/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_foreman/idle/n",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/n/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/n/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/n/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/n/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_foreman/idle/ne",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/ne/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/ne/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/ne/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/ne/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_foreman/idle/e",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/e/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/e/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/e/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/e/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_foreman/idle/se",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/se/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/se/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/se/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/se/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_foreman/idle/s",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/s/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/s/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/s/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/s/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_foreman/idle/sw",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/sw/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/sw/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/sw/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/sw/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_foreman/idle/w",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/w/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/w/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/w/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/w/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_foreman/idle/nw",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/nw/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/nw/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/nw/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_foreman/idle/nw/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_smith/idle/n",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/n/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/n/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/n/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/n/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_smith/idle/ne",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/ne/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/ne/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/ne/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/ne/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_smith/idle/e",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/e/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/e/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/e/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/e/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_smith/idle/se",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/se/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/se/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/se/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/se/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_smith/idle/s",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/s/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/s/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/s/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/s/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_smith/idle/sw",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/sw/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/sw/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/sw/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/sw/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_smith/idle/w",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/w/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/w/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/w/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/w/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_smith/idle/nw",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/nw/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/nw/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/nw/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_smith/idle/nw/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_collier/idle/n",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/n/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/n/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/n/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/n/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_collier/idle/ne",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/ne/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/ne/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/ne/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/ne/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_collier/idle/e",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/e/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/e/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/e/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/e/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_collier/idle/se",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/se/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/se/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/se/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/se/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_collier/idle/s",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/s/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/s/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/s/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/s/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_collier/idle/sw",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/sw/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/sw/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/sw/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/sw/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_collier/idle/w",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/w/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/w/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/w/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/w/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  },
+  {
+   "key": "giver_collier/idle/nw",
+   "frames": [
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/nw/000"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/nw/001"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/nw/002"
+    },
+    {
+     "key": "givers",
+     "frame": "giver_collier/idle/nw/003"
+    }
+   ],
+   "frameRate": 6,
+   "repeat": -1
+  }
+ ]
+}

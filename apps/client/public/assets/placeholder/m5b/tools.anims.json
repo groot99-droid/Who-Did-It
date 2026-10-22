@@ -1,0 +1,50 @@
+{
+ "anims": [
+  {
+   "key": "glow_lantern",
+   "frames": [
+    {
+     "key": "tools",
+     "frame": "glow_lantern/0"
+    },
+    {
+     "key": "tools",
+     "frame": "glow_lantern/1"
+    },
+    {
+     "key": "tools",
+     "frame": "glow_lantern/2"
+    },
+    {
+     "key": "tools",
+     "frame": "glow_lantern/3"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": -1
+  },
+  {
+   "key": "glow_torch",
+   "frames": [
+    {
+     "key": "tools",
+     "frame": "glow_torch/0"
+    },
+    {
+     "key": "tools",
+     "frame": "glow_torch/1"
+    },
+    {
+     "key": "tools",
+     "frame": "glow_torch/2"
+    },
+    {
+     "key": "tools",
+     "frame": "glow_torch/3"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": -1
+  }
+ ]
+}

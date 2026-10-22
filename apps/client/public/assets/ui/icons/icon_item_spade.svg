@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Spade">
+  <title>Spade</title>
+  <path d="M18 4 H30 V9 H18 Z" fill="#2C3240"/>
+  <path d="M22 9 H26 V27 H22 Z" fill="#2C3240"/>
+  <path d="M15 27 H33 V36 C33 41 29 44 24 44 C19 44 15 41 15 36 Z" fill="#6F7A8C"/>
+  <path d="M19 31 V37" stroke="#D9D2C2"/>
+</svg>

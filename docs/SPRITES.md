@@ -1048,3 +1048,64 @@ every image at its file size and on the world palette with alpha 0 or 255, the O
 frame at its art box on one page, the blank band and the Sabotage mark, and the batch file's jobs, picks, prompts
 and references. For the low-poly style: the same keys, URLs and `modes`, every image at the 8-bit size and off the
 snap, the same atlas frames, and the set within 4 MiB (`styles.test.ts` checks the manifest is a re-skin).
+
+## 12. M5b art (Session 6M, round 6)
+
+The sprites M5b draws (`docs/round6/m5b-data.md` 4), with 6E's ids (`resources.json`, `recipes.json`; content
+PR #49). Everything is drawn in code on the `palette.json` world ramps at display scale (route R5,
+`tools/sprites/m5b-draw.ts`) and finished like a rig render for each style of `artStyles()`: snapped and
+mode-halved for 8-bit, box-halved and alpha-bled for low poly. One command writes both styles' atlases under
+`assets/<root>m5b/` and the M5b block of each manifest; `pnpm --filter @wdi/sprites placeholder` writes the
+greybox twins (`placeholder-m5b.ts`, `order` 80):
+
+```
+pnpm --filter @wdi/sprites m5b
+```
+
+| Key | Type | Frames | Packed cell, pivot | Loaded |
+|---|---|---|---|---|
+| `nodes` | multiatlas, one page ≤ 512² | `node_<snake id>/ready`, `node_<snake id>/spent` for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`); the stem is the row's `sprite` | 64 x 64, (32, 48): the ground point under the tile centre | boot |
+| `tools` | multiatlas, one page ≤ 512² | `held_<itemId>/<dir>` for `torch`, `snare`, `spade`, `lockpicks`, `lantern`, `crowbar` (8 screen-frame directions); `glow_lantern/<0-3>`, `glow_torch/<0-3>` | held: 64 x 64, (32, 56), the characters' feet; glow: 32 x 32, centred | boot |
+| `anims_tools` | animation | `glow_lantern`, `glow_torch`: 4 frames at 8 fps, looping | | boot |
+| `mobs` | multiatlas, one page ≤ 1024² | `mob_<id>/<anim>/<dir>/<nnn>` for `wolf`, `boar`, `bat`, `rat` (the stem is the row's `sprite`), `idle` 4 frames, `walk` 6, `attack` 4, 8 screen-frame directions | 64 x 64, (32, 56), the characters' feet; the bat hovers over a ground shadow at the feet | boot |
+| `anims_mobs` | animation | `mob_<id>/<anim>/<dir>`: idle 6 fps and walk 10 fps looping, attack 10 fps once | | boot |
+| `givers` | multiatlas, one page ≤ 512 x 1024 | `giver_<npcId>/idle/<dir>/<nnn>` for `harbourmaster`, `moll`, `foreman`, `smith`, `collier` (`quests.json` npcs), 4 frames, 8 screen-frame directions | 64 x 64, (32, 56), the characters' feet | boot |
+| `anims_givers` | animation | `giver_<npcId>/idle/<dir>`: 6 fps, looping | | boot |
+
+The filter is `nearest` in the 8-bit manifest and the placeholder, `linear` in the low-poly one. The nodes
+and tools add under 0.07 page-equivalents to the boot set in either style; the mobs add 0.125 (8-bit, 512 x 1024)
+or 0.25 (low poly, 1024²) and the givers 0.125 in either style, inside the 6-page limit (10.14).
+
+**Held overlays.** A held frame shares the character cell and feet pivot, and draws the tool's grip where
+the right hand sits in a look's idle frame 000 (`HAND` in `m5b.ts`), so the client places it at the feet with
+the body's draw scale, as one more layer. It goes under the body for `n`, `ne` and `nw` (the hand is on the
+far side) and over it otherwise. A glow on a held lantern or torch sits at the feet plus that hand offset.
+Only the lantern has a public signal (`StatusBit.lantern`); what else a client draws in another seat's hand is
+the wire's decision, never the art's (role secrecy, CLAUDE.md).
+
+**Glows** are additive halos in the dim end of the lantern and brick ramps: banded in 8-bit, one radial
+gradient in low poly. The client plays `glow_lantern` or `glow_torch` over the light, in the `ADD` blend mode.
+
+**Icons.** The tools' inventory icons are hand-written SVG under `assets/ui/icons/` on the rules of section 9:
+`icon_item_torch`, `icon_item_snare`, `icon_item_spade`, `icon_item_lockpicks`, `icon_item_lantern`,
+`icon_item_crowbar`.
+
+**Mobs** are small rigs of spheres, capsules and wing polygons in a mob-local frame (`tools/sprites/m5b-mobs.ts`),
+posed per animation and projected onto the iso ground for each direction, back to front, under one ink
+silhouette. The client turns a `MobSnap`'s world-frame yaw into the atlas direction with `dirFromVector`, as for an
+avatar, and plays `mob_<kind>/<walk|idle|attack>/<dir>`.
+
+**Givers** are standing figures on the same rigs (`tools/sprites/m5b-givers.ts`), on the villager's proportions,
+each dressed for its trade: the harbourmaster's navy coat, peaked cap and beard; Moll's shawl, headscarf and herb
+basket; the foreman's waistcoat, flat cap and ledger; the smith's apron and hammer; the collier's lamp helmet and
+pick. Every npc wears the `villager` body in `quests.json`, which has no real art (`char_villager` is
+placeholder-only, SPRITES 10.13), so a giver has its own key rather than reusing `char_<lookId>`; none borrows a
+deck look, so a giver is never mistaken for a seat. A giver is a scene static, never a seat: the client turns
+`scene.givers[].facing` (world frame) into the atlas direction with `dirFromVector` and loops
+`giver_<npc>/idle/<dir>`.
+
+**Tests.** `tools/sprites/test/m5b.test.ts`: every resource row has its node and every recipe its held tool;
+each style's and the placeholder's atlases carry exactly these frames, on one page within 512², with the same
+cells and pivots; every manifest lists the keys at boot; the glow loops; and the shipped files equal what the
+build writes today. `manifest.test.ts`, `styles.test.ts`, `budget.test.ts`, `palette.test.ts` and
+`icons.test.ts` cover the rest as they stand.
