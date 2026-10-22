@@ -486,15 +486,124 @@ In M5a nobody carries a light that anyone else can see. Your vision is drawn for
 
 ### 3.14 Resources and crafting
 
-Round 6 (ROADMAP M5b); the data fields were pre-seeded in round 5 (3.13). The contract is `docs/round6/m5b-data.md` 1 and 2.1 until 6E and 6F write this section; the numbers land in `packages/content/data` with it.
+Round 6 (ROADMAP M5b). The rows are `resources.json`, `recipes.json` and the `material` rows of `items.json`; the
+numbers below are theirs and `balance.resources`'s. Sentences marked (6F) are the server's behaviour and may be
+corrected by Session 6F when it lands.
+
+**Resources.** Six resources grow at the **nodes** of the forests, caves and the Blackpine camp (`nodes` in the scene
+files): Timber, Stone, Pine Resin, Herbs, Mushrooms and Tin Ore. Every map has all six at every party size: Hollowmere's
+Small profile finds them in Gallows Wood and the Tin Gallery mouth, Blackpine's in the woods, the camp and the
+Workings. Nodes that share a `pool` are one pool: at Start the server activates half of each pool's spots
+(`poolActiveFrac` 0.5), drawn from the `nodes` stream, so a forest is never stripped the same way twice; a node
+outside any pool is always active. (6F)
+
+| Resource | Gather hold | Yield | Respawn | Needs |
+|---|---|---|---|---|
+| Timber | 3 s | 1 | 90 s | |
+| Stone | 3 s | 1 | 120 s | |
+| Pine Resin | 2 s | 1 | 90 s | |
+| Herbs | 2 s | 2 | 60 s | |
+| Mushrooms | 2 s | 1 | 75 s | |
+| Tin Ore | 4 s | 1 | 150 s | a Spade in the inventory |
+
+**Gathering** is a hold (E) at an active node within the verb reach of 3.7, like Collect: moving or being interrupted
+cancels it and yields nothing; at its end the yield goes into the inventory and the node goes inactive until its
+respawn time has passed (counted in ticks). A gather with no room for the yield is refused. (6F) Gathering makes no
+noise and leaves no clue, and nobody's role changes what a node gives.
+
+**Materials stack.** A material is an item of kind `material`: up to 5 units of one material share one of the 5
+slots (`stackMax`); a tool takes a slot of its own (3.5). Materials drop on death like every non-bound item.
+
+**Crafting** is a hold at a **station**, a prop of the recipe's kind within the verb reach; a recipe with no station
+crafts anywhere. The inputs are taken when the hold ends, and the tool goes into the inventory; an interrupted craft
+takes nothing. (6F) Every tool is role-neutral: anyone may craft one, and a crafted tool says nothing about who made
+it.
+
+| Tool | Inputs | Station | Hold |
+|---|---|---|---|
+| Torch | 1 Timber, 1 Pine Resin | anywhere | 2 s |
+| Snare | 2 Herbs, 1 Timber | anywhere | 3 s |
+| Spade | 2 Timber, 1 Stone | a basin | 3 s |
+| Lockpicks | 1 Tin Ore | a basin | 3 s |
+| Lantern | 1 Tin Ore, 1 Pine Resin | an oven | 4 s |
+| Crowbar | 2 Tin Ore, 1 Timber | an oven | 4 s |
+
+Basins stand in the apothecary, Crumb's Ovens, the bunkhouse and the forge; ovens in Crumb's Ovens and the bunkhouse,
+so both maps craft every tool at the Small profile. The Torch is a carried light like the Lantern (radius 4, 3.5) and
+ships in V1. The Lockpicks and the Snare can be crafted, carried, traded and dropped; their verbs (Pick a lock, Set a
+snare) are the V1.5 abilities of 3.5 and stay off until they ship.
 
 ### 3.15 Mobs
 
-Round 6 (ROADMAP M5b); the data fields were pre-seeded in round 5 (3.13). The contract is `docs/round6/m5b-data.md` 1 and 2.2 until 6E and 6G write this section; the numbers land in `packages/content/data` with it.
+Round 6 (ROADMAP M5b). The rows are `mobs.json` and the scenes' `spawners`; sentences marked (6G) are the server's
+behaviour and may be corrected by Session 6G.
+
+**Creatures.** Each spawner raises one creature of its kind, awake in the spawner's `phases` (default: always),
+which never strays further from it than its `leashTiles` and walks its `pathId` loop when it has one. A scene has
+at most 3 spawners (`mobs.maxPerScene`). Creatures are not seats: they carry no handle, no role and no look, and
+they are drawn from the scene state for everyone in the scene.
+
+| Creature | Where | Speed | Senses | Flees light within | Attack | Kills |
+|---|---|---|---|---|---|---|
+| Wolf | the forests' wolf loops, dusk and night | 3.6 tiles/s | 6 tiles | 4 tiles | after 1 s in reach | yes |
+| Boar | the Fenwood, Blackpine Woods, day and dusk | 3.2 tiles/s | 4 tiles | 2 tiles | after 1.5 s in reach | no |
+| Bat | the caves | 4 tiles/s | 5 tiles | 3 tiles | after 2 s in reach | no |
+| Rat | the caves past the Tin Gallery mouth | 2.5 tiles/s | 3 tiles | 2 tiles | after 2 s in reach | no |
+
+**Behaviour.** A creature idles or roams its loop; it chases a living seat it senses and can see (3.7) for at most
+6 s (`mobs.chaseS`), then returns to its spawner; it flees any lit light within its flee radius, carried or
+standing. (6G) Its attack lands 1 damage (3.6's HP) when the seat has stayed in reach for the attack time. A wolf's
+attack can kill, with the death cause `wolf` and the body left where it fell, so the Killer's "blame the wolves"
+cover of WORLD 4.6 has a real alibi; the other creatures wound but never take a seat below 1 HP. (6G) Wolves keep
+3.6: the wolf flee radius is `balance.wolves.fleeLightTiles`, a mended fence stops them, a bolt kills one. An NPC seat
+flees a creature like a frightened player (3.12); ghosts are never sensed. Creatures use the `mobs` random
+stream, keyed per spawner, and never a secret stream.
+
+**Dark scenes on the server.** With creatures, a dark scene's visibility moves to the server (3.13): a living seat
+in a dark scene, or anywhere at night, receives another avatar only within the night radius and a clear line of
+sight over the scene's grid; a lit carried Lantern or Torch adds 2 tiles (`vision.lanternTiles`) to both seeing and
+being seen. Ghosts see everything. (6G; 3.7's lantern line is 6G's.)
 
 ### 3.16 Quests and mini-games
 
-Round 6 (ROADMAP M5b); the data fields were pre-seeded in round 5 (3.13). The contract is `docs/round6/m5b-data.md` 1 and 2.3 until 6E and 6H write this section; the numbers land in `packages/content/data` with it.
+Round 6 (ROADMAP M5b). The rows are `quests.json`, `minigames.json` and the scenes' `givers`; sentences marked (6H)
+are the server's behaviour and may be corrected by Session 6H.
+
+**Givers.** A quest giver is a figure standing at a scene spot, never a seat: it wears the `villager` body (so it
+can never be mistaken for a seat's character), faces its spot's direction and carries a quest marker. Each map has
+a giver on its hub and others in its wild places:
+
+| Giver | Where | Quest | Wants | Reward |
+|---|---|---|---|---|
+| Harbourmaster Pell | Hollowmere village, by the dock | Caulk the skiff | 2 Pine Resin, 1 Timber | Lantern |
+| Mother Moll | the Fenwood, her charcoal hut (Medium) | Moll's herbs | 4 Herbs | Bandage |
+| | | Moll's mushrooms | 3 Mushrooms | Salts |
+| Foreman Hask | the Blackpine yard | Stack the yard | 4 Timber | Crowbar |
+| Ada Kerrow | the forge (Medium) | The smith's ore | 3 Tin Ore | Lantern |
+| The Collier | Blackpine Woods, at the kilns | The collier's stone | 3 Stone | Torch |
+
+**Quests.** Speaking to a giver (E within reach) offers its quests; a seat holds at most 2 accepted quests
+(`quests.maxActive`), each private to that seat's view. Turning a quest in at its giver takes the wanted items
+from the inventory and gives the reward through the inventory; with no room for the reward the turn-in is refused
+and nothing is taken. A quest can be done once per seat per match. Every quest is open to every role, and what a
+giver offers never depends on who asks. (6H) Quests of kind `contract` are the round-7 vendetta seam and are
+refused in round 6.
+
+**Mini-games.** Every fetch task of 3.5 plays a mini-game at its target in place of the plain 2 s hold: the hold
+opens it, the server keeps the solution, and the task completes only when the client's answer checks. The four
+kinds are the quick mode's (3.11): crates, pour, slide and stoke. (6H)
+
+| Task | Mini-game | Difficulty (1-5) |
+|---|---|---|
+| Light the lanterns | pour | 2 |
+| Fix the well pump | slide | 3 |
+| Deliver a letter | slide | 1 |
+| Mend the fence | crates | 2 |
+| Fetch the flour | crates | 1 |
+
+After 20 s the Done control appears, as in the quick mode. A wrong answer completes nothing and may be tried again.
+A Cabal seat's fake task plays the same mini-game, writes the same alibi entry and never moves the task bar (3.5).
+The co-op task keeps its two-player hold.
 
 ### 3.17 Characters and disguise
 
@@ -537,4 +646,10 @@ Round 6 (ROADMAP M5c). Cutscenes are data (`packages/content/data/cutscenes/`) p
 
 ### 3.19 Admin auto-mode
 
-Round 6 (ROADMAP M5d). An owner-only room runs a match in which every seat is an NPC, at 1x, 2x, 5x or 10x sim speed, paused or stepped, watched from a god view on several scene viewports, with the invariants of `docs/round6/auto-admin.md` 5 checked as it runs. Nothing about it changes a normal match: a `party` room never leaves 1x, an NPC Killer takes an NPC as prey only in an auto match, and the room exists only when the owner's GitHub login is configured on the server (ARCHITECTURE 5.11). The contract is `docs/round6/auto-admin.md`; 6A writes this section.
+Round 6 (ROADMAP M5d). An owner-only room runs a match in which every seat is an NPC, watched from a god view on several scene viewports, with the invariants of `docs/round6/auto-admin.md` 5 checked as it runs. Nothing about it changes a normal match: a `party` room never leaves 1x, an NPC Killer takes an NPC as prey only in an auto match, and the room exists only when the owner's GitHub login is configured on the server (ARCHITECTURE 5.11). The contract is `docs/round6/auto-admin.md`.
+
+**Sim speed.** Every timer of the game counts ticks, so a speed is the number of ticks the server runs per tick of wall time: 1x, 2x, 5x or 10x, with pause and single steps while paused. Phase lengths are sim seconds: at 10x a 15-minute match plays in about 90 wall seconds, and cooldowns, phase timers, the NPC walk and every countdown keep their meaning. When the server cannot run the asked number of ticks inside its per-tick budget it runs fewer, at least one, and owes the rest to later ticks: the speed reached drops, and no tick is ever skipped. Only the auto room's controls change the speed; nothing a player can send does.
+
+**The all-NPC match.** The owner chooses the map, the mode (main or quick), the seat count (every seat an NPC, up to `players.max`), the NPC difficulty, the quick mode's deck if not the default, and optionally the seed words. Start needs no leader and no human; the match deals, plays and ends exactly as a normal one, and below `players.min` seats the usual NPC fill applies. Each NPC brain plays as in 3.12, with one difference: an NPC Killer may take another NPC as prey, so the brains play each other. Reset returns the room to the lobby with the same seats under the same ids, the same options and the speed paused.
+
+**Replay.** An auto match fixes the seed words of every random stream and the seat ids before Start, so the same words and ids replay the same match tick for tick. The headless runner (`pnpm auto`) plays such matches with no network and no client and prints one line per match (winner, ticks, rounds, invariant failures); a failure is printed with the seed words of every stream and the seat ids, which the admin page can set to watch it again. The runner's `--seed` decides every match's words, so a run with the same flags plays the same matches.

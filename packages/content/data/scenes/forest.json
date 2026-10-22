@@ -186,6 +186,17 @@
       "pathId": "fo.wolf_loop_e"
     }
   ],
+  "nodes": [
+    { "id": "fo.nd_timber_0", "resource": "timber", "x": 3, "y": 12, "pool": "galTimber" },
+    { "id": "fo.nd_timber_1", "resource": "timber", "x": 15, "y": 5, "pool": "galTimber" },
+    { "id": "fo.nd_timber_2", "resource": "timber", "x": 28, "y": 24, "pool": "galTimber" },
+    { "id": "fo.nd_timber_3", "resource": "timber", "x": 37, "y": 17, "pool": "galTimber" },
+    { "id": "fo.nd_resin_0", "resource": "resin", "x": 21, "y": 9, "pool": "galResin" },
+    { "id": "fo.nd_resin_1", "resource": "resin", "x": 12, "y": 22, "pool": "galResin" },
+    { "id": "fo.nd_herb_0", "resource": "herb", "x": 17, "y": 27, "pool": "galHerbs" },
+    { "id": "fo.nd_herb_1", "resource": "herb", "x": 33, "y": 9, "pool": "galHerbs" },
+    { "id": "fo.nd_stone_0", "resource": "stone", "x": 6, "y": 24 }
+  ],
   "grid": [
     "######D#################################",
     "#.....S................................#",

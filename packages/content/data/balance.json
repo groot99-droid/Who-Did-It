@@ -144,7 +144,7 @@
     "dayTiles": 7,
     "nightTiles": 3.5,
     "childDeltaTiles": -1,
-    "lanternTiles": 0,
+    "lanternTiles": 2,
     "gddRef": "3.7"
   },
   "noise": {
@@ -226,7 +226,7 @@
     "stuckInvariantS": 20,
     "gddRef": "3.12"
   },
-  "resources": { "poolActiveFrac": 0.5, "gatherHoldS": 2, "gddRef": "3.14" },
+  "resources": { "poolActiveFrac": 0.5, "stackMax": 5, "gddRef": "3.14" },
   "mobs": { "maxPerScene": 3, "chaseS": 6, "gddRef": "3.15" },
   "quests": { "maxActive": 2, "gddRef": "3.16" },
   "ui": {
