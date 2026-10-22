@@ -2736,6 +2736,18 @@ session's goes back to it. Log under "Integration log, round 6".
   the mock sends the opening at Start only under `?cutscene=1`, so the other mock specs reach the HUD at once;
   the "Round 6 (6J)" block of `components.css`; UI.md 14.20; `e2e/cutscene.spec.ts` (caption, Skip, Esc). The e2e run
   needs `pnpm --filter @wdi/shared build` and `@wdi/content build` first, as for every spec. No contract request.
+- **PR 3 (death cutscenes, spec, GDD)** on `claude/r6-cutscenes-deaths`, stacked on PR 2: `deathKnife`, `deathPoison`,
+  `deathShot`, `deathEjected` and `deathWolf` (a sound, a vfx, one whispered line, a held last frame, `maxS` 4) and
+  their copy; `playDeath` stashes the id under `REG_CUTSCENE` when the World is asleep (a vote's ejection) so the rebuilt
+  World plays it; `CutscenePlayer.playing`; the mock kills a `?cutscene=1&ghost=1` seat once the World first reads the
+  feed; `kill.test.ts` pins `cutsceneId`; `cutscene.spec.ts` covers the death cutscene, Skip and the ghost handoff; GDD
+  3.18 death paragraph. The ghost handoff guard (`if (!this.cutscenes.playing) this.refreshGhost();` in `World.update`) is in this PR: the
+  orchestrator ruled it a World.ts play hook inside 6J's Owns.
+- **Also in PR 2 (answered contract request)**: the first line of `World.ts` `preload()` is
+  `mountMatchLoadingScreen(this, overlayRoot(), this.matchMap())`, added after #51 merged.
+- **Done.** PR 1 (#52) is merged; PRs 2 and 3 (#55, #57) are retargeted by the orchestrator. Every PR was green on
+  `pnpm lint && pnpm typecheck && pnpm test` before each push. Open items: none from 6J; the Port-au-Levain opening
+  and the memorial video are round-7 content.
 
 ### Round 6 log: 6K (loading, transitions, trailer, budgets)
 
