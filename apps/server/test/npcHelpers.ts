@@ -1,4 +1,4 @@
-import type { StepContext } from '@colyseus/core';
+import type { Client, StepContext } from '@colyseus/core';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { boot } from '@colyseus/testing';
 import { type SceneId, roles } from '@wdi/content';
@@ -140,18 +140,36 @@ export function placeSeat(party: Party, id: string, sceneId: SceneId, tx: number
   sim.viewsDirty = true;
 }
 
+/** The room's own fixed step (`PartyRoom.setFixedTimestep`), without the clock. */
+function fixedStep(room: PartyRoom, ctx: StepContext): void {
+  step(room, ctx);
+  runLobbyCommands(room);
+  runLobbyPhase(room);
+}
+
 /**
- * Runs `ticks` server steps synchronously (no sleeps), calling `onTick` after each: the room's own fixed step
- * (`PartyRoom.setFixedTimestep`) without the clock, so a test covers minutes of play in milliseconds.
+ * Runs `ticks` server steps synchronously (no sleeps), calling `onTick` after each: `fixedStep` without the clock,
+ * so a test covers minutes of play in milliseconds.
  */
 export function advance(party: Party, ticks: number, onTick?: (tick: number) => void): void {
   const ctx = {} as StepContext;
   for (let i = 0; i < ticks; i++) {
-    step(party.room, ctx);
-    runLobbyCommands(party.room);
-    runLobbyPhase(party.room);
+    fixedStep(party.room, ctx);
     onTick?.(party.room.state.tick);
   }
+}
+
+/**
+ * Takes the room off its clock: it then steps only through `advance`, so the tick a test reads depends on the steps
+ * it ran and never on wall time (the clock keeps stepping while a test awaits). `resumeClock` puts `fixedStep` back
+ * on the room's own clock.
+ */
+export function pauseClock(room: PartyRoom): void {
+  room.setTimestep();
+}
+
+export function resumeClock(room: PartyRoom): void {
+  room.setFixedTimestep((ctx) => fixedStep(room, ctx), TICK_RATE);
 }
 
 /** White-box: puts the room in `phase` until `seconds` from now. */
@@ -173,9 +191,17 @@ export const SEED_SETS: Record<SeedSet, readonly [number, number, number, number
 export const npcIdsOf = (set: SeedSet): string[] =>
   Array.from({ length: 9 }, (_, i) => `${set.toLowerCase()}npc000${i + 1}`);
 
+/** The tick a standard party's lobby is advanced to before Start, whatever the lobby took in wall time. */
+const STANDARD_START_TICK = 5 * TICK_RATE;
+
 /**
  * A 1 human + 9 NPC party at the large profile, seeds and NPC seat ids fixed to `set`; stops on the role card when
  * `onCard`, else in its first world phase. The human never sends input, never readies and never votes.
+ *
+ * From the lobby on the party runs on the test's own steps, not the room's clock: Start is queued and consumed on
+ * a fixed tick, the card is cut, and grace and every placement follow on the ticks after. So every run of a set has
+ * the same tick timeline, every brain timer is set on the same tick, and two runs compared tick for tick (R18, M7)
+ * line up whatever the load. The clock is back on the room when the party is returned.
  */
 export async function standardParty(
   colyseus: ColyseusTestServer,
@@ -183,10 +209,24 @@ export async function standardParty(
   onCard = false,
 ): Promise<Party> {
   const party = await lobbyOf(colyseus, 1);
+  pauseClock(party.room);
+  const lobbyTicks = party.room.state.tick;
+  if (lobbyTicks > STANDARD_START_TICK) throw new Error(`standardParty: the lobby took ${lobbyTicks} ticks`);
+  advance(party, STANDARD_START_TICK - lobbyTicks);
   const words = SEED_SETS[set];
   fixSeeds(party.room, { deal: words, npcTiming: words, npcPlay: words });
   for (const id of npcIdsOf(set)) addNpcSeat(party.room, party.room.seeds.get('npcNames'), id);
-  await start(party);
-  if (!onCard) await toWorld(party);
+  party.room.lobbyCommands.push({ sessionId: party.humans[0]!.id } as Client, C2S.lobbyStart, {});
+  advance(party, 1);
+  if (party.room.state.phase !== Phase.roleReveal) throw new Error('standardParty: Start was refused');
+  if (!onCard) {
+    party.room.state.phaseEndsTick = party.room.state.tick;
+    advance(party, 1);
+    const sim = simOf(party.room);
+    const placed = () => sim.players.size > 0 && [...sim.players.values()].every((p) => p.placed);
+    for (let i = 0; i < TICK_RATE && !placed(); i++) advance(party, 1);
+    if (!placed()) throw new Error('standardParty: not every seat was placed within a second of grace');
+  }
+  resumeClock(party.room);
   return party;
 }
