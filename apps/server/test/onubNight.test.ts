@@ -522,7 +522,7 @@ describe('the Iron Cloche', () => {
     act(m, 0, 'onub.cloche', ['seat.0.loc']);
     await until(() => m.o.cloche !== '');
     expect(m.o.cloche).toBe('seat.0.loc');
-    await until(() => errorsOf(m.bots[0]!).length > 0);
+    await until(() => errorsOf(m.bots[0]!).length >= 1);
     expect(errorsOf(m.bots[0]!)).toEqual([ErrorCode.cannot]);
     act(m, 0, 'onub.cloche', ['seat.2.loc']);
     await until(() => errorsOf(m.bots[0]!).length > 1);
@@ -614,7 +614,7 @@ describe('debug.clock in the quick mode', () => {
     await clock(m, { phase: 'dawn' }); // from prepReveal: runs the whole night
     expect(m.room.state.phase).toBe(Phase.dawn);
     await clock(m, { phase: 'night' }); // from dawn: wrong phase
-    await until(() => errorsOf(m.bots[0]!).length > 0);
+    await until(() => errorsOf(m.bots[0]!).length >= 1);
     expect(errorsOf(m.bots[0]!)).toEqual([ErrorCode.wrongPhase]);
     expect(m.room.state.phase).toBe(Phase.dawn);
   });
@@ -646,17 +646,17 @@ describe('debug.clock in the quick mode', () => {
     expect(m.room.state.onub.window).toBe('chef');
     expect(m.o.wakers).toEqual([m.bots[1]!.id]);
     await clock(m, { window: 'tourrier' }); // not in this deck
-    await until(() => errorsOf(m.bots[0]!).length > 0);
+    await until(() => errorsOf(m.bots[0]!).length >= 1);
     expect(errorsOf(m.bots[0]!)).toEqual([ErrorCode.cannot]);
     await clock(m, { bogus: true }); // no window and no phase: refused as 'not now'
-    await until(() => errorsOf(m.bots[0]!).length > 1);
+    await until(() => errorsOf(m.bots[0]!).length >= 2);
     expect(errorsOf(m.bots[0]!)).toEqual([ErrorCode.cannot, ErrorCode.wrongPhase]);
   });
 
   it('refuses {window} outside the night with 425', async () => {
     const m = await startNightMatch(colyseus, TABLE5);
     await clock(m, { window: 'chef' });
-    await until(() => errorsOf(m.bots[0]!).length > 0);
+    await until(() => errorsOf(m.bots[0]!).length >= 1);
     expect(errorsOf(m.bots[0]!)).toEqual([ErrorCode.wrongPhase]);
   });
 });

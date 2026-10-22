@@ -74,7 +74,7 @@ The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 star
 |---|---|---|
 | Lobby | Leader creates party; Start with >= 1 human (NPCs fill to 4, 3.12) | – |
 | Role reveal | Server deals the deck and the traits; cover roles pick a look (3.17) | 20 s, then 3-2-1 |
-| Grace | Spawn spread around the hub (3.13); kills disabled; guided clue | 30 s |
+| Grace | Spawn spread around the hub (3.13); kills disabled; guided clue; the map's opening cutscene plays inside it (3.18) | 30 s, plus `phases.openingS` (50 s) when the map has an opening |
 | Day | Free roam; light radius 7 tiles; the Knife is sheathed | 60 s |
 | Dusk | Vignette, "Night falls in 10 s"; the Knife, Impersonate and the night powers wake; missing-person check | 10 s |
 | Night | Light radius 3.5 tiles; wolves active; the hunt | 100 s |
@@ -146,7 +146,7 @@ Players have 2 HP, regenerating 1 per 90 s; the Knife does 2. At 1 HP you are **
 
 ### 3.7 Stealth, hiding and doors
 
-Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2; noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene, as an avatar under a random handle (3.17); the darkness radius is a client-side mask, drawn as the lighting layer of 3.13; a dark scene uses the night radius in every phase. Radius + occluder visibility is V1.5 (same `Visibility.ts` policy, different predicate).
+Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2; noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene, as an avatar under a random handle (3.17); the darkness radius is a client-side mask, drawn as the lighting layer of 3.13; a dark scene uses the night radius in every phase. Since M5b a dark scene's radius and occluders hold on the server (3.15): a living seat there receives another avatar only within its night radius and line of sight, and a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both seeing and being seen; lights start out and are lit by their holder.
 
 **Hiding spots** (wardrobe, hay pile, under bed, barrel; crawlspaces for the Child) hold one player; **body spots** (cellar dump, crypt niche, hay pile) are separate objects. Entering takes 1 s, noise 2; the hidden player sees a slit view and keeps one action, **Burst Out** (E): instant, stuns the Checker 1 s, noise 6. **Check** (E, 2 s) opens a spot; a Check on an occupied spot writes a Verified Notebook entry for the hider ("X opened my wardrobe at 3:12"), so checking is evidence.
 
@@ -551,18 +551,32 @@ they are drawn from the scene state for everyone in the scene.
 | Rat | the caves past the Tin Gallery mouth | 2.5 tiles/s | 3 tiles | 2 tiles | after 2 s in reach | no |
 
 **Behaviour.** A creature idles or roams its loop; it chases a living seat it senses and can see (3.7) for at most
-6 s (`mobs.chaseS`), then returns to its spawner; it flees any lit light within its flee radius, carried or
-standing. (6G) Its attack lands 1 damage (3.6's HP) when the seat has stayed in reach for the attack time. A wolf's
-attack can kill, with the death cause `wolf` and the body left where it fell, so the Killer's "blame the wolves"
-cover of WORLD 4.6 has a real alibi; the other creatures wound but never take a seat below 1 HP. (6G) Wolves keep
-3.6: the wolf flee radius is `balance.wolves.fleeLightTiles`, a mended fence stops them, a bolt kills one. An NPC seat
-flees a creature like a frightened player (3.12); ghosts are never sensed. Creatures use the `mobs` random
-stream, keyed per spawner, and never a secret stream.
+6 s (`mobs.chaseS`), then returns to its spawner and starts no new chase for as long; it flees any lit flame within
+its flee radius, carried or standing (a lit carried light, or a burning lantern, torch, lamp or fire of the scene;
+moss, moonlight, daylight shafts and windows are not flames), and walks home once out of its reach. (6G) It walks
+tile paths whose every tile lies inside its leash, so it never strays further; a loop point beyond the leash is
+pulled in to its edge, and at each point it pauses as a wandering NPC does (`npc.wander.stepMinS` to `stepMaxS`). A
+seat in transit or a ghost is never sensed, and nothing it senses depends on a card. (6G) Its attack lands 1 damage
+(`health.wolfDamage`) each time the seat has stayed in reach (1.5 tiles, 3.7) and in sight for its attack time.
+Creature bites are the only damage the server counts in hit points: a seat regains 1 HP every 90 s after its last
+bite, up to 2 (3.6), and Wounded's slower walk and drip trail are not applied yet. A wolf's bite that takes a seat to
+0 HP is a death with the cause `wolf`: the body is left where it fell and the kill scream rings (3.7), with no clue
+of a killer, so the Killer's "blame the wolves" cover of WORLD 4.6 has a real alibi; the other creatures wound but
+never take a seat below 1 HP. (6G) Wolves keep 3.6's flee radius (`balance.wolves.fleeLightTiles`, which their row
+equals) and stay in the woods by their leash; the mended fence and the bolt do not touch them yet. An NPC seat a
+creature chases runs for the nearest open door of its scene and takes it, or straight away from the creature when
+there is none (3.12; live once the NPC brain's call lands, DECISIONS A89). Creatures use the `mobs` random stream,
+keyed per spawner, and never a secret stream.
 
 **Dark scenes on the server.** With creatures, a dark scene's visibility moves to the server (3.13): a living seat
-in a dark scene, or anywhere at night, receives another avatar only within the night radius and a clear line of
-sight over the scene's grid; a lit carried Lantern or Torch adds 2 tiles (`vision.lanternTiles`) to both seeing and
-being seen. Ghosts see everything. (6G; 3.7's lantern line is 6G's.)
+in a dark scene receives another avatar only within the night radius and a clear line of sight over the scene's
+grid (walls, and the `u` ground that is walkable but blocks sight), or when that avatar stands in the pool of a
+scene light burning now; a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both
+seeing and being seen, so two lit seats see each other 4 tiles further. Every light starts out: its holder lights
+it or puts it out (`act.light`), and a lit light shows on its avatar as the lantern bit, never by card. Outside the
+dark scenes the server still sends every position in the scene and the night radius stays the client's picture
+(3.13), so a lantern post's pool on the square shows what it lights. Ghosts see everything. (6G; 3.7's lantern line
+is 6G's.)
 
 ### 3.16 Quests and mini-games
 
@@ -637,6 +651,10 @@ The co-op task keeps its two-player hold.
 ### 3.18 Cinematics and music
 
 Round 6 (ROADMAP M5c). Cutscenes are data (`packages/content/data/cutscenes/`) played in-engine: the opening of a map runs inside grace, which `phases.openingS` lengthens for it, and adds no phase; a death plays the cutscene of its cause before the ghost handoff; every cutscene can be skipped, and reduce-motion turns its camera moves into cuts. Music follows the phase class of the map (`music.json`), is loaded after Start under its own budget (ASSETS 6.8) and is never sent by the server. The contract is `docs/round6/cutscene-music.md`; 6J writes the cutscene paragraphs and 6L the music paragraphs here, and the seconds live in `balance.json` (`phases.openingS`, `ui.transitionS`).
+
+**Cutscene openings (6J).** `cutscenes.json` maps each map to an opening cutscene. At the start of grace the server broadcasts `cutscene { id }` to every seat and adds `phases.openingS` to grace; it adds no phase and never waits for a client, so the NPCs walk and the clock runs while the camera pans. HollowMere's opening is a 50 s pan over the square with a narrator caption track ending on the role chip slamming in; Blackpine's is a 12 s two-step pan with no narrator. `openingS` is one number for every map, and every opening is at most that long (the content check enforces it), so a shorter opening leaves the rest of the lengthened grace to play. A seat can skip an opening with Esc or the Skip button and sees the world under the remaining grace.
+
+**Death cutscenes (6J).** A seat that dies by the knife, poison, the Gamekeeper's shot, a vote or a wolf is told so in its private `killed`, which names the cutscene of that cause (`cutsceneId`); a vanishing has none. The client plays it before the ghost handoff: a sound, one whispered line, and the last frame held for four seconds at most, skippable like the opening. The id is the victim's own news, so it reveals nothing the `cause` beside it does not. A seat voted out hears it while the meeting has the World asleep, so its cutscene plays when the World is rebuilt after the meeting.
 
 **Music (6L).** Each map plays one playlist per class, chosen by the phase and mapped in `music.json`: `loading` from the map's load until the first `day`, `lobby` between matches, `day` (dawn included), `dusk`, `night`, `meeting` (the discussion, the vote, the reveal and the immunity beat), `finalNight` and `gameOver`; the quick mode plays `kitchen` (Evening Prep and the crime scenes), `night`, `rush` (dawn to the Final Bake) and `over`. A phase that stays in its class changes nothing, so a track is never restarted, and the role card and grace keep the `loading` piece playing so the opening's speech is heard whole. Playlists cross-fade; their tracks, gains and fade seconds are in `audio/music/manifest.json`. Music is fetched only after Start (the lobby warms the first track of the picked map's day theme, never more) and has its own budget (ASSETS 6.8), separate from effects. Every player has a music slider, an effects slider and a mute (UI 14.22), kept on their own device and never sent; a class with no playlist, or a playlist with no track, is silence. No role, cover or secret is a class: the server sends nothing, and the pick depends only on public phases.
 

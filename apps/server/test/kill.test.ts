@@ -83,7 +83,7 @@ describe('kill', () => {
       roles: Record<string, string>;
     }>;
     expect(killed).toHaveLength(1);
-    expect(killed[0]).toMatchObject({ sceneId: 'overworld', cause: 'knife' });
+    expect(killed[0]).toMatchObject({ sceneId: 'overworld', cause: 'knife', cutsceneId: 'deathKnife' });
     expect(killed[0]!.roles[k.id]).toBe('killer');
     expect(Object.keys(killed[0]!.roles)).toHaveLength(5);
     expect(eventsOf(w, 'killed')).toEqual([]);

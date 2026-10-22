@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Torch">
+  <title>Torch</title>
+  <path d="M21 44 L19 20 H29 L27 44 Z" fill="#2C3240"/>
+  <path d="M18 20 H30 V16 H18 Z" fill="#D9D2C2"/>
+  <path d="M24 3 C30 9 32 12 31 15 H17 C16 12 18 9 24 3 Z" fill="#FFB457"/>
+  <path d="M24 9 C26 11 27 13 26 15 H22 C21 13 22 11 24 9 Z" fill="#D9D2C2"/>
+</svg>

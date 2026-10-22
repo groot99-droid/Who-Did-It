@@ -864,6 +864,49 @@
       "modes": [
         "onub"
       ]
+    },
+    {
+      "key": "nodes",
+      "type": "multiatlas",
+      "url": "m5b/nodes.json",
+      "path": "m5b/",
+      "filter": "nearest"
+    },
+    {
+      "key": "tools",
+      "type": "multiatlas",
+      "url": "m5b/tools.json",
+      "path": "m5b/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_tools",
+      "type": "animation",
+      "url": "m5b/tools.anims.json"
+    },
+    {
+      "key": "mobs",
+      "type": "multiatlas",
+      "url": "m5b/mobs.json",
+      "path": "m5b/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_mobs",
+      "type": "animation",
+      "url": "m5b/mobs.anims.json"
+    },
+    {
+      "key": "givers",
+      "type": "multiatlas",
+      "url": "m5b/givers.json",
+      "path": "m5b/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_givers",
+      "type": "animation",
+      "url": "m5b/givers.anims.json"
     }
   ]
 }
