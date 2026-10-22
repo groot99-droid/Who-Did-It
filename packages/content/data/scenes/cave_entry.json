@@ -106,6 +106,13 @@
       "phases": ["day", "dusk"]
     }
   ],
+  "nodes": [
+    { "id": "ce.nd_tin_0", "resource": "tinOre", "x": 17, "y": 2, "pool": "entryTin" },
+    { "id": "ce.nd_tin_1", "resource": "tinOre", "x": 14, "y": 10, "pool": "entryTin" },
+    { "id": "ce.nd_stone_0", "resource": "stone", "x": 2, "y": 2 },
+    { "id": "ce.nd_mush_0", "resource": "mushroom", "x": 12, "y": 6 }
+  ],
+  "spawners": [{ "id": "ce.sp_bats", "mob": "bat", "x": 13, "y": 11, "leashTiles": 5 }],
   "grid": [
     "##########D#########",
     "#.........S........#",

@@ -235,11 +235,12 @@ export const BalanceFile = z.strictObject({
     /** Round 6 (GDD 3.19): an NPC at one goal and one tile for longer than this fails the stuck invariant. */
     stuckInvariantS: Seconds,
   }),
-  /** Round 6 (GDD 3.14; docs/round6/m5b-data.md): placeholders until Session 6E tunes them. */
+  /** Round 6 (GDD 3.14). Each resource's own gather hold and respawn are rows of resources.json. */
   resources: Section({
     /** The share of each node pool that is active in a match. */
     poolActiveFrac: Chance,
-    gatherHoldS: Seconds,
+    /** The most units of one material a slot holds. */
+    stackMax: z.number().int().positive(),
   }),
   /** Round 6 (GDD 3.15): placeholders until Session 6E tunes them. */
   mobs: Section({ maxPerScene: z.number().int().nonnegative(), chaseS: Seconds }),

@@ -1,1 +1,53 @@
-{ "gddRef": "3.14", "recipes": {} }
+{
+  "gddRef": "3.14",
+  "recipes": {
+    "torch": {
+      "id": "torch",
+      "out": "torch",
+      "qty": 1,
+      "in": [{ "item": "timber", "qty": 1 }, { "item": "resin", "qty": 1 }],
+      "station": null,
+      "craftS": 2
+    },
+    "snare": {
+      "id": "snare",
+      "out": "snare",
+      "qty": 1,
+      "in": [{ "item": "herb", "qty": 2 }, { "item": "timber", "qty": 1 }],
+      "station": null,
+      "craftS": 3
+    },
+    "spade": {
+      "id": "spade",
+      "out": "spade",
+      "qty": 1,
+      "in": [{ "item": "timber", "qty": 2 }, { "item": "stone", "qty": 1 }],
+      "station": "basin",
+      "craftS": 3
+    },
+    "lockpicks": {
+      "id": "lockpicks",
+      "out": "lockpicks",
+      "qty": 1,
+      "in": [{ "item": "tinOre", "qty": 1 }],
+      "station": "basin",
+      "craftS": 3
+    },
+    "lantern": {
+      "id": "lantern",
+      "out": "lantern",
+      "qty": 1,
+      "in": [{ "item": "tinOre", "qty": 1 }, { "item": "resin", "qty": 1 }],
+      "station": "oven",
+      "craftS": 4
+    },
+    "crowbar": {
+      "id": "crowbar",
+      "out": "crowbar",
+      "qty": 1,
+      "in": [{ "item": "tinOre", "qty": 2 }, { "item": "timber", "qty": 1 }],
+      "station": "oven",
+      "craftS": 4
+    }
+  }
+}

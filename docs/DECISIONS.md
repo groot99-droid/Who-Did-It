@@ -124,7 +124,7 @@ All fifteen open questions were closed on 2026-10-10 in the decisions round (A18
 | A84 | Reserved for session 6B (round 6) | |
 | A85 | Reserved for session 6C (round 6) | |
 | A86 | Reserved for session 6D (round 6) | |
-| A87 | Reserved for session 6E (round 6) | |
+| A87 | **M5b content (6E, round 6).** Resources are the six the round-5 scene nodes already named (timber, stone, tinOre, resin, herb, mushroom); each is also an `items.json` row of a new kind `material` that stacks to `balance.resources.stackMax`. `balance.resources.gatherHoldS` is dropped: each resource carries its own `gatherS`. Recipes use the station kinds already in the houses (basin, oven), never a new prop. The validator requires every recipe craftable on every map at every party profile from the open scenes' nodes and stations, and every quest's wants to be had where its giver stands. Givers wear the `villager` body, so no giver reads as a seat's card character. The Torch ships V1; Lockpicks and the Snare are craftable but their verbs stay V1.5 (open question for the owner: ship the two verbs in M5b, or hold the two recipes). Every fetch task gets one mini-game; the co-op task keeps its hold. | Open: the Lockpicks and Snare verbs. |
 | A88 | Reserved for session 6F (round 6) | |
 | A89 | Reserved for session 6G (round 6) | |
 | A90 | Reserved for session 6H (round 6) | |

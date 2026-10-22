@@ -1,1 +1,40 @@
-{ "gddRef": "3.16", "minigames": {} }
+{
+  "gddRef": "3.16",
+  "minigames": {
+    "lanternPour": {
+      "id": "lanternPour",
+      "kind": "pour",
+      "task": "lightLanterns",
+      "difficulty": 2,
+      "assistS": 20
+    },
+    "pumpSlide": {
+      "id": "pumpSlide",
+      "kind": "slide",
+      "task": "fixPump",
+      "difficulty": 3,
+      "assistS": 20
+    },
+    "letterSlide": {
+      "id": "letterSlide",
+      "kind": "slide",
+      "task": "deliverLetter",
+      "difficulty": 1,
+      "assistS": 20
+    },
+    "fenceCrates": {
+      "id": "fenceCrates",
+      "kind": "crates",
+      "task": "mendFence",
+      "difficulty": 2,
+      "assistS": 20
+    },
+    "flourCrates": {
+      "id": "flourCrates",
+      "kind": "crates",
+      "task": "fetchFlour",
+      "difficulty": 1,
+      "assistS": 20
+    }
+  }
+}

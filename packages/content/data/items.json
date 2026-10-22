@@ -341,8 +341,8 @@
       "onDeath": "drops",
       "use": "light",
       "lightRadiusTiles": 4,
-      "tooltip": "Carried light.",
-      "ships": "V1.5",
+      "tooltip": "Carried light, crafted from timber and resin; wolves flee it.",
+      "ships": "V1",
       "gddRef": "3.5"
     },
     "lockpicks": {
@@ -440,6 +440,76 @@
       "tooltip": "Your last shot, when you fall.",
       "ships": "V1",
       "gddRef": "3.5"
+    },
+    "spade": {
+      "id": "spade",
+      "name": "Spade",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Dig tin ore out of a seam.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "timber": {
+      "id": "timber",
+      "name": "Timber",
+      "kind": "material",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Crafting: torches, snares, spades, crowbars.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "stone": {
+      "id": "stone",
+      "name": "Stone",
+      "kind": "material",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Crafting: spades.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "tinOre": {
+      "id": "tinOre",
+      "name": "Tin Ore",
+      "kind": "material",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Crafting: lanterns, lockpicks, crowbars. Needs a spade.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "resin": {
+      "id": "resin",
+      "name": "Pine Resin",
+      "kind": "material",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Crafting: torches and lanterns.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "herb": {
+      "id": "herb",
+      "name": "Herbs",
+      "kind": "material",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Crafting: snares; wanted by quest givers.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "mushroom": {
+      "id": "mushroom",
+      "name": "Mushrooms",
+      "kind": "material",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Wanted by quest givers.",
+      "ships": "V1",
+      "gddRef": "3.14"
     }
   }
 }
