@@ -1,1 +1,45 @@
-{ "gddRef": "3.15", "mobs": {} }
+{
+  "gddRef": "3.15",
+  "mobs": {
+    "wolf": {
+      "id": "wolf",
+      "name": "Wolf",
+      "speedTilesPerS": 3.6,
+      "senseTiles": 6,
+      "fleeLightTiles": 4,
+      "attackS": 1,
+      "kills": true,
+      "sprite": "mob_wolf"
+    },
+    "boar": {
+      "id": "boar",
+      "name": "Boar",
+      "speedTilesPerS": 3.2,
+      "senseTiles": 4,
+      "fleeLightTiles": 2,
+      "attackS": 1.5,
+      "kills": false,
+      "sprite": "mob_boar"
+    },
+    "bat": {
+      "id": "bat",
+      "name": "Bat",
+      "speedTilesPerS": 4,
+      "senseTiles": 5,
+      "fleeLightTiles": 3,
+      "attackS": 2,
+      "kills": false,
+      "sprite": "mob_bat"
+    },
+    "rat": {
+      "id": "rat",
+      "name": "Rat",
+      "speedTilesPerS": 2.5,
+      "senseTiles": 3,
+      "fleeLightTiles": 2,
+      "attackS": 2,
+      "kills": false,
+      "sprite": "mob_rat"
+    }
+  }
+}

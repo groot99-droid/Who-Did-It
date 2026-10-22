@@ -1,17 +1,28 @@
-import type { FixedSeeds } from '../seeds';
+import { randomInt } from 'node:crypto';
+import { generateId } from '@colyseus/core';
+import { MAP_IDS } from '@wdi/content';
+import { GameMode, MAX_PLAYERS, NpcLevel, Phase } from '@wdi/shared';
+import { type FixedSeeds, MatchSeeds, type SeedWords, type StreamName } from '../seeds';
 import type { PartyRoom } from '../../rooms/PartyRoom';
+import { startMatch, startRefusal } from '../../rooms/handlers/lobby';
+import { isNpcSeat, releaseNpcSeat } from '../Npc';
+import { addNpcSeat } from '../npc/seats';
+import { onubDeckSetting } from '../Onub';
 import { simOf } from '../RoomSim';
+import { resetToLobby } from '../Win';
+import { clockOf } from './clock';
 
 /**
- * The all-NPC match (round 6, docs/round6/auto-admin.md 3): a room whose every seat is an NPC, started inside the
- * step with no leader, at the clock's speed. Pre-seeded by 6Z; Session 6A fills the bodies. `enableAuto` is the one
- * production path allowed to assign `room.fixedSeeds` (`seeds.test.ts` allowlist).
+ * The all-NPC match (round 6, docs/round6/auto-admin.md 3, GDD 3.19): a room whose every seat is an NPC, started
+ * inside the step with no leader, at the clock's speed. `enableAuto` is the one production path allowed to assign
+ * `room.fixedSeeds` (`seeds.test.ts` allowlist), and this file is the only writer of the clock (`auto.test.ts`).
  */
 export interface AutoOptions {
   map: string;
   mode: 'main' | 'onub';
   seats: number;
   difficulty: 'easy' | 'normal' | 'hard';
+  /** The quick mode's custom deck (`Settings.onubDeck`); the main mode's deck follows the seat count (GDD 3.1). */
   deck?: string[];
   seeds?: FixedSeeds;
   /** Fixed NPC seat ids, for replay and the log; drawn when absent. */
@@ -30,26 +41,141 @@ export interface AutoState {
   /** Queued by the admin handlers and the harness, applied by `runAuto` inside the step. */
   commands: AutoCommand[];
   started: boolean;
+  /** The options in force, with the seed words and seat ids filled in, so a run can be replayed from them. */
   options: AutoOptions;
+}
+
+/** Every stream of `sim/seeds.ts`: an auto match fixes them all, so its seed record replays it whole. */
+const STREAMS = {
+  deal: 1,
+  traits: 1,
+  npcNames: 1,
+  script: 1,
+  piles: 1,
+  thaw: 1,
+  perk: 1,
+  prepTimeout: 1,
+  nightTimeout: 1,
+  npcTiming: 1,
+  npcPlay: 1,
+  mobs: 1,
+  nodes: 1,
+  contract: 1,
+  events: 1,
+} satisfies Record<StreamName, 1>;
+export const AUTO_STREAMS = Object.keys(STREAMS) as StreamName[];
+
+const SCALES: readonly number[] = [1, 2, 5, 10];
+
+const drawWords = (): SeedWords => [
+  randomInt(2 ** 32),
+  randomInt(2 ** 32),
+  randomInt(2 ** 32),
+  randomInt(2 ** 32),
+];
+
+/** Why the options cannot run, or null. */
+export function autoOptionsProblem(opts: AutoOptions): string | null {
+  if (!(MAP_IDS as readonly string[]).includes(opts.map)) return `unknown map ${opts.map}`;
+  if (opts.mode !== 'main' && opts.mode !== 'onub') return `unknown mode ${String(opts.mode)}`;
+  if (!(opts.difficulty in NpcLevel)) return `unknown difficulty ${String(opts.difficulty)}`;
+  if (!Number.isInteger(opts.seats) || opts.seats < 1 || opts.seats > MAX_PLAYERS)
+    return `seats must be 1 to ${MAX_PLAYERS}`;
+  if (opts.npcIds !== undefined && new Set(opts.npcIds).size !== opts.npcIds.length)
+    return 'duplicate npcIds';
+  if (opts.deck !== undefined && opts.deck.length > 0 && onubDeckSetting(opts.deck) === null)
+    return 'bad deck';
+  return null;
 }
 
 export function autoOf(room: PartyRoom): AutoState | null {
   return simOf(room).auto;
 }
 
-/** Marks the room as an auto match, fixes its seeds, adds the NPC seats and applies the settings (6A). */
-export function enableAuto(_room: PartyRoom, _opts: AutoOptions): void {
-  throw new Error('sim/auto/Auto.ts enableAuto: round 6, Session 6A');
+/** Seeds, settings and seats from the options; the room must be in the lobby. Fills in what was drawn. */
+function applyOptions(room: PartyRoom, opts: AutoOptions): AutoOptions {
+  const seeds: FixedSeeds = { ...opts.seeds };
+  for (const name of AUTO_STREAMS) seeds[name] ??= drawWords();
+  room.fixedSeeds = seeds;
+  room.seeds = new MatchSeeds(seeds);
+
+  const settings = room.state.settings;
+  settings.map = opts.map;
+  settings.mode = GameMode[opts.mode];
+  settings.npcDifficulty = NpcLevel[opts.difficulty];
+  settings.onubDeck.clear();
+  for (const id of opts.mode === 'onub' ? (opts.deck ?? []) : []) settings.onubDeck.push(id);
+
+  // The seats: every NPC seat goes, then `seats` come back under the given ids (or fresh ones), named in order
+  // from the fixed `npcNames` stream, so a replay seats the same names under the same ids.
+  for (const id of [...room.state.players.keys()]) {
+    if (!isNpcSeat(room, id)) continue;
+    room.state.players.delete(id);
+    releaseNpcSeat(room, id);
+  }
+  const names = room.seeds.get('npcNames');
+  const npcIds: string[] = [];
+  for (let i = 0; i < opts.seats; i++) {
+    const id = addNpcSeat(room, names, opts.npcIds?.[i] ?? generateId());
+    if (id !== null) npcIds.push(id);
+  }
+  room.state.leaderId = '';
+  return { ...opts, seeds, npcIds };
 }
 
-/** Queues `{ kind: 'start' }`; `runAuto` calls the exported `startMatch` inside the next step (6A). */
-export function queueAutoStart(_room: PartyRoom): void {
-  throw new Error('sim/auto/Auto.ts queueAutoStart: round 6, Session 6A');
+/** Marks the room as an auto match, fixes its seeds, adds the NPC seats and applies the settings. */
+export function enableAuto(room: PartyRoom, opts: AutoOptions): void {
+  const problem = autoOptionsProblem(opts);
+  if (problem !== null) throw new Error(`enableAuto: ${problem}`);
+  const sim = simOf(room);
+  sim.auto = { npcPrey: true, commands: [], started: false, options: opts };
+  sim.auto.options = applyOptions(room, opts);
 }
 
-/** Step stage before `runNpcs` (locked call site in `sim/Step.ts`): drains the auto commands. No-op until 6A. */
+/** Queues `{ kind: 'start' }`; `runAuto` calls `startMatch` inside the next step. */
+export function queueAutoStart(room: PartyRoom): void {
+  const auto = autoOf(room);
+  if (auto === null) throw new Error('queueAutoStart: not an auto room');
+  auto.commands.push({ kind: 'start' });
+}
+
+/** The clock command: a scale of 1, 2, 5 or 10, pause or resume, and single steps to run while paused. */
+export function applyClock(
+  room: PartyRoom,
+  cmd: Omit<Extract<AutoCommand, { kind: 'clock' }>, 'kind'>,
+): void {
+  const clock = clockOf(room);
+  if (cmd.scale !== undefined && SCALES.includes(cmd.scale)) clock.scale = cmd.scale;
+  if (typeof cmd.paused === 'boolean') clock.paused = cmd.paused;
+  if (cmd.step !== undefined && Number.isInteger(cmd.step) && cmd.step > 0) clock.pendingSteps += cmd.step;
+}
+
+/** Step stage before `runNpcs` (locked call site in `sim/Step.ts`): drains the auto commands, in order. */
 export function runAuto(room: PartyRoom): void {
   const auto = simOf(room).auto;
   if (auto === null || auto.commands.length === 0) return;
-  // 6A: apply each command (start through `startMatch`, reset through `resetToLobby`, clock through `clockOf`).
+  for (const cmd of auto.commands.splice(0)) {
+    switch (cmd.kind) {
+      case 'start':
+        // No leader and no human: `leaderId` is '' and `startRefusal` skips the human minimum in an auto room.
+        if (startRefusal(room, room.state.leaderId) === null) {
+          startMatch(room);
+          auto.started = true;
+        }
+        break;
+      case 'setup':
+        if (room.state.phase === Phase.lobby && autoOptionsProblem(cmd.options) === null)
+          auto.options = applyOptions(room, cmd.options);
+        break;
+      case 'reset':
+        resetToLobby(room);
+        auto.started = false;
+        auto.options = applyOptions(room, auto.options);
+        clockOf(room).paused = true;
+        break;
+      case 'clock':
+        applyClock(room, cmd);
+        break;
+    }
+  }
 }
