@@ -16,6 +16,12 @@
     { "key": "amb_village", "url": "amb_village.ogg", "gain": 0.6 },
     { "key": "amb_house", "url": "amb_house.ogg", "gain": 0.6 },
     { "key": "amb_forest", "url": "amb_forest.ogg", "gain": 0.6 },
-    { "key": "amb_cave", "url": "amb_cave.ogg", "gain": 0.6 }
+    { "key": "amb_cave", "url": "amb_cave.ogg", "gain": 0.6 },
+    { "key": "narr_bed_hollowmere", "url": "narr_bed_hollowmere.ogg", "gain": 0.6 },
+    { "key": "sting_kill", "url": "sting_kill.ogg", "gain": 1 },
+    { "key": "sting_meeting", "url": "sting_meeting.ogg", "gain": 1 },
+    { "key": "sting_eject", "url": "sting_eject.ogg", "gain": 1 },
+    { "key": "sting_win_village", "url": "sting_win_village.ogg", "gain": 1 },
+    { "key": "sting_win_cabal", "url": "sting_win_cabal.ogg", "gain": 1 }
   ]
 }

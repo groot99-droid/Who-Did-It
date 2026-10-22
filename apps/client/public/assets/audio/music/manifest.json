@@ -13,6 +13,27 @@
       "gain": 1,
       "durationS": 66.6,
       "bytes": 827223
+    },
+    {
+      "key": "bed_heartbeat",
+      "url": "bed_heartbeat.ogg",
+      "gain": 1,
+      "durationS": 19.81,
+      "bytes": 146496
+    },
+    {
+      "key": "bed_tick",
+      "url": "bed_tick.ogg",
+      "gain": 1,
+      "durationS": 18.0,
+      "bytes": 115213
+    },
+    {
+      "key": "bed_tense",
+      "url": "bed_tense.ogg",
+      "gain": 1,
+      "durationS": 20.0,
+      "bytes": 150775
     }
   ],
   "playlists": [
@@ -50,19 +71,25 @@
     },
     {
       "id": "hollowmere_night",
-      "tracks": [],
+      "tracks": [
+        "bed_tense"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
     {
       "id": "hollowmere_meeting",
-      "tracks": [],
+      "tracks": [
+        "bed_heartbeat"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
     {
       "id": "hollowmere_finalnight",
-      "tracks": [],
+      "tracks": [
+        "bed_tick"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
@@ -94,19 +121,25 @@
     },
     {
       "id": "blackpine_night",
-      "tracks": [],
+      "tracks": [
+        "bed_tense"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
     {
       "id": "blackpine_meeting",
-      "tracks": [],
+      "tracks": [
+        "bed_heartbeat"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
     {
       "id": "blackpine_finalnight",
-      "tracks": [],
+      "tracks": [
+        "bed_tick"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
@@ -126,7 +159,9 @@
     },
     {
       "id": "onub_night",
-      "tracks": [],
+      "tracks": [
+        "bed_tense"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },

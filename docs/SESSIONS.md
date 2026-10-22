@@ -2908,6 +2908,16 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6N (ROSW media)
 
+- **Step 1 (2026-10-22): the library sounds.** From ROSW `SFX_2026_01` (the owner's tag; `media.md` still says
+  `sfx-2026-10`, which 6Z corrects), fetched by id with `library.py fetch` (seven zips) and mastered as `media.md` 1:
+  the five `sting_*` files, `narr_bed_hollowmere`, `amb_forest` and `amb_cave` (replacing 5K's CC0 loops), and the
+  music beds `bed_heartbeat`, `bed_tick` and `bed_tense` in the `*_meeting`, `*_finalnight`, `*_night` and
+  `onub_night` playlists. Rows in both manifests, `CREDITS.md` (the two replaced CC0 rows removed) and
+  `assets/source/MANIFEST.md`; the picks and the reasons in DECISIONS A96. `media.test.ts` green. No `.ts`, nothing
+  under `packages/`.
+- **Waiting**: the owner's `Who_Did_It_Music_Pt1.zip` and `Who_Did_It_SFX_Pt1.zip` on the release (step 2: the ROSW
+  ingest, the owner's tracks and `train_arrive`, `train_brake`, `ferry_horn`, `crows`); the videos (step 3).
+
 ## Integration log, round 6
 
 - **NPC test flake, R18 (2026-10-22).** On PR #47's CI run 252 (head ac0409c) `npcRoutine.test.ts` R18 failed
