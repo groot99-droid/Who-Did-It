@@ -18,5 +18,8 @@ export const PORTAL_REACH_TILES = balance.doors.reachTiles;
  * so neither tells a role or an action apart (GDD 3.12 "Animation").
  */
 export const AnimId = { idle: 0, walk: 1, swing: 2, die: 3, interact: 4 } as const;
-/** `Presence.statusBits` and `Avatar.statusBits`; `ghost` marks a dead seat's avatar (GDD 3.17, Session 5F). */
-export const StatusBit = { transit: 1, bloody: 2, ghost: 4 } as const;
+/**
+ * `Presence.statusBits` and `Avatar.statusBits`; `ghost` marks a dead seat's avatar (GDD 3.17, Session 5F); `lantern`
+ * a lit lantern or torch in hand (GDD 3.15, round 6, Session 6G sets and copies it; nothing sets it before).
+ */
+export const StatusBit = { transit: 1, bloody: 2, ghost: 4, lantern: 8 } as const;

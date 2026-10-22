@@ -10,6 +10,7 @@ import { ErrorCode, JOIN_ERROR_CODE, JOIN_ERROR_MESSAGE, RATE_LIMITS } from '../
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const PROTOCOL_SOURCE = resolve(here, '../src/protocol/index.ts');
+export const ADMIN_SOURCE = resolve(here, '../src/protocol/admin.ts');
 export const PROTOCOL_DOC = resolve(here, '../../../docs/PROTOCOL.md');
 
 const oneLine = (text: string) => text.replace(/\s+/g, ' ').trim();
@@ -26,7 +27,7 @@ function members(source: ts.SourceFile, name: string) {
   const decl = source.statements.find(
     (s): s is ts.InterfaceDeclaration => ts.isInterfaceDeclaration(s) && s.name.text === name,
   );
-  if (!decl) throw new Error(`interface ${name} not found in protocol/index.ts`);
+  if (!decl) throw new Error(`interface ${name} not found in ${source.fileName}`);
   return decl.members.filter(ts.isPropertySignature).map((m) => ({
     name: m.name.getText(source).replace(/^'|'$/g, ''),
     type: oneLine(m.type?.getText(source) ?? 'unknown'),
@@ -40,15 +41,19 @@ function declarationText(source: ts.SourceFile, name: string): string {
       (ts.isInterfaceDeclaration(s) || ts.isTypeAliasDeclaration(s)) &&
       (s as { name: ts.Identifier }).name.text === name,
   );
-  if (!decl) throw new Error(`${name} not found in protocol/index.ts`);
+  if (!decl) throw new Error(`${name} not found in ${source.fileName}`);
   return decl.getText(source).replace(/^\s*\/\*\*[\s\S]*?\*\/\s*/, '');
 }
 
 export function renderProtocolDoc(): string {
   const text = readFileSync(PROTOCOL_SOURCE, 'utf8');
   const source = ts.createSourceFile(PROTOCOL_SOURCE, text, ts.ScriptTarget.ES2022, true);
+  const adminText = readFileSync(ADMIN_SOURCE, 'utf8');
+  const admin = ts.createSourceFile(ADMIN_SOURCE, adminText, ts.ScriptTarget.ES2022, true);
   const c2s = members(source, 'C2SPayloads');
   const s2c = members(source, 'S2CPayloads');
+  const adminC2s = members(admin, 'AdminC2SPayloads');
+  const adminS2c = members(admin, 'AdminS2CPayloads');
   const limit = (type: string) => {
     const n = (RATE_LIMITS as Record<string, number | undefined>)[type];
     return n === undefined ? '-' : `${n}/s`;
@@ -76,8 +81,21 @@ export function renderProtocolDoc(): string {
     'ClaimSawPayload',
     'OnubClaimPayload',
     'JoinOptions',
+    'HoldAction',
+    'MinigameKind',
+    'DeathCause',
   ]
     .map((n) => '```ts\n' + declarationText(source, n) + '\n```')
+    .join('\n\n');
+  const adminNamed = [
+    'ClockScale',
+    'AdminSeat',
+    'AdminMob',
+    'InvariantFailure',
+    'SimEventWire',
+    'AdminJoinOptions',
+  ]
+    .map((n) => '```ts\n' + declarationText(admin, n) + '\n```')
     .join('\n\n');
   const errors = Object.entries(ErrorCode)
     .map(([name, code]) => `| ${code} | \`${name}\` |`)
@@ -106,6 +124,26 @@ ${rows(s2c, false)}
 ## Payload types
 
 ${named}
+
+## Admin (WDI_ADMIN only)
+
+Round 6 (\`docs/round6/auto-admin.md\` 6). Accepted by the \`admin\` room alone, which exists only when \`WDI_ADMIN=1\` and the GitHub login is configured (ARCHITECTURE 5.11); a \`party\` room drops every \`admin.*\` message. Every admin command is queued and applied inside the step.
+
+### Client to server
+
+| Type | Payload | Notes |
+|---|---|---|
+${rows(adminC2s, false)}
+
+### Server to client
+
+| Type | Payload | Notes |
+|---|---|---|
+${rows(adminS2c, false)}
+
+### Admin payload types
+
+${adminNamed}
 
 ## Error codes
 

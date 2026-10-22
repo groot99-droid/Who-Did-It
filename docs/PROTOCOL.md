@@ -30,6 +30,9 @@
 | `lobby.removeNpc` | `Record<string, never>` | 2/s | Leader only, phase lobby: removes the most recently added NPC seat; none left is 422. No id, so it never tells a seat apart (A39). |
 | `meeting.claim` | `OnubClaimPayload` | 2/s | Quick mode, a seat in play in the Rush or CRUST: replaces the seat's claim (GDD 3.11). |
 | `role.cover` | `{ lookId: string }` | 4/s | Main mode, role card only, a cover role: picks the look it will walk as (a look of a non-cover card of the deck); changeable until the card closes (GDD 3.17). Refused 425 outside the card, 422 otherwise. |
+| `quest.accept` | `{ questId: string }` | 2/s | Round 6 (M5b, GDD 3.16): a `quests.json` id whose giver stands in reach. Refused 422 until Session 6H lands. |
+| `quest.turnIn` | `{ questId: string }` | 2/s | Round 6 (M5b, GDD 3.16): an accepted quest whose wants the inventory holds, at its giver. Refused 422 until 6H. |
+| `minigame.result` | `{ taskId: string; answer: unknown }` | 2/s | Round 6 (M5b, GDD 3.16): the answer to the `minigameStart` of `taskId`; the server checks it against the solution it kept and completes the task. Refused 422 until Session 6H lands. |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
 
@@ -40,7 +43,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `roleReveal` | `RoleRevealPayload` | Private. |
 | `sceneEnter` | `{ sceneId: string; spawn: string; facing: string }` | Private. |
 | `clueFound` | `{ entryId: string }` | Private. |
-| `killed` | `{ sceneId: string; cause: DeathCause; roles: Record<string, string> }` | Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). |
+| `killed` | `{ sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string }` | Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). |
 | `chat.msg` | `{ from: string; text: string; channel: ChatChannel }` | Private: routed per recipient; `from` is a player id. |
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
@@ -55,6 +58,8 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `aim` | `{ endsTick: number }` | Private, a dying Gamekeeper: pick a seat with `act.ability {abilityId: 'lastShot'}` before `endsTick` (GDD 3.2). |
 | `inherit` | `Record<string, never>` | Private, an Accomplice: the Knife passed to you (GDD 3.2 Inherit); nothing public changes. |
 | `shot` | `{ fromId: string; targetId: string; role: string }` | Public, only during a reveal: the ejected Gamekeeper shot `targetId`, whose role was `role` (GDD 3.2). |
+| `cutscene` | `{ id: string; scope?: 'all' }` | Round 6 (M5c, GDD 3.18): play the cutscene `id` of `packages/content/data/cutscenes/`. Broadcast once for a map's opening at `beginPlay`; `scope: 'all'` marks a memorial every client plays (round 7). The server never waits for a client to finish it. A death's cutscene travels on `killed.cutsceneId` instead. |
+| `minigameStart` | `{ taskId: string; kind: MinigameKind; public: unknown }` | Private, round 6 (M5b, GDD 3.16): a station task's hold opened its mini-game; `public` is the puzzle without its solution (`rules/minigames.ts generate`). Answered with `minigame.result`. |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 
@@ -258,6 +263,98 @@ export interface JoinOptions {
   name: string;
   build: string;
   deviceId: string;
+}
+```
+
+```ts
+export type HoldAction = 'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft';
+```
+
+```ts
+export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke';
+```
+
+```ts
+export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf';
+```
+
+## Admin (WDI_ADMIN only)
+
+Round 6 (`docs/round6/auto-admin.md` 6). Accepted by the `admin` room alone, which exists only when `WDI_ADMIN=1` and the GitHub login is configured (ARCHITECTURE 5.11); a `party` room drops every `admin.*` message. Every admin command is queued and applied inside the step.
+
+### Client to server
+
+| Type | Payload | Notes |
+|---|---|---|
+| `admin.setup` | `{ map: string; mode: 'main' \| 'onub'; seats: number; difficulty: 'easy' \| 'normal' \| 'hard'; deck?: string[]; seeds?: FixedSeeds; }` | Configure the next match: a `MAP_IDS` id, the mode, the seat count (all NPCs), the difficulty, an optional deck and seed words. Applied at the next `admin.start`. |
+| `admin.start` | `Record<string, never>` | Start the configured match inside the step (`runAuto` calls `startMatch`); no leader is needed. |
+| `admin.reset` | `Record<string, never>` | Back to the lobby with the same setup, the clock paused. |
+| `admin.clock` | `{ scale?: ClockScale; paused?: boolean; step?: number }` | Set the speed, pause or resume, or run `step` ticks while paused. |
+
+### Server to client
+
+| Type | Payload | Notes |
+|---|---|---|
+| `admin.snapshot` | `{ tick: number; phase: number; scale: ClockScale; paused: boolean; effectiveScale: number; seats: AdminSeat[]; mobs?: AdminMob[]; invariants: InvariantFailure[]; }` | Every tick, to the admin client only: the sim's state beyond the schema. `effectiveScale` is the speed actually reached under the tick budget. |
+| `admin.event` | `{ events: SimEventWire[] }` | The tick's sim events. |
+| `admin.invariant` | `InvariantFailure` | Once per new invariant failure. |
+
+### Admin payload types
+
+```ts
+export type ClockScale = 1 | 2 | 5 | 10;
+```
+
+```ts
+export interface AdminSeat {
+  id: string;
+  name: string;
+  roleId: string;
+  /** The public look; `coverOf` the card's own look when the seat wears a cover, absent otherwise. */
+  look: string;
+  coverOf?: string;
+  sceneId: string;
+  x: number;
+  y: number;
+  dead: boolean;
+  /** The NPC brain's fields, absent for a human seat. */
+  brain?: { mode: string; goal: string; striking: boolean; flee: boolean };
+}
+```
+
+```ts
+export interface AdminMob {
+  id: string;
+  kind: string;
+  sceneId: string;
+  x: number;
+  y: number;
+  state: string;
+}
+```
+
+```ts
+export interface InvariantFailure {
+  name: string;
+  tick: number;
+  detail: string;
+}
+```
+
+```ts
+export interface SimEventWire {
+  tick: number;
+  kind: string;
+  seat?: string;
+  sceneId?: string;
+  data?: Record<string, unknown>;
+}
+```
+
+```ts
+export interface AdminJoinOptions {
+  build: string;
+  token: string;
 }
 ```
 
