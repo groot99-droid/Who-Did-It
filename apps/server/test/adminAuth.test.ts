@@ -1,5 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { type ColyseusTestServer, boot } from '@colyseus/testing';
+import { BUILD_VERSION, JOIN_ERROR_CODE, JOIN_ERROR_MESSAGE } from '@wdi/shared';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Application } from 'express';
+import { createServer } from '../src/server';
 import {
   type AdminConfig,
   STATE_TTL_S,
@@ -246,5 +249,34 @@ describe('adminRedirect', () => {
     expect(adminRedirect({ ...cfg, clientUrl: 'http://localhost:5173/Who-Did-It/#/old' }, 't0k')).toBe(
       'http://localhost:5173/Who-Did-It/#/admin?token=t0k',
     );
+  });
+});
+
+describe('the registration gate (server.ts)', () => {
+  let colyseus: ColyseusTestServer;
+  beforeAll(async () => {
+    for (const key of Object.keys(ENV)) delete process.env[key];
+    colyseus = await boot(createServer({ ipBurst: 1e5, ipPerMin: 1e8, globalPerMin: 1e8 }));
+  });
+  afterAll(async () => colyseus.shutdown());
+
+  it('has no admin room without the variables: create fails like any room that does not exist', async () => {
+    const token = signAdminToken(cfg, {
+      sub: 'owner-login',
+      id: 1,
+      exp: Math.floor(Date.now() / 1000) + 600,
+    });
+    const err = await colyseus.sdk
+      .create('admin', { build: BUILD_VERSION, token })
+      .then(() => null)
+      .catch((e: { code?: number; message?: string }) => ({ code: e.code, message: e.message }));
+    expect(err).toEqual({ code: JOIN_ERROR_CODE, message: JOIN_ERROR_MESSAGE });
+  });
+
+  it('has no login routes without the variables', async () => {
+    for (const path of ['/auth/github/login', '/auth/github/callback?code=x&state=y']) {
+      const res = await fetch(`http://localhost:2568${path}`, { redirect: 'manual' });
+      expect(res.status, path).toBe(404);
+    }
   });
 });

@@ -2699,6 +2699,14 @@ session's goes back to it. Log under "Integration log, round 6".
   checks the allowlist again, so dropping a login from the variable locks it out within the token's life. Every
   callback failure answers the same 403, and the callback is rate limited globally (20 burst) before it spends a
   GitHub call. `adminAuth.test.ts`: 17 tests with a fake `fetch` and a fake `now`.
+- PR 2: `AdminRoom` and `sim/auto/AdminView.ts`. `onAuth` runs for create and every join: no config, a wrong build
+  or a token that does not verify (absent, forged, expired, off the allowlist) all throw the generic join error.
+  `onJoin` gives no seat and `client.view = createAdminView(room)`; the view holds every `Player` with the `presence`
+  and `priv` tags and every avatar with the `ghost` tag, topped up by `reconcileAdminView` on the shared 5 Hz pass. A
+  second client is refused; a leave or a drop disposes the room (no reconnection window). `isAdminClient` reads a
+  per-room mark that only `AdminRoom` sets, so it is false in every `party` room without `Visibility.ts` importing the
+  room. `adminRoom.test.ts` (8) and the gate test in `adminAuth.test.ts` (2) are one file each because a second
+  `boot` in one process resets its first request (UND_ERR_SOCKET).
 
 ### Round 6 log: 6D (admin client)
 
