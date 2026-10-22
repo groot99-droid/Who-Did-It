@@ -103,7 +103,7 @@ export function handleTaskHold(room: PartyRoom, sessionId: string, taskId: strin
     return;
   }
   // The puzzle is the seat's own business: a stream keyed by seat, shared with nothing public (`sim/seeds.ts`).
-  const rng = room.seeds.get('contract', `minigame:${sessionId}`);
+  const rng = room.seeds.get('minigame', sessionId);
   const puzzle = generateMinigame(def.kind, def.difficulty, rng, basesFromOnub());
   openOf(room).set(sessionId, { taskId, puzzle, startTick: room.state.tick });
   room.clients

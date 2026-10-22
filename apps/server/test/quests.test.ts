@@ -1,6 +1,7 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { quests } from '@wdi/content';
+import { resetToLobby } from '../src/sim/Win';
 import { ErrorCode, ItemStack, Phase, type PlayerState } from '@wdi/shared';
 import {
   advance,
@@ -182,8 +183,7 @@ describe('quest progress and turn-in', () => {
     const { party, h, me } = await world();
     stand(party, h, PELL);
     await say(party, h, 'quest.accept', 'caulkTheSkiff');
-    party.room.state.phase = Phase.lobby;
-    advance(party, 2);
+    resetToLobby(party.room);
     expect(me.priv.quests).toHaveLength(0);
   });
 });

@@ -1,5 +1,5 @@
 import { balance, quests, scenes } from '@wdi/content';
-import { ErrorCode, Phase, QuestState, TILE_PX, type PlayerState } from '@wdi/shared';
+import { ErrorCode, QuestState, TILE_PX, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { count, exchange } from './Inventory';
 import { type PlayerSim, simOf } from './RoomSim';
@@ -66,19 +66,11 @@ function questFor(room: PartyRoom, sessionId: string, payload: Record<string, un
   return { player, quest };
 }
 
-/** A new match starts clean: the lobby and the role card hold no quest (the reset in `Win.ts` is not ours to edit). */
-const BEFORE_PLAY: ReadonlySet<number> = new Set([Phase.lobby, Phase.roleReveal]);
-
 /** Step stage after `runMobs` (locked call site in `sim/Step.ts`): progress follows the inventory. */
 export function runQuests(room: PartyRoom): void {
-  const clear = BEFORE_PLAY.has(room.state.phase);
   for (const player of room.state.players.values()) {
     const list = player.priv?.quests;
     if (!list || list.length === 0) continue;
-    if (clear) {
-      list.clear();
-      continue;
-    }
     for (const s of list) {
       if (s.done) continue;
       const { have, total } = wantProgress(player, s.id);

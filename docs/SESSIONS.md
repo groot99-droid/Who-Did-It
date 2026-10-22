@@ -2767,10 +2767,7 @@ session's goes back to it. Log under "Integration log, round 6".
   `sim/Hold.ts`, `test/minigames.test.ts`, the GDD 3.16 (6H) sentences and DECISIONS A90. The branch rule of this round
   allows one branch, so the steps are commits of one PR rather than three.
 - **Contract requests (for the orchestrator)**: (a) done: 6F's `sim/Inventory.ts` landed (#61); the stand-in is deleted and
-  the quest turn-in is one `exchange`. (b) A `minigame` name
-  in `StreamName` (`sim/seeds.ts`, locked): until then the puzzle draws from `seeds.get('contract', 'minigame:<seat>')`.
-  (c) `priv.quests.clear()` in the reset of `Win.ts`: until then `runQuests` clears quests in the lobby and role-card
-  phases. (d) The `task` branch of `handleHold` is in `sim/Hold.ts` (the brief says `Actions.ts`, which only dispatches
+  the quest turn-in is one `exchange`. (b) done: the `minigame` stream (#65) is in use, `seeds.get('minigame', seat)`. (c) done: `Win.ts` clears `priv.quests` in the reset and `runQuests` no longer clears in the lobby. (d) The `task` branch of `handleHold` is in `sim/Hold.ts` (the brief says `Actions.ts`, which only dispatches
   to it); six lines, a call into `Minigames.ts`.
 - **Gap found, for the orchestrator and the owner**: the base has no main-mode task layer. Nothing assigns
   `Private.tasks` (the `tasksEach` rows of `balance.json` are read by no code), nothing picks a deliverable up at its
