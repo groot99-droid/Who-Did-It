@@ -75,7 +75,10 @@ round-8 content (BlackPine ships a two-step camera pan with no narrator in round
 - **`client/view/LoadingScreen.ts`** (pre-seeded no-op, 6K fills): a DOM overlay with a progress bar bound to
   `Phaser.Loader.Events.PROGRESS`, shown only once a load has run past 300 ms, with a tip every 4 s from
   `client/ui/copy/tips.ts` (no role tells: tips describe controls and the world, never a role's powers).
-  Mounted in `Preload.ts` (pre-seeded line) and in the match preloads (the map's manifests on Start).
+  Mounted in `Preload.ts` (pre-seeded line) and in the match preloads (the map's manifests on Start). On a match
+  load it asks `MusicBus` for the map's `loading` class (`music.json`; the owner's per-map speech-and-music pieces,
+  `media.md` 1 and 4), which keeps playing under the opening cutscene until the first `phaseChange` picks `day`;
+  the load never waits for the piece.
 - **`client/view/Transition.ts`** (pre-seeded no-op, 6K fills): a full-screen DOM layer with `fade`, `iris`
   and `wipe`; `transition(kind, ms, then)` runs `then` on `transitionend` or a timeout fallback, synchronously
   when `ms` is 0 (the pre-seeded value, and every duration under `prefers-reduced-motion`), so the router's
@@ -99,7 +102,7 @@ round-8 content (BlackPine ships a two-step camera pan with no narrator in round
   shuffle }] }`. A track with `map` counts against that map's 4 MB; a track without one counts against every
   map it is listed under.
 - **`packages/content/data/music.json`** (pre-seeded empty, zod `schemas/music.ts`): `byMap[map][class]` ->
-  playlist id, classes `lobby | day | dusk | night | meeting | finalNight | gameOver`, plus `onub: { kitchen,
+  playlist id, classes `loading | lobby | day | dusk | night | meeting | finalNight | gameOver`, plus `onub: { kitchen,
   night, rush, over }`. The validator checks every playlist id exists in the manifest shape (a test over the
   committed manifest). Numbers (`crossfadeS`, `gain`) live in the manifest, the mapping in content.
 - **`client/view/MusicBus.ts`** (pre-seeded no-op, 6L fills): two `<audio>` elements, `crossfadeTo(playlistId)`,

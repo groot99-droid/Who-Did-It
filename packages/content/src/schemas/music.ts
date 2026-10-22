@@ -8,7 +8,20 @@ import { GddRef, WorldId } from './common.js';
 /** A playlist id of `apps/client/public/assets/audio/music/manifest.json`. */
 const PlaylistId = z.string().regex(/^[a-z][a-z0-9_]*$/);
 
-export const MUSIC_CLASSES = ['lobby', 'day', 'dusk', 'night', 'meeting', 'finalNight', 'gameOver'] as const;
+/**
+ * `loading` is the map's loading-screen piece (the owner's speech-and-music pieces, docs/round6/media.md 1): it starts
+ * with the map's load and runs under the opening until the first phase class takes over (cutscene-music.md 2, 3).
+ */
+export const MUSIC_CLASSES = [
+  'loading',
+  'lobby',
+  'day',
+  'dusk',
+  'night',
+  'meeting',
+  'finalNight',
+  'gameOver',
+] as const;
 export const MusicClass = z.enum(MUSIC_CLASSES);
 export type MusicClass = z.infer<typeof MusicClass>;
 

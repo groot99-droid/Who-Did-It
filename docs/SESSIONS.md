@@ -2616,7 +2616,7 @@ never edits `catalog.json` by hand; asks before `--replace`. **PRs**: ROSW: (1) 
 ingest; (2) the video runs; here: (1) the SFX, stingers and ambiences with their rows; (2) the music with its
 rows; (3) the two videos and the poster with their rows. **Tests**: `media.test.ts` passes with every file in
 place; the library's own tests and `verify` after the ingest. **Not**: any `.ts`, any JSON under `packages/`,
-`music-cue`. Needs the owner's answers of `media.md` 6 (the release tag above all) and the manifest shapes of
+`music-cue`. Needs the `sfx-2026-10` release of ROSW published with the two zips (`media.md` 1 and 6) and the manifest shapes of
 6K and 6L. Before code,
 `seams.md`; log under "Round 6 log: 6N".
 
@@ -2653,6 +2653,12 @@ session's goes back to it. Log under "Integration log, round 6".
   section 4, provenance rows in 7), `music-cue` leaves round 6, the 6L and 6N briefs, DECISIONS A81, ROADMAP
   M5c, `CLAUDE.md`, ASSETS 6.10 and the MANIFEST header follow, and the ROSW branch merges main and points the
   `sound-library` skill at `media.md`.
+- **The owner's answers (2026-10-22, later).** Flow Music (model Lyria 3 Pro) made the three OuterSkylight
+  tracks; `Trailer_Audio` is the start screen's trailer and credits piece; `HollowMere_`, `Port_Au_Levain` and
+  `My_Song` (renamed `BlackPine`) are the three maps' loading-screen speech pieces, so `music.json` gains the
+  class `loading` (`schemas/music.ts`, `cutscene-music.md` 2 and 3, `media.md` 4). 6Z zipped the eleven files as
+  the two batches of `media.md` 1 and handed them back; the owner publishes the `sfx-2026-10` release (none exists
+  yet). The admin gate keeps no password (`auto-admin.md` 7).
 - **For the sessions**: `adminConfig` returns null and `AdminRoom` is unregistered, so no admin surface exists until
   6C; the quest and mini-game commands and the gather and craft holds refuse 422 until 6F and 6H; the Step stages
   `runAuto`, `runResources`, `runMobs`, `runQuests` and `runEvents` are no-ops; every new content record is

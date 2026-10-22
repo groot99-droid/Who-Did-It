@@ -184,7 +184,10 @@ export const TOKEN_TTL_S = 3600;
 | `WDI_ADMIN_SECRET` | the HMAC key for the state and the token, 32 random bytes in base64 |
 | `WDI_ADMIN_CLIENT_URL` | where the callback sends the browser (`https://groot99-droid.github.io/Who-Did-It/`) |
 
-`TOKEN_TTL_S` is an ops constant, not a game number (ARCHITECTURE 5.11). **Registration gate** (`server.ts`,
+There is **no password** anywhere in the gate: the owner signs in to GitHub, GitHub says who they are, and the
+allowlist (`groot99-droid`) decides. `WDI_ADMIN_SECRET` is generated on the owner's machine (`openssl rand -base64
+32`) and pasted into Railway; a phrase a person chose is not a key, and no variable's value is ever written into a
+file of either repo or into a PR. `TOKEN_TTL_S` is an ops constant, not a game number (ARCHITECTURE 5.11). **Registration gate** (`server.ts`,
 pre-seeded block): the `admin` room and the routes exist only when `adminConfig()` is non-null;
 `AdminRoom.onAuth` throws the generic join error otherwise, and the error text never says why.
 
