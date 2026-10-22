@@ -12,6 +12,10 @@ import type { OnubRolesFile } from './schemas/onubRoles.js';
 import type { PaletteFile } from './schemas/palette.js';
 import type { RolesFile } from './schemas/roles.js';
 import { RoutineWorldPhase, type RoutinesFile } from './schemas/routines.js';
+import type { CutscenesFile } from './schemas/cutscenes.js';
+import type { MusicFile } from './schemas/music.js';
+import type { MinigamesFile, MobsFile, QuestsFile, RecipesFile, ResourcesFile } from './schemas/m5b.js';
+import type { EventsFile, EvolutionsFile, LawsFile, VendettasFile } from './schemas/bible.js';
 import type { Scene, SceneId } from './schemas/scene.js';
 import type { StyleFile } from './schemas/style.js';
 import type { TasksFile } from './schemas/tasks.js';
@@ -36,6 +40,18 @@ export interface Content {
   onubBalance: OnubBalanceFile;
   looks: LooksFile;
   routines: RoutinesFile;
+  // Round 6 (docs/round6/seams.md 1.2), empty until their sessions fill them.
+  cutscenes: CutscenesFile;
+  music: MusicFile;
+  resources: ResourcesFile;
+  recipes: RecipesFile;
+  mobs: MobsFile;
+  quests: QuestsFile;
+  minigames: MinigamesFile;
+  vendettas: VendettasFile;
+  evolutions: EvolutionsFile;
+  laws: LawsFile;
+  events: EventsFile;
 }
 
 const maxProfile = (a: Profile, b: Profile): Profile => (PROFILE_RANK[a] >= PROFILE_RANK[b] ? a : b);
@@ -224,7 +240,38 @@ export function validateContent(c: Content): string[] {
   // NPC routines (GDD 3.12): the stations by prop kind and the npc spans.
   checkRoutines(c, err);
 
+  // Round 6 (GDD 3.14 to 3.16, 3.18): the M5b cross-references, the cutscene index and the music mapping.
+  checkM5b(c, err);
+
   return errors;
+}
+
+/**
+ * Round 6 (docs/round6/m5b-data.md 1, cutscene-music.md 1.1 and 3). Session 6E fills the M5b checks: every
+ * `scene.nodes[].resource` names a resource, every `spawners[].mob` a mob, every `givers[].npc` a quest npc; a
+ * recipe's `out`, `in[].item` and a resource's `tool` are items; a recipe's `station` is a `routines.json` prop
+ * kind; a quest's `giver` is an npc and its items exist; a mini-game's `task` is a task. Session 6J adds: every
+ * index entry of `cutscenes` names a cutscene of the right kind, every `openings` key a map. Session 6L adds: every
+ * `music.byMap` key is a map (the playlist ids are checked against the client manifest by a client test). Until
+ * then every record is empty and there is nothing to check.
+ */
+function checkM5b(c: Content, err: (msg: string) => void): void {
+  const { resources, recipes, mobs, quests, minigames, cutscenes } = c;
+  keyedById('resources.json', resources.resources, [] as string[]);
+  keyedById('recipes.json', recipes.recipes, [] as string[]);
+  for (const [file, map] of [
+    ['resources.json', resources.resources],
+    ['recipes.json', recipes.recipes],
+    ['mobs.json', mobs.mobs],
+    ['quests.json', quests.quests],
+    ['quests.json npcs', quests.npcs],
+    ['minigames.json', minigames.minigames],
+    ['cutscenes.json', cutscenes.cutscenes],
+  ] as const) {
+    for (const [key, record] of Object.entries(map)) {
+      if (key !== record.id) err(`${file}: key "${key}" holds record with id "${record.id}"`);
+    }
+  }
 }
 
 const NIGHT_PHASES: ReadonlySet<string> = new Set(['dusk', 'night', 'finalNight']);

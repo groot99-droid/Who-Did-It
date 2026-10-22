@@ -21,6 +21,7 @@
     "revealS": 8,
     "immunityS": 15,
     "gameOverS": 20,
+    "openingS": 0,
     "gddRef": "3.3"
   },
   "byCount": {
@@ -139,7 +140,13 @@
     "gddRef": "3.6"
   },
   "movement": { "walkTilesPerS": 3, "runTilesPerS": 4.5, "sneakFactor": 0.6, "gddRef": "3.7" },
-  "vision": { "dayTiles": 7, "nightTiles": 3.5, "childDeltaTiles": -1, "gddRef": "3.7" },
+  "vision": {
+    "dayTiles": 7,
+    "nightTiles": 3.5,
+    "childDeltaTiles": -1,
+    "lanternTiles": 0,
+    "gddRef": "3.7"
+  },
   "noise": {
     "walk": 2,
     "run": 6,
@@ -216,8 +223,13 @@
     "vote": { "windowFrac": { "min": 0.3, "max": 0.9 } },
     "ready": { "delayS": { "min": 2, "max": 9 } },
     "nightPower": { "windowFrac": { "min": 0.1, "max": 0.8 }, "lastShotS": { "min": 2, "max": 8 } },
+    "stuckInvariantS": 20,
     "gddRef": "3.12"
   },
+  "resources": { "poolActiveFrac": 0.5, "gatherHoldS": 2, "gddRef": "3.14" },
+  "mobs": { "maxPerScene": 3, "chaseS": 6, "gddRef": "3.15" },
+  "quests": { "maxActive": 2, "gddRef": "3.16" },
+  "ui": { "transitionS": { "fade": 0, "iris": 0, "wipe": 0 }, "gddRef": "3.13" },
   "ghosts": { "wispsPerCycle": 1, "gddRef": "3.7" },
   "chat": {
     "maxChars": 200,
