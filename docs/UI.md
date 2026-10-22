@@ -1212,3 +1212,39 @@ Lines are in `apps/client/src/ui/copy/tips.ts` (`LOADING_COPY`, `TIPS`); the sec
 | `loading.progress` | Loading | the progress bar's accessible name |
 
 Tips are ten short lines about the controls and the world (hold E on a clue, Tab for the role card, Shift to sneak, locked doors, the Bell, dark places, meetings, clues in pairs, woods and caves); none names a role or what it can do. `data-testid`s: `loading` (the screen, hidden until the load passes `ui.loading.showAfterS`), `transition` (the cover layer), `landing-trailer` (the video's slot; the `<video>` inside it is `muted loop playsinline autoplay preload="none"` with the poster `landing_loop.jpg`, and the slot stays hidden until the poster or a frame arrives). The trailer is skipped under reduced motion, the data saver and `?video=0`.
+
+### 14.23 Admin page (6D)
+
+Session 6D, round 6 (DECISIONS A86; `docs/round6/auto-admin.md` 8). The owner's admin page at `#/admin`, module
+`ui/copy/admin.ts`, panels in `client/admin/`. The brief reserved 14.18 for it, but 14.18 is the art-style switch
+(5N), so the page takes the next free number. DOM only over the Phaser grid, in the "Round 6 (6D)" block of
+`components.css`; every control is at least `--wdi-touch` high and a keyboard reaches all of them.
+
+- **Signed out.** A panel (`admin-signin-panel`) with `admin.signin.lead` and one button, `admin-signin`
+  (`admin.signin.button`), that goes to the server's `/auth/github/login`. A refused join clears the stored token and
+  shows `admin.signin.failed` (`role="alert"`, `admin-signin-error`).
+- **Controls** (`admin-controls`, top). Speed 1x/2x/5x/10x (`admin-scale-<n>`, `aria-pressed` on the current one), Pause or
+  Resume (`admin-pause`), a tick count and Step (`admin-step-count`, `admin-step`), Start (`admin-start`: sends
+  `admin.setup` then `admin.start`), Reset (`admin-reset`: sends `admin.reset` and clears the log), Sign out
+  (`admin-signout`) and the status line (`admin-status`, `role="status"`, `admin.status` or `admin.status.paused`). A
+  details block `admin-setup` holds the map, mode, difficulty, seats (4 to 10), the deck as role ids and the seed
+  words, one stream per line (`world 1 2 3 4`); a bad line shows `admin.seeds.invalid` (`admin-seeds-error`).
+- **Viewports.** Up to six scenes at once on the 1280x720 canvas (1, 2, 4 or 6 cells; six are 426x360), each captioned with
+  its scene id; each seat is labelled name, true role and, for a cover, the look it wears. A click on a seat selects it.
+- **Inspector** (`admin-inspector`, right). A button per seat (`admin-seat-<id>`), then role, cover, scene, position,
+  state, brain, inventory and notebook (`admin-detail-<label>`); Follow seat (`admin-follow`) collapses the grid to that
+  seat's scene and the same button shows the grid again; the scenes that did not fit queue as `admin-queue-<scene>`
+  buttons that swap in. Inventory and notebook read `admin.inspector.unreported` until the snapshot carries them.
+- **Log** (`admin-log`, bottom). Invariant failures first as red rows (`admin-log-failure`, `role="alert"`) that stay
+  until Reset, then the events newest first (`admin-log-event`), 200 at most.
+
+| Id | Text |
+|---|---|
+| `admin.signin.button` | Sign in with GitHub |
+| `admin.start` / `admin.reset` | Start / Reset |
+| `admin.status` | Tick {tick}, phase {phase}, speed {effective}x |
+| `admin.status.paused` | Tick {tick}, phase {phase}, paused |
+| `admin.inspector.cover.worn` | wears the look of {look} |
+| `admin.log.invariant` | Invariant {name} failed at tick {tick}: {detail} |
+
+The full list is `ui/copy/admin.ts`.

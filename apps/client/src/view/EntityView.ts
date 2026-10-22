@@ -30,6 +30,8 @@ interface Tracked {
 export class EntityView {
   private readonly tracked = new Map<string, Tracked>();
   private ghost = false;
+  /** How far in the past other figures are drawn; the admin views shrink it with the sim speed (`remoteDelayMs`). */
+  private delayMs = REMOTE_DELAY_MS;
   private readonly off: Array<() => void> = [];
 
   /**
@@ -41,6 +43,8 @@ export class EntityView {
     private readonly selfId: string,
     private readonly source: () => AvatarSource | undefined = () =>
       scene.registry?.get(REG_WORLD) as WorldFeed | undefined,
+    /** Round 6 (6D): the admin views replace a figure's nameplate text; undefined keeps the roster name. */
+    private readonly label?: (handle: string) => string | undefined,
   ) {
     const bus = source()?.bus;
     if (bus) {
@@ -62,6 +66,11 @@ export class EntityView {
   /** Draws the viewer's own sprite translucent once they are a ghost, and shows true names over borrowed faces. */
   setGhost(on: boolean): void {
     this.ghost = on;
+  }
+
+  /** Sets the interpolation delay of other figures in ms. */
+  setDelayMs(ms: number): void {
+    this.delayMs = ms;
   }
 
   /** The puff of a disguise a strike dropped (`vfx_disguise`, or a plain ring until the art exists). */
@@ -113,7 +122,8 @@ export class EntityView {
       present.add(a.handle);
       const true_ = this.ghost && a.seat !== undefined ? roster.get(a.seat) : undefined;
       const masked = true_ !== undefined && a.seat !== a.lookOf;
-      const name = true_ ? `${masked ? `${MASK_GLYPH} ` : ''}${true_.name}` : shown.name;
+      const name =
+        this.label?.(a.handle) ?? (true_ ? `${masked ? `${MASK_GLYPH} ` : ''}${true_.name}` : shown.name);
       const look = {
         height: a.height,
         scarf: shown.traits.scarf,
@@ -125,7 +135,7 @@ export class EntityView {
       const near = selfPr !== null && Math.hypot(a.x - selfPr.x, a.y - selfPr.y) <= BLOOD_SIGHT_PX;
       t.view.setBlood(bloody && near);
       t.view.setGhost((a.statusBits & StatusBit.ghost) !== 0);
-      this.pose(t, a, now, REMOTE_DELAY_MS);
+      this.pose(t, a, now, this.delayMs);
     }
 
     for (const [id, t] of this.tracked) {

@@ -2616,9 +2616,9 @@ never edits `catalog.json` by hand; asks before `--replace`. **PRs**: ROSW: (1) 
 ingest; (2) the video runs; here: (1) the SFX, stingers and ambiences with their rows; (2) the music with its
 rows; (3) the two videos and the poster with their rows. **Tests**: `media.test.ts` passes with every file in
 place; the library's own tests and `verify` after the ingest. **Not**: any `.ts`, any JSON under `packages/`,
-`music-cue`. Needs the `sfx-2026-10` release of ROSW published with the two zips (`media.md` 1 and 6) and the manifest shapes of
-6K and 6L. Before code,
-`seams.md`; log under "Round 6 log: 6N".
+`music-cue`. Needs the `SFX_2026_01` release of ROSW (the library zips are on it; the owner's two zips of
+`media.md` 1 and 6 still to attach) and the manifest shapes of 6K and 6L. Before code, `seams.md`; log under
+"Round 6 log: 6N".
 
 **6P. Integration.** Merge in the order above, regenerate `PROTOCOL.md` and the lockfile, run the 50-match
 `pnpm auto` soak on both maps, both modes and every difficulty, the two 30-minute soaks and the opt-in e2e
@@ -2713,7 +2713,49 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6C (GitHub auth and AdminRoom)
 
+- PR 1 (`claude/r6-admin-server`): `services/adminAuth.ts` filled and pure. `adminConfig` is null unless `WDI_ADMIN=1`
+  and all five variables are set, the key is at least 32 characters and the client URL is http(s). The state and the
+  token are HMAC-SHA256 under the one key with a purpose prefix, so neither verifies as the other; `verifyAdminToken`
+  checks the allowlist again, so dropping a login from the variable locks it out within the token's life. Every
+  callback failure answers the same 403, and the callback is rate limited globally (20 burst) before it spends a
+  GitHub call. `adminAuth.test.ts`: 17 tests with a fake `fetch` and a fake `now`.
+- PR 2: `AdminRoom` and `sim/auto/AdminView.ts`. `onAuth` runs for create and every join: no config, a wrong build
+  or a token that does not verify (absent, forged, expired, off the allowlist) all throw the generic join error.
+  `onJoin` gives no seat and `client.view = createAdminView(room)`; the view holds every `Player` with the `presence`
+  and `priv` tags and every avatar with the `ghost` tag, topped up by `reconcileAdminView` on the shared 5 Hz pass. A
+  second client is refused; a leave or a drop disposes the room (no reconnection window). `isAdminClient` reads a
+  per-room mark that only `AdminRoom` sets, so it is false in every `party` room without `Visibility.ts` importing the
+  room. `adminRoom.test.ts` (8) and the gate test in `adminAuth.test.ts` (2) are one file each because a second
+  `boot` in one process resets its first request (UND_ERR_SOCKET).
+- PR 3: `rooms/handlers/admin.ts`, the per-tick feed in `sim/auto/AdminView.ts` and the docs. The four handlers
+  validate and push `setup`, `start`, `reset` and `clock` onto `autoOf(room).commands` (32 at most), refusing a bad
+  payload with a 422 and no change. `AdminRoom.setFixedTimestep` wraps the room's step: after it, `publishAdmin` sends the new invariant failures, the tick's events and `admin.snapshot`. The snapshot
+  reads the clock through `AdminView.ts` (inside `sim/auto/`, where `auto.test.ts` allows `clockOf(`). `coverOf` is
+  the card's own look, set only for a cover role whose public look differs. Failures are kept (200 at most) until
+  Reset. Docs: ARCHITECTURE 5.11, the README Railway notes, DECISIONS A85. Tests: 6 wire tests in
+  `adminRoom.test.ts`, one a todo (see the contract request below). Mutation check: without the drain step in
+  `stepsThisTick` the paused-Start test fails.
+- **Contract request to 6A** (also in the PR description): `stepsThisTick` returns 0 for a paused clock with no
+  `pendingSteps`, and `PartyRoom` then skips `step`, so `runAuto` never drains `autoOf(room).commands` while paused.
+  After `admin.reset` (which pauses) the next `start`, and the `paused: false` that would follow it, would wait for ever.
+  Answered by 6Z (6A is archived): `stepsThisTick(clock, lastTickMs, queuedCommands)` returns 1 for a paused clock with
+  queued commands and none pending (`PartyRoom` passes `autoOf(this).commands.length`); test in `auto.test.ts`; the
+  local stand-in `grantDrainStep` is gone. The admin feed subscribes per kind (`ADMIN_EVENT_KINDS`: kill death clue meeting vote eject phase start end; 6Z
+  declined the `ANY_SIM` switch) and forwards them as `admin.event`; the test in `adminRoom.test.ts` emits one and reads it on the wire.
+
 ### Round 6 log: 6D (admin client)
+
+- **Branch `claude/r6-admin-client`, draft PR #66 (2026-10-22)**: (1) the route, scene, sign-in, controls and
+  `mockAdmin.ts`; (2)-(3) the viewport grid with `AdminSceneView`, the label of `EntityView`, the seat inspector, the log
+  pane, `e2e/admin.spec.ts` and UI.md 14.23 as one commit; (4) `AdminNet.ts` on the live room (6C had merged, so
+  `connectAdmin` is written and unit-tested against a fake client with the wire of `protocol/admin.ts`; the live e2e
+  case is opt-in, `WDI_E2E_ADMIN=1` with `WDI_E2E_ADMIN_TOKEN`).
+- **Contract requests**: `readFlags` (`flags/index.ts`) read `route[0]` with its query (`admin?token=...`), so the GitHub
+  callback never started the Admin scene; 6Z granted the one-line edit and 6D made it (with a flags test and the e2e case);
+  UI.md 14.18 was already the art-style switch,
+  so the admin page is 14.23; `AdminSeat` carries no inventory or notebook (open item for round 7: the snapshot is 6C's).
+- **Tests**: `admin/*.test.ts` (model, token capture, the connect wire, controls, panels, the viewport maths), `EntityView`
+  label, `remoteDelayMs`; `e2e/admin.spec.ts` on the mock (8 pass, 1 skipped: the live case is opt-in). The e2e build needs `pnpm --filter @wdi/content build` first in a fresh checkout.
 
 ### Round 6 log: 6E (M5b content and GDD 3.14-3.16)
 
@@ -2902,6 +2944,16 @@ pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock 
 
 ### Round 6 log: 6N (ROSW media)
 
+- **Step 1 (2026-10-22): the library sounds.** From ROSW `SFX_2026_01` (the owner's tag; `media.md` still says
+  `sfx-2026-10`, which 6Z corrects), fetched by id with `library.py fetch` (seven zips) and mastered as `media.md` 1:
+  the five `sting_*` files, `narr_bed_hollowmere`, `amb_forest` and `amb_cave` (replacing 5K's CC0 loops), and the
+  music beds `bed_heartbeat`, `bed_tick` and `bed_tense` in the `*_meeting`, `*_finalnight`, `*_night` and
+  `onub_night` playlists. Rows in both manifests, `CREDITS.md` (the two replaced CC0 rows removed) and
+  `assets/source/MANIFEST.md`; the picks and the reasons in DECISIONS A96. `media.test.ts` green. No `.ts`, nothing
+  under `packages/`.
+- **Waiting**: the owner's `Who_Did_It_Music_Pt1.zip` and `Who_Did_It_SFX_Pt1.zip` on the release (step 2: the ROSW
+  ingest, the owner's tracks and `train_arrive`, `train_brake`, `ferry_horn`, `crows`); the videos (step 3).
+
 ## Integration log, round 6
 
 - **NPC test flake, R18 (2026-10-22).** On PR #47's CI run 252 (head ac0409c) `npcRoutine.test.ts` R18 failed
@@ -2955,3 +3007,12 @@ pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock 
   are inert in a live match until an assignment session lands; ROADMAP M5b does not count station tasks as playable
   before that. 6H switches its puzzle draw from the keyed `contract` stand-in to `seeds.get('minigame', seat)` and
   drops its lobby clear once this merges.
+
+- **6Z after the first wave (2026-10-22, 22:40 UTC).** Every session PR of the first wave is in: #63 (6B), #61
+  (6F), #65 (6Z), #64 (the onub wire waits, an owner fix), #60 (6H) and #58 (6C), each merged with a merge commit
+  once both CI runs on its head were green; 6D (#66) and 6I (#67) are open. ROSW: the sound library is on the
+  release `SFX_2026_01` (16 zips, 2,648 sounds) and ROSW #13 points `catalog.json` at it; the owner's two zips of
+  `media.md` 1 are not on it yet, so `media.md` 1 and 6 and the 6N brief now name that tag and that gap, and 6N
+  starts with the library part. Contract answers: 6D edits `flags/index.ts` (`admin: route[0]?.split('?')[0]
+  === 'admin'`) in #66; 6I adds the four `WorldFeed` members, the M5b layer and E routing in `World.ts`, and
+  `answer()` on the four ONUB widgets in #67, so no stand-in lands; 6C kept the per-kind admin feed.

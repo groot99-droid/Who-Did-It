@@ -48,12 +48,13 @@ function record(clock: SimClock, steps: number): number {
 /**
  * How many steps this tick runs: `scale` plus the carry, capped so `lastTickMs * steps` stays under
  * `MAX_SIM_MS_PER_TICK` (at least one step, so a slow sim crawls rather than stalls); the remainder goes back to
- * the carry, so nothing is skipped. Paused returns only the pending single steps, and clears them. At 1x it returns
- * 1 and never touches the carry.
+ * the carry, so nothing is skipped. Paused returns only the pending single steps, and clears them; with none
+ * pending but `queuedCommands` waiting it returns 1, so a queued Start, Reset or Resume drains (the step is what
+ * consumes the queue). At 1x it returns 1 and never touches the carry.
  */
-export function stepsThisTick(clock: SimClock, lastTickMs: number): number {
+export function stepsThisTick(clock: SimClock, lastTickMs: number, queuedCommands = 0): number {
   if (clock.paused) {
-    const n = clock.pendingSteps;
+    const n = clock.pendingSteps > 0 ? clock.pendingSteps : queuedCommands > 0 ? 1 : 0;
     clock.pendingSteps = 0;
     return record(clock, n);
   }

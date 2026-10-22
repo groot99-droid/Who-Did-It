@@ -18,11 +18,11 @@ Eleven files, 27 MB raw, uploaded into the planning session. On 2026-10-22 6Z zi
 `Who_Did_It_Music_Pt1.zip` (22.4 MB, sha256 `77d54dfc4eb490d67549eb03949d075be29c61df796dd17b0315ba1f2d8779b7`)
 and `Who_Did_It_SFX_Pt1.zip` (4.1 MB, sha256 `c77e46b1e368eae62bc18b6ade581f679755114741c5337dc55ed8456e5195a3`),
 with `My_Song.m4a` renamed `BlackPine.m4a` at the owner's word, and handed both back to the owner, **who attaches
-them to the `sfx-2026-10` release of ROSW** (section 6). No release of that repo exists yet (checked 2026-10-22),
-so the 2,648 sounds the catalog already records under that tag cannot be fetched by a cloud session either until
-the owner publishes it with their own category zips attached. 6N then ingests the two batches with the
-`sound-library` skill (`python -I sound-library/library.py ingest --from-release sfx-2026-10`, then `verify`, the
-library tests and `status`) and commits `sound-library/catalog.json` in its ROSW PR. A dry ingest of the two zips
+them to the `SFX_2026_01` release of ROSW** (section 6). That release went up on 2026-10-22 with the 2,648 library
+sounds as 16 zips (`Sounds_B01` to `Sounds_B15` and `Sounds_12`), and ROSW #13 pointed the catalog at it; the two
+zips above are not on it yet (checked 22:40 UTC). Once they are, 6N ingests them with the `sound-library` skill
+(`python -I sound-library/library.py ingest --from-release SFX_2026_01`, then `verify`, the library tests and
+`status`) and commits `sound-library/catalog.json` in its ROSW PR. A dry ingest of the two zips
 against a copy of the catalog gave `11 new, 0 already there, 0 replaced, 0 refused` and the ids below (the zip's
 name gives the category, the file's name the id; the names stay the owner's); the library reads no duration from
 an MP3 (shown `?`), which changes nothing, since 6N measures with ffprobe. Nobody has listened to the files yet;
@@ -147,10 +147,10 @@ Answered: (1) the three OuterSkylight tracks were generated with **Flow Music, m
 credits piece and the other Port-au-Levain's loading-screen piece; (3) `My_Song.m4a` is BlackPine's
 loading-screen piece and is renamed `BlackPine.m4a`. Still open:
 
-1. **Publish the `sfx-2026-10` release of ROSW** (GitHub, Releases, Draft a new release, tag `sfx-2026-10`,
-   Publish) **with the two zips 6Z handed back** (hashes in section 1) and the owner's own category zips the
-   catalog already records under that tag, then tell 6N it is up. Until then nothing in the library can be
-   fetched from a cloud session.
+1. **Attach the two zips 6Z handed back** (hashes in section 1) **to the `SFX_2026_01` release of ROSW**, the
+   tag the owner chose instead of `sfx-2026-10`; the 16 library zips are on it since 2026-10-22 and the catalog
+   names it since ROSW #13, so the library sounds can be fetched from a cloud session now. The owner's own tracks
+   cannot until the two zips are up; then tell 6N.
 2. The GitHub OAuth app and the Railway variables of `auto-admin.md` 7. The gate has **no password**: the owner
    signs in to GitHub, GitHub says who they are, and `WDI_ADMIN_GITHUB_LOGINS=groot99-droid` lets them in;
    `WDI_ADMIN_SECRET` is generated (`openssl rand -base64 32`) and pasted into Railway, never a phrase anyone

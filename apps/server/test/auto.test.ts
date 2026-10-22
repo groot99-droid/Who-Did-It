@@ -77,6 +77,15 @@ describe('the sim clock (GDD 3.19)', () => {
     expect(c.carry).toBe(0);
   });
 
+  it('runs one step while paused when commands are queued and none is pending', () => {
+    const c = clock({ scale: 10, paused: true });
+    expect(stepsThisTick(c, 1, 0)).toBe(0);
+    expect(stepsThisTick(c, 1, 2)).toBe(1);
+    expect(c.paused).toBe(true);
+    c.pendingSteps = 3;
+    expect(stepsThisTick(c, 1, 2)).toBe(3);
+  });
+
   it('is written only under sim/auto/: everything else only reads it through stepsThisTick', () => {
     const files: string[] = [];
     const walk = (dir: string) => {

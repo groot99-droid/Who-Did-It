@@ -10,6 +10,7 @@ export { ART_STYLE_COPY, styleName } from './artStyle';
 export { LOOKS_COPY } from './looks';
 export { CUTSCENE_COPY, cutsceneLine } from './cutscenes';
 export { SETTINGS_COPY } from './settings';
+export { ADMIN_COPY } from './admin';
 
 /** Replaces `{key}` placeholders; a missing key is left as is so the gap shows in a test. */
 export function fill(line: string, values: Record<string, string | number>): string {
