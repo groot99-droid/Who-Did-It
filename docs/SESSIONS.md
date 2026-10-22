@@ -2688,6 +2688,13 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6L (music)
 
+- **PR 1 (2026-10-22): bus, settings, panel.** `view/audioSettings.ts` (`wdi:audio`, a subscribe so a slider moves
+  what is already playing), `view/MusicBus.ts` (two elements, lazy `src`, `crossfadeTo`/`prefetch`/`setVolume`/
+  `setMuted`, a manifest parser; its timing is a `tick(dtMs)` the tests drive), `AudioBus.setSfxVolume` and the
+  `narr_bed_hollowmere` and `sting_*` keys, `ui/SettingsPanel.ts` with `ui/copy/settings.ts`, the "Round 6 (6L)" CSS
+  block, UI.md 14.22, and the empty `audio/music/manifest.json` shape. The sound library's release is not up, so no
+  bed is fetched yet. The `narr_*` and `sting_*` keys are the ones `media.md` 4 names; 6N adds the files and rows.
+
 ### Round 6 log: 6M (M5b art)
 
 ### Round 6 log: 6N (ROSW media)
