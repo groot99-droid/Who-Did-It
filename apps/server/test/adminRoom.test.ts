@@ -7,6 +7,7 @@ import {
   type GameStateType,
   Phase,
   type SceneStateType,
+  type AdminS2CPayloads,
 } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AdminRoom } from '../src/rooms/AdminRoom';
@@ -17,6 +18,7 @@ import { simOf } from '../src/sim/RoomSim';
 import { autoOf } from '../src/sim/auto/Auto';
 import { clockOf } from '../src/sim/auto/clock';
 import { until } from './flowHelpers';
+import { registerInvariant } from '../src/sim/auto/invariants';
 import { advance, lobbyOf, pauseClock, start, toWorld } from './npcHelpers';
 import { sleep } from './simHelpers';
 
@@ -203,5 +205,155 @@ describe('with the variables set', () => {
     expect(admin.roomId).not.toBe(party.room.roomId);
     expect((party.room as PartyRoom).clients.length).toBe(1);
     await admin.leave();
+  });
+
+  describe('the admin wire', () => {
+    type Snapshot = AdminS2CPayloads['admin.snapshot'];
+    /** An admin client that keeps the latest snapshot, every invariant row and every error. */
+    async function watch() {
+      const client = await create();
+      const got = {
+        snapshots: 0,
+        last: null as Snapshot | null,
+        invariants: [] as unknown[],
+        errors: [] as number[],
+      };
+      client.onMessage('admin.snapshot', (m: Snapshot) => {
+        got.snapshots++;
+        got.last = m;
+      });
+      client.onMessage('admin.invariant', (m: unknown) => got.invariants.push(m));
+      client.onMessage('error', (m: { code: number }) => got.errors.push(m.code));
+      return { client, got, room: roomOf(client.roomId) };
+    }
+
+    it('sends a snapshot every tick: phase, seats with roles and brains, the clock', async () => {
+      const { client, got, room } = await watch();
+      await sleep(1000);
+      expect(got.snapshots).toBeGreaterThan(10);
+      const snap = got.last as Snapshot;
+      expect(snap.phase).toBe(Phase.lobby);
+      expect(snap.scale).toBe(1);
+      expect(snap.paused).toBe(false);
+      expect(snap.seats.map((x) => x.id).sort()).toEqual([...room.state.players.keys()].sort());
+      for (const seat of snap.seats) expect(seat.brain).toBeDefined();
+      expect(snap.invariants).toEqual([]);
+      await client.leave();
+    });
+
+    it('configures with admin.setup and starts with admin.start, all inside the step', async () => {
+      const { client, got, room } = await watch();
+      const seeds = { deal: [1, 2, 3, 4] };
+      client.send('admin.setup', { map: 'blackpine', mode: 'main', seats: 5, difficulty: 'hard', seeds });
+      await sleep(300);
+      expect(room.state.players.size).toBe(5);
+      expect(room.state.settings.map).toBe('blackpine');
+      expect(autoOf(room)?.options.seeds?.deal).toEqual([1, 2, 3, 4]);
+
+      client.send('admin.start', {});
+      expect(await until(() => room.state.phase !== Phase.lobby, 3000)).toBe(true);
+      await sleep(200);
+      const snap = got.last as Snapshot;
+      expect(snap.seats).toHaveLength(5);
+      for (const seat of snap.seats) {
+        expect(seat.roleId).toBe(room.state.players.get(seat.id)?.priv.role.roleId);
+        expect(seat.roleId).not.toBe('');
+      }
+      await client.leave();
+    });
+
+    it('refuses a bad setup and a bad clock with a 422 and changes nothing', async () => {
+      const { client, got, room } = await watch();
+      const before = room.state.players.size;
+      client.send('admin.setup', { map: 'nowhere', mode: 'main', seats: 5, difficulty: 'hard' });
+      client.send('admin.setup', { map: 'hollowmere', mode: 'main', seats: 99, difficulty: 'hard' });
+      client.send('admin.setup', {
+        map: 'hollowmere',
+        mode: 'main',
+        seats: 5,
+        difficulty: 'hard',
+        seeds: { bogus: [1, 2, 3, 4] },
+      });
+      client.send('admin.setup', 'x');
+      client.send('admin.clock', { scale: 3 });
+      client.send('admin.clock', { paused: 'yes' });
+      client.send('admin.clock', { step: 1e9 });
+      client.send('admin.clock', null);
+      await sleep(300);
+      expect(got.errors).toEqual(Array(8).fill(422));
+      expect(room.state.players.size).toBe(before);
+      expect(clockOf(room)).toMatchObject({ scale: 1, paused: false, pendingSteps: 0 });
+      expect(autoOf(room)?.commands).toEqual([]);
+      await client.leave();
+    });
+
+    it('sets the speed, pauses, single-steps exactly, and still starts while paused', async () => {
+      const { client, got, room } = await watch();
+      client.send('admin.clock', { scale: 10 });
+      await sleep(400);
+      expect(clockOf(room).scale).toBe(10);
+      expect((got.last as Snapshot).scale).toBe(10);
+      expect((got.last as Snapshot).effectiveScale).toBeGreaterThan(1);
+
+      client.send('admin.clock', { scale: 1, paused: true });
+      await sleep(300);
+      expect((got.last as Snapshot).paused).toBe(true);
+      const frozen = room.state.tick;
+      await sleep(300);
+      expect(room.state.tick).toBe(frozen);
+      expect((got.last as Snapshot).tick).toBe(frozen);
+
+      client.send('admin.clock', { step: 3 });
+      await sleep(300);
+      expect(room.state.tick).toBe(frozen + 3);
+
+      // A paused room runs no step, so Start would wait for ever without the drain step.
+      client.send('admin.start', {});
+      expect(await until(() => room.state.phase !== Phase.lobby, 3000)).toBe(true);
+      expect(room.state.tick).toBe(frozen + 4);
+      expect(clockOf(room).paused).toBe(true);
+
+      client.send('admin.clock', { paused: false });
+      expect(await until(() => !clockOf(room).paused, 3000)).toBe(true);
+      expect(await until(() => room.state.tick > frozen + 10, 3000)).toBe(true);
+      await client.leave();
+    });
+
+    it('resets to the lobby with the clock paused', async () => {
+      const { client, room } = await watch();
+      client.send('admin.start', {});
+      expect(await until(() => room.state.phase !== Phase.lobby, 3000)).toBe(true);
+      client.send('admin.reset', {});
+      expect(await until(() => room.state.phase === Phase.lobby, 3000)).toBe(true);
+      expect(clockOf(room).paused).toBe(true);
+      expect(autoOf(room)?.started).toBe(false);
+      await client.leave();
+    });
+
+    it('sends each new invariant failure once, keeps it on the snapshot, and clears it at Reset', async () => {
+      const { client, got, room } = await watch();
+      let broken = false;
+      registerInvariant('test.admin', (r) =>
+        broken && r === room ? { name: 'test.admin', tick: r.state.tick, detail: 'constructed' } : null,
+      );
+      client.send('admin.start', {});
+      expect(await until(() => room.state.phase !== Phase.lobby, 3000)).toBe(true);
+      await sleep(1200);
+      expect(got.invariants).toEqual([]);
+      broken = true;
+      await sleep(2500);
+      expect(got.invariants).toHaveLength(1);
+      expect(got.invariants[0]).toMatchObject({ name: 'test.admin', detail: 'constructed' });
+      expect((got.last as Snapshot).invariants).toHaveLength(1);
+
+      broken = false;
+      client.send('admin.reset', {});
+      expect(await until(() => room.state.phase === Phase.lobby, 3000)).toBe(true);
+      await sleep(300);
+      expect((got.last as Snapshot).invariants).toEqual([]);
+      await client.leave();
+    });
+
+    it.todo("forwards the tick's bus events as admin.event (needs the delivery of 6B's runEvents)");
   });
 });

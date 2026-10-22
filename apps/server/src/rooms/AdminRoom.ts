@@ -2,7 +2,14 @@ import type { AuthContext, Client } from '@colyseus/core';
 import { BUILD_VERSION, type AdminJoinOptions, type JoinOptions } from '@wdi/shared';
 import { DEFAULT_MAP, balance } from '@wdi/content';
 import { enableAuto } from '../sim/auto/Auto';
-import { clearAdminClient, createAdminView, markAdminClient } from '../sim/auto/AdminView';
+import {
+  clearAdminClient,
+  createAdminView,
+  grantDrainStep,
+  markAdminClient,
+  publishAdmin,
+  watchAdminFeed,
+} from '../sim/auto/AdminView';
 import { adminConfig, verifyAdminToken } from '../services/adminAuth';
 import { genericJoinError } from '../services/matchmakeGuard';
 import { registerAdminHandlers } from './handlers/admin';
@@ -37,7 +44,34 @@ export class AdminRoom extends PartyRoom {
       seats: balance.players.max,
       difficulty: balance.npc.defaultDifficulty as 'easy' | 'normal' | 'hard',
     });
+    watchAdminFeed(this);
     registerAdminHandlers(this);
+  }
+
+  /**
+   * `PartyRoom.onCreate` installs its fixed step through here (and the test helpers do too): the admin room wraps it
+   * so a paused room still drains the queued commands, and every tick ends with the snapshot for the one client.
+   */
+  override setFixedTimestep(...args: Parameters<PartyRoom['setFixedTimestep']>) {
+    const [step, ...rest] = args;
+    return super.setFixedTimestep(
+      (ctx) => {
+        grantDrainStep(this);
+        step(ctx);
+        this.publish();
+      },
+      ...rest,
+    );
+  }
+
+  private publish(): void {
+    const client = this.adminId === null ? undefined : this.clients.getById(this.adminId);
+    if (!client) return;
+    try {
+      publishAdmin(this, client);
+    } catch (e) {
+      console.error('admin snapshot failed', e instanceof Error ? e.message : e);
+    }
   }
 
   /** No seat: the client gets the god view and nothing else (the base class would seat it). */
