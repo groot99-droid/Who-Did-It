@@ -135,6 +135,8 @@ export class MockWorldFeed implements WorldFeed {
   private aimEndsTick = -1;
   private bloodyUntil = 0;
   private ghost = false;
+  /** `?cutscene=1`: the mock Start sends the HollowMere opening like the server's `beginPlay` (round 6, 6J). */
+  private opening = false;
   private still = false;
   private clueSeq = 0;
   private handleSeq = 0;
@@ -153,6 +155,7 @@ export class MockWorldFeed implements WorldFeed {
     this.phaseEndsTick = PHASE_ORDER[this.phaseIdx]!.ticks;
     this.still = q.get('bots') === 'still';
     this.ghost = q.get('ghost') === '1';
+    this.opening = q.get('cutscene') === '1';
     const names = [selfName, ...BOT_NAMES];
     names.forEach((name, i) => {
       const id = i === 0 ? this.selfId : `mock-bot-${i}`;
@@ -214,6 +217,7 @@ export class MockWorldFeed implements WorldFeed {
       }
       if (due < now) due = now;
     }, period / 2);
+    if (this.opening) this.bus.emit('cutscene', { id: 'openingHollowmere' });
     const me = this.actors.get(this.selfId);
     const spawn = this.content.scenes.overworld?.spawns.find((s) => s.id === 'square_0');
     if (me && spawn)
