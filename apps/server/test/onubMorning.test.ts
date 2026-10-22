@@ -353,6 +353,7 @@ describe('the reveal', () => {
     (m.bots[0] as Bot).room.send('chat.say', { text: 'boo' });
     (m.bots[1] as Bot).room.send('chat.say', { text: 'hello' });
     await until(() => msgs(m.bots[1]!, 'chat.msg').length >= 2);
+    await until(() => msgs(m.bots[0]!, 'chat.msg').length >= 2 && msgs(m.bots[3]!, 'chat.msg').length >= 1);
     expect(msgs(m.bots[0]!, 'chat.msg').map((c) => c.channel)).toEqual(['ghost', 'meeting']);
     expect(msgs(m.bots[3]!, 'chat.msg').map((c) => c.text)).toEqual(['hello']);
   });

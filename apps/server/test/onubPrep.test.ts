@@ -249,6 +249,8 @@ describe('the proofing perk', () => {
     const o = memory(m);
     const slot = o.prep?.perk?.slot as string;
     const seen = o.pantryLocsDealt[Number(slot.split('.')[2])];
+    // The perk is read from the server room; each visitor's reveal is a message, which may still be on its way.
+    await until(() => [0, 1].every((i) => entries(bot(m.bots, i)).length > 0));
     for (const i of [0, 1]) {
       expect(entries(bot(m.bots, i))).toEqual([{ slot, kind: 'loc', value: seen, of: '' }]);
       const rows = m.room.state.players.get(bot(m.bots, i).id)?.priv.nightReveal;

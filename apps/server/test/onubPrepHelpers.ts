@@ -1,5 +1,5 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { C2S, GameMode, Phase, type GameStateType } from '@wdi/shared';
+import { C2S, GameMode, Phase, S2C, type GameStateType, type RoleRevealPayload } from '@wdi/shared';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { flowOf } from '../src/sim/Flow';
 import { onubOf, type OnubState } from '../src/sim/onub/state';
@@ -38,6 +38,10 @@ export async function onubLobby(
 export const phaseOf = (m: OnubParty): number => m.room.state.phase;
 export const clientState = (bot: Bot): GameStateType => bot.room.state as unknown as GameStateType;
 
+/** The role cards a bot has received. */
+export const cards = (bot: Bot): RoleRevealPayload[] =>
+  bot.events.filter((e) => e.type === S2C.roleReveal).map((e) => e.payload as RoleRevealPayload);
+
 /** Polls until `cond` holds or the timeout passes. */
 export async function until(cond: () => boolean, ms = 4000): Promise<boolean> {
   for (let waited = 0; waited < ms; waited += 25) {
@@ -59,7 +63,7 @@ export interface DealOpts {
   deck?: string[];
 }
 
-/** A party in the role card phase. */
+/** A party in the role card phase, every human holding its role card. */
 export async function onubRoleCard(
   colyseus: ColyseusTestServer,
   n: number,
@@ -73,6 +77,8 @@ export async function onubRoleCard(
     );
   }
   await startOnub(m);
+  // The phase is read from the server room; each card is a message, which may still be on its way.
+  await until(() => m.bots.every((b) => cards(b).length >= 1));
   return m;
 }
 

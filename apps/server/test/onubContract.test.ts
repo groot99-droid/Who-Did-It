@@ -111,6 +111,8 @@ describe('O3: at endPrep only proofing visitors receive a message of their own',
     const [station, card] = stations[last] as [string, string];
     commit(m.bots[last] as Bot, station, card);
     await until(() => phaseOf(m) === Phase.prepReveal);
+    // The phase is read from the server room; its phaseChange reaches every seat as a message.
+    await until(() => m.bots.every((b, i) => b.events.length > (seen[i] as number)));
     await sleep(300);
     return m.bots.map((b, i) => b.events.slice(seen[i]).map((e) => e.type));
   };

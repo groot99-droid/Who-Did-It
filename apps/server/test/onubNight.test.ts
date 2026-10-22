@@ -404,6 +404,7 @@ describe('must-acts and the Tourrier', () => {
     };
     expect(second.view.legal.map((l) => l.act)).toEqual(['onub.laminateSwap']);
     expect(second.view.legal[0]!.slots).toContain('seat.0.role');
+    await waitMsgs(m.bots[0]!, 'nightReveal', 1);
     expect(msgs(m.bots[0]!, 'nightReveal')[0]).toEqual({
       entries: [{ slot: 'pantry.role.1', kind: 'role', value: 'sousChef', of: '' }],
     });
@@ -416,7 +417,9 @@ describe('must-acts and the Tourrier', () => {
       ['onub.laminatePeek', false],
       ['onub.laminateSwap', false],
     ]);
-    expect(errorsOf(m.bots[0]!)).toHaveLength(2);
+    // The second refusal is a message, which may land after the swap the test waited for.
+    await until(() => errorsOf(m.bots[0]!).length >= 2);
+    expect(errorsOf(m.bots[0]!)).toEqual([ErrorCode.cannot, ErrorCode.cannot]);
   });
 
   it('completes a must-act left undone by seed, flags it auto and writes the reveal', async () => {
@@ -432,6 +435,7 @@ describe('must-acts and the Tourrier', () => {
     const peeked = m.o.actLog[0]!.slots[0]!;
     expect(peeked.startsWith('pantry.role.')).toBe(true);
     expect(m.o.actLog[1]!.slots[0]).toBe(peeked);
+    await waitMsgs(m.bots[0]!, 'nightReveal', 2);
     expect(msgs(m.bots[0]!, 'nightReveal').length).toBe(2);
     expect(seatOf(m, 0).priv!.nightReveal.length).toBe(1); // the peek; the swap shows nothing
     // Roles stay a permutation of the deal.
@@ -518,10 +522,13 @@ describe('the Iron Cloche', () => {
     act(m, 0, 'onub.cloche', ['seat.0.loc']);
     await until(() => m.o.cloche !== '');
     expect(m.o.cloche).toBe('seat.0.loc');
+    await until(() => errorsOf(m.bots[0]!).length > 0);
     expect(errorsOf(m.bots[0]!)).toEqual([ErrorCode.cannot]);
     act(m, 0, 'onub.cloche', ['seat.2.loc']);
     await until(() => errorsOf(m.bots[0]!).length > 1);
+    expect(errorsOf(m.bots[0]!)).toEqual([ErrorCode.cannot, ErrorCode.cannot]);
     expect(m.o.cloche).toBe('seat.0.loc');
+    await waitMsgs(m.bots[0]!, 'nightReveal', 1);
     expect(msgs(m.bots[0]!, 'nightReveal')).toEqual([{ entries: [] }]);
   });
 
@@ -607,6 +614,7 @@ describe('debug.clock in the quick mode', () => {
     await clock(m, { phase: 'dawn' }); // from prepReveal: runs the whole night
     expect(m.room.state.phase).toBe(Phase.dawn);
     await clock(m, { phase: 'night' }); // from dawn: wrong phase
+    await until(() => errorsOf(m.bots[0]!).length > 0);
     expect(errorsOf(m.bots[0]!)).toEqual([ErrorCode.wrongPhase]);
     expect(m.room.state.phase).toBe(Phase.dawn);
   });
@@ -638,14 +646,17 @@ describe('debug.clock in the quick mode', () => {
     expect(m.room.state.onub.window).toBe('chef');
     expect(m.o.wakers).toEqual([m.bots[1]!.id]);
     await clock(m, { window: 'tourrier' }); // not in this deck
+    await until(() => errorsOf(m.bots[0]!).length > 0);
     expect(errorsOf(m.bots[0]!)).toEqual([ErrorCode.cannot]);
-    await clock(m, { bogus: true });
-    expect(errorsOf(m.bots[0]!)).toHaveLength(2);
+    await clock(m, { bogus: true }); // no window and no phase: refused as 'not now'
+    await until(() => errorsOf(m.bots[0]!).length > 1);
+    expect(errorsOf(m.bots[0]!)).toEqual([ErrorCode.cannot, ErrorCode.wrongPhase]);
   });
 
   it('refuses {window} outside the night with 425', async () => {
     const m = await startNightMatch(colyseus, TABLE5);
     await clock(m, { window: 'chef' });
+    await until(() => errorsOf(m.bots[0]!).length > 0);
     expect(errorsOf(m.bots[0]!)).toEqual([ErrorCode.wrongPhase]);
   });
 });

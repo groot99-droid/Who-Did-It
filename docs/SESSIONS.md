@@ -2789,3 +2789,15 @@ session's goes back to it. Log under "Integration log, round 6".
   R18 and the NPC suite under sixteen busy-loop processes, and with a throwaway probe of the timeline: the failure
   itself did not reproduce locally, only the tick drift that explains it (the lobby tick varied from 3 to 8, the
   card and grace ticks with it). The NPC tests stay S's and 5H's.
+- **Quick-mode test flakes, wire timing (2026-10-22).** Three CI runs on commits that do not touch the quick
+  mode failed in `onubNight.test.ts` (the Tourrier's two-step saw `[422]` for two refusals; the Boulanger's
+  Cloche saw `[]` for one) and `onubDeal.test.ts` (one bot held no role card right after `onubRoleCard`
+  returned); the twin run on each commit passed. Cause: each test waited for the server's state (`m.o.acted`,
+  `m.o.cloche`, the phase) and then read a message (`errorsOf`, `cards`) that travels the Colyseus wire behind
+  that state, so a read could run before it landed; under load it did. Fix in `apps/server/test/` alone, the
+  server, rules and numbers untouched, no assertion loosened: every such read now follows an `until` on the
+  message count (`onubNight`, `onubDeal`, the `debug.clock` refusals, the proofing perk's reveals in
+  `onubPrep`, the phase change in `onubContract`, the ghost chat in `onubMorning`), `onubRoleCard` waits until
+  every human holds its card, and `cards` moved into `onubPrepHelpers.ts`. Verified with the `onub` suites
+  repeated, and four times with busy loops on the three other cores, then `pnpm lint`, `pnpm typecheck` and
+  `pnpm test`.

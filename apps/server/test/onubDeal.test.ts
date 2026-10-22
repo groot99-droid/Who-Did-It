@@ -1,15 +1,6 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
 import { onubBalance, onubFor, onubRoles } from '@wdi/content';
-import {
-  C2S,
-  ErrorCode,
-  LOFT_SCENE_INDEX,
-  Phase,
-  S2C,
-  Team,
-  type PlayerState,
-  type RoleRevealPayload,
-} from '@wdi/shared';
+import { C2S, ErrorCode, LOFT_SCENE_INDEX, Phase, S2C, Team, type PlayerState } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { flowOf } from '../src/sim/Flow';
 import { onubDeckSetting, resetOnubForLobby } from '../src/sim/Onub';
@@ -17,6 +8,7 @@ import { onubOf } from '../src/sim/onub/state';
 import { createServer } from '../src/server';
 import { fixSeeds } from './seedHelpers';
 import {
+  cards,
   clientState,
   errorsOf,
   memory,
@@ -36,8 +28,6 @@ beforeAll(async () => {
 afterAll(async () => colyseus.shutdown());
 beforeEach(async () => colyseus.cleanup());
 
-const cards = (bot: Bot) =>
-  bot.events.filter((e) => e.type === S2C.roleReveal).map((e) => e.payload as RoleRevealPayload);
 const rowOf = (roleId: string) => {
   const role = onubRoles.roles[roleId as keyof typeof onubRoles.roles];
   const team = onubRoles.teams[role?.team as keyof typeof onubRoles.teams];
@@ -74,7 +64,7 @@ describe('onubDeckSetting', () => {
   it('refuses a bad deck in lobby.settings with 422 and writes nothing (all or nothing)', async () => {
     const m = await onubLobby(colyseus, 4);
     m.bots[0]?.room.send(C2S.lobbySettings, { onubDeck: ['chef'], npcDifficulty: 2 });
-    await sleep(200);
+    await until(() => errorsOf(m.bots[0] as Bot).length > 0);
     expect(errorsOf(m.bots[0] as Bot)).toContainEqual({ code: ErrorCode.cannot, msg: 'bad setting' });
     expect(m.room.state.settings.onubDeck.length).toBe(0);
   });
@@ -173,7 +163,7 @@ describe('Start in the quick mode', () => {
     const five = onubFor(5).deck;
     const wrong = await onubLobby(colyseus, 4, [...five]);
     await startOnub(wrong);
-    await sleep(200);
+    await until(() => errorsOf(wrong.bots[0] as Bot).length > 0);
     expect(phaseOf(wrong)).toBe(Phase.lobby);
     expect(errorsOf(wrong.bots[0] as Bot)).toContainEqual({ code: ErrorCode.cannot, msg: 'bad deck' });
     expect(errorsOf(wrong.bots[1] as Bot)).toHaveLength(0);
