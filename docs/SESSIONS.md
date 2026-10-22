@@ -2700,6 +2700,24 @@ session's goes back to it. Log under "Integration log, round 6".
   playlist slots declared with no tracks yet, a test that every id `music.json` names is a playlist of the committed
   manifest, and the GDD 3.18 music paragraph. `playlistFor(map, class)` is exported for 6K: its `LoadingScreen` calls
   `musicBus.crossfadeTo(playlistFor(mapId, 'loading'))`; a stand-in until it lands is that one line.
+- **Step 3 (2026-10-22): the slot list, beds not fetched.** The `sfx-2026-10` release of ROSW is not published, and
+  the cloud proxy refuses its release URLs, so no bed is fetched and `audio/music/manifest.json` keeps its slots
+  with no tracks (a slot with no track is silence). The slots, against the catalog read from a read-only clone of
+  ROSW (candidates by ear are 6N's and the owner's call):
+  - **The owner's tracks fill**: `hollowmere_day` (Railroad Barons), `blackpine_day` (Extraction Camp), the three
+    `*_loading` pieces, `trailer`, and `onub_kitchen` and `onub_rush` (The Baker's Bell, until round 8's map).
+  - **The library can fill, as a looped, cross-faded bed**: `*_meeting` (`tension-builders/heartbeat-tension-builder`,
+    48 s), `*_finalnight` (`tension-builders/tick-tension-builder`, 46 s, or `science-fiction-ambience/deep-scary-ambience`,
+    42 s), `*_night` and `onub_night` (`science-fiction-ambience/tense-ambience`, 42 s, or `deep-scary-ambience`).
+  - **The library cannot fill (it holds no melodic bed)**: `lobby`, and the two `*_gameover` plus `onub_over`
+    (the `sting_win_*` stingers cover the end; a bed after them is optional). Proposed: `*_dusk` reuses the day
+    theme, and the owner says whether they want to record or upload a `lobby` track and an end-screen track, or
+    whether a CC0 bed (ASSETS 6.5, with a CREDITS row) fills them. Nothing is downloaded until that answer.
+  - **Budget**: the owner's seven tracks master to about 9 to 10 MB of the 12 MB, so the library beds must be short
+    loops (about 0.4 MB each at 20 s); `media.test.ts` (6K) enforces 12 MB and 4 MB per map.
+  - **To finish**: when the release is up, `library.py fetch --id <id>` for the ids above, master as `media.md` 1,
+    add the OGG, the manifest rows (tracks and playlist `tracks`), the `CREDITS.md` and `MANIFEST.md` rows (`media.md`
+    7), and run the budget test.
 
 ### Round 6 log: 6M (M5b art)
 
