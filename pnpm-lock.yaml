@@ -133,6 +133,28 @@ importers:
         specifier: ~5.9.3
         version: 5.9.3
 
+  tools/auto:
+    dependencies:
+      '@wdi/content':
+        specifier: workspace:*
+        version: link:../../packages/content
+      '@wdi/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+    devDependencies:
+      '@types/node':
+        specifier: ^22.20.5
+        version: 22.20.5
+      tsx:
+        specifier: ^4.23.0
+        version: 4.23.15
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^5.0.3
+        version: 5.0.3(@types/node@22.20.5)(vite@8.3.4(@types/node@22.20.5)(esbuild@0.28.2)(tsx@4.23.15))
+
   tools/blender: {}
 
   tools/bots:

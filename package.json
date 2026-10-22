@@ -24,6 +24,7 @@
     "bots:ruin": "pnpm --filter @wdi/bots ruin",
     "bots:live": "pnpm --filter @wdi/bots live",
     "bots:live:onub": "pnpm --filter @wdi/bots live -- --mode onub",
+    "auto": "pnpm --filter @wdi/auto start",
     "e2e": "pnpm --filter @wdi/client test:e2e"
   },
   "devDependencies": {
