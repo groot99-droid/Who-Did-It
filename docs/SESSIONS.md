@@ -2888,6 +2888,19 @@ session's goes back to it. Log under "Integration log, round 6".
   every other `errorsOf` read in the file already waited on the count. Verified with the file five times unloaded and five times under eight
   busy-loop processes on four cores, then `pnpm lint`, `pnpm typecheck` and `pnpm test`; the failure itself did not
   reproduce locally, on the unfixed file either. The night tests stay 5B's.
+- **Quick-mode test flakes, wire timing (2026-10-22).** Three CI runs on commits that do not touch the quick
+  mode failed in `onubNight.test.ts` (the Tourrier's two-step saw `[422]` for two refusals; the Boulanger's
+  Cloche saw `[]` for one) and `onubDeal.test.ts` (one bot held no role card right after `onubRoleCard`
+  returned); the twin run on each commit passed. Cause: each test waited for the server's state (`m.o.acted`,
+  `m.o.cloche`, the phase) and then read a message (`errorsOf`, `cards`) that travels the Colyseus wire behind
+  that state, so a read could run before it landed; under load it did. Fix in `apps/server/test/` alone, the
+  server, rules and numbers untouched, no assertion loosened, on top of the `onubNight` error waits of the entry
+  above: every such read now follows an `until` on the
+  message count (`onubNight`, `onubDeal`, the `debug.clock` refusals, the proofing perk's reveals in
+  `onubPrep`, the phase change in `onubContract`, the ghost chat in `onubMorning`), `onubRoleCard` waits until
+  every human holds its card, and `cards` moved into `onubPrepHelpers.ts`. Verified with the `onub` suites
+  repeated, and four times with busy loops on the three other cores, then `pnpm lint`, `pnpm typecheck` and
+  `pnpm test`.
 - **6Z follow-up after 6G and 6H (2026-10-22).** The locked lines the wave-2 PRs requested, in one PR on the
   orchestrator's branch: `act.light { on }` in `C2S` (`packages/shared/src/protocol`, rate 5/s) dispatched to
   `handleLight` in `sim/mobs/light.ts` from `sim/Commands.ts`, with `docs/PROTOCOL.md` regenerated; the
