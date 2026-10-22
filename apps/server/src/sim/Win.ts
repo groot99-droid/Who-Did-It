@@ -234,6 +234,7 @@ export function resetToLobby(room: PartyRoom): void {
     priv.inventory.slots.clear();
     priv.notebook.clear();
     priv.tasks.clear();
+    priv.quests.clear(); // round 6 (6H): a new match starts with no quest
     priv.cabalMates.clear();
     priv.cooldownEndTick.clear();
     priv.ledger.clear();

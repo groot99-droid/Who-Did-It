@@ -17,6 +17,7 @@
 | `act.reportBody` | `{ bodyId: string }` | 2/s | - |
 | `act.bell` | `Record<string, never>` | 2/s | - |
 | `act.present` | `{ entryId: string }` | 2/s | - |
+| `act.light` | `{ on: boolean }` | 5/s | Round 6: `on` lights the carried Lantern or Torch, or puts it out; refused 422 without one. |
 | `meeting.vote` | `{ targetId: string }` | 2/s | A living player's id, or `"skip"`; quick mode: another seat's id or `"pantry"`, never `"skip"`. Changeable until the vote closes (A30). |
 | `chat.say` | `{ text: string }` | 2/s | - |
 | `chat.quick` | `{ phraseId: string }` | 2/s | - |

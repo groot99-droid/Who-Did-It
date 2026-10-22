@@ -60,6 +60,7 @@ const STREAMS = {
   npcPlay: 1,
   mobs: 1,
   nodes: 1,
+  minigame: 1,
   contract: 1,
   events: 1,
 } satisfies Record<StreamName, 1>;

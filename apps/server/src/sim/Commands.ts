@@ -3,6 +3,7 @@ import { C2S } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { runAction } from './Actions';
 import { handleMinigameResult } from './Minigames';
+import { handleLight } from './mobs/light';
 import { handleQuestAccept, handleQuestTurnIn } from './Quests';
 import { runHolds } from './Hold';
 import { queuePortal } from './PortalQueue';
@@ -69,6 +70,9 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.minigameResult:
         handleMinigameResult(room, cmd.sessionId, payload);
+        break;
+      case C2S.light:
+        handleLight(room, cmd.sessionId, payload);
         break;
       default:
         // act.interact, hide, check, burst, present arrive with M4+; queued and ignored until then.
