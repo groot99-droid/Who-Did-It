@@ -370,9 +370,9 @@ describe('with the variables set', () => {
       const { client, got, room } = await watch();
       client.send('admin.start', {});
       expect(await until(() => room.state.phase !== Phase.lobby, 3000)).toBe(true);
-      emitSim(room, { tick: room.state.tick, kind: 'test.ping', seat: 'seat-x', data: { n: 1 } });
-      expect(await until(() => got.events.flat().some((e) => e.kind === 'test.ping'), 3000)).toBe(true);
-      const ping = got.events.flat().find((e) => e.kind === 'test.ping');
+      emitSim(room, { tick: room.state.tick, kind: 'clue', seat: 'seat-x', data: { n: 1 } });
+      expect(await until(() => got.events.flat().some((e) => e.kind === 'clue'), 3000)).toBe(true);
+      const ping = got.events.flat().find((e) => e.kind === 'clue');
       expect(ping).toMatchObject({ seat: 'seat-x', data: { n: 1 } });
       expect(got.events.flat().some((e) => e.kind === 'start')).toBe(true);
       await client.leave();

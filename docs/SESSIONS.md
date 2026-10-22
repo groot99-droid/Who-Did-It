@@ -2740,8 +2740,8 @@ session's goes back to it. Log under "Integration log, round 6".
   After `admin.reset` (which pauses) the next `start`, and the `paused: false` that would follow it, would wait for ever.
   Answered by 6Z (6A is archived): `stepsThisTick(clock, lastTickMs, queuedCommands)` returns 1 for a paused clock with
   queued commands and none pending (`PartyRoom` passes `autoOf(this).commands.length`); test in `auto.test.ts`; the
-  local stand-in `grantDrainStep` is gone. The admin feed hears every bus event through `onSim(room, ANY_SIM, ...)` (6B's
-  #63) and forwards them as `admin.event`; the test in `adminRoom.test.ts` emits one and reads it on the wire.
+  local stand-in `grantDrainStep` is gone. The admin feed subscribes per kind (`ADMIN_EVENT_KINDS`: kill death clue meeting vote eject phase start end; 6Z
+  declined the `ANY_SIM` switch) and forwards them as `admin.event`; the test in `adminRoom.test.ts` emits one and reads it on the wire.
 
 ### Round 6 log: 6D (admin client)
 
