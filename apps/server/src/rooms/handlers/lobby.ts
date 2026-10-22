@@ -1,5 +1,5 @@
 import { randomInt } from 'node:crypto';
-import { MAP_IDS, abilities, balance, items, roles } from '@wdi/content';
+import { MAP_IDS, abilities, balance, cutscenes, items, roles } from '@wdi/content';
 import {
   ABILITY_KEYS,
   C2S,
@@ -19,6 +19,7 @@ import {
   Team,
   TRAIT_IDS,
   dealTraits,
+  openingFor,
   type RoleRevealPayload,
   type TeamId,
 } from '@wdi/shared';
@@ -39,6 +40,8 @@ import { newestNpcSeat, isNpcSeat, releaseNpcSeat } from '../../sim/Npc';
 import { addNpcSeat, fillNpcSeats } from '../../sim/npc/seats';
 import { beginOnubPlay, onubDeckSetting, startOnubMatch } from '../../sim/Onub';
 import { MatchSeeds } from '../../sim/seeds';
+import { simOf } from '../../sim/RoomSim';
+import { mapIdOfRoom } from '../../sim/MapSites';
 
 /**
  * Flow messages: the lobby and role-card flow plus the meeting vote and chat (consumed by the phase
@@ -110,7 +113,8 @@ export function startRefusal(room: PartyRoom, sessionId: string): ErrorCode | nu
   room.state.players.forEach((p: PlayerState, id: string) => {
     if (p.connected && !isNpcSeat(room, id)) humans++;
   });
-  if (humans < balance.lobby.startMinHumans) return ErrorCode.cannot;
+  // Round 6 (docs/round6/auto-admin.md 3, locked): an auto match has no human and needs none.
+  if (simOf(room).auto === null && humans < balance.lobby.startMinHumans) return ErrorCode.cannot;
   return null;
 }
 
@@ -317,7 +321,11 @@ export function beginPlay(room: PartyRoom): void {
   room.state.round = 0;
   room.state.startTick = room.state.tick;
   publishLooks(room); // round 5, 5F: every seat's public look in one tick, before grace
-  setPhase(room, Phase.grace, balance.phases.graceS);
+  // Round 6, 6J (locked call site): the map's opening cutscene plays inside grace, which `openingS` lengthens for
+  // it; no new phase, and the server never waits for a client (docs/round6/cutscene-music.md 1.2).
+  const opening = openingFor(cutscenes, mapIdOfRoom(room));
+  if (opening !== null) room.broadcast(S2C.cutscene, { id: opening });
+  setPhase(room, Phase.grace, balance.phases.graceS + (opening === null ? 0 : balance.phases.openingS));
   room.state.players.forEach((player: PlayerState) => {
     player.ready = false;
   });

@@ -95,8 +95,10 @@ describe('fixSeeds (test helper)', () => {
         .filter((line) => /fixSeeds\(|fixedSeeds\s*=[^=]/.test(line) && !line.trim().startsWith('*'))
         .map((line) => `${path.slice(path.indexOf('src'))}: ${line.trim()}`),
     );
-    // The field's declaration (`fixedSeeds: FixedSeeds | undefined = undefined`) is not an assignment.
-    expect(uses).toEqual([]);
+    // The field's declaration (`fixedSeeds: FixedSeeds | undefined = undefined`) is not an assignment. Round 6
+    // (docs/round6/auto-admin.md 3): `sim/auto/Auto.ts` (`enableAuto`) is the one production path allowed to assign
+    // it, for the all-NPC match's replayable seeds.
+    expect(uses.filter((u) => !u.startsWith('src/sim/auto/Auto.ts:'))).toEqual([]);
   });
 });
 

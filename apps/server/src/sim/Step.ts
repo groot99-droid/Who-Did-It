@@ -4,6 +4,11 @@ import { VIEW_RECONCILE_EVERY_TICKS } from '@wdi/shared';
 import { runDebugStart } from '../rooms/handlers/movement';
 import { publishAvatars } from './Avatars';
 import { runDecay } from './Clues';
+import { runAuto } from './auto/Auto';
+import { runEvents } from './events/bus';
+import { runMobs } from './Mobs';
+import { runQuests } from './Quests';
+import { runResources } from './Resources';
 import { runCommands } from './Commands';
 import { runConductor } from './Conductor';
 import { runHunger } from './Hunger';
@@ -17,7 +22,8 @@ import { simOf } from './RoomSim';
 import { reconcileViews } from './Visibility';
 
 // Fixed order inside setFixedTimestep (ARCHITECTURE 5.6). Stages without a milestone yet are empty.
-const runAiAndHazards = (room: PartyRoom): void => runDecay(room); // M3: clue decay and cap; M5: wolves
+// Round 6 (docs/round6/seams.md 1.3, locked call sites): `runAuto` before the brains; `runResources`, `runMobs` and
+// `runQuests` in the old `runAiAndHazards` slot after the clue decay; `runEvents` after the phases.
 
 /** Keeps one PlayerSim per seated player and places newcomers when the match is on. */
 function syncRoster(room: PartyRoom): void {
@@ -36,6 +42,7 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   room.state.tick++;
   runDebugStart(room);
   syncRoster(room);
+  runAuto(room); // round 6, 6A: the auto commands, Start inside the step (locked call site)
   runNpcs(room); // M3c: NPC brains write their inputs and verbs (round 4, S)
   applyInputs(room);
   moveAndCollide(room);
@@ -45,7 +52,10 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   runNightPowers(room); // round 5, 5G: night powers, aims, Inherit (locked call site)
   runPortals(room);
   runConductor(room); // M3b: the quick-mode night (round 4, R)
-  runAiAndHazards(room);
+  runDecay(room); // M3: clue decay and cap
+  runResources(room); // round 6, 6F (locked call site)
+  runMobs(room); // round 6, 6G (locked call site)
+  runQuests(room); // round 6, 6H (locked call site)
   runHunger(room); // round 5, 5G (locked call site)
   const sim = simOf(room);
   if (room.state.tick % VIEW_RECONCILE_EVERY_TICKS === 0 || sim.viewsDirty) {
@@ -53,4 +63,5 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
     reconcileViews(room);
   }
   runPhases(room);
+  runEvents(room); // round 6, 6B: deliver the tick's sim events (locked call site)
 }

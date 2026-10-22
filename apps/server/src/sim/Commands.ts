@@ -2,6 +2,8 @@ import type { Client } from '@colyseus/core';
 import { C2S } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { runAction } from './Actions';
+import { handleMinigameResult } from './Minigames';
+import { handleQuestAccept, handleQuestTurnIn } from './Quests';
 import { runHolds } from './Hold';
 import { queuePortal } from './PortalQueue';
 
@@ -57,6 +59,16 @@ export function runCommands(room: PartyRoom): void {
       case C2S.reportBody:
       case C2S.bell:
         runAction(room, cmd.sessionId, cmd.type, payload);
+        break;
+      // Round 6 (locked call sites): the M5b commands go to their owners' files (6H); each refuses until it lands.
+      case C2S.questAccept:
+        handleQuestAccept(room, cmd.sessionId, payload);
+        break;
+      case C2S.questTurnIn:
+        handleQuestTurnIn(room, cmd.sessionId, payload);
+        break;
+      case C2S.minigameResult:
+        handleMinigameResult(room, cmd.sessionId, payload);
         break;
       default:
         // act.interact, hide, check, burst, present arrive with M4+; queued and ignored until then.

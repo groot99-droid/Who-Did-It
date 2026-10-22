@@ -18,7 +18,8 @@ import { type Rng, sfc32 } from '@wdi/shared';
  * - `prepTimeout`: the commit of a seat that let the prep clock run out;
  * - `nightTimeout`: the targets of a must-act left undone;
  * - `npcTiming`, `npcPlay`: keyed by NPC seat id; each NPC seat draws only from its own two;
- * - `mobs`, `nodes`: round-6 world draws.
+ * - `mobs`, `nodes`: round-6 world draws (`mobs` keyed by spawner id);
+ * - `contract`, `events`: the Bible's mail stream and world events (rounds 7 and 9, docs/round6/bible-seams.md).
  */
 export type StreamName =
   | 'deal'
@@ -33,7 +34,9 @@ export type StreamName =
   | 'npcTiming'
   | 'npcPlay'
   | 'mobs'
-  | 'nodes';
+  | 'nodes'
+  | 'contract'
+  | 'events';
 
 /** Four 32-bit seed words of one sfc32 stream. */
 export type SeedWords = readonly [number, number, number, number];
