@@ -19,6 +19,7 @@ import { type Rng, sfc32 } from '@wdi/shared';
  * - `nightTimeout`: the targets of a must-act left undone;
  * - `npcTiming`, `npcPlay`: keyed by NPC seat id; each NPC seat draws only from its own two;
  * - `mobs`, `nodes`: round-6 world draws (`mobs` keyed by spawner id);
+ * - `minigame`: the station-task puzzles (6H), keyed by seat id, so no public draw shares a seat's board;
  * - `contract`, `events`: the Bible's mail stream and world events (rounds 7 and 9, docs/round6/bible-seams.md).
  */
 export type StreamName =
@@ -35,6 +36,7 @@ export type StreamName =
   | 'npcPlay'
   | 'mobs'
   | 'nodes'
+  | 'minigame'
   | 'contract'
   | 'events';
 

@@ -2691,6 +2691,26 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6B (event bus and invariants)
 
+- **Three steps on one branch and one draft PR (2026-10-22)**, as 6A did, each commit green on `pnpm lint && pnpm
+  typecheck && pnpm test`: (1) `sim/events/bus.ts` delivers (`ANY_SIM` added), `sim/auto/log.ts` keeps the match's
+  events and `logHash`, the emitters in `Kill.ts`, `Death.ts`, `Clues.ts` and `Meeting.ts`, and the bus tests of
+  `invariants.test.ts`; (2) the seven invariants in `sim/auto/invariants.ts` with `guardStep`, each tested firing on a
+  constructed failure and quiet on clean rooms; (3) `tools/auto/checks`, `tools/auto/report`, the `soak.yml` `auto`
+  leg (guard off, difficulty in the matrix, `--seed` from the run number), DECISIONS A84 and this entry. `log.ts` moved
+  from step 3 to step 1 because the bus delivers into it and `killClues` reads it.
+- **Emitters.** `phase`, `start` and `end` come from the bus watching the phase, so `Phases.ts` and `Win.ts` carry no
+  emitter and the match log's `event: 'auto'` line is written by `log.ts` at an auto room's `end` (DECISIONS A84). The
+  four one-line calls for the orchestrator to confirm: `Kill.ts` before `markDead`, `Death.ts markDead` after the death
+  is queued, `Clues.ts spawnClue` after the clue is set, and `Meeting.ts` in `openMeeting`, `handleVote`, `startReveal`
+  and the quick-mode `outs` loop.
+- **Measured.** 36 probe auto matches (both maps, both modes, three difficulties, 4, 7 and 10 seats) ran with no
+  failure; the main-mode ones had 2 to 4 kills each, so `killClues` runs on real kills; `logHash` and the `auto` line
+  replay identically for the same seeds and seat ids.
+- **For 6A and 6C** (contract requests in the PR): `run.ts` gains `import './checks'`; `AutoResult` can carry
+  `logHash(room)` beside `digest`, read before the room is disconnected; the admin room sends `admin.event` from an
+  `onSim(room, ANY_SIM, ...)` listener and dedupes `admin.invariant` (the pure checks repeat while the state holds;
+  `npcStuck`, `step` and `killClues` report each incident once).
+
 ### Round 6 log: 6C (GitHub auth and AdminRoom)
 
 - PR 1 (`claude/r6-admin-server`): `services/adminAuth.ts` filled and pure. `adminConfig` is null unless `WDI_ADMIN=1`
@@ -2720,9 +2740,8 @@ session's goes back to it. Log under "Integration log, round 6".
   After `admin.reset` (which pauses) the next `start`, and the `paused: false` that would follow it, would wait for ever.
   Answered by 6Z (6A is archived): `stepsThisTick(clock, lastTickMs, queuedCommands)` returns 1 for a paused clock with
   queued commands and none pending (`PartyRoom` passes `autoOf(this).commands.length`); test in `auto.test.ts`; the
-  local stand-in `grantDrainStep` is gone. Request to 6B: `runEvents` delivers by kind through `onSim`; the admin feed subscribes to
-  `kill death clue meeting vote eject phase start end` and forwards them as `admin.event`, so nothing more is needed
-  from 6B, but the todo test in `adminRoom.test.ts` becomes real once delivery exists.
+  local stand-in `grantDrainStep` is gone. The admin feed hears every bus event through `onSim(room, ANY_SIM, ...)` (6B's
+  #63) and forwards them as `admin.event`; the test in `adminRoom.test.ts` emits one and reads it on the wire.
 
 ### Round 6 log: 6D (admin client)
 
@@ -2743,6 +2762,14 @@ session's goes back to it. Log under "Integration log, round 6".
   (`onubNight.test.ts`, a 422 not yet received); it passed alone three times and on the rerun.
 
 ### Round 6 log: 6F (gathering and crafting)
+
+- **One branch, `claude/r6-gather-craft`, three commits (2026-10-22)**: (1) `Inventory.ts` and the node pool with
+  `inventory.test.ts` and `resources.test.ts`; (2) the `gather` hold; (3) `Craft.ts`, the `craft` hold and `craft.test.ts`.
+  For 6H: `addStack(player, item, qty): boolean`, `take(player, item, qty): boolean`, `count(player, item): number`
+  and `exchange(player, takes, gives): boolean` (a turn-in is one `exchange`), all in `sim/Inventory.ts`.
+- **Touched outside Owns**: `sim/Hold.ts` `runHolds` hands `gather`/`craft` holds to `tickGather`/`tickCraft`
+  (without it the clue check cancels them every tick); `test/npcRoutine.test.ts` R17 allows the `nodes` stream beside `npcNames`. `Node` on the wire is `{ id, resource, x, y, active, respawnTick }`
+  (not `carriedTicks` as `m5b-data.md` 2.1 says). GDD 3.14 (6F) sentences corrected. DECISIONS A88.
 
 ### Round 6 log: 6G (mobs and dark visibility)
 
@@ -2891,3 +2918,14 @@ session's goes back to it. Log under "Integration log, round 6".
   every other `errorsOf` read in the file already waited on the count. Verified with the file five times unloaded and five times under eight
   busy-loop processes on four cores, then `pnpm lint`, `pnpm typecheck` and `pnpm test`; the failure itself did not
   reproduce locally, on the unfixed file either. The night tests stay 5B's.
+- **6Z follow-up after 6G and 6H (2026-10-22).** The locked lines the wave-2 PRs requested, in one PR on the
+  orchestrator's branch: `act.light { on }` in `C2S` (`packages/shared/src/protocol`, rate 5/s) dispatched to
+  `handleLight` in `sim/mobs/light.ts` from `sim/Commands.ts`, with `docs/PROTOCOL.md` regenerated; the
+  `fleeCreature` line in `sim/npc/world.ts` `runWorldNpc` before the body reaction (6G's #59 request 2, which 6G's own
+  permission check refused on its locked file); `minigame` in `StreamName` (`sim/seeds.ts`) for 6H's puzzles, keyed by
+  seat; `priv.quests.clear()` in the `Win.ts` reset. `docs/round6/m5b-data.md` 2.1 now names `respawnTick` on the
+  wire `Node`, as 6F built it (#61). Open for the owner and 6P from the wave-2 PRs: the base has no station-task
+  layer (nothing assigns `Private.tasks`, nothing writes `taskBar`, `Win.ts` never checks it), so 6H's mini-games
+  are inert in a live match until an assignment session lands; ROADMAP M5b does not count station tasks as playable
+  before that. 6H switches its puzzle draw from the keyed `contract` stand-in to `seeds.get('minigame', seat)` and
+  drops its lobby clear once this merges.

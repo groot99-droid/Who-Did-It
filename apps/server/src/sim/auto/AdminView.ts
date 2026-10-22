@@ -14,7 +14,7 @@ import {
 } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { npcMemory } from '../npc/memory';
-import { onSim } from '../events/bus';
+import { ANY_SIM, onSim } from '../events/bus';
 import { simOf } from '../RoomSim';
 import { SCENE_KEYS, isLoft, sceneKey } from '../World';
 import { autoOf } from './Auto';
@@ -95,19 +95,6 @@ function fill(room: PartyRoom, view: StateView): void {
   for (const gone of [...mine.avatars]) if (!avatars.has(gone)) mine.avatars.delete(gone);
 }
 
-/** The kinds the round-6 emitters send (auto-admin.md 5); the bus has no wildcard, so the feed names them. */
-export const ADMIN_EVENT_KINDS = [
-  'kill',
-  'death',
-  'clue',
-  'meeting',
-  'vote',
-  'eject',
-  'phase',
-  'start',
-  'end',
-] as const;
-
 /** Failures kept for the log pane until Reset; past it the oldest go (the page shows the newest). */
 export const MAX_KEPT_FAILURES = 200;
 /** Events sent in one `admin.event`; the rest of a burst waits for the next tick. */
@@ -131,18 +118,16 @@ function feedOf(room: PartyRoom): Feed {
     feed = { events: [], failures: [], seen: new Set(), lastInvariantTick: -Infinity, sawStart: false };
     feeds.set(room, feed);
     const f = feed;
-    for (const kind of ADMIN_EVENT_KINDS) {
-      onSim(room, kind, (ev) => {
-        // A seat id or a scene id, never a handle (the log records seats, auto-admin.md 4).
-        f.events.push({
-          tick: ev.tick,
-          kind: ev.kind,
-          ...(ev.seat !== undefined ? { seat: ev.seat } : {}),
-          ...(ev.sceneId !== undefined ? { sceneId: ev.sceneId } : {}),
-          ...(ev.data !== undefined ? { data: ev.data } : {}),
-        });
+    onSim(room, ANY_SIM, (ev) => {
+      // A seat id or a scene id, never a handle (the log records seats, auto-admin.md 4).
+      f.events.push({
+        tick: ev.tick,
+        kind: ev.kind,
+        ...(ev.seat !== undefined ? { seat: ev.seat } : {}),
+        ...(ev.sceneId !== undefined ? { sceneId: ev.sceneId } : {}),
+        ...(ev.data !== undefined ? { data: ev.data } : {}),
       });
-    }
+    });
   }
   return feed;
 }

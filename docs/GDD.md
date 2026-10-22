@@ -493,9 +493,10 @@ corrected by Session 6F when it lands.
 **Resources.** Six resources grow at the **nodes** of the forests, caves and the Blackpine camp (`nodes` in the scene
 files): Timber, Stone, Pine Resin, Herbs, Mushrooms and Tin Ore. Every map has all six at every party size: Hollowmere's
 Small profile finds them in Gallows Wood and the Tin Gallery mouth, Blackpine's in the woods, the camp and the
-Workings. Nodes that share a `pool` are one pool: at Start the server activates half of each pool's spots
-(`poolActiveFrac` 0.5), drawn from the `nodes` stream, so a forest is never stripped the same way twice; a node
-outside any pool is always active. (6F)
+Workings. Nodes that share a `pool` are one pool: at Start the server activates half of each pool's spots, rounded
+up (`poolActiveFrac` 0.5, so a pool of two keeps one), drawn from the `nodes` stream, so a forest is never stripped the same
+way twice; a spot not drawn has no node that match and is not sent to anyone, and a node outside any pool is always
+active. (6F)
 
 | Resource | Gather hold | Yield | Respawn | Needs |
 |---|---|---|---|---|
@@ -508,7 +509,9 @@ outside any pool is always active. (6F)
 
 **Gathering** is a hold (E) at an active node within the verb reach of 3.7, like Collect: moving or being interrupted
 cancels it and yields nothing; at its end the yield goes into the inventory and the node goes inactive until its
-respawn time has passed (counted in ticks). A gather with no room for the yield is refused. (6F) Gathering makes no
+respawn time has passed (counted in ticks). A gather with no room for the yield is refused, and so is one at a node
+that is empty, out of reach or needs a tool the seat does not hold (the Spade stays in the inventory); two seats at one
+node share one yield: the first to finish takes it and the other's hold ends. (6F) Gathering makes no
 noise and leaves no clue, and nobody's role changes what a node gives.
 
 **Materials stack.** A material is an item of kind `material`: up to 5 units of one material share one of the 5
@@ -516,7 +519,8 @@ slots (`stackMax`); a tool takes a slot of its own (3.5). Materials drop on deat
 
 **Crafting** is a hold at a **station**, a prop of the recipe's kind within the verb reach; a recipe with no station
 crafts anywhere. The inputs are taken when the hold ends, and the tool goes into the inventory; an interrupted craft
-takes nothing. (6F) Every tool is role-neutral: anyone may craft one, and a crafted tool says nothing about who made
+takes nothing, and a craft whose inputs are gone by the end of the hold gives nothing. The tool takes the slot the
+inputs free, so a full inventory can still craft. (6F) Every tool is role-neutral: anyone may craft one, and a crafted tool says nothing about who made
 it.
 
 | Tool | Inputs | Station | Hold |

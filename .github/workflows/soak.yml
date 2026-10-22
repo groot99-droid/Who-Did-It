@@ -5,8 +5,9 @@
 # (ONUB v2) seats 4 bots plus NPCs up to 4, 6, 8 and 10 in turn, fails on a night leak (a sleeper that received a
 # `nightWake` or `nightReveal`, or any presence), and ends with the ruin rate per party size against the 20-30%
 # target, from the matches it played and from the prep Monte Carlo (`pnpm bots:ruin`). The `auto` job (round 6,
-# docs/round6/auto-admin.md 4) plays all-NPC matches headless with `pnpm auto`; it is `continue-on-error` until
-# Session 6A lands the runner and 6B takes the guard off.
+# docs/round6/auto-admin.md 4 and 5) plays all-NPC matches headless with `pnpm auto` per map, mode and difficulty,
+# on a fresh `--seed` each run, and fails on any invariant failure or a match that never reaches game over; the
+# report prints the seed words of every failing match so it replays.
 name: soak
 
 on:
@@ -64,16 +65,15 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
   auto:
-    name: auto (${{ matrix.map }}, ${{ matrix.mode }})
+    name: auto (${{ matrix.map }}, ${{ matrix.mode }}, ${{ matrix.difficulty }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    # Round 6 pre-seed: the runner exits 2 until Session 6A fills it; 6B removes this line with the `auto` leg's report.
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
         map: [hollowmere, blackpine]
         mode: [main, onub]
+        difficulty: [easy, normal, hard]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -85,14 +85,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Auto matches
         shell: bash
-        run: pnpm auto -- --matches 20 --map ${{ matrix.map }} --mode ${{ matrix.mode }} --json | tee auto.log
-      - name: Result
+        run: >-
+          pnpm auto -- --matches 20 --seed ${{ github.run_number }} --map ${{ matrix.map }}
+          --mode ${{ matrix.mode }} --difficulty ${{ matrix.difficulty }} --json | tee auto.log
+      - name: Report
         if: always()
         shell: bash
-        run: |
-          {
-            echo "### auto (${{ matrix.map }}, ${{ matrix.mode }})"
-            echo '```'
-            tail -n 24 auto.log || true
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+        run: >-
+          pnpm --silent --filter @wdi/auto exec tsx report/index.ts "$GITHUB_WORKSPACE/auto.log"
+          "auto (${{ matrix.map }}, ${{ matrix.mode }}, ${{ matrix.difficulty }})" >> "$GITHUB_STEP_SUMMARY"

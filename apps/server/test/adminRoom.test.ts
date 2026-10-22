@@ -15,6 +15,7 @@ import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { createServer } from '../src/server';
 import { adminConfig, signAdminToken } from '../src/services/adminAuth';
 import { simOf } from '../src/sim/RoomSim';
+import { emitSim } from '../src/sim/events/bus';
 import { autoOf } from '../src/sim/auto/Auto';
 import { clockOf } from '../src/sim/auto/clock';
 import { until } from './flowHelpers';
@@ -216,12 +217,23 @@ describe('with the variables set', () => {
         snapshots: 0,
         last: null as Snapshot | null,
         invariants: [] as unknown[],
+        events: [] as { tick: number; kind: string; seat?: string }[][],
         errors: [] as number[],
       };
       client.onMessage('admin.snapshot', (m: Snapshot) => {
         got.snapshots++;
         got.last = m;
       });
+      client.onMessage(
+        'admin.event',
+        (
+          m:
+            | { events?: { tick: number; kind: string; seat?: string }[] }
+            | { tick: number; kind: string; seat?: string }[],
+        ) => {
+          got.events.push(Array.isArray(m) ? m : (m.events ?? []));
+        },
+      );
       client.onMessage('admin.invariant', (m: unknown) => got.invariants.push(m));
       client.onMessage('error', (m: { code: number }) => got.errors.push(m.code));
       return { client, got, room: roomOf(client.roomId) };
@@ -354,6 +366,16 @@ describe('with the variables set', () => {
       await client.leave();
     });
 
-    it.todo("forwards the tick's bus events as admin.event (needs the delivery of 6B's runEvents)");
+    it("forwards the tick's bus events as admin.event, seats and scene ids only", async () => {
+      const { client, got, room } = await watch();
+      client.send('admin.start', {});
+      expect(await until(() => room.state.phase !== Phase.lobby, 3000)).toBe(true);
+      emitSim(room, { tick: room.state.tick, kind: 'test.ping', seat: 'seat-x', data: { n: 1 } });
+      expect(await until(() => got.events.flat().some((e) => e.kind === 'test.ping'), 3000)).toBe(true);
+      const ping = got.events.flat().find((e) => e.kind === 'test.ping');
+      expect(ping).toMatchObject({ seat: 'seat-x', data: { n: 1 } });
+      expect(got.events.flat().some((e) => e.kind === 'start')).toBe(true);
+      await client.leave();
+    });
   });
 });
