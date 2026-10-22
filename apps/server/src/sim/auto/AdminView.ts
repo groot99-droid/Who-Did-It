@@ -152,17 +152,6 @@ export function watchAdminFeed(room: PartyRoom): void {
   feedOf(room);
 }
 
-/**
- * A paused room runs no step, so a queued Start, Reset or setup would wait for ever (and so would the Resume that
- * follows them). With commands waiting and no single step asked for, ask for one: it drains the queue in order.
- */
-export function grantDrainStep(room: PartyRoom): void {
-  const clock = clockOf(room);
-  if (clock.paused && clock.pendingSteps === 0 && (autoOf(room)?.commands.length ?? 0) > 0) {
-    clock.pendingSteps = 1;
-  }
-}
-
 const seatSceneId = (idx: number): string => (isLoft(idx) ? 'loft' : sceneKey(idx));
 
 /** Every seat as the god view lists it: role and cover included, the brain for an NPC (auto-admin.md 6). */

@@ -2709,19 +2709,18 @@ session's goes back to it. Log under "Integration log, round 6".
   `boot` in one process resets its first request (UND_ERR_SOCKET).
 - PR 3: `rooms/handlers/admin.ts`, the per-tick feed in `sim/auto/AdminView.ts` and the docs. The four handlers
   validate and push `setup`, `start`, `reset` and `clock` onto `autoOf(room).commands` (32 at most), refusing a bad
-  payload with a 422 and no change. `AdminRoom.setFixedTimestep` wraps the room's step: before it, `grantDrainStep`;
-  after it, `publishAdmin` sends the new invariant failures, the tick's events and `admin.snapshot`. The snapshot
+  payload with a 422 and no change. `AdminRoom.setFixedTimestep` wraps the room's step: after it, `publishAdmin` sends the new invariant failures, the tick's events and `admin.snapshot`. The snapshot
   reads the clock through `AdminView.ts` (inside `sim/auto/`, where `auto.test.ts` allows `clockOf(`). `coverOf` is
   the card's own look, set only for a cover role whose public look differs. Failures are kept (200 at most) until
   Reset. Docs: ARCHITECTURE 5.11, the README Railway notes, DECISIONS A85. Tests: 6 wire tests in
-  `adminRoom.test.ts`, one a todo (see the contract request below). Mutation check: without `grantDrainStep` the
-  paused-Start test fails.
+  `adminRoom.test.ts`, one a todo (see the contract request below). Mutation check: without the drain step in
+  `stepsThisTick` the paused-Start test fails.
 - **Contract request to 6A** (also in the PR description): `stepsThisTick` returns 0 for a paused clock with no
   `pendingSteps`, and `PartyRoom` then skips `step`, so `runAuto` never drains `autoOf(room).commands` while paused.
   After `admin.reset` (which pauses) the next `start`, and the `paused: false` that would follow it, would wait for ever.
-  Local stand-in: `grantDrainStep` (AdminView.ts) sets `pendingSteps = 1` before the tick when commands wait. Proposed
-  fix in `stepsThisTick`: a paused clock with queued commands returns 1; the stand-in then goes (it would double the
-  step otherwise). Request to 6B: `runEvents` delivers by kind through `onSim`; the admin feed subscribes to
+  Answered by 6Z (6A is archived): `stepsThisTick(clock, lastTickMs, queuedCommands)` returns 1 for a paused clock with
+  queued commands and none pending (`PartyRoom` passes `autoOf(this).commands.length`); test in `auto.test.ts`; the
+  local stand-in `grantDrainStep` is gone. Request to 6B: `runEvents` delivers by kind through `onSim`; the admin feed subscribes to
   `kill death clue meeting vote eject phase start end` and forwards them as `admin.event`, so nothing more is needed
   from 6B, but the todo test in `adminRoom.test.ts` becomes real once delivery exists.
 

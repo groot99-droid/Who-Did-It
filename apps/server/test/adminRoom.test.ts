@@ -307,7 +307,7 @@ describe('with the variables set', () => {
       await sleep(300);
       expect(room.state.tick).toBe(frozen + 3);
 
-      // A paused room runs no step, so Start would wait for ever without the drain step.
+      // A paused room runs no step, so Start would wait for ever unless `stepsThisTick` runs one step for the queued commands.
       client.send('admin.start', {});
       expect(await until(() => room.state.phase !== Phase.lobby, 3000)).toBe(true);
       expect(room.state.tick).toBe(frozen + 4);

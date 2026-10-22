@@ -5,7 +5,6 @@ import { enableAuto } from '../sim/auto/Auto';
 import {
   clearAdminClient,
   createAdminView,
-  grantDrainStep,
   markAdminClient,
   publishAdmin,
   watchAdminFeed,
@@ -50,13 +49,12 @@ export class AdminRoom extends PartyRoom {
 
   /**
    * `PartyRoom.onCreate` installs its fixed step through here (and the test helpers do too): the admin room wraps it
-   * so a paused room still drains the queued commands, and every tick ends with the snapshot for the one client.
+   * so every tick ends with the snapshot for the one client.
    */
   override setFixedTimestep(...args: Parameters<PartyRoom['setFixedTimestep']>) {
     const [step, ...rest] = args;
     return super.setFixedTimestep(
       (ctx) => {
-        grantDrainStep(this);
         step(ctx);
         this.publish();
       },
