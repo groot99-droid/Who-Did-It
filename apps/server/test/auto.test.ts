@@ -1,7 +1,20 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import type { ColyseusTestServer } from '@colyseus/testing';
+import { boot } from '@colyseus/testing';
+import { balance } from '@wdi/content';
+import { GameMode, NpcLevel, Phase, TICK_RATE } from '@wdi/shared';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import type { PartyRoom } from '../src/rooms/PartyRoom';
+import { createServer } from '../src/server';
+import { isNpcSeat } from '../src/sim/Npc';
+import { simOf } from '../src/sim/RoomSim';
+import { applyClock, autoOf, enableAuto, queueAutoStart } from '../src/sim/auto/Auto';
+import { clockOf } from '../src/sim/auto/clock';
+import { preyFor } from '../src/sim/npc/world';
+import { runAutoMatch } from './autoHelpers';
+import { advance } from './npcHelpers';
 import {
   EFFECTIVE_SCALE_TICKS,
   MAX_SIM_MS_PER_TICK,
@@ -83,4 +96,107 @@ describe('the sim clock (GDD 3.19)', () => {
       );
     expect(uses).toEqual([]);
   });
+});
+
+describe('the all-NPC match (GDD 3.19)', () => {
+  let colyseus: ColyseusTestServer;
+  beforeAll(async () => {
+    colyseus = await boot(createServer({ ipBurst: 1e5, ipPerMin: 1e8, globalPerMin: 1e8 }));
+  });
+  afterAll(async () => colyseus.shutdown());
+
+  const oneDay = Math.ceil(
+    (balance.phases.roleRevealS + balance.phases.graceS + balance.phases.dayS) * TICK_RATE,
+  );
+  const create = async () => (await colyseus.createRoom('party', {})) as unknown as PartyRoom;
+
+  it('seats every NPC under the given ids, with no leader and the settings applied', async () => {
+    const room = await create();
+    const npcIds = ['autonpc01', 'autonpc02', 'autonpc03', 'autonpc04', 'autonpc05'];
+    enableAuto(room, { map: 'blackpine', mode: 'onub', seats: 5, difficulty: 'hard', npcIds });
+    expect([...room.state.players.keys()]).toEqual(npcIds);
+    expect(npcIds.every((id) => isNpcSeat(room, id))).toBe(true);
+    expect(room.state.leaderId).toBe('');
+    expect(room.state.settings.map).toBe('blackpine');
+    expect(room.state.settings.mode).toBe(GameMode.onub);
+    expect(room.state.settings.npcDifficulty).toBe(NpcLevel.hard);
+    // Every stream is fixed, so the record replays the whole match.
+    expect(Object.keys(autoOf(room)?.options.seeds ?? {})).toContain('npcPlay');
+    expect(room.fixedSeeds).toBe(autoOf(room)?.options.seeds);
+    expect(() => enableAuto(room, { map: 'atlantis', mode: 'main', seats: 5, difficulty: 'easy' })).toThrow();
+    await room.disconnect();
+  });
+
+  it('starts inside the step with no human and no lobby.start', async () => {
+    const room = await create();
+    enableAuto(room, { map: 'hollowmere', mode: 'main', seats: 6, difficulty: 'normal' });
+    applyClock(room, { paused: true });
+    queueAutoStart(room);
+    expect(room.state.phase).toBe(Phase.lobby);
+    advance({ humans: [], room }, 1);
+    expect(room.state.phase).toBe(Phase.roleReveal);
+    expect(autoOf(room)?.started).toBe(true);
+    await room.disconnect();
+  });
+
+  it('resets to the lobby with the same seats and the clock paused', async () => {
+    const room = await create();
+    enableAuto(room, { map: 'hollowmere', mode: 'main', seats: 6, difficulty: 'normal' });
+    const ids = [...room.state.players.keys()];
+    queueAutoStart(room);
+    advance({ humans: [], room }, 2);
+    autoOf(room)?.commands.push({ kind: 'reset' });
+    advance({ humans: [], room }, 1);
+    expect(room.state.phase).toBe(Phase.lobby);
+    expect([...room.state.players.keys()]).toEqual(ids);
+    expect(clockOf(room).paused).toBe(true);
+    await room.disconnect();
+  });
+
+  it('applies clock commands inside the step', async () => {
+    const room = await create();
+    enableAuto(room, { map: 'hollowmere', mode: 'main', seats: 4, difficulty: 'normal' });
+    autoOf(room)?.commands.push({ kind: 'clock', scale: 10 }, { kind: 'clock', scale: 3 as never });
+    expect(clockOf(room).scale).toBe(1);
+    advance({ humans: [], room }, 1);
+    expect(clockOf(room).scale).toBe(10);
+    await room.disconnect();
+  });
+
+  it('lets an NPC Killer take an NPC as prey only under auto.npcPrey', async () => {
+    const room = await create();
+    enableAuto(room, { map: 'hollowmere', mode: 'main', seats: 4, difficulty: 'normal' });
+    queueAutoStart(room);
+    advance({ humans: [], room }, 1);
+    const sim = simOf(room);
+    const [a, b] = [...room.state.players.values()];
+    if (!a || !b) throw new Error('no seats');
+    for (const p of sim.players.values()) p.placed = false;
+    const pa = sim.ensure(a.id);
+    const pb = sim.ensure(b.id);
+    pa.placed = pb.placed = true;
+    pa.sceneIdx = pb.sceneIdx = 0;
+    const isNpc = (id: string) => isNpcSeat(room, id);
+    expect(preyFor(room, a, pa, isNpc)).toBe(b.id);
+    (autoOf(room) as { npcPrey: boolean }).npcPrey = false;
+    expect(preyFor(room, a, pa, isNpc)).toBeNull();
+    sim.auto = null;
+    expect(preyFor(room, a, pa, isNpc)).toBeNull();
+    await room.disconnect();
+  });
+
+  for (const mode of ['main', 'onub'] as const) {
+    it(`plays one day of a ${mode} match on Hollowmere with six NPC seats`, async () => {
+      const r = await runAutoMatch(colyseus, {
+        map: 'hollowmere',
+        mode,
+        seats: 6,
+        difficulty: 'normal',
+        maxTicks: oneDay,
+      });
+      expect(r.failures).toEqual([]);
+      expect(r.ticks).toBeGreaterThan(0);
+      expect(r.npcIds).toHaveLength(6);
+    }, 60_000);
+  }
 });
