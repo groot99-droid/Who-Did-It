@@ -2782,6 +2782,30 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6I (M5b client)
 
+- **Steps on one branch and one draft PR (`claude/r6-m5b-client`, 2026-10-22)**, each commit green on `pnpm lint &&
+  pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock and Colyseus readers
+  (`net/mock/m5bMock.ts`, `net/worldColyseus.ts`, `view/{NodeView,MobView,GiverView,m5bFrames}.ts`); (2) the pockets,
+  crafting and quest panels, the prompt layer, the mini-game modal, copy and CSS; (3) `e2e/m5b.spec.ts`, UI.md 14.19,
+  this log and DECISIONS A91.
+- **Contract requests (for the orchestrator)**, each with a local stand-in:
+  (a) `WorldFeed` gains `inventory()`, `questAccept(id)`, `questTurnIn(id)` and `light(on)` (locked file `net/world.ts`).
+  Stand-in: `net/m5b.ts` defines `M5bFeed`, `asM5b(feed)` narrows a feed to it, and both `ColyseusWorldFeed` and the mock
+  implement it. When the members move into `WorldFeed`, `asM5b` becomes a cast-free pass-through.
+  (b) `World.ts` constructs the M5b layer directly (`mountM5bLayer`) and routes E through it. Stand-in: `NodeView` mounts
+  the layer from its constructor and the layer owns its own G, T, I, C, J and Esc keys.
+  (c) The ONUB widgets of `view/onub/minigames/` expose their `answer()`. Stand-in: `view/minigames/answers.ts` rebuilds
+  the server board from the `public` payload through the same rng bands and synthesizes an answer that
+  `checkMinigame` accepts, so the modal does not read the widget's state. This is a known limitation: a widget that
+  grows a different internal solution would need the real hook.
+- **Gap, for the owner**: the base has no main-mode task layer (see 6H), so `S2C.minigameStart` never fires in a live
+  match. The modal is exercised from the mock, the `?minigame=<kind>` hook and fixtures; the live path waits on the
+  task layer, which this session did not build.
+- **Mock first**: `?mock=1&m5b=1` stands the own seat beside the overworld giver with a spade and five kit nodes
+  (spread distances so the nearest-node prompt walks them in order), one rat, and a station-free craft. The mock mirrors
+  the server rules (reach, hold time, yield and respawn, the spade, five slots, stack size, `quests.maxActive`).
+- **Measured / checked**: client tests 496 (new: views 3 files, panels, answers, mock); `e2e/m5b.spec.ts` gathers, crafts
+  and lights a lantern and turns in `caulkTheSkiff`, then opens a slide board through `?minigame=slide`.
+
 ### Round 6 log: 6J (cutscenes)
 
 - **PR 1 (schema, index, rules, server lines, `openingS`)** on `claude/r6-cutscenes`: `rules/cutscenes.ts` bodies with
