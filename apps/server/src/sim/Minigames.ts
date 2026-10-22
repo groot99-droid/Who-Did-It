@@ -121,7 +121,9 @@ export function recomputeTaskBar(room: PartyRoom): void {
     for (const t of player.priv?.tasks ?? []) {
       if (t.fake) continue;
       total++;
-      if (t.done) ghost ? ghostDone++ : done++;
+      if (!t.done) continue;
+      if (ghost) ghostDone++;
+      else done++;
     }
   }
   if (total === 0) return;
