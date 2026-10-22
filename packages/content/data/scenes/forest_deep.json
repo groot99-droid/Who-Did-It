@@ -162,7 +162,9 @@
     { "id": "fd.nd_herb_2", "resource": "herb", "x": 35, "y": 11, "pool": "fenHerbs" },
     { "id": "fd.nd_mush_0", "resource": "mushroom", "x": 10, "y": 9, "pool": "fenMush" },
     { "id": "fd.nd_mush_1", "resource": "mushroom", "x": 35, "y": 29, "pool": "fenMush" },
-    { "id": "fd.nd_stone_0", "resource": "stone", "x": 4, "y": 9 }
+    { "id": "fd.nd_stone_0", "resource": "stone", "x": 4, "y": 9 },
+    { "id": "fd.nd_resin_0", "resource": "resin", "x": 12, "y": 6, "pool": "fenResin" },
+    { "id": "fd.nd_resin_1", "resource": "resin", "x": 37, "y": 24, "pool": "fenResin" }
   ],
   "spawners": [
     {

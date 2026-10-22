@@ -2666,6 +2666,29 @@ session's goes back to it. Log under "Integration log, round 6".
 
 ### Round 6 log: 6A (time scale, auto mode, headless harness, CLI)
 
+- **Three steps on one branch and one draft PR (2026-10-22)**, each commit green on `pnpm lint && pnpm typecheck &&
+  pnpm test`: (1) `sim/auto/clock.ts` (`stepsThisTick` with the pause, the single steps, the budget guard and the
+  carry; `effectiveScale` over the last 20 ticks) and the writer test; the `PartyRoom` loop was already the
+  pre-seed's, so it is unchanged; (2) `sim/auto/Auto.ts` (`enableAuto`, `queueAutoStart`, `applyClock`, `runAuto`
+  draining `start`, `setup`, `reset`, `clock`; `autoOptionsProblem`), `test/autoHelpers.ts runAutoMatch` on
+  `advance` and a one-day match per mode in `auto.test.ts`; (3) the determinism test, the clientless dispose, the
+  `party` room at one step per tick, `tools/auto/run.ts` with the seed derivation in `args.ts`, GDD 3.19, the
+  ARCHITECTURE Start-flow sentence and DECISIONS A83. `preyFor` and the `startRefusal` auto line were complete in
+  the pre-seed and stay as they were.
+- **Measured.** A full 8-seat match runs headless in 1.1 to 1.7 s (main, about 18 000 steps) and 0.4 to 0.5 s
+  (quick mode); two runs with the same seeds and seat ids gave the same digest in both modes, and `pnpm auto`
+  printed the same lines twice for the same flags. A clientless room is disposed by Colyseus's seat-reservation
+  timer (15 s by default) after `onCreate`; the harness disconnects its room itself.
+- **For 6B.** `runAutoMatch` subscribes to the nine kinds of `auto-admin.md` 5 with `onSim` (`AUTO_EVENT_KINDS`), so
+  `AutoResult.events` fills once `runEvents` delivers; `digest` stands in for `logHash` until `log.ts` lands; a
+  `step` that throws is recorded as the failure `step`. `run.ts` needs one import of `./checks` when the
+  invariants register there. **For 6C**: every admin command is an `AutoCommand` pushed onto
+  `autoOf(room).commands`; `effectiveScale(clockOf(room))` is the snapshot field.
+- **Seen in passing, for the owner and 6P.** All six distinct full main-mode probes (7 and 8 seats, normal and
+  hard) ended in a Cabal win after the Final Night, and the two whose match log was read had one and two kills: the
+  NPC Killer strikes only when alone with its prey (`preyFor`), which an all-NPC party rarely gives it. That is GDD 3.12 behaviour, not a harness fault; the 50-match
+  soak will say whether it needs a balance look.
+
 ### Round 6 log: 6B (event bus and invariants)
 
 ### Round 6 log: 6C (GitHub auth and AdminRoom)
@@ -2673,6 +2696,20 @@ session's goes back to it. Log under "Integration log, round 6".
 ### Round 6 log: 6D (admin client)
 
 ### Round 6 log: 6E (M5b content and GDD 3.14-3.16)
+
+- **One PR, four commits (2026-10-22)**, #49, each green on `pnpm lint && pnpm typecheck && pnpm test`, as 6Z did
+  with one branch: (1) resources, recipes, the material items and the Spade, `checkM5b`'s craft checks; (2)-(3) mobs,
+  quest npcs and quests, the harbourmaster's giver on the overworld, mini-games and their checks; (4) nodes on
+  Gallows Wood and the Tin Gallery mouth and bats there, the per-profile craft check, `vision.lanternTiles` 2, GDD
+  3.14-3.16, the WORLD 4.6 economy note, DECISIONS A87. Ids for 6F-6I and 6M: resources `timber`, `stone`, `tinOre`,
+  `resin`, `herb`, `mushroom` (sprites `node_<snake>`); recipes = their tool ids `torch`, `snare`, `spade`,
+  `lockpicks`, `lantern`, `crowbar`; mobs `wolf`, `boar`, `bat`, `rat` (sprites `mob_<id>`); npcs `harbourmaster`,
+  `moll`, `foreman`, `smith`, `collier` (all `villager`); quests `caulkTheSkiff`, `mollsHerbs`, `mollsMushrooms`,
+  `stackTheYard`, `smithsOre`, `colliersStone` (copy ids `quest.<id>`); mini-games `lanternPour`, `pumpSlide`,
+  `letterSlide`, `fenceCrates`, `flourCrates`.
+- **Contract notes for the orchestrator**: `seams.md` 1.2 still lists `gatherHoldS` (now `stackMax`);
+  `schemas/items.ts` gained the `material` kind (one line). One baseline flake seen under full-suite load
+  (`onubNight.test.ts`, a 422 not yet received); it passed alone three times and on the rerun.
 
 ### Round 6 log: 6F (gathering and crafting)
 

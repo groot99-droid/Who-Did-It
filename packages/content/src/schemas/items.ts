@@ -4,7 +4,18 @@ import { GddRef, Id, Ships, Tiles } from './common.js';
 export const Item = z.strictObject({
   id: Id,
   name: z.string().min(1),
-  kind: z.enum(['weapon', 'key', 'tool', 'charge', 'medical', 'light', 'deliverable', 'valuable']),
+  /** `material`: a gathered resource that stacks (GDD 3.14); its id is the `resources.json` row it comes from. */
+  kind: z.enum([
+    'weapon',
+    'key',
+    'tool',
+    'charge',
+    'medical',
+    'light',
+    'deliverable',
+    'valuable',
+    'material',
+  ]),
   /** Role-bound items never drop on death; the Magnifier is the one exception (GDD 3.5). */
   roleBound: z.boolean(),
   /** `inspectStation`: drops as a world object anyone can Inspect with (the Magnifier). */

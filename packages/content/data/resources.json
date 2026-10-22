@@ -1,1 +1,54 @@
-{ "gddRef": "3.14", "resources": {} }
+{
+  "gddRef": "3.14",
+  "resources": {
+    "timber": {
+      "id": "timber",
+      "name": "Timber",
+      "gatherS": 3,
+      "yield": 1,
+      "respawnS": 90,
+      "sprite": "node_timber"
+    },
+    "stone": {
+      "id": "stone",
+      "name": "Stone",
+      "gatherS": 3,
+      "yield": 1,
+      "respawnS": 120,
+      "sprite": "node_stone"
+    },
+    "tinOre": {
+      "id": "tinOre",
+      "name": "Tin Ore",
+      "gatherS": 4,
+      "yield": 1,
+      "respawnS": 150,
+      "tool": "spade",
+      "sprite": "node_tin_ore"
+    },
+    "resin": {
+      "id": "resin",
+      "name": "Pine Resin",
+      "gatherS": 2,
+      "yield": 1,
+      "respawnS": 90,
+      "sprite": "node_resin"
+    },
+    "herb": {
+      "id": "herb",
+      "name": "Herbs",
+      "gatherS": 2,
+      "yield": 2,
+      "respawnS": 60,
+      "sprite": "node_herb"
+    },
+    "mushroom": {
+      "id": "mushroom",
+      "name": "Mushrooms",
+      "gatherS": 2,
+      "yield": 1,
+      "respawnS": 75,
+      "sprite": "node_mushroom"
+    }
+  }
+}
