@@ -1,9 +1,26 @@
 {
-  "tracks": [],
+  "tracks": [
+    {
+      "key": "lobby_contemplation",
+      "url": "lobby_contemplation.ogg",
+      "gain": 1,
+      "durationS": 60,
+      "bytes": 541229
+    },
+    {
+      "key": "end_the_fade",
+      "url": "end_the_fade.ogg",
+      "gain": 1,
+      "durationS": 66.6,
+      "bytes": 827223
+    }
+  ],
   "playlists": [
     {
       "id": "lobby",
-      "tracks": [],
+      "tracks": [
+        "lobby_contemplation"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
@@ -51,7 +68,9 @@
     },
     {
       "id": "hollowmere_gameover",
-      "tracks": [],
+      "tracks": [
+        "end_the_fade"
+      ],
       "crossfadeS": 3,
       "shuffle": false
     },
@@ -93,7 +112,9 @@
     },
     {
       "id": "blackpine_gameover",
-      "tracks": [],
+      "tracks": [
+        "end_the_fade"
+      ],
       "crossfadeS": 3,
       "shuffle": false
     },
@@ -117,7 +138,9 @@
     },
     {
       "id": "onub_over",
-      "tracks": [],
+      "tracks": [
+        "end_the_fade"
+      ],
       "crossfadeS": 3,
       "shuffle": false
     }

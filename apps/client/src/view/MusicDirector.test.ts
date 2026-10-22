@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import musicJson from '@wdi/content/data/music.json';
 import { MAP_IDS, MUSIC_CLASSES, ONUB_MUSIC_CLASSES } from '@wdi/content';
@@ -121,5 +121,22 @@ describe('MusicConductor', () => {
     c.phase(Phase.night);
     c.phase(Phase.dawn);
     expect(calls).toEqual(['kitchen', 'night', 'rush'].map((k) => onubPlaylistFor(k as 'kitchen')));
+  });
+});
+
+describe('committed music files', () => {
+  it('has every listed track on disk and keeps each map under its 4 MB and the whole under 12 MB', () => {
+    const dir = new URL('../../public/assets/audio/music/', import.meta.url);
+    const manifest = parseMusicManifest(JSON.parse(readFileSync(new URL('manifest.json', dir), 'utf8')));
+    for (const t of manifest.tracks) expect(statSync(new URL(t.url, dir)).size, t.key).toBe(t.bytes);
+    const total = manifest.tracks.reduce((n, t) => n + t.bytes, 0);
+    expect(total).toBeLessThanOrEqual(12_000_000);
+    for (const [map, classes] of Object.entries(musicJson.byMap)) {
+      const keys = new Set<string>();
+      for (const id of [...Object.values(classes)])
+        for (const k of manifest.playlists.find((p) => p.id === id)?.tracks ?? []) keys.add(k);
+      const bytes = [...keys].reduce((n, k) => n + (manifest.tracks.find((t) => t.key === k)?.bytes ?? 0), 0);
+      expect(bytes, map).toBeLessThanOrEqual(4_000_000);
+    }
   });
 });

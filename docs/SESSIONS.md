@@ -2718,6 +2718,11 @@ session's goes back to it. Log under "Integration log, round 6".
   - **To finish**: when the release is up, `library.py fetch --id <id>` for the ids above, master as `media.md` 1,
     add the OGG, the manifest rows (tracks and playlist `tracks`), the `CREDITS.md` and `MANIFEST.md` rows (`media.md`
     7), and run the budget test.
+- **CC0 beds (2026-10-22, owner: "Use a CC0 bed for lobby and the end screen").** `lobby` plays OpenGameArt
+  "Contemplation" (Pro Sensory, CC0, first 60 s, 0.5 MB); `hollowmere_gameover`, `blackpine_gameover` and `onub_over`
+  play "The Fade" (breadman, CC0, 0.8 MB). Mastered at -18 LUFS, Vorbis q3, CREDITS rows with URL, hash and date;
+  no `MANIFEST.md` row, since a CC0 download is not a master. FreePD is closed, so OpenGameArt is the source. Still
+  open: the library beds (release unpublished), and `*_dusk` reusing the day theme.
 
 ### Round 6 log: 6M (M5b art)
 
