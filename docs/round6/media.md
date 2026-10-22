@@ -68,6 +68,17 @@ music track trimmed to a clean loop (the day themes loop; the beds loop; the tra
 mastered files are what lands under `apps/client/public/assets/audio/` and nothing else does: no `.mp3`, `.m4a`
 or `.wav` is committed here, and nothing under ROSW `sound-library/files/` is ever added to git.
 
+**Later on 2026-10-22.** The owner attached `Who.Did.It.zip` (29,809,986 bytes, sha256
+`8bc15359c48696d6197fc82575cf9e6dbdf661002bb0fb41073cef81b7881872`) to `SFX_2026_01`: the same eleven files byte
+for byte, in three town folders and under their original names, plus a twelfth, `Who Did It theme.m4a` (3:24,
+Opus 48 kHz, tagged "made with suno", 2026-10-22; library id `who-did-it-music/who-did-it-theme`), the theme of
+the opening cinematic and the start screen (DECISIONS A98). 6N ingests from that asset; the two zips above are
+superseded. The videos travel as `Who_Did_It_Video_Pt1.zip` (26,578,807 bytes, sha256
+`2c74308189cf66f1e23e76f6a90998de61526f0dd8e3749e8e9d6131da4a55a7`), which the owner attaches next: the cinematic
+`copy_A2EDCB60-FF7B-4357-A239-0183004A55FD.MOV` (22.87 s, 1920x1080 HEVC 30 fps, stereo AAC 44.1 kHz, 26 MB), the
+loop `higgsfield-9b7d9b7f-2fa9-4009-abbb-d5a0fcc0d4ca.MP4` (8.04 s, 1920x1080 HEVC 24 fps, silent, 0.6 MB) and its
+still `IMG_2851.WEBP` (640x360).
+
 ## 2. The music budget (DECISIONS A81)
 
 Mastered as above the seven music files come to roughly 9 to 10 MB, above the 6 MB audio budget of ASSETS 6.8.
@@ -76,18 +87,22 @@ budget: at most 12 MB in all and at most 4 MB per map**; the 6 MB budget stays f
 first load carries. `tools/sprites/test/media.test.ts` (6K) enforces both from `audio/manifest.json` and
 `audio/music/manifest.json`, and the per-video cap of section 3.
 
-## 3. The two videos (6N, ROSW `video-shot`)
+## 3. The videos (6N; the owner's cinematic and loop, and one ROSW `video-shot` run)
 
-Only two real videos exist in round 6; every other cinematic is in-engine and data-driven (`cutscene-music.md`).
+Three real videos exist in round 6 (two of them the owner's, DECISIONS A98); every other cinematic is in-engine and
+data-driven (`cutscene-music.md`).
 
 | Key | File | What it is | Limits |
 |---|---|---|---|
-| `landing_loop` | `apps/client/public/assets/video/landing_loop.webm` (+ `landing_loop.jpg` poster) | the start-screen trailer: a silent 12 to 20 s loop of the three towns in the 8-bit style, cut to `trailer-audio` (the audio plays only after a tap, through `MusicBus`) | VP9, 960x540, 24 fps, no audio track, **at most 2 MB**; a poster frame under 60 KB |
+| `intro` | `apps/client/public/assets/video/intro.webm` (+ `intro.jpg` poster) | the owner's opening cinematic (section 1, "Later on 2026-10-22"), played once per browser session before the menu by the `Intro` scene (6Q), with its own sound; the library effects 6N proposes are mixed in only after the owner's word | VP9, 1280x720, 24 or 30 fps, Opus audio, **at most 5 MB**, streamed (`preload="auto"`), the one video outside the 2 MB rule and the first-load count; a poster under 60 KB |
+| `landing_loop` | `apps/client/public/assets/video/landing_loop.webm` (+ `landing_loop.jpg` poster) | the start-screen background: the owner's silent 8 s Higgsfield render, cut to loop, poster from `IMG_2851.WEBP`; the `lobby` playlist (the theme) plays after the first tap, through `MusicBus` | VP9, 960x540, 24 fps, no audio track, **at most 2 MB**; a poster frame under 60 KB |
 | `memorial_vicar` | `apps/client/public/assets/video/memorial_vicar.webm` | the Vicar martyrdom, Bible Book I.6: an 8-bit video of 20 to 30 s with its own narration bed (a library riser or tension builder, section 4) | VP9, 960x540, 24 fps, Vorbis audio, at most 2 MB; **played only by the round-7 `memorial.vicar` cutscene** (the `video` step), so round 6 ships the file and the manifest row and no caller |
 
-Both come out of ROSW `studio/pipeline/spec.yaml` `video-shot` runs through the Higgsfield connector, kept as
-masters under `studio/assets/who-did-it/video/<slug>/`, with a studio note, a `MANIFEST.md` row and a `CREDITS.md`
-"Generated" row citing the ROSW `studio/library/catalog.json` id. `assets/video/manifest.json` (6N writes it to
+The memorial comes out of a ROSW `studio/pipeline/spec.yaml` `video-shot` run through the Higgsfield connector,
+kept as a master under `studio/assets/who-did-it/video/<slug>/`, with a studio note, a `MANIFEST.md` row and a
+`CREDITS.md` "Generated" row citing the ROSW `studio/library/catalog.json` id. The cinematic and the loop are the
+owner's masters (the same folder, no studio note, a `MANIFEST.md` row each); the loop's `CREDITS.md` row cites its
+Higgsfield catalog id (`higgsfield-library-sync`), the cinematic's names the owner's tool once stated. `assets/video/manifest.json` (6N writes it to
 6K's shape) lists `{key, url, poster?, durationS, bytes}`. The `render-pipeline` skill's Kinds paragraph in ROSW
 names this document for the `video` kind.
 
@@ -147,10 +162,9 @@ Answered: (1) the three OuterSkylight tracks were generated with **Flow Music, m
 credits piece and the other Port-au-Levain's loading-screen piece; (3) `My_Song.m4a` is BlackPine's
 loading-screen piece and is renamed `BlackPine.m4a`. Still open:
 
-1. **Attach the two zips 6Z handed back** (hashes in section 1) **to the `SFX_2026_01` release of ROSW**, the
-   tag the owner chose instead of `sfx-2026-10`; the 16 library zips are on it since 2026-10-22 and the catalog
-   names it since ROSW #13, so the library sounds can be fetched from a cloud session now. The owner's own tracks
-   cannot until the two zips are up; then tell 6N.
+1. **Done for the audio, open for the video.** The owner attached `Who.Did.It.zip` to `SFX_2026_01` on 2026-10-22
+   at 23:23 UTC (section 1, "Later on 2026-10-22"), so the two zips 6Z handed back are superseded and 6N's step 2
+   runs. Still to attach: `Who_Did_It_Video_Pt1.zip` (hashes in section 1), then tell 6N.
 2. The GitHub OAuth app and the Railway variables of `auto-admin.md` 7. The gate has **no password**: the owner
    signs in to GitHub, GitHub says who they are, and `WDI_ADMIN_GITHUB_LOGINS=groot99-droid` lets them in;
    `WDI_ADMIN_SECRET` is generated (`openssl rand -base64 32`) and pasted into Railway, never a phrase anyone
