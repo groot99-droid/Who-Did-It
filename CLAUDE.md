@@ -76,6 +76,17 @@ Versions are pinned in `docs/ARCHITECTURE.md` 5.1. Sessions never upgrade depend
 - ROSW `writing-museum/` is a Three.js first-person viewer with doors, rooms, lights,
   touch and gamepad input; it is the candidate seed for the V2 renderer.
 
+## Compact instructions
+
+Every session compacts its context at 400k tokens (`.claude/settings.json`, `autoCompactWindow`). When a
+compaction summary is written for a session of `docs/SESSIONS.md`, it keeps, in this order: the session id
+(for example 6F) and its branch; the PR split step it is on and which PRs are open, merged or unpushed; the
+files it has edited since its last push; every contract request it has made in a PR description and whether
+the orchestrator answered; the test command and its last result; and the sections of the contract documents
+it still has to read. It drops tool output, file contents it can re-read, and anything a document already
+says. A session that resumes after a compaction re-reads its brief and `docs/round<N>/seams.md` before the
+next edit.
+
 ## Naming caution
 
 "One Night Ultimate Baguette" is a parody of a published card game's title and stays an

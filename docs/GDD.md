@@ -482,15 +482,15 @@ In M5a nobody carries a light that anyone else can see. Your vision is drawn for
 
 ### 3.14 Resources and crafting
 
-Round 6 (ROADMAP M5b); data fields are pre-seeded in round 5 (3.13).
+Round 6 (ROADMAP M5b); the data fields were pre-seeded in round 5 (3.13). The contract is `docs/round6/m5b-data.md` 1 and 2.1 until 6E and 6F write this section; the numbers land in `packages/content/data` with it.
 
 ### 3.15 Mobs
 
-Round 6 (ROADMAP M5b); data fields are pre-seeded in round 5 (3.13).
+Round 6 (ROADMAP M5b); the data fields were pre-seeded in round 5 (3.13). The contract is `docs/round6/m5b-data.md` 1 and 2.2 until 6E and 6G write this section; the numbers land in `packages/content/data` with it.
 
 ### 3.16 Quests and mini-games
 
-Round 6 (ROADMAP M5b); data fields are pre-seeded in round 5 (3.13).
+Round 6 (ROADMAP M5b); the data fields were pre-seeded in round 5 (3.13). The contract is `docs/round6/m5b-data.md` 1 and 2.3 until 6E and 6H write this section; the numbers land in `packages/content/data` with it.
 
 ### 3.17 Characters and disguise
 
@@ -520,3 +520,11 @@ Round 6 (ROADMAP M5b); data fields are pre-seeded in round 5 (3.13).
 **Reveals.** An ejection shows the ejected seat's role portrait beside the look it wore. A death in the world shows nothing until the next meeting flips `alive`, and no role until game over. The end screen shows, for every seat, the role card, the look it wore, and the two undealt cards.
 
 **(M5a) On the wire.** The look is the public `Player.look`; others are drawn from scene-scoped avatars keyed by random handles, and the Kill and the Bandage name a handle, which the server resolves to a seat; list acts (Impersonate, the night powers) name a seat. There is no cover flag and no disguise flag anywhere: a cover look is sent exactly like a real one, and an impersonation is an avatar like any other. Schema, messages and the privacy tests are ARCHITECTURE 5.4 and 5.5.
+
+### 3.18 Cinematics and music
+
+Round 6 (ROADMAP M5c). Cutscenes are data (`packages/content/data/cutscenes/`) played in-engine: the opening of a map runs inside grace, which `phases.openingS` lengthens for it, and adds no phase; a death plays the cutscene of its cause before the ghost handoff; every cutscene can be skipped, and reduce-motion turns its camera moves into cuts. Music follows the phase class of the map (`music.json`), is loaded after Start under its own budget (ASSETS 6.8) and is never sent by the server. The contract is `docs/round6/cutscene-music.md`; 6J writes the cutscene paragraphs and 6L the music paragraphs here, and the seconds live in `balance.json` (`phases.openingS`, `ui.transitionS`).
+
+### 3.19 Admin auto-mode
+
+Round 6 (ROADMAP M5d). An owner-only room runs a match in which every seat is an NPC, at 1x, 2x, 5x or 10x sim speed, paused or stepped, watched from a god view on several scene viewports, with the invariants of `docs/round6/auto-admin.md` 5 checked as it runs. Nothing about it changes a normal match: a `party` room never leaves 1x, an NPC Killer takes an NPC as prey only in an auto match, and the room exists only when the owner's GitHub login is configured on the server (ARCHITECTURE 5.11). The contract is `docs/round6/auto-admin.md`; 6A writes this section.

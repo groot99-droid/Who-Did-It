@@ -2294,3 +2294,365 @@ Branch `claude/r5-char-art`, PR #33 (the L1-L5 split as commits on one branch). 
   are set, and `onub_station_oven`, its kitchen quadrant, `onub_loc_oven` and the oven's Ingredient cards are rebuilt
   in both styles; no greybox is left. The real oven pushed the low-poly set past 4 MiB, so the
   generated and composed art goes to quality 82 (3.85 MiB; A64). The three retake MANIFEST rows now cite their new generation ids.
+
+## Round 6 (started 2026-10-22, after round 5 landed at a60d855)
+
+Fifteen sessions build **M5b, Resources, mobs and quests** (GDD 3.14-3.16; ROADMAP M5b), **M5c, Cinematics and
+music** (GDD 3.18; ROADMAP M5c), **M5d, the admin auto-mode** (GDD 3.19; ROADMAP M5d), and the empty seams of
+the owner's Integrated Master World, System & Design Bible (`docs/round6/owner-brief.md`, quoted word for word;
+`bible-seams.md` stages it over rounds 6 to 9). Same rules as rounds 1 to 5:
+- draft PRs against `claude/zen-turing-m1jnw0`, under 400 lines where the work allows (split by step, each PR
+  green);
+- `pnpm lint && pnpm typecheck && pnpm test` clean before every push;
+- pinned versions only, and no model identifiers in committed files (the Model column of this table is the one
+  exception, as in round 5);
+- `docs/GDD.md` changes in the same PR as a behaviour change;
+- numbers only in `docs/GDD.md` and `packages/content/data`.
+
+**Models.** The owner's rule for this round: Sonnet 5.5 for almost everything; Opus 5.5 for planning and the
+complex game logic (6A, 6B, 6G) and, as in round 5, for content and art (6E, 6M, 6N); Fable 5.1 only for the
+system redesign, which is 6Z (this contract and the pre-seed). The decisions of this round are DECISIONS A81
+(the owner's answers and the contract); a session never re-decides them.
+
+**Context.** Every session compacts at 400k tokens: `.claude/settings.json` sets `autoCompactWindow` to 400000
+(an absolute token count; a cloud session may compact earlier through its own percentage threshold, which is
+fine) and `CLAUDE.md` "Compact instructions" says what a compacting session keeps. A session is spawned with its
+model, that setting, and a prompt of the form "You are session 6X of docs/SESSIONS.md Round 6. Read your brief,
+then docs/round6/seams.md, then the sections it names. Branch claude/r6-<slug>."
+
+**What changed for everyone.**
+- **The sim has a clock.** `PartyRoom`'s fixed step runs `step` `n` times per tick from `sim/auto/clock.ts`;
+  a `party` room never leaves 1x and nothing in `C2S` changes the clock (`auto-admin.md` 2).
+- **A match can have no human.** `RoomSim.auto` marks an auto match; the NPC Killer takes NPC prey only there;
+  Start needs no leader there (`auto-admin.md` 3).
+- **A seatless admin client** sees everything, in its own room (`admin`), only when `WDI_ADMIN=1` and the
+  GitHub variables are set (`auto-admin.md` 7, 8).
+- **Cutscenes are data** (`packages/content/data/cutscenes/`), captions are copy ids, the opening lengthens
+  grace by `phases.openingS`, and a `killed` carries its cutscene id (`cutscene-music.md` 1).
+- **Music is lazy and has its own budget** (<= 12 MB, <= 4 MB per map, loaded after Start); the 6 MB audio
+  budget is SFX and ambience (`media.md` 2, DECISIONS A81).
+- **The Step order** gains `runAuto` (before `runNpcs`), `runResources`, `runMobs`, `runQuests` (in place of
+  `runAiAndHazards`, after `runDecay`) and `runEvents` (after `runPhases`).
+
+**The contract documents** (`docs/round6/`) carry everything a session needs beyond this section:
+- `seams.md`: every pre-seeded hook, its owner, its locked call site and its stub body, kept current per step;
+- `auto-admin.md`: the clock, the all-NPC match, the harness and `pnpm auto`, the invariants, the admin wire,
+  the GitHub login, the observer;
+- `cutscene-music.md`: cutscenes, loading, transitions, the trailer, music, the budgets;
+- `m5b-data.md`: the M5b content, server modules, client views and art;
+- `bible-seams.md`: the Bible's systems by round, and the empty seams round 6 leaves;
+- `media.md`: the owner's audio, the two videos, the ROSW route, the provenance rows;
+- `owner-brief.md`.
+
+Read your brief below, then `seams.md`, then the sections of those documents it names. GDD 3.14-3.16, 3.18 and
+3.19 are stubs that point at the contract documents until their owners write them (6E, 6J and 6L, 6A); ROADMAP
+7.1 carries M5b, M5c, M5d and the round 7-9 rows; ARCHITECTURE 5.11 points at the admin gate (6C writes it).
+
+**Pre-seeded on the base branch** by 6Z after this section, additively, in six steps (`seams.md` 1): (1) the
+shared wire and schema (`protocol/admin.ts`, `S2C.cutscene`, `minigameStart`, the quest and mini-game `C2S`
+types, `HoldAction` `gather` and `craft`, `killed.cutsceneId`, `DeathCause.wolf`, `StatusBit.lantern`,
+`SceneState.nodes` and `mobs`, `Private.quests`, `GameState.lawStage`, `Role.evolvedFrom`, `PROTOCOL.md`
+regenerated); (2) the content stubs with zod (`cutscenes/`, `music.json`, the five M5b files, the four Bible
+files, the `balance.json` rows); (3) the server stubs and locked call sites (`sim/auto/{Auto,clock,AdminView,
+invariants,log}.ts`, `sim/events/bus.ts`, `rooms/AdminRoom.ts` unregistered, `services/adminAuth.ts` with
+`adminConfig` returning null, `RoomSim.auto`, the clock loop in `PartyRoom`, `preyFor`, the `startRefusal` auto
+branch, the Step stages as no-ops, the `isAdminClient` line in `reconcileViews`, the `seeds.test.ts`
+allowlist); (4) the client stubs (`#/admin`, `scenes/Admin.ts`, `admin/`, `view/cutscene/`,
+`view/{MusicBus,MusicDirector,Transition,LoadingScreen}.ts` with their mount lines, the feed types); (5)
+`tools/auto/` and `test/autoHelpers.ts`; (6) the `soak.yml` `auto` leg. Nothing the code at a60d855 reads is
+removed or made required. Until a step lands, its rows in `seams.md` say "pending" and a session that needs
+one writes a local stand-in with the same signature.
+
+**Nobody edits** `packages/shared/src/**` except the rule bodies a brief names (`rules/cutscenes.ts` 6J,
+`rules/minigames.ts` 6H), `packages/content/src/**` and the content data except the lines a brief names,
+`apps/server/src/sim/{Step,RoomSim,Flow,Phases,Win,Npc,seeds,constants}.ts`, the pre-seeded call sites in
+`rooms/PartyRoom.ts`, `rooms/handlers/lobby.ts`, `sim/{Visibility,Death,Actions,Commands}.ts` and
+`sim/npc/world.ts` (the other lines of those files belong to the owners in the table), `apps/server/test/{simHelpers,
+killHelpers,seedHelpers,npcHelpers}.ts`, the client contract files (`net/{world,worldColyseus,worldRouter,
+protocol,NetworkService,mock}.ts`, `net/mock/worldMock.ts`, `scenes/registry.ts`, `view/animIds.ts`, `main.ts`
+and every pre-seeded mount line in `scenes/{Preload,World}.ts`, `ui/{Landing,Lobby}.ts` and `view/Hud.ts`),
+`tools/sprites/{placeholder,placeholder-kit}.ts` and `eslint.config.js`. A session that needs another contract
+writes it in its PR description and carries on with a local stand-in; the orchestrator adds it to the base
+branch.
+
+| Session | Model | Track | Branch | Owns |
+|---|---|---|---|---|
+| **6Z. Round-6 contract and pre-seed** | Fable 5.1 | Contract | `claude/game-features-admin-planning-v43tvq` | `docs/round6/**`, this section, DECISIONS A81, the pre-seed of `seams.md` 1, the settings and CLAUDE.md compact sections in both repos |
+| **6A. Time scale, auto mode, headless harness, CLI** | Opus 5.5 | Code | `claude/r6-auto-core` | `sim/auto/{Auto,clock}.ts`, `preyFor`, the `startRefusal` auto line, `test/autoHelpers.ts`, `test/auto.test.ts`, `tools/auto/run.ts`, GDD 3.19 |
+| **6B. Event bus and invariants** | Opus 5.5 | Code | `claude/r6-invariants` | `sim/events/**`, `sim/auto/{invariants,log}.ts`, `tools/auto/{report,checks}/**`, `MatchLog` `event: 'auto'`, `test/invariants.test.ts`, `soak.yml` auto leg |
+| **6C. GitHub auth and AdminRoom** | Sonnet 5.5 | Code | `claude/r6-admin-server` | `services/adminAuth.ts`, `rooms/AdminRoom.ts`, `rooms/handlers/admin.ts`, `sim/auto/AdminView.ts`, the admin block of `server.ts`, ARCHITECTURE 5.11 admin text, README Railway notes, tests |
+| **6D. Admin client** | Sonnet 5.5 | Code | `claude/r6-admin-client` | `client/admin/**`, `scenes/Admin.ts`, `EntityView` label option, `interpolation.ts` delay parameter, `e2e/admin.spec.ts`, UI.md 14.18 |
+| **6E. M5b content and GDD 3.14-3.16** | Opus 5.5 | Content | `claude/r6-m5b-content` | the five M5b files, their schemas and `checkM5b`, `items.json` rows, `balance.json` `resources`, `mobs`, `quests`, `vision.lanternTiles`, the scenes' `nodes`, `spawners`, `givers`, GDD 3.14-3.16, WORLD economy notes |
+| **6F. Gathering and crafting** | Sonnet 5.5 | Code | `claude/r6-gather-craft` | `sim/{Resources,Craft,Inventory}.ts`, the `gather` and `craft` hold cases of `Actions.ts`, tests |
+| **6G. Mobs and dark visibility** | Opus 5.5 | Code | `claude/r6-mobs` | `sim/Mobs.ts`, `sim/mobs/**`, `sim/Sight.ts`, the `canSee` line of `reconcileAvatars`, the lantern bit in `publishAvatars`, the wolf cause in `Kill.ts` and `Death.ts`, tests |
+| **6H. Quests and mini-games** | Sonnet 5.5 | Code | `claude/r6-quests-minigames` | `sim/{Quests,Minigames}.ts`, `rules/minigames.ts`, the quest and mini-game cases of `Commands.ts`, the task hold of `Actions.ts`, the fake-list rule, tests |
+| **6I. M5b client** | Sonnet 5.5 | Code | `claude/r6-m5b-client` | `view/{NodeView,MobView,GiverView}.ts`, `ui/{Inventory,Crafting,QuestLog}.ts`, `view/minigames/**`, the lantern glow of `Lighting.ts`, the readers of `worldColyseus.ts` and the mock, `ui/copy/m5b.ts`, `e2e/m5b.spec.ts`, UI.md 14.19 |
+| **6J. Cutscenes** | Sonnet 5.5 | Code | `claude/r6-cutscenes` | `content/data/cutscenes/**` and the schema, `rules/cutscenes.ts`, `view/cutscene/**`, `ui/copy/cutscenes.ts`, the `beginPlay` broadcast and `openingS`, the `markDead` line, the `World.ts` play hooks, `e2e/cutscene.spec.ts`, GDD 3.18 cutscene lines, GDD 3.3 `openingS` line |
+| **6K. Loading, transitions, trailer, budgets** | Sonnet 5.5 | Code | `claude/r6-polish-flow` | `view/{LoadingScreen,Transition}.ts`, `ui/copy/tips.ts`, the Landing video element, the `worldRouter.ts` wrappers' bodies, `tools/sprites/test/media.test.ts`, the video manifest shape, ASSETS 6.8 text, GDD 3.13 `transitionS` line |
+| **6L. Music** | Sonnet 5.5 | Code | `claude/r6-music` | `view/{MusicBus,MusicDirector,audioSettings}.ts`, `ui/SettingsPanel.ts`, `AudioBus.setSfxVolume` and the `narr_*`/`sting_*` keys, `content/data/music.json` and its schema, the music manifest shape, CC0 beds and CREDITS, GDD 3.18 music lines |
+| **6M. M5b art** | Opus 5.5 | Art | `claude/r6-m5b-art` | `tools/sprites/placeholder-m5b.ts`, node, mob, giver, tool and light sprites in both styles, manifest keys, SPRITES.md section, CREDITS |
+| **6N. ROSW media (both repos)** | Opus 5.5 | Art | `claude/r6-rosw-media` | ROSW: the `music-cue` and `video-shot` runs, studio notes, library catalog; here: `public/assets/{video,audio/music}/**` binaries, the manifest rows, the mastered owner tracks, `assets/source/MANIFEST.md`, CREDITS rows |
+| **6P. Integration** | Sonnet 5.5 | Code | `claude/r6-integration` | merges, lockfile, `PROTOCOL.md` regen, the 50-match `pnpm auto` soak on both maps and modes, both 30-minute soaks, the opt-in e2e suites, this round's integration log, DECISIONS A97 |
+
+Merge order: 6Z first and alone; then 6A, 6E, 6J, 6K, 6L, 6M in parallel; 6B and 6C after 6A; 6F, 6G, 6H
+after 6E; 6D after 6C; 6I after 6F, 6G and 6H; 6N when its binaries pass `media.test.ts`; 6P last. Shared
+documents: edits stay inside the named section with no renumbering or reflow, and the orchestrator keeps both
+sides of any conflict. Copy: a session that needs new lines adds a UI.md 14 subsection of its own (6D 14.18,
+6I 14.19, 6J 14.20, 6K 14.21, 6L 14.22) and a copy module of its own under `ui/copy/`. Theme: new rules are
+appended at the end of `ui/theme/components.css` under a "Round 6 (6X)" comment, one block per session.
+Decisions a session has to make go to `docs/DECISIONS.md` under its reserved row, which every session may fill
+(6Z A82, 6A A83, 6B A84, 6C A85, 6D A86, 6E A87, 6F A88, 6G A89, 6H A90, 6I A91, 6J A92, 6K A93, 6L A94,
+6M A95, 6N A96; integration A97). A second row takes the number plus 16 (A98 to A112, appended after A97, so it
+never meets the integration row); nobody edits an older row. The orchestrator runs the opt-in e2e suites
+(`WDI_E2E_ONUB=1`, `WDI_E2E_NPC=1`, `WDI_E2E_LOOKS=1`, and this round's `WDI_E2E_ADMIN=1`), `pnpm auto --
+--matches 50` per map, mode and difficulty, and the 30-minute soaks of both modes at integration. The Railway
+variables of `auto-admin.md` 7 are set by the owner.
+
+### Briefs
+
+Every brief names the session's paths, the sections it reads, its PR split, its tests and what it leaves
+alone. Every session reads `docs/round6/seams.md` before writing code and records its round-6 log under its
+reserved "Round 6 log" heading at the end of this section.
+
+**6Z. Round-6 contract and pre-seed.** Write the contract (this section and `docs/round6/`), the shared-document
+stubs, the settings and CLAUDE.md compact sections in both repos, then land the six pre-seed steps additively,
+each PR green, editing `seams.md` as each lands. **Owns** `docs/round6/**`, this section, DECISIONS A81 and
+A82, ROADMAP 7.1 rows M5b to M5d and rounds 7-9, GDD 3.14-3.16 pointers and the 3.18 and 3.19 stubs,
+ARCHITECTURE 5.11's pointer, `docs/README.md`'s row, `CLAUDE.md` "Compact instructions" and
+`.claude/settings.json` in both repos, ROSW's `render-pipeline` Kinds line, and every file `seams.md` 1 marks
+as a pre-seed. **Reads** everything. **PRs**: (1) the documents and settings; (2)-(7) the six steps of
+`seams.md` 1, each under 400 lines. **Tests**: `pnpm lint && pnpm typecheck && pnpm test` on every step;
+`party.test.ts` still proves no `admin` room and no debug handlers without env; `protocol-doc.test.ts` after
+`pnpm docs:protocol`; the content tests validate every new empty file. **Not**: any body a brief gives another
+session. Log under "Round 6 log: 6Z".
+
+**6A. Time scale, auto mode, headless harness, CLI.** Make the sim run at 1x, 2x, 5x and 10x from one place,
+let a match run with every seat an NPC and no leader, and give the repo a headless harness and a CLI that plays
+such matches to the end deterministically. **Owns** `apps/server/src/sim/auto/{Auto,clock}.ts`, the `preyFor`
+body in `sim/npc/world.ts`, the auto branch of `startRefusal` in `rooms/handlers/lobby.ts`,
+`apps/server/test/autoHelpers.ts`, new `apps/server/test/auto.test.ts`, `tools/auto/run.ts` and its
+`package.json` scripts, GDD 3.19 (the whole section, from the stub), ARCHITECTURE 5.3's Start-flow paragraph
+(`seams.md` 3). **Reads** `auto-admin.md` 1-4 and 6; `seams.md` 1.3 and 1.5; GDD 3.12 (the brains it drives).
+`enableAuto` is the one production path that assigns `fixedSeeds`; `runAuto` is the only writer of the clock;
+`startMatch` is called inside the step and never from a handler. **PRs**: (1) `clock.ts`, the loop in
+`PartyRoom` filled, the writer test; (2) `Auto.ts`, `preyFor`, `startRefusal`, `autoHelpers.ts` and a one-day
+auto match per mode in `auto.test.ts`; (3) the determinism test, `autoDispose` on a clientless room, `run.ts`
+and GDD 3.19. **Tests**: the clock's budget guard (`carry` grows, `effectiveScale` drops, nothing is skipped);
+an NPC Killer takes NPC prey only under `auto.npcPrey`; a `party` room's `tickP95` is unchanged at 1x; two
+runs with the same seeds hash the same. **Not**: `Visibility.ts`, `AdminRoom.ts`, the invariants (6B), any
+admin handler (6C). Before code, `seams.md`; log under "Round 6 log: 6A".
+
+**6B. Event bus and invariants.** Give the sim an event bus the vendettas and the propagation matrix will
+subscribe to, and an invariant registry the harness and the admin page run every few ticks; put the all-NPC
+matches in the weekly soak. **Owns** `apps/server/src/sim/events/**`, `sim/auto/{invariants,log}.ts`,
+`tools/auto/{report,checks}/**`, the `event: 'auto'` lines of `MatchLog` in `sim/Win.ts`, new
+`apps/server/test/invariants.test.ts`, the one-line `emitSim` calls in `Kill.ts`, `Death.ts`, `Clues.ts`,
+`Meeting.ts`, `Phases.ts` and `Win.ts` (listed in the PR; the orchestrator confirms them), the `auto` leg of
+`.github/workflows/soak.yml`. **Reads** `auto-admin.md` 4-6; `bible-seams.md` 1 and 2; `seams.md` 1.3 and 1.5.
+The log records seat ids, never avatar handles. **PRs**: (1) the bus, `runEvents`, the emitters and
+`invariants.test.ts` for the bus; (2) the seven invariants of `auto-admin.md` 5 with tests on `npcHelpers`
+rooms; (3) `log.ts`, `tools/auto/report`, the `soak.yml` leg. **Tests**: each invariant fires on a constructed
+failure and not on a clean room; the leak invariant reproduces `visibility.test.ts`'s cases. **Not**: the
+brains, `Auto.ts`, the admin wire. Before code, `seams.md`; log under "Round 6 log: 6B".
+
+**6C. GitHub auth and AdminRoom.** Put the owner's GitHub login on the server and open the `admin` room only
+to it: the OAuth routes, the signed token, the room that joins without a seat and sees everything, the admin
+handlers that queue into the auto commands. **Owns** `apps/server/src/services/adminAuth.ts`,
+`rooms/AdminRoom.ts`, new `rooms/handlers/admin.ts`, `sim/auto/AdminView.ts`, the admin block of `server.ts`,
+new `apps/server/test/{adminAuth,adminRoom}.test.ts`, ARCHITECTURE 5.11's admin paragraph (from the pointer),
+the Railway variable notes in `README.md`. **Reads** `auto-admin.md` 1, 3, 6-8; `seams.md` 1.3; ARCHITECTURE
+5.11; `party.test.ts` (the debug-handler assertion it mirrors). No cookie; the token travels in the join
+options; the generic join error never says why. **PRs**: (1) `adminAuth.ts` pure with `adminAuth.test.ts`; (2)
+`AdminRoom`, `AdminView`, the `server.ts` block and `adminRoom.test.ts`; (3) `handlers/admin.ts` (the commands
+into `autoOf(room).commands`), `admin.snapshot` every tick, the docs. **Tests**: `auto-admin.md` 7's list; a
+`party` client in the same server never receives `Avatar.seat` alive nor any `admin.*`. **Not**: `PartyRoom.ts`
+beyond its pre-seeded lines, `Auto.ts`, `Visibility.ts` beyond the pre-seeded line, any client file. Before
+code, `seams.md`; log under "Round 6 log: 6C".
+
+**6D. Admin client.** Build `#/admin`: the sign-in button, the controls, the grid of up to six scene viewports
+rendered from the god view, the seat inspector and the log pane, on a mock first and on the live `admin` room
+once 6C lands. **Owns** `apps/client/src/admin/**`, `scenes/Admin.ts`, the optional label of
+`view/EntityView.ts`, the `remoteDelayMs(scale)` parameter of `view/interpolation.ts`, new
+`apps/client/e2e/admin.spec.ts` (mock, opt-in `WDI_E2E_ADMIN=1` for the live case), new `ui/copy/admin.ts`, the
+"Round 6 (6D)" block of `components.css`, UI.md 14.18. **Reads** `auto-admin.md` 6 and 8; `seams.md` 1.4;
+`docs/UI.md` 1-5 (the DOM system). One Phaser game; `AdminSceneView` reuses the world views and owns no feed of
+its own. **PRs**: (1) the route, the scene, the sign-in and the controls on `mockAdmin.ts`; (2) the viewport
+grid and `AdminSceneView` with the label; (3) the inspector, the log pane, `admin.spec.ts`, UI.md 14.18; (4)
+after 6C merges, `AdminNet.ts` on the live room. **Tests**: `auto-admin.md` 8's list. **Not**: `World.ts`,
+`worldRouter.ts` beyond the pre-seeded route line, any server file. Before code, `seams.md`; log under "Round
+6 log: 6D".
+
+**6E. M5b content and GDD 3.14-3.16.** Write the rows: resources, recipes, mobs, quests and mini-games, the
+tool items, the balance numbers, the nodes, spawners and givers on every scene of both maps, and the
+cross-reference checks; then write GDD 3.14 to 3.16 from them. **Owns** `packages/content/data/{resources,
+recipes,mobs,quests,minigames}.json`, their schemas under `packages/content/src/schemas/`, `checkM5b` in
+`validate.ts`, the new rows of `items.json`, the `resources`, `mobs`, `quests` and `vision.lanternTiles` rows
+of `balance.json` and their schema lines, the `nodes`, `spawners` and `givers` arrays of the scene files
+(nothing else in them), GDD 3.14-3.16, WORLD 4's economy notes, the content tests. **Reads** `m5b-data.md` 1;
+`owner-brief.md` 2 Book IV (what fits round 6) and 3; `bible-seams.md` 2.2 (what waits for round 8); GDD 3.5,
+3.6, 3.7, 3.13; WORLD 4.2-4.10; `scene.ts:235-275`. Ids are stable from the first PR (6F to 6M build on them).
+**PRs**: (1) resources and recipes with the tool items and `checkM5b`; (2) mobs and the spawners; (3) quests,
+givers and the mini-games; (4) the nodes on every scene, the balance rows, GDD 3.14-3.16. **Tests**: every
+cross-reference of the table; a scene with a node names a resource; every recipe is craftable from gatherable
+inputs on its map. **Not**: code outside the content package. Before code, `seams.md`; log under "Round 6
+log: 6E".
+
+**6F. Gathering and crafting.** Make nodes gatherable as a hold, give seats an inventory, and let them craft
+the six tools at stations. **Owns** `apps/server/src/sim/{Resources,Craft,Inventory}.ts`, the `gather` and
+`craft` hold cases of `sim/Actions.ts`, new `apps/server/test/{resources,craft,inventory}.test.ts`, the GDD
+3.14 sentences marked "(6F)" (the hold and respawn behaviour, if 6E's text differs from what lands). **Reads**
+`m5b-data.md` 1 and 2.1; `seams.md` 1.3; GDD 3.5 and 3.14; `Actions.ts`'s `collect` case (the hold pattern it
+copies). The node pool draws from `seeds.get('nodes')` only. **PRs**: (1) `Resources.ts` and the pool with
+`resources.test.ts`; (2) `Inventory.ts` and the `gather` hold; (3) `Craft.ts` and the `craft` hold. **Tests**:
+the pool fraction, respawn in ticks, a gather interrupted by movement, five slots, a craft refused without a
+station in reach. **Not**: `Visibility.ts`, `Mobs.ts`, `Quests.ts`, any client file. Before code, `seams.md`;
+log under "Round 6 log: 6F".
+
+**6G. Mobs and dark visibility.** Spawn mobs from the scenes' spawners, drive them with a small FSM on keyed
+streams, let a wolf kill in the dark, and make darkness real on the server: a living seat sees avatars in a
+dark scene only within its radius and line of sight, lanterns widen it both ways. **Owns**
+`apps/server/src/sim/Mobs.ts`, `sim/mobs/**`, `sim/Sight.ts`, the `canSee` filter line of `reconcileAvatars` in
+`sim/Visibility.ts`, the lantern bit line of `publishAvatars` in `sim/Avatars.ts`, the `wolf` cause in
+`sim/Kill.ts` and `sim/Death.ts`, new `apps/server/test/{mobs,sight}.test.ts` and the dark cases of
+`visibility.test.ts`, the GDD 3.15 sentences marked "(6G)" and the 3.7 lantern line. **Reads** `m5b-data.md`
+1 and 2.2; `seams.md` 1.3; GDD 3.6, 3.7, 3.15; `npc/walk.ts` (the pathing it reuses); `deck-wire.md` 6 (the
+privacy invariants it must keep). **PRs**: (1) `Mobs.ts`, `spawn.ts`, `ai.ts` and the wire with `mobs.test.ts`;
+(2) the wolf kill and the NPC flee; (3) `Sight.ts`, the filter line, the lantern bit and `sight.test.ts`.
+**Tests**: the FSM transitions; a wolf never leaves its leash; 10 NPC seats plus 3 wolves at p95 tick < 15 ms;
+a seat beyond the radius or behind a wall receives no avatar; a ghost receives all. **Not**: the NPC routines,
+`Craft.ts`, `Resources.ts`, any client file. Before code, `seams.md`; log under "Round 6 log: 6G".
+
+**6H. Quests and mini-games.** Let givers hand out fetch quests and take them back, and turn a station task's
+hold into a server-checked mini-game the client plays, the same one for a Cabal seat's fake task. **Owns**
+`apps/server/src/sim/{Quests,Minigames}.ts`, the `packages/shared/src/rules/minigames.ts` bodies and new
+`packages/shared/test/minigames.test.ts`, the quest and mini-game cases of `sim/Commands.ts`, the `task` hold of
+`sim/Actions.ts`, new `apps/server/test/{quests,minigames}.test.ts`, the GDD 3.16 sentences marked "(6H)".
+**Reads** `m5b-data.md` 1 and 2.3; `seams.md` 1.1 and 1.3; GDD 3.5 (the fake list) and 3.16; `onub-contract.md`
+2.3 (the four mini-game kinds). A `contract` quest refuses in round 6. **PRs**: (1) the pure rules with their
+tests; (2) `Quests.ts` with `quests.test.ts`; (3) `Minigames.ts`, the task hold and `minigames.test.ts`.
+**Tests**: `generate` is deterministic per rng; a wrong answer completes nothing; a Cabal fake task never moves
+`taskBar`; a quest reward goes through `Inventory`. **Not**: `Resources.ts`, `Mobs.ts`, any client file. Before
+code, `seams.md`; log under "Round 6 log: 6H".
+
+**6I. M5b client.** Draw nodes, mobs and givers, build the inventory, crafting and quest panels and the hold
+prompts, and wrap the ONUB mini-game widgets in a main-mode modal. **Owns** `apps/client/src/view/{NodeView,
+MobView,GiverView}.ts` with tests, `ui/{Inventory,Crafting,QuestLog}.ts` with tests, `view/minigames/**`, the
+lantern glow of `view/Lighting.ts`, the `nodes`, `mobs`, `quests` and `minigame` readers of
+`net/worldColyseus.ts` and `net/mock/worldMock.ts`, new `ui/copy/m5b.ts`, the "Round 6 (6I)" block of
+`components.css`, new `apps/client/e2e/m5b.spec.ts` (mock), UI.md 14.19. **Reads** `m5b-data.md` 1-3;
+`seams.md` 1.4; UI.md 1-5; `view/onub/minigames/` (the widgets it imports). **PRs**: (1) the three views on the
+mock; (2) the inventory and crafting panels with the hold prompts; (3) the quest log and the mini-game modal;
+(4) `m5b.spec.ts`, UI.md 14.19, and after 6F-6H merge, the live readers. **Tests**: each panel on the mock; the
+spec gathers, crafts a lantern, turns in a quest. **Not**: `worldRouter.ts`, `admin/**`, `World.ts` beyond
+constructing the views on the pre-seeded lines, the ONUB widgets' files. Before code, `seams.md`; log under
+"Round 6 log: 6I".
+
+**6J. Cutscenes.** Write the HollowMere opening and the five death cutscenes as data, play them in-engine with
+captions, camera and sound, and send them from the server at the right moments. **Owns**
+`packages/content/data/cutscenes/**` and `schemas/cutscenes.ts`, the `packages/shared/src/rules/cutscenes.ts`
+bodies with a test, `apps/client/src/view/cutscene/**` with tests, new `ui/copy/cutscenes.ts`, the `beginPlay`
+broadcast and `balance.phases.openingS`, the `markDead` `cutsceneId` line, the play hooks in `scenes/World.ts`
+(the two pre-seeded lines filled), the opening in `mock/worldMock.ts`, new `apps/client/e2e/cutscene.spec.ts`
+(mock), the "Round 6 (6J)" block of `components.css`, UI.md 14.20, the GDD 3.18 cutscene paragraphs and the
+GDD 3.3 `openingS` line. **Reads** `cutscene-music.md` 1; `seams.md` 1.1-1.4; `owner-brief.md` 2 Book I.1 (the
+narration); GDD 3.3. No new phase; the server never waits for a client. **PRs**: (1) the schema, the index,
+the rules and the server lines with `openingS`; (2) the sequencer and the player on the mock; (3) the five
+death cutscenes, the HollowMere opening's captions, `cutscene.spec.ts`, the GDD lines. **Tests**: the sequencer
+(timeline, `withPrevious`, `maxS`, Skip); the spec's caption, Skip and ghost handoff. **Not**: `Transition.ts`,
+music, `worldRouter.ts`. Before code, `seams.md`; log under "Round 6 log: 6J".
+
+**6K. Loading, transitions, trailer, budgets.** Give the game a loading screen with tips, animated transitions
+between the scenes the router starts, the landing trailer loop, and the media budget test. **Owns**
+`apps/client/src/view/{LoadingScreen,Transition}.ts` with tests, new `ui/copy/tips.ts`, the video element of
+`ui/Landing.ts`, the bodies of the pre-seeded `transition` wrappers in `net/worldRouter.ts` (the call sites
+stay), new `tools/sprites/test/media.test.ts`, the shape of `assets/video/manifest.json`, the "Round 6 (6K)"
+block of `components.css`, UI.md 14.21, ASSETS 6.8's round-6 text, the GDD 3.13 `transitionS` line and
+`balance.ui.transitionS`. **Reads** `cutscene-music.md` 2; `media.md` 2 and 3; `seams.md` 1.4 and 1.5; ASSETS
+6.8. Reduce-motion makes every duration 0. **PRs**: (1) `Transition.ts` and the wrappers, with `transitionS`;
+(2) `LoadingScreen.ts` and the tips; (3) the trailer element, `media.test.ts`, the manifest shape, ASSETS 6.8.
+**Tests**: `transition` resolves on `transitionend` and on timeout; the loading screen never shows under 300
+ms; `media.test.ts` passes on the empty manifests and fails on a constructed oversize entry. **Not**:
+`World.ts`'s camera fade, the cutscene player, music. Before code, `seams.md`; log under "Round 6 log: 6K".
+
+**6L. Music.** Give the game music that follows the phases per map, with a settings panel for music and SFX
+volume, lazy-loaded within its own budget. **Owns** `apps/client/src/view/{MusicBus,MusicDirector,
+audioSettings}.ts` with tests, new `ui/SettingsPanel.ts` with a test, `AudioBus.setSfxVolume` and the `narr_*`
+and `sting_*` keys in `view/AudioBus.ts`, `packages/content/data/music.json` and `schemas/music.ts` with the
+playlist-id test, the shape of `audio/music/manifest.json`, the CC0 beds (files and CREDITS rows), new
+`ui/copy/settings.ts`, the "Round 6 (6L)" block of `components.css`, UI.md 14.22, the GDD 3.18 music paragraphs.
+**Reads** `cutscene-music.md` 3; `media.md` 2 and 4; `seams.md` 1.4; ASSETS 6.5 (the CC0 sources). The server
+sends no music message; `AUDIO_KEYS` stays an SFX union. **PRs**: (1) `MusicBus.ts` and `audioSettings.ts`
+with the settings panel; (2) `MusicDirector.ts`, `music.json` and the schema; (3) the CC0 beds, the manifest
+rows for them, the GDD lines. **Tests**: the crossfade swaps elements; a class change in the same phase does
+nothing; the settings persist; the budget test (6K's) passes with the beds. **Not**: SFX files, the cutscene
+`audio` steps, 6N's tracks. Before code, `seams.md`; log under "Round 6 log: 6L".
+
+**6M. M5b art.** Make the sprites M5b draws, in both styles: nodes in two states, the four mobs in eight
+directions, the givers, the six tools as icons and held overlays, the lantern and torch glows. **Owns**
+`tools/sprites/placeholder-m5b.ts`, the sprite sources and exports under the keys SPRITES.md names, the
+manifest entries in both style manifests, SPRITES.md's round-6 section, CREDITS and MANIFEST rows. **Reads**
+`m5b-data.md` 4; `art-plan.md` (round 5) 1.3 and its appendix (the style); SPRITES 10 and 11; ASSETS 6.5.
+**PRs**: (1) the placeholders for every key; (2) nodes and tools; (3) mobs; (4) givers and glows. **Tests**:
+`manifest.test.ts`, `budget.test.ts`, `palette.test.ts` as they stand. **Not**: code outside `tools/sprites`.
+Needs 6E's ids first. Before code, `seams.md`; log under "Round 6 log: 6M".
+
+**6N. ROSW media (both repos).** Master the owner's eleven files, make the stingers with `music-cue` and the
+two videos with `video-shot`, keep every master in the ROSW studio with its note, and land the binaries and
+rows here. **Owns** in ROSW: the `music-cue` and `video-shot` runs under `studio/`, the studio notes the
+pipeline writes, the `studio/library/catalog.json` entries; here: `apps/client/public/assets/video/**`,
+`apps/client/public/assets/audio/music/**`, the owner's SFX under `apps/client/public/assets/audio/`, the rows
+of both media manifests and `audio/manifest.json`, `assets/source/MANIFEST.md`, CREDITS rows. **Reads**
+`media.md` (all); `cutscene-music.md` 2 and 3 (the shapes); ROSW `studio/vault/CLAUDE.md` and the
+`render-pipeline` skill. Never commits an original; never a link to an uploaded input. **PRs**: ROSW: one PR
+per pipeline kind; here: (1) the SFX and the music with their rows; (2) the two videos and the poster with their
+rows. **Tests**: `media.test.ts` passes with every file in place. **Not**: any `.ts`, any JSON under
+`packages/`. Needs the owner's answers of `media.md` 6 and the manifest shapes of 6K and 6L. Before code,
+`seams.md`; log under "Round 6 log: 6N".
+
+**6P. Integration.** Merge in the order above, regenerate `PROTOCOL.md` and the lockfile, run the 50-match
+`pnpm auto` soak on both maps, both modes and every difficulty, the two 30-minute soaks and the opt-in e2e
+suites, fix what breaks in the seams, and write the integration log and DECISIONS A97. **Owns** the merges,
+`pnpm-lock.yaml`, `docs/PROTOCOL.md`, "Integration log, round 6" below, DECISIONS A97; the Railway variables
+are set by the owner from `auto-admin.md` 7. **Reads** everything. **Not**: new features; a fix that is a
+session's goes back to it. Log under "Integration log, round 6".
+
+### Round 6 log: 6Z (round-6 contract and pre-seed)
+
+- **Documents and settings (2026-10-22).** `docs/round6/` written (`README`, `owner-brief`, `auto-admin`,
+  `cutscene-music`, `m5b-data`, `bible-seams`, `media`, `seams`); this section; ROADMAP M5b's definition of
+  done and the M5c, M5d and round 7-9 rows; DECISIONS A81 and the reserved rows; GDD 3.14-3.16 pointers, 3.18
+  and 3.19 stubs; ARCHITECTURE 5.11's pointer; `docs/README.md`; `CLAUDE.md` "Compact instructions" and
+  `.claude/settings.json` (`autoCompactWindow` 400000) here and in ROSW, with the `render-pipeline` Kinds line
+  there. DECISIONS A80 had been taken by the art-style switch (5N) while this round was planned, so the round's
+  rows start at A81.
+- **Pre-seed.** Pending; `seams.md` 1 says "pending" on every row until a step lands.
+
+### Round 6 log: 6A (time scale, auto mode, headless harness, CLI)
+
+### Round 6 log: 6B (event bus and invariants)
+
+### Round 6 log: 6C (GitHub auth and AdminRoom)
+
+### Round 6 log: 6D (admin client)
+
+### Round 6 log: 6E (M5b content and GDD 3.14-3.16)
+
+### Round 6 log: 6F (gathering and crafting)
+
+### Round 6 log: 6G (mobs and dark visibility)
+
+### Round 6 log: 6H (quests and mini-games)
+
+### Round 6 log: 6I (M5b client)
+
+### Round 6 log: 6J (cutscenes)
+
+### Round 6 log: 6K (loading, transitions, trailer, budgets)
+
+### Round 6 log: 6L (music)
+
+### Round 6 log: 6M (M5b art)
+
+### Round 6 log: 6N (ROSW media)
+
+## Integration log, round 6
