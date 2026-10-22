@@ -828,9 +828,9 @@ describe('the hunt, the fallback and the streams (R15 to R18)', () => {
     for (const k of new Set(asked)) {
       const [name, key] = k.split(':');
       if (name === 'npcPlay' || name === 'npcTiming') expect(ids.has(key!), k).toBe(true);
-      // Round 6: the creatures draw from their own stream, keyed by spawner.
+      // Round 6: the creatures draw from their own stream, keyed by spawner; the node pool (6F) from `nodes`.
       else if (name === 'mobs') expect(spawners.has(key!), k).toBe(true);
-      else expect(name, k).toBe('npcNames');
+      else expect(['npcNames', 'nodes'], k).toContain(name);
     }
   });
 
