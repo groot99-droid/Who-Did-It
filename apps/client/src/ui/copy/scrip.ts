@@ -13,6 +13,7 @@ export const SCRIP_COPY = {
   'shop.short': 'Not enough Scrip',
   'shop.purse': 'Your purse: {n} Scrip',
   'shop.close': 'Close',
+  'prompt.coins': 'Hold E: pick up the coins',
 
   // 14.34.1 Shop names
   'shop.bakery': 'Bakery',
