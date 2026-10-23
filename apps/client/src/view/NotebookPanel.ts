@@ -4,6 +4,7 @@ import type { NotebookSnap, WorldFeed } from '../net/world';
 import { WORLD_COPY as C, fill } from '../ui/copy';
 import { h } from '../ui/dom';
 import { formatClock } from './Hud';
+import '../ui/match.css';
 import { loadSceneNames } from './sceneNames';
 
 const BASE = import.meta.env.BASE_URL;
@@ -71,7 +72,7 @@ export class NotebookPanel {
     this.list = h('div', { class: 'wdi-notebook__list' });
     this.root = h(
       'section',
-      { class: 'wdi-notebook', 'data-testid': 'notebook', 'aria-label': C['notebook.title'] },
+      { class: 'wdi-glass wdi-notebook', 'data-testid': 'notebook', 'aria-label': C['notebook.title'] },
       h('h2', { class: 'wdi-eyebrow' }, C['notebook.title']),
       this.list,
     );

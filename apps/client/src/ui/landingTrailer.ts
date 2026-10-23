@@ -29,13 +29,13 @@ export function readTrailerEnv(): TrailerEnv {
 export interface TrailerOptions {
   /** `import.meta.env.BASE_URL`. */
   base: string;
-  /** The music bus: its `trailer` playlist starts on the first tap (the autoplay policy forbids earlier). */
+  /** The music bus: its `lobby` playlist (the theme) starts on the first tap (the autoplay policy forbids earlier). */
   music?: { crossfadeTo(playlistId: string | null): void } | undefined;
   env?: TrailerEnv;
 }
 
-/** The playlist id of the trailer's soundtrack in `audio/music/manifest.json`. */
-export const TRAILER_PLAYLIST = 'trailer';
+/** The playlist the start screen plays in `audio/music/manifest.json`: the theme, which runs on into the lobby (A98). */
+export const TRAILER_PLAYLIST = 'lobby';
 
 export function mountTrailer(slot: HTMLElement, opts: TrailerOptions): { destroy(): void } {
   const env = opts.env ?? readTrailerEnv();

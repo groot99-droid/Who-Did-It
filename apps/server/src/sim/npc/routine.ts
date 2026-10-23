@@ -724,6 +724,18 @@ function runWork(
     endAct(brain);
     return stand(p);
   }
+  // A reaction can leave the seat away from its station with the visit still open: walk back to the stand first.
+  const goal = act.goal;
+  if (
+    goal &&
+    p.hold === null &&
+    (goal.scene !== p.sceneIdx || Math.hypot(goal.x - p.x, goal.y - p.y) > TILE_PX)
+  ) {
+    brain.act = { kind: 'travel', untilTick: act.untilTick, stationId: act.stationId, goal };
+    brain.path = null;
+    brain.goalKey = '';
+    return stand(p);
+  }
   const hold = routines.holds[st.kind];
   if (hold !== undefined && act.refused !== true) {
     if (p.hold !== null) act.holding = true;

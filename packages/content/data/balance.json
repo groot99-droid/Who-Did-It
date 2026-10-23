@@ -238,12 +238,20 @@
   "resources": { "poolActiveFrac": 0.5, "stackMax": 5, "gddRef": "3.14" },
   "mobs": { "maxPerScene": 3, "chaseS": 6, "gddRef": "3.15" },
   "quests": { "maxActive": 2, "gddRef": "3.16" },
+  "train": { "arriveAtS": 5, "deliveryAfterS": 8, "hearTiles": 20, "gddRef": "3.3" },
   "ui": {
     "transitionS": { "fade": 0.4, "iris": 0.6, "wipe": 0.7 },
     "loading": { "showAfterS": 0.3, "tipEveryS": 4 },
     "gddRef": "3.13"
   },
   "ghosts": { "wispsPerCycle": 1, "gddRef": "3.7" },
+  "vendettas": {
+    "conversion": { "shareS": 45 },
+    "sabotage": { "tamperS": 6, "stations": 2, "undoTasks": 1 },
+    "heist": { "crackS": 8 },
+    "contract": { "offTargetRestS": 30 },
+    "gddRef": "3.20"
+  },
   "chat": {
     "maxChars": 200,
     "quickChatRadiusTiles": 5,

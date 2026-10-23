@@ -71,13 +71,17 @@ export class Intro extends Phaser.Scene {
     });
     const begin = h(
       'button',
-      { class: 'wdi-btn wdi-btn--primary wdi-intro__begin', type: 'button', 'data-testid': 'intro-begin' },
+      {
+        class: 'wdi-glass-btn wdi-glass-btn--primary wdi-glass-btn--sm wdi-intro__begin',
+        type: 'button',
+        'data-testid': 'intro-begin',
+      },
       INTRO_COPY['intro.begin'],
     );
     const skip = h(
       'button',
       {
-        class: 'wdi-btn wdi-btn--ghost wdi-btn--sm wdi-intro__skip',
+        class: 'wdi-glass-btn wdi-glass-btn--sm wdi-intro__skip',
         type: 'button',
         hidden: true,
         'data-testid': 'intro-skip',

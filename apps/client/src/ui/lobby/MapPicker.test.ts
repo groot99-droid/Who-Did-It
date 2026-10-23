@@ -19,4 +19,12 @@ describe('map row (GDD 3.13)', () => {
     expect(chosenMap(rows, 'atlantis')?.id).toBe('hollowmere');
     expect(chosenMap([], 'hollowmere')).toBeUndefined();
   });
+
+  it('has a name, a blurb and a thumbnail id for every card (the mockup shows all three)', () => {
+    for (const m of MAP_ROWS) {
+      expect(m.name.length).toBeGreaterThan(0);
+      expect(m.blurb.length).toBeGreaterThan(0);
+      expect(m.thumbnail.length).toBeGreaterThan(0);
+    }
+  });
 });

@@ -87,7 +87,7 @@ export function toggleRole(deck: readonly string[], roleId: string): string[] {
  * that says why it cannot start.
  */
 export function mountDeckEditor(root: HTMLElement, net: NetworkService): DeckEditor {
-  const count = h('p', { class: 'wdi-hint', 'data-testid': 'deck-count' });
+  const count = h('p', { class: 'wdi-hint wdi-lobby__note', 'data-testid': 'deck-count' });
   const problem = h('p', {
     class: 'wdi-field__msg wdi-field__msg--error',
     role: 'alert',
@@ -98,7 +98,7 @@ export function mountDeckEditor(root: HTMLElement, net: NetworkService): DeckEdi
     'button',
     {
       type: 'button',
-      class: 'wdi-btn wdi-btn--ghost wdi-btn--sm',
+      class: 'wdi-btn wdi-lobby__btn',
       'data-testid': 'deck-reset',
       hidden: true,
     },
@@ -111,7 +111,7 @@ export function mountDeckEditor(root: HTMLElement, net: NetworkService): DeckEdi
       'button',
       {
         type: 'button',
-        class: 'wdi-btn wdi-btn--sm wdi-deck__role',
+        class: 'wdi-btn wdi-lobby__btn wdi-deck__role',
         'data-testid': `deck-role-${id}`,
         'aria-pressed': false,
         title: role.gloss,
@@ -123,10 +123,14 @@ export function mountDeckEditor(root: HTMLElement, net: NetworkService): DeckEdi
   }
   const el = h(
     'div',
-    { class: 'wdi-stack wdi-stack--tight', 'data-testid': 'deck-editor', hidden: true },
-    h('h3', { class: 'wdi-subtitle' }, C['onub.deck.title']),
-    h('p', { class: 'wdi-hint' }, fill(C['onub.deck.hint'], { pantry: onubBalance.pantry.roles })),
-    h('div', { class: 'wdi-row wdi-row--wrap' }, ...buttons.values()),
+    { class: 'wdi-lobby__stack wdi-deckedit', 'data-testid': 'deck-editor', hidden: true },
+    h('h3', { class: 'wdi-lobby__title' }, C['onub.deck.title']),
+    h(
+      'p',
+      { class: 'wdi-hint wdi-lobby__note' },
+      fill(C['onub.deck.hint'], { pantry: onubBalance.pantry.roles }),
+    ),
+    h('div', { class: 'wdi-deckedit__roles' }, ...buttons.values()),
     count,
     problem,
     reset,

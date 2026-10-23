@@ -1,6 +1,7 @@
 import { readAudioSettings, writeAudioSettings, type AudioSettings } from '../view/audioSettings';
 import { SETTINGS_COPY as S, fill } from './copy';
 import { h } from './dom';
+import './match.css';
 
 /**
  * The settings gear (round 6, docs/round6/cutscene-music.md 3, UI.md 14.22): a button that opens two volume sliders

@@ -19,7 +19,20 @@ interface Sites {
   bell: Prop | undefined;
   teachingClue: Prop | undefined;
   kitChest: Prop | undefined;
+  station: Station | undefined;
 }
+
+/** Round 7: where the Daily Train stops, as a spawn of the hub with its tile. */
+export interface Station extends SpawnSite {
+  x: number;
+  y: number;
+}
+
+const stationAt = (ref: string): Station => {
+  const site = siteOf(ref);
+  const spawn = scenes[site.sceneId].spawns.find((s) => s.id === site.spawn)!;
+  return { ...site, x: spawn.x, y: spawn.y };
+};
 
 const siteOf = (ref: string): SpawnSite => {
   const dot = ref.indexOf('.');
@@ -41,6 +54,7 @@ const SITES = new Map<MapId, Sites>(
         bell: prop(map.bell),
         teachingClue: prop(map.teachingClue),
         kitChest: prop(map.kitChest),
+        station: map.station === undefined ? undefined : stationAt(map.station),
       },
     ] as const;
   }),
@@ -81,6 +95,11 @@ export function teachingClueOf(room: PartyRoom): Prop | undefined {
 /** The kit chest prop on the hub. No server code reads it yet; a session that does calls this. */
 export function kitChestOf(room: PartyRoom): Prop | undefined {
   return sitesOf(room).kitChest;
+}
+
+/** Round 7 (GDD 3.3): the hub spawn where the Daily Train stops; a map without one has no Train. */
+export function stationOf(room: PartyRoom): Station | undefined {
+  return sitesOf(room).station;
 }
 
 /** The scenes of the room's map (GDD 3.13: a closed graph; every portal stays inside it). */

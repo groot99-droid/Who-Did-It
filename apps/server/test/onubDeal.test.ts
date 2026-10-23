@@ -115,7 +115,17 @@ describe('Start in the quick mode', () => {
   it('writes Private.role and the public board, and nothing else about the deal', async () => {
     const m = await onubRoleCard(colyseus, 5);
     const o = memory(m);
-    await sleep(100);
+    // The board and each private role travel the wire behind the phase `onubRoleCard` waits on.
+    await until(() =>
+      m.bots.every((bot) => {
+        const seen = clientState(bot);
+        return (
+          seen.onub.seats.length === o.seats.length &&
+          seen.onub.deck.length === o.deck.length &&
+          seen.players.get(bot.id)?.priv.role.roleId === o.dealt.get(bot.id)
+        );
+      }),
+    );
     for (const bot of m.bots) {
       const seen = clientState(bot);
       expect([...seen.onub.seats]).toEqual(o.seats);

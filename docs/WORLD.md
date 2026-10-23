@@ -33,6 +33,7 @@
 **Maps (M5a).** A match is played on one map, picked by the leader in the lobby (GDD 3.13). A map is a closed graph of scenes in `packages/content/data/maps/<id>.json`:
 
 - It names its hub (the exterior with the Emergency Bell), 10 start spawns and 10 meeting spawns on the hub, the bell, the teaching clue and the kit chest.
+- (Round 7) It may name a `station`: the spawn on the hub where the Daily Train stops (GDD 3.3). HollowMere's is `overworld.platform`, on the plank platform beside a rail spur (`=`) along the overworld's east edge, with the lantern `ov.lt_platform`; Blackpine has none. The station is a spot on the hub, not a scene (DECISIONS A113).
 - Every scene belongs to exactly one map, and every portal leads inside its own map.
 - Each map has at least one `forest` and one `cave` scene open at the Small profile.
 - Round 5 ships Hollowmere (below) and Blackpine (4.10).
@@ -71,7 +72,7 @@ New objects use typed prefixes:
 
 | id | Name | Profile | Size (tiles) | Biome | Exits (portal id -> target.spawn) | Player spots / body spots | Notes |
 |---|---|---|---|---|---|---|---|
-| `overworld` | Hollowmere | Small (64x48 authored; NW Manor Rise and NE paddock gated shut below Medium) | 64x48 | village | `ov.tavern_front` -> `tavern_bar.front`; `ov.tavern_alley` -> `tavern_bar.alley`; `ov.apoth` -> `apoth_shop.door`; `ov.bakery` -> `bakery.door`; `ov.widow` -> `widow_parlour.door`; `ov.forest_gate` -> `forest.gate`; `ov.manor_front` / `ov.manor_back` -> `manor_hall.*` [M]; `ov.barn` -> `barn.door` [M]; `ov.chapel` -> `chapel.door` [L]; `ov.well` -> `cellar.well` [L] | hedges, cart, dock crates / – | Hub: square with bell and well; 4 lantern posts; fence line NE. Every building door faces south or east (the tavern front door and the apothecary door moved to their south faces in M5a, 4.4) |
+| `overworld` | Hollowmere | Small (64x48 authored; NW Manor Rise and NE paddock gated shut below Medium) | 64x48 | village | `ov.tavern_front` -> `tavern_bar.front`; `ov.tavern_alley` -> `tavern_bar.alley`; `ov.apoth` -> `apoth_shop.door`; `ov.bakery` -> `bakery.door`; `ov.widow` -> `widow_parlour.door`; `ov.forest_gate` -> `forest.gate`; `ov.manor_front` / `ov.manor_back` -> `manor_hall.*` [M]; `ov.barn` -> `barn.door` [M]; `ov.chapel` -> `chapel.door` [L]; `ov.well` -> `cellar.well` [L] | hedges, cart, dock crates / – | Hub: square with bell and well; 4 lantern posts; fence line NE. The Daily Train's platform (spawn `platform`) and rail spur on the east edge (round 7). Every building door faces south or east (the tavern front door and the apothecary door moved to their south faces in M5a, 4.4) |
 | `tavern_bar` | The Drowned Lantern | Small | 20x12 | house | `tb.front`, `tb.alley` -> overworld; `tb.back` -> `tavern_back.door` | behind bar, keg stack / – | Warmest light (hearth and two lamps); task: dartboard letter drop; `tb.front` is on the south wall |
 | `tavern_back` | Tavern back room | Small | 12x10 | house | `tk.door` -> `tavern_bar.back`; `tk.trap` -> `cellar.trap` [L, boarded below] | wardrobe / crate pile | Oil barrel (task tool) |
 | `apoth_shop` | Mallory Apothecary | Small | 18x11 | house | `as.door` -> overworld; `as.stairs` -> `apoth_loft.stairs` | behind counter / – | Basin (Blood wash); Wrench on the bench; `as.door` is on the south wall |

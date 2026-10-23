@@ -100,12 +100,15 @@ function alphaOf(token: string): string {
   if (!m) throw new Error(`--wdi-${token} is not an alpha token`);
   return `${m[1]}@${m[2]}`;
 }
-const GLASS = alphaOf('glass-fill');
+const GLASS = `${alphaOf('glass-sheen')} over ${alphaOf('glass-fill')}`;
+const WASH = alphaOf('glass-wash');
+const SUNKEN = alphaOf('glass-sunken');
 const VEIL = alphaOf('veil');
 const VIGNETTE = alphaOf('vignette');
 /**
- * The loop backdrop is a video, so a glass surface is measured over its two bounds: the darkest frame (night)
- * and the brightest any frame could be (snow) under the veil. Bare text on the backdrop is measured likewise.
+ * The loop backdrop is a video, so a glass surface (its fill and, at worst, a cell of its checker sheen) is
+ * measured over its two bounds: the darkest frame (night) and the brightest any frame could be (snow) under the
+ * veil. Bare text on the backdrop is measured likewise.
  */
 const GLASS_DARK = `${GLASS} over night`;
 const GLASS_BRIGHT = `${GLASS} over ${VEIL} over snow`;
@@ -155,6 +158,13 @@ export const TEXT_PAIRS: { fg: string; bg: string; use: string; min: number }[] 
     bg: GLASS_BRIGHT,
     use: 'the primary rim and the focus ring on glass (non-text, 3:1)',
     min: 3,
+  },
+  { fg: 'snow', bg: `${WASH} over ${GLASS_BRIGHT}`, use: 'the primary label under its hover wash', min: 4.5 },
+  {
+    fg: 'lilac@0.8',
+    bg: `${SUNKEN} over ${GLASS_BRIGHT}`,
+    use: 'placeholders in glass inputs and selects',
+    min: 4.5,
   },
   {
     fg: 'lilac',

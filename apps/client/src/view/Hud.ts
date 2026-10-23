@@ -6,6 +6,7 @@ import { mountDeckChip, type DeckChip } from '../ui/main/deckChip';
 import { mountSettingsPanel } from '../ui/SettingsPanel';
 import '../ui/theme/tokens.css';
 import '../ui/theme/components.css';
+import '../ui/match.css';
 import './hud.css';
 
 export interface HudChip {

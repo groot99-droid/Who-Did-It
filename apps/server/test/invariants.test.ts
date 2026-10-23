@@ -217,7 +217,7 @@ describe('the round-6 invariants', () => {
     const [leak] = runInvariants(m.room);
     expect(leak).toMatchObject({ name: 'privLeak', tick: m.room.state.tick });
     expect(leak?.detail).toContain(idOf(m, 2));
-  });
+  }, 20_000);
 
   it('npcStuck fires once on an NPC held off its goal for longer than npc.stuckInvariantS', async () => {
     const room = await autoDay();

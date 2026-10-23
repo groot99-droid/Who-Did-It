@@ -259,6 +259,11 @@ export const BalanceFile = z.strictObject({
   mobs: Section({ maxPerScene: z.number().int().nonnegative(), chaseS: Seconds }),
   /** Round 6 (GDD 3.16): placeholders until Session 6E tunes them. */
   quests: Section({ maxActive: z.number().int().nonnegative() }),
+  /**
+   * Round 7 (GDD 3.3): the Daily Train of a map with a `station`. It stops `arriveAtS` into each day and delivers
+   * `deliveryAfterS` later; the seats of the hub within `hearTiles` of the platform hear it.
+   */
+  train: Section({ arriveAtS: z.number().nonnegative(), deliveryAfterS: Seconds, hearTiles: Tiles }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
     transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }),
@@ -266,6 +271,21 @@ export const BalanceFile = z.strictObject({
     loading: z.strictObject({ showAfterS: z.number().positive(), tipEveryS: z.number().positive() }),
   }),
   ghosts: Section({ wispsPerCycle: z.number().int().nonnegative() }),
+  /** Round 7 (GDD 3.20): the four vendettas' seconds and counts. */
+  vendettas: Section({
+    /** World-phase seconds the Zealot shares a scene with the Vicar's seat before the doubt is sown. */
+    conversion: z.strictObject({ shareS: Seconds }),
+    /** The Activist's still seconds at one task target, the targets wanted, the finished real tasks undone. */
+    sabotage: z.strictObject({
+      tamperS: Seconds,
+      stations: z.number().int().positive(),
+      undoTasks: z.number().int().nonnegative(),
+    }),
+    /** The Bandit's seconds alone at the loaded strongbox. */
+    heist: z.strictObject({ crackS: Seconds }),
+    /** The Knife's extra rest after a strike on anyone but a living contract target. */
+    contract: z.strictObject({ offTargetRestS: Seconds }),
+  }),
   chat: Section({
     /** A `chat.say` line is cut to this many characters (GDD 3.5). */
     maxChars: z.number().int().positive(),
