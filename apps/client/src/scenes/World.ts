@@ -20,6 +20,7 @@ import {
 } from '../net/world';
 import { LOOKS_COPY, WORLD_COPY as C, fill } from '../ui/copy';
 import { overlayRoot } from '../ui/dom';
+import { refusedIn } from '../ui/theme/motion';
 import { mountSeatPicker } from '../ui/SeatPicker';
 import { AUDIO_KEYS, type AudioKey, AudioBus } from '../view/AudioBus';
 import { BodyView } from '../view/BodyView';
@@ -246,6 +247,7 @@ export class World extends Phaser.Scene {
     const onNoise = (n: NoisePulse) => this.ring(n);
     const onError = (e: { code?: number; msg: string }) => {
       this.hud.say(this.refusal(e));
+      refusedIn(overlayRoot()); // round 8, 8H (locked): the refused prompt shakes (UI.md 9)
       if (e.code === 423 || e.code === 428) this.audio.play('door_locked');
     };
     const onFound = () => this.clueFound();

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { cooldown, flash, FX, refused, type MotionTarget } from './motion';
+import { cooldown, flash, FX, refused, refusedIn, type MotionTarget } from './motion';
 
 // Round 8 (8H, docs/UI.md 9): the interface's motion reads tokens only, and every duration or distance token
 // has its zero under prefers-reduced-motion, so a rule written against the tokens needs no reduced twin.
@@ -112,6 +112,15 @@ describe('activation helpers (motion.ts)', () => {
     expect(f.classes.has(FX.cooling)).toBe(true);
     cooldown(f.el, 0);
     expect(f.classes.has(FX.cooling)).toBe(false);
+  });
+
+  it('shakes the visible prompt on a refusal, and nothing when no prompt shows', () => {
+    const f = fakeEl();
+    const asked: string[] = [];
+    refusedIn({ querySelector: (sel) => (asked.push(sel), f.el) });
+    expect(asked[0]).toContain(':not([hidden])');
+    expect(f.classes.has(FX.refused)).toBe(true);
+    expect(() => refusedIn({ querySelector: () => null })).not.toThrow();
   });
 
   it('every helper class is drawn by the 8H block', () => {
