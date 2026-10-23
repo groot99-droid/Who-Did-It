@@ -3267,11 +3267,18 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
   and in the measured stacks (muted lilac on a sheen cell 4.63). `.wdi-seg` stays in 7E's
   `ui/artStyle/artStyle.css`, which loads after `components.css`, so the glass look is the modifier
   `.wdi-seg--glass` (with `.wdi-seg__note`) for 7E to add. `ui/theme/title.ts` builds the title's letters.
+- 2026-10-23: PR 3 (`ui/backdrop.ts`, `.wdi-backdrop`, `view/Backdrop.ts` removed). One DOM layer mounted as
+  `#overlay`'s preceding sibling (the overlay has no z-index, so tree order paints canvas, backdrop, screens).
+  With no `landing_loop` row it is the night page alone; with the row, the poster, then the video unless
+  `?video=0` or the data saver; reduced motion keeps it paused. The four scenes that drew the canvas backdrop
+  (Boot, and 7C's, 7E's and 7F's Landing, Lobby, RoleReveal) each changed by a show and a hide line only.
+  For 7C: `ui/landingTrailer.ts` now plays a second copy of the loop, so the menu should drop `mountTrailer`.
 
 ### Round 7 log: 7C
 
 - PR 1 (the menu): Start Game dialog (name, Open or Private), code box (`#/join/CODE` opens it prefilled and focused), Settings, How to Play and Credits live, Create Profile, Friends and Quit greyed with the note, the sound toggle, the `/health` footer, `e2e/fixtures/party.ts` and the specs' landing lines, UI.md 14.25, A107. `pnpm test` fails in `apps/server` here on `bootFlowServer` (`release is not a function`, nine files), which this PR does not touch; the client suite, typecheck, lint and Prettier are clean. `party.spec.ts`'s first test passes through the lobby and the role cards and then waits on `hud-clock` after the overworld enters, which is the World, not the menu.
 - PR 2 (profile and friends): `ui/menu/{profileModel,profile,friendsModel,friends,clipboard}.ts`, the chip as a button, Create Profile and Friends live, `LobbyPlayer.profile` and the roster mapping, `profile` in the create and join options, tests in `ui/menu/profile.test.ts`, A107. 7E's `ui/lobby/addFriend.ts` can re-export `addFriendButton` from `ui/menu/friends.ts` (same signature; pass its own `className`).
+- PR 3 (Quit, glass, help): `ui/menu/quit.ts` and `Landing` `onQuit`, the menu on `.wdi-glass*` and `titleLetters`, `public/help/index.html` in the night palette with `public/help/fonts/`, a smoke e2e for Quit, profile and friends. Locally `party.spec.ts` needs the config's 15 s expect timeout raised to 60 s here (the same 4-bots test also fails at 15 s on the base b951a8d: the guest's page is still loading); smoke 5/5 at the stock timeout.
 
 ### Round 7 log: 7D
 
@@ -3282,6 +3289,7 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 - PR 1 (columns A and C): `Lobby.ts` as three columns, `ui/lobby.css`, the Add friend stand-in and its test, the deck list's classes, UI.md 14.26, A109. Column B holds today's map, art-style, sound and deck-editor mounts in one card until PR 2.
 - PR 2 (column B): the map cards with a tick, the art-style segment with `.wdi-seg--glass` and `.wdi-seg__note`, the deck editor as chips; the rules are in `ui/lobby.css` until 7B's glass classes land.
+- PR 3 (7B's pieces): the lobby markup uses `.wdi-glass-panel`, `.wdi-glass-btn`, `.wdi-glass-select` and `.wdi-tag`; `ui/lobby.css` keeps only layout, the code display, the deck chips and the map cards. The Add friend stand-in is gone: the roster imports 7C's `addFriendButton` from `ui/menu/friends.ts`.
 
 ### Round 7 log: 7F
 

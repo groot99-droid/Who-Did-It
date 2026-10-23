@@ -75,7 +75,7 @@ export function mountMapPicker(root: HTMLElement, net: NetworkService): MapPicke
       'span',
       { class: 'wdi-map__text' },
       h('span', { class: 'wdi-map__name' }, title),
-      h('span', { class: 'wdi-hint wdi-lobby__note' }, m.blurb),
+      h('span', { class: 'wdi-glass-panel__hint' }, m.blurb),
     );
 
   function render(s: LobbySnapshot): void {
@@ -85,7 +85,11 @@ export function mountMapPicker(root: HTMLElement, net: NetworkService): MapPicke
     if (!chosen) return;
     const row = h('div', { class: 'wdi-map', 'data-testid': 'map-select', 'data-map': chosen.id });
     if (s.selfId === s.leaderId) {
-      const label = h('span', { class: 'wdi-lobby__title', id: 'map-select-label' }, C['lobby.map.label']);
+      const label = h(
+        'span',
+        { class: 'wdi-glass-panel__title', id: 'map-select-label' },
+        C['lobby.map.label'],
+      );
       const group = h('div', {
         class: 'wdi-map__list',
         role: 'radiogroup',

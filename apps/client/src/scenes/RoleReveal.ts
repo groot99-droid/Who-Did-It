@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 import type { SceneEnterPayload } from '../net/protocol';
+import { buildLine, hideBackdrop, showBackdrop } from '../ui/backdrop';
 import { h, overlayRoot } from '../ui/dom';
 import { mountRoleCard, type RoleCardScreen } from '../ui/RoleCard';
 import { REG_WORLD, type WorldFeed } from '../net/world';
-import { Backdrop } from '../view/Backdrop';
 import { getHealth, getNet } from './registry';
 
 /**
@@ -19,7 +19,7 @@ export class RoleReveal extends Phaser.Scene {
   }
 
   create(): void {
-    new Backdrop(this).setHealth(getHealth(this));
+    showBackdrop({ status: buildLine(getHealth(this)) });
     const net = getNet(this);
     const payload = net.roleCard;
     if (payload === null) {
@@ -46,6 +46,7 @@ export class RoleReveal extends Phaser.Scene {
       hideBanner = window.setTimeout(() => (banner.hidden = true), 2500);
       // The world router (net/worldRouter.ts) starts the World scene; this scene only steps aside, once.
       net.bus.off('sceneEnter', onEnter);
+      hideBackdrop();
       if (this.scene.isActive()) this.scene.sleep();
     };
     const onLeft = () => this.scene.stop();
@@ -58,6 +59,7 @@ export class RoleReveal extends Phaser.Scene {
       banner.remove();
       this.card?.destroy();
       this.card = null;
+      hideBackdrop();
     });
   }
 }
