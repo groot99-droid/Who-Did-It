@@ -20,6 +20,7 @@ interface PlayerState {
   name: string;
   traits?: { height: number; scarf: number; hat: number };
   look?: string;
+  profile?: string;
   alive: boolean;
   hasVoted: boolean;
   priv?: { myVote?: string };
@@ -100,6 +101,7 @@ export class ColyseusMeetingFeed implements MeetingFeed {
         look: p.look ?? '',
         alive: p.alive,
         hasVoted: p.hasVoted,
+        profile: p.profile ?? '',
       }),
     );
     return out;
