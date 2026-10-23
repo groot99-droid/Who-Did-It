@@ -163,6 +163,7 @@ First load (engine ~1.2 MB gz + lobby UI + own card + overworld + body pages + o
 | Music | 12 MB in all, 4 MB per map | `audio/music/manifest.json` (`tracks`, `playlists`) and the playlists `music.json` gives each map; lazy per map after Start, never in the first load |
 | Each video | 2 MB, its poster 60 KB; the one key `intro` (the opening cinematic, A98) 5 MB, streamed and outside the first-load count | `video/manifest.json`, `{ version, entries: [{ key, url, poster?, durationS, bytes }] }`, `bytes` equal to the file |
 | First load | 12 MB | every art entry `Preload` queues (no `maps` or `modes`) plus the Hollowmere map's, for the default style; the other styles swap in after boot (art plan 1.9) |
+| HD style | 80 MB | every file under `public/assets/hd` (A164): fetched only when a player picks HD, and counted inside the site cap; the cap is set from four times the low-poly set and is checked against the first HD renders |
 | Site | 150 MB | every file under `public/assets` |
 
 The first-load figure counts art only, as the brief names it. With the SFX files and the engine bundle added, the default style comes to about 14.4 MB, over the 12 MB the paragraph above states for the whole first load; the lowpoly style's resident set is 16.9 MB. Both are reported to the orchestrator (`docs/SESSIONS.md`, "Round 6 log: 6K") rather than hidden in the test.
