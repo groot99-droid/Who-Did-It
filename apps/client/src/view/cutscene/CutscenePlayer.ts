@@ -11,6 +11,7 @@ import type { AudioBus, AudioKey } from '../AudioBus';
 import { readDevFlags } from '../devFlags';
 import { isoZoom } from '../iso';
 import { Captions } from './Captions';
+import { CutsceneStage } from './CutsceneStage';
 import {
   CUTSCENE_END,
   type CameraLeg,
@@ -20,6 +21,7 @@ import {
   cameraPose,
   planTimeline,
 } from './sequencer';
+import { Staging } from './staging';
 import { CutsceneVideo } from './video';
 
 /**
@@ -29,8 +31,10 @@ import { CutsceneVideo } from './video';
  * back while one plays (`body.wdi-cutscene`, the input controller's `stop`); the camera goes back to the own figure
  * through `followOf` when it ends. Both World.ts call sites are locked (docs/round6/seams.md 1.4).
  *
- * Round 7 (7A, DECISIONS A101): a `video` step plays a full-frame video from the video manifest under the captions and
- * Skip (`video.ts`); the cutscene ends with it.
+ * Round 7 (7A, DECISIONS A101): a camera step in another scene is filmed on the `CutsceneStage`, which builds that
+ * scene for the shot and is disposed when the cutscene ends (`staging.ts`); a change of scene between shots is a cut,
+ * a short dip from black unless reduce-motion is on. A `video` step plays a full-frame video from the video manifest
+ * under the captions and Skip (`video.ts`); the cutscene ends with it.
  */
 export type CutsceneOutcome = 'done' | 'skipped' | 'none';
 
@@ -42,7 +46,10 @@ const FX: Record<string, (cam: Phaser.Cameras.Scene2D.Camera) => void> = {
   flash: (cam) => cam.flash(300, 255, 255, 255),
   shake: (cam) => cam.shake(400, 0.006),
   fade: (cam) => cam.fadeOut(900, 0, 0, 0),
+  dip: (cam) => cam.fadeIn(600, 0, 0, 0),
 };
+/** The dip from black of a cut between scenes. */
+const CUT_MS = 250;
 
 interface Run {
   skip(): void;
@@ -147,6 +154,10 @@ export class CutscenePlayer {
     document.body.classList.add('wdi-cutscene-on');
     input?.stop();
 
+    let stage: CutsceneStage | null = null;
+    const staging = new Staging(sceneId, () => (stage = CutsceneStage.open(scene)), cutscene.steps);
+    /** The camera of the shot now: the World's, or the stage's for a shot in another scene. */
+    let shotCam = cam;
     const videos: CutsceneVideo[] = [];
 
     const startedAt = performance.now();
@@ -161,20 +172,25 @@ export class CutscenePlayer {
     const pose = (l: CameraLeg, elapsedMs: number): void => {
       const p = cameraPose(l, elapsedMs);
       const at = toScreen((p.tx + 0.5) * TILE_PX, (p.ty + 0.5) * TILE_PX);
-      cam.stopFollow();
-      cam.setZoom(Math.min(3, Math.max(0.5, isoZoom(scene.scale.height) * p.zoom)));
-      cam.centerOn(at.x, at.y);
+      shotCam.stopFollow();
+      shotCam.setZoom(Math.min(3, Math.max(0.5, isoZoom(scene.scale.height) * p.zoom)));
+      shotCam.centerOn(at.x, at.y);
     };
 
     const begin = (e: TimelineEntry): void => {
       const s = e.step as Cutscene['steps'][number];
       switch (s.t) {
-        case 'camera':
-          if (sceneId !== undefined && s.sceneId !== sceneId) break;
+        case 'camera': {
+          const before = staging.showing;
+          const place = staging.shot(s.sceneId);
+          if (place === 'skip') break; // its scene is not loaded yet: the shot before holds
+          shotCam = place === 'staged' && stage !== null ? stage.camera : cam;
+          if (!reduced && before !== null && before !== staging.showing) shotCam.fadeIn(CUT_MS, 0, 0, 0);
           lastLeg = s;
           if (reduced) pose(s, s.durationS * 1000);
           else leg = { entry: e, leg: s };
           break;
+        }
         case 'caption': {
           const text = cutsceneLine(s.copyId);
           if (text === null) console.warn(`cutscene ${cutscene.id}: no copy for ${s.copyId}`);
@@ -192,7 +208,7 @@ export class CutscenePlayer {
         }
         case 'vfx': {
           const fx = FX[s.kind];
-          if (fx) fx(cam);
+          if (fx) fx(shotCam);
           else console.debug(`cutscene ${cutscene.id}: unknown vfx ${s.kind}`);
           break;
         }
@@ -235,6 +251,7 @@ export class CutscenePlayer {
       window.clearInterval(guard);
       window.removeEventListener('keydown', onKey);
       for (const key of looping) audio.stopLoop(key);
+      staging.end();
       for (const v of videos) v.destroy();
       captions.destroy();
       layer.remove();
