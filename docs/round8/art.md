@@ -145,7 +145,62 @@ Each scene ships with a before-and-after screenshot in the PR, at the new charac
 both together. 8J and 8K may fan out per room with subagents (Sonnet for the per-room passes). The lead holds the
 placement rules and reviews every room.
 
-## 5. Tests the sessions owe
+## 5. Materials from Poly Haven, for all three styles (8I, with 8F, 8G, 8J, 8K)
+
+The owner, 2026-10-23 (A155): "Can you use my Polyhaven textures and more for the HD version and maybe even
+rerender them as 8 bit and low poly for better texture in those games?"
+
+**Licence.**
+- Poly Haven's textures, models and HDRIs are CC0 (https://polyhaven.com/license), the default ASSETS 6.5 allows.
+  The same goes for ambientCG (https://docs.ambientcg.com/license/), the "and more".
+- The owner's own Poly Haven library is the Blender add-on's local mirror on their laptop, which a session cannot
+  reach. The sessions fetch the same assets by slug from `api.polyhaven.com`.
+- Under the API's terms (https://github.com/Poly-Haven/Public-API/blob/master/ToS.md, read 2026-10-23), use is free
+  for any purpose. Calls carry the user agent `who-did-it-build`. The in-game credit of 2.5 applies only to an app
+  that surfaces the live API, and the game never calls it: assets are fetched once, at build time.
+- Each asset used still gets a `CREDITS.md` row (source, slug, CC0) for provenance.
+
+**The material library** is `tools/blender/materials/`, owned by 8I:
+- `polyhaven.lock.json`: every slug used, with its type, resolution, file names and the md5 the API reports.
+  ambientCG ids sit in the same lock under their own source.
+- `fetch.py`: downloads the locked files into `tools/blender/.cache/materials/` (git-ignored), checks their hashes
+  and refuses a mismatch. It is stdlib only, with no live calls at render time beyond a missing file.
+- `roles.py`: material **roles** mapped to slugs, for example `wood_plank`, `wood_rough`, `plaster`, `brick`,
+  `stone_wall`, `cobble`, `flagstone`, `thatch`, `slate_roof`, `iron`, `rust`, `copper`, `wool`, `linen`,
+  `leather`, `fur`, `bread_crust`, `flour_sack`, `moss`, `mud` and `soil`. The kit, the props, the buildings, the
+  ground and the characters ask for a role, never a slug, so one swap changes every use.
+- Box projection at a fixed **texel density** per role, because the kit's meshes have no authored UVs. Each role
+  also has a palette-toned variant (below).
+
+**How each style uses them.**
+
+| Style | Textures | Finish |
+|---|---|---|
+| **8-bit** | 1k, toned toward the role's palette ramp before render | The existing pixel finish (`palettize.py`, oklab match). The grain survives as the dither patterns `style.json` already asks for on plaster, stone and wood |
+| **Low poly** | 1k, toned toward the palette and slightly posterised, so the look stays stylised and never photographic (`styleAvoid`) | As today: box-downscaled, linear filtering |
+| **HD** | 2k (4k where a surface fills the frame), untoned colour, normal and roughness; one Poly Haven HDRI as soft fill only | The HD finish of 3 |
+
+- **The key light stays A9's at 225° in every style.** The sprites keep matching the game's lighting layer, and the
+  HDRI never decides a shadow's direction.
+- **Poly Haven models** (barrels, crates, furniture, rocks, plants) may stand in for or join kit props. Each is
+  decimated for low poly, re-textured by role, and judged against the style formula. A photographic model dropped
+  in unstyled is refused.
+- **Sources are never committed.** Textures, `.blend` and `.gltf` sources stay in the cache, as raw Mixamo and
+  Quaternius sources do (CLAUDE.md). Only renders ship, and the lock file makes every render reproducible.
+
+**Who re-renders what.**
+- 8I builds the library first, as its own small PR, and the others build on it.
+- Each session re-renders its own keys in **all three styles**:
+  - 8F: the characters (cloth, leather, metal, fur roles);
+  - 8J and 8K: their props, buildings and ground;
+  - 8I: the shared tiles of `build_tiles.py` and anything no other session owns;
+  - 8G: any creature, node or VFX it moves from code-drawn art to the rig.
+- The keys, cells, pivots and draw scale do not change (A79). Textured renders compress less well, so a session
+  fits the budgets with fewer frames first. A raised budget needs a DECISIONS row.
+- **The owner signs off.** 8I's look PR shows one room and one figure in each style, flat against textured, and
+  the owner judges it by eye before any session re-renders in bulk.
+
+## 6. Tests the sessions owe
 
 - **8F**:
   - the manifest keys for every look × clip × direction × style;
@@ -153,6 +208,8 @@ placement rules and reviews every room.
   - the camera's zoom table at the new `viewTilesHigh`;
   - the e2e screenshots of a match at the new scale.
 - **8I**:
+  - `fetch.py` against a fake server (hashes checked, mismatch refused, the user agent sent);
+  - every role in `roles.py` resolves to a locked slug;
   - the `hd` manifest's keys against the 8-bit set (missing keys listed, and falling back);
   - the device gate;
   - lazy loading;
