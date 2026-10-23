@@ -69,7 +69,7 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
     handleTaskHold(room, sessionId, targetId);
     return;
   }
-  // Round 8 (8C, GDD 3.23): a `shop` or `bank` hold on its counter opens it; `act.buy`, `act.sell` and `act.bank` use it.
+  // Round 8, 8C (locked; GDD 3.23): a `shop` or `bank` hold opens that counter for `act.buy`, `act.sell`, `act.bank`.
   if (action === 'shop' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
     handleShopHold(room, sessionId, targetId);
     return;
