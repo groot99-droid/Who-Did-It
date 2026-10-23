@@ -39,6 +39,8 @@ async function gather(page: Page, item: string, qty: number) {
 test('gathers, crafts a lantern and turns in a quest', async ({ page }) => {
   await toWorld(page, '&m5b=1');
   await expect(page.getByTestId('m5b')).toBeVisible();
+  // The layer spans the viewport above the HUD and the canvas; it must not paint the theme background over the world.
+  await expect(page.getByTestId('m5b')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
 
   // Pockets: a spade to begin with.
   await page.getByTestId('m5b-inv').click();
