@@ -449,3 +449,159 @@ describe('NPC Killer', () => {
     }
   });
 });
+
+describe('NPC Killer: the kill-opportunity timer (A100)', () => {
+  type Row = { killChancePer10s: number };
+  const row = balance.npc.difficulty.normal as Row;
+  const alone = balance.npc.aloneKill as { afterS: number; sightTiles: number };
+  const dwell = balance.npc.routine.sceneDwellS as { min: number; max: number };
+  type Weights = { work: number; stroll: number; idle: number };
+  const weights = balance.npc.routine.weights as { day: Weights; night: Weights };
+  const saved = {
+    chance: row.killChancePer10s,
+    sight: alone.sightTiles,
+    dwell: { ...dwell },
+    day: { ...weights.day },
+    night: { ...weights.night },
+  };
+  const BAKERY = openRun('bakery', 6);
+  const AFTER = Math.round(alone.afterS * TICK_RATE);
+
+  /** The roll never fires, nobody leaves a room on its own and the routine only idles: only the timer moves a seat. */
+  function arm() {
+    row.killChancePer10s = 0;
+    dwell.min = 600;
+    dwell.max = 600;
+    Object.assign(weights.day, { work: 0, stroll: 0, idle: 1 });
+    Object.assign(weights.night, { work: 0, stroll: 0, idle: 1 });
+  }
+  function restore() {
+    row.killChancePer10s = saved.chance;
+    alone.sightTiles = saved.sight;
+    dwell.min = saved.dwell.min;
+    dwell.max = saved.dwell.max;
+    Object.assign(weights.day, saved.day);
+    Object.assign(weights.night, saved.night);
+  }
+
+  /** A Killer NPC and one companion in the bakery, the Knife ready, the other seats far away in other rooms. */
+  async function room(companionIsNpc: boolean) {
+    const party = await lobbyOf(colyseus, 1);
+    for (let i = 0; i < 3; i++) await send(party.humans[0]!, 'lobby.addNpc', {}, 40);
+    await start(party);
+    await toWorld(party);
+    allTownsfolk(party.room);
+    const ids = npcSeats(party.room).map((p) => p.id);
+    const [k, ...rest] = ids as [string, ...string[]];
+    const human = party.humans[0]!.id;
+    setRole(party.room, k, 'killer');
+    party.room.state.players.get(k)?.priv.cooldownEndTick.set('kill', 0);
+    const companion = companionIsNpc ? rest[0]! : human;
+    const away = companionIsNpc ? [human, ...rest.slice(1)] : rest;
+    away.forEach((id, i) => {
+      const scene = i === 0 ? 'chapel' : i === 1 ? 'barn' : 'tavern_bar';
+      const at = openRun(scene, 1);
+      placeSeat(party, id, scene, at.x, at.y);
+    });
+    placeSeat(party, k, 'bakery', BAKERY.x, BAKERY.y);
+    placeSeat(party, companion, 'bakery', BAKERY.x + 3, BAKERY.y);
+    return { party, k, companion, rest, human };
+  }
+
+  it('strikes the seat it has been alone with for longer than afterS, then leaves the room', async () => {
+    arm();
+    try {
+      const { party, k, companion } = await room(false);
+      holdPhase(party, Phase.night, 3600);
+      advance(party, AFTER - 10);
+      expect(simAt(party, companion).dead).toBe(false);
+      expect(npcMemory(party.room).brain(k).aloneWith).toBe(companion);
+      let killedAt = -1;
+      let leftAt = -1;
+      const began = party.room.state.tick;
+      advance(party, 15 * TICK_RATE, (tick) => {
+        if (killedAt < 0 && simAt(party, companion).dead) killedAt = tick;
+        if (killedAt >= 0 && leftAt < 0 && sceneKey(simAt(party, k).sceneIdx) !== 'bakery') leftAt = tick;
+      });
+      expect(killedAt).toBeGreaterThan(began);
+      expect(killedAt - began).toBeLessThanOrEqual(5 * TICK_RATE);
+      expect(leftAt).toBeGreaterThan(killedAt);
+      expect(leftAt - killedAt).toBeLessThanOrEqual(10 * TICK_RATE);
+    } finally {
+      restore();
+    }
+  });
+
+  it('counts the wait by day and strikes as soon as the Knife works', async () => {
+    arm();
+    try {
+      const { party, companion } = await room(false);
+      holdPhase(party, Phase.day, 3600);
+      advance(party, AFTER + 40);
+      expect(simAt(party, companion).dead).toBe(false);
+      holdPhase(party, Phase.dusk, 3600);
+      advance(party, 5 * TICK_RATE);
+      expect(simAt(party, companion).dead).toBe(true);
+    } finally {
+      restore();
+    }
+  });
+
+  it('restarts when a third seat joins, and never runs on the hub', async () => {
+    arm();
+    try {
+      const { party, k, companion, rest } = await room(false);
+      holdPhase(party, Phase.night, 3600);
+      advance(party, AFTER - 10);
+      placeSeat(party, rest[0]!, 'bakery', BAKERY.x + 5, BAKERY.y);
+      advance(party, 60);
+      expect(simAt(party, companion).dead).toBe(false);
+      expect(npcMemory(party.room).brain(k).aloneWith).toBeNull();
+
+      placeSeat(party, rest[0]!, 'chapel', openRun('chapel', 1).x, openRun('chapel', 1).y);
+      placeSeat(party, k, 'overworld', RUN.x, RUN.y);
+      placeSeat(party, companion, 'overworld', RUN.x + 3, RUN.y);
+      advance(party, AFTER + 60);
+      expect(simAt(party, companion).dead).toBe(false);
+      expect(npcMemory(party.room).brain(k).aloneWith).toBeNull();
+    } finally {
+      restore();
+    }
+  });
+
+  it('needs the seat within sightTiles', async () => {
+    arm();
+    alone.sightTiles = 2;
+    try {
+      const { party, k, companion } = await room(false);
+      holdPhase(party, Phase.night, 3600);
+      advance(party, AFTER + 60);
+      expect(simAt(party, companion).dead).toBe(false);
+      expect(npcMemory(party.room).brain(k).aloneWith).toBeNull();
+    } finally {
+      restore();
+    }
+  });
+
+  it('takes an NPC seat as its companion in a normal match, never a Cabal mate', async () => {
+    arm();
+    try {
+      const { party, companion } = await room(true);
+      holdPhase(party, Phase.night, 3600);
+      advance(party, AFTER + 5 * TICK_RATE);
+      expect(simAt(party, companion).dead).toBe(true);
+    } finally {
+      restore();
+    }
+    arm();
+    try {
+      const { party, k, companion } = await room(false);
+      party.room.state.players.get(k)!.priv.cabalMates.push(companion);
+      holdPhase(party, Phase.night, 3600);
+      advance(party, AFTER + 5 * TICK_RATE);
+      expect(simAt(party, companion).dead).toBe(false);
+    } finally {
+      restore();
+    }
+  });
+});

@@ -50,6 +50,8 @@ export function runNpcs(room: PartyRoom): void {
         brain.path = null;
         brain.act = null;
         brain.striking = false;
+        brain.aloneWith = null;
+        brain.aloneSinceTick = -1;
         releaseClaims(mem, id);
       }
     }
