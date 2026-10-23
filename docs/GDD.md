@@ -422,6 +422,13 @@ creature chases runs for the nearest open door of its scene and takes it, or str
 there is none (3.12; live once the NPC brain's call lands, DECISIONS A89). Creatures use the `mobs` random stream,
 keyed per spawner, and never a secret stream.
 
+**Hit points and how a creature is drawn (round 8, 8G).** Each creature row carries `hp`: the wolf 36, the boar 48,
+the bat 10 and the rat 8. Fists, bolts and lights take them off (3.22; the damage is 8A's table), and a creature at
+0 dies. Everyone in the scene sees the same creature: its bite as a sequence (it crouches, lunges and bites, then
+recoils), a flinch with a white flash when a hit lands, a `flee` gait while it runs from a light, and a fall onto
+its side when it dies, where it lies until the server removes it and then fades. Under reduced motion the flash
+and the fade are cut and the clips still play. None of this carries a card or a seat.
+
 **Dark scenes on the server.** With creatures, a dark scene's visibility moves to the server (3.13): a living seat
 in a dark scene receives another avatar only within the night radius and a clear line of sight over the scene's
 grid (walls, and the `u` ground that is walkable but blocks sight), or when that avatar stands in the pool of a
