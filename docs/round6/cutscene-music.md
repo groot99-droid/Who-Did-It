@@ -46,7 +46,8 @@ round-8 content (BlackPine ships a two-step camera pan with no narrator in round
 - **The opening** is sent in `lobby.ts beginPlay` after `publishLooks` (pre-seeded line, 6J fills):
   `room.broadcast(S2C.cutscene, { id: openingFor(mapIdOfRoom(room)) })` and `setPhase(Phase.grace,
   p.graceS + p.openingS)`. `balance.phases.openingS` (pre-seeded `0`; 6J sets it with the GDD 3.3 line in the
-  same PR). **No new phase**: NPCs walk during the pan, the grace just runs longer, and a seat that skips sees
+  same PR). **Round 7 (7A, A101):** grace grows by the opening's own `maxS`, which equals its intro track's
+  length rounded down (HollowMere 117 s, BlackPine 80 s); `openingS` (120) is only the cap. **No new phase**: NPCs walk during the pan, the grace just runs longer, and a seat that skips sees
   the world under the remaining grace. Order on the client: role card (20 s; the cover pick closes with it) ->
   `beginPlay` -> the opening pan with the narrator -> `cardSlam` of the known chip -> grace.
 - The server never waits for a client to finish a cutscene.

@@ -29,7 +29,7 @@
     "revealS": 8,
     "immunityS": 15,
     "gameOverS": 20,
-    "openingS": 50,
+    "openingS": 120,
     "gddRef": "3.3"
   },
   "byCount": {

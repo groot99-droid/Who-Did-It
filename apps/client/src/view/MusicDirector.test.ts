@@ -1,6 +1,7 @@
 import { readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import musicJson from '@wdi/content/data/music.json';
+import cutscenesJson from '@wdi/content/data/cutscenes/cutscenes.json';
 import { MAP_IDS, MUSIC_CLASSES, ONUB_MUSIC_CLASSES } from '@wdi/content';
 import { Phase } from '@wdi/shared';
 import {
@@ -49,6 +50,17 @@ describe('music.json and the committed manifest', () => {
     for (const m of MAP_IDS)
       for (const c of MUSIC_CLASSES) expect(playlistFor(m, c), `${m}/${c}`).not.toBeNull();
     for (const c of ONUB_MUSIC_CLASSES) expect(onubPlaylistFor(c), c).not.toBeNull();
+  });
+
+  it("runs each map's opening as long as its intro track, rounded down to the second (A101)", () => {
+    for (const m of MAP_IDS) {
+      const pl = manifest.playlists.find((p) => p.id === playlistFor(m, 'opening'))!;
+      expect(pl.loop, m).toBe(false);
+      expect(pl.tracks, m).toHaveLength(1);
+      const track = manifest.tracks.find((t) => t.key === pl.tracks[0])!;
+      const opening = (cutscenesJson.cutscenes as Record<string, { maxS: number }>)[openingFor(m)!]!;
+      expect(opening.maxS, m).toBe(Math.floor(track.durationS));
+    }
   });
 
   it('lists only tracks that exist, and playlist ids once', () => {
