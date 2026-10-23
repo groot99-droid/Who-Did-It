@@ -3,7 +3,6 @@ import { simOf } from '../RoomSim';
 import { sceneKey } from '../World';
 import { vicarSeat } from './conversion';
 import { activeBody, progressOf } from './progress';
-import { sabotageTargets } from './sabotage';
 import { vendettaOf } from './state';
 
 /** Where an NPC Killer's vendetta asks it to go: a scene, and the seat it is about when there is one. */
@@ -26,10 +25,6 @@ export function vendettaGoalFor(room: PartyRoom, seatId: string): VendettaGoal |
     const vicar = prog.sown ? null : vicarSeat(room);
     const body = vicar === null ? null : activeBody(room, vicar);
     return vicar !== null && body ? { sceneId: sceneKey(body.sceneIdx), targetSeat: vicar } : null;
-  }
-  if (v.kind === 'sabotage') {
-    const target = sabotageTargets(room).find((t) => !prog.tampered.includes(t.prop));
-    return target ? { sceneId: target.scene } : null;
   }
   return null;
 }

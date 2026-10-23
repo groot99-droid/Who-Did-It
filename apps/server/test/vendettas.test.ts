@@ -1,6 +1,6 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { balance, roles, scenes, validateContent, vendettas } from '@wdi/content';
-import { BUILD_VERSION, C2S, NoteKind, Phase, TICK_RATE, TaskEntry } from '@wdi/shared';
+import { balance, roles, validateContent, vendettas } from '@wdi/content';
+import { BUILD_VERSION, C2S, NoteKind, Phase, TICK_RATE } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { MatchSeeds, type SeedWords } from '../src/sim/seeds';
@@ -12,7 +12,6 @@ import {
   vendettaOf,
 } from '../src/sim/vendettas/state';
 import { fixSeeds } from './seedHelpers';
-import { sceneKey } from '../src/sim/World';
 import { matchEvents } from '../src/sim/auto/log';
 import { countsVote } from '../src/sim/vendettas/conversion';
 import { vendettaGoalFor } from '../src/sim/vendettas/goal';
@@ -30,7 +29,7 @@ import {
   until,
   voteAll,
 } from './flowHelpers';
-import { type Match, sleep, standAt, startMatch } from './simHelpers';
+import { type Match, sleep, startMatch } from './simHelpers';
 
 // Round 7, Session 7H (GDD 3.20; docs/round7/vendettas.md 2): the four vendettas, the draw at the deal and its stream.
 
@@ -169,7 +168,7 @@ describe('the deal of a real match', () => {
   });
 });
 
-describe('conversion and sabotage in a match', () => {
+describe('conversion in a match', () => {
   beforeEach(async () => colyseus.cleanup());
 
   const ROLES = { Bot0: 'killer', Bot1: 'vicar', Bot2: 'detective', Bot3: 'townsfolk', Bot4: 'townsfolk' };
@@ -220,37 +219,5 @@ describe('conversion and sabotage in a match', () => {
     await until(() => stepsOf(m).length > 0);
     await sleep(200);
     expect(stepsOf(m)).toEqual(['vendetta.conversion.lapsed']);
-  });
-
-  it('tampers with still seconds at task targets, then undoes a finished task and readies the Knife', async () => {
-    const m = await start('activist');
-    const killer = idOf(m, 0);
-    const p = sim(m, 0);
-    const finished = new TaskEntry();
-    finished.id = 'fixPump';
-    finished.done = true;
-    seat(m, 3).priv.tasks.push(finished);
-    const other = new TaskEntry();
-    other.id = 'lightLanterns';
-    seat(m, 3).priv.tasks.push(other);
-    m.room.state.taskBar = 50;
-    seat(m, 0).priv.cooldownEndTick.set('kill', m.room.state.tick + 100 * TICK_RATE);
-
-    expect(vendettaGoalFor(m.room, killer)?.sceneId).toBeTypeOf('string');
-    const pump = scenes.overworld.props.find((q) => q.id === 'ov.pump') as { x: number; y: number };
-    standAt(m, m.bots[0] as never, pump.x, pump.y + 1);
-    expect(sceneKey(p.sceneIdx)).toBe('overworld');
-    const prog = progressOf(m.room, killer);
-    prog.tampered.push('ov.lantern_0');
-    await sleep(200);
-    expect(prog.holding?.prop).toBe('ov.pump');
-    prog.holding = { prop: 'ov.pump', ticks: balance.vendettas.sabotage.tamperS * TICK_RATE - 2 };
-    await until(() => prog.over);
-    expect(stepsOf(m)).toEqual(['vendetta.sabotage.tampered', 'vendetta.sabotage.wrecked']);
-    expect(finished.done).toBe(false);
-    expect(m.room.state.taskBar).toBe(0);
-    expect(seat(m, 0).priv.cooldownEndTick.get('kill')).toBeLessThanOrEqual(m.room.state.tick);
-    expect(vendettaGoalFor(m.room, killer)).toBeNull();
-    for (const e of vendettaEvents(m)) expect(e.seat).toBeUndefined();
   });
 });

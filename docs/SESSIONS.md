@@ -3245,10 +3245,10 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 - 2026-10-23: PR 1 (the four rows, the widened schema and its checks, `balance.json` `vendettas`, the `vendetta`
   stream, the draw through the `sim/Deck.ts` line, GDD 3.20, A112); the holding in room memory behind
   `privateVendetta` until 7D's schema version 4 lands. Hooks asked of 6Z in the PR description.
-- 2026-10-23: PR 2 (conversion and sabotage: `sim/vendettas/{progress,conversion,sabotage,run,goal}.ts`; the Step
+- 2026-10-23: PR 2 (conversion: `sim/vendettas/{progress,conversion,run,goal}.ts`; the Step
   line `runVendettas` after `runEvents`, to follow 7I's `runTrain` once #87 lands; the three `sim/Meeting.ts` lines
   for the doubted Vicar's abstention; `NoteKind.doubt`; `Private.vendetta` on schema version 4; the NPC hook
-  `vendettaGoalFor`; UI.md 14.29).
+  `vendettaGoalFor`; UI.md 14.29). Sabotage follows as PR 2b to keep each under 400 lines.
 
 ### Round 7 log: 7I
 
