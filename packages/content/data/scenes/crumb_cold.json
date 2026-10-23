@@ -1,0 +1,78 @@
+{
+  "id": "crumb_cold",
+  "prefix": "cf",
+  "name": "Crumb's cold room",
+  "zoneId": "crumb_cold",
+  "profile": "small",
+  "kind": "interior",
+  "biome": "house",
+  "dark": false,
+  "size": { "w": 12, "h": 9 },
+  "notes": "La Chambre Froide: the walk-in behind Crumb's Ovens, shelves of butter, milk and yeast, the frosted compressor; its steel door opens east onto the bakery.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "cf.door",
+      "from": "crumb_cold",
+      "x": 11,
+      "y": 6,
+      "kind": "door",
+      "to": "bakery",
+      "toSpawn": "cold_room",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [{ "id": "door", "x": 10, "y": 6, "z": 0, "facing": "w" }],
+  "spots": [
+    {
+      "id": "cf.milk_crates",
+      "kind": "hide",
+      "variant": "crates",
+      "x": 1,
+      "y": 1,
+      "childOnly": false
+    },
+    {
+      "id": "cf.crate_pile",
+      "kind": "body",
+      "variant": "cratePile",
+      "x": 1,
+      "y": 7,
+      "childOnly": false
+    }
+  ],
+  "props": [],
+  "gates": [],
+  "paths": [],
+  "lights": [
+    { "id": "cf.lt_lamp", "kind": "lamp", "x": 6, "y": 3, "radiusTiles": 3, "color": "moon" }
+  ],
+  "grid": [
+    "############",
+    "#H.........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#.........SD",
+    "#B.........#",
+    "############"
+  ],
+  "material": [
+    "WWWWWWWWWWWW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WWWWWWWWWWWW"
+  ]
+}
