@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { MEETING_COPY } from './copy/meeting';
 import { clockText, ejectionLine, factionOf, noEjectionLine, reasonLine, winnerLine } from './meetingText';
 
 const names: Record<string, string> = { h: 'Hana', g: 'Gus' };
@@ -38,21 +37,5 @@ describe('meeting lines', () => {
     expect(factionOf('killer')).toBe('cabal');
     expect(factionOf('detective')).toBe('village');
     expect(factionOf('drifter')).toBe('neutral');
-  });
-});
-
-describe('quick-mode lines', () => {
-  it('opens on the dawn line', () => {
-    expect(reasonLine({ reason: 'dawn', callerId: '', missing: [] }, nameOf)).toBe(
-      MEETING_COPY['meeting.reason.dawn'],
-    );
-  });
-
-  it('reads factions through the teams of roles.onub.json', () => {
-    expect(factionOf('champignon', 'onub')).toBe('cabal');
-    expect(factionOf('levain', 'onub')).toBe('cabal');
-    expect(factionOf('croissant', 'onub')).toBe('neutral');
-    expect(factionOf('chef', 'onub')).toBe('village');
-    expect(factionOf('chef')).toBe('village');
   });
 });

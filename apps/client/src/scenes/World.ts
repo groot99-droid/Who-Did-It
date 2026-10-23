@@ -180,15 +180,11 @@ export class World extends Phaser.Scene {
     if (!this.cache.tilemap.exists(key)) this.load.tilemapTiledJSON(key, sceneMapUrl(base, this.sceneId));
     // The match's map art (SPRITES 10.13): entries listing its map or mode that the boot did not load.
     const manifest = peekManifest(getFlags(this).art, base);
-    if (manifest) queueMatchEntries(this.load, this, manifest, this.matchMap(), this.matchMode());
+    if (manifest) queueMatchEntries(this.load, this, manifest, this.matchMap());
   }
 
   private matchMap(): string {
     return getNet(this).snapshot?.settings.map ?? DEFAULT_MAP_ID;
-  }
-
-  private matchMode(): 'main' | 'onub' {
-    return getNet(this).snapshot?.settings.mode ?? 'main';
   }
 
   create(): void {

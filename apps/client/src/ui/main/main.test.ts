@@ -17,13 +17,13 @@ beforeEach(() => {
 
 const asEl = (n: FakeNode) => n as unknown as HTMLElement;
 const net = {} as NetworkService;
-const snapshot = (n: number, mode: 'main' | 'onub' = 'main'): LobbySnapshot =>
+const snapshot = (n: number): LobbySnapshot =>
   ({
     code: 'ABCDE',
     selfId: 'a',
     leaderId: 'a',
     players: Array.from({ length: n }, (_, i) => ({ id: `p${i}`, name: `P${i}` })),
-    settings: { mode, npcDifficulty: 'normal', npcSeats: 0, onubDeck: [], map: 'hollowmere' },
+    settings: { npcDifficulty: 'normal', npcSeats: 0, map: 'hollowmere' },
   }) as unknown as LobbySnapshot;
 
 describe('cards (public content)', () => {
@@ -51,7 +51,7 @@ describe('cards (public content)', () => {
 });
 
 describe('the lobby deck list', () => {
-  it('lists the deck of the party size, follows it, and empties in the quick mode', () => {
+  it('lists the deck of the party size and follows it', () => {
     const slot = root();
     const list = mountDeckList(asEl(slot), net);
     list.update(snapshot(6));
@@ -61,8 +61,6 @@ describe('the lobby deck list', () => {
     list.update(snapshot(8));
     expect(slot.byTestId('lobby-deck-size')?.content).toBe('10 cards for 8 players');
     expect(slot.byTestId('deck-card-herbalist')?.content).toBe('Herbalist');
-    list.update(snapshot(8, 'onub'));
-    expect(slot.childElementCount).toBe(0);
     list.update(snapshot(2));
     expect(slot.byTestId('lobby-deck-practice')).toBeDefined();
     list.destroy();

@@ -1,4 +1,4 @@
-import { balance, onubBalance } from '@wdi/content';
+import { balance } from '@wdi/content';
 import { TILE_PX } from '@wdi/shared';
 import { expect, test, type Page } from '@playwright/test';
 import { type Swarm, runSwarm } from '../../../tools/bots/swarm';
@@ -8,8 +8,8 @@ import { createParty as startParty } from './fixtures/party';
 // NPC fill (M3c, GDD 3.12) end to end against the real server. The host adds NPC seats in the lobby or
 // lets Start fill the party; nothing on the page marks a seat as an NPC, so the specs read names from the
 // player list and positions from a standing bot's state (never the server-only name pool). It needs the
-// NPC server (S), the lobby (V) and the match flow, so it runs only with WDI_E2E_NPC=1; the quick-mode
-// case also needs ONUB v2 (WDI_E2E_ONUB=1). The server runs with WDI_DEBUG=1 (playwright.config.ts).
+// NPC server (S), the lobby (V) and the match flow, so it runs only with WDI_E2E_NPC=1. The server runs with
+// WDI_DEBUG=1 (playwright.config.ts).
 test.skip(
   process.env.WDI_E2E_NPC !== '1',
   'needs the M3b/M3c sessions R, S, T, U and V merged (WDI_E2E_NPC=1)',
@@ -247,61 +247,4 @@ test('Start alone fills the party: four portraits in the meeting', async ({ brow
     await w.swarm.stop();
     await page.context().close();
   }
-});
-
-// ONUB v2 with NPC seats (GDD 3.11 "NPC seats", bugs.md: a real NPC seat through a whole quick match). One
-// human and three NPCs: the human commits at once, so the prep ends before its clock only if every NPC committed
-// inside `npc.commitS`; the NPCs then claim in the Rush (`claimFrac`) and vote, and the match reaches game over.
-// Nothing on a page marks a seat as an NPC. Elements are the frozen hooks of onub-contract.md section 7. Opt-in
-// like the rest of this file, and it needs ONUB v2 whole, so it also waits for WDI_E2E_ONUB=1.
-test('quick mode, one human and three NPCs: prep, claims and votes by the NPC brain to game over', async ({
-  browser,
-}) => {
-  test.skip(process.env.WDI_E2E_ONUB !== '1', 'needs ONUB v2 (sessions 5A to 5D) merged (WDI_E2E_ONUB=1)');
-  test.setTimeout(1_200_000);
-  const { timers, npc } = onubBalance;
-  const page = await (await browser.newContext()).newPage();
-  // The live lobby offers the mode toggle only with ?onub=1.
-  await createParty(page, '?onub=1');
-  await page.getByTestId('mode-toggle').click();
-  await expect(page.getByTestId('deck-editor')).toBeVisible();
-  for (let i = 0; i < 3; i++) await page.getByTestId('add-npc').click();
-  await expect(page.getByTestId('player-count')).toHaveText('4 / 10');
-
-  await page.getByTestId('start').click();
-  await page.getByTestId('confirm-start').click();
-  await expect(page.getByTestId('rolecard')).toBeVisible();
-  await page.getByTestId('ready').click();
-
-  // Prep: the human works the Oven (the fastest mini-game) with the assist control and commits a good card.
-  await expect(page.getByTestId('kitchen')).toBeVisible({ timeout: (timers.roleCardS + 10) * 1000 });
-  const prepFrom = Date.now();
-  await page.getByTestId('station-oven').click();
-  await page.getByTestId('minigame-assist').click({ timeout: (timers.minigameAssistS + 10) * 1000 });
-  const good = onubBalance.stations.find((s) => s.id === 'oven')!.good[0];
-  await page.getByTestId(`card-${good}`).click();
-  await page.getByTestId('prep-commit').click();
-  await expect(page.getByTestId('prep-done')).toBeVisible();
-  // Every NPC commits by `commitS.max`; the prep ends when the last one has, well before the 60 s clock.
-  await expect(page.getByTestId('prep-board')).toBeVisible({ timeout: (npc.commitS.max + 10) * 1000 });
-  expect((Date.now() - prepFrom) / 1000, 'prep ended before its clock ran out').toBeLessThan(timers.prepS);
-
-  // The Rush: each NPC claims inside `claimFrac` of it, so three claims are on the board by the latest of them.
-  await expect(page.getByTestId('meeting')).toBeVisible({ timeout: 300_000 });
-  await expect(page.getByTestId('vote-skip')).toBeHidden();
-  await expect(page.locator('[data-testid^="portrait-"]')).toHaveCount(balance.players.min);
-  // Every portrait carries its `claimed-<id>` badge, hidden until that seat claims: count the shown ones.
-  await expect(page.locator('[data-testid^="claimed-"]:visible')).toHaveCount(3, {
-    timeout: (npc.claimFrac.max * timers.rushS + 15) * 1000,
-  });
-
-  // The human votes for the Pantry; the NPCs have voted by `voteFrac` of the Rush plus CRUST, so the reveal and
-  // game over follow without anyone waiting on a silent seat.
-  await page.getByTestId('vote-pantry').click();
-  await expect(page.getByTestId('stamp').first()).toBeVisible({
-    timeout: (timers.rushS + timers.voteS + 30) * 1000,
-  });
-  await expect(page.getByTestId('gameover')).toBeVisible({ timeout: (timers.revealS + 30) * 1000 });
-  await expect(page.getByTestId('actlog')).toBeVisible();
-  await page.context().close();
 });

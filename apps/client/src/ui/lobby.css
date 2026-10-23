@@ -1,5 +1,5 @@
 /* The party lobby (round 7, 7E; docs/round7/ui-reskin.md 1, UI.md 14.26): three columns of frosted glass over the
-   night. A holds the code, the mode, the NPCs and the seats; B the map, the art style and the sound (next PR); C the
+   night. A holds the code, the NPCs and the seats; B the map, the art style and the sound (next PR); C the
    deck and the actions. The surfaces, buttons, selects and tags are 7B's `.wdi-glass*` and `.wdi-tag` classes
    (ui/theme/components.css); this file keeps the layout and the pieces they have no class for. Tokens only. */
 
@@ -100,16 +100,10 @@
   gap: var(--wdi-space-2);
 }
 
-/* Tags: You, Leader, Ready, Away, the mode, and the Add friend action. */
+/* Tags: You, Leader, Ready, Away, and the Add friend action. */
 .wdi-lobby__tag--quiet {
   background-color: rgb(var(--wdi-indigo-rgb) / 0.8);
   color: var(--wdi-night-text-muted);
-}
-
-.wdi-lobby__tag--mode {
-  flex-shrink: 1;
-  white-space: normal;
-  text-align: right;
 }
 
 .wdi-lobby__tag--action {
@@ -173,7 +167,7 @@
   box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.3);
 }
 
-/* Column B: the map cards, the art style and the quick-mode deck editor. */
+/* Column B: the map cards and the art style. */
 .wdi-lobby__b {
   flex: 1;
 }
@@ -252,22 +246,6 @@
   letter-spacing: var(--wdi-tracking-caps);
   text-transform: uppercase;
   color: var(--wdi-night-text-muted);
-}
-
-/* The quick-mode deck editor: role chips in the deck's style, the accent on a role in play. */
-.wdi-deckedit__roles {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
-  gap: var(--wdi-space-2);
-}
-
-.wdi-lobby .wdi-deck__role.is-on {
-  color: var(--wdi-on-night-accent);
-  background-color: var(--wdi-night-accent);
-}
-
-.wdi-lobby .wdi-deck__role:disabled:not(.is-on) {
-  opacity: 0.7;
 }
 
 .wdi-lobby .wdi-field__msg--error {

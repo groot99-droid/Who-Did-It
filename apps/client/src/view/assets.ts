@@ -5,7 +5,6 @@ import { type LoadedEntry, loadsAtBoot, loadsWithMatch, mergeStyleManifest } fro
 export {
   type LoadedEntry,
   type ManifestEntry,
-  QUICK_MATCH_MAP,
   loadsAtBoot,
   loadsWithMatch,
   changedEntries,
@@ -98,7 +97,7 @@ export function queueManifest(load: Phaser.Loader.LoaderPlugin, manifest: Loaded
 }
 
 /**
- * Queues the entries a match adds to the boot set: those listing the match's map or mode, and not loaded yet. The
+ * Queues the entries a match adds to the boot set: those listing the match's map, and not loaded yet. The
  * World's `preload` calls it; a `key` already in the texture manager, the animation cache or the JSON cache is skipped.
  */
 export function queueMatchEntries(
@@ -106,10 +105,9 @@ export function queueMatchEntries(
   scene: Phaser.Scene,
   manifest: LoadedManifest,
   mapId: string,
-  mode: 'main' | 'onub',
 ): void {
   const missing = manifest.entries.filter((e) => {
-    if (!loadsWithMatch(e, mapId, mode)) return false;
+    if (!loadsWithMatch(e, mapId)) return false;
     return e.type === 'animation' ? !scene.cache.json.exists(e.key) : !scene.textures.exists(e.key);
   });
   queueEntries(load, manifest, missing);

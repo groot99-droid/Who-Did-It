@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import balance from '@wdi/content/data/balance.json';
 import { SKIP, type MeetingPlayer } from '../meeting';
-import onubBalance from '@wdi/content/data/balance.onub.json';
 import { MockMeetingFeed, mockBotVotes, tallyVotes } from './meetingMock';
 
 const look = { height: 0, scarf: 0, hat: 0 };
@@ -93,55 +92,6 @@ describe('MockMeetingFeed', () => {
     feed.vote(SKIP);
     vi.advanceTimersByTime(5000 + balance.phases.revealS * 1000);
     expect(done).toHaveBeenCalledWith('resume');
-    feed.dispose();
-  });
-});
-
-describe('MockMeetingFeed, dawn', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-    vi.stubGlobal('window', globalThis);
-  });
-  afterEach(() => {
-    vi.useRealTimers();
-    vi.unstubAllGlobals();
-  });
-
-  it('plays the quick-mode stand-in: no Skip, no self vote, the Pantry, a plurality reveal, then game over', () => {
-    const done = vi.fn();
-    const phases: number[] = [];
-    const feed = new MockMeetingFeed(roster, 'me', { onDone: done });
-    feed.bus.on('phaseChange', (e) => phases.push(e.phase));
-    feed.begin({ reason: 'dawn', callerId: '' });
-    expect(feed.mode()).toBe('onub');
-
-    feed.vote(SKIP);
-    feed.vote('me');
-    expect(feed.myVote()).toBe('');
-    feed.vote('pantry');
-    expect(feed.myVote()).toBe('pantry');
-    feed.vote('d');
-    expect(feed.myVote()).toBe('d');
-    // The Rush never ends early.
-    vi.advanceTimersByTime((onubBalance.timers.rushS - 1) * 1000);
-    expect(phases).toEqual([7]);
-    vi.advanceTimersByTime((1 + onubBalance.timers.voteS) * 1000);
-    expect(phases).toEqual([7, 8, 9]);
-    expect(feed.result()?.outs).toEqual(['d']);
-
-    vi.advanceTimersByTime(onubBalance.timers.revealS * 1000);
-    expect(feed.over()).toMatchObject({ winner: 5, roles: {} });
-    expect(feed.over()?.onub).toBeUndefined();
-    expect(done).toHaveBeenCalledWith('gameOver');
-    feed.dispose();
-  });
-
-  it('keeps the main-mode meeting unchanged on a body', () => {
-    const feed = new MockMeetingFeed(roster, 'me', { onDone: vi.fn() });
-    feed.begin({ reason: 'body', callerId: 'me', bodyOf: 'b' });
-    expect(feed.mode()).toBe('main');
-    feed.vote('pantry');
-    expect(feed.myVote()).toBe('');
     feed.dispose();
   });
 });

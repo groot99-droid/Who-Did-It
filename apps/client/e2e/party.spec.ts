@@ -86,17 +86,11 @@ test('a full or started party refuses a late joiner with the generic error', asy
   await hostCtx.close();
 });
 
-// Mock lobby (no server): the leader toggles the mode and the chip text follows; NPC seats come and go.
-test('the leader toggles the mode chip and adds and removes NPC seats', async ({ page }) => {
+// Mock lobby (no server): NPC seats come and go.
+test('the leader adds and removes NPC seats', async ({ page }) => {
   await page.goto('/Who-Did-It/?mock=1');
   await createParty(page, 'Hana');
   await expect(page.getByTestId('player-count')).toHaveText('4 / 10', { timeout: 5000 });
-
-  await expect(page.getByTestId('mode-chip')).toHaveText('Who Did It');
-  await page.getByTestId('mode-toggle').click();
-  await expect(page.getByTestId('mode-chip')).toContainText('One Night Ultimate Baguette');
-  await page.getByTestId('mode-toggle').click();
-  await expect(page.getByTestId('mode-chip')).toHaveText('Who Did It');
 
   await expect(page.getByTestId('remove-npc')).toBeHidden();
   await expect(page.getByTestId('npc-difficulty')).toBeDisabled();

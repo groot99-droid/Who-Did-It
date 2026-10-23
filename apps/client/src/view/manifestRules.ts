@@ -9,19 +9,13 @@ export interface ManifestEntry {
   origin?: [number, number];
   /** Map ids: the entry loads with the match's map, not at boot (SPRITES 5, 10.13). */
   maps?: string[];
-  /** Modes: the entry loads at match start when the match's mode is listed, whatever the client's card. */
-  modes?: Array<'main' | 'onub'>;
 }
 
-/** Entries with neither `maps` nor `modes` load at boot (SPRITES 10.13). */
-export const loadsAtBoot = (e: ManifestEntry): boolean => e.maps === undefined && e.modes === undefined;
+/** Entries without `maps` load at boot (SPRITES 10.13). */
+export const loadsAtBoot = (e: ManifestEntry): boolean => e.maps === undefined;
 
-/** Whether an entry loads with this match: its map or its mode is listed. */
-export const loadsWithMatch = (e: ManifestEntry, mapId: string, mode: 'main' | 'onub'): boolean =>
-  (e.maps?.includes(mapId) ?? false) || (e.modes?.includes(mode) ?? false);
-
-/** The map id a quick match loads art for: none, as the quick mode walks no map (GDD 3.11), so only `modes` entries. */
-export const QUICK_MATCH_MAP = '';
+/** Whether an entry loads with this match: its map is listed. */
+export const loadsWithMatch = (e: ManifestEntry, mapId: string): boolean => e.maps?.includes(mapId) ?? false;
 
 /** An entry a style manifest re-skinned carries the directory its urls are relative to; others use the manifest's. */
 export type LoadedEntry = ManifestEntry & { root?: string };
@@ -37,7 +31,7 @@ const isEntry = (e: unknown): e is ManifestEntry =>
 
 /**
  * Merges a style manifest over the 8-bit one key by key (SPRITES 5, A79). A style entry replaces the 8-bit entry of
- * its key, keeps that entry's `maps`, `modes` and `origin` where it leaves them out, and takes the style's `filter`
+ * its key, keeps that entry's `maps` and `origin` where it leaves them out, and takes the style's `filter`
  * where it names none. Any key the style lacks keeps its 8-bit entry. A style that is not a manifest changes nothing.
  */
 export function mergeStyleManifest<M extends { entries: LoadedEntry[] }>(
@@ -55,7 +49,6 @@ export function mergeStyleManifest<M extends { entries: LoadedEntry[] }>(
     const merged: LoadedEntry = { ...raw, root: styleRoot };
     if (old) {
       if (merged.maps === undefined && old.maps !== undefined) merged.maps = old.maps;
-      if (merged.modes === undefined && old.modes !== undefined) merged.modes = old.modes;
       if (merged.origin === undefined && old.origin !== undefined) merged.origin = old.origin;
     }
     if (merged.filter === undefined && merged.type !== 'animation') merged.filter = styleFilter;

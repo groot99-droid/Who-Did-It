@@ -1,6 +1,6 @@
 import balanceJson from '@wdi/content/data/balance.json';
 import { SERVER_URL } from '../../health';
-import { gameModeId, type PartyListing } from '../../net/protocol';
+import type { PartyListing } from '../../net/protocol';
 import { MAP_ROWS } from '../lobby/MapPicker';
 
 export const LIST_REFRESH_MS: number = balanceJson.party.listRefreshS * 1000;
@@ -25,5 +25,3 @@ export const fetchParties: ListParties = async (profile) => {
 
 /** The map's display name, or its id for a map this client does not know. */
 export const mapName = (id: string): string => MAP_ROWS.find((m) => m.id === id)?.name ?? id;
-
-export const modeId = gameModeId;

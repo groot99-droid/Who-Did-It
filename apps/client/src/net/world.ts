@@ -125,7 +125,7 @@ export type WorldFeedEvents = {
   /** Private, a dying Gamekeeper: pick a seat with `ability('lastShot', seatId)` before `endsTick` (GDD 3.2). */
   aim: { endsTick: number };
   /** Mock only: the mock world's report or bell asks the mock network to open a meeting (round 3, M | N seam). */
-  meetingRequest: { reason: 'body' | 'bell' | 'dawn'; callerId: string; bodyOf?: string };
+  meetingRequest: { reason: 'body' | 'bell'; callerId: string; bodyOf?: string };
   /** Round 6 (6J): play a cutscene; the router keeps an opening under `REG_CUTSCENE` for the World. */
   cutscene: { id: string; scope?: 'all' };
   /** Private, round 6 (6H, 6I): a station task's mini-game opened; answered with `minigameResult`. */
@@ -179,8 +179,6 @@ export interface WorldFeed {
   /** Doors of the scene this client is in. */
   doors(): DoorSnap[];
   clock(): { tick: number; phase: number; phaseEndsTick: number; startTick: number };
-  /** `main` or `onub` (quick mode, GDD 3.11), from the lobby setting. Quick mode never starts the World. */
-  mode(): 'main' | 'onub';
   /** Bodies of the scene this client is in. */
   bodies(): BodySnap[];
   /** Clues of the scene this client is in. */
