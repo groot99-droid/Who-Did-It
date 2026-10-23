@@ -1,14 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import onubBalance from '@wdi/content/data/balance.onub.json';
+import balance from '@wdi/content/data/balance.json';
 import { slotRect, SlideModel } from './slide';
 
-const proofing = onubBalance.stations.find((s) => s.id === 'proofing')!;
-
 describe('slide mini-game', () => {
-  it('takes its step count from the proofing station', () => {
-    expect(new SlideModel(() => 0.3).steps).toBe(
-      proofing.minigame.kind === 'slide' ? proofing.minigame.steps : -1,
-    );
+  it('takes its step count from balance.json', () => {
+    expect(new SlideModel(() => 0.3).steps).toBe(balance.minigames.slide.steps);
   });
 
   it('lights every slot once, in a random order', () => {

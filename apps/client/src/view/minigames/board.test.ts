@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import onubBalance from '@wdi/content/data/balance.onub.json';
+import balance from '@wdi/content/data/balance.json';
 import { checkMinigame, generateMinigame, mulberry32, type MinigameBases } from '@wdi/shared/rules';
 import type { CratesPublic, PourPublic, SlidePublic, StokePublic } from '@wdi/shared/rules';
 import type { MinigameKind } from '@wdi/shared/protocol';
@@ -9,13 +9,7 @@ import { SlideModel, slotRect } from './slide';
 import { StokeModel } from './stoke';
 import { bandRng } from './board';
 
-const spec = (k: MinigameKind) => onubBalance.stations.find((s) => s.minigame.kind === k)!.minigame;
-const bases = {
-  crates: spec('crates'),
-  pour: spec('pour'),
-  slide: spec('slide'),
-  stoke: spec('stoke'),
-} as unknown as MinigameBases;
+const bases: MinigameBases = balance.minigames;
 
 /** Plays a widget model the way a careful player would and returns its `answer()` record. */
 function play(kind: MinigameKind, pub: unknown): unknown {

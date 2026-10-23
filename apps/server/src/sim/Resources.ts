@@ -4,8 +4,7 @@ import { ErrorCode, Node, Phase, TICK_RATE, TILE_PX, type PlayerState, type Rng 
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { mapScenesOf } from './MapSites';
 import { addStack, canAdd, count } from './Inventory';
-import { isLoft, isVerbPhase, profileOpen, reject, sceneKey, tileCentre } from './World';
-import { isOnub } from './onub/state';
+import { isVerbPhase, profileOpen, reject, sceneKey, tileCentre } from './World';
 import { type PlayerSim, simOf } from './RoomSim';
 import type { MatchSeeds } from './seeds';
 
@@ -98,15 +97,15 @@ function clearNodes(room: PartyRoom): void {
 /** Whether a main-mode match is on and placed: from grace to the final night. */
 function matchOn(room: PartyRoom): boolean {
   const { phase } = room.state;
-  return !isOnub(room) && phase >= Phase.grace && phase <= Phase.finalNight && simOf(room).profileFixed;
+  return phase >= Phase.grace && phase <= Phase.finalNight && simOf(room).profileFixed;
 }
 
-/** The room's node memory, drawn on the first placed tick of a match; null in the lobby and in the quick mode. */
+/** The room's node memory, drawn on the first placed tick of a match; null in the lobby. */
 function memoryOf(room: PartyRoom): NodeMemory | null {
   const mem = MEMORY.get(room);
   if (!matchOn(room)) {
     const { phase } = room.state;
-    if (mem && (phase === Phase.lobby || phase === Phase.roleReveal || isOnub(room))) clearNodes(room);
+    if (mem && (phase === Phase.lobby || phase === Phase.roleReveal)) clearNodes(room);
     return mem ?? null; // game over keeps the last nodes in view; the lobby has cleared them
   }
   if (mem && mem.seeds === room.seeds) return mem;
@@ -145,7 +144,7 @@ function gatherProblem(
   nodeId: string,
 ): { code: ErrorCode; msg: string } | null {
   if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
-  if (p.dead || !p.placed || isLoft(p.sceneIdx)) return { code: ErrorCode.cannot, msg: 'not now' };
+  if (p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
   if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
   const node = nodeFor(room, p, nodeId);
   const resource = node ? resources.resources[node.resource] : undefined;

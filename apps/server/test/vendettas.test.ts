@@ -1,6 +1,6 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance, roles, scenes, validateContent, vendettas } from '@wdi/content';
-import { BUILD_VERSION, C2S, NoteKind, Phase, TICK_RATE, TaskEntry } from '@wdi/shared';
+import { BUILD_VERSION, C2S, ClueKind, NoteKind, Phase, TICK_RATE, TILE_PX, TaskEntry } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { MatchSeeds, type SeedWords } from '../src/sim/seeds';
@@ -13,6 +13,11 @@ import {
 } from '../src/sim/vendettas/state';
 import { fixSeeds } from './seedHelpers';
 import { sceneKey } from '../src/sim/World';
+import { emitSim } from '../src/sim/events/bus';
+import { count } from '../src/sim/Inventory';
+import { simOf } from '../src/sim/RoomSim';
+import { STRONGBOX_ITEM, strongboxOf } from '../src/sim/vendettas/heist';
+import { setPhase, teleport } from './killHelpers';
 import { matchEvents } from '../src/sim/auto/log';
 import { countsVote } from '../src/sim/vendettas/conversion';
 import { vendettaGoalFor } from '../src/sim/vendettas/goal';
@@ -30,7 +35,7 @@ import {
   until,
   voteAll,
 } from './flowHelpers';
-import { type Match, sleep, standAt, startMatch } from './simHelpers';
+import { type Bot, type Match, sleep, standAt, startMatch } from './simHelpers';
 
 // Round 7, Session 7H (GDD 3.20; docs/round7/vendettas.md 2): the four vendettas, the draw at the deal and its stream.
 
@@ -252,5 +257,57 @@ describe('conversion and sabotage in a match', () => {
     expect(seat(m, 0).priv.cooldownEndTick.get('kill')).toBeLessThanOrEqual(m.room.state.tick);
     expect(vendettaGoalFor(m.room, killer)).toBeNull();
     for (const e of vendettaEvents(m)) expect(e.seat).toBeUndefined();
+  });
+});
+
+describe('the heist in a match', () => {
+  beforeEach(async () => colyseus.cleanup());
+
+  it('loads the strongbox at the delivery, then the Bandit cracks it alone after dark', async () => {
+    const m = await startMatch(colyseus, 5, { Bot0: 'killer', Bot1: 'detective' });
+    const killer = idOf(m, 0);
+    holdVendetta(m.room, killer, 'bandit');
+    // White-box: the hall opens at the medium profile; a party of five plays the small one.
+    simOf(m.room).profile = 'medium';
+    const box = strongboxOf(m.room);
+    expect(vendettaGoalFor(m.room, killer)).toBeNull();
+    const data = { map: 'hollowmere', station: 'overworld.platform', round: 1 };
+    emitSim(m.room, { tick: m.room.state.tick, kind: 'train.delivery', sceneId: 'overworld', data });
+    await until(() => box.loaded);
+    expect(vendettaGoalFor(m.room, killer)).toEqual({ sceneId: 'manor_hall' });
+
+    const prog = progressOf(m.room, killer);
+    const bots = m.bots as Bot[];
+    const [b0, b2] = [bots[0]!, bots[2]!];
+    setPhase(m, Phase.day);
+    teleport(m, b0, 'manor_hall', 18, 1);
+    await sleep(200);
+    expect(prog.holding).toBeNull();
+    setPhase(m, Phase.night);
+    const home = { x: Math.floor(sim(m, 2).x / TILE_PX), y: Math.floor(sim(m, 2).y / TILE_PX) };
+    teleport(m, b2, 'manor_hall', 14, 4);
+    await sleep(200);
+    expect(prog.holding).toBeNull();
+    teleport(m, b2, 'overworld', home.x, home.y);
+    await until(() => prog.holding !== null);
+    expect(prog.holding?.prop).toBe('mh.safe');
+    seat(m, 0).priv.cooldownEndTick.set('kill', m.room.state.tick + 100 * TICK_RATE);
+    prog.holding = { prop: 'mh.safe', ticks: balance.vendettas.heist.crackS * TICK_RATE - 2 };
+    await until(() => prog.over);
+
+    expect(box.taken).toBe(true);
+    expect(count(seat(m, 0), STRONGBOX_ITEM)).toBe(1);
+    expect(seat(m, 0).priv.cooldownEndTick.get('kill')).toBeLessThanOrEqual(m.room.state.tick);
+    const prints = [...m.room.state.scenes.get('manor_hall')!.clues.values()].filter(
+      (c) => c.kind === ClueKind.footprints,
+    );
+    expect(prints.map((c) => c.value)).toEqual([seat(m, 0).traits.height]);
+    expect(vendettaGoalFor(m.room, killer)).toBeNull();
+    expect(vendettaSteps(m.room).map((s) => s.kind)).toEqual(['vendetta.heist.cracked']);
+    const heistEvents = () => matchEvents(m.room).filter((e) => e.kind.startsWith('vendetta.'));
+    await until(() => heistEvents().length === 2);
+    const kinds = heistEvents();
+    expect(kinds.map((e) => e.kind)).toEqual(['vendetta.heist.loaded', 'vendetta.heist.cracked']);
+    for (const e of kinds) expect(e.seat).toBeUndefined();
   });
 });

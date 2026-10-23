@@ -35,7 +35,6 @@ export async function listParties(profile: string | null): Promise<PartyListing[
         leader: m.leader,
         players: m.players,
         max: m.max,
-        mode: m.mode,
         map: m.map,
         visibility: m.visibility satisfies PartyVisibility,
       };

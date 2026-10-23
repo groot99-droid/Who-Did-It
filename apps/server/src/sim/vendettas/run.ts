@@ -1,7 +1,7 @@
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { onSim } from '../events/bus';
-import { isOnub } from '../onub/state';
 import { onMeetingConversion, runConversion } from './conversion';
+import { onDeliveryHeist, runHeist } from './heist';
 import { runSabotage } from './sabotage';
 import { privateVendetta, vendettaHolders, vendettaOf } from './state';
 
@@ -17,11 +17,11 @@ function subscribe(room: PartyRoom): void {
   if (subscribed.has(room)) return;
   subscribed.add(room);
   onSim(room, 'meeting', (_e, r) => onMeetingConversion(r));
+  onSim(room, 'train.delivery', (_e, r) => onDeliveryHeist(r));
 }
 
 export function runVendettas(room: PartyRoom): void {
   subscribe(room);
-  if (isOnub(room)) return;
   // The card's goal line (`Private.vendetta`), written here because the deal fills the Cabal mates after the draw.
   for (const [id, player] of room.state.players) {
     const line = player.priv ? privateVendetta(room, id) : '';
@@ -33,5 +33,6 @@ export function runVendettas(room: PartyRoom): void {
     if (!v || room.state.players.get(seat)?.priv?.role.roleId !== v.role) continue;
     if (v.kind === 'conversion') runConversion(room, seat);
     else if (v.kind === 'sabotage') runSabotage(room, seat);
+    else if (v.kind === 'heist') runHeist(room, seat);
   }
 }

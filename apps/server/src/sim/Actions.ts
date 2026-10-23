@@ -1,5 +1,5 @@
 import { abilities, roles } from '@wdi/content';
-import { ErrorCode, ONUB_ACT_PREFIX, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { ErrorCode, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { resolveHandle } from './Avatars';
 import { handleHold } from './Hold';
@@ -7,9 +7,8 @@ import { handleImpersonate } from './Impersonate';
 import { handleKill } from './Kill';
 import { bellOf, hubOf } from './MapSites';
 import { handleNightPower } from './NightPowers';
-import { handleOnubAbility } from './Onub';
 import { type PlayerSim, simOf } from './RoomSim';
-import { isLoft, isVerbPhase, reject, sceneKey, tileCentre } from './World';
+import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
 /** Dispatches the `act.*` verbs of the Round 3 brief; every payload is untrusted. */
 export function runAction(
@@ -39,8 +38,7 @@ function livingActor(room: PartyRoom, sessionId: string, needBellPhase = false):
   const phaseOk = needBellPhase
     ? phase === Phase.grace || phase === Phase.day // the Bell is silent after dark (GDD 3.3, M5a)
     : isVerbPhase(phase);
-  // A sleeper in the quick-mode loft is in no scene and acts on nothing (A39).
-  if (p.dead || !p.placed || isLoft(p.sceneIdx)) reject(room, sessionId, ErrorCode.cannot, 'not now');
+  if (p.dead || !p.placed) reject(room, sessionId, ErrorCode.cannot, 'not now');
   else if (!phaseOk) reject(room, sessionId, ErrorCode.wrongPhase, 'not now');
   else if (room.state.tick < p.busyUntilTick) reject(room, sessionId, ErrorCode.busy, 'busy');
   else return p;
@@ -63,9 +61,6 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
     case 'lastShot':
       return handleNightPower(room, sessionId, payload);
     default:
-      if (typeof payload.abilityId === 'string' && payload.abilityId.startsWith(ONUB_ACT_PREFIX)) {
-        return handleOnubAbility(room, sessionId, payload);
-      }
       reject(room, sessionId, ErrorCode.cannot, 'cannot do that');
   }
 }

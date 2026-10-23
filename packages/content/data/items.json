@@ -510,6 +510,16 @@
       "tooltip": "Wanted by quest givers.",
       "ships": "V1",
       "gddRef": "3.14"
+    },
+    "strongbox": {
+      "id": "strongbox",
+      "name": "Strongbox",
+      "kind": "valuable",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "The manor's strongbox, heavy with the Train's delivery.",
+      "ships": "V1",
+      "gddRef": "3.20"
     }
   }
 }

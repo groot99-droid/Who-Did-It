@@ -1,11 +1,11 @@
-import onubBalance from '@wdi/content/data/balance.onub.json';
+import balance from '@wdi/content/data/balance.json';
 import { fill } from '../../ui/copy';
 import { MINIGAME_COPY as C } from '../../ui/copy/minigames';
 import { h } from '../../ui/dom';
 import type { MiniGameFactory } from './registry';
 import { box, COLORS, createStage, inside, loop, type Rect } from './draw';
 
-const SPEC = onubBalance.stations.find((s) => s.minigame.kind === 'slide')!.minigame as { steps: number };
+const SPEC = balance.minigames.slide;
 
 export const CABINET: Rect = { x: 84, y: 6, w: 60, h: 88 };
 export const BANNETON = { w: 28, h: 16 };

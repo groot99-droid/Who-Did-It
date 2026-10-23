@@ -11,10 +11,8 @@ import {
   timingRng,
 } from './npc/memory';
 import { readyOnRoleCard, runMeetingVotes } from './npc/meeting';
-import { runOnubNpc } from './npc/onub';
 import { drawPersonas, releaseClaims } from './npc/routine';
 import { runWorldNpc } from './npc/world';
-import { isOnub } from './onub/state';
 import { simOf } from './RoomSim';
 import { isWorldPhase } from './World';
 
@@ -40,7 +38,7 @@ export function runNpcs(room: PartyRoom): void {
     if (state.phase === Phase.roleReveal) {
       mem.brains.clear();
       mem.claims.clear();
-      if (!isOnub(room)) drawPersonas(room, mem);
+      drawPersonas(room, mem);
     }
     if (state.phase === Phase.meetingDiscussion) {
       for (const [id, brain] of mem.brains) {
@@ -58,13 +56,12 @@ export function runNpcs(room: PartyRoom): void {
     if (state.phase === Phase.grace || state.phase === Phase.immunity) {
       for (const brain of mem.brains.values()) brain.placementPending = true;
     }
-    if ((state.phase === Phase.dusk || state.phase === Phase.finalNight) && !isOnub(room)) {
+    if (state.phase === Phase.dusk || state.phase === Phase.finalNight) {
       drawNightPowerTicks(room, mem);
     }
   }
 
   const sim = simOf(room);
-  const quick = isOnub(room);
   for (const id of mem.order) {
     const player = state.players.get(id) as PlayerState;
     const p = sim.players.get(id);
@@ -72,7 +69,7 @@ export function runNpcs(room: PartyRoom): void {
     const brain = mem.brain(id);
     // The Last Shot tick is drawn once, on the first tick the seat is seen dead (every NPC, whatever its card): that
     // tick plus a `lastShotS` delay, the tick an aiming NPC Gamekeeper fires at (npc.md 6, 9).
-    if (p.dead && brain.lastShotAtTick < 0 && !quick) {
+    if (p.dead && brain.lastShotAtTick < 0) {
       brain.lastShotAtTick =
         state.tick +
         npcDelayTicks(
@@ -82,10 +79,8 @@ export function runNpcs(room: PartyRoom): void {
           TICK_RATE,
         );
     }
-    // Quick mode hands every phase but the role card to its own brain (round 5, 5E).
     if (state.phase === Phase.lobby) readyInLobby(room, brain, player);
     else if (state.phase === Phase.roleReveal) readyOnRoleCard(room, mem, brain, player);
-    else if (quick) runOnubNpc(room, mem, brain, player, p);
     else if (state.phase === Phase.meetingDiscussion || state.phase === Phase.meetingVote) {
       runMeetingVotes(room, mem, brain, player, p);
     } else if (isWorldPhase(state.phase)) runWorldNpc(room, mem, brain, player, p);

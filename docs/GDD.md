@@ -138,7 +138,7 @@ Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife,
 | Oil, Wrench, Planks, Letter, Flour | Task deliverables fetched from other scenes | V1 |
 | Forged Alibi, Handcuffs, Crossbow kit, Lockpicks, Smoke Bomb, Heirlooms | V1.5 kits | V1.5 |
 
-**Tasks.** Village players get 3-5 tasks; the global bar at 100% wins. Each needs a tool from another scene and a 2 s hold at the node: Light the lanterns (Oil from the tavern back room to a square lantern post, night only), Fix the well pump (Wrench from the apothecary bench), Deliver a letter (from the widow's letter box to the tavern dartboard), Mend the fence (2 Planks from the edge of Gallows Wood by the gate to the NE fence; while mended, wolves cannot enter the village), Fetch the flour (from Crumb's Ovens to the tavern). Co-op task (Shutter the windows, in the tavern): both players within 2 tiles of the node holding E for 4 s; progress pauses when one releases. Two-player carrying is V1.5. Completing a task writes a Claimed alibi entry (time + scene). Cabal see a fake list that writes entries but never fills the bar. Ghost task completion counts 100% but ghost contribution is capped at 25% of the bar, except the martyred Vicar's (3.20). A full bar in play ends the match for the Village.
+**Tasks.** Village players get 3-5 tasks; the global bar at 100% wins. Each needs a tool from another scene and a 2 s hold at the node: Light the lanterns (Oil from the tavern back room to a square lantern post, night only), Fix the well pump (Wrench from the apothecary bench), Deliver a letter (from the widow's letter box to the tavern dartboard), Mend the fence (2 Planks from the edge of Gallows Wood by the gate to the NE fence; while mended, wolves cannot enter the village), Fetch the flour (from Crumb's Ovens to the tavern); and behind Crumb's Ovens (round 7, A118) Mix the dough (Flour from the bakery's sacks to the mixer), Stoke the oven (Timber from the woodpile at the edge of Gallows Wood to the brick oven), Stock the cold room (a Bucket of well water from the pump to the cold shelves) and Proof the loaves (a Candle from the widow's bedroom to the proofing cabinet), which join the pool the deal draws from, the number dealt and the bar's maths unchanged. Co-op task (Shutter the windows, in the tavern): both players within 2 tiles of the node holding E for 4 s; progress pauses when one releases. Two-player carrying is V1.5. Completing a task writes a Claimed alibi entry (time + scene). Cabal see a fake list that writes entries but never fills the bar. Ghost task completion counts 100% but ghost contribution is capped at 25% of the bar, except the martyred Vicar's (3.20). A full bar in play ends the match for the Village.
 
 **Communication.** No voice in V1. Global text chat in meetings, lines of at most 200 characters. Outside meetings: an 8-phrase quick-chat wheel (Follow me / Where were you? / I saw something / Help! / Clear / Suspicious / Wait / Go) as speech bubbles within 5 tiles, plus world pings. Cabal channel and ghost channel are sent per-recipient by the server; the client never chooses a channel. (M3) A living player may speak only while a meeting runs (discussion, vote and reveal), to everyone; a ghost may speak in any phase, to the other ghosts only; empty lines are refused and long ones are cut to the limit. Proximity text chat is a V1.5 toggle.
 
@@ -459,7 +459,7 @@ The quick mode does not walk (3.11). Its kitchen and night rooms are isometric i
 
 | Phase | Darkness |
 |---|---|
-| Grace, day, immunity | `slate` at 40% |
+| Grace, day, immunity | `slate` at 20% (softened by the owner, A121) |
 | Night, Final Night | `ink` at 90% |
 | Dusk, dawn | Eased between the two |
 
@@ -626,6 +626,10 @@ kinds are the quick mode's (3.11): crates, pour, slide and stoke. (6H)
 | Deliver a letter | slide | 1 |
 | Mend the fence | crates | 2 |
 | Fetch the flour | crates | 1 |
+| Mix the dough | pour | 2 |
+| Stoke the oven | stoke | 2 |
+| Stock the cold room | crates | 1 |
+| Proof the loaves | slide | 2 |
 
 After 20 s the Done control appears, as in the quick mode. A wrong answer completes nothing and may be tried again.
 A Cabal seat's fake task plays the same mini-game, writes the same alibi entry and never moves the task bar (3.5).
@@ -738,10 +742,11 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
   finished real task of the match (`vendettas.sabotage.undoTasks`), drawn from the Activist's stream, is undone,
   the task bar falls with it, and the Activist's Knife is ready at once. With no finished real task the bar has
   nothing to lose and only the Knife is readied.
-- **Heist: the Bandit against the strongbox (7H).** The strongbox stands in the manor hall, empty, in every
-  HollowMere match the hall is open at; the first Train delivery of the match loads it (`vendetta.heist.loaded`,
-  in every such match, Bandit or not). The Bandit's goal is to crack it: **8 s** (`vendettas.heist.crackS`)
-  still within verb reach of it, after dark, with no other living seat in the hall. Cracking it
+- **Heist: the Bandit against the strongbox (7H).** The strongbox (the hall's safe, `mh.safe`) stands in the
+  manor hall, empty, in every HollowMere match the hall is open at; the first Train delivery of the match loads it
+  (`vendetta.heist.loaded`, in every such match, Bandit or not). The Bandit's goal is to crack it: **8 s**
+  (`vendettas.heist.crackS`) still within verb reach of it, after dark (night or final night), with no other
+  living seat in the hall. Cracking it
   (`vendetta.heist.cracked`, the consequence) puts the Strongbox item in the Bandit's inventory (it needs a free
   slot), leaves a footprint of the Bandit's own height at the box as a kill does (3.4), and readies the Knife at
   once. The strongbox is in one inventory at most.
@@ -772,8 +777,10 @@ room's next match until another replaces it), which round 8's evolutions read.
 a Knife death. A Vicar taken by a wolf, poisoned, shot or ejected is no martyr. The martyr is the seat the memorial
 mourns, so it follows the public look like the film: a cover in the Vicar's look is the martyr, and a seat dealt the
 Vicar under another look is not, since the bar is public and Killers pick victims by the look they see. From that
-reveal, each real task the martyr's ghost finishes counts **10** times on the task bar (`tasks.martyrWeight`),
-outside the ghost cap (3.5); the tasks it finished before that reveal count as any ghost's. A full bar in play wins
+reveal and for **10 minutes** (`tasks.martyrS`, the owner's limit), each real task the martyr's ghost finishes
+counts **10** times on the task bar (`tasks.martyrWeight`), outside the ghost cap (3.5); the tasks it finished
+before that reveal or after the ten minutes count as any ghost's. The boost ends with the match and never carries
+into the room's next one. A full bar in play wins
 for the Village, so a Killer that strikes the Vicar hands the village a fast clock: the Zealot, whose goal is the
 Vicar's flock, is the one Killer with a reason to take that risk. The private candidacy above stays on the card.
 

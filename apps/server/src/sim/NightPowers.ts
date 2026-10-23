@@ -22,9 +22,8 @@ import { closeAims, handleLastShot, runNpcShots, startAim } from './LastShot';
 import { runInherit } from './Inherit';
 import { dropNightMemory, nightOf } from './nightMemory';
 import { npcMemory } from './npc/memory';
-import { isOnub } from './onub/state';
 import { type PlayerSim, simOf } from './RoomSim';
-import { isLoft, reject, sceneKey } from './World';
+import { reject, sceneKey } from './World';
 
 // Night powers, protections, Nightshade, the Last Shot and Inherit (GDD 3.2, round-5 `deck/wire.md` 5). Session
 // 5G owns this file; the hooks below are called from their locked sites (wire.md 8.1). The memory is
@@ -79,7 +78,7 @@ function powerProblem(room: PartyRoom, seat: string, ability: string, target: un
   if (!roles.roles[player.priv.role.roleId]?.abilities.includes(ability)) {
     return { code: ErrorCode.cannot, msg: 'cannot do that' };
   }
-  if (p.dead || !p.placed || isLoft(p.sceneIdx)) return { code: ErrorCode.cannot, msg: 'not now' };
+  if (p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
   const phase = POWER_PHASE[room.state.phase];
   if (phase === undefined || !(def.phases as readonly string[] | undefined)?.includes(phase)) {
     return { code: ErrorCode.wrongPhase, msg: 'not now' };
@@ -171,7 +170,7 @@ function resolvePoison(room: PartyRoom): void {
     const p = sim.players.get(seat);
     if (!p || p.dead) continue;
     markDead(room, seat, 'poison');
-    if (p.placed && !isLoft(p.sceneIdx)) {
+    if (p.placed) {
       spawnBody(room, sceneKey(p.sceneIdx), seat, Math.floor(p.x / TILE_PX), Math.floor(p.y / TILE_PX));
     }
   }
@@ -231,10 +230,10 @@ function runNpcPowers(room: PartyRoom): void {
 /**
  * A stage after `runImpersonation` (`Step.ts`): clears spent powers when a dusk or the Final Night begins, resolves
  * Nightshade at daybreak, expires the Watch when the night ends, runs the NPC night powers and Last Shots, closes
- * aims and checks Inherit each tick. The quick mode has none of it.
+ * aims and checks Inherit each tick.
  */
 export function runNightPowers(room: PartyRoom): void {
-  if (isOnub(room) || room.state.phase < Phase.grace) return;
+  if (room.state.phase < Phase.grace) return;
   const mem = nightOf(room);
   const phase = room.state.phase;
   if (phase !== mem.phase) {
@@ -265,7 +264,7 @@ export function onMeetingOpenNight(room: PartyRoom): void {
 export function holdReveal(room: PartyRoom): boolean {
   if (nightOf(room).aims.size > 0) return true;
   // The reveal of the forced meeting is the last thing of a match: it ends the match here (FinalNight.ts).
-  if (!isOnub(room) && room.state.meeting.reason === 'final') {
+  if (room.state.meeting.reason === 'final') {
     finishFinalNight(room);
     return true;
   }

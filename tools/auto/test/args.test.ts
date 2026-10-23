@@ -7,7 +7,6 @@ describe('pnpm auto arguments', () => {
       matches: 20,
       seed: 1,
       map: 'hollowmere',
-      mode: 'main',
       difficulty: 'normal',
       seats: 6,
       json: false,
@@ -20,8 +19,6 @@ describe('pnpm auto arguments', () => {
         '7',
         '--map',
         'blackpine',
-        '--mode',
-        'onub',
         '--difficulty',
         'hard',
         '--seats',
@@ -32,7 +29,6 @@ describe('pnpm auto arguments', () => {
       matches: 50,
       seed: 7,
       map: 'blackpine',
-      mode: 'onub',
       difficulty: 'hard',
       seats: 10,
       json: true,
@@ -42,7 +38,7 @@ describe('pnpm auto arguments', () => {
   it('refuses what it does not know', () => {
     expect(parseArgs(['--speed', '10'])).toBeNull();
     expect(parseArgs(['--matches', 'many'])).toBeNull();
-    expect(parseArgs(['--mode', 'story'])).toBeNull();
+    expect(parseArgs(['--mode', 'main'])).toBeNull();
     expect(parseArgs(['--seed'])).toBeNull();
   });
 });

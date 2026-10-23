@@ -247,16 +247,3 @@ describe('the reveal and the way out', () => {
     expect(events(m.bots[0]!, 'meetingStart')).toHaveLength(2);
   });
 });
-
-describe('quick-mode messages in the main mode (GDD 3.11)', () => {
-  it('refuses meeting.claim 422 outside quick mode, in a meeting too', async () => {
-    const m = await startParty(colyseus, 5);
-    await skipPhase(m);
-    await openMeeting(m, 1);
-    const bot = m.bots[0]!;
-    bot.room.send('meeting.claim', { roleId: 'cutpurse' });
-    await sleep(250);
-    expect(events(bot, 'error').map((e) => e.code)).toEqual([422]);
-    expect(m.room.state.meeting.claims.length).toBe(0);
-  });
-});

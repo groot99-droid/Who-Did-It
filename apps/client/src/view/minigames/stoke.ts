@@ -1,16 +1,11 @@
-import onubBalance from '@wdi/content/data/balance.onub.json';
+import balance from '@wdi/content/data/balance.json';
 import { fill } from '../../ui/copy';
 import { MINIGAME_COPY as C } from '../../ui/copy/minigames';
 import { h } from '../../ui/dom';
 import type { MiniGameFactory } from './registry';
 import { box, COLORS, createStage, loop, type Rect } from './draw';
 
-const SPEC = onubBalance.stations.find((s) => s.minigame.kind === 'stoke')!.minigame as {
-  stokePerTap: number;
-  ratePerS: number;
-  bandFrac: number;
-  holdS: number;
-};
+const SPEC = balance.minigames.stoke;
 
 /**
  * The oven's stoke (GDD 3.11): each tap feeds `stokePerTap` of the heat, the fire cools `ratePerS` a second, and

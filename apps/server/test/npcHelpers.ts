@@ -225,6 +225,7 @@ export async function standardParty(
     mobs: words,
     minigame: words,
     contract: words,
+    vendetta: words,
     events: words,
   });
   for (const id of npcIdsOf(set)) addNpcSeat(party.room, party.room.seeds.get('npcNames'), id);

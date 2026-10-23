@@ -216,7 +216,7 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
   }
 
   /**
-   * Publishes the listing fields through `setMetadata` when they change (join, leave, leader pass, mode or map),
+   * Publishes the listing fields through `setMetadata` when they change (join, leave, leader pass, map),
    * and clears them once the party leaves the lobby phase (GDD 3.21). The matchmaking stays private; the
    * `/parties` route reads these fields. Nothing here reaches the schema.
    */
@@ -229,7 +229,6 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
           leader: state.players.get(state.leaderId)?.name ?? '',
           players: state.players.size,
           max: MAX_PLAYERS,
-          mode: state.settings.mode,
           map: state.settings.map,
           invited: this.invited,
         }

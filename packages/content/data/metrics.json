@@ -29,7 +29,7 @@
   },
   "lighting": {
     "ambient": {
-      "day": { "color": "slate", "alpha": 0.4 },
+      "day": { "color": "slate", "alpha": 0.2 },
       "night": { "color": "ink", "alpha": 0.9 },
       "dark": { "color": "ink", "alpha": 0.94 }
     },

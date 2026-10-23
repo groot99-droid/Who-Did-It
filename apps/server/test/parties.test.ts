@@ -98,7 +98,7 @@ describe('the profile and the create options in onAuth', () => {
 
 const PORT = 2568; // @colyseus/testing default
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const LISTING_KEYS = ['code', 'leader', 'map', 'max', 'mode', 'players', 'visibility'];
+const LISTING_KEYS = ['code', 'leader', 'map', 'max', 'players', 'visibility'];
 
 async function fetchParties(profile?: string): Promise<PartyListing[]> {
   const url = `http://localhost:${PORT}/parties${profile === undefined ? '' : `?profile=${profile}`}`;
@@ -119,7 +119,7 @@ async function until(check: (rows: PartyListing[]) => boolean, profile?: string)
 }
 
 describe('the party list', () => {
-  it('lists an open party with its leader, seats, mode and map, and nothing else', async () => {
+  it('lists an open party with its leader, seats and map, and nothing else', async () => {
     const leader = await colyseus.sdk.create('party', opts('Ada'));
     const rows = await until((r) => r.some((p) => p.code === leader.roomId));
     const row = rows.find((p) => p.code === leader.roomId) as PartyListing;
@@ -128,19 +128,18 @@ describe('the party list', () => {
       leader: 'Ada',
       players: 1,
       max: 10,
-      mode: 0,
       map: 'hollowmere',
       visibility: 'open',
     });
     expect(Object.keys(row).sort()).toEqual(LISTING_KEYS);
   });
 
-  it('follows a join, a leader change of mode and map, and a leave', async () => {
+  it('follows a join, a leader change of map, and a leave', async () => {
     const leader = await colyseus.sdk.create('party', opts('Ada'));
     const guest = await colyseus.sdk.joinById(leader.roomId, opts('Bob'));
     await until((r) => r.find((p) => p.code === leader.roomId)?.players === 2);
-    leader.send(C2S.lobbySettings, { mode: 1 });
-    await until((r) => r.find((p) => p.code === leader.roomId)?.mode === 1);
+    leader.send(C2S.lobbySettings, { map: 'blackpine' });
+    await until((r) => r.find((p) => p.code === leader.roomId)?.map === 'blackpine');
     await leader.leave(true);
     const rows = await until((r) => r.find((p) => p.code === leader.roomId)?.leader === 'Bob');
     expect(rows.find((p) => p.code === leader.roomId)?.players).toBe(1);

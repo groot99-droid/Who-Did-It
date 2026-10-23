@@ -88,6 +88,62 @@
       "effect": "Both players within range hold E; progress pauses when one releases.",
       "ships": "V1",
       "gddRef": "3.5"
+    },
+    "mixDough": {
+      "id": "mixDough",
+      "name": "Mix the dough",
+      "kind": "fetch",
+      "tool": "flour",
+      "toolQty": 1,
+      "source": { "scene": "bakery", "prop": "bk.flour_sacks" },
+      "targets": [{ "scene": "crumb_mixing", "prop": "cm.mixer" }],
+      "holdS": 2,
+      "nightOnly": false,
+      "effect": "Pour flour from Crumb's sacks into the mixer in the mixing room.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "stokeOven": {
+      "id": "stokeOven",
+      "name": "Stoke the oven",
+      "kind": "fetch",
+      "tool": "timber",
+      "toolQty": 1,
+      "source": { "scene": "forest", "prop": "fo.planks" },
+      "targets": [{ "scene": "crumb_oven", "prop": "co.brick_oven" }],
+      "holdS": 2,
+      "nightOnly": false,
+      "effect": "Feed timber from the woodpile at the edge of Gallows Wood into the brick oven.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "stockColdRoom": {
+      "id": "stockColdRoom",
+      "name": "Stock the cold room",
+      "kind": "fetch",
+      "tool": "bucket",
+      "toolQty": 1,
+      "source": { "scene": "overworld", "prop": "ov.pump" },
+      "targets": [{ "scene": "crumb_cold", "prop": "cf.cold_shelves" }],
+      "holdS": 2,
+      "nightOnly": false,
+      "effect": "Carry a bucket of well water to the cold room's shelves for the ice trays.",
+      "ships": "V1",
+      "gddRef": "3.5"
+    },
+    "proofLoaves": {
+      "id": "proofLoaves",
+      "name": "Proof the loaves",
+      "kind": "fetch",
+      "tool": "candle",
+      "toolQty": 1,
+      "source": { "scene": "widow_bedroom", "prop": "wb.candle" },
+      "targets": [{ "scene": "crumb_proofing", "prop": "cp.proofer" }],
+      "holdS": 2,
+      "nightOnly": false,
+      "effect": "Bring a candle from the widow's bedroom to warm the proofing cabinet.",
+      "ships": "V1",
+      "gddRef": "3.5"
     }
   }
 }
