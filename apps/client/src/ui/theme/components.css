@@ -2874,6 +2874,8 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   place-items: center;
   background-color: var(--wdi-ink);
   cursor: pointer;
+  /* #overlay lets pointer events through to the canvas; the cinematic takes them, so a tap anywhere ends it. */
+  pointer-events: auto;
 }
 
 .wdi-intro__poster,

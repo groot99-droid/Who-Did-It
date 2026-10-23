@@ -63,6 +63,18 @@ test('Skip ends it at once, and it does not play again in the same session', asy
   await expect(page.getByTestId('intro')).toHaveCount(0);
 });
 
+test('a tap on the playing video ends it too', async ({ page }) => {
+  await serveStandIn(page);
+  await page.goto('/Who-Did-It/?mock=1&intro=1');
+  await page.getByTestId('intro-begin').click();
+  await expect(page.getByTestId('intro-video')).toBeVisible();
+  // The overlay must take the pointer itself: #overlay lets events through to the canvas.
+  const box = (await page.getByTestId('intro').boundingBox())!;
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page.getByTestId('intro')).toHaveCount(0);
+  await expect(page.locator('video.wdi-intro__video')).toHaveCount(0);
+});
+
 test('Esc skips, even before the tap', async ({ page }) => {
   await serveStandIn(page);
   await page.goto('/Who-Did-It/?mock=1&intro=1');
