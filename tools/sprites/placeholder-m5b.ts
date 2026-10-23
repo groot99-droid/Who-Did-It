@@ -13,6 +13,7 @@ import {
   GIVER_PAGE,
   NODE_CELL,
   NODE_GROUND,
+  BREAK_FRAMES,
   NODE_STATES,
   RESOURCE_IDS,
   TOOL_IDS,
@@ -25,6 +26,8 @@ import {
   mobAnims,
   mobFrame,
   mobFrameList,
+  nodeAnims,
+  nodeBreakFrame,
   nodeFrame,
   packM5b,
   toolAnims,
@@ -52,7 +55,16 @@ function nodeFrames(): Frame[] {
       });
       if (state === 'ready') label(g, id.slice(0, 4), x, y - 8, 8);
       return { name: nodeFrame(id, state), png: c.toBuffer('image/png'), pivot: [x, y] as const };
-    }),
+    }).concat(
+      // The break: the block sinking from ready to spent height.
+      Array.from({ length: BREAK_FRAMES }, (_, n) => {
+        const c = createCanvas(size, size);
+        const g = c.getContext('2d');
+        const tall = 20 - Math.round((17 * n) / (BREAK_FRAMES - 1));
+        shape(g, 'fog', () => g.rect(x - 14, y - tall, 28, tall));
+        return { name: nodeBreakFrame(id, n), png: c.toBuffer('image/png'), pivot: [x, y] as const };
+      }),
+    ),
   );
 }
 
@@ -147,6 +159,7 @@ export function placeholderEntries(): PlaceholderEntry[] {
       files: async () => {
         registerFont();
         const files = new Map(await packM5b('nodes', nodeFrames()));
+        files.set('nodes.anims.json', Buffer.from(nodeAnims()));
         for (const [k, v] of await packM5b('tools', toolFrames())) files.set(k, v);
         files.set('tools.anims.json', Buffer.from(toolAnims()));
         for (const [k, v] of await packM5b('mobs', mobFrames(), MOB_PAGE)) files.set(k, v);

@@ -17,6 +17,20 @@ export function nodeFrame(resource: string, active: boolean): string {
   return `${stem}/${active ? 'ready' : 'spent'}`;
 }
 
+/** A node's break animation `node_<snake id>/break` (round 8, 8G): once on collection, backwards as it regrows. */
+export function nodeBreakKey(resource: string): string {
+  return `${NODE_ROWS[resource]?.sprite ?? `node_${resource}`}/break`;
+}
+
+/**
+ * What a node does when its `active` flag changes: break (forward) as its yield is taken, regrow (the break
+ * reversed) as it returns, or a cut to the new frame when the art has no break or the player asked for reduced motion.
+ */
+export function nodeChange(active: boolean, hasBreak: boolean, reduced: boolean): 'break' | 'regrow' | 'cut' {
+  if (!hasBreak || reduced) return 'cut';
+  return active ? 'regrow' : 'break';
+}
+
 /** The clip of an `AnimId`: attack frames for a swing, walk for a walk, idle otherwise (SPRITES 10.14). */
 export function mobClip(animId: number): 'idle' | 'walk' | 'attack' {
   return animId === AnimId.swing ? 'attack' : animId === AnimId.walk ? 'walk' : 'idle';

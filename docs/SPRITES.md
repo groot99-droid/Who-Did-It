@@ -996,7 +996,8 @@ pnpm --filter @wdi/sprites m5b
 
 | Key | Type | Frames | Packed cell, pivot | Loaded |
 |---|---|---|---|---|
-| `nodes` | multiatlas, one page ≤ 512² | `node_<snake id>/ready`, `node_<snake id>/spent` for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`); the stem is the row's `sprite` | 64 x 64, (32, 48): the ground point under the tile centre | boot |
+| `nodes` | multiatlas, one page ≤ 512² | `node_<snake id>/ready`, `node_<snake id>/spent` and `node_<snake id>/break/<000-007>` (round 8, 8G) for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`); the stem is the row's `sprite` | 64 x 64, (32, 48): the ground point under the tile centre | boot |
+| `anims_nodes` | animation | `node_<snake id>/break`: 12 fps once; the client plays it forward as the yield is taken and backwards as the node regrows | | boot |
 | `tools` | multiatlas, one page ≤ 512² | `held_<itemId>/<dir>` for `torch`, `snare`, `spade`, `lockpicks`, `lantern`, `crowbar` (8 screen-frame directions); `glow_lantern/<0-3>`, `glow_torch/<0-3>` | held: 64 x 64, (32, 56), the characters' feet; glow: 32 x 32, centred | boot |
 | `anims_tools` | animation | `glow_lantern`, `glow_torch`: 4 frames at 8 fps, looping | | boot |
 | `mobs` | multiatlas, one page ≤ 1024² | `mob_<id>/<anim>/<dir>/<nnn>` for `wolf`, `boar`, `bat`, `rat` (the stem is the row's `sprite`), `idle` 4 frames, `walk` 6, `attack` 4, 8 screen-frame directions | 64 x 64, (32, 56), the characters' feet; the bat hovers over a ground shadow at the feet | boot |
@@ -1021,6 +1022,14 @@ gradient in low poly. The client plays `glow_lantern` or `glow_torch` over the l
 **Icons.** The tools' inventory icons are hand-written SVG under `assets/ui/icons/` on the rules of section 9:
 `icon_item_torch`, `icon_item_snare`, `icon_item_spade`, `icon_item_lockpicks`, `icon_item_lantern`,
 `icon_item_crowbar`.
+
+**Node breaks** (round 8, 8G; motion.md 2) are drawn in code over the node art (`drawNodeBreak` in
+`m5b-draw.ts`): the spent art fades up under the going yield while debris is thrown up and settles. Timber shudders
+and splits into splinters; stone cracks, then crumbles into shards in a puff of dust; tin ore glints, then
+shatters into crystals; resin's drips run down the trunk and drop as its cuts seal; herbs and mushrooms lift away
+as they are plucked and drop a few leaves or crumbs. The last frame is `spent` with the debris on the ground.
+`NodeView` plays the break once when `active` falls and rests on `spent`, plays it backwards when it rises and
+rests on `ready`, and cuts straight to the frame under reduced motion.
 
 **Mobs** are small rigs of spheres, capsules and wing polygons in a mob-local frame (`tools/sprites/m5b-mobs.ts`),
 posed per animation and projected onto the iso ground for each direction, back to front, under one ink
