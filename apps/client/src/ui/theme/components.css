@@ -241,7 +241,8 @@
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   transition:
-    transform var(--wdi-dur-fast) var(--wdi-ease),
+    translate var(--wdi-dur-fast) var(--wdi-ease),
+    scale var(--wdi-dur-fast) var(--wdi-ease),
     box-shadow var(--wdi-dur-fast) var(--wdi-ease),
     filter var(--wdi-dur-fast) var(--wdi-ease);
 }
@@ -288,13 +289,15 @@
 }
 
 .wdi-btn:hover {
-  transform: translateY(-1px);
+  translate: 0 var(--wdi-lift);
   box-shadow: var(--wdi-shadow-2);
   filter: brightness(1.06);
 }
 
 .wdi-btn:active {
-  transform: translateY(1px);
+  translate: 0 var(--wdi-press);
+  scale: var(--wdi-press-scale);
+  transition-duration: var(--wdi-dur-press);
   box-shadow: none;
   filter: brightness(0.96);
 }
@@ -303,7 +306,8 @@
 .wdi-btn[aria-disabled='true'] {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
+  translate: none;
+  scale: none;
   box-shadow: none;
   filter: none;
 }
@@ -1171,7 +1175,7 @@
   border: var(--wdi-stroke-w) solid var(--wdi-hazard);
   border-radius: 50%;
   box-shadow: var(--wdi-glow-hazard);
-  animation: wdi-pulse 1.2s var(--wdi-ease) infinite;
+  animation: wdi-pulse var(--wdi-dur-loop) var(--wdi-ease) infinite;
 }
 
 .wdi-edge-cue--cool {
@@ -1251,7 +1255,7 @@
 }
 
 .wdi-touch-btn:active {
-  transform: scale(0.96);
+  scale: var(--wdi-press-scale);
   box-shadow: none;
 }
 
@@ -1542,7 +1546,7 @@
   }
 
   .wdi-btn:hover {
-    transform: none;
+    translate: none;
   }
 }
 
@@ -2633,7 +2637,9 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   text-align: left;
   text-transform: uppercase;
   cursor: pointer;
-  transition: transform var(--wdi-dur-fast) var(--wdi-ease);
+  transition:
+    translate var(--wdi-dur-fast) var(--wdi-ease),
+    scale var(--wdi-dur-fast) var(--wdi-ease);
 }
 
 .wdi-glass-btn__icon {
@@ -2683,11 +2689,13 @@ body.wdi-cutscene-slam .wdi-hud-chip {
 
 .wdi-glass-btn:hover:not(:disabled, [aria-disabled='true']) {
   --wdi-glass-ring: inset 0 0 0 1px var(--wdi-glass-rim-top);
-  transform: translateY(-2px);
+  translate: 0 var(--wdi-lift);
 }
 
 .wdi-glass-btn:active:not(:disabled, [aria-disabled='true']) {
-  transform: translateY(1px);
+  translate: 0 var(--wdi-press);
+  scale: var(--wdi-press-scale);
+  transition-duration: var(--wdi-dur-press);
 }
 
 .wdi-glass-btn--primary,
@@ -3084,5 +3092,159 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   .wdi-glass-btn::before,
   .wdi-glass-btn__chev {
     transition: none;
+  }
+}
+
+/* ---------------------------------------------------- Round 8 (8H): interface motion (UI.md 9, A143) */
+/* Every value is a token of tokens.css, zeroed under reduced motion there, so no rule below needs its own
+   reduced-motion twin unless it would loop. Motion moves through the individual `translate` and `scale`
+   properties, never `transform`, so it composes with the transform a control already uses to sit in place
+   (the E prompt's centring, the stamp's tilt). Other sessions' panels are animated here by class only. */
+
+/* Hover and press: the controls that lift. The press goes down in --wdi-dur-press and comes back in
+   --wdi-dur-fast. */
+.wdi-chip:is(button, a),
+.wdi-portrait:is(button, a),
+.wdi-seat:is(button),
+button.wdi-map__option,
+.wdi-coverpicker__look,
+.wdi-menu-dialog__close,
+.wdi-menu__chip,
+.wdi-menu__sound,
+.wdi-settings__gear,
+.wdi-m5b__prompt,
+.wdi-touch-btn,
+.wdi-admin__btn,
+.wdi-admin__seat {
+  transition:
+    translate var(--wdi-dur-fast) var(--wdi-ease),
+    scale var(--wdi-dur-fast) var(--wdi-ease),
+    box-shadow var(--wdi-dur-fast) var(--wdi-ease),
+    background-color var(--wdi-dur-fast) var(--wdi-ease),
+    border-color var(--wdi-dur-fast) var(--wdi-ease),
+    filter var(--wdi-dur-fast) var(--wdi-ease);
+}
+
+:is(
+    .wdi-chip:is(button, a),
+    .wdi-portrait:is(button, a),
+    .wdi-seat:is(button),
+    button.wdi-map__option,
+    .wdi-coverpicker__look,
+    .wdi-menu-dialog__close,
+    .wdi-menu__chip,
+    .wdi-menu__sound,
+    .wdi-settings__gear,
+    .wdi-m5b__prompt,
+    .wdi-admin__btn,
+    .wdi-admin__seat
+  ):hover:not(:disabled, [aria-disabled='true']) {
+  translate: 0 var(--wdi-lift);
+  filter: brightness(1.06);
+}
+
+:is(
+    .wdi-chip:is(button, a),
+    .wdi-portrait:is(button, a),
+    .wdi-seat:is(button),
+    button.wdi-map__option,
+    .wdi-coverpicker__look,
+    .wdi-menu-dialog__close,
+    .wdi-menu__chip,
+    .wdi-menu__sound,
+    .wdi-settings__gear,
+    .wdi-m5b__prompt,
+    .wdi-touch-btn,
+    .wdi-admin__btn,
+    .wdi-admin__seat
+  ):active:not(:disabled, [aria-disabled='true']) {
+  translate: 0 var(--wdi-press);
+  scale: var(--wdi-press-scale);
+  filter: brightness(0.96);
+  transition-duration: var(--wdi-dur-press);
+}
+
+/* Tabs and segments do not lift: the label brightens and the rule under a tab grows in from its centre. */
+.wdi-tab,
+.wdi-seg__opt {
+  transition:
+    color var(--wdi-dur-fast) var(--wdi-ease),
+    background-color var(--wdi-dur-fast) var(--wdi-ease),
+    border-color var(--wdi-dur-fast) var(--wdi-ease),
+    scale var(--wdi-dur-fast) var(--wdi-ease);
+}
+
+.wdi-tab:hover:not([aria-selected='true'], :disabled) {
+  color: var(--wdi-text);
+  border-bottom-color: var(--wdi-hairline);
+}
+
+.wdi-seg--glass .wdi-seg__opt:hover:not(.is-on, :disabled) {
+  background-color: var(--wdi-glass-wash);
+}
+
+:is(.wdi-tab, .wdi-seg__opt):active:not(:disabled) {
+  scale: var(--wdi-press-scale);
+  transition-duration: var(--wdi-dur-press);
+}
+
+/* List rows lean in rather than lift, and take a wash, so a column of them never jitters vertically. The
+   rows that hold a button (the inventory slots, recipes, quests) answer to hover and to focus inside them. */
+.wdi-m5b__row,
+.wdi-menu-parties__row,
+.wdi-notebook__entry,
+.wdi-roster__row,
+.wdi-deck__card {
+  transition:
+    translate var(--wdi-dur-fast) var(--wdi-ease),
+    background-color var(--wdi-dur-fast) var(--wdi-ease),
+    border-color var(--wdi-dur-fast) var(--wdi-ease),
+    box-shadow var(--wdi-dur-fast) var(--wdi-ease);
+}
+
+:is(.wdi-m5b__row, .wdi-menu-parties__row, .wdi-deck__card):is(:hover, :focus-within) {
+  translate: var(--wdi-nudge) 0;
+}
+
+.wdi-m5b__row:is(:hover, :focus-within) {
+  box-shadow: inset 2px 0 0 0 var(--wdi-interact);
+}
+
+.wdi-menu-parties__row:active {
+  scale: var(--wdi-press-scale);
+  transition-duration: var(--wdi-dur-press);
+}
+
+/* Focus rings in step: the ring closes in from a wider offset as focus lands, in the hover's time. It
+   animates only the offset and the colour, so the ring each control already draws stays its own. */
+:is(
+  .wdi-btn,
+  .wdi-glass-btn,
+  .wdi-input,
+  .wdi-chip:is(button, a),
+  .wdi-portrait:is(button, a),
+  .wdi-touch-btn,
+  .wdi-tab,
+  .wdi-link,
+  .wdi-seg__opt,
+  .wdi-seat,
+  .wdi-map__option,
+  .wdi-coverpicker__look,
+  .wdi-menu__chip,
+  .wdi-menu__sound,
+  .wdi-menu-dialog__close,
+  .wdi-menu-parties__row,
+  .wdi-settings__gear,
+  .wdi-m5b__prompt,
+  .wdi-admin__btn,
+  .wdi-admin__seat
+):focus-visible {
+  animation: wdi-ring-in var(--wdi-dur-fast) var(--wdi-ease-out) both;
+}
+
+@keyframes wdi-ring-in {
+  from {
+    outline-color: transparent;
+    outline-offset: 6px;
   }
 }
