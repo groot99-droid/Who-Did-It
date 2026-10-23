@@ -225,6 +225,10 @@ export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
     'prop_wheelbarrow',
     'prop_window',
     'prop_workbench',
+    // Round 8 (8K, for 8D's economy rows): the tally rack, the wayside altar, the black market.
+    'prop_altar',
+    'prop_blackMarket',
+    'prop_rack',
   ],
 };
 

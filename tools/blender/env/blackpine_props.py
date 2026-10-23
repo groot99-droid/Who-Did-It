@@ -396,6 +396,60 @@ DRESSING = {
     "prop_cart": (64, 80, cart),
 }
 
+def tally_rack():
+    """The quota rack (8D's `rack`): a timber frame of pigeonholes holding the day's bundled tallies, its
+    chalked slate on top."""
+    return [part("Frame", T("wood", 2), *[B(sx * 0.4, 0.05, 0.7, 0.08, 0.4, 1.4) for sx in (1, -1)],
+                 *[B(0, 0.05, z, 0.88, 0.4, 0.05) for z in (0.06, 0.5, 0.95, 1.4)]),
+            part("Back", T("wood", 1), B(0, 0.23, 0.72, 0.8, 0.04, 1.34), outline=False),
+            part("Planks", T("wood", 4), *[B(x, -0.02, 0.18, 0.2, 0.3, 0.07 + 0.04 * (k % 2))
+                                           for k, x in enumerate((-0.24, 0.0, 0.24))]),
+            part("Ore", T("brick", 2), *[B(x, -0.02, 0.6, 0.14, 0.2, 0.12 - 0.03 * k)
+                                         for k, x in enumerate((-0.22, 0.0, 0.2))], bevel=0.03),
+            part("Tags", T("bone", 2), *[B(-0.3 + 0.12 * k, -0.15, 1.12, 0.06, 0.01, 0.1) for k in range(6)],
+                 outline=False),
+            part("Slate", T("slate", 0), B(0, 0.05, 1.6, 0.7, 0.06, 0.32)),
+            part("Chalk", T("bone", 3), *[B(-0.25 + 0.06 * k, 0.01, 1.6, 0.015, 0.01, 0.18) for k in range(8)],
+                 outline=False)]
+
+
+def wayside_altar():
+    """The camp's wayside altar (8D's `altar`): a little shingled shrine on a split-log post, a candle and an
+    offering dish in its niche, a rock cairn at its foot."""
+    return [part("Cairn", T("stone", 3), S(blob(0, 0, 0.18, 0.4, [(0.08, 5, 1.3)], n=14), 0, 0.3)),
+            part("Post", T("wood", 2), B(0, 0.05, 0.75, 0.16, 0.16, 1.1)),
+            part("Box", T("wood", 3), B(0, 0.05, 1.42, 0.5, 0.38, 0.46), bevel=0.02),
+            part("Niche", T("wood", 0), B(0, -0.13, 1.42, 0.36, 0.03, 0.32), outline=False),
+            part("Roof", T("slate", 1), B(0, 0.05, 1.68, 0.66, 0.56, 0.05), B(0, 0.05, 1.74, 0.44, 0.56, 0.06),
+                 B(0, 0.05, 1.8, 0.22, 0.56, 0.06)),
+            part("Ridge", T("wood", 2), B(0, 0.05, 1.85, 0.06, 0.6, 0.05), outline=False),
+            part("Dish", T("brass", 2), C(-0.1, -0.16, 1.26, 0.08, 0.03, 10), outline=False),
+            part("Candle", T("bone", 3), C(0.1, -0.16, 1.26, 0.035, 0.14, 6), outline=False),
+            part("Flame", F("lantern", 4), B(0.1, -0.16, 1.44, 0.04, 0.04, 0.07), outline=False),
+            part("Glow", F("lantern", 1), B(0, -0.12, 1.3, 0.3, 0.02, 0.08), outline=False),
+            part("Sprig", T("moss", 2), B(-0.22, -0.2, 1.22, 0.08, 0.02, 0.14), outline=False)]
+
+
+def black_market():
+    """The lodge's black market (8D's `blackMarket`): a footlocker under a grey tarp pulled back on bottles,
+    tins and a wrapped bundle, a lamp turned low beside it."""
+    return [part("Locker", T("wood", 3), B(0, 0.08, 0.22, 0.8, 0.5, 0.44), bevel=0.02),
+            part("Straps", T("ink", 1), *[B(x, -0.18, 0.22, 0.05, 0.02, 0.44) for x in (-0.25, 0.25)],
+                 outline=False),
+            part("Tarp", T("fog", 0), B(0.12, 0.12, 0.47, 0.6, 0.56, 0.06), B(0.38, 0.12, 0.3, 0.06, 0.56, 0.36),
+                 bevel=0.03),
+            part("Bottles", T("moss", 1), *[C(x, -0.05, 0.45, 0.04, 0.22, 6, rt=0.02) for x in (-0.3, -0.2)]),
+            part("Tins", T("slate", 3), C(-0.05, 0.0, 0.45, 0.07, 0.1, 8), outline=False),
+            part("Bundle", T("litter", 2), B(0.12, -0.05, 0.53, 0.2, 0.14, 0.1), bevel=0.03),
+            *lamp_on(-0.38, -0.3, 0.0)]
+
+
+ECONOMY = {
+    "prop_rack": (64, 112, tally_rack),
+    "prop_altar": (64, 112, wayside_altar),
+    "prop_blackMarket": (64, 80, black_market),
+}
+
 PROPS = {
     "prop_bell": (64, 128, bell),
     "prop_oven": (64, 96, oven),
@@ -417,4 +471,5 @@ PROPS = {
     "prop_tin_crate": (64, 64, tin_crate),
     **SPOTS,
     **DRESSING,
+    **ECONOMY,
 }
