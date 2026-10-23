@@ -3301,6 +3301,7 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 ### Round 7 log: 7G
 
 - 2026-10-23: PR 1 (meeting and game over): `ui/table.css` scoped under `.wdi-table`, the game-over Add friend through 7C's `addFriendButton`, `MeetingPlayer.profile`, UI.md 14.28, A111. The meeting and game-over panels are 7B's `.wdi-glass-panel`. PR 2 (seat picker, look tags, shot toast, over lists) rides the same branch. The quick-mode re-skin was dropped (A115) and kept on the branch `claude/quick-mode-archive` (commit 9ae9711).
+- 2026-10-23: PR 4 (admin page): `ui/admin.css` imported by `scenes/Admin.ts`, UI.md 14.31; `e2e/admin.spec.ts` mock cases pass.
 
 ### Round 7 log: 7H
 
