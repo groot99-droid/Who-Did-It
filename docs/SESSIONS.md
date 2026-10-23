@@ -3112,7 +3112,7 @@ pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock 
     bot's night monitor counted its own seat's `presence` as a leak (143,022 false `nightLeaks`); it now skips its own
     seat. The quick bot kept a stale role when `roleReveal` landed before the phase patch (a lobby tick reset it),
     so its Rush claims were refused with 422; the lobby branch now resets only when the state differs from a fresh
-    bot, and a new test covers the race.
+    bot, and a new test covers the race. (Those quick-bot fixes went away with `tools/bots/quick.ts` in #121, DECISIONS A115; the walker change stays.)
   - **The opt-in e2e specs had followed neither round 5 nor round 6.** Repaired in `apps/client/e2e/`: the lobby
     confirm button is `confirm-start`; the 6C opening cutscene hides the HUD until `skipOpening` presses Escape and
     6Q's intro needs `skipIntro` (`helpers.ts`); positions are read from `scenes.get('overworld').avatars` by
