@@ -12,7 +12,7 @@
   0.52 m shoulder, wide hands and boots), so the head is a quarter of the figure and reads at 64 px packed. Nothing
   may rise above the crown by more than about 0.05 m: the 112 px cap (`maxStandingSilhouettePx`, 10.3) leaves
   four or five rows above a bare head, and a lean away from the camera, a hat brim's far end or a prop behind the
-  figure lifts on screen by half its depth. The rig's `tools/blender` probe of the highest projected vertex, not
+  figure lifts on screen by half its depth. `tools/blender/probe_cap.py`, the highest projected vertex of every clip, not
   the render, is the check; the clips take a lean with bent knees for the same reason.
 - Animations play at **12 fps**. The rig renders the source clip with `frame_step` so the output is
   12 fps whatever the clip's scene rate.
