@@ -1167,6 +1167,7 @@ trade; a refusal is the usual error line. 8H animates the panel by `wdi-anim-pan
 | `shop.short` | Not enough Scrip | a stock row the purse cannot cover |
 | `shop.purse` | Your purse: {n} Scrip | under the shop's name |
 | `shop.close` | Close | the panel's close button |
+| `prompt.coins` | Hold E: pick up the coins | the hold prompt at dropped coins in reach (the hold lasts `economy.coinPickupS`) |
 | `shop.<id>` | Bakery, Apothecary, General Store, Market, Gamekeeper's Stall, Lodge Store, Camp Market | the panel's title, by `economy.json` shop id |
 
 #### 14.34.2 The purse counter

@@ -310,6 +310,8 @@ export const BalanceFile = z.strictObject({
     heavyPurse: z.number().int().positive(),
     /** The wage of one finished task, real or fake alike. */
     taskWage: z.number().int().nonnegative(),
+    /** The hold that picks up a coins node on the ground (all of it). */
+    coinPickupS: z.number().positive(),
   }),
   chat: Section({
     /** A `chat.say` line is cut to this many characters (GDD 3.5). */

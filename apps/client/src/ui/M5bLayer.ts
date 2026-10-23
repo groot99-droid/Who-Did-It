@@ -17,6 +17,7 @@ import { mountCrafting } from './Crafting';
 import { h, isTyping, overlayRoot } from './dom';
 import { itemName, mountInventory, stacksOf, type Panel } from './Inventory';
 import { mountQuestLog } from './QuestLog';
+import { coinsCastMs, coinsPrompt } from './shop/coins'; // Round 8, 8C (GDD 3.23): a coins node's hold
 
 const REACH_PX = balance.doors.reachTiles * TILE_PX;
 const RES = resources.resources as Record<
@@ -79,6 +80,8 @@ export function nearest<T extends { x: number; y: number }>(
 export function promptFor(t: Target | null, hasTool: (item: string) => boolean): string | null {
   if (!t) return null;
   if (t.kind === 'giver') return fill(C['prompt.giver'], { name: NPC_NAME(t.npc) });
+  const coins = coinsPrompt(t.resource); // Round 8, 8C (GDD 3.23): dropped coins are no `resources.json` row
+  if (coins) return coins;
   const res = RES[t.resource];
   const what = res?.name ?? t.resource;
   const tool = res?.tool;
@@ -314,7 +317,7 @@ class Layer implements M5bLayer {
     if (!t || this.hold || this.feed.dead()) return;
     const res = RES[t.resource];
     if (res?.tool && !this.has(res.tool)) return;
-    this.begin('gather', t.id, (res?.gatherS ?? 3) * 1000);
+    this.begin('gather', t.id, coinsCastMs(t.resource) ?? (res?.gatherS ?? 3) * 1000); // Round 8, 8C: coins' cast
   }
 
   private toggleCraft(recipeId: string): void {
