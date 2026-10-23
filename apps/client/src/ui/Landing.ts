@@ -1,15 +1,23 @@
-import { isValidCode, normalizeCode } from '../flags';
-import { JOIN_FAILED_MESSAGE, NAME_MAX, NAME_MIN } from '../net/protocol';
-import { getItem, setItem } from '../net/storage';
-import { LOBBY_COPY as C, fill } from './copy';
+import type { PartyVisibility } from '../net/protocol';
+import { readAudioSettings, onAudioSettings, writeAudioSettings } from '../view/audioSettings';
+import { MENU_COPY as C, fill } from './copy';
 import { h, type Screen } from './dom';
 import { mountTrailer } from './landingTrailer';
+import { openCodeBox } from './menu/codeBox';
+import { openDialog, type MenuDialog } from './menu/dialog';
+import { openFriendsPanel } from './menu/friends';
+import { openProfilePanel } from './menu/profile';
+import { readProfile } from './menu/profileModel';
+import { openStartDialog } from './menu/startDialog';
 import { mountSettingsPanel } from './SettingsPanel';
+import './menu.css';
 
 export interface LandingOptions {
   /** Prefilled from the `#/join/CODE` deep link. */
   joinCode: string | null;
-  onCreate(name: string): Promise<void>;
+  /** The build from `/health`, for the footer; null until it is known. */
+  build?: string | null;
+  onCreate(name: string, visibility: PartyVisibility): Promise<void>;
   onJoin(code: string, name: string): Promise<void>;
   /** After a failed join: a better message than the generic one, if there is one (stale build). */
   explainFailure?(): Promise<string | null>;
@@ -17,130 +25,179 @@ export interface LandingOptions {
   music?: { crossfadeTo(playlistId: string | null): void } | undefined;
 }
 
-const NAME_KEY = 'wdi:name';
+/** The repository's CREDITS.md, opened in a new tab (CLAUDE.md: CC-BY needs a credits row). */
+export const CREDITS_URL = 'https://github.com/groot99-droid/Who-Did-It/blob/HEAD/CREDITS.md';
 
-export function validateName(raw: string): string | null {
-  const name = raw.trim();
-  if (name.length < NAME_MIN || name.length > NAME_MAX)
-    return fill(C['landing.name.error'], { min: NAME_MIN, max: NAME_MAX });
-  return null;
+type Glyph = '▶' | '⇥' | '+' | '☰' | '⚙' | '?' | '★' | '⏻';
+
+function menuButton(label: string, glyph: Glyph, cls: string, soon = false): HTMLButtonElement {
+  return h(
+    'button',
+    {
+      type: 'button',
+      class: `wdi-menu__btn ${cls}`,
+      ...(soon ? { disabled: true, title: C['menu.soon'] } : {}),
+    },
+    h('span', { class: 'wdi-menu__icon', 'aria-hidden': 'true' }, glyph),
+    h('span', { class: 'wdi-menu__label' }, label),
+    soon && h('span', { class: 'wdi-menu__note' }, C['menu.soon']),
+  );
+}
+
+function menuLink(label: string, glyph: Glyph, href: string): HTMLAnchorElement {
+  return h(
+    'a',
+    { class: 'wdi-menu__btn wdi-menu__btn--sm', href, target: '_blank', rel: 'noopener noreferrer' },
+    h('span', { class: 'wdi-menu__icon', 'aria-hidden': 'true' }, glyph),
+    h('span', { class: 'wdi-menu__label' }, label),
+  );
+}
+
+/** The title drops in letter by letter (menu.css; no animation under reduced motion). */
+function titleLine(text: string, cls: string, offset: number): HTMLElement {
+  return h(
+    'span',
+    { class: `wdi-menu__title-line ${cls}`, 'aria-hidden': 'true' },
+    ...[...text].map((ch, i) =>
+      h('span', { class: 'wdi-menu__letter', style: `--i: ${offset + i}` }, ch === ' ' ? ' ' : ch),
+    ),
+  );
 }
 
 export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
-  const message = h('p', { class: 'wdi-field__msg', role: 'alert' });
-  const say = (text: string, error = true) => {
-    message.textContent = text;
-    message.classList.toggle('wdi-field__msg--error', error && text !== '');
+  let dialog: MenuDialog | null = null;
+  let settings: { destroy(): void } | null = null;
+  const closed = () => {
+    dialog = null;
+    settings?.destroy();
+    settings = null;
   };
-  const name = h('input', {
-    id: 'name',
-    class: 'wdi-input',
-    type: 'text',
-    autocomplete: 'nickname',
-    maxlength: NAME_MAX,
-    value: getItem(NAME_KEY) ?? '',
-    'aria-describedby': 'name-hint',
-  });
-  const code = h('input', {
-    id: 'code',
-    class: 'wdi-input wdi-input--code',
-    type: 'text',
-    inputmode: 'text',
-    autocapitalize: 'characters',
-    autocomplete: 'off',
-    maxlength: 5,
-    placeholder: C['landing.code.placeholder'],
-    value: opts.joinCode ?? '',
-    'aria-label': C['landing.code.label'],
-  });
-  const create = h(
-    'button',
-    { type: 'button', class: 'wdi-btn wdi-btn--primary wdi-btn--lg wdi-btn--block' },
-    C['landing.create'],
+  const show = (open: (onClose: () => void) => MenuDialog) => {
+    dialog?.close();
+    dialog = open(closed);
+  };
+  /** The profile's name prefills both dialogs; a guest types it each time and nothing is remembered. */
+  const remembered = () => readProfile()?.name ?? '';
+
+  const start = menuButton(C['menu.start'], '▶', 'wdi-menu__btn--primary');
+  const join = menuButton(C['menu.join'], '⇥', '');
+  const profile = menuButton(readProfile() ? C['menu.profile.edit'] : C['menu.profile'], '+', '');
+  const friends = menuButton(C['menu.friends'], '☰', '');
+  const settingsBtn = menuButton(C['menu.settings'], '⚙', '');
+  const help = menuLink(C['menu.help'], '?', `${import.meta.env.BASE_URL}help/`);
+  const credits = menuLink(C['menu.credits'], '★', CREDITS_URL);
+  const quit = menuButton(C['menu.quit'], '⏻', 'wdi-menu__btn--sm', true);
+
+  const openCode = (code: string | null) =>
+    show((onClose) =>
+      openCodeBox({
+        root,
+        code,
+        name: remembered(),
+        onClose,
+        onJoin: opts.onJoin,
+        ...(opts.explainFailure ? { explainFailure: opts.explainFailure } : {}),
+      }),
+    );
+
+  start.addEventListener('click', () =>
+    show((onClose) =>
+      openStartDialog({
+        root,
+        name: remembered(),
+        onClose,
+        onCreate: opts.onCreate,
+        ...(opts.explainFailure ? { explainFailure: opts.explainFailure } : {}),
+      }),
+    ),
   );
-  const join = h(
-    'button',
-    { type: 'button', class: `wdi-btn wdi-grow${opts.joinCode ? ' wdi-btn--primary' : ''}` },
-    C['landing.join'],
+  // Until the party list lands (PR 4) Join Game opens the code box.
+  join.addEventListener('click', () => openCode(null));
+  settingsBtn.addEventListener('click', () =>
+    show((onClose) => {
+      const d = openDialog(root, { id: 'settings-title', title: C['settings.title'], onClose });
+      settings = mountSettingsPanel(d.body);
+      d.body.querySelector<HTMLElement>('[data-testid="settings-gear"]')?.click();
+      return d;
+    }),
   );
 
-  const setBusy = (busy: boolean) => {
-    for (const el of [create, join, name, code]) el.toggleAttribute('disabled', busy);
-    if (busy) say(C['landing.connecting'], false);
+  const chipName = h('span', {});
+  const chip = h(
+    'button',
+    { type: 'button', class: 'wdi-menu__chip', 'data-testid': 'menu-chip' },
+    h('span', { class: 'wdi-menu__icon', 'aria-hidden': 'true' }, '☺'),
+    chipName,
+  );
+  const showProfile = () => {
+    const saved = readProfile();
+    chipName.textContent = saved?.name ?? C['menu.chip.guest'];
+    profile.querySelector('.wdi-menu__label')!.textContent = saved
+      ? C['menu.profile.edit']
+      : C['menu.profile'];
   };
-
-  const run = async (action: (name: string) => Promise<void>) => {
-    const trimmed = name.value.trim();
-    const problem = validateName(trimmed);
-    if (problem !== null) {
-      say(problem);
-      name.focus();
-      return;
-    }
-    setItem(NAME_KEY, trimmed);
-    setBusy(true);
-    try {
-      await action(trimmed);
-    } catch {
-      say(JOIN_FAILED_MESSAGE);
-      setBusy(false);
-      void opts.explainFailure?.().then((better) => {
-        if (better !== null) say(better);
-      });
-    }
+  const openProfile = () => show((onClose) => openProfilePanel({ root, onClose, onSaved: showProfile }));
+  chip.addEventListener('click', openProfile);
+  profile.addEventListener('click', openProfile);
+  friends.addEventListener('click', () => show((onClose) => openFriendsPanel({ root, onClose })));
+  showProfile();
+  const sound = h('button', { type: 'button', class: 'wdi-menu__sound', 'data-testid': 'menu-sound' });
+  const showSound = () => {
+    const muted = readAudioSettings().muted;
+    sound.setAttribute('aria-pressed', String(!muted));
+    sound.setAttribute('aria-label', muted ? C['menu.sound.off'] : C['menu.sound.on']);
+    sound.textContent = muted ? '×' : '♪';
   };
-
-  create.addEventListener('click', () => void run((n) => opts.onCreate(n)));
-  join.addEventListener('click', () => {
-    if (!isValidCode(code.value)) {
-      say(JOIN_FAILED_MESSAGE);
-      code.focus();
-      return;
-    }
-    void run((n) => opts.onJoin(normalizeCode(code.value), n));
+  sound.addEventListener('click', () => {
+    const now = readAudioSettings();
+    writeAudioSettings({ ...now, muted: !now.muted });
   });
-  code.addEventListener('input', () => {
-    code.value = code.value.toUpperCase();
-  });
+  const unsubscribe = onAudioSettings(showSound);
+  showSound();
 
   const el = h(
-    'section',
-    { class: 'wdi-panel wdi-stack', 'aria-labelledby': 'landing-title' },
-    h('p', { class: 'wdi-eyebrow' }, C['landing.eyebrow']),
+    'div',
+    { class: 'wdi-menu', 'data-testid': 'menu' },
+    h('div', { class: 'wdi-menu__top' }, chip, sound),
     h(
-      'h1',
-      { id: 'landing-title', class: 'wdi-display wdi-display--lg' },
-      opts.joinCode ? C['landing.title.invited'] : C['landing.title'],
-    ),
-    h(
-      'div',
-      { class: 'wdi-field' },
-      h('label', { class: 'wdi-label', for: 'name' }, C['landing.name.label']),
-      name,
+      'main',
+      { class: 'wdi-menu__main' },
       h(
-        'p',
-        { id: 'name-hint', class: 'wdi-field__msg' },
-        fill(C['landing.name.hint'], { min: NAME_MIN, max: NAME_MAX }),
+        'h1',
+        { class: 'wdi-menu__title', 'aria-label': C['menu.title.label'] },
+        titleLine(C['menu.title.top'], 'wdi-menu__title-line--top', 0),
+        titleLine(C['menu.title.bottom'], 'wdi-menu__title-line--bottom', C['menu.title.top'].length),
       ),
+      h(
+        'nav',
+        { class: 'wdi-menu__nav', 'aria-label': C['menu.title.label'] },
+        start,
+        join,
+        profile,
+        friends,
+        settingsBtn,
+      ),
+      h('div', { class: 'wdi-menu__small' }, help, credits, quit),
     ),
-    create,
-    h('div', { class: 'wdi-divider' }, C['landing.divider']),
-    h('div', { class: 'wdi-row' }, code, join),
-    message,
+    h(
+      'footer',
+      { class: 'wdi-menu__footer', 'data-testid': 'menu-build' },
+      opts.build ? fill(C['menu.footer'], { build: opts.build }) : '',
+    ),
   );
-  // Round 6 (locked slots): the trailer loop (6K) and the settings gear (6L).
+  // Round 6 (locked slot): the trailer loop (6K).
   const trailer = h('div', { class: 'wdi-landing__trailer', 'data-testid': 'landing-trailer', hidden: true });
-  const settingsSlot = h('div', { class: 'wdi-landing__settings', 'data-testid': 'settings-slot' });
-  const settings = mountSettingsPanel(settingsSlot);
   const trailerPlayer = mountTrailer(trailer, { base: import.meta.env.BASE_URL, music: opts.music });
-  root.append(trailer, el, settingsSlot);
-  (opts.joinCode ? name : create).focus();
+  root.append(trailer, el);
+  if (opts.joinCode !== null) openCode(opts.joinCode);
+  else start.focus();
   return {
     destroy: () => {
-      settings.destroy();
+      dialog?.close();
+      settings?.destroy();
+      unsubscribe();
       trailerPlayer.destroy();
       trailer.remove();
-      settingsSlot.remove();
       el.remove();
     },
   };
