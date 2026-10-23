@@ -3,7 +3,8 @@ import metrics from '@wdi/content/data/metrics.json';
 import { toScreen } from '@wdi/shared/iso';
 import type { NodeSnap } from '../net/world';
 import { BIAS, depthAt } from './iso';
-import { nodeFrame } from './m5bFrames';
+import { nodeBreakKey, nodeChange, nodeFrame } from './m5bFrames';
+import { reducedMotion as prefersReducedMotion } from './vfx/motion';
 
 const ATLAS = 'nodes';
 interface Drawn {
@@ -11,15 +12,23 @@ interface Drawn {
   art: boolean;
   resource: string;
   active: boolean;
+  /** Bumped on every change, so a break that finishes after a newer change does not set a stale frame. */
+  seq: number;
 }
 
 /**
  * Round 6, Session 6I (docs/round6/m5b-data.md 3): draws the scene's resource nodes from the world feed, one sprite
  * each, ready or spent. A frame the atlas lacks draws a greybox disc, so a scene is playable without art.
+ *
+ * Round 8 (8G, motion.md 2): when the yield is taken the node plays its `break` once and rests on `spent`; as it
+ * regrows the break plays backwards and rests on `ready`. Under reduced motion it cuts straight to the frame.
  */
 export class NodeView {
   private readonly drawn = new Map<string, Drawn>();
-  constructor(private readonly scene: Phaser.Scene) {}
+  constructor(
+    private readonly scene: Phaser.Scene,
+    private readonly reducedMotion: () => boolean = prefersReducedMotion,
+  ) {}
 
   get count(): number {
     return this.drawn.size;
@@ -60,19 +69,36 @@ export class NodeView {
         .sprite(at.x, at.y, ATLAS, key)
         .setScale(metrics.iso.artScale)
         .setDepth(depth);
-      return { obj: sprite, art: true, resource: n.resource, active: n.active };
+      return { obj: sprite, art: true, resource: n.resource, active: n.active, seq: 0 };
     }
     const disc = this.scene.add
       .ellipse(at.x, at.y, 56, 28, n.active ? 0x7a9a5a : 0x4a4f5c, 0.9)
       .setStrokeStyle(2, 0x12141c)
       .setDepth(depth);
-    return { obj: disc, art: false, resource: n.resource, active: n.active };
+    return { obj: disc, art: false, resource: n.resource, active: n.active, seq: 0 };
   }
 
   private pose(d: Drawn, resource: string, active: boolean): void {
     d.active = active;
-    if (d.art) (d.obj as Phaser.GameObjects.Sprite).setFrame(nodeFrame(resource, active));
-    else (d.obj as Phaser.GameObjects.Ellipse).setFillStyle(active ? 0x7a9a5a : 0x4a4f5c, 0.9);
+    const seq = ++d.seq;
+    if (!d.art) {
+      (d.obj as Phaser.GameObjects.Ellipse).setFillStyle(active ? 0x7a9a5a : 0x4a4f5c, 0.9);
+      return;
+    }
+    const sprite = d.obj as Phaser.GameObjects.Sprite;
+    const key = nodeBreakKey(resource);
+    const rest = nodeFrame(resource, active);
+    const change = nodeChange(active, this.scene.anims.exists(key), this.reducedMotion());
+    if (change === 'cut') {
+      sprite.stop();
+      sprite.setFrame(rest);
+      return;
+    }
+    sprite.once('animationcomplete', () => {
+      if (d.seq === seq) sprite.setFrame(rest);
+    });
+    if (change === 'break') sprite.play(key);
+    else sprite.playReverse(key);
   }
 
   destroy(): void {
