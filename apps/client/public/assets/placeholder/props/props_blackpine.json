@@ -35,6 +35,56 @@
      }
     },
     {
+     "filename": "prop_axe_block",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_barrel",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_basin",
      "rotated": false,
      "trimmed": true,
@@ -82,6 +132,56 @@
      "pivot": {
       "x": 0.5,
       "y": 0.875
+     }
+    },
+    {
+     "filename": "prop_bench",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_bucket",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -785,6 +885,181 @@
      }
     },
     {
+     "filename": "prop_cart",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_chair",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_coat_rack",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_crate",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_crates",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_cupboard",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_firewood",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_flume",
      "rotated": false,
      "trimmed": true,
@@ -807,6 +1082,31 @@
      "pivot": {
       "x": 0.5,
       "y": 0.8333
+     }
+    },
+    {
+     "filename": "prop_footlocker",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -907,6 +1207,31 @@
      "pivot": {
       "x": 0.5,
       "y": 0.8571
+     }
+    },
+    {
+     "filename": "prop_grindstone",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -1260,6 +1585,31 @@
      }
     },
     {
+     "filename": "prop_lamp_post",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_ledger_desk",
      "rotated": false,
      "trimmed": true,
@@ -1282,6 +1632,31 @@
      "pivot": {
       "x": 0.5,
       "y": 0.8
+     }
+    },
+    {
+     "filename": "prop_log",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -1710,6 +2085,31 @@
      }
     },
     {
+     "filename": "prop_ore_pile",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_oven",
      "rotated": false,
      "trimmed": true,
@@ -1835,6 +2235,81 @@
      }
     },
     {
+     "filename": "prop_rock_pile",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_rope_coil",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_sacks",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_safe",
      "rotated": false,
      "trimmed": true,
@@ -1860,6 +2335,31 @@
      }
     },
     {
+     "filename": "prop_saw_horse",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_shelves",
      "rotated": false,
      "trimmed": true,
@@ -1882,6 +2382,106 @@
      "pivot": {
       "x": 0.5,
       "y": 0.8571
+     }
+    },
+    {
+     "filename": "prop_side_table",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_signpost",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_stool",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_stump",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -1932,6 +2532,31 @@
      "pivot": {
       "x": 0.5,
       "y": 0.8333
+     }
+    },
+    {
+     "filename": "prop_timber_set",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -2132,6 +2757,131 @@
      "pivot": {
       "x": 0.5,
       "y": 0.8108
+     }
+    },
+    {
+     "filename": "prop_wall_lamp",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_wall_shelf",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_wheelbarrow",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_window",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 112
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 82
+     },
+     "frame": {
+      "x": 2,
+      "y": 104,
+      "w": 34,
+      "h": 82
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.8571
+     }
+    },
+    {
+     "filename": "prop_workbench",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 40,
+      "y": 374,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
