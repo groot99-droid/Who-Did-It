@@ -62,6 +62,12 @@ round-8 content (BlackPine ships a two-step camera pan with no narrator in round
   overlay root for `Captions.ts`, the `AudioBus` and the input for Skip (Esc, a tap on the Skip button, both
   only when `skippable`). Under `prefers-reduced-motion` camera steps become cuts; `?cutscene=0` (dev flag in
   `view/devFlags.ts`) disables every cutscene.
+- **Round 7 (7A, A101): shots in other scenes.** A `camera` step whose `sceneId` is not the scene the seat stands in
+  is filmed on `cutscene/CutsceneStage.ts`, a Phaser scene launched over the World for the cutscene: it loads the
+  cutscene's other maps at the start, builds one scene's `GroundView` and `StaticView` per shot as the World does,
+  and is stopped when the cutscene ends (`cutscene/staging.ts` holds the Phaser-free decisions; a shot whose map has
+  not loaded holds the shot before). A change of scene between shots is a 250 ms dip from black, none under
+  reduce-motion, where moves stay cuts. A vfx `dip` is a longer one. No `World.ts` line changes.
 - **Round 7 (7A, A101): the `video` step.** `cutscene/video.ts` finds the step's `key` in
   `assets/video/manifest.json` (fetched once) and mounts a full-frame `<video playsinline>` at the back of the
   cutscene layer, under the captions and Skip; its sound follows the music slider and mute, falling back to muted when
