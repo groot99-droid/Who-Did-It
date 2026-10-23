@@ -384,7 +384,7 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
   checkCutscenes(c, err);
 }
 
-/** The cutscene index and steps (GDD 3.18): kinds, map ids, scene and tile references, and the opening's length. */
+/** The cutscene index and steps (GDD 3.18): kinds, map ids, scene and tile references, and the openings' lengths. */
 function checkCutscenes(c: Content, err: (msg: string) => void): void {
   const { cutscenes, scenes, balance } = c;
   const named = (what: string, id: string, kind: string): void => {
@@ -404,9 +404,15 @@ function checkCutscenes(c: Content, err: (msg: string) => void): void {
         `cutscenes.json: opening "${id}" runs ${cs.maxS} s, longer than phases.openingS ${balance.phases.openingS}`,
       );
     }
+    // Round 7 (7A, A101): grace grows by `maxS`, and the steps fill it, so the opening runs as long as its track
+    // (which the client's MusicDirector.test.ts checks against the music manifest).
+    const run = cs ? mainTrackS(cs) : 0;
+    if (cs && Math.abs(run - cs.maxS) > 1) {
+      err(`cutscenes.json: opening "${id}" steps run ${run} s, not its maxS ${cs.maxS}`);
+    }
   }
   for (const cs of Object.values(cutscenes.cutscenes)) {
-    let mainTrack = 0;
+    const mainTrack = mainTrackS(cs);
     for (const step of cs.steps) {
       const where = `cutscenes.json ${cs.id}`;
       if (step.t === 'camera' || step.t === 'vfx') {
@@ -424,10 +430,17 @@ function checkCutscenes(c: Content, err: (msg: string) => void): void {
       if (step.t === 'cardSlam' && cs.kind !== 'opening') err(`${where}: cardSlam belongs to an opening`);
       if (step.t === 'hold' && cs.kind !== 'death') err(`${where}: hold belongs to a death cutscene`);
       if (step.t === 'video' && cs.kind !== 'memorial') err(`${where}: video belongs to a memorial`);
-      if (!('withPrevious' in step && step.withPrevious) && 'durationS' in step) mainTrack += step.durationS;
     }
     if (mainTrack > cs.maxS) err(`cutscenes.json ${cs.id}: steps run ${mainTrack} s, over maxS ${cs.maxS}`);
   }
+}
+
+/** Seconds of a cutscene's main track: the steps that do not start with the one before them. */
+function mainTrackS(cs: Content['cutscenes']['cutscenes'][string]): number {
+  let s = 0;
+  for (const step of cs.steps)
+    if (!('withPrevious' in step && step.withPrevious) && 'durationS' in step) s += step.durationS;
+  return s;
 }
 
 /**

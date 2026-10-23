@@ -325,7 +325,9 @@ export function beginPlay(room: PartyRoom): void {
   // it; no new phase, and the server never waits for a client (docs/round6/cutscene-music.md 1.2).
   const opening = openingFor(cutscenes, mapIdOfRoom(room));
   if (opening !== null) room.broadcast(S2C.cutscene, { id: opening });
-  setPhase(room, Phase.grace, balance.phases.graceS + (opening === null ? 0 : balance.phases.openingS));
+  // Round 7, 7A (A101): grace grows by the opening's own length, its track's (`phases.openingS` is the cap).
+  const openingS = opening === null ? 0 : (cutscenes.cutscenes[opening]?.maxS ?? 0);
+  setPhase(room, Phase.grace, balance.phases.graceS + openingS);
   room.state.players.forEach((player: PlayerState) => {
     player.ready = false;
   });

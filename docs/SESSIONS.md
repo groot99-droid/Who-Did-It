@@ -3257,6 +3257,7 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 - 2026-10-23: PR 1 (role card, HUD and its log, notebook sheet, settings panel): `ui/match.css`, `view/hud.css`, UI.md 14.27, A110. Rules are scoped under an ancestor class, so they do not wait for 7B's glass classes; `theme.test.ts` and the 565 client unit tests pass. Surfaces over the world and cutscenes use `--wdi-match-glass` (night at 85%) because the shared glass fill gives lilac 3.32 over an unveiled white pixel (UI.md 14.27).
 - PR 2 (loading, transitions, cutscene captions and Skip, the intro's Skip): `ui/match.css`, plus 7B's glass classes (d22c8ad): the cutscene Skip, the intro's Skip and Begin become `.wdi-glass-btn--sm` (ids and `data-testid`s kept; one class string each in `CutscenePlayer.ts` and `Intro.ts`, no staging touched) and the notebook takes `.wdi-glass`, replacing PR 1's stand-in rims. Surfaces with lilac text over the world keep `--wdi-match-glass` (UI.md 14.27).
+- PR 3 (the M5b layer, Inventory, Crafting and QuestLog panels, the mini-game modal): `ui/match.css` only; `.wdi-m5b` keeps `background: transparent` (the #80 hotfix), every id and `data-testid` kept. The panels carry lilac text over the world, so they use `--wdi-match-glass`, not 7B's 66% glass (UI.md 14.27); numbers (hints, quantities, quest lines) stay Inter.
 
 ### Round 7 log: 7G
 
@@ -3265,6 +3266,10 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 - 2026-10-23: PR 1 (the four rows, the widened schema and its checks, `balance.json` `vendettas`, the `vendetta`
   stream, the draw through the `sim/Deck.ts` line, GDD 3.20, A112); the holding in room memory behind
   `privateVendetta` until 7D's schema version 4 lands. Hooks asked of 6Z in the PR description.
+- 2026-10-23: PR 2 (conversion: `sim/vendettas/{progress,conversion,run,goal}.ts`; the Step
+  line `runVendettas` after 7I's `runTrain` (Step order: `runEvents`, `runTrain`, `runVendettas`); the three `sim/Meeting.ts` lines
+  for the doubted Vicar's abstention; `NoteKind.doubt`; `Private.vendetta` on schema version 4; the NPC hook
+  `vendettaGoalFor`; UI.md 14.29). Sabotage follows as PR 2b to keep each under 400 lines.
 
 ### Round 7 log: 7I
 

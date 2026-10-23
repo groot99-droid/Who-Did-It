@@ -172,4 +172,15 @@ describe('validateContent rejects cutscene data', () => {
       ]),
     );
   });
+
+  it('an opening whose steps stop short of its maxS', () => {
+    const errors = broken((c) => {
+      c.cutscenes.cutscenes.openingBlackpine!.steps = c.cutscenes.cutscenes.openingBlackpine!.steps.filter(
+        (s) => s.t !== 'wait',
+      );
+    });
+    expect(errors).toEqual(
+      expect.arrayContaining([expect.stringContaining('opening "openingBlackpine" steps run')]),
+    );
+  });
 });
