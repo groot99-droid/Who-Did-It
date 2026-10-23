@@ -3245,6 +3245,9 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 - 2026-10-23: PR 1 (the four rows, the widened schema and its checks, `balance.json` `vendettas`, the `vendetta`
   stream, the draw through the `sim/Deck.ts` line, GDD 3.20, A112); the holding in room memory behind
   `privateVendetta` until 7D's schema version 4 lands. Hooks asked of 6Z in the PR description.
+- 2026-10-23: PR 2 (conversion and sabotage: `sim/vendettas/{progress,conversion,sabotage,run}.ts`, the Step line
+  after `runEvents` and the `countsVote` line of `sim/Meeting.ts`, both asked of 6Z); the NPC hook
+  `vendettaGoalFor` and the copy of UI.md 14.29 ride PR 3 with the heist and the contract.
 
 ### Round 7 log: 7I
 

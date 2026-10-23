@@ -78,3 +78,8 @@ export function privateVendetta(room: PartyRoom, seat: string): string {
   const mates = [...(player?.priv?.cabalMates ?? [])];
   return mates.flatMap((m) => heldOf(room).get(m) ?? []).join(',');
 }
+
+/** Gives `seat` the vendetta `id` (tests and the debug start, which deal no card through `dealMainDeck`). */
+export function holdVendetta(room: PartyRoom, seat: string, id: string): void {
+  if (vendettas.vendettas[id]) heldOf(room).set(seat, id);
+}

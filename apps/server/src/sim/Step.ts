@@ -6,6 +6,7 @@ import { publishAvatars } from './Avatars';
 import { runDecay } from './Clues';
 import { runAuto } from './auto/Auto';
 import { runEvents } from './events/bus';
+import { runVendettas } from './vendettas/run';
 import { runMobs } from './Mobs';
 import { runQuests } from './Quests';
 import { runResources } from './Resources';
@@ -64,4 +65,5 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   }
   runPhases(room);
   runEvents(room); // round 6, 6B: deliver the tick's sim events (locked call site)
+  runVendettas(room); // round 7, 7H: the vendettas' watched goals (GDD 3.20)
 }

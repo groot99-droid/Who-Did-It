@@ -14,6 +14,7 @@ import {
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { enterScene } from './Portals';
 import { emitSim } from './events/bus';
+import { countsVote } from './vendettas/conversion';
 import { countRow, factionOf, flowOf, refuse, roleIdOf, rolesOf, secondsToTicks, setPhase } from './Flow';
 import { hubOf, meetingSpawnsOf } from './MapSites';
 import { onMeetingOpenDisguise } from './Impersonate';
@@ -140,7 +141,7 @@ function startReveal(room: PartyRoom): void {
   const votes: Record<string, string> = {};
   for (const id of living) {
     const vote = state.players.get(id)?.priv?.myVote ?? '';
-    if (vote !== '') votes[id] = vote;
+    if (vote !== '' && countsVote(room, id)) votes[id] = vote; // round 7, 7H: a sown doubt (GDD 3.20)
   }
   const { tally, ejectedId } = resolveVotes(votes, living, { skipAllowed: balance.meeting.skipAllowed });
   const stat = flow.current;
