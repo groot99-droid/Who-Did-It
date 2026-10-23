@@ -4,6 +4,7 @@ import type { NotebookSnap, WorldFeed } from '../net/world';
 import { WORLD_COPY as C, fill } from '../ui/copy';
 import { h } from '../ui/dom';
 import { formatClock } from './Hud';
+import '../ui/match.css';
 import { loadSceneNames } from './sceneNames';
 
 const BASE = import.meta.env.BASE_URL;

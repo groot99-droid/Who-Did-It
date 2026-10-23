@@ -5,7 +5,7 @@ import { readFlags } from '../../flags';
 import type { LobbySnapshot, NetworkService } from '../../net/NetworkService';
 import { MAP_COPY as C } from '../copy/maps';
 import { fill } from '../copy';
-import { h } from '../dom';
+import { h, icon } from '../dom';
 
 export interface MapPicker {
   /** Re-reads the lobby: the mode, the leader and `settings.map`. */
@@ -64,14 +64,18 @@ export function mountMapPicker(root: HTMLElement, net: NetworkService): MapPicke
   // A style switch (A79) re-reads the thumbnails from the new style's manifest.
   const offArt = onArtStyleChanged(loadThumbs);
 
+  // A map whose thumbnail is not loaded yet keeps its frame (a dark box), so the cards do not jump.
   const thumb = (m: MapRow) =>
-    thumbs[m.thumbnail] ? h('img', { class: 'wdi-map__thumb', src: thumbs[m.thumbnail], alt: '' }) : null;
+    thumbs[m.thumbnail]
+      ? h('img', { class: 'wdi-map__thumb', src: thumbs[m.thumbnail], alt: '' })
+      : h('span', { class: 'wdi-map__thumb wdi-map__thumb--empty', 'aria-hidden': 'true' });
+  const tick = () => h('span', { class: 'wdi-map__tick', 'aria-hidden': 'true' }, icon('glyphs/glyph_check'));
   const text = (m: MapRow, title: string) =>
     h(
       'span',
       { class: 'wdi-map__text' },
       h('span', { class: 'wdi-map__name' }, title),
-      h('span', { class: 'wdi-hint' }, m.blurb),
+      h('span', { class: 'wdi-hint wdi-lobby__note' }, m.blurb),
     );
 
   function render(s: LobbySnapshot): void {
@@ -81,7 +85,7 @@ export function mountMapPicker(root: HTMLElement, net: NetworkService): MapPicke
     if (!chosen) return;
     const row = h('div', { class: 'wdi-map', 'data-testid': 'map-select', 'data-map': chosen.id });
     if (s.selfId === s.leaderId) {
-      const label = h('span', { class: 'wdi-label', id: 'map-select-label' }, C['lobby.map.label']);
+      const label = h('span', { class: 'wdi-lobby__title', id: 'map-select-label' }, C['lobby.map.label']);
       const group = h('div', {
         class: 'wdi-map__list',
         role: 'radiogroup',
@@ -105,6 +109,7 @@ export function mountMapPicker(root: HTMLElement, net: NetworkService): MapPicke
             },
             thumb(m),
             text(m, m.name),
+            on && tick(),
           ),
         );
       }
@@ -116,6 +121,7 @@ export function mountMapPicker(root: HTMLElement, net: NetworkService): MapPicke
           { class: 'wdi-map__option is-selected' },
           thumb(chosen),
           text(chosen, fill(C['lobby.map.current'], { name: chosen.name })),
+          tick(),
         ),
       );
     }

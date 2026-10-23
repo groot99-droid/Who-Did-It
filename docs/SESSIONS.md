@@ -3244,8 +3244,11 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 ### Round 7 log: 7E
 
 - PR 1 (columns A and C): `Lobby.ts` as three columns, `ui/lobby.css`, the Add friend stand-in and its test, the deck list's classes, UI.md 14.26, A109. Column B holds today's map, art-style, sound and deck-editor mounts in one card until PR 2.
+- PR 2 (column B): the map cards with a tick, the art-style segment with `.wdi-seg--glass` and `.wdi-seg__note`, the deck editor as chips; the rules are in `ui/lobby.css` until 7B's glass classes land.
 
 ### Round 7 log: 7F
+
+- 2026-10-23: PR 1 (role card, HUD and its log, notebook sheet, settings panel): `ui/match.css`, `view/hud.css`, UI.md 14.27, A110. Rules are scoped under an ancestor class, so they do not wait for 7B's glass classes; `theme.test.ts` and the 565 client unit tests pass.
 
 ### Round 7 log: 7G
 
@@ -3256,5 +3259,7 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
   `privateVendetta` until 7D's schema version 4 lands. Hooks asked of 6Z in the PR description.
 
 ### Round 7 log: 7I
+
+- 2026-10-23: PR 1, the Daily Train: the platform spot on HollowMere's overworld (A113), `sim/Train.ts` and its `runTrain` line, `balance.json` `train`, GDD 3.3, WORLD 4.3, UI.md 14.30, `test/train.test.ts`.
 
 ## Integration log, round 7

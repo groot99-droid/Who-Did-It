@@ -21,7 +21,7 @@ import {
 import { LOOKS_COPY, WORLD_COPY as C, fill } from '../ui/copy';
 import { overlayRoot } from '../ui/dom';
 import { mountSeatPicker } from '../ui/SeatPicker';
-import { AudioBus } from '../view/AudioBus';
+import { AUDIO_KEYS, type AudioKey, AudioBus } from '../view/AudioBus';
 import { BodyView } from '../view/BodyView';
 import { ClueView } from '../view/ClueView';
 import { CutscenePlayer } from '../view/cutscene/CutscenePlayer';
@@ -743,6 +743,12 @@ export class World extends Phaser.Scene {
   /** A noise pulse: an expanding ring at its source, a log line and, off screen, an edge cue pointing to it. */
   private ring(n: NoisePulse): void {
     if (n.sceneId !== this.sceneId) return;
+    // Round 7, 7I: the Daily Train's pulses are sounds, not rings (GDD 3.3).
+    if (n.kind.startsWith('train_') && (AUDIO_KEYS as readonly string[]).includes(n.kind)) {
+      this.audio.play(n.kind as AudioKey);
+      if (n.kind === 'train_arrive') this.hud.say(C['log.train']);
+      return;
+    }
     const scream = /scream/i.test(n.kind);
     const col = colorOf(scream ? palette.colors.magenta : palette.colors.lantern);
     // A ring on the ground: an ellipse on the screen, above the darkness (SPRITES 10.6).
