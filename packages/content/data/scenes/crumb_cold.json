@@ -47,7 +47,15 @@
       "childOnly": false
     }
   ],
-  "props": [],
+  "props": [
+    {
+      "id": "cf.cold_shelves",
+      "kind": "coldShelves",
+      "x": 3,
+      "y": 1,
+      "footprint": { "x": 2, "y": 1, "w": 3, "h": 1 }
+    }
+  ],
   "gates": [],
   "paths": [],
   "lights": [
@@ -55,7 +63,7 @@
   ],
   "grid": [
     "############",
-    "#H.........#",
+    "#H###......#",
     "#..........#",
     "#..........#",
     "#..........#",
@@ -66,7 +74,7 @@
   ],
   "material": [
     "WWWWWWWWWWWW",
-    "WffffffffffW",
+    "WfPPPffffffW",
     "WffffffffffW",
     "WffffffffffW",
     "WffffffffffW",

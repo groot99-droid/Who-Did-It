@@ -272,7 +272,43 @@ def floor_spot(colour_ramp, i, wet=None):
     return objs
 
 
+def _flour_heap():
+    """A heap of farine sacks, one on top (the mixing and proofing rooms)."""
+    rnd = random.Random("heap")
+    sacks = [S(blob(x, y, 0.2, 0.15, [(0.1, 3, rnd.random() * 6)], n=12), z, z + 0.45)
+             for x, y, z in ((-0.2, 0.15, 0), (0.2, 0.12, 0), (0.0, -0.15, 0), (0.0, 0.05, 0.45))]
+    return [part("Sacks", T("bone", 2), *sacks, bevel=0.07),
+            part("Scoop", T("wood", 4), B(0.05, 0.05, 0.98, 0.05, 0.05, 0.25))]
+
+
+def _bread_rack():
+    """The oven room's wooden rack of loaves."""
+    posts = [B(x, y, 0.75, 0.06, 0.06, 1.5) for x in (-0.4, 0.4) for y in (-0.2, 0.2)]
+    out = [part("Rack", T("wood", 2), *posts, *[B(0, 0, z, 0.86, 0.46, 0.04) for z in (0.3, 0.75, 1.2)])]
+    for j, z in enumerate((0.32, 0.77, 1.22)):
+        for i in range(3):
+            out += loaf(f"Rack{j}{i}", -0.25 + 0.25 * i, 0.0, z)
+    return out
+
+
+def _wood_box():
+    """Split logs for the oven in an open box."""
+    return [part("Box", T("wood", 2), B(0, 0, 0.25, 0.8, 0.6, 0.5), bevel=0.02),
+            part("Logs", T("wood", 4), *[C(-0.25 + 0.17 * i, 0.0, 0.42, 0.07, 0.04, 6) for i in range(4)]),
+            part("Hollow", F("ink", 0), B(0, 0, 0.5, 0.7, 0.5, 0.01), outline=False)]
+
+
+def _tray_stack():
+    """Couche trays stacked by the proofing room's wall."""
+    return [part("Trays", T("wood", 3), *[B(0, 0, 0.08 + 0.17 * k, 0.8, 0.6, 0.14) for k in range(8)], bevel=0.01),
+            part("Linen", T("plaster", 3), B(0, 0, 1.43, 0.7, 0.5, 0.02), outline=False)]
+
+
 SPOTS = {
+    "spot_breadRack": (64, 112, _bread_rack),
+    "spot_flourSacks": (64, 80, _flour_heap),
+    "spot_trayStack": (64, 96, _tray_stack),
+    "spot_woodBox": (64, 64, _wood_box),
     "spot_cratePile": (64, 96, lambda: _crates(3)),
     "spot_crates": (64, 80, lambda: _crates(2)),
     "spot_cryptNiche": (64, 112, lambda: [kenney("graveyard-kit", "crypt-small", size=0.95,
