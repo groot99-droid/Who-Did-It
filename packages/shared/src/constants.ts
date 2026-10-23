@@ -36,6 +36,8 @@ export const ClueKind = {
   clawMarks: 8,
   /** A Hungry Killer's glowing footprints (GDD 3.3): `value` the height index, `dir` the facing. */
   hungerPrints: 9,
+  /** Round 8 (8E, GDD 3.24): scuffed ground where a mugging happened; `value` the mugger's height index. */
+  scuffle: 10,
 } as const;
 export type ClueKindId = (typeof ClueKind)[keyof typeof ClueKind];
 
