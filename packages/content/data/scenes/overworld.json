@@ -262,12 +262,7 @@
     { "id": "ov.lantern_3", "kind": "lanternPost", "x": 38, "y": 27 },
     { "id": "ov.fence", "kind": "fence", "x": 53, "y": 15 },
     { "id": "ov.crepe", "kind": "decor", "x": 13, "y": 11 },
-    { "id": "ov.scarecrow", "kind": "decor", "x": 60, "y": 13 },
-    { "id": "ov.altar_shrine", "kind": "altar", "x": 12, "y": 35 },
-    { "id": "ov.mailbag_platform", "kind": "mailbag", "x": 61, "y": 29 },
-    { "id": "ov.hq_chapel", "kind": "hq", "x": 11, "y": 33 },
-    { "id": "ov.hq_office", "kind": "hq", "x": 16, "y": 12 },
-    { "id": "ov.hq_store", "kind": "hq", "x": 21, "y": 26 }
+    { "id": "ov.scarecrow", "kind": "decor", "x": 60, "y": 13 }
   ],
   "gates": [
     { "id": "ov.gate_manor", "minProfile": "medium", "x": 21, "y": 10, "w": 1, "h": 2 },

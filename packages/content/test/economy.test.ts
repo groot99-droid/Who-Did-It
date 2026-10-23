@@ -13,11 +13,12 @@ describe('economy.json (GDD 3.23)', () => {
     expect(errorsOf(() => {})).toEqual([]);
   });
 
-  it('every map has an altar open at the smallest profile, and HollowMere a mailbag', () => {
+  it('every map has an altar on its hub, open at the smallest profile, and HollowMere a mailbag', () => {
+    // The rows land with their art (A139), so the hub is found by the altar's id prefix.
     for (const map of ['hollowmere', 'blackpine'] as const) {
       const hub = content.scenes[content.maps[map].hub];
       expect(hub.profile).toBe('small');
-      expect(hub.props.some((p) => economy.faith.altars.includes(p.id))).toBe(true);
+      expect(economy.faith.altars.some((id) => id.startsWith(`${hub.prefix}.`))).toBe(true);
     }
     expect(economy.notices.mailbags.every((id) => id.startsWith('ov.'))).toBe(true);
   });
@@ -32,9 +33,9 @@ describe('economy.json (GDD 3.23)', () => {
     }
   });
 
-  it('rejects a missing prop, a prop of the wrong kind, an unknown item and a cheaper tier', () => {
-    expect(errorsOf((c) => (c.economy.faith.altars = ['ov.nowhere']))).toEqual([
-      'economy faith.altars: no prop ov.nowhere',
+  it('rejects an unknown prefix, a placed prop of the wrong kind, an unknown item and a cheaper tier', () => {
+    expect(errorsOf((c) => (c.economy.faith.altars = ['zz.nowhere']))).toEqual([
+      'economy faith.altars: no scene has the prefix of zz.nowhere',
     ]);
     expect(errorsOf((c) => (c.economy.notices.mailbags = ['ov.bell']))).toEqual([
       'economy notices.mailbags: ov.bell has kind bell, expected mailbag',
