@@ -1,5 +1,5 @@
 // Round 6, Session 6D (docs/round6/auto-admin.md 8): the DOM controls (1x/2x/5x/10x, pause, step, the seed words,
-// map, deck, difficulty, seats, Start, Reset). Every button sends one admin message; the server queues it into
+// map, difficulty, seats, Start, Reset). Every button sends one admin message; the server queues it into
 // the step, so nothing here changes the match by itself.
 import type { AdminC2SPayloads, AdminC2SType, ClockScale } from '@wdi/shared/protocol';
 import { ADMIN_COPY as C, fill } from '../ui/copy';
@@ -45,24 +45,16 @@ export interface SetupForm {
   map: string;
   seats: number;
   difficulty: (typeof DIFFICULTIES)[number];
-  deck: string;
   seeds: FixedSeeds | undefined;
 }
 
-/** The `admin.setup` payload of a form: the deck is the comma list of role ids, omitted when empty. */
+/** The `admin.setup` payload of a form: the seats clamped, the seeds omitted when absent. */
 export function setupPayload(f: SetupForm): AdminC2SPayloads['admin.setup'] {
-  const deck = f.deck
-    .split(',')
-    .map((s) => s.trim())
-    .filter((s) => s !== '');
   const seats = Math.max(SEAT_RANGE.min, Math.min(SEAT_RANGE.max, Math.round(f.seats) || SEAT_RANGE.min));
   return {
     map: f.map,
-    // The wire keeps `mode` until schema version 5; the quick mode is gone (DECISIONS A115).
-    mode: 'main',
     seats,
     difficulty: f.difficulty,
-    ...(deck.length > 0 ? { deck } : {}),
     ...(f.seeds !== undefined ? { seeds: f.seeds } : {}),
   };
 }
@@ -149,12 +141,6 @@ export function mountControls(
     class: 'wdi-admin__num',
     ...tid('admin-seats'),
   });
-  const deck = h('input', {
-    type: 'text',
-    id: 'admin-deck',
-    class: 'wdi-admin__field',
-    ...tid('admin-deck'),
-  });
   const seeds = h('textarea', {
     id: 'admin-seeds',
     class: 'wdi-admin__field wdi-admin__seeds',
@@ -188,7 +174,6 @@ export function mountControls(
         map: map.el.value,
         seats: Number(seats.value),
         difficulty: DIFFICULTIES.find((d) => d === difficulty.el.value) ?? 'normal',
-        deck: deck.value,
         seeds: parsed.seeds,
       }),
     );
@@ -218,7 +203,6 @@ export function mountControls(
     map.row,
     difficulty.row,
     h('label', { class: 'wdi-admin__row', for: 'admin-seats' }, h('span', {}, C['admin.seatCount']), seats),
-    h('label', { class: 'wdi-admin__row', for: 'admin-deck' }, h('span', {}, C['admin.deck']), deck),
     h('label', { class: 'wdi-admin__row', for: 'admin-seeds' }, h('span', {}, C['admin.seeds.label']), seeds),
     problem,
   );

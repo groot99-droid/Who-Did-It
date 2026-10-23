@@ -135,12 +135,12 @@ describe('the party list', () => {
     expect(Object.keys(row).sort()).toEqual(LISTING_KEYS);
   });
 
-  it('follows a join, a leader change of mode and map, and a leave', async () => {
+  it('follows a join, a leader change of map, and a leave', async () => {
     const leader = await colyseus.sdk.create('party', opts('Ada'));
     const guest = await colyseus.sdk.joinById(leader.roomId, opts('Bob'));
     await until((r) => r.find((p) => p.code === leader.roomId)?.players === 2);
-    leader.send(C2S.lobbySettings, { mode: 1 });
-    await until((r) => r.find((p) => p.code === leader.roomId)?.mode === 1);
+    leader.send(C2S.lobbySettings, { map: 'blackpine' });
+    await until((r) => r.find((p) => p.code === leader.roomId)?.map === 'blackpine');
     await leader.leave(true);
     const rows = await until((r) => r.find((p) => p.code === leader.roomId)?.leader === 'Bob');
     expect(rows.find((p) => p.code === leader.roomId)?.players).toBe(1);

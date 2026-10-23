@@ -2,7 +2,6 @@ import { balance, deckFor, roles } from '@wdi/content';
 import { dealDeck } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { flowOf } from './Flow';
-import { isOnub } from './onub/state';
 import { drawVendettas } from './vendettas/state';
 
 // The main-mode deal from the deck (GDD 3.1, round-5 `deck/wire.md` 4.4 and 5). Session 5G owns this file; the hook
@@ -32,13 +31,12 @@ export function fixedDealFits(fixed: Record<string, string>, seats: number): boo
 }
 
 /**
- * `startMatch` (main mode), before the roster deal: deals `deckFor(n).cards` with `dealDeck` (`rules/deck.ts`) on
+ * `startMatch`, before the roster deal: deals `deckFor(n).cards` with `dealDeck` (`rules/deck.ts`) on
  * `room.seeds.get('deal')`, every Killer card always dealt, keeps `flow.deck` and `flow.undealt` and returns seat
  * -> card role id. A pending `debug.deal` places its fixed cards first and deals the rest from what remains, the
- * remaining Killer cards still always dealt. The quick mode deals its own cards (`startOnubMatch`) and gets null.
+ * remaining Killer cards still always dealt.
  */
-export function dealMainDeck(room: PartyRoom, ids: readonly string[]): Map<string, string> | null {
-  if (isOnub(room)) return null;
+export function dealMainDeck(room: PartyRoom, ids: readonly string[]): Map<string, string> {
   const flow = flowOf(room);
   const cards = deckCardsFor(ids.length);
   const fixed = flow.fixedDeal;

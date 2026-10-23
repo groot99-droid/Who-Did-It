@@ -6,7 +6,7 @@ import { isAiming } from './NightPowers';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isAdminClient, reconcileAdminView } from './auto/AdminView';
 import { canSee } from './Sight';
-import { SCENE_KEYS, isLoft, isWorldPhase, sceneKey } from './World';
+import { SCENE_KEYS, isWorldPhase, sceneKey } from './World';
 
 export { SCENE_KEYS, sceneKey };
 
@@ -76,7 +76,7 @@ export function reconcileViews(room: PartyRoom): void {
       sim.views.set(client.sessionId, held);
     }
 
-    const want = isLoft(viewerSim.sceneIdx) ? null : sceneKey(viewerSim.sceneIdx);
+    const want = sceneKey(viewerSim.sceneIdx);
     if (held.scene !== want) {
       const old = held.scene === null ? undefined : room.state.scenes.get(held.scene);
       if (old) view.remove(old);
@@ -113,12 +113,12 @@ function reconcileAvatars(
   const held = heldOf(room, sessionId);
   const ghostViewer = viewerSim.dead;
   const wanted = new Set<string>();
-  if (world && !isAiming(room, sessionId) && !isLoft(viewerSim.sceneIdx)) {
+  if (world && !isAiming(room, sessionId)) {
     const scene = room.state.scenes.get(sceneKey(viewerSim.sceneIdx));
     scene?.avatars.forEach((_avatar, handle) => {
       const seat = memory.seatOf.get(handle);
       const p = seat === undefined ? undefined : sim.players.get(seat);
-      if (!p?.placed || isLoft(p.sceneIdx)) return;
+      if (!p?.placed) return;
       if (p.dead && !ghostViewer) return;
       // Round 6, 6G (locked): a living viewer in the dark sees only within its sight; this only ever removes.
       if (!ghostViewer && !canSee(room, viewerSim, p)) return;

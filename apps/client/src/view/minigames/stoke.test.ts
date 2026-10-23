@@ -1,13 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import onubBalance from '@wdi/content/data/balance.onub.json';
+import balance from '@wdi/content/data/balance.json';
 import { StokeModel } from './stoke';
 
-const oven = onubBalance.stations.find((s) => s.id === 'oven')!.minigame as {
-  stokePerTap: number;
-  ratePerS: number;
-  bandFrac: number;
-  holdS: number;
-};
+const oven = balance.minigames.stoke;
 
 /** Taps until the heat is inside the band. */
 function heatUp(m: StokeModel): void {
@@ -15,7 +10,7 @@ function heatUp(m: StokeModel): void {
 }
 
 describe('stoke mini-game', () => {
-  it('reads the oven station numbers', () => {
+  it('reads the stoke numbers from balance.json', () => {
     const m = new StokeModel(() => 0.5);
     expect([m.stokePerTap, m.ratePerS, m.bandFrac, m.holdS]).toEqual([
       oven.stokePerTap,

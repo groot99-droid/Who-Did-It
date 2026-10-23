@@ -3,7 +3,6 @@ import { ErrorCode, Phase, type PlayerState, type RoleRevealPayload, coverHints 
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { resetAvatarsForLobby } from './Avatars';
 import { flowOf, refuse } from './Flow';
-import { isOnub } from './onub/state';
 
 // The role card in both modes, the cover pick and the public look (GDD 3.17, round-5 `deck-wire.md` 4.4). Ready on
 // the card is private (`flow.cardReady`), the cover roles' hints are computed once at the deal, and every seat's
@@ -77,7 +76,7 @@ export function assignCovers(room: PartyRoom, dealt: ReadonlyMap<string, string>
   const flow = flowOf(room);
   const memory = hintsOf(room);
   memory.clear();
-  if (isOnub(room) || flow.deck.length === 0) return;
+  if (flow.deck.length === 0) return;
   const hints = coverHints(dealt, flow.undealt, flow.deck, isCover, isCabal);
   for (const [seat, list] of hints) {
     memory.set(seat, list);
@@ -94,11 +93,11 @@ export function assignCovers(room: PartyRoom, dealt: ReadonlyMap<string, string>
   }
 }
 
-/** The main-mode fields of `seat`'s role card (`startMatch`, beside `buildRoleReveal`); `{}` in the quick mode. */
+/** The deck fields of `seat`'s role card (`startMatch`, beside `buildRoleReveal`). */
 export function mainRevealFields(room: PartyRoom, seat: string): MainRevealFields {
   const flow = flowOf(room);
   const priv = room.state.players.get(seat)?.priv;
-  if (isOnub(room) || flow.deck.length === 0 || !priv) return {};
+  if (flow.deck.length === 0 || !priv) return {};
   const card = roles.roles[priv.role.roleId];
   const portrait = looks.looks[card?.look ?? '']?.portrait;
   const hints = hintsOf(room).get(seat);

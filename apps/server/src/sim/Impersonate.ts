@@ -2,7 +2,7 @@ import { balance, roles } from '@wdi/content';
 import { ErrorCode, Phase, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { avatarMemory, rehandle } from './Avatars';
-import { isLoft, reject } from './World';
+import { reject } from './World';
 import { simOf } from './RoomSim';
 
 // Impersonate (GDD 3.17, round-5 `deck-wire.md` 4.5). A Killer asks for a living seat's face; it changes only unseen
@@ -19,7 +19,7 @@ const isDisguisePhase = (phase: number): boolean =>
 function isAlone(room: PartyRoom, seat: string): boolean {
   const sim = simOf(room);
   const p = sim.players.get(seat);
-  if (!p || isLoft(p.sceneIdx)) return false;
+  if (!p) return false;
   for (const [id, other] of sim.players) {
     if (id !== seat && other.placed && !other.dead && other.sceneIdx === p.sceneIdx) return false;
   }
@@ -128,8 +128,7 @@ export function handleImpersonate(room: PartyRoom, seat: string, payload: Record
   if (!roles.roles[player.priv.role.roleId]?.abilities.includes('impersonate')) {
     return reject(room, seat, ErrorCode.cannot, 'cannot do that');
   }
-  if (p.dead || !p.placed || isLoft(p.sceneIdx))
-    return reject(room, seat, ErrorCode.cannot, 'cannot do that');
+  if (p.dead || !p.placed) return reject(room, seat, ErrorCode.cannot, 'cannot do that');
   if (!isDisguisePhase(room.state.phase)) return reject(room, seat, ErrorCode.wrongPhase, 'not now');
   const tick = room.state.tick;
   if (tick < p.busyUntilTick) return reject(room, seat, ErrorCode.busy, 'busy');

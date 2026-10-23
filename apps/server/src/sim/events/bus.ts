@@ -72,7 +72,7 @@ function notePhase(room: PartyRoom, bus: Bus): void {
     bus.pending.push({
       tick,
       kind: 'start',
-      data: { mode: settings.mode, map: settings.map, seats: room.state.players.size },
+      data: { map: settings.map, seats: room.state.players.size },
     });
   }
   bus.pending.push({ tick, kind: 'phase', data: { from, to: phase } });

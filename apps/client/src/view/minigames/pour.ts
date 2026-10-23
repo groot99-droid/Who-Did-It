@@ -1,14 +1,10 @@
-import onubBalance from '@wdi/content/data/balance.onub.json';
+import balance from '@wdi/content/data/balance.json';
 import { MINIGAME_COPY as C } from '../../ui/copy/minigames';
 import { h } from '../../ui/dom';
 import type { MiniGameFactory } from './registry';
 import { ART_W, box, COLORS, createStage, loop } from './draw';
 
-const SPEC = onubBalance.stations.find((s) => s.minigame.kind === 'pour')!.minigame as {
-  steps: number;
-  ratePerS: number;
-  bandFrac: number;
-};
+const SPEC = balance.minigames.pour;
 
 export type PourResult = 'poured' | 'spilled' | 'short';
 

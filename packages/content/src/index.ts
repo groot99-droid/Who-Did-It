@@ -11,8 +11,6 @@ import itemsJson from '../data/items.json' with { type: 'json' };
 import cluesJson from '../data/clues.json' with { type: 'json' };
 import tasksJson from '../data/tasks.json' with { type: 'json' };
 import balanceJson from '../data/balance.json' with { type: 'json' };
-import onubRolesJson from '../data/roles.onub.json' with { type: 'json' };
-import onubBalanceJson from '../data/balance.onub.json' with { type: 'json' };
 import looksJson from '../data/looks.json' with { type: 'json' };
 import routinesJson from '../data/routines.json' with { type: 'json' };
 // Round 6 (docs/round6/seams.md 1.2): pre-seeded empty; 6E, 6J and 6L fill them, rounds 7 to 9 the Bible's four.
@@ -65,8 +63,6 @@ import { CluesFile } from './schemas/clues.js';
 import { ItemsFile } from './schemas/items.js';
 import { LooksFile, type Look } from './schemas/looks.js';
 import { MetricsFile } from './schemas/metrics.js';
-import { OnubBalanceFile, type OnubCountRow } from './schemas/onubBalance.js';
-import { OnubRolesFile } from './schemas/onubRoles.js';
 import { PaletteFile } from './schemas/palette.js';
 import { RolesFile, type DeckRow } from './schemas/roles.js';
 import { RoutinesFile } from './schemas/routines.js';
@@ -94,8 +90,6 @@ export * from './schemas/clues.js';
 export * from './schemas/tasks.js';
 export * from './schemas/balance.js';
 export * from './schemas/scene.js';
-export * from './schemas/onubRoles.js';
-export * from './schemas/onubBalance.js';
 export * from './schemas/maps.js';
 export * from './schemas/routines.js';
 export * from './schemas/cutscenes.js';
@@ -166,8 +160,6 @@ export function parseContent(raw: {
   clues: unknown;
   tasks: unknown;
   balance: unknown;
-  onubRoles: unknown;
-  onubBalance: unknown;
   looks: unknown;
   routines: unknown;
   cutscenes: unknown;
@@ -193,8 +185,6 @@ export function parseContent(raw: {
     clues: CluesFile.parse(raw.clues),
     tasks: TasksFile.parse(raw.tasks),
     balance: BalanceFile.parse(raw.balance),
-    onubRoles: OnubRolesFile.parse(raw.onubRoles),
-    onubBalance: OnubBalanceFile.parse(raw.onubBalance),
     looks: LooksFile.parse(raw.looks),
     routines: RoutinesFile.parse(raw.routines),
     cutscenes: CutscenesFile.parse(raw.cutscenes),
@@ -223,8 +213,6 @@ export const content: Content = {
     clues: cluesJson,
     tasks: tasksJson,
     balance: balanceJson,
-    onubRoles: onubRolesJson,
-    onubBalance: onubBalanceJson,
     looks: looksJson,
     routines: routinesJson,
     cutscenes: cutscenesJson,
@@ -257,8 +245,6 @@ export const {
   balance,
   scenes,
   maps,
-  onubRoles,
-  onubBalance,
   looks,
   routines,
   cutscenes,
@@ -300,11 +286,6 @@ export function balanceFor(playerCount: number): BalanceRow {
 /** Scene profile open at a party size (Small 4-6, Medium 7-8, Large 9-10). */
 export function profileFor(playerCount: number): Profile {
   return balanceFor(playerCount).profile;
-}
-
-/** The balance.onub.json row (deck, loaves, discussion) for a party size. */
-export function onubFor(playerCount: number): OnubCountRow {
-  return onubBalance.byCount[countKey(playerCount)];
 }
 
 const sceneMap = new Map<SceneId, MapId>(

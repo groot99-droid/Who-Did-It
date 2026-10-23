@@ -75,32 +75,6 @@ describe('validateContent rejects', () => {
     ).toEqual(expect.arrayContaining([expect.stringContaining('ranger')]));
   });
 
-  it('a quick-mode deck that is not N + 3', () => {
-    expect(
-      broken((c) => {
-        c.onubBalance.byCount['5'].deck.pop();
-      }),
-    ).toEqual(expect.arrayContaining([expect.stringContaining('onub 5: deck has 7 cards, expected 8')]));
-  });
-
-  it('a waking quick-mode role without a window', () => {
-    expect(
-      broken((c) => {
-        c.onubBalance.windows = c.onubBalance.windows.filter((w) => w.role !== 'inspecteur');
-      }),
-    ).toEqual(
-      expect.arrayContaining([expect.stringContaining('onub role inspecteur: wakes=true but has no window')]),
-    );
-  });
-
-  it('a quick-mode NPC step delay whose min is above its max', () => {
-    expect(
-      broken((c) => {
-        c.onubBalance.npc.stepS = { min: 2, max: 1 };
-      }),
-    ).toEqual(expect.arrayContaining(['balance.onub.json npc.stepS: min > max']));
-  });
-
   it('an ability or item reference that does not exist', () => {
     expect(
       broken((c) => {

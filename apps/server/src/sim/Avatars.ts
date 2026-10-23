@@ -5,9 +5,9 @@ import { StatusBit } from './constants';
 import { settleDisguise } from './Impersonate';
 import { lightBurns } from './mobs/light';
 import { type PlayerSim, simOf } from './RoomSim';
-import { isLoft, sceneKey } from './World';
+import { sceneKey } from './World';
 
-// Avatars and handles (GDD 3.17, round-5 `deck-wire.md` 4.1). Every placed seat outside the loft walks its scene as
+// Avatars and handles (GDD 3.17, round-5 `deck-wire.md` 4.1). Every placed seat walks its scene as
 // an `Avatar` keyed by an opaque handle that is re-rolled on every scene entry and every death. The handle memory
 // (seat <-> handle, the transit tails, the used set, the disguises) lives here in room memory, never in a schema.
 
@@ -128,8 +128,8 @@ function faceOf(room: PartyRoom, seat: string): string {
  * A new handle for `seat` in its current scene: from `enterScene` (every crossing and placement; `transit` leaves
  * the old avatar at the door until its transit ends) and from `markDead`. The seat's old avatar is deleted, or with
  * `transit` frozen in the old scene with the transit bit until `Presence.transitUntilTick`; a new `Avatar` is created
- * in the scene of `PlayerSim.sceneIdx` and `Private.avatar` follows. A seat in the loft has no avatar. `settle`
- * is false for the re-handles that are not a scene entry or a death (a disguise applying or dropping, a repair).
+ * in the scene of `PlayerSim.sceneIdx` and `Private.avatar` follows. `settle` is false for the re-handles that are
+ * not a scene entry or a death (a disguise applying or dropping, a repair).
  */
 export function rehandle(room: PartyRoom, seat: string, transit: boolean, settle = true): void {
   const player = room.state.players.get(seat);
@@ -141,7 +141,7 @@ export function rehandle(room: PartyRoom, seat: string, transit: boolean, settle
   const old = memory.handleOf.get(seat);
   if (old !== undefined) {
     const avatar = avatarOf(room, old);
-    if (transit && avatar && !isLoft(p.sceneIdx)) {
+    if (transit && avatar) {
       avatar.statusBits |= StatusBit.transit;
       avatar.transitUntilTick = player.presence.transitUntilTick;
       avatar.animId = 0;
@@ -155,21 +155,17 @@ export function rehandle(room: PartyRoom, seat: string, transit: boolean, settle
       removeHandle(room, old);
     }
   }
-  if (isLoft(p.sceneIdx)) {
-    player.priv.avatar = '';
-  } else {
-    const scene = sceneKey(p.sceneIdx);
-    const sceneState = room.state.scenes.get(scene);
-    if (sceneState) {
-      const handle = newHandle(room);
-      const avatar = new Avatar();
-      writeAvatar(avatar, seat, player, p, faceOf(room, seat));
-      sceneState.avatars.set(handle, avatar);
-      memory.handleOf.set(seat, handle);
-      memory.seatOf.set(handle, seat);
-      memory.sceneOf.set(handle, scene);
-      player.priv.avatar = handle;
-    }
+  const scene = sceneKey(p.sceneIdx);
+  const sceneState = room.state.scenes.get(scene);
+  if (sceneState) {
+    const handle = newHandle(room);
+    const avatar = new Avatar();
+    writeAvatar(avatar, seat, player, p, faceOf(room, seat));
+    sceneState.avatars.set(handle, avatar);
+    memory.handleOf.set(seat, handle);
+    memory.seatOf.set(handle, seat);
+    memory.sceneOf.set(handle, scene);
+    player.priv.avatar = handle;
   }
   simOf(room).viewsDirty = true;
 }
@@ -192,10 +188,6 @@ export function publishAvatars(room: PartyRoom): void {
     const player = room.state.players.get(seat);
     if (!player || !p.placed) continue;
     const handle = memory.handleOf.get(seat);
-    if (isLoft(p.sceneIdx)) {
-      if (handle !== undefined) rehandle(room, seat, false, false);
-      continue;
-    }
     const avatar = handle === undefined ? undefined : avatarOf(room, handle);
     if (!avatar || memory.sceneOf.get(handle as string) !== sceneKey(p.sceneIdx)) {
       rehandle(room, seat, false, false);

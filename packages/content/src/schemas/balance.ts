@@ -43,6 +43,8 @@ const Section = <T extends z.ZodRawShape>(shape: T) => z.strictObject({ ...shape
 export const NpcDifficulty = z.enum(['easy', 'normal', 'hard']);
 export type NpcDifficulty = z.infer<typeof NpcDifficulty>;
 const Chance = z.number().min(0).max(1);
+const Frac = z.number().gt(0).lte(1);
+const Count = z.number().int().positive();
 export const NpcDifficultyRow = z.strictObject({
   /** A Killer NPC strikes a human alone in its scene at night with this chance per 10 s of opportunity. */
   killChancePer10s: Chance,
@@ -261,6 +263,18 @@ export const BalanceFile = z.strictObject({
   mobs: Section({ maxPerScene: z.number().int().nonnegative(), chaseS: Seconds }),
   /** Round 6 (GDD 3.16): placeholders until Session 6E tunes them. */
   quests: Section({ maxActive: z.number().int().nonnegative() }),
+  /**
+   * GDD 3.16: the four station mini-games' numbers, read by `rules/minigames.ts` as `MinigameBases`. Crates: drag
+   * `steps` crates, then release the needle inside a `bandFrac` band. Pour: `steps` pours filling at `ratePerS` of the
+   * bowl a second, released inside `bandFrac`. Slide: `steps` bannetons. Stoke: each tap adds `stokePerTap` heat,
+   * heat falls `ratePerS` a second; hold inside `bandFrac` for `holdS`.
+   */
+  minigames: Section({
+    crates: z.strictObject({ steps: Count, bandFrac: Frac }),
+    pour: z.strictObject({ steps: Count, ratePerS: Frac, bandFrac: Frac }),
+    slide: z.strictObject({ steps: Count }),
+    stoke: z.strictObject({ stokePerTap: Frac, ratePerS: Frac, bandFrac: Frac, holdS: Seconds }),
+  }),
   /**
    * Round 7 (GDD 3.3): the Daily Train of a map with a `station`. It stops `arriveAtS` into each day and delivers
    * `deliveryAfterS` later; the seats of the hub within `hearTiles` of the platform hear it.

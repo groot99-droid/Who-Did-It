@@ -86,7 +86,7 @@ export const QuestsFile = z.strictObject({
 });
 export type QuestsFile = z.infer<typeof QuestsFile>;
 
-/** Mirrors the protocol's `MinigameKind`: the four ONUB v2 mini-games. */
+/** Mirrors the protocol's `MinigameKind`: the four station mini-games (GDD 3.16). */
 export const MinigameKind = z.enum(['crates', 'pour', 'slide', 'stoke']);
 
 export const MinigameDef = z.strictObject({
@@ -95,7 +95,7 @@ export const MinigameDef = z.strictObject({
   /** The `tasks.json` station task it plays for. */
   task: Id,
   difficulty: z.number().int().min(1).max(5),
-  /** Seconds before the Done control appears, as ONUB's `minigameAssistS`. */
+  /** Seconds before the Done control appears, as GDD 3.16 sets it. */
   assistS: Seconds,
 });
 export type MinigameDef = z.infer<typeof MinigameDef>;

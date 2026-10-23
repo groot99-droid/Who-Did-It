@@ -10,7 +10,7 @@ import {
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { type PlayerSim, simOf } from './RoomSim';
-import { isLoft, isVerbPhase, reject, sceneKey } from './World';
+import { isVerbPhase, reject, sceneKey } from './World';
 import { handleCraft, tickCraft } from './Craft';
 import { handleTaskHold } from './Minigames';
 import { handleGather, tickGather } from './Resources';
@@ -34,7 +34,7 @@ function holdProblem(
   clueId: string,
 ): { code: ErrorCode; msg: string } | null {
   if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
-  if (p.dead || !p.placed || isLoft(p.sceneIdx)) return { code: ErrorCode.cannot, msg: 'not now' };
+  if (p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
   if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
   const clue = clueFor(room, p, clueId);
   if (!clue) return { code: ErrorCode.cannot, msg: 'nothing there' };

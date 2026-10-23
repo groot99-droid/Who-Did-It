@@ -1,4 +1,4 @@
-import { balance, minigames, onubBalance, scenes, tasks } from '@wdi/content';
+import { balance, minigames, scenes, tasks } from '@wdi/content';
 import {
   ErrorCode,
   LedgerLine,
@@ -8,7 +8,6 @@ import {
   TILE_PX,
   checkMinigame,
   generateMinigame,
-  type MinigameBases,
   type MinigamePuzzle,
   type PlayerState,
 } from '@wdi/shared';
@@ -17,7 +16,7 @@ import { martyrOf } from './Memorial';
 import { type PlayerSim, simOf } from './RoomSim';
 import { endMatch } from './Win';
 import { count, take } from './Inventory';
-import { isLoft, isVerbPhase, reject, sceneKey, tileCentre } from './World';
+import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
 /**
  * Main-mode mini-games (round 6, M5b, GDD 3.16; docs/round6/m5b-data.md 2.3): a station task's `task` hold sends
@@ -41,18 +40,6 @@ function openOf(room: PartyRoom): Map<string, Open> {
   return m;
 }
 
-/** The numbers the four kinds take from the ONUB stations (GDD 3.11); the rules file cannot import content. */
-function basesFromOnub(): MinigameBases {
-  const spec = (kind: string) =>
-    onubBalance.stations.find((s) => s.minigame.kind === kind)?.minigame as never;
-  return {
-    crates: spec('crates'),
-    pour: spec('pour'),
-    slide: spec('slide'),
-    stoke: spec('stoke'),
-  };
-}
-
 type Problem = { code: ErrorCode; msg: string };
 
 /** Why this seat cannot work `taskId` now, or null: the checks that start a mini-game and that finish it. */
@@ -63,7 +50,7 @@ function taskProblem(
   taskId: string,
 ): Problem | null {
   if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
-  if (!p || p.dead || !p.placed || isLoft(p.sceneIdx)) return { code: ErrorCode.cannot, msg: 'not now' };
+  if (!p || p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
   if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
   const entry = player.priv.tasks.find((t) => t.id === taskId);
   const task = tasks.tasks[taskId];
@@ -106,7 +93,7 @@ export function handleTaskHold(room: PartyRoom, sessionId: string, taskId: strin
   }
   // The puzzle is the seat's own business: a stream keyed by seat, shared with nothing public (`sim/seeds.ts`).
   const rng = room.seeds.get('minigame', sessionId);
-  const puzzle = generateMinigame(def.kind, def.difficulty, rng, basesFromOnub());
+  const puzzle = generateMinigame(def.kind, def.difficulty, rng, balance.minigames);
   openOf(room).set(sessionId, { taskId, puzzle, startTick: room.state.tick });
   room.clients
     .getById(sessionId)

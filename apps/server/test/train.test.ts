@@ -1,6 +1,6 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
 import { balance, maps, scenes } from '@wdi/content';
-import { GameMode, Phase, S2C, TICK_RATE } from '@wdi/shared';
+import { Phase, S2C, TICK_RATE } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { createServer } from '../src/server';
@@ -97,10 +97,6 @@ describe('the Daily Train (GDD 3.3)', () => {
     m.room.state.settings.map = 'blackpine';
     expect(stationOf(m.room)).toBeUndefined();
     m.room.state.settings.map = 'hollowmere';
-    m.room.state.settings.mode = GameMode.onub;
-    dayAt(m, 3, ARRIVE);
-    runTrain(m.room);
-    m.room.state.settings.mode = GameMode.main;
     expect(eventsOf(m.bots[0]!, S2C.chatMsg)).toEqual([]);
   });
 

@@ -3,7 +3,7 @@ import { Phase, TICK_RATE, TILE_PX, chancePerTick, type PlayerState } from '@wdi
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { runAction } from '../Actions';
 import { type PlayerSim, simOf } from '../RoomSim';
-import { isLoft, sceneKey } from '../World';
+import { sceneKey } from '../World';
 import { hubOf, mapScenesOf } from '../MapSites';
 import { fleeCreature } from '../mobs/flee';
 import { canSee } from '../Sight';
@@ -59,7 +59,7 @@ function observe(room: PartyRoom, brain: Brain, player: PlayerState, p: PlayerSi
     }
     for (const [id, other] of sim.players) {
       if (id === player.id || id === body.of || other.dead || !other.placed) continue;
-      if (other.sceneIdx !== p.sceneIdx || isLoft(other.sceneIdx)) continue;
+      if (other.sceneIdx !== p.sceneIdx) continue;
       if (Math.hypot(other.x - p.x, other.y - p.y) <= sight)
         brain.suspicion.set(id, (brain.suspicion.get(id) ?? 0) + 1);
     }
@@ -202,7 +202,7 @@ export function runWorldNpc(
   p: PlayerSim,
 ): void {
   const id = player.id;
-  if (p.dead || !p.placed || isLoft(p.sceneIdx)) {
+  if (p.dead || !p.placed) {
     if (p.dead) {
       releaseClaims(mem, id);
       brain.act = null;

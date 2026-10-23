@@ -1,13 +1,12 @@
 import { randomInt } from 'node:crypto';
 import { generateId } from '@colyseus/core';
 import { MAP_IDS } from '@wdi/content';
-import { GameMode, MAX_PLAYERS, NpcLevel, Phase } from '@wdi/shared';
+import { MAX_PLAYERS, NpcLevel, Phase } from '@wdi/shared';
 import { type FixedSeeds, MatchSeeds, type SeedWords, type StreamName } from '../seeds';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { startMatch, startRefusal } from '../../rooms/handlers/lobby';
 import { isNpcSeat, releaseNpcSeat } from '../Npc';
 import { addNpcSeat } from '../npc/seats';
-import { onubDeckSetting } from '../Onub';
 import { simOf } from '../RoomSim';
 import { resetToLobby } from '../Win';
 import { clockOf } from './clock';
@@ -19,11 +18,8 @@ import { clockOf } from './clock';
  */
 export interface AutoOptions {
   map: string;
-  mode: 'main' | 'onub';
   seats: number;
   difficulty: 'easy' | 'normal' | 'hard';
-  /** The quick mode's custom deck (`Settings.onubDeck`); the main mode's deck follows the seat count (GDD 3.1). */
-  deck?: string[];
   seeds?: FixedSeeds;
   /** Fixed NPC seat ids, for replay and the log; drawn when absent. */
   npcIds?: string[];
@@ -50,12 +46,7 @@ const STREAMS = {
   deal: 1,
   traits: 1,
   npcNames: 1,
-  script: 1,
   piles: 1,
-  thaw: 1,
-  perk: 1,
-  prepTimeout: 1,
-  nightTimeout: 1,
   npcTiming: 1,
   npcPlay: 1,
   mobs: 1,
@@ -79,14 +70,11 @@ const drawWords = (): SeedWords => [
 /** Why the options cannot run, or null. */
 export function autoOptionsProblem(opts: AutoOptions): string | null {
   if (!(MAP_IDS as readonly string[]).includes(opts.map)) return `unknown map ${opts.map}`;
-  if (opts.mode !== 'main' && opts.mode !== 'onub') return `unknown mode ${String(opts.mode)}`;
   if (!(opts.difficulty in NpcLevel)) return `unknown difficulty ${String(opts.difficulty)}`;
   if (!Number.isInteger(opts.seats) || opts.seats < 1 || opts.seats > MAX_PLAYERS)
     return `seats must be 1 to ${MAX_PLAYERS}`;
   if (opts.npcIds !== undefined && new Set(opts.npcIds).size !== opts.npcIds.length)
     return 'duplicate npcIds';
-  if (opts.deck !== undefined && opts.deck.length > 0 && onubDeckSetting(opts.deck) === null)
-    return 'bad deck';
   return null;
 }
 
@@ -103,10 +91,7 @@ function applyOptions(room: PartyRoom, opts: AutoOptions): AutoOptions {
 
   const settings = room.state.settings;
   settings.map = opts.map;
-  settings.mode = GameMode[opts.mode];
   settings.npcDifficulty = NpcLevel[opts.difficulty];
-  settings.onubDeck.clear();
-  for (const id of opts.mode === 'onub' ? (opts.deck ?? []) : []) settings.onubDeck.push(id);
 
   // The seats: every NPC seat goes, then `seats` come back under the given ids (or fresh ones), named in order
   // from the fixed `npcNames` stream, so a replay seats the same names under the same ids.
