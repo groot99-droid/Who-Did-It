@@ -372,6 +372,8 @@ export const BalanceFile = z.strictObject({
     /** The Knife's extra rest after a strike on anyone but a living contract target. */
     contract: z.strictObject({ offTargetRestS: Seconds }),
   }),
+  /** Round 8 (GDD 3.23), 8C's keys: a purse of `heavyPurse` Scrip or more reads "a heavy purse" at inspect. */
+  economy: Section({ heavyPurse: z.number().int().positive() }),
   chat: Section({
     /** A `chat.say` line is cut to this many characters (GDD 3.5). */
     maxChars: z.number().int().positive(),

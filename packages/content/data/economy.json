@@ -1,0 +1,21 @@
+{
+  "gddRef": "3.23",
+  "stakes": {
+    "tiers": { "modest": { "min": 8, "max": 14 }, "comfortable": { "min": 24, "max": 34 } },
+    "byLook": {
+      "detective": "comfortable",
+      "doctor": "comfortable",
+      "baker": "comfortable",
+      "vicar": "modest",
+      "watchman": "modest",
+      "herbalist": "modest",
+      "gamekeeper": "modest",
+      "lamplighter": "modest",
+      "fisher": "modest",
+      "tinner": "modest"
+    },
+    "default": "modest"
+  },
+  "shops": {},
+  "prices": {}
+}

@@ -21,6 +21,7 @@ import type { TraitsFile } from './schemas/traits.js';
 import { MAP_IDS, type MapFile, type MapId } from './schemas/maps.js';
 import { checkMaps, checkSceneWorld } from './validateWorld.js';
 import { checkVendettas } from './validateVendettas.js';
+import type { EconomyFile } from './schemas/economy.js';
 
 export interface Content {
   palette: PaletteFile;
@@ -49,6 +50,8 @@ export interface Content {
   evolutions: EvolutionsFile;
   laws: LawsFile;
   events: EventsFile;
+  // Round 8 (GDD 3.23).
+  economy: EconomyFile;
 }
 
 const maxProfile = (a: Profile, b: Profile): Profile => (PROFILE_RANK[a] >= PROFILE_RANK[b] ? a : b);
@@ -236,6 +239,7 @@ export function validateContent(c: Content): string[] {
   checkM5b(c, err);
   // Round 7 (GDD 3.20): the vendettas' cards, maps and kinds.
   checkVendettas(c, err);
+  checkStakes(c, err);
 
   return errors;
 }
@@ -752,4 +756,31 @@ export function checkGrid(scene: Scene): string[] {
     }
   }
   return errors;
+}
+
+/**
+ * Round 8 (GDD 3.23, 8C): the starting stake is card-blind. It follows a look a card shows in the world, never a
+ * cover card's own, every tier is worn by some look (so a cover can carry it), and every tier lies on one side of
+ * `economy.heavyPurse`, so the purse band at Start says the look's tier and nothing more.
+ */
+function checkStakes(c: Content, err: (msg: string) => void): void {
+  const { stakes } = c.economy;
+  const heavy = c.balance.economy.heavyPurse;
+  const coverLooks = new Set(
+    Object.values(c.roles.roles)
+      .filter((r) => r.cover)
+      .map((r) => r.look),
+  );
+  const worn = new Set(Object.values(stakes.byLook));
+  if (!stakes.tiers[stakes.default]) err(`economy.json: stakes.default "${stakes.default}" is not a tier`);
+  for (const [look, tier] of Object.entries(stakes.byLook)) {
+    if (!c.looks.looks[look]) err(`economy.json: stakes.byLook "${look}" is not a look`);
+    if (coverLooks.has(look)) err(`economy.json: stakes.byLook "${look}" is a cover card's look`);
+    if (!stakes.tiers[tier]) err(`economy.json: stakes.byLook "${look}" names no tier "${tier}"`);
+  }
+  for (const [id, t] of Object.entries(stakes.tiers)) {
+    if (!worn.has(id)) err(`economy.json: stake tier "${id}" is worn by no look`);
+    if (t.min < heavy && t.max >= heavy)
+      err(`economy.json: stake tier "${id}" straddles balance economy.heavyPurse`);
+  }
 }

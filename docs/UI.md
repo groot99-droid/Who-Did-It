@@ -298,12 +298,32 @@ for a selection, `-hazard` for a cue. Never a black shadow.
 
 | What | Duration | Easing | Reduced motion |
 |---|---|---|---|
-| hover, press | 120 ms | `--wdi-ease` | none |
+| hover (`--wdi-dur-fast`, lift `--wdi-lift`) | 120 ms, 2 px up | `--wdi-ease` | changes colour in place, no lift |
+| press (`--wdi-dur-press` down, `--wdi-dur-fast` back; `--wdi-press`, `--wdi-press-scale`) | 60 ms down, 1 px and 0.97 | `--wdi-ease` | changes colour in place |
+| list row hover (`--wdi-nudge`) | 120 ms, 2 px in | `--wdi-ease` | wash only |
+| tab and segment hover | 120 ms, colour and rule only | `--wdi-ease` | instant |
+| focus ring closing in | 120 ms from 6 px out | `--wdi-ease-out` | appears in place |
 | toast, dialog, stamp rise | 220 ms | `--wdi-ease` | appears in place |
 | the card flip | 600 ms | `--wdi-ease` | swap, no rotation |
 | the card hold timer | the hold (GDD 2 step 4) | linear | still drains |
-| edge cue pulse | 1.2 s loop | `--wdi-ease` | static ring |
+| edge cue pulse (`--wdi-dur-loop`) | 1.2 s loop | `--wdi-ease` | static ring |
 | busy spinner | 0.8 s loop | linear | kept (it is status) |
+
+Round 8 (8H, A143). Every interface motion reads a token of `ui/theme/tokens.css`: the durations
+`--wdi-dur-*`, the stagger `--wdi-stagger`, the distances `--wdi-lift`, `--wdi-press`, `--wdi-nudge`,
+`--wdi-rise`, `--wdi-shake` and the scale `--wdi-press-scale`, with the easings `--wdi-ease`,
+`--wdi-ease-out` (arriving), `--wdi-ease-in` (leaving) and `--wdi-ease-spring` (one overshoot). Each
+duration and distance is zeroed under `prefers-reduced-motion` in the same file (`motion.test.ts` checks
+it), so a rule written against the tokens needs no reduced twin; only a loop needs `animation: none`.
+The rules live in the "Round 8 (8H)" block of `components.css`, which moves controls through the `translate`
+and `scale` properties and never through `transform`, so a control's own placing transform is kept.
+Other sessions' panels are animated there by their classes; their files are not edited.
+
+Controls that lift on hover and sink on press: `.wdi-btn`, `.wdi-glass-btn`, button chips, portraits, seat
+cards, map options, the cover picker's looks, the menu chips and close button, the settings gear, the E
+prompt, touch buttons (press only) and the admin buttons and seats. Tabs and segments brighten without
+lifting. List rows (the inventory slots, recipes and quests of `.wdi-m5b__row`, the party list, the deck's
+cards) lean in by `--wdi-nudge` on hover or focus inside them, and an M5b row takes a teal edge.
 
 ## 10. Accessibility checklist and measured contrast
 

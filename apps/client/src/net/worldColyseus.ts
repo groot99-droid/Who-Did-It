@@ -18,6 +18,7 @@ import type {
   MobSnap,
   NodeSnap,
   QuestSnap,
+  TaskSnap,
   StackSnap,
 } from './world';
 
@@ -36,6 +37,7 @@ interface PlayerState {
     notebook?: { forEach(cb: (e: Required<NotebookSnap>) => void): void };
     inventory?: { slots?: { forEach(cb: (s: StackSnap) => void): void } };
     quests?: { forEach(cb: (q: QuestSnap) => void): void };
+    tasks?: { forEach(cb: (t: TaskSnap) => void): void };
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
@@ -294,6 +296,14 @@ export class ColyseusWorldFeed implements WorldFeed {
     this.state.players
       .get(this.selfId)
       ?.priv?.inventory?.slots?.forEach((s) => out.push({ defId: s.defId, qty: s.qty }));
+    return out;
+  }
+
+  tasks(): TaskSnap[] {
+    const out: TaskSnap[] = [];
+    this.state.players
+      .get(this.selfId)
+      ?.priv?.tasks?.forEach((t) => out.push({ id: t.id, done: t.done, fake: t.fake }));
     return out;
   }
 
