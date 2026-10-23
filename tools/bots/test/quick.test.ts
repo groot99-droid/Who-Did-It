@@ -174,6 +174,21 @@ function harness(role: string, seed = 1) {
 }
 
 describe('QuickPlayer', () => {
+  it("keeps a card that lands before the lobby phase has left the bot's state", () => {
+    const h = harness('chef', 3);
+    // The card is a message and the phase a patch: a lobby tick right after the card must not wipe the role.
+    h.state.phase = Phase.lobby;
+    h.tick();
+    h.state.phase = Phase.meetingDiscussion;
+    for (let i = 0; i < 30 * TICK_RATE; i++) {
+      h.state.tick++;
+      h.tick();
+    }
+    const claims = h.sent.filter((m) => m.type === 'meeting.claim');
+    expect(claims.length).toBeGreaterThan(0);
+    expect((claims[0]!.payload as { roleId: string }).roleId).toBe('chef');
+  });
+
   it('commits once, inside the commitS span', () => {
     const { min, max } = PACES.human.commitS;
     for (let seed = 1; seed <= 15; seed++) {

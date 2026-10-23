@@ -364,7 +364,10 @@ export class QuickPlayer {
     const me = state.players.get(this.selfId());
     if (!me) return;
     if (state.phase === Phase.lobby) {
-      this.m = QuickPlayer.fresh();
+      // The role card is a message and the phase a state patch, so the card can land while this tick still sees the
+      // lobby: a memory that holds the new card and nothing played yet is kept, a played one is the last match's.
+      if (JSON.stringify({ ...this.m, role: '' }) !== JSON.stringify(QuickPlayer.fresh()))
+        this.m = QuickPlayer.fresh();
       return;
     }
     // Quick mode sends no presence to anyone (every seat is in the loft); the seat's own Player carries an
