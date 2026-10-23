@@ -3,12 +3,14 @@ import { ErrorCode, QuestState, TILE_PX, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { count, exchange } from './Inventory';
 import { type PlayerSim, simOf } from './RoomSim';
+import { CONTRACT_QUEST, acceptContract } from './vendettas/contract';
 import { isLoft, isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
 /**
  * Quests (round 6, M5b, GDD 3.16; docs/round6/m5b-data.md 2.3): givers are scene statics; `quest.accept` and
  * `quest.turnIn` go through the command queue; the own `Private.quests` holds the state; rewards go through
- * `sim/Inventory.ts`. A `contract` quest (round 7) refuses.
+ * `sim/Inventory.ts`. A `contract` quest row refuses; the Hitman's mail (`contract`, round 7, 7H) is accepted
+ * from anywhere by `sim/vendettas/contract.ts`.
  * Session 6H.
  */
 
@@ -86,6 +88,7 @@ export function handleQuestAccept(
   sessionId: string,
   payload: Record<string, unknown>,
 ): void {
+  if (payload.questId === CONTRACT_QUEST) return acceptContract(room, sessionId);
   const found = questFor(room, sessionId, payload);
   if (!found) return;
   const { player, quest } = found;

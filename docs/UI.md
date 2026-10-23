@@ -1506,3 +1506,4 @@ Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaG
 | `vendetta.goal.hitman` | Hitman: the Train brings you a contract. Take only its mark. | a Killer holding contract |
 | `vendetta.mate` | Your Killer’s vendetta: {goal} | the Accomplice's card, once per Killer it knows; `{goal}` is that Killer's goal line |
 | `vendetta.note.doubt` | Doubt took the flock: your vote did not carry. | the Vicar's own Notebook entry of kind `NoteKind.doubt`, written at the reveal of the doubted meeting |
+| `vendetta.note.contract` | The mail brought a contract: {name}. | the Hitman's own Notebook entry of kind `NoteKind.contract` (`of` the target seat, `{name}` its seat name), written at the first Train arrival |

@@ -9,6 +9,7 @@ export const VENDETTA_COPY = {
   'vendetta.goal.hitman': 'Hitman: the Train brings you a contract. Take only its mark.',
   'vendetta.mate': 'Your Killer’s vendetta: {goal}',
   'vendetta.note.doubt': 'Doubt took the flock: your vote did not carry.',
+  'vendetta.note.contract': 'The mail brought a contract: {name}.',
 } as const satisfies Record<string, string>;
 
 type Goal = Extract<keyof typeof VENDETTA_COPY, `vendetta.goal.${string}`>;
