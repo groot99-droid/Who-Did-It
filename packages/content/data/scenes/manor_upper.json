@@ -8,7 +8,7 @@
   "biome": "house",
   "dark": false,
   "size": { "w": 24, "h": 12 },
-  "notes": "Locked study (Study Key in the barn [M] or the cellar [L]; V1.5).",
+  "notes": "Locked study (Study Key in the barn [M] or the cellar [L]; V1.5). Round 8 (8J): the Vanes' bedroom along the north wall, her mirror hung in black; the study door faces south from a notch off the landing.",
   "worldRef": "4.3",
   "portals": [
     {
@@ -79,37 +79,74 @@
       "y": 8,
       "item": "studyKey",
       "ships": "V1.5"
-    }
+    },
+    { "id": "mu.window_w", "kind": "drapedWindow", "x": 6, "y": 0 },
+    { "id": "mu.portrait", "kind": "vanePortrait", "x": 11, "y": 0 },
+    { "id": "mu.window_e", "kind": "drapedWindow", "x": 16, "y": 0 },
+    { "id": "mu.dressing_table", "kind": "dressingTable", "x": 1, "y": 1 },
+    { "id": "mu.nightstand_w", "kind": "nightstand", "x": 4, "y": 1 },
+    { "id": "mu.nightstand_e", "kind": "nightstand", "x": 9, "y": 1 },
+    { "id": "mu.washstand", "kind": "washstand", "x": 13, "y": 1 },
+    { "id": "mu.linen_press", "kind": "linenPress", "x": 22, "y": 1 },
+    { "id": "mu.chest_w", "kind": "blanketChest", "x": 3, "y": 3 },
+    { "id": "mu.chest_e", "kind": "blanketChest", "x": 8, "y": 3 },
+    { "id": "mu.lamp_landing", "kind": "lampTable", "x": 14, "y": 10 },
+    { "id": "mu.books_0", "kind": "bookcase", "x": 17, "y": 1 },
+    { "id": "mu.books_1", "kind": "bookcaseB", "x": 18, "y": 1 },
+    { "id": "mu.chair", "kind": "armchair", "x": 18, "y": 3 },
+    { "id": "mu.lamp_nook", "kind": "lampTable", "x": 17, "y": 3 }
   ],
   "gates": [],
   "paths": [],
-  "lights": [{ "id": "mu.lt_lamp", "kind": "lamp", "x": 12, "y": 6, "radiusTiles": 2 }],
+  "lights": [
+    { "id": "mu.lt_lamp", "kind": "lamp", "x": 4, "y": 1, "radiusTiles": 2 },
+    { "id": "mu.lt_lamp_e", "kind": "lamp", "x": 9, "y": 1, "radiusTiles": 2 },
+    { "id": "mu.lt_landing", "kind": "lamp", "x": 14, "y": 10, "radiusTiles": 2 },
+    {
+      "id": "mu.lt_window_w",
+      "kind": "window",
+      "x": 6,
+      "y": 0,
+      "radiusTiles": 3,
+      "phases": ["day", "dusk"]
+    },
+    {
+      "id": "mu.lt_window_e",
+      "kind": "window",
+      "x": 16,
+      "y": 0,
+      "radiusTiles": 3,
+      "phases": ["day", "dusk"]
+    },
+    { "id": "mu.lt_moon", "kind": "moon", "x": 16, "y": 0, "radiusTiles": 2, "phases": ["night"] },
+    { "id": "mu.lt_nook", "kind": "lamp", "x": 17, "y": 3, "radiusTiles": 2 }
+  ],
   "grid": [
     "########################",
-    "#...................H..#",
+    "##..#....#...#...##.H.##",
     "#..H....H..............#",
-    "#......................#",
+    "#..#....#........##....#",
     "#......................#",
     "#......................D",
     "#######................#",
     "#######................#",
     "#######................#",
-    "#######................#",
-    "#######.....S..........#",
+    "######.................#",
+    "######......S.#........#",
     "############D###########"
   ],
   "material": [
-    "WWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWPWWWWPWWWWPWWWWWWW",
+    "WPwwPwwwwPwwwPwwwPPwwwPW",
     "WwwwwwwwwwwwwwwwwwwwwwwW",
-    "WwwwwwwwwwwwwwwwwwwwwwwW",
-    "WwwwwwwwwwwwwwwwwwwwwwwW",
+    "WwwPwwwwPwwwwwwwwPPwwwwW",
     "WwwwwwwwwwwwwwwwwwwwwwwW",
     "WwwwwwwwwwwwwwwwwwwwwwwW",
     "WWWWWWWwwwwwwwwwwwwwwwwW",
     "WWWWWWWwwwwwwwwwwwwwwwwW",
     "WWWWWWPwwwwwwwwwwwwwwwwW",
-    "WWWWWWWwwwwwwwwwwwwwwwwW",
-    "WWWWWWWwwwwwwwwwwwwwwwwW",
+    "WWWWWWwwwwwwwwwwwwwwwwwW",
+    "WWWWWWwwwwwwwwPwwwwwwwwW",
     "WWWWWWWWWWWWWWWWWWWWWWWW"
   ]
 }
