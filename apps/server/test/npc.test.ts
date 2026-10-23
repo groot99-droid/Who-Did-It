@@ -113,8 +113,11 @@ describe('lobby.addNpc and lobby.removeNpc', () => {
     const leader = party.humans[0]!;
     await send(leader, C2S.lobbyAddNpc, {}, 60);
     await send(leader, C2S.lobbyAddNpc, {}, 60);
+    // A command is consumed on the room's next steps, which a loaded machine can delay past the send's wait.
+    await until(() => npcSeats(party.room).length >= 2);
     const [first, second] = npcSeats(party.room);
     await send(leader, C2S.lobbyRemoveNpc);
+    await until(() => !party.room.state.players.has(second?.id ?? ''));
     expect(party.room.state.players.has(first?.id ?? '')).toBe(true);
     expect(party.room.state.players.has(second?.id ?? '')).toBe(false);
   });
@@ -329,6 +332,7 @@ describe('the wire never marks an NPC seat', () => {
     const leader = party.humans[0]!;
     await send(leader, C2S.lobbyAddNpc, {}, 60);
     await send(leader, C2S.lobbyAddNpc, {}, 60);
+    await until(() => npcSeats(party.room).length >= 2);
     const [first, second] = npcSeats(party.room);
     stateOf(leader).players.forEach((p, id) => {
       if (id !== leader.id) expect(p.ready, id).toBe(false);
@@ -337,6 +341,7 @@ describe('the wire never marks an NPC seat', () => {
     const mem = npcMemory(party.room);
     expect(mem.brain(first!.id).lobbyReadyAtTick).toBeGreaterThan(seated - 20);
     await send(leader, C2S.lobbyRemoveNpc, {}, 60);
+    await until(() => !party.room.state.players.has(second!.id));
     expect(party.room.state.players.has(second!.id)).toBe(false);
     expect(mem.brains.has(second!.id)).toBe(false);
     const d = balance.npc.ready.delayS;

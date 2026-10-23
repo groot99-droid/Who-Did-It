@@ -214,7 +214,19 @@ export async function standardParty(
   if (lobbyTicks > STANDARD_START_TICK) throw new Error(`standardParty: the lobby took ${lobbyTicks} ticks`);
   advance(party, STANDARD_START_TICK - lobbyTicks);
   const words = SEED_SETS[set];
-  fixSeeds(party.room, { deal: words, npcTiming: words, npcPlay: words });
+  // Every stream a day of play can draw from, so two runs of a set are the same day (the node pool and the creatures
+  // are drawn from `nodes` and `mobs`; the rest keep crypto words).
+  fixSeeds(party.room, {
+    deal: words,
+    npcTiming: words,
+    npcPlay: words,
+    traits: words,
+    nodes: words,
+    mobs: words,
+    minigame: words,
+    contract: words,
+    events: words,
+  });
   for (const id of npcIdsOf(set)) addNpcSeat(party.room, party.room.seeds.get('npcNames'), id);
   party.room.lobbyCommands.push({ sessionId: party.humans[0]!.id } as Client, C2S.lobbyStart, {});
   advance(party, 1);
