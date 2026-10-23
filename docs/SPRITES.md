@@ -12,6 +12,12 @@
   12 fps whatever the clip's scene rate.
 - Height traits are not separate art: the client scales the sprite by the GDD 3.1 factor, anchored at
   the feet pivot.
+- **The drawn figure (round 8, 8F).** `PlayerView` draws a packed frame at `iso.artScale` (2) like every other
+  packed sprite, then `iso.figureScale` larger than true scale against props and tiles (`metrics.json`, A141),
+  then the height factor; all three anchor at the feet pivot. Until round 8 the characters were drawn at 1,
+  half their designed size, which is why they looked small beside a 2.5 m wall (A141). `characterRect`
+  (10.7) and the nameplate are sized for the designed figure, so `figureScale` 1 keeps them exact; a larger
+  `figureScale` multiplies `characterRect` too.
 - Eight directions, clockwise from screen up; the atlas `<dir>` is screen frame, data and wire
   directions are world frame (10.4). This order is the only direction table; the code copy
   is `dirFromVector` in `@wdi/shared` and the rig copy is `DIRECTIONS` in `tools/blender/rig_common.py`.
@@ -744,6 +750,14 @@ snaps down to a multiple of 0.5, so an art pixel is always a whole number of scr
 
 The view covers about the same number of tiles as before, because the projection keeps area.
 
+**The character scale (round 8, 8F; art.md 2).** The owner asked for figures about 1.5 times taller on screen.
+The proposal of A141 is the drawn-figure fix of section 1 (two times what shipped, the designed size) with
+`iso.viewTilesHigh` 11 and `iso.figureScale` 1 unchanged, so the view, the vision pool (GDD 3.13) and the zoom
+table above stay as they are. The screenshots the owner judges by are `assets/source/review/scale-<720|1080|1440>-<before|after|closer>.png`:
+`closer` is the alternative with `viewTilesHigh` 7.5 and the zoom clamped at 3 instead of 2 (zoom 1.5 at
+720, 2 at 1080, 3 at 1440), which the owner may ask for instead. Whichever pair the owner picks, the vision rule
+does not change and the camera keeps following the player centred.
+
 **Rendering and follow.** `roundPixels` is on, and the camera follows your container at lerp 0.1, as today.
 
 **Bounds** are `sceneBounds(w, h)` grown by `iso.topPadPx` (320) above and one tile on the other sides. A scene
@@ -935,6 +949,21 @@ Page-equivalents are of 2048². These are the art plan's numbers (`docs/round5/a
 
 `char_villager` and `ovl_villager` load only with `?art=placeholder` in round 5 (10.13), so they count in no
 budget. `tools/sprites/test/budget.test.ts` asserts each cap and, for each map, the resident sum.
+
+**Round 8 re-plan (8F, art.md 2, motion.md 1): the measured cost.** Each shipped look packs its 304 frames per
+pass (five clips, 8 directions) on one 1024² body page at a fill of 0.42-0.47 (about 1 500 trimmed px a frame,
+3 450 page px a frame with padding and the power-of-two rounding) and its 608 overlay frames on a 512² or
+1024 x 512 page: 0.31-0.375 a look, 3.1-3.75 for the ten looks of a 10-seat match. The clips of motion.md 1 add
+16 clips; the frame plan of A141 (idle 12, walk, run, limp, stagger 8 each, swing, strike, knockdown, getup,
+inspect, eat, rob 6 each, die and interact 8, hurt 3, threaten, cower, stomp, stunned 4 each, fidget 6, down 2) is
+129 frames a direction, 1 032 a pass. At the measured cost that is one 2048² body page and one 1024² overlay
+page a look (1.25), 12.5 for ten looks and a worst-case resident of 14.6 against the cap of 6. Halving the
+packed cell's density does not help: 128 px packed cells (A135) quadruple every frame, so even today's five
+clips would need a 2048² body page. The character budget therefore cannot hold the full clip table at any cell
+size without a DECISIONS row; A141 asks 6Z for it and names the fallbacks (one-shots in four directions, fewer
+frames, or a lazily loaded second page per look). Until the row lands, the 8-bit and low-poly looks keep 64 px
+packed cells (the figure shares the world's pixel grid; see section 1), and the 128 px packed cell is the HD
+style's (8I packs every key at its zoom-2 size, art.md 3).
 
 ### 10.15 Tests each session adds
 
