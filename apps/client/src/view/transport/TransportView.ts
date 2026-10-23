@@ -42,31 +42,34 @@ function quad(g: Phaser.GameObjects.Graphics, p: Pt[], fill: number, alpha = 1):
   for (let i = 0; i < 4; i++) g.lineBetween(p[i]!.x, p[i]!.y, p[(i + 1) % 4]!.x, p[(i + 1) % 4]!.y);
 }
 
-/** A box on the ground plane from world px (x0..x1, y0..y1), `z0..z1` screen px up: the top and the two faces the camera sees. */
+/** A box from world px `[x0, x1, y0, y1]`, `z0..z1` screen px up: the two faces the camera sees, then the top. */
 function box(
   g: Phaser.GameObjects.Graphics,
   b: number[],
-  z0: number,
-  z1: number,
+  z: [number, number],
   ramp: Ramp,
   alpha: number,
 ): void {
   const [x0, x1, y0, y1] = b as [number, number, number, number];
   const n = palette.world.ramps[ramp].length;
-  quad(
-    g,
-    [at(x0, y1, z0), at(x1, y1, z0), at(x1, y1, z1), at(x0, y1, z1)],
-    hex(ramp, Math.max(0, n - 4)),
-    alpha,
-  );
-  quad(
-    g,
-    [at(x1, y0, z0), at(x1, y1, z0), at(x1, y1, z1), at(x1, y0, z1)],
-    hex(ramp, Math.max(0, n - 3)),
-    alpha,
-  );
-  quad(g, [at(x0, y0, z1), at(x1, y0, z1), at(x1, y1, z1), at(x0, y1, z1)], hex(ramp, n - 2), alpha);
+  const faces = [
+    [x0, y1, x1, y1, z[0], z[1]],
+    [x1, y0, x1, y1, z[0], z[1]],
+    [x0, y0, x1, y0, z[1], z[1], y1 - y0],
+  ];
+  faces.forEach(([ax, ay, bx, by, lo, hi, d = 0], i) => {
+    const pts = [at(ax!, ay!, lo), at(bx!, by!, lo), at(bx!, by! + d, hi), at(ax!, ay! + d, hi)];
+    quad(g, pts, hex(ramp, Math.max(0, n - 4 + i)), alpha);
+  });
 }
+
+/** The four corners of a square on the ground, `half` px out from a point, with its far edge lifted to (`fy`, `up`). */
+const square = (x: number, y: number, half: number, fy = y + half, up = 0): Pt[] => [
+  at(x - half, y - half),
+  at(x + half, y - half),
+  at(x + half, fy, up),
+  at(x - half, fy, up),
+];
 
 /** A portal as the World holds it: its `MapPortal`s (`sceneMap.ts`), typed by the fields the World declares. */
 type Portal = { id: string; x: number; y: number; kind?: string; face?: string | null };
@@ -183,28 +186,11 @@ export class TransportView {
     }
     const half = DOOR_W / 2;
     if (s.kind === 'hatch') {
-      quad(
-        g,
-        [
-          at(p.x - half, p.y - half),
-          at(p.x + half, p.y - half),
-          at(p.x + half, p.y + half),
-          at(p.x - half, p.y + half),
-        ],
-        hex('ink', 0),
-        open,
-      );
       const a = (open * 105 * Math.PI) / 180;
-      const fy = p.y - half + Math.cos(a) * DOOR_W;
-      const up = Math.sin(a) * DOOR_W;
+      quad(g, square(p.x, p.y, half), hex('ink', 0), open);
       quad(
         g,
-        [
-          at(p.x - half, p.y - half),
-          at(p.x + half, p.y - half),
-          at(p.x + half, fy, up),
-          at(p.x - half, fy, up),
-        ],
+        square(p.x, p.y, half, p.y - half + Math.cos(a) * DOOR_W, Math.sin(a) * DOOR_W),
         hex('wood', 4),
       );
       return;
@@ -224,9 +210,8 @@ export class TransportView {
         g.lineStyle(3, hex('wood', 3), 1).lineBetween(l.x, l.y - h, r.x, r.y - h);
       if (reduced) return;
       const k = Math.min(1, (1 - leftS / balance.doors.swingS) / 0.6);
-      const h =
-        climbHeight(s.left, this.graph ? elevationOf(this.graph.scenes, this.sceneId, p.id) : -1, k) *
-        LADDER_H;
+      const rise = this.graph ? elevationOf(this.graph.scenes, this.sceneId, p.id) : -1;
+      const h = climbHeight(s.left, rise, k) * LADDER_H;
       const alpha = Math.min(1, Math.max(0, 1 + h / 18));
       const c = at(p.x, p.y, h);
       g.fillStyle(hex('ink', 1), alpha)
@@ -236,13 +221,8 @@ export class TransportView {
     }
     const dark = p.kind !== 'gate' && p.kind !== 'forest_gate';
     const c = at(p.x, p.y);
-    for (let i = 0; i < 3; i++)
-      g.fillStyle(dark ? hex('ink', 0) : hex('lantern', 3), 0.3 * open).fillEllipse(
-        c.x,
-        c.y - i * 16 * open,
-        60 - i * 14,
-        30 - i * 7,
-      );
+    g.fillStyle(dark ? hex('ink', 0) : hex('lantern', 3), 0.3 * open);
+    for (let i = 0; i < 3; i++) g.fillEllipse(c.x, c.y - i * 16 * open, 60 - i * 14, 30 - i * 7);
   }
 
   private drawTrain(now: number, reduced: boolean): void {
@@ -250,11 +230,8 @@ export class TransportView {
     if (t === null || !this.track) {
       this.train?.destroy();
       this.train = null;
-      if (
-        (this.heard.arriveAt ?? this.heard.brakeAt) !== null &&
-        now > (this.heard.arriveAt ?? this.heard.brakeAt)!
-      )
-        this.heard = { arriveAt: null, brakeAt: null };
+      // Gone (or never heard): forget the day's pulses.
+      if (this.track) this.heard = { arriveAt: null, brakeAt: null };
       return;
     }
     const g = (this.train ??= this.scene.add.graphics()).clear();
@@ -269,11 +246,11 @@ export class TransportView {
       return [x0, x1, Math.min(ya, yb), Math.max(ya, yb)];
     };
     // The engine on the spur's closed side, its tender car towards the open end it backs out through.
-    box(g, along(-2.6, 2.4), 0, 8, 'ink', alpha);
-    box(g, along(-2.6, -0.1), 8, 54, 'brick', alpha);
-    box(g, along(-2.6, -1.8), 54, 70, 'stone', alpha);
-    box(g, along(-0.9, -0.5), 54, 76, 'stone', alpha);
-    box(g, along(0.1, 2.4), 8, 46, 'wood', alpha);
+    box(g, along(-2.6, 2.4), [0, 8], 'ink', alpha);
+    box(g, along(-2.6, -0.1), [8, 54], 'brick', alpha);
+    box(g, along(-2.6, -1.8), [54, 70], 'stone', alpha);
+    box(g, along(-0.9, -0.5), [54, 76], 'stone', alpha);
+    box(g, along(0.1, 2.4), [8, 46], 'wood', alpha);
     g.setDepth(depthAt(x1, cy + 2.6 * TILE_PX, BIAS.character));
   }
 
