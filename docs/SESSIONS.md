@@ -3221,6 +3221,11 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 ### Round 7 log: 7A
 
+- 2026-10-23: PR 1 (#83, music). The intro tracks are `<map>_opening` playlists with `loop: false`, in a new
+  `opening` class held over grace until the piece ends or the opening is skipped; `loading` maps to the lobby
+  piece. Contract requests (manifest, `MUSIC_CLASSES`, `LoadingScreen.test.ts`) granted by 6Z. Measured
+  lengths 117 s and 80 s (A101); steps 2 and 3 (length, staging) are stacked locally and go up after #83.
+
 ### Round 7 log: 7B
 
 - 2026-10-23: PR 1 (fonts, night set, tokens, the gate on every `.css` under `apps/client/src`, licences,
