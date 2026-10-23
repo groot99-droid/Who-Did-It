@@ -686,3 +686,38 @@ Round 6 (ROADMAP M5d). An owner-only room runs a match in which every seat is an
 **The all-NPC match.** The owner chooses the map, the mode (main or quick), the seat count (every seat an NPC, up to `players.max`), the NPC difficulty, the quick mode's deck if not the default, and optionally the seed words. Start needs no leader and no human; the match deals, plays and ends exactly as a normal one, and below `players.min` seats the usual NPC fill applies. Each NPC brain plays as in 3.12, with one difference: an NPC Killer may take another NPC as prey, so the brains play each other. Reset returns the room to the lobby with the same seats under the same ids, the same options and the speed paused.
 
 **Replay.** An auto match fixes the seed words of every random stream and the seat ids before Start, so the same words and ids replay the same match tick for tick. The headless runner (`pnpm auto`) plays such matches with no network and no client and prints one line per match (winner, ticks, rounds, invariant failures); a failure is printed with the seed words of every stream and the seat ids, which the admin page can set to watch it again. The runner's `--seed` decides every match's words, so a run with the same flags plays the same matches.
+
+### 3.20 Vendettas
+
+Round 7 (ROADMAP R7). A Killer's card carries one of four vendettas drawn at the deal (conversion, sabotage,
+heist, contract), each a trigger and a consequence around the kill, never a second way to kill; HollowMere's
+Daily Train is the clock they run on, and the Vicar's death by the Knife is marked by a memorial every seat sees.
+The contract is `docs/round7/vendettas.md`; 7H writes the vendetta paragraphs here and 7I the Train and memorial
+paragraphs, and the numbers live in `balance.json` (`vendettas`, `train`).
+
+### 3.21 Parties, profiles and friends
+
+Round 7 (ROADMAP R7b; `docs/round7/parties.md`; DECISIONS A103, A104). The menu asks the name on Start Game and
+lists parties under Join Game instead of asking a code; a code box stays one tap away for links and codes.
+
+**Parties.** A party is **open** or **private**, chosen by its leader at Create (open by default). The party
+list shows open parties in the lobby phase, newest first, at most **50**, refreshed every **3 s** while the list
+is open; a row shows the leader's name, the seats taken and the maximum, the mode and the map, nothing else. A
+private party is unlisted, except to a device whose profile code the leader **invited** (up to **50** codes,
+picked from the leader's friends list at Create), and is joinable by its code or link as every party is. The
+list ends at the lobby: a party that has started is never listed, and a listing never carries a seat id, a
+device id or a role. The server keeps none of this past the room's life.
+
+**Profile.** One profile per device: the name (**2 to 16** characters, as before) and a **profile code** of **8**
+characters from the join-code alphabet, made on the device. The code is shown under Create Profile and may be
+shared; it is not a secret and proves nothing, so a device that knows a friend's code sees the private parties
+that friend was invited to (the open column of A104). A seat's profile code travels on the public roster, like
+its name, so a friend can be added from a lobby row or a game-over row.
+
+**Friends.** Up to **50** entries, each a profile code and the name last seen under it, kept on the device and
+never sent except as the leader's invited list at Create. **Quit** leaves any party as Leave does, silences the
+music and shows a goodbye panel; it sends nothing more.
+
+The numbers are `balance.json` `party` (`profileCodeLength`, `friendsMax`, `invitedMax`, `listMax`,
+`listRefreshS`); nothing else restates them.
+

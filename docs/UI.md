@@ -344,6 +344,8 @@ screenshots at 1280 x 720 and 390 x 844 in `docs/ui/`:
 | `hud` | chip, night clock, log, stick and buttons, a toast over a dark world | 2 steps 5 to 7 |
 | `meeting` | eight portraits, the tally, chat, claim chips, the vote | 2 step 8, 3.8 |
 | `loft` | the dark loft with eight occupied bedrolls and a creak cue | 3.11 |
+| `menu-mockup` (owner, Claude Design, 2026-10-23) | the round-7 menu: title, glass buttons, profile chip, sound toggle over the loop (`docs/round7/ui-reskin.md`) | 2 step 1, 3.21 |
+| `lobby-mockup` (owner, Claude Design, 2026-10-23) | the round-7 lobby in three columns: code and seats, map cards and art style, the deck and Start | 2 step 3 |
 
 Owner sign-off requested on the role card and the meeting screen before the frames are final.
 
