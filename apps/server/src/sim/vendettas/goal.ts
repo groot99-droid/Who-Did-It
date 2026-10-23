@@ -2,6 +2,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { simOf } from '../RoomSim';
 import { sceneKey } from '../World';
 import { vicarSeat } from './conversion';
+import { strongboxOf, strongboxProp } from './heist';
 import { activeBody, progressOf } from './progress';
 import { sabotageTargets } from './sabotage';
 import { vendettaOf } from './state';
@@ -30,6 +31,10 @@ export function vendettaGoalFor(room: PartyRoom, seatId: string): VendettaGoal |
   if (v.kind === 'sabotage') {
     const target = sabotageTargets(room).find((t) => !prog.tampered.includes(t.prop));
     return target ? { sceneId: target.scene } : null;
+  }
+  if (v.kind === 'heist') {
+    const box = strongboxOf(room);
+    return box.loaded && !box.taken && strongboxProp(room) ? { sceneId: 'manor_hall' } : null;
   }
   return null;
 }

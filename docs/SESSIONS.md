@@ -3313,6 +3313,10 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
   `vendettaGoalFor`; UI.md 14.29). Sabotage follows as PR 2b to keep each under 400 lines.
 - 2026-10-23: PR 2b (sabotage: `sim/vendettas/sabotage.ts`, its branch of `runVendettas` and of `vendettaGoalFor`,
   the task targets a still hold tampers with, the wreck that undoes a finished real task and readies the Knife).
+- 2026-10-23: PR 3a (heist: `sim/vendettas/heist.ts`, the `train.delivery` subscription and the heist branches of
+  `runVendettas` and `vendettaGoalFor`; the strongbox is the hall's existing safe `mh.safe`, read by id, so
+  the scene, its tilemap and `routines.json` are unchanged; the `strongbox` row of `items.json`). The contract
+  follows as PR 3b.
 
 ### Round 7 log: 7I
 

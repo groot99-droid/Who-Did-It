@@ -738,10 +738,11 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
   finished real task of the match (`vendettas.sabotage.undoTasks`), drawn from the Activist's stream, is undone,
   the task bar falls with it, and the Activist's Knife is ready at once. With no finished real task the bar has
   nothing to lose and only the Knife is readied.
-- **Heist: the Bandit against the strongbox (7H).** The strongbox stands in the manor hall, empty, in every
-  HollowMere match the hall is open at; the first Train delivery of the match loads it (`vendetta.heist.loaded`,
-  in every such match, Bandit or not). The Bandit's goal is to crack it: **8 s** (`vendettas.heist.crackS`)
-  still within verb reach of it, after dark, with no other living seat in the hall. Cracking it
+- **Heist: the Bandit against the strongbox (7H).** The strongbox (the hall's safe, `mh.safe`) stands in the
+  manor hall, empty, in every HollowMere match the hall is open at; the first Train delivery of the match loads it
+  (`vendetta.heist.loaded`, in every such match, Bandit or not). The Bandit's goal is to crack it: **8 s**
+  (`vendettas.heist.crackS`) still within verb reach of it, after dark (night or final night), with no other
+  living seat in the hall. Cracking it
   (`vendetta.heist.cracked`, the consequence) puts the Strongbox item in the Bandit's inventory (it needs a free
   slot), leaves a footprint of the Bandit's own height at the box as a kill does (3.4), and readies the Knife at
   once. The strongbox is in one inventory at most.
