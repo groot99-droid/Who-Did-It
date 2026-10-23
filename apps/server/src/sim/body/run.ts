@@ -4,6 +4,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { speedPxPerTick } from '../Movement';
 import { type MoveInput, type PlayerSim, simOf } from '../RoomSim';
 import { isWorldPhase } from '../World';
+import { registerBodyInvariant } from './invariants';
 import { die, showClip, wake } from './damage';
 import {
   blocksAct,
@@ -11,7 +12,6 @@ import {
   blocksRun,
   deriveEffects,
   factorOf,
-  hasEffect,
   speedFactorOf,
   statusBitsOf,
   tickEffects,
@@ -25,6 +25,7 @@ import { type Body, bodies, bodyOf, clearBodies, ensureBody, publishBodies } fro
  * only tick in the world phases; a meeting, the card and game over freeze them. The lobby has none.
  */
 export function runBody(room: PartyRoom): void {
+  registerBodyInvariant(); // once; see `invariants.ts` on why not at import
   const phase = room.state.phase;
   if (phase === Phase.lobby) {
     clearBodies(room);
@@ -105,12 +106,6 @@ export function overlayBody(
 export function bodyBlocksAct(room: PartyRoom, sessionId: string): boolean {
   const body = bodyOf(room, sessionId);
   return body !== undefined && blocksAct(body);
-}
-
-/** Whether a seat lies knocked out (the night powers' Keep Watch and Remedy refuse it, body.md 5; GDD 3.22). */
-export function knockedOut(room: PartyRoom, sessionId: string): boolean {
-  const body = bodyOf(room, sessionId);
-  return body !== undefined && hasEffect(body, 'knockedOut');
 }
 
 /**

@@ -1,0 +1,102 @@
+/* The body panel of the World HUD (round 8, 8A; docs/UI.md 14.32). The theme's tokens.css and components.css load
+   first (Hud.ts imports them). The function only: 8H's "Round 8 (8H)" block of components.css animates the states
+   (`is-wounded`, `is-down`, `is-fatigued`, `is-timed`) by class. */
+
+.wdi-body {
+  display: grid;
+  gap: var(--wdi-space-1);
+  width: min(240px, 40vw);
+  padding: var(--wdi-space-2);
+  color: var(--wdi-text);
+  background: var(--wdi-scrim);
+  border-radius: var(--wdi-radius-sm);
+  pointer-events: none;
+}
+
+.wdi-body[hidden] {
+  display: none;
+}
+
+.wdi-body__bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0 var(--wdi-space-2);
+  font-size: var(--wdi-text-sm);
+}
+
+.wdi-body__track {
+  display: block;
+  grid-column: 1 / -1;
+  height: var(--wdi-space-1);
+  overflow: hidden;
+  background-color: var(--wdi-surface-sunken);
+  border-radius: var(--wdi-radius-xs);
+}
+
+.wdi-body__fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  background-color: var(--wdi-interact);
+}
+
+.wdi-body__bar--health .wdi-body__fill {
+  background-color: var(--wdi-danger);
+}
+
+.wdi-body__bar--stamina .wdi-body__fill {
+  background-color: var(--wdi-warm);
+}
+
+.wdi-body.is-wounded .wdi-body__bar--health .wdi-body__fill,
+.wdi-body.is-down .wdi-body__bar--health .wdi-body__fill {
+  background-color: var(--wdi-hazard);
+}
+
+.wdi-body.is-fatigued .wdi-body__bar--stamina .wdi-body__fill {
+  background-color: var(--wdi-text-muted);
+}
+
+.wdi-body__label {
+  color: var(--wdi-text-muted);
+}
+
+.wdi-body__value {
+  font-variant-numeric: tabular-nums;
+}
+
+.wdi-body__effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wdi-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wdi-body__effects[hidden] {
+  display: none;
+}
+
+.wdi-body__chip {
+  display: inline-flex;
+  gap: var(--wdi-space-1);
+  padding: 0 var(--wdi-space-2);
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-text-on-paper);
+  background: var(--wdi-paper);
+  border-radius: var(--wdi-radius-xs);
+}
+
+.wdi-body__chip--bleeding,
+.wdi-body__chip--poisoned,
+.wdi-body__chip--knockedOut {
+  color: var(--wdi-on-danger);
+  background: var(--wdi-danger);
+}
+
+.wdi-body__chip-left,
+.wdi-body__chip-stacks {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}

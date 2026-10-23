@@ -8,8 +8,20 @@ import { GddRef, Id, WorldId } from './common.js';
 const Tile = z.strictObject({ x: z.number().int().nonnegative(), y: z.number().int().nonnegative() });
 const Seconds = z.number().positive();
 
-/** `DeathCause` of the protocol, as the index keys it; `vanished` never has a cutscene. */
-export const CutsceneDeathCause = z.enum(['knife', 'ejected', 'poison', 'shot', 'wolf']);
+/**
+ * `DeathCause` of the protocol, as the index keys it; `vanished` never has a cutscene. Round 8 (8A, GDD 3.22) adds
+ * the body's causes: `creature` (a boar, bat or rat bite), `bled` (Bleeding) and `sickened` (Poisoned).
+ */
+export const CutsceneDeathCause = z.enum([
+  'knife',
+  'ejected',
+  'poison',
+  'shot',
+  'wolf',
+  'creature',
+  'bled',
+  'sickened',
+]);
 export type CutsceneDeathCause = z.infer<typeof CutsceneDeathCause>;
 
 export const CutsceneKind = z.enum(['opening', 'death', 'memorial']);

@@ -3,7 +3,7 @@ import { TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { StatusBit } from '../constants';
 import { emitSim } from '../events/bus';
-import { type Body, bodyRng } from './state';
+import { type Body, bodyOf, bodyRng } from './state';
 
 /**
  * Effects (GDD 3.22; docs/round8/body.md 6): the rows of `effects.json`, applied, ticked and cured here. An
@@ -153,4 +153,13 @@ export function tickEffects(room: PartyRoom, target: string, body: Body): 'bled'
   }
   if (drainedBy === null) return null;
   return drainedBy === 'bleeding' ? 'bled' : 'sickened';
+}
+
+/**
+ * Whether a seat lies knocked out (the night powers' Keep Watch and Remedy refuse it, body.md 5; GDD 3.22). It lives
+ * here, not in `run.ts`, so `NightPowers.ts` (reached by `auto/invariants.ts`) never loads the body's own invariant.
+ */
+export function knockedOut(room: PartyRoom, sessionId: string): boolean {
+  const body = bodyOf(room, sessionId);
+  return body !== undefined && hasEffect(body, 'knockedOut');
 }

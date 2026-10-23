@@ -189,6 +189,7 @@ describe('the round-6 invariants', () => {
       'contractQuest',
       'strongboxOnce',
       'vendettaPublic',
+      'bodyBounds', // round 8, 8A
     ]);
   });
 
