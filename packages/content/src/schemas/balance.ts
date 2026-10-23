@@ -230,6 +230,11 @@ export const BalanceFile = z.strictObject({
     vote: z.strictObject({ windowFrac: FracSpan }),
     /** The ready delay on the role card and in the lobby. */
     ready: z.strictObject({ delayS: Span }),
+    /**
+     * The kill-opportunity timer (GDD 3.12, A100): a Killer NPC alone with one seat in a room for longer than
+     * `afterS` strikes it; in a room wider than the view the seat counts only within `sightTiles` and in sight.
+     */
+    aloneKill: z.strictObject({ afterS: Seconds, sightTiles: Tiles }),
     /** NPC night powers (GDD 3.2, 3.12): the use tick over dusk plus night, and the Last Shot delay. */
     nightPower: z.strictObject({ windowFrac: FracSpan, lastShotS: Span }),
     /** Round 6 (GDD 3.19): an NPC at one goal and one tile for longer than this fails the stuck invariant. */

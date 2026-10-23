@@ -458,6 +458,7 @@ its card does not use it, so no card changes how far a seat's streams move:
 | night-power tick | `npcTiming` | on the first tick of each dusk and each Final Night hunt | an NPC holding a night power (5G reads it, section 8) |
 | night-power pick (one uniform) | `npcPlay` | right after the night-power tick | the same NPC, to choose among its legal targets (5G) |
 | Last Shot delay | `npcTiming` | on the tick the NPC dies | an NPC Gamekeeper that aims |
+| kill-opportunity timer (A100, round 7) | none | every NPC that holds `kill` keeps it, no draw: alone in a room with one seat for `npc.aloneKill.afterS` | the same NPC, as a certain strike in the Knife's phases |
 
 As landed, the keyed streams `npcPlay:<seat>` and `npcTiming:<seat>` exist in `seeds.ts`, but the NPC brain still
 draws from `NpcMemory.rng` (the role-card ready, the vote tick); only `npcNames` is read from `room.seeds` so far.

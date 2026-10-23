@@ -641,7 +641,9 @@ function checkRoutines(c: Content, err: (msg: string) => void): void {
   }
 
   // Rule 6: the npc spans and the routine weights of balance.json.
-  const { routine, react, night, vote, ready, nightPower } = c.balance.npc;
+  const { routine, react, night, vote, ready, nightPower, aloneKill } = c.balance.npc;
+  if (aloneKill.afterS <= 0) err('balance.json npc.aloneKill.afterS: must be positive');
+  if (aloneKill.sightTiles <= 0) err('balance.json npc.aloneKill.sightTiles: must be positive');
   const spans: [string, { min: number; max: number }][] = [
     ['routine.stationDwellS', routine.stationDwellS],
     ['routine.workPauseS', routine.workPauseS],
