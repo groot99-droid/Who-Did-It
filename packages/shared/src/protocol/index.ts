@@ -92,9 +92,12 @@ export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke';
 export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
 /**
  * How a player died; `vanished` is the disconnect death of GDD 3.8 (M7); `poison` is Nightshade, `shot` the
- * Gamekeeper's Last Shot (GDD 3.2); `wolf` is a mob kill in the dark (GDD 3.15, round 6, Session 6G).
+ * Gamekeeper's Last Shot (GDD 3.2); `wolf` is a mob kill in the dark (GDD 3.15, round 6, Session 6G). Round 8
+ * (GDD 3.22, Session 8A; append-only): `creature` is a kill by any other creature, `bled` and `sickened` are
+ * Bleeding and Poisoned at zero health.
  */
-export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf';
+export type DeathCause =
+  'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'bled' | 'sickened';
 /** Chat channels the server derives (GDD 3.5); the client never chooses one. */
 export type ChatChannel = 'meeting' | 'ghost' | 'cabal' | 'system';
 

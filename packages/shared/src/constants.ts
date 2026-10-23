@@ -77,5 +77,28 @@ export const AVATAR_HANDLE_BYTES = 6;
 export const NpcLevel = { easy: 0, normal: 1, hard: 2 } as const;
 export type NpcLevelId = (typeof NpcLevel)[keyof typeof NpcLevel];
 
+/**
+ * Round 8 (GDD 3.22, docs/round8/seams.md 2): the effect ids of `EffectState.id`, u8 on the wire; `effects.json`
+ * keys its rows by the string. Append-only. `indebted` is the economy status 8D sets (GDD 3.23); it is defined
+ * here so every session shares one table.
+ */
+export const EffectId = {
+  slowed: 1,
+  wounded: 2,
+  bleeding: 3,
+  weakened: 4,
+  poisoned: 5,
+  fatigued: 6,
+  stunned: 7,
+  dazed: 8,
+  famished: 9,
+  knockedOut: 10,
+  indebted: 11,
+} as const;
+export type EffectKey = keyof typeof EffectId;
+export type EffectIdValue = (typeof EffectId)[EffectKey];
+/** `EffectId` keys in id order, so a wire id maps back to its `effects.json` row. */
+export const EFFECT_KEYS = Object.keys(EffectId) as readonly EffectKey[];
+
 // Gameplay radii, light, noise and timers are rules numbers: they live once, in
 // packages/content/data/balance.json (GDD 3.x), and are read through @wdi/content.
