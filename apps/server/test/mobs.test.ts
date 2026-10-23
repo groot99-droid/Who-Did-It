@@ -242,6 +242,16 @@ describe('creatures in a match', () => {
     const body = bodyOf(party.room, id)!;
     for (let i = 0; i < 270 * TICK_RATE && !simOf(party.room).players.get(id)!.dead; i++) {
       body.hp = Math.min(body.hp, 1);
+      if (i % TICK_RATE === 0) {
+        // Stay on the bat: its roam draws from the `mobs` stream and can take it out of its senses for minutes.
+        const b = mobBodies(party.room).get(bat.id);
+        if (b) {
+          const tx = Math.floor(b.x / TILE_PX);
+          const ty = Math.floor(b.y / TILE_PX);
+          const near = floorNear(party.room, 'cave_entry', tx, ty, 1, 2);
+          placeSeat(party, id, 'cave_entry', near.x, near.y);
+        }
+      }
       advance(party, 1);
     }
     expect(simOf(party.room).players.get(id)!.dead).toBe(true);
