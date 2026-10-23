@@ -2680,6 +2680,8 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   inset: 0;
   z-index: var(--wdi-z-panel);
   pointer-events: none;
+  /* A full-screen layer over the world: the theme's root background must not cover the canvas (styles.css). */
+  background: transparent;
 }
 
 .wdi-m5b[hidden] {
