@@ -119,6 +119,7 @@
   --wdi-on-night-accent: var(--wdi-night); /* 11.06 */
   --wdi-veil: rgb(var(--wdi-night-rgb) / 0.6); /* over the loop video, always */
   --wdi-vignette: rgb(var(--wdi-night-rgb) / 0.5); /* added at the edges, where the footer sits */
+  --wdi-scanline: rgb(var(--wdi-night-rgb) / 0.2); /* one dark row in three over the loop; it only darkens */
   --wdi-glass-fill: rgb(var(--wdi-indigo-rgb) / 0.66); /* every glass surface's fill */
   --wdi-glass-sheen: rgb(var(--wdi-snow-rgb) / 0.04); /* the 4 px checker over the fill, measured with it */
   --wdi-glass-wash: rgb(var(--wdi-lantern-rgb) / 0.12); /* the primary button's hover, measured */

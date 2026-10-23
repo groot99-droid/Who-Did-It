@@ -3346,6 +3346,73 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   }
 }
 
+/* The loop backdrop (ui/backdrop.ts): a sibling just before #overlay, so it paints over the canvas and under
+   every screen. The veil is always on, so the text pairs of UI.md 10 hold on the loop's brightest frame. */
+.wdi-backdrop {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--wdi-night-bg);
+}
+
+.wdi-backdrop[hidden] {
+  display: none;
+}
+
+.wdi-backdrop__poster,
+.wdi-backdrop__video,
+.wdi-backdrop__veil,
+.wdi-backdrop__vignette,
+.wdi-backdrop__scan {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.wdi-backdrop__poster,
+.wdi-backdrop__video {
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.wdi-backdrop__veil {
+  background: var(--wdi-veil);
+}
+
+.wdi-backdrop__vignette {
+  background: radial-gradient(ellipse at center, transparent 45%, var(--wdi-vignette) 100%);
+}
+
+.wdi-backdrop__scan {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent var(--wdi-space-1),
+    var(--wdi-scanline) var(--wdi-space-1),
+    var(--wdi-scanline) calc(var(--wdi-space-1) + 2px)
+  );
+}
+
+.wdi-backdrop__title {
+  position: absolute;
+  top: var(--wdi-space-6);
+  left: var(--wdi-space-6);
+}
+
+.wdi-backdrop__status {
+  position: absolute;
+  right: 0;
+  bottom: var(--wdi-space-3);
+  left: 0;
+  margin: 0;
+  color: var(--wdi-night-text);
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-sm);
+  text-align: center;
+}
+
 @media (max-width: 480px) {
   .wdi-title {
     font-size: var(--wdi-display-lg);
@@ -3353,6 +3420,11 @@ body.wdi-cutscene-slam .wdi-hud-chip {
 
   .wdi-glass-panel {
     padding: var(--wdi-space-4);
+  }
+
+  .wdi-backdrop__title {
+    top: var(--wdi-space-4);
+    left: var(--wdi-space-4);
   }
 }
 

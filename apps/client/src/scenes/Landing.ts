@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { setRoute } from '../flags';
 import { buildIsStale, REFRESH_MESSAGE } from '../health';
+import { hideBackdrop, showBackdrop } from '../ui/backdrop';
 import { mountLanding } from '../ui/Landing';
 import { overlayRoot, type Screen } from '../ui/dom';
 import type { MusicBus } from '../view/MusicBus';
@@ -14,7 +15,11 @@ export class Landing extends Phaser.Scene {
   }
 
   create(): void {
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.screen?.destroy());
+    showBackdrop(); // the menu draws its own title and build footer (7C)
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.screen?.destroy();
+      hideBackdrop();
+    });
 
     const net = getNet(this);
     const flags = getFlags(this);
