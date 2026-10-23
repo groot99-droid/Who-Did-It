@@ -1,0 +1,307 @@
+/*
+ * Who Did It: the match screens on the night theme (round 7, 7F; docs/round7/ui-reskin.md 4, UI.md 14.27).
+ *
+ * The role card, the notebook sheet and the settings panel, restyled to the owner's mockups: night and indigo
+ * fills, lilac text, snow rims at low alpha, lantern the one accent, the pixel display face for short caps
+ * (the role name, the faction word, button labels) and Inter for every running line (the card text, the
+ * notebook). Tokens only: theme.test.ts refuses a hex outside palette.json, a literal rgb() and any font
+ * family but the --wdi-font-* tokens.
+ *
+ * Every rule sits under an ancestor class (.wdi-flip, .wdi-notebook-sheet, .wdi-settings, .wdi-m5b) so it beats
+ * components.css whichever stylesheet the bundler emits first, and no other screen's card, button or chip
+ * changes. A screen's id, class hook and markup are kept: this file only paints them.
+ */
+
+/*
+ * The world has no veil under it, so a surface over the world or a cutscene is measured against a bare white
+ * pixel: --wdi-glass-fill (indigo at 66%, measured under the menu's veil) gives lilac 3.32 there, and this
+ * night scrim gives lilac 8.61 and muted lilac 6.12 (UI.md 14.27). Surfaces over the world use it.
+ */
+:root {
+  --wdi-match-glass: rgb(var(--wdi-night-rgb) / 0.85);
+}
+
+/* ---------------------------------------------------------------- the role card */
+
+/* The nine-slice frame and the flip stay (UI.md 7); the paper becomes the night card. */
+.wdi-flip .wdi-card:not(.wdi-card--back) {
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-indigo);
+  background-image: linear-gradient(
+    to bottom,
+    rgb(var(--wdi-snow-rgb) / 0.06),
+    rgb(var(--wdi-snow-rgb) / 0) 40%
+  );
+}
+
+/* The faction stripe: the faction colour, icon and word together, the word in the pixel face. */
+.wdi-flip .wdi-card__stripe {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-align: center;
+  border-color: var(--wdi-night);
+  box-shadow: inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.3);
+}
+
+.wdi-flip .wdi-card__title {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-display-md);
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  color: var(--wdi-night-label);
+  overflow-wrap: anywhere;
+  text-shadow: 2px 2px 0 var(--wdi-violet);
+}
+
+.wdi-flip .wdi-card__look,
+.wdi-flip .wdi-card__cooldown {
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-flip .wdi-card__goal {
+  color: var(--wdi-night-accent);
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.3);
+}
+
+.wdi-flip .wdi-card .wdi-eyebrow,
+.wdi-flip .wdi-card .wdi-hint,
+.wdi-flip .wdi-card .wdi-muted {
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-flip .wdi-card .wdi-eyebrow {
+  font-family: var(--wdi-font-pixel-text);
+  font-weight: 600;
+  font-synthesis: none;
+}
+
+/* Keycaps were ink on paper; on the night card they are lilac outlines. */
+.wdi-flip .wdi-card:not(.wdi-card--back) .wdi-kbd,
+.wdi-notebook-sheet .wdi-notebook .wdi-kbd {
+  color: var(--wdi-night-text);
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.45);
+}
+
+/* Chips on the card are labels, not paper: a glass pill, the cover look keeps its blood rim. */
+.wdi-flip .wdi-card:not(.wdi-card--back) .wdi-chip {
+  --_stroke: rgb(var(--wdi-lilac-rgb) / 0.35);
+  color: var(--wdi-night-text);
+  background-color: rgb(var(--wdi-snow-rgb) / 0.08);
+  background-image: none;
+  box-shadow: none;
+}
+
+.wdi-flip .wdi-card .wdi-card__deckcard.is-cover {
+  --_stroke: var(--wdi-faction-cabal);
+}
+
+.wdi-flip .wdi-card__beware {
+  background: rgb(var(--wdi-lantern-rgb) / 0.14);
+}
+
+.wdi-flip .wdi-card .wdi-timer {
+  background: var(--wdi-night);
+  box-shadow: inset 0 0 0 1px rgb(var(--wdi-lilac-rgb) / 0.35);
+}
+
+/* The cover picker: a night well, glass look buttons, the picked one lantern. */
+.wdi-flip .wdi-coverpicker {
+  background-color: var(--wdi-night);
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.35);
+  border-radius: var(--wdi-radius-xs);
+}
+
+.wdi-flip .wdi-coverpicker__look {
+  color: var(--wdi-night-text);
+  background-color: rgb(var(--wdi-snow-rgb) / 0.08);
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.35);
+  border-radius: var(--wdi-radius-xs);
+}
+
+.wdi-flip .wdi-coverpicker__look.is-picked {
+  border-color: var(--wdi-night-accent);
+  box-shadow: 0 0 0 1px var(--wdi-night-accent);
+}
+
+.wdi-flip .wdi-coverpicker__note {
+  color: var(--wdi-night-text-muted);
+}
+
+/* Ready: the one primary action, lantern on night in the pixel face. */
+.wdi-flip .wdi-btn--primary {
+  --_bg: var(--wdi-night-accent);
+  --_fg: var(--wdi-on-night-accent);
+  --_stroke: var(--wdi-night);
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: 0.04em;
+  border-radius: var(--wdi-radius-xs);
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.45),
+    var(--wdi-shadow-1);
+}
+
+/* The back: the same night, a lilac double rule, nothing that hints at the faction. */
+.wdi-flip .wdi-card--back {
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-night);
+  border-color: var(--wdi-indigo);
+  box-shadow:
+    inset 0 0 0 6px var(--wdi-night),
+    inset 0 0 0 8px rgb(var(--wdi-lilac-rgb) / 0.4),
+    var(--wdi-shadow-3);
+}
+
+.wdi-flip .wdi-card--back .wdi-eyebrow {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  font-weight: 400;
+  color: var(--wdi-night-label);
+}
+
+/* The chip that reopens the card (Tab). */
+.wdi-btn.wdi-rolechip {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: 0.04em;
+  color: var(--wdi-night-label);
+  background-color: var(--wdi-match-glass);
+  background-image: none;
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.45);
+  border-radius: var(--wdi-radius-xs);
+  backdrop-filter: blur(6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-btn.wdi-rolechip {
+    backdrop-filter: none;
+    background-color: var(--wdi-indigo);
+  }
+}
+
+/* ---------------------------------------------------------------- the notebook sheet (N or the HUD button) */
+
+.wdi-notebook-sheet {
+  background: var(--wdi-veil);
+}
+
+.wdi-notebook-sheet .wdi-notebook {
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-glass-fill);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 27px,
+    rgb(var(--wdi-lilac-rgb) / 0.12) 27px 28px
+  );
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.45);
+  border-radius: var(--wdi-radius-xs);
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.12),
+    inset 6px 0 0 rgb(var(--wdi-snow-rgb) / 0.08),
+    var(--wdi-shadow-3);
+  backdrop-filter: blur(8px);
+}
+
+.wdi-notebook-sheet .wdi-notebook .wdi-eyebrow {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-sm);
+  font-weight: 400;
+  font-synthesis: none;
+  color: var(--wdi-night-label);
+}
+
+.wdi-notebook-sheet .wdi-notebook .wdi-muted,
+.wdi-notebook-sheet .wdi-notebook .wdi-hint {
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-notebook-sheet .wdi-notebook__entry.is-new {
+  box-shadow: inset 3px 0 0 var(--wdi-night-accent);
+}
+
+.wdi-notebook-sheet .wdi-notebook .wdi-chip {
+  color: var(--wdi-night-text);
+  background-color: rgb(var(--wdi-snow-rgb) / 0.08);
+  background-image: none;
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.35);
+}
+
+.wdi-notebook-sheet .wdi-notebook .wdi-icon-disc {
+  background-color: rgb(var(--wdi-snow-rgb) / 0.12);
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.35);
+}
+
+.wdi-notebook-sheet__close {
+  color: var(--wdi-night-label);
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-notebook-sheet .wdi-notebook {
+    backdrop-filter: none;
+    background-color: var(--wdi-indigo);
+  }
+}
+
+/* ---------------------------------------------------------------- the settings gear and its panel */
+
+.wdi-settings .wdi-settings__gear {
+  color: var(--wdi-night-label);
+  background-color: var(--wdi-match-glass);
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.45);
+  border-radius: var(--wdi-radius-xs);
+  box-shadow: inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.2);
+  backdrop-filter: blur(6px);
+}
+
+.wdi-settings .wdi-settings__gear:focus-visible,
+.wdi-settings .wdi-settings__slider:focus-visible,
+.wdi-settings .wdi-settings__mute:focus-visible {
+  outline: var(--wdi-stroke-w) solid var(--wdi-night-accent);
+  outline-offset: var(--wdi-stroke-w);
+}
+
+.wdi-settings .wdi-settings__panel {
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-match-glass);
+  background-image: none;
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.45);
+  border-radius: var(--wdi-radius-xs);
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.15),
+    var(--wdi-shadow-3);
+  backdrop-filter: blur(10px);
+}
+
+.wdi-settings .wdi-settings__row {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-sm);
+}
+
+.wdi-settings .wdi-settings__slider,
+.wdi-settings .wdi-settings__mute {
+  accent-color: var(--wdi-night-accent);
+}
+
+.wdi-settings .wdi-settings__value {
+  font-family: var(--wdi-font-text);
+  color: var(--wdi-night-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-settings .wdi-settings__gear,
+  .wdi-settings .wdi-settings__panel {
+    backdrop-filter: none;
+    background-color: var(--wdi-indigo);
+  }
+}

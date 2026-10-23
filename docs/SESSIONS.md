@@ -3246,6 +3246,8 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 ### Round 7 log: 7F
 
+- 2026-10-23: PR 1 (role card, HUD and its log, notebook sheet, settings panel): `ui/match.css`, `view/hud.css`, UI.md 14.27, A110. Rules are scoped under an ancestor class, so they do not wait for 7B's glass classes; `theme.test.ts` and the 565 client unit tests pass.
+
 ### Round 7 log: 7G
 
 ### Round 7 log: 7H

@@ -1366,3 +1366,39 @@ The lobby's lines stay in `apps/client/src/ui/copy/lobby.ts`; the re-skin (A103,
 - **Column B.** The map cards (`map-select`, one `radio` per map, the picked one with a tick; a non-leader sees the picked card only), the art-style segment (`art-style*`, `.wdi-seg--glass`, HD disabled with its "Coming later" note) and, in the quick mode, the deck editor (`deck-editor`, `deck-role-*`) as chips in the deck's style. A map whose thumbnail has not loaded keeps a dark frame. No line changes.
 - **Tags.** The NPC tag is not shown: the lobby snapshot carries only the NPC seat count, not which seats they are, and the wire is not widened for a tag. Add friend shows only where a seat's `profile` is in the snapshot; until the client's roster mapping carries it, no row offers it.
 - **Left out.** The mockup's "Locate" button has no feature.
+
+### 14.27 Match screens on the night theme (7F)
+
+The re-skin of the screens a match shows (`ui-reskin.md` 4, DECISIONS A110). Round 7 adds no copy to these screens
+in this subsection's first PR: every line stays its key in `ui/copy/`, and a key a later PR adds is listed here.
+The rules live in `ui/match.css` (role card, notebook sheet, settings) and `view/hud.css` (HUD and touch cluster),
+tokens only, each rule under an ancestor class (`.wdi-flip`, `.wdi-notebook-sheet`, `.wdi-settings`, `.wdi-hud`) so
+no other screen's card, chip or button changes. Ids, `data-testid`s and markup are kept.
+
+| Element | Face | Fill and colour |
+|---|---|---|
+| Role card front | the nine-slice frame and the flip stay | indigo fill, lilac text, a faint snow sheen at the top |
+| Faction word (`__stripe`) | Press Start 2P, 12 px | the faction colour with its `--wdi-on-*` text, as before |
+| Role name (`__title`) | Press Start 2P, `display-md`, snow, a violet step shadow | |
+| Card text, goal, abilities, Beware, mates | Inter (A103, A106: running text) | goal lantern on indigo, the rest lilac |
+| Card chips, keycaps, cover picker | Oswald caps chips, Pixelify Sans notes | glass pills with a lilac rim; the picked look takes the lantern rim |
+| Card back, role chip | Press Start 2P | night with a lilac double rule, nothing of the faction |
+| Ready | Press Start 2P, 12 px | the primary: night on lantern |
+| HUD chip, clock, log, toasts | Pixelify Sans; the clock digits Press Start 2P | glass (`--wdi-glass-fill`) with a lilac rim over the world; under `prefers-reduced-motion` the blur is dropped for the solid indigo |
+| Notebook sheet | Inter for entries, Press Start 2P for the title | glass page, ruled in lilac at 12%, over the veil |
+| Settings gear and panel | Pixelify Sans | glass; lantern sliders and focus ring |
+
+**Numbers stay Inter.** Pixelify Sans' 2, 5 and 8 blur together at 12, 14 and 16 px (checked at 2x), so a line
+that can show a number is not set in it: the HUD goal, log lines, toasts and phase ("Day 2"), the settings value
+("70%"), hints and quantities in the panels ("2 wood", "x3", "3 of 8 slots") are Inter. Static labels with no number
+keep the pixel face, and Press Start 2P's digits are clear (the clock). UI.md 3 lists Pixelify Sans for body text;
+this is the exception, found while checking the HUD.
+
+**Over the world.** The world has no veil, so a surface over it is measured against a bare white pixel. The shared
+glass fill (indigo at 66%) is measured under the menu's veil (10) and gives lilac only 3.32 there, so the HUD, the
+role chip, the settings gear and panel use `--wdi-match-glass` (`ui/match.css`: night at 85%): lilac on it is 8.61,
+lilac at 80% is 6.12 and snow is 13.14 over white. The notebook sheet sits under its own veil and keeps the glass fill.
+
+No focusable element is clipped to a stepped corner: a `clip-path` would cut the focus ring, so the pixel corner is
+a 2 px radius with an inset snow rim, and the glass classes of 7B (`.wdi-glass-btn`) replace these rims where they
+land.
