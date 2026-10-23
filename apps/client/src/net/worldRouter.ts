@@ -215,6 +215,8 @@ export function installWorldRouter(
                 callerId: feedMock.selfId,
                 ...(reason === 'body' ? { bodyOf: 'mock-bot-2' } : {}),
               }),
+            /** The clues of the own scene in pixels, so a spec can walk to one instead of guessing a direction. */
+            clues: () => feedMock.clues().map((c) => ({ kind: c.kind, x: c.x, y: c.y })),
           };
           feedMock.start();
         });

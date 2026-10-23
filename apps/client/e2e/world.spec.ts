@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { createParty } from './fixtures/party';
+import { ClueKind, TILE_PX } from '@wdi/shared';
 
 // The World scene against the ?mock=1 world feed: lobby -> role card -> village, walking and a door.
 
@@ -135,17 +136,70 @@ test('kill -> body -> collect -> one Notebook entry', async ({ page }, info) => 
   // Footprints lie one tile past the body; step onto them and hold E for the 2 s collect.
   await expect(page.getByTestId('prompt')).toBeVisible();
   await page.waitForTimeout(300);
-  // Walk along the trail until the prompt offers the clue instead of the report.
+  // Walk to the footprints (the mock puts them one tile from the body, toward the nearest door, so the side depends
+  // on where the strike landed) until the prompt offers the clue instead of the report.
   const prompt = page.getByTestId('prompt');
-  for (let i = 0; i < 20 && !(await prompt.textContent())?.includes('collect'); i++) {
-    await hold(page, WORLD_KEYS.east, 60);
-    await page.waitForTimeout(60);
+  const at = async () => {
+    const m = /at ([\d.]+),([\d.]+)/.exec((await fps.textContent()) ?? '');
+    return { x: Number(m?.[1]), y: Number(m?.[2]) };
+  };
+  // Two footprint clues exist (the trail and the grace teaching clue far off): the trail's is the one by the body.
+  const struck = await at();
+  const prints = await page.evaluate(
+    ([kind, sx, sy, tile]) => {
+      const hook = (window as unknown as { __wdiMock: { clues(): { kind: number; x: number; y: number }[] } })
+        .__wdiMock;
+      const near = (c: { x: number; y: number }) => Math.hypot(c.x / tile! - sx!, c.y / tile! - sy!);
+      const c = hook
+        .clues()
+        .filter((k) => k.kind === kind)
+        .sort((l, r) => near(l) - near(r))[0];
+      return c ? { x: c.x, y: c.y } : null;
+    },
+    [ClueKind.footprints, struck.x, struck.y, TILE_PX],
+  );
+  expect(prints, 'the strike left footprints').not.toBeNull();
+  // Stand on the footprints, not at the first step that reads "collect": a bell or door near the trail can be nearer
+  // one step later, and the prompt takes the nearest target.
+  // A prop (the bell) can stand in the way: a step that goes nowhere switches to the other axis for a few steps.
+  let last = await at();
+  let sidestep = 0;
+  let stalled = 0;
+  for (let i = 0; i < 200; i++) {
+    const me = await at();
+    const dx = prints!.x / TILE_PX - me.x;
+    const dy = prints!.y / TILE_PX - me.y;
+    if (Math.hypot(dx, dy) <= 0.3) break;
+    if (Math.hypot(me.x - last.x, me.y - last.y) < 0.02) stalled++;
+    else stalled = 0;
+    last = me;
+    if (stalled >= 4) sidestep = 6;
+    const alongX = Math.abs(dx) >= Math.abs(dy) !== sidestep > 0;
+    if (sidestep > 0) sidestep--;
+    const keys = alongX
+      ? dx > 0
+        ? WORLD_KEYS.east
+        : WORLD_KEYS.west
+      : dy > 0
+        ? WORLD_KEYS.south
+        : WORLD_KEYS.north;
+    await hold(page, keys, Math.hypot(dx, dy) > 1 ? 80 : 30);
+    await page.waitForTimeout(120);
   }
+  const end = await at();
+  const left = Math.hypot(prints!.x / TILE_PX - end.x, prints!.y / TILE_PX - end.y);
+  expect(
+    left,
+    `tiles left to the footprints at ${prints!.x / TILE_PX},${prints!.y / TILE_PX} from ${end.x},${end.y}`,
+  ).toBeLessThanOrEqual(0.3);
   await expect(prompt).toContainText('Hold to collect');
+  // A hold started while the last step is still in flight is cancelled (GDD 3.4): let the player settle first.
+  await page.waitForTimeout(400);
+  await expect(prompt).toContainText('Hold to collect');
+  // The collect takes 2 s of mock ticks and a loaded runner ticks late: hold until the Notebook opens.
   await page.keyboard.down('KeyE');
-  await page.waitForTimeout(2300);
+  await expect(page.getByTestId('notebook')).toBeVisible({ timeout: 10_000 });
   await page.keyboard.up('KeyE');
-  await expect(page.getByTestId('notebook')).toBeVisible();
   await expect(page.getByTestId('notebook-entry')).toHaveCount(1);
   await page.screenshot({ path: info.outputPath('notebook.png') });
 });
