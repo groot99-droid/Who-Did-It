@@ -712,6 +712,51 @@ describe('clues and stuck goals (R13, R14)', () => {
     }
   });
 
+  it('R14: a work visit that a reaction left away from its station walks back to the stand', async () => {
+    const { party, a, restore } = await clueScene(0);
+    try {
+      const sim = simOf(party.room);
+      const st = stationsOf(mapScenesOf(party.room), sim.profile).find((s) => s.propId === 'ov.pump')!;
+      const stand = st.stands[0]!;
+      const grid = new NavGrid(navs.overworld, sim.profile);
+      // An open tile three tiles from the stand on a row or a column.
+      const off = [
+        [3, 0],
+        [-3, 0],
+        [0, 3],
+        [0, -3],
+      ].find(([dx, dy]) => !grid.solidAt(stand.x + dx!, stand.y + dy!))!;
+      const goal = {
+        scene: sim.players.get(a)!.sceneIdx,
+        x: (stand.x + 0.5) * TILE_PX,
+        y: (stand.y + 0.5) * TILE_PX,
+      };
+      const brain = npcMemory(party.room).brain(a);
+      brain.act = {
+        kind: 'work',
+        untilTick: party.room.state.tick + 600,
+        stationId: 'ov.pump',
+        goal,
+        faced: true,
+      };
+      npcMemory(party.room).claims.set('ov.pump', a);
+      brain.pauseUntilTick = -1;
+      placeSeat(party, a, 'overworld', stand.x + off[0]!, stand.y + off[1]!);
+      const p = sim.players.get(a)!;
+      const kinds = new Set<string>();
+      let back = -1;
+      advance(party, 10 * TICK_RATE, (tick) => {
+        kinds.add(brain.act?.kind ?? '');
+        if (back < 0 && brain.act?.kind === 'work' && Math.hypot(goal.x - p.x, goal.y - p.y) <= TILE_PX / 2)
+          back = tick;
+      });
+      expect(kinds.has('travel')).toBe(true);
+      expect(back).toBeGreaterThan(0);
+    } finally {
+      restore();
+    }
+  });
+
   it('R14: a goal it cannot approach is dropped after stuckS and never picked straight again', async () => {
     const { party, a, restore } = await clueScene(0);
     const unpatch = patch(balance.movement, 'walkTilesPerS', 0);
