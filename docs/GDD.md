@@ -767,12 +767,13 @@ Vicar that dies by the Knife becomes `flow.ascendedVicarCandidate` at that revea
 room's next match until another replaces it), which round 8's evolutions read.
 
 **The martyr's due (owner's rule, 7I).** The Vicar must die a martyr: struck by a Killer's Knife, the only source of
-a Knife death. A Vicar taken by a wolf, poisoned, shot or ejected is no martyr. From the reveal that names the
-candidate, each real task the martyr's ghost finishes counts **10** times on the task bar (`tasks.martyrWeight`),
-outside the ghost cap (3.5); the tasks it finished before that reveal count as any ghost's. A full bar wins for the
-Village, so a Killer that strikes the Vicar hands the village a fast clock: the Zealot, whose goal is the Vicar's
-flock, is the one Killer with a reason to take that risk. Like the candidacy, it follows the dealt card; the only
-thing anyone sees is the bar.
+a Knife death. A Vicar taken by a wolf, poisoned, shot or ejected is no martyr. The martyr is the seat the memorial
+mourns, so it follows the public look like the film: a cover in the Vicar's look is the martyr, and a seat dealt the
+Vicar under another look is not, since the bar is public and Killers pick victims by the look they see. From that
+reveal, each real task the martyr's ghost finishes counts **10** times on the task bar (`tasks.martyrWeight`),
+outside the ghost cap (3.5); the tasks it finished before that reveal count as any ghost's. A full bar in play wins
+for the Village, so a Killer that strikes the Vicar hands the village a fast clock: the Zealot, whose goal is the
+Vicar's flock, is the one Killer with a reason to take that risk. The private candidacy above stays on the card.
 
 ### 3.21 Parties, profiles and friends
 

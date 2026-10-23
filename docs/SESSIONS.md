@@ -3313,7 +3313,7 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 - 2026-10-23: PR 1, the Daily Train: the platform spot on HollowMere's overworld (A113), `sim/Train.ts` and its `runTrain` line, `balance.json` `train`, GDD 3.3, WORLD 4.3, UI.md 14.30, `test/train.test.ts`.
 - 2026-10-23: PR 2, the Vicar's memorial: `sim/Memorial.ts` and its `runMemorial` line, `FlowState.ascendedVicarCandidate`, the `cutscenes.json` `memorialVicar` row and the `cs.memorial.*` caption block, GDD 3.20, UI.md 14.30, A113, `test/memorial.test.ts`.
-- 2026-10-23: PR 2, the owner's martyrdom rule: the Vicar's ghost tasks count `tasks.martyrWeight` times after a Killer's Knife, and a full task bar wins (`sim/Minigames.ts`, `sim/Memorial.ts`, `balance.json`), GDD 3.5 and 3.20, A131, `test/martyr.test.ts`.
+- 2026-10-23: PR 2, the owner's martyrdom rule: the Vicar's ghost tasks count `tasks.martyrWeight` times after a Killer's Knife, and a full task bar wins (`sim/Minigames.ts`, `sim/Memorial.ts`, `balance.json`), GDD 3.5 and 3.20, A131, `test/memorial.test.ts`.
 
 ### Round 7 log: 7J
 
