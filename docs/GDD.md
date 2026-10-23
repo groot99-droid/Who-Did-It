@@ -140,7 +140,7 @@ Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife,
 
 **Tasks.** Village players get 3-5 tasks; the global bar at 100% wins. Each needs a tool from another scene and a 2 s hold at the node: Light the lanterns (Oil from the tavern back room to a square lantern post, night only), Fix the well pump (Wrench from the apothecary bench), Deliver a letter (from the widow's letter box to the tavern dartboard), Mend the fence (2 Planks from the edge of Gallows Wood by the gate to the NE fence; while mended, wolves cannot enter the village), Fetch the flour (from Crumb's Ovens to the tavern); and behind Crumb's Ovens (round 7, A118) Mix the dough (Flour from the bakery's sacks to the mixer), Stoke the oven (Timber from the woodpile at the edge of Gallows Wood to the brick oven), Stock the cold room (a Bucket of well water from the pump to the cold shelves) and Proof the loaves (a Candle from the widow's bedroom to the proofing cabinet), which join the pool the deal draws from, the number dealt and the bar's maths unchanged. Co-op task (Shutter the windows, in the tavern): both players within 2 tiles of the node holding E for 4 s; progress pauses when one releases. Two-player carrying is V1.5. Completing a task writes a Claimed alibi entry (time + scene). Cabal see a fake list that writes entries but never fills the bar. Ghost task completion counts 100% but ghost contribution is capped at 25% of the bar, except the martyred Vicar's (3.20). A full bar in play ends the match for the Village.
 
-**The deal (round 7, A133).** At Start, after the cards, each human seat is dealt its list from the pool of fetch tasks whose source and at least one target stand on the chosen map at the party's profile (3.13); Blackpine, whose scenes hold no station yet, has an empty pool, so it deals nothing and its bar never moves. A Village seat draws `tasksEach` (3.9) real tasks and a Cabal or neutral seat as many fake ones, both without replacement from the same pool, on a stream of their own that nothing public shares. An NPC seat is dealt no list: its brain plays no mini-game, and a list never worked would cap the bar below 100 for the match. The bar starts every match at 0. A ghost finishes its own tasks (3.8) through the same hold and the same mini-game, under the ghost cap above. The co-op task joins the pool when its two-player hold lands.
+**The deal (round 7, A133).** At Start, after the cards, each human seat is dealt its list from the pool of fetch tasks whose source and at least one target stand on the chosen map at the party's profile (3.13); Blackpine, whose scenes hold no station yet, has an empty pool, so it deals nothing and its bar never moves. A Village seat draws `tasksEach` (3.9) real tasks and a Cabal or neutral seat as many fake ones, both without replacement from the same pool, on a stream of their own that nothing public shares. An NPC seat is dealt no list: its brain plays no mini-game, and a list never worked would cap the bar below 100 for the match. The bar starts every match at 0. A ghost finishes its own tasks (3.8) through the same hold and the same mini-game, under the ghost cap above. The co-op task joins the pool when its two-player hold lands. **Fetching (7M).** At a task's source prop the same hold is the pick-up: it puts the task's deliverable (its tool, `toolQty` of it) in your pockets, once at a time (not while you carry that many, not without a free slot), and the puzzle at the target takes it back when the task is done. A fake list's holder goes through the same motion at the same shelf and takes nothing; inventories are private, so nothing public tells the two apart. The `taskBar` invariant (A133) holds the bar to what the lists say (so a fake task never moved it and the ghost cap held), lets no NPC seat hold a list, and matches every `taskDone` of the match log to a finished entry on its seat's list.
 
 **Communication.** No voice in V1. Global text chat in meetings, lines of at most 200 characters. Outside meetings: an 8-phrase quick-chat wheel (Follow me / Where were you? / I saw something / Help! / Clear / Suspicious / Wait / Go) as speech bubbles within 5 tiles, plus world pings. Cabal channel and ghost channel are sent per-recipient by the server; the client never chooses a channel. (M3) A living player may speak only while a meeting runs (discussion, vote and reveal), to everyone; a ghost may speak in any phase, to the other ghosts only; empty lines are refused and long ones are cut to the limit. Proximity text chat is a V1.5 toggle.
 
@@ -332,7 +332,7 @@ In M5a nobody carries a light that anyone else can see. Your vision is drawn for
 
 **Explored fog and the minimap** are M5b. M5a draws no memory of where you have been and no map overlay.
 
-**Transitions.** The client covers the screen while the router starts a scene: a fade into the world (`balance.ui.transitionS.fade`, 0.4 s), an iris into a meeting (`iris`, 0.6 s) and a wipe into the end screen (`wipe`, 0.7 s), each the whole cover-and-lift. Under reduced motion every duration is 0 and the scene starts at once. A transition that begins while another runs replaces it. Nothing here touches the sim or the wire.
+**Transitions.** The client covers the screen while the router starts a scene: a fade into the world (`balance.ui.transitionS.fade`, 0.4 s), an iris into a meeting (`iris`, 0.6 s) and a wipe into the end screen (`wipe`, 0.7 s), each the whole cover-and-lift. Since round 8 (8H, A143) the cover into the world follows the portal the seat came through, at the same `fade` duration: a door wipes, a ladder, stair, hatch, shaft, drop or crawl irises (with rungs passing up or down when the portal changes height), an arrival at a map's Train station fades through the station, and the first spawn, a cave mouth, a forest gate or the return from a meeting fades. Under reduced motion every duration is 0 and the scene starts at once. A transition that begins while another runs replaces it. Nothing here touches the sim or the wire.
 
 **Loading.** A load that runs longer than `balance.ui.loading.showAfterS` (0.3 s) shows a progress bar and a tip, which changes every `tipEveryS` (4 s); a shorter load shows nothing. Tips describe the controls and the world and never a role's powers. A match's load also starts the map's `loading` music (3.18).
 
@@ -687,6 +687,26 @@ strike with its fists.
 
 Session 8A writes this section's rules and corrects 3.6 and 3.15 where the two-hit-point model is replaced; 8B
 writes the inspect paragraph. The numbers are `balance.json` `body` and `effects.json`.
+
+**Inspect** (8B, A137). In any world phase, a living seat can study another living seat it can see within
+`relations.json` `inspect.rangeTiles`, once per `inspect.cooldownS`. The inspector learns, privately:
+- the look the figure is drawn as;
+- its physical signs: those its status bits draw (knocked out, stunned, dazed, bloody, bleeding, limping, pale,
+  weary) and, to a close look only, weak (Weakened), hungry (Famished) and hunted (Indebted);
+- its health as a band (unhurt, bruised, badly hurt; the floors are `inspect.health`), never the number;
+- its purse as a band (light, fair, heavy; `inspect.purse`), or unknown while the purse or its bands do not exist;
+- whether it carries a burning light.
+
+It never learns a card, a cover, a vendetta, an inventory, a notebook or a role's private state; a cover-wearer
+and a true wearer of a look read alike. The inspected seat is told privately which look studied it.
+
+**Relations.** `relations.json` `rows` say which looks are suspicious. A row names an inspector and an inspected
+side (a card, a vendetta, a faction, a drawn look, a townsfolk figure, or `mark`, the target of the inspector's open
+contract), may hold to one map, and carries a `suspicion` and an optional `note`. When rows hold for a look, every
+living NPC seat that saw it (in the scene, within the vision radius and in sight), and the inspected seat if it is
+an NPC, counts the inspector's drawn face the sum of their `suspicion` more; the first row with a note sends the
+inspected seat a card-blind hunch. Nothing a third client receives depends on a match. An `inert` row names a role
+or figure of a later round and never holds.
 
 ### 3.23 The economy
 

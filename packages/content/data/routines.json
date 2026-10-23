@@ -27,6 +27,7 @@
   },
   "holds": {},
   "ignore": [
+    "dressing",
     "kitChest",
     "teachingClue",
     "keyCache",
