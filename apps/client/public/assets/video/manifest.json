@@ -1,4 +1,12 @@
 {
   "version": 1,
-  "entries": []
+  "entries": [
+    {
+      "key": "intro",
+      "url": "intro.webm",
+      "poster": "intro.jpg",
+      "durationS": 29.1,
+      "bytes": 4515216
+    }
+  ]
 }
