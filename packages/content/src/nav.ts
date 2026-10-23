@@ -27,6 +27,10 @@ import bpMine from '../data/scenes/bp_mine.nav.json' with { type: 'json' };
 import bpOffice from '../data/scenes/bp_office.nav.json' with { type: 'json' };
 import bpSmithy from '../data/scenes/bp_smithy.nav.json' with { type: 'json' };
 import bpDeep from '../data/scenes/bp_deep.nav.json' with { type: 'json' };
+import crumbCold from '../data/scenes/crumb_cold.nav.json' with { type: 'json' };
+import crumbMixing from '../data/scenes/crumb_mixing.nav.json' with { type: 'json' };
+import crumbOven from '../data/scenes/crumb_oven.nav.json' with { type: 'json' };
+import crumbProofing from '../data/scenes/crumb_proofing.nav.json' with { type: 'json' };
 import { Profile } from './schemas/balance.js';
 import { SCENE_IDS, type SceneId } from './schemas/scene.js';
 
@@ -81,6 +85,10 @@ const navJson: Record<SceneId, unknown> = {
   bp_office: bpOffice,
   bp_smithy: bpSmithy,
   bp_deep: bpDeep,
+  crumb_cold: crumbCold,
+  crumb_mixing: crumbMixing,
+  crumb_oven: crumbOven,
+  crumb_proofing: crumbProofing,
 };
 
 function parseNavs(): Record<SceneId, NavFile> {
