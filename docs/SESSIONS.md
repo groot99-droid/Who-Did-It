@@ -3322,6 +3322,9 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
   spawn, one hiding and one body spot and the picture's lights; ids, doors and sizes in A118. The pictures were read
   as rooms without a question to 6Z. Station props, their renders and the pictures' own spot art follow in PR 2,
   the task nodes and `e2e/ovens.spec.ts` in PR 3.
+- 2026-10-23: PR 1 is #111 (with 6Z's one-line exception in `mapSites.test.ts:29`). PR 2: the four station props and the
+  pictures' four spot variants, rendered and packed for both art styles (A118); `enterScene` clears a hold on the
+  same tick (6Z's answer, new `holdScene.test.ts`), which the stations had surfaced in `npcTells` S1.
 - Seed for round 8 (Port-au-Levain, A116): the ten kitchen pictures stay unbuilt and are its rooms, the cellar,
   cold pantry, command desk, dish pit, expediter, front of house, hygiene, lamination, shaping bench and
   sub-basement (`assets/source/concepts/onub/`); they move to `docs/round8/` when that folder exists.
