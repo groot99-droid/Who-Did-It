@@ -3234,6 +3234,7 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 ### Round 7 log: 7D
 
 - PR 1 (wire): `CreateOptions`, `JoinOptions.profile`, `Player.profile` (schema version 4), `balance.json` `party`, the `onAuth` checks, `PROTOCOL.md`, `parties.test.ts` (auth half), ARCHITECTURE 5.3 and GDD 3.21 server lines, A108. `protocol-doc.ts` lists `PartyVisibility` and `CreateOptions`. Profile codes are exact-length upper-case join-alphabet strings; `newSeat` is untouched (the profile is set in `onJoin`).
+- PR 2 (listing): `PartyRoom.syncListing` and the room-memory visibility, `services/partyListing.ts`, `GET /parties` in `server.ts`, `allowRoute` and the route's global bucket in `matchmakeGuard.ts`, `PartyListing` in the protocol, swarm `--create`, ARCHITECTURE 5.3, GDD 3.21, A108 amended. The route is the one place a new HTTP cost appears: 7C polls it every `listRefreshS`.
 
 ### Round 7 log: 7E
 
@@ -3242,6 +3243,10 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 ### Round 7 log: 7G
 
 ### Round 7 log: 7H
+
+- 2026-10-23: PR 1 (the four rows, the widened schema and its checks, `balance.json` `vendettas`, the `vendetta`
+  stream, the draw through the `sim/Deck.ts` line, GDD 3.20, A112); the holding in room memory behind
+  `privateVendetta` until 7D's schema version 4 lands. Hooks asked of 6Z in the PR description.
 
 ### Round 7 log: 7I
 
