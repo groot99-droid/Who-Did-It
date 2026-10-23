@@ -1,7 +1,17 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { scenes, tasks } from '@wdi/content';
-import { ErrorCode, ItemStack, Phase, S2C, TaskEntry, type PlayerState } from '@wdi/shared';
+import {
+  ErrorCode,
+  ItemStack,
+  Phase,
+  S2C,
+  TICK_RATE,
+  TaskEntry,
+  Winner,
+  type PlayerState,
+} from '@wdi/shared';
+import { matchEvents } from '../src/sim/auto/log';
 import {
   advance,
   allTownsfolk,
@@ -17,7 +27,8 @@ import {
   type Party,
 } from './npcHelpers';
 
-// Round 7, 7M (GDD 3.5, A133 (8)): the pick-up of a task's deliverable at its source prop. New file.
+// Round 7, 7M (GDD 3.5, A133 (8), (9)): the pick-up of a task's deliverable at its source prop and the `taskDone` sim
+// event. New file.
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -125,5 +136,41 @@ describe('the pick-up at a task source (GDD 3.5)', () => {
     stand(party, h, PUMP);
     await hold(party, h, 'fixPump');
     expect(opened(h)).toBe(1);
+  });
+});
+
+/** Finishes the open puzzle by the Done control (GDD 3.16), once it has been open for its `assistS`. */
+async function finish(party: Party, h: Human, taskId: string): Promise<void> {
+  advance(party, 20 * TICK_RATE + 1);
+  await send(h, 'minigame.result', { taskId, answer: { assist: true } }, 80);
+  advance(party, 3);
+  await wait(80);
+}
+const dones = (party: Party) => matchEvents(party.room).filter((e) => e.kind === 'taskDone');
+
+describe('taskDone (A133 (9))', () => {
+  it('fires for a fake task and a real one alike, names the seat and the task, and the bar follows the lists', async () => {
+    const { party, h, me } = await world();
+    assign(me, 'fixPump', true);
+    stand(party, h, PUMP);
+    await hold(party, h, 'fixPump');
+    expect(opened(h)).toBe(1);
+    await finish(party, h, 'fixPump');
+    expect(me.priv.tasks[0]!.done).toBe(true);
+    expect(party.room.state.taskBar).toBe(0);
+    expect(dones(party)).toMatchObject([
+      { kind: 'taskDone', seat: h.id, sceneId: 'overworld', data: { taskId: 'fixPump', fake: true } },
+    ]);
+
+    me.priv.tasks.clear();
+    assign(me, 'fixPump');
+    give(me, FIX.tool!, FIX.toolQty ?? 1);
+    await hold(party, h, 'fixPump');
+    await finish(party, h, 'fixPump');
+    expect(dones(party)).toHaveLength(2);
+    expect(dones(party)[1]).toMatchObject({ seat: h.id, data: { taskId: 'fixPump', fake: false } });
+    expect(qty(me, FIX.tool!)).toBe(0);
+    expect(party.room.state.taskBar).toBe(100);
+    expect(party.room.state.winner).toBe(Winner.village);
   });
 });
