@@ -97,6 +97,8 @@ The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 star
 
 **Final Night** (M5a). When the server would start a day whose round is above `finalNight.afterCycle` (4), after a night or after the immunity of a meeting, and nobody has won, the Final Night begins instead of that day. Everyone stays where they stand under night lighting; every Knife's cooldown is cut to at most `finalNight.killCooldownS` (20 s) and the Knife rests that long after each strike; the night powers wake for one more use; clues keep spawning. The hunt lasts `finalNight.huntS` (90 s); a body report ends it at once (`finalNight.reportEndsHunt`; the Bell is silent after dark). Then Nightshade resolves, everyone moves to the square and the forced meeting opens (reason `final`): the discussion of the party size, then a vote with no Skip (`finalNight.skipAllowed`) and the Case Board open. The plurality is ejected and revealed; a tie ejects nobody (`finalNight.tieEjectsNobody`). The match always ends there (3.8). A death during the hunt runs the win check as usual, so parity can still end the match first.
 
+**The Daily Train** (round 7, HollowMere only; DECISIONS A113). A map whose file names a `station` (a spawn on its hub: HollowMere's platform `overworld.platform` on the overworld's east edge) has a Train. On every day, `train.arriveAtS` (5 s) after the day begins, the Train arrives: the seats on the hub within `train.hearTiles` (20 tiles) of the platform hear `train_arrive`, and every seat's chat log gets the system line of UI.md 14.30. `train.deliveryAfterS` (8 s) later it delivers, with `train_brake` to the same seats when the world is in play. A meeting that opens before the arrival takes that day's Train with it; once arrived, the delivery follows whatever the phase. No Train in grace, at dusk, at night, in the Final Night or in the quick mode. The arrival and the delivery are the sim events `train.arrive` and `train.delivery`, which name no seat; the vendettas run on them (3.20). BlackPine has no Train.
+
 ### 3.4 Investigation and clues
 
 A knife kill spawns, server-side: the Body; **2 of the 3 trait clues** (seeded choice; the first body of the match always spawns 2 trait clues and a Dust-able print); a fingerprint on the body; Blood on the killer; and for a dragged body a **drag smear** from kill tile to spot.
@@ -694,6 +696,9 @@ heist, contract), each a trigger and a consequence around the kill, never a seco
 Daily Train is the clock they run on, and the Vicar's death by the Knife is marked by a memorial every seat sees.
 The contract is `docs/round7/vendettas.md`; 7H writes the vendetta paragraphs here and 7I the Train and memorial
 paragraphs, and the numbers live in `balance.json` (`vendettas`, `train`).
+
+**The Daily Train** is the vendettas' clock: its rule is in 3.3. `train.arrive` brings the mail (the Hitman's
+contract) and `train.delivery` the strongbox (the Bandit's heist).
 
 ### 3.21 Parties, profiles and friends
 

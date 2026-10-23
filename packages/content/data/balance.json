@@ -230,6 +230,7 @@
   "resources": { "poolActiveFrac": 0.5, "stackMax": 5, "gddRef": "3.14" },
   "mobs": { "maxPerScene": 3, "chaseS": 6, "gddRef": "3.15" },
   "quests": { "maxActive": 2, "gddRef": "3.16" },
+  "train": { "arriveAtS": 5, "deliveryAfterS": 8, "hearTiles": 20, "gddRef": "3.3" },
   "ui": {
     "transitionS": { "fade": 0.4, "iris": 0.6, "wipe": 0.7 },
     "loading": { "showAfterS": 0.3, "tipEveryS": 4 },

@@ -1251,6 +1251,17 @@ Session 6D, round 6 (DECISIONS A86; `docs/round6/auto-admin.md` 8). The owner's 
 
 The full list is `ui/copy/admin.ts`.
 
+### 14.30 The Train and the memorial (7I)
+
+Session 7I, round 7 (DECISIONS A113). The Daily Train (GDD 3.3) adds no screen: the server sends the arrival line on
+the existing `chat.msg` `system` channel, so it lands in every seat's chat log and shows in the next meeting's chat
+with the system style; the arrival and the brake are `noise` pulses whose `kind` is the `AudioBus` key
+(`train_arrive`, `train_brake`) for the seats on the hub near the platform.
+
+| Line | Text | Where |
+|---|---|---|
+| the arrival (server, `Train.ts` `TRAIN_ARRIVE_LINE`) | The train pulls into the station. | `chat.msg` `system`, every seat, once per day |
+
 ### 14.24 Opening cinematic (6Q)
 
 Lines are in `apps/client/src/ui/copy/intro.ts` (`INTRO_COPY`). The `Intro` scene sits between `Preload` and `Landing` (never before `Admin`).

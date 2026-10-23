@@ -51,6 +51,7 @@
   "bell": "ov.bell",
   "teachingClue": "ov.teaching_clue",
   "kitChest": "ov.chest",
+  "station": "overworld.platform",
   "thumbnail": "thumb_hollowmere",
   "worldRef": "4.3",
   "gddRef": "3.13"
