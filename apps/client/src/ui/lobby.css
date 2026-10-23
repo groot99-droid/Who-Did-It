@@ -1,7 +1,7 @@
 /* The party lobby (round 7, 7E; docs/round7/ui-reskin.md 1, UI.md 14.26): three columns of frosted glass over the
-   night. A holds the code, the mode, the NPCs and the seats; B the map, the art style and the sound (next PR); C the
-   deck and the actions. Tokens only. Each rule is scoped to `.wdi-lobby` (or the confirm dialog) and stands in
-   for 7B's `.wdi-glass*` pieces until they land. */
+   night. A holds the code, the NPCs and the seats; B the map, the art style and the sound (next PR); C the
+   deck and the actions. The surfaces, buttons, selects and tags are 7B's `.wdi-glass*` and `.wdi-tag` classes
+   (ui/theme/components.css); this file keeps the layout and the pieces they have no class for. Tokens only. */
 
 .wdi-lobby {
   display: grid;
@@ -39,37 +39,6 @@
   gap: var(--wdi-space-3);
 }
 
-/* The glass surface: translucent fill, blur, a stepped corner, a thin light rim. */
-.wdi-lobby__card {
-  position: relative;
-  padding: var(--wdi-space-5);
-  background: var(--wdi-glass-fill);
-  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.3);
-  backdrop-filter: blur(var(--wdi-space-2));
-  clip-path: polygon(
-    0 var(--wdi-space-2),
-    var(--wdi-space-1) var(--wdi-space-2),
-    var(--wdi-space-1) var(--wdi-space-1),
-    var(--wdi-space-2) var(--wdi-space-1),
-    var(--wdi-space-2) 0,
-    calc(100% - var(--wdi-space-2)) 0,
-    calc(100% - var(--wdi-space-2)) var(--wdi-space-1),
-    calc(100% - var(--wdi-space-1)) var(--wdi-space-1),
-    calc(100% - var(--wdi-space-1)) var(--wdi-space-2),
-    100% var(--wdi-space-2),
-    100% calc(100% - var(--wdi-space-2)),
-    calc(100% - var(--wdi-space-1)) calc(100% - var(--wdi-space-2)),
-    calc(100% - var(--wdi-space-1)) calc(100% - var(--wdi-space-1)),
-    calc(100% - var(--wdi-space-2)) calc(100% - var(--wdi-space-1)),
-    calc(100% - var(--wdi-space-2)) 100%,
-    var(--wdi-space-2) 100%,
-    var(--wdi-space-2) calc(100% - var(--wdi-space-1)),
-    var(--wdi-space-1) calc(100% - var(--wdi-space-1)),
-    var(--wdi-space-1) calc(100% - var(--wdi-space-2)),
-    0 calc(100% - var(--wdi-space-2))
-  );
-}
-
 .wdi-lobby__card[hidden] {
   display: none;
 }
@@ -80,24 +49,6 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--wdi-space-2);
-}
-
-.wdi-lobby__eyebrow {
-  margin: 0;
-  font-family: var(--wdi-font-pixel-text);
-  font-size: var(--wdi-text-sm);
-  letter-spacing: var(--wdi-tracking-caps);
-  text-transform: uppercase;
-  color: var(--wdi-night-text-muted);
-}
-
-.wdi-lobby__title {
-  margin: 0;
-  font-family: var(--wdi-font-pixel-display);
-  font-size: var(--wdi-text-lg);
-  font-weight: var(--wdi-weight-text);
-  line-height: var(--wdi-leading-display);
-  color: var(--wdi-night-label);
 }
 
 .wdi-lobby__count {
@@ -115,91 +66,6 @@
     var(--wdi-space-1) var(--wdi-space-1) 0 var(--wdi-violet),
     calc(2 * var(--wdi-space-1)) calc(2 * var(--wdi-space-1)) 0 var(--wdi-indigo);
   overflow-wrap: anywhere;
-}
-
-.wdi-lobby__note {
-  margin: 0;
-  font-size: var(--wdi-text-sm);
-  color: var(--wdi-night-text-muted);
-}
-
-/* Buttons: glass on the dark, pixel labels, the primary the accent on night. */
-.wdi-lobby .wdi-lobby__btn {
-  min-height: var(--wdi-touch);
-  padding: var(--wdi-space-2) var(--wdi-space-3);
-  font-family: var(--wdi-font-pixel-display);
-  font-size: var(--wdi-text-xs);
-  font-weight: var(--wdi-weight-text);
-  letter-spacing: var(--wdi-tracking-caps);
-  text-transform: uppercase;
-  color: var(--wdi-night-label);
-  background-color: rgb(var(--wdi-violet-rgb) / 0.45);
-  background-image: none;
-  border: 0;
-  border-radius: 0;
-  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.4);
-  clip-path: polygon(
-    0 var(--wdi-space-1),
-    var(--wdi-space-1) var(--wdi-space-1),
-    var(--wdi-space-1) 0,
-    calc(100% - var(--wdi-space-1)) 0,
-    calc(100% - var(--wdi-space-1)) var(--wdi-space-1),
-    100% var(--wdi-space-1),
-    100% calc(100% - var(--wdi-space-1)),
-    calc(100% - var(--wdi-space-1)) calc(100% - var(--wdi-space-1)),
-    calc(100% - var(--wdi-space-1)) 100%,
-    var(--wdi-space-1) 100%,
-    var(--wdi-space-1) calc(100% - var(--wdi-space-1)),
-    0 calc(100% - var(--wdi-space-1))
-  );
-}
-
-.wdi-lobby .wdi-lobby__btn:hover:not(:disabled) {
-  background-color: rgb(var(--wdi-violet-rgb) / 0.75);
-}
-
-.wdi-lobby .wdi-lobby__btn:focus-visible {
-  outline: var(--wdi-stroke-w) solid var(--wdi-night-accent);
-  outline-offset: calc(-1 * var(--wdi-space-1));
-}
-
-.wdi-lobby .wdi-lobby__btn--wide {
-  width: 100%;
-}
-
-.wdi-lobby .wdi-lobby__btn--mini {
-  flex: none;
-  width: var(--wdi-touch);
-  padding: 0;
-}
-
-.wdi-lobby__plus {
-  font-size: var(--wdi-text-md);
-}
-
-.wdi-lobby .wdi-lobby__btn .wdi-icon {
-  filter: brightness(0) invert(1);
-}
-
-.wdi-lobby .wdi-lobby__btn--start {
-  min-height: calc(var(--wdi-touch) + var(--wdi-space-3));
-  font-size: var(--wdi-text-md);
-  color: var(--wdi-on-night-accent);
-  background-color: var(--wdi-night-accent);
-  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.6);
-}
-
-.wdi-lobby .wdi-lobby__btn--start::before {
-  content: '';
-  width: var(--wdi-space-3);
-  height: var(--wdi-space-4);
-  margin-right: var(--wdi-space-3);
-  background: currentcolor;
-  clip-path: polygon(0 0, 100% 50%, 0 100%);
-}
-
-.wdi-lobby .wdi-lobby__btn--start:hover:not(:disabled) {
-  background-color: var(--wdi-snow);
 }
 
 .wdi-lobby__pair {
@@ -234,57 +100,10 @@
   gap: var(--wdi-space-2);
 }
 
-.wdi-lobby .wdi-lobby__select {
-  font-family: var(--wdi-font-pixel-text);
-  font-size: var(--wdi-text-md);
-  color: var(--wdi-night-text);
-  background-color: rgb(var(--wdi-night-rgb) / 0.45);
-  background-image: none;
-  border: 0;
-  border-radius: 0;
-  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.3);
-}
-
-.wdi-lobby .wdi-lobby__select:disabled {
-  opacity: 0.7;
-}
-
-/* Tags: You, Leader, Ready, Away, the mode, and the Add friend action. */
-.wdi-lobby__tag {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--wdi-space-1);
-  min-height: var(--wdi-space-5);
-  padding: 2px var(--wdi-space-2);
-  font-family: var(--wdi-font-pixel-display);
-  font-size: var(--wdi-text-xs);
-  letter-spacing: var(--wdi-tracking-caps);
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--wdi-night-label);
-  background-color: rgb(var(--wdi-violet-rgb) / 0.6);
-  border: 0;
-}
-
-.wdi-lobby__tag--lead {
-  color: var(--wdi-on-night-accent);
-  background-color: var(--wdi-night-accent);
-}
-
-.wdi-lobby__tag--ready {
-  color: var(--wdi-on-night-accent);
-  background-color: var(--wdi-lilac);
-}
-
+/* Tags: You, Leader, Ready, Away, and the Add friend action. */
 .wdi-lobby__tag--quiet {
   background-color: rgb(var(--wdi-indigo-rgb) / 0.8);
   color: var(--wdi-night-text-muted);
-}
-
-.wdi-lobby__tag--mode {
-  flex-shrink: 1;
-  white-space: normal;
-  text-align: right;
 }
 
 .wdi-lobby__tag--action {
@@ -295,10 +114,6 @@
 .wdi-lobby__tag--action:disabled {
   cursor: default;
   opacity: 0.7;
-}
-
-.wdi-lobby__tag .wdi-icon {
-  filter: brightness(0);
 }
 
 /* The seats. */
@@ -352,7 +167,7 @@
   box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.3);
 }
 
-/* Column B: the map cards, the art style and the quick-mode deck editor. */
+/* Column B: the map cards and the art style. */
 .wdi-lobby__b {
   flex: 1;
 }
@@ -433,57 +248,6 @@
   color: var(--wdi-night-text-muted);
 }
 
-.wdi-lobby .wdi-seg {
-  border: 0;
-  border-radius: 0;
-  background: rgb(var(--wdi-night-rgb) / 0.6);
-  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.3);
-}
-
-.wdi-lobby .wdi-seg__opt {
-  font-family: var(--wdi-font-pixel-text);
-  font-size: var(--wdi-text-md);
-  color: var(--wdi-night-text);
-}
-
-.wdi-lobby .wdi-seg__opt + .wdi-seg__opt {
-  border-left: 0;
-}
-
-.wdi-lobby .wdi-seg__opt.is-on {
-  background: var(--wdi-night-accent);
-  color: var(--wdi-on-night-accent);
-}
-
-.wdi-lobby .wdi-seg__opt:disabled {
-  color: var(--wdi-night-text-muted);
-}
-
-.wdi-lobby .wdi-seg__opt:focus-visible {
-  outline-color: var(--wdi-night-accent);
-}
-
-.wdi-lobby .wdi-artstyle__hint {
-  font-size: var(--wdi-text-sm);
-  color: var(--wdi-night-text-muted);
-}
-
-/* The quick-mode deck editor: role chips in the deck's style, the accent on a role in play. */
-.wdi-deckedit__roles {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
-  gap: var(--wdi-space-2);
-}
-
-.wdi-lobby .wdi-deck__role.is-on {
-  color: var(--wdi-on-night-accent);
-  background-color: var(--wdi-night-accent);
-}
-
-.wdi-lobby .wdi-deck__role:disabled:not(.is-on) {
-  opacity: 0.7;
-}
-
 .wdi-lobby .wdi-field__msg--error {
   margin: 0;
   padding-left: var(--wdi-space-3);
@@ -519,11 +283,5 @@
 
   .wdi-lobby__code {
     font-size: var(--wdi-display-lg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .wdi-lobby .wdi-lobby__btn {
-    transition: none;
   }
 }

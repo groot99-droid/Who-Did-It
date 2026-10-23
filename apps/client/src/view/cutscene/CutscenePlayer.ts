@@ -20,6 +20,7 @@ import {
   cameraPose,
   planTimeline,
 } from './sequencer';
+import { CutsceneVideo } from './video';
 
 /**
  * Plays a cutscene in-engine (round 6, docs/round6/cutscene-music.md 1.3): camera pans and zooms on the scene's
@@ -27,6 +28,9 @@ import {
  * Reduce-motion turns pans into cuts; `?cutscene=0` disables every cutscene. The HUD and the move input are held
  * back while one plays (`body.wdi-cutscene`, the input controller's `stop`); the camera goes back to the own figure
  * through `followOf` when it ends. Both World.ts call sites are locked (docs/round6/seams.md 1.4).
+ *
+ * Round 7 (7A, DECISIONS A101): a `video` step plays a full-frame video from the video manifest under the captions and
+ * Skip (`video.ts`); the cutscene ends with it.
  */
 export type CutsceneOutcome = 'done' | 'skipped' | 'none';
 
@@ -143,6 +147,8 @@ export class CutscenePlayer {
     document.body.classList.add('wdi-cutscene-on');
     input?.stop();
 
+    const videos: CutsceneVideo[] = [];
+
     const startedAt = performance.now();
     const looping: AudioKey[] = [];
     let leg: { entry: TimelineEntry; leg: CameraLeg } | null = null;
@@ -193,9 +199,12 @@ export class CutscenePlayer {
         case 'cardSlam':
           document.body.classList.add('wdi-cutscene-slam');
           break;
-        case 'video':
-          console.debug(`cutscene ${cutscene.id}: video steps arrive with the memorials (round 7)`);
+        case 'video': {
+          const video = new CutsceneVideo(layer, () => finish('done'));
+          videos.push(video);
+          void video.play(s.key, import.meta.env.BASE_URL);
           break;
+        }
         default:
           break;
       }
@@ -226,6 +235,7 @@ export class CutscenePlayer {
       window.clearInterval(guard);
       window.removeEventListener('keydown', onKey);
       for (const key of looping) audio.stopLoop(key);
+      for (const v of videos) v.destroy();
       captions.destroy();
       layer.remove();
       document.body.classList.remove('wdi-cutscene-on', 'wdi-cutscene-slam');

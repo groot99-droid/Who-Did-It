@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
 import { setRoute } from '../flags';
 import type { LobbySnapshot } from '../net/NetworkService';
+import { buildLine, hideBackdrop, showBackdrop } from '../ui/backdrop';
 import { type LobbyScreen, mountLobby } from '../ui/Lobby';
 import { overlayRoot } from '../ui/dom';
-import { Backdrop } from '../view/Backdrop';
-import { getFlags, getHealth, getNet } from './registry';
+import { getHealth, getNet } from './registry';
 
 export class Lobby extends Phaser.Scene {
   private screen: LobbyScreen | null = null;
@@ -14,17 +14,14 @@ export class Lobby extends Phaser.Scene {
   }
 
   create(): void {
-    new Backdrop(this).setHealth(getHealth(this));
+    showBackdrop({ status: buildLine(getHealth(this)) });
     const net = getNet(this);
-    const flags = getFlags(this);
 
     this.screen = mountLobby(overlayRoot(), {
       net,
-      offerOnub: flags.onub || flags.mock || true, // ONUB v2 is merged (round 5): every live lobby offers quick mode
       onStart: () => net.send('lobby.start', {}),
       onReady: (ready) => net.send('lobby.ready', { ready }),
       onLeave: () => void net.leave(),
-      onMode: (mode) => net.setMode(mode),
       onNpcDifficulty: (level) => net.setNpcDifficulty(level),
       onAddNpc: () => net.addNpc(),
       onRemoveNpc: () => net.removeNpc(),
@@ -47,6 +44,7 @@ export class Lobby extends Phaser.Scene {
       net.bus.off('left', onLeft);
       this.screen?.destroy();
       this.screen = null;
+      hideBackdrop();
     });
   }
 }

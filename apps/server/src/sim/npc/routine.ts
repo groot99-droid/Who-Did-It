@@ -18,6 +18,7 @@ import { type PlayerSim, simOf } from '../RoomSim';
 import { navGrid, profileOpen, sceneIndex, sceneKey, tileCentre } from '../World';
 import { type Act, type Brain, type NpcMemory, playRng } from './memory';
 import { GOAL_SLACK, drive, firstPortalToward, stand, walkThrough, walkTo, wander } from './walk';
+import { vendettaGoalFor } from '../vendettas/goal';
 
 // The NPC routine (GDD 3.12 "Routines", "Night"; npc.md 7): the persona, the stations and the one-tick brain that
 // walks to a station, stands at it, strolls and idles. `world.ts` calls `runRoutine` (or `runHome` in an unlit
@@ -389,6 +390,19 @@ function pickStation(
   const other = base.filter((st) => st.scene !== here && adjacent.has(st.scene));
   const dwellRun = tick >= brain.sceneDwellUntilTick;
   let pool = dwellRun ? (other.length > 0 ? other : own) : own;
+  // GDD 3.20 "NPC Killers": a vendetta's scene is one more place to work, drawn under the same weights (7H's
+  // `vendettaGoalFor`, no draw). It keeps the dwell and the one-hop rule, so it reads like any routine trip: in the
+  // goal scene the seat works there; elsewhere, once the dwell has run, its next trip is to the next scene on the way.
+  const goal = vendettaGoalFor(room, player.id);
+  if (goal) {
+    let toward: Station[] = [];
+    if (goal.sceneId === here) toward = own;
+    else if (dwellRun) {
+      const hop = firstPortalToward(here, sim.profile, (s) => s === goal.sceneId, map);
+      toward = hop ? other.filter((st) => st.scene === hop.to) : [];
+    }
+    if (toward.length > 0) pool = toward;
+  }
   let hunt = false;
   if (killer && litOnly) {
     const prey = preyStations(room, mem, brain, player, p);

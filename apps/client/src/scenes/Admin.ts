@@ -17,6 +17,7 @@ import { createMockAdmin } from '../admin/mockAdmin';
 import { ADMIN_COPY as C } from '../ui/copy';
 import { h, overlayRoot, type Screen } from '../ui/dom';
 import { getFlags } from './registry';
+import '../ui/admin.css';
 
 const viewKey = (sceneId: string) => `AdminView:${sceneId}`;
 

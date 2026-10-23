@@ -21,7 +21,11 @@
     "chapel",
     "cellar",
     "forest_deep",
-    "cave_gallery"
+    "cave_gallery",
+    "crumb_cold",
+    "crumb_mixing",
+    "crumb_oven",
+    "crumb_proofing"
   ],
   "hub": "overworld",
   "startSpawns": [

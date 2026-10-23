@@ -260,7 +260,7 @@ these classes and writes only layout in its own file. All of them read tokens (t
 | `.wdi-tag` | A seat tag, 24 px, Press Start 2P 12 px caps, the 2 px step | `--you` (violet, lilac), `--leader` (lantern, night), `--npc` (a lilac rim, no fill), `--ready` (violet with a stepped tick before the word). Each says its word, so none is told by colour alone |
 | `.wdi-seg--glass` | The glass look of the segmented radio group (`.wdi-seg`, `ui/artStyle/artStyle.css`): a `.wdi-glass` strip, options in Pixelify 600 14 px lilac | `.is-on` lantern with night text; `:disabled` 50% with `.wdi-seg__note` ("Coming later") beside the group |
 | `.wdi-title` | The game's title: two lines in Press Start 2P at display-xl (display-lg on phones), snow then lantern at 1.875 times that (`__line--accent`), each letter a `__ch` span with its index in `--i`, with a stepped violet then indigo shadow. The letters drop in one after another (`--wdi-title-step` apart, in pixel steps); `prefers-reduced-motion` shows them in place | `ui/theme/title.ts` `titleLetters(text)` builds the spans; the line carries the whole text as its accessible name and the letters are `aria-hidden` |
-| `.wdi-backdrop` | The loop behind the night screens (`ui/backdrop.ts`, 7B's third PR): the poster, the video, the veil, the vignette and the scanlines, fixed under `#overlay`'s content | `prefers-reduced-motion` pauses the video on its frame; `?video=0` never loads it and keeps the poster |
+| `.wdi-backdrop` | The loop behind the night screens (`ui/backdrop.ts`, 7B's third PR): the poster, the video, the veil, the vignette and the scanlines (`--wdi-scanline`, which only darkens), fixed under `#overlay`'s content; `__title` (the `.wdi-title`, top left, opt-in; the menu draws its own title, so Landing leaves it off) and `__status` (lilac, bottom centre: Boot's "Waking the village..." and the refresh message, then `build <id>`, which replaces the canvas `{ok, build}` line). `showBackdrop` and `hideBackdrop` are called by the menu scenes (Boot, Landing, Lobby, RoleReveal; GameOver and the Intro's end may join); testids `backdrop`, `backdrop-status` | `prefers-reduced-motion` pauses the video on its frame; `?video=0` never loads it and keeps the poster |
 
 ## 7. The role card
 
@@ -1306,7 +1306,7 @@ Lines are in `apps/client/src/ui/copy/tips.ts` (`LOADING_COPY`, `TIPS`); the sec
 | `loading.tipLabel` | Tip | the eyebrow above the tip |
 | `loading.progress` | Loading | the progress bar's accessible name |
 
-Tips are ten short lines about the controls and the world (hold E on a clue, Tab for the role card, Shift to sneak, locked doors, the Bell, dark places, meetings, clues in pairs, woods and caves); none names a role or what it can do. `data-testid`s: `loading` (the screen, hidden until the load passes `ui.loading.showAfterS`), `transition` (the cover layer), `landing-trailer` (the video's slot; the `<video>` inside it is `muted loop playsinline autoplay preload="none"` with the poster `landing_loop.jpg`, and the slot stays hidden until the poster or a frame arrives). The trailer is skipped under reduced motion, the data saver and `?video=0`.
+Tips are ten short lines about the controls and the world (hold E on a clue, Tab for the role card, Shift to sneak, locked doors, the Bell, dark places, meetings, clues in pairs, woods and caves); none names a role or what it can do. `data-testid`s: `loading` (the screen, hidden until the load passes `ui.loading.showAfterS`), `transition` (the cover layer), `landing-trailer` was the video's slot; since round 7 the loop behind the menu is 7B's backdrop (`ui/backdrop.ts`, section 6) and the menu only starts the `lobby` theme on the first tap (7C, A107). The loop is skipped under reduced motion, the data saver and `?video=0` as before.
 
 ### 14.23 Admin page (6D)
 
@@ -1356,6 +1356,15 @@ with the system style; the arrival and the brake are `noise` pulses whose `kind`
 | the arrival (server, `Train.ts` `TRAIN_ARRIVE_LINE`) | The train pulls into the station. | `chat.msg` `system`, every seat, once per day |
 | `log.train` (`ui/copy/world.ts`) | The train pulls in at the platform | the HUD log of a seat that hears `train_arrive`; `World.ring` plays the two `train_*` pulses as sounds and draws no ring |
 
+The Vicar's memorial (GDD 3.20) is a cutscene, `memorialVicar` in `cutscenes.json` (kind `memorial`), sent to every
+seat as `cutscene { id: 'memorialVicar', scope: 'all' }` at the reveal after a seat in the Vicar's look dies by the
+Knife. Its `video` step plays `memorial_vicar` once 7A's `CutscenePlayer` renders video steps; until then the client
+drops a `scope: 'all'` cutscene. Its caption is one block at the end of `ui/copy/cutscenes.ts`:
+
+| Copy id | Text | Where |
+|---|---|---|
+| `cs.memorial.vicar` | In memory of the Vicar of HollowMere, who fell to the Knife. | `title` caption over the first 5 s of the film |
+
 ### 14.24 Opening cinematic (6Q)
 
 Lines are in `apps/client/src/ui/copy/intro.ts` (`INTRO_COPY`). The `Intro` scene sits between `Preload` and `Landing` (never before `Admin`).
@@ -1388,7 +1397,15 @@ asked where it is used.
 | `menu.friends` | Friends | opens the friends list (greyed with `menu.soon` until it lands) |
 | `menu.settings` | Settings | opens the sound panel of UI.md 14.22 in a dialog |
 | `menu.help`, `menu.credits` | How to Play, Credits | small links, a new tab: `${BASE}help/` and the repository's `CREDITS.md` |
-| `menu.quit` | Quit | small button (greyed with `menu.soon` until it lands) |
+| `join.title`, `parties.title` | Join a game, Open parties | Join Game's dialog: the party list above the code field (`party-list`, rows `party-row` with `data-code`) |
+| `parties.players`, `parties.tag.friend` | {n} / {max}, Friend's party | each row: the leader, players / max, mode and map; a private row (one the viewer is invited to) carries the tag |
+| `parties.empty` | No open parties right now. Have a code? Type it below. | the empty state (`party-list-empty`), also what a 429, a network error or a bad body shows; the list asks again every `party.listRefreshS` |
+| `parties.pick.name` | Type your name to join {leader}. | a tap on a row joins by its code; with no name typed it fills the code and asks for one |
+| `invite.title`, `invite.empty`, `invite.count` | Invite friends, Add friends from the menu to invite them., {n} / {max} invited | the Start dialog's pick (`invite-pick`) when Private is chosen: the friends as checkboxes, capped by `party.invitedMax` |
+| `menu.quit` | Quit | small button; opens the confirm below |
+| `quit.title`, `quit.body` | Leave Who Did It?, If you are in a party you leave it, and the music stops. | the confirm dialog |
+| `quit.confirm`, `quit.cancel` | Quit, Stay | `quit-confirm`; Stay closes the dialog |
+| `quit.bye.title`, `quit.bye.body`, `quit.back` | See you soon, You can close this tab now., Back to the menu | the goodbye panel after the consented leave and the music to silence (`quit-bye`, `quit-back`); `window.close()` runs first, only in a window the page opened itself |
 | `menu.soon` | Coming later | the note on a greyed button (the title and screen-reader text on the small one) |
 | `menu.haveCode` | Have a code? | the party list's link to the code box |
 | `menu.chip.guest`, `menu.chip.label` | Guest, Profile: {name} | the top-right chip |
@@ -1403,8 +1420,8 @@ asked where it is used.
 | `settings.title` | Settings | the settings dialog |
 
 A failed create or join says the generic error (`JOIN_FAILED_MESSAGE`, UI.md 1.6) in the dialog's one `role="alert"`
-line, or the refresh line when the build is stale. `data-testid`s: `menu`, `menu-chip`, `menu-sound`, `menu-build`,
-`landing-trailer` (kept). The e2e fixture `e2e/fixtures/party.ts` (`createParty`, `joinParty`) drives the buttons and
+line, or the refresh line when the build is stale. `data-testid`s: `menu`, `menu-chip`, `menu-sound`, `menu-build`
+(`landing-trailer` left with the trailer in #110). The e2e fixture `e2e/fixtures/party.ts` (`createParty`, `joinParty`) drives the buttons and
 labels above; a visible label that changes changes there.
 
 ### 14.26 Lobby re-skin (7E, round 7)
@@ -1413,11 +1430,9 @@ The lobby's lines stay in `apps/client/src/ui/copy/lobby.ts`; the re-skin (A103,
 
 | Key | Text | Where |
 |---|---|---|
-| `lobby.friend.add` | Add friend | a seat row that carries a `profile` (`data-testid="add-friend"`) |
-| `lobby.friend.add.label` | Add {name} as a friend | that button's accessible name |
-| `lobby.friend.added` | Friend | the same button once the profile is on the device's list; it is disabled |
+| (`friends.seat.*`) | Add friend | a seat row that carries a `profile` (`data-testid="add-friend"`): 7C's `addFriendButton` from `ui/menu/friends.ts`, copy in 14.25 |
 
-- **Columns.** A: the party code in display type (`party-code`), Copy invite link, Change mode (`mode-toggle`) beside Add NPC (`add-npc`) with Remove NPC (`remove-npc`) as a small minus (`aria-label` "Remove NPC"), the NPC skill select (`npc-difficulty`) with its locked note, the mode chip (`mode-chip`) in the card's corner, then "Players n / 10" with the You, Leader, Ready and Away tags. B: the map, the art style, the sound settings and the quick-mode deck editor. C: the deck as chips with its two notes, Start (leader), Ready, Leave. Below 900 px the columns stack.
+- **Columns.** A: the party code in display type (`party-code`), Copy invite link, Change mode (`mode-toggle`; it and `mode-chip` go with the quick mode, A115, and are not restyled further) beside Add NPC (`add-npc`) with Remove NPC (`remove-npc`) as a small minus (`aria-label` "Remove NPC"), the NPC skill select (`npc-difficulty`) with its locked note, the mode chip (`mode-chip`) in the card's corner, then "Players n / 10" with the You, Leader, Ready and Away tags. B: the map, the art style, the sound settings and the quick-mode deck editor. C: the deck as chips with its two notes, Start (leader), Ready, Leave. Below 900 px the columns stack.
 - **Column B.** The map cards (`map-select`, one `radio` per map, the picked one with a tick; a non-leader sees the picked card only), the art-style segment (`art-style*`, `.wdi-seg--glass`, HD disabled with its "Coming later" note) and, in the quick mode, the deck editor (`deck-editor`, `deck-role-*`) as chips in the deck's style. A map whose thumbnail has not loaded keeps a dark frame. No line changes.
 - **Tags.** The NPC tag is not shown: the lobby snapshot carries only the NPC seat count, not which seats they are, and the wire is not widened for a tag. Add friend shows only where a seat's `profile` is in the snapshot; until the client's roster mapping carries it, no row offers it.
 - **Left out.** The mockup's "Locate" button has no feature.
@@ -1463,6 +1478,20 @@ is never cut: the cutscene Skip, the intro's Skip and Begin (`.wdi-glass-btn--sm
 (`.wdi-glass`) use them; the snow label is 9.51 at worst on that glass, so it holds over the world. The HUD chip, the
 role chip, the settings gear and panel and the captions keep `--wdi-match-glass`, because their text is lilac or
 muted lilac, which the 66% fill does not carry over bare white.
+
+### 14.28 Table screens in the night theme (7G)
+
+Session 7G, round 7 (DECISIONS A111; `docs/round7/ui-reskin.md` 4). The meeting, the game over, the main-mode cards, the seat picker and the over view wear the owner's mockups: `ui/table.css` holds every rule,
+scoped under `.wdi-table` so they beat the paper components without editing `components.css`, and read tokens only. Press Start
+2P carries titles, the clock, tabs, button labels and one-word tags; Pixelify Sans carries headings, tile names, hints and
+claim chips; Inter stays for chat and the report, which run past two lines (A106). Every id and class the specs find is
+unchanged; the copy of 14.6 to 14.10, 14.14 and 14.16 is unchanged. No new copy: the game-over Add friend action is 7C's `addFriendButton` (`ui/menu/friends.ts`, copy in `ui/copy/menu.ts`).
+
+The Add friend action on a game-over row is 7C's `addFriendButton`, shown only for a seat that carries a `profile` and never on your own row. The faction chip on a row stays the one place a faction shows for another seat.
+
+### 14.31 The admin page in the night theme (7G)
+
+Session 7G, round 7 (DECISIONS A111). The owner's admin page (14.23) wears the table screens' dark glass: `ui/admin.css` holds every rule, each doubling its own class so it beats the paper rules of `components.css` (not edited) and does not depend on the `.wdi-admin` root, because the sign-in panel and the notice are mounted outside it. Indigo glass fill with a snow rim, lilac text; Press Start 2P on the controls, panel headings and sign-in title, Pixelify Sans on the rest, Inter on the log (running text, A106); the pressed speed button, the seat, Start and a failed invariant row take the lantern accent. No blur and no `clip-path`: six live viewports run behind the panels. The copy of 14.23, every id and testid, and the markup are unchanged, and no new lines are added.
 
 ### 14.29 Vendettas (7H)
 

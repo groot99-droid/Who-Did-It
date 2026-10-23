@@ -70,7 +70,6 @@ interface GameStateLike {
   startTick: number;
   players: Collection<PlayerState> & { get(id: string): PlayerState | undefined };
   scenes: { forEach(cb: (s: SceneStateLike, id: string) => void): void };
-  settings?: { mode?: number };
 }
 
 export class ColyseusWorldFeed implements WorldFeed {
@@ -176,10 +175,6 @@ export class ColyseusWorldFeed implements WorldFeed {
       scene.doors.forEach((d) => out.push({ id: d.id, state: d.state, swingUntilTick: d.swingUntilTick })),
     );
     return out;
-  }
-
-  mode(): 'main' | 'onub' {
-    return this.state.settings?.mode === 1 ? 'onub' : 'main';
   }
 
   bodies(): BodySnap[] {

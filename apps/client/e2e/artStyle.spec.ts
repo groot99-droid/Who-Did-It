@@ -4,8 +4,8 @@ import { expect, test, type Page } from '@playwright/test';
 import { createParty } from './fixtures/party';
 
 // The art-style switch (A79) on the mocks, with a tiny fixture low-poly manifest: the match stays up, the textures
-// change by key, and a failed swap keeps the old style. The 8-bit root manifest is real plus two fixture images (a
-// 4 px tile and a 4 px kitchen); the low-poly fixture re-skins both at 8 px with the `linear` filter.
+// change by key, and a failed swap keeps the old style. The 8-bit root manifest is real plus a fixture image (a
+// 4 px tile); the low-poly fixture re-skins it at 8 px with the `linear` filter.
 
 const fixture = (name: string) => readFileSync(fileURLToPath(new URL(`./fixtures/${name}`, import.meta.url)));
 const PNG = { 'content-type': 'image/png' };
@@ -30,21 +30,13 @@ declare global {
 async function fixtures(page: Page, opts: { lowpoly: boolean } = { lowpoly: true }): Promise<void> {
   await page.route('**/assets/manifest.json', async (route) => {
     const body = (await (await route.fetch()).json()) as { entries: unknown[] };
-    // The fixture images replace the real tiles_grass and onub_kitchen entries.
-    body.entries = body.entries.filter(
-      (e) => !['tiles_grass', 'onub_kitchen'].includes((e as { key: string }).key),
-    );
-    body.entries.push(
-      { key: 'tiles_grass', type: 'image', url: 'e2e/tiles_grass.png', filter: 'nearest' },
-      { key: 'onub_kitchen', type: 'image', url: 'e2e/onub_kitchen.png', filter: 'nearest', modes: ['onub'] },
-    );
+    // The fixture image replaces the real tiles_grass entry.
+    body.entries = body.entries.filter((e) => (e as { key: string }).key !== 'tiles_grass');
+    body.entries.push({ key: 'tiles_grass', type: 'image', url: 'e2e/tiles_grass.png', filter: 'nearest' });
     await route.fulfill({ json: body });
   });
   await page.route('**/assets/e2e/tiles_grass.png', (r) =>
     r.fulfill({ body: fixture('tiles_grass_8bit.png'), headers: PNG }),
-  );
-  await page.route('**/assets/e2e/onub_kitchen.png', (r) =>
-    r.fulfill({ body: fixture('onub_kitchen_8bit.png'), headers: PNG }),
   );
   if (!opts.lowpoly) {
     // The manifest loads but its image does not: the swap fails and the old textures stay.
@@ -121,22 +113,6 @@ test('switching in the world swaps the textures and keeps the match', async ({ p
   await page.getByTestId('hud').getByTestId('art-style-8bit').click();
   await expect.poll(() => probe(page, 'tiles_grass').then((p) => p.width)).toBe(4);
   expect((await probe(page, 'tiles_grass')).scale).toBe(before.scale);
-});
-
-test('switching in a quick-mode scene swaps the kitchen', async ({ page }) => {
-  await fixtures(page);
-  await page.goto('/Who-Did-It/?mock=1&mode=onub&speed=2');
-  await createParty(page, 'Hana');
-  await expect(page.getByTestId('start')).toBeEnabled({ timeout: 10_000 });
-  await page.getByTestId('start').click();
-  await page.getByTestId('confirm-start').click();
-  await page.getByTestId('ready').click();
-  await expect(page.getByTestId('kitchen')).toBeVisible({ timeout: 20_000 });
-  expect((await probe(page, 'onub_kitchen')).width).toBe(4);
-  await page.getByTestId('art-style-lowpoly').click();
-  await expect.poll(() => probe(page, 'onub_kitchen').then((p) => p.width)).toBe(8);
-  await expect(page.getByTestId('kitchen')).toBeVisible();
-  expect(await active(page, 'Kitchen')).toBe(true);
 });
 
 test('a failed swap stays on the old style and says so', async ({ page }) => {

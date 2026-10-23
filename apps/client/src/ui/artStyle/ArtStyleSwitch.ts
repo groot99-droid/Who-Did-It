@@ -161,11 +161,7 @@ export function mountArtStyleSwitch(root: HTMLElement, opts: { compact?: boolean
     h('span', { class: 'wdi-label wdi-artstyle__label', id: labelId }, C['artStyle.label']),
     group,
     reserved.length > 0
-      ? h(
-          'span',
-          { class: 'wdi-hint wdi-seg__note wdi-artstyle__hint', id: hintId },
-          C['artStyle.reserved.hint'],
-        )
+      ? h('span', { class: 'wdi-seg__note wdi-artstyle__hint', id: hintId }, C['artStyle.reserved.hint'])
       : null,
   );
   root.append(el);
@@ -180,7 +176,7 @@ export function mountArtStyleSwitch(root: HTMLElement, opts: { compact?: boolean
   };
 }
 
-/** The in-match placement for the DOM-only quick-mode screens: a small fixed control at the bottom left. */
+/** The in-match placement for the DOM-only match screens (the meeting): a small fixed control at the bottom left. */
 export function mountMatchArtSwitch(root: HTMLElement): ArtStyleSwitch {
   const wrap = h('div', { class: 'wdi-artcorner' });
   root.append(wrap);

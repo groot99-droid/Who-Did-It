@@ -8,9 +8,6 @@ import {
   type CreateOptions,
   type ErrorPayload,
   type GameOverPayload,
-  gameModeId,
-  GameMode,
-  type GameModeId,
   JOIN_FAILED_MESSAGE,
   type JoinOptions,
   type LobbyPlayer,
@@ -46,11 +43,10 @@ export interface LobbySnapshot {
 }
 
 /**
- * The settings a fresh room shows before its state arrives (mode main, the default level, no NPC seats, the
- * default map).
+ * The settings a fresh room shows before its state arrives (the default level, no NPC seats, the default map).
  */
 export function defaultSettings(defaultLevel: NpcLevelId = 'normal'): LobbySettings {
-  return { mode: 'main', npcDifficulty: defaultLevel, npcSeats: 0, onubDeck: [], map: DEFAULT_MAP_ID };
+  return { npcDifficulty: defaultLevel, npcSeats: 0, map: DEFAULT_MAP_ID };
 }
 
 export type NetEvents = {
@@ -105,16 +101,12 @@ export interface NetworkService {
     timeoutMs?: number,
   ): Promise<Res>;
   leave(): Promise<void>;
-  /** Leader only (the server refuses anyone else): `lobby.settings {mode}`. */
-  setMode(mode: GameModeId): void;
   /** Leader only: `lobby.settings {npcDifficulty}`; the server accepts it with enough NPC seats. */
   setNpcDifficulty(level: NpcLevelId): void;
   /** Leader only: `lobby.addNpc`. */
   addNpc(): void;
   /** Leader only: `lobby.removeNpc`; the server drops the most recently added NPC seat. */
   removeNpc(): void;
-  /** Leader only: `lobby.settings {onubDeck}`, a custom quick-mode deck (`[]` for the default, GDD 3.11). */
-  setOnubDeck(deck: readonly string[]): void;
   /**
    * Leader only: `lobby.settings {map}`, a map id of `MAP_IDS` (GDD 3.13). The lobby's map row calls it; the
    * server ignores the field until Session 5J reads it.
@@ -135,15 +127,10 @@ interface PlayerState {
   profile?: string;
 }
 
-/**
- * `state.settings` as the lobby reads it (numbers: `GameMode`, `NpcLevel`, a seat count; the deck's role ids;
- * the map id).
- */
+/** `state.settings` as the lobby reads it (numbers: `NpcLevel`, a seat count; the map id). */
 interface SettingsState {
-  mode: number;
   npcDifficulty: number;
   npcSeats: number;
-  onubDeck?: Iterable<string>;
   map?: string;
 }
 
@@ -152,9 +139,6 @@ interface LobbyCallbacks {
   onAdd(prop: 'players', handler: (player: PlayerState, key: string) => void): () => void;
   onRemove(prop: 'players', handler: (player: PlayerState, key: string) => void): () => void;
   onChange(instance: object, handler: () => void): () => void;
-  /** A collection field of `instance` (the deck): an item added or changed. */
-  onChange(instance: object, prop: 'onubDeck', handler: () => void): () => void;
-  onRemove(instance: object, prop: 'onubDeck', handler: () => void): () => void;
   listen(prop: 'leaderId', handler: (value: string) => void): () => void;
   listen(prop: 'settings', handler: (value: SettingsState) => void): () => void;
 }
@@ -227,10 +211,6 @@ export class ColyseusNetwork implements NetworkService {
     return this.current.request<ClientMessages[K], Res>(type as never, payload, { timeout: timeoutMs });
   }
 
-  setMode(mode: GameModeId): void {
-    this.send('lobby.settings', { mode: GameMode[mode] });
-  }
-
   setNpcDifficulty(level: NpcLevelId): void {
     this.send('lobby.settings', { npcDifficulty: NpcLevel[level] });
   }
@@ -241,10 +221,6 @@ export class ColyseusNetwork implements NetworkService {
 
   removeNpc(): void {
     this.send('lobby.removeNpc', {});
-  }
-
-  setOnubDeck(deck: readonly string[]): void {
-    this.send('lobby.settings', { onubDeck: [...deck] });
   }
 
   setMap(mapId: string): void {
@@ -322,20 +298,13 @@ export class ColyseusNetwork implements NetworkService {
       cb.listen('settings', (value: SettingsState) => {
         const read = () => {
           this.settings = {
-            mode: gameModeId(value.mode),
             npcDifficulty: npcLevelId(value.npcDifficulty),
             npcSeats: value.npcSeats,
-            onubDeck: [...(value.onubDeck ?? [])],
             map: value.map || DEFAULT_MAP_ID,
           };
           emit();
         };
-        // The deck is a collection: its items change without a change of `settings` itself.
-        this.disposers.push(
-          cb.onChange(value, read),
-          cb.onChange(value, 'onubDeck', read),
-          cb.onRemove(value, 'onubDeck', read),
-        );
+        this.disposers.push(cb.onChange(value, read));
         read();
       }),
     );

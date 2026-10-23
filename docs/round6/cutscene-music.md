@@ -62,6 +62,12 @@ round-8 content (BlackPine ships a two-step camera pan with no narrator in round
   overlay root for `Captions.ts`, the `AudioBus` and the input for Skip (Esc, a tap on the Skip button, both
   only when `skippable`). Under `prefers-reduced-motion` camera steps become cuts; `?cutscene=0` (dev flag in
   `view/devFlags.ts`) disables every cutscene.
+- **Round 7 (7A, A101): the `video` step.** `cutscene/video.ts` finds the step's `key` in
+  `assets/video/manifest.json` (fetched once) and mounts a full-frame `<video playsinline>` at the back of the
+  cutscene layer, under the captions and Skip; its sound follows the music slider and mute, falling back to muted when
+  autoplay with sound is refused. The step is open-ended (`sequencer.ts`), so captions over it carry `withPrevious`;
+  the cutscene finishes `done` when the video ends, and Skip, Esc or `maxS` release the stream. A missing row or a
+  decode error drops the picture with a warning and the cutscene runs on.
 - `World.ts` plays the opening after its `fadeIn` (`client/scenes/World.ts:263`) when `REG_CUTSCENE` is set
   (pre-seeded registry key and the mount line; `worldRouter.ts` sets it from the `cutscene` feed event); the
   `onKilled` handler plays the death cutscene of `killed.cutsceneId` and then enters ghost mode exactly as
@@ -104,8 +110,10 @@ round-8 content (BlackPine ships a two-step camera pan with no narrator in round
   map it is listed under. `loop: false` (round 7, 7A) plays a playlist once and leaves the bus silent at its end
   (`MusicBus.onFinish` tells the director); a playlist without it loops.
 - **Round 7 (7A, DECISIONS A101): the opening piece.** The owner's `load_hollowmere` and `load_blackpine` are the
-  maps' intro tracks, in the `<map>_opening` playlists (`loop: false`) of the `opening` class; `loading` maps to
-  `lobby`, so the load keeps the lobby piece. The director starts `opening` when the router leaves the opening's id
+  maps' intro tracks, in the `<map>_opening` playlists (`loop: false`) of the `opening` class. No map lists a
+  `loading` playlist, so the match load leaves the bus alone and the lobby piece plays on: the opening's `cutscene`
+  message reaches the client before the World preloads, and a `loading` request then cut the opening piece off
+  0.2 s after it began (the owner's report of 2026-10-23, A101). The director starts `opening` when the router leaves the opening's id
   under `REG_CUTSCENE`, holds every phase class until the piece ends or the player emits `CUTSCENE_END` with
   `skipped` (`cutscene/sequencer.ts`), then cross-fades to the class the phase wants (the `day` during grace).
 - **`packages/content/data/music.json`** (pre-seeded empty, zod `schemas/music.ts`): `byMap[map][class]` ->

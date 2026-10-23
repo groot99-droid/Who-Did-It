@@ -2,7 +2,6 @@ import mitt, { type Emitter } from 'mitt';
 import type { Room } from '@colyseus/sdk';
 import type {
   ChatLine,
-  MatchMode,
   GameOver,
   MeetingFeed,
   MeetingFeedEvents,
@@ -20,6 +19,7 @@ interface PlayerState {
   name: string;
   traits?: { height: number; scarf: number; hat: number };
   look?: string;
+  profile?: string;
   alive: boolean;
   hasVoted: boolean;
   priv?: { myVote?: string };
@@ -33,7 +33,6 @@ interface GameStateLike {
     get(id: string): PlayerState | undefined;
   };
   meeting?: MeetingInfo;
-  settings?: { mode?: number };
 }
 
 export class ColyseusMeetingFeed implements MeetingFeed {
@@ -86,10 +85,6 @@ export class ColyseusMeetingFeed implements MeetingFeed {
     return this.room.state as unknown as GameStateLike;
   }
 
-  mode(): MatchMode {
-    return this.state.settings?.mode === 1 ? 'onub' : 'main';
-  }
-
   roster(): MeetingPlayer[] {
     const out: MeetingPlayer[] = [];
     this.state.players.forEach((p) =>
@@ -100,6 +95,7 @@ export class ColyseusMeetingFeed implements MeetingFeed {
         look: p.look ?? '',
         alive: p.alive,
         hasVoted: p.hasVoted,
+        profile: p.profile ?? '',
       }),
     );
     return out;

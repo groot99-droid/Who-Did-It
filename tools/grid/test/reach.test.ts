@@ -81,3 +81,11 @@ describe('greybox reachability of the M3 interiors and outdoor scenes', () => {
     expectDoorsReachable('cave_entry', 'mouth');
   });
 });
+
+describe("greybox reachability of Crumb's Ovens and its station rooms (A116, A118)", () => {
+  it('reaches all five doors of the bakery from its street door, and each room door from its spawn', () => {
+    expectDoorsReachable('bakery', 'door');
+    for (const id of ['crumb_cold', 'crumb_mixing', 'crumb_oven', 'crumb_proofing'])
+      expectDoorsReachable(id, 'door');
+  });
+});

@@ -8,7 +8,7 @@ import { fill } from '../copy';
 import { h, icon } from '../dom';
 
 export interface MapPicker {
-  /** Re-reads the lobby: the mode, the leader and `settings.map`. */
+  /** Re-reads the lobby: the leader and `settings.map`. */
   update(s: LobbySnapshot): void;
   destroy(): void;
 }
@@ -25,7 +25,7 @@ export interface MapRow {
 /** The map files in lobby order (`MAP_IDS`, append-only; a test pins the two lists together). */
 export const MAP_ROWS: readonly MapRow[] = [hollowmere, blackpine];
 
-/** The maps offered in a mode: those whose `modes` lists it (none in the quick mode, which does not walk). */
+/** The maps offered in a mode: those whose `modes` lists it. */
 export const mapsForMode = (mode: string): MapRow[] => MAP_ROWS.filter((m) => m.modes.includes(mode));
 
 /** The row to show as chosen: `settings.map` when it is offered, else the first offered map. */
@@ -35,9 +35,9 @@ export function chosenMap(rows: readonly MapRow[], mapId: string): MapRow | unde
 
 /**
  * The lobby's map row (GDD 3.13, round-5 world schemas 9.2): the name, the blurb and the thumbnail of every map
- * whose `modes` holds the chosen mode, under the frozen test id `map-select`. The leader picks with `net.setMap`;
- * everyone else reads one line. `ui/Lobby.ts` mounts it in its own slot under the settings and hides that slot in
- * the quick mode; the row also renders nothing when no map is offered. A map whose `thumb_<mapId>` is not in the
+ * whose `modes` holds the main mode, under the frozen test id `map-select`. The leader picks with `net.setMap`;
+ * everyone else reads one line. `ui/Lobby.ts` mounts it in its own slot under the settings; the row renders
+ * nothing when no map is offered. A map whose `thumb_<mapId>` is not in the
  * manifest yet shows its name and blurb only.
  */
 export function mountMapPicker(root: HTMLElement, net: NetworkService): MapPicker {
@@ -75,17 +75,21 @@ export function mountMapPicker(root: HTMLElement, net: NetworkService): MapPicke
       'span',
       { class: 'wdi-map__text' },
       h('span', { class: 'wdi-map__name' }, title),
-      h('span', { class: 'wdi-hint wdi-lobby__note' }, m.blurb),
+      h('span', { class: 'wdi-glass-panel__hint' }, m.blurb),
     );
 
   function render(s: LobbySnapshot): void {
     root.replaceChildren();
-    const rows = mapsForMode(s.settings.mode);
+    const rows = mapsForMode('main');
     const chosen = chosenMap(rows, s.settings.map);
     if (!chosen) return;
     const row = h('div', { class: 'wdi-map', 'data-testid': 'map-select', 'data-map': chosen.id });
     if (s.selfId === s.leaderId) {
-      const label = h('span', { class: 'wdi-lobby__title', id: 'map-select-label' }, C['lobby.map.label']);
+      const label = h(
+        'span',
+        { class: 'wdi-glass-panel__title', id: 'map-select-label' },
+        C['lobby.map.label'],
+      );
       const group = h('div', {
         class: 'wdi-map__list',
         role: 'radiogroup',

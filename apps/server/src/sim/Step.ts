@@ -7,6 +7,7 @@ import { runDecay } from './Clues';
 import { runAuto } from './auto/Auto';
 import { runEvents } from './events/bus';
 import { runVendettas } from './vendettas/run';
+import { runMemorial } from './Memorial';
 import { runMobs } from './Mobs';
 import { runQuests } from './Quests';
 import { runResources } from './Resources';
@@ -26,7 +27,7 @@ import { reconcileViews } from './Visibility';
 // Fixed order inside setFixedTimestep (ARCHITECTURE 5.6). Stages without a milestone yet are empty.
 // Round 6 (docs/round6/seams.md 1.3, locked call sites): `runAuto` before the brains; `runResources`, `runMobs` and
 // `runQuests` in the old `runAiAndHazards` slot after the clue decay; `runEvents` after the phases. Round 7: `runTrain`
-// after `runEvents`, so the Train's events reach the bus on the next tick; then `runVendettas` (7H).
+// after `runEvents`, so the Train's events reach the bus on the next tick; then `runVendettas` (7H) and `runMemorial`.
 
 /** Keeps one PlayerSim per seated player and places newcomers when the match is on. */
 function syncRoster(room: PartyRoom): void {
@@ -69,4 +70,5 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   runEvents(room); // round 6, 6B: deliver the tick's sim events (locked call site)
   runTrain(room); // round 7, 7I: the Daily Train (locked call site)
   runVendettas(room); // round 7, 7H: the vendettas' watched goals (GDD 3.20)
+  runMemorial(room); // round 7, 7I: the Vicar's memorial, bus listeners registered once (locked call site)
 }

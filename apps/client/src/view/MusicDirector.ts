@@ -189,7 +189,7 @@ export function installMusicDirector(game: Phaser.Game, net: NetworkService): ()
   const bus = game.registry.get(REG_MUSIC) as MusicBus | undefined;
   if (bus === undefined) return () => undefined;
   const c = new MusicConductor(bus);
-  const onLobby = (s: LobbySnapshot) => c.lobby(s.settings.map, s.settings.mode);
+  const onLobby = (s: LobbySnapshot) => c.lobby(s.settings.map, 'main');
   const onPhase = (p: { phase: number }) => c.phase(p.phase);
   const onOver = () => c.gameOver();
   const onLeft = () => c.left();

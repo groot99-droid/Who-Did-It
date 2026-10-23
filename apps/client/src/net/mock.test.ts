@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import balanceJson from '@wdi/content/data/balance.json';
-import onubRoles from '@wdi/content/data/roles.onub.json';
 import { MockNetwork } from './mock';
 import type { LobbySnapshot } from './NetworkService';
 
@@ -24,26 +23,13 @@ async function lobby(net: MockNetwork): Promise<LobbySnapshot> {
 }
 
 describe('MockNetwork lobby settings', () => {
-  it('starts in the main mode with the default level and no NPC seats', async () => {
+  it('starts with the default level and no NPC seats', async () => {
     const snap = await lobby(new MockNetwork());
     expect(snap.settings).toEqual({
-      mode: 'main',
       npcDifficulty: defaultDifficulty,
       npcSeats: 0,
-      onubDeck: [],
       map: 'hollowmere',
     });
-    expect((await lobby(new MockNetwork('onub'))).settings.mode).toBe('onub');
-  });
-
-  it('setMode changes the mode for the leader and announces it', async () => {
-    const net = new MockNetwork();
-    await lobby(net);
-    const seen: string[] = [];
-    net.bus.on('lobby', (s) => seen.push(s.settings.mode));
-    net.setMode('onub');
-    expect(net.snapshot?.settings.mode).toBe('onub');
-    expect(seen).toEqual(['onub']);
   });
 
   it('addNpc and removeNpc change the roster and the count; remove drops the newest seat', async () => {
@@ -84,24 +70,13 @@ describe('MockNetwork lobby settings', () => {
     const net = new MockNetwork();
     await net.join('K7M2P', 'Gus');
     vi.advanceTimersByTime(5000);
-    net.setMode('onub');
     net.addNpc();
-    net.setOnubDeck(['chef']);
     net.setMap('blackpine');
     expect(net.snapshot?.settings).toEqual({
-      mode: 'main',
       npcDifficulty: defaultDifficulty,
       npcSeats: 0,
-      onubDeck: [],
       map: 'hollowmere',
     });
-  });
-
-  it('keeps a custom quick-mode deck from the leader', async () => {
-    const net = new MockNetwork('onub');
-    await lobby(net);
-    net.setOnubDeck(['chef', 'aboyeur']);
-    expect(net.snapshot?.settings.onubDeck).toEqual(['chef', 'aboyeur']);
   });
 
   it('keeps the map the leader picks and announces it', async () => {
@@ -116,16 +91,7 @@ describe('MockNetwork lobby settings', () => {
 });
 
 describe('MockNetwork Start', () => {
-  it('deals a quick-mode card in quick mode and the main-mode card otherwise', async () => {
-    const quick = new MockNetwork('onub');
-    await lobby(quick);
-    quick.send('lobby.start', {});
-    vi.advanceTimersByTime(1000);
-    expect(quick.roleCard?.beware).toBe(onubRoles.cardLine);
-    expect(quick.roleCard?.roleId).toBe('chef');
-    expect(quick.roleCard?.teamName).toBe(onubRoles.teams.baker.name);
-    expect(quick.roleCard?.abilities).toEqual([]);
-
+  it('deals the main-mode card', async () => {
     const main = new MockNetwork();
     await lobby(main);
     main.send('lobby.start', {});

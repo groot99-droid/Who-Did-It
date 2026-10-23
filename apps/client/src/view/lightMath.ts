@@ -141,8 +141,8 @@ export const glowAlpha = (darkness: number): number => L.glowAlpha * darkness;
 const PHASE = { dusk: 4, night: 5, dawn: 6, finalNight: 11 } as const;
 
 /**
- * 0 in full day, 1 at night; dusk (and quick mode's dawn, eased the same way) goes between them over its
- * length. `duskTicks` is that length: `balance.phases.duskS` unless the quick-mode dusk is meant.
+ * 0 in full day, 1 at night; dusk (and dawn, eased the same way) goes between them over its length.
+ * `duskTicks` is that length: `balance.phases.duskS` by default.
  */
 export function darknessOf(
   phase: number,

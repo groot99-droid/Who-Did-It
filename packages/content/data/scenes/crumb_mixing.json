@@ -1,0 +1,69 @@
+{
+  "id": "crumb_mixing",
+  "prefix": "cm",
+  "name": "Crumb's mixing room",
+  "zoneId": "crumb_mixing",
+  "profile": "small",
+  "kind": "interior",
+  "biome": "house",
+  "dark": false,
+  "size": { "w": 12, "h": 9 },
+  "notes": "Le Pétrin: the dough mixer in the back corner, sacks of farine along the west wall, the shaping table and the water buckets.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "cm.door",
+      "from": "crumb_mixing",
+      "x": 6,
+      "y": 8,
+      "kind": "door",
+      "to": "bakery",
+      "toSpawn": "mixing_room",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [{ "id": "door", "x": 6, "y": 7, "z": 0, "facing": "n" }],
+  "spots": [
+    {
+      "id": "cm.flour_sacks",
+      "kind": "hide",
+      "variant": "pantry",
+      "x": 1,
+      "y": 2,
+      "childOnly": false
+    },
+    { "id": "cm.trunk", "kind": "body", "variant": "trunk", "x": 10, "y": 7, "childOnly": false }
+  ],
+  "props": [],
+  "gates": [],
+  "paths": [],
+  "lights": [{ "id": "cm.lt_lamp", "kind": "lamp", "x": 5, "y": 4, "radiusTiles": 3 }],
+  "grid": [
+    "############",
+    "#..........#",
+    "#H.........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#.....S...B#",
+    "######D#####"
+  ],
+  "material": [
+    "WWWWWWWWWWWW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WWWWWWWWWWWW"
+  ]
+}
