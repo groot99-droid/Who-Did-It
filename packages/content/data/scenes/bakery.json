@@ -26,9 +26,79 @@
       "elevationDelta": 0,
       "minProfile": "small",
       "ships": "V1"
+    },
+    {
+      "id": "bk.oven_room",
+      "from": "bakery",
+      "x": 5,
+      "y": 0,
+      "kind": "door",
+      "to": "crumb_oven",
+      "toSpawn": "door",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "bk.mixing_room",
+      "from": "bakery",
+      "x": 8,
+      "y": 0,
+      "kind": "door",
+      "to": "crumb_mixing",
+      "toSpawn": "door",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "bk.proofing_room",
+      "from": "bakery",
+      "x": 11,
+      "y": 0,
+      "kind": "door",
+      "to": "crumb_proofing",
+      "toSpawn": "door",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    },
+    {
+      "id": "bk.cold_room",
+      "from": "bakery",
+      "x": 14,
+      "y": 0,
+      "kind": "door",
+      "to": "crumb_cold",
+      "toSpawn": "door",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
     }
   ],
-  "spawns": [{ "id": "door", "x": 8, "y": 9, "z": 0, "facing": "n" }],
+  "spawns": [
+    { "id": "door", "x": 8, "y": 9, "z": 0, "facing": "n" },
+    { "id": "oven_room", "x": 5, "y": 1, "z": 0, "facing": "s" },
+    { "id": "mixing_room", "x": 8, "y": 1, "z": 0, "facing": "s" },
+    { "id": "proofing_room", "x": 11, "y": 1, "z": 0, "facing": "s" },
+    { "id": "cold_room", "x": 14, "y": 1, "z": 0, "facing": "s" }
+  ],
   "spots": [
     {
       "id": "bk.behind_counter",
@@ -72,8 +142,8 @@
     { "id": "bk.lt_lamp_counter", "kind": "lamp", "x": 14, "y": 6, "radiusTiles": 2 }
   ],
   "grid": [
-    "##################",
-    "####...........H.#",
+    "#####D##D##D##D###",
+    "####.S..S..S..SH.#",
     "####.............#",
     "#..#.........#####",
     "#....#######.....#",

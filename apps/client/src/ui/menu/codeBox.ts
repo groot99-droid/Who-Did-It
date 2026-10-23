@@ -4,6 +4,9 @@ import { MENU_COPY as C } from '../copy';
 import { h } from '../dom';
 import { openDialog, type MenuDialog } from './dialog';
 import { messageLine, nameField, validateName } from './form';
+import { mountPartyList } from './partyList';
+import type { ListParties } from './partyListModel';
+import { fill } from '../copy';
 
 export interface CodeBoxOptions {
   root: HTMLElement;
@@ -12,16 +15,22 @@ export interface CodeBoxOptions {
   /** The remembered name (the profile's, from PR 2). */
   name: string;
   onJoin(code: string, name: string): Promise<void>;
+  /** Join Game: the party list above the code field; absent for the `#/join/CODE` link. */
+  list?: { profile: string | null; fetch: ListParties };
   explainFailure?(): Promise<string | null>;
   onClose?(): void;
 }
 
 /** The code box ("Have a code?", and the `#/join/CODE` link): the old landing's code and name fields in a dialog. */
 export function openCodeBox(opts: CodeBoxOptions): MenuDialog {
+  let parties: { destroy(): void } | null = null;
   const dialog = openDialog(opts.root, {
     id: 'code-title',
-    title: opts.code !== null ? C['code.title.invited'] : C['code.title'],
-    ...(opts.onClose ? { onClose: opts.onClose } : {}),
+    title: opts.code !== null ? C['code.title.invited'] : opts.list ? C['join.title'] : C['code.title'],
+    onClose: () => {
+      parties?.destroy();
+      opts.onClose?.();
+    },
   });
   const name = nameField('code-name', C['code.name.label'], opts.name);
   const code = h('input', {
@@ -72,6 +81,25 @@ export function openCodeBox(opts: CodeBoxOptions): MenuDialog {
     }
   };
   join.addEventListener('click', () => void submit());
+  parties = opts.list
+    ? (() => {
+        const host = h('div', { class: 'wdi-field' });
+        dialog.body.prepend(host);
+        return mountPartyList(host, {
+          profile: opts.list.profile,
+          list: opts.list.fetch,
+          // A tap joins by code; with no name yet it asks for one first.
+          onPick: (party) => {
+            code.value = party.code;
+            if (validateName(name.input.value) === null) void submit();
+            else {
+              msg.say(fill(C['parties.pick.name'], { leader: party.leader }), false);
+              name.input.focus();
+            }
+          },
+        });
+      })()
+    : null;
   code.addEventListener('input', () => {
     code.value = code.value.toUpperCase();
   });

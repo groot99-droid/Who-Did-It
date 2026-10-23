@@ -1306,7 +1306,7 @@ Lines are in `apps/client/src/ui/copy/tips.ts` (`LOADING_COPY`, `TIPS`); the sec
 | `loading.tipLabel` | Tip | the eyebrow above the tip |
 | `loading.progress` | Loading | the progress bar's accessible name |
 
-Tips are ten short lines about the controls and the world (hold E on a clue, Tab for the role card, Shift to sneak, locked doors, the Bell, dark places, meetings, clues in pairs, woods and caves); none names a role or what it can do. `data-testid`s: `loading` (the screen, hidden until the load passes `ui.loading.showAfterS`), `transition` (the cover layer), `landing-trailer` (the video's slot; the `<video>` inside it is `muted loop playsinline autoplay preload="none"` with the poster `landing_loop.jpg`, and the slot stays hidden until the poster or a frame arrives). The trailer is skipped under reduced motion, the data saver and `?video=0`.
+Tips are ten short lines about the controls and the world (hold E on a clue, Tab for the role card, Shift to sneak, locked doors, the Bell, dark places, meetings, clues in pairs, woods and caves); none names a role or what it can do. `data-testid`s: `loading` (the screen, hidden until the load passes `ui.loading.showAfterS`), `transition` (the cover layer), `landing-trailer` was the video's slot; since round 7 the loop behind the menu is 7B's backdrop (`ui/backdrop.ts`, section 6) and the menu only starts the `lobby` theme on the first tap (7C, A107). The loop is skipped under reduced motion, the data saver and `?video=0` as before.
 
 ### 14.23 Admin page (6D)
 
@@ -1397,6 +1397,11 @@ asked where it is used.
 | `menu.friends` | Friends | opens the friends list (greyed with `menu.soon` until it lands) |
 | `menu.settings` | Settings | opens the sound panel of UI.md 14.22 in a dialog |
 | `menu.help`, `menu.credits` | How to Play, Credits | small links, a new tab: `${BASE}help/` and the repository's `CREDITS.md` |
+| `join.title`, `parties.title` | Join a game, Open parties | Join Game's dialog: the party list above the code field (`party-list`, rows `party-row` with `data-code`) |
+| `parties.players`, `parties.tag.friend` | {n} / {max}, Friend's party | each row: the leader, players / max, mode and map; a private row (one the viewer is invited to) carries the tag |
+| `parties.empty` | No open parties right now. Have a code? Type it below. | the empty state (`party-list-empty`), also what a 429, a network error or a bad body shows; the list asks again every `party.listRefreshS` |
+| `parties.pick.name` | Type your name to join {leader}. | a tap on a row joins by its code; with no name typed it fills the code and asks for one |
+| `invite.title`, `invite.empty`, `invite.count` | Invite friends, Add friends from the menu to invite them., {n} / {max} invited | the Start dialog's pick (`invite-pick`) when Private is chosen: the friends as checkboxes, capped by `party.invitedMax` |
 | `menu.quit` | Quit | small button; opens the confirm below |
 | `quit.title`, `quit.body` | Leave Who Did It?, If you are in a party you leave it, and the music stops. | the confirm dialog |
 | `quit.confirm`, `quit.cancel` | Quit, Stay | `quit-confirm`; Stay closes the dialog |
@@ -1473,6 +1478,16 @@ is never cut: the cutscene Skip, the intro's Skip and Begin (`.wdi-glass-btn--sm
 (`.wdi-glass`) use them; the snow label is 9.51 at worst on that glass, so it holds over the world. The HUD chip, the
 role chip, the settings gear and panel and the captions keep `--wdi-match-glass`, because their text is lilac or
 muted lilac, which the 66% fill does not carry over bare white.
+
+### 14.28 Table screens in the night theme (7G)
+
+Session 7G, round 7 (DECISIONS A111; `docs/round7/ui-reskin.md` 4). The meeting, the game over, the main-mode cards, the seat picker and the over view wear the owner's mockups: `ui/table.css` holds every rule,
+scoped under `.wdi-table` so they beat the paper components without editing `components.css`, and read tokens only. Press Start
+2P carries titles, the clock, tabs, button labels and one-word tags; Pixelify Sans carries headings, tile names, hints and
+claim chips; Inter stays for chat and the report, which run past two lines (A106). Every id and class the specs find is
+unchanged; the copy of 14.6 to 14.10, 14.14 and 14.16 is unchanged. No new copy: the game-over Add friend action is 7C's `addFriendButton` (`ui/menu/friends.ts`, copy in `ui/copy/menu.ts`).
+
+The Add friend action on a game-over row is 7C's `addFriendButton`, shown only for a seat that carries a `profile` and never on your own row. The faction chip on a row stays the one place a faction shows for another seat.
 
 ### 14.29 Vendettas (7H)
 

@@ -1,0 +1,81 @@
+{
+  "id": "crumb_oven",
+  "prefix": "co",
+  "name": "Crumb's oven room",
+  "zoneId": "crumb_oven",
+  "profile": "small",
+  "kind": "interior",
+  "biome": "house",
+  "dark": false,
+  "size": { "w": 12, "h": 10 },
+  "notes": "Le Four à Pain: the brick dome oven and its flue, the bread rack, the peel and the hanging bulb.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "co.door",
+      "from": "crumb_oven",
+      "x": 5,
+      "y": 9,
+      "kind": "door",
+      "to": "bakery",
+      "toSpawn": "oven_room",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [{ "id": "door", "x": 5, "y": 8, "z": 0, "facing": "n" }],
+  "spots": [
+    {
+      "id": "co.bread_rack",
+      "kind": "hide",
+      "variant": "kegStack",
+      "x": 1,
+      "y": 3,
+      "childOnly": false
+    },
+    {
+      "id": "co.wood_box",
+      "kind": "body",
+      "variant": "cratePile",
+      "x": 10,
+      "y": 7,
+      "childOnly": false
+    }
+  ],
+  "props": [],
+  "gates": [],
+  "paths": [],
+  "lights": [
+    { "id": "co.lt_bulb", "kind": "lamp", "x": 3, "y": 1, "radiusTiles": 2.5 },
+    { "id": "co.lt_oven", "kind": "fire", "x": 6, "y": 3, "radiusTiles": 3 }
+  ],
+  "grid": [
+    "############",
+    "#..........#",
+    "#..........#",
+    "#H.........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#.........B#",
+    "#....S.....#",
+    "#####D######"
+  ],
+  "material": [
+    "WWWWWWWWWWWW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WffffffffffW",
+    "WWWWWWWWWWWW"
+  ]
+}

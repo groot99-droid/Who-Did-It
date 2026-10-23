@@ -48,6 +48,11 @@ export const SCENE_IDS = [
   'bp_office',
   'bp_smithy',
   'bp_deep',
+  // Round 7 (A116, A118): Crumb's Ovens' four station rooms behind the bakery's back wall.
+  'crumb_cold',
+  'crumb_mixing',
+  'crumb_oven',
+  'crumb_proofing',
 ] as const;
 export type SceneId = (typeof SCENE_IDS)[number];
 
