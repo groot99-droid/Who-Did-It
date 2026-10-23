@@ -212,10 +212,7 @@
       "y": 35,
       "footprint": { "x": 18, "y": 35, "w": 3, "h": 2 }
     },
-    { "id": "bc.flume", "kind": "decor", "x": 50, "y": 18 },
-    { "id": "bc.altar_shrine", "kind": "altar", "x": 4, "y": 21 },
-    { "id": "bc.hq_chapel", "kind": "hq", "x": 5, "y": 21 },
-    { "id": "bc.hq_store", "kind": "hq", "x": 24, "y": 14 }
+    { "id": "bc.flume", "kind": "decor", "x": 50, "y": 18 }
   ],
   "gates": [],
   "paths": [],

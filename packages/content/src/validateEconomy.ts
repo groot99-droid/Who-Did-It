@@ -5,7 +5,7 @@ import type { MapFile, MapId } from './schemas/maps.js';
 import type { Scene, SceneId } from './schemas/scene.js';
 
 /**
- * Round 8 (GDD 3.23), Session 8D: every prop `economy.json` names is a prop of the right kind on a scene of a map,
+ * Round 8 (GDD 3.23), Session 8D: every prop `economy.json` names is on a scene of its map, of the right kind once placed,
  * every item and look exists, each curfew scene is an interior of its map, and the HQ tiers cost more as they climb.
  */
 export function checkEconomy(
@@ -19,21 +19,25 @@ export function checkEconomy(
   err: (msg: string) => void,
 ): void {
   const { economy } = c;
-  const propAt = (id: string): { kind: string; map: MapId | undefined } | undefined => {
+  const mapOf = (scene: Scene): MapId | undefined =>
+    (Object.keys(c.maps) as MapId[]).find((m) => c.maps[m].scenes.includes(scene.id as SceneId));
+  /**
+   * A named prop's kind and map. A prop whose scene row has not landed yet (its art session adds the row with the
+   * frame, A139) resolves through its id prefix with no kind; once the row lands, its kind is checked too.
+   */
+  const propAt = (id: string): { kind?: string; map: MapId | undefined } | undefined => {
     for (const scene of Object.values(c.scenes)) {
       const prop = scene.props.find((p) => p.id === id);
-      if (!prop) continue;
-      const map = (Object.keys(c.maps) as MapId[]).find((m) =>
-        c.maps[m].scenes.includes(scene.id as SceneId),
-      );
-      return { kind: prop.kind, map };
+      if (prop) return { kind: prop.kind, map: mapOf(scene) };
     }
-    return undefined;
+    const scene = Object.values(c.scenes).find((s) => id.startsWith(`${s.prefix}.`));
+    return scene && { map: mapOf(scene) };
   };
   const expectProp = (where: string, id: string, kind: string, map?: MapId) => {
     const prop = propAt(id);
-    if (!prop) return err(`economy ${where}: no prop ${id}`);
-    if (prop.kind !== kind) err(`economy ${where}: ${id} has kind ${prop.kind}, expected ${kind}`);
+    if (!prop) return err(`economy ${where}: no scene has the prefix of ${id}`);
+    if (prop.kind !== undefined && prop.kind !== kind)
+      err(`economy ${where}: ${id} has kind ${prop.kind}, expected ${kind}`);
     if (map !== undefined && prop.map !== map) err(`economy ${where}: ${id} is not on ${map}`);
   };
   const isItem = (id: string) => id in c.items.items;

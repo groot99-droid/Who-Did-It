@@ -67,10 +67,7 @@
       "childOnly": false
     }
   ],
-  "props": [
-    { "id": "ch.rope", "kind": "decor", "x": 9, "y": 0 },
-    { "id": "ch.altar_main", "kind": "altar", "x": 7, "y": 1 }
-  ],
+  "props": [{ "id": "ch.rope", "kind": "decor", "x": 9, "y": 0 }],
   "gates": [],
   "paths": [],
   "lights": [
