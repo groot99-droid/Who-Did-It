@@ -3481,6 +3481,16 @@ an existing `apps/server/test/*.test.ts`, anything written into ROSW.
   `handlers/lobby.ts` imports `sim/Tasks` before `sim/Npc`; that alone moved the evaluation of `npc/meeting` earlier, two tests
   of `lastShot.test.ts` (which `vi.mock`s that module) failed, and `pnpm auto` hung at 0% CPU with NPC matches that never
   ended. `Tasks.ts` now reads `npcMemory(room).ids` from `npc/memory` and imports nothing above it. Told 6Z for `seams.md`.
+- 2026-10-23: PR 1 is #129 (draft). PR 2a (the pick-up): the task hold at a task's source prop puts its deliverable in the
+  pockets (`sim/Minigames.ts pickUp`, the reach check shared with the station as `atNode`), a fake list's holder takes
+  nothing for the same motion; `test/taskPickup.test.ts`; GDD 3.5 "Fetching"; A133 (8); `WorldFeed.tasks()` on the live
+  feed and both mocks for the client's chores panel (PR 2b). Also in 2a, after 6Z's grant and 8C's ask: the `taskDone` sim
+  event from `complete()` (seat, scene, `{taskId, fake}`, fired for fake tasks too; A133 (9)). The `taskBar` invariant is
+  written but not in 2a: `sim/auto/invariants.ts` imports `NightPowers` → `LastShot` → `Npc` → `npc/routine` → `Hold` →
+  `Minigames` and `AdminView` → `Auto` → `lobby` → `Tasks`, so a `registerInvariant` reached from any 7M module runs
+  while the registry is still evaluating (TDZ at boot). 7H's checks hang off `Step.ts` → `vendettas/run.ts`, outside that
+  closure; asked 6Z for the same one line in `Step.ts`. A seam for `seams.md`: a new invariant module needs a host outside
+  the registry's closure.
 - Read from ROSW (never written): the UDGT teardown chapters 00 to 03 on `claude/sweet-maxwell-lmsiw3`, and the Who Did It lore
   on `claude/sharp-mccarthy-pqi3ws` (the Canon Ledger, the Lamplighter's Round, the Gazette, the Tab Book, Fourteen Things, the
   Daybook of Crumb's Ovens, Hopscotch, three stories). Drifts noted for 6Z, not resolved here: the lore dates HollowMere to 1893
