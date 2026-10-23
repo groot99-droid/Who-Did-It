@@ -113,7 +113,12 @@ const RULES: PlacementRules = {
     torch: { props: [], wall: true },
     window: { props: ['window', 'stained_glass', 'stained_glass_e'], wall: true, building: true },
     // Moonlight falls anywhere out of doors; indoors it comes through a window.
-    moon: { props: ['window', 'stained_glass', 'stained_glass_e'], wall: true, building: true, outdoors: true },
+    moon: {
+      props: ['window', 'stained_glass', 'stained_glass_e'],
+      wall: true,
+      building: true,
+      outdoors: true,
+    },
   },
 };
 
