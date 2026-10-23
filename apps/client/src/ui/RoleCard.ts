@@ -4,6 +4,7 @@ import onubRoles from '@wdi/content/data/roles.onub.json';
 import type { CoverState } from '../net/world';
 import type { RoleRevealPayload, TraitIds } from '../net/protocol';
 import { LOOKS_COPY, fill } from './copy';
+import './match.css';
 import { h, icon, isTyping, type Screen } from './dom';
 import { type PortraitTextures, drawPortrait, isCoverRole, lookName, roleLook } from './portrait';
 

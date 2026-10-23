@@ -11,7 +11,15 @@ import type { AudioBus, AudioKey } from '../AudioBus';
 import { readDevFlags } from '../devFlags';
 import { isoZoom } from '../iso';
 import { Captions } from './Captions';
-import { type CameraLeg, type TimelineEntry, advance, cameraPose, planTimeline } from './sequencer';
+import {
+  CUTSCENE_END,
+  type CameraLeg,
+  type CutsceneEnd,
+  type TimelineEntry,
+  advance,
+  cameraPose,
+  planTimeline,
+} from './sequencer';
 
 /**
  * Plays a cutscene in-engine (round 6, docs/round6/cutscene-music.md 1.3): camera pans and zooms on the scene's
@@ -123,7 +131,7 @@ export class CutscenePlayer {
           'button',
           {
             type: 'button',
-            class: 'wdi-btn wdi-btn--ghost wdi-btn--sm wdi-cutscene__skip',
+            class: 'wdi-glass-btn wdi-glass-btn--sm wdi-cutscene__skip',
             'data-testid': 'cutscene-skip',
             'aria-label': CUTSCENE_COPY['cutscene.skip.label'],
             onClick: () => finish('skipped'),
@@ -226,6 +234,7 @@ export class CutscenePlayer {
       const self = this.followOf();
       if (self) cam.startFollow(self, true, 0.1, 0.1);
       input?.start();
+      scene.game.events.emit(CUTSCENE_END, { id: cutscene.id, outcome } satisfies CutsceneEnd);
       resolve(outcome);
     };
 

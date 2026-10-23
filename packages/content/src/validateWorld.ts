@@ -182,6 +182,11 @@ export function checkMaps(c: MapContent): string[] {
       if (!prop) err(`${field} ${map[field]} is not a prop of the hub`);
       else if (prop.kind !== kind) err(`${field} ${map[field]} has kind ${prop.kind}, expected ${kind}`);
     }
+    if (map.station !== undefined) {
+      const [sceneId, spawnId] = map.station.split('.');
+      if (sceneId !== map.hub || !hub?.spawns.some((s) => s.id === spawnId))
+        err(`station ${map.station} is not a spawn of the hub`);
+    }
 
     // Closed graph: every portal stays inside the map.
     for (const s of map.scenes) {

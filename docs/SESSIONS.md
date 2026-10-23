@@ -3290,11 +3290,21 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 ### Round 7 log: 7A
 
+- 2026-10-23: PR 1 (#83, music). The intro tracks are `<map>_opening` playlists with `loop: false`, in a new
+  `opening` class held over grace until the piece ends or the opening is skipped; `loading` maps to the lobby
+  piece. Contract requests (manifest, `MUSIC_CLASSES`, `LoadingScreen.test.ts`) granted by 6Z. Measured
+  lengths 117 s and 80 s (A101); steps 2 and 3 (length, staging) are stacked locally and go up after #83.
+
 ### Round 7 log: 7B
 
 - 2026-10-23: PR 1 (fonts, night set, tokens, the gate on every `.css` under `apps/client/src`, licences,
   CREDITS, UI.md 2, 3 and 10, ASSETS 6.1, A106). The night set sits in its own `palette.json` block (A106);
   glass contrast is measured over the darkest and the brightest bound of the loop, so it does not wait for 6N.
+- 2026-10-23: PR 2 (the night glass, UI.md 6 rows first): the glass is a `::before` layer under the content so
+  the stepped `clip-path` never cuts the focus ring; the checker sheen and the primary's hover wash are tokens
+  and in the measured stacks (muted lilac on a sheen cell 4.63). `.wdi-seg` stays in 7E's
+  `ui/artStyle/artStyle.css`, which loads after `components.css`, so the glass look is the modifier
+  `.wdi-seg--glass` (with `.wdi-seg__note`) for 7E to add. `ui/theme/title.ts` builds the title's letters.
 
 ### Round 7 log: 7C
 
@@ -3305,7 +3315,13 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 ### Round 7 log: 7E
 
+- PR 1 (columns A and C): `Lobby.ts` as three columns, `ui/lobby.css`, the Add friend stand-in and its test, the deck list's classes, UI.md 14.26, A109. Column B holds today's map, art-style, sound and deck-editor mounts in one card until PR 2.
+- PR 2 (column B): the map cards with a tick, the art-style segment with `.wdi-seg--glass` and `.wdi-seg__note`, the deck editor as chips; the rules are in `ui/lobby.css` until 7B's glass classes land.
+
 ### Round 7 log: 7F
+
+- 2026-10-23: PR 1 (role card, HUD and its log, notebook sheet, settings panel): `ui/match.css`, `view/hud.css`, UI.md 14.27, A110. Rules are scoped under an ancestor class, so they do not wait for 7B's glass classes; `theme.test.ts` and the 565 client unit tests pass. Surfaces over the world and cutscenes use `--wdi-match-glass` (night at 85%) because the shared glass fill gives lilac 3.32 over an unveiled white pixel (UI.md 14.27).
+- PR 2 (loading, transitions, cutscene captions and Skip, the intro's Skip): `ui/match.css`, plus 7B's glass classes (d22c8ad): the cutscene Skip, the intro's Skip and Begin become `.wdi-glass-btn--sm` (ids and `data-testid`s kept; one class string each in `CutscenePlayer.ts` and `Intro.ts`, no staging touched) and the notebook takes `.wdi-glass`, replacing PR 1's stand-in rims. Surfaces with lilac text over the world keep `--wdi-match-glass` (UI.md 14.27).
 
 ### Round 7 log: 7G
 
@@ -3316,5 +3332,7 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
   `privateVendetta` until 7D's schema version 4 lands. Hooks asked of 6Z in the PR description.
 
 ### Round 7 log: 7I
+
+- 2026-10-23: PR 1, the Daily Train: the platform spot on HollowMere's overworld (A113), `sim/Train.ts` and its `runTrain` line, `balance.json` `train`, GDD 3.3, WORLD 4.3, UI.md 14.30, `test/train.test.ts`.
 
 ## Integration log, round 7

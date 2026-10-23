@@ -119,8 +119,8 @@ describe('the balance rows and the tips', () => {
   });
 
   it("names each map's loading playlist from music.json, and none for an unknown map", () => {
-    expect(loadingPlaylistFor('hollowmere')).toBe('hollowmere_loading');
-    expect(loadingPlaylistFor('blackpine')).toBe('blackpine_loading');
+    expect(loadingPlaylistFor('hollowmere')).toBe('lobby');
+    expect(loadingPlaylistFor('blackpine')).toBe('lobby');
     expect(loadingPlaylistFor('nowhere')).toBeNull();
   });
 });

@@ -59,6 +59,7 @@ export const WORLD_COPY = {
   'log.door': 'A door to the {dir}',
   'log.steps': 'Footsteps to the {dir}',
   'log.bell': 'The bell rings',
+  'log.train': 'The train pulls in at the platform',
   'dir.n': 'north',
   'dir.ne': 'north-east',
   'dir.e': 'east',

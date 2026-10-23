@@ -28,17 +28,21 @@ export function mountDeckList(root: HTMLElement, _net: NetworkService): DeckList
     root.append(
       h(
         'section',
-        { class: 'wdi-deck wdi-stack', 'aria-label': C['deck.title'], 'data-testid': 'lobby-deck' },
-        h('h3', { class: 'wdi-eyebrow' }, C['deck.title']),
+        { class: 'wdi-deck wdi-lobby__stack', 'aria-label': C['deck.title'], 'data-testid': 'lobby-deck' },
+        h('h3', { class: 'wdi-lobby__title' }, C['deck.title']),
         h(
           'p',
-          { class: 'wdi-hint', 'data-testid': 'lobby-deck-size' },
+          { class: 'wdi-hint wdi-lobby__note', 'data-testid': 'lobby-deck-size' },
           fill(C['deck.size'], { cards: deck.cards.length, players: deck.seats }),
         ),
         h('ul', { class: 'wdi-deck__cards' }, ...deckItems(deck.cards)),
-        h('p', { class: 'wdi-hint' }, C['deck.note']),
+        h('p', { class: 'wdi-hint wdi-lobby__note' }, C['deck.note']),
         deck.practice &&
-          h('p', { class: 'wdi-hint', 'data-testid': 'lobby-deck-practice' }, C['deck.practice']),
+          h(
+            'p',
+            { class: 'wdi-hint wdi-lobby__note', 'data-testid': 'lobby-deck-practice' },
+            C['deck.practice'],
+          ),
       ),
     );
   };

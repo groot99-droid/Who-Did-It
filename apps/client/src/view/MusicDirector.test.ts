@@ -3,7 +3,14 @@ import { describe, expect, it } from 'vitest';
 import musicJson from '@wdi/content/data/music.json';
 import { MAP_IDS, MUSIC_CLASSES, ONUB_MUSIC_CLASSES } from '@wdi/content';
 import { Phase } from '@wdi/shared';
-import { MusicConductor, mainClassFor, onubClassFor, onubPlaylistFor, playlistFor } from './MusicDirector';
+import {
+  MusicConductor,
+  mainClassFor,
+  onubClassFor,
+  onubPlaylistFor,
+  openingFor,
+  playlistFor,
+} from './MusicDirector';
 import { parseMusicManifest } from './MusicBus';
 import { BUDGET, PRE_MATCH_PLAYLISTS } from '../../../../tools/sprites/test/budgets';
 
@@ -11,7 +18,8 @@ function rig(map = 'hollowmere', mode: 'main' | 'onub' = 'main') {
   const calls: Array<string | null> = [];
   const prefetched: string[] = [];
   const c = new MusicConductor({
-    crossfadeTo: (id) => void calls.push(id),
+    // The bus ignores a call for the playlist it already wants.
+    crossfadeTo: (id) => void (calls.at(-1) !== id && calls.push(id)),
     prefetch: (id) => void prefetched.push(id),
   });
   c.lobby(map, mode);
@@ -71,11 +79,11 @@ describe('phase to class', () => {
 });
 
 describe('MusicConductor', () => {
-  it('plays the lobby playlist and warms the day theme when the map is picked', () => {
+  it('plays the lobby playlist and warms the opening piece and the day theme when the map is picked', () => {
     const { c, calls, prefetched } = rig('hollowmere');
     c.lobby('blackpine', 'main');
     expect(calls).toEqual([playlistFor('blackpine', 'lobby')]);
-    expect(prefetched).toEqual([playlistFor('blackpine', 'day')]);
+    expect(prefetched).toEqual([playlistFor('blackpine', 'opening'), playlistFor('blackpine', 'day')]);
   });
 
   it('follows the phases of the chosen map', () => {
@@ -92,6 +100,58 @@ describe('MusicConductor', () => {
     c.phase(Phase.roleReveal);
     c.phase(Phase.grace);
     expect(calls).toEqual([]);
+  });
+
+  it('starts the opening piece with the opening and holds the day until the piece ends', () => {
+    const { c, calls } = rig('hollowmere');
+    c.phase(Phase.roleReveal);
+    c.phase(Phase.grace);
+    c.cutscene(openingFor('hollowmere')!);
+    expect(calls).toEqual([playlistFor('hollowmere', 'opening')]);
+    c.cutsceneEnded(openingFor('hollowmere')!, 'done'); // the camera is done; the piece still plays
+    c.phase(Phase.day);
+    expect(calls).toHaveLength(1);
+    c.finished(playlistFor('hollowmere', 'opening')!);
+    expect(calls).toEqual([playlistFor('hollowmere', 'opening'), playlistFor('hollowmere', 'day')]);
+  });
+
+  it('crossfades to the day at the end of the piece even while grace still runs', () => {
+    const { c, calls } = rig('blackpine');
+    c.phase(Phase.grace);
+    c.cutscene(openingFor('blackpine')!);
+    c.finished(playlistFor('blackpine', 'opening')!);
+    c.phase(Phase.day);
+    expect(calls).toEqual([playlistFor('blackpine', 'opening'), playlistFor('blackpine', 'day')]);
+  });
+
+  it('crossfades at once when the opening is skipped', () => {
+    const { c, calls } = rig('hollowmere');
+    c.phase(Phase.grace);
+    c.cutscene(openingFor('hollowmere')!);
+    c.cutsceneEnded(openingFor('hollowmere')!, 'skipped');
+    expect(calls).toEqual([playlistFor('hollowmere', 'opening'), playlistFor('hollowmere', 'day')]);
+    c.finished(playlistFor('hollowmere', 'opening')!);
+    expect(calls).toHaveLength(2);
+  });
+
+  it('ignores other cutscenes, other maps and the quick mode', () => {
+    const { c, calls } = rig('hollowmere');
+    c.phase(Phase.grace);
+    c.cutscene('deathKnife');
+    c.cutscene(openingFor('blackpine')!);
+    expect(calls).toEqual([]);
+    const q = rig('hollowmere', 'onub');
+    q.c.cutscene(openingFor('hollowmere')!);
+    expect(q.calls).toEqual([]);
+  });
+
+  it('drops the opening piece when the match ends or the room is left', () => {
+    const { c, calls } = rig('hollowmere');
+    c.phase(Phase.grace);
+    c.cutscene(openingFor('hollowmere')!);
+    c.left();
+    c.finished(playlistFor('hollowmere', 'opening')!);
+    expect(calls).toEqual([playlistFor('hollowmere', 'opening'), null]);
   });
 
   it('does not switch to the lobby class when the roster changes mid-match', () => {
