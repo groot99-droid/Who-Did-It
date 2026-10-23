@@ -6,7 +6,7 @@ import { lookName } from '../portrait';
 import './inspect.css';
 
 // The inspect card (GDD 3.22 "Inspect", UI.md 14.33), Session 8B: what the eye read of a figure, shown in the HUD
-// until it is closed, replaced or `INSPECT_CARD_MS` passes. 8H animates `.wdi-inspect` by class.
+// until it is closed, replaced or `INSPECT_CARD_MS` passes. 8H animates it by its `wdi-anim-*` classes (UI.md 14.37).
 
 /** How long a card stays up unless closed; a reading time, not a rule number. */
 export const INSPECT_CARD_MS = 6000;
@@ -54,13 +54,13 @@ export function mountInspectCard(parent: HTMLElement, ms = INSPECT_CARD_MS): Ins
       el = h(
         'section',
         {
-          class: 'wdi-panel wdi-inspect',
+          class: 'wdi-panel wdi-inspect wdi-anim-panel',
           role: 'dialog',
           'aria-label': lines.title,
           'data-testid': 'inspect',
         },
         h('h2', { class: 'wdi-inspect__title' }, lines.title),
-        h('ul', { class: 'wdi-inspect__signs' }, ...lines.signs.map((s) => h('li', {}, s))),
+        h('ul', { class: 'wdi-inspect__signs wdi-anim-list' }, ...lines.signs.map((s) => h('li', {}, s))),
         h('ul', { class: 'wdi-inspect__facts' }, ...lines.facts.map((s) => h('li', {}, s))),
         h('button', { class: 'wdi-inspect__close', type: 'button', onclick: close }, C['inspect.close']),
       );
