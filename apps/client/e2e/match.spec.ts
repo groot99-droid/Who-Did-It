@@ -40,6 +40,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /** Create, join, bring the bots in, fix the deal (the host is the Killer), Start, and dismiss both cards. */
 async function startMatch(browser: Browser, botCount: number, botVote: string): Promise<Match> {
   const ctxs: BrowserContext[] = [await browser.newContext(), await browser.newContext()];
+  await Promise.all(ctxs.map((c) => c.addInitScript("sessionStorage.setItem('wdi:introSeen', '1')"))); // no opening cinematic (6Q)
   const [host, guest] = (await Promise.all(ctxs.map((c) => c.newPage()))) as [Page, Page];
 
   await host.goto('/Who-Did-It/');

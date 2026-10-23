@@ -2862,3 +2862,39 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   display: flex;
   justify-content: flex-end;
 }
+
+/* ---------------------------------------------------- Round 6 (6Q): the opening cinematic (UI.md 14.24) */
+.wdi-intro {
+  position: fixed;
+  inset: 0;
+  z-index: var(--wdi-z-toast);
+  display: grid;
+  place-items: center;
+  background-color: var(--wdi-ink);
+  cursor: pointer;
+}
+
+.wdi-intro__poster,
+.wdi-intro__video {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.wdi-intro__video[hidden],
+.wdi-intro__skip[hidden] {
+  display: none;
+}
+
+.wdi-intro__begin {
+  grid-area: 1 / 1;
+  align-self: end;
+  margin-bottom: var(--wdi-space-6);
+}
+
+.wdi-intro__skip {
+  position: absolute;
+  top: var(--wdi-space-3);
+  right: var(--wdi-space-3);
+}

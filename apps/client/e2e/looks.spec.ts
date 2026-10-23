@@ -7,6 +7,7 @@ import { expect, test, type Page } from '@playwright/test';
 test.skip(process.env.WDI_E2E_LOOKS !== '1', 'needs the deck deal of Session 5G merged (WDI_E2E_LOOKS=1)');
 
 async function startFour(page: Page): Promise<void> {
+  await page.addInitScript("sessionStorage.setItem('wdi:introSeen', '1')"); // no opening cinematic (6Q)
   await page.goto('/Who-Did-It/');
   await page.getByLabel('Your name').fill('Hana');
   await page.getByRole('button', { name: 'Create Party' }).click();

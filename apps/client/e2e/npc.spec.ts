@@ -41,6 +41,7 @@ const voteWindowMs =
   1000;
 
 async function createParty(page: Page, query = ''): Promise<string> {
+  await page.addInitScript("sessionStorage.setItem('wdi:introSeen', '1')"); // no opening cinematic (6Q)
   await page.goto(`/Who-Did-It/${query}`);
   await page.getByLabel('Your name').fill('Hana');
   await page.getByRole('button', { name: 'Create Party' }).click();

@@ -1248,3 +1248,19 @@ Session 6D, round 6 (DECISIONS A86; `docs/round6/auto-admin.md` 8). The owner's 
 | `admin.log.invariant` | Invariant {name} failed at tick {tick}: {detail} |
 
 The full list is `ui/copy/admin.ts`.
+
+### 14.24 Opening cinematic (6Q)
+
+Lines are in `apps/client/src/ui/copy/intro.ts` (`INTRO_COPY`). The `Intro` scene sits between `Preload` and `Landing` (never before `Admin`).
+
+| Key | Text | Where |
+|---|---|---|
+| `intro.begin` | Tap to begin | the button over the poster; the tap unlocks audio and starts the video |
+| `intro.skip` | Skip | the corner button while the video plays |
+| `intro.label` | Opening cinematic | the overlay's accessible name |
+
+`data-testid`s: `intro` (the full-screen overlay, `role="dialog"`), `intro-begin`, `intro-video` (hidden until the tap; `preload="auto"`, `playsinline`, its own sound, muted only by the player's mute setting, volume the music slider), `intro-skip` (hidden until the tap). The poster is `intro.jpg` of the `intro` row of `assets/video/manifest.json`; with no poster the overlay is plain ink.
+
+- **When it plays.** Once per browser session (`sessionStorage['wdi:introSeen']`, set at the tap). Not under `prefers-reduced-motion`, the data saver (`saveData`), `?intro=0`, a reload that rejoins a lobby (`#/lobby/CODE`), and in the mock (`?mock=1`) unless `?intro=1`. `?intro=1` overrides only the mock rule.
+- **How it ends.** The video ends, Skip, a click or tap anywhere while it plays, or Esc (also before the tap). A stream that has not started 8 s after the tap, or a video error, ends it the same way. Then `Landing` starts as it always did.
+- **A missing file.** No manifest, no `intro` row, a failed HEAD request for the file, or an HTML answer where a video should be: the scene starts `Landing` at once and shows nothing.

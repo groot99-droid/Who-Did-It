@@ -2970,10 +2970,36 @@ pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock 
   `onub_night` playlists. Rows in both manifests, `CREDITS.md` (the two replaced CC0 rows removed) and
   `assets/source/MANIFEST.md`; the picks and the reasons in DECISIONS A96. `media.test.ts` green. No `.ts`, nothing
   under `packages/`.
-- **Waiting**: the owner's `Who_Did_It_Music_Pt1.zip` and `Who_Did_It_SFX_Pt1.zip` on the release (step 2: the ROSW
-  ingest, the owner's tracks and `train_arrive`, `train_brake`, `ferry_horn`, `crows`); the videos (step 3).
+- **Step 2 (2026-10-22): the owner's tracks and field recordings.** The owner attached `Who.Did.It.zip` (one zip, so
+  the ids are `who-did-it/<slug>`) and seven more packs; ROSW #14 ingests them (929 new; `Drones.zip` is damaged and
+  two names collide, both left to the owner) and teaches the library to read an MP3's duration, which its own
+  catalog test needs. Mastered at q3 stereo by 6Z's call: the three day themes as clean loops, the loading pieces
+  and the trailer whole; the playlists `trailer`, `*_loading`, `*_day`, `*_dusk`, `onub_kitchen`, `onub_rush`
+  filled; `train_arrive`, `train_brake`, `ferry_horn`, `crows` in `audio/manifest.json`. Numbers and reasons in A96.
+  Contract requests, answered by 6Z: the four SFX keys in `AUDIO_KEYS` (granted, in this PR); the licence and the
+  vendor row of the Flow Music tracks (asked of the owner; CREDITS says "licence open" until then).
+- **Waiting**: the owner's intake and context answers for the two videos (step 3).
 
 ### Round 6 log: 6Q (opening cinematic)
+
+- **Two steps on one branch and one draft PR (`claude/r6-intro`, 2026-10-22)**, each commit green on `pnpm lint && pnpm
+  typecheck && pnpm test`: (1) `scenes/Intro.ts` with `scenes/introPolicy.ts` (the Phaser-free rules, so the unit tests can
+  load them), `ui/copy/intro.ts`, the "Round 6 (6Q)" CSS block, the `first` line of `Preload.ts`, the 2 s stand-in clip under
+  `e2e/fixtures/`, the `intro` budget line; (2) `e2e/intro.spec.ts`, UI.md 14.24, this log.
+- **Contract requests, all granted by 6Z on #72 and done in the PR**: (a) `main.ts` lists `Intro` in the scene array (one
+  import, one entry, after `Admin`); (b) the budget cap lives in `tools/sprites/test/media.ts` (`BUDGET.introVideoBytes`,
+  `INTRO_VIDEO_KEY`), because `checkVideos` is there and `media.test.ts` only calls it; (c) the four live-server specs
+  (`match`, `npc`, `onub`, `looks`) open `/Who-Did-It/` without `?mock=1`, so once 6N lands `intro.webm` they would stop on
+  the poster: each now sets `sessionStorage['wdi:introSeen']` in an init script before its first page load (one line each). Until
+  the file lands the scene finds no row and starts `Landing`, so nothing changed before this either.
+- **Settled from the code (A98's open items)**: the first-load figure (A93) is unaffected, since `firstLoadBytes` counts the
+  art manifests and the intro is fetched only after the tap; the cinematic's volume follows the player's music slider and mute
+  (`wdi:audio`); a reload that rejoins `#/lobby/CODE` skips it. Still open for the owner: the cinematic's tool and date, and
+  whether the lobby keeps the theme after the first match.
+- **Measured / checked**: client tests 538 (new: `introPolicy.test.ts`), sprites tests 386 (new: the 5 MB intro line, a
+  non-intro key at 4.5 MB fails, 5 MB + 1 fails); `e2e/intro.spec.ts` 8 specs (mock skip, live default, tap and end, Skip and
+  once per session, Esc, `?intro=0` and reduced motion, missing file or row, admin route). Not run against a real cinematic:
+  its file and poster are 6N's.
 
 ## Integration log, round 6
 

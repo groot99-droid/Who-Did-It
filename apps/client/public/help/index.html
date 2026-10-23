@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Who Did It: help</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --paper: #f4efe6;
+        --ink: #1d1b19;
+        --teal: #1f8a86;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --paper: #1d1b19;
+          --ink: #f4efe6;
+          --teal: #5cc9c4;
+        }
+      }
+      body {
+        margin: 0;
+        padding: 24px 16px 48px;
+        background: var(--paper);
+        color: var(--ink);
+        font:
+          17px/1.5 Georgia,
+          'Times New Roman',
+          serif;
+        max-width: 720px;
+        margin-inline: auto;
+      }
+      h1,
+      h2 {
+        font-family: Oswald, Impact, 'Arial Narrow', sans-serif;
+        letter-spacing: 0.02em;
+        margin: 1.4em 0 0.4em;
+      }
+      a {
+        color: var(--teal);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      td,
+      th {
+        text-align: left;
+        padding: 6px 8px;
+        border-bottom: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+        vertical-align: top;
+      }
+      kbd {
+        font:
+          14px ui-monospace,
+          Menlo,
+          Consolas,
+          monospace;
+        padding: 1px 6px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+      }
+      .back {
+        display: inline-block;
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <a class="back" href="../">&larr; Back to the game</a>
+    <h1>Who Did It: help</h1>
+    <p>
+      A hidden-role whodunit for four to ten friends. Most of you are villagers; a few are the Cabal, who kill
+      after dark and lie about it. Find the bodies, read the clues, argue, and vote.
+    </p>
+
+    <h2>Quick start</h2>
+    <ol>
+      <li>One player presses <strong>Create Party</strong> and shares the invite link or the party code.</li>
+      <li>
+        Everyone else opens the link (or presses <strong>Join Party</strong> and types the code), then presses
+        <strong>Ready</strong>.
+      </li>
+      <li>
+        The leader presses <strong>Start</strong>. Each player gets a secret role card. Read it;
+        <kbd>Tab</kbd> reopens it.
+      </li>
+      <li>
+        By day, explore, gather and compare notes. After dark, stay in pairs, sneak, and listen for screams.
+      </li>
+      <li>
+        Report bodies with <kbd>E</kbd>. In a meeting, present a Notebook entry and vote. Then a new day.
+      </li>
+    </ol>
+
+    <h2>Controls</h2>
+    <table>
+      <tr>
+        <th>Move</th>
+        <td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or the arrow keys; drag on touch</td>
+      </tr>
+      <tr>
+        <th>Sneak</th>
+        <td>hold <kbd>Shift</kbd> (quiet, slower)</td>
+      </tr>
+      <tr>
+        <th>Run</th>
+        <td><kbd>Space</kbd> (louder)</td>
+      </tr>
+      <tr>
+        <th>Use</th>
+        <td><kbd>E</kbd>: doors, the bell, report a body; hold on a glowing clue to collect it</td>
+      </tr>
+      <tr>
+        <th>Ability</th>
+        <td><kbd>Q</kbd>, <kbd>R</kbd> or <kbd>F</kbd>, as your card shows</td>
+      </tr>
+      <tr>
+        <th>Role card / Notebook</th>
+        <td><kbd>Tab</kbd> / <kbd>N</kbd></td>
+      </tr>
+      <tr>
+        <th>Skip a cutscene</th>
+        <td><kbd>Esc</kbd> or the Skip button</td>
+      </tr>
+    </table>
+
+    <h2>The guides</h2>
+    <p>The full manuals live in the repository and read well on a phone:</p>
+    <ul>
+      <li>
+        <a
+          href="https://github.com/groot99-droid/Who-Did-It/blob/claude/zen-turing-m1jnw0/docs/guides/HOW_TO_PLAY.md"
+          >How to play</a
+        >: controls, phases, clues, meetings, roles, winning.
+      </li>
+      <li>
+        <a
+          href="https://github.com/groot99-droid/Who-Did-It/blob/claude/zen-turing-m1jnw0/docs/guides/QUICK_MODE.md"
+          >Quick mode</a
+        >: One Night Ultimate Baguette, two cards, one night, one vote.
+      </li>
+      <li>
+        <a
+          href="https://github.com/groot99-droid/Who-Did-It/blob/claude/zen-turing-m1jnw0/docs/guides/HOST_GUIDE.md"
+          >Host guide</a
+        >: making a party, the lobby settings, what to do when something sticks.
+      </li>
+      <li>
+        <a
+          href="https://github.com/groot99-droid/Who-Did-It/blob/claude/zen-turing-m1jnw0/docs/guides/ADMIN_GUIDE.md"
+          >Admin guide</a
+        >: the owner's auto-mode page and the headless runner.
+      </li>
+    </ul>
+
+    <h2>Something stuck?</h2>
+    <ul>
+      <li><strong>"Waking the village..."</strong>: the server is starting. Wait a few seconds.</li>
+      <li>
+        <strong>No sound</strong>: click Create or Join once (browsers block audio until then), then check the
+        gear for mute.
+      </li>
+      <li>
+        <strong>Old page after an update</strong>: hard-reload with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd
+          >R</kbd
+        >
+        or <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>.
+      </li>
+      <li><strong>Party not found</strong>: codes never use 0, O, 1 or I; a started party is locked.</li>
+    </ul>
+  </body>
+</html>

@@ -24,6 +24,11 @@ export const AUDIO_KEYS = [
   'sting_eject',
   'sting_win_village',
   'sting_win_cabal',
+  // Round 6 (docs/round6/media.md 1): the owner's field recordings for the openings and dusk.
+  'train_arrive',
+  'train_brake',
+  'ferry_horn',
+  'crows',
 ] as const;
 export type AudioKey = (typeof AUDIO_KEYS)[number];
 

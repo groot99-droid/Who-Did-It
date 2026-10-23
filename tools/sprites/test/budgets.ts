@@ -8,6 +8,8 @@ export const BUDGET = {
   musicBytes: 12 * MB,
   musicPerMapBytes: 4 * MB,
   videoBytes: 2 * MB,
+  /** The one exception (A98): the opening cinematic, streamed, outside the first load. */
+  introVideoBytes: 5 * MB,
   posterBytes: 60 * 1000,
   firstLoadBytes: 12 * MB,
   siteBytes: 150 * MB,

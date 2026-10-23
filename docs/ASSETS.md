@@ -160,7 +160,7 @@ First load (engine ~1.2 MB gz + lobby UI + own card + overworld + body pages + o
 |---|---|---|
 | SFX and ambience | 6 MB | the files of `audio/manifest.json` (the first load carries them) |
 | Music | 12 MB in all, 4 MB per map | `audio/music/manifest.json` (`tracks`, `playlists`) and the playlists `music.json` gives each map; lazy per map after Start, never in the first load |
-| Each video | 2 MB, its poster 60 KB | `video/manifest.json`, `{ version, entries: [{ key, url, poster?, durationS, bytes }] }`, `bytes` equal to the file |
+| Each video | 2 MB, its poster 60 KB; the one key `intro` (the opening cinematic, A98) 5 MB, streamed and outside the first-load count | `video/manifest.json`, `{ version, entries: [{ key, url, poster?, durationS, bytes }] }`, `bytes` equal to the file |
 | First load | 12 MB | every art entry `Preload` queues (no `maps` or `modes`) plus the Hollowmere map's, for the default style; the other styles swap in after boot (art plan 1.9) |
 | Site | 150 MB | every file under `public/assets` |
 

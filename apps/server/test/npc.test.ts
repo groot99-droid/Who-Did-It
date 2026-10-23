@@ -332,6 +332,7 @@ describe('the wire never marks an NPC seat', () => {
     const leader = party.humans[0]!;
     await send(leader, C2S.lobbyAddNpc, {}, 60);
     await send(leader, C2S.lobbyAddNpc, {}, 60);
+    // A command is consumed on the room's next steps, which a loaded machine can delay past the send's wait.
     await until(() => npcSeats(party.room).length >= 2);
     const [first, second] = npcSeats(party.room);
     stateOf(leader).players.forEach((p, id) => {
