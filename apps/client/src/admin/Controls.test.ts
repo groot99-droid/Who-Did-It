@@ -20,7 +20,6 @@ describe('seed words', () => {
 describe('setup payload', () => {
   const form = {
     map: 'hollowmere',
-    mode: 'main',
     seats: 6,
     difficulty: 'hard',
     deck: '',

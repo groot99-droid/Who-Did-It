@@ -52,8 +52,7 @@ export class AdminSceneView extends Phaser.Scene {
     if (!this.cache.tilemap.exists(key))
       this.load.tilemapTiledJSON(key, sceneMapUrl(base, this.data0.sceneId));
     const manifest = peekManifest(getFlags(this).art, base);
-    if (manifest)
-      queueMatchEntries(this.load, this, manifest, this.data0.store.mapId || 'hollowmere', 'main');
+    if (manifest) queueMatchEntries(this.load, this, manifest, this.data0.store.mapId || 'hollowmere');
   }
 
   create(): void {

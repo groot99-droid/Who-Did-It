@@ -1,7 +1,6 @@
 import { TICK_RATE } from '@wdi/shared/constants';
 import roles from '@wdi/content/data/roles.json';
-import onubRoles from '@wdi/content/data/roles.onub.json';
-import type { ChatLine, MatchMode, MeetingStart, VoteResult } from '../net/meeting';
+import type { ChatLine, MeetingStart, VoteResult } from '../net/meeting';
 import { SKIP } from '../net/meeting';
 import { fill } from './copy';
 import { MEETING_COPY as C } from './copy/meeting';
@@ -27,10 +26,9 @@ export function joinNames(names: readonly string[]): string {
   return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
 }
 
-/** "Hana reported Gus's body" / "Hana rang the bell" / the dawn line. */
+/** "Hana reported Gus's body" / "Hana rang the bell". */
 export function reasonLine(start: MeetingStart | null, nameOf: NameOf): string {
   if (start === null) return C['meeting.reason.none'];
-  if (start.reason === 'dawn') return C['meeting.reason.dawn'];
   const caller = nameOf(start.callerId);
   if (start.reason === 'bell') return fill(C['meeting.reason.bell'], { caller });
   if (start.reason === 'body') {
@@ -48,13 +46,12 @@ export function clockText(ticksLeft: number | null): string {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
-/** Every seat the vote turned out: the quick-mode `outs`, else the one `ejectedId`. */
+/** Every seat the vote turned out: the one `ejectedId`, or none. */
 export function outsOf(result: VoteResult): string[] {
-  if (result.outs !== undefined) return result.outs;
   return result.ejectedId === undefined ? [] : [result.ejectedId];
 }
 
-/** Why nobody left: no votes at all, a Skip plurality, or a tie. Quick mode's lines are the Rush panel's (5D). */
+/** Why nobody left: no votes at all, a Skip plurality, or a tie. */
 export function noEjectionLine(result: VoteResult): string {
   const ranked = Object.entries(result.tally).sort((a, b) => b[1] - a[1]);
   const top = ranked[0];
@@ -63,12 +60,11 @@ export function noEjectionLine(result: VoteResult): string {
   return C['reveal.none.tie'];
 }
 
-/** The reveal's lines: who left and what they were, or why nobody did (the main mode). */
+/** The reveal's lines: who left and what they were, or why nobody did. */
 export function ejectionLines(result: VoteResult, nameOf: NameOf): string[] {
   const outs = outsOf(result);
   if (outs.length === 0) return [noEjectionLine(result)];
-  const roleOf = (id: string): string | undefined =>
-    result.roles?.[id] ?? (id === result.ejectedId ? result.role : undefined);
+  const roleOf = (id: string): string | undefined => (id === result.ejectedId ? result.role : undefined);
   const named = (id: string) => {
     const role = roleOf(id);
     return role === undefined ? null : fill(C['reveal.role'], { name: nameOf(id), role: roleTitle(role) });
@@ -86,10 +82,7 @@ export function chatTag(line: ChatLine): string {
   return line.channel === 'ghost' ? 'ghost' : line.channel === 'cabal' ? 'cabal' : '';
 }
 
-/**
- * `Winner` ids of the schema: 0 none, 1 village, 2 cabal, 3 drifter, 4 croissant, 5 nobody. Quick mode's
- * headline is its winners row (the end panel, 5D), so 4 reads as the plain line here.
- */
+/** `Winner` ids of the schema: 0 none, 1 village, 2 cabal, 3 drifter, 4 (unused), 5 nobody. */
 const WINNER_LINE = [
   C['over.none'],
   C['over.village'],
@@ -103,18 +96,12 @@ export function winnerLine(winner: number): string {
   return WINNER_LINE[winner] ?? C['over.none'];
 }
 
-type RoleRow = { faction?: string; team?: string };
+type RoleRow = { faction?: string };
 const mainRoles = roles.roles as Record<string, RoleRow | undefined>;
-const onubRoleRows = onubRoles.roles as Record<string, RoleRow | undefined>;
-const onubTeams = onubRoles.teams as Record<string, { faction: string } | undefined>;
 
-/**
- * The faction a role belongs to, shown only at the end: `roles.json`, or in quick mode the faction of the
- * role's team in `roles.onub.json` (no team literal lives in code).
- */
-export function factionOf(roleId: string, mode: MatchMode = 'main'): 'village' | 'cabal' | 'neutral' {
-  const faction =
-    mode === 'onub' ? onubTeams[onubRoleRows[roleId]?.team ?? '']?.faction : mainRoles[roleId]?.faction;
+/** The faction a role belongs to, shown only at the end: `roles.json` (no team literal lives in code). */
+export function factionOf(roleId: string): 'village' | 'cabal' | 'neutral' {
+  const faction = mainRoles[roleId]?.faction;
   return faction === 'cabal' || faction === 'neutral' ? faction : 'village';
 }
 

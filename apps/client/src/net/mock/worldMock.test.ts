@@ -156,14 +156,6 @@ describe('MockWorldFeed cutscenes (?cutscene=1, GDD 3.18)', () => {
   });
 });
 
-describe('MockWorldFeed and quick mode', () => {
-  it('stays the main-mode world whatever ?mode says: quick mode plays MockOnubFeed', () => {
-    const { feed } = make('?mode=onub');
-    expect(feed.mode()).toBe('main');
-    expect(feed.clock().phase).toBe(2);
-  });
-});
-
 describe('MockWorldFeed avatars and Impersonate (GDD 3.17)', () => {
   it('serves the own presence only, avatars for everyone in view, a look per seat and the own handle', () => {
     const { feed } = make('?bots=still');

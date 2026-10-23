@@ -1,13 +1,11 @@
 // UI.md 14 meeting, reveal and game-over lines (Session U, round 4). Ids are the deck's (14.6, 14.7, 14.9,
-// 14.10). Quick mode's Rush, reveal and end-screen lines live in `onubNight.ts` (5D) from round 5. `{key}`
-// values are filled by the caller with `fill()`.
+// 14.10). `{key}` values are filled by the caller with `fill()`.
 export const MEETING_COPY = {
   // 14.6 Meeting
   'meeting.title': 'Who did it?',
   'meeting.reason.body': "{caller} reported {victim}'s body",
   'meeting.reason.bodyUnknown': '{caller} reported a body',
   'meeting.reason.bell': '{caller} rang the bell',
-  'meeting.reason.dawn': 'Dawn: the loaves are on the plates',
   'meeting.reason.missing': 'Roll call: someone is missing',
   'meeting.reason.none': 'A meeting has been called',
   'meeting.dead.one': '{names} was found dead',
@@ -15,7 +13,6 @@ export const MEETING_COPY = {
   'meeting.discuss': 'Talk it over',
   'meeting.vote.open': 'Votes are secret until the reveal',
   'meeting.vote.hint': 'Tap a portrait to vote, or Skip',
-  'meeting.vote.hintNoSkip': 'Tap a portrait to vote. You cannot vote for yourself.',
   'meeting.vote.skip': 'Skip',
   'meeting.vote.mine': 'Your vote: {name}',
   'meeting.vote.mineSkip': 'Your vote: Skip',
