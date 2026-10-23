@@ -1411,8 +1411,8 @@ asked where it is used.
 | `settings.title` | Settings | the settings dialog |
 
 A failed create or join says the generic error (`JOIN_FAILED_MESSAGE`, UI.md 1.6) in the dialog's one `role="alert"`
-line, or the refresh line when the build is stale. `data-testid`s: `menu`, `menu-chip`, `menu-sound`, `menu-build`,
-`landing-trailer` (kept). The e2e fixture `e2e/fixtures/party.ts` (`createParty`, `joinParty`) drives the buttons and
+line, or the refresh line when the build is stale. `data-testid`s: `menu`, `menu-chip`, `menu-sound`, `menu-build`
+(`landing-trailer` left with the trailer in #110). The e2e fixture `e2e/fixtures/party.ts` (`createParty`, `joinParty`) drives the buttons and
 labels above; a visible label that changes changes there.
 
 ### 14.26 Lobby re-skin (7E, round 7)
