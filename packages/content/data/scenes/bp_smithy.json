@@ -8,7 +8,7 @@
   "biome": "house",
   "dark": false,
   "size": { "w": 16, "h": 11 },
-  "notes": "Forge hearth on the north wall (the warmest light in Blackpine), the anvil, the quench trough (Blood wash), the tool rack, the coal bin (hiding spot). Door south. M5b's crafting happens here.",
+  "notes": "Forge hearth on the north wall (the warmest light in Blackpine), the anvil, the quench trough (Blood wash), the tool rack, the coal bin (hiding spot). Door south. M5b's crafting happens here. Round 8 (8K): the tool rack hangs on the north wall beside a window, a workbench and a wall lamp; a quench barrel by the anvil, a bucket by the trough, a grindstone, crates by the east wall; cobbles before the hearth and coal dust round the bin.",
   "worldRef": "4.10",
   "portals": [
     {
@@ -49,39 +49,48 @@
     },
     { "id": "bf.anvil", "kind": "decor", "x": 7, "y": 4 },
     { "id": "bf.trough", "kind": "basin", "x": 3, "y": 3 },
-    { "id": "bf.tool_rack", "kind": "decor", "x": 0, "y": 5 }
+    { "id": "bf.tool_rack", "kind": "decor", "x": 2, "y": 1 },
+    { "id": "bf.window", "kind": "dressing", "x": 4, "y": 1 },
+    { "id": "bf.workbench", "kind": "dressing", "x": 10, "y": 1 },
+    { "id": "bf.wall_lamp", "kind": "dressing", "x": 12, "y": 1 },
+    { "id": "bf.bucket", "kind": "dressing", "x": 4, "y": 3 },
+    { "id": "bf.barrel", "kind": "dressing", "x": 8, "y": 5 },
+    { "id": "bf.grindstone", "kind": "dressing", "x": 2, "y": 7 },
+    { "id": "bf.crates", "kind": "dressing", "x": 14, "y": 8 },
+    { "id": "bf.crate", "kind": "dressing", "x": 14, "y": 9 },
+    { "id": "bf.stool", "kind": "dressing", "x": 9, "y": 6 }
   ],
   "gates": [],
   "paths": [],
   "lights": [
-    { "id": "bf.lt_forge", "kind": "fire", "x": 7, "y": 2, "radiusTiles": 3 },
-    { "id": "bf.lt_lamp", "kind": "lamp", "x": 12, "y": 7, "radiusTiles": 2 }
+    { "id": "bf.lt_forge", "kind": "fire", "x": 7, "y": 1, "radiusTiles": 3 },
+    { "id": "bf.lt_lamp", "kind": "lamp", "x": 12, "y": 1, "radiusTiles": 2.5 }
   ],
   "givers": [{ "id": "bf.gv_smith", "npc": "smith", "x": 10, "y": 4, "facing": "w" }],
   "grid": [
     "################",
-    "#.....###......#",
+    "#.#.#.###.#.#..#",
     "#............H.#",
-    "#..#...........#",
+    "#..##..........#",
     "#......#.......#",
-    "#..............#",
-    "#..............#",
-    "#..............#",
-    "#..............#",
-    "#......S.......#",
+    "#.......#......#",
+    "#........#.....#",
+    "#.#............#",
+    "#.............##",
+    "#......S......##",
     "#######D########"
   ],
   "material": [
     "WWWWWWWWWWWWWWWW",
-    "WfffffPPPffffffW",
-    "WffffffffffffffW",
-    "WffPfffffffffffW",
+    "WfPfPfPPPfPfPffW",
+    "WfffffcccfffdfdW",
+    "WffPPffcfffffddW",
     "WffffffPfffffffW",
-    "PffffffffffffffW",
-    "WffffffffffffffW",
-    "WffffffffffffffW",
-    "WffffffffffffffW",
-    "WffffffffffffffW",
+    "WfffffffPffffffW",
+    "WffffffffPfffffW",
+    "WfPffffffffffffW",
+    "WfffffffffffffPW",
+    "WfffffffffffffPW",
     "WWWWWWWWWWWWWWWW"
   ]
 }

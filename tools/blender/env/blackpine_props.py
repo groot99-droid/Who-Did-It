@@ -171,6 +171,231 @@ SPOTS = {
                                               outline=False)]),
 }
 
+
+# ---------------------------------------------------------------- dressing (round 8, 8K; kind `dressing`)
+# Set dressing for every Blackpine room, drawn by id tail (`bl.crate_2` -> prop_crate, SPRITES 3). Hung pieces
+# (`wall_*`, `window`) stand on the floor tile in front of a wall, their back panel at the tile's north edge.
+CANVAS = ["#5C4A2A", "#80683A", "#B2AA99"]
+
+
+def lamp_on(x, y, z):
+    """A small oil lamp: brass foot, glass, flame."""
+    return [part("LampFoot", T("brass", 1), C(x, y, z, 0.07, 0.05, 8)),
+            part("LampGlass", F("lantern", 3), C(x, y, z + 0.05, 0.06, 0.14, 8, rt=0.04), outline=False),
+            part("LampCap", T("ink", 1), C(x, y, z + 0.19, 0.04, 0.03, 6), outline=False)]
+
+
+def crate():
+    return [kenney("survival-kit", "box-large", size=0.7, ramp=WOODR)]
+
+
+def crates():
+    return [kenney("survival-kit", "box-large", size=0.72, ramp=WOODR, at=(-0.05, 0.05, 0)),
+            kenney("survival-kit", "box", size=0.45, ramp=WOODR, at=(0.08, -0.05, 0.52), rot=0.4)]
+
+
+def barrel():
+    return [kenney("survival-kit", "barrel", height=0.8, ramp=WOODR),
+            part("Lid", T("wood", 2), C(0, 0, 0.8, 0.27, 0.03, 12), outline=False)]
+
+
+def sacks():
+    return [part("Sacks", T("litter", 2), *[S(blob(x, y, 0.22, 0.18, [(0.06, 3, x)], n=12), z, z + h)
+                                            for x, y, z, h in ((-0.18, 0.1, 0, 0.42), (0.2, 0.05, 0, 0.38),
+                                                               (0.0, -0.15, 0, 0.34), (0.02, 0.05, 0.36, 0.3))],
+                 bevel=0.08),
+            part("Ties", T("litter", 0), *[B(x, y, z, 0.1, 0.1, 0.04) for x, y, z in
+                                           ((-0.18, 0.1, 0.42), (0.2, 0.05, 0.38), (0.02, 0.05, 0.66))],
+                 outline=False)]
+
+
+def stool():
+    return [part("Seat", T("wood", 3), C(0, 0, 0.45, 0.2, 0.06, 10)),
+            part("Legs", T("wood", 2), *[B(0.12 * math.cos(a), 0.12 * math.sin(a), 0.22, 0.05, 0.05, 0.45)
+                                         for a in (0.4, 2.5, 4.6)])]
+
+
+def chair():
+    return [kenney("furniture-kit", "chair", height=0.95, ramp=WOODR, rot=math.pi)]
+
+
+def bench():
+    return [kenney("furniture-kit", "bench", size=0.9, ramp=WOODR)]
+
+
+def side_table():
+    return [part("Top", T("wood", 3), B(0, 0, 0.62, 0.62, 0.55, 0.05)),
+            part("Legs", T("wood", 2), *[B(sx * 0.25, sy * 0.21, 0.3, 0.05, 0.05, 0.6) for sx in (1, -1)
+                                         for sy in (1, -1)]),
+            part("Cloth", T("bone", 1), B(-0.12, -0.05, 0.655, 0.22, 0.3, 0.01), outline=False),
+            *lamp_on(0.12, 0.05, 0.65)]
+
+
+def wall_lamp():
+    return [back_panel("Bracket", T("wood", 2), 0.34, 0.7, 0.95),
+            part("Arm", T("ink", 1), B(0, 0.25, 1.5, 0.05, 0.3, 0.05), outline=False),
+            part("LampBody", T("slate", 1), C(0, 0.12, 1.1, 0.13, 0.08, 8)),
+            part("LampGlass", F("lantern", 3), C(0, 0.12, 1.18, 0.11, 0.24, 8, rt=0.08), outline=False),
+            part("LampCap", T("ink", 1), C(0, 0.12, 1.42, 0.09, 0.06, 8, rt=0.03))]
+
+
+def wall_shelf():
+    return [back_panel("Back", T("wood", 1), 0.9, 1.1, 0.7),
+            part("Boards", T("wood", 3), *[B(0, 0.3, z, 0.9, 0.22, 0.04) for z in (0.95, 1.4)]),
+            part("Jars", T("bone", 2), *[C(x, 0.3, z + 0.02, 0.06, 0.16, 8) for x, z in
+                                         ((-0.3, 0.95), (-0.15, 0.95), (0.25, 1.4))]),
+            part("Tins", T("slate", 2), *[C(x, 0.3, z + 0.02, 0.07, 0.12, 8) for x, z in
+                                          ((0.1, 0.95), (0.3, 0.95), (-0.25, 1.4))]),
+            part("Box", T("brick", 2), B(0.0, 0.3, 1.5, 0.22, 0.16, 0.16))]
+
+
+def window():
+    return [back_panel("Frame", T("wood", 3), 0.8, 0.95, 0.85),
+            part("Glass", F("moon", 1), B(0, 0.38, 1.32, 0.64, 0.02, 0.78), outline=False),
+            part("Bars", T("wood", 2), B(0, 0.36, 1.32, 0.05, 0.03, 0.8), B(0, 0.36, 1.32, 0.66, 0.03, 0.05),
+                 outline=False),
+            part("Sill", T("wood", 4), B(0, 0.3, 0.84, 0.88, 0.2, 0.05))]
+
+
+def cupboard():
+    return [kenney("furniture-kit", "bookcaseClosedDoors", height=1.5, ramp=["#24171A", "#55332A", "#94603F"])]
+
+
+def footlocker():
+    return [kenney("survival-kit", "chest", size=0.75, ramp=WOODR)]
+
+
+def firewood():
+    pos = ((-0.2, 0.09), (0, 0.09), (0.2, 0.09), (-0.1, 0.26), (0.1, 0.26), (0, 0.43))
+    return [part("Logs", T("wood", 3), *[B(0, y, z, 0.8, 0.18, 0.17) for y, z in pos], bevel=0.05),
+            part("Ends", T("wood", 5), *[B(0.405, y, z, 0.01, 0.13, 0.12) for y, z in pos], outline=False)]
+
+
+def bucket():
+    return [kenney("survival-kit", "bucket", height=0.4, ramp=["#2C3240", "#4D5A70", "#6F7A8C"]),
+            part("Mop", T("wood", 4), B(0.05, 0.05, 0.6, 0.04, 0.04, 1.1), outline=False)]
+
+
+def coat_rack():
+    return [kenney("furniture-kit", "coatRackStanding", height=1.7, ramp=WOODR),
+            part("Coat", T("litter", 1), B(0.05, -0.08, 1.15, 0.3, 0.12, 0.6), bevel=0.04)]
+
+
+def axe_block():
+    return [part("Block", T("wood", 3), C(0, 0, 0, 0.3, 0.45, 10)),
+            part("Rings", T("wood", 5), C(0, 0, 0.45, 0.26, 0.01, 10), outline=False),
+            part("Handle", T("wood", 4), B(0.05, 0, 0.75, 0.05, 0.05, 0.6)),
+            part("Head", T("slate", 2), B(0.05, 0, 0.48, 0.2, 0.04, 0.12)),
+            part("Chips", T("wood", 5), *[B(x, y, 0.01, 0.08, 0.04, 0.02) for x, y in
+                                          ((-0.35, -0.2), (0.3, -0.3), (-0.1, -0.38))], outline=False)]
+
+
+def saw_horse():
+    return [part("Beam", T("wood", 3), B(0, 0, 0.62, 0.9, 0.1, 0.08)),
+            part("Legs", T("wood", 2), *[B(sx * 0.38, sy * 0.12, 0.3, 0.06, 0.06, 0.64) for sx in (1, -1)
+                                         for sy in (1, -1)]),
+            part("Log", T("wood", 4), B(0.1, 0, 0.75, 0.6, 0.18, 0.18), bevel=0.05)]
+
+
+def rope_coil():
+    return [part("Coil", T("plaster", 1), *[C(0, 0, 0.06 * k, 0.3 - 0.03 * k, 0.06, 12) for k in range(4)],
+                 bevel=0.02),
+            part("Pin", T("wood", 2), B(0.2, 0.15, 0.3, 0.06, 0.06, 0.6), outline=False)]
+
+
+def workbench():
+    return [kenney("survival-kit", "workbench", size=0.95, ramp=WOODR),
+            part("Plane", T("slate", 2), B(0.2, 0, 0.82, 0.22, 0.08, 0.06), outline=False)]
+
+
+def grindstone():
+    return [kenney("survival-kit", "workbench-grind", size=0.9, ramp=["#2E2A2D", "#5E5553", "#9A9083"])]
+
+
+def timber_set():
+    """A mine set: two posts and a cap, with lagging behind."""
+    return [part("Posts", T("wood", 2), *[B(sx * 0.36, 0.2, 0.9, 0.14, 0.14, 1.8) for sx in (1, -1)]),
+            part("Cap", T("wood", 3), B(0, 0.2, 1.86, 0.95, 0.18, 0.14)),
+            part("Lagging", T("wood", 1), *[B(0, 0.36, 0.25 + 0.32 * k, 0.86, 0.04, 0.26) for k in range(5)])]
+
+
+def rock_pile():
+    rnd = random.Random("bprocks")
+    return [part("Rocks", T("stone", 2), *[S(blob(x, y, r, r * 0.8, [(0.1, 4, rnd.random() * 6)], n=10), z,
+                                             z + r * 1.2) for x, y, r, z in
+                                           ((-0.2, 0.1, 0.22, 0), (0.18, 0.05, 0.2, 0), (0, -0.18, 0.18, 0),
+                                            (0.02, 0.06, 0.15, 0.22))], bevel=0.06)]
+
+
+def ore_pile():
+    return [part("Ore", T("brick", 1), S(blob(0, 0, 0.4, 0.34, [(0.15, 5, 0.2)], n=14), 0, 0.3), bevel=0.12),
+            part("Glints", F("brass", 2), *[B(x, y, 0.3, 0.05, 0.05, 0.03) for x, y in
+                                            ((-0.1, -0.1), (0.15, 0.05), (0.0, 0.15))], outline=False)]
+
+
+def lamp_post():
+    """A mine lamp hung from a post."""
+    return [part("Post", T("wood", 2), B(0, 0.1, 0.9, 0.12, 0.12, 1.8)),
+            part("Hook", T("ink", 1), B(0, -0.05, 1.6, 0.04, 0.3, 0.04), outline=False),
+            part("Lamp", T("slate", 1), C(0, -0.18, 1.3, 0.08, 0.06, 8)),
+            part("Glow", F("lantern", 3), C(0, -0.18, 1.36, 0.07, 0.14, 8), outline=False)]
+
+
+def wheelbarrow():
+    return [part("Tray", T("slate", 1), (frustum, dict(z0=0.18, z1=0.46, bottom=(0.4, 0.3), top=(0.6, 0.45)))),
+            part("Wheel", T("ink", 1), B(0.35, 0, 0.14, 0.28, 0.06, 0.28), bevel=0.06),
+            part("Handles", T("wood", 3), *[B(-0.3, sy * 0.18, 0.45, 0.5, 0.04, 0.04) for sy in (1, -1)])]
+
+
+def stump():
+    return [kenney("nature-kit", "stump_old", size=0.6, colours={"woodBark": "#55332A", "woodInner": "#B57F54"})]
+
+
+def log():
+    return [kenney("nature-kit", "log", size=0.95, colours={"woodBark": "#55332A", "woodInner": "#B57F54"})]
+
+
+def signpost():
+    return [kenney("survival-kit", "signpost", height=1.3, ramp=WOODR)]
+
+
+def cart():
+    return [kenney("fantasy-town-kit", "cart", size=0.95, ramp=WOODR)]
+
+
+DRESSING = {
+    "prop_crate": (64, 64, crate),
+    "prop_crates": (64, 80, crates),
+    "prop_barrel": (64, 80, barrel),
+    "prop_sacks": (64, 64, sacks),
+    "prop_stool": (64, 64, stool),
+    "prop_chair": (64, 80, chair),
+    "prop_bench": (64, 64, bench),
+    "prop_side_table": (64, 80, side_table),
+    "prop_wall_lamp": (64, 112, wall_lamp),
+    "prop_wall_shelf": (64, 112, wall_shelf),
+    "prop_window": (64, 112, window),
+    "prop_cupboard": (64, 112, cupboard),
+    "prop_footlocker": (64, 64, footlocker),
+    "prop_firewood": (64, 64, firewood),
+    "prop_bucket": (64, 96, bucket),
+    "prop_coat_rack": (64, 128, coat_rack),
+    "prop_axe_block": (64, 80, axe_block),
+    "prop_saw_horse": (64, 80, saw_horse),
+    "prop_rope_coil": (64, 64, rope_coil),
+    "prop_workbench": (64, 80, workbench),
+    "prop_grindstone": (64, 80, grindstone),
+    "prop_timber_set": (64, 128, timber_set),
+    "prop_rock_pile": (64, 64, rock_pile),
+    "prop_ore_pile": (64, 64, ore_pile),
+    "prop_lamp_post": (64, 128, lamp_post),
+    "prop_wheelbarrow": (64, 64, wheelbarrow),
+    "prop_stump": (64, 64, stump),
+    "prop_log": (64, 64, log),
+    "prop_signpost": (64, 112, signpost),
+    "prop_cart": (64, 80, cart),
+}
+
 PROPS = {
     "prop_bell": (64, 128, bell),
     "prop_oven": (64, 96, oven),
@@ -191,4 +416,5 @@ PROPS = {
     "prop_refuge_table": (64, 80, refuge_table),
     "prop_tin_crate": (64, 64, tin_crate),
     **SPOTS,
+    **DRESSING,
 }
