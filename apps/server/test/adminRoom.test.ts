@@ -85,7 +85,8 @@ describe('with the variables set', () => {
       ['an empty token', ''],
       ['a number', 42],
       ['garbage', 'not.a.token'],
-      ['a tampered signature', `${payload}.${sig.slice(0, -2)}AA`],
+      // Flip the first character: the old tamper wrote 'AA' over the last two, a no-op when they already were (1 run in 256).
+      ['a tampered signature', `${payload}.${sig[0] === 'A' ? 'B' : 'A'}${sig.slice(1)}`],
       ['a forged payload', `${forged}.${sig}`],
       ['an expired token', tokenFor('owner-login', nowS() - 1)],
       ['a login off the allowlist', tokenFor('stranger')],
