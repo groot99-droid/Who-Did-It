@@ -3309,4 +3309,13 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 ### Round 7 log: 7K
 
+- 2026-10-23: PR 1 (the four rooms as scenes). `crumb_cold`, `crumb_mixing`, `crumb_oven` and `crumb_proofing`
+  (prefixes `cf`, `cm`, `co`, `cp`) behind four new doors in the bakery's back wall, each a dead end with one
+  spawn, one hiding and one body spot and the picture's lights; ids, doors and sizes in A118. The pictures were read
+  as rooms without a question to 6Z. Station props, their renders and the pictures' own spot art follow in PR 2,
+  the task nodes and `e2e/ovens.spec.ts` in PR 3.
+- Seed for round 8 (Port-au-Levain, A116): the ten kitchen pictures stay unbuilt and are its rooms, the cellar,
+  cold pantry, command desk, dish pit, expediter, front of house, hygiene, lamination, shaping bench and
+  sub-basement (`assets/source/concepts/onub/`); they move to `docs/round8/` when that folder exists.
+
 ## Integration log, round 7
