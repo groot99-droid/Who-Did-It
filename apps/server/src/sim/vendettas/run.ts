@@ -3,7 +3,7 @@ import { onSim } from '../events/bus';
 import { isOnub } from '../onub/state';
 import { onMeetingConversion, runConversion } from './conversion';
 import { runSabotage } from './sabotage';
-import { vendettaHolders, vendettaOf } from './state';
+import { privateVendetta, vendettaHolders, vendettaOf } from './state';
 
 /**
  * The vendettas' Step stage (round 7, GDD 3.20), Session 7H: the conditions each holder's vendetta watches, once per
@@ -22,6 +22,11 @@ function subscribe(room: PartyRoom): void {
 export function runVendettas(room: PartyRoom): void {
   subscribe(room);
   if (isOnub(room)) return;
+  // The card's goal line (`Private.vendetta`), written here because the deal fills the Cabal mates after the draw.
+  for (const [id, player] of room.state.players) {
+    const line = player.priv ? privateVendetta(room, id) : '';
+    if (player.priv && player.priv.vendetta !== line) player.priv.vendetta = line;
+  }
   for (const seat of vendettaHolders(room).keys()) {
     const kind = vendettaOf(room, seat)?.kind;
     if (kind === 'conversion') runConversion(room, seat);

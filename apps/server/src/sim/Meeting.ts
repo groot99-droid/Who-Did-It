@@ -14,7 +14,7 @@ import {
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { enterScene } from './Portals';
 import { emitSim } from './events/bus';
-import { countsVote } from './vendettas/conversion';
+import { countsVote, hasCastDespiteDoubt } from './vendettas/conversion';
 import { countRow, factionOf, flowOf, refuse, roleIdOf, rolesOf, secondsToTicks, setPhase } from './Flow';
 import { hubOf, meetingSpawnsOf } from './MapSites';
 import { onMeetingOpenDisguise } from './Impersonate';
@@ -111,7 +111,7 @@ export function handleVote(room: PartyRoom, sessionId: string, payload: Record<s
         : isLiving(room, target) && (!quick || onubBalance.vote.selfVoteAllowed || target !== sessionId));
   if (!ok) return refuse(room, sessionId, ErrorCode.cannot, 'no such candidate');
   voter.priv.myVote = target;
-  voter.hasVoted = true;
+  voter.hasVoted = countsVote(room, sessionId); // round 7, 7H: a doubted Vicar's vote stays unseen (GDD 3.20)
   emitSim(room, { tick: room.state.tick, kind: 'vote', seat: sessionId, data: { target } }); // round 6, 6B
 }
 
@@ -128,7 +128,12 @@ function livingIds(room: PartyRoom): string[] {
 
 const allVoted = (room: PartyRoom): boolean => {
   const living = livingIds(room);
-  return living.length > 0 && living.every((id) => room.state.players.get(id)?.hasVoted === true);
+  return (
+    living.length > 0 &&
+    living.every(
+      (id) => room.state.players.get(id)?.hasVoted === true || hasCastDespiteDoubt(room, id), // round 7, 7H
+    )
+  );
 };
 
 /** Tally, announce, eject: the reveal lasts `revealS`, the win check waits for its end. */

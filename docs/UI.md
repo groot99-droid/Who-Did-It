@@ -1339,3 +1339,17 @@ Lines are in `apps/client/src/ui/copy/intro.ts` (`INTRO_COPY`). The `Intro` scen
 - **When it plays.** Once per browser session (`sessionStorage['wdi:introSeen']`, set at the tap). Not under `prefers-reduced-motion`, the data saver (`saveData`), `?intro=0`, a reload that rejoins a lobby (`#/lobby/CODE`), and in the mock (`?mock=1`) unless `?intro=1`. `?intro=1` overrides only the mock rule.
 - **How it ends.** The video ends, Skip, a click or tap anywhere while it plays, or Esc (also before the tap). A stream that has not started 8 s after the tap, or a video error, ends it the same way. Then `Landing` starts as it always did.
 - **A missing file.** No manifest, no `intro` row, a failed HEAD request for the file, or an HTML answer where a video should be: the scene starts `Landing` at once and shows nothing.
+
+### 14.29 Vendettas (7H)
+
+Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaGoal(id)`). The role card (`ui/RoleCard.ts`, 7F renders it) reads `Private.vendetta` (GDD 3.20): a Killer's own vendetta id, or for the Accomplice the ids of the Killers it knows, joined by commas. An empty value shows no line. No other seat's card, no world label and no toast names a vendetta; the doubted Vicar's note is its own.
+
+| Key | Text | Where |
+|---|---|---|
+| `vendetta.label` | Vendetta | the heading of the goal line on a Killer's card |
+| `vendetta.goal.zealot` | Zealot: stay near the Vicar until doubt takes the flock. | a Killer holding conversion |
+| `vendetta.goal.activist` | Activist: tamper with two of the company’s work stations. | a Killer holding sabotage |
+| `vendetta.goal.bandit` | Bandit: crack the manor’s strongbox after dark, alone. | a Killer holding heist |
+| `vendetta.goal.hitman` | Hitman: the Train brings you a contract. Take only its mark. | a Killer holding contract |
+| `vendetta.mate` | Your Killer’s vendetta: {goal} | the Accomplice's card, once per Killer it knows; `{goal}` is that Killer's goal line |
+| `vendetta.note.doubt` | Doubt took the flock: your vote did not carry. | the Vicar's own Notebook entry of kind `NoteKind.doubt`, written at the reveal of the doubted meeting |

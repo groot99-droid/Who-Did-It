@@ -1,7 +1,8 @@
 import { balance } from '@wdi/content';
-import { TICK_RATE } from '@wdi/shared';
+import { NoteKind, Phase, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { flowOf } from '../Flow';
+import { addNote } from '../NightPowers';
 import { simOf } from '../RoomSim';
 import { isWorldPhase } from '../World';
 import { activeBody, emitStep, progressOf } from './progress';
@@ -9,7 +10,8 @@ import { vendettaHolders, vendettaOf } from './state';
 
 /**
  * Conversion, the Zealot against the Vicar (GDD 3.20): world-phase time shared with the seat dealt the Vicar sows
- * the doubt; the next meeting's tally does not count the Vicar's vote. Session 7H.
+ * the doubt; at the next meeting the Vicar's vote is an abstention for every other seat, and the Vicar alone learns
+ * at the reveal, in its Notebook, that its voice did not carry. Session 7H.
  */
 
 const VICAR = 'vicar';
@@ -27,11 +29,16 @@ function lapse(room: PartyRoom, seat: string): void {
   progressOf(room, seat).over = true;
 }
 
-/** Step stage (`runVendettas`): the shared time, the sowing and the lapse. */
+/** Step stage (`runVendettas`): the shared time, the sowing, the lapse and the Vicar's note. */
 export function runConversion(room: PartyRoom, seat: string): void {
   const prog = progressOf(room, seat);
-  if (prog.over || prog.sown) return;
   const vicar = vicarSeat(room);
+  // The Vicar's own news, at the reveal of the doubted meeting (no other seat learns it).
+  if (prog.doubtMeeting !== null && !prog.doubtNoted && room.state.phase === Phase.reveal && vicar !== null) {
+    prog.doubtNoted = true;
+    addNote(room, vicar, NoteKind.doubt, vicar);
+  }
+  if (prog.over || prog.sown) return;
   if (vicar === null || vicarGone(room, vicar)) return lapse(room, seat);
   if (!isWorldPhase(room.state.phase)) return;
   const me = activeBody(room, seat);
@@ -67,4 +74,9 @@ export function countsVote(room: PartyRoom, voter: string): boolean {
   for (const seat of vendettaHolders(room).keys())
     if (progressOf(room, seat).doubtMeeting === index) return false;
   return true;
+}
+
+/** A doubted Vicar who has cast: voted for the meeting's early end, though its public `hasVoted` stays false. */
+export function hasCastDespiteDoubt(room: PartyRoom, id: string): boolean {
+  return !countsVote(room, id) && (room.state.players.get(id)?.priv?.myVote ?? '') !== '';
 }

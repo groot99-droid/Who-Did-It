@@ -717,8 +717,10 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
 - **Conversion: the Zealot against the Vicar (7H).** The Zealot's goal is the Vicar's flock: world-phase time in
   the same scene as the seat dealt the Vicar, both alive and placed, counted across scenes and phases. At **45 s**
   (`vendettas.conversion.shareS`) the doubt is sown (`vendetta.conversion.sown`). At the next meeting the
-  Vicar's vote counts for nothing in the tally (`vendetta.conversion.doubt`, the consequence); the Vicar still
-  votes and sees its vote, and the tally shows one vote fewer. If the Vicar dies or is ejected first, the
+  Vicar's vote counts for nothing (`vendetta.conversion.doubt`, the consequence). To every other seat it is an
+  ordinary abstention: the Vicar's voted mark stays down and the tally leaves it out, while the meeting still ends
+  early once every living seat has cast. The Vicar still votes and sees its own vote, and at the reveal it alone
+  learns, in its Notebook, that its voice did not carry. If the Vicar dies or is ejected first, the
   vendetta lapses (`vendetta.conversion.lapsed`).
 - **Sabotage: the Activist against the company (7H).** The Activist's goal is the company's stations: standing
   still within verb reach of a target prop of a task (3.5) for **6 s** (`vendettas.sabotage.tamperS`) in a verb

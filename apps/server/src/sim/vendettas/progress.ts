@@ -15,6 +15,7 @@ export interface Progress {
   sharedTicks: number;
   sown: boolean;
   doubtMeeting: number | null;
+  doubtNoted: boolean;
   /** Sabotage: the target being held, since how many still ticks, and the targets tampered with. */
   holding: { prop: string; ticks: number } | null;
   tampered: string[];
@@ -52,6 +53,7 @@ export function progressOf(room: PartyRoom, seat: string): Progress {
       sharedTicks: 0,
       sown: false,
       doubtMeeting: null,
+      doubtNoted: false,
       holding: null,
       tampered: [],
       last: null,

@@ -1,6 +1,6 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance, roles, scenes, validateContent, vendettas } from '@wdi/content';
-import { BUILD_VERSION, C2S, Phase, TICK_RATE, TaskEntry } from '@wdi/shared';
+import { BUILD_VERSION, C2S, NoteKind, Phase, TICK_RATE, TaskEntry } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { MatchSeeds, type SeedWords } from '../src/sim/seeds';
@@ -15,6 +15,7 @@ import { fixSeeds } from './seedHelpers';
 import { sceneKey } from '../src/sim/World';
 import { matchEvents } from '../src/sim/auto/log';
 import { countsVote } from '../src/sim/vendettas/conversion';
+import { vendettaGoalFor } from '../src/sim/vendettas/goal';
 import { progressOf, vendettaSteps } from '../src/sim/vendettas/progress';
 import { holdVendetta } from '../src/sim/vendettas/state';
 import {
@@ -185,9 +186,12 @@ describe('conversion and sabotage in a match', () => {
     const killer = idOf(m, 0);
     const vicar = idOf(m, 1);
     expect(sim(m, 0).sceneIdx).toBe(sim(m, 1).sceneIdx);
+    expect(vendettaGoalFor(m.room, killer)).toEqual({ sceneId: 'overworld', targetSeat: vicar });
     progressOf(m.room, killer).sharedTicks = balance.vendettas.conversion.shareS * TICK_RATE - 2;
     await until(() => progressOf(m.room, killer).sown);
     expect(stepsOf(m)).toEqual(['vendetta.conversion.sown']);
+    expect(vendettaGoalFor(m.room, killer)).toBeNull();
+    expect([seat(m, 0).priv.vendetta, seat(m, 1).priv.vendetta]).toEqual(['zealot', '']);
 
     await openMeeting(m, 2);
     await until(() => stepsOf(m).length === 2);
@@ -199,6 +203,12 @@ describe('conversion and sabotage in a match', () => {
     const tally = events(m.bots[0] as never, 'voteResult').at(-1)?.tally as Record<string, number>;
     expect(tally[idOf(m, 4)] ?? 0).toBe(0);
     expect(tally[idOf(m, 3)]).toBe(4);
+    // Publicly the doubted Vicar never voted, yet the meeting ended early; it alone holds the note.
+    expect(seat(m, 1).hasVoted).toBe(false);
+    await until(() => seat(m, 1).priv.notebook.some((n) => n.note === NoteKind.doubt));
+    expect(seat(m, 1).priv.notebook.filter((n) => n.note === NoteKind.doubt)).toHaveLength(1);
+    for (const i of [0, 2, 3, 4])
+      expect(seat(m, i).priv.notebook.some((n) => n.note === NoteKind.doubt)).toBe(false);
     // Every step on the bus names no seat; the record keeps the holder.
     for (const e of vendettaEvents(m)) expect(e.seat).toBeUndefined();
     expect(vendettaSteps(m.room).every((s) => s.seat === killer)).toBe(true);
@@ -226,6 +236,7 @@ describe('conversion and sabotage in a match', () => {
     m.room.state.taskBar = 50;
     seat(m, 0).priv.cooldownEndTick.set('kill', m.room.state.tick + 100 * TICK_RATE);
 
+    expect(vendettaGoalFor(m.room, killer)?.sceneId).toBeTypeOf('string');
     const pump = scenes.overworld.props.find((q) => q.id === 'ov.pump') as { x: number; y: number };
     standAt(m, m.bots[0] as never, pump.x, pump.y + 1);
     expect(sceneKey(p.sceneIdx)).toBe('overworld');
@@ -239,6 +250,7 @@ describe('conversion and sabotage in a match', () => {
     expect(finished.done).toBe(false);
     expect(m.room.state.taskBar).toBe(0);
     expect(seat(m, 0).priv.cooldownEndTick.get('kill')).toBeLessThanOrEqual(m.room.state.tick);
+    expect(vendettaGoalFor(m.room, killer)).toBeNull();
     for (const e of vendettaEvents(m)) expect(e.seat).toBeUndefined();
   });
 });
