@@ -29,6 +29,7 @@ import { GiverView } from '../view/GiverView';
 import { MobView } from '../view/MobView';
 import { NodeView } from '../view/NodeView';
 import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
+import { type MugPrompt, mountMugPrompt } from '../ui/mug/MugPrompt';
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
@@ -129,6 +130,7 @@ export class World extends Phaser.Scene {
   private mobView!: MobView;
   private giverView!: GiverView;
   private m5b: M5bLayer | null = null;
+  private mug: MugPrompt | null = null;
   private cutscenes!: CutscenePlayer;
   private ground: GroundView | null = null;
   private bell: { x: number; y: number } | null = null;
@@ -218,6 +220,8 @@ export class World extends Phaser.Scene {
     this.lighting = new Lighting(this, overlayRoot());
     this.lighting.setScene(sceneLights(this.map.lights), this.map.dark);
     this.sheet = new NotebookSheet(overlayRoot(), feed);
+    // Round 8 (8E, GDD 3.24): the mugging prompt, opened by the private `mugPrompt`.
+    this.mug = mountMugPrompt(overlayRoot(), feed, (choice) => feed.mug(choice));
     this.audio = this.registry.get(REG_AUDIO) ?? new AudioBus();
     if (!this.registry.has(REG_AUDIO)) {
       this.registry.set(REG_AUDIO, this.audio);
@@ -312,6 +316,7 @@ export class World extends Phaser.Scene {
       this.mobView.destroy();
       this.giverView.destroy();
       this.m5b?.destroy();
+      this.mug?.destroy();
       this.cutscenes.destroy();
       this.ground?.destroy();
       this.ground = null;

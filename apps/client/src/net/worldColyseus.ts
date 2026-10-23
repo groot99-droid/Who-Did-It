@@ -93,6 +93,7 @@ export class ColyseusWorldFeed implements WorldFeed {
     room.onMessage('minigameStart', (m: WorldFeedEvents['minigameStart']) =>
       this.bus.emit('minigameStart', m),
     );
+    room.onMessage('mugPrompt', (m: WorldFeedEvents['mugPrompt']) => this.bus.emit('mugPrompt', m));
   }
 
   /** Set by the private `killed` message or a false roster `alive`; cleared when the lobby returns. */
@@ -321,6 +322,10 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   minigameResult(taskId: string, answer: unknown): void {
     this.room.send('minigame.result', { taskId, answer });
+  }
+
+  mug(choice: 'pay' | 'fight' | 'flee'): void {
+    this.room.send('act.mug', { choice });
   }
 
   dispose(): void {

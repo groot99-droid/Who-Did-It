@@ -536,6 +536,10 @@ export class MockWorldFeed implements WorldFeed {
     // The mock has no task layer: `?minigame=<kind>` opens a modal whose result is dropped here.
   }
 
+  mug(_choice: 'pay' | 'fight' | 'flee'): void {
+    // The mock has no townsfolk, so nothing mugs.
+  }
+
   dispose(): void {
     if (this.timer !== null) window.clearInterval(this.timer);
     this.timer = null;

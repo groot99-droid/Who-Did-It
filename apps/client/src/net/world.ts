@@ -133,6 +133,8 @@ export type WorldFeedEvents = {
   cutscene: { id: string; scope?: 'all' };
   /** Private, round 6 (6H, 6I): a station task's mini-game opened; answered with `minigameResult`. */
   minigameStart: { taskId: string; kind: string; public: unknown };
+  /** Private, round 8 (8E, GDD 3.24): a mugger's demand; `muggerId` is its avatar handle, the answer is due by `endsTick`. */
+  mugPrompt: { muggerId: string; endsTick: number };
 };
 
 /** Round 6 (M5b): a resource node of the scene this client is in (`SceneState.nodes`). */
@@ -211,6 +213,8 @@ export interface WorldFeed {
   light(on: boolean): void;
   /** Round 6 (6I): the answer to a `minigameStart`. */
   minigameResult(taskId: string, answer: unknown): void;
+  /** Round 8 (8E, GDD 3.24): the answer to a `mugPrompt` (`act.mug`). */
+  mug(choice: 'pay' | 'fight' | 'flee'): void;
   /**
    * True once this player has been killed or their roster `alive` is false. Held here, never in the
    * scene, so it survives World restarts; resets when the phase returns to the lobby.
