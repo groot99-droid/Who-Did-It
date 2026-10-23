@@ -98,7 +98,7 @@ describe('the profile and the create options in onAuth', () => {
 
 const PORT = 2568; // @colyseus/testing default
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const LISTING_KEYS = ['code', 'leader', 'map', 'max', 'mode', 'players', 'visibility'];
+const LISTING_KEYS = ['code', 'leader', 'map', 'max', 'players', 'visibility'];
 
 async function fetchParties(profile?: string): Promise<PartyListing[]> {
   const url = `http://localhost:${PORT}/parties${profile === undefined ? '' : `?profile=${profile}`}`;
@@ -119,7 +119,7 @@ async function until(check: (rows: PartyListing[]) => boolean, profile?: string)
 }
 
 describe('the party list', () => {
-  it('lists an open party with its leader, seats, mode and map, and nothing else', async () => {
+  it('lists an open party with its leader, seats and map, and nothing else', async () => {
     const leader = await colyseus.sdk.create('party', opts('Ada'));
     const rows = await until((r) => r.some((p) => p.code === leader.roomId));
     const row = rows.find((p) => p.code === leader.roomId) as PartyListing;
@@ -128,7 +128,6 @@ describe('the party list', () => {
       leader: 'Ada',
       players: 1,
       max: 10,
-      mode: 0,
       map: 'hollowmere',
       visibility: 'open',
     });
