@@ -640,6 +640,15 @@ function checkRoutines(c: Content, err: (msg: string) => void): void {
     }
   }
 
+  // Round 7 (GDD 3.21): the party numbers are positive; the profile code is not shorter than a join code.
+  const { party, lobby } = c.balance;
+  for (const [key, value] of Object.entries(party)) {
+    if (typeof value === 'number' && value <= 0) err(`balance.json party.${key}: must be positive`);
+  }
+  if (party.profileCodeLength < lobby.codeLength) {
+    err('balance.json party.profileCodeLength: must be at least lobby.codeLength');
+  }
+
   // Rule 6: the npc spans and the routine weights of balance.json.
   const { routine, react, night, vote, ready, nightPower, aloneKill } = c.balance.npc;
   if (aloneKill.afterS <= 0) err('balance.json npc.aloneKill.afterS: must be positive');
