@@ -3,7 +3,6 @@
   "byMap": {
     "hollowmere": {
       "lobby": "lobby",
-      "loading": "lobby",
       "opening": "hollowmere_opening",
       "day": "hollowmere_day",
       "dusk": "hollowmere_dusk",
@@ -14,7 +13,6 @@
     },
     "blackpine": {
       "lobby": "lobby",
-      "loading": "lobby",
       "opening": "blackpine_opening",
       "day": "blackpine_day",
       "dusk": "blackpine_dusk",

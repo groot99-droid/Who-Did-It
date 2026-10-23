@@ -51,3 +51,32 @@ test('a death cutscene can be skipped, and the ghost handoff follows at once', a
   await page.getByTestId('cutscene-skip').click();
   await expect(page.getByTestId('hud')).toContainText('You are a ghost');
 });
+
+// The owner's report of 2026-10-23 (A101): the intro track started with the opening and the match load's music
+// request cut it off 0.2 s later. Every `<audio>` the page plays is recorded; seconds into the opening the map's
+// intro track must still be the one playing.
+test("the opening plays the map's intro track and nothing cuts it off", async ({ page }) => {
+  await page.addInitScript(() => {
+    const played: HTMLMediaElement[] = [];
+    (window as unknown as { wdiPlayed: HTMLMediaElement[] }).wdiPlayed = played;
+    const play = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function (this: HTMLMediaElement) {
+      played.push(this);
+      return play.call(this);
+    };
+  });
+  await start(page, '&cutscene=1');
+  await expect(page.getByTestId('cutscene')).toBeVisible();
+  await page.waitForTimeout(4000);
+  const intro = await page.evaluate(() => {
+    const played = (window as unknown as { wdiPlayed: HTMLMediaElement[] }).wdiPlayed;
+    const el = played.find((e) => e.src.endsWith('/load_hollowmere.ogg'));
+    const music = played.filter((e) => e.src.includes('/audio/music/') && !e.paused);
+    return {
+      started: el !== undefined,
+      playing: el !== undefined && !el.paused && el.currentTime > 2,
+      others: music.filter((e) => e !== el).map((e) => e.src),
+    };
+  });
+  expect(intro).toEqual({ started: true, playing: true, others: [] });
+});
