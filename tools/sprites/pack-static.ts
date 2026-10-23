@@ -227,6 +227,18 @@ export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
   ],
 };
 
+/**
+ * Maps whose single-tile prop frames (`MAP_PROPS_FRAMES`) pack into the map's building atlas `bld_<mapId>`, which
+ * keeps only its multi-tile slices in `props_<mapId>` (round 8, 8J): the building atlas's last page has the room,
+ * and the client looks a prop up in `props_<mapId>`, then `bld_<mapId>`, then `props` (SPRITES 3). `packStatic`
+ * refuses a `bld_` pack that these frames would give a new or larger page.
+ */
+export const BLD_PROPS_MAPS: ReadonlySet<string> = new Set(['hollowmere']);
+
+/** The `MAP_PROPS_FRAMES` frames a map's building atlas packs (none for a map outside `BLD_PROPS_MAPS`). */
+export const bldPropFrames = (map: string): readonly string[] =>
+  BLD_PROPS_MAPS.has(map) ? (MAP_PROPS_FRAMES[`props_${map}`] ?? []) : [];
+
 /** The clue keys of SPRITES 8 plus Hunger's glowing footprints (art plan 3.8): 24 frames. */
 export function clueFrameNames(): string[] {
   const glow = ['s', 'm', 't'].map((h) => `clue_footprint_${h}_glow`);
@@ -317,7 +329,11 @@ export function expectedFrames(atlas: StaticAtlas): string[] {
   if (atlas.startsWith('iso_kit_')) return kitFrameNames();
   if (atlas === 'props') return [...PROPS_FRAMES].sort();
   if (atlas === 'clues') return clueFrameNames();
-  if (atlas.startsWith('props_')) return [...(MAP_PROPS_FRAMES[atlas] ?? [])].sort();
+  if (atlas.startsWith('props_')) {
+    const bld = bldPropFrames(atlas.slice('props_'.length));
+    return (MAP_PROPS_FRAMES[atlas] ?? []).filter((f) => !bld.includes(f)).sort();
+  }
+  if (atlas.startsWith('bld_')) return [...bldPropFrames(atlas.slice('bld_'.length))].sort();
   return staticFrameNames(atlas as 'vfx');
 }
 
@@ -360,26 +376,69 @@ export function staticAnims(texture: string, frameNames: string[]): { anims: Pha
   };
 }
 
+/**
+ * A building atlas that also holds a map's props (BLD_PROPS_MAPS): the slices pack as they would alone, then the
+ * last page is packed again with the props, on a page no larger. Its other pages are unchanged; props that would
+ * need a new or larger page are refused.
+ */
+async function packIntoLastPage(
+  name: string,
+  inputs: PackInput[],
+  props: string[],
+  cap: readonly [number, number],
+  on: boolean,
+): Promise<PackResult> {
+  const alone = await packSmallest(
+    name,
+    inputs.filter((i) => !props.includes(i.name)),
+    cap[0],
+    cap[1],
+    on,
+  );
+  const n = alone.atlas.textures.length;
+  const last = alone.atlas.textures[n - 1]!;
+  const onLast = new Set([...last.frames.map((f) => f.filename), ...props]);
+  const tail = await packCapped(
+    name,
+    inputs.filter((i) => onLast.has(i.name)),
+    last.size.w,
+    last.size.h,
+    on,
+  ).catch(() => null);
+  if (tail?.atlas.textures.length !== 1) throw new Error(`${name}: its props need a new or larger page`);
+  const page = tail.atlas.textures[0]!;
+  const image = `${name}-${n - 1}.png`;
+  const pages = new Map(alone.pages);
+  pages.set(image, tail.pages.get(page.image)!);
+  return {
+    atlas: { textures: [...alone.atlas.textures.slice(0, -1), { ...page, image }], meta: alone.atlas.meta },
+    pages,
+  };
+}
+
 /** Pack a static sheet; the frame set must match the keys of docs/SPRITES.md 8 exactly. */
 export async function packStatic(
   manifest: StaticManifest,
   inputs: PackInput[],
   on: boolean = finishEnabled('main'),
+  want: string[] = expectedFrames(manifest.atlas),
 ): Promise<Map<string, Buffer>> {
   // Slices are whatever the footprints cut (slice.ts): a building atlas holds only slices, a map's prop
   // atlas its frame list plus the slices of its multi-tile props.
   const got = inputs.map((i) => i.name).sort();
   const sliced = manifest.atlas.startsWith('bld_') || manifest.atlas.startsWith('props_');
-  const want = manifest.atlas.startsWith('bld_') ? [] : expectedFrames(manifest.atlas);
   const missing = want.filter((n) => !got.includes(n));
   const extra = got.filter((n) => !want.includes(n) && !(sliced && SLICE_RE.test(n)));
   if (missing.length || extra.length) {
     throw new Error(`${manifest.atlas}: missing [${missing.join(', ')}], unexpected [${extra.join(', ')}]`);
   }
   const cap = pageCap(manifest.atlas);
-  const { atlas, pages } = cap
-    ? await packSmallest(manifest.atlas, inputs, cap[0], cap[1], on)
-    : await packFrames(manifest.atlas, inputs);
+  const { atlas, pages } =
+    manifest.atlas.startsWith('bld_') && want.length && cap
+      ? await packIntoLastPage(manifest.atlas, inputs, want, cap, on)
+      : cap
+        ? await packSmallest(manifest.atlas, inputs, cap[0], cap[1], on)
+        : await packFrames(manifest.atlas, inputs);
   applyStaticPivots(atlas, manifest);
   const out = new Map<string, Buffer>(pages);
   out.set(`${manifest.atlas}.json`, Buffer.from(atlasJson(atlas)));
