@@ -255,6 +255,11 @@ describe('QuickPlayer', () => {
     (h.state.players.get('b') as { presence?: unknown }).presence = { x: 1, y: 2 };
     h.tick();
     expect(h.player.stats.nightLeaks).toBe(3);
+    // The seat's own all-zero default presence (its own view) is not a leak.
+    delete (h.state.players.get('b') as { presence?: unknown }).presence;
+    (h.state.players.get('me') as { presence?: unknown }).presence = { x: 0, y: 0 };
+    h.tick();
+    expect(h.player.stats.nightLeaks).toBe(3);
   });
 
   it('claims once and votes once in the Rush, for another seat', () => {

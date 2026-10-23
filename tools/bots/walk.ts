@@ -28,7 +28,6 @@ import { fileURLToPath } from 'node:url';
 import { QuickPlayer, type QuickBehavior, type QuickState } from './quick';
 
 export const DEFAULT_URL = 'http://localhost:2567';
-const SCENE_IDS = Object.keys(scenes) as Array<keyof typeof scenes>;
 const REACH_PX = balance.doors.reachTiles * TILE_PX;
 function rangePx(id: string): number {
   const tiles = abilities.abilities[id]?.rangeTiles;
@@ -111,7 +110,19 @@ interface StateLike {
     forEach(cb: (p: PlayerLike, id: string) => void): void;
     get(id: string): PlayerLike | undefined;
   };
-  scenes?: { get(key: string): { bodies: { forEach(cb: (b: BodyLike) => void): void } } | undefined };
+  scenes?: {
+    get(key: string): SceneLike | undefined;
+    forEach(cb: (scene: SceneLike, key: string) => void): void;
+  };
+}
+/** A scene in the bot's view: the bodies and the walking figures under their opaque handles (A50). */
+interface SceneLike {
+  bodies: { forEach(cb: (b: BodyLike) => void): void };
+  avatars: {
+    forEach(
+      cb: (a: { lookOf: string; x: number; y: number; statusBits: number }, handle: string) => void,
+    ): void;
+  };
 }
 
 /** Deterministic PRNG so a soak run can be reproduced from its seed. */
@@ -260,7 +271,11 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
     }
     if (!me.presence || !isWorld(state.phase)) return;
 
-    const sceneKey = SCENE_IDS[me.sceneId] ?? 'overworld';
+    // Round 5 (A50): a client holds only its own scene, so the scene key is the one in `state.scenes`.
+    let sceneKey: keyof typeof scenes = 'overworld';
+    state.scenes?.forEach((_scene, key) => {
+      if (key in scenes) sceneKey = key as keyof typeof scenes;
+    });
     const scene = scenes[sceneKey];
     const { x, y } = me.presence;
     let steer: { dx: number; dy: number } | undefined;
@@ -300,14 +315,14 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
       (me.priv?.cooldownEndTick.get('kill') ?? 0) <= state.tick;
     if (knifeReady && !standStill) {
       const mates = new Set(card?.teammates.map((t) => t.id));
-      let prey: PlayerLike | undefined;
+      let prey: { handle: string; x: number; y: number } | undefined;
       let preyD = Infinity;
-      state.players.forEach((p, id) => {
-        if (id === room.sessionId || mates.has(id) || !p.presence || p.sceneId !== me.sceneId) return;
-        if ((p.presence.statusBits & 1) !== 0) return;
-        const d = Math.hypot(p.presence.x - x, p.presence.y - y);
+      // Round 5 (A50): the figures in my scene are avatars under opaque handles; `lookOf` names the seat drawn.
+      state.scenes?.get(sceneKey)?.avatars.forEach((a, handle) => {
+        if (a.lookOf === room.sessionId || mates.has(a.lookOf) || (a.statusBits & 1) !== 0) return;
+        const d = Math.hypot(a.x - x, a.y - y);
         if (d < preyD) {
-          prey = p;
+          prey = { handle, x: a.x, y: a.y };
           preyD = d;
         }
       });
@@ -315,10 +330,10 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
         if (preyD <= KILL_PX) {
           if (now - lastKillAt > 500) {
             lastKillAt = now;
-            room.send('act.ability', { abilityId: 'kill', targetId: prey.id });
+            room.send('act.ability', { abilityId: 'kill', targetId: prey.handle });
             stats.kills++;
           }
-        } else if (walk && !steer) steer = unit(prey.presence!.x - x, prey.presence!.y - y, preyD);
+        } else if (walk && !steer) steer = unit(prey.x - x, prey.y - y, preyD);
       }
     }
 

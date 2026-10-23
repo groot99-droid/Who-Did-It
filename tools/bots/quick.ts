@@ -367,9 +367,10 @@ export class QuickPlayer {
       this.m = QuickPlayer.fresh();
       return;
     }
-    // Quick mode sends no presence to anyone (every seat is in the loft).
-    state.players.forEach((p) => {
-      if (p.presence) this.stats.nightLeaks++;
+    // Quick mode sends no presence to anyone (every seat is in the loft); the seat's own Player carries an
+    // all-zero default `presence` object (the own view, `sim/Visibility.ts`), which is not a leak.
+    state.players.forEach((p, id) => {
+      if (id !== this.selfId() && p.presence) this.stats.nightLeaks++;
     });
     this.deck = listOf(state.onub?.deck);
     this.station = me.priv?.onubLoc ?? '';
