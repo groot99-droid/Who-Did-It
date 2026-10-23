@@ -2,6 +2,12 @@
   "version": 1,
   "entries": [
     {
+      "key": "memorial_vicar",
+      "url": "memorial_vicar.webm",
+      "durationS": 21.13,
+      "bytes": 1858342
+    },
+    {
       "key": "intro",
       "url": "intro.webm",
       "poster": "intro.jpg",
