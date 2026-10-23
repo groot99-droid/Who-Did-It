@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 import { setRoute } from '../flags';
 import { buildIsStale, REFRESH_MESSAGE } from '../health';
+import { buildLine, hideBackdrop, showBackdrop } from '../ui/backdrop';
 import { mountLanding } from '../ui/Landing';
 import { overlayRoot, type Screen } from '../ui/dom';
-import { Backdrop } from '../view/Backdrop';
 import type { MusicBus } from '../view/MusicBus';
 import { REG_MUSIC, getFlags, getHealth, getNet } from './registry';
 
@@ -15,8 +15,11 @@ export class Landing extends Phaser.Scene {
   }
 
   create(): void {
-    new Backdrop(this).setHealth(getHealth(this));
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.screen?.destroy());
+    showBackdrop({ title: true, status: buildLine(getHealth(this)) });
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.screen?.destroy();
+      hideBackdrop();
+    });
 
     const net = getNet(this);
     const flags = getFlags(this);

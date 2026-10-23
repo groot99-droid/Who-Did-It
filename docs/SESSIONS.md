@@ -3236,6 +3236,12 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
   and in the measured stacks (muted lilac on a sheen cell 4.63). `.wdi-seg` stays in 7E's
   `ui/artStyle/artStyle.css`, which loads after `components.css`, so the glass look is the modifier
   `.wdi-seg--glass` (with `.wdi-seg__note`) for 7E to add. `ui/theme/title.ts` builds the title's letters.
+- 2026-10-23: PR 3 (`ui/backdrop.ts`, `.wdi-backdrop`, `view/Backdrop.ts` removed). One DOM layer mounted as
+  `#overlay`'s preceding sibling (the overlay has no z-index, so tree order paints canvas, backdrop, screens).
+  With no `landing_loop` row it is the night page alone; with the row, the poster, then the video unless
+  `?video=0` or the data saver; reduced motion keeps it paused. The four scenes that drew the canvas backdrop
+  (Boot, and 7C's, 7E's and 7F's Landing, Lobby, RoleReveal) each changed by a show and a hide line only.
+  For 7C: `ui/landingTrailer.ts` now plays a second copy of the loop, so the menu should drop `mountTrailer`.
 
 ### Round 7 log: 7C
 
