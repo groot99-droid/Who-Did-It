@@ -545,7 +545,8 @@ def write_manifest(out_dir: str, atlas: str, frames: dict) -> None:
         with open(path) as fh:
             frames = {**json.load(fh)["frames"], **frames}
     with open(path, "w") as fh:
-        json.dump({"version": 1, "atlas": atlas, "frames": frames}, fh, indent=2, sort_keys=True)
+        json.dump({"version": 1, "atlas": atlas, "style": sc.STYLE, "factor": sc.FACTOR, "frames": frames}, fh,
+                  indent=2, sort_keys=True)
         fh.write("\n")
     print(f"{atlas}: {len(frames)} -> {out_dir}")
 

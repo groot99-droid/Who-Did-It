@@ -48,6 +48,23 @@ class Roles(unittest.TestCase):
             roles.texture_file("x", "ao", "1k")
 
 
+class Retexture(unittest.TestCase):
+    def test_every_ramp_role_is_a_role(self):
+        for table in (roles.WORLD_ROLES, roles.FIGURE_ROLES):
+            for ramp, name in table.items():
+                self.assertIn(name, roles.ROLES, f"{ramp} -> {name}")
+        for name in roles.LEGACY_EXTRA.values():
+            self.assertIn(name, roles.ROLES)
+
+    def test_legacy_material_names(self):
+        self.assertEqual(roles.legacy_role("KitTex_plaster"), ("plaster", None))
+        self.assertEqual(roles.legacy_role("BldTex_planks_#8A5A3C"), ("wood_plank", "#8A5A3C"))
+        self.assertEqual(roles.legacy_role("BldTex_shakes"), ("wood_plank", None))
+        self.assertIsNone(roles.legacy_role("KitTex_nosuch"))
+        self.assertIsNone(roles.legacy_role("P_wood_2"))
+        self.assertIsNone(roles.legacy_role("RT_hd_plaster_plain"))
+
+
 class _Handler(http.server.SimpleHTTPRequestHandler):
     agents: list = []
 

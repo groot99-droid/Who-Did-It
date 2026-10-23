@@ -82,24 +82,55 @@ def _posterise(nodes, links, colour, levels: int):
     return comb.outputs["Color"]
 
 
-def toned_colour(nodes, links, colour, role_name: str, style: str):
-    """The role's tint, the style's pull toward the ramp's middle colour, and low poly's posterise."""
+def toned_colour(nodes, links, colour, role_name: str, style: str, toward: str | None = None):
+    """The role's tint, the style's pull toward the ramp's middle colour (or `toward`, the colour a retextured
+    material keeps, so a brass bell stays brass under an iron grain), and low poly's posterise."""
     r = roles.role(role_name)
     if r.tint:
         colour = _multiply(nodes, links, colour, r.tint)
     tone = roles.STYLE_TONE[style]
     if tone > 0:
         steps = rc.WORLD_RAMPS[r.ramp]
-        colour = _mix(nodes, links, colour, rc.hex_to_linear(steps[len(steps) // 2]), tone)
+        colour = _mix(nodes, links, colour, rc.hex_to_linear(toward or steps[len(steps) // 2]), tone)
     levels = roles.POSTERISE_LEVELS.get(style)
     if levels:
         colour = _posterise(nodes, links, colour, levels)
     return colour
 
 
+_MEANS: dict[str, float] = {}
+
+
+def mean_luma(img: bpy.types.Image) -> float:
+    """The image's mean luma (0..1, display space), so a tint can keep a texture's average colour."""
+    if img.name not in _MEANS:
+        import numpy as np
+
+        w, h = img.size
+        arr = np.empty(w * h * 4, dtype=np.float32)
+        img.pixels.foreach_get(arr)
+        rgb = arr.reshape(-1, 4)[:, :3]
+        lum = 0.2126 * rgb[:, 0] + 0.7152 * rgb[:, 1] + 0.0722 * rgb[:, 2]
+        _MEANS[img.name] = float(max(rc.linear_to_srgb(float(lum.mean())), 0.05))
+    return _MEANS[img.name]
+
+
+def _tint(nodes, links, colour, hex_colour: str, img, normalise: bool):
+    """`colour` times a hex; with `normalise`, divided by the texture's mean luma first, so the result averages
+    to the hex itself and the texture only adds its grain."""
+    if normalise:
+        lift = nodes.new("ShaderNodeVectorMath")
+        lift.operation = "SCALE"
+        lift.inputs["Scale"].default_value = 1.0 / mean_luma(img)
+        links.new(colour, lift.inputs[0])
+        colour = lift.outputs["Vector"]
+    return _multiply(nodes, links, colour, hex_colour)
+
+
 def role_material(name: str, role_name: str, style: str = "8bit", gains=(1.15, 0.85, 0.55),
-                  cache: str = roles.CACHE_DIR) -> bpy.types.Material:
-    """The role's material for one style; cached by `name`."""
+                  cache: str = roles.CACHE_DIR, tint: str | None = None, normalise: bool = False) -> bpy.types.Material:
+    """The role's material for one style; cached by `name`. `tint` multiplies the texture (`normalise`: by its
+    mean, so the surface averages to the tint, as retexture.py does with a flat material's own colour)."""
     if name in _MATS:
         return _MATS[name]
     if style not in roles.STYLE_RESOLUTION:
@@ -108,31 +139,30 @@ def role_material(name: str, role_name: str, style: str = "8bit", gains=(1.15, 0
     mat = build_rig._new_material(name)
     nodes, links = mat.node_tree.nodes, mat.node_tree.links
     out = nodes.new("ShaderNodeOutputMaterial")
-    diff = _box_sample(nodes, links, image(role_name, "diff", style, cache), r.metres)
+    diff_img = image(role_name, "diff", style, cache)
+    diff = _box_sample(nodes, links, diff_img, r.metres)
+    colour = diff.outputs["Color"]
+    if tint:
+        colour = _tint(nodes, links, colour, tint, diff_img, normalise)
+    colour = toned_colour(nodes, links, colour, role_name, style, toward=tint if normalise else None)
+    group = nodes.new("ShaderNodeGroup")
+    group.node_tree = bpy.data.node_groups[build_rig.TOON_GROUP]
+    for sock, gain in zip(("Light", "Mid", "Shadow"), gains):
+        g = nodes.new("ShaderNodeVectorMath")
+        g.operation = "SCALE"
+        g.inputs["Scale"].default_value = gain
+        links.new(colour, g.inputs[0])
+        links.new(g.outputs["Vector"], group.inputs[sock])
     if style == "hd":
-        bsdf = nodes.new("ShaderNodeBsdfPrincipled")
-        colour = diff.outputs["Color"]
-        if r.tint:
-            colour = _multiply(nodes, links, colour, r.tint)
-        links.new(colour, bsdf.inputs["Base Color"])
-        rough = _box_sample(nodes, links, image(role_name, "rough", style, cache), r.metres, "Linear")
-        links.new(rough.outputs["Color"], bsdf.inputs["Roughness"])
-        nor = _box_sample(nodes, links, image(role_name, "nor_gl", style, cache), r.metres, "Linear")
-        nmap = nodes.new("ShaderNodeNormalMap")
-        nmap.space = "OBJECT"  # box projection has no tangent frame; object space keeps the three faces consistent
-        links.new(nor.outputs["Color"], nmap.inputs["Color"])
-        links.new(nmap.outputs["Normal"], bsdf.inputs["Normal"])
-        links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
-    else:
-        colour = toned_colour(nodes, links, diff.outputs["Color"], role_name, style)
-        group = nodes.new("ShaderNodeGroup")
-        group.node_tree = bpy.data.node_groups[build_rig.TOON_GROUP]
-        for sock, gain in zip(("Light", "Mid", "Shadow"), gains):
-            g = nodes.new("ShaderNodeVectorMath")
-            g.operation = "SCALE"
-            g.inputs["Scale"].default_value = gain
-            links.new(colour, g.inputs[0])
-            links.new(g.outputs["Vector"], group.inputs[sock])
-        links.new(group.outputs["Shader"], out.inputs["Surface"])
+        # Relief from the diffuse map's own luma as a bump (box projection has no tangent frame for `nor_gl`),
+        # into the group's `Normal` that hd.smooth_toon_group adds; the bands then follow the texture's grain.
+        bw = nodes.new("ShaderNodeRGBToBW")
+        links.new(diff.outputs["Color"], bw.inputs["Color"])
+        bump = nodes.new("ShaderNodeBump")
+        bump.inputs["Strength"].default_value = rc.HD["bumpStrength"]
+        bump.inputs["Distance"].default_value = rc.HD["bumpDistance"]
+        links.new(bw.outputs["Val"], bump.inputs["Height"])
+        links.new(bump.outputs["Normal"], group.inputs["Normal"])
+    links.new(group.outputs["Shader"], out.inputs["Surface"])
     _MATS[name] = mat
     return mat

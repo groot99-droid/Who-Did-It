@@ -23,8 +23,21 @@ import bmesh  # after bpy: the bpy wheel registers bmesh on import
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_rig  # noqa: E402
 import rig_common as rc  # noqa: E402
+import batch_render  # noqa: E402
 from batch_render import feet_px, render_to, touches_border  # noqa: E402
 from build_villager import box, frustum, ring  # noqa: E402,F401  (re-exported shape helpers)
+
+# The art-style switch (docs/round8/art.md 3): `--style hd` renders every frame at STYLE_FACTOR times the
+# display scale with the HD finish, `--textured` swaps flat materials for the library's roles. Both are taken
+# out of sys.argv here, at import, so each script's own parser sees only its flags.
+STYLE, TEXTURED = rc.style_from_argv(sys.argv)
+FACTOR = rc.STYLE_FACTOR[STYLE]
+if TEXTURED:
+    from materials import retexture  # noqa: E402
+
+    # Every world render (ground, kit, props, buildings) swaps its flat materials for the library's roles
+    # just before each frame, once the script has built the objects of that frame.
+    batch_render.BEFORE_RENDER.append(lambda scene: retexture.retexture(scene.objects, STYLE))
 
 
 def args_out(argv: list[str], prog: str) -> str:
@@ -42,6 +55,10 @@ def setup() -> bpy.types.Scene:
     for obj in bpy.data.collections["Calibration"].objects:
         obj.hide_render = True
     bpy.data.objects["TT"].rotation_euler.z = 0.0
+    if STYLE == "hd":
+        from materials import hd
+
+        hd.apply(scene)
     return scene
 
 
@@ -52,7 +69,7 @@ def sprite_cam(scene, cell: int, feet_row: float) -> None:
     cam.data.ortho_scale = cell / rc.TILE_PX
     cam.data.shift_x = 0.0
     cam.data.shift_y = rc.camera_shift_y(feet_row, cell)
-    scene.render.resolution_x = scene.render.resolution_y = cell
+    scene.render.resolution_x = scene.render.resolution_y = cell * FACTOR
 
 
 def tile_cam(scene, cell: int, metres: float | None = None) -> None:
@@ -61,7 +78,7 @@ def tile_cam(scene, cell: int, metres: float | None = None) -> None:
     scene.camera = cam
     cam.location = (0.0, 0.0, 30.0)
     cam.data.ortho_scale = metres if metres is not None else cell / rc.TILE_PX
-    scene.render.resolution_x = scene.render.resolution_y = cell
+    scene.render.resolution_x = scene.render.resolution_y = cell * FACTOR
 
 
 # ---------------------------------------------------------------- materials
@@ -197,7 +214,10 @@ class Sheet:
 
     def write(self) -> None:
         with open(os.path.join(self.dir, "manifest.json"), "w") as fh:
-            json.dump({"version": 1, "atlas": self.atlas, "frames": self.frames}, fh, indent=2, sort_keys=True)
+            # `cell` and `pivot` of a frame are in render px unless the script overrode them in display px;
+            # `factor` (render px per display px) lets the packer tell (tools/sprites/hd.ts).
+            json.dump({"version": 1, "atlas": self.atlas, "style": STYLE, "factor": FACTOR, "frames": self.frames},
+                      fh, indent=2, sort_keys=True)
             fh.write("\n")
         print(f"{self.atlas}: {len(self.frames)} frames -> {self.dir}")
 
@@ -245,7 +265,7 @@ def iso_setup(scene) -> bpy.types.Object:
 
 
 def iso_frame(scene, w: int, h: int, origin_px: tuple[float, float], target=(0.0, 0.0, 0.0)) -> None:
-    """Frame IsoCam on a w x h px image at the display scale with Blender point `target` at `origin_px`."""
+    """Frame IsoCam on a w x h display-px image (rendered at FACTOR times that) with Blender point `target` at `origin_px`."""
     from mathutils import Vector
 
     cam = iso_setup(scene)
@@ -255,7 +275,7 @@ def iso_frame(scene, w: int, h: int, origin_px: tuple[float, float], target=(0.0
     cam.location = centre - forward * 60.0
     cam.data.ortho_scale = max(w, h) / ISO_PX_PER_M
     cam.data.shift_x = cam.data.shift_y = 0.0
-    scene.render.resolution_x, scene.render.resolution_y = w, h
+    scene.render.resolution_x, scene.render.resolution_y = w * FACTOR, h * FACTOR
 
 
 def iso_px(point, w: int, h: int, origin_px: tuple[float, float], target=(0.0, 0.0, 0.0)) -> tuple[float, float]:
