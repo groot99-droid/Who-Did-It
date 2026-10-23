@@ -18,6 +18,7 @@ export {
   type CreateOptions,
   type ErrorPayload,
   type JoinOptions,
+  type PartyListing,
   type PartyVisibility,
   type RoleRevealPayload,
   type S2CPayloads as ServerMessages,

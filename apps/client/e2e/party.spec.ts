@@ -107,3 +107,38 @@ test('the leader toggles the mode chip and adds and removes NPC seats', async ({
   await expect(page.getByTestId('player-count')).toHaveText('4 / 10');
   await expect(page.getByTestId('remove-npc')).toBeHidden();
 });
+
+test('Join Game lists open and private parties, a 429 reads as empty, and Private offers the friends to invite', async ({
+  page,
+}) => {
+  await page.addInitScript(SKIP_INTRO);
+  const rows = [
+    { code: 'ABCDE', leader: 'Mira', players: 2, max: 10, mode: 0, map: 'hollowmere', visibility: 'open' },
+    { code: 'FGHJK', leader: 'Odo', players: 3, max: 10, mode: 0, map: 'blackpine', visibility: 'private' },
+  ];
+  let throttled = false;
+  await page.route('**/parties**', (route) =>
+    throttled
+      ? route.fulfill({ status: 429, json: { error: 'too many requests' } })
+      : route.fulfill({ json: { parties: rows } }),
+  );
+  await page.goto('/Who-Did-It/');
+  await page.getByRole('button', { name: 'Join Game' }).click();
+  await expect(page.getByTestId('party-row')).toHaveCount(2);
+  await expect(page.getByTestId('party-row').nth(1)).toContainText("Friend's party");
+  await expect(page.getByTestId('party-row').first()).toContainText('2 / 10');
+
+  throttled = true;
+  await expect(page.getByTestId('party-list-empty')).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByTestId('party-row')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Close' }).click();
+
+  await page.evaluate(() =>
+    localStorage.setItem('wdi:friends', JSON.stringify([{ code: 'ABCD2345', name: 'Mira' }])),
+  );
+  await page.getByRole('button', { name: 'Start Game' }).click();
+  await expect(page.getByTestId('invite-pick')).toBeHidden();
+  await page.getByLabel('Private').check();
+  await expect(page.getByTestId('invite-pick')).toBeVisible();
+  await expect(page.getByTestId('invite-pick')).toContainText('Mira');
+});

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { setRoute } from '../flags';
 import { buildIsStale, REFRESH_MESSAGE } from '../health';
 import { hideBackdrop, showBackdrop } from '../ui/backdrop';
+import { fetchParties } from '../ui/menu/partyListModel';
 import { mountLanding } from '../ui/Landing';
 import { overlayRoot, type Screen } from '../ui/dom';
 import type { MusicBus } from '../view/MusicBus';
@@ -35,7 +36,9 @@ export class Landing extends Phaser.Scene {
         build: getHealth(this).build,
         music: this.registry.get(REG_MUSIC) as MusicBus | undefined,
         onQuit: () => net.leave(),
-        onCreate: async (name, visibility) => enterLobby(await net.create(name, { visibility })),
+        onCreate: async (name, visibility, invited) =>
+          enterLobby(await net.create(name, { visibility, ...(invited.length > 0 ? { invited } : {}) })),
+        ...(flags.mock ? {} : { listParties: fetchParties }),
         onJoin: async (code, name) => enterLobby(await net.join(code, name)),
         explainFailure: async () => (!flags.mock && (await buildIsStale()) ? REFRESH_MESSAGE : null),
       });
