@@ -83,6 +83,22 @@ describe('the checks fail on a constructed oversize entry', () => {
     expect(checkMusic(m, { hollowmere: {} }, sizeOf)).toEqual([]);
   });
 
+  it('the lobby and trailer playlists never count toward a map, only toward the total (A98)', () => {
+    const m: MusicManifest = {
+      tracks: [
+        { key: 'theme', url: 'theme.ogg', bytes: 3 * MB },
+        { key: 'day', url: 'day.ogg', bytes: 3 * MB },
+      ],
+      playlists: [
+        { id: 'lobby', tracks: ['theme'] },
+        { id: 'day', tracks: ['day'] },
+      ],
+    };
+    expect(checkMusic(m, { blackpine: { lobby: 'lobby', day: 'day' } }, sizeOf)).toEqual([]);
+    const crowded = { ...m, playlists: [{ id: 'day', tracks: ['theme', 'day'] }] };
+    expect(checkMusic(crowded, { blackpine: { day: 'day' } }, sizeOf)).toHaveLength(1);
+  });
+
   it('music over 12 MB in all', () => {
     const tracks = [1, 2, 3, 4].map((n) => ({ key: `t${n}`, url: `t${n}.ogg`, bytes: 3.5 * MB }));
     expect(checkMusic({ tracks, playlists: [] }, {}, sizeOf)).toHaveLength(1);

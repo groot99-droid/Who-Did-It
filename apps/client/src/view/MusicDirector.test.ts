@@ -5,6 +5,7 @@ import { MAP_IDS, MUSIC_CLASSES, ONUB_MUSIC_CLASSES } from '@wdi/content';
 import { Phase } from '@wdi/shared';
 import { MusicConductor, mainClassFor, onubClassFor, onubPlaylistFor, playlistFor } from './MusicDirector';
 import { parseMusicManifest } from './MusicBus';
+import { BUDGET, PRE_MATCH_PLAYLISTS } from '../../../../tools/sprites/test/budgets';
 
 function rig(map = 'hollowmere', mode: 'main' | 'onub' = 'main') {
   const calls: Array<string | null> = [];
@@ -125,18 +126,19 @@ describe('MusicConductor', () => {
 });
 
 describe('committed music files', () => {
-  it('has every listed track on disk and keeps each map under its 4 MB and the whole under 12 MB', () => {
+  it('has every listed track on disk and keeps each map under its 4 MiB and the whole under 12 MiB', () => {
     const dir = new URL('../../public/assets/audio/music/', import.meta.url);
     const manifest = parseMusicManifest(JSON.parse(readFileSync(new URL('manifest.json', dir), 'utf8')));
     for (const t of manifest.tracks) expect(statSync(new URL(t.url, dir)).size, t.key).toBe(t.bytes);
     const total = manifest.tracks.reduce((n, t) => n + t.bytes, 0);
-    expect(total).toBeLessThanOrEqual(12_000_000);
+    expect(total).toBeLessThanOrEqual(BUDGET.musicBytes);
     for (const [map, classes] of Object.entries(musicJson.byMap)) {
       const keys = new Set<string>();
       for (const id of [...Object.values(classes)])
-        for (const k of manifest.playlists.find((p) => p.id === id)?.tracks ?? []) keys.add(k);
+        if (!PRE_MATCH_PLAYLISTS.includes(id))
+          for (const k of manifest.playlists.find((p) => p.id === id)?.tracks ?? []) keys.add(k);
       const bytes = [...keys].reduce((n, k) => n + (manifest.tracks.find((t) => t.key === k)?.bytes ?? 0), 0);
-      expect(bytes, map).toBeLessThanOrEqual(4_000_000);
+      expect(bytes, map).toBeLessThanOrEqual(BUDGET.musicPerMapBytes);
     }
   });
 });
