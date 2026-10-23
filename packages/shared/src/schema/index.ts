@@ -9,7 +9,8 @@ import { schema, t } from '@colyseus/schema';
 // Every Schema stays under 63 fields. Round 5 (DECISIONS A50): `Player.sceneId` is gone and `presence` reaches its
 // owner only; every other seat walks as an avatar under a handle (GDD 3.17). Round 6 (DECISIONS A81): the M5b
 // maps `nodes` and `mobs`, `Private.quests`, `GameState.lawStage` and `Role.evolvedFrom`, all empty until their
-// sessions fill them (docs/round6/seams.md 1.1). Version 4 (round 7, A104): `Player.profile`.
+// sessions fill them (docs/round6/seams.md 1.1). Version 4 (round 7, A104): `Player.profile`,
+// `Private.vendetta` (A112).
 
 export const SCHEMA_VERSION = 4;
 
@@ -217,6 +218,8 @@ export const Private = schema(
     mateLooks: t.map('string'),
     /** Round 6 (M5b): the quests this seat holds; empty until Session 6H. */
     quests: t.array(QuestState),
+    /** Round 7 (GDD 3.20): a Killer's vendetta id, or an Accomplice's Killers' ids joined by commas; '' otherwise. */
+    vendetta: str(),
   },
   'Private',
 );

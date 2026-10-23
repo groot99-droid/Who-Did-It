@@ -5,7 +5,7 @@ import { createServer } from '../src/server';
 import { markDead } from '../src/sim/Death';
 import { flowOf, resetFlow } from '../src/sim/Flow';
 import { MEMORIAL_VICAR } from '../src/sim/Memorial';
-import { eventsOf, setPhase, sleep } from './killHelpers';
+import { eventsOf, playerOf, setPhase, sleep } from './killHelpers';
 import { type Match, startMatch } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -25,8 +25,15 @@ const MEMORIAL = { id: MEMORIAL_VICAR, scope: 'all' };
 const memorials = (m: Match) =>
   m.bots.map((b) => eventsOf(b, S2C.cutscene).filter((c) => (c as { id: string }).id === MEMORIAL_VICAR));
 
-/** The Vicar and a Killer to hold the Knife; the other seats are Villagers, enough that the deaths end no match. */
-const SEATS = { Bot0: 'vicar', Bot1: 'killer' };
+/**
+ * Bot0 is dealt `card` and walks as `look` (white-box: the debug start publishes no look); Bot1 holds the Knife; the
+ * other seats are Villagers, enough that the deaths end no match.
+ */
+async function deal(n: number, card: string, look: string): Promise<Match> {
+  const m = await startMatch(colyseus, n, { Bot0: card, Bot1: 'killer' });
+  playerOf(m, m.bots[0]!).look = look;
+  return m;
+}
 
 /** White-box: a night, then the meeting's reveal, with the bus delivering each change. */
 async function nightThenReveal(m: Match, kill: () => void): Promise<void> {
@@ -42,13 +49,15 @@ async function nightThenReveal(m: Match, kill: () => void): Promise<void> {
   await sleep(250);
 }
 
+const knifeBot0 = (m: Match) => () => markDead(m.room, m.bots[0]!.id, 'knife', m.bots[1]!.id);
+
 describe("the Vicar's memorial (GDD 3.20)", () => {
   it('plays to every seat at the reveal after the Vicar dies by the Knife, once per match', async () => {
-    const m = await startMatch(colyseus, 4, SEATS);
-    const [vicar, killer] = m.bots;
-    await nightThenReveal(m, () => markDead(m.room, vicar!.id, 'knife', killer!.id));
+    const m = await deal(4, 'vicar', 'vicar');
+    const vicar = m.bots[0]!;
+    await nightThenReveal(m, knifeBot0(m));
     expect(memorials(m)).toEqual([[MEMORIAL], [MEMORIAL], [MEMORIAL], [MEMORIAL]]);
-    expect(flowOf(m.room).ascendedVicarCandidate).toBe(vicar!.id);
+    expect(flowOf(m.room).ascendedVicarCandidate).toBe(vicar.id);
 
     // The next meeting's reveal does not play it again.
     setPhase(m, Phase.day);
@@ -59,17 +68,41 @@ describe("the Vicar's memorial (GDD 3.20)", () => {
 
     // The candidate outlives the match: the lobby's fresh flow keeps it for round 8.
     resetFlow(m.room);
-    expect(flowOf(m.room).ascendedVicarCandidate).toBe(vicar!.id);
+    expect(flowOf(m.room).ascendedVicarCandidate).toBe(vicar.id);
   });
 
-  it('stays silent for another cause or another card', async () => {
-    const m = await startMatch(colyseus, 5, SEATS);
-    const [vicar, killer, villager] = m.bots;
+  it('stays silent for another cause or another look', async () => {
+    const m = await startMatch(colyseus, 5, { Bot0: 'vicar', Bot1: 'killer', Bot2: 'doctor' });
+    const [vicar, killer, doctor] = m.bots;
+    playerOf(m, vicar!).look = 'vicar';
+    playerOf(m, doctor!).look = 'doctor';
     await nightThenReveal(m, () => {
       markDead(m.room, vicar!.id, 'poison');
-      markDead(m.room, villager!.id, 'knife', killer!.id);
+      markDead(m.room, doctor!.id, 'knife', killer!.id);
     });
     expect(memorials(m).flat()).toEqual([]);
     expect(flowOf(m.room).ascendedVicarCandidate).toBeNull();
+  });
+
+  it('follows the public look: a cover in the Vicar look is mourned, a Vicar in another look is not', async () => {
+    // A Drifter wearing the Vicar's look as its cover: the film plays, and nobody becomes the candidate.
+    const cover = await deal(4, 'drifter', 'vicar');
+    await nightThenReveal(cover, knifeBot0(cover));
+    expect(memorials(cover)).toEqual([[MEMORIAL], [MEMORIAL], [MEMORIAL], [MEMORIAL]]);
+    expect(flowOf(cover.room).ascendedVicarCandidate).toBeNull();
+
+    // The seat dealt the Vicar walking as the Doctor: no film, the candidacy stays private, and every seat receives
+    // exactly the messages it would for a true Doctor knifed in its place.
+    const hidden = await deal(4, 'vicar', 'doctor');
+    const plain = await deal(4, 'doctor', 'doctor');
+    const before = (m: Match) => m.bots.map((b) => b.events.length);
+    const marks = [before(hidden), before(plain)];
+    await nightThenReveal(hidden, knifeBot0(hidden));
+    await nightThenReveal(plain, knifeBot0(plain));
+    expect(memorials(hidden).flat()).toEqual([]);
+    expect(flowOf(hidden.room).ascendedVicarCandidate).toBe(hidden.bots[0]!.id);
+    const kinds = (m: Match, mark: number[]) =>
+      m.bots.map((b, i) => b.events.slice(mark[i]).map((e) => e.type));
+    expect(kinds(hidden, marks[0]!)).toEqual(kinds(plain, marks[1]!));
   });
 });

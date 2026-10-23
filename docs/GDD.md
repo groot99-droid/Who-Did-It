@@ -74,7 +74,7 @@ The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 star
 |---|---|---|
 | Lobby | Leader creates party; Start with >= 1 human (NPCs fill to 4, 3.12) | – |
 | Role reveal | Server deals the deck and the traits; cover roles pick a look (3.17) | 20 s, then 3-2-1 |
-| Grace | Spawn spread around the hub (3.13); kills disabled; guided clue; the map's opening cutscene plays inside it (3.18) | 30 s, plus `phases.openingS` (50 s) when the map has an opening |
+| Grace | Spawn spread around the hub (3.13); kills disabled; guided clue; the map's opening cutscene plays inside it (3.18) | 30 s, plus the length of the map's opening (its intro track: HollowMere 117 s, BlackPine 80 s; at most `phases.openingS`, 120 s) |
 | Day | Free roam; light radius 7 tiles; the Knife is sheathed | 60 s |
 | Dusk | Vignette, "Night falls in 10 s"; the Knife, Impersonate and the night powers wake; missing-person check | 10 s |
 | Night | Light radius 3.5 tiles; wolves active; the hunt | 100 s |
@@ -207,6 +207,8 @@ The Knife works only after dark (3.3), about 110 s of each 170 s cycle, so a coo
 **V2**: Medium, the Beast and Cave Gate, bats, bog lurker, crows, poison, voice chat, cosmetics; first-person renderer.
 
 ### 3.11 One Night Ultimate Baguette (quick mode)
+
+**Being removed (round 7, DECISIONS A115).** On 2026-10-23 the owner chose to remove the quick mode from the game. Session 7J deletes it (`docs/round7/quick-mode-removal.md`); until its PRs land the rules below still describe what the code does, and when they land this section becomes a short record so 3.12 to 3.21 keep their numbers. Crumb's Ovens stays as a HollowMere building and gains four rooms (A116, 3.13).
 
 Origin: the owner's friend first framed the whole game as "One Night Ultimate Baguette", a wrapper around the one-night hidden-role card game; on 2026-10-17 the owner supplied the full mode (two cards per player, four prep stations, night roles, a 5-minute Morning Rush, one vote) and its art. This section is **ONUB v2**, an original ruleset with original wording that replaces the round-4 wake-loaf mode; the round-4 bakery scene stays frozen and unused. Lobby setting `mode = onub`. Target length 8-10 minutes (`targetLengthMin` in `balance.onub.json`, which the lobby chip reads; "Balance and length" below gives 8.7 to 9.7 minutes plus jitter, less when prep ends early). The roles, teams, scenes and card texts are `roles.onub.json`; the decks, stations, ingredient cards, mini-games, acts, night windows, timers, vote rule, winners table and NPC numbers are `balance.onub.json`.
 
@@ -673,7 +675,7 @@ the node, or a phase where verbs do not work, drops the open puzzle.
 
 Round 6 (ROADMAP M5c). Cutscenes are data (`packages/content/data/cutscenes/`) played in-engine: the opening of a map runs inside grace, which `phases.openingS` lengthens for it, and adds no phase; a death plays the cutscene of its cause before the ghost handoff; every cutscene can be skipped, and reduce-motion turns its camera moves into cuts. Music follows the phase class of the map (`music.json`), is loaded after Start under its own budget (ASSETS 6.8) and is never sent by the server. The contract is `docs/round6/cutscene-music.md`; 6J writes the cutscene paragraphs and 6L the music paragraphs here, and the seconds live in `balance.json` (`phases.openingS`, `ui.transitionS`).
 
-**Cutscene openings (6J).** `cutscenes.json` maps each map to an opening cutscene. At the start of grace the server broadcasts `cutscene { id }` to every seat and adds `phases.openingS` to grace; it adds no phase and never waits for a client, so the NPCs walk and the clock runs while the camera pans. HollowMere's opening is a 50 s pan over the square with a narrator caption track ending on the role chip slamming in; Blackpine's is a 12 s two-step pan with no narrator. `openingS` is one number for every map, and every opening is at most that long (the content check enforces it), so a shorter opening leaves the rest of the lengthened grace to play. A seat can skip an opening with Esc or the Skip button and sees the world under the remaining grace.
+**Cutscene openings (6J).** `cutscenes.json` maps each map to an opening cutscene. At the start of grace the server broadcasts `cutscene { id }` to every seat and lengthens grace by that opening's own length (its `maxS`); it adds no phase and never waits for a client, so the NPCs walk and the clock runs while the camera pans. **Round 7 (7A, DECISIONS A101):** each opening runs exactly as long as its map's intro track (the `opening` music class), measured and rounded down to the second: HollowMere 117 s, BlackPine 80 s. `phases.openingS` (120 s) is the cap no opening may pass, and the content checks that an opening's steps fill its whole length; a client test checks that length against the track. HollowMere's opening is a pan over the square with a narrator caption track ending on the role chip slamming in; Blackpine's is a two-step pan with no narrator. A seat can skip an opening with Esc or the Skip button and sees the world under the remaining grace.
 
 **Death cutscenes (6J).** A seat that dies by the knife, poison, the Gamekeeper's shot, a vote or a wolf is told so in its private `killed`, which names the cutscene of that cause (`cutsceneId`); a vanishing has none. The client plays it before the ghost handoff: a sound, one whispered line, and the last frame held for four seconds at most, skippable like the opening. The id is the victim's own news, so it reveals nothing the `cause` beside it does not. A seat voted out hears it while the meeting has the World asleep, so its cutscene plays when the World is rebuilt after the meeting.
 
@@ -722,8 +724,10 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
 - **Conversion: the Zealot against the Vicar (7H).** The Zealot's goal is the Vicar's flock: world-phase time in
   the same scene as the seat dealt the Vicar, both alive and placed, counted across scenes and phases. At **45 s**
   (`vendettas.conversion.shareS`) the doubt is sown (`vendetta.conversion.sown`). At the next meeting the
-  Vicar's vote counts for nothing in the tally (`vendetta.conversion.doubt`, the consequence); the Vicar still
-  votes and sees its vote, and the tally shows one vote fewer. If the Vicar dies or is ejected first, the
+  Vicar's vote counts for nothing (`vendetta.conversion.doubt`, the consequence). To every other seat it is an
+  ordinary abstention: the Vicar's voted mark stays down and the tally leaves it out, while the meeting still ends
+  early once every living seat has cast. The Vicar still votes and sees its own vote, and at the reveal it alone
+  learns, in its Notebook, that its voice did not carry. If the Vicar dies or is ejected first, the
   vendetta lapses (`vendetta.conversion.lapsed`).
 - **Sabotage: the Activist against the company (7H).** The Activist's goal is the company's stations: standing
   still within verb reach of a target prop of a task (3.5) for **6 s** (`vendettas.sabotage.tamperS`) in a verb
@@ -752,13 +756,15 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
 under its routine (3.12): the Vicar's scene, a task target's scene, the loaded strongbox's hall or its target's
 scene, through `vendettaGoalFor`. It does nothing a human could not do in the same place.
 
-**The Vicar's memorial (7I).** When the seat dealt the Vicar dies by the Knife, the next meeting's reveal plays a
-memorial to every seat: the Vicar's film (`memorial_vicar`) under one title caption, skippable like every
+**The Vicar's memorial (7I).** Everything public follows the look (3.17). When a seat whose public look is the
+Vicar's dies by the Knife, whether it was dealt the Vicar or wears that look as a cover, the next meeting's reveal
+plays a memorial to every seat: the Vicar's film (`memorial_vicar`) under one title caption, skippable like every
 cutscene (3.18). It plays once per match, so a later reveal stays plain, and the meeting, not the night, carries
-it. No other death plays it: the Vicar poisoned, shot, ejected or taken by a wolf, or another card struck by the
-Knife. It names no seat on screen and changes nothing public beyond the film. The server remembers the fallen
-Vicar as the Ascended Vicar candidate (`flow.ascendedVicarCandidate`, room memory only, kept into the room's next
-match until another memorial replaces it), which round 8's evolutions read.
+it. No other death plays it: a seat in the Vicar's look poisoned, shot, ejected or taken by a wolf, or a seat in
+another look struck by the Knife, even one dealt the Vicar. It names no seat on screen and changes nothing public
+beyond the film. The Ascended Vicar candidacy follows the dealt card instead and stays private: the seat dealt the
+Vicar that dies by the Knife becomes `flow.ascendedVicarCandidate` at that reveal (room memory only, kept into the
+room's next match until another replaces it), which round 8's evolutions read.
 
 ### 3.21 Parties, profiles and friends
 
