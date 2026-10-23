@@ -43,10 +43,10 @@ async function party4(): Promise<Party> {
 }
 
 describe('the bodyBounds invariant (round 8, GDD 3.22; body.md 8)', () => {
-  it('is registered after the round-7 checks once a room steps, and stays quiet on a whole party', async () => {
+  it('is registered on import and stays quiet on a whole party', async () => {
     const party = await party4();
     const { room } = party;
-    expect(registeredInvariants().at(-1)).toBe('bodyBounds');
+    expect(registeredInvariants()).toContain('bodyBounds');
     expect(bodies(room).size).toBe(4);
     expect(failing(room)).not.toContain('bodyBounds');
     advance(party, 60);

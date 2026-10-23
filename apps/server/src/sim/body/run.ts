@@ -4,7 +4,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { speedPxPerTick } from '../Movement';
 import { type MoveInput, type PlayerSim, simOf } from '../RoomSim';
 import { isWorldPhase } from '../World';
-import { registerBodyInvariant } from './invariants';
+import './invariants'; // the `bodyBounds` check registers with the body stage
 import { die, showClip, wake } from './damage';
 import {
   blocksAct,
@@ -25,7 +25,6 @@ import { type Body, bodies, bodyOf, clearBodies, ensureBody, publishBodies } fro
  * only tick in the world phases; a meeting, the card and game over freeze them. The lobby has none.
  */
 export function runBody(room: PartyRoom): void {
-  registerBodyInvariant(); // once; see `invariants.ts` on why not at import
   const phase = room.state.phase;
   if (phase === Phase.lobby) {
     clearBodies(room);

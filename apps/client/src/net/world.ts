@@ -168,6 +168,22 @@ export interface QuestSnap {
   done: boolean;
 }
 
+/** Round 8 (8A, GDD 3.22): one effect on this seat's body (`Private.body.effects`): the wire id, the tick it wears off (0 while it lasts), its stacks. */
+export interface OwnEffectSnap {
+  id: number;
+  untilTick: number;
+  stacks: number;
+}
+
+/** Round 8 (8A, GDD 3.22): this seat's own `Private.body`, in the units of `balance.json` `body`; own view only. */
+export interface OwnBodySnap {
+  hp: number;
+  maxHp: number;
+  stamina: number;
+  maxStamina: number;
+  effects: readonly OwnEffectSnap[];
+}
+
 export interface WorldFeed {
   readonly bus: Emitter<WorldFeedEvents>;
   readonly selfId: string;
@@ -194,6 +210,8 @@ export interface WorldFeed {
   quests(): QuestSnap[];
   /** Round 6 (6I): this player's own inventory slots, in slot order. */
   inventory(): StackSnap[];
+  /** Round 8 (8A): this seat's own body, or null while the row is empty (the lobby, the card, a ghost). */
+  body(): OwnBodySnap | null;
   /** Round 6 (6I): `quest.accept { questId }`. */
   questAccept(questId: string): void;
   /** Round 6 (6I): `quest.turnIn { questId }`. */

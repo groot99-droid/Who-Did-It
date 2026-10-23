@@ -11,10 +11,11 @@ import { bodies } from './state';
  * round 7's four and read by `pnpm auto`, the soak and the admin room: every body's health and stamina within its
  * bounds, no dead seat with a body in memory or on its wire, and every living seat with a body while the world runs.
  *
- * It registers on a call, not on import: `auto/invariants.ts` reaches every body module through the handlers
- * (`AdminView` → `Auto` → the lobby handler → `Chat` → `run.ts`), so a check that registered while that module
- * loads would find its registry still uninitialised. `runBody` calls it on every tick (a boolean after the first)
- * and `tools/auto/checks` before it counts the registered checks.
+ * It registers on import, like the others. `auto/invariants.ts` reaches this module through the handlers
+ * (`AdminView` → `Auto` → the lobby handler → `Chat` → `run.ts`), so the registration can run while that module is
+ * still loading; its registry is a hoisted function for that (round 8's line there). Where the registry's module is
+ * the entry (the admin room, `tools/auto/checks`), the body check lands before round 6's; where a handler or the
+ * body is, after them. `run.ts` imports this module so every server that steps a body carries the check.
  */
 
 const fail = (room: PartyRoom, detail: string): InvariantFailure => ({
@@ -33,13 +34,7 @@ const lingeringOf = (room: PartyRoom): Map<string, number> => {
   return m;
 };
 
-let registered = false;
-
-export function registerBodyInvariant(): void {
-  if (registered) return;
-  registered = true;
-  registerInvariant('bodyBounds', bodyBounds);
-}
+registerInvariant('bodyBounds', bodyBounds);
 
 function bodyBounds(room: PartyRoom): InvariantFailure | null {
   const sim = simOf(room);

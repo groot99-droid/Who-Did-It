@@ -3,6 +3,9 @@
    (`is-wounded`, `is-down`, `is-fatigued`, `is-timed`) by class. */
 
 .wdi-body {
+  position: absolute;
+  left: calc(var(--wdi-space-3) + env(safe-area-inset-left));
+  bottom: calc(var(--wdi-space-3) + env(safe-area-inset-bottom));
   display: grid;
   gap: var(--wdi-space-1);
   width: min(240px, 40vw);
@@ -11,6 +14,11 @@
   background: var(--wdi-scrim);
   border-radius: var(--wdi-radius-sm);
   pointer-events: none;
+}
+
+/* On touch the stick (128px, `.wdi-stick`) holds the bottom-left corner: the panel sits above it. */
+.wdi-hud:has(~ .wdi-hud-touch) .wdi-body {
+  bottom: calc(var(--wdi-space-3) * 2 + 128px + env(safe-area-inset-bottom));
 }
 
 .wdi-body[hidden] {

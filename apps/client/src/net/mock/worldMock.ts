@@ -22,6 +22,7 @@ import type {
   WorldFeedEvents,
   MobSnap,
   NodeSnap,
+  OwnBodySnap,
   QuestSnap,
   StackSnap,
 } from '../world';
@@ -509,6 +510,13 @@ export class MockWorldFeed implements WorldFeed {
 
   inventory(): StackSnap[] {
     return this.m5b.inventory();
+  }
+
+  /** Round 8 (8A): a whole body while this seat walks the world; the mock takes no damage. */
+  body(): OwnBodySnap | null {
+    if (this.dead() || !this.actors.has(this.selfId)) return null;
+    const b = balanceJson.body;
+    return { hp: b.maxHp, maxHp: b.maxHp, stamina: b.maxStamina, maxStamina: b.maxStamina, effects: [] };
   }
 
   questAccept(questId: string): void {

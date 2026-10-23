@@ -17,6 +17,8 @@ import type {
   WorldFeedEvents,
   MobSnap,
   NodeSnap,
+  OwnBodySnap,
+  OwnEffectSnap,
   QuestSnap,
   StackSnap,
 } from './world';
@@ -36,6 +38,7 @@ interface PlayerState {
     notebook?: { forEach(cb: (e: Required<NotebookSnap>) => void): void };
     inventory?: { slots?: { forEach(cb: (s: StackSnap) => void): void } };
     quests?: { forEach(cb: (q: QuestSnap) => void): void };
+    body?: Omit<OwnBodySnap, 'effects'> & { effects: { forEach(cb: (e: OwnEffectSnap) => void): void } };
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
@@ -295,6 +298,15 @@ export class ColyseusWorldFeed implements WorldFeed {
       .get(this.selfId)
       ?.priv?.inventory?.slots?.forEach((s) => out.push({ defId: s.defId, qty: s.qty }));
     return out;
+  }
+
+  /** Round 8 (8A): the own `Private.body`; null while the row is empty (`maxHp` 0: the lobby, the card, a ghost). */
+  body(): OwnBodySnap | null {
+    const b = this.state.players.get(this.selfId)?.priv?.body;
+    if (!b || b.maxHp <= 0) return null;
+    const effects: OwnEffectSnap[] = [];
+    b.effects.forEach((e) => effects.push({ id: e.id, untilTick: e.untilTick, stacks: e.stacks }));
+    return { hp: b.hp, maxHp: b.maxHp, stamina: b.stamina, maxStamina: b.maxStamina, effects };
   }
 
   questAccept(questId: string): void {

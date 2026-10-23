@@ -18,7 +18,7 @@ const line = (over: Partial<MatchLine>): MatchLine => ({
 
 describe('tools/auto checks', () => {
   it('registers every round-6 check on import', () => {
-    const all = [...ROUND6_CHECKS, ...ROUND7_CHECKS, ...ROUND8_CHECKS]; // round 8, 8A
+    const all = [...ROUND8_CHECKS, ...ROUND6_CHECKS, ...ROUND7_CHECKS]; // round 8, 8A: the body's registers first here
     expect(missingChecks(all)).toEqual([]);
     expect(missingChecks(['privLeak'])).toHaveLength(all.length - 1);
     expect(registeredInvariants()).toEqual(all);

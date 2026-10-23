@@ -5,7 +5,7 @@
 // the body check (Session 8A, GDD 3.22).
 import { registeredInvariants } from '../../../apps/server/src/sim/auto/invariants';
 import '../../../apps/server/src/sim/vendettas/invariants';
-import { registerBodyInvariant } from '../../../apps/server/src/sim/body/invariants';
+import '../../../apps/server/src/sim/body/invariants';
 
 /** The seven checks of `auto-admin.md` 5, in its order (DECISIONS A84 has the names). */
 export const ROUND6_CHECKS = [
@@ -28,9 +28,6 @@ export const ROUND8_CHECKS = ['bodyBounds'] as const;
 export function missingChecks(names: readonly string[]): string[] {
   return [...ROUND6_CHECKS, ...ROUND7_CHECKS, ...ROUND8_CHECKS].filter((name) => !names.includes(name));
 }
-
-// The body check registers on a call (its module says why); the server's `runBody` makes the same call.
-registerBodyInvariant();
 
 const missing = missingChecks(registeredInvariants());
 if (missing.length > 0)

@@ -1,27 +1,14 @@
 import effectsJson from '@wdi/content/data/effects.json';
 import { EFFECT_KEYS, type EffectKey, TICK_RATE } from '@wdi/shared/constants';
+import type { OwnBodySnap, OwnEffectSnap } from '../../net/world';
+
+export type { OwnBodySnap, OwnEffectSnap };
 
 /**
  * The body HUD's model (round 8, 8A; GDD 3.22, docs/UI.md 14.32): pure functions from this seat's `Private.body`
  * and the clock to what the panel shows. `BodyHud.ts` draws it; 8H animates the classes. No number of
  * `balance.json` lives here: the states are read from the effects the server derived (Wounded, Fatigued, Knocked out).
  */
-
-/** This seat's `Private.body` as the feed hands it over (every number 0 while the row is empty). */
-export interface OwnBodySnap {
-  hp: number;
-  maxHp: number;
-  stamina: number;
-  maxStamina: number;
-  effects: readonly OwnEffectSnap[];
-}
-
-/** One effect on this seat: the wire id, the tick it wears off (0 while it lasts), its stacks. */
-export interface OwnEffectSnap {
-  id: number;
-  untilTick: number;
-  stacks: number;
-}
 
 export type HealthState = 'whole' | 'wounded' | 'down';
 export type StaminaState = 'fresh' | 'fatigued';

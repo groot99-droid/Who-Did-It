@@ -1129,16 +1129,17 @@ Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaG
 ### 14.32 The body panel (8A, round 8)
 
 Session 8A, round 8 (DECISIONS A136; GDD 3.22). `view/body/BodyHud.ts` (`mountBodyHud(parent)`) draws this seat's
-`Private.body`: a health bar, a stamina bar and a row of effect chips, in a `section.wdi-body` the caller places at
-the HUD's bottom-left, above the touch cluster, and feeds each frame with the own body and the clock (`update(body,
-tick)`; nothing is written when nothing changed). The model is `view/body/model.ts` (`bodyHudModel`): the shares are
+`Private.body`: a health bar, a stamina bar and a row of effect chips, in a `section.wdi-body` the World mounts in
+the HUD root (`mountBodyHud(hud.root)`) at the HUD's bottom-left, above the touch cluster, and feeds each frame with
+the own body and the clock (`update(feed.body(), clock.tick)`; nothing is written when nothing changed; the feed's
+`body()` reads the own `Private.body` and is null while the row is empty). The model is `view/body/model.ts` (`bodyHudModel`): the shares are
 whole percentages and a sliver of health still reads 1; the states are read from the effects the server derived,
 never from a number of the client's own: `is-wounded` under Wounded, `is-down` under Knocked out, `is-fatigued` under
 Fatigued; a timed chip carries `is-timed` and counts down in whole seconds, the soonest to pass first, and an effect
 that lasts until cured shows no count. An effect's name is its `effects.json` row's `name`; a chip is
-`li.wdi-body__chip--<effect>`. The panel hides while the row is empty (the lobby, the card, a ghost). It is the
-function only: 8H's "Round 8 (8H)" block of `components.css` animates the states by class, and `view/body/body.css`
-holds the panel's own rules. Module `ui/copy/body.ts`.
+`li.wdi-body__chip--<effect>`. The panel hides while the row is empty (the lobby, the card, a ghost). 8H's "Round 8
+(8H)" block of `components.css` animates the states by class, and 8N's `effectIconUrl(effectId, style)` will give a
+chip its icon; `view/body/body.css` holds the panel's own rules. Module `ui/copy/body.ts`.
 
 | Id | Text | Notes |
 |---|---|---|

@@ -185,11 +185,11 @@ describe('the round-6 invariants', () => {
       'step',
       'matchLength',
       'killClues',
+      'bodyBounds', // round 8, 8A: the body's module registers on `Auto`'s import path, before the vendettas'
       'vendettaOnce',
       'contractQuest',
       'strongboxOnce',
       'vendettaPublic',
-      'bodyBounds', // round 8, 8A
     ]);
   });
 
