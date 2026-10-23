@@ -1006,13 +1006,14 @@ def kerchief(b: Builder, spec: dict) -> None:
 
 @piece
 def stick(b: Builder, spec: dict) -> None:
-    """A walking stick in the right hand, knob at the hip, tip near the ankle so the walk's swing keeps it off the ground."""
-    x = HAND_X + 0.02
-    b.part("Stick", "body", ("wood", 1), "prop.R", [
-        (rod, dict(a=(x, 0.06, PROP_Z + 0.14), b=(x + 0.03, 0.10, ANKLE - 0.02), width=0.035)),
+    """A walking stick carried mid-shaft in the left hand (the swing is right-handed), its knob at the belt and
+    its tip at the knee: short enough that the interact reach, which turns the hand forward, keeps it in the cell."""
+    x = -HAND_X - 0.02
+    b.part("Stick", "body", ("wood", 1), "prop.L", [
+        (rod, dict(a=(x, 0.06, PROP_Z + 0.26), b=(x - 0.02, 0.09, KNEE), width=0.035)),
     ], bevel=0)
-    b.part("StickKnob", "body", ("wood", 2), "prop.R", [
-        (box, dict(center=(x, 0.06, PROP_Z + 0.15), size=(0.07, 0.07, 0.06))),
+    b.part("StickKnob", "body", ("wood", 2), "prop.L", [
+        (box, dict(center=(x, 0.06, PROP_Z + 0.27), size=(0.07, 0.07, 0.06))),
     ], bevel=0.01)
 
 
