@@ -11,23 +11,27 @@ import { count } from '../src/sim/Inventory';
 import { act, errorCodes, eventsOf, playerOf, setPhase, sleep, teleport } from './killHelpers';
 import { type Match, startMatch } from './simHelpers';
 
-/** Round 8 (GDD 3.23), Session 8D: Faith at the altar, the Indulgence and the Parish Seal. */
+/** Round 8 (GDD 3.23), Session 8D: Faith at the altar, the Indulgence, the Parish Seal, and fencing a notice. */
 
 /**
  * The wayside altar's scene row lands with its art (8J, A139), so these tests stand it on the overworld in a fixture
  * of their own, on the tile its row will take.
  */
 const altar = { id: economy.faith.altars[0]!, kind: 'altar', x: 12, y: 35 };
+const stall = { id: economy.notices.blackMarkets[0]!, kind: 'blackMarket', x: 10, y: 3 };
 
 let colyseus: ColyseusTestServer;
 beforeAll(async () => {
   if (!scenes.overworld.props.some((p) => p.id === altar.id)) scenes.overworld.props.push(altar);
+  if (!scenes.tavern_back.props.some((p) => p.id === stall.id)) scenes.tavern_back.props.push(stall);
   process.env.WDI_DEBUG = '1';
   colyseus = await boot(createServer({ ipBurst: 1e5, ipPerMin: 1e8, globalPerMin: 1e8 }));
 });
 afterAll(async () => {
   const i = scenes.overworld.props.indexOf(altar);
   if (i >= 0) scenes.overworld.props.splice(i, 1);
+  const j = scenes.tavern_back.props.indexOf(stall);
+  if (j >= 0) scenes.tavern_back.props.splice(j, 1);
   delete process.env.WDI_DEBUG;
   await colyseus.shutdown();
 });
@@ -146,5 +150,22 @@ describe('the Parish Seal (GDD 3.23, A139)', () => {
     civicMeetingStart(m.room);
     await act(c, 'meeting.vote', { targetId: a.id });
     expect(playerOf(m, c).priv.myVote).toBe(a.id);
+  });
+});
+
+describe('fencing a notice (GDD 3.23)', () => {
+  it('sells a held notice at the black market for Scrip, and nowhere else', async () => {
+    const m = await atAltar(2, 0);
+    const a = m.bots[0]!;
+    notice(m, 'notice_sold', 'doctor', a.id);
+    await act(a, 'act.notice', { itemId: 'notice_sold', op: 'fence' });
+    expect(errorCodes(a)).toContain(ErrorCode.outOfRange);
+    expect(ledgerOf(m.room).notices.has('notice_sold')).toBe(true);
+
+    teleport(m, a, 'tavern_back', stall.x - 1, stall.y);
+    await sleep(100);
+    await act(a, 'act.notice', { itemId: 'notice_sold', op: 'fence' });
+    expect(ledgerOf(m.room).notices.has('notice_sold')).toBe(false);
+    expect(playerOf(m, a).priv.purse).toBe(economy.notices.fencePrice);
   });
 });

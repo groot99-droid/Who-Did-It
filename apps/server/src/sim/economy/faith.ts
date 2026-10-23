@@ -1,11 +1,12 @@
-import { balance, economy, scenes } from '@wdi/content';
-import { ErrorCode, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { economy } from '@wdi/content';
+import { ErrorCode, Phase, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { addStack, canAdd, count, take } from '../Inventory';
 import { simOf } from '../RoomSim';
-import { isVerbPhase, reject, sceneKey, tileCentre } from '../World';
+import { isVerbPhase, reject } from '../World';
 import { balanceOf, movePurse, TOWN } from './purse';
 import { perkMul } from './perks';
+import { nearProp } from './reach';
 import { dropNotice, ledgerOf, systemLine } from './rumours';
 
 /**
@@ -48,18 +49,7 @@ export function sealShield(room: PartyRoom): void {
   shieldsOf(room).clear();
 }
 
-/** Whether the seat stands in verb reach of an altar prop. */
-function atAltar(room: PartyRoom, seat: string): boolean {
-  const p = simOf(room).players.get(seat);
-  if (!p || p.dead || !p.placed) return false;
-  const scene = scenes[sceneKey(p.sceneIdx)];
-  return (scene?.props ?? []).some((prop) => {
-    if (!economy.faith.altars.includes(prop.id)) return false;
-    const dx = p.x - tileCentre(prop.x, TILE_PX);
-    const dy = p.y - tileCentre(prop.y, TILE_PX);
-    return Math.hypot(dx, dy) <= balance.doors.reachTiles * TILE_PX;
-  });
-}
+const atAltar = (room: PartyRoom, seat: string) => nearProp(room, seat, economy.faith.altars);
 
 /** `act.donate {amount}`: Scrip to the town at an altar, Faith in return. */
 export function handleDonate(room: PartyRoom, seat: string, payload: Record<string, unknown>): void {

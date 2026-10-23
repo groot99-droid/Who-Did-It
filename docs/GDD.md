@@ -770,8 +770,8 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   Notices, private Notebook entries, up to `notices.maxHeld` held at once. A notice can be:
   - shown at a meeting, where it becomes a public line;
   - burnt, except one that names the holder's own look (only an Indulgence clears your own name);
-  - fenced at the black market (the tavern back room; BlackPine's lodge) for `notices.fencePrice` Scrip, once the
-    purse lands (until then the server refuses it).
+  - fenced at the black market (the tavern back room; BlackPine's lodge), within verb reach, for
+    `notices.fencePrice` Scrip from the town.
 
   A notice neither shown nor cleansed `notices.gazetteAfterRounds` day cycles after it was made is printed by the
   Gazette at the next meeting's start and leaves its holder's Notebook. BlackPine has no Train this round, so no
