@@ -30,12 +30,12 @@ describe('shared basics', () => {
     expect(pxToTiles(tilesToPx(3))).toBe(3);
   });
 
-  it('builds state with defaults and a mode field', () => {
+  it('builds state with defaults', () => {
     const s = new GameState();
-    expect(SCHEMA_VERSION).toBe(4);
+    expect(SCHEMA_VERSION).toBe(5);
     expect(s.schemaVersion).toBe(SCHEMA_VERSION);
     expect(s.settings).toBeInstanceOf(Settings);
-    expect(s.settings.mode).toBe(0);
+    expect('mode' in s.settings).toBe(false);
     const p = new Player();
     p.name = 'Ada';
     s.players.set('a', p);

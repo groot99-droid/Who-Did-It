@@ -10,7 +10,6 @@ import {
   deckFor,
   items,
   metrics,
-  onubRoles,
   palette,
   PLAYER_COUNTS,
   profileFor,
@@ -36,7 +35,6 @@ describe('content package', () => {
       ...Object.values(tasks.tasks),
       ...Object.values(roles.decks),
       ...Object.values(balance.byCount),
-      ...Object.values(onubRoles.roles),
     ];
     for (const r of records) expect(r.gddRef).toMatch(/^3(\.\d+)?$/);
   });
@@ -290,9 +288,7 @@ describe('items (GDD 3.5)', () => {
 });
 
 describe('role secrecy in public ids', () => {
-  const roleTokens = new Set(
-    [...Object.keys(roles.roles), ...Object.keys(onubRoles.roles)].map((id) => id.toLowerCase()),
-  );
+  const roleTokens = new Set(Object.keys(roles.roles).map((id) => id.toLowerCase()));
   const tokens = (id: string) =>
     id
       .replace(/([a-z])([A-Z])/g, '$1_$2')

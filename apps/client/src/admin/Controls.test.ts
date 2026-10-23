@@ -22,22 +22,20 @@ describe('setup payload', () => {
     map: 'hollowmere',
     seats: 6,
     difficulty: 'hard',
-    deck: '',
     seeds: undefined,
   } as const;
 
-  it('omits an empty deck and absent seeds', () => {
-    expect(setupPayload(form)).toEqual({ map: 'hollowmere', mode: 'main', seats: 6, difficulty: 'hard' });
+  it('omits absent seeds', () => {
+    expect(setupPayload(form)).toEqual({ map: 'hollowmere', seats: 6, difficulty: 'hard' });
   });
 
-  it('carries the deck and seeds and clamps the seats', () => {
+  it('carries the seeds and clamps the seats', () => {
     const p = setupPayload({
       ...form,
       seats: 40,
-      deck: 'killer, detective ,',
       seeds: { world: [1, 2, 3, 4] },
     });
-    expect(p).toMatchObject({ seats: 10, deck: ['killer', 'detective'], seeds: { world: [1, 2, 3, 4] } });
+    expect(p).toMatchObject({ seats: 10, seeds: { world: [1, 2, 3, 4] } });
     expect(setupPayload({ ...form, seats: 1 }).seats).toBe(4);
   });
 });

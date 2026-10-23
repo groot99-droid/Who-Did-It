@@ -1,7 +1,6 @@
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { emitSim } from '../events/bus';
 import { simOf } from '../RoomSim';
-import { isLoft } from '../World';
 import { vendettaOf } from './state';
 
 /**
@@ -79,8 +78,8 @@ export function emitStep(room: PartyRoom, seat: string, kind: string, sceneId?: 
   if (kind === v.fires) progressOf(room, seat).over = true;
 }
 
-/** The holder's world body when it can act on its goal: alive, placed and out of the loft. */
+/** The holder's world body when it can act on its goal: alive and placed. */
 export function activeBody(room: PartyRoom, seat: string) {
   const p = simOf(room).players.get(seat);
-  return p && !p.dead && p.placed && !isLoft(p.sceneIdx) ? p : null;
+  return p && !p.dead && p.placed ? p : null;
 }

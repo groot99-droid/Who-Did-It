@@ -3,9 +3,8 @@ import { ClueKind, DIRECTIONS, Phase, TICK_RATE, TILE_PX, dirFromVector } from '
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { decaySeconds, spawnClue } from './Clues';
 import { nightOf } from './nightMemory';
-import { isOnub } from './onub/state';
 import { simOf } from './RoomSim';
-import { isLoft, sceneKey } from './World';
+import { sceneKey } from './World';
 
 // Hunger (GDD 3.3; round-5 `deck/wire.md` 5). Session 5G owns this file; the hook is called from its locked site in
 // `Step.ts`. The strike rounds live in `nightMemory.ts` (`spendProtection` writes them, Inherit too).
@@ -17,7 +16,7 @@ import { isLoft, sceneKey } from './World';
  * phase and whatever look it wears, until a strike ends the Hunger.
  */
 export function runHunger(room: PartyRoom): void {
-  if (isOnub(room) || room.state.phase < Phase.grace) return;
+  if (room.state.phase < Phase.grace) return;
   const mem = nightOf(room);
   const state = room.state;
   if (state.phase !== mem.hungerPhase) {
@@ -34,7 +33,7 @@ export function runHunger(room: PartyRoom): void {
       mem.trail.delete(seat);
       continue;
     }
-    if (!p.placed || isLoft(p.sceneIdx)) continue;
+    if (!p.placed) continue;
     const trail = mem.trail.get(seat) ?? { x: p.x, y: p.y, moving: 0 };
     if (Math.hypot(p.x - trail.x, p.y - trail.y) > 0.5) trail.moving++;
     trail.x = p.x;

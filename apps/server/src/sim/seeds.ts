@@ -4,19 +4,14 @@ import { type Rng, sfc32 } from '@wdi/shared';
 /**
  * The independent random streams of one match (round-5 contract, DECISIONS A49, `deck/wire.md` 2.2). Each stream
  * is `sfc32` seeded with four `crypto.randomInt` words the first time it is asked for, so every public draw (traits,
- * NPC names, pile order, timings) can be seen in full without saying anything about the deal. Nothing secret may
+ * NPC names, timings) can be seen in full without saying anything about the deal. Nothing secret may
  * share a stream with anything public: add a name here rather than reuse one. Avatar handles never come from a
  * stream (`randomBytes`), and cover hints need no draw.
  *
- * - `deal`: the main-mode deal and the ONUB deal, then its Pantry Locations;
+ * - `deal`: the deal;
  * - `traits`: the cosmetic traits (never the deal stream);
  * - `npcNames`: the names of the NPC seats `fillNpcSeats` adds;
- * - `script`: the ONUB night script jitter;
- * - `piles`: the public order of each ONUB pile (`resolvePrep` step 1);
- * - `thaw`: the card each Thermostat Flip discards (secret until game over);
- * - `perk`: the Pantry Location the proofing visitors see (private to them);
- * - `prepTimeout`: the commit of a seat that let the prep clock run out;
- * - `nightTimeout`: the targets of a must-act left undone;
+ * - `piles`: drawn by nothing since the quick mode left (A115); `seeds.test.ts` fixes it as its sample stream;
  * - `npcTiming`, `npcPlay`: keyed by NPC seat id; each NPC seat draws only from its own two;
  * - `mobs`, `nodes`: round-6 world draws (`mobs` keyed by spawner id);
  * - `minigame`: the station-task puzzles (6H), keyed by seat id, so no public draw shares a seat's board;
@@ -27,12 +22,7 @@ export type StreamName =
   | 'deal'
   | 'traits'
   | 'npcNames'
-  | 'script'
   | 'piles'
-  | 'thaw'
-  | 'perk'
-  | 'prepTimeout'
-  | 'nightTimeout'
   | 'npcTiming'
   | 'npcPlay'
   | 'mobs'

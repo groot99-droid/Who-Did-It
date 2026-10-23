@@ -42,7 +42,7 @@ export function logHash(room: PartyRoom): string {
 function logAuto(room: PartyRoom, log: readonly SimEventWire[]): void {
   const auto = simOf(room).auto;
   if (auto === null) return;
-  const { map, mode, seats, difficulty, seeds, npcIds } = auto.options;
+  const { map, seats, difficulty, seeds, npcIds } = auto.options;
   const kinds: Record<string, number> = {};
   for (const e of log) kinds[e.kind] = (kinds[e.kind] ?? 0) + 1;
   matchLog.write(
@@ -50,7 +50,6 @@ function logAuto(room: PartyRoom, log: readonly SimEventWire[]): void {
       event: 'auto',
       code: room.roomId,
       map,
-      mode,
       seats,
       difficulty,
       winner: log[log.length - 1]?.data?.winner ?? '',

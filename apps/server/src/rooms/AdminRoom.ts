@@ -39,7 +39,6 @@ export class AdminRoom extends PartyRoom {
     await super.onCreate(options);
     enableAuto(this, {
       map: DEFAULT_MAP,
-      mode: 'main',
       seats: balance.players.max,
       difficulty: balance.npc.defaultDifficulty as 'easy' | 'normal' | 'hard',
     });

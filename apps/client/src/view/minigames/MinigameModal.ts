@@ -1,4 +1,4 @@
-import onubBalance from '@wdi/content/data/balance.onub.json';
+import balance from '@wdi/content/data/balance.json';
 import { M5B_COPY as C } from '../../ui/copy/m5b';
 import { h } from '../../ui/dom';
 import { MINIGAMES, type MiniGame, type MiniGameFactory, type MiniGameSpec } from './registry';
@@ -21,13 +21,12 @@ export interface MinigameModal {
   close(): void;
 }
 
-const specOf = (kind: MinigameKind): MiniGameSpec =>
-  onubBalance.stations.find((s) => s.minigame.kind === kind)!.minigame;
+const specOf = (kind: MinigameKind): MiniGameSpec => ({ kind, ...balance.minigames[kind] }) as MiniGameSpec;
 
 /**
- * The main-mode station mini-game as a DOM modal (UI.md 14.19.6): the ONUB widget of `kind` inside a dialog, fed the
+ * The main-mode station mini-game as a DOM modal (UI.md 14.19.6): the widget of `kind` inside a dialog, fed the
  * server's board (`bandRng`, `steps`, `holdS`), with the assist control after `assistS` and a way to step away. When the widget reports done the
- * modal sends the answer once through `send` and closes. `factory` is a seam for tests; it defaults to the ONUB widget.
+ * modal sends the answer once through `send` and closes. `factory` is a seam for tests; it defaults to the registry's widget.
  */
 export function openMinigame(
   parent: HTMLElement,

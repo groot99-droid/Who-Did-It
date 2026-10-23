@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import onubBalance from '@wdi/content/data/balance.onub.json';
+import balance from '@wdi/content/data/balance.json';
 import { PourModel } from './pour';
-
-const mixer = onubBalance.stations.find((s) => s.id === 'mixer')!;
 
 /** Holds until the level sits at `target`, using the model's own rate. */
 function holdTo(m: PourModel, target: number): void {
@@ -11,9 +9,9 @@ function holdTo(m: PourModel, target: number): void {
 }
 
 describe('pour mini-game', () => {
-  it('reads the steps, the rate and the band from the mixer station', () => {
+  it('reads the steps, the rate and the band from balance.json', () => {
     const m = new PourModel(() => 0.5);
-    const spec = mixer.minigame as { steps: number; ratePerS: number; bandFrac: number };
+    const spec = balance.minigames.pour;
     expect([m.steps, m.ratePerS, m.bandFrac]).toEqual([spec.steps, spec.ratePerS, spec.bandFrac]);
   });
 

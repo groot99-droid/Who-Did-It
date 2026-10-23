@@ -6,10 +6,8 @@ export interface MatchRecord {
   code: string;
   seats: number;
   durationS: number;
-  /** A `Winner` name: `village` or `cabal` in the main mode; quick mode adds `croissant` and `nobody` (GDD 3.11). */
-  winner: 'village' | 'cabal' | 'croissant' | 'nobody';
-  /** `main` or `onub` (round 4). */
-  mode?: 'main' | 'onub';
+  /** A `Winner` name: `village` or `cabal`. */
+  winner: 'village' | 'cabal';
   rounds: number;
   kills: number;
   vanished: number;
@@ -20,8 +18,6 @@ export interface MatchRecord {
     faction: string;
     survived: boolean;
     clues: number;
-    /** Quick mode: the Role card held at dawn (`role` is the card dealt). */
-    finalRole?: string;
     /** NPC seat (GDD 3.12); stdout only, never on the wire. */
     isNpc?: boolean;
   }[];
@@ -34,11 +30,7 @@ export interface MatchRecord {
     ejectedId?: string;
     ejectedRole?: string;
     ejectionCorrect?: boolean;
-    /** Quick mode: every seat turned out, ties included (`ejectedId` names the first). */
-    outs?: string[];
   }[];
-  /** Quick mode: the winners row that applied and the seats that won (stdout only). */
-  onub?: { rowId: string; winnerIds: string[] };
 }
 
 export const matchLog = {

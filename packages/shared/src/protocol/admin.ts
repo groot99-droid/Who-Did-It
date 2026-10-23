@@ -66,13 +66,11 @@ export interface SimEventWire {
 }
 
 export interface AdminC2SPayloads {
-  /** Configure the next match: a `MAP_IDS` id, the mode, the seat count (all NPCs), the difficulty, an optional deck and seed words. Applied at the next `admin.start`. */
+  /** Configure the next match: a `MAP_IDS` id, the seat count (all NPCs), the difficulty and seed words. Applied at the next `admin.start`. */
   'admin.setup': {
     map: string;
-    mode: 'main' | 'onub';
     seats: number;
     difficulty: 'easy' | 'normal' | 'hard';
-    deck?: string[];
     seeds?: FixedSeeds;
   };
   /** Start the configured match inside the step (`runAuto` calls `startMatch`); no leader is needed. */

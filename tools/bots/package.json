@@ -8,7 +8,6 @@
     "start": "tsx swarm.ts",
     "walk": "tsx --conditions=development walk.ts",
     "soak": "tsx --conditions=development soak.ts",
-    "ruin": "tsx --conditions=development ruin.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "live": "tsx live.ts"

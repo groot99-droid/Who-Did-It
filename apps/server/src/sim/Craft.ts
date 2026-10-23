@@ -3,7 +3,7 @@ import { ErrorCode, type PlayerState, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { canExchange, exchange } from './Inventory';
 import { type PlayerSim, simOf } from './RoomSim';
-import { isLoft, isVerbPhase, reject, sceneKey, tileCentre } from './World';
+import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
 /**
  * Crafting (round 6, M5b, GDD 3.14; docs/round6/m5b-data.md 2.1): the `craft` hold at a station prop of the recipe's
@@ -29,7 +29,7 @@ function craftProblem(
   recipeId: string,
 ): { code: ErrorCode; msg: string } | null {
   if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
-  if (p.dead || !p.placed || isLoft(p.sceneIdx)) return { code: ErrorCode.cannot, msg: 'not now' };
+  if (p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
   if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
   const recipe = recipes.recipes[recipeId];
   if (!recipe) return { code: ErrorCode.cannot, msg: 'no such recipe' };

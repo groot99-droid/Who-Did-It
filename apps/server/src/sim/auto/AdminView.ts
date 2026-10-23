@@ -16,7 +16,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { npcMemory } from '../npc/memory';
 import { onSim } from '../events/bus';
 import { simOf } from '../RoomSim';
-import { SCENE_KEYS, isLoft, sceneKey } from '../World';
+import { SCENE_KEYS, sceneKey } from '../World';
 import { autoOf } from './Auto';
 import { clockOf, effectiveScale } from './clock';
 import { runInvariants } from './invariants';
@@ -152,7 +152,7 @@ export function watchAdminFeed(room: PartyRoom): void {
   feedOf(room);
 }
 
-const seatSceneId = (idx: number): string => (isLoft(idx) ? 'loft' : sceneKey(idx));
+const seatSceneId = (idx: number): string => sceneKey(idx);
 
 /** Every seat as the god view lists it: role and cover included, the brain for an NPC (auto-admin.md 6). */
 export function adminSeats(room: PartyRoom): AdminSeat[] {

@@ -13,7 +13,7 @@ import { addNote } from './NightPowers';
 import { nightOf } from './nightMemory';
 import { simOf } from './RoomSim';
 import { endMatch, evaluateWin } from './Win';
-import { isLoft, isWorldPhase, reject, sceneKey } from './World';
+import { isWorldPhase, reject, sceneKey } from './World';
 
 // The Gamekeeper's Last Shot (GDD 3.2, 3.8; round-5 `deck/wire.md` 5). Session 5G owns this file. A dying Gamekeeper
 // (Knife, Nightshade or an ejection) gets `aim {endsTick}` for `lastShot.params.aimS`; its view holds no avatar
@@ -79,7 +79,7 @@ function fire(room: PartyRoom, shooter: string, targetId: string): void {
       if (phase === Phase.reveal && nightOf(room).aims.get(shooter)?.cause === 'ejected') {
         room.broadcast(S2C.shot, { fromId: shooter, targetId, role: targetPlayer.priv.role.roleId });
       }
-    } else if (isWorldPhase(phase) && target.placed && !isLoft(target.sceneIdx)) {
+    } else if (isWorldPhase(phase) && target.placed) {
       const sceneId = sceneKey(target.sceneIdx);
       spawnBody(room, sceneId, targetId, Math.floor(target.x / TILE_PX), Math.floor(target.y / TILE_PX));
       emitNoise(room, sceneId, target.x, target.y, balance.noise.shot, 'shot', shooter);

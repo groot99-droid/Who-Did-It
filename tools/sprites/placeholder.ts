@@ -1,27 +1,21 @@
 // Placeholder art for every key in docs/SPRITES.md 8, so playtests run before real art (ROADMAP 7.3).
 // tsx tools/sprites/placeholder.ts [out dir]   (default apps/client/public/assets/placeholder)
 //
-// The core (art plan 1.2 item 6): it collects the stand-ins of three modules, one per art session,
-// and writes them with the placeholder manifest. placeholder-world.ts is 5K's, placeholder-chars.ts 5L's
-// and placeholder-onub.ts 5M's; each session edits only its own module, never this file or the kit.
+// The core (art plan 1.2 item 6): it collects the stand-ins of the art sessions' modules and writes them
+// with the placeholder manifest. placeholder-world.ts is 5K's and placeholder-chars.ts 5L's (5M's quick-mode
+// module left with the mode, A115); each session edits only its own module, never this file or the kit.
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { writeFiles } from './pack.ts';
 import { placeholderEntries as charsEntries } from './placeholder-chars.ts';
 import type { ManifestEntry, PlaceholderEntry } from './placeholder-kit.ts';
 import { placeholderEntries as m5bEntries } from './placeholder-m5b.ts';
-import { placeholderEntries as onubEntries } from './placeholder-onub.ts';
 import { placeholderEntries as worldEntries } from './placeholder-world.ts';
 
 export { PALETTE, type ManifestEntry, type PlaceholderEntry, type Token } from './placeholder-kit.ts';
 
 /** The modules, in the order that breaks a tie of `order`. */
-const MODULES: ReadonlyArray<() => PlaceholderEntry[]> = [
-  worldEntries,
-  charsEntries,
-  onubEntries,
-  m5bEntries,
-];
+const MODULES: ReadonlyArray<() => PlaceholderEntry[]> = [worldEntries, charsEntries, m5bEntries];
 
 export async function generate(): Promise<Map<string, Buffer>> {
   const files = new Map<string, Buffer>();

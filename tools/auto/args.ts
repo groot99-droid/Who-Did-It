@@ -3,7 +3,6 @@ export interface AutoArgs {
   matches: number;
   seed: number;
   map: string;
-  mode: 'main' | 'onub';
   difficulty: 'easy' | 'normal' | 'hard';
   seats: number;
   json: boolean;
@@ -13,7 +12,6 @@ const DEFAULTS: AutoArgs = {
   matches: 20,
   seed: 1,
   map: 'hollowmere',
-  mode: 'main',
   difficulty: 'normal',
   seats: 6,
   json: false,
@@ -42,10 +40,6 @@ export function parseArgs(argv: readonly string[]): AutoArgs | null {
       }
       case '--map':
         out.map = value;
-        break;
-      case '--mode':
-        if (value !== 'main' && value !== 'onub') return null;
-        out.mode = value;
         break;
       case '--difficulty':
         if (value !== 'easy' && value !== 'normal' && value !== 'hard') return null;

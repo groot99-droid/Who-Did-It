@@ -2,7 +2,7 @@
 // seat by its name, so this module is reached through `@wdi/content/server` and the client lint forbids
 // that import. Importing it parses and validates `data/names.json` against the lobby rules.
 import namesJson from '../data/names.json' with { type: 'json' };
-import { balance, onubRoles, roles } from './index.js';
+import { balance, roles } from './index.js';
 import { NamesFile } from './schemas/names.js';
 
 export * from './schemas/names.js';
@@ -11,7 +11,7 @@ export * from './schemas/names.js';
 export function validateNames(file: NamesFile): string[] {
   const errors: string[] = [];
   const seen = new Set<string>();
-  const tokens = [...Object.keys(roles.roles), ...Object.keys(onubRoles.roles)].map((r) => r.toLowerCase());
+  const tokens = Object.keys(roles.roles).map((r) => r.toLowerCase());
   for (const name of file.pool) {
     const key = name.trim().toLowerCase();
     if (name !== name.trim() || key.length < balance.lobby.nameMin || key.length > balance.lobby.nameMax) {
