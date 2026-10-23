@@ -1,7 +1,7 @@
 /*
  * The menu (round 7, Session 7C; docs/UI.md 14.25): the title, the column of glass buttons, the chip and the sound
- * toggle, and the dialogs the buttons open. Tokens only (theme.test.ts); the glass classes of 7B's PR 2 replace the
- * local fill and rim below when they land.
+ * toggle, and the dialogs the buttons open. Tokens only (theme.test.ts); the surfaces are 7B's `.wdi-glass*` classes and
+ * the title is `titleLetters`, so this file keeps the layout only.
  */
 
 .wdi-menu {
@@ -34,14 +34,12 @@
   gap: var(--wdi-space-2);
   min-height: var(--wdi-touch);
   padding: 0 var(--wdi-space-4);
+  border: 0;
   font-family: var(--wdi-font-pixel-display);
   font-size: var(--wdi-text-xs);
   color: var(--wdi-night-label);
-  background: var(--wdi-glass-fill);
-  border: 1px solid rgb(var(--wdi-snow-rgb) / 0.3);
-  border-radius: var(--wdi-radius-sm);
-  backdrop-filter: blur(6px);
   text-transform: uppercase;
+  cursor: pointer;
 }
 
 .wdi-menu__sound {
@@ -49,7 +47,13 @@
   justify-content: center;
   padding: 0;
   font-size: var(--wdi-text-md);
-  cursor: pointer;
+}
+
+.wdi-menu__chip:focus-visible,
+.wdi-menu__sound:focus-visible,
+.wdi-menu-dialog__close:focus-visible {
+  outline: var(--wdi-stroke-w) solid var(--wdi-night-accent);
+  outline-offset: 2px;
 }
 
 .wdi-menu__main {
@@ -58,46 +62,6 @@
   justify-content: center;
   gap: var(--wdi-space-4);
   width: min(380px, 100%);
-}
-
-.wdi-menu__title {
-  display: flex;
-  flex-direction: column;
-  margin: 0 0 var(--wdi-space-3);
-  font-family: var(--wdi-font-pixel-display);
-  font-weight: 400;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
-
-.wdi-menu__title-line--top {
-  font-size: var(--wdi-display-lg);
-  color: var(--wdi-night-label);
-  text-shadow:
-    3px 3px 0 var(--wdi-violet),
-    6px 6px 0 var(--wdi-indigo);
-}
-
-.wdi-menu__title-line--bottom {
-  font-size: calc(var(--wdi-display-xl) * 2);
-  color: var(--wdi-night-accent);
-  text-shadow:
-    3px 3px 0 var(--wdi-violet),
-    6px 6px 0 var(--wdi-indigo);
-}
-
-.wdi-menu__letter {
-  display: inline-block;
-  white-space: pre;
-  animation: wdi-menu-drop 420ms var(--wdi-ease) both;
-  animation-delay: calc(var(--i) * 70ms);
-}
-
-@keyframes wdi-menu-drop {
-  from {
-    opacity: 0;
-    transform: translateY(-24px);
-  }
 }
 
 .wdi-menu__nav {
@@ -110,96 +74,15 @@
   gap: var(--wdi-space-2);
 }
 
-.wdi-menu__btn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--wdi-space-3);
-  min-height: var(--wdi-touch);
-  padding: var(--wdi-space-2) var(--wdi-space-4);
-  font-family: var(--wdi-font-pixel-display);
-  font-size: var(--wdi-text-sm);
-  text-align: left;
-  text-decoration: none;
-  text-transform: uppercase;
-  color: var(--wdi-night-label);
-  background: var(--wdi-glass-fill);
-  border: 1px solid rgb(var(--wdi-snow-rgb) / 0.3);
-  border-radius: var(--wdi-radius-sm);
-  backdrop-filter: blur(6px);
-  cursor: pointer;
-  transition:
-    transform var(--wdi-dur-fast) var(--wdi-ease),
-    filter var(--wdi-dur-fast) var(--wdi-ease);
-}
-
-.wdi-menu__nav .wdi-menu__btn {
-  min-height: calc(var(--wdi-touch) + var(--wdi-space-2));
-}
-
-.wdi-menu__btn--primary {
-  color: var(--wdi-on-night-accent);
-  background: var(--wdi-night-accent);
-}
-
-.wdi-menu__btn--sm {
+.wdi-menu__small > .wdi-glass-btn {
   flex: 1 1 auto;
+  width: auto;
   justify-content: center;
-  padding: var(--wdi-space-2) var(--wdi-space-3);
-  font-size: var(--wdi-text-xs);
-}
-
-.wdi-menu__btn:hover:not(:disabled) {
-  filter: brightness(1.15);
-}
-
-.wdi-menu__btn:active:not(:disabled) {
-  transform: translateY(1px);
-}
-
-.wdi-menu__btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.wdi-menu__btn:focus-visible,
-.wdi-menu__sound:focus-visible,
-.wdi-menu-dialog__close:focus-visible {
-  outline: var(--wdi-stroke-w) solid var(--wdi-night-accent);
-  outline-offset: 2px;
-}
-
-.wdi-menu__icon {
-  width: 1.5em;
-  text-align: center;
-}
-
-.wdi-menu__label {
-  flex: 1 1 auto;
-}
-
-.wdi-menu__btn--sm .wdi-menu__label {
-  flex: 0 1 auto;
-}
-
-.wdi-menu__note {
-  font-family: var(--wdi-font-pixel-text);
-  font-size: var(--wdi-text-xs);
-  text-transform: none;
-  color: var(--wdi-night-text-muted);
-}
-
-.wdi-menu__btn--sm {
   white-space: nowrap;
 }
 
-/* The small row has no room for the note; the button's title and the disabled state carry it. */
-.wdi-menu__btn--sm .wdi-menu__note {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
+.wdi-menu a.wdi-glass-btn {
+  text-decoration: none;
 }
 
 .wdi-menu__footer {
@@ -219,12 +102,6 @@
   width: min(420px, 100%);
   max-height: calc(100dvh - var(--wdi-space-6));
   overflow: auto;
-  padding: var(--wdi-space-5);
-  background: var(--wdi-glass-fill);
-  border: 1px solid rgb(var(--wdi-snow-rgb) / 0.3);
-  border-radius: var(--wdi-radius-md);
-  backdrop-filter: blur(10px);
-  box-shadow: var(--wdi-shadow-3);
   animation: wdi-rise var(--wdi-dur-base) var(--wdi-ease) both;
 }
 

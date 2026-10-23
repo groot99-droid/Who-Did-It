@@ -50,8 +50,5 @@ export const LOBBY_COPY = {
   'npc.level.easy': 'Easy',
   'npc.level.normal': 'Normal',
   'npc.level.hard': 'Hard',
-  'lobby.friend.add': 'Add friend',
-  'lobby.friend.add.label': 'Add {name} as a friend',
-  'lobby.friend.added': 'Friend',
   'lobby.practice': 'Practice party: roles on, the Cabal wins with one villager left',
 } as const satisfies Record<string, string>;
