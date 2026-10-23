@@ -332,7 +332,7 @@ In M5a nobody carries a light that anyone else can see. Your vision is drawn for
 
 **Explored fog and the minimap** are M5b. M5a draws no memory of where you have been and no map overlay.
 
-**Transitions.** The client covers the screen while the router starts a scene: a fade into the world (`balance.ui.transitionS.fade`, 0.4 s), an iris into a meeting (`iris`, 0.6 s) and a wipe into the end screen (`wipe`, 0.7 s), each the whole cover-and-lift. Under reduced motion every duration is 0 and the scene starts at once. A transition that begins while another runs replaces it. Nothing here touches the sim or the wire.
+**Transitions.** The client covers the screen while the router starts a scene: a fade into the world (`balance.ui.transitionS.fade`, 0.4 s), an iris into a meeting (`iris`, 0.6 s) and a wipe into the end screen (`wipe`, 0.7 s), each the whole cover-and-lift. Since round 8 (8H, A143) the cover into the world follows the portal the seat came through, at the same `fade` duration: a door wipes, a ladder, stair, hatch, shaft, drop or crawl irises (with rungs passing up or down when the portal changes height), an arrival at a map's Train station fades through the station, and the first spawn, a cave mouth, a forest gate or the return from a meeting fades. Under reduced motion every duration is 0 and the scene starts at once. A transition that begins while another runs replaces it. Nothing here touches the sim or the wire.
 
 **Loading.** A load that runs longer than `balance.ui.loading.showAfterS` (0.3 s) shows a progress bar and a tip, which changes every `tipEveryS` (4 s); a shorter load shows nothing. Tips describe the controls and the world and never a role's powers. A match's load also starts the map's `loading` music (3.18).
 

@@ -311,6 +311,7 @@ for a selection, `-hazard` for a cue. Never a black shadow.
 | pop (`pop`; the E prompt appearing) | 200 ms, from 0.6 | `--wdi-ease-spring` | appears in place |
 | cooldown sweep (`cooldown`) | the card's cooldown | linear | kept (it is status) |
 | the E hold fill | follows the hold, smoothed over 60 ms | linear | kept, unsmoothed |
+| scene cover into the world, per portal (`view/Transition.ts` `portalTransition`) | `balance.ui.transitionS.fade` (GDD 3.13) | ease-in-out | a cut |
 | toast, dialog, stamp rise | 220 ms | `--wdi-ease` | appears in place |
 | the card flip | 600 ms | `--wdi-ease` | swap, no rotation |
 | the card hold timer | the hold (GDD 2 step 4) | linear | still drains |
@@ -349,6 +350,14 @@ when a press landed (an ability fired, an item used), `refused(el)` when the ser
 clockwise over the card's cooldown. Each restarts its animation on every call and removes its class at
 `animationend`; none reads or changes state, so the caller decides what happened. The E prompt pops in as it
 appears and its bar fills smoothly while E is held; a task's mini-game opens with the panel entrance.
+
+Transitions and transport (8H, A143). The World's cover follows the portal the seat came through (GDD
+3.13): `wipe` for a door, `iris` for a level stair or crawl, `climbUp` and `climbDown` (the iris with
+lantern rungs passing the way the seat goes) for a portal that changes height, `station` (night with
+lantern-lit carriage windows sliding past) for an arrival at a map's Train station, and `fade` otherwise. The
+meeting keeps its iris and the end screen its wipe. The in-transit veil is the cover itself: the 0.6 s door
+transit of GDD 3.7 runs while it is down. The Train carries no seat today (GDD 3.3), so its journey card waits
+for a rule that moves seats by Train; the `station` cover is ready for it.
 
 ## 10. Accessibility checklist and measured contrast
 
