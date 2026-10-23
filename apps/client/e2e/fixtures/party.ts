@@ -43,9 +43,12 @@ export async function joinParty(page: Page, code: string, name: string): Promise
  */
 export async function enterWorld(page: Page): Promise<void> {
   await expect(page.getByTestId('entered')).toContainText('overworld');
+  // The map opening (117 s on HollowMere) hides the HUD until it ends: wait for whichever comes first, its Skip or
+  // the HUD clock, rather than a fixed window that a slower second page can miss.
   const skip = page.getByTestId('cutscene-skip');
-  await skip.waitFor({ state: 'visible', timeout: 4000 }).then(
-    () => skip.click(),
-    () => undefined,
-  );
+  const clock = page.getByTestId('hud-clock');
+  await expect
+    .poll(async () => (await skip.isVisible()) || (await clock.isVisible()), { timeout: 30_000 })
+    .toBe(true);
+  if (await skip.isVisible()) await skip.click();
 }
