@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { createParty } from './fixtures/party';
 
 // The World scene against the ?mock=1 world feed: lobby -> role card -> village, walking and a door.
 
 async function toWorld(page: import('@playwright/test').Page, query = '') {
   await page.goto(`/Who-Did-It/?mock=1${query}`);
-  await page.getByLabel('Your name').fill('Hana');
-  await page.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(page, 'Hana');
   await expect(page.getByTestId('player-list')).toContainText('Hana');
   await expect(page.getByTestId('start')).toBeEnabled();
   await page.getByTestId('start').click();
