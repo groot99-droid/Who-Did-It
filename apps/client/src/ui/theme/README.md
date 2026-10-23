@@ -5,7 +5,7 @@ itself is written up in `docs/UI.md`; this folder is what a screen imports.
 
 | File               | What it is                                                                                                                                                                                                                                                                                                                              |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tokens.css`       | `@font-face` for Oswald and Inter, every `palette.json` colour as `--wdi-<name>` (and `--wdi-<name>-rgb` for alpha), the role tokens (`--wdi-bg`, `--wdi-paper`, `--wdi-primary`, factions), type scale, spacing, radii, strokes, shadows, the paper grain, the four nine-slice card frames as data URIs, motion durations and z layers |
+| `tokens.css`       | `@font-face` for Oswald, Inter, Pixelify Sans and Press Start 2P, every `palette.json` colour (the ten tokens and the night set) as `--wdi-<name>` (and `--wdi-<name>-rgb` for alpha), the role tokens (`--wdi-bg`, `--wdi-paper`, `--wdi-primary`, factions), type scale, spacing, radii, strokes, shadows, the paper grain, the four nine-slice card frames as data URIs, motion durations and z layers |
 | `components.css`   | The `wdi-` classes: text, layout helpers, panels, buttons, inputs, chips, icons, roster rows, the role card and its flip, timer, dialogs, toasts, HUD, touch controls, portraits and votes, chat, tabs, notebook, the dark loft                                                                                                         |
 | `build-frames.mjs` | Writes `public/assets/ui/frames/frame_*.svg` and prints the `--wdi-frame-*` tokens; run it after changing a motif, then paste the output into `tokens.css`                                                                                                                                                                              |
 | `theme.test.ts`    | Palette-only colours, the 2 px stroke and 48 px grid on every UI SVG, frames identical to their data URIs, WCAG AA on every text pair, and the ratio table in `docs/UI.md`                                                                                                                                                              |
@@ -32,8 +32,11 @@ through the dev server (`pnpm --filter @wdi/client dev`, then
 
 ## Rules the tests enforce
 
-- No hex outside `packages/content/data/palette.json`, in CSS or in any SVG under
+- No hex outside `packages/content/data/palette.json` (`colors` and `night`), and no literal
+  `rgb()` or `hsl()`, in any `.css` file under `apps/client/src` (round 7) or in any SVG under
   `public/assets/ui/`. Alpha variants are `rgb(var(--wdi-bone-rgb) / 0.72)`, never a new hex.
+- Fonts only through the `--wdi-font-*` tokens, in any `.css` file under `apps/client/src`
+  (generic families such as `monospace` aside); the four `@font-face` rules live in `tokens.css`.
 - Every SVG under `public/assets/ui/{frames,marks,glyphs}` sits on the 48 px grid with 2 px strokes.
   `icons/` is checked by `tools/sprites/test/icons.test.ts` against `docs/SPRITES.md` 9; do not add
   files there without a `SPRITES.md` row.
