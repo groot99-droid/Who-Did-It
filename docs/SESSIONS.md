@@ -3491,6 +3491,11 @@ an existing `apps/server/test/*.test.ts`, anything written into ROSW.
   while the registry is still evaluating (TDZ at boot). 7H's checks hang off `Step.ts` → `vendettas/run.ts`, outside that
   closure; asked 6Z for the same one line in `Step.ts`. A seam for `seams.md`: a new invariant module needs a host outside
   the registry's closure.
+- 2026-10-23: PR 2a-bis (the `taskBar` invariant, A133 (10)): `sim/tasks/invariants.ts`, registered through 6Z's
+  side-effect import in `Step.ts` (directly above `./vendettas/run`, so 7H's four stay the last registered and their `vendettas.test.ts` pin holds), pinned in `test/invariants.test.ts` (one line, granted) and
+  appended to `ROUND7_CHECKS` in `tools/auto/checks/index.ts`; `tools/auto/test/report.test.ts` reads the constants and
+  needed no line. Tests in `taskPickup.test.ts`: a bar the lists do not explain, an NPC seat with a list and a logged
+  `taskDone` nobody finished each fail it; a fake and a real completion by the Done control leave it quiet.
 - Read from ROSW (never written): the UDGT teardown chapters 00 to 03 on `claude/sweet-maxwell-lmsiw3`, and the Who Did It lore
   on `claude/sharp-mccarthy-pqi3ws` (the Canon Ledger, the Lamplighter's Round, the Gazette, the Tab Book, Fourteen Things, the
   Daybook of Crumb's Ovens, Hopscotch, three stories). Drifts noted for 6Z, not resolved here: the lore dates HollowMere to 1893
@@ -3549,6 +3554,9 @@ then docs/round8/README.md, seams.md and the documents your brief names. Branch 
 | **8J. HollowMere rooms** | Opus 5.5 | Art and content | `claude/r8-hollowmere-rooms` | every HollowMere scene's placement and detail |
 | **8K. BlackPine rooms** | Opus 5.5 | Art and content | `claude/r8-blackpine-rooms` | every BlackPine scene's placement and detail |
 | **8P. Integration** | Opus 5.5 | Code | `claude/r8-integration` | spawned last: merges, `PROTOCOL.md`, auto 50, the e2e sets, A147 |
+| **8L. Anti-cheat** | Opus 5.5 | Code | `claude/r8-anticheat` | `teardown.md` 1: blood by range, night sight on the server, the leak test, replay, the vote delay (A170) |
+| **8M. Rules** | Opus 5.5 | Code and docs | `claude/r8-rules` | `teardown.md` 2: match length, the Final Night hunt and trial, card text from the data (A171) |
+| **8N. Icons** | Fable 5.1 | Art | `claude/r8-icons` | `teardown.md` 3: every status and HUD icon drawn, in all three styles (A172) |
 
 ### Round 8 briefs
 
@@ -3643,6 +3651,28 @@ then docs/round8/README.md, seams.md and the documents your brief names. Branch 
   office, mine and deep, with `blackpine_props.py`.
 
 **Merge order**: seams.md 7.
+
+### Round 8 addendum briefs (A168, A169)
+
+Spawned after the owner's teardown answers. Contract: `docs/round8/teardown.md`, with seams.md for everything shared.
+
+- **8L. Anti-cheat** (`teardown.md` 1).
+  1. Blood by range in `publishPresence`.
+  2. Night sight on the server in every scene.
+  3. The vote delay `meeting.minVoteS` (GDD 3.4).
+  4. The per-message leak test and the replay seed and build in `MatchLog`.
+
+  One PR per step, each with tests, and auto 50 clean.
+- **8M. Rules** (`teardown.md` 2).
+  1. Match length 20 to 25 minutes in GDD 2, 3.3 and 3.9, with the soak.
+  2. The Final Night: `finalNight.huntS` about 45 s, then the trial `finalNight.trialS`, with the GDD and auto 50.
+  3. The card-text drift test.
+  4. The generated numbers.
+- **8N. Icons** (`teardown.md` 3).
+  1. Survey every icon the game shows as a word or a placeholder.
+  2. Send 6Z the list and a sheet of five or six icons, bleeding first in the owner's words, for the owner's look.
+  3. After the owner's yes, draw the set in 8-bit, low poly and HD into the UI atlas.
+  4. Wire the effect icons into the HUD and the bloodied mark over a figure, with 8H's helpers.
 
 ### Round 8 log: 6Z
 
