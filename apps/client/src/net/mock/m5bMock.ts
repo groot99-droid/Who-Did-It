@@ -6,7 +6,7 @@ import resourcesJson from '@wdi/content/data/resources.json';
 import { TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { HoldAction } from '@wdi/shared/protocol';
 import type { StackSnap } from '../world';
-import type { MobSnap, NodeSnap, QuestSnap } from '../world';
+import type { MobSnap, NodeSnap, QuestSnap, TaskSnap } from '../world';
 
 // The mock's half of M5b (round 6, 6I): nodes, gathering, crafting, quests and one wandering creature, with the
 // server's rules in miniature (`apps/server/src/sim/{Resources,Craft,Quests}.ts`). `MockWorldFeed` owns an instance
@@ -63,6 +63,8 @@ export class MockM5b {
   private readonly nodeMap = new Map<string, MockNode>();
   private readonly stacks: StackSnap[] = [];
   private readonly questList: QuestSnap[] = [];
+  /** Round 7 (7M): the mock's own task list; the chores panel of PR 2b seeds and reads it. */
+  readonly taskList: TaskSnap[] = [];
   private hold: { action: 'gather' | 'craft'; targetId: string; since: number; x: number; y: number } | null =
     null;
   private lit = false;
@@ -141,6 +143,10 @@ export class MockM5b {
 
   quests(): QuestSnap[] {
     return this.questList.map((q) => ({ ...q }));
+  }
+
+  tasks(): TaskSnap[] {
+    return this.taskList.map((t) => ({ ...t }));
   }
 
   inventory(): StackSnap[] {
