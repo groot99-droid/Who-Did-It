@@ -2954,6 +2954,27 @@ pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock 
 - **Waiting**: the owner's `Who_Did_It_Music_Pt1.zip` and `Who_Did_It_SFX_Pt1.zip` on the release (step 2: the ROSW
   ingest, the owner's tracks and `train_arrive`, `train_brake`, `ferry_horn`, `crows`); the videos (step 3).
 
+### Round 6 log: 6Q (opening cinematic)
+
+- **Two steps on one branch and one draft PR (`claude/r6-intro`, 2026-10-22)**, each commit green on `pnpm lint && pnpm
+  typecheck && pnpm test`: (1) `scenes/Intro.ts` with `scenes/introPolicy.ts` (the Phaser-free rules, so the unit tests can
+  load them), `ui/copy/intro.ts`, the "Round 6 (6Q)" CSS block, the `first` line of `Preload.ts`, the 2 s stand-in clip under
+  `e2e/fixtures/`, the `intro` budget line; (2) `e2e/intro.spec.ts`, UI.md 14.24, this log.
+- **Contract requests, with their stand-ins in the PR description**: (a) `main.ts` lists `Intro` in the scene array (one
+  import, one entry, after `Admin`); (b) the budget cap lives in `tools/sprites/test/media.ts` (`BUDGET.introVideoBytes`,
+  `INTRO_VIDEO_KEY`), because `checkVideos` is there and `media.test.ts` only calls it; (c) the four live-server specs
+  (`match`, `npc`, `onub`, `looks`) open `/Who-Did-It/` without `?mock=1`, so once 6N lands `intro.webm` they would stop on
+  the poster: they need `?intro=0` or an init script setting `sessionStorage['wdi:introSeen']`. Until the file lands the scene
+  finds no row and starts `Landing`, so nothing changes today.
+- **Settled from the code (A98's open items)**: the first-load figure (A93) is unaffected, since `firstLoadBytes` counts the
+  art manifests and the intro is fetched only after the tap; the cinematic's volume follows the player's music slider and mute
+  (`wdi:audio`); a reload that rejoins `#/lobby/CODE` skips it. Still open for the owner: the cinematic's tool and date, and
+  whether the lobby keeps the theme after the first match.
+- **Measured / checked**: client tests 538 (new: `introPolicy.test.ts`), sprites tests 386 (new: the 5 MB intro line, a
+  non-intro key at 4.5 MB fails, 5 MB + 1 fails); `e2e/intro.spec.ts` 8 specs (mock skip, live default, tap and end, Skip and
+  once per session, Esc, `?intro=0` and reduced motion, missing file or row, admin route). Not run against a real cinematic:
+  its file and poster are 6N's.
+
 ## Integration log, round 6
 
 - **NPC test flake, R18 (2026-10-22).** On PR #47's CI run 252 (head ac0409c) `npcRoutine.test.ts` R18 failed
