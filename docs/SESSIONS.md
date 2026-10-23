@@ -3231,6 +3231,11 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 - 2026-10-23: PR 1 (fonts, night set, tokens, the gate on every `.css` under `apps/client/src`, licences,
   CREDITS, UI.md 2, 3 and 10, ASSETS 6.1, A106). The night set sits in its own `palette.json` block (A106);
   glass contrast is measured over the darkest and the brightest bound of the loop, so it does not wait for 6N.
+- 2026-10-23: PR 2 (the night glass, UI.md 6 rows first): the glass is a `::before` layer under the content so
+  the stepped `clip-path` never cuts the focus ring; the checker sheen and the primary's hover wash are tokens
+  and in the measured stacks (muted lilac on a sheen cell 4.63). `.wdi-seg` stays in 7E's
+  `ui/artStyle/artStyle.css`, which loads after `components.css`, so the glass look is the modifier
+  `.wdi-seg--glass` (with `.wdi-seg__note`) for 7E to add. `ui/theme/title.ts` builds the title's letters.
 
 ### Round 7 log: 7C
 
