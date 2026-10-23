@@ -70,5 +70,6 @@ describe('shared basics', () => {
 
   it('adds the round-7 profile empty (docs/round7/parties.md 2)', () => {
     expect(new Player().profile).toBe('');
+    expect(new Private().vendetta).toBe('');
   });
 });

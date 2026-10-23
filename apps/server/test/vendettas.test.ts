@@ -1,9 +1,8 @@
-import { ColyseusTestServer, boot } from '@colyseus/testing';
-import { roles, validateContent, vendettas } from '@wdi/content';
-import { BUILD_VERSION, C2S, Phase } from '@wdi/shared';
+import type { ColyseusTestServer } from '@colyseus/testing';
+import { balance, roles, validateContent, vendettas } from '@wdi/content';
+import { BUILD_VERSION, C2S, NoteKind, Phase, TICK_RATE } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
-import { createServer } from '../src/server';
 import { MatchSeeds, type SeedWords } from '../src/sim/seeds';
 import {
   drawVendettas,
@@ -13,6 +12,24 @@ import {
   vendettaOf,
 } from '../src/sim/vendettas/state';
 import { fixSeeds } from './seedHelpers';
+import { matchEvents } from '../src/sim/auto/log';
+import { countsVote } from '../src/sim/vendettas/conversion';
+import { vendettaGoalFor } from '../src/sim/vendettas/goal';
+import { progressOf, vendettaSteps } from '../src/sim/vendettas/progress';
+import { holdVendetta } from '../src/sim/vendettas/state';
+import {
+  bootFlowServer,
+  events,
+  idOf,
+  murder,
+  openMeeting,
+  seat,
+  sim,
+  skipPhase,
+  until,
+  voteAll,
+} from './flowHelpers';
+import { type Match, sleep, startMatch } from './simHelpers';
 
 // Round 7, Session 7H (GDD 3.20; docs/round7/vendettas.md 2): the four vendettas, the draw at the deal and its stream.
 
@@ -122,12 +139,13 @@ describe('the draw', () => {
   });
 });
 
+// One server for the file: the debug handlers on (a second boot in the same file cannot be reached).
+let colyseus: ColyseusTestServer;
+let release: () => Promise<void>;
+beforeAll(async () => ({ colyseus, release } = await bootFlowServer()));
+afterAll(async () => release());
+
 describe('the deal of a real match', () => {
-  let colyseus: ColyseusTestServer;
-  beforeAll(async () => {
-    colyseus = await boot(createServer({ ipBurst: 1e5, ipPerMin: 1e8, globalPerMin: 1e8 }));
-  });
-  afterAll(async () => colyseus.shutdown());
   beforeEach(async () => colyseus.cleanup());
 
   it('draws the Killer seat a vendetta at Start, from its own key of the vendetta stream', async () => {
@@ -147,5 +165,59 @@ describe('the deal of a real match', () => {
       expect(vendettaOf(room, seat)?.id).toBe(rows[Math.floor(rng() * rows.length)]?.id);
     }
     await leader.leave();
+  });
+});
+
+describe('conversion in a match', () => {
+  beforeEach(async () => colyseus.cleanup());
+
+  const ROLES = { Bot0: 'killer', Bot1: 'vicar', Bot2: 'detective', Bot3: 'townsfolk', Bot4: 'townsfolk' };
+  const start = async (vendetta: string): Promise<Match> => {
+    const m = await startMatch(colyseus, 5, ROLES);
+    holdVendetta(m.room, idOf(m, 0), vendetta);
+    return m;
+  };
+  const vendettaEvents = (m: Match) => matchEvents(m.room).filter((e) => e.kind.startsWith('vendetta.'));
+  const stepsOf = (m: Match) => vendettaSteps(m.room).map((s) => s.kind);
+
+  it('sows the doubt after the shared time and silences the Vicar at the next meeting only', async () => {
+    const m = await start('zealot');
+    const killer = idOf(m, 0);
+    const vicar = idOf(m, 1);
+    expect(sim(m, 0).sceneIdx).toBe(sim(m, 1).sceneIdx);
+    expect(vendettaGoalFor(m.room, killer)).toEqual({ sceneId: 'overworld', targetSeat: vicar });
+    progressOf(m.room, killer).sharedTicks = balance.vendettas.conversion.shareS * TICK_RATE - 2;
+    await until(() => progressOf(m.room, killer).sown);
+    expect(stepsOf(m)).toEqual(['vendetta.conversion.sown']);
+    expect(vendettaGoalFor(m.room, killer)).toBeNull();
+    expect([seat(m, 0).priv.vendetta, seat(m, 1).priv.vendetta]).toEqual(['zealot', '']);
+
+    await openMeeting(m, 2);
+    await until(() => stepsOf(m).length === 2);
+    expect(stepsOf(m)).toEqual(['vendetta.conversion.sown', 'vendetta.conversion.doubt']);
+    expect(countsVote(m.room, vicar)).toBe(false);
+    expect(countsVote(m.room, killer)).toBe(true);
+    await skipPhase(m);
+    await voteAll(m, [0, 1, 2, 3, 4], (i) => (i === 1 ? idOf(m, 4) : idOf(m, 3)));
+    const tally = events(m.bots[0] as never, 'voteResult').at(-1)?.tally as Record<string, number>;
+    expect(tally[idOf(m, 4)] ?? 0).toBe(0);
+    expect(tally[idOf(m, 3)]).toBe(4);
+    // Publicly the doubted Vicar never voted, yet the meeting ended early; it alone holds the note.
+    expect(seat(m, 1).hasVoted).toBe(false);
+    await until(() => seat(m, 1).priv.notebook.some((n) => n.note === NoteKind.doubt));
+    expect(seat(m, 1).priv.notebook.filter((n) => n.note === NoteKind.doubt)).toHaveLength(1);
+    for (const i of [0, 2, 3, 4])
+      expect(seat(m, i).priv.notebook.some((n) => n.note === NoteKind.doubt)).toBe(false);
+    // Every step on the bus names no seat; the record keeps the holder.
+    for (const e of vendettaEvents(m)) expect(e.seat).toBeUndefined();
+    expect(vendettaSteps(m.room).every((s) => s.seat === killer)).toBe(true);
+  });
+
+  it('lapses when the Vicar dies before the doubt is sown', async () => {
+    const m = await start('zealot');
+    murder(m, 1);
+    await until(() => stepsOf(m).length > 0);
+    await sleep(200);
+    expect(stepsOf(m)).toEqual(['vendetta.conversion.lapsed']);
   });
 });

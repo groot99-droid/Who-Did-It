@@ -58,6 +58,8 @@ export const NoteKind = {
   remedyHeld: 5,
   poisonGiven: 6,
   shot: 7,
+  /** Round 7 (GDD 3.20): the Vicar's own news that a sown doubt kept its vote out of the tally; `of` is itself. */
+  doubt: 8,
 } as const;
 export type NoteKindId = (typeof NoteKind)[keyof typeof NoteKind];
 
