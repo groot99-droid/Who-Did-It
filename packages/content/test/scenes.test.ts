@@ -6,6 +6,8 @@ import {
   maps,
   PROFILE_RANK,
   routines,
+  tasks,
+  minigames,
   SCENE_IDS,
   scenes,
   type Profile,
@@ -473,6 +475,26 @@ describe("Crumb's Ovens' station rooms (A116, A118)", () => {
           expect(s.grid[y]![x], `${id} ${x},${y}`).toBe('#');
           expect(s.material?.[y]![x], `${id} ${x},${y}`).toBe('P');
         }
+    }
+  });
+  it("make each station the node of one task, played with the room's mini-game (GDD 3.5, 3.16)", () => {
+    const want = {
+      crumb_cold: ['stockColdRoom', 'crates'],
+      crumb_mixing: ['mixDough', 'pour'],
+      crumb_oven: ['stokeOven', 'stoke'],
+      crumb_proofing: ['proofLoaves', 'slide'],
+    };
+    for (const id of rooms) {
+      const station = scenes[id].props[0]!.id;
+      const at = Object.values(tasks.tasks).filter((t) =>
+        t.targets.some((n) => n.scene === id && n.prop === station),
+      );
+      expect(
+        at.map((t) => t.id),
+        id,
+      ).toEqual([want[id][0]]);
+      const game = Object.values(minigames.minigames).find((g) => g.task === want[id][0]);
+      expect(game?.kind, id).toBe(want[id][1]);
     }
   });
 });

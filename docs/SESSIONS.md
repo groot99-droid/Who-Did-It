@@ -3337,6 +3337,9 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 - 2026-10-23: PR 1 is #111 (with 6Z's one-line exception in `mapSites.test.ts:29`). PR 2: the four station props and the
   pictures' four spot variants, rendered and packed for both art styles (A118); `enterScene` clears a hold on the
   same tick (6Z's answer, new `holdScene.test.ts`), which the stations had surfaced in `npcTells` S1.
+- 2026-10-23: PR 3: the four stations as task nodes (mixDough, stokeOven, stockColdRoom, proofLoaves, 6Z's choice of
+  items, A118) with their mini-games in GDD 3.5 and 3.16, and `e2e/ovens.spec.ts` walking the square, the bakery and
+  the four rooms on a position-reading walker.
 - Seed for round 8 (Port-au-Levain, A116): the ten kitchen pictures stay unbuilt and are its rooms, the cellar,
   cold pantry, command desk, dish pit, expediter, front of house, hygiene, lamination, shaping bench and
   sub-basement (`assets/source/concepts/onub/`); they move to `docs/round8/` when that folder exists.
