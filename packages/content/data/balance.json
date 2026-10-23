@@ -152,7 +152,7 @@
     "koPurseShare": 0.5,
     "strikeStamina": 15,
     "healHp": 40,
-    "driveOffS": 30,
+    "creatureCorpseS": 10,
     "damage": {
       "strike": { "dmg": 8, "effects": { "dazed": 0.1, "weakened": 0.2 }, "kills": false },
       "mugging": { "dmg": 8, "effects": { "dazed": 0.1, "weakened": 0.2 }, "kills": false },

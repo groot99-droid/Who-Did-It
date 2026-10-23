@@ -190,8 +190,8 @@ export const BalanceFile = z.strictObject({
     strikeStamina: z.number().int().positive(),
     /** Health a medkit (`heal`) restores. */
     healHp: z.number().int().positive(),
-    /** A creature struck to zero runs home and starts no chase for this long. */
-    driveOffS: Seconds,
+    /** How long a dead creature's row stays in the scene before it goes (GDD 3.15, A142). */
+    creatureCorpseS: Seconds,
     damage: z.strictObject({ strike: DamageRow, mugging: DamageRow, slingshot: DamageRow }),
   }),
   movement: Section({

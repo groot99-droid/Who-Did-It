@@ -47,6 +47,8 @@ export type RecipesFile = z.infer<typeof RecipesFile>;
 export const MobDef = z.strictObject({
   id: Id,
   name: z.string().min(1),
+  /** Hit points (round 8, 8G): fists, bolts and lights take them off; at zero it dies (GDD 3.15, body.md 4). */
+  hp: z.number().int().positive(),
   speedTilesPerS: z.number().positive(),
   /** How far it notices a seat, and how close a light must be for it to flee. */
   senseTiles: Tiles,
@@ -58,8 +60,7 @@ export const MobDef = z.strictObject({
   attackS: Seconds,
   kills: z.boolean(),
   sprite: SpriteKey,
-  /** Round 8 (GDD 3.22, Session 8A): its health against a strike, the health its attack takes, the effects it may apply. */
-  hp: z.number().int().positive(),
+  /** Round 8 (GDD 3.22, Session 8A): the health its attack takes and the effects it may apply (`hp` above is 8G's). */
   dmg: z.number().int().positive(),
   effects: z.record(z.string().regex(/^[a-z][A-Za-z0-9]*$/), z.number().min(0).max(1)),
 });

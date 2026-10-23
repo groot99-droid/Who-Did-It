@@ -401,10 +401,10 @@ they are drawn from the scene state for everyone in the scene.
 
 | Creature | Where | Speed | Senses | Flees light within | Attack | Bite (3.22) | Health | Kills |
 |---|---|---|---|---|---|---|---|---|
-| Wolf | the forests' wolf loops, dusk and night | 3.6 tiles/s | 6 tiles | 4 tiles | after 1 s in reach | 25, Bleeding 50% | 30 | yes, cause `wolf` |
-| Boar | the Fenwood, Blackpine Woods, day and dusk | 3.2 tiles/s | 4 tiles | 2 tiles | after 1.5 s in reach | 18, Bleeding 30% | 40 | yes, cause `creature` |
-| Bat | the caves | 4 tiles/s | 5 tiles | 3 tiles | after 2 s in reach | 6 | 8 | yes, cause `creature` |
-| Rat | the caves past the Tin Gallery mouth | 2.5 tiles/s | 3 tiles | 2 tiles | after 2 s in reach | 5, Poisoned 50% | 10 | yes, cause `creature` |
+| Wolf | the forests' wolf loops, dusk and night | 3.6 tiles/s | 6 tiles | 4 tiles | after 1 s in reach | 25, Bleeding 50% | 36 | yes, cause `wolf` |
+| Boar | the Fenwood, Blackpine Woods, day and dusk | 3.2 tiles/s | 4 tiles | 2 tiles | after 1.5 s in reach | 18, Bleeding 30% | 48 | yes, cause `creature` |
+| Bat | the caves | 4 tiles/s | 5 tiles | 3 tiles | after 2 s in reach | 6 | 10 | yes, cause `creature` |
+| Rat | the caves past the Tin Gallery mouth | 2.5 tiles/s | 3 tiles | 2 tiles | after 2 s in reach | 5, Poisoned 50% | 8 | yes, cause `creature` |
 
 **Behaviour.** A creature idles or roams its loop; it chases a living seat it senses and can see (3.7) for at most
 6 s (`mobs.chaseS`), then returns to its spawner and starts no new chase for as long; it flees any lit flame within
@@ -418,12 +418,19 @@ tiles, 3.7) and in sight for its attack time; a bite is a row of the damage tabl
 regenerates and its Bleeding or Poisoned is cured like any other hit's. A bite that takes a seat to zero health is a
 death, cause `wolf` for a wolf and `creature` for the boar, the bat and the rat (the owner's answer, DECISIONS A134:
 creatures kill): the body is left where it fell and the kill scream rings (3.7), with no clue of a killer, so the
-Killer's "blame the wolves" cover of WORLD 4.6 has a real alibi. A creature's own health (`mobs.json` `hp`) is what a
-seat's fists must take to drive it off (3.22). (6G) Wolves keep 3.6's flee radius (`balance.wolves.fleeLightTiles`, which their row
+Killer's "blame the wolves" cover of WORLD 4.6 has a real alibi. A creature's own health (`mobs.json` `hp`, the
+table's Health column) is what a seat's fists must take to kill it (3.22, A142). (6G) Wolves keep 3.6's flee radius (`balance.wolves.fleeLightTiles`, which their row
 equals) and stay in the woods by their leash; the mended fence and the bolt do not touch them yet. An NPC seat a
 creature chases runs for the nearest open door of its scene and takes it, or straight away from the creature when
 there is none (3.12; live once the NPC brain's call lands, DECISIONS A89). Creatures use the `mobs` random stream,
 keyed per spawner, and never a secret stream.
+
+**How a creature is drawn (round 8, 8G).** Fists, bolts and lights take a creature's health off (3.22; the damage
+is 8A's table) and a creature at zero health dies, where it lies for `body.creatureCorpseS` 10 s before its row goes.
+Everyone in the scene sees the same creature: its bite as a sequence (it crouches, lunges and bites, then
+recoils), a flinch with a white flash when a hit lands, a `flee` gait while it runs from a light, and a fall onto
+its side when it dies, where it lies until the server removes it and then fades. Under reduced motion the flash
+and the fade are cut and the clips still play. None of this carries a card or a seat.
 
 **Dark scenes on the server.** With creatures, a dark scene's visibility moves to the server (3.13): a living seat
 in a dark scene receives another avatar only within the night radius and a clear line of sight over the scene's
@@ -707,8 +714,8 @@ world phases: a meeting, the role card and game over freeze health, stamina and 
 roll on the body's own stream, never a secret one.
 
 **Fists** (`strike`): every card, in every world phase, a 2 s cooldown and 1.2 tiles of reach (`abilities.json`), at
-the stamina cost above. It hurts seats, ambient townsfolk and creatures; a creature at zero health (`mobs.json` `hp`)
-is driven off, home and resting for `body.driveOffS` 30 s. The swing is public to everyone who can see it (3.7) and
+the stamina cost above. It hurts seats, ambient townsfolk and creatures; a creature at zero health (`mobs.json` `hp`,
+3.15) dies where it stands and lies there for `body.creatureCorpseS` 10 s (A142). The swing is public to everyone who can see it (3.7) and
 leaves no clue unless blood is drawn. The fists, the slingshot and the curing items below go live in 8A's next PR;
 until then only the creatures and the drains use the table, and only time cures.
 
