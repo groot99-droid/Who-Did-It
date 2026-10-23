@@ -96,9 +96,6 @@ export const PROPS_FRAMES: readonly string[] = [
   'spot_timberCrib',
   'spot_underBed',
   'spot_wardrobe',
-  // Round 8 (8K, for 8C's shops): the counter and the bank.
-  'prop_bank',
-  'prop_counter',
 ];
 
 /** Each map's own atlas `props_<mapId>` (art plan 3.5, 3.6). */
@@ -228,7 +225,11 @@ export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
     'prop_wheelbarrow',
     'prop_window',
     'prop_workbench',
-    // Round 8 (8K, for 8D's economy rows): the tally rack.
+    // Round 8 (8K, A166): BlackPine's own economy frames for 8C's and 8D's kinds.
+    'prop_altar',
+    'prop_bank',
+    'prop_blackMarket',
+    'prop_counter',
     'prop_rack',
   ],
 };

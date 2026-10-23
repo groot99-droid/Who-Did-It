@@ -510,56 +510,6 @@
      }
     },
     {
-     "filename": "prop_bank",
-     "rotated": false,
-     "trimmed": true,
-     "sourceSize": {
-      "w": 64,
-      "h": 64
-     },
-     "spriteSourceSize": {
-      "x": 15,
-      "y": 15,
-      "w": 34,
-      "h": 34
-     },
-     "frame": {
-      "x": 2,
-      "y": 572,
-      "w": 34,
-      "h": 34
-     },
-     "pivot": {
-      "x": 0.5,
-      "y": 0.75
-     }
-    },
-    {
-     "filename": "prop_counter",
-     "rotated": false,
-     "trimmed": true,
-     "sourceSize": {
-      "w": 64,
-      "h": 64
-     },
-     "spriteSourceSize": {
-      "x": 15,
-      "y": 15,
-      "w": 34,
-      "h": 34
-     },
-     "frame": {
-      "x": 2,
-      "y": 572,
-      "w": 34,
-      "h": 34
-     },
-     "pivot": {
-      "x": 0.5,
-      "y": 0.75
-     }
-    },
-    {
      "filename": "prop_kitChest",
      "rotated": false,
      "trimmed": true,

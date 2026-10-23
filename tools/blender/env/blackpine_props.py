@@ -413,8 +413,77 @@ def tally_rack():
                  outline=False)]
 
 
+def wayside_altar():
+    """The camp's wayside altar (8D's `altar`): a little shingled shrine on a split-log post, a candle and an
+    offering dish in its niche, a rock cairn at its foot."""
+    return [part("Cairn", T("stone", 3), S(blob(0, 0, 0.18, 0.4, [(0.08, 5, 1.3)], n=14), 0, 0.3)),
+            part("Post", T("wood", 2), B(0, 0.05, 0.75, 0.16, 0.16, 1.1)),
+            part("Box", T("wood", 3), B(0, 0.05, 1.42, 0.5, 0.38, 0.46), bevel=0.02),
+            part("Niche", T("wood", 0), B(0, -0.13, 1.42, 0.36, 0.03, 0.32), outline=False),
+            part("Roof", T("slate", 1), B(0, 0.05, 1.68, 0.66, 0.56, 0.05), B(0, 0.05, 1.74, 0.44, 0.56, 0.06),
+                 B(0, 0.05, 1.8, 0.22, 0.56, 0.06)),
+            part("Ridge", T("wood", 2), B(0, 0.05, 1.85, 0.06, 0.6, 0.05), outline=False),
+            part("Dish", T("brass", 2), C(-0.1, -0.16, 1.26, 0.08, 0.03, 10), outline=False),
+            part("Candle", T("bone", 3), C(0.1, -0.16, 1.26, 0.035, 0.14, 6), outline=False),
+            part("Flame", F("lantern", 4), B(0.1, -0.16, 1.44, 0.04, 0.04, 0.07), outline=False),
+            part("Glow", F("lantern", 1), B(0, -0.12, 1.3, 0.3, 0.02, 0.08), outline=False),
+            part("Sprig", T("moss", 2), B(-0.22, -0.2, 1.22, 0.08, 0.02, 0.14), outline=False)]
+
+
+def black_market():
+    """The lodge's black market (8D's `blackMarket`): a footlocker under a grey tarp pulled back on bottles,
+    tins and a wrapped bundle, a lamp turned low beside it."""
+    return [part("Locker", T("wood", 3), B(0, 0.08, 0.22, 0.8, 0.5, 0.44), bevel=0.02),
+            part("Straps", T("ink", 1), *[B(x, -0.18, 0.22, 0.05, 0.02, 0.44) for x in (-0.25, 0.25)],
+                 outline=False),
+            part("Tarp", T("fog", 0), B(0.12, 0.12, 0.47, 0.6, 0.56, 0.06), B(0.38, 0.12, 0.3, 0.06, 0.56, 0.36),
+                 bevel=0.03),
+            part("Bottles", T("moss", 1), *[C(x, -0.05, 0.45, 0.04, 0.22, 6, rt=0.02) for x in (-0.3, -0.2)]),
+            part("Tins", T("slate", 3), C(-0.05, 0.0, 0.45, 0.07, 0.1, 8), outline=False),
+            part("Bundle", T("litter", 2), B(0.12, -0.05, 0.53, 0.2, 0.14, 0.1), bevel=0.03),
+            *lamp_on(-0.38, -0.3, 0.0)]
+
+
+
+def counter():
+    """8C's `counter`: a shop counter of planked panels under a worn top, brass scales and a weight, a ledger,
+    jars of goods and a bell for service."""
+    return [part("Body", T("wood", 3), B(0, 0.05, 0.45, 0.94, 0.5, 0.9), bevel=0.02),
+            part("Panels", T("wood", 2), *[B(x, -0.205, 0.45, 0.24, 0.01, 0.7) for x in (-0.3, 0.0, 0.3)],
+                 outline=False),
+            part("Top", T("wood", 4), B(0, 0.03, 0.92, 1.0, 0.6, 0.06)),
+            part("Scales", T("brass", 2), C(-0.28, 0.05, 0.95, 0.03, 0.3, 6), B(-0.28, 0.05, 1.25, 0.36, 0.03, 0.03),
+                 *[C(x, 0.05, 1.08, 0.08, 0.02, 10) for x in (-0.44, -0.12)], outline=False),
+            part("Weight", T("ink", 1), C(-0.12, 0.05, 1.1, 0.04, 0.06, 8), outline=False),
+            part("Ledger", T("bone", 2), B(0.12, -0.05, 0.96, 0.24, 0.18, 0.03)),
+            part("Jars", T("moon", 4), *[C(x, 0.2, 0.95, 0.06, 0.16, 8, rt=0.05) for x in (0.3, 0.42)]),
+            part("Goods", T("lantern", 1), *[C(x, 0.2, 0.97, 0.05, 0.09, 8) for x in (0.3, 0.42)], outline=False),
+            part("Bell", T("brass", 2), C(0.4, -0.12, 0.95, 0.05, 0.05, 8, rt=0.01), outline=False)]
+
+
+def bank():
+    """8C's `bank`: a teller's counter behind a brass grille with a pass-through, a cash drawer, and a black
+    strongbox with an iron dial standing beside it."""
+    return [part("Desk", T("wood", 2), B(0, 0.08, 0.45, 0.94, 0.5, 0.9), bevel=0.02),
+            part("Top", T("wood", 3), B(0, 0.06, 0.92, 1.0, 0.58, 0.06)),
+            part("Grille", T("brass", 1), *[B(-0.45 + 0.1 * k, 0.12, 1.32, 0.025, 0.025, 0.74) for k in range(10)
+                                              if k not in (4, 5)],
+                 B(0, 0.12, 1.7, 0.96, 0.04, 0.04), B(0, 0.12, 1.1, 0.24, 0.04, 0.03), outline=False),
+            part("Sign", T("ink", 1), B(0, 0.12, 1.8, 0.5, 0.04, 0.16)),
+            part("Gilt", T("brass", 2), B(0, 0.1, 1.8, 0.4, 0.01, 0.06), outline=False),
+            part("Drawer", T("wood", 4), B(0.2, -0.18, 0.75, 0.3, 0.02, 0.12), outline=False),
+            part("Coins", T("brass", 2), *[C(x, -0.08, 0.95, 0.04, 0.02 + 0.02 * k, 8)
+                                            for k, x in enumerate((-0.1, -0.02))], outline=False),
+            part("Strongbox", T("ink", 1), B(-0.32, -0.05, 1.08, 0.3, 0.28, 0.26), bevel=0.02),
+            part("Dial", T("slate", 3), C(-0.32, -0.19, 1.08, 0.05, 0.02, 10), outline=False)]
+
+
 ECONOMY = {
     "prop_rack": (64, 112, tally_rack),
+    "prop_altar": (64, 112, wayside_altar),
+    "prop_blackMarket": (64, 80, black_market),
+    "prop_counter": (64, 96, counter),
+    "prop_bank": (64, 112, bank),
 }
 
 PROPS = {

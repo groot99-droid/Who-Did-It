@@ -229,42 +229,6 @@ def portal_frames():
     return out
 
 
-# ---------------------------------------------------------------- round 8 economy (8K, for 8C's shops)
-
-
-def counter():
-    """8C's `counter`: a shop counter of planked panels under a worn top, brass scales and a weight, a ledger,
-    jars of goods and a bell for service."""
-    return [part("Body", T("wood", 3), B(0, 0.05, 0.45, 0.94, 0.5, 0.9), bevel=0.02),
-            part("Panels", T("wood", 2), *[B(x, -0.205, 0.45, 0.24, 0.01, 0.7) for x in (-0.3, 0.0, 0.3)],
-                 outline=False),
-            part("Top", T("wood", 4), B(0, 0.03, 0.92, 1.0, 0.6, 0.06)),
-            part("Scales", T("brass", 2), C(-0.28, 0.05, 0.95, 0.03, 0.3, 6), B(-0.28, 0.05, 1.25, 0.36, 0.03, 0.03),
-                 *[C(x, 0.05, 1.08, 0.08, 0.02, 10) for x in (-0.44, -0.12)], outline=False),
-            part("Weight", T("ink", 1), C(-0.12, 0.05, 1.1, 0.04, 0.06, 8), outline=False),
-            part("Ledger", T("bone", 2), B(0.12, -0.05, 0.96, 0.24, 0.18, 0.03)),
-            part("Jars", T("moon", 4), *[C(x, 0.2, 0.95, 0.06, 0.16, 8, rt=0.05) for x in (0.3, 0.42)]),
-            part("Goods", T("lantern", 1), *[C(x, 0.2, 0.97, 0.05, 0.09, 8) for x in (0.3, 0.42)], outline=False),
-            part("Bell", T("brass", 2), C(0.4, -0.12, 0.95, 0.05, 0.05, 8, rt=0.01), outline=False)]
-
-
-def bank():
-    """8C's `bank`: a teller's counter behind a brass grille with a pass-through, a cash drawer, and a black
-    strongbox with an iron dial standing beside it."""
-    return [part("Desk", T("wood", 2), B(0, 0.08, 0.45, 0.94, 0.5, 0.9), bevel=0.02),
-            part("Top", T("wood", 3), B(0, 0.06, 0.92, 1.0, 0.58, 0.06)),
-            part("Grille", T("brass", 1), *[B(-0.45 + 0.1 * k, 0.12, 1.32, 0.025, 0.025, 0.74) for k in range(10)
-                                              if k not in (4, 5)],
-                 B(0, 0.12, 1.7, 0.96, 0.04, 0.04), B(0, 0.12, 1.1, 0.24, 0.04, 0.03), outline=False),
-            part("Sign", T("ink", 1), B(0, 0.12, 1.8, 0.5, 0.04, 0.16)),
-            part("Gilt", T("brass", 2), B(0, 0.1, 1.8, 0.4, 0.01, 0.06), outline=False),
-            part("Drawer", T("wood", 4), B(0.2, -0.18, 0.75, 0.3, 0.02, 0.12), outline=False),
-            part("Coins", T("brass", 2), *[C(x, -0.08, 0.95, 0.04, 0.02 + 0.02 * k, 8)
-                                            for k, x in enumerate((-0.1, -0.02))], outline=False),
-            part("Strongbox", T("ink", 1), B(-0.32, -0.05, 1.08, 0.3, 0.28, 0.26), bevel=0.02),
-            part("Dial", T("slate", 3), C(-0.32, -0.19, 1.08, 0.05, 0.02, 10), outline=False)]
-
-
 PROPS = {
     "prop_noticeBoard": (64, 96, notice_board),
     "prop_kitChest": (64, 64, kit_chest),
@@ -280,6 +244,4 @@ PROPS = {
     "spot_timberCrib": (64, 96, timber_crib),
     "spot_sump": (64, 48, sump),
     **portal_frames(),
-    "prop_counter": (64, 96, counter),
-    "prop_bank": (64, 112, bank),
 }
