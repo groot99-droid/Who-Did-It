@@ -23,6 +23,8 @@ export interface MusicPlaylist {
   tracks: string[];
   crossfadeS: number;
   shuffle: boolean;
+  /** False plays the playlist once and then goes silent (a map's opening piece, GDD 3.18); the default loops. */
+  loop: boolean;
 }
 
 export interface MusicManifest {
@@ -56,6 +58,7 @@ export function parseMusicManifest(raw: unknown): MusicManifest {
       tracks: p.tracks.filter((k): k is string => typeof k === 'string'),
       crossfadeS: Math.max(0, num(p.crossfadeS, 2)),
       shuffle: p.shuffle === true,
+      loop: p.loop !== false,
     });
   }
   return out;
@@ -120,6 +123,7 @@ export class MusicBus {
   private timer: ReturnType<typeof setInterval> | null = null;
   private lastMs = 0;
   private readonly warmed = new Set<string>();
+  private readonly finishFns = new Set<(playlistId: string) => void>();
 
   constructor(deps: MusicBusDeps = {}) {
     this.base = deps.base ?? import.meta.env.BASE_URL;
@@ -161,6 +165,15 @@ export class MusicBus {
       this.cursor = 0;
       this.startTrack(m, pl);
     });
+  }
+
+  /**
+   * Calls `fn` with the playlist id when a playlist that does not loop has played its last track to the end; the bus
+   * is silent then, and asking for the same playlist again does nothing. Returns the unsubscribe.
+   */
+  onFinish(fn: (playlistId: string) => void): () => void {
+    this.finishFns.add(fn);
+    return () => void this.finishFns.delete(fn);
   }
 
   prefetch(playlistId: string): void {
@@ -241,7 +254,7 @@ export class MusicBus {
     this.front = 1 - this.front;
     next.track = track;
     next.el.src = this.urlOf(track); // the lazy fetch: the source is set only now
-    next.el.loop = this.order.length === 1 && pl.tracks.length === 1;
+    next.el.loop = pl.loop && this.order.length === 1 && pl.tracks.length === 1;
     next.el.currentTime = 0;
     next.level = 0;
     this.fadeS = pl.crossfadeS;
@@ -257,6 +270,13 @@ export class MusicBus {
 
   private onEnded(m: MusicManifest, pl: MusicPlaylist, slot: Slot): void {
     if (this.slots?.[this.front] !== slot || this.wanted !== pl.id) return;
+    if (!pl.loop && this.cursor + 1 >= this.order.length) {
+      // Played once: silence, no restart and no fade into itself.
+      this.release(slot);
+      this.apply();
+      for (const fn of [...this.finishFns]) fn(pl.id);
+      return;
+    }
     this.cursor = (this.cursor + 1) % this.order.length;
     if (this.cursor === 0) this.order = this.orderOf(pl);
     this.startTrack(m, pl);

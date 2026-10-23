@@ -15,8 +15,7 @@
       "skippable": true,
       "maxS": 50,
       "steps": [
-        { "t": "audio", "key": "narr_bed_hollowmere" },
-        { "t": "audio", "key": "storm", "withPrevious": true },
+        { "t": "audio", "key": "storm" },
         { "t": "caption", "copyId": "cs.hollowmere.title", "durationS": 4, "style": "title" },
         {
           "t": "camera",
