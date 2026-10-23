@@ -22,6 +22,7 @@ import { LOOKS_COPY, WORLD_COPY as C, fill } from '../ui/copy';
 import { overlayRoot } from '../ui/dom';
 import { refusedIn } from '../ui/theme/motion';
 import { mountSeatPicker } from '../ui/SeatPicker';
+import { INSPECT_PROMPT, INSPECT_REACH_TILES, type InspectBinding, bindInspect } from '../ui/inspect/bind';
 import { AUDIO_KEYS, type AudioKey, AudioBus } from '../view/AudioBus';
 import { BodyView } from '../view/BodyView';
 import { ClueView } from '../view/ClueView';
@@ -30,6 +31,7 @@ import { GiverView } from '../view/GiverView';
 import { MobView } from '../view/MobView';
 import { VfxView } from '../view/vfx/VfxView';
 import { NodeView } from '../view/NodeView';
+import { TransportView } from '../view/transport/TransportView';
 import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
@@ -97,7 +99,9 @@ type Target =
   | { kind: 'body'; id: string; x: number; y: number }
   | { kind: 'clue'; id: string; x: number; y: number }
   | { kind: 'bell'; x: number; y: number }
-  | { kind: 'door'; id: string; x: number; y: number; boarded: boolean };
+  | { kind: 'door'; id: string; x: number; y: number; boarded: boolean }
+  // Round 8 (8B): a figure to inspect, by avatar handle; offered only when nothing else is.
+  | { kind: 'seat'; id: string; x: number; y: number };
 
 /** Clue ids this client has already collected, per feed: the prompt does not offer them again. */
 const collectedBy = new WeakMap<WorldFeed, Set<string>>();
@@ -130,6 +134,7 @@ export class World extends Phaser.Scene {
   private nodeView!: NodeView;
   private mobView!: MobView;
   private vfxView!: VfxView; // round 8, 8G (locked)
+  private transportView!: TransportView; // round 8, 8G (locked)
   private giverView!: GiverView;
   private m5b: M5bLayer | null = null;
   private cutscenes!: CutscenePlayer;
@@ -211,6 +216,7 @@ export class World extends Phaser.Scene {
     this.nodeView = new NodeView(this);
     this.mobView = new MobView(this);
     this.vfxView = new VfxView(this); // round 8, 8G (locked)
+    this.transportView = new TransportView(this); // round 8, 8G (locked)
     this.giverView = new GiverView(this);
     this.m5b = mountM5bLayer(this);
     this.entities = new EntityView(this, feed.selfId);
@@ -264,6 +270,7 @@ export class World extends Phaser.Scene {
     feed.bus.on('killed', onKilled);
     feed.bus.on('aim', onAim);
     net.bus.on('error', onError as never);
+    this.inspect = bindInspect(feed, this.hud, overlayRoot()); // round 8, 8B
     this.offs.push(
       () => feed.bus.off('noise', onNoise),
       () => feed.bus.off('error', onError),
@@ -271,6 +278,7 @@ export class World extends Phaser.Scene {
       () => feed.bus.off('killed', onKilled),
       () => feed.bus.off('aim', onAim),
       () => net.bus.off('error', onError as never),
+      () => this.inspect?.off(),
     );
 
     // Fill the window while in the world (phones rotate), and fit the camera on every resize.
@@ -316,6 +324,7 @@ export class World extends Phaser.Scene {
       this.nodeView.destroy();
       this.mobView.destroy();
       this.vfxView.destroy(); // round 8, 8G (locked)
+      this.transportView.destroy(); // round 8, 8G (locked)
       this.giverView.destroy();
       this.m5b?.destroy();
       this.cutscenes.destroy();
@@ -361,6 +370,7 @@ export class World extends Phaser.Scene {
     this.vfxView.update(feed.avatars(), feed.mobs(), this.time.now); // round 8, 8G (locked)
     this.syncBodies(bodies);
     this.drawDoors(clock.tick);
+    this.transportView.update(this.sceneId, this.portals, feed, clock.tick, this.time.now); // round 8, 8G (locked)
     this.updateTarget(self, clues, bodies);
     this.updateHold(self, clues);
     this.footsteps(now);
@@ -397,6 +407,7 @@ export class World extends Phaser.Scene {
     this.endUse();
     this.input_.unbindAll();
     this.sheet.close();
+    this.inspect?.card.close();
     this.hud.setHidden(true);
     this.touch?.setHidden(true);
     this.lighting.setHidden(true);
@@ -431,6 +442,9 @@ export class World extends Phaser.Scene {
       case 'door':
         this.feed.enterPortal(t.id);
         if (!t.boarded) this.audio.play('door_open');
+        break;
+      case 'seat':
+        this.feed.inspect(t.id);
         break;
       case 'clue':
         if (this.hold) break;
@@ -473,6 +487,9 @@ export class World extends Phaser.Scene {
   private nearestPlayer(reachTiles: number): string | null {
     return nearestAvatar(this.feed.avatars(), this.feed.selfHandle(), reachTiles * TILE_PX);
   }
+
+  /** Round 8 (8B): the inspect card and its three messages. */
+  private inspect: InspectBinding | null = null;
 
   private seatPicker: { destroy(): void } | null = null;
 
@@ -555,6 +572,10 @@ export class World extends Phaser.Scene {
       const boarded = doors.find((d) => d.id === p.id)?.state === 1;
       consider({ kind: 'door', id: p.id, x: p.x, y: p.y, boarded }, PORTAL_REACH_TILES * TILE_PX);
     }
+    if (!ghost && this.target === null) {
+      const handle = this.nearestPlayer(INSPECT_REACH_TILES);
+      if (handle !== null) this.target = { kind: 'seat', id: handle, x: me.x, y: me.y };
+    }
     const t = this.target as Target | null;
     this.hud.setPrompt(
       t === null
@@ -569,7 +590,9 @@ export class World extends Phaser.Scene {
                 ? t.boarded
                   ? C['prompt.door.boarded']
                   : C['prompt.door']
-                : null,
+                : t.kind === 'seat'
+                  ? INSPECT_PROMPT
+                  : null,
     );
   }
 
@@ -749,6 +772,7 @@ export class World extends Phaser.Scene {
     // Round 7, 7I: the Daily Train's pulses are sounds, not rings (GDD 3.3).
     if (n.kind.startsWith('train_') && (AUDIO_KEYS as readonly string[]).includes(n.kind)) {
       this.audio.play(n.kind as AudioKey);
+      this.transportView.pulse(n.kind, this.time.now); // round 8, 8G (locked)
       if (n.kind === 'train_arrive') this.hud.say(C['log.train']);
       return;
     }
