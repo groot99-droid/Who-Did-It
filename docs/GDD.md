@@ -459,7 +459,7 @@ The quick mode does not walk (3.11). Its kitchen and night rooms are isometric i
 
 | Phase | Darkness |
 |---|---|
-| Grace, day, immunity | `slate` at 40% |
+| Grace, day, immunity | `slate` at 20% (softened by the owner, A121) |
 | Night, Final Night | `ink` at 90% |
 | Dusk, dawn | Eased between the two |
 
@@ -777,8 +777,10 @@ room's next match until another replaces it), which round 8's evolutions read.
 a Knife death. A Vicar taken by a wolf, poisoned, shot or ejected is no martyr. The martyr is the seat the memorial
 mourns, so it follows the public look like the film: a cover in the Vicar's look is the martyr, and a seat dealt the
 Vicar under another look is not, since the bar is public and Killers pick victims by the look they see. From that
-reveal, each real task the martyr's ghost finishes counts **10** times on the task bar (`tasks.martyrWeight`),
-outside the ghost cap (3.5); the tasks it finished before that reveal count as any ghost's. A full bar in play wins
+reveal and for **10 minutes** (`tasks.martyrS`, the owner's limit), each real task the martyr's ghost finishes
+counts **10** times on the task bar (`tasks.martyrWeight`), outside the ghost cap (3.5); the tasks it finished
+before that reveal or after the ten minutes count as any ghost's. The boost ends with the match and never carries
+into the room's next one. A full bar in play wins
 for the Village, so a Killer that strikes the Vicar hands the village a fast clock: the Zealot, whose goal is the
 Vicar's flock, is the one Killer with a reason to take that risk. The private candidacy above stays on the card.
 

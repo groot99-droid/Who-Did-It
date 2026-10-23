@@ -1,13 +1,12 @@
 // Round 6 (M5b, GDD 3.16): the main-mode mini-games, pure. `generateMinigame` builds a puzzle from a seeded rng and
 // `checkMinigame` judges an answer. The server keeps the puzzle in room memory and sends `public` in `minigameStart`;
-// a Cabal seat's fake task runs the same puzzle and never moves the task bar. The four kinds are ONUB v2's Evening Prep
-// games (GDD 3.11), whose client widgets 6I reuses; `@wdi/shared` cannot import `@wdi/content`, so the caller passes the
-// ONUB station numbers in as `MinigameBases`. Every answer is a record of what the player did, which `checkMinigame`
-// replays against the puzzle; it never trusts a bare "done".
+// a Cabal seat's fake task runs the same puzzle and never moves the task bar. `@wdi/shared` cannot import
+// `@wdi/content`, so the caller passes the numbers of `balance.json` `minigames` in as `MinigameBases`. Every answer
+// is a record of what the player did, which `checkMinigame` replays against the puzzle; it never trusts a bare "done".
 import type { MinigameKind } from '../protocol/index';
 import type { Rng } from './prng';
 
-/** The per-kind numbers `balance.onub.json` `stations[].minigame` carries, passed in by the caller. */
+/** The per-kind numbers of `balance.json` `minigames` (GDD 3.16), passed in by the caller. */
 export interface MinigameBases {
   crates: { steps: number; bandFrac: number };
   pour: { steps: number; ratePerS: number; bandFrac: number };
@@ -72,7 +71,7 @@ const STOKE_DT = 0.05;
 /** Every two levels of difficulty above 1 add one step (one second of hold for the stoke). */
 const extraSteps = (difficulty: number): number => Math.floor((Math.max(1, Math.min(5, difficulty)) - 1) / 2);
 
-/** The pour band keeps clear of a single quick tap at the bottom and of the rim (ONUB's rule). */
+/** The pour band keeps clear of a single quick tap at the bottom and of the rim. */
 const pourBand = (rng: Rng, bandFrac: number): number => 0.25 + rng() * (0.95 - bandFrac - 0.25);
 
 export function generateMinigame(
@@ -129,7 +128,7 @@ const numList = (v: unknown): number[] | null =>
 const inBand = (x: number, start: number, frac: number): boolean => x >= start && x <= start + frac;
 
 /**
- * Replays the stoke (ONUB's `StokeModel`): each tap adds `stokePerTap` heat, the fire cools `ratePerS` a second, and the
+ * Replays the stoke (the client's `StokeModel`): each tap adds `stokePerTap` heat, the fire cools `ratePerS` a second, and the
  * heat must stay in the band for `holdS` seconds in a row. `taps` are ascending seconds; the replay ends `holdS` after
  * the last tap, when the fire can only cool.
  */

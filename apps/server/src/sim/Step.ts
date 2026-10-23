@@ -13,7 +13,6 @@ import { runQuests } from './Quests';
 import { runResources } from './Resources';
 import { runTrain } from './Train';
 import { runCommands } from './Commands';
-import { runConductor } from './Conductor';
 import { runHunger } from './Hunger';
 import { runImpersonation } from './Impersonate';
 import { runNpcs } from './Npc';
@@ -55,7 +54,6 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   runImpersonation(room); // round 5, 5F (locked call site)
   runNightPowers(room); // round 5, 5G: night powers, aims, Inherit (locked call site)
   runPortals(room);
-  runConductor(room); // M3b: the quick-mode night (round 4, R)
   runDecay(room); // M3: clue decay and cap
   runResources(room); // round 6, 6F (locked call site)
   runMobs(room); // round 6, 6G (locked call site)

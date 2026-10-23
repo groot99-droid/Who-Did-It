@@ -5,7 +5,6 @@ import { Phase, type SimEventWire, TICK_RATE, TILE_PX, VIEW_TAG } from '@wdi/sha
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { enableAuto, queueAutoStart } from '../src/sim/auto/Auto';
 import { guardStep, registeredInvariants, runInvariants } from '../src/sim/auto/invariants';
-import { flowOf } from '../src/sim/Flow';
 import { npcMemory } from '../src/sim/npc/memory';
 import { simOf } from '../src/sim/RoomSim';
 import { isWorldPhase } from '../src/sim/World';
@@ -105,39 +104,34 @@ describe('the sim event bus', () => {
     ).toEqual(kinds);
   });
 
-  it.each(['main', 'onub'] as const)(
-    'a %s auto match logs start, phases, votes and end by seat id, and replays to the same hash',
-    async (mode) => {
-      const lines: string[] = [];
-      captureMatchLog((line) => lines.push(line));
-      const run = () =>
-        runAutoMatch(colyseus, {
-          map: 'hollowmere',
-          mode,
-          seats: 6,
-          difficulty: 'normal',
-          seeds: fixedSeeds,
-          npcIds: fixedIds,
-        });
-      const a = await run();
-      const b = await run();
-      const kinds = new Set(a.events.map((e) => e.kind));
-      for (const kind of ['start', 'phase', 'meeting', 'vote', 'end']) expect(kinds).toContain(kind);
-      expect(a.events[0]?.kind).toBe('start');
-      expect(a.events.at(-1)?.kind).toBe('end');
-      const seats = new Set(fixedIds);
-      for (const e of a.events) if (e.seat) expect(seats).toContain(e.seat);
-      expect(a.events.length).toBeGreaterThan(0);
-      expect(hashOf(a.events)).toBe(hashOf(b.events));
+  it('a main auto match logs start, phases, votes and end by seat id, and replays to the same hash', async () => {
+    const lines: string[] = [];
+    captureMatchLog((line) => lines.push(line));
+    const run = () =>
+      runAutoMatch(colyseus, {
+        map: 'hollowmere',
+        seats: 6,
+        difficulty: 'normal',
+        seeds: fixedSeeds,
+        npcIds: fixedIds,
+      });
+    const a = await run();
+    const b = await run();
+    const kinds = new Set(a.events.map((e) => e.kind));
+    for (const kind of ['start', 'phase', 'meeting', 'vote', 'end']) expect(kinds).toContain(kind);
+    expect(a.events[0]?.kind).toBe('start');
+    expect(a.events.at(-1)?.kind).toBe('end');
+    const seats = new Set(fixedIds);
+    for (const e of a.events) if (e.seat) expect(seats).toContain(e.seat);
+    expect(a.events.length).toBeGreaterThan(0);
+    expect(hashOf(a.events)).toBe(hashOf(b.events));
 
-      const autoLines = lines.map((l) => JSON.parse(l)).filter((r) => r.event === 'auto');
-      expect(autoLines).toHaveLength(2);
-      expect(autoLines[0]).toMatchObject({ mode, map: 'hollowmere', seats: 6, npcIds: fixedIds });
-      expect(autoLines[0].logHash).toBe(autoLines[1].logHash);
-      expect(autoLines[0].kinds.end).toBe(1);
-    },
-    60_000,
-  );
+    const autoLines = lines.map((l) => JSON.parse(l)).filter((r) => r.event === 'auto');
+    expect(autoLines).toHaveLength(2);
+    expect(autoLines[0]).toMatchObject({ map: 'hollowmere', seats: 6, npcIds: fixedIds });
+    expect(autoLines[0].logHash).toBe(autoLines[1].logHash);
+    expect(autoLines[0].kinds.end).toBe(1);
+  }, 60_000);
 
   it('keeps the log of the current match only, and hashes it', async () => {
     const room = await quietRoom();
@@ -156,12 +150,11 @@ describe('the sim event bus', () => {
 const failing = (room: PartyRoom): string[] => runInvariants(room).map((f) => f.name);
 
 /** An all-NPC room off its clock, advanced into its first day with every seat placed. */
-async function autoDay(mode: 'main' | 'onub' = 'main'): Promise<PartyRoom> {
+async function autoDay(): Promise<PartyRoom> {
   const room = await quietRoom();
   const party = { humans: [], room };
   enableAuto(room, {
     map: 'hollowmere',
-    mode,
     seats: 6,
     difficulty: 'normal',
     seeds: fixedSeeds,
@@ -169,9 +162,7 @@ async function autoDay(mode: 'main' | 'onub' = 'main'): Promise<PartyRoom> {
   });
   queueAutoStart(room);
   const sim = simOf(room);
-  const ready = () =>
-    (mode === 'onub' ? room.state.phase >= Phase.grace : room.state.phase === Phase.day) &&
-    [...sim.players.values()].every((p) => p.placed);
+  const ready = () => room.state.phase === Phase.day && [...sim.players.values()].every((p) => p.placed);
   for (let i = 0; i < 400 * TICK_RATE && !ready(); i++) advance(party, 1);
   if (!ready()) throw new Error('autoDay: no placed day');
   return room;
@@ -268,21 +259,12 @@ describe('the round-6 invariants', () => {
     expect(failing(room)).toEqual([]);
   });
 
-  it('matchLength fires past the Final Night round and on a second quick-mode meeting', async () => {
+  it('matchLength fires past the Final Night round', async () => {
     const main = await autoDay();
     main.state.round = balance.finalNight.afterCycle + 1;
     expect(failing(main)).toEqual([]);
     main.state.round++;
     expect(failing(main)).toEqual(['matchLength']);
-
-    const onub = await autoDay('onub');
-    const flow = flowOf(onub);
-    const stat = { round: 0, reason: 'dawn', votes: 0, correctVotes: 0 };
-    flow.meetings.length = 0;
-    flow.meetings.push({ ...stat });
-    expect(failing(onub)).toEqual([]);
-    flow.meetings.push({ ...stat });
-    expect(failing(onub)).toEqual(['matchLength']);
   });
 
   it('killClues fires once on a kill that left no clue in its scene, and not on a knife kill', async () => {

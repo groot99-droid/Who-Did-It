@@ -4,7 +4,6 @@ import {
   ABILITY_KEYS,
   C2S,
   ErrorCode,
-  GameMode,
   Inventory,
   ItemStack,
   NpcLevel,
@@ -33,12 +32,11 @@ import {
   publishLooks,
 } from '../../sim/Covers';
 import { dealMainDeck } from '../../sim/Deck';
-import { flowOf, refuse, setPhase } from '../../sim/Flow';
+import { refuse, setPhase } from '../../sim/Flow';
 import { handleSay } from '../../sim/Chat';
-import { handleClaim, handleVote } from '../../sim/Meeting';
+import { handleVote } from '../../sim/Meeting';
 import { newestNpcSeat, isNpcSeat, releaseNpcSeat } from '../../sim/Npc';
 import { addNpcSeat, fillNpcSeats } from '../../sim/npc/seats';
-import { beginOnubPlay, onubDeckSetting, startOnubMatch } from '../../sim/Onub';
 import { MatchSeeds } from '../../sim/seeds';
 import { simOf } from '../../sim/RoomSim';
 import { mapIdOfRoom } from '../../sim/MapSites';
@@ -61,7 +59,6 @@ const LOBBY_TYPES: readonly string[] = [
   C2S.lobbySettings,
   C2S.lobbyAddNpc,
   C2S.lobbyRemoveNpc,
-  C2S.claim,
 ];
 export const isLobbyCommand = (type: string): boolean => LOBBY_TYPES.includes(type);
 
@@ -152,9 +149,6 @@ export function runLobbyCommands(room: PartyRoom): void {
       case C2S.say:
         handleSay(room, cmd.sessionId, payload);
         break;
-      case C2S.claim:
-        handleClaim(room, cmd.sessionId, payload);
-        break;
       case C2S.lobbySettings:
         handleSettings(room, cmd.sessionId, payload);
         break;
@@ -193,36 +187,23 @@ export function removeNewestNpcSeat(room: PartyRoom): boolean {
 }
 
 /**
- * `lobby.settings {mode?, npcDifficulty?, onubDeck?, map?}`: leader, lobby; every field is checked before any is
- * written, all or nothing (GDD 3.11, 3.12, 3.13, A39, A41). A mode change drops a pending `debug.deal`, whose role
- * ids belong to the other mode. `map` is a map id of `MAP_IDS` in either mode; the quick mode ignores it.
+ * `lobby.settings {npcDifficulty?, map?}`: leader, lobby; every field is checked before any is written, all or
+ * nothing (GDD 3.12, 3.13, A39, A41). `map` is a map id of `MAP_IDS`.
  */
 function handleSettings(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   if (room.state.leaderId !== sessionId)
     return refuse(room, sessionId, ErrorCode.cannot, 'cannot change settings');
   if (room.state.phase !== Phase.lobby) return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
-  const { mode, npcDifficulty, onubDeck, map } = payload;
+  const { npcDifficulty, map } = payload;
   const settings = room.state.settings;
-  const modes: unknown[] = Object.values(GameMode);
   const levels: unknown[] = Object.values(NpcLevel);
-  const badMode = mode !== undefined && !modes.includes(mode);
   const badLevel =
     npcDifficulty !== undefined &&
     (!levels.includes(npcDifficulty) || settings.npcSeats < balance.npc.difficultyMinNpcs);
-  const deck = onubDeck === undefined ? undefined : onubDeckSetting(onubDeck);
   const badMap = map !== undefined && !(MAP_IDS as readonly unknown[]).includes(map);
-  if (badMode || badLevel || deck === null || badMap)
-    return refuse(room, sessionId, ErrorCode.cannot, 'bad setting');
-  if (typeof mode === 'number' && mode !== settings.mode) {
-    settings.mode = mode;
-    flowOf(room).fixedDeal = null;
-  }
+  if (badLevel || badMap) return refuse(room, sessionId, ErrorCode.cannot, 'bad setting');
   if (typeof npcDifficulty === 'number') settings.npcDifficulty = npcDifficulty;
   if (typeof map === 'string') settings.map = map;
-  if (deck !== undefined) {
-    settings.onubDeck.clear();
-    for (const id of deck) settings.onubDeck.push(id);
-  }
 }
 
 /** `lobby.addNpc`: leader, lobby, below `players.max`. */
@@ -256,9 +237,8 @@ export function startMatch(room: PartyRoom): void {
   // The party fills to `players.min` with NPC seats, named from a stream apart from the deal's (GDD 3.12).
   fillNpcSeats(room, room.seeds.get('npcNames'));
   const ids = [...room.state.players.keys()];
-  if (startOnubMatch(room, ids)) return; // quick mode deals its own cards from `room.seeds` (round 5, 5A)
-  // The main-mode deal from the public deck (GDD 3.1); the quick mode returned above, so it is never null here.
-  const dealt = dealMainDeck(room, ids) as Map<string, string>;
+  // The deal from the public deck (GDD 3.1).
+  const dealt = dealMainDeck(room, ids);
   const looks = dealTraits(ids, room.seeds.get('traits'));
   const factionOf = (id: string) => roles.roles[dealt.get(id) as string]?.faction;
 
@@ -317,7 +297,6 @@ export function startMatch(room: PartyRoom): void {
  * step and sends the one `sceneEnter`; nothing here touches positions or scenes.
  */
 export function beginPlay(room: PartyRoom): void {
-  if (beginOnubPlay(room)) return; // quick mode starts at Evening Prep (round 5, 5A)
   room.state.round = 0;
   room.state.startTick = room.state.tick;
   publishLooks(room); // round 5, 5F: every seat's public look in one tick, before grace

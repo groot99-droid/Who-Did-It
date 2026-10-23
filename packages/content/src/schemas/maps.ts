@@ -25,8 +25,8 @@ export const MapFile = z.strictObject({
   name: z.string().min(1).max(24),
   /** One line under the name in the lobby's map row. */
   blurb: z.string().min(1).max(120),
-  /** Modes the map is offered in. The quick mode does not walk, so the M5a maps list only `main`. */
-  modes: z.array(z.enum(['main', 'onub'])).min(1),
+  /** Modes the map is offered in; only the main mode exists since round 7 (A115). */
+  modes: z.array(z.enum(['main'])).min(1),
   /** Art set of the map's ground and walls: `iso_ground_<theme>` and `iso_kit_<theme>` (SPRITES 10.13). */
   theme: z.enum(['harbour', 'timber']),
   scenes: z.array(SceneIdEnum).min(1),

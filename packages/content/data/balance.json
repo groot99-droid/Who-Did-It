@@ -175,7 +175,13 @@
     "gddRef": "3.7"
   },
   "doors": { "swingS": 3, "transitS": 0.6, "sceneFadeS": 0.4, "gddRef": "3.7", "reachTiles": 1.5 },
-  "tasks": { "cabalFakeList": true, "ghostShareCap": 0.25, "martyrWeight": 10, "gddRef": "3.5" },
+  "tasks": {
+    "cabalFakeList": true,
+    "ghostShareCap": 0.25,
+    "martyrWeight": 10,
+    "martyrS": 600,
+    "gddRef": "3.5"
+  },
   "wolves": {
     "count": 3,
     "fleeLightTiles": 4,
@@ -238,6 +244,13 @@
   "resources": { "poolActiveFrac": 0.5, "stackMax": 5, "gddRef": "3.14" },
   "mobs": { "maxPerScene": 3, "chaseS": 6, "gddRef": "3.15" },
   "quests": { "maxActive": 2, "gddRef": "3.16" },
+  "minigames": {
+    "crates": { "steps": 3, "bandFrac": 0.2 },
+    "pour": { "steps": 2, "ratePerS": 0.35, "bandFrac": 0.12 },
+    "slide": { "steps": 4 },
+    "stoke": { "stokePerTap": 0.15, "ratePerS": 0.08, "bandFrac": 0.18, "holdS": 3 },
+    "gddRef": "3.16"
+  },
   "train": { "arriveAtS": 5, "deliveryAfterS": 8, "hearTiles": 20, "gddRef": "3.3" },
   "ui": {
     "transitionS": { "fade": 0.4, "iris": 0.6, "wipe": 0.7 },

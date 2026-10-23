@@ -3,7 +3,7 @@ import { ErrorCode, QuestState, TILE_PX, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { count, exchange } from './Inventory';
 import { type PlayerSim, simOf } from './RoomSim';
-import { isLoft, isVerbPhase, reject, sceneKey, tileCentre } from './World';
+import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
 /**
  * Quests (round 6, M5b, GDD 3.16; docs/round6/m5b-data.md 2.3): givers are scene statics; `quest.accept` and
@@ -32,7 +32,7 @@ const stateOf = (player: PlayerState, questId: string): InstanceType<typeof Ques
 /** Why this seat cannot speak to a giver now, or null: alive, placed, in the world, in a verb phase. */
 function speakProblem(room: PartyRoom, p: PlayerSim | undefined): { code: ErrorCode; msg: string } | null {
   if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
-  if (!p || p.dead || !p.placed || isLoft(p.sceneIdx)) return { code: ErrorCode.cannot, msg: 'not now' };
+  if (!p || p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
   if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
   return null;
 }

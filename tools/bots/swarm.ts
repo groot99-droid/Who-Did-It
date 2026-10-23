@@ -3,10 +3,9 @@
 // what the Playwright match spec and the soak drive (ARCHITECTURE 5.12).
 //
 //   pnpm bots -- (--code ABCDE | --create) --count 6 [--url http://localhost:2567] [--prefix Bot]
-//        [--vote skip|leader|random|other|<name>] [--report] [--walk] [--sabotage 0.6] [--pace human|fast]
+//        [--vote skip|leader|random|other|<name>] [--report] [--walk]
 //
 // `--create` makes the first bot create a private party (never listed, GDD 3.21) and the rest join it.
-// `--sabotage` and `--pace` shape the bots' ONUB v2 play (tools/bots/quick.ts).
 import { Client, type Room } from '@colyseus/sdk';
 import { BUILD_VERSION, type CreateOptions, type JoinOptions } from '@wdi/shared';
 import { fileURLToPath } from 'node:url';
@@ -28,7 +27,6 @@ export interface SwarmOptions extends BotBehavior {
 
 /** The party settings as a bot sees them (`state.settings`), read-only. */
 export interface SwarmSettings {
-  readonly mode: number;
   readonly npcDifficulty: number;
   readonly npcSeats: number;
 }
@@ -87,7 +85,7 @@ export async function runSwarm(opts: SwarmOptions): Promise<Swarm> {
     dealt: Promise.all(cards).then(() => undefined),
     get settings(): SwarmSettings {
       const st = (observer?.state as unknown as { settings?: SwarmSettings } | undefined)?.settings;
-      return { mode: st?.mode ?? 0, npcDifficulty: st?.npcDifficulty ?? 0, npcSeats: st?.npcSeats ?? 0 };
+      return { npcDifficulty: st?.npcDifficulty ?? 0, npcSeats: st?.npcSeats ?? 0 };
     },
     addNpc: () => observer?.send('lobby.addNpc', {}),
     removeNpc: () => observer?.send('lobby.removeNpc', {}),
@@ -120,12 +118,6 @@ export function parseArgs(argv: string[]): SwarmOptions {
     vote: get('--vote') ?? 'skip',
     report: argv.includes('--report'),
     walk: argv.includes('--walk'),
-    quick: {
-      ...(get('--sabotage') ? { sabotage: Number(get('--sabotage')) } : {}),
-      ...(get('--pace') === 'fast' || get('--pace') === 'human'
-        ? { pace: get('--pace') as 'fast' | 'human' }
-        : {}),
-    },
   };
 }
 

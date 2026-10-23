@@ -1,12 +1,10 @@
 import { balance } from '@wdi/content';
 import { type InvariantFailure, Phase, TICK_RATE, TILE_PX, VIEW_TAG } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
-import { flowOf } from '../Flow';
 import { isAiming } from '../NightPowers';
 import { npcMemory } from '../npc/memory';
-import { isOnub } from '../onub/state';
 import { simOf } from '../RoomSim';
-import { isLoft, isWorldPhase } from '../World';
+import { isWorldPhase } from '../World';
 import { isAdminClient } from './AdminView';
 import { matchEvents } from './log';
 
@@ -106,7 +104,7 @@ registerInvariant('npcStuck', (room) => {
     const p = sim.players.get(id);
     const goal = brain.act?.goal;
     const away = goal && p && Math.hypot(goal.x - p.x, goal.y - p.y) > TILE_PX;
-    if (!p || !goal || !away || p.dead || !p.placed || isLoft(p.sceneIdx) || !isWorldPhase(phase)) {
+    if (!p || !goal || !away || p.dead || !p.placed || !isWorldPhase(phase)) {
       watch.delete(id);
       continue;
     }
@@ -145,15 +143,10 @@ export function guardStep(room: PartyRoom, run: () => void): boolean {
 }
 registerInvariant('step', (room) => stepErrors(room).shift() ?? null);
 
-// 6. The match ends by `finalNight.afterCycle + 1` cycles: the main mode's rounds stop at the Final Night, and the
-// quick mode holds one meeting (GDD 3.3, 3.11).
+// 6. The match ends by `finalNight.afterCycle + 1` cycles: the rounds stop at the Final Night (GDD 3.3).
 registerInvariant('matchLength', (room) => {
   const { phase, round } = room.state;
   if (phase === Phase.lobby || phase === Phase.gameOver) return null;
-  if (isOnub(room)) {
-    const meetings = flowOf(room).meetings.length;
-    return meetings > 1 ? fail(room, `quick mode in meeting ${meetings}`) : null;
-  }
   const last = balance.finalNight.afterCycle + 1;
   return round > last ? fail(room, `round ${round} after the Final Night (round ${last})`) : null;
 });

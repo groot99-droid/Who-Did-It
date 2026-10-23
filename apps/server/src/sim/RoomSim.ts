@@ -116,7 +116,7 @@ export interface PortalRequest {
   portalId: string;
 }
 
-/** Pushed by report and bell (sim/Actions), drained by the phase stage (sim/Phases); quick mode opens `dawn`. */
+/** Pushed by report and bell (sim/Actions), drained by the phase stage (sim/Phases). */
 export interface MeetingRequest {
   reason: MeetingReason;
   callerId: string;

@@ -3,7 +3,7 @@ import { TICK_RATE, TILE_PX, moveAabb } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { AnimId, FOOT_HALF_PX, INPUT_STALE_TICKS, StatusBit } from './constants';
 import { type MoveInput, type PlayerSim, simOf } from './RoomSim';
-import { isLoft, isWorldPhase, navGrid, sceneKey } from './World';
+import { isWorldPhase, navGrid, sceneKey } from './World';
 
 const PX_PER_TICK = (tilesPerS: number): number => (tilesPerS * TILE_PX) / TICK_RATE;
 
@@ -50,7 +50,7 @@ export function applyInputs(room: PartyRoom): void {
   for (const [sessionId, p] of sim.players) {
     p.vx = 0;
     p.vy = 0;
-    if (!walking || !p.placed || p.input === null || isLoft(p.sceneIdx)) continue;
+    if (!walking || !p.placed || p.input === null) continue;
     if (tick - p.input.tick > INPUT_STALE_TICKS) {
       p.input = null;
       continue;
@@ -73,7 +73,7 @@ export function moveAndCollide(room: PartyRoom): void {
   if (!isWorldPhase(room.state.phase)) return;
   for (const [sessionId, p] of sim.players) {
     const player = room.state.players.get(sessionId);
-    if (!player || !p.placed || isLoft(p.sceneIdx)) continue;
+    if (!player || !p.placed) continue;
     if (p.transitFrom !== -1 && tick >= p.busyUntilTick) {
       // The crossing is over: the scene they left stops seeing them on this very tick.
       p.transitFrom = -1;

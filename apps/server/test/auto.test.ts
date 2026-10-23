@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { boot } from '@colyseus/testing';
 import { balance } from '@wdi/content';
-import { GameMode, NpcLevel, Phase, TICK_RATE } from '@wdi/shared';
+import { NpcLevel, Phase, TICK_RATE } from '@wdi/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { createServer } from '../src/server';
@@ -124,23 +124,22 @@ describe('the all-NPC match (GDD 3.19)', () => {
   it('seats every NPC under the given ids, with no leader and the settings applied', async () => {
     const room = await create();
     const npcIds = ['autonpc01', 'autonpc02', 'autonpc03', 'autonpc04', 'autonpc05'];
-    enableAuto(room, { map: 'blackpine', mode: 'onub', seats: 5, difficulty: 'hard', npcIds });
+    enableAuto(room, { map: 'blackpine', seats: 5, difficulty: 'hard', npcIds });
     expect([...room.state.players.keys()]).toEqual(npcIds);
     expect(npcIds.every((id) => isNpcSeat(room, id))).toBe(true);
     expect(room.state.leaderId).toBe('');
     expect(room.state.settings.map).toBe('blackpine');
-    expect(room.state.settings.mode).toBe(GameMode.onub);
     expect(room.state.settings.npcDifficulty).toBe(NpcLevel.hard);
     // Every stream is fixed, so the record replays the whole match.
     expect(Object.keys(autoOf(room)?.options.seeds ?? {})).toContain('npcPlay');
     expect(room.fixedSeeds).toBe(autoOf(room)?.options.seeds);
-    expect(() => enableAuto(room, { map: 'atlantis', mode: 'main', seats: 5, difficulty: 'easy' })).toThrow();
+    expect(() => enableAuto(room, { map: 'atlantis', seats: 5, difficulty: 'easy' })).toThrow();
     await room.disconnect();
   });
 
   it('starts inside the step with no human and no lobby.start', async () => {
     const room = await create();
-    enableAuto(room, { map: 'hollowmere', mode: 'main', seats: 6, difficulty: 'normal' });
+    enableAuto(room, { map: 'hollowmere', seats: 6, difficulty: 'normal' });
     applyClock(room, { paused: true });
     queueAutoStart(room);
     expect(room.state.phase).toBe(Phase.lobby);
@@ -152,7 +151,7 @@ describe('the all-NPC match (GDD 3.19)', () => {
 
   it('resets to the lobby with the same seats and the clock paused', async () => {
     const room = await create();
-    enableAuto(room, { map: 'hollowmere', mode: 'main', seats: 6, difficulty: 'normal' });
+    enableAuto(room, { map: 'hollowmere', seats: 6, difficulty: 'normal' });
     const ids = [...room.state.players.keys()];
     queueAutoStart(room);
     advance({ humans: [], room }, 2);
@@ -166,7 +165,7 @@ describe('the all-NPC match (GDD 3.19)', () => {
 
   it('applies clock commands inside the step', async () => {
     const room = await create();
-    enableAuto(room, { map: 'hollowmere', mode: 'main', seats: 4, difficulty: 'normal' });
+    enableAuto(room, { map: 'hollowmere', seats: 4, difficulty: 'normal' });
     autoOf(room)?.commands.push({ kind: 'clock', scale: 10 }, { kind: 'clock', scale: 3 as never });
     expect(clockOf(room).scale).toBe(1);
     advance({ humans: [], room }, 1);
@@ -176,7 +175,7 @@ describe('the all-NPC match (GDD 3.19)', () => {
 
   it('lets an NPC Killer take an NPC as prey only under auto.npcPrey', async () => {
     const room = await create();
-    enableAuto(room, { map: 'hollowmere', mode: 'main', seats: 4, difficulty: 'normal' });
+    enableAuto(room, { map: 'hollowmere', seats: 4, difficulty: 'normal' });
     queueAutoStart(room);
     advance({ humans: [], room }, 1);
     const sim = simOf(room);
@@ -196,23 +195,20 @@ describe('the all-NPC match (GDD 3.19)', () => {
     await room.disconnect();
   });
 
-  for (const mode of ['main', 'onub'] as const) {
-    it(`plays one day of a ${mode} match on Hollowmere with six NPC seats`, async () => {
-      const r = await runAutoMatch(colyseus, {
-        map: 'hollowmere',
-        mode,
-        seats: 6,
-        difficulty: 'normal',
-        maxTicks: oneDay,
-      });
-      expect(r.failures).toEqual([]);
-      expect(r.ticks).toBeGreaterThan(0);
-      expect(r.npcIds).toHaveLength(6);
-    }, 60_000);
-  }
+  it('plays one day of a main match on Hollowmere with six NPC seats', async () => {
+    const r = await runAutoMatch(colyseus, {
+      map: 'hollowmere',
+      seats: 6,
+      difficulty: 'normal',
+      maxTicks: oneDay,
+    });
+    expect(r.failures).toEqual([]);
+    expect(r.ticks).toBeGreaterThan(0);
+    expect(r.npcIds).toHaveLength(6);
+  }, 60_000);
 
   it('replays the same match from the same seeds and seat ids', async () => {
-    const opts = { map: 'hollowmere', mode: 'main', seats: 6, difficulty: 'hard', maxTicks: oneDay } as const;
+    const opts = { map: 'hollowmere', seats: 6, difficulty: 'hard', maxTicks: oneDay } as const;
     const a = await runAutoMatch(colyseus, opts);
     const b = await runAutoMatch(colyseus, { ...opts, seeds: a.seeds, npcIds: a.npcIds });
     const c = await runAutoMatch(colyseus, opts);
@@ -224,7 +220,7 @@ describe('the all-NPC match (GDD 3.19)', () => {
   it('disposes an auto room no client ever joined', async () => {
     const room = await create();
     const id = room.roomId;
-    enableAuto(room, { map: 'hollowmere', mode: 'main', seats: 4, difficulty: 'normal' });
+    enableAuto(room, { map: 'hollowmere', seats: 4, difficulty: 'normal' });
     // The seat-reservation timer Colyseus arms after onCreate, shortened: an empty room goes when it fires.
     (room as unknown as { resetAutoDisposeTimeout(s: number): void }).resetAutoDisposeTimeout(0.05);
     await sleep(300);

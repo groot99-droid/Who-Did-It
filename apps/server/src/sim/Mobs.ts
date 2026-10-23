@@ -6,9 +6,8 @@ import { type MobMind, MobState, newMind, think } from './mobs/ai';
 import { hurtByCreature, resetHurts } from './mobs/hurt';
 import { burningLights, lightBurns, resetLights } from './mobs/light';
 import { type SpawnSite, awake, dayPartOf, spawnSites } from './mobs/spawn';
-import { isOnub } from './onub/state';
 import { simOf } from './RoomSim';
-import { isLoft, navGrid, tileCentre } from './World';
+import { navGrid, tileCentre } from './World';
 
 /**
  * Mobs (round 6, M5b, GDD 3.15; docs/round6/m5b-data.md 2.2): one creature per spawner of the room's map, awake in
@@ -64,7 +63,7 @@ function memoryOf(room: PartyRoom): MobMemory {
 /** The creatures awake now, by id (tests and the NPC flee read them). */
 export const mobBodies = (room: PartyRoom): ReadonlyMap<string, MobBody> => memoryOf(room).bodies;
 
-/** Every creature leaves the world and the wire (the lobby, the card, the quick mode). */
+/** Every creature leaves the world and the wire (the lobby, the card). */
 function clearMobs(room: PartyRoom): void {
   const memory = memoryOf(room);
   for (const body of memory.bodies.values()) room.state.scenes.get(body.site.scene)?.mobs.delete(body.id);
@@ -77,7 +76,7 @@ function clearMobs(room: PartyRoom): void {
 /** Step stage after `runResources` (locked call site in `sim/Step.ts`): spawn, think, move, attack. */
 export function runMobs(room: PartyRoom): void {
   const phase = room.state.phase;
-  if (phase === Phase.lobby || phase === Phase.roleReveal || isOnub(room)) {
+  if (phase === Phase.lobby || phase === Phase.roleReveal) {
     clearMobs(room);
     return;
   }
@@ -168,7 +167,7 @@ function sensePrey(room: PartyRoom, body: MobBody): string | null {
   const reach = body.def.senseTiles * TILE_PX;
   let best: { seat: string; d: number } | null = null;
   for (const [seat, p] of sim.players) {
-    if (!p.placed || p.dead || isLoft(p.sceneIdx) || p.sceneIdx !== body.site.sceneIdx) continue;
+    if (!p.placed || p.dead || p.sceneIdx !== body.site.sceneIdx) continue;
     if (room.state.tick < p.busyUntilTick) continue;
     const d = Math.hypot(p.x - body.x, p.y - body.y);
     if (d > reach || (best !== null && d >= best.d)) continue;

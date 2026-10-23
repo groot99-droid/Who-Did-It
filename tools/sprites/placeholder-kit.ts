@@ -1,6 +1,5 @@
 // The drawing kit and the module contract of the placeholder art (placeholder.ts). Part of the core:
-// the three placeholder modules (placeholder-world.ts, placeholder-chars.ts, placeholder-onub.ts) import
-// it, and no art session edits it (art plan 1.2 item 6).
+// the placeholder modules (placeholder-world.ts, placeholder-chars.ts, placeholder-m5b.ts) import it, and no art session edits it (art plan 1.2 item 6).
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { GlobalFonts, type SKRSContext2D } from '@napi-rs/canvas';

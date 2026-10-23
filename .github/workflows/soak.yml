@@ -1,11 +1,8 @@
 # The long match soak (ARCHITECTURE 5.12): 6 walking bots play matches back to back for 30 minutes against the
-# built server, once in the main mode and once in quick mode (GDD 3.11), and fail on a presence or night leak,
-# a dropped bot, a protocol error, a p95 tick above 15 ms, or a run in which nothing happened. It never runs
-# on push or pull request: it is started by hand (Actions > soak > Run workflow) and weekly. The quick-mode leg
-# (ONUB v2) seats 4 bots plus NPCs up to 4, 6, 8 and 10 in turn, fails on a night leak (a sleeper that received a
-# `nightWake` or `nightReveal`, or any presence), and ends with the ruin rate per party size against the 20-30%
-# target, from the matches it played and from the prep Monte Carlo (`pnpm bots:ruin`). The `auto` job (round 6,
-# docs/round6/auto-admin.md 4 and 5) plays all-NPC matches headless with `pnpm auto` per map, mode and difficulty,
+# built server, and fail on a presence leak, a dropped bot, a protocol error, a p95 tick above 15 ms, or a run in
+# which nothing happened. It never runs on push or pull request: it is started by hand (Actions > soak > Run
+# workflow) and weekly. The `auto` job (round 6, docs/round6/auto-admin.md 4 and 5) plays all-NPC matches
+# headless with `pnpm auto` per map and difficulty,
 # on a fresh `--seed` each run, and fails on any invariant failure or a match that never reaches game over; the
 # report prints the seed words of every failing match so it replays.
 name: soak
@@ -14,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       minutes:
-        description: Minutes per mode
+        description: Minutes of play
         default: '30'
   schedule:
     # Mondays 04:17 UTC.
@@ -25,18 +22,10 @@ permissions:
 
 jobs:
   soak:
-    name: soak (${{ matrix.mode }})
+    name: soak
     runs-on: ubuntu-latest
-    # 30 minutes of play plus install and build; the two modes run side by side, not one after the other.
+    # 30 minutes of play plus install and build.
     timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - mode: main
-            args: ''
-          - mode: onub
-            args: '--bots 4 --sizes 4,6,8,10'
     steps:
       - uses: actions/checkout@v7
         with:
@@ -49,30 +38,25 @@ jobs:
       - run: pnpm --filter @wdi/server build
       - name: Soak
         shell: bash
-        run: pnpm bots:soak -- --mode ${{ matrix.mode }} --minutes ${{ inputs.minutes || '30' }} ${{ matrix.args }} | tee soak.log
-      - name: Ruin rate (prep Monte Carlo)
-        if: matrix.mode == 'onub'
-        shell: bash
-        run: pnpm bots:ruin | tee -a soak.log
+        run: pnpm bots:soak -- --minutes ${{ inputs.minutes || '30' }} | tee soak.log
       - name: Result
         if: always()
         shell: bash
         run: |
           {
-            echo "### soak (${{ matrix.mode }})"
+            echo "### soak"
             echo '```'
             tail -n 24 soak.log || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
   auto:
-    name: auto (${{ matrix.map }}, ${{ matrix.mode }}, ${{ matrix.difficulty }})
+    name: auto (${{ matrix.map }}, ${{ matrix.difficulty }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
         map: [hollowmere, blackpine]
-        mode: [main, onub]
         difficulty: [easy, normal, hard]
     steps:
       - uses: actions/checkout@v7
@@ -87,10 +71,10 @@ jobs:
         shell: bash
         run: >-
           pnpm auto -- --matches 20 --seed ${{ github.run_number }} --map ${{ matrix.map }}
-          --mode ${{ matrix.mode }} --difficulty ${{ matrix.difficulty }} --json | tee auto.log
+          --difficulty ${{ matrix.difficulty }} --json | tee auto.log
       - name: Report
         if: always()
         shell: bash
         run: >-
           pnpm --silent --filter @wdi/auto exec tsx report/index.ts "$GITHUB_WORKSPACE/auto.log"
-          "auto (${{ matrix.map }}, ${{ matrix.mode }}, ${{ matrix.difficulty }})" >> "$GITHUB_STEP_SUMMARY"
+          "auto (${{ matrix.map }}, ${{ matrix.difficulty }})" >> "$GITHUB_STEP_SUMMARY"

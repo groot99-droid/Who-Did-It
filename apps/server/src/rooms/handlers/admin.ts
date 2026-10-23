@@ -37,23 +37,15 @@ function parseSeeds(raw: unknown): FixedSeeds | null | undefined {
 /** The options of an `admin.setup` payload, or null when the shape is wrong or `enableAuto` would refuse them. */
 export function parseSetup(raw: unknown): AutoOptions | null {
   if (!isRecord(raw)) return null;
-  const { map, mode, seats, difficulty, deck } = raw;
-  if (typeof map !== 'string' || typeof mode !== 'string' || typeof difficulty !== 'string') return null;
+  const { map, seats, difficulty } = raw;
+  if (typeof map !== 'string' || typeof difficulty !== 'string') return null;
   if (typeof seats !== 'number' || seats > MAX_PLAYERS) return null;
-  if (
-    deck !== undefined &&
-    (!Array.isArray(deck) || deck.length > 64 || !deck.every((d) => typeof d === 'string'))
-  ) {
-    return null;
-  }
   const seeds = parseSeeds(raw.seeds);
   if (seeds === null) return null;
   const options = {
     map,
-    mode,
     seats,
     difficulty,
-    ...(deck !== undefined ? { deck: deck as string[] } : {}),
     ...(seeds !== undefined ? { seeds } : {}),
   } as AutoOptions;
   return autoOptionsProblem(options) === null ? options : null;

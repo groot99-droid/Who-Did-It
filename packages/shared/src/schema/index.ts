@@ -10,9 +10,9 @@ import { schema, t } from '@colyseus/schema';
 // owner only; every other seat walks as an avatar under a handle (GDD 3.17). Round 6 (DECISIONS A81): the M5b
 // maps `nodes` and `mobs`, `Private.quests`, `GameState.lawStage` and `Role.evolvedFrom`, all empty until their
 // sessions fill them (docs/round6/seams.md 1.1). Version 4 (round 7, A104): `Player.profile`,
-// `Private.vendetta` (A112).
+// `Private.vendetta` (A112). Version 5 (round 7, A115): the quick mode's fields are gone.
 
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 
 /**
  * View tags (Visibility.ts): `presence` and `priv` are the numeric tags 1 and 2, granted one by one; `ghost`
@@ -44,18 +44,12 @@ export const Phase = {
   immunity: 10,
   finalNight: 11,
   gameOver: 12,
-  /** Quick mode (GDD 3.11): the prep piles face up on `GameState.onub`, between Evening Prep and the night. */
-  prepReveal: 13,
 } as const;
 export type PhaseId = (typeof Phase)[keyof typeof Phase];
 
-export const GameMode = { main: 0, onub: 1 } as const;
 export const DoorState = { open: 0, closed: 1, locked: 2, broken: 3 } as const;
-/**
- * 0 = nobody has won yet. `croissant` (the Stale Croissant, alone or with the Bakers) and `nobody` are quick-mode
- * values (GDD 3.11; 4 was the round-4 `debtor`). In quick mode the headline comes from the winners row, not this.
- */
-export const Winner = { none: 0, village: 1, cabal: 2, drifter: 3, croissant: 4, nobody: 5 } as const;
+/** 0 = nobody has won yet. */
+export const Winner = { none: 0, village: 1, cabal: 2, drifter: 3 } as const;
 export const Team = { village: 0, cabal: 1, neutral: 2 } as const;
 
 // --- Public roster ---------------------------------------------------------------------------
@@ -91,8 +85,7 @@ export const Clue = schema(
   { id: str(), kind: u8(), value: u8(), dir: u8(), x: i16(), y: i16(), claimed: bool() },
   'Clue',
 );
-/** `of` names a seat a prop belongs to, empty otherwise (round 4's quick-mode plates; ONUB v2 uses no props). */
-export const Prop = schema({ id: str(), kind: str(), turned: bool(), of: str() }, 'Prop');
+export const Prop = schema({ id: str(), kind: str(), turned: bool() }, 'Prop');
 /**
  * Round 6 (M5b, GDD 3.14): a resource node of the scene, public like a prop. `resource` is a `resources.json` id,
  * `active` whether it can be gathered now, `respawnTick` when it comes back. Empty until Session 6F fills it.
@@ -178,14 +171,6 @@ export const NotebookEntry = schema(
 export const TaskEntry = schema({ id: str(), done: bool(), fake: bool() }, 'TaskEntry');
 /** Round 6 (M5b, GDD 3.16): one accepted quest of this seat; `id` a `quests.json` id. Empty until Session 6H. */
 export const QuestState = schema({ id: str(), progress: u8(), done: bool() }, 'QuestState');
-/**
- * Quick mode (GDD 3.11): one thing this seat learned, kept so a reconnecting client can re-read it.
- * `slot` is a card slot (`seat.<i>.role`, `seat.<i>.loc`, `pantry.role.<k>`, `pantry.loc.<k>`, see
- * `rules/onub.ts`); `kind` is `role` or `loc` for a card seen, `mate` for a seat seen at night (the other
- * Spore or Commis, a Spore the Levain sees; `slot` is then `seat.<i>`); `value` is the role or station id;
- * `of` is the seat id behind a seat slot, empty for the Pantry.
- */
-export const NightReveal = schema({ slot: str(), kind: str(), value: str(), of: str() }, 'NightReveal');
 export const LedgerLine = schema({ sceneId: u8(), tick: u32() }, 'LedgerLine');
 
 export const Private = schema(
@@ -199,16 +184,7 @@ export const Private = schema(
     ledger: t.array(LedgerLine),
     lensCharges: u8(),
     myVote: str(),
-    /** Quick mode only; empty in the main mode. Every peek, sighting and the proofing perk, in order. */
-    nightReveal: t.array(NightReveal),
-    /** Quick mode: the station this seat committed at prep (its dealt Location card), empty before. */
-    onubLoc: str(),
-    /** Quick mode: the Ingredient card this seat committed at prep, empty before. */
-    onubCard: str(),
-    /**
-     * Own scene index in SCENE_IDS order (LOFT_SCENE_INDEX in the quick-mode loft): the only scene index on the
-     * wire, and only to its owner.
-     */
+    /** Own scene index in SCENE_IDS order: the only scene index on the wire, and only to its owner. */
     sceneId: u8(),
     /** Own avatar handle in the own scene; '' while not placed. */
     avatar: str(),
@@ -249,32 +225,17 @@ export const Player = schema(
 // --- Game ------------------------------------------------------------------------------------
 
 /**
- * `mode` is 0 main, 1 onub (ARCHITECTURE 5.14). `revealMode` 0 is full, locked in V1 (GDD 2).
- * `npcDifficulty` is an `NpcLevel` index and `npcSeats` the number of NPC seats in the party, a count
- * only: no seat is ever marked (GDD 3.12, A39). `onubDeck` is the leader's custom quick-mode deck, public;
- * empty means `onubFor(n).deck` (GDD 3.11).
+ * `revealMode` 0 is full, locked in V1 (GDD 2). `npcDifficulty` is an `NpcLevel` index and `npcSeats` the number
+ * of NPC seats in the party, a count only: no seat is ever marked (GDD 3.12, A39).
  */
 export const Settings = schema(
   {
     map: str('hollowmere'),
     revealMode: u8(),
-    mode: u8(),
     npcDifficulty: u8(),
     npcSeats: u8(),
-    onubDeck: t.array('string'),
   },
   'Settings',
-);
-
-/** One thing a quick-mode claim says it saw: `targetId` a seat id or `"pantry"`, with a role or a station id. */
-export const ClaimSaw = schema({ targetId: str(), roleId: str(), stationId: str() }, 'ClaimSaw');
-/**
- * A quick-mode claim (GDD 3.11), latest per seat: "I was {roleId}, I worked {stationId} and played {cardId}",
- * plus up to `claims.maxSaw` sightings. Empty strings are parts left out.
- */
-export const Claim = schema(
-  { from: str(), roleId: str(), stationId: str(), cardId: str(), saw: t.array(ClaimSaw) },
-  'Claim',
 );
 
 export const BoardRow = schema(
@@ -292,41 +253,8 @@ export const MeetingState = schema(
     missing: t.array('string'),
     board: t.array(BoardRow),
     suspects: t.array('string'),
-    /** Quick mode: the structured claims, latest per seat (GDD 3.11). */
-    claims: t.array(Claim),
   },
   'MeetingState',
-);
-
-/**
- * One prep pile face up (GDD 3.11), keyed by station id in `OnubBoard.piles`: `cards` the card ids still in it,
- * in seeded order; `lost` how many the Thermostat Flip discarded; `net` its net sabotage weight; `underMixed`
- * the Mixer's caution flag.
- */
-export const OnubPile = schema(
-  { cards: t.array('string'), lost: u8(), net: u8(), underMixed: bool() },
-  'OnubPile',
-);
-
-/**
- * The public quick-mode board (GDD 3.11). `seats` is the deal order (slot index `i` of `seat.<i>.*` is
- * `seats[i]`) and `deck` the cards in play, both from the role card on; `piles`, `ruinWeight`, `ruined` and
- * `perk` from `prepReveal`; `cloche` (a slot id) from dawn. `window` is the open night window's role id, the
- * narrator's call, '' during fades and outside the night: public, since every window of the deck runs whatever
- * was dealt. Cleared at the lobby reset; empty in the main mode.
- */
-export const OnubBoard = schema(
-  {
-    seats: t.array('string'),
-    deck: t.array('string'),
-    piles: t.map(OnubPile),
-    ruinWeight: u8(),
-    ruined: bool(),
-    perk: bool(),
-    cloche: str(),
-    window: str(),
-  },
-  'OnubBoard',
 );
 
 export const GameState = schema(
@@ -345,8 +273,6 @@ export const GameState = schema(
     scenes: t.map(SceneState).view(),
     meeting: MeetingState,
     winner: u8(),
-    /** Quick mode only (GDD 3.11). */
-    onub: OnubBoard,
     /** Round 8 (the Bible's law pipeline, docs/round6/bible-seams.md 2.2): 0 until then. Public. */
     lawStage: u8(),
   },
