@@ -25,7 +25,8 @@
     "deepCullTiles": 2,
     "topPadPx": 320,
     "viewTilesHigh": 11,
-    "zoomStep": 0.5
+    "zoomStep": 0.5,
+    "figureScale": 1
   },
   "lighting": {
     "ambient": {
