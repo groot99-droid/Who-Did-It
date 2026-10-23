@@ -724,8 +724,17 @@ below is awake time.
 | Anger | being struck (`anger.struck`), robbed (`robbed`), rent or quota taken (`taxed`) | time (`fallS`); a meal (`mealRelief`); the ejection of the seat it suspects most (`ejectionRelief`) |
 | Want | a purse under `want.lightPurse` Scrip (`lightRiseS`), Indebted (`debtRiseS`) | a wage (`wage`), a sale (`sale`) |
 
-The **mood** built on the needs (the stacked PR) is what shows: a need itself is never a word, a clip or a number
-on the wire.
+The **mood** is the strongest need at or over `moods.threshold`: Hungry, Scared, Angry, or Desperate for Want;
+with `desperateNeeds` or more needs over the threshold it is Desperate; with none, Calm. A mood holds at least
+`moodHoldS` before it changes, so a seat does not flicker. A mood shows in two ways only:
+
+- **The routine draw.** The class's work, stroll and idle weights (3.12) are scaled by `moods.weights[mood]` and
+  renormalised: a Hungry seat works more, a Scared one idles more, an Angry or Desperate one strolls more. The
+  richer habits of `townsfolk.md` 1 (home earlier, the bakery, the quiet places, lingering near the one it is angry
+  at) wait on routine hooks that do not exist yet (A140, open).
+- **The idle.** While it stands still a Scared seat cowers, a Hungry or Desperate one fidgets, an Angry one stomps
+  (the `cower`, `fidget` and `stomp` clips of 3.22); a Calm seat shows the plain idle. A client receives the clip id
+  and nothing else, so a mood is a thing to notice, never a word.
 
 Anger remembers who struck, robbed or taxed the seat until it cools to zero; the mugging (below) and relations
 (3.22) read it. A new card (3.12: the brain forgets) starts every need at zero.

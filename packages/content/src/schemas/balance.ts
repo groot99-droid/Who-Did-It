@@ -63,6 +63,12 @@ const TileSpan = z.strictObject({ min: z.number().int().positive(), max: z.numbe
 const FracSpan = z.strictObject({ min: Chance, max: Chance });
 /** The next activity's weights in one phase class; each row sums to 1 (validate.ts). */
 const RoutineWeights = z.strictObject({ work: Chance, stroll: Chance, idle: Chance });
+/** A mood's factors on the routine weights (round 8, GDD 3.24). */
+const MoodWeights = z.strictObject({
+  work: z.number().nonnegative(),
+  stroll: z.number().nonnegative(),
+  idle: z.number().nonnegative(),
+});
 
 export const BalanceFile = z.strictObject({
   gddRef: GddRef,
@@ -261,6 +267,9 @@ export const BalanceFile = z.strictObject({
    * rate; the other keys are the jump one event gives. `weights` scale the routine's draw per mood (`moodWeights`).
    */
   moods: Section({
+    threshold: Chance,
+    desperateNeeds: z.number().int().positive(),
+    moodHoldS: Seconds,
     /** Hunger rises over `riseS` (`famishedMul` times faster under 8A's Famished), falls at home and on a meal. */
     hunger: z.strictObject({
       riseS: Seconds,
@@ -291,6 +300,12 @@ export const BalanceFile = z.strictObject({
       debtRiseS: Seconds,
       wage: Chance,
       sale: Chance,
+    }),
+    weights: z.strictObject({
+      hungry: MoodWeights,
+      scared: MoodWeights,
+      angry: MoodWeights,
+      desperate: MoodWeights,
     }),
   }),
   /** Round 6 (GDD 3.14). Each resource's own gather hold and respawn are rows of resources.json. */

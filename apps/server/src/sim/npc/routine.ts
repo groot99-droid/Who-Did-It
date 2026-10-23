@@ -17,6 +17,7 @@ import { mapScenesOf } from '../MapSites';
 import { type PlayerSim, simOf } from '../RoomSim';
 import { navGrid, profileOpen, sceneIndex, sceneKey, tileCentre } from '../World';
 import { type Act, type Brain, type NpcMemory, playRng } from './memory';
+import { moodWeights } from './needs';
 import { GOAL_SLACK, drive, firstPortalToward, stand, walkThrough, walkTo, wander } from './walk';
 import { vendettaGoalFor } from '../vendettas/goal';
 
@@ -488,7 +489,7 @@ function choose(
     }
   }
 
-  const w = balance.npc.routine.weights[cls];
+  const w = moodWeights(brain, balance.npc.routine.weights[cls]); // round 8, 8E: the mood shifts the draw (locked hook)
   const u = rng();
   let kind: 'work' | 'stroll' | 'idle' = u < w.work ? 'work' : u < w.work + w.stroll ? 'stroll' : 'idle';
   // A Killer NPC with prey in sight of the map goes hunting at once, whatever the weights drew.

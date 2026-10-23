@@ -1,7 +1,8 @@
 import { balance } from '@wdi/content';
 import { TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
-import { onSim, type SimEvent } from '../events/bus';
+import { AnimId } from '../constants';
+import { emitSim, onSim, type SimEvent } from '../events/bus';
 import { mobBodies } from '../Mobs';
 import { MobState } from '../mobs/ai';
 import { lightBurns } from '../mobs/light';
@@ -11,16 +12,19 @@ import { type Brain, npcMemory } from './memory';
 import { litAtNight, phaseClassOf } from './routine';
 
 /**
- * Needs (round 8, GDD 3.24, docs/round8/townsfolk.md 1; Session 8E). Every NPC seat carries four needs, each a 0..1
- * level in room memory: Hunger, Fear, Anger and Want. They move with the bus events of seams.md 4 and the rates of
- * `balance.json` `moods`, and nothing here reaches the wire. Card-blind: every need moves on what happened to the
- * seat, never on its card, so a Killer NPC fears a body like anyone else, its own included. The mood built on them
- * (the idle a still seat shows and the routine draw it shifts) is the stacked PR's.
+ * Needs and moods (round 8, GDD 3.24, docs/round8/townsfolk.md 1; Session 8E). Every NPC seat (and, through the same
+ * functions, every ambient townsfolk figure) carries four needs, each a 0..1 level in room memory: Hunger, Fear,
+ * Anger and Want. The mood is the strongest need over `moods.threshold`, or Desperate when `moods.desperateNeeds`
+ * needs are over it. Nothing here reaches the wire: the only public trace of a mood is the idle the seat plays
+ * while it stands still (`moodIdleOf`, the `cower`, `fidget` and `stomp` idles of seams.md 2) and the routine draw
+ * it shifts (`moodWeights`). Card-blind: every need moves on what happened to the seat, never on its card, so a
+ * Killer NPC cowers at a body like anyone else, its own included.
  *
- * `updateNeeds` is the one-line hook of `sim/npc/world.ts` (seams.md 5). The needs are keyed by the `Brain` object,
- * so a new role card (which forgets every brain) starts them afresh.
+ * `updateNeeds` is the one-line hook of `sim/npc/world.ts` (seams.md 5), `moodWeights` the one of `sim/npc/routine.ts`.
+ * The needs are keyed by the `Brain` object, so a new role card (which forgets every brain) starts them afresh.
  */
 
+export type Mood = 'calm' | 'hungry' | 'scared' | 'angry' | 'desperate';
 export type NeedId = 'hunger' | 'fear' | 'anger' | 'want';
 
 /** What one seat needs; room memory only, never on the wire. */
@@ -29,6 +33,9 @@ export interface Needs {
   fear: number;
   anger: number;
   want: number;
+  mood: Mood;
+  /** The tick the current mood began (a mood holds `moods.moodHoldS` before it may change). */
+  moodSinceTick: number;
   /** The seat this one was last struck, robbed or taxed by; null when none (the Angry routine's anchor). */
   angryAt: string | null;
   /** Bodies counted into Fear so far (`Brain.seenBodies` only ever grows within a brain's life). */
@@ -37,7 +44,29 @@ export interface Needs {
   chasedBy: string | null;
 }
 
+/** The mood idles the server sends while a seat stands still (seams.md 2; the `AnimId` rows of 8A's #131). */
+export const MOOD_ANIM = { cower: AnimId.cower, fidget: AnimId.fidget, stomp: AnimId.stomp } as const;
+
+/** The idle each mood shows; Calm shows the plain idle. A mood is never a word on the wire, only this. */
+const IDLE_OF: Record<Mood, number | null> = {
+  calm: null,
+  hungry: MOOD_ANIM.fidget,
+  scared: MOOD_ANIM.cower,
+  angry: MOOD_ANIM.stomp,
+  desperate: MOOD_ANIM.fidget,
+};
+
+const MOOD_OF_NEED: Record<NeedId, Mood> = {
+  hunger: 'hungry',
+  fear: 'scared',
+  anger: 'angry',
+  want: 'desperate',
+};
+const NEED_IDS: readonly NeedId[] = ['hunger', 'fear', 'anger', 'want'];
+
 const store = new WeakMap<Brain, Needs>();
+/** The idle a still seat shows this tick, by its sim; absent when its mood is Calm (or it is not an NPC). */
+const idles = new WeakMap<PlayerSim, number>();
 const wired = new WeakSet<PartyRoom>();
 
 const clamp = (v: number): number => Math.min(1, Math.max(0, v));
@@ -51,6 +80,8 @@ export function needsOf(brain: Brain): Needs {
       fear: 0,
       anger: 0,
       want: 0,
+      mood: 'calm',
+      moodSinceTick: -1,
       angryAt: null,
       bodiesSeen: 0,
       chasedBy: null,
@@ -58,6 +89,37 @@ export function needsOf(brain: Brain): Needs {
     store.set(brain, n);
   }
   return n;
+}
+
+/** The mood of an NPC seat, or null for a seat with no brain (a human, or one not yet ticked). */
+export function moodOf(room: PartyRoom, seat: string): Mood | null {
+  const brain = npcMemory(room).brains.get(seat);
+  const n = brain === undefined ? undefined : store.get(brain);
+  return n?.mood ?? null;
+}
+
+/** The mood idle a still seat shows (the `publishPresence` line, `sim/Movement.ts`); undefined for the plain idle. */
+export function moodIdleOf(p: PlayerSim): number | undefined {
+  return idles.get(p);
+}
+
+/**
+ * The routine weights under the seat's mood (the `choose` line of `sim/npc/routine.ts`): the class's base weights
+ * scaled by `moods.weights[mood]` and normalised, so a Hungry seat works more, a Scared one idles, an Angry or
+ * Desperate one strolls. Calm returns the base untouched.
+ */
+export function moodWeights<T extends { work: number; stroll: number; idle: number }>(
+  brain: Brain,
+  base: T,
+): T {
+  const n = store.get(brain);
+  if (!n || n.mood === 'calm') return base;
+  const f = balance.moods.weights[n.mood];
+  const work = base.work * f.work;
+  const stroll = base.stroll * f.stroll;
+  const idle = base.idle * f.idle;
+  const sum = work + stroll + idle || 1;
+  return { ...base, work: work / sum, stroll: stroll / sum, idle: idle / sum };
 }
 
 /** 8C's purse, read without a compile-time dependency on its schema row; null until it exists. */
@@ -174,7 +236,7 @@ function wire(room: PartyRoom): void {
 
 /**
  * One tick of a living, placed NPC seat (the locked hook in `runWorldNpc`, after `observe`): the needs rise and fall
- * by their rates.
+ * by their rates, then the mood is settled and its idle recorded for `publishPresence`.
  */
 export function updateNeeds(room: PartyRoom, brain: Brain, seat: string): void {
   wire(room);
@@ -216,4 +278,29 @@ export function updateNeeds(room: PartyRoom, brain: Brain, seat: string): void {
   const purse = purseOf(room, seat);
   if (purse !== null && purse < m.want.lightPurse) n.want = clamp(n.want + dt / m.want.lightRiseS);
   if (hasEffect(room, seat, INDEBTED_EFFECT)) n.want = clamp(n.want + dt / m.want.debtRiseS);
+
+  settleMood(room, seat, n);
+  const idle = IDLE_OF[n.mood];
+  if (idle === null) idles.delete(p);
+  else idles.set(p, idle);
+}
+
+/** The strongest need over the threshold, Desperate with `desperateNeeds` over it, Calm with none; held `moodHoldS`. */
+function settleMood(room: PartyRoom, figure: string, n: Needs): void {
+  const m = balance.moods;
+  const tick = room.state.tick;
+  const over = NEED_IDS.filter((id) => n[id] >= m.threshold);
+  let next: Mood = 'calm';
+  if (over.length >= m.desperateNeeds) next = 'desperate';
+  else if (over.length > 0) {
+    let best = over[0] as NeedId;
+    for (const id of over) if (n[id] > n[best]) best = id;
+    next = MOOD_OF_NEED[best];
+  }
+  if (next === n.mood) return;
+  if (n.moodSinceTick >= 0 && tick - n.moodSinceTick < Math.round(m.moodHoldS * TICK_RATE)) return;
+  n.mood = next;
+  n.moodSinceTick = tick;
+  // Server only (seams.md 4): the admin log may show it, a client never does.
+  emitSim(room, { tick, kind: 'mood', data: { figure, mood: next } });
 }
