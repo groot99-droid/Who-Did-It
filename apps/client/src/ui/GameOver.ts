@@ -91,7 +91,7 @@ export function mountGameOver(root: HTMLElement, opts: GameOverOptions): GameOve
   const el = h(
     'section',
     {
-      class: 'wdi-panel wdi-stack wdi-over wdi-table',
+      class: 'wdi-panel wdi-stack wdi-over wdi-table wdi-glass-panel',
       'aria-labelledby': 'gameover-title',
       'data-testid': 'gameover',
     },

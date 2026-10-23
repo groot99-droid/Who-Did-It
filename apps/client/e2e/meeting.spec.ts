@@ -44,14 +44,12 @@ test('a body opens the meeting, one vote ends it early, the stamp lands, game ov
   await expect(page.getByTestId('chat-log')).toContainText('I was at the well');
 
   // Tap a portrait to vote; the vote shows as yours.
+  // The bots vote on their own clock and their "Voted" chip shows until the last vote (yours) lands, so wait on that
+  // state before voting instead of sampling it after the click, where a slow screenshot above would miss it.
+  await expect(page.getByTestId('voted-mock-bot-3')).toBeVisible({ timeout: 10_000 });
   const started = Date.now();
   await page.getByTestId('portrait-mock-bot-1').click();
   await expect(page.getByTestId('portrait-mock-bot-1')).toHaveClass(/is-selected/);
-  // A bot's "Voted" chip shows until the last vote lands, then the reveal hides it: either proves the votes came in
-  // (a heavier paint, such as the night theme's glass, can take a screenshot past the bots' short window).
-  await expect(
-    page.locator('[data-testid="voted-mock-bot-3"]:visible, [data-testid="stamp"]:visible').first(),
-  ).toBeVisible({ timeout: 10_000 });
 
   // Everyone voted: the reveal starts at once, long before the discussion would have ended.
   await expect(page.getByTestId('stamp')).toBeVisible({ timeout: 15_000 });
