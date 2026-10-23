@@ -6,6 +6,13 @@
  * step starts with the entry before it and does not move that cursor. A step with no `durationS` takes no time, except
  * `hold` and `video`, which run to `maxS`. The whole is clamped to `maxS`; a step that would start after it is dropped.
  */
+/** The `game.events` event the player emits when a cutscene ends (round 7: the music director hands over on it). */
+export const CUTSCENE_END = 'cutsceneEnd';
+export interface CutsceneEnd {
+  id: string;
+  outcome: 'done' | 'skipped';
+}
+
 export interface TimelineStep {
   t: string;
   durationS?: number;

@@ -32,6 +32,7 @@ const MANIFEST = {
     { id: 'day', tracks: ['a'], crossfadeS: 2, shuffle: false },
     { id: 'night', tracks: ['b'], crossfadeS: 2, shuffle: false },
     { id: 'mix', tracks: ['a', 'c'], crossfadeS: 1, shuffle: false },
+    { id: 'once', tracks: ['c'], crossfadeS: 2, shuffle: false, loop: false },
   ],
 };
 
@@ -142,6 +143,40 @@ describe('MusicBus', () => {
     expect(bus.playingTrack).toBe('a');
     first.end();
     expect(bus.playingTrack).toBe('c');
+  });
+
+  it('plays a playlist that does not loop once, then is silent and reports it', async () => {
+    const { bus, els } = setup();
+    const finished: string[] = [];
+    bus.onFinish((id) => void finished.push(id));
+    bus.crossfadeTo('day');
+    await flush();
+    bus.tick(2000);
+    bus.crossfadeTo('once');
+    await flush();
+    const piece = els.find((e) => e.src.endsWith('c.ogg'))!;
+    expect(piece.loop).toBe(false);
+    expect(els.find((e) => e.src.endsWith('a.ogg'))!.loop).toBe(true);
+    bus.tick(2000);
+    expect(piece.volume).toBeCloseTo(1);
+    piece.end();
+    expect(finished).toEqual(['once']);
+    expect(bus.playingTrack).toBeNull();
+    expect(els.every((e) => e.src === '' && e.volume === 0)).toBe(true);
+    expect(piece.plays).toBe(1);
+    // Asking for it again restarts nothing; another playlist plays as usual.
+    bus.crossfadeTo('once');
+    await flush();
+    expect(els.every((e) => e.src === '')).toBe(true);
+    bus.crossfadeTo('night');
+    await flush();
+    expect(bus.playingTrack).toBe('b');
+  });
+
+  it('reads loop as true unless a playlist says false', () => {
+    const m = parseMusicManifest(MANIFEST);
+    expect(m.playlists.find((p) => p.id === 'day')!.loop).toBe(true);
+    expect(m.playlists.find((p) => p.id === 'once')!.loop).toBe(false);
   });
 
   it('prefetches the first track once', async () => {

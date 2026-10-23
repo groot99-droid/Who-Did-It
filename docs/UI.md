@@ -1374,3 +1374,17 @@ A failed create or join says the generic error (`JOIN_FAILED_MESSAGE`, UI.md 1.6
 line, or the refresh line when the build is stale. `data-testid`s: `menu`, `menu-chip`, `menu-sound`, `menu-build`,
 `landing-trailer` (kept). The e2e fixture `e2e/fixtures/party.ts` (`createParty`, `joinParty`) drives the buttons and
 labels above; a visible label that changes changes there.
+
+### 14.26 Lobby re-skin (7E, round 7)
+
+The lobby's lines stay in `apps/client/src/ui/copy/lobby.ts`; the re-skin (A103, A109) changes markup and style, not wording. Every id of `ui/Lobby.ts` is kept (`ui-reskin.md` 2). New lines:
+
+| Key | Text | Where |
+|---|---|---|
+| `lobby.friend.add` | Add friend | a seat row that carries a `profile` (`data-testid="add-friend"`) |
+| `lobby.friend.add.label` | Add {name} as a friend | that button's accessible name |
+| `lobby.friend.added` | Friend | the same button once the profile is on the device's list; it is disabled |
+
+- **Columns.** A: the party code in display type (`party-code`), Copy invite link, Change mode (`mode-toggle`) beside Add NPC (`add-npc`) with Remove NPC (`remove-npc`) as a small minus (`aria-label` "Remove NPC"), the NPC skill select (`npc-difficulty`) with its locked note, the mode chip (`mode-chip`) in the card's corner, then "Players n / 10" with the You, Leader, Ready and Away tags. B: the map, the art style, the sound settings and the quick-mode deck editor. C: the deck as chips with its two notes, Start (leader), Ready, Leave. Below 900 px the columns stack.
+- **Tags.** The NPC tag is not shown: the lobby snapshot carries only the NPC seat count, not which seats they are, and the wire is not widened for a tag. Add friend shows only where a seat's `profile` is in the snapshot; until the client's roster mapping carries it, no row offers it.
+- **Left out.** The mockup's "Locate" button has no feature.
