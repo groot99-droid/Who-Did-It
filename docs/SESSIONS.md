@@ -3227,6 +3227,8 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 ### Round 7 log: 7D
 
+- PR 1 (wire): `CreateOptions`, `JoinOptions.profile`, `Player.profile` (schema version 4), `balance.json` `party`, the `onAuth` checks, `PROTOCOL.md`, `parties.test.ts` (auth half), ARCHITECTURE 5.3 and GDD 3.21 server lines, A108. `protocol-doc.ts` lists `PartyVisibility` and `CreateOptions`. Profile codes are exact-length upper-case join-alphabet strings; `newSeat` is untouched (the profile is set in `onJoin`).
+
 ### Round 7 log: 7E
 
 ### Round 7 log: 7F
