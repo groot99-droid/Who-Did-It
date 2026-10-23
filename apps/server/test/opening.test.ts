@@ -1,5 +1,5 @@
 import { type ColyseusTestServer, boot } from '@colyseus/testing';
-import { balance } from '@wdi/content';
+import { balance, cutscenes } from '@wdi/content';
 import { Phase, S2C, TICK_RATE } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
@@ -25,16 +25,19 @@ async function begin(map: string): Promise<{ room: PartyRoom; sent: Array<[unkno
 }
 
 describe('the opening cutscene (GDD 3.18)', () => {
-  it('is broadcast once at the start of grace, which openingS lengthens', async () => {
+  it("is broadcast once at the start of grace, which the opening's own length lengthens", async () => {
     const { room, sent } = await begin('hollowmere');
     expect(sent.filter(([t]) => t === S2C.cutscene)).toEqual([[S2C.cutscene, { id: 'openingHollowmere' }]]);
     expect(room.state.phase).toBe(Phase.grace);
     const ticks = room.state.phaseEndsTick - room.state.tick;
-    expect(ticks).toBe((balance.phases.graceS + balance.phases.openingS) * TICK_RATE);
+    expect(ticks).toBe((balance.phases.graceS + cutscenes.cutscenes.openingHollowmere!.maxS) * TICK_RATE);
   });
 
-  it('names the map it starts on', async () => {
-    const { sent } = await begin('blackpine');
+  it("names the map it starts on, and grace runs that map's opening length", async () => {
+    const { room, sent } = await begin('blackpine');
     expect(sent.filter(([t]) => t === S2C.cutscene)).toEqual([[S2C.cutscene, { id: 'openingBlackpine' }]]);
+    const ticks = room.state.phaseEndsTick - room.state.tick;
+    expect(ticks).toBe((balance.phases.graceS + cutscenes.cutscenes.openingBlackpine!.maxS) * TICK_RATE);
+    expect(cutscenes.cutscenes.openingBlackpine!.maxS).not.toBe(cutscenes.cutscenes.openingHollowmere!.maxS);
   });
 });

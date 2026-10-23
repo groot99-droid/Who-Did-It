@@ -425,3 +425,134 @@
     background: none;
   }
 }
+
+/* ---------------------------------------------------------------- the M5b layer: prompt, pockets, crafting, quests, mini-games */
+
+/* `.wdi-m5b` itself keeps its transparent background (the hotfix of #80): nothing below paints the layer, only
+   its children. The layer sits over the world, so its surfaces use the night scrim (see the note at the top). */
+.wdi-m5b .wdi-m5b__prompt,
+.wdi-m5b .wdi-m5b__toast {
+  font-family: var(--wdi-font-pixel-text);
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-match-glass);
+  border: 1px solid rgb(var(--wdi-lilac-rgb) / 0.45);
+  border-radius: var(--wdi-radius-xs);
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.15),
+    var(--wdi-shadow-1);
+  backdrop-filter: blur(6px);
+}
+
+.wdi-m5b .wdi-m5b__prompt:focus-visible {
+  outline: var(--wdi-stroke-w) solid var(--wdi-night-accent);
+  outline-offset: var(--wdi-stroke-w);
+}
+
+.wdi-m5b .wdi-m5b__bar {
+  height: var(--wdi-space-2);
+  background-color: var(--wdi-night);
+  border: 1px solid rgb(var(--wdi-lilac-rgb) / 0.45);
+  border-radius: 0;
+}
+
+.wdi-m5b .wdi-m5b__bar > i {
+  background-color: var(--wdi-night-accent);
+}
+
+/* The panels: Pockets, Crafting and Quests (`.wdi-root.wdi-m5b__panel`) and the mini-game's (`.wdi-m5b__modal`). */
+:is(.wdi-root.wdi-m5b__panel, .wdi-m5b__modal .wdi-m5b__panel) {
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-match-glass);
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.45);
+  border-radius: var(--wdi-radius-xs);
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.15),
+    var(--wdi-shadow-3);
+  backdrop-filter: blur(8px);
+}
+
+.wdi-m5b__modal {
+  background-color: var(--wdi-veil);
+}
+
+:is(.wdi-root.wdi-m5b__panel, .wdi-m5b__modal .wdi-m5b__panel) .wdi-m5b__head h2 {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-md);
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--wdi-night-label);
+}
+
+:is(.wdi-root.wdi-m5b__panel, .wdi-m5b__modal .wdi-m5b__panel) .wdi-m5b__row {
+  background-color: rgb(var(--wdi-snow-rgb) / 0.06);
+  border: 1px solid rgb(var(--wdi-lilac-rgb) / 0.25);
+  border-radius: var(--wdi-radius-xs);
+}
+
+/* Names are short static labels: Pixelify Sans. Hints and quantities carry counts ("2 wood", "x3", "3 of 8
+   slots") and Pixelify's 2, 5 and 8 blur at 12 to 16 px, so they stay Inter, as does a quest's own line. */
+:is(.wdi-root.wdi-m5b__panel, .wdi-m5b__modal .wdi-m5b__panel) .wdi-m5b__name {
+  font-family: var(--wdi-font-pixel-text);
+}
+
+:is(.wdi-root.wdi-m5b__panel, .wdi-m5b__modal .wdi-m5b__panel) .wdi-hint,
+:is(.wdi-root.wdi-m5b__panel, .wdi-m5b__modal .wdi-m5b__panel) :is(.wdi-m5b__lack, .wdi-m5b__empty) {
+  color: var(--wdi-night-text-muted);
+}
+
+:is(.wdi-root.wdi-m5b__panel, .wdi-m5b__modal .wdi-m5b__panel) :is(.wdi-m5b__ok, .wdi-m5b__done) {
+  color: var(--wdi-interact);
+}
+
+/* Buttons inside the layer: glass labels in the pixel face; the primary is night on lantern. */
+.wdi-m5b :is(.wdi-m5b__key, .wdi-m5b__panel .wdi-btn, .wdi-m5b__modal .wdi-btn),
+.wdi-m5b__modal .wdi-btn {
+  --_bg: var(--wdi-match-glass);
+  --_fg: var(--wdi-night-label);
+  --_stroke: rgb(var(--wdi-lilac-rgb) / 0.45);
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: 0.04em;
+  background-image: none;
+  border-radius: var(--wdi-radius-xs);
+  box-shadow: inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.2);
+}
+
+.wdi-m5b :is(.wdi-m5b__panel, .wdi-m5b__modal) .wdi-btn--primary,
+.wdi-m5b__modal .wdi-btn--primary {
+  --_bg: var(--wdi-night-accent);
+  --_fg: var(--wdi-on-night-accent);
+  --_stroke: var(--wdi-night);
+  box-shadow: inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.45);
+}
+
+.wdi-m5b :is(.wdi-m5b__panel, .wdi-m5b__modal) .wdi-btn--ghost,
+.wdi-m5b__modal .wdi-btn--ghost {
+  --_bg: transparent;
+  --_fg: var(--wdi-night-text);
+  box-shadow: none;
+}
+
+.wdi-m5b .wdi-m5b__key kbd {
+  font-family: var(--wdi-font-pixel-display);
+  font-synthesis: none;
+  color: var(--wdi-night-label);
+}
+
+.wdi-m5b__panel .wdi-btn:focus-visible,
+.wdi-m5b .wdi-m5b__key:focus-visible {
+  outline: var(--wdi-stroke-w) solid var(--wdi-night-accent);
+  outline-offset: var(--wdi-stroke-w);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-m5b .wdi-m5b__prompt,
+  .wdi-m5b .wdi-m5b__toast,
+  :is(.wdi-root.wdi-m5b__panel, .wdi-m5b__modal .wdi-m5b__panel) {
+    backdrop-filter: none;
+  }
+}

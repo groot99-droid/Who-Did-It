@@ -3097,6 +3097,10 @@ Read your brief, then the docs/round7/ documents it names. Branch claude/r7-<slu
 - **The openings run their track's length** and visit other scenes (`map-intros.md`): the music class
   `opening`, `loop: false`, the grace lengthened by the chosen map's opening.
 - **The Step order** gains `runTrain` after `runEvents` (7I); the bus gains the `vendetta.*`, `train.*` kinds.
+- **The quick mode leaves the game and Crumb's Ovens gains four rooms** (`quick-mode-removal.md`, A115, A116,
+  13:05Z): 7J deletes One Night Ultimate Baguette in three deletion PRs (`Settings.mode` leaves the wire on
+  schema version 5; the mini-games and the bakery stay); 7K builds the four station rooms. Nobody else edits a
+  quick-mode file, restyles its screens, or touches the mode chip and toggle: 7J removes them.
 - **Round 6 is still landing**: 6P's #73 (tests, the integration log, A97) and 6N's A102 (the intro trim, the
   landing loop). A round-7 session never edits `apps/server/test/*.test.ts` files that exist today (new files
   only), the round-6 log or A97.
@@ -3110,7 +3114,8 @@ renumbering or reflow, and the orchestrator keeps both sides of any conflict. Co
 lines adds a UI.md 14 subsection of its own (7C 14.25, 7E 14.26, 7F 14.27, 7G 14.28, 7H 14.29, 7I 14.30) and a
 copy module under `ui/copy/`. Decisions a session has to make go to `docs/DECISIONS.md` under its reserved row
 (7A A101, 6N A102, 7B A106, 7C A107, 7D A108, 7E A109, 7F A110, 7G A111, 7H A112, 7I A113; integration A114). A
-second row takes the number plus 14 (A115 to A128, appended after A114); nobody edits an older row.
+second row takes the number plus 18 (A119 to A132, appended after A118); nobody edits an older row. A115 and
+A116 are the owner's decisions of 13:05Z (the quick mode's removal, the bakery rooms), A117 is 7J's, A118 7K's.
 
 | Session | Model | Track | Branch | Owns |
 |---|---|---|---|---|
@@ -3121,14 +3126,18 @@ second row takes the number plus 14 (A115 to A128, appended after A114); nobody 
 | **7D. Parties server** | Sonnet 5.5 | Code | `claude/r7-parties-server` | the wire rows of `parties.md` 2, `rooms/PartyRoom.ts` create and metadata lines, the `/parties` route in `server.ts`, `services/matchmakeGuard.ts` (the route's bucket), `balance.json` `party` and its schema, `test/parties.test.ts`, `tools/bots/swarm.ts` visibility, ARCHITECTURE 5.3, `PROTOCOL.md`, GDD 3.21 server lines, A108 |
 | **7E. Lobby** | Sonnet 5.5 | Code | `claude/r7-lobby` | `ui/Lobby.ts`, `ui/lobby/**`, `ui/artStyle/**`, `ui/main/{deckList,deckChip,deckView}.ts`, `scenes/Lobby.ts`, `ui/lobby.css`, the lobby keys of `ui/copy/lobby.ts`, `Lobby.test.ts`, `MapPicker.test.ts`, `DeckEditor.test.ts`, the lobby half of `e2e/party.spec.ts`, UI.md 14.26, A109 |
 | **7F. Match screens** | Sonnet 5.5 | Code | `claude/r7-match-ui` | `ui/RoleCard.ts`, `view/Hud.ts`, `view/hud.css`, `view/NotebookPanel.ts`, `ui/SettingsPanel.ts`, `view/{LoadingScreen,Transition}.ts`, the captions and Skip DOM of `CutscenePlayer.ts`, the Skip of `scenes/Intro.ts`, `ui/M5bLayer.ts`, `ui/{Inventory,Crafting,QuestLog}.ts`, `view/minigames/**`, `ui/match.css`, their tests, `e2e/m5b.spec.ts`, UI.md 14.27, A110 |
-| **7G. Table and quick-mode screens, admin page** | Sonnet 5.5 | Code | `claude/r7-table-ui` | `ui/Meeting.ts`, `ui/GameOver.ts`, `ui/SeatPicker.ts`, `ui/main/{cards,overMain,shotToast,lookPortraits}.ts`, `ui/portrait.ts`, `ui/onub/**`, `view/onub/**`, the DOM of `scenes/{Kitchen,Night,Meeting,GameOver}.ts`, `client/admin/**`, `ui/table.css`, `ui/onub/onub.css`, their tests, `e2e/{meeting,onub,night,kitchen,admin}.spec.ts`, UI.md 14.28, A111 |
+| **7G. Table screens, admin page** (the quick-mode screens left its scope on 2026-10-23, A115) | Sonnet 5.5 | Code | `claude/r7-table-ui` | `ui/Meeting.ts`, `ui/GameOver.ts`, `ui/SeatPicker.ts`, `ui/main/{cards,overMain,shotToast,lookPortraits}.ts`, `ui/portrait.ts`, the DOM of `scenes/{Meeting,GameOver}.ts`, `client/admin/**` (after 7J's PR 1), `ui/table.css`, their tests, `e2e/{meeting,onub,night,kitchen,admin}.spec.ts`, UI.md 14.28, A111 |
 | **7H. Vendettas** | Opus 5.5 | Code | `claude/r7-vendettas` | `sim/vendettas/**`, `vendettas.json` and its schema, `balance.json` `vendettas`, `Private.vendetta` (after 7D), the strongbox rows of `scenes/manor_hall.json`, the `contract` acceptance line of `sim/Quests.ts`, `ui/copy/vendettas.ts`, `test/vendettas.test.ts`, the vendetta invariants, GDD 3.20 vendetta paragraphs, UI.md 14.29, A112 |
 | **7I. The Train, the memorial, the Ascended Vicar** | Opus 5.5 | Code | `claude/r7-train` | `sim/{Train,Memorial}.ts`, the `runTrain` line, `scenes/station.json` (or the overworld spot), `maps/hollowmere.json`, `FlowState.ascendedVicarCandidate`, the memorial row of `cutscenes.json` and its caption block, `balance.json` `train`, `test/{train,memorial}.test.ts`, GDD 3.3 Train line and 3.20 memorial paragraph, WORLD 4.3, UI.md 14.30, A113 |
+| **7J. The quick mode's removal** | Opus 5.5 | Code | `claude/r7-remove-quick` | every file `quick-mode-removal.md` 2 lists, in its three PRs; `Settings.mode` and `OnubState` in the schema (version 5), the `onub.*` protocol rows, the mini-games' move to `view/minigames/` and their numbers to `balance.json` `minigames`, GDD 3.11's record and 3.16's reference, ARCHITECTURE 5.14, ASSETS 6.7, UI.md 14.12, CLAUDE.md's three mentions, `docs/guides/QUICK_MODE.md`, the CREDITS, MANIFEST and LICENSES rows, `soak.yml`, the `bots:*:onub` scripts, A117 |
+| **7K. Crumb's Ovens' rooms** | Opus 5.5 | Content and art | `claude/r7-ovens` | four new scene JSONs and nav under `packages/content/data/scenes/`, their rows in `maps/hollowmere.json` and `SCENE_IDS` (append), their tilemaps and renders for both art styles under `apps/client/public/assets/`, the task nodes, WORLD 4.3 rows, GDD 3.13's count, CREDITS and MANIFEST rows, `e2e/ovens.spec.ts`, A118 |
 | **7P. Integration** | Sonnet 5.5 | Code | `claude/r7-integration` | merges, lockfile, `PROTOCOL.md` regen, the dead landing keys of `ui/copy/lobby.ts`, the opt-in e2e suites, both screenshot sets (UI.md 12), `pnpm auto -- --matches 50` per map, both 30-minute soaks, this round's integration log, A114 |
 
 Merge order: 6Z first (this contract); then 7A, 7B, 7D, 7H (conversion and sabotage), 7I in parallel; 7C, 7E, 7F
 and 7G after 7B's theme PR, and 7C's party list PR after 7D; 7H's heist and contract PRs after 7I's Train; 7I's
-memorial PR after 7A's `video` step; 7P last. 6P's #73 and 6N's A102 merge whenever they are green.
+memorial PR after 7A's `video` step; 7J's PR 1 after 7E's glass PR, its PR 3 after 7A's #101; 7K's PRs as they are
+green (7K's PR 1 and 7J's PR 2 both append to `SCENE_IDS` and edit `validate.ts`: the second merges the base);
+7P last. 6P's #73 and 6N's A102 merge whenever they are green.
 
 ### Briefs
 
@@ -3210,6 +3219,26 @@ GDD 3.3's line, WORLD 4.3; (2) the memorial and the Ascended Vicar field after 7
 `test/train.test.ts`, `test/memorial.test.ts`, content validation of the new scene. **Not**: BlackPine, the
 evolutions (round 8), the player.
 
+**7J. The quick mode's removal.** `quick-mode-removal.md` 1 to 3 and 5. **Owns** its row. **Reads**
+`quick-mode-removal.md`, GDD 3.11, 3.13, 3.16, ARCHITECTURE 5.14, A115, `CLAUDE.md`, `sim/Minigames.ts`,
+`view/minigames/board.ts`, the schema and protocol files, `tools/bots/*.ts`, `.github/workflows/soak.yml`.
+**PRs** (deletion-only, exempt from the 400-line rule, A115): (1) client; (2) server, shared, content, tools,
+schema version 5, `PROTOCOL.md`; (3) assets and documents, the music classes after #101. Each body lists what it
+deletes by area, what it keeps and why, and the test counts before and after. **Tests**: `pnpm lint &&
+pnpm typecheck && pnpm test` green at every PR, `pnpm auto -- --matches 10` on HollowMere after PR 2, the
+party, smoke, meeting and looks e2e after PR 1. **Not**: any scene id, `bakery.json`, the mini-games' behaviour
+or numbers, `ui/theme/**`, `sim/vendettas/**`, `sim/Train.ts`, any existing `apps/server/test/*.test.ts` but
+the `onub*` files it deletes, the Port-au-Levain track (it stays in no playlist, A101).
+
+**7K. Crumb's Ovens' rooms.** `quick-mode-removal.md` 4. **Owns** its row. **Reads** `quick-mode-removal.md` 4,
+GDD 3.13 and 3.16, WORLD 4.3 and the `bakery` row, `docs/SPRITES.md`, `packages/content/data/scenes/bakery.json`
+and one other small interior as the model, `maps/hollowmere.json`, the content validation, `tools/grid`,
+`tools/blender`, A116, the four pictures under `assets/source/concepts/onub/`. **PRs**: (1) scenes, nav, portals,
+map, `SCENE_IDS`, validation, WORLD 4.3, GDD 3.13; (2) tilemaps and renders for both art styles, CREDITS,
+MANIFEST; (3) task nodes and `e2e/ovens.spec.ts`. **Tests**: content validation, `pnpm auto -- --matches 10` on
+HollowMere with the rooms reachable, the e2e walk. **Not**: the ten kitchen pictures (round 8), any change to
+`bakery`'s own layout beyond its new doors, any rule or number.
+
 **7P. Integration.** As 6P's brief, for this round: merges in the order above, lockfile, `PROTOCOL.md`, the dead
 landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm auto`, the log and A114.
 
@@ -3218,6 +3247,8 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 - 2026-10-23: #81 (A100, the Killer's timer) merged at 11168d1; the contract written from the owner's requests
   of 05:00Z to 07:10Z; 7A spawned first (its brief needed no other session), 6N given A102; the rest spawned as
   this contract lands.
+- 2026-10-23, 13:05Z: the owner, back, asked for the quick mode's removal and for rooms from their bakery
+  pictures (A115, A116); `quick-mode-removal.md` written, 7G's quick-mode re-skin stopped, 7J and 7K spawned.
 
 ### Round 7 log: 7A
 
@@ -3256,6 +3287,7 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 - 2026-10-23: PR 1 (role card, HUD and its log, notebook sheet, settings panel): `ui/match.css`, `view/hud.css`, UI.md 14.27, A110. Rules are scoped under an ancestor class, so they do not wait for 7B's glass classes; `theme.test.ts` and the 565 client unit tests pass. Surfaces over the world and cutscenes use `--wdi-match-glass` (night at 85%) because the shared glass fill gives lilac 3.32 over an unveiled white pixel (UI.md 14.27).
 - PR 2 (loading, transitions, cutscene captions and Skip, the intro's Skip): `ui/match.css`, plus 7B's glass classes (d22c8ad): the cutscene Skip, the intro's Skip and Begin become `.wdi-glass-btn--sm` (ids and `data-testid`s kept; one class string each in `CutscenePlayer.ts` and `Intro.ts`, no staging touched) and the notebook takes `.wdi-glass`, replacing PR 1's stand-in rims. Surfaces with lilac text over the world keep `--wdi-match-glass` (UI.md 14.27).
+- PR 3 (the M5b layer, Inventory, Crafting and QuestLog panels, the mini-game modal): `ui/match.css` only; `.wdi-m5b` keeps `background: transparent` (the #80 hotfix), every id and `data-testid` kept. The panels carry lilac text over the world, so they use `--wdi-match-glass`, not 7B's 66% glass (UI.md 14.27); numbers (hints, quantities, quest lines) stay Inter.
 
 ### Round 7 log: 7G
 
@@ -3264,9 +3296,17 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 - 2026-10-23: PR 1 (the four rows, the widened schema and its checks, `balance.json` `vendettas`, the `vendetta`
   stream, the draw through the `sim/Deck.ts` line, GDD 3.20, A112); the holding in room memory behind
   `privateVendetta` until 7D's schema version 4 lands. Hooks asked of 6Z in the PR description.
+- 2026-10-23: PR 2 (conversion: `sim/vendettas/{progress,conversion,run,goal}.ts`; the Step
+  line `runVendettas` after 7I's `runTrain` (Step order: `runEvents`, `runTrain`, `runVendettas`); the three `sim/Meeting.ts` lines
+  for the doubted Vicar's abstention; `NoteKind.doubt`; `Private.vendetta` on schema version 4; the NPC hook
+  `vendettaGoalFor`; UI.md 14.29). Sabotage follows as PR 2b to keep each under 400 lines.
 
 ### Round 7 log: 7I
 
 - 2026-10-23: PR 1, the Daily Train: the platform spot on HollowMere's overworld (A113), `sim/Train.ts` and its `runTrain` line, `balance.json` `train`, GDD 3.3, WORLD 4.3, UI.md 14.30, `test/train.test.ts`.
+
+### Round 7 log: 7J
+
+### Round 7 log: 7K
 
 ## Integration log, round 7
