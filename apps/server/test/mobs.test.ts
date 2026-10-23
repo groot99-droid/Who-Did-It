@@ -248,8 +248,14 @@ describe('creatures in a match', () => {
         if (b) {
           const tx = Math.floor(b.x / TILE_PX);
           const ty = Math.floor(b.y / TILE_PX);
-          const near = floorNear(party.room, 'cave_entry', tx, ty, 1, 2);
-          placeSeat(party, id, 'cave_entry', near.x, near.y);
+          // A bat flies where no seat stands (a crevice, over the water): with no floor near it this second, the
+          // seat stays where it is and the bat comes back to it (CI saw `no floor near cave_entry 15,8`).
+          try {
+            const near = floorNear(party.room, 'cave_entry', tx, ty, 1, 2);
+            placeSeat(party, id, 'cave_entry', near.x, near.y);
+          } catch {
+            /* no floor near the bat */
+          }
         }
       }
       advance(party, 1);
