@@ -15,7 +15,8 @@
 // as a day frame and a night frame (a simulated darkness layer with the lantern pools), each at zoom 1
 // and a zoom-2 crop. Its two runs differ only in the assets folder they read (the same raw renders finished
 // on and off) and the texture filter. Missing frames draw the greybox of SPRITES 10.13. An assets folder of
-// the HD style holds `texels` render px per display px (hd.ts): its frames draw at 1 / texels of the scale.
+// the HD style holds `texels` render px per display px (hd.ts): its ground draws at 1 / texels of the scale
+// and its unhalved frames at 1 / (2 texels) of it.
 //
 // `proposal` is the look proposal of docs/round8/art.md 5: one cell per assets folder (a style, flat or
 // textured), each the square's room with three figures at zoom 2 and the same view at zoom 1, in the order
@@ -23,7 +24,7 @@
 // subject: `figure-<label>.png` (the look idling in three directions at zoom 3), `room-<label>.png` (the
 // square's room at zoom 2) and `building-<label>.png` (the BlackPine lodge whole at zoom 1 and its middle at
 // zoom 2), so each file stays small and the looks compare file by file.
-import { readFileSync, existsSync, writeFileSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createCanvas, loadImage, type Canvas, type Image, type SKRSContext2D } from '@napi-rs/canvas';
@@ -208,8 +209,10 @@ interface Atlases {
   bld: Map<string, Sprite>;
   look: Map<string, Sprite>;
   lookId: string;
-  /** Render px per display px of this folder's frames (1 for the 8-bit and low-poly sets). */
+  /** Render px per display px of this folder's ground cells (1 for the 8-bit and low-poly sets). */
   texels: number;
+  /** The scale a world sprite draws at for one display px: ART_SCALE for the halved 8-bit and low-poly frames. */
+  artScale: number;
 }
 
 async function loadAtlases(
@@ -232,6 +235,9 @@ async function loadAtlases(
     look: await readAtlas(join(assets, 'chars', `char_${lookId}.json`)),
     lookId,
     texels,
+    // The 8-bit and low-poly frames are packed at half the display scale and drawn at ART_SCALE (SPRITES 10.9);
+    // an HD frame ships unhalved, so against them it holds twice its factor, and its ground cells the factor.
+    artScale: texels > 1 ? ART_SCALE / (texels * 2) : ART_SCALE,
   };
 }
 
@@ -313,7 +319,7 @@ function vignette(
   g.fillStyle = INK;
   g.fillRect(0, 0, canvas.width, canvas.height);
   drawGround(g, a, v.ground, ox, oy);
-  const artScale = ART_SCALE / a.texels;
+  const artScale = a.artScale;
 
   const placed: Placed[] = [];
   const at = (tx: number, ty: number) => {
@@ -488,7 +494,7 @@ export async function proposalSheet(columns: ProposalColumn[]): Promise<Buffer> 
 /** One column of the look sheet: the three subjects as separate PNGs, named by the column's label. */
 export async function lookSheets(c: ProposalColumn): Promise<Record<string, Buffer>> {
   const a = await loadAtlases(c.assets, 'harbour', 'hollowmere', 'baker', c.texels);
-  const artScale = ART_SCALE / a.texels;
+  const artScale = a.artScale;
   const out: Record<string, Buffer> = {};
   const labelled = (w: number, h: number, text: string) => {
     const canvas = createCanvas(w, h);
@@ -732,6 +738,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     out = assets;
     png = await proposalSheet(more.map(parseColumn));
   } else if (mode === 'look' && assets && more.length > 0) {
+    mkdirSync(assets, { recursive: true });
     for (const c of more.map(parseColumn)) {
       for (const [subject, buf] of Object.entries(await lookSheets(c))) {
         const file = join(assets, `${subject}-${c.label}.png`);
