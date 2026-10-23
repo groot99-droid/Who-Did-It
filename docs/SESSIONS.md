@@ -3491,6 +3491,11 @@ an existing `apps/server/test/*.test.ts`, anything written into ROSW.
   while the registry is still evaluating (TDZ at boot). 7H's checks hang off `Step.ts` → `vendettas/run.ts`, outside that
   closure; asked 6Z for the same one line in `Step.ts`. A seam for `seams.md`: a new invariant module needs a host outside
   the registry's closure.
+- 2026-10-23: PR 2a-bis (the `taskBar` invariant, A133 (10)): `sim/tasks/invariants.ts`, registered through 6Z's
+  side-effect import in `Step.ts` (directly above `./vendettas/run`, so 7H's four stay the last registered and their `vendettas.test.ts` pin holds), pinned in `test/invariants.test.ts` (one line, granted) and
+  appended to `ROUND7_CHECKS` in `tools/auto/checks/index.ts`; `tools/auto/test/report.test.ts` reads the constants and
+  needed no line. Tests in `taskPickup.test.ts`: a bar the lists do not explain, an NPC seat with a list and a logged
+  `taskDone` nobody finished each fail it; a fake and a real completion by the Done control leave it quiet.
 - Read from ROSW (never written): the UDGT teardown chapters 00 to 03 on `claude/sweet-maxwell-lmsiw3`, and the Who Did It lore
   on `claude/sharp-mccarthy-pqi3ws` (the Canon Ledger, the Lamplighter's Round, the Gazette, the Tab Book, Fourteen Things, the
   Daybook of Crumb's Ovens, Hopscotch, three stories). Drifts noted for 6Z, not resolved here: the lore dates HollowMere to 1893
