@@ -35,7 +35,19 @@
     "wakeTable",
     "plate",
     "deadLoaf",
-    "ledger"
+    "ledger",
+    "pew",
+    "stainedGlass",
+    "stainedGlassE",
+    "candleStand",
+    "hymnBoard",
+    "memorial",
+    "lectern",
+    "pulpit",
+    "font",
+    "votiveRack",
+    "almsBox",
+    "flowerStand"
   ],
   "lightKinds": ["lanternPost"]
 }

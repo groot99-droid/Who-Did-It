@@ -107,6 +107,8 @@ SLICED_PROPS = {
         "prop_doughMixer": (2, 2, "dough_mixer"),
         "prop_brickOven": (2, 2, "brick_oven"),
         "prop_proofingCabinet": (3, 2, "proofing_cabinet"),
+        # Round 8 (8J, art.md 4.2): St Brannock's pews, four seats wide, facing the altar (north).
+        "prop_pew": (4, 1, "pew"),
     },
     "blackpine": {
         "prop_trestle": (3, 2, "trestle"),
@@ -459,7 +461,24 @@ def forge(w, h):
             part("Bellows", T("litter", 1), B(0.3, -h / 2, 0.7, 0.5, 0.4, 0.3))]
 
 
-SLICED_BUILDERS = {"wake_table": wake_table, "cold_shelves": cold_shelves, "dough_mixer": dough_mixer,
+def pew(w, h):
+    """An oak box pew facing north: the seat, a high back on its south side with the hymn shelf for the row
+    behind, carved bench ends, a kneeler, and what the last service left on it."""
+    y_seat, y_back = -h * 0.5, -h + 0.12
+    ends = [B(x, -h / 2, 0.5, 0.08, h - 0.15, 1.0) for x in (0.06, w - 0.06)]
+    return [part("Ends", T("wood", 2), *ends, bevel=0.02),
+            part("Poppies", T("wood", 3), *[C(x, -h / 2, 1.0, 0.06, 0.1, 6, rt=0.02) for x in (0.06, w - 0.06)]),
+            part("Seat", T("wood", 3), B(w / 2, y_seat, 0.45, w - 0.16, 0.42, 0.06)),
+            part("Back", T("wood", 2), B(w / 2, y_back, 0.72, w - 0.16, 0.06, 0.55), bevel=0.01),
+            part("Rail", T("wood", 4), B(w / 2, y_back, 1.0, w - 0.12, 0.09, 0.04)),
+            part("Shelf", T("wood", 3), B(w / 2, y_back - 0.08, 0.82, w - 0.2, 0.12, 0.03)),
+            part("Hymnals", T("blood", 0), *[B(0.5 + 0.7 * k, y_back - 0.08, 0.88, 0.14, 0.09, 0.1) for k in range(5)]),
+            part("Kneeler", T("blood", 1), B(w / 2, -0.15, 0.08, w - 0.3, 0.16, 0.1), bevel=0.02),
+            part("Book", T("ink", 1), B(w * 0.3, y_seat + 0.05, 0.5, 0.16, 0.12, 0.04)),
+            part("Hat", T("ink", 1), C(w * 0.72, y_seat, 0.48, 0.12, 0.02, 10), C(w * 0.72, y_seat, 0.5, 0.07, 0.08, 10))]
+
+
+SLICED_BUILDERS = {"wake_table": wake_table, "pew": pew, "cold_shelves": cold_shelves, "dough_mixer": dough_mixer,
                    "brick_oven": brick_oven, "proofing_cabinet": proofing_cabinet, "hanging_oak": hanging_oak, "clamp": clamp, "pump_beam": pump_beam,
                    "trestle": trestle, "mess_table": mess_table, "bunks": bunks, "head_saw": head_saw, "kiln": kiln,
                    "map_table": map_table, "forge": forge}

@@ -9,7 +9,7 @@
   "dark": false,
   "size": { "w": 18, "h": 12 },
   "silent": true,
-  "notes": "Silent zone: no footstep noise. The bell rope with a torn glove in it is decoration.",
+  "notes": "Silent zone: no footstep noise. St Brannock's faces north: the altar under the great window, candle stands either side, the lectern and pulpit at the chancel step, three rows of box pews down the nave with the aisle on x 9. The bell rope with a torn glove in it hangs in the tower corner by the door; the font, poor box and votive rack stand by the door. Tile 9,2, at the head of the aisle in front of the candle stands, is kept for 8D's altar (ch.altar_main).",
   "worldRef": "4.3",
   "portals": [
     {
@@ -67,46 +67,123 @@
       "childOnly": false
     }
   ],
-  "props": [{ "id": "ch.rope", "kind": "decor", "x": 9, "y": 0 }],
+  "props": [
+    { "id": "ch.rope", "kind": "decor", "x": 15, "y": 0 },
+    { "id": "ch.window_w", "kind": "stainedGlass", "x": 3, "y": 0 },
+    { "id": "ch.hymn_board", "kind": "hymnBoard", "x": 6, "y": 0 },
+    { "id": "ch.window_east", "kind": "stainedGlass", "x": 9, "y": 0 },
+    { "id": "ch.memorial", "kind": "memorial", "x": 12, "y": 0 },
+    { "id": "ch.window_nave_n", "kind": "stainedGlassE", "x": 0, "y": 4 },
+    { "id": "ch.window_nave_s", "kind": "stainedGlassE", "x": 0, "y": 8 },
+    { "id": "ch.lilies_w", "kind": "flowerStand", "x": 4, "y": 1 },
+    { "id": "ch.lectern", "kind": "lectern", "x": 5, "y": 1 },
+    { "id": "ch.candles_w", "kind": "candleStand", "x": 8, "y": 1 },
+    { "id": "ch.candles_e", "kind": "candleStand", "x": 10, "y": 1 },
+    { "id": "ch.pulpit", "kind": "pulpit", "x": 13, "y": 1 },
+    { "id": "ch.lilies_e", "kind": "flowerStand", "x": 14, "y": 1 },
+    {
+      "id": "ch.pew_0w",
+      "kind": "pew",
+      "x": 5,
+      "y": 3,
+      "footprint": { "x": 5, "y": 3, "w": 4, "h": 1 }
+    },
+    {
+      "id": "ch.pew_0e",
+      "kind": "pew",
+      "x": 10,
+      "y": 3,
+      "footprint": { "x": 10, "y": 3, "w": 4, "h": 1 }
+    },
+    {
+      "id": "ch.pew_1w",
+      "kind": "pew",
+      "x": 5,
+      "y": 5,
+      "footprint": { "x": 5, "y": 5, "w": 4, "h": 1 }
+    },
+    {
+      "id": "ch.pew_1e",
+      "kind": "pew",
+      "x": 10,
+      "y": 5,
+      "footprint": { "x": 10, "y": 5, "w": 4, "h": 1 }
+    },
+    {
+      "id": "ch.pew_2w",
+      "kind": "pew",
+      "x": 5,
+      "y": 7,
+      "footprint": { "x": 5, "y": 7, "w": 4, "h": 1 }
+    },
+    {
+      "id": "ch.pew_2e",
+      "kind": "pew",
+      "x": 10,
+      "y": 7,
+      "footprint": { "x": 10, "y": 7, "w": 4, "h": 1 }
+    },
+    { "id": "ch.votives", "kind": "votiveRack", "x": 15, "y": 3 },
+    { "id": "ch.alms_box", "kind": "almsBox", "x": 16, "y": 8 },
+    { "id": "ch.font", "kind": "font", "x": 15, "y": 9 }
+  ],
   "gates": [],
   "paths": [],
   "lights": [
-    { "id": "ch.lt_candles", "kind": "lamp", "x": 9, "y": 1, "radiusTiles": 2.5 },
+    { "id": "ch.lt_candles", "kind": "lamp", "x": 8, "y": 1, "radiusTiles": 2.5 },
+    { "id": "ch.lt_candles_e", "kind": "lamp", "x": 10, "y": 1, "radiusTiles": 2.5 },
+    { "id": "ch.lt_votives", "kind": "lamp", "x": 15, "y": 3, "radiusTiles": 1.5 },
+    {
+      "id": "ch.lt_window_east",
+      "kind": "window",
+      "x": 9,
+      "y": 0,
+      "radiusTiles": 3,
+      "phases": ["day", "dusk"]
+    },
     {
       "id": "ch.lt_moon_window",
       "kind": "moon",
-      "x": 4,
-      "y": 6,
+      "x": 9,
+      "y": 0,
+      "radiusTiles": 2.5,
+      "phases": ["night"]
+    },
+    {
+      "id": "ch.lt_moon_nave",
+      "kind": "moon",
+      "x": 0,
+      "y": 8,
       "radiusTiles": 2,
       "phases": ["night"]
     }
   ],
   "grid": [
     "##################",
-    "#...............B#",
+    "#...##..#.#..##.B#",
     "#H...............#",
-    "#....####.####...#",
+    "#....####.####.#.#",
     "#................#",
     "#....####.####...#",
     "#...............SD",
     "#....####.####...#",
-    "#................#",
-    "#................#",
+    "#...............##",
+    "#..............#.#",
     "#.S..............#",
     "##D###############"
   ],
   "material": [
-    "WWWWWWWWWPWWWWWWWW",
+    "WWWPWWPWWPWWPWWPWW",
+    "WwwwPPwwPwPwwPPwwW",
+    "WwwwwwwwwwwwwwwwwW",
+    "WffffPPPPfPPPPfPfW",
+    "PffffffffffffffffW",
+    "WffffPPPPfPPPPfffW",
     "WffffffffffffffffW",
-    "WffffffffffffffffW",
-    "WffffKKKKfKKKKfffW",
-    "WffffffffffffffffW",
-    "WffffKKKKfKKKKfffW",
-    "WffffffffffffffffW",
-    "WffffKKKKfKKKKfffW",
-    "WffffffffffffffffW",
-    "WffffffffffffffffW",
-    "WffffffffffffffffW",
+    "WffffPPPPfPPPPfffW",
+    "PfffffffffffffffPW",
+    "WdddfffffffffffPfW",
+    "WdddfffffffffffffW",
     "WWWWWWWWWWWWWWWWWW"
   ]
 }

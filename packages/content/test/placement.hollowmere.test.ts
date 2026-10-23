@@ -51,6 +51,20 @@ const RULES: PlacementRules = {
     hanging_oak: 'free',
     clamp: 'free',
     pump_beam: 'free',
+    // Round 8 (8J): St Brannock's.
+    stainedGlass: 'hung',
+    stainedGlassE: 'hungEast',
+    hymnBoard: 'hung',
+    memorial: 'hung',
+    lectern: 'front',
+    pulpit: 'front',
+    altar: 'front',
+    pew: 'free',
+    candleStand: 'free',
+    votiveRack: 'free',
+    almsBox: 'free',
+    flowerStand: 'free',
+    font: 'free',
     wakeTable: 'surface',
     plate: 'overlay',
     crepe: 'doorOverlay',
@@ -93,13 +107,13 @@ const RULES: PlacementRules = {
     woodBox: 'free',
   },
   lights: {
-    lamp: { props: ['lamp', 'ledger', 'bench'] },
+    lamp: { props: ['lamp', 'ledger', 'bench', 'candleStand', 'votiveRack', 'altar'] },
     lantern: { props: ['lanternPost', 'drowned_lantern'] },
     fire: { props: ['oven', 'brickOven'] },
     torch: { props: [], wall: true },
-    window: { props: ['window'], wall: true, building: true },
+    window: { props: ['window', 'stainedGlass', 'stainedGlassE'], wall: true, building: true },
     // Moonlight falls anywhere out of doors; indoors it comes through a window.
-    moon: { props: ['window'], wall: true, building: true, outdoors: true },
+    moon: { props: ['window', 'stainedGlass', 'stainedGlassE'], wall: true, building: true, outdoors: true },
   },
 };
 
@@ -156,10 +170,6 @@ const PENDING: Partial<Record<SceneId, readonly string[]>> = {
   barn: [
     'prop ba.study_key stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)',
     'light ba.lt_lantern (lantern) at 10,6 hangs on nothing that could hold it',
-  ],
-  chapel: [
-    'light ch.lt_candles (lamp) at 9,1 hangs on nothing that could hold it',
-    'light ch.lt_moon_window (moon) at 4,6 hangs on nothing that could hold it',
   ],
   cellar: [
     'prop cl.study_key stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)',
@@ -245,7 +255,9 @@ describe('the placement check', () => {
   });
 
   it('refuses a lamp light with no lamp under it, and takes moonlight anywhere outside', () => {
-    expect(check(copy('chapel'))).toEqual(
+    const s = copy('chapel');
+    s.lights!.find((l) => l.id === 'ch.lt_candles')!.x = 9;
+    expect(check(s)).toEqual(
       expect.arrayContaining(['light ch.lt_candles (lamp) at 9,1 hangs on nothing that could hold it']),
     );
     expect(check(copy('forest')).some((p) => p.includes('fo.lt_moon_clearing'))).toBe(false);
