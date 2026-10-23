@@ -22,6 +22,7 @@ import type { TasksFile } from './schemas/tasks.js';
 import type { TraitsFile } from './schemas/traits.js';
 import { MAP_IDS, type MapFile, type MapId } from './schemas/maps.js';
 import { checkMaps, checkSceneWorld } from './validateWorld.js';
+import { checkVendettas } from './validateVendettas.js';
 
 export interface Content {
   palette: PaletteFile;
@@ -242,6 +243,8 @@ export function validateContent(c: Content): string[] {
 
   // Round 6 (GDD 3.14 to 3.16, 3.18): the M5b cross-references, the cutscene index and the music mapping.
   checkM5b(c, err);
+  // Round 7 (GDD 3.20): the vendettas' cards, maps and kinds.
+  checkVendettas(c, err);
 
   return errors;
 }
@@ -638,6 +641,15 @@ function checkRoutines(c: Content, err: (msg: string) => void): void {
       ].some(([a, b]) => floorAt(a as number, b as number));
       if (!stand) err(`scene ${scene.id}: station ${prop.id} has no floor tile next to it`);
     }
+  }
+
+  // Round 7 (GDD 3.21): the party numbers are positive; the profile code is not shorter than a join code.
+  const { party, lobby } = c.balance;
+  for (const [key, value] of Object.entries(party)) {
+    if (typeof value === 'number' && value <= 0) err(`balance.json party.${key}: must be positive`);
+  }
+  if (party.profileCodeLength < lobby.codeLength) {
+    err('balance.json party.profileCodeLength: must be at least lobby.codeLength');
   }
 
   // Rule 6: the npc spans and the routine weights of balance.json.

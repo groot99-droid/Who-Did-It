@@ -264,6 +264,32 @@ export interface JoinOptions {
   name: string;
   build: string;
   deviceId: string;
+  /** Round 7 (GDD 3.21): the device's profile code; absent for a device without a profile and for the bots. */
+  profile?: string;
+}
+```
+
+```ts
+export type PartyVisibility = 'open' | 'private';
+```
+
+```ts
+export interface PartyListing {
+  code: string;
+  leader: string;
+  players: number;
+  max: number;
+  mode: number;
+  map: string;
+  visibility: PartyVisibility;
+}
+```
+
+```ts
+export interface CreateOptions extends JoinOptions {
+  visibility: PartyVisibility;
+  /** Profile codes the leader invited, capped by balance.json `party.invitedMax`; ignored for an open party. */
+  invited?: string[];
 }
 ```
 

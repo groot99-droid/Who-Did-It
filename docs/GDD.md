@@ -675,7 +675,7 @@ Round 6 (ROADMAP M5c). Cutscenes are data (`packages/content/data/cutscenes/`) p
 
 **Death cutscenes (6J).** A seat that dies by the knife, poison, the Gamekeeper's shot, a vote or a wolf is told so in its private `killed`, which names the cutscene of that cause (`cutsceneId`); a vanishing has none. The client plays it before the ghost handoff: a sound, one whispered line, and the last frame held for four seconds at most, skippable like the opening. The id is the victim's own news, so it reveals nothing the `cause` beside it does not. A seat voted out hears it while the meeting has the World asleep, so its cutscene plays when the World is rebuilt after the meeting.
 
-**Music (6L).** Each map plays one playlist per class, chosen by the phase and mapped in `music.json`: `loading` from the map's load until the first `day`, `lobby` between matches, `day` (dawn included), `dusk`, `night`, `meeting` (the discussion, the vote, the reveal and the immunity beat), `finalNight` and `gameOver`; the quick mode plays `kitchen` (Evening Prep and the crime scenes), `night`, `rush` (dawn to the Final Bake) and `over`. A phase that stays in its class changes nothing, so a track is never restarted, and the role card and grace keep the `loading` piece playing so the opening's speech is heard whole. Playlists cross-fade; their tracks, gains and fade seconds are in `audio/music/manifest.json`. Music is fetched only after Start (the lobby warms the first track of the picked map's day theme, never more) and has its own budget (ASSETS 6.8), separate from effects. Every player has a music slider, an effects slider and a mute (UI 14.22), kept on their own device and never sent; a class with no playlist, or a playlist with no track, is silence. No role, cover or secret is a class: the server sends nothing, and the pick depends only on public phases.
+**Music (6L).** Each map plays one playlist per class, chosen by the phase and mapped in `music.json`: `loading` from the map's load to the opening (the lobby piece, so the load changes nothing), `opening` with the opening cutscene, `lobby` between matches, `day` (dawn included), `dusk`, `night`, `meeting` (the discussion, the vote, the reveal and the immunity beat), `finalNight` and `gameOver`; the quick mode plays `kitchen` (Evening Prep and the crime scenes), `night`, `rush` (dawn to the Final Bake) and `over`. A phase that stays in its class changes nothing, so a track is never restarted. **The opening piece (round 7, 7A, DECISIONS A101)** is the map's intro track of speech and music: it starts when the opening's `cutscene` message arrives, plays once and whole, never loops, and is silent at its end; the class the phase wants by then (the `day`, even while grace still runs) cross-fades in only when the piece ends or the seat skips the opening. A seat that skips also skips the rest of the piece. Port-au-Levain's piece waits for its map (round 8). Playlists cross-fade; their tracks, gains and fade seconds are in `audio/music/manifest.json`. Music is fetched only after Start (the lobby warms the first track of the picked map's day theme, never more) and has its own budget (ASSETS 6.8), separate from effects. Every player has a music slider, an effects slider and a mute (UI 14.22), kept on their own device and never sent; a class with no playlist, or a playlist with no track, is silence. No role, cover or secret is a class: the server sends nothing, and the pick depends only on public phases.
 
 ### 3.19 Admin auto-mode
 
@@ -694,6 +694,58 @@ heist, contract), each a trigger and a consequence around the kill, never a seco
 Daily Train is the clock they run on, and the Vicar's death by the Knife is marked by a memorial every seat sees.
 The contract is `docs/round7/vendettas.md`; 7H writes the vendetta paragraphs here and 7I the Train and memorial
 paragraphs, and the numbers live in `balance.json` (`vendettas`, `train`).
+
+**The draw (7H).** At the deal, every seat dealt a card that carries vendettas (the Killer; `vendettas.json`
+`role`) draws one, uniformly among the rows the match allows: the Zealot only when a seat is dealt the Vicar, the
+Bandit only when the manor hall is open at the party's size (Medium and Large, 3.13), the Bandit and the Hitman
+only on HollowMere, where the Train runs. A seat with no row allowed draws none. Each seat draws from a stream of
+its own (`vendetta`, keyed by seat), so the draw moves no other draw. The two Killers of a 10-seat deck draw
+apart and may draw the same row. The quick mode deals no vendetta. The vendetta stays with its seat: it ends
+when the seat dies or is ejected, and an Accomplice who inherits the Knife (3.2) inherits none.
+
+**On the card.** A Killer's role card shows its vendetta as a goal line; the Accomplice's card shows the goal of
+each Killer it knows and nothing else of them; no other seat's card changes. The vendetta lives only in the seat's
+private view (`Private.vendetta`); no look, no public field, no message to another seat and no bus event names
+it with its holder (3.17). What a vendetta does in the world is the only tell, as a body is the only tell of a
+kill.
+
+**Pressure, not a second kill.** A vendetta never kills, never changes whom the Knife may take, and never
+touches the strike roll or the kill-opportunity timer of an NPC Killer (3.12). Each has a goal, watched by the
+server, and one consequence that fires at most once per match; the bus carries its steps as `vendetta.<kind>.<step>`
+events that name no seat (`vendettas.json` `emits`, `fires`).
+
+- **Conversion: the Zealot against the Vicar (7H).** The Zealot's goal is the Vicar's flock: world-phase time in
+  the same scene as the seat dealt the Vicar, both alive and placed, counted across scenes and phases. At **45 s**
+  (`vendettas.conversion.shareS`) the doubt is sown (`vendetta.conversion.sown`). At the next meeting the
+  Vicar's vote counts for nothing in the tally (`vendetta.conversion.doubt`, the consequence); the Vicar still
+  votes and sees its vote, and the tally shows one vote fewer. If the Vicar dies or is ejected first, the
+  vendetta lapses (`vendetta.conversion.lapsed`).
+- **Sabotage: the Activist against the company (7H).** The Activist's goal is the company's stations: standing
+  still within verb reach of a target prop of a task (3.5) for **6 s** (`vendettas.sabotage.tamperS`) in a verb
+  phase tampers with it (`vendetta.sabotage.tampered`, once per target); at **2** targets
+  (`vendettas.sabotage.stations`) the works are wrecked (`vendetta.sabotage.wrecked`, the consequence): **1**
+  finished real task of the match (`vendettas.sabotage.undoTasks`), drawn from the Activist's stream, is undone,
+  the task bar falls with it, and the Activist's Knife is ready at once. With no finished real task the bar has
+  nothing to lose and only the Knife is readied.
+- **Heist: the Bandit against the strongbox (7H).** The strongbox stands in the manor hall, empty, in every
+  HollowMere match the hall is open at; the first Train delivery of the match loads it (`vendetta.heist.loaded`,
+  in every such match, Bandit or not). The Bandit's goal is to crack it: **8 s** (`vendettas.heist.crackS`)
+  still within verb reach of it, after dark, with no other living seat in the hall. Cracking it
+  (`vendetta.heist.cracked`, the consequence) puts the Strongbox item in the Bandit's inventory (it needs a free
+  slot), leaves a footprint of the Bandit's own height at the box as a kill does (3.4), and readies the Knife at
+  once. The strongbox is in one inventory at most.
+- **Contract: the Hitman (7H).** At the first Train arrival of the match the mail brings the Hitman a sealed
+  letter (`vendetta.contract.offered`): a target drawn from the mail stream (`contract`) among the living seats
+  other than the Hitman and its Cabal mates, written to the Hitman's own Notebook. The Hitman accepts it as a
+  quest of kind `contract` (3.16) from anywhere (`vendetta.contract.accepted`); an NPC Hitman accepts at once.
+  While the contract is accepted and the target lives, a Knife strike on anyone else rests the Knife **30 s**
+  longer (`vendettas.contract.offTargetRestS`). A strike that kills the target completes the quest
+  (`vendetta.contract.done`, the consequence) and readies the Knife at once; a target who dies any other way
+  ends the contract unpaid (`vendetta.contract.lapsed`).
+
+**NPC Killers (7H).** An NPC Killer holds a vendetta like any Killer and walks toward its goal as one more place
+under its routine (3.12): the Vicar's scene, a task target's scene, the loaded strongbox's hall or its target's
+scene, through `vendettaGoalFor`. It does nothing a human could not do in the same place.
 
 ### 3.21 Parties, profiles and friends
 

@@ -74,6 +74,14 @@ export const BalanceFile = z.strictObject({
     /** Humans needed to press Start; below `players.min` the seats are NPC-filled (GDD 3.12). */
     startMinHumans: z.number().int().min(1),
   }),
+  /** Round 7 (GDD 3.21, `docs/round7/parties.md`): the device profile, the friends and invited lists, the party list. */
+  party: Section({
+    profileCodeLength: z.number().int().positive(),
+    friendsMax: z.number().int().positive(),
+    invitedMax: z.number().int().positive(),
+    listMax: z.number().int().positive(),
+    listRefreshS: z.number().positive(),
+  }),
   phases: Section({
     roleRevealS: Seconds,
     countdownS: Seconds,
@@ -258,6 +266,21 @@ export const BalanceFile = z.strictObject({
     loading: z.strictObject({ showAfterS: z.number().positive(), tipEveryS: z.number().positive() }),
   }),
   ghosts: Section({ wispsPerCycle: z.number().int().nonnegative() }),
+  /** Round 7 (GDD 3.20): the four vendettas' seconds and counts. */
+  vendettas: Section({
+    /** World-phase seconds the Zealot shares a scene with the Vicar's seat before the doubt is sown. */
+    conversion: z.strictObject({ shareS: Seconds }),
+    /** The Activist's still seconds at one task target, the targets wanted, the finished real tasks undone. */
+    sabotage: z.strictObject({
+      tamperS: Seconds,
+      stations: z.number().int().positive(),
+      undoTasks: z.number().int().nonnegative(),
+    }),
+    /** The Bandit's seconds alone at the loaded strongbox. */
+    heist: z.strictObject({ crackS: Seconds }),
+    /** The Knife's extra rest after a strike on anyone but a living contract target. */
+    contract: z.strictObject({ offTargetRestS: Seconds }),
+  }),
   chat: Section({
     /** A `chat.say` line is cut to this many characters (GDD 3.5). */
     maxChars: z.number().int().positive(),
