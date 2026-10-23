@@ -13,7 +13,7 @@ and a **party lobby**, both 1280 x 720 artboards. Asked three questions, the own
    box stays one tap away for links and codes.
 3. **Scope**: "Whole game in one go". Every screen moves to the mockups' style this round: menu, lobby, role
    card, HUD, notebook, meeting, game over, settings, loading, transitions, cutscene captions, the M5b panels,
-   the mini-games, the quick mode's screens, the intro's Skip, the help page and the admin page.
+   the mini-games, the intro's Skip, the help page and the admin page.
 
 The screenshots are `docs/ui/menu-mockup-1280x720.png` and `docs/ui/lobby-mockup-1280x720.png`. The exports
 themselves (React runtime inside) are design references kept by the orchestrator and are not committed.
@@ -38,7 +38,7 @@ never add a sixth.
 Profile, Friends, Settings; a row of small ones How to Play, Credits, Quit; top right a profile chip ("Guest")
 and a sound toggle; a footer `v0.1.0`.
 
-**Lobby** (`lobby-mockup`), three columns. **A**: the party code in display type, Copy Invite Link, Change Mode,
+**Lobby** (`lobby-mockup`), three columns. **A**: the party code in display type, Copy Invite Link, Change Mode (goes with the quick mode, A115),
 Add NPC, the NPC skill select with its locked note, then "Players n / 10" with You / Leader / NPC tags. **B**: the
 Map cards (Hollowmere, Blackpine, a blurb each and a tick on the picked one), the Art style segment (8-bit, Low
 poly, HD disabled "Coming later"), a "Locate" icon button. **C**: The Deck as chips with its two notes, then
@@ -50,7 +50,7 @@ Start (leader), Ready, Leave.
   in `ui/Lobby.ts` (`party-code`, `player-list`, `player-count`, `start`, `confirm-start`, `confirm-fill`,
   `not-ready`, `lobby-ready`, `mode-chip`, `mode-toggle`, `add-npc`, `remove-npc`, `npc-difficulty`,
   `lobby-settings`, `lobby-map`, `map-select`, `art-style*`, `lobby-deck*`, `deck-card-*`, `deck-editor`,
-  `deck-role-*`, `settings-*`), in the HUD, the meeting, the game over, the M5b panels and the quick mode stays.
+  `deck-role-*`, `settings-*`), in the HUD, the meeting, the game over, the M5b panels stays (the quick mode's screens leave with the mode, A115).
   A re-skin changes classes, markup and copy, never an id. Where a visible label changes because the owner's
   mockup says so ("Create Party" becomes "Start Game"), the specs change in one place (`e2e/fixtures/party.ts`,
   7C) rather than an `aria-label` that lies.
@@ -92,7 +92,7 @@ One PR, first, so every screen session builds on it:
 - UI.md 6 (components) rows for each new class, written before the CSS, as round 1 did.
 
 Every later session writes its screen's rules in its own file (`ui/menu.css` 7C, `ui/lobby.css` 7E,
-`ui/match.css` and `view/hud.css` 7F, `ui/table.css` and `ui/onub/onub.css` 7G), imported by its screen, using
+`ui/match.css` and `view/hud.css` 7F, `ui/table.css` 7G), imported by its screen, using
 7B's classes and tokens; `components.css` and `tokens.css` are 7B's alone this round.
 
 ## 4. The screens and their owners
@@ -102,11 +102,11 @@ Every later session writes its screen's rules in its own file (`ui/menu.css` 7C,
 | Menu, name and visibility dialog, party list, code box, profile, friends, Quit, help page | `ui/Landing.ts` (becomes the menu), `scenes/Landing.ts`, `ui/menu/**`, `ui/copy/menu.ts`, `public/help/index.html`, `e2e/fixtures/party.ts`, `e2e/party.spec.ts` (menu half), `e2e/smoke.spec.ts` | 7C |
 | Lobby (three columns), map cards, art-style segment, deck chips, deck editor, confirm dialog | `ui/Lobby.ts`, `ui/lobby/**`, `ui/artStyle/**`, `ui/main/{deckList,deckChip,deckView}.ts`, `scenes/Lobby.ts`, `ui/copy/lobby.ts` (lobby keys), `ui/lobby.css`, `Lobby.test.ts`, `MapPicker.test.ts`, `DeckEditor.test.ts`, `e2e/party.spec.ts` (lobby half) | 7E |
 | Role card, HUD and log, notebook, settings panel, loading screen, transitions, cutscene captions and Skip, the intro's Skip, M5b layer and panels, mini-games | `ui/RoleCard.ts`, `view/Hud.ts`, `view/hud.css`, `view/NotebookPanel.ts`, `ui/SettingsPanel.ts`, `view/LoadingScreen.ts`, `view/Transition.ts`, the DOM of `view/cutscene/CutscenePlayer.ts` (captions and Skip only; 7A owns its camera), `scenes/Intro.ts` (the Skip button only), `ui/M5bLayer.ts`, `ui/{Inventory,Crafting,QuestLog}.ts`, `view/minigames/**`, `ui/match.css`, their tests, `e2e/m5b.spec.ts` | 7F |
-| Meeting, game over, seat picker, the main-mode cards, shot toast and over view, the quick mode (prep board, night, loft, dawn, rush, over), the admin page | `ui/Meeting.ts`, `ui/GameOver.ts`, `ui/SeatPicker.ts`, `ui/main/{cards,overMain,shotToast,lookPortraits}.ts`, `ui/portrait.ts`, `ui/onub/**`, `view/onub/**`, the DOM of `scenes/{Kitchen,Night,Meeting,GameOver}.ts`, `client/admin/**`, `ui/table.css`, `ui/onub/onub.css`, their tests, `e2e/{meeting,onub,night,kitchen}.spec.ts` | 7G |
+| Meeting, game over, seat picker, the main-mode cards, shot toast and over view, the admin page (the quick mode's screens are removed with the mode, A115, not re-skinned) | `ui/Meeting.ts`, `ui/GameOver.ts`, `ui/SeatPicker.ts`, `ui/main/{cards,overMain,shotToast,lookPortraits}.ts`, `ui/portrait.ts`, the DOM of `scenes/{Meeting,GameOver}.ts`, `client/admin/**`, `ui/table.css`, `ui/onub/onub.css`, their tests, `e2e/{meeting,onub,night,kitchen}.spec.ts` | 7G |
 
 Screens keep their behaviour: a re-skin PR changes no rule, no number and no wire. Where a mockup shows a
 control the game does not have ("Locate"), it is left out; where the game has a control the mockup lacks
-(Remove NPC, the deck editor, the mode's quick-mode settings), it is kept in the mockup's style and placed where
+(Remove NPC, the deck editor), it is kept in the mockup's style and placed where
 the column has room. The HD art style stays disabled with its note.
 
 ## 5. Order and gates
