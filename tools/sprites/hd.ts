@@ -18,6 +18,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { alphaBleed, bleed, decodePng, encodePng, type Rgba } from './bleed.ts';
 import { CHAR_PAGE, OVL_PAGE } from './keys.ts';
+import { crop } from './pixel.ts';
 import { atlasJson, packCharacter, readRender, writeFiles } from './pack.ts';
 import {
   applyStaticPivots,
@@ -119,8 +120,22 @@ export function hdGround(renderDir: string): Map<string, Buffer> {
  * `subset` the frames present pack as they are; otherwise the atlas's whole key list is required.
  */
 export async function hdStatic(renderDir: string, subset = false): Promise<Map<string, Buffer>> {
-  const { manifest, inputs } = readStatic(renderDir);
-  const texels = texelsOf(manifest, manifest.atlas);
+  const { manifest: display, inputs } = readStatic(renderDir);
+  const texels = texelsOf(display, display.atlas);
+  // The render manifest holds cells and pivots in display px; the frames are `texels` times that.
+  const manifest: StaticManifest = {
+    ...display,
+    frames: Object.fromEntries(
+      Object.entries(display.frames).map(([k, f]) => [
+        k,
+        {
+          ...f,
+          cell: Array.isArray(f.cell) ? f.cell.map((v) => v * texels) : f.cell * texels,
+          ...(f.pivot ? { pivot: [f.pivot[0] * texels, f.pivot[1] * texels] } : {}),
+        },
+      ]),
+    ) as StaticManifest['frames'],
+  };
   if (!subset) return packStatic(manifest, inputs, false, texels);
   const cap = pageCap(manifest.atlas) ?? [2048, 2048];
   const { atlas, pages } = await packCapped(manifest.atlas, inputs, cap[0] * texels, cap[1] * texels, false);
@@ -130,10 +145,30 @@ export async function hdStatic(renderDir: string, subset = false): Promise<Map<s
   return out;
 }
 
+/** The box [x, y, w, h] of an image's pixels with alpha, or null for an empty image. */
+export function alphaBox(img: Rgba): [number, number, number, number] | null {
+  let x0 = img.width;
+  let y0 = img.height;
+  let x1 = -1;
+  let y1 = -1;
+  for (let y = 0; y < img.height; y++) {
+    for (let x = 0; x < img.width; x++) {
+      if (img.data[(y * img.width + x) * 4 + 3] === 0) continue;
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
+    }
+  }
+  return x1 < 0 ? null : [x0, y0, x1 - x0 + 1, y1 - y0 + 1];
+}
+
 /**
  * The slices of a build_buildings.py render dir at HD: each frame alpha-bled, not finished or halved, cut
  * by its tile map one pixel to one (the map is rendered at the same size), the pivot and the cell in render
- * px. The manifest records `cell` and `pivot` in display px, so the factor is the image's.
+ * px. The manifest records `cell` and `pivot` in display px, so the factor is the image's. Unlike slice.ts
+ * a slice keeps only its own box, not the whole canvas (an HD canvas is taller than the building page cap,
+ * and the packer refuses an input larger than its page before it trims), so its pivot moves with the crop.
  */
 export function hdSlices(renderDir: string): { files: Map<string, Buffer>; manifest: StaticManifest } {
   const src = JSON.parse(readFileSync(join(renderDir, 'manifest.json'), 'utf8')) as {
@@ -154,11 +189,15 @@ export function hdSlices(renderDir: string): { files: Map<string, Buffer>; manif
     for (const [suffix, slice] of sliceFrame(img, index, f.footprint)) {
       const frame = `${name}${suffix}`;
       const file = `${frame.replace('#', '__')}.png`;
-      files.set(file, encodePng(slice));
+      const box = alphaBox(slice);
+      if (!box) continue;
+      files.set(file, encodePng(crop(slice, box, box[2], box[3])));
+      // In display px like every render manifest (hdStatic scales them back); a crop at an odd render px
+      // leaves a half.
       manifest.frames[frame] = {
         file,
-        cell: [img.width, img.height],
-        pivot: [f.pivot[0] * texels, f.pivot[1] * texels],
+        cell: [box[2] / texels, box[3] / texels],
+        pivot: [f.pivot[0] - box[0] / texels, f.pivot[1] - box[1] / texels],
       };
     }
   }

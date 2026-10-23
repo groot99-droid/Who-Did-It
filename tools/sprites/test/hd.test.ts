@@ -66,7 +66,7 @@ describe('hd tileset', () => {
 });
 
 describe('hd slices', () => {
-  it('cuts an HD building render one pixel to one, with the pivot scaled to render px', () => {
+  it('cuts an HD building render one pixel to one, each slice cropped to its box in display px', () => {
     const dir = mkdtempSync(join(tmpdir(), 'wdi-hd-'));
     const w = 16;
     const h = 8;
@@ -97,11 +97,22 @@ describe('hd slices', () => {
     );
     const { files, manifest } = hdSlices(dir);
     expect([...files.keys()].sort()).toEqual(['tavern__0_0.png', 'tavern__1_0.png']);
-    expect(manifest.frames['tavern#0_0']).toEqual({ file: 'tavern__0_0.png', cell: [w, h], pivot: [8, 6] });
+    // Each slice is cropped to its own box, in display px: the left half keeps the pivot, the right half's
+    // moves with the crop.
+    const t = TEXELS;
+    expect(manifest.frames['tavern#0_0']).toEqual({
+      file: 'tavern__0_0.png',
+      cell: [w / 2 / t, h / t],
+      pivot: [4, 3],
+    });
+    expect(manifest.frames['tavern#1_0']).toEqual({
+      file: 'tavern__1_0.png',
+      cell: [w / 2 / t, h / t],
+      pivot: [0, 3],
+    });
     const left = decodePng(files.get('tavern__0_0.png')!);
-    expect(left.width).toBe(w);
-    expect(left.data[(0 * w + 0) * 4 + 3]).toBe(255);
-    expect(left.data[(0 * w + w - 1) * 4 + 3]).toBe(0);
+    expect([left.width, left.height]).toEqual([w / 2, h]);
+    for (let i = 0; i < (w / 2) * h; i++) expect(left.data[i * 4 + 3]).toBe(255);
   });
 });
 
@@ -118,7 +129,8 @@ describe('hd static sheet', () => {
         atlas: 'props',
         style: 'hd',
         factor: TEXELS,
-        frames: { prop_pump: { file: 'prop_pump.png', cell, pivot: [cell / 2, cell - 32] } },
+        // Cells and pivots in display px, as build_props.py writes them.
+        frames: { prop_pump: { file: 'prop_pump.png', cell: 192, pivot: [96, 192 - 16] } },
       }),
     );
     const files = await hdStatic(dir, true);
@@ -126,7 +138,8 @@ describe('hd static sheet', () => {
     const f = atlas.textures[0]!.frames[0]!;
     expect(f.filename).toBe('prop_pump');
     expect(f.sourceSize).toEqual({ w: cell, h: cell });
-    expect(f.pivot).toEqual({ x: 0.5, y: Math.round(((cell - 32) / cell) * 10000) / 10000 });
+    // 176 of 192 display px: the pivot fraction is the same whatever the factor.
+    expect(f.pivot).toEqual({ x: 0.5, y: Math.round((176 / 192) * 10000) / 10000 });
     expect(atlas.textures[0]!.size.w).toBeLessThanOrEqual(1024 * TEXELS);
     await expect(hdStatic(dir, false)).rejects.toThrow(/missing/);
   });
