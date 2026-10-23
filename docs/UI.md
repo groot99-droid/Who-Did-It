@@ -1148,6 +1148,7 @@ present only when the cutscene is skippable. Reduce-motion turns camera moves in
 | `cutscene.skip` | Skip | the button |
 | `cutscene.skip.label` | Skip the cutscene | its `aria-label` |
 | `cs.hollowmere.<line>` | the opening's captions | `title`, `seven`, `laid`, `own`, `train`, `dusk`, `end`, `vicar`, `letter`, `nobody`, `check`, `miss`; the Bible's Book I.1 trimmed |
+| `cs.blackpine.<line>` | the BlackPine opening's captions (7A) | `title`, `intake`, `owns`, `day`, `night`, `pines`, `adits`, `blind`, `dawn`; the Bible's Book III.2 trimmed |
 
 Frozen test ids: `cutscene` (the layer, with `data-cutscene`), `cutscene-caption`, `cutscene-skip`.
 ### 14.22 Sound settings (6L)
