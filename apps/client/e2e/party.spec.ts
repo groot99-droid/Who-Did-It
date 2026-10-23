@@ -2,6 +2,7 @@ import { roles } from '@wdi/content';
 import { expect, test, type Page } from '@playwright/test';
 import { runSwarm } from '../../../tools/bots/swarm';
 import { E2E_SERVER_URL } from './env';
+import { skipIntro, skipOpening } from './helpers';
 
 // Two real browsers against the real server: create, join by deep link, Start with four swarm bots,
 // and each browser shows its own role card from the server.
@@ -17,7 +18,9 @@ async function cardRole(page: Page): Promise<string> {
 
 test('create, join by deep link, start with 4 bots, both browsers get a role card', async ({ browser }) => {
   const hostCtx = await browser.newContext();
+  await skipIntro(hostCtx);
   const guestCtx = await browser.newContext();
+  await skipIntro(guestCtx);
   const host = await hostCtx.newPage();
   const guest = await guestCtx.newPage();
 
@@ -54,7 +57,9 @@ test('create, join by deep link, start with 4 bots, both browsers get a role car
     await guest.getByTestId('ready').click();
     await expect(host.getByTestId('entered')).toContainText('overworld');
     await expect(guest.getByTestId('entered')).toContainText('overworld');
-    // The World scene starts from the same sceneEnter (M2): its HUD timer is the proof of entry.
+    // The World scene starts from the same sceneEnter (M2): its HUD timer is the proof of entry. The opening
+    // cutscene (6C) keeps the HUD back until it ends.
+    await Promise.all([skipOpening(host), skipOpening(guest)]);
     await expect(host.getByTestId('hud-clock')).toBeVisible();
     await expect(guest.getByTestId('hud-clock')).toBeVisible();
     await expect(host.getByTestId('rolecard')).toBeHidden();
@@ -69,6 +74,7 @@ test('create, join by deep link, start with 4 bots, both browsers get a role car
 
 test('a full or started party refuses a late joiner with the generic error', async ({ browser, page }) => {
   const hostCtx = await browser.newContext();
+  await skipIntro(hostCtx);
   const host = await hostCtx.newPage();
   await host.goto('/Who-Did-It/');
   await host.getByLabel('Your name').fill('Hana');
@@ -78,6 +84,7 @@ test('a full or started party refuses a late joiner with the generic error', asy
   await host.getByTestId('confirm-start').click();
   await cardRole(host);
 
+  await skipIntro(page);
   await page.goto(`/Who-Did-It/#/join/${code}`);
   await page.getByLabel('Your name').fill('Late');
   await page.getByRole('button', { name: 'Join Party' }).click();

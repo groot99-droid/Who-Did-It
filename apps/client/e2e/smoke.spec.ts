@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { skipIntro } from './helpers';
 
 // Runs against the `?mock=1` fixture, so no server is needed. Each browser context is an
 // isolated world: the joiner types the creator's code, and the mock accepts any well-formed one.
@@ -67,6 +68,7 @@ test('boot prints {ok, build} from /health', async ({ page }) => {
       body: JSON.stringify({ ok: true, build: 'dev' }),
     }),
   );
+  await skipIntro(page);
   await page.goto('/Who-Did-It/');
   await expect(page.getByLabel('Your name')).toBeVisible({ timeout: 10_000 });
   await expect(page.locator('canvas')).toBeVisible();
