@@ -3216,6 +3216,7 @@ A116 are the owner's decisions of 13:05Z (the quick mode's removal, the bakery r
 | **7J. The quick mode's removal** | Opus 5.5 | Code | `claude/r7-remove-quick` | every file `quick-mode-removal.md` 2 lists, in its three PRs; `Settings.mode` and `OnubState` in the schema (version 5), the `onub.*` protocol rows, the mini-games' move to `view/minigames/` and their numbers to `balance.json` `minigames`, GDD 3.11's record and 3.16's reference, ARCHITECTURE 5.14, ASSETS 6.7, UI.md 14.12, CLAUDE.md's three mentions, `docs/guides/QUICK_MODE.md`, the CREDITS, MANIFEST and LICENSES rows, `soak.yml`, the `bots:*:onub` scripts, A117 |
 | **7K. Crumb's Ovens' rooms** | Opus 5.5 | Content and art | `claude/r7-ovens` | four new scene JSONs and nav under `packages/content/data/scenes/`, their rows in `maps/hollowmere.json` and `SCENE_IDS` (append), their tilemaps and renders for both art styles under `apps/client/public/assets/`, the task nodes, WORLD 4.3 rows, GDD 3.13's count, CREDITS and MANIFEST rows, `e2e/ovens.spec.ts`, A118 |
 | **7P. Integration** | Sonnet 5.5 | Code | `claude/r7-integration` | merges, lockfile, `PROTOCOL.md` regen, the dead landing keys of `ui/copy/lobby.ts`, the opt-in e2e suites, both screenshot sets (UI.md 12), `pnpm auto -- --matches 50` per map, both 30-minute soaks, this round's integration log, A114 |
+| **7M. Mini-games and tasks** (spawned 2026-10-23 on the owner's request, after the teardown and lore projects) | Fable 5.1 (Ultracode) | Code | `claude/r7-minigames` | `sim/Tasks.ts`, the `tasks` stream line, the `dealTasks` line of `handlers/lobby.ts`, `sim/Minigames.ts`, `rules/minigames.ts`, `view/minigames/**`, `MinigameModal.ts`, the chores panel and task prompt of `ui/M5bLayer.ts`, `minigames.json`, `balance.json` `minigames`, `ui/copy/minigames.ts`, `test/taskDeal.test.ts` and its later siblings, GDD 3.5 deal and pick-up lines and 3.16, A133, A151 |
 
 Merge order: 6Z first (this contract); then 7A, 7B, 7D, 7H (conversion and sabotage), 7I in parallel; 7C, 7E, 7F
 and 7G after 7B's theme PR, and 7C's party list PR after 7D; 7H's heist and contract PRs after 7I's Train; 7I's
@@ -3325,6 +3326,16 @@ HollowMere with the rooms reachable, the e2e walk. **Not**: the ten kitchen pict
 
 **7P. Integration.** As 6P's brief, for this round: merges in the order above, lockfile, `PROTOCOL.md`, the dead
 landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm auto`, the log and A114.
+
+**7M. Mini-games and tasks.** Deal every seat its tasks at Start (A133), give every task in `tasks.json` a playable
+mini-game drawn as its own station, and polish the four kinds against the UDGT teardown and the lore project (both in
+ROSW, read only). **Owns** its row. **Reads** GDD 3.5, 3.8, 3.16, 3.20, A90, A91, A97 (5), A118, A121, A131,
+`docs/round6/m5b-data.md` 2.3, the teardown chapters and the lore digest. **PRs**: (1) the deal, the `tasks` stream, ghosts
+at their own tasks, `test/taskDeal.test.ts`; (2) the deliverable pick-up at a source and the client's chores panel, bar and
+prompt; (3) a `tap` rule kind and a `skin` per station row, every widget in the night theme; (4) the co-op hold for Shutter
+the windows; (5) the teardown's readability, touch and reduced-motion findings. **Tests**: new files only; `pnpm auto --
+--matches 50 --map hollowmere` clean on every PR. **Not**: a mode switch, a new number outside `balance.json`, any edit to
+an existing `apps/server/test/*.test.ts`, anything written into ROSW.
 
 ### Round 7 log: 6Z
 
@@ -3457,4 +3468,173 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
   cold pantry, command desk, dish pit, expediter, front of house, hygiene, lamination, shaping bench and
   sub-basement (`assets/source/concepts/onub/`); they move to `docs/round8/` when that folder exists.
 
+### Round 7 log: 7M
+
+- 2026-10-23: spawned on the owner's request ("a new session just to develop every mini game ... utilize the new teardown and
+  lore projects"), Fable 5.1 with Ultracode. Found on 16ea76b: four mini-game kinds (crates, pour, slide, stoke; `board.ts` is
+  the band-RNG helper, not a kind), nothing dealing tasks, no task UI on the client, no source pick-up, the co-op task without a
+  handler, every task a Hollowmere one, and `taskProblem` refusing ghosts against GDD 3.8. Plan sent to 6Z before code.
+- 2026-10-23: PR 1 (the deal): `sim/Tasks.ts`, the `tasks` stream, the `dealTasks` line in `startMatch`, ghosts allowed at their
+  own tasks, `test/taskDeal.test.ts` (the pool, the counts, determinism per seed words, fake lists for Cabal and neutral seats,
+  none for NPCs, Blackpine empty, the bar and the full-bar win, a ghost's hold); GDD 3.5 "The deal"; A133.
+- 2026-10-23: a seam, for whoever imports `sim/Npc` next. `sim/Tasks.ts` first imported `isNpcSeat` from `sim/Npc`, and
+  `handlers/lobby.ts` imports `sim/Tasks` before `sim/Npc`; that alone moved the evaluation of `npc/meeting` earlier, two tests
+  of `lastShot.test.ts` (which `vi.mock`s that module) failed, and `pnpm auto` hung at 0% CPU with NPC matches that never
+  ended. `Tasks.ts` now reads `npcMemory(room).ids` from `npc/memory` and imports nothing above it. Told 6Z for `seams.md`.
+- Read from ROSW (never written): the UDGT teardown chapters 00 to 03 on `claude/sweet-maxwell-lmsiw3`, and the Who Did It lore
+  on `claude/sharp-mccarthy-pqi3ws` (the Canon Ledger, the Lamplighter's Round, the Gazette, the Tab Book, Fourteen Things, the
+  Daybook of Crumb's Ovens, Hopscotch, three stories). Drifts noted for 6Z, not resolved here: the lore dates HollowMere to 1893
+  (GDD 3.13 says 1931); the lore kneads at a trough and proofs cold (the rooms have a mixer and a candle-warmed cabinet, A118);
+  the lore keeps the pump and the well apart and knows no wrench at the apothecary.
+
 ## Integration log, round 7
+
+## Round 8 (started 2026-10-23, after round 7's #128 landed at 6e5a91b; 7M still running)
+
+Eleven sessions build **R8, Bodies, coin, motion and art** (ROADMAP R8; GDD 3.22, 3.23 and 3.24): the owner's two
+requests and four answers of 2026-10-23 (DECISIONS A134), on the contract `docs/round8/` (A135). The round-7 seed
+of Port-au-Levain (the ten kitchen pictures, A116) moves to round 9 with that map. The rules of rounds 1 to 7 still
+hold:
+- Draft PRs go against `claude/zen-turing-m1jnw0`, under 400 lines where the work allows. Split by step, each PR
+  green. An art PR may run longer by its binaries, never by its code.
+- Run `pnpm lint && pnpm typecheck && pnpm test` clean before every push.
+- Pinned versions only. No model identifiers in committed files, except the Model column of the table below.
+- `docs/GDD.md` changes in the same PR as a behaviour change.
+- Numbers live only in `docs/GDD.md` and `packages/content/data`.
+- 6Z merges. A session subscribes to its own PR, fixes its CI and answers review, and says in the PR description
+  when a PR is complete.
+
+**Models** (the owner, 2026-10-23: "use fable and opus mostly, use sonnet only for multi session swarm coding"):
+- Fable 5.1: 6Z, 7M, 8A, 8E, 8F and 8I.
+- Opus 5.5: 8B, 8C, 8D, 8G, 8H, 8J, 8K and 8P.
+- Sonnet 5.5: only the subagents a session fans out for repetitive passes (per look, per room, per clip). The
+  owner opted into that fan-out ("token max").
+
+The decisions of this round are A134 and A135, and a session never re-decides them.
+
+**Context.** Every session compacts at 400k tokens (`.claude/settings.json`, `CLAUDE.md` "Compact instructions").
+A session is spawned with a prompt of the form "You are session 8X of docs/SESSIONS.md Round 8. Read your brief,
+then docs/round8/README.md, seams.md and the documents your brief names. Branch claude/r8-<slug>."
+
+**Shared files, ids, hooks and the merge order** are `docs/round8/seams.md`, which holds them once.
+- **Decisions.** A session's decisions go under its reserved row: 8A A136, 8B A137, 8C A138, 8D A139, 8E A140, 8F
+  A141, 8G A142, 8H A143, 8I A144, 8J A145, 8K A146, integration A147. A second row takes the number plus 20, and
+  nobody edits an older row.
+- **Copy.** A session's copy goes in its UI.md 14 subsection: 8A 14.32, 8B 14.33, 8C 14.34, 8D 14.35, 8E 14.36,
+  8H 14.37.
+- **Tests.** No session edits an existing `apps/server/test/*.test.ts` without 6Z's grant in its PR.
+
+| Session | Model | Track | Branch | Owns (seams.md 6) |
+|---|---|---|---|---|
+| **6Z. Round-8 contract** | Fable 5.1 | Contract | `claude/game-features-admin-planning-v43tvq` | `docs/round8/**`, this section, A134 and A135, the GDD 3.22-3.24 stubs, ROADMAP R8-R10 |
+| **8A. Bodies** | Fable 5.1 | Code | `claude/r8-body` | health, stamina, effects, fists, knockout, every round-8 id, schema version 6 |
+| **8B. Inspect** | Opus 5.5 | Code | `claude/r8-inspect` | `act.inspect`, `relations.json`, the inspect card |
+| **8C. Scrip** | Opus 5.5 | Code | `claude/r8-scrip` | purses, wages, shops, the bank, coins, `movePurse` |
+| **8D. Rent, Faith, rumours, HQ** | Opus 5.5 | Code | `claude/r8-civic` | rent, quota, Indebted, Faith, notices, the Gazette, HQ tiers |
+| **8E. Moods and townsfolk** | Fable 5.1 | Code | `claude/r8-townsfolk` | needs, moods, ambient townsfolk, mugging |
+| **8F. Characters** | Fable 5.1 | Art | `claude/r8-characters` | the looks redesigned, the larger figures, every character clip |
+| **8G. Creatures and effects** | Opus 5.5 | Art | `claude/r8-creatures-vfx` | creature clips (the wolf's attack), resource breaks, VFX, transport, sounds |
+| **8H. Interface motion** | Opus 5.5 | Code | `claude/r8-ui-motion` | hover, press, panels, transitions, transport, activation, the body and economy HUD's motion |
+| **8I. HD** | Fable 5.1 | Art | `claude/r8-hd` | the `hd` art style end to end |
+| **8J. HollowMere rooms** | Opus 5.5 | Art and content | `claude/r8-hollowmere-rooms` | every HollowMere scene's placement and detail |
+| **8K. BlackPine rooms** | Opus 5.5 | Art and content | `claude/r8-blackpine-rooms` | every BlackPine scene's placement and detail |
+| **8P. Integration** | Opus 5.5 | Code | `claude/r8-integration` | spawned last: merges, `PROTOCOL.md`, auto 50, the e2e sets, A147 |
+
+### Round 8 briefs
+
+- **8A. Bodies** (`body.md` 1-6, `seams.md` 1, 2, 5).
+  1. **The ids.** Every id of seams.md 2 and the `Private.body` row, with schema version 6, in a first small PR
+     that others build on.
+  2. **The body.** `sim/body/` (health, stamina, regen, the damage table, effects with tick and cure), with
+     `sim/mobs/hurt.ts` moved in. The old tests that need changing are listed for 6Z's grant.
+  3. **Fists.** `strike` and `slingshot`, the knockout and wake, the meeting wake, and the items that cure.
+  4. **The death causes** `creature`, `bled` and `sickened`, with their GDD 3.18 cutscene rows.
+  5. **The body HUD's function** (bars, effect icons), which 8H animates.
+  6. **The invariant `bodyBounds`.**
+
+  GDD 3.22, with 3.6 and 3.15 corrected.
+- **8B. Inspect** (`body.md` 7).
+  1. `act.inspect` and its three private messages.
+  2. The signs as copy, and the health and purse bands. Until 8C lands, the purse band reads "unknown"; after, it
+     reads 8C's purse.
+  3. `relations.json` with its schema, seeded with rows for today's cards and vendettas, which the PR lists for
+     the owner. The Activist and Railroad Baron row ships inert.
+  4. The NPC suspicion raise through `Brain.suspicion`, the inspected seat's notice and hunch, the `E`-style
+     prompt and the card panel.
+  5. Tests: a cover-wearer and a true wearer of a look give the same messages, and a third client receives
+     nothing new.
+- **8C. Scrip** (`economy.md` 1, 2).
+  1. `Private.purse` and `bank`, the stake deal (its own stream), and `movePurse` with the invariant
+     `scripConserved`.
+  2. Wages: on 7M's task event (on `work` until it lands), quest rewards and sales.
+  3. Shops: the economy props appended to the scenes, and the shop panel.
+  4. The bank, the heist's take, and coins dropped and picked up.
+  5. The purse HUD.
+
+  GDD 3.23 Scrip.
+- **8D. Rent, Faith, rumours, HQ** (`economy.md` 3; after 8C's purse PR).
+  1. The Clerk's and Tallyman's rent and quota (with 8E's figures; until they land, at the bank and the tally
+     rack), Indebted, and the locked home door at curfew.
+  2. Faith at the altar: the Indulgence and the Parish Seal's meeting shield.
+  3. Ledger slips in the mailbag (true, look-only), Blackmail Notices, the tavern back room's black market, and
+     the Gazette's read-out.
+  4. HQ tiers with perks proposed in the PR for the owner, the right to buy by look, and `GameState.hq`.
+
+  GDD 3.23's other paragraphs.
+- **8E. Moods and townsfolk** (`townsfolk.md`).
+  1. Needs and moods in the NPC brain (the two hooks), with gait and idle signs.
+  2. Ambient townsfolk: counts by profile, the `townsfolk` stream, routines, the Clerk, Tallyman and
+     stallholders, the reduced body, and the creature-only death with the meeting line.
+  3. The mugging roll, prompt, choices and robbery, and the `scuffle` clue.
+  4. The invariant `figureNotSeat`.
+
+  GDD 3.24.
+- **8F. Characters** (`art.md` 1, 2; `motion.md` 1).
+  1. **Scale.** `iso.viewTilesHigh` and `iso.figureScale`, with screenshots at 720, 1080 and 1440 for the owner,
+     and the cell and budget re-plan.
+  2. **The redesign.** The 13 looks and the villager variants, with turnaround contact sheets, both styles.
+  3. **Clips.** The clips of motion.md 1, the breathing idle, secondary motion, and the client's gait selection
+     and overlays.
+
+  Fan out per look with Sonnet subagents if useful, and keep the design in the lead.
+- **8G. Creatures and effects** (`motion.md` 2).
+  1. The wolf's attack sequence, and hurt, death and flee for every creature, with `hp` in `mobs.json`.
+  2. A `break` for every resource node, played in reverse on regrowth.
+  3. The VFX list.
+  4. Transport animations.
+  5. The HQ tier props, after 8D.
+  6. The owner's sounds by catalog id, with CREDITS and MANIFEST rows and a list for the owner.
+- **8H. Interface motion** (`motion.md` 3).
+  1. Tokens with their reduced-motion zero.
+  2. Hover and press on every control.
+  3. Panels, with list stagger.
+  4. Transitions per portal kind, and the transport overlays.
+  5. Activation (cooldown sweep, press flash, refused shake, the `E` fill).
+  6. The body and economy HUD's motion, after 8A and 8C.
+
+  It touches no rule, number or wire. UI.md 9 and 12.
+- **8I. HD** (`art.md` 3).
+  1. The look proposal: one room and one figure in three styles, for the owner.
+  2. The `--style hd` render path, the `assets/hd/` manifest, budgets, lazy loading, the device gate and the
+     switch enabled.
+  3. HD renders of today's art.
+  4. A last pass after 8F, 8J and 8K.
+
+  The A79 and A80 contracts hold (same keys, fallback per key, the pick never on the wire).
+- **8J. HollowMere rooms** (`art.md` 4).
+  1. The placement test for HollowMere.
+  2. Room by room, with before-and-after screenshots at 8F's scale: the overworld, the forest, the caves, the
+     chapel, the tavern, the manor, the apothecary, the widow's house, the barn, the cellar, Crumb's Ovens and
+     its four rooms, and every other non-`bp_` scene.
+  3. New props in `hollowmere_props.py`, nav regenerated, and lights as design.
+
+  Fan out per room with Sonnet subagents, and the lead reviews every room against the placement rules.
+- **8K. BlackPine rooms** (`art.md` 4). As 8J, for every `bp_` scene: the camp, woods, lodge, mill, smithy,
+  office, mine and deep, with `blackpine_props.py`.
+
+**Merge order**: seams.md 7.
+
+### Round 8 log: 6Z
+
+- 2026-10-23: the contract `docs/round8/` and A134, A135 written from the owner's requests and answers. The
+  sixteen reference pictures are described in `art.md` 1 and not committed.

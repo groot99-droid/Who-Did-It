@@ -52,6 +52,7 @@ async function world(): Promise<{ party: Party; h: Human; me: PlayerState }> {
   await start(party);
   await toWorld(party);
   allTownsfolk(party.room);
+  for (const p of party.room.state.players.values()) p.priv.tasks.clear(); // the deal of 7M (A133); tests assign their own
   pauseClock(party.room);
   party.room.state.phase = Phase.day;
   party.room.state.phaseEndsTick = party.room.state.tick + 1e6;
