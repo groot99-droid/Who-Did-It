@@ -265,7 +265,7 @@
     "contract": { "offTargetRestS": 30 },
     "gddRef": "3.20"
   },
-  "economy": { "heavyPurse": 20, "gddRef": "3.23" },
+  "economy": { "heavyPurse": 20, "taskWage": 3, "gddRef": "3.23" },
   "chat": {
     "maxChars": 200,
     "quickChatRadiusTiles": 5,
