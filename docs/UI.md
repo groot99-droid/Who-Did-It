@@ -1361,6 +1361,11 @@ no other screen's card, chip or button changes. Ids, `data-testid`s and markup a
 | Notebook sheet | Inter for entries, Press Start 2P for the title | glass page, ruled in lilac at 12%, over the veil |
 | Settings gear and panel | Pixelify Sans | glass; lantern sliders and focus ring |
 
+**Over the world.** The world has no veil, so a surface over it is measured against a bare white pixel. The shared
+glass fill (indigo at 66%) is measured under the menu's veil (10) and gives lilac only 3.32 there, so the HUD, the
+role chip, the settings gear and panel use `--wdi-match-glass` (`ui/match.css`: night at 85%): lilac on it is 8.61,
+lilac at 80% is 6.12 and snow is 13.14 over white. The notebook sheet sits under its own veil and keeps the glass fill.
+
 No focusable element is clipped to a stepped corner: a `clip-path` would cut the focus ring, so the pixel corner is
 a 2 px radius with an inset snow rim, and the glass classes of 7B (`.wdi-glass-btn`) replace these rims where they
 land.
