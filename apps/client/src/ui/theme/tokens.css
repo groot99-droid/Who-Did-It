@@ -199,6 +199,27 @@
   --wdi-dur-flip: 600ms; /* the card flip itself */
   --wdi-card-hold: 12s; /* GDD 2 step 4: the card holds 12 s */
 
+  /* Round 8 (8H, docs/UI.md 9): every interface motion reads one of these. A duration or a distance zeroes
+     under reduced motion below; an easing does not need to. Loops that carry status (the spinner, a cooldown
+     sweep, the hold fill) keep their own duration and are listed as kept in UI.md 9. */
+  --wdi-ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* things arriving: panels, icons, rows */
+  --wdi-ease-in: cubic-bezier(0.5, 0, 0.75, 0); /* things leaving */
+  --wdi-ease-spring: cubic-bezier(0.3, 1.5, 0.5, 1); /* one small overshoot: a press flash, a pop */
+  --wdi-dur-press: 60ms; /* the press going down; the release takes --wdi-dur-fast */
+  --wdi-dur-panel: 200ms; /* a panel opening */
+  --wdi-dur-panel-out: 140ms; /* a panel closing, where the browser can animate it */
+  --wdi-dur-slow: 360ms; /* overlays: the transit veil, the journey card */
+  --wdi-dur-shake: 320ms; /* a refused action */
+  --wdi-dur-flash: 180ms; /* an activation flash, a damage flash */
+  --wdi-dur-loop: 1.2s; /* a decorative pulse (the edge cue, a fresh effect icon) */
+  --wdi-stagger: 28ms; /* between two rows of a list as it opens */
+  --wdi-lift: -2px; /* hover raise */
+  --wdi-press: 1px; /* press sink */
+  --wdi-press-scale: 0.97; /* press squeeze */
+  --wdi-nudge: 2px; /* a list row leaning in on hover */
+  --wdi-rise: 8px; /* how far a panel or row travels in */
+  --wdi-shake: 4px; /* a refused shake's swing */
+
   /* ---- layers ---- */
   --wdi-z-hud: 10;
   --wdi-z-panel: 20;
@@ -211,5 +232,19 @@
     --wdi-dur-fast: 0ms;
     --wdi-dur-base: 0ms;
     --wdi-dur-flip: 0ms;
+    --wdi-dur-press: 0ms;
+    --wdi-dur-panel: 0ms;
+    --wdi-dur-panel-out: 0ms;
+    --wdi-dur-slow: 0ms;
+    --wdi-dur-shake: 0ms;
+    --wdi-dur-flash: 0ms;
+    --wdi-dur-loop: 0ms;
+    --wdi-stagger: 0ms;
+    --wdi-lift: 0px;
+    --wdi-press: 0px;
+    --wdi-press-scale: 1;
+    --wdi-nudge: 0px;
+    --wdi-rise: 0px;
+    --wdi-shake: 0px;
   }
 }

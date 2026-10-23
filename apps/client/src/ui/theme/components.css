@@ -241,7 +241,8 @@
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   transition:
-    transform var(--wdi-dur-fast) var(--wdi-ease),
+    translate var(--wdi-dur-fast) var(--wdi-ease),
+    scale var(--wdi-dur-fast) var(--wdi-ease),
     box-shadow var(--wdi-dur-fast) var(--wdi-ease),
     filter var(--wdi-dur-fast) var(--wdi-ease);
 }
@@ -288,13 +289,15 @@
 }
 
 .wdi-btn:hover {
-  transform: translateY(-1px);
+  translate: 0 var(--wdi-lift);
   box-shadow: var(--wdi-shadow-2);
   filter: brightness(1.06);
 }
 
 .wdi-btn:active {
-  transform: translateY(1px);
+  translate: 0 var(--wdi-press);
+  scale: var(--wdi-press-scale);
+  transition-duration: var(--wdi-dur-press);
   box-shadow: none;
   filter: brightness(0.96);
 }
@@ -303,7 +306,8 @@
 .wdi-btn[aria-disabled='true'] {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
+  translate: none;
+  scale: none;
   box-shadow: none;
   filter: none;
 }
@@ -1171,7 +1175,7 @@
   border: var(--wdi-stroke-w) solid var(--wdi-hazard);
   border-radius: 50%;
   box-shadow: var(--wdi-glow-hazard);
-  animation: wdi-pulse 1.2s var(--wdi-ease) infinite;
+  animation: wdi-pulse var(--wdi-dur-loop) var(--wdi-ease) infinite;
 }
 
 .wdi-edge-cue--cool {
@@ -1251,7 +1255,7 @@
 }
 
 .wdi-touch-btn:active {
-  transform: scale(0.96);
+  scale: var(--wdi-press-scale);
   box-shadow: none;
 }
 
@@ -1542,7 +1546,7 @@
   }
 
   .wdi-btn:hover {
-    transform: none;
+    translate: none;
   }
 }
 
@@ -2633,7 +2637,9 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   text-align: left;
   text-transform: uppercase;
   cursor: pointer;
-  transition: transform var(--wdi-dur-fast) var(--wdi-ease);
+  transition:
+    translate var(--wdi-dur-fast) var(--wdi-ease),
+    scale var(--wdi-dur-fast) var(--wdi-ease);
 }
 
 .wdi-glass-btn__icon {
@@ -2683,11 +2689,13 @@ body.wdi-cutscene-slam .wdi-hud-chip {
 
 .wdi-glass-btn:hover:not(:disabled, [aria-disabled='true']) {
   --wdi-glass-ring: inset 0 0 0 1px var(--wdi-glass-rim-top);
-  transform: translateY(-2px);
+  translate: 0 var(--wdi-lift);
 }
 
 .wdi-glass-btn:active:not(:disabled, [aria-disabled='true']) {
-  transform: translateY(1px);
+  translate: 0 var(--wdi-press);
+  scale: var(--wdi-press-scale);
+  transition-duration: var(--wdi-dur-press);
 }
 
 .wdi-glass-btn--primary,
@@ -3085,4 +3093,413 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   .wdi-glass-btn__chev {
     transition: none;
   }
+}
+
+/* ---------------------------------------------------- Round 8 (8H): interface motion (UI.md 9, A143) */
+/* Every value is a token of tokens.css, zeroed under reduced motion there, so no rule below needs its own
+   reduced-motion twin unless it would loop. Motion moves through the individual `translate` and `scale`
+   properties, never `transform`, so it composes with the transform a control already uses to sit in place
+   (the E prompt's centring, the stamp's tilt). Other sessions' panels are animated here by class only. */
+
+/* Hover and press: the controls that lift. The press goes down in --wdi-dur-press and comes back in
+   --wdi-dur-fast. */
+.wdi-chip:is(button, a),
+.wdi-portrait:is(button, a),
+.wdi-seat:is(button),
+button.wdi-map__option,
+.wdi-coverpicker__look,
+.wdi-menu-dialog__close,
+.wdi-menu__chip,
+.wdi-menu__sound,
+.wdi-settings__gear,
+.wdi-m5b__prompt,
+.wdi-touch-btn,
+.wdi-admin__btn,
+.wdi-admin__seat {
+  transition:
+    translate var(--wdi-dur-fast) var(--wdi-ease),
+    scale var(--wdi-dur-fast) var(--wdi-ease),
+    box-shadow var(--wdi-dur-fast) var(--wdi-ease),
+    background-color var(--wdi-dur-fast) var(--wdi-ease),
+    border-color var(--wdi-dur-fast) var(--wdi-ease),
+    filter var(--wdi-dur-fast) var(--wdi-ease);
+}
+
+:is(
+    .wdi-chip:is(button, a),
+    .wdi-portrait:is(button, a),
+    .wdi-seat:is(button),
+    button.wdi-map__option,
+    .wdi-coverpicker__look,
+    .wdi-menu-dialog__close,
+    .wdi-menu__chip,
+    .wdi-menu__sound,
+    .wdi-settings__gear,
+    .wdi-m5b__prompt,
+    .wdi-admin__btn,
+    .wdi-admin__seat
+  ):hover:not(:disabled, [aria-disabled='true']) {
+  translate: 0 var(--wdi-lift);
+  filter: brightness(1.06);
+}
+
+:is(
+    .wdi-chip:is(button, a),
+    .wdi-portrait:is(button, a),
+    .wdi-seat:is(button),
+    button.wdi-map__option,
+    .wdi-coverpicker__look,
+    .wdi-menu-dialog__close,
+    .wdi-menu__chip,
+    .wdi-menu__sound,
+    .wdi-settings__gear,
+    .wdi-m5b__prompt,
+    .wdi-touch-btn,
+    .wdi-admin__btn,
+    .wdi-admin__seat
+  ):active:not(:disabled, [aria-disabled='true']) {
+  translate: 0 var(--wdi-press);
+  scale: var(--wdi-press-scale);
+  filter: brightness(0.96);
+  transition-duration: var(--wdi-dur-press);
+}
+
+/* Tabs and segments do not lift: the label brightens and the rule under a tab grows in from its centre. */
+.wdi-tab,
+.wdi-seg__opt {
+  transition:
+    color var(--wdi-dur-fast) var(--wdi-ease),
+    background-color var(--wdi-dur-fast) var(--wdi-ease),
+    border-color var(--wdi-dur-fast) var(--wdi-ease),
+    scale var(--wdi-dur-fast) var(--wdi-ease);
+}
+
+.wdi-tab:hover:not([aria-selected='true'], :disabled) {
+  color: var(--wdi-text);
+  border-bottom-color: var(--wdi-hairline);
+}
+
+.wdi-seg--glass .wdi-seg__opt:hover:not(.is-on, :disabled) {
+  background-color: var(--wdi-glass-wash);
+}
+
+:is(.wdi-tab, .wdi-seg__opt):active:not(:disabled) {
+  scale: var(--wdi-press-scale);
+  transition-duration: var(--wdi-dur-press);
+}
+
+/* List rows lean in rather than lift, and take a wash, so a column of them never jitters vertically. The
+   rows that hold a button (the inventory slots, recipes, quests) answer to hover and to focus inside them. */
+.wdi-m5b__row,
+.wdi-menu-parties__row,
+.wdi-notebook__entry,
+.wdi-roster__row,
+.wdi-deck__card {
+  transition:
+    translate var(--wdi-dur-fast) var(--wdi-ease),
+    background-color var(--wdi-dur-fast) var(--wdi-ease),
+    border-color var(--wdi-dur-fast) var(--wdi-ease),
+    box-shadow var(--wdi-dur-fast) var(--wdi-ease);
+}
+
+:is(.wdi-m5b__row, .wdi-menu-parties__row, .wdi-deck__card):is(:hover, :focus-within) {
+  translate: var(--wdi-nudge) 0;
+}
+
+.wdi-m5b__row:is(:hover, :focus-within) {
+  box-shadow: inset 2px 0 0 0 var(--wdi-interact);
+}
+
+.wdi-menu-parties__row:active {
+  scale: var(--wdi-press-scale);
+  transition-duration: var(--wdi-dur-press);
+}
+
+/* Focus rings in step: the ring closes in from a wider offset as focus lands, in the hover's time. It
+   animates only the offset and the colour, so the ring each control already draws stays its own. */
+:is(
+  .wdi-btn,
+  .wdi-glass-btn,
+  .wdi-input,
+  .wdi-chip:is(button, a),
+  .wdi-portrait:is(button, a),
+  .wdi-touch-btn,
+  .wdi-tab,
+  .wdi-link,
+  .wdi-seg__opt,
+  .wdi-seat,
+  .wdi-map__option,
+  .wdi-coverpicker__look,
+  .wdi-menu__chip,
+  .wdi-menu__sound,
+  .wdi-menu-dialog__close,
+  .wdi-menu-parties__row,
+  .wdi-settings__gear,
+  .wdi-m5b__prompt,
+  .wdi-admin__btn,
+  .wdi-admin__seat
+):focus-visible {
+  animation: wdi-ring-in var(--wdi-dur-fast) var(--wdi-ease-out) both;
+}
+
+@keyframes wdi-ring-in {
+  from {
+    outline-color: transparent;
+    outline-offset: 6px;
+  }
+}
+
+/* Panels open and close. A panel shown by clearing `hidden` replays its entrance on every open, because an
+   animation restarts when an element leaves display: none, and so does every row inside it. Closing animates
+   where the browser can hold `display` through a transition (allow-discrete) and is instant elsewhere; the
+   panel stops taking the pointer the moment it is hidden, so its logic never waits on the motion. A panel
+   built fresh each time (the meeting, a dialog) plays the entrance once as it mounts. */
+:is(
+  .wdi-m5b__panel,
+  .wdi-settings__panel,
+  .wdi-notebook-sheet__page,
+  .wdi-meet__board,
+  .wdi-meet__side,
+  .wdi-anim-panel
+) {
+  animation: wdi-panel-in var(--wdi-dur-panel) var(--wdi-ease-out) backwards;
+}
+
+:is(.wdi-m5b__panel, .wdi-settings__panel, .wdi-notebook-sheet, .wdi-anim-panel) {
+  transition:
+    opacity var(--wdi-dur-panel-out) var(--wdi-ease-in),
+    translate var(--wdi-dur-panel-out) var(--wdi-ease-in),
+    display var(--wdi-dur-panel-out) allow-discrete;
+}
+
+:is(.wdi-m5b__panel, .wdi-settings__panel, .wdi-notebook-sheet, .wdi-anim-panel)[hidden] {
+  display: none;
+  opacity: 0;
+  translate: 0 calc(var(--wdi-rise) / 2);
+  pointer-events: none;
+}
+
+/* Scrims and veils behind a panel fade rather than travel. */
+:is(.wdi-m5b__modal, .wdi-notebook-sheet, .wdi-anim-veil) {
+  animation: wdi-fade var(--wdi-dur-panel) var(--wdi-ease-out) backwards;
+}
+
+.wdi-meet__side {
+  animation-delay: calc(var(--wdi-stagger) * 3);
+}
+
+@keyframes wdi-panel-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--wdi-rise);
+    scale: 0.98;
+  }
+}
+
+/* Lists stagger in as their panel opens: each of the first ten rows waits one --wdi-stagger more than the
+   one above it, and the rest arrive with the tenth, so a long list is never slow to read. */
+:is(.wdi-m5b__list, .wdi-notebook__list, .wdi-portraits, .wdi-deck__cards, .wdi-menu-parties, .wdi-anim-list)
+  > * {
+  animation: wdi-row-in var(--wdi-dur-panel) var(--wdi-ease-out) backwards;
+  animation-delay: calc(var(--wdi-stagger) * 10);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(1) {
+  animation-delay: calc(var(--wdi-stagger) * 0);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(2) {
+  animation-delay: calc(var(--wdi-stagger) * 1);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(3) {
+  animation-delay: calc(var(--wdi-stagger) * 2);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(4) {
+  animation-delay: calc(var(--wdi-stagger) * 3);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(5) {
+  animation-delay: calc(var(--wdi-stagger) * 4);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(6) {
+  animation-delay: calc(var(--wdi-stagger) * 5);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(7) {
+  animation-delay: calc(var(--wdi-stagger) * 6);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(8) {
+  animation-delay: calc(var(--wdi-stagger) * 7);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(9) {
+  animation-delay: calc(var(--wdi-stagger) * 8);
+}
+
+@keyframes wdi-row-in {
+  from {
+    opacity: 0;
+    translate: 0 calc(var(--wdi-rise) / 2);
+  }
+}
+
+/* Activation (ui/theme/motion.ts puts these classes on a control and takes them off at animationend). */
+.wdi-fx-flash {
+  animation: wdi-flash var(--wdi-dur-flash) var(--wdi-ease-out);
+}
+
+.wdi-fx-refused {
+  animation: wdi-refused var(--wdi-dur-shake) var(--wdi-ease);
+}
+
+.wdi-fx-pop {
+  animation: wdi-pop var(--wdi-dur-panel) var(--wdi-ease-spring) backwards;
+}
+
+@keyframes wdi-flash {
+  from {
+    filter: brightness(1.5);
+    scale: 1.06;
+  }
+}
+
+@keyframes wdi-refused {
+  20%,
+  60% {
+    translate: calc(-1 * var(--wdi-shake)) 0;
+  }
+  40%,
+  80% {
+    translate: var(--wdi-shake) 0;
+  }
+  0%,
+  90% {
+    box-shadow: var(--wdi-glow-hazard);
+  }
+}
+
+@keyframes wdi-pop {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+/* The cooldown sweep: a night shade over the control that unwinds clockwise. It is status, as the busy
+   spinner is, so its time is the caller's (--wdi-cooldown-ms, the card's cooldown) and not a motion token,
+   and it runs under reduced motion too. */
+@property --_sweep {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+.wdi-fx-cooling {
+  position: relative;
+}
+
+.wdi-fx-cooling::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: conic-gradient(rgb(var(--wdi-night-rgb) / 0.6) calc(var(--_sweep) * 1turn), transparent 0);
+  pointer-events: none;
+  animation: wdi-sweep var(--wdi-cooldown-ms) linear forwards;
+}
+
+@keyframes wdi-sweep {
+  from {
+    --_sweep: 1;
+  }
+  to {
+    --_sweep: 0;
+  }
+}
+
+/* The E prompt pops in as it appears, and its bar fills smoothly between frames while E is held; the bar
+   glows as it fills. A task's mini-game opening rides the panel entrance above (`.wdi-m5b__modal`). */
+.wdi-m5b__prompt:not([hidden]) {
+  animation: wdi-pop var(--wdi-dur-panel) var(--wdi-ease-spring) backwards;
+}
+
+.wdi-m5b__bar > i {
+  transition: width var(--wdi-dur-press) linear;
+  box-shadow: 0 0 var(--wdi-space-2) rgb(var(--wdi-teal-rgb) / 0.6);
 }
