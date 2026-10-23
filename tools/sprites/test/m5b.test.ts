@@ -11,6 +11,8 @@ import {
   MOB_ANIM,
   MOB_ANIMS,
   MOB_IDS,
+  BREAK_FPS,
+  BREAK_FRAMES,
   NODE_STATES,
   RESOURCE_IDS,
   TOOL_IDS,
@@ -24,6 +26,8 @@ import {
   mobAnim,
   mobFrame,
   mobFrameList,
+  nodeBreakAnim,
+  nodeBreakFrame,
   nodeFrame,
   pageOf,
   snakeOf,
@@ -46,7 +50,10 @@ interface Atlas {
 }
 
 const WANT = {
-  nodes: RESOURCE_IDS.flatMap((id) => NODE_STATES.map((s) => nodeFrame(id, s))).sort(),
+  nodes: RESOURCE_IDS.flatMap((id) => [
+    ...NODE_STATES.map((s) => nodeFrame(id, s)),
+    ...Array.from({ length: BREAK_FRAMES }, (_, n) => nodeBreakFrame(id, n)),
+  ]).sort(),
   tools: [
     ...TOOL_IDS.flatMap((t) => DIRECTIONS.map((d) => heldFrame(t, d))),
     ...GLOWS.flatMap((g) => Array.from({ length: GLOW_FRAMES }, (_, n) => glowFrame(g, n))),
@@ -134,6 +141,16 @@ describe('M5b art (SPRITES 12)', () => {
       }
     });
   }
+
+  it('breaks every resource node once from anims_nodes (round 8, 8G: motion.md 2)', () => {
+    const a = json<{ anims: Array<{ key: string; repeat: number; frameRate: number; frames: unknown[] }> }>(
+      join(ASSETS, 'm5b', 'nodes.anims.json'),
+    );
+    expect(a.anims.map((x) => [x.key, x.repeat, x.frameRate, x.frames.length])).toEqual(
+      RESOURCE_IDS.map((id) => [nodeBreakAnim(id), 0, BREAK_FPS, BREAK_FRAMES]),
+    );
+    expect(nodeBreakFrame('tinOre', 3)).toBe('node_tin_ore/break/003');
+  });
 
   it('loops both glows from anims_tools', () => {
     const a = json<{ anims: Array<{ key: string; repeat: number; frames: unknown[] }> }>(

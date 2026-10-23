@@ -23,6 +23,9 @@ import build_rig  # noqa: E402
 import rig_common as rc  # noqa: E402
 from materials import roles  # noqa: E402
 
+# The posterise rounds in display space (a plain 2.2 gamma stands in for the sRGB curve).
+DISPLAY_GAMMA = 2.2
+
 _MATS: dict[str, bpy.types.Material] = {}
 
 
@@ -69,17 +72,28 @@ def _multiply(nodes, links, a, hex_colour: str):
 
 
 def _posterise(nodes, links, colour, levels: int):
-    """Snap each channel to `levels` steps (low poly's stylised flatness)."""
+    """Round each channel to `levels` steps (low poly's stylised flatness), in display space: snapped on the
+    linear value, every tone below mid grey fell to the lowest step, and a dark wood door rendered black."""
+    to_display = nodes.new("ShaderNodeGamma")
+    to_display.inputs["Gamma"].default_value = 1.0 / DISPLAY_GAMMA
+    links.new(colour, to_display.inputs["Color"])
     sep = nodes.new("ShaderNodeSeparateColor")
-    links.new(colour, sep.inputs["Color"])
+    links.new(to_display.outputs["Color"], sep.inputs["Color"])
     comb = nodes.new("ShaderNodeCombineColor")
     for ch in ("Red", "Green", "Blue"):
+        half = nodes.new("ShaderNodeMath")
+        half.operation = "ADD"
+        half.inputs[1].default_value = 0.5 / levels
+        links.new(sep.outputs[ch], half.inputs[0])
         snap = nodes.new("ShaderNodeMath")
         snap.operation = "SNAP"
         snap.inputs[1].default_value = 1.0 / levels
-        links.new(sep.outputs[ch], snap.inputs[0])
+        links.new(half.outputs[0], snap.inputs[0])
         links.new(snap.outputs[0], comb.inputs[ch])
-    return comb.outputs["Color"]
+    to_linear = nodes.new("ShaderNodeGamma")
+    to_linear.inputs["Gamma"].default_value = DISPLAY_GAMMA
+    links.new(comb.outputs["Color"], to_linear.inputs["Color"])
+    return to_linear.outputs["Color"]
 
 
 def toned_colour(nodes, links, colour, role_name: str, style: str, toward: str | None = None):

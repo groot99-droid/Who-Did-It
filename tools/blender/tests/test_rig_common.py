@@ -197,10 +197,13 @@ class ArtStyles(unittest.TestCase):
         self.assertEqual(rc.ART_STYLES, ("8bit", "lowpoly", "hd"))
         self.assertEqual(rc.STYLE_FACTOR, {"8bit": 1, "lowpoly": 1, "hd": 2})
         for key in ("taaSamples", "filterSize", "keyAngleDeg", "shadowRays", "shadowSteps", "aoDistance",
-                    "rimToken", "rimAmount", "catcherStrength", "catcherLit", "bandSoft", "bumpStrength",
-                    "bumpDistance"):
+                    "rimToken", "rimAmount", "catcherStrength", "catcherLit", "catcherHaze", "bandSoft",
+                    "bumpStrength", "bumpDistance"):
             self.assertIn(key, rc.HD)
         self.assertIn(rc.HD["rimToken"], rc.PALETTE)
         lo, hi = rc.TOON_RAMP_STOPS
         self.assertLess(rc.HD["bandSoft"], (hi - lo) / 2)  # the mid band keeps a plateau
         self.assertGreater(rc.HD["catcherLit"], hi)  # unshadowed ground stays in the light band
+        # The clear threshold sits under the lit measurement and above the light band's stop.
+        self.assertGreater(rc.HD["catcherHaze"], 0)
+        self.assertGreater(rc.HD["catcherLit"] - rc.HD["catcherHaze"], hi)

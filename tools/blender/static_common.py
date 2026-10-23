@@ -49,6 +49,10 @@ def args_out(argv: list[str], prog: str) -> str:
     return p.parse_args(argv).out
 
 
+# Rig meshes that are not the subject: a code pass (the building tile map) hides them rather than coding them.
+RIG_PLANES = (rc.CATCHER_NAME,)
+
+
 def setup() -> bpy.types.Scene:
     """The rig with the calibration objects hidden."""
     scene = build_rig.build()
@@ -59,6 +63,10 @@ def setup() -> bpy.types.Scene:
         from materials import hd
 
         hd.apply(scene)
+        if os.environ.get("WDI_HD_PBR"):  # the rough PBR + HDRI look of the owner's look sheet
+            from materials import pbr
+
+            pbr.apply(scene)
     return scene
 
 

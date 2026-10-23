@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import build_rig  # noqa: E402
 import rig_common as rc  # noqa: E402
 
-CATCHER = "ShadowCatcher"
+CATCHER = rc.CATCHER_NAME
 
 
 def apply(scene: bpy.types.Scene, rim_hex: str | None = None) -> None:
@@ -102,9 +102,9 @@ def catcher_material() -> bpy.types.Material:
     links.new(diffuse.outputs["BSDF"], to_rgb.inputs["Shader"])
     bw = nodes.new("ShaderNodeRGBToBW")
     links.new(to_rgb.outputs["Color"], bw.inputs["Color"])
-    shade = nodes.new("ShaderNodeMapRange")  # lit luma -> 0, fully shadowed -> catcherStrength
+    shade = nodes.new("ShaderNodeMapRange")  # lit luma (less the haze margin) -> 0, fully shadowed -> catcherStrength
     shade.clamp = True
-    shade.inputs["From Min"].default_value = rc.HD["catcherLit"]
+    shade.inputs["From Min"].default_value = rc.HD["catcherLit"] - rc.HD["catcherHaze"]
     shade.inputs["From Max"].default_value = 0.0
     shade.inputs["To Min"].default_value = 0.0
     shade.inputs["To Max"].default_value = rc.HD["catcherStrength"]
