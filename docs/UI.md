@@ -1361,6 +1361,12 @@ no other screen's card, chip or button changes. Ids, `data-testid`s and markup a
 | Notebook sheet | Inter for entries, Press Start 2P for the title | glass page, ruled in lilac at 12%, over the veil |
 | Settings gear and panel | Pixelify Sans | glass; lantern sliders and focus ring |
 
+**Numbers stay Inter.** Pixelify Sans' 2, 5 and 8 blur together at 12, 14 and 16 px (checked at 2x), so a line
+that can show a number is not set in it: the HUD goal, log lines, toasts and phase ("Day 2"), the settings value
+("70%"), hints and quantities in the panels ("2 wood", "x3", "3 of 8 slots") are Inter. Static labels with no number
+keep the pixel face, and Press Start 2P's digits are clear (the clock). UI.md 3 lists Pixelify Sans for body text;
+this is the exception, found while checking the HUD.
+
 **Over the world.** The world has no veil, so a surface over it is measured against a bare white pixel. The shared
 glass fill (indigo at 66%) is measured under the menu's veil (10) and gives lilac only 3.32 there, so the HUD, the
 role chip, the settings gear and panel use `--wdi-match-glass` (`ui/match.css`: night at 85%): lilac on it is 8.61,

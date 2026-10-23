@@ -128,6 +128,8 @@
   pointer-events: none;
 }
 
+/* Numbers stay Inter: Pixelify Sans' 2, 5 and 8 blur at 12 to 16 px (UI.md 14.27), so the log, the toasts, the
+   goal and the phase ("Day 2") are not set in it; the labels with no number ("Your goal") are. */
 /* ---- Round 7 (7F): the HUD on the night theme (docs/round7/ui-reskin.md 4, UI.md 14.27). Glass over the
    world: the pointer-events rules above are untouched, so every rule below only paints. ---- */
 
@@ -156,7 +158,7 @@
 }
 
 .wdi-hud .wdi-hud-chip__goal {
-  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-sm);
 }
 
 .wdi-hud .wdi-hud-chip .wdi-icon-disc {
@@ -178,10 +180,8 @@
 }
 
 .wdi-hud .wdi-hud-clock__phase {
-  font-family: var(--wdi-font-pixel-text);
-  font-size: var(--wdi-text-sm); /* 12 px Pixelify reads "2" as "8" */
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-size: var(--wdi-text-sm);
+  font-weight: var(--wdi-weight-strong);
   color: var(--wdi-night-text);
 }
 
@@ -192,7 +192,6 @@
 }
 
 .wdi-hud .wdi-log__line {
-  font-family: var(--wdi-font-pixel-text);
   color: var(--wdi-night-text);
   background: var(--wdi-match-glass);
   border-radius: var(--wdi-radius-xs);
@@ -202,7 +201,6 @@
 
 /* The prompt and every HUD toast: a glass slab with the paper toast's coloured rule kept. */
 .wdi-hud .wdi-toast {
-  font-family: var(--wdi-font-pixel-text);
   color: var(--wdi-night-text);
   background-color: var(--wdi-match-glass);
   background-image: none;

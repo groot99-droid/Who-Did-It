@@ -294,6 +294,7 @@
 }
 
 .wdi-settings .wdi-settings__value {
+  font-family: var(--wdi-font-text);
   color: var(--wdi-night-text-muted);
 }
 
