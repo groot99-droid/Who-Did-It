@@ -51,3 +51,12 @@ export function cooldown(el: MotionTarget, ms: number): void {
   el.style.setProperty('--wdi-cooldown-ms', `${Math.round(ms)}ms`);
   replay(el, FX.cooling);
 }
+
+/** The prompts a refused press came from: the E prompt of the world layer, or the HUD's interact toast. */
+const PRESSED = '.wdi-m5b__prompt:not([hidden]), .wdi-hud-prompt:not([hidden])';
+
+/** A refusal from the server: shakes the first visible prompt under `root`, if one is showing. */
+export function refusedIn(root: { querySelector(sel: string): MotionTarget | null }): void {
+  const el = root.querySelector(PRESSED);
+  if (el) refused(el);
+}

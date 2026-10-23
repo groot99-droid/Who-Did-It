@@ -348,7 +348,9 @@ Activation (8H, A143). `ui/theme/motion.ts` gives a screen four one-shot calls o
 when a press landed (an ability fired, an item used), `refused(el)` when the server refused it (the codes of
 14.3), `pop(el)` when something arrives to be noticed, and `cooldown(el, ms)`, a night shade that unwinds
 clockwise over the card's cooldown. Each restarts its animation on every call and removes its class at
-`animationend`; none reads or changes state, so the caller decides what happened. The E prompt pops in as it
+`animationend`; none reads or changes state, so the caller decides what happened. Each owner calls them from its own code
+(8A's strike button flashes and cools, 8C's shop buttons flash); the world scene's error handler calls
+`refusedIn(overlay)`, which shakes whichever E prompt is showing as the refusal toast appears. The E prompt pops in as it
 appears and its bar fills smoothly while E is held; a task's mini-game opens with the panel entrance.
 
 Transitions and transport (8H, A143). The World's cover follows the portal the seat came through (GDD
