@@ -258,6 +258,21 @@ export const BalanceFile = z.strictObject({
     loading: z.strictObject({ showAfterS: z.number().positive(), tipEveryS: z.number().positive() }),
   }),
   ghosts: Section({ wispsPerCycle: z.number().int().nonnegative() }),
+  /** Round 7 (GDD 3.20): the four vendettas' seconds and counts. */
+  vendettas: Section({
+    /** World-phase seconds the Zealot shares a scene with the Vicar's seat before the doubt is sown. */
+    conversion: z.strictObject({ shareS: Seconds }),
+    /** The Activist's still seconds at one task target, the targets wanted, the finished real tasks undone. */
+    sabotage: z.strictObject({
+      tamperS: Seconds,
+      stations: z.number().int().positive(),
+      undoTasks: z.number().int().nonnegative(),
+    }),
+    /** The Bandit's seconds alone at the loaded strongbox. */
+    heist: z.strictObject({ crackS: Seconds }),
+    /** The Knife's extra rest after a strike on anyone but a living contract target. */
+    contract: z.strictObject({ offTargetRestS: Seconds }),
+  }),
   chat: Section({
     /** A `chat.say` line is cut to this many characters (GDD 3.5). */
     maxChars: z.number().int().positive(),

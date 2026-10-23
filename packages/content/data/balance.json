@@ -236,6 +236,13 @@
     "gddRef": "3.13"
   },
   "ghosts": { "wispsPerCycle": 1, "gddRef": "3.7" },
+  "vendettas": {
+    "conversion": { "shareS": 45 },
+    "sabotage": { "tamperS": 6, "stations": 2, "undoTasks": 1 },
+    "heist": { "crackS": 8 },
+    "contract": { "offTargetRestS": 30 },
+    "gddRef": "3.20"
+  },
   "chat": {
     "maxChars": 200,
     "quickChatRadiusTiles": 5,

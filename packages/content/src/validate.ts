@@ -22,6 +22,7 @@ import type { TasksFile } from './schemas/tasks.js';
 import type { TraitsFile } from './schemas/traits.js';
 import { MAP_IDS, type MapFile, type MapId } from './schemas/maps.js';
 import { checkMaps, checkSceneWorld } from './validateWorld.js';
+import { checkVendettas } from './validateVendettas.js';
 
 export interface Content {
   palette: PaletteFile;
@@ -242,6 +243,8 @@ export function validateContent(c: Content): string[] {
 
   // Round 6 (GDD 3.14 to 3.16, 3.18): the M5b cross-references, the cutscene index and the music mapping.
   checkM5b(c, err);
+  // Round 7 (GDD 3.20): the vendettas' cards, maps and kinds.
+  checkVendettas(c, err);
 
   return errors;
 }
