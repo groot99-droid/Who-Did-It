@@ -11,6 +11,10 @@ import { flowOf } from './Flow';
  * Vicar candidacy follows the dealt card and stays private: the seat dealt the Vicar that dies by the Knife becomes
  * `flow.ascendedVicarCandidate` at that reveal, for round 8. It listens on the sim bus: the `death` event and the
  * `phase` event into the reveal.
+ *
+ * The martyr's due (GDD 3.20, the owner's rule): a Knife death is a Killer's strike (`Kill.ts` is its only source;
+ * wolves, poison, shots and ejections have their own causes), so the same reveal makes that seat the match's martyr,
+ * and each real task its ghost finishes from then on counts `tasks.martyrWeight` times on the bar (`Minigames.ts`).
  */
 export const MEMORIAL_VICAR = 'memorialVicar';
 const VICAR = 'vicar';
@@ -21,18 +25,26 @@ interface MemorialMemory {
   played: boolean;
   /** The seat dealt the Vicar killed by the Knife, not yet named the candidate. */
   candidate: string | null;
+  /** This match's martyr from its reveal on, with the real tasks it had finished by then. */
+  martyr: Martyr | null;
+}
+
+export interface Martyr {
+  seat: string;
+  doneBefore: number;
 }
 
 const memories = new WeakMap<PartyRoom, MemorialMemory>();
 
 export function runMemorial(room: PartyRoom): void {
   if (memories.has(room)) return;
-  const memory: MemorialMemory = { film: false, played: false, candidate: null };
+  const memory: MemorialMemory = { film: false, played: false, candidate: null, martyr: null };
   memories.set(room, memory);
   onSim(room, 'start', () => {
     memory.film = false;
     memory.played = false;
     memory.candidate = null;
+    memory.martyr = null;
   });
   onSim(room, 'death', (e) => onDeath(room, memory, e));
   onSim(room, 'phase', (e) => {
@@ -47,8 +59,18 @@ function onDeath(room: PartyRoom, memory: MemorialMemory, e: SimEvent): void {
   if (player.priv?.role.roleId === VICAR) memory.candidate = e.seat!;
 }
 
+/** The match's martyr, once its reveal has come; null before it and in a match without one. */
+export function martyrOf(room: PartyRoom): Martyr | null {
+  return memories.get(room)?.martyr ?? null;
+}
+
 function onReveal(room: PartyRoom, memory: MemorialMemory): void {
-  if (memory.candidate !== null) flowOf(room).ascendedVicarCandidate = memory.candidate;
+  if (memory.candidate !== null) {
+    flowOf(room).ascendedVicarCandidate = memory.candidate;
+    const tasks = room.state.players.get(memory.candidate)?.priv?.tasks ?? [];
+    const doneBefore = [...tasks].filter((t) => t.done && !t.fake).length;
+    memory.martyr ??= { seat: memory.candidate, doneBefore };
+  }
   memory.candidate = null;
   if (!memory.film || memory.played) return;
   memory.film = false;
