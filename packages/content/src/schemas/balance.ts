@@ -259,6 +259,11 @@ export const BalanceFile = z.strictObject({
   mobs: Section({ maxPerScene: z.number().int().nonnegative(), chaseS: Seconds }),
   /** Round 6 (GDD 3.16): placeholders until Session 6E tunes them. */
   quests: Section({ maxActive: z.number().int().nonnegative() }),
+  /**
+   * Round 7 (GDD 3.3): the Daily Train of a map with a `station`. It stops `arriveAtS` into each day and delivers
+   * `deliveryAfterS` later; the seats of the hub within `hearTiles` of the platform hear it.
+   */
+  train: Section({ arriveAtS: z.number().nonnegative(), deliveryAfterS: Seconds, hearTiles: Tiles }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
     transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }),

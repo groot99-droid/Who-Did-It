@@ -40,6 +40,8 @@ export const MapFile = z.strictObject({
   bell: PrefixedId,
   teachingClue: PrefixedId,
   kitChest: PrefixedId,
+  /** Round 7: the hub spawn where the Daily Train stops (GDD 3.3); a map without one has no Train. */
+  station: SpawnRef.optional(),
   /** Manifest key of the lobby thumbnail (`type: image`). */
   thumbnail: z.string().regex(/^thumb_[a-z]+$/),
   worldRef: GddRef,
