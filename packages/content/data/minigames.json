@@ -35,6 +35,34 @@
       "task": "fetchFlour",
       "difficulty": 1,
       "assistS": 20
+    },
+    "doughPour": {
+      "id": "doughPour",
+      "kind": "pour",
+      "task": "mixDough",
+      "difficulty": 2,
+      "assistS": 20
+    },
+    "ovenStoke": {
+      "id": "ovenStoke",
+      "kind": "stoke",
+      "task": "stokeOven",
+      "difficulty": 2,
+      "assistS": 20
+    },
+    "coldCrates": {
+      "id": "coldCrates",
+      "kind": "crates",
+      "task": "stockColdRoom",
+      "difficulty": 1,
+      "assistS": 20
+    },
+    "proofSlide": {
+      "id": "proofSlide",
+      "kind": "slide",
+      "task": "proofLoaves",
+      "difficulty": 2,
+      "assistS": 20
     }
   }
 }
