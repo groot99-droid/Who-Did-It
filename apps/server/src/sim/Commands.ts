@@ -75,7 +75,7 @@ export function runCommands(room: PartyRoom): void {
       case C2S.light:
         handleLight(room, cmd.sessionId, payload);
         break;
-      // Round 8 (8C, GDD 3.23): trading at the shop a `shop` hold opened.
+      // Round 8, 8C (locked; GDD 3.23): trading at the shop a `shop` hold opened.
       case C2S.buy:
         handleBuy(room, cmd.sessionId, payload);
         break;
