@@ -190,6 +190,8 @@ export const BalanceFile = z.strictObject({
     ghostShareCap: z.number().min(0).max(1),
     /** Each real task the martyred Vicar's ghost finishes counts this many times, outside the cap (GDD 3.20). */
     martyrWeight: z.number().positive(),
+    /** For this many seconds from the martyr's reveal; tasks finished later count as any ghost's (GDD 3.20). */
+    martyrS: z.number().positive(),
   }),
   wolves: Section({
     count: z.number().int().nonnegative(),

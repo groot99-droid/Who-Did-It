@@ -1,6 +1,6 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
 import { balance } from '@wdi/content';
-import { Phase, S2C, TaskEntry, Winner } from '@wdi/shared';
+import { Phase, S2C, TICK_RATE, TaskEntry, Winner } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createServer } from '../src/server';
 import { markDead } from '../src/sim/Death';
@@ -124,7 +124,7 @@ const finish = (m: Match, k: number) => {
   recomputeTaskBar(m.room);
 };
 const bar = (total: number, counted: number) => Math.min(100, Math.floor((100 * counted) / total));
-const { martyrWeight: weight, ghostShareCap } = balance.tasks;
+const { martyrWeight: weight, martyrS, ghostShareCap } = balance.tasks;
 
 describe("the martyr's due (GDD 3.20)", () => {
   it('counts the martyr ghost tasks after the reveal martyrWeight times; a full bar wins for the Village', async () => {
@@ -135,12 +135,32 @@ describe("the martyr's due (GDD 3.20)", () => {
       expect(martyrOf(m.room)).toBeNull();
       expect(m.room.state.taskBar).toBe(bar(total, 1));
     });
-    expect(martyrOf(m.room)).toEqual({ seat: m.bots[0]!.id, doneBefore: 1 });
+    expect(martyrOf(m.room)).toMatchObject({ seat: m.bots[0]!.id, doneBefore: 1, doneAtEnd: null });
     finish(m, 1);
     expect(m.room.state.taskBar).toBe(bar(total, 1 + weight));
     expect(m.room.state.phase).toBe(Phase.reveal);
     finish(m, 2);
     expect(m.room.state).toMatchObject({ taskBar: 100, phase: Phase.gameOver, winner: Winner.village });
+  });
+
+  it('lasts martyrS seconds from the reveal; the ghost tasks after it count as any ghost (A121)', async () => {
+    const m = await deal(6, 'vicar', 'vicar');
+    const total = tasked(m);
+    await nightThenReveal(m, knifeBot0(m));
+    const martyr = martyrOf(m.room)!;
+    const span = Math.round(martyrS * TICK_RATE);
+    expect(martyr.untilTick).toBeGreaterThan(m.room.state.tick);
+    expect(martyr.untilTick).toBeLessThanOrEqual(m.room.state.tick + span);
+    expect(martyr.untilTick).toBeGreaterThan(m.room.state.tick + span - TICK_RATE);
+    finish(m, 0);
+    expect(m.room.state.taskBar).toBe(bar(total, weight));
+    // White-box: the window ends now; the next step snapshots it.
+    martyr.untilTick = m.room.state.tick;
+    await sleep(150);
+    expect(martyr.doneAtEnd).toBe(1);
+    finish(m, 1);
+    expect(m.room.state.taskBar).toBe(bar(total, weight + Math.min(1, ghostShareCap * total)));
+    expect(m.room.state.phase).toBe(Phase.reveal);
   });
 
   it.each(['wolf', 'poison', 'shot'] as const)('gives nothing to a Vicar taken by %s', async (cause) => {

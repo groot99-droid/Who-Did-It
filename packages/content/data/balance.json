@@ -175,7 +175,13 @@
     "gddRef": "3.7"
   },
   "doors": { "swingS": 3, "transitS": 0.6, "sceneFadeS": 0.4, "gddRef": "3.7", "reachTiles": 1.5 },
-  "tasks": { "cabalFakeList": true, "ghostShareCap": 0.25, "martyrWeight": 10, "gddRef": "3.5" },
+  "tasks": {
+    "cabalFakeList": true,
+    "ghostShareCap": 0.25,
+    "martyrWeight": 10,
+    "martyrS": 600,
+    "gddRef": "3.5"
+  },
   "wolves": {
     "count": 3,
     "fleeLightTiles": 4,

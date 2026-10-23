@@ -9,7 +9,11 @@ import type { MapObject } from './sceneMap';
 
 const L = metrics.lighting;
 
-export const lerp = (a: number, b: number, t: number): number => a + (b - a) * Math.min(1, Math.max(0, t));
+/** Weighted, so both ends come back exactly (`a + (b - a) * t` gives 0.8999... for 0.2 to 0.9 at 1). */
+export const lerp = (a: number, b: number, t: number): number => {
+  const k = Math.min(1, Math.max(0, t));
+  return (1 - k) * a + k * b;
+};
 
 const rgb = (hex: string): [number, number, number] => {
   const n = Number.parseInt(hex.slice(1), 16);

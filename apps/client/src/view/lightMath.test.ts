@@ -16,13 +16,13 @@ import {
 const hex = (t: keyof typeof palette.colors) => Number.parseInt(palette.colors[t].slice(1), 16);
 
 describe('ambient darkness (SPRITES 10.11, GDD 3.13)', () => {
-  it('is slate at 40% by day and ink at 90% at night', () => {
-    expect(ambientFor(0, false)).toEqual({ colour: hex('slate'), alpha: 0.4 });
+  it('is slate at 20% by day and ink at 90% at night', () => {
+    expect(ambientFor(0, false)).toEqual({ colour: hex('slate'), alpha: 0.2 });
     expect(ambientFor(1, false)).toEqual({ colour: hex('ink'), alpha: 0.9 });
   });
   it('eases between the two through dusk', () => {
     const mid = ambientFor(0.5, false);
-    expect(mid.alpha).toBeCloseTo(0.65);
+    expect(mid.alpha).toBeCloseTo(0.55);
     expect(mid.colour).not.toBe(hex('slate'));
     expect(mid.colour).not.toBe(hex('ink'));
   });
