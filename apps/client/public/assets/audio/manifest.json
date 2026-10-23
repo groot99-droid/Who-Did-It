@@ -22,6 +22,10 @@
     { "key": "sting_meeting", "url": "sting_meeting.ogg", "gain": 1 },
     { "key": "sting_eject", "url": "sting_eject.ogg", "gain": 1 },
     { "key": "sting_win_village", "url": "sting_win_village.ogg", "gain": 1 },
-    { "key": "sting_win_cabal", "url": "sting_win_cabal.ogg", "gain": 1 }
+    { "key": "sting_win_cabal", "url": "sting_win_cabal.ogg", "gain": 1 },
+    { "key": "train_arrive", "url": "train_arrive.ogg", "gain": 1 },
+    { "key": "train_brake", "url": "train_brake.ogg", "gain": 1 },
+    { "key": "ferry_horn", "url": "ferry_horn.ogg", "gain": 1 },
+    { "key": "crows", "url": "crows.ogg", "gain": 1 }
   ]
 }

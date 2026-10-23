@@ -34,6 +34,55 @@
       "gain": 1,
       "durationS": 20.0,
       "bytes": 150775
+    },
+    {
+      "key": "theme_railroad_barons",
+      "url": "theme_railroad_barons.ogg",
+      "gain": 1,
+      "durationS": 64.0,
+      "bytes": 778934
+    },
+    {
+      "key": "theme_extraction_camp",
+      "url": "theme_extraction_camp.ogg",
+      "gain": 1,
+      "durationS": 72.0,
+      "bytes": 907178
+    },
+    {
+      "key": "theme_bakers_bell",
+      "url": "theme_bakers_bell.ogg",
+      "gain": 1,
+      "durationS": 72.0,
+      "bytes": 923857
+    },
+    {
+      "key": "load_hollowmere",
+      "url": "load_hollowmere.ogg",
+      "gain": 1,
+      "durationS": 117.84,
+      "bytes": 1363276
+    },
+    {
+      "key": "load_blackpine",
+      "url": "load_blackpine.ogg",
+      "gain": 1,
+      "durationS": 80.76,
+      "bytes": 1006728
+    },
+    {
+      "key": "load_port_au_levain",
+      "url": "load_port_au_levain.ogg",
+      "gain": 1,
+      "durationS": 76.39,
+      "bytes": 943898
+    },
+    {
+      "key": "trailer_audio",
+      "url": "trailer_audio.ogg",
+      "gain": 1,
+      "durationS": 76.39,
+      "bytes": 865132
     }
   ],
   "playlists": [
@@ -47,25 +96,33 @@
     },
     {
       "id": "trailer",
-      "tracks": [],
+      "tracks": [
+        "trailer_audio"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
     {
       "id": "hollowmere_loading",
-      "tracks": [],
+      "tracks": [
+        "load_hollowmere"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
     {
       "id": "hollowmere_day",
-      "tracks": [],
+      "tracks": [
+        "theme_railroad_barons"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
     {
       "id": "hollowmere_dusk",
-      "tracks": [],
+      "tracks": [
+        "theme_railroad_barons"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
@@ -103,19 +160,25 @@
     },
     {
       "id": "blackpine_loading",
-      "tracks": [],
+      "tracks": [
+        "load_blackpine"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
     {
       "id": "blackpine_day",
-      "tracks": [],
+      "tracks": [
+        "theme_extraction_camp"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
     {
       "id": "blackpine_dusk",
-      "tracks": [],
+      "tracks": [
+        "theme_extraction_camp"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
@@ -153,7 +216,9 @@
     },
     {
       "id": "onub_kitchen",
-      "tracks": [],
+      "tracks": [
+        "theme_bakers_bell"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
@@ -167,7 +232,9 @@
     },
     {
       "id": "onub_rush",
-      "tracks": [],
+      "tracks": [
+        "theme_bakers_bell"
+      ],
       "crossfadeS": 2,
       "shuffle": false
     },
