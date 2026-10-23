@@ -10,7 +10,7 @@ import { mountDeckList } from './main/deckList';
 import { mountMapPicker } from './lobby/MapPicker';
 import { mountSettingsPanel } from './SettingsPanel';
 import { mountArtStyleSwitch } from './artStyle/ArtStyleSwitch';
-import { addFriendButton } from './lobby/addFriend';
+import { addFriendButton } from './menu/friends';
 import './lobby.css';
 
 const { npc, players: seatRange } = balanceJson;
@@ -313,7 +313,7 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     count.textContent = `${next.players.length} / ${MAX_PLAYERS}`;
     list.replaceChildren(
       ...next.players.map((p) => {
-        const friend = addFriendButton(p);
+        const friend = addFriendButton(p, 'wdi-tag wdi-lobby__tag--action');
         return h(
           'li',
           { class: `wdi-roster__row wdi-lobby__row${p.connected ? '' : ' is-away'}` },
