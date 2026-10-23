@@ -8,6 +8,7 @@ import { isProfileCode, readProfile } from './profileModel';
  */
 export const FRIENDS_KEY = 'wdi:friends';
 export const FRIENDS_MAX: number = balanceJson.party.friendsMax;
+export const INVITED_MAX: number = balanceJson.party.invitedMax;
 
 export interface Friend {
   code: string;
