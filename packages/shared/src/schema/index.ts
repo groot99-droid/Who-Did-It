@@ -9,9 +9,9 @@ import { schema, t } from '@colyseus/schema';
 // Every Schema stays under 63 fields. Round 5 (DECISIONS A50): `Player.sceneId` is gone and `presence` reaches its
 // owner only; every other seat walks as an avatar under a handle (GDD 3.17). Round 6 (DECISIONS A81): the M5b
 // maps `nodes` and `mobs`, `Private.quests`, `GameState.lawStage` and `Role.evolvedFrom`, all empty until their
-// sessions fill them (docs/round6/seams.md 1.1).
+// sessions fill them (docs/round6/seams.md 1.1). Version 4 (round 7, A104): `Player.profile`.
 
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 /**
  * View tags (Visibility.ts): `presence` and `priv` are the numeric tags 1 and 2, granted one by one; `ghost`
@@ -233,6 +233,8 @@ export const Player = schema(
     hasVoted: bool(),
     /** Public look id (looks.json): '' for every seat until the role card closes, then fixed (GDD 3.17). */
     look: str(),
+    /** Round 7 (GDD 3.21): the device's profile code, '' for a seat without one; public like the name, says nothing of a role. */
+    profile: str(),
     // Own client only: the own position (others are avatars). `alive` flips only at a meeting or an ejection (A30).
     presence: t.ref(Presence).view(VIEW_TAG.presence),
     // Own client only

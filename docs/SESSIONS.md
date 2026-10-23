@@ -3063,3 +3063,188 @@ pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock 
   starts with the library part. Contract answers: 6D edits `flags/index.ts` (`admin: route[0]?.split('?')[0]
   === 'admin'`) in #66; 6I adds the four `WorldFeed` members, the M5b layer and E routing in `World.ts`, and
   `answer()` on the four ONUB widgets in #67, so no stand-in lands; 6C kept the per-kind admin feed.
+## Round 7 (started 2026-10-23, after round 6's #81 landed at 11168d1; 6P's #73 and 6N's A102 still to land)
+
+Ten sessions build **R7, Vendettas and memorials** (GDD 3.20; ROADMAP R7) and **R7b, the re-skin, parties and
+profiles** (GDD 3.21; ROADMAP R7b): the owner's two Claude Design mockups of 2026-10-23 and their three answers
+(DECISIONS A103), the party list with open and private parties, profiles and friends (A104), the map intro
+tracks played whole over longer cinematic openings (A101), and the Bible's Book I.3 and I.6 staged by
+`docs/round6/bible-seams.md` 2.1. The contract is `docs/round7/` (A105). Same rules as rounds 1 to 6:
+- draft PRs against `claude/zen-turing-m1jnw0`, under 400 lines where the work allows (split by step, each PR
+  green; a re-skin PR may run longer where one screen's CSS does, never two screens in one PR);
+- `pnpm lint && pnpm typecheck && pnpm test` clean before every push;
+- pinned versions only, and no model identifiers in committed files (the Model column of this table is the one
+  exception);
+- `docs/GDD.md` changes in the same PR as a behaviour change; a re-skin PR changes no rule, no number and no
+  wire;
+- numbers only in `docs/GDD.md` and `packages/content/data`.
+
+**Models.** The owner's rule holds: Sonnet 5.5 for almost everything; Opus 5.5 for planning, the complex game
+logic (7H, 7I), content and art (7A, 7B); Fable 5.1 for the orchestrator only. The decisions of this round are
+DECISIONS A101 to A105; a session never re-decides them.
+
+**Context.** Every session compacts at 400k tokens (`.claude/settings.json`, `CLAUDE.md` "Compact instructions").
+A session is spawned with its model and a prompt of the form "You are session 7X of docs/SESSIONS.md Round 7.
+Read your brief, then the docs/round7/ documents it names. Branch claude/r7-<slug>."
+
+**What changed for everyone.**
+- **Every screen is re-skinned** to the owner's mockups (`ui-reskin.md`): the night palette, two pixel fonts and
+  the glass components are 7B's theme pieces; each screen session writes its rules in its own CSS file;
+  `components.css` and `tokens.css` are 7B's alone; `theme.test.ts` scans every `.css` under `apps/client/src`.
+- **The menu asks the name on Start and lists parties on Join** (`parties.md`): `CreateOptions { visibility,
+  invited }`, `JoinOptions.profile`, `Player.profile` on the roster (schema version 4), `GET /parties` beside
+  `/health`. The e2e helper `e2e/fixtures/party.ts` (7C) is the one place the specs create and join a party.
+- **The openings run their track's length** and visit other scenes (`map-intros.md`): the music class
+  `opening`, `loop: false`, the grace lengthened by the chosen map's opening.
+- **The Step order** gains `runTrain` after `runEvents` (7I); the bus gains the `vendetta.*`, `train.*` kinds.
+- **Round 6 is still landing**: 6P's #73 (tests, the integration log, A97) and 6N's A102 (the intro trim, the
+  landing loop). A round-7 session never edits `apps/server/test/*.test.ts` files that exist today (new files
+  only), the round-6 log or A97.
+
+**Shared files.** Locked for every session but 6Z: `packages/shared/src/schema/index.ts` and `protocol/index.ts`
+(7D adds the rows `parties.md` 2 names, 7H the `Private.vendetta` row after 7D merges; anything else through
+6Z), `apps/server/src/sim/{Step,Deck,Flow,Quests,Npc,seeds}.ts` and `sim/npc/**` (the one-line hooks
+`vendettas.md` names are agreed in a PR description first), `ui/theme/**` (7B), `e2e/fixtures/party.ts` (7C),
+`.claude/settings.json`, `eslint.config.js`. Shared documents: edits stay inside the named section with no
+renumbering or reflow, and the orchestrator keeps both sides of any conflict. Copy: a session that needs new
+lines adds a UI.md 14 subsection of its own (7C 14.25, 7E 14.26, 7F 14.27, 7G 14.28, 7H 14.29, 7I 14.30) and a
+copy module under `ui/copy/`. Decisions a session has to make go to `docs/DECISIONS.md` under its reserved row
+(7A A101, 6N A102, 7B A106, 7C A107, 7D A108, 7E A109, 7F A110, 7G A111, 7H A112, 7I A113; integration A114). A
+second row takes the number plus 14 (A115 to A128, appended after A114); nobody edits an older row.
+
+| Session | Model | Track | Branch | Owns |
+|---|---|---|---|---|
+| **6Z. Round-7 contract** | Fable 5.1 | Contract | `claude/game-features-admin-planning-v43tvq` | `docs/round7/**`, this section, DECISIONS A103 to A105, GDD 3.20 and 3.21 stubs, ROADMAP R7 and R7b rows, UI.md 12 rows, the locked one-line hooks |
+| **7A. Map intros** | Opus 5.5 | Code | `claude/r7-map-intros` | `music.json`, `cutscenes.json` and their schemas, `view/{MusicBus,MusicDirector}.ts`, `view/cutscene/**` (camera, staging, the `video` step), the grace line of `handlers/lobby.ts`, the opening cap of `validate.ts`, GDD 3.3 and 3.18 opening lines, `cutscene-music.md` 1 and 3, A101 |
+| **7B. Theme pieces** | Opus 5.5 | Art | `claude/r7-theme` | `palette.json` night set, `style.json` `ui.fonts`, `ui/theme/**`, the two fonts and their licences, `ui/backdrop.ts`, the removal of `view/Backdrop.ts`, UI.md 2, 3, 6, 10, ASSETS 6.1, CREDITS rows, A106 |
+| **7C. Menu, profile, friends, Quit, party list** | Sonnet 5.5 | Code | `claude/r7-menu` | `ui/Landing.ts`, `scenes/Landing.ts`, `ui/menu/**`, `ui/menu.css`, `ui/copy/menu.ts`, `public/help/index.html`, `e2e/fixtures/party.ts` and the two landing lines of every spec, `e2e/smoke.spec.ts`, the menu half of `e2e/party.spec.ts`, UI.md 14.25, GDD 3.21 client lines, A107 |
+| **7D. Parties server** | Sonnet 5.5 | Code | `claude/r7-parties-server` | the wire rows of `parties.md` 2, `rooms/PartyRoom.ts` create and metadata lines, the `/parties` route in `server.ts`, `services/matchmakeGuard.ts` (the route's bucket), `balance.json` `party` and its schema, `test/parties.test.ts`, `tools/bots/swarm.ts` visibility, ARCHITECTURE 5.3, `PROTOCOL.md`, GDD 3.21 server lines, A108 |
+| **7E. Lobby** | Sonnet 5.5 | Code | `claude/r7-lobby` | `ui/Lobby.ts`, `ui/lobby/**`, `ui/artStyle/**`, `ui/main/{deckList,deckChip,deckView}.ts`, `scenes/Lobby.ts`, `ui/lobby.css`, the lobby keys of `ui/copy/lobby.ts`, `Lobby.test.ts`, `MapPicker.test.ts`, `DeckEditor.test.ts`, the lobby half of `e2e/party.spec.ts`, UI.md 14.26, A109 |
+| **7F. Match screens** | Sonnet 5.5 | Code | `claude/r7-match-ui` | `ui/RoleCard.ts`, `view/Hud.ts`, `view/hud.css`, `view/NotebookPanel.ts`, `ui/SettingsPanel.ts`, `view/{LoadingScreen,Transition}.ts`, the captions and Skip DOM of `CutscenePlayer.ts`, the Skip of `scenes/Intro.ts`, `ui/M5bLayer.ts`, `ui/{Inventory,Crafting,QuestLog}.ts`, `view/minigames/**`, `ui/match.css`, their tests, `e2e/m5b.spec.ts`, UI.md 14.27, A110 |
+| **7G. Table and quick-mode screens, admin page** | Sonnet 5.5 | Code | `claude/r7-table-ui` | `ui/Meeting.ts`, `ui/GameOver.ts`, `ui/SeatPicker.ts`, `ui/main/{cards,overMain,shotToast,lookPortraits}.ts`, `ui/portrait.ts`, `ui/onub/**`, `view/onub/**`, the DOM of `scenes/{Kitchen,Night,Meeting,GameOver}.ts`, `client/admin/**`, `ui/table.css`, `ui/onub/onub.css`, their tests, `e2e/{meeting,onub,night,kitchen,admin}.spec.ts`, UI.md 14.28, A111 |
+| **7H. Vendettas** | Opus 5.5 | Code | `claude/r7-vendettas` | `sim/vendettas/**`, `vendettas.json` and its schema, `balance.json` `vendettas`, `Private.vendetta` (after 7D), the strongbox rows of `scenes/manor_hall.json`, the `contract` acceptance line of `sim/Quests.ts`, `ui/copy/vendettas.ts`, `test/vendettas.test.ts`, the vendetta invariants, GDD 3.20 vendetta paragraphs, UI.md 14.29, A112 |
+| **7I. The Train, the memorial, the Ascended Vicar** | Opus 5.5 | Code | `claude/r7-train` | `sim/{Train,Memorial}.ts`, the `runTrain` line, `scenes/station.json` (or the overworld spot), `maps/hollowmere.json`, `FlowState.ascendedVicarCandidate`, the memorial row of `cutscenes.json` and its caption block, `balance.json` `train`, `test/{train,memorial}.test.ts`, GDD 3.3 Train line and 3.20 memorial paragraph, WORLD 4.3, UI.md 14.30, A113 |
+| **7P. Integration** | Sonnet 5.5 | Code | `claude/r7-integration` | merges, lockfile, `PROTOCOL.md` regen, the dead landing keys of `ui/copy/lobby.ts`, the opt-in e2e suites, both screenshot sets (UI.md 12), `pnpm auto -- --matches 50` per map, both 30-minute soaks, this round's integration log, A114 |
+
+Merge order: 6Z first (this contract); then 7A, 7B, 7D, 7H (conversion and sabotage), 7I in parallel; 7C, 7E, 7F
+and 7G after 7B's theme PR, and 7C's party list PR after 7D; 7H's heist and contract PRs after 7I's Train; 7I's
+memorial PR after 7A's `video` step; 7P last. 6P's #73 and 6N's A102 merge whenever they are green.
+
+### Briefs
+
+Every brief names the session's paths, the sections it reads, its PR split, its tests and what it leaves
+alone. Every session records its round-7 log under its reserved "Round 7 log" heading at the end of this section.
+
+**7A. Map intros.** Play the owner's three intro pieces whole and never looped, lengthen each map's opening to
+its track and make the openings cinematic, visiting the rooms and the caves. **Owns** the files of its row.
+**Reads** `docs/round7/map-intros.md`, `docs/round6/cutscene-music.md` 1 and 3, `media.md` 1, GDD 3.3 and 3.18,
+A81, A96, A98. **PRs**: (1) the `opening` class, `loop: false`, the once-only bus and the director's hold; (2) the
+lengths, the cap, the grace line, GDD, validation, A101; (3) other-scene staging in the player and the two
+rewritten openings; (4) the `video` step for 7I. **Tests**: MusicBus, MusicDirector, sequencer and player,
+content validation, `e2e/cutscene.spec.ts`. **Not**: the day themes, any file 7F restyles (captions and Skip
+DOM: 7A keeps the markup it finds and 7F restyles it). Stop and ask 6Z if staging proves heavier than two days.
+
+**7B. Theme pieces.** Give every screen session the night palette, the two pixel fonts, the glass components and
+the loop backdrop, exactly as `ui-reskin.md` 3 lists them, with UI.md 6 rows written first and the contrast of
+every new pair measured in UI.md 10. **Owns** its row. **Reads** `ui-reskin.md` 1 to 3, UI.md 1 to 10, ASSETS
+6.1, 6.5, 6.8, A93, A98, `LICENSES/fonts/README.md`, `theme.test.ts`. **PRs**: (1) fonts, palette, tokens, the
+gate widened to every `.css` file, licences and CREDITS; (2) the glass components and `.wdi-title`; (3)
+`ui/backdrop.ts` fed by 6N's `landing_loop` rows (a poster-only path until they land) and the removal of
+`view/Backdrop.ts`. **Tests**: `theme.test.ts`, `media.test.ts`, the existing screens still render (`pnpm
+test`, `e2e/smoke.spec.ts`). **Not**: any screen's own markup; a fifth or sixth colour beyond the set.
+
+**7C. Menu, profile, friends, Quit, party list.** Build the menu of the mockup with every button, the Start
+dialog, the party list, the profile, the friends list and Quit, as `parties.md` 4 says; restyle the help page.
+**Owns** its row. **Reads** `parties.md`, `ui-reskin.md` 1, 2 and 4, GDD 2 step 1 and 3.21, UI.md 14.11, A98,
+A103, A104. **PRs**: (1) the menu, the Start dialog (open or private), the code box, the Settings, How to Play
+and Credits buttons, Create Profile, Friends and Quit greyed with the note, `e2e/fixtures/party.ts` and the
+specs' landing lines; (2) the profile and the friends list, the chip; (3) Quit and the help page; (4) the party
+list after 7D merges, with the invite pick on the Start dialog. **Tests**: new `ui/menu/*.test.ts`,
+`e2e/party.spec.ts` (menu half), `e2e/smoke.spec.ts`, every spec still green through the helper. **Not**:
+`ui/copy/lobby.ts`, the lobby, the server.
+
+**7D. Parties server.** The wire, the server and the numbers of `parties.md` 2 and 3. **Owns** its row.
+**Reads** `parties.md`, ARCHITECTURE 5.3 and 5.11, GDD 3.21, `rooms/PartyRoom.ts`, `services/{CodeRegistry,
+matchmakeGuard}.ts`, `tools/bots/swarm.ts`. **PRs**: (1) `CreateOptions`, `JoinOptions.profile`, `Player.profile`
+(schema version 4), `balance.json` `party`, `onAuth` checks, `PROTOCOL.md`; (2) the metadata and the `/parties`
+route with its bucket, the swarm's visibility, ARCHITECTURE 5.3. **Tests**: `test/parties.test.ts` as
+`parties.md` 3 lists, `schema.test.ts`, `protocol-doc.test.ts`. **Not**: the client, any existing test file.
+
+**7E. Lobby.** The three columns of the mockup with every control the lobby has today, in 7B's pieces. **Owns**
+its row. **Reads** `ui-reskin.md` 1, 2 and 4, UI.md 14.11 to 14.18, GDD 2 step 3. **PRs**: (1) columns A and C
+(code, copy link, mode, NPCs, seats with tags, the deck chips, Start, Ready, Leave, the confirm dialog); (2)
+column B (map cards with blurbs from `copy/maps.ts`, the art-style segment, HD disabled) and the deck editor.
+**Tests**: `Lobby.test.ts`, `MapPicker.test.ts`, `DeckEditor.test.ts`, the lobby half of `e2e/party.spec.ts`,
+`e2e/looks.spec.ts`. **Not**: a new wire field (the NPC tag only where the snapshot already says which seats are
+NPCs); the "Locate" button.
+
+**7F. Match screens.** The role card, the HUD and log, the notebook, the settings panel, the loading screen, the
+transitions, the captions and Skip, the M5b layer and panels and the mini-games, in 7B's pieces, nothing moved
+that the specs find by id. **Owns** its row. **Reads** `ui-reskin.md` 2 and 4, UI.md 7, 14.4, 14.5, 14.19 to
+14.22, 14.24. **PRs**: (1) role card, HUD, notebook, settings; (2) loading, transitions, captions, the Skips; (3)
+M5b layer and panels, mini-games. **Tests**: `RoleCard.test.ts`, `m5bPanels.test.ts`, `LoadingScreen.test.ts`,
+`Transition.test.ts`, `e2e/m5b.spec.ts`, `e2e/cutscene.spec.ts`, `e2e/intro.spec.ts`. **Not**: the camera of the
+player (7A), the rule of any panel.
+
+**7G. Table and quick-mode screens, admin page.** The meeting, the game over, the seat picker, the main-mode
+cards and toasts, every quick-mode screen and the admin page, in 7B's pieces. **Owns** its row. **Reads**
+`ui-reskin.md` 2 and 4, UI.md 14.6 to 14.10, 14.12, 14.14 to 14.16, 14.23. **PRs**: (1) meeting and game over;
+(2) the main-mode cards, seat picker, toasts; (3) the quick mode; (4) the admin page. **Tests**:
+`meetingText.test.ts`, `main.test.ts`, the `onub` unit tests, `e2e/{meeting,onub,night,kitchen,admin}.spec.ts`
+(the opt-in ones with their flags). **Not**: any rule or wire; the HUD (7F).
+
+**7H. Vendettas.** The four vendettas of `vendettas.md` 2 as data, server modules, invariants and GDD 3.20.
+**Owns** its row. **Reads** `vendettas.md`, `bible-seams.md` 1 and 2.1, `owner-brief.md` Book I.3, GDD 3.2,
+3.3, 3.12, 3.16, A100, `sim/events/bus.ts`, `sim/auto/invariants.ts`, `sim/Quests.ts`. **PRs**: (1) the schema
+widened, `vendettas.json` with the four rows, `balance.json` `vendettas`, the `vendetta` stream and draw (the
+`Deck.ts` line agreed with 6Z), `Private.vendetta` after 7D, GDD 3.20's rules; (2) conversion and sabotage; (3)
+heist and contract after 7I's Train; (4) invariants and the auto gate. **Tests**: `test/vendettas.test.ts`,
+`seeds.test.ts`, `pnpm auto -- --matches 50` on HollowMere. **Not**: the NPC brain (one hook through 6Z), the
+kill loop, the timer, anything public that names a vendetta.
+
+**7I. The Train, the memorial, the Ascended Vicar.** `vendettas.md` 3. **Owns** its row. **Reads**
+`vendettas.md`, `bible-seams.md` 1 and 2.1, `owner-brief.md` Book I.2 and I.6, GDD 3.3, 3.13, 3.18, WORLD 4.3,
+A98, A99, `media.md` 3, `sim/Flow.ts`, `sim/Step.ts`, `sim/events/bus.ts`. **PRs**: (1) the station (scene or
+spot), the Train with `train.arrive` and `train.delivery`, the sounds and the log line, `balance.json` `train`,
+GDD 3.3's line, WORLD 4.3; (2) the memorial and the Ascended Vicar field after 7A's `video` step. **Tests**:
+`test/train.test.ts`, `test/memorial.test.ts`, content validation of the new scene. **Not**: BlackPine, the
+evolutions (round 8), the player.
+
+**7P. Integration.** As 6P's brief, for this round: merges in the order above, lockfile, `PROTOCOL.md`, the dead
+landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm auto`, the log and A114.
+
+### Round 7 log: 6Z
+
+- 2026-10-23: #81 (A100, the Killer's timer) merged at 11168d1; the contract written from the owner's requests
+  of 05:00Z to 07:10Z; 7A spawned first (its brief needed no other session), 6N given A102; the rest spawned as
+  this contract lands.
+
+### Round 7 log: 7A
+
+### Round 7 log: 7B
+
+- 2026-10-23: PR 1 (fonts, night set, tokens, the gate on every `.css` under `apps/client/src`, licences,
+  CREDITS, UI.md 2, 3 and 10, ASSETS 6.1, A106). The night set sits in its own `palette.json` block (A106);
+  glass contrast is measured over the darkest and the brightest bound of the loop, so it does not wait for 6N.
+
+### Round 7 log: 7C
+
+### Round 7 log: 7D
+
+- PR 1 (wire): `CreateOptions`, `JoinOptions.profile`, `Player.profile` (schema version 4), `balance.json` `party`, the `onAuth` checks, `PROTOCOL.md`, `parties.test.ts` (auth half), ARCHITECTURE 5.3 and GDD 3.21 server lines, A108. `protocol-doc.ts` lists `PartyVisibility` and `CreateOptions`. Profile codes are exact-length upper-case join-alphabet strings; `newSeat` is untouched (the profile is set in `onJoin`).
+
+### Round 7 log: 7E
+
+### Round 7 log: 7F
+
+### Round 7 log: 7G
+
+### Round 7 log: 7H
+
+- 2026-10-23: PR 1 (the four rows, the widened schema and its checks, `balance.json` `vendettas`, the `vendetta`
+  stream, the draw through the `sim/Deck.ts` line, GDD 3.20, A112); the holding in room memory behind
+  `privateVendetta` until 7D's schema version 4 lands. Hooks asked of 6Z in the PR description.
+
+### Round 7 log: 7I
+
+## Integration log, round 7

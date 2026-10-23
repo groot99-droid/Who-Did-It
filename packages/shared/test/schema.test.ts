@@ -32,7 +32,7 @@ describe('shared basics', () => {
 
   it('builds state with defaults and a mode field', () => {
     const s = new GameState();
-    expect(SCHEMA_VERSION).toBe(3);
+    expect(SCHEMA_VERSION).toBe(4);
     expect(s.schemaVersion).toBe(SCHEMA_VERSION);
     expect(s.settings).toBeInstanceOf(Settings);
     expect(s.settings.mode).toBe(0);
@@ -66,5 +66,9 @@ describe('shared basics', () => {
     expect(priv.quests.length).toBe(0);
     expect(priv.role.evolvedFrom).toBe('');
     expect(new GameState().lawStage).toBe(0);
+  });
+
+  it('adds the round-7 profile empty (docs/round7/parties.md 2)', () => {
+    expect(new Player().profile).toBe('');
   });
 });

@@ -10,6 +10,14 @@
     "startMinHumans": 1,
     "gddRef": "2"
   },
+  "party": {
+    "profileCodeLength": 8,
+    "friendsMax": 50,
+    "invitedMax": 50,
+    "listMax": 50,
+    "listRefreshS": 3,
+    "gddRef": "3.21"
+  },
   "phases": {
     "roleRevealS": 20,
     "countdownS": 3,
@@ -236,6 +244,13 @@
     "gddRef": "3.13"
   },
   "ghosts": { "wispsPerCycle": 1, "gddRef": "3.7" },
+  "vendettas": {
+    "conversion": { "shareS": 45 },
+    "sabotage": { "tamperS": 6, "stations": 2, "undoTasks": 1 },
+    "heist": { "crackS": 8 },
+    "contract": { "offTargetRestS": 30 },
+    "gddRef": "3.20"
+  },
   "chat": {
     "maxChars": 200,
     "quickChatRadiusTiles": 5,

@@ -686,3 +686,90 @@ Round 6 (ROADMAP M5d). An owner-only room runs a match in which every seat is an
 **The all-NPC match.** The owner chooses the map, the mode (main or quick), the seat count (every seat an NPC, up to `players.max`), the NPC difficulty, the quick mode's deck if not the default, and optionally the seed words. Start needs no leader and no human; the match deals, plays and ends exactly as a normal one, and below `players.min` seats the usual NPC fill applies. Each NPC brain plays as in 3.12, with one difference: an NPC Killer may take another NPC as prey, so the brains play each other. Reset returns the room to the lobby with the same seats under the same ids, the same options and the speed paused.
 
 **Replay.** An auto match fixes the seed words of every random stream and the seat ids before Start, so the same words and ids replay the same match tick for tick. The headless runner (`pnpm auto`) plays such matches with no network and no client and prints one line per match (winner, ticks, rounds, invariant failures); a failure is printed with the seed words of every stream and the seat ids, which the admin page can set to watch it again. The runner's `--seed` decides every match's words, so a run with the same flags plays the same matches.
+
+### 3.20 Vendettas
+
+Round 7 (ROADMAP R7). A Killer's card carries one of four vendettas drawn at the deal (conversion, sabotage,
+heist, contract), each a trigger and a consequence around the kill, never a second way to kill; HollowMere's
+Daily Train is the clock they run on, and the Vicar's death by the Knife is marked by a memorial every seat sees.
+The contract is `docs/round7/vendettas.md`; 7H writes the vendetta paragraphs here and 7I the Train and memorial
+paragraphs, and the numbers live in `balance.json` (`vendettas`, `train`).
+
+**The draw (7H).** At the deal, every seat dealt a card that carries vendettas (the Killer; `vendettas.json`
+`role`) draws one, uniformly among the rows the match allows: the Zealot only when a seat is dealt the Vicar, the
+Bandit only when the manor hall is open at the party's size (Medium and Large, 3.13), the Bandit and the Hitman
+only on HollowMere, where the Train runs. A seat with no row allowed draws none. Each seat draws from a stream of
+its own (`vendetta`, keyed by seat), so the draw moves no other draw. The two Killers of a 10-seat deck draw
+apart and may draw the same row. The quick mode deals no vendetta. The vendetta stays with its seat: it ends
+when the seat dies or is ejected, and an Accomplice who inherits the Knife (3.2) inherits none.
+
+**On the card.** A Killer's role card shows its vendetta as a goal line; the Accomplice's card shows the goal of
+each Killer it knows and nothing else of them; no other seat's card changes. The vendetta lives only in the seat's
+private view (`Private.vendetta`); no look, no public field, no message to another seat and no bus event names
+it with its holder (3.17). What a vendetta does in the world is the only tell, as a body is the only tell of a
+kill.
+
+**Pressure, not a second kill.** A vendetta never kills, never changes whom the Knife may take, and never
+touches the strike roll or the kill-opportunity timer of an NPC Killer (3.12). Each has a goal, watched by the
+server, and one consequence that fires at most once per match; the bus carries its steps as `vendetta.<kind>.<step>`
+events that name no seat (`vendettas.json` `emits`, `fires`).
+
+- **Conversion: the Zealot against the Vicar (7H).** The Zealot's goal is the Vicar's flock: world-phase time in
+  the same scene as the seat dealt the Vicar, both alive and placed, counted across scenes and phases. At **45 s**
+  (`vendettas.conversion.shareS`) the doubt is sown (`vendetta.conversion.sown`). At the next meeting the
+  Vicar's vote counts for nothing in the tally (`vendetta.conversion.doubt`, the consequence); the Vicar still
+  votes and sees its vote, and the tally shows one vote fewer. If the Vicar dies or is ejected first, the
+  vendetta lapses (`vendetta.conversion.lapsed`).
+- **Sabotage: the Activist against the company (7H).** The Activist's goal is the company's stations: standing
+  still within verb reach of a target prop of a task (3.5) for **6 s** (`vendettas.sabotage.tamperS`) in a verb
+  phase tampers with it (`vendetta.sabotage.tampered`, once per target); at **2** targets
+  (`vendettas.sabotage.stations`) the works are wrecked (`vendetta.sabotage.wrecked`, the consequence): **1**
+  finished real task of the match (`vendettas.sabotage.undoTasks`), drawn from the Activist's stream, is undone,
+  the task bar falls with it, and the Activist's Knife is ready at once. With no finished real task the bar has
+  nothing to lose and only the Knife is readied.
+- **Heist: the Bandit against the strongbox (7H).** The strongbox stands in the manor hall, empty, in every
+  HollowMere match the hall is open at; the first Train delivery of the match loads it (`vendetta.heist.loaded`,
+  in every such match, Bandit or not). The Bandit's goal is to crack it: **8 s** (`vendettas.heist.crackS`)
+  still within verb reach of it, after dark, with no other living seat in the hall. Cracking it
+  (`vendetta.heist.cracked`, the consequence) puts the Strongbox item in the Bandit's inventory (it needs a free
+  slot), leaves a footprint of the Bandit's own height at the box as a kill does (3.4), and readies the Knife at
+  once. The strongbox is in one inventory at most.
+- **Contract: the Hitman (7H).** At the first Train arrival of the match the mail brings the Hitman a sealed
+  letter (`vendetta.contract.offered`): a target drawn from the mail stream (`contract`) among the living seats
+  other than the Hitman and its Cabal mates, written to the Hitman's own Notebook. The Hitman accepts it as a
+  quest of kind `contract` (3.16) from anywhere (`vendetta.contract.accepted`); an NPC Hitman accepts at once.
+  While the contract is accepted and the target lives, a Knife strike on anyone else rests the Knife **30 s**
+  longer (`vendettas.contract.offTargetRestS`). A strike that kills the target completes the quest
+  (`vendetta.contract.done`, the consequence) and readies the Knife at once; a target who dies any other way
+  ends the contract unpaid (`vendetta.contract.lapsed`).
+
+**NPC Killers (7H).** An NPC Killer holds a vendetta like any Killer and walks toward its goal as one more place
+under its routine (3.12): the Vicar's scene, a task target's scene, the loaded strongbox's hall or its target's
+scene, through `vendettaGoalFor`. It does nothing a human could not do in the same place.
+
+### 3.21 Parties, profiles and friends
+
+Round 7 (ROADMAP R7b; `docs/round7/parties.md`; DECISIONS A103, A104). The menu asks the name on Start Game and
+lists parties under Join Game instead of asking a code; a code box stays one tap away for links and codes.
+
+**Parties.** A party is **open** or **private**, chosen by its leader at Create (open by default). The party
+list shows open parties in the lobby phase, newest first, at most **50**, refreshed every **3 s** while the list
+is open; a row shows the leader's name, the seats taken and the maximum, the mode and the map, nothing else. A
+private party is unlisted, except to a device whose profile code the leader **invited** (up to **50** codes,
+picked from the leader's friends list at Create), and is joinable by its code or link as every party is. The
+list ends at the lobby: a party that has started is never listed, and a listing never carries a seat id, a
+device id or a role. The server keeps none of this past the room's life.
+
+**Profile.** One profile per device: the name (**2 to 16** characters, as before) and a **profile code** of **8**
+characters from the join-code alphabet, made on the device. The code is shown under Create Profile and may be
+shared; it is not a secret and proves nothing, so a device that knows a friend's code sees the private parties
+that friend was invited to (the open column of A104). A seat's profile code travels on the public roster, like
+its name, so a friend can be added from a lobby row or a game-over row.
+
+**Friends.** Up to **50** entries, each a profile code and the name last seen under it, kept on the device and
+never sent except as the leader's invited list at Create. **Quit** leaves any party as Leave does, silences the
+music and shows a goodbye panel; it sends nothing more.
+
+The numbers are `balance.json` `party` (`profileCodeLength`, `friendsMax`, `invitedMax`, `listMax`,
+`listRefreshS`); nothing else restates them.
+
