@@ -39,7 +39,7 @@ Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accompl
 
 ### 3.2 Role cards
 
-"Cover" says whether the role wears another card's look (3.17). Every card's character, portrait and world look are `looks.json`.
+"Cover" says whether the role wears another card's look (3.17). Every card's character, portrait and world look are `looks.json`. (Round 8, DECISIONS A171.) A number in a card's goal, card text, Beware or win line is never typed in `roles.json`: it is a token naming the data it states (for example `{clues.clues.blood.params.visibleTiles}`), filled when the content loads, so the card shows the same words and always agrees with the rules ("data wins, card generated", the owner, A168). The Thief's Heirloom count waits for its data until the Thief ships.
 
 | Role | Cover | Win | Start kit | Abilities (max 3) | Card text | Beware |
 |---|---|---|---|---|---|---|

@@ -24,9 +24,9 @@
       "look": "killer",
       "ships": "V1",
       "firstPlayable": true,
-      "goal": "Kill until the Cabal matches the village (one villager left at 4-5), and never get voted out.",
+      "goal": "Kill until the Cabal matches the village (one villager left at {byCount.villageAtMostOne.sizes}), and never get voted out.",
       "winsWith": "cabal",
-      "win": "Parity at 6+ players, living Village at most 1 at 4-5, or the Final Night vote fails.",
+      "win": "Parity at {byCount.parity.from}+ players, living Village at most 1 at {byCount.villageAtMostOne.sizes}, or the Final Night vote fails.",
       "parity": "cabal",
       "startKit": [
         { "item": "knife", "qty": 1 },
@@ -36,7 +36,7 @@
       ],
       "abilities": ["kill", "impersonate", "dragBody"],
       "cardText": "Walk in a borrowed character. Strike after dark when the room is empty, clean one clue, wash at the well, then be the loudest voice asking who did it.",
-      "beware": "Clues match your own traits whatever face you wear; your height never changes; Blood shows within 3 tiles; a guarded target voids your kill.",
+      "beware": "Clues match your own traits whatever face you wear; your height never changes; Blood shows within {clues.clues.blood.params.visibleTiles} tiles; a guarded target voids your kill.",
       "bellPulls": 1,
       "gddRef": "3.2"
     },
@@ -102,7 +102,7 @@
       ],
       "abilities": ["inspect", "dustCompare"],
       "cardText": "Collect, inspect, cross-reference. Your Verified clues narrow the board; the village does the rest.",
-      "beware": "Prime target; the Rag erases clues; forgeries cost Lenses; Compare never gives a name. If you die the Magnifier drops and anyone can Inspect in 6 s.",
+      "beware": "Prime target; the Rag erases clues; forgeries cost Lenses; Compare never gives a name. If you die the Magnifier drops and anyone can Inspect in {abilities.abilities.inspect.params.droppedMagnifierCastS} s.",
       "bellPulls": 1,
       "gddRef": "3.2"
     },
@@ -167,7 +167,7 @@
       ],
       "abilities": ["silentHide", "witness", "slingshot"],
       "cardText": "You are small and quiet. Hide, watch, remember.",
-      "beware": "Top kill target; vision -1 tile; cannot pick up items.",
+      "beware": "Top kill target; vision {balance.vision.childDeltaTiles} tile; cannot pick up items.",
       "bellPulls": 1,
       "gddRef": "3.2"
     },
@@ -234,7 +234,7 @@
       ],
       "abilities": ["shoot", "arrest", "snare"],
       "cardText": "You hunt wolves. One arrest per match: be right.",
-      "beware": "Bolts are loud (noise 10).",
+      "beware": "Bolts are loud (noise {balance.noise.bolt}).",
       "bellPulls": 1,
       "gddRef": "3.2"
     },
