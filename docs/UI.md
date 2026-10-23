@@ -1256,11 +1256,12 @@ The full list is `ui/copy/admin.ts`.
 Session 7I, round 7 (DECISIONS A113). The Daily Train (GDD 3.3) adds no screen: the server sends the arrival line on
 the existing `chat.msg` `system` channel, so it lands in every seat's chat log and shows in the next meeting's chat
 with the system style; the arrival and the brake are `noise` pulses whose `kind` is the `AudioBus` key
-(`train_arrive`, `train_brake`) for the seats on the hub near the platform.
+(`train_arrive`, `train_brake`) for the seats on the hub near the platform, which the World scene plays instead of drawing a ring.
 
 | Line | Text | Where |
 |---|---|---|
 | the arrival (server, `Train.ts` `TRAIN_ARRIVE_LINE`) | The train pulls into the station. | `chat.msg` `system`, every seat, once per day |
+| `log.train` (`ui/copy/world.ts`) | The train pulls in at the platform | the HUD log of a seat that hears `train_arrive`; `World.ring` plays the two `train_*` pulses as sounds and draws no ring |
 
 ### 14.24 Opening cinematic (6Q)
 
