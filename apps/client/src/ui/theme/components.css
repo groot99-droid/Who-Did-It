@@ -3418,3 +3418,88 @@ button.wdi-map__option,
     translate: 0 calc(var(--wdi-rise) / 2);
   }
 }
+
+/* Activation (ui/theme/motion.ts puts these classes on a control and takes them off at animationend). */
+.wdi-fx-flash {
+  animation: wdi-flash var(--wdi-dur-flash) var(--wdi-ease-out);
+}
+
+.wdi-fx-refused {
+  animation: wdi-refused var(--wdi-dur-shake) var(--wdi-ease);
+}
+
+.wdi-fx-pop {
+  animation: wdi-pop var(--wdi-dur-panel) var(--wdi-ease-spring) backwards;
+}
+
+@keyframes wdi-flash {
+  from {
+    filter: brightness(1.5);
+    scale: 1.06;
+  }
+}
+
+@keyframes wdi-refused {
+  20%,
+  60% {
+    translate: calc(-1 * var(--wdi-shake)) 0;
+  }
+  40%,
+  80% {
+    translate: var(--wdi-shake) 0;
+  }
+  0%,
+  90% {
+    box-shadow: var(--wdi-glow-hazard);
+  }
+}
+
+@keyframes wdi-pop {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+/* The cooldown sweep: a night shade over the control that unwinds clockwise. It is status, as the busy
+   spinner is, so its time is the caller's (--wdi-cooldown-ms, the card's cooldown) and not a motion token,
+   and it runs under reduced motion too. */
+@property --_sweep {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+.wdi-fx-cooling {
+  position: relative;
+}
+
+.wdi-fx-cooling::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: conic-gradient(rgb(var(--wdi-night-rgb) / 0.6) calc(var(--_sweep) * 1turn), transparent 0);
+  pointer-events: none;
+  animation: wdi-sweep var(--wdi-cooldown-ms) linear forwards;
+}
+
+@keyframes wdi-sweep {
+  from {
+    --_sweep: 1;
+  }
+  to {
+    --_sweep: 0;
+  }
+}
+
+/* The E prompt pops in as it appears, and its bar fills smoothly between frames while E is held; the bar
+   glows as it fills. A task's mini-game opening rides the panel entrance above (`.wdi-m5b__modal`). */
+.wdi-m5b__prompt:not([hidden]) {
+  animation: wdi-pop var(--wdi-dur-panel) var(--wdi-ease-spring) backwards;
+}
+
+.wdi-m5b__bar > i {
+  transition: width var(--wdi-dur-press) linear;
+  box-shadow: 0 0 var(--wdi-space-2) rgb(var(--wdi-teal-rgb) / 0.6);
+}
