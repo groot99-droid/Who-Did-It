@@ -1407,6 +1407,9 @@ no other screen's card, chip or button changes. Ids, `data-testid`s and markup a
 | HUD chip, clock, log, toasts | Pixelify Sans; the clock digits Press Start 2P | glass (`--wdi-glass-fill`) with a lilac rim over the world; under `prefers-reduced-motion` the blur is dropped for the solid indigo |
 | Notebook sheet | Inter for entries, Press Start 2P for the title | glass page, ruled in lilac at 12%, over the veil |
 | Settings gear and panel | Pixelify Sans | glass; lantern sliders and focus ring |
+| Loading screen, transitions | Press Start 2P title with a violet step shadow, Pixelify Sans tip | night page with an indigo glow; a stepped glass bar with a lantern fill; the transition layer is night, not ink |
+| Cutscene captions | Pixelify Sans (a title caption Press Start 2P, `clamp(1.5rem, 5vw, 2.75rem)`) | a night scrim plate with a lilac rim; the title has none, a violet step shadow and a night halo for bright frames; a whisper is quieter, never slanted (no italic in the pixel face) |
+| Cutscene Skip, the intro's Skip and Begin | Press Start 2P, 12 px and 14 px | Skip a scrim chip; Begin the primary, night on lantern |
 
 **Numbers stay Inter.** Pixelify Sans' 2, 5 and 8 blur together at 12, 14 and 16 px (checked at 2x), so a line
 that can show a number is not set in it: the HUD goal, log lines, toasts and phase ("Day 2"), the settings value
@@ -1417,8 +1420,11 @@ this is the exception, found while checking the HUD.
 **Over the world.** The world has no veil, so a surface over it is measured against a bare white pixel. The shared
 glass fill (indigo at 66%) is measured under the menu's veil (10) and gives lilac only 3.32 there, so the HUD, the
 role chip, the settings gear and panel use `--wdi-match-glass` (`ui/match.css`: night at 85%): lilac on it is 8.61,
-lilac at 80% is 6.12 and snow is 13.14 over white. The notebook sheet sits under its own veil and keeps the glass fill.
+lilac at 80% is 6.12 and snow is 13.14 over white. The notebook sheet sits under its own veil and is a 7B `.wdi-glass`.
 
 No focusable element is clipped to a stepped corner: a `clip-path` would cut the focus ring, so the pixel corner is
-a 2 px radius with an inset snow rim, and the glass classes of 7B (`.wdi-glass-btn`) replace these rims where they
-land.
+a 2 px radius with an inset snow rim. 7B's glass classes keep their stepped corner on a `::before` layer, so the ring
+is never cut: the cutscene Skip, the intro's Skip and Begin (`.wdi-glass-btn--sm`, Begin `--primary`) and the notebook
+(`.wdi-glass`) use them; the snow label is 9.51 at worst on that glass, so it holds over the world. The HUD chip, the
+role chip, the settings gear and panel and the captions keep `--wdi-match-glass`, because their text is lilac or
+muted lilac, which the 66% fill does not carry over bare white.
