@@ -133,6 +133,12 @@ export type WorldFeedEvents = {
   cutscene: { id: string; scope?: 'all' };
   /** Private, round 6 (6H, 6I): a station task's mini-game opened; answered with `minigameResult`. */
   minigameStart: { taskId: string; kind: string; public: unknown };
+  /** Private, round 8, 8C (locked; GDD 3.23): a `shop` hold opened this shop (`S2C.shopOpen`). */
+  shopOpen: {
+    shopId: string;
+    stock: Array<{ itemId: string; price: number }>;
+    buys: Array<{ itemId: string; price: number }>;
+  };
 };
 
 /** Round 6 (M5b): a resource node of the scene this client is in (`SceneState.nodes`). */
@@ -203,6 +209,11 @@ export interface WorldFeed {
   tasks(): TaskSnap[];
   /** Round 6 (6I): this player's own inventory slots, in slot order. */
   inventory(): StackSnap[];
+  /** Round 8, 8C (locked; GDD 3.23): this player's own purse, `Private.purse`. */
+  purse(): number;
+  /** Round 8, 8C (locked): `act.buy` and `act.sell` at the shop a `shop` hold opened. */
+  buy(shopId: string, itemId: string, qty: number): void;
+  sell(shopId: string, itemId: string, qty: number): void;
   /** Round 6 (6I): `quest.accept { questId }`. */
   questAccept(questId: string): void;
   /** Round 6 (6I): `quest.turnIn { questId }`. */

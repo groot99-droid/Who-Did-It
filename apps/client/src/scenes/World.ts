@@ -29,6 +29,7 @@ import { GiverView } from '../view/GiverView';
 import { MobView } from '../view/MobView';
 import { NodeView } from '../view/NodeView';
 import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
+import { mountShopLayer, type ShopLayer } from '../ui/shop/ShopLayer'; // round 8, 8C (locked)
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
@@ -129,6 +130,7 @@ export class World extends Phaser.Scene {
   private mobView!: MobView;
   private giverView!: GiverView;
   private m5b: M5bLayer | null = null;
+  private shop: ShopLayer | null = null; // round 8, 8C (locked)
   private cutscenes!: CutscenePlayer;
   private ground: GroundView | null = null;
   private bell: { x: number; y: number } | null = null;
@@ -209,6 +211,7 @@ export class World extends Phaser.Scene {
     this.mobView = new MobView(this);
     this.giverView = new GiverView(this);
     this.m5b = mountM5bLayer(this);
+    this.shop = mountShopLayer(this); // round 8, 8C (locked)
     this.entities = new EntityView(this, feed.selfId);
 
     this.hud = new Hud(overlayRoot());
@@ -312,6 +315,7 @@ export class World extends Phaser.Scene {
       this.mobView.destroy();
       this.giverView.destroy();
       this.m5b?.destroy();
+      this.shop?.destroy(); // round 8, 8C (locked)
       this.cutscenes.destroy();
       this.ground?.destroy();
       this.ground = null;
@@ -403,6 +407,7 @@ export class World extends Phaser.Scene {
 
   /** E / Use: the M5b layer takes it for a node or a giver in reach; otherwise the clue, body, bell and door verbs. */
   private useKey(down: boolean): void {
+    if (this.shop?.use(down)) return; // round 8, 8C (locked): a shop counter in reach
     if (this.m5b?.use(down)) return;
     if (down) this.startUse();
     else this.endUse();

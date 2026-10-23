@@ -516,6 +516,15 @@ export class MockWorldFeed implements WorldFeed {
     return this.m5b.tasks();
   }
 
+  // Round 8, 8C (locked): the mock town has no shops and an empty purse.
+  purse(): number {
+    return 0;
+  }
+
+  buy(_shopId: string, _itemId: string, _qty: number): void {}
+
+  sell(_shopId: string, _itemId: string, _qty: number): void {}
+
   questAccept(questId: string): void {
     const me = this.actors.get(this.selfId);
     const refusal = me && this.m5b.questAccept(questId, me, this.content.scenes);
