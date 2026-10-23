@@ -88,6 +88,11 @@ budget: at most 12 MB in all and at most 4 MB per map**; the 6 MB budget stays f
 first load carries. `tools/sprites/test/media.test.ts` (6K) enforces both from `audio/manifest.json` and
 `audio/music/manifest.json`, and the per-video cap of section 3.
 
+**Amended 2026-10-23 (A98).** The `lobby` and `trailer` playlists play before any map loads, so they are a pre-match
+bucket: counted toward the 12 MB total, never toward a map's 4 MB. The per-map cap is `media.ts`'s 4 MiB, and
+`MusicDirector.test.ts` reads the same constant (6P). With the owner's theme whole in `lobby` (about 2.7 MB at q3)
+all music comes to about 10.7 MB.
+
 ## 3. The videos (6N; the owner's cinematic and loop, and one ROSW `video-shot` run)
 
 Three real videos exist in round 6 (two of them the owner's, DECISIONS A98); every other cinematic is in-engine and
