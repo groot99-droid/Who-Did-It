@@ -3216,6 +3216,7 @@ A116 are the owner's decisions of 13:05Z (the quick mode's removal, the bakery r
 | **7J. The quick mode's removal** | Opus 5.5 | Code | `claude/r7-remove-quick` | every file `quick-mode-removal.md` 2 lists, in its three PRs; `Settings.mode` and `OnubState` in the schema (version 5), the `onub.*` protocol rows, the mini-games' move to `view/minigames/` and their numbers to `balance.json` `minigames`, GDD 3.11's record and 3.16's reference, ARCHITECTURE 5.14, ASSETS 6.7, UI.md 14.12, CLAUDE.md's three mentions, `docs/guides/QUICK_MODE.md`, the CREDITS, MANIFEST and LICENSES rows, `soak.yml`, the `bots:*:onub` scripts, A117 |
 | **7K. Crumb's Ovens' rooms** | Opus 5.5 | Content and art | `claude/r7-ovens` | four new scene JSONs and nav under `packages/content/data/scenes/`, their rows in `maps/hollowmere.json` and `SCENE_IDS` (append), their tilemaps and renders for both art styles under `apps/client/public/assets/`, the task nodes, WORLD 4.3 rows, GDD 3.13's count, CREDITS and MANIFEST rows, `e2e/ovens.spec.ts`, A118 |
 | **7P. Integration** | Sonnet 5.5 | Code | `claude/r7-integration` | merges, lockfile, `PROTOCOL.md` regen, the dead landing keys of `ui/copy/lobby.ts`, the opt-in e2e suites, both screenshot sets (UI.md 12), `pnpm auto -- --matches 50` per map, both 30-minute soaks, this round's integration log, A114 |
+| **7M. Mini-games and tasks** (spawned 2026-10-23 on the owner's request, after the teardown and lore projects) | Fable 5.1 (Ultracode) | Code | `claude/r7-minigames` | `sim/Tasks.ts`, the `tasks` stream line, the `dealTasks` line of `handlers/lobby.ts`, `sim/Minigames.ts`, `rules/minigames.ts`, `view/minigames/**`, `MinigameModal.ts`, the chores panel and task prompt of `ui/M5bLayer.ts`, `minigames.json`, `balance.json` `minigames`, `ui/copy/minigames.ts`, `test/taskDeal.test.ts` and its later siblings, GDD 3.5 deal and pick-up lines and 3.16, A133, A151 |
 
 Merge order: 6Z first (this contract); then 7A, 7B, 7D, 7H (conversion and sabotage), 7I in parallel; 7C, 7E, 7F
 and 7G after 7B's theme PR, and 7C's party list PR after 7D; 7H's heist and contract PRs after 7I's Train; 7I's
@@ -3325,6 +3326,16 @@ HollowMere with the rooms reachable, the e2e walk. **Not**: the ten kitchen pict
 
 **7P. Integration.** As 6P's brief, for this round: merges in the order above, lockfile, `PROTOCOL.md`, the dead
 landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm auto`, the log and A114.
+
+**7M. Mini-games and tasks.** Deal every seat its tasks at Start (A133), give every task in `tasks.json` a playable
+mini-game drawn as its own station, and polish the four kinds against the UDGT teardown and the lore project (both in
+ROSW, read only). **Owns** its row. **Reads** GDD 3.5, 3.8, 3.16, 3.20, A90, A91, A97 (5), A118, A121, A131,
+`docs/round6/m5b-data.md` 2.3, the teardown chapters and the lore digest. **PRs**: (1) the deal, the `tasks` stream, ghosts
+at their own tasks, `test/taskDeal.test.ts`; (2) the deliverable pick-up at a source and the client's chores panel, bar and
+prompt; (3) a `tap` rule kind and a `skin` per station row, every widget in the night theme; (4) the co-op hold for Shutter
+the windows; (5) the teardown's readability, touch and reduced-motion findings. **Tests**: new files only; `pnpm auto --
+--matches 50 --map hollowmere` clean on every PR. **Not**: a mode switch, a new number outside `balance.json`, any edit to
+an existing `apps/server/test/*.test.ts`, anything written into ROSW.
 
 ### Round 7 log: 6Z
 
@@ -3456,5 +3467,24 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 - Seed for round 8 (Port-au-Levain, A116): the ten kitchen pictures stay unbuilt and are its rooms, the cellar,
   cold pantry, command desk, dish pit, expediter, front of house, hygiene, lamination, shaping bench and
   sub-basement (`assets/source/concepts/onub/`); they move to `docs/round8/` when that folder exists.
+
+### Round 7 log: 7M
+
+- 2026-10-23: spawned on the owner's request ("a new session just to develop every mini game ... utilize the new teardown and
+  lore projects"), Fable 5.1 with Ultracode. Found on 16ea76b: four mini-game kinds (crates, pour, slide, stoke; `board.ts` is
+  the band-RNG helper, not a kind), nothing dealing tasks, no task UI on the client, no source pick-up, the co-op task without a
+  handler, every task a Hollowmere one, and `taskProblem` refusing ghosts against GDD 3.8. Plan sent to 6Z before code.
+- 2026-10-23: PR 1 (the deal): `sim/Tasks.ts`, the `tasks` stream, the `dealTasks` line in `startMatch`, ghosts allowed at their
+  own tasks, `test/taskDeal.test.ts` (the pool, the counts, determinism per seed words, fake lists for Cabal and neutral seats,
+  none for NPCs, Blackpine empty, the bar and the full-bar win, a ghost's hold); GDD 3.5 "The deal"; A133.
+- 2026-10-23: a seam, for whoever imports `sim/Npc` next. `sim/Tasks.ts` first imported `isNpcSeat` from `sim/Npc`, and
+  `handlers/lobby.ts` imports `sim/Tasks` before `sim/Npc`; that alone moved the evaluation of `npc/meeting` earlier, two tests
+  of `lastShot.test.ts` (which `vi.mock`s that module) failed, and `pnpm auto` hung at 0% CPU with NPC matches that never
+  ended. `Tasks.ts` now reads `npcMemory(room).ids` from `npc/memory` and imports nothing above it. Told 6Z for `seams.md`.
+- Read from ROSW (never written): the UDGT teardown chapters 00 to 03 on `claude/sweet-maxwell-lmsiw3`, and the Who Did It lore
+  on `claude/sharp-mccarthy-pqi3ws` (the Canon Ledger, the Lamplighter's Round, the Gazette, the Tab Book, Fourteen Things, the
+  Daybook of Crumb's Ovens, Hopscotch, three stories). Drifts noted for 6Z, not resolved here: the lore dates HollowMere to 1893
+  (GDD 3.13 says 1931); the lore kneads at a trough and proofs cold (the rooms have a mixer and a candle-warmed cabinet, A118);
+  the lore keeps the pump and the well apart and knows no wrench at the apothecary.
 
 ## Integration log, round 7
