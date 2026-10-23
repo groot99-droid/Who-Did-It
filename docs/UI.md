@@ -1388,7 +1388,10 @@ asked where it is used.
 | `menu.friends` | Friends | opens the friends list (greyed with `menu.soon` until it lands) |
 | `menu.settings` | Settings | opens the sound panel of UI.md 14.22 in a dialog |
 | `menu.help`, `menu.credits` | How to Play, Credits | small links, a new tab: `${BASE}help/` and the repository's `CREDITS.md` |
-| `menu.quit` | Quit | small button (greyed with `menu.soon` until it lands) |
+| `menu.quit` | Quit | small button; opens the confirm below |
+| `quit.title`, `quit.body` | Leave Who Did It?, If you are in a party you leave it, and the music stops. | the confirm dialog |
+| `quit.confirm`, `quit.cancel` | Quit, Stay | `quit-confirm`; Stay closes the dialog |
+| `quit.bye.title`, `quit.bye.body`, `quit.back` | See you soon, You can close this tab now., Back to the menu | the goodbye panel after the consented leave and the music to silence (`quit-bye`, `quit-back`); `window.close()` runs first, only in a window the page opened itself |
 | `menu.soon` | Coming later | the note on a greyed button (the title and screen-reader text on the small one) |
 | `menu.haveCode` | Have a code? | the party list's link to the code box |
 | `menu.chip.guest`, `menu.chip.label` | Guest, Profile: {name} | the top-right chip |

@@ -29,6 +29,7 @@ export class Landing extends Phaser.Scene {
         joinCode: flags.joinCode,
         build: getHealth(this).build,
         music: this.registry.get(REG_MUSIC) as MusicBus | undefined,
+        onQuit: () => net.leave(),
         onCreate: async (name, visibility) => enterLobby(await net.create(name, { visibility })),
         onJoin: async (code, name) => enterLobby(await net.join(code, name)),
         explainFailure: async () => (!flags.mock && (await buildIsStale()) ? REFRESH_MESSAGE : null),
