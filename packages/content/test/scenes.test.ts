@@ -5,6 +5,7 @@ import {
   MAP_IDS,
   maps,
   PROFILE_RANK,
+  routines,
   SCENE_IDS,
   scenes,
   type Profile,
@@ -450,6 +451,28 @@ describe("Crumb's Ovens' station rooms (A116, A118)", () => {
       expect(s.spawns, id).toHaveLength(1);
       expect(s.spots.map((p) => p.kind).sort(), id).toEqual(['body', 'hide']);
       expect(s.lights?.length, id).toBeGreaterThan(0);
+    }
+  });
+  it('stand their station prop on a solid footprint, as a work station of the routines', () => {
+    const station = {
+      crumb_cold: 'coldShelves',
+      crumb_mixing: 'doughMixer',
+      crumb_oven: 'brickOven',
+      crumb_proofing: 'proofingCabinet',
+    };
+    for (const id of rooms) {
+      const s = scenes[id];
+      expect(
+        s.props.map((p) => p.kind),
+        id,
+      ).toEqual([station[id]]);
+      expect(routines.activities.work?.kinds, id).toContain(station[id]);
+      const f = s.props[0]!.footprint!;
+      for (let y = f.y; y < f.y + f.h; y++)
+        for (let x = f.x; x < f.x + f.w; x++) {
+          expect(s.grid[y]![x], `${id} ${x},${y}`).toBe('#');
+          expect(s.material?.[y]![x], `${id} ${x},${y}`).toBe('P');
+        }
     }
   });
 });

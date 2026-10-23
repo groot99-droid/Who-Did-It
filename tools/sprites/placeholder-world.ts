@@ -70,6 +70,11 @@ export const MAP_SLICED_PROPS: Record<string, ReadonlyArray<{ art: string; w: nu
     { art: 'prop_hanging_oak', w: 2, h: 2 },
     { art: 'prop_clamp', w: 2, h: 2 },
     { art: 'prop_pump_beam', w: 2, h: 3 },
+    // Round 7 (A118): Crumb's Ovens' four stations.
+    { art: 'prop_coldShelves', w: 3, h: 1 },
+    { art: 'prop_doughMixer', w: 2, h: 2 },
+    { art: 'prop_brickOven', w: 2, h: 2 },
+    { art: 'prop_proofingCabinet', w: 3, h: 2 },
   ],
   props_blackpine: [
     { art: 'prop_trestle', w: 3, h: 2 },
