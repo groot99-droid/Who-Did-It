@@ -205,6 +205,8 @@ and records the decision as a row in `docs/DECISIONS.md`; ROADMAP 7.6 tags the m
 
 ## 8. Quick mode evening (M3b)
 
+Removed in round 7 with the quick mode (DECISIONS A115); kept as the record of the plan.
+
 The M3b exit (ROADMAP 7.1, the M3b row; the tier is ROADMAP 7.5 `4-6 humans`): three 6-player
 quick-mode matches in a row finish in the target length, players name their final role at the reveal
 in at least half the matches, and "would play again" is compared with M3. The rules are GDD 3.11 and
@@ -263,7 +265,7 @@ instead of the long game?
 ## 9. NPC session (M3c)
 
 The M3c exit (ROADMAP 7.1, the M3c row; the tier is ROADMAP 7.5 `1-3 humans`): one human with three
-NPCs finishes a main match and a quick-mode match, and the NPC Killer wins at least one of five
+NPCs finishes a main match (the quick-mode match left with the mode, A115), and the NPC Killer wins at least one of five
 scripted matches at Normal. The rules are GDD 3.12 and `balance.json` `npc`; the lobby lines are
 `docs/UI.md` 14.13. Two sessions on different days.
 
@@ -279,10 +281,9 @@ which seats are NPCs; with two or three humans each guesses on the form (item 10
 | 0:00 | The party created; NPCs fill at Start, or the leader adds them with Add NPC | Host |
 | 0:05 | Main match, one human with three NPCs (session 1) or the humans with NPCs to four (session 2) | All |
 | after it | The match-log line copied; the scorecard row | Host |
-| | The mode chip to quick mode; one quick-mode match the same way | All |
 | | Optional: the difficulty at Hard with enough NPC seats, one more main match | All |
 | then | The form (item 10 included); notes within a day | All |
 
-**Script.** Part A of 5 for the main match and part A of 8 for quick mode, minus the Discord rule
+**Script.** Part A of 5 for the main match, minus the Discord rule
 when the owner plays alone. Add once: "Some seats may be computer villagers. They never chat. Play
 everyone the same."

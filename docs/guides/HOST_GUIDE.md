@@ -18,9 +18,7 @@ filled with NPC villagers at Start, and even a single human can start a match fo
 
 ## Lobby settings
 
-- **Mode**: Who Did It (the main mode, with the village) or One Night Ultimate Baguette (the quick
-  mode, no walking). See [Quick mode](QUICK_MODE.md).
-- **Map**: Hollowmere or Blackpine (main mode only).
+- **Map**: Hollowmere or Blackpine.
 - **Add NPC / Remove NPC** and **NPC difficulty**: fill or thin the table with bots.
 - **Art style** (landing page): 8-bit or low poly, per player, changed at any time.
 - **Sound** (gear): music, effects and mute, per player.

@@ -1,7 +1,7 @@
 # UI design system
 
 The DOM overlay's look: what every screen the player meets shares, from the Landing buttons to
-the dark loft of the quick mode. It is implemented in `apps/client/src/ui/theme/` (tokens and
+the game over. It is implemented in `apps/client/src/ui/theme/` (tokens and
 component classes, one import per screen), drawn in `apps/client/public/assets/ui/` (frames,
 marks, glyphs) and previewed in `apps/client/public/theme-preview.html` and
 `apps/client/public/mockups/`. Numbers in this document that are rules of play (the 12 s card
@@ -191,12 +191,10 @@ strikes the name and shows the ghost glyph in the seat. The same row serves the 
 with meta "fits 1/1 known traits, claimed 0, last house: Apothecary". The seat is a paper
 circle with an initial, never a role tint.
 
-**Lobby settings** (`data-testid="lobby-settings"`, between the code row and the roster). The mode
-chip (`mode-chip`) reads "Who Did It" or "One Night Ultimate Baguette, {min}-{max} min, {players}"
-(length from `balance.onub.json`, counts from `balance.json`); the leader sees the toggle
-(`mode-toggle`), "Add NPC" (`add-npc`, hidden when the party is full), "Remove NPC" (`remove-npc`,
+**Lobby settings** (`data-testid="lobby-settings"`, between the code row and the roster). The leader
+sees "Add NPC" (`add-npc`, hidden when the party is full), "Remove NPC" (`remove-npc`,
 hidden with no NPC seats) and the difficulty select (`npc-difficulty`, disabled below
-`npc.difficultyMinNpcs` NPC seats, with a hint line). Others see the chip only. No seat is ever marked
+`npc.difficultyMinNpcs` NPC seats, with a hint line). No seat is ever marked
 as an NPC; Remove drops the most recently added one.
 
 **Dialogs** (`.wdi-scrim`, `.wdi-dialog`). Ink at 72% over the screen, a slate panel at most
@@ -236,14 +234,6 @@ mustard rule under the selected one.
 
 **Notebook** (`.wdi-notebook`). A ruled paper page with a 6 px inner margin rule and the tab
 mark on the HUD chip; entries are icon, text and a status chip (claimed, verified, forged).
-
-**The dark loft** (`.wdi-loft`, `.wdi-bedroll`). Ink with a moon vignette at the top, one
-bedroll per seat (72 px columns, every one drawn occupied), the player's own with the moon glow;
-muted text; a loft edge cue in `--cool` for each fake creak. No clock, no stick, no buttons.
-
-**Quick-mode marks.** `mark_plate` (a bone plate with a slate rim) labels a Wake Table seat and
-the reveal's plate rows; `mark_loaf` (lantern crust, blood underside, three ink scores) is the
-loaf token chip and the oven-ledge count.
 
 **Round 7: the night glass (7B, A106).** The owner's mockups (`docs/round7/ui-reskin.md` 1): "frosted
 glass, pixel-stepped" surfaces over the loop backdrop. A screen session builds every night screen from
@@ -411,8 +401,6 @@ the classes. Today's selectors map as follows:
 | `.role-name`, `.look`, `.goal`, `.abilities li`, `kbd`, `.inventory li`, `.text`, `.beware`, `.mates` | `.wdi-card__title`, `__look`, `__goal`, `__ability`, `.wdi-kbd`, `__inventory` > `.wdi-chip`, `__text`, `__beware`, `__mates` |
 | `.timer`, `.timer-bar` | `.wdi-timer`, `.wdi-timer__bar.is-running` (set `--wdi-timer-duration` or rely on `--wdi-card-hold`) |
 | `.wdi-world-chip` (the World HUD in `view/hud.css` keeps a `wdi-world-*` namespace until it adopts the theme) | `.wdi-hud-chip` inside `.wdi-hud > .wdi-hud__tl` |
-| the meeting's claim strip (quick mode, round 4) | `.wdi-claims` > `.wdi-claims__chips` of `.wdi-chip.wdi-chip--claim` (`data-testid="claim-<roleId>"`) and `.wdi-claims__form` (`claim-target`, `claim-saw`, `claim-post`); a seat's claim under its portrait is `.wdi-portrait__claim` |
-| the end screen's quick-mode extras | `.wdi-over__onub`: the dead's loaves as `.wdi-chip`, the swap log as `.wdi-timeline` (`data-testid="swaplog"`), the vote lines; a winning row is `.wdi-roster__row.is-winner` |
 
 Landing, Lobby and the role card use these classes since round 3 (Session M); every `data-testid` is
 unchanged. `ui/styles.css` is down to the page chrome (`#game`, `#overlay`, the pointer-events rule) and
@@ -436,7 +424,6 @@ screenshots at 1280 x 720 and 390 x 844 in `docs/ui/`:
 | `rolecard-front`, `rolecard-back` | the Detective's card and the back of the card | 2 step 4, 3.2 |
 | `hud` | chip, night clock, log, stick and buttons, a toast over a dark world | 2 steps 5 to 7 |
 | `meeting` | eight portraits, the tally, chat, claim chips, the vote | 2 step 8, 3.8 |
-| `loft` | the dark loft with eight occupied bedrolls and a creak cue | 3.11 |
 | `menu-mockup` (owner, Claude Design, 2026-10-23) | the round-7 menu: title, glass buttons, profile chip, sound toggle over the loop (`docs/round7/ui-reskin.md`) | 2 step 1, 3.21 |
 | `lobby-mockup` (owner, Claude Design, 2026-10-23) | the round-7 lobby in three columns: code and seats, map cards and art style, the deck and Start | 2 step 3 |
 
@@ -447,16 +434,6 @@ reason line, the portrait grid (the villager atlas drawn to a canvas from the pu
 on slate when the atlas is absent), Report and Chat tabs with room for the Notebook, and the reveal with
 tally chips, the stamp and the role line. The faction chips on the game-over rows are the one place a
 faction is shown for other players.
-
-Quick mode (round 4, DECISIONS A43) changes the same two screens and adds nothing else: the reason line
-reads the dawn line, the report tab lists the dawn traces and every claim, the `vote-skip` button is
-hidden and your own portrait is disabled, the chat panel gets the claim strip (a role chip posts a
-role that shows nothing at once; a role that looks at a loaf opens a seat and seen-role pick first) and
-each portrait shows "Claimed: <role>" under the name. The reveal stamps every seat in `outs`, names each
-with the final role and lists the abstainers. The end screen keeps one row per seat with the dealt role
-(`gameover-role-<id>`) and the final one beside it (`gameover-final-<id>`), then the dead's three loaves,
-the swap log as a timeline and one "A voted B" line per seat; winners carry the winner mark. Every line
-comes from `ui/copy/meeting.ts`.
 
 ## 13. Open points
 
@@ -670,114 +647,9 @@ look like: {height} / {scarf} / {hat}", "Beware:", "Your Cabal:", "Tab reopens t
 role", "Keep your screen to yourself.", "Ready - role card (Tab)". The role name, goal, card text,
 Beware line and ability names come from `roles.json` and `abilities.json`, never from this deck.
 
-### 14.12 Quick mode: lobby chip, deck editor, Evening Prep and the prep board (5C)
+### 14.12 Quick mode: lobby chip, deck editor, Evening Prep and the prep board (removed)
 
-Session 5C, 2026-10-18 (replaces the round-4 section; the night, the Rush, the claim form, the reveal and
-the end screen are 14.14, 5D). Every line Evening Prep shows (GDD 3.11, DECISIONS A49). Names come from
-content and are never restated here: station `name` and `gloss`, card `name` and `text`, role `name` and
-`gloss`. No line shows another seat during prep, and nothing here changes when someone else commits (A21, A39).
-The fiction's words stay put: a **pile**, the **thaw**, the **Mother Dough**, the **Pantry**.
-
-**Lobby chip** (V, `data-testid="mode-chip"`; the length is `targetLengthMin`, the counts `balance.players`).
-
-| Id | Text | Notes |
-|---|---|---|
-| `lobby.mode.main` | Who Did It | the chip in the main mode |
-| `lobby.mode.onub` | One Night Ultimate Baguette, {min}-{max} min, {players} | `{players}` is `lobby.mode.players` |
-| `lobby.mode.players` | {min}-{max} players | |
-| `lobby.mode.toggle` | Change mode | leader-only `mode-toggle` |
-| `lobby.mode.leaderOnly` | The leader picks the mode | under the chip for everyone else |
-| `lobby.mode.onub.hint` | One night, one vote. What you hold at dawn is what you are. | under the chip in quick mode |
-
-If the game is ever sold, `lobby.mode.onub` becomes the neutral label of GDD 3.11 (A22) and no other line uses
-the parody title.
-
-**Deck editor** (`deck-editor`; the leader toggles `deck-role-<roleId>`, `deck-reset` is leader-only,
-`deck-problem` shows the first problem of `onubDeckProblem`; `{need}` is the party size after the NPC fill plus
-`pantry.roles`).
-
-| Id | Text | Notes |
-|---|---|---|
-| `onub.deck.title` | Quick-mode deck |  |
-| `onub.deck.hint` | Pick the roles in play. The deck holds the party size plus {pantry} cards for the Pantry. |  |
-| `onub.deck.count` | {n} cards, {need} needed |  |
-| `onub.deck.reset` | Default deck |  |
-| `onub.deck.copies` | x{n} |  |
-| `onub.deck.problem.unknownRole` | The deck names a role that does not exist. | problem id `unknownRole` |
-| `onub.deck.problem.notShipped` | The deck holds a role that is not in this version. | `notShipped` |
-| `onub.deck.problem.copies` | A role appears too many or too few times. | `copies` |
-| `onub.deck.problem.missingRequired` | The deck needs at least one Mold Spore. | `missingRequired` |
-| `onub.deck.problem.size` | The deck needs {need} cards for this party; it has {n}. | `size` |
-
-**Kitchen** (`kitchen`, `onub-clock`, `station-<stationId>`, `station-room`, `station-back`).
-
-| Id | Text | Notes |
-|---|---|---|
-| `onub.kitchen.title` | Evening Prep |  |
-| `onub.kitchen.caption` | Pick a station. Play its game, then play one card. |  |
-| `onub.kitchen.clock` | {s} s |  |
-| `onub.kitchen.clock.label` | Time left in the kitchen |  |
-| `onub.kitchen.room.label` | {station}, {gloss} |  |
-| `onub.station.back` | Back to the kitchen |  |
-| `onub.station.room` | In {station} |  |
-
-**Mini-games** (`minigame-<stationId>`, `minigame-assist` after `timers.minigameAssistS`; the result never
-reaches the wire).
-
-| Id | Text | Notes |
-|---|---|---|
-| `onub.mini.crates.hint` | Drag {steps} crates onto the cart, then stop the needle inside the cold band. |  |
-| `onub.mini.crates.dial` | Stop the needle |  |
-| `onub.mini.crates.load` | Load a crate |  |
-| `onub.mini.crates.stop` | Stop |  |
-| `onub.mini.pour.hint` | Hold to pour. Let go with the level inside the line. |  |
-| `onub.mini.pour.flour` | Flour |  |
-| `onub.mini.pour.water` | Water |  |
-| `onub.mini.pour.spilled` | Too much. The bowl is empty again. |  |
-| `onub.mini.pour.hold` | Hold to pour |  |
-| `onub.mini.slide.hint` | Slide {steps} bannetons into the glowing slots. |  |
-| `onub.mini.slide.next` | Slide in the next banneton |  |
-| `onub.mini.stoke.hint` | Tap to feed the fire. Hold the needle in the band for {holdS} s. |  |
-| `onub.mini.stoke.tap` | Feed oak |  |
-| `onub.mini.stoke.progress` | {s} s held |  |
-| `onub.mini.done` | Done. Choose a card. |  |
-| `onub.mini.assist` | Done |  |
-| `onub.mini.assist.hint` | Stuck? Skip the game. |  |
-
-**Hand and commit** (`hand`, `card-<cardId>`, `prep-commit`, `prep-done`).
-
-| Id | Text | Notes |
-|---|---|---|
-| `onub.hand.title` | Your hand |  |
-| `onub.hand.hint` | Play one card into the pile. It cannot be taken back. |  |
-| `onub.hand.sabotage` | Sabotage |  |
-| `onub.hand.good` | Good |  |
-| `onub.prep.commit` | Play this card |  |
-| `onub.prep.pick` | Pick a card |  |
-| `onub.prep.done` | Your card is in the pile. |  |
-| `onub.prep.wait` | Waiting for the kitchen to close. |  |
-| `onub.prep.auto` | The kitchen chose for you. | the server committed at the timeout |
-| `onub.prep.yours` | You worked {station} and played {card}. |  |
-| `onub.refuse.prep` | That card cannot be played here. | a 422 on `onub.prep` (the commit went unanswered) |
-
-**The crime scenes** (`prep-board`, `pile-<stationId>`, `ruin-banner`, `under-mix-flag`, `perk-card`; 5D reuses
-these through `renderPiles` on the Rush board).
-
-| Id | Text | Notes |
-|---|---|---|
-| `onub.board.pile` | {station} |  |
-| `onub.board.empty` | Nobody came here. |  |
-| `onub.board.lost` | {count} card lost to the thaw |  |
-| `onub.board.lost.many` | {count} cards lost to the thaw |  |
-| `onub.board.net` | Sabotage weight {net} |  |
-| `onub.board.underMix` | Under-mixed: one card is not a dough. |  |
-| `onub.board.ruin` | The Mother Dough is ruined. |  |
-| `onub.board.ruin.weight` | Ruin weight {n} |  |
-| `onub.board.ok` | The Mother Dough holds, for now. |  |
-| `onub.board.perk` | Someone proofed in peace and peeked at the Pantry. |  |
-| `onub.board.perk.card` | The Pantry showed you {station}. | `perk-card`, a proofing visitor only |
-| `onub.board.card.sabotage` | Sabotage | screen-reader suffix on a sabotage card, public by design after prep |
-| `onub.board.card.good` | Good |  |
+Removed in round 7 with the quick mode (DECISIONS A115, GDD 3.11); `docs/round5/onub-contract.md` keeps the mode's contract as history. The section keeps its number.
 
 ### 14.13 NPC lobby (V)
 
@@ -804,265 +676,9 @@ The difficulty labels are the keys of `balance.json` `npc.difficulty` in sentenc
 deck does not list shows its key. `lobby.hint.fill` replaces the interim "NPC fill is coming" line
 (A28, removed by A39).
 
-### 14.14 Quick mode: night, morning and end (5D)
+### 14.14 Quick mode: night, morning and end (removed)
 
-Round 5, Session 5D (GDD 3.11, DECISIONS A49, A55). Every line the ONUB v2 night, dawn, Morning Rush, CRUST,
-reveal and end screen show, in the house style above; `ui/copy/onubNight.ts` carries them verbatim. Names come
-from content (`roles.onub.json`, `balance.onub.json`) and are never restated here. `{key}` values are filled by
-the caller. The narrator's lines are the same on every page and name only the window's role (invariant O9).
-
-
-**The night**
-
-| Id | Text |
-|---|---|
-| `onub.night.caption` | The kitchen is dark. Keep your eyes shut. |
-| `onub.night.waiting` | The night shift has not been called yet. |
-| `onub.night.clock` | Window closes in {s} s |
-| `onub.night.slot.seatRole` | {name}'s Role card |
-| `onub.night.slot.seatLoc` | {name}'s Location card |
-| `onub.night.slot.pantryRole` | Pantry Role card {n} |
-| `onub.night.slot.pantryLoc` | Pantry Location card {n} |
-| `onub.night.slot.you` | You |
-
-**The role scene**
-
-| Id | Text |
-|---|---|
-| `onub.wake.title` | You wake as {role} |
-| `onub.wake.mates` | You see: {names} |
-| `onub.wake.seen` | The Spores are: {names} |
-| `onub.wake.alone.champignon` | You are the only Spore at the table. The other card lies in the Pantry. |
-| `onub.wake.alone.commis` | You are the only Commis at the table. The other lies in the Pantry. |
-| `onub.wake.nothing` | Nothing to do but remember. |
-| `onub.wake.must` | You must act before the lamp dims. |
-| `onub.wake.done` | Done. Wait for the lamp to dim. |
-
-**The narrator, one pair per waking role**
-
-| Id | Text |
-|---|---|
-| `onub.narrator.boulanger.wake` | Le Boulanger, réveillez-vous… posez la cloche de fonte. |
-| `onub.narrator.boulanger.sleep` | Le Boulanger, rendormez-vous. |
-| `onub.narrator.champignon.wake` | Les Champignons, réveillez-vous… reconnaissez-vous dans le noir. |
-| `onub.narrator.champignon.sleep` | Les Champignons, rendormez-vous. |
-| `onub.narrator.levain.wake` | Le Levain, réveillez-vous… comptez les spores. |
-| `onub.narrator.levain.sleep` | Le Levain, rendormez-vous. |
-| `onub.narrator.apprenti.wake` | L'Apprenti, réveillez-vous… lisez le registre du poste. |
-| `onub.narrator.apprenti.sleep` | L'Apprenti, rendormez-vous. |
-| `onub.narrator.ratDeCave.wake` | Le Rat de Cave, réveillez-vous… soulevez la grille. |
-| `onub.narrator.ratDeCave.sleep` | Le Rat de Cave, rendormez-vous. |
-| `onub.narrator.commis.wake` | Les Commis, réveillez-vous… cherchez votre vis-à-vis. |
-| `onub.narrator.commis.sleep` | Les Commis, rendormez-vous. |
-| `onub.narrator.chef.wake` | Le Chef de Cuisine, réveillez-vous… ouvrez les dossiers. |
-| `onub.narrator.chef.sleep` | Le Chef de Cuisine, rendormez-vous. |
-| `onub.narrator.aboyeur.wake` | L'Aboyeur, réveillez-vous… regardez l'écran vert. |
-| `onub.narrator.aboyeur.sleep` | L'Aboyeur, rendormez-vous. |
-| `onub.narrator.sousChef.wake` | Le Sous-Chef, réveillez-vous… sonnez la cloche de laiton. |
-| `onub.narrator.sousChef.sleep` | Le Sous-Chef, rendormez-vous. |
-| `onub.narrator.tourrier.wake` | Le Tourrier, réveillez-vous… repliez la recette. |
-| `onub.narrator.tourrier.sleep` | Le Tourrier, rendormez-vous. |
-| `onub.narrator.plongeur.wake` | Le Plongeur, réveillez-vous… rangez les casseroles. |
-| `onub.narrator.plongeur.sleep` | Le Plongeur, rendormez-vous. |
-| `onub.narrator.gardeManger.wake` | Le Garde Manger, réveillez-vous… rentrez du bon pied. |
-| `onub.narrator.gardeManger.sleep` | Le Garde Manger, rendormez-vous. |
-| `onub.narrator.inspecteur.wake` | L'Inspecteur Sanitaire, réveillez-vous… dernière tournée. |
-| `onub.narrator.inspecteur.sleep` | L'Inspecteur Sanitaire, rendormez-vous. |
-
-**Night acts, one label and two pick prompts per act of balance.onub.json**
-
-| Id | Text |
-|---|---|
-| `onub.act.cloche.label` | Set the Iron Cloche |
-| `onub.act.cloche.pick` | Pick the card to cover |
-| `onub.act.cloche.pick2` | Pick the card to cover |
-| `onub.act.sporePeek.label` | Peek at the Pantry |
-| `onub.act.sporePeek.pick` | Pick a Pantry Role card |
-| `onub.act.sporePeek.pick2` | Pick a Pantry Role card |
-| `onub.act.peekLoc.label` | Read the shift log |
-| `onub.act.peekLoc.pick` | Pick another player's Location card |
-| `onub.act.peekLoc.pick2` | Pick another player's Location card |
-| `onub.act.vent.label` | Swap through the grate |
-| `onub.act.vent.pick` | Pick the Location card to take: a player's or the Pantry's |
-| `onub.act.vent.pick2` | Pick the Location card to take |
-| `onub.act.peekRole.label` | Audit one file |
-| `onub.act.peekRole.pick` | Pick another player's Role card |
-| `onub.act.peekRole.pick2` | Pick another player's Role card |
-| `onub.act.peekPantry.label` | Audit the Pantry |
-| `onub.act.peekPantry.pick` | Pick a Pantry Role card |
-| `onub.act.peekPantry.pick2` | Pick a second Pantry Role card |
-| `onub.act.peekLocs.label` | Check the monitor |
-| `onub.act.peekLocs.pick` | Pick another player's Location card |
-| `onub.act.peekLocs.pick2` | Pick a second Location card |
-| `onub.act.rob.label` | Ring the bell |
-| `onub.act.rob.pick` | Pick the player whose Role card you take |
-| `onub.act.rob.pick2` | Pick the player whose Role card you take |
-| `onub.act.laminatePeek.label` | Fold in the recipe |
-| `onub.act.laminatePeek.pick` | Pick a Pantry Role card to look at |
-| `onub.act.laminatePeek.pick2` | Pick a Pantry Role card to look at |
-| `onub.act.laminateSwap.label` | Fold it into the line |
-| `onub.act.laminateSwap.pick` | Pick the player whose Role card takes it |
-| `onub.act.laminateSwap.pick2` | Pick the player whose Role card takes it |
-| `onub.act.drunk.label` | Stumble back |
-| `onub.act.drunk.pick` | Pick a Pantry Role card to swap with yours |
-| `onub.act.drunk.pick2` | Pick a Pantry Role card to swap with yours |
-| `onub.act.dishRoles.label` | Swap two Role cards |
-| `onub.act.dishRoles.pick` | Pick the first player's Role card |
-| `onub.act.dishRoles.pick2` | Pick the second player's Role card |
-| `onub.act.dishLocs.label` | Swap two Location cards |
-| `onub.act.dishLocs.pick` | Pick the first player's Location card |
-| `onub.act.dishLocs.pick2` | Pick the second player's Location card |
-| `onub.act.inspect.label` | Sweep your own cards |
-| `onub.act.inspect.pick` | Nothing to pick |
-| `onub.act.inspect.pick2` | Nothing to pick |
-| `onub.act.confirm` | Do it |
-| `onub.act.picked` | {n} of {total} picked |
-
-**What a peek, a swap or a sighting showed (nightReveal rows)**
-
-| Id | Text |
-|---|---|
-| `onub.reveal.title` | What you learned |
-| `onub.reveal.role` | {card} is {value} |
-| `onub.reveal.loc` | {card} is {value} |
-| `onub.reveal.own` | You now hold {value} |
-| `onub.reveal.mate` | {name} was dealt {value} |
-| `onub.reveal.face.dealt` | As dealt |
-| `onub.reveal.face.seen` | Seen |
-| `onub.cloche.token` | Iron Cloche |
-
-**Dawn**
-
-| Id | Text |
-|---|---|
-| `onub.dawn.title` | Dawn |
-| `onub.dawn.text` | Grey light under the door. The night shift is over. |
-| `onub.dawn.cloche` | The Iron Cloche lies on {card}. |
-| `onub.dawn.noCloche` | No Iron Cloche was set down. |
-
-**The Morning Rush**
-
-| Id | Text |
-|---|---|
-| `onub.rush.title` | The Morning Rush |
-| `onub.rush.deck` | In the kitchen tonight |
-| `onub.rush.cloche` | The Iron Cloche lay on {card}. |
-| `onub.rush.claims` | Claims |
-| `onub.rush.claims.empty` | Nobody has claimed anything yet. |
-| `onub.rush.claimed` | Claimed {role} |
-
-**Claims**
-
-| Id | Text |
-|---|---|
-| `onub.claim.open` | Make a claim |
-| `onub.claim.edit` | Change your claim |
-| `onub.claim.close` | Cancel |
-| `onub.claim.role` | I was dealt |
-| `onub.claim.station` | I worked at |
-| `onub.claim.card` | and played |
-| `onub.claim.saw` | I saw |
-| `onub.claim.saw.add` | Add a sighting |
-| `onub.claim.saw.remove` | Remove |
-| `onub.claim.saw.target` | Whose card |
-| `onub.claim.saw.pantry` | The Pantry |
-| `onub.claim.saw.kind` | What it was |
-| `onub.claim.saw.role` | a Role card |
-| `onub.claim.saw.station` | a Location card |
-| `onub.claim.saw.value` | Which |
-| `onub.claim.none` | Not saying |
-| `onub.claim.post` | Post claim |
-| `onub.claim.line` | {name} says: {parts}. |
-| `onub.claim.part.role` | dealt {role} |
-| `onub.claim.part.station` | worked at {station} |
-| `onub.claim.part.card` | played {card} |
-| `onub.claim.part.saw` | saw {sightings} |
-| `onub.claim.saw.seatRole` | {name}'s Role card was {role} |
-| `onub.claim.saw.seatStation` | {name}'s Location card was {station} |
-| `onub.claim.saw.pantryRole` | the Pantry holding {role} |
-| `onub.claim.saw.pantryStation` | the Pantry holding {station} |
-
-**The vote and CRUST**
-
-| Id | Text |
-|---|---|
-| `onub.vote.pantry` | The Pantry |
-| `onub.vote.pantry.hint` | Point at nobody |
-| `onub.vote.count1` | Un… |
-| `onub.vote.count2` | deux… |
-| `onub.vote.count3` | trois… |
-| `onub.vote.crust` | CRUST! |
-| `onub.vote.countdown` | Un, deux, trois, CRUST! |
-
-**The Final Bake**
-
-| Id | Text |
-|---|---|
-| `onub.out.title` | The Final Bake |
-| `onub.out.line` | {name} goes in the oven: {role} |
-| `onub.out.hop` | The Critique's pen drags {name} in too. |
-| `onub.out.pantry` | The Pantry was pointed at. |
-| `onub.out.none` | Nobody goes in the oven. |
-| `onub.out.abstained` | Did not point: {names} |
-| `onub.out.votes` | Votes: {tally} |
-
-**The end screen**
-
-| Id | Text |
-|---|---|
-| `onub.over.row.croissantAndBakers` | The Croissant and the Bakers win |
-| `onub.over.row.croissant` | The Stale Croissant wins alone |
-| `onub.over.row.ruined` | The Mother Dough is ruined: Team Mold wins |
-| `onub.over.row.sporeOut` | A Mold Spore goes in the oven: the Loyal Bakers win |
-| `onub.over.row.sporesHide` | The Spores stay out of the oven: Team Mold wins |
-| `onub.over.row.cleanTable` | A clean table: the Loyal Bakers win |
-| `onub.over.row.moldOut` | Team Mold goes in the oven: the Loyal Bakers win |
-| `onub.over.row.wrongOven` | The wrong oven: Team Mold wins |
-| `onub.over.nobody` | Nobody wins |
-| `onub.over.seats` | Every card |
-| `onub.over.seat.role` | Role: dealt {dealt}, held at dawn {final} |
-| `onub.over.seat.loc` | Location: worked {dealt}, held at dawn {final} |
-| `onub.over.seat.card` | Played {card} |
-| `onub.over.seat.auto` | The kitchen chose for them |
-| `onub.over.seat.won` | Won |
-| `onub.over.pantry` | The Pantry |
-| `onub.over.pantry.role` | Role card {n}: dealt {dealt}, at dawn {final} |
-| `onub.over.pantry.loc` | Location card {n}: dealt {dealt}, at dawn {final} |
-| `onub.over.piles` | The piles |
-| `onub.over.pile` | {station}: {cards} |
-| `onub.over.pile.lost` | lost to the thaw: {cards} |
-| `onub.over.pile.empty` | no cards |
-| `onub.over.pile.net` | net weight {net} |
-| `onub.over.ruin` | Ruin weight {weight}: {state} |
-| `onub.over.ruin.yes` | ruined |
-| `onub.over.ruin.no` | the dough held |
-| `onub.over.cloche` | The Iron Cloche lay on {card} |
-| `onub.over.votes` | Who pointed at whom |
-| `onub.over.vote` | {from} pointed at {to} |
-| `onub.over.vote.pantry` | the Pantry |
-| `onub.over.vote.none` | Nobody pointed at anyone. |
-
-**The night as a timeline**
-
-| Id | Text |
-|---|---|
-| `onub.log.title` | The night, window by window |
-| `onub.log.empty` | Nobody did anything all night. |
-| `onub.log.auto` | (the kitchen chose for them) |
-| `onub.log.cloche` | {role} set the Iron Cloche on {a} |
-| `onub.log.sporePeek` | {role} peeked at {a} |
-| `onub.log.peekLoc` | {role} peeked at {a} |
-| `onub.log.vent` | {role} swapped their Location card with {a} |
-| `onub.log.peekRole` | {role} peeked at {a} |
-| `onub.log.peekPantry` | {role} peeked at {a} and {b} |
-| `onub.log.peekLocs` | {role} looked at {a} and {b} |
-| `onub.log.rob` | {role} took {a} |
-| `onub.log.laminatePeek` | {role} looked at {a} |
-| `onub.log.laminateSwap` | {role} swapped the Pantry card with {a} |
-| `onub.log.drunk` | {role} swapped with {a}, without looking |
-| `onub.log.dishRoles` | {role} swapped {a} and {b}, without looking |
-| `onub.log.dishLocs` | {role} swapped {a} and {b}, without looking |
-| `onub.log.inspect` | {role} checked their own cards |
+Removed in round 7 with the quick mode (DECISIONS A115, GDD 3.11). The section keeps its number.
 
 ### 14.16 Main deck, looks and the night roles (5G)
 
@@ -1090,7 +706,7 @@ its article ("the Baker"), `{name}` a seat's name.
 | `over.alsoWon` | Also won | header of `gameover-alsowon`, from `gameOver.alsoWon` |
 | `over.alsoWon.row` | {name} was ejected as the Drifter | an ejected Drifter's win beside the winning faction |
 
-The lobby list shows nothing in the quick mode. The look tag takes the look's own base colour (`looks.json`
+The look tag takes the look's own base colour (`looks.json`
 `palette.base`), and the trait portrait (height, scarf, hat) stays under it. The night-power picker and the Last Shot
 aim list wait for 5F's `ui/SeatPicker.ts` and a mount point in the world HUD (5I's files).
 
@@ -1112,8 +728,7 @@ map shown as chosen. Each map shows its `name` and `blurb` from `maps/<id>.json`
 Session 5N, round 5 (DECISIONS A79, A80). The segmented control of `ui/artStyle/ArtStyleSwitch.ts` (module
 `ui/copy/artStyle.ts`). One option per shipped style of `style.json` `artStyles`, then one disabled option per reserved
 id. It is a radio group: the checked option has `aria-checked="true"` and is the only tab stop, the arrow keys move and
-select, and the buttons are at least `--wdi-touch` high. It sits in the lobby settings, in the World HUD's top right
-and, in the DOM-only quick-mode screens, at the bottom left. The pick is per player and never sent. The loading veil
+select, and the buttons are at least `--wdi-touch` high. It sits in the lobby settings, in the World HUD's top right. The pick is per player and never sent. The loading veil
 (`art-veil`, `role="status"`) covers the screen while textures swap; a failed swap shows `art-notice`
 (`role="alert"`) for four seconds. A style name comes from `artStyle.name.<id>`.
 
@@ -1197,7 +812,7 @@ the seat holds (taken, done) with `have of total`; Take the work and Hand it in 
 third quest shows `quest.full`.
 
 **Mini-game modal.** `view/minigames/MinigameModal.ts` opens on `S2C.minigameStart` as `role="dialog"` over the world
-(test id `minigame`, `data-kind`, `data-state` play, sent). The ONUB widget of the kind draws in the stage
+(test id `minigame`, `data-kind`, `data-state` play, sent). The widget of the kind draws in the stage
 (`minigame-stage`); the widget's `answer()` is the record the server replays, and the Done control sends the server's assist answer. After the kind's `assistS` a
 `mini.assist` button appears (`minigame-assist`), and `mini.cancel` (`minigame-cancel`) steps away at any time. A Cabal
 seat's fake task runs the same board; the wire carries no fake flag, so `mini.fake` titles the dialog only where a
@@ -1274,7 +889,7 @@ Frozen test ids: `m5b`, `m5b-inv`, `m5b-craft`, `m5b-quests`, `m5b-prompt`, `m5b
 
 Session 5F, round 5. The lines of GDD 3.17 on the role card and the seat picker; `ui/copy/looks.ts` holds them as
 `LOOKS_COPY`. `{look}` is a look's name from `looks.json` ("the Baker"), `{name}` a seat's name. The card's deck strip and
-walk line show in the main mode only (`RoleRevealPayload.deck`, `look`); a quick-mode card has neither.
+walk line come from `RoleRevealPayload.deck` and `look`.
 
 | Id | Text | Notes |
 |---|---|---|
@@ -1432,8 +1047,8 @@ The lobby's lines stay in `apps/client/src/ui/copy/lobby.ts`; the re-skin (A103,
 |---|---|---|
 | (`friends.seat.*`) | Add friend | a seat row that carries a `profile` (`data-testid="add-friend"`): 7C's `addFriendButton` from `ui/menu/friends.ts`, copy in 14.25 |
 
-- **Columns.** A: the party code in display type (`party-code`), Copy invite link, Change mode (`mode-toggle`; it and `mode-chip` go with the quick mode, A115, and are not restyled further) beside Add NPC (`add-npc`) with Remove NPC (`remove-npc`) as a small minus (`aria-label` "Remove NPC"), the NPC skill select (`npc-difficulty`) with its locked note, the mode chip (`mode-chip`) in the card's corner, then "Players n / 10" with the You, Leader, Ready and Away tags. B: the map, the art style, the sound settings and the quick-mode deck editor. C: the deck as chips with its two notes, Start (leader), Ready, Leave. Below 900 px the columns stack.
-- **Column B.** The map cards (`map-select`, one `radio` per map, the picked one with a tick; a non-leader sees the picked card only), the art-style segment (`art-style*`, `.wdi-seg--glass`, HD disabled with its "Coming later" note) and, in the quick mode, the deck editor (`deck-editor`, `deck-role-*`) as chips in the deck's style. A map whose thumbnail has not loaded keeps a dark frame. No line changes.
+- **Columns.** A: the party code in display type (`party-code`), Copy invite link, Add NPC (`add-npc`) with Remove NPC (`remove-npc`) as a small minus (`aria-label` "Remove NPC"), the NPC skill select (`npc-difficulty`) with its locked note, then "Players n / 10" with the You, Leader, Ready and Away tags. B: the map, the art style and the sound settings. C: the deck as chips with its two notes, Start (leader), Ready, Leave. Below 900 px the columns stack.
+- **Column B.** The map cards (`map-select`, one `radio` per map, the picked one with a tick; a non-leader sees the picked card only), the art-style segment (`art-style*`, `.wdi-seg--glass`, HD disabled with its "Coming later" note). A map whose thumbnail has not loaded keeps a dark frame. No line changes.
 - **Tags.** The NPC tag is not shown: the lobby snapshot carries only the NPC seat count, not which seats they are, and the wire is not widened for a tag. Add friend shows only where a seat's `profile` is in the snapshot; until the client's roster mapping carries it, no row offers it.
 - **Left out.** The mockup's "Locate" button has no feature.
 

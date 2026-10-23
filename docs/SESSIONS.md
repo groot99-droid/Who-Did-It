@@ -3327,6 +3327,15 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 ### Round 7 log: 7J
 
+- 2026-10-23: PR 1 (#109, the client): the quick-mode screens, net layer, mocks, copy, e2e, fixtures and renders; the
+  mode chip and toggle out of `ui/Lobby.ts`; the mini-games moved to `view/minigames/`; the admin mode select.
+- 2026-10-23: PR 2 (#121, server, shared, content, tools): schema version 5 without `Settings.mode` and `OnubState`, the
+  rules, the server branches, `balance.onub.json` and `roles.onub.json` (the mini-game numbers moved to `balance.json`
+  `minigames`), the bots' quick player, the scripts and the soak row; `PROTOCOL.md` regenerated.
+- 2026-10-23: PR 3 (assets and documents): the music classes, playlists and the Baker's Bell track, `build_loft.py`
+  and the loft keys, the manifest `modes` field, the `pixelFinish` `onub` switch, the plate and loaf marks, the CREDITS
+  rows, the MANIFEST exports, GDD 3.11 and the other documents of the inventory, `docs/guides/QUICK_MODE.md`; A117.
+
 ### Round 7 log: 7K
 
 - 2026-10-23: PR 1 (the four rooms as scenes). `crumb_cold`, `crumb_mixing`, `crumb_oven` and `crumb_proofing`

@@ -20,8 +20,7 @@ The token lives in the browser session only and expires on its own.
 
 ## The page
 
-- **Setup**: map, mode, seat count, NPC difficulty, the quick mode's deck, and optionally the seed
-  words. **Start** needs no leader and no human.
+- **Setup**: map, seat count, NPC difficulty, and optionally the seed words. **Start** needs no leader and no human.
 - **Clock**: 1x, 2x, 5x, 10x, pause and single step. Every timer in the game counts ticks, so phase
   lengths, cooldowns and countdowns keep their meaning at any speed. When the server cannot keep up it
   runs fewer ticks and reports the speed it reached; no tick is skipped.

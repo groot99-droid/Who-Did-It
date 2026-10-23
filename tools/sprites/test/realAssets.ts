@@ -15,7 +15,6 @@ export interface Entry {
   url: string;
   path?: string;
   maps?: string[];
-  modes?: Array<'main'>;
   /** The folder the entry's urls are relative to (the style root, or the 8-bit root for a fallback). */
   dir?: string;
 }

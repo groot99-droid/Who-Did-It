@@ -3,7 +3,7 @@
 | File | What it owns |
 |---|---|
 | [MASTER_PLAN.md](MASTER_PLAN.md) | The full v0.1 master plan (frozen snapshot). Start here. |
-| [GDD.md](GDD.md) | Game design: pillars, first ten minutes, roles, match loop, clues, items, PvE, stealth, meetings, balance, cut list, and the One Night Ultimate Baguette quick mode (3.11). The only source of numbers together with `balance.json`. |
+| [GDD.md](GDD.md) | Game design: pillars, first ten minutes, roles, match loop, clues, items, PvE, stealth, meetings, balance, cut list, and the record of the removed quick mode (3.11). The only source of numbers together with `balance.json`. |
 | [WORLD.md](WORLD.md) | World bible: Hollowmere, scene graph with ids and exits, overworld sketch, portal rules, bestiary, lighting. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Stack, monorepo layout, lobby and join codes, state schema and role secrecy, protocol, netcode, deployment, security, testing, V2 path. |
 | [ASSETS.md](ASSETS.md) | Palette, Blender 8-direction rig, per-asset pipelines, Higgsfield tool map, Adobe usage, licensing policy, backlog, budgets. |
@@ -11,7 +11,7 @@
 | [DECISIONS.md](DECISIONS.md) | Decisions locked with the owner, changes from review, open questions. |
 | [PROTOCOL.md](PROTOCOL.md) | Generated wire protocol: message tables, payload types, error codes (`pnpm docs:protocol`). |
 | [UI.md](UI.md) | DOM design system: palette roles, type and spacing scale, components, card frames, measured contrast, screen mockups, the M3 copy deck. |
-| [guides/](guides/README.md) | Player manuals: how to play, the quick mode, the host guide and the admin guide. Served beside the game at `/help/`. |
+| [guides/](guides/README.md) | Player manuals: how to play, the host guide and the admin guide. Served beside the game at `/help/`. |
 | [PLAYTESTS/](PLAYTESTS/README.md) | How a playtest session runs, the feedback form, the fun-or-stop scorecard, the notes template and one entry per session. |
 | [RESEARCH.md](RESEARCH.md) | Sourced facts behind the version pins, hosting choice and licensing rules. |
 | [round5/](round5/README.md) | The round-5 contract documents: the owner's brief, the ONUB v2 contract, the deck wire and data, the world and maps, the NPC routines, the art plan, and the seams of the pre-seed (every hook and its locked call site). |

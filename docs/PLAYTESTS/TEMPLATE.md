@@ -21,9 +21,9 @@ names to first names or seat names, and quotes short. Delete any section that do
 
 One block per match. For an M3 session the scorecard row is filled from the same facts.
 
-For a quick-mode match (M3b) add the dealt and final role per seat, the three dead loaves, the swap
+For a quick-mode match (M3b, removed in round 7, A115) add the dealt and final role per seat, the three dead loaves, the swap
 log as the end screen reads it, the votes, and each player's DM'd guess with right or wrong. For an
-NPC match (M3c) add the mode, the difficulty and which seats were NPCs (every seat that is not a
+NPC match (M3c) add the difficulty and which seats were NPCs (every seat that is not a
 friend's name); never paste that list where a player who
 has not filled item 10 can read it.
 

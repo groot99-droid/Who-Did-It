@@ -63,7 +63,7 @@ describe.each(artStyles().filter((s) => hasManifest(s.root)))(
         .sort((a, b) => b - a)
         .slice(0, LOOKS_COUNTED)
         .reduce((a, b) => a + b, 0);
-      const boot = equiv(gpu.filter((p) => !lookOf(p.key) && !p.entry.maps && !p.entry.modes));
+      const boot = equiv(gpu.filter((p) => !lookOf(p.key) && !p.entry.maps));
       const maps = new Set(gpu.flatMap((p) => p.entry.maps ?? []));
       for (const map of maps.size ? maps : new Set([''])) {
         const env = equiv(gpu.filter((p) => p.entry.maps?.includes(map)));

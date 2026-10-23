@@ -1,5 +1,7 @@
 # ONUB v2: the round-5 contract for Sessions 5A to 5E
 
+> **History.** The quick mode this contract built was removed in round 7 (DECISIONS A115, A117; GDD 3.11); nothing here describes the game today.
+
 Everything the five ONUB v2 sessions need to start in parallel on the round-5 base branch. It builds on the round-5
 decisions (DECISIONS A49, the owner's answers, and A50, the round-5 contract) and on sections 2 to 4 of the
 orchestrator's ONUB report (which stays with the orchestrator), and re-decides none of them; section 12 lists the few

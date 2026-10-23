@@ -17,7 +17,7 @@ never overwrite an old one, since an asset is governed by the terms in force whe
 | Freesound | the CC0 licence of each sound (one row per sound in `CREDITS.md`) | the first Freesound SFX | no |
 | Quaternius | the Quaternius Asset License (QAL) | the first sprite rendered from a Quaternius model | no |
 | OpenGameArt | the licence of each entry (CC0 only) | the first OpenGameArt asset | yes, 2026-10-16: `opengameart-rain-long-thunder-license-2026-10-16.md` (the `storm` loop); 2026-10-18: `opengameart-ambience-license-2026-10-18.md` (the four `amb_*` loops) |
-| Google (Nano Banana Pro, Gemini app, Google AI Pro) | Terms of Service; Generative AI Prohibited Use Policy | the 13 ONUB room images the owner made (`assets/source/concepts/onub/`, DECISIONS A79) | no copy saved; links checked 2026-10-18 (Session 5M), below |
+| Google (Nano Banana Pro, Gemini app, Google AI Pro) | Terms of Service; Generative AI Prohibited Use Policy | the 13 kitchen pictures the owner made (`assets/source/concepts/onub/`, DECISIONS A79; kept as source art after the quick mode's removal, A115) | no copy saved; links checked 2026-10-18 (Session 5M), below |
 
 Fonts (OFL) live in `LICENSES/fonts/`, owned by Session B.
 

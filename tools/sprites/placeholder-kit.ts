@@ -80,8 +80,6 @@ export interface ManifestEntry {
   origin?: [number, number];
   /** Map ids: the entry loads with the match's map, not at boot (SPRITES 5, 10.13). */
   maps?: string[];
-  /** Modes: the entry loads at match start when the match's mode is listed (SPRITES 5, 10.13). */
-  modes?: 'main'[];
 }
 
 /**

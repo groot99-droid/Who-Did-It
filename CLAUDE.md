@@ -5,8 +5,8 @@
 A browser multiplayer hidden-role game for 4 to 10 players: a static Phaser client on
 GitHub Pages and an authoritative Colyseus server. V1 is isometric 2.5D (since round 5,
 DECISIONS A49) with pre-rendered and generated sprites; V2 is first-person 3D on the same
-server, rules and world data. It also ships a short quick mode, One Night Ultimate Baguette
-(length in `GDD.md` 3.11).
+server, rules and world data. The quick mode it once had was removed in round 7 (DECISIONS A115,
+`GDD.md` 3.11).
 
 Implementation started 2026-10-10 in four parallel sessions; `docs/SESSIONS.md` says which paths
 each session owns. Until their PRs merge, `docs/` and the root scaffold are the whole project.
@@ -45,8 +45,7 @@ Versions are pinned in `docs/ARCHITECTURE.md` 5.1. Sessions never upgrade depend
   (owner decision, 2026-10-17, DECISIONS A49), except for the cover roles, which wear another
   card's look: nothing a client receives may reveal that a seat wears a cover, a
   cover-wearer's true role, or who walks under an impersonation beyond what the drawn figure
-  shows. In the quick mode nothing a client receives about another seat may correlate with
-  its role. Nothing secret shares a random stream with anything public (`sim/seeds.ts`).
+  shows. Nothing secret shares a random stream with anything public (`sim/seeds.ts`).
   Debug handlers register only with `WDI_DEBUG=1`.
 - Every client action is queued and consumed inside the server `step()`; nothing mutates
   state in a message callback.
@@ -90,9 +89,3 @@ the orchestrator answered; the test command and its last result; and the section
 it still has to read. It drops tool output, file contents it can re-read, and anything a document already
 says. A session that resumes after a compaction re-reads its brief and `docs/round<N>/seams.md` before the
 next edit.
-
-## Naming caution
-
-"One Night Ultimate Baguette" is a parody of a published card game's title and stays an
-in-joke for a free game among friends. If the game is ever sold, the mode ships under a
-neutral label (see `docs/GDD.md` 3.11) and never reuses that game's text or art.

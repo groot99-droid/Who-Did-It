@@ -11,7 +11,7 @@ interface Entry {
   type: string;
   filter?: 'linear' | 'nearest';
   maps?: string[];
-  modes?: Array<'main'>;
+  modes?: unknown;
 }
 interface Manifest {
   art: string;
@@ -47,20 +47,17 @@ describe('asset manifests (docs/SPRITES.md 5, 10.13)', () => {
     if (!LEGACY.includes('char_villager')) for (const k of PLACEHOLDER_ONLY) expect(r.has(k), k).toBe(false);
   });
 
-  it('give every key the same maps and modes in both manifests', () => {
+  it('give every key the same maps in both manifests', () => {
     const p = byKey(placeholder);
     for (const e of real.entries) {
       const q = p.get(e.key);
       if (!q) continue;
       expect(q.maps, `${e.key} maps`).toEqual(e.maps);
-      expect(q.modes, `${e.key} modes`).toEqual(e.modes);
     }
   });
 
-  it('mark no key with a mode other than the main one', () => {
-    for (const e of [...real.entries, ...placeholder.entries]) {
-      if (e.modes !== undefined) expect(e.modes, e.key).toEqual(['main']);
-    }
+  it('carry no `modes` (the quick mode left in round 7, A115)', () => {
+    for (const e of [...real.entries, ...placeholder.entries]) expect(e.modes, e.key).toBeUndefined();
   });
 
   it('filter the round-5 world textures by the pixel-finish switch, and clues linear', () => {

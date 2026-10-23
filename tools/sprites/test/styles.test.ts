@@ -11,7 +11,6 @@ interface Entry {
   url?: string;
   filter?: 'linear' | 'nearest';
   maps?: string[];
-  modes?: Array<'main'>;
 }
 interface Manifest {
   art: string;
@@ -42,7 +41,6 @@ describe('art styles (DECISIONS A79, SPRITES 5)', () => {
         if (!b) continue;
         expect(e.type, `${e.key} type`).toBe(b.type);
         expect(e.maps, `${e.key} maps`).toEqual(b.maps);
-        expect(e.modes, `${e.key} modes`).toEqual(b.modes);
         if (b.filter) expect(e.filter, `${e.key} filter`).toBe(style.filter);
         if (e.url) expect(existsSync(join(ASSETS, style.root, e.url)), `${e.key} url ${e.url}`).toBe(true);
       }
