@@ -1324,6 +1324,18 @@ Session 6D, round 6 (DECISIONS A86; `docs/round6/auto-admin.md` 8). The owner's 
 
 The full list is `ui/copy/admin.ts`.
 
+### 14.30 The Train and the memorial (7I)
+
+Session 7I, round 7 (DECISIONS A113). The Daily Train (GDD 3.3) adds no screen: the server sends the arrival line on
+the existing `chat.msg` `system` channel, so it lands in every seat's chat log and shows in the next meeting's chat
+with the system style; the arrival and the brake are `noise` pulses whose `kind` is the `AudioBus` key
+(`train_arrive`, `train_brake`) for the seats on the hub near the platform, which the World scene plays instead of drawing a ring.
+
+| Line | Text | Where |
+|---|---|---|
+| the arrival (server, `Train.ts` `TRAIN_ARRIVE_LINE`) | The train pulls into the station. | `chat.msg` `system`, every seat, once per day |
+| `log.train` (`ui/copy/world.ts`) | The train pulls in at the platform | the HUD log of a seat that hears `train_arrive`; `World.ring` plays the two `train_*` pulses as sounds and draws no ring |
+
 ### 14.24 Opening cinematic (6Q)
 
 Lines are in `apps/client/src/ui/copy/intro.ts` (`INTRO_COPY`). The `Intro` scene sits between `Preload` and `Landing` (never before `Admin`).
@@ -1351,8 +1363,45 @@ The lobby's lines stay in `apps/client/src/ui/copy/lobby.ts`; the re-skin (A103,
 | `lobby.friend.added` | Friend | the same button once the profile is on the device's list; it is disabled |
 
 - **Columns.** A: the party code in display type (`party-code`), Copy invite link, Change mode (`mode-toggle`) beside Add NPC (`add-npc`) with Remove NPC (`remove-npc`) as a small minus (`aria-label` "Remove NPC"), the NPC skill select (`npc-difficulty`) with its locked note, the mode chip (`mode-chip`) in the card's corner, then "Players n / 10" with the You, Leader, Ready and Away tags. B: the map, the art style, the sound settings and the quick-mode deck editor. C: the deck as chips with its two notes, Start (leader), Ready, Leave. Below 900 px the columns stack.
+- **Column B.** The map cards (`map-select`, one `radio` per map, the picked one with a tick; a non-leader sees the picked card only), the art-style segment (`art-style*`, `.wdi-seg--glass`, HD disabled with its "Coming later" note) and, in the quick mode, the deck editor (`deck-editor`, `deck-role-*`) as chips in the deck's style. A map whose thumbnail has not loaded keeps a dark frame. No line changes.
 - **Tags.** The NPC tag is not shown: the lobby snapshot carries only the NPC seat count, not which seats they are, and the wire is not widened for a tag. Add friend shows only where a seat's `profile` is in the snapshot; until the client's roster mapping carries it, no row offers it.
 - **Left out.** The mockup's "Locate" button has no feature.
+
+### 14.27 Match screens on the night theme (7F)
+
+The re-skin of the screens a match shows (`ui-reskin.md` 4, DECISIONS A110). Round 7 adds no copy to these screens
+in this subsection's first PR: every line stays its key in `ui/copy/`, and a key a later PR adds is listed here.
+The rules live in `ui/match.css` (role card, notebook sheet, settings) and `view/hud.css` (HUD and touch cluster),
+tokens only, each rule under an ancestor class (`.wdi-flip`, `.wdi-notebook-sheet`, `.wdi-settings`, `.wdi-hud`) so
+no other screen's card, chip or button changes. Ids, `data-testid`s and markup are kept.
+
+| Element | Face | Fill and colour |
+|---|---|---|
+| Role card front | the nine-slice frame and the flip stay | indigo fill, lilac text, a faint snow sheen at the top |
+| Faction word (`__stripe`) | Press Start 2P, 12 px | the faction colour with its `--wdi-on-*` text, as before |
+| Role name (`__title`) | Press Start 2P, `display-md`, snow, a violet step shadow | |
+| Card text, goal, abilities, Beware, mates | Inter (A103, A106: running text) | goal lantern on indigo, the rest lilac |
+| Card chips, keycaps, cover picker | Oswald caps chips, Pixelify Sans notes | glass pills with a lilac rim; the picked look takes the lantern rim |
+| Card back, role chip | Press Start 2P | night with a lilac double rule, nothing of the faction |
+| Ready | Press Start 2P, 12 px | the primary: night on lantern |
+| HUD chip, clock, log, toasts | Pixelify Sans; the clock digits Press Start 2P | glass (`--wdi-glass-fill`) with a lilac rim over the world; under `prefers-reduced-motion` the blur is dropped for the solid indigo |
+| Notebook sheet | Inter for entries, Press Start 2P for the title | glass page, ruled in lilac at 12%, over the veil |
+| Settings gear and panel | Pixelify Sans | glass; lantern sliders and focus ring |
+
+**Numbers stay Inter.** Pixelify Sans' 2, 5 and 8 blur together at 12, 14 and 16 px (checked at 2x), so a line
+that can show a number is not set in it: the HUD goal, log lines, toasts and phase ("Day 2"), the settings value
+("70%"), hints and quantities in the panels ("2 wood", "x3", "3 of 8 slots") are Inter. Static labels with no number
+keep the pixel face, and Press Start 2P's digits are clear (the clock). UI.md 3 lists Pixelify Sans for body text;
+this is the exception, found while checking the HUD.
+
+**Over the world.** The world has no veil, so a surface over it is measured against a bare white pixel. The shared
+glass fill (indigo at 66%) is measured under the menu's veil (10) and gives lilac only 3.32 there, so the HUD, the
+role chip, the settings gear and panel use `--wdi-match-glass` (`ui/match.css`: night at 85%): lilac on it is 8.61,
+lilac at 80% is 6.12 and snow is 13.14 over white. The notebook sheet sits under its own veil and keeps the glass fill.
+
+No focusable element is clipped to a stepped corner: a `clip-path` would cut the focus ring, so the pixel corner is
+a 2 px radius with an inset snow rim, and the glass classes of 7B (`.wdi-glass-btn`) replace these rims where they
+land.
 
 ### 14.29 Vendettas (7H)
 

@@ -131,7 +131,7 @@ export function mountArtStyleSwitch(root: HTMLElement, opts: { compact?: boolean
 
   const group = h(
     'div',
-    { class: 'wdi-seg', role: 'radiogroup', 'aria-labelledby': labelId },
+    { class: 'wdi-seg wdi-seg--glass', role: 'radiogroup', 'aria-labelledby': labelId },
     ...options,
     ...reserved,
   );
@@ -161,7 +161,11 @@ export function mountArtStyleSwitch(root: HTMLElement, opts: { compact?: boolean
     h('span', { class: 'wdi-label wdi-artstyle__label', id: labelId }, C['artStyle.label']),
     group,
     reserved.length > 0
-      ? h('span', { class: 'wdi-hint wdi-artstyle__hint', id: hintId }, C['artStyle.reserved.hint'])
+      ? h(
+          'span',
+          { class: 'wdi-hint wdi-seg__note wdi-artstyle__hint', id: hintId },
+          C['artStyle.reserved.hint'],
+        )
       : null,
   );
   root.append(el);
