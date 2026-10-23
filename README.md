@@ -16,8 +16,12 @@ who you are. The owner's friend invented it as a wrapper of the one-night hidden
 
 ## Status
 
-Planning complete, implementation not started. Everything about the game lives in
-[`docs/`](docs/README.md); start with [`docs/MASTER_PLAN.md`](docs/MASTER_PLAN.md).
+**Playable now:** [https://groot99-droid.github.io/Who-Did-It/](https://groot99-droid.github.io/Who-Did-It/),
+served from GitHub Pages against the Railway server. The player manuals are in
+[`docs/guides/`](docs/guides/README.md) and beside the game at
+[`/Who-Did-It/help/`](https://groot99-droid.github.io/Who-Did-It/help/). Rounds 1 to 5 of the roadmap are merged
+and round 6 (gathering and crafting, creatures, quests, cutscenes, music, the admin auto-mode) is landing;
+`docs/ROADMAP.md` carries the milestones. Everything about the design lives in [`docs/`](docs/README.md).
 
 | Version | Rendering | Networking | Players | Art |
 |---|---|---|---|---|
