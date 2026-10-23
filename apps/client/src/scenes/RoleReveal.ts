@@ -27,7 +27,7 @@ export class RoleReveal extends Phaser.Scene {
       return;
     }
     // Main mode (GDD 3.17): a cover role picks its look here, and sees its Cabal mates' picks live from the feed
-    // the world router publishes with the room; the quick mode's card has no picker.
+    // the world router publishes with the room.
     const feed = () => this.registry.get(REG_WORLD) as WorldFeed | undefined;
     this.card = mountRoleCard(overlayRoot(), payload, {
       onReady: () => net.send('lobby.ready', { ready: true }),

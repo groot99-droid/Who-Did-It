@@ -7,7 +7,6 @@ const base = {
     { key: 'char_a', type: 'multiatlas', url: 'chars/char_a.json', path: 'chars/', filter: 'nearest' },
     { key: 'tiles_grass', type: 'image', url: 'tiles/grass.png', filter: 'nearest' },
     { key: 'anims_a', type: 'animation', url: 'chars/a.anims.json' },
-    { key: 'onub_kitchen', type: 'image', url: 'onub/kitchen.webp', modes: ['onub'] },
     { key: 'iso_ground_harbour', type: 'image', url: 'iso/harbour.png', maps: ['harbour'], origin: [0.5, 1] },
   ] as LoadedEntry[],
 };
@@ -52,19 +51,15 @@ describe('mergeStyleManifest', () => {
     expect(byKey(merged, 'char_a')).toBe(base.entries[0]);
   });
 
-  it('keeps the 8-bit maps, modes and origin where the style leaves them out', () => {
+  it('keeps the 8-bit maps and origin where the style leaves them out', () => {
     const merged = mergeStyleManifest(
       base,
       {
-        entries: [
-          { key: 'onub_kitchen', type: 'image', url: 'k.webp' },
-          { key: 'iso_ground_harbour', type: 'image', url: 'h.png' },
-        ],
+        entries: [{ key: 'iso_ground_harbour', type: 'image', url: 'h.png' }],
       },
       ROOT,
       'linear',
     );
-    expect(byKey(merged, 'onub_kitchen')?.modes).toEqual(['onub']);
     expect(byKey(merged, 'iso_ground_harbour')).toMatchObject({ maps: ['harbour'], origin: [0.5, 1] });
   });
 

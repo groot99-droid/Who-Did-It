@@ -1,7 +1,6 @@
 import balance from '@wdi/content/data/balance.json';
 import { TRAIT_IDS } from '@wdi/shared/protocol';
 import { type MeetingFeed, type MeetingFeedEvents, type MeetingPlayer, SKIP } from '../net/meeting';
-import type { OnubFeed } from '../net/onub';
 import { fill } from './copy';
 import { MEETING_COPY as C } from './copy/meeting';
 import { h, icon, type Screen } from './dom';
@@ -16,9 +15,7 @@ import {
 } from './meetingText';
 import { renderLookPortrait, revealLookLine } from './main/lookPortraits';
 import { showShotToast } from './main/shotToast';
-import { mountRush, type RushPanel } from './onub/rush';
 import type { PortraitLook } from './portrait';
-import { roleTitle } from './RoleCard';
 
 /** An extra tab (the Notebook, wired at integration): `update` runs with every refresh. */
 export interface MeetingTab {
@@ -28,8 +25,6 @@ export interface MeetingTab {
 
 export interface MeetingOptions {
   feed: MeetingFeed;
-  /** Quick mode: the ONUB feed the Rush panel reads (board, claims); absent in the main mode. */
-  onub?: OnubFeed;
   /** Paints a portrait into the canvas (the scene owns the texture manager). */
   drawPortrait(canvas: HTMLCanvasElement, look: PortraitLook, name: string): void;
 }
@@ -50,8 +45,6 @@ interface Seat {
   count: HTMLElement;
   stamp: HTMLElement;
   ghost: HTMLElement;
-  /** Quick mode: the role this seat claimed (`claimed-<id>`), hidden until it has claimed. */
-  claimed: HTMLElement;
 }
 
 const traitIcons = (look: PortraitLook): HTMLImageElement[] => {
@@ -77,14 +70,7 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
   const clock = h('div', { class: 'wdi-hud-clock' }, clockPhase, clockTime);
   const grid = h('ul', { class: 'wdi-portraits' });
   const hint = h('span', { class: 'wdi-hint', 'aria-live': 'polite' });
-  // Quick mode's reveal lines are the Rush panel's (`reveal-role` there), so only one element carries the hook.
-  const revealRole = h('p', {
-    class: 'wdi-subtitle',
-    hidden: true,
-    ...(feed.mode() === 'main' ? { 'data-testid': 'reveal-role' } : {}),
-  });
-  // Quick mode: the Rush panel (claims, the board, the Pantry vote, the reveal lines) mounts here.
-  const rushRoot = h('div', { class: 'wdi-stack', hidden: true });
+  const revealRole = h('p', { class: 'wdi-subtitle', hidden: true, 'data-testid': 'reveal-role' });
   const skipCount = h('span', {
     class: 'wdi-chip wdi-chip--vote',
     hidden: true,
@@ -116,7 +102,6 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     ),
     grid,
     revealRole,
-    rushRoot,
     h('div', { class: 'wdi-row wdi-row--between wdi-row--wrap' }, hint, h('div', { class: 'wdi-row' }, skip)),
   );
 
@@ -185,9 +170,6 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
   addPanel('chat', C['meeting.tab.chat'], chat);
   select(selected);
 
-  // --- quick mode: the Rush panel (GDD 3.11, Session 5D) ------------------------------------------
-  let rush: RushPanel | null = null;
-
   const el = h('div', { class: 'wdi-meet wdi-screen', 'data-testid': 'meeting' }, board, side);
   root.append(el);
 
@@ -199,14 +181,13 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
 
   const build = (roster: MeetingPlayer[]) => {
     seats = new Map();
-    const main = feed.mode() === 'main';
     const items = roster.map((p) => {
       const look: PortraitLook = p.traits;
       const canvas = h('canvas', { width: 128, height: 192, 'aria-hidden': 'true' });
       opts.drawPortrait(canvas, look, p.name);
       const pic = h('span', { class: 'wdi-portrait__pic' }, canvas);
-      // Main mode: the portrait by public look (GDD 3.17, Session 5G's `ui/main/lookPortraits.ts`).
-      if (main) renderLookPortrait(pic, p);
+      // The portrait by public look (GDD 3.17, Session 5G's `ui/main/lookPortraits.ts`).
+      renderLookPortrait(pic, p);
       const voted = h(
         'span',
         {
@@ -228,11 +209,6 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
         alt: fill(C['reveal.ejected'], { name: p.name }),
         'data-testid': 'stamp',
       });
-      const claimed = h('span', {
-        class: 'wdi-portrait__claim',
-        hidden: true,
-        'data-testid': `claimed-${p.id}`,
-      });
       const ghost = icon('glyphs/glyph_ghost', C['meeting.chip.dead'], 'wdi-portrait__ghost');
       ghost.hidden = true;
       const button = h(
@@ -244,10 +220,9 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
         voted,
         count,
         ghost,
-        claimed,
       );
       button.addEventListener('click', () => feed.vote(p.id));
-      seats.set(p.id, { player: p, button, voted, count, stamp, ghost, claimed });
+      seats.set(p.id, { player: p, button, voted, count, stamp, ghost });
       return h('li', {}, button);
     });
     grid.replaceChildren(...items);
@@ -330,7 +305,6 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     const phase = info.phase !== 0 ? info.phase : clockNow.phase;
     const result = feed.result();
     const revealing = result !== null;
-    const quick = feed.mode() === 'onub';
     const inTalk = phase === MEETING_PHASE.discussion || phase === MEETING_PHASE.vote;
     const canVote = me?.alive === true && !revealing && inTalk;
 
@@ -340,12 +314,7 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     setText(clockTime, clockText(endsTick > 0 ? endsTick - clockNow.tick : null));
 
     const outs = result === null ? [] : outsOf(result);
-    // Quick mode: each portrait shows the role its seat claimed (GDD 3.11).
-    const claims = quick ? (opts.onub?.claims() ?? []) : [];
     for (const [id, seat] of seats) {
-      const claim = claims.find((c) => c.from === id);
-      seat.claimed.hidden = claim === undefined;
-      if (claim !== undefined) setText(seat.claimed, roleTitle(claim.roleId, 'onub'));
       const p = roster.find((q) => q.id === id) ?? seat.player;
       seat.player = p;
       const b = seat.button;
@@ -353,8 +322,7 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
       b.classList.toggle('is-dead', !p.alive);
       b.classList.toggle('is-selected', mine === id);
       b.setAttribute('aria-pressed', String(mine === id));
-      // Quick mode refuses a vote for yourself (GDD 3.11).
-      b.disabled = !canVote || !p.alive || (quick && id === feed.selfId);
+      b.disabled = !canVote || !p.alive;
       seat.ghost.hidden = p.alive;
       const votes = result?.tally[id] ?? 0;
       seat.voted.hidden = revealing || !p.hasVoted || !p.alive;
@@ -365,7 +333,6 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
         if (!seat.stamp.isConnected) b.append(seat.stamp);
       } else seat.stamp.remove();
     }
-    skip.hidden = quick;
     skip.disabled = !canVote;
     skip.classList.toggle('is-selected', mine === SKIP);
     skip.setAttribute('aria-pressed', String(mine === SKIP));
@@ -373,38 +340,29 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     skipCount.hidden = !revealing || skips === 0;
     if (!skipCount.hidden) setText(skipCount, `${skips}`);
 
-    // Quick mode's reveal lines are the Rush panel's.
-    revealRole.hidden = result === null || quick;
-    if (result !== null && !quick) {
-      // Main mode: "walking as the Baker" after the ejection line (GDD 3.17, Session 5G).
+    revealRole.hidden = result === null;
+    if (result !== null) {
+      // "Walking as the Baker" after the ejection line (GDD 3.17, Session 5G).
       const ejectedLook = roster.find((p) => p.id === result.ejectedId)?.look ?? '';
       const lookLine = result.ejectedId === undefined ? '' : revealLookLine(ejectedLook);
       const lines = [...ejectionLines(result, nameOf), lookLine].filter((line) => line !== '');
       setText(revealRole, lines.join(' '));
     }
     const voteLine = (() => {
-      if (mine === '')
-        return `${C['meeting.vote.open']}. ${quick ? C['meeting.vote.hintNoSkip'] : C['meeting.vote.hint']}`;
+      if (mine === '') return `${C['meeting.vote.open']}. ${C['meeting.vote.hint']}`;
       const who =
         mine === SKIP ? C['meeting.vote.mineSkip'] : fill(C['meeting.vote.mine'], { name: nameOf(mine) });
       return `${who}. ${C['meeting.vote.change']}`;
     })();
     setText(hint, revealing ? '' : me?.alive === false ? C['ghost.noVote'] : voteLine);
 
-    // Quick mode: the Rush panel, once the ONUB feed is there (it is published before the dawn meeting).
-    if (quick && rush === null && opts.onub !== undefined) rush = mountRush(rushRoot, feed, opts.onub);
-    rushRoot.hidden = rush === null;
-    rush?.update();
-
     renderReport(roster);
     renderChat(me);
     for (const tab of extras) tab.update();
   };
 
-  // Main mode, during a reveal: the ejected Gamekeeper's Last Shot (GDD 3.2, Session 5G's `ui/main/shotToast.ts`).
-  const onShot = (shot: MeetingFeedEvents['shot']) => {
-    if (feed.mode() === 'main') showShotToast(board, shot, nameOf);
-  };
+  // During a reveal: the ejected Gamekeeper's Last Shot (GDD 3.2, Session 5G's `ui/main/shotToast.ts`).
+  const onShot = (shot: MeetingFeedEvents['shot']) => showShotToast(board, shot, nameOf);
   feed.bus.on('shot', onShot);
 
   update();
@@ -426,8 +384,6 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
       feed.bus.off('shot', onShot);
       for (const tab of extras) tab.destroy();
       extras.length = 0;
-      rush?.destroy();
-      rush = null;
       el.remove();
     },
   };

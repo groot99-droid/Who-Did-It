@@ -8,9 +8,8 @@ describe('map row (GDD 3.13)', () => {
     for (const m of MAP_ROWS) expect(m).toMatchObject({ name: maps[m.id as keyof typeof maps].name });
   });
 
-  it('offers every map in the main mode and none in the quick mode', () => {
+  it('offers every map in the main mode', () => {
     expect(mapsForMode('main').map((m) => m.id)).toEqual(['hollowmere', 'blackpine']);
-    expect(mapsForMode('onub')).toEqual([]);
   });
 
   it('shows the pick, or the first offered map when the pick is not offered', () => {

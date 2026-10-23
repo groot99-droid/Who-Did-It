@@ -1,7 +1,6 @@
 // The wire protocol lives once, in @wdi/shared (docs/PROTOCOL.md is generated from it). This module
 // re-exports it under the names the client uses, plus the roster row the lobby draws.
 import {
-  GameMode,
   JOIN_ERROR_MESSAGE,
   MAX_PLAYERS as SHARED_MAX_PLAYERS,
   MIN_PLAYERS_TO_START as SHARED_MIN_PLAYERS,
@@ -48,17 +47,13 @@ export interface LobbyPlayer {
 }
 
 /**
- * The lobby settings the server publishes (`state.settings`, GDD 3.11, 3.12, 3.13); `npcSeats` is a count only.
- * `onubDeck` is the leader's custom quick-mode deck (role ids), empty for the default deck of the party size.
- * `map` is the map id the main mode plays (`MAP_IDS` of `@wdi/content`); the quick mode never reads it.
+ * The lobby settings the server publishes (`state.settings`, GDD 3.12, 3.13); `npcSeats` is a count only.
+ * `map` is the map id the match plays (`MAP_IDS` of `@wdi/content`).
  */
-export type GameModeId = keyof typeof GameMode;
 export type NpcLevelId = keyof typeof NpcLevel;
 export interface LobbySettings {
-  mode: GameModeId;
   npcDifficulty: NpcLevelId;
   npcSeats: number;
-  onubDeck: string[];
   map: string;
 }
 
@@ -68,7 +63,6 @@ export interface LobbySettings {
  */
 export const DEFAULT_MAP_ID = 'hollowmere';
 
-export const gameModeId = (n: number): GameModeId => (n === GameMode.onub ? 'onub' : 'main');
 export const npcLevelId = (n: number): NpcLevelId =>
   (Object.keys(NpcLevel) as NpcLevelId[]).find((k) => NpcLevel[k] === n) ?? 'normal';
-export { GameMode, NpcLevel };
+export { NpcLevel };

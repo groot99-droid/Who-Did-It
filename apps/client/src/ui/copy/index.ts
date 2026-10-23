@@ -5,7 +5,6 @@ export { WORLD_COPY } from './world';
 export { MEETING_COPY } from './meeting';
 export { LOBBY_COPY } from './lobby';
 export { DECK_COPY } from './deck';
-export { ONUB_NIGHT_COPY } from './onubNight';
 export { ART_STYLE_COPY, styleName } from './artStyle';
 export { LOOKS_COPY } from './looks';
 export { CUTSCENE_COPY, cutsceneLine } from './cutscenes';

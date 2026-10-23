@@ -156,8 +156,7 @@ export class MockWorldFeed implements WorldFeed {
   ) {
     const q = new URLSearchParams(typeof location === 'undefined' ? '' : location.search);
     // ?phase=day|dusk|night starts there (kills are refused in grace like the server), ?bots=still
-    // parks the bots, ?ghost=1 starts as a ghost: all three exist so tests reach those states fast. Quick mode
-    // never reaches this feed: `?mode=onub` plays `MockOnubFeed` (net/mock/onubMock.ts).
+    // parks the bots, ?ghost=1 starts as a ghost: all three exist so tests reach those states fast.
     this.phaseIdx = Math.max(0, PHASE_NAMES.indexOf(q.get('phase') ?? ''));
     this.phaseEndsTick = PHASE_ORDER[this.phaseIdx]!.ticks;
     this.still = q.get('bots') === 'still';
@@ -345,10 +344,6 @@ export class MockWorldFeed implements WorldFeed {
       phaseEndsTick: this.phaseEndsTick,
       startTick: 0,
     };
-  }
-
-  mode(): 'main' | 'onub' {
-    return 'main';
   }
 
   bodies(): BodySnap[] {

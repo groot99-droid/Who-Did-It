@@ -10,7 +10,7 @@ export interface MeetingPlayer {
   name: string;
   /** Trait indices as dealt (height S/M/T, scarf red/green/blue, hat cap/bowler/bare, GDD 3.1). */
   traits: { height: number; scarf: number; hat: number };
-  /** Public look id (`Player.look`, looks.json): '' until the role card closes, and in the quick mode (GDD 3.17). */
+  /** Public look id (`Player.look`, looks.json): '' until the role card closes (GDD 3.17). */
   look: string;
   alive: boolean;
   hasVoted: boolean;
@@ -34,10 +34,6 @@ export interface ChatLine {
 export type MeetingStart = S2CPayloads['meetingStart'];
 export type VoteResult = S2CPayloads['voteResult'];
 export type GameOver = S2CPayloads['gameOver'];
-export type OnubGameOver = NonNullable<GameOver['onub']>;
-
-/** `Settings.mode` as the screens see it. */
-export type MatchMode = 'main' | 'onub';
 
 export type MeetingFeedEvents = {
   meetingStart: MeetingStart;
@@ -52,8 +48,6 @@ export type MeetingFeedEvents = {
 export interface MeetingFeed {
   readonly bus: Emitter<MeetingFeedEvents>;
   readonly selfId: string;
-  /** `state.settings.mode`: quick mode (`onub`) hides Skip and mounts the Rush panel (claims live on the OnubFeed). */
-  mode(): MatchMode;
   /** Everyone seated, public fields only. */
   roster(): MeetingPlayer[];
   meeting(): MeetingInfo;
@@ -67,7 +61,7 @@ export interface MeetingFeed {
   over(): GameOver | null;
   /** Chat lines since the meeting opened. */
   lines(): readonly ChatLine[];
-  /** `targetId` is a living player's id or `"skip"`; quick mode: another seat in play or `"pantry"`. */
+  /** `targetId` is a living player's id or `"skip"`. */
   vote(targetId: string): void;
   say(text: string): void;
   dispose(): void;
