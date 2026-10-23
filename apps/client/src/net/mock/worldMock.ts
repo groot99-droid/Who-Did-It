@@ -516,6 +516,10 @@ export class MockWorldFeed implements WorldFeed {
     return this.m5b.tasks();
   }
 
+  taskBar(): number {
+    return this.m5b.taskBar();
+  }
+
   questAccept(questId: string): void {
     const me = this.actors.get(this.selfId);
     const refusal = me && this.m5b.questAccept(questId, me, this.content.scenes);
