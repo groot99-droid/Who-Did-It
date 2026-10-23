@@ -4,6 +4,7 @@
     "wolf": {
       "id": "wolf",
       "name": "Wolf",
+      "hp": 36,
       "speedTilesPerS": 3.6,
       "senseTiles": 6,
       "fleeLightTiles": 4,
@@ -14,6 +15,7 @@
     "boar": {
       "id": "boar",
       "name": "Boar",
+      "hp": 48,
       "speedTilesPerS": 3.2,
       "senseTiles": 4,
       "fleeLightTiles": 2,
@@ -24,6 +26,7 @@
     "bat": {
       "id": "bat",
       "name": "Bat",
+      "hp": 10,
       "speedTilesPerS": 4,
       "senseTiles": 5,
       "fleeLightTiles": 3,
@@ -34,6 +37,7 @@
     "rat": {
       "id": "rat",
       "name": "Rat",
+      "hp": 8,
       "speedTilesPerS": 2.5,
       "senseTiles": 3,
       "fleeLightTiles": 2,

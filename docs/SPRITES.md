@@ -12,6 +12,12 @@
   12 fps whatever the clip's scene rate.
 - Height traits are not separate art: the client scales the sprite by the GDD 3.1 factor, anchored at
   the feet pivot.
+- **The drawn figure (round 8, 8F).** `PlayerView` draws a packed frame at `iso.artScale` (2) like every other
+  packed sprite, then `iso.figureScale` larger than true scale against props and tiles (`metrics.json`, A141),
+  then the height factor; all three anchor at the feet pivot. Until round 8 the characters were drawn at 1,
+  half their designed size, which is why they looked small beside a 2.5 m wall (A141). `characterRect`
+  (10.7) and the nameplate are sized for the designed figure, so `figureScale` 1 keeps them exact; a larger
+  `figureScale` multiplies `characterRect` too.
 - Eight directions, clockwise from screen up; the atlas `<dir>` is screen frame, data and wire
   directions are world frame (10.4). This order is the only direction table; the code copy
   is `dirFromVector` in `@wdi/shared` and the rig copy is `DIRECTIONS` in `tools/blender/rig_common.py`.
@@ -751,6 +757,14 @@ snaps down to a multiple of 0.5, so an art pixel is always a whole number of scr
 
 The view covers about the same number of tiles as before, because the projection keeps area.
 
+**The character scale (round 8, 8F; art.md 2).** The owner asked for figures about 1.5 times taller on screen.
+The proposal of A141 is the drawn-figure fix of section 1 (two times what shipped, the designed size) with
+`iso.viewTilesHigh` 11 and `iso.figureScale` 1 unchanged, so the view, the vision pool (GDD 3.13) and the zoom
+table above stay as they are. The screenshots the owner judges by are `assets/source/review/scale-<720|1080|1440>-<before|after|closer>.png`:
+`closer` is the alternative with `viewTilesHigh` 7.5 and the zoom clamped at 3 instead of 2 (zoom 1.5 at
+720, 2 at 1080, 3 at 1440), which the owner may ask for instead. Whichever pair the owner picks, the vision rule
+does not change and the camera keeps following the player centred.
+
 **Rendering and follow.** `roundPixels` is on, and the camera follows your container at lerp 0.1, as today.
 
 **Bounds** are `sceneBounds(w, h)` grown by `iso.topPadPx` (320) above and one tile on the other sides. A scene
@@ -943,6 +957,21 @@ Page-equivalents are of 2048². These are the art plan's numbers (`docs/round5/a
 `char_villager` and `ovl_villager` load only with `?art=placeholder` in round 5 (10.13), so they count in no
 budget. `tools/sprites/test/budget.test.ts` asserts each cap and, for each map, the resident sum.
 
+**Round 8 re-plan (8F, art.md 2, motion.md 1): the measured cost.** Each shipped look packs its 304 frames per
+pass (five clips, 8 directions) on one 1024² body page at a fill of 0.42-0.47 (about 1 500 trimmed px a frame,
+3 450 page px a frame with padding and the power-of-two rounding) and its 608 overlay frames on a 512² or
+1024 x 512 page: 0.31-0.375 a look, 3.1-3.75 for the ten looks of a 10-seat match. The clips of motion.md 1 add
+16 clips; the frame plan of A141 (idle 12, walk, run, limp, stagger 8 each, swing, strike, knockdown, getup,
+inspect, eat, rob 6 each, die and interact 8, hurt 3, threaten, cower, stomp, stunned 4 each, fidget 6, down 2) is
+129 frames a direction, 1 032 a pass. At the measured cost that is one 2048² body page and one 1024² overlay
+page a look (1.25), 12.5 for ten looks and a worst-case resident of 14.6 against the cap of 6. Halving the
+packed cell's density does not help: 128 px packed cells (A135) quadruple every frame, so even today's five
+clips would need a 2048² body page. The character budget therefore cannot hold the full clip table at any cell
+size without a DECISIONS row; A141 asks 6Z for it and names the fallbacks (one-shots in four directions, fewer
+frames, or a lazily loaded second page per look). Until the row lands, the 8-bit and low-poly looks keep 64 px
+packed cells (the figure shares the world's pixel grid; see section 1), and the 128 px packed cell is the HD
+style's (8I packs every key at its zoom-2 size, art.md 3).
+
 ### 10.15 Tests each session adds
 
 | Session | Tests |
@@ -1006,8 +1035,8 @@ pnpm --filter @wdi/sprites m5b
 | `nodes` | multiatlas, one page ≤ 512² | `node_<snake id>/ready`, `node_<snake id>/spent` for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`); the stem is the row's `sprite` | 64 x 64, (32, 48): the ground point under the tile centre | boot |
 | `tools` | multiatlas, one page ≤ 512² | `held_<itemId>/<dir>` for `torch`, `snare`, `spade`, `lockpicks`, `lantern`, `crowbar` (8 screen-frame directions); `glow_lantern/<0-3>`, `glow_torch/<0-3>` | held: 64 x 64, (32, 56), the characters' feet; glow: 32 x 32, centred | boot |
 | `anims_tools` | animation | `glow_lantern`, `glow_torch`: 4 frames at 8 fps, looping | | boot |
-| `mobs` | multiatlas, one page ≤ 1024² | `mob_<id>/<anim>/<dir>/<nnn>` for `wolf`, `boar`, `bat`, `rat` (the stem is the row's `sprite`), `idle` 4 frames, `walk` 6, `attack` 4, 8 screen-frame directions | 64 x 64, (32, 56), the characters' feet; the bat hovers over a ground shadow at the feet | boot |
-| `anims_mobs` | animation | `mob_<id>/<anim>/<dir>`: idle 6 fps and walk 10 fps looping, attack 10 fps once | | boot |
+| `mobs` | multiatlas, one page ≤ 1024² | `mob_<id>/<anim>/<dir>/<nnn>` for `wolf`, `boar`, `bat`, `rat` (the stem is the row's `sprite`), `idle` 4 frames, `walk` 6, `attack` 6, `hurt` 3, `death` 6, `flee` 4 (round 8, 8G), 8 screen-frame directions | 64 x 64, (32, 56), the characters' feet; the bat hovers over a ground shadow at the feet | boot |
+| `anims_mobs` | animation | `mob_<id>/<anim>/<dir>`: idle 6 fps, walk 10 fps and flee 14 fps looping; attack 10 fps, hurt 12 fps and death 8 fps once (the death holds its last frame) | | boot |
 | `givers` | multiatlas, one page ≤ 512 x 1024 | `giver_<npcId>/idle/<dir>/<nnn>` for `harbourmaster`, `moll`, `foreman`, `smith`, `collier` (`quests.json` npcs), 4 frames, 8 screen-frame directions | 64 x 64, (32, 56), the characters' feet | boot |
 | `anims_givers` | animation | `giver_<npcId>/idle/<dir>`: 6 fps, looping | | boot |
 
@@ -1032,7 +1061,13 @@ gradient in low poly. The client plays `glow_lantern` or `glow_torch` over the l
 **Mobs** are small rigs of spheres, capsules and wing polygons in a mob-local frame (`tools/sprites/m5b-mobs.ts`),
 posed per animation and projected onto the iso ground for each direction, back to front, under one ink
 silhouette. The client turns a `MobSnap`'s world-frame yaw into the atlas direction with `dirFromVector`, as for an
-avatar, and plays `mob_<kind>/<walk|idle|attack>/<dir>`.
+avatar, and plays `mob_<kind>/<clip>/<dir>`. Round 8 (8G, motion.md 2): every clip is one pose of the rig (`pose()`:
+crouch, reach, jaw, stride, low, roll). The attack is six beats, crouch, crouch, lunge with the jaw open, bite,
+recoil and settle, with the hind feet planted through the lunge; `hurt` throws the head up and the body back;
+`flee` lengthens the stride, flattens the ears and tucks the tail; `death` rolls the posed body onto its side about
+the ground line under the spine (the bat drops to the floor instead). The client picks the clip from `animId` and
+`state`: `death` while the state is `dead`, `hurt` on `AnimId.hurt`, `attack` on a swing, `flee` while it walks
+in the `flee` state, else walk or idle.
 
 **Givers** are standing figures on the same rigs (`tools/sprites/m5b-givers.ts`), on the villager's proportions,
 each dressed for its trade: the harbourmaster's navy coat, peaked cap and beard; Moll's shawl, headscarf and herb

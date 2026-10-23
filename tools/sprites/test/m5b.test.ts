@@ -93,7 +93,8 @@ describe('M5b art (SPRITES 12)', () => {
       expect(MOB_IDS, id).toContain(id);
       expect(m.sprite).toBe(`mob_${id}`);
     }
-    expect(WANT.mobs).toHaveLength(MOB_IDS.length * DIRECTIONS.length * 14);
+    const perDir = MOB_ANIMS.reduce((n, a) => n + MOB_ANIM[a].frames, 0);
+    expect(WANT.mobs).toHaveLength(MOB_IDS.length * DIRECTIONS.length * perDir);
   });
 
   it('draws every quest npc of quests.json in 8 directions, all in the villager body', () => {
@@ -143,7 +144,16 @@ describe('M5b art (SPRITES 12)', () => {
     );
   });
 
-  it('plays each mob animation in each direction, looping all but the attack', () => {
+  it('draws the round-8 clips for every creature: the bite sequence, hurt, death and flee (motion.md 2)', () => {
+    expect(MOB_ANIMS).toEqual(['idle', 'walk', 'attack', 'hurt', 'death', 'flee']);
+    // Crouch, crouch, lunge, bite, recoil, settle: one frame per beat so the bite reads.
+    expect(MOB_ANIM.attack.frames).toBeGreaterThanOrEqual(6);
+    for (const once of ['attack', 'hurt', 'death'] as const) expect(MOB_ANIM[once].repeat, once).toBe(0);
+    for (const loop of ['idle', 'walk', 'flee'] as const) expect(MOB_ANIM[loop].repeat, loop).toBe(-1);
+    expect(MOB_ANIM.flee.fps).toBeGreaterThan(MOB_ANIM.walk.fps);
+  });
+
+  it('plays each mob animation in each direction, looping all but the attack, the hurt and the death', () => {
     const a = json<{ anims: Array<{ key: string; repeat: number; frameRate: number; frames: unknown[] }> }>(
       join(ASSETS, 'm5b', 'mobs.anims.json'),
     );

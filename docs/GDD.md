@@ -33,7 +33,7 @@ Who Did It is a 5-10 player (4 = practice; NPCs fill the seats below 4, see 3.12
 
 Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accomplice know each other), **Neutral** (amber, mask). In the main mode every seat walks the world as the character of its card, so a role is public by sight, except for the three **cover roles** (Killer, Accomplice, Drifter), which always wear the look of another card of the deck (3.17). A client never receives another seat's role card, inventory, Notebook or cooldowns, and nothing it receives tells a cover look from a real one. In the quick mode (3.11) every role stays hidden.
 
-**Traits.** Each player is dealt a unique triple from 27 combinations, from a random stream of its own (never the deal's): **Height** S/M/T (sprite scale 0.9/1.0/1.1, feet-anchored), **Scarf** red/green/blue (every character wears a storm scarf, a tinted overlay in the palette tokens blood/teal/moon; the nameplate repeats it as a shape: diamond/circle/square), **Hat** cap/bowler/bare. The boot trait from the earlier draft is dropped because a boot is 6 px at shipping scale. (M5a) Height and scarf are drawn on the character in the world; the hat is not, since every character keeps its own headgear, and it shows as a glyph on the nameplate, on the role card and in the meeting roster. Traits are dealt apart from the cards, so they still say nothing about a role, and a kill leaves the killer's own traits whatever look they wear (3.4, 3.17). Traits appear on the role card, the HUD chip tooltip and the meeting roster.
+**Traits.** Each player is dealt a unique triple from 27 combinations, from a random stream of its own (never the deal's): **Height** S/M/T (sprite scale 0.9/1.0/1.1, feet-anchored, on top of the drawn figure scale of `metrics.json` `iso.figureScale`, round 8), **Scarf** red/green/blue (every character wears a storm scarf, a tinted overlay in the palette tokens blood/teal/moon; the nameplate repeats it as a shape: diamond/circle/square), **Hat** cap/bowler/bare. The boot trait from the earlier draft is dropped because a boot is 6 px at shipping scale. (M5a) Height and scarf are drawn on the character in the world; the hat is not, since every character keeps its own headgear, and it shows as a glyph on the nameplate, on the role card and in the meeting roster. Traits are dealt apart from the cards, so they still say nothing about a role, and a kill leaves the killer's own traits whatever look they wear (3.4, 3.17). Traits appear on the role card, the HUD chip tooltip and the meeting roster.
 
 **The deck.** A match deals from a public deck of player count + 2 character cards (table in 3.9). Every card is a different character, so two seats share a look only when a cover role chooses to (3.17); the one repeated card is the second Killer of the 10-seat deck, which never walks as itself (Killers always wear a cover). Every Killer card is always dealt; the other cards are shuffled, and two of them stay **undealt**. Which two is secret; the deck list itself is public, in the lobby (for the current party size), on the role card and in the HUD. Townsfolk are dealt as **professions** (Lamplighter, Baker, Fisher, Tinner): each is one card, the Townsfolk card with a character of its own. The deck rows are `roles.json` `decks["4".."10"]`; the rules engine reads them, and no document restates them. The Butler and the Child stay out of the decks until their abilities ship (M4); the Ranger (V1.5), the Thief (V1.5) and the Medium (V2) join when they ship. Lobby toggles (Thief, Medium, faction-only reveal) are V1.5.
 
@@ -140,7 +140,7 @@ Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife,
 
 **Tasks.** Village players get 3-5 tasks; the global bar at 100% wins. Each needs a tool from another scene and a 2 s hold at the node: Light the lanterns (Oil from the tavern back room to a square lantern post, night only), Fix the well pump (Wrench from the apothecary bench), Deliver a letter (from the widow's letter box to the tavern dartboard), Mend the fence (2 Planks from the edge of Gallows Wood by the gate to the NE fence; while mended, wolves cannot enter the village), Fetch the flour (from Crumb's Ovens to the tavern); and behind Crumb's Ovens (round 7, A118) Mix the dough (Flour from the bakery's sacks to the mixer), Stoke the oven (Timber from the woodpile at the edge of Gallows Wood to the brick oven), Stock the cold room (a Bucket of well water from the pump to the cold shelves) and Proof the loaves (a Candle from the widow's bedroom to the proofing cabinet), which join the pool the deal draws from, the number dealt and the bar's maths unchanged. Co-op task (Shutter the windows, in the tavern): both players within 2 tiles of the node holding E for 4 s; progress pauses when one releases. Two-player carrying is V1.5. Completing a task writes a Claimed alibi entry (time + scene). Cabal see a fake list that writes entries but never fills the bar. Ghost task completion counts 100% but ghost contribution is capped at 25% of the bar, except the martyred Vicar's (3.20). A full bar in play ends the match for the Village.
 
-**The deal (round 7, A133).** At Start, after the cards, each human seat is dealt its list from the pool of fetch tasks whose source and at least one target stand on the chosen map at the party's profile (3.13); Blackpine, whose scenes hold no station yet, has an empty pool, so it deals nothing and its bar never moves. A Village seat draws `tasksEach` (3.9) real tasks and a Cabal or neutral seat as many fake ones, both without replacement from the same pool, on a stream of their own that nothing public shares. An NPC seat is dealt no list: its brain plays no mini-game, and a list never worked would cap the bar below 100 for the match. The bar starts every match at 0. A ghost finishes its own tasks (3.8) through the same hold and the same mini-game, under the ghost cap above. The co-op task joins the pool when its two-player hold lands.
+**The deal (round 7, A133).** At Start, after the cards, each human seat is dealt its list from the pool of fetch tasks whose source and at least one target stand on the chosen map at the party's profile (3.13); Blackpine, whose scenes hold no station yet, has an empty pool, so it deals nothing and its bar never moves. A Village seat draws `tasksEach` (3.9) real tasks and a Cabal or neutral seat as many fake ones, both without replacement from the same pool, on a stream of their own that nothing public shares. An NPC seat is dealt no list: its brain plays no mini-game, and a list never worked would cap the bar below 100 for the match. The bar starts every match at 0. A ghost finishes its own tasks (3.8) through the same hold and the same mini-game, under the ghost cap above. The co-op task joins the pool when its two-player hold lands. **Fetching (7M).** At a task's source prop the same hold is the pick-up: it puts the task's deliverable (its tool, `toolQty` of it) in your pockets, once at a time (not while you carry that many, not without a free slot), and the puzzle at the target takes it back when the task is done. A fake list's holder goes through the same motion at the same shelf and takes nothing; inventories are private, so nothing public tells the two apart.
 
 **Communication.** No voice in V1. Global text chat in meetings, lines of at most 200 characters. Outside meetings: an 8-phrase quick-chat wheel (Follow me / Where were you? / I saw something / Help! / Clear / Suspicious / Wait / Go) as speech bubbles within 5 tiles, plus world pings. Cabal channel and ghost channel are sent per-recipient by the server; the client never chooses a channel. (M3) A living player may speak only while a meeting runs (discussion, vote and reveal), to everyone; a ghost may speak in any phase, to the other ghosts only; empty lines are refused and long ones are cut to the limit. Proximity text chat is a V1.5 toggle.
 
@@ -424,6 +424,13 @@ creature chases runs for the nearest open door of its scene and takes it, or str
 there is none (3.12; live once the NPC brain's call lands, DECISIONS A89). Creatures use the `mobs` random stream,
 keyed per spawner, and never a secret stream.
 
+**Hit points and how a creature is drawn (round 8, 8G).** Each creature row carries `hp`: the wolf 36, the boar 48,
+the bat 10 and the rat 8. Fists, bolts and lights take them off (3.22; the damage is 8A's table), and a creature at
+0 dies. Everyone in the scene sees the same creature: its bite as a sequence (it crouches, lunges and bites, then
+recoils), a flinch with a white flash when a hit lands, a `flee` gait while it runs from a light, and a fall onto
+its side when it dies, where it lies until the server removes it and then fades. Under reduced motion the flash
+and the fade are cut and the clips still play. None of this carries a card or a seat.
+
 **Dark scenes on the server.** With creatures, a dark scene's visibility moves to the server (3.13): a living seat
 in a dark scene receives another avatar only within the night radius and a clear line of sight over the scene's
 grid (walls, and the `u` ground that is walkable but blocks sight), or when that avatar stands in the pool of a
@@ -680,6 +687,26 @@ strike with its fists.
 
 Session 8A writes this section's rules and corrects 3.6 and 3.15 where the two-hit-point model is replaced; 8B
 writes the inspect paragraph. The numbers are `balance.json` `body` and `effects.json`.
+
+**Inspect** (8B, A137). In any world phase, a living seat can study another living seat it can see within
+`relations.json` `inspect.rangeTiles`, once per `inspect.cooldownS`. The inspector learns, privately:
+- the look the figure is drawn as;
+- its physical signs: those its status bits draw (knocked out, stunned, dazed, bloody, bleeding, limping, pale,
+  weary) and, to a close look only, weak (Weakened), hungry (Famished) and hunted (Indebted);
+- its health as a band (unhurt, bruised, badly hurt; the floors are `inspect.health`), never the number;
+- its purse as a band (light, fair, heavy; `inspect.purse`), or unknown while the purse or its bands do not exist;
+- whether it carries a burning light.
+
+It never learns a card, a cover, a vendetta, an inventory, a notebook or a role's private state; a cover-wearer
+and a true wearer of a look read alike. The inspected seat is told privately which look studied it.
+
+**Relations.** `relations.json` `rows` say which looks are suspicious. A row names an inspector and an inspected
+side (a card, a vendetta, a faction, a drawn look, a townsfolk figure, or `mark`, the target of the inspector's open
+contract), may hold to one map, and carries a `suspicion` and an optional `note`. When rows hold for a look, every
+living NPC seat that saw it (in the scene, within the vision radius and in sight), and the inspected seat if it is
+an NPC, counts the inspector's drawn face the sum of their `suspicion` more; the first row with a note sends the
+inspected seat a card-blind hunch. Nothing a third client receives depends on a match. An `inert` row names a role
+or figure of a later round and never holds.
 
 ### 3.23 The economy
 
