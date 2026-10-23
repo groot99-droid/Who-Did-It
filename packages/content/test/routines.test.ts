@@ -47,19 +47,8 @@ const TABLE: Record<string, 'work' | 'social' | 'rest' | 'ignore'> = {
   plate: 'ignore',
   deadLoaf: 'ignore',
   ledger: 'ignore',
-  // Round 8 (8J, art.md 4.2): HollowMere's dressing kinds are scenery, never stations.
-  pew: 'ignore',
-  stainedGlass: 'ignore',
-  stainedGlassE: 'ignore',
-  candleStand: 'ignore',
-  hymnBoard: 'ignore',
-  memorial: 'ignore',
-  lectern: 'ignore',
-  pulpit: 'ignore',
-  font: 'ignore',
-  votiveRack: 'ignore',
-  almsBox: 'ignore',
-  flowerStand: 'ignore',
+  // Round 8 (8J, 8K): set dressing is scenery, never a station; its art resolves by id tail (SPRITES 3).
+  dressing: 'ignore',
 };
 
 function classOf(kind: string): string | undefined {

@@ -27,6 +27,7 @@
   },
   "holds": {},
   "ignore": [
+    "dressing",
     "kitChest",
     "teachingClue",
     "keyCache",
@@ -35,19 +36,7 @@
     "wakeTable",
     "plate",
     "deadLoaf",
-    "ledger",
-    "pew",
-    "stainedGlass",
-    "stainedGlassE",
-    "candleStand",
-    "hymnBoard",
-    "memorial",
-    "lectern",
-    "pulpit",
-    "font",
-    "votiveRack",
-    "almsBox",
-    "flowerStand"
+    "ledger"
   ],
   "lightKinds": ["lanternPost"]
 }

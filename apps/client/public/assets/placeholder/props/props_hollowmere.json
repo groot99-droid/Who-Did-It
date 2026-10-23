@@ -10,7 +10,7 @@
    "scale": 1,
    "frames": [
     {
-     "filename": "prop_almsBox",
+     "filename": "prop_alms_box",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -260,7 +260,7 @@
      }
     },
     {
-     "filename": "prop_candleStand",
+     "filename": "prop_candle_stand",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -785,7 +785,7 @@
      }
     },
     {
-     "filename": "prop_flowerStand",
+     "filename": "prop_flower_stand",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -1010,7 +1010,7 @@
      }
     },
     {
-     "filename": "prop_hymnBoard",
+     "filename": "prop_hymn_board",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -1885,7 +1885,7 @@
      }
     },
     {
-     "filename": "prop_stainedGlass",
+     "filename": "prop_stained_glass",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -1910,7 +1910,7 @@
      }
     },
     {
-     "filename": "prop_stainedGlassE",
+     "filename": "prop_stained_glass_e",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -1960,7 +1960,7 @@
      }
     },
     {
-     "filename": "prop_votiveRack",
+     "filename": "prop_votive_rack",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
