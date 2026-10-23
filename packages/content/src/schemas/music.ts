@@ -9,7 +9,8 @@ import { GddRef, WorldId } from './common.js';
 const PlaylistId = z.string().regex(/^[a-z][a-z0-9_]*$/);
 
 /**
- * `loading` plays from the map's load to the opening (round 7: the lobby piece, so the load changes nothing).
+ * `loading` plays from the map's load to the opening; since round 7 no map lists one, so the load never touches the bus
+ * (the opening's piece starts before the World preloads, and a `loading` request would cut it off; DECISIONS A101).
  * `opening` is the map's intro piece (the owner's speech-and-music pieces, docs/round6/media.md 1; DECISIONS A101):
  * it starts with the opening cutscene, plays once and whole (its playlist has `loop: false`), and the first phase
  * class takes over only when it ends or the opening is skipped (GDD 3.18).
