@@ -140,6 +140,8 @@ Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife,
 
 **Tasks.** Village players get 3-5 tasks; the global bar at 100% wins. Each needs a tool from another scene and a 2 s hold at the node: Light the lanterns (Oil from the tavern back room to a square lantern post, night only), Fix the well pump (Wrench from the apothecary bench), Deliver a letter (from the widow's letter box to the tavern dartboard), Mend the fence (2 Planks from the edge of Gallows Wood by the gate to the NE fence; while mended, wolves cannot enter the village), Fetch the flour (from Crumb's Ovens to the tavern); and behind Crumb's Ovens (round 7, A118) Mix the dough (Flour from the bakery's sacks to the mixer), Stoke the oven (Timber from the woodpile at the edge of Gallows Wood to the brick oven), Stock the cold room (a Bucket of well water from the pump to the cold shelves) and Proof the loaves (a Candle from the widow's bedroom to the proofing cabinet), which join the pool the deal draws from, the number dealt and the bar's maths unchanged. Co-op task (Shutter the windows, in the tavern): both players within 2 tiles of the node holding E for 4 s; progress pauses when one releases. Two-player carrying is V1.5. Completing a task writes a Claimed alibi entry (time + scene). Cabal see a fake list that writes entries but never fills the bar. Ghost task completion counts 100% but ghost contribution is capped at 25% of the bar, except the martyred Vicar's (3.20). A full bar in play ends the match for the Village.
 
+**The deal (round 7, A133).** At Start, after the cards, each human seat is dealt its list from the pool of fetch tasks whose source and at least one target stand on the chosen map at the party's profile (3.13); Blackpine, whose scenes hold no station yet, has an empty pool, so it deals nothing and its bar never moves. A Village seat draws `tasksEach` (3.9) real tasks and a Cabal or neutral seat as many fake ones, both without replacement from the same pool, on a stream of their own that nothing public shares. An NPC seat is dealt no list: its brain plays no mini-game, and a list never worked would cap the bar below 100 for the match. The bar starts every match at 0. A ghost finishes its own tasks (3.8) through the same hold and the same mini-game, under the ghost cap above. The co-op task joins the pool when its two-player hold lands.
+
 **Communication.** No voice in V1. Global text chat in meetings, lines of at most 200 characters. Outside meetings: an 8-phrase quick-chat wheel (Follow me / Where were you? / I saw something / Help! / Clear / Suspicious / Wait / Go) as speech bubbles within 5 tiles, plus world pings. Cabal channel and ghost channel are sent per-recipient by the server; the client never chooses a channel. (M3) A living player may speak only while a meeting runs (discussion, vote and reveal), to everyone; a ghost may speak in any phase, to the other ghosts only; empty lines are refused and long ones are cut to the limit. Proximity text chat is a V1.5 toggle.
 
 ### 3.6 PvE
@@ -422,6 +424,13 @@ creature chases runs for the nearest open door of its scene and takes it, or str
 there is none (3.12; live once the NPC brain's call lands, DECISIONS A89). Creatures use the `mobs` random stream,
 keyed per spawner, and never a secret stream.
 
+**Hit points and how a creature is drawn (round 8, 8G).** Each creature row carries `hp`: the wolf 36, the boar 48,
+the bat 10 and the rat 8. Fists, bolts and lights take them off (3.22; the damage is 8A's table), and a creature at
+0 dies. Everyone in the scene sees the same creature: its bite as a sequence (it crouches, lunges and bites, then
+recoils), a flinch with a white flash when a hit lands, a `flee` gait while it runs from a light, and a fall onto
+its side when it dies, where it lies until the server removes it and then fades. Under reduced motion the flash
+and the fade are cut and the clips still play. None of this carries a card or a seat.
+
 **Dark scenes on the server.** With creatures, a dark scene's visibility moves to the server (3.13): a living seat
 in a dark scene receives another avatar only within the night radius and a clear line of sight over the scene's
 grid (walls, and the `u` ground that is walkable but blocks sight), or when that avatar stands in the pool of a
@@ -664,3 +673,40 @@ music and shows a goodbye panel; it sends nothing more.
 The numbers are `balance.json` `party` (`profileCodeLength`, `friendsMax`, `invitedMax`, `listMax`,
 `listRefreshS`); nothing else restates them.
 
+
+### 3.22 Bodies: health, stamina and effects
+
+Round 8 (DECISIONS A134, A135; the contract is `docs/round8/body.md`). Every seat has health and stamina, which only
+the seat itself sees. Attacks drain health by the damage table, and effects (Slowed, Wounded, Bleeding, Weakened,
+Poisoned, Fatigued, Stunned, Dazed, Famished, Knocked out) apply, tick and are cured as listed. Every card can
+strike with its fists.
+- **Death.** A seat dies only to creatures, to Bleeding or Poisoned at zero health, and to the existing kills (the
+  Knife, Nightshade's poison, the last shot, ejection).
+- **Knockout.** Fists, a mugging or the slingshot at zero health knock a seat out, and it wakes Dazed.
+- **Inspect.** Anyone can inspect a seat or a figure in reach and learns only its physical signs.
+
+Session 8A writes this section's rules and corrects 3.6 and 3.15 where the two-hit-point model is replaced; 8B
+writes the inspect paragraph. The numbers are `balance.json` `body` and `effects.json`.
+
+### 3.23 The economy
+
+Round 8 (A134, A135; `docs/round8/economy.md`): the Bible's Book IV on today's maps and roles.
+- **Scrip**: a private purse and bank balance; stakes, wages, sales, shops, the bank, and coins on the ground.
+- **Rent and quota**, and the Indebted status.
+- **Faith**: Indulgences and Parish Seals.
+- **Rumours**: ledger slips, Blackmail Notices, the black market and the Gazette.
+- **HQ tiers** for the role stations, bought by look.
+
+Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `economy.json` and `balance.json`
+`economy`.
+
+### 3.24 Moods, mugging and townsfolk
+
+Round 8 (A134, A135; `docs/round8/townsfolk.md`).
+- **Needs and moods.** NPC seats and the new ambient townsfolk have needs (Hunger, Fear, Anger, Want) and moods.
+  These are server-only and show only as gait and idle.
+- **Townsfolk.** They are not seats, are never the Knife's prey and die only to creatures.
+- **Mugging.** A hungry, angry or desperate figure alone with a seat may mug it. A heavier purse raises the chance;
+  company and a lit light lower it.
+
+Session 8E writes this section. The numbers are `balance.json` `moods` and `townsfolk`.
