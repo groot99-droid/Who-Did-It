@@ -35,7 +35,7 @@ export function addFriendButton(player: LobbyPlayer & { profile?: string }): HTM
     'button',
     {
       type: 'button',
-      class: 'wdi-lobby__tag wdi-lobby__tag--action',
+      class: 'wdi-tag wdi-lobby__tag--action',
       'data-testid': 'add-friend',
       'aria-label': fill(C['lobby.friend.add.label'], { name: player.name }),
     },
