@@ -196,6 +196,10 @@ export const Private = schema(
     quests: t.array(QuestState),
     /** Round 7 (GDD 3.20): a Killer's vendetta id, or an Accomplice's Killers' ids joined by commas; '' otherwise. */
     vendetta: str(),
+    /** Round 8 (GDD 3.23, 8C): the Scrip this seat carries; others learn only its band, by inspect. */
+    purse: u32(),
+    /** Round 8 (GDD 3.23, 8C): the Scrip this seat keeps at the bank, safe from muggings and knockouts. */
+    bank: u32(),
   },
   'Private',
 );
