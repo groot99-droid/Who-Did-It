@@ -2,11 +2,13 @@ import { roles } from '@wdi/content';
 import { expect, test, type Page } from '@playwright/test';
 import { runSwarm } from '../../../tools/bots/swarm';
 import { E2E_SERVER_URL } from './env';
+import { createParty, enterWorld, joinParty } from './fixtures/party';
 
 // Two real browsers against the real server: create, join by deep link, Start with four swarm bots,
 // and each browser shows its own role card from the server.
 
 // Any card of the main deck (round 5 deals the Werewolf-inspired roles too, GDD 3.2).
+const SKIP_INTRO = "sessionStorage.setItem('wdi:introSeen', '1')"; // no opening cinematic (6Q)
 const KNOWN_ROLES = Object.values(roles.roles).map((r) => r.name);
 
 async function cardRole(page: Page): Promise<string> {
@@ -18,20 +20,19 @@ async function cardRole(page: Page): Promise<string> {
 test('create, join by deep link, start with 4 bots, both browsers get a role card', async ({ browser }) => {
   const hostCtx = await browser.newContext();
   const guestCtx = await browser.newContext();
+  await Promise.all([hostCtx, guestCtx].map((c) => c.addInitScript(SKIP_INTRO)));
   const host = await hostCtx.newPage();
   const guest = await guestCtx.newPage();
 
   await host.goto('/Who-Did-It/');
-  await host.getByLabel('Your name').fill('Hana');
-  await host.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(host, 'Hana');
   const code = ((await host.getByTestId('party-code').textContent()) ?? '').trim();
   expect(code).toMatch(/^[A-Z2-9]{5}$/);
 
   // The invite link opens the join screen with the code filled in.
   await guest.goto(`/Who-Did-It/#/join/${code}`);
   await expect(guest.getByLabel('Party code')).toHaveValue(code);
-  await guest.getByLabel('Your name').fill('Gus');
-  await guest.getByRole('button', { name: 'Join Party' }).click();
+  await joinParty(guest, code, 'Gus');
   await expect(guest.getByTestId('party-code')).toHaveText(code);
   await expect(guest.getByTestId('start')).toBeHidden();
 
@@ -52,8 +53,8 @@ test('create, join by deep link, start with 4 bots, both browsers get a role car
     // Ready dismisses the card; once everyone is ready the server sends the overworld.
     await host.getByTestId('ready').click();
     await guest.getByTestId('ready').click();
-    await expect(host.getByTestId('entered')).toContainText('overworld');
-    await expect(guest.getByTestId('entered')).toContainText('overworld');
+    await enterWorld(host);
+    await enterWorld(guest);
     // The World scene starts from the same sceneEnter (M2): its HUD timer is the proof of entry.
     await expect(host.getByTestId('hud-clock')).toBeVisible();
     await expect(guest.getByTestId('hud-clock')).toBeVisible();
@@ -69,18 +70,18 @@ test('create, join by deep link, start with 4 bots, both browsers get a role car
 
 test('a full or started party refuses a late joiner with the generic error', async ({ browser, page }) => {
   const hostCtx = await browser.newContext();
+  await hostCtx.addInitScript(SKIP_INTRO);
+  await page.addInitScript(SKIP_INTRO);
   const host = await hostCtx.newPage();
   await host.goto('/Who-Did-It/');
-  await host.getByLabel('Your name').fill('Hana');
-  await host.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(host, 'Hana');
   const code = ((await host.getByTestId('party-code').textContent()) ?? '').trim();
   await host.getByTestId('start').click();
   await host.getByTestId('confirm-start').click();
   await cardRole(host);
 
   await page.goto(`/Who-Did-It/#/join/${code}`);
-  await page.getByLabel('Your name').fill('Late');
-  await page.getByRole('button', { name: 'Join Party' }).click();
+  await joinParty(page, code, 'Late');
   await expect(page.getByRole('alert')).toHaveText('party not found or unavailable');
   await hostCtx.close();
 });
@@ -88,8 +89,7 @@ test('a full or started party refuses a late joiner with the generic error', asy
 // Mock lobby (no server): the leader toggles the mode and the chip text follows; NPC seats come and go.
 test('the leader toggles the mode chip and adds and removes NPC seats', async ({ page }) => {
   await page.goto('/Who-Did-It/?mock=1');
-  await page.getByLabel('Your name').fill('Hana');
-  await page.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(page, 'Hana');
   await expect(page.getByTestId('player-count')).toHaveText('4 / 10', { timeout: 5000 });
 
   await expect(page.getByTestId('mode-chip')).toHaveText('Who Did It');

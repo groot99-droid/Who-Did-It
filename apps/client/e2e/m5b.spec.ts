@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { createParty } from './fixtures/party';
 
 // Round 6 (6I) on the ?mock=1 world feed: `?m5b=1` stands the own seat beside the overworld's quest giver with a
 // spade and a kit of nodes at spread distances (the nearest-node prompt walks them in order); E gathers. The run gathers, crafts a lantern, takes the giver's quest and
@@ -6,8 +7,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 async function toWorld(page: Page, query: string) {
   await page.goto(`/Who-Did-It/?mock=1${query}`);
-  await page.getByLabel('Your name').fill('Hana');
-  await page.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(page, 'Hana');
   await expect(page.getByTestId('player-list')).toContainText('Hana');
   await page.getByTestId('start').click();
   await page.getByTestId('confirm-start').click();

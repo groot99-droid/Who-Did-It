@@ -15,8 +15,10 @@ export {
   ROOM_NAME,
   type C2SPayloads as ClientMessages,
   type C2SType as ClientMessageType,
+  type CreateOptions,
   type ErrorPayload,
   type JoinOptions,
+  type PartyVisibility,
   type RoleRevealPayload,
   type S2CPayloads as ServerMessages,
   type S2CType as ServerMessageType,
@@ -41,6 +43,8 @@ export interface LobbyPlayer {
   name: string;
   ready: boolean;
   connected: boolean;
+  /** The seat's profile code (GDD 3.21) when it sent one; the public handle behind "Add friend". */
+  profile?: string;
 }
 
 /**

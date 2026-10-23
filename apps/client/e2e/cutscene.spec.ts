@@ -1,12 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
+import { createParty } from './fixtures/party';
 
 // The cutscene player against the ?mock=1 world feed. `?cutscene=1` makes the mock Start send the HollowMere opening
 // (the default mock does not, so the other specs reach the HUD at once).
 
 async function start(page: Page, query: string): Promise<void> {
   await page.goto(`/Who-Did-It/?mock=1${query}`);
-  await page.getByLabel('Your name').fill('Hana');
-  await page.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(page, 'Hana');
   await expect(page.getByTestId('player-list')).toContainText('Hana');
   await page.getByTestId('start').click();
   await page.getByTestId('confirm-start').click();

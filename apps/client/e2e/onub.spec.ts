@@ -3,6 +3,7 @@ import { GameMode } from '@wdi/shared';
 import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test';
 import { type Swarm, runSwarm } from '../../../tools/bots/swarm';
 import { E2E_SERVER_URL } from './env';
+import { createParty, joinParty } from './fixtures/party';
 
 // ONUB v2 (quick mode, GDD 3.11) end to end against the real server: two browsers and three fast bots play
 // lobby -> role card -> Evening Prep (station, mini-game, hand, commit) -> the crime scenes -> the night (one
@@ -57,12 +58,10 @@ async function lobby(browser: Browser): Promise<Quick> {
   const [host, guest] = (await Promise.all(ctxs.map((c) => c.newPage()))) as [Page, Page];
   // The lobby offers the mode toggle only with ?onub=1 until ONUB v2 is merged.
   await host.goto('/Who-Did-It/?onub=1');
-  await host.getByLabel('Your name').fill('Hana');
-  await host.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(host, 'Hana');
   const code = ((await host.getByTestId('party-code').textContent()) ?? '').trim();
   await guest.goto(`/Who-Did-It/#/join/${code}`);
-  await guest.getByLabel('Your name').fill('Gus');
-  await guest.getByRole('button', { name: 'Join Party' }).click();
+  await joinParty(guest, code, 'Gus');
   await expect(guest.getByTestId('party-code')).toHaveText(code);
 
   const swarm = await runSwarm({ code, count: 3, url: E2E_SERVER_URL, walk: false, quick: { pace: 'fast' } });
