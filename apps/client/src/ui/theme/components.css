@@ -3503,3 +3503,73 @@ button.wdi-map__option,
   transition: width var(--wdi-dur-press) linear;
   box-shadow: 0 0 var(--wdi-space-2) rgb(var(--wdi-teal-rgb) / 0.6);
 }
+
+/* Scene transitions per portal kind (view/Transition.ts `portalTransition`): a door wipes and a ladder
+   irises (the Round 6 layers above); an arrival at the Train station fades through lantern-lit carriage
+   windows sliding past, the night between them, before the platform lifts. The layer's half time is the
+   router's (`--wdi-transition-ms`); reduced motion hides the layer, as for the others. */
+.wdi-transition--station {
+  opacity: 0;
+  background-color: var(--wdi-night);
+  background-image: repeating-linear-gradient(
+    to right,
+    rgb(var(--wdi-lantern-rgb) / 0.35) 0 var(--wdi-space-7),
+    transparent var(--wdi-space-7) calc(var(--wdi-space-7) * 3)
+  );
+  background-size: calc(var(--wdi-space-7) * 3) 30%;
+  background-position: 0 50%;
+  background-repeat: repeat-x;
+  transition-property: opacity, background-position;
+}
+
+.wdi-transition--station.wdi-transition--covered {
+  opacity: 1;
+  background-position: calc(var(--wdi-space-7) * -6) 50%;
+}
+
+.wdi-transition--station.wdi-transition--lifted {
+  opacity: 0;
+  background-position: calc(var(--wdi-space-7) * -12) 50%;
+}
+
+/* A climb (a ladder, shaft or stair that changes height) irises as the meeting does, with rungs passing the
+   way the seat goes: up the ladder the rungs fall away below, down it they rise past. */
+.wdi-transition--climbUp,
+.wdi-transition--climbDown {
+  clip-path: circle(0% at 50% 50%);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgb(var(--wdi-lantern-rgb) / 0.22) 0 var(--wdi-space-2),
+    transparent var(--wdi-space-2) var(--wdi-space-7)
+  );
+  background-size: 40% var(--wdi-space-7);
+  background-position: 50% 0;
+  background-repeat: repeat-y;
+  transition-property: clip-path, background-position;
+}
+
+.wdi-transition--climbUp.wdi-transition--covered,
+.wdi-transition--climbDown.wdi-transition--covered {
+  clip-path: circle(75% at 50% 50%);
+}
+
+.wdi-transition--climbUp.wdi-transition--lifted,
+.wdi-transition--climbDown.wdi-transition--lifted {
+  clip-path: circle(0% at 50% 50%);
+}
+
+.wdi-transition--climbUp.wdi-transition--covered {
+  background-position: 50% calc(var(--wdi-space-7) * 4);
+}
+
+.wdi-transition--climbUp.wdi-transition--lifted {
+  background-position: 50% calc(var(--wdi-space-7) * 8);
+}
+
+.wdi-transition--climbDown.wdi-transition--covered {
+  background-position: 50% calc(var(--wdi-space-7) * -4);
+}
+
+.wdi-transition--climbDown.wdi-transition--lifted {
+  background-position: 50% calc(var(--wdi-space-7) * -8);
+}

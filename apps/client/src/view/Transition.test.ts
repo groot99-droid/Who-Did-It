@@ -1,8 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import balance from '@wdi/content/data/balance.json';
+import { scenes } from '@wdi/content';
 import {
   domHost,
+  pickTransition,
+  portalTransition,
   transition,
+  type PortalRow,
   type TransitionHost,
   type TransitionKind,
   type TransitionLayer,
@@ -131,5 +135,47 @@ describe('balance.ui.transitionS', () => {
       expect(balance.ui.transitionS[kind]).toBeGreaterThan(0);
       expect(balance.ui.transitionS[kind]).toBeLessThanOrEqual(1);
     }
+  });
+});
+
+describe('portal transitions (round 8, 8H)', () => {
+  const portals: PortalRow[] = [
+    { from: 'bakery', to: 'overworld', toSpawn: 'bakery', kind: 'door' },
+    { from: 'bp_mine', to: 'bp_deep', toSpawn: 'ladder', kind: 'shaft', elevationDelta: -8 },
+    { from: 'bp_deep', to: 'bp_mine', toSpawn: 'winze', kind: 'shaft', elevationDelta: 8 },
+    { from: 'barn', to: 'loft', toSpawn: 'stair', kind: 'stairs', elevationDelta: 0 },
+    { from: 'overworld', to: 'woods', toSpawn: 'gate', kind: 'forest_gate' },
+  ];
+  const stations = new Set(['overworld.platform']);
+  const enter = (sceneId: string, spawn: string) => ({ sceneId, spawn });
+
+  it('wipes through a door, climbs a shaft either way, irises a level stair and fades through a gate', () => {
+    expect(pickTransition('bakery', enter('overworld', 'bakery'), portals, stations)).toBe('wipe');
+    expect(pickTransition('bp_mine', enter('bp_deep', 'ladder'), portals, stations)).toBe('climbDown');
+    expect(pickTransition('bp_deep', enter('bp_mine', 'winze'), portals, stations)).toBe('climbUp');
+    expect(pickTransition('barn', enter('loft', 'stair'), portals, stations)).toBe('iris');
+    expect(pickTransition('overworld', enter('woods', 'gate'), portals, stations)).toBe('fade');
+  });
+
+  it('fades through the station on an arrival at a map station', () => {
+    expect(pickTransition('elsewhere', enter('overworld', 'platform'), portals, stations)).toBe('station');
+  });
+
+  it('fades for the first spawn, a return to the same scene, and an unknown route', () => {
+    expect(pickTransition(null, enter('overworld', 'bakery'), portals, stations)).toBe('fade');
+    expect(pickTransition('overworld', enter('overworld', 'bakery'), portals, stations)).toBe('fade');
+    expect(pickTransition('woods', enter('overworld', 'bakery'), portals, stations)).toBe('fade');
+  });
+
+  it('maps every portal kind the scenes use, and every door of the shipped scenes wipes', () => {
+    const real = Object.values(scenes as Record<string, { portals: PortalRow[] }>).flatMap((s) => s.portals);
+    const known = new Set(['door', 'stairs', 'hatch', 'shaft', 'drop', 'crawl', 'forest_gate', 'cave_mouth']);
+    for (const p of real) expect(known, `${p.from} -> ${p.to}: ${p.kind}`).toContain(p.kind);
+    const door = real.find((p) => p.kind === 'door')!;
+    expect(pickTransition(door.from, enter(door.to, door.toSpawn), real, stations)).toBe('wipe');
+  });
+
+  it('remembers the scene it last saw, and answers fade until the graph loads', () => {
+    expect(portalTransition(enter('bakery', 'door'))).toBe('fade');
   });
 });
