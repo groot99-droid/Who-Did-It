@@ -43,6 +43,8 @@ export interface LobbyPlayer {
   name: string;
   ready: boolean;
   connected: boolean;
+  /** The seat's profile code (GDD 3.21) when it sent one; the public handle behind "Add friend". */
+  profile?: string;
 }
 
 /**

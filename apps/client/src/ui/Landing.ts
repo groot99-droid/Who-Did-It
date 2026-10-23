@@ -1,4 +1,3 @@
-import { getItem, setItem } from '../net/storage';
 import type { PartyVisibility } from '../net/protocol';
 import { readAudioSettings, onAudioSettings, writeAudioSettings } from '../view/audioSettings';
 import { MENU_COPY as C, fill } from './copy';
@@ -6,6 +5,9 @@ import { h, type Screen } from './dom';
 import { mountTrailer } from './landingTrailer';
 import { openCodeBox } from './menu/codeBox';
 import { openDialog, type MenuDialog } from './menu/dialog';
+import { openFriendsPanel } from './menu/friends';
+import { openProfilePanel } from './menu/profile';
+import { readProfile } from './menu/profileModel';
 import { openStartDialog } from './menu/startDialog';
 import { mountSettingsPanel } from './SettingsPanel';
 import './menu.css';
@@ -22,8 +24,6 @@ export interface LandingOptions {
   /** The music bus, so the trailer's soundtrack can start on the first tap (round 6, 6K). */
   music?: { crossfadeTo(playlistId: string | null): void } | undefined;
 }
-
-const NAME_KEY = 'wdi:name';
 
 /** The repository's CREDITS.md, opened in a new tab (CLAUDE.md: CC-BY needs a credits row). */
 export const CREDITS_URL = 'https://github.com/groot99-droid/Who-Did-It/blob/HEAD/CREDITS.md';
@@ -76,13 +76,13 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
     dialog?.close();
     dialog = open(closed);
   };
-  const remembered = () => getItem(NAME_KEY) ?? '';
-  const remember = (name: string) => setItem(NAME_KEY, name);
+  /** The profile's name prefills both dialogs; a guest types it each time and nothing is remembered. */
+  const remembered = () => readProfile()?.name ?? '';
 
   const start = menuButton(C['menu.start'], '▶', 'wdi-menu__btn--primary');
   const join = menuButton(C['menu.join'], '⇥', '');
-  const profile = menuButton(C['menu.profile'], '+', '', true);
-  const friends = menuButton(C['menu.friends'], '☰', '', true);
+  const profile = menuButton(readProfile() ? C['menu.profile.edit'] : C['menu.profile'], '+', '');
+  const friends = menuButton(C['menu.friends'], '☰', '');
   const settingsBtn = menuButton(C['menu.settings'], '⚙', '');
   const help = menuLink(C['menu.help'], '?', `${import.meta.env.BASE_URL}help/`);
   const credits = menuLink(C['menu.credits'], '★', CREDITS_URL);
@@ -95,10 +95,7 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
         code,
         name: remembered(),
         onClose,
-        onJoin: async (c, name) => {
-          remember(name);
-          await opts.onJoin(c, name);
-        },
+        onJoin: opts.onJoin,
         ...(opts.explainFailure ? { explainFailure: opts.explainFailure } : {}),
       }),
     );
@@ -109,10 +106,7 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
         root,
         name: remembered(),
         onClose,
-        onCreate: async (name, visibility) => {
-          remember(name);
-          await opts.onCreate(name, visibility);
-        },
+        onCreate: opts.onCreate,
         ...(opts.explainFailure ? { explainFailure: opts.explainFailure } : {}),
       }),
     ),
@@ -128,12 +122,25 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
     }),
   );
 
+  const chipName = h('span', {});
   const chip = h(
-    'div',
-    { class: 'wdi-menu__chip', 'data-testid': 'menu-chip' },
+    'button',
+    { type: 'button', class: 'wdi-menu__chip', 'data-testid': 'menu-chip' },
     h('span', { class: 'wdi-menu__icon', 'aria-hidden': 'true' }, '☺'),
-    h('span', {}, C['menu.chip.guest']),
+    chipName,
   );
+  const showProfile = () => {
+    const saved = readProfile();
+    chipName.textContent = saved?.name ?? C['menu.chip.guest'];
+    profile.querySelector('.wdi-menu__label')!.textContent = saved
+      ? C['menu.profile.edit']
+      : C['menu.profile'];
+  };
+  const openProfile = () => show((onClose) => openProfilePanel({ root, onClose, onSaved: showProfile }));
+  chip.addEventListener('click', openProfile);
+  profile.addEventListener('click', openProfile);
+  friends.addEventListener('click', () => show((onClose) => openFriendsPanel({ root, onClose })));
+  showProfile();
   const sound = h('button', { type: 'button', class: 'wdi-menu__sound', 'data-testid': 'menu-sound' });
   const showSound = () => {
     const muted = readAudioSettings().muted;

@@ -26,6 +26,13 @@ import {
   type ServerMessages,
 } from './protocol';
 import { deviceId, reconnectTokens } from './storage';
+import { profileCode } from '../ui/menu/profileModel';
+
+/** The device's profile code for the create and join options, or nothing for a guest. */
+function profileField(): { profile?: string } {
+  const profile = profileCode();
+  return profile === undefined ? {} : { profile };
+}
 
 /** The state schema arrives with `@wdi/shared`; until then the room is dynamically typed. */
 export type Room = ColyseusRoom;
@@ -125,6 +132,7 @@ interface PlayerState {
   name: string;
   ready: boolean;
   connected: boolean;
+  profile?: string;
 }
 
 /**
@@ -179,12 +187,18 @@ export class ColyseusNetwork implements NetworkService {
   }
 
   async create(name: string, party: PartyOptions = { visibility: 'open' }): Promise<string> {
-    const options: CreateOptions = { name, build: BUILD_VERSION, deviceId: deviceId(), ...party };
+    const options: CreateOptions = {
+      name,
+      build: BUILD_VERSION,
+      deviceId: deviceId(),
+      ...profileField(),
+      ...party,
+    };
     return this.enter(() => this.client.create(ROOM_NAME, options));
   }
 
   async join(code: string, name: string): Promise<string> {
-    const options: JoinOptions = { name, build: BUILD_VERSION, deviceId: deviceId() };
+    const options: JoinOptions = { name, build: BUILD_VERSION, deviceId: deviceId(), ...profileField() };
     return this.enter(() => this.client.joinById(code.toUpperCase(), options));
   }
 
@@ -334,6 +348,7 @@ export class ColyseusNetwork implements NetworkService {
       name: p.name,
       ready: p.ready,
       connected: p.connected,
+      ...(p.profile ? { profile: p.profile } : {}),
     }));
     this.last = {
       code: room.roomId,

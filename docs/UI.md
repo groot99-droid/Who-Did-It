@@ -1364,7 +1364,7 @@ asked where it is used.
 | `menu.title.top`, `menu.title.bottom` | Who did / it? | the title, two lines (accessible name `menu.title.label`: Who Did It?) |
 | `menu.start` | Start Game | primary button; opens the Start dialog |
 | `menu.join` | Join Game | opens the party list (until the list lands: the code box) |
-| `menu.profile` | Create Profile | opens the profile panel (greyed with `menu.soon` until it lands) |
+| `menu.profile` | Create Profile | opens the profile panel; reads `menu.profile.edit` (Profile) once a profile exists |
 | `menu.friends` | Friends | opens the friends list (greyed with `menu.soon` until it lands) |
 | `menu.settings` | Settings | opens the sound panel of UI.md 14.22 in a dialog |
 | `menu.help`, `menu.credits` | How to Play, Credits | small links, a new tab: `${BASE}help/` and the repository's `CREDITS.md` |
