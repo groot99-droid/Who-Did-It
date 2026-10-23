@@ -28,6 +28,7 @@ import { CutscenePlayer } from '../view/cutscene/CutscenePlayer';
 import { GiverView } from '../view/GiverView';
 import { MobView } from '../view/MobView';
 import { NodeView } from '../view/NodeView';
+import { TransportView } from '../view/transport/TransportView';
 import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
@@ -127,6 +128,7 @@ export class World extends Phaser.Scene {
   // Round 6 (locked lines): the M5b views (6I) and the cutscene player (6J).
   private nodeView!: NodeView;
   private mobView!: MobView;
+  private transportView!: TransportView; // round 8, 8G (locked)
   private giverView!: GiverView;
   private m5b: M5bLayer | null = null;
   private cutscenes!: CutscenePlayer;
@@ -207,6 +209,7 @@ export class World extends Phaser.Scene {
     this.clueView = new ClueView(this);
     this.nodeView = new NodeView(this);
     this.mobView = new MobView(this);
+    this.transportView = new TransportView(this); // round 8, 8G (locked)
     this.giverView = new GiverView(this);
     this.m5b = mountM5bLayer(this);
     this.entities = new EntityView(this, feed.selfId);
@@ -310,6 +313,7 @@ export class World extends Phaser.Scene {
       this.clueView.destroy();
       this.nodeView.destroy();
       this.mobView.destroy();
+      this.transportView.destroy(); // round 8, 8G (locked)
       this.giverView.destroy();
       this.m5b?.destroy();
       this.cutscenes.destroy();
@@ -354,6 +358,7 @@ export class World extends Phaser.Scene {
     this.mobView.update(feed.mobs(), this.time.now); // round 6, 6I (locked)
     this.syncBodies(bodies);
     this.drawDoors(clock.tick);
+    this.transportView.update(this.sceneId, this.portals, feed, clock.tick, this.time.now); // round 8, 8G (locked)
     this.updateTarget(self, clues, bodies);
     this.updateHold(self, clues);
     this.footsteps(now);
@@ -742,6 +747,7 @@ export class World extends Phaser.Scene {
     // Round 7, 7I: the Daily Train's pulses are sounds, not rings (GDD 3.3).
     if (n.kind.startsWith('train_') && (AUDIO_KEYS as readonly string[]).includes(n.kind)) {
       this.audio.play(n.kind as AudioKey);
+      this.transportView.pulse(n.kind, this.time.now); // round 8, 8G (locked)
       if (n.kind === 'train_arrive') this.hud.say(C['log.train']);
       return;
     }
