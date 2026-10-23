@@ -1,0 +1,34 @@
+/* The inspect card (UI.md 14.33, Session 8B). Layout only; 8H owns its motion through the class. */
+.wdi-inspect {
+  position: absolute;
+  top: var(--wdi-space-4);
+  right: var(--wdi-space-4);
+  width: min(280px, calc(100% - 2 * var(--wdi-space-4)));
+  padding: var(--wdi-space-4);
+  pointer-events: auto;
+}
+
+.wdi-inspect__title {
+  margin: 0 0 var(--wdi-space-2);
+  font-size: 1.1rem;
+}
+
+.wdi-inspect__signs,
+.wdi-inspect__facts {
+  margin: 0 0 var(--wdi-space-3);
+  padding-left: var(--wdi-space-4);
+}
+
+.wdi-inspect__facts {
+  color: var(--wdi-text-muted);
+}
+
+.wdi-inspect__close {
+  min-height: var(--wdi-touch);
+  padding: 0 var(--wdi-space-4);
+  color: var(--wdi-text-on-paper);
+  background: var(--wdi-paper);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-pill);
+  cursor: pointer;
+}

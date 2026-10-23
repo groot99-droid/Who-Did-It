@@ -8,6 +8,7 @@ import { handleMinigameResult } from './Minigames';
 import { handleLight } from './mobs/light';
 import { handleQuestAccept, handleQuestTurnIn } from './Quests';
 import { runHolds } from './Hold';
+import { handleInspect } from './inspect';
 import { queuePortal } from './PortalQueue';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
@@ -75,6 +76,10 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.light:
         handleLight(room, cmd.sessionId, payload);
+        break;
+      // Round 8 (GDD 3.22 "Inspect"): 8B's `sim/inspect/`.
+      case C2S.inspect:
+        handleInspect(room, cmd.sessionId, payload);
         break;
       // Round 8, 8C (locked; GDD 3.23): trading at the shop, and banking at the bank, a hold opened.
       case C2S.buy:
