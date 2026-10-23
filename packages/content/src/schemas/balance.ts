@@ -308,6 +308,20 @@ export const BalanceFile = z.strictObject({
       desperate: MoodWeights,
     }),
   }),
+  /**
+   * Round 8 (GDD 3.24, Session 8E): the ambient townsfolk. `count` is how many figures a map holds at each party
+   * profile (the named figure and the stallholders of `routines.json` `townsfolk` first); a figure walks at
+   * `walkTilesPerS`, works a station for `stationDwellS`, then idles for `idleS` with chance `idleChance`; `height`
+   * is the trait index it is drawn at.
+   */
+  townsfolk: Section({
+    count: z.strictObject({ small: Count, medium: Count, large: Count }),
+    walkTilesPerS: z.number().positive(),
+    stationDwellS: Span,
+    idleS: Span,
+    idleChance: Chance,
+    height: z.number().int().nonnegative(),
+  }),
   /** Round 6 (GDD 3.14). Each resource's own gather hold and respawn are rows of resources.json. */
   resources: Section({
     /** The share of each node pool that is active in a match. */

@@ -185,6 +185,7 @@ describe('the round-6 invariants', () => {
       'step',
       'matchLength',
       'killClues',
+      'figureNotSeat', // round 8, 8E (GDD 3.24)
       'vendettaOnce',
       'contractQuest',
       'strongboxOnce',

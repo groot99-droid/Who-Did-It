@@ -738,3 +738,24 @@ with `desperateNeeds` or more needs over the threshold it is Desperate; with non
 
 Anger remembers who struck, robbed or taxed the seat until it cools to zero; the mugging (below) and relations
 (3.22) read it. A new card (3.12: the brain forgets) starts every need at zero.
+
+**Ambient townsfolk (8E, A160).** Each map holds `townsfolk.count[profile]` figures that are not seats: no card, no
+vote, no task list, no part in any win. The map's named figure comes first (HollowMere's Company Clerk, BlackPine's
+Tallyman: the `named` rows of `routines.json` `townsfolk`), then one stallholder per shop prop (`fixed`), then
+villagers to fill. They are spawned at the deal, each with a `townsfolk:<figure>` stream of its own (never a seat's),
+a home (a lit interior, the persona rule of 3.12) and a route: a named figure walks its row's prop kinds in order
+(the Clerk the ledger, the notice board, the tavern window and the pump; the Tallyman the tally rack, the notice
+board, the pump and a basin), a stallholder keeps its one counter, a villager draws `npc.routine.favouriteStations`
+favourites among the seats' stations. By day a figure walks to its next station at `walkTilesPerS`, works it for
+`stationDwellS` (the interact clip), then idles for `idleS` with chance `idleChance`; a walk longer than
+`npc.routine.maxWalkS` is given up. In the night class it goes home and stands there. It crosses portals like a seat
+and stands still for the door's transit on the far side, under a new handle. Outside the world phases it holds
+still where it is; the lobby clears every figure.
+
+On the wire a figure is a scene `Avatar` under an opaque handle like a seat's (3.17) with a `villager` look (never
+a card's: 8F's variants all begin `villager`), the `townsfolk.height` height, no status bit and never the ghost
+tag, so nothing but the drawn figure tells it apart; its id never leaves the server. Needs and moods tick for it as
+for a seat (the mood idle shows while it stands), it hears the same bus events, and it counts the bodies it sees.
+The Knife never finds it (its handle resolves to no seat) and a vote for it is refused. The invariant `figureNotSeat`
+(auto 50) checks that no figure is in any seat list, vote, death or meeting, and that no figure avatar carries a
+seat's handle, the ghost tag or a card's look.
