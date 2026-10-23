@@ -8,6 +8,7 @@ import { hubOf, mapScenesOf } from '../MapSites';
 import { fleeCreature } from '../mobs/flee';
 import { canSee } from '../Sight';
 import { difficultyRow } from './difficulty';
+import { updateNeeds } from './needs';
 import type { Brain, NpcMemory } from './memory';
 import { playRng } from './memory';
 import {
@@ -217,6 +218,7 @@ export function runWorldNpc(
   if (brain.placementPending) handlePlacement(room, mem, brain, player, p);
   trackScene(room, brain, player, p);
   observe(room, brain, player, p);
+  updateNeeds(room, brain, player.id); // round 8, 8E: the needs and the mood (locked hook, seams.md 5)
   brain.mode = 'routine';
   if (!mem.walk) return stand(p);
 
