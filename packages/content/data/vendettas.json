@@ -1,1 +1,50 @@
-{ "gddRef": "3", "vendettas": {} }
+{
+  "gddRef": "3.20",
+  "vendettas": {
+    "zealot": {
+      "id": "zealot",
+      "role": "killer",
+      "kind": "conversion",
+      "needsCard": "vicar",
+      "triggers": [{ "on": "meeting" }],
+      "emits": [
+        "vendetta.conversion.sown",
+        "vendetta.conversion.doubt",
+        "vendetta.conversion.lapsed"
+      ],
+      "fires": "vendetta.conversion.doubt"
+    },
+    "activist": {
+      "id": "activist",
+      "role": "killer",
+      "kind": "sabotage",
+      "triggers": [],
+      "emits": ["vendetta.sabotage.tampered", "vendetta.sabotage.wrecked"],
+      "fires": "vendetta.sabotage.wrecked"
+    },
+    "bandit": {
+      "id": "bandit",
+      "role": "killer",
+      "kind": "heist",
+      "maps": ["hollowmere"],
+      "needsScene": "manor_hall",
+      "triggers": [{ "on": "train.delivery" }],
+      "emits": ["vendetta.heist.loaded", "vendetta.heist.cracked"],
+      "fires": "vendetta.heist.cracked"
+    },
+    "hitman": {
+      "id": "hitman",
+      "role": "killer",
+      "kind": "contract",
+      "maps": ["hollowmere"],
+      "triggers": [{ "on": "train.arrive" }, { "on": "kill" }, { "on": "death" }],
+      "emits": [
+        "vendetta.contract.offered",
+        "vendetta.contract.accepted",
+        "vendetta.contract.done",
+        "vendetta.contract.lapsed"
+      ],
+      "fires": "vendetta.contract.done"
+    }
+  }
+}

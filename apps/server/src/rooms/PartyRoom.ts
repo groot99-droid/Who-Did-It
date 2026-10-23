@@ -15,6 +15,7 @@ import {
   TICK_RATE,
   ROOM_CODE_ALPHABET,
   type CreateOptions,
+  type PartyVisibility,
   type JoinOptions,
 } from '@wdi/shared';
 import { balance } from '@wdi/content';
@@ -22,6 +23,7 @@ import { CommandQueue } from '../sim/Commands';
 import { simOf } from '../sim/RoomSim';
 import { step } from '../sim/Step';
 import { SCENE_KEYS, createPlayerView } from '../sim/Visibility';
+import type { PartyMetadata } from '../services/partyListing';
 import { CodeRegistry } from '../services/CodeRegistry';
 import { genericJoinError } from '../services/matchmakeGuard';
 import { metrics } from '../services/Metrics';
@@ -77,6 +79,11 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
   /** The last tick's wall time per step, for the clock's budget (round 6, `sim/auto/clock.ts`). */
   private lastStepMs = 0;
   private code = '';
+  /** Room memory only (GDD 3.21): how the party was created; never on the schema. */
+  private visibility: PartyVisibility = 'open';
+  private invited: string[] = [];
+  /** The listing last published, so `setMetadata` runs only when it changes. */
+  private listed = '';
 
   /**
    * Runs for create and every join in the matchmaker, before any seat exists. Any problem throws the same
@@ -119,7 +126,9 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
     return true;
   }
 
-  override async onCreate(_options: JoinOptions) {
+  override async onCreate(options: JoinOptions & Partial<CreateOptions>) {
+    this.visibility = options.visibility === 'private' ? 'private' : 'open';
+    this.invited = this.visibility === 'private' ? [...new Set(options.invited ?? [])] : [];
     const registry = this.registry();
     this.code = await registry.claim();
     this.roomId = this.code;
@@ -148,6 +157,7 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
         runLobbyCommands(this);
         runLobbyPhase(this);
       }
+      this.syncListing();
       this.lastStepMs = (performance.now() - t0) / n;
       metrics.recordTick(this.lastStepMs);
     }, TICK_RATE);
@@ -203,6 +213,31 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
     player.connected = false;
     simOf(this).deaths.push({ playerId: client.sessionId, cause: 'vanished', tick: this.state.tick });
     this.passLeader(client.sessionId);
+  }
+
+  /**
+   * Publishes the listing fields through `setMetadata` when they change (join, leave, leader pass, mode or map),
+   * and clears them once the party leaves the lobby phase (GDD 3.21). The matchmaking stays private; the
+   * `/parties` route reads these fields. Nothing here reaches the schema.
+   */
+  private syncListing(): void {
+    const { state } = this;
+    const lobby = state.phase === Phase.lobby && state.leaderId !== '';
+    const meta: Partial<PartyMetadata> = lobby
+      ? {
+          visibility: this.visibility,
+          leader: state.players.get(state.leaderId)?.name ?? '',
+          players: state.players.size,
+          max: MAX_PLAYERS,
+          mode: state.settings.mode,
+          map: state.settings.map,
+          invited: this.invited,
+        }
+      : {};
+    const key = JSON.stringify(meta);
+    if (key === this.listed) return;
+    this.listed = key;
+    void this.setMetadata(meta);
   }
 
   /** The leader role moves to the first connected seat when the leader drops or leaves. */
