@@ -109,6 +109,8 @@ SLICED_PROPS = {
         "prop_proofingCabinet": (3, 2, "proofing_cabinet"),
         # Round 8 (8J, art.md 4.2): St Brannock's pews, four seats wide, facing the altar (north).
         "prop_pew": (4, 1, "pew"),
+        # Vane Manor's dining table, laid for a dinner nobody ate.
+        "prop_diningTable": (4, 1, "dining_table"),
     },
     "blackpine": {
         "prop_trestle": (3, 2, "trestle"),
@@ -478,7 +480,36 @@ def pew(w, h):
             part("Hat", T("ink", 1), C(w * 0.72, y_seat, 0.48, 0.12, 0.02, 10), C(w * 0.72, y_seat, 0.5, 0.07, 0.08, 10))]
 
 
-SLICED_BUILDERS = {"wake_table": wake_table, "pew": pew, "cold_shelves": cold_shelves, "dough_mixer": dough_mixer,
+def dining_table(w, h):
+    """The Vanes' mahogany dining table, laid for eight: a runner, plates and glasses, the candelabrum lit in
+    the middle (its light sits on the second tile), and one chair on the south side pushed back askew."""
+    yc = -h / 2
+    legs = [B(x, y, 0.36, 0.08, 0.08, 0.72) for x in (0.25, w - 0.25) for y in (yc + 0.25, yc - 0.25)]
+    chairs_n = [B(x, yc + 0.42, 0.45, 0.38, 0.06, 0.9) for x in (0.7, 2.0, 3.3)]
+    seats = [B(x, yc + sy * 0.32, 0.44, 0.38, 0.36, 0.05) for x in (0.7, 2.0, 3.3) for sy in (1, -1)]
+    objs = [part("Top", T("wood", 1), B(w / 2, yc, 0.74, w - 0.2, 0.62, 0.05), bevel=0.01),
+            part("Legs", T("wood", 1), *legs),
+            part("Runner", T("bone", 3), B(w / 2, yc, 0.768, w - 0.6, 0.24, 0.005), outline=False),
+            part("Plates", T("bone", 2), *[C(x, yc + sy * 0.2, 0.765, 0.09, 0.015, 10) for x in (0.7, 2.0, 3.3)
+                                          for sy in (1, -1)], C(0.18, yc, 0.765, 0.09, 0.015, 10)),
+            part("Glasses", F("moon", 4), *[C(x + 0.14, yc + sy * 0.2, 0.765, 0.025, 0.1, 6) for x in (0.7, 2.0, 3.3)
+                                           for sy in (1, -1)], outline=False),
+            part("Wine", F("blood", 2), C(2.14, yc - 0.2, 0.765, 0.022, 0.05, 6), outline=False),
+            part("Chairs", T("wood", 2), *chairs_n, *seats),
+            part("Pads", T("blood", 1), *[B(x, yc + sy * 0.32, 0.475, 0.32, 0.3, 0.02) for x in (0.7, 2.0, 3.3)
+                                          for sy in (1, -1)], outline=False),
+            part("Arms", T("brass", 2), C(1.5, yc, 0.77, 0.08, 0.04, 8), C(1.5, yc, 0.81, 0.025, 0.3, 6),
+                 B(1.5, yc, 1.1, 0.4, 0.03, 0.03)),
+            part("Candles", T("bone", 3), *[C(1.5 + dx, yc, 1.12, 0.02, 0.14, 6) for dx in (-0.19, 0, 0.19)]),
+            part("Flames", F("lantern", 3), *[B(1.5 + dx, yc, 1.3, 0.025, 0.025, 0.05) for dx in (-0.19, 0, 0.19)],
+                 outline=False)]
+    askew = part("Pushed", T("wood", 2), B(0, 0, 0.45, 0.38, 0.06, 0.9), B(0, 0.18, 0.44, 0.38, 0.36, 0.05))
+    askew.location = (2.6, yc - 0.62, 0)
+    askew.rotation_euler.z = 0.5
+    return objs + [askew]
+
+
+SLICED_BUILDERS = {"wake_table": wake_table, "pew": pew, "dining_table": dining_table, "cold_shelves": cold_shelves, "dough_mixer": dough_mixer,
                    "brick_oven": brick_oven, "proofing_cabinet": proofing_cabinet, "hanging_oak": hanging_oak, "clamp": clamp, "pump_beam": pump_beam,
                    "trestle": trestle, "mess_table": mess_table, "bunks": bunks, "head_saw": head_saw, "kiln": kiln,
                    "map_table": map_table, "forge": forge}

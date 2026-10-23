@@ -186,7 +186,11 @@ def rope():
 def clock():
     return [part("Case", T("wood", 2), B(0, 0.25, 1.05, 0.5, 0.34, 2.1), bevel=0.02),
             part("Hood", T("wood", 3), B(0, 0.25, 2.18, 0.58, 0.4, 0.16)),
-            part("Face", T("bone", 2), C(0, 0.07, 1.75, 0.17, 0.02, 12), outline=False),
+            part("Face", T("bone", 3), C(0, 0.07, 1.75, 0.17, 0.02, 12), outline=False),
+            part("Trunk", F("ink", 0), B(0, 0.075, 1.05, 0.2, 0.01, 0.6), outline=False),
+            part("Bob", T("brass", 2), B(0, 0.07, 0.86, 0.12, 0.01, 0.12), B(0, 0.07, 1.1, 0.02, 0.01, 0.4),
+                 outline=False),
+            part("Finials", T("brass", 2), *[C(sx * 0.22, 0.25, 2.26, 0.03, 0.08, 6) for sx in (1, -1, 0)]),
             part("Hands", T("ink", 1), B(-0.04, 0.05, 1.79, 0.02, 0.01, 0.12), B(0.03, 0.05, 1.76, 0.09, 0.01, 0.02),
                  outline=False)]
 
@@ -451,6 +455,259 @@ def chapel_rope():
                      part("Tear", F("ink", 1), B(0.02, 0.039, 1.44, 0.04, 0.005, 0.03), outline=False)]
 
 
+# ---------------------------------------------------------------- Vane Manor (round 8, 8J: art.md 4.2)
+
+
+def spun(objs, a):
+    """The art turned `a` radians about the tile centre (its front, -Y, turns with it)."""
+    c, s = math.cos(a), math.sin(a)
+    for o in objs:
+        x, y, z = o.location
+        o.location = (c * x - s * y, s * x + c * y, z)
+        o.rotation_euler.z += a
+    return objs
+
+
+def moved(objs, dx, dy, dz):
+    for o in objs:
+        o.location = (o.location.x + dx, o.location.y + dy, o.location.z + dz)
+    return objs
+
+
+BOOK_COLOURS = [("blood", 0), ("blood", 1), ("teal", 0), ("moss", 1), ("ink", 1), ("brass", 1), ("wood", 3), ("bone", 2)]
+
+
+def _books(rnd, y, z, x0=-0.42, x1=0.42, gap=True):
+    """A shelf's run of spines, grouped by colour into one part each, with a gap and a book leaning into it."""
+    runs, x = {}, x0
+    hole = rnd.uniform(x0 + 0.2, x1 - 0.2) if gap else 99
+    while x < x1 - 0.04:
+        w = rnd.uniform(0.04, 0.08)
+        if abs(x - hole) < 0.09:
+            x += 0.16
+            continue
+        h = rnd.uniform(0.26, 0.38)
+        runs.setdefault(rnd.choice(BOOK_COLOURS), []).append(B(x + w / 2, y, z + h / 2, w - 0.005, 0.22, h))
+        x += w
+    return [part(f"Books{r}{i}{z:.1f}", T(r, i), *shapes, outline=False) for (r, i), shapes in runs.items()]
+
+
+def bookcase(seed="a"):
+    """A full-height oak bookcase that stands in for a run of partition wall: five shelves of spines, the
+    cornice carried across so a row of them reads as one library wall."""
+    rnd = random.Random(f"bookcase{seed}")
+    shelves = (0.12, 0.58, 1.04, 1.5, 1.96)
+    objs = [part("Carcass", T("wood", 1), B(0, 0.15, 1.15, 1.0, 0.6, 2.3)),
+            part("Sides", T("wood", 2), *[B(sx * 0.47, -0.3, 1.15, 0.06, 0.3, 2.3) for sx in (1, -1)]),
+            part("Shelves", T("wood", 3), *[B(0, -0.3, z, 0.94, 0.3, 0.04) for z in shelves], outline=False),
+            part("Cornice", T("wood", 3), B(0, -0.02, 2.34, 1.0, 0.94, 0.08)),
+            part("Plinth", T("wood", 0), B(0, -0.3, 0.05, 1.0, 0.32, 0.1))]
+    for z in shelves[1:]:
+        objs += _books(rnd, -0.3, z + 0.02)
+    if seed == "b":
+        objs += [part("Globe", T("brass", 2), C(0.2, -0.3, 0.14, 0.05, 0.08, 8)),
+                 part("World", T("teal", 1), C(0.2, -0.3, 0.22, 0.14, 0.24, 12, rt=0.05), bevel=0.04),
+                 part("Ledger", T("blood", 0), B(-0.2, -0.3, 0.17, 0.36, 0.24, 0.07))]
+    else:
+        objs += _books(rnd, -0.3, 0.14, gap=False)
+    return objs
+
+
+def tin_cabinet(seed="a"):
+    """A Vane Tin Co. display case: a panelled base with the company's brass plate, glazed shelves of ingots
+    and ore above. The second case has one empty cradle, its dust outline still on the baize."""
+    objs = [part("Base", T("wood", 1), B(0, 0.0, 0.45, 0.98, 0.8, 0.9), bevel=0.01),
+            part("Panels", T("wood", 2), *[B(sx * 0.22, -0.405, 0.45, 0.36, 0.02, 0.6) for sx in (1, -1)],
+                 outline=False),
+            part("Plate", T("brass", 2), B(0, -0.41, 0.8, 0.4, 0.01, 0.08), outline=False),
+            part("Back", T("wood", 0), B(0, 0.3, 1.5, 0.98, 0.2, 1.2)),
+            part("Baize", F("moss", 0), *[B(0, -0.05, z, 0.88, 0.5, 0.02) for z in (0.92, 1.32, 1.72)], outline=False),
+            part("Frame", T("wood", 3), *[B(x, -0.3, 1.5, 0.05, 0.06, 1.2) for x in (-0.47, 0, 0.47)],
+                 B(0, -0.3, 2.12, 0.98, 0.06, 0.05), B(0, 0.0, 2.17, 1.0, 0.82, 0.06)),
+            part("Glint", F("bone", 3), B(-0.25, -0.33, 1.6, 0.03, 0.005, 0.5), outline=False),
+            part("Ingots", T("fog", 3), *[(frustum, dict(z0=0.93, z1=1.0, bottom=(0.16, 0.08), top=(0.12, 0.05),
+                                                         offset=(x, -0.05))) for x in (-0.3, -0.1, 0.1)]),
+            part("Ore", T("stone", 2), *[S(blob(x, -0.05, 0.08, 0.06, [(0.2, 3, 0.3)], n=8), 1.33, 1.42)
+                                         for x in (-0.25, 0.0, 0.25)])]
+    if seed == "b":
+        objs += [part("Cradle", T("brass", 1), B(0.15, -0.05, 1.75, 0.24, 0.1, 0.04)),
+                 part("Dust", F("moss", 1), B(-0.2, -0.05, 1.732, 0.22, 0.08, 0.003), outline=False),
+                 part("Pick", T("ink", 1), B(-0.2, -0.08, 1.38, 0.34, 0.03, 0.03), outline=False)]
+    else:
+        objs += [part("Lamp", T("brass", 2), C(0.2, -0.05, 1.73, 0.05, 0.16, 8)),
+                 part("Card", T("bone", 3), B(-0.2, -0.15, 1.78, 0.16, 0.01, 0.1), outline=False)]
+    return objs
+
+
+def fireplace():
+    """The hall hearth: a marble surround set into the wall, a low fire, the overmantel mirror draped in black
+    for the dead. Drawn shallow (on_wall at -0.75) so it stays inside its tile when turned onto a west wall."""
+    flames = [B(x, 0.2, 0.22 + 0.03 * (k % 2), 0.1, 0.04, 0.2 + 0.08 * (k % 2)) for k, x in enumerate((-0.12, 0.0, 0.12))]
+    return [back_panel("Wall", T("plaster", 2), 0.9, 2.1, 0.0),
+            part("Firebox", F("ink", 0), B(0, 0.24, 0.36, 0.52, 0.01, 0.58), outline=False),
+            part("Jambs", T("bone", 2), *[B(sx * 0.37, 0.2, 0.5, 0.16, 0.12, 1.0) for sx in (1, -1)]),
+            part("Lintel", T("bone", 2), B(0, 0.2, 0.86, 0.6, 0.12, 0.2)),
+            part("Mantel", T("wood", 2), B(0, 0.19, 1.03, 0.98, 0.12, 0.06)),
+            part("Hearth", T("stone", 3), B(0, 0.17, 0.02, 0.98, 0.16, 0.04)),
+            part("Grate", T("ink", 1), B(0, 0.2, 0.1, 0.4, 0.06, 0.12)),
+            part("Logs", T("wood", 1), B(0, 0.2, 0.17, 0.36, 0.06, 0.07), B(0.04, 0.2, 0.23, 0.28, 0.05, 0.06)),
+            part("Flames", F("lantern", 2), *flames, outline=False),
+            part("Hot", F("lantern", 4), *[B(x, 0.18, 0.24, 0.05, 0.02, 0.1) for x in (-0.08, 0.06)], outline=False),
+            part("Embers", F("blood", 2), B(0, 0.19, 0.16, 0.34, 0.03, 0.02), outline=False),
+            part("Gilt", T("brass", 2), B(0, 0.24, 1.6, 0.66, 0.02, 0.72)),
+            part("Crepe", T("ink", 1), B(0, 0.225, 1.62, 0.6, 0.02, 0.66), bevel=0.01),
+            part("Sticks", T("brass", 1), *[C(sx * 0.36, 0.19, 1.06, 0.03, 0.2, 6) for sx in (1, -1)]),
+            part("Card", T("bone", 3), B(0.1, 0.2, 1.12, 0.12, 0.01, 0.12), outline=False)]
+
+
+def armchair(knitting=False):
+    """A buttoned wing chair in faded red, a shawl over one arm (and, by the other, a basket of knitting)."""
+    objs = [part("Legs", T("wood", 1), *[B(sx * 0.25, sy * 0.25, 0.1, 0.06, 0.06, 0.2) for sx in (1, -1)
+                                         for sy in (1, -1)]),
+            part("Seat", T("blood", 1), B(0, 0, 0.32, 0.62, 0.6, 0.24), bevel=0.03),
+            part("Back", T("blood", 1), B(0, 0.25, 0.85, 0.62, 0.12, 0.85), bevel=0.03),
+            part("Wings", T("blood", 0), *[B(sx * 0.28, 0.12, 0.9, 0.07, 0.3, 0.5) for sx in (1, -1)]),
+            part("Arms", T("blood", 0), *[B(sx * 0.3, -0.04, 0.55, 0.1, 0.52, 0.14) for sx in (1, -1)], bevel=0.02),
+            part("Cushion", T("blood", 2), B(0, -0.03, 0.46, 0.46, 0.46, 0.06), bevel=0.02),
+            part("Shawl", T("moss", 1), B(0.3, -0.02, 0.6, 0.14, 0.4, 0.1), outline=False)]
+    if knitting:
+        objs += [part("Basket", T("litter", 2), C(-0.35, -0.35, 0, 0.12, 0.14, 8, rt=0.14)),
+                 part("Wool", T("teal", 1), C(-0.35, -0.35, 0.14, 0.07, 0.06, 8, rt=0.04))]
+    return objs
+
+
+def lamp_table():
+    """A round side table with an oil lamp under a glass chimney, a doily and a photograph in a black ribbon."""
+    return [part("Leg", T("wood", 2), C(0, 0, 0, 0.18, 0.05, 8), C(0, 0, 0.05, 0.04, 0.62, 6)),
+            part("Top", T("wood", 3), C(0, 0, 0.67, 0.26, 0.04, 12)),
+            part("Doily", T("bone", 3), C(0, 0, 0.71, 0.18, 0.005, 12), outline=False),
+            part("Font", T("brass", 2), C(0.04, 0.04, 0.715, 0.08, 0.12, 10, rt=0.06)),
+            part("Chimney", F("lantern", 3), C(0.04, 0.04, 0.835, 0.04, 0.16, 8, rt=0.03), outline=False),
+            part("Photo", T("ink", 1), B(-0.12, 0.06, 0.8, 0.12, 0.02, 0.16)),
+            part("PhotoFace", T("fog", 3), B(-0.12, 0.048, 0.8, 0.08, 0.005, 0.11), outline=False)]
+
+
+def boot_rack():
+    """The boot rack by the front door: two pairs dry, one pair still caked in the lane's red mud."""
+    return [part("Rack", T("wood", 2), B(0, 0.1, 0.12, 0.9, 0.3, 0.04), B(0, 0.1, 0.02, 0.9, 0.3, 0.04)),
+            part("Boots", T("ink", 1), *[B(x, 0.1, 0.32, 0.12, 0.24, 0.36) for x in (-0.33, -0.18, 0.05, 0.2)]),
+            part("Muddy", T("brick", 1), *[B(x, -0.12, 0.2, 0.12, 0.26, 0.4) for x in (0.32, 0.44)]),
+            part("Mud", F("brick", 0), S(blob(0.38, -0.3, 0.2, 0.1, [(0.3, 4, 0.4)], n=10), 0, 0.005),
+                 outline=False),
+            part("Stick", T("wood", 3), B(-0.44, 0.3, 0.45, 0.03, 0.03, 0.9), outline=False)]
+
+
+def coat_stand():
+    """A bentwood coat stand: the master's greatcoat and top hat, never taken down."""
+    return [kenney("furniture-kit", "coatRackStanding", height=1.8, ramp=["#24171A", "#55332A", "#94603F"]),
+            part("Coat", T("ink", 1), S(blob(0.0, -0.08, 0.22, 0.12, [(0.1, 3, 0.2)], n=12), 0.6, 1.6), bevel=0.04),
+            part("Hat", T("ink", 0), C(0.1, -0.05, 1.72, 0.12, 0.02, 10), C(0.1, -0.05, 1.74, 0.08, 0.14, 10))]
+
+
+def vane_portrait():
+    """Old Vane in oils: a gilt frame, a dark coat and a pale face, a black crepe sash across one corner."""
+    return [back_panel("Wall", T("plaster", 2), 0.9, 2.1, 0.0),
+            part("Gilt", T("brass", 2), B(0, 0.37, 1.4, 0.62, 0.05, 0.8), bevel=0.01),
+            part("Canvas", F("ink", 1), B(0, 0.343, 1.4, 0.5, 0.005, 0.68), outline=False),
+            part("Coat", F("slate", 1), B(0, 0.34, 1.22, 0.3, 0.005, 0.3), outline=False),
+            part("Face", F("plaster", 3), B(0, 0.34, 1.5, 0.12, 0.005, 0.16), outline=False),
+            part("Sash", T("ink", 0), B(0.2, 0.335, 1.66, 0.06, 0.01, 0.34), outline=False),
+            part("Light", T("brass", 1), B(0, 0.3, 1.86, 0.3, 0.06, 0.04))]
+
+
+def draped_window():
+    """A tall sash window, its heavy curtains half drawn and tied back."""
+    return [back_panel("Wall", T("plaster", 2), 0.9, 2.3, 0.0),
+            part("Glass", F("moon", 3), B(0, 0.375, 1.3, 0.5, 0.01, 1.2), outline=False),
+            part("Sashes", T("bone", 3), B(0, 0.36, 1.3, 0.58, 0.03, 0.05), *[B(x, 0.36, 1.3, 0.04, 0.03, 1.24)
+                                                                              for x in (-0.27, 0, 0.27)],
+                 B(0, 0.36, 1.92, 0.58, 0.03, 0.05), B(0, 0.36, 0.69, 0.58, 0.03, 0.05), outline=False),
+            part("Sill", T("stone", 4), B(0, 0.3, 0.66, 0.7, 0.14, 0.05)),
+            part("Drapes", T("blood", 1), *[B(sx * 0.33, 0.3, 1.2, 0.2, 0.08, 1.7) for sx in (1, -1)], bevel=0.02),
+            part("Pelmet", T("blood", 0), B(0, 0.3, 2.08, 0.9, 0.1, 0.16)),
+            part("Ties", T("brass", 2), *[B(sx * 0.33, 0.25, 1.0, 0.22, 0.02, 0.04) for sx in (1, -1)], outline=False)]
+
+
+def sideboard():
+    """The dining sideboard: decanters on a silver tray, the black-edged funeral cards stacked to go out."""
+    return [part("Body", T("wood", 1), B(0, 0.2, 0.55, 0.96, 0.5, 0.5), bevel=0.01),
+            part("Legs", T("wood", 1), *[B(sx * 0.44, y, 0.15, 0.06, 0.06, 0.3) for sx in (1, -1) for y in (0, 0.4)]),
+            part("Drawers", T("wood", 2), *[B(x, -0.055, 0.66, 0.28, 0.01, 0.16) for x in (-0.31, 0, 0.31)],
+                 outline=False),
+            part("Pulls", T("brass", 2), *[B(x, -0.06, 0.66, 0.05, 0.01, 0.02) for x in (-0.31, 0, 0.31)],
+                 outline=False),
+            part("Tray", T("fog", 3), C(-0.18, 0.2, 0.8, 0.18, 0.02, 12)),
+            part("Decanters", F("blood", 2), C(-0.25, 0.22, 0.82, 0.05, 0.2, 8, rt=0.03),
+                 C(-0.1, 0.16, 0.82, 0.05, 0.16, 8, rt=0.03), outline=False),
+            part("Cards", T("bone", 3), B(0.25, 0.15, 0.82, 0.16, 0.11, 0.04)),
+            part("Edge", T("ink", 0), B(0.25, 0.15, 0.845, 0.17, 0.12, 0.01), outline=False)]
+
+
+def nightstand():
+    """A bedside cupboard: a candle burnt low, a glass of water, spectacles folded on a Bible."""
+    return [part("Body", T("wood", 2), B(0, 0.15, 0.32, 0.46, 0.4, 0.64), bevel=0.01),
+            part("Door", T("wood", 3), B(0, -0.055, 0.26, 0.34, 0.01, 0.34), outline=False),
+            part("Bible", T("ink", 1), B(0.1, 0.15, 0.67, 0.18, 0.24, 0.05)),
+            part("Specs", T("brass", 2), B(0.1, 0.1, 0.7, 0.12, 0.03, 0.01), outline=False),
+            part("Glass", F("moon", 4), C(-0.12, 0.22, 0.64, 0.035, 0.1, 8), outline=False),
+            *moved(candle(), -0.06, 0.06, 0.64)]
+
+
+def dressing_table():
+    """Her Ladyship's dressing table: a triple mirror with the middle glass hung over in black, brushes, scent
+    bottles and a jewel box left open (one ring missing from its slot)."""
+    return [part("Table", T("wood", 2), B(0, 0.15, 0.6, 0.9, 0.42, 0.08)),
+            part("Legs", T("wood", 1), *[B(sx * 0.4, y, 0.3, 0.05, 0.05, 0.56) for sx in (1, -1) for y in (-0.03, 0.33)]),
+            part("Skirt", T("bone", 2), B(0, -0.065, 0.45, 0.92, 0.02, 0.26), outline=False),
+            part("Frames", T("wood", 3), B(0, 0.33, 1.1, 0.4, 0.04, 0.8), *[B(sx * 0.33, 0.3, 1.0, 0.24, 0.04, 0.6)
+                                                                            for sx in (1, -1)]),
+            part("Glass", F("moon", 4), *[B(sx * 0.33, 0.278, 1.0, 0.18, 0.005, 0.52) for sx in (1, -1)], outline=False),
+            part("Crepe", T("ink", 1), B(0, 0.3, 1.12, 0.36, 0.02, 0.78), bevel=0.01),
+            part("Bottles", F("teal", 1), *[C(x, 0.12, 0.64, 0.03, 0.1, 6, rt=0.015) for x in (-0.3, -0.22)],
+                 outline=False),
+            part("Brush", T("fog", 2), B(-0.05, 0.05, 0.655, 0.18, 0.06, 0.03)),
+            part("Box", T("blood", 0), B(0.22, 0.1, 0.68, 0.2, 0.14, 0.08)),
+            part("Rings", T("brass", 2), *[C(0.16 + 0.05 * k, 0.1, 0.72, 0.015, 0.01, 6) for k in (0, 2)],
+                 outline=False),
+            part("Stool", T("blood", 1), C(0, -0.3, 0.3, 0.16, 0.12, 10), bevel=0.02),
+            part("StoolLegs", T("wood", 1), C(0, -0.3, 0.0, 0.1, 0.3, 4))]
+
+
+def washstand():
+    """A marble-topped washstand: the ewer in its basin, a folded towel on the rail, the water gone cold."""
+    return [part("Stand", T("wood", 2), B(0, 0.15, 0.4, 0.8, 0.44, 0.8), bevel=0.01),
+            part("Marble", T("bone", 2), B(0, 0.15, 0.82, 0.84, 0.48, 0.04)),
+            part("Splash", T("bone", 2), B(0, 0.37, 1.0, 0.84, 0.04, 0.32)),
+            part("Basin", T("bone", 3), C(-0.1, 0.12, 0.84, 0.18, 0.08, 12, rt=0.2)),
+            part("Ewer", T("bone", 3), C(-0.1, 0.12, 0.86, 0.08, 0.26, 10, rt=0.05)),
+            part("Rim", T("teal", 1), C(-0.1, 0.12, 1.1, 0.06, 0.02, 10), outline=False),
+            part("Rail", T("wood", 3), B(0.42, 0.15, 0.6, 0.03, 0.4, 0.03)),
+            part("Towel", T("bone", 3), B(0.43, 0.15, 0.5, 0.02, 0.3, 0.22), outline=False),
+            part("Soap", T("moss", 2), B(0.22, 0.2, 0.86, 0.08, 0.05, 0.03))]
+
+
+def blanket_chest():
+    """An iron-strapped oak chest at the foot of the bed, a folded quilt on the lid."""
+    return [part("Chest", T("wood", 2), B(0, 0, 0.24, 0.8, 0.44, 0.48), bevel=0.02),
+            part("Straps", T("ink", 1), *[B(x, 0, 0.24, 0.05, 0.46, 0.5) for x in (-0.25, 0.25)], outline=False),
+            part("Hasp", T("brass", 2), B(0, -0.225, 0.4, 0.06, 0.01, 0.1), outline=False),
+            part("Quilt", T("blood", 1), B(0.05, 0.02, 0.52, 0.6, 0.36, 0.08), bevel=0.02),
+            part("Patches", T("bone", 3), *[B(x, -0.165, 0.52, 0.1, 0.01, 0.06) for x in (-0.15, 0.1, 0.3)],
+                 outline=False)]
+
+
+def linen_press():
+    """A tall linen press, one door ajar on stacked sheets, a moth bag hanging from the key."""
+    return [part("Press", T("wood", 1), B(0, 0.15, 1.05, 0.9, 0.56, 2.1), bevel=0.01),
+            part("Cornice", T("wood", 2), B(0, 0.12, 2.14, 0.98, 0.62, 0.08)),
+            part("DoorL", T("wood", 2), B(-0.22, -0.14, 1.3, 0.42, 0.02, 1.4), outline=False),
+            part("Inside", F("ink", 0), B(0.22, -0.13, 1.3, 0.42, 0.005, 1.4), outline=False),
+            part("Sheets", T("bone", 3), *[B(0.22, -0.05, 0.75 + 0.2 * k, 0.38, 0.2, 0.14) for k in range(5)]),
+            part("DoorR", T("wood", 2), B(0.48, -0.32, 1.3, 0.02, 0.38, 1.4)),
+            part("Drawers", T("wood", 3), *[B(0, -0.135, z, 0.84, 0.01, 0.2) for z in (0.18, 0.42)], outline=False),
+            part("Bag", T("moss", 2), B(-0.03, -0.17, 1.15, 0.06, 0.04, 0.1), outline=False)]
+
+
 def _crates(n=3):
     rnd = random.Random(f"crates{n}")
     return [kenney("survival-kit", "box-large", height=0.5, ramp=["#3A231F", "#744733", "#B57F54"],
@@ -571,7 +828,6 @@ PROPS = {
     "prop_keyCache": (64, 64, key_cache),
     "prop_green_lamp": (64, 64, green_lamp),
     "prop_candle": (64, 64, candle),
-    "prop_lockedDoor": (64, 112, locked_door),
     "prop_window": (64, 112, window),
     "prop_fence": (64, 56, fence),
     "prop_bench": (64, 64, bench),
@@ -579,8 +835,6 @@ PROPS = {
     "prop_oil_barrel": (64, 64, oil_barrel),
     "prop_letter_box": (64, 80, letter_box),
     "prop_shelf": (64, 112, shelf),
-    "prop_clock": (64, 128, clock),
-    "prop_safe": (64, 80, safe),
     "prop_crepe": (64, 112, crepe),
     "prop_scarecrow": (64, 112, scarecrow),
     "prop_photos": (64, 96, photos),
@@ -603,5 +857,26 @@ PROPS = {
     "prop_almsBox": (64, 80, alms_box),
     "prop_flowerStand": (64, 96, flower_stand),
     "prop_altar": (64, 96, altar),
+    # Round 8 (8J): Vane Manor. Hung things carry their own wall block (on_wall).
+    "prop_clock": (64, 128, lambda: on_wall(clock(), -0.72)),
+    "prop_safe": (64, 128, lambda: on_wall(safe(), -0.24)),
+    "prop_lockedDoor": (64, 128, lambda: on_wall(locked_door())),
+    "prop_bookcase": (64, 128, bookcase),
+    "prop_bookcaseB": (64, 128, lambda: bookcase("b")),
+    "prop_tinCabinet": (64, 128, tin_cabinet),
+    "prop_tinCabinetB": (64, 128, lambda: tin_cabinet("b")),
+    "prop_fireplaceE": (64, 128, lambda: turned(on_wall(fireplace(), -0.75))),
+    "prop_armchair": (64, 96, lambda: spun(armchair(True), -0.98)),
+    "prop_lampTable": (64, 80, lamp_table),
+    "prop_bootRack": (64, 64, boot_rack),
+    "prop_coatStand": (64, 112, coat_stand),
+    "prop_vanePortrait": (64, 128, lambda: on_wall(vane_portrait())),
+    "prop_drapedWindow": (64, 128, lambda: on_wall(draped_window())),
+    "prop_sideboard": (64, 96, sideboard),
+    "prop_nightstand": (64, 80, nightstand),
+    "prop_dressingTable": (64, 112, dressing_table),
+    "prop_washstand": (64, 96, washstand),
+    "prop_blanketChest": (64, 64, blanket_chest),
+    "prop_linenPress": (64, 128, linen_press),
     **SPOTS,
 }

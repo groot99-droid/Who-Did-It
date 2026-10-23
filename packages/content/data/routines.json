@@ -47,7 +47,25 @@
     "font",
     "votiveRack",
     "almsBox",
-    "flowerStand"
+    "flowerStand",
+    "bookcase",
+    "bookcaseB",
+    "tinCabinet",
+    "tinCabinetB",
+    "diningTable",
+    "fireplaceE",
+    "armchair",
+    "lampTable",
+    "bootRack",
+    "coatStand",
+    "vanePortrait",
+    "drapedWindow",
+    "sideboard",
+    "nightstand",
+    "dressingTable",
+    "washstand",
+    "blanketChest",
+    "linenPress"
   ],
   "lightKinds": ["lanternPost"]
 }
