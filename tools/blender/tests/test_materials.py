@@ -30,6 +30,21 @@ class Roles(unittest.TestCase):
                     self.assertRegex(entry["md5"], r"^[0-9a-f]{32}$")
         self.assertEqual(set(lock["assets"]), set(roles.slugs()))  # nothing locked that no role names
 
+    def test_legacy_tables_mirror_env_kits(self):
+        """The tables `env/kits.py` still renders from, mirrored here slug for slug (6Z's condition on #138)."""
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "env"))
+        import kits  # noqa: E402
+
+        self.assertEqual(set(roles.LEGACY_SURFACES), set(kits.SURFACE_TEXTURES))
+        for name, slug in kits.SURFACE_TEXTURES.items():
+            self.assertEqual(roles.role(roles.LEGACY_SURFACES[name]).slug, slug, f"surface {name}")
+        self.assertEqual(set(roles.GROUND_ROLES), set(kits.GROUND_TEXTURES))
+        for theme, chars in kits.GROUND_TEXTURES.items():
+            self.assertEqual(set(roles.GROUND_ROLES[theme]), set(chars), f"theme {theme}")
+            for char, slug in chars.items():
+                name = roles.GROUND_ROLES[theme][char]
+                self.assertEqual(None if name is None else roles.role(name).slug, slug, f"{theme} {char!r}")
+
     def test_legacy_tables_and_paths(self):
         for name in roles.LEGACY_SURFACES.values():
             roles.role(name)
