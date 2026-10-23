@@ -1,8 +1,8 @@
 import type { CratesPublic, PourPublic, SlidePublic, StokePublic } from '@wdi/shared/rules';
 import type { MinigameKind } from '@wdi/shared/protocol';
 
-// Round 6 (6I, docs/round6/m5b-data.md 2.3): the main-mode mini-game wraps the ONUB widgets of `view/onub/minigames/`,
-// which build their own board from a `host.rng`. The server's board is the `public` of `S2C.minigameStart`, so
+// Round 6 (6I, docs/round6/m5b-data.md 2.3): the main-mode mini-game wraps the widgets of `view/minigames/`, which
+// build their own board from a `host.rng`. The server's board is the `public` of `S2C.minigameStart`, so
 // `bandRng` feeds each widget the draws that rebuild that board; the widget's `answer()` is what the player did.
 
 const clamp01 = (x: number): number => Math.min(0.999999, Math.max(0, x));
