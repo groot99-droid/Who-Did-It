@@ -55,6 +55,7 @@ const STREAMS = {
   contract: 1,
   events: 1,
   vendetta: 1,
+  tasks: 1,
   purse: 1,
 } satisfies Record<StreamName, 1>;
 export const AUTO_STREAMS = Object.keys(STREAMS) as StreamName[];

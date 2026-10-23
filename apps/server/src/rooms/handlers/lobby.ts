@@ -32,6 +32,7 @@ import {
   publishLooks,
 } from '../../sim/Covers';
 import { dealMainDeck } from '../../sim/Deck';
+import { dealTasks } from '../../sim/Tasks';
 import { refuse, setPhase } from '../../sim/Flow';
 import { handleSay } from '../../sim/Chat';
 import { handleVote } from '../../sim/Meeting';
@@ -274,6 +275,7 @@ export function startMatch(room: PartyRoom): void {
   }
   // Round 5, 5F: the cover hints, each cover seat's preset `coverLook` and the Cabal mates' `mateLooks`.
   assignCovers(room, dealt);
+  dealTasks(room, dealt); // round 7, 7M: every seat's task list, real or fake, on its own stream (GDD 3.5)
   dealPurses(room); // round 8, 8C: purses and banks emptied; the stakes follow the public looks (GDD 3.23)
 
   void room.lock();
