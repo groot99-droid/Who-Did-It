@@ -1448,12 +1448,3 @@ unchanged; the copy of 14.6 to 14.10, 14.14 and 14.16 is unchanged. New lines ar
 
 The action reads and writes `wdi:friends` (`{ code, name }`) through `ui/table/addFriend.ts`, a stand-in with the signature of
 7C's shared helper until it lands. The faction chip on a game-over row stays the one place a faction shows for another seat.
-
-**Quick mode (7G, PR 3).** `ui/onub/onub.css` (loaded with `ui/table.css` by `PrepView`, `NightView` and the Rush) dresses the
-kitchen (room tiles on a veil over the owner's art, the station room, the hand, the piles), the night (an indigo wash behind
-the narrator, lights-out, the wake scene and the dawn as glass over their art with a fill and veil laid by a pseudo-element, so
-lilac text holds on any frame), the card table (seat groups and slots, lantern for yours, moon for what you saw, hazard for
-sabotage) and the claim form. The Rush and the end panel ride the meeting's and the game over's glass. Two paint rules, found
-under software GL: the stepped-corner `clip-path` is for singular surfaces (panels, buttons, tiles), never for the twenty slots
-of a card table or a panel with a photo behind it (a clipped photo layer or twenty clipped layers made one screenshot take
-three times as long), and no blur on a full-screen photo.

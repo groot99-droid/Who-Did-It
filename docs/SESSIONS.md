@@ -3257,7 +3257,6 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 ### Round 7 log: 7G
 
 - 2026-10-23: PR 1 (meeting and game over): `ui/table.css` scoped under `.wdi-table`, the Add friend stand-in (`ui/table/addFriend.ts`, `ui/copy/table.ts`), `MeetingPlayer.profile`, UI.md 14.28, A111. 7B's glass classes had not landed, so the glass is local.
-- 2026-10-23: PR 2 (seat picker, look tags, shot toast, over lists) and PR 3 (the quick mode: prep board, station rooms, hand, piles, night, card table, dawn, claim form, Rush and over via the shared glass; `ui/onub/onub.css`). `e2e/night.spec.ts` preloads the two pixel faces during lights-out and `e2e/kitchen.spec.ts` takes four screenshots for 7P. Heavy clip-path is the one paint cost to avoid (UI.md 14.28).
 
 ### Round 7 log: 7H
 

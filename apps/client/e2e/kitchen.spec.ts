@@ -34,10 +34,9 @@ test('lobby deck editor: one toggle per role, the leader can change it', async (
   await expect(page.getByTestId('deck-problem')).toBeHidden();
 });
 
-test('a Baker plays a station through to the crime-scene board', async ({ page }, info) => {
+test('a Baker plays a station through to the crime-scene board', async ({ page }) => {
   await startQuick(page, 'speed=2');
   await expect(page.getByTestId('onub-clock')).toBeVisible();
-  await page.screenshot({ path: info.outputPath('kitchen-overview.png') });
   for (const s of onubBalance.stations) {
     await expect(page.getByTestId(`station-${s.id}`)).toHaveCount(1);
     await expect(page.getByTestId(`station-${s.id}`)).toBeEnabled();
@@ -45,7 +44,6 @@ test('a Baker plays a station through to the crime-scene board', async ({ page }
   await page.getByTestId('station-fridge').click();
   await expect(page.getByTestId('station-room')).toBeVisible();
   await expect(page.getByTestId('minigame-fridge')).toBeVisible();
-  await page.screenshot({ path: info.outputPath('kitchen-room.png') });
   await expect(page.getByTestId('hand')).toBeHidden();
   await expect(page.getByTestId('station-back')).toBeVisible();
   await expect(page.getByTestId('minigame-assist')).toBeVisible({
@@ -54,7 +52,6 @@ test('a Baker plays a station through to the crime-scene board', async ({ page }
   await page.getByTestId('minigame-assist').click();
   await expect(page.getByTestId('hand')).toBeVisible();
   await expect(page.getByTestId('card-pureDairy')).toBeVisible();
-  await page.screenshot({ path: info.outputPath('kitchen-hand.png') });
   await expect(page.getByTestId('card-spoiledMilk')).toHaveCount(0);
   await expect(page.getByTestId('prep-commit')).toBeDisabled();
   await page.getByTestId('card-pureDairy').click();
@@ -64,7 +61,6 @@ test('a Baker plays a station through to the crime-scene board', async ({ page }
   for (const s of onubBalance.stations) await expect(page.getByTestId(`station-${s.id}`)).toBeDisabled();
   await expect(page.getByTestId('prep-board')).toBeVisible({ timeout: 30_000 });
   for (const s of onubBalance.stations) await expect(page.getByTestId(`pile-${s.id}`)).toHaveCount(1);
-  await page.screenshot({ path: info.outputPath('kitchen-board.png') });
   await expect(page.getByTestId('kitchen')).toBeVisible();
 });
 
