@@ -260,6 +260,20 @@
       "description": "The grace-phase teaching clue beside the well: \"Footprints, long stride: Tall\".",
       "ships": "V1",
       "gddRef": "3.4"
+    },
+    "scuffle": {
+      "id": "scuffle",
+      "name": "Scuffle",
+      "reveals": "height",
+      "inWorld": true,
+      "collectible": true,
+      "decay": { "kind": "cycles", "cycles": 1 },
+      "reader": "anyone",
+      "plantable": false,
+      "source": "mugging",
+      "description": "Scuffed ground where a mugging happened; the stride of the prints gives the mugger's height.",
+      "ships": "V1",
+      "gddRef": "3.24"
     }
   }
 }

@@ -301,6 +301,31 @@ export const BalanceFile = z.strictObject({
       wage: Chance,
       sale: Chance,
     }),
+    /**
+     * The mugging (GDD 3.24): a Hungry, Angry or Desperate figure or NPC seat alone with a seat rolls each second
+     * `chancePerS[band]` of the target's purse band, times `1 + moodMul * strength` (the need behind its mood), times
+     * `1 - fearMul * fear`, times `nightMul` in the night class, `weakMul` for a Weakened or Fatigued target,
+     * `longAloneMul` after `longAloneS` alone with a heavy purse, `lightMul` when the target's light burns. The
+     * mugger walks up (`approachS` at most, within `reachTiles`), threatens for `threatS`, and the target answers
+     * within `answerS`; Pay loses `share` of the purse; Flee is chased for `chaseS`. Each side waits `cooldownS`.
+     */
+    mug: z.strictObject({
+      chancePerS: z.strictObject({ light: Chance, heavy: Chance }),
+      moodMul: z.number().nonnegative(),
+      fearMul: z.number().nonnegative(),
+      nightMul: z.number().nonnegative(),
+      weakMul: z.number().nonnegative(),
+      longAloneS: Seconds,
+      longAloneMul: z.number().nonnegative(),
+      lightMul: z.number().nonnegative(),
+      reachTiles: z.number().positive(),
+      approachS: Seconds,
+      threatS: Seconds,
+      answerS: Seconds,
+      share: Chance,
+      chaseS: Seconds,
+      cooldownS: Seconds,
+    }),
     weights: z.strictObject({
       hungry: MoodWeights,
       scared: MoodWeights,
