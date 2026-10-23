@@ -10,9 +10,11 @@ import { schema, t } from '@colyseus/schema';
 // owner only; every other seat walks as an avatar under a handle (GDD 3.17). Round 6 (DECISIONS A81): the M5b
 // maps `nodes` and `mobs`, `Private.quests`, `GameState.lawStage` and `Role.evolvedFrom`, all empty until their
 // sessions fill them (docs/round6/seams.md 1.1). Version 4 (round 7, A104): `Player.profile`,
-// `Private.vendetta` (A112). Version 5 (round 7, A115): the quick mode's fields are gone.
+// `Private.vendetta` (A112). Version 5 (round 7, A115): the quick mode's fields are gone. Version 6 (round 8,
+// A135, docs/round8/seams.md 1): `Private.body` (8A); the later round-8 rows (`purse`, `bank`, `faith`, `hq`) join
+// version 6 without another bump.
 
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 
 /**
  * View tags (Visibility.ts): `presence` and `priv` are the numeric tags 1 and 2, granted one by one; `ghost`
@@ -172,6 +174,20 @@ export const TaskEntry = schema({ id: str(), done: bool(), fake: bool() }, 'Task
 /** Round 6 (M5b, GDD 3.16): one accepted quest of this seat; `id` a `quests.json` id. Empty until Session 6H. */
 export const QuestState = schema({ id: str(), progress: u8(), done: bool() }, 'QuestState');
 export const LedgerLine = schema({ sceneId: u8(), tick: u32() }, 'LedgerLine');
+/**
+ * Round 8 (GDD 3.22, docs/round8/seams.md 1 and 2): one effect on this seat's body. `id` is an `EffectId`,
+ * `untilTick` the tick it wears off (0 for an effect that lasts until cured) and `stacks` its stack count.
+ */
+export const EffectState = schema({ id: u8(), untilTick: u32(), stacks: u8() }, 'EffectState');
+/**
+ * Round 8 (GDD 3.22): this seat's health and stamina, in the units of `balance.json` `body`. Own view only: no
+ * other client and no public field ever carries a number of it; the drawn figure shows only its `StatusBit`s.
+ * Empty (every number 0) until Session 8A's body lands.
+ */
+export const BodyState = schema(
+  { hp: u16(), maxHp: u16(), stamina: u16(), maxStamina: u16(), effects: t.array(EffectState) },
+  'BodyState',
+);
 
 export const Private = schema(
   {
@@ -196,6 +212,8 @@ export const Private = schema(
     quests: t.array(QuestState),
     /** Round 7 (GDD 3.20): a Killer's vendetta id, or an Accomplice's Killers' ids joined by commas; '' otherwise. */
     vendetta: str(),
+    /** Round 8 (GDD 3.22, schema version 6): this seat's body; empty until Session 8A fills it. */
+    body: BodyState,
   },
   'Private',
 );
@@ -281,6 +299,8 @@ export const GameState = schema(
 
 export type PlayerState = InstanceType<typeof Player>;
 export type PrivateState = InstanceType<typeof Private>;
+export type BodyStateType = InstanceType<typeof BodyState>;
+export type EffectStateType = InstanceType<typeof EffectState>;
 export type SceneStateType = InstanceType<typeof SceneState>;
 export type AvatarState = InstanceType<typeof Avatar>;
 export type GameStateType = InstanceType<typeof GameState>;

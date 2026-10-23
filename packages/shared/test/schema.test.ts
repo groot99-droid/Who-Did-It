@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   Avatar,
   BUILD_VERSION,
+  BodyState,
   CHAR_CELL_PX,
   GameState,
+  EffectId,
+  EffectState,
   Mob,
   Node,
   NotebookEntry,
@@ -32,7 +35,7 @@ describe('shared basics', () => {
 
   it('builds state with defaults', () => {
     const s = new GameState();
-    expect(SCHEMA_VERSION).toBe(5);
+    expect(SCHEMA_VERSION).toBe(6);
     expect(s.schemaVersion).toBe(SCHEMA_VERSION);
     expect(s.settings).toBeInstanceOf(Settings);
     expect('mode' in s.settings).toBe(false);
@@ -71,5 +74,28 @@ describe('shared basics', () => {
   it('adds the round-7 profile empty (docs/round7/parties.md 2)', () => {
     expect(new Player().profile).toBe('');
     expect(new Private().vendetta).toBe('');
+  });
+
+  it('adds the round-8 body empty, own view only (docs/round8/seams.md 1)', () => {
+    const priv = new Private();
+    expect(priv.body).toBeInstanceOf(BodyState);
+    expect([priv.body.hp, priv.body.maxHp, priv.body.stamina, priv.body.maxStamina]).toEqual([0, 0, 0, 0]);
+    expect(priv.body.effects.length).toBe(0);
+    const e = new EffectState();
+    expect([e.id, e.untilTick, e.stacks]).toEqual([0, 0, 0]);
+    // The effect ids are fixed by the contract and fit the u8 wire field.
+    expect(EffectId).toEqual({
+      slowed: 1,
+      wounded: 2,
+      bleeding: 3,
+      weakened: 4,
+      poisoned: 5,
+      fatigued: 6,
+      stunned: 7,
+      dazed: 8,
+      famished: 9,
+      knockedOut: 10,
+      indebted: 11,
+    });
   });
 });
