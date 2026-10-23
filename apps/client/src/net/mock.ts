@@ -3,7 +3,6 @@ import mitt, { type Emitter } from 'mitt';
 import { MOCK_BOTS, MOCK_NPC_NAMES, MOCK_ROLE_REVEAL } from './fixtures';
 import type { MeetingFeed } from './meeting';
 import { MockMeetingFeed, type MockMeetingRequest } from './mock/meetingMock';
-import { onubMockRoleCard } from './mock/onubMock';
 import {
   defaultSettings,
   JoinError,
@@ -13,12 +12,10 @@ import {
   type PartyOptions,
   type Room,
 } from './NetworkService';
-import type { OnubFeed } from './onub';
 import type { WorldFeed } from './world';
 import {
   type ClientMessages,
   type ClientMessageType,
-  type GameModeId,
   type LobbyPlayer,
   MAX_PLAYERS,
   type NpcLevelId,
@@ -48,14 +45,10 @@ export class MockNetwork implements NetworkService {
   private timers: number[] = [];
   private card: RoleRevealPayload | null = null;
   private world: WorldFeed | null = null;
-  private onub: OnubFeed | null = null;
   private publishMeeting: ((feed: MeetingFeed) => void) | null = null;
   private meeting: MockMeetingFeed | null = null;
   /** Ids of the NPC seats the leader added, oldest first; `removeNpc` drops the last (like the server). */
   private npcs: string[] = [];
-
-  /** `?mode=onub` starts the mock lobby in quick mode, so the mocks of both modes agree. */
-  constructor(private readonly initialMode: GameModeId = 'main') {}
 
   /** There is no room behind ?mock=1; the router feeds the screens from the mock feeds instead. */
   get room(): Room | null {
@@ -98,12 +91,10 @@ export class MockNetwork implements NetworkService {
   send<K extends ClientMessageType>(type: K, payload: ClientMessages[K]): void {
     const room = this.lobby;
     if (room === null) return;
-    // Mirrors the server: Start is leader-only and needs one human; the rest of the party is Ready. Quick mode
-    // deals the self seat's quick-mode card from the mock ONUB deal (bugs.md: never the main-mode Killer card).
+    // Mirrors the server: Start is leader-only and needs one human; the rest of the party is Ready.
     if (type === 'lobby.start' && room.leaderId === room.selfId && this.card === null) {
       this.later(() => {
-        const self = room.players.find((p) => p.id === room.selfId)?.name;
-        this.card = room.settings.mode === 'onub' ? onubMockRoleCard(self) : MOCK_ROLE_REVEAL;
+        this.card = MOCK_ROLE_REVEAL;
         this.bus.emit('roleReveal', this.card);
       }, 300);
     }
@@ -115,10 +106,6 @@ export class MockNetwork implements NetworkService {
       };
       this.bus.emit('lobby', this.lobby);
     }
-  }
-
-  setMode(mode: GameModeId): void {
-    this.patch((room) => (room.leaderId === room.selfId ? { settings: { ...room.settings, mode } } : {}));
   }
 
   setNpcDifficulty(npcDifficulty: NpcLevelId): void {
@@ -143,13 +130,7 @@ export class MockNetwork implements NetworkService {
     });
   }
 
-  setOnubDeck(deck: readonly string[]): void {
-    this.patch((room) =>
-      room.leaderId === room.selfId ? { settings: { ...room.settings, onubDeck: [...deck] } } : {},
-    );
-  }
-
-  /** Leader only, in the lobby, whatever the mode (GDD 3.13). The mock keeps the id the map row sends. */
+  /** Leader only, in the lobby (GDD 3.13). The mock keeps the id the map row sends. */
   setMap(map: string): void {
     this.patch((room) => (room.leaderId === room.selfId ? { settings: { ...room.settings, map } } : {}));
   }
@@ -175,40 +156,22 @@ export class MockNetwork implements NetworkService {
   /** The router hands over the published mock world feed and a way to publish the meeting feed. */
   bindWorld(world: WorldFeed, publishMeeting: (feed: MeetingFeed) => void): void {
     this.world = world;
-    this.onub = null;
-    this.publishMeeting = publishMeeting;
-    this.meeting = null;
-  }
-
-  /** Quick mode: the router hands over the published mock ONUB feed instead of a world. */
-  bindOnub(onub: OnubFeed, publishMeeting: (feed: MeetingFeed) => void): void {
-    this.onub = onub;
-    this.world = null;
     this.publishMeeting = publishMeeting;
     this.meeting = null;
   }
 
   /**
-   * The mock world's report or bell asked for a meeting, or the mock ONUB dawn ended: run discussion -> vote ->
+   * The mock world's report or bell asked for a meeting: run discussion -> vote ->
    * reveal on a mock meeting feed, then either end the match (the router shows game over, then the lobby) or
    * resume the world.
    */
   openMeeting(req: MockMeetingRequest): void {
     const world = this.world;
-    const onub = this.onub;
-    if ((world === null && onub === null) || this.meeting !== null) return;
-    // The ONUB seats carry no look: every seat shows the same neutral portrait (GDD 3.11).
-    const roster =
-      world !== null
-        ? world.snapshot().map(({ id, name, traits }) => ({ id, name, traits }))
-        : (onub?.seats() ?? []).map(({ id, name }) => ({
-            id,
-            name,
-            traits: { height: 1, scarf: 0, hat: 0 },
-          }));
-    const feed = new MockMeetingFeed(roster, world?.selfId ?? onub?.selfId ?? '', {
+    if (world === null || this.meeting !== null) return;
+    const roster = world.snapshot().map(({ id, name, traits }) => ({ id, name, traits }));
+    const feed = new MockMeetingFeed(roster, world.selfId, {
       onDone: (outcome) => {
-        if (outcome === 'resume' && world !== null) {
+        if (outcome === 'resume') {
           this.meeting = null;
           // Until the mock world implements `resume()` (Session N), say what it would: the same scene again.
           if (world.resume) world.resume();
@@ -228,7 +191,6 @@ export class MockNetwork implements NetworkService {
     this.card = null;
     this.meeting = null;
     this.world = null;
-    this.onub = null;
     const room = this.lobby;
     if (room === null) return;
     this.lobby = { ...room, players: room.players.map((p) => ({ ...p, ready: false })) };
@@ -252,10 +214,7 @@ export class MockNetwork implements NetworkService {
       selfId: 'mock-me',
       leaderId,
       players,
-      settings: {
-        ...defaultSettings(balanceJson.npc.defaultDifficulty as NpcLevelId),
-        mode: this.initialMode,
-      },
+      settings: defaultSettings(balanceJson.npc.defaultDifficulty as NpcLevelId),
     };
   }
 
@@ -286,6 +245,5 @@ export class MockNetwork implements NetworkService {
     this.meeting?.dispose();
     this.meeting = null;
     this.world = null;
-    this.onub = null;
   }
 }

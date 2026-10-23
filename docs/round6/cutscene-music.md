@@ -110,8 +110,10 @@ round-8 content (BlackPine ships a two-step camera pan with no narrator in round
   map it is listed under. `loop: false` (round 7, 7A) plays a playlist once and leaves the bus silent at its end
   (`MusicBus.onFinish` tells the director); a playlist without it loops.
 - **Round 7 (7A, DECISIONS A101): the opening piece.** The owner's `load_hollowmere` and `load_blackpine` are the
-  maps' intro tracks, in the `<map>_opening` playlists (`loop: false`) of the `opening` class; `loading` maps to
-  `lobby`, so the load keeps the lobby piece. The director starts `opening` when the router leaves the opening's id
+  maps' intro tracks, in the `<map>_opening` playlists (`loop: false`) of the `opening` class. No map lists a
+  `loading` playlist, so the match load leaves the bus alone and the lobby piece plays on: the opening's `cutscene`
+  message reaches the client before the World preloads, and a `loading` request then cut the opening piece off
+  0.2 s after it began (the owner's report of 2026-10-23, A101). The director starts `opening` when the router leaves the opening's id
   under `REG_CUTSCENE`, holds every phase class until the piece ends or the player emits `CUTSCENE_END` with
   `skipped` (`cutscene/sequencer.ts`), then cross-fades to the class the phase wants (the `day` during grace).
 - **`packages/content/data/music.json`** (pre-seeded empty, zod `schemas/music.ts`): `byMap[map][class]` ->

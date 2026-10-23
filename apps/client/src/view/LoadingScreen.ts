@@ -156,7 +156,7 @@ export function loadingPlaylistFor(mapId: string): string | null {
 }
 
 /**
- * A match preload (World, Kitchen): the same screen, torn down when the scene's `create` runs, and the map's
+ * A match preload (World): the same screen, torn down when the scene's `create` runs, and the map's
  * loading piece asked of the music bus. The load never waits for the piece.
  */
 export function mountMatchLoadingScreen(

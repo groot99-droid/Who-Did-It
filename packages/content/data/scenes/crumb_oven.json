@@ -33,7 +33,7 @@
     {
       "id": "co.bread_rack",
       "kind": "hide",
-      "variant": "kegStack",
+      "variant": "breadRack",
       "x": 1,
       "y": 3,
       "childOnly": false
@@ -41,13 +41,21 @@
     {
       "id": "co.wood_box",
       "kind": "body",
-      "variant": "cratePile",
+      "variant": "woodBox",
       "x": 10,
       "y": 7,
       "childOnly": false
     }
   ],
-  "props": [],
+  "props": [
+    {
+      "id": "co.brick_oven",
+      "kind": "brickOven",
+      "x": 6,
+      "y": 2,
+      "footprint": { "x": 6, "y": 1, "w": 2, "h": 2 }
+    }
+  ],
   "gates": [],
   "paths": [],
   "lights": [
@@ -56,8 +64,8 @@
   ],
   "grid": [
     "############",
-    "#..........#",
-    "#..........#",
+    "#.....##...#",
+    "#.....##...#",
     "#H.........#",
     "#..........#",
     "#..........#",
@@ -68,8 +76,8 @@
   ],
   "material": [
     "WWWWWWWWWWWW",
-    "WffffffffffW",
-    "WffffffffffW",
+    "WfffffPPfffW",
+    "WfffffPPfffW",
     "WffffffffffW",
     "WffffffffffW",
     "WffffffffffW",

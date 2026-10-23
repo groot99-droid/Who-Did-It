@@ -1,7 +1,7 @@
 /*
  * Who Did It: the table screens in the night theme (round 7, 7G; docs/UI.md 2, 3, 6, 10, 14.28).
  *
- * The meeting, the game over, the main-mode cards and the quick mode's screens wear the owner's mockups:
+ * The meeting, the game over and the main-mode cards wear the owner's mockups:
  * frosted glass with a stepped corner over the dark, lilac text, Press Start 2P for titles, labels and
  * one-word tags, Pixelify Sans for headings and controls, Inter and Oswald kept for running text of more
  * than two lines (chat, the report, the notebook tab; A106). Every rule is scoped under `.wdi-table` so it
@@ -190,8 +190,7 @@
 }
 
 .wdi-table .wdi-chip--ready,
-.wdi-table .wdi-chip--vote,
-.wdi-table .wdi-chip--lead {
+.wdi-table .wdi-chip--vote {
   color: var(--wdi-on-night-accent);
   background-color: var(--wdi-night-accent);
   box-shadow: none;
@@ -204,19 +203,6 @@
 
 .wdi-table .wdi-chip--vote {
   font-size: var(--wdi-text-sm);
-}
-
-/* A claim chip is a sentence fragment a player tapped: Pixelify, sentence case, a lantern rim when picked. */
-.wdi-table .wdi-chip--claim {
-  font-family: var(--wdi-font-pixel-text);
-  font-size: var(--wdi-text-md);
-  color: var(--wdi-night-text);
-  background-color: rgb(var(--wdi-night-rgb) / 0.5);
-}
-
-.wdi-table .wdi-chip--claim.is-selected {
-  color: var(--wdi-on-night-accent);
-  background-color: var(--wdi-night-accent);
 }
 
 .wdi-table .wdi-input {
@@ -269,12 +255,6 @@
   letter-spacing: 0;
   text-transform: none;
   color: var(--wdi-night-label);
-}
-
-.wdi-table .wdi-portrait__claim {
-  font-family: var(--wdi-font-pixel-text);
-  font-size: var(--wdi-text-sm);
-  color: var(--wdi-night-accent);
 }
 
 /* The corner pieces sit inside the tile: the clip would cut a badge that hangs outside it. */

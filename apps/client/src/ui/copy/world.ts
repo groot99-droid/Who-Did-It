@@ -1,6 +1,5 @@
 // UI.md 14.1 toasts, 14.2 prompts, 14.3 refusals, 14.4 HUD and log, 14.5 Notebook, 14.8 Ghost (Session T,
-// round 4). Quick mode's lines live in `onubPrep.ts` (5C) and `onubNight.ts` (5D) from round 5. Values in
-// braces are filled with `fill()`.
+// round 4). Values in braces are filled with `fill()`.
 export const WORLD_COPY = {
   // 14.1 Toasts
   'toast.grace.sneak': 'Shift to sneak',

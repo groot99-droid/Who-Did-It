@@ -25,8 +25,8 @@ export default defineConfig({
         '--use-gl=angle',
         '--use-angle=swiftshader',
         '--enable-unsafe-swiftshader',
-        // Multi-page specs (host and guest): a page not in front must keep its game loop, or a short phase such as
-        // the quick-mode dawn passes unpainted on it.
+        // Multi-page specs (host and guest): a page not in front must keep its game loop, or a short phase
+        // passes unpainted on it.
         '--disable-renderer-backgrounding',
         '--disable-backgrounding-occluded-windows',
         '--disable-background-timer-throttling',

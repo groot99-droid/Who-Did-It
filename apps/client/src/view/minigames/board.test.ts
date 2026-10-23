@@ -3,10 +3,10 @@ import onubBalance from '@wdi/content/data/balance.onub.json';
 import { checkMinigame, generateMinigame, mulberry32, type MinigameBases } from '@wdi/shared/rules';
 import type { CratesPublic, PourPublic, SlidePublic, StokePublic } from '@wdi/shared/rules';
 import type { MinigameKind } from '@wdi/shared/protocol';
-import { CART, CratesModel } from '../onub/minigames/crates';
-import { PourModel } from '../onub/minigames/pour';
-import { SlideModel, slotRect } from '../onub/minigames/slide';
-import { StokeModel } from '../onub/minigames/stoke';
+import { CART, CratesModel } from './crates';
+import { PourModel } from './pour';
+import { SlideModel, slotRect } from './slide';
+import { StokeModel } from './stoke';
 import { bandRng } from './board';
 
 const spec = (k: MinigameKind) => onubBalance.stations.find((s) => s.minigame.kind === k)!.minigame;

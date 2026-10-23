@@ -4,7 +4,20 @@
   "activities": {
     "work": {
       "phases": ["day"],
-      "kinds": ["taskSource", "pump", "flourBin", "oven", "basin", "goat", "fence", "window"]
+      "kinds": [
+        "taskSource",
+        "pump",
+        "flourBin",
+        "oven",
+        "basin",
+        "goat",
+        "fence",
+        "window",
+        "coldShelves",
+        "doughMixer",
+        "brickOven",
+        "proofingCabinet"
+      ]
     },
     "social": {
       "phases": ["day", "night"],

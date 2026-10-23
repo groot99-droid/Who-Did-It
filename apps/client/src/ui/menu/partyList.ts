@@ -1,6 +1,6 @@
 import { MENU_COPY as C, fill } from '../copy';
 import { h } from '../dom';
-import { LIST_REFRESH_MS, mapName, modeId, type ListParties } from './partyListModel';
+import { LIST_REFRESH_MS, mapName, type ListParties } from './partyListModel';
 import type { PartyListing } from '../../net/protocol';
 
 export interface PartyListOptions {
@@ -12,14 +12,13 @@ export interface PartyListOptions {
   refreshMs?: number;
 }
 
-/** The rows of the party list: leader, players / max, mode and map, and a tag for a private party (a friend's). */
+/** The rows of the party list: leader, players / max, map, and a tag for a private party (a friend's). */
 export function mountPartyList(host: HTMLElement, opts: PartyListOptions): { destroy(): void } {
   const list = h('ul', { class: 'wdi-menu-parties', 'data-testid': 'party-list' });
   const empty = h('p', { class: 'wdi-field__msg', 'data-testid': 'party-list-empty' }, C['parties.empty']);
   host.append(h('h3', { class: 'wdi-label' }, C['parties.title']), list, empty);
 
   const row = (p: PartyListing) => {
-    const mode = C[modeId(p.mode) === 'onub' ? 'parties.mode.onub' : 'parties.mode.main'];
     const button = h(
       'button',
       {
@@ -31,13 +30,12 @@ export function mountPartyList(host: HTMLElement, opts: PartyListOptions): { des
           leader: p.leader,
           n: p.players,
           max: p.max,
-          mode,
           map: mapName(p.map),
         }),
       },
       h('span', { class: 'wdi-menu-parties__leader' }, p.leader),
       h('span', {}, fill(C['parties.players'], { n: p.players, max: p.max })),
-      h('span', { class: 'wdi-menu-parties__meta' }, `${mode} · ${mapName(p.map)}`),
+      h('span', { class: 'wdi-menu-parties__meta' }, mapName(p.map)),
       p.visibility === 'private' && h('span', { class: 'wdi-tag' }, C['parties.tag.friend']),
     );
     button.addEventListener('click', () => opts.onPick(p));

@@ -1,17 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { traits } from '@wdi/content';
 import balance from '@wdi/content/data/balance.json';
-import onubBalance from '@wdi/content/data/balance.onub.json';
-import onubRoles from '@wdi/content/data/roles.onub.json';
-import { onubMockRoleCard } from '../net/mock/onubMock';
+import { MOCK_ROLE_REVEAL } from '../net/fixtures';
 import type { RoleRevealPayload } from '../net/protocol';
 import {
   coverChoices,
   createCoverModel,
-  isOnubCard,
   lookLine,
   ROLE_CARD_SECONDS,
-  roleCardSeconds,
   roleTitle,
   TRAIT_LABELS,
 } from './RoleCard';
@@ -41,27 +37,18 @@ describe('trait labels', () => {
   });
 });
 
-describe('quick-mode card', () => {
-  it('reads the hold from balance.json, or from the quick-mode timers when the card says so', () => {
+describe('role card hold', () => {
+  it('reads the hold from balance.json', () => {
     expect(ROLE_CARD_SECONDS).toBe(balance.phases.roleRevealS);
-    expect(roleCardSeconds({ beware: 'Clues match your traits' })).toBe(balance.phases.roleRevealS);
-    expect(isOnubCard({ beware: onubRoles.cardLine })).toBe(true);
-    expect(roleCardSeconds({ beware: onubRoles.cardLine })).toBe(onubBalance.timers.roleCardS);
-  });
-
-  it('names a quick-mode role through roles.onub.json', () => {
-    expect(roleTitle('sousChef', 'onub')).toBe(onubRoles.roles.sousChef.name);
-    expect(roleTitle('sousChef')).toBe('SousChef');
   });
 });
 
 const DECK = ['killer', 'accomplice', 'detective', 'vicar', 'doctor', 'lamplighter', 'baker'];
 const cover = (over: Partial<RoleRevealPayload> = {}): RoleRevealPayload =>
   ({
-    ...onubMockRoleCard('me'),
+    ...MOCK_ROLE_REVEAL,
     roleId: 'killer',
     team: 'cabal',
-    teamName: undefined,
     deck: DECK,
     look: 'baker',
     coverHints: ['baker', 'lamplighter'],
@@ -113,12 +100,5 @@ describe('cover picker model', () => {
     model.pick('vicar');
     model.sync({ look: 'doctor', mates: {} });
     expect(model.choices().find((c) => c.picked)?.lookId).toBe('doctor');
-  });
-});
-
-describe('the quick-mode card', () => {
-  it('carries no main-mode field, so it has no deck strip, look line or picker', () => {
-    const card = onubMockRoleCard('me');
-    for (const key of ['deck', 'look', 'portrait', 'coverHints'] as const) expect(card[key]).toBeUndefined();
   });
 });

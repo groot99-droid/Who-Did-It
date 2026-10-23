@@ -1,7 +1,7 @@
 import onubBalance from '@wdi/content/data/balance.onub.json';
 import { M5B_COPY as C } from '../../ui/copy/m5b';
 import { h } from '../../ui/dom';
-import { MINIGAMES, type MiniGame, type MiniGameFactory, type MiniGameSpec } from '../onub/StationView';
+import { MINIGAMES, type MiniGame, type MiniGameFactory, type MiniGameSpec } from './registry';
 import { bandRng } from './board';
 import type { MinigameKind } from '@wdi/shared/protocol';
 

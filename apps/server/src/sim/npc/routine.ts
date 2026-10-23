@@ -390,11 +390,19 @@ function pickStation(
   const other = base.filter((st) => st.scene !== here && adjacent.has(st.scene));
   const dwellRun = tick >= brain.sceneDwellUntilTick;
   let pool = dwellRun ? (other.length > 0 ? other : own) : own;
-  // GDD 3.20 "NPC Killers": a vendetta's scene is one more place to work, drawn under the same weights; like the
-  // hunt below it ignores the dwell, and the hunt still wins (`vendettaGoalFor`, 7H; no draw).
+  // GDD 3.20 "NPC Killers": a vendetta's scene is one more place to work, drawn under the same weights (7H's
+  // `vendettaGoalFor`, no draw). It keeps the dwell and the one-hop rule, so it reads like any routine trip: in the
+  // goal scene the seat works there; elsewhere, once the dwell has run, its next trip is to the next scene on the way.
   const goal = vendettaGoalFor(room, player.id);
-  const there = goal ? base.filter((st) => st.scene === goal.sceneId) : [];
-  if (there.length > 0) pool = there;
+  if (goal) {
+    let toward: Station[] = [];
+    if (goal.sceneId === here) toward = own;
+    else if (dwellRun) {
+      const hop = firstPortalToward(here, sim.profile, (s) => s === goal.sceneId, map);
+      toward = hop ? other.filter((st) => st.scene === hop.to) : [];
+    }
+    if (toward.length > 0) pool = toward;
+  }
   let hunt = false;
   if (killer && litOnly) {
     const prey = preyStations(room, mem, brain, player, p);

@@ -33,7 +33,7 @@
     {
       "id": "cp.tray_stack",
       "kind": "hide",
-      "variant": "wardrobe",
+      "variant": "trayStack",
       "x": 10,
       "y": 3,
       "childOnly": false
@@ -41,13 +41,21 @@
     {
       "id": "cp.flour_sacks",
       "kind": "body",
-      "variant": "trunk",
+      "variant": "flourSacks",
       "x": 1,
       "y": 2,
       "childOnly": false
     }
   ],
-  "props": [],
+  "props": [
+    {
+      "id": "cp.proofer",
+      "kind": "proofingCabinet",
+      "x": 5,
+      "y": 3,
+      "footprint": { "x": 4, "y": 2, "w": 3, "h": 2 }
+    }
+  ],
   "gates": [],
   "paths": [],
   "lights": [
@@ -58,8 +66,8 @@
   "grid": [
     "############",
     "#..........#",
-    "#B.........#",
-    "#.........H#",
+    "#B..###....#",
+    "#...###...H#",
     "#..........#",
     "#..........#",
     "#..........#",
@@ -70,8 +78,8 @@
   "material": [
     "WWWWWWWWWWWW",
     "WccccccccccW",
-    "WccccccccccW",
-    "WccccccccccW",
+    "WcccPPPccccW",
+    "WcccPPPccccW",
     "WccccccccccW",
     "WccccccccccW",
     "WccccccccccW",

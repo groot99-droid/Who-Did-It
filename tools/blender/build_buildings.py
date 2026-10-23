@@ -102,6 +102,11 @@ SLICED_PROPS = {
         "prop_hanging_oak": (2, 2, "hanging_oak"),
         "prop_clamp": (2, 2, "clamp"),
         "prop_pump_beam": (2, 3, "pump_beam"),
+        # Round 7 (A118): the stations of Crumb's Ovens' four rooms, from the owner's pictures.
+        "prop_coldShelves": (3, 1, "cold_shelves"),
+        "prop_doughMixer": (2, 2, "dough_mixer"),
+        "prop_brickOven": (2, 2, "brick_oven"),
+        "prop_proofingCabinet": (3, 2, "proofing_cabinet"),
     },
     "blackpine": {
         "prop_trestle": (3, 2, "trestle"),
@@ -347,6 +352,62 @@ def pump_beam(w, h):
             part("Broken", T("wood", 3), B(w / 2 + 0.4, -h + 0.4, 0.15, 0.9, 0.2, 0.2))]
 
 
+def cold_shelves(w, h):
+    """La Chambre Froide: steel shelving of yeast jars, milk and butter blocks, frost on the shelf lips."""
+    posts = [B(x, y, 0.9, 0.06, 0.06, 1.8) for x in (0.08, w / 2, w - 0.08) for y in (-0.12, -h + 0.12)]
+    shelves = [B(w / 2, -h / 2, z, w - 0.08, h - 0.16, 0.04) for z in (0.25, 0.8, 1.35, 1.8)]
+    return [part("Rack", T("slate", 3), *posts, *shelves),
+            part("Jars", T("brass", 1), *[C(0.25 + 0.3 * i, -h / 2, 0.27, 0.08, 0.18, 8) for i in range(9)]),
+            part("Lids", T("blood", 1), *[C(0.25 + 0.3 * i, -h / 2, 0.45, 0.085, 0.04, 8) for i in range(9)],
+                 outline=False),
+            part("Milk", T("bone", 3), *[B(0.3 + 0.34 * i, -h / 2, 0.98, 0.2, 0.2, 0.32) for i in range(7)]),
+            part("Labels", F("moon", 3), *[B(0.3 + 0.34 * i, -h / 2 - 0.105, 0.98, 0.12, 0.01, 0.1)
+                                           for i in range(7)], outline=False),
+            part("Butter", T("plaster", 3), *[B(0.35 + 0.47 * i, -h / 2, 1.43, 0.34, 0.3, 0.12) for i in range(5)]),
+            part("Frost", F("moon", 5), *[B(0.2 + 0.37 * i, -h + 0.1, z - 0.05, 0.05, 0.02, 0.08)
+                                          for i in range(7) for z in (0.8, 1.35, 1.8)], outline=False)]
+
+
+def dough_mixer(w, h):
+    """Le Pétrin: the spiral mixer on its pedestal, the bowl of dough under the hook, flour on the floor."""
+    return [part("Dust", T("bone", 2), S(blob(0.8, -1.2, 0.75, 0.6, [(0.15, 5, 0.7)], n=16), 0, 0.01),
+                 outline=False),
+            part("Base", T("fog", 1), B(1.2, -0.85, 0.15, 1.3, 1.1, 0.3), bevel=0.03),
+            part("Column", T("fog", 2), B(1.45, -0.6, 1.0, 0.55, 0.55, 1.7), bevel=0.03),
+            part("Head", T("fog", 2), B(1.05, -0.75, 1.75, 1.05, 0.6, 0.38), bevel=0.04),
+            part("Vent", F("ink", 0), *[B(0.75 + 0.1 * i, -1.06, 1.78, 0.04, 0.01, 0.22) for i in range(5)],
+                 outline=False),
+            part("Switch", F("blood", 2), B(1.73, -0.75, 1.1, 0.01, 0.12, 0.12), outline=False),
+            part("Bowl", T("fog", 1), C(0.8, -1.15, 0.3, 0.42, 0.5, 16, rt=0.5), bevel=0.02),
+            part("Dough", T("plaster", 2), C(0.8, -1.15, 0.79, 0.44, 0.05, 16), outline=False),
+            part("Hook", T("slate", 3), B(0.8, -1.05, 1.15, 0.06, 0.06, 0.5))]
+
+
+def brick_oven(w, h):
+    """Le Four à Pain: the brick dome on its stone hearth, the lit mouth, the steel flue, logs beneath."""
+    return [part("Hearth", T("stone", 3), B(w / 2, -h / 2, 0.35, w - 0.2, h - 0.25, 0.7), bevel=0.03),
+            part("Dome", T("brick", 3), C(w / 2, -h / 2 + 0.05, 0.7, 0.85, 0.75, 16, rt=0.3), bevel=0.06),
+            part("Band", T("slate", 1), C(w / 2, -h / 2 + 0.05, 0.98, 0.84, 0.07, 16, rt=0.8)),
+            part("Arch", T("slate", 2), B(w / 2, -h + 0.22, 0.98, 0.72, 0.12, 0.5)),
+            part("Mouth", F("lantern", 2), B(w / 2, -h + 0.15, 0.95, 0.5, 0.02, 0.36), outline=False),
+            part("Flue", T("slate", 2), C(w / 2 + 0.15, -h / 2 + 0.3, 1.3, 0.14, 1.1, 10)),
+            part("Logs", T("wood", 3), *[B(w / 2 - 0.3 + 0.3 * i, -h + 0.25, 0.12, 0.12, 0.5, 0.12)
+                                         for i in range(3)])]
+
+
+def proofing_cabinet(w, h):
+    """La Chambre de Pousse: the glass-fronted wooden cabinet, warm inside, trays stacked on its roof."""
+    doors = [B(0.5 + 1.0 * i, -h + 0.19, 1.05, 0.8, 0.02, 1.5) for i in range(3)]
+    return [part("Cabinet", T("wood", 3), B(w / 2, -h / 2, 1.0, w - 0.2, h - 0.4, 2.0), bevel=0.02),
+            part("Roof", T("wood", 4), B(w / 2, -h / 2, 2.04, w - 0.1, h - 0.3, 0.08)),
+            part("Glass", F("lantern", 3), *doors, B(w - 0.09, -h / 2, 1.05, 0.02, h - 0.7, 1.5), outline=False),
+            part("Trays", T("wood", 2), *[B(w / 2, -h + 0.17, z, w - 0.4, 0.02, 0.04) for z in (0.55, 0.9, 1.25, 1.6)],
+                 *[B(w - 0.08, -h / 2, z, 0.02, h - 0.8, 0.04) for z in (0.55, 0.9, 1.25, 1.6)], outline=False),
+            part("Sign", T("brass", 0), B(w / 2, -h + 0.18, 1.92, 1.6, 0.02, 0.12)),
+            part("Bins", T("wood", 2), B(w / 2 - 0.6, -h / 2 + 0.1, 2.2, 0.8, 0.6, 0.24),
+                 B(w / 2 + 0.5, -h / 2 + 0.2, 2.2, 0.7, 0.5, 0.24), bevel=0.02)]
+
+
 def trestle(w, h):
     """The broken trestle standing in the water, a lantern hanging from a snapped beam."""
     return [part("Bents", T("wood", 2), *[B(x, -h / 2, 1.3, 0.14, h - 0.4, 2.6) for x in (0.5, 1.5)]),
@@ -398,7 +459,8 @@ def forge(w, h):
             part("Bellows", T("litter", 1), B(0.3, -h / 2, 0.7, 0.5, 0.4, 0.3))]
 
 
-SLICED_BUILDERS = {"wake_table": wake_table, "hanging_oak": hanging_oak, "clamp": clamp, "pump_beam": pump_beam,
+SLICED_BUILDERS = {"wake_table": wake_table, "cold_shelves": cold_shelves, "dough_mixer": dough_mixer,
+                   "brick_oven": brick_oven, "proofing_cabinet": proofing_cabinet, "hanging_oak": hanging_oak, "clamp": clamp, "pump_beam": pump_beam,
                    "trestle": trestle, "mess_table": mess_table, "bunks": bunks, "head_saw": head_saw, "kiln": kiln,
                    "map_table": map_table, "forge": forge}
 

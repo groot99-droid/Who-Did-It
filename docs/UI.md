@@ -1356,6 +1356,15 @@ with the system style; the arrival and the brake are `noise` pulses whose `kind`
 | the arrival (server, `Train.ts` `TRAIN_ARRIVE_LINE`) | The train pulls into the station. | `chat.msg` `system`, every seat, once per day |
 | `log.train` (`ui/copy/world.ts`) | The train pulls in at the platform | the HUD log of a seat that hears `train_arrive`; `World.ring` plays the two `train_*` pulses as sounds and draws no ring |
 
+The Vicar's memorial (GDD 3.20) is a cutscene, `memorialVicar` in `cutscenes.json` (kind `memorial`), sent to every
+seat as `cutscene { id: 'memorialVicar', scope: 'all' }` at the reveal after a seat in the Vicar's look dies by the
+Knife. Its `video` step plays `memorial_vicar` once 7A's `CutscenePlayer` renders video steps; until then the client
+drops a `scope: 'all'` cutscene. Its caption is one block at the end of `ui/copy/cutscenes.ts`:
+
+| Copy id | Text | Where |
+|---|---|---|
+| `cs.memorial.vicar` | In memory of the Vicar of HollowMere, who fell to the Knife. | `title` caption over the first 5 s of the film |
+
 ### 14.24 Opening cinematic (6Q)
 
 Lines are in `apps/client/src/ui/copy/intro.ts` (`INTRO_COPY`). The `Intro` scene sits between `Preload` and `Landing` (never before `Admin`).
@@ -1411,8 +1420,8 @@ asked where it is used.
 | `settings.title` | Settings | the settings dialog |
 
 A failed create or join says the generic error (`JOIN_FAILED_MESSAGE`, UI.md 1.6) in the dialog's one `role="alert"`
-line, or the refresh line when the build is stale. `data-testid`s: `menu`, `menu-chip`, `menu-sound`, `menu-build`,
-`landing-trailer` (kept). The e2e fixture `e2e/fixtures/party.ts` (`createParty`, `joinParty`) drives the buttons and
+line, or the refresh line when the build is stale. `data-testid`s: `menu`, `menu-chip`, `menu-sound`, `menu-build`
+(`landing-trailer` left with the trailer in #110). The e2e fixture `e2e/fixtures/party.ts` (`createParty`, `joinParty`) drives the buttons and
 labels above; a visible label that changes changes there.
 
 ### 14.26 Lobby re-skin (7E, round 7)
@@ -1479,6 +1488,10 @@ claim chips; Inter stays for chat and the report, which run past two lines (A106
 unchanged; the copy of 14.6 to 14.10, 14.14 and 14.16 is unchanged. No new copy: the game-over Add friend action is 7C's `addFriendButton` (`ui/menu/friends.ts`, copy in `ui/copy/menu.ts`).
 
 The Add friend action on a game-over row is 7C's `addFriendButton`, shown only for a seat that carries a `profile` and never on your own row. The faction chip on a row stays the one place a faction shows for another seat.
+
+### 14.31 The admin page in the night theme (7G)
+
+Session 7G, round 7 (DECISIONS A111). The owner's admin page (14.23) wears the table screens' dark glass: `ui/admin.css` holds every rule, each doubling its own class so it beats the paper rules of `components.css` (not edited) and does not depend on the `.wdi-admin` root, because the sign-in panel and the notice are mounted outside it. Indigo glass fill with a snow rim, lilac text; Press Start 2P on the controls, panel headings and sign-in title, Pixelify Sans on the rest, Inter on the log (running text, A106); the pressed speed button, the seat, Start and a failed invariant row take the lantern accent. No blur and no `clip-path`: six live viewports run behind the panels. The copy of 14.23, every id and testid, and the markup are unchanged, and no new lines are added.
 
 ### 14.29 Vendettas (7H)
 

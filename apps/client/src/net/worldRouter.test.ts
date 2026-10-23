@@ -1,8 +1,6 @@
 import mitt from 'mitt';
 import { describe, expect, it, vi } from 'vitest';
 import type { NetEvents, NetworkService } from './NetworkService';
-import { REG_ONUB } from './onub';
-import { ColyseusOnubFeed } from './onubColyseus';
 import { installWorldRouter } from './worldRouter';
 
 type Handler = (payload: unknown) => void;
@@ -89,34 +87,5 @@ describe('world router', () => {
     room.emit('phaseChange', { phase: 0, endsTick: 0 });
     expect(active.has('GameOver')).toBe(false);
     expect(calls.at(-1)).toBe('start Lobby');
-  });
-
-  it('leaves the night messages to the ONUB feed: one handler each, and the world feed registers none', () => {
-    const { room } = setup();
-    expect(room.count('nightSleep')).toBe(1);
-    expect(room.count('nightWake')).toBe(1);
-    expect(room.count('nightReveal')).toBe(1);
-  });
-
-  it("publishes the room's live ONUB feed (5D's ColyseusOnubFeed) for the quick-mode scenes", () => {
-    const { game } = setup();
-    const onub = game.registry.set.mock.calls.find(([key]) => key === REG_ONUB);
-    expect(onub?.[1]).toBeInstanceOf(ColyseusOnubFeed);
-  });
-
-  it('a meeting, game over or the return to the lobby stops Kitchen and Night', () => {
-    const { room, active } = setup();
-    active.add('Kitchen');
-    room.emit('meetingStart', { reason: 'dawn', callerId: '', missing: [] });
-    expect(active.has('Kitchen')).toBe(false);
-    expect(active.has('Meeting')).toBe(true);
-    active.add('Night');
-    room.emit('gameOver', { winner: 5, roles: {}, summary: '' });
-    expect(active.has('Night')).toBe(false);
-    expect(active.has('GameOver')).toBe(true);
-    active.add('Kitchen');
-    room.emit('phaseChange', { phase: 0, endsTick: 0 });
-    expect(active.has('Kitchen')).toBe(false);
-    expect(active.has('Lobby')).toBe(true);
   });
 });

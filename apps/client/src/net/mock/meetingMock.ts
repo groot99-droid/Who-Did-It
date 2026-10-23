@@ -1,12 +1,9 @@
 import mitt, { type Emitter } from 'mitt';
 import balanceJson from '@wdi/content/data/balance.json';
-import onubBalance from '@wdi/content/data/balance.onub.json';
 import { TICK_RATE } from '@wdi/shared';
-import { PANTRY_VOTE } from '@wdi/shared/constants';
 import {
   type ChatLine,
   type GameOver,
-  type MatchMode,
   type MeetingFeed,
   type MeetingFeedEvents,
   type MeetingInfo,
@@ -20,15 +17,9 @@ import {
 // bots, the same message shapes and phase ids as K's server. Lengths come from balance.json; the pacing
 // constants below only decide when the bots speak and vote, and how long the mock game-over card shows
 // before the lobby (a mock-only shortcut, the real length is `phases.gameOverS`).
-//
-// Quick mode (a `dawn` meeting, GDD 3.11) is a bare stand-in since round 5's pre-seed: the Rush and CRUST
-// lengths of `balance.onub.json`, no Skip, no vote for yourself, the Pantry as a target, no bot votes, a
-// plurality reveal and a game over with no winner and no `onub` facts. Claims live on the OnubFeed.
 
 /** `Phase` ids of the schema (mirrored, as the server mirrors them in constants). */
 const PHASE = { lobby: 0, discussion: 7, vote: 8, reveal: 9, gameOver: 12 } as const;
-/** `Winner.nobody` of the schema: the quick-mode stand-in ends the match with no winner. */
-const WINNER_NOBODY = 5;
 const BOT_VOTE_STEP_MS = 450;
 const BOT_VOTE_FIRST_MS = 900;
 const MOCK_GAME_OVER_MS = 4000;
@@ -44,8 +35,7 @@ const SELF_ROLE = 'killer';
 const CABAL = new Set(['killer', 'accomplice']);
 
 export interface MockMeetingRequest {
-  /** `dawn` is the quick-mode meeting (the Morning Rush); the mock plays its stand-in on it. */
-  reason: 'body' | 'bell' | 'dawn';
+  reason: 'body' | 'bell';
   callerId: string;
   bodyOf?: string;
 }
@@ -123,7 +113,6 @@ export class MockMeetingFeed implements MeetingFeed {
   private startedAt = performance.now();
   private phase: number = PHASE.lobby;
   private endsAt = 0;
-  private quick = false;
 
   constructor(
     roster: ReadonlyArray<Pick<MeetingPlayer, 'id' | 'name' | 'traits'> & { look?: string }>,
@@ -131,10 +120,6 @@ export class MockMeetingFeed implements MeetingFeed {
     private readonly opts: MockMeetingOptions,
   ) {
     this.players = roster.map((p) => ({ ...p, look: p.look ?? '', alive: true, hasVoted: false }));
-  }
-
-  mode(): MatchMode {
-    return this.quick ? 'onub' : 'main';
   }
 
   roster(): MeetingPlayer[] {
@@ -173,10 +158,7 @@ export class MockMeetingFeed implements MeetingFeed {
     const me = this.players.find((p) => p.id === this.selfId);
     if (!me?.alive || (this.phase !== PHASE.discussion && this.phase !== PHASE.vote)) return;
     const living = this.players.some((p) => p.alive && p.id === targetId);
-    // Quick mode has no Skip and no vote for yourself, and the Pantry is a target (GDD 3.11).
-    if (this.quick) {
-      if (targetId === SKIP || targetId === this.selfId || (!living && targetId !== PANTRY_VOTE)) return;
-    } else if (targetId !== SKIP && !living) return;
+    if (targetId !== SKIP && !living) return;
     this.mine = targetId;
     this.votes[this.selfId] = targetId;
     me.hasVoted = true;
@@ -199,7 +181,6 @@ export class MockMeetingFeed implements MeetingFeed {
     this.votes = {};
     this.mine = '';
     this.tally = null;
-    this.quick = req.reason === 'dawn';
     for (const p of this.players) p.hasVoted = false;
     const dead = req.bodyOf === undefined ? undefined : this.players.find((p) => p.id === req.bodyOf);
     if (dead) dead.alive = false;
@@ -219,13 +200,11 @@ export class MockMeetingFeed implements MeetingFeed {
     };
     this.bus.emit('meetingStart', start);
     const n = Math.min(10, Math.max(4, this.players.length));
-    const talkS = this.quick
-      ? onubBalance.timers.rushS
-      : balanceJson.byCount[String(n) as keyof typeof balanceJson.byCount].discussionS;
-    const voteS = this.quick ? onubBalance.timers.voteS : balanceJson.phases.voteS;
+    const talkS = balanceJson.byCount[String(n) as keyof typeof balanceJson.byCount].discussionS;
+    const voteS = balanceJson.phases.voteS;
     this.setPhase(PHASE.discussion, talkS);
 
-    const botVotes = this.quick ? {} : mockBotVotes(this.roster(), this.selfId, req.reason);
+    const botVotes = mockBotVotes(this.roster(), this.selfId, req.reason);
     Object.entries(botVotes).forEach(([id, target], i) =>
       this.later(
         () => {
@@ -249,16 +228,13 @@ export class MockMeetingFeed implements MeetingFeed {
   }
 
   private checkAllVoted(): void {
-    // Quick mode: the Rush never ends early, CRUST does once every seat in play has voted (GDD 3.11).
-    if (this.quick ? this.phase !== PHASE.vote : this.phase !== PHASE.discussion && this.phase !== PHASE.vote)
-      return;
+    if (this.phase !== PHASE.discussion && this.phase !== PHASE.vote) return;
     if (this.players.filter((p) => p.alive).every((p) => this.votes[p.id] !== undefined)) this.reveal();
   }
 
   private reveal(): void {
     if (this.phase === PHASE.reveal || this.phase === PHASE.gameOver) return;
     this.clearTimers();
-    if (this.quick) return this.revealQuick();
     const { tally, ejectedId } = tallyVotes(this.votes);
     const ejected = ejectedId === undefined ? undefined : this.players.find((p) => p.id === ejectedId);
     const role = ejected === undefined ? undefined : this.roleOf(ejected);
@@ -274,20 +250,6 @@ export class MockMeetingFeed implements MeetingFeed {
     this.later(
       () => (ejected ? this.finish(role ?? '') : this.opts.onDone('resume')),
       balanceJson.phases.revealS * 1000,
-    );
-  }
-
-  /** Quick mode: a plurality reveal with no roles, then the match ends with no winner (the stand-in above). */
-  private revealQuick(): void {
-    const { tally, ejectedId } = tallyVotes(this.votes);
-    this.setPhase(PHASE.reveal, onubBalance.timers.revealS);
-    const result: VoteResult = { tally, outs: ejectedId === undefined ? [] : [ejectedId] };
-    this.tally = result;
-    for (const p of this.players) if (p.id === ejectedId) p.alive = false;
-    this.bus.emit('voteResult', result);
-    this.later(
-      () => this.end({ winner: WINNER_NOBODY, roles: {}, summary: '' }),
-      onubBalance.timers.revealS * 1000,
     );
   }
 

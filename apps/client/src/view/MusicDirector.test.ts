@@ -45,9 +45,13 @@ describe('music.json and the committed manifest', () => {
     for (const id of used) expect(ids, id).toContain(id);
   });
 
-  it('maps every class of every map and every quick-mode class', () => {
-    for (const m of MAP_IDS)
-      for (const c of MUSIC_CLASSES) expect(playlistFor(m, c), `${m}/${c}`).not.toBeNull();
+  it('maps every class of every map but `loading`, and every quick-mode class', () => {
+    for (const m of MAP_IDS) {
+      for (const c of MUSIC_CLASSES.filter((k) => k !== 'loading'))
+        expect(playlistFor(m, c), `${m}/${c}`).not.toBeNull();
+      // The match load must leave the opening piece alone (A101): the lobby piece plays on through it.
+      expect(playlistFor(m, 'loading'), m).toBeNull();
+    }
     for (const c of ONUB_MUSIC_CLASSES) expect(onubPlaylistFor(c), c).not.toBeNull();
   });
 

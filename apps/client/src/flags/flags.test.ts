@@ -6,23 +6,10 @@ describe('readFlags', () => {
     expect(readFlags('', '')).toEqual({
       art: 'default',
       mock: false,
-      mode: 'main',
-      onub: false,
       joinCode: null,
       resumeCode: null,
       admin: false,
     });
-  });
-
-  it('reads the quick-mode flag for the mocks', () => {
-    expect(readFlags('?mode=onub', '').mode).toBe('onub');
-    expect(readFlags('?mode=other', '').mode).toBe('main');
-  });
-
-  it('offers the live quick-mode toggle only with onub=1', () => {
-    expect(readFlags('?onub=1', '').onub).toBe(true);
-    expect(readFlags('?onub=0', '').onub).toBe(false);
-    expect(readFlags('?mode=onub', '').onub).toBe(false);
   });
 
   it('reads art and mock query flags', () => {

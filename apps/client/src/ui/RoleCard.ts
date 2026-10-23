@@ -1,6 +1,4 @@
 import balance from '@wdi/content/data/balance.json';
-import onubBalance from '@wdi/content/data/balance.onub.json';
-import onubRoles from '@wdi/content/data/roles.onub.json';
 import type { CoverState } from '../net/world';
 import type { RoleRevealPayload, TraitIds } from '../net/protocol';
 import { LOOKS_COPY, fill } from './copy';
@@ -10,18 +8,6 @@ import { type PortraitTextures, drawPortrait, isCoverRole, lookName, roleLook } 
 
 /** Fallback hold time (`balance.json` phases.roleRevealS); the server's `phaseChange.endsTick` overrides it. */
 export const ROLE_CARD_SECONDS = balance.phases.roleRevealS;
-
-type OnubRoleRow = { name: string };
-const onubRow = (roleId: string): OnubRoleRow | undefined =>
-  (onubRoles.roles as Record<string, OnubRoleRow | undefined>)[roleId];
-
-/** A quick-mode card carries the quick-mode card line as its `beware` (R -> U seam). */
-export const isOnubCard = (role: Pick<RoleRevealPayload, 'beware'>): boolean =>
-  role.beware === onubRoles.cardLine;
-
-/** How long the card holds: `timers.roleCardS` for a quick-mode card, else `phases.roleRevealS`. */
-export const roleCardSeconds = (role: Pick<RoleRevealPayload, 'beware'>): number =>
-  isOnubCard(role) ? onubBalance.timers.roleCardS : ROLE_CARD_SECONDS;
 
 const FLIP_DELAY_MS = 650;
 
@@ -44,12 +30,8 @@ export function lookLine(t: TraitIds): string {
   return `You look like: ${TRAIT_LABELS.height[t.height]} / ${TRAIT_LABELS.scarf[t.scarf]} / ${TRAIT_LABELS.hat[t.hat]}`;
 }
 
-/** The role's display name; quick mode reads `roles.onub.json` (`sousChef` is "Le Sous-Chef"). */
-export function roleTitle(roleId: string, mode: 'main' | 'onub' = 'main'): string {
-  if (mode === 'onub') {
-    const row = onubRow(roleId);
-    if (row !== undefined) return row.name;
-  }
+/** The role's display name. */
+export function roleTitle(roleId: string): string {
   return roleId.split(/[_-]/).map(cap).join(' ');
 }
 
@@ -112,8 +94,7 @@ export function mountRoleCard(
   role: RoleRevealPayload,
   opts: RoleCardOptions,
 ): RoleCardScreen {
-  const quick = isOnubCard(role);
-  const holdS = roleCardSeconds(role);
+  const holdS = ROLE_CARD_SECONDS;
   const timerBar = h('div', { class: 'wdi-timer__bar' });
   const ready = h(
     'button',
@@ -145,7 +126,7 @@ export function mountRoleCard(
     );
   };
 
-  // Main mode (GDD 3.17): the look this seat walks as, the deck, and for a cover role the picker.
+  // GDD 3.17: the look this seat walks as, the deck, and for a cover role the picker.
   const hints = role.coverHints ?? [];
   const walkLead =
     role.look !== undefined && role.look !== '' && hints.length === 0
@@ -162,18 +143,8 @@ export function mountRoleCard(
   const front = h(
     'article',
     { class: `wdi-card wdi-card--${role.team} wdi-flip__face wdi-flip__face--front` },
-    // Quick mode names the card's team (`teamName`, roles.onub.json) in place of the faction label.
-    h(
-      'div',
-      { class: 'wdi-card__stripe' },
-      icon(`icons/icon_faction_${role.team}`),
-      role.teamName || TEAM_LABEL[role.team],
-    ),
-    h(
-      'h1',
-      { class: 'wdi-display wdi-card__title', 'data-testid': 'role-name' },
-      roleTitle(role.roleId, quick ? 'onub' : 'main'),
-    ),
+    h('div', { class: 'wdi-card__stripe' }, icon(`icons/icon_faction_${role.team}`), TEAM_LABEL[role.team]),
+    h('h1', { class: 'wdi-display wdi-card__title', 'data-testid': 'role-name' }, roleTitle(role.roleId)),
     h(
       'p',
       { class: 'wdi-card__look', 'aria-label': lookLine(role.traits), 'data-testid': 'card-look' },

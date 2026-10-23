@@ -52,6 +52,8 @@ export class FlowState {
   readonly cardReady = new Set<string>();
   /** Main mode: the seats Nightshade will kill when it resolves (GDD 3.2); Session 5G fills it. */
   readonly poisoned = new Set<string>();
+  /** Main mode: the Vicar seat whose memorial played last (GDD 3.20); kept across `resetFlow`. Round 7, 7I sets it. */
+  ascendedVicarCandidate: string | null = null;
 }
 
 const flows = new WeakMap<PartyRoom, FlowState>();
@@ -68,6 +70,7 @@ export function resetFlow(room: PartyRoom): void {
   const old = flowOf(room);
   const fresh = new FlowState();
   fresh.debug.push(...old.debug);
+  fresh.ascendedVicarCandidate = old.ascendedVicarCandidate; // round 8 reads it in the room's next match
   flows.set(room, fresh);
 }
 

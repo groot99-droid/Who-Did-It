@@ -3301,6 +3301,7 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 ### Round 7 log: 7G
 
 - 2026-10-23: PR 1 (meeting and game over): `ui/table.css` scoped under `.wdi-table`, the game-over Add friend through 7C's `addFriendButton`, `MeetingPlayer.profile`, UI.md 14.28, A111. The meeting and game-over panels are 7B's `.wdi-glass-panel`. PR 2 (seat picker, look tags, shot toast, over lists) rides the same branch. The quick-mode re-skin was dropped (A115) and kept on the branch `claude/quick-mode-archive` (commit 9ae9711).
+- 2026-10-23: PR 4 (admin page): `ui/admin.css` imported by `scenes/Admin.ts`, UI.md 14.31; `e2e/admin.spec.ts` mock cases pass.
 
 ### Round 7 log: 7H
 
@@ -3321,6 +3322,8 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 ### Round 7 log: 7I
 
 - 2026-10-23: PR 1, the Daily Train: the platform spot on HollowMere's overworld (A113), `sim/Train.ts` and its `runTrain` line, `balance.json` `train`, GDD 3.3, WORLD 4.3, UI.md 14.30, `test/train.test.ts`.
+- 2026-10-23: PR 2, the Vicar's memorial: `sim/Memorial.ts` and its `runMemorial` line, `FlowState.ascendedVicarCandidate`, the `cutscenes.json` `memorialVicar` row and the `cs.memorial.*` caption block, GDD 3.20, UI.md 14.30, A113, `test/memorial.test.ts`.
+- 2026-10-23: PR 2, the owner's martyrdom rule: the Vicar's ghost tasks count `tasks.martyrWeight` times after a Killer's Knife, and a full task bar wins (`sim/Minigames.ts`, `sim/Memorial.ts`, `balance.json`), GDD 3.5 and 3.20, A131, `test/memorial.test.ts`.
 
 ### Round 7 log: 7J
 
@@ -3331,6 +3334,9 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
   spawn, one hiding and one body spot and the picture's lights; ids, doors and sizes in A118. The pictures were read
   as rooms without a question to 6Z. Station props, their renders and the pictures' own spot art follow in PR 2,
   the task nodes and `e2e/ovens.spec.ts` in PR 3.
+- 2026-10-23: PR 1 is #111 (with 6Z's one-line exception in `mapSites.test.ts:29`). PR 2: the four station props and the
+  pictures' four spot variants, rendered and packed for both art styles (A118); `enterScene` clears a hold on the
+  same tick (6Z's answer, new `holdScene.test.ts`), which the stations had surfaced in `npcTells` S1.
 - Seed for round 8 (Port-au-Levain, A116): the ten kitchen pictures stay unbuilt and are its rooms, the cellar,
   cold pantry, command desk, dish pit, expediter, front of house, hygiene, lamination, shaping bench and
   sub-basement (`assets/source/concepts/onub/`); they move to `docs/round8/` when that folder exists.

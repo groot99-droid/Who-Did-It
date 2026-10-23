@@ -12,7 +12,7 @@ import './hud.css';
 export interface HudChip {
   team: string;
   goal: string;
-  /** Main mode: the match's deck from `roleReveal.deck` (GDD 3.1); absent in the quick mode. */
+  /** The match's deck from `roleReveal.deck` (GDD 3.1). */
   deck?: readonly string[];
 }
 
@@ -29,8 +29,7 @@ export function formatTimer(ticksLeft: number | null): string {
 export const formatClock = formatTimer;
 
 /**
- * A pulsing ring at a screen edge, `angle` radians clockwise from screen-up. Shared by the HUD (noise cues)
- * and the quick-mode loft (muffled creaks, with no `label` so a cue says nothing about where or what).
+ * A pulsing ring at a screen edge, `angle` radians clockwise from screen-up: the HUD's noise cues.
  */
 export function edgeCue(
   parent: HTMLElement,
