@@ -2,6 +2,7 @@ import { balance } from '@wdi/content';
 import { ErrorCode, Node, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { type PlayerSim, simOf } from '../RoomSim';
+import { emitSim } from '../events/bus';
 import { isVerbPhase, sceneKey } from '../World';
 import { balanceOf, movePurse } from './purse';
 
@@ -83,5 +84,8 @@ export function tickCoins(room: PartyRoom, sessionId: string, p: PlayerSim): voi
   p.hold = null;
   const account = accountOf(hold.targetId);
   movePurse(room, account, sessionId, balanceOf(room, account), 'pickup');
-  room.state.scenes.get(sceneKey(p.sceneIdx))?.nodes.delete(hold.targetId);
+  // Seat-free (6Z, A138): 8G's break animation may key on it; it stays on the server bus, never on the wire.
+  const sceneId = sceneKey(p.sceneIdx);
+  emitSim(room, { tick: room.state.tick, kind: 'econ.coinsTaken', data: { sceneId, nodeId: hold.targetId } });
+  room.state.scenes.get(sceneId)?.nodes.delete(hold.targetId);
 }

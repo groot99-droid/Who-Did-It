@@ -96,6 +96,8 @@ describe('coins on the ground', () => {
       ['drop', -6],
       ['pickup', 6],
     ]);
+    const taken = matchEvents(party.room).filter((e) => e.kind === 'econ.coinsTaken');
+    expect(taken.map((e) => [e.seat, e.data])).toEqual([[undefined, { sceneId: 'manor_hall', nodeId: id }]]);
     conserved(party);
   });
 
