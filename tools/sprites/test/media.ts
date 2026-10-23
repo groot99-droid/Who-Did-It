@@ -12,6 +12,8 @@ export const BUDGET = {
   musicBytes: 12 * MB,
   musicPerMapBytes: 4 * MB,
   videoBytes: 2 * MB,
+  /** The one exception (A98): the opening cinematic, streamed, outside the first load. */
+  introVideoBytes: 5 * MB,
   posterBytes: 60 * 1000,
   firstLoadBytes: 12 * MB,
   siteBytes: 150 * MB,
@@ -96,7 +98,10 @@ export interface VideoManifest {
   entries: Array<{ key: string; url: string; poster?: string; durationS: number; bytes: number }>;
 }
 
-/** Each video at most 2 MB, its poster under 60 KB, `bytes` equal to the file, `durationS` positive. */
+/** The manifest key allowed the larger cap. */
+export const INTRO_VIDEO_KEY = 'intro';
+
+/** Each video at most 2 MB (the `intro` key 5 MB), its poster under 60 KB, `bytes` equal to the file, `durationS` positive. */
 export function checkVideos(m: VideoManifest, sizeOf: SizeOf = diskSize): string[] {
   const problems: string[] = [];
   for (const e of m.entries) {
@@ -105,8 +110,8 @@ export function checkVideos(m: VideoManifest, sizeOf: SizeOf = diskSize): string
     if (actual !== null && actual !== e.bytes)
       problems.push(`video ${e.key} declares ${e.bytes} bytes, the file has ${actual}`);
     const bytes = actual ?? e.bytes;
-    if (bytes > BUDGET.videoBytes)
-      problems.push(`video ${e.key} is ${bytes} bytes, over ${BUDGET.videoBytes}`);
+    const cap = e.key === INTRO_VIDEO_KEY ? BUDGET.introVideoBytes : BUDGET.videoBytes;
+    if (bytes > cap) problems.push(`video ${e.key} is ${bytes} bytes, over ${cap}`);
     if (e.poster !== undefined) {
       const poster = sizeOf(`video/${e.poster}`);
       if (poster === null) problems.push(`poster ${e.poster} of ${e.key} is missing`);
