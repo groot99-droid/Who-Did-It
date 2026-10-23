@@ -2273,7 +2273,7 @@ body.wdi-cutscene-slam .wdi-hud-chip {
     animation: none;
   }
 }
-/* Round 6 (6K): scene transitions (view/Transition.ts), the loading screen, the landing trailer. */
+/* Round 6 (6K): scene transitions (view/Transition.ts) and the loading screen. */
 .wdi-transition {
   position: fixed;
   inset: 0;
@@ -2366,25 +2366,6 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   max-width: 420px;
   margin: 0;
   min-height: 3em;
-}
-
-.wdi-landing__trailer {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-color: var(--wdi-ink);
-}
-
-.wdi-landing__trailer[hidden] {
-  display: none;
-}
-
-.wdi-landing__video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.45;
 }
 
 /* Round 6 (6L): the sound settings gear and its panel (UI.md 14.22). */
