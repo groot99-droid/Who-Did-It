@@ -233,6 +233,45 @@
    ],
    "frameRate": 12,
    "repeat": 0
+  },
+  {
+   "key": "node_coins/break",
+   "frames": [
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/000"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/001"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/002"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/003"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/004"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/005"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/006"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
   }
  ]
 }

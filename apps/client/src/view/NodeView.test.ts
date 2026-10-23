@@ -38,7 +38,10 @@ class FakeSprite {
     this.done = [];
     for (const fn of fns) fn();
   }
-  destroy() {}
+  destroyed = false;
+  destroy() {
+    this.destroyed = true;
+  }
 }
 
 function fakeScene(withBreak: boolean) {
@@ -104,5 +107,35 @@ describe('NodeView breaks (motion.md 2, round 8 8G)', () => {
       view.update([node(false)], 0);
       expect(sprites[0]!.calls).toEqual(['frame node_tin_ore/spent']);
     }
+  });
+
+  it('sweeps up a coins heap the server removed: the break plays once where it lay, then the sprite goes', () => {
+    const coins: NodeSnap = { id: 'coins.0', resource: 'coins', x: 64, y: 64, active: true };
+    expect(nodeBreakKey('coins')).toBe('node_coins/break');
+    const { scene, sprites } = fakeScene(true);
+    const view = new NodeView(scene, () => false);
+    view.update([coins], 0);
+    view.update([], 0);
+    expect(view.has('coins.0')).toBe(false);
+    expect(sprites[0]!.calls).toEqual(['play node_coins/break']);
+    expect(sprites[0]!.destroyed).toBe(false);
+    sprites[0]!.finish();
+    expect(sprites[0]!.destroyed).toBe(true);
+  });
+
+  it('removes a node at once under reduced motion, and a sweep still playing goes with the view', () => {
+    const coins: NodeSnap = { id: 'coins.0', resource: 'coins', x: 64, y: 64, active: true };
+    const reduced = fakeScene(true);
+    const quiet = new NodeView(reduced.scene, () => true);
+    quiet.update([coins], 0);
+    quiet.update([], 0);
+    expect(reduced.sprites[0]!.calls).toEqual([]);
+    expect(reduced.sprites[0]!.destroyed).toBe(true);
+    const moving = fakeScene(true);
+    const view = new NodeView(moving.scene, () => false);
+    view.update([coins], 0);
+    view.update([], 0);
+    view.destroy();
+    expect(moving.sprites[0]!.destroyed).toBe(true);
   });
 });

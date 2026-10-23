@@ -142,6 +142,30 @@ function mushroom(g: SKRSContext2D, x: number, y: number, s: number): void {
   ell(g, c('bone', 3), x + s * 0.35, y - s * 1.2, s * 0.15, s * 0.12, 0);
 }
 
+/** One Scrip coin lying flat (`edge` false) or standing on its rim, brass with a lantern glint. */
+function coin(g: SKRSContext2D, x: number, y: number, s: number, edge = false): void {
+  if (edge) {
+    ell(g, c('brass', 1), x, y - s, s * 0.35, s, 1.5);
+    seg(g, c('lantern', 3), [x, y - s * 1.6], [x, y - s * 0.4], 1);
+    return;
+  }
+  ell(g, c('brass', 0), x, y + 1, s, s * 0.5, 1.5);
+  ell(g, c('brass', 2), x, y, s, s * 0.5, 1.5);
+  ell(g, c('lantern', 3), x - s * 0.3, y - s * 0.12, s * 0.35, s * 0.15, 0);
+}
+
+/** The dropped heap: where each coin lies, back to front, and whether it stands on its rim. */
+const HEAP: ReadonlyArray<readonly [number, number, boolean]> = [
+  [-14, -4, false],
+  [6, -6, false],
+  [-4, -2, false],
+  [16, 2, false],
+  [-18, 4, false],
+  [2, 4, false],
+  [-6, -6, true],
+  [10, -2, true],
+];
+
 export function drawNode(g: SKRSContext2D, id: string, state: 'ready' | 'spent', o: Pt): void {
   const [x, y] = o;
   const ready = state === 'ready';
@@ -271,6 +295,16 @@ export function drawNode(g: SKRSContext2D, id: string, state: 'ready' | 'spent',
             [sx + 2, sy - 5],
             [sx - 2, sy - 5],
           ]);
+      return;
+    case 'coins':
+      // A scattered heap where a purse spilled; once swept up only a scuff in the dirt is left.
+      if (ready) for (const [dx, dy, edge] of HEAP) coin(g, x + dx, y + dy, 7, edge);
+      else {
+        g.save();
+        g.globalAlpha = 0.5;
+        ell(g, c('fog', 0), x, y, 20, 7, 0);
+        g.restore();
+      }
       return;
     default:
       throw new Error(`m5b: no node art for ${id}`);
@@ -443,6 +477,34 @@ export function drawNodeBreak(g: SKRSContext2D, id: string, n: number, o: Pt): v
         debris(g, o, (n - 2) / (BREAK_FRAMES - 3), id === 'herb' ? 17 : 19, 5, (px, py, sz) =>
           ell(g, colour, px, py, 2.5 * sz, 1.8 * sz, 1),
         );
+      return;
+    }
+    case 'coins': {
+      // Swept up: a glint, then each coin lifts toward the hand in turn, spinning onto its rim, and is gone.
+      if (n === 1)
+        poly(
+          g,
+          c('lantern', 4),
+          [
+            [x, y - 30],
+            [x + 3, y - 20],
+            [x + 12, y - 17],
+            [x + 3, y - 14],
+            [x, y - 4],
+            [x - 3, y - 14],
+            [x - 12, y - 17],
+            [x - 3, y - 20],
+          ],
+          1,
+        );
+      for (const [i, [dx, dy, edge]] of HEAP.entries()) {
+        const t = Math.min(1, Math.max(0, k * 1.6 - i * 0.08));
+        if (t >= 1) continue;
+        g.save();
+        g.globalAlpha = 1 - t * t;
+        coin(g, x + dx * (1 - t * 0.7), y + dy - t * 34, 7 * (1 - t * 0.4), edge || t > 0.3);
+        g.restore();
+      }
       return;
     }
     default:

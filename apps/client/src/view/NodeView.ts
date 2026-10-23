@@ -21,10 +21,13 @@ interface Drawn {
  * each, ready or spent. A frame the atlas lacks draws a greybox disc, so a scene is playable without art.
  *
  * Round 8 (8G, motion.md 2): when the yield is taken the node plays its `break` once and rests on `spent`; as it
- * regrows the break plays backwards and rests on `ready`. Under reduced motion it cuts straight to the frame.
+ * regrows the break plays backwards and rests on `ready`. Under reduced motion it cuts straight to the frame. A coins
+ * heap, which the server removes when it is picked up, plays its break as it leaves.
  */
 export class NodeView {
   private readonly drawn = new Map<string, Drawn>();
+  /** Swept-up nodes still playing their break. */
+  private readonly leaving = new Set<Phaser.GameObjects.Sprite>();
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly reducedMotion: () => boolean = prefersReducedMotion,
@@ -51,8 +54,8 @@ export class NodeView {
     }
     for (const [id, d] of this.drawn) {
       if (present.has(id)) continue;
-      d.obj.destroy();
       this.drawn.delete(id);
+      this.sweep(d);
     }
   }
 
@@ -101,7 +104,29 @@ export class NodeView {
     else sprite.playReverse(key);
   }
 
+  /**
+   * A node gone from the feed: the coins heap a pickup took whole (8C, `sim/economy/coins.ts`). It plays its break
+   * once where it lay, then goes; anything else, or under reduced motion, goes at once. A scene change restarts the
+   * World scene and with it this view, so a node leaving the feed here was always taken.
+   */
+  private sweep(d: Drawn): void {
+    const key = nodeBreakKey(d.resource);
+    if (!d.art || !d.active || this.reducedMotion() || !this.scene.anims.exists(key)) {
+      d.obj.destroy();
+      return;
+    }
+    const sprite = d.obj as Phaser.GameObjects.Sprite;
+    this.leaving.add(sprite);
+    sprite.once('animationcomplete', () => {
+      this.leaving.delete(sprite);
+      sprite.destroy();
+    });
+    sprite.play(key);
+  }
+
   destroy(): void {
+    for (const s of this.leaving) s.destroy();
+    this.leaving.clear();
     for (const d of this.drawn.values()) d.obj.destroy();
     this.drawn.clear();
   }
