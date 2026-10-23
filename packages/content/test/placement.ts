@@ -10,14 +10,17 @@ import type { Scene } from '../src/index.js';
 
 /**
  * - `hung`: on a wall (a solid tile behind it, to the north) and facing the floor south of it;
+ * - `hungEast`: on a west wall (a solid tile behind it, to the west) and facing the floor east of it;
  * - `front`: free-standing with a front, used from the floor south of it;
+ * - `frontEast`: free-standing with a front, used from the floor east of it;
  * - `free`: free-standing, used or seen from any side;
  * - `floor`: flat on a walkable tile (a mark, a rug), never solid;
  * - `overlay`: one tile inside a `surface` prop's footprint (the plates on the Wake Table);
  * - `doorOverlay`: one tile over a building's door (the mourning crepe);
  * - `surface`: a table or ledge that overlays stand on; free otherwise.
  */
-export type PlaceClass = 'hung' | 'front' | 'free' | 'floor' | 'overlay' | 'doorOverlay' | 'surface';
+export type PlaceClass =
+  'hung' | 'hungEast' | 'front' | 'frontEast' | 'free' | 'floor' | 'overlay' | 'doorOverlay' | 'surface';
 
 export interface PlacementRules {
   /** The class of a prop, by kind, or by id tail for `decor` and `taskSource` (whose art is keyed by the tail). */
@@ -145,11 +148,15 @@ export function placementProblems(
       out.push(
         `prop ${p.id} stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)`,
       );
-    const south = tiles.filter(([x, y]) => !tiles.some(([a, b]) => a === x && b === y + 1));
-    const north = tiles.filter(([x, y]) => !tiles.some(([a, b]) => a === x && b === y - 1));
-    if ((cls === 'hung' || cls === 'front') && !south.some(([x, y]) => walkable(x, y + 1)))
+    const edge = (dx: number, dy: number) =>
+      tiles.filter(([x, y]) => !tiles.some(([a, b]) => a === x + dx && b === y + dy));
+    if ((cls === 'hung' || cls === 'front') && !edge(0, 1).some(([x, y]) => walkable(x, y + 1)))
       out.push(`prop ${p.id} faces south into no floor (its front is hidden)`);
-    if (cls === 'hung' && !north.every(([x, y]) => solid(x, y - 1)))
+    if ((cls === 'hungEast' || cls === 'frontEast') && !edge(1, 0).some(([x, y]) => walkable(x + 1, y)))
+      out.push(`prop ${p.id} faces east into no floor (its front is hidden)`);
+    if (cls === 'hung' && !edge(0, -1).every(([x, y]) => solid(x, y - 1)))
+      out.push(`wall-hung prop ${p.id} has no wall behind it`);
+    if (cls === 'hungEast' && !edge(-1, 0).every(([x, y]) => solid(x - 1, y)))
       out.push(`wall-hung prop ${p.id} has no wall behind it`);
     if (cls !== 'floor' && !tiles.some(([x, y]) => reachableFrom(x, y)))
       out.push(`prop ${p.id} has no reachable floor beside it`);
@@ -159,7 +166,10 @@ export function placementProblems(
     if (cls === undefined) out.push(`spot ${s.id} (${s.variant}) has no placement class`);
     if ((cls === 'hung' || cls === 'front') && !walkable(s.x, s.y + 1))
       out.push(`spot ${s.id} faces south into no floor`);
+    if ((cls === 'hungEast' || cls === 'frontEast') && !walkable(s.x + 1, s.y))
+      out.push(`spot ${s.id} faces east into no floor`);
     if (cls === 'hung' && !solid(s.x, s.y - 1)) out.push(`wall-hung spot ${s.id} has no wall behind it`);
+    if (cls === 'hungEast' && !solid(s.x - 1, s.y)) out.push(`wall-hung spot ${s.id} has no wall behind it`);
   }
 
   // Nothing blocks the things a player must reach: doors, spawns, spots, task nodes, resource nodes, stations
