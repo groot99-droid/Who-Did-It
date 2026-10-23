@@ -3,6 +3,7 @@ import { TILE_PX } from '@wdi/shared';
 import { expect, test, type Page } from '@playwright/test';
 import { type Swarm, runSwarm } from '../../../tools/bots/swarm';
 import { E2E_SERVER_URL } from './env';
+import { skipOpening } from './helpers';
 import { createParty as startParty } from './fixtures/party';
 
 // NPC fill (M3c, GDD 3.12) end to end against the real server. The host adds NPC seats in the lobby or
@@ -110,7 +111,7 @@ const WORLD_KEYS = {
 const OPPOSITE: Record<string, string> = { KeyW: 'KeyS', KeyS: 'KeyW', KeyA: 'KeyD', KeyD: 'KeyA' };
 
 /** Walk the host toward a named seat with the keys of each world axis that is off, until in reach. */
-async function approach(page: Page, v: () => StateView, target: string, ms = 20_000): Promise<void> {
+async function approach(page: Page, v: () => StateView, target: string, ms = 20_000): Promise<boolean> {
   const pos = (name: string) => positionOf(v(), name);
   const held = new Set<string>();
   const press = async (key: string, on: boolean) => {
@@ -121,6 +122,7 @@ async function approach(page: Page, v: () => StateView, target: string, ms = 20_
   };
   try {
     for (const t0 = Date.now(); tilesBetween(v(), 'Hana', target) > 1.1 && Date.now() - t0 < ms;) {
+      if (await page.getByTestId('gameover').isVisible()) return false; // the match ended on the way (see the kill loop)
       const a = pos('Hana');
       const b = pos(target);
       if (a && b) {
@@ -139,6 +141,7 @@ async function approach(page: Page, v: () => StateView, target: string, ms = 20_
     for (const k of [...held]) await page.keyboard.up(k);
   }
   expect(tilesBetween(v(), 'Hana', target) <= 1.1, `the host reached ${target}`).toBe(true);
+  return true;
 }
 
 test('three NPC seats added by hand: the host kills and reports, the NPCs vote in time, the match ends', async ({
@@ -167,6 +170,7 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
     await page.getByTestId('confirm-start').click();
     await expect(page.getByTestId('role-name')).toHaveText('Killer');
     await page.getByTestId('ready').click();
+    await skipOpening(page);
     await expect(page.getByTestId('hud-clock')).toBeVisible();
     // Park the NPCs on their spawns so the host can find them, and free the Knife; the Knife works from dusk to the
     // end of the night (balance.json `kill.phases`, GDD 3.2), so the clock goes to the night.
@@ -203,9 +207,18 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
     const bodies = () => w.view().scenes.get('overworld')?.bodies.size ?? 0;
     const downed = new Set<string>();
     for (let i = 0; i < 2; i++) {
-      const prey = alive().find((n) => !downed.has(n))!;
+      // An NPC that went indoors is out of the watcher's scene-scoped view: take one in sight, wait for one if none is.
+      const inSight = () => alive().find((n) => !downed.has(n) && positionOf(w.view(), n)) ?? '';
+      // The meeting's vote can eject an NPC (a Skip is not the only vote an NPC may cast), which leaves the Village at
+      // one a kill early: the match is then already over and the last kill is not needed.
+      const target = async () => ((await page.getByTestId('gameover').isVisible()) ? 'over' : inSight());
+      await expect
+        .poll(target, { message: `a seat to kill ${i + 2} is in sight`, timeout: 30_000 })
+        .not.toBe('');
+      const prey = await target();
+      if (prey === 'over') break;
       const before = bodies();
-      await approach(page, w.view, prey);
+      if (!(await approach(page, w.view, prey))) break;
       await page.keyboard.press('KeyQ');
       await expect.poll(bodies, { message: `kill ${i + 2} leaves a body` }).toBe(before + 1);
       downed.add(prey);
@@ -233,6 +246,7 @@ test('Start alone fills the party: four portraits in the meeting', async ({ brow
     await page.getByTestId('confirm-start').click();
     await expect(page.getByTestId('role-name')).toHaveText('Killer');
     await page.getByTestId('ready').click();
+    await skipOpening(page);
     await expect(page.getByTestId('hud-clock')).toBeVisible();
     w.swarm.rooms[0]!.send('debug.npc', { walk: false });
     w.swarm.rooms[0]!.send('debug.clock', { phase: 'night', clearCooldowns: true });

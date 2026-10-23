@@ -3,6 +3,7 @@ import { TILE_PX } from '@wdi/shared';
 import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test';
 import { type Swarm, runSwarm } from '../../../tools/bots/swarm';
 import { E2E_SERVER_URL } from './env';
+import { skipOpening } from './helpers';
 import { createParty, joinParty } from './fixtures/party';
 
 // The first playable, end to end against the real server (M3): two browsers and bots play kill -> body ->
@@ -15,11 +16,15 @@ test.skip(process.env.WDI_E2E_MATCH !== '1', 'needs the M3 sessions K, L, M and 
 interface PlayerView {
   id: string;
   name: string;
-  presence?: { x: number; y: number };
+}
+/** Round 5 (A50): other seats are avatars in the scene's view, `lookOf` names the seat drawn. */
+interface SceneView {
+  bodies: { size: number };
+  avatars: { forEach(cb: (a: { lookOf: string; x: number; y: number }) => void): void };
 }
 interface StateView {
   players: { forEach(cb: (p: PlayerView) => void): void };
-  scenes: { get(key: string): { bodies: { size: number } } | undefined };
+  scenes: { get(key: string): SceneView | undefined };
 }
 
 interface Match {
@@ -31,6 +36,7 @@ interface Match {
   ids: () => Map<string, string>;
   /** Tile distance between two players as the observer bot sees them. */
   tilesBetween: (a: string, b: string) => number;
+  at: (name: string) => { x: number; y: number } | undefined;
   debug: (type: 'debug.deal' | 'debug.clock', payload: unknown) => void;
   bodies: () => number;
   close: () => Promise<void>;
@@ -61,9 +67,10 @@ async function startMatch(browser: Browser, botCount: number, botVote: string): 
     return out;
   };
   const position = (name: string) => {
+    const id = roster().get(name);
     let at: { x: number; y: number } | undefined;
-    (observer.state as unknown as StateView).players.forEach((p) => {
-      if (p.name === name) at = p.presence;
+    (observer.state as unknown as StateView).scenes.get('overworld')?.avatars.forEach((a) => {
+      if (a.lookOf === id) at = a;
     });
     return at;
   };
@@ -73,6 +80,7 @@ async function startMatch(browser: Browser, botCount: number, botVote: string): 
     code,
     swarm,
     ids: roster,
+    at: position,
     tilesBetween: (a, b) => {
       const pa = position(a);
       const pb = position(b);
@@ -96,27 +104,50 @@ async function startMatch(browser: Browser, botCount: number, botVote: string): 
   await swarm.dealt;
   await host.getByTestId('ready').click();
   await guest.getByTestId('ready').click();
+  await Promise.all([skipOpening(host), skipOpening(guest)]);
   await expect(host.getByTestId('hud-clock')).toBeVisible();
   await expect(guest.getByTestId('hud-clock')).toBeVisible();
-  // Out of grace with the Knife ready.
-  m.debug('debug.clock', { phase: 'day', clearCooldowns: true });
+  // Out of grace with the Knife ready: the Kill is allowed from dusk to the last night only (abilities.json).
+  m.debug('debug.clock', { phase: 'night', clearCooldowns: true });
   return m;
 }
 
-/** Hold a movement key until `near()` holds (or give up), then release it. */
-async function walkUntil(page: Page, key: string, near: () => boolean, ms = 15_000): Promise<void> {
-  await page.keyboard.down(key);
+/**
+ * Steer the host toward `victim` with the four movement keys until it stands within a tile, then release them.
+ * The spawn squares moved with the round-5 and round-6 maps, so the way is read off the avatars, not assumed.
+ */
+async function walkToward(m: Match, victim: string, ms = 30_000): Promise<void> {
+  const held = new Set<string>();
+  const set = async (key: string, on: boolean) => {
+    if (on === held.has(key)) return;
+    if (on) held.add(key);
+    else held.delete(key);
+    await (on ? m.host.keyboard.down(key) : m.host.keyboard.up(key));
+  };
   try {
-    for (const t0 = Date.now(); !near() && Date.now() - t0 < ms;) await sleep(30);
+    for (
+      const t0 = Date.now();
+      m.tilesBetween('Hana', victim) > 1.1 && Date.now() - t0 < ms;
+      await sleep(30)
+    ) {
+      const me = m.at('Hana');
+      const to = m.at(victim);
+      if (!me || !to) continue;
+      const slack = TILE_PX / 4;
+      await set('KeyD', to.x - me.x > slack);
+      await set('KeyA', me.x - to.x > slack);
+      await set('KeyS', to.y - me.y > slack);
+      await set('KeyW', me.y - to.y > slack);
+    }
   } finally {
-    await page.keyboard.up(key);
+    for (const key of [...held]) await set(key, false);
   }
-  expect(near(), 'the host reached its target').toBe(true);
+  expect(m.tilesBetween('Hana', victim), 'the host reached its target').toBeLessThanOrEqual(1.1);
 }
 
-/** The host walks east along the square to `victim`, strikes with Q and reports the body with E. */
+/** The host walks to `victim`, strikes with Q and reports the body with E. */
 async function killAndReport(m: Match, victim: string): Promise<void> {
-  await walkUntil(m.host, 'KeyD', () => m.tilesBetween('Hana', victim) <= 1.1);
+  await walkToward(m, victim);
   await m.host.keyboard.press('KeyQ');
   await expect.poll(m.bodies, { message: 'a body appears' }).toBe(1);
   await expect(m.host.getByTestId('prompt')).toContainText(/report/i);

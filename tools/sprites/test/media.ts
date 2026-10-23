@@ -4,20 +4,10 @@
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { BUDGET, PRE_MATCH_PLAYLISTS } from './budgets.ts';
 import { ASSETS } from './realAssets.ts';
 
-export const MB = 1024 * 1024;
-export const BUDGET = {
-  sfxBytes: 6 * MB,
-  musicBytes: 12 * MB,
-  musicPerMapBytes: 4 * MB,
-  videoBytes: 2 * MB,
-  /** The one exception (A98): the opening cinematic, streamed, outside the first load. */
-  introVideoBytes: 5 * MB,
-  posterBytes: 60 * 1000,
-  firstLoadBytes: 12 * MB,
-  siteBytes: 150 * MB,
-} as const;
+export { BUDGET, MB, PRE_MATCH_PLAYLISTS } from './budgets.ts';
 
 /** The size of a file under `assets/`, or null when it does not exist. */
 export type SizeOf = (relPath: string) => number | null;
@@ -84,6 +74,7 @@ export function checkMusic(
   for (const map of maps) {
     const keys = new Set(m.tracks.filter((t) => t.map === map).map((t) => t.key));
     for (const id of Object.values(byMap[map] ?? {})) {
+      if (PRE_MATCH_PLAYLISTS.includes(id ?? '')) continue;
       for (const key of playlistTracks.get(id ?? '') ?? []) keys.add(key);
     }
     const sum = [...keys].reduce((n, k) => n + (bytesOf.get(k) ?? 0), 0);

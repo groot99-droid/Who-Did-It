@@ -31,7 +31,8 @@ test('create, join by deep link, start with 4 bots, both browsers get a role car
 
   // The invite link opens the join screen with the code filled in.
   await guest.goto(`/Who-Did-It/#/join/${code}`);
-  await expect(guest.getByLabel('Party code')).toHaveValue(code);
+  // The second browser boots Phaser and the menu assets while the host's lobby renders: about 25 s on a software-GL runner.
+  await expect(guest.getByLabel('Party code')).toHaveValue(code, { timeout: 60_000 });
   await joinParty(guest, code, 'Gus');
   await expect(guest.getByTestId('party-code')).toHaveText(code);
   await expect(guest.getByTestId('start')).toBeHidden();
