@@ -703,6 +703,15 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   and nothing more.
 - **Wages.** The town pays `economy.taskWage` for each finished task, a fake task exactly as a real one, so a purse
   never tells a worker from a pretender. A quest turn-in pays the quest's `scrip` (`quests.json`) beside its items.
+- **Shops.** A shop is a counter or stall in a scene (`economy.json` `shops`). Holding the action key at it opens
+  its panel, privately: what it sells at its `ask` and what it buys at its `pay` (`economy.json` `prices`). A living
+  seat in a world phase other than the immunity window buys and sells while the counter stays within
+  `doors.reachTiles`. A purchase is refused, and nothing changes, when the purse or the inventory falls short. The
+  bakery sells flour, the apothecary bandages and salts, the general store (HollowMere's tavern bar, BlackPine's
+  lodge) rope, lantern oil, candles and planks, and the Gamekeeper's stall (HollowMere's forest edge, BlackPine's
+  lodge) snares and torches. The market (HollowMere's square, BlackPine's camp) sells nothing and buys timber, stone,
+  resin, herbs, mushrooms and tin ore. No shop trades a role's kit, and an item a shop both sells and buys pays
+  less than it asks.
 - **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice. It leaves only as a
   purchase, rent, a fine, a donation or an HQ tier. Theft, drops, pickups and the bank only move it.
 

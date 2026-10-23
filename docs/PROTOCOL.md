@@ -33,6 +33,8 @@
 | `quest.accept` | `{ questId: string }` | 2/s | Round 6 (M5b, GDD 3.16): a `quests.json` id whose giver stands in reach. Refused 422 until Session 6H lands. |
 | `quest.turnIn` | `{ questId: string }` | 2/s | Round 6 (M5b, GDD 3.16): an accepted quest whose wants the inventory holds, at its giver. Refused 422 until 6H. |
 | `minigame.result` | `{ taskId: string; answer: unknown }` | 2/s | Round 6 (M5b, GDD 3.16): the answer to the `minigameStart` of `taskId`; the server checks it against the solution it kept and completes the task. Refused 422 until Session 6H lands. |
+| `act.buy` | `{ shopId: string; itemId: string; qty: number }` | 5/s | Round 8 (GDD 3.23, 8C): `qty` of `itemId` from `shopId`, which a `shop` hold opened and whose counter is still in reach, at its `ask` each, paid from the purse. Refused 422 when the purse or the inventory falls short. |
+| `act.sell` | `{ shopId: string; itemId: string; qty: number }` | 5/s | Round 8 (GDD 3.23, 8C): `qty` of `itemId` from the inventory to `shopId`, at its `pay` each, into the purse. |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
 
@@ -57,6 +59,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `shot` | `{ fromId: string; targetId: string; role: string }` | Public, only during a reveal: the ejected Gamekeeper shot `targetId`, whose role was `role` (GDD 3.2). |
 | `cutscene` | `{ id: string; scope?: 'all' }` | Round 6 (M5c, GDD 3.18): play the cutscene `id` of `packages/content/data/cutscenes/`. Broadcast once for a map's opening at `beginPlay`; `scope: 'all'` marks a memorial every client plays (round 7). The server never waits for a client to finish it. A death's cutscene travels on `killed.cutsceneId` instead. |
 | `minigameStart` | `{ taskId: string; kind: MinigameKind; public: unknown }` | Private, round 6 (M5b, GDD 3.16): a station task's hold opened its mini-game; `public` is the puzzle without its solution (`rules/minigames.ts generate`). Answered with `minigame.result`. |
+| `shop.open` | `{ shopId: string; stock: Array<{ itemId: string; price: number }>; buys: Array<{ itemId: string; price: number }>; }` | Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 
@@ -166,7 +169,8 @@ export interface CreateOptions extends JoinOptions {
 ```
 
 ```ts
-export type HoldAction = 'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft';
+export type HoldAction =
+  'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft' | 'shop' | 'bank';
 ```
 
 ```ts

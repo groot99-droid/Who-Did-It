@@ -33,6 +33,10 @@ export const C2S = {
   questTurnIn: 'quest.turnIn',
   /** Round 6 (M5b, GDD 3.16): the answer to a `minigameStart`; Session 6H reads it. */
   minigameResult: 'minigame.result',
+  /** Round 8 (GDD 3.23, 8C): buy from the shop the seat holds open; Session 8C reads it. */
+  buy: 'act.buy',
+  /** Round 8 (GDD 3.23, 8C): sell to the shop the seat holds open; Session 8C reads it. */
+  sell: 'act.sell',
 } as const;
 
 export const S2C = {
@@ -55,13 +59,16 @@ export const S2C = {
   cutscene: 'cutscene',
   /** Round 6 (M5b, GDD 3.16): a station task's mini-game; sent by Session 6H, nothing sends it before. */
   minigameStart: 'minigameStart',
+  /** Round 8 (GDD 3.23, 8C): a `shop` hold opened a shop; sent by Session 8C. */
+  shopOpen: 'shop.open',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
 export type S2CType = (typeof S2C)[keyof typeof S2C];
 
 /** `gather` and `craft` are round 6 (M5b, GDD 3.14); the server refuses them until Session 6F lands. */
-export type HoldAction = 'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft';
+export type HoldAction =
+  'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft' | 'shop' | 'bank';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke';
 /**
@@ -211,6 +218,13 @@ export interface C2SPayloads {
    * solution it kept and completes the task. Refused 422 until Session 6H lands.
    */
   'minigame.result': { taskId: string; answer: unknown };
+  /**
+   * Round 8 (GDD 3.23, 8C): `qty` of `itemId` from `shopId`, which a `shop` hold opened and whose counter is still in
+   * reach, at its `ask` each, paid from the purse. Refused 422 when the purse or the inventory falls short.
+   */
+  'act.buy': { shopId: string; itemId: string; qty: number };
+  /** Round 8 (GDD 3.23, 8C): `qty` of `itemId` from the inventory to `shopId`, at its `pay` each, into the purse. */
+  'act.sell': { shopId: string; itemId: string; qty: number };
 }
 
 export interface S2CPayloads {
@@ -263,6 +277,15 @@ export interface S2CPayloads {
    * its solution (`rules/minigames.ts generate`). Answered with `minigame.result`.
    */
   minigameStart: { taskId: string; kind: MinigameKind; public: unknown };
+  /**
+   * Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each
+   * price, `buys` what it pays for. Answered with `act.buy` and `act.sell`.
+   */
+  'shop.open': {
+    shopId: string;
+    stock: Array<{ itemId: string; price: number }>;
+    buys: Array<{ itemId: string; price: number }>;
+  };
 }
 
 export type ErrorPayload = S2CPayloads['error'];
@@ -294,6 +317,8 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'quest.accept': 2,
   'quest.turnIn': 2,
   'minigame.result': 2,
+  'act.buy': 5,
+  'act.sell': 5,
 };
 
 export const ErrorCode = {
