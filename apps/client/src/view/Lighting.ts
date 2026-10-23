@@ -134,6 +134,9 @@ export class Lighting {
   resize(): void {
     const cam = this.scene.cameras.main;
     this.dark.setSize(Math.max(2, cam.width), Math.max(2, cam.height));
+    // The image keeps the size and origin of the frame it was made with: without this it stays centred on the old
+    // size and leaves a strip of the canvas uncovered on the left and top after a resize (the owner's "shadow").
+    this.image.setSizeToFrame().updateDisplayOrigin();
     this.lastDraw = -1;
   }
 
