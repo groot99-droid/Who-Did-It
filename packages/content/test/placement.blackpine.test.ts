@@ -44,6 +44,37 @@ export const BLACKPINE_RULES: PlacementRules = {
     refuge_table: 'surface',
     map_table: 'surface',
     teachingClue: 'floor',
+    // The dressing kit (kind `dressing`, art by tail and stem).
+    crate: 'free',
+    crates: 'free',
+    barrel: 'free',
+    sacks: 'free',
+    stool: 'free',
+    chair: 'free',
+    bench: 'free',
+    side_table: 'surface',
+    wall_lamp: 'hung',
+    wall_shelf: 'hung',
+    window: 'hung',
+    cupboard: 'front',
+    footlocker: 'free',
+    firewood: 'free',
+    bucket: 'free',
+    coat_rack: 'free',
+    axe_block: 'free',
+    saw_horse: 'free',
+    rope_coil: 'free',
+    workbench: 'front',
+    grindstone: 'free',
+    timber_set: 'free',
+    rock_pile: 'free',
+    ore_pile: 'free',
+    lamp_post: 'free',
+    wheelbarrow: 'free',
+    stump: 'free',
+    log: 'free',
+    signpost: 'free',
+    cart: 'free',
   },
   spots: {
     behindCounter: 'free',
@@ -70,12 +101,23 @@ export const BLACKPINE_RULES: PlacementRules = {
     pool: 'free',
   },
   lights: {
-    lamp: { props: ['pegs', 'tally_board', 'ledger_desk', 'mess_table', 'refuge_table', 'map_table'] },
-    lantern: { props: ['lanternPost'] },
+    lamp: {
+      props: [
+        'tally_board',
+        'ledger_desk',
+        'mess_table',
+        'refuge_table',
+        'map_table',
+        'side_table',
+        'wall_lamp',
+        'lamp_post',
+      ],
+    },
+    lantern: { props: ['lanternPost', 'lamp_post'] },
     fire: { props: ['oven', 'forge', 'kiln_0', 'kiln_1'], building: true },
-    torch: { props: [], wall: true },
-    window: { props: [], wall: true, building: true },
-    moon: { props: [], wall: true, building: true, outdoors: true },
+    torch: { props: ['timber_set'], wall: true },
+    window: { props: ['window'], wall: true, building: true },
+    moon: { props: ['window'], wall: true, building: true, outdoors: true },
   },
 };
 
@@ -122,8 +164,35 @@ const taskPropsOf = (sceneId: string): Set<string> =>
       (t.targets ?? []).filter((n) => n.scene === sceneId).map((n) => n.prop),
     ),
   );
+/**
+ * placement.ts keys a prop's art by its kind, or by id tail for `decor`; Blackpine's `dressing` props are keyed by
+ * tail and then by stem (`bl.crate_2` -> crate, SPRITES 3). Until the shared check reads them so, they are
+ * checked as `decor` against a class table and holder lists that fall back to the stem.
+ */
+const stem = (k: string) => k.replace(/_\d+$/, '');
+class Holders extends Array<string> {
+  override includes(k: string) {
+    return super.includes(k) || super.includes(stem(k));
+  }
+}
+const CHECKED: PlacementRules = {
+  ...BLACKPINE_RULES,
+  props: new Proxy(BLACKPINE_RULES.props, {
+    get: (t, k: string) => t[k] ?? t[stem(k)],
+  }),
+  lights: Object.fromEntries(
+    Object.entries(BLACKPINE_RULES.lights).map(([k, v]) => [
+      k,
+      { ...v, props: Holders.from(v!.props) as unknown as string[] },
+    ]),
+  ),
+};
+const asChecked = (s: Scene): Scene => ({
+  ...s,
+  props: s.props.map((p) => (p.kind === 'dressing' ? { ...p, kind: 'decor' } : p)),
+});
 const problemsOf = (s: Scene) => [
-  ...placementProblems(s, BLACKPINE_RULES, taskPropsOf(s.id)),
+  ...placementProblems(asChecked(s), CHECKED, taskPropsOf(s.id)),
   ...wallProblems(s),
 ];
 
@@ -131,56 +200,7 @@ const problemsOf = (s: Scene) => [
  * Scenes not yet placed by 8K, with the problems they still have: each room's pull request fixes its scene and
  * takes it off this list, and the test fails on an entry that no longer fails, so the list only shrinks.
  */
-const PENDING: Partial<Record<SceneId, readonly string[]>> = {
-  bp_camp: [
-    'light bc.lt_lodge_window (window) at 15,20 hangs on nothing that could hold it',
-    'light bc.lt_mill_window (window) at 46,25 hangs on nothing that could hold it',
-    'light bc.lt_office_window (window) at 49,12 hangs on nothing that could hold it',
-    'light bc.lt_smithy_glow (fire) at 33,12 hangs on nothing that could hold it',
-    'light bc.lt_adit_torch (torch) at 41,4 hangs on nothing that could hold it',
-  ],
-  bp_lodge: [
-    'prop bl.stove faces south into no floor (its front is hidden)',
-    'light bl.lt_stove (fire) at 1,3 hangs on nothing that could hold it',
-    'light bl.lt_lamp_mess (lamp) at 7,7 hangs on nothing that could hold it',
-    'light bl.lt_lamp_bunks (lamp) at 17,5 hangs on nothing that could hold it',
-    'prop bl.stove stands in the wall ring at 0,3 (it leaves a hole in the wall)',
-    'prop bl.basin stands in the wall ring at 9,0 (it leaves a hole in the wall)',
-    'prop bl.pegs stands in the wall ring at 11,0 (it leaves a hole in the wall)',
-  ],
-  bp_mill: [
-    'light bs.lt_lamp_saw (lamp) at 11,8 hangs on nothing that could hold it',
-    'light bs.lt_lamp_door (lamp) at 20,7 hangs on nothing that could hold it',
-    'prop bs.gearing stands in the wall ring at 12,0 (it leaves a hole in the wall)',
-  ],
-  bp_woods: [
-    'light bw.lt_kiln_0 (fire) at 23,28 hangs on nothing that could hold it',
-    'light bw.lt_kiln_1 (fire) at 27,28 hangs on nothing that could hold it',
-    'light bw.lt_chute_lantern (lantern) at 43,10 hangs on nothing that could hold it',
-  ],
-  bp_mine: [
-    'light bm.lt_adit_torch (torch) at 23,26 hangs on nothing that could hold it',
-    'light bm.lt_lamp_chamber (lamp) at 18,13 hangs on nothing that could hold it',
-    'light bm.lt_lamp_tally (lamp) at 20,10 hangs on nothing that could hold it',
-    'light bm.lt_torch_winze (torch) at 35,9 hangs on nothing that could hold it',
-  ],
-  bp_office: [
-    'light bo.lt_desk_lamp (lamp) at 13,4 hangs on nothing that could hold it',
-    'light bo.lt_store_lamp (lamp) at 5,6 hangs on nothing that could hold it',
-    'prop bo.shelves stands in the wall ring at 3,0 (it leaves a hole in the wall)',
-    'prop bo.telephone stands in the wall ring at 10,0 (it leaves a hole in the wall)',
-  ],
-  bp_smithy: [
-    'prop bf.tool_rack faces south into no floor (its front is hidden)',
-    'light bf.lt_forge (fire) at 7,2 hangs on nothing that could hold it',
-    'light bf.lt_lamp (lamp) at 12,7 hangs on nothing that could hold it',
-    'prop bf.tool_rack stands in the wall ring at 0,5 (it leaves a hole in the wall)',
-  ],
-  bp_deep: [
-    'light bd.lt_refuge_lamp (lamp) at 6,23 hangs on nothing that could hold it',
-    'light bd.lt_torch_adit (torch) at 3,20 hangs on nothing that could hold it',
-  ],
-};
+const PENDING: Partial<Record<SceneId, readonly string[]>> = {};
 
 /** Every id the rooms had before round 8 (art.md 4.6): spawns, spots, nodes, givers, props, spawners and paths. */
 const FROZEN: Record<string, string[]> = {
