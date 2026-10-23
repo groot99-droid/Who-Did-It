@@ -6,6 +6,7 @@
 import { registeredInvariants } from '../../../apps/server/src/sim/auto/invariants';
 import '../../../apps/server/src/sim/vendettas/invariants';
 import '../../../apps/server/src/sim/body/invariants';
+import '../../../apps/server/src/sim/tasks/invariants';
 
 /** The seven checks of `auto-admin.md` 5, in its order (DECISIONS A84 has the names). */
 export const ROUND6_CHECKS = [
@@ -18,8 +19,17 @@ export const ROUND6_CHECKS = [
   'killClues',
 ] as const;
 
-/** The four vendetta checks of `docs/round7/vendettas.md` 2, in their registration order (GDD 3.20). */
-export const ROUND7_CHECKS = ['vendettaOnce', 'contractQuest', 'strongboxOnce', 'vendettaPublic'] as const;
+/**
+ * The four vendetta checks of `docs/round7/vendettas.md` 2, in their registration order (GDD 3.20), then 7M's task
+ * check (GDD 3.5, A133) from `sim/tasks/invariants.ts`.
+ */
+export const ROUND7_CHECKS = [
+  'vendettaOnce',
+  'contractQuest',
+  'strongboxOnce',
+  'vendettaPublic',
+  'taskBar',
+] as const;
 
 /** The body check of `docs/round8/body.md` 8 (GDD 3.22). */
 export const ROUND8_CHECKS = ['bodyBounds'] as const;

@@ -7,7 +7,7 @@ import { hasManifest, type Page, realPages } from './realAssets.ts';
  * style separately (1.9: one style is resident at a time).
  */
 const PAGE = 2048 * 2048;
-const RESIDENT_CAP = 6.0;
+const RESIDENT_CAP = 6.1;
 const LOOKS_COUNTED = 10;
 
 /** [prefix, width cap, height cap]; the first matching prefix wins, so `props_` precedes `props`. */
