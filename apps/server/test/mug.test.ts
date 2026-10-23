@@ -1,15 +1,26 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance } from '@wdi/content';
-import { Phase, TILE_PX } from '@wdi/shared';
+import { ClueKind, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { avatarOf } from '../src/sim/Avatars';
+import { runInvariants } from '../src/sim/auto/invariants';
+import { AnimId } from '../src/sim/constants';
 import { TOWN, balanceOf, movePurse } from '../src/sim/economy/purse';
 import { onSim, type SimEvent } from '../src/sim/events/bus';
 import { npcMemory } from '../src/sim/npc/memory';
 import { needsOf } from '../src/sim/npc/needs';
 import { simOf } from '../src/sim/RoomSim';
 import { type Figure, figuresOf, rehandleFigure } from '../src/sim/townsfolk/figures';
-import { type MugFactors, aloneTarget, mugChance } from '../src/sim/townsfolk/mug';
-import { sceneIndex } from '../src/sim/World';
+import {
+  type MugFactors,
+  aloneTarget,
+  figureAccount,
+  handleMug,
+  mugChance,
+  muggingOf,
+} from '../src/sim/townsfolk/mug';
+import { sceneIndex, tileCentre } from '../src/sim/World';
+import { until } from './flowHelpers';
 import { openRun } from './killHelpers';
 import {
   type Party,
@@ -26,14 +37,16 @@ import {
 } from './npcHelpers';
 
 /**
- * The mugging roll (round 8, GDD 3.24, docs/round8/townsfolk.md 3; Session 8E): the chance rises with the purse
- * band and the mood and falls with fear and a lit light, and the one seat alone with the mugger is found by A100's
- * room rule with the figures as company too.
+ * The mugging (round 8, GDD 3.24, docs/round8/townsfolk.md 3 and 4; Session 8E): the roll rises with the purse band
+ * and the mood and is zero with company or a lit light; the walk-up, the threat and the prompt; Pay, the silent
+ * take and the escape through a door (Flee and Fight are part two, A161); the cooldown; nothing of it on the wire.
  */
 
 /** The cellar is not the hub, is dark by day and has no creature spawner. */
 const RUN = openRun('cellar', 6);
 const m = balance.moods.mug;
+const ticksOf = (s: number) => Math.round(s * TICK_RATE);
+const figureNotSeat = (party: Party) => runInvariants(party.room).filter((f) => f.name === 'figureNotSeat');
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -95,6 +108,24 @@ async function world(
   for (const kind of ['mug.start', 'mug.end', 'rob']) onSim(room, kind, (e) => heard.push(e));
   advance(party, 1);
   return { party, human, target, mugger, heard };
+}
+
+/** Steps until a mugging of `human` is under way, within `maxS` seconds; returns whether one started. */
+function untilMugged(party: Party, human: string, maxS = 180): boolean {
+  for (let i = 0; i < ticksOf(maxS); i++) {
+    advance(party, 1);
+    if (muggingOf(party.room, human)) return true;
+  }
+  return false;
+}
+
+/** Steps until the human's prompt is open. */
+function untilPrompt(party: Party, human: string): void {
+  for (let i = 0; i < ticksOf(m.approachS + m.threatS + 1); i++) {
+    advance(party, 1);
+    if (muggingOf(party.room, human)?.state === 'prompt') return;
+  }
+  throw new Error('no prompt');
 }
 
 const BASE: MugFactors = {
@@ -159,5 +190,116 @@ describe('the mugging roll', () => {
     placeSeat(party, human, 'overworld', 3, 3);
     placeFigure(party, mugger, 'overworld', 4, 3);
     expect(aloneTarget(room, { ...who, sceneIdx: mugger.sceneIdx, x: mugger.x, y: mugger.y })).toBeNull();
+  });
+});
+
+describe('a mugging', () => {
+  it('walks up, threatens, prompts the target, and takes the share when the target pays', async () => {
+    const { party, human, mugger, heard } = await world();
+    const room = party.room;
+    expect(untilMugged(party, human)).toBe(true);
+    expect(heard.map((e) => e.kind)).toEqual(['mug.start']);
+    expect(heard[0]!.data).toEqual({ mugger: mugger.id, target: human });
+    expect(muggingOf(room, human)?.state).toBe('approach');
+    untilPrompt(party, human);
+    // The walk-up ended within reach, the threat played on the avatar, and only the target heard of it.
+    const t = simOf(room).players.get(human)!;
+    expect(Math.hypot(t.x - mugger.x, t.y - mugger.y)).toBeLessThanOrEqual(m.reachTiles * TILE_PX);
+    expect(avatarOf(room, mugger.handle as string)?.animId).toBe(AnimId.threaten);
+    const log = party.humans[0]!.log;
+    expect(await until(() => log.some((e) => e.type === 'mugPrompt'))).toBe(true);
+    const prompt = log.find((e) => e.type === 'mugPrompt')!.payload as { muggerId: string; endsTick: number };
+    expect(prompt.muggerId).toBe(mugger.handle);
+    expect(prompt.endsTick).toBe(muggingOf(room, human)!.untilTick);
+    expect(JSON.stringify(room.state.toJSON())).not.toMatch(/"mug|"scuffle|"folk/);
+    // Pay: the share leaves the purse for the figure's account, through 8C's purse, and the mugging ends.
+    handleMug(room, human, { choice: 'pay' });
+    expect(muggingOf(room, human)).toBeUndefined();
+    expect(balanceOf(room, human)).toBe(30 - 9);
+    expect(balanceOf(room, figureAccount(mugger.id))).toBe(9);
+    // The scuffle lies where the target stood, with the mugger's height (clues.json `scuffle`).
+    const scuffle = [...room.state.scenes.get('cellar')!.clues.values()].find(
+      (c) => c.kind === ClueKind.scuffle,
+    );
+    expect(scuffle).toMatchObject({
+      value: balance.townsfolk.height,
+      x: Math.round(tileCentre(Math.floor(t.x / TILE_PX), TILE_PX)),
+      y: Math.round(tileCentre(Math.floor(t.y / TILE_PX), TILE_PX)),
+    });
+    advance(party, 1); // the bus delivers on the next tick
+    expect(heard.slice(1).map((e) => [e.kind, e.data])).toEqual([
+      ['rob', { by: mugger.id, target: human, amount: 9 }],
+      ['mug.end', { mugger: mugger.id, target: human, outcome: 'paid' }],
+    ]);
+    expect(avatarOf(room, mugger.handle as string)?.animId).not.toBe(AnimId.threaten);
+    expect(figureNotSeat(party)).toEqual([]);
+    // Neither side is rolled against again for the cooldown.
+    advance(party, ticksOf(m.cooldownS) - 2);
+    expect(heard.filter((e) => e.kind === 'mug.start')).toHaveLength(1);
+  });
+
+  it('lets a target through a door escape while its answer is due, and pays through the wire', async () => {
+    const { party, human, mugger, heard } = await world({ apart: 1 });
+    const room = party.room;
+    expect(untilMugged(party, human)).toBe(true);
+    expect(muggingOf(room, human)?.state).toBe('threat'); // in reach already: no walk-up
+    untilPrompt(party, human);
+    placeSeat(party, human, 'overworld', 3, 3);
+    advance(party, 2);
+    expect(heard.at(-1)?.data).toEqual({ mugger: mugger.id, target: human, outcome: 'escaped' });
+    expect(balanceOf(room, human)).toBe(30);
+    // A second match: the answer comes over the wire (`act.mug`, consumed in the step) and pays.
+    const second = await world({ apart: 1 });
+    expect(untilMugged(second.party, second.human)).toBe(true);
+    untilPrompt(second.party, second.human);
+    second.party.humans[0]!.room.send('act.mug', { choice: 'pay' });
+    // The clock is paused: each poll runs one step, which consumes the queued command (ARCHITECTURE 5.6).
+    expect(
+      await until(() => {
+        advance(second.party, 1);
+        return muggingOf(second.party.room, second.human) === undefined;
+      }),
+    ).toBe(true);
+    advance(second.party, 1);
+    expect(second.heard.at(-1)?.data).toMatchObject({ outcome: 'paid' });
+    expect(balanceOf(second.party.room, second.human)).toBe(21);
+  });
+
+  it('takes the share from a silent target when the answer runs out, and refuses a late, odd, fleeing or fighting answer', async () => {
+    const { party, human, mugger, heard } = await world({ apart: 1 });
+    const room = party.room;
+    expect(untilMugged(party, human)).toBe(true);
+    untilPrompt(party, human);
+    const errors = () => party.humans[0]!.log.filter((e) => e.type === 'error').length;
+    handleMug(room, human, { choice: 'fight' }); // the fists are not in yet (A161 part two)
+    handleMug(room, human, { choice: 'flee' }); // nor the chase
+    handleMug(room, human, { choice: 'rob' });
+    expect(muggingOf(room, human)?.state).toBe('prompt');
+    advance(party, ticksOf(m.answerS) + 1);
+    expect(heard.at(-1)?.data).toEqual({ mugger: mugger.id, target: human, outcome: 'taken' });
+    expect(balanceOf(room, human)).toBe(21);
+    handleMug(room, human, { choice: 'pay' }); // no prompt open
+    expect(await until(() => errors() === 4)).toBe(true);
+  });
+
+  it('never starts on a target with an empty purse, an NPC seat pays at once, and a meeting drops it', async () => {
+    const { party, human } = await world({ apart: 1, purse: 0 });
+    expect(untilMugged(party, human, 30)).toBe(false);
+    // An NPC seat as the target, alone with the figure: it pays, and is angry at the figure.
+    const { party: p2, target: npc, mugger, heard } = await world({ apart: 1, npcTarget: true });
+    const room = p2.room;
+    expect(untilMugged(p2, npc)).toBe(true);
+    for (let i = 0; i < ticksOf(m.threatS + 1) && muggingOf(room, npc); i++) advance(p2, 1);
+    expect(heard.at(-1)?.data).toEqual({ mugger: mugger.id, target: npc, outcome: 'paid' });
+    expect(balanceOf(room, npc)).toBe(21);
+    expect(needsOf(npcMemory(room).brain(npc)).angryAt).toBe(mugger.id);
+    // A meeting (no world phase) drops a mugging under way.
+    const third = await world({ apart: 1 });
+    expect(untilMugged(third.party, third.human)).toBe(true);
+    holdPhase(third.party, Phase.meetingDiscussion, 60);
+    advance(third.party, 1);
+    expect(muggingOf(third.party.room, third.human)).toBeUndefined();
+    expect(third.heard.at(-1)?.data).toMatchObject({ outcome: 'lost' });
+    expect(balanceOf(third.party.room, third.human)).toBe(30);
   });
 });

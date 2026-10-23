@@ -717,8 +717,9 @@ Round 8 (A134, A135; `docs/round8/townsfolk.md`).
 - **Needs and moods.** NPC seats and the new ambient townsfolk have needs (Hunger, Fear, Anger, Want) and moods.
   These are server-only and show only as gait and idle.
 - **Townsfolk.** They are not seats, are never the Knife's prey and die only to creatures.
-- **Mugging.** A hungry, angry or desperate figure alone with a seat may mug it. A heavier purse raises the chance;
-  company and a lit light lower it.
+- **Mugging.** A hungry, angry or desperate figure or NPC seat alone with a seat may mug it. A heavier purse raises
+  the chance; company, the Watchman's look and a lit light lower it. The target pays or, once the fists land, runs
+  or fights.
 
 The numbers are `balance.json` `moods` and `townsfolk`.
 
@@ -783,5 +784,19 @@ wearing the Watchman's look (the badge everyone sees, never the card) or one wit
 mugged. The chance per second is `moods.mug.chancePerS` by the target's purse band (3.23), times `1 + moodMul` by
 the need behind the mugger's mood, times `nightMul` in the night class, `weakMul` for a Weakened or Fatigued target
 (3.22) and `longAloneMul` after `longAloneS` alone beside a heavy purse; the mugger's own Fear (`fearMul`) and a
-light burning in the target's hand (`lightMul`) lower it. What the roll starts, the walk-up, the threat and the
-target's answer, is the next step of A161.
+light burning in the target's hand (`lightMul`) lower it. A figure walks up to within
+`reachTiles` (giving up after `approachS`); an NPC seat mugs only a seat already within reach until its walk-up
+lands (A161, open). The mugger stands and threatens for `threatS` (the `threaten` clip on a figure; an NPC seat
+holds its mood idle until 8A's one-shot slot lands), then the target has `answerS` to answer by the private prompt
+(UI 14.37):
+- **Pay**: `share` of the purse (rounded, at least one Scrip) moves to the mugger through 3.23's one function; a
+  figure's takings sit in its `@figure:<id>` account. Banked Scrip is safe.
+- **Silence**: the share is taken when the answer runs out (the strike, once the fists land).
+- **A door**: a target that leaves the scene while its answer is due escapes, with nothing taken.
+- **Flee** (a chase of `chaseS`, the share taken if the mugger reaches the target) and **Fight** (strikes on both
+  sides, 3.22) are part two of A161, after 8A's fists; until then both answers are refused.
+
+A mugged NPC seat pays. Every mugging ends with `mug.end` on the bus, a `scuffle` clue (3.4) where the target
+stood showing the mugger's height, and a robbed seat angry at its mugger
+(`anger.robbed`); each side waits `cooldownS` before another roll touches it, and a meeting drops a mugging under
+way. Only the target hears of a mugging: the prompt is private and everything else is the drawn figure.

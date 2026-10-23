@@ -74,6 +74,8 @@ export interface Figure {
   hp: number;
   hurtAtTick: number;
   dead: boolean;
+  /** Mid-mugging (`mug.ts`): the `threaten` clip while it stands over its target. */
+  threatening: boolean;
 }
 
 interface TownsfolkMemory {
@@ -253,6 +255,7 @@ function makeFigure(
     hp: balance.health.maxHp,
     hurtAtTick: -1,
     dead: false,
+    threatening: false,
   };
   const rng = figureRng(room, f);
   // The home: a lit interior open at this party size (the rule of a seat's persona, GDD 3.12), from its own stream.
@@ -316,9 +319,11 @@ function writeFigure(avatar: AvatarState, f: Figure): void {
   if (avatar.yaw !== f.yaw) avatar.yaw = f.yaw;
   const animId = f.moving
     ? AnimId.walk
-    : f.act?.kind === 'work'
-      ? AnimId.interact
-      : (moodIdleFor(f.brain) ?? AnimId.idle);
+    : f.threatening
+      ? AnimId.threaten
+      : f.act?.kind === 'work'
+        ? AnimId.interact
+        : (moodIdleFor(f.brain) ?? AnimId.idle);
   if (avatar.animId !== animId) avatar.animId = animId;
   avatar.statusBits = 0;
   avatar.transitUntilTick = 0;

@@ -1,5 +1,5 @@
 import { type Portal, type SceneId, balance, scenes } from '@wdi/content';
-import { DIRECTIONS, Phase, TICK_RATE, TILE_PX, tilePath } from '@wdi/shared';
+import { DIRECTIONS, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { PORTAL_REACH_TILES } from '../constants';
 import { mapScenesOf } from '../MapSites';
@@ -18,6 +18,8 @@ import {
   spawnTownsfolk,
   townsfolkMemory,
 } from './figures';
+import { clearMuggings, muggingBy, runMuggings } from './mug';
+import { walkFigure } from './walk';
 import './invariants';
 
 /**
@@ -30,16 +32,18 @@ import './invariants';
 
 /** A goal counts as reached within this distance. */
 const GOAL_PX = TILE_PX / 4;
-/** A path is rebuilt from where the figure stands at least this often. */
-const REPLAN_TICKS = TICK_RATE;
 
 export function runTownsfolk(room: PartyRoom): void {
   const phase = room.state.phase;
   const memory = townsfolkMemory(room);
   if (phase === Phase.lobby) {
     if (memory.spawned) clearTownsfolk(room);
+    clearMuggings(room);
     return;
   }
+  // The muggings first (GDD 3.24): a mugger figure is walked or held by `mug.ts`, not by its routine below; outside
+  // the world phases (a meeting) it drops them.
+  runMuggings(room);
   if (!isWorldPhase(phase) || !simOf(room).profileFixed) return;
   if (!memory.spawned) spawnTownsfolk(room); // a match that skipped the deal's line (an older save) still has them
   for (const f of memory.figures.values()) {
@@ -62,7 +66,8 @@ function seeBodies(room: PartyRoom, f: Figure): void {
 
 function stepFigure(room: PartyRoom, f: Figure): void {
   const tick = room.state.tick;
-  f.moving = false;
+  const mugging = muggingBy(room, f.id) !== undefined;
+  if (!mugging) f.moving = false;
   if (tick < f.busyUntilTick) return;
   seeBodies(room, f);
   const here = sceneKey(f.sceneIdx);
@@ -74,6 +79,7 @@ function stepFigure(room: PartyRoom, f: Figure): void {
     home: f.home === here,
     light: false,
   });
+  if (mugging) return;
 
   const cls = phaseClassOf(room.state.phase);
   if (cls === 'night') {
@@ -96,7 +102,7 @@ function stepFigure(room: PartyRoom, f: Figure): void {
       f.act = null;
       return;
     }
-    const result = walk(
+    const result = walkFigure(
       room,
       f,
       tileCentre(portal.x, TILE_PX),
@@ -107,7 +113,7 @@ function stepFigure(room: PartyRoom, f: Figure): void {
     else if (result === 'stuck') f.act = null;
     return;
   }
-  const result = walk(room, f, act.goal.x, act.goal.y, GOAL_PX);
+  const result = walkFigure(room, f, act.goal.x, act.goal.y, GOAL_PX);
   if (result === 'stuck') {
     f.act = null;
     return;
@@ -215,48 +221,4 @@ function cross(room: PartyRoom, f: Figure, portal: Portal): void {
   f.brain.path = null;
   f.busyUntilTick = room.state.tick + Math.round(balance.doors.transitS * TICK_RATE);
   rehandleFigure(room, f);
-}
-
-type WalkResult = 'arrived' | 'walking' | 'stuck';
-
-/**
- * One tick of walking toward a point of the figure's scene along a tile path (the creature walker's rule without
- * the leash): the figure moves `townsfolk.walkTilesPerS` and is never collided, it is not a seat.
- */
-function walk(room: PartyRoom, f: Figure, tx: number, ty: number, reachPx: number): WalkResult {
-  if (Math.hypot(f.x - tx, f.y - ty) <= reachPx) return 'arrived';
-  const tick = room.state.tick;
-  const grid = navGrid(sceneKey(f.sceneIdx), simOf(room).profile);
-  const here = { x: Math.floor(f.x / TILE_PX), y: Math.floor(f.y / TILE_PX) };
-  const key = `${f.sceneIdx}:${Math.round(tx)}:${Math.round(ty)}`;
-  let plan = f.brain.path;
-  const onPlan = plan?.tiles.some((t) => t.x === here.x && t.y === here.y) ?? false;
-  if (!plan || plan.key !== key || !onPlan || tick - plan.bornTick >= REPLAN_TICKS) {
-    const tiles = tilePath(
-      grid.w,
-      grid.h,
-      (x, y) => grid.solidAt(x, y),
-      here,
-      (x, y) =>
-        !grid.solidAt(x, y) &&
-        Math.hypot(tileCentre(x, TILE_PX) - tx, tileCentre(y, TILE_PX) - ty) <= reachPx,
-    );
-    plan = tiles ? { key, scene: f.sceneIdx, bornTick: tick, tiles } : null;
-    f.brain.path = plan;
-  }
-  if (!plan) return 'stuck';
-  let at = plan.tiles.findIndex((t) => t.x === here.x && t.y === here.y);
-  if (at < 0) at = 0;
-  const next = plan.tiles[at + 1];
-  const aim = next ? { x: tileCentre(next.x, TILE_PX), y: tileCentre(next.y, TILE_PX) } : { x: tx, y: ty };
-  const dx = aim.x - f.x;
-  const dy = aim.y - f.y;
-  const len = Math.hypot(dx, dy);
-  if (len < 1e-6) return 'arrived';
-  const step = Math.min(len, (balance.townsfolk.walkTilesPerS * TILE_PX) / TICK_RATE);
-  f.x += (dx / len) * step;
-  f.y += (dy / len) * step;
-  f.yaw = Math.atan2(dx, -dy);
-  f.moving = true;
-  return 'walking';
 }

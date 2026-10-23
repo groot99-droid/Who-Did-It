@@ -14,6 +14,8 @@ export const C2S = {
   present: 'act.present',
   /** Round 6 (M5b, GDD 3.15): light or put out the carried light; `sim/mobs/light.ts` (6G) handles it. */
   light: 'act.light',
+  /** Round 8 (GDD 3.24): the answer to a `mugPrompt`; `sim/townsfolk/mug.ts` (8E) handles it. */
+  mug: 'act.mug',
   vote: 'meeting.vote',
   say: 'chat.say',
   quick: 'chat.quick',
@@ -55,6 +57,8 @@ export const S2C = {
   cutscene: 'cutscene',
   /** Round 6 (M5b, GDD 3.16): a station task's mini-game; sent by Session 6H, nothing sends it before. */
   minigameStart: 'minigameStart',
+  /** Round 8 (GDD 3.24): a mugger's demand, private to the target; sent by Session 8E's `mug.ts`. */
+  mugPrompt: 'mugPrompt',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
@@ -214,6 +218,11 @@ export interface C2SPayloads {
    * solution it kept and completes the task. Refused 422 until Session 6H lands.
    */
   'minigame.result': { taskId: string; answer: unknown };
+  /**
+   * Round 8 (GDD 3.24): the target's answer to its open `mugPrompt`. Refused 422 with no prompt open; `flee` and
+   * `fight` are refused until the fists land (DECISIONS A161).
+   */
+  'act.mug': { choice: 'pay' | 'fight' | 'flee' };
 }
 
 export interface S2CPayloads {
@@ -266,6 +275,11 @@ export interface S2CPayloads {
    * its solution (`rules/minigames.ts generate`). Answered with `minigame.result`.
    */
   minigameStart: { taskId: string; kind: MinigameKind; public: unknown };
+  /**
+   * Private, round 8 (GDD 3.24): a mugger demands the purse; `muggerId` is its avatar handle in the target's
+   * scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`).
+   */
+  mugPrompt: { muggerId: string; endsTick: number };
 }
 
 export type ErrorPayload = S2CPayloads['error'];
