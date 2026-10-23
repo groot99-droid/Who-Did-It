@@ -2,6 +2,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { onSim } from '../events/bus';
 import { isOnub } from '../onub/state';
 import { onMeetingConversion, runConversion } from './conversion';
+import { runSabotage } from './sabotage';
 import { privateVendetta, vendettaHolders, vendettaOf } from './state';
 
 /**
@@ -29,5 +30,6 @@ export function runVendettas(room: PartyRoom): void {
   for (const seat of vendettaHolders(room).keys()) {
     const kind = vendettaOf(room, seat)?.kind;
     if (kind === 'conversion') runConversion(room, seat);
+    else if (kind === 'sabotage') runSabotage(room, seat);
   }
 }

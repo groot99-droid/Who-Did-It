@@ -3269,6 +3269,8 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
   line `runVendettas` after 7I's `runTrain` (Step order: `runEvents`, `runTrain`, `runVendettas`); the three `sim/Meeting.ts` lines
   for the doubted Vicar's abstention; `NoteKind.doubt`; `Private.vendetta` on schema version 4; the NPC hook
   `vendettaGoalFor`; UI.md 14.29). Sabotage follows as PR 2b to keep each under 400 lines.
+- 2026-10-23: PR 2b (sabotage: `sim/vendettas/sabotage.ts`, its branch of `runVendettas` and of `vendettaGoalFor`,
+  the task targets a still hold tampers with, the wreck that undoes a finished real task and readies the Knife).
 
 ### Round 7 log: 7I
 
