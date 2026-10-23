@@ -479,6 +479,20 @@ export interface JoinOptions {
 /** Party visibility chosen at Create (GDD 3.21). */
 export type PartyVisibility = 'open' | 'private';
 
+/**
+ * One row of `GET /parties` (GDD 3.21): a lobby-phase, unlocked room. `players` counts the seats taken, `mode` is
+ * `Settings.mode` and `map` a `MAP_IDS` entry. No seat id, device id, role or invited list ever appears.
+ */
+export interface PartyListing {
+  code: string;
+  leader: string;
+  players: number;
+  max: number;
+  mode: number;
+  map: string;
+  visibility: PartyVisibility;
+}
+
 /** Options for `create("party", ...)` only; `joinById` keeps `JoinOptions`. */
 export interface CreateOptions extends JoinOptions {
   visibility: PartyVisibility;
