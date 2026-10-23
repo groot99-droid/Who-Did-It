@@ -81,6 +81,8 @@ export function renderProtocolDoc(): string {
     'ClaimSawPayload',
     'OnubClaimPayload',
     'JoinOptions',
+    'PartyVisibility',
+    'CreateOptions',
     'HoldAction',
     'MinigameKind',
     'DeathCause',

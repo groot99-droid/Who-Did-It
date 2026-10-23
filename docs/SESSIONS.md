@@ -3223,9 +3223,15 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 ### Round 7 log: 7B
 
+- 2026-10-23: PR 1 (fonts, night set, tokens, the gate on every `.css` under `apps/client/src`, licences,
+  CREDITS, UI.md 2, 3 and 10, ASSETS 6.1, A106). The night set sits in its own `palette.json` block (A106);
+  glass contrast is measured over the darkest and the brightest bound of the loop, so it does not wait for 6N.
+
 ### Round 7 log: 7C
 
 ### Round 7 log: 7D
+
+- PR 1 (wire): `CreateOptions`, `JoinOptions.profile`, `Player.profile` (schema version 4), `balance.json` `party`, the `onAuth` checks, `PROTOCOL.md`, `parties.test.ts` (auth half), ARCHITECTURE 5.3 and GDD 3.21 server lines, A108. `protocol-doc.ts` lists `PartyVisibility` and `CreateOptions`. Profile codes are exact-length upper-case join-alphabet strings; `newSeat` is untouched (the profile is set in `onJoin`).
 
 ### Round 7 log: 7E
 

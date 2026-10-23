@@ -37,6 +37,11 @@ export const PaletteFile = z.strictObject({
     lantern: Hex,
     moon: Hex,
   }),
+  /**
+   * The night set of the round-7 theme (docs/UI.md 2, DECISIONS A106): DOM UI colours only, never in art or the
+   * world palette; the accent is `lantern` above.
+   */
+  night: z.strictObject({ night: Hex, violet: Hex, indigo: Hex, lilac: Hex, snow: Hex }),
   ambient: z.strictObject({
     day: z.strictObject({ color: Hex, intensity: z.number().min(0).max(1) }),
     night: z.strictObject({ color: Hex, intensity: z.number().min(0).max(1) }),

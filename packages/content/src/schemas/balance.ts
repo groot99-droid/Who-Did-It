@@ -74,6 +74,14 @@ export const BalanceFile = z.strictObject({
     /** Humans needed to press Start; below `players.min` the seats are NPC-filled (GDD 3.12). */
     startMinHumans: z.number().int().min(1),
   }),
+  /** Round 7 (GDD 3.21, `docs/round7/parties.md`): the device profile, the friends and invited lists, the party list. */
+  party: Section({
+    profileCodeLength: z.number().int().positive(),
+    friendsMax: z.number().int().positive(),
+    invitedMax: z.number().int().positive(),
+    listMax: z.number().int().positive(),
+    listRefreshS: z.number().positive(),
+  }),
   phases: Section({
     roleRevealS: Seconds,
     countdownS: Seconds,

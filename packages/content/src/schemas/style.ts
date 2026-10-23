@@ -7,7 +7,12 @@ const Coord = z.number().int().min(0);
 /** docs/UI.md 4 to 5: the DOM theme's scale, mirrored by apps/client/src/ui/theme/tokens.css. */
 export const UiStyle = z.strictObject({
   source: z.literal('docs/UI.md'),
-  fonts: z.strictObject({ display: z.literal('Oswald'), text: z.literal('Inter') }),
+  fonts: z.strictObject({
+    display: z.literal('Oswald'),
+    text: z.literal('Inter'),
+    pixelDisplay: z.literal('Press Start 2P'),
+    pixelText: z.literal('Pixelify Sans'),
+  }),
   typeScalePx: z.strictObject({
     displayXl: Px,
     displayLg: Px,

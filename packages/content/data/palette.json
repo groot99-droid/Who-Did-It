@@ -12,6 +12,13 @@
     "lantern": "#FFB457",
     "moon": "#7FA8FF"
   },
+  "night": {
+    "night": "#0A0924",
+    "violet": "#4B36B8",
+    "indigo": "#251A6B",
+    "lilac": "#C9CEFF",
+    "snow": "#FFFFFF"
+  },
   "ambient": {
     "day": { "color": "#2C3240", "intensity": 0.6 },
     "night": { "color": "#12141C", "intensity": 0.25 },

@@ -67,7 +67,12 @@
   },
   "ui": {
     "source": "docs/UI.md",
-    "fonts": { "display": "Oswald", "text": "Inter" },
+    "fonts": {
+      "display": "Oswald",
+      "text": "Inter",
+      "pixelDisplay": "Press Start 2P",
+      "pixelText": "Pixelify Sans"
+    },
     "typeScalePx": {
       "displayXl": 44,
       "displayLg": 32,
