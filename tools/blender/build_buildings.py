@@ -509,11 +509,15 @@ def render_pair(scene, objs, w: int, h: int, out_dir: str, name: str) -> dict:
     pivot = (cw / 2, TOP + (w + h) * 16)
     sc.iso_frame(scene, cw, ch, pivot, target=(w / 2, -h / 2, 0.0))
     render_to(scene, os.path.join(out_dir, f"{name}.png"))
-    # The tile map: every slot coded, raw output, no anti-aliasing so no code is blended.
+    # The tile map: every slot coded, raw output, no anti-aliasing so no code is blended. The HD shadow
+    # catcher under the building stays out of it: coded, its plane put the whole frame in tile (0, 0).
     saved = {}
     code = code_material(w, h)
+    hidden = [o for o in scene.objects if o.name in sc.RIG_PLANES and not o.hide_render]
+    for o in hidden:
+        o.hide_render = True
     for o in scene.objects:
-        if o.type == "MESH":
+        if o.type == "MESH" and o.name not in sc.RIG_PLANES:
             saved[o.name] = [s.material for s in o.material_slots]
             for s in o.material_slots:
                 s.material = code
@@ -521,6 +525,8 @@ def render_pair(scene, objs, w: int, h: int, out_dir: str, name: str) -> dict:
     scene.view_settings.view_transform, scene.render.filter_size, scene.eevee.taa_render_samples = "Raw", 0.0, 1
     render_to(scene, os.path.join(out_dir, f"{name}.tiles.png"))
     scene.view_settings.view_transform, scene.render.filter_size, scene.eevee.taa_render_samples = vt, fs, taa
+    for o in hidden:
+        o.hide_render = False
     for o in scene.objects:
         if o.name in saved:
             for s, m in zip(o.material_slots, saved[o.name]):

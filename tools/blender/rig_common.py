@@ -83,6 +83,8 @@ STYLE_FACTOR = {"8bit": 1, "lowpoly": 1, "hd": 2}
 # The HD finish (materials/hd.py): no pixel finish, so a wider film filter and more samples; the key light casts
 # soft shadows onto a shadow catcher under the subject; EEVEE's fast GI as ambient occlusion; the toon ramp
 # interpolates between its three tones instead of stepping; a rim in the lamp colour on every toon material.
+# The HD shadow catcher's object name (materials/hd.py adds it; a code pass hides it, static_common.RIG_PLANES).
+CATCHER_NAME = "ShadowCatcher"
 HD = {
     "taaSamples": 32,
     "filterSize": 1.5,
@@ -96,6 +98,10 @@ HD = {
     # ramp sees on unshadowed ground (the measurement above TOON_RAMP_STOPS).
     "catcherStrength": 0.6,
     "catcherLit": 0.77,
+    # The catcher stays clear until the luma falls this far below catcherLit: lit ground renders a little under
+    # the measurement (the fast GI, the wider filter), and without the margin every HD frame carried a 4 % ink
+    # haze over its whole cell.
+    "catcherHaze": 0.1,
     # Half-width of the soft edge on each toon ramp stop; the bump a textured material's diffuse luma makes.
     "bandSoft": 0.08,
     "bumpStrength": 0.4,
