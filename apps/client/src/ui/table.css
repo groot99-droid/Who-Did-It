@@ -390,7 +390,7 @@
   box-shadow: inset 4px 0 0 var(--wdi-night-accent);
 }
 
-.wdi-table .wdi-seat {
+.wdi-table .wdi-roster__row .wdi-seat {
   font-family: var(--wdi-font-pixel-display);
   color: var(--wdi-night-label);
   background: rgb(var(--wdi-night-rgb) / 0.55);
@@ -402,6 +402,88 @@
 .wdi-table .wdi-friend {
   min-height: 32px;
   padding-inline: var(--wdi-space-2);
+}
+
+/* ------------------------------------------------------------------ the seat picker (PR 2) */
+
+/* A bottom sheet of glass over the world: tiles of the living seats, Cancel under them. */
+.wdi-seatpicker.wdi-table {
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-glass-fill);
+  border: 0;
+  border-radius: 0;
+  clip-path: var(--_corner);
+  box-shadow: inset 0 0 0 2px var(--_rim);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.wdi-seatpicker.wdi-table .wdi-seat {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  height: auto;
+  color: var(--wdi-night-label);
+  background-color: rgb(var(--wdi-night-rgb) / 0.5);
+  border: 0;
+  border-radius: 0;
+  clip-path: var(--_corner);
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+.wdi-seatpicker.wdi-table .wdi-seat:hover {
+  background-color: rgb(var(--wdi-violet-rgb) / 0.6);
+}
+
+.wdi-seatpicker.wdi-table .wdi-seat__portrait {
+  background-color: rgb(var(--wdi-night-rgb) / 0.7);
+  border-radius: 0;
+  image-rendering: pixelated;
+}
+
+.wdi-seatpicker.wdi-table .wdi-seat__name {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+}
+
+/* ------------------------------------------------------------------ the main-mode cards and toasts (PR 2) */
+
+/* The look a seat walked as is a one-word tag on the foot of its tile: pixel type on the look's own body colour. */
+.wdi-table .wdi-look-tag {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  letter-spacing: 0;
+  text-transform: capitalize;
+}
+
+/* The Last Shot toast: a glass slip with a hazard edge, on the board. */
+.wdi-table .wdi-toast {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-glass-fill);
+  background-image: none;
+  border: 0;
+  border-left: 6px solid var(--wdi-night-accent);
+  border-radius: 0;
+  clip-path: var(--_corner);
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+.wdi-table .wdi-toast--shot {
+  border-left-color: var(--wdi-hazard);
+}
+
+/* The end panel's lists (looks, undealt cards, alsoWon): running pixel text under a pixel eyebrow. */
+.wdi-table .wdi-over__list,
+.wdi-table [data-testid='gameover-undealt'] {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  color: var(--wdi-night-text);
+}
+
+.wdi-table .wdi-over__list > li::marker {
+  color: var(--wdi-night-accent);
 }
 
 @media (max-width: 480px) {
