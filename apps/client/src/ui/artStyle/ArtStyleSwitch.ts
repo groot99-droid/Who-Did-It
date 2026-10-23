@@ -161,11 +161,7 @@ export function mountArtStyleSwitch(root: HTMLElement, opts: { compact?: boolean
     h('span', { class: 'wdi-label wdi-artstyle__label', id: labelId }, C['artStyle.label']),
     group,
     reserved.length > 0
-      ? h(
-          'span',
-          { class: 'wdi-hint wdi-seg__note wdi-artstyle__hint', id: hintId },
-          C['artStyle.reserved.hint'],
-        )
+      ? h('span', { class: 'wdi-seg__note wdi-artstyle__hint', id: hintId }, C['artStyle.reserved.hint'])
       : null,
   );
   root.append(el);
