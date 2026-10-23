@@ -53,6 +53,7 @@ interface Quick {
 /** Create, join, bring three fast bots in and switch the host's lobby to the quick mode. */
 async function lobby(browser: Browser): Promise<Quick> {
   const ctxs: BrowserContext[] = [await browser.newContext(), await browser.newContext()];
+  await Promise.all(ctxs.map((c) => c.addInitScript("sessionStorage.setItem('wdi:introSeen', '1')"))); // no opening cinematic (6Q)
   const [host, guest] = (await Promise.all(ctxs.map((c) => c.newPage()))) as [Page, Page];
   // The lobby offers the mode toggle only with ?onub=1 until ONUB v2 is merged.
   await host.goto('/Who-Did-It/?onub=1');
