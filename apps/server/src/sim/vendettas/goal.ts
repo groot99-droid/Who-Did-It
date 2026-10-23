@@ -1,6 +1,7 @@
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { simOf } from '../RoomSim';
 import { sceneKey } from '../World';
+import { openContract } from './contract';
 import { vicarSeat } from './conversion';
 import { strongboxOf, strongboxProp } from './heist';
 import { activeBody, progressOf } from './progress';
@@ -35,6 +36,11 @@ export function vendettaGoalFor(room: PartyRoom, seatId: string): VendettaGoal |
   if (v.kind === 'heist') {
     const box = strongboxOf(room);
     return box.loaded && !box.taken && strongboxProp(room) ? { sceneId: 'manor_hall' } : null;
+  }
+  if (v.kind === 'contract') {
+    const target = openContract(room, seatId)?.target;
+    const body = target === undefined ? null : activeBody(room, target);
+    return target !== undefined && body ? { sceneId: sceneKey(body.sceneIdx), targetSeat: target } : null;
   }
   return null;
 }

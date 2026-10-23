@@ -82,6 +82,9 @@ export interface NotebookSnap {
   sceneId: number;
   tick: number;
   status: number;
+  /** `NoteKind` of a power or vendetta note (0 a clue entry) and the seat it is about ('' for a clue). */
+  note?: number;
+  of?: string;
 }
 
 export interface DoorSnap {

@@ -33,7 +33,7 @@ interface PlayerState {
   look?: string;
   presence?: PresenceState;
   priv?: {
-    notebook?: { forEach(cb: (e: NotebookSnap) => void): void };
+    notebook?: { forEach(cb: (e: Required<NotebookSnap>) => void): void };
     inventory?: { slots?: { forEach(cb: (s: StackSnap) => void): void } };
     quests?: { forEach(cb: (q: QuestSnap) => void): void };
     avatar?: string;
@@ -205,6 +205,8 @@ export class ColyseusWorldFeed implements WorldFeed {
         sceneId: e.sceneId,
         tick: e.tick,
         status: e.status,
+        note: e.note,
+        of: e.of,
       }),
     );
     return out;

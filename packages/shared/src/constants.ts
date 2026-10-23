@@ -60,6 +60,8 @@ export const NoteKind = {
   shot: 7,
   /** Round 7 (GDD 3.20): the Vicar's own news that a sown doubt kept its vote out of the tally; `of` is itself. */
   doubt: 8,
+  /** Round 7 (GDD 3.20): the Hitman's own contract, brought by the first Train; `of` is the target seat. */
+  contract: 9,
 } as const;
 export type NoteKindId = (typeof NoteKind)[keyof typeof NoteKind];
 

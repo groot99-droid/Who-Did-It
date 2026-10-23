@@ -763,6 +763,7 @@ present only when the cutscene is skippable. Reduce-motion turns camera moves in
 | `cutscene.skip` | Skip | the button |
 | `cutscene.skip.label` | Skip the cutscene | its `aria-label` |
 | `cs.hollowmere.<line>` | the opening's captions | `title`, `seven`, `laid`, `own`, `train`, `dusk`, `end`, `vicar`, `letter`, `nobody`, `check`, `miss`; the Bible's Book I.1 trimmed |
+| `cs.blackpine.<line>` | the BlackPine opening's captions (7A) | `title`, `intake`, `owns`, `day`, `night`, `pines`, `adits`, `blind`, `dawn`; the Bible's Book III.2 trimmed |
 
 Frozen test ids: `cutscene` (the layer, with `data-cutscene`), `cutscene-caption`, `cutscene-skip`.
 ### 14.22 Sound settings (6L)
@@ -1121,3 +1122,5 @@ Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaG
 | `vendetta.goal.hitman` | Hitman: the Train brings you a contract. Take only its mark. | a Killer holding contract |
 | `vendetta.mate` | Your Killer’s vendetta: {goal} | the Accomplice's card, once per Killer it knows; `{goal}` is that Killer's goal line |
 | `vendetta.note.doubt` | Doubt took the flock: your vote did not carry. | the Vicar's own Notebook entry of kind `NoteKind.doubt`, written at the reveal of the doubted meeting |
+| `vendetta.note.contract` | The mail brought a contract: {name}. | the Hitman's own Notebook entry of kind `NoteKind.contract` (`of` the target seat, `{name}` its seat name), written at the first Train arrival |
+| `vendetta.contract.accept` | Accept | the button on that contract entry while the offer is open (no `contract` quest yet, the mark on the roster); it sends `quest.accept { questId: 'contract' }` |

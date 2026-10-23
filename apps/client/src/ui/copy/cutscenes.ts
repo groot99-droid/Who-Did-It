@@ -32,6 +32,21 @@ export const CUTSCENE_COPY = {
 
   // 14.30 The Vicar's memorial (round 7, 7I): played to every seat at the reveal after the Vicar falls to the Knife
   'cs.memorial.vicar': 'In memory of the Vicar of HollowMere, who fell to the Knife.',
+
+  // 14.20.1b The BlackPine opening (round 7, 7A): the Bible's Book III.2 narration, trimmed the same way
+  'cs.blackpine.title': 'BLACKPINE — TIMBER & COAL SYNDICATE',
+  'cs.blackpine.intake':
+    "They tell you at the intake office: you're either feeding the furnace or you're fuel.",
+  'cs.blackpine.owns':
+    'The Syndicate owns the axes, the tracks, the coal seams, and the dirt your bones rot in.',
+  'cs.blackpine.day':
+    'By day, we swing axes, grease the steam lines, and watch our fingers around the blade.',
+  'cs.blackpine.night':
+    'But when the night shift bell rings and the coal smoke settles, the woods get quiet.',
+  'cs.blackpine.pines': "Something out there in the black pines isn't cutting trees.",
+  'cs.blackpine.adits': 'And down in the deep adits, a black-powder contract just arrived.',
+  'cs.blackpine.blind': 'Watch your blind spots. Keep your lantern lit.',
+  'cs.blackpine.dawn': 'The log on your rack at dawn is who you are.',
 } as const;
 
 export type CutsceneCopyId = keyof typeof CUTSCENE_COPY;

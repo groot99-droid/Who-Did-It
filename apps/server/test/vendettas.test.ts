@@ -1,6 +1,16 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance, roles, scenes, validateContent, vendettas } from '@wdi/content';
-import { BUILD_VERSION, C2S, ClueKind, NoteKind, Phase, TICK_RATE, TILE_PX, TaskEntry } from '@wdi/shared';
+import {
+  BUILD_VERSION,
+  C2S,
+  ClueKind,
+  ErrorCode,
+  NoteKind,
+  Phase,
+  TICK_RATE,
+  TILE_PX,
+  TaskEntry,
+} from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { MatchSeeds, type SeedWords } from '../src/sim/seeds';
@@ -17,7 +27,9 @@ import { emitSim } from '../src/sim/events/bus';
 import { count } from '../src/sim/Inventory';
 import { simOf } from '../src/sim/RoomSim';
 import { STRONGBOX_ITEM, strongboxOf } from '../src/sim/vendettas/heist';
-import { setPhase, teleport } from './killHelpers';
+import { act, errorCodes, setPhase, teleport } from './killHelpers';
+import { markDead } from '../src/sim/Death';
+import { CONTRACT_QUEST, openContract } from '../src/sim/vendettas/contract';
 import { matchEvents } from '../src/sim/auto/log';
 import { countsVote } from '../src/sim/vendettas/conversion';
 import { vendettaGoalFor } from '../src/sim/vendettas/goal';
@@ -309,5 +321,97 @@ describe('the heist in a match', () => {
     const kinds = heistEvents();
     expect(kinds.map((e) => e.kind)).toEqual(['vendetta.heist.loaded', 'vendetta.heist.cracked']);
     for (const e of kinds) expect(e.seat).toBeUndefined();
+  });
+});
+
+describe('the contract in a match', () => {
+  beforeEach(async () => colyseus.cleanup());
+
+  const ROLES = {
+    Bot0: 'killer',
+    Bot1: 'detective',
+    Bot2: 'townsfolk',
+    Bot3: 'townsfolk',
+    Bot4: 'townsfolk',
+  };
+  const arrive = (m: Match) =>
+    emitSim(m.room, {
+      tick: m.room.state.tick,
+      kind: 'train.arrive',
+      sceneId: 'overworld',
+      data: { map: 'hollowmere', station: 'overworld.platform', round: 1 },
+    });
+  /** A landed Knife strike as `sim/Kill.ts` sends it: the `kill` event, then the death. */
+  const knife = (m: Match, by: string, victim: string) => {
+    emitSim(m.room, { tick: m.room.state.tick, kind: 'kill', seat: victim, data: { by } });
+    markDead(m.room, victim, 'knife', by);
+  };
+  const stepsOf = (m: Match) => vendettaSteps(m.room).map((s) => s.kind);
+  const hitmanStart = async () => {
+    const m = await startMatch(colyseus, 5, ROLES);
+    const hitman = idOf(m, 0);
+    holdVendetta(m.room, hitman, 'hitman');
+    arrive(m);
+    await until(() => openContract(m.room, hitman) !== null);
+    return { m, hitman, target: openContract(m.room, hitman)!.target };
+  };
+
+  it('mails the Hitman a target to its own Notebook, accepted from anywhere, paid by the Knife on the mark', async () => {
+    const { m, hitman, target } = await hitmanStart();
+    expect(target).not.toBe(hitman);
+    expect(
+      seat(m, 0)
+        .priv.notebook.filter((n) => n.note === NoteKind.contract)
+        .map((n) => n.of),
+    ).toEqual([target]);
+    for (const i of [1, 2, 3, 4])
+      expect(seat(m, i).priv.notebook.some((n) => n.note === NoteKind.contract)).toBe(false);
+    expect(vendettaGoalFor(m.room, hitman)?.targetSeat).toBe(target);
+
+    // Nobody else can take it; the Hitman takes it wherever it stands, once.
+    const other = [1, 2, 3, 4].find((i) => idOf(m, i) !== target)!;
+    await act(m.bots[other] as Bot, 'quest.accept', { questId: CONTRACT_QUEST });
+    expect(errorCodes(m.bots[other] as Bot)).toContain(ErrorCode.cannot);
+    await act(m.bots[0] as Bot, 'quest.accept', { questId: CONTRACT_QUEST });
+    await act(m.bots[0] as Bot, 'quest.accept', { questId: CONTRACT_QUEST });
+    expect(seat(m, 0).priv.quests.map((q) => [q.id, q.done])).toEqual([[CONTRACT_QUEST, false]]);
+    expect(errorCodes(m.bots[0] as Bot)).toContain(ErrorCode.cannot);
+
+    // A kill off the mark rests the Knife the longer; the mark's kill pays and readies it.
+    const bystander = [1, 2, 3, 4].map((i) => idOf(m, i)).find((id) => id !== target)!;
+    const rest = m.room.state.tick + 100 * TICK_RATE;
+    seat(m, 0).priv.cooldownEndTick.set('kill', rest);
+    knife(m, hitman, bystander);
+    await until(() => (seat(m, 0).priv.cooldownEndTick.get('kill') ?? 0) > rest);
+    expect(seat(m, 0).priv.cooldownEndTick.get('kill')).toBe(
+      rest + balance.vendettas.contract.offTargetRestS * TICK_RATE,
+    );
+    knife(m, hitman, target);
+    await until(() => progressOf(m.room, hitman).over);
+    expect(stepsOf(m)).toEqual([
+      'vendetta.contract.offered',
+      'vendetta.contract.accepted',
+      'vendetta.contract.done',
+    ]);
+    expect(seat(m, 0).priv.quests[0]?.done).toBe(true);
+    expect(seat(m, 0).priv.cooldownEndTick.get('kill')).toBeLessThanOrEqual(m.room.state.tick);
+    expect(vendettaGoalFor(m.room, hitman)).toBeNull();
+    await sleep(100);
+    for (const e of matchEvents(m.room).filter((e) => e.kind.startsWith('vendetta.')))
+      expect(e.seat).toBeUndefined();
+  });
+
+  it('ends unpaid when the mark dies any other way', async () => {
+    const { m, hitman, target } = await hitmanStart();
+    await act(m.bots[0] as Bot, 'quest.accept', { questId: CONTRACT_QUEST });
+    expect(seat(m, 0).priv.quests).toHaveLength(1);
+    markDead(m.room, target, 'poison');
+    await until(() => progressOf(m.room, hitman).over);
+    expect(stepsOf(m)).toEqual([
+      'vendetta.contract.offered',
+      'vendetta.contract.accepted',
+      'vendetta.contract.lapsed',
+    ]);
+    expect(seat(m, 0).priv.quests).toHaveLength(0);
   });
 });

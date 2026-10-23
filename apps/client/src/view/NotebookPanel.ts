@@ -1,7 +1,8 @@
 import traits from '@wdi/content/data/traits.json';
-import { ClueKind, NotebookStatus } from '@wdi/shared/constants';
+import { ClueKind, NoteKind, NotebookStatus } from '@wdi/shared/constants';
 import type { NotebookSnap, WorldFeed } from '../net/world';
 import { WORLD_COPY as C, fill } from '../ui/copy';
+import { VENDETTA_COPY, acceptContract, openContractEntry } from '../ui/copy/vendettas';
 import { h } from '../ui/dom';
 import { formatClock } from './Hud';
 import '../ui/match.css';
@@ -88,13 +89,20 @@ export class NotebookPanel {
   update(): void {
     const entries = this.feed.notebook();
     const start = this.feed.clock().startTick;
-    const sig = `${start}|${this.sceneName ? 1 : 0}|${entries.map((e) => `${e.id}:${e.status}`).join(',')}`;
+    const roster = this.feed.snapshot();
+    const offer = openContractEntry(entries, this.feed.quests(), (seat) =>
+      roster.some((p) => p.id === seat && p.alive),
+    );
+    const sig = `${start}|${this.sceneName ? 1 : 0}|${offer}|${entries.map((e) => `${e.id}:${e.status}`).join(',')}`;
     if (sig === this.signature) return;
     this.signature = sig;
+    const nameOf = (seat: string) => roster.find((p) => p.id === seat)?.name ?? '?';
     this.list.replaceChildren(
       ...(entries.length === 0
         ? [h('p', { class: 'wdi-muted' }, C['notebook.empty'])]
-        : entries.map((e) => this.row(e, start))),
+        : entries.map((e) =>
+            e.note === NoteKind.contract ? this.contractRow(e, nameOf, e.id === offer) : this.row(e, start),
+          )),
     );
   }
 
@@ -121,6 +129,26 @@ export class NotebookPanel {
       ),
       h('span', { class: `wdi-chip${status.cls}` }, status.label),
     );
+  }
+
+  /** GDD 3.20 "Contract": the Hitman's mail and, while the offer is open, its Accept button (`quest.accept`). */
+  private contractRow(e: NotebookSnap, nameOf: (seat: string) => string, open: boolean): HTMLElement {
+    const row = h(
+      'div',
+      { class: 'wdi-notebook__entry', 'data-testid': 'notebook-entry' },
+      h('span', { class: 'wdi-icon-disc' }, icon('glyphs/glyph_lens')),
+      h('span', {}, fill(VENDETTA_COPY['vendetta.note.contract'], { name: nameOf(e.of ?? '') })),
+    );
+    if (open) {
+      const accept = h(
+        'button',
+        { type: 'button', class: 'wdi-btn', 'data-testid': 'contract-accept' },
+        VENDETTA_COPY['vendetta.contract.accept'],
+      );
+      accept.addEventListener('click', () => acceptContract(this.feed));
+      row.append(accept);
+    }
+    return row;
   }
 
   destroy(): void {
