@@ -158,6 +158,12 @@ The other hooks:
 | Meeting start | `clearFigureBodies(room)` | 8E |
 | The heist's existing bus listener (7H) | `bankTake(room)` | 8C |
 
+Granted by 6Z for 8C (A138, #141):
+- `sim/seeds.ts`: the `purse` stream, one line in `StreamName` and its doc bullet;
+- `dealPurses(room)` in `rooms/handlers/lobby.ts` `startMatch`, after `dealTasks` and `assignCovers`, rather than
+  beside the vendetta draw, because the stake follows the public look;
+- `purse: 1` in `sim/auto/Auto.ts` `STREAMS`.
+
 ## 6. Who owns which path
 
 Every session also owns its GDD section stub, its DECISIONS row, its UI.md 14 subsection (8A 14.32, 8B 14.33, 8C
@@ -191,6 +197,9 @@ Every session also owns its GDD section stub, its DECISIONS row, its UI.md 14 su
 **Tests.** A round-8 session never edits an `apps/server/test/*.test.ts` file that exists today without 6Z's grant
 in its PR. New test files are free. The one known case is the old two-hit-point tests in `mobs*.test.ts`: 8A lists
 the lines it must change in its PR and waits for the grant.
+
+Granted by 6Z for 8C (A138, #141): `sim/economy/run.ts` is 8C's, the home of `runEconomy`, and 8D adds its loops
+there; in `apps/server/test/invariants.test.ts`, the one line `'scripConserved',` after `'killClues',`.
 
 ## 7. Merge order
 
