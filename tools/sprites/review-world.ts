@@ -8,6 +8,7 @@
 //   tsx review-world.ts buildings <assets dir> <mapId> <out.png>
 //   tsx review-world.ts thumbs <assets dir> <out dir> [--finish on|off]   (thumb_<mapId>.webp, art plan 3.9)
 //   tsx review-world.ts proposal <out.png> <label>=<assets dir>[:texels][:smooth]...   (art.md 5, the look PR)
+//   tsx review-world.ts look <out dir> <label>=<assets dir>[:texels][:smooth]...   (docs/round8/hd-look, A164)
 //
 // `gate` is Gate A's Hollowmere square vignette: ground with blends, kit walls, a tree line, boulders, the
 // hedge-wall, the tavern's slices, the bell, the pump, two lantern posts and a look idling in 8 directions,
@@ -18,7 +19,10 @@
 //
 // `proposal` is the look proposal of docs/round8/art.md 5: one cell per assets folder (a style, flat or
 // textured), each the square's room with three figures at zoom 2 and the same view at zoom 1, in the order
-// given, two cells per row.
+// given, two cells per row. `look` writes the owner's look sheet from the same columns, one PNG per column and
+// subject: `figure-<label>.png` (the look idling in three directions at zoom 3), `room-<label>.png` (the
+// square's room at zoom 2) and `building-<label>.png` (the BlackPine lodge whole at zoom 1 and its middle at
+// zoom 2), so each file stays small and the looks compare file by file.
 import { readFileSync, existsSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -481,6 +485,90 @@ export async function proposalSheet(columns: ProposalColumn[]): Promise<Buffer> 
   return out.toBuffer('image/png');
 }
 
+/** One column of the look sheet: the three subjects as separate PNGs, named by the column's label. */
+export async function lookSheets(c: ProposalColumn): Promise<Record<string, Buffer>> {
+  const a = await loadAtlases(c.assets, 'harbour', 'hollowmere', 'baker', c.texels);
+  const artScale = ART_SCALE / a.texels;
+  const out: Record<string, Buffer> = {};
+  const labelled = (w: number, h: number, text: string) => {
+    const canvas = createCanvas(w, h);
+    const g = canvas.getContext('2d');
+    g.imageSmoothingEnabled = c.smooth;
+    g.fillStyle = INK;
+    g.fillRect(0, 0, w, h);
+    g.fillStyle = '#D9D2C2';
+    g.font = '16px sans-serif';
+    g.fillText(text, 8, 20);
+    return { canvas, g };
+  };
+  // The figure: idle south, south-east and south-west at zoom 2, each in its own slot.
+  {
+    const zoom = 2;
+    const { canvas, g } = labelled(540, 400, `${c.label}: ${a.lookId} idle at zoom 2`);
+    ['s', 'se', 'sw'].forEach((dir, i) => {
+      const s = a.look.get(`char/${a.lookId}/idle/${dir}/000`);
+      const x = 90 + i * 180;
+      if (s) draw(g, s, x, 380, zoom * (a.lookId === 'villager' ? 1 : artScale));
+      else greybox(g, x, 380, 100 * zoom, 30 * zoom);
+    });
+    out.figure = canvas.toBuffer('image/png');
+  }
+  // The room: the tavern whole at zoom 1 above, its door and front wall at zoom 2 below.
+  {
+    const { canvas: v } = vignette(a, c.smooth, PROPOSAL);
+    const at = (tx: number, ty: number, dy: number) => {
+      const t = tileCentre(tx, ty);
+      return { x: PROPOSAL.ground.length * 64 + 64 + t.x, y: 220 + t.y + dy };
+    };
+    const whole = at(9, 5, 20);
+    const front = at(8, 8, -70);
+    const cw = 1000;
+    const ch = 500;
+    const { canvas, g } = labelled(
+      cw,
+      ch * 2 + 40,
+      `${c.label}: the tavern at zoom 1 above, its door at zoom 2 below`,
+    );
+    g.drawImage(v, whole.x - cw / 2, whole.y - ch / 2, cw, ch, 0, 28, cw, ch);
+    g.drawImage(v, front.x - cw / 4, front.y - ch / 4, cw / 2, ch / 2, 0, ch + 40, cw, ch);
+    out.room = canvas.toBuffer('image/png');
+  }
+  // The BlackPine lodge: whole at zoom 1, its middle at zoom 2 beside it; drawn from its slices alone.
+  {
+    const bld = await readAtlas(join(c.assets, 'buildings', 'bld_blackpine.json'));
+    const slices = [...bld.entries()].filter(([k]) => k.startsWith('lodge#')).map(([, s]) => s);
+    let x0 = 0;
+    let y0 = 0;
+    let x1 = 0;
+    let y1 = 0;
+    for (const s of slices) {
+      x0 = Math.min(x0, s.dx * artScale);
+      y0 = Math.min(y0, s.dy * artScale);
+      x1 = Math.max(x1, (s.dx + s.sw) * artScale);
+      y1 = Math.max(y1, (s.dy + s.sh) * artScale);
+    }
+    const w = Math.ceil(x1 - x0) || 400;
+    const h = Math.ceil(y1 - y0) || 300;
+    const whole = createCanvas(w, h);
+    const wg = whole.getContext('2d');
+    wg.imageSmoothingEnabled = c.smooth;
+    if (slices.length === 0) greybox(wg, w / 2, h, 200, 300);
+    for (const s of slices) draw(wg, s, -x0, -y0, artScale);
+    const cw = 560;
+    const ch = 400;
+    const { canvas, g } = labelled(
+      w + 16 + cw,
+      Math.max(h, ch) + 28,
+      `${c.label}: the lodge at zoom 1, its door end at zoom 2`,
+    );
+    g.drawImage(whole, 0, 28);
+    // The zoom-2 crop sits on the end wall with the door, low and right of the slices' centre.
+    g.drawImage(whole, w * 0.72 - cw / 4, h * 0.7 - ch / 4, cw / 2, ch / 2, w + 16, 28, cw, ch);
+    out.building = canvas.toBuffer('image/png');
+  }
+  return out;
+}
+
 function withoutPeople(v: Layout): Layout {
   const { people: _people, ...rest } = v;
   return rest;
@@ -643,6 +731,15 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   } else if (mode === 'proposal' && assets && more.length > 0) {
     out = assets;
     png = await proposalSheet(more.map(parseColumn));
+  } else if (mode === 'look' && assets && more.length > 0) {
+    for (const c of more.map(parseColumn)) {
+      for (const [subject, buf] of Object.entries(await lookSheets(c))) {
+        const file = join(assets, `${subject}-${c.label}.png`);
+        writeFileSync(file, buf);
+        console.log(`review-world: look ${subject} -> ${file}`);
+      }
+    }
+    process.exit(0);
   } else if (mode === 'thumbs' && assets && more[0]) {
     for (const map of ['hollowmere', 'blackpine'] as const) {
       const file = join(more[0], `thumb_${map}.webp`);
@@ -663,6 +760,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     console.error('usage: tsx review-world.ts gate <assets> <out.png> [--finish on|off] [--look id]');
     console.error('       tsx review-world.ts ground|kit <assets> <theme> <out.png>');
     console.error('       tsx review-world.ts proposal <out.png> <label>=<assets>[:texels][:smooth]...');
+    console.error('       tsx review-world.ts look <out dir> <label>=<assets>[:texels][:smooth]...');
     process.exit(2);
   }
   if (!out) process.exit(2);

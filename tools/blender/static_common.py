@@ -59,6 +59,10 @@ def setup() -> bpy.types.Scene:
         from materials import hd
 
         hd.apply(scene)
+        if os.environ.get("WDI_HD_PBR"):  # the rough PBR + HDRI look of the owner's look sheet
+            from materials import pbr
+
+            pbr.apply(scene)
     return scene
 
 
