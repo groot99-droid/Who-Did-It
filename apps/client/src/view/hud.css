@@ -127,3 +127,150 @@
   margin: -28px 0 0 -28px;
   pointer-events: none;
 }
+
+/* ---- Round 7 (7F): the HUD on the night theme (docs/round7/ui-reskin.md 4, UI.md 14.27). Glass over the
+   world: the pointer-events rules above are untouched, so every rule below only paints. ---- */
+
+.wdi-hud .wdi-hud-chip {
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-glass-fill);
+  background-image: none;
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.45);
+  border-radius: var(--wdi-radius-xs);
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.2),
+    var(--wdi-shadow-2);
+  backdrop-filter: blur(6px);
+}
+
+.wdi-hud .wdi-hud-chip:focus-visible {
+  outline-color: var(--wdi-night-accent);
+  box-shadow: 0 0 0 var(--wdi-stroke-w) var(--wdi-night);
+}
+
+.wdi-hud .wdi-hud-chip__role {
+  font-family: var(--wdi-font-pixel-text);
+  font-weight: 600;
+  font-synthesis: none;
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-hud .wdi-hud-chip__goal {
+  font-family: var(--wdi-font-pixel-text);
+}
+
+.wdi-hud .wdi-hud-chip .wdi-icon-disc {
+  background-color: rgb(var(--wdi-snow-rgb) / 0.12);
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.35);
+}
+
+.wdi-hud .wdi-hud-clock {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-display-sm);
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: 0.04em;
+  background: var(--wdi-glass-fill);
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.45);
+  border-radius: var(--wdi-radius-xs);
+  box-shadow: inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.2);
+  backdrop-filter: blur(6px);
+}
+
+.wdi-hud .wdi-hud-clock__phase {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-sm); /* 12 px Pixelify reads "2" as "8" */
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--wdi-night-text);
+}
+
+.wdi-hud .wdi-hud-clock--night {
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.2),
+    var(--wdi-glow-moon);
+}
+
+.wdi-hud .wdi-log__line {
+  font-family: var(--wdi-font-pixel-text);
+  color: var(--wdi-night-text);
+  background: var(--wdi-glass-fill);
+  border-radius: var(--wdi-radius-xs);
+  box-shadow: inset 0 0 0 1px rgb(var(--wdi-lilac-rgb) / 0.3);
+  backdrop-filter: blur(4px);
+}
+
+/* The prompt and every HUD toast: a glass slab with the paper toast's coloured rule kept. */
+.wdi-hud .wdi-toast {
+  font-family: var(--wdi-font-pixel-text);
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-glass-fill);
+  background-image: none;
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.35);
+  border-left-color: var(--wdi-night-accent);
+  border-radius: var(--wdi-radius-xs);
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.12),
+    var(--wdi-shadow-2);
+  backdrop-filter: blur(6px);
+}
+
+.wdi-hud .wdi-toast--interact {
+  border-left-color: var(--wdi-interact);
+}
+
+.wdi-hud .wdi-toast--hazard {
+  border-left-color: var(--wdi-hazard);
+}
+
+.wdi-hud .wdi-toast .wdi-kbd,
+.wdi-hud-touch .wdi-touch-btn__key {
+  font-family: var(--wdi-font-pixel-display);
+  font-synthesis: none;
+}
+
+/* Touch cluster: glass discs, the Use button the lantern one. */
+.wdi-hud-touch .wdi-stick {
+  background: var(--wdi-veil);
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.35);
+}
+
+.wdi-hud-touch .wdi-stick__knob {
+  background-color: var(--wdi-glass-fill);
+  background-image: none;
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.6);
+  box-shadow: inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.25);
+}
+
+.wdi-hud-touch .wdi-touch-btn {
+  font-family: var(--wdi-font-pixel-text);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--wdi-night-label);
+  background-color: var(--wdi-glass-fill);
+  background-image: none;
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.6);
+  box-shadow: inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.2);
+}
+
+.wdi-hud-touch .wdi-touch-btn--primary {
+  color: var(--wdi-on-night-accent);
+  background-color: var(--wdi-night-accent);
+  border-color: var(--wdi-night);
+}
+
+.wdi-hud-touch .wdi-touch-btn.is-on {
+  color: var(--wdi-night-label);
+  background-color: var(--wdi-violet);
+  border-color: var(--wdi-night-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-hud .wdi-hud-chip,
+  .wdi-hud .wdi-hud-clock,
+  .wdi-hud .wdi-log__line,
+  .wdi-hud .wdi-toast {
+    backdrop-filter: none;
+    background-color: var(--wdi-indigo);
+  }
+}

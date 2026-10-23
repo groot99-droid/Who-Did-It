@@ -1339,3 +1339,28 @@ Lines are in `apps/client/src/ui/copy/intro.ts` (`INTRO_COPY`). The `Intro` scen
 - **When it plays.** Once per browser session (`sessionStorage['wdi:introSeen']`, set at the tap). Not under `prefers-reduced-motion`, the data saver (`saveData`), `?intro=0`, a reload that rejoins a lobby (`#/lobby/CODE`), and in the mock (`?mock=1`) unless `?intro=1`. `?intro=1` overrides only the mock rule.
 - **How it ends.** The video ends, Skip, a click or tap anywhere while it plays, or Esc (also before the tap). A stream that has not started 8 s after the tap, or a video error, ends it the same way. Then `Landing` starts as it always did.
 - **A missing file.** No manifest, no `intro` row, a failed HEAD request for the file, or an HTML answer where a video should be: the scene starts `Landing` at once and shows nothing.
+
+### 14.27 Match screens on the night theme (7F)
+
+The re-skin of the screens a match shows (`ui-reskin.md` 4, DECISIONS A110). Round 7 adds no copy to these screens
+in this subsection's first PR: every line stays its key in `ui/copy/`, and a key a later PR adds is listed here.
+The rules live in `ui/match.css` (role card, notebook sheet, settings) and `view/hud.css` (HUD and touch cluster),
+tokens only, each rule under an ancestor class (`.wdi-flip`, `.wdi-notebook-sheet`, `.wdi-settings`, `.wdi-hud`) so
+no other screen's card, chip or button changes. Ids, `data-testid`s and markup are kept.
+
+| Element | Face | Fill and colour |
+|---|---|---|
+| Role card front | the nine-slice frame and the flip stay | indigo fill, lilac text, a faint snow sheen at the top |
+| Faction word (`__stripe`) | Press Start 2P, 12 px | the faction colour with its `--wdi-on-*` text, as before |
+| Role name (`__title`) | Press Start 2P, `display-md`, snow, a violet step shadow | |
+| Card text, goal, abilities, Beware, mates | Inter (A103, A106: running text) | goal lantern on indigo, the rest lilac |
+| Card chips, keycaps, cover picker | Oswald caps chips, Pixelify Sans notes | glass pills with a lilac rim; the picked look takes the lantern rim |
+| Card back, role chip | Press Start 2P | night with a lilac double rule, nothing of the faction |
+| Ready | Press Start 2P, 12 px | the primary: night on lantern |
+| HUD chip, clock, log, toasts | Pixelify Sans; the clock digits Press Start 2P | glass (`--wdi-glass-fill`) with a lilac rim over the world; under `prefers-reduced-motion` the blur is dropped for the solid indigo |
+| Notebook sheet | Inter for entries, Press Start 2P for the title | glass page, ruled in lilac at 12%, over the veil |
+| Settings gear and panel | Pixelify Sans | glass; lantern sliders and focus ring |
+
+No focusable element is clipped to a stepped corner: a `clip-path` would cut the focus ring, so the pixel corner is
+a 2 px radius with an inset snow rim, and the glass classes of 7B (`.wdi-glass-btn`) replace these rims where they
+land.
