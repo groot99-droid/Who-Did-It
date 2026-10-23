@@ -212,7 +212,9 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
       // The meeting's vote can eject an NPC (a Skip is not the only vote an NPC may cast), which leaves the Village at
       // one a kill early: the match is then already over and the last kill is not needed.
       const target = async () => ((await page.getByTestId('gameover').isVisible()) ? 'over' : inSight());
-      await expect.poll(target, { message: `a seat to kill ${i + 2} is in sight`, timeout: 30_000 }).not.toBe('');
+      await expect
+        .poll(target, { message: `a seat to kill ${i + 2} is in sight`, timeout: 30_000 })
+        .not.toBe('');
       const prey = await target();
       if (prey === 'over') break;
       const before = bodies();
