@@ -50,7 +50,8 @@ function taskProblem(
   taskId: string,
 ): Problem | null {
   if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
-  if (!p || p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
+  // A ghost finishes its own tasks (GDD 3.8; the bar caps its share, 3.5), so `dead` is no bar here (7M).
+  if (!p || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
   if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
   const entry = player.priv.tasks.find((t) => t.id === taskId);
   const task = tasks.tasks[taskId];
