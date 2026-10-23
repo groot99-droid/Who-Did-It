@@ -944,7 +944,7 @@ Page-equivalents are of 2048². These are the art plan's numbers (`docs/round5/a
 | Environment per map | ≤ 1.8: ground 1280 x 1792 (0.55), kit ≤ 1024² (0.25), buildings ≤ 2048 x 1024 (0.5), map props ≤ 1024² (0.25), shared props ≤ 1024² (0.25) |
 | Boot effects | `clues` ≤ 512² (0.06), `vfx` ≤ 512 x 2048 (0.25) |
 | Characters (the deck's 10 world looks, A50) | ≤ 3.75: each look's `char_<lookId>` ≤ 1024² and `ovl_<lookId>` ≤ 1024 x 512 (0.375). About 3 expected, since most looks pack onto a 1024 x 512 body page |
-| Resident pages | ≤ 6 (ASSETS 6.8). The worst case, one map's environment, the boot effects and the 10 largest looks, is 5.86 |
+| Resident pages | ≤ 6.1 (ASSETS 6.8; 6.0 until round 8, when 6Z granted the 0.1 for the node break page, A142). The worst case, one map's environment, the boot effects and the 10 largest looks, is 6.02 (low-poly HollowMere) |
 | Static world sprites per scene | ≤ 1 200; the World hides those outside the view grown by 2 tiles, re-checked when the camera moves more than a tile |
 
 `char_villager` and `ovl_villager` load only with `?art=placeholder` in round 5 (10.13), so they count in no
@@ -1025,7 +1025,8 @@ pnpm --filter @wdi/sprites m5b
 
 | Key | Type | Frames | Packed cell, pivot | Loaded |
 |---|---|---|---|---|
-| `nodes` | multiatlas, one page ≤ 512² | `node_<snake id>/ready`, `node_<snake id>/spent` for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`); the stem is the row's `sprite` | 64 x 64, (32, 48): the ground point under the tile centre | boot |
+| `nodes` | multiatlas, one page ≤ 512 x 256 (`NODE_PAGE`) | `node_<snake id>/ready`, `node_<snake id>/spent` and `node_<snake id>/break/<000-007>` (round 8, 8G) for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`); the stem is the row's `sprite` | 64 x 64, (32, 48): the ground point under the tile centre | boot |
+| `anims_nodes` | animation | `node_<snake id>/break`: 12 fps once; the client plays it forward as the yield is taken and backwards as the node regrows | | boot |
 | `tools` | multiatlas, one page ≤ 512² | `held_<itemId>/<dir>` for `torch`, `snare`, `spade`, `lockpicks`, `lantern`, `crowbar` (8 screen-frame directions); `glow_lantern/<0-3>`, `glow_torch/<0-3>` | held: 64 x 64, (32, 56), the characters' feet; glow: 32 x 32, centred | boot |
 | `anims_tools` | animation | `glow_lantern`, `glow_torch`: 4 frames at 8 fps, looping | | boot |
 | `mobs` | multiatlas, one page ≤ 1024² | `mob_<id>/<anim>/<dir>/<nnn>` for `wolf`, `boar`, `bat`, `rat` (the stem is the row's `sprite`), `idle` 4 frames, `walk` 6, `attack` 6, `hurt` 3, `death` 6, `flee` 4 (round 8, 8G), 8 screen-frame directions | 64 x 64, (32, 56), the characters' feet; the bat hovers over a ground shadow at the feet | boot |
@@ -1034,7 +1035,7 @@ pnpm --filter @wdi/sprites m5b
 | `anims_givers` | animation | `giver_<npcId>/idle/<dir>`: 6 fps, looping | | boot |
 
 The filter is `nearest` in the 8-bit manifest and the placeholder, `linear` in the low-poly one. The nodes
-and tools add under 0.07 page-equivalents to the boot set in either style; the mobs add 0.125 (8-bit, 512 x 1024)
+and tools add under 0.1 page-equivalents to the boot set in either style; the mobs add 0.125 (8-bit, 512 x 1024)
 or 0.25 (low poly, 1024²) and the givers 0.125 in either style, inside the 6-page limit (10.14).
 
 **Held overlays.** A held frame shares the character cell and feet pivot, and draws the tool's grip where
@@ -1050,6 +1051,14 @@ gradient in low poly. The client plays `glow_lantern` or `glow_torch` over the l
 **Icons.** The tools' inventory icons are hand-written SVG under `assets/ui/icons/` on the rules of section 9:
 `icon_item_torch`, `icon_item_snare`, `icon_item_spade`, `icon_item_lockpicks`, `icon_item_lantern`,
 `icon_item_crowbar`.
+
+**Node breaks** (round 8, 8G; motion.md 2) are drawn in code over the node art (`drawNodeBreak` in
+`m5b-draw.ts`): the spent art fades up under the going yield while debris is thrown up and settles. Timber shudders
+and splits into splinters; stone cracks, then crumbles into shards in a puff of dust; tin ore glints, then
+shatters into crystals; resin's drips run down the trunk and drop as its cuts seal; herbs and mushrooms lift away
+as they are plucked and drop a few leaves or crumbs. The last frame is `spent` with the debris on the ground.
+`NodeView` plays the break once when `active` falls and rests on `spent`, plays it backwards when it rises and
+rests on `ready`, and cuts straight to the frame under reduced motion.
 
 **Mobs** are small rigs of spheres, capsules and wing polygons in a mob-local frame (`tools/sprites/m5b-mobs.ts`),
 posed per animation and projected onto the iso ground for each direction, back to front, under one ink
