@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import metrics from '@wdi/content/data/metrics.json';
 import palette from '@wdi/content/data/palette.json';
 import traits from '@wdi/content/data/traits.json';
 import type { Direction } from '@wdi/shared/direction';
@@ -19,7 +20,16 @@ export const SCARF_TINT = traits.axes.scarf.values.map((v) =>
   Number.parseInt(palette.colors[v.tint as keyof typeof palette.colors].slice(1), 16),
 );
 const SCARF_SHAPE = ['◆', '●', '■']; // diamond, circle, square (nameplateShape)
-export const HEIGHT_SCALE = traits.axes.height.values.map((v) => v.spriteScale);
+/**
+ * The drawn scale of a figure (round 8, 8F; SPRITES 1, 10.3): packed frames are drawn `iso.artScale` times larger
+ * like every other packed sprite, then `iso.figureScale` larger than true scale against props and tiles, both
+ * anchored at the feet pivot. Before round 8 the characters were drawn at 1, half their designed size.
+ */
+export const FIGURE_SCALE = metrics.iso.artScale * metrics.iso.figureScale;
+/** The GDD 3.1 height factor of each height trait, times `FIGURE_SCALE`: the whole scale of a drawn figure. */
+export const HEIGHT_SCALE = traits.axes.height.values.map((v) => v.spriteScale * FIGURE_SCALE);
+/** The standing figure's cap in packed px (SPRITES 1): the nameplate and the tick sit above it. */
+const HEAD_PX = metrics.maxStandingSilhouettePx / metrics.iso.artScale;
 
 export interface PlayerLook {
   /** The look id of the deck (`char/<lookId>/...`, SPRITES 3); the plain villager body when absent or not loaded. */
@@ -57,7 +67,8 @@ export class PlayerView {
     const overlayTexture = `ovl_${this.bodyId}`;
     this.hasArt = scene.textures.exists(bodyTexture);
     this.plateColor = isSelf ? palette.colors.mustard : palette.colors.bone;
-    const shadow = scene.add.ellipse(0, 0, 40, 20, 0x12141c, 0.4);
+    const scale = HEIGHT_SCALE[look.height] ?? FIGURE_SCALE;
+    const shadow = scene.add.ellipse(0, 0, 20 * scale, 10 * scale, 0x12141c, 0.4);
     this.body = scene.add.sprite(0, 0, this.hasArt ? bodyTexture : '__DEFAULT');
     this.scarf = scene.add.sprite(0, 0, scene.textures.exists(overlayTexture) ? overlayTexture : '__DEFAULT');
     this.hat = scene.add.sprite(0, 0, scene.textures.exists(overlayTexture) ? overlayTexture : '__DEFAULT');
@@ -68,10 +79,9 @@ export class PlayerView {
     // The scarf and hat are the villager's overlays; a deck look wears its own, baked into the body.
     this.hatPass = this.bodyId === BODY ? (HATS[look.hat] ?? null) : null;
     this.scarf.setVisible(this.bodyId === BODY);
-    const scale = HEIGHT_SCALE[look.height] ?? 1;
     const shape = SCARF_SHAPE[look.scarf] ?? SCARF_SHAPE[0];
     this.plate = scene.add
-      .text(0, -Math.round(130 * scale), `${shape} ${name}`, {
+      .text(0, -Math.round(HEAD_PX * scale + 18), `${shape} ${name}`, {
         fontFamily: 'Inter, sans-serif',
         fontSize: '15px',
         color: this.plateColor,
@@ -85,13 +95,19 @@ export class PlayerView {
       .setScale(scale * drawScale(bodyTexture));
     // The greybox mark of an interact pose a look has no clip for: a small teal tick above the head.
     this.tick = scene.add
-      .rectangle(0, -Math.round(120 * scale), 10, 10, Number.parseInt(palette.colors.teal.slice(1), 16))
+      .rectangle(
+        0,
+        -Math.round(HEAD_PX * scale + 8),
+        10,
+        10,
+        Number.parseInt(palette.colors.teal.slice(1), 16),
+      )
       .setAngle(45)
       .setVisible(false);
     this.root = scene.add.container(0, 0, [shadow, art, this.tick, this.plate]);
     if (!this.hasArt) {
-      // No texture at all: a bare capsule keeps the game playable.
-      art.add(scene.add.rectangle(0, -40, 28, 80, 0x6f7a8c).setStrokeStyle(3, 0x12141c));
+      // No texture at all: a bare capsule (packed px, scaled with the art) keeps the game playable.
+      art.add(scene.add.rectangle(0, -20, 14, 40, 0x6f7a8c).setStrokeStyle(2, 0x12141c));
     }
   }
 

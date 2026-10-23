@@ -1,0 +1,71 @@
+{
+  "gddRef": "3.22",
+  "inspect": { "rangeTiles": 1.5, "cooldownS": 4, "health": { "unhurt": 0.9, "bruised": 0.4 } },
+  "rows": [
+    {
+      "inspector": "vendetta:hitman",
+      "inspected": "mark",
+      "suspicion": 3,
+      "note": "inspect.hunch.watchChain"
+    },
+    {
+      "inspector": "vendetta:zealot",
+      "inspected": "role:vicar",
+      "suspicion": 2,
+      "note": "inspect.hunch.collar"
+    },
+    {
+      "inspector": "vendetta:bandit",
+      "inspected": "role:butler",
+      "map": "hollowmere",
+      "suspicion": 2,
+      "note": "inspect.hunch.keys"
+    },
+    {
+      "inspector": "vendetta:bandit",
+      "inspected": "figure:clerk",
+      "map": "hollowmere",
+      "suspicion": 2,
+      "note": "inspect.hunch.keys",
+      "inert": true
+    },
+    {
+      "inspector": "vendetta:activist",
+      "inspected": "role:railroadBaron",
+      "suspicion": 3,
+      "note": "inspect.hunch.rings",
+      "inert": true
+    },
+    {
+      "inspector": "faction:cabal",
+      "inspected": "role:detective",
+      "suspicion": 1,
+      "note": "inspect.hunch.measured"
+    },
+    { "inspector": "faction:cabal", "inspected": "role:watchman", "suspicion": 1 },
+    {
+      "inspector": "role:detective",
+      "inspected": "role:vicar",
+      "suspicion": 0,
+      "note": "inspect.hunch.confession"
+    },
+    {
+      "inspector": "role:vicar",
+      "inspected": "role:detective",
+      "suspicion": 0,
+      "note": "inspect.hunch.blessing"
+    },
+    {
+      "inspector": "role:thief",
+      "inspected": "role:butler",
+      "suspicion": 1,
+      "note": "inspect.hunch.pockets"
+    },
+    {
+      "inspector": "role:thief",
+      "inspected": "role:baker",
+      "suspicion": 1,
+      "note": "inspect.hunch.pockets"
+    }
+  ]
+}
