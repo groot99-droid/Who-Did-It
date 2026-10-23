@@ -245,6 +245,23 @@ muted text; a loft edge cue in `--cool` for each fake creak. No clock, no stick,
 the reveal's plate rows; `mark_loaf` (lantern crust, blood underside, three ink scores) is the
 loaf token chip and the oven-ledge count.
 
+**Round 7: the night glass (7B, A106).** The owner's mockups (`docs/round7/ui-reskin.md` 1): "frosted
+glass, pixel-stepped" surfaces over the loop backdrop. A screen session builds every night screen from
+these classes and writes only layout in its own file. All of them read tokens (the night roles of 2,
+`--wdi-glass-*`, `--wdi-step`); nothing here is a faction colour.
+
+| Class | What it is | Variants, slots and states |
+|---|---|---|
+| `.wdi-glass` | The surface: `--wdi-glass-fill` under a `--wdi-glass-blur` backdrop blur, the corners cut in two pixel steps of `--wdi-step` (a `clip-path`), a 1 px snow rim at 28% with a brighter top edge and a night bevel at the bottom, and a faint 4 px snow checker sheen. Where `backdrop-filter` is missing the fill is used alone (the contrast in 10 never counts the blur) | none; every class below is a `.wdi-glass` |
+| `.wdi-glass-btn` | A menu or lobby button, 56 px tall, full width of its column: an optional icon slot, the label (a text node is enough) in Press Start 2P 16 px snow caps, a chevron slot at the right | `--primary` (the one per screen: a 2 px lantern rim and a lantern chevron, a lantern wash on hover); `--ghost` (no fill and no blur, the rim only, lilac label; only on a glass panel, never bare on the backdrop); `--sm` (44 px, the label at 12 px: How to Play, Credits, Quit, Copy Invite Link). Slots `__icon` (24 px, `currentColor`) and `__chev` (a stepped triangle, shown on hover and focus, always on `--primary`). Hover lifts 2 px and brightens the rim; active sinks; focus is a 2 px lantern ring outside the step. `:disabled` and `aria-disabled="true"` fade the icon and label to 50% and greyscale them, and show `__note` ("Coming later", Pixelify 12 px lilac, never faded), as the HD art style does |
+| `.wdi-glass-panel` | A column or dialog: a `.wdi-glass` with 24 px padding (16 on phones) and the bigger 8 px step | `__eyebrow` (Press Start 2P 12 px caps, lilac at 80%: "PARTY CODE"), `__title` (Pixelify 600 at 24 px: "Players 1 / 10", "The Deck"), `__hint` (Pixelify 14 px, lilac at 80%) |
+| `.wdi-glass-input` | A text field on glass: night at 55% sunk into the panel, a 1 px rim, Pixelify 16 px lilac, the placeholder lilac at 80%, 44 px | focus: the lantern ring; `aria-invalid="true"`: the rim turns lantern and the message below is lantern with the warning glyph |
+| `.wdi-glass-select` | The same field as a native `select` (the NPC skill) with a stepped lilac chevron drawn from two gradients; its options are night with lilac text | `:disabled` fades to 50% and the screen shows the locked note under it (`__hint`) |
+| `.wdi-tag` | A seat tag, 24 px, Press Start 2P 12 px caps, the 2 px step | `--you` (violet, lilac), `--leader` (lantern, night), `--npc` (a lilac rim, no fill), `--ready` (violet with a stepped tick before the word). Each says its word, so none is told by colour alone |
+| `.wdi-seg--glass` | The glass look of the segmented radio group (`.wdi-seg`, `ui/artStyle/artStyle.css`): a `.wdi-glass` strip, options in Pixelify 600 14 px lilac | `.is-on` lantern with night text; `:disabled` 50% with `.wdi-seg__note` ("Coming later") beside the group |
+| `.wdi-title` | The game's title: two lines in Press Start 2P at display-xl (display-lg on phones), snow then lantern at 1.875 times that (`__line--accent`), each letter a `__ch` span with its index in `--i`, with a stepped violet then indigo shadow. The letters drop in one after another (`--wdi-title-step` apart, in pixel steps); `prefers-reduced-motion` shows them in place | `ui/theme/title.ts` `titleLetters(text)` builds the spans; the line carries the whole text as its accessible name and the letters are `aria-hidden` |
+| `.wdi-backdrop` | The loop behind the night screens (`ui/backdrop.ts`, 7B's third PR): the poster, the video, the veil, the vignette and the scanlines, fixed under `#overlay`'s content | `prefers-reduced-motion` pauses the video on its frame; `?video=0` never loads it and keeps the poster |
+
 ## 7. The role card
 
 The card is the one place the faction shows. Structure, top to bottom (`.wdi-card`):
@@ -341,8 +358,9 @@ composited over the background first. Floors: 4.5 for text, 3 for large text (24
 | `mustard` | `ink` | 9.88 | 3 | AAA | focus ring on the page (non-text, 3:1) |
 | `fog` | `ink` | 4.23 | 3 | AA large / UI | display text 24 px and up only (large text, 3:1) |
 
-The night theme (round 7). A stack such as `indigo@0.66 over night@0.6 over snow` is composited
-bottom up: the brightest frame the loop could show (`snow`), the veil, then the glass fill. The
+The night theme (round 7). A stack such as `snow@0.04 over indigo@0.66 over night@0.6 over snow` is
+composited bottom up: the brightest frame the loop could show (`snow`), the veil, the glass fill, then
+a cell of the glass's checker sheen (the worst place a letter can sit). The
 alphas are read from `tokens.css` by the test, so a changed token re-measures the rows.
 
 | Foreground | Background | Ratio | Floor | Grade | Use |
@@ -354,11 +372,13 @@ alphas are read from `tokens.css` by the test, so a changed token re-measures th
 | `lantern` | `night` | 11.06 | 4.5 | AAA | the party code, warnings and the focus ring on night |
 | `lilac` | `violet` | 5.46 | 4.5 | AA | You, NPC and Ready tags |
 | `lantern` | `indigo` | 8.28 | 3 | AAA | the title's second line against its stepped shadow (large text, 3:1) |
-| `lilac` | `indigo@0.66 over night` | 10.79 | 4.5 | AAA | text on glass over the loop's darkest frame |
-| `lilac` | `indigo@0.66 over night@0.6 over snow` | 7.00 | 4.5 | AAA | text on glass over the brightest frame possible |
-| `lilac@0.8` | `indigo@0.66 over night@0.6 over snow` | 5.14 | 4.5 | AA | muted text and hints on glass |
-| `snow` | `indigo@0.66 over night@0.6 over snow` | 10.69 | 4.5 | AAA | pixel labels on glass buttons |
-| `lantern` | `indigo@0.66 over night@0.6 over snow` | 6.07 | 3 | AA | the primary rim and the focus ring on glass (non-text, 3:1) |
+| `lilac` | `snow@0.04 over indigo@0.66 over night` | 9.81 | 4.5 | AAA | text on glass over the loop's darkest frame |
+| `lilac` | `snow@0.04 over indigo@0.66 over night@0.6 over snow` | 6.23 | 4.5 | AA | text on glass over the brightest frame possible |
+| `lilac@0.8` | `snow@0.04 over indigo@0.66 over night@0.6 over snow` | 4.63 | 4.5 | AA | muted text and hints on glass |
+| `snow` | `snow@0.04 over indigo@0.66 over night@0.6 over snow` | 9.51 | 4.5 | AAA | pixel labels on glass buttons |
+| `lantern` | `snow@0.04 over indigo@0.66 over night@0.6 over snow` | 5.40 | 3 | AA | the primary rim and the focus ring on glass (non-text, 3:1) |
+| `snow` | `lantern@0.12 over snow@0.04 over indigo@0.66 over night@0.6 over snow` | 7.70 | 4.5 | AAA | the primary label under its hover wash |
+| `lilac@0.8` | `night@0.55 over snow@0.04 over indigo@0.66 over night@0.6 over snow` | 6.83 | 4.5 | AA | placeholders in glass inputs and selects |
 | `lilac` | `night@0.5 over night@0.6 over snow` | 7.21 | 4.5 | AAA | bare text at the vignetted edge: the footer, the chip row |
 | `lilac` | `night@0.6 over snow` | 3.41 | 3 | AA large / UI | bare display text on the veil, 24 px and up (large text, 3:1) |
 
