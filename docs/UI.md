@@ -260,7 +260,7 @@ these classes and writes only layout in its own file. All of them read tokens (t
 | `.wdi-tag` | A seat tag, 24 px, Press Start 2P 12 px caps, the 2 px step | `--you` (violet, lilac), `--leader` (lantern, night), `--npc` (a lilac rim, no fill), `--ready` (violet with a stepped tick before the word). Each says its word, so none is told by colour alone |
 | `.wdi-seg--glass` | The glass look of the segmented radio group (`.wdi-seg`, `ui/artStyle/artStyle.css`): a `.wdi-glass` strip, options in Pixelify 600 14 px lilac | `.is-on` lantern with night text; `:disabled` 50% with `.wdi-seg__note` ("Coming later") beside the group |
 | `.wdi-title` | The game's title: two lines in Press Start 2P at display-xl (display-lg on phones), snow then lantern at 1.875 times that (`__line--accent`), each letter a `__ch` span with its index in `--i`, with a stepped violet then indigo shadow. The letters drop in one after another (`--wdi-title-step` apart, in pixel steps); `prefers-reduced-motion` shows them in place | `ui/theme/title.ts` `titleLetters(text)` builds the spans; the line carries the whole text as its accessible name and the letters are `aria-hidden` |
-| `.wdi-backdrop` | The loop behind the night screens (`ui/backdrop.ts`, 7B's third PR): the poster, the video, the veil, the vignette and the scanlines (`--wdi-scanline`, which only darkens), fixed under `#overlay`'s content; `__title` (the `.wdi-title`, top left, Landing only) and `__status` (lilac, bottom centre: Boot's "Waking the village..." and the refresh message, then `build <id>`, which replaces the canvas `{ok, build}` line). `showBackdrop` and `hideBackdrop` are called by the menu scenes (Boot, Landing, Lobby, RoleReveal; GameOver and the Intro's end may join); testids `backdrop`, `backdrop-status` | `prefers-reduced-motion` pauses the video on its frame; `?video=0` never loads it and keeps the poster |
+| `.wdi-backdrop` | The loop behind the night screens (`ui/backdrop.ts`, 7B's third PR): the poster, the video, the veil, the vignette and the scanlines (`--wdi-scanline`, which only darkens), fixed under `#overlay`'s content; `__title` (the `.wdi-title`, top left, opt-in; the menu draws its own title, so Landing leaves it off) and `__status` (lilac, bottom centre: Boot's "Waking the village..." and the refresh message, then `build <id>`, which replaces the canvas `{ok, build}` line). `showBackdrop` and `hideBackdrop` are called by the menu scenes (Boot, Landing, Lobby, RoleReveal; GameOver and the Intro's end may join); testids `backdrop`, `backdrop-status` | `prefers-reduced-motion` pauses the video on its frame; `?video=0` never loads it and keeps the poster |
 
 ## 7. The role card
 
@@ -1371,6 +1371,41 @@ Lines are in `apps/client/src/ui/copy/intro.ts` (`INTRO_COPY`). The `Intro` scen
 - **When it plays.** Once per browser session (`sessionStorage['wdi:introSeen']`, set at the tap). Not under `prefers-reduced-motion`, the data saver (`saveData`), `?intro=0`, a reload that rejoins a lobby (`#/lobby/CODE`), and in the mock (`?mock=1`) unless `?intro=1`. `?intro=1` overrides only the mock rule.
 - **How it ends.** The video ends, Skip, a click or tap anywhere while it plays, or Esc (also before the tap). A stream that has not started 8 s after the tap, or a video error, ends it the same way. Then `Landing` starts as it always did.
 - **A missing file.** No manifest, no `intro` row, a failed HEAD request for the file, or an HTML answer where a video should be: the scene starts `Landing` at once and shows nothing.
+
+### 14.25 Menu, dialogs, profile, friends, Quit and the party list (7C)
+
+Round 7, Session 7C (DECISIONS A103, A104, A107). Lines are in `apps/client/src/ui/copy/menu.ts` (`MENU_COPY`); the
+landing keys of `lobby.ts` stay until 7P deletes them. The numbers (name length, caps, refresh) are GDD 3.21 and
+`balance.json`, never restated here. The menu replaces the old landing form: no field on the menu itself, the name is
+asked where it is used.
+
+| Key | Text | Where |
+|---|---|---|
+| `menu.title.top`, `menu.title.bottom` | Who did / it? | the title, two lines (accessible name `menu.title.label`: Who Did It?) |
+| `menu.start` | Start Game | primary button; opens the Start dialog |
+| `menu.join` | Join Game | opens the party list (until the list lands: the code box) |
+| `menu.profile` | Create Profile | opens the profile panel; reads `menu.profile.edit` (Profile) once a profile exists |
+| `menu.friends` | Friends | opens the friends list (greyed with `menu.soon` until it lands) |
+| `menu.settings` | Settings | opens the sound panel of UI.md 14.22 in a dialog |
+| `menu.help`, `menu.credits` | How to Play, Credits | small links, a new tab: `${BASE}help/` and the repository's `CREDITS.md` |
+| `menu.quit` | Quit | small button (greyed with `menu.soon` until it lands) |
+| `menu.soon` | Coming later | the note on a greyed button (the title and screen-reader text on the small one) |
+| `menu.haveCode` | Have a code? | the party list's link to the code box |
+| `menu.chip.guest`, `menu.chip.label` | Guest, Profile: {name} | the top-right chip |
+| `menu.sound.on`, `menu.sound.off` | Sound on, Sound off | the sound toggle's name; it is the settings mute |
+| `menu.footer` | v{build} | the footer; `{build}` is `/health`'s build |
+| `start.title` | Start a party | the Start dialog |
+| `start.name.label`, `start.name.hint`, `start.name.error` | Your name, {min} to {max} characters, Name must be {min} to {max} characters. | the name field, as before |
+| `start.visibility`, `start.open`, `start.open.hint`, `start.private`, `start.private.hint` | Who can see it, Open, Anyone can find it in the party list., Private, Only people with the code or link. | the choice, Open by default |
+| `start.create`, `start.cancel` | Create Party, Cancel | the dialog's buttons |
+| `code.title`, `code.title.invited` | Join with a code, You are invited | the code box; the second when a `#/join/CODE` link opened it |
+| `code.label`, `code.placeholder`, `code.name.label`, `code.join` | Party code, CODE, Your name, Join Party | the code box's fields and button |
+| `settings.title` | Settings | the settings dialog |
+
+A failed create or join says the generic error (`JOIN_FAILED_MESSAGE`, UI.md 1.6) in the dialog's one `role="alert"`
+line, or the refresh line when the build is stale. `data-testid`s: `menu`, `menu-chip`, `menu-sound`, `menu-build`,
+`landing-trailer` (kept). The e2e fixture `e2e/fixtures/party.ts` (`createParty`, `joinParty`) drives the buttons and
+labels above; a visible label that changes changes there.
 
 ### 14.26 Lobby re-skin (7E, round 7)
 
