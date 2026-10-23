@@ -17,6 +17,20 @@ export function nodeFrame(resource: string, active: boolean): string {
   return `${stem}/${active ? 'ready' : 'spent'}`;
 }
 
+/** A node's break animation `node_<snake id>/break` (round 8, 8G): once on collection, backwards as it regrows. */
+export function nodeBreakKey(resource: string): string {
+  return `${NODE_ROWS[resource]?.sprite ?? `node_${resource}`}/break`;
+}
+
+/**
+ * What a node does when its `active` flag changes: break (forward) as its yield is taken, regrow (the break
+ * reversed) as it returns, or a cut to the new frame when the art has no break or the player asked for reduced motion.
+ */
+export function nodeChange(active: boolean, hasBreak: boolean, reduced: boolean): 'break' | 'regrow' | 'cut' {
+  if (!hasBreak || reduced) return 'cut';
+  return active ? 'regrow' : 'break';
+}
+
 /**
  * `Mob.state` on the wire (the server's `sim/mobs/ai.ts` `MobState`): the view reads only `flee` and `dead`. A creature
  * asleep for its part of the day leaves the feed, so `dead` in the feed is a creature killed (round 8, 8G).
