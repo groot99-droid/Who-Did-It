@@ -131,7 +131,7 @@ export class CutscenePlayer {
           'button',
           {
             type: 'button',
-            class: 'wdi-btn wdi-btn--ghost wdi-btn--sm wdi-cutscene__skip',
+            class: 'wdi-glass-btn wdi-glass-btn--sm wdi-cutscene__skip',
             'data-testid': 'cutscene-skip',
             'aria-label': CUTSCENE_COPY['cutscene.skip.label'],
             onClick: () => finish('skipped'),

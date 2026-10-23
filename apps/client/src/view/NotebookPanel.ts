@@ -72,7 +72,7 @@ export class NotebookPanel {
     this.list = h('div', { class: 'wdi-notebook__list' });
     this.root = h(
       'section',
-      { class: 'wdi-notebook', 'data-testid': 'notebook', 'aria-label': C['notebook.title'] },
+      { class: 'wdi-glass wdi-notebook', 'data-testid': 'notebook', 'aria-label': C['notebook.title'] },
       h('h2', { class: 'wdi-eyebrow' }, C['notebook.title']),
       this.list,
     );

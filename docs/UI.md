@@ -1420,8 +1420,11 @@ this is the exception, found while checking the HUD.
 **Over the world.** The world has no veil, so a surface over it is measured against a bare white pixel. The shared
 glass fill (indigo at 66%) is measured under the menu's veil (10) and gives lilac only 3.32 there, so the HUD, the
 role chip, the settings gear and panel use `--wdi-match-glass` (`ui/match.css`: night at 85%): lilac on it is 8.61,
-lilac at 80% is 6.12 and snow is 13.14 over white. The notebook sheet sits under its own veil and keeps the glass fill.
+lilac at 80% is 6.12 and snow is 13.14 over white. The notebook sheet sits under its own veil and is a 7B `.wdi-glass`.
 
 No focusable element is clipped to a stepped corner: a `clip-path` would cut the focus ring, so the pixel corner is
-a 2 px radius with an inset snow rim, and the glass classes of 7B (`.wdi-glass-btn`) replace these rims where they
-land.
+a 2 px radius with an inset snow rim. 7B's glass classes keep their stepped corner on a `::before` layer, so the ring
+is never cut: the cutscene Skip, the intro's Skip and Begin (`.wdi-glass-btn--sm`, Begin `--primary`) and the notebook
+(`.wdi-glass`) use them; the snow label is 9.51 at worst on that glass, so it holds over the world. The HUD chip, the
+role chip, the settings gear and panel and the captions keep `--wdi-match-glass`, because their text is lilac or
+muted lilac, which the 66% fill does not carry over bare white.
