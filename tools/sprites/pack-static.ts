@@ -267,6 +267,8 @@ export function expectedFrames(atlas: StaticAtlas): string[] {
 export interface StaticManifest {
   version: number;
   atlas: StaticAtlas;
+  /** Render px per display px of the frames (the HD style, hd.ts); absent or 1 otherwise. */
+  factor?: number;
   frames: Record<
     string,
     { file: string; cell: number | [number, number]; pivot?: [number, number]; clipped?: boolean }
@@ -303,25 +305,31 @@ export function staticAnims(texture: string, frameNames: string[]): { anims: Pha
   };
 }
 
-/** Pack a static sheet; the frame set must match the keys of docs/SPRITES.md 8 exactly. */
+/**
+ * Pack a static sheet; the frame set must match the keys of docs/SPRITES.md 8 exactly. `texels` (render px
+ * per display px, the HD style's factor) scales the page cap with the frames.
+ */
 export async function packStatic(
   manifest: StaticManifest,
   inputs: PackInput[],
   on: boolean = finishEnabled('main'),
+  texels = 1,
+  subset = false,
 ): Promise<Map<string, Buffer>> {
   // Slices are whatever the footprints cut (slice.ts): a building atlas holds only slices, a map's prop
-  // atlas its frame list plus the slices of its multi-tile props.
+  // atlas its frame list plus the slices of its multi-tile props. A `subset` (a partial render for review)
+  // packs what it holds.
   const got = inputs.map((i) => i.name).sort();
   const sliced = manifest.atlas.startsWith('bld_') || manifest.atlas.startsWith('props_');
   const want = manifest.atlas.startsWith('bld_') ? [] : expectedFrames(manifest.atlas);
-  const missing = want.filter((n) => !got.includes(n));
+  const missing = subset ? [] : want.filter((n) => !got.includes(n));
   const extra = got.filter((n) => !want.includes(n) && !(sliced && SLICE_RE.test(n)));
   if (missing.length || extra.length) {
     throw new Error(`${manifest.atlas}: missing [${missing.join(', ')}], unexpected [${extra.join(', ')}]`);
   }
   const cap = pageCap(manifest.atlas);
   const { atlas, pages } = cap
-    ? await packCapped(manifest.atlas, inputs, cap[0], cap[1], on)
+    ? await packCapped(manifest.atlas, inputs, cap[0] * texels, cap[1] * texels, on)
     : await packFrames(manifest.atlas, inputs);
   applyStaticPivots(atlas, manifest);
   const out = new Map<string, Buffer>(pages);
@@ -342,15 +350,16 @@ export function readStatic(dir: string): { manifest: StaticManifest; inputs: Pac
   return { manifest, inputs };
 }
 
-// CLI: tsx tools/sprites/pack-static.ts <render dir, e.g. build/render/props> <out dir>
+// CLI: tsx tools/sprites/pack-static.ts <render dir, e.g. build/render/props> <out dir> [--subset]
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const [renderDir, outDir] = process.argv.slice(2);
+  const subset = process.argv.includes('--subset');
+  const [renderDir, outDir] = process.argv.slice(2).filter((a) => a !== '--subset');
   if (!renderDir || !outDir) {
-    console.error('usage: tsx pack-static.ts <render dir> <out dir>');
+    console.error('usage: tsx pack-static.ts <render dir> <out dir> [--subset]');
     process.exit(2);
   }
   const { manifest, inputs } = readStatic(renderDir);
-  const files = await packStatic(manifest, inputs);
+  const files = await packStatic(manifest, inputs, undefined, 1, subset);
   writeFiles(outDir, files);
   console.log(`pack-static: ${[...files.keys()].join(', ')} -> ${outDir}`);
 }

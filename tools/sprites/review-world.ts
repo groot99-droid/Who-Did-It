@@ -7,12 +7,18 @@
 //   tsx review-world.ts atlas <assets dir> <atlas json, e.g. props/props.json> <out.png>
 //   tsx review-world.ts buildings <assets dir> <mapId> <out.png>
 //   tsx review-world.ts thumbs <assets dir> <out dir> [--finish on|off]   (thumb_<mapId>.webp, art plan 3.9)
+//   tsx review-world.ts proposal <out.png> <label>=<assets dir>[:texels][:smooth]...   (art.md 5, the look PR)
 //
 // `gate` is Gate A's Hollowmere square vignette: ground with blends, kit walls, a tree line, boulders, the
 // hedge-wall, the tavern's slices, the bell, the pump, two lantern posts and a look idling in 8 directions,
 // as a day frame and a night frame (a simulated darkness layer with the lantern pools), each at zoom 1
 // and a zoom-2 crop. Its two runs differ only in the assets folder they read (the same raw renders finished
-// on and off) and the texture filter. Missing frames draw the greybox of SPRITES 10.13.
+// on and off) and the texture filter. Missing frames draw the greybox of SPRITES 10.13. An assets folder of
+// the HD style holds `texels` render px per display px (hd.ts): its frames draw at 1 / texels of the scale.
+//
+// `proposal` is the look proposal of docs/round8/art.md 5: one cell per assets folder (a style, flat or
+// textured), each the square's room with three figures at zoom 2 and the same view at zoom 1, in the order
+// given, two cells per row.
 import { readFileSync, existsSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -198,9 +204,17 @@ interface Atlases {
   bld: Map<string, Sprite>;
   look: Map<string, Sprite>;
   lookId: string;
+  /** Render px per display px of this folder's frames (1 for the 8-bit and low-poly sets). */
+  texels: number;
 }
 
-async function loadAtlases(assets: string, theme: string, map: string, look: string): Promise<Atlases> {
+async function loadAtlases(
+  assets: string,
+  theme: string,
+  map: string,
+  look: string,
+  texels = 1,
+): Promise<Atlases> {
   const ground = join(assets, 'ground', `iso_ground_${theme}.png`);
   const props = await readAtlas(join(assets, 'props', 'props.json'));
   for (const [k, v] of await readAtlas(join(assets, 'props', `props_${map}.json`))) props.set(k, v);
@@ -213,6 +227,7 @@ async function loadAtlases(assets: string, theme: string, map: string, look: str
     bld: await readAtlas(join(assets, 'buildings', `bld_${map}.json`)),
     look: await readAtlas(join(assets, 'chars', `char_${lookId}.json`)),
     lookId,
+    texels,
   };
 }
 
@@ -222,7 +237,18 @@ function groundCell(g: SKRSContext2D, a: Atlases, char: string, c: number, x: nu
   if (!a.ground) return;
   const col = c % COLUMNS;
   const row = 2 * m + Math.floor(c / COLUMNS);
-  g.drawImage(a.ground, col * CELL_W, row * CELL_H, CELL_W, CELL_H, x - CELL_W / 2, y, CELL_W, CELL_H);
+  const t = a.texels;
+  g.drawImage(
+    a.ground,
+    col * CELL_W * t,
+    row * CELL_H * t,
+    CELL_W * t,
+    CELL_H * t,
+    x - CELL_W / 2,
+    y,
+    CELL_W,
+    CELL_H,
+  );
 }
 
 /** The ground layer and the two blend layers of SPRITES 10.12 for a grid of material chars. */
@@ -283,6 +309,7 @@ function vignette(
   g.fillStyle = INK;
   g.fillRect(0, 0, canvas.width, canvas.height);
   drawGround(g, a, v.ground, ox, oy);
+  const artScale = ART_SCALE / a.texels;
 
   const placed: Placed[] = [];
   const at = (tx: number, ty: number) => {
@@ -304,7 +331,7 @@ function vignette(
       const cell = KIT_CELLS[`${kind}/full`]!;
       placed.push({
         depth: p.depth,
-        paint: () => (s ? draw(g, s, p.x, p.y, ART_SCALE) : greybox(g, p.x, p.y, cell[1] * 1.5)),
+        paint: () => (s ? draw(g, s, p.x, p.y, artScale) : greybox(g, p.x, p.y, cell[1] * 1.5)),
       });
     }),
   );
@@ -317,7 +344,7 @@ function vignette(
         depth: p.depth,
         paint: () =>
           s
-            ? draw(g, s, ox + anchor.x, oy + anchor.y, ART_SCALE)
+            ? draw(g, s, ox + anchor.x, oy + anchor.y, artScale)
             : dx === 0 || dy === 0
               ? undefined
               : greybox(g, p.x, p.y, 150, 128),
@@ -331,14 +358,14 @@ function vignette(
     if (pr.frame.startsWith('prop_lanternPost')) lights.push({ x: p.x, y: p.y - 100 });
     placed.push({
       depth: p.depth,
-      paint: () => (s ? draw(g, s, p.x, p.y, ART_SCALE) : greybox(g, p.x, p.y, 90, 24)),
+      paint: () => (s ? draw(g, s, p.x, p.y, artScale) : greybox(g, p.x, p.y, 90, 24)),
     });
   }
   (v.people?.dirs ?? []).forEach((dir, i) => {
     const p = at(v.people!.x0 + i, v.people!.y);
     const s = a.look.get(`char/${a.lookId}/idle/${dir}/000`);
     // A round-5 look is packed at half size; the round-4 villager atlas is still at display size.
-    const scale = a.lookId === 'villager' ? 1 : ART_SCALE;
+    const scale = a.lookId === 'villager' ? 1 : artScale;
     placed.push({
       depth: p.depth + 0.5,
       paint: () => (s ? draw(g, s, p.x, p.y, scale) : greybox(g, p.x, p.y, 100, 30)),
@@ -401,6 +428,56 @@ export async function gateSheet(assets: string, smooth: boolean, look = 'baker')
   const cy = focus.y - ch / 4;
   g.drawImage(day, cx, cy, cw / 2, ch / 2, 0, day.height + 32, cw, ch);
   g.drawImage(nightC, cx, cy, cw / 2, ch / 2, day.width + 32, day.height + 32, cw, ch);
+  return out.toBuffer('image/png');
+}
+
+/** The look proposal's view of the square: three figures by the pump, the crop between the tavern door and the bell. */
+export const PROPOSAL: Layout = {
+  ...VIGNETTE,
+  people: { x0: 8, y: 11, dirs: ['s', 'se', 'sw'] },
+  focus: [9, 10],
+};
+
+export interface ProposalColumn {
+  label: string;
+  assets: string;
+  texels: number;
+  smooth: boolean;
+}
+
+/** `<label>=<assets dir>[:texels][:smooth]` */
+export function parseColumn(arg: string): ProposalColumn {
+  const eq = arg.indexOf('=');
+  if (eq < 0) throw new Error(`proposal: ${arg} is not <label>=<assets dir>[:texels][:smooth]`);
+  const [assets, ...flags] = arg.slice(eq + 1).split(':') as [string, ...string[]];
+  const texels = Number(flags.find((f) => /^\d+$/.test(f)) ?? 1);
+  return { label: arg.slice(0, eq), assets, texels, smooth: flags.includes('smooth') };
+}
+
+/** One cell per column: the room at zoom 2 above the same view at zoom 1; two cells per row. */
+export async function proposalSheet(columns: ProposalColumn[]): Promise<Buffer> {
+  const cw = 800;
+  const ch = 450;
+  const pad = 16;
+  const label = 28;
+  const cellH = label + ch * 2 + pad;
+  const cols = 2;
+  const out = createCanvas(cols * (cw + pad) + pad, Math.ceil(columns.length / cols) * cellH + pad);
+  const g = out.getContext('2d');
+  g.fillStyle = INK;
+  g.fillRect(0, 0, out.width, out.height);
+  for (const [i, c] of columns.entries()) {
+    const a = await loadAtlases(c.assets, 'harbour', 'hollowmere', 'baker', c.texels);
+    const { canvas, focus } = vignette(a, c.smooth, PROPOSAL);
+    const x = pad + (i % cols) * (cw + pad);
+    const y = pad + Math.floor(i / cols) * cellH;
+    g.fillStyle = '#D9D2C2';
+    g.font = '18px sans-serif';
+    g.fillText(`${c.label}  (zoom 2 above, zoom 1 below)`, x, y + 20);
+    g.imageSmoothingEnabled = c.smooth;
+    g.drawImage(canvas, focus.x - cw / 4, focus.y - ch / 4, cw / 2, ch / 2, x, y + label, cw, ch);
+    g.drawImage(canvas, focus.x - cw / 2, focus.y - ch / 2, cw, ch, x, y + label + ch, cw, ch);
+  }
   return out.toBuffer('image/png');
 }
 
@@ -563,6 +640,9 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   if (mode === 'gate' && assets) {
     out = more[0];
     png = await gateSheet(assets, smooth, look);
+  } else if (mode === 'proposal' && assets && more.length > 0) {
+    out = assets;
+    png = await proposalSheet(more.map(parseColumn));
   } else if (mode === 'thumbs' && assets && more[0]) {
     for (const map of ['hollowmere', 'blackpine'] as const) {
       const file = join(more[0], `thumb_${map}.webp`);
@@ -582,6 +662,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   } else {
     console.error('usage: tsx review-world.ts gate <assets> <out.png> [--finish on|off] [--look id]');
     console.error('       tsx review-world.ts ground|kit <assets> <theme> <out.png>');
+    console.error('       tsx review-world.ts proposal <out.png> <label>=<assets>[:texels][:smooth]...');
     process.exit(2);
   }
   if (!out) process.exit(2);
