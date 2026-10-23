@@ -99,10 +99,16 @@ round-8 content (BlackPine ships a two-step camera pan with no narrator in round
 
 - **`apps/client/public/assets/audio/music/manifest.json`** (6L's shape; 6N fills the rows):
   `{ tracks: [{ key, url, gain, durationS, bytes, map?: MapId }], playlists: [{ id, tracks: string[], crossfadeS,
-  shuffle }] }`. A track with `map` counts against that map's 4 MB; a track without one counts against every
-  map it is listed under.
+  shuffle, loop? }] }`. A track with `map` counts against that map's 4 MB; a track without one counts against every
+  map it is listed under. `loop: false` (round 7, 7A) plays a playlist once and leaves the bus silent at its end
+  (`MusicBus.onFinish` tells the director); a playlist without it loops.
+- **Round 7 (7A, DECISIONS A101): the opening piece.** The owner's `load_hollowmere` and `load_blackpine` are the
+  maps' intro tracks, in the `<map>_opening` playlists (`loop: false`) of the `opening` class; `loading` maps to
+  `lobby`, so the load keeps the lobby piece. The director starts `opening` when the router leaves the opening's id
+  under `REG_CUTSCENE`, holds every phase class until the piece ends or the player emits `CUTSCENE_END` with
+  `skipped` (`cutscene/sequencer.ts`), then cross-fades to the class the phase wants (the `day` during grace).
 - **`packages/content/data/music.json`** (pre-seeded empty, zod `schemas/music.ts`): `byMap[map][class]` ->
-  playlist id, classes `loading | lobby | day | dusk | night | meeting | finalNight | gameOver`, plus `onub: { kitchen,
+  playlist id, classes `loading | opening | lobby | day | dusk | night | meeting | finalNight | gameOver`, plus `onub: { kitchen,
   night, rush, over }`. The validator checks every playlist id exists in the manifest shape (a test over the
   committed manifest). Numbers (`crossfadeS`, `gain`) live in the manifest, the mapping in content.
 - **`client/view/MusicBus.ts`** (pre-seeded no-op, 6L fills): two `<audio>` elements, `crossfadeTo(playlistId)`,

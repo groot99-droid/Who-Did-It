@@ -9,11 +9,14 @@ import { GddRef, WorldId } from './common.js';
 const PlaylistId = z.string().regex(/^[a-z][a-z0-9_]*$/);
 
 /**
- * `loading` is the map's loading-screen piece (the owner's speech-and-music pieces, docs/round6/media.md 1): it starts
- * with the map's load and runs under the opening until the first phase class takes over (cutscene-music.md 2, 3).
+ * `loading` plays from the map's load to the opening (round 7: the lobby piece, so the load changes nothing).
+ * `opening` is the map's intro piece (the owner's speech-and-music pieces, docs/round6/media.md 1; DECISIONS A101):
+ * it starts with the opening cutscene, plays once and whole (its playlist has `loop: false`), and the first phase
+ * class takes over only when it ends or the opening is skipped (GDD 3.18).
  */
 export const MUSIC_CLASSES = [
   'loading',
+  'opening',
   'lobby',
   'day',
   'dusk',

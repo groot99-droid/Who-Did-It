@@ -122,7 +122,9 @@ describe('the Conductor', () => {
     await startNight(m);
     const heard: string[][] = m.bots.map(() => []);
     const sample = async (): Promise<void> => {
-      await sleep(80);
+      // Each seat's patch trails the server's board; read once every seat shows what the server shows.
+      const shown = m.room.state.onub.window;
+      await until(() => m.bots.every((b) => publicOf(b).window === shown));
       m.bots.forEach((b, i) => heard[i]!.push(publicOf(b).window));
     };
     await sample();
