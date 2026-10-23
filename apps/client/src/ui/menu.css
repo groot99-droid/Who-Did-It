@@ -1,0 +1,336 @@
+/*
+ * The menu (round 7, Session 7C; docs/UI.md 14.25): the title, the column of glass buttons, the chip and the sound
+ * toggle, and the dialogs the buttons open. Tokens only (theme.test.ts); the glass classes of 7B's PR 2 replace the
+ * local fill and rim below when they land.
+ */
+
+.wdi-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: var(--wdi-space-5) var(--wdi-space-6);
+  color: var(--wdi-night-text);
+  font-family: var(--wdi-font-pixel-text);
+  pointer-events: none;
+  background: radial-gradient(ellipse at 30% 40%, transparent 30%, var(--wdi-vignette) 100%), var(--wdi-veil);
+}
+
+.wdi-menu :is(button, a) {
+  pointer-events: auto;
+}
+
+.wdi-menu__top {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--wdi-space-3);
+}
+
+.wdi-menu__chip,
+.wdi-menu__sound {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wdi-space-2);
+  min-height: var(--wdi-touch);
+  padding: 0 var(--wdi-space-4);
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  color: var(--wdi-night-label);
+  background: var(--wdi-glass-fill);
+  border: 1px solid rgb(var(--wdi-snow-rgb) / 0.3);
+  border-radius: var(--wdi-radius-sm);
+  backdrop-filter: blur(6px);
+  text-transform: uppercase;
+}
+
+.wdi-menu__sound {
+  min-width: var(--wdi-touch);
+  justify-content: center;
+  padding: 0;
+  font-size: var(--wdi-text-md);
+  cursor: pointer;
+}
+
+.wdi-menu__main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--wdi-space-4);
+  width: min(380px, 100%);
+}
+
+.wdi-menu__title {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 var(--wdi-space-3);
+  font-family: var(--wdi-font-pixel-display);
+  font-weight: 400;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.wdi-menu__title-line--top {
+  font-size: var(--wdi-display-lg);
+  color: var(--wdi-night-label);
+  text-shadow:
+    3px 3px 0 var(--wdi-violet),
+    6px 6px 0 var(--wdi-indigo);
+}
+
+.wdi-menu__title-line--bottom {
+  font-size: calc(var(--wdi-display-xl) * 2);
+  color: var(--wdi-night-accent);
+  text-shadow:
+    3px 3px 0 var(--wdi-violet),
+    6px 6px 0 var(--wdi-indigo);
+}
+
+.wdi-menu__letter {
+  display: inline-block;
+  white-space: pre;
+  animation: wdi-menu-drop 420ms var(--wdi-ease) both;
+  animation-delay: calc(var(--i) * 70ms);
+}
+
+@keyframes wdi-menu-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+}
+
+.wdi-menu__nav {
+  display: grid;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-menu__small {
+  display: flex;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-menu__btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--wdi-space-3);
+  min-height: var(--wdi-touch);
+  padding: var(--wdi-space-2) var(--wdi-space-4);
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-sm);
+  text-align: left;
+  text-decoration: none;
+  text-transform: uppercase;
+  color: var(--wdi-night-label);
+  background: var(--wdi-glass-fill);
+  border: 1px solid rgb(var(--wdi-snow-rgb) / 0.3);
+  border-radius: var(--wdi-radius-sm);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition:
+    transform var(--wdi-dur-fast) var(--wdi-ease),
+    filter var(--wdi-dur-fast) var(--wdi-ease);
+}
+
+.wdi-menu__nav .wdi-menu__btn {
+  min-height: calc(var(--wdi-touch) + var(--wdi-space-2));
+}
+
+.wdi-menu__btn--primary {
+  color: var(--wdi-on-night-accent);
+  background: var(--wdi-night-accent);
+}
+
+.wdi-menu__btn--sm {
+  flex: 1 1 auto;
+  justify-content: center;
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  font-size: var(--wdi-text-xs);
+}
+
+.wdi-menu__btn:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+.wdi-menu__btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.wdi-menu__btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.wdi-menu__btn:focus-visible,
+.wdi-menu__sound:focus-visible,
+.wdi-menu-dialog__close:focus-visible {
+  outline: var(--wdi-stroke-w) solid var(--wdi-night-accent);
+  outline-offset: 2px;
+}
+
+.wdi-menu__icon {
+  width: 1.5em;
+  text-align: center;
+}
+
+.wdi-menu__label {
+  flex: 1 1 auto;
+}
+
+.wdi-menu__btn--sm .wdi-menu__label {
+  flex: 0 1 auto;
+}
+
+.wdi-menu__note {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-xs);
+  text-transform: none;
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-menu__btn--sm {
+  white-space: nowrap;
+}
+
+/* The small row has no room for the note; the button's title and the disabled state carry it. */
+.wdi-menu__btn--sm .wdi-menu__note {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.wdi-menu__footer {
+  font-size: var(--wdi-text-xs);
+  color: var(--wdi-night-text-muted);
+}
+
+/* ---------------------------------------------------------------- dialogs over the menu */
+
+.wdi-menu-scrim {
+  font-family: var(--wdi-font-pixel-text);
+  color: var(--wdi-night-text);
+}
+
+.wdi-menu-dialog {
+  position: relative;
+  width: min(420px, 100%);
+  max-height: calc(100dvh - var(--wdi-space-6));
+  overflow: auto;
+  padding: var(--wdi-space-5);
+  background: var(--wdi-glass-fill);
+  border: 1px solid rgb(var(--wdi-snow-rgb) / 0.3);
+  border-radius: var(--wdi-radius-md);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--wdi-shadow-3);
+  animation: wdi-rise var(--wdi-dur-base) var(--wdi-ease) both;
+}
+
+.wdi-menu-dialog__title {
+  margin: 0 var(--wdi-space-6) var(--wdi-space-4) 0;
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-md);
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--wdi-night-label);
+}
+
+.wdi-menu-dialog__close {
+  position: absolute;
+  top: var(--wdi-space-3);
+  right: var(--wdi-space-3);
+  min-width: var(--wdi-touch);
+  min-height: var(--wdi-touch);
+  font-size: var(--wdi-display-sm);
+  color: var(--wdi-night-label);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.wdi-menu-dialog .wdi-label,
+.wdi-menu-dialog .wdi-field__msg {
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-menu-dialog .wdi-field__msg--error {
+  color: var(--wdi-night-accent);
+}
+
+.wdi-menu-dialog .wdi-input {
+  font-family: var(--wdi-font-pixel-text);
+}
+
+.wdi-menu-choices {
+  display: grid;
+  gap: var(--wdi-space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.wdi-menu-choice {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 var(--wdi-space-3);
+  align-items: center;
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  border: 1px solid rgb(var(--wdi-snow-rgb) / 0.3);
+  border-radius: var(--wdi-radius-sm);
+  cursor: pointer;
+}
+
+.wdi-menu-choice:has(:checked) {
+  border-color: var(--wdi-night-accent);
+}
+
+.wdi-menu-choice__label {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  text-transform: uppercase;
+  color: var(--wdi-night-label);
+}
+
+.wdi-menu-choice__hint {
+  grid-column: 2;
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-night-text-muted);
+}
+
+/* The sound panel's own gear is the menu button's job here: show its sliders in place. */
+.wdi-menu-dialog .wdi-settings__gear {
+  display: none;
+}
+
+.wdi-menu-dialog .wdi-settings__panel {
+  position: static;
+  margin: 0;
+  color: var(--wdi-night-text);
+  background: transparent;
+  background-image: none;
+  border: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .wdi-menu {
+    padding: var(--wdi-space-4);
+  }
+
+  .wdi-menu__title-line--top {
+    font-size: var(--wdi-display-md);
+  }
+
+  .wdi-menu__title-line--bottom {
+    font-size: var(--wdi-display-xl);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-menu__letter,
+  .wdi-menu-dialog {
+    animation: none;
+  }
+}

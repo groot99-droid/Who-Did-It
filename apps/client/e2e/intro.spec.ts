@@ -24,7 +24,7 @@ async function serveStandIn(page: Page, opts: { missingFile?: boolean } = {}): P
   );
 }
 
-const landing = (page: Page) => page.getByLabel('Your name');
+const landing = (page: Page) => page.getByRole('button', { name: 'Start Game' });
 
 test('the mock e2e skips the intro unless ?intro=1', async ({ page }) => {
   await serveStandIn(page);

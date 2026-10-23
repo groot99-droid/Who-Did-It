@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
+import { createParty } from './fixtures/party';
 
 // The art-style switch (A79) on the mocks, with a tiny fixture low-poly manifest: the match stays up, the textures
 // change by key, and a failed swap keeps the old style. The 8-bit root manifest is real plus two fixture images (a
@@ -72,8 +73,7 @@ const active = (page: Page, scene: string) =>
 
 async function toWorld(page: Page, query = ''): Promise<void> {
   await page.goto(`/Who-Did-It/?mock=1${query}`);
-  await page.getByLabel('Your name').fill('Hana');
-  await page.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(page, 'Hana');
   await expect(page.getByTestId('start')).toBeEnabled();
   await page.getByTestId('start').click();
   await page.getByTestId('confirm-start').click();
@@ -84,8 +84,7 @@ async function toWorld(page: Page, query = ''): Promise<void> {
 test('the lobby offers 8-bit, low poly and a disabled HD', async ({ page }) => {
   await fixtures(page);
   await page.goto('/Who-Did-It/?mock=1');
-  await page.getByLabel('Your name').fill('Hana');
-  await page.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(page, 'Hana');
   const sw = page.getByTestId('lobby-settings').getByTestId('art-style');
   await expect(sw.getByTestId('art-style-8bit')).toHaveAttribute('aria-checked', 'true');
   await expect(sw.getByTestId('art-style-lowpoly')).toHaveAttribute('aria-checked', 'false');
@@ -127,8 +126,7 @@ test('switching in the world swaps the textures and keeps the match', async ({ p
 test('switching in a quick-mode scene swaps the kitchen', async ({ page }) => {
   await fixtures(page);
   await page.goto('/Who-Did-It/?mock=1&mode=onub&speed=2');
-  await page.getByLabel('Your name').fill('Hana');
-  await page.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(page, 'Hana');
   await expect(page.getByTestId('start')).toBeEnabled({ timeout: 10_000 });
   await page.getByTestId('start').click();
   await page.getByTestId('confirm-start').click();

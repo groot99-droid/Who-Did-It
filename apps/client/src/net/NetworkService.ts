@@ -5,6 +5,7 @@ import {
   type ClientMessages,
   type ClientMessageType,
   DEFAULT_MAP_ID,
+  type CreateOptions,
   type ErrorPayload,
   type GameOverPayload,
   gameModeId,
@@ -17,6 +18,7 @@ import {
   NpcLevel,
   npcLevelId,
   type NpcLevelId,
+  type PartyVisibility,
   type PhaseChangePayload,
   ROOM_NAME,
   type RoleRevealPayload,
@@ -68,6 +70,12 @@ export class JoinError extends Error {
   }
 }
 
+/** What the Start dialog adds to the join options at Create (round 7, parties.md 2). */
+export interface PartyOptions {
+  visibility: PartyVisibility;
+  invited?: string[];
+}
+
 /** What the scenes depend on; `ColyseusNetwork` and the `?mock=1` `MockNetwork` implement it. */
 export interface NetworkService {
   readonly bus: Emitter<NetEvents>;
@@ -78,7 +86,8 @@ export interface NetworkService {
   readonly snapshot: LobbySnapshot | null;
   /** This player's own card, kept for the whole match so Tab can reopen it in any scene. */
   readonly roleCard: RoleRevealPayload | null;
-  create(name: string): Promise<string>;
+  /** `options` is the Start dialog's pick (GDD 3.21); absent means an open party. */
+  create(name: string, options?: PartyOptions): Promise<string>;
   join(code: string, name: string): Promise<string>;
   /** Re-enter a room with the stored token; resolves false when there is none or it is stale. */
   resume(code: string): Promise<boolean>;
@@ -169,8 +178,8 @@ export class ColyseusNetwork implements NetworkService {
     return this.card;
   }
 
-  async create(name: string): Promise<string> {
-    const options: JoinOptions = { name, build: BUILD_VERSION, deviceId: deviceId() };
+  async create(name: string, party: PartyOptions = { visibility: 'open' }): Promise<string> {
+    const options: CreateOptions = { name, build: BUILD_VERSION, deviceId: deviceId(), ...party };
     return this.enter(() => this.client.create(ROOM_NAME, options));
   }
 

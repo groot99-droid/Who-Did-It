@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { onubBalance } from '@wdi/content';
+import { createParty } from './fixtures/party';
 
 // Evening Prep on the mock (`?mock=1&mode=onub`, no server): the kitchen, a station room, the mini-game gate,
 // the hand, the single commit, the waiting panel and the crime-scene board. Hooks are onub-contract.md 7; no
@@ -7,8 +8,7 @@ import { onubBalance } from '@wdi/content';
 
 async function startQuick(page: Page, search: string): Promise<void> {
   await page.goto(`/Who-Did-It/?mock=1&mode=onub&${search}`);
-  await page.getByLabel('Your name').fill('Hana');
-  await page.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(page, 'Hana');
   await expect(page.getByTestId('deck-editor')).toBeVisible();
   await expect(page.getByTestId('start')).toBeEnabled({ timeout: 10_000 });
   await page.getByTestId('start').click();
@@ -19,8 +19,7 @@ async function startQuick(page: Page, search: string): Promise<void> {
 
 test('lobby deck editor: one toggle per role, the leader can change it', async ({ page }) => {
   await page.goto('/Who-Did-It/?mock=1&mode=onub');
-  await page.getByLabel('Your name').fill('Hana');
-  await page.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(page, 'Hana');
   await expect(page.getByTestId('deck-editor')).toBeVisible();
   for (const id of ['boulanger', 'champignon', 'critique']) {
     await expect(page.getByTestId(`deck-role-${id}`)).toHaveCount(1);

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { createParty } from './fixtures/party';
 
 // Public looks and covers (GDD 3.17) end to end against the real server: the role card shows the deck and the
 // look a seat walks as, a cover role gets the picker (hints first, the first one preselected, a click sends
@@ -9,8 +10,7 @@ test.skip(process.env.WDI_E2E_LOOKS !== '1', 'needs the deck deal of Session 5G 
 async function startFour(page: Page): Promise<void> {
   await page.addInitScript("sessionStorage.setItem('wdi:introSeen', '1')"); // no opening cinematic (6Q)
   await page.goto('/Who-Did-It/');
-  await page.getByLabel('Your name').fill('Hana');
-  await page.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(page, 'Hana');
   await expect(page.getByTestId('party-code')).toBeVisible();
   for (let i = 0; i < 3; i++) await page.getByTestId('add-npc').click();
   await page.getByRole('button', { name: /start/i }).first().click();

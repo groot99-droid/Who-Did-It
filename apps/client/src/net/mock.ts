@@ -10,6 +10,7 @@ import {
   type LobbySnapshot,
   type NetEvents,
   type NetworkService,
+  type PartyOptions,
   type Room,
 } from './NetworkService';
 import type { OnubFeed } from './onub';
@@ -73,7 +74,7 @@ export class MockNetwork implements NetworkService {
     return this.card;
   }
 
-  async create(name: string): Promise<string> {
+  async create(name: string, _party?: PartyOptions): Promise<string> {
     const me: LobbyPlayer = { id: 'mock-me', name, ready: false, connected: true };
     this.open(randomCode(), me.id, [me]);
     this.addBots(MOCK_BOTS.slice(0, 3));
