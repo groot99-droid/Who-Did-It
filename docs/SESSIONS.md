@@ -3236,6 +3236,7 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 ### Round 7 log: 7E
 
 - PR 1 (columns A and C): `Lobby.ts` as three columns, `ui/lobby.css`, the Add friend stand-in and its test, the deck list's classes, UI.md 14.26, A109. Column B holds today's map, art-style, sound and deck-editor mounts in one card until PR 2.
+- PR 2 (column B): the map cards with a tick, the art-style segment with `.wdi-seg--glass` and `.wdi-seg__note`, the deck editor as chips; the rules are in `ui/lobby.css` until 7B's glass classes land.
 
 ### Round 7 log: 7F
 

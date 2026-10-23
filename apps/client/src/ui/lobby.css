@@ -352,6 +352,146 @@
   box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.3);
 }
 
+/* Column B: the map cards, the art style and the quick-mode deck editor. */
+.wdi-lobby__b {
+  flex: 1;
+}
+
+.wdi-lobby .wdi-map,
+.wdi-lobby .wdi-map__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-3);
+}
+
+.wdi-lobby .wdi-map__option {
+  position: relative;
+  align-items: flex-start;
+  width: 100%;
+  padding: var(--wdi-space-3);
+  color: var(--wdi-night-text);
+  background-color: rgb(var(--wdi-night-rgb) / 0.45);
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.3);
+}
+
+.wdi-lobby button.wdi-map__option:hover {
+  background-color: rgb(var(--wdi-violet-rgb) / 0.45);
+}
+
+.wdi-lobby button.wdi-map__option:focus-visible {
+  outline: var(--wdi-stroke-w) solid var(--wdi-night-accent);
+  outline-offset: calc(-1 * var(--wdi-space-1));
+}
+
+.wdi-lobby .wdi-map__option.is-selected {
+  background-color: rgb(var(--wdi-violet-rgb) / 0.55);
+  box-shadow:
+    inset 0 0 0 2px var(--wdi-night-accent),
+    0 0 var(--wdi-space-3) rgb(var(--wdi-lantern-rgb) / 0.35);
+}
+
+.wdi-lobby .wdi-map__thumb {
+  width: 96px;
+  aspect-ratio: 1;
+  border-radius: 0;
+  image-rendering: pixelated;
+  background-color: rgb(var(--wdi-night-rgb) / 0.8);
+  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.2);
+}
+
+.wdi-lobby .wdi-map__name {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-sm);
+  font-weight: var(--wdi-weight-text);
+  color: var(--wdi-night-label);
+}
+
+.wdi-lobby .wdi-map__tick {
+  position: absolute;
+  top: var(--wdi-space-2);
+  right: var(--wdi-space-3);
+  display: inline-flex;
+}
+
+.wdi-lobby .wdi-map__tick .wdi-icon {
+  filter: brightness(0) invert(1);
+}
+
+.wdi-lobby .wdi-artstyle {
+  margin-top: auto;
+  gap: var(--wdi-space-3);
+}
+
+.wdi-lobby .wdi-artstyle__label {
+  flex-basis: 100%;
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-sm);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-lobby .wdi-seg {
+  border: 0;
+  border-radius: 0;
+  background: rgb(var(--wdi-night-rgb) / 0.6);
+  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.3);
+}
+
+.wdi-lobby .wdi-seg__opt {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  color: var(--wdi-night-text);
+}
+
+.wdi-lobby .wdi-seg__opt + .wdi-seg__opt {
+  border-left: 0;
+}
+
+.wdi-lobby .wdi-seg__opt.is-on {
+  background: var(--wdi-night-accent);
+  color: var(--wdi-on-night-accent);
+}
+
+.wdi-lobby .wdi-seg__opt:disabled {
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-lobby .wdi-seg__opt:focus-visible {
+  outline-color: var(--wdi-night-accent);
+}
+
+.wdi-lobby .wdi-artstyle__hint {
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-night-text-muted);
+}
+
+/* The quick-mode deck editor: role chips in the deck's style, the accent on a role in play. */
+.wdi-deckedit__roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+  gap: var(--wdi-space-2);
+}
+
+.wdi-lobby .wdi-deck__role.is-on {
+  color: var(--wdi-on-night-accent);
+  background-color: var(--wdi-night-accent);
+}
+
+.wdi-lobby .wdi-deck__role:disabled:not(.is-on) {
+  opacity: 0.7;
+}
+
+.wdi-lobby .wdi-field__msg--error {
+  margin: 0;
+  padding-left: var(--wdi-space-3);
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-night-label);
+  border-left: var(--wdi-space-1) solid var(--wdi-night-accent);
+}
+
 /* The confirm dialog: the same glass, over the scrim. */
 .wdi-lobby-dialog {
   font-family: var(--wdi-font-pixel-text);
