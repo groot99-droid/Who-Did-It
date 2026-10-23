@@ -1,6 +1,7 @@
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { onSim } from '../events/bus';
 import { onMeetingConversion, runConversion } from './conversion';
+import { onArriveContract, onDeathContract, onKillContract } from './contract';
 import { onDeliveryHeist, runHeist } from './heist';
 import { runSabotage } from './sabotage';
 import { privateVendetta, vendettaHolders, vendettaOf } from './state';
@@ -18,6 +19,9 @@ function subscribe(room: PartyRoom): void {
   subscribed.add(room);
   onSim(room, 'meeting', (_e, r) => onMeetingConversion(r));
   onSim(room, 'train.delivery', (_e, r) => onDeliveryHeist(r));
+  onSim(room, 'train.arrive', (_e, r) => onArriveContract(r));
+  onSim(room, 'kill', (e, r) => onKillContract(r, e));
+  onSim(room, 'death', (e, r) => onDeathContract(r, e));
 }
 
 export function runVendettas(room: PartyRoom): void {

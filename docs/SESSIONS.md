@@ -3318,6 +3318,11 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
   `runVendettas` and `vendettaGoalFor`; the strongbox is the hall's existing safe `mh.safe`, read by id, so
   the scene, its tilemap and `routines.json` are unchanged; the `strongbox` row of `items.json`). The contract
   follows as PR 3b.
+- 2026-10-23: PR 3b (contract: `sim/vendettas/contract.ts`, the `train.arrive`, `kill` and `death` subscriptions
+  and the contract branch of `vendettaGoalFor`; `NoteKind.contract`; the one `sim/Quests.ts` line that hands
+  `quest.accept {questId:'contract'}` to the vendetta; the quest has no `quests.json` row, so the round-6
+  refusal of a `contract` row and its tests stand; UI.md 14.29's `vendetta.note.contract`; the Notebook's contract
+  entry and its Accept button, which 6Z handed to 7H: `NotebookSnap.note` and `of` and the `NotebookPanel` row).
 
 ### Round 7 log: 7I
 
