@@ -33,7 +33,7 @@ export function openDialog(root: HTMLElement, opts: DialogOptions): MenuDialog {
   const panel = h(
     'div',
     {
-      class: 'wdi-menu-dialog',
+      class: 'wdi-glass-panel wdi-menu-dialog',
       role: 'dialog',
       'aria-modal': 'true',
       'aria-labelledby': opts.id,

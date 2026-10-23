@@ -29,18 +29,18 @@ export function mountDeckList(root: HTMLElement, _net: NetworkService): DeckList
       h(
         'section',
         { class: 'wdi-deck wdi-lobby__stack', 'aria-label': C['deck.title'], 'data-testid': 'lobby-deck' },
-        h('h3', { class: 'wdi-lobby__title' }, C['deck.title']),
+        h('h3', { class: 'wdi-glass-panel__title' }, C['deck.title']),
         h(
           'p',
-          { class: 'wdi-hint wdi-lobby__note', 'data-testid': 'lobby-deck-size' },
+          { class: 'wdi-glass-panel__hint', 'data-testid': 'lobby-deck-size' },
           fill(C['deck.size'], { cards: deck.cards.length, players: deck.seats }),
         ),
         h('ul', { class: 'wdi-deck__cards' }, ...deckItems(deck.cards)),
-        h('p', { class: 'wdi-hint wdi-lobby__note' }, C['deck.note']),
+        h('p', { class: 'wdi-glass-panel__hint' }, C['deck.note']),
         deck.practice &&
           h(
             'p',
-            { class: 'wdi-hint wdi-lobby__note', 'data-testid': 'lobby-deck-practice' },
+            { class: 'wdi-glass-panel__hint', 'data-testid': 'lobby-deck-practice' },
             C['deck.practice'],
           ),
       ),
