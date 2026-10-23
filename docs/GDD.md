@@ -754,7 +754,8 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
   letter (`vendetta.contract.offered`): a target drawn from the mail stream (`contract`) among the living seats
   other than the Hitman and its Cabal mates, written to the Hitman's own Notebook. The Hitman accepts it as a
   quest of kind `contract` (3.16; the quest `contract` of its own quest list, with no giver and no `quests.json`
-  row) from anywhere (`vendetta.contract.accepted`); an NPC Hitman accepts at once.
+  row) from anywhere (`vendetta.contract.accepted`), with the Accept button on that Notebook entry while the
+  offer is open; an NPC Hitman accepts at once.
   While the contract is accepted and the target lives, a Knife kill of anyone else rests the Knife **30 s**
   longer (`vendettas.contract.offTargetRestS`). A strike that kills the target completes the quest
   (`vendetta.contract.done`, the consequence) and readies the Knife at once; a target who dies any other way

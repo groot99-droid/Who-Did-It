@@ -1507,3 +1507,4 @@ Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaG
 | `vendetta.mate` | Your Killer’s vendetta: {goal} | the Accomplice's card, once per Killer it knows; `{goal}` is that Killer's goal line |
 | `vendetta.note.doubt` | Doubt took the flock: your vote did not carry. | the Vicar's own Notebook entry of kind `NoteKind.doubt`, written at the reveal of the doubted meeting |
 | `vendetta.note.contract` | The mail brought a contract: {name}. | the Hitman's own Notebook entry of kind `NoteKind.contract` (`of` the target seat, `{name}` its seat name), written at the first Train arrival |
+| `vendetta.contract.accept` | Accept | the button on that contract entry while the offer is open (no `contract` quest yet, the mark on the roster); it sends `quest.accept { questId: 'contract' }` |
