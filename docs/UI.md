@@ -1171,3 +1171,43 @@ Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaG
 | `vendetta.note.doubt` | Doubt took the flock: your vote did not carry. | the Vicar's own Notebook entry of kind `NoteKind.doubt`, written at the reveal of the doubted meeting |
 | `vendetta.note.contract` | The mail brought a contract: {name}. | the Hitman's own Notebook entry of kind `NoteKind.contract` (`of` the target seat, `{name}` its seat name), written at the first Train arrival |
 | `vendetta.contract.accept` | Accept | the button on that contract entry while the offer is open (no `contract` quest yet, the mark on the roster); it sends `quest.accept { questId: 'contract' }` |
+
+### 14.33 Inspect (8B)
+
+Lines are in `apps/client/src/ui/copy/inspect.ts` (`INSPECT_COPY`, `inspectLine(id)`); the card is `ui/inspect/` (GDD 3.22 "Inspect"). The server sends only copy ids and bands; a sign or hunch id this build has no line for is left out. The card and the toasts never name a card, a cover or a vendetta.
+
+| Key | Text | Where |
+|---|---|---|
+| `prompt.inspect` | Inspect | the HUD prompt (`E`) on the nearest living figure in reach when nothing else is offered |
+| `inspect.title` | {look} | the card heading; `{look}` is the drawn look's name, capitalised |
+| `inspect.signs.none` | No sign of trouble | the card, when no sign shows |
+| `inspect.light` | Carries a lit light | the card, when a light burns in hand |
+| `inspect.close` | Close | the card's button (Esc also closes; it closes itself after 6 s) |
+| `inspect.noticed` | {look} looked you over | a warm toast to the inspected seat; `{look}` is the inspector's drawn look |
+| `inspect.noticed.someone` | Someone looked you over | the same, for a look this build cannot name |
+| `inspect.health.unhurt` | Unhurt | the card, the health band |
+| `inspect.health.bruised` | Bruised | the card, the health band |
+| `inspect.health.badlyHurt` | Badly hurt | the card, the health band |
+| `inspect.purse.unknown` | You cannot tell their purse | the card, the purse band |
+| `inspect.purse.light` | A light purse | the card, the purse band |
+| `inspect.purse.fair` | A fair purse | the card, the purse band |
+| `inspect.purse.heavy` | A heavy purse | the card, the purse band |
+| `inspect.sign.down` | Out cold | the card, a sign |
+| `inspect.sign.stunned` | Stunned | the card, a sign |
+| `inspect.sign.dazed` | Dazed, eyes swimming | the card, a sign |
+| `inspect.sign.bloody` | Blood on their clothes | the card, a sign |
+| `inspect.sign.bleeding` | Bleeding | the card, a sign |
+| `inspect.sign.limping` | Limping | the card, a sign |
+| `inspect.sign.pale` | Pale and sweating | the card, a sign |
+| `inspect.sign.weary` | Weary, stumbling | the card, a sign |
+| `inspect.sign.weak` | Drawn and weak | the card, a sign |
+| `inspect.sign.hungry` | Hollow-cheeked | the card, a sign |
+| `inspect.sign.hunted` | A hunted look | the card, a sign |
+| `inspect.hunch.watchChain` | Their eyes lingered on your watch chain. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.collar` | They studied your collar as if it offended them. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.keys` | Their eyes counted the keys at your belt. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.rings` | Their stare went straight to your rings. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.measured` | They took your measure, slowly. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.confession` | They watched you as if waiting for a confession. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.blessing` | They looked at you the way one looks for a blessing. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.pockets` | Their glance went to your pockets. | a warm toast to the inspected seat, a `relations.json` note |
