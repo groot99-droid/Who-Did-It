@@ -103,12 +103,13 @@
       "shuffle": false
     },
     {
-      "id": "hollowmere_loading",
+      "id": "hollowmere_opening",
       "tracks": [
         "load_hollowmere"
       ],
-      "crossfadeS": 2,
-      "shuffle": false
+      "crossfadeS": 0.5,
+      "shuffle": false,
+      "loop": false
     },
     {
       "id": "hollowmere_day",
@@ -159,12 +160,13 @@
       "shuffle": false
     },
     {
-      "id": "blackpine_loading",
+      "id": "blackpine_opening",
       "tracks": [
         "load_blackpine"
       ],
-      "crossfadeS": 2,
-      "shuffle": false
+      "crossfadeS": 0.5,
+      "shuffle": false,
+      "loop": false
     },
     {
       "id": "blackpine_day",
