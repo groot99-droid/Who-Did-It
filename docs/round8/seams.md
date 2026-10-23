@@ -198,8 +198,8 @@ Every session also owns its GDD section stub, its DECISIONS row, its UI.md 14 su
 in its PR. New test files are free. The one known case is the old two-hit-point tests in `mobs*.test.ts`: 8A lists
 the lines it must change in its PR and waits for the grant.
 
-Granted by 6Z for 8C (A138, #141): `sim/economy/run.ts` is 8C's, the home of `runEconomy`, and 8D adds its loops
-there; in `apps/server/test/invariants.test.ts`, the one line `'scripConserved',` after `'killClues',`.
+Granted by 6Z for 8C (A138, #141): `sim/economy/run.ts` is 8C's, the home of `runEconomy`, and 8D adds one line
+there, `runCivic(room)`, at the end; in `apps/server/test/invariants.test.ts`, the one line `'scripConserved',` after `'killClues',`.
 
 ## 7. Merge order
 
