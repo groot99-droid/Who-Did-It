@@ -173,6 +173,13 @@ describe('E3: the detector, pure', () => {
     expect(codes(rec)).toContain('T6');
   });
 
+  it('a crossing on the tick the brain turns home is not T6', () => {
+    const rec = synth(500, Phase.day, (tick, seats) => {
+      if (tick >= 1300) Object.assign(seats.get('n1')!, { scene: 1, mode: 'home' });
+    });
+    expect(codes(rec).includes('T6')).toBe(false);
+  });
+
   it('standing 40 ticks beside a body it did not make is T11, beside its own it is not', () => {
     const body = (by: string) => (_: number, __: Map<string, SeatSample>, t: TickSample) => {
       t.bodies = [{ id: 'body_x', scene: 0, x: 100 + 3 * 64, y: 100, by, open: true }];
