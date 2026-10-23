@@ -214,6 +214,10 @@ export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
     'prop_store_shelf_b',
     'prop_card_table',
     'prop_blackMarket',
+    // Widow Vane's.
+    'prop_tea_table',
+    'prop_writing_desk',
+    'prop_birdcage',
   ],
   props_blackpine: [
     'prop_anvil',

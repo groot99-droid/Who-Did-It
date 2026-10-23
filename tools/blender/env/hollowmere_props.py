@@ -1013,6 +1013,66 @@ def black_market():
             part("Slit", F("lantern", 3), B(0.25, 0.019, 0.72, 0.1, 0.005, 0.02), outline=False)]
 
 
+# ---------------------------------------------------------------- Widow Vane's (round 8, 8J: art.md 4.2)
+
+
+def tea_table():
+    """A tea table laid for two under a lamp: her cup half drunk, his cup clean and turned down on its saucer."""
+    return [part("Leg", T("wood", 2), C(0, 0, 0, 0.2, 0.05, 8), C(0, 0, 0.05, 0.05, 0.62, 6)),
+            part("Top", T("wood", 3), C(0, 0, 0.67, 0.36, 0.04, 14)),
+            part("Cloth", T("bone", 3), C(0, 0, 0.71, 0.3, 0.005, 14), outline=False),
+            part("Pot", T("bone", 2), C(-0.1, 0.12, 0.715, 0.09, 0.14, 10, rt=0.06), C(-0.1, 0.12, 0.855, 0.03, 0.03, 6)),
+            part("Saucers", T("bone", 3), *[C(x, y, 0.715, 0.07, 0.01, 10) for x, y in ((0.16, -0.12), (-0.16, -0.16))]),
+            part("Cup", T("bone", 2), C(0.16, -0.12, 0.725, 0.04, 0.06, 8, rt=0.05)),
+            part("Tea", F("litter", 1), C(0.16, -0.12, 0.78, 0.04, 0.005, 8), outline=False),
+            part("Turned", T("bone", 1), C(-0.16, -0.16, 0.725, 0.05, 0.05, 8, rt=0.035)),
+            part("Font", T("brass", 2), C(0.12, 0.16, 0.715, 0.07, 0.11, 10, rt=0.05)),
+            part("Chimney", F("lantern", 3), C(0.12, 0.16, 0.825, 0.035, 0.15, 8, rt=0.03), outline=False)]
+
+
+def writing_desk():
+    """Her writing desk, the flap down: letters edged in black, a sealing stick, the pen dry in the well, and one
+    envelope addressed but never sent."""
+    return [part("Body", T("wood", 1), B(0, 0.12, 0.4, 0.86, 0.5, 0.8), bevel=0.01),
+            part("Drawers", T("wood", 2), *[B(0, -0.135, z, 0.78, 0.01, 0.16) for z in (0.2, 0.42)], outline=False),
+            part("Pulls", T("brass", 2), *[B(sx * 0.2, -0.14, z, 0.05, 0.01, 0.02) for sx in (1, -1) for z in (0.2, 0.42)],
+                 outline=False),
+            part("Cabinet", T("wood", 2), B(0, 0.28, 1.0, 0.86, 0.18, 0.4)),
+            part("Pigeonholes", F("ink", 0), *[B(x, 0.185, 1.0, 0.14, 0.005, 0.12) for x in (-0.24, 0, 0.24)],
+                 outline=False),
+            part("Flap", T("wood", 3), B(0, -0.12, 0.81, 0.86, 0.36, 0.03)),
+            part("Letters", T("bone", 3), B(-0.15, -0.1, 0.835, 0.22, 0.16, 0.02), B(0.12, -0.18, 0.835, 0.2, 0.12, 0.01),
+                 outline=False),
+            part("Borders", T("ink", 0), B(-0.15, -0.1, 0.847, 0.22, 0.16, 0.003), outline=False),
+            part("Well", T("ink", 1), C(0.28, 0.02, 0.825, 0.04, 0.06, 6), B(0.25, 0.0, 0.9, 0.01, 0.01, 0.16)),
+            part("Wax", T("blood", 2), B(0.2, -0.25, 0.83, 0.12, 0.02, 0.02), outline=False)]
+
+
+def birdcage():
+    """A brass birdcage on its stand, the door open and the perch empty, a few seed husks on the floor."""
+    bars = [B(0.16 * math.cos(a), 0.16 * math.sin(a), 1.25, 0.015, 0.015, 0.5) for a in [k * math.pi / 5 for k in range(10)]]
+    return [part("Stand", T("brass", 1), C(0, 0, 0, 0.2, 0.03, 8), C(0, 0, 0.03, 0.03, 0.97, 6)),
+            part("Base", T("brass", 2), C(0, 0, 1.0, 0.18, 0.04, 10)),
+            part("Bars", T("brass", 2), *bars, outline=False),
+            part("Dome", T("brass", 2), C(0, 0, 1.5, 0.17, 0.12, 10, rt=0.04), C(0, 0, 1.62, 0.03, 0.08, 6)),
+            part("Door", T("brass", 1), B(0.08, -0.22, 1.2, 0.12, 0.01, 0.16), outline=False),
+            part("Perch", T("wood", 3), B(0, 0, 1.18, 0.26, 0.02, 0.02), outline=False),
+            part("Husks", T("litter", 2), *[B(x, y, 0.005, 0.03, 0.02, 0.01) for x, y in ((0.2, -0.2), (-0.1, -0.28),
+                                                                                        (0.05, -0.32))], outline=False)]
+
+
+def bedside_candle():
+    """The widow's one candle (the proofing task's), in a brass chamberstick on a little tripod table."""
+    return [part("Legs", T("wood", 1), *[B(0.12 * math.cos(a), 0.12 * math.sin(a), 0.3, 0.04, 0.04, 0.6)
+                                         for a in (0.5, 2.6, 4.7)]),
+            part("Top", T("wood", 3), C(0, 0, 0.6, 0.22, 0.04, 12)),
+            part("Stick", T("brass", 2), C(0, 0, 0.64, 0.1, 0.02, 10), C(0, 0, 0.66, 0.03, 0.08, 6)),
+            part("Handle", T("brass", 2), B(0.11, 0, 0.66, 0.06, 0.02, 0.04), outline=False),
+            part("Candle", T("bone", 3), C(0, 0, 0.74, 0.03, 0.16, 8)),
+            part("Flame", F("lantern", 3), B(0, 0, 0.94, 0.03, 0.03, 0.06), outline=False),
+            part("Book", T("ink", 1), B(-0.08, -0.1, 0.65, 0.14, 0.1, 0.03), outline=False)]
+
+
 def _crates(n=3):
     rnd = random.Random(f"crates{n}")
     return [kenney("survival-kit", "box-large", height=0.5, ramp=["#3A231F", "#744733", "#B57F54"],
@@ -1132,7 +1192,7 @@ PROPS = {
     "prop_goat": (64, 64, goat),
     "prop_keyCache": (64, 64, key_cache),
     "prop_green_lamp": (64, 64, green_lamp),
-    "prop_candle": (64, 64, candle),
+    "prop_candle": (64, 80, bedside_candle),
     "prop_window": (64, 112, window),
     "prop_fence": (64, 56, fence),
     "prop_bench": (64, 64, bench),
@@ -1207,5 +1267,9 @@ PROPS = {
     "prop_store_shelf_b": (64, 128, lambda: on_wall(store_shelf("b"))),
     "prop_card_table": (64, 80, card_table),
     "prop_blackMarket": (64, 80, black_market),
+    # Widow Vane's.
+    "prop_tea_table": (64, 80, tea_table),
+    "prop_writing_desk": (64, 96, writing_desk),
+    "prop_birdcage": (64, 112, birdcage),
     **SPOTS,
 }
