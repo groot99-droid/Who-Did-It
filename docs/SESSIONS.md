@@ -2395,10 +2395,12 @@ branch.
 | **6L. Music** | Sonnet 5.5 | Code | `claude/r6-music` | `view/{MusicBus,MusicDirector,audioSettings}.ts`, `ui/SettingsPanel.ts`, `AudioBus.setSfxVolume` and the `narr_*`/`sting_*` keys, `content/data/music.json` and its schema, the music manifest shape, the playlist slots filled from the sound library (CC0 only where it cannot) and their CREDITS, GDD 3.18 music lines |
 | **6M. M5b art** | Opus 5.5 | Art | `claude/r6-m5b-art` | `tools/sprites/placeholder-m5b.ts`, node, mob, giver, tool and light sprites in both styles, manifest keys, SPRITES.md section, CREDITS |
 | **6N. ROSW media (both repos)** | Opus 5.5 | Art | `claude/r6-rosw-media` | ROSW: the `sound-library` ingest of the owner's batch (`catalog.json`), the `video-shot` runs, their studio notes and library entries; here: `public/assets/{video,audio,audio/music}/**` binaries fetched by catalog id and mastered, the manifest rows, `assets/source/MANIFEST.md`, CREDITS rows |
+| **6Q. Opening cinematic** (added 2026-10-22) | Sonnet 5.5 | Code | `claude/r6-intro` | `scenes/Intro.ts`, `ui/copy/intro.ts`, the `first` line of `Preload.ts`, the `intro` video budget line of `media.test.ts` and ASSETS 6.8, `e2e/intro.spec.ts`, UI.md 14.24 |
 | **6P. Integration** | Sonnet 5.5 | Code | `claude/r6-integration` | merges, lockfile, `PROTOCOL.md` regen, the 50-match `pnpm auto` soak on both maps and modes, both 30-minute soaks, the opt-in e2e suites, this round's integration log, DECISIONS A97 |
 
 Merge order: 6Z first and alone; then 6A, 6E, 6J, 6K, 6L, 6M in parallel; 6B and 6C after 6A; 6F, 6G, 6H
-after 6E; 6D after 6C; 6I after 6F, 6G and 6H; 6N when its binaries pass `media.test.ts`; 6P last. Shared
+after 6E; 6D after 6C; 6I after 6F, 6G and 6H; 6N when its binaries pass `media.test.ts`; 6Q (added 2026-10-22, A98) after 6K and
+6L; 6P last. Shared
 documents: edits stay inside the named section with no renumbering or reflow, and the orchestrator keeps both
 sides of any conflict. Copy: a session that needs new lines adds a UI.md 14 subsection of its own (6D 14.18,
 6I 14.19, 6J 14.20, 6K 14.21, 6L 14.22) and a copy module of its own under `ui/copy/`. Theme: new rules are
@@ -2626,6 +2628,23 @@ suites, fix what breaks in the seams, and write the integration log and DECISION
 `pnpm-lock.yaml`, `docs/PROTOCOL.md`, "Integration log, round 6" below, DECISIONS A97; the Railway variables
 are set by the owner from `auto-admin.md` 7. **Reads** everything. **Not**: new features; a fix that is a
 session's goes back to it. Log under "Integration log, round 6".
+
+**6Q. Opening cinematic (added 2026-10-22, DECISIONS A98).** Play the owner's opening cinematic before the menu:
+a new `scenes/Intro.ts` that `Preload` starts before `Landing` (never before `Admin`), showing the poster with a
+"tap to begin" control (the tap unlocks audio), then the video with its own sound, Skip on tap or Esc, once per
+browser session (`sessionStorage['wdi:introSeen']`), skipped under `prefers-reduced-motion`, `saveData`,
+`?intro=0` and in the mock e2e unless `?intro=1`; then `Landing` as today, where the `lobby` playlist (the owner's
+theme, 6N) starts as it does now. **Owns** `apps/client/src/scenes/Intro.ts` with tests, `ui/copy/intro.ts`, the
+"Round 6 (6Q)" block of `components.css`, the `first` line of `Preload.ts` (a locked line, granted), the `intro`
+exception of `tools/sprites/test/media.test.ts` (one video key may be 5 MB, streamed, outside the first-load
+count) and the matching ASSETS 6.8 sentence, `e2e/intro.spec.ts`, UI.md 14.24. **Reads** `media.md` 1, 3 and 6;
+`docs/UI.md` 1-5; `view/MusicBus.ts` and `view/MusicDirector.ts`; `scenes/Preload.ts` and `scenes/Landing.ts`
+(read only). **PRs**: (1) the scene on a stand-in clip (a 2 s generated test video under `apps/client/e2e/fixtures/`,
+never under `public/`), the flag and the budget line; (2) `intro.spec.ts`, UI.md 14.24, the log, the A98 fill-in.
+**Tests**: skip, once per session, reduce-motion, `?intro=0`, the admin route untouched, the budget line. **Not**:
+`Landing.ts`, `World.ts`, `worldRouter.ts`, anything under `public/assets/` (6N lands `intro.webm`, its poster,
+`landing_loop.webm` and the theme), `music.json`, `MusicBus.ts`. Before code, `seams.md`; log under "Round 6 log:
+6Q".
 
 ### Round 6 log: 6Z (round-6 contract and pre-seed)
 
@@ -2953,6 +2972,8 @@ pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock 
   under `packages/`.
 - **Waiting**: the owner's `Who_Did_It_Music_Pt1.zip` and `Who_Did_It_SFX_Pt1.zip` on the release (step 2: the ROSW
   ingest, the owner's tracks and `train_arrive`, `train_brake`, `ferry_horn`, `crows`); the videos (step 3).
+
+### Round 6 log: 6Q (opening cinematic)
 
 ## Integration log, round 6
 
