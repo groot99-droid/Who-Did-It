@@ -110,7 +110,7 @@ SLICED_PROPS = {
         # Round 8 (8J, art.md 4.2): St Brannock's pews, four seats wide, facing the altar (north).
         "prop_pew": (4, 1, "pew"),
         # Vane Manor's dining table, laid for a dinner nobody ate.
-        "prop_diningTable": (4, 1, "dining_table"),
+        "prop_dining_table": (4, 1, "dining_table"),
     },
     "blackpine": {
         "prop_trestle": (3, 2, "trestle"),
