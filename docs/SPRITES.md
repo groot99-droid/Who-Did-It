@@ -50,8 +50,10 @@
 Example: `out/<body>/scarf/char_villager_walk_se_003.png`. Frame numbers start at `000` and are
 contiguous per clip and direction.
 
-**Body ids** are the look ids of `looks.json` (`^[a-z][a-z0-9]*$`) plus `villager` for figures that
-are not seats. A look names a character, and in the main mode a look is public by design; the three
+**Body ids** are the look ids of `looks.json` (`^[a-z][a-z0-9]*$`) plus the `villager` family of its
+`villagers` section (round 8: `villager`, `villagerelder`, `villagergoodwife`, `villagerlass`, `villagerclerk`),
+the figures that are not seats: the ambient townsfolk and the quest givers, and the plain `villager` as a seat's
+fallback body (10.13). A villager look carries no card's signature prop and no hat-trait shape. A look names a character, and in the main mode a look is public by design; the three
 cover cards (Killer, Accomplice, Drifter) never get a body, so no world key, frame or file ever names a
 role that hides.
 

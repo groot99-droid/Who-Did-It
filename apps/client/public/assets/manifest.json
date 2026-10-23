@@ -193,6 +193,101 @@
       "url": "chars/tinner.anims.json"
     },
     {
+      "key": "char_villager",
+      "type": "multiatlas",
+      "url": "chars/char_villager.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_villager",
+      "type": "multiatlas",
+      "url": "chars/ovl_villager.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_villager",
+      "type": "animation",
+      "url": "chars/villager.anims.json"
+    },
+    {
+      "key": "char_villagerelder",
+      "type": "multiatlas",
+      "url": "chars/char_villagerelder.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_villagerelder",
+      "type": "multiatlas",
+      "url": "chars/ovl_villagerelder.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_villagerelder",
+      "type": "animation",
+      "url": "chars/villagerelder.anims.json"
+    },
+    {
+      "key": "char_villagergoodwife",
+      "type": "multiatlas",
+      "url": "chars/char_villagergoodwife.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_villagergoodwife",
+      "type": "multiatlas",
+      "url": "chars/ovl_villagergoodwife.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_villagergoodwife",
+      "type": "animation",
+      "url": "chars/villagergoodwife.anims.json"
+    },
+    {
+      "key": "char_villagerlass",
+      "type": "multiatlas",
+      "url": "chars/char_villagerlass.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_villagerlass",
+      "type": "multiatlas",
+      "url": "chars/ovl_villagerlass.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_villagerlass",
+      "type": "animation",
+      "url": "chars/villagerlass.anims.json"
+    },
+    {
+      "key": "char_villagerclerk",
+      "type": "multiatlas",
+      "url": "chars/char_villagerclerk.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "ovl_villagerclerk",
+      "type": "multiatlas",
+      "url": "chars/ovl_villagerclerk.json",
+      "path": "chars/",
+      "filter": "nearest"
+    },
+    {
+      "key": "anims_villagerclerk",
+      "type": "animation",
+      "url": "chars/villagerclerk.anims.json"
+    },
+    {
       "key": "portrait_detective",
       "type": "image",
       "url": "portraits/portrait_detective.webp"
