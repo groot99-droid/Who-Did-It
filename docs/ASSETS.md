@@ -9,6 +9,7 @@
 **Two palettes, one style (A-style, round 5).** `packages/content/data/palette.json` holds both.
 
 - **The ten tokens** are the only colours of the DOM UI, the SVG icons, runtime tints and effects drawn in code: ink `#12141C`, slate `#2C3240`, fog `#6F7A8C`, bone `#D9D2C2`, mustard `#F2B33D`, teal `#2EC4B6`, magenta `#E04E9A`, blood `#B3121F`, lantern `#FFB457`, moon `#7FA8FF`. Runtime tints include the scarf tints, the teal interactable pulse, the magenta hazard mark and the faction colours.
+- **The night set** (`palette.json` `night`, round 7, A106) adds five colours for the DOM UI only, from the owner's mockups: night `#0A0924`, violet `#4B36B8`, indigo `#251A6B`, lilac `#C9CEFF`, snow `#FFFFFF`. They are never in art, the world palette or a runtime tint; their roles are `docs/UI.md` 2.
 - **The world palette** (`palette.json` `world`) is 64 colours in 16 named ramps, built from the owner's ONUB images. It holds every token but magenta. It is the only set of colours in rendered and generated art: world sprites, tiles, characters, portraits, cards and the ONUB rooms. Every shipped art pixel is one of its colours, fully opaque or fully transparent. The pixel finish (6.11) snaps to it, and `tools/sprites/test/palette.test.ts` checks every exported image. While the main mode's finish is off (`style.json` `pixelFinish.enabled.main`, 6.11), its rig renders are exempt.
 
 **Light.**
@@ -33,7 +34,7 @@
 - Outlines are one art pixel, near-black: the inverted hull on renders, the finish on generated cutouts.
 - Three cel bands per surface, plus a few highlight pixels. CC0 textures are allowed and become dither when snapped.
 
-Interactables pulse teal, hazards magenta. UI: Illustrator vector system, 2 px rounded ink strokes, paper-textured bone fills, mustard primary buttons, Art-Deco card frames; fonts Oswald + Inter (OFL, texts in `LICENSES/`) from day 1 in both Illustrator and the DOM. The DOM design system (tokens, components, the frames, the contrast table and the screen mockups) is `docs/UI.md`, implemented in `apps/client/src/ui/theme/` and `apps/client/public/assets/ui/`; its type and spacing scale is the `ui` block of `packages/content/data/style.json`.
+Interactables pulse teal, hazards magenta. UI: Illustrator vector system, 2 px rounded ink strokes, paper-textured bone fills, mustard primary buttons, Art-Deco card frames; fonts Oswald + Inter (OFL, texts in `LICENSES/`) from day 1 in both Illustrator and the DOM; since round 7 (A106) the night theme adds Pixelify Sans and Press Start 2P (OFL, self-hosted Latin woff2 from Fontsource 5.3.0, about 24 KiB together), and those four are the only families. The DOM design system (tokens, components, the frames, the contrast table and the screen mockups) is `docs/UI.md`, implemented in `apps/client/src/ui/theme/` and `apps/client/public/assets/ui/`; its type and spacing scale is the `ui` block of `packages/content/data/style.json`.
 
 ### 6.2 Blender render rig
 

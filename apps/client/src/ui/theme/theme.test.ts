@@ -1,21 +1,59 @@
 import { readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 // The design system's contract (docs/UI.md): palette colours only, the 2 px stroke and the 48 px
 // grid on every SVG, nine-slice frames that match their CSS data URIs, and WCAG AA on every token
-// pair the components use. The ratios here are the ones printed in docs/UI.md 10.
+// pair the components use. The ratios here are the ones printed in docs/UI.md 10. Since round 7 the
+// colour and font rules hold for every stylesheet under apps/client/src, not only this folder's.
 
 const THEME = import.meta.dirname;
+const SRC = join(THEME, '../..');
 const ROOT = join(THEME, '../../../../..');
 const UI_ASSETS = join(ROOT, 'apps/client/public/assets/ui');
-const palette: Record<string, string> = JSON.parse(
-  readFileSync(join(ROOT, 'packages/content/data/palette.json'), 'utf8'),
-).colors;
+const paletteFile = JSON.parse(readFileSync(join(ROOT, 'packages/content/data/palette.json'), 'utf8'));
+/** The ten tokens, then the round-7 night set: the only colours of the DOM UI. */
+const palette: Record<string, string> = { ...paletteFile.colors, ...paletteFile.night };
 const paletteHex = new Set(Object.values(palette).map((h) => h.toUpperCase()));
 
 const tokens = readFileSync(join(THEME, 'tokens.css'), 'utf8');
-const components = readFileSync(join(THEME, 'components.css'), 'utf8');
+
+/** Every stylesheet under apps/client/src, as [path from src, text]. */
+function stylesheets(dir = SRC): [string, string][] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((d): [string, string][] => {
+    const path = join(dir, d.name);
+    if (d.isDirectory()) return stylesheets(path);
+    return d.name.endsWith('.css') ? [[relative(SRC, path), readFileSync(path, 'utf8')]] : [];
+  });
+}
+const sheets = stylesheets();
+
+/** The four self-hosted families (style.json `ui.fonts`, docs/UI.md 3). */
+const FAMILIES = ['Inter', 'Oswald', 'Pixelify Sans', 'Press Start 2P'];
+/** What a declaration may name besides a `--wdi-font-*` token: CSS-wide keywords and generic families. */
+const GENERIC = new Set([
+  'inherit',
+  'initial',
+  'unset',
+  'revert',
+  'sans-serif',
+  'serif',
+  'monospace',
+  'ui-monospace',
+  'system-ui',
+  'ui-sans-serif',
+]);
+
+/** The families a `font-family` or `font` declaration names once its tokens are taken out. */
+function namedFamilies(prop: 'font' | 'font-family', value: string): string[] {
+  let rest = value.replace(/var\(--wdi-font-[a-z-]+\)/g, '').trim();
+  // The `font` shorthand puts style, weight and size (with an optional /line-height) before the families.
+  if (prop === 'font') rest = rest.replace(/^(?:[^,]*?\s)?[\d.]+[a-z%]*(?:\/[\d.]+[a-z%]*)?\s*/, '');
+  return rest
+    .split(',')
+    .map((f) => f.trim().replace(/^['"]|['"]$/g, ''))
+    .filter((f) => f !== '');
+}
 
 function hexes(text: string): string[] {
   return [...text.matchAll(/#[0-9A-Fa-f]{3,8}\b/g)].map((m) => m[0].toUpperCase());
@@ -33,19 +71,46 @@ function luminance([r, g, b]: [number, number, number]): number {
   return 0.2126 * lr + 0.7152 * lg + 0.0722 * lb;
 }
 
-/** `fg` may be `name` or `name@alpha`, composited over `bg` before measuring. */
-export function contrast(fg: string, bg: string): number {
-  const [fgName, alphaText] = fg.split('@') as [string, string | undefined];
+/** `name` or `name@alpha`, composited over `under` (an RGB triplet) when it has an alpha. */
+function layer(spec: string, under?: [number, number, number]): [number, number, number] {
+  const [name, alphaText] = spec.split('@') as [string, string | undefined];
   const alpha = alphaText === undefined ? 1 : Number(alphaText);
-  const b = rgb(palette[bg]!);
-  const f = rgb(palette[fgName]!).map((v, i) => Math.round(v * alpha + b[i]! * (1 - alpha))) as [
-    number,
-    number,
-    number,
-  ];
+  const c = rgb(palette[name]!);
+  if (under === undefined) return c;
+  return c.map((v, i) => Math.round(v * alpha + under[i]! * (1 - alpha))) as [number, number, number];
+}
+
+/**
+ * `fg` may be `name` or `name@alpha`, composited over `bg` before measuring; `bg` may be a stack read top
+ * first, `indigo@0.66 over night@0.6 over snow`, each layer composited over the one below it.
+ */
+export function contrast(fg: string, bg: string): number {
+  const b = bg
+    .split(' over ')
+    .reverse()
+    .reduce<[number, number, number] | undefined>((under, spec) => layer(spec, under), undefined)!;
+  const f = layer(fg, b);
   const [hi, lo] = [luminance(f), luminance(b)].sort((x, y) => y - x) as [number, number];
   return (hi + 0.05) / (lo + 0.05);
 }
+
+/** A token's alpha, `rgb(var(--wdi-<name>-rgb) / a)`, read from tokens.css so the stacks below follow it. */
+function alphaOf(token: string): string {
+  const m = tokens.match(new RegExp(`--wdi-${token}: rgb\\(var\\(--wdi-([a-z]+)-rgb\\) / ([\\d.]+)\\);`));
+  if (!m) throw new Error(`--wdi-${token} is not an alpha token`);
+  return `${m[1]}@${m[2]}`;
+}
+const GLASS = alphaOf('glass-fill');
+const VEIL = alphaOf('veil');
+const VIGNETTE = alphaOf('vignette');
+/**
+ * The loop backdrop is a video, so a glass surface is measured over its two bounds: the darkest frame (night)
+ * and the brightest any frame could be (snow) under the veil. Bare text on the backdrop is measured likewise.
+ */
+const GLASS_DARK = `${GLASS} over night`;
+const GLASS_BRIGHT = `${GLASS} over ${VEIL} over snow`;
+const VEIL_BRIGHT = `${VEIL} over snow`;
+const EDGE_BRIGHT = `${VIGNETTE} over ${VEIL} over snow`;
 
 /** docs/UI.md 10: every text pair the components ship, with the WCAG AA floor it must clear. */
 export const TEXT_PAIRS: { fg: string; bg: string; use: string; min: number }[] = [
@@ -68,15 +133,51 @@ export const TEXT_PAIRS: { fg: string; bg: string; use: string; min: number }[] 
   { fg: 'mustard', bg: 'slate', use: 'selected tab rule, focus ring on panels (non-text, 3:1)', min: 3 },
   { fg: 'mustard', bg: 'ink', use: 'focus ring on the page (non-text, 3:1)', min: 3 },
   { fg: 'fog', bg: 'ink', use: 'display text 24 px and up only (large text, 3:1)', min: 3 },
+  // The night theme (round 7, docs/UI.md 2).
+  { fg: 'lilac', bg: 'night', use: 'text on the night page and over the poster', min: 4.5 },
+  { fg: 'lilac@0.8', bg: 'night', use: 'muted text on the night page', min: 4.5 },
+  { fg: 'bone', bg: 'night', use: 'Inter running text kept on night surfaces', min: 4.5 },
+  { fg: 'night', bg: 'lantern', use: 'primary glass button, Leader tag, selected segment', min: 4.5 },
+  { fg: 'lantern', bg: 'night', use: 'the party code, warnings and the focus ring on night', min: 4.5 },
+  { fg: 'lilac', bg: 'violet', use: 'You, NPC and Ready tags', min: 4.5 },
+  {
+    fg: 'lantern',
+    bg: 'indigo',
+    use: "the title's second line against its stepped shadow (large text, 3:1)",
+    min: 3,
+  },
+  { fg: 'lilac', bg: GLASS_DARK, use: "text on glass over the loop's darkest frame", min: 4.5 },
+  { fg: 'lilac', bg: GLASS_BRIGHT, use: 'text on glass over the brightest frame possible', min: 4.5 },
+  { fg: 'lilac@0.8', bg: GLASS_BRIGHT, use: 'muted text and hints on glass', min: 4.5 },
+  { fg: 'snow', bg: GLASS_BRIGHT, use: 'pixel labels on glass buttons', min: 4.5 },
+  {
+    fg: 'lantern',
+    bg: GLASS_BRIGHT,
+    use: 'the primary rim and the focus ring on glass (non-text, 3:1)',
+    min: 3,
+  },
+  {
+    fg: 'lilac',
+    bg: EDGE_BRIGHT,
+    use: 'bare text at the vignetted edge: the footer, the chip row',
+    min: 4.5,
+  },
+  {
+    fg: 'lilac',
+    bg: VEIL_BRIGHT,
+    use: 'bare display text on the veil, 24 px and up (large text, 3:1)',
+    min: 3,
+  },
 ];
 
 describe('tokens.css', () => {
-  it('mirrors palette.json colour for colour, in file order', () => {
+  it('mirrors palette.json colour for colour, in file order (the ten tokens, then the night set)', () => {
     const block = [...tokens.matchAll(/--wdi-([a-z]+): (#[0-9a-fA-F]{6});/g)].map((m) => [
       m[1],
       m[2]!.toUpperCase(),
     ]);
     expect(block).toEqual(Object.entries(palette));
+    expect(Object.keys(paletteFile.night)).toHaveLength(5);
   });
 
   it('carries each colour as an RGB triplet for alpha use', () => {
@@ -85,16 +186,45 @@ describe('tokens.css', () => {
     }
   });
 
-  it('uses no hex outside the palette, in tokens or components', () => {
-    for (const hex of [...hexes(tokens), ...hexes(components)]) expect(paletteHex).toContain(hex);
+  it('declares the four self-hosted families once each, and nothing else', () => {
+    const faces = sheets.flatMap(([path, text]) =>
+      [...text.matchAll(/@font-face\s*\{[^}]*font-family: '?([^;']+)'?;/g)].map((m) => [path, m[1]]),
+    );
+    expect(faces.map(([, family]) => family).sort()).toEqual(FAMILIES);
+    for (const [path] of faces) expect(path).toBe(join('ui', 'theme', 'tokens.css'));
   });
 
-  it('uses only the two self-hosted fonts', () => {
-    const families = [...tokens.matchAll(/font-family: ([A-Za-z]+);/g)].map((m) => m[1]);
-    expect(families.sort()).toEqual(['Inter', 'Oswald']);
-    expect(components).not.toMatch(/font-family: (?!var\(--wdi-font)/);
+  it('starts every --wdi-font-* token with one of the four families', () => {
+    const fontTokens = [...tokens.matchAll(/--wdi-font-[a-z-]+: ([^;]+);/g)].map((m) => m[1]!);
+    expect(fontTokens.length).toBe(4);
+    for (const value of fontTokens) {
+      expect(FAMILIES).toContain(value.split(',')[0]!.trim().replace(/^'|'$/g, ''));
+    }
+  });
+});
+
+describe('every stylesheet under apps/client/src (round 7)', () => {
+  it('finds the theme and the screens', () => {
+    expect(sheets.map(([path]) => path)).toEqual(
+      expect.arrayContaining([join('ui', 'theme', 'tokens.css'), join('ui', 'theme', 'components.css')]),
+    );
   });
 
+  for (const [path, text] of sheets) {
+    it(`${path}: no hex outside palette.json, no literal rgb() or hsl()`, () => {
+      for (const hex of hexes(text)) expect(paletteHex, hex).toContain(hex);
+      expect(text).not.toMatch(/\b(?:rgba?|hsla?)\(\s*[\d.]/);
+    });
+
+    it(`${path}: fonts only through the --wdi-font-* tokens`, () => {
+      const body = text.replace(/@font-face\s*\{[^}]*\}/g, '');
+      for (const m of body.matchAll(/(?<![-\w])(font-family|font):\s*([^;]+);/g)) {
+        for (const family of namedFamilies(m[1] as 'font' | 'font-family', m[2]!)) {
+          expect(GENERIC, `${m[0]}`).toContain(family);
+        }
+      }
+    });
+  }
   it('embeds the nine-slice frames exactly as the SVG files', () => {
     for (const name of ['plain', 'village', 'cabal', 'neutral']) {
       const svg = readFileSync(join(UI_ASSETS, 'frames', `frame_${name}.svg`), 'utf8');
@@ -148,6 +278,9 @@ describe('tokens.css mirrors style.json ui (docs/UI.md 4, 5)', () => {
   it('fonts', () => {
     expect(token('font-display')?.startsWith(ui.fonts.display)).toBe(true);
     expect(token('font-text')?.startsWith(ui.fonts.text)).toBe(true);
+    expect(token('font-pixel-display')?.startsWith(`'${ui.fonts.pixelDisplay}'`)).toBe(true);
+    expect(token('font-pixel-text')?.startsWith(`'${ui.fonts.pixelText}'`)).toBe(true);
+    expect(Object.values(ui.fonts).sort()).toEqual(FAMILIES);
   });
 });
 
