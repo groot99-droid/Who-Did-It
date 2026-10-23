@@ -13,12 +13,14 @@ import {
 } from '@wdi/shared';
 import { flowOf } from '../src/sim/Flow';
 import { resetToLobby } from '../src/sim/Win';
+import { until } from './flowHelpers';
 import { flatten } from './killHelpers';
 import { simOf } from '../src/sim/RoomSim';
 import { npcMemory } from '../src/sim/npc/memory';
 import {
   advance,
   bootNpcServer,
+  type Human,
   errors,
   join,
   lobbyOf,
@@ -30,6 +32,12 @@ import {
   toWorld,
 } from './npcHelpers';
 import { sleep } from './simHelpers';
+
+/** The refusals travel the wire behind the state a test sees: wait for the count, then assert the exact codes. */
+async function errorsAre(h: Human, codes: number[]): Promise<void> {
+  await until(() => errors(h).length >= codes.length);
+  expect(errors(h)).toEqual(codes);
+}
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -49,7 +57,10 @@ describe('NPC fill at Start (GDD 3.12)', () => {
     expect(npcSeats(party.room)).toHaveLength(3);
     const dealt = [...party.room.state.players.values()].map((p) => p.priv.role.roleId).sort();
     expect([...dealt, ...flowOf(party.room).undealt].sort()).toEqual([...deckFor(4).cards].sort());
-    const cards = party.humans[0]?.log.filter((m) => m.type === S2C.roleReveal) ?? [];
+    const reveals = () => party.humans[0]?.log.filter((m) => m.type === S2C.roleReveal) ?? [];
+    // The card travels the wire behind the state `start` waits on.
+    await until(() => reveals().length >= 1);
+    const cards = reveals();
     expect(cards).toHaveLength(1);
     expect((cards[0]?.payload as RoleRevealPayload).teammates.length).toBeLessThanOrEqual(0);
   });
@@ -87,14 +98,14 @@ describe('lobby.addNpc and lobby.removeNpc', () => {
     );
     expect(errors(leader)).toEqual([]);
     await send(leader, C2S.lobbyAddNpc);
-    expect(errors(leader)).toEqual([ErrorCode.cannot]);
+    await errorsAre(leader, [ErrorCode.cannot]);
 
     for (let i = 0; i < MAX_PLAYERS - 1; i++) await send(leader, C2S.lobbyRemoveNpc, {}, 60);
     await sleep(100);
     expect(party.room.state.players.size).toBe(1);
     expect(party.room.state.settings.npcSeats).toBe(0);
     await send(leader, C2S.lobbyRemoveNpc);
-    expect(errors(leader)).toEqual([ErrorCode.cannot, ErrorCode.cannot]);
+    await errorsAre(leader, [ErrorCode.cannot, ErrorCode.cannot]);
   });
 
   it('removes the most recently added seat', async () => {
@@ -113,13 +124,13 @@ describe('lobby.addNpc and lobby.removeNpc', () => {
     const guest = party.humans[1]!;
     await send(guest, C2S.lobbyAddNpc);
     await send(guest, C2S.lobbyRemoveNpc);
-    expect(errors(guest)).toEqual([ErrorCode.cannot, ErrorCode.cannot]);
+    await errorsAre(guest, [ErrorCode.cannot, ErrorCode.cannot]);
     expect(party.room.state.settings.npcSeats).toBe(0);
     await start(party);
     const leader = party.humans[0]!;
     await send(leader, C2S.lobbyAddNpc);
     await send(leader, C2S.lobbyRemoveNpc);
-    expect(errors(leader)).toEqual([ErrorCode.wrongPhase, ErrorCode.wrongPhase]);
+    await errorsAre(leader, [ErrorCode.wrongPhase, ErrorCode.wrongPhase]);
   });
 
   it('lets a human joining a full party take an NPC seat', async () => {
@@ -148,8 +159,8 @@ describe('lobby.settings', () => {
     expect(party.room.state.settings.mode).toBe(0);
     await send(leader, C2S.lobbySettings, { mode: 2 });
     await send(guest, C2S.lobbySettings, { mode: 1 });
-    expect(errors(leader)).toEqual([ErrorCode.cannot]);
-    expect(errors(guest)).toEqual([ErrorCode.cannot]);
+    await errorsAre(leader, [ErrorCode.cannot]);
+    await errorsAre(guest, [ErrorCode.cannot]);
     expect(party.room.state.settings.mode).toBe(0);
   });
 
@@ -160,7 +171,7 @@ describe('lobby.settings', () => {
       NpcLevel[balance.npc.defaultDifficulty as keyof typeof NpcLevel],
     );
     await send(leader, C2S.lobbySettings, { npcDifficulty: NpcLevel.hard });
-    expect(errors(leader)).toEqual([ErrorCode.cannot]);
+    await errorsAre(leader, [ErrorCode.cannot]);
     for (let i = 0; i < balance.npc.difficultyMinNpcs; i++) await send(leader, C2S.lobbyAddNpc, {}, 60);
     await send(leader, C2S.lobbySettings, { npcDifficulty: NpcLevel.hard });
     expect(party.room.state.settings.npcDifficulty).toBe(NpcLevel.hard);
