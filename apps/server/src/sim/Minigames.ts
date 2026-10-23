@@ -12,10 +12,11 @@ import {
   type PlayerState,
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { emitSim } from './events/bus';
 import { martyrOf } from './Memorial';
 import { type PlayerSim, simOf } from './RoomSim';
 import { endMatch } from './Win';
-import { count, take } from './Inventory';
+import { addStack, canAdd, count, take } from './Inventory';
 import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
 /**
@@ -42,6 +43,17 @@ function openOf(room: PartyRoom): Map<string, Open> {
 
 type Problem = { code: ErrorCode; msg: string };
 
+/** Whether `p` stands in `node`'s scene within `doors.reachTiles` of its prop (the station reach of GDD 3.5). */
+function atNode(p: PlayerSim, node: { scene: string; prop: string }): boolean {
+  const here = sceneKey(p.sceneIdx);
+  const prop = node.scene === here ? scenes[here]?.props.find((q) => q.id === node.prop) : undefined;
+  return (
+    prop !== undefined &&
+    Math.hypot(p.x - tileCentre(prop.x, TILE_PX), p.y - tileCentre(prop.y, TILE_PX)) <=
+      balance.doors.reachTiles * TILE_PX
+  );
+}
+
 /** Why this seat cannot work `taskId` now, or null: the checks that start a mini-game and that finish it. */
 function taskProblem(
   room: PartyRoom,
@@ -60,20 +72,35 @@ function taskProblem(
   if (task.nightOnly && room.state.phase !== Phase.night && room.state.phase !== Phase.finalNight) {
     return { code: ErrorCode.wrongPhase, msg: 'only at night' };
   }
-  const here = sceneKey(p.sceneIdx);
-  const reach = balance.doors.reachTiles * TILE_PX;
-  const atTarget = task.targets.some((t) => {
-    const prop = t.scene === here ? scenes[here]?.props.find((q) => q.id === t.prop) : undefined;
-    return (
-      prop !== undefined &&
-      Math.hypot(p.x - tileCentre(prop.x, TILE_PX), p.y - tileCentre(prop.y, TILE_PX)) <= reach
-    );
-  });
-  if (!atTarget) return { code: ErrorCode.outOfRange, msg: 'too far' };
+  if (!task.targets.some((t) => atNode(p, t))) return { code: ErrorCode.outOfRange, msg: 'too far' };
   // A fake task (a Cabal seat's alibi list) needs no deliverable; a real one carries it to the node.
   if (!entry.fake && task.tool !== undefined && count(player, task.tool) < (task.toolQty ?? 1))
     return { code: ErrorCode.cannot, msg: 'you lack the tool' };
   return null;
+}
+
+/**
+ * The pick-up (GDD 3.5): a seat at a task's source prop takes the task's deliverable, `toolQty` of its tool, into its
+ * pockets, once at a time: not while it carries that many already, and not without the room. A fake list's holder goes
+ * through the same motion and takes nothing, so the Cabal's alibi theatre visits the same shelves as the Village's
+ * errands; nothing public tells the two apart, since inventories are private. The hold is instant, like the opener.
+ */
+function pickUp(
+  room: PartyRoom,
+  sessionId: string,
+  player: PlayerState,
+  p: PlayerSim,
+  fake: boolean,
+  tool: string | undefined,
+  qty: number,
+): void {
+  if (!isVerbPhase(room.state.phase)) return reject(room, sessionId, ErrorCode.wrongPhase, 'not now');
+  if (!p.placed) return reject(room, sessionId, ErrorCode.cannot, 'not now');
+  if (room.state.tick < p.busyUntilTick) return reject(room, sessionId, ErrorCode.busy, 'busy');
+  if (fake || tool === undefined) return;
+  if (count(player, tool) >= qty) return reject(room, sessionId, ErrorCode.cannot, 'you carry it already');
+  if (!canAdd(player, tool, qty)) return reject(room, sessionId, ErrorCode.cannot, 'no room in your pockets');
+  addStack(player, tool, qty);
 }
 
 /**
@@ -85,6 +112,13 @@ export function handleTaskHold(room: PartyRoom, sessionId: string, taskId: strin
   const p = simOf(room).players.get(sessionId);
   const def = Object.values(minigames.minigames).find((m) => m.task === taskId);
   if (!player || !p) return;
+  // Round 7 (7M, GDD 3.5): at the task's source the same hold picks its deliverable up instead.
+  const task = tasks.tasks[taskId];
+  const entry = player.priv.tasks.find((t) => t.id === taskId);
+  if (entry && !entry.done && task?.kind === 'fetch' && task.source && atNode(p, task.source)) {
+    pickUp(room, sessionId, player, p, entry.fake, task.tool, task.toolQty ?? 1);
+    return;
+  }
   const problem = def
     ? taskProblem(room, p, player, taskId)
     : { code: ErrorCode.cannot, msg: 'cannot do that' };
@@ -102,11 +136,12 @@ export function handleTaskHold(room: PartyRoom, sessionId: string, taskId: strin
 }
 
 /**
- * The global bar: finished real tasks over all real tasks; a ghost's finished ones count up to `ghostShareCap`. The
- * martyred Vicar's ghost (GDD 3.20) counts each real task it finishes in the `martyrS` seconds after its reveal
- * `martyrWeight` times, outside the cap; before and after that window its tasks count as any ghost's. A full bar in play wins the match for the Village (GDD 3.5).
+ * The global bar as the lists say it: finished real tasks over all real tasks; a ghost's finished ones count up to
+ * `ghostShareCap`. The martyred Vicar's ghost (GDD 3.20) counts each real task it finishes in the `martyrS` seconds
+ * after its reveal `martyrWeight` times, outside the cap; before and after that window its tasks count as any ghost's.
+ * Null when no seat holds a real task (the bar then stays where the deal left it). The `taskBar` invariant reads it.
  */
-export function recomputeTaskBar(room: PartyRoom): void {
+export function taskBarValue(room: PartyRoom): number | null {
   const martyr = martyrOf(room);
   let total = 0;
   let done = 0;
@@ -129,12 +164,19 @@ export function recomputeTaskBar(room: PartyRoom): void {
       martyrDone += boosted;
     }
   }
-  if (total === 0) return;
+  if (total === 0) return null;
   const counted =
     done + Math.min(ghostDone, balance.tasks.ghostShareCap * total) + martyrDone * balance.tasks.martyrWeight;
-  room.state.taskBar = Math.min(100, Math.floor((100 * counted) / total));
+  return Math.min(100, Math.floor((100 * counted) / total));
+}
+
+/** Writes the bar; a full bar in play wins the match for the Village (GDD 3.5). */
+export function recomputeTaskBar(room: PartyRoom): void {
+  const value = taskBarValue(room);
+  if (value === null) return;
+  room.state.taskBar = value;
   const phase = room.state.phase;
-  if (room.state.taskBar === 100 && phase >= Phase.grace && phase < Phase.gameOver) endMatch(room, 'village');
+  if (value === 100 && phase >= Phase.grace && phase < Phase.gameOver) endMatch(room, 'village');
 }
 
 function complete(
@@ -154,6 +196,15 @@ function complete(
   line.sceneId = p.sceneIdx;
   line.tick = room.state.tick;
   player.priv.ledger.push(line);
+  // Round 7 (7M, A133 (9)): the completion on the sim bus, for the log and the wages of round 8. A fake task fires it
+  // too, so no listener can treat the two differently by accident; `data.fake` never reaches a client.
+  emitSim(room, {
+    tick: room.state.tick,
+    kind: 'taskDone',
+    seat: sessionId,
+    sceneId: sceneKey(p.sceneIdx),
+    data: { taskId, fake: entry.fake },
+  });
   if (!entry.fake) recomputeTaskBar(room);
   openOf(room).delete(sessionId);
 }
