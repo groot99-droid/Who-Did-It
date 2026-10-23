@@ -31,7 +31,7 @@ describe('the committed media manifests', () => {
     expect(checkMusic(music, byMap)).toEqual([]);
   });
 
-  it('keep every video within 2 MB and every poster within 60 KB', () => {
+  it('keep every video within 2 MB (the intro within 5 MB) and every poster within 60 KB', () => {
     expect(checkVideos(videos)).toEqual([]);
   });
 
@@ -96,5 +96,16 @@ describe('the checks fail on a constructed oversize entry', () => {
     expect(checkVideos({ version: 1, entries: [big] }, sizeOf)).toHaveLength(2);
     const lie = { key: 'ok', url: 'ok.webm', durationS: 12, bytes: 5 };
     expect(checkVideos({ version: 1, entries: [lie] }, sizeOf)).toHaveLength(1);
+  });
+
+  it('the intro may be up to 5 MB, no other key may, and 5 MB + 1 fails', () => {
+    sizes['video/intro.webm'] = 4.5 * MB;
+    sizes['video/other.webm'] = 4.5 * MB;
+    const intro = { key: 'intro', url: 'intro.webm', durationS: 23, bytes: 4.5 * MB };
+    const other = { key: 'other', url: 'other.webm', durationS: 23, bytes: 4.5 * MB };
+    expect(checkVideos({ version: 1, entries: [intro] }, sizeOf)).toEqual([]);
+    expect(checkVideos({ version: 1, entries: [other] }, sizeOf)).toHaveLength(1);
+    sizes['video/intro.webm'] = 5 * MB + 1;
+    expect(checkVideos({ version: 1, entries: [{ ...intro, bytes: 5 * MB + 1 }] }, sizeOf)).toHaveLength(1);
   });
 });

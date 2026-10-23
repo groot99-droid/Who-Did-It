@@ -28,7 +28,7 @@ export class Preload extends Phaser.Scene {
     this.registry.set(REG_MUSIC, new MusicBus());
     installMusicDirector(this.game, getNet(this));
     const loading = mountLoadingScreen(this, overlayRoot());
-    const first = flags.admin ? 'Admin' : 'Landing';
+    const first = flags.admin ? 'Admin' : 'Intro';
     void resolveManifest(flags.art, base).then(
       (manifest) => {
         queueManifest(this.load, manifest);
