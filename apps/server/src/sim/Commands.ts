@@ -2,6 +2,7 @@ import type { Client } from '@colyseus/core';
 import { C2S } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { runAction } from './Actions';
+import { handleBank } from './economy/bank';
 import { handleBuy, handleSell } from './economy/shops';
 import { handleMinigameResult } from './Minigames';
 import { handleLight } from './mobs/light';
@@ -75,12 +76,15 @@ export function runCommands(room: PartyRoom): void {
       case C2S.light:
         handleLight(room, cmd.sessionId, payload);
         break;
-      // Round 8 (8C, GDD 3.23): trading at the shop a `shop` hold opened.
+      // Round 8 (8C, GDD 3.23): trading at the shop, and banking at the bank, a hold opened.
       case C2S.buy:
         handleBuy(room, cmd.sessionId, payload);
         break;
       case C2S.sell:
         handleSell(room, cmd.sessionId, payload);
+        break;
+      case C2S.bank:
+        handleBank(room, cmd.sessionId, payload);
         break;
       default:
         // act.interact, hide, check, burst, present arrive with M4+; queued and ignored until then.

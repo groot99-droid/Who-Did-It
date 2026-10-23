@@ -712,6 +712,11 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   lodge) snares and torches. The market (HollowMere's square, BlackPine's camp) sells nothing and buys timber, stone,
   resin, herbs, mushrooms and tin ore. No shop trades a role's kit, and an item a shop both sells and buys pays
   less than it asks.
+- **The bank.** HollowMere's manor hall and BlackPine's intake office each have a bank counter. Holding the action
+  key at it opens the seat's account, and the seat then deposits from its purse or withdraws to it, the whole amount
+  or nothing, while the counter stays within reach. Banked Scrip is safe from a mugging and a knockout. Only the
+  heist reaches it: when the Bandit cracks the strongbox, the box carries off `economy.heistShare` of every seat's
+  bank balance (rounded down per seat) as its loot.
 - **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice. It leaves only as a
   purchase, rent, a fine, a donation or an HQ tier. Theft, drops, pickups and the bank only move it.
 

@@ -823,7 +823,10 @@ function checkShops(c: Content, err: (msg: string) => void): void {
   for (const item of Object.keys(prices))
     if (!used.has(item)) err(`economy.json: price for ${item}, which no shop trades`);
   for (const scene of Object.values(c.scenes))
-    for (const p of scene.props)
+    for (const p of scene.props) {
       if (p.kind === 'counter' && !owner.has(p.id))
         err(`scene ${scene.id}: counter ${p.id} belongs to no shop`);
+      if (p.kind === 'bank' && !p.id.startsWith(`${scene.prefix}.bank_`))
+        err(`scene ${scene.id}: bank ${p.id} lacks the bank_ tail`);
+    }
 }

@@ -13,6 +13,7 @@ import { type PlayerSim, simOf } from './RoomSim';
 import { isVerbPhase, reject, sceneKey } from './World';
 import { handleCraft, tickCraft } from './Craft';
 import { handleTaskHold } from './Minigames';
+import { handleBankHold } from './economy/bank';
 import { handleShopHold } from './economy/shops';
 import { handleGather, tickGather } from './Resources';
 
@@ -68,9 +69,13 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
     handleTaskHold(room, sessionId, targetId);
     return;
   }
-  // Round 8 (8C, GDD 3.23): a `shop` hold on a counter opens its shop; `act.buy` and `act.sell` trade there.
+  // Round 8 (8C, GDD 3.23): a `shop` or `bank` hold on its counter opens it; `act.buy`, `act.sell` and `act.bank` use it.
   if (action === 'shop' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
     handleShopHold(room, sessionId, targetId);
+    return;
+  }
+  if (action === 'bank' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
+    handleBankHold(room, sessionId, targetId);
     return;
   }
   if (action !== 'collect' || typeof targetId !== 'string' || targetId.length === 0 || targetId.length > 64) {
