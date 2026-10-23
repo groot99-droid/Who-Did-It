@@ -41,6 +41,11 @@ export function installMatchmakeGuard(
   const global = new TokenBucket(globalPerMin, globalPerMin / 60, clock.now());
   const original: Invoke = matchMaker.controller.invokeMethod.bind(matchMaker.controller);
 
+  // Round 7 (GDD 3.21): `GET /parties` draws from the same per-IP bucket and has a global bucket of its own, so a
+  // menu polling the list cannot use up the joinById cap.
+  const listGlobal = new TokenBucket(globalPerMin, globalPerMin / 60, clock.now());
+  routeGate = (ip) => perIp.take(ip, clock.now()) && listGlobal.take(clock.now());
+
   matchMaker.controller.invokeMethod = async (method, roomName, clientOptions, authOptions) => {
     const ip = clientIp(authOptions);
     const allowed = perIp.take(ip, clock.now()) && (method !== 'joinById' || global.take(clock.now()));
@@ -54,8 +59,14 @@ export function installMatchmakeGuard(
 
   return () => {
     matchMaker.controller.invokeMethod = original;
+    routeGate = null;
   };
 }
+
+let routeGate: ((ip: string) => boolean) | null = null;
+
+/** True when an HTTP route (`GET /parties`) may run for this caller; always true while no guard is installed. */
+export const allowRoute = (ip: string): boolean => routeGate === null || routeGate(ip);
 
 /**
  * The address the per-IP bucket keys on. `AuthContext.ip` is the FIRST `x-forwarded-for` hop, which
