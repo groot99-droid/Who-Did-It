@@ -4,6 +4,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { POSITION_RING_TICKS } from './constants';
 import { resolveHandle } from './Avatars';
 import { spawnBody } from './Bodies';
+import { bodyBlocksAct } from './body/run';
 import { spawnKillClues } from './Clues';
 import { markDead } from './Death';
 import { emitSim } from './events/bus';
@@ -59,6 +60,7 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
     reject(room, sessionId, ErrorCode.cannot, 'no knife');
     return;
   }
+  if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, ErrorCode.cannot, 'not now'); // round 8, 8A
   const targetId = resolveHandle(room, sessionId, payload.targetId);
   const target = targetId === null ? undefined : sim.players.get(targetId);
   if (targetId === null || !target || targetId === sessionId) {

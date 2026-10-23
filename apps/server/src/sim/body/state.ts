@@ -1,6 +1,5 @@
-import { randomInt } from 'node:crypto';
 import { type EffectKey, balance } from '@wdi/content';
-import { EffectId, EffectState, type Rng, sfc32 } from '@wdi/shared';
+import { EffectId, EffectState, type Rng } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { simOf } from '../RoomSim';
 
@@ -37,16 +36,15 @@ export interface Body {
 
 interface BodyMemory {
   bodies: Map<string, Body>;
-  /** Effect chance rolls: a crypto-seeded stream of its own, so no draw shares a stream with the deal (A49). */
-  rng: Rng;
+  /** A test's replacement for the `body` stream of `seeds.ts`; null in play. */
+  rng: Rng | null;
 }
 
 const memories = new WeakMap<PartyRoom, BodyMemory>();
 function memoryOf(room: PartyRoom): BodyMemory {
   let memory = memories.get(room);
   if (!memory) {
-    const word = (): number => randomInt(0, 2 ** 32);
-    memory = { bodies: new Map(), rng: sfc32(word(), word(), word(), word()) };
+    memory = { bodies: new Map(), rng: null };
     memories.set(room, memory);
   }
   return memory;
@@ -57,8 +55,8 @@ export const bodies = (room: PartyRoom): ReadonlyMap<string, Body> => memoryOf(r
 
 export const bodyOf = (room: PartyRoom, id: string): Body | undefined => memoryOf(room).bodies.get(id);
 
-/** The body's chance stream; a test replaces it with a fixed one. */
-export const bodyRng = (room: PartyRoom): Rng => memoryOf(room).rng;
+/** The body's chance stream, `seeds.get('body')` (no secret draw shares it, A49); a test replaces it with a fixed one. */
+export const bodyRng = (room: PartyRoom): Rng => memoryOf(room).rng ?? room.seeds.get('body');
 export function setBodyRng(room: PartyRoom, rng: Rng): void {
   memoryOf(room).rng = rng;
 }

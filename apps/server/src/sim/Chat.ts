@@ -3,6 +3,7 @@ import { type ChatChannel, ErrorCode, Phase, S2C } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { refuse } from './Flow';
 import { simOf } from './RoomSim';
+import { bodyBlocksAct } from './body/run';
 
 const SPEAKING_PHASES: readonly number[] = [Phase.meetingDiscussion, Phase.meetingVote, Phase.reveal];
 
@@ -23,6 +24,7 @@ export function handleSay(room: PartyRoom, sessionId: string, payload: Record<st
     if (!SPEAKING_PHASES.includes(room.state.phase)) {
       return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
     }
+    if (bodyBlocksAct(room, sessionId)) return refuse(room, sessionId, ErrorCode.cannot, 'not now'); // round 8, 8A
     channel = 'meeting';
   }
   for (const client of room.clients) {

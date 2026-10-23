@@ -4,13 +4,14 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { speedPxPerTick } from '../Movement';
 import { type MoveInput, type PlayerSim, simOf } from '../RoomSim';
 import { isWorldPhase } from '../World';
-import { die, wake } from './damage';
+import { die, showClip, wake } from './damage';
 import {
   blocksAct,
   blocksRegen,
   blocksRun,
   deriveEffects,
   factorOf,
+  hasEffect,
   speedFactorOf,
   statusBitsOf,
   tickEffects,
@@ -102,4 +103,19 @@ export function overlayBody(
 export function bodyBlocksAct(room: PartyRoom, sessionId: string): boolean {
   const body = bodyOf(room, sessionId);
   return body !== undefined && blocksAct(body);
+}
+
+/** Whether a seat lies knocked out (the night powers' Keep Watch and Remedy refuse it, body.md 5; GDD 3.22). */
+export function knockedOut(room: PartyRoom, sessionId: string): boolean {
+  const body = bodyOf(room, sessionId);
+  return body !== undefined && hasEffect(body, 'knockedOut');
+}
+
+/**
+ * A one-shot clip on a seat's figure (`overlayBody` lays it over the presence for `CLIP_TICKS`): the body's own
+ * `hurt`, `knockdown` and `getup`, and any other session's one-shot (8B's `inspect`) through this one call.
+ */
+export function showOneShot(room: PartyRoom, sessionId: string, clip: number): void {
+  const body = bodyOf(room, sessionId);
+  if (body) showClip(body, clip, room.state.tick);
 }

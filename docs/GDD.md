@@ -723,7 +723,8 @@ until then only the creatures and the drains use the table, and only time cures.
 it lies where it fell (`down`), cannot move, act or hold, takes no second knockout, and drops the hold it had; the
 knockout drops `body.koPurseShare` (half) of its purse where it lies (3.23, with 8C). It wakes at `body.koWakeHp` 20
 health, Dazed; a meeting's gather wakes it at once. A knockout is never a death: no body on the floor, no meeting, no
-clue but the dropped coins. A killing bite still kills a downed seat.
+clue but the dropped coins. A killing bite still kills a downed seat. Keep Watch and the Remedy refuse a knocked-out
+seat as a target (body.md 5); the Knife, Nightshade and the Last Shot do not.
 
 **Effects.** Each is a row of `effects.json`. A timed effect's fresh application restarts its clock and adds a stack;
 an effect without a duration lasts until cured or until its condition ends. The sign is what everyone sees on the
