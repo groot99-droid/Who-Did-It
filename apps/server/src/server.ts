@@ -5,11 +5,16 @@ import { PartyRoom } from './rooms/PartyRoom';
 import { adminConfig, installAdminAuth } from './services/adminAuth';
 import {
   type GuardLimits,
+  allowRoute,
+  clientIp,
+  THROTTLED_CODE,
   installCors,
   isAllowedOrigin,
   installMatchmakeGuard,
 } from './services/matchmakeGuard';
 import { metrics } from './services/Metrics';
+import { listParties } from './services/partyListing';
+import { cleanProfile } from './rooms/PartyRoom';
 
 export function createServer(limits: Partial<GuardLimits> = {}) {
   installCors();
@@ -31,6 +36,25 @@ export function createServer(limits: Partial<GuardLimits> = {}) {
         const origin = req.headers.origin;
         if (isAllowedOrigin(origin)) res.set({ 'Access-Control-Allow-Origin': origin, Vary: 'Origin' });
         res.json(metrics.snapshot(BUILD_VERSION));
+      });
+      // Round 7 (GDD 3.21): the party list. Same per-IP bucket and a global cap as the matchmake route; a bad
+      // profile gets an empty list, not an error.
+      app.get('/parties', async (req, res) => {
+        const origin = req.headers.origin;
+        if (isAllowedOrigin(origin)) res.set({ 'Access-Control-Allow-Origin': origin, Vary: 'Origin' });
+        res.set('Cache-Control', 'no-store');
+        const ip = clientIp({ ip: req.ip, headers: { get: (name) => req.get(name) } });
+        if (!allowRoute(ip)) {
+          res.status(THROTTLED_CODE).json({ error: 'too many requests' });
+          return;
+        }
+        const raw = req.query.profile;
+        const profile = raw === undefined ? null : cleanProfile(raw);
+        if (raw !== undefined && profile === null) {
+          res.json({ parties: [] });
+          return;
+        }
+        res.json({ parties: await listParties(profile) });
       });
     },
   });

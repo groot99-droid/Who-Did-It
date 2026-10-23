@@ -6,6 +6,9 @@
  * Alpha variants are written as `rgb(var(--wdi-<name>-rgb) / a)` so no new hex is ever born.
  * Shadows tint toward slate or moon, never black.
  *
+ * The night set (palette.json `night`, round 7) is for the DOM UI only; its glass and veil alphas
+ * below are the ones docs/UI.md 10 measures, so change them there and in theme.test.ts together.
+ *
  * One import (`import './ui/theme/tokens.css'`) gives a screen the fonts, the palette, the type
  * scale, spacing, radii, strokes, shadows and motion. Component classes live in components.css.
  */
@@ -24,6 +27,20 @@
   src: url('../../assets/fonts/inter-latin-wght-normal.woff2') format('woff2');
 }
 
+@font-face {
+  font-family: 'Pixelify Sans';
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../../assets/fonts/pixelify-sans-latin-wght-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Press Start 2P';
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../assets/fonts/press-start-2p-latin-400-normal.woff2') format('woff2');
+}
+
 :root {
   /* ---- palette.json colours (generated block; keep in file order) ---- */
   --wdi-ink: #12141c;
@@ -36,6 +53,11 @@
   --wdi-blood: #b3121f;
   --wdi-lantern: #ffb457;
   --wdi-moon: #7fa8ff;
+  --wdi-night: #0a0924;
+  --wdi-violet: #4b36b8;
+  --wdi-indigo: #251a6b;
+  --wdi-lilac: #c9ceff;
+  --wdi-snow: #ffffff;
 
   /* The same colours as space-separated RGB for alpha use: rgb(var(--wdi-bone-rgb) / 0.72). */
   --wdi-ink-rgb: 18 20 28;
@@ -48,6 +70,11 @@
   --wdi-blood-rgb: 179 18 31;
   --wdi-lantern-rgb: 255 180 87;
   --wdi-moon-rgb: 127 168 255;
+  --wdi-night-rgb: 10 9 36;
+  --wdi-violet-rgb: 75 54 184;
+  --wdi-indigo-rgb: 37 26 107;
+  --wdi-lilac-rgb: 201 206 255;
+  --wdi-snow-rgb: 255 255 255;
 
   /* ---- roles: night mode (light on dark). Ratios in docs/UI.md 10. ---- */
   --wdi-bg: var(--wdi-ink); /* page and world scrim */
@@ -79,9 +106,27 @@
   --wdi-faction-neutral: var(--wdi-mustard);
   --wdi-on-neutral: var(--wdi-ink); /* 9.88 */
 
+  /*
+   * ---- the night theme (round 7, the owner's mockups; docs/UI.md 2, ratios in 10) ----
+   * Screens over the loop backdrop: lilac text on night and on glass, lantern the one accent. Snow is
+   * never a fill: it is rims and sheens at low alpha, and the pixel labels on glass.
+   */
+  --wdi-night-bg: var(--wdi-night);
+  --wdi-night-text: var(--wdi-lilac); /* on night 12.77, on glass 7.00 at worst */
+  --wdi-night-text-muted: rgb(var(--wdi-lilac-rgb) / 0.8); /* on glass 5.14 at worst */
+  --wdi-night-label: var(--wdi-snow); /* pixel display labels on glass: 10.69 at worst */
+  --wdi-night-accent: var(--wdi-lantern); /* primary fill, Leader tag, selected segment */
+  --wdi-on-night-accent: var(--wdi-night); /* 11.06 */
+  --wdi-veil: rgb(var(--wdi-night-rgb) / 0.6); /* over the loop video, always */
+  --wdi-vignette: rgb(var(--wdi-night-rgb) / 0.5); /* added at the edges, where the footer sits */
+  --wdi-glass-fill: rgb(var(--wdi-indigo-rgb) / 0.66); /* every glass surface's fill */
+
   /* ---- type: Oswald for display, Inter for text (both self-hosted, OFL) ---- */
   --wdi-font-display: Oswald, 'Arial Narrow', 'Helvetica Neue', sans-serif;
   --wdi-font-text: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* The night theme's pixel faces (docs/UI.md 3): never below 12 px, never synthesised bold. */
+  --wdi-font-pixel-display: 'Press Start 2P', ui-monospace, monospace;
+  --wdi-font-pixel-text: 'Pixelify Sans', system-ui, sans-serif;
   --wdi-display-xl: 2.75rem; /* 44: party code */
   --wdi-display-lg: 2rem; /* 32: screen titles, role name */
   --wdi-display-md: 1.5rem; /* 24: section titles, portrait names */

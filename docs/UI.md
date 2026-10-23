@@ -24,7 +24,8 @@ Session I, 2026-10-10. Owner review pending on the role card and the meeting scr
    colour; a card has one faction. Saturated tokens never cover more than a tenth of a screen
    (`palette.rules.maxSaturatedAccentShare`).
 4. **Night-friendly contrast.** Light on dark by default, never pure white, never pure black;
-   shadows tint toward `slate` or `moon`. Every text pair clears WCAG AA at its size (10).
+   shadows tint toward `slate` or `moon`. (The night theme of round 7 lets `snow` be the pixel
+   labels on glass and the rims and sheens at low alpha, as the owner's mockups draw them; 2.) Every text pair clears WCAG AA at its size (10).
 5. **No information carried by colour alone.** Ready, away, dead, verified, forged, selected,
    voted: each has a glyph, a word, a stroke or a shape as well as a colour. The three faction
    frames differ in corner motif, not only in hue.
@@ -36,8 +37,8 @@ Session I, 2026-10-10. Owner review pending on the role card and the meeting scr
 
 ## 2. Palette
 
-The ten tokens of `packages/content/data/palette.json` (docs/ASSETS.md 6.1) are the only
-colours. CSS exposes each as `--wdi-<name>` and as `--wdi-<name>-rgb` so an alpha variant is
+The ten tokens of `packages/content/data/palette.json` (docs/ASSETS.md 6.1) and its five-colour
+`night` set (round 7, below) are the only colours. CSS exposes each as `--wdi-<name>` and as `--wdi-<name>-rgb` so an alpha variant is
 written `rgb(var(--wdi-bone-rgb) / 0.72)` and no new hex is ever born. The night roles:
 
 | Role token | Palette | Used for |
@@ -66,11 +67,58 @@ and `blood` are never text on slate (3.50 and 1.85), so an error on a panel is l
 warning glyph and an error on paper is blood; `teal` and `moon` are never text on paper (1.44 and
 1.56), so links live on dark surfaces only.
 
+**The night set (round 7, 7B, DECISIONS A106).** The owner's two mockups (`docs/round7/ui-reskin.md`)
+add five colours, kept in `palette.json` `night` apart from the ten tokens because they are DOM UI
+only: never in art, never in the world palette, never a runtime tint. The accent stays `lantern`
+(the mockups' `#FFB347` is one digit from it and is not added).
+
+| Token | Hex | From the mockups |
+|---|---|---|
+| `night` | `#0A0924` | the page behind everything, the poster's frame |
+| `violet` | `#4B36B8` | the title's near shadow, the You, NPC and Ready tags |
+| `indigo` | `#251A6B` | the title's far shadow, the glass fill |
+| `lilac` | `#C9CEFF` | text |
+| `snow` | `#FFFFFF` | rims and sheens at low alpha, the pixel labels on glass; never a fill |
+
+| Role token | Value | Used for |
+|---|---|---|
+| `--wdi-night-bg` | night | the page under the backdrop, and the page when there is no video |
+| `--wdi-night-text` | lilac | text on night and on glass |
+| `--wdi-night-text-muted` | lilac at 80% | hints and meta on night and on glass |
+| `--wdi-night-label` | snow | the Press Start 2P labels of glass buttons |
+| `--wdi-night-accent` / `--wdi-on-night-accent` | lantern / night | the primary glass button, the Leader tag, the selected segment, the focus ring on night |
+| `--wdi-veil` | night at 60% | over the loop video, always |
+| `--wdi-vignette` | night at 50% | added toward the edges, where the footer and the chip row sit |
+| `--wdi-glass-fill` | indigo at 66% | the fill of every glass surface, under its blur |
+
+The veil and the glass alphas are the ones 10 measures, over the darkest frame the loop can show
+(`night`) and the brightest (`snow`): text on glass passes whatever the video shows. Bare text on
+the backdrop is display size (24 px and up) or sits in the vignette.
+
 ## 3. Type
 
 Oswald for display (titles, buttons, names, codes, chips: uppercase, tracked) and Inter for
 text (body, hints, inputs, chat). Both are self-hosted variable fonts under the OFL
 (`apps/client/src/assets/fonts/`, texts in `LICENSES/fonts/`); `tokens.css` declares them.
+
+**The pixel faces (round 7, 7B, DECISIONS A106).** The night theme adds Press Start 2P
+(`--wdi-font-pixel-display`, one weight) and Pixelify Sans (`--wdi-font-pixel-text`, variable 400 to
+700), both OFL, self-hosted from Fontsource 5.3.0 as Latin woff2 (12.2 and 11.7 KiB, about 24 KiB
+together, bundled with the stylesheet and fetched only by a screen that uses them). `style.json`
+`ui.fonts` names all four and `theme.test.ts` refuses any other family in any stylesheet under
+`apps/client/src` (generic families such as `monospace` aside). The sizes are the scale below;
+which face each size takes on a night surface:
+
+| Token | Night face | Why |
+|---|---|---|
+| `--wdi-display-xl`, `-lg` | Press Start 2P | the title, the party code, screen titles: the mockups' display type |
+| `--wdi-display-md`, `-sm` | Press Start 2P for button labels and tags in caps; Pixelify Sans 600 for panel headings ("Players 1 / 10", "The Deck") | Press Start 2P is a full em wide, so it is kept to short caps |
+| `--wdi-text-lg`, `-md`, `-sm` | Pixelify Sans | body, hints, selects and inputs on glass |
+| `--wdi-text-xs` | Pixelify Sans 600 | tags and eyebrows; Press Start 2P at 12 px only for one-word tags |
+| running text of more than two lines: the role card's text and abilities, the notebook, the chat log | Inter (Oswald for their headings) | a pixel face at 14 px over several lines reads as noise; the colours are the same, so the contrast in 10 holds |
+
+Never below 12 px, never synthesised bold (Press Start 2P has one weight: `font-synthesis: none`),
+and the pixel faces take no tracking beyond 0.04 em.
 
 | Token | Size | Face | Where |
 |---|---|---|---|
@@ -293,9 +341,34 @@ composited over the background first. Floors: 4.5 for text, 3 for large text (24
 | `mustard` | `ink` | 9.88 | 3 | AAA | focus ring on the page (non-text, 3:1) |
 | `fog` | `ink` | 4.23 | 3 | AA large / UI | display text 24 px and up only (large text, 3:1) |
 
+The night theme (round 7). A stack such as `indigo@0.66 over night@0.6 over snow` is composited
+bottom up: the brightest frame the loop could show (`snow`), the veil, then the glass fill. The
+alphas are read from `tokens.css` by the test, so a changed token re-measures the rows.
+
+| Foreground | Background | Ratio | Floor | Grade | Use |
+|---|---|---|---|---|---|
+| `lilac` | `night` | 12.77 | 4.5 | AAA | text on the night page and over the poster |
+| `lilac@0.8` | `night` | 8.38 | 4.5 | AAA | muted text on the night page |
+| `bone` | `night` | 12.95 | 4.5 | AAA | Inter running text kept on night surfaces |
+| `night` | `lantern` | 11.06 | 4.5 | AAA | primary glass button, Leader tag, selected segment |
+| `lantern` | `night` | 11.06 | 4.5 | AAA | the party code, warnings and the focus ring on night |
+| `lilac` | `violet` | 5.46 | 4.5 | AA | You, NPC and Ready tags |
+| `lantern` | `indigo` | 8.28 | 3 | AAA | the title's second line against its stepped shadow (large text, 3:1) |
+| `lilac` | `indigo@0.66 over night` | 10.79 | 4.5 | AAA | text on glass over the loop's darkest frame |
+| `lilac` | `indigo@0.66 over night@0.6 over snow` | 7.00 | 4.5 | AAA | text on glass over the brightest frame possible |
+| `lilac@0.8` | `indigo@0.66 over night@0.6 over snow` | 5.14 | 4.5 | AA | muted text and hints on glass |
+| `snow` | `indigo@0.66 over night@0.6 over snow` | 10.69 | 4.5 | AAA | pixel labels on glass buttons |
+| `lantern` | `indigo@0.66 over night@0.6 over snow` | 6.07 | 3 | AA | the primary rim and the focus ring on glass (non-text, 3:1) |
+| `lilac` | `night@0.5 over night@0.6 over snow` | 7.21 | 4.5 | AAA | bare text at the vignetted edge: the footer, the chip row |
+| `lilac` | `night@0.6 over snow` | 3.41 | 3 | AA large / UI | bare display text on the veil, 24 px and up (large text, 3:1) |
+
 Pairs the system avoids, so nobody has to re-measure them: `fog` on `slate` 2.95, `bone` on
 `fog` 2.88, `magenta` on `slate` 3.50, `magenta` on `bone` 2.44, `blood` on `slate` 1.85,
-`teal` on `bone` 1.44, `moon` on `bone` 1.56, `mustard` on `bone` 1.24.
+`teal` on `bone` 1.44, `moon` on `bone` 1.56, `mustard` on `bone` 1.24. On the night theme:
+`lantern` bare on the veil 2.96 and `lilac@0.8` bare on the veil 2.76 at the bright bound (so the
+title's lantern line keeps its indigo shadow and hints sit on glass), `violet` on `night` 2.34 and
+`indigo` on `night` 1.34 (shadows and fills, never text), `lilac` on `lantern` 1.15 and `snow` on
+`lantern` 1.76 (the accent always takes `night` text).
 
 ## 11. Adopting it in a screen (Session F)
 

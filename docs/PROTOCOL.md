@@ -274,6 +274,18 @@ export type PartyVisibility = 'open' | 'private';
 ```
 
 ```ts
+export interface PartyListing {
+  code: string;
+  leader: string;
+  players: number;
+  max: number;
+  mode: number;
+  map: string;
+  visibility: PartyVisibility;
+}
+```
+
+```ts
 export interface CreateOptions extends JoinOptions {
   visibility: PartyVisibility;
   /** Profile codes the leader invited, capped by balance.json `party.invitedMax`; ignored for an open party. */

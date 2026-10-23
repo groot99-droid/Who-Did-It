@@ -11,8 +11,15 @@
       "key": "intro",
       "url": "intro.webm",
       "poster": "intro.jpg",
-      "durationS": 29.1,
-      "bytes": 4514024
+      "durationS": 22.33,
+      "bytes": 3764926
+    },
+    {
+      "key": "landing_loop",
+      "url": "landing_loop.webm",
+      "poster": "landing_loop.jpg",
+      "durationS": 6.29,
+      "bytes": 236787
     }
   ]
 }

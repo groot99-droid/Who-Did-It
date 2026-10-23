@@ -20,7 +20,8 @@ import { type Rng, sfc32 } from '@wdi/shared';
  * - `npcTiming`, `npcPlay`: keyed by NPC seat id; each NPC seat draws only from its own two;
  * - `mobs`, `nodes`: round-6 world draws (`mobs` keyed by spawner id);
  * - `minigame`: the station-task puzzles (6H), keyed by seat id, so no public draw shares a seat's board;
- * - `contract`, `events`: the Bible's mail stream and world events (rounds 7 and 9, docs/round6/bible-seams.md).
+ * - `contract`, `events`: the Bible's mail stream and world events (rounds 7 and 9, docs/round6/bible-seams.md);
+ * - `vendetta`: a Killer card's vendetta, keyed by seat id (round 7, GDD 3.20).
  */
 export type StreamName =
   | 'deal'
@@ -38,7 +39,8 @@ export type StreamName =
   | 'nodes'
   | 'minigame'
   | 'contract'
-  | 'events';
+  | 'events'
+  | 'vendetta';
 
 /** Four 32-bit seed words of one sfc32 stream. */
 export type SeedWords = readonly [number, number, number, number];
