@@ -47,6 +47,8 @@ export type RecipesFile = z.infer<typeof RecipesFile>;
 export const MobDef = z.strictObject({
   id: Id,
   name: z.string().min(1),
+  /** Hit points (round 8, 8G): fists, bolts and lights take them off; at zero it dies (GDD 3.15, body.md 4). */
+  hp: z.number().int().positive(),
   speedTilesPerS: z.number().positive(),
   /** How far it notices a seat, and how close a light must be for it to flee. */
   senseTiles: Tiles,
