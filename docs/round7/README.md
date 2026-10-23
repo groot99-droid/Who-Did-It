@@ -12,6 +12,7 @@ never restate a rule differently.
 | [map-intros.md](map-intros.md) | The three intro tracks played whole, the longer cinematic openings that visit the rooms and the caves, the music class `opening` | 7A |
 | [vendettas.md](vendettas.md) | The four killer vendettas, the Daily Train, the Vicar's memorial and the Ascended Vicar: data, bus events, server modules, invariants, the client's part | 7H, 7I |
 | [quick-mode-removal.md](quick-mode-removal.md) | The owner's decisions of 13:05Z: the quick mode leaves the game (what stays, the inventory, 7J's three deletion PRs), and the four station pictures become rooms of Crumb's Ovens (7K); the ten kitchen pictures seed Port-au-Levain in round 8 | 7J, 7K |
+| [seams.md](seams.md) | What a round-7 session learnt about a hook or a call site another may touch next: today the module evaluation order around `handlers/lobby.ts` and `sim/Npc.ts` | 7M |
 
 **Elsewhere.** The rules are in `docs/GDD.md`: 3.20 "Vendettas" (7H writes it from the stub), 3.21 "Parties,
 profiles and friends" (7D and 7C), the 3.3 and 3.18 lines the openings change (7A), the 3.3 Train line (7I).
