@@ -77,6 +77,11 @@ Versions are pinned in `docs/ARCHITECTURE.md` 5.1. Sessions never upgrade depend
   plugin (style catalog, contrast-checked design-system generator); see `docs/ASSETS.md`
   6.10. The `rosw` plugin itself (creative-writing and studio pipelines) only works from
   the ROSW checkout, so it is not enabled here.
+- The game's teardown lives in ROSW `teardowns/who-did-it/` (the `udgt` plugin, enabled in
+  `.claude/settings.json`). It maps every design choice to its decision, its section, its data, its
+  code and its history, and it holds the owner's answers to the teardown briefs, verbatim. Before
+  changing a mechanic, a screen or a dataset, the `udgt-consult` skill answers "why is it like this"
+  from it (ROSW checked out beside this repo). It reads this repo and never writes it.
 - ROSW `writing-museum/` is a Three.js first-person viewer with doors, rooms, lights,
   touch and gamepad input; it is the candidate seed for the V2 renderer.
 
