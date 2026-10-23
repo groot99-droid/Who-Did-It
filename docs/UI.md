@@ -1356,6 +1356,15 @@ with the system style; the arrival and the brake are `noise` pulses whose `kind`
 | the arrival (server, `Train.ts` `TRAIN_ARRIVE_LINE`) | The train pulls into the station. | `chat.msg` `system`, every seat, once per day |
 | `log.train` (`ui/copy/world.ts`) | The train pulls in at the platform | the HUD log of a seat that hears `train_arrive`; `World.ring` plays the two `train_*` pulses as sounds and draws no ring |
 
+The Vicar's memorial (GDD 3.20) is a cutscene, `memorialVicar` in `cutscenes.json` (kind `memorial`), sent to every
+seat as `cutscene { id: 'memorialVicar', scope: 'all' }` at the reveal. Its `video` step plays `memorial_vicar` once
+7A's `CutscenePlayer` renders video steps; until then the client drops a `scope: 'all'` cutscene. Its caption is one
+block at the end of `ui/copy/cutscenes.ts`:
+
+| Copy id | Text | Where |
+|---|---|---|
+| `cs.memorial.vicar` | In memory of the Vicar of HollowMere, who fell to the Knife. | `title` caption over the first 5 s of the film |
+
 ### 14.24 Opening cinematic (6Q)
 
 Lines are in `apps/client/src/ui/copy/intro.ts` (`INTRO_COPY`). The `Intro` scene sits between `Preload` and `Landing` (never before `Admin`).

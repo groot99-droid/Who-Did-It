@@ -752,6 +752,14 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
 under its routine (3.12): the Vicar's scene, a task target's scene, the loaded strongbox's hall or its target's
 scene, through `vendettaGoalFor`. It does nothing a human could not do in the same place.
 
+**The Vicar's memorial (7I).** When the seat dealt the Vicar dies by the Knife, the next meeting's reveal plays a
+memorial to every seat: the Vicar's film (`memorial_vicar`) under one title caption, skippable like every
+cutscene (3.18). It plays once per match, so a later reveal stays plain, and the meeting, not the night, carries
+it. No other death plays it: the Vicar poisoned, shot, ejected or taken by a wolf, or another card struck by the
+Knife. The quick mode never plays it. It names no seat on screen and changes nothing public beyond the film. The
+server remembers the fallen Vicar as the Ascended Vicar candidate (`flow.ascendedVicarCandidate`, room memory
+only, kept into the room's next match until another memorial replaces it), which round 8's evolutions read.
+
 ### 3.21 Parties, profiles and friends
 
 Round 7 (ROADMAP R7b; `docs/round7/parties.md`; DECISIONS A103, A104). The menu asks the name on Start Game and

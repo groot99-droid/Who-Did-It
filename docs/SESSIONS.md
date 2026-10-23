@@ -3265,5 +3265,6 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 ### Round 7 log: 7I
 
 - 2026-10-23: PR 1, the Daily Train: the platform spot on HollowMere's overworld (A113), `sim/Train.ts` and its `runTrain` line, `balance.json` `train`, GDD 3.3, WORLD 4.3, UI.md 14.30, `test/train.test.ts`.
+- 2026-10-23: PR 2, the Vicar's memorial: `sim/Memorial.ts` and its `runMemorial` line, `FlowState.ascendedVicarCandidate`, the `cutscenes.json` `memorialVicar` row and the `cs.memorial.*` caption block, GDD 3.20, UI.md 14.30, A113, `test/memorial.test.ts`.
 
 ## Integration log, round 7

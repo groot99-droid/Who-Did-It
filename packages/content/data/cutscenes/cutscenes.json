@@ -219,6 +219,22 @@
         { "t": "caption", "copyId": "cs.deathWolf.line", "durationS": 2.5, "style": "whisper" },
         { "t": "hold" }
       ]
+    },
+    "memorialVicar": {
+      "id": "memorialVicar",
+      "kind": "memorial",
+      "skippable": true,
+      "maxS": 22,
+      "steps": [
+        { "t": "video", "key": "memorial_vicar" },
+        {
+          "t": "caption",
+          "copyId": "cs.memorial.vicar",
+          "durationS": 5,
+          "style": "title",
+          "withPrevious": true
+        }
+      ]
     }
   }
 }
