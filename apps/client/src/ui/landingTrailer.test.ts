@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { trailerAllowed } from './landingTrailer';
+import { TRAILER_PLAYLIST, trailerAllowed } from './landingTrailer';
 
 const env = { reducedMotion: false, saveData: false, search: '' };
 
@@ -19,5 +19,11 @@ describe('trailerAllowed', () => {
   it('skips with ?video=0 and plays with any other value', () => {
     expect(trailerAllowed({ ...env, search: '?mock=1&video=0' })).toBe(false);
     expect(trailerAllowed({ ...env, search: '?video=1' })).toBe(true);
+  });
+});
+
+describe('TRAILER_PLAYLIST', () => {
+  it('is the lobby playlist, the theme (A98)', () => {
+    expect(TRAILER_PLAYLIST).toBe('lobby');
   });
 });
