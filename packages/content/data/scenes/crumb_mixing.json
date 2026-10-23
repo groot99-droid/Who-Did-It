@@ -33,21 +33,29 @@
     {
       "id": "cm.flour_sacks",
       "kind": "hide",
-      "variant": "pantry",
+      "variant": "flourSacks",
       "x": 1,
       "y": 2,
       "childOnly": false
     },
     { "id": "cm.trunk", "kind": "body", "variant": "trunk", "x": 10, "y": 7, "childOnly": false }
   ],
-  "props": [],
+  "props": [
+    {
+      "id": "cm.mixer",
+      "kind": "doughMixer",
+      "x": 6,
+      "y": 2,
+      "footprint": { "x": 6, "y": 1, "w": 2, "h": 2 }
+    }
+  ],
   "gates": [],
   "paths": [],
   "lights": [{ "id": "cm.lt_lamp", "kind": "lamp", "x": 5, "y": 4, "radiusTiles": 3 }],
   "grid": [
     "############",
-    "#..........#",
-    "#H.........#",
+    "#.....##...#",
+    "#H....##...#",
     "#..........#",
     "#..........#",
     "#..........#",
@@ -57,8 +65,8 @@
   ],
   "material": [
     "WWWWWWWWWWWW",
-    "WffffffffffW",
-    "WffffffffffW",
+    "WfffffPPfffW",
+    "WfffffPPfffW",
     "WffffffffffW",
     "WffffffffffW",
     "WffffffffffW",
