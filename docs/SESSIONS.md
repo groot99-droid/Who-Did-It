@@ -3075,15 +3075,19 @@ pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock 
   tap), #81 (11168d1, the Killer NPC's kill-opportunity timer `npc.aloneKill`, A100, the owner's rule change landed by
   6Z), ROSW #14 (21dd819), and #82 (the round-7 contract, documents only: **the round-7 opening**, 6Z), then #85
   (e006abc, 7D's party create options and schema version 4: **round 7's first code merge**), #86, #88, #84 (6N's
-  intro trim and landing loop, A102), #89, and last #93. #93 is the determinism split below, which landed ahead of
+  intro trim and landing loop, A102), #89, #87, #97, #93 and, in the last hours, the base merges up to #120
+  (among them #109, which removed the quick mode from the client). #93 is the determinism split below, which landed ahead of
   the integration at 6Z's request (a2d1d17), so #73 carries no duplicate of those commits.
   *Protocol and lockfile.* `pnpm install --frozen-lockfile` and `pnpm docs:protocol` produced no change on the
   integrated tree (checked again after #81 and #85): nothing to commit for step 1.
   *Soaks (step 2).* `pnpm auto -- --matches 50 --seed 6006` on every combination of both maps (hollowmere,
   blackpine), both modes (main, onub) and all three difficulties: 12 runs, 600 matches, 12 of 12 clean, zero
-  failures, on the tree after #81 and #85. `pnpm bots:soak` 30 minutes, main mode, six bots: SOAK_MAIN.
-  `pnpm bots:soak` 30 minutes, quick mode (`--sizes 4,6,8 --pace fast`): SOAK_ONUB. Opt-in e2e with
-  `WDI_E2E_MATCH=1 WDI_E2E_LOOKS=1 WDI_E2E_NPC=1 WDI_E2E_ONUB=1`: E2E_RESULT. The admin live spec stays skipped: it
+  failures, on the tree after #81 and #85 (before #87 and #97). `pnpm bots:soak -- --minutes 30 --bots 6 --mode main` on the
+  tree 06d80e3 (every later base commit was merged without a new soak, at 6Z's instruction): 1,800 s, 5 matches, 169
+  kills, 5 meetings, 190 portal uses, worst tick p95 0.513 ms, leaks 0, protocol errors 0, dropped bots 0. A first
+  main soak on the tree before #87 was equally clean. The quick-mode soak and `onub.spec.ts` were removed under
+  DECISIONS A115 (owner decision, session 7J) and are not run; the files stay for 7J's PR 3. Opt-in e2e with
+  `WDI_E2E_MATCH=1 WDI_E2E_LOOKS=1 WDI_E2E_NPC=1`: E2E_RESULT. The admin live spec stays skipped: it
   needs `WDI_E2E_ADMIN`, the owner's Railway variables and a token, none of which this session has or writes into
   any file. `media.test.ts` and the sprite budgets are green on the final tree (6N's steps 2 and 3 landed in #71 and
   #84).
@@ -3113,11 +3117,14 @@ pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock 
     confirm button is `confirm-start`; the 6C opening cutscene hides the HUD until `skipOpening` presses Escape and
     6Q's intro needs `skipIntro` (`helpers.ts`); positions are read from `scenes.get('overworld').avatars` by
     `lookOf`, not from `presence`; kills are only legal at dusk, night and final night, so the match spec sets
-    `debug.clock { phase: 'night', clearCooldowns: true }` and walks to the victim with `walkToward`. The last one:
-    in `onub.spec.ts` the reveal expects a stamp, which needs a top tally of at least `minVotesToTurnOut` (2); the
-    test cast two votes (host on a bot, guest on the Pantry) and left the three fast bots' votes to chance, so a
-    split or a Pantry lead turned nobody out. The guest now votes the same seat and the bots' Pantry chance is 0
-    in that spec (the Pantry path stays the soak's and the rules tests'). No assertion was loosened.
+    `debug.clock { phase: 'night', clearCooldowns: true }` and walks to the victim with `walkToward`. `world.spec.ts` "kill -> body -> collect"
+    walked east and held E for a fixed 2.3 s: the strike side varies, a bell nearer than the footprints flips the
+    prompt, and a loaded runner ticks late. It now reads the clue positions from the mock-only `__wdiMock.clues()`
+    hook, walks onto the nearest footprints, lets the player settle and holds E until the Notebook opens (24 of 24
+    runs under four parallel workers). `npc.spec.ts` "three NPC seats" walked to a prey that could be indoors (out of
+    the watcher's scene-scoped view) and assumed the third kill happens, but a meeting vote can eject an NPC and end
+    the match one kill early; it now picks a prey in sight and stops when `gameover` shows. `onub.spec.ts` had a
+    vote assumption of the same kind (fixed, then removed with the quick mode). No assertion was loosened.
   *Railway "Wait for CI".* A red base push run on 18c8fd0 (flake D3) stranded the server on build 1156a758 until the
   owner turned the setting off at about 00:36Z; the server then redeployed on f74ab229 and ba7f88ae. A flaky test now
   stops production, which is the reason #93 was split out first.
