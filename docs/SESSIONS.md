@@ -3246,7 +3246,8 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 ### Round 7 log: 7F
 
-- 2026-10-23: PR 1 (role card, HUD and its log, notebook sheet, settings panel): `ui/match.css`, `view/hud.css`, UI.md 14.27, A110. Rules are scoped under an ancestor class, so they do not wait for 7B's glass classes; `theme.test.ts` and the 565 client unit tests pass.
+- 2026-10-23: PR 1 (role card, HUD and its log, notebook sheet, settings panel): `ui/match.css`, `view/hud.css`, UI.md 14.27, A110. Rules are scoped under an ancestor class, so they do not wait for 7B's glass classes; `theme.test.ts` and the 565 client unit tests pass. Surfaces over the world and cutscenes use `--wdi-match-glass` (night at 85%) because the shared glass fill gives lilac 3.32 over an unveiled white pixel (UI.md 14.27).
+- PR 2 (loading, transitions, cutscene captions and Skip, the intro's Skip): CSS only, in `ui/match.css`; no markup, class or id changed, so 7A's staging of `CutscenePlayer.ts` is untouched.
 
 ### Round 7 log: 7G
 

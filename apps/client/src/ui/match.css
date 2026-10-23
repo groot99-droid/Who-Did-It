@@ -305,3 +305,165 @@
     background-color: var(--wdi-indigo);
   }
 }
+
+/* ---------------------------------------------------------------- scene transitions and the loading screen */
+
+.wdi-transition {
+  background-color: var(--wdi-night);
+}
+
+.wdi-loading {
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-night);
+  background-image: radial-gradient(
+    ellipse at 50% 40%,
+    rgb(var(--wdi-indigo-rgb) / 0.8),
+    rgb(var(--wdi-night-rgb) / 0) 70%
+  );
+}
+
+.wdi-loading .wdi-display {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-display-md);
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  color: var(--wdi-night-label);
+  overflow-wrap: anywhere;
+  text-shadow: 3px 3px 0 var(--wdi-violet);
+}
+
+/* The bar: a stepped glass track with a lantern fill, no rounding. */
+.wdi-loading .wdi-loading__bar {
+  height: var(--wdi-space-3);
+  background-color: var(--wdi-glass-fill);
+  border: 2px solid rgb(var(--wdi-lilac-rgb) / 0.45);
+  border-radius: 0;
+  box-shadow: inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.12);
+}
+
+.wdi-loading .wdi-loading__fill {
+  background-color: var(--wdi-night-accent);
+}
+
+.wdi-loading .wdi-eyebrow {
+  font-family: var(--wdi-font-pixel-text);
+  font-weight: 600;
+  font-synthesis: none;
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-loading .wdi-loading__tip {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  line-height: var(--wdi-leading-text);
+  color: var(--wdi-night-text);
+}
+
+/* ---------------------------------------------------------------- cutscene captions and Skip, the intro's Skip */
+
+.wdi-cutscene {
+  background:
+    linear-gradient(to bottom, rgb(var(--wdi-night-rgb) / 0.85) 0, transparent 12%),
+    linear-gradient(to top, rgb(var(--wdi-night-rgb) / 0.85) 0, transparent 28%);
+}
+
+/* A caption is one or two lines: Pixelify Sans on a glass plate (lilac on glass is measured in UI.md 10). */
+.wdi-cutscene .wdi-caption {
+  padding: var(--wdi-space-2) var(--wdi-space-4);
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-lg);
+  line-height: 1.35;
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-match-glass);
+  border: 1px solid rgb(var(--wdi-lilac-rgb) / 0.35);
+  border-radius: var(--wdi-radius-xs);
+  box-shadow: inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.12);
+  text-shadow: none;
+  backdrop-filter: blur(6px);
+}
+
+.wdi-cutscene .wdi-caption[data-style='title'] {
+  padding: 0;
+  font-family: var(--wdi-font-pixel-display);
+  font-size: clamp(1.5rem, 5vw, 2.75rem);
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  color: var(--wdi-night-label);
+  background: none;
+  border: 0;
+  box-shadow: none;
+  overflow-wrap: anywhere;
+  /* The step shadow is the mockup's; the night halo keeps the title legible over a bright day frame. */
+  text-shadow:
+    3px 3px 0 var(--wdi-violet),
+    0 0 10px var(--wdi-night),
+    0 0 22px var(--wdi-night);
+  backdrop-filter: none;
+}
+
+/* Pixelify has no italic and synthesis is off, so a whisper is quieter, not slanted. */
+.wdi-cutscene .wdi-caption[data-style='whisper'] {
+  font-style: normal;
+  color: var(--wdi-night-text-muted);
+  opacity: 1;
+}
+
+.wdi-cutscene .wdi-caption.wdi-caption--out {
+  opacity: 0;
+}
+
+.wdi-cutscene .wdi-cutscene__skip,
+.wdi-intro .wdi-intro__skip {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: 0.04em;
+  color: var(--wdi-night-label);
+  background-color: var(--wdi-match-glass);
+  border-color: rgb(var(--wdi-lilac-rgb) / 0.45);
+  border-radius: var(--wdi-radius-xs);
+  box-shadow: inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.2);
+  backdrop-filter: blur(6px);
+}
+
+.wdi-intro {
+  background-color: var(--wdi-night);
+}
+
+.wdi-intro .wdi-intro__begin {
+  --_bg: var(--wdi-night-accent);
+  --_fg: var(--wdi-on-night-accent);
+  --_stroke: var(--wdi-night);
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-sm);
+  font-weight: 400;
+  font-synthesis: none;
+  letter-spacing: 0.04em;
+  border-radius: var(--wdi-radius-xs);
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--wdi-snow-rgb) / 0.45),
+    var(--wdi-shadow-2);
+}
+
+.wdi-cutscene .wdi-cutscene__skip:focus-visible,
+.wdi-intro .wdi-intro__skip:focus-visible,
+.wdi-intro .wdi-intro__begin:focus-visible {
+  outline: var(--wdi-stroke-w) solid var(--wdi-night-accent);
+  outline-offset: var(--wdi-stroke-w);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-cutscene .wdi-caption,
+  .wdi-cutscene .wdi-cutscene__skip,
+  .wdi-intro .wdi-intro__skip {
+    backdrop-filter: none;
+    background-color: var(--wdi-indigo);
+  }
+
+  .wdi-cutscene .wdi-caption[data-style='title'] {
+    background: none;
+  }
+}
