@@ -115,8 +115,8 @@ export function handleTaskHold(room: PartyRoom, sessionId: string, taskId: strin
 
 /**
  * The global bar: finished real tasks over all real tasks; a ghost's finished ones count up to `ghostShareCap`. The
- * martyred Vicar's ghost (GDD 3.20) counts each real task it finishes after its reveal `martyrWeight` times, outside
- * the cap. A full bar in play wins the match for the Village (GDD 3.5).
+ * martyred Vicar's ghost (GDD 3.20) counts each real task it finishes in the `martyrS` seconds after its reveal
+ * `martyrWeight` times, outside the cap; before and after that window its tasks count as any ghost's. A full bar in play wins the match for the Village (GDD 3.5).
  */
 export function recomputeTaskBar(room: PartyRoom): void {
   const martyr = martyrOf(room);
@@ -136,8 +136,9 @@ export function recomputeTaskBar(room: PartyRoom): void {
     else if (id !== martyr?.seat) ghostDone += finished;
     else {
       const before = Math.min(finished, martyr.doneBefore);
-      ghostDone += before;
-      martyrDone += finished - before;
+      const boosted = Math.max(0, Math.min(finished, martyr.doneAtEnd ?? finished) - before);
+      ghostDone += finished - boosted;
+      martyrDone += boosted;
     }
   }
   if (total === 0) return;
