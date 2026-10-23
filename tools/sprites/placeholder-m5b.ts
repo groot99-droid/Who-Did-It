@@ -13,6 +13,7 @@ import {
   GIVER_PAGE,
   NODE_CELL,
   NODE_GROUND,
+  NODE_PAGE,
   BREAK_FRAMES,
   NODE_STATES,
   RESOURCE_IDS,
@@ -158,7 +159,7 @@ export function placeholderEntries(): PlaceholderEntry[] {
       entries: m5bManifest('nearest'),
       files: async () => {
         registerFont();
-        const files = new Map(await packM5b('nodes', nodeFrames()));
+        const files = new Map(await packM5b('nodes', nodeFrames(), NODE_PAGE));
         files.set('nodes.anims.json', Buffer.from(nodeAnims()));
         for (const [k, v] of await packM5b('tools', toolFrames())) files.set(k, v);
         files.set('tools.anims.json', Buffer.from(toolAnims()));

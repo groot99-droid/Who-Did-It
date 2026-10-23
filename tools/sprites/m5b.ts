@@ -170,10 +170,12 @@ export function giverFrameList(): Array<[(typeof GIVER_IDS)[number], Dir, number
 
 /** Page caps (SPRITES 12): nodes and tools fit one 512² page each, the givers one 512 x 1024 and the mobs one 1024². */
 export const M5B_PAGE = { w: 512, h: 512 } as const;
+/** The nodes page with its break frames: held to 512 x 256 so the breaks cost a tenth of a resident page (A142). */
+export const NODE_PAGE = { w: 512, h: 256 } as const;
 export const MOB_PAGE = { w: 1024, h: 1024 } as const;
 export const GIVER_PAGE = { w: 512, h: 1024 } as const;
 export const pageOf = (atlas: M5bAtlas) =>
-  atlas === 'mobs' ? MOB_PAGE : atlas === 'givers' ? GIVER_PAGE : M5B_PAGE;
+  atlas === 'mobs' ? MOB_PAGE : atlas === 'givers' ? GIVER_PAGE : atlas === 'nodes' ? NODE_PAGE : M5B_PAGE;
 
 /** Pack frames onto one page and set each frame's pivot as a fraction of its source size. */
 export async function packM5b(
