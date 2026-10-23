@@ -1339,3 +1339,17 @@ Lines are in `apps/client/src/ui/copy/intro.ts` (`INTRO_COPY`). The `Intro` scen
 - **When it plays.** Once per browser session (`sessionStorage['wdi:introSeen']`, set at the tap). Not under `prefers-reduced-motion`, the data saver (`saveData`), `?intro=0`, a reload that rejoins a lobby (`#/lobby/CODE`), and in the mock (`?mock=1`) unless `?intro=1`. `?intro=1` overrides only the mock rule.
 - **How it ends.** The video ends, Skip, a click or tap anywhere while it plays, or Esc (also before the tap). A stream that has not started 8 s after the tap, or a video error, ends it the same way. Then `Landing` starts as it always did.
 - **A missing file.** No manifest, no `intro` row, a failed HEAD request for the file, or an HTML answer where a video should be: the scene starts `Landing` at once and shows nothing.
+
+### 14.26 Lobby re-skin (7E, round 7)
+
+The lobby's lines stay in `apps/client/src/ui/copy/lobby.ts`; the re-skin (A103, A109) changes markup and style, not wording. Every id of `ui/Lobby.ts` is kept (`ui-reskin.md` 2). New lines:
+
+| Key | Text | Where |
+|---|---|---|
+| `lobby.friend.add` | Add friend | a seat row that carries a `profile` (`data-testid="add-friend"`) |
+| `lobby.friend.add.label` | Add {name} as a friend | that button's accessible name |
+| `lobby.friend.added` | Friend | the same button once the profile is on the device's list; it is disabled |
+
+- **Columns.** A: the party code in display type (`party-code`), Copy invite link, Change mode (`mode-toggle`) beside Add NPC (`add-npc`) with Remove NPC (`remove-npc`) as a small minus (`aria-label` "Remove NPC"), the NPC skill select (`npc-difficulty`) with its locked note, the mode chip (`mode-chip`) in the card's corner, then "Players n / 10" with the You, Leader, Ready and Away tags. B: the map, the art style, the sound settings and the quick-mode deck editor. C: the deck as chips with its two notes, Start (leader), Ready, Leave. Below 900 px the columns stack.
+- **Tags.** The NPC tag is not shown: the lobby snapshot carries only the NPC seat count, not which seats they are, and the wire is not widened for a tag. Add friend shows only where a seat's `profile` is in the snapshot; until the client's roster mapping carries it, no row offers it.
+- **Left out.** The mockup's "Locate" button has no feature.
