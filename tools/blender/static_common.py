@@ -62,7 +62,7 @@ def setup() -> bpy.types.Scene:
     if STYLE == "hd":
         from materials import hd
 
-        hd.apply(scene)
+        hd.apply(scene, rim_amount=rc.HD["rimAmountWorld"])
         if os.environ.get("WDI_HD_PBR"):  # the rough PBR + HDRI look of the owner's look sheet
             from materials import pbr
 
