@@ -664,3 +664,40 @@ music and shows a goodbye panel; it sends nothing more.
 The numbers are `balance.json` `party` (`profileCodeLength`, `friendsMax`, `invitedMax`, `listMax`,
 `listRefreshS`); nothing else restates them.
 
+
+### 3.22 Bodies: health, stamina and effects
+
+Round 8 (DECISIONS A134, A135; the contract is `docs/round8/body.md`). Every seat has health and stamina, which only
+the seat itself sees. Attacks drain health by the damage table, and effects (Slowed, Wounded, Bleeding, Weakened,
+Poisoned, Fatigued, Stunned, Dazed, Famished, Knocked out) apply, tick and are cured as listed. Every card can
+strike with its fists.
+- **Death.** A seat dies only to creatures, to Bleeding or Poisoned at zero health, and to the existing kills (the
+  Knife, Nightshade's poison, the last shot, ejection).
+- **Knockout.** Fists, a mugging or the slingshot at zero health knock a seat out, and it wakes Dazed.
+- **Inspect.** Anyone can inspect a seat or a figure in reach and learns only its physical signs.
+
+Session 8A writes this section's rules and corrects 3.6 and 3.15 where the two-hit-point model is replaced; 8B
+writes the inspect paragraph. The numbers are `balance.json` `body` and `effects.json`.
+
+### 3.23 The economy
+
+Round 8 (A134, A135; `docs/round8/economy.md`): the Bible's Book IV on today's maps and roles.
+- **Scrip**: a private purse and bank balance; stakes, wages, sales, shops, the bank, and coins on the ground.
+- **Rent and quota**, and the Indebted status.
+- **Faith**: Indulgences and Parish Seals.
+- **Rumours**: ledger slips, Blackmail Notices, the black market and the Gazette.
+- **HQ tiers** for the role stations, bought by look.
+
+Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `economy.json` and `balance.json`
+`economy`.
+
+### 3.24 Moods, mugging and townsfolk
+
+Round 8 (A134, A135; `docs/round8/townsfolk.md`).
+- **Needs and moods.** NPC seats and the new ambient townsfolk have needs (Hunger, Fear, Anger, Want) and moods.
+  These are server-only and show only as gait and idle.
+- **Townsfolk.** They are not seats, are never the Knife's prey and die only to creatures.
+- **Mugging.** A hungry, angry or desperate figure alone with a seat may mug it. A heavier purse raises the chance;
+  company and a lit light lower it.
+
+Session 8E writes this section. The numbers are `balance.json` `moods` and `townsfolk`.
