@@ -1124,3 +1124,27 @@ Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaG
 | `vendetta.note.doubt` | Doubt took the flock: your vote did not carry. | the Vicar's own Notebook entry of kind `NoteKind.doubt`, written at the reveal of the doubted meeting |
 | `vendetta.note.contract` | The mail brought a contract: {name}. | the Hitman's own Notebook entry of kind `NoteKind.contract` (`of` the target seat, `{name}` its seat name), written at the first Train arrival |
 | `vendetta.contract.accept` | Accept | the button on that contract entry while the offer is open (no `contract` quest yet, the mark on the roster); it sends `quest.accept { questId: 'contract' }` |
+
+### 14.34 Scrip (8C)
+
+Lines are in `apps/client/src/ui/copy/scrip.ts` (`SCRIP_COPY`, `shopName(id)`). The shop panel (`ui/shop/ShopPanel.ts`)
+opens on `shop.open` after a `shop` hold at a counter (GDD 3.23); it lists what the shop sells and what it wants, one
+item per press, and greys a Buy the purse cannot cover or a Sell with nothing in the pockets. The server decides each
+trade; a refusal is the usual error line. 8H animates the panel by `wdi-anim-panel` and `wdi-anim-list`.
+
+#### 14.34.1 The shop panel
+
+| Key | Text | Where |
+|---|---|---|
+| `prompt.shop` | Hold E: trade at the {shop} | the hold prompt at a counter in reach |
+| `shop.sells` | For sale | the heading of the shop's stock |
+| `shop.buys` | Wanted | the heading of what the shop buys |
+| `shop.none` | Nothing here. | a shop with neither list |
+| `shop.price` | {n} Scrip | each row's price, its ask or its pay |
+| `shop.buy` | Buy | a stock row's button (one item) |
+| `shop.sell` | Sell | a wanted row's button (one item) |
+| `shop.have` | You have {n} | each row: how many the pockets hold |
+| `shop.short` | Not enough Scrip | a stock row the purse cannot cover |
+| `shop.purse` | Your purse: {n} Scrip | under the shop's name |
+| `shop.close` | Close | the panel's close button |
+| `shop.<id>` | Bakery, Apothecary, General Store, Market, Gamekeeper's Stall, Lodge Store, Camp Market | the panel's title, by `economy.json` shop id |
