@@ -10,6 +10,8 @@ import { mountDeckList } from './main/deckList';
 import { mountMapPicker } from './lobby/MapPicker';
 import { mountSettingsPanel } from './SettingsPanel';
 import { mountArtStyleSwitch } from './artStyle/ArtStyleSwitch';
+import { addFriendButton } from './lobby/addFriend';
+import './lobby.css';
 
 const { npc, players: seatRange } = balanceJson;
 const { min: lengthMin, max: lengthMax } = onubBalanceJson.targetLengthMin;
@@ -84,73 +86,121 @@ async function copyText(text: string): Promise<boolean> {
 
 export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
   const codeText = h('span', {
-    class: 'wdi-display wdi-display--xl',
-    style: 'letter-spacing: var(--wdi-tracking-code)',
+    class: 'wdi-lobby__code',
     'data-testid': 'party-code',
   });
-  const copyBtn = h('button', { type: 'button', class: 'wdi-btn wdi-btn--sm' }, C['lobby.copy']);
-  const list = h('ul', { class: 'wdi-roster', 'data-testid': 'player-list' });
-  const count = h('span', { class: 'wdi-muted', 'data-testid': 'player-count' });
-  const hint = h('p', { class: 'wdi-hint', 'aria-live': 'polite' });
+  const copyBtn = h(
+    'button',
+    { type: 'button', class: 'wdi-btn wdi-lobby__btn wdi-lobby__btn--wide' },
+    icon('glyphs/glyph_copy'),
+    h('span', { class: 'wdi-lobby__copy-label' }, C['lobby.copy']),
+  );
+  const copyLabel = copyBtn.querySelector('.wdi-lobby__copy-label') as HTMLElement;
+  const list = h('ul', { class: 'wdi-roster wdi-lobby__roster', 'data-testid': 'player-list' });
+  const count = h('span', { class: 'wdi-lobby__count', 'data-testid': 'player-count' });
+  const hint = h('p', { class: 'wdi-hint wdi-lobby__note', 'aria-live': 'polite' });
   const start = h(
     'button',
-    { type: 'button', class: 'wdi-btn wdi-btn--primary wdi-grow', 'data-testid': 'start' },
+    {
+      type: 'button',
+      class: 'wdi-btn wdi-btn--primary wdi-lobby__btn wdi-lobby__btn--start',
+      'data-testid': 'start',
+    },
     C['lobby.start'],
   );
   const readyBtn = h(
     'button',
-    { type: 'button', class: 'wdi-btn', 'data-testid': 'lobby-ready' },
+    { type: 'button', class: 'wdi-btn wdi-lobby__btn', 'data-testid': 'lobby-ready' },
     C['lobby.ready'],
   );
-  const leave = h('button', { type: 'button', class: 'wdi-btn wdi-btn--ghost' }, C['lobby.leave']);
-  const modeChip = h('span', { class: 'wdi-chip', 'data-testid': 'mode-chip' });
+  const leave = h('button', { type: 'button', class: 'wdi-btn wdi-lobby__btn' }, C['lobby.leave']);
+  const modeChip = h('span', { class: 'wdi-lobby__tag wdi-lobby__tag--mode', 'data-testid': 'mode-chip' });
   const modeToggle = h(
     'button',
-    { type: 'button', class: 'wdi-btn wdi-btn--sm', 'data-testid': 'mode-toggle' },
+    { type: 'button', class: 'wdi-btn wdi-lobby__btn', 'data-testid': 'mode-toggle' },
     C['lobby.mode.toggle'],
   );
   const addNpc = h(
     'button',
-    { type: 'button', class: 'wdi-btn wdi-btn--sm', 'data-testid': 'add-npc' },
+    { type: 'button', class: 'wdi-btn wdi-lobby__btn', 'data-testid': 'add-npc' },
+    h('span', { class: 'wdi-lobby__plus', 'aria-hidden': 'true' }, '+'),
     C['lobby.npc.add'],
   );
+  // A small minus beside Add NPC (the mockup has no remove control; the game does).
   const removeNpc = h(
     'button',
-    { type: 'button', class: 'wdi-btn wdi-btn--sm wdi-btn--ghost', 'data-testid': 'remove-npc' },
-    C['lobby.npc.remove'],
+    {
+      type: 'button',
+      class: 'wdi-btn wdi-lobby__btn wdi-lobby__btn--mini',
+      'data-testid': 'remove-npc',
+      'aria-label': C['lobby.npc.remove'],
+      title: C['lobby.npc.remove.hint'],
+    },
+    h('span', { 'aria-hidden': 'true' }, '\u2212'),
   );
   const difficulty = h(
     'select',
-    { id: 'npc-difficulty', class: 'wdi-input', 'data-testid': 'npc-difficulty' },
+    { id: 'npc-difficulty', class: 'wdi-input wdi-lobby__select', 'data-testid': 'npc-difficulty' },
     ...LEVELS.map((level) => h('option', { value: level }, LEVEL_LABELS[level])),
   );
-  const difficultyHint = h('p', { class: 'wdi-hint' }, difficultyLockedText());
-  const settingsBlock = h(
+  const difficultyHint = h('p', { class: 'wdi-hint wdi-lobby__note' }, difficultyLockedText());
+
+  // Column A: the code, the mode and the NPCs; then the seats.
+  const settingsCard = h(
     'div',
-    { class: 'wdi-stack', 'aria-label': C['lobby.settings'], 'data-testid': 'lobby-settings' },
-    h('div', { class: 'wdi-row wdi-row--between' }, modeChip, modeToggle),
-    h('div', { class: 'wdi-row' }, addNpc, removeNpc),
+    { class: 'wdi-lobby__card wdi-lobby__stack', 'aria-label': C['lobby.settings'], role: 'group' },
     h(
       'div',
-      { class: 'wdi-field' },
-      h('label', { class: 'wdi-label', for: 'npc-difficulty' }, C['lobby.npc.difficulty']),
+      { class: 'wdi-lobby__head' },
+      h('p', { class: 'wdi-lobby__eyebrow', id: 'lobby-title' }, C['lobby.code']),
+      modeChip,
+    ),
+    codeText,
+    copyBtn,
+    h(
+      'div',
+      { class: 'wdi-lobby__pair' },
+      modeToggle,
+      h('div', { class: 'wdi-lobby__npc' }, addNpc, removeNpc),
+    ),
+    h(
+      'div',
+      { class: 'wdi-lobby__field' },
+      h('label', { class: 'wdi-lobby__eyebrow', for: 'npc-difficulty' }, C['lobby.npc.difficulty']),
       difficulty,
     ),
     difficultyHint,
   );
-  // The main mode's map row (GDD 3.13, Session 5J) in its own slot under the settings, hidden in the quick mode.
+  const seatsCard = h(
+    'div',
+    { class: 'wdi-lobby__card wdi-lobby__stack wdi-lobby__seats' },
+    h('h2', { class: 'wdi-lobby__title' }, `${C['lobby.players']} `, count),
+    list,
+    hint,
+  );
+  const colA = h('div', { class: 'wdi-lobby__col wdi-lobby__col--a' }, settingsCard, seatsCard);
+
+  // Column B (map, art style, sound, quick-mode deck editor): styled in the next PR.
+  const colBCard = h('div', { class: 'wdi-lobby__card wdi-lobby__stack wdi-lobby__b' });
+  // The main mode's map row (GDD 3.13, Session 5J) in its own slot, hidden in the quick mode.
   const mapSlot = h('div', { 'data-testid': 'lobby-map', hidden: true });
-  settingsBlock.append(mapSlot);
+  colBCard.append(mapSlot);
   const mapPicker = mountMapPicker(mapSlot, opts.net);
-  mountArtStyleSwitch(settingsBlock);
-  const audioSettings = mountSettingsPanel(settingsBlock); // round 6, 6L (locked slot)
-  // The main mode's deck list (GDD 3.1, Session 5G) in its own slot under the settings, hidden in the quick mode.
-  const deckListSlot = h('div', { 'data-testid': 'lobby-deck-list', hidden: true });
-  settingsBlock.append(deckListSlot);
+  mountArtStyleSwitch(colBCard);
+  const audioSettings = mountSettingsPanel(colBCard); // round 6, 6L (locked slot)
+  // The quick-mode deck editor (GDD 3.11, Session 5C).
+  const deckEditor = mountDeckEditor(colBCard, opts.net);
+  const colB = h('div', { class: 'wdi-lobby__col wdi-lobby__col--b' }, colBCard);
+
+  // Column C: the main mode's deck (GDD 3.1, Session 5G), hidden in the quick mode; then the actions.
+  const deckListSlot = h('div', { 'data-testid': 'lobby-deck-list', class: 'wdi-lobby__card', hidden: true });
   const deckList = mountDeckList(deckListSlot, opts.net);
-  // The quick-mode deck editor (GDD 3.11, Session 5C) under the settings.
-  const deckEditor = mountDeckEditor(settingsBlock, opts.net);
-  const actions = h('div', { class: 'wdi-row' }, start, readyBtn, leave);
+  const colC = h(
+    'div',
+    { class: 'wdi-lobby__col wdi-lobby__col--c' },
+    deckListSlot,
+    h('div', { class: 'wdi-lobby__actions' }, start, h('div', { class: 'wdi-lobby__pair' }, readyBtn, leave)),
+  );
 
   let snapshot: LobbySnapshot | null = null;
   let dialog: HTMLElement | null = null;
@@ -168,12 +218,12 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
       .map((p) => p.name);
     const confirm = h(
       'button',
-      { type: 'button', class: 'wdi-btn wdi-btn--primary', 'data-testid': 'confirm-start' },
+      { type: 'button', class: 'wdi-btn wdi-btn--primary wdi-lobby__btn', 'data-testid': 'confirm-start' },
       C['lobby.confirm.go'],
     );
     const cancel = h(
       'button',
-      { type: 'button', class: 'wdi-btn wdi-btn--ghost' },
+      { type: 'button', class: 'wdi-btn wdi-lobby__btn' },
       C['lobby.confirm.cancel'],
     );
     confirm.addEventListener('click', () => {
@@ -183,18 +233,18 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     cancel.addEventListener('click', closeDialog);
     dialog = h(
       'div',
-      { class: 'wdi-scrim' },
+      { class: 'wdi-scrim wdi-lobby-dialog' },
       h(
         'div',
         {
-          class: 'wdi-panel wdi-dialog',
+          class: 'wdi-panel wdi-dialog wdi-lobby__card',
           role: 'dialog',
           'aria-modal': 'true',
           'aria-labelledby': 'confirm-title',
         },
         h(
           'h2',
-          { id: 'confirm-title', class: 'wdi-display wdi-display--md wdi-dialog__title' },
+          { id: 'confirm-title', class: 'wdi-lobby__title wdi-dialog__title' },
           fill(C['lobby.confirm.title'], { n: snapshot.players.length }),
         ),
         h('p', { class: 'wdi-dialog__body' }, C['lobby.confirm.body']),
@@ -237,21 +287,22 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
   copyBtn.addEventListener('click', () => {
     if (snapshot === null) return;
     void copyText(joinLink(snapshot.code)).then((ok) => {
-      copyBtn.textContent = ok ? C['lobby.copied'] : C['lobby.copyFailed'];
-      setTimeout(() => (copyBtn.textContent = C['lobby.copy']), 1800);
+      copyLabel.textContent = ok ? C['lobby.copied'] : C['lobby.copyFailed'];
+      setTimeout(() => (copyLabel.textContent = C['lobby.copy']), 1800);
     });
   });
 
+  // The root keeps `lobby-settings` (the art-style spec scopes to it): the three columns are its children.
   const el = h(
     'section',
-    { class: 'wdi-panel wdi-stack', 'aria-labelledby': 'lobby-title' },
-    h('p', { class: 'wdi-eyebrow', id: 'lobby-title' }, C['lobby.code']),
-    h('div', { class: 'wdi-row wdi-row--between' }, codeText, copyBtn),
-    settingsBlock,
-    h('h2', { class: 'wdi-subtitle' }, `${C['lobby.players']} `, count),
-    list,
-    hint,
-    actions,
+    {
+      class: 'wdi-lobby',
+      'aria-labelledby': 'lobby-title',
+      'data-testid': 'lobby-settings',
+    },
+    colA,
+    colB,
+    colC,
   );
   root.append(el);
 
@@ -260,34 +311,41 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     codeText.textContent = next.code;
     count.textContent = `${next.players.length} / ${MAX_PLAYERS}`;
     list.replaceChildren(
-      ...next.players.map((p) =>
-        h(
+      ...next.players.map((p) => {
+        const friend = addFriendButton(p);
+        return h(
           'li',
-          { class: `wdi-roster__row${p.connected ? '' : ' is-away'}` },
-          h('span', { class: 'wdi-seat', 'aria-hidden': 'true' }, p.name.charAt(0).toUpperCase()),
+          { class: `wdi-roster__row wdi-lobby__row${p.connected ? '' : ' is-away'}` },
+          h(
+            'span',
+            { class: 'wdi-seat wdi-lobby__seat', 'aria-hidden': 'true' },
+            p.name.charAt(0).toUpperCase(),
+          ),
           h('span', { class: 'wdi-grow' }, h('span', { class: 'wdi-roster__name' }, p.name)),
           h(
             'span',
             { class: 'wdi-roster__tags' },
-            p.id === next.selfId && h('span', { class: 'wdi-chip' }, C['lobby.tag.you']),
-            p.id === next.leaderId && h('span', { class: 'wdi-chip wdi-chip--lead' }, C['lobby.tag.leader']),
+            p.id === next.selfId && h('span', { class: 'wdi-lobby__tag' }, C['lobby.tag.you']),
+            p.id === next.leaderId &&
+              h('span', { class: 'wdi-lobby__tag wdi-lobby__tag--lead' }, C['lobby.tag.leader']),
             p.ready &&
               h(
                 'span',
-                { class: 'wdi-chip wdi-chip--ready' },
+                { class: 'wdi-lobby__tag wdi-lobby__tag--ready' },
                 icon('glyphs/glyph_check'),
                 C['lobby.tag.ready'],
               ),
             !p.connected &&
               h(
                 'span',
-                { class: 'wdi-chip wdi-chip--quiet' },
+                { class: 'wdi-lobby__tag wdi-lobby__tag--quiet' },
                 icon('glyphs/glyph_clock'),
                 C['lobby.tag.away'],
               ),
+            friend,
           ),
-        ),
-      ),
+        );
+      }),
     );
     const isLeader = next.selfId === next.leaderId;
     const me = next.players.find((p) => p.id === next.selfId);
@@ -309,7 +367,7 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
         ? fill(C['lobby.hint.fill'], { min: MIN_PLAYERS_TO_START })
         : C['lobby.hint.go'];
     mapPicker.update(next);
-    // Empty (the pre-seed stub) the slot stays hidden too, so it adds no gap to the settings stack.
+    // Empty (the pre-seed stub) the slot stays hidden too, so it adds no gap.
     mapSlot.hidden = !showsMapRow(mode) || mapSlot.childElementCount === 0;
     deckList.update(next);
     // Empty (the pre-seed stub) the slot stays hidden too, so it adds no gap to the settings stack.

@@ -3221,6 +3221,11 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 ### Round 7 log: 7A
 
+- 2026-10-23: PR 1 (#83, music). The intro tracks are `<map>_opening` playlists with `loop: false`, in a new
+  `opening` class held over grace until the piece ends or the opening is skipped; `loading` maps to the lobby
+  piece. Contract requests (manifest, `MUSIC_CLASSES`, `LoadingScreen.test.ts`) granted by 6Z. Measured
+  lengths 117 s and 80 s (A101); steps 2 and 3 (length, staging) are stacked locally and go up after #83.
+
 ### Round 7 log: 7B
 
 - 2026-10-23: PR 1 (fonts, night set, tokens, the gate on every `.css` under `apps/client/src`, licences,
@@ -3235,6 +3240,8 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 - PR 2 (listing): `PartyRoom.syncListing` and the room-memory visibility, `services/partyListing.ts`, `GET /parties` in `server.ts`, `allowRoute` and the route's global bucket in `matchmakeGuard.ts`, `PartyListing` in the protocol, swarm `--create`, ARCHITECTURE 5.3, GDD 3.21, A108 amended. The route is the one place a new HTTP cost appears: 7C polls it every `listRefreshS`.
 
 ### Round 7 log: 7E
+
+- PR 1 (columns A and C): `Lobby.ts` as three columns, `ui/lobby.css`, the Add friend stand-in and its test, the deck list's classes, UI.md 14.26, A109. Column B holds today's map, art-style, sound and deck-editor mounts in one card until PR 2.
 
 ### Round 7 log: 7F
 

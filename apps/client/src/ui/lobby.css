@@ -1,0 +1,389 @@
+/* The party lobby (round 7, 7E; docs/round7/ui-reskin.md 1, UI.md 14.26): three columns of frosted glass over the
+   night. A holds the code, the mode, the NPCs and the seats; B the map, the art style and the sound (next PR); C the
+   deck and the actions. Tokens only. Each rule is scoped to `.wdi-lobby` (or the confirm dialog) and stands in
+   for 7B's `.wdi-glass*` pieces until they land. */
+
+.wdi-lobby {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: var(--wdi-space-5);
+  align-items: stretch;
+  width: min(1200px, 100%);
+  max-height: calc(100dvh - 2 * var(--wdi-space-4));
+  overflow-y: auto;
+  pointer-events: auto;
+  color: var(--wdi-night-text);
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  line-height: var(--wdi-leading-text);
+}
+
+.wdi-lobby__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-4);
+  min-width: 0;
+}
+
+.wdi-lobby__col--c {
+  justify-content: space-between;
+}
+
+.wdi-lobby__seats {
+  flex: 1;
+}
+
+.wdi-lobby__stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-3);
+}
+
+/* The glass surface: translucent fill, blur, a stepped corner, a thin light rim. */
+.wdi-lobby__card {
+  position: relative;
+  padding: var(--wdi-space-5);
+  background: var(--wdi-glass-fill);
+  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.3);
+  backdrop-filter: blur(var(--wdi-space-2));
+  clip-path: polygon(
+    0 var(--wdi-space-2),
+    var(--wdi-space-1) var(--wdi-space-2),
+    var(--wdi-space-1) var(--wdi-space-1),
+    var(--wdi-space-2) var(--wdi-space-1),
+    var(--wdi-space-2) 0,
+    calc(100% - var(--wdi-space-2)) 0,
+    calc(100% - var(--wdi-space-2)) var(--wdi-space-1),
+    calc(100% - var(--wdi-space-1)) var(--wdi-space-1),
+    calc(100% - var(--wdi-space-1)) var(--wdi-space-2),
+    100% var(--wdi-space-2),
+    100% calc(100% - var(--wdi-space-2)),
+    calc(100% - var(--wdi-space-1)) calc(100% - var(--wdi-space-2)),
+    calc(100% - var(--wdi-space-1)) calc(100% - var(--wdi-space-1)),
+    calc(100% - var(--wdi-space-2)) calc(100% - var(--wdi-space-1)),
+    calc(100% - var(--wdi-space-2)) 100%,
+    var(--wdi-space-2) 100%,
+    var(--wdi-space-2) calc(100% - var(--wdi-space-1)),
+    var(--wdi-space-1) calc(100% - var(--wdi-space-1)),
+    var(--wdi-space-1) calc(100% - var(--wdi-space-2)),
+    0 calc(100% - var(--wdi-space-2))
+  );
+}
+
+.wdi-lobby__card[hidden] {
+  display: none;
+}
+
+.wdi-lobby__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-lobby__eyebrow {
+  margin: 0;
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-sm);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-lobby__title {
+  margin: 0;
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-lg);
+  font-weight: var(--wdi-weight-text);
+  line-height: var(--wdi-leading-display);
+  color: var(--wdi-night-label);
+}
+
+.wdi-lobby__count {
+  white-space: nowrap;
+}
+
+/* The party code: display type in the accent, stepped shadows in violet and indigo. */
+.wdi-lobby__code {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-display-xl);
+  line-height: var(--wdi-leading-display);
+  letter-spacing: var(--wdi-tracking-code);
+  color: var(--wdi-night-accent);
+  text-shadow:
+    var(--wdi-space-1) var(--wdi-space-1) 0 var(--wdi-violet),
+    calc(2 * var(--wdi-space-1)) calc(2 * var(--wdi-space-1)) 0 var(--wdi-indigo);
+  overflow-wrap: anywhere;
+}
+
+.wdi-lobby__note {
+  margin: 0;
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-night-text-muted);
+}
+
+/* Buttons: glass on the dark, pixel labels, the primary the accent on night. */
+.wdi-lobby .wdi-lobby__btn {
+  min-height: var(--wdi-touch);
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  font-weight: var(--wdi-weight-text);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+  color: var(--wdi-night-label);
+  background-color: rgb(var(--wdi-violet-rgb) / 0.45);
+  background-image: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.4);
+  clip-path: polygon(
+    0 var(--wdi-space-1),
+    var(--wdi-space-1) var(--wdi-space-1),
+    var(--wdi-space-1) 0,
+    calc(100% - var(--wdi-space-1)) 0,
+    calc(100% - var(--wdi-space-1)) var(--wdi-space-1),
+    100% var(--wdi-space-1),
+    100% calc(100% - var(--wdi-space-1)),
+    calc(100% - var(--wdi-space-1)) calc(100% - var(--wdi-space-1)),
+    calc(100% - var(--wdi-space-1)) 100%,
+    var(--wdi-space-1) 100%,
+    var(--wdi-space-1) calc(100% - var(--wdi-space-1)),
+    0 calc(100% - var(--wdi-space-1))
+  );
+}
+
+.wdi-lobby .wdi-lobby__btn:hover:not(:disabled) {
+  background-color: rgb(var(--wdi-violet-rgb) / 0.75);
+}
+
+.wdi-lobby .wdi-lobby__btn:focus-visible {
+  outline: var(--wdi-stroke-w) solid var(--wdi-night-accent);
+  outline-offset: calc(-1 * var(--wdi-space-1));
+}
+
+.wdi-lobby .wdi-lobby__btn--wide {
+  width: 100%;
+}
+
+.wdi-lobby .wdi-lobby__btn--mini {
+  flex: none;
+  width: var(--wdi-touch);
+  padding: 0;
+}
+
+.wdi-lobby__plus {
+  font-size: var(--wdi-text-md);
+}
+
+.wdi-lobby .wdi-lobby__btn .wdi-icon {
+  filter: brightness(0) invert(1);
+}
+
+.wdi-lobby .wdi-lobby__btn--start {
+  min-height: calc(var(--wdi-touch) + var(--wdi-space-3));
+  font-size: var(--wdi-text-md);
+  color: var(--wdi-on-night-accent);
+  background-color: var(--wdi-night-accent);
+  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.6);
+}
+
+.wdi-lobby .wdi-lobby__btn--start::before {
+  content: '';
+  width: var(--wdi-space-3);
+  height: var(--wdi-space-4);
+  margin-right: var(--wdi-space-3);
+  background: currentcolor;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.wdi-lobby .wdi-lobby__btn--start:hover:not(:disabled) {
+  background-color: var(--wdi-snow);
+}
+
+.wdi-lobby__pair {
+  display: flex;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-lobby__pair > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.wdi-lobby__npc {
+  display: flex;
+  gap: var(--wdi-space-1);
+}
+
+.wdi-lobby__npc > .wdi-lobby__btn:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.wdi-lobby__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-3);
+}
+
+.wdi-lobby__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-2);
+}
+
+.wdi-lobby .wdi-lobby__select {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  color: var(--wdi-night-text);
+  background-color: rgb(var(--wdi-night-rgb) / 0.45);
+  background-image: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.3);
+}
+
+.wdi-lobby .wdi-lobby__select:disabled {
+  opacity: 0.7;
+}
+
+/* Tags: You, Leader, Ready, Away, the mode, and the Add friend action. */
+.wdi-lobby__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wdi-space-1);
+  min-height: var(--wdi-space-5);
+  padding: 2px var(--wdi-space-2);
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--wdi-night-label);
+  background-color: rgb(var(--wdi-violet-rgb) / 0.6);
+  border: 0;
+}
+
+.wdi-lobby__tag--lead {
+  color: var(--wdi-on-night-accent);
+  background-color: var(--wdi-night-accent);
+}
+
+.wdi-lobby__tag--ready {
+  color: var(--wdi-on-night-accent);
+  background-color: var(--wdi-lilac);
+}
+
+.wdi-lobby__tag--quiet {
+  background-color: rgb(var(--wdi-indigo-rgb) / 0.8);
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-lobby__tag--mode {
+  flex-shrink: 1;
+  white-space: normal;
+  text-align: right;
+}
+
+.wdi-lobby__tag--action {
+  cursor: pointer;
+  min-height: var(--wdi-touch);
+}
+
+.wdi-lobby__tag--action:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.wdi-lobby__tag .wdi-icon {
+  filter: brightness(0);
+}
+
+/* The seats. */
+.wdi-lobby__roster {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.wdi-lobby .wdi-roster__row {
+  border-color: rgb(var(--wdi-snow-rgb) / 0.18);
+}
+
+.wdi-lobby .wdi-roster__name {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  letter-spacing: var(--wdi-tracking-caps);
+  color: var(--wdi-night-label);
+}
+
+.wdi-lobby .wdi-lobby__seat {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-night-label);
+  background-color: rgb(var(--wdi-night-rgb) / 0.6);
+  background-image: none;
+  border: 0;
+  border-radius: 0;
+}
+
+/* The deck: chips and notes (column C). */
+.wdi-lobby .wdi-deck__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--wdi-space-2);
+}
+
+.wdi-lobby .wdi-deck__card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--wdi-touch);
+  padding: var(--wdi-space-2);
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  text-align: center;
+  overflow-wrap: anywhere;
+  color: var(--wdi-night-label);
+  background-color: rgb(var(--wdi-violet-rgb) / 0.45);
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.3);
+}
+
+/* The confirm dialog: the same glass, over the scrim. */
+.wdi-lobby-dialog {
+  font-family: var(--wdi-font-pixel-text);
+  color: var(--wdi-night-text);
+}
+
+.wdi-lobby-dialog .wdi-lobby__card {
+  width: min(440px, 100%);
+}
+
+.wdi-lobby-dialog .wdi-dialog__title {
+  margin-bottom: var(--wdi-space-3);
+}
+
+.wdi-lobby-dialog .wdi-dialog__actions {
+  display: flex;
+  gap: var(--wdi-space-3);
+  margin-top: var(--wdi-space-4);
+}
+
+@media (max-width: 900px) {
+  .wdi-lobby {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wdi-lobby__code {
+    font-size: var(--wdi-display-lg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-lobby .wdi-lobby__btn {
+    transition: none;
+  }
+}
