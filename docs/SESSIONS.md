@@ -3279,6 +3279,7 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 - PR 1 (the menu): Start Game dialog (name, Open or Private), code box (`#/join/CODE` opens it prefilled and focused), Settings, How to Play and Credits live, Create Profile, Friends and Quit greyed with the note, the sound toggle, the `/health` footer, `e2e/fixtures/party.ts` and the specs' landing lines, UI.md 14.25, A107. `pnpm test` fails in `apps/server` here on `bootFlowServer` (`release is not a function`, nine files), which this PR does not touch; the client suite, typecheck, lint and Prettier are clean. `party.spec.ts`'s first test passes through the lobby and the role cards and then waits on `hud-clock` after the overworld enters, which is the World, not the menu.
 - PR 2 (profile and friends): `ui/menu/{profileModel,profile,friendsModel,friends,clipboard}.ts`, the chip as a button, Create Profile and Friends live, `LobbyPlayer.profile` and the roster mapping, `profile` in the create and join options, tests in `ui/menu/profile.test.ts`, A107. 7E's `ui/lobby/addFriend.ts` can re-export `addFriendButton` from `ui/menu/friends.ts` (same signature; pass its own `className`).
 - PR 3 (Quit, glass, help): `ui/menu/quit.ts` and `Landing` `onQuit`, the menu on `.wdi-glass*` and `titleLetters`, `public/help/index.html` in the night palette with `public/help/fonts/`, a smoke e2e for Quit, profile and friends. Locally `party.spec.ts` needs the config's 15 s expect timeout raised to 60 s here (the same 4-bots test also fails at 15 s on the base b951a8d: the guest's page is still loading); smoke 5/5 at the stock timeout.
+- PR 4 (party list, invite pick): `ui/menu/{partyList,partyListModel}.ts`, Join Game's dialog, the Start dialog's invite pick, `create` carries `invited`, `partyList.test.ts`, a party.spec test with a routed `/parties`, UI.md 14.25, A107. `party.spec.ts`'s 4-bots test now fails at `hud-clock` hidden after both `enterWorld` calls, on the base ab1d0b7 too (checked with my changes stashed); the other seven specs pass.
 
 ### Round 7 log: 7D
 
@@ -3299,6 +3300,8 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 ### Round 7 log: 7G
 
+- 2026-10-23: PR 1 (meeting and game over): `ui/table.css` scoped under `.wdi-table`, the game-over Add friend through 7C's `addFriendButton`, `MeetingPlayer.profile`, UI.md 14.28, A111. The meeting and game-over panels are 7B's `.wdi-glass-panel`. PR 2 (seat picker, look tags, shot toast, over lists) rides the same branch. The quick-mode re-skin was dropped (A115) and kept on the branch `claude/quick-mode-archive` (commit 9ae9711).
+
 ### Round 7 log: 7H
 
 - 2026-10-23: PR 1 (the four rows, the widened schema and its checks, `balance.json` `vendettas`, the `vendetta`
@@ -3308,6 +3311,8 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
   line `runVendettas` after 7I's `runTrain` (Step order: `runEvents`, `runTrain`, `runVendettas`); the three `sim/Meeting.ts` lines
   for the doubted Vicar's abstention; `NoteKind.doubt`; `Private.vendetta` on schema version 4; the NPC hook
   `vendettaGoalFor`; UI.md 14.29). Sabotage follows as PR 2b to keep each under 400 lines.
+- 2026-10-23: PR 2b (sabotage: `sim/vendettas/sabotage.ts`, its branch of `runVendettas` and of `vendettaGoalFor`,
+  the task targets a still hold tampers with, the wreck that undoes a finished real task and readies the Knife).
 
 ### Round 7 log: 7I
 
@@ -3316,5 +3321,14 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 ### Round 7 log: 7J
 
 ### Round 7 log: 7K
+
+- 2026-10-23: PR 1 (the four rooms as scenes). `crumb_cold`, `crumb_mixing`, `crumb_oven` and `crumb_proofing`
+  (prefixes `cf`, `cm`, `co`, `cp`) behind four new doors in the bakery's back wall, each a dead end with one
+  spawn, one hiding and one body spot and the picture's lights; ids, doors and sizes in A118. The pictures were read
+  as rooms without a question to 6Z. Station props, their renders and the pictures' own spot art follow in PR 2,
+  the task nodes and `e2e/ovens.spec.ts` in PR 3.
+- Seed for round 8 (Port-au-Levain, A116): the ten kitchen pictures stay unbuilt and are its rooms, the cellar,
+  cold pantry, command desk, dish pit, expediter, front of house, hygiene, lamination, shaping bench and
+  sub-basement (`assets/source/concepts/onub/`); they move to `docs/round8/` when that folder exists.
 
 ## Integration log, round 7

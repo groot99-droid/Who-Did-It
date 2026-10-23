@@ -26,6 +26,13 @@ describe('map sites (GDD 3.13, round 5 X5)', () => {
     expect(teachingClueOf(room)?.id).toBe('ov.teaching_clue');
     expect(kitChestOf(room)?.id).toBe('ov.chest');
     // The 15 scenes of 2026-10-10, then the Fenwood and the Flooded Gallery; Blackpine's are not Hollowmere's.
-    expect([...mapScenesOf(room)]).toEqual(SCENE_IDS.slice(0, 17));
+    // Round 7 (7K, A118): Crumb's Ovens' four station rooms join the map (6Z's exception for this line).
+    expect([...mapScenesOf(room)]).toEqual([
+      ...SCENE_IDS.slice(0, 17),
+      'crumb_cold',
+      'crumb_mixing',
+      'crumb_oven',
+      'crumb_proofing',
+    ]);
   });
 });

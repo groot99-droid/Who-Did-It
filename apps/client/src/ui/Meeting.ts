@@ -16,6 +16,7 @@ import {
 import { renderLookPortrait, revealLookLine } from './main/lookPortraits';
 import { showShotToast } from './main/shotToast';
 import type { PortraitLook } from './portrait';
+import './table.css';
 
 /** An extra tab (the Notebook, wired at integration): `update` runs with every refresh. */
 export interface MeetingTab {
@@ -88,7 +89,10 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
 
   const board = h(
     'section',
-    { class: 'wdi-panel wdi-panel--wide wdi-stack wdi-meet__board', 'aria-labelledby': 'meeting-title' },
+    {
+      class: 'wdi-panel wdi-panel--wide wdi-stack wdi-meet__board wdi-glass-panel',
+      'aria-labelledby': 'meeting-title',
+    },
     h(
       'div',
       { class: 'wdi-row wdi-row--between wdi-row--wrap' },
@@ -165,12 +169,12 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     counter.hidden = true;
   });
 
-  const side = h('aside', { class: 'wdi-panel wdi-stack wdi-meet__side' }, tabBar);
+  const side = h('aside', { class: 'wdi-panel wdi-stack wdi-meet__side wdi-glass-panel' }, tabBar);
   addPanel('report', C['meeting.tab.report'], h('div', { class: 'wdi-stack' }, reportBody));
   addPanel('chat', C['meeting.tab.chat'], chat);
   select(selected);
 
-  const el = h('div', { class: 'wdi-meet wdi-screen', 'data-testid': 'meeting' }, board, side);
+  const el = h('div', { class: 'wdi-meet wdi-screen wdi-table', 'data-testid': 'meeting' }, board, side);
   root.append(el);
 
   // --- state -----------------------------------------------------------------------------------

@@ -2,12 +2,12 @@ import type { PartyVisibility } from '../net/protocol';
 import { readAudioSettings, onAudioSettings, writeAudioSettings } from '../view/audioSettings';
 import { MENU_COPY as C, fill } from './copy';
 import { h, type Screen } from './dom';
-import { mountTrailer } from './landingTrailer';
 import { openCodeBox } from './menu/codeBox';
 import { openDialog, type MenuDialog } from './menu/dialog';
 import { openFriendsPanel } from './menu/friends';
+import type { ListParties } from './menu/partyListModel';
 import { openProfilePanel } from './menu/profile';
-import { readProfile } from './menu/profileModel';
+import { profileCode, readProfile } from './menu/profileModel';
 import { openQuitDialog } from './menu/quit';
 import { openStartDialog } from './menu/startDialog';
 import { titleLetters } from './theme/title';
@@ -19,13 +19,15 @@ export interface LandingOptions {
   joinCode: string | null;
   /** The build from `/health`, for the footer; null until it is known. */
   build?: string | null;
-  onCreate(name: string, visibility: PartyVisibility): Promise<void>;
+  onCreate(name: string, visibility: PartyVisibility, invited: string[]): Promise<void>;
+  /** `GET /parties` for the Join Game list; absent in the mock, where the list stays empty. */
+  listParties?: ListParties;
   onJoin(code: string, name: string): Promise<void>;
   /** After a failed join: a better message than the generic one, if there is one (stale build). */
   explainFailure?(): Promise<string | null>;
   /** The consented leave of the current party, for Quit; the scene passes `net.leave`. */
   onQuit?(): Promise<void>;
-  /** The music bus, so the trailer's soundtrack can start on the first tap (round 6, 6K). */
+  /** The music bus, so the menu theme can start on the first tap (round 6, 6K). */
   music?: { crossfadeTo(playlistId: string | null): void } | undefined;
 }
 
@@ -77,7 +79,7 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
   const credits = menuLink(C['menu.credits'], '★', CREDITS_URL);
   const quit = menuButton(C['menu.quit'], '⏻', 'wdi-glass-btn--sm');
 
-  const openCode = (code: string | null) =>
+  const openCode = (code: string | null, withList = false) =>
     show((onClose) =>
       openCodeBox({
         root,
@@ -85,6 +87,9 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
         name: remembered(),
         onClose,
         onJoin: opts.onJoin,
+        ...(withList
+          ? { list: { profile: profileCode() ?? null, fetch: opts.listParties ?? (async () => []) } }
+          : {}),
         ...(opts.explainFailure ? { explainFailure: opts.explainFailure } : {}),
       }),
     );
@@ -100,8 +105,7 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
       }),
     ),
   );
-  // Until the party list lands (PR 4) Join Game opens the code box.
-  join.addEventListener('click', () => openCode(null));
+  join.addEventListener('click', () => openCode(null, true));
   quit.addEventListener('click', () =>
     show((onClose) =>
       openQuitDialog({ root, onClose, leave: opts.onQuit ?? (async () => undefined), music: opts.music }),
@@ -178,10 +182,11 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
       opts.build ? fill(C['menu.footer'], { build: opts.build }) : '',
     ),
   );
-  // Round 6 (locked slot): the trailer loop (6K).
-  const trailer = h('div', { class: 'wdi-landing__trailer', 'data-testid': 'landing-trailer', hidden: true });
-  const trailerPlayer = mountTrailer(trailer, { base: import.meta.env.BASE_URL, music: opts.music });
-  root.append(trailer, el);
+  // The menu theme starts on the first tap: the autoplay policy forbids earlier (A98); it runs on into the lobby.
+  const startMusic = () => opts.music?.crossfadeTo('lobby');
+  document.addEventListener('pointerdown', startMusic, { once: true });
+  document.addEventListener('keydown', startMusic, { once: true });
+  root.append(el);
   if (opts.joinCode !== null) openCode(opts.joinCode);
   else start.focus();
   return {
@@ -189,8 +194,8 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
       dialog?.close();
       settings?.destroy();
       unsubscribe();
-      trailerPlayer.destroy();
-      trailer.remove();
+      document.removeEventListener('pointerdown', startMusic);
+      document.removeEventListener('keydown', startMusic);
       el.remove();
     },
   };

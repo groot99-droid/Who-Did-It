@@ -1,6 +1,7 @@
 import { LOOKS_COPY } from './copy';
 import { h, type Screen } from './dom';
 import { type PortraitLook, type PortraitTextures, drawPortrait } from './portrait';
+import './table.css';
 
 // The list of publicly living seats, each with its name and portrait (GDD 3.17): the target picker of Impersonate,
 // and of the night powers and the Last Shot aim (Session 5G plugs into it). A `target: 'seat'` ability names a seat
@@ -60,7 +61,12 @@ export function mountSeatPicker(root: HTMLElement, opts: SeatPickerOptions): Scr
   );
   const panel = h(
     'div',
-    { class: 'wdi-seatpicker', role: 'dialog', 'aria-label': opts.title, 'data-testid': 'seat-picker' },
+    {
+      class: 'wdi-seatpicker wdi-table',
+      role: 'dialog',
+      'aria-label': opts.title,
+      'data-testid': 'seat-picker',
+    },
     h('p', { class: 'wdi-eyebrow' }, opts.title),
     rows.length > 0
       ? h('ul', { class: 'wdi-seatpicker__list' }, ...rows)

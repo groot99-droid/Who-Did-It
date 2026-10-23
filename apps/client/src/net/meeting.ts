@@ -14,6 +14,8 @@ export interface MeetingPlayer {
   look: string;
   alive: boolean;
   hasVoted: boolean;
+  /** Round 7 (GDD 3.21): the seat's public profile code, '' or absent without one; says nothing of a role. */
+  profile?: string;
 }
 
 export interface MeetingInfo {

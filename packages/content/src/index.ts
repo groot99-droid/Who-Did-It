@@ -52,6 +52,10 @@ import bpMineJson from '../data/scenes/bp_mine.json' with { type: 'json' };
 import bpOfficeJson from '../data/scenes/bp_office.json' with { type: 'json' };
 import bpSmithyJson from '../data/scenes/bp_smithy.json' with { type: 'json' };
 import bpDeepJson from '../data/scenes/bp_deep.json' with { type: 'json' };
+import crumbColdJson from '../data/scenes/crumb_cold.json' with { type: 'json' };
+import crumbMixingJson from '../data/scenes/crumb_mixing.json' with { type: 'json' };
+import crumbOvenJson from '../data/scenes/crumb_oven.json' with { type: 'json' };
+import crumbProofingJson from '../data/scenes/crumb_proofing.json' with { type: 'json' };
 import hollowmereJson from '../data/maps/hollowmere.json' with { type: 'json' };
 import blackpineJson from '../data/maps/blackpine.json' with { type: 'json' };
 
@@ -127,6 +131,10 @@ const sceneJson: Record<SceneId, unknown> = {
   bp_office: bpOfficeJson,
   bp_smithy: bpSmithyJson,
   bp_deep: bpDeepJson,
+  crumb_cold: crumbColdJson,
+  crumb_mixing: crumbMixingJson,
+  crumb_oven: crumbOvenJson,
+  crumb_proofing: crumbProofingJson,
 };
 
 const mapJson: Record<MapId, unknown> = {

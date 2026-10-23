@@ -2,9 +2,11 @@ import type { GameOver, MeetingPlayer } from '../net/meeting';
 import { fill } from './copy';
 import { MEETING_COPY as C } from './copy/meeting';
 import { h, icon, type Screen } from './dom';
+import { addFriendButton } from './menu/friends';
 import { renderMainOver } from './main/overMain';
 import { FACTION_LABEL, factionOf, winnerLine } from './meetingText';
 import { roleTitle } from './RoleCard';
+import './table.css';
 
 export interface GameOverOptions {
   over: GameOver;
@@ -66,6 +68,13 @@ export function mountGameOver(root: HTMLElement, opts: GameOverOptions): GameOve
         tag !== null &&
           h('span', { class: `wdi-chip ${winner ? 'wdi-chip--ready' : 'wdi-chip--quiet'}` }, tag),
         h('span', { class: 'wdi-chip' }, icon(`icons/icon_faction_${faction}`), FACTION_LABEL[faction]),
+        // Round 7: a seat that carries a profile can be added as a friend; never your own row.
+        id === opts.selfId
+          ? null
+          : addFriendButton(
+              { name: player?.name ?? 'Someone', profile: player?.profile },
+              'wdi-tag wdi-friend',
+            ),
       ),
     );
   });
@@ -78,7 +87,7 @@ export function mountGameOver(root: HTMLElement, opts: GameOverOptions): GameOve
   const el = h(
     'section',
     {
-      class: 'wdi-panel wdi-stack wdi-over',
+      class: 'wdi-panel wdi-stack wdi-over wdi-table wdi-glass-panel',
       'aria-labelledby': 'gameover-title',
       'data-testid': 'gameover',
     },

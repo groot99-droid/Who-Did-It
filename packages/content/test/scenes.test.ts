@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   balance,
+  biomeOf,
   MAP_IDS,
   maps,
   PROFILE_RANK,
@@ -72,7 +73,18 @@ const WORLD: Record<string, { profile: Profile; w: number; h: number; portals: s
       'fo.deep -> forest_deep.wood_side',
     ],
   },
-  bakery: { profile: 'small', w: 18, h: 11, portals: ['bk.door -> overworld.bakery'] },
+  bakery: {
+    profile: 'small',
+    w: 18,
+    h: 11,
+    portals: [
+      'bk.door -> overworld.bakery',
+      'bk.oven_room -> crumb_oven.door',
+      'bk.mixing_room -> crumb_mixing.door',
+      'bk.proofing_room -> crumb_proofing.door',
+      'bk.cold_room -> crumb_cold.door',
+    ],
+  },
   cave_entry: {
     profile: 'small',
     w: 20,
@@ -193,6 +205,11 @@ const WORLD: Record<string, { profile: Profile; w: number; h: number; portals: s
     h: 28,
     portals: ['bd.winze -> bp_mine.winze', 'bd.old_adit -> bp_woods.old_adit'],
   },
+  // Round 7 (A116, A118): Crumb's Ovens' four station rooms.
+  crumb_cold: { profile: 'small', w: 12, h: 9, portals: ['cf.door -> bakery.cold_room'] },
+  crumb_mixing: { profile: 'small', w: 12, h: 9, portals: ['cm.door -> bakery.mixing_room'] },
+  crumb_oven: { profile: 'small', w: 12, h: 10, portals: ['co.door -> bakery.oven_room'] },
+  crumb_proofing: { profile: 'small', w: 12, h: 10, portals: ['cp.door -> bakery.proofing_room'] },
 };
 
 const PROFILES: Profile[] = ['small', 'medium', 'large'];
@@ -407,5 +424,32 @@ describe('quick-mode bakery (GDD 3.11)', () => {
     expect(kinds.filter((k) => k === 'plate')).toHaveLength(balance.players.max);
     expect(kinds.filter((k) => k === 'deadLoaf')).toHaveLength(3);
     expect(kinds).toContain('ledger');
+  });
+});
+
+describe("Crumb's Ovens' station rooms (A116, A118)", () => {
+  const rooms = ['crumb_cold', 'crumb_mixing', 'crumb_oven', 'crumb_proofing'] as const;
+  it('are small lit house interiors on Hollowmere, each with one door back to the bakery', () => {
+    for (const id of rooms) {
+      const s = scenes[id];
+      expect([s.profile, s.kind, biomeOf(s), s.dark], id).toEqual(['small', 'interior', 'house', false]);
+      expect(maps.hollowmere.scenes, id).toContain(id);
+      expect(
+        s.portals.map((p) => p.to),
+        id,
+      ).toEqual(['bakery']);
+      expect(
+        scenes.bakery.portals.filter((p) => p.to === id),
+        id,
+      ).toHaveLength(1);
+    }
+  });
+  it('hold one spawn, one hiding spot, one body spot and a light each', () => {
+    for (const id of rooms) {
+      const s = scenes[id];
+      expect(s.spawns, id).toHaveLength(1);
+      expect(s.spots.map((p) => p.kind).sort(), id).toEqual(['body', 'hide']);
+      expect(s.lights?.length, id).toBeGreaterThan(0);
+    }
   });
 });

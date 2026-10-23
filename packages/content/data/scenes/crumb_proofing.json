@@ -1,0 +1,82 @@
+{
+  "id": "crumb_proofing",
+  "prefix": "cp",
+  "name": "Crumb's proofing room",
+  "zoneId": "crumb_proofing",
+  "profile": "small",
+  "kind": "interior",
+  "biome": "house",
+  "dark": false,
+  "size": { "w": 12, "h": 10 },
+  "notes": "La Chambre de Pousse: the glass-fronted proofing cabinet in the middle of the room, couche trays stacked by the east wall, sacks of farine by the west wall and three hanging bulbs.",
+  "worldRef": "4.3",
+  "portals": [
+    {
+      "id": "cp.door",
+      "from": "crumb_proofing",
+      "x": 5,
+      "y": 9,
+      "kind": "door",
+      "to": "bakery",
+      "toSpawn": "proofing_room",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [{ "id": "door", "x": 5, "y": 8, "z": 0, "facing": "n" }],
+  "spots": [
+    {
+      "id": "cp.tray_stack",
+      "kind": "hide",
+      "variant": "wardrobe",
+      "x": 10,
+      "y": 3,
+      "childOnly": false
+    },
+    {
+      "id": "cp.flour_sacks",
+      "kind": "body",
+      "variant": "trunk",
+      "x": 1,
+      "y": 2,
+      "childOnly": false
+    }
+  ],
+  "props": [],
+  "gates": [],
+  "paths": [],
+  "lights": [
+    { "id": "cp.lt_bulb_w", "kind": "lamp", "x": 2, "y": 1, "radiusTiles": 2 },
+    { "id": "cp.lt_bulb_e", "kind": "lamp", "x": 9, "y": 1, "radiusTiles": 2 },
+    { "id": "cp.lt_cabinet", "kind": "lamp", "x": 5, "y": 4, "radiusTiles": 2 }
+  ],
+  "grid": [
+    "############",
+    "#..........#",
+    "#B.........#",
+    "#.........H#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#..........#",
+    "#....S.....#",
+    "#####D######"
+  ],
+  "material": [
+    "WWWWWWWWWWWW",
+    "WccccccccccW",
+    "WccccccccccW",
+    "WccccccccccW",
+    "WccccccccccW",
+    "WccccccccccW",
+    "WccccccccccW",
+    "WccccccccccW",
+    "WccccccccccW",
+    "WWWWWWWWWWWW"
+  ]
+}
