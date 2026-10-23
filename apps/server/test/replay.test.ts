@@ -51,6 +51,45 @@ describe('the match log replay record', () => {
   afterAll(async () => colyseus.shutdown());
   beforeEach(async () => colyseus.cleanup());
 
+  for (const debug of [false, true])
+    it(`no stdout line before game over carries a seed word, and the game-over line is the only match line (WDI_DEBUG ${debug ? 'on' : 'off'})`, async () => {
+      const before = process.env.WDI_DEBUG;
+      if (debug) process.env.WDI_DEBUG = '1';
+      else delete process.env.WDI_DEBUG;
+      const lines: string[] = [];
+      const write = process.stdout.write.bind(process.stdout);
+      process.stdout.write = ((chunk: string | Uint8Array, ...rest: unknown[]) => {
+        lines.push(String(chunk));
+        return (write as (c: unknown, ...r: unknown[]) => boolean)(chunk, ...rest);
+      }) as typeof process.stdout.write;
+      try {
+        const leader = await colyseus.sdk.create('party', {
+          name: 'Solo',
+          build: BUILD_VERSION,
+          deviceId: `dev-${debug}`,
+        });
+        await new Promise((r) => setTimeout(r, 100));
+        const room = colyseus.getRoomById(leader.roomId) as unknown as PartyRoom;
+        leader.send(C2S.lobbyStart, {});
+        await new Promise((r) => setTimeout(r, 1500)); // the deal, the card, the first ticks of play
+        const live = lines.length;
+        endMatch(room, 'village'); // after the reveal: the cards are public now
+        const words = Object.values(room.seeds.recorded()).flat().map(String);
+        expect(words.length).toBeGreaterThan(0);
+        const early = lines.slice(0, live).join('');
+        expect(early).not.toContain('"seeds"');
+        for (const w of words) expect(early).not.toMatch(new RegExp(`\\b${w}\\b`));
+        const matchLines = lines.filter((l) => l.includes('"event":"match"'));
+        expect(matchLines).toHaveLength(1);
+        expect(lines.indexOf(matchLines[0]!)).toBeGreaterThanOrEqual(live);
+        await leader.leave();
+      } finally {
+        process.stdout.write = write;
+        if (before === undefined) delete process.env.WDI_DEBUG;
+        else process.env.WDI_DEBUG = before;
+      }
+    });
+
   it('a real Start, then game over: the line carries the build and the seeds, and they redraw the traits', async () => {
     const leader = await colyseus.sdk.create('party', {
       name: 'Solo',
