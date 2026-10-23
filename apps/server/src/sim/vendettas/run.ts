@@ -28,8 +28,10 @@ export function runVendettas(room: PartyRoom): void {
     if (player.priv && player.priv.vendetta !== line) player.priv.vendetta = line;
   }
   for (const seat of vendettaHolders(room).keys()) {
-    const kind = vendettaOf(room, seat)?.kind;
-    if (kind === 'conversion') runConversion(room, seat);
-    else if (kind === 'sabotage') runSabotage(room, seat);
+    const v = vendettaOf(room, seat);
+    // A vendetta is its Killer card's: a seat no longer holding that card (a fixture's re-deal) runs none of it.
+    if (!v || room.state.players.get(seat)?.priv?.role.roleId !== v.role) continue;
+    if (v.kind === 'conversion') runConversion(room, seat);
+    else if (v.kind === 'sabotage') runSabotage(room, seat);
   }
 }
