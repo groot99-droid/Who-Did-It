@@ -3063,6 +3063,75 @@ pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock 
   starts with the library part. Contract answers: 6D edits `flags/index.ts` (`admin: route[0]?.split('?')[0]
   === 'admin'`) in #66; 6I adds the four `WorldFeed` members, the M5b layer and E routing in `World.ts`, and
   `answer()` on the four ONUB widgets in #67, so no stand-in lands; 6C kept the per-kind admin feed.
+- **6P, round 6 integration (2026-10-23).** Session 6P on `claude/r6-integration` (PR #73), the last PR of round 6.
+  *Merges in order*, each with a merge commit once both CI runs on its head were green: the first wave and the wave
+  before it are 6A #54, 6B #63, 6C #58, 6D #66, 6E #49, 6F #61, 6G #59, 6H #60, 6I #67, 6J #52/#55/#57, 6K, 6L #48,
+  6M #56, 6N step 1 #69, 6Z #47/#65/#68 and the test-stability PRs #50/#62/#64; then, in the last day, #70
+  (18c8fd0, A98 docs), #74 (f74ab22, the guides and help page), #75 (48b67e5, my first determinism fixes), #71
+  (617caf7, 6N step 2 sounds), #72 (ba7f88a, 6Q's start-screen intro), #76 (72b1e4f, the memorial video), #77
+  (5dbe879, `intro.webm`), #78 (5bd6f22, the Vicar's voice, A99), #79 (ed0d5a7, the intro explosion), #80
+  (e98b888, the hotfix for the owner's report that the M5b layer's background painted over the world:
+  `.wdi-m5b { background: transparent }`, with an e2e that fails on the old base, and the intro's Skip sound and
+  tap), #81 (11168d1, the Killer NPC's kill-opportunity timer `npc.aloneKill`, A100, the owner's rule change landed by
+  6Z), ROSW #14 (21dd819), and #82 (the round-7 contract, documents only: **the round-7 opening**, 6Z), then #85
+  (e006abc, 7D's party create options and schema version 4: **round 7's first code merge**), #86, #88, #84 (6N's
+  intro trim and landing loop, A102), #89, and last #93. #93 is the determinism split below, which landed ahead of
+  the integration at 6Z's request (a2d1d17), so #73 carries no duplicate of those commits.
+  *Protocol and lockfile.* `pnpm install --frozen-lockfile` and `pnpm docs:protocol` produced no change on the
+  integrated tree (checked again after #81 and #85): nothing to commit for step 1.
+  *Soaks (step 2).* `pnpm auto -- --matches 50 --seed 6006` on every combination of both maps (hollowmere,
+  blackpine), both modes (main, onub) and all three difficulties: 12 runs, 600 matches, 12 of 12 clean, zero
+  failures, on the tree after #81 and #85. `pnpm bots:soak` 30 minutes, main mode, six bots: SOAK_MAIN.
+  `pnpm bots:soak` 30 minutes, quick mode (`--sizes 4,6,8 --pace fast`): SOAK_ONUB. Opt-in e2e with
+  `WDI_E2E_MATCH=1 WDI_E2E_LOOKS=1 WDI_E2E_NPC=1 WDI_E2E_ONUB=1`: E2E_RESULT. The admin live spec stays skipped: it
+  needs `WDI_E2E_ADMIN`, the owner's Railway variables and a token, none of which this session has or writes into
+  any file. `media.test.ts` and the sprite budgets are green on the final tree (6N's steps 2 and 3 landed in #71 and
+  #84).
+  *What the soaks and the suites found, and where it was fixed.*
+  - **npcStuck, `sim/npc/routine.ts` `runWork`.** A work visit that was interrupted by a reaction did not walk back
+    to its station, so the NPC stood held off its goal until `npc.stuckInvariantS` and the `npcStuck` invariant fired
+    in the soak (11 of 12 combinations clean before the fix; the failing matches replay clean after it). Regression test
+    R14 in `npcRoutine.test.ts`. No rule or number moved, so GDD is unchanged. Landed in #93.
+  - **R3, the seed-set determinism.** `standardParty` (`test/npcHelpers.ts`) left the `nodes`, `mobs`, `traits` and
+    other streams unpinned, so two parties of one seed set could differ. It now pins every stream.
+  - **D3 (the flake behind the red base run).** `npc.test.ts` "1 human + 3 NPCs starts and deals the 4-player deck"
+    read `npcSeats` before the room consumed `lobby.addNpc`, and the `roleReveal` message before it arrived. A state
+    wait is not a message wait: both now wait on the message. Same cause, same fix in `onubNight.test.ts` O8 and
+    `onubDeal.test.ts`. Landed in #75 and #93, with `invariants.test.ts`'s ghost-case test given an explicit 20 s
+    timeout (it passes in about 7 s alone and timed out at the 5 s default only in the parallel full gate).
+  - **A98, the pre-match music bucket.** The lobby and trailer playlists are one budget constant shared by both music
+    checks (`tools/sprites/test/budgets.ts`, `media.ts`), the intro video's 5 MB cap named, and the 4,000,000 against
+    4 MiB seam resolved in favour of the smaller. Landed in this PR (#73), with the A98 text from #70.
+  - **The bots after A50 (scene-scoped views).** The main-mode walker hunted prey through `players[].presence` and
+    `sceneId`, which no client has after A50, so the soak reported "match loop never ran: no kill"; it now hunts
+    through `state.scenes` avatars and sends `act.ability` with the avatar handle (`tools/bots/walk.ts`). The quick
+    bot's night monitor counted its own seat's `presence` as a leak (143,022 false `nightLeaks`); it now skips its own
+    seat. The quick bot kept a stale role when `roleReveal` landed before the phase patch (a lobby tick reset it),
+    so its Rush claims were refused with 422; the lobby branch now resets only when the state differs from a fresh
+    bot, and a new test covers the race.
+  - **The opt-in e2e specs had followed neither round 5 nor round 6.** Repaired in `apps/client/e2e/`: the lobby
+    confirm button is `confirm-start`; the 6C opening cutscene hides the HUD until `skipOpening` presses Escape and
+    6Q's intro needs `skipIntro` (`helpers.ts`); positions are read from `scenes.get('overworld').avatars` by
+    `lookOf`, not from `presence`; kills are only legal at dusk, night and final night, so the match spec sets
+    `debug.clock { phase: 'night', clearCooldowns: true }` and walks to the victim with `walkToward`. The last one:
+    in `onub.spec.ts` the reveal expects a stamp, which needs a top tally of at least `minVotesToTurnOut` (2); the
+    test cast two votes (host on a bot, guest on the Pantry) and left the three fast bots' votes to chance, so a
+    split or a Pantry lead turned nobody out. The guest now votes the same seat and the bots' Pantry chance is 0
+    in that spec (the Pantry path stays the soak's and the rules tests'). No assertion was loosened.
+  *Railway "Wait for CI".* A red base push run on 18c8fd0 (flake D3) stranded the server on build 1156a758 until the
+  owner turned the setting off at about 00:36Z; the server then redeployed on f74ab229 and ba7f88ae. A flaky test now
+  stops production, which is the reason #93 was split out first.
+  *Known gaps, recorded and not built.* (1) No main-mode task assignment: nothing fills `Private.tasks` or
+  `GameState.taskBar` (A90), so station mini-games are inert in a live match; ROADMAP M5b's definition of done does
+  not count them as playable (reworded by 6Z in beb7452). (2) The admin snapshot carries no inventory or notebook
+  (6D; round 7). (3) The admin feed subscribes per kind; 6Z declined a wildcard. (4) The walker's leak monitor in
+  `tools/bots/walk.ts` still reads `p.presence` and `p.sceneId` of other players, which a client no longer holds
+  after A50, so it is vacuous; the server's own `privLeak`/`seatLeak` invariants and the quick monitor are the live
+  checks. A round-7 follow-up should rewrite it over `state.scenes`. (5) The ROSW `SFX_2026_01` zip `Drones.zip` is
+  damaged (34 of 93 members unreadable); the owner must upload it again. (6) A94 is still "Reserved for session
+  6L". The owner sets the `WDI_ADMIN_*` Railway variables and has no password anywhere; no value is written into
+  any file.
+
 ## Round 7 (started 2026-10-23, after round 6's #81 landed at 11168d1; 6P's #73 and 6N's A102 still to land)
 
 Ten sessions build **R7, Vendettas and memorials** (GDD 3.20; ROADMAP R7) and **R7b, the re-skin, parties and
