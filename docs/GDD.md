@@ -755,7 +755,8 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
   other than the Hitman and its Cabal mates, written to the Hitman's own Notebook. The Hitman accepts it as a
   quest of kind `contract` (3.16; the quest `contract` of its own quest list, with no giver and no `quests.json`
   row) from anywhere (`vendetta.contract.accepted`), with the Accept button on that Notebook entry while the
-  offer is open; an NPC Hitman accepts at once.
+  offer is open; an NPC Hitman accepts at once. The button reads the public roster, so after a private death of
+  the target it stays until the next meeting (A30) and the server refuses the press (`cannot`).
   While the contract is accepted and the target lives, a Knife kill of anyone else rests the Knife **30 s**
   longer (`vendettas.contract.offTargetRestS`). A strike that kills the target completes the quest
   (`vendetta.contract.done`, the consequence) and readies the Knife at once; a target who dies any other way
