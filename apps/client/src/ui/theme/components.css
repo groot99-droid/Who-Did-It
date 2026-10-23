@@ -2902,3 +2902,468 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   top: var(--wdi-space-3);
   right: var(--wdi-space-3);
 }
+
+/* ---------------------------------------------------- Round 7 (7B): the night glass (UI.md 6, A106) */
+/* The owner's mockups: frosted glass, pixel-stepped, over the loop backdrop. Tokens only. The glass itself is
+   a ::before layer under the content, so the stepped clip-path cuts the fill and rim but never the focus ring. */
+.wdi-glass,
+.wdi-glass-btn,
+.wdi-glass-panel,
+.wdi-seg--glass {
+  --wdi-glass-step: var(--wdi-step);
+  --wdi-glass-ring: inset 0 0 0 1px var(--wdi-glass-rim);
+  position: relative;
+  isolation: isolate;
+  color: var(--wdi-night-text);
+}
+
+.wdi-glass::before,
+.wdi-glass-btn::before,
+.wdi-glass-panel::before,
+.wdi-seg--glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    repeating-conic-gradient(var(--wdi-glass-sheen) 0 25%, transparent 0 50%) 0 0 / 8px 8px,
+    var(--wdi-glass-fill);
+  box-shadow:
+    var(--wdi-glass-ring),
+    inset 0 2px 0 0 var(--wdi-glass-rim-top),
+    inset 0 -3px 0 0 var(--wdi-glass-bevel);
+  -webkit-backdrop-filter: blur(var(--wdi-glass-blur));
+  backdrop-filter: blur(var(--wdi-glass-blur));
+  pointer-events: none;
+  transition: box-shadow var(--wdi-dur-fast) var(--wdi-ease);
+  /* Two pixel steps cut from each corner. */
+  clip-path: polygon(
+    calc(var(--wdi-glass-step) * 2) 0,
+    calc(100% - var(--wdi-glass-step) * 2) 0,
+    calc(100% - var(--wdi-glass-step) * 2) var(--wdi-glass-step),
+    calc(100% - var(--wdi-glass-step)) var(--wdi-glass-step),
+    calc(100% - var(--wdi-glass-step)) calc(var(--wdi-glass-step) * 2),
+    100% calc(var(--wdi-glass-step) * 2),
+    100% calc(100% - var(--wdi-glass-step) * 2),
+    calc(100% - var(--wdi-glass-step)) calc(100% - var(--wdi-glass-step) * 2),
+    calc(100% - var(--wdi-glass-step)) calc(100% - var(--wdi-glass-step)),
+    calc(100% - var(--wdi-glass-step) * 2) calc(100% - var(--wdi-glass-step)),
+    calc(100% - var(--wdi-glass-step) * 2) 100%,
+    calc(var(--wdi-glass-step) * 2) 100%,
+    calc(var(--wdi-glass-step) * 2) calc(100% - var(--wdi-glass-step)),
+    var(--wdi-glass-step) calc(100% - var(--wdi-glass-step)),
+    var(--wdi-glass-step) calc(100% - var(--wdi-glass-step) * 2),
+    0 calc(100% - var(--wdi-glass-step) * 2),
+    0 calc(var(--wdi-glass-step) * 2),
+    var(--wdi-glass-step) calc(var(--wdi-glass-step) * 2),
+    var(--wdi-glass-step) var(--wdi-glass-step),
+    calc(var(--wdi-glass-step) * 2) var(--wdi-glass-step)
+  );
+}
+
+.wdi-glass-btn:focus-visible,
+.wdi-seg--glass .wdi-seg__opt:focus-visible {
+  outline: 2px solid var(--wdi-night-accent);
+  outline-offset: 2px;
+}
+
+.wdi-glass-btn {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--wdi-space-3);
+  width: 100%;
+  min-height: 56px;
+  padding: 0 var(--wdi-space-4);
+  border: 0;
+  background: none;
+  color: var(--wdi-night-label);
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-md);
+  font-synthesis: none;
+  line-height: var(--wdi-leading-display);
+  letter-spacing: var(--wdi-tracking-display);
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform var(--wdi-dur-fast) var(--wdi-ease);
+}
+
+.wdi-glass-btn__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--wdi-space-5);
+  height: var(--wdi-space-5);
+  color: currentColor;
+}
+
+.wdi-glass-btn__icon > svg,
+.wdi-glass-btn__icon > img {
+  width: 100%;
+  height: 100%;
+}
+
+/* A stepped triangle pointing right, in three pixel rows. */
+.wdi-glass-btn__chev {
+  flex: none;
+  margin-left: auto;
+  width: 8px;
+  height: 12px;
+  background: currentColor;
+  clip-path: polygon(
+    0 0,
+    34% 0,
+    34% 17%,
+    67% 17%,
+    67% 34%,
+    100% 34%,
+    100% 67%,
+    67% 67%,
+    67% 84%,
+    34% 84%,
+    34% 100%,
+    0 100%
+  );
+  opacity: 0;
+  transition: opacity var(--wdi-dur-fast) var(--wdi-ease);
+}
+
+.wdi-glass-btn:hover .wdi-glass-btn__chev,
+.wdi-glass-btn:focus-visible .wdi-glass-btn__chev {
+  opacity: 1;
+}
+
+.wdi-glass-btn:hover:not(:disabled, [aria-disabled='true']) {
+  --wdi-glass-ring: inset 0 0 0 1px var(--wdi-glass-rim-top);
+  transform: translateY(-2px);
+}
+
+.wdi-glass-btn:active:not(:disabled, [aria-disabled='true']) {
+  transform: translateY(1px);
+}
+
+.wdi-glass-btn--primary,
+.wdi-glass-btn--primary:hover:not(:disabled, [aria-disabled='true']) {
+  --wdi-glass-ring: inset 0 0 0 2px var(--wdi-night-accent);
+}
+
+.wdi-glass-btn--primary .wdi-glass-btn__chev {
+  color: var(--wdi-night-accent);
+  opacity: 1;
+}
+
+.wdi-glass-btn--primary:hover:not(:disabled, [aria-disabled='true'])::before {
+  background:
+    linear-gradient(var(--wdi-glass-wash), var(--wdi-glass-wash)),
+    repeating-conic-gradient(var(--wdi-glass-sheen) 0 25%, transparent 0 50%) 0 0 / 8px 8px,
+    var(--wdi-glass-fill);
+}
+
+.wdi-glass-btn--ghost {
+  color: var(--wdi-night-text);
+}
+
+.wdi-glass-btn--ghost::before {
+  background: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.wdi-glass-btn--sm {
+  gap: var(--wdi-space-2);
+  width: auto;
+  min-height: var(--wdi-touch);
+  padding: 0 var(--wdi-space-3);
+  font-size: var(--wdi-text-xs);
+}
+
+.wdi-glass-btn--sm .wdi-glass-btn__icon {
+  width: var(--wdi-space-4);
+  height: var(--wdi-space-4);
+}
+
+.wdi-glass-btn--sm .wdi-glass-btn__chev {
+  display: none;
+}
+
+/* Disabled: the label and icon fade (text nodes too, through the colour); the note stays readable. */
+.wdi-glass-btn:is(:disabled, [aria-disabled='true']) {
+  color: rgb(var(--wdi-snow-rgb) / 0.5);
+  cursor: not-allowed;
+}
+
+.wdi-glass-btn:is(:disabled, [aria-disabled='true']) .wdi-glass-btn__chev {
+  display: none;
+}
+
+.wdi-glass-btn__note {
+  margin-left: auto;
+  color: var(--wdi-night-text);
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-xs);
+  font-weight: var(--wdi-weight-strong);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.wdi-glass-panel {
+  --wdi-glass-step: var(--wdi-step-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-3);
+  padding: var(--wdi-space-5);
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  line-height: var(--wdi-leading-text);
+}
+
+.wdi-glass-panel__eyebrow {
+  margin: 0;
+  color: var(--wdi-night-text-muted);
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  font-synthesis: none;
+  text-transform: uppercase;
+}
+
+.wdi-glass-panel__title {
+  margin: 0;
+  color: var(--wdi-night-text);
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-display-md);
+  font-weight: var(--wdi-weight-strong);
+  line-height: var(--wdi-leading-display);
+}
+
+.wdi-glass-panel__hint {
+  margin: 0;
+  color: var(--wdi-night-text-muted);
+  font-size: var(--wdi-text-sm);
+}
+
+/* Inputs have no ::before, so the field clips itself; its focus ring is drawn inside the clip. */
+.wdi-glass-input,
+.wdi-glass-select {
+  --wdi-glass-step: var(--wdi-step);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--wdi-touch);
+  padding: 0 var(--wdi-space-3);
+  border: 0;
+  border-radius: 0;
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-glass-sunken);
+  box-shadow:
+    inset 0 0 0 1px var(--wdi-glass-rim),
+    inset 0 2px 0 1px var(--wdi-glass-bevel);
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  clip-path: polygon(
+    var(--wdi-glass-step) 0,
+    calc(100% - var(--wdi-glass-step)) 0,
+    calc(100% - var(--wdi-glass-step)) var(--wdi-glass-step),
+    100% var(--wdi-glass-step),
+    100% calc(100% - var(--wdi-glass-step)),
+    calc(100% - var(--wdi-glass-step)) calc(100% - var(--wdi-glass-step)),
+    calc(100% - var(--wdi-glass-step)) 100%,
+    var(--wdi-glass-step) 100%,
+    var(--wdi-glass-step) calc(100% - var(--wdi-glass-step)),
+    0 calc(100% - var(--wdi-glass-step)),
+    0 var(--wdi-glass-step),
+    var(--wdi-glass-step) var(--wdi-glass-step)
+  );
+}
+
+.wdi-glass-input::placeholder {
+  color: var(--wdi-night-text-muted);
+  opacity: 1;
+}
+
+.wdi-glass-input[aria-invalid='true'] {
+  box-shadow:
+    inset 0 0 0 1px var(--wdi-night-accent),
+    inset 0 2px 0 1px var(--wdi-glass-bevel);
+}
+
+.wdi-glass-input:focus-visible,
+.wdi-glass-select:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 2px var(--wdi-night-accent),
+    inset 0 3px 0 2px var(--wdi-glass-bevel);
+}
+
+/* A chevron from two hard-edged gradients, so the select needs no image. */
+.wdi-glass-select {
+  padding-right: var(--wdi-space-6);
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--wdi-night-text) 50%),
+    linear-gradient(135deg, var(--wdi-night-text) 50%, transparent 50%);
+  background-position:
+    calc(100% - var(--wdi-space-4)) 50%,
+    calc(100% - var(--wdi-space-3)) 50%;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.wdi-glass-select option {
+  color: var(--wdi-night-text);
+  background: var(--wdi-night-bg);
+}
+
+.wdi-glass-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wdi-tag {
+  --wdi-glass-step: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wdi-space-1);
+  min-height: var(--wdi-space-5);
+  padding: 0 var(--wdi-space-2);
+  color: var(--wdi-night-text);
+  background: var(--wdi-violet);
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  font-synthesis: none;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  clip-path: polygon(
+    var(--wdi-glass-step) 0,
+    calc(100% - var(--wdi-glass-step)) 0,
+    100% var(--wdi-glass-step),
+    100% calc(100% - var(--wdi-glass-step)),
+    calc(100% - var(--wdi-glass-step)) 100%,
+    var(--wdi-glass-step) 100%,
+    0 calc(100% - var(--wdi-glass-step)),
+    0 var(--wdi-glass-step)
+  );
+}
+
+.wdi-tag--leader {
+  color: var(--wdi-on-night-accent);
+  background: var(--wdi-night-accent);
+}
+
+.wdi-tag--npc {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--wdi-night-text);
+}
+
+/* A tick: two strokes of the text colour. */
+.wdi-tag--ready::before {
+  content: '';
+  width: 8px;
+  height: 4px;
+  margin-bottom: 2px;
+  border-bottom: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+/* The segmented group's own rules are ui/artStyle/artStyle.css; this modifier dresses it in glass. */
+.wdi-seg.wdi-seg--glass {
+  border: 0;
+  border-radius: 0;
+  background: none;
+  overflow: visible;
+}
+
+.wdi-seg--glass .wdi-seg__opt {
+  color: var(--wdi-night-text);
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-sm);
+  font-weight: var(--wdi-weight-strong);
+}
+
+.wdi-seg--glass .wdi-seg__opt + .wdi-seg__opt {
+  border-left: 1px solid var(--wdi-glass-rim);
+}
+
+.wdi-seg--glass .wdi-seg__opt.is-on {
+  color: var(--wdi-on-night-accent);
+  background: var(--wdi-night-accent);
+}
+
+.wdi-seg--glass .wdi-seg__opt:disabled {
+  color: rgb(var(--wdi-lilac-rgb) / 0.5);
+}
+
+.wdi-seg__note {
+  color: var(--wdi-night-text);
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-xs);
+  font-weight: var(--wdi-weight-strong);
+}
+
+.wdi-title {
+  margin: 0;
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-display-xl);
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: var(--wdi-leading-display);
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.wdi-title__line {
+  display: block;
+  color: var(--wdi-night-label);
+  text-shadow:
+    0.06em 0.06em 0 var(--wdi-violet),
+    0.12em 0.12em 0 var(--wdi-indigo);
+}
+
+.wdi-title__line--accent {
+  color: var(--wdi-night-accent);
+  /* The mockup's second line is nearly twice the first. */
+  font-size: 1.875em;
+}
+
+.wdi-title__ch {
+  display: inline-block;
+  white-space: pre;
+  animation: wdi-title-drop 420ms steps(6, end) both;
+  animation-delay: calc(var(--i, 0) * var(--wdi-title-step));
+}
+
+@keyframes wdi-title-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-0.75em);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .wdi-title {
+    font-size: var(--wdi-display-lg);
+  }
+
+  .wdi-glass-panel {
+    padding: var(--wdi-space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-title__ch {
+    animation: none;
+  }
+
+  .wdi-glass-btn,
+  .wdi-glass-btn::before,
+  .wdi-glass-btn__chev {
+    transition: none;
+  }
+}
