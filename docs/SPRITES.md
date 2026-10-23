@@ -72,6 +72,14 @@ and arrive after the M3 gate.
 | `interact` | 8 | loop | A V1 clip of every look, in 8 directions, `Presence.animId` 4: one id for every hold, as `swing` is for every strike, so it never tells one action or role from another |
 | `die` | 8 | once, hold last frame | The last frame is the body on the floor. Rendered in 256 px cells with the feet at the centre (a fallen body reaches about 90 px below the feet); trim and the pivot hide the difference |
 
+Prop frames (round 8, 8K) are looked up in `props_<mapId>`, then `props`, and within each atlas by stem in this
+order: the exact state frame where the kind has one (`prop_lanternPost_lit`), then `prop_<kind>`, then
+`prop_<id tail>`, then `prop_<id tail without a trailing _<n>>`, so `bm.ore_cart_0` and `bw.kiln_1` share
+`prop_ore_cart` and `prop_kiln`. A multi-tile prop looks up `<stem>#0_0` in the same order and is cut with the
+stem that matched (`propStems`, `apps/client/src/view/mapDefs.ts`). `decor` and `dressing` props have no frame of
+their kind, so they always resolve by tail; with no frame they draw nothing (10.13). HD manifests and every map's
+prop rows follow this order.
+
 ## 4. Feet pivot manifest
 
 The rig projects the `Feet` empty into camera space on every rendered frame and writes one
