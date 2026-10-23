@@ -7,6 +7,7 @@ import {
   ErrorCode,
   NoteKind,
   Phase,
+  QuestState,
   TICK_RATE,
   TILE_PX,
   TaskEntry,
@@ -33,7 +34,9 @@ import { CONTRACT_QUEST, openContract } from '../src/sim/vendettas/contract';
 import { matchEvents } from '../src/sim/auto/log';
 import { countsVote } from '../src/sim/vendettas/conversion';
 import { vendettaGoalFor } from '../src/sim/vendettas/goal';
-import { progressOf, vendettaSteps } from '../src/sim/vendettas/progress';
+import { emitStep, progressOf, vendettaSteps } from '../src/sim/vendettas/progress';
+import { registeredInvariants, runInvariants } from '../src/sim/auto/invariants';
+import { addStack } from '../src/sim/Inventory';
 import { holdVendetta } from '../src/sim/vendettas/state';
 import {
   bootFlowServer,
@@ -413,5 +416,58 @@ describe('the contract in a match', () => {
       'vendetta.contract.lapsed',
     ]);
     expect(seat(m, 0).priv.quests).toHaveLength(0);
+  });
+});
+
+describe('the vendetta invariants', () => {
+  beforeEach(async () => colyseus.cleanup());
+
+  const CHECKS = ['vendettaOnce', 'contractQuest', 'strongboxOnce', 'vendettaPublic'];
+  const ROLES = {
+    Bot0: 'killer',
+    Bot1: 'detective',
+    Bot2: 'townsfolk',
+    Bot3: 'townsfolk',
+    Bot4: 'townsfolk',
+  };
+  const failing = (room: PartyRoom) =>
+    runInvariants(room)
+      .filter((f) => CHECKS.includes(f.name))
+      .map((f) => f.name);
+
+  it('register after the round-6 checks', () => {
+    expect(registeredInvariants().slice(-CHECKS.length)).toEqual(CHECKS);
+  });
+
+  it('stay quiet through a played contract, then catch each breach', async () => {
+    const m = await startMatch(colyseus, 5, ROLES);
+    const hitman = idOf(m, 0);
+    holdVendetta(m.room, hitman, 'hitman');
+    emitSim(m.room, {
+      tick: m.room.state.tick,
+      kind: 'train.arrive',
+      sceneId: 'overworld',
+      data: { map: 'hollowmere', station: 'overworld.platform', round: 1 },
+    });
+    await until(() => openContract(m.room, hitman) !== null);
+    await act(m.bots[0] as Bot, 'quest.accept', { questId: CONTRACT_QUEST });
+    emitStep(m.room, hitman, 'vendetta.contract.done');
+    await sleep(100);
+    expect(failing(m.room)).toEqual([]);
+
+    // A second fire of the same vendetta.
+    emitStep(m.room, hitman, 'vendetta.contract.done');
+    expect(failing(m.room)).toEqual(['vendettaOnce']);
+    // A contract quest on a seat without the contract, and the strongbox in two inventories.
+    const quest = new QuestState();
+    quest.id = CONTRACT_QUEST;
+    seat(m, 1).priv.quests.push(quest);
+    addStack(seat(m, 2), STRONGBOX_ITEM, 1);
+    addStack(seat(m, 3), STRONGBOX_ITEM, 1);
+    // A public vendetta event that names a seat, reported once.
+    emitSim(m.room, { tick: m.room.state.tick, kind: 'vendetta.contract.offered', seat: hitman });
+    await sleep(100);
+    expect(failing(m.room)).toEqual(CHECKS);
+    expect(failing(m.room)).toEqual(CHECKS.slice(0, 3));
   });
 });
