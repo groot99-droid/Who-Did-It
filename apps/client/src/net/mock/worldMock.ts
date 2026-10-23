@@ -23,6 +23,7 @@ import type {
   MobSnap,
   NodeSnap,
   QuestSnap,
+  TaskSnap,
   StackSnap,
 } from '../world';
 import { MockM5b, type MockSceneM5b } from './m5bMock';
@@ -509,6 +510,10 @@ export class MockWorldFeed implements WorldFeed {
 
   inventory(): StackSnap[] {
     return this.m5b.inventory();
+  }
+
+  tasks(): TaskSnap[] {
+    return this.m5b.tasks();
   }
 
   questAccept(questId: string): void {

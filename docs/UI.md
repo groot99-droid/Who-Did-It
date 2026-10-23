@@ -298,12 +298,45 @@ for a selection, `-hazard` for a cue. Never a black shadow.
 
 | What | Duration | Easing | Reduced motion |
 |---|---|---|---|
-| hover, press | 120 ms | `--wdi-ease` | none |
+| hover (`--wdi-dur-fast`, lift `--wdi-lift`) | 120 ms, 2 px up | `--wdi-ease` | changes colour in place, no lift |
+| press (`--wdi-dur-press` down, `--wdi-dur-fast` back; `--wdi-press`, `--wdi-press-scale`) | 60 ms down, 1 px and 0.97 | `--wdi-ease` | changes colour in place |
+| list row hover (`--wdi-nudge`) | 120 ms, 2 px in | `--wdi-ease` | wash only |
+| tab and segment hover | 120 ms, colour and rule only | `--wdi-ease` | instant |
+| focus ring closing in | 120 ms from 6 px out | `--wdi-ease-out` | appears in place |
+| panel open (`--wdi-dur-panel`, `--wdi-rise`) | 200 ms, 8 px up and 0.98 to full | `--wdi-ease-out` | appears in place |
+| panel close (`--wdi-dur-panel-out`), where `display` can transition | 140 ms, fade and 4 px down | `--wdi-ease-in` | disappears |
+| list stagger (`--wdi-stagger`) | 28 ms per row, rows 1 to 10, the rest with row 10 | `--wdi-ease-out` | every row at once |
 | toast, dialog, stamp rise | 220 ms | `--wdi-ease` | appears in place |
 | the card flip | 600 ms | `--wdi-ease` | swap, no rotation |
 | the card hold timer | the hold (GDD 2 step 4) | linear | still drains |
-| edge cue pulse | 1.2 s loop | `--wdi-ease` | static ring |
+| edge cue pulse (`--wdi-dur-loop`) | 1.2 s loop | `--wdi-ease` | static ring |
 | busy spinner | 0.8 s loop | linear | kept (it is status) |
+
+Round 8 (8H, A143). Every interface motion reads a token of `ui/theme/tokens.css`: the durations
+`--wdi-dur-*`, the stagger `--wdi-stagger`, the distances `--wdi-lift`, `--wdi-press`, `--wdi-nudge`,
+`--wdi-rise`, `--wdi-shake` and the scale `--wdi-press-scale`, with the easings `--wdi-ease`,
+`--wdi-ease-out` (arriving), `--wdi-ease-in` (leaving) and `--wdi-ease-spring` (one overshoot). Each
+duration and distance is zeroed under `prefers-reduced-motion` in the same file (`motion.test.ts` checks
+it), so a rule written against the tokens needs no reduced twin; only a loop needs `animation: none`.
+The rules live in the "Round 8 (8H)" block of `components.css`, which moves controls through the `translate`
+and `scale` properties and never through `transform`, so a control's own placing transform is kept.
+Other sessions' panels are animated there by their classes; their files are not edited.
+
+Controls that lift on hover and sink on press: `.wdi-btn`, `.wdi-glass-btn`, button chips, portraits, seat
+cards, map options, the cover picker's looks, the menu chips and close button, the settings gear, the E
+prompt, touch buttons (press only) and the admin buttons and seats. Tabs and segments brighten without
+lifting. List rows (the inventory slots, recipes and quests of `.wdi-m5b__row`, the party list, the deck's
+cards) lean in by `--wdi-nudge` on hover or focus inside them, and an M5b row takes a teal edge.
+
+Panels that open (8H, A143): Pockets, Crafting and Quests (`.wdi-m5b__panel`), the settings panel, the
+notebook sheet's page, the meeting's board and side panel, and any panel carrying `.wdi-anim-panel`, rise in
+on every open (an animation replays when an element leaves `display: none`); their veils (`.wdi-m5b__modal`,
+the notebook sheet, `.wdi-anim-veil`) fade. A panel hidden with `hidden` stops taking the pointer at once and
+fades out where the browser can transition `display`. The lists inside them (`.wdi-m5b__list`, the notebook
+list, the meeting's portraits, the deck's cards, the party list, `.wdi-anim-list`) stagger in row by row.
+The round-8 panels other sessions build (the shop, the inspect card, the mugging prompt, the altar, mailbag,
+notice and HQ panels) opt in with `.wdi-anim-panel` on the panel, `.wdi-anim-veil` on its scrim and
+`.wdi-anim-list` on its list; nothing else is needed from them, and 8H owns no line of their files.
 
 ## 10. Accessibility checklist and measured contrast
 
