@@ -472,6 +472,18 @@ export interface JoinOptions {
   name: string;
   build: string;
   deviceId: string;
+  /** Round 7 (GDD 3.21): the device's profile code; absent for a device without a profile and for the bots. */
+  profile?: string;
+}
+
+/** Party visibility chosen at Create (GDD 3.21). */
+export type PartyVisibility = 'open' | 'private';
+
+/** Options for `create("party", ...)` only; `joinById` keeps `JoinOptions`. */
+export interface CreateOptions extends JoinOptions {
+  visibility: PartyVisibility;
+  /** Profile codes the leader invited, capped by balance.json `party.invitedMax`; ignored for an open party. */
+  invited?: string[];
 }
 
 // Round 6: the admin wire (docs/round6/auto-admin.md 6), accepted by the `admin` room only.

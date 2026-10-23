@@ -10,6 +10,14 @@
     "startMinHumans": 1,
     "gddRef": "2"
   },
+  "party": {
+    "profileCodeLength": 8,
+    "friendsMax": 50,
+    "invitedMax": 50,
+    "listMax": 50,
+    "listRefreshS": 3,
+    "gddRef": "3.21"
+  },
   "phases": {
     "roleRevealS": 20,
     "countdownS": 3,

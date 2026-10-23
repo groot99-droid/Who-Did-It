@@ -13,6 +13,8 @@ import {
   Phase,
   SceneState,
   TICK_RATE,
+  ROOM_CODE_ALPHABET,
+  type CreateOptions,
   type JoinOptions,
 } from '@wdi/shared';
 import { balance } from '@wdi/content';
@@ -46,6 +48,13 @@ export function cleanName(raw: unknown): string | null {
   return name.length >= NAME_MIN_LENGTH && name.length <= NAME_MAX_LENGTH ? name : null;
 }
 
+/** A profile code: `party.profileCodeLength` characters of the join-code alphabet (GDD 3.21). */
+export function cleanProfile(raw: unknown): string | null {
+  if (typeof raw !== 'string' || raw.length !== balance.party.profileCodeLength) return null;
+  for (const ch of raw) if (!ROOM_CODE_ALPHABET.includes(ch)) return null;
+  return raw;
+}
+
 const isCommandType = (type: string): boolean => (Object.values(C2S) as string[]).includes(type);
 
 export class PartyRoom extends Room<{ state: GameStateType }> {
@@ -75,7 +84,7 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
    */
   static override async onAuth(
     _token: string | undefined,
-    options: Partial<JoinOptions> | undefined,
+    options: Partial<CreateOptions> | undefined,
     _ctx: AuthContext,
   ) {
     if (!options || options.build !== BUILD_VERSION || cleanName(options.name) === null) {
@@ -87,6 +96,25 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
       options.deviceId.length > 64
     ) {
       throw genericJoinError();
+    }
+    // Round 7 (GDD 3.21): the profile, and for a create the visibility and the invited list.
+    if (options.profile !== undefined && cleanProfile(options.profile) === null) throw genericJoinError();
+    if (
+      options.visibility !== undefined &&
+      options.visibility !== 'open' &&
+      options.visibility !== 'private'
+    ) {
+      throw genericJoinError();
+    }
+    if (options.invited !== undefined) {
+      const { invited } = options;
+      if (
+        !Array.isArray(invited) ||
+        invited.length > balance.party.invitedMax ||
+        invited.some((code) => cleanProfile(code) === null)
+      ) {
+        throw genericJoinError();
+      }
     }
     return true;
   }
@@ -137,7 +165,8 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
 
     // A human joining a full party takes an NPC seat (GDD 3.12).
     if (this.state.players.size >= MAX_PLAYERS) removeNewestNpcSeat(this);
-    newSeat(this, client.sessionId, name);
+    const seat = newSeat(this, client.sessionId, name);
+    seat.profile = cleanProfile(options.profile) ?? '';
     if (this.state.leaderId === '') this.state.leaderId = client.sessionId;
 
     // Only this player's own Player (so `priv` arrives) and their scene are in the view.
