@@ -480,14 +480,17 @@ against `quests.maxActive`. The lobby and the role card clear every seat's quest
 round-7 vendetta seam and are refused in round 6.
 
 **Mini-games.** Every fetch task of 3.5 plays a mini-game at its target in place of the plain 2 s hold: the hold
-opens it, the server keeps the solution, and the task completes only when the client's answer checks. The four
-kinds, first made for the quick mode (3.11), are crates, pour, slide and stoke. (6H)
+opens it, the server keeps the solution, and the task completes only when the client's answer checks. The five
+kinds are crates, pour, slide and stoke, first made for the quick mode (3.11), and the tap (round 7, 7M, A151): a
+marker sweeps a track back and forth once per `minigames.tap.periodS`, and the player taps while it crosses the band
+(`bandFrac` of the track, at a place drawn for each hit), `steps` times in a row; a tap outside the band starts the
+run again from the first band. (6H)
 
 | Task | Mini-game | Difficulty (1-5) |
 |---|---|---|
 | Light the lanterns | pour | 2 |
 | Fix the well pump | slide | 3 |
-| Deliver a letter | slide | 1 |
+| Deliver a letter | tap | 1 |
 | Mend the fence | crates | 2 |
 | Fetch the flour | crates | 1 |
 | Mix the dough | pour | 2 |
@@ -502,13 +505,15 @@ the task within reach, in the task's own time of day (Light the lanterns only at
 seat's own list that is not done; a real task also needs its deliverable in the inventory, which completion takes, and
 a fake task needs none. The server draws the puzzle from a stream of its own keyed by seat, sends the client its
 statement (the board it draws: the bands, the lit order) and keeps it; the answer is a record of what the player did
-(crates placed and the needle's stop, how long each pour was held, the slots filled in order, the stoke's taps), which
+(crates placed and the needle's stop, how long each pour was held, the slots filled in order, the stoke's taps, the
+tap's every tap, hit or miss), which
 the server replays against the puzzle, so a bare "done" completes nothing. The Done control sends an assist answer the
 server accepts only once the puzzle has been open for `assistS`. Each two difficulty levels above 1 add one step (one
 second of hold for the stoke) to the base numbers of `balance.json` `minigames`. Completion marks the task done, writes the
 alibi entry (the scene and the tick, into the seat's own ledger) and, for a real task, raises the bar to the finished
 real tasks over all real tasks; a ghost's finished tasks count in full up to `tasks.ghostShareCap` of the bar. Leaving
-the node, or a phase where verbs do not work, drops the open puzzle.
+the node, or a phase where verbs do not work, drops the open puzzle. Each two difficulty levels above 1 add one hit to
+the tap as they add a step to the others.
 
 ### 3.17 Characters and disguise
 
