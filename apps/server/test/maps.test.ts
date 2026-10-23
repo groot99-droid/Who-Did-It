@@ -55,15 +55,6 @@ describe('lobby.settings {map} (GDD 3.13)', () => {
     expect(errors(guest)).toEqual([ErrorCode.cannot]);
   });
 
-  it('is all or nothing with the other fields, and is taken in the quick mode too', async () => {
-    const party = await lobbyOf(colyseus, 1);
-    const leader = party.humans[0]!;
-    await send(leader, C2S.lobbySettings, { mode: 1, map: 'nowhere' });
-    expect(party.room.state.settings.mode).toBe(0);
-    await send(leader, C2S.lobbySettings, { mode: 1, map: 'blackpine' });
-    expect(party.room.state.settings).toMatchObject({ mode: 1, map: 'blackpine' });
-  });
-
   it('keeps the pick through the return to the lobby', async () => {
     const party = await blackpineMatch(4);
     resetToLobby(party.room);

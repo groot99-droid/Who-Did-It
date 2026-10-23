@@ -1,11 +1,13 @@
-import onubBalance from '@wdi/content/data/balance.onub.json';
+import balance from '@wdi/content/data/balance.json';
 import { cratesGame } from './crates';
 import { pourGame } from './pour';
 import { slideGame } from './slide';
 import { stokeGame } from './stoke';
 
-export type MiniGameSpec = (typeof onubBalance.stations)[number]['minigame'];
-export type MiniKind = MiniGameSpec['kind'];
+type Bases = typeof balance.minigames;
+export type MiniKind = 'crates' | 'pour' | 'slide' | 'stoke';
+/** One kind's numbers from `balance.json` `minigames` (GDD 3.16), tagged with the kind. */
+export type MiniGameSpec = { [K in MiniKind]: { kind: K } & Bases[K] }[MiniKind];
 
 /** What a mini-game is given: its slot, its station's numbers and a local RNG for the bands. */
 export interface MiniGameHost {

@@ -1,13 +1,11 @@
-import { balance, onubRoles, roles } from '@wdi/content';
+import { balance, roles } from '@wdi/content';
 import { ErrorCode, Phase, type PlayerState, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { fixedDealFits } from './Deck';
 import { beginFinalNight, endHunt, enforceFinalVote, isFinalNightRound } from './FinalNight';
 import { countRow, flowOf, isMeetingPhase, refuse, setPhase } from './Flow';
-import { onubClock, runOnubPhases } from './Conductor';
 import { enterImmunity, openMeeting, runMeeting } from './Meeting';
 import { isAiming } from './NightPowers';
-import { isOnub } from './onub/state';
 import { simOf } from './RoomSim';
 import { endMatch, evaluateWin, resetToLobby } from './Win';
 import { isWorldPhase } from './World';
@@ -28,7 +26,6 @@ export function runPhases(room: PartyRoom): void {
     if (state.tick >= state.phaseEndsTick) resetToLobby(room);
     return;
   }
-  if (isOnub(room)) return runOnubPhases(room); // quick mode: dusk, the night, dawn, one meeting (round 4, R)
   if (drainDeaths(room)) return;
   if (isMeetingPhase(state.phase)) {
     sim.meetingRequests.length = 0;
@@ -124,20 +121,18 @@ function runDebugCommands(room: PartyRoom): void {
     const payload = (cmd.payload ?? {}) as Record<string, unknown>;
     if (cmd.type === 'deal') {
       const fixed = payload.roles;
-      // In quick mode the fixed cards are validated against roles.onub.json (GDD 3.11); in the main mode against
-      // the deck of the party (only its cards, each as often as it holds it; `deck/wire.md` 5).
-      const known = isOnub(room) ? onubRoles.roles : roles.roles;
+      // The fixed cards are validated against the deck of the party (only its cards, each as often as it holds
+      // it; `deck/wire.md` 5).
+      const known = roles.roles;
       const strings =
         fixed !== null &&
         typeof fixed === 'object' &&
         Object.values(fixed).every((r) => typeof r === 'string' && known[r] !== undefined);
-      const valid =
-        strings && (isOnub(room) || fixedDealFits(fixed as Record<string, string>, room.state.players.size));
+      const valid = strings && fixedDealFits(fixed as Record<string, string>, room.state.players.size);
       if (valid) flow.fixedDeal = { ...(fixed as Record<string, string>) };
       else refuse(room, cmd.sessionId, ErrorCode.cannot, 'bad deal');
       continue;
     }
-    if (cmd.type === 'clock' && onubClock(room, cmd.sessionId, payload)) continue;
     const name = payload.phase;
     const target = typeof name === 'string' ? CLOCK_PHASES[name] : undefined;
     if (name !== undefined && !target) {

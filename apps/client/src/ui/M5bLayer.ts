@@ -1,5 +1,4 @@
 import balance from '@wdi/content/data/balance.json';
-import onubBalance from '@wdi/content/data/balance.onub.json';
 import minigames from '@wdi/content/data/minigames.json';
 import quests from '@wdi/content/data/quests.json';
 import recipes from '@wdi/content/data/recipes.json';
@@ -90,14 +89,7 @@ export function promptFor(t: Target | null, hasTool: (item: string) => boolean):
 
 /** The board a `?minigame=<kind>` run opens (a dev flag, like the server's `minigameStart` without a server). */
 export function devBoard(kind: MinigameKind, seed = 7) {
-  const stations = onubBalance.stations;
-  const spec = (k: MinigameKind) => stations.find((s) => s.minigame.kind === k)!.minigame;
-  const bases = {
-    crates: spec('crates'),
-    pour: spec('pour'),
-    slide: spec('slide'),
-    stoke: spec('stoke'),
-  } as unknown as MinigameBases;
+  const bases: MinigameBases = balance.minigames;
   const def = Object.values(minigames.minigames).find((m) => m.kind === kind);
   return {
     taskId: def?.task ?? 'devTask',

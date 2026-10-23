@@ -7,10 +7,7 @@ export * from './votes';
 export * from './win';
 export * from './kill';
 export * from './clues';
-// Round 4 (docs/SESSIONS.md): S added npc. Round 5: 5A fills onub (table, deal, prep), 5B fills onubNight
-// (acts, wake view, vote, winners); nobody else edits this file.
-export * from './onub';
-export * from './onubNight';
+// Round 4 (docs/SESSIONS.md): S added npc. Round 7: 7J removed the quick mode's onub and onubNight (A115).
 export * from './npc';
 // Round 6 (docs/round6/seams.md 1.1): 6J fills cutscenes, 6H fills minigames; nobody else edits this file.
 export * from './cutscenes';

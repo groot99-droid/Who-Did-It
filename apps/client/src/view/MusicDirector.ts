@@ -55,7 +55,6 @@ export function mainClassFor(phase: number): MainClass | undefined {
 export function onubClassFor(phase: number): OnubClass | undefined {
   switch (phase) {
     case Phase.dusk:
-    case Phase.prepReveal:
       return 'kitchen';
     case Phase.night:
       return 'night';

@@ -3,7 +3,7 @@
 // runAutoMatch`), no network: one line per match (winner, ticks, rounds, failures), every invariant failure with the
 // four seed words of each stream so the admin page can replay it, exit 1 on any failure.
 //
-//   pnpm auto -- [--matches 20] [--seed 7] [--map hollowmere|blackpine] [--mode main|onub]
+//   pnpm auto -- [--matches 20] [--seed 7] [--map hollowmere|blackpine]
 //                [--difficulty easy|normal|hard] [--seats 10] [--json]
 import { Winner } from '@wdi/shared';
 import {
@@ -19,7 +19,7 @@ import './checks';
 const opts = parseArgs(process.argv.slice(2).filter((a) => a !== '--'));
 if (opts === null) {
   console.error(
-    'usage: pnpm auto -- [--matches N] [--seed N] [--map ID] [--mode main|onub] [--difficulty L] [--seats N] [--json]',
+    'usage: pnpm auto -- [--matches N] [--seed N] [--map ID] [--difficulty L] [--seats N] [--json]',
   );
   process.exit(2);
 }
@@ -43,7 +43,6 @@ try {
     const t0 = performance.now();
     const r = await runAutoMatch(colyseus, {
       map: opts.map,
-      mode: opts.mode,
       seats: opts.seats,
       difficulty: opts.difficulty,
       seeds: seedWordsFor(opts.seed, m, AUTO_STREAMS),

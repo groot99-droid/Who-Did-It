@@ -250,21 +250,6 @@ describe('Ready and the public look (P7)', () => {
     });
     expect(covers).toBeGreaterThanOrEqual(1);
   });
-
-  it('in the quick mode every ready stays false through the card too', async () => {
-    const { bots, room } = await party(5);
-    bots[0]?.room.send(C2S.lobbySettings, { mode: 1 });
-    await sleep(150);
-    bots[0]?.room.send(C2S.lobbyStart, {});
-    await sleep(350);
-    if (room.state.phase !== Phase.roleReveal) return; // the quick-mode Start is 5A's; nothing to check without it
-    for (const bot of bots) bot.room.send(C2S.lobbyReady, { ready: true });
-    await sleep(100);
-    stateOf(bots[0] as Bot).players.forEach((p: PlayerState) => expect(p.ready).toBe(false));
-    for (const bot of bots) expect(cardOf(bot).deck).toBeUndefined();
-    for (const bot of bots) expect(cardOf(bot).look).toBeUndefined();
-    for (const bot of bots) expect(cardOf(bot).coverHints).toBeUndefined();
-  });
 });
 
 describe('role.cover refusals and mates (P14)', () => {

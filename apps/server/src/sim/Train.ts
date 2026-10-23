@@ -5,7 +5,6 @@ import { emitSim } from './events/bus';
 import { secondsToTicks } from './Flow';
 import { mapIdOfRoom, stationOf } from './MapSites';
 import { emitNoise } from './Noise';
-import { isOnub } from './onub/state';
 import { isWorldPhase } from './World';
 
 /**
@@ -35,7 +34,6 @@ export function runTrain(room: PartyRoom): void {
     trains.delete(room);
     return;
   }
-  if (isOnub(room)) return;
   const station = stationOf(room);
   if (!station) return;
   let train = trains.get(room);

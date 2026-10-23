@@ -11,7 +11,7 @@ export interface MatchLine {
   failures: { name: string; tick: number; detail: string }[];
   seeds: Record<string, number[]>;
   npcIds: string[];
-  log?: { kills?: number; mode?: string };
+  log?: { kills?: number };
 }
 
 export interface Report {

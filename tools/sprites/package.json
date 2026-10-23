@@ -20,9 +20,6 @@
     "world": "tsx world.ts",
     "review:world": "tsx review-world.ts",
     "lineup": "tsx lineup.ts",
-    "onub": "tsx onub.ts",
-    "onub:cards": "tsx onub-cards.ts",
-    "onub:mini": "tsx onub-mini.ts",
     "m5b": "tsx m5b.ts"
   },
   "dependencies": {

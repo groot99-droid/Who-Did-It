@@ -147,7 +147,6 @@ export function checkMaps(c: MapContent): string[] {
     const map = c.maps[id];
     const err = (msg: string) => errors.push(`map ${id}: ${msg}`);
     if (map.id !== id) err(`file holds map "${map.id}"`);
-    if (map.modes.includes('onub')) err('the quick mode does not walk, so no map lists it (GDD 3.11)');
     if (new Set(map.scenes).size !== map.scenes.length) err('a scene is listed twice');
     for (const s of map.scenes) {
       if (owner.has(s)) err(`scene ${s} also belongs to map ${owner.get(s)}`);

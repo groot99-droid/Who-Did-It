@@ -1,13 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import onubBalance from '@wdi/content/data/balance.onub.json';
+import balance from '@wdi/content/data/balance.json';
 import { CART, CratesModel, needleAt } from './crates';
 
-const fridge = onubBalance.stations[0]!;
-
 describe('crates mini-game', () => {
-  it('reads its numbers from the fridge station', () => {
+  it('reads its numbers from balance.json', () => {
     const m = new CratesModel(() => 0.5);
-    expect(m.steps).toBe(fridge.minigame.kind === 'crates' ? fridge.minigame.steps : -1);
+    expect(m.steps).toBe(balance.minigames.crates.steps);
     expect(m.bandFrac).toBe(0.2);
   });
 

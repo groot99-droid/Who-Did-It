@@ -1,14 +1,11 @@
-import onubBalance from '@wdi/content/data/balance.onub.json';
+import balance from '@wdi/content/data/balance.json';
 import { fill } from '../../ui/copy';
 import { MINIGAME_COPY as C } from '../../ui/copy/minigames';
 import { h } from '../../ui/dom';
 import type { MiniGameFactory } from './registry';
 import { ART_H, ART_W, box, COLORS, createStage, inside, loop, type Rect } from './draw';
 
-const SPEC = onubBalance.stations.find((s) => s.minigame.kind === 'crates')!.minigame as {
-  steps: number;
-  bandFrac: number;
-};
+const SPEC = balance.minigames.crates;
 
 /** One sweep of the needle across the dial, in seconds. */
 export const NEEDLE_PERIOD_S = 1.6;

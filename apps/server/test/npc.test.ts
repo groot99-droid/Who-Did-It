@@ -153,20 +153,6 @@ describe('lobby.addNpc and lobby.removeNpc', () => {
 });
 
 describe('lobby.settings', () => {
-  it('writes the mode for the leader and refuses a bad value', async () => {
-    const party = await lobbyOf(colyseus, 2);
-    const [leader, guest] = [party.humans[0]!, party.humans[1]!];
-    await send(leader, C2S.lobbySettings, { mode: 1 });
-    expect(party.room.state.settings.mode).toBe(1);
-    await send(leader, C2S.lobbySettings, { mode: 0 });
-    expect(party.room.state.settings.mode).toBe(0);
-    await send(leader, C2S.lobbySettings, { mode: 2 });
-    await send(guest, C2S.lobbySettings, { mode: 1 });
-    await errorsAre(leader, [ErrorCode.cannot]);
-    await errorsAre(guest, [ErrorCode.cannot]);
-    expect(party.room.state.settings.mode).toBe(0);
-  });
-
   it('defaults the difficulty and accepts a change only with enough NPC seats', async () => {
     const party = await lobbyOf(colyseus, 1);
     const leader = party.humans[0]!;
@@ -178,16 +164,15 @@ describe('lobby.settings', () => {
     for (let i = 0; i < balance.npc.difficultyMinNpcs; i++) await send(leader, C2S.lobbyAddNpc, {}, 60);
     await send(leader, C2S.lobbySettings, { npcDifficulty: NpcLevel.hard });
     expect(party.room.state.settings.npcDifficulty).toBe(NpcLevel.hard);
-    await send(leader, C2S.lobbySettings, { npcDifficulty: 7, mode: 1 });
+    await send(leader, C2S.lobbySettings, { npcDifficulty: 7 });
     expect(party.room.state.settings.npcDifficulty).toBe(NpcLevel.hard);
-    expect(party.room.state.settings.mode).toBe(0);
   });
 });
 
 describe('NPC seats through the match', () => {
   it('survives resetToLobby: seats, count, ready and the settings stay', async () => {
     const party = await lobbyOf(colyseus, 1);
-    await send(party.humans[0]!, C2S.lobbySettings, { mode: 0 });
+    await send(party.humans[0]!, C2S.lobbySettings, {});
     await start(party);
     party.room.state.settings.npcDifficulty = NpcLevel.hard;
     const ids = npcSeats(party.room).map((p) => p.id);

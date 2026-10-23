@@ -4,7 +4,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { PORTAL_REACH_TILES } from '../constants';
 import { queuePortal } from '../PortalQueue';
 import { type PlayerSim, simOf } from '../RoomSim';
-import { isLoft, navGrid, profileOpen, sceneKey, tileCentre } from '../World';
+import { navGrid, profileOpen, sceneKey, tileCentre } from '../World';
 import { type Brain, type NpcMemory, playRng } from './memory';
 
 /** A path goal tile counts as arrived a little inside the reach, so a rounding step never refuses the act. */
@@ -190,5 +190,3 @@ export function firstPortalToward(
   }
   return null;
 }
-
-export const inLoft = (p: PlayerSim): boolean => isLoft(p.sceneIdx);

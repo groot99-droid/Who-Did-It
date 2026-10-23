@@ -8,7 +8,7 @@
 |---|---|---|---|
 | `input.move` | `{ seq: number; dx: number; dy: number; sprint: boolean; sneak: boolean }` | 25/s | 20 Hz; one applied per tick, newest wins; the vector is normalised server-side. |
 | `act.interact` | `{ targetId: string }` | 5/s | - |
-| `act.ability` | `{ abilityId: string; targetId?: string; targets?: string[] }` | 5/s | Main mode: `targetId` names the target per the ability's `target`: `player` (Kill, Bandage) an avatar handle, `seat` (Impersonate, the night powers, Last Shot) a seat id. Quick mode: `targets` names every pick, in order: `[stationId, cardId]` for `onub.prep`, card slots for a night act (none for `onub.inspect`). |
+| `act.ability` | `{ abilityId: string; targetId?: string }` | 5/s | `targetId` names the target per the ability's `target`: `player` (Kill, Bandage) an avatar handle, `seat` (Impersonate, the night powers, Last Shot) a seat id. |
 | `act.hold` | `{ action: HoldAction; targetId: string; on: boolean }` | 5/s | Re-validated every tick. |
 | `act.hide` | `{ spotId: string }` | 5/s | - |
 | `act.check` | `{ spotId: string }` | 5/s | - |
@@ -18,7 +18,7 @@
 | `act.bell` | `Record<string, never>` | 2/s | - |
 | `act.present` | `{ entryId: string }` | 2/s | - |
 | `act.light` | `{ on: boolean }` | 5/s | Round 6: `on` lights the carried Lantern or Torch, or puts it out; refused 422 without one. |
-| `meeting.vote` | `{ targetId: string }` | 2/s | A living player's id, or `"skip"`; quick mode: another seat's id or `"pantry"`, never `"skip"`. Changeable until the vote closes (A30). |
+| `meeting.vote` | `{ targetId: string }` | 2/s | A living player's id, or `"skip"`. Changeable until the vote closes (A30). |
 | `chat.say` | `{ text: string }` | 2/s | - |
 | `chat.quick` | `{ phraseId: string }` | 2/s | - |
 | `world.ping` | `{ x: number; y: number }` | 2/s | - |
@@ -26,10 +26,9 @@
 | `net.ping` | `{ t: number }` | - | - |
 | `lobby.start` | `Record<string, never>` | 2/s | Leader only, phase lobby, at least 1 human (GDD 3.12). Refused with error 422 otherwise. |
 | `lobby.ready` | `{ ready: boolean }` | 2/s | Lobby: the Ready tick. Role card: dismisses the card; the match begins when all are ready or `phases.roleRevealS` passes. |
-| `lobby.settings` | `{ mode?: number; npcDifficulty?: number; onubDeck?: string[]; map?: string }` | 2/s | Leader only, phase lobby: `mode` is a `GameMode`, `npcDifficulty` an `NpcLevel` (A39); `onubDeck` a custom quick-mode deck (role ids, `[]` for the default), checked by `onubDeckProblem` without the size (GDD 3.11); `map` a map id of `MAP_IDS` (GDD 3.13; ignored until Session 5J reads it). All or nothing; refused 422 / 425. |
+| `lobby.settings` | `{ npcDifficulty?: number; map?: string }` | 2/s | Leader only, phase lobby: `npcDifficulty` an `NpcLevel` (A39); `map` a map id of `MAP_IDS` (GDD 3.13). All or nothing; refused 422 / 425. |
 | `lobby.addNpc` | `Record<string, never>` | 2/s | Leader only, phase lobby: one NPC seat up to `players.max` (GDD 3.12). |
 | `lobby.removeNpc` | `Record<string, never>` | 2/s | Leader only, phase lobby: removes the most recently added NPC seat; none left is 422. No id, so it never tells a seat apart (A39). |
-| `meeting.claim` | `OnubClaimPayload` | 2/s | Quick mode, a seat in play in the Rush or CRUST: replaces the seat's claim (GDD 3.11). |
 | `role.cover` | `{ lookId: string }` | 4/s | Main mode, role card only, a cover role: picks the look it will walk as (a look of a non-cover card of the deck); changeable until the card closes (GDD 3.17). Refused 425 outside the card, 422 otherwise. |
 | `quest.accept` | `{ questId: string }` | 2/s | Round 6 (M5b, GDD 3.16): a `quests.json` id whose giver stands in reach. Refused 422 until Session 6H lands. |
 | `quest.turnIn` | `{ questId: string }` | 2/s | Round 6 (M5b, GDD 3.16): an accepted quest whose wants the inventory holds, at its giver. Refused 422 until 6H. |
@@ -48,13 +47,10 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `chat.msg` | `{ from: string; text: string; channel: ChatChannel }` | Private: routed per recipient; `from` is a player id. |
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
-| `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string; outs?: string[]; hop?: string; pantryOut?: boolean; roles?: Record<string, string>; abstained?: string[]; }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). Quick mode (3.11): `tally` counts `"pantry"` instead of `"skip"`; `outs` are the seats in the oven (the drag included), `hop` the seat the Critique dragged in, `pantryOut` whether the Pantry was at the top, `roles` the final Role cards of `outs`, `abstained` the seats in play that did not vote. |
-| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; onub?: OnubGameOver; alsoWon?: string[]; undealt?: string[]; }` | `roles` are the final roles; `onub` is present in quick mode only (GDD 3.11). Main mode: `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). |
+| `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). |
+| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). |
 | `noise` | `{ sceneId: string; x: number; y: number; kind: string }` | - |
 | `error` | `{ code: ErrorCode; msg: string }` | - |
-| `nightWake` | `{ windowRole: string; endsTick: number; view: OnubWakeView }` | Private, quick mode: your window is open until `endsTick` (GDD 3.11). Sent again inside the window when `view.legal` changes (the Tourrier's second step); the latest one wins. Never sent to a sleeper. |
-| `nightReveal` | `{ entries: NightRevealEntry[] }` | Private, quick mode: what you learned, the same rows `Private.nightReveal` gains. Sent for every accepted act (empty for an act that shows nothing), for the sightings at a window's opening and for the proofing perk. |
-| `nightSleep` | `Record<string, never>` | Private, quick mode: your window closed; back to the lights-out screen. |
 | `vfx` | `{ sceneId: string; x: number; y: number; kind: 'disguise' }` | To every client whose view holds that scene: the puff of a disguise a Knife strike dropped, at (x, y). Names no handle or seat. Sent only from `handleKill` (GDD 3.17). |
 | `aim` | `{ endsTick: number }` | Private, a dying Gamekeeper: pick a seat with `act.ability {abilityId: 'lastShot'}` before `endsTick` (GDD 3.2). |
 | `inherit` | `Record<string, never>` | Private, an Accomplice: the Knife passed to you (GDD 3.2 Inherit); nothing public changes. |
@@ -119,8 +115,6 @@ export interface RoleRevealPayload {
   beware: string;
   teammates: RoleRevealTeammate[];
   traits: TraitIds;
-  /** Quick mode: the card's team name (`roles.onub.json` `teams[team].name`), shown in place of the faction. */
-  teamName?: string;
   /** Main mode only. The match's deck, card role ids in deck order; identical for every seat (GDD 3.1). */
   deck?: string[];
   /** Main mode only. The look this seat walks as: its card's, or a cover role's first hint (GDD 3.17). */
@@ -135,127 +129,6 @@ export interface RoleRevealPayload {
    * in `rules/deck.ts`). Absent for every other seat.
    */
   coverHints?: string[];
-}
-```
-
-```ts
-export interface NightRevealEntry {
-  slot: string;
-  kind: 'role' | 'loc' | 'mate';
-  value: string;
-  of: string;
-}
-```
-
-```ts
-export interface OnubLegalAct {
-  /** An `ONUB_ACTS` id. */
-  act: string;
-  /** How many distinct slots `act.ability.targets` must name; 0 for `onub.inspect`. */
-  picks: number;
-  /** The pool the picks come from; empty when `picks` is 0. */
-  slots: string[];
-}
-```
-
-```ts
-export interface OnubWakeView {
-  /** Other seats dealt this window's role (`seeEachOther`): the other Spore, the other Commis. */
-  mates: string[];
-  /** Seats dealt a role this window is shown (`sees`): the Levain's Spores. */
-  seen: { seat: string; roleId: string }[];
-  /** `seeEachOther` and nobody else was dealt this role: a lone Spore or a lone Commis. */
-  alone: boolean;
-  /** The slot under the Iron Cloche, or empty. */
-  cloche: string;
-  /** The acts open to this seat now: empty for a window that only shows, or once the seat has acted. */
-  legal: OnubLegalAct[];
-  /** The window's act is mandatory: the server completes it by seed when the window ends. */
-  must: boolean;
-}
-```
-
-```ts
-export interface OnubActLogEntry {
-  /** The window's `order`. */
-  order: number;
-  /** The acting window's role id (the actor's dealt role), never the actor's seat. */
-  roleId: string;
-  /** An `ONUB_ACTS` id. */
-  act: string;
-  /** The slots the act named; for a swap with the actor's own card, the actor's slot first. */
-  slots: string[];
-  /** The server made it by seed when the window ended (a must-act left undone). */
-  auto: boolean;
-}
-```
-
-```ts
-export interface OnubPileOver {
-  cards: string[];
-  lost: string[];
-  net: number;
-  underMixed: boolean;
-}
-```
-
-```ts
-export interface OnubGameOver {
-  /** The deal order: `seat.<i>.*` slots name `seats[i]`. */
-  seats: string[];
-  /** The deck in play. */
-  deck: string[];
-  /** Seat -> Role card dealt; seat -> Role card held at dawn. */
-  dealt: Record<string, string>;
-  final: Record<string, string>;
-  /** Seat -> station chosen at prep (its Location card dealt); seat -> Location card held at dawn. */
-  dealtLoc: Record<string, string>;
-  finalLoc: Record<string, string>;
-  /** Seat -> the Ingredient card it played (a card the thaw discarded included). */
-  prepCards: Record<string, string>;
-  /** Seats whose prep the server completed at the timeout. */
-  prepAuto: string[];
-  /** The Pantry's Role and Location cards, as dealt and at dawn, slot `k` at index `k`. */
-  pantryRolesDealt: string[];
-  pantryRoles: string[];
-  pantryLocsDealt: string[];
-  pantryLocs: string[];
-  /** Station id -> its pile. */
-  piles: Record<string, OnubPileOver>;
-  ruinWeight: number;
-  ruined: boolean;
-  /** The Iron Cloche's slot, or empty. */
-  cloche: string;
-  actLog: OnubActLogEntry[];
-  /** Voter -> seat id or `"pantry"`; an abstention is absent. */
-  votes: Record<string, string>;
-  /** Seats in the oven, the Critique's drag included. */
-  outs: string[];
-  /** The seat the Critique dragged in, or empty. */
-  hop: string;
-  /** The Pantry was among the top of the vote. */
-  pantryOut: boolean;
-  /** The `balance.onub.json` winners row that applied. */
-  rowId: string;
-  /** The seats that won. */
-  winnerIds: string[];
-}
-```
-
-```ts
-export interface ClaimSawPayload {
-  targetId: string;
-  roleId?: string;
-  stationId?: string;
-}
-```
-
-```ts
-export interface OnubClaimPayload {
-  roleId: string;
-  stationId?: string;
-  cardId?: string;
-  saw?: ClaimSawPayload[];
 }
 ```
 
@@ -279,7 +152,6 @@ export interface PartyListing {
   leader: string;
   players: number;
   max: number;
-  mode: number;
   map: string;
   visibility: PartyVisibility;
 }
@@ -313,7 +185,7 @@ Round 6 (`docs/round6/auto-admin.md` 6). Accepted by the `admin` room alone, whi
 
 | Type | Payload | Notes |
 |---|---|---|
-| `admin.setup` | `{ map: string; mode: 'main' \| 'onub'; seats: number; difficulty: 'easy' \| 'normal' \| 'hard'; deck?: string[]; seeds?: FixedSeeds; }` | Configure the next match: a `MAP_IDS` id, the mode, the seat count (all NPCs), the difficulty, an optional deck and seed words. Applied at the next `admin.start`. |
+| `admin.setup` | `{ map: string; seats: number; difficulty: 'easy' \| 'normal' \| 'hard'; seeds?: FixedSeeds; }` | Configure the next match: a `MAP_IDS` id, the seat count (all NPCs), the difficulty and seed words. Applied at the next `admin.start`. |
 | `admin.start` | `Record<string, never>` | Start the configured match inside the step (`runAuto` calls `startMatch`); no leader is needed. |
 | `admin.reset` | `Record<string, never>` | Back to the lobby with the same setup, the clock paused. |
 | `admin.clock` | `{ scale?: ClockScale; paused?: boolean; step?: number }` | Set the speed, pause or resume, or run `step` ticks while paused. |

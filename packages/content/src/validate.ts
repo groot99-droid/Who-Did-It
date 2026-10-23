@@ -7,8 +7,6 @@ import { PLAYER_COUNTS } from './schemas/common.js';
 import type { ItemsFile } from './schemas/items.js';
 import type { LooksFile } from './schemas/looks.js';
 import type { MetricsFile } from './schemas/metrics.js';
-import type { OnubBalanceFile } from './schemas/onubBalance.js';
-import type { OnubRolesFile } from './schemas/onubRoles.js';
 import type { PaletteFile } from './schemas/palette.js';
 import type { RolesFile } from './schemas/roles.js';
 import { RoutineWorldPhase, type RoutinesFile } from './schemas/routines.js';
@@ -37,8 +35,6 @@ export interface Content {
   balance: BalanceFile;
   scenes: Record<SceneId, Scene>;
   maps: Record<MapId, MapFile>;
-  onubRoles: OnubRolesFile;
-  onubBalance: OnubBalanceFile;
   looks: LooksFile;
   routines: RoutinesFile;
   // Round 6 (docs/round6/seams.md 1.2), empty until their sessions fill them.
@@ -67,7 +63,7 @@ function keyedById(file: string, map: Record<string, { id: string }>, errors: st
 export function validateContent(c: Content): string[] {
   const errors: string[] = [];
   const err = (msg: string) => errors.push(msg);
-  const { roles, abilities, items, clues, tasks, balance, onubRoles, onubBalance } = c;
+  const { roles, abilities, items, clues, tasks, balance } = c;
   const scenes: Record<string, Scene | undefined> = c.scenes;
 
   keyedById('roles.json', roles.roles, errors);
@@ -75,8 +71,6 @@ export function validateContent(c: Content): string[] {
   keyedById('items.json', items.items, errors);
   keyedById('clues.json', clues.clues, errors);
   keyedById('tasks.json', tasks.tasks, errors);
-  keyedById('roles.onub.json', onubRoles.roles, errors);
-  keyedById('balance.onub.json acts', onubBalance.acts, errors);
 
   const isItem = (id: string) => id in items.items;
   const isAbility = (id: string) => id in abilities.abilities;
@@ -234,9 +228,6 @@ export function validateContent(c: Content): string[] {
     const expected: Profile = count <= 6 ? 'small' : count <= 8 ? 'medium' : 'large';
     if (profile !== expected) err(`balance ${n}: profile ${profile}, WORLD 4.3 says ${expected}`);
   }
-
-  // Quick mode (ONUB v2, GDD 3.11): roles, stations and cards, decks, windows and acts.
-  checkOnub(onubRoles, onubBalance, err);
 
   // NPC routines (GDD 3.12): the stations by prop kind and the npc spans.
   checkRoutines(c, err);
@@ -695,123 +686,6 @@ function checkRoutines(c: Content, err: (msg: string) => void): void {
 export function assertValid(c: Content): void {
   const errors = validateContent(c);
   if (errors.length) throw new Error(`@wdi/content is inconsistent:\n- ${errors.join('\n- ')}`);
-}
-
-/** The ONUB v2 cross-file rules: every id a record names exists, decks obey `copies`, windows and acts chain. */
-function checkOnub(onubRoles: OnubRolesFile, onubBalance: OnubBalanceFile, err: (msg: string) => void): void {
-  const { roles, scenes, teams } = onubRoles;
-  const { stations, cards, acts, windows } = onubBalance;
-  for (const [key, team] of Object.entries(teams)) {
-    if (key !== team.id) err(`roles.onub.json teams: key "${key}" holds team "${team.id}"`);
-  }
-  for (const [key, scene] of Object.entries(scenes)) {
-    if (key !== scene.id) err(`roles.onub.json scenes: key "${key}" holds scene "${scene.id}"`);
-  }
-  for (const [key, card] of Object.entries(cards)) {
-    if (key !== card.id) err(`balance.onub.json cards: key "${key}" holds card "${card.id}"`);
-  }
-
-  // Roles.
-  const windowRoles = windows.map((w) => w.role);
-  for (const role of Object.values(roles)) {
-    if (!(role.scene in scenes)) err(`onub role ${role.id}: unknown scene ${role.scene}`);
-    if (role.spore && role.team !== 'mold') err(`onub role ${role.id}: a Spore is Team Mold`);
-    if (role.sabotages !== (role.team === 'mold')) err(`onub role ${role.id}: sabotages iff Team Mold`);
-    if (new Set(role.copies).size !== role.copies.length) err(`onub role ${role.id}: copies repeat`);
-    if (role.wakes !== windowRoles.includes(role.id)) {
-      err(`onub role ${role.id}: wakes=${role.wakes} but ${role.wakes ? 'has no' : 'has a'} window`);
-    }
-  }
-  if (!Object.values(roles).some((r) => r.spore && r.required)) err('roles.onub.json: no required Spore');
-
-  // Stations and their ingredient cards: each card in exactly one hand, of its own station and kind.
-  const stationIds = stations.map((s) => s.id);
-  if (new Set(stationIds).size !== stationIds.length) err('balance.onub.json: a station id repeats');
-  const listed = new Map<string, number>();
-  for (const s of stations) {
-    if ((s.underMixBelow === undefined) !== (s.underMixWeight === undefined)) {
-      err(`onub station ${s.id}: underMixBelow and underMixWeight go together`);
-    }
-    for (const [kind, ids] of [
-      ['good', s.good],
-      ['sabotage', s.sabotage],
-    ] as const) {
-      for (const id of ids) {
-        listed.set(id, (listed.get(id) ?? 0) + 1);
-        const card = cards[id];
-        if (!card) err(`onub station ${s.id}: unknown card ${id}`);
-        else if (card.station !== s.id || card.kind !== kind)
-          err(`onub card ${id}: listed as ${s.id} ${kind}`);
-      }
-    }
-  }
-  for (const card of Object.values(cards)) {
-    if (!stationIds.includes(card.station)) err(`onub card ${card.id}: unknown station ${card.station}`);
-    if (listed.get(card.id) !== 1)
-      err(`onub card ${card.id}: in ${listed.get(card.id) ?? 0} hands, expected 1`);
-  }
-
-  // Default decks: player count + Pantry roles, each role within its copies, every required role present.
-  for (const n of PLAYER_COUNTS) {
-    const deck = onubBalance.byCount[n].deck;
-    const size = Number(n) + onubBalance.pantry.roles;
-    if (deck.length !== size) err(`onub ${n}: deck has ${deck.length} cards, expected ${size}`);
-    const counts = new Map<string, number>();
-    for (const id of deck) counts.set(id, (counts.get(id) ?? 0) + 1);
-    for (const [id, count] of counts) {
-      const role = roles[id];
-      if (!role) err(`onub ${n}: unknown role ${id}`);
-      else if (role.ships !== 'V1') err(`onub ${n}: ${id} does not ship in V1`);
-      else if (!role.copies.includes(count))
-        err(`onub ${n}: ${count} x ${id}, allowed ${role.copies.join(' or ')}`);
-    }
-    for (const role of Object.values(roles)) {
-      if (role.required && !counts.has(role.id)) err(`onub ${n}: deck lacks ${role.id}`);
-    }
-  }
-
-  // Windows and acts: one window per waking role in order; every act is reached by a window or a `then`.
-  if (new Set(windowRoles).size !== windowRoles.length) err('onub: a role has two night windows');
-  const reached = new Set<string>();
-  windows.forEach((w, i) => {
-    if (w.order !== i + 1) err(`onub window ${w.role}: order ${w.order}, expected ${i + 1}`);
-    if (!roles[w.role]) err(`onub window: unknown role ${w.role}`);
-    for (const id of w.sees) if (!roles[id]) err(`onub window ${w.role}: sees unknown role ${id}`);
-    if (w.onlyIfAlone && !w.seeEachOther) err(`onub window ${w.role}: onlyIfAlone needs seeEachOther`);
-    if (w.onTimeout === 'seededPick' && w.acts.length !== 1)
-      err(`onub window ${w.role}: a must-act has one act`);
-    for (const id of w.acts) {
-      const act = acts[id];
-      if (!act) err(`onub window ${w.role}: unknown act ${id}`);
-      else if (act.effect === 'swapWithPeeked') err(`onub window ${w.role}: ${id} is only a second step`);
-      reached.add(id);
-    }
-  });
-  for (const act of Object.values(acts)) {
-    if (act.then === undefined) continue;
-    const next = acts[act.then];
-    if (!next) err(`onub act ${act.id}: unknown then ${act.then}`);
-    else if (next.effect !== 'swapWithPeeked' || act.effect !== 'peek')
-      err(`onub act ${act.id}: then needs peek -> swapWithPeeked`);
-    reached.add(act.then);
-  }
-  for (const id of Object.keys(acts)) if (!reached.has(id)) err(`onub act ${id}: no window or step uses it`);
-
-  // Ranges and the winners table.
-  const winnerIds = onubBalance.winners.map((w) => w.id);
-  if (new Set(winnerIds).size !== winnerIds.length) err('balance.onub.json: a winners row id repeats');
-  const { npc, timers, targetLengthMin } = onubBalance;
-  const ranges: [string, { min: number; max: number }][] = [
-    ['npc.commitS', npc.commitS],
-    ['npc.actFrac', npc.actFrac],
-    ['npc.claimFrac', npc.claimFrac],
-    ['npc.voteFrac', npc.voteFrac],
-    ['npc.stepS', npc.stepS],
-    ['timers.sleeperPulse', { min: timers.sleeperPulseMinS, max: timers.sleeperPulseMaxS }],
-    ['timers.crustCountdownS (inside voteS)', { min: timers.crustCountdownS, max: timers.voteS }],
-    ['targetLengthMin', targetLengthMin],
-  ];
-  for (const [name, r] of ranges) if (r.min > r.max) err(`balance.onub.json ${name}: min > max`);
 }
 
 const SOLID_USED_FROM_FLOOR = new Set(['D', 'H', 'B']);
