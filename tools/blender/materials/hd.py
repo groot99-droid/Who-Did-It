@@ -22,8 +22,9 @@ import rig_common as rc  # noqa: E402
 CATCHER = rc.CATCHER_NAME
 
 
-def apply(scene: bpy.types.Scene, rim_hex: str | None = None) -> None:
-    """The whole HD finish; `rim_hex` keys the rim to another lamp colour than `lantern`."""
+def apply(scene: bpy.types.Scene, rim_hex: str | None = None, rim_amount: float | None = None) -> None:
+    """The whole HD finish; `rim_hex` keys the rim to another lamp colour than `lantern`, `rim_amount`
+    overrides `rimAmount` (static_common passes `rimAmountWorld`: the rim is for figures)."""
     r, e = scene.render, scene.eevee
     r.filter_size = rc.HD["filterSize"]
     e.taa_render_samples = rc.HD["taaSamples"]
@@ -43,7 +44,8 @@ def apply(scene: bpy.types.Scene, rim_hex: str | None = None) -> None:
     # The inverted-hull outline wraps every model: both its faces are backfaces to a shadow ray, so culling
     # them keeps the hull from shadowing the model it outlines.
     bpy.data.materials[build_rig.OUTLINE_MATERIAL].use_backface_culling_shadow = True
-    smooth_toon_group(rim_hex or rc.PALETTE[rc.HD["rimToken"]], rc.HD["rimAmount"])
+    amount = rc.HD["rimAmount"] if rim_amount is None else rim_amount
+    smooth_toon_group(rim_hex or rc.PALETTE[rc.HD["rimToken"]], amount)
     add_catcher(scene)
 
 
