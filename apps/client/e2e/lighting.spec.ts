@@ -4,13 +4,18 @@ import { createParty } from './fixtures/party';
 // The darkness layer (SPRITES 10.11) covers the whole canvas, also after the window changes size. Before the fix it
 // kept the centre of its first size and left a strip uncovered on the left and top, which read as a shadow's edge.
 
-async function toWorld(page: Page): Promise<void> {
-  await page.goto('/Who-Did-It/?mock=1');
+async function toWorld(page: Page, query = ''): Promise<void> {
+  await page.goto(`/Who-Did-It/?mock=1${query}`);
   await createParty(page, 'Hana');
   await expect(page.getByTestId('player-list')).toContainText('Hana');
   await page.getByTestId('start').click();
   await page.getByTestId('confirm-start').click();
   await page.getByTestId('ready').click();
+  if (query.includes('cutscene=1')) {
+    await expect(page.getByTestId('cutscene')).toBeVisible();
+    await page.waitForTimeout(1500);
+    await page.getByTestId('cutscene-skip').click();
+  }
   await expect(page.getByTestId('hud-clock')).toBeVisible();
 }
 
@@ -63,3 +68,19 @@ test('the darkness layer covers the canvas at start and after a resize', async (
   await expect.poll(async () => (await layer(page))?.cw).toBe(1470);
   expectCovers(await layer(page));
 });
+
+for (const [width, height] of [
+  [1340, 720],
+  [1470, 830],
+] as const) {
+  test(`after the opening is skipped at ${width} x ${height}, the layer still covers the canvas`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height });
+    await toWorld(page, '&cutscene=1');
+    await page.waitForTimeout(1000);
+    const l = await layer(page);
+    expect(l?.cw).toBe(width);
+    expectCovers(l);
+  });
+}
