@@ -1,0 +1,133 @@
+/*
+ * Who Did It: the admin page in the night theme (round 7, 7G; docs/UI.md 14.31, DECISIONS A111).
+ *
+ * The owner's page (round 6, UI.md 14.23) wears the same dark glass as the table screens: indigo fill with a snow
+ * rim, lilac text, Press Start 2P on the controls, Pixelify Sans on the rest, Inter on the log (running text, A106).
+ * Every rule doubles its own class so it beats the paper rules of components.css without editing that file; the
+ * sign-in panel and the notice are mounted outside `.wdi-admin`, so nothing here relies on that root. Ids, testids
+ * and the markup are unchanged. No blur and no clip-path: six live viewports run behind these panels.
+ */
+
+.wdi-admin.wdi-admin {
+  font-family: var(--wdi-font-pixel-text);
+  color: var(--wdi-night-text);
+}
+
+.wdi-admin__controls.wdi-admin__controls,
+.wdi-admin__signin.wdi-admin__signin,
+.wdi-admin__inspector.wdi-admin__inspector,
+.wdi-admin__log.wdi-admin__log,
+.wdi-admin__notice.wdi-admin__notice {
+  font-family: var(--wdi-font-pixel-text);
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-glass-fill);
+  background-image: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.28);
+}
+
+.wdi-admin__signin.wdi-admin__signin {
+  box-shadow:
+    inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.28),
+    var(--wdi-shadow-3);
+}
+
+.wdi-admin__signin h1,
+.wdi-admin h2,
+.wdi-admin h3 {
+  font-family: var(--wdi-font-pixel-display);
+  font-weight: 400;
+  letter-spacing: var(--wdi-tracking-caps);
+  color: var(--wdi-night-label);
+}
+
+.wdi-admin__signin h1 {
+  margin: 0;
+  font-size: var(--wdi-text-md);
+}
+
+.wdi-admin h2,
+.wdi-admin h3 {
+  font-size: var(--wdi-text-xs);
+  text-transform: uppercase;
+}
+
+.wdi-admin__btn.wdi-admin__btn,
+.wdi-admin__seat.wdi-admin__seat {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+  color: var(--wdi-night-label);
+  background-color: rgb(var(--wdi-violet-rgb) / 0.55);
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.28);
+}
+
+.wdi-admin__btn.wdi-admin__btn:hover:not(:disabled),
+.wdi-admin__seat.wdi-admin__seat:hover:not(:disabled) {
+  background-color: rgb(var(--wdi-violet-rgb) / 0.8);
+}
+
+.wdi-admin__btn.wdi-admin__btn:disabled {
+  opacity: 0.55;
+}
+
+.wdi-admin__btn.wdi-admin__btn[aria-pressed='true'],
+.wdi-admin__seat.wdi-admin__seat[aria-pressed='true'],
+.wdi-admin__btn--go.wdi-admin__btn--go {
+  color: var(--wdi-on-night-accent);
+  background-color: var(--wdi-night-accent);
+  font-weight: 400;
+}
+
+.wdi-admin__btn.wdi-admin__btn:focus-visible,
+.wdi-admin__seat.wdi-admin__seat:focus-visible,
+.wdi-admin__field:focus-visible,
+.wdi-admin__num:focus-visible,
+.wdi-admin__setup > summary:focus-visible {
+  outline: var(--wdi-stroke-w) solid var(--wdi-night-accent);
+  outline-offset: var(--wdi-stroke-w);
+}
+
+.wdi-admin__num.wdi-admin__num,
+.wdi-admin__field.wdi-admin__field {
+  color: var(--wdi-night-text);
+  background-color: rgb(var(--wdi-night-rgb) / 0.6);
+  border: 0;
+  border-radius: 0;
+  padding: 0 var(--wdi-space-2);
+  box-shadow: inset 0 0 0 2px rgb(var(--wdi-snow-rgb) / 0.28);
+}
+
+.wdi-admin__field.wdi-admin__field option {
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-night);
+}
+
+.wdi-admin__status,
+.wdi-admin__row > span,
+.wdi-admin__detail dt {
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-admin__detail dt,
+.wdi-admin__detail dd {
+  color: var(--wdi-night-text);
+}
+
+.wdi-admin__problem.wdi-admin__problem {
+  color: var(--wdi-night-accent);
+}
+
+.wdi-admin__log.wdi-admin__log {
+  font-family: var(--wdi-font-text);
+}
+
+.wdi-admin__log-row--fail.wdi-admin__log-row--fail {
+  color: var(--wdi-on-night-accent);
+  background-color: var(--wdi-night-accent);
+  border-radius: 0;
+}

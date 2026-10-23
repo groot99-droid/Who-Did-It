@@ -78,6 +78,8 @@ export function enterScene(
   p.y = y;
   p.vx = p.vy = 0;
   p.input = null;
+  // Round 7 (7K, A118): every scene change cancels a hold on the same tick, the meeting move included (Hold.ts).
+  p.hold = null;
   room.commands.clearMove(player.id);
   p.resetRing();
   p.sceneIdx = sceneIndex(sceneId);

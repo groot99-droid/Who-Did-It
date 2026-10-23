@@ -1489,6 +1489,10 @@ unchanged; the copy of 14.6 to 14.10, 14.14 and 14.16 is unchanged. No new copy:
 
 The Add friend action on a game-over row is 7C's `addFriendButton`, shown only for a seat that carries a `profile` and never on your own row. The faction chip on a row stays the one place a faction shows for another seat.
 
+### 14.31 The admin page in the night theme (7G)
+
+Session 7G, round 7 (DECISIONS A111). The owner's admin page (14.23) wears the table screens' dark glass: `ui/admin.css` holds every rule, each doubling its own class so it beats the paper rules of `components.css` (not edited) and does not depend on the `.wdi-admin` root, because the sign-in panel and the notice are mounted outside it. Indigo glass fill with a snow rim, lilac text; Press Start 2P on the controls, panel headings and sign-in title, Pixelify Sans on the rest, Inter on the log (running text, A106); the pressed speed button, the seat, Start and a failed invariant row take the lantern accent. No blur and no `clip-path`: six live viewports run behind the panels. The copy of 14.23, every id and testid, and the markup are unchanged, and no new lines are added.
+
 ### 14.29 Vendettas (7H)
 
 Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaGoal(id)`). The role card (`ui/RoleCard.ts`, 7F renders it) reads `Private.vendetta` (GDD 3.20): a Killer's own vendetta id, or for the Accomplice the ids of the Killers it knows, joined by commas. An empty value shows no line. No other seat's card, no world label and no toast names a vendetta; the doubted Vicar's note is its own.
