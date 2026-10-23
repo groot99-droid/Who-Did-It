@@ -1,8 +1,10 @@
 import items from '@wdi/content/data/items.json';
 import { fill } from './copy';
 import { M5B_COPY as C } from './copy/m5b';
+import { BODY_COPY } from './copy/body'; // round 8, 8A
 import { h } from './dom';
 import type { StackSnap } from '../net/world';
+import { useVerbOf } from '../view/body/verbs'; // round 8, 8A
 
 const DEFS = items.items as Record<string, { name: string; kind: string; use?: string; tooltip?: string }>;
 export const INVENTORY_SLOTS = items.inventorySlots;
@@ -28,6 +30,10 @@ export interface InventoryDeps {
   /** Whether a lit light is in hand (the `lantern` status bit of the own avatar). */
   lit(): boolean;
   light(on: boolean): void;
+  /** Round 8 (8A): a Use button's verb, `act.ability {abilityId, targetId?}`; no target is the actor. */
+  use(abilityId: string, targetId?: string): void;
+  /** Round 8 (8A): the handle of the avatar nearest to the own within `rangeTiles`, for a cure on a seat in reach. */
+  near(rangeTiles: number): string | null;
 }
 
 export interface Panel {
@@ -44,6 +50,8 @@ export interface Panel {
 /**
  * The pockets (UI.md 14.19.2): `inventorySlots` rows, one per stack, the name, the quantity and, for a carried light,
  * a Light / Douse button (`act.light`). Opens with I; the data is the own `Private.inventory`, never another seat's.
+ * Round 8 (8A, UI.md 14.32): a row whose item any holder may use (`useVerbOf`) gets a Use button, and a cure that also
+ * works on a seat gets a second one while an avatar stands in its reach.
  */
 export function mountInventory(parent: HTMLElement, deps: InventoryDeps): Panel {
   const list = h('ul', { class: 'wdi-m5b__list', 'data-testid': 'inventory-list' });
@@ -88,7 +96,12 @@ export function mountInventory(parent: HTMLElement, deps: InventoryDeps): Panel 
       if (root.hidden) return;
       const stacks = stacksOf(deps.inventory());
       const lit = deps.lit();
-      const sig = `${stacks.map((s) => `${s.defId}:${s.qty}`).join('|')}#${lit}`;
+      // round 8, 8A: the near handle of each cure is part of the signature, so its second button follows the reach.
+      const nearOf = (id: string): string | null => {
+        const v = useVerbOf(id);
+        return v && v.target === 'player' ? deps.near(v.rangeTiles) : null;
+      };
+      const sig = `${stacks.map((s) => `${s.defId}:${s.qty}:${nearOf(s.defId) ?? ''}`).join('|')}#${lit}`;
       if (sig === shown) return;
       shown = sig;
       list.replaceChildren(
@@ -113,6 +126,30 @@ export function mountInventory(parent: HTMLElement, deps: InventoryDeps): Panel 
                 );
                 b.addEventListener('click', () => deps.light(!deps.lit()));
                 row.append(b);
+              }
+              const verb = useVerbOf(s.defId); // round 8, 8A
+              if (verb) {
+                const use = h(
+                  'button',
+                  { type: 'button', class: 'wdi-btn wdi-btn--sm', 'data-testid': `inventory-use-${s.defId}` },
+                  BODY_COPY['body.use'],
+                );
+                use.addEventListener('click', () => deps.use(verb.id));
+                row.append(use);
+                const near = nearOf(s.defId);
+                if (near !== null) {
+                  const onNear = h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: 'wdi-btn wdi-btn--sm',
+                      'data-testid': `inventory-use-near-${s.defId}`,
+                    },
+                    BODY_COPY['body.use.near'],
+                  );
+                  onNear.addEventListener('click', () => deps.use(verb.id, near));
+                  row.append(onNear);
+                }
               }
               return row;
             })),
