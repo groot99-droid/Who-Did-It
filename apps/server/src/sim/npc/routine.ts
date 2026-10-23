@@ -18,6 +18,7 @@ import { type PlayerSim, simOf } from '../RoomSim';
 import { navGrid, profileOpen, sceneIndex, sceneKey, tileCentre } from '../World';
 import { type Act, type Brain, type NpcMemory, playRng } from './memory';
 import { GOAL_SLACK, drive, firstPortalToward, stand, walkThrough, walkTo, wander } from './walk';
+import { vendettaGoalFor } from '../vendettas/goal';
 
 // The NPC routine (GDD 3.12 "Routines", "Night"; npc.md 7): the persona, the stations and the one-tick brain that
 // walks to a station, stands at it, strolls and idles. `world.ts` calls `runRoutine` (or `runHome` in an unlit
@@ -389,6 +390,11 @@ function pickStation(
   const other = base.filter((st) => st.scene !== here && adjacent.has(st.scene));
   const dwellRun = tick >= brain.sceneDwellUntilTick;
   let pool = dwellRun ? (other.length > 0 ? other : own) : own;
+  // GDD 3.20 "NPC Killers": a vendetta's scene is one more place to work, drawn under the same weights; like the
+  // hunt below it ignores the dwell, and the hunt still wins (`vendettaGoalFor`, 7H; no draw).
+  const goal = vendettaGoalFor(room, player.id);
+  const there = goal ? base.filter((st) => st.scene === goal.sceneId) : [];
+  if (there.length > 0) pool = there;
   let hunt = false;
   if (killer && litOnly) {
     const prey = preyStations(room, mem, brain, player, p);
