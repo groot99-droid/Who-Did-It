@@ -1,0 +1,427 @@
+commit 86f1076205ffc392bfca5d7376da72c9a6486615
+Author: Claude <noreply@anthropic.com>
+Date:   Fri Oct 23 08:48:59 2026 +0000
+
+    Table screens 3: the quick mode in the night theme (7G, A111)
+    
+    ui/onub/onub.css dresses the prep board, station rooms, hand, piles, night, card table,
+    dawn and claim form; the Rush and the end panel ride the shared glass. Slots and card-table
+    groups stay square-cornered (a clip-path on twenty layers triples a screenshot under software
+    GL). night.spec preloads the pixel faces during lights-out; kitchen.spec takes four
+    screenshots. No id, rule or wire changes.
+    
+    Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_01FaeMV9GRLPvTQhMazRQTw2
+
+diff --git a/apps/client/e2e/kitchen.spec.ts b/apps/client/e2e/kitchen.spec.ts
+index ef9bb85..d18ef96 100644
+--- a/apps/client/e2e/kitchen.spec.ts
++++ b/apps/client/e2e/kitchen.spec.ts
+@@ -34,9 +34,10 @@ test('lobby deck editor: one toggle per role, the leader can change it', async (
+   await expect(page.getByTestId('deck-problem')).toBeHidden();
+ });
+ 
+-test('a Baker plays a station through to the crime-scene board', async ({ page }) => {
++test('a Baker plays a station through to the crime-scene board', async ({ page }, info) => {
+   await startQuick(page, 'speed=2');
+   await expect(page.getByTestId('onub-clock')).toBeVisible();
++  await page.screenshot({ path: info.outputPath('kitchen-overview.png') });
+   for (const s of onubBalance.stations) {
+     await expect(page.getByTestId(`station-${s.id}`)).toHaveCount(1);
+     await expect(page.getByTestId(`station-${s.id}`)).toBeEnabled();
+@@ -44,6 +45,7 @@ test('a Baker plays a station through to the crime-scene board', async ({ page }
+   await page.getByTestId('station-fridge').click();
+   await expect(page.getByTestId('station-room')).toBeVisible();
+   await expect(page.getByTestId('minigame-fridge')).toBeVisible();
++  await page.screenshot({ path: info.outputPath('kitchen-room.png') });
+   await expect(page.getByTestId('hand')).toBeHidden();
+   await expect(page.getByTestId('station-back')).toBeVisible();
+   await expect(page.getByTestId('minigame-assist')).toBeVisible({
+@@ -52,6 +54,7 @@ test('a Baker plays a station through to the crime-scene board', async ({ page }
+   await page.getByTestId('minigame-assist').click();
+   await expect(page.getByTestId('hand')).toBeVisible();
+   await expect(page.getByTestId('card-pureDairy')).toBeVisible();
++  await page.screenshot({ path: info.outputPath('kitchen-hand.png') });
+   await expect(page.getByTestId('card-spoiledMilk')).toHaveCount(0);
+   await expect(page.getByTestId('prep-commit')).toBeDisabled();
+   await page.getByTestId('card-pureDairy').click();
+@@ -61,6 +64,7 @@ test('a Baker plays a station through to the crime-scene board', async ({ page }
+   for (const s of onubBalance.stations) await expect(page.getByTestId(`station-${s.id}`)).toBeDisabled();
+   await expect(page.getByTestId('prep-board')).toBeVisible({ timeout: 30_000 });
+   for (const s of onubBalance.stations) await expect(page.getByTestId(`pile-${s.id}`)).toHaveCount(1);
++  await page.screenshot({ path: info.outputPath('kitchen-board.png') });
+   await expect(page.getByTestId('kitchen')).toBeVisible();
+ });
+ 
+diff --git a/apps/client/e2e/night.spec.ts b/apps/client/e2e/night.spec.ts
+index afd9e4b..6808441 100644
+--- a/apps/client/e2e/night.spec.ts
++++ b/apps/client/e2e/night.spec.ts
+@@ -19,6 +19,11 @@ test('a sleeper sees lights-out and the narrator, a waker the card table, then d
+   await toNight(page);
+ 
+   await expect(page.getByTestId('night')).toBeVisible({ timeout: 40_000 });
++  // The night theme's pixel faces load on first use; the waker's window is short, so fetch them during lights-out
++  // rather than inside the window (a screenshot waits for them).
++  await page.evaluate(() =>
++    Promise.all([document.fonts.load('16px "Pixelify Sans"'), document.fonts.load('12px "Press Start 2P"')]),
++  );
+   await expect(page.getByTestId('narrator')).toBeVisible();
+   await expect(page.getByTestId('lights-out')).toBeVisible();
+   await expect(page.getByTestId('night-wake')).toBeHidden();
+diff --git a/apps/client/src/ui/onub/onub.css b/apps/client/src/ui/onub/onub.css
+new file mode 100644
+index 0000000..d4726d8
+--- /dev/null
++++ b/apps/client/src/ui/onub/onub.css
+@@ -0,0 +1,264 @@
++/*
++ * Who Did It: the quick mode's screens in the night theme (round 7, 7G; docs/UI.md 14.28).
++ *
++ * The prep board, the station rooms and the hand, the night's lights-out, wake scene, card table and dawn,
++ * the piles. The Rush and the end panel ride the meeting's and the game over's glass (`ui/table.css`), which
++ * every quick-mode root also loads. Scoped under `.wdi-table` (the roots carry it), tokens only; the markup
++ * and every id are unchanged.
++ */
++
++/* ------------------------------------------------------------------ the kitchen */
++
++.wdi-kitchen.wdi-table .wdi-kitchen__room {
++  align-items: flex-start;
++  background-color: rgb(var(--wdi-night-rgb) / 0.55);
++  text-align: left;
++}
++
++.wdi-kitchen.wdi-table .wdi-kitchen__room:not(:disabled):hover,
++.wdi-kitchen.wdi-table .wdi-kitchen__room:not(:disabled):focus-visible {
++  background-color: rgb(var(--wdi-violet-rgb) / 0.7);
++  box-shadow: inset 0 0 0 3px var(--wdi-night-accent);
++}
++
++.wdi-table .wdi-kitchen__name {
++  font-family: var(--wdi-font-pixel-display);
++  font-size: var(--wdi-text-lg);
++  line-height: 1.4;
++  letter-spacing: 0;
++  text-transform: none;
++  color: var(--wdi-night-label);
++}
++
++.wdi-table .wdi-kitchen__gloss {
++  font-family: var(--wdi-font-pixel-text);
++  font-size: var(--wdi-text-md);
++  letter-spacing: 0;
++  text-transform: none;
++  color: var(--wdi-night-text-muted);
++}
++
++/* The overview and the done card sit on the owner's art: a veil keeps the lilac text readable on any frame. */
++.wdi-kitchen.wdi-table .wdi-kitchen__overview {
++  padding: var(--wdi-space-3);
++  background: var(--wdi-veil);
++}
++
++.wdi-table .wdi-station {
++  background-color: var(--wdi-glass-fill);
++  border: 0;
++  border-radius: 0;
++  clip-path: var(--_corner);
++  box-shadow: inset 0 0 0 2px var(--_rim);
++  backdrop-filter: blur(6px);
++  -webkit-backdrop-filter: blur(6px);
++}
++
++.wdi-table .wdi-station__game canvas {
++  box-shadow: inset 0 0 0 2px var(--_rim);
++}
++
++/* ------------------------------------------------------------------ the hand and the piles */
++
++.wdi-table .wdi-hand__card {
++  font-family: var(--wdi-font-pixel-text);
++  font-size: var(--wdi-text-md);
++  letter-spacing: 0;
++  text-transform: none;
++  color: var(--wdi-night-text);
++}
++
++.wdi-table .wdi-hand__card .wdi-strong {
++  font-family: var(--wdi-font-pixel-display);
++  font-size: var(--wdi-text-xs);
++  letter-spacing: 0;
++  color: var(--wdi-night-label);
++}
++
++.wdi-table .wdi-hand__card[aria-pressed='true'] {
++  outline: 0;
++  color: var(--wdi-on-night-accent);
++  background-color: var(--wdi-night-accent);
++}
++
++.wdi-table .wdi-hand__card[aria-pressed='true'] .wdi-strong,
++.wdi-table .wdi-hand__card[aria-pressed='true'] .wdi-hint {
++  color: var(--wdi-on-night-accent);
++}
++
++.wdi-table .wdi-hand__card--sabotage {
++  box-shadow: inset 0 0 0 2px var(--wdi-hazard);
++}
++
++.wdi-table .wdi-pile__name {
++  font-family: var(--wdi-font-pixel-display);
++  font-size: var(--wdi-text-xs);
++  line-height: 1.5;
++  letter-spacing: 0;
++  color: var(--wdi-night-label);
++}
++
++.wdi-table .wdi-pile__card--sabotage {
++  box-shadow: inset 0 0 0 2px var(--wdi-hazard);
++}
++
++.wdi-table .wdi-pile__flag,
++.wdi-table .wdi-pile__ruin {
++  white-space: normal;
++  line-height: 1.4;
++}
++
++.wdi-table .wdi-chip--danger {
++  color: var(--wdi-night-label);
++  background-color: var(--wdi-danger);
++}
++
++/* ------------------------------------------------------------------ the night */
++
++.wdi-night.wdi-table {
++  background:
++    radial-gradient(ellipse at 50% 20%, rgb(var(--wdi-violet-rgb) / 0.45), transparent 60%),
++    var(--wdi-night-bg);
++}
++
++.wdi-table .wdi-narrator {
++  font-family: var(--wdi-font-pixel-text);
++  font-size: var(--wdi-display-sm);
++  letter-spacing: 0;
++  color: var(--wdi-night-label);
++}
++
++.wdi-table .wdi-lights-out {
++  font-family: var(--wdi-font-pixel-text);
++  color: var(--wdi-night-text-muted);
++}
++
++/* The wake scene and the dawn keep their art (an inline background image of the panel): a pseudo-element lays the
++   glass fill and the veil over it and under the content, so the lilac text holds on any frame. No blur and no
++   stepped-corner clip, which a full-screen photo makes slow to paint (a clipped photo layer cost a screenshot a
++   second under software GL). */
++.wdi-night.wdi-table .wdi-night-wake,
++.wdi-night.wdi-table .wdi-night-dawn {
++  isolation: isolate;
++  clip-path: none;
++  backdrop-filter: none;
++  -webkit-backdrop-filter: none;
++}
++
++.wdi-night.wdi-table .wdi-night-wake::before,
++.wdi-night.wdi-table .wdi-night-dawn::before {
++  content: '';
++  position: absolute;
++  inset: 0;
++  z-index: -1;
++  background: linear-gradient(var(--wdi-glass-fill), var(--wdi-glass-fill)), var(--wdi-veil);
++  pointer-events: none;
++}
++
++/* ------------------------------------------------------------------ the card table */
++
++.wdi-table .wdi-seat-row,
++.wdi-table .wdi-pantry-cards {
++  gap: var(--wdi-space-2);
++}
++
++.wdi-night.wdi-table {
++  gap: var(--wdi-space-3);
++  padding: var(--wdi-space-3) var(--wdi-space-5);
++}
++
++.wdi-night.wdi-table .wdi-panel {
++  padding: var(--wdi-space-4);
++}
++
++.wdi-table .wdi-seat-cards {
++  background-color: rgb(var(--wdi-night-rgb) / 0.5);
++  border: 0;
++  border-radius: 0;
++  clip-path: none;
++  box-shadow: inset 0 0 0 2px var(--_rim);
++}
++
++.wdi-table .wdi-seat-cards.is-self {
++  box-shadow: inset 0 0 0 3px var(--wdi-night-accent);
++}
++
++.wdi-table .wdi-seat-cards.is-glow {
++  box-shadow:
++    inset 0 0 0 2px var(--wdi-night-accent),
++    var(--wdi-glow-moon);
++}
++
++.wdi-table .wdi-seat-cards__name {
++  font-family: var(--wdi-font-pixel-display);
++  letter-spacing: 0;
++  text-transform: none;
++  color: var(--wdi-night-label);
++}
++
++/* A slot is a card on the table (square-cornered: twenty clipped layers make a screenshot three times slower under
++   software GL): glass face-down, lantern-lined when it is yours to take. The type stays at 12 px so
++   five seats and the Pantry still fit one 1280 x 720 screen with the confirm button above the fold. */
++.wdi-table .wdi-slot {
++  min-width: 72px;
++  min-height: 56px;
++  padding: var(--wdi-space-1) var(--wdi-space-2);
++  font-family: var(--wdi-font-pixel-text);
++  font-size: var(--wdi-text-xs);
++  color: var(--wdi-night-text);
++  background-color: rgb(var(--wdi-night-rgb) / 0.55);
++  border: 0;
++  border-radius: 0;
++  clip-path: none;
++  box-shadow: inset 0 0 0 2px var(--_rim);
++}
++
++.wdi-table .wdi-slot.is-dealt,
++.wdi-table .wdi-slot.is-seen {
++  color: var(--wdi-night-label);
++  background-color: rgb(var(--wdi-violet-rgb) / 0.7);
++}
++
++.wdi-table .wdi-slot.is-seen {
++  box-shadow: inset 0 0 0 2px var(--wdi-moon);
++}
++
++.wdi-table .wdi-slot.is-selectable:not(:disabled) {
++  box-shadow: inset 0 0 0 2px var(--wdi-night-accent);
++}
++
++.wdi-table .wdi-slot.is-picked {
++  color: var(--wdi-on-night-accent);
++  background-color: var(--wdi-night-accent);
++  box-shadow: none;
++}
++
++.wdi-table .wdi-slot.is-covered {
++  box-shadow: inset 0 0 0 2px var(--wdi-night-text-muted);
++}
++
++.wdi-table .wdi-slot__face {
++  font-family: var(--wdi-font-pixel-display);
++  font-size: var(--wdi-text-xs);
++  font-weight: 400;
++  line-height: 1.5;
++}
++
++/* ------------------------------------------------------------------ the claim form */
++
++.wdi-table .wdi-claim-form {
++  background-color: rgb(var(--wdi-night-rgb) / 0.5);
++  border: 0;
++  clip-path: var(--_corner);
++  box-shadow: inset 0 0 0 2px var(--_rim);
++}
++
++@media (max-width: 480px) {
++  .wdi-kitchen.wdi-table .wdi-kitchen__grid {
++    gap: var(--wdi-space-2);
++  }
++
++  .wdi-table .wdi-kitchen__name {
++    font-size: var(--wdi-text-md);
++  }
++}
+diff --git a/apps/client/src/ui/onub/rush.ts b/apps/client/src/ui/onub/rush.ts
+index c23bd54..088e770 100644
+--- a/apps/client/src/ui/onub/rush.ts
++++ b/apps/client/src/ui/onub/rush.ts
+@@ -7,6 +7,8 @@ import { h } from '../dom';
+ import { MEETING_PHASE } from '../meetingText';
+ import { createClaimForm } from './claim';
+ import { slotLabel } from './slots';
++import '../table.css';
++import './onub.css';
+ import { claimableRoles, claimLine, crustLine, outLines, PANTRY, roleName } from './rushModel';
+ 
+ export interface RushPanel {
+diff --git a/apps/client/src/view/onub/NightView.ts b/apps/client/src/view/onub/NightView.ts
+index e35c343..f17b679 100644
+--- a/apps/client/src/view/onub/NightView.ts
++++ b/apps/client/src/view/onub/NightView.ts
+@@ -10,6 +10,8 @@ import type { NightRevealEntry, S2CPayloads } from '@wdi/shared/protocol';
+ import { ActFlow } from '../../ui/onub/actflow';
+ import { seatSlot, slotLabel } from '../../ui/onub/slots';
+ import { CardTableView, type Face } from './CardTableView';
++import '../../ui/table.css';
++import '../../ui/onub/onub.css';
+ import { LightsOutView } from './LightsOutView';
+ 
+ export { NightSound, type NightAudioOut } from './NightSound';
+@@ -163,7 +165,7 @@ export class NightView {
+     );
+     this.root = h(
+       'div',
+-      { class: 'wdi-root wdi-night', 'data-testid': 'night' },
++      { class: 'wdi-root wdi-night wdi-table', 'data-testid': 'night' },
+       this.narratorEl,
+       this.lightsOut.root,
+       this.wakeEl,
+diff --git a/apps/client/src/view/onub/PrepView.ts b/apps/client/src/view/onub/PrepView.ts
+index df4ce73..b254299 100644
+--- a/apps/client/src/view/onub/PrepView.ts
++++ b/apps/client/src/view/onub/PrepView.ts
+@@ -6,6 +6,8 @@ import { ONUB_PHASE } from '../../net/onubRouter';
+ import { fill } from '../../ui/copy';
+ import { ONUB_PREP_COPY as C } from '../../ui/copy/onubPrep';
+ import { h, type Screen } from '../../ui/dom';
++import '../../ui/table.css';
++import '../../ui/onub/onub.css';
+ import { renderPiles } from './PilesView';
+ import { mountStation, type StationRoom } from './StationView';
+ 
+@@ -209,7 +211,7 @@ export function mountPrep(
+   const top = h('div', { class: 'wdi-row wdi-row--between' }, clock);
+   const kitchen = h(
+     'div',
+-    { class: 'wdi-kitchen', 'data-testid': 'kitchen' },
++    { class: 'wdi-kitchen wdi-table', 'data-testid': 'kitchen' },
+     top,
+     overview,
+     donePanel,
+diff --git a/docs/SESSIONS.md b/docs/SESSIONS.md
+index aaeec09..1f805ff 100644
+--- a/docs/SESSIONS.md
++++ b/docs/SESSIONS.md
+@@ -3240,6 +3240,7 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
+ ### Round 7 log: 7G
+ 
+ - 2026-10-23: PR 1 (meeting and game over): `ui/table.css` scoped under `.wdi-table`, the Add friend stand-in (`ui/table/addFriend.ts`, `ui/copy/table.ts`), `MeetingPlayer.profile`, UI.md 14.28, A111. 7B's glass classes had not landed, so the glass is local.
++- 2026-10-23: PR 2 (seat picker, look tags, shot toast, over lists) and PR 3 (the quick mode: prep board, station rooms, hand, piles, night, card table, dawn, claim form, Rush and over via the shared glass; `ui/onub/onub.css`). `e2e/night.spec.ts` preloads the two pixel faces during lights-out and `e2e/kitchen.spec.ts` takes four screenshots for 7P. Heavy clip-path is the one paint cost to avoid (UI.md 14.28).
+ 
+ ### Round 7 log: 7H
+ 
+diff --git a/docs/UI.md b/docs/UI.md
+index a1f0fea..1f3c8f3 100644
+--- a/docs/UI.md
++++ b/docs/UI.md
+@@ -1359,3 +1359,12 @@ unchanged; the copy of 14.6 to 14.10, 14.14 and 14.16 is unchanged. New lines ar
+ 
+ The action reads and writes `wdi:friends` (`{ code, name }`) through `ui/table/addFriend.ts`, a stand-in with the signature of
+ 7C's shared helper until it lands. The faction chip on a game-over row stays the one place a faction shows for another seat.
++
++**Quick mode (7G, PR 3).** `ui/onub/onub.css` (loaded with `ui/table.css` by `PrepView`, `NightView` and the Rush) dresses the
++kitchen (room tiles on a veil over the owner's art, the station room, the hand, the piles), the night (an indigo wash behind
++the narrator, lights-out, the wake scene and the dawn as glass over their art with a fill and veil laid by a pseudo-element, so
++lilac text holds on any frame), the card table (seat groups and slots, lantern for yours, moon for what you saw, hazard for
++sabotage) and the claim form. The Rush and the end panel ride the meeting's and the game over's glass. Two paint rules, found
++under software GL: the stepped-corner `clip-path` is for singular surfaces (panels, buttons, tiles), never for the twenty slots
++of a card table or a panel with a photo behind it (a clipped photo layer or twenty clipped layers made one screenshot take
++three times as long), and no blur on a full-screen photo.

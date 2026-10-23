@@ -1,0 +1,500 @@
+/*
+ * Who Did It: the table screens in the night theme (round 7, 7G; docs/UI.md 2, 3, 6, 10, 14.28).
+ *
+ * The meeting, the game over, the main-mode cards and the quick mode's screens wear the owner's mockups:
+ * frosted glass with a stepped corner over the dark, lilac text, Press Start 2P for titles, labels and
+ * one-word tags, Pixelify Sans for headings and controls, Inter and Oswald kept for running text of more
+ * than two lines (chat, the report, the notebook tab; A106). Every rule is scoped under `.wdi-table` so it
+ * beats the paper components of components.css without touching them, and reads tokens only. Ids, classes
+ * the specs find and the markup's order are unchanged: this file moves paint, never structure.
+ */
+
+.wdi-table {
+  --_step: 4px;
+  --_corner: polygon(
+    0 calc(var(--_step) * 2),
+    var(--_step) calc(var(--_step) * 2),
+    var(--_step) var(--_step),
+    calc(var(--_step) * 2) var(--_step),
+    calc(var(--_step) * 2) 0,
+    calc(100% - var(--_step) * 2) 0,
+    calc(100% - var(--_step) * 2) var(--_step),
+    calc(100% - var(--_step)) var(--_step),
+    calc(100% - var(--_step)) calc(var(--_step) * 2),
+    100% calc(var(--_step) * 2),
+    100% calc(100% - var(--_step) * 2),
+    calc(100% - var(--_step)) calc(100% - var(--_step) * 2),
+    calc(100% - var(--_step)) calc(100% - var(--_step)),
+    calc(100% - var(--_step) * 2) calc(100% - var(--_step)),
+    calc(100% - var(--_step) * 2) 100%,
+    calc(var(--_step) * 2) 100%,
+    calc(var(--_step) * 2) calc(100% - var(--_step)),
+    var(--_step) calc(100% - var(--_step)),
+    var(--_step) calc(100% - var(--_step) * 2),
+    0 calc(100% - var(--_step) * 2)
+  );
+  --_rim: rgb(var(--wdi-snow-rgb) / 0.28);
+  --_sheen: rgb(var(--wdi-snow-rgb) / 0.04);
+  font-family: var(--wdi-font-pixel-text);
+  color: var(--wdi-night-text);
+}
+
+/* ------------------------------------------------------------------ glass surfaces */
+
+.wdi-table.wdi-over,
+.wdi-table .wdi-panel,
+.wdi-table .wdi-meet__board,
+.wdi-table .wdi-meet__side {
+  /* The fill, rim, corner and blur are 7B's .wdi-glass-panel (UI.md 6), added in the markup. */
+  color: var(--wdi-night-text);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* The two columns of the meeting are the glass; the wrapper is only a grid. */
+.wdi-meet.wdi-table {
+  background: none;
+  clip-path: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.wdi-table .wdi-eyebrow {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  letter-spacing: var(--wdi-tracking-caps);
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-table .wdi-display {
+  font-family: var(--wdi-font-pixel-display);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--wdi-night-label);
+  text-shadow: 2px 2px 0 var(--wdi-violet);
+}
+
+.wdi-table .wdi-eyebrow + .wdi-display {
+  margin-top: var(--wdi-space-2);
+}
+
+.wdi-table .wdi-display--md {
+  font-size: var(--wdi-display-sm);
+}
+
+.wdi-table .wdi-display--lg {
+  font-size: var(--wdi-display-md);
+}
+
+.wdi-table .wdi-muted,
+.wdi-table .wdi-hint,
+.wdi-table .wdi-subtitle {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-table .wdi-subtitle {
+  color: var(--wdi-night-text);
+}
+
+/* The clock is a lantern readout in a sunken glass slot. */
+.wdi-table .wdi-hud-clock {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-lg);
+  letter-spacing: 0;
+  color: var(--wdi-night-accent);
+  background: rgb(var(--wdi-night-rgb) / 0.55);
+  border: 0;
+  border-radius: 0;
+  clip-path: var(--_corner);
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+.wdi-table .wdi-hud-clock__phase {
+  font-size: var(--wdi-text-xs);
+  color: var(--wdi-night-text);
+}
+
+/* ------------------------------------------------------------------ buttons, chips, inputs */
+
+.wdi-table .wdi-btn,
+.wdi-table .wdi-tab {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  font-weight: 400;
+  letter-spacing: var(--wdi-tracking-caps);
+  text-transform: uppercase;
+  color: var(--wdi-night-label);
+}
+
+.wdi-table .wdi-btn {
+  background-color: rgb(var(--wdi-violet-rgb) / 0.55);
+  border: 0;
+  border-radius: 0;
+  clip-path: var(--_corner);
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+.wdi-table .wdi-btn:hover:not(:disabled) {
+  background-color: rgb(var(--wdi-violet-rgb) / 0.8);
+}
+
+.wdi-table .wdi-btn:disabled {
+  opacity: 0.55;
+}
+
+.wdi-table .wdi-btn.is-selected {
+  color: var(--wdi-on-night-accent);
+  background-color: var(--wdi-night-accent);
+  background-image: none;
+}
+
+.wdi-table .wdi-btn--primary {
+  color: var(--wdi-on-night-accent);
+  background-color: var(--wdi-night-accent);
+  background-image: none;
+}
+
+.wdi-table .wdi-btn--ghost {
+  background-color: transparent;
+}
+
+.wdi-table .wdi-btn:focus-visible,
+.wdi-table .wdi-input:focus-visible,
+.wdi-table .wdi-portrait:focus-visible,
+.wdi-table .wdi-tab:focus-visible,
+.wdi-table .wdi-chip:is(button):focus-visible {
+  outline: var(--wdi-stroke-w) solid var(--wdi-night-accent);
+  outline-offset: var(--wdi-stroke-w);
+  box-shadow: none;
+}
+
+/* A chip is a one-word tag: pixel type on a violet slot; the vote count is the accent. */
+.wdi-table .wdi-chip {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--wdi-night-label);
+  background-color: rgb(var(--wdi-violet-rgb) / 0.7);
+  background-image: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+.wdi-table .wdi-chip--ready,
+.wdi-table .wdi-chip--vote,
+.wdi-table .wdi-chip--lead {
+  color: var(--wdi-on-night-accent);
+  background-color: var(--wdi-night-accent);
+  box-shadow: none;
+}
+
+.wdi-table .wdi-chip--quiet {
+  color: var(--wdi-night-text);
+  background-color: rgb(var(--wdi-night-rgb) / 0.5);
+}
+
+.wdi-table .wdi-chip--vote {
+  font-size: var(--wdi-text-sm);
+}
+
+/* A claim chip is a sentence fragment a player tapped: Pixelify, sentence case, a lantern rim when picked. */
+.wdi-table .wdi-chip--claim {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  color: var(--wdi-night-text);
+  background-color: rgb(var(--wdi-night-rgb) / 0.5);
+}
+
+.wdi-table .wdi-chip--claim.is-selected {
+  color: var(--wdi-on-night-accent);
+  background-color: var(--wdi-night-accent);
+}
+
+.wdi-table .wdi-input {
+  font-family: var(--wdi-font-text);
+  color: var(--wdi-night-text);
+  background-color: rgb(var(--wdi-night-rgb) / 0.55);
+  background-image: none;
+  border: 0;
+  border-radius: 0;
+  clip-path: var(--_corner);
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+.wdi-table .wdi-input::placeholder {
+  color: var(--wdi-night-text-muted);
+}
+
+/* ------------------------------------------------------------------ the portrait tiles */
+
+.wdi-table .wdi-portraits {
+  gap: var(--wdi-space-4);
+}
+
+.wdi-table .wdi-portrait {
+  color: var(--wdi-night-text);
+  background-color: rgb(var(--wdi-night-rgb) / 0.5);
+  border: 0;
+  border-radius: 0;
+  clip-path: var(--_corner);
+  box-shadow: inset 0 0 0 2px var(--_rim);
+  transition: background-color var(--wdi-dur-fast) var(--wdi-ease);
+}
+
+.wdi-table .wdi-portrait:hover:not(:disabled) {
+  background-color: rgb(var(--wdi-violet-rgb) / 0.6);
+}
+
+.wdi-table .wdi-portrait__pic {
+  background: rgb(var(--wdi-night-rgb) / 0.7);
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px var(--_rim);
+  image-rendering: pixelated;
+}
+
+.wdi-table .wdi-portrait__name {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  font-weight: var(--wdi-weight-strong);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--wdi-night-label);
+}
+
+.wdi-table .wdi-portrait__claim {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-night-accent);
+}
+
+/* The corner pieces sit inside the tile: the clip would cut a badge that hangs outside it. */
+.wdi-table .wdi-portrait__votes {
+  top: var(--wdi-space-1);
+  right: var(--wdi-space-1);
+}
+
+.wdi-table .wdi-portrait.is-self {
+  outline: 0;
+  box-shadow: inset 0 0 0 2px var(--wdi-night-text-muted);
+}
+
+.wdi-table .wdi-portrait.is-selected {
+  background-color: rgb(var(--wdi-violet-rgb) / 0.85);
+  box-shadow: inset 0 0 0 3px var(--wdi-night-accent);
+}
+
+.wdi-table .wdi-portrait.is-dead {
+  color: var(--wdi-night-text-muted);
+}
+
+/* The reveal stamp: it drops in two pixel steps, never a glide; reduced motion turns it off. */
+.wdi-table .wdi-stamp {
+  animation: wdi-table-stamp var(--wdi-dur-base) steps(2, end) both;
+}
+
+@keyframes wdi-table-stamp {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) rotate(-12deg) scale(1.5);
+  }
+
+  to {
+    opacity: 1;
+    transform: rotate(-12deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-table .wdi-stamp {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ tabs, chat, report */
+
+.wdi-table .wdi-tabs {
+  border-bottom: var(--wdi-stroke-w) solid var(--wdi-night-text-muted);
+}
+
+.wdi-table .wdi-tab {
+  padding-inline: var(--wdi-space-2);
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-table .wdi-tab[aria-selected='true'] {
+  color: var(--wdi-night-accent);
+  border-bottom-color: var(--wdi-night-accent);
+}
+
+/* Chat is running text: Inter, over a sunken slot (A106). The speaker's name is the pixel face. */
+.wdi-table .wdi-chat__log {
+  font-family: var(--wdi-font-text);
+  color: var(--wdi-night-text);
+  background: rgb(var(--wdi-night-rgb) / 0.55);
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+.wdi-table .wdi-chat__who {
+  font-family: var(--wdi-font-pixel-text);
+  font-weight: var(--wdi-weight-strong);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--wdi-night-accent);
+}
+
+.wdi-table .wdi-chat__line--system {
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-table [data-testid='report'] dd {
+  font-family: var(--wdi-font-text);
+  color: var(--wdi-night-text);
+}
+
+/* ------------------------------------------------------------------ game over */
+
+.wdi-table .wdi-roster__row {
+  gap: var(--wdi-space-3);
+  border-bottom: var(--wdi-stroke-w) solid rgb(var(--wdi-snow-rgb) / 0.14);
+}
+
+.wdi-table .wdi-roster__name {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-lg);
+  font-weight: var(--wdi-weight-strong);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--wdi-night-label);
+}
+
+.wdi-table .wdi-roster__meta {
+  font-family: var(--wdi-font-pixel-text);
+  color: var(--wdi-night-text-muted);
+}
+
+.wdi-table .wdi-roster__row.is-winner {
+  border-color: var(--wdi-night-accent);
+  box-shadow: inset 4px 0 0 var(--wdi-night-accent);
+}
+
+.wdi-table .wdi-roster__row .wdi-seat {
+  font-family: var(--wdi-font-pixel-display);
+  color: var(--wdi-night-label);
+  background: rgb(var(--wdi-night-rgb) / 0.55);
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+.wdi-table .wdi-friend {
+  min-height: 32px;
+  padding-inline: var(--wdi-space-2);
+}
+
+/* ------------------------------------------------------------------ the seat picker (PR 2) */
+
+/* A bottom sheet of glass over the world: tiles of the living seats, Cancel under them. */
+.wdi-seatpicker.wdi-table {
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-glass-fill);
+  border: 0;
+  border-radius: 0;
+  clip-path: var(--_corner);
+  box-shadow: inset 0 0 0 2px var(--_rim);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.wdi-seatpicker.wdi-table .wdi-seat {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  height: auto;
+  color: var(--wdi-night-label);
+  background-color: rgb(var(--wdi-night-rgb) / 0.5);
+  border: 0;
+  border-radius: 0;
+  clip-path: var(--_corner);
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+.wdi-seatpicker.wdi-table .wdi-seat:hover {
+  background-color: rgb(var(--wdi-violet-rgb) / 0.6);
+}
+
+.wdi-seatpicker.wdi-table .wdi-seat__portrait {
+  background-color: rgb(var(--wdi-night-rgb) / 0.7);
+  border-radius: 0;
+  image-rendering: pixelated;
+}
+
+.wdi-seatpicker.wdi-table .wdi-seat__name {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+}
+
+/* ------------------------------------------------------------------ the main-mode cards and toasts (PR 2) */
+
+/* The look a seat walked as is a one-word tag on the foot of its tile: pixel type on the look's own body colour. */
+.wdi-table .wdi-look-tag {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  letter-spacing: 0;
+  text-transform: capitalize;
+}
+
+/* The Last Shot toast: a glass slip with a hazard edge, on the board. */
+.wdi-table .wdi-toast {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-glass-fill);
+  background-image: none;
+  border: 0;
+  border-left: 6px solid var(--wdi-night-accent);
+  border-radius: 0;
+  clip-path: var(--_corner);
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+.wdi-table .wdi-toast--shot {
+  border-left-color: var(--wdi-hazard);
+}
+
+/* The end panel's lists (looks, undealt cards, alsoWon): running pixel text under a pixel eyebrow. */
+.wdi-table .wdi-over__list,
+.wdi-table [data-testid='gameover-undealt'] {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  color: var(--wdi-night-text);
+}
+
+.wdi-table .wdi-over__list > li::marker {
+  color: var(--wdi-night-accent);
+}
+
+@media (max-width: 480px) {
+  .wdi-table .wdi-roster__row {
+    grid-template-columns: auto 1fr;
+  }
+
+  .wdi-table .wdi-roster__tags {
+    grid-column: 2;
+    justify-content: flex-start;
+  }
+
+  .wdi-table .wdi-btn {
+    white-space: nowrap;
+  }
+}
