@@ -62,7 +62,30 @@ function clueAt(party: Party, dx = 0): string {
 
 describe('animation ids', () => {
   it('A5: interact is 4', () => {
-    expect(AnimId).toEqual({ idle: 0, walk: 1, swing: 2, die: 3, interact: 4 });
+    expect(AnimId).toEqual({
+      idle: 0,
+      walk: 1,
+      swing: 2,
+      die: 3,
+      interact: 4,
+      // Round 8 (docs/round8/seams.md 2), appended.
+      strike: 5,
+      hurt: 6,
+      knockdown: 7,
+      down: 8,
+      getup: 9,
+      run: 10,
+      limp: 11,
+      stagger: 12,
+      stunned: 13,
+      inspect: 14,
+      threaten: 15,
+      cower: 16,
+      fidget: 17,
+      stomp: 18,
+      eat: 19,
+      rob: 20,
+    });
   });
 });
 
