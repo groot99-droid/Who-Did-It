@@ -1306,7 +1306,7 @@ Lines are in `apps/client/src/ui/copy/tips.ts` (`LOADING_COPY`, `TIPS`); the sec
 | `loading.tipLabel` | Tip | the eyebrow above the tip |
 | `loading.progress` | Loading | the progress bar's accessible name |
 
-Tips are ten short lines about the controls and the world (hold E on a clue, Tab for the role card, Shift to sneak, locked doors, the Bell, dark places, meetings, clues in pairs, woods and caves); none names a role or what it can do. `data-testid`s: `loading` (the screen, hidden until the load passes `ui.loading.showAfterS`), `transition` (the cover layer), `landing-trailer` (the video's slot; the `<video>` inside it is `muted loop playsinline autoplay preload="none"` with the poster `landing_loop.jpg`, and the slot stays hidden until the poster or a frame arrives). The trailer is skipped under reduced motion, the data saver and `?video=0`.
+Tips are ten short lines about the controls and the world (hold E on a clue, Tab for the role card, Shift to sneak, locked doors, the Bell, dark places, meetings, clues in pairs, woods and caves); none names a role or what it can do. `data-testid`s: `loading` (the screen, hidden until the load passes `ui.loading.showAfterS`), `transition` (the cover layer), `landing-trailer` was the video's slot; since round 7 the loop behind the menu is 7B's backdrop (`ui/backdrop.ts`, section 6) and the menu only starts the `lobby` theme on the first tap (7C, A107). The loop is skipped under reduced motion, the data saver and `?video=0` as before.
 
 ### 14.23 Admin page (6D)
 

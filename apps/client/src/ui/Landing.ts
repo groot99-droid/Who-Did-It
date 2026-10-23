@@ -2,7 +2,6 @@ import type { PartyVisibility } from '../net/protocol';
 import { readAudioSettings, onAudioSettings, writeAudioSettings } from '../view/audioSettings';
 import { MENU_COPY as C, fill } from './copy';
 import { h, type Screen } from './dom';
-import { mountTrailer } from './landingTrailer';
 import { openCodeBox } from './menu/codeBox';
 import { openDialog, type MenuDialog } from './menu/dialog';
 import { openFriendsPanel } from './menu/friends';
@@ -28,7 +27,7 @@ export interface LandingOptions {
   explainFailure?(): Promise<string | null>;
   /** The consented leave of the current party, for Quit; the scene passes `net.leave`. */
   onQuit?(): Promise<void>;
-  /** The music bus, so the trailer's soundtrack can start on the first tap (round 6, 6K). */
+  /** The music bus, so the menu theme can start on the first tap (round 6, 6K). */
   music?: { crossfadeTo(playlistId: string | null): void } | undefined;
 }
 
@@ -183,10 +182,11 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
       opts.build ? fill(C['menu.footer'], { build: opts.build }) : '',
     ),
   );
-  // Round 6 (locked slot): the trailer loop (6K).
-  const trailer = h('div', { class: 'wdi-landing__trailer', 'data-testid': 'landing-trailer', hidden: true });
-  const trailerPlayer = mountTrailer(trailer, { base: import.meta.env.BASE_URL, music: opts.music });
-  root.append(trailer, el);
+  // The menu theme starts on the first tap: the autoplay policy forbids earlier (A98); it runs on into the lobby.
+  const startMusic = () => opts.music?.crossfadeTo('lobby');
+  document.addEventListener('pointerdown', startMusic, { once: true });
+  document.addEventListener('keydown', startMusic, { once: true });
+  root.append(el);
   if (opts.joinCode !== null) openCode(opts.joinCode);
   else start.focus();
   return {
@@ -194,8 +194,8 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
       dialog?.close();
       settings?.destroy();
       unsubscribe();
-      trailerPlayer.destroy();
-      trailer.remove();
+      document.removeEventListener('pointerdown', startMusic);
+      document.removeEventListener('keydown', startMusic);
       el.remove();
     },
   };
