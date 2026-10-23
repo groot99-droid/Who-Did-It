@@ -2933,7 +2933,8 @@ session's goes back to it. Log under "Integration log, round 6".
   catalog test needs. Mastered at q3 stereo by 6Z's call: the three day themes as clean loops, the loading pieces
   and the trailer whole; the playlists `trailer`, `*_loading`, `*_day`, `*_dusk`, `onub_kitchen`, `onub_rush`
   filled; `train_arrive`, `train_brake`, `ferry_horn`, `crows` in `audio/manifest.json`. Numbers and reasons in A96.
-  Contract requests: the four SFX keys in `AUDIO_KEYS`; the licence and the vendor row of the Flow Music tracks.
+  Contract requests, answered by 6Z: the four SFX keys in `AUDIO_KEYS` (granted, in this PR); the licence and the
+  vendor row of the Flow Music tracks (asked of the owner; CREDITS says "licence open" until then).
 - **Waiting**: the owner's intake and context answers for the two videos (step 3).
 
 ## Integration log, round 6
