@@ -3418,6 +3418,10 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
   `quest.accept {questId:'contract'}` to the vendetta; the quest has no `quests.json` row, so the round-6
   refusal of a `contract` row and its tests stand; UI.md 14.29's `vendetta.note.contract`; the Notebook's contract
   entry and its Accept button, which 6Z handed to 7H: `NotebookSnap.note` and `of` and the `NotebookPanel` row).
+- 2026-10-23: PR 4 (the four vendetta invariants: `sim/vendettas/invariants.ts`, loaded from `run.ts`, GDD 3.20;
+  `pnpm auto -- --matches 50 --map hollowmere` 50/50 clean; `tools/auto/checks` `ROUND7_CHECKS`, so a run refuses
+  to start without them; the exact name pins of `test/invariants.test.ts` and `tools/auto/test/report.test.ts`
+  extended by the four, on 6Z's exception).
 
 ### Round 7 log: 7I
 

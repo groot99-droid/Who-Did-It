@@ -185,6 +185,10 @@ describe('the round-6 invariants', () => {
       'step',
       'matchLength',
       'killClues',
+      'vendettaOnce',
+      'contractQuest',
+      'strongboxOnce',
+      'vendettaPublic',
     ]);
   });
 
