@@ -16,12 +16,13 @@ import {
   statusBitsOf,
   tickEffects,
 } from './effects';
+import { runCreatures } from './fists';
 import { type Body, bodies, bodyOf, clearBodies, ensureBody, publishBodies } from './state';
 
 /**
  * The body stage (GDD 3.22), the locked call site after `runMobs` in `sim/Step.ts`: stamina, the effects' tick,
- * regeneration, the knockout's clock and the wire. Bodies only tick in the world phases; a meeting, the card and
- * game over freeze them. The lobby has none.
+ * regeneration, the knockout's clock, the wire, and the creatures' flinch and corpse window (`runCreatures`). Bodies
+ * only tick in the world phases; a meeting, the card and game over freeze them. The lobby has none.
  */
 export function runBody(room: PartyRoom): void {
   const phase = room.state.phase;
@@ -40,6 +41,7 @@ export function runBody(room: PartyRoom): void {
       if (!body.figure && (!p || p.dead)) continue; // `publishBodies` drops it: a ghost has no body
       tickBody(room, id, body, p);
     }
+    runCreatures(room);
   }
   publishBodies(room);
 }

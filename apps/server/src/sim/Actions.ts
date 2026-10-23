@@ -2,7 +2,9 @@ import { abilities, roles } from '@wdi/content';
 import { ErrorCode, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { resolveHandle } from './Avatars';
+import { cureBy } from './body/cures';
 import { bodyBlocksAct } from './body/run';
+import { handleBodyAbility } from './body/verbs';
 import { handleHold } from './Hold';
 import { handleImpersonate } from './Impersonate';
 import { handleKill } from './Kill';
@@ -32,7 +34,7 @@ export function runAction(
 }
 
 /** A living, placed player in a phase where verbs work, else the refusal is sent and null returned. */
-function livingActor(room: PartyRoom, sessionId: string, needBellPhase = false): PlayerSim | null {
+export function livingActor(room: PartyRoom, sessionId: string, needBellPhase = false): PlayerSim | null {
   const p = simOf(room).players.get(sessionId);
   if (!p) return null;
   const phase = room.state.phase;
@@ -63,6 +65,14 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
     case 'poison':
     case 'lastShot':
       return handleNightPower(room, sessionId, payload);
+    // Round 8, 8A (GDD 3.22): the fists, the slingshot, the curing items and the Wake Loaf (`sim/body/verbs.ts`).
+    case 'strike':
+    case 'slingshot':
+    case 'heal':
+    case 'salts':
+    case 'antidote':
+    case 'eat':
+      return handleBodyAbility(room, sessionId, payload);
     default:
       reject(room, sessionId, ErrorCode.cannot, 'cannot do that');
   }
@@ -105,6 +115,7 @@ function handleBandage(room: PartyRoom, sessionId: string, payload: Record<strin
   if (stack.qty <= 1) slots.splice(at, 1);
   else stack.qty -= 1;
   target.bandagedUntilTick = tick + Math.round((def.params?.protectS ?? 0) * TICK_RATE);
+  if (targetId !== null) cureBy(room, targetId, def.consumes ?? 'bandage'); // round 8, 8A: it stops Bleeding (GDD 3.22)
   player.priv.cooldownEndTick.set('bandage', tick + Math.round((def.cooldownS ?? 0) * TICK_RATE));
 }
 

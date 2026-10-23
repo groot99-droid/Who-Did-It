@@ -109,6 +109,7 @@ New kinds, emitted by their owner and heard by anyone. Data carries seat ids or 
 | `body.hit` | `{ target, by?, source, dmg, effects }` | 8A |
 | `body.ko`, `body.wake` | `{ target, by? }` | 8A |
 | `body.effect` | `{ target, effect, on: boolean }` | 8A |
+| `eat` | `{ seat }` (a Wake Loaf, or any food, eaten; 8E's hunger hears it) | 8A |
 | `inspect` | `{ by, target }` | 8B |
 | `purse` | `{ seat, delta, reason: 'stake' \| 'wage' \| 'sale' \| 'buy' \| 'rent' \| 'fine' \| 'theft' \| 'drop' \| 'pickup' \| 'bank' \| 'faith' \| 'hq' \| 'fence' }` | 8C (and 8D, 8E through 8C's `movePurse`) |
 | `econ.heistTake` | `{ amount }` | 8C, on the existing `vendetta.heist.*` |
