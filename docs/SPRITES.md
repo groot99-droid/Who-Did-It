@@ -963,7 +963,8 @@ pass (five clips, 8 directions) on one 1024² body page at a fill of 0.42-0.47 (
 16 clips; the frame plan of A141 (idle 12, walk, run, limp, stagger 8 each, swing, strike, knockdown, getup,
 inspect, eat, rob 6 each, die and interact 8, hurt 3, threaten, cower, stomp, stunned 4 each, fidget 6, down 2) is
 129 frames a direction, 1 032 a pass. At the measured cost that is one 2048² body page and one 1024² overlay
-page a look (1.25), 12.5 for ten looks and a worst-case resident of 14.6 against the cap of 6. Halving the
+page a look (1.25), 12.5 for ten looks and a worst-case resident of 14.6 against the cap of 8 (6 until round 8;
+A141 carries 6Z's ruling and the four-direction plan that fits under it). Halving the
 packed cell's density does not help: 128 px packed cells (A135) quadruple every frame, so even today's five
 clips would need a 2048² body page. The character budget therefore cannot hold the full clip table at any cell
 size without a DECISIONS row; A141 asks 6Z for it and names the fallbacks (one-shots in four directions, fewer
