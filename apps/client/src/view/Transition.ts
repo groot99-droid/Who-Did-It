@@ -7,7 +7,93 @@
  * scene start (a meeting's end after its start, a game over after anything) is the one that must win.
  * The three call sites in `net/worldRouter.ts` are locked.
  */
-export type TransitionKind = 'fade' | 'iris' | 'wipe';
+export type TransitionKind = 'fade' | 'iris' | 'wipe' | 'station' | 'climbUp' | 'climbDown';
+
+/**
+ * Round 8 (8H, A143; motion.md 3): the World's scene start picks its cover from the portal the seat came
+ * through. A door wipes; a ladder, stair, hatch, shaft, drop or crawl irises, with rungs passing the way the
+ * seat climbs when the portal changes height (its `elevationDelta`); an arrival at a map's Train station fades
+ * through the station; anything else (the first spawn, a cave mouth, a forest gate, the return from a meeting)
+ * fades. The transit veil is this cover itself. Reduced motion still cuts, in `transition`.
+ */
+const BY_PORTAL: Record<string, TransitionKind> = {
+  door: 'wipe',
+  stairs: 'iris',
+  hatch: 'iris',
+  shaft: 'iris',
+  drop: 'iris',
+  crawl: 'iris',
+};
+
+/** A portal as the scene files carry it: the part the pick needs. */
+export interface PortalRow {
+  from: string;
+  to: string;
+  toSpawn: string;
+  kind: string;
+  elevationDelta?: number;
+}
+
+/** Where a seat now stands, as `sceneEnter` carries it. */
+export interface SceneEnterLike {
+  sceneId: string;
+  spawn: string;
+}
+
+/**
+ * The pure pick: the portal leading from `prevScene` to this spawn names the cover; a spawn that is a map's
+ * `station` ("scene.spawn") fades through the station; nothing known, or no scene change, fades.
+ */
+export function pickTransition(
+  prevScene: string | null,
+  enter: SceneEnterLike,
+  portals: readonly PortalRow[],
+  stations: ReadonlySet<string>,
+): TransitionKind {
+  if (prevScene === null || prevScene === enter.sceneId) return 'fade';
+  const via = portals.find(
+    (p) => p.from === prevScene && p.to === enter.sceneId && p.toSpawn === enter.spawn,
+  );
+  if (via) {
+    const kind = BY_PORTAL[via.kind] ?? 'fade';
+    const rise = via.elevationDelta ?? 0;
+    return kind === 'iris' && rise !== 0 ? (rise > 0 ? 'climbUp' : 'climbDown') : kind;
+  }
+  return stations.has(`${enter.sceneId}.${enter.spawn}`) ? 'station' : 'fade';
+}
+
+/** The portal graph, loaded lazily so `@wdi/content` stays out of the main bundle (as `sceneNames.ts`). */
+let graph: { portals: PortalRow[]; stations: Set<string> } | null = null;
+let loading: Promise<void> | null = null;
+let lastScene: string | null = null;
+
+function loadGraph(): void {
+  loading ??= import('@wdi/content')
+    .then(({ scenes, maps }) => {
+      const all = Object.values(scenes as Record<string, { portals?: PortalRow[] }>);
+      graph = {
+        portals: all.flatMap((s) => s.portals ?? []),
+        stations: new Set(
+          Object.values(maps as Record<string, { station?: string }>).flatMap((m) =>
+            m.station ? [m.station] : [],
+          ),
+        ),
+      };
+    })
+    .catch(() => undefined);
+}
+
+/**
+ * The cover for a World scene start (`net/worldRouter.ts` `onWorldEnter`, the one line 6Z granted 8H). It
+ * remembers the scene it last saw so it can find the portal between the two. Until the graph has loaded
+ * (only the first spawn of a page, which fades anyway) it answers 'fade'.
+ */
+export function portalTransition(enter: SceneEnterLike): TransitionKind {
+  loadGraph();
+  const kind = graph ? pickTransition(lastScene, enter, graph.portals, graph.stations) : 'fade';
+  lastScene = enter.sceneId;
+  return kind;
+}
 
 /** One mounted layer; `cover` and `reveal` call `done` on `transitionend`, the core adds the timeout fallback. */
 export interface TransitionLayer {

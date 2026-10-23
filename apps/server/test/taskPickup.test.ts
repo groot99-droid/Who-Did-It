@@ -11,7 +11,10 @@ import {
   Winner,
   type PlayerState,
 } from '@wdi/shared';
+import { runInvariants } from '../src/sim/auto/invariants';
 import { matchEvents } from '../src/sim/auto/log';
+import { emitSim } from '../src/sim/events/bus';
+import { npcMemory } from '../src/sim/npc/memory';
 import {
   advance,
   allTownsfolk,
@@ -27,8 +30,8 @@ import {
   type Party,
 } from './npcHelpers';
 
-// Round 7, 7M (GDD 3.5, A133 (8), (9)): the pick-up of a task's deliverable at its source prop and the `taskDone` sim
-// event. New file.
+// Round 7, 7M (GDD 3.5, A133 (8), (9), (10)): the pick-up of a task's deliverable at its source prop, the `taskDone` sim
+// event and the `taskBar` invariant. New file.
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -172,5 +175,61 @@ describe('taskDone (A133 (9))', () => {
     expect(qty(me, FIX.tool!)).toBe(0);
     expect(party.room.state.taskBar).toBe(100);
     expect(party.room.state.winner).toBe(Winner.village);
+  });
+});
+
+const failing = (party: Party) => runInvariants(party.room).map((f) => f.name);
+
+describe('the taskBar invariant (A133 (10))', () => {
+  it('fails on a bar the lists do not explain, on an NPC seat with a list, and on a taskDone nobody finished', async () => {
+    const { party, h, me } = await world();
+    expect(failing(party)).toEqual([]);
+    assign(me, 'fixPump');
+    party.room.state.taskBar = 50;
+    expect(failing(party)).toEqual(['taskBar']);
+    party.room.state.taskBar = 0;
+    expect(failing(party)).toEqual([]);
+    // A party of humans has no NPC seat, so one seat is marked as one for the check.
+    const other = party.humans[2]!;
+    const npc = party.room.state.players.get(other.id)!;
+    npcMemory(party.room).ids.add(other.id);
+    assign(npc, 'fixPump');
+    expect(failing(party)).toEqual(['taskBar']);
+    npc.priv.tasks.clear();
+    npcMemory(party.room).ids.delete(other.id);
+    me.priv.tasks.clear();
+    assign(me, 'fixPump', false, true);
+    party.room.state.taskBar = 100;
+    expect(failing(party)).toEqual([]);
+    // A completion the log claims but no list shows.
+    emitSim(party.room, {
+      tick: party.room.state.tick,
+      kind: 'taskDone',
+      seat: h.id,
+      data: { taskId: 'mendFence', fake: false },
+    });
+    advance(party, 2);
+    await wait(50);
+    expect(dones(party)).toHaveLength(1);
+    expect(failing(party)).toEqual(['taskBar']);
+  });
+
+  it('stays quiet through a fake and a real completion by the Done control', async () => {
+    const { party, h, me } = await world();
+    assign(me, 'fixPump', true);
+    stand(party, h, PUMP);
+    await hold(party, h, 'fixPump');
+    await finish(party, h, 'fixPump');
+    expect(dones(party)).toHaveLength(1);
+    expect(failing(party)).toEqual([]);
+    assign(me, 'mendFence');
+    give(me, tasks.tasks.mendFence!.tool!, tasks.tasks.mendFence!.toolQty ?? 1);
+    const fence = propOf(tasks.tasks.mendFence!.targets[0]!.scene, tasks.tasks.mendFence!.targets[0]!.prop);
+    stand(party, h, fence);
+    await hold(party, h, 'mendFence');
+    await finish(party, h, 'mendFence');
+    expect(dones(party)).toHaveLength(2);
+    expect(party.room.state.taskBar).toBe(100);
+    expect(failing(party)).toEqual([]);
   });
 });
