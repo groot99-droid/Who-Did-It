@@ -82,6 +82,7 @@ export function renderProtocolDoc(): string {
     'OnubClaimPayload',
     'JoinOptions',
     'PartyVisibility',
+    'PartyListing',
     'CreateOptions',
     'HoldAction',
     'MinigameKind',

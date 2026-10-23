@@ -3232,6 +3232,7 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 ### Round 7 log: 7D
 
 - PR 1 (wire): `CreateOptions`, `JoinOptions.profile`, `Player.profile` (schema version 4), `balance.json` `party`, the `onAuth` checks, `PROTOCOL.md`, `parties.test.ts` (auth half), ARCHITECTURE 5.3 and GDD 3.21 server lines, A108. `protocol-doc.ts` lists `PartyVisibility` and `CreateOptions`. Profile codes are exact-length upper-case join-alphabet strings; `newSeat` is untouched (the profile is set in `onJoin`).
+- PR 2 (listing): `PartyRoom.syncListing` and the room-memory visibility, `services/partyListing.ts`, `GET /parties` in `server.ts`, `allowRoute` and the route's global bucket in `matchmakeGuard.ts`, `PartyListing` in the protocol, swarm `--create`, ARCHITECTURE 5.3, GDD 3.21, A108 amended. The route is the one place a new HTTP cost appears: 7C polls it every `listRefreshS`.
 
 ### Round 7 log: 7E
 
