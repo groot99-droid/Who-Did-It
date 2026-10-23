@@ -14,6 +14,12 @@ export const SCRIP_COPY = {
   'shop.purse': 'Your purse: {n} Scrip',
   'shop.close': 'Close',
 
+  // 14.34.2 The purse counter
+  'purse.label': 'Your purse',
+  'purse.amount': '{n} Scrip',
+  'purse.gain': '+{n}',
+  'purse.loss': '−{n}',
+
   // 14.34.1 Shop names
   'shop.bakery': 'Bakery',
   'shop.apothecary': 'Apothecary',

@@ -1168,3 +1168,16 @@ trade; a refusal is the usual error line. 8H animates the panel by `wdi-anim-pan
 | `shop.purse` | Your purse: {n} Scrip | under the shop's name |
 | `shop.close` | Close | the panel's close button |
 | `shop.<id>` | Bakery, Apothecary, General Store, Market, Gamekeeper's Stall, Lodge Store, Camp Market | the panel's title, by `economy.json` shop id |
+
+#### 14.34.2 The purse counter
+
+`view/purse/PurseHud.ts`: a pill under the goal chip in the HUD's top-left column, own client only. It shows the
+purse and, for a moment after a change, the change beside it (`data-change="gain"` or `"loss"`); 8H animates the roll
+by `wdi-anim-purse`. Entering a scene shows the amount alone, never the whole purse as a gain.
+
+| Key | Text | Where |
+|---|---|---|
+| `purse.label` | Your purse | the counter's accessible name |
+| `purse.amount` | {n} Scrip | the counter |
+| `purse.gain` | +{n} | beside it after a wage, a sale or a pickup |
+| `purse.loss` | −{n} | beside it after a buy, a deposit or a theft |
