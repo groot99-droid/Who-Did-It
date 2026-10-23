@@ -43,19 +43,25 @@ export class NodeView {
 
   update(items: readonly NodeSnap[], _now: number): void {
     const present = new Set<string>();
+    const fresh = new Set<string>();
     for (const n of items) {
       present.add(n.id);
       let d = this.drawn.get(n.id);
       if (!d) {
+        fresh.add(n.id);
         d = this.build(n);
         this.drawn.set(n.id, d);
       }
       if (d.active !== n.active) this.pose(d, n.resource, n.active);
     }
+    // A pickup takes one heap from a feed that otherwise carries on. A feed whose old nodes are all gone has changed
+    // scene behind the portal fade or been reset by a reconnect, and nothing it drops plays a break (6Z, #189).
+    let kept = false;
+    for (const id of this.drawn.keys()) if (present.has(id) && !fresh.has(id)) kept = true;
     for (const [id, d] of this.drawn) {
       if (present.has(id)) continue;
       this.drawn.delete(id);
-      this.sweep(d);
+      this.sweep(d, kept);
     }
   }
 
@@ -106,12 +112,14 @@ export class NodeView {
 
   /**
    * A node gone from the feed: the coins heap a pickup took whole (8C, `sim/economy/coins.ts`). It plays its break
-   * once where it lay, then goes; anything else, or under reduced motion, goes at once. A scene change restarts the
-   * World scene and with it this view, so a node leaving the feed here was always taken.
+   * once where it lay, then goes, but only while the feed carried on (`kept`) and the heap was on the viewer's
+   * screen; anything else, or under reduced motion, goes at once. The server keeps its pickup event to itself
+   * (8C's `econ.coinsTaken`), so the leave is the only cue.
    */
-  private sweep(d: Drawn): void {
+  private sweep(d: Drawn, kept: boolean): void {
     const key = nodeBreakKey(d.resource);
-    if (!d.art || !d.active || this.reducedMotion() || !this.scene.anims.exists(key)) {
+    const seen = this.scene.cameras.main.worldView.contains(d.obj.x, d.obj.y);
+    if (!kept || !seen || !d.art || !d.active || this.reducedMotion() || !this.scene.anims.exists(key)) {
       d.obj.destroy();
       return;
     }
