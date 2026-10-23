@@ -11,18 +11,26 @@ import { type Match, startMatch } from './simHelpers';
 
 /** Round 8 (GDD 3.23), Session 8D: the rumour ledger, the mailbag and Blackmail Notices. */
 
+/**
+ * The mailbag's scene row lands with its art (8J, A139), so these tests stand it on the platform in a fixture of
+ * their own, on the tile its row will take.
+ */
+const bag = { id: economy.notices.mailbags[0]!, kind: 'mailbag', x: 61, y: 29 };
+
 let colyseus: ColyseusTestServer;
 beforeAll(async () => {
+  if (!scenes.overworld.props.some((p) => p.id === bag.id)) scenes.overworld.props.push(bag);
   process.env.WDI_DEBUG = '1';
   colyseus = await boot(createServer({ ipBurst: 1e5, ipPerMin: 1e8, globalPerMin: 1e8 }));
 });
 afterAll(async () => {
+  const i = scenes.overworld.props.indexOf(bag);
+  if (i >= 0) scenes.overworld.props.splice(i, 1);
   delete process.env.WDI_DEBUG;
   await colyseus.shutdown();
 });
 beforeEach(async () => colyseus.cleanup());
 
-const bag = scenes.overworld.props.find((p) => p.id === economy.notices.mailbags[0])!;
 const SAMPLE = economy.notices.sampleS * TICK_RATE;
 
 /** Gives every seat a public look, in seat order. */
