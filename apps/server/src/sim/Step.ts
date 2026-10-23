@@ -6,6 +6,7 @@ import { publishAvatars } from './Avatars';
 import { runDecay } from './Clues';
 import { runAuto } from './auto/Auto';
 import { runEvents } from './events/bus';
+import './tasks/invariants'; // round 7, 7M: the taskBar invariant's host (locked line, granted by 6Z; above 7H's so its four stay last)
 import { runVendettas } from './vendettas/run';
 import { runMemorial } from './Memorial';
 import { runMobs } from './Mobs';

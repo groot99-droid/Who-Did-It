@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { createCanvas, type SKRSContext2D } from '@napi-rs/canvas';
 import { encodePng, type Rgba } from './bleed.ts';
 import { DIRECTIONS, type Dir } from './keys.ts';
-import { drawGlow, drawHeld, drawNode } from './m5b-draw.ts';
+import { BREAK_FPS, BREAK_FRAMES, drawGlow, drawHeld, drawNode, drawNodeBreak } from './m5b-draw.ts';
 import { GIVER_IDLE, GIVER_IDS, drawGiver } from './m5b-givers.ts';
 import { MOB_ANIM, MOB_ANIMS, MOB_IDS, drawMob, type MobAnim } from './m5b-mobs.ts';
 import { atlasJson, packFrames, type MultiAtlas, type PackInput } from './pack.ts';
@@ -61,6 +61,11 @@ export const HELD_BEHIND: readonly Dir[] = ['n', 'ne', 'nw'];
 export const snakeOf = (id: string): string => id.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
 export const nodeFrame = (id: string, state: (typeof NODE_STATES)[number]): string =>
   `node_${snakeOf(id)}/${state}`;
+/** A node's break (round 8, 8G): the animation `node_<snake id>/break` and its frames `<key>/<nnn>`. */
+export const nodeBreakAnim = (id: string): string => `node_${snakeOf(id)}/break`;
+export const nodeBreakFrame = (id: string, n: number): string =>
+  `${nodeBreakAnim(id)}/${String(n).padStart(3, '0')}`;
+export { BREAK_FPS, BREAK_FRAMES };
 export const heldFrame = (tool: string, dir: Dir): string => `held_${tool}/${dir}`;
 export const glowFrame = (glow: string, n: number): string => `glow_${glow}/${n}`;
 /** A mob's animation key, `mob_<id>/<anim>/<dir>` (the row's `sprite` stem), and its frame `<key>/<nnn>`. */
@@ -103,13 +108,18 @@ export function m5bFrames(atlas: M5bAtlas, style: ArtStyle): M5bFrame[] {
       pivot: half(MOB_FEET),
     }));
   if (atlas === 'nodes')
-    return RESOURCE_IDS.flatMap((id) =>
-      NODE_STATES.map((state) => ({
+    return RESOURCE_IDS.flatMap((id) => [
+      ...NODE_STATES.map((state) => ({
         name: nodeFrame(id, state),
         img: fin(render(NODE_CELL, (g) => drawNode(g, id, state, NODE_GROUND))),
         pivot: half(NODE_GROUND),
       })),
-    );
+      ...Array.from({ length: BREAK_FRAMES }, (_, n) => ({
+        name: nodeBreakFrame(id, n),
+        img: fin(render(NODE_CELL, (g) => drawNodeBreak(g, id, n, NODE_GROUND))),
+        pivot: half(NODE_GROUND),
+      })),
+    ]);
   const held = TOOL_IDS.flatMap((tool) =>
     DIRECTIONS.map((dir) => {
       const hand = [HELD_FEET[0] + 2 * HAND[dir][0], HELD_FEET[1] + 2 * HAND[dir][1]] as const;
@@ -160,10 +170,12 @@ export function giverFrameList(): Array<[(typeof GIVER_IDS)[number], Dir, number
 
 /** Page caps (SPRITES 12): nodes and tools fit one 512² page each, the givers one 512 x 1024 and the mobs one 1024². */
 export const M5B_PAGE = { w: 512, h: 512 } as const;
+/** The nodes page with its break frames: held to 512 x 256 so the breaks cost a tenth of a resident page (A142). */
+export const NODE_PAGE = { w: 512, h: 256 } as const;
 export const MOB_PAGE = { w: 1024, h: 1024 } as const;
 export const GIVER_PAGE = { w: 512, h: 1024 } as const;
 export const pageOf = (atlas: M5bAtlas) =>
-  atlas === 'mobs' ? MOB_PAGE : atlas === 'givers' ? GIVER_PAGE : M5B_PAGE;
+  atlas === 'mobs' ? MOB_PAGE : atlas === 'givers' ? GIVER_PAGE : atlas === 'nodes' ? NODE_PAGE : M5B_PAGE;
 
 /** Pack frames onto one page and set each frame's pivot as a fraction of its source size. */
 export async function packM5b(
@@ -196,6 +208,17 @@ export function toolAnims(texture = 'tools'): string {
     frames: Array.from({ length: GLOW_FRAMES }, (_, n) => ({ key: texture, frame: glowFrame(glow, n) })),
     frameRate: GLOW_FPS,
     repeat: -1,
+  }));
+  return `${JSON.stringify({ anims }, null, 1)}\n`;
+}
+
+/** The node breaks (`anims_nodes`): one per resource, `BREAK_FPS`, once; the client plays it backwards to regrow. */
+export function nodeAnims(texture = 'nodes'): string {
+  const anims = RESOURCE_IDS.map((id) => ({
+    key: nodeBreakAnim(id),
+    frames: Array.from({ length: BREAK_FRAMES }, (_, n) => ({ key: texture, frame: nodeBreakFrame(id, n) })),
+    frameRate: BREAK_FPS,
+    repeat: 0,
   }));
   return `${JSON.stringify({ anims }, null, 1)}\n`;
 }
@@ -241,6 +264,7 @@ export async function m5bFiles(style: ArtStyle): Promise<Map<string, Buffer>> {
     const frames = m5bFrames(atlas, style).map((f) => ({ ...f, png: encodePng(f.img) }));
     for (const [k, v] of await packM5b(atlas, frames, pageOf(atlas))) files.set(k, v);
   }
+  files.set('nodes.anims.json', Buffer.from(nodeAnims()));
   files.set('tools.anims.json', Buffer.from(toolAnims()));
   files.set('mobs.anims.json', Buffer.from(mobAnims()));
   files.set('givers.anims.json', Buffer.from(giverAnims()));
@@ -259,6 +283,7 @@ export interface M5bManifestEntry {
 export function m5bManifest(filter: 'nearest' | 'linear'): M5bManifestEntry[] {
   return [
     { key: 'nodes', type: 'multiatlas', url: 'm5b/nodes.json', path: 'm5b/', filter },
+    { key: 'anims_nodes', type: 'animation', url: 'm5b/nodes.anims.json' },
     { key: 'tools', type: 'multiatlas', url: 'm5b/tools.json', path: 'm5b/', filter },
     { key: 'anims_tools', type: 'animation', url: 'm5b/tools.anims.json' },
     { key: 'mobs', type: 'multiatlas', url: 'm5b/mobs.json', path: 'm5b/', filter },

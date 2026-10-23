@@ -311,6 +311,7 @@ for a selection, `-hazard` for a cue. Never a black shadow.
 | pop (`pop`; the E prompt appearing) | 200 ms, from 0.6 | `--wdi-ease-spring` | appears in place |
 | cooldown sweep (`cooldown`) | the card's cooldown | linear | kept (it is status) |
 | the E hold fill | follows the hold, smoothed over 60 ms | linear | kept, unsmoothed |
+| scene cover into the world, per portal (`view/Transition.ts` `portalTransition`) | `balance.ui.transitionS.fade` (GDD 3.13) | ease-in-out | a cut |
 | toast, dialog, stamp rise | 220 ms | `--wdi-ease` | appears in place |
 | the card flip | 600 ms | `--wdi-ease` | swap, no rotation |
 | the card hold timer | the hold (GDD 2 step 4) | linear | still drains |
@@ -351,6 +352,14 @@ clockwise over the card's cooldown. Each restarts its animation on every call an
 (8A's strike button flashes and cools, 8C's shop buttons flash); the world scene's error handler calls
 `refusedIn(overlay)`, which shakes whichever E prompt is showing as the refusal toast appears. The E prompt pops in as it
 appears and its bar fills smoothly while E is held; a task's mini-game opens with the panel entrance.
+
+Transitions and transport (8H, A143). The World's cover follows the portal the seat came through (GDD
+3.13): `wipe` for a door, `iris` for a level stair or crawl, `climbUp` and `climbDown` (the iris with
+lantern rungs passing the way the seat goes) for a portal that changes height, `station` (night with
+lantern-lit carriage windows sliding past) for an arrival at a map's Train station, and `fade` otherwise. The
+meeting keeps its iris and the end screen its wipe. The in-transit veil is the cover itself: the 0.6 s door
+transit of GDD 3.7 runs while it is down. The Train carries no seat today (GDD 3.3), so its journey card waits
+for a rule that moves seats by Train; the `station` cover is ready for it.
 
 ## 10. Accessibility checklist and measured contrast
 
@@ -1171,3 +1180,43 @@ Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaG
 | `vendetta.note.doubt` | Doubt took the flock: your vote did not carry. | the Vicar's own Notebook entry of kind `NoteKind.doubt`, written at the reveal of the doubted meeting |
 | `vendetta.note.contract` | The mail brought a contract: {name}. | the Hitman's own Notebook entry of kind `NoteKind.contract` (`of` the target seat, `{name}` its seat name), written at the first Train arrival |
 | `vendetta.contract.accept` | Accept | the button on that contract entry while the offer is open (no `contract` quest yet, the mark on the roster); it sends `quest.accept { questId: 'contract' }` |
+
+### 14.33 Inspect (8B)
+
+Lines are in `apps/client/src/ui/copy/inspect.ts` (`INSPECT_COPY`, `inspectLine(id)`); the card is `ui/inspect/` (GDD 3.22 "Inspect"). The server sends only copy ids and bands; a sign or hunch id this build has no line for is left out. The card and the toasts never name a card, a cover or a vendetta.
+
+| Key | Text | Where |
+|---|---|---|
+| `prompt.inspect` | Inspect | the HUD prompt (`E`) on the nearest living figure in reach when nothing else is offered |
+| `inspect.title` | {look} | the card heading; `{look}` is the drawn look's name, capitalised |
+| `inspect.signs.none` | No sign of trouble | the card, when no sign shows |
+| `inspect.light` | Carries a lit light | the card, when a light burns in hand |
+| `inspect.close` | Close | the card's button (Esc also closes; it closes itself after 6 s) |
+| `inspect.noticed` | {look} looked you over | a warm toast to the inspected seat; `{look}` is the inspector's drawn look |
+| `inspect.noticed.someone` | Someone looked you over | the same, for a look this build cannot name |
+| `inspect.health.unhurt` | Unhurt | the card, the health band |
+| `inspect.health.bruised` | Bruised | the card, the health band |
+| `inspect.health.badlyHurt` | Badly hurt | the card, the health band |
+| `inspect.purse.unknown` | You cannot tell their purse | the card, the purse band |
+| `inspect.purse.light` | A light purse | the card, the purse band |
+| `inspect.purse.fair` | A fair purse | the card, the purse band |
+| `inspect.purse.heavy` | A heavy purse | the card, the purse band |
+| `inspect.sign.down` | Out cold | the card, a sign |
+| `inspect.sign.stunned` | Stunned | the card, a sign |
+| `inspect.sign.dazed` | Dazed, eyes swimming | the card, a sign |
+| `inspect.sign.bloody` | Blood on their clothes | the card, a sign |
+| `inspect.sign.bleeding` | Bleeding | the card, a sign |
+| `inspect.sign.limping` | Limping | the card, a sign |
+| `inspect.sign.pale` | Pale and sweating | the card, a sign |
+| `inspect.sign.weary` | Weary, stumbling | the card, a sign |
+| `inspect.sign.weak` | Drawn and weak | the card, a sign |
+| `inspect.sign.hungry` | Hollow-cheeked | the card, a sign |
+| `inspect.sign.hunted` | A hunted look | the card, a sign |
+| `inspect.hunch.watchChain` | Their eyes lingered on your watch chain. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.collar` | They studied your collar as if it offended them. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.keys` | Their eyes counted the keys at your belt. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.rings` | Their stare went straight to your rings. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.measured` | They took your measure, slowly. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.confession` | They watched you as if waiting for a confession. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.blessing` | They looked at you the way one looks for a blessing. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.pockets` | Their glance went to your pockets. | a warm toast to the inspected seat, a `relations.json` note |
