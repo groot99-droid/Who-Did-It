@@ -49,6 +49,10 @@ def args_out(argv: list[str], prog: str) -> str:
     return p.parse_args(argv).out
 
 
+# Rig meshes that are not the subject: a code pass (the building tile map) hides them rather than coding them.
+RIG_PLANES = (rc.CATCHER_NAME,)
+
+
 def setup() -> bpy.types.Scene:
     """The rig with the calibration objects hidden."""
     scene = build_rig.build()
