@@ -3256,6 +3256,17 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
   `opening` class held over grace until the piece ends or the opening is skipped; `loading` maps to the lobby
   piece. Contract requests (manifest, `MUSIC_CLASSES`, `LoadingScreen.test.ts`) granted by 6Z. Measured
   lengths 117 s and 80 s (A101); steps 2 and 3 (length, staging) are stacked locally and go up after #83.
+- 2026-10-23: PR 2 (#101, length). Each opening's `maxS` is its track's measured length rounded down; grace grows
+  by `maxS` and the content checks that an opening's steps fill it; a client test ties `maxS` to the track.
+- 2026-10-23: PR 3 (#105, video step). A cutscene `video` step plays a row of `assets/video/manifest.json` full
+  frame under the captions; any failure drops the picture and the cutscene runs on (7I's memorials use it).
+- 2026-10-23: PR 4 (#116, intro-music fix). The owner reported the HollowMere and BlackPine speeches did not
+  play: the match load's `loading` request (the lobby piece) replaced the opening piece 0.2 s in. No map lists
+  `loading` now; an e2e test checks the intro track still plays 4 s into the opening.
+- 2026-10-23: PR 5 (#119, staging). `CutsceneStage` films camera steps in other scenes over the World, with a
+  dip from black between scenes (none under reduce-motion); `staging.ts` holds the decisions, unit-tested.
+- 2026-10-23: PR 6 (#124, openings). HollowMere (117 s) and BlackPine (80 s) cut between the hub and the
+  map's rooms and caves, the narration spread over the whole track. The owner's report is fixed. 7A closed.
 
 ### Round 7 log: 7B
 
