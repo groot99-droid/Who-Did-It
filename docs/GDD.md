@@ -756,9 +756,9 @@ scene, through `vendettaGoalFor`. It does nothing a human could not do in the sa
 memorial to every seat: the Vicar's film (`memorial_vicar`) under one title caption, skippable like every
 cutscene (3.18). It plays once per match, so a later reveal stays plain, and the meeting, not the night, carries
 it. No other death plays it: the Vicar poisoned, shot, ejected or taken by a wolf, or another card struck by the
-Knife. The quick mode never plays it. It names no seat on screen and changes nothing public beyond the film. The
-server remembers the fallen Vicar as the Ascended Vicar candidate (`flow.ascendedVicarCandidate`, room memory
-only, kept into the room's next match until another memorial replaces it), which round 8's evolutions read.
+Knife. It names no seat on screen and changes nothing public beyond the film. The server remembers the fallen
+Vicar as the Ascended Vicar candidate (`flow.ascendedVicarCandidate`, room memory only, kept into the room's next
+match until another memorial replaces it), which round 8's evolutions read.
 
 ### 3.21 Parties, profiles and friends
 

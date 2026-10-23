@@ -1,5 +1,5 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
-import { GameMode, Phase, S2C } from '@wdi/shared';
+import { Phase, S2C } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createServer } from '../src/server';
 import { markDead } from '../src/sim/Death';
@@ -62,7 +62,7 @@ describe("the Vicar's memorial (GDD 3.20)", () => {
     expect(flowOf(m.room).ascendedVicarCandidate).toBe(vicar!.id);
   });
 
-  it('stays silent for another cause, another card, or the quick mode', async () => {
+  it('stays silent for another cause or another card', async () => {
     const m = await startMatch(colyseus, 5, SEATS);
     const [vicar, killer, villager] = m.bots;
     await nightThenReveal(m, () => {
@@ -71,12 +71,5 @@ describe("the Vicar's memorial (GDD 3.20)", () => {
     });
     expect(memorials(m).flat()).toEqual([]);
     expect(flowOf(m.room).ascendedVicarCandidate).toBeNull();
-
-    const q = await startMatch(colyseus, 4, SEATS);
-    q.room.state.settings.mode = GameMode.onub;
-    await nightThenReveal(q, () => markDead(q.room, q.bots[0]!.id, 'knife', q.bots[1]!.id));
-    q.room.state.settings.mode = GameMode.main;
-    expect(memorials(q).flat()).toEqual([]);
-    expect(flowOf(q.room).ascendedVicarCandidate).toBeNull();
   });
 });
