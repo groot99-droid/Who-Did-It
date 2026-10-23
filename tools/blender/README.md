@@ -15,7 +15,6 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 | `look_parts.py` | The shape helpers (`frustum`, `box`, `ring`, `cylinder`, `rod`), the world-ramp toon materials, the part builder and every costume piece (`@piece`) |
 | `looks_spec.py` | Each look's colours (world ramp steps), skin tone, `interact` base and costume pieces; pure Python |
 | `build_villager.py` | Retired: a re-export shim of `look_parts.py`'s shapes for `static_common.py` until it imports them from there |
-| `build_loft.py` | Renders the dark-loft images `loft_backdrop` (1280 x 720) and `prop_bedroll` / `prop_bedroll_self` (112 x 184) through a non-square `SpriteCam` framing |
 | `build_buildings.py` | Renders each map's buildings (`bld_<mapId>`) from recipes at their footprints (the scene's `buildings[]`, else art plan 3.4) and the multi-tile props, each twice through IsoCam: the beauty and a raw tile map that `tools/sprites/slice.ts` cuts slices with |
 | `build_ground.py` | Renders the isometric ground cells (art plan 3.2): each of the 14 materials of both themes in four variants, one metre under IsoCam at 128 x 64 display px, from a Poly Haven texture pulled towards its world-palette colour and a seeded scatter; the variants blend to one shared mapping at the tile edge, so all four tile with each other. `tools/sprites/tileset.ts` joins them |
 | `env/kitbash.py`, `env/shared_props.py`, `env/hollowmere_props.py`, `env/blackpine_props.py` | The modelling vocabulary (world-palette toon `T`, unlit `F`, box, prism and outline shapes, fitted Kenney meshes) and the frames of `props` (shared props, 8 spots, 20 portal frames), `props_hollowmere` (33 props, 22 spots) and `props_blackpine` (18 props, 14 spots); the multi-tile props are in `build_buildings.py` |
@@ -23,7 +22,7 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 | `kit_import.py` | Imports a CC0 kit mesh (GLB, glTF, FBX, OBJ), joins it, tags it (`wdi_part`) and re-materials it through `WDI_Toon` in the world palette |
 | `env/kits.py` | The CC0 packs and textures of the world art (Kenney URLs, the Poly Haven ids per theme and material) and their fetch into git-ignored `assets/external/kits/`, saving the licence files; pure Python |
 | `build_tiles.py` | Renders four seamless 64 px straight-down variants of each of the six ground sets (`tiles_<biome>_<v>`) |
-| `save_masters.py` | Saves the world masters `buildings_<mapId>.blend` and `props_<mapId>.blend` (round 5) and `loft.blend` into git-ignored `assets/external/` for the ROSW checkout; the round-4 `bakery_props.py` and its master are retired (DECISIONS A62) |
+| `save_masters.py` | Saves the world masters `buildings_<mapId>.blend` and `props_<mapId>.blend` (round 5) into git-ignored `assets/external/` for the ROSW checkout; the round-4 `bakery_props.py` and its master are retired (DECISIONS A62) |
 | `env/ambience.py` | Fetches the four CC0 OpenGameArt ambient sources and masters `amb_village`, `amb_house`, `amb_forest`, `amb_cave` with ffmpeg (loop, mono, -18 LUFS, 2 s crossfade seam, Vorbis q5); pure Python, no `bpy` |
 | `build_vfx.py` | Animates the four M3 VFX frame by frame at 12 fps (`vfx_blood_pool`, `vfx_blood_splat`, `vfx_vote_stamp`, `vfx_dust_step`) |
 | `palettize.py` | Snaps materials to the 64-colour world palette (OKLab), light and shadow from the ramp neighbours; fails on untextured PBR |
@@ -68,8 +67,7 @@ for a in clues props vfx; do
   pnpm --filter @wdi/sprites pack:static ../../build/render/$a ../../apps/client/public/assets/$a
 done
 
-# Loft images, building exteriors and tilesets (minutes on llvmpipe), then finish them (tools/sprites)
-python tools/blender/build_loft.py -- --out build/render        # build/render/loft/
+# Building exteriors and tilesets (minutes on llvmpipe), then finish them (tools/sprites)
 python tools/blender/build_tiles.py -- --out build/render       # build/render/tiles/ (until K6)
 pnpm --filter @wdi/sprites images ../../build/render ../../apps/client/public/assets
 
@@ -109,7 +107,7 @@ pnpm --filter @wdi/sprites world ../../build/render ../../apps/client/public/ass
 pnpm --filter @wdi/sprites review:world thumbs ../../apps/client/public/assets ../../apps/client/public/assets/thumbs
 python3 tools/blender/env/ambience.py --out apps/client/public/assets/audio --licences LICENSES/vendors
 
-# The world and loft masters (git-ignored; copy to the ROSW checkout, assets/source/MANIFEST.md)
+# The world masters (git-ignored; copy to the ROSW checkout, assets/source/MANIFEST.md)
 python tools/blender/save_masters.py -- --out assets/external
 
 # The body review sheet from a die render (all passes)

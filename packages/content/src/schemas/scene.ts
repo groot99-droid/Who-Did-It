@@ -17,8 +17,8 @@ export const GRID_LEGEND = {
 } as const;
 
 /**
- * Scene ids of WORLD 4.3 and 4.10. Append-only: a scene's index is its wire id (`Player.sceneId` is a u8,
- * 255 is the quick-mode loft), so the first 15 entries never move (a test pins them). A new scene's id goes at
+ * Scene ids of WORLD 4.3 and 4.10. Append-only: a scene's index is its wire id (`Player.sceneId` is a u8),
+ * so the first 15 entries never move (a test pins them). A new scene's id goes at
  * the end in the same pull request as its file (GDD 3.13). V2 reads the same graph.
  */
 export const SCENE_IDS = [

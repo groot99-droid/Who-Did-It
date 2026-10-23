@@ -11,7 +11,7 @@ import type { MusicBus } from './MusicBus';
 /**
  * Picks the music class (round 6, docs/round6/cutscene-music.md 3): listens to the lobby, `phaseChange` and `gameOver`
  * on the network bus and asks the `MusicBus` for the playlist `music.json` maps the current map and class to. The
- * meeting and the quick mode's kitchen, night, rush and end come from the phase too, so no scene needs to ask.
+ * meeting comes from the phase too, so no scene needs to ask.
  * Installed once by `Preload` beside the router (locked call site). The server sends no music message.
  *
  * Round 7 (7A, DECISIONS A101): the map's `opening` piece starts when the opening's `cutscene` message arrives (the
@@ -20,7 +20,6 @@ import type { MusicBus } from './MusicBus';
  */
 
 export type MainClass = 'lobby' | 'day' | 'dusk' | 'night' | 'meeting' | 'finalNight' | 'gameOver';
-export type OnubClass = 'kitchen' | 'night' | 'rush' | 'over';
 
 /**
  * The class a phase plays, or `undefined` when the phase keeps whatever plays now: the role card and grace keep the
@@ -51,37 +50,11 @@ export function mainClassFor(phase: number): MainClass | undefined {
   }
 }
 
-/** The quick mode (GDD 3.11): Evening Prep and the crime scenes are the kitchen, the Morning Rush follows dawn. */
-export function onubClassFor(phase: number): OnubClass | undefined {
-  switch (phase) {
-    case Phase.dusk:
-      return 'kitchen';
-    case Phase.night:
-      return 'night';
-    case Phase.dawn:
-    case Phase.meetingDiscussion:
-    case Phase.meetingVote:
-    case Phase.reveal:
-      return 'rush';
-    case Phase.gameOver:
-      return 'over';
-    default:
-      return undefined;
-  }
-}
-
 type ByMap = Record<string, Partial<Record<string, string>> | undefined>;
 
 /** The playlist id `music.json` gives a map's class (a class it does not list is silence). */
 export function playlistFor(mapId: string, cls: string, music: { byMap: ByMap } = musicJson): string | null {
   return music.byMap[mapId]?.[cls] ?? null;
-}
-
-export function onubPlaylistFor(
-  cls: OnubClass,
-  music: { onub: Partial<Record<string, string>> } = musicJson,
-): string | null {
-  return music.onub[cls] ?? null;
 }
 
 /** The opening cutscene id `cutscenes.json` gives a map, or null. */
@@ -97,7 +70,6 @@ type Bus = Pick<MusicBus, 'crossfadeTo' | 'prefetch'>;
 /** The director's logic, apart from Phaser so a test drives it with a fake bus and plain events. */
 export class MusicConductor {
   private mapId: string = DEFAULT_MAP_ID;
-  private onub = false;
   private inMatch = false;
   /** The opening playlist playing now, while its piece runs whole. */
   private opening: string | null = null;
@@ -106,33 +78,23 @@ export class MusicConductor {
 
   constructor(private readonly bus: Bus) {}
 
-  lobby(map: string, mode: 'main' | 'onub'): void {
-    this.onub = mode === 'onub';
+  lobby(map: string): void {
     const picked = map !== this.mapId;
     this.mapId = map;
     // The roster also changes mid-match; only the lobby between matches plays the lobby class.
     if (this.inMatch) return;
-    if (this.onub) this.bus.crossfadeTo(onubPlaylistFor('kitchen'));
-    else {
-      this.bus.crossfadeTo(playlistFor(this.mapId, 'lobby'));
-      // The map is picked: warm its opening piece and the first track of its day theme while the lobby waits.
-      if (picked) {
-        for (const cls of ['opening', 'day'] as const) {
-          const id = playlistFor(this.mapId, cls);
-          if (id !== null) this.bus.prefetch(id);
-        }
+    this.bus.crossfadeTo(playlistFor(this.mapId, 'lobby'));
+    // The map is picked: warm its opening piece and the first track of its day theme while the lobby waits.
+    if (picked) {
+      for (const cls of ['opening', 'day'] as const) {
+        const id = playlistFor(this.mapId, cls);
+        if (id !== null) this.bus.prefetch(id);
       }
     }
   }
 
   phase(phase: number): void {
     this.inMatch = phase !== Phase.lobby && phase !== Phase.gameOver;
-    if (this.onub) {
-      const c = onubClassFor(phase);
-      if (c !== undefined) this.bus.crossfadeTo(onubPlaylistFor(c));
-      else if (phase === Phase.lobby) this.bus.crossfadeTo(onubPlaylistFor('kitchen'));
-      return;
-    }
     const c = mainClassFor(phase);
     if (c === undefined) return;
     if (this.opening !== null && this.inMatch) {
@@ -146,7 +108,7 @@ export class MusicConductor {
 
   /** A `cutscene` message: the map's opening starts its piece; any other cutscene changes nothing. */
   cutscene(id: string): void {
-    if (this.onub || id !== openingFor(this.mapId)) return;
+    if (id !== openingFor(this.mapId)) return;
     const pl = playlistFor(this.mapId, 'opening');
     if (pl === null) return;
     this.opening = pl;
@@ -188,7 +150,7 @@ export function installMusicDirector(game: Phaser.Game, net: NetworkService): ()
   const bus = game.registry.get(REG_MUSIC) as MusicBus | undefined;
   if (bus === undefined) return () => undefined;
   const c = new MusicConductor(bus);
-  const onLobby = (s: LobbySnapshot) => c.lobby(s.settings.map, 'main');
+  const onLobby = (s: LobbySnapshot) => c.lobby(s.settings.map);
   const onPhase = (p: { phase: number }) => c.phase(p.phase);
   const onOver = () => c.gameOver();
   const onLeft = () => c.left();

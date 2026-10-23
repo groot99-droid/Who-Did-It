@@ -361,7 +361,7 @@ export function kitFrames(theme: string): { manifest: StaticManifest; inputs: Pa
   return { manifest, inputs };
 }
 
-// ---------------------------------------------------------------- props, vfx, loft (greybox marks)
+// ---------------------------------------------------------------- props, vfx (greybox marks)
 
 /** The art cell of a round-5 prop, spot or portal frame (art plan 3.5-3.7), as `build_props.py` renders it. */
 export function propCell(name: string): [number, number] {

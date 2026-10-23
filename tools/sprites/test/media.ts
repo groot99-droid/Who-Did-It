@@ -118,12 +118,11 @@ interface ArtEntry {
   url: string;
   path?: string;
   maps?: string[];
-  modes?: string[];
 }
 
-/** The boot entries plus those that load with the match's map, whatever the mode lists. */
+/** The boot entries plus those that load with the match's map. */
 export const loadsInFirstLoad = (e: ArtEntry, map: string): boolean =>
-  (e.maps === undefined && e.modes === undefined) || (e.maps?.includes(map) ?? false);
+  e.maps === undefined || e.maps.includes(map);
 
 /** Bytes of the files an art entry loads: its image, or its atlas json and pages, or its animation json. */
 export function entryBytes(e: ArtEntry, dir: string, sizeOf: SizeOf = diskSize): number {
@@ -137,7 +136,7 @@ export function entryBytes(e: ArtEntry, dir: string, sizeOf: SizeOf = diskSize):
 }
 
 /**
- * The first load: every art entry `Preload` queues (the manifest's entries without `maps` or `modes`) plus the
+ * The first load: every art entry `Preload` queues (the manifest's entries without `maps`) plus the
  * entries of the Hollowmere map, for the style at `styleRoot` merged over the 8-bit one as the client does. The
  * SFX manifest and the engine bundle are not in it (the brief counts what `Preload` queues and the map); the
  * test below reports them beside it.
@@ -152,9 +151,8 @@ export function firstLoadBytes(styleRoot = '', map = 'hollowmere', sizeOf: SizeO
   for (const e of own) {
     const old = merged.get(e.key)?.e;
     const maps = e.maps ?? old?.maps;
-    const modes = e.modes ?? old?.modes;
     merged.set(e.key, {
-      e: { ...e, ...(maps === undefined ? {} : { maps }), ...(modes === undefined ? {} : { modes }) },
+      e: { ...e, ...(maps === undefined ? {} : { maps }) },
       dir: styleRoot,
     });
   }

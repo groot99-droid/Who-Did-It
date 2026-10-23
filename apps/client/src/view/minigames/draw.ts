@@ -1,7 +1,7 @@
 import palette from '@wdi/content/data/palette.json';
 
-// The mini-games draw at the room's own pixel size and scale up with `nearest` (art plan 5.7). Until 5M's
-// `onub_mini` atlas lands they draw labelled greybox rectangles of the atlas frames' art-box sizes.
+// The mini-games draw at the room's own pixel size and scale up with `nearest` (art plan 5.7). With no mini-game
+// atlas they draw labelled greybox rectangles of the art-box sizes.
 
 /** The stage in art pixels; the canvas shows it at `SCALE` (`style.pixel.illustrationScale`). */
 export const ART_W = 160;

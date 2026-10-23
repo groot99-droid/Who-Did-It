@@ -1,19 +1,15 @@
-// Finishes the single-image keys rendered by tools/blender (docs/SPRITES.md 8): the dark-loft images
-// (build_loft.py) and the round-4 ground tilesets (build_tiles.py,
-// four 64 px variants joined into one 256 x 64 row). Each image is checked against its size, alpha-bled
+// Finishes the single-image keys rendered by tools/blender (docs/SPRITES.md 8): the round-4 ground tilesets
+// (build_tiles.py, four 64 px variants joined into one 256 x 64 row). Each image is checked against its size, alpha-bled
 // and re-encoded, which also drops the render's date stamp, so a re-render writes byte-identical files.
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { bleed, decodePng, encodePng, type Rgba } from './bleed.ts';
-import { LOFT_KEYS, TILESET_KEYS } from './keys.ts';
+import { TILESET_KEYS } from './keys.ts';
 import { writeFiles } from './pack.ts';
 
 /** Pixel size of each image key. The round-4 building exteriors left with `bld_hollowmere` (art plan 3.4). */
 export const IMAGE_SIZES: Readonly<Record<string, readonly [number, number]>> = {
-  loft_backdrop: [1280, 720],
-  prop_bedroll: [112, 184], // twice the 56 x 92 px blanket of apps/client/public/mockups/loft.html
-  prop_bedroll_self: [112, 184],
   ...Object.fromEntries(TILESET_KEYS.map((k) => [k, [256, 64] as const])),
 };
 
@@ -64,10 +60,7 @@ export function finishImages(
 }
 
 /** The render folder and the asset folder of each image set. */
-export const IMAGE_SETS = [
-  { dir: 'loft', keys: LOFT_KEYS },
-  { dir: 'tiles', keys: TILESET_KEYS },
-] as const;
+export const IMAGE_SETS = [{ dir: 'tiles', keys: TILESET_KEYS }] as const;
 
 // CLI: tsx tools/sprites/images.ts <render root, e.g. build/render> <assets dir>; sets not rendered are skipped.
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

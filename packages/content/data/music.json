@@ -21,11 +21,5 @@
       "finalNight": "blackpine_finalnight",
       "gameOver": "blackpine_gameover"
     }
-  },
-  "onub": {
-    "kitchen": "onub_kitchen",
-    "night": "onub_night",
-    "rush": "onub_rush",
-    "over": "onub_over"
   }
 }

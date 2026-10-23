@@ -107,8 +107,8 @@ manifest.json` (generated placeholders) have the same keys; `?art=placeholder` p
 **Art styles (A79).** The real art ships in each style of `style.json` `artStyles`. The 8-bit style is
 `assets/manifest.json` (`"art": "real"`). The low-poly style is `assets/lowpoly/manifest.json`
 (`"art": "lowpoly"`), with its files under `assets/lowpoly/` and its URLs relative to that folder. A style
-manifest re-skins keys of the 8-bit manifest only: same type, frame names, cells, pivots, `maps` and
-`modes`, and the style's `filter` on every filtered texture (`tools/sprites/test/styles.test.ts`). The client
+manifest re-skins keys of the 8-bit manifest only: same type, frame names, cells, pivots and `maps`,
+and the style's `filter` on every filtered texture (`tools/sprites/test/styles.test.ts`). The client
 loads the player's style and falls back key by key to the 8-bit entry for any key the style lacks. Switching
 style mid-match swaps the textures in place, by key. `?art=placeholder` overrides every style.
 
@@ -127,19 +127,18 @@ style mid-match swaps the textures in place, by key. `?art=placeholder` override
 `type` maps to the Phaser loader method (`multiatlas`, `atlas`, `image`, `animation`); `filter` is
 `linear` or `nearest` and is set per texture after load: `nearest` for every world texture except
 `clues` (linear) while the main mode's pixel finish is on (`style.json` `pixelFinish.enabled.main`;
-10.3), and `linear` for every main-mode world texture while it is off. Two optional fields say when an
-entry loads (10.13): `maps` (`string[]`, map ids) loads it with the match's map, and `modes`
-(`('main' | 'onub')[]`) at match start when the match's mode is listed, whatever the client's card; an
-entry with neither loads at boot; `origin` (optional, `[x, y]` normalised) is
+10.3), and `linear` for every main-mode world texture while it is off. An optional field says when an
+entry loads (10.13): `maps` (`string[]`, map ids) loads it with the match's map; an
+entry without it loads at boot; `origin` (optional, `[x, y]` normalised) is
 the display origin for single images: building exteriors use `[0.5, 1]`, the middle of the front wall's
 base. Atlas pages are always named `<key>-<n>.png`. Clue frames are centred (no pivot). Anim files use Phaser's own
 `{anims: [{key, frames: [{key, frame}], frameRate, repeat}]}` format for `load.animation`.
 
 **Loading notes (M3).** The `World` scene never names a path: bodies use the last frame of `char/villager/die/s` (and its `scarf` and `hat_*` twins) from `char_villager` and `ovl_villager`; clues use frames of the `clues` atlas (`clue_footprint_<s|m|t>_mid`, `clue_thread_<red|green|blue>`); the overworld props use `prop_<kind>` frames of a `props` atlas (`prop_bell`, `prop_pump`, `prop_noticeBoard`, `prop_kitChest`, `prop_lanternPost`; the id suffix, e.g. `prop_board`, is tried second). Any key the manifest lacks draws a labelled greybox mark (`textures.exists`), so the game plays before the art lands. Sound is separate: `assets/audio/manifest.json` (`{key, url, gain}`) is fetched once by `AudioBus` and a missing file leaves the game silent.
 
-**Loading notes (M5a).** `queueManifest` queues only the entries with neither `maps` nor `modes`; the World's `preload` calls `queueMatchEntries` with the match's `Settings.map` and mode for the rest, reading the manifest that `resolveManifest` remembered (`peekManifest`), and skips what is already loaded. A texture a map adds gets its filter from `applyFilters` once it is loaded.
+**Loading notes (M5a).** `queueManifest` queues only the entries without `maps`; the World's `preload` calls `queueMatchEntries` with the match's `Settings.map` for the rest, reading the manifest that `resolveManifest` remembered (`peekManifest`), and skips what is already loaded. A texture a map adds gets its filter from `applyFilters` once it is loaded.
 
-**Loading notes (M3b, quick mode).** The bakery draws its props from the same `props` atlas by `prop_<kind>` then `prop_<id tail>` (`prop_plate`, `prop_deadLoaf`, `prop_ledger`, `prop_wakeTable`, `prop_oven`, `prop_basin`, `prop_flour_sacks`); a plate appears only for a seat the server lists and wears the owner's name over its frame, and a prop whose key is missing draws a labelled greybox (the wake table draws nothing without its art, since the plates stand on it). The loft is DOM, not a Phaser scene: `loft_backdrop`, `prop_bedroll` and `prop_bedroll_self` are `type: image` entries whose `url` the loft reads through `manifestImageUrls` (`view/assets.ts`) and sets as CSS backgrounds (the backdrop `cover`, a bedroll `contain` in a 56 x 92 px box); a missing entry keeps the theme's CSS bedroll. Loop beds such as the loft's `storm` come from `AudioBus.playLoop`.
+**Loading notes (M3b).** The bakery draws its props from the same `props` atlas by `prop_<kind>` then `prop_<id tail>` (`prop_plate`, `prop_deadLoaf`, `prop_ledger`, `prop_wakeTable`, `prop_oven`, `prop_basin`, `prop_flour_sacks`); a plate appears only for a seat the server lists and wears the owner's name over its frame, and a prop whose key is missing draws a labelled greybox (the wake table draws nothing without its art, since the plates stand on it).
 
 ## 6. Overlay passes
 
@@ -267,15 +266,7 @@ cut into one slice per footprint tile, `prop_<kind>#<dx>_<dy>` (10.5); the 40° 
 | `prop_basin` | `basin` (`bk.basin`) | Stone wash basin with water, a rag and a jug |
 | `prop_flour_sacks` | `taskSource` (`bk.flour_sacks`) | Three flour sacks and a spill |
 
-**Loft images** (`type: image`, `loft/`; M3b). The quick mode's dark loft is DOM, not a Phaser scene, so
-its art is plain images the client sets as CSS backgrounds; rendered by `tools/blender/build_loft.py` and
-finished by `tools/sprites/images.ts`.
-
-| Key | Size | Use |
-|---|---|---|
-| `loft_backdrop` | 1280 x 720, opaque | Behind the whole loft view: the bakery loft at night, storm light at the gable window, lantern glow at the hatch; the middle is kept dark for the grid and the copy (`background-size: cover`) |
-| `prop_bedroll` | 112 x 184 | One seat's bedroll in the `.wdi-bedrolls` grid, at twice the 56 x 92 px blanket of `mockups/loft.html`; always occupied |
-| `prop_bedroll_self` | 112 x 184 | The viewer's own bedroll: the same with moon blanket stripes |
+**Loft images** (`type: image`, `loft/`; M3b) left with the quick mode (round 7, A115), with `build_loft.py`.
 
 **VFX** (texture `vfx`, `vfx/vfx.json`; anims `anims_vfx`, `vfx/vfx.anims.json`; M3; the placeholder set
 has the same frames as flat marks that grow or fade).
@@ -917,11 +908,9 @@ door) but still takes the boarded overlay `portal_boarded_<face>` when closed.
 
 - **Map entries.** A manifest entry may carry **`maps: string[]`**. The World's `preload` queues every entry whose
   `maps` holds the match's `Settings.map` and that is not loaded yet.
-- **Mode entries.** A manifest entry may carry **`modes: ('main' | 'onub')[]`**. An entry with `modes` loads at
-  match start when the match's mode is listed, whatever the client's card (what a client loads never depends on
-  its role). Every ONUB key carries `modes: ['onub']` (`docs/round5/onub-contract.md` 5.4).
-- **Boot.** An entry with neither `maps` nor `modes` loads at boot.
-- **Both manifests** (real and `?art=placeholder`) carry the same keys, the same `maps` and the same `modes`, the
+- **Mode entries.** The `modes` field left with the quick mode (round 7, A115); no entry carries it.
+- **Boot.** An entry without `maps` loads at boot.
+- **Both manifests** (real and `?art=placeholder`) carry the same keys and the same `maps`, the
   villager aside (in the placeholder manifest only, once 5L's L4 lands); `manifest.test.ts` checks both.
 - **Filters.** The `nearest` of this table holds while `style.json` `pixelFinish.enabled.main` is true; with it off,
   every main-mode world texture is `linear` (10.3). `clues` is always `linear`.
@@ -988,66 +977,9 @@ world texture except `clues` (linear)", while the main mode's pixel finish is on
 **WORLD 4.2** carries the metrics of this section. ARCHITECTURE gets no change from this section: the server stays
 on the square grid.
 
-## 11. ONUB images (Session 5M, round 5)
+## 11. ONUB images (removed)
 
-The art of the quick mode (GDD 3.11). The keys are `docs/round5/onub-contract.md` 5.4 plus `onub_mini` (art plan
-5.7); every entry carries `modes: ['onub']` in both manifests, so it loads at ONUB match start whatever the client's
-card and never in the main mode. All of it is pixel art on the world palette, finished whatever the main mode's
-switch says (ASSETS 6.11), and built by one command:
-
-```
-pnpm --filter @wdi/sprites onub build     # images, cards, atlas, the real manifest's ONUB block
-pnpm --filter @wdi/sprites onub review    # assets/source/review/{gate-c-*,onub-*}.png
-pnpm --filter @wdi/sprites placeholder    # the greybox twins in assets/placeholder/onub/
-```
-
-The build reads the picked generations from git-ignored `assets/external/generated/5M/<id>.png` (a T5 cutout from
-`<id>.cut.png`, the `remove_background` result); a key whose pick is missing there gets its labelled greybox, so a
-fresh checkout rebuilds only what it has. The output is byte-identical across runs.
-
-| Key | File (under `assets/onub/`) | Art size | File size | Drawn |
-|---|---|---|---|---|
-| `onub_station_<stationId>` (4), `onub_scene_<sceneId>` (10), `onub_kitchen` | `rooms/<key>.webp` | 640 x 360 | 1920 x 1080 | DOM, `image-rendering: pixelated` |
-| `onub_card_<cardId>` (18), `onub_loc_<stationId>` (4), `onub_card_back_role`, `onub_card_back_loc` | `cards/<key>.webp` | 80 x 112 | 240 x 336 | DOM |
-| `onub_cloche` | `misc/onub_cloche.webp` | 64 x 64 | 192 x 192 | DOM |
-| `onub_portrait_<roleId>` (15), `onub_baker` | `portraits/<key>.webp` | 128 x 192 | 384 x 576 | DOM |
-| `onub_mini` | `onub_mini.json`, `onub_mini-0.png` (multiatlas, one 512² page) | art size | – | Phaser, x3, `nearest` |
-
-**The kitchen.** `onub_kitchen` is four 320 x 180 quadrants, fridge and mixer on top, proofing and oven below, with
-the pass (96 x 64) centred at (320, 180). Each quadrant is that station's tap target; the DOM writes the names.
-
-**The cards.** A 1 px ink border, a 3 px frame in the station's ramp (fridge `moon`, mixer `plaster`, proofing
-`brass`, oven `brick`; Sabotage cards `moss` with a crack and a rot blot at the top-right corner), the window
-(4, 4) to (76, 68) and the blank text band (4, 72) to (76, 108) in art pixels: bone paper `#D9D2C2` under a 1 px
-`#B2AA99` rule, where the client writes the card's name and text. An Ingredient card's window is its object
-(56 x 48) over a darkened crop of its station's floor; a Location card's is the station room (`onub-fixes.json`
-`locBoxes`).
-
-**`onub_mini` frames.** `mini_crate_butter`, `mini_crate_milk`, `mini_crate_eggs` (24 x 18), `mini_cart` (48 x 32),
-`mini_dial`, `mini_gauge` (48 x 48), `mini_needle` (4 x 20, pivot (0.5, 0.9), pointing up), `mini_sack` (28 x 32),
-`mini_bucket` (24 x 24), `mini_bowl` (64 x 48, its inner window (8, 8) to (56, 44) transparent for the fill),
-`mini_fill_flour`, `mini_fill_water` (8 x 8, tiling), `mini_stream_flour`, `mini_stream_water` (4 x 8, tiling),
-`mini_banneton` (28 x 16), `mini_cabinet` (72 x 88), `mini_slot_glow` (28 x 12), `mini_log` (24 x 10) and
-`mini_oven/0` to `/3` (72 x 48). The fire loop has no animation key, since a manifest key starting `onub_` must be an
-ONUB entry and an `anims_*` one may not list `onub`: the client builds `mini_fire` from `mini_oven/0..3` at 8 fps,
-looping. No frame carries a target band (GDD 3.11).
-
-**The low-poly style** (art plan 1.9, DECISIONS A79). The same build writes every key a second time, for
-`artStyle('lowpoly')`, to `assets/lowpoly/onub/` with the same paths, file sizes, frame names and `modes`, and its
-ONUB block to `assets/lowpoly/manifest.json` (`"art": "lowpoly"`, the atlas `linear`). Nothing is snapped or
-outlined. The owner's rooms are cropped and box-downscaled straight to 1920 x 1080. The generated portraits are
-treated the same way at 384 x 576, and cutouts are fitted at three times their art box, keeping their soft edges.
-The kitchen, the cards and the backs are composed at the shipped size: their code-drawn frames, bands and fields
-are enlarged with nearest, and the room window, floor and object are pasted in smooth. The owner's 13 rooms are lossy WebP
-at `offWebpQuality` (90). The generated rooms, the kitchen, cards, the cloche and portraits are at
-`LOWPOLY_ART_QUALITY` (82), which keeps the set within 4 MiB (3.85 MiB). `onub_mini` keeps its 512 page and art-size frames, packed from smooth objects. Its fire loop finds
-the lantern pixels on a snapped copy and scales each pixel's own colour.
-
-**Tests.** `tools/sprites/test/onub.test.ts`: every key in both manifests with its type and `modes`, no loft key,
-every image at its file size and on the world palette with alpha 0 or 255, the ONUB set within 2.5 MB, every atlas
-frame at its art box on one page, the blank band and the Sabotage mark, and the batch file's jobs, picks, prompts
-and references. For the low-poly style: the same keys, URLs and `modes`, every image at the 8-bit size and off the
-snap, the same atlas frames, and the set within 4 MiB (`styles.test.ts` checks the manifest is a re-skin).
+The quick mode's images, cards, portraits and `onub_mini` atlas left the client with the mode in round 7 (DECISIONS A115), with `tools/sprites/onub*.ts`, `placeholder-onub.ts` and `batches/5M.json`. The owner's 13 pictures stay in `assets/source/concepts/onub/`. The section keeps its number.
 
 ## 12. M5b art (Session 6M, round 6)
 

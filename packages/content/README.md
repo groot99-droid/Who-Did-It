@@ -24,7 +24,6 @@ onubFor(6).deck;              // 9 loaves for 6 players
 | `abilities.json` | every verb with a number: role abilities, item uses, universal verbs | GDD 3.2-3.7 |
 | `items.json`, `clues.json`, `tasks.json` | items, clue types (frozen ids, sprite key `clue_<id>`), task templates | GDD 3.4, 3.5 |
 | `balance.json` | phases, the per-count table `byCount["4".."10"]`, noise, health, vision, meeting rules | GDD 3.3-3.9 |
-| `roles.onub.json`, `balance.onub.json` | quick-mode roles; decks, night windows, acts, timers, vote, winner table | GDD 3.11 |
 | `scenes/<id>.json` | the 15 scenes of WORLD 4.3 | WORLD 4.3-4.5 |
 
 Rules of the data:

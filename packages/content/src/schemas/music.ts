@@ -29,14 +29,9 @@ export const MUSIC_CLASSES = [
 export const MusicClass = z.enum(MUSIC_CLASSES);
 export type MusicClass = z.infer<typeof MusicClass>;
 
-/** The quick mode's classes (GDD 3.11): the kitchen (prep), the night, the Morning Rush and the end screen. */
-export const ONUB_MUSIC_CLASSES = ['kitchen', 'night', 'rush', 'over'] as const;
-export const OnubMusicClass = z.enum(ONUB_MUSIC_CLASSES);
-
 export const MusicFile = z.strictObject({
   gddRef: GddRef,
   /** Map id -> class -> playlist id; a missing class is silence. */
   byMap: z.record(WorldId, z.partialRecord(MusicClass, PlaylistId)),
-  onub: z.partialRecord(OnubMusicClass, PlaylistId),
 });
 export type MusicFile = z.infer<typeof MusicFile>;

@@ -142,8 +142,8 @@ describe('the style formula and the pixel finish (ASSETS 6.4, 6.11)', () => {
     }
   });
 
-  it('proposes the pixel finish for the main mode and keeps it for ONUB (ruling F15)', () => {
-    expect(style.pixelFinish.enabled).toEqual({ main: true, onub: true });
+  it('proposes the pixel finish for the main mode (ruling F15)', () => {
+    expect(style.pixelFinish.enabled).toEqual({ main: true });
   });
 
   it('ships the 8-bit and low-poly art styles, 8-bit by default, HD reserved (A79)', () => {

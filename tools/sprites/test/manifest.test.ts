@@ -11,7 +11,7 @@ interface Entry {
   type: string;
   filter?: 'linear' | 'nearest';
   maps?: string[];
-  modes?: Array<'main' | 'onub'>;
+  modes?: unknown;
 }
 interface Manifest {
   art: string;
@@ -47,25 +47,17 @@ describe('asset manifests (docs/SPRITES.md 5, 10.13)', () => {
     if (!LEGACY.includes('char_villager')) for (const k of PLACEHOLDER_ONLY) expect(r.has(k), k).toBe(false);
   });
 
-  it('give every key the same maps and modes in both manifests', () => {
+  it('give every key the same maps in both manifests', () => {
     const p = byKey(placeholder);
     for (const e of real.entries) {
       const q = p.get(e.key);
       if (!q) continue;
       expect(q.maps, `${e.key} maps`).toEqual(e.maps);
-      expect(q.modes, `${e.key} modes`).toEqual(e.modes);
     }
   });
 
-  it("mark every ONUB key, and only ONUB keys, with modes ['onub']", () => {
-    for (const e of [...real.entries, ...placeholder.entries]) {
-      if (e.modes !== undefined) {
-        expect(e.modes.length, e.key).toBeGreaterThan(0);
-        expect(new Set(e.modes).size, e.key).toBe(e.modes.length);
-      }
-      if (e.key.startsWith('onub_')) expect(e.modes, e.key).toEqual(['onub']);
-      else expect(e.modes?.includes('onub') ?? false, e.key).toBe(false);
-    }
+  it('carry no `modes` (the quick mode left in round 7, A115)', () => {
+    for (const e of [...real.entries, ...placeholder.entries]) expect(e.modes, e.key).toBeUndefined();
   });
 
   it('filter the round-5 world textures by the pixel-finish switch, and clues linear', () => {

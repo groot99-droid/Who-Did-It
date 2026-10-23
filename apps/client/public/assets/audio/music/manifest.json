@@ -50,13 +50,6 @@
       "bytes": 907178
     },
     {
-      "key": "theme_bakers_bell",
-      "url": "theme_bakers_bell.ogg",
-      "gain": 1,
-      "durationS": 72.0,
-      "bytes": 923857
-    },
-    {
       "key": "load_hollowmere",
       "url": "load_hollowmere.ogg",
       "gain": 1,
@@ -210,38 +203,6 @@
     },
     {
       "id": "blackpine_gameover",
-      "tracks": [
-        "end_the_fade"
-      ],
-      "crossfadeS": 3,
-      "shuffle": false
-    },
-    {
-      "id": "onub_kitchen",
-      "tracks": [
-        "theme_bakers_bell"
-      ],
-      "crossfadeS": 2,
-      "shuffle": false
-    },
-    {
-      "id": "onub_night",
-      "tracks": [
-        "bed_tense"
-      ],
-      "crossfadeS": 2,
-      "shuffle": false
-    },
-    {
-      "id": "onub_rush",
-      "tracks": [
-        "theme_bakers_bell"
-      ],
-      "crossfadeS": 2,
-      "shuffle": false
-    },
-    {
-      "id": "onub_over",
       "tracks": [
         "end_the_fade"
       ],

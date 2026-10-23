@@ -66,7 +66,7 @@ score from a Townsfolk player.
 ## Questions for the later milestones
 
 Add these after item 8 for the sessions that need them; items 1 to 8 stay as they are. For an M3b
-session, item 1's options are the V1 role names of `roles.onub.json` (Poisoner, Hireling, Sin-Eater,
+session (the quick mode, removed in round 7, A115), item 1's options are the V1 role names of `roles.onub.json` (Poisoner, Hireling, Sin-Eater,
 Cutpurse, Busybody, Sot, Lamplighter, Debtor, Mourner), meaning the role dealt.
 
 **9. "At the reveal I knew which loaf I held."** [Linear scale] Required in an M3b session.

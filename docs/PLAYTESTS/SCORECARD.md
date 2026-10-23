@@ -96,6 +96,8 @@ Signed: `owner`, date `____`. Recorded in `docs/DECISIONS.md` row `A__`.
 
 ## 6. M3b, quick mode
 
+Removed in round 7 with the quick mode (DECISIONS A115); kept as the record of the plan.
+
 Copy this section with 0 to 4 to `YYYY-MM-DD-m3b-scorecard.md` for each of the two M3b sessions (run
 sheet `README.md` 8). The lines are ROADMAP 7.1, the M3b row.
 
@@ -129,7 +131,6 @@ server tests and the soak, not the session.
 | Line | Result | Evidence |
 |---|---|---|
 | One human and three NPCs finish a main match | yes / no | the match-log line |
-| One human and three NPCs finish a quick-mode match | yes / no | the match-log line |
 | The NPC Killer wins at least one of five scripted matches at Normal | `__` of 5 | the five match-log lines |
 | Humans who named every NPC seat (form item 10, session 2 only) | `__` of `__` | |
 

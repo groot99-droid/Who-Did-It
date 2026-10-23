@@ -122,13 +122,13 @@ describe('M5b art (SPRITES 12)', () => {
 
   for (const root of roots) {
     it(`${root || '8bit/'}manifest.json lists the M5b keys at boot`, () => {
-      const m = json<{ entries: Array<{ key: string; maps?: unknown; modes?: unknown }> }>(
+      const m = json<{ entries: Array<{ key: string; maps?: unknown }> }>(
         join(ASSETS, root, 'manifest.json'),
       );
       for (const key of M5B_KEYS) {
         const e = m.entries.find((x) => x.key === key);
         expect(e, key).toBeDefined();
-        expect(e!.maps ?? e!.modes, key).toBeUndefined();
+        expect(e!.maps, key).toBeUndefined();
       }
     });
   }
