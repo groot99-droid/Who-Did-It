@@ -3087,7 +3087,15 @@ pnpm typecheck && pnpm test`: (1) the three views, `Lighting.ts` glow, the mock 
   kills, 5 meetings, 190 portal uses, worst tick p95 0.513 ms, leaks 0, protocol errors 0, dropped bots 0. A first
   main soak on the tree before #87 was equally clean. The quick-mode soak and `onub.spec.ts` were removed under
   DECISIONS A115 (owner decision, session 7J) and are not run; the files stay for 7J's PR 3. Opt-in e2e with
-  `WDI_E2E_MATCH=1 WDI_E2E_LOOKS=1 WDI_E2E_NPC=1`: E2E_RESULT. The admin live spec stays skipped: it
+  `WDI_E2E_MATCH=1 WDI_E2E_LOOKS=1 WDI_E2E_NPC=1` on the tree at 1cf2255 plus this PR (ff0b105 and its docs): 59
+  specs, 56 passed, 1 skipped (the admin live spec), 2 failed. `admin.spec.ts` "Start sends the setup" still expected
+  `mode: 'main'` in `admin.setup` after #121 removed the field; fixed here (the field dropped from the expectation),
+  passes 3 of 3. `ovens.spec.ts` "walks from the square into Crumb's Ovens and through each of its four station
+  rooms" (7K, #114) fails 3 of 3: after the door the HUD reads `bakery` at 5 fps and never `crumb_oven` within the 5 s
+  expect. It is not fixed here: it is inside 7K's feature (reported to 6Z with the case). Earlier on the way:
+  `world.spec.ts` "tavern door" failed once on the tree before #114 and passes on the final tree; `party.spec.ts`
+  "create, join by deep link" waited 15 s for a second browser that boots in about 25 s under software GL, now 60 s;
+  `npc.spec.ts` "three NPC seats" is 6 of 6 after its fix. The admin live spec stays skipped: it
   needs `WDI_E2E_ADMIN`, the owner's Railway variables and a token, none of which this session has or writes into
   any file. `media.test.ts` and the sprite budgets are green on the final tree (6N's steps 2 and 3 landed in #71 and
   #84).

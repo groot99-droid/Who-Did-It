@@ -58,7 +58,6 @@ test('Start sends the setup and the start; a bad seed line is refused', async ({
     type: 'admin.setup',
     payload: {
       map: 'hollowmere',
-      mode: 'main',
       seats: 8,
       difficulty: 'normal',
       seeds: { world: [1, 2, 3, 4] },
