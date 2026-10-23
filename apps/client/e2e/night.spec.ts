@@ -1,12 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
+import { createParty } from './fixtures/party';
 
 // The ONUB v2 night, dawn and Morning Rush against the `?mock=1&mode=onub` feed (no server). The mock's
 // clock runs `speed` times faster. Frozen hooks only (onub-contract.md 7); no text is asserted on an ONUB hook.
 
 async function toNight(page: Page, role = 'chef') {
   await page.goto(`/Who-Did-It/?mock=1&mode=onub&speed=8&role=${role}`);
-  await page.getByLabel('Your name').fill('Hana');
-  await page.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(page, 'Hana');
   await expect(page.getByTestId('player-list')).toContainText('Hana');
   await page.getByTestId('start').click();
   await page.getByTestId('confirm-start').click();

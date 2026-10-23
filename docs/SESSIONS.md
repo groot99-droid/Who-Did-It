@@ -3308,6 +3308,9 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 ### Round 7 log: 7C
 
+- PR 1 (the menu): Start Game dialog (name, Open or Private), code box (`#/join/CODE` opens it prefilled and focused), Settings, How to Play and Credits live, Create Profile, Friends and Quit greyed with the note, the sound toggle, the `/health` footer, `e2e/fixtures/party.ts` and the specs' landing lines, UI.md 14.25, A107. `pnpm test` fails in `apps/server` here on `bootFlowServer` (`release is not a function`, nine files), which this PR does not touch; the client suite, typecheck, lint and Prettier are clean. `party.spec.ts`'s first test passes through the lobby and the role cards and then waits on `hud-clock` after the overworld enters, which is the World, not the menu.
+- PR 2 (profile and friends): `ui/menu/{profileModel,profile,friendsModel,friends,clipboard}.ts`, the chip as a button, Create Profile and Friends live, `LobbyPlayer.profile` and the roster mapping, `profile` in the create and join options, tests in `ui/menu/profile.test.ts`, A107. 7E's `ui/lobby/addFriend.ts` can re-export `addFriendButton` from `ui/menu/friends.ts` (same signature; pass its own `className`).
+
 ### Round 7 log: 7D
 
 - PR 1 (wire): `CreateOptions`, `JoinOptions.profile`, `Player.profile` (schema version 4), `balance.json` `party`, the `onAuth` checks, `PROTOCOL.md`, `parties.test.ts` (auth half), ARCHITECTURE 5.3 and GDD 3.21 server lines, A108. `protocol-doc.ts` lists `PartyVisibility` and `CreateOptions`. Profile codes are exact-length upper-case join-alphabet strings; `newSeat` is untouched (the profile is set in `onJoin`).

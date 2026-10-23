@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { createParty } from './fixtures/party';
 
 // The meeting, the reveal, game over and the way back to the lobby against the ?mock=1 feeds (no server).
 // The mock world will request a meeting itself once the world session lands; until then the router's
@@ -10,8 +11,7 @@ interface MockHook {
 
 async function toWorld(page: Page) {
   await page.goto('/Who-Did-It/?mock=1');
-  await page.getByLabel('Your name').fill('Hana');
-  await page.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(page, 'Hana');
   await expect(page.getByTestId('player-list')).toContainText('Hana');
   await expect(page.getByTestId('start')).toBeEnabled();
   await page.getByTestId('start').click();

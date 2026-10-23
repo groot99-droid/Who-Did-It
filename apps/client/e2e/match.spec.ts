@@ -4,6 +4,7 @@ import { expect, test, type Browser, type BrowserContext, type Page } from '@pla
 import { type Swarm, runSwarm } from '../../../tools/bots/swarm';
 import { E2E_SERVER_URL } from './env';
 import { skipOpening } from './helpers';
+import { createParty, joinParty } from './fixtures/party';
 
 // The first playable, end to end against the real server (M3): two browsers and bots play kill -> body ->
 // report -> meeting -> vote -> game over -> lobby. It needs the match flow (K), the verbs (L), the screens
@@ -50,12 +51,10 @@ async function startMatch(browser: Browser, botCount: number, botVote: string): 
   const [host, guest] = (await Promise.all(ctxs.map((c) => c.newPage()))) as [Page, Page];
 
   await host.goto('/Who-Did-It/');
-  await host.getByLabel('Your name').fill('Hana');
-  await host.getByRole('button', { name: 'Create Party' }).click();
+  await createParty(host, 'Hana');
   const code = ((await host.getByTestId('party-code').textContent()) ?? '').trim();
   await guest.goto(`/Who-Did-It/#/join/${code}`);
-  await guest.getByLabel('Your name').fill('Gus');
-  await guest.getByRole('button', { name: 'Join Party' }).click();
+  await joinParty(guest, code, 'Gus');
   await expect(guest.getByTestId('party-code')).toHaveText(code);
 
   // Standing bots (`walk: false`) keep their spawn: Bot1 on square_2, Bot2 on square_3. They cast

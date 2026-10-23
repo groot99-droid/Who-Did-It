@@ -4,6 +4,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { type Swarm, runSwarm } from '../../../tools/bots/swarm';
 import { E2E_SERVER_URL } from './env';
 import { skipOpening } from './helpers';
+import { createParty as startParty } from './fixtures/party';
 
 // NPC fill (M3c, GDD 3.12) end to end against the real server. The host adds NPC seats in the lobby or
 // lets Start fill the party; nothing on the page marks a seat as an NPC, so the specs read names from the
@@ -44,8 +45,7 @@ const voteWindowMs =
 async function createParty(page: Page, query = ''): Promise<string> {
   await page.addInitScript("sessionStorage.setItem('wdi:introSeen', '1')"); // no opening cinematic (6Q)
   await page.goto(`/Who-Did-It/${query}`);
-  await page.getByLabel('Your name').fill('Hana');
-  await page.getByRole('button', { name: 'Create Party' }).click();
+  await startParty(page, 'Hana');
   return ((await page.getByTestId('party-code').textContent()) ?? '').trim();
 }
 
