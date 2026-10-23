@@ -1339,3 +1339,23 @@ Lines are in `apps/client/src/ui/copy/intro.ts` (`INTRO_COPY`). The `Intro` scen
 - **When it plays.** Once per browser session (`sessionStorage['wdi:introSeen']`, set at the tap). Not under `prefers-reduced-motion`, the data saver (`saveData`), `?intro=0`, a reload that rejoins a lobby (`#/lobby/CODE`), and in the mock (`?mock=1`) unless `?intro=1`. `?intro=1` overrides only the mock rule.
 - **How it ends.** The video ends, Skip, a click or tap anywhere while it plays, or Esc (also before the tap). A stream that has not started 8 s after the tap, or a video error, ends it the same way. Then `Landing` starts as it always did.
 - **A missing file.** No manifest, no `intro` row, a failed HEAD request for the file, or an HTML answer where a video should be: the scene starts `Landing` at once and shows nothing.
+
+### 14.28 Table and quick-mode screens in the night theme (7G)
+
+Session 7G, round 7 (DECISIONS A111; `docs/round7/ui-reskin.md` 4). The meeting, the game over, the main-mode cards and the
+quick mode's screens wear the owner's mockups: `ui/table.css` (and `ui/onub/onub.css` for the quick mode) hold every rule,
+scoped under `.wdi-table` so they beat the paper components without editing `components.css`, and read tokens only. Press Start
+2P carries titles, the clock, tabs, button labels and one-word tags; Pixelify Sans carries headings, tile names, hints and
+claim chips; Inter stays for chat and the report, which run past two lines (A106). Every id and class the specs find is
+unchanged; the copy of 14.6 to 14.10, 14.14 and 14.16 is unchanged. New lines are in `ui/copy/table.ts` (`TABLE_COPY`).
+
+| Key | Text | Where |
+|---|---|---|
+| `friend.add` | Add friend | a game-over row of a seat that carries a `profile`, never your own row; `add-friend-<profile>` |
+| `friend.added` | Friends | the same button once the seat is in `wdi:friends` (disabled) |
+| `friend.add.label` | Add {name} as a friend | the button's accessible name |
+| `friend.added.label` | {name} is your friend | the disabled button's accessible name |
+| `friend.full` | Friends list full | the button's text when `balance.party.friendsMax` is reached |
+
+The action reads and writes `wdi:friends` (`{ code, name }`) through `ui/table/addFriend.ts`, a stand-in with the signature of
+7C's shared helper until it lands. The faction chip on a game-over row stays the one place a faction shows for another seat.

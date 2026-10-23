@@ -6,6 +6,8 @@ import { renderMainOver } from './main/overMain';
 import { FACTION_LABEL, factionOf, winnerLine } from './meetingText';
 import { overHeadline, renderOnubOver } from './onub/over';
 import { roleTitle } from './RoleCard';
+import { renderAddFriend } from './table/addFriend';
+import './table.css';
 
 export interface GameOverOptions {
   over: GameOver;
@@ -73,6 +75,8 @@ export function mountGameOver(root: HTMLElement, opts: GameOverOptions): GameOve
         tag !== null &&
           h('span', { class: `wdi-chip ${winner ? 'wdi-chip--ready' : 'wdi-chip--quiet'}` }, tag),
         h('span', { class: 'wdi-chip' }, icon(`icons/icon_faction_${faction}`), FACTION_LABEL[faction]),
+        // Round 7: a seat that carries a profile can be added as a friend; never your own row.
+        id === opts.selfId ? null : renderAddFriend(player?.profile ?? '', player?.name ?? 'Someone'),
       ),
     );
   });
@@ -87,7 +91,7 @@ export function mountGameOver(root: HTMLElement, opts: GameOverOptions): GameOve
   const el = h(
     'section',
     {
-      class: 'wdi-panel wdi-stack wdi-over',
+      class: 'wdi-panel wdi-stack wdi-over wdi-table',
       'aria-labelledby': 'gameover-title',
       'data-testid': 'gameover',
     },

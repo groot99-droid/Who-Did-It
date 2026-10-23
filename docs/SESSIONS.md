@@ -3239,6 +3239,8 @@ landing keys, the opt-in e2e suites, both screenshot sets, the soaks and `pnpm a
 
 ### Round 7 log: 7G
 
+- 2026-10-23: PR 1 (meeting and game over): `ui/table.css` scoped under `.wdi-table`, the Add friend stand-in (`ui/table/addFriend.ts`, `ui/copy/table.ts`), `MeetingPlayer.profile`, UI.md 14.28, A111. 7B's glass classes had not landed, so the glass is local.
+
 ### Round 7 log: 7H
 
 ### Round 7 log: 7I

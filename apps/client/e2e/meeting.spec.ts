@@ -47,7 +47,11 @@ test('a body opens the meeting, one vote ends it early, the stamp lands, game ov
   const started = Date.now();
   await page.getByTestId('portrait-mock-bot-1').click();
   await expect(page.getByTestId('portrait-mock-bot-1')).toHaveClass(/is-selected/);
-  await expect(page.getByTestId('voted-mock-bot-3')).toBeVisible({ timeout: 10_000 });
+  // A bot's "Voted" chip shows until the last vote lands, then the reveal hides it: either proves the votes came in
+  // (a heavier paint, such as the night theme's glass, can take a screenshot past the bots' short window).
+  await expect(
+    page.locator('[data-testid="voted-mock-bot-3"]:visible, [data-testid="stamp"]:visible').first(),
+  ).toBeVisible({ timeout: 10_000 });
 
   // Everyone voted: the reveal starts at once, long before the discussion would have ended.
   await expect(page.getByTestId('stamp')).toBeVisible({ timeout: 15_000 });

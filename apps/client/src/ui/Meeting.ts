@@ -19,6 +19,7 @@ import { showShotToast } from './main/shotToast';
 import { mountRush, type RushPanel } from './onub/rush';
 import type { PortraitLook } from './portrait';
 import { roleTitle } from './RoleCard';
+import './table.css';
 
 /** An extra tab (the Notebook, wired at integration): `update` runs with every refresh. */
 export interface MeetingTab {
@@ -188,7 +189,7 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
   // --- quick mode: the Rush panel (GDD 3.11, Session 5D) ------------------------------------------
   let rush: RushPanel | null = null;
 
-  const el = h('div', { class: 'wdi-meet wdi-screen', 'data-testid': 'meeting' }, board, side);
+  const el = h('div', { class: 'wdi-meet wdi-screen wdi-table', 'data-testid': 'meeting' }, board, side);
   root.append(el);
 
   // --- state -----------------------------------------------------------------------------------
