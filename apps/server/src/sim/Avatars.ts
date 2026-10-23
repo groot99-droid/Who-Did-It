@@ -5,6 +5,7 @@ import { StatusBit } from './constants';
 import { settleDisguise } from './Impersonate';
 import { lightBurns } from './mobs/light';
 import { type PlayerSim, simOf } from './RoomSim';
+import { reconcileNear } from './Visibility';
 import { sceneKey } from './World';
 
 // Avatars and handles (GDD 3.17, round-5 `deck-wire.md` 4.1). Every placed seat walks its scene as
@@ -96,7 +97,8 @@ function removeHandle(room: PartyRoom, handle: string): void {
 
 /**
  * Copies the seat's own presence onto its avatar: position, animation, status bits (the ghost bit for a dead seat),
- * the height it is drawn at, the face it shows and, for ghosts only, its true seat. Unchanged values cost no bytes.
+ * the height it is drawn at, the face it shows and, for ghosts only, its true seat. Blood goes to `nearBits`, which
+ * only a view in range receives (round 8, 8L; `reconcileAvatars`). Unchanged values cost no bytes.
  */
 function writeAvatar(
   avatar: AvatarState,
@@ -113,10 +115,14 @@ function writeAvatar(
   avatar.z = presence.z;
   avatar.yaw = presence.yaw;
   avatar.animId = presence.animId;
-  avatar.statusBits = presence.statusBits | (p.dead ? StatusBit.ghost : 0);
+  avatar.statusBits = (presence.statusBits & ~NEAR_BITS) | (p.dead ? StatusBit.ghost : 0);
+  avatar.nearBits = presence.statusBits & NEAR_BITS;
   avatar.transitUntilTick = presence.transitUntilTick;
   avatar.seat = seat;
 }
+
+/** The status bits an avatar carries in `nearBits` instead of `statusBits`: seen only from close by (GDD 3.4). */
+export const NEAR_BITS = StatusBit.bloody;
 
 /** The seat whose face `seat` shows: its own, or the seat it impersonates while the disguise is applied. */
 function faceOf(room: PartyRoom, seat: string): string {
@@ -197,6 +203,7 @@ export function publishAvatars(room: PartyRoom): void {
     writeAvatar(avatar, seat, player, p, faceOf(room, seat));
     if (lightBurns(room, seat)) avatar.statusBits |= StatusBit.lantern; // round 6, 6G: a lit light in hand
   }
+  reconcileNear(room); // round 8, 8L: Blood reaches only the views in range, every tick
 }
 
 /**

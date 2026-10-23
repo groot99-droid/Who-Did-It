@@ -51,6 +51,8 @@ interface AvatarState {
   yaw: number;
   animId: number;
   statusBits: number;
+  /** Round 8 (8L): the bits seen only from close by (Blood); the server sends them only in range. */
+  nearBits?: number;
   transitUntilTick: number;
   seat?: string;
 }
@@ -150,7 +152,7 @@ export class ColyseusWorldFeed implements WorldFeed {
           y: a.y,
           yaw: a.yaw,
           animId: a.animId,
-          statusBits: a.statusBits,
+          statusBits: a.statusBits | (a.nearBits ?? 0),
           transitUntilTick: a.transitUntilTick,
           ...(a.seat ? { seat: a.seat } : {}),
         }),
