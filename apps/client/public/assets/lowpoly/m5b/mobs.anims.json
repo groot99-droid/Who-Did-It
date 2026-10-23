@@ -450,6 +450,14 @@
     {
      "key": "mobs",
      "frame": "mob_wolf/attack/n/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/n/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/n/005"
     }
    ],
    "frameRate": 10,
@@ -473,6 +481,14 @@
     {
      "key": "mobs",
      "frame": "mob_wolf/attack/ne/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/ne/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/ne/005"
     }
    ],
    "frameRate": 10,
@@ -496,6 +512,14 @@
     {
      "key": "mobs",
      "frame": "mob_wolf/attack/e/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/e/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/e/005"
     }
    ],
    "frameRate": 10,
@@ -519,6 +543,14 @@
     {
      "key": "mobs",
      "frame": "mob_wolf/attack/se/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/se/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/se/005"
     }
    ],
    "frameRate": 10,
@@ -542,6 +574,14 @@
     {
      "key": "mobs",
      "frame": "mob_wolf/attack/s/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/s/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/s/005"
     }
    ],
    "frameRate": 10,
@@ -565,6 +605,14 @@
     {
      "key": "mobs",
      "frame": "mob_wolf/attack/sw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/sw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/sw/005"
     }
    ],
    "frameRate": 10,
@@ -588,6 +636,14 @@
     {
      "key": "mobs",
      "frame": "mob_wolf/attack/w/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/w/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/w/005"
     }
    ],
    "frameRate": 10,
@@ -611,10 +667,602 @@
     {
      "key": "mobs",
      "frame": "mob_wolf/attack/nw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/nw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/attack/nw/005"
     }
    ],
    "frameRate": 10,
    "repeat": 0
+  },
+  {
+   "key": "mob_wolf/hurt/n",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/n/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/n/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/n/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/hurt/ne",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/ne/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/ne/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/ne/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/hurt/e",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/e/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/e/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/e/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/hurt/se",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/se/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/se/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/se/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/hurt/s",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/s/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/s/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/s/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/hurt/sw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/sw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/sw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/sw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/hurt/w",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/w/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/w/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/w/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/hurt/nw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/nw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/nw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/hurt/nw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/death/n",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/n/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/n/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/n/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/n/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/n/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/n/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/death/ne",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/ne/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/ne/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/ne/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/ne/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/ne/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/ne/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/death/e",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/e/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/e/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/e/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/e/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/e/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/e/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/death/se",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/se/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/se/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/se/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/se/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/se/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/se/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/death/s",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/s/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/s/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/s/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/s/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/s/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/s/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/death/sw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/sw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/sw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/sw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/sw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/sw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/sw/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/death/w",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/w/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/w/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/w/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/w/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/w/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/w/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/death/nw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/nw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/nw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/nw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/nw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/nw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/death/nw/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_wolf/flee/n",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/n/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/n/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/n/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/n/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_wolf/flee/ne",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/ne/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/ne/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/ne/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/ne/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_wolf/flee/e",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/e/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/e/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/e/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/e/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_wolf/flee/se",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/se/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/se/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/se/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/se/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_wolf/flee/s",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/s/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/s/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/s/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/s/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_wolf/flee/sw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/sw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/sw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/sw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/sw/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_wolf/flee/w",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/w/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/w/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/w/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/w/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_wolf/flee/nw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/nw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/nw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/nw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_wolf/flee/nw/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
   },
   {
    "key": "mob_boar/idle/n",
@@ -1066,6 +1714,14 @@
     {
      "key": "mobs",
      "frame": "mob_boar/attack/n/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/n/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/n/005"
     }
    ],
    "frameRate": 10,
@@ -1089,6 +1745,14 @@
     {
      "key": "mobs",
      "frame": "mob_boar/attack/ne/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/ne/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/ne/005"
     }
    ],
    "frameRate": 10,
@@ -1112,6 +1776,14 @@
     {
      "key": "mobs",
      "frame": "mob_boar/attack/e/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/e/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/e/005"
     }
    ],
    "frameRate": 10,
@@ -1135,6 +1807,14 @@
     {
      "key": "mobs",
      "frame": "mob_boar/attack/se/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/se/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/se/005"
     }
    ],
    "frameRate": 10,
@@ -1158,6 +1838,14 @@
     {
      "key": "mobs",
      "frame": "mob_boar/attack/s/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/s/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/s/005"
     }
    ],
    "frameRate": 10,
@@ -1181,6 +1869,14 @@
     {
      "key": "mobs",
      "frame": "mob_boar/attack/sw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/sw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/sw/005"
     }
    ],
    "frameRate": 10,
@@ -1204,6 +1900,14 @@
     {
      "key": "mobs",
      "frame": "mob_boar/attack/w/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/w/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/w/005"
     }
    ],
    "frameRate": 10,
@@ -1227,10 +1931,602 @@
     {
      "key": "mobs",
      "frame": "mob_boar/attack/nw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/nw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/attack/nw/005"
     }
    ],
    "frameRate": 10,
    "repeat": 0
+  },
+  {
+   "key": "mob_boar/hurt/n",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/n/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/n/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/n/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/hurt/ne",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/ne/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/ne/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/ne/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/hurt/e",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/e/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/e/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/e/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/hurt/se",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/se/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/se/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/se/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/hurt/s",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/s/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/s/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/s/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/hurt/sw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/sw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/sw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/sw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/hurt/w",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/w/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/w/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/w/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/hurt/nw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/nw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/nw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/hurt/nw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/death/n",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/n/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/n/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/n/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/n/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/n/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/n/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/death/ne",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/ne/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/ne/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/ne/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/ne/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/ne/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/ne/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/death/e",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/e/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/e/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/e/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/e/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/e/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/e/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/death/se",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/se/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/se/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/se/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/se/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/se/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/se/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/death/s",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/s/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/s/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/s/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/s/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/s/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/s/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/death/sw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/sw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/sw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/sw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/sw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/sw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/sw/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/death/w",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/w/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/w/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/w/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/w/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/w/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/w/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/death/nw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/nw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/nw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/nw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/nw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/nw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/death/nw/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_boar/flee/n",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/n/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/n/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/n/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/n/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_boar/flee/ne",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/ne/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/ne/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/ne/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/ne/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_boar/flee/e",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/e/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/e/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/e/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/e/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_boar/flee/se",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/se/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/se/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/se/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/se/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_boar/flee/s",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/s/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/s/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/s/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/s/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_boar/flee/sw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/sw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/sw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/sw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/sw/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_boar/flee/w",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/w/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/w/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/w/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/w/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_boar/flee/nw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/nw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/nw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/nw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_boar/flee/nw/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
   },
   {
    "key": "mob_bat/idle/n",
@@ -1682,6 +2978,14 @@
     {
      "key": "mobs",
      "frame": "mob_bat/attack/n/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/n/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/n/005"
     }
    ],
    "frameRate": 10,
@@ -1705,6 +3009,14 @@
     {
      "key": "mobs",
      "frame": "mob_bat/attack/ne/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/ne/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/ne/005"
     }
    ],
    "frameRate": 10,
@@ -1728,6 +3040,14 @@
     {
      "key": "mobs",
      "frame": "mob_bat/attack/e/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/e/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/e/005"
     }
    ],
    "frameRate": 10,
@@ -1751,6 +3071,14 @@
     {
      "key": "mobs",
      "frame": "mob_bat/attack/se/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/se/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/se/005"
     }
    ],
    "frameRate": 10,
@@ -1774,6 +3102,14 @@
     {
      "key": "mobs",
      "frame": "mob_bat/attack/s/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/s/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/s/005"
     }
    ],
    "frameRate": 10,
@@ -1797,6 +3133,14 @@
     {
      "key": "mobs",
      "frame": "mob_bat/attack/sw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/sw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/sw/005"
     }
    ],
    "frameRate": 10,
@@ -1820,6 +3164,14 @@
     {
      "key": "mobs",
      "frame": "mob_bat/attack/w/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/w/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/w/005"
     }
    ],
    "frameRate": 10,
@@ -1843,10 +3195,602 @@
     {
      "key": "mobs",
      "frame": "mob_bat/attack/nw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/nw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/attack/nw/005"
     }
    ],
    "frameRate": 10,
    "repeat": 0
+  },
+  {
+   "key": "mob_bat/hurt/n",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/n/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/n/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/n/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/hurt/ne",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/ne/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/ne/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/ne/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/hurt/e",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/e/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/e/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/e/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/hurt/se",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/se/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/se/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/se/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/hurt/s",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/s/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/s/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/s/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/hurt/sw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/sw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/sw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/sw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/hurt/w",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/w/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/w/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/w/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/hurt/nw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/nw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/nw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/hurt/nw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/death/n",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/n/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/n/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/n/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/n/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/n/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/n/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/death/ne",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/ne/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/ne/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/ne/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/ne/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/ne/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/ne/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/death/e",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/e/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/e/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/e/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/e/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/e/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/e/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/death/se",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/se/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/se/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/se/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/se/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/se/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/se/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/death/s",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/s/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/s/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/s/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/s/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/s/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/s/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/death/sw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/sw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/sw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/sw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/sw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/sw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/sw/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/death/w",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/w/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/w/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/w/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/w/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/w/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/w/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/death/nw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/nw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/nw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/nw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/nw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/nw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/death/nw/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_bat/flee/n",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/n/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/n/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/n/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/n/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_bat/flee/ne",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/ne/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/ne/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/ne/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/ne/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_bat/flee/e",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/e/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/e/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/e/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/e/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_bat/flee/se",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/se/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/se/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/se/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/se/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_bat/flee/s",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/s/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/s/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/s/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/s/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_bat/flee/sw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/sw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/sw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/sw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/sw/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_bat/flee/w",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/w/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/w/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/w/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/w/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_bat/flee/nw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/nw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/nw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/nw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_bat/flee/nw/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
   },
   {
    "key": "mob_rat/idle/n",
@@ -2298,6 +4242,14 @@
     {
      "key": "mobs",
      "frame": "mob_rat/attack/n/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/n/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/n/005"
     }
    ],
    "frameRate": 10,
@@ -2321,6 +4273,14 @@
     {
      "key": "mobs",
      "frame": "mob_rat/attack/ne/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/ne/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/ne/005"
     }
    ],
    "frameRate": 10,
@@ -2344,6 +4304,14 @@
     {
      "key": "mobs",
      "frame": "mob_rat/attack/e/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/e/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/e/005"
     }
    ],
    "frameRate": 10,
@@ -2367,6 +4335,14 @@
     {
      "key": "mobs",
      "frame": "mob_rat/attack/se/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/se/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/se/005"
     }
    ],
    "frameRate": 10,
@@ -2390,6 +4366,14 @@
     {
      "key": "mobs",
      "frame": "mob_rat/attack/s/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/s/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/s/005"
     }
    ],
    "frameRate": 10,
@@ -2413,6 +4397,14 @@
     {
      "key": "mobs",
      "frame": "mob_rat/attack/sw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/sw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/sw/005"
     }
    ],
    "frameRate": 10,
@@ -2436,6 +4428,14 @@
     {
      "key": "mobs",
      "frame": "mob_rat/attack/w/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/w/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/w/005"
     }
    ],
    "frameRate": 10,
@@ -2459,10 +4459,602 @@
     {
      "key": "mobs",
      "frame": "mob_rat/attack/nw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/nw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/attack/nw/005"
     }
    ],
    "frameRate": 10,
    "repeat": 0
+  },
+  {
+   "key": "mob_rat/hurt/n",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/n/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/n/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/n/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/hurt/ne",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/ne/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/ne/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/ne/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/hurt/e",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/e/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/e/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/e/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/hurt/se",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/se/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/se/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/se/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/hurt/s",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/s/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/s/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/s/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/hurt/sw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/sw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/sw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/sw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/hurt/w",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/w/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/w/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/w/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/hurt/nw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/nw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/nw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/hurt/nw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/death/n",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/n/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/n/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/n/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/n/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/n/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/n/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/death/ne",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/ne/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/ne/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/ne/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/ne/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/ne/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/ne/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/death/e",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/e/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/e/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/e/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/e/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/e/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/e/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/death/se",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/se/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/se/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/se/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/se/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/se/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/se/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/death/s",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/s/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/s/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/s/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/s/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/s/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/s/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/death/sw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/sw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/sw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/sw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/sw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/sw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/sw/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/death/w",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/w/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/w/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/w/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/w/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/w/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/w/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/death/nw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/nw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/nw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/nw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/nw/003"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/nw/004"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/death/nw/005"
+    }
+   ],
+   "frameRate": 8,
+   "repeat": 0
+  },
+  {
+   "key": "mob_rat/flee/n",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/n/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/n/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/n/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/n/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_rat/flee/ne",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/ne/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/ne/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/ne/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/ne/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_rat/flee/e",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/e/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/e/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/e/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/e/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_rat/flee/se",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/se/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/se/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/se/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/se/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_rat/flee/s",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/s/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/s/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/s/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/s/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_rat/flee/sw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/sw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/sw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/sw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/sw/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_rat/flee/w",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/w/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/w/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/w/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/w/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
+  },
+  {
+   "key": "mob_rat/flee/nw",
+   "frames": [
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/nw/000"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/nw/001"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/nw/002"
+    },
+    {
+     "key": "mobs",
+     "frame": "mob_rat/flee/nw/003"
+    }
+   ],
+   "frameRate": 14,
+   "repeat": -1
   }
  ]
 }
