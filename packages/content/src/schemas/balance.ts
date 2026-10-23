@@ -312,6 +312,8 @@ export const BalanceFile = z.strictObject({
     taskWage: z.number().int().nonnegative(),
     /** The share of every bank balance a cracked strongbox carries off (rounded down per seat). */
     heistShare: z.number().min(0).max(1),
+    /** The hold that picks up a coins node on the ground (all of it). */
+    coinPickupS: z.number().positive(),
   }),
   chat: Section({
     /** A `chat.say` line is cut to this many characters (GDD 3.5). */
