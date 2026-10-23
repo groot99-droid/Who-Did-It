@@ -14,6 +14,7 @@ import type { CutscenesFile } from './schemas/cutscenes.js';
 import type { MusicFile } from './schemas/music.js';
 import type { MinigamesFile, MobsFile, QuestsFile, RecipesFile, ResourcesFile } from './schemas/m5b.js';
 import type { EventsFile, EvolutionsFile, LawsFile, VendettasFile } from './schemas/bible.js';
+import type { RelationsFile } from './schemas/relations.js';
 import type { Scene, SceneId } from './schemas/scene.js';
 import type { StyleFile } from './schemas/style.js';
 import type { TasksFile } from './schemas/tasks.js';
@@ -21,6 +22,7 @@ import type { TraitsFile } from './schemas/traits.js';
 import { MAP_IDS, type MapFile, type MapId } from './schemas/maps.js';
 import { checkMaps, checkSceneWorld } from './validateWorld.js';
 import { checkVendettas } from './validateVendettas.js';
+import { checkRelations } from './validateRelations.js';
 
 export interface Content {
   palette: PaletteFile;
@@ -49,6 +51,8 @@ export interface Content {
   evolutions: EvolutionsFile;
   laws: LawsFile;
   events: EventsFile;
+  // Round 8 (GDD 3.22), Session 8B.
+  relations: RelationsFile;
 }
 
 const maxProfile = (a: Profile, b: Profile): Profile => (PROFILE_RANK[a] >= PROFILE_RANK[b] ? a : b);
@@ -236,6 +240,8 @@ export function validateContent(c: Content): string[] {
   checkM5b(c, err);
   // Round 7 (GDD 3.20): the vendettas' cards, maps and kinds.
   checkVendettas(c, err);
+  // Round 8 (GDD 3.22): the relations table's sides and the inspect bands.
+  checkRelations(c, err);
 
   return errors;
 }
