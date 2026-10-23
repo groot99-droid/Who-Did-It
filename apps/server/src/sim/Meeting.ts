@@ -63,7 +63,10 @@ export function openMeeting(room: PartyRoom, req: MeetingRequest): void {
     ...(req.bodyOf !== undefined && { bodyOf: req.bodyOf }),
     missing: [],
   });
-  setPhase(room, Phase.meetingDiscussion, countRow(state.players.size).discussionS);
+  // The trial after the Final Night hunt has its own, longer discussion (GDD 3.3); the phases are the same.
+  const discussionS =
+    req.reason === 'final' ? balance.finalNight.trialS : countRow(state.players.size).discussionS;
+  setPhase(room, Phase.meetingDiscussion, discussionS);
 }
 
 /** `meeting.vote`: a living player, in discussion or vote, for a living player or Skip; changeable. */

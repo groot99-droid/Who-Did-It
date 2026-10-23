@@ -662,6 +662,12 @@ function checkRoutines(c: Content, err: (msg: string) => void): void {
     err('balance.json party.profileCodeLength: must be at least lobby.codeLength');
   }
 
+  // Round 8 (GDD 3.3): the trial's discussion is longer than every ordinary meeting's.
+  const longest = Math.max(...Object.values(c.balance.byCount).map((row) => row.discussionS));
+  if (c.balance.finalNight.trialS <= longest) {
+    err(`balance.json finalNight.trialS: must be longer than the longest discussion (${longest} s)`);
+  }
+
   // Rule 6: the npc spans and the routine weights of balance.json.
   const { routine, react, night, vote, ready, nightPower, aloneKill } = c.balance.npc;
   if (aloneKill.afterS <= 0) err('balance.json npc.aloneKill.afterS: must be positive');
