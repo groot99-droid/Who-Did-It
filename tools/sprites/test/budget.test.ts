@@ -22,17 +22,13 @@ const CAPS: Array<[string, number, number]> = [
   ['char_', 1024, 1024],
   ['ovl_', 1024, 512],
 ];
-/**
- * DOM images are not GPU pages; their cap is bytes per set. The ONUB caps are binary, as SPRITES 11 and onub.test.ts
- * state them: 2.5 MiB, and 4 MiB for the low-poly set (art plan 1.9).
- */
-const domBytes = (style: string): Array<[string, number]> => [
+/** DOM images are not GPU pages; their cap is bytes per set. */
+const DOM_BYTES: Array<[string, number]> = [
   ['portrait_', 0.8e6],
   ['thumb_', 0.2e6],
-  ['onub_', (style === 'lowpoly' ? 4 : 2.5) * 1024 * 1024],
 ];
 
-const isDom = (p: Page) => domBytes('').some(([x]) => p.key.startsWith(x)) && p.entry.type === 'image';
+const isDom = (p: Page) => DOM_BYTES.some(([x]) => p.key.startsWith(x)) && p.entry.type === 'image';
 const equiv = (ps: Page[]) => ps.reduce((n, p) => n + (p.width * p.height) / PAGE, 0);
 const lookOf = (key: string) => /^(?:char|ovl)_([a-z][a-z0-9]*)$/.exec(key)?.[1];
 
@@ -40,7 +36,7 @@ describe.each(artStyles().filter((s) => hasManifest(s.root)))(
   'texture budget, $id (art plan 1.4, SPRITES 10.14)',
   (style) => {
     const pages = realPages(style.root);
-    const gpu = pages.filter((p) => !isDom(p) && !(p.entry.modes ?? []).includes('onub'));
+    const gpu = pages.filter((p) => !isDom(p));
 
     for (const p of gpu) {
       const cap = CAPS.find(([x]) => p.key.startsWith(x));
@@ -75,7 +71,7 @@ describe.each(artStyles().filter((s) => hasManifest(s.root)))(
       }
     });
 
-    for (const [prefix, cap] of domBytes(style.id)) {
+    for (const [prefix, cap] of DOM_BYTES) {
       it(`keeps the ${prefix}* DOM images within ${cap} bytes`, () => {
         const bytes = pages
           .filter((p) => isDom(p) && p.key.startsWith(prefix))

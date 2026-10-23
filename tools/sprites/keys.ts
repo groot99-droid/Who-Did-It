@@ -115,9 +115,6 @@ export const BAKERY_PROP_KEYS: readonly string[] = [
 /** Every frame of the `props` texture. */
 export const PROP_KEYS: readonly string[] = [...SQUARE_PROP_KEYS, ...BAKERY_PROP_KEYS];
 
-/** The dark-loft images (`type: image`, DOM backgrounds of the quick-mode loft; GDD 3.11). */
-export const LOFT_KEYS: readonly string[] = ['loft_backdrop', 'prop_bedroll', 'prop_bedroll_self'];
-
 /** The Small-profile building exteriors (`type: image`, origin at the front wall's base). */
 export const BUILDING_KEYS: readonly string[] = [
   'bld_tavern_ext',

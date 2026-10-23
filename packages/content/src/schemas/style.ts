@@ -113,7 +113,7 @@ export const StyleFile = z.strictObject({
    * `artStyles` says which style takes the finish; the low-poly style never does.
    */
   pixelFinish: z.strictObject({
-    enabled: z.strictObject({ main: z.boolean(), onub: z.literal(true) }),
+    enabled: z.strictObject({ main: z.boolean() }),
     offWebpQuality: z.number().int().min(1).max(99),
   }),
   artStyles: ArtStyles,

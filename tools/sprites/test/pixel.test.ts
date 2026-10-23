@@ -13,7 +13,6 @@ import {
   cutAlpha,
   encodeWebp,
   finishDisplay,
-  finishEnabled,
   finishFolder,
   finishIllustration,
   finishRender,
@@ -70,10 +69,6 @@ describe('the world palette', () => {
     expect(new Set(p).size).toBe(64);
     expect(p).toContain(INK);
     expect(p).not.toContain('#E04E9A');
-  });
-
-  it('keeps the ONUB finish on', () => {
-    expect(finishEnabled('onub')).toBe(true);
   });
 });
 

@@ -11,7 +11,7 @@ interface Entry {
   type: string;
   filter?: 'linear' | 'nearest';
   maps?: string[];
-  modes?: Array<'main' | 'onub'>;
+  modes?: Array<'main'>;
 }
 interface Manifest {
   art: string;
@@ -57,14 +57,9 @@ describe('asset manifests (docs/SPRITES.md 5, 10.13)', () => {
     }
   });
 
-  it("mark every ONUB key, and only ONUB keys, with modes ['onub']", () => {
+  it('mark no key with a mode other than the main one', () => {
     for (const e of [...real.entries, ...placeholder.entries]) {
-      if (e.modes !== undefined) {
-        expect(e.modes.length, e.key).toBeGreaterThan(0);
-        expect(new Set(e.modes).size, e.key).toBe(e.modes.length);
-      }
-      if (e.key.startsWith('onub_')) expect(e.modes, e.key).toEqual(['onub']);
-      else expect(e.modes?.includes('onub') ?? false, e.key).toBe(false);
+      if (e.modes !== undefined) expect(e.modes, e.key).toEqual(['main']);
     }
   });
 

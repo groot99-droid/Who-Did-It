@@ -7,7 +7,7 @@ import { dist2, hexToRgb, oklab, type Lab } from './oklab.ts';
 
 const DATA = join(import.meta.dirname, '../../packages/content/data');
 
-export type Mode = 'main' | 'onub';
+export type Mode = 'main';
 
 interface PaletteJson {
   colors: Record<string, string>;
@@ -39,7 +39,7 @@ export const paletteFile: PaletteJson = readJson<PaletteJson>('palette.json');
 export const styleFile: StyleJson = readJson<StyleJson>('style.json');
 export const pixelSettings: PixelSettings = styleFile.pixel;
 
-/** Whether a mode's art takes the pixel finish (style.json `pixelFinish.enabled`; ONUB is always on). */
+/** Whether a mode's art takes the pixel finish (style.json `pixelFinish.enabled`). */
 export function finishEnabled(mode: Mode): boolean {
   return styleFile.pixelFinish.enabled[mode];
 }

@@ -2,19 +2,12 @@ import { readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import musicJson from '@wdi/content/data/music.json';
 import cutscenesJson from '@wdi/content/data/cutscenes/cutscenes.json';
-import { MAP_IDS, MUSIC_CLASSES, ONUB_MUSIC_CLASSES } from '@wdi/content';
+import { MAP_IDS, MUSIC_CLASSES } from '@wdi/content';
 import { Phase } from '@wdi/shared';
-import {
-  MusicConductor,
-  mainClassFor,
-  onubClassFor,
-  onubPlaylistFor,
-  openingFor,
-  playlistFor,
-} from './MusicDirector';
+import { MusicConductor, mainClassFor, openingFor, playlistFor } from './MusicDirector';
 import { parseMusicManifest } from './MusicBus';
 
-function rig(map = 'hollowmere', mode: 'main' | 'onub' = 'main') {
+function rig(map = 'hollowmere') {
   const calls: Array<string | null> = [];
   const prefetched: string[] = [];
   const c = new MusicConductor({
@@ -22,7 +15,7 @@ function rig(map = 'hollowmere', mode: 'main' | 'onub' = 'main') {
     crossfadeTo: (id) => void (calls.at(-1) !== id && calls.push(id)),
     prefetch: (id) => void prefetched.push(id),
   });
-  c.lobby(map, mode);
+  c.lobby(map);
   calls.length = 0;
   prefetched.length = 0;
   return { c, calls, prefetched };
@@ -37,22 +30,18 @@ describe('music.json and the committed manifest', () => {
   const ids = new Set(manifest.playlists.map((p) => p.id));
 
   it('names only playlists the manifest declares', () => {
-    const used = [
-      ...Object.values(musicJson.byMap).flatMap((m) => Object.values(m)),
-      ...Object.values(musicJson.onub),
-    ];
+    const used = Object.values(musicJson.byMap).flatMap((m) => Object.values(m));
     expect(used.length).toBeGreaterThan(0);
     for (const id of used) expect(ids, id).toContain(id);
   });
 
-  it('maps every class of every map but `loading`, and every quick-mode class', () => {
+  it('maps every class of every map but `loading`', () => {
     for (const m of MAP_IDS) {
       for (const c of MUSIC_CLASSES.filter((k) => k !== 'loading'))
         expect(playlistFor(m, c), `${m}/${c}`).not.toBeNull();
       // The match load must leave the opening piece alone (A101): the lobby piece plays on through it.
       expect(playlistFor(m, 'loading'), m).toBeNull();
     }
-    for (const c of ONUB_MUSIC_CLASSES) expect(onubPlaylistFor(c), c).not.toBeNull();
   });
 
   it("runs each map's opening as long as its intro track, rounded down to the second (A101)", () => {
@@ -84,19 +73,12 @@ describe('phase to class', () => {
     for (const p of [Phase.meetingDiscussion, Phase.meetingVote, Phase.reveal, Phase.immunity])
       expect(mainClassFor(p)).toBe('meeting');
   });
-
-  it('maps the quick mode to its four classes', () => {
-    expect(onubClassFor(Phase.dusk)).toBe('kitchen');
-    expect(onubClassFor(Phase.night)).toBe('night');
-    expect(onubClassFor(Phase.meetingDiscussion)).toBe('rush');
-    expect(onubClassFor(Phase.gameOver)).toBe('over');
-  });
 });
 
 describe('MusicConductor', () => {
   it('plays the lobby playlist and warms the opening piece and the day theme when the map is picked', () => {
     const { c, calls, prefetched } = rig('hollowmere');
-    c.lobby('blackpine', 'main');
+    c.lobby('blackpine');
     expect(calls).toEqual([playlistFor('blackpine', 'lobby')]);
     expect(prefetched).toEqual([playlistFor('blackpine', 'opening'), playlistFor('blackpine', 'day')]);
   });
@@ -149,15 +131,12 @@ describe('MusicConductor', () => {
     expect(calls).toHaveLength(2);
   });
 
-  it('ignores other cutscenes, other maps and the quick mode', () => {
+  it('ignores other cutscenes and other maps', () => {
     const { c, calls } = rig('hollowmere');
     c.phase(Phase.grace);
     c.cutscene('deathKnife');
     c.cutscene(openingFor('blackpine')!);
     expect(calls).toEqual([]);
-    const q = rig('hollowmere', 'onub');
-    q.c.cutscene(openingFor('hollowmere')!);
-    expect(q.calls).toEqual([]);
   });
 
   it('drops the opening piece when the match ends or the room is left', () => {
@@ -173,7 +152,7 @@ describe('MusicConductor', () => {
     const { c, calls } = rig();
     c.phase(Phase.day);
     calls.length = 0;
-    c.lobby('hollowmere', 'main');
+    c.lobby('hollowmere');
     expect(calls).toEqual([]);
   });
 
@@ -181,7 +160,7 @@ describe('MusicConductor', () => {
     const { c, calls } = rig();
     c.phase(Phase.day);
     c.gameOver();
-    c.lobby('hollowmere', 'main');
+    c.lobby('hollowmere');
     c.left();
     expect(calls).toEqual([
       playlistFor('hollowmere', 'day'),
@@ -189,14 +168,6 @@ describe('MusicConductor', () => {
       playlistFor('hollowmere', 'lobby'),
       null,
     ]);
-  });
-
-  it('plays the quick mode classes in the quick mode', () => {
-    const { c, calls } = rig('hollowmere', 'onub');
-    c.phase(Phase.dusk);
-    c.phase(Phase.night);
-    c.phase(Phase.dawn);
-    expect(calls).toEqual(['kitchen', 'night', 'rush'].map((k) => onubPlaylistFor(k as 'kitchen')));
   });
 });
 

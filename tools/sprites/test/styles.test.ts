@@ -11,7 +11,7 @@ interface Entry {
   url?: string;
   filter?: 'linear' | 'nearest';
   maps?: string[];
-  modes?: Array<'main' | 'onub'>;
+  modes?: Array<'main'>;
 }
 interface Manifest {
   art: string;

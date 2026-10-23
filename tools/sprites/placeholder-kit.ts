@@ -81,7 +81,7 @@ export interface ManifestEntry {
   /** Map ids: the entry loads with the match's map, not at boot (SPRITES 5, 10.13). */
   maps?: string[];
   /** Modes: the entry loads at match start when the match's mode is listed (SPRITES 5, 10.13). */
-  modes?: ('main' | 'onub')[];
+  modes?: 'main'[];
 }
 
 /**
@@ -91,8 +91,8 @@ export interface ManifestEntry {
  */
 export interface PlaceholderEntry {
   /**
-   * Position in `manifest.json`: stand-ins are sorted by it, ties keeping module order (world, chars,
-   * onub). Today's blocks: 10 villager, 20 clues, 30 props, 40 vfx, 50 loft, 60 buildings, 70 tiles.
+   * Position in `manifest.json`: stand-ins are sorted by it, ties keeping module order (world, chars).
+   * Today's blocks: 10 villager, 20 clues, 30 props, 40 vfx, 60 buildings, 70 tiles.
    * A new block takes a number of its own.
    */
   order: number;

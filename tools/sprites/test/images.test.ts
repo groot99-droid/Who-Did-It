@@ -4,7 +4,7 @@ import { loadImage } from '@napi-rs/canvas';
 import { describe, expect, it } from 'vitest';
 import { decodePng, encodePng } from '../bleed.ts';
 import { finishImages, IMAGE_SETS, IMAGE_SIZES, TILE_VARIANTS } from '../images.ts';
-import { LOFT_KEYS, TILESET_KEYS } from '../keys.ts';
+import { TILESET_KEYS } from '../keys.ts';
 
 function image(w: number, h: number, shade = 217): Buffer {
   const data = new Uint8Array(w * h * 4);
@@ -15,19 +15,19 @@ function image(w: number, h: number, shade = 217): Buffer {
 const flat = (keys: readonly string[]) => new Map(keys.map((k) => [k, image(...IMAGE_SIZES[k]!)]));
 
 describe('finishImages', () => {
-  it('sizes every loft and tileset key', () => {
-    expect(IMAGE_SETS.flatMap((s) => s.keys).sort()).toEqual([...LOFT_KEYS, ...TILESET_KEYS].sort());
+  it('sizes every tileset key', () => {
+    expect(IMAGE_SETS.flatMap((s) => s.keys).sort()).toEqual([...TILESET_KEYS].sort());
     for (const s of IMAGE_SETS) for (const k of s.keys) expect(IMAGE_SIZES[k]).toBeDefined();
   });
 
   it('writes one PNG per key at its size, deterministically', () => {
-    const a = finishImages(LOFT_KEYS, flat(LOFT_KEYS));
-    expect([...a.keys()].sort()).toEqual(LOFT_KEYS.map((k) => `${k}.png`).sort());
-    for (const k of LOFT_KEYS) {
+    const a = finishImages(TILESET_KEYS, flat(TILESET_KEYS));
+    expect([...a.keys()].sort()).toEqual(TILESET_KEYS.map((k) => `${k}.png`).sort());
+    for (const k of TILESET_KEYS) {
       const img = decodePng(a.get(`${k}.png`)!);
       expect([img.width, img.height]).toEqual(IMAGE_SIZES[k]);
     }
-    const b = finishImages(LOFT_KEYS, flat(LOFT_KEYS));
+    const b = finishImages(TILESET_KEYS, flat(TILESET_KEYS));
     for (const [name, bytes] of a) expect(bytes.equals(b.get(name)!)).toBe(true);
   });
 
@@ -40,12 +40,12 @@ describe('finishImages', () => {
   });
 
   it('refuses a missing key or a wrong size', () => {
-    const missing = flat(LOFT_KEYS);
-    missing.delete('prop_bedroll_self');
-    expect(() => finishImages(LOFT_KEYS, missing)).toThrow(/missing prop_bedroll_self/);
-    const wrong = flat(LOFT_KEYS);
-    wrong.set('prop_bedroll', image(56, 92));
-    expect(() => finishImages(LOFT_KEYS, wrong)).toThrow(/56x92, want 112x184/);
+    const missing = flat(TILESET_KEYS);
+    missing.delete('tiles_grass');
+    expect(() => finishImages(TILESET_KEYS, missing)).toThrow(/missing tiles_grass/);
+    const wrong = flat(TILESET_KEYS);
+    wrong.set('tiles_grass', image(64, 64));
+    expect(() => finishImages(TILESET_KEYS, wrong)).toThrow(/64x64, want 256x64/);
   });
 });
 

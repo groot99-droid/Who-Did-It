@@ -421,15 +421,6 @@ describe('forest (WORLD 4.3, GDD 3.6)', () => {
   });
 });
 
-describe('quick-mode bakery (GDD 3.11)', () => {
-  it("has 10 plates, the dead's 3 loaves and the ledger", () => {
-    const kinds = scenes.bakery.props.map((p) => p.kind);
-    expect(kinds.filter((k) => k === 'plate')).toHaveLength(balance.players.max);
-    expect(kinds.filter((k) => k === 'deadLoaf')).toHaveLength(3);
-    expect(kinds).toContain('ledger');
-  });
-});
-
 describe("Crumb's Ovens' station rooms (A116, A118)", () => {
   const rooms = ['crumb_cold', 'crumb_mixing', 'crumb_oven', 'crumb_proofing'] as const;
   it('are small lit house interiors on Hollowmere, each with one door back to the bakery', () => {
