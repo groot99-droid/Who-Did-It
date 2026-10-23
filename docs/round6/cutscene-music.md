@@ -62,6 +62,12 @@ round-8 content (BlackPine ships a two-step camera pan with no narrator in round
   overlay root for `Captions.ts`, the `AudioBus` and the input for Skip (Esc, a tap on the Skip button, both
   only when `skippable`). Under `prefers-reduced-motion` camera steps become cuts; `?cutscene=0` (dev flag in
   `view/devFlags.ts`) disables every cutscene.
+- **Round 7 (7A, A101): the `video` step.** `cutscene/video.ts` finds the step's `key` in
+  `assets/video/manifest.json` (fetched once) and mounts a full-frame `<video playsinline>` at the back of the
+  cutscene layer, under the captions and Skip; its sound follows the music slider and mute, falling back to muted when
+  autoplay with sound is refused. The step is open-ended (`sequencer.ts`), so captions over it carry `withPrevious`;
+  the cutscene finishes `done` when the video ends, and Skip, Esc or `maxS` release the stream. A missing row or a
+  decode error drops the picture with a warning and the cutscene runs on.
 - `World.ts` plays the opening after its `fadeIn` (`client/scenes/World.ts:263`) when `REG_CUTSCENE` is set
   (pre-seeded registry key and the mount line; `worldRouter.ts` sets it from the `cutscene` feed event); the
   `onKilled` handler plays the death cutscene of `killed.cutsceneId` and then enters ghost mode exactly as
