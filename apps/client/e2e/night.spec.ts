@@ -19,6 +19,11 @@ test('a sleeper sees lights-out and the narrator, a waker the card table, then d
   await toNight(page);
 
   await expect(page.getByTestId('night')).toBeVisible({ timeout: 40_000 });
+  // The night theme's pixel faces load on first use; the waker's window is short, so fetch them during lights-out
+  // rather than inside the window (a screenshot waits for them).
+  await page.evaluate(() =>
+    Promise.all([document.fonts.load('16px "Pixelify Sans"'), document.fonts.load('12px "Press Start 2P"')]),
+  );
   await expect(page.getByTestId('narrator')).toBeVisible();
   await expect(page.getByTestId('lights-out')).toBeVisible();
   await expect(page.getByTestId('night-wake')).toBeHidden();

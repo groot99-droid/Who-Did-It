@@ -10,6 +10,8 @@ import type { NightRevealEntry, S2CPayloads } from '@wdi/shared/protocol';
 import { ActFlow } from '../../ui/onub/actflow';
 import { seatSlot, slotLabel } from '../../ui/onub/slots';
 import { CardTableView, type Face } from './CardTableView';
+import '../../ui/table.css';
+import '../../ui/onub/onub.css';
 import { LightsOutView } from './LightsOutView';
 
 export { NightSound, type NightAudioOut } from './NightSound';
@@ -163,7 +165,7 @@ export class NightView {
     );
     this.root = h(
       'div',
-      { class: 'wdi-root wdi-night', 'data-testid': 'night' },
+      { class: 'wdi-root wdi-night wdi-table', 'data-testid': 'night' },
       this.narratorEl,
       this.lightsOut.root,
       this.wakeEl,

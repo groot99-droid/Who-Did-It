@@ -1,0 +1,264 @@
+/*
+ * Who Did It: the quick mode's screens in the night theme (round 7, 7G; docs/UI.md 14.28).
+ *
+ * The prep board, the station rooms and the hand, the night's lights-out, wake scene, card table and dawn,
+ * the piles. The Rush and the end panel ride the meeting's and the game over's glass (`ui/table.css`), which
+ * every quick-mode root also loads. Scoped under `.wdi-table` (the roots carry it), tokens only; the markup
+ * and every id are unchanged.
+ */
+
+/* ------------------------------------------------------------------ the kitchen */
+
+.wdi-kitchen.wdi-table .wdi-kitchen__room {
+  align-items: flex-start;
+  background-color: rgb(var(--wdi-night-rgb) / 0.55);
+  text-align: left;
+}
+
+.wdi-kitchen.wdi-table .wdi-kitchen__room:not(:disabled):hover,
+.wdi-kitchen.wdi-table .wdi-kitchen__room:not(:disabled):focus-visible {
+  background-color: rgb(var(--wdi-violet-rgb) / 0.7);
+  box-shadow: inset 0 0 0 3px var(--wdi-night-accent);
+}
+
+.wdi-table .wdi-kitchen__name {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-lg);
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--wdi-night-label);
+}
+
+.wdi-table .wdi-kitchen__gloss {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--wdi-night-text-muted);
+}
+
+/* The overview and the done card sit on the owner's art: a veil keeps the lilac text readable on any frame. */
+.wdi-kitchen.wdi-table .wdi-kitchen__overview {
+  padding: var(--wdi-space-3);
+  background: var(--wdi-veil);
+}
+
+.wdi-table .wdi-station {
+  background-color: var(--wdi-glass-fill);
+  border: 0;
+  border-radius: 0;
+  clip-path: var(--_corner);
+  box-shadow: inset 0 0 0 2px var(--_rim);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.wdi-table .wdi-station__game canvas {
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+/* ------------------------------------------------------------------ the hand and the piles */
+
+.wdi-table .wdi-hand__card {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-md);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--wdi-night-text);
+}
+
+.wdi-table .wdi-hand__card .wdi-strong {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  letter-spacing: 0;
+  color: var(--wdi-night-label);
+}
+
+.wdi-table .wdi-hand__card[aria-pressed='true'] {
+  outline: 0;
+  color: var(--wdi-on-night-accent);
+  background-color: var(--wdi-night-accent);
+}
+
+.wdi-table .wdi-hand__card[aria-pressed='true'] .wdi-strong,
+.wdi-table .wdi-hand__card[aria-pressed='true'] .wdi-hint {
+  color: var(--wdi-on-night-accent);
+}
+
+.wdi-table .wdi-hand__card--sabotage {
+  box-shadow: inset 0 0 0 2px var(--wdi-hazard);
+}
+
+.wdi-table .wdi-pile__name {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: var(--wdi-night-label);
+}
+
+.wdi-table .wdi-pile__card--sabotage {
+  box-shadow: inset 0 0 0 2px var(--wdi-hazard);
+}
+
+.wdi-table .wdi-pile__flag,
+.wdi-table .wdi-pile__ruin {
+  white-space: normal;
+  line-height: 1.4;
+}
+
+.wdi-table .wdi-chip--danger {
+  color: var(--wdi-night-label);
+  background-color: var(--wdi-danger);
+}
+
+/* ------------------------------------------------------------------ the night */
+
+.wdi-night.wdi-table {
+  background:
+    radial-gradient(ellipse at 50% 20%, rgb(var(--wdi-violet-rgb) / 0.45), transparent 60%),
+    var(--wdi-night-bg);
+}
+
+.wdi-table .wdi-narrator {
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-display-sm);
+  letter-spacing: 0;
+  color: var(--wdi-night-label);
+}
+
+.wdi-table .wdi-lights-out {
+  font-family: var(--wdi-font-pixel-text);
+  color: var(--wdi-night-text-muted);
+}
+
+/* The wake scene and the dawn keep their art (an inline background image of the panel): a pseudo-element lays the
+   glass fill and the veil over it and under the content, so the lilac text holds on any frame. No blur and no
+   stepped-corner clip, which a full-screen photo makes slow to paint (a clipped photo layer cost a screenshot a
+   second under software GL). */
+.wdi-night.wdi-table .wdi-night-wake,
+.wdi-night.wdi-table .wdi-night-dawn {
+  isolation: isolate;
+  clip-path: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.wdi-night.wdi-table .wdi-night-wake::before,
+.wdi-night.wdi-table .wdi-night-dawn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(var(--wdi-glass-fill), var(--wdi-glass-fill)), var(--wdi-veil);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ the card table */
+
+.wdi-table .wdi-seat-row,
+.wdi-table .wdi-pantry-cards {
+  gap: var(--wdi-space-2);
+}
+
+.wdi-night.wdi-table {
+  gap: var(--wdi-space-3);
+  padding: var(--wdi-space-3) var(--wdi-space-5);
+}
+
+.wdi-night.wdi-table .wdi-panel {
+  padding: var(--wdi-space-4);
+}
+
+.wdi-table .wdi-seat-cards {
+  background-color: rgb(var(--wdi-night-rgb) / 0.5);
+  border: 0;
+  border-radius: 0;
+  clip-path: none;
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+.wdi-table .wdi-seat-cards.is-self {
+  box-shadow: inset 0 0 0 3px var(--wdi-night-accent);
+}
+
+.wdi-table .wdi-seat-cards.is-glow {
+  box-shadow:
+    inset 0 0 0 2px var(--wdi-night-accent),
+    var(--wdi-glow-moon);
+}
+
+.wdi-table .wdi-seat-cards__name {
+  font-family: var(--wdi-font-pixel-display);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--wdi-night-label);
+}
+
+/* A slot is a card on the table (square-cornered: twenty clipped layers make a screenshot three times slower under
+   software GL): glass face-down, lantern-lined when it is yours to take. The type stays at 12 px so
+   five seats and the Pantry still fit one 1280 x 720 screen with the confirm button above the fold. */
+.wdi-table .wdi-slot {
+  min-width: 72px;
+  min-height: 56px;
+  padding: var(--wdi-space-1) var(--wdi-space-2);
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-xs);
+  color: var(--wdi-night-text);
+  background-color: rgb(var(--wdi-night-rgb) / 0.55);
+  border: 0;
+  border-radius: 0;
+  clip-path: none;
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+.wdi-table .wdi-slot.is-dealt,
+.wdi-table .wdi-slot.is-seen {
+  color: var(--wdi-night-label);
+  background-color: rgb(var(--wdi-violet-rgb) / 0.7);
+}
+
+.wdi-table .wdi-slot.is-seen {
+  box-shadow: inset 0 0 0 2px var(--wdi-moon);
+}
+
+.wdi-table .wdi-slot.is-selectable:not(:disabled) {
+  box-shadow: inset 0 0 0 2px var(--wdi-night-accent);
+}
+
+.wdi-table .wdi-slot.is-picked {
+  color: var(--wdi-on-night-accent);
+  background-color: var(--wdi-night-accent);
+  box-shadow: none;
+}
+
+.wdi-table .wdi-slot.is-covered {
+  box-shadow: inset 0 0 0 2px var(--wdi-night-text-muted);
+}
+
+.wdi-table .wdi-slot__face {
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-xs);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------------------------ the claim form */
+
+.wdi-table .wdi-claim-form {
+  background-color: rgb(var(--wdi-night-rgb) / 0.5);
+  border: 0;
+  clip-path: var(--_corner);
+  box-shadow: inset 0 0 0 2px var(--_rim);
+}
+
+@media (max-width: 480px) {
+  .wdi-kitchen.wdi-table .wdi-kitchen__grid {
+    gap: var(--wdi-space-2);
+  }
+
+  .wdi-table .wdi-kitchen__name {
+    font-size: var(--wdi-text-md);
+  }
+}

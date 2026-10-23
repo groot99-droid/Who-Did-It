@@ -6,6 +6,8 @@ import { ONUB_PHASE } from '../../net/onubRouter';
 import { fill } from '../../ui/copy';
 import { ONUB_PREP_COPY as C } from '../../ui/copy/onubPrep';
 import { h, type Screen } from '../../ui/dom';
+import '../../ui/table.css';
+import '../../ui/onub/onub.css';
 import { renderPiles } from './PilesView';
 import { mountStation, type StationRoom } from './StationView';
 
@@ -209,7 +211,7 @@ export function mountPrep(
   const top = h('div', { class: 'wdi-row wdi-row--between' }, clock);
   const kitchen = h(
     'div',
-    { class: 'wdi-kitchen', 'data-testid': 'kitchen' },
+    { class: 'wdi-kitchen wdi-table', 'data-testid': 'kitchen' },
     top,
     overview,
     donePanel,

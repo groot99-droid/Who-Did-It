@@ -7,6 +7,8 @@ import { h } from '../dom';
 import { MEETING_PHASE } from '../meetingText';
 import { createClaimForm } from './claim';
 import { slotLabel } from './slots';
+import '../table.css';
+import './onub.css';
 import { claimableRoles, claimLine, crustLine, outLines, PANTRY, roleName } from './rushModel';
 
 export interface RushPanel {
