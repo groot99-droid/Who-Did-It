@@ -1,5 +1,6 @@
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { onSim } from '../events/bus';
+import { sealShield } from './faith';
 import { gazette, onDeliveryRumours, runRumours } from './rumours';
 
 /**
@@ -23,5 +24,6 @@ export function runCivic(room: PartyRoom): void {
 
 /** Meeting start (locked hooks of seams.md 5: `sealShield(room)` and `gazette(room)`). */
 export function civicMeetingStart(room: PartyRoom): void {
+  sealShield(room);
   gazette(room);
 }

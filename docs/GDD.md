@@ -751,6 +751,17 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 - **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice. It leaves only as a
   purchase, rent, a fine, a donation or an HQ tier. Theft, drops, pickups and the bank only move it.
 
+- **Faith** (8D). Donating Scrip at an altar (`act.donate`, within verb reach, up to `faith.donateMax` at a time)
+  earns `faith.perScrip` Faith per Scrip, up to `faith.max`; Faith is private (`Private.faith`). There is an altar in
+  the chapel and a wayside altar on each map's hub. Faith plus Scrip buys, at an altar (`act.faith {kind}`):
+  - an **Indulgence** (`faith.indulgence`). Burning a held notice that names your own look spends one. Presented in a
+    meeting it is always spent and silently voids the one oldest notice naming your look, wherever it is held;
+    nothing reports whether one was voided;
+  - a **Parish Seal** (`faith.seal`, at most `faith.holdMax` held). Presented in a meeting, it posts a public line
+    under your public name ("the charge is a matter for the Church"), clears every vote cast so far, and for
+    `faith.sealShieldS` refuses any vote naming you. The shield ends with the meeting. The full heresy trial waits for
+    R9's Tribunal.
+
 - **Rumours** (8D). The server keeps a rumour ledger: every `notices.sampleS` it writes down each drawn look that
   stands in a scene with at least one other figure, so a line is only ever what an observer could have seen, and it
   names a look, never a seat or a card. Each Train delivery fills the mailbag beside the platform (HollowMere) with
