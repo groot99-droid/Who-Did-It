@@ -197,7 +197,7 @@ class ArtStyles(unittest.TestCase):
         self.assertEqual(rc.ART_STYLES, ("8bit", "lowpoly", "hd"))
         self.assertEqual(rc.STYLE_FACTOR, {"8bit": 1, "lowpoly": 1, "hd": 2})
         for key in ("taaSamples", "filterSize", "keyAngleDeg", "shadowRays", "shadowSteps", "aoDistance",
-                    "rimToken", "rimAmount", "catcherStrength", "catcherLit", "catcherHaze", "bandSoft",
+                    "rimToken", "rimAmount", "rimAmountWorld", "catcherStrength", "catcherLit", "catcherHaze", "bandSoft",
                     "bumpStrength", "bumpDistance"):
             self.assertIn(key, rc.HD)
         self.assertIn(rc.HD["rimToken"], rc.PALETTE)

@@ -94,6 +94,9 @@ HD = {
     "aoDistance": 1.0,
     "rimToken": "lantern",
     "rimAmount": 0.3,
+    # World statics take no rim: its mask is the view-facing angle, which covers a whole roof slope turned from
+    # the camera, so at 0.3 the tavern's back slope rendered lantern tan. The 8-bit world has no rim either.
+    "rimAmountWorld": 0.0,
     # The catcher's alpha is catcherStrength where the ground is fully shadowed; catcherLit is the luma the toon
     # ramp sees on unshadowed ground (the measurement above TOON_RAMP_STOPS).
     "catcherStrength": 0.6,

@@ -62,7 +62,7 @@ def setup() -> bpy.types.Scene:
     if STYLE == "hd":
         from materials import hd
 
-        hd.apply(scene)
+        hd.apply(scene, rim_amount=rc.HD["rimAmountWorld"])
     return scene
 
 
