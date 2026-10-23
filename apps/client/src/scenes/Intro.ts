@@ -99,6 +99,9 @@ export class Intro extends Phaser.Scene {
       if (state === 'done') return;
       state = 'done';
       markSeen();
+      // Stop the sound and drop the overlay now; the scene's shutdown, which runs on a later game step, would otherwise
+      // leave the video playing until then.
+      this.cleanup?.();
       this.scene.start('Landing');
     };
     const play = () => {
@@ -133,6 +136,7 @@ export class Intro extends Phaser.Scene {
       window.removeEventListener('keydown', onKey);
       video.pause();
       video.removeAttribute('src');
+      video.load(); // releases the stream and the decoder; pause alone keeps them
       root.remove();
       this.cleanup = null;
     };

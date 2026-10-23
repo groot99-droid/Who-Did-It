@@ -2680,6 +2680,8 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   inset: 0;
   z-index: var(--wdi-z-panel);
   pointer-events: none;
+  /* A full-screen layer over the world: the theme's root background must not cover the canvas (styles.css). */
+  background: transparent;
 }
 
 .wdi-m5b[hidden] {
@@ -2872,6 +2874,8 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   place-items: center;
   background-color: var(--wdi-ink);
   cursor: pointer;
+  /* #overlay lets pointer events through to the canvas; the cinematic takes them, so a tap anywhere ends it. */
+  pointer-events: auto;
 }
 
 .wdi-intro__poster,
