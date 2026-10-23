@@ -9,7 +9,10 @@
       "fleeLightTiles": 4,
       "attackS": 1,
       "kills": true,
-      "sprite": "mob_wolf"
+      "sprite": "mob_wolf",
+      "hp": 30,
+      "dmg": 25,
+      "effects": { "bleeding": 0.5 }
     },
     "boar": {
       "id": "boar",
@@ -18,8 +21,11 @@
       "senseTiles": 4,
       "fleeLightTiles": 2,
       "attackS": 1.5,
-      "kills": false,
-      "sprite": "mob_boar"
+      "kills": true,
+      "sprite": "mob_boar",
+      "hp": 40,
+      "dmg": 18,
+      "effects": { "bleeding": 0.3 }
     },
     "bat": {
       "id": "bat",
@@ -28,8 +34,11 @@
       "senseTiles": 5,
       "fleeLightTiles": 3,
       "attackS": 2,
-      "kills": false,
-      "sprite": "mob_bat"
+      "kills": true,
+      "sprite": "mob_bat",
+      "hp": 8,
+      "dmg": 6,
+      "effects": {}
     },
     "rat": {
       "id": "rat",
@@ -38,8 +47,11 @@
       "senseTiles": 3,
       "fleeLightTiles": 2,
       "attackS": 2,
-      "kills": false,
-      "sprite": "mob_rat"
+      "kills": true,
+      "sprite": "mob_rat",
+      "hp": 10,
+      "dmg": 5,
+      "effects": { "poisoned": 0.5 }
     }
   }
 }

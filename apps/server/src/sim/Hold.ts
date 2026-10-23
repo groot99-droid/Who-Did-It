@@ -9,6 +9,7 @@ import {
   type PlayerState,
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { bodyBlocksAct } from './body/run';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isVerbPhase, reject, sceneKey } from './World';
 import { handleCraft, tickCraft } from './Craft';
@@ -56,6 +57,7 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
     p.hold = null;
     return;
   }
+  if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, ErrorCode.cannot, 'not now'); // round 8, 8A
   // Round 6 (locked call sites): the M5b holds go to their owners' files (6F); each refuses until it lands.
   if ((action === 'gather' || action === 'craft') && typeof targetId === 'string' && targetId.length > 0) {
     if (action === 'gather') handleGather(room, sessionId, targetId);

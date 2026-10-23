@@ -15,6 +15,8 @@ export const Item = z.strictObject({
     'deliverable',
     'valuable',
     'material',
+    /** Round 8 (GDD 3.22): eaten with `eat`; any food cures Famished and Weakened. */
+    'food',
   ]),
   /** Role-bound items never drop on death; the Magnifier is the one exception (GDD 3.5). */
   roleBound: z.boolean(),

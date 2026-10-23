@@ -137,15 +137,28 @@
     "collectHoldS": 2,
     "gddRef": "3.4"
   },
-  "health": {
-    "maxHp": 2,
-    "regenHp": 1,
-    "regenEveryS": 90,
-    "knifeDamage": 2,
-    "wolfDamage": 1,
-    "woundedS": 20,
-    "woundedSpeedFactor": 0.8,
-    "gddRef": "3.6"
+  "body": {
+    "maxHp": 100,
+    "regenHpPerS": 2,
+    "regenAfterS": 8,
+    "maxStamina": 100,
+    "runCostPerS": 12,
+    "staminaRegenPerS": 6,
+    "fatigueRecover": 25,
+    "woundedBelow": 30,
+    "famishedAfterS": 480,
+    "koS": 20,
+    "koWakeHp": 20,
+    "koPurseShare": 0.5,
+    "strikeStamina": 15,
+    "healHp": 40,
+    "driveOffS": 30,
+    "damage": {
+      "strike": { "dmg": 8, "effects": { "dazed": 0.1, "weakened": 0.2 }, "kills": false },
+      "mugging": { "dmg": 8, "effects": { "dazed": 0.1, "weakened": 0.2 }, "kills": false },
+      "slingshot": { "dmg": 4, "effects": { "stunned": 1 }, "kills": false }
+    },
+    "gddRef": "3.22"
   },
   "movement": { "walkTilesPerS": 3, "runTilesPerS": 4.5, "sneakFactor": 0.6, "gddRef": "3.7" },
   "vision": {

@@ -1,0 +1,108 @@
+{
+  "gddRef": "3.22",
+  "effects": {
+    "slowed": {
+      "id": "slowed",
+      "name": "Slowed",
+      "durationS": 12,
+      "speedFactor": 0.7,
+      "cures": ["salts"],
+      "sign": "limp",
+      "gddRef": "3.22"
+    },
+    "wounded": {
+      "id": "wounded",
+      "name": "Wounded",
+      "durationS": 0,
+      "speedFactor": 0.8,
+      "cures": [],
+      "sign": "limp",
+      "drip": true,
+      "gddRef": "3.22"
+    },
+    "bleeding": {
+      "id": "bleeding",
+      "name": "Bleeding",
+      "durationS": 0,
+      "hpPerS": 1.5,
+      "blocksRegen": true,
+      "cures": ["bandage", "medkit"],
+      "sign": "bleeding",
+      "drip": true,
+      "gddRef": "3.22"
+    },
+    "weakened": {
+      "id": "weakened",
+      "name": "Weakened",
+      "durationS": 60,
+      "strikeFactor": 0.5,
+      "cures": ["food"],
+      "gddRef": "3.22"
+    },
+    "poisoned": {
+      "id": "poisoned",
+      "name": "Poisoned",
+      "durationS": 90,
+      "hpPerS": 0.5,
+      "blocksRegen": true,
+      "applies": { "weakened": 0.02 },
+      "cures": ["remedy", "salts"],
+      "sign": "poisoned",
+      "gddRef": "3.22"
+    },
+    "fatigued": {
+      "id": "fatigued",
+      "name": "Fatigued",
+      "durationS": 0,
+      "strikeCooldownFactor": 1.5,
+      "noRun": true,
+      "cures": ["wakeLoaf"],
+      "sign": "fatigued",
+      "gddRef": "3.22"
+    },
+    "stunned": {
+      "id": "stunned",
+      "name": "Stunned",
+      "durationS": 1.5,
+      "noMove": true,
+      "noAct": true,
+      "cures": [],
+      "sign": "stunned",
+      "gddRef": "3.22"
+    },
+    "dazed": {
+      "id": "dazed",
+      "name": "Dazed",
+      "durationS": 8,
+      "speedFactor": 0.85,
+      "cures": [],
+      "sign": "dazed",
+      "gddRef": "3.22"
+    },
+    "famished": {
+      "id": "famished",
+      "name": "Famished",
+      "durationS": 0,
+      "staminaRegenFactor": 0.5,
+      "cures": ["food"],
+      "gddRef": "3.22"
+    },
+    "knockedOut": {
+      "id": "knockedOut",
+      "name": "Knocked out",
+      "durationS": 0,
+      "noMove": true,
+      "noAct": true,
+      "cures": [],
+      "sign": "down",
+      "gddRef": "3.22"
+    },
+    "indebted": {
+      "id": "indebted",
+      "name": "Indebted",
+      "durationS": 0,
+      "cures": [],
+      "gddRef": "3.23"
+    }
+  }
+}

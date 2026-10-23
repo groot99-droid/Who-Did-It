@@ -1,6 +1,7 @@
 import { balance } from '@wdi/content';
 import { ErrorCode, Phase, type PlayerState, S2C, SKIP_VOTE, resolveVotes } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { wakeAll } from './body/damage';
 import { enterScene } from './Portals';
 import { emitSim } from './events/bus';
 import { countsVote, hasCastDespiteDoubt } from './vendettas/conversion';
@@ -42,6 +43,7 @@ export function openMeeting(room: PartyRoom, req: MeetingRequest): void {
     if (sim.players.get(id)?.dead) player.alive = false;
   });
   onMeetingOpenDisguise(room);
+  wakeAll(room); // round 8, 8A: the gather wakes every knocked-out seat (GDD 3.22, locked call site)
   placeAtSquare(room, false);
   state.players.forEach((player: PlayerState) => {
     player.hasVoted = false;

@@ -146,7 +146,7 @@ Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife,
 
 ### 3.6 PvE
 
-Players have 2 HP, regenerating 1 per 90 s; the Knife does 2. At 1 HP you are **Wounded**: 0.8x speed and a drip trail for 20 s. **Wolves** (3, forest interior loops, night): 1 damage, chase unlit players, flee any lantern or candle within 4 tiles, die to one bolt, blocked by a mended fence; a broken fence pulls one wolf into the village at night (the Cabal's reason not to mend it). The forest gate has a 6-tile safe clearing. V1 has no well fall and no bear traps; the well ladder into the cellar (`ov.well`) opens at the Large profile in V1 as a plain portal. V1.5: bear traps placed by the Ranger, a Shove verb at the well. V2: the Beast and Cave Gate, bats, bog lurker, crows.
+Round 8 (3.22, DECISIONS A134, A136) replaced the two-hit-point model: a seat has `body.maxHp` (100) health, and the Knife still kills outright whatever the health (A89). Under `body.woundedBelow` (30) you are **Wounded**: 0.8x speed and a drip trail until healing takes you back over the threshold (`effects.json` `wounded`). **Wolves** (3, forest interior loops, dusk and night): a bite takes 25 health and starts Bleeding half the time (3.15), chase unlit players, flee any lantern or candle within 4 tiles, die to one bolt, blocked by a mended fence; a broken fence pulls one wolf into the village at night (the Cabal's reason not to mend it). The forest gate has a 6-tile safe clearing. V1 has no well fall and no bear traps; the well ladder into the cellar (`ov.well`) opens at the Large profile in V1 as a plain portal. V1.5: bear traps placed by the Ranger, a Shove verb at the well. V2: the Beast and Cave Gate, bats, bog lurker, crows.
 
 ### 3.7 Stealth, hiding and doors
 
@@ -399,12 +399,12 @@ which never strays further from it than its `leashTiles` and walks its `pathId` 
 at most 3 spawners (`mobs.maxPerScene`). Creatures are not seats: they carry no handle, no role and no look, and
 they are drawn from the scene state for everyone in the scene.
 
-| Creature | Where | Speed | Senses | Flees light within | Attack | Kills |
-|---|---|---|---|---|---|---|
-| Wolf | the forests' wolf loops, dusk and night | 3.6 tiles/s | 6 tiles | 4 tiles | after 1 s in reach | yes |
-| Boar | the Fenwood, Blackpine Woods, day and dusk | 3.2 tiles/s | 4 tiles | 2 tiles | after 1.5 s in reach | no |
-| Bat | the caves | 4 tiles/s | 5 tiles | 3 tiles | after 2 s in reach | no |
-| Rat | the caves past the Tin Gallery mouth | 2.5 tiles/s | 3 tiles | 2 tiles | after 2 s in reach | no |
+| Creature | Where | Speed | Senses | Flees light within | Attack | Bite (3.22) | Health | Kills |
+|---|---|---|---|---|---|---|---|---|
+| Wolf | the forests' wolf loops, dusk and night | 3.6 tiles/s | 6 tiles | 4 tiles | after 1 s in reach | 25, Bleeding 50% | 30 | yes, cause `wolf` |
+| Boar | the Fenwood, Blackpine Woods, day and dusk | 3.2 tiles/s | 4 tiles | 2 tiles | after 1.5 s in reach | 18, Bleeding 30% | 40 | yes, cause `creature` |
+| Bat | the caves | 4 tiles/s | 5 tiles | 3 tiles | after 2 s in reach | 6 | 8 | yes, cause `creature` |
+| Rat | the caves past the Tin Gallery mouth | 2.5 tiles/s | 3 tiles | 2 tiles | after 2 s in reach | 5, Poisoned 50% | 10 | yes, cause `creature` |
 
 **Behaviour.** A creature idles or roams its loop; it chases a living seat it senses and can see (3.7) for at most
 6 s (`mobs.chaseS`), then returns to its spawner and starts no new chase for as long; it flees any lit flame within
@@ -412,13 +412,14 @@ its flee radius, carried or standing (a lit carried light, or a burning lantern,
 moss, moonlight, daylight shafts and windows are not flames), and walks home once out of its reach. (6G) It walks
 tile paths whose every tile lies inside its leash, so it never strays further; a loop point beyond the leash is
 pulled in to its edge, and at each point it pauses as a wandering NPC does (`npc.wander.stepMinS` to `stepMaxS`). A
-seat in transit or a ghost is never sensed, and nothing it senses depends on a card. (6G) Its attack lands 1 damage
-(`health.wolfDamage`) each time the seat has stayed in reach (1.5 tiles, 3.7) and in sight for its attack time.
-Creature bites are the only damage the server counts in hit points: a seat regains 1 HP every 90 s after its last
-bite, up to 2 (3.6), and Wounded's slower walk and drip trail are not applied yet. A wolf's bite that takes a seat to
-0 HP is a death with the cause `wolf`: the body is left where it fell and the kill scream rings (3.7), with no clue
-of a killer, so the Killer's "blame the wolves" cover of WORLD 4.6 has a real alibi; the other creatures wound but
-never take a seat below 1 HP. (6G) Wolves keep 3.6's flee radius (`balance.wolves.fleeLightTiles`, which their row
+seat in transit or a ghost is never sensed, and nothing it senses depends on a card. (6G; round 8, 8A) Its attack
+lands its row's bite (`mobs.json` `dmg`, each effect by its chance) each time the seat has stayed in reach (1.5
+tiles, 3.7) and in sight for its attack time; a bite is a row of the damage table of 3.22, so the health it takes
+regenerates and its Bleeding or Poisoned is cured like any other hit's. A bite that takes a seat to zero health is a
+death, cause `wolf` for a wolf and `creature` for the boar, the bat and the rat (the owner's answer, DECISIONS A134:
+creatures kill): the body is left where it fell and the kill scream rings (3.7), with no clue of a killer, so the
+Killer's "blame the wolves" cover of WORLD 4.6 has a real alibi. A creature's own health (`mobs.json` `hp`) is what a
+seat's fists must take to drive it off (3.22). (6G) Wolves keep 3.6's flee radius (`balance.wolves.fleeLightTiles`, which their row
 equals) and stay in the woods by their leash; the mended fence and the bolt do not touch them yet. An NPC seat a
 creature chases runs for the nearest open door of its scene and takes it, or straight away from the creature when
 there is none (3.12; live once the NPC brain's call lands, DECISIONS A89). Creatures use the `mobs` random stream,
@@ -669,17 +670,79 @@ The numbers are `balance.json` `party` (`profileCodeLength`, `friendsMax`, `invi
 
 ### 3.22 Bodies: health, stamina and effects
 
-Round 8 (DECISIONS A134, A135; the contract is `docs/round8/body.md`). Every seat has health and stamina, which only
-the seat itself sees. Attacks drain health by the damage table, and effects (Slowed, Wounded, Bleeding, Weakened,
-Poisoned, Fatigued, Stunned, Dazed, Famished, Knocked out) apply, tick and are cured as listed. Every card can
-strike with its fists.
-- **Death.** A seat dies only to creatures, to Bleeding or Poisoned at zero health, and to the existing kills (the
-  Knife, Nightshade's poison, the last shot, ejection).
-- **Knockout.** Fists, a mugging or the slingshot at zero health knock a seat out, and it wakes Dazed.
-- **Inspect.** Anyone can inspect a seat or a figure in reach and learns only its physical signs.
+Round 8 (DECISIONS A134, A135, A136; the contract is `docs/round8/body.md`). Every seat has a body: health, stamina
+and the effects on it, in room memory and sent only to the seat itself (`Private.body`, schema version 6). No other
+client and no public field ever carries a number of it: the drawn figure shows only the physical signs of the
+effects table (its `statusBits`) and the one-shot clips of a hit, a knockdown and a getting up. A ghost has no body.
+NPC seats have bodies like anyone; ambient townsfolk (3.24) hold a reduced one, health and effects without stamina.
+The numbers are `balance.json` `body` and `effects.json`.
 
-Session 8A writes this section's rules and corrects 3.6 and 3.15 where the two-hit-point model is replaced; 8B
-writes the inspect paragraph. The numbers are `balance.json` `body` and `effects.json`.
+**Health.** `body.maxHp` 100. Out of combat (no hit for `body.regenAfterS`, 8 s) it regenerates `body.regenHpPerS`
+2 per second, never while Bleeding or Poisoned. Under `body.woundedBelow` 30 the seat is Wounded (3.6).
+
+**Stamina.** `body.maxStamina` 100. Running costs `body.runCostPerS` 12 per second; walking and standing regain
+`body.staminaRegenPerS` 6 per second (half that while Famished). At zero the seat is **Fatigued**: it walks when it
+asks to run and strikes slower, until stamina is back over `body.fatigueRecover` 25. A strike costs
+`body.strikeStamina` 15.
+
+**The damage table.** Every attack but the Knife is a row with its damage, the chance of each effect and what zero
+health from it means. The Knife, Nightshade's poison, the Last Shot and the vote kill as before (3.2, 3.8), whatever
+the health (A89). A Weakened striker's fist lands half its damage.
+
+| Source | Damage | Effects it may apply | At zero health |
+|---|---|---|---|
+| Fists (`strike`, every card) | 8 | Dazed 10%, Weakened 20% | knocked out |
+| Mugging blow (3.24) | 8 | as fists | knocked out |
+| Slingshot (`slingshot`, the Child) | 4 | Stunned | knocked out |
+| Wolf bite | 25 | Bleeding 50% | death, cause `wolf` |
+| Boar bite | 18 | Bleeding 30% | death, cause `creature` |
+| Bat bite | 6 | none | death, cause `creature` |
+| Rat bite | 5 | Poisoned 50% | death, cause `creature` |
+| Bleeding | 1.5 per second | none | death, cause `bled` |
+| Poisoned | 0.5 per second | Weakened, 2% per second | death, cause `sickened` |
+
+A death by `bled` or `sickened` leaves the body where the seat fell, with no scream, no killer and no clue; a death by
+`creature` is like `wolf` (3.15). The dead seat's body row empties with the ghost handoff. Bodies tick only in the
+world phases: a meeting, the role card and game over freeze health, stamina and every effect clock. Effect chances
+roll on the body's own stream, never a secret one.
+
+**Fists** (`strike`): every card, in every world phase, a 2 s cooldown and 1.2 tiles of reach (`abilities.json`), at
+the stamina cost above. It hurts seats, ambient townsfolk and creatures; a creature at zero health (`mobs.json` `hp`)
+is driven off, home and resting for `body.driveOffS` 30 s. The swing is public to everyone who can see it (3.7) and
+leaves no clue unless blood is drawn. The fists, the slingshot and the curing items below go live in 8A's next PR;
+until then only the creatures and the drains use the table, and only time cures.
+
+**The knockout.** At zero health from fists, a mugging or the slingshot the seat is knocked out for `body.koS` 20 s:
+it lies where it fell (`down`), cannot move, act or hold, takes no second knockout, and drops the hold it had; the
+knockout drops `body.koPurseShare` (half) of its purse where it lies (3.23, with 8C). It wakes at `body.koWakeHp` 20
+health, Dazed; a meeting's gather wakes it at once. A knockout is never a death: no body on the floor, no meeting, no
+clue but the dropped coins. A killing bite still kills a downed seat.
+
+**Effects.** Each is a row of `effects.json`. A timed effect's fresh application restarts its clock and adds a stack;
+an effect without a duration lasts until cured or until its condition ends. The sign is what everyone sees on the
+figure (its `StatusBit`, seams.md 2); an effect without one shows only to Inspect (8B).
+
+| Effect | Does | Lasts | From | Cured by | Sign |
+|---|---|---|---|---|---|
+| Slowed | 0.7x speed | 12 s | a snare, deep mud (to come) | time, Salts | limp |
+| Wounded | 0.8x speed, a drip trail | while health is under 30 | low health | healing over the threshold | limp |
+| Bleeding | 1.5 health per second, no regeneration | until cured | wolf and boar bites | Bandage, Medkit | bleeding, a drip trail |
+| Weakened | fists land half their damage | 60 s | heavy hits, Poisoned | food | none |
+| Poisoned | 0.5 health per second, no regeneration, Weakened 2% per second | 90 s | rat bites, bad food (to come) | Remedy, Salts | poisoned, a green cast |
+| Fatigued | no running, strike cooldown 1.5x | until stamina is over 25 | stamina at zero | rest, a Wake Loaf | fatigued, a stagger |
+| Stunned | no move, no act | 1.5 s | the slingshot | time | stunned |
+| Dazed | 0.85x speed | 8 s | waking from a knockout, a heavy fist | time | dazed, a stagger and stars |
+| Famished | stamina regenerates at half rate | until fed | `body.famishedAfterS` 480 s without food | any food | none |
+| Knocked out | see above | `body.koS` | fists, a mugging, the slingshot | time, a meeting | down |
+| Indebted | an economy status (3.23, 8D) | until paid | unpaid rent | paying | none |
+
+The curing items: the Medkit's `heal` restores `body.healHp` 40 and stops Bleeding (self or a seat in reach); the
+Doctor's Bandage also stops Bleeding; Salts cure Slowed and Poisoned; the Herbalist's Remedy cures Poisoned as
+`antidote`; the Wake Loaf (`wakeLoaf`, a food bought at the bakery and baked at Crumb's Ovens) cures Famished and
+Weakened and restores stamina.
+
+- **Inspect.** Anyone can inspect a seat or a figure in reach and learns only its physical signs; 8B writes the
+  paragraph (`docs/round8/body.md` 7).
 
 ### 3.23 The economy
 
