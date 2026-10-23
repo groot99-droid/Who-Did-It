@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 import { setRoute } from '../flags';
 import type { LobbySnapshot } from '../net/NetworkService';
+import { buildLine, hideBackdrop, showBackdrop } from '../ui/backdrop';
 import { type LobbyScreen, mountLobby } from '../ui/Lobby';
 import { overlayRoot } from '../ui/dom';
-import { Backdrop } from '../view/Backdrop';
 import { getFlags, getHealth, getNet } from './registry';
 
 export class Lobby extends Phaser.Scene {
@@ -14,7 +14,7 @@ export class Lobby extends Phaser.Scene {
   }
 
   create(): void {
-    new Backdrop(this).setHealth(getHealth(this));
+    showBackdrop({ status: buildLine(getHealth(this)) });
     const net = getNet(this);
     const flags = getFlags(this);
 
@@ -47,6 +47,7 @@ export class Lobby extends Phaser.Scene {
       net.bus.off('left', onLeft);
       this.screen?.destroy();
       this.screen = null;
+      hideBackdrop();
     });
   }
 }

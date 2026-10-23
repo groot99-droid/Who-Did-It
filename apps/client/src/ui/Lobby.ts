@@ -10,7 +10,7 @@ import { mountDeckList } from './main/deckList';
 import { mountMapPicker } from './lobby/MapPicker';
 import { mountSettingsPanel } from './SettingsPanel';
 import { mountArtStyleSwitch } from './artStyle/ArtStyleSwitch';
-import { addFriendButton } from './lobby/addFriend';
+import { addFriendButton } from './menu/friends';
 import './lobby.css';
 
 const { npc, players: seatRange } = balanceJson;
@@ -91,38 +91,39 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
   });
   const copyBtn = h(
     'button',
-    { type: 'button', class: 'wdi-btn wdi-lobby__btn wdi-lobby__btn--wide' },
-    icon('glyphs/glyph_copy'),
+    { type: 'button', class: 'wdi-glass-btn wdi-glass-btn--sm wdi-lobby__wide' },
+    h('span', { class: 'wdi-glass-btn__icon' }, icon('glyphs/glyph_copy')),
     h('span', { class: 'wdi-lobby__copy-label' }, C['lobby.copy']),
   );
   const copyLabel = copyBtn.querySelector('.wdi-lobby__copy-label') as HTMLElement;
   const list = h('ul', { class: 'wdi-roster wdi-lobby__roster', 'data-testid': 'player-list' });
   const count = h('span', { class: 'wdi-lobby__count', 'data-testid': 'player-count' });
-  const hint = h('p', { class: 'wdi-hint wdi-lobby__note', 'aria-live': 'polite' });
+  const hint = h('p', { class: 'wdi-glass-panel__hint', 'aria-live': 'polite' });
   const start = h(
     'button',
     {
       type: 'button',
-      class: 'wdi-btn wdi-btn--primary wdi-lobby__btn wdi-lobby__btn--start',
+      class: 'wdi-glass-btn wdi-glass-btn--primary',
       'data-testid': 'start',
     },
     C['lobby.start'],
+    h('span', { class: 'wdi-glass-btn__chev', 'aria-hidden': 'true' }),
   );
   const readyBtn = h(
     'button',
-    { type: 'button', class: 'wdi-btn wdi-lobby__btn', 'data-testid': 'lobby-ready' },
+    { type: 'button', class: 'wdi-glass-btn', 'data-testid': 'lobby-ready' },
     C['lobby.ready'],
   );
-  const leave = h('button', { type: 'button', class: 'wdi-btn wdi-lobby__btn' }, C['lobby.leave']);
-  const modeChip = h('span', { class: 'wdi-lobby__tag wdi-lobby__tag--mode', 'data-testid': 'mode-chip' });
+  const leave = h('button', { type: 'button', class: 'wdi-glass-btn' }, C['lobby.leave']);
+  const modeChip = h('span', { class: 'wdi-tag wdi-lobby__tag--mode', 'data-testid': 'mode-chip' });
   const modeToggle = h(
     'button',
-    { type: 'button', class: 'wdi-btn wdi-lobby__btn', 'data-testid': 'mode-toggle' },
+    { type: 'button', class: 'wdi-glass-btn wdi-glass-btn--sm', 'data-testid': 'mode-toggle' },
     C['lobby.mode.toggle'],
   );
   const addNpc = h(
     'button',
-    { type: 'button', class: 'wdi-btn wdi-lobby__btn', 'data-testid': 'add-npc' },
+    { type: 'button', class: 'wdi-glass-btn wdi-glass-btn--sm', 'data-testid': 'add-npc' },
     h('span', { class: 'wdi-lobby__plus', 'aria-hidden': 'true' }, '+'),
     C['lobby.npc.add'],
   );
@@ -131,7 +132,7 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     'button',
     {
       type: 'button',
-      class: 'wdi-btn wdi-lobby__btn wdi-lobby__btn--mini',
+      class: 'wdi-glass-btn wdi-glass-btn--sm wdi-lobby__mini',
       'data-testid': 'remove-npc',
       'aria-label': C['lobby.npc.remove'],
       title: C['lobby.npc.remove.hint'],
@@ -140,19 +141,19 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
   );
   const difficulty = h(
     'select',
-    { id: 'npc-difficulty', class: 'wdi-input wdi-lobby__select', 'data-testid': 'npc-difficulty' },
+    { id: 'npc-difficulty', class: 'wdi-glass-select', 'data-testid': 'npc-difficulty' },
     ...LEVELS.map((level) => h('option', { value: level }, LEVEL_LABELS[level])),
   );
-  const difficultyHint = h('p', { class: 'wdi-hint wdi-lobby__note' }, difficultyLockedText());
+  const difficultyHint = h('p', { class: 'wdi-glass-panel__hint' }, difficultyLockedText());
 
   // Column A: the code, the mode and the NPCs; then the seats.
   const settingsCard = h(
     'div',
-    { class: 'wdi-lobby__card wdi-lobby__stack', 'aria-label': C['lobby.settings'], role: 'group' },
+    { class: 'wdi-glass-panel wdi-lobby__card', 'aria-label': C['lobby.settings'], role: 'group' },
     h(
       'div',
       { class: 'wdi-lobby__head' },
-      h('p', { class: 'wdi-lobby__eyebrow', id: 'lobby-title' }, C['lobby.code']),
+      h('p', { class: 'wdi-glass-panel__eyebrow', id: 'lobby-title' }, C['lobby.code']),
       modeChip,
     ),
     codeText,
@@ -166,22 +167,22 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     h(
       'div',
       { class: 'wdi-lobby__field' },
-      h('label', { class: 'wdi-lobby__eyebrow', for: 'npc-difficulty' }, C['lobby.npc.difficulty']),
+      h('label', { class: 'wdi-glass-panel__eyebrow', for: 'npc-difficulty' }, C['lobby.npc.difficulty']),
       difficulty,
     ),
     difficultyHint,
   );
   const seatsCard = h(
     'div',
-    { class: 'wdi-lobby__card wdi-lobby__stack wdi-lobby__seats' },
-    h('h2', { class: 'wdi-lobby__title' }, `${C['lobby.players']} `, count),
+    { class: 'wdi-glass-panel wdi-lobby__card wdi-lobby__seats' },
+    h('h2', { class: 'wdi-glass-panel__title' }, `${C['lobby.players']} `, count),
     list,
     hint,
   );
   const colA = h('div', { class: 'wdi-lobby__col wdi-lobby__col--a' }, settingsCard, seatsCard);
 
   // Column B (map, art style, sound, quick-mode deck editor): styled in the next PR.
-  const colBCard = h('div', { class: 'wdi-lobby__card wdi-lobby__stack wdi-lobby__b' });
+  const colBCard = h('div', { class: 'wdi-glass-panel wdi-lobby__card wdi-lobby__b' });
   // The main mode's map row (GDD 3.13, Session 5J) in its own slot, hidden in the quick mode.
   const mapSlot = h('div', { 'data-testid': 'lobby-map', hidden: true });
   colBCard.append(mapSlot);
@@ -193,7 +194,11 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
   const colB = h('div', { class: 'wdi-lobby__col wdi-lobby__col--b' }, colBCard);
 
   // Column C: the main mode's deck (GDD 3.1, Session 5G), hidden in the quick mode; then the actions.
-  const deckListSlot = h('div', { 'data-testid': 'lobby-deck-list', class: 'wdi-lobby__card', hidden: true });
+  const deckListSlot = h('div', {
+    'data-testid': 'lobby-deck-list',
+    class: 'wdi-glass-panel wdi-lobby__card',
+    hidden: true,
+  });
   const deckList = mountDeckList(deckListSlot, opts.net);
   const colC = h(
     'div',
@@ -218,14 +223,10 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
       .map((p) => p.name);
     const confirm = h(
       'button',
-      { type: 'button', class: 'wdi-btn wdi-btn--primary wdi-lobby__btn', 'data-testid': 'confirm-start' },
+      { type: 'button', class: 'wdi-glass-btn wdi-glass-btn--primary', 'data-testid': 'confirm-start' },
       C['lobby.confirm.go'],
     );
-    const cancel = h(
-      'button',
-      { type: 'button', class: 'wdi-btn wdi-lobby__btn' },
-      C['lobby.confirm.cancel'],
-    );
+    const cancel = h('button', { type: 'button', class: 'wdi-glass-btn' }, C['lobby.confirm.cancel']);
     confirm.addEventListener('click', () => {
       closeDialog();
       opts.onStart();
@@ -237,27 +238,27 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
       h(
         'div',
         {
-          class: 'wdi-panel wdi-dialog wdi-lobby__card',
+          class: 'wdi-glass-panel wdi-dialog',
           role: 'dialog',
           'aria-modal': 'true',
           'aria-labelledby': 'confirm-title',
         },
         h(
           'h2',
-          { id: 'confirm-title', class: 'wdi-lobby__title wdi-dialog__title' },
+          { id: 'confirm-title', class: 'wdi-glass-panel__title wdi-dialog__title' },
           fill(C['lobby.confirm.title'], { n: snapshot.players.length }),
         ),
-        h('p', { class: 'wdi-dialog__body' }, C['lobby.confirm.body']),
+        h('p', { class: 'wdi-glass-panel__hint wdi-dialog__body' }, C['lobby.confirm.body']),
         snapshot.players.length < MIN_PLAYERS_TO_START &&
           h(
             'p',
-            { class: 'wdi-hint', 'data-testid': 'confirm-fill' },
+            { class: 'wdi-glass-panel__hint', 'data-testid': 'confirm-fill' },
             fill(C['lobby.confirm.fill'], { min: MIN_PLAYERS_TO_START }),
           ),
         waiting.length > 0 &&
           h(
             'p',
-            { class: 'wdi-hint', 'data-testid': 'not-ready' },
+            { class: 'wdi-glass-panel__hint', 'data-testid': 'not-ready' },
             fill(C['lobby.confirm.notReady'], { names: waiting.join(', ') }),
           ),
         h('div', { class: 'wdi-dialog__actions' }, confirm, cancel),
@@ -312,7 +313,7 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
     count.textContent = `${next.players.length} / ${MAX_PLAYERS}`;
     list.replaceChildren(
       ...next.players.map((p) => {
-        const friend = addFriendButton(p);
+        const friend = addFriendButton(p, 'wdi-tag wdi-lobby__tag--action');
         return h(
           'li',
           { class: `wdi-roster__row wdi-lobby__row${p.connected ? '' : ' is-away'}` },
@@ -325,20 +326,13 @@ export function mountLobby(root: HTMLElement, opts: LobbyOptions): LobbyScreen {
           h(
             'span',
             { class: 'wdi-roster__tags' },
-            p.id === next.selfId && h('span', { class: 'wdi-lobby__tag' }, C['lobby.tag.you']),
-            p.id === next.leaderId &&
-              h('span', { class: 'wdi-lobby__tag wdi-lobby__tag--lead' }, C['lobby.tag.leader']),
-            p.ready &&
-              h(
-                'span',
-                { class: 'wdi-lobby__tag wdi-lobby__tag--ready' },
-                icon('glyphs/glyph_check'),
-                C['lobby.tag.ready'],
-              ),
+            p.id === next.selfId && h('span', { class: 'wdi-tag wdi-tag--you' }, C['lobby.tag.you']),
+            p.id === next.leaderId && h('span', { class: 'wdi-tag wdi-tag--leader' }, C['lobby.tag.leader']),
+            p.ready && h('span', { class: 'wdi-tag wdi-tag--ready' }, C['lobby.tag.ready']),
             !p.connected &&
               h(
                 'span',
-                { class: 'wdi-lobby__tag wdi-lobby__tag--quiet' },
+                { class: 'wdi-tag wdi-lobby__tag--quiet' },
                 icon('glyphs/glyph_clock'),
                 C['lobby.tag.away'],
               ),

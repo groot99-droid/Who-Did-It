@@ -5,39 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Who Did It: help</title>
     <style>
-      :root {
-        color-scheme: light dark;
-        --paper: #f4efe6;
-        --ink: #1d1b19;
-        --teal: #1f8a86;
+      /* The night palette of src/ui/theme/tokens.css (night, indigo, lilac, lantern, snow) and the same two
+         self-hosted fonts as the menu, copied to ./fonts because this page is static and not bundled. */
+      @font-face {
+        font-family: 'Pixelify Sans';
+        font-weight: 400 700;
+        font-display: swap;
+        src: url('./fonts/pixelify-sans-latin-wght-normal.woff2') format('woff2');
       }
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --paper: #1d1b19;
-          --ink: #f4efe6;
-          --teal: #5cc9c4;
-        }
+      @font-face {
+        font-family: 'Press Start 2P';
+        font-weight: 400;
+        font-display: swap;
+        src: url('./fonts/press-start-2p-latin-400-normal.woff2') format('woff2');
+      }
+      :root {
+        color-scheme: dark;
+        --night: #0a0924;
+        --indigo: #251a6b;
+        --lilac: #c9ceff;
+        --lantern: #ffb457;
+        --snow: #ffffff;
       }
       body {
         margin: 0;
         padding: 24px 16px 48px;
-        background: var(--paper);
-        color: var(--ink);
+        background: var(--night);
+        color: var(--lilac);
         font:
-          17px/1.5 Georgia,
-          'Times New Roman',
-          serif;
+          18px/1.55 'Pixelify Sans',
+          system-ui,
+          sans-serif;
         max-width: 720px;
         margin-inline: auto;
       }
       h1,
       h2 {
-        font-family: Oswald, Impact, 'Arial Narrow', sans-serif;
-        letter-spacing: 0.02em;
-        margin: 1.4em 0 0.4em;
+        font-family: 'Press Start 2P', 'Pixelify Sans', monospace;
+        font-weight: 400;
+        line-height: 1.4;
+        text-transform: uppercase;
+        color: var(--snow);
+        margin: 1.6em 0 0.6em;
+      }
+      h1 {
+        font-size: 22px;
+        color: var(--lantern);
+        text-shadow: 3px 3px 0 var(--indigo);
+      }
+      h2 {
+        font-size: 14px;
       }
       a {
-        color: var(--teal);
+        color: var(--lantern);
+      }
+      a:focus-visible {
+        outline: 2px solid var(--lantern);
+        outline-offset: 2px;
+      }
+      strong {
+        color: var(--snow);
       }
       table {
         border-collapse: collapse;
@@ -47,22 +74,34 @@
       th {
         text-align: left;
         padding: 6px 8px;
-        border-bottom: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+        border-bottom: 1px solid rgba(201, 206, 255, 0.25);
         vertical-align: top;
       }
       kbd {
         font:
-          14px ui-monospace,
-          Menlo,
-          Consolas,
+          14px 'Pixelify Sans',
+          ui-monospace,
           monospace;
         padding: 1px 6px;
+        color: var(--snow);
+        background: var(--indigo);
         border: 1px solid currentColor;
-        border-radius: 4px;
+        border-radius: 2px;
       }
       .back {
         display: inline-block;
         margin-bottom: 8px;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        h1 {
+          animation: drop 420ms steps(6) both;
+        }
+        @keyframes drop {
+          from {
+            opacity: 0;
+            transform: translateY(-12px);
+          }
+        }
       }
     </style>
   </head>
@@ -76,9 +115,12 @@
 
     <h2>Quick start</h2>
     <ol>
-      <li>One player presses <strong>Create Party</strong> and shares the invite link or the party code.</li>
       <li>
-        Everyone else opens the link (or presses <strong>Join Party</strong> and types the code), then presses
+        One player presses <strong>Start Game</strong>, then <strong>Create Party</strong>, and shares the
+        invite link or the party code.
+      </li>
+      <li>
+        Everyone else opens the link (or presses <strong>Join Game</strong> and types the code), then presses
         <strong>Ready</strong>.
       </li>
       <li>
@@ -133,12 +175,6 @@
           href="https://github.com/groot99-droid/Who-Did-It/blob/claude/zen-turing-m1jnw0/docs/guides/HOW_TO_PLAY.md"
           >How to play</a
         >: controls, phases, clues, meetings, roles, winning.
-      </li>
-      <li>
-        <a
-          href="https://github.com/groot99-droid/Who-Did-It/blob/claude/zen-turing-m1jnw0/docs/guides/QUICK_MODE.md"
-          >Quick mode</a
-        >: One Night Ultimate Baguette, two cards, one night, one vote.
       </li>
       <li>
         <a

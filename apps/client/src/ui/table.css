@@ -398,8 +398,7 @@
 }
 
 .wdi-table .wdi-friend {
-  min-height: 32px;
-  padding-inline: var(--wdi-space-2);
+  cursor: pointer;
 }
 
 /* ------------------------------------------------------------------ the seat picker (PR 2) */
