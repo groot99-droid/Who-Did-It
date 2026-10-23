@@ -68,3 +68,29 @@ test('the menu shows the build from /health', async ({ page }) => {
   await expect(page.getByTestId('menu-build')).toHaveText('vdev');
   await expect(page.locator('canvas')).toBeVisible();
 });
+
+test('Quit asks, says goodbye and goes back to the menu; a profile and a friend survive a reload', async ({
+  page,
+}) => {
+  await page.goto('/Who-Did-It/?mock=1&intro=0');
+  await page.getByRole('button', { name: 'Quit' }).click();
+  await page.getByTestId('quit-confirm').click();
+  await expect(page.getByTestId('quit-bye')).toBeVisible();
+  await page.getByTestId('quit-back').click();
+  await expect(page.getByTestId('menu')).toBeVisible();
+
+  await page.getByTestId('menu-chip').click();
+  await page.getByLabel('Your name').fill('Mira');
+  const code = (await page.getByTestId('profile-code').textContent())?.trim() ?? '';
+  expect(code).toMatch(/^[A-Z2-9]{8}$/);
+  await page.getByRole('button', { name: 'Save profile' }).click();
+  await expect(page.getByTestId('menu-chip')).toContainText('Mira');
+
+  await page.getByRole('button', { name: 'Friends' }).click();
+  await page.getByLabel('Friend code or link').fill('https://x.example/#/friend/ABCD2345');
+  await page.getByRole('button', { name: 'Add friend' }).click();
+  await expect(page.getByTestId('friends-list')).toContainText('ABCD2345');
+
+  await page.reload();
+  await expect(page.getByTestId('menu-chip')).toContainText('Mira');
+});

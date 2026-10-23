@@ -8,7 +8,9 @@ import { openDialog, type MenuDialog } from './menu/dialog';
 import { openFriendsPanel } from './menu/friends';
 import { openProfilePanel } from './menu/profile';
 import { readProfile } from './menu/profileModel';
+import { openQuitDialog } from './menu/quit';
 import { openStartDialog } from './menu/startDialog';
+import { titleLetters } from './theme/title';
 import { mountSettingsPanel } from './SettingsPanel';
 import './menu.css';
 
@@ -21,6 +23,8 @@ export interface LandingOptions {
   onJoin(code: string, name: string): Promise<void>;
   /** After a failed join: a better message than the generic one, if there is one (stale build). */
   explainFailure?(): Promise<string | null>;
+  /** The consented leave of the current party, for Quit; the scene passes `net.leave`. */
+  onQuit?(): Promise<void>;
   /** The music bus, so the trailer's soundtrack can start on the first tap (round 6, 6K). */
   music?: { crossfadeTo(playlistId: string | null): void } | undefined;
 }
@@ -30,37 +34,22 @@ export const CREDITS_URL = 'https://github.com/groot99-droid/Who-Did-It/blob/HEA
 
 type Glyph = '▶' | '⇥' | '+' | '☰' | '⚙' | '?' | '★' | '⏻';
 
-function menuButton(label: string, glyph: Glyph, cls: string, soon = false): HTMLButtonElement {
+function menuButton(label: string, glyph: Glyph, modifier = ''): HTMLButtonElement {
   return h(
     'button',
-    {
-      type: 'button',
-      class: `wdi-menu__btn ${cls}`,
-      ...(soon ? { disabled: true, title: C['menu.soon'] } : {}),
-    },
-    h('span', { class: 'wdi-menu__icon', 'aria-hidden': 'true' }, glyph),
+    { type: 'button', class: `wdi-glass-btn ${modifier}`.trim() },
+    h('span', { class: 'wdi-glass-btn__icon', 'aria-hidden': 'true' }, glyph),
     h('span', { class: 'wdi-menu__label' }, label),
-    soon && h('span', { class: 'wdi-menu__note' }, C['menu.soon']),
+    h('span', { class: 'wdi-glass-btn__chev', 'aria-hidden': 'true' }),
   );
 }
 
 function menuLink(label: string, glyph: Glyph, href: string): HTMLAnchorElement {
   return h(
     'a',
-    { class: 'wdi-menu__btn wdi-menu__btn--sm', href, target: '_blank', rel: 'noopener noreferrer' },
-    h('span', { class: 'wdi-menu__icon', 'aria-hidden': 'true' }, glyph),
-    h('span', { class: 'wdi-menu__label' }, label),
-  );
-}
-
-/** The title drops in letter by letter (menu.css; no animation under reduced motion). */
-function titleLine(text: string, cls: string, offset: number): HTMLElement {
-  return h(
-    'span',
-    { class: `wdi-menu__title-line ${cls}`, 'aria-hidden': 'true' },
-    ...[...text].map((ch, i) =>
-      h('span', { class: 'wdi-menu__letter', style: `--i: ${offset + i}` }, ch === ' ' ? ' ' : ch),
-    ),
+    { class: 'wdi-glass-btn wdi-glass-btn--sm', href, target: '_blank', rel: 'noopener noreferrer' },
+    h('span', { class: 'wdi-glass-btn__icon', 'aria-hidden': 'true' }, glyph),
+    label,
   );
 }
 
@@ -79,14 +68,14 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
   /** The profile's name prefills both dialogs; a guest types it each time and nothing is remembered. */
   const remembered = () => readProfile()?.name ?? '';
 
-  const start = menuButton(C['menu.start'], '▶', 'wdi-menu__btn--primary');
-  const join = menuButton(C['menu.join'], '⇥', '');
-  const profile = menuButton(readProfile() ? C['menu.profile.edit'] : C['menu.profile'], '+', '');
-  const friends = menuButton(C['menu.friends'], '☰', '');
-  const settingsBtn = menuButton(C['menu.settings'], '⚙', '');
+  const start = menuButton(C['menu.start'], '▶', 'wdi-glass-btn--primary');
+  const join = menuButton(C['menu.join'], '⇥');
+  const profile = menuButton(readProfile() ? C['menu.profile.edit'] : C['menu.profile'], '+');
+  const friends = menuButton(C['menu.friends'], '☰');
+  const settingsBtn = menuButton(C['menu.settings'], '⚙');
   const help = menuLink(C['menu.help'], '?', `${import.meta.env.BASE_URL}help/`);
   const credits = menuLink(C['menu.credits'], '★', CREDITS_URL);
-  const quit = menuButton(C['menu.quit'], '⏻', 'wdi-menu__btn--sm', true);
+  const quit = menuButton(C['menu.quit'], '⏻', 'wdi-glass-btn--sm');
 
   const openCode = (code: string | null) =>
     show((onClose) =>
@@ -113,6 +102,11 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
   );
   // Until the party list lands (PR 4) Join Game opens the code box.
   join.addEventListener('click', () => openCode(null));
+  quit.addEventListener('click', () =>
+    show((onClose) =>
+      openQuitDialog({ root, onClose, leave: opts.onQuit ?? (async () => undefined), music: opts.music }),
+    ),
+  );
   settingsBtn.addEventListener('click', () =>
     show((onClose) => {
       const d = openDialog(root, { id: 'settings-title', title: C['settings.title'], onClose });
@@ -125,7 +119,7 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
   const chipName = h('span', {});
   const chip = h(
     'button',
-    { type: 'button', class: 'wdi-menu__chip', 'data-testid': 'menu-chip' },
+    { type: 'button', class: 'wdi-glass wdi-menu__chip', 'data-testid': 'menu-chip' },
     h('span', { class: 'wdi-menu__icon', 'aria-hidden': 'true' }, '☺'),
     chipName,
   );
@@ -141,7 +135,11 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
   profile.addEventListener('click', openProfile);
   friends.addEventListener('click', () => show((onClose) => openFriendsPanel({ root, onClose })));
   showProfile();
-  const sound = h('button', { type: 'button', class: 'wdi-menu__sound', 'data-testid': 'menu-sound' });
+  const sound = h('button', {
+    type: 'button',
+    class: 'wdi-glass wdi-menu__sound',
+    'data-testid': 'menu-sound',
+  });
   const showSound = () => {
     const muted = readAudioSettings().muted;
     sound.setAttribute('aria-pressed', String(!muted));
@@ -162,12 +160,7 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
     h(
       'main',
       { class: 'wdi-menu__main' },
-      h(
-        'h1',
-        { class: 'wdi-menu__title', 'aria-label': C['menu.title.label'] },
-        titleLine(C['menu.title.top'], 'wdi-menu__title-line--top', 0),
-        titleLine(C['menu.title.bottom'], 'wdi-menu__title-line--bottom', C['menu.title.top'].length),
-      ),
+      titleLetters([C['menu.title.top'], C['menu.title.bottom']], { 'data-testid': 'menu-title' }),
       h(
         'nav',
         { class: 'wdi-menu__nav', 'aria-label': C['menu.title.label'] },

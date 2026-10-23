@@ -208,6 +208,8 @@ The Knife works only after dark (3.3), about 110 s of each 170 s cycle, so a coo
 
 ### 3.11 One Night Ultimate Baguette (quick mode)
 
+**Being removed (round 7, DECISIONS A115).** On 2026-10-23 the owner chose to remove the quick mode from the game. Session 7J deletes it (`docs/round7/quick-mode-removal.md`); until its PRs land the rules below still describe what the code does, and when they land this section becomes a short record so 3.12 to 3.21 keep their numbers. Crumb's Ovens stays as a HollowMere building and gains four rooms (A116, 3.13).
+
 Origin: the owner's friend first framed the whole game as "One Night Ultimate Baguette", a wrapper around the one-night hidden-role card game; on 2026-10-17 the owner supplied the full mode (two cards per player, four prep stations, night roles, a 5-minute Morning Rush, one vote) and its art. This section is **ONUB v2**, an original ruleset with original wording that replaces the round-4 wake-loaf mode; the round-4 bakery scene stays frozen and unused. Lobby setting `mode = onub`. Target length 8-10 minutes (`targetLengthMin` in `balance.onub.json`, which the lobby chip reads; "Balance and length" below gives 8.7 to 9.7 minutes plus jitter, less when prep ends early). The roles, teams, scenes and card texts are `roles.onub.json`; the decks, stations, ingredient cards, mini-games, acts, night windows, timers, vote rule, winners table and NPC numbers are `balance.onub.json`.
 
 **Fiction.** Paris, the graveyard shift before the Bake-Off. You are French bakers keeping the Mother Dough alive through the night; hidden among you are Mold Spores who want it ruined. Nobody leaves the kitchen and nobody is eliminated during the night: the whole match comes down to one argument at dawn and one vote on who goes into the brick oven. **Nobody walks in this mode**: every screen is a card table or a kitchen room over the owner's art, and the server never places a seat in a scene.
@@ -724,8 +726,10 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
 - **Conversion: the Zealot against the Vicar (7H).** The Zealot's goal is the Vicar's flock: world-phase time in
   the same scene as the seat dealt the Vicar, both alive and placed, counted across scenes and phases. At **45 s**
   (`vendettas.conversion.shareS`) the doubt is sown (`vendetta.conversion.sown`). At the next meeting the
-  Vicar's vote counts for nothing in the tally (`vendetta.conversion.doubt`, the consequence); the Vicar still
-  votes and sees its vote, and the tally shows one vote fewer. If the Vicar dies or is ejected first, the
+  Vicar's vote counts for nothing (`vendetta.conversion.doubt`, the consequence). To every other seat it is an
+  ordinary abstention: the Vicar's voted mark stays down and the tally leaves it out, while the meeting still ends
+  early once every living seat has cast. The Vicar still votes and sees its own vote, and at the reveal it alone
+  learns, in its Notebook, that its voice did not carry. If the Vicar dies or is ejected first, the
   vendetta lapses (`vendetta.conversion.lapsed`).
 - **Sabotage: the Activist against the company (7H).** The Activist's goal is the company's stations: standing
   still within verb reach of a target prop of a task (3.5) for **6 s** (`vendettas.sabotage.tamperS`) in a verb

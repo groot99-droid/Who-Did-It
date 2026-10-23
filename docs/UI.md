@@ -260,7 +260,7 @@ these classes and writes only layout in its own file. All of them read tokens (t
 | `.wdi-tag` | A seat tag, 24 px, Press Start 2P 12 px caps, the 2 px step | `--you` (violet, lilac), `--leader` (lantern, night), `--npc` (a lilac rim, no fill), `--ready` (violet with a stepped tick before the word). Each says its word, so none is told by colour alone |
 | `.wdi-seg--glass` | The glass look of the segmented radio group (`.wdi-seg`, `ui/artStyle/artStyle.css`): a `.wdi-glass` strip, options in Pixelify 600 14 px lilac | `.is-on` lantern with night text; `:disabled` 50% with `.wdi-seg__note` ("Coming later") beside the group |
 | `.wdi-title` | The game's title: two lines in Press Start 2P at display-xl (display-lg on phones), snow then lantern at 1.875 times that (`__line--accent`), each letter a `__ch` span with its index in `--i`, with a stepped violet then indigo shadow. The letters drop in one after another (`--wdi-title-step` apart, in pixel steps); `prefers-reduced-motion` shows them in place | `ui/theme/title.ts` `titleLetters(text)` builds the spans; the line carries the whole text as its accessible name and the letters are `aria-hidden` |
-| `.wdi-backdrop` | The loop behind the night screens (`ui/backdrop.ts`, 7B's third PR): the poster, the video, the veil, the vignette and the scanlines, fixed under `#overlay`'s content | `prefers-reduced-motion` pauses the video on its frame; `?video=0` never loads it and keeps the poster |
+| `.wdi-backdrop` | The loop behind the night screens (`ui/backdrop.ts`, 7B's third PR): the poster, the video, the veil, the vignette and the scanlines (`--wdi-scanline`, which only darkens), fixed under `#overlay`'s content; `__title` (the `.wdi-title`, top left, opt-in; the menu draws its own title, so Landing leaves it off) and `__status` (lilac, bottom centre: Boot's "Waking the village..." and the refresh message, then `build <id>`, which replaces the canvas `{ok, build}` line). `showBackdrop` and `hideBackdrop` are called by the menu scenes (Boot, Landing, Lobby, RoleReveal; GameOver and the Intro's end may join); testids `backdrop`, `backdrop-status` | `prefers-reduced-motion` pauses the video on its frame; `?video=0` never loads it and keeps the poster |
 
 ## 7. The role card
 
@@ -1388,7 +1388,10 @@ asked where it is used.
 | `menu.friends` | Friends | opens the friends list (greyed with `menu.soon` until it lands) |
 | `menu.settings` | Settings | opens the sound panel of UI.md 14.22 in a dialog |
 | `menu.help`, `menu.credits` | How to Play, Credits | small links, a new tab: `${BASE}help/` and the repository's `CREDITS.md` |
-| `menu.quit` | Quit | small button (greyed with `menu.soon` until it lands) |
+| `menu.quit` | Quit | small button; opens the confirm below |
+| `quit.title`, `quit.body` | Leave Who Did It?, If you are in a party you leave it, and the music stops. | the confirm dialog |
+| `quit.confirm`, `quit.cancel` | Quit, Stay | `quit-confirm`; Stay closes the dialog |
+| `quit.bye.title`, `quit.bye.body`, `quit.back` | See you soon, You can close this tab now., Back to the menu | the goodbye panel after the consented leave and the music to silence (`quit-bye`, `quit-back`); `window.close()` runs first, only in a window the page opened itself |
 | `menu.soon` | Coming later | the note on a greyed button (the title and screen-reader text on the small one) |
 | `menu.haveCode` | Have a code? | the party list's link to the code box |
 | `menu.chip.guest`, `menu.chip.label` | Guest, Profile: {name} | the top-right chip |
@@ -1413,11 +1416,9 @@ The lobby's lines stay in `apps/client/src/ui/copy/lobby.ts`; the re-skin (A103,
 
 | Key | Text | Where |
 |---|---|---|
-| `lobby.friend.add` | Add friend | a seat row that carries a `profile` (`data-testid="add-friend"`) |
-| `lobby.friend.add.label` | Add {name} as a friend | that button's accessible name |
-| `lobby.friend.added` | Friend | the same button once the profile is on the device's list; it is disabled |
+| (`friends.seat.*`) | Add friend | a seat row that carries a `profile` (`data-testid="add-friend"`): 7C's `addFriendButton` from `ui/menu/friends.ts`, copy in 14.25 |
 
-- **Columns.** A: the party code in display type (`party-code`), Copy invite link, Change mode (`mode-toggle`) beside Add NPC (`add-npc`) with Remove NPC (`remove-npc`) as a small minus (`aria-label` "Remove NPC"), the NPC skill select (`npc-difficulty`) with its locked note, the mode chip (`mode-chip`) in the card's corner, then "Players n / 10" with the You, Leader, Ready and Away tags. B: the map, the art style, the sound settings and the quick-mode deck editor. C: the deck as chips with its two notes, Start (leader), Ready, Leave. Below 900 px the columns stack.
+- **Columns.** A: the party code in display type (`party-code`), Copy invite link, Change mode (`mode-toggle`; it and `mode-chip` go with the quick mode, A115, and are not restyled further) beside Add NPC (`add-npc`) with Remove NPC (`remove-npc`) as a small minus (`aria-label` "Remove NPC"), the NPC skill select (`npc-difficulty`) with its locked note, the mode chip (`mode-chip`) in the card's corner, then "Players n / 10" with the You, Leader, Ready and Away tags. B: the map, the art style, the sound settings and the quick-mode deck editor. C: the deck as chips with its two notes, Start (leader), Ready, Leave. Below 900 px the columns stack.
 - **Column B.** The map cards (`map-select`, one `radio` per map, the picked one with a tick; a non-leader sees the picked card only), the art-style segment (`art-style*`, `.wdi-seg--glass`, HD disabled with its "Coming later" note) and, in the quick mode, the deck editor (`deck-editor`, `deck-role-*`) as chips in the deck's style. A map whose thumbnail has not loaded keeps a dark frame. No line changes.
 - **Tags.** The NPC tag is not shown: the lobby snapshot carries only the NPC seat count, not which seats they are, and the wire is not widened for a tag. Add friend shows only where a seat's `profile` is in the snapshot; until the client's roster mapping carries it, no row offers it.
 - **Left out.** The mockup's "Locate" button has no feature.
@@ -1463,3 +1464,17 @@ is never cut: the cutscene Skip, the intro's Skip and Begin (`.wdi-glass-btn--sm
 (`.wdi-glass`) use them; the snow label is 9.51 at worst on that glass, so it holds over the world. The HUD chip, the
 role chip, the settings gear and panel and the captions keep `--wdi-match-glass`, because their text is lilac or
 muted lilac, which the 66% fill does not carry over bare white.
+
+### 14.29 Vendettas (7H)
+
+Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaGoal(id)`). The role card (`ui/RoleCard.ts`, 7F renders it) reads `Private.vendetta` (GDD 3.20): a Killer's own vendetta id, or for the Accomplice the ids of the Killers it knows, joined by commas. An empty value shows no line. No other seat's card, no world label and no toast names a vendetta; the doubted Vicar's note is its own.
+
+| Key | Text | Where |
+|---|---|---|
+| `vendetta.label` | Vendetta | the heading of the goal line on a Killer's card |
+| `vendetta.goal.zealot` | Zealot: stay near the Vicar until doubt takes the flock. | a Killer holding conversion |
+| `vendetta.goal.activist` | Activist: tamper with two of the company’s work stations. | a Killer holding sabotage |
+| `vendetta.goal.bandit` | Bandit: crack the manor’s strongbox after dark, alone. | a Killer holding heist |
+| `vendetta.goal.hitman` | Hitman: the Train brings you a contract. Take only its mark. | a Killer holding contract |
+| `vendetta.mate` | Your Killer’s vendetta: {goal} | the Accomplice's card, once per Killer it knows; `{goal}` is that Killer's goal line |
+| `vendetta.note.doubt` | Doubt took the flock: your vote did not carry. | the Vicar's own Notebook entry of kind `NoteKind.doubt`, written at the reveal of the doubted meeting |
