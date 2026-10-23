@@ -101,9 +101,10 @@ describe('the bank', () => {
     conserved(party);
   });
 
-  it("gives the heist a share of every balance, rounded down, into the strongbox's loot", async () => {
+  it('gives the heist a share of every balance, rounded down, and the cracker pockets the loot', async () => {
     const { party } = await world();
     const seats = [...party.room.state.players.keys()];
+    const before = party.room.state.players.get(seats[0]!)!.priv.purse;
     const deposits = [7, 4, 0, 1];
     seats.forEach((seat, i) => movePurse(party.room, TOWN, bankAccount(seat), deposits[i] ?? 0, 'wage'));
     emitSim(party.room, { tick: party.room.state.tick, kind: 'vendetta.heist.cracked', seat: seats[0]! });
@@ -114,7 +115,9 @@ describe('the bank', () => {
       expect(party.room.state.players.get(seat)!.priv.bank).toBe((deposits[i] ?? 0) - taken[i]!),
     );
     const total = taken.reduce((a, b) => a + b, 0);
-    expect(balanceOf(party.room, STRONGBOX)).toBe(total);
+    expect(total).toBeGreaterThan(0);
+    expect(balanceOf(party.room, STRONGBOX)).toBe(0);
+    expect(party.room.state.players.get(seats[0]!)!.priv.purse).toBe(before + total);
     expect(matchEvents(party.room).find((e) => e.kind === 'econ.heistTake')?.data).toEqual({ amount: total });
     conserved(party);
   });

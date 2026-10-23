@@ -723,7 +723,8 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   key at it opens the seat's account, and the seat then deposits from its purse or withdraws to it, the whole amount
   or nothing, while the counter stays within reach. Banked Scrip is safe from a mugging and a knockout. Only the
   heist reaches it: when the Bandit cracks the strongbox, the box carries off `economy.heistShare` of every seat's
-  bank balance (rounded down per seat) as its loot.
+  bank balance (rounded down per seat) as its loot, and the cracker pockets it. A suddenly heavy purse is the
+  heist's tell, though wages and sales can make anyone rich.
 - **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice. It leaves only as a
   purchase, rent, a fine, a donation or an HQ tier. Theft, drops, pickups and the bank only move it.
 

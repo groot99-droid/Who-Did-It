@@ -12,7 +12,7 @@ import { counterProblem } from './shops';
  * office each hold a `bank` static. An `act.hold {action: 'bank'}` at one opens it, and `act.bank` then moves Scrip
  * between the purse and `Private.bank` while the counter stays in reach. Banked Scrip is safe from a mugging and a
  * knockout; only the heist reaches it: a cracked strongbox (`vendetta.heist.cracked`) carries off
- * `economy.heistShare` of every balance into `@strongbox`.
+ * `economy.heistShare` of every balance into `@strongbox`'s loot, which the cracker pockets.
  */
 
 export const STRONGBOX = '@strongbox';
@@ -71,20 +71,23 @@ export function handleBank(room: PartyRoom, sessionId: string, payload: Record<s
 
 /**
  * The heist's take: on the existing `vendetta.heist.cracked` (7H), `economy.heistShare` of every seat's bank balance
- * (rounded down) moves to `@strongbox`, and `econ.heistTake` says how much in all.
+ * (rounded down) moves into the strongbox's loot, and `econ.heistTake` says how much in all. 7H names no loot
+ * collector, so the cracker pockets it (6Z's ruling; GDD 3.23): a heavy purse is the heist's tell. Without a seated
+ * cracker the loot stays in `@strongbox`.
  */
-export function bankTake(room: PartyRoom): void {
+export function bankTake(room: PartyRoom, cracker?: string): void {
   let amount = 0;
   for (const [seat, player] of room.state.players) {
     const share = Math.floor((player.priv?.bank ?? 0) * balance.economy.heistShare);
     amount += movePurse(room, bankAccount(seat), STRONGBOX, share, 'theft');
   }
   emitSim(room, { tick: room.state.tick, kind: 'econ.heistTake', data: { amount } });
+  if (cracker && room.state.players.has(cracker)) movePurse(room, STRONGBOX, cracker, amount, 'theft');
 }
 
 /** `runEconomy`: listens for the crack once per room. */
 export function runBank(room: PartyRoom): void {
   if (subscribed.has(room)) return;
   subscribed.add(room);
-  onSim(room, 'vendetta.heist.cracked', (_e, r) => bankTake(r));
+  onSim(room, 'vendetta.heist.cracked', (e, r) => bankTake(r, e.seat));
 }
