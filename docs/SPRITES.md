@@ -870,6 +870,22 @@ wall or front shell, so the face is `sill` and the frame is `portal_<kind>_sill`
 `portal_hatch` and `portal_drop`. A portal inside a building footprint draws no frame (the building art has the
 door) but still takes the boarded overlay `portal_boarded_<face>` when closed.
 
+**Transport motion (round 8, 8G; motion.md 2).** While a portal swings (`DoorSnap.swingUntilTick`, `doors.swingS`
+of GDD 3.7) `view/transport/TransportView.ts` draws over its frame, in code and with no atlas page:
+
+| Portal | Motion |
+|---|---|
+| `door`, face `s` or `e` | a wood leaf opens on its hinge away from the one crossing (both ways), holds, and falls shut, over a dark doorway |
+| `hatch` with `well` or `winze` in its id | a ladder rises out of the opening and an ink silhouette climbs it, down or up by the crossing and the portal's `elevationDelta` |
+| any other `hatch` (the cellar trapdoors) | the lid lifts on its north hinge over the dark opening |
+| everything else, and doors with a `sill` face | a veil of three ellipses fades where someone stepped through: ink for stairs, drops, crawls and cave mouths, lantern light for gates |
+
+The Daily Train (GDD 3.3) is two boxes, engine and car, on the rail spur (`=`) nearest the map's `station` spawn:
+it rolls in on `train_arrive`, stands, and backs out through the spur's end nearer the map's edge 2.5 s after
+`train_brake`, or after the delivery was due if that pulse is never heard. Only the seats that hear the Train see
+it. Reduced motion holds a portal open for its swing, draws the ladder without its climber, and cuts the Train in
+and out.
+
 **The client.**
 
 - It creates the three tile layers with `map.createLayer(name, tileset, -64, 0)`, an offset of
