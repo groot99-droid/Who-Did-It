@@ -98,7 +98,7 @@
     }
   },
   "meeting": {
-    "voteOpensImmediately": true,
+    "minVoteS": 15,
     "endsWhenAllVoted": true,
     "secretVotes": true,
     "skipAllowed": true,

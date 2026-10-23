@@ -233,6 +233,13 @@ export function validateContent(c: Content): string[] {
     if (profile !== expected) err(`balance ${n}: profile ${profile}, WORLD 4.3 says ${expected}`);
   }
 
+  // Round 8 (8L, GDD 3.8): votes open before the shortest discussion ends.
+  const shortest = Math.min(...Object.values(balance.byCount).map((row) => row.discussionS));
+  if (balance.meeting.minVoteS >= shortest)
+    err(
+      `balance meeting.minVoteS ${balance.meeting.minVoteS} is not under the shortest discussion, ${shortest} s`,
+    );
+
   // NPC routines (GDD 3.12): the stations by prop kind and the npc spans.
   checkRoutines(c, err);
 
