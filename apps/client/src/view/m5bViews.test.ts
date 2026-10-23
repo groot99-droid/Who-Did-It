@@ -4,7 +4,16 @@ import quests from '@wdi/content/data/quests.json';
 import resources from '@wdi/content/data/resources.json';
 import { screenDirOfYaw } from '@wdi/shared/iso';
 import { AnimId, StatusBit } from './animIds';
-import { giverAnimKey, giverDir, lanternCarriers, mobAnimKey, mobClip, nodeFrame } from './m5bFrames';
+import {
+  MOB_HURT_ANIM,
+  MobWireState,
+  giverAnimKey,
+  giverDir,
+  lanternCarriers,
+  mobAnimKey,
+  mobClip,
+  nodeFrame,
+} from './m5bFrames';
 import { M5B_COPY, questLine } from '../ui/copy/m5b';
 
 describe('NodeView frames', () => {
@@ -21,6 +30,19 @@ describe('MobView clips', () => {
     expect(mobClip(AnimId.idle)).toBe('idle');
     expect(mobClip(AnimId.walk)).toBe('walk');
     expect(mobClip(AnimId.swing)).toBe('attack');
+  });
+  it('picks the round-8 clips from the hit, the flee and the death (motion.md 2)', () => {
+    expect(mobClip(MOB_HURT_ANIM)).toBe('hurt');
+    expect(mobClip(AnimId.walk, MobWireState.flee)).toBe('flee');
+    // A fleeing creature that has stopped idles; one that turns to bite attacks.
+    expect(mobClip(AnimId.idle, MobWireState.flee)).toBe('idle');
+    expect(mobClip(AnimId.swing, MobWireState.flee)).toBe('attack');
+    for (const id of [AnimId.idle, AnimId.walk, AnimId.swing, MOB_HURT_ANIM])
+      expect(mobClip(id, MobWireState.dead)).toBe('death');
+    expect(mobAnimKey('wolf', AnimId.walk, 0, MobWireState.flee)).toBe(`mob_wolf/flee/${screenDirOfYaw(0)}`);
+  });
+  it('keeps the hurt id in step with seams.md 2', () => {
+    expect(MOB_HURT_ANIM).toBe((AnimId as Record<string, number>).hurt ?? 6);
   });
   it('turns the world-frame yaw into the screen-frame direction, as for an avatar', () => {
     expect(mobAnimKey('wolf', AnimId.walk, 0)).toBe(`mob_wolf/walk/${screenDirOfYaw(0)}`);

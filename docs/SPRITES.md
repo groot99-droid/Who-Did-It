@@ -999,8 +999,8 @@ pnpm --filter @wdi/sprites m5b
 | `nodes` | multiatlas, one page ≤ 512² | `node_<snake id>/ready`, `node_<snake id>/spent` for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`); the stem is the row's `sprite` | 64 x 64, (32, 48): the ground point under the tile centre | boot |
 | `tools` | multiatlas, one page ≤ 512² | `held_<itemId>/<dir>` for `torch`, `snare`, `spade`, `lockpicks`, `lantern`, `crowbar` (8 screen-frame directions); `glow_lantern/<0-3>`, `glow_torch/<0-3>` | held: 64 x 64, (32, 56), the characters' feet; glow: 32 x 32, centred | boot |
 | `anims_tools` | animation | `glow_lantern`, `glow_torch`: 4 frames at 8 fps, looping | | boot |
-| `mobs` | multiatlas, one page ≤ 1024² | `mob_<id>/<anim>/<dir>/<nnn>` for `wolf`, `boar`, `bat`, `rat` (the stem is the row's `sprite`), `idle` 4 frames, `walk` 6, `attack` 4, 8 screen-frame directions | 64 x 64, (32, 56), the characters' feet; the bat hovers over a ground shadow at the feet | boot |
-| `anims_mobs` | animation | `mob_<id>/<anim>/<dir>`: idle 6 fps and walk 10 fps looping, attack 10 fps once | | boot |
+| `mobs` | multiatlas, one page ≤ 1024² | `mob_<id>/<anim>/<dir>/<nnn>` for `wolf`, `boar`, `bat`, `rat` (the stem is the row's `sprite`), `idle` 4 frames, `walk` 6, `attack` 6, `hurt` 3, `death` 6, `flee` 4 (round 8, 8G), 8 screen-frame directions | 64 x 64, (32, 56), the characters' feet; the bat hovers over a ground shadow at the feet | boot |
+| `anims_mobs` | animation | `mob_<id>/<anim>/<dir>`: idle 6 fps, walk 10 fps and flee 14 fps looping; attack 10 fps, hurt 12 fps and death 8 fps once (the death holds its last frame) | | boot |
 | `givers` | multiatlas, one page ≤ 512 x 1024 | `giver_<npcId>/idle/<dir>/<nnn>` for `harbourmaster`, `moll`, `foreman`, `smith`, `collier` (`quests.json` npcs), 4 frames, 8 screen-frame directions | 64 x 64, (32, 56), the characters' feet | boot |
 | `anims_givers` | animation | `giver_<npcId>/idle/<dir>`: 6 fps, looping | | boot |
 
@@ -1025,7 +1025,13 @@ gradient in low poly. The client plays `glow_lantern` or `glow_torch` over the l
 **Mobs** are small rigs of spheres, capsules and wing polygons in a mob-local frame (`tools/sprites/m5b-mobs.ts`),
 posed per animation and projected onto the iso ground for each direction, back to front, under one ink
 silhouette. The client turns a `MobSnap`'s world-frame yaw into the atlas direction with `dirFromVector`, as for an
-avatar, and plays `mob_<kind>/<walk|idle|attack>/<dir>`.
+avatar, and plays `mob_<kind>/<clip>/<dir>`. Round 8 (8G, motion.md 2): every clip is one pose of the rig (`pose()`:
+crouch, reach, jaw, stride, low, roll). The attack is six beats, crouch, crouch, lunge with the jaw open, bite,
+recoil and settle, with the hind feet planted through the lunge; `hurt` throws the head up and the body back;
+`flee` lengthens the stride, flattens the ears and tucks the tail; `death` rolls the posed body onto its side about
+the ground line under the spine (the bat drops to the floor instead). The client picks the clip from `animId` and
+`state`: `death` while the state is `dead`, `hurt` on `AnimId.hurt`, `attack` on a swing, `flee` while it walks
+in the `flee` state, else walk or idle.
 
 **Givers** are standing figures on the same rigs (`tools/sprites/m5b-givers.ts`), on the villager's proportions,
 each dressed for its trade: the harbourmaster's navy coat, peaked cap and beard; Moll's shawl, headscarf and herb
