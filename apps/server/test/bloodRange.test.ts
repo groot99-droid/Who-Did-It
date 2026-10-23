@@ -17,6 +17,8 @@ beforeAll(async () => ({ colyseus, release } = await bootFlowServer()));
 afterAll(async () => release());
 beforeEach(async () => colyseus.cleanup());
 
+type Decoded = { triggerChanges?: (changes: Array<{ field: string; value: unknown }>) => void };
+
 const RANGE = clues.clues.blood!.params!.visibleTiles!;
 
 /** What bot `i`'s client holds of seat 0's avatar: its public bits and its near bits. */
@@ -67,6 +69,38 @@ describe('Blood by range (8L)', () => {
     await sleep(500);
     expect(heldOf0(m, 1)).toBeDefined();
     expect(bloodyFor(m, 1)).toBe(false);
+  });
+
+  it('the encoded patches an out-of-range client decodes never carry the bit, not even for one change', async () => {
+    const m = await startParty(colyseus, 4);
+    setPhase(m, Phase.day);
+    teleport(m, m.bots[0]!, 'forest', 3, 3);
+    teleport(m, m.bots[1]!, 'forest', 4, 3); // within range: the control
+    teleport(m, m.bots[2]!, 'forest', 3 + Math.ceil(RANGE) + 3, 3);
+    // Every change the client's decoder reads from the raw patch bytes, before any state is folded or replaced.
+    const bloodyChanges = (i: number) => {
+      const seen: unknown[] = [];
+      const decoder = (m.bots[i]!.room as unknown as { serializer: { decoder: Decoded } }).serializer.decoder;
+      const prev = decoder.triggerChanges;
+      decoder.triggerChanges = (changes) => {
+        for (const c of changes)
+          if (
+            typeof c.value === 'number' &&
+            c.value & StatusBit.bloody &&
+            /^(statusBits|nearBits)$/.test(c.field)
+          )
+            seen.push(c);
+        prev?.(changes);
+      };
+      return seen;
+    };
+    const near = bloodyChanges(1);
+    const far = bloodyChanges(2);
+    expect(await until(() => heldOf0(m, 2) !== undefined)).toBe(true);
+    sim(m, 0).bloodyUntilTick = m.room.state.tick + 6000;
+    expect(await until(() => near.length > 0)).toBe(true);
+    await sleep(500);
+    expect(far).toEqual([]);
   });
 
   it('a ghost holds the bit at any distance', async () => {

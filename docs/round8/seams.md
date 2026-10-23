@@ -16,11 +16,13 @@ before it adds its own.
 | 2 | `Private.purse` u32, `Private.bank` u32 | own client only | 8C |
 | 3 | `Private.faith` u16 | own client only | 8D |
 | 4 | `GameState.hq`: map of station id to tier u8 | public (a building is public) | 8D |
+| 5 | `Avatar.nearBits` u16 behind the new view tag `VIEW_TAG.near = 4`: the status bits seen only from close by (Blood), never set in `Avatar.statusBits` (A170) | viewers within `clues.blood.params.visibleTiles`, and ghosts | 8L |
 
 - Nothing else of round 8 goes on the schema:
   - moods, needs and every NPC or townsfolk brain field stay in room memory;
   - the town till, the rumour ledger and the relations matches stay in room memory;
-  - a townsfolk figure is an `Avatar` under a handle (A50), with no new field.
+  - a townsfolk figure is an `Avatar` under a handle (A50), with no new field; like every avatar it carries Blood only
+    in `nearBits` (row 5).
 - `statusBits` is already u16. Round 8 appends the bits of 3, with no width change.
 
 ## 2. Ids
