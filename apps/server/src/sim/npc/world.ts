@@ -6,6 +6,7 @@ import { type PlayerSim, simOf } from '../RoomSim';
 import { isLoft, sceneKey } from '../World';
 import { hubOf, mapScenesOf } from '../MapSites';
 import { fleeCreature } from '../mobs/flee';
+import { canSee } from '../Sight';
 import { difficultyRow } from './difficulty';
 import type { Brain, NpcMemory } from './memory';
 import { playRng } from './memory';
@@ -99,6 +100,30 @@ export function preyFor(
   return prey === null || (isNpc(prey) && !simOf(room).auto?.npcPrey) ? null : prey;
 }
 
+/**
+ * The kill-opportunity timer's companion (GDD 3.12, A100): the one other living seat, human or NPC, placed in the
+ * Killer's room and not crossing a door, when that room is not the map's hub and the seat stands within
+ * `npc.aloneKill.sightTiles` and in sight (`canSee`: darkness and walls); null otherwise, and null for a Cabal
+ * mate. No draw: every NPC that holds the Knife keeps the timer, so the streams move the same.
+ */
+export function companionFor(room: PartyRoom, player: PlayerState, p: PlayerSim): string | null {
+  if (sceneKey(p.sceneIdx) === hubOf(room)) return null;
+  const sim = simOf(room);
+  const tick = room.state.tick;
+  let found: string | null = null;
+  let other: PlayerSim | null = null;
+  for (const [id, q] of sim.players) {
+    if (id === player.id || q.dead || !q.placed || q.sceneIdx !== p.sceneIdx) continue;
+    if (found !== null) return null;
+    found = id;
+    other = q;
+  }
+  if (found === null || other === null) return null;
+  if (tick < other.busyUntilTick || player.priv.cabalMates.includes(found)) return null;
+  if (Math.hypot(other.x - p.x, other.y - p.y) > balance.npc.aloneKill.sightTiles * TILE_PX) return null;
+  return canSee(room, p, other) ? found : null;
+}
+
 /** A placement (grace or immunity) puts the seat on the square: the routine starts over with a fresh scene dwell. */
 function handlePlacement(
   room: PartyRoom,
@@ -115,6 +140,8 @@ function handlePlacement(
   brain.goalKey = '';
   brain.flee = null;
   brain.striking = false;
+  brain.aloneWith = null;
+  brain.aloneSinceTick = -1;
   brain.leaveAtTick = -1;
   brain.startleUntilTick = -1;
   brain.pauseUntilTick = -1;
@@ -133,6 +160,8 @@ function handlePlacement(
 function trackScene(room: PartyRoom, brain: Brain, player: PlayerState, p: PlayerSim): void {
   if (brain.sceneIdx === p.sceneIdx) return;
   const tick = room.state.tick;
+  brain.aloneWith = null;
+  brain.aloneSinceTick = -1;
   const first = brain.sceneIdx < 0;
   brain.sceneIdx = p.sceneIdx;
   brain.sceneEnteredTick = tick;
@@ -205,10 +234,25 @@ export function runWorldNpc(
       brain.mode = 'react';
       return;
     }
-    const prey = sole !== null && !player.priv.cabalMates.includes(sole) ? sole : null;
+    // The kill-opportunity timer (A100): alone in a room with one seat, human or NPC, for longer than `afterS`.
+    // It counts in every world phase and fires only when the Knife works; a change of company restarts it.
+    const companion = brain.flee === null ? companionFor(room, player, p) : null;
+    if (companion !== brain.aloneWith) {
+      brain.aloneWith = companion;
+      brain.aloneSinceTick = tick;
+    }
+    const timerDue =
+      killPhase &&
+      companion !== null &&
+      tick - brain.aloneSinceTick > Math.round(balance.npc.aloneKill.afterS * TICK_RATE);
+    const rolled = sole !== null && !player.priv.cabalMates.includes(sole) ? sole : null;
+    const prey = rolled ?? (timerDue ? companion : null);
     const ready = (player.priv.cooldownEndTick.get('kill') ?? 0) <= tick;
     if (prey !== null && ready) {
-      if (!brain.striking && roll !== null && roll < chancePerTick(diff.killChancePer10s, TICK_RATE))
+      if (
+        !brain.striking &&
+        ((roll !== null && roll < chancePerTick(diff.killChancePer10s, TICK_RATE)) || timerDue)
+      )
         brain.striking = true;
       const target = sim.players.get(prey) as PlayerSim;
       if (brain.striking) {
@@ -224,10 +268,14 @@ export function runWorldNpc(
         brain.striking = false;
         stand(p);
         if (target.dead) {
-          // The body is ours: never startled at, never reported.
+          // The body is ours: never startled at, never reported. The flee starts next tick and leaves the room by
+          // the first portal of its route; the activity is dropped so nothing stale drives the seat.
           brain.ownBodies.add(`body_${prey}`);
           brain.seenBodies.add(`body_${prey}`);
           brain.flee = 'basin';
+          brain.act = null;
+          brain.aloneWith = null;
+          brain.aloneSinceTick = -1;
         }
         return;
       }

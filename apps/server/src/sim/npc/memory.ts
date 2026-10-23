@@ -37,8 +37,14 @@ export class Brain {
   readonly suspicion = new Map<string, number>();
   /** A Killer's run after a strike: first to a scene with a basin, then back to the overworld square. */
   flee: 'basin' | 'square' | null = null;
-  /** A Killer that rolled its strike chance and is closing on its prey. */
+  /** A Killer that rolled its strike chance (or whose kill-opportunity timer ran out) and is closing on its prey. */
   striking = false;
+  /**
+   * The kill-opportunity timer (GDD 3.12, A100): the one seat this Killer has been alone with in its room, and the
+   * tick that started; null and -1 when none. Kept for every NPC that holds the Knife, no draw.
+   */
+  aloneWith: string | null = null;
+  aloneSinceTick = -1;
   path: PathPlan | null = null;
   /**
    * Card-blind draws made for every NPC (npc.md 6; Session 5H draws them, 5G reads them): the night-power tick
