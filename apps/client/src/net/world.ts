@@ -168,6 +168,13 @@ export interface QuestSnap {
   done: boolean;
 }
 
+/** Round 7 (7M, GDD 3.5): one entry of this player's own task list, real or a fake one for the alibi theatre. */
+export interface TaskSnap {
+  id: string;
+  done: boolean;
+  fake: boolean;
+}
+
 export interface WorldFeed {
   readonly bus: Emitter<WorldFeedEvents>;
   readonly selfId: string;
@@ -192,6 +199,8 @@ export interface WorldFeed {
   nodes(): NodeSnap[];
   mobs(): MobSnap[];
   quests(): QuestSnap[];
+  /** Round 7 (7M): this player's own task list, in deal order (`Private.tasks`). */
+  tasks(): TaskSnap[];
   /** Round 6 (6I): this player's own inventory slots, in slot order. */
   inventory(): StackSnap[];
   /** Round 6 (6I): `quest.accept { questId }`. */
