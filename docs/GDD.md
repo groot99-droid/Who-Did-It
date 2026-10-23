@@ -688,6 +688,26 @@ strike with its fists.
 Session 8A writes this section's rules and corrects 3.6 and 3.15 where the two-hit-point model is replaced; 8B
 writes the inspect paragraph. The numbers are `balance.json` `body` and `effects.json`.
 
+**Inspect** (8B, A137). In any world phase, a living seat can study another living seat it can see within
+`relations.json` `inspect.rangeTiles`, once per `inspect.cooldownS`. The inspector learns, privately:
+- the look the figure is drawn as;
+- its physical signs: those its status bits draw (knocked out, stunned, dazed, bloody, bleeding, limping, pale,
+  weary) and, to a close look only, weak (Weakened), hungry (Famished) and hunted (Indebted);
+- its health as a band (unhurt, bruised, badly hurt; the floors are `inspect.health`), never the number;
+- its purse as a band (light, fair, heavy; `inspect.purse`), or unknown while the purse or its bands do not exist;
+- whether it carries a burning light.
+
+It never learns a card, a cover, a vendetta, an inventory, a notebook or a role's private state; a cover-wearer
+and a true wearer of a look read alike. The inspected seat is told privately which look studied it.
+
+**Relations.** `relations.json` `rows` say which looks are suspicious. A row names an inspector and an inspected
+side (a card, a vendetta, a faction, a drawn look, a townsfolk figure, or `mark`, the target of the inspector's open
+contract), may hold to one map, and carries a `suspicion` and an optional `note`. When rows hold for a look, every
+living NPC seat that saw it (in the scene, within the vision radius and in sight), and the inspected seat if it is
+an NPC, counts the inspector's drawn face the sum of their `suspicion` more; the first row with a note sends the
+inspected seat a card-blind hunch. Nothing a third client receives depends on a match. An `inert` row names a role
+or figure of a later round and never holds.
+
 ### 3.23 The economy
 
 Round 8 (A134, A135; `docs/round8/economy.md`): the Bible's Book IV on today's maps and roles.
