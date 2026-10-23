@@ -60,7 +60,8 @@ becomes a cut or a single held frame, a flash becomes a static mark.
   node regrows at `respawnTick`. The ids are `node_<id>/break/<nnn>`, drawn in code like the rest of A95.
 - **Effects (VFX)**: hit spark; blood spatter; poison puff; coin burst (a mugging, a dropped purse, a sale); dust
   from footsteps and from a fall; the knockout's stars; the Wake Loaf's crumbs; the HQ tier's build dust and its
-  upgraded props (economy.md 3); the Clerk's ledger; the mailbag.
+  upgraded props (economy.md 3); the Clerk's ledger; the mailbag. They are runtime particles from a tiny sheet the
+  client draws at runtime (`view/vfx/`), with no atlas page; reduced motion shows a short static mark instead (A162).
 - **Transport**: door swings (both ways), the portal fade and step, the well ladder's climb, the Train's arrival
   and departure (7I's station), the cellar hatch.
 - **Owner's sounds.** The sounds that go with these come from the ROSW sound library by id (CLAUDE.md), with
