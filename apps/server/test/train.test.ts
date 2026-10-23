@@ -6,7 +6,7 @@ import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { createServer } from '../src/server';
 import { type SimEvent, onSim } from '../src/sim/events/bus';
 import { stationOf } from '../src/sim/MapSites';
-import { TRAIN_ARRIVE_LINE, runTrain } from '../src/sim/Train';
+import { TRAIN_ARRIVE_LINE } from '../src/sim/Train';
 import { eventsOf, sleep, teleport } from './killHelpers';
 import { type Match, startMatch } from './simHelpers';
 
