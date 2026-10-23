@@ -298,12 +298,68 @@ for a selection, `-hazard` for a cue. Never a black shadow.
 
 | What | Duration | Easing | Reduced motion |
 |---|---|---|---|
-| hover, press | 120 ms | `--wdi-ease` | none |
+| hover (`--wdi-dur-fast`, lift `--wdi-lift`) | 120 ms, 2 px up | `--wdi-ease` | changes colour in place, no lift |
+| press (`--wdi-dur-press` down, `--wdi-dur-fast` back; `--wdi-press`, `--wdi-press-scale`) | 60 ms down, 1 px and 0.97 | `--wdi-ease` | changes colour in place |
+| list row hover (`--wdi-nudge`) | 120 ms, 2 px in | `--wdi-ease` | wash only |
+| tab and segment hover | 120 ms, colour and rule only | `--wdi-ease` | instant |
+| focus ring closing in | 120 ms from 6 px out | `--wdi-ease-out` | appears in place |
+| panel open (`--wdi-dur-panel`, `--wdi-rise`) | 200 ms, 8 px up and 0.98 to full | `--wdi-ease-out` | appears in place |
+| panel close (`--wdi-dur-panel-out`), where `display` can transition | 140 ms, fade and 4 px down | `--wdi-ease-in` | disappears |
+| list stagger (`--wdi-stagger`) | 28 ms per row, rows 1 to 10, the rest with row 10 | `--wdi-ease-out` | every row at once |
+| press flash (`flash`, `--wdi-dur-flash`) | 180 ms, from 1.5 brightness and 1.06 | `--wdi-ease-out` | none |
+| refused shake (`refused`, `--wdi-dur-shake`, `--wdi-shake`) | 320 ms, 4 px either way, a hazard glow | `--wdi-ease` | the glow only, in place |
+| pop (`pop`; the E prompt appearing) | 200 ms, from 0.6 | `--wdi-ease-spring` | appears in place |
+| cooldown sweep (`cooldown`) | the card's cooldown | linear | kept (it is status) |
+| the E hold fill | follows the hold, smoothed over 60 ms | linear | kept, unsmoothed |
+| scene cover into the world, per portal (`view/Transition.ts` `portalTransition`) | `balance.ui.transitionS.fade` (GDD 3.13) | ease-in-out | a cut |
 | toast, dialog, stamp rise | 220 ms | `--wdi-ease` | appears in place |
 | the card flip | 600 ms | `--wdi-ease` | swap, no rotation |
 | the card hold timer | the hold (GDD 2 step 4) | linear | still drains |
-| edge cue pulse | 1.2 s loop | `--wdi-ease` | static ring |
+| edge cue pulse (`--wdi-dur-loop`) | 1.2 s loop | `--wdi-ease` | static ring |
 | busy spinner | 0.8 s loop | linear | kept (it is status) |
+
+Round 8 (8H, A143). Every interface motion reads a token of `ui/theme/tokens.css`: the durations
+`--wdi-dur-*`, the stagger `--wdi-stagger`, the distances `--wdi-lift`, `--wdi-press`, `--wdi-nudge`,
+`--wdi-rise`, `--wdi-shake` and the scale `--wdi-press-scale`, with the easings `--wdi-ease`,
+`--wdi-ease-out` (arriving), `--wdi-ease-in` (leaving) and `--wdi-ease-spring` (one overshoot). Each
+duration and distance is zeroed under `prefers-reduced-motion` in the same file (`motion.test.ts` checks
+it), so a rule written against the tokens needs no reduced twin; only a loop needs `animation: none`.
+The rules live in the "Round 8 (8H)" block of `components.css`, which moves controls through the `translate`
+and `scale` properties and never through `transform`, so a control's own placing transform is kept.
+Other sessions' panels are animated there by their classes; their files are not edited.
+
+Controls that lift on hover and sink on press: `.wdi-btn`, `.wdi-glass-btn`, button chips, portraits, seat
+cards, map options, the cover picker's looks, the menu chips and close button, the settings gear, the E
+prompt, touch buttons (press only) and the admin buttons and seats. Tabs and segments brighten without
+lifting. List rows (the inventory slots, recipes and quests of `.wdi-m5b__row`, the party list, the deck's
+cards) lean in by `--wdi-nudge` on hover or focus inside them, and an M5b row takes a teal edge.
+
+Panels that open (8H, A143): Pockets, Crafting and Quests (`.wdi-m5b__panel`), the settings panel, the
+notebook sheet's page, the meeting's board and side panel, and any panel carrying `.wdi-anim-panel`, rise in
+on every open (an animation replays when an element leaves `display: none`); their veils (`.wdi-m5b__modal`,
+the notebook sheet, `.wdi-anim-veil`) fade. A panel hidden with `hidden` stops taking the pointer at once and
+fades out where the browser can transition `display`. The lists inside them (`.wdi-m5b__list`, the notebook
+list, the meeting's portraits, the deck's cards, the party list, `.wdi-anim-list`) stagger in row by row.
+The round-8 panels other sessions build (the shop, the inspect card, the mugging prompt, the altar, mailbag,
+notice and HQ panels) opt in with `.wdi-anim-panel` on the panel, `.wdi-anim-veil` on its scrim and
+`.wdi-anim-list` on its list; nothing else is needed from them, and 8H owns no line of their files.
+
+Activation (8H, A143). `ui/theme/motion.ts` gives a screen four one-shot calls on any control: `flash(el)`
+when a press landed (an ability fired, an item used), `refused(el)` when the server refused it (the codes of
+14.3), `pop(el)` when something arrives to be noticed, and `cooldown(el, ms)`, a night shade that unwinds
+clockwise over the card's cooldown. Each restarts its animation on every call and removes its class at
+`animationend`; none reads or changes state, so the caller decides what happened. Each owner calls them from its own code
+(8A's strike button flashes and cools, 8C's shop buttons flash); the world scene's error handler calls
+`refusedIn(overlay)`, which shakes whichever E prompt is showing as the refusal toast appears. The E prompt pops in as it
+appears and its bar fills smoothly while E is held; a task's mini-game opens with the panel entrance.
+
+Transitions and transport (8H, A143). The World's cover follows the portal the seat came through (GDD
+3.13): `wipe` for a door, `iris` for a level stair or crawl, `climbUp` and `climbDown` (the iris with
+lantern rungs passing the way the seat goes) for a portal that changes height, `station` (night with
+lantern-lit carriage windows sliding past) for an arrival at a map's Train station, and `fade` otherwise. The
+meeting keeps its iris and the end screen its wipe. The in-transit veil is the cover itself: the 0.6 s door
+transit of GDD 3.7 runs while it is down. The Train carries no seat today (GDD 3.3), so its journey card waits
+for a rule that moves seats by Train; the `station` cover is ready for it.
 
 ## 10. Accessibility checklist and measured contrast
 
@@ -1152,3 +1208,43 @@ chip its icon; `view/body/body.css` holds the panel's own rules. Module `ui/copy
 | `body.stacks` | ×{n} | a chip's stacks above one (Weakened from a rat) |
 
 Frozen test ids: `body` (the section), `body-health`, `body-stamina` (the bars, `role="meter"`), `body-effects`.
+
+### 14.33 Inspect (8B)
+
+Lines are in `apps/client/src/ui/copy/inspect.ts` (`INSPECT_COPY`, `inspectLine(id)`); the card is `ui/inspect/` (GDD 3.22 "Inspect"). The server sends only copy ids and bands; a sign or hunch id this build has no line for is left out. The card and the toasts never name a card, a cover or a vendetta.
+
+| Key | Text | Where |
+|---|---|---|
+| `prompt.inspect` | Inspect | the HUD prompt (`E`) on the nearest living figure in reach when nothing else is offered |
+| `inspect.title` | {look} | the card heading; `{look}` is the drawn look's name, capitalised |
+| `inspect.signs.none` | No sign of trouble | the card, when no sign shows |
+| `inspect.light` | Carries a lit light | the card, when a light burns in hand |
+| `inspect.close` | Close | the card's button (Esc also closes; it closes itself after 6 s) |
+| `inspect.noticed` | {look} looked you over | a warm toast to the inspected seat; `{look}` is the inspector's drawn look |
+| `inspect.noticed.someone` | Someone looked you over | the same, for a look this build cannot name |
+| `inspect.health.unhurt` | Unhurt | the card, the health band |
+| `inspect.health.bruised` | Bruised | the card, the health band |
+| `inspect.health.badlyHurt` | Badly hurt | the card, the health band |
+| `inspect.purse.unknown` | You cannot tell their purse | the card, the purse band |
+| `inspect.purse.light` | A light purse | the card, the purse band |
+| `inspect.purse.fair` | A fair purse | the card, the purse band |
+| `inspect.purse.heavy` | A heavy purse | the card, the purse band |
+| `inspect.sign.down` | Out cold | the card, a sign |
+| `inspect.sign.stunned` | Stunned | the card, a sign |
+| `inspect.sign.dazed` | Dazed, eyes swimming | the card, a sign |
+| `inspect.sign.bloody` | Blood on their clothes | the card, a sign |
+| `inspect.sign.bleeding` | Bleeding | the card, a sign |
+| `inspect.sign.limping` | Limping | the card, a sign |
+| `inspect.sign.pale` | Pale and sweating | the card, a sign |
+| `inspect.sign.weary` | Weary, stumbling | the card, a sign |
+| `inspect.sign.weak` | Drawn and weak | the card, a sign |
+| `inspect.sign.hungry` | Hollow-cheeked | the card, a sign |
+| `inspect.sign.hunted` | A hunted look | the card, a sign |
+| `inspect.hunch.watchChain` | Their eyes lingered on your watch chain. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.collar` | They studied your collar as if it offended them. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.keys` | Their eyes counted the keys at your belt. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.rings` | Their stare went straight to your rings. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.measured` | They took your measure, slowly. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.confession` | They watched you as if waiting for a confession. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.blessing` | They looked at you the way one looks for a blessing. | a warm toast to the inspected seat, a `relations.json` note |
+| `inspect.hunch.pockets` | Their glance went to your pockets. | a warm toast to the inspected seat, a `relations.json` note |

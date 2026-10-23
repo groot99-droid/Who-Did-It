@@ -1,5 +1,5 @@
 import type { Emitter } from 'mitt';
-import type { HoldAction } from '@wdi/shared/protocol';
+import type { HoldAction, S2CPayloads } from '@wdi/shared/protocol';
 
 // What the World scene needs from the network. `ColyseusWorldFeed` reads the room state, the mock feed
 // (?mock=1) simulates the same data locally; the scene cannot tell them apart. Kept apart from
@@ -133,6 +133,12 @@ export type WorldFeedEvents = {
   cutscene: { id: string; scope?: 'all' };
   /** Private, round 6 (6H, 6I): a station task's mini-game opened; answered with `minigameResult`. */
   minigameStart: { taskId: string; kind: string; public: unknown };
+  /** Private, round 8 (8B, GDD 3.22): what the eye read of the inspected avatar. */
+  'inspect.result': S2CPayloads['inspect.result'];
+  /** Private, round 8: a look of `lookId` looked this player over. */
+  'inspect.noticed': S2CPayloads['inspect.noticed'];
+  /** Private, round 8: a card-blind hunch, an `inspect.hunch.*` copy id. */
+  'inspect.hunch': S2CPayloads['inspect.hunch'];
 };
 
 /** Round 6 (M5b): a resource node of the scene this client is in (`SceneState.nodes`). */
@@ -184,6 +190,13 @@ export interface OwnBodySnap {
   effects: readonly OwnEffectSnap[];
 }
 
+/** Round 7 (7M, GDD 3.5): one entry of this player's own task list, real or a fake one for the alibi theatre. */
+export interface TaskSnap {
+  id: string;
+  done: boolean;
+  fake: boolean;
+}
+
 export interface WorldFeed {
   readonly bus: Emitter<WorldFeedEvents>;
   readonly selfId: string;
@@ -208,6 +221,8 @@ export interface WorldFeed {
   nodes(): NodeSnap[];
   mobs(): MobSnap[];
   quests(): QuestSnap[];
+  /** Round 7 (7M): this player's own task list, in deal order (`Private.tasks`). */
+  tasks(): TaskSnap[];
   /** Round 6 (6I): this player's own inventory slots, in slot order. */
   inventory(): StackSnap[];
   /** Round 8 (8A): this seat's own body, or null while the row is empty (the lobby, the card, a ghost). */
@@ -220,6 +235,8 @@ export interface WorldFeed {
   light(on: boolean): void;
   /** Round 6 (6I): the answer to a `minigameStart`. */
   minigameResult(taskId: string, answer: unknown): void;
+  /** Round 8 (8B): `act.inspect { targetId }`, an avatar handle in reach. */
+  inspect(targetId: string): void;
   /**
    * True once this player has been killed or their roster `alive` is false. Held here, never in the
    * scene, so it survives World restarts; resets when the phase returns to the lobby.
