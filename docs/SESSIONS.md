@@ -3477,6 +3477,10 @@ an existing `apps/server/test/*.test.ts`, anything written into ROSW.
 - 2026-10-23: PR 1 (the deal): `sim/Tasks.ts`, the `tasks` stream, the `dealTasks` line in `startMatch`, ghosts allowed at their
   own tasks, `test/taskDeal.test.ts` (the pool, the counts, determinism per seed words, fake lists for Cabal and neutral seats,
   none for NPCs, Blackpine empty, the bar and the full-bar win, a ghost's hold); GDD 3.5 "The deal"; A133.
+- 2026-10-23: a seam, for whoever imports `sim/Npc` next. `sim/Tasks.ts` first imported `isNpcSeat` from `sim/Npc`, and
+  `handlers/lobby.ts` imports `sim/Tasks` before `sim/Npc`; that alone moved the evaluation of `npc/meeting` earlier, two tests
+  of `lastShot.test.ts` (which `vi.mock`s that module) failed, and `pnpm auto` hung at 0% CPU with NPC matches that never
+  ended. `Tasks.ts` now reads `npcMemory(room).ids` from `npc/memory` and imports nothing above it. Told 6Z for `seams.md`.
 - Read from ROSW (never written): the UDGT teardown chapters 00 to 03 on `claude/sweet-maxwell-lmsiw3`, and the Who Did It lore
   on `claude/sharp-mccarthy-pqi3ws` (the Canon Ledger, the Lamplighter's Round, the Gazette, the Tab Book, Fourteen Things, the
   Daybook of Crumb's Ovens, Hopscotch, three stories). Drifts noted for 6Z, not resolved here: the lore dates HollowMere to 1893
