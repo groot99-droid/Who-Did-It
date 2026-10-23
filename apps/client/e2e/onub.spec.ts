@@ -65,7 +65,13 @@ async function lobby(browser: Browser): Promise<Quick> {
   await guest.getByRole('button', { name: 'Join Party' }).click();
   await expect(guest.getByTestId('party-code')).toHaveText(code);
 
-  const swarm = await runSwarm({ code, count: 3, url: E2E_SERVER_URL, walk: false, quick: { pace: 'fast' } });
+  const swarm = await runSwarm({
+    code,
+    count: 3,
+    url: E2E_SERVER_URL,
+    walk: false,
+    quick: { pace: 'fast', pantryVote: 0 },
+  });
   const observer = swarm.rooms[0]!;
   let over: GameOverView | null = null;
   observer.onMessage('gameOver', (m: GameOverView) => (over = m));
@@ -223,8 +229,11 @@ test('a 5-seat ONUB v2 match: card, prep, crime scenes, night, dawn, Rush, revea
     for (const id of bots)
       await expect(q.host.getByTestId(`claimed-${id}`)).toBeVisible({ timeout: seconds(30) });
 
+    // Two votes on one seat reach `minVotesToTurnOut`, so the reveal always has a stamp whatever the fast bots vote
+    // (their Pantry chance is 0 here; the Pantry path is the soak's and the rules tests'). The Pantry tile stays
+    // asserted visible above.
     await q.host.getByTestId(`portrait-${bots[0]}`).click();
-    await q.guest.getByTestId('vote-pantry').click();
+    await q.guest.getByTestId(`portrait-${bots[0]}`).click();
 
     // The Rush never ends early; CRUST follows, and the reveal shows who went in the oven.
     const rushMs = seconds(onubBalance.timers.rushS + onubBalance.timers.voteS + 30);
