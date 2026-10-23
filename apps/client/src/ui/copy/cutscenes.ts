@@ -29,6 +29,9 @@ export const CUTSCENE_COPY = {
   'cs.deathShot.line': 'One shot, and the whole square goes quiet.',
   'cs.deathEjected.line': 'The town has spoken.',
   'cs.deathWolf.line': 'The pines were not empty.',
+
+  // 14.30 The Vicar's memorial (round 7, 7I): played to every seat at the reveal after the Vicar falls to the Knife
+  'cs.memorial.vicar': 'In memory of the Vicar of HollowMere, who fell to the Knife.',
 } as const;
 
 export type CutsceneCopyId = keyof typeof CUTSCENE_COPY;

@@ -13,7 +13,9 @@ import {
   type PlayerState,
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { martyrOf } from './Memorial';
 import { type PlayerSim, simOf } from './RoomSim';
+import { endMatch } from './Win';
 import { count, take } from './Inventory';
 import { isLoft, isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
@@ -111,24 +113,39 @@ export function handleTaskHold(room: PartyRoom, sessionId: string, taskId: strin
     ?.send(S2C.minigameStart, { taskId, kind: puzzle.kind, public: puzzle.public });
 }
 
-/** The global bar: finished real tasks over all real tasks; a ghost's finished ones count up to `ghostShareCap`. */
+/**
+ * The global bar: finished real tasks over all real tasks; a ghost's finished ones count up to `ghostShareCap`. The
+ * martyred Vicar's ghost (GDD 3.20) counts each real task it finishes after its reveal `martyrWeight` times, outside
+ * the cap. A full bar in play wins the match for the Village (GDD 3.5).
+ */
 export function recomputeTaskBar(room: PartyRoom): void {
+  const martyr = martyrOf(room);
   let total = 0;
   let done = 0;
   let ghostDone = 0;
+  let martyrDone = 0;
   for (const [id, player] of room.state.players) {
     const ghost = simOf(room).players.get(id)?.dead === true;
+    let finished = 0;
     for (const t of player.priv?.tasks ?? []) {
       if (t.fake) continue;
       total++;
-      if (!t.done) continue;
-      if (ghost) ghostDone++;
-      else done++;
+      if (t.done) finished++;
+    }
+    if (!ghost) done += finished;
+    else if (id !== martyr?.seat) ghostDone += finished;
+    else {
+      const before = Math.min(finished, martyr.doneBefore);
+      ghostDone += before;
+      martyrDone += finished - before;
     }
   }
   if (total === 0) return;
-  const counted = done + Math.min(ghostDone, balance.tasks.ghostShareCap * total);
+  const counted =
+    done + Math.min(ghostDone, balance.tasks.ghostShareCap * total) + martyrDone * balance.tasks.martyrWeight;
   room.state.taskBar = Math.min(100, Math.floor((100 * counted) / total));
+  const phase = room.state.phase;
+  if (room.state.taskBar === 100 && phase >= Phase.grace && phase < Phase.gameOver) endMatch(room, 'village');
 }
 
 function complete(

@@ -138,7 +138,7 @@ Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife,
 | Oil, Wrench, Planks, Letter, Flour | Task deliverables fetched from other scenes | V1 |
 | Forged Alibi, Handcuffs, Crossbow kit, Lockpicks, Smoke Bomb, Heirlooms | V1.5 kits | V1.5 |
 
-**Tasks.** Village players get 3-5 tasks; the global bar at 100% wins. Each needs a tool from another scene and a 2 s hold at the node: Light the lanterns (Oil from the tavern back room to a square lantern post, night only), Fix the well pump (Wrench from the apothecary bench), Deliver a letter (from the widow's letter box to the tavern dartboard), Mend the fence (2 Planks from the edge of Gallows Wood by the gate to the NE fence; while mended, wolves cannot enter the village), Fetch the flour (from Crumb's Ovens to the tavern). Co-op task (Shutter the windows, in the tavern): both players within 2 tiles of the node holding E for 4 s; progress pauses when one releases. Two-player carrying is V1.5. Completing a task writes a Claimed alibi entry (time + scene). Cabal see a fake list that writes entries but never fills the bar. Ghost task completion counts 100% but ghost contribution is capped at 25% of the bar.
+**Tasks.** Village players get 3-5 tasks; the global bar at 100% wins. Each needs a tool from another scene and a 2 s hold at the node: Light the lanterns (Oil from the tavern back room to a square lantern post, night only), Fix the well pump (Wrench from the apothecary bench), Deliver a letter (from the widow's letter box to the tavern dartboard), Mend the fence (2 Planks from the edge of Gallows Wood by the gate to the NE fence; while mended, wolves cannot enter the village), Fetch the flour (from Crumb's Ovens to the tavern). Co-op task (Shutter the windows, in the tavern): both players within 2 tiles of the node holding E for 4 s; progress pauses when one releases. Two-player carrying is V1.5. Completing a task writes a Claimed alibi entry (time + scene). Cabal see a fake list that writes entries but never fills the bar. Ghost task completion counts 100% but ghost contribution is capped at 25% of the bar, except the martyred Vicar's (3.20). A full bar in play ends the match for the Village.
 
 **Communication.** No voice in V1. Global text chat in meetings, lines of at most 200 characters. Outside meetings: an 8-phrase quick-chat wheel (Follow me / Where were you? / I saw something / Help! / Clear / Suspicious / Wait / Go) as speech bubbles within 5 tiles, plus world pings. Cabal channel and ghost channel are sent per-recipient by the server; the client never chooses a channel. (M3) A living player may speak only while a meeting runs (discussion, vote and reveal), to everyone; a ghost may speak in any phase, to the other ghosts only; empty lines are refused and long ones are cut to the limit. Proximity text chat is a V1.5 toggle.
 
@@ -757,6 +757,25 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
 **NPC Killers (7H).** An NPC Killer holds a vendetta like any Killer and walks toward its goal as one more place
 under its routine (3.12): the Vicar's scene, a task target's scene, the loaded strongbox's hall or its target's
 scene, through `vendettaGoalFor`. It does nothing a human could not do in the same place.
+
+**The Vicar's memorial (7I).** Everything public follows the look (3.17). When a seat whose public look is the
+Vicar's dies by the Knife, whether it was dealt the Vicar or wears that look as a cover, the next meeting's reveal
+plays a memorial to every seat: the Vicar's film (`memorial_vicar`) under one title caption, skippable like every
+cutscene (3.18). It plays once per match, so a later reveal stays plain, and the meeting, not the night, carries
+it. No other death plays it: a seat in the Vicar's look poisoned, shot, ejected or taken by a wolf, or a seat in
+another look struck by the Knife, even one dealt the Vicar. It names no seat on screen and changes nothing public
+beyond the film. The Ascended Vicar candidacy follows the dealt card instead and stays private: the seat dealt the
+Vicar that dies by the Knife becomes `flow.ascendedVicarCandidate` at that reveal (room memory only, kept into the
+room's next match until another replaces it), which round 8's evolutions read.
+
+**The martyr's due (owner's rule, 7I).** The Vicar must die a martyr: struck by a Killer's Knife, the only source of
+a Knife death. A Vicar taken by a wolf, poisoned, shot or ejected is no martyr. The martyr is the seat the memorial
+mourns, so it follows the public look like the film: a cover in the Vicar's look is the martyr, and a seat dealt the
+Vicar under another look is not, since the bar is public and Killers pick victims by the look they see. From that
+reveal, each real task the martyr's ghost finishes counts **10** times on the task bar (`tasks.martyrWeight`),
+outside the ghost cap (3.5); the tasks it finished before that reveal count as any ghost's. A full bar in play wins
+for the Village, so a Killer that strikes the Vicar hands the village a fast clock: the Zealot, whose goal is the
+Vicar's flock, is the one Killer with a reason to take that risk. The private candidacy above stays on the card.
 
 ### 3.21 Parties, profiles and friends
 
