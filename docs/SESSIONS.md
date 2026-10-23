@@ -3549,6 +3549,9 @@ then docs/round8/README.md, seams.md and the documents your brief names. Branch 
 | **8J. HollowMere rooms** | Opus 5.5 | Art and content | `claude/r8-hollowmere-rooms` | every HollowMere scene's placement and detail |
 | **8K. BlackPine rooms** | Opus 5.5 | Art and content | `claude/r8-blackpine-rooms` | every BlackPine scene's placement and detail |
 | **8P. Integration** | Opus 5.5 | Code | `claude/r8-integration` | spawned last: merges, `PROTOCOL.md`, auto 50, the e2e sets, A147 |
+| **8L. Anti-cheat** | Opus 5.5 | Code | `claude/r8-anticheat` | `teardown.md` 1: blood by range, night sight on the server, the leak test, replay, the vote delay (A170) |
+| **8M. Rules** | Opus 5.5 | Code and docs | `claude/r8-rules` | `teardown.md` 2: match length, the Final Night hunt and trial, card text from the data (A171) |
+| **8N. Icons** | Fable 5.1 | Art | `claude/r8-icons` | `teardown.md` 3: every status and HUD icon drawn, in all three styles (A172) |
 
 ### Round 8 briefs
 
@@ -3643,6 +3646,28 @@ then docs/round8/README.md, seams.md and the documents your brief names. Branch 
   office, mine and deep, with `blackpine_props.py`.
 
 **Merge order**: seams.md 7.
+
+### Round 8 addendum briefs (A168, A169)
+
+Spawned after the owner's teardown answers. Contract: `docs/round8/teardown.md`, with seams.md for everything shared.
+
+- **8L. Anti-cheat** (`teardown.md` 1).
+  1. Blood by range in `publishPresence`.
+  2. Night sight on the server in every scene.
+  3. The vote delay `meeting.minVoteS` (GDD 3.4).
+  4. The per-message leak test and the replay seed and build in `MatchLog`.
+
+  One PR per step, each with tests, and auto 50 clean.
+- **8M. Rules** (`teardown.md` 2).
+  1. Match length 20 to 25 minutes in GDD 2, 3.3 and 3.9, with the soak.
+  2. The Final Night: `finalNight.huntS` about 45 s, then the trial `finalNight.trialS`, with the GDD and auto 50.
+  3. The card-text drift test.
+  4. The generated numbers.
+- **8N. Icons** (`teardown.md` 3).
+  1. Survey every icon the game shows as a word or a placeholder.
+  2. Send 6Z the list and a sheet of five or six icons, bleeding first in the owner's words, for the owner's look.
+  3. After the owner's yes, draw the set in 8-bit, low poly and HD into the UI atlas.
+  4. Wire the effect icons into the HUD and the bloodied mark over a figure, with 8H's helpers.
 
 ### Round 8 log: 6Z
 
