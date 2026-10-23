@@ -8,7 +8,7 @@ import { StatusBit } from '../src/sim/constants';
 import { handleVote } from '../src/sim/Meeting';
 import { MOOD_ANIM, needsOf } from '../src/sim/npc/needs';
 import { simOf } from '../src/sim/RoomSim';
-import { figuresOf, namedFigure } from '../src/sim/townsfolk/figures';
+import { figureLossesOf, figuresOf, hurtFigure, namedFigure } from '../src/sim/townsfolk/figures';
 import { resetToLobby } from '../src/sim/Win';
 import { sceneKey } from '../src/sim/World';
 import {
@@ -144,6 +144,39 @@ describe('ambient townsfolk', () => {
     expect(voter.priv.myVote).toBe('');
     expect(voter.hasVoted).toBe(false);
     expect(figureNotSeat(party)).toEqual([]);
+  });
+
+  it('dies only to a creature that kills, leaves a body nobody reports, cleared at the next meeting with a count', async () => {
+    const party = await world();
+    const room = party.room;
+    const sim = simOf(room);
+    const f = [...figuresOf(room).values()][0]!;
+    const sceneId = sceneKey(f.sceneIdx);
+    // A creature that never kills leaves it at one hit point however often it bites.
+    for (let i = 0; i < 5; i++) expect(hurtFigure(room, f.id, false)).toBe(false);
+    expect(f.dead).toBe(false);
+    expect(hurtFigure(room, f.id, true)).toBe(true);
+    expect(f.dead).toBe(true);
+    expect(f.handle).toBeNull();
+    const bodyId = `body_${f.id}`;
+    const scene = room.state.scenes.get(sceneId)!;
+    expect(scene.bodies.get(bodyId)?.of).toBe(f.id);
+    expect(sim.reportedBodies.has(bodyId)).toBe(true); // a report finds it "already reported": no meeting
+    advance(party, 2);
+    expect(figureNotSeat(party)).toEqual([]);
+    // The next meeting clears it and counts it for the meeting line; the one after mourns nobody.
+    sim.meetingRequests.push({ reason: 'bell', callerId: party.humans[0]!.id });
+    advance(party, 1);
+    expect(room.state.phase).toBe(Phase.meetingDiscussion);
+    expect(scene.bodies.has(bodyId)).toBe(false);
+    expect(sim.reportedBodies.has(bodyId)).toBe(false);
+    expect(figureLossesOf(room)).toBe(1);
+    expect(figureNotSeat(party)).toEqual([]);
+    holdPhase(party, Phase.day, 3600);
+    advance(party, 1);
+    sim.meetingRequests.push({ reason: 'bell', callerId: party.humans[0]!.id });
+    advance(party, 1);
+    expect(figureLossesOf(room)).toBe(0);
   });
 
   it('shows its mood idle while it stands still, and nothing of the mood on the wire', async () => {

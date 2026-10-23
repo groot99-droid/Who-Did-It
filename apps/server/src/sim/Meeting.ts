@@ -8,6 +8,7 @@ import { countRow, factionOf, flowOf, refuse, roleIdOf, rolesOf, setPhase } from
 import { hubOf, meetingSpawnsOf } from './MapSites';
 import { onMeetingOpenDisguise } from './Impersonate';
 import { beginAim, holdReveal, onMeetingOpenNight } from './NightPowers';
+import { clearFigureBodies } from './townsfolk/figures';
 import { type MeetingRequest, simOf } from './RoomSim';
 import { evaluateWin, endMatch } from './Win';
 
@@ -42,6 +43,7 @@ export function openMeeting(room: PartyRoom, req: MeetingRequest): void {
     if (sim.players.get(id)?.dead) player.alive = false;
   });
   onMeetingOpenDisguise(room);
+  clearFigureBodies(room); // round 8, 8E: the creatures' takings leave with the meeting line (locked call site)
   placeAtSquare(room, false);
   state.players.forEach((player: PlayerState) => {
     player.hasVoted = false;

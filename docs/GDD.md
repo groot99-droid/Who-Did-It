@@ -756,6 +756,10 @@ On the wire a figure is a scene `Avatar` under an opaque handle like a seat's (3
 a card's: 8F's variants all begin `villager`), the `townsfolk.height` height, no status bit and never the ghost
 tag, so nothing but the drawn figure tells it apart; its id never leaves the server. Needs and moods tick for it as
 for a seat (the mood idle shows while it stands), it hears the same bus events, and it counts the bodies it sees.
-The Knife never finds it (its handle resolves to no seat) and a vote for it is refused. The invariant `figureNotSeat`
-(auto 50) checks that no figure is in any seat list, vote, death or meeting, and that no figure avatar carries a
-seat's handle, the ghost tag or a card's look.
+The Knife never finds it (its handle resolves to no seat), a vote for it is refused, and it dies only to a creature
+that kills (the wolf: `health.wolfDamage` off `health.maxHp`, regained like a seat's). Its body lies where it fell
+as a public `Body` that opens no meeting (it counts as reported from the start) until the next meeting clears every
+such body and the meeting text says how many the creatures took (`ui/copy/townsfolk.ts`, UI 14.36). A fist's
+knockout (3.22, the reduced body) reaches a figure only once the strike hook of A160 lands. The invariant
+`figureNotSeat` (auto 50) checks that no figure is in any seat list, vote, death or meeting, and that no figure
+avatar carries a seat's handle, the ghost tag or a card's look.

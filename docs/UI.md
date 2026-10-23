@@ -1124,3 +1124,15 @@ Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaG
 | `vendetta.note.doubt` | Doubt took the flock: your vote did not carry. | the Vicar's own Notebook entry of kind `NoteKind.doubt`, written at the reveal of the doubted meeting |
 | `vendetta.note.contract` | The mail brought a contract: {name}. | the Hitman's own Notebook entry of kind `NoteKind.contract` (`of` the target seat, `{name}` its seat name), written at the first Train arrival |
 | `vendetta.contract.accept` | Accept | the button on that contract entry while the offer is open (no `contract` quest yet, the mark on the roster); it sends `quest.accept { questId: 'contract' }` |
+
+### 14.36 Townsfolk (8E)
+
+Lines are in `apps/client/src/ui/copy/townsfolk.ts` (`TOWNSFOLK_COPY`, `figureName(lookId)`). An ambient figure (GDD 3.24) is an avatar whose `lookOf` is a `villager` look id rather than a seat: its nameplate is `figureName(lookOf)`, the plain `figure.villager` for a look with no line of its own, and it never shows a scarf, a hat glyph or a mask. The meeting text reads the count of townsfolk the creatures took since the last meeting (`meetingStart.figuresLost`, once that field lands) and adds one line below the reason; no count, no line.
+
+| Key | Text | Where |
+|---|---|---|
+| `figure.villager` | Villager | the nameplate of any `villager` look without a line of its own |
+| `figure.villager_clerk` | Company Clerk | the nameplate of HollowMere's Clerk (8F's look) |
+| `figure.villager_tallyman` | Tallyman | the nameplate of BlackPine's Tallyman (8F's look) |
+| `meeting.townsfolk.lost.one` | The wolves took one of the townsfolk. | the meeting text when one figure died since the last meeting |
+| `meeting.townsfolk.lost.many` | The wolves took {n} of the townsfolk. | the meeting text when more did; `{n}` is the count |

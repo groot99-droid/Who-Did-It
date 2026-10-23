@@ -43,6 +43,7 @@ export function runTownsfolk(room: PartyRoom): void {
   if (!isWorldPhase(phase) || !simOf(room).profileFixed) return;
   if (!memory.spawned) spawnTownsfolk(room); // a match that skipped the deal's line (an older save) still has them
   for (const f of memory.figures.values()) {
+    if (f.dead) continue;
     stepFigure(room, f);
     publishFigure(room, f);
   }

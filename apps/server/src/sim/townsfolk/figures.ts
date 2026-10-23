@@ -7,10 +7,20 @@ import {
   scenes,
   type Profile,
 } from '@wdi/content';
-import { Avatar, type AvatarState, MAX_PLAYERS, MIN_PLAYERS_TO_START, type Rng, TILE_PX } from '@wdi/shared';
+import {
+  Avatar,
+  type AvatarState,
+  MAX_PLAYERS,
+  MIN_PLAYERS_TO_START,
+  type Rng,
+  TICK_RATE,
+  TILE_PX,
+} from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { avatarMemory, newHandle } from '../Avatars';
+import { spawnBody } from '../Bodies';
 import { AnimId } from '../constants';
+import { emitSim } from '../events/bus';
 import { hubOf, mapIdOfRoom, mapScenesOf, startSpawnsOf } from '../MapSites';
 import { Brain } from '../npc/memory';
 import { bindFigureNeeds, moodIdleFor } from '../npc/needs';
@@ -61,12 +71,19 @@ export interface Figure {
   stations: readonly Station[];
   nextStation: number;
   act: FigureAct | null;
+  hp: number;
+  hurtAtTick: number;
+  dead: boolean;
 }
 
 interface TownsfolkMemory {
   figures: Map<string, Figure>;
   byHandle: Map<string, string>;
   spawned: boolean;
+  /** The bodies the creatures left since the last meeting opened. */
+  lost: { bodyId: string; scene: SceneId }[];
+  /** How many the last meeting's opening cleared: the meeting line (`figureLossesOf`). */
+  lastLosses: number;
   seq: number;
 }
 
@@ -76,13 +93,13 @@ const memories = new WeakMap<PartyRoom, TownsfolkMemory>();
 export function townsfolkMemory(room: PartyRoom): TownsfolkMemory {
   let memory = memories.get(room);
   if (!memory) {
-    memory = { figures: new Map(), byHandle: new Map(), spawned: false, seq: 0 };
+    memory = { figures: new Map(), byHandle: new Map(), spawned: false, lost: [], lastLosses: 0, seq: 0 };
     memories.set(room, memory);
   }
   return memory;
 }
 
-/** Every figure of the match by id. */
+/** Every figure of the match by id, dead ones included. */
 export const figuresOf = (room: PartyRoom): ReadonlyMap<string, Figure> => townsfolkMemory(room).figures;
 
 /** The figure behind an avatar handle, or undefined for a seat's handle or an unknown one. */
@@ -94,7 +111,7 @@ export function figureOfHandle(room: PartyRoom, handle: string): Figure | undefi
 
 /** The living named figure of a kind (8D's Company Clerk or Tallyman), or undefined when the map has none. */
 export function namedFigure(room: PartyRoom, kind: string): Figure | undefined {
-  for (const f of townsfolkMemory(room).figures.values()) if (f.kind === kind) return f;
+  for (const f of townsfolkMemory(room).figures.values()) if (f.kind === kind && !f.dead) return f;
   return undefined;
 }
 
@@ -108,7 +125,7 @@ export function figuresNear(
 ): Figure[] {
   const out: Figure[] = [];
   for (const f of townsfolkMemory(room).figures.values()) {
-    if (f.sceneIdx !== sceneIdx) continue;
+    if (f.dead || f.sceneIdx !== sceneIdx) continue;
     if (Math.hypot(f.x - x, f.y - y) <= reachPx) out.push(f);
   }
   return out;
@@ -233,6 +250,9 @@ function makeFigure(
     stations: [],
     nextStation: 0,
     act: null,
+    hp: balance.health.maxHp,
+    hurtAtTick: -1,
+    dead: false,
   };
   const rng = figureRng(room, f);
   // The home: a lit interior open at this party size (the rule of a seat's persona, GDD 3.12), from its own stream.
@@ -349,15 +369,78 @@ export function publishFigure(room: PartyRoom, f: Figure): void {
   writeFigure(avatar, f);
 }
 
-/** The lobby: every figure and handle goes; the next deal spawns afresh. */
+/**
+ * A creature's attack lands on a living figure (the `mobs/hurt.ts` rule: `health.wolfDamage` off `health.maxHp`,
+ * regained like a seat's); returns whether it killed. Only a creature that `kills` can take a figure to zero.
+ */
+export function hurtFigure(room: PartyRoom, id: string, kills: boolean): boolean {
+  const f = townsfolkMemory(room).figures.get(id);
+  if (!f || f.dead) return false;
+  const h = balance.health;
+  const every = Math.max(1, Math.round(h.regenEveryS * TICK_RATE));
+  const regained = f.hurtAtTick < 0 ? 0 : Math.floor((room.state.tick - f.hurtAtTick) / every) * h.regenHp;
+  const hp = Math.max(kills ? 0 : 1, Math.min(h.maxHp, f.hp + regained) - h.wolfDamage);
+  f.hp = hp;
+  f.hurtAtTick = room.state.tick;
+  if (hp > 0) return false;
+  killFigure(room, f);
+  return true;
+}
+
+/**
+ * The creature-only death (GDD 3.24): the avatar goes, a public `Body` lies where it fell (`body_<figureId>`,
+ * never reportable: a figure's body opens no meeting, so it is marked reported from the start) until the next
+ * meeting clears it with a line.
+ */
+function killFigure(room: PartyRoom, f: Figure): void {
+  f.dead = true;
+  f.act = null;
+  f.moving = false;
+  dropHandle(room, f);
+  bindFigureNeeds(room, f.id, null);
+  const sceneId = sceneKey(f.sceneIdx);
+  spawnBody(room, sceneId, f.id, Math.floor(f.x / TILE_PX), Math.floor(f.y / TILE_PX));
+  const bodyId = `body_${f.id}`;
+  simOf(room).reportedBodies.add(bodyId);
+  townsfolkMemory(room).lost.push({ bodyId, scene: sceneId });
+  emitSim(room, {
+    tick: room.state.tick,
+    kind: 'figure.death',
+    data: { figure: f.id, cause: 'wolf', sceneId },
+  });
+}
+
+/**
+ * The locked meeting-start line (seams.md 5): every body the creatures left since the last meeting leaves its
+ * scene; returns how many, kept for the meeting line (`figureLossesOf`).
+ */
+export function clearFigureBodies(room: PartyRoom): number {
+  const memory = townsfolkMemory(room);
+  const sim = simOf(room);
+  for (const { bodyId, scene } of memory.lost) {
+    room.state.scenes.get(scene)?.bodies.delete(bodyId);
+    sim.reportedBodies.delete(bodyId);
+  }
+  memory.lastLosses = memory.lost.length;
+  memory.lost = [];
+  return memory.lastLosses;
+}
+
+/** How many townsfolk the last meeting's opening mourned (the meeting text's line, `ui/copy/townsfolk.ts`). */
+export const figureLossesOf = (room: PartyRoom): number => townsfolkMemory(room).lastLosses;
+
+/** The lobby: every figure, body and handle goes; the next deal spawns afresh. */
 export function clearTownsfolk(room: PartyRoom): void {
   const memory = townsfolkMemory(room);
   for (const f of memory.figures.values()) {
     dropHandle(room, f);
     bindFigureNeeds(room, f.id, null);
   }
+  for (const { bodyId, scene } of memory.lost) room.state.scenes.get(scene)?.bodies.delete(bodyId);
   memory.figures.clear();
   memory.byHandle.clear();
+  memory.lost = [];
+  memory.lastLosses = 0;
   memory.spawned = false;
   memory.seq = 0;
 }

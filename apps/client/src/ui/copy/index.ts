@@ -11,6 +11,7 @@ export { CUTSCENE_COPY, cutsceneLine } from './cutscenes';
 export { SETTINGS_COPY } from './settings';
 export { ADMIN_COPY } from './admin';
 export { MENU_COPY } from './menu';
+export { TOWNSFOLK_COPY, figureName, townsfolkLostLine } from './townsfolk';
 
 /** Replaces `{key}` placeholders; a missing key is left as is so the gap shows in a test. */
 export function fill(line: string, values: Record<string, string | number>): string {
