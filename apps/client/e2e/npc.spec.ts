@@ -3,6 +3,7 @@ import { TILE_PX } from '@wdi/shared';
 import { expect, test, type Page } from '@playwright/test';
 import { type Swarm, runSwarm } from '../../../tools/bots/swarm';
 import { E2E_SERVER_URL } from './env';
+import { skipOpening } from './helpers';
 
 // NPC fill (M3c, GDD 3.12) end to end against the real server. The host adds NPC seats in the lobby or
 // lets Start fill the party; nothing on the page marks a seat as an NPC, so the specs read names from the
@@ -167,6 +168,7 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
     await page.getByTestId('confirm-start').click();
     await expect(page.getByTestId('role-name')).toHaveText('Killer');
     await page.getByTestId('ready').click();
+    await skipOpening(page);
     await expect(page.getByTestId('hud-clock')).toBeVisible();
     // Park the NPCs on their spawns so the host can find them, and free the Knife; the Knife works from dusk to the
     // end of the night (balance.json `kill.phases`, GDD 3.2), so the clock goes to the night.
@@ -233,6 +235,7 @@ test('Start alone fills the party: four portraits in the meeting', async ({ brow
     await page.getByTestId('confirm-start').click();
     await expect(page.getByTestId('role-name')).toHaveText('Killer');
     await page.getByTestId('ready').click();
+    await skipOpening(page);
     await expect(page.getByTestId('hud-clock')).toBeVisible();
     w.swarm.rooms[0]!.send('debug.npc', { walk: false });
     w.swarm.rooms[0]!.send('debug.clock', { phase: 'night', clearCooldowns: true });

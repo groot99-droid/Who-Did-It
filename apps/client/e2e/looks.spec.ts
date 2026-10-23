@@ -14,7 +14,7 @@ async function startFour(page: Page): Promise<void> {
   await expect(page.getByTestId('party-code')).toBeVisible();
   for (let i = 0; i < 3; i++) await page.getByTestId('add-npc').click();
   await page.getByRole('button', { name: /start/i }).first().click();
-  const confirm = page.getByRole('button', { name: /^start$/i });
+  const confirm = page.getByTestId('confirm-start');
   if (await confirm.isVisible().catch(() => false)) await confirm.click();
   await expect(page.getByTestId('rolecard')).toBeVisible();
 }
