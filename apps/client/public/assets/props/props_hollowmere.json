@@ -10,7 +10,7 @@
    "scale": 1,
    "frames": [
     {
-     "filename": "prop_almsBox",
+     "filename": "prop_alms_box",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -160,7 +160,7 @@
      }
     },
     {
-     "filename": "prop_blanketChest",
+     "filename": "prop_blanket_chest",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -210,7 +210,7 @@
      }
     },
     {
-     "filename": "prop_bookcaseB",
+     "filename": "prop_bookcase_b",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -235,7 +235,7 @@
      }
     },
     {
-     "filename": "prop_bootRack",
+     "filename": "prop_boot_rack",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -385,7 +385,7 @@
      }
     },
     {
-     "filename": "prop_candleStand",
+     "filename": "prop_candle_stand",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -535,7 +535,7 @@
      }
     },
     {
-     "filename": "prop_coatStand",
+     "filename": "prop_coat_stand",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -735,7 +735,7 @@
      }
     },
     {
-     "filename": "prop_diningTable#0_0",
+     "filename": "prop_dining_table#0_0",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -760,7 +760,7 @@
      }
     },
     {
-     "filename": "prop_diningTable#1_0",
+     "filename": "prop_dining_table#1_0",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -785,7 +785,7 @@
      }
     },
     {
-     "filename": "prop_diningTable#2_0",
+     "filename": "prop_dining_table#2_0",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -810,7 +810,7 @@
      }
     },
     {
-     "filename": "prop_diningTable#3_0",
+     "filename": "prop_dining_table#3_0",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -935,7 +935,7 @@
      }
     },
     {
-     "filename": "prop_drapedWindow",
+     "filename": "prop_draped_window",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -960,7 +960,7 @@
      }
     },
     {
-     "filename": "prop_dressingTable",
+     "filename": "prop_dressing_table",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -1035,7 +1035,7 @@
      }
     },
     {
-     "filename": "prop_fireplaceE",
+     "filename": "prop_fireplace_e",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -1110,7 +1110,7 @@
      }
     },
     {
-     "filename": "prop_flowerStand",
+     "filename": "prop_flower_stand",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -1335,7 +1335,7 @@
      }
     },
     {
-     "filename": "prop_hymnBoard",
+     "filename": "prop_hymn_board",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -1385,7 +1385,7 @@
      }
     },
     {
-     "filename": "prop_lampTable",
+     "filename": "prop_lamp_table",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -1485,7 +1485,7 @@
      }
     },
     {
-     "filename": "prop_linenPress",
+     "filename": "prop_linen_press",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -2310,7 +2310,7 @@
      }
     },
     {
-     "filename": "prop_stainedGlass",
+     "filename": "prop_stained_glass",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -2335,7 +2335,7 @@
      }
     },
     {
-     "filename": "prop_stainedGlassE",
+     "filename": "prop_stained_glass_e",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -2360,7 +2360,7 @@
      }
     },
     {
-     "filename": "prop_tinCabinet",
+     "filename": "prop_tin_cabinet",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -2385,7 +2385,7 @@
      }
     },
     {
-     "filename": "prop_tinCabinetB",
+     "filename": "prop_tin_cabinet_b",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -2435,7 +2435,7 @@
      }
     },
     {
-     "filename": "prop_vanePortrait",
+     "filename": "prop_vane_portrait",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -2460,7 +2460,7 @@
      }
     },
     {
-     "filename": "prop_votiveRack",
+     "filename": "prop_votive_rack",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {

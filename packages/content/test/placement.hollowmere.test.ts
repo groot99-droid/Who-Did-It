@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { maps, scenes, tasks, type SceneId } from '../src/index.js';
-import { type PlacementRules, placementProblems } from './placement.js';
+import { type PlacementRules, placementProblems, propKey } from './placement.js';
 
 // Round 8 (8J, docs/round8/art.md 4.1): perfect object placement in every Hollowmere scene. The classes say what
 // each prop's art needs (tools/blender/env/hollowmere_props.py, shared_props.py and the sliced props of
@@ -52,38 +52,38 @@ const RULES: PlacementRules = {
     clamp: 'free',
     pump_beam: 'free',
     // Round 8 (8J): St Brannock's.
-    stainedGlass: 'hung',
-    stainedGlassE: 'hungEast',
-    hymnBoard: 'hung',
+    stained_glass: 'hung',
+    stained_glass_e: 'hungEast',
+    hymn_board: 'hung',
     memorial: 'hung',
     lectern: 'front',
     pulpit: 'front',
     altar: 'front',
     pew: 'free',
-    candleStand: 'free',
-    votiveRack: 'free',
-    almsBox: 'free',
-    flowerStand: 'free',
+    candle_stand: 'free',
+    votive_rack: 'free',
+    alms_box: 'free',
+    flower_stand: 'free',
     font: 'free',
     // Vane Manor.
     bookcase: 'front',
-    bookcaseB: 'front',
-    tinCabinet: 'front',
-    tinCabinetB: 'front',
-    fireplaceE: 'hungEast',
-    vanePortrait: 'hung',
-    drapedWindow: 'hung',
+    bookcase_b: 'front',
+    tin_cabinet: 'front',
+    tin_cabinet_b: 'front',
+    fireplace_e: 'hungEast',
+    vane_portrait: 'hung',
+    draped_window: 'hung',
     sideboard: 'front',
-    dressingTable: 'front',
+    dressing_table: 'front',
     washstand: 'front',
-    linenPress: 'front',
-    diningTable: 'free',
+    linen_press: 'front',
+    dining_table: 'free',
     armchair: 'free',
-    lampTable: 'free',
-    bootRack: 'free',
-    coatStand: 'free',
+    lamp_table: 'free',
+    boot_rack: 'free',
+    coat_stand: 'free',
     nightstand: 'free',
-    blanketChest: 'free',
+    blanket_chest: 'free',
     wakeTable: 'surface',
     plate: 'overlay',
     crepe: 'doorOverlay',
@@ -131,25 +131,25 @@ const RULES: PlacementRules = {
         'lamp',
         'ledger',
         'bench',
-        'candleStand',
-        'votiveRack',
+        'candle_stand',
+        'votive_rack',
         'altar',
-        'lampTable',
-        'diningTable',
+        'lamp_table',
+        'dining_table',
         'nightstand',
       ],
     },
     lantern: { props: ['lanternPost', 'drowned_lantern'] },
-    fire: { props: ['oven', 'brickOven', 'fireplaceE'] },
+    fire: { props: ['oven', 'brickOven', 'fireplace_e'] },
     torch: { props: [], wall: true },
     window: {
-      props: ['window', 'stainedGlass', 'stainedGlassE', 'drapedWindow'],
+      props: ['window', 'stained_glass', 'stained_glass_e', 'draped_window'],
       wall: true,
       building: true,
     },
     // Moonlight falls anywhere out of doors; indoors it comes through a window.
     moon: {
-      props: ['window', 'stainedGlass', 'stainedGlassE', 'drapedWindow'],
+      props: ['window', 'stained_glass', 'stained_glass_e', 'draped_window'],
       wall: true,
       building: true,
       outdoors: true,
@@ -249,6 +249,14 @@ describe('Hollowmere placement (art.md 4.1)', () => {
 });
 
 describe('the placement check', () => {
+  it('keys dressing by id tail, then by the tail without _<n> (SPRITES 3)', () => {
+    const known = (k: string) => k in RULES.props;
+    expect(propKey({ id: 'ch.pew_3', kind: 'dressing' }, known)).toBe('pew');
+    expect(propKey({ id: 'ch.stained_glass_e_1', kind: 'dressing' }, known)).toBe('stained_glass_e');
+    expect(propKey({ id: 'ch.lectern', kind: 'dressing' }, known)).toBe('lectern');
+    expect(propKey({ id: 'ch.pew_3', kind: 'pew' }, known)).toBe('pew');
+  });
+
   const copy = (id: SceneId) => structuredClone(scenes[id]);
   const check = (s: ReturnType<typeof copy>) => placementProblems(s, RULES, new Set());
 
