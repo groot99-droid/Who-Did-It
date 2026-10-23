@@ -122,7 +122,8 @@
       "x": 26,
       "y": 26,
       "footprint": { "x": 26, "y": 26, "w": 2, "h": 2 }
-    }
+    },
+    { "id": "bw.hq_lodge", "kind": "hq", "x": 49, "y": 21 }
   ],
   "gates": [],
   "paths": [

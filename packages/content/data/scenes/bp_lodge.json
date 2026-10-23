@@ -106,7 +106,10 @@
       "y": 9,
       "footprint": { "x": 14, "y": 9, "w": 7, "h": 2 }
     },
-    { "id": "bl.pegs", "kind": "decor", "x": 11, "y": 0 }
+    { "id": "bl.pegs", "kind": "decor", "x": 11, "y": 0 },
+    { "id": "bl.shop_black_market", "kind": "blackMarket", "x": 13, "y": 3 },
+    { "id": "bl.hq_ovens", "kind": "hq", "x": 1, "y": 4 },
+    { "id": "bl.hq_infirmary", "kind": "hq", "x": 22, "y": 7 }
   ],
   "gates": [],
   "paths": [],

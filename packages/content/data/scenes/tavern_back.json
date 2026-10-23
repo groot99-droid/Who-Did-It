@@ -66,7 +66,10 @@
       "childOnly": false
     }
   ],
-  "props": [{ "id": "tk.oil_barrel", "kind": "taskSource", "x": 0, "y": 7, "item": "oil" }],
+  "props": [
+    { "id": "tk.oil_barrel", "kind": "taskSource", "x": 0, "y": 7, "item": "oil" },
+    { "id": "tk.shop_black_market", "kind": "blackMarket", "x": 10, "y": 3 }
+  ],
   "gates": [],
   "paths": [],
   "lights": [{ "id": "tk.lt_lamp", "kind": "lamp", "x": 6, "y": 4, "radiusTiles": 2 }],

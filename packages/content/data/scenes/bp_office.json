@@ -66,7 +66,8 @@
       "y": 6,
       "footprint": { "x": 11, "y": 6, "w": 2, "h": 2 }
     },
-    { "id": "bo.telephone", "kind": "decor", "x": 10, "y": 0 }
+    { "id": "bo.telephone", "kind": "decor", "x": 10, "y": 0 },
+    { "id": "bo.hq_office", "kind": "hq", "x": 1, "y": 1 }
   ],
   "gates": [],
   "paths": [],

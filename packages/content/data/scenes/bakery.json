@@ -133,7 +133,8 @@
     { "id": "bk.ledger", "kind": "ledger", "x": 15, "y": 7 },
     { "id": "bk.oven", "kind": "oven", "x": 2, "y": 2 },
     { "id": "bk.flour_sacks", "kind": "taskSource", "x": 0, "y": 8, "item": "flour" },
-    { "id": "bk.basin", "kind": "basin", "x": 17, "y": 5 }
+    { "id": "bk.basin", "kind": "basin", "x": 17, "y": 5 },
+    { "id": "bk.hq_ovens", "kind": "hq", "x": 1, "y": 3 }
   ],
   "gates": [],
   "paths": [],

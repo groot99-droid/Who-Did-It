@@ -25,6 +25,8 @@ import vendettasJson from '../data/vendettas.json' with { type: 'json' };
 import evolutionsJson from '../data/evolutions.json' with { type: 'json' };
 import lawsJson from '../data/laws.json' with { type: 'json' };
 import eventsJson from '../data/events.json' with { type: 'json' };
+// Round 8 (GDD 3.23): Book IV's numbers.
+import economyJson from '../data/economy.json' with { type: 'json' };
 import overworldJson from '../data/scenes/overworld.json' with { type: 'json' };
 import tavernBarJson from '../data/scenes/tavern_bar.json' with { type: 'json' };
 import tavernBackJson from '../data/scenes/tavern_back.json' with { type: 'json' };
@@ -70,6 +72,7 @@ import { CutscenesFile } from './schemas/cutscenes.js';
 import { MusicFile } from './schemas/music.js';
 import { MinigamesFile, MobsFile, QuestsFile, RecipesFile, ResourcesFile } from './schemas/m5b.js';
 import { EventsFile, EvolutionsFile, LawsFile, VendettasFile } from './schemas/bible.js';
+import { EconomyFile } from './schemas/economy.js';
 import { SCENE_IDS, Scene, type SceneId } from './schemas/scene.js';
 import { StyleFile } from './schemas/style.js';
 import { TasksFile } from './schemas/tasks.js';
@@ -96,6 +99,7 @@ export * from './schemas/cutscenes.js';
 export * from './schemas/music.js';
 export * from './schemas/m5b.js';
 export * from './schemas/bible.js';
+export * from './schemas/economy.js';
 export { validateContent, type Content } from './validate.js';
 export { navs, NavFile } from './nav.js';
 
@@ -173,6 +177,7 @@ export function parseContent(raw: {
   evolutions: unknown;
   laws: unknown;
   events: unknown;
+  economy: unknown;
 }): Omit<Content, 'scenes' | 'maps'> {
   return {
     palette: PaletteFile.parse(raw.palette),
@@ -198,6 +203,7 @@ export function parseContent(raw: {
     evolutions: EvolutionsFile.parse(raw.evolutions),
     laws: LawsFile.parse(raw.laws),
     events: EventsFile.parse(raw.events),
+    economy: EconomyFile.parse(raw.economy),
   };
 }
 
@@ -226,6 +232,7 @@ export const content: Content = {
     evolutions: evolutionsJson,
     laws: lawsJson,
     events: eventsJson,
+    economy: economyJson,
   }),
   scenes: parseScenes(),
   maps: parseMaps(),
@@ -258,6 +265,7 @@ export const {
   evolutions,
   laws,
   events,
+  economy,
 } = content;
 
 function countKey(playerCount: number): `${4 | 5 | 6 | 7 | 8 | 9 | 10}` {

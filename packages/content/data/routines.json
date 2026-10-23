@@ -35,7 +35,12 @@
     "wakeTable",
     "plate",
     "deadLoaf",
-    "ledger"
+    "ledger",
+    "altar",
+    "mailbag",
+    "rack",
+    "hq",
+    "blackMarket"
   ],
   "lightKinds": ["lanternPost"]
 }

@@ -47,6 +47,12 @@ const TABLE: Record<string, 'work' | 'social' | 'rest' | 'ignore'> = {
   plate: 'ignore',
   deadLoaf: 'ignore',
   ledger: 'ignore',
+  // Round 8 (GDD 3.23, 8D): the economy statics are no NPC station.
+  altar: 'ignore',
+  mailbag: 'ignore',
+  rack: 'ignore',
+  hq: 'ignore',
+  blackMarket: 'ignore',
 };
 
 function classOf(kind: string): string | undefined {

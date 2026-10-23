@@ -21,6 +21,8 @@ import type { TraitsFile } from './schemas/traits.js';
 import { MAP_IDS, type MapFile, type MapId } from './schemas/maps.js';
 import { checkMaps, checkSceneWorld } from './validateWorld.js';
 import { checkVendettas } from './validateVendettas.js';
+import type { EconomyFile } from './schemas/economy.js';
+import { checkEconomy } from './validateEconomy.js';
 
 export interface Content {
   palette: PaletteFile;
@@ -49,6 +51,8 @@ export interface Content {
   evolutions: EvolutionsFile;
   laws: LawsFile;
   events: EventsFile;
+  /** Round 8 (GDD 3.23). */
+  economy: EconomyFile;
 }
 
 const maxProfile = (a: Profile, b: Profile): Profile => (PROFILE_RANK[a] >= PROFILE_RANK[b] ? a : b);
@@ -236,6 +240,8 @@ export function validateContent(c: Content): string[] {
   checkM5b(c, err);
   // Round 7 (GDD 3.20): the vendettas' cards, maps and kinds.
   checkVendettas(c, err);
+  // Round 8 (GDD 3.23): the economy's props, items, looks and curfew scenes.
+  checkEconomy(c, err);
 
   return errors;
 }
