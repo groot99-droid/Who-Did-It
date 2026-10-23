@@ -614,6 +614,11 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
 under its routine (3.12): the Vicar's scene, a task target's scene, the loaded strongbox's hall or its target's
 scene, through `vendettaGoalFor`. It does nothing a human could not do in the same place.
 
+**Invariants (7H).** Four checks join the registry of 3.19 and run wherever it runs (`pnpm auto`, the soak, the
+admin room): `vendettaOnce` (every step is for the seat holding that vendetta, and each holder's consequence fires
+at most once), `contractQuest` (a `contract` quest sits only on the Hitman), `strongboxOnce` (one Strongbox in all
+inventories at most) and `vendettaPublic` (no `vendetta.*` event carries a seat, nor a seat id in its data).
+
 **The Vicar's memorial (7I).** Everything public follows the look (3.17). When a seat whose public look is the
 Vicar's dies by the Knife, whether it was dealt the Vicar or wears that look as a cover, the next meeting's reveal
 plays a memorial to every seat: the Vicar's film (`memorial_vicar`) under one title caption, skippable like every

@@ -5,6 +5,7 @@ import { onArriveContract, onDeathContract, onKillContract } from './contract';
 import { onDeliveryHeist, runHeist } from './heist';
 import { runSabotage } from './sabotage';
 import { privateVendetta, vendettaHolders, vendettaOf } from './state';
+import './invariants';
 
 /**
  * The vendettas' Step stage (round 7, GDD 3.20), Session 7H: the conditions each holder's vendetta watches, once per
