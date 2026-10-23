@@ -3,6 +3,7 @@ import metrics from '@wdi/content/data/metrics.json';
 import palette from '@wdi/content/data/palette.json';
 import { toScreen } from '@wdi/shared/iso';
 import { shade, tokenColour } from './greyboxColours';
+import { drawScale } from './texels';
 import { TILE_PX } from '@wdi/shared/constants';
 import type { Rect } from './iso';
 import {
@@ -117,7 +118,7 @@ export class StaticView {
     if (tex?.has(def.frame)) {
       const sprite = s.add
         .sprite(at.x, at.y, def.atlas, def.frame)
-        .setScale(metrics.iso.artScale)
+        .setScale(drawScale(def.atlas, metrics.iso.artScale))
         .setDepth(depth);
       // Frames carry their own pivot (the ground point, SPRITES 10.5); a frame without one stands on its bottom edge.
       if (!tex.get(def.frame).customPivot) sprite.setOrigin(0.5, 1);

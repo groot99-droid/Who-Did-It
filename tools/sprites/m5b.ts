@@ -271,6 +271,13 @@ export const M5B_KEYS: readonly string[] = m5bManifest('nearest').map((e) => e.k
 
 const ASSETS = join(import.meta.dirname, '../../apps/client/public/assets');
 
+/**
+ * The styles the M5b build draws for: those whose manifest ships (the 8-bit root always does). A style joins once
+ * its manifest exists; until then its M5b keys fall back to the 8-bit entries (A80), as HD's do before its renders.
+ */
+export const m5bStyles = (): ArtStyle[] =>
+  artStyles().filter((s) => existsSync(join(ASSETS, s.root, 'manifest.json')));
+
 /** Replace the M5b block of a style's manifest, appended at the end. */
 export function writeM5bManifest(style: ArtStyle): void {
   const file = join(ASSETS, style.root, 'manifest.json');
@@ -281,7 +288,7 @@ export function writeM5bManifest(style: ArtStyle): void {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  for (const style of artStyles()) {
+  for (const style of m5bStyles()) {
     const dir = join(ASSETS, style.root, 'm5b');
     for (const [name, bytes] of await m5bFiles(style)) {
       mkdirSync(dirname(join(dir, name)), { recursive: true });

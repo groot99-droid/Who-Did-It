@@ -4,6 +4,7 @@ import traits from '@wdi/content/data/traits.json';
 import type { Direction } from '@wdi/shared/direction';
 import { isoDepth, toScreen } from '@wdi/shared/iso';
 import { BIAS } from './iso';
+import { drawScale } from './texels';
 import { type Clip, clipFor, dirFromYaw } from './poses';
 
 export { dirFromYaw };
@@ -78,7 +79,10 @@ export class PlayerView {
         strokeThickness: 4,
       })
       .setOrigin(0.5, 1);
-    const art = scene.add.container(0, 0, [this.body, this.scarf, this.hat, this.blood]).setScale(scale);
+    // The art alone divides by the body texture's texel factor (HD, A164); the plate and tick keep world px.
+    const art = scene.add
+      .container(0, 0, [this.body, this.scarf, this.hat, this.blood])
+      .setScale(scale * drawScale(bodyTexture));
     // The greybox mark of an interact pose a look has no clip for: a small teal tick above the head.
     this.tick = scene.add
       .rectangle(0, -Math.round(120 * scale), 10, 10, Number.parseInt(palette.colors.teal.slice(1), 16))

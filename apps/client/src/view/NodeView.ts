@@ -3,6 +3,7 @@ import metrics from '@wdi/content/data/metrics.json';
 import { toScreen } from '@wdi/shared/iso';
 import type { NodeSnap } from '../net/world';
 import { BIAS, depthAt } from './iso';
+import { drawScale } from './texels';
 import { nodeFrame } from './m5bFrames';
 
 const ATLAS = 'nodes';
@@ -58,7 +59,7 @@ export class NodeView {
     if (this.frame(key)) {
       const sprite = this.scene.add
         .sprite(at.x, at.y, ATLAS, key)
-        .setScale(metrics.iso.artScale)
+        .setScale(drawScale(ATLAS, metrics.iso.artScale))
         .setDepth(depth);
       return { obj: sprite, art: true, resource: n.resource, active: n.active };
     }

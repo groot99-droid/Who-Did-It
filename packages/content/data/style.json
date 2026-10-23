@@ -53,7 +53,7 @@
   "pixelFinish": { "enabled": { "main": true }, "offWebpQuality": 90 },
   "artStyles": {
     "default": "8bit",
-    "reserved": ["hd"],
+    "reserved": [],
     "styles": [
       { "id": "8bit", "pixelFinish": true, "filter": "nearest", "drawScale": 2, "root": "" },
       {
@@ -62,6 +62,14 @@
         "filter": "linear",
         "drawScale": 2,
         "root": "lowpoly/"
+      },
+      {
+        "id": "hd",
+        "pixelFinish": false,
+        "filter": "linear",
+        "drawScale": 2,
+        "root": "hd/",
+        "requires": { "screenHeightPx": 900, "deviceMemoryGb": 4, "texturePx": 4096 }
       }
     ]
   },

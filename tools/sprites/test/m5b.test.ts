@@ -20,6 +20,7 @@ import {
   giverFrame,
   giverFrameList,
   m5bFiles,
+  m5bStyles,
   mobAnim,
   mobFrame,
   mobFrameList,
@@ -27,7 +28,6 @@ import {
   pageOf,
   snakeOf,
 } from '../m5b.ts';
-import { artStyles } from '../palette.ts';
 
 const ASSETS = join(import.meta.dirname, '../../../apps/client/public/assets');
 const DATA = join(import.meta.dirname, '../../../packages/content/data');
@@ -105,7 +105,8 @@ describe('M5b art (SPRITES 12)', () => {
     expect(WANT.givers).toHaveLength(GIVER_IDS.length * DIRECTIONS.length * GIVER_IDLE.frames);
   });
 
-  const roots = [...artStyles().map((s) => s.root), 'placeholder/'];
+  // The styles whose manifest ships; HD joins with its renders (A164).
+  const roots = [...m5bStyles().map((s) => s.root), 'placeholder/'];
   for (const atlas of ['nodes', 'tools', 'mobs', 'givers'] as const) {
     const base = pivots(json<Atlas>(join(ASSETS, 'm5b', `${atlas}.json`)));
     for (const root of roots) {
@@ -169,7 +170,7 @@ describe('M5b art (SPRITES 12)', () => {
     );
   });
 
-  for (const style of artStyles()) {
+  for (const style of m5bStyles()) {
     it(`ships the ${style.id} files the build writes today (run \`pnpm --filter @wdi/sprites m5b\`)`, async () => {
       for (const [name, bytes] of await m5bFiles(style))
         expect(readFileSync(join(ASSETS, style.root, 'm5b', name)).equals(bytes), name).toBe(true);
