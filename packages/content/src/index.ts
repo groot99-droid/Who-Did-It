@@ -27,6 +27,7 @@ import relationsJson from '../data/relations.json' with { type: 'json' };
 import evolutionsJson from '../data/evolutions.json' with { type: 'json' };
 import lawsJson from '../data/laws.json' with { type: 'json' };
 import eventsJson from '../data/events.json' with { type: 'json' };
+import economyJson from '../data/economy.json' with { type: 'json' };
 import overworldJson from '../data/scenes/overworld.json' with { type: 'json' };
 import tavernBarJson from '../data/scenes/tavern_bar.json' with { type: 'json' };
 import tavernBackJson from '../data/scenes/tavern_back.json' with { type: 'json' };
@@ -72,6 +73,7 @@ import { CutscenesFile } from './schemas/cutscenes.js';
 import { MusicFile } from './schemas/music.js';
 import { MinigamesFile, MobsFile, QuestsFile, RecipesFile, ResourcesFile } from './schemas/m5b.js';
 import { EventsFile, EvolutionsFile, LawsFile, VendettasFile } from './schemas/bible.js';
+import { EconomyFile } from './schemas/economy.js';
 import { RelationsFile } from './schemas/relations.js';
 import { SCENE_IDS, Scene, type SceneId } from './schemas/scene.js';
 import { StyleFile } from './schemas/style.js';
@@ -99,6 +101,7 @@ export * from './schemas/cutscenes.js';
 export * from './schemas/music.js';
 export * from './schemas/m5b.js';
 export * from './schemas/bible.js';
+export * from './schemas/economy.js';
 export * from './schemas/relations.js';
 export { validateContent, type Content } from './validate.js';
 export { navs, NavFile } from './nav.js';
@@ -177,6 +180,7 @@ export function parseContent(raw: {
   evolutions: unknown;
   laws: unknown;
   events: unknown;
+  economy: unknown;
   relations: unknown;
 }): Omit<Content, 'scenes' | 'maps'> {
   return {
@@ -203,6 +207,7 @@ export function parseContent(raw: {
     evolutions: EvolutionsFile.parse(raw.evolutions),
     laws: LawsFile.parse(raw.laws),
     events: EventsFile.parse(raw.events),
+    economy: EconomyFile.parse(raw.economy),
     relations: RelationsFile.parse(raw.relations),
   };
 }
@@ -232,6 +237,7 @@ export const content: Content = {
     evolutions: evolutionsJson,
     laws: lawsJson,
     events: eventsJson,
+    economy: economyJson,
     relations: relationsJson,
   }),
   scenes: parseScenes(),
@@ -265,6 +271,7 @@ export const {
   evolutions,
   laws,
   events,
+  economy,
   relations,
 } = content;
 

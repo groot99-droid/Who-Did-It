@@ -720,6 +720,17 @@ Round 8 (A134, A135; `docs/round8/economy.md`): the Bible's Book IV on today's m
 Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `economy.json` and `balance.json`
 `economy`.
 
+**Scrip** (8C, A138). Every seat carries a purse and keeps a bank balance, and only the seat sees either number.
+- **The stake.** At Start each seat draws its stake on a stream of its own. It is paid the moment the looks are
+  public (before grace), from the range of the tier its **public look** names in `economy.json` `stakes`, never from
+  its card, so a seat wearing a cover carries the purse of the look it wears. A seat with no look takes the default
+  tier.
+- **The band.** Others never see the number. Inspect shows "a light purse" below `economy.heavyPurse` and "a heavy
+  purse" from it. Every stake tier lies wholly on one side of that line, so at Start the band says the look's tier
+  and nothing more.
+- **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice. It leaves only as a
+  purchase, rent, a fine, a donation or an HQ tier. Theft, drops, pickups and the bank only move it.
+
 ### 3.24 Moods, mugging and townsfolk
 
 Round 8 (A134, A135; `docs/round8/townsfolk.md`).
