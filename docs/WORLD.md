@@ -227,13 +227,13 @@ Keep every scene, portal, spawn and clue id; 1 tile = 1 m. Manor floors and the 
 
 ### 4.10 Blackpine
 
-**Blackpine** is the Vane Timber and Tin Company's camp in the pine valley above Hollowmere, the same autumn of 1931. Log bunkhouses and a water-driven sawmill stand at the foot of the hill the company's tin workings run into.
+**BlackPine** is the Harrow Timber & Coal Syndicate's camp in the pine valley above HollowMere, the same December of 1893 (`docs/round8/canon.md`, A201). It was Vane's timber-and-tin camp until the tin ran out; Harrow bought it and found coal under the old workings. The deed is Harrow's and the name on the mill is still Vane's. Log bunkhouses and a water-driven sawmill stand at the foot of the hill the old tin workings run into, and the motto over the camp reads PRODUCTION IS OBLIGATION.
 
-The storm that shut the coast road also took the trestle over the Blackwater, the river along the camp's south edge. The telephone in the company office went dead the night the foreman read the telegram from Hollowmere: Lord Vane is dead, and the camp, the mill and the mine go to "whoever remains when the last lantern goes out".
+The storm that shut the coach road also took the trestle over the Blackwater, the river along the camp's south edge, so no Payroll Train reaches the camp this week, and the shift bell stands in for the Shift-Whistle. The telephone in the company office is Harrow's new line, which rarely works; it was dead the night the foreman read the telegram from HollowMere: Lord Vane is dead, and his will names "whoever remains when the last lantern goes out". The camp is not his to leave, but his name is on the mill.
 
 The tone is Hollowmere's, cooler and wetter: pine-black woods, sawdust and woodsmoke, lantern light on wet logs, and the adit breathing cold air.
 
-The landmark NPCs are signage and ledger flavour in V1, and quest givers in M5b: Foreman Hask at the office, Ada Kerrow at the forge, and the collier at the kilns. One bell stands on the yard: the shift bell, which is the Emergency Bell and the Final Night object.
+The landmark NPCs are signage and ledger flavour in V1, and quest givers in M5b: Foreman Hask on the yard, Ada Kerrow at the forge, and the collier at the kilns. One bell stands on the yard: the shift bell, which is the Emergency Bell and the Final Night object.
 
 ```
  N ┌──────────────── cliff: the hill ─────────────────[ADIT]─────────────┐
