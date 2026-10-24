@@ -1,7 +1,7 @@
 {
   "id": "blackpine",
   "name": "Blackpine",
-  "blurb": "Storm-cut logging camp: bunkhouse, sawmill, pine woods and the company's tin workings under the hill.",
+  "blurb": "Storm-cut timber and coal camp: bunkhouse, Vane's sawmill, pine woods and the old tin workings under the hill.",
   "modes": ["main"],
   "theme": "timber",
   "scenes": [
