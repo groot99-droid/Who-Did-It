@@ -1,10 +1,12 @@
-"""A rough PBR + HDRI look for the HD style (docs/round8/art.md 5 as written; the owner's look sheet, A164).
+"""The PBR + HDRI finish of the HD style for buildings and the kit (docs/round8/art.md 5; the owner's pick, A164).
 
 Set `WDI_HD_PBR=1` with `--style hd --textured` and every render swaps the HD toon materials for a Principled
 BSDF: a role material reads its 2k diffuse, roughness and normal maps untoned, a flat toon material becomes its
-mid colour, and a Poly Haven sky HDRI fills the world (the A9 key light stays, as art.md 5 asks). The outline,
-the shadow catcher and the unlit materials stay. Nothing here is a shipped path: it exists so the owner can see
-the art.md 5 line beside the toon HD of A164 and choose. Needs bpy and the HDRI in the cache (`HDRI_URL`).
+mid colour, and the Poly Haven sky of `roles.HDRIS` fills the world (EEVEE world light casts no shadow, so the
+A9 key still decides every shadow's direction, as art.md 5 asks). The outline, the shadow catcher and the unlit
+materials stay. The finish is per render process, so it is per atlas: `bld_*` and `iso_kit_*` ship in it,
+figures, props, clues, ground and effects in the toon HD of `hd.py`. Needs bpy and the HDRI in the cache
+(`fetch.py --style hd` fetches it with the 2k maps).
 """
 
 from __future__ import annotations
@@ -22,9 +24,6 @@ import rig_common as rc  # noqa: E402
 from materials import nodes as mn  # noqa: E402
 from materials import roles  # noqa: E402
 
-HDRI = "kloofendal_48d_partly_cloudy_puresky_1k.hdr"
-HDRI_URL = f"https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/{HDRI}"
-HDRI_DIR = os.path.join(os.path.dirname(roles.CACHE_DIR), "hdri")
 HDRI_STRENGTH = 0.6
 BUMP_STRENGTH = 0.6
 FLAT_ROUGHNESS = 0.65
@@ -34,9 +33,16 @@ _MATS: dict[str, bpy.types.Material] = {}
 
 def apply(scene: bpy.types.Scene) -> None:
     """The HDRI world now, the material swap before every render."""
-    path = os.path.join(HDRI_DIR, HDRI)
+    sky(scene)
+    batch_render.BEFORE_RENDER.append(lambda s: convert(s.objects))
+
+
+def sky(scene: bpy.types.Scene) -> None:
+    """The locked HDRI as the world's background at `HDRI_STRENGTH`. On its own (`WDI_HD_SKY=1`) it puts the same
+    ambient under the toon HD figures as under the PBR buildings, their bands kept: the A164 ambient test."""
+    path = roles.hdri_path()
     if not os.path.exists(path):
-        raise FileNotFoundError(f"{path}: fetch {HDRI_URL} into {HDRI_DIR}")
+        raise FileNotFoundError(f"{path}: run `python3 tools/blender/materials/fetch.py --style hd`")
     world = scene.world
     nodes, links = world.node_tree.nodes, world.node_tree.links
     bg = next(n for n in nodes if n.type == "BACKGROUND")
@@ -44,7 +50,6 @@ def apply(scene: bpy.types.Scene) -> None:
     env.image = bpy.data.images.load(path, check_existing=True)
     links.new(env.outputs["Color"], bg.inputs["Color"])
     bg.inputs["Strength"].default_value = HDRI_STRENGTH
-    batch_render.BEFORE_RENDER.append(lambda s: convert(s.objects))
 
 
 def convert(objects) -> int:
