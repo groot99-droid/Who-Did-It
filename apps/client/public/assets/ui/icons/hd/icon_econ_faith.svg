@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Faith: a votive candle burning. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g1" data-flat="#D9D2C2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <radialGradient id="g2" data-flat="#FFB457" gradientUnits="userSpaceOnUse" cx="24" cy="14" r="10"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#FFB457"/></radialGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<circle class="hd" cx="24" cy="15" r="11" fill="#FFD48A" opacity="0.35"/>
+<path d="M24,3 C33,11 32,21 24,22 C16,21 15,11 24,3 Z" fill="url(#g2)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path class="flat" display="none" d="M24,10 C28,14 28,19 24,20 C20,19 20,14 24,10 Z" fill="#FFF1DC"/>
+<line x1="24" y1="22" x2="24" y2="24" stroke="#12141C" stroke-width="2" stroke-linecap="round"/>
+<rect x="16" y="24" width="16" height="14" rx="1.5" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="10" y="38" width="28" height="6" rx="1.5" fill="#A07C36" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>

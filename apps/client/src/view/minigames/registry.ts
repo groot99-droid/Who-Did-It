@@ -4,6 +4,9 @@ import { pourGame } from './pour';
 import { slideGame } from './slide';
 import { stokeGame } from './stoke';
 import { tapGame } from './tap';
+import type { MiniSkin } from './skin';
+
+export { skinOf, type MiniSkin } from './skin';
 
 type Bases = typeof balance.minigames;
 export type MiniKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
@@ -16,6 +19,8 @@ export interface MiniGameHost {
   spec: MiniGameSpec;
   /** Local: the bands come from the server's seed through `bandRng` (`board.ts`). */
   rng: () => number;
+  /** The station it is drawn as; the kind's own when absent. */
+  skin?: MiniSkin | undefined;
   /** The mini-game is done. Calling it twice is harmless. */
   onDone(): void;
   /** The server's board size where it differs from the station's base (`minigames.json` difficulty adds steps). */

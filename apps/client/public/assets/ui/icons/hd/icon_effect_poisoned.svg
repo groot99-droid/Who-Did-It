@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Poisoned: a green skull, its cast dripping from the jaw. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g1" data-flat="#26361F" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3A5A33"/><stop offset="1" stop-color="#26361F"/></linearGradient>
+  <linearGradient id="g2" data-flat="#26361F" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3A5A33"/><stop offset="1" stop-color="#26361F"/></linearGradient>
+  <linearGradient id="g3" data-flat="#5FC266" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A8F09A"/><stop offset="1" stop-color="#5FC266"/></linearGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<path d="M17.3,33 L17.3,39.3 A2.7,2.7 0 1 0 20.7,39.3 L20.7,33 Z" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse class="hd" cx="18.2" cy="38.8" rx="0.8" ry="1.2" fill="#FFF1DC" opacity="0.7"/>
+<path d="M24.1,33 L24.1,42.1 A2.9,2.9 0 1 0 27.9,42.1 L27.9,33 Z" fill="url(#g2)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse class="hd" cx="25.2" cy="41.6" rx="0.8" ry="1.2" fill="#FFF1DC" opacity="0.7"/>
+<path d="M13,21 A11,11 0 1 1 35,21 L34,27 L31,30 L31,34 L17,34 L17,30 L14,27 Z" fill="url(#g3)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path class="flat" display="none" d="M14,27 L17,30 L17,34 L31,34 L31,30 L34,27 L31,27 L17,27 Z" fill="#4F8A4A" />
+<ellipse cx="18.5" cy="20" rx="3.4" ry="3.8" fill="#12141C" />
+<ellipse cx="29.5" cy="20" rx="3.4" ry="3.8" fill="#12141C" />
+<polygon points="24,24 22.2,27.5 25.8,27.5" fill="#12141C" />
+<line x1="20.5" y1="30.5" x2="20.5" y2="34" stroke="#12141C" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="24" y1="30.5" x2="24" y2="34" stroke="#12141C" stroke-width="1.4" stroke-linecap="round"/>
+<line x1="27.5" y1="30.5" x2="27.5" y2="34" stroke="#12141C" stroke-width="1.4" stroke-linecap="round"/>
+<ellipse class="hd" cx="20" cy="13" rx="3" ry="1.6" fill="#FFF1DC" opacity="0.7"/>
+<ellipse cx="37" cy="14" rx="1.6" ry="1.6" fill="#A8F09A" />
+<ellipse cx="40" cy="9.5" rx="1.1" ry="1.1" fill="#A8F09A" />
+</svg>
