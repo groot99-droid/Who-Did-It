@@ -1221,6 +1221,31 @@ Lines are in `apps/client/src/ui/copy/inspect.ts` (`INSPECT_COPY`, `inspectLine(
 | `inspect.hunch.blessing` | They looked at you the way one looks for a blessing. | a warm toast to the inspected seat, a `relations.json` note |
 | `inspect.hunch.pockets` | Their glance went to your pockets. | a warm toast to the inspected seat, a `relations.json` note |
 
+### 14.34 Scrip (8C)
+
+Lines are in `apps/client/src/ui/copy/scrip.ts` (`SCRIP_COPY`, `shopName(id)`). The shop panel (`ui/shop/ShopPanel.ts`)
+opens on `shop.open` after a `shop` hold at a counter (GDD 3.23); it lists what the shop sells and what it wants, one
+item per press, and greys a Buy the purse cannot cover or a Sell with nothing in the pockets. The server decides each
+trade; a refusal is the usual error line. 8H animates the panel by `wdi-anim-panel` and `wdi-anim-list`.
+
+#### 14.34.1 The shop panel
+
+| Key | Text | Where |
+|---|---|---|
+| `prompt.shop` | Hold E: trade at the {shop} | the hold prompt at a counter in reach |
+| `shop.sells` | For sale | the heading of the shop's stock |
+| `shop.buys` | Wanted | the heading of what the shop buys |
+| `shop.none` | Nothing here. | a shop with neither list |
+| `shop.price` | {n} Scrip | each row's price, its ask or its pay |
+| `shop.buy` | Buy | a stock row's button (one item) |
+| `shop.sell` | Sell | a wanted row's button (one item) |
+| `shop.have` | You have {n} | each row: how many the pockets hold |
+| `shop.short` | Not enough Scrip | a stock row the purse cannot cover |
+| `shop.purse` | Your purse: {n} Scrip | under the shop's name |
+| `shop.close` | Close | the panel's close button |
+| `prompt.coins` | Hold E: pick up the coins | the hold prompt at dropped coins in reach (the hold lasts `economy.coinPickupS`) |
+| `shop.<id>` | Bakery, Apothecary, General Store, Market, Gamekeeper's Stall, Lodge Store, Camp Market | the panel's title, by `economy.json` shop id |
+
 ### 14.38 Tasks: the chores panel, the station prompts and the village's work (7M)
 
 Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt at Start gets its screen half in the M5b layer (14.19): nothing here changes the layer's gather, craft or quest behaviour, and `ui/theme/**` is not edited; the new rules live in `ui/match.css`.
