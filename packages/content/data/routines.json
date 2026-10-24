@@ -27,6 +27,7 @@
   },
   "holds": {},
   "ignore": [
+    "dressing",
     "kitChest",
     "teachingClue",
     "keyCache",
@@ -35,7 +36,9 @@
     "wakeTable",
     "plate",
     "deadLoaf",
-    "ledger"
+    "ledger",
+    "counter",
+    "bank"
   ],
   "lightKinds": ["lanternPost"],
   "townsfolk": {
