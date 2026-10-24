@@ -14,6 +14,7 @@ import {
   BREAK_FPS,
   BREAK_FRAMES,
   NODE_STATES,
+  NODE_IDS,
   RESOURCE_IDS,
   TOOL_IDS,
   glowFrame,
@@ -50,7 +51,7 @@ interface Atlas {
 }
 
 const WANT = {
-  nodes: RESOURCE_IDS.flatMap((id) => [
+  nodes: NODE_IDS.flatMap((id) => [
     ...NODE_STATES.map((s) => nodeFrame(id, s)),
     ...Array.from({ length: BREAK_FRAMES }, (_, n) => nodeBreakFrame(id, n)),
   ]).sort(),
@@ -86,6 +87,9 @@ describe('M5b art (SPRITES 12)', () => {
       expect(RESOURCE_IDS, id).toContain(id);
       expect(r.sprite).toBe(`node_${snakeOf(id)}`);
     }
+    // The coins a knockout or a mugging drops are drawn as a node but are Scrip, not a resource (8C, GDD 3.23).
+    expect(NODE_IDS).toContain('coins');
+    expect(Object.keys(resources)).not.toContain('coins');
   });
 
   it('draws a held tool for every recipe of recipes.json', () => {
@@ -147,7 +151,7 @@ describe('M5b art (SPRITES 12)', () => {
       join(ASSETS, 'm5b', 'nodes.anims.json'),
     );
     expect(a.anims.map((x) => [x.key, x.repeat, x.frameRate, x.frames.length])).toEqual(
-      RESOURCE_IDS.map((id) => [nodeBreakAnim(id), 0, BREAK_FPS, BREAK_FRAMES]),
+      NODE_IDS.map((id) => [nodeBreakAnim(id), 0, BREAK_FPS, BREAK_FRAMES]),
     );
     expect(nodeBreakFrame('tinOre', 3)).toBe('node_tin_ore/break/003');
   });

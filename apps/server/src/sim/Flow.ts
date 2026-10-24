@@ -9,6 +9,8 @@ import {
   type WinFaction,
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { dayPartOf } from './mobs/spawn';
+import { reconcileViews } from './Visibility';
 
 /** Shared plumbing of the match flow (phases, meetings, win): room-memory state and small helpers. */
 
@@ -83,7 +85,10 @@ export const isMeetingPhase = (phase: number): boolean => MEETING_PHASES.include
  */
 export function setPhase(room: PartyRoom, phase: number, seconds: number): void {
   const state = room.state;
+  const wasNight = dayPartOf(state.phase) === 'night'; // round 8, 8L
   state.phase = phase;
+  // Round 8, 8L (A190): sight narrows at night in every scene, so the views follow on this tick's patch.
+  if ((dayPartOf(phase) === 'night') !== wasNight) reconcileViews(room); // round 8, 8L
   state.phaseEndsTick = state.tick + secondsToTicks(seconds);
   state.meeting.phase = isMeetingPhase(phase) ? phase : 0;
   state.meeting.endsTick = isMeetingPhase(phase) ? state.phaseEndsTick : 0;

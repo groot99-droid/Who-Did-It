@@ -119,6 +119,8 @@ A knife kill spawns, server-side: the Body; **2 of the 3 trait clues** (seeded c
 
 Wolf kills spawn Fur and Claw Marks (decay 1 cycle), no footprints. Collecting: stand on a clue, hold E 2 s; it enters the Notebook with trait, scene and time. (M3: Footprints and Thread only; the hold is cancelled by moving, releasing, dying or a meeting, and several players may collect the same clue.) The Rag erases 1 clue (3 s, noise 4). Washing needs the Bucket and water (the well or a basin). A Wounded player's drips fade after 20 s; a one-way drop leaves a 90 s footprint trail (height) at the landing. Each scene keeps at most 40 clues; past that the oldest Claimed clue is collected first. Plants are indistinguishable until Inspected. When two different players collect the same physical clue it becomes **Corroborated** and counts as Verified for the suspect set; Townsfolk therefore have a deduction verb.
 
+**Blood is held by the server** (round 8, 8L, A170): a client receives a figure's Blood only while it stands within the Blood clue's range of that figure (`clues.json` `blood.params.visibleTiles`), or when it is a ghost; nobody further away is sent it at all, and the client draws it only within the same range. The killer's own client always knows it is bloody.
+
 **Case Board.** Verified and Corroborated entries are posted automatically; each living player may Present one Claimed entry. The board renders a per-player summary row (fits n/m known traits, Claimed count, last house) rather than raw entries. The server intersects the Verified traits of each body against living players' traits and shows **Suspects: A, B** when the set is 3 or fewer. A suspect's own vote is void and a tie ejects them only when the set is exactly one player and was built from two bodies, or from a Child silhouette plus one Verified trait. Forged entries discredit nobody; they display "Forged: an Accomplice is in play".
 
 ### 3.5 Items and tasks
@@ -150,7 +152,7 @@ Players have 2 HP, regenerating 1 per 90 s; the Knife does 2. At 1 HP you are **
 
 ### 3.7 Stealth, hiding and doors
 
-Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2; noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene, as an avatar under a random handle (3.17); the darkness radius is a client-side mask, drawn as the lighting layer of 3.13; a dark scene uses the night radius in every phase. Since M5b a dark scene's radius and occluders hold on the server (3.15): a living seat there receives another avatar only within its night radius and line of sight, and a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both seeing and being seen; lights start out and are lit by their holder.
+Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2; noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene, as an avatar under a random handle (3.17); the darkness radius is a client-side mask, drawn as the lighting layer of 3.13; a dark scene uses the night radius in every phase. Since M5b a dark scene's radius and occluders hold on the server (3.15): a living seat there receives another avatar only within its night radius and line of sight, and a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both seeing and being seen; lights start out and are lit by their holder. Since round 8 (8L, A190) the same holds in every scene at night and in the Final Night: by day, at dusk and at dawn an ordinary scene is still sent whole.
 
 **Hiding spots** (wardrobe, hay pile, under bed, barrel; crawlspaces for the Child) hold one player; **body spots** (cellar dump, crypt niche, hay pile) are separate objects. Entering takes 1 s, noise 2; the hidden player sees a slit view and keeps one action, **Burst Out** (E): instant, stuns the Checker 1 s, noise 6. **Check** (E, 2 s) opens a spot; a Check on an occupied spot writes a Verified Notebook entry for the hider ("X opened my wardrobe at 3:12"), so checking is evidence.
 
@@ -171,6 +173,8 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
 - No Clue Surge. A wrong ejection adds 15 s to the next discussion instead.
 - (M3) The win check runs when a death is recorded and, for an ejection, when the reveal ends, so the tally, the stamp and the role line always show first; it never runs on a bare tick. A tied vote, or a Skip plurality, ejects nobody. (M5a) A Nightshade death and a Last Shot are deaths like a kill; the win check of a batch that holds a dying Gamekeeper waits until its aim closes, then runs once for every death of the batch. Meeting requests and phase changes never wait for an aim (3.2).
 - (M5a) **What a meeting reveals.** An ejection reveals the ejected seat's role card and the look it wore ("Bo was the Killer, walking as the Baker"); a shot fired at the reveal reveals its target's role too. A death in the world (Knife, Nightshade, a shot) only flips `alive` when the next meeting opens; it reveals no role until game over, which shows every seat's role, the look it wore and the two undealt cards (3.17).
+
+- (Round 8, A174) **The bell at night.** The bell may be rung at night, by a seat or an NPC, while an unreported body lies in the world; with no such body the night rule above stands. **Meeting notes** (8T): a second meeting channel whose lines carry no speaker, open to every living seat, rate-limited by `balance.json` `talk`; NPC seats write there too (3.25). 8R and 8T write the detail with their code.
 
 ### 3.9 Balance by player count
 
@@ -253,6 +257,8 @@ The section keeps its number so 3.12 to 3.21 keep theirs.
 - **Meetings, the role card and night powers (M5a).** An NPC casts its vote at a tick drawn uniformly over 0.3-0.9 (`npc.vote.windowFrac`) of the meeting's discussion time (as set when the meeting opens, a wrong-ejection bonus included) plus the vote time (`phases.voteS`, 25 s), counted from the start of the discussion: 26-77 s in with a 60 s discussion, 30-90 s with 75 s, 35-104 s with 90 s. On the role card an NPC readies 2-9 s (`npc.ready.delayS`) after the card opens; in the lobby it readies as the Seats bullet says. An NPC holding a night power (3.2) uses it at a tick drawn uniformly over 0.1-0.8 (`npc.nightPower.windowFrac`) of the time from the start of dusk to the end of the night (11-88 s with the 10 s dusk and 100 s night), or of the Final Night hunt (9-72 s of 90 s); an NPC Gamekeeper fires its Last Shot 2-8 s into its aim (`npc.nightPower.lastShotS`), or holds its fire when it has nobody to vote for. Each NPC seat draws only from its own streams, `npcPlay:<seatId>` and `npcTiming:<seatId>` (`sim/seeds.ts`), never from the deal's or another seat's: the ready, vote and night-power ticks and the Last Shot delay from `npcTiming`, every other choice (persona, activity, station, stroll tile, durations, the leave delay, clue, strike roll, night-power pick, vote target) from `npcPlay`. A draw that only some cards use is made by every NPC at the same moment and ignored when its card does not use it (the strike roll on every check, below; the vote's draws; the night-power tick and pick; the Last Shot delay), so no card changes how far a seat's streams move.
 - **Rules of the scripted brain.** (M5a) A Killer NPC is any NPC that holds `kill`: a Killer, or an Accomplice after Inherit (3.2). Every NPC walk follows a tile path, so a wall between never pins the seat (M3c). An NPC reports the nearest body it is within reporting reach of, `reportDelayS` after it first stands there (M3c); (M5a) a Killer NPC never reports a body it made and reports any other as every NPC does (Reactions). A Killer NPC strikes only in a phase the Knife works in (`abilities.json` `kill.phases`: dusk, night and the Final Night hunt, 3.3) with the Knife ready, and only when exactly one other living seat shares its scene and that seat is a human, not its Cabal partner; the chance `killChancePer10s` is spread evenly over those ten seconds. **The kill-opportunity timer** (owner, 2026-10-23, A100): a Killer NPC that has been alone in a room with exactly one other living seat, human or NPC, for longer than 30 s (`npc.aloneKill.afterS`) strikes that seat as soon as the Knife works and is ready, whatever the roll said. A room is any scene but the map's hub; in a room wider than the view (the woods, the caves) the seat counts only within 20 tiles (`npc.aloneKill.sightTiles`) and in sight (3.7). The wait counts in every world phase, so a pair left alone by day is struck at dusk; a change of company, a crossing, a placement or a meeting restarts it, and a Cabal mate never counts. It draws nothing. (M5a) The strike roll is drawn by every NPC on each check, a tick of such a phase on which exactly one other living seat shares its scene and that seat is a human not crossing a door, and is ignored unless the NPC holds `kill`, its Knife is ready and that seat is not its Cabal partner. After a kill a Killer NPC leaves the room at once and walks to the nearest scene with a basin and then to the map's hub (the map manifest's `hub`, the overworld square in Hollowmere), there being no wash verb yet (M3c). Until the Case Board ships (M4) "the player with the most Verified clues" is the seat the NPC had most often in sight when it came across a body; an NPC with no such memory votes Skip, and a Killer NPC first votes at its drawn tick with the plurality of the votes already cast and re-reads it every second (M3c). (M5a) When Skip is disabled (the forced vote of 3.8 and the Final Night vote), an NPC with no suspect, and a Killer NPC with no plurality to follow, votes for a random living seat other than itself. (M5a) An NPC whose Notebook holds a Cabal confession (Hear Confession, 3.2) votes for that seat and aims its Last Shot at it, ahead of every rule above (the confession heard first, while that seat lives).
 - **Scope.** NPCs ship in M3c (ROADMAP 7.1) after the first playable, inside the room as entities rather than clients. (M5a) The routines replace the M3c wander, which stays only as the fallback above. NPC seats keep a Notebook only for the clues they collect and do no tasks until M4d; when a human station hold ships, its row in `routines.json` `holds` turns NPC work at those stations into the same hold, with no change to the brain.
+
+- **The hive and the body bands (round 8, A173; 8R and 8S write the detail with their code).** Every NPC seat and figure reads one public blackboard of what anyone there could perceive (3.25). An NPC that sees a body walks to it within `npc.body.pullTiles` (10), shouts for the nearest Detective and Doctor within `npc.body.shoutTiles` (5) and runs for the bell within `npc.body.bellTiles` (2), then reports after `reportDelayS`. NPC seats do their tasks, use their card's abilities, and share what they find on the Case Board and in meeting notes; on hard an NPC shares with a player only after that player gives it a briarberry. This replaces "NPCs never chat" above once 8T lands.
 
 ### 3.13 Maps and presentation
 
@@ -436,10 +442,13 @@ in a dark scene receives another avatar only within the night radius and a clear
 grid (walls, and the `u` ground that is walkable but blocks sight), or when that avatar stands in the pool of a
 scene light burning now; a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both
 seeing and being seen, so two lit seats see each other 4 tiles further. Every light starts out: its holder lights
-it or puts it out (`act.light`), and a lit light shows on its avatar as the lantern bit, never by card. Outside the
-dark scenes the server still sends every position in the scene and the night radius stays the client's picture
-(3.13), so a lantern post's pool on the square shows what it lights. Ghosts see everything. (6G; 3.7's lantern line
+it or puts it out (`act.light`), and a lit light shows on its avatar as the lantern bit, never by card. At night and
+in the Final Night every scene is dark on the server in the same way (round 8, 8L, A190), so a lantern post's pool
+on the square shows who stands in it and nothing else; by day, at dusk and at dawn an ordinary scene is sent whole
+and its darkness stays the client's picture (3.13). Ghosts see everything. (6G; 3.7's lantern line
 is 6G's.)
+
+**Habitats (round 8, A173; 8Q writes the detail with its code).** Each spawner becomes a habitat: an area (about 5 by 5 tiles) that spawns `count` creatures on free reachable floor and migrates inside its own cell of the scene, so no two habitats' paths meet. Creatures walk, run, lie, sit and graze inside it and move with it. A seat entering a hostile habitat (wolf, bat) is chased for `mobs.chaseS` (10 s); every habitat it trips inside that window joins the chase, the timer restarting at the last one. A passive creature (boar, rat) that is hit flees `mobs.fleeTiles` beyond its area, stops, and drifts back over `mobs.returnS` (10 s) with a pause to graze. A boss habitat's area is its whole room. The broken-fence intruder wolf (3.6) and the Final Night's village wolves (3.8) are built on habitats.
 
 ### 3.16 Quests and mini-games
 
@@ -720,6 +729,37 @@ Round 8 (A134, A135; `docs/round8/economy.md`): the Bible's Book IV on today's m
 Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `economy.json` and `balance.json`
 `economy`.
 
+**Scrip** (8C, A138). Every seat carries a purse and keeps a bank balance, and only the seat sees either number.
+- **The stake.** At Start each seat draws its stake on a stream of its own. It is paid the moment the looks are
+  public (before grace), from the range of the tier its **public look** names in `economy.json` `stakes`, never from
+  its card, so a seat wearing a cover carries the purse of the look it wears. A seat with no look takes the default
+  tier.
+- **The band.** Others never see the number. Inspect shows "a light purse" below `economy.heavyPurse` and "a heavy
+  purse" from it. Every stake tier lies wholly on one side of that line, so at Start the band says the look's tier
+  and nothing more.
+- **Wages.** The town pays `economy.taskWage` for each finished task, a fake task exactly as a real one, so a purse
+  never tells a worker from a pretender. A quest turn-in pays the quest's `scrip` (`quests.json`) beside its items.
+- **Shops.** A shop is a counter or stall in a scene (`economy.json` `shops`). Holding the action key at it opens
+  its panel, privately: what it sells at its `ask` and what it buys at its `pay` (`economy.json` `prices`). A living
+  seat in a world phase other than the immunity window buys and sells while the counter stays within
+  `doors.reachTiles`. A purchase is refused, and nothing changes, when the purse or the inventory falls short. The
+  bakery sells flour, the apothecary bandages and salts, the general store (HollowMere's tavern bar, BlackPine's
+  lodge) rope, lantern oil, candles and planks, and the Gamekeeper's stall (HollowMere's forest edge, BlackPine's
+  lodge) snares and torches. The market (HollowMere's square, BlackPine's camp) sells nothing and buys timber, stone,
+  resin, herbs, mushrooms and tin ore. No shop trades a role's kit, and an item a shop both sells and buys pays
+  less than it asks.
+- **The bank.** HollowMere's manor hall and BlackPine's intake office each have a bank counter. Holding the action
+  key at it opens the seat's account, and the seat then deposits from its purse or withdraws to it, the whole amount
+  or nothing, while the counter stays within reach. Banked Scrip is safe from a mugging and a knockout. Only the
+  heist reaches it: when the Bandit cracks the strongbox, the box carries off `economy.heistShare` of every seat's
+  bank balance (rounded down per seat) as its loot, and the cracker pockets it. A suddenly heavy purse is the
+  heist's tell, though wages and sales can make anyone rich.
+- **Coins on the ground.** A knockout or a mugging drops part of the purse where the seat lies, as a heap of coins
+  anyone alive can pick up with the gather hold (`economy.coinPickupS`, within reach). The first to finish takes the
+  whole heap, and it never comes back.
+- **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice. It leaves only as a
+  purchase, rent, a fine, a donation or an HQ tier. Theft, drops, pickups and the bank only move it.
+
 ### 3.24 Moods, mugging and townsfolk
 
 Round 8 (A134, A135; `docs/round8/townsfolk.md`).
@@ -730,3 +770,11 @@ Round 8 (A134, A135; `docs/round8/townsfolk.md`).
   company and a lit light lower it.
 
 Session 8E writes this section. The numbers are `balance.json` `moods` and `townsfolk`.
+
+### 3.25 The living world
+
+Round 8 addendum B (A173, A174; `docs/round8/living.md`). Sessions 8Q, 8R, 8S, 8T and 8U write this section with their code.
+- **The world index.** Every scene knows its reachable floor, its occupied tiles and a density cap, so nothing spawns in a tree, a wall or off the map (8Q).
+- **The hive.** NPCs share one public blackboard with potential, state and proximity triggers; it never holds a card, a cover or a private view (8R).
+- **Talk.** NPC lines in meeting notes come from templates, or from Claude when the server holds a key, off the tick and logged for replay; one to three a meeting are red herrings, slightly off (8T).
+- **Briarberry.** The Doctor's healing ingredient, picked from briar bushes that make the picker bleed (on hard down to half health, never to death); easy villagers gift it, normal shops sell it, hard only grows it (8U).

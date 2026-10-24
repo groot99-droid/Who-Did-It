@@ -11,16 +11,18 @@ import { schema, t } from '@colyseus/schema';
 // maps `nodes` and `mobs`, `Private.quests`, `GameState.lawStage` and `Role.evolvedFrom`, all empty until their
 // sessions fill them (docs/round6/seams.md 1.1). Version 4 (round 7, A104): `Player.profile`,
 // `Private.vendetta` (A112). Version 5 (round 7, A115): the quick mode's fields are gone. Version 6 (round 8,
-// A135, docs/round8/seams.md 1): `Private.body` (8A); the later round-8 rows (`purse`, `bank`, `faith`, `hq`) join
-// version 6 without another bump.
+// A135, docs/round8/seams.md 1): `Private.body` (8A); the later round-8 rows (`purse`, `bank`, `faith`, `hq`, 8L's
+// `Avatar.nearBits`) join version 6 without another bump.
 
 export const SCHEMA_VERSION = 6;
 
 /**
  * View tags (Visibility.ts): `presence` and `priv` are the numeric tags 1 and 2, granted one by one; `ghost`
- * reveals an avatar's true seat to a ghost's view only (GDD 3.17).
+ * reveals an avatar's true seat to a ghost's view only (GDD 3.17); `near` (round 8, 8L) reveals an avatar's
+ * range-limited bits to a view within range of it, and to a ghost's (GDD 3.4). Tags are bit masks: `near` takes a
+ * bit of its own.
  */
-export const VIEW_TAG = { presence: 1, priv: 2, ghost: 3 } as const;
+export const VIEW_TAG = { presence: 1, priv: 2, ghost: 3, near: 4 } as const;
 
 // Every primitive carries a default so a fresh instance never encodes `undefined`.
 const u8 = (v = 0) => t.uint8().default(v);
@@ -125,6 +127,11 @@ export const Avatar = schema(
     transitUntilTick: u32(),
     /** The walker's true seat; only a ghost's view receives it. */
     seat: t.string().default('').view(VIEW_TAG.ghost),
+    /**
+     * Round 8 (8L): the status bits seen only from close by (`StatusBit.bloody`, never in `statusBits`); only a view
+     * within range of the avatar, or a ghost's, receives them.
+     */
+    nearBits: u16().view(VIEW_TAG.near),
   },
   'Avatar',
 );
@@ -214,6 +221,10 @@ export const Private = schema(
     vendetta: str(),
     /** Round 8 (GDD 3.22, schema version 6): this seat's body; empty until Session 8A fills it. */
     body: BodyState,
+    /** Round 8 (GDD 3.23, 8C): the Scrip this seat carries; others learn only its band, by inspect. */
+    purse: u32(),
+    /** Round 8 (GDD 3.23, 8C): the Scrip this seat keeps at the bank, safe from muggings and knockouts. */
+    bank: u32(),
   },
   'Private',
 );
