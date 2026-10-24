@@ -4,6 +4,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { StatusBit } from './constants';
 import { settleDisguise } from './Impersonate';
 import { lightBurns } from './mobs/light';
+import { dayPartOf } from './mobs/spawn';
 import { type PlayerSim, simOf } from './RoomSim';
 import { reconcileNear } from './Visibility';
 import { sceneKey } from './World';
@@ -48,6 +49,7 @@ interface AvatarMemory {
 }
 
 const memories = new WeakMap<PartyRoom, AvatarMemory>();
+const nights = new WeakMap<PartyRoom, boolean>();
 
 /** The room's handle memory; `Impersonate.ts` reads the disguises through it. */
 export function avatarMemory(room: PartyRoom): AvatarMemory {
@@ -188,6 +190,13 @@ export function publishAvatars(room: PartyRoom): void {
   for (const [handle, tail] of memory.leaving) {
     if (tick < tail.untilTick) continue;
     removeHandle(room, handle);
+    sim.viewsDirty = true;
+  }
+  // Round 8, 8L (A190): sight narrows at night in every scene (`Sight.ts`), so the night's start and end re-run the
+  // views on the tick they happen, not up to a reconcile later.
+  const night = dayPartOf(room.state.phase) === 'night';
+  if (nights.get(room) !== night) {
+    nights.set(room, night);
     sim.viewsDirty = true;
   }
   for (const [seat, p] of sim.players) {
