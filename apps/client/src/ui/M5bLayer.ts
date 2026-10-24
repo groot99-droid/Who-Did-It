@@ -20,6 +20,7 @@ import { h, isTyping, overlayRoot } from './dom';
 import { itemName, mountInventory, stacksOf, type Panel } from './Inventory';
 import { mountQuestLog } from './QuestLog';
 import { loadPropAt, loadSceneNameOf, taskPrompt, taskSpots, type TaskSpot } from './tasks';
+import { coinsCastMs, coinsPrompt } from './shop/coins'; // Round 8, 8C (GDD 3.23): a coins node's hold
 
 const REACH_PX = balance.doors.reachTiles * TILE_PX;
 const RES = resources.resources as Record<
@@ -93,6 +94,8 @@ export function promptFor(
   if (!t) return null;
   if (t.kind === 'task') return taskPrompt(t, hasTool, night);
   if (t.kind === 'giver') return fill(C['prompt.giver'], { name: NPC_NAME(t.npc) });
+  const coins = coinsPrompt(t.resource); // Round 8, 8C (GDD 3.23): dropped coins are no `resources.json` row
+  if (coins) return coins;
   const res = RES[t.resource];
   const what = res?.name ?? t.resource;
   const tool = res?.tool;
@@ -262,7 +265,7 @@ class Layer implements M5bLayer {
   /** `?minigame=<kind>`: opens that kind's board at once and judges the answer in place (a demo and test hook). */
   private devMinigame(): void {
     const kind = new URLSearchParams(location.search).get('minigame') as MinigameKind | null;
-    if (!kind || !['crates', 'pour', 'slide', 'stoke'].includes(kind)) return;
+    if (!kind || !['crates', 'pour', 'slide', 'stoke', 'tap'].includes(kind)) return;
     const board = devBoard(kind);
     const verdict = (taskId: string, answer: unknown) => {
       const ok = checkMinigame(board.puzzle, answer);
@@ -361,7 +364,7 @@ class Layer implements M5bLayer {
     if (!t || this.hold || this.feed.dead()) return;
     const res = RES[t.resource];
     if (res?.tool && !this.has(res.tool)) return;
-    this.begin('gather', t.id, (res?.gatherS ?? 3) * 1000);
+    this.begin('gather', t.id, coinsCastMs(t.resource) ?? (res?.gatherS ?? 3) * 1000); // Round 8, 8C: coins' cast
   }
 
   /** The task hold at `t`. At the source a real task's pick-up shows when the pockets change; a fake one is theatre. */
