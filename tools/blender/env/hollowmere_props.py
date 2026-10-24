@@ -11,6 +11,7 @@ import math
 import random
 
 from env.kitbash import B, C, F, S, T, back_panel, blob, frustum, kenney, part
+import static_common as sc  # noqa: E402  (on the path once env.kitbash is imported)
 
 TABLE_TOP = 0.78  # the Wake Table's top: a plate frame sits at that height (an overlay, depth bias 0.1)
 
@@ -256,6 +257,200 @@ def tin_crate():
 # ---------------------------------------------------------------- spots (3.6)
 
 
+# ---------------------------------------------------------------- St Brannock's (round 8, 8J: art.md 4.2)
+
+
+def on_wall(objs, dy=-0.89):
+    """Hang art on the kit's own full wall (build_kit.py, harbour, variant 0) instead of a thin board at the
+    tile's back edge, which the neighbouring wall blocks hide: the board is dropped and the rest moves `dy`
+    onto the wall's room-facing (south) face."""
+    import build_kit as bk
+
+    keep = []
+    for o in objs:
+        if o.name.startswith("Wall"):
+            sc.clear([o])
+            continue
+        o.location.y += dy
+        keep.append(o)
+    return bk.wall("harbour", "full", 0, None) + keep
+
+
+def turned(objs):
+    """The same art turned a quarter so its front faces east (+X): for things hung on a west wall."""
+    for o in objs:
+        x, y, z = o.location
+        o.location = (-y, x, z)
+        o.rotation_euler.z += math.pi / 2
+    return objs
+
+
+def lancet(name, cx, y, z0, w, h, mat):
+    """A pointed window opening as stepped boxes (it reads as an arch at 64 px)."""
+    steps = [B(cx, y, z0 + h / 2, w, 0.02, h)]
+    for k, f in enumerate((0.78, 0.52, 0.26)):
+        steps.append(B(cx, y, z0 + h + 0.05 + 0.1 * k, w * f, 0.02, 0.1))
+    return part(name, mat, *steps, outline=False)
+
+
+def stained_glass():
+    """A lancet of coloured glass in the north wall: moon blue, teal, blood and brass panes, leaded, one cracked."""
+    panes = [("moon", 3), ("teal", 1), ("blood", 2), ("brass", 2), ("moon", 4), ("teal", 2), ("moon", 2), ("blood", 1)]
+    glass = [part(f"Pane{k}", F(r, i), B(-0.11 + 0.22 * (k % 2), 0.37, 0.92 + 0.26 * (k // 2), 0.2, 0.02, 0.24),
+                  outline=False) for k, (r, i) in enumerate(panes)]
+    return [back_panel("Wall", T("plaster", 2), 0.9, 2.3, 0.0),
+            part("Jambs", T("stone", 4), *[B(sx * 0.27, 0.35, 1.3, 0.08, 0.08, 1.12) for sx in (1, -1)],
+                 B(0, 0.33, 0.76, 0.7, 0.14, 0.08)),
+            *glass,
+            lancet("Head", 0, 0.37, 1.95, 0.44, 0.0, F("moon", 5)),
+            part("Arch", T("stone", 4), *[B(sx * 0.2, 0.35, 2.0, 0.08, 0.08, 0.18) for sx in (1, -1)],
+                 B(0, 0.35, 2.28, 0.16, 0.08, 0.1)),
+            part("Leads", T("ink", 1), B(0, 0.355, 1.4, 0.025, 0.02, 1.1),
+                 *[B(0, 0.355, 0.8 + 0.26 * k, 0.44, 0.02, 0.02) for k in range(5)], outline=False),
+            part("Crack", F("bone", 3), B(0.12, 0.352, 1.1, 0.015, 0.01, 0.22), outline=False)]
+
+
+def candle_stand():
+    """A wrought pricket stand: tripod feet, a shaft and a ring of five candles, wax run down the drip pan."""
+    feet = [B(0.16 * math.cos(a), 0.16 * math.sin(a), 0.03, 0.2, 0.04, 0.04) for a in (0.3, 2.4, 4.5)]
+    tips = [(0.13 * math.cos(a), 0.13 * math.sin(a)) for a in [k * 2 * math.pi / 5 + 0.4 for k in range(5)]]
+    return [part("Iron", T("ink", 1), *feet, B(0, 0, 0.55, 0.04, 0.04, 1.0), C(0, 0, 1.05, 0.18, 0.03, 10)),
+            part("Pan", T("brass", 1), C(0, 0, 1.08, 0.16, 0.02, 10)),
+            part("Candles", T("bone", 3), *[C(x, y, 1.1, 0.025, 0.12 + 0.05 * (k % 3), 6)
+                                           for k, (x, y) in enumerate(tips)]),
+            part("Wax", T("bone", 2), B(0.12, -0.12, 0.95, 0.03, 0.02, 0.12), outline=False),
+            part("Flames", F("lantern", 3), *[B(x, y, 1.27 + 0.05 * (k % 3), 0.025, 0.025, 0.05)
+                                              for k, (x, y) in enumerate(tips)], outline=False)]
+
+
+def hymn_board():
+    """The hymn board by the chancel: four slots, three numbers in, one slot empty."""
+    tabs = [B(0, 0.36, 1.55 - 0.18 * k, 0.4, 0.02, 0.12) for k in range(3)]
+    return [back_panel("Wall", T("plaster", 2), 0.9, 2.1, 0.0),
+            part("Board", T("wood", 2), B(0, 0.38, 1.35, 0.56, 0.04, 0.9), bevel=0.01),
+            part("Cap", T("wood", 3), B(0, 0.36, 1.83, 0.62, 0.08, 0.06)),
+            part("Tabs", T("bone", 3), *tabs, outline=False),
+            part("Numbers", F("ink", 0), *[B(dx, 0.348, 1.55 - 0.18 * k, 0.05, 0.005, 0.07)
+                                          for k in range(3) for dx in (-0.08, 0.0, 0.08)], outline=False),
+            part("Gap", F("ink", 1), B(0, 0.36, 1.01, 0.4, 0.01, 0.12), outline=False)]
+
+
+def memorial():
+    """Plaques to the drowned: a marble tablet with an anchor, two small brasses, a dry wreath under them."""
+    return [back_panel("Wall", T("plaster", 1), 0.9, 2.1, 0.0),
+            part("Tablet", T("bone", 2), B(0, 0.37, 1.45, 0.5, 0.04, 0.6), bevel=0.01),
+            part("Pediment", T("bone", 1), (frustum, dict(z0=1.75, z1=1.9, bottom=(0.56, 0.06), top=(0.1, 0.06),
+                                                           offset=(0, 0.37)))),
+            part("Lettering", F("stone", 1), *[B(0, 0.348, 1.62 - 0.08 * k, 0.34 - 0.04 * (k % 2), 0.005, 0.025)
+                                               for k in range(4)], outline=False),
+            part("Anchor", F("stone", 0), B(0, 0.348, 1.25, 0.025, 0.005, 0.16), B(0, 0.348, 1.18, 0.12, 0.005, 0.02),
+                 outline=False),
+            part("Brasses", T("brass", 1), B(-0.3, 0.37, 1.0, 0.18, 0.02, 0.12), B(0.3, 0.37, 1.05, 0.18, 0.02, 0.12)),
+            part("Wreath", T("litter", 1), C(0, 0.3, 0.55, 0.14, 0.05, 10), bevel=0.02),
+            part("Ribbon", T("blood", 0), B(0.06, 0.24, 0.5, 0.04, 0.01, 0.12), outline=False)]
+
+
+def lectern():
+    """The brass eagle lectern, the great Bible open on its wings, a ribbon hanging down."""
+    return [part("Foot", T("stone", 3), C(0, 0, 0, 0.22, 0.08, 8)),
+            part("Shaft", T("brass", 1), C(0, 0, 0.08, 0.05, 0.85, 8, rt=0.04), C(0, 0, 0.45, 0.08, 0.06, 8)),
+            part("Wings", T("brass", 2), (frustum, dict(z0=0.93, z1=1.1, bottom=(0.1, 0.1), top=(0.5, 0.3),
+                                                        top_offset=(0, -0.02)))),
+            part("Book", T("blood", 0), B(0, -0.04, 1.13, 0.48, 0.3, 0.05)),
+            part("Pages", T("bone", 3), B(-0.11, -0.04, 1.165, 0.21, 0.26, 0.02), B(0.11, -0.04, 1.165, 0.21, 0.26, 0.02),
+                 outline=False),
+            part("Ribbon", T("blood", 2), B(0.02, -0.2, 1.0, 0.025, 0.01, 0.22), outline=False)]
+
+
+def pulpit():
+    """A panelled oak pulpit on a stone base, its steps behind, a sounding board above."""
+    return [part("Base", T("stone", 3), C(0, 0.05, 0, 0.24, 0.5, 8)),
+            part("Tub", T("wood", 2), C(0, 0.05, 0.5, 0.42, 0.75, 8, rt=0.45), bevel=0.02),
+            part("Panels", T("wood", 3), *[B(0.33 * math.cos(a), 0.05 + 0.33 * math.sin(a), 0.87, 0.18, 0.02, 0.45)
+                                          for a in (-2.4, -1.57, -0.75)], outline=False),
+            part("Rail", T("wood", 4), C(0, 0.05, 1.25, 0.46, 0.05, 8)),
+            part("Cloth", T("blood", 1), B(0, -0.37, 1.05, 0.28, 0.02, 0.3), outline=False),
+            part("Steps", T("wood", 1), *[B(0.32, 0.35 - 0.0 * k, 0.12 + 0.24 * k, 0.24, 0.2, 0.24) for k in range(3)]),
+            part("Post", T("wood", 2), B(0, 0.42, 1.6, 0.07, 0.07, 1.2)),
+            part("Sounding", T("wood", 3), C(0, 0.15, 2.1, 0.34, 0.06, 8), bevel=0.01)]
+
+
+def font():
+    """The octagonal font by the door, its oak cover lifted a crack, a dry ring of old water on the stone."""
+    return [part("Step", T("stone", 2), C(0, 0, 0, 0.42, 0.08, 8)),
+            part("Stem", T("stone", 3), C(0, 0, 0.08, 0.16, 0.5, 8)),
+            part("Bowl", T("stone", 4), C(0, 0, 0.58, 0.22, 0.32, 8, rt=0.34), bevel=0.02),
+            part("Carving", F("stone", 1), *[B(0.29 * math.cos(a), 0.29 * math.sin(a), 0.74, 0.08, 0.01, 0.12)
+                                             for a in (-2.0, -1.2)], outline=False),
+            part("Cover", T("wood", 2), C(0.04, 0.02, 0.92, 0.33, 0.05, 8), bevel=0.01),
+            part("Knob", T("brass", 1), C(0.04, 0.02, 0.97, 0.04, 0.08, 6)),
+            part("Ring", F("stone", 1), C(0, 0, 0.081, 0.36, 0.003, 12), outline=False)]
+
+
+def votive_rack():
+    """An iron rack of prayer lights in a sand tray, most burnt down, a few still going."""
+    lit = {1, 4, 6, 9}
+    lights = [(-0.3 + 0.15 * (k % 5), -0.1 + 0.2 * (k // 5)) for k in range(10)]
+    return [part("Legs", T("ink", 1), *[B(sx * 0.36, sy * 0.15, 0.35, 0.04, 0.04, 0.7) for sx in (1, -1)
+                                       for sy in (1, -1)]),
+            part("Tray", T("ink", 0), (frustum, dict(z0=0.7, z1=0.78, bottom=(0.78, 0.36), top=(0.82, 0.42)))),
+            part("Sand", T("litter", 2), B(0, 0, 0.775, 0.78, 0.38, 0.01), outline=False),
+            part("Lights", T("bone", 2), *[C(x, y, 0.78, 0.035, 0.04 + 0.02 * (k % 3), 6)
+                                          for k, (x, y) in enumerate(lights)], outline=False),
+            part("Flames", F("lantern", 3), *[B(x, y, 0.86, 0.02, 0.02, 0.04)
+                                             for k, (x, y) in enumerate(lights) if k in lit], outline=False),
+            part("Box", T("wood", 2), B(0.3, 0.22, 0.85, 0.16, 0.08, 0.14))]
+
+
+def alms_box():
+    """The poor box on its post, iron-banded, the padlock new and the slot worn bright."""
+    return [part("Post", T("wood", 1), B(0, 0, 0.4, 0.14, 0.14, 0.8)),
+            part("Box", T("wood", 2), B(0, 0, 0.92, 0.32, 0.28, 0.26), bevel=0.01),
+            part("Bands", T("ink", 1), B(0, 0, 0.86, 0.34, 0.3, 0.03), B(0, 0, 1.0, 0.34, 0.3, 0.03)),
+            part("Slot", F("ink", 0), B(0, 0, 1.055, 0.14, 0.03, 0.005), outline=False),
+            part("Padlock", T("brass", 2), B(0, -0.16, 0.9, 0.06, 0.03, 0.07), outline=False)]
+
+
+def flower_stand():
+    """A tall stand of white lilies gone over, petals on the flags under it."""
+    rnd = random.Random("lilies")
+    stems = [(rnd.uniform(-0.1, 0.1), rnd.uniform(-0.08, 0.08), rnd.uniform(0.3, 0.45)) for _ in range(7)]
+    return [part("Stand", T("wood", 3), C(0, 0, 0, 0.16, 0.05, 8), C(0, 0, 0.05, 0.05, 0.75, 6),
+                 C(0, 0, 0.8, 0.13, 0.04, 8)),
+            part("Vase", T("brass", 1), C(0, 0, 0.84, 0.08, 0.24, 8, rt=0.12)),
+            part("Stems", T("moss", 2), *[B(x, y, 1.08 + h / 2, 0.02, 0.02, h) for x, y, h in stems], outline=False),
+            part("Lilies", T("bone", 3), *[C(x, y, 1.08 + h, 0.05, 0.05, 6, rt=0.08) for x, y, h in stems[:5]]),
+            part("Brown", T("litter", 2), *[C(x, y, 1.08 + h, 0.05, 0.04, 6, rt=0.07) for x, y, h in stems[5:]]),
+            part("Petals", T("bone", 2), *[B(rnd.uniform(-0.3, 0.3), rnd.uniform(-0.3, 0.1), 0.005, 0.05, 0.03, 0.01)
+                                          for _ in range(5)], outline=False)]
+
+
+def altar():
+    """The high altar (8D's donations station): a stone table, white cloth and red frontal, a brass cross between
+    two candlesticks, and the plate for the offerings."""
+    return [part("Step", T("stone", 2), B(0, 0.05, 0.06, 1.0, 0.8, 0.12)),
+            part("Table", T("stone", 4), B(0, 0.1, 0.55, 0.9, 0.55, 0.86), bevel=0.02),
+            part("Cloth", T("bone", 3), B(0, 0.1, 1.0, 0.94, 0.6, 0.03), B(0, -0.18, 0.9, 0.94, 0.02, 0.2)),
+            part("Frontal", T("blood", 1), B(0, -0.185, 0.55, 0.5, 0.02, 0.62), outline=False),
+            part("Orphrey", T("brass", 2), B(0, -0.19, 0.55, 0.06, 0.01, 0.62), B(0, -0.19, 0.7, 0.3, 0.01, 0.05),
+                 outline=False),
+            part("Cross", T("brass", 2), B(0, 0.28, 1.25, 0.05, 0.05, 0.5), B(0, 0.28, 1.36, 0.22, 0.05, 0.05),
+                 C(0, 0.28, 1.015, 0.08, 0.04, 8)),
+            part("Sticks", T("brass", 1), *[C(sx * 0.32, 0.2, 1.015, 0.03, 0.22, 6) for sx in (1, -1)]),
+            part("Candles", T("bone", 3), *[C(sx * 0.32, 0.2, 1.235, 0.025, 0.16, 6) for sx in (1, -1)]),
+            part("Flames", F("lantern", 3), *[B(sx * 0.32, 0.2, 1.42, 0.025, 0.025, 0.05) for sx in (1, -1)],
+                 outline=False),
+            part("Plate", T("brass", 1), C(-0.15, -0.02, 1.015, 0.1, 0.02, 10, rt=0.12))]
+
+
+def chapel_rope():
+    """The bell rope through the ceiling, its red sally, and the torn glove caught in the strands (WORLD 4.3)."""
+    return rope() + [part("Glove", T("plaster", 3), B(0.04, 0.05, 1.4, 0.12, 0.06, 0.18),
+                          B(-0.04, 0.05, 1.28, 0.05, 0.05, 0.1),
+                          bevel=0.01),
+                     part("Tear", F("ink", 1), B(0.02, 0.039, 1.44, 0.04, 0.005, 0.03), outline=False)]
+
+
 def _crates(n=3):
     rnd = random.Random(f"crates{n}")
     return [kenney("survival-kit", "box-large", height=0.5, ramp=["#3A231F", "#744733", "#B57F54"],
@@ -384,7 +579,6 @@ PROPS = {
     "prop_oil_barrel": (64, 64, oil_barrel),
     "prop_letter_box": (64, 80, letter_box),
     "prop_shelf": (64, 112, shelf),
-    "prop_rope": (64, 112, rope),
     "prop_clock": (64, 128, clock),
     "prop_safe": (64, 80, safe),
     "prop_crepe": (64, 112, crepe),
@@ -395,5 +589,19 @@ PROPS = {
     "prop_den": (64, 96, den),
     "prop_ore_cart": (64, 64, ore_cart),
     "prop_tin_crate": (64, 64, tin_crate),
+    # Round 8 (8J, art.md 4.2): St Brannock's.
+    "prop_rope": (64, 128, lambda: on_wall(chapel_rope(), -0.7)),
+    "prop_stained_glass": (64, 128, lambda: on_wall(stained_glass())),
+    "prop_stained_glass_e": (64, 128, lambda: turned(on_wall(stained_glass()))),
+    "prop_candle_stand": (64, 96, candle_stand),
+    "prop_hymn_board": (64, 128, lambda: on_wall(hymn_board())),
+    "prop_memorial": (64, 128, lambda: on_wall(memorial())),
+    "prop_lectern": (64, 80, lectern),
+    "prop_pulpit": (64, 128, pulpit),
+    "prop_font": (64, 80, font),
+    "prop_votive_rack": (64, 64, votive_rack),
+    "prop_alms_box": (64, 80, alms_box),
+    "prop_flower_stand": (64, 96, flower_stand),
+    "prop_altar": (64, 96, altar),
     **SPOTS,
 }

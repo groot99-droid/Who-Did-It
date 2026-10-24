@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { maps, scenes, tasks, type SceneId } from '../src/index.js';
-import { type PlacementRules, placementProblems } from './placement.js';
+import { type PlacementRules, placementProblems, propKey } from './placement.js';
 
 // Round 8 (8J, docs/round8/art.md 4.1): perfect object placement in every Hollowmere scene. The classes say what
 // each prop's art needs (tools/blender/env/hollowmere_props.py, shared_props.py and the sliced props of
@@ -51,6 +51,20 @@ const RULES: PlacementRules = {
     hanging_oak: 'free',
     clamp: 'free',
     pump_beam: 'free',
+    // Round 8 (8J): St Brannock's.
+    stained_glass: 'hung',
+    stained_glass_e: 'hungEast',
+    hymn_board: 'hung',
+    memorial: 'hung',
+    lectern: 'front',
+    pulpit: 'front',
+    altar: 'front',
+    pew: 'free',
+    candle_stand: 'free',
+    votive_rack: 'free',
+    alms_box: 'free',
+    flower_stand: 'free',
+    font: 'free',
     wakeTable: 'surface',
     plate: 'overlay',
     crepe: 'doorOverlay',
@@ -93,13 +107,18 @@ const RULES: PlacementRules = {
     woodBox: 'free',
   },
   lights: {
-    lamp: { props: ['lamp', 'ledger', 'bench'] },
+    lamp: { props: ['lamp', 'ledger', 'bench', 'candle_stand', 'votive_rack', 'altar'] },
     lantern: { props: ['lanternPost', 'drowned_lantern'] },
     fire: { props: ['oven', 'brickOven'] },
     torch: { props: [], wall: true },
-    window: { props: ['window'], wall: true, building: true },
+    window: { props: ['window', 'stained_glass', 'stained_glass_e'], wall: true, building: true },
     // Moonlight falls anywhere out of doors; indoors it comes through a window.
-    moon: { props: ['window'], wall: true, building: true, outdoors: true },
+    moon: {
+      props: ['window', 'stained_glass', 'stained_glass_e'],
+      wall: true,
+      building: true,
+      outdoors: true,
+    },
   },
 };
 
@@ -157,10 +176,6 @@ const PENDING: Partial<Record<SceneId, readonly string[]>> = {
     'prop ba.study_key stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)',
     'light ba.lt_lantern (lantern) at 10,6 hangs on nothing that could hold it',
   ],
-  chapel: [
-    'light ch.lt_candles (lamp) at 9,1 hangs on nothing that could hold it',
-    'light ch.lt_moon_window (moon) at 4,6 hangs on nothing that could hold it',
-  ],
   cellar: [
     'prop cl.study_key stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)',
     'prop cl.study_key faces south into no floor (its front is hidden)',
@@ -208,6 +223,14 @@ describe('Hollowmere placement (art.md 4.1)', () => {
 });
 
 describe('the placement check', () => {
+  it('keys dressing by id tail, then by the tail without _<n> (SPRITES 3)', () => {
+    const known = (k: string) => k in RULES.props;
+    expect(propKey({ id: 'ch.pew_3', kind: 'dressing' }, known)).toBe('pew');
+    expect(propKey({ id: 'ch.stained_glass_e_1', kind: 'dressing' }, known)).toBe('stained_glass_e');
+    expect(propKey({ id: 'ch.lectern', kind: 'dressing' }, known)).toBe('lectern');
+    expect(propKey({ id: 'ch.pew_3', kind: 'pew' }, known)).toBe('pew');
+  });
+
   const copy = (id: SceneId) => structuredClone(scenes[id]);
   const check = (s: ReturnType<typeof copy>) => placementProblems(s, RULES, new Set());
 
@@ -245,7 +268,9 @@ describe('the placement check', () => {
   });
 
   it('refuses a lamp light with no lamp under it, and takes moonlight anywhere outside', () => {
-    expect(check(copy('chapel'))).toEqual(
+    const s = copy('chapel');
+    s.lights!.find((l) => l.id === 'ch.lt_candles')!.x = 9;
+    expect(check(s)).toEqual(
       expect.arrayContaining(['light ch.lt_candles (lamp) at 9,1 hangs on nothing that could hold it']),
     );
     expect(check(copy('forest')).some((p) => p.includes('fo.lt_moon_clearing'))).toBe(false);
