@@ -23,6 +23,7 @@ import { overlayRoot } from '../ui/dom';
 import { refusedIn } from '../ui/theme/motion';
 import { mountSeatPicker } from '../ui/SeatPicker';
 import { INSPECT_PROMPT, INSPECT_REACH_TILES, type InspectBinding, bindInspect } from '../ui/inspect/bind';
+import { bindShout } from '../ui/hive/shout';
 import { AUDIO_KEYS, type AudioKey, AudioBus } from '../view/AudioBus';
 import { BodyView } from '../view/BodyView';
 import { ClueView } from '../view/ClueView';
@@ -283,6 +284,7 @@ export class World extends Phaser.Scene {
     feed.bus.on('aim', onAim);
     net.bus.on('error', onError as never);
     this.inspect = bindInspect(feed, this.hud, overlayRoot()); // round 8, 8B
+    this.offs.push(bindShout(feed, this.hud)); // round 8, 8R: the shout cue
     this.offs.push(
       () => feed.bus.off('noise', onNoise),
       () => feed.bus.off('error', onError),

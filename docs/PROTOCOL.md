@@ -60,6 +60,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). |
 | `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). |
 | `noise` | `{ sceneId: string; x: number; y: number; kind: string }` | - |
+| `shout` | `{ sceneId: string; x: number; y: number }` | Where the shout rang; names no seat, no card and no body. |
 | `error` | `{ code: ErrorCode; msg: string }` | - |
 | `vfx` | `{ sceneId: string; x: number; y: number; kind: 'disguise' }` | To every client whose view holds that scene: the puff of a disguise a Knife strike dropped, at (x, y). Names no handle or seat. Sent only from `handleKill` (GDD 3.17). |
 | `aim` | `{ endsTick: number }` | Private, a dying Gamekeeper: pick a seat with `act.ability {abilityId: 'lastShot'}` before `endsTick` (GDD 3.2). |

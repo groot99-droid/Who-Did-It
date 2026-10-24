@@ -1403,3 +1403,11 @@ leaves `notes` lines out. A refused note (too soon, past the cap) is the usual r
 | `notes.send` | Pin the note | the send button's label |
 | `notes.empty` | No notes yet | the list, before the first note |
 | `notes.ghost` | The dead leave no notes | the field, disabled, for a ghost |
+
+### 14.41 The shout (8R)
+
+Lines are in `apps/client/src/ui/copy/hive.ts` (`HIVE_COPY`); the binder is `ui/hive/shout.ts` (GDD 3.12 "The body bands"). The private `shout {sceneId, x, y}` reaches only the nearest living Detective and Doctor. The toast names the place and never a card, a seat or the body.
+
+| Key | Text | Where |
+|---|---|---|
+| `hive.shout` | Someone is shouting for help in {place} | a hazard toast; `{place}` is the scene's name |

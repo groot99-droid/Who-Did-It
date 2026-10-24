@@ -17,6 +17,7 @@ export const NOISE_KEYS = [
   'goat',
   'wispRattle',
   'shot',
+  'shout',
 ] as const;
 export const NoiseKey = z.enum(NOISE_KEYS);
 export type NoiseKey = z.infer<typeof NoiseKey>;
@@ -261,7 +262,7 @@ export const BalanceFile = z.strictObject({
     hive: z.strictObject({ staggerS: Span, memoryS: Seconds }),
     /**
      * Round 8, 8R (GDD 3.12): the body bands, in tiles from the body: walk to it, shout for the Detective and the
-     * Doctor, and stay to report it or run for the bell (the shout and the bell land in 8R's next PR).
+     * Doctor, and stay to report it or run for the bell.
      */
     body: z.strictObject({ pullTiles: Tiles, shoutTiles: Tiles, bellTiles: Tiles }),
     /** Round 6 (GDD 3.19): an NPC at one goal and one tile for longer than this fails the stuck invariant. */
