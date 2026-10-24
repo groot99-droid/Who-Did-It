@@ -121,6 +121,49 @@ describe('buildHdManifest', () => {
   });
 });
 
+describe('a sliced atlas (bld_*, props_<map>)', () => {
+  const frame = (filename: string, w: number, h: number) => ({ filename, sourceSize: { w, h } });
+  // In 8-bit a slice keeps its building's whole canvas; at HD it is cropped to its box.
+  const bld: Atlas = {
+    textures: [
+      {
+        image: 'b-0.png',
+        frames: [frame('inn#0_0', 320, 400), frame('inn#1_0', 320, 400), frame('well', 64, 96)],
+      },
+    ],
+  };
+  const hdBld = (texels?: number, well: [number, number] = [128, 192]): Atlas => ({
+    textures: [
+      {
+        image: 'b-0.webp',
+        frames: [frame('inn#0_0', 212, 38), frame('inn#1_0', 90, 410), frame('well', ...well)],
+      },
+    ],
+    ...(texels === undefined ? {} : { meta: { texels } }),
+  });
+  const src = (hd: Atlas): HdSources => ({
+    base: [{ key: 'bld_x', type: 'multiatlas', url: 'buildings/bld_x.json', path: 'buildings/' }],
+    imageAt: (root, rel) =>
+      root === 'hd/' && rel === 'buildings/b-0.webp' ? { width: 4096, height: 2048 } : null,
+    atlasAt: (root, rel) => (rel === 'buildings/bld_x.json' ? (root === '' ? bld : hd) : null),
+  });
+
+  it('takes its factor from meta.texels, not from the cropped slices, and still measures its whole frames', () => {
+    expect(buildHdManifest(src(hdBld(2))).manifest.entries).toEqual([
+      { key: 'bld_x', type: 'multiatlas', url: 'buildings/bld_x.json', path: 'buildings/', filter: 'linear' },
+    ]);
+    expect(buildHdManifest(src(hdBld(2))).manifest.texels).toBe(2);
+    expect(() => buildHdManifest(src(hdBld(4)))).toThrow(/frame well is not at factor 4/);
+  });
+
+  it('refuses slices with no meta.texels to say their factor', () => {
+    const slicesOnly: Atlas = {
+      textures: [{ ...hdBld().textures[0]!, frames: hdBld().textures[0]!.frames.slice(0, 2) }],
+    };
+    expect(() => buildHdManifest(src(slicesOnly))).toThrow(/only slices and no meta.texels/);
+  });
+});
+
 describe('texelFactor', () => {
   it('is the whole ratio on both axes', () => {
     expect(texelFactor({ width: 256, height: 128 }, { width: 128, height: 64 }, 'x')).toBe(2);

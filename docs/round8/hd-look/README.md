@@ -12,7 +12,7 @@ the shipped art is packed under `apps/client/public/assets/` by the PRs that fol
 | `lowpoly` | The low-poly style (no finish, six-level posterise) with the library | `--style lowpoly --textured` |
 | `hd` | HD toon at twice the display scale, flat ramps (A164) | `--style hd` |
 | `hdtex` | HD toon at twice the display scale with the library's 2k maps as bump | `--style hd --textured` |
-| `pbr` | The `docs/round8/art.md` 5 line as written: untoned PBR with an HDRI as fill. A rough, unshipped path (`tools/blender/materials/pbr.py`), rendered only for this sheet | `WDI_HD_PBR=1`, `--style hd --textured` |
+| `pbr` | The `docs/round8/art.md` 5 line as written: untoned PBR with an HDRI as fill (`tools/blender/materials/pbr.py`). The owner's pick for buildings and the kit (A164); figures, props, clues and ground ship as `hdtex` | `WDI_HD_PBR=1`, `--style hd --textured` |
 
 ## The files
 
@@ -24,6 +24,7 @@ the shipped art is packed under `apps/client/public/assets/` by the PRs that fol
 | `contact-figure.png` | Every `figure-*` side by side, full size |
 | `contact-room.png` | Every `room-*` side by side at half size |
 | `contact-building.png` | Every `building-*` side by side at half size |
+| `webp-q90.png` | The budget's option 1 (A164, pending the owner): one crop of BlackPine's PBR mill on the packed HD `bld_blackpine` page at zoom 2 (staged on `claude/r8-hd-stage-buildings`), lossless PNG beside lossy WebP at q90 (that page: 6.7 MB as PNG, 0.8 MB as WebP) |
 | `texture-strip.png` | Four roles of the library (wood plank, plaster, brick, stone wall), an eighth of one repeat at one texel per pixel: the 1k diffuse toned 0.45 toward its ramp as 8-bit and low poly read it, the untoned 2k the HD toon reads, and the untoned 4k of the `art.md` 5 line |
 
 ## How each cell was made
