@@ -272,7 +272,7 @@ which. Nothing is committed from the vault except these excerpts.
 | `bo.wall_shelf_0` `densityAudit`      | `creative-writing/vault/10_Characters/11_The_Density_Audit.md`                                                  | 32-32, 44-48, 178-186            |
 | `bo.wall_shelf_0` `stationsNotBuilt`  | `creative-writing/vault/05_Worldbuilding/28_Timetable_of_Stations_Not_Yet_Built.md`                             | 64-71, 74-78, 133-140            |
 | `bo.wall_shelf_1` `cables`            | `creative-writing/vault/05_Worldbuilding/17_Cables.md`                                                          | 36-44, 82-86, 130-134            |
-| `bo.wall_shelf_1` `intake`            | `creative-writing/vault/05_Worldbuilding/15_Intake.md`                                                          | 48-56, 99-105, 133-137           |
+| `bo.wall_shelf_1` `intake`            | `creative-writing/vault/05_Worldbuilding/15_Intake.md`                                                          | 119-123, 169-173, 179-187        |
 | `bo.wall_shelf_1` `arrivals`          | `creative-writing/vault/05_Worldbuilding/24_Arrivals.md`                                                        | 30-32, 109-118, 153-157          |
 | `bo.ledger_desk` `lastShiftTally`     | `creative-writing/vault/05_Worldbuilding/16_The_Last_Shift_s_Tally_Board.md`                                    | 28-34, 36-46, 88-94              |
 | `bo.ledger_desk` `tallyRack`          | `creative-writing/vault/10_Characters/09_The_Tally_Rack.md`                                                     | 35-36, 40-41                     |
