@@ -1394,6 +1394,18 @@ Showing a notice, and presenting an Indulgence or a Seal, happen at a meeting an
 | `bank.pay` | Pay what you owe | `act.payRent`, the whole debt or nothing |
 | `civic.close` | Close | the panel's close button |
 
+### 14.36 Townsfolk (8E)
+
+Lines are in `apps/client/src/ui/copy/townsfolk.ts` (`TOWNSFOLK_COPY`, `figureName(lookId)`). An ambient figure (GDD 3.24) is an avatar whose `lookOf` is a `villager` look id rather than a seat: its nameplate is `figureName(lookOf)`, the plain `figure.villager` for a look with no line of its own, and it never shows a scarf, a hat glyph or a mask. The meeting text reads the count of townsfolk the creatures took since the last meeting (`meetingStart.figuresLost`, once that field lands) and adds one line below the reason; no count, no line.
+
+| Key | Text | Where |
+|---|---|---|
+| `figure.villager` | Villager | the nameplate of any `villager` look without a line of its own |
+| `figure.villager_clerk` | Company Clerk | the nameplate of HollowMere's Clerk (8F's look) |
+| `figure.villager_tallyman` | Tallyman | the nameplate of BlackPine's Tallyman (8F's look) |
+| `meeting.townsfolk.lost.one` | The wolves took one of the townsfolk. | the meeting text when one figure died since the last meeting |
+| `meeting.townsfolk.lost.many` | The wolves took {n} of the townsfolk. | the meeting text when more did; `{n}` is the count |
+
 ### 14.38 Tasks: the chores panel, the station prompts and the village's work (7M)
 
 Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt at Start gets its screen half in the M5b layer (14.19): nothing here changes the layer's gather, craft or quest behaviour, and `ui/theme/**` is not edited; the new rules live in `ui/match.css`.

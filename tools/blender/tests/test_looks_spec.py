@@ -68,6 +68,13 @@ class LooksSpec(unittest.TestCase):
         for k in looks_spec.VILLAGERS:
             self.assertFalse(trade & set(looks_spec.LOOKS[k]["parts"]), k)
 
+    def test_villagers_play_no_trade_clip(self):
+        """The family renders without the Knife's swing, strike, rob, threaten and inspect (option B, A161)."""
+        for k in looks_spec.VILLAGERS:
+            self.assertFalse(set(rc.FAMILY_DROPS) & set(rc.look_clips(k)), k)
+        for k in looks_spec.WORLD_LOOKS:
+            self.assertEqual(rc.look_clips(k), rc.R8_CLIPS, k)
+
 
 if __name__ == "__main__":
     unittest.main()

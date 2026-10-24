@@ -32,6 +32,7 @@ import {
   publishLooks,
 } from '../../sim/Covers';
 import { dealMainDeck } from '../../sim/Deck';
+import { spawnTownsfolk } from '../../sim/townsfolk/figures';
 import { dealTasks } from '../../sim/Tasks';
 import { refuse, setPhase } from '../../sim/Flow';
 import { handleNote, handleSay } from '../../sim/Chat';
@@ -245,6 +246,7 @@ export function startMatch(room: PartyRoom): void {
   const ids = [...room.state.players.keys()];
   // The deal from the public deck (GDD 3.1).
   const dealt = dealMainDeck(room, ids);
+  spawnTownsfolk(room); // round 8, 8E: the ambient figures take their stations (locked call site)
   const looks = dealTraits(ids, room.seeds.get('traits'));
   const factionOf = (id: string) => roles.roles[dealt.get(id) as string]?.faction;
 

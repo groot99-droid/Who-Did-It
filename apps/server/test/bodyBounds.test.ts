@@ -6,6 +6,7 @@ import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { registeredInvariants, runInvariants } from '../src/sim/auto/invariants';
 import { bodies, bodyOf, publishBodies } from '../src/sim/body';
 import { simOf } from '../src/sim/RoomSim';
+import { figuresOf } from '../src/sim/townsfolk/figures';
 import {
   type Party,
   advance,
@@ -47,7 +48,9 @@ describe('the bodyBounds invariant (round 8, GDD 3.22; body.md 8)', () => {
     const party = await party4();
     const { room } = party;
     expect(registeredInvariants()).toContain('bodyBounds');
-    expect(bodies(room).size).toBe(4);
+    // A body per seat and one per ambient figure (GDD 3.22, 3.24), nothing else.
+    expect([...bodies(room).keys()].filter((id) => room.state.players.has(id))).toHaveLength(4);
+    expect(bodies(room).size).toBe(4 + figuresOf(room).size);
     expect(failing(room)).not.toContain('bodyBounds');
     advance(party, 60);
     expect(failing(room)).not.toContain('bodyBounds');
