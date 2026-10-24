@@ -1,0 +1,63 @@
+https://polyhaven.com/license (saved 2026-10-23, Session 8I)
+
+Poly Haven assets licence
+
+All assets on Poly Haven are licensed as CC0 1.0 Universal (public domain dedication):
+https://creativecommons.org/publicdomain/zero/1.0/
+
+You may use them for any purpose, commercial or not, without attribution, and redistribute and modify
+them. Who Did It credits Poly Haven anyway (CREDITS.md, "Poly Haven material library").
+
+Public API terms (https://github.com/Poly-Haven/Public-API/blob/master/ToS.md, read 2026-10-23): free
+for any purpose; requests carry a user agent naming the app (`who-did-it-build`); an in-app credit is asked
+of apps that surface the live API, which the game never does (assets are fetched once, at build time).
+
+Assets taken (diffuse, normal and roughness maps, 1k and 2k jpg, via https://api.polyhaven.com/files/<id>,
+pinned by md5 in tools/blender/materials/polyhaven.lock.json):
+- bark_brown_02: Bark Brown 02 (Rob Tuytel)
+- brown_leather: Brown Leather (Rob Tuytel)
+- brown_mud_02: Brown Mud 02 (Rob Tuytel)
+- brown_mud_rocks_01: Brown Mud Rocks 01 (Rob Tuytel)
+- brown_planks_05: Brown Planks 05 (Rob Tuytel)
+- clean_pebbles: Clean Pebbles (Charlotte Baglioni, Dario Barresi)
+- curly_teddy_natural: Curly Teddy Natural (Rico Cilliers, colormass)
+- dirt_floor: Dirt Floor (eye-candy.xyz)
+- forest_floor: Forest Floor (eye-candy.xyz)
+- forest_ground_04: Forest Ground 04 (Rico Cilliers, Rob Tuytel)
+- forest_ground_05: Forest Ground 05 (Charlotte Baglioni)
+- forest_leaves_02: Forest Leaves 02 (Rob Tuytel)
+- forrest_ground_01: Forest Ground 01 (Rob Tuytel)
+- gravel: Gravel (Dimitrios Savva)
+- gravel_floor: Gravel Floor (Jenelle van Heerden, Matterfield)
+- gravel_stones: Gravel Stones (Amal Kumar)
+- green_metal_rust: Green Metal Rust (Rob Tuytel)
+- hessian_380: Hessian 380 (Rico Cilliers, colormass)
+- leafy_grass: Leafy Grass (Charlotte Baglioni)
+- metal_plate: Metal Plate (Rob Tuytel)
+- moss_wood: Moss Wood (Rob Tuytel)
+- mossy_cobblestone: Mossy Cobblestone (Sơn Nguyễn)
+- mossy_rock: Mossy Rock (Rob Tuytel)
+- mud_cracked_dry_03: Mud Cracked Dry 03 (Dario Barresi, Dimitrios Savva)
+- mud_forest: Mud Forest (eye-candy.xyz)
+- muddy_tracks: Muddy Tracks (Amal Kumar)
+- old_wood_floor: Old Wood Floor (Guillaume Monsergent)
+- pine_bark: Pine Bark (Dimitrios Savva)
+- poly_wool_herringbone: Poly Wool Herringbone (Rico Cilliers, colormass)
+- red_brick_03: Red Brick 03 (Rob Tuytel)
+- river_small_rocks: River Small Rocks (Rico Cilliers, Rob Tuytel)
+- rock_face: Rock Face (Dario Barresi, Greg Zaal)
+- rock_ground: Rock Ground (Rob Tuytel)
+- rock_wall_08: Rock Wall 08 (Amal Kumar)
+- rocky_gravel: Rocky Gravel (Dario Barresi, Dimitrios Savva)
+- rocky_trail: Rocky Trail (Amal Kumar)
+- roof_slates_02: Roof Slates 02 (Rob Tuytel)
+- rough_linen: Rough Linen (Rico Cilliers, colormass)
+- rust_coarse_01: Rust Coarse 01 (Dimitrios Savva, Rico Cilliers)
+- slate_floor_02: Slate Floor 02 (Dimitrios Savva)
+- stone_floor: Stone Floor (Dimitrios Savva)
+- thatch_roof_angled: Thatch Roof Angled (Dimitrios Savva, Rob Tuytel)
+- weathered_plank_siding: Weathered Plank Siding (Dimitrios Savva)
+- weathered_planks: Weathered Planks (Dario Barresi, Dimitrios Savva)
+- withered_grass: Withered Grass (Charlotte Baglioni)
+- wood_trunk_wall: Wood Trunk Wall (Amal Kumar)
+- worn_mossy_plasterwall: Worn Mossy Plasterwall (Amal Kumar)

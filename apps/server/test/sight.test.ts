@@ -72,12 +72,14 @@ describe('sight in a dark scene (GDD 3.15)', () => {
     expect(canSee(m.room, sim(m, 0), sim(m, 2))).toBe(true);
   });
 
-  it('a scene that is not dark is seen whole, by day and by night', async () => {
+  it('a scene that is not dark is seen whole by day; at night it is dark like the others (8L)', async () => {
     const m = await startParty(colyseus, 4);
-    setPhase(m, Phase.night);
-    teleport(m, m.bots[0]!, 'forest', 3, 3);
-    teleport(m, m.bots[1]!, 'forest', 30, 20);
+    teleport(m, m.bots[0]!, 'forest', 7, 1);
+    teleport(m, m.bots[1]!, 'forest', 35, 1);
+    setPhase(m, Phase.day);
     expect(canSee(m.room, sim(m, 0), sim(m, 1))).toBe(true);
+    setPhase(m, Phase.night);
+    expect(canSee(m.room, sim(m, 0), sim(m, 1))).toBe(false);
   });
 
   it('on the wire: a living client holds no avatar it cannot see, a ghost holds all, and the lantern bit is public', async () => {

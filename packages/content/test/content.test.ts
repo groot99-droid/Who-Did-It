@@ -61,7 +61,7 @@ describe('palette and metrics (ASSETS 6.1, WORLD 4.2)', () => {
     expect(metrics.characterCellPx).toBe(128);
     expect(metrics.maxStandingSilhouettePx).toBe(112);
     expect(metrics.maxSilhouetteTiles).toBe(1.75);
-    expect(metrics.characterHeadsTall).toBe(5);
+    expect(metrics.characterHeadsTall).toBe(4);
     expect(metrics.overworldTiles).toEqual({ w: 64, h: 48 });
     expect(Math.round(Math.cos((metrics.camera.tiltXDeg * Math.PI) / 180) * 100) / 100).toBe(
       metrics.camera.verticalSquash,
