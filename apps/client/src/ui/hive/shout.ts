@@ -3,7 +3,7 @@ import { loadSceneName } from '../../view/sceneNames';
 import { fill } from '../copy';
 import { HIVE_COPY } from '../copy/hive';
 
-// The World's shout cue (GDD 3.12 "The body bands", UI.md 14.40), Session 8R: the private `shout` reaches the nearest
+// The World's shout cue (GDD 3.12 "The body bands", UI.md 14.41), Session 8R: the private `shout` reaches the nearest
 // living Detective and Doctor when an NPC finds a body; the toast names the place, never a card or a seat.
 
 interface Toaster {
