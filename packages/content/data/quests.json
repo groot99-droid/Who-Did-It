@@ -14,6 +14,7 @@
       "kind": "fetch",
       "wants": [{ "item": "resin", "qty": 2 }, { "item": "timber", "qty": 1 }],
       "reward": [{ "item": "lantern", "qty": 1 }],
+      "scrip": 6,
       "copyId": "quest.caulkTheSkiff"
     },
     "mollsHerbs": {
@@ -22,6 +23,7 @@
       "kind": "fetch",
       "wants": [{ "item": "herb", "qty": 4 }],
       "reward": [{ "item": "bandage", "qty": 1 }],
+      "scrip": 4,
       "copyId": "quest.mollsHerbs"
     },
     "mollsMushrooms": {
@@ -30,6 +32,7 @@
       "kind": "fetch",
       "wants": [{ "item": "mushroom", "qty": 3 }],
       "reward": [{ "item": "salts", "qty": 1 }],
+      "scrip": 4,
       "copyId": "quest.mollsMushrooms"
     },
     "stackTheYard": {
@@ -38,6 +41,7 @@
       "kind": "fetch",
       "wants": [{ "item": "timber", "qty": 4 }],
       "reward": [{ "item": "crowbar", "qty": 1 }],
+      "scrip": 6,
       "copyId": "quest.stackTheYard"
     },
     "smithsOre": {
@@ -46,6 +50,7 @@
       "kind": "fetch",
       "wants": [{ "item": "tinOre", "qty": 3 }],
       "reward": [{ "item": "lantern", "qty": 1 }],
+      "scrip": 5,
       "copyId": "quest.smithsOre"
     },
     "colliersStone": {
@@ -54,6 +59,7 @@
       "kind": "fetch",
       "wants": [{ "item": "stone", "qty": 3 }],
       "reward": [{ "item": "torch", "qty": 1 }],
+      "scrip": 5,
       "copyId": "quest.colliersStone"
     }
   }

@@ -119,6 +119,8 @@ A knife kill spawns, server-side: the Body; **2 of the 3 trait clues** (seeded c
 
 Wolf kills spawn Fur and Claw Marks (decay 1 cycle), no footprints. Collecting: stand on a clue, hold E 2 s; it enters the Notebook with trait, scene and time. (M3: Footprints and Thread only; the hold is cancelled by moving, releasing, dying or a meeting, and several players may collect the same clue.) The Rag erases 1 clue (3 s, noise 4). Washing needs the Bucket and water (the well or a basin). A Wounded player's drips fade after 20 s; a one-way drop leaves a 90 s footprint trail (height) at the landing. Each scene keeps at most 40 clues; past that the oldest Claimed clue is collected first. Plants are indistinguishable until Inspected. When two different players collect the same physical clue it becomes **Corroborated** and counts as Verified for the suspect set; Townsfolk therefore have a deduction verb.
 
+**Blood is held by the server** (round 8, 8L, A170): a client receives a figure's Blood only while it stands within the Blood clue's range of that figure (`clues.json` `blood.params.visibleTiles`), or when it is a ghost; nobody further away is sent it at all, and the client draws it only within the same range. The killer's own client always knows it is bloody.
+
 **Case Board.** Verified and Corroborated entries are posted automatically; each living player may Present one Claimed entry. The board renders a per-player summary row (fits n/m known traits, Claimed count, last house) rather than raw entries. The server intersects the Verified traits of each body against living players' traits and shows **Suspects: A, B** when the set is 3 or fewer. A suspect's own vote is void and a tie ejects them only when the set is exactly one player and was built from two bodies, or from a Child silhouette plus one Verified trait. Forged entries discredit nobody; they display "Forged: an Accomplice is in play".
 
 ### 3.5 Items and tasks
@@ -150,7 +152,7 @@ Players have 2 HP, regenerating 1 per 90 s; the Knife does 2. At 1 HP you are **
 
 ### 3.7 Stealth, hiding and doors
 
-Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2; noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene, as an avatar under a random handle (3.17); the darkness radius is a client-side mask, drawn as the lighting layer of 3.13; a dark scene uses the night radius in every phase. Since M5b a dark scene's radius and occluders hold on the server (3.15): a living seat there receives another avatar only within its night radius and line of sight, and a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both seeing and being seen; lights start out and are lit by their holder.
+Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2; noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene, as an avatar under a random handle (3.17); the darkness radius is a client-side mask, drawn as the lighting layer of 3.13; a dark scene uses the night radius in every phase. Since M5b a dark scene's radius and occluders hold on the server (3.15): a living seat there receives another avatar only within its night radius and line of sight, and a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both seeing and being seen; lights start out and are lit by their holder. Since round 8 (8L, A190) the same holds in every scene at night and in the Final Night: by day, at dusk and at dawn an ordinary scene is still sent whole.
 
 **Hiding spots** (wardrobe, hay pile, under bed, barrel; crawlspaces for the Child) hold one player; **body spots** (cellar dump, crypt niche, hay pile) are separate objects. Entering takes 1 s, noise 2; the hidden player sees a slit view and keeps one action, **Burst Out** (E): instant, stuns the Checker 1 s, noise 6. **Check** (E, 2 s) opens a spot; a Check on an occupied spot writes a Verified Notebook entry for the hider ("X opened my wardrobe at 3:12"), so checking is evidence.
 
@@ -436,9 +438,10 @@ in a dark scene receives another avatar only within the night radius and a clear
 grid (walls, and the `u` ground that is walkable but blocks sight), or when that avatar stands in the pool of a
 scene light burning now; a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both
 seeing and being seen, so two lit seats see each other 4 tiles further. Every light starts out: its holder lights
-it or puts it out (`act.light`), and a lit light shows on its avatar as the lantern bit, never by card. Outside the
-dark scenes the server still sends every position in the scene and the night radius stays the client's picture
-(3.13), so a lantern post's pool on the square shows what it lights. Ghosts see everything. (6G; 3.7's lantern line
+it or puts it out (`act.light`), and a lit light shows on its avatar as the lantern bit, never by card. At night and
+in the Final Night every scene is dark on the server in the same way (round 8, 8L, A190), so a lantern post's pool
+on the square shows who stands in it and nothing else; by day, at dusk and at dawn an ordinary scene is sent whole
+and its darkness stays the client's picture (3.13). Ghosts see everything. (6G; 3.7's lantern line
 is 6G's.)
 
 ### 3.16 Quests and mini-games
@@ -719,6 +722,37 @@ Round 8 (A134, A135; `docs/round8/economy.md`): the Bible's Book IV on today's m
 
 Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `economy.json` and `balance.json`
 `economy`.
+
+**Scrip** (8C, A138). Every seat carries a purse and keeps a bank balance, and only the seat sees either number.
+- **The stake.** At Start each seat draws its stake on a stream of its own. It is paid the moment the looks are
+  public (before grace), from the range of the tier its **public look** names in `economy.json` `stakes`, never from
+  its card, so a seat wearing a cover carries the purse of the look it wears. A seat with no look takes the default
+  tier.
+- **The band.** Others never see the number. Inspect shows "a light purse" below `economy.heavyPurse` and "a heavy
+  purse" from it. Every stake tier lies wholly on one side of that line, so at Start the band says the look's tier
+  and nothing more.
+- **Wages.** The town pays `economy.taskWage` for each finished task, a fake task exactly as a real one, so a purse
+  never tells a worker from a pretender. A quest turn-in pays the quest's `scrip` (`quests.json`) beside its items.
+- **Shops.** A shop is a counter or stall in a scene (`economy.json` `shops`). Holding the action key at it opens
+  its panel, privately: what it sells at its `ask` and what it buys at its `pay` (`economy.json` `prices`). A living
+  seat in a world phase other than the immunity window buys and sells while the counter stays within
+  `doors.reachTiles`. A purchase is refused, and nothing changes, when the purse or the inventory falls short. The
+  bakery sells flour, the apothecary bandages and salts, the general store (HollowMere's tavern bar, BlackPine's
+  lodge) rope, lantern oil, candles and planks, and the Gamekeeper's stall (HollowMere's forest edge, BlackPine's
+  lodge) snares and torches. The market (HollowMere's square, BlackPine's camp) sells nothing and buys timber, stone,
+  resin, herbs, mushrooms and tin ore. No shop trades a role's kit, and an item a shop both sells and buys pays
+  less than it asks.
+- **The bank.** HollowMere's manor hall and BlackPine's intake office each have a bank counter. Holding the action
+  key at it opens the seat's account, and the seat then deposits from its purse or withdraws to it, the whole amount
+  or nothing, while the counter stays within reach. Banked Scrip is safe from a mugging and a knockout. Only the
+  heist reaches it: when the Bandit cracks the strongbox, the box carries off `economy.heistShare` of every seat's
+  bank balance (rounded down per seat) as its loot, and the cracker pockets it. A suddenly heavy purse is the
+  heist's tell, though wages and sales can make anyone rich.
+- **Coins on the ground.** A knockout or a mugging drops part of the purse where the seat lies, as a heap of coins
+  anyone alive can pick up with the gather hold (`economy.coinPickupS`, within reach). The first to finish takes the
+  whole heap, and it never comes back.
+- **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice. It leaves only as a
+  purchase, rent, a fine, a donation or an HQ tier. Theft, drops, pickups and the bank only move it.
 
 ### 3.24 Moods, mugging and townsfolk
 

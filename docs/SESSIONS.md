@@ -3496,6 +3496,12 @@ an existing `apps/server/test/*.test.ts`, anything written into ROSW.
   appended to `ROUND7_CHECKS` in `tools/auto/checks/index.ts`; `tools/auto/test/report.test.ts` reads the constants and
   needed no line. Tests in `taskPickup.test.ts`: a bar the lists do not explain, an NPC seat with a list and a logged
   `taskDone` nobody finished each fail it; a fake and a real completion by the Done control leave it quiet.
+- 2026-10-23: PR 2b (the client's pure half): `ui/tasks.ts` (task spots, prompts and chore rows from `tasks.json` and the
+  scene props, with `tasks.test.ts`), `ui/copy/tasks.ts` (the lines of UI.md 14.38), `WorldFeed.taskBar()` on the live feed
+  and both mocks. Nothing on screen yet; PR 2c mounts it. No GDD line: the rules are PR 1's and 2a's.
+- 2026-10-23: PR 2c (the screen, UI.md 14.38): `ui/Chores.ts` (the chores panel on K and the village's work bar under the
+  clock), the layer picks task spots beside nodes and givers and sends the `task` hold, a ghost keeps the layer for its tasks
+  only (GDD 3.8); CSS in `ui/match.css`, `ui/theme/**` untouched.
 - Read from ROSW (never written): the UDGT teardown chapters 00 to 03 on `claude/sweet-maxwell-lmsiw3`, and the Who Did It lore
   on `claude/sharp-mccarthy-pqi3ws` (the Canon Ledger, the Lamplighter's Round, the Gazette, the Tab Book, Fourteen Things, the
   Daybook of Crumb's Ovens, Hopscotch, three stories). Drifts noted for 6Z, not resolved here: the lore dates HollowMere to 1893
