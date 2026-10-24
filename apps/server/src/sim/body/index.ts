@@ -6,3 +6,4 @@ export * from './run';
 export * from './verbs';
 export * from './fists';
 export * from './cures';
+export * from './charm';

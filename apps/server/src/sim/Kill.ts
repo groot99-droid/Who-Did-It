@@ -5,6 +5,7 @@ import { POSITION_RING_TICKS } from './constants';
 import { resolveHandle } from './Avatars';
 import { spawnBody } from './Bodies';
 import { bodyBlocksAct } from './body/run';
+import { spendCharm } from './body/charm'; // round 8, 8A: the well's charm
 import { spawnKillClues } from './Clues';
 import { markDead } from './Death';
 import { emitSim } from './events/bus';
@@ -110,6 +111,7 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
     reject(room, sessionId, ErrorCode.cannot, 'nothing happens');
     return;
   }
+  if (spendCharm(room, targetId)) return reject(room, sessionId, ErrorCode.cannot, 'nothing happens'); // round 8, 8A
 
   const tx = Math.floor(target.x / TILE_PX);
   const ty = Math.floor(target.y / TILE_PX);

@@ -782,8 +782,11 @@ figure (its `StatusBit`, seams.md 2); an effect without one shows only to Inspec
 | Charmed | one silent charge: the first killing Knife strike spends it and leaves the seat Wounded at 1 health | until spent | the well (7M, stations.md 4) | being spent | none |
 
 Rows that another system writes onto the body's effect list (Indebted, 3.23) are left as the body's clock finds
-them: it never decays, clears or resets them, on a wake, a knockout or a death. The Charmed row is reserved here;
-the well sets it and the Knife spends it in a later 8A pull request.
+them: it never decays, clears or resets them, on a wake, a knockout or a death. The Charmed row is set by the
+well (`grantCharm`, one at a time) and spent by the Knife after the Watch, the Remedy and the Bandage: a strike that
+any of those voids leaves the charm held, and a strike that would kill instead leaves the seat Wounded at 1 health
+and tells the striker "nothing happens", as a voided strike does. The striker still bloodies and the Knife still
+rests; there is no hit, clip, scream, clue or death, and the figure shows only Wounded's limp, as any wound does.
 
 The curing items: the Medkit's `heal` restores `body.healHp` 40 and stops Bleeding (self or a seat in reach); the
 Doctor's Bandage also stops Bleeding; Salts cure Slowed and Poisoned; the Herbalist's Remedy cures Poisoned as
