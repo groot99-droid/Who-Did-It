@@ -218,7 +218,7 @@ the hazard glow, pulsing.
 **Touch** (`.wdi-stick`, `.wdi-touch-btn`). The stick is a 128 px ring of ink at 55% with a 56 px
 paper knob. Buttons are 64 px paper discs with the key in Oswald 20 px over a 12 px caps label;
 `--primary` is the 80 px mustard Use button. They sit bottom-right in a two-by-two cluster, the
-stick bottom-left.
+stick bottom-left. Round 8 (8A) adds a fifth disc, Strike (X, `touch-strike`), at the end of the cluster (14.32).
 
 **Portraits** (`.wdi-portraits`, `.wdi-portrait`). A grid of paper tiles at least 132 px wide
 (104 on phones): a 2:3 picture slot on slate, the name in display-sm, the trait icons in a row,
@@ -561,7 +561,7 @@ disc carries the key instead.
 | `prompt.ability.cooldown` | – | {ability} in {s} s | the same row while its cooldown runs; `{s}` is the remaining seconds |
 
 Touch labels (`.wdi-touch-btn`): `touch.use` Use, `touch.act` Act, `touch.run` Run, `touch.sneak`
-Sneak.
+Sneak; the Strike disc's label is 8A's `body.strike` (14.32).
 
 ### 14.3 Refusals (a toast after a refused action, N)
 
@@ -879,7 +879,7 @@ giver is in reach. A toast (`m5b-toast`, `aria-live="polite"`)
 reports a gather, a craft or a quest for a few seconds.
 
 **Panels.** Pockets lists the stacks with the slot count and, for a light in the pocket, a Light / Douse button
-(`act.light`). Craft lists the recipes with what each needs, where it is made and a Make / Stop button; a recipe
+(`act.light`); since round 8 (8A, 14.32) a row whose item any holder may use also carries a Use button. Craft lists the recipes with what each needs, where it is made and a Make / Stop button; a recipe
 missing inputs is listed with `craft.need` and its button disabled. Quests lists every offer in reach, then the quests
 the seat holds (taken, done) with `have of total`; Take the work and Hand it in are live only beside the giver, and a
 third quest shows `quest.full`.
@@ -892,7 +892,7 @@ seat's fake task runs the same board; the wire carries no fake flag, so `mini.fa
 fixture passes `fake`.
 
 Frozen test ids: `m5b`, `m5b-inv`, `m5b-craft`, `m5b-quests`, `m5b-prompt`, `m5b-toast`, `inventory`, `inventory-list`,
-`inventory-item-<id>`, `inventory-light`, `inventory-close`, `crafting`, `craft-<recipe>`, `crafting-close`, `quests`,
+`inventory-item-<id>`, `inventory-light`, `inventory-use-<id>` and `inventory-use-near-<id>` (8A, 14.32), `inventory-close`, `crafting`, `craft-<recipe>`, `crafting-close`, `quests`,
 `quest-<id>` (`data-state` offer, taken, done), `quest-accept-<id>`, `quest-turnin-<id>`, `quest-close`, `minigame`,
 `minigame-stage`, `minigame-assist`, `minigame-cancel`, `minigame-status`.
 
@@ -1221,8 +1221,26 @@ chip its icon; `view/body/body.css` holds the panel's own rules. Module `ui/copy
 | `body.value` | {value} / {max} | after a bar's label; whole numbers as the wire carries them |
 | `body.left` | {s}s | a timed chip's seconds left |
 | `body.stacks` | ×{n} | a chip's stacks above one (Weakened from a rat) |
+| `body.strike` | Strike | the Strike disc's label on touch (`touch-strike`) |
+| `body.use` | Use | a pocket row's Use button (`inventory-use-<id>`): the item on yourself |
+| `body.use.near` | Use on them | the second button of a cure (`inventory-use-near-<id>`), shown while an avatar stands in its reach |
 
-Frozen test ids: `body` (the section), `body-health`, `body-stamina` (the bars, `role="meter"`), `body-effects`.
+Frozen test ids: `body` (the section), `body-health`, `body-stamina` (the bars, `role="meter"`), `body-effects`,
+`touch-strike`, `inventory-use-<id>`, `inventory-use-near-<id>`.
+
+**The strike key and the Use buttons** (8A, the last PR of its brief; GDD 3.22). `X` (or the Strike disc on touch, a
+fifth `.wdi-touch-btn` after Sneak in the cluster) swings the fists: `view/body/verbs.ts` `strikeTarget` names the
+nearest other avatar in reach (a handle, as the Kill does; never the own figure, a ghost or a figure in transit), else
+the nearest living creature (its id; a dead one is no target), at the `strike` row's reach plus the one-tile slack of
+the other verbs, and the World sends `act.ability {abilityId: 'strike', targetId}`; with nothing in reach the HUD says
+`refuse.nobody`. The server resolves and refuses the rest (a knocked-out seat, a creature in another scene, the
+cooldown), each a toast of 14.3. The strike has no prompt chip: it is a swing, not a use. In the pockets (14.19.2)
+a row whose item any holder may use gets a Use button: `useVerbOf(itemId)` is the active ability of `scope` item or
+universal that consumes or requires the item (the Medkit's `heal`, the Remedy's `antidote`, the Wake Loaf's `eat`),
+sent with no target, so it works on yourself; a cure whose target is a player (`heal`, `antidote`) also shows
+`body.use.near` while an avatar stands within its reach, sending that handle. A role's own item verbs (the Doctor's
+Bandage and Salts, the Child's slingshot) stay the card's keys (Q, R, F) and get no button; a light keeps Light /
+Douse. The mock refuses every verb but the Knife (a toast), as before.
 
 ### 14.33 Inspect (8B)
 

@@ -27,6 +27,7 @@ import { bindShout } from '../ui/hive/shout';
 import { AUDIO_KEYS, type AudioKey, AudioBus } from '../view/AudioBus';
 import { BodyView } from '../view/BodyView';
 import { type BodyHud, mountBodyHud } from '../view/body/BodyHud'; // round 8, 8A
+import { STRIKE_RANGE_TILES, reachPx, strikeTarget } from '../view/body/verbs'; // round 8, 8A
 import { ClueView } from '../view/ClueView';
 import { CutscenePlayer } from '../view/cutscene/CutscenePlayer';
 import { GiverView } from '../view/GiverView';
@@ -264,6 +265,7 @@ export class World extends Phaser.Scene {
       this.touch = new TouchControls(overlayRoot(), {
         onUse: (on) => this.useKey(on),
         onAct: () => this.abilityKey('Q'),
+        onStrike: () => this.strikeKey(), // round 8, 8A
       });
       input.attachTouch(this.touch);
     }
@@ -425,6 +427,23 @@ export class World extends Phaser.Scene {
     input.bind('KeyN', (down) => down && this.sheet.toggle());
     for (const [code, slot] of Object.entries(ABILITY_SLOTS))
       input.bind(code, (down) => down && this.abilityKey(slot));
+    input.bind('KeyX', (down) => down && this.strikeKey()); // round 8, 8A
+  }
+
+  /**
+   * Round 8, 8A: X / Strike, the fists of every card (GDD 3.22): a swing at the nearest other avatar in reach, else
+   * the nearest living creature; the server resolves the handle or the creature id and refuses the rest.
+   */
+  private strikeKey(): void {
+    if (this.feed.dead()) return;
+    const target = strikeTarget(
+      this.feed.avatars(),
+      this.feed.selfHandle(),
+      this.feed.mobs(),
+      reachPx(STRIKE_RANGE_TILES),
+    );
+    if (target === null) return this.hud.say(C['refuse.nobody']);
+    this.feed.ability('strike', target);
   }
 
   private onSleep(): void {
