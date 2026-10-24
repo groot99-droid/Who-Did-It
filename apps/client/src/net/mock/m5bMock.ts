@@ -65,6 +65,8 @@ export class MockM5b {
   private readonly questList: QuestSnap[] = [];
   /** Round 7 (7M): the mock's own task list; the chores panel of PR 2b seeds and reads it. */
   readonly taskList: TaskSnap[] = [];
+  /** Round 7 (7M): the mock's task bar, 0 to 100. */
+  taskBarPct = 0;
   private hold: { action: 'gather' | 'craft'; targetId: string; since: number; x: number; y: number } | null =
     null;
   private lit = false;
@@ -147,6 +149,10 @@ export class MockM5b {
 
   tasks(): TaskSnap[] {
     return this.taskList.map((t) => ({ ...t }));
+  }
+
+  taskBar(): number {
+    return this.taskBarPct;
   }
 
   inventory(): StackSnap[] {

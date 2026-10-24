@@ -1,4 +1,5 @@
 import balance from '@wdi/content/data/balance.json';
+import { TICK_RATE } from '@wdi/shared/constants';
 import { TRAIT_IDS } from '@wdi/shared/protocol';
 import { type MeetingFeed, type MeetingFeedEvents, type MeetingPlayer, SKIP } from '../net/meeting';
 import { fill } from './copy';
@@ -310,7 +311,9 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     const result = feed.result();
     const revealing = result !== null;
     const inTalk = phase === MEETING_PHASE.discussion || phase === MEETING_PHASE.vote;
-    const canVote = me?.alive === true && !revealing && inTalk;
+    // Round 8 (8L, GDD 3.8): the server refuses a vote before `meeting.minVoteS`; hold the buttons until then.
+    const waitTicks = feed.votesOpenTick() - clockNow.tick;
+    const canVote = me?.alive === true && !revealing && inTalk && waitTicks <= 0;
 
     setText(reason, reasonLine(feed.started(), nameOf));
     setText(clockPhase, revealing ? (PHASE_LABEL[MEETING_PHASE.reveal] ?? '') : (PHASE_LABEL[phase] ?? ''));
@@ -353,6 +356,7 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
       setText(revealRole, lines.join(' '));
     }
     const voteLine = (() => {
+      if (waitTicks > 0) return fill(C['meeting.vote.wait'], { s: Math.ceil(waitTicks / TICK_RATE) });
       if (mine === '') return `${C['meeting.vote.open']}. ${C['meeting.vote.hint']}`;
       const who =
         mine === SKIP ? C['meeting.vote.mineSkip'] : fill(C['meeting.vote.mine'], { name: nameOf(mine) });

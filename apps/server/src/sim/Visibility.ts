@@ -1,5 +1,6 @@
 import { StateView } from '@colyseus/schema';
-import { VIEW_TAG } from '@wdi/shared';
+import { clues } from '@wdi/content';
+import { TILE_PX, VIEW_TAG } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { avatarMemory, avatarOf } from './Avatars';
 import { isAiming } from './NightPowers';
@@ -10,17 +11,21 @@ import { SCENE_KEYS, isWorldPhase, sceneKey } from './World';
 
 export { SCENE_KEYS, sceneKey };
 
-/** The avatars one client's view holds (round 5): `plain` with the default tag, `ghost` also with the ghost tag. */
+/**
+ * The avatars one client's view holds (round 5): `plain` with the default tag, `ghost` also with the ghost tag,
+ * `near` also with the near tag (round 8, 8L).
+ */
 interface HeldAvatars {
   plain: Set<string>;
   ghost: Set<string>;
+  near: Set<string>;
 }
 const heldAvatars = new WeakMap<PartyRoom, Map<string, HeldAvatars>>();
 function heldOf(room: PartyRoom, sessionId: string): HeldAvatars {
   let all = heldAvatars.get(room);
   if (!all) heldAvatars.set(room, (all = new Map()));
   let held = all.get(sessionId);
-  if (!held) all.set(sessionId, (held = { plain: new Set(), ghost: new Set() }));
+  if (!held) all.set(sessionId, (held = { plain: new Set(), ghost: new Set(), near: new Set() }));
   return held;
 }
 
@@ -132,6 +137,12 @@ function reconcileAvatars(
     if (avatar) view.remove(avatar, VIEW_TAG.ghost);
     held.ghost.delete(handle);
   }
+  for (const handle of [...held.near]) {
+    if (wanted.has(handle)) continue;
+    const avatar = avatarOf(room, handle);
+    if (avatar) view.remove(avatar, VIEW_TAG.near);
+    held.near.delete(handle);
+  }
   for (const handle of [...held.plain]) {
     if (wanted.has(handle)) continue;
     const avatar = avatarOf(room, handle);
@@ -148,6 +159,39 @@ function reconcileAvatars(
     if (ghostViewer && !held.ghost.has(handle)) {
       view.add(avatar, VIEW_TAG.ghost);
       held.ghost.add(handle);
+    }
+  }
+  syncNear(room, held, view, viewerSim);
+}
+
+/** `clues.blood.params.visibleTiles` in px: the range Blood is seen from (GDD 3.4; the client's guard reads it too). */
+const NEAR_PX = (clues.clues.blood?.params?.visibleTiles ?? 0) * TILE_PX;
+
+/**
+ * Round 8 (8L, docs/round8/teardown.md 1): every tick, after the avatars are written (`publishAvatars`), each view
+ * holds the near tag of exactly the avatars it holds that stand within `NEAR_PX` of the viewer, or all of them for a
+ * ghost, so `Avatar.nearBits` (Blood) never reaches a client out of range, not even between two reconciles.
+ */
+export function reconcileNear(room: PartyRoom): void {
+  const sim = simOf(room);
+  for (const client of room.clients) {
+    const viewerSim = sim.players.get(client.sessionId);
+    if (!client.view || !viewerSim || isAdminClient(room, client.sessionId)) continue;
+    syncNear(room, heldOf(room, client.sessionId), client.view, viewerSim);
+  }
+}
+
+function syncNear(room: PartyRoom, held: HeldAvatars, view: StateView, viewerSim: PlayerSim): void {
+  for (const handle of held.plain) {
+    const avatar = avatarOf(room, handle);
+    if (!avatar) continue;
+    const near = viewerSim.dead || Math.hypot(avatar.x - viewerSim.x, avatar.y - viewerSim.y) <= NEAR_PX;
+    if (near && !held.near.has(handle)) {
+      view.add(avatar, VIEW_TAG.near);
+      held.near.add(handle);
+    } else if (!near && held.near.has(handle)) {
+      view.remove(avatar, VIEW_TAG.near);
+      held.near.delete(handle);
     }
   }
 }
