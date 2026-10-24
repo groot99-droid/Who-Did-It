@@ -6,6 +6,8 @@ import { publishAvatars } from './Avatars';
 import { runDecay } from './Clues';
 import { runAuto } from './auto/Auto';
 import { runEvents } from './events/bus';
+import { runEconomy } from './economy/run';
+import './tasks/invariants'; // round 7, 7M: the taskBar invariant's host (locked line, granted by 6Z; above 7H's so its four stay last)
 import { runVendettas } from './vendettas/run';
 import { runMemorial } from './Memorial';
 import { runMobs } from './Mobs';
@@ -69,4 +71,5 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   runTrain(room); // round 7, 7I: the Daily Train (locked call site)
   runVendettas(room); // round 7, 7H: the vendettas' watched goals (GDD 3.20)
   runMemorial(room); // round 7, 7I: the Vicar's memorial, bus listeners registered once (locked call site)
+  runEconomy(room); // round 8, 8C: purses, shops, bank; 8D's loops inside sim/economy (locked call site)
 }

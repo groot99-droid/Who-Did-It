@@ -1,0 +1,277 @@
+{
+ "anims": [
+  {
+   "key": "node_timber/break",
+   "frames": [
+    {
+     "key": "nodes",
+     "frame": "node_timber/break/000"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_timber/break/001"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_timber/break/002"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_timber/break/003"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_timber/break/004"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_timber/break/005"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_timber/break/006"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_timber/break/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "node_stone/break",
+   "frames": [
+    {
+     "key": "nodes",
+     "frame": "node_stone/break/000"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_stone/break/001"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_stone/break/002"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_stone/break/003"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_stone/break/004"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_stone/break/005"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_stone/break/006"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_stone/break/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "node_tin_ore/break",
+   "frames": [
+    {
+     "key": "nodes",
+     "frame": "node_tin_ore/break/000"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_tin_ore/break/001"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_tin_ore/break/002"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_tin_ore/break/003"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_tin_ore/break/004"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_tin_ore/break/005"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_tin_ore/break/006"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_tin_ore/break/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "node_resin/break",
+   "frames": [
+    {
+     "key": "nodes",
+     "frame": "node_resin/break/000"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_resin/break/001"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_resin/break/002"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_resin/break/003"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_resin/break/004"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_resin/break/005"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_resin/break/006"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_resin/break/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "node_herb/break",
+   "frames": [
+    {
+     "key": "nodes",
+     "frame": "node_herb/break/000"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_herb/break/001"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_herb/break/002"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_herb/break/003"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_herb/break/004"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_herb/break/005"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_herb/break/006"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_herb/break/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "node_mushroom/break",
+   "frames": [
+    {
+     "key": "nodes",
+     "frame": "node_mushroom/break/000"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_mushroom/break/001"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_mushroom/break/002"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_mushroom/break/003"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_mushroom/break/004"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_mushroom/break/005"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_mushroom/break/006"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_mushroom/break/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "node_coins/break",
+   "frames": [
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/000"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/001"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/002"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/003"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/004"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/005"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/006"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_coins/break/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  }
+ ]
+}
