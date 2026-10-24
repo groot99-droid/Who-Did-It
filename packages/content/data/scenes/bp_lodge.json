@@ -120,7 +120,9 @@
     { "id": "bl.footlocker_0", "kind": "dressing", "x": 15, "y": 3 },
     { "id": "bl.footlocker_1", "kind": "dressing", "x": 19, "y": 3 },
     { "id": "bl.footlocker_2", "kind": "dressing", "x": 15, "y": 8 },
-    { "id": "bl.footlocker_3", "kind": "dressing", "x": 19, "y": 8 }
+    { "id": "bl.footlocker_3", "kind": "dressing", "x": 19, "y": 8 },
+    { "id": "bl.shop_store", "kind": "counter", "x": 12, "y": 7 },
+    { "id": "bl.shop_stall", "kind": "counter", "x": 12, "y": 6 }
   ],
   "gates": [],
   "paths": [],
@@ -150,8 +152,8 @@
     "WwwwwwwwwwwwWwwPwwwPwwwW",
     "WwwwPPPPPPwwWwwwwwwwwwwW",
     "WwwwPPPPPPwwWwwwwwwwwddW",
-    "WPwwwwwwwwwwWwwwwPwwwwwW",
-    "WwwwwwwwwwwwWwwwwwwwwwwW",
+    "WPwwwwwwwwwwPwwwwPwwwwwW",
+    "WwwwwwwwwwwwPwwwwwwwwwwW",
     "WwwwwwwwwwwwwwwPwwwPwwwW",
     "WPwwwwwwwwwwwwPPPPPPPwwW",
     "WPwPPdddwwwwwwPPPPPPPWwW",
