@@ -3,6 +3,7 @@ import metrics from '@wdi/content/data/metrics.json';
 import { toScreen } from '@wdi/shared/iso';
 import type { MobSnap } from '../net/world';
 import { BIAS, depthAt } from './iso';
+import { drawScale } from './texels';
 import { mobAnimKey, mobClip } from './m5bFrames';
 import { reducedMotion as prefersReducedMotion } from './vfx/motion';
 
@@ -98,7 +99,9 @@ export class MobView {
     const frame = `${key}/000`;
     const art = this.scene.textures.exists(ATLAS) && this.scene.textures.get(ATLAS).has(frame);
     if (art) {
-      const sprite = this.scene.add.sprite(at.x, at.y, ATLAS, frame).setScale(metrics.iso.artScale);
+      const sprite = this.scene.add
+        .sprite(at.x, at.y, ATLAS, frame)
+        .setScale(drawScale(ATLAS, metrics.iso.artScale));
       // A creature first seen dead (a client joining the scene) lies on its last frame rather than falling again.
       if (this.scene.anims.exists(key)) {
         sprite.play(key);

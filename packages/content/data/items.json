@@ -520,6 +520,26 @@
       "tooltip": "The manor's strongbox, heavy with the Train's delivery.",
       "ships": "V1",
       "gddRef": "3.20"
+    },
+    "indulgence": {
+      "id": "indulgence",
+      "name": "Indulgence",
+      "kind": "valuable",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Clears one rumour naming your look: burn your own notice with it, or present it at a meeting.",
+      "ships": "V1",
+      "gddRef": "3.23"
+    },
+    "parishSeal": {
+      "id": "parishSeal",
+      "name": "Parish Seal",
+      "kind": "valuable",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Present it at a meeting: the vote begins again, and for a short while no vote may name you.",
+      "ships": "V1",
+      "gddRef": "3.23"
     }
   }
 }

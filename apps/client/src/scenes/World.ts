@@ -23,6 +23,7 @@ import { overlayRoot } from '../ui/dom';
 import { refusedIn } from '../ui/theme/motion';
 import { mountSeatPicker } from '../ui/SeatPicker';
 import { INSPECT_PROMPT, INSPECT_REACH_TILES, type InspectBinding, bindInspect } from '../ui/inspect/bind';
+import { bindShout } from '../ui/hive/shout';
 import { AUDIO_KEYS, type AudioKey, AudioBus } from '../view/AudioBus';
 import { BodyView } from '../view/BodyView';
 import { ClueView } from '../view/ClueView';
@@ -30,9 +31,13 @@ import { CutscenePlayer } from '../view/cutscene/CutscenePlayer';
 import { GiverView } from '../view/GiverView';
 import { MobView } from '../view/MobView';
 import { VfxView } from '../view/vfx/VfxView';
+import { HqView } from '../view/hq/HqView';
 import { NodeView } from '../view/NodeView';
 import { TransportView } from '../view/transport/TransportView';
 import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
+import { mountShopLayer, type ShopLayer } from '../ui/shop/ShopLayer'; // round 8, 8C (locked)
+import { type CivicLayer, mountCivicLayer } from '../ui/econ/CivicLayer'; // round 8, 8D
+import { mountPurseHud, type PurseHud } from '../view/purse/PurseHud'; // round 8, 8C (locked)
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
@@ -135,8 +140,12 @@ export class World extends Phaser.Scene {
   private mobView!: MobView;
   private vfxView!: VfxView; // round 8, 8G (locked)
   private transportView!: TransportView; // round 8, 8G (locked)
+  private hqView!: HqView; // round 8, 8G (locked)
   private giverView!: GiverView;
   private m5b: M5bLayer | null = null;
+  private shop: ShopLayer | null = null; // round 8, 8C (locked)
+  private civic: CivicLayer | null = null; // round 8, 8D
+  private purse: PurseHud | null = null; // round 8, 8C (locked)
   private cutscenes!: CutscenePlayer;
   private ground: GroundView | null = null;
   private bell: { x: number; y: number } | null = null;
@@ -217,12 +226,16 @@ export class World extends Phaser.Scene {
     this.mobView = new MobView(this);
     this.vfxView = new VfxView(this); // round 8, 8G (locked)
     this.transportView = new TransportView(this); // round 8, 8G (locked)
+    this.hqView = new HqView(this.statics, this.vfxView); // round 8, 8G (locked)
     this.giverView = new GiverView(this);
     this.m5b = mountM5bLayer(this);
+    this.shop = mountShopLayer(this); // round 8, 8C (locked)
+    this.civic = mountCivicLayer(this); // round 8, 8D
     this.entities = new EntityView(this, feed.selfId);
 
     this.hud = new Hud(overlayRoot());
     this.hud.setChip((this.registry.get(REG_ROLE_CHIP) as HudChip | undefined) ?? null);
+    this.purse = mountPurseHud(this, feed, this.hud.root.querySelector('.wdi-hud__tl') ?? this.hud.root); // round 8, 8C (locked)
     void loadSceneName(this.sceneId).then((scene) => this.hud.say(fill(C['hud.scene'], { scene }), 1500));
     this.hud.onNotebook(() => this.sheet.toggle());
     this.lighting = new Lighting(this, overlayRoot());
@@ -271,6 +284,7 @@ export class World extends Phaser.Scene {
     feed.bus.on('aim', onAim);
     net.bus.on('error', onError as never);
     this.inspect = bindInspect(feed, this.hud, overlayRoot()); // round 8, 8B
+    this.offs.push(bindShout(feed, this.hud)); // round 8, 8R: the shout cue
     this.offs.push(
       () => feed.bus.off('noise', onNoise),
       () => feed.bus.off('error', onError),
@@ -325,8 +339,12 @@ export class World extends Phaser.Scene {
       this.mobView.destroy();
       this.vfxView.destroy(); // round 8, 8G (locked)
       this.transportView.destroy(); // round 8, 8G (locked)
+      this.hqView.destroy(); // round 8, 8G (locked)
       this.giverView.destroy();
       this.m5b?.destroy();
+      this.shop?.destroy(); // round 8, 8C (locked)
+      this.civic?.destroy(); // round 8, 8D
+      this.purse?.destroy(); // round 8, 8C (locked)
       this.cutscenes.destroy();
       this.ground?.destroy();
       this.ground = null;
@@ -371,6 +389,7 @@ export class World extends Phaser.Scene {
     this.syncBodies(bodies);
     this.drawDoors(clock.tick);
     this.transportView.update(this.sceneId, this.portals, feed, clock.tick, this.time.now); // round 8, 8G (locked)
+    this.hqView.update(feed.hqTiers()); // round 8, 8G (locked)
     this.updateTarget(self, clues, bodies);
     this.updateHold(self, clues);
     this.footsteps(now);
@@ -421,6 +440,8 @@ export class World extends Phaser.Scene {
 
   /** E / Use: the M5b layer takes it for a node or a giver in reach; otherwise the clue, body, bell and door verbs. */
   private useKey(down: boolean): void {
+    if (this.shop?.use(down)) return; // round 8, 8C (locked): a shop counter in reach
+    if (this.civic?.use(down)) return; // round 8, 8D: an altar, the mailbag, a rack, the back room, a station, a bank
     if (this.m5b?.use(down)) return;
     if (down) this.startUse();
     else this.endUse();

@@ -69,6 +69,8 @@ describe('needs', () => {
     const { party, a } = await world();
     const n = needsFor(party, a);
     const before = n.hunger;
+    // Standing still, so its routine never takes it home or busies it at a station while hunger rises.
+    npcMemory(party.room).walk = false;
     advance(party, ticksOf(m.hunger.riseS / 10));
     expect(n.hunger).toBeGreaterThan(before);
     expect(n.hunger).toBeCloseTo(before + 0.1, 1);
