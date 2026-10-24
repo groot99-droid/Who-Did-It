@@ -256,6 +256,7 @@
     "tap": { "steps": 3, "periodS": 1.4, "bandFrac": 0.18 },
     "gddRef": "3.16"
   },
+  "reader": { "spinesMin": 3, "spinesMax": 5, "pageMaxChars": 600, "gddRef": "3.26" },
   "train": { "arriveAtS": 5, "deliveryAfterS": 8, "hearTiles": 20, "gddRef": "3.3" },
   "ui": {
     "transitionS": { "fade": 0.4, "iris": 0.6, "wipe": 0.7 },

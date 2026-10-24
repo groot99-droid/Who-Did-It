@@ -24,6 +24,7 @@ import minigamesJson from '../data/minigames.json' with { type: 'json' };
 import vendettasJson from '../data/vendettas.json' with { type: 'json' };
 // Round 8 (GDD 3.22 "Inspect"), Session 8B.
 import relationsJson from '../data/relations.json' with { type: 'json' };
+import loreJson from '../data/lore.json' with { type: 'json' };
 import evolutionsJson from '../data/evolutions.json' with { type: 'json' };
 import lawsJson from '../data/laws.json' with { type: 'json' };
 import eventsJson from '../data/events.json' with { type: 'json' };
@@ -76,6 +77,7 @@ import { MinigamesFile, MobsFile, QuestsFile, RecipesFile, ResourcesFile } from 
 import { EventsFile, EvolutionsFile, LawsFile, VendettasFile } from './schemas/bible.js';
 import { EconomyFile } from './schemas/economy.js';
 import { RelationsFile } from './schemas/relations.js';
+import { LoreFile } from './schemas/lore.js';
 import { SCENE_IDS, Scene, type SceneId } from './schemas/scene.js';
 import { StyleFile } from './schemas/style.js';
 import { TasksFile } from './schemas/tasks.js';
@@ -105,6 +107,7 @@ export * from './schemas/m5b.js';
 export * from './schemas/bible.js';
 export * from './schemas/economy.js';
 export * from './schemas/relations.js';
+export * from './schemas/lore.js';
 export { validateContent, type Content } from './validate.js';
 export { navs, NavFile } from './nav.js';
 
@@ -184,6 +187,7 @@ export function parseContent(raw: {
   events: unknown;
   economy: unknown;
   relations: unknown;
+  lore: unknown;
 }): Omit<Content, 'scenes' | 'maps'> {
   const parsed = {
     palette: PaletteFile.parse(raw.palette),
@@ -211,6 +215,7 @@ export function parseContent(raw: {
     events: EventsFile.parse(raw.events),
     economy: EconomyFile.parse(raw.economy),
     relations: RelationsFile.parse(raw.relations),
+    lore: LoreFile.parse(raw.lore),
   };
   // Round 8 (A171): the role text's number tokens are filled from the data here, before anything reads a role.
   return { ...parsed, roles: fillRoles(parsed.roles, parsed) };
@@ -243,6 +248,7 @@ export const content: Content = {
     events: eventsJson,
     economy: economyJson,
     relations: relationsJson,
+    lore: loreJson,
   }),
   scenes: parseScenes(),
   maps: parseMaps(),
@@ -277,6 +283,7 @@ export const {
   events,
   economy,
   relations,
+  lore,
 } = content;
 
 function countKey(playerCount: number): `${4 | 5 | 6 | 7 | 8 | 9 | 10}` {

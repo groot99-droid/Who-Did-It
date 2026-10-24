@@ -1,0 +1,383 @@
+{
+  "gddRef": "3.26",
+  "shelves": {
+    "as.shelf": {
+      "title": "Mallory Apothecary, the shelf",
+      "volumes": [
+        {
+          "id": "fieldGuide",
+          "title": "A Field Guide to the Things That Walk",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/22_A_Field_Guide_to_the_Things_That_Walk_at_Night.md"
+        },
+        {
+          "id": "greatHearth",
+          "title": "The Recipe Book of the Great Hearth",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/20_The_Recipe_Book_of_the_Great_Hearth.md"
+        },
+        {
+          "id": "dreamBook",
+          "title": "The Dream Book",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/31_The_Dream_Book.md"
+        },
+        {
+          "id": "lavenderField",
+          "title": "The Lavender Field",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/29_The_Lavender_Field.md"
+        }
+      ]
+    },
+    "mh.bookcase_0": {
+      "title": "Vane Manor, the hall: faith",
+      "volumes": [
+        {
+          "id": "motherOfMothers",
+          "title": "The Testament of the Mother of Mothers",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/08_The_Testament_of_the_Mother_of_Mothers.md"
+        },
+        {
+          "id": "holyWar",
+          "title": "The Holy War",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/14_The_Holy_War.md"
+        },
+        {
+          "id": "dawnJudgment",
+          "title": "The Dawn Judgment",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/21_The_Dawn_Judgment.md"
+        }
+      ]
+    },
+    "mh.bookcase_3": {
+      "title": "Vane Manor, the hall: records",
+      "volumes": [
+        {
+          "id": "undertakersRegister",
+          "title": "The Undertaker's Register",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/13_The_Undertaker_s_Register.md"
+        },
+        {
+          "id": "exhibits",
+          "title": "Exhibits A to R",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/23_Exhibits_A_to_R.md"
+        },
+        {
+          "id": "personsOfNote",
+          "title": "Persons of Note",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/10_Characters/08_Persons_of_Note.md"
+        },
+        {
+          "id": "subjectFiles",
+          "title": "Subject Files",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/10_Characters/10_Subject_Files.md"
+        }
+      ]
+    },
+    "mh.bookcase_6": {
+      "title": "Vane Manor, the hall: stories",
+      "volumes": [
+        {
+          "id": "wellRemembers",
+          "title": "What the Well Remembers",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/03_Stories/12_What_the_Well_Remembers.md"
+        },
+        {
+          "id": "deadMansLamp",
+          "title": "The Dead Man's Lamp",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/03_Stories/15_The_Dead_Man_s_Lamp.md"
+        },
+        {
+          "id": "lastDance",
+          "title": "The Last Dance at the Hall",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/03_Stories/26_The_Last_Dance_at_the_Hall.md"
+        },
+        {
+          "id": "threeHeirlooms",
+          "title": "Three Heirlooms, Low Tide",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/03_Stories/27_Three_Heirlooms_Low_Tide.md"
+        }
+      ]
+    },
+    "mu.bookcase": {
+      "title": "Vane Manor, upstairs",
+      "volumes": [
+        {
+          "id": "confessionBook",
+          "title": "The Confession Book of St Brannock's",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/10_Characters/06_The_Confession_Book_of_St_Brannock_s.md"
+        },
+        {
+          "id": "eightPhrases",
+          "title": "Eight Phrases",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/30_Eight_Phrases.md"
+        },
+        {
+          "id": "willO",
+          "title": "Will o'",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/28_Will_o.md"
+        },
+        {
+          "id": "hopscotch",
+          "title": "Hopscotch",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/23_Hopscotch.md"
+        }
+      ]
+    },
+    "wp.writing_desk": {
+      "title": "Widow Vane's desk",
+      "volumes": [
+        {
+          "id": "blackWax",
+          "title": "Black Wax",
+          "kind": "letter",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/08_Letters/04_Black_Wax.md"
+        },
+        {
+          "id": "censored",
+          "title": "Censored",
+          "kind": "letter",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/08_Letters/03_Censored.md"
+        },
+        {
+          "id": "redCrust",
+          "title": "The Red Crust",
+          "kind": "letter",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/08_Letters/06_The_Red_Crust.md"
+        }
+      ]
+    },
+    "wp.letter_box": {
+      "title": "Widow Vane's letter box",
+      "volumes": [
+        {
+          "id": "oneShot",
+          "title": "One Shot",
+          "kind": "letter",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/08_Letters/05_One_Shot.md"
+        }
+      ]
+    },
+    "bk.ledger": {
+      "title": "Crumb's Ovens, the daybook",
+      "volumes": [
+        {
+          "id": "crumbsDaybook",
+          "title": "The Daybook of Crumb's Ovens",
+          "kind": "ledger",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/22_The_Daybook_of_Crumb_s_Ovens.md"
+        }
+      ]
+    },
+    "ov.board": {
+      "title": "The Hollowmere notice board",
+      "volumes": [
+        {
+          "id": "gazetteMorning",
+          "title": "The HollowMere Gazette, Morning Edition",
+          "kind": "clipping",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/10_The_HollowMere_Gazette_Morning_Edition.md"
+        },
+        {
+          "id": "fourNotices",
+          "title": "Four Notices",
+          "kind": "clipping",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/10_Characters/07_Four_Notices.md"
+        },
+        {
+          "id": "lamplightersRound",
+          "title": "A Lamplighter's Round of HollowMere",
+          "kind": "clipping",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/09_A_Lamplighter_s_Round_of_HollowMere.md"
+        },
+        {
+          "id": "trainTimetable",
+          "title": "The Daily Train Timetable",
+          "kind": "clipping",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/07_The_Daily_Train_Timetable_Manifest_and_Rules_of_Carriage.md"
+        }
+      ]
+    },
+    "bl.wall_shelf": {
+      "title": "The Bunkhouse shelf",
+      "volumes": [
+        {
+          "id": "tinGallery",
+          "title": "The Tin Gallery",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/03_Stories/20_The_Tin_Gallery.md"
+        },
+        {
+          "id": "deadWeight",
+          "title": "Dead Weight",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/03_Stories/21_Dead_Weight.md"
+        },
+        {
+          "id": "wolvesBlamed",
+          "title": "What the Wolves Were Blamed For",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/03_Stories/19_What_the_Wolves_Were_Blamed_For.md"
+        },
+        {
+          "id": "roadClosed",
+          "title": "The Road Is Closed",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/03_Stories/25_The_Road_Is_Closed.md"
+        }
+      ]
+    },
+    "bo.wall_shelf_0": {
+      "title": "Company Office, the charter shelf",
+      "volumes": [
+        {
+          "id": "thorneBylaws",
+          "title": "Bylaws of the Thorne Expanse Line",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/06_Articles_of_Incorporation_and_Bylaws_of_the_Thorne_Expanse_Line.md"
+        },
+        {
+          "id": "standingOrders",
+          "title": "Standing Orders",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/26_Standing_Orders.md"
+        },
+        {
+          "id": "densityAudit",
+          "title": "The Density Audit",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/10_Characters/11_The_Density_Audit.md"
+        },
+        {
+          "id": "stationsNotBuilt",
+          "title": "Timetable of Stations Not Yet Built",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/28_Timetable_of_Stations_Not_Yet_Built.md"
+        }
+      ]
+    },
+    "bo.wall_shelf_1": {
+      "title": "Company Office, the wire shelf",
+      "volumes": [
+        {
+          "id": "cables",
+          "title": "Cables",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/17_Cables.md"
+        },
+        {
+          "id": "intake",
+          "title": "Intake",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/15_Intake.md"
+        },
+        {
+          "id": "arrivals",
+          "title": "Arrivals",
+          "kind": "book",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/24_Arrivals.md"
+        }
+      ]
+    },
+    "bo.ledger_desk": {
+      "title": "Company Office, the payroll desk",
+      "volumes": [
+        {
+          "id": "lastShiftTally",
+          "title": "The Last Shift's Tally Board",
+          "kind": "ledger",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/05_Worldbuilding/16_The_Last_Shift_s_Tally_Board.md"
+        },
+        {
+          "id": "tallyRack",
+          "title": "The Tally Rack",
+          "kind": "ledger",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/10_Characters/09_The_Tally_Rack.md"
+        },
+        {
+          "id": "pledged",
+          "title": "Pledged and Unredeemed",
+          "kind": "ledger",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/10_Characters/12_Pledged_and_Unredeemed.md"
+        }
+      ]
+    },
+    "bc.board": {
+      "title": "The Blackpine camp board",
+      "volumes": [
+        {
+          "id": "sayingsOfFork",
+          "title": "Sayings of the Fork",
+          "kind": "clipping",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/27_Sayings_of_the_Fork.md"
+        },
+        {
+          "id": "twoRoads",
+          "title": "The Two Roads",
+          "kind": "clipping",
+          "pages": ["fill later"],
+          "source": "creative-writing/vault/10_Characters/13_The_Two_Roads.md"
+        }
+      ]
+    }
+  }
+}

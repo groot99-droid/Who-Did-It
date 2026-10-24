@@ -294,6 +294,12 @@ export const BalanceFile = z.strictObject({
     tap: z.strictObject({ steps: Count, periodS: Seconds, bandFrac: Frac }),
   }),
   /**
+   * Round 8 (GDD 3.26, 7M): the shelf reader. A shelf of books shows `spinesMin` to `spinesMax` spines (owner, A200
+   * round 2); no page of `lore.json` is longer than `pageMaxChars`, so the first page reads whole at 1280x720 and on
+   * a phone.
+   */
+  reader: Section({ spinesMin: Count, spinesMax: Count, pageMaxChars: Count }),
+  /**
    * Round 7 (GDD 3.3): the Daily Train of a map with a `station`. It stops `arriveAtS` into each day and delivers
    * `deliveryAfterS` later; the seats of the hub within `hearTiles` of the platform hear it.
    */

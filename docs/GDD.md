@@ -843,3 +843,10 @@ Round 8 addendum B (A173, A174; `docs/round8/living.md`). Sessions 8Q, 8R, 8S, 8
   - **Input.** A line is built only from facts every seat at the table has: the round, the meeting's reason, the caller's and the body's names, the roll-call's missing names and the other living seats' names (`services/talk/facts.ts`). Never a card, a cover, a private view or which seats are NPCs.
   - **Templates.** `services/talk/templates.ts`: questions and remarks that name seats by name and never name a card, a role or a faction. A template whose name has nothing to fill (no body at a bell meeting) is not drawn; the bell question is drawn only at a bell meeting. Each line draws two uniforms from the seat's `talk` stream, whatever is drawn.
 - **Briarberry.** The Doctor's healing ingredient, picked from briar bushes that make the picker bleed (on hard down to half health, never to death); easy villagers gift it, normal shops sell it, hard only grows it (8U).
+
+### 3.26 The reader: shelves, letters, ledgers and boards
+
+Round 8 addendum C (A200; `docs/round8/stations.md` 5), 7M. The owner: "walking up to a book shelf should allow you to read through the lore of the game, with books and letters spread throughout multiple shelf locations".
+- **What can be read.** `lore.json` keys each readable prop by its id: shelves, a writing desk, the letter box, the bakery's daybook, the office's payroll desk and both notice boards, on Hollowmere and Blackpine. Each holds volumes: a **book** (leafed page by page), a **letter** (one sheet, unfolded), a **ledger** (columns) or a **clipping** (pinned). A shelf of books shows `reader.spinesMin` to `reader.spinesMax` spines (owner, round 2), and no page is longer than `reader.pageMaxChars`, so the reader shows it whole at 1280x720 and on a phone.
+- **The text.** Every page reads "fill later" until the codex is done (owner, round 1). 8V fills the pages from the vault works, and each volume names its vault path (`source`). Ids are frozen; titles and pages are text.
+- **Secrecy.** A volume is the same bytes for every seat and shows no card, cover or private view. The server keeps nothing of what a seat read.
