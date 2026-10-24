@@ -3,6 +3,7 @@ import { balance, clues } from '@wdi/content';
 import { Phase, TILE_PX } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { avatarMemory } from '../src/sim/Avatars';
+import { clockOf } from '../src/sim/auto/clock';
 import { StatusBit } from '../src/sim/constants';
 import { simOf } from '../src/sim/RoomSim';
 import { canSee } from '../src/sim/Sight';
@@ -161,14 +162,17 @@ describe('the leak audit (8L)', () => {
     const a = audit(m);
     moved(m, a);
     expect(await until(() => avatarsHeld(m.bots[1]!).length > 0)).toBe(true);
+    // The audit judges a patch only on the tick it was encoded. A loaded runner decodes ticks late, so the clock
+    // stops here: patches still go out, and every one is decoded on the server's current tick.
+    clockOf(m.room).paused = true;
     // White-box: bypass `writeAvatar` for seat 0's avatar every few ms, as a regression would.
     const timer = setInterval(() => {
       const handle = avatarMemory(m.room).handleOf.get(m.bots[0]!.id) ?? '';
       const avatar = m.room.state.scenes.get('forest')?.avatars.get(handle);
       if (avatar) avatar.statusBits |= StatusBit.bloody;
     }, 5);
-    // Only a patch decoded on the tick it was encoded is judged, which a loaded runner can delay for seconds.
-    expect(await until(() => a.leaks.some((l) => l.includes('Blood')), 20_000)).toBe(true);
+    expect(await until(() => a.leaks.some((l) => l.includes('Blood')))).toBe(true);
     clearInterval(timer);
+    clockOf(m.room).paused = false;
   });
 });
