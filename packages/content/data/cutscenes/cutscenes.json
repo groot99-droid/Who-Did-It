@@ -5,7 +5,10 @@
     "poison": "deathPoison",
     "shot": "deathShot",
     "ejected": "deathEjected",
-    "wolf": "deathWolf"
+    "wolf": "deathWolf",
+    "creature": "deathCreature",
+    "bled": "deathBled",
+    "sickened": "deathSickened"
   },
   "openings": { "hollowmere": "openingHollowmere", "blackpine": "openingBlackpine" },
   "cutscenes": {
@@ -395,6 +398,60 @@
           "withPrevious": true
         },
         { "t": "caption", "copyId": "cs.deathWolf.line", "durationS": 2.5, "style": "whisper" },
+        { "t": "hold" }
+      ]
+    },
+    "deathCreature": {
+      "id": "deathCreature",
+      "kind": "death",
+      "skippable": true,
+      "maxS": 4,
+      "steps": [
+        { "t": "audio", "key": "creak" },
+        {
+          "t": "vfx",
+          "kind": "shake",
+          "sceneId": "overworld",
+          "at": { "x": 0, "y": 0 },
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.deathCreature.line", "durationS": 2.5, "style": "whisper" },
+        { "t": "hold" }
+      ]
+    },
+    "deathBled": {
+      "id": "deathBled",
+      "kind": "death",
+      "skippable": true,
+      "maxS": 4,
+      "steps": [
+        { "t": "audio", "key": "creak" },
+        {
+          "t": "vfx",
+          "kind": "fade",
+          "sceneId": "overworld",
+          "at": { "x": 0, "y": 0 },
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.deathBled.line", "durationS": 2.5, "style": "whisper" },
+        { "t": "hold" }
+      ]
+    },
+    "deathSickened": {
+      "id": "deathSickened",
+      "kind": "death",
+      "skippable": true,
+      "maxS": 4,
+      "steps": [
+        { "t": "audio", "key": "sting_kill" },
+        {
+          "t": "vfx",
+          "kind": "fade",
+          "sceneId": "overworld",
+          "at": { "x": 0, "y": 0 },
+          "withPrevious": true
+        },
+        { "t": "caption", "copyId": "cs.deathSickened.line", "durationS": 2.5, "style": "whisper" },
         { "t": "hold" }
       ]
     },

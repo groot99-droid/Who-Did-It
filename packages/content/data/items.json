@@ -128,7 +128,7 @@
       "roleBound": false,
       "onDeath": "drops",
       "use": "heal",
-      "tooltip": "Heal a wound.",
+      "tooltip": "Heal, and stop the bleeding.",
       "ships": "V1",
       "gddRef": "3.5"
     },
@@ -139,7 +139,7 @@
       "roleBound": false,
       "onDeath": "drops",
       "use": "bandage",
-      "tooltip": "The target survives the next kill attempt.",
+      "tooltip": "The target survives the next kill attempt; stops bleeding.",
       "ships": "V1",
       "gddRef": "3.5"
     },
@@ -150,7 +150,7 @@
       "roleBound": false,
       "onDeath": "drops",
       "use": "salts",
-      "tooltip": "Cure Wounded or Snared.",
+      "tooltip": "Cure Slowed or Poisoned.",
       "ships": "V1",
       "gddRef": "3.5"
     },
@@ -520,6 +520,17 @@
       "tooltip": "The manor's strongbox, heavy with the Train's delivery.",
       "ships": "V1",
       "gddRef": "3.20"
+    },
+    "wakeLoaf": {
+      "id": "wakeLoaf",
+      "name": "Wake Loaf",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "eat",
+      "tooltip": "Bakery bread: cures Famished and restores stamina.",
+      "ships": "V1",
+      "gddRef": "3.22"
     },
     "indulgence": {
       "id": "indulgence",

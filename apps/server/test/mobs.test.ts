@@ -3,6 +3,7 @@ import { type SceneId, balance, mobs, scenes } from '@wdi/content';
 import { ItemStack, Phase, TICK_RATE, TILE_PX, segmentBlocked } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
+import { bodyOf } from '../src/sim/body';
 import { mobBodies } from '../src/sim/Mobs';
 import { MobState, newMind, think } from '../src/sim/mobs/ai';
 import { hpOf } from '../src/sim/mobs/hurt';
@@ -156,7 +157,7 @@ describe('creatures in a match', () => {
     expect(worst).toBeLessThanOrEqual(1e-6);
   });
 
-  it('a wolf that reaches an unlit seat bites it twice and kills it: a wolf death, a body and no killer', async () => {
+  it('a wolf that reaches an unlit seat bites it to death: a wolf death, a body and no killer', async () => {
     const party = await party4();
     holdPhase(party, Phase.night, 600);
     const at = floorNear(party.room, 'forest', forestWolf.x, forestWolf.y, 1, 2);
@@ -166,7 +167,7 @@ describe('creatures in a match', () => {
     let bitten = -1;
     for (let i = 0; i < 20 * TICK_RATE && !sim.players.get(id)!.dead; i++) {
       advance(party, 1);
-      if (bitten < 0 && hpOf(party.room, id) < balance.health.maxHp) bitten = party.room.state.tick;
+      if (bitten < 0 && hpOf(party.room, id) < balance.body.maxHp) bitten = party.room.state.tick;
     }
     expect(bitten).toBeGreaterThan(0);
     expect(sim.players.get(id)!.dead).toBe(true);
@@ -202,7 +203,7 @@ describe('creatures in a match', () => {
     });
     expect(states.has(MobState.flee)).toBe(true);
     expect(states.has(MobState.chase)).toBe(false);
-    expect(hpOf(party.room, id)).toBe(balance.health.maxHp);
+    expect(hpOf(party.room, id)).toBe(balance.body.maxHp);
     expect(simOf(party.room).players.get(id)!.dead).toBe(false);
   });
 
@@ -225,16 +226,46 @@ describe('creatures in a match', () => {
     expect(fleeCreature(party.room, npc[0], new Brain(), npc[1])).toBe(false);
   });
 
-  it('a bat bites but never takes a seat below 1 HP', async () => {
+  it('a bat bites a seat down and, given time, kills it: a creature death (round 8, GDD 3.22)', async () => {
     const party = await party4();
     holdPhase(party, Phase.day, 600);
     const bat = scenes.cave_entry.spawners![0]!;
     const at = floorNear(party.room, 'cave_entry', bat.x, bat.y, 1, 2);
     const id = human(party);
     placeSeat(party, id, 'cave_entry', at.x, at.y);
-    advance(party, 30 * TICK_RATE);
-    expect(hpOf(party.room, id)).toBe(1);
+    // The lowest health across the window, not its last reading: regeneration can refill an early bite by then.
+    let lowest = balance.body.maxHp;
+    advance(party, 30 * TICK_RATE, () => (lowest = Math.min(lowest, hpOf(party.room, id))));
+    expect(lowest).toBeLessThan(balance.body.maxHp);
     expect(simOf(party.room).players.get(id)!.dead).toBe(false);
+    // Its bites come between chase cycles and regeneration refills most of them (a standing seat lasts minutes,
+    // or longer when the roam takes the bat out of its senses), so the kill is proved at the edge: the seat is
+    // held at 1 health until the next bite lands.
+    const body = bodyOf(party.room, id)!;
+    for (let i = 0; i < 270 * TICK_RATE && !simOf(party.room).players.get(id)!.dead; i++) {
+      body.hp = Math.min(body.hp, 1);
+      if (i % TICK_RATE === 0) {
+        // Stay on the bat: its roam draws from the `mobs` stream and can take it out of its senses for minutes.
+        const b = mobBodies(party.room).get(bat.id);
+        if (b) {
+          const tx = Math.floor(b.x / TILE_PX);
+          const ty = Math.floor(b.y / TILE_PX);
+          // A bat flies where no seat stands (a crevice, over the water): with no floor near it this second, the
+          // seat stays where it is and the bat comes back to it (CI saw `no floor near cave_entry 15,8`).
+          try {
+            const near = floorNear(party.room, 'cave_entry', tx, ty, 1, 2);
+            placeSeat(party, id, 'cave_entry', near.x, near.y);
+          } catch {
+            /* no floor near the bat */
+          }
+        }
+      }
+      advance(party, 1);
+    }
+    expect(simOf(party.room).players.get(id)!.dead).toBe(true);
+    const death = simOf(party.room).deaths.find((d) => d.playerId === id) ?? null;
+    if (death) expect(death).toMatchObject({ cause: 'creature' });
+    expect(party.room.state.scenes.get('cave_entry')!.bodies.has(`body_${id}`)).toBe(true);
   });
 
   it('keeps the tick p95 under 15 ms with 10 seats and the wolves awake', async () => {

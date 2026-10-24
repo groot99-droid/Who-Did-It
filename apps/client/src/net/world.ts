@@ -186,6 +186,22 @@ export interface QuestSnap {
   done: boolean;
 }
 
+/** Round 8 (8A, GDD 3.22): one effect on this seat's body (`Private.body.effects`): the wire id, the tick it wears off (0 while it lasts), its stacks. */
+export interface OwnEffectSnap {
+  id: number;
+  untilTick: number;
+  stacks: number;
+}
+
+/** Round 8 (8A, GDD 3.22): this seat's own `Private.body`, in the units of `balance.json` `body`; own view only. */
+export interface OwnBodySnap {
+  hp: number;
+  maxHp: number;
+  stamina: number;
+  maxStamina: number;
+  effects: readonly OwnEffectSnap[];
+}
+
 /** Round 7 (7M, GDD 3.5): one entry of this player's own task list, real or a fake one for the alibi theatre. */
 export interface TaskSnap {
   id: string;
@@ -226,6 +242,8 @@ export interface WorldFeed {
   taskBar(): number;
   /** Round 6 (6I): this player's own inventory slots, in slot order. */
   inventory(): StackSnap[];
+  /** Round 8 (8A): this seat's own body, or null while the row is empty (the lobby, the card, a ghost). */
+  body(): OwnBodySnap | null;
   /** Round 8, 8C (locked; GDD 3.23): this player's own purse, `Private.purse`. */
   purse(): number;
   /** Round 8, 8C (locked): `act.buy` and `act.sell` at the shop a `shop` hold opened. */

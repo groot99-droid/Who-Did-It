@@ -226,6 +226,60 @@ The sky the PBR finish of the HD style fills the world with (`tools/blender/mate
 | `apps/client/public/assets/video/memorial_vicar.webm` (audio track)                                                                                                                                                                                                        | owner recording, ROSW `sound-library/catalog.json` `tension-builders/ambient-tension`, `deep-risers/deep-hollow-riser`, release `SFX_2026_01`; mixed with ffmpeg 6.1 (EBU R128, limited to -2 dBFS)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | 2026-10-23 | the memorial's narration bed: the first tiled three times with 0.6 s crossfades at -14 dB, the second from 9.8 s at -6 dB, 2 s fade in and 2.5 s fade out, about -16 LUFS, Vorbis q2 stereo; Session 6N                                |
 | `apps/client/public/assets/video/intro.webm` (audio track)                                                                                                                                                                                                                 | owner recording, ROSW `sound-library/catalog.json` `animals-insects/crickets-by-the-water`, `blockbuster-fire/small-pit-fire`, `blockbuster-footsteps/running-on-earth`, `crowd-festival/crowd-roaring`, `whooshes/deep-fire-whoosh`, `whooshes/deep-fire-burst`, `whooshes/whoosh-magic-spell-long`, `braams/ambient-braam`, `hits/magical-hit`, `whooshes/deep-wind-whoosh`, `glitches/crumbling-glitch`, `science-fiction-whooshes/glitch-whoosh`, `deep-impacts/cinematic-impact-rumble`, `blockbuster-explosions/explosion-fire`, `weapons-bombs/cinematic-explosion`, release `SFX_2026_01`; mixed with ffmpeg 6.1 (two-pass EBU R128 to -16 LUFS, true peak under -1 dBTP); A102 cuts the final braam | 2026-10-23 | the owner-approved cue list over the cinematic's own track, with the explosion where the Vicar blows up (21.16 s); cut at 22.33 s (A102), no cue after the cut, a 0.6 s fade-out; cues in `docs/round6/media.md` 3; Session 6N         |
 
+## The owner's own writing (shelf pages)
+
+Round 8 (8W; GDD 3.26). Every page of `packages/content/data/lore.json` is quoted verbatim from a work in the owner's
+ROSW vault (groot99-droid/Pipelines-Plugin, read-only from here), by the owner, who reviews the excerpts. The works are
+certified transcriptions and are never edited here; a page is whole source lines, and `pageLines` in the data records
+which. Nothing is committed from the vault except these excerpts.
+
+| Prop and volume                       | Vault work (ROSW)                                                                                               | Source lines, one range per page |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| `as.shelf` `fieldGuide`               | `creative-writing/vault/05_Worldbuilding/22_A_Field_Guide_to_the_Things_That_Walk_at_Night.md`                  | 36-36, 54-56, 60-60              |
+| `as.shelf` `greatHearth`              | `creative-writing/vault/05_Worldbuilding/20_The_Recipe_Book_of_the_Great_Hearth.md`                             | 31-31, 98-102, 316-318           |
+| `as.shelf` `dreamBook`                | `creative-writing/vault/07_Poems_and_Prose/31_The_Dream_Book.md`                                                | 22-28, 57-63, 153-161            |
+| `as.shelf` `lavenderField`            | `creative-writing/vault/07_Poems_and_Prose/29_The_Lavender_Field.md`                                            | 38-44, 58-65, 122-124            |
+| `mh.bookcase_0` `motherOfMothers`     | `creative-writing/vault/05_Worldbuilding/08_The_Testament_of_the_Mother_of_Mothers.md`                          | 31-33, 35-37, 78-80              |
+| `mh.bookcase_0` `holyWar`             | `creative-writing/vault/05_Worldbuilding/14_The_Holy_War.md`                                                    | 30-32, 62-62, 243-245            |
+| `mh.bookcase_0` `dawnJudgment`        | `creative-writing/vault/05_Worldbuilding/21_The_Dawn_Judgment.md`                                               | 86-90, 104-106, 142-150          |
+| `mh.bookcase_3` `undertakersRegister` | `creative-writing/vault/05_Worldbuilding/13_The_Undertaker_s_Register.md`                                       | 28-32, 34-40, 219-227, 309-311   |
+| `mh.bookcase_3` `exhibits`            | `creative-writing/vault/05_Worldbuilding/23_Exhibits_A_to_R.md`                                                 | 28-30, 41-43, 174-178            |
+| `mh.bookcase_3` `personsOfNote`       | `creative-writing/vault/10_Characters/08_Persons_of_Note.md`                                                    | 32-38, 54-56, 266-271            |
+| `mh.bookcase_3` `subjectFiles`        | `creative-writing/vault/05_Worldbuilding/11_Mrs_Grieves_s_Tab_Book.md`                                          | 36-42, 48-54, 99-99              |
+| `mh.bookcase_6` `wellRemembers`       | `creative-writing/vault/03_Stories/12_What_the_Well_Remembers.md`                                               | 28-30, 40-40, 84-88, 98-104      |
+| `mh.bookcase_6` `deadMansLamp`        | `creative-writing/vault/03_Stories/15_The_Dead_Man_s_Lamp.md`                                                   | 20-24, 96-100, 144-150           |
+| `mh.bookcase_6` `lastDance`           | `creative-writing/vault/03_Stories/26_The_Last_Dance_at_the_Hall.md`                                            | 20-24, 58-66, 116-122            |
+| `mh.bookcase_6` `threeHeirlooms`      | `creative-writing/vault/03_Stories/27_Three_Heirlooms_Low_Tide.md`                                              | 20-24, 28-32, 76-78              |
+| `mu.bookcase` `confessionBook`        | `creative-writing/vault/10_Characters/06_The_Confession_Book_of_St_Brannock_s.md`                               | 86-88, 138-140, 374-376          |
+| `mu.bookcase` `eightPhrases`          | `creative-writing/vault/07_Poems_and_Prose/30_Eight_Phrases.md`                                                 | 20-22, 40-42, 78-86              |
+| `mu.bookcase` `willO`                 | `creative-writing/vault/07_Poems_and_Prose/28_Will_o.md`                                                        | 20-26, 36-42, 54-64              |
+| `mu.bookcase` `hopscotch`             | `creative-writing/vault/07_Poems_and_Prose/23_Hopscotch.md`                                                     | 20-34, 36-50, 76-91, 105-122     |
+| `wp.writing_desk` `blackWax`          | `creative-writing/vault/08_Letters/04_Black_Wax.md`                                                             | 94-96                            |
+| `wp.writing_desk` `censored`          | `creative-writing/vault/08_Letters/03_Censored.md`                                                              | 103-107                          |
+| `wp.writing_desk` `redCrust`          | `creative-writing/vault/08_Letters/06_The_Red_Crust.md`                                                         | 48-50                            |
+| `wp.letter_box` `oneShot`             | `creative-writing/vault/08_Letters/05_One_Shot.md`                                                              | 44-48                            |
+| `bk.ledger` `crumbsDaybook`           | `creative-writing/vault/07_Poems_and_Prose/22_The_Daybook_of_Crumb_s_Ovens.md`                                  | 22-28, 40-44, 76-78              |
+| `ov.board` `gazetteMorning`           | `creative-writing/vault/05_Worldbuilding/10_The_HollowMere_Gazette_Morning_Edition.md`                          | 82-84                            |
+| `ov.board` `fourNotices`              | `creative-writing/vault/10_Characters/07_Four_Notices.md`                                                       | 24-26                            |
+| `ov.board` `lamplightersRound`        | `creative-writing/vault/05_Worldbuilding/09_A_Lamplighter_s_Round_of_HollowMere.md`                             | 26-28                            |
+| `ov.board` `trainTimetable`           | `creative-writing/vault/05_Worldbuilding/07_The_Daily_Train_Timetable_Manifest_and_Rules_of_Carriage.md`        | 30-40                            |
+| `bl.wall_shelf` `tinGallery`          | `creative-writing/vault/03_Stories/20_The_Tin_Gallery.md`                                                       | 20-22, 26-28, 30-40              |
+| `bl.wall_shelf` `deadWeight`          | `creative-writing/vault/03_Stories/21_Dead_Weight.md`                                                           | 18-20, 22-22                     |
+| `bl.wall_shelf` `wolvesBlamed`        | `creative-writing/vault/03_Stories/19_What_the_Wolves_Were_Blamed_For.md`                                       | 20-22, 40-46, 52-56              |
+| `bl.wall_shelf` `roadClosed`          | `creative-writing/vault/03_Stories/25_The_Road_Is_Closed.md`                                                    | 20-22, 40-42, 96-102             |
+| `bo.wall_shelf_0` `thorneBylaws`      | `creative-writing/vault/05_Worldbuilding/06_Articles_of_Incorporation_and_Bylaws_of_the_Thorne_Expanse_Line.md` | 31-35, 140-148, 203-208          |
+| `bo.wall_shelf_0` `standingOrders`    | `creative-writing/vault/05_Worldbuilding/26_Standing_Orders.md`                                                 | 37-42, 48-55, 63-72              |
+| `bo.wall_shelf_0` `densityAudit`      | `creative-writing/vault/10_Characters/11_The_Density_Audit.md`                                                  | 32-32, 44-48, 178-186            |
+| `bo.wall_shelf_0` `stationsNotBuilt`  | `creative-writing/vault/05_Worldbuilding/28_Timetable_of_Stations_Not_Yet_Built.md`                             | 64-71, 74-78, 133-140            |
+| `bo.wall_shelf_1` `cables`            | `creative-writing/vault/05_Worldbuilding/17_Cables.md`                                                          | 36-44, 82-86, 130-134            |
+| `bo.wall_shelf_1` `intake`            | `creative-writing/vault/05_Worldbuilding/15_Intake.md`                                                          | 119-123, 169-173, 179-187        |
+| `bo.wall_shelf_1` `arrivals`          | `creative-writing/vault/05_Worldbuilding/24_Arrivals.md`                                                        | 30-32, 109-118, 153-157          |
+| `bo.ledger_desk` `lastShiftTally`     | `creative-writing/vault/05_Worldbuilding/16_The_Last_Shift_s_Tally_Board.md`                                    | 28-34, 36-46, 88-94              |
+| `bo.ledger_desk` `tallyRack`          | `creative-writing/vault/10_Characters/09_The_Tally_Rack.md`                                                     | 35-36, 40-41                     |
+| `bo.ledger_desk` `pledged`            | `creative-writing/vault/10_Characters/12_Pledged_and_Unredeemed.md`                                             | 27-31, 51-54, 194-196            |
+| `bc.board` `sayingsOfFork`            | `creative-writing/vault/07_Poems_and_Prose/27_Sayings_of_the_Fork.md`                                           | 26-30                            |
+| `bc.board` `twoRoads`                 | `creative-writing/vault/10_Characters/13_The_Two_Roads.md`                                                      | 100-104                          |
+
 ## Adobe generative use
 
 | Files | Feature | Date | Notes |

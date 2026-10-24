@@ -124,7 +124,8 @@ LOOKS: dict[str, dict] = {
         "raise_deg": 85,  # the raised hand stays inside the cell facing away
         "parts": ["hair_short", "oilskin_cape", "belt", "match_pouch", "lighting_pole"],
     },
-    # bone / fog / mustard; skin 2, wood hair under the toque; the peel over her shoulder. Works at her waist.
+    # bone / fog / mustard; skin 2, wood hair under the toque; the peel over her shoulder and, at the owner's
+    # ruling of 2026-10-24, a basket of loaves on her left forearm. Works at her waist.
     "baker": {
         "skin": 2,
         "hair": ("wood", 3),
@@ -135,7 +136,8 @@ LOOKS: dict[str, dict] = {
         "boots": ("wood", 1),
         "apron": ("bone", 2),
         "interact": "waist",
-        "parts": ["hair_bun", "toque", "apron_long", "flour", "peel"],
+        "basket_load": "loaves",
+        "parts": ["hair_bun", "toque", "apron_long", "flour", "peel", "hand_basket"],
     },
     # fog / ink / mustard; skin 4, a bone beard. Mends the net at his waist.
     "fisher": {

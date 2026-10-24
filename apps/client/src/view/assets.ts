@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { currentStyleId, styleOf } from './artStyle';
+import { getFlags } from '../scenes/registry';
 import {
   type LoadedEntry,
   entryTexels,
@@ -160,6 +161,38 @@ export function queueEntries(
         break;
     }
   }
+}
+
+/** The keys of a look's lazy pair (SPRITES 3, A161): the rare clips' pages and their animations. */
+export const lazyKeys = (lookId: string): string[] => [
+  `char_${lookId}_2`,
+  `ovl_${lookId}_2`,
+  `anims_${lookId}_2`,
+];
+
+const lazyRequested = new Set<string>();
+
+/**
+ * Loads a look's lazy pair on first use: the manifest rows of `lazyKeys` carry `maps: []`, so nothing loads them at
+ * boot or with the match; `PlayerView` calls this on the first frame a figure wants a lazy clip the look has no
+ * animation for, and plays the fallback until the loader is done. One request per look and manifest; returns
+ * whether this call queued anything (nothing when already requested, or when no manifest is resolved yet).
+ */
+export function loadLazyLook(scene: Phaser.Scene, lookId: string): boolean {
+  const manifest = peekManifest(getFlags(scene).art, import.meta.env.BASE_URL);
+  if (!manifest) return false;
+  const id = `${manifest.root}|${lookId}`;
+  if (lazyRequested.has(id)) return false;
+  lazyRequested.add(id);
+  const keys = lazyKeys(lookId);
+  const entries = manifest.entries.filter((e) => keys.includes(e.key) && !scene.textures.exists(e.key));
+  if (entries.length === 0) return false;
+  queueEntries(scene.load, manifest, entries);
+  scene.load.once(Phaser.Loader.Events.COMPLETE, () =>
+    applyFilters(scene.textures, { ...manifest, entries }),
+  );
+  scene.load.start();
+  return true;
 }
 
 /** Records that a staged entry now lives under its real key. */

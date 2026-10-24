@@ -64,6 +64,16 @@ const TileSpan = z.strictObject({ min: z.number().int().positive(), max: z.numbe
 const FracSpan = z.strictObject({ min: Chance, max: Chance });
 /** The next activity's weights in one phase class; each row sums to 1 (validate.ts). */
 const RoutineWeights = z.strictObject({ work: Chance, stroll: Chance, idle: Chance });
+/**
+ * One row of the damage table (GDD 3.22, round 8): the health it takes, each effect it may apply with its chance,
+ * and whether zero health from it is a death (else a knockout). The effect keys are `effects.json` ids.
+ */
+export const DamageRow = z.strictObject({
+  dmg: z.number().int().positive(),
+  effects: z.record(z.string().regex(/^[a-z][A-Za-z0-9]*$/), Chance),
+  kills: z.boolean(),
+});
+export type DamageRow = z.infer<typeof DamageRow>;
 /** A mood's factors on the routine weights (round 8, GDD 3.24). */
 const MoodWeights = z.strictObject({
   work: z.number().nonnegative(),
@@ -162,14 +172,37 @@ export const BalanceFile = z.strictObject({
     capPerScene: z.number().int().positive(),
     collectHoldS: Seconds,
   }),
-  health: Section({
+  /**
+   * Round 8 (GDD 3.22, Session 8A; docs/round8/body.md 2-5): the body, replacing the two-hit-point `health` block.
+   * Every attack is a row of `damage` (creatures carry theirs in `mobs.json`); the effects' numbers are
+   * `effects.json`.
+   */
+  body: Section({
     maxHp: z.number().int().positive(),
-    regenHp: z.number().int().positive(),
-    regenEveryS: Seconds,
-    knifeDamage: z.number().int().positive(),
-    wolfDamage: z.number().int().positive(),
-    woundedS: Seconds,
-    woundedSpeedFactor: z.number().positive().max(1),
+    /** Health regained per second out of combat (no hit for `regenAfterS`), never while an effect blocks it. */
+    regenHpPerS: z.number().positive(),
+    regenAfterS: Seconds,
+    maxStamina: z.number().int().positive(),
+    /** Stamina running costs per second; walking and standing regain `staminaRegenPerS`. */
+    runCostPerS: z.number().positive(),
+    staminaRegenPerS: z.number().positive(),
+    /** Fatigued ends once stamina is back over this. */
+    fatigueRecover: z.number().int().positive(),
+    /** Health under this is Wounded. */
+    woundedBelow: z.number().int().positive(),
+    /** No food for this long is Famished. */
+    famishedAfterS: Seconds,
+    /** A knockout lasts this long; the seat wakes at `koWakeHp`, Dazed, having dropped `koPurseShare` of its purse. */
+    koS: Seconds,
+    koWakeHp: z.number().int().positive(),
+    koPurseShare: z.number().min(0).max(1),
+    /** Stamina one strike costs. */
+    strikeStamina: z.number().int().positive(),
+    /** Health a medkit (`heal`) restores. */
+    healHp: z.number().int().positive(),
+    /** How long a dead creature's row stays in the scene before it goes (GDD 3.15, A142). */
+    creatureCorpseS: Seconds,
+    damage: z.strictObject({ strike: DamageRow, mugging: DamageRow, slingshot: DamageRow }),
   }),
   movement: Section({
     walkTilesPerS: z.number().positive(),
@@ -386,6 +419,12 @@ export const BalanceFile = z.strictObject({
     stoke: z.strictObject({ stokePerTap: Frac, ratePerS: Frac, bandFrac: Frac, holdS: Seconds }),
     tap: z.strictObject({ steps: Count, periodS: Seconds, bandFrac: Frac }),
   }),
+  /**
+   * Round 8 (GDD 3.26, 7M): the shelf reader. A shelf of books shows `spinesMin` to `spinesMax` spines (owner, A200
+   * round 2); no page of `lore.json` is longer than `pageMaxChars`, so the first page reads whole at 1280x720 and on
+   * a phone.
+   */
+  reader: Section({ spinesMin: Count, spinesMax: Count, pageMaxChars: Count }),
   /**
    * Round 7 (GDD 3.3): the Daily Train of a map with a `station`. It stops `arriveAtS` into each day and delivers
    * `deliveryAfterS` later; the seats of the hub within `hearTiles` of the platform hear it.

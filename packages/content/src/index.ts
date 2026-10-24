@@ -19,11 +19,14 @@ import musicJson from '../data/music.json' with { type: 'json' };
 import resourcesJson from '../data/resources.json' with { type: 'json' };
 import recipesJson from '../data/recipes.json' with { type: 'json' };
 import mobsJson from '../data/mobs.json' with { type: 'json' };
+// Round 8 (GDD 3.22, Session 8A): the effects table.
+import effectsJson from '../data/effects.json' with { type: 'json' };
 import questsJson from '../data/quests.json' with { type: 'json' };
 import minigamesJson from '../data/minigames.json' with { type: 'json' };
 import vendettasJson from '../data/vendettas.json' with { type: 'json' };
 // Round 8 (GDD 3.22 "Inspect"), Session 8B.
 import relationsJson from '../data/relations.json' with { type: 'json' };
+import loreJson from '../data/lore.json' with { type: 'json' };
 import evolutionsJson from '../data/evolutions.json' with { type: 'json' };
 import lawsJson from '../data/laws.json' with { type: 'json' };
 import eventsJson from '../data/events.json' with { type: 'json' };
@@ -74,8 +77,10 @@ import { CutscenesFile } from './schemas/cutscenes.js';
 import { MusicFile } from './schemas/music.js';
 import { MinigamesFile, MobsFile, QuestsFile, RecipesFile, ResourcesFile } from './schemas/m5b.js';
 import { EventsFile, EvolutionsFile, LawsFile, VendettasFile } from './schemas/bible.js';
+import { EffectsFile } from './schemas/effects.js';
 import { EconomyFile } from './schemas/economy.js';
 import { RelationsFile } from './schemas/relations.js';
+import { LoreFile } from './schemas/lore.js';
 import { SCENE_IDS, Scene, type SceneId } from './schemas/scene.js';
 import { StyleFile } from './schemas/style.js';
 import { TasksFile } from './schemas/tasks.js';
@@ -103,8 +108,10 @@ export * from './schemas/cutscenes.js';
 export * from './schemas/music.js';
 export * from './schemas/m5b.js';
 export * from './schemas/bible.js';
+export * from './schemas/effects.js';
 export * from './schemas/economy.js';
 export * from './schemas/relations.js';
+export * from './schemas/lore.js';
 export { validateContent, type Content } from './validate.js';
 export { navs, NavFile } from './nav.js';
 
@@ -182,8 +189,10 @@ export function parseContent(raw: {
   evolutions: unknown;
   laws: unknown;
   events: unknown;
+  effects: unknown;
   economy: unknown;
   relations: unknown;
+  lore: unknown;
 }): Omit<Content, 'scenes' | 'maps'> {
   const parsed = {
     palette: PaletteFile.parse(raw.palette),
@@ -209,8 +218,10 @@ export function parseContent(raw: {
     evolutions: EvolutionsFile.parse(raw.evolutions),
     laws: LawsFile.parse(raw.laws),
     events: EventsFile.parse(raw.events),
+    effects: EffectsFile.parse(raw.effects),
     economy: EconomyFile.parse(raw.economy),
     relations: RelationsFile.parse(raw.relations),
+    lore: LoreFile.parse(raw.lore),
   };
   // Round 8 (A171): the role text's number tokens are filled from the data here, before anything reads a role.
   return { ...parsed, roles: fillRoles(parsed.roles, parsed) };
@@ -241,8 +252,10 @@ export const content: Content = {
     evolutions: evolutionsJson,
     laws: lawsJson,
     events: eventsJson,
+    effects: effectsJson,
     economy: economyJson,
     relations: relationsJson,
+    lore: loreJson,
   }),
   scenes: parseScenes(),
   maps: parseMaps(),
@@ -275,8 +288,10 @@ export const {
   evolutions,
   laws,
   events,
+  effects,
   economy,
   relations,
+  lore,
 } = content;
 
 function countKey(playerCount: number): `${4 | 5 | 6 | 7 | 8 | 9 | 10}` {

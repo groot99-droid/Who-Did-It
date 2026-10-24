@@ -218,7 +218,7 @@ the hazard glow, pulsing.
 **Touch** (`.wdi-stick`, `.wdi-touch-btn`). The stick is a 128 px ring of ink at 55% with a 56 px
 paper knob. Buttons are 64 px paper discs with the key in Oswald 20 px over a 12 px caps label;
 `--primary` is the 80 px mustard Use button. They sit bottom-right in a two-by-two cluster, the
-stick bottom-left.
+stick bottom-left. Round 8 (8A) adds a fifth disc, Strike (X, `touch-strike`), at the end of the cluster (14.32).
 
 **Portraits** (`.wdi-portraits`, `.wdi-portrait`). A grid of paper tiles at least 132 px wide
 (104 on phones): a 2:3 picture slot on slate, the name in display-sm, the trait icons in a row,
@@ -561,7 +561,7 @@ disc carries the key instead.
 | `prompt.ability.cooldown` | – | {ability} in {s} s | the same row while its cooldown runs; `{s}` is the remaining seconds |
 
 Touch labels (`.wdi-touch-btn`): `touch.use` Use, `touch.act` Act, `touch.run` Run, `touch.sneak`
-Sneak.
+Sneak; the Strike disc's label is 8A's `body.strike` (14.32).
 
 ### 14.3 Refusals (a toast after a refused action, N)
 
@@ -832,6 +832,7 @@ present only when the cutscene is skippable. Reduce-motion turns camera moves in
 | `cutscene.skip.label` | Skip the cutscene | its `aria-label` |
 | `cs.hollowmere.<line>` | the opening's captions | `title`, `seven`, `laid`, `own`, `train`, `dusk`, `end`, `vicar`, `letter`, `nobody`, `check`, `miss`; the Bible's Book I.1 trimmed |
 | `cs.blackpine.<line>` | the BlackPine opening's captions (7A) | `title`, `intake`, `owns`, `day`, `night`, `pines`, `adits`, `blind`, `dawn`; the Bible's Book III.2 trimmed |
+| `cs.death<Cause>.line` | the death cutscenes' one whispered line each | `Knife`, `Poison`, `Shot`, `Ejected`, `Wolf` (6J); `Creature`, `Bled`, `Sickened` (round 8, 8A, GDD 3.22) |
 
 Both openings already agree with the canon (`docs/round8/canon.md` 2): the station sign, the Barons and the train of
 Ledger I; the Harrow Timber & Coal Syndicate and the rack of Ledger VIII. They name no killer and not the Beast.
@@ -878,7 +879,7 @@ giver is in reach. A toast (`m5b-toast`, `aria-live="polite"`)
 reports a gather, a craft or a quest for a few seconds.
 
 **Panels.** Pockets lists the stacks with the slot count and, for a light in the pocket, a Light / Douse button
-(`act.light`). Craft lists the recipes with what each needs, where it is made and a Make / Stop button; a recipe
+(`act.light`); since round 8 (8A, 14.32) a row whose item any holder may use also carries a Use button. Craft lists the recipes with what each needs, where it is made and a Make / Stop button; a recipe
 missing inputs is listed with `craft.need` and its button disabled. Quests lists every offer in reach, then the quests
 the seat holds (taken, done) with `have of total`; Take the work and Hand it in are live only beside the giver, and a
 third quest shows `quest.full`.
@@ -891,7 +892,7 @@ seat's fake task runs the same board; the wire carries no fake flag, so `mini.fa
 fixture passes `fake`.
 
 Frozen test ids: `m5b`, `m5b-inv`, `m5b-craft`, `m5b-quests`, `m5b-prompt`, `m5b-toast`, `inventory`, `inventory-list`,
-`inventory-item-<id>`, `inventory-light`, `inventory-close`, `crafting`, `craft-<recipe>`, `crafting-close`, `quests`,
+`inventory-item-<id>`, `inventory-light`, `inventory-use-<id>` and `inventory-use-near-<id>` (8A, 14.32), `inventory-close`, `crafting`, `craft-<recipe>`, `crafting-close`, `quests`,
 `quest-<id>` (`data-state` offer, taken, done), `quest-accept-<id>`, `quest-turnin-<id>`, `quest-close`, `minigame`,
 `minigame-stage`, `minigame-assist`, `minigame-cancel`, `minigame-status`.
 
@@ -1195,6 +1196,51 @@ Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaG
 | `vendetta.note.doubt`      | Doubt took the flock: your vote did not carry.               |
 | `vendetta.note.contract`   | The mail brought a contract: {name}.                         |
 | `vendetta.contract.accept` | Accept                                                       |
+
+### 14.32 The body panel (8A, round 8)
+
+Session 8A, round 8 (DECISIONS A136; GDD 3.22). `view/body/BodyHud.ts` (`mountBodyHud(parent)`) draws this seat's
+`Private.body`: a health bar, a stamina bar and a row of effect chips, in a `section.wdi-body` the World mounts in
+the HUD root (`mountBodyHud(hud.root)`) at the HUD's bottom-left, above the touch cluster, and feeds each frame with
+the own body and the clock (`update(feed.body(), clock.tick)`; nothing is written when nothing changed; the feed's
+`body()` reads the own `Private.body` and is null while the row is empty). The model is `view/body/model.ts` (`bodyHudModel`): the shares are
+whole percentages and a sliver of health still reads 1; the states are read from the effects the server derived,
+never from a number of the client's own: `is-wounded` under Wounded, `is-down` under Knocked out, `is-fatigued` under
+Fatigued; a timed chip carries `is-timed` and counts down in whole seconds, the soonest to pass first, and an effect
+that lasts until cured shows no count. An effect's name is its `effects.json` row's `name`; a chip is
+`li.wdi-body__chip--<effect>`. The panel hides while the row is empty (the lobby, the card, a ghost). 8H's "Round 8
+(8H)" block of `components.css` animates the states by class, and 8N's `effectIconUrl(effectId, style)` will give a
+chip its icon; `view/body/body.css` holds the panel's own rules. Module `ui/copy/body.ts`.
+
+| Id | Text | Notes |
+|---|---|---|
+| `body.label` | Your body | the section's `aria-label` |
+| `body.health` | Health | the health bar's label and `aria-label` |
+| `body.stamina` | Stamina | the stamina bar's label and `aria-label` |
+| `body.effects` | Effects on you | the chip row's `aria-label` |
+| `body.value` | {value} / {max} | after a bar's label; whole numbers as the wire carries them |
+| `body.left` | {s}s | a timed chip's seconds left |
+| `body.stacks` | ×{n} | a chip's stacks above one (Weakened from a rat) |
+| `body.strike` | Strike | the Strike disc's label on touch (`touch-strike`) |
+| `body.use` | Use | a pocket row's Use button (`inventory-use-<id>`): the item on yourself |
+| `body.use.near` | Use on them | the second button of a cure (`inventory-use-near-<id>`), shown while an avatar stands in its reach |
+
+Frozen test ids: `body` (the section), `body-health`, `body-stamina` (the bars, `role="meter"`), `body-effects`,
+`touch-strike`, `inventory-use-<id>`, `inventory-use-near-<id>`.
+
+**The strike key and the Use buttons** (8A, the last PR of its brief; GDD 3.22). `X` (or the Strike disc on touch, a
+fifth `.wdi-touch-btn` after Sneak in the cluster) swings the fists: `view/body/verbs.ts` `strikeTarget` names the
+nearest other avatar in reach (a handle, as the Kill does; never the own figure, a ghost or a figure in transit), else
+the nearest living creature (its id; a dead one is no target), at the `strike` row's reach plus the one-tile slack of
+the other verbs, and the World sends `act.ability {abilityId: 'strike', targetId}`; with nothing in reach the HUD says
+`refuse.nobody`. The server resolves and refuses the rest (a knocked-out seat, a creature in another scene, the
+cooldown), each a toast of 14.3. The strike has no prompt chip: it is a swing, not a use. In the pockets (14.19.2)
+a row whose item any holder may use gets a Use button: `useVerbOf(itemId)` is the active ability of `scope` item or
+universal that consumes or requires the item (the Medkit's `heal`, the Remedy's `antidote`, the Wake Loaf's `eat`),
+sent with no target, so it works on yourself; a cure whose target is a player (`heal`, `antidote`) also shows
+`body.use.near` while an avatar stands within its reach, sending that handle. A role's own item verbs (the Doctor's
+Bandage and Salts, the Child's slingshot) stay the card's keys (Q, R, F) and get no button; a light keeps Light /
+Douse. The mock refuses every verb but the Knife (a toast), as before.
 
 ### 14.33 Inspect (8B)
 

@@ -3740,3 +3740,12 @@ The owner's living-world request of 2026-10-24. Contract: `docs/round8/living.md
   sixteen reference pictures are described in `art.md` 1 and not committed.
 - 2026-10-24: the living-world addendum `docs/round8/living.md` with A173 and A174, from the owner's request and answers; 8Q to 8U added.
 - 2026-10-24: the lore merged in ROSW (Pipelines-Plugin #17); A201 and 8V added for the canon pass.
+
+### Round 8 log: 7M
+
+- 2026-10-24: resumed in a new session after the first ran out of credits; its unpushed S1, S2 and PR 5 were rebuilt
+  from b562561. S1 (the lore data, GDD 3.26): `lore.json` with fourteen readable props on both maps, every page "fill
+  later", each volume citing its vault work in ROSW `creative-writing/vault/` (read only); the zod schema
+  `schemas/lore.ts`, `validateLore.ts` (`checkLore`), `balance.json` `reader` (3 to 5 spines, the page length) and
+  `test/lore.test.ts`. The placement is 7M's proposal for 8V and the owner; it goes to the owner through 6Z before it
+  merges.

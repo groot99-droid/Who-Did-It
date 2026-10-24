@@ -14,17 +14,79 @@ import re
 # TT.rotation_euler.z = 45 deg - i * 45 deg under IsoCam.
 DIRECTIONS = ("n", "ne", "e", "se", "s", "sw", "w", "nw")
 
-ANIMS = ("idle", "walk", "run", "interact", "swing", "carry", "die", "hide")
+# Round 8 appends the clips of docs/round8/motion.md 1 (ids in seams.md 2), keeping the old order.
+R8_ANIMS = ("strike", "hurt", "knockdown", "down", "getup", "limp", "stagger", "stunned", "inspect", "threaten",
+            "cower", "fidget", "stomp", "eat", "rob")
+ANIMS = ("idle", "walk", "run", "interact", "swing", "carry", "die", "hide", *R8_ANIMS)
 
-# V1 clips and frame counts (docs/ASSETS.md 6.3, round 5): 38 frames x 8 directions = 304 per pass.
-V1_CLIPS = {"idle": 8, "walk": 8, "swing": 6, "interact": 8, "die": 8}
+# The V1 clips (docs/SPRITES.md 3). Round 5 rendered idle and interact at 8 frames (38 x 8 directions = 304 a
+# pass); the owner's option B of 2026-10-24 (A161) trims them to 6 (34 x 8 = 272), the same rows as R8_CLIPS.
+V1_CLIPS = {"idle": 6, "walk": 8, "swing": 6, "interact": 6, "die": 8}
+
+# The four screen diagonals a 4-direction clip renders (6Z's budget ruling, A141, and the owner's option B, A161:
+# the one-shots, the mood idles and the limp and stagger gaits in four rendered directions, never mirrored). The
+# client plays the nearest of the four.
+FOUR_DIRS = ("ne", "se", "sw", "nw")
+
+
+class Clip:
+    """A clip's rendered frames, whether it loops, its directions and whether it sits on the lazy second page."""
+
+    def __init__(self, frames: int, loop: bool, dirs: tuple[str, ...] = DIRECTIONS, lazy: bool = False):
+        self.frames, self.loop, self.dirs, self.lazy = frames, loop, dirs, lazy
+
+    def span(self) -> int:
+        """Scene frames from the first key to the last at 24 fps sampled every 2: a loop's last key repeats its
+        first and is not rendered, a one-shot renders its last key."""
+        return 2 * self.frames if self.loop else 2 * (self.frames - 1)
+
+
+# Round 8 clips (motion.md 1) at the frame counts of the owner's option B (A161, plan B of 8F's measured table):
+# the V1 five, `run`, `strike` and `hurt` in eight directions (47 frames); `limp`, `stagger`, the one-shots and the
+# mood idles in four (32); the rare clips on a lazy second page per look (22, in four), transient and outside the
+# resident cap. A clip that the budget trims changes its row here and nowhere else, since every key of
+# build_looks.py is placed in normalised time.
+R8_CLIPS: dict[str, Clip] = {
+    "idle": Clip(6, True), "walk": Clip(8, True), "swing": Clip(6, False), "interact": Clip(6, True),
+    "die": Clip(8, False),
+    "run": Clip(6, True), "limp": Clip(6, True, FOUR_DIRS), "stagger": Clip(6, True, FOUR_DIRS),
+    "strike": Clip(4, False), "hurt": Clip(3, False),
+    "inspect": Clip(4, False, FOUR_DIRS), "cower": Clip(4, True, FOUR_DIRS), "fidget": Clip(4, True, FOUR_DIRS),
+    "stomp": Clip(4, True, FOUR_DIRS), "stunned": Clip(4, True, FOUR_DIRS),
+    "knockdown": Clip(4, False, FOUR_DIRS, lazy=True), "down": Clip(2, True, FOUR_DIRS, lazy=True),
+    "getup": Clip(4, False, FOUR_DIRS, lazy=True), "rob": Clip(4, False, FOUR_DIRS, lazy=True),
+    "eat": Clip(4, False, FOUR_DIRS, lazy=True), "threaten": Clip(4, False, FOUR_DIRS, lazy=True),
+}
+
+# The clips a townsfolk look never plays (the owner's option B, A161; seams.md 5): a villager figure is never a
+# seat, so it neither swings a Knife, strikes, robs, threatens nor inspects, and the family renders none of the
+# five. The client's poses.ts falls back to idle or interact if one is ever sent to such a figure.
+FAMILY_DROPS = ("swing", "strike", "rob", "threaten", "inspect")
+# Every townsfolk look id begins with this (seams.md 5; looks_spec.VILLAGERS).
+VILLAGER_PREFIX = "villager"
+
+
+def is_villager(body: str) -> bool:
+    """True for the plain villager and the townsfolk variants."""
+    return body.startswith(VILLAGER_PREFIX)
+
+
+def look_clips(body: str) -> dict[str, Clip]:
+    """The clip table of one look, in R8_CLIPS order: every clip for a deck look, less FAMILY_DROPS for the family."""
+    drops = set(FAMILY_DROPS) if is_villager(body) else set()
+    return {name: clip for name, clip in R8_CLIPS.items() if name not in drops}
+
+
+def frame_counts(body: str) -> tuple[int, int]:
+    """(resident, lazy) rendered frames a pass of one look (SPRITES 3): the deck 504 and 88, the family 408 and 56."""
+    clips = look_clips(body).values()
+    return (sum(c.frames * len(c.dirs) for c in clips if not c.lazy),
+            sum(c.frames * len(c.dirs) for c in clips if c.lazy))
 
 # Round 5: hats are nameplate glyphs, so the hat passes are gone (art plan 4.2).
 PASSES = ("body", "scarf", "blood")
 
-FRAME_RE = re.compile(
-    r"^char_(\w+)_(idle|walk|run|interact|swing|carry|die|hide)_(n|ne|e|se|s|sw|w|nw)_(\d{3})$"
-)
+FRAME_RE = re.compile(r"^char_(\w+)_(" + "|".join(ANIMS) + r")_(n|ne|e|se|s|sw|w|nw)_(\d{3})$")
 BODY_RE = re.compile(r"^[a-z][a-z0-9]*$")
 
 CELL_PX = 128
@@ -46,9 +108,10 @@ CHAR_ROOT_SCALE = (Z_SCALE, Z_SCALE, Z_SCALE)
 FEET_ROW_PX = 112
 
 # Clips that need a bigger cell, as (cell px, feet row px). A fallen body reaches about 115 display px
-# to the side of the feet, so die renders 256 px cells with the feet at the centre; the scale stays
+# to the side of the feet, so die and the knockout set (knockdown, down, getup; round 8) render 256 px cells with
+# the feet at the centre; the scale stays
 # the display scale. The packer trims every frame and the per-frame Feet pivot keeps clips registered.
-CLIP_CELL = {"die": (256, 128)}
+CLIP_CELL = {"die": (256, 128), "knockdown": (256, 128), "down": (256, 128), "getup": (256, 128)}
 
 # Inverted-hull outline thickness per asset class, metres (Solidify thickness).
 # -0.022 m at the display scale lands on one art pixel after the 2 x 2 finish (art plan S3.3).

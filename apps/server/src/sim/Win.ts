@@ -2,6 +2,7 @@ import { balance } from '@wdi/content';
 import { BUILD_VERSION, Phase, type PlayerState, S2C, TICK_RATE, Winner, checkWin } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { logMatch } from '../services/MatchLog';
+import { talkLog } from '../services/talk/npcNotes';
 import { resetCoversForLobby } from './Covers';
 import { gameOverExtras } from './Deck';
 import { countRow, factionOf, flowOf, resetFlow, roleIdOf, rolesOf, setPhase } from './Flow';
@@ -73,6 +74,7 @@ export function endMatch(room: PartyRoom, winner: 'village' | 'cabal'): void {
         ejectionCorrect: m.ejectionCorrect,
       }),
     })),
+    ...talkLog(room), // round 8, 8T: the NPC notes, so a replay never calls the model (GDD 3.25)
   });
 }
 

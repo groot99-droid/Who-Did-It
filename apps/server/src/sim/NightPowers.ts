@@ -15,6 +15,7 @@ import {
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { spawnBody } from './Bodies';
+import { knockedOut } from './body/effects';
 import { markDead } from './Death';
 import { finishFinalNight } from './FinalNight';
 import { factionOf, flowOf } from './Flow';
@@ -93,6 +94,8 @@ function powerProblem(room: PartyRoom, seat: string, ability: string, target: un
   }
   if (badTarget(room, seat, target, def.allowSelf === true))
     return { code: ErrorCode.cannot, msg: 'no target' };
+  if ((ability === 'keepWatch' || ability === 'remedy') && knockedOut(room, target as string))
+    return { code: ErrorCode.cannot, msg: 'no target' }; // round 8, 8A: a downed seat (GDD 3.22, body.md 5)
   if (
     ability === 'keepWatch' &&
     !balance.nightPowers.watchRepeatAllowed &&

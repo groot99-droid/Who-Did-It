@@ -1,0 +1,584 @@
+{
+  "gddRef": "3.26",
+  "shelves": {
+    "as.shelf": {
+      "title": "Mallory Apothecary, the shelf",
+      "volumes": [
+        {
+          "id": "fieldGuide",
+          "title": "A Field Guide to the Things That Walk",
+          "kind": "book",
+          "pages": [
+            "I drew the plates in my father's books for twenty-one years, and he signed them. Birds of the Eastern Shore. Mammals of the Northern Counties. The Lesser Moths. When people praised the moths they praised him, and he let them. That was our arrangement, and I do not complain of it here. He died in April. The Panic took his publisher in May. In June a society back east advertised a fee for one plate of the Black Pine wolf, \"from life, with a pelt\". I answered as T. Calloway, and they wrote back *Dear Sir*. The fee would keep the house.",
+            "**Habit.** Dusk and night. A wolf runs at a living person it can sense and can also see. It does not run at the dead or the hidden, or at a sound alone. The run is short. I have timed it on my father's watch from the end of the planks eleven times: six seconds, never seven. Then the wolf stops, wherever it is, and goes home, as if it had been called and had heard it.\n\nThey hunt the edge of the light and never cross it. Mere-rot makes them bold. In the fog weeks they stand at the fence closer together and longer, and they do not turn their heads when the bell goes.",
+            "**What it fears.** A lit flame near at hand: a carried lantern, a torch, a candle, a burning post or a fire. A lit window does not turn them. Moonlight does not. The pale glow on the rotten stumps of the Fenwood does not. It has to be fire, and it has to be close. I tested nothing. I only stood still with mine lit and watched them go round me like water round a stone."
+          ],
+          "pageLines": ["36-36", "54-56", "60-60"],
+          "source": "creative-writing/vault/05_Worldbuilding/22_A_Field_Guide_to_the_Things_That_Walk_at_Night.md"
+        },
+        {
+          "id": "greatHearth",
+          "title": "The Recipe Book of the Great Hearth",
+          "kind": "book",
+          "pages": [
+            "**The Desk.** The command desk is the room of the Sacred Kitchen where the day's bake is ordered. It was the Chef's before it was the Council's, and the Council has never moved the inkstand. A receipt enters this book in one way only. The Council orders it, the Sous-Chef's clerk writes it, and the Aboyeur calls it at the expediter. From that hour it is served, and from that hour it is law.",
+            "**Of the Receipt.** Pare citrons thin. Steep the peel in oil for a week in the Apothecary window. Warm the oil with beeswax until it holds together, and colour it with saffron. Rub it onto the silver cloche with a cloth and leave it. It harms nothing. Whoever lifts the cloche afterwards has yellow hands until morning, and soap will not take the colour off before then.\n\n**Of the Law.**\n*Yellow hands at dawn are evidence before the High Chancellor.*\n*Whose hands are yellow is a question for the Tribunal. Why they are yellow is not.*",
+            "*At dusk: the loaf for the empty platter. A plain loaf with no seal. The Aboyeur carries it down the Hall, calls no name, and sets it on the empty platter nearest the Hearth, for a name under seal. At dawn it is taken away. It is not eaten.*\n\n*The night is reckoned from this loaf.*"
+          ],
+          "pageLines": ["31-31", "98-102", "316-318"],
+          "source": "creative-writing/vault/05_Worldbuilding/20_The_Recipe_Book_of_the_Great_Hearth.md"
+        },
+        {
+          "id": "dreamBook",
+          "title": "The Dream Book",
+          "kind": "book",
+          "pages": [
+            "Clem's book counts who comes off at Day and who gets on at Dusk. It doesn't count what you see at night. Nobody's book does. So this one will.\n\nMam calls them dreams, so it's a dream book. I didn't name it. I only keep it.\n\nMy rule is the kind Clem has. I only put a name in the margin if I copied it off something I could put my finger on in daylight. A dream doesn't leave you anything to put your finger on.\n\nEvery morning of my life Mam said on the step what every mother here says, while she pinned my collar: *Keep to the light, and don't miss the train.*",
+            "Saturday, the thirtieth. Dusk. The square full.\nA light came down on the chapel step, as wide as the pump.\nI was too short for the step. There were backs in front of me. I saw what came down the slope.\nThe robes. Over the rail, down the slope, nobody in them.\nI ran after them. The fog had them first.\n\nMam: *It was a dream.* She said it with her boots on under the blanket. That's how she sleeps now, as if she means to get up.",
+            "*[Margin, pencil, large capitals:]* HOLLOWMERE\n\nI keep the clock she set by a train that didn't come.\nI keep the prints that never crossed the rails.\nI keep the step I never got down from, because I was never on it.\n\nShe can call it what she likes. She's keeping me out of everybody's book, and I'm keeping her in mine.\n\nA dream doesn't leave you the spelling. Everything in my margins did."
+          ],
+          "pageLines": ["22-28", "57-63", "153-161"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/31_The_Dream_Book.md"
+        },
+        {
+          "id": "lavenderField",
+          "title": "The Lavender Field",
+          "kind": "book",
+          "pages": [
+            "A field. It came in squares, like a net held up to a lamp, each square its own colour. A colour I have no word for. Somebody at the pump said *lavender* this morning. I let them have the word.\n\nHills, bent. The whole field leaning the way the reeds lean off a boat's wake.\n\nOne tree, near, standing over the rest. Fruit on it the colour of a lamp-flame.\n\nAnd the sky. Blue. Not fog-white. Not mere-grey. Blue. Cloud on it thick as wool before carding.",
+            "Then the words came, under it, white, standing the way the Gazette's type stands, with no voice to them.\n\nI read slow. I read with a finger, and there was no paper to put it to, so I put it to the air, and the words waited for me. They waited the way he did on the bank of the channel, the day I took the Seal and couldn't find what to say.\n\n*\"In the end I sought nothing else but to serve God.*\n*And serve him I did.*\n*With this death's last breath I pray this prayer: may the Almighty grant me the strength of ten in the next life.*\n*And in return, tenfold my own.\"*",
+            "Nobody in HollowMere has seen a blue sky since the fog came off the mere. Last night every one of us saw one, and this morning not one of us had.\n\nA dream is what a town calls the thing it saw together and will not report."
+          ],
+          "pageLines": ["38-44", "58-65", "122-124"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/29_The_Lavender_Field.md"
+        }
+      ]
+    },
+    "mh.bookcase_0": {
+      "title": "Vane Manor, the hall: faith",
+      "volumes": [
+        {
+          "id": "motherOfMothers",
+          "title": "The Testament of the Mother of Mothers",
+          "kind": "book",
+          "pages": [
+            "**The Great Hearth & Hall of Platters.** The Hearth is the oldest fire on the rock and has never been let go out. The Hall around it holds a silver platter for every soul on the island. On each platter sits a Wake Loaf stamped with its owner's guild seal. A soul without a platter has no name in law. A platter without a loaf is a death, or a sentence, or both.\n\n**The Windmill Cliffs.** Here the Council's flour is ground. In fog the fishermen read the turning sails the way other people read a clock face. When the sails stop, the wind has stopped, and when the wind stops the island waits.",
+            "**The Subterranean Yeast Vault.** The Mother of Mothers lives here, in a vat of pressurized glass, fed by steam that rises out of the mountain's throat. The Vault has two keys and one feeding hand. Below the vat there is only heat.\n\n**The Salt-Flats & Smuggler's Wharf.** This is where things come ashore that the Counting-House did not count. The Salt-Flat Drowners walk here at low tide, and the Tide-Ghouls when the tide is wrong. Neither is entered in the census. Both are entered in the burial rolls.",
+            "**The Hymn.** The founding hymn is sung at every first loaf. It has four verses and a refrain, and children learn it before they can count. They are counting when they sing it, though they do not know it. The first verse is the feeding hour. The second is the steam, given in the old measure. The third is the flour-to-water, and the fourth is the rest. Whoever forgets the song forgets the Mother. The Council has never written the song down, because a song cannot be confiscated.\n\n*[— in another hand: the second verse is wrong in every copy after the plague year. Sing it a breath slower.]*"
+          ],
+          "pageLines": ["31-33", "35-37", "78-80"],
+          "source": "creative-writing/vault/05_Worldbuilding/08_The_Testament_of_the_Mother_of_Mothers.md"
+        },
+        {
+          "id": "holyWar",
+          "title": "The Holy War",
+          "kind": "book",
+          "pages": [
+            "The marks are mine. **L** is a soul of the Light: confessed, and seen at St Brannock's. **A** is a soul of the Ash: does not confess, walks at Dusk, rent unpaid. **—** is a soul that is neither. **?** is a soul I cannot enter. A soul is entered under the roof it pays rent on. That is the only rule I brought to this and the only one I trust, because a roof does not lie about where it stands.\n\nI am not a man of faith. I am a man of columns. A column does not care what it holds.",
+            "Those he has brought over walk the lanes after dark in threes, and carry no lantern. They say they see well enough together. I have watched them from this window go past the pump in the black, three abreast, sure-footed as men in daylight, like a lamp split three ways that still gives the same light. The Company asks me, by wire, what the Lamplighter's scrip is for, if the faithful need no lanterns. I have answered that the wolves are not faithful.",
+            "The ones the tracts take are the Entranced. They pay no rent and sleep by day. At Dusk they walk out without lanterns, silent, into the Fenwood past the drowned lantern, which is lit — by whom, not entered — or down the Tin Gallery mouth to the Flooded Gallery. Each one brings another the next night. I watch them from this window and count them as they pass the pump, and the count is only what is gone: empty bunks, unswept steps, a cold stove on Pump Row.\n\nThe A column has numbers in it at last, and every one of them is a subtraction."
+          ],
+          "pageLines": ["30-32", "62-62", "243-245"],
+          "source": "creative-writing/vault/05_Worldbuilding/14_The_Holy_War.md"
+        },
+        {
+          "id": "dawnJudgment",
+          "title": "The Dawn Judgment",
+          "kind": "book",
+          "pages": [
+            "The Iron-Wardens brought the accused up from the cold pantry and set him on the stool. A boy of about fourteen. Flour to the elbows. The apron of the shaping bench. He bowed to the gallery as the Order says, too low, and a Warden had to lift him by the collar.\n\nTHE HIGH CHANCELLOR: Read it.\n\nThe charge, entered as read: *That the accused, L'Apprenti of the shaping bench, red crust, did on the night of the ninth take up from the scraps owed to the Hearth the heel of a gilded loaf of the gallery's table, and did eat of it in the dish pit, which is to eat above his platter.*",
+            "The Ordinance of the crumb measures a crumb against the nail of the High Chancellor's smallest finger. The High Chancellor put his hand out over the gallery rail. The Proof-Reader held the dish up to it. The Hall watched a man compare a bite of bread to his own fingernail.\n\nRULING: The portion exceeds the nail. It is a loaf. The theft is of a loaf of the Gallery.",
+            "RULING: Two thefts, and no fine. Trial by Fire in the Great Hearth.\n\nThe High Chancellor looked at the supper card. Then at the clock over the south doors.\n\nTHE HIGH CHANCELLOR: Supper at eight. No Fire within the hour before supper. Before the seventh bell, then. The consommé does not wait.\n\nEntered: *Trial by Fire, before the seventh bell, the consommé not to wait.*\n\n**Minute.** The hour of the Fire was set by the soup. I entered it in the same size of hand as the charge, because it is part of the sentence now."
+          ],
+          "pageLines": ["86-90", "104-106", "142-150"],
+          "source": "creative-writing/vault/05_Worldbuilding/21_The_Dawn_Judgment.md"
+        }
+      ]
+    },
+    "mh.bookcase_3": {
+      "title": "Vane Manor, the hall: records",
+      "volumes": [
+        {
+          "id": "undertakersRegister",
+          "title": "The Undertaker's Register",
+          "kind": "book",
+          "pages": [
+            "The Clerk's order came up with the Articles. Under Article XI an account survives the man, so the Company wants every account on the Grant in one book, kept by the officer who sees the end of them. Forty souls, one line each: name, trade, habit, burial line. The living are to be marked *not yet*, and the book is to be shown at the Midday Rent on Saturdays.\n\nI took Maud to the back car yesterday at Dusk, so I begin the day after Maud.\n\nForty lines ruled. Nine of them I can fill from my own two hands. These are the nine I carried.",
+            "**No. 2. WILF.** Mouth-organ, at the Drowned Lantern. Played for his pours in the key of G and never once asked the house to sing along. The mouth-organ went in with him.\n**Burial:** Saturday, 21 October. Back car.\n\n> Three of mine that day. Car 3 went out with four. I brought three to the platform. The fourth was not one of my forty.\n\n**No. 3. DORA FINCH.** Read sums. Read Mrs Grieves's sums upside down across the bar, through spectacles mended with thread, and made her strike a quarter off Len's line. The spectacles went in with her.\n**Burial:** Saturday, 21 October.",
+            "Today's date, in my ink and my hand. I know my own downstroke.\n\nI had seen her at first light. With my own eyes, the way I see them all now: in her yard, in her apron, counting. The rule held at dawn. She was alive and her line said otherwise.\n\nI told no one. I took the book to the Clerk at Midday. He ran his finger down the forty and said it balanced.\n\nAt Dusk I was sent for. She was sitting in the hen run with her back to the fence and the eggs in her apron. I counted them. Eleven. She had counted them too, twice.\n\n**Cause:** heart, by the look.",
+            "She took the jar down off the shelf. She said I might as well know. One button off every dead man's shirt I had ever sent down to be washed for the box. She said a man should go into the ground with something of his kept back up here, and nobody misses one button.\n\nI miss one button. Every inventory I have written since I came has come up one button short. I had put it down to the cart."
+          ],
+          "pageLines": ["28-32", "34-40", "219-227", "309-311"],
+          "source": "creative-writing/vault/05_Worldbuilding/13_The_Undertaker_s_Register.md"
+        },
+        {
+          "id": "exhibits",
+          "title": "Exhibits A to R",
+          "kind": "book",
+          "pages": [
+            "*[The bench numbers its exhibits by case: Exhibit 1, Exhibit 2, in the order they come up on the day. When the train goes at Dusk, the numbers go with it. The press keeps them by kind. A case ends. A kind does not. So one woman's things lie in four drawers here, and one drawer holds people who never met.*\n\n*I was lent to the Tribunal for a day. The press came with the day, and the day has not given me back. — R.]*",
+            "**The life.** In fog he whistled two notes, high then low, so Nora would know where he was on the water. She answered with two of her own from the dock, where she mends the nets.\n\n*[The channel where they found him comes to the ankle at low water. That morning the low tide was circled on the chart at the Lantern. I have entered both facts. I draw no line between them; the form has no column for a line.*",
+            "**Tag.** EDITH. See G.\n- A letter to a sister back east, folded once, not finished.\n- A postage stamp, two cents, bought at the Post Office with money kept back from the scrip. It was lying loose on top, not stuck down.\n\n**The life.** She did washing for the manor and the mill office and was two weeks behind. The Undertaker writes that she said \"two weeks\" \"as if, said carefully enough, it might come to one.\" Her sister had written to her twice. Edith had not finished writing back."
+          ],
+          "pageLines": ["28-30", "41-43", "174-178"],
+          "source": "creative-writing/vault/05_Worldbuilding/23_Exhibits_A_to_R.md"
+        },
+        {
+          "id": "personsOfNote",
+          "title": "Persons of Note",
+          "kind": "book",
+          "pages": [
+            "1. Ask by daylight. After Curfew, the answers come from people you did not ask.\n2. Ask in pairs. The town counts alibis in twos, and so should you.\n3. Pay in scrip. It was three to the dollar in October. It is five now. Do not ask what it will be.\n4. Rent is collected at the Shift, by the Clerk, from everyone under a roof. A guest is under a roof.\n5. Do not read the stone in the churchyard aloud. Agnes reads it to the Row each dawn. Let her.\n6. Do not follow a light in the fen unless you know whose it is.\n7. Don't miss the train.",
+            "*What not to say.* Do not count the frames behind the bar out loud. There were six when I last stood there: drowned sailors, one frame empty, and one face nobody admits to hanging. Do not ask after Frank. Bar, her hired man, keeps the sawed-off under the counter. Do not ask him which side of the strike it is for. He has been asked, and he has answered both ways.\n\nShe keeps a line open for Arthur, who died of the cough last winter. His brother pays for a Rotgut on it every week. She has never struck the line through.",
+            "Mail does not stop because a person has. These are held, and I enter them so you will not ask me for them.\n\n- **Elsie**, 25 Nov. A seed list from back east, sent for every autumn. She never once planted from it. She liked to read the names.\n- **Mabel**, 27 Nov. A card from a niece, with a pressed flower that has gone the colour of the card.\n- **Cyril**, the fisher, 29 Nov. Twine, ordered on account. Nora has the account.\n- **Hattie**, the washerwoman, 2 Dec. A letter in her own hand, sent back from back east: *not known at this address*. She had written the address from memory."
+          ],
+          "pageLines": ["32-38", "54-56", "266-271"],
+          "source": "creative-writing/vault/10_Characters/08_Persons_of_Note.md"
+        },
+        {
+          "id": "subjectFiles",
+          "title": "Mrs Grieves's Tab Book",
+          "kind": "book",
+          "pages": [
+            "1. I open a tab. Nobody opens one by asking.\n2. No tab for anyone the Clerk has entered Indebted. That holds after noon. Before noon I have not heard.\n3. A tab closes three ways: paid, the back car, or me.\n4. A closed tab stays closed. It does not pass to the wife, the lodger or the Company. The Company says an account survives a man. A tab is not an account.\n5. Nobody drinks on the barman's line.\n6. Nobody leaves after the whistle who has far to go. There are rooms upstairs. The Company sets the price of them.\n7. What is said over Loose Lips stays in this book. The Gazette can find its own.",
+            "**Rotgut: ¼ a pour.**\nThe cheapest thing on the train and the commonest thing in the glass. Four cases a day, when the train is honest. Men drink it after the Shift and do not talk.\n*What a day costs.*\n\n**Liquid Courage: ¾ a pour.**\nDrunk before something: before the Clerk, before the Bell, before the ticket window. Nobody drinks a second one. A second one is Rotgut, whatever the bottle says.\n*What a door costs.*",
+            "> Ivy Cotter sat over her glass and did not touch it till near the whistle. Her fare was in a twist of paper, and she counted it out on my bar twice and would not spend a coin of it. She sews for the mill. Evenings she sits in the dark to save the wick. I put her pour against the house. Don't tell them."
+          ],
+          "pageLines": ["36-42", "48-54", "99-99"],
+          "source": "creative-writing/vault/05_Worldbuilding/11_Mrs_Grieves_s_Tab_Book.md"
+        }
+      ]
+    },
+    "mh.bookcase_6": {
+      "title": "Vane Manor, the hall: stories",
+      "volumes": [
+        {
+          "id": "wellRemembers",
+          "title": "What the Well Remembers",
+          "kind": "book",
+          "pages": [
+            "His gloves were worn through at the palm from that rope. He darned them himself in red wool, badly. The darn sat right in front of my eyes when I stood inside his arms. I used to count the stitches. Nine on the left hand. I never saw the right one close enough.\n\nI count things. Planks on the platform: forty-two. Lanterns on the square: four. Plates on Crumb's wake table: ten, every time, whether there are ten mourners or two. Counting is how I keep things. If you have counted it, it happened.",
+            "There is a ladder in the well on the square. Iron rungs, set into the shaft wall, going down to the shortcut under the town. Grown men use it sometimes in the day, sideways, cursing, because the rungs sit too close to the stone for a man's shoulders. They don't fit me badly at all. I have hidden on it on curfew nights since I was seven. You go down three rungs, where the light from the square still reaches, and you sit with your knees against the wall, and when the Station Rush starts you climb out and walk home like you've been to the pump.",
+            "The lamp was turned down to a bead, a blue drop on the end of the pipe, but it was burning. Under it was a pallet made of sacking, pressed flat in the shape of a body that had lain there more than once. A tin cup. A candle stub, burned to a puddle. On the shelf over the pallet, a key with a brass tag. I could read the tag. STUDY, and under it, smaller, VANE.\n\nSomeone sleeps here.\n\nI knew it the way you know a bed has been slept in. You don't need to touch it.",
+            "There was chalk on the wall by the pallet. Low down, where a man lying on his side would write if he had a piece of chalk and nothing to do with the night.\n\nFour numbers.\n\n23. 140. 8. 271.\n\nI knew them. I knew them the way you know your own name said in another room. They were the hymn numbers from Father Bray's last Sunday. I read them back to him that morning while he slid the cards into the board, and he said *good*, and he said *again*, and I said them again. They are still on the board upstairs. Nobody has changed them since he went. Nobody has set any numbers at all."
+          ],
+          "pageLines": ["28-30", "40-40", "84-88", "98-104"],
+          "source": "creative-writing/vault/03_Stories/12_What_the_Well_Remembers.md"
+        },
+        {
+          "id": "deadMansLamp",
+          "title": "The Dead Man's Lamp",
+          "kind": "book",
+          "pages": [
+            "There's a lamp burning down there nobody fills.\n\nThe Collier said it on Tuesday, the twenty-eighth of October, with his back to the clamp and his arms black to the elbow. He said it the way a man tells you it will rain.\n\nSix was carrying stone. The Workings crew had been lent to the kilns for the week, and the stone was for the clamp, and the Collier did not look up when the detail officer came down the skid road with a clipboard under his arm.",
+            "Dust lay on the table and the bunk thick and unbroken, like felt. Rat tracks stitched across it. No boots. No boy. No mark where a boy had sat.\n\nThe lamp stood in the middle of the table.\n\nIt was not a camp lamp. It was brass, a flame safety lamp with a glass and a gauze chimney, the kind men carried before carbide, the kind his father had carried. Older than the camp. Older than the program, whatever the program was. Its flame burned small and yellow and did not move.",
+            "The planks were wet.\n\nNot splashed. Wet on top, in marks. Two and two, all the way back, the shape of hands and the shape of knees, as if something had come up out of the stope behind him and crawled along the boards in his own tracks. The hands were wrong. Too long in the finger. Too narrow in the palm. A man's hand, drawn out.\n\nThe water lay flat.\n\nThen, somewhere out on it, a breath let go. A long one, the sound a man makes coming up after too long under."
+          ],
+          "pageLines": ["20-24", "96-100", "144-150"],
+          "source": "creative-writing/vault/03_Stories/15_The_Dead_Man_s_Lamp.md"
+        },
+        {
+          "id": "lastDance",
+          "title": "The Last Dance at the Hall",
+          "kind": "book",
+          "pages": [
+            "The notice went up at noon on Lady Day, in red.\n\nIsaure read it in Gallows Square on her father's arm. The fog was coming off the stones in strips. The board was the old board, with the old nails, and the hand on it was the Committee's.\n\n> *The Ball of the Gallery, on the night of Lady Day, is retained, as anciently used. The consort to play from the gallery stair. The great south doors of the Hall to stand open on Gallows Square, so that the Square may see. The attendance of the Gallery is required, and counted.*",
+            "The same clerk gave out the cards.\n\nThey were the old cards, cream, with a pencil on a silk cord. The pencils had been cut off. The cords hung down with nothing on them.\n\nThe cards were already full.\n\nEvery dance, I to XII, and against every number a partner, in red. Her first three were men she had known all her life, written in a hand that did not know them. Across the foot of the card:\n\n*Not to be amended.*",
+            "He was her partner for the sixth. He was older than her father had been at her birth, unhurried, and slightly behind the beat in a way that made the beat seem wrong. He smelled of the bread he never finished. Everyone knew he did not eat his crusts. He kept them for the gulls.\n\nBetween figures he showed her his card. Then he took hers, gently, and turned it over to the last line.\n\nThey were the same. He had checked others. Every card in the Gallery had the same twelfth line.\n\n*XII. The last dance. Beside the Hearth. At the ferry.*"
+          ],
+          "pageLines": ["20-24", "58-66", "116-122"],
+          "source": "creative-writing/vault/03_Stories/26_The_Last_Dance_at_the_Hall.md"
+        },
+        {
+          "id": "threeHeirlooms",
+          "title": "Three Heirlooms, Low Tide",
+          "kind": "book",
+          "pages": [
+            "My grandmother started the book the first winter the mere kept a tide. Her hand is on the first pages, in ink, small and leaning. After that it's my father's, in pencil, because pencil doesn't run when the book gets wet. Mine comes in after the twenty-ninth of November.\n\nI don't write tides in it. I check them. At every low he marked I take the book and the lantern down to the ferry post and see whether he was right. When he was, I write *true* in the margin.\n\nHe has been right every time.",
+            "The ferry post has the tar line on it, where Tuck ties up. Everybody knows the tar line. A hand's breadth below it my father cut a notch with his knife, and nobody knows the notch. It's ours. If the water stops above it, the book says *short*. If it goes under, the book says *under*, and on the furthest nights of all it says *door*.\n\nSomebody was at the post.\n\nIt was a dark coat, at the edge of my light. Not in the light, just where it gives out. Its thumb was on the notch.",
+            "It's in my father's pencil. Twice a moon there's one word beside two nights of the big low: *door*. Never more than two nights. It's always the second night of the run and the fourth. I'd always read it as his word for the furthest under. I never thought it was a door to anything.\n\nI turned forward. The next run starts on Christmas Eve. *Door* stands against Christmas night, and *door* against Wednesday the twenty-seventh."
+          ],
+          "pageLines": ["20-24", "28-32", "76-78"],
+          "source": "creative-writing/vault/03_Stories/27_Three_Heirlooms_Low_Tide.md"
+        }
+      ]
+    },
+    "mu.bookcase": {
+      "title": "Vane Manor, upstairs",
+      "volumes": [
+        {
+          "id": "confessionBook",
+          "title": "The Confession Book of St Brannock's",
+          "kind": "book",
+          "pages": [
+            "**Confessed.** It is not a sin, he said. It is a sum. Dora Finch reads the tab upside down across the bar, through spectacles she mended with thread. Tonight she found a quarter too much on his line and made Mrs Grieves strike it. He owes less because of her. He was glad of the quarter first, and glad of her second, an hour later. He wanted that hour back.\n\nI bought the Liquid Courage he could not run to. He held it a long while. He did not drink it in front of me.",
+            "**Confessed.** Three wakes in one day: Wilf, Dora Finch, Percy. The custom she carried here is one loaf for each mourner and three for the dead, with a crumb sealed in wax at every heart, and she has never broken it. Today she broke it. She is down to one sack and the sweepings. She halved the mourners' loaves so that the dead would have their three. The living can be hungry and forgive it, she said, and the dead cannot. Then she said that is not doctrine but arithmetic.\n\nThere is more. She has been asked for a fourth wake, and she cannot account for it.",
+            "**Confessed.** Before he began he whistled two notes into the fog, so that anyone out on the channel would know where the bank was.\n\nThen he told me that his people were one of the eleven fisher families. A priest stood at a door and swore them the lake's water before God. The water went into the ground in a night, and by morning the lake was a mere. He does not hold the church to the promise its last man made. He holds it to the next one. That is why he will not come to the box: in case I make one."
+          ],
+          "pageLines": ["86-88", "138-140", "374-376"],
+          "source": "creative-writing/vault/10_Characters/06_The_Confession_Book_of_St_Brannock_s.md"
+        },
+        {
+          "id": "eightPhrases",
+          "title": "Eight Phrases",
+          "kind": "book",
+          "pages": [
+            "**IT WAS DARK.**\n\nSunday night, and Hattie on the board where Doris and the Undertaker laid her out. Chalk round her in one line with no gap, from a twist of paper with three sticks left in it. Three candles: one at her head, one at her feet, one in my hand. Then I count. The dead get eight counts, a held breath's length, and eight things they may say. Never a ninth. The dead are poor in words. Eight is all they have, and they share them.",
+            "**BY THE WATER.**\n\nFour. Cyril, on the Wednesday. I drew my ring on the dock before they carried him up to the Undertaker, out of a channel that comes to the ankle at low water. In fog he whistled two notes, high then low, so Nora would know where he was on the water, and she answered with her own. Nora stood outside my chalk with the nets over her arm and asked what he said. I gave her nothing. She whistles the two notes off the dock in the evenings now, and nobody answers, and I could.",
+            "**HAS IT COME?**\n\nEight. The only question among them. Seven of the phrases are for the living. One is for me.\n\nJory. I have not said his name tonight until now. I came on the first train to meet a man who had written that he would meet it. He did not. Every night since, in every ring I draw for him, he picks the same one.\n\n\"Has it come?\"\n\nAnd I say what a living woman would say. It has. He asks again. I say it again."
+          ],
+          "pageLines": ["20-22", "40-42", "78-86"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/30_Eight_Phrases.md"
+        },
+        {
+          "id": "willO",
+          "title": "Will o'",
+          "kind": "book",
+          "pages": [
+            "Dusk below the Fenwood, and I climb.\n\nOnce it was the oak, limb over limb, at nineteen. Now it is a pole. My knees count the rungs for me, and the can knocks my hip on every one.\n\nI keep it lit. I keep it trimmed. I keep it for nobody, going nowhere in particular.\n\nThere is no lake now to bring a boat home across. There is a fen, and a town on the lip of it, and a light on a pole at the edge of the two, and an old man under the light. That is the whole of the arrangement.",
+            "Out on the fen there are other lights.\n\nLow. Lower than any arm would carry them. Moving against the wind. Moving when nothing moves. Never twice in the same place.\n\nThey are not lanterns. Nobody holds them. They lead walkers off the planks and in, and the fen does the rest.\n\nMine is steady. Theirs are not. I say it the way my father said it of his. The same height every night. The same place every night. The same colour every night, since before this town had a name to put on a stone.",
+            "One of the low ones comes nearer. Mine goes out.\n\nI have not touched it. The oil is in it.\n\nOne. A walker on the planks looks for the steady light.\nTwo. Finds only the ones that move.\nThree. Steps toward the nearest.\nFour. Steps again, and there is no plank.\nFive.\n\nMine comes back. I did not light it."
+          ],
+          "pageLines": ["20-26", "36-42", "54-64"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/28_Will_o.md"
+        },
+        {
+          "id": "hopscotch",
+          "title": "Hopscotch",
+          "kind": "book",
+          "pages": [
+            "One for the bell, and the bell brings the town.\nAlfie counted the gallows stairs: thirteen up, and none come down.\nAlfie climbed in a crate on the morning train.\nThe crate went east. It never wrote.\n\n  *Ten chalk squares and ten of us.*\n  *Hop the stone and don't look down.*\n\nTwo for the pump, two hands on the iron.\nNell pumped first and Nell drank first.\nFever by Friday. Ribbons, blue.\nNell rode the back car east.\n\n  *Ten chalk squares and ten of us.*\n  *Hop the stone and don't look down.*",
+            "Three for the lantern we chalk it under.\nIt keeps the wolves off. It keeps us in.\nSid chased his shadow to where the light stops.\nWhere does the light stop?\nSid knew. His cap's on the fence.\n\n  *Ten chalk squares and ten of us.*\n  *Hop the stone and don't look down.*\n\nFour for the Lantern, sign and all.\nThe barman carried it into the mere.\nFlo swept the floor for a penny a night\nand finished the cups when Mrs Grieves wasn't looking.\nSomething in a cup was not sugar.\nFlo's broom is still by the door.",
+            "Seven for the well, and the ladder down.\nWinnie dropped pebbles and counted the splash.\nWinnie threw her stone and the stone went in.\nWinnie went down the ladder to fetch it.\nWe counted for her.\nWe are counting still.\n\n  *Ten chalk squares and ten of us.*\n  *Hop the stone and don't look down.*\n\nEight for the chapel and the Company bell.\nLil sang loudest, always a beat ahead.\nLil went up to the rope to ring it in.\nThe hymn came out one voice short.\nThere's a glove in the rope.\nNobody says whose.",
+            "Who chalks it fresh when we're all in bed?\n\nBut the tenth square isn't chalk.\n\nTen for the stone with tomorrow's name.\nI hopped every one of them. That's the rule:\nyou never land where the stone is lying.\nAlfie. Nell. Sid. Flo. Peg.\nTed. Winnie. Lil. May.\nI hid. I watched. I remember.\nI can read. I read it.\nI won't read it out.\n\n  *Ten chalk squares and one of me.*\n  *Throw your stone. It's your turn now.*\n\nNobody's out in HollowMere.\nEverybody's next."
+          ],
+          "pageLines": ["20-34", "36-50", "76-91", "105-122"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/23_Hopscotch.md"
+        }
+      ]
+    },
+    "wp.writing_desk": {
+      "title": "Widow Vane's desk",
+      "volumes": [
+        {
+          "id": "blackWax",
+          "title": "Black Wax",
+          "kind": "letter",
+          "pages": [
+            "You know what I do at dusk. The Aboyeur carries the loaf down the Hall and sets it on the empty platter nearest the Hearth, for a name under seal, and the night starts from that loaf. Then I stand outside the great doors and say the Unregistered names out loud, every one I know. There is one loaf I can't say a name for. I say the rest.\n\nSomebody has to. The board doesn't. The ledger doesn't. The Hall calls only the names that are paid."
+          ],
+          "pageLines": ["94-96"],
+          "source": "creative-writing/vault/08_Letters/04_Black_Wax.md"
+        },
+        {
+          "id": "censored",
+          "title": "Censored",
+          "kind": "letter",
+          "pages": [
+            "You did, once. Do you remember? The tin lantern from the dump, the one we soldered on the back step, that leaked oil down your sleeve. I still have it. They let me keep it because it doesn't work. I have never fixed it. I could. I'm the best smith in this camp. I haven't.\n\nI don't forgive you. I'm not cursing you either. I haven't the oil to spare for it.\n\nYou gave them my name. I give the dark a light. Only one of us did the work we were sent for."
+          ],
+          "pageLines": ["103-107"],
+          "source": "creative-writing/vault/08_Letters/03_Censored.md"
+        },
+        {
+          "id": "redCrust",
+          "title": "The Red Crust",
+          "kind": "letter",
+          "pages": [
+            "I am afraid, Madame. I have read the gallery's seating plans. I know which names are near the top, and I know a ledger is read from the top. That is one reason. The other is that some evenings I believe them, and on those evenings the bread does taste like bread and nothing worse. I cannot tell you which of the two lifted my hand tonight. I have been trying since the bell.\n\nIs a man who changes sides to live a convert, or only a guest?"
+          ],
+          "pageLines": ["48-50"],
+          "source": "creative-writing/vault/08_Letters/06_The_Red_Crust.md"
+        }
+      ]
+    },
+    "wp.letter_box": {
+      "title": "Widow Vane's letter box",
+      "volumes": [
+        {
+          "id": "oneShot",
+          "title": "One Shot",
+          "kind": "letter",
+          "pages": [
+            "In November I told the new priest I was more afraid of being right than of being wrong. He told me to wait. I waited.\n\nHere is what being right looks like in HollowMere. Cuffs. The square. A meeting that opens on a face already closed. Then the beam at the Bell, and the crows. If I am right, your paper does that. If I am wrong, your paper does that too. The paper does not know the difference. Only the hand does.\n\nIs a right still a right when it changes hands at a pump?"
+          ],
+          "pageLines": ["44-48"],
+          "source": "creative-writing/vault/08_Letters/05_One_Shot.md"
+        }
+      ]
+    },
+    "bk.ledger": {
+      "title": "Crumb's Ovens, the daybook",
+      "volumes": [
+        {
+          "id": "crumbsDaybook",
+          "title": "The Daybook of Crumb's Ovens",
+          "kind": "ledger",
+          "pages": [
+            "Up before anyone.\n\nThe cold room has a door to the shop, a shelf for the crock, a gap behind the crock where a hand can go, and a place where I am found out. This morning that place is the flour bin. One sack and the sweepings. No flour came Friday. None will come today.\n\nRecipe: one spoon of yesterday, one cup of flour, water to the second knuckle. Stir on the island's hour, not the mainland's. The clock on the wall is the Company's. The crock keeps the other one.\n\nI feed the crock. I feed the town. I feed the dead.",
+            "Recipe for a Rumour Loaf: flour, water, salt, a fist of the daughter, and one folded paper. Fold the paper twice. Lay it flat under the fold of the dough. Shape it tight so nothing shows at the seam.\n\nThe papers come to me unsigned. Under a coin on the counter. Under the door before light. Once, inside a glove someone handed back across the counter. I have never written one. I have folded every one.\n\nI do not read them. I read them. I bake them anyway.",
+            "Three dead. Dora Finch. Wilf. Percy. One loaf to every mourner and three to each of the dead. That is the island's arithmetic, four hundred years old, and I have one sack and the sweepings.\n\nThe Company recognises no custom of mourning, the Articles say, and then they tolerate my table and write: \"No rent shall be assessed on the three loaves set for the dead\". The bread of the dead is the only bread in HollowMere the Company takes no cut of."
+          ],
+          "pageLines": ["22-28", "40-44", "76-78"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/22_The_Daybook_of_Crumb_s_Ovens.md"
+        }
+      ]
+    },
+    "ov.board": {
+      "title": "The Hollowmere notice board",
+      "volumes": [
+        {
+          "id": "gazetteMorning",
+          "title": "The HollowMere Gazette, Morning Edition",
+          "kind": "clipping",
+          "pages": [
+            "**The Company.** Curfew runs from the departure of the Daily Train at Dusk until the Station Rush. The Midday Rent is collected at the Shift, in person, and in scrip. Coin is scrip until proven otherwise.\n\n**The Apothecary.** Doc Mallory gives notice that the fen-cough is in the Rows again. It is not catching. Keep the windows shut against the mere. The Company asks that the word be *miasma*."
+          ],
+          "pageLines": ["82-84"],
+          "source": "creative-writing/vault/05_Worldbuilding/10_The_HollowMere_Gazette_Morning_Edition.md"
+        },
+        {
+          "id": "fourNotices",
+          "title": "Four Notices",
+          "kind": "clipping",
+          "pages": [
+            "A notice posted on the board in the square is lawful notice to every person within the Grant. The Articles say so. They also say it holds whether the notice is read or not, and whether the person can read or not.\n\nThe board stands by the pump. Most of it belongs to the Gazette and to the ledger slips nobody admits to writing. The Constable keeps the left-hand corner. He pastes his notices there at the Station Rush, face out, with four tacks to a sheet and flour paste from Crumb's Ovens."
+          ],
+          "pageLines": ["24-26"],
+          "source": "creative-writing/vault/10_Characters/07_Four_Notices.md"
+        },
+        {
+          "id": "lamplightersRound",
+          "title": "A Lamplighter's Round of HollowMere",
+          "kind": "clipping",
+          "pages": [
+            "The Saloon bell went at dusk the way it always went, flat and quick, a bell that wanted to be done. The train stood at the platform with steam up and its doors still open. She took the can from its hook, the wick-pole from behind the door and the short ladder from the wall, and went out by the back way, because the round began where the oil was.\n\nCurfew in HollowMere does not fall at an hour. It falls when the train leaves. After that, by the Company's own paper, the only lawful light in the town is hers."
+          ],
+          "pageLines": ["26-28"],
+          "source": "creative-writing/vault/05_Worldbuilding/09_A_Lamplighter_s_Round_of_HollowMere.md"
+        },
+        {
+          "id": "trainTimetable",
+          "title": "The Daily Train Timetable",
+          "kind": "clipping",
+          "pages": [
+            "| Station | Down | Up | Remarks |\n|---|---|---|---|\n| Thorne Junction | Day | Dusk | Main line. Connections back east. |\n| Widow's Cut | Day | Dusk | Water only. |\n| Gallows Wood Siding | — | — | Stops on signal only. |\n| HollowMere | Day | Dusk | End of line. |\n\nThe Daily Train arrives at the start of each Day and departs at Dusk.\nNo Sunday service.\n\nConnections back east not guaranteed during the present financial disturbance."
+          ],
+          "pageLines": ["30-40"],
+          "source": "creative-writing/vault/05_Worldbuilding/07_The_Daily_Train_Timetable_Manifest_and_Rules_of_Carriage.md"
+        }
+      ]
+    },
+    "bl.wall_shelf": {
+      "title": "The Bunkhouse shelf",
+      "volumes": [
+        {
+          "id": "tinGallery",
+          "title": "The Tin Gallery",
+          "kind": "book",
+          "pages": [
+            "Saturday, 16 December 1893. The fourth night the fog did not lift.\n\nThe cough was on the Row. You could hear it from the mouth of the Gallery, door after door, as if one chest were going down the street and stopping at each house. The wolves had come down to the fence at noon. Noon. Mere-rot makes them bold, and everybody knew it, and everybody had stopped saying it.",
+            "They were the shut mine's two hands. The Company had issued each of them a lantern, a watch, chalk and rope, so they would have something to hold now that there was nothing to dig. Norman held his watch. He looked at it the way he always did, against nothing. There was nowhere either of them had to be.\n\nReg cracked his knuckles. Little finger first, then up the hand: the adit, the first level, the second, the long drift, the wet level, the bottom. Top to bottom. The old levels, in order. He did it the way other men whistle.",
+            "\"I heard it again,\" Reg said.\n\nNorman did not ask what.\n\n\"Two,\" Reg said. \"Under the hill. Last night and tonight, about the curfew. Two, and then nothing.\" He laid his hand flat on the timber and struck it twice with the heel of the other. The way you strike a plug. The way the plug had been struck.\n\n\"Stone settles,\" Norman said.\n\n\"Two.\"\n\n\"Water works on stone. It's had a lake on it.\""
+          ],
+          "pageLines": ["20-22", "26-28", "30-40"],
+          "source": "creative-writing/vault/03_Stories/20_The_Tin_Gallery.md"
+        },
+        {
+          "id": "deadWeight",
+          "title": "Dead Weight",
+          "kind": "book",
+          "pages": [
+            "A dragged crate is a docked crate.\n\nThat is the first thing you learn carrying off the morning train in HollowMere, and the only thing anybody bothers to tell you. The Company pays by the crate. The Company docks by the scuff. A sack that leaves a furrow on the boards is a sack that cost you, so you take it up on the shoulder, the whole weight of it, and you walk. You never drag. Not a crate, not a sack, not your own heel.",
+            "I know every door in this town by its count from the platform. Crumb's back step is two hundred and twelve. The Lantern's yard door, a hundred and eighty. The Bell is three hundred and some from the Lantern, depending on the mud. I had never needed to count to the Bell."
+          ],
+          "pageLines": ["18-20", "22-22"],
+          "source": "creative-writing/vault/03_Stories/21_Dead_Weight.md"
+        },
+        {
+          "id": "wolvesBlamed",
+          "title": "What the Wolves Were Blamed For",
+          "kind": "book",
+          "pages": [
+            "Thursday, the thirtieth of November. Twilight. In HollowMere twilight lasts a quarter of an hour, and then it is gone.\n\nI was coming back from the mill's timber stack at the wood's edge with no light. A lantern costs scrip, and scrip is rent. I had counted the stack, forty-one lengths, on the hand that has five. I was thinking of nothing but the number.",
+            "They say in town that the wolves hunt the edge of the light and never cross it. There was no light, so the whole wood was edge.\n\nI had my back to a pine. One of them came in low with its head down, as if it were ashamed of what it was about to do.\n\nThen a light came up from the clamp side, swinging through the trees. A man with a sack on his shoulder held a lantern out in front of him at arm's length, the way you hold a lantern when you mean it.\n\nThey broke like water off a hot plate. Every one of them went back from the flame, back past where the light reached, into the dark.",
+            "On six it stopped. It was not tired. It stopped the way a dog stops when it is called in. It turned round and trotted home to the den with its tail down, and did not look back.\n\nThe man with the lantern came up beside me. I knew him by his hands. He was the smith from the railyard bench, the one who rings every spike against the anvil and throws back the ones that sound wrong. He laughed once, not unkindly. He put the lantern in my hand to carry and took the sack back up on his shoulder.\n\n\"Six,\" he said. \"They give you six.\""
+          ],
+          "pageLines": ["20-22", "40-46", "52-56"],
+          "source": "creative-writing/vault/03_Stories/19_What_the_Wolves_Were_Blamed_For.md"
+        },
+        {
+          "id": "roadClosed",
+          "title": "The Road Is Closed",
+          "kind": "book",
+          "pages": [
+            "Keep to the light, and don't miss the train.\n\nI say it to the boy every morning on the step while I scrub it, and he says it back with the basket on his arm. Every mother in HollowMere says it. None of us made it up.",
+            "No ticket shall be sold to the Indebted. Clem has read us that line often enough. The Articles never say who may ride on one.\n\nI took the tin to Harold's step with the boy behind me, carrying the empty basket so the Row would think we were going for washing. Harold looked at the tin and then at the boy, and he did not ask. He has four terms. The fourth is that he does not ask.",
+            "The platform was bare boards. Down the line, going away, were the lit windows, four, five, yellow in the snow, and the red lamp behind them. In one window a passenger sat with a case held on the knees in both arms, the way you hold a thing that is heavy. Then the snow took the windows, and then it took the red lamp.\n\nThe Rules of Carriage say it does not wait. It does not.\n\nThen the Dusk bell rang at its proper hour, over nobody.\n\nThe bell rang Dusk for a train that had gone."
+          ],
+          "pageLines": ["20-22", "40-42", "96-102"],
+          "source": "creative-writing/vault/03_Stories/25_The_Road_Is_Closed.md"
+        }
+      ]
+    },
+    "bo.wall_shelf_0": {
+      "title": "Company Office, the charter shelf",
+      "volumes": [
+        {
+          "id": "thorneBylaws",
+          "title": "Bylaws of the Thorne Expanse Line",
+          "kind": "book",
+          "pages": [
+            "WHEREAS the Territory of Coldwater is not a State, has no State to keep it, and is kept, so far as it is kept at all, by those who have laid down the means of keeping it; and\n\nWHEREAS the Town of Hollowmere was not built by pioneers nor blessed by saints, but laid down tie by wooden tie and spike by iron spike by the subscribers hereto, at their own cost, which cost remains outstanding; and\n\nWHEREAS every soul now living within the Grant came to the end of the line of their own free will, and by the same will consents to the terms upon which they remain;",
+            "**§3. Indebted Status.**\n- A person who does not pay at midday shall be entered on the rolls as Indebted.\n- The Indebted may not purchase a ticket under Article VII §4, may not bear witness before the Tribunal, and shall keep the curfew twice over: from Dusk, and from the hour of their entry.\n\n**[ INDEBTED ]** *(specimen impression, as entered against the rolls)*\n\nCOTTER, IVY. One room. In arrears by the price of a lamp-wick.\n\n> *She paid the wick. She sat in the dark to pay it.*",
+            "**§4. Extraction Only by Ticket.**\n- The only lawful way out of the Grant is aboard the Train, by a ticket purchased in scrip at the platform window.\n- No ticket shall be sold to the Indebted.\n- A person who leaves the Grant by any other means remains, in law, within it. Their rent continues to fall due.\n\n> *Some go out with no ticket and no debt. Ask who sold them the seat.*"
+          ],
+          "pageLines": ["31-35", "140-148", "203-208"],
+          "source": "creative-writing/vault/05_Worldbuilding/06_Articles_of_Incorporation_and_Bylaws_of_the_Thorne_Expanse_Line.md"
+        },
+        {
+          "id": "standingOrders",
+          "title": "Standing Orders",
+          "kind": "book",
+          "pages": [
+            "### Order 1. Of the Principal\n\n1. The detail travels in the private car with the Principal. It is not entered on the passenger count of the Line.\n2. At every platform the dogs go down first, the operatives after them, and the Principal last.\n3. The detail does not carry the Principal's bags. Bags are for the platform crew.\n4. The detail does not speak to the town. The town is spoken to by the Constable.",
+            "### Order 2. Of the Dogs\n\nDogs on strength: *Major. Bess. Turk. Jip.*\n\n1. The dogs do not maul unless provoked.\n2. A dog gives voice at a man who runs, a man at a lock, and a man with a weapon out.\n3. A dog that gives voice is answered by its operative. It is not hushed.\n4. The dogs are not taken past the last lantern.",
+            "### Order 3. Of Public Unrest\n\nThe Company's Clerk enters the temper of the town each day under one of four heads. The detail is governed by the head, as follows.\n\n| Temper, as entered | The detail |\n|---|---|\n| Calm | Not deployed. |\n| Panicked | Not deployed. The Principal is wired. |\n| Rioting | Deployed by the first train. The square is cleared. The soapbox is removed and is not returned. |\n| Entranced | Not provided for. |"
+          ],
+          "pageLines": ["37-42", "48-55", "63-72"],
+          "source": "creative-writing/vault/05_Worldbuilding/26_Standing_Orders.md"
+        },
+        {
+          "id": "densityAudit",
+          "title": "The Density Audit",
+          "kind": "book",
+          "pages": [
+            "1. Every soul on the rock has a platter. The long racks behind the Hearth hold the town's, and the journeymen weigh them. This rack holds ten, the platters the Council audits by office. An Unregistered platter is moved to the tenth place of this rack, where the Council can see it.",
+            "The Morning Ferry had cast off at dawn. Nothing was signalled from the mainland. The fog took the harbour lamps before six.\n\nAt six the Aboyeur carried a loaf down the Hall. He called no name. He set it on the platter nearest the Hearth, for a name under seal, and the night was reckoned from it.\n\nThe Ledger-Clerk closed the tariff desk at the half hour. Nine platters of this rack paid or remitted. Platter 9 was Unregistered, carried three weeks.",
+            "At the fourth bell the whole rack went onto the Great Balance of the Hall against the Council's weights, tared.\n\n| | |\n|---|---|\n| Sum of entries, platters 0–9, declared and weighed | 22 livres 14 onces |\n| The rack on the Great Balance, fourth bell | 23 livres 2 onces |\n| Difference | 4 onces |\n\nPlatter 9 is 4 onces over its nominal, and those 4 onces are already in the entries. The Balance finds 4 onces more."
+          ],
+          "pageLines": ["32-32", "44-48", "178-186"],
+          "source": "creative-writing/vault/10_Characters/11_The_Density_Audit.md"
+        },
+        {
+          "id": "stationsNotBuilt",
+          "title": "Timetable of Stations Not Yet Built",
+          "kind": "book",
+          "pages": [
+            "**UNDER SURVEY. TIMES TO BE ANNOUNCED.**\n\n| Station | Down | Up | Remarks |\n|---|---|---|---|\n| South-East Halt, for the marsh light | T.B.A. | T.B.A. | Low water only.\\* |\n| Tin Gallery, the Cave Gate | T.B.A. | T.B.A. | Lamp at the Gate only.§ |\n| The Fork | T.B.A. | T.B.A. | Change here. Two roads.‖ |\n| Harrow, for timber | — | — | Under survey; may not be built.¶ |",
+            "\\* Passengers will consult the tide. The Company does not keep it.\n§ The Company does not say why.\n‖ A passenger at the Fork travels one road. The ticket reads both. The Company does not say which.\n¶ Owner of record: Harrow.\n‡ Name to be announced.",
+            "**For the Extension:**\n\n13. South-East Halt is served at low water only. The Company does not keep the tide.\n14. One lamp is shown at the Gate, and none between the Tin Gallery and the Gate. The Company is not answerable for what is lost on that section, in the cars or out of them.\n15. At the Fork a passenger travels one road. Tickets are not exchanged.\n16. Fares are not sold to stations under survey. A passenger for such a station travels as freight, at the consignee's risk.\n\n> *16. Then who signs for them.*"
+          ],
+          "pageLines": ["64-71", "74-78", "133-140"],
+          "source": "creative-writing/vault/05_Worldbuilding/28_Timetable_of_Stations_Not_Yet_Built.md"
+        }
+      ]
+    },
+    "bo.wall_shelf_1": {
+      "title": "Company Office, the wire shelf",
+      "volumes": [
+        {
+          "id": "cables",
+          "title": "Cables",
+          "kind": "book",
+          "pages": [
+            "**Telephone log. Monday 6 October.**\n\n0000. Roll. Workings 10. Sawmill 10. Bunkhouse 10. Yard 10. All present.\n\n0310. Bell rang once. Line open. No voice. Logged.\n\n0600. Line tried for the Washington switch. Dead.\n\nThis book is kept beside the telephone because the telephone is the one thing in this office that answers to Washington. It does not answer. Entries by the duty hand. — H.",
+            "**Telephone log. Friday 10 October.**\n\n0610. Payroll on time. Sealed car on time. The frost on its doors was thick enough to write in. Nobody did.\n\n0700. Sawmill No. 3 came to the counter and asked if the train had brought mail. Told no. He thanked me for looking. I had not looked.",
+            "**Telephone log. Friday 17 October.**\n\n0610. Payroll on time.\n\n0700. Sawmill No. 3 asked about mail. Told no. Then he asked me to write a word for him, so that it would be written down somewhere. I wrote it the way it sounded. He read it and laughed, not unkindly, and said it was close. He would not tell me what it meant. I have not copied it here. It was his."
+          ],
+          "pageLines": ["36-44", "82-86", "130-134"],
+          "source": "creative-writing/vault/05_Worldbuilding/17_Cables.md"
+        },
+        {
+          "id": "intake",
+          "title": "Intake",
+          "kind": "book",
+          "pages": [
+            "**RULE ONE. THE SHIFT-WHISTLE.**\nThe Shift-Whistle is the camp's clock. Shifts begin on it and end on it. Detainees do not carry time.\nREAD AND UNDERSTOOD: *99-0417*\n\n> *The watch is in field 9. I count now. Eins, zwei. My mother's counting. I catch myself at it and go on anyway.*",
+            "**RULE EIGHT. THE RACK.**\nEvery detainee is a billet on his crew's rack. The rack is checked at dawn. The log on your rack at dawn is who you are.\nREAD AND UNDERSTOOD: *99-0417*\n\n> *The only rule they wrote as if it were a hymn.*",
+            "THE DETAINEE HAS PASSED UNDER THE GATE AND HAS READ THE MOTTO:\n\n> **PRODUCTION IS OBLIGATION.**\n\nCOPY THE FOLLOWING IN YOUR OWN HAND. PENMANSHIP AND LITERACY ARE ASSESSED.\n\n> YOU'RE EITHER FEEDING THE FURNACE OR YOU'RE FUEL.\n\n*You're either feeding the furnace or you're fuel.*"
+          ],
+          "pageLines": ["119-123", "169-173", "179-187"],
+          "source": "creative-writing/vault/05_Worldbuilding/15_Intake.md"
+        },
+        {
+          "id": "arrivals",
+          "title": "Arrivals",
+          "kind": "book",
+          "pages": [
+            "This is a new book, because the timetable is new. It is in force from 2 October 1893. The old book, if there was one, went down the Line, or nobody handed it to me. This one begins on the 2nd. Whoever went before the 2nd went in some other book, and that includes Father Bray. I am writing down that I noticed.\n\nI am on this book because I am the one on the boards who can fill in a form. I am also the one who reads it back to them. They let me, because it passes the cold. Len says a thing read out weighs less. He has never lifted a word.",
+            "> *At Dusk, Ivy Cotter, in her grey coat, with the thimble on its string.*\n> *She counted her fare out of a paper, coin by coin.*\n> *Crescent die.*\n> *She said there are shops back east with glass in the windows.*\n> *I said I had read so.*\n\n> *Wednesday. Word off the down train: Cotter, Ivy, not counted out at the Junction.*\n> *I read Rule 9 aloud on the boards. Nobody asked me to.*\n> *A passenger booked in is a passenger counted out.*\n> *Len said, Then she's still on it.*",
+            "> *Monday. I read out the manifest, the same as every morning.*\n> *It's signed in a hand I don't know. The crescent is on the fares, the same as ever.*\n> *Car 3, third remark: With a thimble, on a string.*\n> *Nobody on the boards said anything.*\n> *I read it again.*"
+          ],
+          "pageLines": ["30-32", "109-118", "153-157"],
+          "source": "creative-writing/vault/05_Worldbuilding/24_Arrivals.md"
+        }
+      ]
+    },
+    "bo.ledger_desk": {
+      "title": "Company Office, the payroll desk",
+      "volumes": [
+        {
+          "id": "lastShiftTally",
+          "title": "The Last Shift's Tally Board",
+          "kind": "ledger",
+          "pages": [
+            "\"Who kept it before?\"\n\n\"Transferred,\" Hask said. \"Sign.\"\n\nNed Corwin had been a payroll clerk at a foundry in Pittsburgh for eleven years. Then he signed a union petition, and in the camp's words he became an enemy of the state, and in the Workings crew's words he became Four. Hask had looked down the crew's numbers that morning and stopped at his. *You. Four. You were a clerk.*\n\nA keeper does not go down. He knew that before he knew anything else about the job. He signed with his number.",
+            "The DOWN column was not empty.\n\nHigh up, above where any of the crew would be chalked, was one entry in older chalk and a rounder hand than any hand in the crew:\n\n`A_T_N  K_SS__R`\n\nIt was not struck through. It had never come up.\n\nHe did the sum on his trouser seam with his thumbnail, the way he had done sums on the foundry's ledgers when the adding machine jammed. Nine men down. Nine men up. And one.\n\n\"From today,\" Hask said, \"the count is yours to close.\"",
+            "So Four read the frame again. *Clean slate each shift.* He read it the way a clerk reads a rule, looking for the word that gives permission. It was there. *Clean.*\n\nHe filled the bucket at the drip. He wet the rag. The slate went black and shining under it, then slowly back to grey. The rounder hand came off the way any chalk comes off. There was nothing in it that held on.\n\nOld chalk in the grain, washed out. That was all it had ever been.\n\nMonday's sheet: down nine, up nine, residual nought. The bread came back."
+          ],
+          "pageLines": ["28-34", "36-46", "88-94"],
+          "source": "creative-writing/vault/05_Worldbuilding/16_The_Last_Shift_s_Tally_Board.md"
+        },
+        {
+          "id": "tallyRack",
+          "title": "The Tally Rack",
+          "kind": "ledger",
+          "pages": [
+            "2. This is the yard rack. It holds the camp's ten offices and trades. Each work crew keeps its own rack, numbered 0 to 9: the Workings, the sawmill, the bunkhouse. A number means nothing without its rack.\n3. The billet carries the number, the trade, the debts and the sins. You are told once, at the intake office: *you're either feeding the furnace or you're fuel.* The billet says which.",
+            "7. At the Midnight Roll Call you have fifteen seconds to stand by your bunk. Then come the searchlights, the masks and the dogs. A billet without a body is entered *absent*. A body without a billet is entered *surplus*.\n8. The log on your rack at dawn is who you are."
+          ],
+          "pageLines": ["35-36", "40-41"],
+          "source": "creative-writing/vault/10_Characters/09_The_Tally_Rack.md"
+        },
+        {
+          "id": "pledged",
+          "title": "Pledged and Unredeemed",
+          "kind": "ledger",
+          "pages": [
+            "1. I lend on what can be carried over the step. Nothing that breathes. Nothing that is bread.\n2. Thirty days, and a ticket in two halves. You keep one half and I keep the other. Whoever brings your half is the owner, as far as the step knows.\n3. I lend in scrip and I am paid back in scrip. It was three to the dollar in October and it is five now. What it does in between is the Company's business, and has been since the drain.\n4. I do not ask why. I write down what I am told.\n5. At thirty days the thing is mine. I have never sold one.",
+            "**No. 4061. Monday, 16 October.**\n*Article.* One lantern, tin, the glass whole. The wick trimmed short and hardly burned.\n*Name on the ticket.* Ivy Cotter, of the mill.\n*Lent.* Four scrip and some coppers, which was what she was short.",
+            "She came on the first train to meet a man who had written that he would meet it. I knew him. Jory Kitto, a tinner. He drowned at the last plug, and he lies in the first plot behind St Brannock's. She never went back east.\n\nShe told me that every night, in her ring, he asks whether the train has come. She tells him it has, and he asks again. She wanted one night without the ring, to learn whether he would ask anyway, and she asked me to keep the chalk out of her reach. Chalk is worth nothing. I lent on the reach."
+          ],
+          "pageLines": ["27-31", "51-54", "194-196"],
+          "source": "creative-writing/vault/10_Characters/12_Pledged_and_Unredeemed.md"
+        }
+      ]
+    },
+    "bc.board": {
+      "title": "The Blackpine camp board",
+      "volumes": [
+        {
+          "id": "sayingsOfFork",
+          "title": "Sayings of the Fork",
+          "kind": "clipping",
+          "pages": [
+            "This is a young town with old sayings. Some came in on the Line in people's mouths, from back east and from further than that. Some we made here, after the drain, and they took faster than weeds. Harold says *before the drain* about everything, bread included. Nobody laughs any more, because it is a saying now, and you don't laugh at a saying.\n\nWe say it about the bread. We say it about the weather. We say it about the dead, because the dead are weather here.\n\nHow old does a saying have to be before it is true? Two deaths old. One death is bad luck. Two is a custom."
+          ],
+          "pageLines": ["26-30"],
+          "source": "creative-writing/vault/07_Poems_and_Prose/27_Sayings_of_the_Fork.md"
+        },
+        {
+          "id": "twoRoads",
+          "title": "The Two Roads",
+          "kind": "clipping",
+          "pages": [
+            "After the fourth pass, someone in the queue asked me to lay a card for the empty platter nearest the Hearth. It is the one the Aboyeur sets at dusk, for a name under seal. I said a card is laid for a name. Under seal, there is no name to lay it for. She said that was why she had asked.\n\nI put the Cloches back in the crate. The Hall's music stopped as I shut the lid, as if it had been waiting for me.\n\nA ferry will come with news. Every year one does."
+          ],
+          "pageLines": ["100-104"],
+          "source": "creative-writing/vault/10_Characters/13_The_Two_Roads.md"
+        }
+      ]
+    }
+  }
+}
