@@ -384,6 +384,10 @@ this table:
 | Effects (`EffectId`, GDD 3.22) | the body HUD's effect row; `indebted` in its own seat's view only | `effect_slowed`, `effect_wounded`, `effect_bleeding`, `effect_weakened`, `effect_poisoned`, `effect_fatigued`, `effect_stunned`, `effect_dazed`, `effect_famished`, `effect_knockedOut`, `effect_indebted` |
 | Inspect signs (`sim/inspect/read.ts`) without an effect of their own | the inspect card | `sign_bloody`, `sign_hunted` |
 
+The bloodied mark over a figure (`PlayerView.setBlood`) is the bleeding icon as a world image: the manifest key
+`mark_bleeding`, one 48 px `image` entry per style pointing at that style's file (the placeholder set uses the 8-bit
+one), drawn at 24 px above the nameplate. It adds no atlas page and patches no vfx sheet; `budget.test.ts` checks it.
+
 No icon encodes a secret: a cover and its true wearer show the same icons, and the icons of private state (Indebted,
 roles, cards) appear only in their owner's view.
 
