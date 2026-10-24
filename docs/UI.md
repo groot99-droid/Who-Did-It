@@ -371,9 +371,10 @@ against `PurseHud.ts`.
 
 Body HUD (8H, A143). 8A's body panel (14.32) carries its states as classes and its effects as chips with
 `data-effect`. It redraws its chips every second, so CSS alone cannot tell a hit or a new effect from a redraw: `bodyMotion`
-(`ui/theme/motion.ts`, one locked line in `World.ts`) watches the panel's DOM and only adds classes. The health bar flashes on a
+(`ui/theme/motion.ts`, one locked line in `World.ts`, granted by 6Z) watches the panel's DOM, inserts nothing into it and
+only adds classes; it stops itself once the panel leaves the page. The health bar flashes on a
 drop, a new chip pulses once (its pulse resumes across redraws through a negative delay), and a cured chip leaves a copy
-that fades out. The vignette is fixed to the viewport under the HUD's controls; nothing on the panel takes a `translate`,
+that fades out in bodyMotion's own `.wdi-body-ghosts` layer, where the chip last sat. The vignette is fixed to the viewport under the HUD's controls; nothing on the panel takes a `translate`,
 which would hold it inside the panel. The Dazed blur lands on `#game canvas`. All of it reads this seat's own panel, so no
 one sees another seat's body. A timer ring on a timed chip waits on its total duration, which the chip does not carry yet.
 `motion.test.ts` holds the hook names against `BodyHud.ts`.

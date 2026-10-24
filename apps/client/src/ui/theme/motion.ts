@@ -90,26 +90,35 @@ export const BODY_FX = { hit: 'wdi-fx-hit', fresh: 'is-fresh', cured: 'is-cured'
 const FRESH_MS = 3000;
 
 /**
- * The body panel's one-shot motion (round 8, 8H; UI.md 9): 8A's BodyHud redraws its chips every second, so CSS
- * alone cannot tell a new hit or a new effect from a redraw. This watches the panel's DOM and only adds classes:
- * the health bar flashes on a hit, a new chip pulses, and a cured chip leaves a copy that fades out (the next
- * redraw clears it). It reads no game state beyond what the panel shows. Returns a function that stops it.
+ * The body panel's one-shot motion (round 8, 8H; UI.md 9; granted by 6Z, World.ts bodyMotion): 8A's BodyHud
+ * redraws its chips every second, so CSS alone cannot tell a new hit or a new effect from a redraw. This watches
+ * the panel and adds no node to it and changes none of its content: it puts classes on the health bar (a hit)
+ * and on a new chip (a pulse, resumed across redraws through its animation delay), and draws a cured chip's
+ * fading copy in a layer of its own beside the panel. It stops itself once the panel leaves the page.
+ * Returns a function that stops it sooner.
  */
 export function bodyMotion(root: HTMLElement): () => void {
   const meter = (): HTMLElement | null => root.querySelector('.wdi-body__bar--health');
-  const chip = (key: string): HTMLElement | null =>
-    root.querySelector(`.wdi-body__chip[data-effect="${key}"]`);
+  const chips = (): HTMLElement[] => [...root.querySelectorAll<HTMLElement>('.wdi-body__chip')];
   const frame = (): BodyFrame => ({
     hp: Number(meter()?.getAttribute('aria-valuenow') ?? 0),
-    effects: [...root.querySelectorAll<HTMLElement>('.wdi-body__chip:not(.is-cured)')].map(
-      (el) => el.dataset.effect ?? '',
-    ),
+    effects: chips().map((el) => el.dataset.effect ?? ''),
   });
   let prev: BodyFrame | null = root.hidden ? null : frame();
-  // A pulse outlives the one-second redraw that would drop it: the class is put back on each redraw until it ends.
   const fresh = new Map<string, number>();
-  const texts = new Map<string, string>();
+  // Each chip as it last looked, so a cured chip's copy reads the same and sits where the chip sat.
+  const seen = new Map<string, { text: string; rect: DOMRect }>();
+  const ghosts = document.createElement('div');
+  ghosts.className = 'wdi-body-ghosts';
+  ghosts.setAttribute('aria-hidden', 'true');
+  root.after(ghosts);
+
+  const stop = (): void => {
+    observer.disconnect();
+    ghosts.remove();
+  };
   const observer = new MutationObserver(() => {
+    if (!root.isConnected) return stop();
     if (root.hidden) {
       prev = null;
       return;
@@ -124,7 +133,7 @@ export function bodyMotion(root: HTMLElement): () => void {
     }
     for (const key of change.fresh) fresh.set(key, now);
     for (const [key, since] of fresh) {
-      const el = chip(key);
+      const el = root.querySelector<HTMLElement>(`.wdi-body__chip[data-effect="${key}"]`);
       if (now - since > FRESH_MS || !el) {
         fresh.delete(key);
         continue;
@@ -133,28 +142,20 @@ export function bodyMotion(root: HTMLElement): () => void {
       el.style.animationDelay = `${-Math.round(now - since)}ms`;
       el.classList.add(BODY_FX.fresh);
     }
-    const list = root.querySelector<HTMLElement>('.wdi-body__effects');
     for (const key of change.cured) {
-      if (!list) break;
-      const ghost = document.createElement('li');
+      const was = seen.get(key);
+      if (!was) continue;
+      const ghost = document.createElement('span');
       ghost.className = `wdi-body__chip wdi-body__chip--${key} ${BODY_FX.cured}`;
-      ghost.dataset.effect = key;
-      ghost.textContent = texts.get(key) ?? '';
-      ghost.setAttribute('aria-hidden', 'true');
-      list.hidden = false;
-      list.append(ghost);
-      ghost.addEventListener(
-        'animationend',
-        () => {
-          ghost.remove();
-          if (list.childElementCount === 0) list.hidden = true;
-        },
-        { once: true },
-      );
+      ghost.textContent = was.text;
+      ghost.style.left = `${was.rect.left}px`;
+      ghost.style.top = `${was.rect.top}px`;
+      ghosts.append(ghost);
+      ghost.addEventListener('animationend', () => ghost.remove(), { once: true });
     }
-    // Each chip's text, so a cured chip's copy reads the same as the chip did.
-    for (const el of root.querySelectorAll<HTMLElement>('.wdi-body__chip:not(.is-cured)'))
-      texts.set(el.dataset.effect ?? '', el.textContent ?? '');
+    seen.clear();
+    for (const el of chips())
+      seen.set(el.dataset.effect ?? '', { text: el.textContent ?? '', rect: el.getBoundingClientRect() });
   });
   observer.observe(root, {
     subtree: true,
@@ -162,5 +163,7 @@ export function bodyMotion(root: HTMLElement): () => void {
     attributes: true,
     attributeFilter: ['aria-valuenow', 'hidden'],
   });
-  return () => observer.disconnect();
+  // The panel leaving the page is a change to its parent, not to the panel: watch the parent for that too.
+  if (root.parentNode) observer.observe(root.parentNode, { childList: true });
+  return stop;
 }
