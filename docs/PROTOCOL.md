@@ -43,6 +43,7 @@
 | `act.buy` | `{ shopId: string; itemId: string; qty: number }` | 5/s | Round 8 (GDD 3.23, 8C): `qty` of `itemId` from `shopId`, which a `shop` hold opened and whose counter is still in reach, at its `ask` each, paid from the purse. Refused 422 when the purse or the inventory falls short. |
 | `act.sell` | `{ shopId: string; itemId: string; qty: number }` | 5/s | Round 8 (GDD 3.23, 8C): `qty` of `itemId` from the inventory to `shopId`, at its `pay` each, into the purse. |
 | `act.bank` | `{ op: 'deposit' \| 'withdraw'; amount: number }` | 5/s | Round 8 (GDD 3.23, 8C): moves `amount` Scrip between the purse and the bank, at the bank counter a `bank` hold opened and that stays in reach. Refused 422 when the side it draws on holds less. |
+| `act.mug` | `{ choice: 'pay' \| 'fight' \| 'flee' }` | 5/s | Round 8 (GDD 3.24): the target's answer to its open `mugPrompt`. Refused 422 with no prompt open; `flee` and `fight` are refused until the fists land (DECISIONS A180). |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
 
@@ -73,6 +74,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `inspect.hunch` | `{ copyId: string }` | Private, round 8: an `inspect.hunch.*` copy id. |
 | `shop.open` | `{ shopId: string; stock: Array<{ itemId: string; price: number }>; buys: Array<{ itemId: string; price: number }>; }` | Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. |
 | `coopHold` | `{ taskId: string; holders: number; progress: number }` | Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. |
+| `mugPrompt` | `{ muggerId: string; endsTick: number }` | Private, round 8 (GDD 3.24): a mugger demands the purse; `muggerId` is its avatar handle in the target's scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`). |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 

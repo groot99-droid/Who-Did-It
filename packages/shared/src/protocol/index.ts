@@ -14,6 +14,8 @@ export const C2S = {
   present: 'act.present',
   /** Round 6 (M5b, GDD 3.15): light or put out the carried light; `sim/mobs/light.ts` (6G) handles it. */
   light: 'act.light',
+  /** Round 8 (GDD 3.24): the answer to a `mugPrompt`; `sim/townsfolk/mug.ts` (8E) handles it. */
+  mug: 'act.mug',
   vote: 'meeting.vote',
   say: 'chat.say',
   /** Round 8 (GDD 3.8 "Meeting notes", 8T): a line for the meeting notes, which carry no speaker. */
@@ -86,6 +88,8 @@ export const S2C = {
   coopHold: 'coopHold',
   /** Round 8 (GDD 3.12, 8R), private to the nearest living Detective and Doctor: an NPC shouted for a body here. */
   shout: 'shout',
+  /** Round 8 (GDD 3.24): a mugger's demand, private to the target; sent by Session 8E's `mug.ts`. */
+  mugPrompt: 'mugPrompt',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
@@ -288,6 +292,11 @@ export interface C2SPayloads {
    * opened and that stays in reach. Refused 422 when the side it draws on holds less.
    */
   'act.bank': { op: 'deposit' | 'withdraw'; amount: number };
+  /**
+   * Round 8 (GDD 3.24): the target's answer to its open `mugPrompt`. Refused 422 with no prompt open; `flee` and
+   * `fight` are refused until the fists land (DECISIONS A180).
+   */
+  'act.mug': { choice: 'pay' | 'fight' | 'flee' };
 }
 
 export interface S2CPayloads {
@@ -371,6 +380,11 @@ export interface S2CPayloads {
   };
   /** Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. */
   coopHold: { taskId: string; holders: number; progress: number };
+  /**
+   * Private, round 8 (GDD 3.24): a mugger demands the purse; `muggerId` is its avatar handle in the target's
+   * scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`).
+   */
+  mugPrompt: { muggerId: string; endsTick: number };
 }
 
 export type ErrorPayload = S2CPayloads['error'];
@@ -412,6 +426,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.notice': 5,
   'act.hq': 5,
   'act.payRent': 5,
+  'act.mug': 5,
 };
 
 export const ErrorCode = {

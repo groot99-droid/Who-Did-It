@@ -14,6 +14,7 @@ import { handleDonate, handleFaith } from './economy/faith';
 import { handlePayRent } from './economy/rent';
 import { handleHq } from './economy/hq';
 import { handleNotice } from './economy/notices';
+import { handleMug } from './townsfolk/mug';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
 export interface QueuedCommand {
@@ -110,6 +111,10 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.hq: // round 8, 8D (GDD 3.23)
         handleHq(room, cmd.sessionId, payload);
+        break;
+      // Round 8 (8E, GDD 3.24): the answer to a mugging prompt.
+      case C2S.mug:
+        handleMug(room, cmd.sessionId, payload);
         break;
       default:
         // act.interact, hide, check, burst, present arrive with M4+; queued and ignored until then.
