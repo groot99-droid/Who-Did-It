@@ -1706,6 +1706,23 @@ def ore_pile():
             part("Blade", T("slate", 3), B(-0.2, 0.15, 0.12, 0.2, 0.03, 0.22))]
 
 
+def mailbag():
+    """The Daily Train's mail crane on the platform: a canvas bag strapped to its arm, the slips for the town
+    inside, and a second bag waiting at its foot with a tag on it."""
+    rnd = random.Random("mailbag")
+    return [part("Crane", T("wood", 2), B(0.2, 0.1, 0.8, 0.1, 0.1, 1.6), B(0.02, 0.1, 1.55, 0.4, 0.07, 0.07),
+                 B(0.2, 0.1, 0.04, 0.36, 0.3, 0.08), bevel=0.01),
+            part("Irons", T("slate", 3), B(-0.12, 0.1, 1.46, 0.02, 0.02, 0.16), B(-0.12, 0.1, 0.86, 0.02, 0.02, 0.1),
+                 outline=False),
+            part("Bag", T("bone", 3), S(blob(-0.12, 0.1, 0.13, 0.1, [(0.06, 3, rnd.random() * 6)], n=12), 0.9, 1.38),
+                 bevel=0.05),
+            part("Straps", T("blood", 1), B(-0.12, 0.1, 1.24, 0.27, 0.21, 0.04), B(-0.12, 0.1, 1.02, 0.27, 0.21, 0.04),
+                 outline=False),
+            part("Sack", T("bone", 2), S(blob(-0.16, -0.14, 0.2, 0.15, [(0.08, 3, rnd.random() * 6)], n=12), 0, 0.36),
+                 bevel=0.07),
+            part("Tag", T("brass", 2), B(-0.06, -0.29, 0.26, 0.08, 0.01, 0.05), outline=False)]
+
+
 def _crates(n=3):
     rnd = random.Random(f"crates{n}")
     return [kenney("survival-kit", "box-large", height=0.5, ramp=["#3A231F", "#744733", "#B57F54"],
@@ -1957,5 +1974,7 @@ PROPS = {
     "prop_rubble": (64, 64, rubble),
     "prop_miners_lamp": (64, 48, miners_lamp),
     "prop_ore_pile": (64, 64, ore_pile),
+    # The platform's mail crane (8D's mailbag, seams 2).
+    "prop_mailbag": (64, 112, mailbag),
     **SPOTS,
 }

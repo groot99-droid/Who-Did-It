@@ -149,6 +149,8 @@ const RULES: PlacementRules = {
     feed_trough: 'free',
     wine_cask: 'free',
     blackMarket: 'free',
+    // The square, the house fronts, the platform's mail crane (8D's mailbag) and the quay.
+    mailbag: 'free',
     // The wood beyond the gate, the deep wood and Vane's flooded gallery.
     pit_prop: 'hung',
     stump: 'free',
@@ -253,15 +255,7 @@ const RULES: PlacementRules = {
  * Scenes not yet dressed by 8J, with the problems they still have: each room's pull request fixes its scene and
  * takes it off this list, and the test fails on an entry that no longer fails, so the list only shrinks.
  */
-const PENDING: Partial<Record<SceneId, readonly string[]>> = {
-  overworld: [
-    'light ov.lt_tavern_window (window) at 31,35 hangs on nothing that could hold it',
-    'light ov.lt_bakery_window (window) at 44,20 hangs on nothing that could hold it',
-    'light ov.lt_apoth_window (window) at 53,25 hangs on nothing that could hold it',
-    'light ov.lt_chapel_window (window) at 11,30 hangs on nothing that could hold it',
-    'light ov.lt_platform (lantern) at 60,30 hangs on nothing that could hold it',
-  ],
-};
+const PENDING: Partial<Record<SceneId, readonly string[]>> = {};
 
 const taskPropsOf = (sceneId: string): Set<string> =>
   new Set(
