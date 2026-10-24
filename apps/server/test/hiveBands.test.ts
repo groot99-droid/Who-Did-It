@@ -5,6 +5,8 @@ import { Phase, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
 import { runAction } from '../src/sim/Actions';
 import { spawnBody } from '../src/sim/Bodies';
 import { runInvariants } from '../src/sim/auto/invariants';
+import { mobBodies } from '../src/sim/Mobs';
+import { MobState } from '../src/sim/mobs/ai';
 import { emitNoise } from '../src/sim/Noise';
 import { difficultyRow } from '../src/sim/npc/difficulty';
 import { hiveOf } from '../src/sim/npc/hive';
@@ -52,12 +54,13 @@ async function world(humans: number, keep: number): Promise<{ party: Party; npcs
 }
 
 /**
- * The ticks a report takes `tiles` from a body: the noticing stagger, the walk, the difficulty row's delay and 2 s of
- * slack. The routine alone, which found such a body only by chance, took longer in both regression cases.
+ * The ticks a report takes `tiles` from a body: a noticing stagger per reaction, the walk, the difficulty row's delay
+ * and 2 s of slack. A heard scream is two reactions (the scream, then the body once seen), each with its own stagger.
+ * The routine alone, which found such a body only by chance, took longer in both regression cases.
  */
-const deadline = (party: Party, tiles: number) =>
+const deadline = (party: Party, tiles: number, reactions = 1) =>
   seconds(
-    balance.npc.hive.staggerS.max +
+    reactions * balance.npc.hive.staggerS.max +
       tiles / balance.movement.walkTilesPerS +
       difficultyRow(party.room).reportDelayS +
       2,
@@ -88,7 +91,18 @@ describe('the body bands (8R)', () => {
     expect(simOf(party.room).reportedBodies.size).toBe(0);
     emitNoise(party.room, 'forest', px(13), px(1), balance.noise.killScream, 'scream', dead);
     const requests = requestsOf(party);
-    for (let i = 0; i < deadline(party, 6) && requests.length === 0; i++) advance(party, 1);
+    // The forest's creatures wake at night and an NPC one chases flees the scene first (GDD 3.15); this case is about
+    // the scream, so they are put back to idle after every step, as in npcRoutine.test.ts. The flee is mobs.test.ts's.
+    const calm = () => {
+      for (const body of mobBodies(party.room).values()) {
+        body.mind.state = MobState.idle;
+        body.mind.prey = null;
+      }
+    };
+    for (let i = 0; i < deadline(party, 6, 2) && requests.length === 0; i++) {
+      advance(party, 1);
+      calm();
+    }
     expect(requests).toEqual([expect.objectContaining({ reason: 'body', callerId: a })]);
   });
 
