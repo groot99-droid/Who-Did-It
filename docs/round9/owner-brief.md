@@ -26,3 +26,13 @@ The owner wrote this after the first playtest of the round-8 build. It is kept h
 9. **A logic table.** Every placed thing (chests, wood piles, rocks, lumber, boulders and so on) has a purpose and a tool or action that works on it: an axe cuts lumber, a pickaxe breaks boulders. Chests are placed by rules, not scattered as decoration. A table drives what each tool can do to each object.
 10. **Emergent play.** The rules support players finding their own way to play, like the rogue who gathers food instead of buying bread and makes his own lock picks to avoid taxes.
 11. **Voting is removed.** It is replaced by full-screen phases that keep the same pauses, one for each aspect of the game. The screens need planning first.
+
+## Follow-up answers (2026-10-24, verbatim where quoted)
+
+- **Stopping the Killer** (asked: evidence and arrest, role goals, or a trial by evidence): "All 3 can stop the killer and give the person who stopped them one of their types of victories".
+- **Order of work:** "Design only". Round 9 is a design round, and nothing is built until the owner approves the design.
+- **Disguises:** "The killers get to chose which NPC role to fill, they get disguised as that character, they have to perform life as a villager, unless your the bandit they wear their own skin because they are fundamentally different. Killers should also have their own looks when they look at their screen vs when everyone else sees them."
+- **More rules:** "in the new mode I want the 8bit/lowpoly/HD gone inside the game, it breaks it when used, menu only. The train brings in people who died in the day back the next morning by train, days should now last 8 minutes and nights last 5 keep the game play as it was before but prolong everything, I don’t want people to die from bleeding and things like that quite"
+- **Unanswered:** whether "The game should also technically be able to function with the killer (even though it never will)" means a match must work with no Killer, or that the engine must allow an NPC Killer. This goes into the round-9 questionnaire.
+
+The approved round-9 plan and its deliverables (`world-mode.md`, `phases.md`, `logic-table.md`, `failures.md`, `living-world.md`, `emergent-play.md`, `gdd-map.md`) are in `docs/round9/README.md`.
