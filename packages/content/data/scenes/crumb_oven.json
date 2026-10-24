@@ -8,7 +8,7 @@
   "biome": "house",
   "dark": false,
   "size": { "w": 12, "h": 10 },
-  "notes": "Le Four à Pain: the brick dome oven and its flue, the bread rack, the peel and the hanging bulb.",
+  "notes": "Le Four à Pain: the brick dome oven and its flue, its fire always lit; peels on the wall rail beside a bulb on its iron arm, shelves of the morning's loaves, two cooling racks against the east wall, baskets of split logs either side of the oven, a sack of farine and the dousing bucket by the west wall (round 8, 8J).",
   "worldRef": "4.3",
   "portals": [
     {
@@ -54,36 +54,46 @@
       "x": 6,
       "y": 2,
       "footprint": { "x": 6, "y": 1, "w": 2, "h": 2 }
-    }
+    },
+    { "id": "co.peel_rack", "kind": "dressing", "x": 2, "y": 0 },
+    { "id": "co.wall_bulb", "kind": "dressing", "x": 3, "y": 0 },
+    { "id": "co.bread_shelf", "kind": "dressing", "x": 4, "y": 0 },
+    { "id": "co.bread_shelf_b", "kind": "dressing", "x": 9, "y": 0 },
+    { "id": "co.log_basket_0", "kind": "dressing", "x": 1, "y": 1 },
+    { "id": "co.log_basket_1", "kind": "dressing", "x": 8, "y": 2 },
+    { "id": "co.cooling_rack_0", "kind": "dressing", "x": 10, "y": 1 },
+    { "id": "co.cooling_rack_1", "kind": "dressing", "x": 10, "y": 2 },
+    { "id": "co.flour_sacks", "kind": "dressing", "x": 1, "y": 6 },
+    { "id": "co.water_bucket", "kind": "dressing", "x": 1, "y": 7 }
   ],
   "gates": [],
   "paths": [],
   "lights": [
-    { "id": "co.lt_bulb", "kind": "lamp", "x": 3, "y": 1, "radiusTiles": 2.5 },
-    { "id": "co.lt_oven", "kind": "fire", "x": 6, "y": 3, "radiusTiles": 3 }
+    { "id": "co.lt_bulb", "kind": "lamp", "x": 3, "y": 0, "radiusTiles": 2.5 },
+    { "id": "co.lt_oven", "kind": "fire", "x": 6, "y": 2, "radiusTiles": 3 }
   ],
   "grid": [
     "############",
-    "#.....##...#",
-    "#.....##...#",
+    "##....##..##",
+    "#.....###.##",
     "#H.........#",
     "#..........#",
     "#..........#",
-    "#..........#",
-    "#.........B#",
+    "##.........#",
+    "##........B#",
     "#....S.....#",
     "#####D######"
   ],
   "material": [
-    "WWWWWWWWWWWW",
-    "WfffffPPfffW",
-    "WfffffPPfffW",
+    "WWPPPWWWWPWW",
+    "WPffffPPffPW",
+    "WfffffPPPfPW",
     "WffffffffffW",
     "WffffffffffW",
     "WffffffffffW",
+    "WPfffffffffW",
+    "WPfffffffffW",
     "WffffffffffW",
-    "WffffffffffW",
-    "WffffffffffW",
-    "WWWWWWWWWWWW"
+    "WWWWWwWWWWWW"
   ]
 }
