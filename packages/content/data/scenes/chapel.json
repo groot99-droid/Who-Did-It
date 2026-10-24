@@ -71,7 +71,7 @@
     { "id": "ch.rope", "kind": "decor", "x": 15, "y": 0 },
     { "id": "ch.stained_glass_0", "kind": "dressing", "x": 3, "y": 0 },
     { "id": "ch.hymn_board", "kind": "dressing", "x": 6, "y": 0 },
-    { "id": "ch.stained_glass_1", "kind": "dressing", "x": 9, "y": 0 },
+    { "id": "ch.stained_glass_1", "kind": "dressing", "x": 7, "y": 0 },
     { "id": "ch.memorial", "kind": "dressing", "x": 12, "y": 0 },
     { "id": "ch.stained_glass_e_0", "kind": "dressing", "x": 0, "y": 4 },
     { "id": "ch.stained_glass_e_1", "kind": "dressing", "x": 0, "y": 8 },
@@ -125,7 +125,9 @@
     },
     { "id": "ch.votive_rack", "kind": "dressing", "x": 15, "y": 3 },
     { "id": "ch.alms_box", "kind": "dressing", "x": 16, "y": 8 },
-    { "id": "ch.font", "kind": "dressing", "x": 15, "y": 9 }
+    { "id": "ch.font", "kind": "dressing", "x": 15, "y": 9 },
+    { "id": "ch.altar_main", "kind": "altar", "x": 9, "y": 1 },
+    { "id": "ch.stained_glass_2", "kind": "dressing", "x": 11, "y": 0 }
   ],
   "gates": [],
   "paths": [],
@@ -136,7 +138,7 @@
     {
       "id": "ch.lt_window_east",
       "kind": "window",
-      "x": 9,
+      "x": 7,
       "y": 0,
       "radiusTiles": 3,
       "phases": ["day", "dusk"]
@@ -144,7 +146,7 @@
     {
       "id": "ch.lt_moon_window",
       "kind": "moon",
-      "x": 9,
+      "x": 11,
       "y": 0,
       "radiusTiles": 2.5,
       "phases": ["night"]
@@ -160,7 +162,7 @@
   ],
   "grid": [
     "##################",
-    "#...##..#.#..##.B#",
+    "#...##..###..##.B#",
     "#H...............#",
     "#....####.####.#.#",
     "#................#",
@@ -173,8 +175,8 @@
     "##D###############"
   ],
   "material": [
-    "WWWPWWPWWPWWPWWPWW",
-    "WwwwPPwwPwPwwPPwwW",
+    "WWWPWWPPWWWPPWWPWW",
+    "WwwwPPwwPPPwwPPwwW",
     "WwwwwwwwwwwwwwwwwW",
     "WffffPPPPfPPPPfPfW",
     "PffffffffffffffffW",

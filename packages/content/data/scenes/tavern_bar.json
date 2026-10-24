@@ -117,7 +117,8 @@
     { "id": "tb.barrel_2", "kind": "dressing", "x": 18, "y": 9 },
     { "id": "tb.bottle_crate", "kind": "dressing", "x": 18, "y": 10 },
     { "id": "tb.sawdust_0", "kind": "dressing", "x": 7, "y": 9 },
-    { "id": "tb.sawdust_1", "kind": "dressing", "x": 15, "y": 5 }
+    { "id": "tb.sawdust_1", "kind": "dressing", "x": 15, "y": 5 },
+    { "id": "tb.shop_counter", "kind": "counter", "x": 10, "y": 3 }
   ],
   "gates": [],
   "paths": [],
@@ -140,7 +141,7 @@
     "####################",
     "#.......#......H..##",
     "##.................#",
-    "#..........######..#",
+    "#.........#######..#",
     "#.................##",
     "##.................#",
     "#...##............SD",
@@ -154,7 +155,7 @@
     "WPWPWWPWWWPPPPPWPPWW",
     "WwwwwwwwPwwwwwwwwwPW",
     "WPwwwwwwwwwwwwwwwwwW",
-    "PwwwwwwwwwwPPPPPPwwW",
+    "PwwwwwwwwwPPPPPPPwwW",
     "WwwwwwwwwwwwwwwwwwPW",
     "WPwwwwwwwwwwwwwwwwwW",
     "WwwwPPwwwwwwwwwwwwwW",

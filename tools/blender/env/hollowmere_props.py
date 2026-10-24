@@ -1454,6 +1454,112 @@ def wall_bulb():
             part("Flex", T("ink", 0), B(0.2, 0.37, 1.1, 0.01, 0.01, 1.2), outline=False)]
 
 
+# ---------------------------------------------------------------- Pennock's barn and the cellar under the square
+
+
+def hay_bale(seed="bale"):
+    """Two bales of last summer's hay, twine-bound, one tipped on the other, loose stalks at their feet."""
+    rnd = random.Random(seed)
+    objs = [part("Bales", T("litter", 2), B(-0.08, 0.08, 0.2, 0.8, 0.45, 0.4), bevel=0.04),
+            part("Top", T("litter", 2), B(0.08, -0.02, 0.6, 0.7, 0.42, 0.38), bevel=0.04),
+            part("Twine", T("wood", 2), *[B(x, 0.08, 0.2, 0.025, 0.46, 0.41) for x in (-0.3, 0.14)],
+                 *[B(x, -0.02, 0.6, 0.025, 0.43, 0.39) for x in (-0.12, 0.28)], outline=False)]
+    objs.append(part("Stalks", T("litter", 1), *[B(rnd.uniform(-0.45, 0.45), rnd.uniform(-0.35, -0.15), 0.01,
+                                                   rnd.uniform(0.12, 0.25), 0.02, 0.01) for _ in range(9)],
+                     outline=False))
+    return objs
+
+
+def feed_trough():
+    """The goats' trough: split-log sides on two trestles, oats and a scatter of hay in it, a scoop in the corner."""
+    return [part("Trestles", T("wood", 1), *[B(x, 0, 0.18, 0.08, 0.5, 0.36) for x in (-0.36, 0.36)]),
+            part("Trough", T("wood", 3), B(0, 0, 0.42, 0.9, 0.42, 0.12), B(0, 0.19, 0.55, 0.9, 0.05, 0.2),
+                 B(0, -0.19, 0.55, 0.9, 0.05, 0.2), bevel=0.01),
+            part("Oats", T("plaster", 1), B(0, 0, 0.52, 0.8, 0.32, 0.04), outline=False),
+            part("Hay", T("litter", 2), *[B(x, 0.02, 0.56, 0.2, 0.06, 0.02) for x in (-0.22, 0.05, 0.3)],
+                 outline=False),
+            part("Scoop", T("slate", 3), C(0.3, -0.05, 0.54, 0.06, 0.06, 8))]
+
+
+def harness_rack():
+    """Tack on pegs along the boards: a horse collar, a coiled lead, a bridle and the pelt of the wolf over it."""
+    return [back_panel("Boards", T("wood", 2), 0.9, 2.1, 0.0),
+            part("Pegs", T("wood", 4), *[B(x, 0.3, 1.5, 0.04, 0.16, 0.04) for x in (-0.3, 0.0, 0.3)]),
+            part("Collar", T("litter", 1), B(-0.42, 0.26, 1.1, 0.07, 0.08, 0.36), B(-0.18, 0.26, 1.1, 0.07, 0.08, 0.36),
+                 B(-0.3, 0.26, 1.3, 0.31, 0.08, 0.07), bevel=0.02),
+            part("Hames", T("brass", 1), *[B(x, 0.21, 1.12, 0.03, 0.02, 0.4) for x in (-0.42, -0.18)], outline=False),
+            part("Lead", T("plaster", 1), B(-0.06, 0.3, 1.2, 0.03, 0.03, 0.4), B(0.06, 0.3, 1.2, 0.03, 0.03, 0.4),
+                 B(0.0, 0.3, 1.0, 0.15, 0.03, 0.03)),
+            part("Bridle", T("wood", 1), B(0.3, 0.3, 1.25, 0.04, 0.02, 0.45), B(0.3, 0.3, 1.05, 0.2, 0.02, 0.04)),
+            part("Bit", T("slate", 3), B(0.3, 0.28, 1.0, 0.12, 0.02, 0.03), outline=False),
+            part("Pelt", T("stone", 3), B(0.02, 0.33, 1.72, 0.7, 0.03, 0.22), B(-0.2, 0.33, 1.52, 0.16, 0.03, 0.2),
+                 B(0.26, 0.33, 1.5, 0.14, 0.03, 0.24), outline=False)]
+
+
+def tool_rack():
+    """Pennock's long tools on the barn boards: a pitchfork, a hay rake, a scythe and a muck shovel."""
+    return [back_panel("Boards", T("wood", 2), 0.9, 2.1, 0.0),
+            part("Rail", T("wood", 4), B(0, 0.32, 1.7, 0.9, 0.06, 0.06)),
+            part("Hafts", T("wood", 4), *[B(x, 0.28, 0.95, 0.04, 0.04, 1.5) for x in (-0.32, -0.1, 0.12, 0.34)]),
+            part("Fork", T("slate", 3), *[B(-0.32 + d, 0.27, 0.12, 0.015, 0.015, 0.25) for d in (-0.05, 0.0, 0.05)],
+                 B(-0.32, 0.27, 0.26, 0.14, 0.02, 0.03)),
+            part("Rake", T("wood", 3), B(-0.1, 0.27, 1.72, 0.3, 0.04, 0.04),
+                 *[B(-0.22 + 0.06 * k, 0.24, 1.66, 0.012, 0.012, 0.1) for k in range(5)]),
+            part("Scythe", T("slate", 3), B(0.24, 0.26, 1.75, 0.3, 0.02, 0.05)),
+            part("Shovel", T("slate", 2), B(0.34, 0.26, 0.15, 0.2, 0.03, 0.26))]
+
+
+def lantern_hook():
+    """A storm lantern on an iron hook screwed into the post, its glass sooted, a box of matches on the ledge below."""
+    return [back_panel("Boards", T("wood", 2), 0.9, 2.1, 0.0),
+            part("Hook", T("ink", 1), B(0, 0.25, 1.82, 0.03, 0.28, 0.03), B(0, 0.12, 1.74, 0.03, 0.03, 0.16)),
+            part("Frame", T("ink", 1), C(0, 0.12, 1.36, 0.12, 0.04, 10), C(0, 0.12, 1.62, 0.07, 0.06, 10),
+                 *[B(0.1 * math.cos(a), 0.12 + 0.1 * math.sin(a), 1.5, 0.02, 0.02, 0.24)
+                   for a in (0.5, 2.6, 4.7)]),
+            part("Glass", F("lantern", 2), C(0, 0.12, 1.4, 0.09, 0.2, 10), outline=False),
+            part("Flame", F("lantern", 4), C(0, 0.12, 1.46, 0.025, 0.07, 6, rt=0.0), outline=False),
+            part("Ledge", T("wood", 4), B(0, 0.3, 0.9, 0.5, 0.14, 0.04)),
+            part("Matches", T("blood", 1), B(0.12, 0.3, 0.94, 0.12, 0.07, 0.04), outline=False)]
+
+
+def wine_cask():
+    """A hogshead of the Lantern's red stood on chocks in the cellar, a spigot, a drip stain and a tally chalked on."""
+    return [part("Chocks", T("wood", 1), *[B(x, 0.05, 0.04, 0.12, 0.7, 0.08) for x in (-0.22, 0.22)]),
+            part("Cask", T("wood", 3), C(0, 0.05, 0.08, 0.3, 0.42, 14, rt=0.36), C(0, 0.05, 0.5, 0.36, 0.42, 14, rt=0.3),
+                 bevel=0.02),
+            part("Hoops", T("ink", 1), *[C(0, 0.05, z, r, 0.04, 14) for z, r in ((0.14, 0.315), (0.48, 0.365),
+                                                                                    (0.84, 0.315))],
+                 outline=False),
+            part("Spigot", T("brass", 1), B(0, -0.33, 0.28, 0.05, 0.1, 0.05)),
+            part("Stain", F("blood", 0), S(blob(0, -0.42, 0.12, 0.08, [(0.1, 3, 0.2)], n=10), 0.005, 0.01),
+                 outline=False),
+            part("Tally", F("bone", 2), *[B(-0.12 + 0.05 * k, -0.33, 0.66, 0.012, 0.005, 0.12) for k in range(4)],
+                 outline=False)]
+
+
+def ossuary():
+    """The crypt side's bone niche in the old wall: skulls on a ledge, long bones stacked under them like firewood."""
+    objs = [back_panel("Wall", T("stone", 2), 0.9, 1.8, 0.0),
+            part("Niche", F("ink", 0), B(0, 0.36, 0.8, 0.72, 0.02, 1.0), outline=False),
+            part("Ledge", T("stone", 3), B(0, 0.25, 0.85, 0.8, 0.26, 0.06)),
+            part("Bones", T("bone", 1), *[B(0, 0.25, 0.42 + 0.07 * k, 0.7, 0.05 + 0.01 * (k % 2), 0.06)
+                                          for k in range(5)]),
+            part("Skulls", T("bone", 2), *[C(x, 0.24, 0.88, 0.1, 0.17, 10, rt=0.07) for x in (-0.24, 0.0, 0.24)])]
+    objs.append(part("Sockets", F("ink", 0), *[B(x + d, 0.13, 0.98, 0.04, 0.01, 0.04) for x in (-0.24, 0.0, 0.24)
+                                              for d in (-0.035, 0.035)], outline=False))
+    return objs
+
+
+def cobweb():
+    """Webs sagging between the cellar's beam and its wall, and a wine bottle nobody came back for."""
+    return [back_panel("Wall", T("stone", 2), 0.9, 1.8, 0.0),
+            part("Beam", T("wood", 1), B(0, 0.2, 1.75, 0.9, 0.4, 0.1)),
+            part("Web", F("bone", 3), *[B(-0.3 + 0.12 * k, 0.31, 1.5 - 0.03 * abs(k - 2), 0.016, 0.016, 0.4)
+                                        for k in range(5)],
+                 *[B(-0.06, 0.31, 1.38 + 0.08 * k, 0.5 - 0.08 * k, 0.016, 0.016) for k in range(4)], outline=False),
+            part("Bottle", T("moss", 0), C(0.25, 0.25, 0.0, 0.06, 0.24, 8), C(0.25, 0.25, 0.24, 0.02, 0.08, 6))]
+
+
 def _crates(n=3):
     rnd = random.Random(f"crates{n}")
     return [kenney("survival-kit", "box-large", height=0.5, ramp=["#3A231F", "#744733", "#B57F54"],
@@ -1680,5 +1786,14 @@ PROPS = {
     "prop_compressor": (64, 96, compressor),
     "prop_couche_rack": (64, 112, couche_rack),
     "prop_wall_bulb": (64, 128, lambda: on_wall(wall_bulb())),
+    # Pennock's barn and the cellar under the square.
+    "prop_hay_bale": (64, 80, hay_bale),
+    "prop_feed_trough": (64, 64, feed_trough),
+    "prop_harness_rack": (64, 128, lambda: on_wall(harness_rack())),
+    "prop_tool_rack": (64, 128, lambda: on_wall(tool_rack())),
+    "prop_lantern_hook": (64, 128, lambda: on_wall(lantern_hook())),
+    "prop_wine_cask": (64, 80, wine_cask),
+    "prop_ossuary": (64, 112, lambda: on_wall(ossuary())),
+    "prop_cobweb": (64, 128, lambda: on_wall(cobweb())),
     **SPOTS,
 }

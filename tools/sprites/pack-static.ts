@@ -253,6 +253,15 @@ export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
     'prop_compressor',
     'prop_couche_rack',
     'prop_wall_bulb',
+    // Pennock's barn and the cellar under the square.
+    'prop_hay_bale',
+    'prop_feed_trough',
+    'prop_harness_rack',
+    'prop_tool_rack',
+    'prop_lantern_hook',
+    'prop_wine_cask',
+    'prop_ossuary',
+    'prop_cobweb',
   ],
   props_blackpine: [
     'prop_anvil',
