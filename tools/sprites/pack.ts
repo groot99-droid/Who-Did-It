@@ -115,8 +115,12 @@ export async function packFrames(
   return { atlas: { textures, meta }, pages };
 }
 
-export function atlasJson(atlas: MultiAtlas): string {
-  return `${JSON.stringify(atlas, null, 1)}\n`;
+/**
+ * The atlas json a character packs is one line (6Z's grant on #184, A161): pretty-printed, the fifteen looks'
+ * frame lists were a quarter of the first load. The world packers keep `pretty` until their sessions re-pack.
+ */
+export function atlasJson(atlas: MultiAtlas, pretty = false): string {
+  return `${pretty ? JSON.stringify(atlas, null, 1) : JSON.stringify(atlas)}\n`;
 }
 
 function hasPartialAlpha(img: Rgba): boolean {
