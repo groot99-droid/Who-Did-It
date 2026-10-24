@@ -111,18 +111,34 @@ function effectsKey(body: Body): string {
   return key;
 }
 
+/**
+ * The effects another system writes straight onto `Private.body.effects` (8D's Indebted, GDD 3.23). The body's
+ * writer leaves their rows as it finds them: no decay, no clearing and no reset on a wake, a knockout or a death
+ * (6Z's contract note, 2026-10-24); `bodyBounds` counts them out of a dead seat's row for the same reason.
+ */
+export const FOREIGN_EFFECTS: ReadonlySet<EffectKey> = new Set<EffectKey>(['indebted']);
+const FOREIGN_IDS: ReadonlySet<number> = new Set([...FOREIGN_EFFECTS].map((id) => EffectId[id]));
+/** Whether a wire row is the body's own (so its writer may touch it), by its `EffectId`. */
+export const ownsWireEffect = (wireId: number): boolean => !FOREIGN_IDS.has(wireId);
+
 /** The `Private.body` row shape `writeBody` fills (the schema class, typed by what is written). */
 export interface PrivateBody {
   hp: number;
   maxHp: number;
   stamina: number;
   maxStamina: number;
-  effects: { clear(): void; push(e: InstanceType<typeof EffectState>): unknown };
+  effects: {
+    readonly length: number;
+    at(i: number): InstanceType<typeof EffectState> | undefined;
+    splice(start: number, deleteCount: number): unknown;
+    push(e: InstanceType<typeof EffectState>): unknown;
+  };
 }
 
 /**
- * Copies a body onto its `Private.body` (null empties the row). Unchanged numbers cost no patch bytes; the effects
- * array is rebuilt only when the set changed. Health is shown rounded up (1 hit point left reads 1, never 0).
+ * Copies a body onto its `Private.body` (null empties the row). Unchanged numbers cost no patch bytes; the body's
+ * own effect rows are rebuilt only when the set changed, and a foreign row (`FOREIGN_EFFECTS`) is never touched.
+ * Health is shown rounded up (1 hit point left reads 1, never 0).
  */
 export function writeBody(wire: PrivateBody, body: Body | null): void {
   const hp = body ? Math.ceil(body.hp) : 0;
@@ -136,7 +152,10 @@ export function writeBody(wire: PrivateBody, body: Body | null): void {
     if (body.wireEffects === key) return;
     body.wireEffects = key;
   }
-  wire.effects.clear();
+  for (let i = wire.effects.length - 1; i >= 0; i--) {
+    const row = wire.effects.at(i);
+    if (row && ownsWireEffect(row.id)) wire.effects.splice(i, 1);
+  }
   if (!body) return;
   for (const [id, on] of body.effects) {
     const e = new EffectState();

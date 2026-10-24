@@ -62,6 +62,8 @@ export const NoteKind = {
   doubt: 8,
   /** Round 7 (GDD 3.20): the Hitman's own contract, brought by the first Train; `of` is the target seat. */
   contract: 9,
+  /** Round 8 (GDD 3.23): a Blackmail Notice from the mailbag; `of` is the look it names, `sceneId` and `value` (a phase) where and when. */
+  notice: 10,
 } as const;
 export type NoteKindId = (typeof NoteKind)[keyof typeof NoteKind];
 
@@ -78,7 +80,8 @@ export type NpcLevelId = (typeof NpcLevel)[keyof typeof NpcLevel];
 /**
  * Round 8 (GDD 3.22, docs/round8/seams.md 2): the effect ids of `EffectState.id`, u8 on the wire; `effects.json`
  * keys its rows by the string. Append-only. `indebted` is the economy status 8D sets (GDD 3.23); it is defined
- * here so every session shares one table.
+ * here so every session shares one table. `charm` is reserved for 7M's well (round 8, stations.md 4): one silent
+ * charge that the first killing Knife strike spends, leaving the seat Wounded at 1 health (GDD 3.22).
  */
 export const EffectId = {
   slowed: 1,
@@ -92,6 +95,7 @@ export const EffectId = {
   famished: 9,
   knockedOut: 10,
   indebted: 11,
+  charm: 12,
 } as const;
 export type EffectKey = keyof typeof EffectId;
 export type EffectIdValue = (typeof EffectId)[EffectKey];

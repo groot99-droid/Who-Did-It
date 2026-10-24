@@ -21,7 +21,16 @@ import { mountCrafting } from './Crafting';
 import { h, isTyping, overlayRoot } from './dom';
 import { itemName, mountInventory, stacksOf, type Panel } from './Inventory';
 import { mountQuestLog } from './QuestLog';
-import { loadPropAt, loadSceneNameOf, taskPrompt, taskSpots, type TaskSpot } from './tasks';
+import {
+  TASKS,
+  coopPrompt,
+  loadPropAt,
+  loadSceneNameOf,
+  taskPrompt,
+  taskSpots,
+  type TaskSpot,
+} from './tasks';
+import { coinsCastMs, coinsPrompt } from './shop/coins'; // Round 8, 8C (GDD 3.23): a coins node's hold
 
 const REACH_PX = balance.doors.reachTiles * TILE_PX;
 const RES = resources.resources as Record<
@@ -30,6 +39,12 @@ const RES = resources.resources as Record<
 >;
 const RECIPES = recipes.recipes as Record<string, { craftS: number; out: string }>;
 const NPC_NAME = (id: string): string => (quests.npcs as Record<string, { name: string }>)[id]?.name ?? id;
+/** What the toast says when a hold is let go, by its kind. */
+const CANCEL = {
+  gather: C['toast.gather.cancel'],
+  craft: C['toast.craft.cancel'],
+  task: TC['toast.task.coop.cancel'],
+} as const;
 /** Mock and server phase ids with the world running: grace, day, dusk, night. */
 const WORLD_PHASES = new Set([2, 3, 4, 5]);
 /** The phases a `nightOnly` task (GDD 3.5) can be worked in: night and the final night. */
@@ -40,8 +55,9 @@ type Target =
   | { kind: 'giver'; npc: string; x: number; y: number }
   | TaskSpot;
 
+/** A hold the layer runs: a gather, a craft, or the co-op task hold whose progress the server sends (GDD 3.5). */
 interface Hold {
-  action: 'gather' | 'craft';
+  action: 'gather' | 'craft' | 'task';
   targetId: string;
   since: number;
   castMs: number;
@@ -52,11 +68,11 @@ interface Hold {
 }
 
 /**
- * Whether the layer takes E: a press when a node or a giver is in reach, a release only to end a gather. Everything
- * else (clues, bodies, the bell, doors, an empty spot) falls through to the World's own verbs.
+ * Whether the layer takes E: a press when a node, a giver or a task spot is in reach, a release only to end a gather or
+ * the co-op hold. Everything else (clues, bodies, the bell, doors, an empty spot) falls through to the World's verbs.
  */
-export function takesUse(down: boolean, target: Target | null, holding: 'gather' | 'craft' | null): boolean {
-  return down ? target !== null : holding === 'gather';
+export function takesUse(down: boolean, target: Target | null, holding: Hold['action'] | null): boolean {
+  return down ? target !== null : holding === 'gather' || holding === 'task';
 }
 
 export interface M5bLayer {
@@ -65,8 +81,11 @@ export interface M5bLayer {
   destroy(): void;
 }
 
-/** The nearest candidate within `reach`, ties to the first (nodes before givers by the caller's order). */
-export function nearest<T extends { x: number; y: number }>(
+/**
+ * The nearest candidate within `reach`, ties to the first (nodes before givers by the caller's order); a candidate
+ * with a `reach` of its own (the co-op spot's radius, GDD 3.5) is measured against that instead.
+ */
+export function nearest<T extends { x: number; y: number; reach?: number }>(
   from: { x: number; y: number },
   list: readonly T[],
   reach = REACH_PX,
@@ -75,7 +94,7 @@ export function nearest<T extends { x: number; y: number }>(
   let bestD = Infinity;
   for (const t of list) {
     const d = Math.hypot(from.x - t.x, from.y - t.y);
-    if (d <= reach && d < bestD - 1) {
+    if (d <= (t.reach ?? reach) && d < bestD - 1) {
       best = t;
       bestD = d;
     }
@@ -95,6 +114,8 @@ export function promptFor(
   if (!t) return null;
   if (t.kind === 'task') return taskPrompt(t, hasTool, night);
   if (t.kind === 'giver') return fill(C['prompt.giver'], { name: NPC_NAME(t.npc) });
+  const coins = coinsPrompt(t.resource); // Round 8, 8C (GDD 3.23): dropped coins are no `resources.json` row
+  if (coins) return coins;
   const res = RES[t.resource];
   const what = res?.name ?? t.resource;
   const tool = res?.tool;
@@ -146,6 +167,8 @@ class Layer implements M5bLayer {
   private picking: { sig: string; tool: string; until: number } | null = null;
   private target: Target | null = null;
   private hold: Hold | null = null;
+  /** The co-op hold's hands and progress as the server last sent them (`coopHold`). */
+  private coop = { holders: 0, progress: 0 };
   private modal: MinigameModal | null = null;
   private toastUntil = 0;
   private gone = false;
@@ -230,7 +253,12 @@ class Layer implements M5bLayer {
     const onStart = (m: { taskId: string; kind: string; public: unknown }) =>
       this.openGame(m.taskId, m.kind as MinigameKind, m.public, this.assistOf(m.taskId));
     feed.bus.on('minigameStart', onStart);
-    this.offs.push(() => feed.bus.off('minigameStart', onStart));
+    const onCoop = (m: { taskId: string; holders: number; progress: number }) => this.onCoop(m);
+    feed.bus.on('coopHold', onCoop);
+    this.offs.push(
+      () => feed.bus.off('minigameStart', onStart),
+      () => feed.bus.off('coopHold', onCoop),
+    );
     const sleep = () => this.setAsleep(true);
     const wake = () => this.setAsleep(false);
     scene.events.on('sleep', sleep);
@@ -338,7 +366,7 @@ class Layer implements M5bLayer {
     if (this.gone || this.asleep || this.root.hidden) return false;
     if (!takesUse(down, this.target, this.hold?.action ?? null)) return false;
     if (down) this.press(true, false);
-    else this.cancelHold(true, 'gather');
+    else this.cancelHold(true, this.hold?.action === 'task' ? 'task' : 'gather');
     return true;
   }
 
@@ -348,12 +376,17 @@ class Layer implements M5bLayer {
 
   /**
    * E or the prompt pressed or released: start a gather on the node in reach, or stop the hold; at a task's source or
-   * station, send the task hold (the server's instant pick-up or opener, GDD 3.5) and say what came of it.
+   * station, send the task hold (the server's instant pick-up or opener, GDD 3.5) and say what came of it; at a co-op
+   * spot, hold until the hands are enough and the server says it is done, or let go (a release, or the prompt again).
    */
   private press(down: boolean, toggle: boolean): void {
     const t = this.target;
     if (t?.kind === 'giver') {
       if (down) this.questLog.open();
+      return;
+    }
+    if (this.hold?.action === 'task') {
+      if (toggle || !down) this.cancelHold(true, 'task');
       return;
     }
     if (t?.kind === 'task') {
@@ -365,11 +398,18 @@ class Layer implements M5bLayer {
     if (!t || this.hold || this.feed.dead()) return;
     const res = RES[t.resource];
     if (res?.tool && !this.has(res.tool)) return;
-    this.begin('gather', t.id, (res?.gatherS ?? 3) * 1000);
+    this.begin('gather', t.id, coinsCastMs(t.resource) ?? (res?.gatherS ?? 3) * 1000); // Round 8, 8C: coins' cast
   }
 
-  /** The task hold at `t`. At the source a real task's pick-up shows when the pockets change; a fake one is theatre. */
+  /**
+   * The task hold at `t`. A co-op spot keeps the hold until the server ends it. At the source a real task's pick-up
+   * shows when the pockets change; a fake one is theatre.
+   */
   private workTask(t: TaskSpot): void {
+    if (t.step === 'coop') {
+      this.coop = { holders: 0, progress: 0 };
+      return this.begin('task', t.taskId, 1);
+    }
     this.feed.hold('task', t.taskId, true);
     if (t.step !== 'source') return;
     if (t.fake || !t.tool) this.say(TC['toast.task.show']);
@@ -382,7 +422,7 @@ class Layer implements M5bLayer {
     this.begin('craft', recipeId, (RECIPES[recipeId]?.craftS ?? 3) * 1000);
   }
 
-  private begin(action: 'gather' | 'craft', targetId: string, castMs: number): void {
+  private begin(action: Hold['action'], targetId: string, castMs: number): void {
     const me = this.self();
     if (!me) return;
     this.hold = {
@@ -397,18 +437,31 @@ class Layer implements M5bLayer {
     this.feed.hold(action, targetId, true);
   }
 
-  private cancelHold(send: boolean, only?: 'gather' | 'craft'): void {
+  private cancelHold(send: boolean, only?: Hold['action']): void {
     const h0 = this.hold;
     if (!h0 || (only && h0.action !== only)) return;
     this.hold = null;
     if (send) {
       this.feed.hold(h0.action, h0.targetId, false);
-      this.say(C[h0.action === 'gather' ? 'toast.gather.cancel' : 'toast.craft.cancel']);
+      this.say(CANCEL[h0.action]);
     }
   }
 
+  /** The co-op hold's state as the server last sent it (`coopHold`); the hold ends when its progress reaches 1. */
+  private onCoop(m: { taskId: string; holders: number; progress: number }): void {
+    const hd = this.hold;
+    if (hd?.action !== 'task' || hd.targetId !== m.taskId) return;
+    this.coop = { holders: m.holders, progress: m.progress };
+    if (m.progress < 1) return;
+    this.hold = null;
+    this.say(TC['toast.task.coop.done']);
+  }
+
+  /** The hold's progress, 0 to 1: a gather's or craft's by the clock, the co-op hold's as the server sends it. */
   private progress(): number {
-    return this.hold ? Math.min(1, (performance.now() - this.hold.since) / this.hold.castMs) : 0;
+    if (!this.hold) return 0;
+    if (this.hold.action === 'task') return this.coop.progress;
+    return Math.min(1, (performance.now() - this.hold.since) / this.hold.castMs);
   }
 
   private self(): { x: number; y: number; bits: number } | null {
@@ -508,11 +561,18 @@ class Layer implements M5bLayer {
     } else if (now > pk.until) this.picking = null;
   }
 
-  /** Ends a hold that finished (the pockets changed), lost its node or was left (the player moved). */
+  /**
+   * Ends a hold that finished (the pockets changed), lost its node or was left (the player moved). The co-op hold
+   * finishes only on the server's word (`onCoop`); moving away lets go of it, as the server does (GDD 3.5).
+   */
   private runHold(me: { x: number; y: number } | null, nodes: readonly NodeSnap[]): void {
     const hd = this.hold;
     if (!hd) return;
     const moved = !me || Math.hypot(me.x - hd.x, me.y - hd.y) > 3;
+    if (hd.action === 'task') {
+      if (moved) this.cancelHold(true, 'task');
+      return;
+    }
     const node = hd.action === 'gather' ? nodes.find((n) => n.id === hd.targetId) : null;
     if (this.pocketSig() !== hd.sig) {
       this.hold = null;
@@ -532,14 +592,21 @@ class Layer implements M5bLayer {
   }
 
   private drawPrompt(night: boolean): void {
-    const text = this.hold
-      ? C['prompt.gather.cancel']
+    const hd = this.hold;
+    const text = hd
+      ? hd.action === 'task'
+        ? coopPrompt(this.coop.holders, this.coopPlayers(hd.targetId))
+        : C['prompt.gather.cancel']
       : promptFor(this.target, (item) => this.has(item), night);
     this.prompt.hidden = text === null;
     const label = this.prompt.firstElementChild as HTMLElement;
     if (label.textContent !== (text ?? '')) label.textContent = text ?? '';
     this.bar.style.width = `${Math.round(this.progress() * 100)}%`;
     this.prompt.dataset.kind = this.hold ? 'hold' : (this.target?.kind ?? '');
+  }
+
+  private coopPlayers(taskId: string): number {
+    return TASKS[taskId]?.coopPlayers ?? 2;
   }
 
   destroy(): void {

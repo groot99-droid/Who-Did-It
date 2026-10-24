@@ -58,6 +58,7 @@ const STREAMS = {
   tasks: 1,
   body: 1, // round 8, 8A
   purse: 1,
+  talk: 1, // round 8, 8T (with the `talk` stream)
 } satisfies Record<StreamName, 1>;
 export const AUTO_STREAMS = Object.keys(STREAMS) as StreamName[];
 

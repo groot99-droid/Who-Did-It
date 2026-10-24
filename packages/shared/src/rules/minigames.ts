@@ -230,3 +230,28 @@ export function checkMinigame(puzzle: MinigamePuzzle, answer: unknown): boolean 
     }
   }
 }
+
+// Round 7 (7M, GDD 3.5): the co-op hold, pure. A task of kind `coop` (Shutter the windows) is held by `players` seats
+// at once; its progress is a shared count of ticks that runs while enough hands hold, pauses while fewer do, and starts
+// again from nothing once everyone has let go. The numbers come from the task's own row of `tasks.json` (`coopPlayers`,
+// `holdS`).
+
+/**
+ * The next shared count after one tick with `holders` seats holding: one more while `holders >= players`, the same
+ * while some but too few hold (the pause), and 0 when nobody holds.
+ */
+export function coopTicks(ticks: number, holders: number, players: number): number {
+  if (holders <= 0) return 0;
+  return holders >= players ? ticks + 1 : ticks;
+}
+
+/** Whether `ticks` of shared progress reach the task's `holdS` at `tickRate` ticks a second. */
+export function coopDone(ticks: number, holdS: number, tickRate: number): boolean {
+  return ticks >= Math.round(holdS * tickRate);
+}
+
+/** The shared progress to show, 0..1. */
+export function coopProgress(ticks: number, holdS: number, tickRate: number): number {
+  const need = Math.round(holdS * tickRate);
+  return need <= 0 ? 1 : Math.min(1, ticks / need);
+}

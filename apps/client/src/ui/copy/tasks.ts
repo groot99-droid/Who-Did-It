@@ -9,6 +9,12 @@ export const TASK_COPY = {
   'prompt.task.night': 'Only at night: {name}',
   'toast.task.took': 'Took the {tool}.',
   'toast.task.show': 'You make a show of it.',
+  // The co-op hold (GDD 3.5 "Shutter the windows"): offered to every seat at the prop, held with E.
+  'prompt.task.coop': 'Hold E: {name} (takes {n})',
+  'prompt.task.coop.wait': 'Waiting for hands: {holders} of {n}',
+  'prompt.task.coop.hold': 'Keep holding: {holders} of {n}',
+  'toast.task.coop.done': 'Done, together.',
+  'toast.task.coop.cancel': 'You let go.',
 
   // 14.38.2 The chores panel
   'chores.title': 'Chores',
@@ -18,6 +24,7 @@ export const TASK_COPY = {
   'chores.fetch': 'Fetch the {tool} from {scene}',
   'chores.bring': 'Bring it to {scene}',
   'chores.go': 'Go to {scene}',
+  'chores.coop': 'Takes {n} hands, at {scene}',
   'chores.night': 'After dark.',
   'chores.done': 'Done',
   'chores.close': 'Close',

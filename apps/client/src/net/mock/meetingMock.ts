@@ -179,6 +179,15 @@ export class MockMeetingFeed implements MeetingFeed {
     this.bus.emit('chat.msg', line);
   }
 
+  note(text: string): void {
+    const me = this.players.find((p) => p.id === this.selfId);
+    const trimmed = text.trim().slice(0, balanceJson.chat.maxChars);
+    if (trimmed === '' || !me?.alive) return;
+    const line: ChatLine = { from: '', text: trimmed, channel: 'notes' };
+    this.log.push(line);
+    this.bus.emit('chat.msg', line);
+  }
+
   /** Opens the meeting: the mirror of the server's `meetingStart` followed by the discussion phase. */
   begin(req: MockMeetingRequest): void {
     this.startedAt = performance.now();

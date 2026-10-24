@@ -185,5 +185,62 @@
       "ships": "V1",
       "gddRef": "3.17"
     }
+  },
+  "villagers": {
+    "villager": {
+      "id": "villager",
+      "name": "a villager",
+      "bodyAtlas": "char_villager",
+      "overlayAtlas": "ovl_villager",
+      "silhouette": "The plain figure: cropped hair, a short jacket, no hat and nothing carried.",
+      "palette": { "base": "fog", "second": "bone", "accent": "slate" },
+      "notes": "Fog jacket over a bone shirt, slate trousers, ink boots. The seat's fallback body when a look is not loaded and the quest givers' body; the hat and scarf traits draw on it as overlays. Interact: hands at the waist.",
+      "ships": "V1",
+      "gddRef": "3.17"
+    },
+    "villagerelder": {
+      "id": "villagerelder",
+      "name": "an elder",
+      "bodyAtlas": "char_villagerelder",
+      "overlayAtlas": "ovl_villagerelder",
+      "silhouette": "Bald crown over a bone fringe and whiskers, a long slate coat, a stick in the right hand.",
+      "palette": { "base": "slate", "second": "bone", "accent": "wood" },
+      "notes": "Slate greatcoat to the knee over a bone shirt, ink trousers, a wood belt, a wood walking stick with a knob at the hip. Interact: hands at the waist, the stick along the leg.",
+      "ships": "V1",
+      "gddRef": "3.17"
+    },
+    "villagergoodwife": {
+      "id": "villagergoodwife",
+      "name": "a goodwife",
+      "bodyAtlas": "char_villagergoodwife",
+      "overlayAtlas": "ovl_villagergoodwife",
+      "silhouette": "A bonnet's brim and a shawl over a long skirt, a basket on the left arm.",
+      "palette": { "base": "slate", "second": "fog", "accent": "bone" },
+      "notes": "Bone bonnet tied under the chin, a fog shoulder shawl with a notched hem, a long slate skirt, a wicker basket with a bone cloth over its load. Interact: hands at the waist with the basket.",
+      "ships": "V1",
+      "gddRef": "3.17"
+    },
+    "villagerlass": {
+      "id": "villagerlass",
+      "name": "a lass",
+      "bodyAtlas": "char_villagerlass",
+      "overlayAtlas": "ovl_villagerlass",
+      "silhouette": "A kerchief over a plait, an apron over a fog skirt, a pail in the right hand.",
+      "palette": { "base": "fog", "second": "bone", "accent": "wood" },
+      "notes": "Fog kerchief knotted at the nape over a wood plait, a slate bodice, a bone apron with pockets over a long fog skirt, wood boots, a wood pail with slate hoops. Interact: hands at the waist, the pail set down.",
+      "ships": "V1",
+      "gddRef": "3.17"
+    },
+    "villagerclerk": {
+      "id": "villagerclerk",
+      "name": "a clerk",
+      "bodyAtlas": "char_villagerclerk",
+      "overlayAtlas": "ovl_villagerclerk",
+      "silhouette": "Shirt sleeves in garters, a slate waistcoat with spectacles, a ledger under the left arm.",
+      "palette": { "base": "bone", "second": "slate", "accent": "ink" },
+      "notes": "Bone shirt with ink sleeve garters, a slate waistcoat and watch chain, ink trousers and belt, spectacles, a long ink ledger with bone pages under the left arm. The Company Clerk, the Tallyman and the stallholders wear it (townsfolk.md 2). Interact: hands at the waist, writing in the ledger.",
+      "ships": "V1",
+      "gddRef": "3.17"
+    }
   }
 }

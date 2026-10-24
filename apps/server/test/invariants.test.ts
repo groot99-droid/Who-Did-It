@@ -188,6 +188,7 @@ describe('the round-6 invariants', () => {
       'bodyBounds', // round 8, 8A: the body's module registers on `Auto`'s import path, before the vendettas'
       'scripConserved',
       'taskBar',
+      'hiveNoSecrets',
       'vendettaOnce',
       'contractQuest',
       'strongboxOnce',

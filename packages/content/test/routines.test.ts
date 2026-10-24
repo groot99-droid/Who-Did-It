@@ -55,6 +55,8 @@ const TABLE: Record<string, 'work' | 'social' | 'rest' | 'ignore'> = {
   rack: 'ignore',
   hq: 'ignore',
   blackMarket: 'ignore',
+  counter: 'ignore',
+  bank: 'ignore',
 };
 
 function classOf(kind: string): string | undefined {
