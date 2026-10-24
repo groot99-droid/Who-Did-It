@@ -245,6 +245,36 @@
     "stuckInvariantS": 20,
     "gddRef": "3.12"
   },
+  "moods": {
+    "threshold": 0.5,
+    "desperateNeeds": 2,
+    "moodHoldS": 5,
+    "hunger": { "riseS": 480, "homeFallS": 60, "mealRelief": 1, "famishedMul": 2 },
+    "fear": {
+      "body": 0.4,
+      "chase": 0.5,
+      "struck": 0.3,
+      "ejection": 0.2,
+      "darkRiseS": 90,
+      "fallS": 120
+    },
+    "anger": {
+      "struck": 0.4,
+      "robbed": 0.6,
+      "taxed": 0.3,
+      "ejectionRelief": 0.5,
+      "mealRelief": 0.3,
+      "fallS": 180
+    },
+    "want": { "lightPurse": 10, "lightRiseS": 240, "debtRiseS": 120, "wage": 0.4, "sale": 0.2 },
+    "weights": {
+      "hungry": { "work": 1.6, "stroll": 1, "idle": 0.6 },
+      "scared": { "work": 0.6, "stroll": 0.5, "idle": 2 },
+      "angry": { "work": 0.8, "stroll": 1.8, "idle": 0.6 },
+      "desperate": { "work": 0.5, "stroll": 2, "idle": 0.6 }
+    },
+    "gddRef": "3.24"
+  },
   "resources": { "poolActiveFrac": 0.5, "stackMax": 5, "gddRef": "3.14" },
   "mobs": { "maxPerScene": 3, "chaseS": 6, "gddRef": "3.15" },
   "quests": { "maxActive": 2, "gddRef": "3.16" },
