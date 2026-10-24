@@ -145,6 +145,8 @@ export type WorldFeedEvents = {
     stock: Array<{ itemId: string; price: number }>;
     buys: Array<{ itemId: string; price: number }>;
   };
+  /** Private, round 7 (7M, GDD 3.5): the hands on the co-op hold this seat is in and its shared progress (0 to 1). */
+  coopHold: { taskId: string; holders: number; progress: number };
 };
 
 /** Round 6 (M5b): a resource node of the scene this client is in (`SceneState.nodes`). */

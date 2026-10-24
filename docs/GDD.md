@@ -777,6 +777,16 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 - **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice. It leaves only as a
   purchase, rent, a fine, a donation or an HQ tier. Theft, drops, pickups and the bank only move it.
 
+- **Rent and quota** (8D). Each day is one shift. On a map of `rent.maps` (HollowMere), `rent.amount` falls due from
+  every living seat `rent.dueAtDayFrac` into the day; `act.payRent` at a bank counter, within verb reach, pays a seat's
+  whole debt or nothing. The Company Clerk's round (an ambient figure of 8E's) collects it too once that figure walks.
+  On a map of `quota.maps` (BlackPine), every living seat owes `quota.qty` of `quota.items`, any mix, hauled to a
+  tally rack (`act.hold`, `clues.collectHoldS` within verb reach). At dusk a seat short of its quota is fined
+  `quota.fine` from its purse, and what the purse cannot cover joins its debt. Debt carries over from day to day.
+- **Indebted.** A seat that still owes at dusk becomes Indebted (`EffectId.indebted`, its own view only). No bit is
+  drawn; inspect reads "a hunted look". From dusk to dawn the doors from outdoors into its map's `curfew` scenes refuse
+  it as a locked door does, so it sleeps rough; a seat already inside still moves between the rooms and can leave. Paying its debt clears it. Forced labour waits for R9's law pipeline.
+
 - **Faith** (8D). Donating Scrip at an altar (`act.donate`, within verb reach, up to `faith.donateMax` at a time)
   earns `faith.perScrip` Faith per Scrip, up to `faith.max`; Faith is private (`Private.faith`). There is an altar in
   the chapel and a wayside altar on each map's hub. Faith plus Scrip buys, at an altar (`act.faith {kind}`):
