@@ -334,7 +334,12 @@
   "talk": {
     "noteGapS": 6,
     "notesPerMeeting": 4,
-    "npc": { "notesPerMeeting": { "min": 1, "max": 3 }, "windowFrac": { "min": 0.05, "max": 0.8 } },
+    "npc": {
+      "notesPerMeeting": { "min": 1, "max": 3 },
+      "windowFrac": { "min": 0.05, "max": 0.8 },
+      "herringsPerMeeting": { "min": 1, "max": 3 },
+      "smallTalkChance": 0.15
+    },
     "model": {
       "timeoutS": 4,
       "callsPerMatch": 60,

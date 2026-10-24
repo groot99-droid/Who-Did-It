@@ -419,6 +419,13 @@ export const BalanceFile = z.strictObject({
       }),
       /** When they fall: fractions of the discussion plus the vote time, from the discussion's first tick. */
       windowFrac: FracSpan,
+      /** Red herrings a meeting (GDD 3.25 "Misdirection"): this many living NPC seats' first notes. */
+      herringsPerMeeting: z.strictObject({
+        min: z.number().int().nonnegative(),
+        max: z.number().int().nonnegative(),
+      }),
+      /** The chance that any other NPC note is small talk. */
+      smallTalkChance: Chance,
     }),
     /** The model's notes (GDD 3.25 "Talk"), only with the server key: a late answer gives the template line. */
     model: z.strictObject({
