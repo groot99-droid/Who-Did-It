@@ -20,8 +20,14 @@
 | `act.light` | `{ on: boolean }` | 5/s | Round 6: `on` lights the carried Lantern or Torch, or puts it out; refused 422 without one. |
 | `meeting.vote` | `{ targetId: string }` | 2/s | A living player's id, or `"skip"`. Changeable until the vote closes (A30). |
 | `chat.say` | `{ text: string }` | 2/s | - |
+| `chat.note` | `{ text: string }` | 2/s | - |
 | `chat.quick` | `{ phraseId: string }` | 2/s | - |
 | `world.ping` | `{ x: number; y: number }` | 2/s | - |
+| `act.donate` | `{ amount: number }` | 5/s | Round 8 (GDD 3.23, 8D): whole Scrip, at most `economy.json` `faith.donateMax`. |
+| `act.faith` | `{ kind: 'indulgence' \| 'seal' }` | 5/s | - |
+| `act.notice` | `{ itemId: string; op: 'show' \| 'burn' \| 'fence' }` | 5/s | `itemId` is the notice's Notebook entry id. |
+| `act.hq` | `{ stationId: string }` | 5/s | - |
+| `act.payRent` | `Record<string, never>` | 5/s | - |
 | `role.ready` | `Record<string, never>` | - | Deprecated alias of `lobby.ready {ready: true}`. |
 | `net.ping` | `{ t: number }` | - | - |
 | `lobby.start` | `Record<string, never>` | 2/s | Leader only, phase lobby, at least 1 human (GDD 3.12). Refused with error 422 otherwise. |
@@ -34,6 +40,9 @@
 | `quest.turnIn` | `{ questId: string }` | 2/s | Round 6 (M5b, GDD 3.16): an accepted quest whose wants the inventory holds, at its giver. Refused 422 until 6H. |
 | `minigame.result` | `{ taskId: string; answer: unknown }` | 2/s | Round 6 (M5b, GDD 3.16): the answer to the `minigameStart` of `taskId`; the server checks it against the solution it kept and completes the task. Refused 422 until Session 6H lands. |
 | `act.inspect` | `{ targetId: string }` | 5/s | Round 8 (GDD 3.22): an avatar handle in reach, in any world phase; refused 422, 424 or 427. |
+| `act.buy` | `{ shopId: string; itemId: string; qty: number }` | 5/s | Round 8 (GDD 3.23, 8C): `qty` of `itemId` from `shopId`, which a `shop` hold opened and whose counter is still in reach, at its `ask` each, paid from the purse. Refused 422 when the purse or the inventory falls short. |
+| `act.sell` | `{ shopId: string; itemId: string; qty: number }` | 5/s | Round 8 (GDD 3.23, 8C): `qty` of `itemId` from the inventory to `shopId`, at its `pay` each, into the purse. |
+| `act.bank` | `{ op: 'deposit' \| 'withdraw'; amount: number }` | 5/s | Round 8 (GDD 3.23, 8C): moves `amount` Scrip between the purse and the bank, at the bank counter a `bank` hold opened and that stays in reach. Refused 422 when the side it draws on holds less. |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
 
@@ -45,7 +54,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `sceneEnter` | `{ sceneId: string; spawn: string; facing: string }` | Private. |
 | `clueFound` | `{ entryId: string }` | Private. |
 | `killed` | `{ sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string }` | Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). |
-| `chat.msg` | `{ from: string; text: string; channel: ChatChannel }` | Private: routed per recipient; `from` is a player id. |
+| `chat.msg` | `{ from: string; text: string; channel: ChatChannel }` | Private: routed per recipient; `from` is a player id, `''` on `system` and `notes` (no speaker). |
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
 | `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). |
@@ -61,6 +70,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `inspect.result` | `{ targetId: string; lookId: string; signs: string[]; health: InspectHealth; purse: InspectPurse; light: boolean; tool?: string; }` | Private, round 8 (GDD 3.22): the inspected avatar's drawn look and what the eye reads of it. `signs` are copy ids of `ui/copy/inspect.ts` taken only from the avatar's public status bits; `light` is a burning light in hand. Never a card, a cover, a vendetta or an inventory. |
 | `inspect.noticed` | `{ lookId: string }` | Private, round 8: the look the inspector is drawn as. |
 | `inspect.hunch` | `{ copyId: string }` | Private, round 8: an `inspect.hunch.*` copy id. |
+| `shop.open` | `{ shopId: string; stock: Array<{ itemId: string; price: number }>; buys: Array<{ itemId: string; price: number }>; }` | Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 
@@ -170,11 +180,25 @@ export interface CreateOptions extends JoinOptions {
 ```
 
 ```ts
-export type HoldAction = 'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft';
+export type HoldAction =
+  | 'drag'
+  | 'collect'
+  | 'task'
+  | 'inspect'
+  | 'autopsy'
+  | 'gather'
+  | 'craft'
+  // Round 8 (GDD 3.23, 8C): a shop counter and the bank.
+  | 'shop'
+  | 'bank'
+  // Round 8 (GDD 3.23, 8D): the chapel altar, the Train's mailbag, the tally rack.
+  | 'altar'
+  | 'mailbag'
+  | 'rack';
 ```
 
 ```ts
-export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke';
+export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
 ```
 
 ```ts

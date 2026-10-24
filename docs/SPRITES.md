@@ -8,6 +8,12 @@
 
 - Character cells are **128 px displayed cells, packed at 64 px** (10.3). One tile is 64 px = 1 m
   (`TILE_PX`, `WORLD.md` 4.2). A standing 1.7 m villager is about 100 px tall in the cell.
+- **Proportions (round 8, 8F, A161).** The figure is 1.7 m and about four heads tall (a 0.40 m head on a
+  0.52 m shoulder, wide hands and boots), so the head is a quarter of the figure and reads at 64 px packed. Nothing
+  may rise above the crown by more than about 0.05 m: the 112 px cap (`maxStandingSilhouettePx`, 10.3) leaves
+  four or five rows above a bare head, and a lean away from the camera, a hat brim's far end or a prop behind the
+  figure lifts on screen by half its depth. `tools/blender/probe_cap.py`, the highest projected vertex of every clip, not
+  the render, is the check; the clips take a lean with bent knees for the same reason.
 - Animations play at **12 fps**. The rig renders the source clip with `frame_step` so the output is
   12 fps whatever the clip's scene rate.
 - Height traits are not separate art: the client scales the sprite by the GDD 3.1 factor, anchored at
@@ -44,8 +50,10 @@
 Example: `out/<body>/scarf/char_villager_walk_se_003.png`. Frame numbers start at `000` and are
 contiguous per clip and direction.
 
-**Body ids** are the look ids of `looks.json` (`^[a-z][a-z0-9]*$`) plus `villager` for figures that
-are not seats. A look names a character, and in the main mode a look is public by design; the three
+**Body ids** are the look ids of `looks.json` (`^[a-z][a-z0-9]*$`) plus the `villager` family of its
+`villagers` section (round 8: `villager`, `villagerelder`, `villagergoodwife`, `villagerlass`, `villagerclerk`),
+the figures that are not seats: the ambient townsfolk and the quest givers, and the plain `villager` as a seat's
+fallback body (10.13). A villager look carries no card's signature prop and no hat-trait shape. A look names a character, and in the main mode a look is public by design; the three
 cover cards (Killer, Accomplice, Drifter) never get a body, so no world key, frame or file ever names a
 role that hides.
 
@@ -77,6 +85,14 @@ and arrive after the M3 gate.
 | `swing` | 6 | once | Shared by Kill, Crowbar and Check (`ARCHITECTURE.md` 5.4); never role-specific |
 | `interact` | 8 | loop | A V1 clip of every look, in 8 directions, `Presence.animId` 4: one id for every hold, as `swing` is for every strike, so it never tells one action or role from another |
 | `die` | 8 | once, hold last frame | The last frame is the body on the floor. Rendered in 256 px cells with the feet at the centre (a fallen body reaches about 90 px below the feet); trim and the pivot hide the difference |
+
+Prop frames (round 8, 8K) are looked up in `props_<mapId>`, then `props`, and within each atlas by stem in this
+order: the exact state frame where the kind has one (`prop_lanternPost_lit`), then `prop_<kind>`, then
+`prop_<id tail>`, then `prop_<id tail without a trailing _<n>>`, so `bm.ore_cart_0` and `bw.kiln_1` share
+`prop_ore_cart` and `prop_kiln`. A multi-tile prop looks up `<stem>#0_0` in the same order and is cut with the
+stem that matched (`propStems`, `apps/client/src/view/mapDefs.ts`). `decor` and `dressing` props have no frame of
+their kind, so they always resolve by tail; with no frame they draw nothing (10.13). HD manifests and every map's
+prop rows follow this order.
 
 ## 4. Feet pivot manifest
 
@@ -287,6 +303,25 @@ anim plays at 12 fps once (`repeat: 0`) and Phaser holds its last frame. Every f
 | `vfx_vote_stamp` | 10 | straight down, 256 px | Stamp slams down and lifts, leaving the `blood` seal (UI, reveal) |
 | `vfx_dust_step` | 6 | `IsoCam`, 64 px (round 5) | Puff at a boot; ends empty |
 | `vfx_disguise` | 8 | `IsoCam`, 128 px, pivot at the feet (round 5) | Fog and slate smoke rising feet to head round one turning mustard spark, gone by frame 7; only where a Knife strike drops a disguise |
+
+**Round-8 effects** (8G, motion.md 2; DECISIONS A162) are runtime particles, not atlas frames: `view/vfx/VfxView.ts`
+draws seven small shapes once at boot (`fx_spark`, `fx_drop`, `fx_puff`, `fx_coin`, `fx_star`, `fx_chip`,
+`fx_slip`, white with an ink rim, tinted per particle from the world ramps) and bursts them at a figure's feet at
+the art's scale, so they cost no atlas page and keep their size against any figure. `fxSpecs.ts` holds each
+effect's shape, tints, count, speed, spread, gravity and life:
+
+| Effect | Plays when (`fxTriggers.ts`, public fields only) |
+|---|---|
+| `hitSpark` | an avatar's or a creature's `animId` turns to `hurt` |
+| `blood` | an avatar gains the `bleeding` bit |
+| `poisonPuff` | an avatar gains the `poisoned` bit |
+| `fallDust`, `koStars` | an avatar's `animId` turns to `knockdown` (a creature's fall gives `fallDust`) |
+| `crumbs` | `eat` (the Wake Loaf) |
+| `coinBurst` | `rob`; 8C calls `play` for a dropped purse and a sale |
+| `stepDust` | every stride at a walk or a run |
+| `buildDust`, `ledger`, `mailbag` | called by 8D: an HQ tier going up, the Clerk's round, the mailbag collected |
+
+Under reduced motion a burst is a static mark of three particles, cut after 400 ms.
 
 **Body.** The body on the floor is the last frame of `die` (`char/<body>/die/<dir>/007`, with the
 `scarf` and `blood` overlays on the same tail), held by the one-shot anim; no separate key.
@@ -870,6 +905,22 @@ wall or front shell, so the face is `sill` and the frame is `portal_<kind>_sill`
 `portal_hatch` and `portal_drop`. A portal inside a building footprint draws no frame (the building art has the
 door) but still takes the boarded overlay `portal_boarded_<face>` when closed.
 
+**Transport motion (round 8, 8G; motion.md 2).** While a portal swings (`DoorSnap.swingUntilTick`, `doors.swingS`
+of GDD 3.7) `view/transport/TransportView.ts` draws over its frame, in code and with no atlas page:
+
+| Portal | Motion |
+|---|---|
+| `door`, face `s` or `e` | a wood leaf opens on its hinge away from the one crossing (both ways), holds, and falls shut, over a dark doorway |
+| `hatch` with `well` or `winze` in its id | a ladder rises out of the opening and an ink silhouette climbs it, down or up by the crossing and the portal's `elevationDelta` |
+| any other `hatch` (the cellar trapdoors) | the lid lifts on its north hinge over the dark opening |
+| everything else, and doors with a `sill` face | a veil of three ellipses fades where someone stepped through: ink for stairs, drops, crawls and cave mouths, lantern light for gates |
+
+The Daily Train (GDD 3.3) is two boxes, engine and car, on the rail spur (`=`) nearest the map's `station` spawn:
+it rolls in on `train_arrive`, stands, and backs out through the spur's end nearer the map's edge 2.5 s after
+`train_brake`, or after the delivery was due if that pulse is never heard. Only the seats that hear the Train see
+it. Reduced motion holds a portal open for its swing, draws the ladder without its climber, and cuts the Train in
+and out.
+
 **The client.**
 
 - It creates the three tile layers with `map.createLayer(name, tileset, -64, 0)`, an offset of
@@ -912,7 +963,7 @@ door) but still takes the boarded overlay `portal_boarded_<face>` when closed.
 | `props` | `multiatlas`, `nearest` | shared props `prop_<kind>[_<state>]` (`prop_lanternPost_lit`/`_unlit`, lit in the `dusk` and `night` parts of the day); multi-tile slices `prop_<kind>#<dx>_<dy>`; spots `spot_<variant>`; portal frames `portal_<kind>_<s\|e\|sill>`, `portal_hatch`, `portal_drop`, `portal_boarded_<s\|e\|sill>` | at boot |
 | `props_<mapId>` | `multiatlas`, `nearest` | the map's own props, in the same grammar; looked up before `props` | with its map |
 | `char_<lookId>`, `ovl_<lookId>`, `anims_<lookId>` | as the looks catalogue (5L) | characters in 64 px packed cells, atlas `<dir>` in the screen frame | at boot |
-| `char_villager`, `ovl_villager`, `anims_villager` | as the looks | the plain base body | only with `?art=placeholder` in round 5: every seat has a look, and no figure that is not a seat exists until round 6's mobs |
+| `char_villager`, `ovl_villager`, `anims_villager` and the family's (`villagerelder`, `villagergoodwife`, `villagerlass`, `villagerclerk`) | as the looks | the villager family of `looks.json` `villagers` (round 8, A161): the ambient townsfolk's figures and the seat's fallback body | at boot in every real manifest; the placeholder manifest carries the plain villager only (until round 8 the villager loaded only with `?art=placeholder`, C11) |
 | `clues` | `multiatlas`, `linear` | decals finished at display size and drawn through the decal transform (10.5), which rotates them | at boot |
 | `vfx`, `anims_vfx` | `multiatlas`, `nearest`; animation | effects finished at display size; `SpriteCam` frames re-rendered by `IsoCam` | at boot |
 | `thumb_<mapId>` | `image` | 480 x 270 lobby thumbnail of the hub | at boot |
@@ -925,7 +976,8 @@ door) but still takes the boarded overlay `portal_boarded_<face>` when closed.
 - **Mode entries.** The `modes` field left with the quick mode (round 7, A115); no entry carries it.
 - **Boot.** An entry without `maps` loads at boot.
 - **Both manifests** (real and `?art=placeholder`) carry the same keys and the same `maps`, the
-  villager aside (in the placeholder manifest only, once 5L's L4 lands); `manifest.test.ts` checks both.
+  villager family aside (every real manifest carries exactly the `villagers` ids of `looks.json`, the placeholder
+  manifest the plain villager only; round 8, A161); `manifest.test.ts` checks both.
 - **Filters.** The `nearest` of this table holds while `style.json` `pixelFinish.enabled.main` is true; with it off,
   every main-mode world texture is `linear` (10.3). `clues` is always `linear`.
 - **Prop lookup.** The order is `props_<mapId>`, then `props`; within each, `prop_<kind>[_<state>]`, then
@@ -944,11 +996,12 @@ Page-equivalents are of 2048². These are the art plan's numbers (`docs/round5/a
 | Environment per map | ≤ 1.8: ground 1280 x 1792 (0.55), kit ≤ 1024² (0.25), buildings ≤ 2048 x 1024 (0.5), map props ≤ 1024² (0.25), shared props ≤ 1024² (0.25) |
 | Boot effects | `clues` ≤ 512² (0.06), `vfx` ≤ 512 x 2048 (0.25) |
 | Characters (the deck's 10 world looks, A50) | ≤ 3.75: each look's `char_<lookId>` ≤ 1024² and `ovl_<lookId>` ≤ 1024 x 512 (0.375). About 3 expected, since most looks pack onto a 1024 x 512 body page |
-| Resident pages | ≤ 6 (ASSETS 6.8). The worst case, one map's environment, the boot effects and the 10 largest looks, is 5.86 |
+| Resident pages | ≤ 9 (ASSETS 6.8; 6 until round 8, 6.1 with the node break page of A142, 8 by 6Z's round-8 ruling, A141, 9 by the owner's option B of 2026-10-24, A161: plan B frame counts, limp and stagger in four directions, the townsfolk's shorter clip set; a look's lazy clip pages are transient and outside the sum). The worst case is one map's environment, the boot atlases (effects, nodes, tools, mobs, givers), the deck's 10 world looks and the villager family, which is resident on every map for the townsfolk (A161). Measured with the four-heads figures on the round-8 base of 2026-10-24: 8-bit 7.55 (Hollowmere) and 7.42 (Blackpine); low poly 8.02 (Hollowmere) and 7.77 (Blackpine); the deck alone 5.92 / 5.80 / 6.14 / 5.89 (the five clips; the stand-in estimate for option B is about 8.1 and 8.8 on Hollowmere, and the packed figures follow with the clips, PR 3). The character atlas json is written on one line (`atlasJson`, A161), which keeps the default style's first load under ASSETS 6.8's 12 MB with the family resident |
 | Static world sprites per scene | ≤ 1 200; the World hides those outside the view grown by 2 tiles, re-checked when the camera moves more than a tile |
 
-`char_villager` and `ovl_villager` load only with `?art=placeholder` in round 5 (10.13), so they count in no
-budget. `tools/sprites/test/budget.test.ts` asserts each cap and, for each map, the resident sum.
+The villager family's five looks count in the resident sum since round 8 (10.13; in round 5 the villager loaded only
+with `?art=placeholder` and counted in no budget). `tools/sprites/test/budget.test.ts` asserts each cap and, for each
+map, the resident sum.
 
 **Round 8 re-plan (8F, art.md 2, motion.md 1): the measured cost.** Each shipped look packs its 304 frames per
 pass (five clips, 8 directions) on one 1024² body page at a fill of 0.42-0.47 (about 1 500 trimmed px a frame,
@@ -957,7 +1010,8 @@ pass (five clips, 8 directions) on one 1024² body page at a fill of 0.42-0.47 (
 16 clips; the frame plan of A141 (idle 12, walk, run, limp, stagger 8 each, swing, strike, knockdown, getup,
 inspect, eat, rob 6 each, die and interact 8, hurt 3, threaten, cower, stomp, stunned 4 each, fidget 6, down 2) is
 129 frames a direction, 1 032 a pass. At the measured cost that is one 2048² body page and one 1024² overlay
-page a look (1.25), 12.5 for ten looks and a worst-case resident of 14.6 against the cap of 6. Halving the
+page a look (1.25), 12.5 for ten looks and a worst-case resident of 14.6 against the cap of 9 (6 until round 8, 8 until the owner's
+option B; A141 carries 6Z's ruling and the four-direction plan, A161 the owner's option B that fits under 9). Halving the
 packed cell's density does not help: 128 px packed cells (A135) quadruple every frame, so even today's five
 clips would need a 2048² body page. The character budget therefore cannot hold the full clip table at any cell
 size without a DECISIONS row; A141 asks 6Z for it and names the fallbacks (one-shots in four directions, fewer
@@ -1025,7 +1079,8 @@ pnpm --filter @wdi/sprites m5b
 
 | Key | Type | Frames | Packed cell, pivot | Loaded |
 |---|---|---|---|---|
-| `nodes` | multiatlas, one page ≤ 512² | `node_<snake id>/ready`, `node_<snake id>/spent` for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`); the stem is the row's `sprite` | 64 x 64, (32, 48): the ground point under the tile centre | boot |
+| `nodes` | multiatlas, one page ≤ 512 x 256 (`NODE_PAGE`) | `node_<snake id>/ready`, `node_<snake id>/spent` and `node_<snake id>/break/<000-007>` (round 8, 8G) for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`), whose stem is the row's `sprite`, and for `coins`, the heap a knockout or a mugging drops (8C, GDD 3.23), which has no `resources.json` row and plays its break as a pickup removes it | 64 x 64, (32, 48): the ground point under the tile centre | boot |
+| `anims_nodes` | animation | `node_<snake id>/break`: 12 fps once; the client plays it forward as the yield is taken and backwards as the node regrows | | boot |
 | `tools` | multiatlas, one page ≤ 512² | `held_<itemId>/<dir>` for `torch`, `snare`, `spade`, `lockpicks`, `lantern`, `crowbar` (8 screen-frame directions); `glow_lantern/<0-3>`, `glow_torch/<0-3>` | held: 64 x 64, (32, 56), the characters' feet; glow: 32 x 32, centred | boot |
 | `anims_tools` | animation | `glow_lantern`, `glow_torch`: 4 frames at 8 fps, looping | | boot |
 | `mobs` | multiatlas, one page ≤ 1024² | `mob_<id>/<anim>/<dir>/<nnn>` for `wolf`, `boar`, `bat`, `rat` (the stem is the row's `sprite`), `idle` 4 frames, `walk` 6, `attack` 6, `hurt` 3, `death` 6, `flee` 4 (round 8, 8G), 8 screen-frame directions | 64 x 64, (32, 56), the characters' feet; the bat hovers over a ground shadow at the feet | boot |
@@ -1034,7 +1089,7 @@ pnpm --filter @wdi/sprites m5b
 | `anims_givers` | animation | `giver_<npcId>/idle/<dir>`: 6 fps, looping | | boot |
 
 The filter is `nearest` in the 8-bit manifest and the placeholder, `linear` in the low-poly one. The nodes
-and tools add under 0.07 page-equivalents to the boot set in either style; the mobs add 0.125 (8-bit, 512 x 1024)
+and tools add under 0.1 page-equivalents to the boot set in either style; the mobs add 0.125 (8-bit, 512 x 1024)
 or 0.25 (low poly, 1024²) and the givers 0.125 in either style, inside the 6-page limit (10.14).
 
 **Held overlays.** A held frame shares the character cell and feet pivot, and draws the tool's grip where
@@ -1050,6 +1105,14 @@ gradient in low poly. The client plays `glow_lantern` or `glow_torch` over the l
 **Icons.** The tools' inventory icons are hand-written SVG under `assets/ui/icons/` on the rules of section 9:
 `icon_item_torch`, `icon_item_snare`, `icon_item_spade`, `icon_item_lockpicks`, `icon_item_lantern`,
 `icon_item_crowbar`.
+
+**Node breaks** (round 8, 8G; motion.md 2) are drawn in code over the node art (`drawNodeBreak` in
+`m5b-draw.ts`): the spent art fades up under the going yield while debris is thrown up and settles. Timber shudders
+and splits into splinters; stone cracks, then crumbles into shards in a puff of dust; tin ore glints, then
+shatters into crystals; resin's drips run down the trunk and drop as its cuts seal; herbs and mushrooms lift away
+as they are plucked and drop a few leaves or crumbs. The last frame is `spent` with the debris on the ground.
+`NodeView` plays the break once when `active` falls and rests on `spent`, plays it backwards when it rises and
+rests on `ready`, and cuts straight to the frame under reduced motion.
 
 **Mobs** are small rigs of spheres, capsules and wing polygons in a mob-local frame (`tools/sprites/m5b-mobs.ts`),
 posed per animation and projected onto the iso ground for each direction, back to front, under one ink

@@ -556,3 +556,71 @@
     backdrop-filter: none;
   }
 }
+
+/* Round 7 (7M, UI.md 14.38): the chores panel's rows, the village's work bar, and the ghost's layer. */
+.wdi-m5b__panel .wdi-m5b__sub {
+  margin: 0;
+}
+
+.wdi-m5b__panel .wdi-m5b__row--chore .wdi-m5b__what {
+  display: grid;
+  gap: var(--wdi-space-1);
+}
+
+.wdi-m5b__panel .wdi-m5b__row--chore[data-step='done'] .wdi-m5b__name {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+/* The bar sits under the clock (top centre, `wdi-hud__tc`), a thin meter and its percentage, read by a progressbar role. */
+.wdi-m5b .wdi-m5b__work {
+  position: absolute;
+  top: calc(var(--wdi-touch) + var(--wdi-space-4));
+  left: 50%;
+  display: flex;
+  gap: var(--wdi-space-2);
+  align-items: center;
+  width: min(240px, calc(100% - var(--wdi-space-5)));
+  padding: var(--wdi-space-1) var(--wdi-space-2);
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-sm);
+  color: var(--wdi-night-text);
+  background-color: var(--wdi-match-glass);
+  border: 1px solid rgb(var(--wdi-lilac-rgb) / 0.45);
+  border-radius: var(--wdi-radius-xs);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.wdi-m5b .wdi-m5b__work-bar {
+  display: block;
+  flex: 1;
+  height: var(--wdi-space-2);
+  overflow: hidden;
+  background-color: var(--wdi-night);
+  border: 1px solid rgb(var(--wdi-lilac-rgb) / 0.45);
+}
+
+.wdi-m5b .wdi-m5b__work-bar > i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background-color: var(--wdi-night-accent);
+  transition: width 300ms ease-out;
+}
+
+.wdi-m5b .wdi-m5b__work-pct {
+  min-width: 3.5ch;
+  text-align: right;
+}
+
+/* A ghost keeps its chores and the bar (GDD 3.8); pockets, crafting and quests are the living's. */
+.wdi-m5b[data-ghost] .wdi-m5b__key:not([data-testid='m5b-chores']) {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wdi-m5b .wdi-m5b__work-bar > i {
+    transition: none;
+  }
+}

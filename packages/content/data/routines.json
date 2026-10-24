@@ -27,6 +27,7 @@
   },
   "holds": {},
   "ignore": [
+    "dressing",
     "kitChest",
     "teachingClue",
     "keyCache",
@@ -35,7 +36,14 @@
     "wakeTable",
     "plate",
     "deadLoaf",
-    "ledger"
+    "ledger",
+    "counter",
+    "bank",
+    "altar",
+    "mailbag",
+    "rack",
+    "hq",
+    "blackMarket"
   ],
   "lightKinds": ["lanternPost"]
 }

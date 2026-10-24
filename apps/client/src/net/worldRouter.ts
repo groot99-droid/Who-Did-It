@@ -1,6 +1,6 @@
 import type Phaser from 'phaser';
 import balance from '@wdi/content/data/balance.json';
-import { transition } from '../view/Transition';
+import { portalTransition, transition } from '../view/Transition';
 import { REG_MEETING, type MeetingFeed } from './meeting';
 import { ColyseusMeetingFeed } from './meetingColyseus';
 import type { MockNetwork } from './mock';
@@ -64,7 +64,7 @@ export function installWorldRouter(
     for (const key of LOBBY_SCREENS) stopScene(key);
     stopScene('GameOver');
     // Round 6 (locked): the three scene starts run behind a transition (6K); at 0 ms or reduced motion they run at once.
-    transition('fade', transitionMs('fade'), () => game.scene.start('World', data));
+    transition(portalTransition(data), transitionMs('fade'), () => game.scene.start('World', data));
     net.bus.emit('sceneEnter', data);
   };
 

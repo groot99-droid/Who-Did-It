@@ -13,7 +13,10 @@ import { type PlayerSim, simOf } from './RoomSim';
 import { isVerbPhase, reject, sceneKey } from './World';
 import { handleCraft, tickCraft } from './Craft';
 import { handleTaskHold } from './Minigames';
+import { handleBankHold } from './economy/bank';
+import { handleShopHold } from './economy/shops';
 import { handleGather, tickGather } from './Resources';
+import { handleCivicHold, isCivicHold, tickCivicHold } from './economy/holds';
 
 const CLUE_TEACHING = 'clue_teaching';
 
@@ -67,6 +70,16 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
     handleTaskHold(room, sessionId, targetId);
     return;
   }
+  // Round 8, 8C (locked; GDD 3.23): a `shop` or `bank` hold opens that counter for `act.buy`, `act.sell`, `act.bank`.
+  if (action === 'shop' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
+    handleShopHold(room, sessionId, targetId);
+    return;
+  }
+  if (action === 'bank' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
+    handleBankHold(room, sessionId, targetId);
+    return;
+  }
+  if (isCivicHold(action)) return handleCivicHold(room, sessionId, action, targetId); // round 8, 8D (GDD 3.23)
   if (action !== 'collect' || typeof targetId !== 'string' || targetId.length === 0 || targetId.length > 64) {
     reject(room, sessionId, ErrorCode.cannot, 'cannot do that');
     return;
@@ -99,6 +112,10 @@ export function runHolds(room: PartyRoom): void {
     if (hold.action === 'gather' || hold.action === 'craft') {
       if (hold.action === 'gather') tickGather(room, sessionId, p);
       else tickCraft(room, sessionId, p);
+      continue;
+    }
+    if (isCivicHold(hold.action)) {
+      tickCivicHold(room, sessionId, p); // round 8, 8D: the mailbag, altar and rack holds (GDD 3.23)
       continue;
     }
     // Moving, leaving a verb phase, dying, a crossing or a vanished clue all cancel the hold.

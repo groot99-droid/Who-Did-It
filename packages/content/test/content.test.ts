@@ -9,6 +9,8 @@ import {
   content,
   deckFor,
   items,
+  looks,
+  LooksFile,
   metrics,
   palette,
   PLAYER_COUNTS,
@@ -40,6 +42,33 @@ describe('content package', () => {
   });
 });
 
+describe('looks.json villagers (round 8, DECISIONS A161)', () => {
+  it('holds the plain villager and its variants, every id and atlas key under `villager`', () => {
+    const family = Object.values(looks.villagers);
+    expect(family.map((v) => v.id)).toEqual([
+      'villager',
+      'villagerelder',
+      'villagergoodwife',
+      'villagerlass',
+      'villagerclerk',
+    ]);
+    for (const v of family) expect([v.bodyAtlas, v.overlayAtlas]).toEqual([`char_${v.id}`, `ovl_${v.id}`]);
+  });
+
+  it('rejects a villager entry with an unknown key, one without the plain base, and one with a card field', () => {
+    const raw = structuredClone(looks);
+    const extra = structuredClone(raw);
+    (extra.villagers.villagerelder as Record<string, unknown>).hat = 'bowler';
+    expect(LooksFile.safeParse(extra).success).toBe(false);
+    const card = structuredClone(raw);
+    (card.villagers.villagerelder as Record<string, unknown>).portrait = 'portrait_villagerelder';
+    expect(LooksFile.safeParse(card).success).toBe(false);
+    const { villager: _base, ...rest } = raw.villagers;
+    expect(LooksFile.safeParse({ ...raw, villagers: rest }).success).toBe(false);
+    expect(LooksFile.safeParse(raw).success).toBe(true);
+  });
+});
+
 describe('palette and metrics (ASSETS 6.1, WORLD 4.2)', () => {
   it('holds the ten palette tokens', () => {
     expect(palette.colors).toEqual({
@@ -61,7 +90,7 @@ describe('palette and metrics (ASSETS 6.1, WORLD 4.2)', () => {
     expect(metrics.characterCellPx).toBe(128);
     expect(metrics.maxStandingSilhouettePx).toBe(112);
     expect(metrics.maxSilhouetteTiles).toBe(1.75);
-    expect(metrics.characterHeadsTall).toBe(5);
+    expect(metrics.characterHeadsTall).toBe(4);
     expect(metrics.overworldTiles).toEqual({ w: 64, h: 48 });
     expect(Math.round(Math.cos((metrics.camera.tiltXDeg * Math.PI) / 180) * 100) / 100).toBe(
       metrics.camera.verticalSquash,
