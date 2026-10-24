@@ -78,8 +78,23 @@ A bit carries only what the drawn figure shows (body.md 6). Weakened, Famished, 
 
 **Prop ids** (economy statics): the existing scene prefix, then `shop_`, `bank_`, `altar_`, `rack_`, `mailbag_` or
 `hq_` (for example `bk.shop_counter`).
-- 8C and 8D append these rows to a scene's `props`.
-- 8J and 8K may move them, but never rename or delete them.
+- The frame and the scene row land together, in the art owner's PR, so `props.test` never sees a row without a
+  frame (6Z, 2026-10-23). 8C and 8D ship the logic and add no scene row.
+- Frames: 8J draws `prop_altar`, `prop_mailbag` and `prop_blackMarket`, and 8K draws `prop_counter` and `prop_bank`,
+  all in `shared_props`; 8K draws `prop_rack` in `blackpine_props`; 8G draws `prop_hq_<tier>`.
+- Rows: 8J adds HollowMere's rows, 8K BlackPine's (in a PR after 8D's), and 8G the `hq_` rows.
+- 8J and 8K may move these rows, but never rename or delete them.
+
+**Room dressing** is one prop kind, `dressing`, with the piece named by its id tail (`bl.footlocker_3`; a numbered
+tail falls back to its stem, SPRITES 3). Only `dressing` goes in `routines.json` `ignore` (A146). A map's prop
+pages are `propAtlases = [props_<map>, bld_<map>, props]` in `mapDefs.ts`: props pack into the buildings page's
+spare room, with no new page, and a test pins it (8J, granted for both maps).
+
+**Coins** are not a resource: `validate.ts` takes only material items in `resources.json`, and Scrip is not an
+item. There is no `coins` row. 8G draws `node_coins/{ready,spent,break}` from `NODE_IDS = [...RESOURCE_IDS,
+'coins']`, and the client finds them through its `node_<resource>` fallback. 8C's `ui/shop/coins.ts` gives a coins
+node its hold prompt and its cast time (`economy.coinPickupS`). The break plays when a coins node leaves the feed
+only while the viewer stays in the scene, the feed was not reset and the node was in view.
 
 ## 3. Protocol
 
@@ -112,6 +127,8 @@ New kinds, emitted by their owner and heard by anyone. Data carries seat ids or 
 | `inspect` | `{ by, target }` | 8B |
 | `purse` | `{ seat, delta, reason: 'stake' \| 'wage' \| 'sale' \| 'buy' \| 'rent' \| 'fine' \| 'theft' \| 'drop' \| 'pickup' \| 'bank' \| 'faith' \| 'hq' \| 'fence' }` | 8C (and 8D, 8E through 8C's `movePurse`) |
 | `econ.heistTake` | `{ amount }` | 8C, on the existing `vendetta.heist.*` |
+| `econ.coinsTaken` | `{ sceneId, nodeId }`, no seat and no amount; server only, never on the wire (a broadcast would tell clients out of sight that someone picked up coins) | 8C, in `tickCoins` before the node is deleted |
+| `eat` | `{ seat }` | 8A (8E's needs hear it) |
 | `rent.due`, `rent.paid`, `quota.due`, `quota.met` | `{ seat }` | 8D |
 | `notice.made`, `notice.shown`, `notice.burnt`, `notice.fenced`, `notice.gazette` | `{ seat?, noticeId }` | 8D |
 | `hq.tier` | `{ stationId, tier, by }` | 8D |
@@ -173,7 +190,7 @@ Every session also owns its GDD section stub, its DECISIONS row, its UI.md 14 su
 |---|---|
 | **8A** | `sim/body/**` (new), `effects.json` and its schema, `balance.json` `body` (replacing `health`), the `items.json` rows for the medkit, bandage, salts, remedy and Wake Loaf, the `abilities.json` rows `strike` and `slingshot`, every id of 2, `Private.body`, the 8A hooks of 5, `view/body/**` (the body HUD's function, which 8H animates), the GDD 3.22 body paragraphs with the 3.6, 3.15 and 3.18 corrections, and `auto` invariant `bodyBounds` |
 | **8B** | `sim/inspect/**`, `relations.json` and its schema, the `act.inspect` and `inspect.*` rows, `ui/inspect/**`, the 3.22 inspect paragraph |
-| **8C** | `sim/economy/{purse,shops,bank,coins,wages}.ts`, the `runEconomy` line, `economy.json` and its schema (`shops`, `stakes`, `prices`), `balance.json` `economy` (8C's keys), `Private.purse` and `Private.bank`, the `scrip` column of `quests.json`, the `coins` node kind in `resources.json`, `ui/shop/**`, `view/purse/**`, GDD 3.23 Scrip, the invariant `scripConserved` |
+| **8C** | `sim/economy/{purse,shops,bank,coins,wages}.ts`, the `runEconomy` line, `economy.json` and its schema (`shops`, `stakes`, `prices`), `balance.json` `economy` (8C's keys), `Private.purse` and `Private.bank`, the `scrip` column of `quests.json`, the coins nodes (no `resources.json` row, see 2), `ui/shop/**`, `view/purse/**`, GDD 3.23 Scrip, the invariant `scripConserved` |
 | **8D** | `sim/economy/{rent,quota,faith,rumours,hq}.ts`, `economy.json` `rent`, `quota`, `faith`, `notices` and `hq`, `Private.faith`, `GameState.hq`, the meeting hooks of 5, `ui/econ/**` (the altar, mailbag, notice and HQ panels), GDD 3.23's other paragraphs |
 | **8E** | `sim/townsfolk/**`, `sim/npc/needs.ts` and the two hooks, `routines.json` townsfolk rows, `balance.json` `moods` and `townsfolk`, the `scuffle` row of `clues.json`, the `townsfolk` stream in `seeds.ts` (one line), `ui/mug/**`, GDD 3.24, the invariant `figureNotSeat` |
 | **8F** | `looks.json` (clips, villager variants, proportions), `tools/blender/{build_looks,look_parts,looks_spec,build_villager,build_rig,rig_common}.py`, the character renders of both styles under `assets/`, `view/PlayerView.ts` and `view/animIds.ts`, `metrics.json` `iso.viewTilesHigh` and `iso.figureScale` (new), the `style.json` figure wording, SPRITES 1, 3 and 10.9 (art.md 2) |
@@ -182,6 +199,9 @@ Every session also owns its GDD section stub, its DECISIONS row, its UI.md 14 su
 | **8I** | the material library `tools/blender/materials/**` and its cache line in `.gitignore` (art.md 5), the shared tiles of `build_tiles.py`, the `hd` art style (art.md 3): `style.json` `artStyles` (`hd` leaves `reserved`), `assets/hd/**`, the HD settings in `tools/blender/{rig_common,batch_render,static_common}.py` (an `--style hd` switch beside today's two), `tools/sprites/test/budgets.ts` HD rows, the device gate in `ui/artStyle/**`, ASSETS 6.4, 6.9 and 6.11 HD rows, the GDD 3.13 art-style line |
 | **8J** | HollowMere's scenes (every `scenes/*.json` not prefixed `bp_`: `props`, `lights`, `material`, the decor of `grid`, `notes`), their `.nav.json` regenerated with the tool, `tools/blender/env/hollowmere_props.py`, HollowMere's buildings and ground in `build_buildings.py` and `build_ground.py` (its own functions), `maps/hollowmere.json` static rows (art.md 4) |
 | **8K** | the same for BlackPine: `scenes/bp_*.json`, `env/blackpine_props.py`, its building and ground functions, `maps/blackpine.json` static rows |
+
+8L (anti-cheat), 8M (rules) and 8N (icons) joined with the teardown addendum: their paths, rows and seams are in
+`teardown.md` 6.
 
 - **`env/shared_props.py`** is append-only for 8J and 8K. Whoever merges second merges the base.
 - **Scene files.** No session renames or deletes a portal, spawn, clue, task node or economy prop id. A portal or

@@ -35,6 +35,14 @@ export const C2S = {
   questTurnIn: 'quest.turnIn',
   /** Round 6 (M5b, GDD 3.16): the answer to a `minigameStart`; Session 6H reads it. */
   minigameResult: 'minigame.result',
+  /** Round 8 (GDD 3.22 "Inspect"): study the seat in reach; `sim/inspect/` (8B) handles it. */
+  inspect: 'act.inspect',
+  /** Round 8 (GDD 3.23, 8C): buy from the shop the seat holds open; Session 8C reads it. */
+  buy: 'act.buy',
+  /** Round 8 (GDD 3.23, 8C): sell to the shop the seat holds open; Session 8C reads it. */
+  sell: 'act.sell',
+  /** Round 8 (GDD 3.23, 8C): deposit to or withdraw from the bank a `bank` hold opened; Session 8C reads it. */
+  bank: 'act.bank',
 } as const;
 
 export const S2C = {
@@ -57,6 +65,14 @@ export const S2C = {
   cutscene: 'cutscene',
   /** Round 6 (M5b, GDD 3.16): a station task's mini-game; sent by Session 6H, nothing sends it before. */
   minigameStart: 'minigameStart',
+  /** Round 8 (GDD 3.22 "Inspect"), private to the inspector: what the eye can see. Sent by 8B. */
+  inspectResult: 'inspect.result',
+  /** Round 8, private to the inspected seat: a look of `lookId` looked you over. Sent by 8B. */
+  inspectNoticed: 'inspect.noticed',
+  /** Round 8, private to the inspected seat: a card-blind hunch from a `relations.json` row's note. Sent by 8B. */
+  inspectHunch: 'inspect.hunch',
+  /** Round 8 (GDD 3.23, 8C): a `shop` hold opened a shop; sent by Session 8C. */
+  shopOpen: 'shop.open',
   /** Round 8 (GDD 3.24): a mugger's demand, private to the target; sent by Session 8E's `mug.ts`. */
   mugPrompt: 'mugPrompt',
 } as const;
@@ -65,7 +81,8 @@ export type C2SType = (typeof C2S)[keyof typeof C2S];
 export type S2CType = (typeof S2C)[keyof typeof S2C];
 
 /** `gather` and `craft` are round 6 (M5b, GDD 3.14); the server refuses them until Session 6F lands. */
-export type HoldAction = 'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft';
+export type HoldAction =
+  'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft' | 'shop' | 'bank';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke';
 /**
@@ -83,6 +100,10 @@ export type DeathCause =
   'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'bled' | 'sickened';
 /** Chat channels the server derives (GDD 3.5); the client never chooses one. */
 export type ChatChannel = 'meeting' | 'ghost' | 'cabal' | 'system';
+/** Round 8 (GDD 3.22 "Inspect"): what a glance tells of health, never the number. */
+export type InspectHealth = 'unhurt' | 'bruised' | 'badlyHurt';
+/** Round 8: the purse's jingle; `unknown` until a purse exists (8C) or when its bands are not set. */
+export type InspectPurse = 'unknown' | 'light' | 'fair' | 'heavy';
 
 /** Colyseus room name registered by the server (ARCHITECTURE 5.3). */
 export const ROOM_NAME = 'party';
@@ -218,6 +239,20 @@ export interface C2SPayloads {
    * solution it kept and completes the task. Refused 422 until Session 6H lands.
    */
   'minigame.result': { taskId: string; answer: unknown };
+  /** Round 8 (GDD 3.22): an avatar handle in reach, in any world phase; refused 422, 424 or 427. */
+  'act.inspect': { targetId: string };
+  /**
+   * Round 8 (GDD 3.23, 8C): `qty` of `itemId` from `shopId`, which a `shop` hold opened and whose counter is still in
+   * reach, at its `ask` each, paid from the purse. Refused 422 when the purse or the inventory falls short.
+   */
+  'act.buy': { shopId: string; itemId: string; qty: number };
+  /** Round 8 (GDD 3.23, 8C): `qty` of `itemId` from the inventory to `shopId`, at its `pay` each, into the purse. */
+  'act.sell': { shopId: string; itemId: string; qty: number };
+  /**
+   * Round 8 (GDD 3.23, 8C): moves `amount` Scrip between the purse and the bank, at the bank counter a `bank` hold
+   * opened and that stays in reach. Refused 422 when the side it draws on holds less.
+   */
+  'act.bank': { op: 'deposit' | 'withdraw'; amount: number };
   /**
    * Round 8 (GDD 3.24): the target's answer to its open `mugPrompt`. Refused 422 with no prompt open; `flee` and
    * `fight` are refused until the fists land (DECISIONS A161).
@@ -276,6 +311,33 @@ export interface S2CPayloads {
    */
   minigameStart: { taskId: string; kind: MinigameKind; public: unknown };
   /**
+   * Private, round 8 (GDD 3.22): the inspected avatar's drawn look and what the eye reads of it. `signs` are copy ids
+   * of `ui/copy/inspect.ts` taken only from the avatar's public status bits; `light` is a burning light in hand. Never
+   * a card, a cover, a vendetta or an inventory.
+   */
+  'inspect.result': {
+    targetId: string;
+    lookId: string;
+    signs: string[];
+    health: InspectHealth;
+    purse: InspectPurse;
+    light: boolean;
+    tool?: string;
+  };
+  /** Private, round 8: the look the inspector is drawn as. */
+  'inspect.noticed': { lookId: string };
+  /** Private, round 8: an `inspect.hunch.*` copy id. */
+  'inspect.hunch': { copyId: string };
+  /**
+   * Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each
+   * price, `buys` what it pays for. Answered with `act.buy` and `act.sell`.
+   */
+  'shop.open': {
+    shopId: string;
+    stock: Array<{ itemId: string; price: number }>;
+    buys: Array<{ itemId: string; price: number }>;
+  };
+  /**
    * Private, round 8 (GDD 3.24): a mugger demands the purse; `muggerId` is its avatar handle in the target's
    * scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`).
    */
@@ -311,6 +373,10 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'quest.accept': 2,
   'quest.turnIn': 2,
   'minigame.result': 2,
+  'act.inspect': 5,
+  'act.buy': 5,
+  'act.sell': 5,
+  'act.bank': 5,
 };
 
 export const ErrorCode = {
