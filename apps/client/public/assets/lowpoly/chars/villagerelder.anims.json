@@ -1,0 +1,4492 @@
+{
+ "anims": [
+  {
+   "key": "blood/villagerelder/die/e",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/e/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/e/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/e/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/e/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/e/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/e/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/e/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/die/n",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/n/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/n/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/n/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/n/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/n/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/n/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/n/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/die/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/ne/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/ne/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/ne/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/ne/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/ne/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/ne/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/ne/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/die/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/nw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/nw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/nw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/nw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/nw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/nw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/nw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/die/s",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/s/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/s/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/s/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/s/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/s/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/s/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/s/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/die/se",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/se/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/se/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/se/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/se/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/se/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/se/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/se/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/die/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/sw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/sw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/sw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/sw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/sw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/sw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/sw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/die/w",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/w/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/w/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/w/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/w/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/w/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/w/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/w/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/idle/e",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/e/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/e/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/e/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/e/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/e/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/e/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/e/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/idle/n",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/n/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/n/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/n/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/n/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/n/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/n/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/n/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/idle/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/ne/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/ne/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/ne/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/ne/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/ne/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/ne/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/ne/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/idle/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/nw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/nw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/nw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/nw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/nw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/nw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/nw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/idle/s",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/s/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/s/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/s/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/s/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/s/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/s/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/s/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/idle/se",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/se/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/se/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/se/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/se/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/se/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/se/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/se/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/idle/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/sw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/sw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/sw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/sw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/sw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/sw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/sw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/idle/w",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/w/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/w/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/w/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/w/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/w/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/w/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/w/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/interact/e",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/e/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/e/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/e/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/e/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/e/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/e/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/e/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/interact/n",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/n/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/n/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/n/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/n/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/n/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/n/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/n/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/interact/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/ne/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/ne/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/ne/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/ne/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/ne/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/ne/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/ne/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/interact/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/nw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/nw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/nw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/nw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/nw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/nw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/nw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/interact/s",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/s/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/s/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/s/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/s/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/s/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/s/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/s/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/interact/se",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/se/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/se/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/se/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/se/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/se/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/se/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/se/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/interact/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/sw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/sw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/sw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/sw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/sw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/sw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/sw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/interact/w",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/w/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/w/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/w/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/w/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/w/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/w/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/w/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/swing/e",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/e/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/e/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/e/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/e/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/e/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/swing/n",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/n/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/n/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/n/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/n/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/n/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/swing/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/ne/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/ne/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/ne/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/ne/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/ne/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/swing/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/nw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/nw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/nw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/nw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/nw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/swing/s",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/s/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/s/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/s/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/s/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/s/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/swing/se",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/se/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/se/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/se/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/se/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/se/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/swing/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/sw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/sw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/sw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/sw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/sw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/swing/w",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/w/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/w/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/w/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/w/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/w/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerelder/walk/e",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/e/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/e/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/e/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/e/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/e/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/e/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/e/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/walk/n",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/n/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/n/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/n/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/n/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/n/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/n/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/n/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/walk/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/ne/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/ne/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/ne/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/ne/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/ne/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/ne/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/ne/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/walk/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/nw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/nw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/nw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/nw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/nw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/nw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/nw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/walk/s",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/s/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/s/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/s/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/s/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/s/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/s/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/s/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/walk/se",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/se/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/se/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/se/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/se/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/se/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/se/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/se/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/walk/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/sw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/sw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/sw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/sw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/sw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/sw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/sw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerelder/walk/w",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/w/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/w/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/w/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/w/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/w/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/w/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/w/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "blood/villagerelder/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/die/e",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/e/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/e/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/e/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/e/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/e/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/e/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/e/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/die/n",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/n/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/n/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/n/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/n/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/n/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/n/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/n/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/die/ne",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/ne/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/ne/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/ne/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/ne/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/ne/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/ne/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/ne/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/die/nw",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/nw/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/nw/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/nw/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/nw/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/nw/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/nw/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/nw/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/die/s",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/s/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/s/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/s/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/s/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/s/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/s/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/s/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/die/se",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/se/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/se/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/se/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/se/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/se/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/se/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/se/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/die/sw",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/sw/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/sw/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/sw/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/sw/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/sw/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/sw/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/sw/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/die/w",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/w/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/w/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/w/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/w/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/w/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/w/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/w/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/idle/e",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/e/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/e/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/e/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/e/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/e/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/e/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/e/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/idle/n",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/n/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/n/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/n/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/n/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/n/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/n/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/n/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/idle/ne",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/ne/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/ne/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/ne/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/ne/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/ne/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/ne/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/ne/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/idle/nw",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/nw/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/nw/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/nw/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/nw/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/nw/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/nw/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/nw/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/idle/s",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/s/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/s/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/s/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/s/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/s/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/s/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/s/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/idle/se",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/se/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/se/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/se/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/se/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/se/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/se/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/se/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/idle/sw",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/sw/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/sw/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/sw/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/sw/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/sw/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/sw/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/sw/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/idle/w",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/w/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/w/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/w/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/w/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/w/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/w/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/w/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/interact/e",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/e/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/e/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/e/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/e/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/e/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/e/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/e/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/interact/n",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/n/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/n/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/n/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/n/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/n/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/n/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/n/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/interact/ne",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/ne/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/ne/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/ne/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/ne/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/ne/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/ne/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/ne/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/interact/nw",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/nw/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/nw/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/nw/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/nw/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/nw/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/nw/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/nw/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/interact/s",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/s/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/s/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/s/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/s/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/s/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/s/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/s/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/interact/se",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/se/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/se/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/se/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/se/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/se/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/se/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/se/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/interact/sw",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/sw/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/sw/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/sw/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/sw/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/sw/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/sw/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/sw/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/interact/w",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/w/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/w/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/w/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/w/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/w/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/w/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/w/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/swing/e",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/e/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/e/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/e/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/e/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/e/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/swing/n",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/n/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/n/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/n/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/n/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/n/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/swing/ne",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/ne/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/ne/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/ne/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/ne/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/ne/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/swing/nw",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/nw/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/nw/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/nw/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/nw/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/nw/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/swing/s",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/s/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/s/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/s/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/s/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/s/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/swing/se",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/se/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/se/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/se/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/se/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/se/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/swing/sw",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/sw/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/sw/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/sw/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/sw/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/sw/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/swing/w",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/w/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/w/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/w/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/w/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/w/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerelder/walk/e",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/e/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/e/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/e/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/e/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/e/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/e/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/e/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/walk/n",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/n/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/n/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/n/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/n/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/n/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/n/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/n/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/walk/ne",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/ne/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/ne/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/ne/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/ne/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/ne/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/ne/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/ne/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/walk/nw",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/nw/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/nw/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/nw/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/nw/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/nw/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/nw/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/nw/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/walk/s",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/s/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/s/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/s/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/s/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/s/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/s/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/s/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/walk/se",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/se/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/se/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/se/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/se/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/se/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/se/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/se/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/walk/sw",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/sw/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/sw/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/sw/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/sw/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/sw/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/sw/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/sw/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerelder/walk/w",
+   "frames": [
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/w/000"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/w/001"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/w/002"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/w/003"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/w/004"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/w/005"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/w/006"
+    },
+    {
+     "key": "char_villagerelder",
+     "frame": "char/villagerelder/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/die/e",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/e/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/e/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/e/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/e/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/e/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/e/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/e/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/die/n",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/n/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/n/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/n/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/n/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/n/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/n/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/n/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/die/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/ne/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/ne/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/ne/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/ne/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/ne/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/ne/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/ne/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/die/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/nw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/nw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/nw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/nw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/nw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/nw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/nw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/die/s",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/s/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/s/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/s/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/s/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/s/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/s/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/s/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/die/se",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/se/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/se/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/se/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/se/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/se/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/se/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/se/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/die/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/sw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/sw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/sw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/sw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/sw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/sw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/sw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/die/w",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/w/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/w/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/w/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/w/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/w/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/w/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/w/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/idle/e",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/e/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/e/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/e/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/e/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/e/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/e/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/e/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/idle/n",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/n/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/n/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/n/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/n/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/n/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/n/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/n/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/idle/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/ne/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/ne/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/ne/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/ne/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/ne/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/ne/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/ne/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/idle/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/nw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/nw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/nw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/nw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/nw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/nw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/nw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/idle/s",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/s/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/s/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/s/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/s/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/s/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/s/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/s/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/idle/se",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/se/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/se/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/se/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/se/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/se/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/se/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/se/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/idle/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/sw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/sw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/sw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/sw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/sw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/sw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/sw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/idle/w",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/w/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/w/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/w/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/w/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/w/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/w/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/w/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/interact/e",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/e/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/e/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/e/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/e/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/e/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/e/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/e/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/interact/n",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/n/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/n/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/n/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/n/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/n/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/n/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/n/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/interact/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/ne/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/ne/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/ne/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/ne/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/ne/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/ne/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/ne/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/interact/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/nw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/nw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/nw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/nw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/nw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/nw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/nw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/interact/s",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/s/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/s/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/s/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/s/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/s/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/s/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/s/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/interact/se",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/se/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/se/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/se/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/se/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/se/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/se/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/se/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/interact/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/sw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/sw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/sw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/sw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/sw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/sw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/sw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/interact/w",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/w/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/w/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/w/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/w/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/w/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/w/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/w/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/swing/e",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/e/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/e/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/e/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/e/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/e/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/swing/n",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/n/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/n/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/n/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/n/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/n/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/swing/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/ne/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/ne/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/ne/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/ne/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/ne/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/swing/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/nw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/nw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/nw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/nw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/nw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/swing/s",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/s/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/s/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/s/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/s/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/s/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/swing/se",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/se/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/se/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/se/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/se/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/se/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/swing/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/sw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/sw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/sw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/sw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/sw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/swing/w",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/w/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/w/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/w/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/w/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/w/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerelder/walk/e",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/e/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/e/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/e/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/e/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/e/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/e/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/e/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/walk/n",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/n/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/n/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/n/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/n/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/n/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/n/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/n/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/walk/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/ne/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/ne/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/ne/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/ne/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/ne/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/ne/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/ne/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/walk/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/nw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/nw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/nw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/nw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/nw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/nw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/nw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/walk/s",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/s/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/s/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/s/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/s/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/s/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/s/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/s/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/walk/se",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/se/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/se/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/se/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/se/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/se/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/se/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/se/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/walk/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/sw/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/sw/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/sw/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/sw/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/sw/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/sw/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/sw/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerelder/walk/w",
+   "frames": [
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/w/000"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/w/001"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/w/002"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/w/003"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/w/004"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/w/005"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/w/006"
+    },
+    {
+     "key": "ovl_villagerelder",
+     "frame": "scarf/villagerelder/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  }
+ ]
+}
