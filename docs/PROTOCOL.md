@@ -71,6 +71,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `inspect.noticed` | `{ lookId: string }` | Private, round 8: the look the inspector is drawn as. |
 | `inspect.hunch` | `{ copyId: string }` | Private, round 8: an `inspect.hunch.*` copy id. |
 | `shop.open` | `{ shopId: string; stock: Array<{ itemId: string; price: number }>; buys: Array<{ itemId: string; price: number }>; }` | Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. |
+| `coopHold` | `{ taskId: string; holders: number; progress: number }` | Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 

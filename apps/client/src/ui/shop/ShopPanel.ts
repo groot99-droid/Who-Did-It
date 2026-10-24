@@ -3,6 +3,8 @@ import { fill } from '../copy';
 import { SCRIP_COPY as C, shopName } from '../copy/scrip';
 import { h } from '../dom';
 import { itemName, type Panel } from '../Inventory';
+import { flash, pop, refused } from '../theme/motion';
+import { type PendingTrade, tradeLanded } from './feedback';
 import { type ShopOpen, type ShopRow, shopRows } from './rows';
 
 export interface ShopDeps {
@@ -16,12 +18,15 @@ export interface ShopDeps {
 export interface ShopPanel extends Panel {
   /** Opens the panel on the shop a `shop.open` named. */
   show(open: ShopOpen): void;
+  /** The server refused something: shakes the button of the trade still waiting, if one is. */
+  refused(): void;
 }
 
 /**
  * The shop panel (UI.md 14.34.1): the shop's name, the purse, what it sells with a Buy button and what it wants with a
  * Sell button, one at a time. Opened by `shop.open` after a `shop` hold at a counter; the server decides each trade, and
- * a refusal comes back as the usual error line. 8H animates it by its `wdi-anim-*` classes.
+ * a refusal comes back as the usual error line. 8H animates it by its `wdi-anim-*` classes; a trade that lands flashes
+ * its button and pops the purse, a refused one shakes its button (`feedback.ts`).
  */
 export function mountShop(parent: HTMLElement, deps: ShopDeps): ShopPanel {
   const title = h('h2', {});
@@ -42,6 +47,9 @@ export function mountShop(parent: HTMLElement, deps: ShopDeps): ShopPanel {
   parent.append(root);
   let open: ShopOpen | null = null;
   let shown = '';
+  let pending: PendingTrade | null = null;
+  const buttons = new Map<string, HTMLElement>();
+  const key = (side: PendingTrade['side'], itemId: string) => `${side}:${itemId}`;
 
   const line = (r: ShopRow, side: 'buy' | 'sell'): HTMLElement => {
     const button = h(
@@ -55,8 +63,11 @@ export function mountShop(parent: HTMLElement, deps: ShopDeps): ShopPanel {
       side === 'buy' ? C['shop.buy'] : C['shop.sell'],
     );
     button.addEventListener('click', () => {
-      if (open) deps[side](open.shopId, r.itemId, 1);
+      if (!open) return;
+      pending = { side, itemId: r.itemId, coins: deps.purse() };
+      deps[side](open.shopId, r.itemId, 1);
     });
+    buttons.set(key(side, r.itemId), button);
     return h(
       'li',
       { class: 'wdi-m5b__row', 'data-testid': `shop-row-${r.itemId}` },
@@ -91,6 +102,12 @@ export function mountShop(parent: HTMLElement, deps: ShopDeps): ShopPanel {
     },
     close() {
       root.hidden = true;
+      pending = null;
+    },
+    refused() {
+      const b = pending && !root.hidden ? buttons.get(key(pending.side, pending.itemId)) : undefined;
+      pending = null;
+      if (b) refused(b);
     },
     toggle() {
       if (root.hidden) panel.open();
@@ -105,11 +122,18 @@ export function mountShop(parent: HTMLElement, deps: ShopDeps): ShopPanel {
       shown = sig;
       purse.textContent = fill(C['shop.purse'], { n: coins });
       const head = (text: string) => h('li', { class: 'wdi-m5b__row wdi-hint' }, text);
+      buttons.clear();
       list.replaceChildren(
         ...(rows.stock.length ? [head(C['shop.sells']), ...rows.stock.map((r) => line(r, 'buy'))] : []),
         ...(rows.buys.length ? [head(C['shop.buys']), ...rows.buys.map((r) => line(r, 'sell'))] : []),
         ...(rows.stock.length + rows.buys.length === 0 ? [head(C['shop.none'])] : []),
       );
+      if (pending && tradeLanded(pending, coins)) {
+        const b = buttons.get(key(pending.side, pending.itemId));
+        pending = null;
+        if (b) flash(b);
+        pop(purse);
+      }
     },
     destroy() {
       root.remove();
