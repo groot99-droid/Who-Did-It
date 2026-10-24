@@ -311,6 +311,8 @@ for a selection, `-hazard` for a cue. Never a black shadow.
 | pop (`pop`; the E prompt appearing) | 200 ms, from 0.6 | `--wdi-ease-spring` | appears in place |
 | cooldown sweep (`cooldown`) | the card's cooldown | linear | kept (it is status) |
 | the E hold fill | follows the hold, smoothed over 60 ms | linear | kept, unsmoothed |
+| purse change (`.wdi-anim-purse[data-change]`, `--wdi-dur-panel`, `--wdi-rise`) | 200 ms roll of the amount, up on a gain and down on a loss; the change label springs in | `--wdi-ease-out` | the new amount and label at once |
+| coins to or from the purse (`--wdi-dur-slow`) | 360 ms, three coins flying in on a gain with a warm glow, out on a loss | `--wdi-ease-in` in, `--wdi-ease-out` out | none |
 | scene cover into the world, per portal (`view/Transition.ts` `portalTransition`) | `balance.ui.transitionS.fade` (GDD 3.13) | ease-in-out | a cut |
 | toast, dialog, stamp rise | 220 ms | `--wdi-ease` | appears in place |
 | the card flip | 600 ms | `--wdi-ease` | swap, no rotation |
@@ -352,6 +354,14 @@ clockwise over the card's cooldown. Each restarts its animation on every call an
 (8A's strike button flashes and cools, 8C's shop buttons flash); the world scene's error handler calls
 `refusedIn(overlay)`, which shakes whichever E prompt is showing as the refusal toast appears. The E prompt pops in as it
 appears and its bar fills smoothly while E is held; a task's mini-game opens with the panel entrance.
+
+Economy HUD (8H, A143). 8C's purse counter (14.34.2) carries `.wdi-anim-purse` and, for the moment its change
+shows, `[data-change="gain"|"loss"]`. The 8H block rolls the amount in from below on a gain and from above on a loss,
+springs the change label in (mustard on a gain; a loss keeps the counter's warm colour, since `--wdi-danger` is for
+paper), glows the pill warm on a gain, and draws three coins flying into the pill on a gain (a wage, a sale) or out of it
+on a loss (a buy). A wage, a shop sale and a shop buy all reach the purse as a change, so the counter's motion covers
+them; the shop's own buttons flash or shake through `flash` and `refused`. `motion.test.ts` holds the hook names
+against `PurseHud.ts`.
 
 Transitions and transport (8H, A143). The World's cover follows the portal the seat came through (GDD
 3.13): `wipe` for a door, `iris` for a level stair or crawl, `climbUp` and `climbDown` (the iris with
