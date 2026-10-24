@@ -4,6 +4,9 @@
     python3 tools/blender/materials/fetch.py lock      # rebuild polyhaven.lock.json from the API for every role's slug
     python3 tools/blender/materials/fetch.py credits   # the CREDITS.md rows of the lock
 
+A run without `--roles` or `--slugs` also fetches the HDRIs of `roles.HDRIS` (the PBR finish's sky, `pbr.py`),
+unless `--style` names a style that does not read them (8-bit, low poly).
+
 Stdlib only. Downloads carry the user agent `who-did-it-build` (the API's one ask). A file already in the cache
 with the locked md5 is kept; one with another hash is fetched again; a download whose hash does not match the
 lock is deleted and the run fails. Nothing here is called at render time beyond a missing file.
@@ -128,11 +131,29 @@ def lock_asset(slug: str, api: str = API) -> dict:
     return entry
 
 
+def lock_hdri(slug: str, api: str = API) -> dict:
+    """One HDRI's lock entry from the API: name, authors and the `.hdr` at `roles.HDRI_RESOLUTION`."""
+    files = json.loads(get(f"{api}/files/{slug}"))
+    info = json.loads(get(f"{api}/info/{slug}"))
+    res = roles.HDRI_RESOLUTION
+    f = files["hdri"][res]["hdr"]
+    return {"source": "polyhaven", "type": "hdri", "name": info["name"], "authors": info["authors"],
+            "files": {res: {"hdr": {"file": roles.hdri_file(slug, res), "md5": f["md5"], "size": f["size"],
+                                    "url": f["url"]}}}}
+
+
+def hdri_slugs() -> list[str]:
+    return sorted(set(roles.HDRIS.values()))
+
+
 def write_lock(path: str = roles.LOCK_FILE, api: str = API, log=print) -> dict:
     lock = {"version": LOCK_VERSION, "userAgent": roles.USER_AGENT, "sources": SOURCE, "assets": {}}
     for slug in roles.slugs():
         lock["assets"][slug] = lock_asset(slug, api)
         log(f"lock: {slug} ({', '.join(roles.roles_of(slug))})")
+    for slug in hdri_slugs():
+        lock["assets"][slug] = lock_hdri(slug, api)
+        log(f"lock: {slug} (hdri)")
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(dump_lock(lock))
     return lock
@@ -160,8 +181,11 @@ def credits_rows(lock: dict) -> list[str]:
     for slug, a in sorted(lock["assets"].items()):
         authors = ", ".join(sorted(a["authors"]))
         site = lock["sources"][a["source"]]["site"]
+        uses = ", ".join(f"`{r}`" for r in roles.roles_of(slug))
+        if a.get("type") == "hdri":
+            uses = "the world fill of the PBR finish (`materials/pbr.py`)"
         rows.append(f"| `{slug}` | {a['name']} | {authors} | {site}/a/{slug} | {lock['sources'][a['source']]['licence']} "
-                    f"| {', '.join(f'`{r}`' for r in roles.roles_of(slug))} |")
+                    f"| {uses} |")
     return rows
 
 
@@ -192,6 +216,9 @@ def main(argv: list[str] | None = None) -> None:
         slug_list = roles.slugs()
     res_list = a.res.split(",") if a.res else [roles.STYLE_RESOLUTION[a.style]] if a.style else list(roles.RESOLUTIONS)
     counts = fetch(slug_list, res_list, a.maps.split(","), a.cache, a.lock, a.base_url)
+    if not (a.slugs or a.roles) and a.style in (None, "hd"):
+        more = fetch(hdri_slugs(), [roles.HDRI_RESOLUTION], ["hdr"], a.cache, a.lock, a.base_url)
+        counts = {k: counts[k] + more[k] for k in counts}
     print(f"materials: {counts['fetched']} fetched, {counts['kept']} already in {a.cache}")
 
 

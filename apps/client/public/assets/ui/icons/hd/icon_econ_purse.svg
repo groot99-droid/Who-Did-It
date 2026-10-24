@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Purse: a leather pouch drawn shut, a brass bead on its string. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g1" data-flat="#744733" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#94603F"/><stop offset="1" stop-color="#744733"/></linearGradient>
+  <linearGradient id="g2" data-flat="#744733" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#94603F"/><stop offset="1" stop-color="#744733"/></linearGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<path d="M16,13 L32,13 L30,19 L18,19 Z" fill="url(#g2)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M18,19 C8,24 7,41 24,42 C41,41 40,24 30,19 Z" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="16" y1="19" x2="32" y2="19" stroke="#12141C" stroke-width="2.4" stroke-linecap="round"/>
+<line x1="31" y1="19" x2="36" y2="26" stroke="#12141C" stroke-width="1.6" stroke-linecap="round"/>
+<circle cx="37" cy="27.5" r="2.6" fill="#F2B33D" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path class="flat" display="none" d="M30,22 C36,26 37,36 30,40 C34,34 34,27 30,22 Z" fill="#55332A"/>
+<ellipse class="hd" cx="17" cy="27" rx="2" ry="3.4" fill="#FFF1DC" opacity="0.5"/>
+</svg>

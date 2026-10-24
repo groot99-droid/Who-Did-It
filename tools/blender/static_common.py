@@ -63,10 +63,14 @@ def setup() -> bpy.types.Scene:
         from materials import hd
 
         hd.apply(scene, rim_amount=rc.HD["rimAmountWorld"])
-        if os.environ.get("WDI_HD_PBR"):  # the rough PBR + HDRI look of the owner's look sheet
+        if os.environ.get("WDI_HD_PBR"):  # the PBR finish of the buildings and the kit (A164)
             from materials import pbr
 
             pbr.apply(scene)
+        elif os.environ.get("WDI_HD_SKY"):  # the PBR sky under the toon HD: the A164 ambient test
+            from materials import pbr
+
+            pbr.sky(scene)
     return scene
 
 

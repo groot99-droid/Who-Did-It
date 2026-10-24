@@ -20,7 +20,9 @@
     "world": "tsx world.ts",
     "review:world": "tsx review-world.ts",
     "lineup": "tsx lineup.ts",
-    "m5b": "tsx m5b.ts"
+    "m5b": "tsx m5b.ts",
+    "icons": "tsx icons-build.ts",
+    "icons:sheet": "tsx icons-sheet.ts"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
