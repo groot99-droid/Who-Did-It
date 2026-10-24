@@ -1,0 +1,19 @@
+/* UI.md 14.36.1 the mugging prompt (Session 8E): a veil over the world and one glass panel; the theme supplies the
+   scrim, the glass and the buttons, 8H the motion classes. */
+.wdi-mug__panel {
+  width: min(100%, 22rem);
+  text-align: center;
+}
+.wdi-mug__timer {
+  margin: 0;
+  color: var(--wdi-night-text);
+  font-family: var(--wdi-font-pixel-display);
+  font-size: var(--wdi-text-sm);
+  font-synthesis: none;
+  text-transform: uppercase;
+}
+.wdi-mug__choices {
+  display: flex;
+  justify-content: center;
+  gap: var(--wdi-space-3);
+}

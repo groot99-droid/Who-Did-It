@@ -616,6 +616,10 @@ export class MockWorldFeed implements WorldFeed {
     });
   }
 
+  mug(_choice: 'pay' | 'fight' | 'flee'): void {
+    // The mock has no townsfolk, so nothing mugs.
+  }
+
   dispose(): void {
     if (this.timer !== null) window.clearInterval(this.timer);
     this.timer = null;

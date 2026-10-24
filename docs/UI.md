@@ -1425,6 +1425,19 @@ Lines are in `apps/client/src/ui/copy/townsfolk.ts` (`TOWNSFOLK_COPY`, `figureNa
 | `meeting.townsfolk.lost.one` | The wolves took one of the townsfolk. | the meeting text when one figure died since the last meeting |
 | `meeting.townsfolk.lost.many` | The wolves took {n} of the townsfolk. | the meeting text when more did; `{n}` is the count |
 
+#### 14.36.1 The mugging prompt
+
+Lines are in `apps/client/src/ui/copy/mug.ts` (`MUG_COPY`); the panel is `apps/client/src/ui/mug/MugPrompt.ts` (`mountMugPrompt(root, feed, send)`), mounted by the World scene once the `mugPrompt` feed event lands. A private `mugPrompt { muggerId, endsTick }` (GDD 3.24) opens it over the world: a veil, and a glass panel with the mugger's name (`figureName` for a villager look, the character's name for any other look; a handle no avatar wears reads as a villager), the hint, the seconds left until `endsTick` by the feed clock (refreshed four times a second; at zero the panel closes by itself, the server having taken its share), and the choices. A choice sends `act.mug { choice }` and closes the panel; a second prompt replaces the first. Part one (DECISIONS A180) offers Pay alone; Run and Fight join the panel with the fists. Motion: the panel carries 8H's `wdi-anim-panel`, the veil `wdi-anim-veil` and the choice row `wdi-anim-list`, and nothing else of 8H's.
+
+| Key | Text | Where |
+|---|---|---|
+| `mug.title` | {name} wants your purse. | the panel title; `{name}` is the mugger's nameplate |
+| `mug.hint` | Pay a share of your purse. | under the title |
+| `mug.timer` | {s} s to choose | the countdown; `{s}` is the seconds left |
+| `mug.pay` | Pay | the Pay button |
+| `mug.flee` | Run | the Run button, part two |
+| `mug.fight` | Fight | the Fight button, part two |
+
 ### 14.38 Tasks: the chores panel, the station prompts and the village's work (7M)
 
 Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt at Start gets its screen half in the M5b layer (14.19): nothing here changes the layer's gather, craft or quest behaviour, and `ui/theme/**` is not edited; the new rules live in `ui/match.css`.

@@ -149,6 +149,8 @@ export type WorldFeedEvents = {
   coopHold: { taskId: string; holders: number; progress: number };
   /** Private, round 8 (8R, GDD 3.12): an NPC shouted for a body here; to the nearest Detective and Doctor only. */
   shout: S2CPayloads['shout'];
+  /** Private, round 8 (8E, GDD 3.24): a mugger's demand; `muggerId` is its avatar handle, the answer is due by `endsTick`. */
+  mugPrompt: { muggerId: string; endsTick: number };
 };
 
 /** Round 6 (M5b): a resource node of the scene this client is in (`SceneState.nodes`). */
@@ -263,6 +265,8 @@ export interface WorldFeed {
   minigameResult(taskId: string, answer: unknown): void;
   /** Round 8 (8B): `act.inspect { targetId }`, an avatar handle in reach. */
   inspect(targetId: string): void;
+  /** Round 8 (8E, GDD 3.24): the answer to a `mugPrompt` (`act.mug`). */
+  mug(choice: 'pay' | 'fight' | 'flee'): void;
   /**
    * True once this player has been killed or their roster `alive` is false. Held here, never in the
    * scene, so it survives World restarts; resets when the phase returns to the lobby.

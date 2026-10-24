@@ -40,6 +40,7 @@ import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
 import { mountShopLayer, type ShopLayer } from '../ui/shop/ShopLayer'; // round 8, 8C (locked)
 import { type CivicLayer, mountCivicLayer } from '../ui/econ/CivicLayer'; // round 8, 8D
 import { mountPurseHud, type PurseHud } from '../view/purse/PurseHud'; // round 8, 8C (locked)
+import { type MugPrompt, mountMugPrompt } from '../ui/mug/MugPrompt';
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
@@ -148,6 +149,7 @@ export class World extends Phaser.Scene {
   private shop: ShopLayer | null = null; // round 8, 8C (locked)
   private civic: CivicLayer | null = null; // round 8, 8D
   private purse: PurseHud | null = null; // round 8, 8C (locked)
+  private mug: MugPrompt | null = null;
   private cutscenes!: CutscenePlayer;
   private ground: GroundView | null = null;
   private bell: { x: number; y: number } | null = null;
@@ -245,6 +247,8 @@ export class World extends Phaser.Scene {
     this.lighting = new Lighting(this, overlayRoot());
     this.lighting.setScene(sceneLights(this.map.lights), this.map.dark);
     this.sheet = new NotebookSheet(overlayRoot(), feed);
+    // Round 8 (8E, GDD 3.24): the mugging prompt, opened by the private `mugPrompt`.
+    this.mug = mountMugPrompt(overlayRoot(), feed, (choice) => feed.mug(choice));
     this.audio = this.registry.get(REG_AUDIO) ?? new AudioBus();
     if (!this.registry.has(REG_AUDIO)) {
       this.registry.set(REG_AUDIO, this.audio);
@@ -350,6 +354,7 @@ export class World extends Phaser.Scene {
       this.shop?.destroy(); // round 8, 8C (locked)
       this.civic?.destroy(); // round 8, 8D
       this.purse?.destroy(); // round 8, 8C (locked)
+      this.mug?.destroy();
       this.cutscenes.destroy();
       this.ground?.destroy();
       this.ground = null;

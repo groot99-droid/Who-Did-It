@@ -111,6 +111,7 @@ export class ColyseusWorldFeed implements WorldFeed {
     room.onMessage('shop.open', (m: WorldFeedEvents['shopOpen']) => this.bus.emit('shopOpen', m));
     room.onMessage('coopHold', (m: WorldFeedEvents['coopHold']) => this.bus.emit('coopHold', m));
     room.onMessage('shout', (m: WorldFeedEvents['shout']) => this.bus.emit('shout', m)); // round 8, 8R
+    room.onMessage('mugPrompt', (m: WorldFeedEvents['mugPrompt']) => this.bus.emit('mugPrompt', m));
   }
 
   /** Set by the private `killed` message or a false roster `alive`; cleared when the lobby returns. */
@@ -384,6 +385,10 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   inspect(targetId: string): void {
     this.room.send('act.inspect', { targetId });
+  }
+
+  mug(choice: 'pay' | 'fight' | 'flee'): void {
+    this.room.send('act.mug', { choice });
   }
 
   dispose(): void {

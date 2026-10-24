@@ -980,7 +980,7 @@ light burning in the target's hand (`lightMul`) lower it. A figure walks up to w
 `reachTiles` (giving up after `approachS`); an NPC seat mugs only a seat already within reach until its walk-up
 lands (A180, open). The mugger stands and threatens for `threatS` (the `threaten` clip on a figure; an NPC seat
 holds its mood idle until 8A's one-shot slot lands), then the target has `answerS` to answer by the private prompt
-(UI 14.37):
+(UI 14.36.1):
 - **Pay**: `share` of the purse (rounded, at least one Scrip) moves to the mugger through 3.23's one function; a
   figure's takings sit in its `@figure:<id>` account. Banked Scrip is safe.
 - **Silence**: the share is taken when the answer runs out (the strike, once the fists land).
