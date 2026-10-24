@@ -172,6 +172,7 @@
     "goat": 4,
     "wispRattle": 2,
     "shot": 10,
+    "shout": 8,
     "portalFactor": 0.5,
     "gddRef": "3.7"
   },
