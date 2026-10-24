@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { TILE_PX } from '@wdi/shared/constants';
 import { ISO_TILE_W } from '@wdi/shared/iso';
+import { texelsOf } from './texels';
 import { groundColour, materialOfGid, shade, tokenColour } from './greyboxColours';
 import { DEPTH, sceneDiamond, tileDiamond } from './iso';
 import type { SceneMap } from './sceneMap';
@@ -36,7 +37,11 @@ export class GroundView {
   private tiled(scene: Phaser.Scene, mapKey: string, tilesetKey: string): void {
     const tm = scene.make.tilemap({ key: mapKey });
     this.tilemap = tm;
-    const set = tm.addTilesetImage(tilesetKey, tilesetKey, ISO_TILE_W, TILE_PX, 0, 0);
+    // An HD tileset holds `texels` times larger cells (A164): the map is laid out at that cell and the layers are
+    // scaled back, so every tile still covers one 128 x 64 diamond of the world.
+    const t = texelsOf(tilesetKey);
+    if (t !== 1) tm.setBaseTileSize(ISO_TILE_W * t, TILE_PX * t);
+    const set = tm.addTilesetImage(tilesetKey, tilesetKey, ISO_TILE_W * t, TILE_PX * t, 0, 0);
     if (!set) return;
     // Phaser places an isometric tile's image at its left edge; the projection puts the top vertex at x (10.12).
     const layers: Array<[string, number]> = [
@@ -47,7 +52,7 @@ export class GroundView {
     for (const [name, depth] of layers) {
       const layer = tm.createLayer(name, set, -ISO_TILE_W / 2, 0);
       if (layer) {
-        layer.setDepth(depth);
+        layer.setDepth(depth).setScale(1 / t);
         this.objects.push(layer);
       }
     }

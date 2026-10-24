@@ -153,6 +153,10 @@ export class ColyseusMeetingFeed implements MeetingFeed {
     this.room.send('chat.say', { text });
   }
 
+  note(text: string): void {
+    this.room.send('chat.note', { text });
+  }
+
   dispose(): void {
     for (const off of this.offs) off();
     this.offs.length = 0;

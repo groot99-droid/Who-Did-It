@@ -38,6 +38,7 @@ seat and press act to **inspect** it, which can raise suspicion depending on the
 | [seams.md](seams.md) | What the sessions share: the wire (schema version 6), the status bits, the animation ids, the effect ids, the bus events, the locked one-line hooks and who owns which path | all |
 | [teardown.md](teardown.md) | The owner's teardown answers (A168): anti-cheat, the rules changes (match length, the Final Night, card text from the data), every icon drawn, the canon pass's timing, and the process changes | 8L, 8M, 8N, 6Z |
 | [living.md](living.md) | The living world (A173, A174): the world index, mob habitats, the NPC hive and its triggers, NPC roles and abilities, meeting notes and AI talk, briarberry | 8Q, 8R, 8S, 8T, 8U |
+| [stations.md](stations.md) | The station widgets (A200): the owner's ask and questionnaire answers verbatim, the audit of every station, the well as set, the reader and the lore data, the PR split S0 to S8 | 7M |
 
 **Re-scoped roadmap** (A135): ROADMAP R8 becomes "Bodies, coin, motion and art" (this round); evolutions, the law
 pipeline and Port-au-Levain move to R9; the old R9 (world events, propagation, BlackPine industry, story mode)

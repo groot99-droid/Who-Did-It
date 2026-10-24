@@ -102,6 +102,7 @@ export class ColyseusWorldFeed implements WorldFeed {
       room.onMessage(type, (m: never) => this.bus.emit(type, m));
     // Round 8, 8C (locked): the shop a `shop` hold opened.
     room.onMessage('shop.open', (m: WorldFeedEvents['shopOpen']) => this.bus.emit('shopOpen', m));
+    room.onMessage('coopHold', (m: WorldFeedEvents['coopHold']) => this.bus.emit('coopHold', m));
   }
 
   /** Set by the private `killed` message or a false roster `alive`; cleared when the lobby returns. */

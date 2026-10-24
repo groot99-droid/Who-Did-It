@@ -50,7 +50,7 @@ export function parseFootprint(text: unknown): Footprint | null {
 }
 
 /** The atlases a map's props are looked up in, in order (SPRITES 10.13). */
-const propAtlases = (ctx: DefContext) => [`props_${ctx.mapId}`, 'props'];
+export const propAtlases = (ctx: DefContext) => [`props_${ctx.mapId}`, `bld_${ctx.mapId}`, 'props'];
 
 /** The first `(atlas, frame)` that exists, atlases in lookup order and frames in the order given. */
 function find(ctx: DefContext, frames: string[]): { atlas: string; frame: string } | null {

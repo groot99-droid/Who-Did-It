@@ -83,6 +83,7 @@ export const S2C = {
   inspectHunch: 'inspect.hunch',
   /** Round 8 (GDD 3.23, 8C): a `shop` hold opened a shop; sent by Session 8C. */
   shopOpen: 'shop.open',
+  coopHold: 'coopHold',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
@@ -364,6 +365,8 @@ export interface S2CPayloads {
     stock: Array<{ itemId: string; price: number }>;
     buys: Array<{ itemId: string; price: number }>;
   };
+  /** Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. */
+  coopHold: { taskId: string; holders: number; progress: number };
 }
 
 export type ErrorPayload = S2CPayloads['error'];

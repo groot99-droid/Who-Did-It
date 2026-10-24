@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { choreLine, choreRows, taskPrompt, taskSpots, type TaskSpot } from './tasks';
+import { takesUse } from './M5bLayer';
+import { choreLine, choreRows, coopPrompt, taskPrompt, taskSpots, type TaskSpot } from './tasks';
 
 // Round 7, 7M (GDD 3.5, UI.md 14.38): the pure helpers of the task prompt and the chores panel.
 
@@ -7,6 +8,7 @@ const PROPS: Record<string, { x: number; y: number }> = {
   'as.bench': { x: 100, y: 200 },
   'ov.pump': { x: 300, y: 400 },
   'ov.lantern_0': { x: 500, y: 600 },
+  'tb.shutters': { x: 700, y: 800 },
 };
 const propAt = (id: string) => PROPS[id] ?? null;
 const none = () => false;
@@ -32,6 +34,40 @@ describe('taskSpots', () => {
       taskSpots([{ id: 'lightLanterns', done: false, fake: false }], 'overworld', propAt, none),
     ).toMatchObject([{ taskId: 'lightLanterns', step: 'target', x: 500, y: 600, nightOnly: true }]);
     expect(taskSpots([{ id: 'nope', done: false, fake: false }], 'overworld', propAt, none)).toEqual([]);
+  });
+});
+
+describe('the co-op spot (GDD 3.5 "Shutter the windows")', () => {
+  it('offers the shutters to every seat in the tavern, with the task on its list or not, within its own radius', () => {
+    const [spot] = taskSpots([], 'tavern_bar', propAt, none);
+    expect(spot).toMatchObject({
+      taskId: 'shutterWindows',
+      step: 'coop',
+      x: 700,
+      y: 800,
+      fake: false,
+      players: 2,
+      reach: 2 * 64,
+    });
+    expect(
+      taskSpots([{ id: 'shutterWindows', done: false, fake: true }], 'tavern_bar', propAt, none),
+    ).toMatchObject([{ step: 'coop', fake: true }]);
+    expect(taskSpots([], 'overworld', propAt, none)).toEqual([]);
+    expect(taskPrompt(spot!, none, false)).toBe('Hold E: Shutter the windows (takes 2)');
+  });
+  it('says how many hands are on it while holding, and takes the release to let go', () => {
+    expect(coopPrompt(1, 2)).toBe('Waiting for hands: 1 of 2');
+    expect(coopPrompt(2, 2)).toBe('Keep holding: 2 of 2');
+    expect(takesUse(false, null, 'task')).toBe(true);
+    expect(takesUse(false, null, 'craft')).toBe(false);
+  });
+  it('lists it in the chores with the hands it takes', () => {
+    const [row] = choreRows([{ id: 'shutterWindows', done: false, fake: false }], none);
+    expect(row).toMatchObject({ step: 'coop', players: 2, to: ['tavern_bar'] });
+    expect(choreLine(row!, (id) => (id === 'tavern_bar' ? 'The Tavern' : id))).toBe(
+      'Takes 2 hands, at The Tavern',
+    );
+    expect(choreRows([{ id: 'shutterWindows', done: true, fake: false }], none)[0]?.step).toBe('done');
   });
 });
 
