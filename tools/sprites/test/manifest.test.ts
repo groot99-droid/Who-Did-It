@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { artStyles, finishEnabled } from '../palette.ts';
@@ -96,5 +96,22 @@ describe('asset manifests (docs/SPRITES.md 5, 10.13)', () => {
   it('list the props and vfx atlases', () => {
     const keys = placeholder.entries.map((e) => e.key);
     expect(keys).toEqual(expect.arrayContaining(['props', 'vfx', 'anims_vfx']));
+  });
+});
+
+describe('character atlas json (A161, #184 request 4)', () => {
+  const roots = [...artStyles().map((s) => s.root), 'placeholder/'];
+  it('is written on one line in every style, so a re-pack never grows the first load back', () => {
+    const files = roots.flatMap((root) =>
+      readdirSync(join(ASSETS, root, 'chars'))
+        .filter((f) => /^(char|ovl)_[a-z0-9]+\.json$/.test(f))
+        .map((f) => join(root, 'chars', f)),
+    );
+    expect(files.length).toBeGreaterThan(0);
+    for (const f of files) {
+      const text = readFileSync(join(ASSETS, f), 'utf8');
+      expect(text.slice(0, -1), f).not.toContain('\n');
+      expect(JSON.parse(text).textures.length, f).toBeGreaterThan(0);
+    }
   });
 });
