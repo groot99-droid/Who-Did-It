@@ -330,7 +330,7 @@ describe('what a kill leaks (ARCHITECTURE 5.4, scoped to M3)', () => {
       new RegExp(`^players\\.${v.id}\\.presence`), // the ghost's presence may stop arriving (K, Visibility)
     ];
     expect(dWitness.filter((p) => !allowed.some((re) => re.test(p)))).toEqual([]);
-    expect(avatarsHeld(witness).find((a) => a.avatar.lookOf === k.id)?.avatar.statusBits).toBe(
+    expect(avatarsHeld(witness).find((a) => a.avatar.lookOf === k.id)?.avatar.nearBits).toBe(
       StatusBit.bloody,
     );
     const body = stateOf(witness).scenes.get('tavern_bar')!.bodies.get(`body_${v.id}`);
