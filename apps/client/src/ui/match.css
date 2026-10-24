@@ -624,3 +624,29 @@
     transition: none;
   }
 }
+
+/* Round 7 (7M PR 5, the UDGT teardown's findings, A151 (4)). A mini-game is play under time pressure, so its
+   title and controls read in the display face, not the pixel one ("pixel on menus, not in matches", 2026-10-23);
+   the task's name sits under the title; on a touch screen every control is a full touch target. */
+.wdi-m5b__modal .wdi-m5b__head h2,
+.wdi-m5b__modal .wdi-btn {
+  font-family: var(--wdi-font-display);
+  letter-spacing: 0.02em;
+}
+
+.wdi-m5b__modal .wdi-m5b__sub {
+  margin: 0;
+  color: var(--wdi-night-label);
+}
+
+.wdi-m5b__modal .wdi-m5b__stage .wdi-btn {
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+@media (pointer: coarse) {
+  .wdi-m5b__modal .wdi-btn--sm {
+    min-height: var(--wdi-touch);
+  }
+}

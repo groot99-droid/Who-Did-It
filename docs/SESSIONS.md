@@ -3515,6 +3515,9 @@ an existing `apps/server/test/*.test.ts`, anything written into ROSW.
   client, UI.md 14.38): the co-op spot offered to every seat at the shutters (`ui/tasks.ts`), the held `task` hold in
   `M5bLayer.ts` with the prompt and bar fed by `coopHold` (`WorldFeedEvents.coopHold`, both feeds; the mock plays a
   phantom second hand), the chores row, the copy; tests in `ui/tasks.test.ts`.
+- 2026-10-24: PR 5 (the stations and the polish, A151 (4)): a `skin` per `minigames.json` row (zod, `view/minigames/skin.ts`
+  with `skin.test.ts`), the widgets and the copy name the station's objects, the modal shows the task's name; the
+  teardown's readability, touch and reduced-motion findings in `docs/round7/minigames.md`, with the CSS in `ui/match.css`.
 - Read from ROSW (never written): the UDGT teardown chapters 00 to 03 on `claude/sweet-maxwell-lmsiw3`, and the Who Did It lore
   on `claude/sharp-mccarthy-pqi3ws` (the Canon Ledger, the Lamplighter's Round, the Gazette, the Tab Book, Fourteen Things, the
   Daybook of Crumb's Ovens, Hopscotch, three stories). Drifts noted for 6Z, not resolved here: the lore dates HollowMere to 1893

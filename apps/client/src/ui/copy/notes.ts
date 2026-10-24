@@ -8,4 +8,5 @@ export const NOTES_COPY = {
   'notes.send': 'Pin the note',
   'notes.empty': 'No notes yet',
   'notes.ghost': 'The dead leave no notes',
+  'meeting.reason.final': 'The Final Night: the village must choose',
 } as const;
