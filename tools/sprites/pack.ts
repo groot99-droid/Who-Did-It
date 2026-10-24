@@ -94,15 +94,16 @@ export async function packFrames(
   // The packer's extrude resizes edge strips bilinearly, which adds partial alpha and off-palette colours.
   // Finished frames (the pixel finish on: alpha 0 or 255, drawn with nearest filtering) pack without it;
   // the padding alone keeps them apart. Unfinished art keeps the extrude, byte for byte as before, except a
-  // `tight` set (a character's pages, A161): the round-8 clip table fills a 1024² body page to 0.9 in the 8-bit
-  // style and the low-poly frames' soft edges spill it, so those pack without the extrude and at padding 1, which
-  // keeps the neighbour's texel out of the bilinear footprint (no mipmaps) and, alpha-bled and premultiplied,
-  // draws without a fringe.
+  // `tight` set (a character's pages, A161): the round-8 clip table fills a 1024² body page past 0.9 at padding 2
+  // in either style (the Vicar's robe spilled eight frames in the 8-bit style), so those pack without the extrude
+  // and at padding 1, which is a whole texel between neighbours under nearest filtering, and under linear
+  // filtering (no mipmaps) keeps the neighbour's texel out of the bilinear footprint, so an alpha-bled and
+  // premultiplied low-poly frame draws without a fringe.
   const finished = finishEnabled('main') && inputs.every((i) => !hasPartialAlpha(decodePng(i.png)));
   const out = await packAsync(files, {
     ...PACK_OPTIONS,
     extrude: finished || tight ? 0 : PACK_OPTIONS.extrude,
-    padding: tight && !finished ? 1 : PACK_OPTIONS.padding,
+    padding: tight ? 1 : PACK_OPTIONS.padding,
     width: page.w,
     height: page.h,
     textureName,

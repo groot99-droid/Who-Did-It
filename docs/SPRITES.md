@@ -79,11 +79,12 @@ neither at boot nor with the match, SPRITES 5), and `view/assets.ts` `loadLazyLo
 frame a figure of that look needs one of them; until they arrive `PlayerView` plays the fallback of `poses.ts`.
 The pair is transient and outside the resident cap of 10.14.
 
-The table fills a look's 1024² body page to about 0.9 in the 8-bit style, and the low-poly frames' soft edges
-(about 5 % more trimmed area a frame) spill it with the packer's extrude; so a character's pages pack `tight`
-(`pack.ts` `packFrames`): with the finish on as before (no extrude, padding 2), with it off without the extrude and
-at padding 1, which keeps the neighbour's texel out of the bilinear footprint (no mipmaps) and, alpha-bled and
-premultiplied, draws without a fringe. A low-poly body that still spills its 1024² page takes one 1024 x 2048 page
+The table fills a look's 1024² body page past 0.9 at padding 2 in either style (the Vicar's robe spilled eight
+frames in the 8-bit style; the low-poly frames' soft edges, about 5 % more trimmed area a frame, spill it with the
+packer's extrude); so a character's pages pack `tight` (`pack.ts` `packFrames`): no extrude and padding 1 in both
+styles. Under nearest filtering (the finish on) that is a whole texel between neighbours; under linear filtering
+(no mipmaps) it keeps the neighbour's texel out of the bilinear footprint, so an alpha-bled and premultiplied
+low-poly frame draws without a fringe. A low-poly body that still spills its 1024² page takes one 1024 x 2048 page
 (0.5 page-equivalents instead of 0.25; 6Z's decision of 2026-10-24, inside the cap of 9 of 10.14); the 8-bit bodies
 and every overlay and lazy page keep their caps. The world atlases keep 10.3's settings.
 
@@ -711,7 +712,7 @@ re-rendered by `IsoCam` under the same keys.
 colour, and a 2 x 2 mode downscale keeps one-pixel lines; alpha bleed is harmless and no longer needed under
 nearest filtering. With it off, a 2 x 2 box downscale keeps partial alpha and the frames are alpha-bled
 (`bleed.ts`) for linear filtering. Either way, frames are packed with trim and padding 2, and cells, pivots and
-packed sizes are the same; the one exception is a character's pages with the finish off (section 3, A161): no
+packed sizes are the same; the one exception is a character's pages in either style (section 3, A161): no
 extrude and padding 1, so the round-8 clip table fits the body page. The ground tileset, `clues` and `vfx` are drawn at display size: finished, then
 doubled with nearest scaling (or, with the finish off, shipped at the display scale).
 
