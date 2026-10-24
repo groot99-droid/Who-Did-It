@@ -95,20 +95,20 @@ describe('taskPrompt', () => {
 });
 
 describe('choreRows and choreLine', () => {
-  const name = (id: string) => ({ apoth_shop: 'Mallory Apothecary', overworld: 'Hollowmere' })[id] ?? id;
+  const name = (id: string) => ({ apoth_shop: 'Mallory Apothecary', overworld: 'HollowMere' })[id] ?? id;
   it('steps a real task from fetch to bring to done, and a fake one straight to its station', () => {
     const [fetch] = choreRows([{ id: 'fixPump', done: false, fake: false }], none);
     expect(fetch).toMatchObject({ step: 'fetch', from: 'apoth_shop', to: ['overworld'], tool: 'wrench' });
     expect(choreLine(fetch!, name)).toBe('Fetch the Wrench from Mallory Apothecary');
     const [bring] = choreRows([{ id: 'fixPump', done: false, fake: false }], wrench);
     expect(bring?.step).toBe('bring');
-    expect(choreLine(bring!, name)).toBe('Bring it to Hollowmere');
+    expect(choreLine(bring!, name)).toBe('Bring it to HollowMere');
     const [done] = choreRows([{ id: 'fixPump', done: true, fake: false }], none);
     expect(done?.step).toBe('done');
     expect(choreLine(done!, name)).toBe('Done');
     const [show] = choreRows([{ id: 'fixPump', done: false, fake: true }], none);
     expect(show).toMatchObject({ step: 'bring', fake: true });
-    expect(choreLine(show!, name)).toBe('Go to Hollowmere');
+    expect(choreLine(show!, name)).toBe('Go to HollowMere');
   });
   it('skips ids the content does not know', () => {
     expect(choreRows([{ id: 'nope', done: false, fake: false }], none)).toEqual([]);

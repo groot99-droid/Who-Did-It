@@ -57,7 +57,7 @@ import { mapStatics } from '../view/mapDefs';
 import { isTouchDevice, readDevFlags } from '../view/devFlags';
 import { DEPTH, cameraBounds, decalHolder, isoZoom, sceneDiamond, tileDiamond } from '../view/iso';
 import { type SceneMap, type TiledMap, readSceneMap } from '../view/sceneMap';
-import { loadSceneName } from '../view/sceneNames';
+import { loadMapName, loadSceneName } from '../view/sceneNames';
 import { nearestAvatar } from '../view/targets';
 import { DEFAULT_MAP_ID } from '../net/protocol';
 import { REG_AUDIO, REG_CUTSCENE, getFlags, getNet } from './registry';
@@ -243,7 +243,9 @@ export class World extends Phaser.Scene {
     bodyMotion(this.bodyHud.root); // round 8, 8H (locked): hit flash, fresh and cured effect chips (UI.md 9)
     this.hud.setChip((this.registry.get(REG_ROLE_CHIP) as HudChip | undefined) ?? null);
     this.purse = mountPurseHud(this, feed, this.hud.root.querySelector('.wdi-hud__tl') ?? this.hud.root); // round 8, 8C (locked)
-    void loadSceneName(this.sceneId).then((scene) => this.hud.say(fill(C['hud.scene'], { scene }), 1500));
+    void Promise.all([loadMapName(this.matchMap()), loadSceneName(this.sceneId)]).then(([map, scene]) =>
+      this.hud.say(fill(C['hud.scene'], { map, scene }), 1500),
+    );
     this.hud.onNotebook(() => this.sheet.toggle());
     this.lighting = new Lighting(this, overlayRoot());
     this.lighting.setScene(sceneLights(this.map.lights), this.map.dark);

@@ -1,7 +1,7 @@
 // UI.md 14.11 landing and lobby lines, and the 14.13 NPC lobby lines until Y's rows land (Session V, round 4).
 // Values in braces are filled with `fill()`.
 export const LOBBY_COPY = {
-  'landing.eyebrow': 'Hollowmere, after dark',
+  'landing.eyebrow': 'HollowMere, after dark',
   'landing.title': 'Gather your party',
   'landing.title.invited': 'You are invited',
   'landing.name.label': 'Your name',

@@ -1,7 +1,7 @@
 {
   "id": "bp_mine",
   "prefix": "bm",
-  "name": "Blackpine Workings",
+  "name": "BlackPine Workings",
   "zoneId": "bp_mine",
   "profile": "small",
   "kind": "interior",
