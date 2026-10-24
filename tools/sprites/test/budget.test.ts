@@ -6,10 +6,12 @@ import { hasManifest, type Page, realPages } from './realAssets.ts';
 /**
  * Art plan 1.4 (SPRITES 10.14): the page caps, the resident limit and the DOM byte caps, for each art style
  * separately (1.9: one style is resident at a time). The resident cap went from 6 to 8 page-equivalents in round 8
- * (DECISIONS A141, 6Z's ruling): the four-heads figures' overlay pages and 8G's node page are inside it.
+ * (DECISIONS A141, 6Z's ruling): the four-heads figures' overlay pages and 8G's node page are inside it. It is 9
+ * since the owner's option B of 2026-10-24 (A161): the round-8 clips at plan B's frame counts, limp and stagger in
+ * four directions and the townsfolk's shorter clip set; a look's lazy clip pages are transient and outside the sum.
  */
 const PAGE = 2048 * 2048;
-const RESIDENT_CAP = 8.0;
+const RESIDENT_CAP = 9.0;
 /** The deck's ten world looks plus the villager family, resident on every map for the townsfolk (A161). */
 const LOOKS_COUNTED = 10 + villagerLooks().length;
 
