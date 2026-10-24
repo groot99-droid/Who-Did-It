@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { decodePng, encodePng, type Rgba } from '../bleed.ts';
-import { hdSlices, hdStatic, hdTileset, texelsOf, texelsOfSize, webpPages } from '../hd.ts';
+import { hdSlices, hdStatic, hdTileset, texelsOf, texelsOfSize, webpPages, withTexels } from '../hd.ts';
 import { imageSize } from './realAssets.ts';
 import type { MultiAtlas } from '../pack.ts';
 import { CELL_H, CELL_W, COLUMNS, GROUND_ROWS, inDiamond } from '../tileset.ts';
@@ -164,5 +164,26 @@ describe('hd webp pages', () => {
     const json = JSON.parse(out.get('props.json')!.toString('utf8')) as MultiAtlas;
     expect(json.textures.map((t) => t.image)).toEqual(['props-0.webp']);
     expect(out.get('vfx.anims.json')).toBe(anims);
+  });
+});
+
+describe('hd withTexels', () => {
+  it("writes the factor into the atlas json's meta and leaves the pages alone", () => {
+    const page = Buffer.from('page');
+    const out = withTexels(
+      new Map([
+        ['bld_x-0.png', page],
+        ['bld_x.json', Buffer.from(JSON.stringify({ textures: [], meta: { app: 'p', version: '1' } }))],
+      ]),
+      'bld_x',
+      2,
+    );
+    expect(out.get('bld_x-0.png')).toBe(page);
+    expect(JSON.parse(out.get('bld_x.json')!.toString('utf8')).meta).toEqual({
+      app: 'p',
+      version: '1',
+      texels: 2,
+    });
+    expect(() => withTexels(new Map(), 'bld_x', 2)).toThrow(/no bld_x.json/);
   });
 });

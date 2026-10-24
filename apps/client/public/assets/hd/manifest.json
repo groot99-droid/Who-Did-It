@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "art": "hd",
+  "texels": 2,
+  "entries": [
+    {
+      "key": "props_hollowmere",
+      "type": "multiatlas",
+      "url": "props/props_hollowmere.json",
+      "filter": "linear",
+      "path": "props/",
+      "maps": [
+        "hollowmere"
+      ]
+    },
+    {
+      "key": "bld_blackpine",
+      "type": "multiatlas",
+      "url": "buildings/bld_blackpine.json",
+      "filter": "linear",
+      "path": "buildings/",
+      "maps": [
+        "blackpine"
+      ]
+    }
+  ]
+}
