@@ -29,7 +29,7 @@ the server sent.
    carries another seat's card, cover, private view, cooldowns, or a status bit or avatar that seat could not see
    under 1 and 2. 6Z grants the edit in the PR.
 4. **Replay.** `MatchLog` records the match seed and the build id, so a logged match can be replayed.
-5. **Vote delay.** A vote cast before `meeting.minVoteS` (new, in `balance.json`; GDD 3.4) is refused with a
+5. **Vote delay.** A vote cast before `meeting.minVoteS` (new, in `balance.json`; GDD 3.8) is refused with a
    reason, so a pre-agreed instant vote cannot land before anyone has spoken. `meeting.voteOpensImmediately`
    gives way to it.
 
@@ -55,8 +55,11 @@ dripping. One small square, readable at HUD size, in the palette, in all three a
 
 - 8N surveys the icons first and sends 6Z a list and a sheet of five or six of them for the owner's look before
   drawing the rest.
-- The art lives in the UI atlas (`ui/` keys), drawn by the studio pipeline or Blender like the rest of round 8's art
-  (ASSETS 6.5). The textual name stays as the accessible label.
+- The HUD and panel icons are DOM images: one file per icon and art style, beside the SPRITES 9 SVGs, found through
+  8N's `effectIconUrl` helper. There is no new UI atlas. The mark over a figure is a frame in the existing `vfx`
+  atlas. The "white" of the owner's example is the palette's bone, `#FFF1DC`. All of it is drawn by the studio
+  pipeline or Blender like the rest of round 8's art (ASSETS 6.5). The textual name stays as the accessible label.
+- 8A's body HUD draws the effect row and calls the helper; 8N ships the icons and the helper.
 - The bloodied mark over a figure (`PlayerView.setBlood`) shows the bleeding icon above the figure as well as the
   blood overlay.
 
@@ -98,4 +101,5 @@ same PR as a behaviour change, no edit to an existing server test without 6Z's g
 - 8L's sight change and 8E's townsfolk, 8A's status bits and 8B's inspect all go through `publishPresence` and
   `canSee`. 8L takes the filter, and the others keep calling those functions as they do now.
 - 8M's Final Night touches the phase machine that 8D's curfew reads. 8M emits the existing phase events unchanged.
-- 8N draws into the UI atlas, which 8H animates. 8N adds keys, and 8H's helpers show them.
+- 8N's icons are DOM files and one `vfx` frame. 8H's helpers animate the elements that show them; 8N adds no
+  motion of its own.
