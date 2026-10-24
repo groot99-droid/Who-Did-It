@@ -30,14 +30,13 @@ import './invariants';
 
 /** A goal counts as reached within this distance. */
 const GOAL_PX = TILE_PX / 4;
-/** A path is rebuilt from where the figure stands at least this often. */
-const REPLAN_TICKS = TICK_RATE;
 
 export function runTownsfolk(room: PartyRoom): void {
   const phase = room.state.phase;
   const memory = townsfolkMemory(room);
   if (phase === Phase.lobby) {
     if (memory.spawned) clearTownsfolk(room);
+    portals.delete(room); // the next match may draw another profile or map
     return;
   }
   if (!isWorldPhase(phase) || !simOf(room).profileFixed) return;
@@ -85,12 +84,7 @@ function stepFigure(room: PartyRoom, f: Figure): void {
 
   // Another scene first: the first portal on the way, then through it.
   if (act.goal.scene !== here) {
-    const portal = firstPortalToward(
-      here,
-      simOf(room).profile,
-      (s) => s === act.goal.scene,
-      mapScenesOf(room),
-    );
+    const portal = portalToward(room, here, act.goal.scene);
     if (!portal) {
       f.act = null;
       return;
@@ -123,6 +117,20 @@ function stepFigure(room: PartyRoom, f: Figure): void {
       act.untilTick = tick + spanTicks(figureRng(room, f), t.idleS);
     }
   }
+}
+
+/** The first portal from one scene toward another, by room: the profile and the map are fixed for the match. */
+const portals = new WeakMap<PartyRoom, Map<string, Portal | null>>();
+function portalToward(room: PartyRoom, from: SceneId, to: SceneId): Portal | null {
+  let byRoute = portals.get(room);
+  if (!byRoute) portals.set(room, (byRoute = new Map()));
+  const key = `${from}>${to}`;
+  let portal = byRoute.get(key);
+  if (portal === undefined) {
+    portal = firstPortalToward(from, simOf(room).profile, (s) => s === to, mapScenesOf(room));
+    byRoute.set(key, portal);
+  }
+  return portal;
 }
 
 /** The next station of the route: a fixed figure's one prop, the named loop in order, a villager's favourites. */
@@ -229,8 +237,10 @@ function walk(room: PartyRoom, f: Figure, tx: number, ty: number, reachPx: numbe
   const here = { x: Math.floor(f.x / TILE_PX), y: Math.floor(f.y / TILE_PX) };
   const key = `${f.sceneIdx}:${Math.round(tx)}:${Math.round(ty)}`;
   let plan = f.brain.path;
-  const onPlan = plan?.tiles.some((t) => t.x === here.x && t.y === here.y) ?? false;
-  if (!plan || plan.key !== key || !onPlan || tick - plan.bornTick >= REPLAN_TICKS) {
+  let at = plan?.tiles.findIndex((t) => t.x === here.x && t.y === here.y) ?? -1;
+  // A figure is never collided and its scene's grid never changes: a path holds until its goal changes or the
+  // figure steps off it.
+  if (!plan || plan.key !== key || at < 0) {
     const tiles = tilePath(
       grid.w,
       grid.h,
@@ -242,10 +252,9 @@ function walk(room: PartyRoom, f: Figure, tx: number, ty: number, reachPx: numbe
     );
     plan = tiles ? { key, scene: f.sceneIdx, bornTick: tick, tiles } : null;
     f.brain.path = plan;
+    at = Math.max(0, plan?.tiles.findIndex((t) => t.x === here.x && t.y === here.y) ?? 0);
   }
   if (!plan) return 'stuck';
-  let at = plan.tiles.findIndex((t) => t.x === here.x && t.y === here.y);
-  if (at < 0) at = 0;
   const next = plan.tiles[at + 1];
   const aim = next ? { x: tileCentre(next.x, TILE_PX), y: tileCentre(next.y, TILE_PX) } : { x: tx, y: ty };
   const dx = aim.x - f.x;
