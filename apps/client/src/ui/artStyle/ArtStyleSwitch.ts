@@ -8,12 +8,19 @@ import {
   isSwitching,
   onArtStyleChanged,
   requestArtStyle,
+  styleGate,
 } from '../../view/artStyle';
 import './artStyle.css';
 
 // The segmented "8-bit | Low poly | HD" control (A79, UI.md 14.18). The options come from `style.json` `artStyles`;
+// a style this device cannot hold (HD's gate, A164) shows disabled with the reason ("Needs a larger screen"), and
 // each reserved id shows disabled with a "coming later" hint. Mounted in the lobby and in the match; every copy
-// follows the one pick. A radio group: arrow keys move and select, Tab leaves, Space and Enter select.
+// follows the one pick. A radio group: arrow keys move and select among the enabled options, Tab leaves, Space
+// and Enter select.
+
+/** The hint line of a gated style, by the gate's verdict. */
+const gateHint = (verdict: NonNullable<ReturnType<typeof styleGate>>): string =>
+  C[`artStyle.gated.${verdict}`];
 
 let veil: HTMLElement | null = null;
 let notice: HTMLElement | null = null;
@@ -92,7 +99,13 @@ export function mountArtStyleSwitch(root: HTMLElement, opts: { compact?: boolean
     void switchWithVeil(id).then(follow);
   };
 
+  const hints: string[] = [];
+  const enabledIds: string[] = [];
   const options = ART_STYLES.map((s) => {
+    const verdict = styleGate(s.id);
+    const gated = verdict !== null;
+    if (gated) hints.push(gateHint(verdict));
+    else enabledIds.push(s.id);
     const b = h(
       'button',
       {
@@ -103,13 +116,17 @@ export function mountArtStyleSwitch(root: HTMLElement, opts: { compact?: boolean
         'aria-label': fill(C['artStyle.pick'], { style: styleName(s.id) }),
         'data-testid': `art-style-${s.id}`,
         'data-style': s.id,
+        ...(gated
+          ? { disabled: true, 'aria-disabled': 'true', 'aria-describedby': hintId, title: gateHint(verdict) }
+          : {}),
       },
       styleName(s.id),
     );
-    b.addEventListener('click', () => choose(s.id));
+    if (!gated) b.addEventListener('click', () => choose(s.id));
     radios.set(s.id, b);
     return b;
   });
+  if (RESERVED_STYLE_IDS.length > 0) hints.push(C['artStyle.reserved.hint']);
 
   const reserved = RESERVED_STYLE_IDS.map((id) =>
     h(
@@ -143,9 +160,8 @@ export function mountArtStyleSwitch(root: HTMLElement, opts: { compact?: boolean
           ? -1
           : 0;
     if (step === 0) return;
-    const ids = ART_STYLES.map((s) => s.id);
-    const i = ids.indexOf(currentStyleId());
-    const next = ids[(i + step + ids.length) % ids.length];
+    const i = enabledIds.indexOf(currentStyleId());
+    const next = enabledIds[(i + step + enabledIds.length) % enabledIds.length];
     if (next === undefined) return;
     e.preventDefault();
     radios.get(next)?.focus();
@@ -160,8 +176,8 @@ export function mountArtStyleSwitch(root: HTMLElement, opts: { compact?: boolean
     },
     h('span', { class: 'wdi-label wdi-artstyle__label', id: labelId }, C['artStyle.label']),
     group,
-    reserved.length > 0
-      ? h('span', { class: 'wdi-seg__note wdi-artstyle__hint', id: hintId }, C['artStyle.reserved.hint'])
+    hints.length > 0
+      ? h('span', { class: 'wdi-seg__note wdi-artstyle__hint', id: hintId }, hints.join(' '))
       : null,
   );
   root.append(el);

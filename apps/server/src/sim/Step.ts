@@ -8,6 +8,7 @@ import { runAuto } from './auto/Auto';
 import { runEvents } from './events/bus';
 import { runEconomy } from './economy/run';
 import './tasks/invariants'; // round 7, 7M: the taskBar invariant's host (locked line, granted by 6Z; above 7H's so its four stay last)
+import './npc/hive/invariant'; // round 8, 8R: hiveNoSecrets's host, as 7M's above (one line, pending 6Z's grant)
 import { runVendettas } from './vendettas/run';
 import { runMemorial } from './Memorial';
 import { runMobs } from './Mobs';

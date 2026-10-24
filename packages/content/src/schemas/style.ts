@@ -46,16 +46,24 @@ export const ArtStyle = z.strictObject({
   pixelFinish: z.boolean(),
   /** The texture filter of the style's world textures. */
   filter: z.enum(['nearest', 'linear']),
-  /** The draw scale of a packed world frame (`iso.artScale` for both round-5 styles; HD may ship at 1). */
+  /** The draw scale of a packed world frame (`iso.artScale`; an HD frame divides it by its manifest's `texels`). */
   drawScale: z.number().int().min(1).max(4),
   root: z.string().regex(/^([a-z0-9]+\/)?$/),
+  /**
+   * The device a style needs (docs/round8/art.md 3, GDD 3.13): the client enables the style only where the screen is
+   * at least `screenHeightPx` tall, `navigator.deviceMemory` (where the browser reports it) is at least
+   * `deviceMemoryGb` and WebGL allows `texturePx` textures. Absent, the style is offered everywhere.
+   */
+  requires: z
+    .strictObject({ screenHeightPx: Px, deviceMemoryGb: z.number().positive(), texturePx: Px })
+    .optional(),
 });
 export type ArtStyle = z.infer<typeof ArtStyle>;
 
 export const ArtStyles = z
   .strictObject({
     default: z.string(),
-    /** Style ids promised for later (HD); no art or manifest yet. */
+    /** Style ids promised for later; no art or manifest yet (empty since HD shipped, round 8). */
     reserved: z.array(z.string().regex(/^[a-z0-9]+$/)),
     styles: z.array(ArtStyle).min(1),
   })

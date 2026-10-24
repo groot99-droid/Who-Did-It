@@ -6,6 +6,7 @@ import { bodyBlocksAct } from './body/run';
 import { handleHold } from './Hold';
 import { handleImpersonate } from './Impersonate';
 import { handleKill } from './Kill';
+import { emitSim } from './events/bus';
 import { bellOf, hubOf } from './MapSites';
 import { handleNightPower } from './NightPowers';
 import { type PlayerSim, simOf } from './RoomSim';
@@ -137,10 +138,21 @@ function handleReport(room: PartyRoom, sessionId: string, payload: Record<string
   sim.meetingRequests.push({ reason: 'body', callerId: sessionId, bodyOf: body.of });
 }
 
+/** Round 8, 8R (A174, GDD 3.8): an unreported body anywhere in the world lets the bell ring after dark too. */
+function unreportedBody(room: PartyRoom): boolean {
+  const reported = simOf(room).reportedBodies;
+  for (const scene of room.state.scenes.values()) {
+    for (const body of scene.bodies.values()) if (!body.hidden && !reported.has(body.id)) return true;
+  }
+  return false;
+}
+
 /** `act.bell`: on the hub within reach of the map's bell (`bellOf`), at most the role's `bellPulls` per match. */
 function handleBell(room: PartyRoom, sessionId: string): void {
   const player = room.state.players.get(sessionId);
-  const actor = livingActor(room, sessionId, true);
+  const phase = room.state.phase;
+  const nightBell = isVerbPhase(phase) && phase !== Phase.finalNight && unreportedBody(room);
+  const actor = livingActor(room, sessionId, !nightBell);
   const bell = bellOf(room);
   if (!player || !actor || !bell) return;
   if (sceneKey(actor.sceneIdx) !== hubOf(room)) {
@@ -158,4 +170,6 @@ function handleBell(room: PartyRoom, sessionId: string): void {
   }
   actor.bellPulls++;
   simOf(room).meetingRequests.push({ reason: 'bell', callerId: sessionId });
+  const sceneId = hubOf(room);
+  emitSim(room, { tick: room.state.tick, kind: 'bell', sceneId, data: { sceneId } }); // round 8, 8R
 }

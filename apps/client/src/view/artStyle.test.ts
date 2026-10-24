@@ -1,11 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import styleJson from '@wdi/content/data/style.json';
+import { type DeviceProbe, setDeviceForTests } from '../ui/artStyle/deviceGate';
 import {
   ART_STYLES,
   DEFAULT_STYLE_ID,
   RESERVED_STYLE_IDS,
   STORAGE_KEY,
   currentStyleId,
+  isAvailableStyle,
   isShippedStyle,
   onArtStyleChanged,
   queryStyle,
@@ -15,7 +17,12 @@ import {
   resetArtStyleForTests,
   resolveStyleId,
   storeStyle,
+  styleGate,
 } from './artStyle';
+
+/** A desktop that holds HD (art.md 3); the tests run outside a browser, where the probe reads as a phone. */
+const desktop: DeviceProbe = { screenHeightPx: 1080, deviceMemoryGb: 8, maxTexturePx: 16384 };
+const phone: DeviceProbe = { screenHeightPx: 844, deviceMemoryGb: 4, maxTexturePx: 4096 };
 
 const throwing = {
   getItem: () => {
@@ -26,7 +33,10 @@ const throwing = {
   },
 };
 
-afterEach(resetArtStyleForTests);
+afterEach(() => {
+  resetArtStyleForTests();
+  setDeviceForTests(null);
+});
 
 describe('the style list', () => {
   it('is read from style.json, never a literal', () => {
@@ -35,11 +45,49 @@ describe('the style list', () => {
     expect(RESERVED_STYLE_IDS).toEqual(styleJson.artStyles.reserved);
   });
 
-  it('ships 8-bit and low poly and reserves HD without shipping it', () => {
+  it('ships 8-bit, low poly and HD, with nothing left reserved (A164)', () => {
     expect(isShippedStyle('8bit')).toBe(true);
     expect(isShippedStyle('lowpoly')).toBe(true);
-    expect(isShippedStyle('hd')).toBe(false);
-    expect(RESERVED_STYLE_IDS).toContain('hd');
+    expect(isShippedStyle('hd')).toBe(true);
+    expect(isShippedStyle('vaporwave')).toBe(false);
+    expect(RESERVED_STYLE_IDS).toEqual([]);
+  });
+});
+
+describe('the device gate', () => {
+  it('offers 8-bit and low poly everywhere and HD only where the device holds it', () => {
+    setDeviceForTests(phone);
+    expect(styleGate('8bit')).toBeNull();
+    expect(styleGate('lowpoly')).toBeNull();
+    expect(styleGate('hd')).toBe('screen');
+    expect(isAvailableStyle('hd')).toBe(false);
+    setDeviceForTests(desktop);
+    expect(styleGate('hd')).toBeNull();
+    expect(isAvailableStyle('hd')).toBe(true);
+    expect(isAvailableStyle('vaporwave')).toBe(false);
+  });
+
+  it('drops a stored or queried HD pick on a device that cannot show it', () => {
+    setDeviceForTests(phone);
+    expect(readStoredStyle({ getItem: () => 'hd' })).toBeNull();
+    expect(queryStyle('?art=hd')).toBeNull();
+    expect(resolveStyleId('?art=hd', { getItem: () => 'hd' })).toBe(DEFAULT_STYLE_ID);
+    expect(resolveStyleId('?art=hd', { getItem: () => 'lowpoly' })).toBe('lowpoly');
+    setDeviceForTests(desktop);
+    expect(readStoredStyle({ getItem: () => 'hd' })).toBe('hd');
+    expect(resolveStyleId('?art=hd', { getItem: () => null })).toBe('hd');
+  });
+
+  it('refuses to switch to HD on a gated device and switches on one that holds it', async () => {
+    const swap = vi.fn(() => Promise.resolve());
+    registerSwitcher(swap);
+    setDeviceForTests(phone);
+    expect(await requestArtStyle('hd')).toBe(false);
+    expect(swap).not.toHaveBeenCalled();
+    setDeviceForTests(desktop);
+    expect(await requestArtStyle('hd')).toBe(true);
+    expect(swap).toHaveBeenCalledWith('hd');
+    expect(currentStyleId()).toBe('hd');
   });
 });
 
@@ -51,7 +99,6 @@ describe('the storage guard', () => {
   it('treats empty, blocked and unknown storage as no pick', () => {
     expect(readStoredStyle({ getItem: () => null })).toBeNull();
     expect(readStoredStyle(throwing)).toBeNull();
-    expect(readStoredStyle({ getItem: () => 'hd' })).toBeNull();
     expect(readStoredStyle({ getItem: () => 'vaporwave' })).toBeNull();
     expect(readStoredStyle(null)).toBeNull();
   });
@@ -79,7 +126,7 @@ describe('the pick', () => {
 
   it('ignores ?art=placeholder and unknown ids as a style', () => {
     expect(queryStyle('?art=placeholder')).toBeNull();
-    expect(queryStyle('?art=hd')).toBeNull();
+    expect(queryStyle('?art=vaporwave')).toBeNull();
     expect(resolveStyleId('?art=placeholder', { getItem: () => 'lowpoly' })).toBe('lowpoly');
   });
 });
@@ -107,10 +154,9 @@ describe('requestArtStyle', () => {
     expect(heard).toEqual([]);
   });
 
-  it('refuses a reserved or unknown id and ignores the style already shown', async () => {
+  it('refuses an unknown id and ignores the style already shown', async () => {
     const swap = vi.fn(() => Promise.resolve());
     registerSwitcher(swap);
-    expect(await requestArtStyle('hd')).toBe(false);
     expect(await requestArtStyle('nope')).toBe(false);
     expect(await requestArtStyle(currentStyleId())).toBe(true);
     expect(swap).not.toHaveBeenCalled();

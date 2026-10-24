@@ -177,4 +177,10 @@ export function siteBytes(dir = ASSETS): number {
   return total;
 }
 
+/** Every file under a style's root (`hd/`), or 0 before the style ships. */
+export function styleBytes(root: string, dir = ASSETS): number {
+  const at = join(dir, root);
+  return existsSync(at) ? siteBytes(at) : 0;
+}
+
 export const readManifest = readJson;

@@ -4,8 +4,9 @@ import { toScreen } from '@wdi/shared/iso';
 import type { AvatarSnap, MobSnap } from '../../net/world';
 import { BIAS, depthAt } from '../iso';
 import { FX, FX_SHAPES, STILL_COUNT, STILL_MS, ramp, type FxKind, type FxShape } from './fxSpecs';
-import { avatarFx, mobFx, type FxEvent, type Seen } from './fxTriggers';
+import { avatarFx, mobFx, type FxEvent, type FxResult, type Seen } from './fxTriggers';
 import { reducedMotion as prefersReducedMotion } from './motion';
+import { Sfx, type Cue } from './sfx';
 
 /** The texture of a particle shape. */
 export const fxTexture = (shape: FxShape): string => `fx_${shape}`;
@@ -70,11 +71,14 @@ export class VfxView {
   private readonly avatars = new Map<string, Seen>();
   private readonly mobs = new Map<string, Seen>();
   private ready = false;
+  private readonly sfx: Sfx;
 
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly reducedMotion: () => boolean = prefersReducedMotion,
-  ) {}
+  ) {
+    this.sfx = new Sfx(scene);
+  }
 
   private textures(): void {
     if (this.ready) return;
@@ -90,17 +94,23 @@ export class VfxView {
 
   update(avatars: readonly AvatarSnap[], mobs: readonly MobSnap[], now: number): void {
     const events: FxEvent[] = [];
-    this.diff(this.avatars, avatars, (a) => a.handle, avatarFx, events, now);
-    this.diff(this.mobs, mobs, (m) => m.id, mobFx, events, now);
-    for (const e of events) this.play(e.kind, e.x, e.y);
+    const cues: Cue[] = [];
+    this.diff(this.avatars, avatars, (a) => a.handle, avatarFx, events, cues, now);
+    this.diff(this.mobs, mobs, (m) => m.id, mobFx, events, cues, now);
+    for (const e of events) this.burst(e.kind, e.x, e.y);
+    for (const c of cues) {
+      const at = toScreen(c.x, c.y);
+      this.sfx.play(c.key, at.x, at.y);
+    }
   }
 
   private diff<T>(
     seen: Map<string, Seen>,
     items: readonly T[],
     id: (t: T) => string,
-    fx: (prev: Seen | undefined, t: T, now: number) => { fx: FxEvent[]; seen: Seen },
+    fx: (prev: Seen | undefined, t: T, now: number) => FxResult,
     out: FxEvent[],
+    cues: Cue[],
     now: number,
   ): void {
     const present = new Set<string>();
@@ -110,12 +120,21 @@ export class VfxView {
       const r = fx(seen.get(key), t, now);
       seen.set(key, r.seen);
       out.push(...r.fx);
+      cues.push(...r.cues);
     }
     for (const key of seen.keys()) if (!present.has(key)) seen.delete(key);
   }
 
-  /** One effect at a world point (px). */
+  /** One effect at a world point (px), for another session's event; a coin burst also chinks (`fx_coins`). */
   play(kind: FxKind, wx: number, wy: number): void {
+    this.burst(kind, wx, wy);
+    if (kind === 'coinBurst') {
+      const at = toScreen(wx, wy);
+      this.sfx.play('fx_coins', at.x, at.y);
+    }
+  }
+
+  private burst(kind: FxKind, wx: number, wy: number): void {
     this.textures();
     const spec = FX[kind];
     // Particles are drawn at the art's scale, so a burst keeps its size against the figures (8F may grow them).
