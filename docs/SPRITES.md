@@ -973,7 +973,7 @@ and out.
 | `props` | `multiatlas`, `nearest` | shared props `prop_<kind>[_<state>]` (`prop_lanternPost_lit`/`_unlit`, lit in the `dusk` and `night` parts of the day); multi-tile slices `prop_<kind>#<dx>_<dy>`; spots `spot_<variant>`; portal frames `portal_<kind>_<s\|e\|sill>`, `portal_hatch`, `portal_drop`, `portal_boarded_<s\|e\|sill>` | at boot |
 | `props_<mapId>` | `multiatlas`, `nearest` | the map's own props, in the same grammar; looked up before `props` | with its map |
 | `char_<lookId>`, `ovl_<lookId>`, `anims_<lookId>` | as the looks catalogue (5L) | characters in 64 px packed cells, atlas `<dir>` in the screen frame | at boot |
-| `char_villager`, `ovl_villager`, `anims_villager` | as the looks | the plain base body | only with `?art=placeholder` in round 5: every seat has a look, and no figure that is not a seat exists until round 6's mobs |
+| `char_villager`, `ovl_villager`, `anims_villager` and the family's (`villagerelder`, `villagergoodwife`, `villagerlass`, `villagerclerk`) | as the looks | the villager family of `looks.json` `villagers` (round 8, A161): the ambient townsfolk's figures and the seat's fallback body | at boot in every real manifest; the placeholder manifest carries the plain villager only (until round 8 the villager loaded only with `?art=placeholder`, C11) |
 | `clues` | `multiatlas`, `linear` | decals finished at display size and drawn through the decal transform (10.5), which rotates them | at boot |
 | `vfx`, `anims_vfx` | `multiatlas`, `nearest`; animation | effects finished at display size; `SpriteCam` frames re-rendered by `IsoCam` | at boot |
 | `thumb_<mapId>` | `image` | 480 x 270 lobby thumbnail of the hub | at boot |
@@ -986,7 +986,8 @@ and out.
 - **Mode entries.** The `modes` field left with the quick mode (round 7, A115); no entry carries it.
 - **Boot.** An entry without `maps` loads at boot.
 - **Both manifests** (real and `?art=placeholder`) carry the same keys and the same `maps`, the
-  villager aside (in the placeholder manifest only, once 5L's L4 lands); `manifest.test.ts` checks both.
+  villager family aside (every real manifest carries exactly the `villagers` ids of `looks.json`, the placeholder
+  manifest the plain villager only; round 8, A161); `manifest.test.ts` checks both.
 - **Filters.** The `nearest` of this table holds while `style.json` `pixelFinish.enabled.main` is true; with it off,
   every main-mode world texture is `linear` (10.3). `clues` is always `linear`.
 - **Prop lookup.** The order is `props_<mapId>`, then `props`; within each, `prop_<kind>[_<state>]`, then
@@ -1005,11 +1006,12 @@ Page-equivalents are of 2048². These are the art plan's numbers (`docs/round5/a
 | Environment per map | ≤ 1.8: ground 1280 x 1792 (0.55), kit ≤ 1024² (0.25), buildings ≤ 2048 x 1024 (0.5), map props ≤ 1024² (0.25), shared props ≤ 1024² (0.25) |
 | Boot effects | `clues` ≤ 512² (0.06), `vfx` ≤ 512 x 2048 (0.25) |
 | Characters (the deck's 10 world looks, A50) | ≤ 3.75: each look's `char_<lookId>` ≤ 1024² and `ovl_<lookId>` ≤ 1024 x 512 (0.375). About 3 expected, since most looks pack onto a 1024 x 512 body page |
-| Resident pages | ≤ 6.1 (ASSETS 6.8; 6.0 until round 8, when 6Z granted the 0.1 for the node break page, A142). The worst case, one map's environment, the boot effects and the 10 largest looks, is 6.02 (low-poly HollowMere) |
+| Resident pages | ≤ 8 (ASSETS 6.8; 6 until round 8, 6.1 with the node break page of A142, 8 by 6Z's round-8 ruling, A141). The worst case is one map's environment, the boot atlases (effects, nodes, tools, mobs, givers), the deck's 10 world looks and the villager family, which is resident on every map for the townsfolk (A161). Measured with the four-heads figures: 8-bit 7.53 (Hollowmere) and 7.41 (Blackpine); low poly 8.02 (Hollowmere) and 7.77 (Blackpine); the deck alone 5.91 / 5.78 / 6.14 / 5.89 |
 | Static world sprites per scene | ≤ 1 200; the World hides those outside the view grown by 2 tiles, re-checked when the camera moves more than a tile |
 
-`char_villager` and `ovl_villager` load only with `?art=placeholder` in round 5 (10.13), so they count in no
-budget. `tools/sprites/test/budget.test.ts` asserts each cap and, for each map, the resident sum.
+The villager family's five looks count in the resident sum since round 8 (10.13; in round 5 the villager loaded only
+with `?art=placeholder` and counted in no budget). `tools/sprites/test/budget.test.ts` asserts each cap and, for each
+map, the resident sum.
 
 **Round 8 re-plan (8F, art.md 2, motion.md 1): the measured cost.** Each shipped look packs its 304 frames per
 pass (five clips, 8 directions) on one 1024² body page at a fill of 0.42-0.47 (about 1 500 trimmed px a frame,
