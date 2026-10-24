@@ -338,14 +338,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/e/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/e/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/e/007"
     }
    ],
    "frameRate": 12,
@@ -377,14 +369,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/n/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/n/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/n/007"
     }
    ],
    "frameRate": 12,
@@ -416,14 +400,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/ne/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/ne/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/ne/007"
     }
    ],
    "frameRate": 12,
@@ -455,14 +431,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/nw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/nw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/nw/007"
     }
    ],
    "frameRate": 12,
@@ -494,14 +462,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/s/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/s/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/s/007"
     }
    ],
    "frameRate": 12,
@@ -533,14 +493,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/se/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/se/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/se/007"
     }
    ],
    "frameRate": 12,
@@ -572,14 +524,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/sw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/sw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/sw/007"
     }
    ],
    "frameRate": 12,
@@ -611,14 +555,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/w/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/w/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/w/007"
     }
    ],
    "frameRate": 12,
@@ -650,14 +586,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/e/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/e/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/e/007"
     }
    ],
    "frameRate": 12,
@@ -689,14 +617,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/n/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/n/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/n/007"
     }
    ],
    "frameRate": 12,
@@ -728,14 +648,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/ne/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/ne/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/ne/007"
     }
    ],
    "frameRate": 12,
@@ -767,14 +679,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/nw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/nw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/nw/007"
     }
    ],
    "frameRate": 12,
@@ -806,14 +710,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/s/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/s/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/s/007"
     }
    ],
    "frameRate": 12,
@@ -845,14 +741,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/se/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/se/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/se/007"
     }
    ],
    "frameRate": 12,
@@ -884,14 +772,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/sw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/sw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/sw/007"
     }
    ],
    "frameRate": 12,
@@ -923,14 +803,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/w/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/w/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/w/007"
     }
    ],
    "frameRate": 12,
@@ -1834,14 +1706,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/e/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/e/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/e/007"
     }
    ],
    "frameRate": 12,
@@ -1873,14 +1737,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/n/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/n/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/n/007"
     }
    ],
    "frameRate": 12,
@@ -1912,14 +1768,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/ne/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/ne/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/ne/007"
     }
    ],
    "frameRate": 12,
@@ -1951,14 +1799,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/nw/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/nw/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/nw/007"
     }
    ],
    "frameRate": 12,
@@ -1990,14 +1830,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/s/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/s/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/s/007"
     }
    ],
    "frameRate": 12,
@@ -2029,14 +1861,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/se/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/se/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/se/007"
     }
    ],
    "frameRate": 12,
@@ -2068,14 +1892,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/sw/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/sw/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/sw/007"
     }
    ],
    "frameRate": 12,
@@ -2107,14 +1923,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/w/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/w/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/w/007"
     }
    ],
    "frameRate": 12,
@@ -2146,14 +1954,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/e/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/e/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/e/007"
     }
    ],
    "frameRate": 12,
@@ -2185,14 +1985,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/n/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/n/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/n/007"
     }
    ],
    "frameRate": 12,
@@ -2224,14 +2016,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/ne/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/ne/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/ne/007"
     }
    ],
    "frameRate": 12,
@@ -2263,14 +2047,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/nw/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/nw/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/nw/007"
     }
    ],
    "frameRate": 12,
@@ -2302,14 +2078,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/s/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/s/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/s/007"
     }
    ],
    "frameRate": 12,
@@ -2341,14 +2109,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/se/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/se/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/se/007"
     }
    ],
    "frameRate": 12,
@@ -2380,14 +2140,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/sw/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/sw/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/sw/007"
     }
    ],
    "frameRate": 12,
@@ -2419,14 +2171,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/w/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/w/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/w/007"
     }
    ],
    "frameRate": 12,
@@ -3330,14 +3074,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/e/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/e/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/e/007"
     }
    ],
    "frameRate": 12,
@@ -3369,14 +3105,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/n/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/n/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/n/007"
     }
    ],
    "frameRate": 12,
@@ -3408,14 +3136,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/ne/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/ne/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/ne/007"
     }
    ],
    "frameRate": 12,
@@ -3447,14 +3167,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/nw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/nw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/nw/007"
     }
    ],
    "frameRate": 12,
@@ -3486,14 +3198,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/s/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/s/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/s/007"
     }
    ],
    "frameRate": 12,
@@ -3525,14 +3229,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/se/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/se/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/se/007"
     }
    ],
    "frameRate": 12,
@@ -3564,14 +3260,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/sw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/sw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/sw/007"
     }
    ],
    "frameRate": 12,
@@ -3603,14 +3291,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/w/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/w/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/w/007"
     }
    ],
    "frameRate": 12,
@@ -3642,14 +3322,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/e/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/e/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/e/007"
     }
    ],
    "frameRate": 12,
@@ -3681,14 +3353,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/n/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/n/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/n/007"
     }
    ],
    "frameRate": 12,
@@ -3720,14 +3384,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/ne/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/ne/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/ne/007"
     }
    ],
    "frameRate": 12,
@@ -3759,14 +3415,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/nw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/nw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/nw/007"
     }
    ],
    "frameRate": 12,
@@ -3798,14 +3446,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/s/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/s/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/s/007"
     }
    ],
    "frameRate": 12,
@@ -3837,14 +3477,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/se/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/se/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/se/007"
     }
    ],
    "frameRate": 12,
@@ -3876,14 +3508,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/sw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/sw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/sw/007"
     }
    ],
    "frameRate": 12,
@@ -3915,14 +3539,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/w/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/w/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/w/007"
     }
    ],
    "frameRate": 12,

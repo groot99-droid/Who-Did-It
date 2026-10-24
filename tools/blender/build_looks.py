@@ -218,8 +218,9 @@ def crouch(deg: float) -> dict:
             "foot.R": (deg, 0, 0), "foot.L": (deg, 0, 0), "root": (0, 0, 0, 0, _drop(deg), 0)}
 
 
-def interact_keys(base: str, raise_deg: float = 95) -> list[tuple[int, dict]]:
-    """Eight looping frames of a hold: hands working, the body still, one of three bases (art plan 4.2).
+def interact_keys(base: str, raise_deg: float = 95) -> list[tuple[float, dict]]:
+    """A looping hold keyed in normalised time (`_clip`): hands working, the body still, one of three bases (art
+    plan 4.2).
 
     `raise_deg` is how far `raise` lifts the left arm: a look whose left hand holds a pole lifts it less,
     so the prop stays inside the cell."""
@@ -247,20 +248,38 @@ def interact_keys(base: str, raise_deg: float = 95) -> list[tuple[int, dict]]:
     else:
         raise ValueError(f"unknown interact base {base!r}")
     keys = []
-    for frame, t in ((1, 0.0), (5, 1.0), (9, 0.0), (13, -1.0), (17, 0.0)):
-        keys.append((frame, {**body, **work(t)}))
+    for t, s in ((0, 0.0), (0.25, 1.0), (0.5, 0.0), (0.75, -1.0), (1, 0.0)):
+        keys.append((t, {**body, **work(s)}))
     return keys
 
 
-def make_actions(arm, spec: dict) -> None:
-    # Loops span 16 scene frames (8 at 12 fps; the last key repeats the first and is not rendered).
-    # One-shots span 2n - 1 frames so they render n frames including the last.
-    _action(arm, "idle", [
+def swing_keys() -> list[tuple[int, dict]]:
+    """The Knife's swing (and the Crowbar's, the Check's; never role-specific), on round-5 frames: see make_actions."""
+    return [
         (1, {**arms()}),
-        (5, {**arms(2, 2), "chest": (2, 0, 0), "root": (0, 0, 0, 0.004, 0.006, 0)}),
-        (9, {**arms()}),
-        (13, {**arms(-1, -1), "chest": (-1, 0, 0), "head": (-2, 0, 2), "root": (0, 0, 0, -0.004, -0.003, 0)}),
-        (17, {**arms()}),
+        (3, {**arms(-10, 5), "upper_arm.R": (22, 0, -14), "forearm.R": (92, 0, 0), "chest": (3, -18, 0),
+             "head": (0, 18, 0), **crouch(5)}),
+        (5, {**arms(-15, 10), "upper_arm.R": (24, 0, -12), "forearm.R": (100, 0, 0), "chest": (5, -25, 0),
+             "head": (0, 25, 0), **crouch(10)}),
+        (7, {**arms(15, -10), "upper_arm.R": (55, 0, -5), "forearm.R": (10, 0, 0), "chest": (-8, 15, 0),
+             "spine": (-3, 0, 0), "head": (-3, 0, 0), **crouch(22)}),
+        (9, {**arms(5, 0), "upper_arm.R": (25, 0, -6), "forearm.R": (15, 0, 0), "chest": (-4, 6, 0), **crouch(8)}),
+        (11, {**arms()}),
+    ]
+
+
+def make_actions(arm, spec: dict, clips: dict[str, rc.Clip] = rc.R8_CLIPS) -> None:
+    """Every action of `clips` (rig_common.look_clips: the family builds none of FAMILY_DROPS). `idle` and
+    `interact` are keyed in normalised time through `_clip`, so their frame counts are the table's (A161); `walk`,
+    `swing` and `die` keep their round-5 frames, which the table never changed."""
+    # Loops span 2n scene frames (n at 12 fps; the last key repeats the first and is not rendered).
+    # One-shots span 2n - 1 frames so they render n frames including the last.
+    _clip(arm, "idle", [
+        (0, {**arms()}),
+        (0.25, {**arms(2, 2), "chest": (2, 0, 0), "root": (0, 0, 0, 0.004, 0.006, 0)}),
+        (0.5, {**arms()}),
+        (0.75, {**arms(-1, -1), "chest": (-1, 0, 0), "head": (-2, 0, 2), "root": (0, 0, 0, -0.004, -0.003, 0)}),
+        (1, {**arms()}),
     ])
     # Two steps of a 0.5 m stride: each thigh swings 18 deg either way (0.78 m legs), the passing leg
     # lifts its foot by bending the knee; the arms swing against the legs.
@@ -278,18 +297,9 @@ def make_actions(arm, spec: dict) -> None:
     # of the right hand from bent knees; recovery. The leans are small and the knees take the strike because a
     # hat or a fist raised beside the head reaches the cell top on the four-heads figure, and a lean away from
     # the camera lifts the crown on screen (the 112 px cap of SPRITES 1).
-    _action(arm, "swing", [
-        (1, {**arms()}),
-        (3, {**arms(-10, 5), "upper_arm.R": (22, 0, -14), "forearm.R": (92, 0, 0), "chest": (3, -18, 0),
-             "head": (0, 18, 0), **crouch(5)}),
-        (5, {**arms(-15, 10), "upper_arm.R": (24, 0, -12), "forearm.R": (100, 0, 0), "chest": (5, -25, 0),
-             "head": (0, 25, 0), **crouch(10)}),
-        (7, {**arms(15, -10), "upper_arm.R": (55, 0, -5), "forearm.R": (10, 0, 0), "chest": (-8, 15, 0),
-             "spine": (-3, 0, 0), "head": (-3, 0, 0), **crouch(22)}),
-        (9, {**arms(5, 0), "upper_arm.R": (25, 0, -6), "forearm.R": (15, 0, 0), "chest": (-4, 6, 0), **crouch(8)}),
-        (11, {**arms()}),
-    ])
-    _action(arm, "interact", interact_keys(spec["interact"], spec.get("raise_deg", 95)))
+    if "swing" in clips:
+        _action(arm, "swing", swing_keys())
+    _clip(arm, "interact", interact_keys(spec["interact"], spec.get("raise_deg", 95)))
     # Die: knees buckle, a fall to the back-left, spread-eagled on the last frame so it reads from all
     # 8 directions. The root tips back about X (towards -Y) and turns about the world up (local Y) to the
     # left; it is lifted as it tips so the body lies on the ground.
@@ -316,7 +326,7 @@ def make_actions(arm, spec: dict) -> None:
               "forearm.L": (5, 0, 0), "thigh.R": (3, 0, -22), "thigh.L": (3, 0, 22), "head": (0, 20, 0),
               "root": (90, -45, 0, 0, 0.13, 0)}),
     ])
-    make_r8_actions(arm, held_hands(arm))
+    make_r8_actions(arm, held_hands(arm), clips)
     arm.animation_data.action = None
 
 
@@ -375,12 +385,13 @@ DOWN = {"upper_arm.R": (-20, 0, -35), "upper_arm.L": (-15, 0, 35), "forearm.R": 
 GUARD = {"upper_arm.R": (35, 0, -8), "upper_arm.L": (35, 0, 8), "forearm.R": (105, 0, 0), "forearm.L": (105, 0, 0)}
 
 
-def make_r8_actions(arm, held: set[str]) -> None:
-    """The round-8 clips (motion.md 1). Gaits loop in eight directions; the one-shots and mood idles render in the
-    four diagonals; the leans stay small and the knees take the weight, as in swing, so a raised hand or a hat
-    keeps inside the cell (SPRITES 1)."""
+def make_r8_actions(arm, held: set[str], clips: dict[str, rc.Clip] = rc.R8_CLIPS) -> None:
+    """The round-8 clips (motion.md 1) that `clips` names. Run, strike and hurt render in eight directions; limp,
+    stagger, the one-shots and the mood idles in the four diagonals (A161); the leans stay small and the knees take
+    the weight, as in swing, so a raised hand or a hat keeps inside the cell (SPRITES 1)."""
     def clip(name: str, keys: list[tuple[float, dict]]) -> None:
-        _clip(arm, name, keys, held)
+        if name in clips:
+            _clip(arm, name, keys, held)
 
     # Run: a 0.7 m stride, the trunk leaning in, elbows bent near 70 degrees, the hips dropping at each contact.
     # The bounce goes down, not up, and the lean stays at 6 degrees: either lifts a hat crown on screen when the
@@ -568,7 +579,7 @@ def build(look: str, out_dir: str) -> str:
     feet = bpy.data.objects.new("Feet", None)
     col.objects.link(feet)
     feet.parent = arm
-    make_actions(arm, spec)
+    make_actions(arm, spec, rc.look_clips(look))
 
     tris = 0
     deps = bpy.context.evaluated_depsgraph_get()

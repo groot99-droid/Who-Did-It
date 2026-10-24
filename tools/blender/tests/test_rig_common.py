@@ -25,15 +25,15 @@ class FrameNames(unittest.TestCase):
     def test_every_v1_frame_is_valid(self):
         names = {rc.frame_name("villager", a, d, i)
                  for a, n in rc.V1_CLIPS.items() for d in rc.DIRECTIONS for i in range(n)}
-        self.assertEqual(len(names), 304)  # docs/ASSETS.md 6.3, round 5: 304 frames per pass
+        self.assertEqual(len(names), 272)  # SPRITES 3: 304 until the owner's option B trimmed idle and interact (A161)
 
-    def test_round5_clips_and_passes(self):
-        self.assertEqual(rc.V1_CLIPS, {"idle": 8, "walk": 8, "swing": 6, "interact": 8, "die": 8})
+    def test_v1_clips_and_passes(self):
+        self.assertEqual(rc.V1_CLIPS, {"idle": 6, "walk": 8, "swing": 6, "interact": 6, "die": 8})
         self.assertEqual(rc.PASSES, ("body", "scarf", "blood"))
 
 
 class Round8Clips(unittest.TestCase):
-    """The clip table of docs/round8/motion.md 1 under 6Z's budget ruling (A141)."""
+    """The clip table of docs/round8/motion.md 1 at the owner's option B (A161; SPRITES 3)."""
 
     def test_names_follow_the_anim_ids(self):
         # The client's AnimId order (apps/client/src/view/animIds.ts) without `carry` and `hide`, which no look renders.
@@ -43,12 +43,37 @@ class Round8Clips(unittest.TestCase):
         self.assertTrue(set(rc.R8_CLIPS) <= set(rc.ANIMS))
         self.assertEqual(rc.ANIMS[:8], ("idle", "walk", "run", "interact", "swing", "carry", "die", "hide"))
 
-    def test_v1_clips_keep_their_frames(self):
+    def test_v1_clips_follow_the_table(self):
         for name, n in rc.V1_CLIPS.items():
             self.assertEqual((rc.R8_CLIPS[name].frames, rc.R8_CLIPS[name].dirs), (n, rc.DIRECTIONS), name)
 
+    def test_option_b_frame_counts(self):
+        # The owner's option B (A161): plan B's frame counts, limp and stagger in the four diagonals.
+        table = {name: (c.frames, len(c.dirs)) for name, c in rc.R8_CLIPS.items()}
+        self.assertEqual(table, {
+            "idle": (6, 8), "walk": (8, 8), "swing": (6, 8), "interact": (6, 8), "die": (8, 8), "run": (6, 8),
+            "strike": (4, 8), "hurt": (3, 8),
+            "limp": (6, 4), "stagger": (6, 4), "inspect": (4, 4), "cower": (4, 4), "fidget": (4, 4),
+            "stomp": (4, 4), "stunned": (4, 4),
+            "knockdown": (4, 4), "down": (2, 4), "getup": (4, 4), "rob": (4, 4), "eat": (4, 4), "threaten": (4, 4),
+        })
+        # SPRITES 3: a deck look renders 504 resident frames a pass (47 x 8 and 32 x 4) and 88 lazy (22 x 4).
+        self.assertEqual(rc.frame_counts("baker"), (504, 88))
+        self.assertEqual(rc.look_clips("baker"), rc.R8_CLIPS)
+
+    def test_the_family_drops_five_clips(self):
+        self.assertEqual(rc.FAMILY_DROPS, ("swing", "strike", "rob", "threaten", "inspect"))
+        for body in ("villager", "villagerelder", "villagerclerk"):
+            self.assertTrue(rc.is_villager(body))
+            clips = rc.look_clips(body)
+            self.assertEqual(set(clips), set(rc.R8_CLIPS) - set(rc.FAMILY_DROPS), body)
+            self.assertEqual(list(clips), [n for n in rc.R8_CLIPS if n not in rc.FAMILY_DROPS], body)
+            # SPRITES 3: 408 resident frames a pass (37 x 8 and 28 x 4) and 56 lazy (14 x 4).
+            self.assertEqual(rc.frame_counts(body), (408, 56), body)
+        self.assertFalse(rc.is_villager("vicar"))
+
     def test_directions_and_lazy_page(self):
-        eight = {"idle", "walk", "swing", "interact", "die", "run", "limp", "stagger", "strike", "hurt"}
+        eight = {"idle", "walk", "swing", "interact", "die", "run", "strike", "hurt"}
         lazy = {"knockdown", "down", "getup", "rob", "eat", "threaten"}
         for name, clip in rc.R8_CLIPS.items():
             self.assertEqual(clip.dirs, rc.DIRECTIONS if name in eight else rc.FOUR_DIRS, name)

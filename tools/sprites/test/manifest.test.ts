@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { frameCounts } from '../keys.ts';
 import { artStyles, finishEnabled } from '../palette.ts';
 import { villagerLooks } from '../placeholder-chars.ts';
 import { LEGACY } from './legacy.ts';
@@ -26,7 +27,10 @@ const read = (rel: string) => JSON.parse(readFileSync(join(ASSETS, rel), 'utf8')
  * (ruling C11).
  */
 const FAMILY = villagerLooks().map((l) => l.id);
-const familyKeys = (id: string) => [`char_${id}`, `ovl_${id}`, `anims_${id}`];
+/** A look's resident pair and animation file, and its lazy pair with its own (SPRITES 3, A161). */
+const lookKeys = (id: string) => [`char_${id}`, `ovl_${id}`, `anims_${id}`];
+const lazyKeys = (id: string) => lookKeys(`${id}_2`);
+const familyKeys = (id: string) => [...lookKeys(id), ...lazyKeys(id)];
 const FAMILY_KEYS = FAMILY.flatMap(familyKeys);
 /** World textures whose filter follows style.json `pixelFinish.enabled.main` (SPRITES 5, 10.3). */
 const WORLD_PREFIXES = ['iso_ground_', 'iso_kit_', 'bld_', 'props', 'char_', 'ovl_', 'vfx'];
@@ -36,10 +40,10 @@ describe('asset manifests (docs/SPRITES.md 5, 10.13)', () => {
   const placeholder = read('placeholder/manifest.json');
   const byKey = (m: Manifest) => new Map(m.entries.map((e) => [e.key, e]));
 
-  it('give the real and the placeholder art the same keys and types, the villager family aside', () => {
+  it('give the real and the placeholder art the same keys and types, the family and the lazy pairs aside', () => {
     const shape = (m: Manifest) =>
       m.entries
-        .filter((e) => !FAMILY_KEYS.includes(e.key))
+        .filter((e) => !FAMILY_KEYS.includes(e.key) && !/_2$/.test(e.key))
         .map((e) => `${e.key}:${e.type}`)
         .sort();
     expect(real.art).toBe('real');
@@ -54,21 +58,38 @@ describe('asset manifests (docs/SPRITES.md 5, 10.13)', () => {
       const keys = m.entries.map((e) => e.key).filter((k) => /^(?:char|ovl|anims)_villager/.test(k));
       expect(keys.sort(), style.id).toEqual([...FAMILY_KEYS].sort());
       for (const id of FAMILY) {
-        const atlas = JSON.parse(readFileSync(join(ASSETS, style.root, `chars/char_${id}.json`), 'utf8')) as {
-          textures: Array<{ frames: unknown[] }>;
+        const count = (key: string) => {
+          const atlas = JSON.parse(readFileSync(join(ASSETS, style.root, `chars/${key}.json`), 'utf8')) as {
+            textures: Array<{ frames: unknown[] }>;
+          };
+          return atlas.textures.reduce((n, t) => n + t.frames.length, 0);
         };
-        expect(
-          atlas.textures.reduce((n, t) => n + t.frames.length, 0),
-          `${style.id} ${id}`,
-        ).toBe(304);
+        const { resident, lazy } = frameCounts(id);
+        expect(count(`char_${id}`), `${style.id} ${id}`).toBe(resident);
+        expect(count(`char_${id}_2`), `${style.id} ${id} lazy`).toBe(lazy);
       }
     }
   });
 
   it('keep the plain villager, and no family member, in the placeholder manifest', () => {
     const p = byKey(placeholder);
-    for (const k of familyKeys('villager')) expect(p.has(k), k).toBe(true);
-    for (const k of FAMILY_KEYS) if (!familyKeys('villager').includes(k)) expect(p.has(k), k).toBe(false);
+    for (const k of lookKeys('villager')) expect(p.has(k), k).toBe(true);
+    for (const k of FAMILY_KEYS) if (!lookKeys('villager').includes(k)) expect(p.has(k), k).toBe(false);
+  });
+
+  it('load every lazy pair with no map, in every real manifest (SPRITES 3)', () => {
+    for (const style of artStyles()) {
+      const m = read(join(style.root, 'manifest.json'));
+      const lazy = m.entries.filter((e) => /_2$/.test(e.key));
+      expect(lazy.length, style.id).toBeGreaterThan(0);
+      for (const e of lazy) {
+        expect(e.maps, `${style.id} ${e.key}`).toEqual([]);
+        expect(
+          m.entries.some((r) => r.key === e.key.slice(0, -2)),
+          `${style.id} ${e.key}`,
+        ).toBe(true);
+      }
+    }
   });
 
   it('give every key the same maps in both manifests', () => {

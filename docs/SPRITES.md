@@ -72,48 +72,61 @@ tail on every layer:
 Round 5: the hat passes are gone (hats are nameplate glyphs, GDD 3.1); a look's body is one 1024² page and its
 overlays one 1024 x 512 page (art plan 1.4).
 
+Round 8 (A161): a look's **lazy clips** (the `lazy` column below) pack the same way onto a second pair,
+`char_<body>_2` and `ovl_<body>_2`, with their own animation file `anims_<body>_2`; the frame and anim keys keep the
+grammar above, only the texture differs. The manifest rows of the pair carry `maps: []` (they load with no map:
+neither at boot nor with the match, SPRITES 5), and `view/assets.ts` `loadLazyLook` fetches the three on the first
+frame a figure of that look needs one of them; until they arrive `PlayerView` plays the fallback of `poses.ts`.
+The pair is transient and outside the resident cap of 10.14.
+
 Frame names inside an atlas are the anim key plus `/` and the three-digit frame number:
 `scarf/villager/walk/se/003`. The packer derives them from the rendered file name and its pass folder.
 
-Clips and frame counts for V1 (`ASSETS.md` 6.3). `carry` and `hide` are reserved by the regex and never
-rendered; the round-8 clips follow the table.
+Clips and frame counts for V1 (`ASSETS.md` 6.3), at the owner's option B of 2026-10-24 (A161: `idle` and
+`interact` were 8 until then, 304 frames a pass; now 272). `carry` and `hide` are reserved by the regex and never
+rendered; the round-8 clips follow the table. The placeholder figures (`?art=placeholder`) render these five only.
 
 | Anim | Frames | Repeat | Notes |
 |---|---|---|---|
-| `idle` | 8 | loop | |
+| `idle` | 6 | loop | |
 | `walk` | 8 | loop | |
-| `swing` | 6 | once | Shared by Kill, Crowbar and Check (`ARCHITECTURE.md` 5.4); never role-specific |
-| `interact` | 8 | loop | A V1 clip of every look, in 8 directions, `Presence.animId` 4: one id for every hold, as `swing` is for every strike, so it never tells one action or role from another |
+| `swing` | 6 | once | Shared by Kill, Crowbar and Check (`ARCHITECTURE.md` 5.4); never role-specific. Not rendered for the villager family |
+| `interact` | 6 | loop | A V1 clip of every look, in 8 directions, `Presence.animId` 4: one id for every hold, as `swing` is for every strike, so it never tells one action or role from another |
 | `die` | 8 | once, hold last frame | The last frame is the body on the floor. Rendered in 256 px cells with the feet at the centre (a fallen body reaches about 90 px below the feet); trim and the pivot hide the difference |
 
-**Round 8 clips** (motion.md 1, DECISIONS A141, 8F; the table is `tools/blender/rig_common.py` `R8_CLIPS` and its
-`rig_common` tests). The gaits, `strike` and `hurt` render in 8 directions like the V1 five; the one-shots and
-the mood idles render in the four diagonals `ne`, `se`, `sw`, `nw` only, never mirrored, and the client plays the
-nearest diagonal for a figure facing `n`, `e`, `s` or `w`. The rare clips sit on a lazy second page per look,
-loaded on first use. Every key of a clip is placed in normalised time, so a frame count that the budget trims
-changes one table row and nothing in the keys. `knockdown`, `down` and `getup` render in `die`'s 256 px cell.
+**Round 8 clips** (motion.md 1, DECISIONS A141 and A161, 8F; the table is `tools/blender/rig_common.py` `R8_CLIPS`
+and `tools/sprites/keys.ts` `R8_CLIPS`, with their tests). The frame counts are the owner's option B (A161, plan B of
+8F's measured table). `run`, `strike` and `hurt` render in 8 directions like the V1 five; `limp`, `stagger`, the
+one-shots and the mood idles render in the four diagonals `ne`, `se`, `sw`, `nw` only, never mirrored, and the
+client plays the nearest diagonal for a figure facing `n`, `e`, `s` or `w` (`poses.ts` `dirFor`). The rare clips
+sit on the lazy pair of pages per look (above), loaded on first use. Every key of a clip is placed in normalised
+time, so a frame count that the budget trims changes one table row and nothing in the keys. `knockdown`, `down`
+and `getup` render in `die`'s 256 px cell.
 
 | Anim | Frames | Repeat | Directions | Page | Plays when |
 |---|---|---|---|---|---|
-| `run` | 8 | loop | 8 | resident | the client, above walking speed |
-| `limp` | 8 | loop | 8 | resident | the client, under the `limp` bit (Slowed, Wounded) |
-| `stagger` | 8 | loop | 8 | resident | the client, under `fatigued` or `dazed` |
-| `strike` | 6 | once | 8 | resident | fists (body.md 4); `swing` stays the Knife's |
-| `hurt` | 4 | once | 8 | resident | a hit lands |
-| `stunned` | 6 | loop | 4 | resident | the client, under the `stunned` bit |
-| `inspect` | 6 | once | 4 | resident | inspect (body.md 7) |
-| `cower` | 6 | loop | 4 | resident | a Scared idle |
-| `fidget` | 6 | loop | 4 | resident | a restless idle |
-| `stomp` | 6 | loop | 4 | resident | an Angry idle |
-| `knockdown` | 6 | once, hold last frame | 4 | lazy | health reaches zero by fists; ends in the `down` pose |
-| `down` | 4 | loop | 4 | lazy | the client, under the `down` bit |
-| `getup` | 6 | once | 4 | lazy | waking; `knockdown` reversed through a sit and a kneel |
-| `rob` | 6 | once | 4 | lazy | robbing a knocked-out seat |
-| `eat` | 6 | once | 4 | lazy | eating a Wake Loaf |
-| `threaten` | 6 | once | 4 | lazy | a mugging's threat |
+| `run` | 6 | loop | 8 | resident | the client, above walking speed |
+| `strike` | 4 | once | 8 | resident | fists (body.md 4); `swing` stays the Knife's. Not rendered for the villager family |
+| `hurt` | 3 | once | 8 | resident | a hit lands |
+| `limp` | 6 | loop | 4 | resident | the client, under the `limp` bit (Slowed, Wounded) |
+| `stagger` | 6 | loop | 4 | resident | the client, under `fatigued` or `dazed` |
+| `stunned` | 4 | loop | 4 | resident | the client, under the `stunned` bit |
+| `inspect` | 4 | once | 4 | resident | inspect (body.md 7). Not rendered for the villager family |
+| `cower` | 4 | loop | 4 | resident | a Scared idle |
+| `fidget` | 4 | loop | 4 | resident | a restless idle |
+| `stomp` | 4 | loop | 4 | resident | an Angry idle |
+| `knockdown` | 4 | once, hold last frame | 4 | lazy | health reaches zero by fists; ends in the `down` pose |
+| `down` | 2 | loop | 4 | lazy | the client, under the `down` bit |
+| `getup` | 4 | once | 4 | lazy | waking; `knockdown` reversed through a sit and a kneel |
+| `rob` | 4 | once | 4 | lazy | robbing a knocked-out seat. Not rendered for the villager family |
+| `eat` | 4 | once | 4 | lazy | eating a Wake Loaf |
+| `threaten` | 4 | once | 4 | lazy | a mugging's threat. Not rendered for the villager family |
 
-Per look that is 696 resident frames a pass (72 x 8 directions and 30 x 4) and 136 lazy (34 x 4), against the
-304 of V1; the measured page cost and the cap are in 10.14 and A141.
+Per deck look that is 504 resident frames a pass (47 x 8 directions and 32 x 4) and 88 lazy (22 x 4), against
+the 304 of V1. The **villager family** (`looks.json` `villagers`, A161) renders without `swing`, `strike`, `rob`,
+`threaten` and `inspect`: a townsfolk figure is never a seat, so it never plays them (`rig_common.look_clips`,
+`keys.ts` `lookClips`; `poses.ts` falls back to `idle` or `interact` if one is ever sent), which makes 408 resident
+frames a pass (37 x 8 and 28 x 4) and 56 lazy (14 x 4). The measured page cost and the cap are in 10.14 and A161.
 
 Prop frames (round 8, 8K) are looked up in `props_<mapId>`, then `props`, and within each atlas by stem in this
 order: the exact state frame where the kind has one (`prop_lanternPost_lit`), then `prop_<kind>`, then

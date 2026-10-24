@@ -36,6 +36,8 @@ const DOM_BYTES: Array<[string, number]> = [
 const isDom = (p: Page) => DOM_BYTES.some(([x]) => p.key.startsWith(x)) && p.entry.type === 'image';
 const equiv = (ps: Page[]) => ps.reduce((n, p) => n + (p.width * p.height) / PAGE, 0);
 const lookOf = (key: string) => /^(?:char|ovl)_([a-z][a-z0-9]*)$/.exec(key)?.[1];
+/** A look's lazy pair (SPRITES 3, A161): one page each, outside the resident sum. */
+const lazyOf = (key: string) => /^(?:char|ovl)_([a-z][a-z0-9]*)_2$/.exec(key)?.[1];
 
 describe.each(artStyles().filter((s) => hasManifest(s.root)))(
   'texture budget, $id (art plan 1.4, SPRITES 10.14)',
@@ -52,10 +54,16 @@ describe.each(artStyles().filter((s) => hasManifest(s.root)))(
       });
     }
 
-    it('keeps each look within one body page and one overlay page', () => {
+    it('keeps each look within one body page and one overlay page, and its lazy pair the same', () => {
       const counts = new Map<string, number>();
-      for (const p of gpu) if (lookOf(p.key)) counts.set(p.key, (counts.get(p.key) ?? 0) + 1);
+      for (const p of gpu)
+        if (lookOf(p.key) || lazyOf(p.key)) counts.set(p.key, (counts.get(p.key) ?? 0) + 1);
+      expect([...counts.keys()].some((k) => lazyOf(k))).toBe(true);
       for (const [key, n] of counts) expect(n, key).toBe(1);
+    });
+
+    it('keeps the lazy pairs outside the resident sum: they load with no map', () => {
+      for (const p of gpu) if (lazyOf(p.key)) expect(p.entry.maps, p.key).toEqual([]);
     });
 
     it(`fits each map's environment, the boot atlases and the ${LOOKS_COUNTED} largest looks in ${RESIDENT_CAP} pages`, () => {

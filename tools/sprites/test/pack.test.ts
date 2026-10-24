@@ -2,13 +2,22 @@ import { createCanvas } from '@napi-rs/canvas';
 import { describe, expect, it } from 'vitest';
 import { applyPivots, buildAnims, fileStemOf, type FeetManifest } from '../gen-anims.ts';
 import {
+  CLIP_CELL,
+  CLIP_NAMES,
   DIRECTIONS,
+  FAMILY_DROPS,
   PASSES,
+  R8_CLIPS,
   V1_CLIPS,
   animKey,
+  frameCounts,
   frameFileName,
   frameKey,
+  isLazy,
+  lookClips,
+  lookTails,
   parseFrameFileName,
+  textureKey,
   type Dir,
 } from '../keys.ts';
 import { atlasJson, packCharacter, packFrames, type MultiAtlas, type PackInput } from '../pack.ts';
@@ -65,7 +74,7 @@ describe('keys', () => {
     expect(PASSES).toEqual(['body', 'scarf', 'blood']);
     expect(Object.keys(V1_CLIPS)).toEqual(['idle', 'walk', 'swing', 'interact', 'die']);
     const perPass = Object.values(V1_CLIPS).reduce((n, c) => n + c.frames, 0) * DIRECTIONS.length;
-    expect(perPass).toBe(304);
+    expect(perPass).toBe(272); // 304 until the owner's option B trimmed idle and interact to 6 (A161)
     expect(animKey('blood', 'villager', 'die', 'nw')).toBe('blood/villager/die/nw');
     expect(fileStemOf('scarf/villager/walk/se/003')).toBe('char_villager_walk_se_003');
   });
@@ -73,6 +82,62 @@ describe('keys', () => {
   it('rejects role-like or malformed names', () => {
     expect(() => parseFrameFileName('char_villager_dance_n_000')).toThrow();
     expect(() => frameFileName({ body: 'old_man', anim: 'walk', dir: 'n', index: 0 })).toThrow();
+  });
+
+  it("carries the clip table of SPRITES 3 at the frame counts of the owner's option B (A161)", () => {
+    expect(parseFrameFileName('char_villager_knockdown_ne_003').anim).toBe('knockdown');
+    expect(CLIP_NAMES).toHaveLength(21);
+    const table = Object.fromEntries(
+      CLIP_NAMES.map((c) => [c, [R8_CLIPS[c].frames, R8_CLIPS[c].dirs.length]]),
+    );
+    expect(table).toEqual({
+      idle: [6, 8],
+      walk: [8, 8],
+      swing: [6, 8],
+      interact: [6, 8],
+      die: [8, 8],
+      run: [6, 8],
+      strike: [4, 8],
+      hurt: [3, 8],
+      limp: [6, 4],
+      stagger: [6, 4],
+      inspect: [4, 4],
+      cower: [4, 4],
+      fidget: [4, 4],
+      stomp: [4, 4],
+      stunned: [4, 4],
+      knockdown: [4, 4],
+      down: [2, 4],
+      getup: [4, 4],
+      rob: [4, 4],
+      eat: [4, 4],
+      threaten: [4, 4],
+    });
+    expect(CLIP_NAMES.filter((c) => R8_CLIPS[c].lazy)).toEqual([
+      'knockdown',
+      'down',
+      'getup',
+      'rob',
+      'eat',
+      'threaten',
+    ]);
+    expect(isLazy('down') && !isLazy('limp') && !isLazy('dance')).toBe(true);
+    expect(CLIP_CELL).toEqual({
+      die: [256, 128],
+      knockdown: [256, 128],
+      down: [256, 128],
+      getup: [256, 128],
+    });
+    // A deck look renders 504 resident frames a pass and 88 lazy; the villager family drops five clips: 408 and 56.
+    expect(frameCounts('baker')).toEqual({ resident: 504, lazy: 88 });
+    expect([...lookClips('baker').keys()]).toEqual(CLIP_NAMES);
+    expect(frameCounts('villagerelder')).toEqual({ resident: 408, lazy: 56 });
+    expect([...lookClips('villager').keys()]).toEqual(CLIP_NAMES.filter((c) => !FAMILY_DROPS.includes(c)));
+    expect(lookTails('villager', true)).toHaveLength(56);
+    expect(lookTails('baker', false)[0]).toBe('baker/idle/n/000');
+    expect(lookTails('baker', false).filter((t) => t.includes('/limp/'))).toHaveLength(24);
+    expect(textureKey('body', 'baker', true)).toBe('char_baker_2');
+    expect(textureKey('blood', 'baker', true)).toBe('ovl_baker_2');
   });
 });
 

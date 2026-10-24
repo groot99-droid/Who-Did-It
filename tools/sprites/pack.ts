@@ -5,7 +5,16 @@ import { fileURLToPath } from 'node:url';
 import { packAsync } from 'free-tex-packer-core';
 import { alphaBleed, decodePng, type Rgba } from './bleed.ts';
 import { applyPivots, buildAnims, type FeetManifest } from './gen-anims.ts';
-import { CHAR_PAGE, OVL_PAGE, PASSES, frameKey, parseFrameFileName, textureKey, type Pass } from './keys.ts';
+import {
+  CHAR_PAGE,
+  OVL_PAGE,
+  PASSES,
+  frameKey,
+  isLazy,
+  parseFrameFileName,
+  textureKey,
+  type Pass,
+} from './keys.ts';
 import { artStyle, defaultArtStyle, finishEnabled } from './palette.ts';
 
 /** The packer settings fixed by ASSETS.md 6.3. */
@@ -135,10 +144,15 @@ export interface CharacterPages {
 }
 export const LOOK_PAGES: CharacterPages = { body: CHAR_PAGE, overlay: OVL_PAGE };
 
+/** The anim of an atlas frame name `<pass>/<body>/<anim>/<dir>/<nnn>`. */
+const animOf = (name: string): string => name.split('/')[2] ?? '';
+
 /**
  * Pack one body's passes: `char_<body>` (body pass) and `ovl_<body>` (every overlay pass), pivots
- * from the Feet manifest, and `<body>.anims.json`. Returns output file name -> bytes. A set that
- * does not fit its page size spills onto a second page, which budget.test.ts refuses for a look.
+ * from the Feet manifest, and `<body>.anims.json`; the lazy clips of the table (SPRITES 3, A161) go the same
+ * way onto `char_<body>_2`, `ovl_<body>_2` and `<body>_2.anims.json`, a pair the client loads on first use.
+ * Returns output file name -> bytes. A set that does not fit its page size spills onto a second page, which
+ * budget.test.ts refuses for a look.
  */
 export async function packCharacter(
   body: string,
@@ -147,21 +161,27 @@ export async function packCharacter(
   pageSizes: CharacterPages = LOOK_PAGES,
 ): Promise<Map<string, Buffer>> {
   const out = new Map<string, Buffer>();
-  const bodyFrames = framesByPass.get('body') ?? [];
-  const overlayFrames = PASSES.filter((p) => p !== 'body').flatMap((p) => framesByPass.get(p) ?? []);
-  const textures: { key: string; atlas: MultiAtlas }[] = [];
-  for (const [key, frames, size] of [
-    [textureKey('body', body), bodyFrames, pageSizes.body],
-    [textureKey('scarf', body), overlayFrames, pageSizes.overlay],
-  ] as const) {
-    if (frames.length === 0) continue;
-    const { atlas, pages } = await packFrames(key, frames, size);
-    applyPivots(atlas, manifest);
-    textures.push({ key, atlas });
-    for (const [name, png] of pages) out.set(name, png);
-    out.set(`${key}.json`, Buffer.from(atlasJson(atlas)));
+  for (const lazy of [false, true]) {
+    const pick = (pass: Pass) =>
+      (framesByPass.get(pass) ?? []).filter((i) => isLazy(animOf(i.name)) === lazy);
+    const bodyFrames = pick('body');
+    const overlayFrames = PASSES.filter((p) => p !== 'body').flatMap(pick);
+    const textures: { key: string; atlas: MultiAtlas }[] = [];
+    for (const [key, frames, size] of [
+      [textureKey('body', body, lazy), bodyFrames, pageSizes.body],
+      [textureKey('scarf', body, lazy), overlayFrames, pageSizes.overlay],
+    ] as const) {
+      if (frames.length === 0) continue;
+      const { atlas, pages } = await packFrames(key, frames, size);
+      applyPivots(atlas, manifest);
+      textures.push({ key, atlas });
+      for (const [name, png] of pages) out.set(name, png);
+      out.set(`${key}.json`, Buffer.from(atlasJson(atlas)));
+    }
+    if (lazy && textures.length === 0) continue;
+    const anims = `${JSON.stringify(buildAnims(textures), null, 1)}\n`;
+    out.set(`${body}${lazy ? '_2' : ''}.anims.json`, Buffer.from(anims));
   }
-  out.set(`${body}.anims.json`, Buffer.from(`${JSON.stringify(buildAnims(textures), null, 1)}\n`));
   return out;
 }
 

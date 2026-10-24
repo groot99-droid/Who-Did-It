@@ -7,7 +7,7 @@ import { isoDepth, toScreen } from '@wdi/shared/iso';
 import { StatusBit } from './animIds';
 import { TELEPORT_PX } from './interpolation';
 import { BIAS } from './iso';
-import { type Clip, clipFor, dirFor, dirFromYaw } from './poses';
+import { type Clip, clipFor, dirFor, dirFromYaw, LAZY_CLIPS, wantedClip } from './poses';
 import { reducedMotion } from './vfx/motion';
 
 export { dirFromYaw };
@@ -62,6 +62,8 @@ export class PlayerView {
   private readonly tick: Phaser.GameObjects.Rectangle;
   private readonly scale: number;
   private anim = '';
+  /** Whether this view has asked for its look's lazy pair. */
+  private lazyAsked = false;
   private hatPass: string | null = null;
   private bloodOn = false;
   private bleeding = false;
@@ -135,7 +137,10 @@ export class PlayerView {
     this.plate.setVisible(!transit);
     const key = (clip: Clip) => `${this.bodyId}/${clip}/${dirFor(clip, dir)}`;
     const has = (c: Clip) => this.scene.anims.exists(`char/${key(c)}`);
-    const { clip, tick } = clipFor(animId, has, { bits, speed: this.speed });
+    const motion = { bits, speed: this.speed };
+    const wanted = wantedClip(animId, motion);
+    if (LAZY_CLIPS.has(wanted) && !has(wanted)) this.requestLazy();
+    const { clip, tick } = clipFor(animId, has, motion);
     this.tick.setVisible(tick && !transit);
     this.showSigns(bits & SIGN_BITS);
     if (!this.hasArt) return;
@@ -278,6 +283,17 @@ export class PlayerView {
 
   private play(sprite: Phaser.GameObjects.Sprite, key: string, startFrame: number): void {
     if (this.scene.anims.exists(key)) sprite.play({ key, startFrame });
+  }
+
+  /**
+   * Asks `assets.ts` for the look's lazy pair (SPRITES 3, A161) the first time a figure wants one of its clips; the
+   * figure plays the fallback until the pair is in and the next pose picks the clip up. The loader module pulls in
+   * Phaser, so it is reached lazily, and never on a scene without a loader (the tests' fakes).
+   */
+  private requestLazy(): void {
+    if (this.lazyAsked || !this.hasArt || !this.scene.load) return;
+    this.lazyAsked = true;
+    void import('./assets').then((m) => m.loadLazyLook(this.scene, this.bodyId));
   }
 
   /**

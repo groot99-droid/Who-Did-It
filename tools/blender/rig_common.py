@@ -19,11 +19,13 @@ R8_ANIMS = ("strike", "hurt", "knockdown", "down", "getup", "limp", "stagger", "
             "cower", "fidget", "stomp", "eat", "rob")
 ANIMS = ("idle", "walk", "run", "interact", "swing", "carry", "die", "hide", *R8_ANIMS)
 
-# V1 clips and frame counts (docs/ASSETS.md 6.3, round 5): 38 frames x 8 directions = 304 per pass.
-V1_CLIPS = {"idle": 8, "walk": 8, "swing": 6, "interact": 8, "die": 8}
+# The V1 clips (docs/SPRITES.md 3). Round 5 rendered idle and interact at 8 frames (38 x 8 directions = 304 a
+# pass); the owner's option B of 2026-10-24 (A161) trims them to 6 (34 x 8 = 272), the same rows as R8_CLIPS.
+V1_CLIPS = {"idle": 6, "walk": 8, "swing": 6, "interact": 6, "die": 8}
 
-# The four screen diagonals a 4-direction clip renders (6Z's budget ruling, round 8: one-shots and mood idles in
-# four rendered directions, never mirrored). The client plays the nearest of the four.
+# The four screen diagonals a 4-direction clip renders (6Z's budget ruling, A141, and the owner's option B, A161:
+# the one-shots, the mood idles and the limp and stagger gaits in four rendered directions, never mirrored). The
+# client plays the nearest of the four.
 FOUR_DIRS = ("ne", "se", "sw", "nw")
 
 
@@ -39,21 +41,47 @@ class Clip:
         return 2 * self.frames if self.loop else 2 * (self.frames - 1)
 
 
-# Round 8 clips (motion.md 1, the budget ruling of A141's open column): the V1 five, the gaits and `strike` and
-# `hurt` in eight directions; the one-shots and mood idles in four; the rare clips on a lazy second page. The frame
-# counts are the full plan sent to 6Z with the measured budget; a clip that the budget trims gets fewer frames
-# here and nowhere else, since every key of build_looks.py is placed in normalised time.
+# Round 8 clips (motion.md 1) at the frame counts of the owner's option B (A161, plan B of 8F's measured table):
+# the V1 five, `run`, `strike` and `hurt` in eight directions (47 frames); `limp`, `stagger`, the one-shots and the
+# mood idles in four (32); the rare clips on a lazy second page per look (22, in four), transient and outside the
+# resident cap. A clip that the budget trims changes its row here and nowhere else, since every key of
+# build_looks.py is placed in normalised time.
 R8_CLIPS: dict[str, Clip] = {
-    "idle": Clip(8, True), "walk": Clip(8, True), "swing": Clip(6, False), "interact": Clip(8, True),
+    "idle": Clip(6, True), "walk": Clip(8, True), "swing": Clip(6, False), "interact": Clip(6, True),
     "die": Clip(8, False),
-    "run": Clip(8, True), "limp": Clip(8, True), "stagger": Clip(8, True),
-    "strike": Clip(6, False), "hurt": Clip(4, False),
-    "inspect": Clip(6, False, FOUR_DIRS), "cower": Clip(6, True, FOUR_DIRS), "fidget": Clip(6, True, FOUR_DIRS),
-    "stomp": Clip(6, True, FOUR_DIRS), "stunned": Clip(6, True, FOUR_DIRS),
-    "knockdown": Clip(6, False, FOUR_DIRS, lazy=True), "down": Clip(4, True, FOUR_DIRS, lazy=True),
-    "getup": Clip(6, False, FOUR_DIRS, lazy=True), "rob": Clip(6, False, FOUR_DIRS, lazy=True),
-    "eat": Clip(6, False, FOUR_DIRS, lazy=True), "threaten": Clip(6, False, FOUR_DIRS, lazy=True),
+    "run": Clip(6, True), "limp": Clip(6, True, FOUR_DIRS), "stagger": Clip(6, True, FOUR_DIRS),
+    "strike": Clip(4, False), "hurt": Clip(3, False),
+    "inspect": Clip(4, False, FOUR_DIRS), "cower": Clip(4, True, FOUR_DIRS), "fidget": Clip(4, True, FOUR_DIRS),
+    "stomp": Clip(4, True, FOUR_DIRS), "stunned": Clip(4, True, FOUR_DIRS),
+    "knockdown": Clip(4, False, FOUR_DIRS, lazy=True), "down": Clip(2, True, FOUR_DIRS, lazy=True),
+    "getup": Clip(4, False, FOUR_DIRS, lazy=True), "rob": Clip(4, False, FOUR_DIRS, lazy=True),
+    "eat": Clip(4, False, FOUR_DIRS, lazy=True), "threaten": Clip(4, False, FOUR_DIRS, lazy=True),
 }
+
+# The clips a townsfolk look never plays (the owner's option B, A161; seams.md 5): a villager figure is never a
+# seat, so it neither swings a Knife, strikes, robs, threatens nor inspects, and the family renders none of the
+# five. The client's poses.ts falls back to idle or interact if one is ever sent to such a figure.
+FAMILY_DROPS = ("swing", "strike", "rob", "threaten", "inspect")
+# Every townsfolk look id begins with this (seams.md 5; looks_spec.VILLAGERS).
+VILLAGER_PREFIX = "villager"
+
+
+def is_villager(body: str) -> bool:
+    """True for the plain villager and the townsfolk variants."""
+    return body.startswith(VILLAGER_PREFIX)
+
+
+def look_clips(body: str) -> dict[str, Clip]:
+    """The clip table of one look, in R8_CLIPS order: every clip for a deck look, less FAMILY_DROPS for the family."""
+    drops = set(FAMILY_DROPS) if is_villager(body) else set()
+    return {name: clip for name, clip in R8_CLIPS.items() if name not in drops}
+
+
+def frame_counts(body: str) -> tuple[int, int]:
+    """(resident, lazy) rendered frames a pass of one look (SPRITES 3): the deck 504 and 88, the family 408 and 56."""
+    clips = look_clips(body).values()
+    return (sum(c.frames * len(c.dirs) for c in clips if not c.lazy),
+            sum(c.frames * len(c.dirs) for c in clips if c.lazy))
 
 # Round 5: hats are nameplate glyphs, so the hat passes are gone (art plan 4.2).
 PASSES = ("body", "scarf", "blood")
