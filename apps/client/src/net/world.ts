@@ -139,6 +139,16 @@ export type WorldFeedEvents = {
   'inspect.noticed': S2CPayloads['inspect.noticed'];
   /** Private, round 8: a card-blind hunch, an `inspect.hunch.*` copy id. */
   'inspect.hunch': S2CPayloads['inspect.hunch'];
+  /** Private, round 8, 8C (locked; GDD 3.23): a `shop` hold opened this shop (`S2C.shopOpen`). */
+  shopOpen: {
+    shopId: string;
+    stock: Array<{ itemId: string; price: number }>;
+    buys: Array<{ itemId: string; price: number }>;
+  };
+  /** Private, round 7 (7M, GDD 3.5): the hands on the co-op hold this seat is in and its shared progress (0 to 1). */
+  coopHold: { taskId: string; holders: number; progress: number };
+  /** Private, round 8 (8R, GDD 3.12): an NPC shouted for a body here; to the nearest Detective and Doctor only. */
+  shout: S2CPayloads['shout'];
   /** Private, round 8 (8E, GDD 3.24): a mugger's demand; `muggerId` is its avatar handle, the answer is due by `endsTick`. */
   mugPrompt: { muggerId: string; endsTick: number };
 };
@@ -183,6 +193,9 @@ export interface TaskSnap {
   fake: boolean;
 }
 
+/** Round 8, 8D (GDD 3.23): the civic acts a client sends through `WorldFeed.civic`. */
+export type CivicAct = 'act.donate' | 'act.faith' | 'act.notice' | 'act.hq' | 'act.payRent';
+
 export interface WorldFeed {
   readonly bus: Emitter<WorldFeedEvents>;
   readonly selfId: string;
@@ -213,6 +226,17 @@ export interface WorldFeed {
   taskBar(): number;
   /** Round 6 (6I): this player's own inventory slots, in slot order. */
   inventory(): StackSnap[];
+  /** Round 8, 8C (locked; GDD 3.23): this player's own purse, `Private.purse`. */
+  purse(): number;
+  /** Round 8, 8C (locked): `act.buy` and `act.sell` at the shop a `shop` hold opened. */
+  buy(shopId: string, itemId: string, qty: number): void;
+  sell(shopId: string, itemId: string, qty: number): void;
+  /** Round 8, 8D (GDD 3.23): this player's own Faith, `Private.faith`. */
+  faith(): number;
+  /** Round 8, 8D: each HQ station's bought tier by station id (`GameState.hq`, public; a station absent is unbuilt). */
+  hqTiers(): Record<string, number>;
+  /** Round 8, 8D: one of the civic acts at the altar, the black market, a station or a bank counter. */
+  civic(type: CivicAct, payload: object): void;
   /** Round 6 (6I): `quest.accept { questId }`. */
   questAccept(questId: string): void;
   /** Round 6 (6I): `quest.turnIn { questId }`. */

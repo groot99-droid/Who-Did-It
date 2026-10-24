@@ -64,6 +64,8 @@ export const NoteKind = {
   doubt: 8,
   /** Round 7 (GDD 3.20): the Hitman's own contract, brought by the first Train; `of` is the target seat. */
   contract: 9,
+  /** Round 8 (GDD 3.23): a Blackmail Notice from the mailbag; `of` is the look it names, `sceneId` and `value` (a phase) where and when. */
+  notice: 10,
 } as const;
 export type NoteKindId = (typeof NoteKind)[keyof typeof NoteKind];
 

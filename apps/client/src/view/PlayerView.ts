@@ -7,6 +7,7 @@ import { isoDepth, toScreen } from '@wdi/shared/iso';
 import { StatusBit } from './animIds';
 import { TELEPORT_PX } from './interpolation';
 import { BIAS } from './iso';
+import { drawScale } from './texels';
 import { type Clip, clipFor, dirFor, dirFromYaw } from './poses';
 import { reducedMotion } from './vfx/motion';
 
@@ -97,9 +98,10 @@ export class PlayerView {
     this.blood.setVisible(false);
     this.body.setVisible(this.hasArt);
     this.scarf.setTint(SCARF_TINT[look.scarf] ?? SCARF_TINT[0]);
-    // The scarf and hat are the villager's overlays; a deck look wears its own, baked into the body.
+    // The scarf is the villager family's overlay (the townsfolk's variants too, looks.json `villagers`); a deck
+    // look wears its own, baked into the body. The hat passes exist only on the placeholder villager.
     this.hatPass = this.bodyId === BODY ? (HATS[look.hat] ?? null) : null;
-    this.scarf.setVisible(this.bodyId === BODY);
+    this.scarf.setVisible(this.bodyId.startsWith(BODY));
     const shape = SCARF_SHAPE[look.scarf] ?? SCARF_SHAPE[0];
     this.plate = scene.add
       .text(0, -Math.round(HEAD_PX * scale + 18), `${shape} ${name}`, {
@@ -110,7 +112,10 @@ export class PlayerView {
         strokeThickness: 4,
       })
       .setOrigin(0.5, 1);
-    const art = scene.add.container(0, 0, [this.body, this.scarf, this.hat, this.blood]).setScale(scale);
+    // The art alone divides by the body texture's texel factor (HD, A164); the plate and tick keep world px.
+    const art = scene.add
+      .container(0, 0, [this.body, this.scarf, this.hat, this.blood])
+      .setScale(scale * drawScale(bodyTexture));
     // The greybox mark of an interact pose a look has no clip for: a small teal tick above the head.
     this.tick = scene.add
       .rectangle(0, -Math.round(HEAD_PX * scale + 8), 10, 10, hex(palette.colors.teal))

@@ -23,6 +23,7 @@ import { MAP_IDS, type MapFile, type MapId } from './schemas/maps.js';
 import { checkMaps, checkSceneWorld } from './validateWorld.js';
 import { checkVendettas } from './validateVendettas.js';
 import type { EconomyFile } from './schemas/economy.js';
+import { checkEconomy } from './validateEconomy.js';
 import { checkRelations } from './validateRelations.js';
 
 export interface Content {
@@ -250,6 +251,8 @@ export function validateContent(c: Content): string[] {
   checkM5b(c, err);
   // Round 7 (GDD 3.20): the vendettas' cards, maps and kinds.
   checkVendettas(c, err);
+  // Round 8 (GDD 3.23): the economy's props, items, looks and curfew scenes.
+  checkEconomy(c, err);
   checkStakes(c, err);
   // Round 8 (GDD 3.22): the relations table's sides and the inspect bands.
   checkRelations(c, err);
@@ -672,6 +675,12 @@ function checkRoutines(c: Content, err: (msg: string) => void): void {
   }
   if (party.profileCodeLength < lobby.codeLength) {
     err('balance.json party.profileCodeLength: must be at least lobby.codeLength');
+  }
+
+  // Round 8 (GDD 3.3): the trial's discussion is longer than every ordinary meeting's.
+  const longest = Math.max(...Object.values(c.balance.byCount).map((row) => row.discussionS));
+  if (c.balance.finalNight.trialS <= longest) {
+    err(`balance.json finalNight.trialS: must be longer than the longest discussion (${longest} s)`);
   }
 
   // Rule 6: the npc spans and the routine weights of balance.json.

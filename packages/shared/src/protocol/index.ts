@@ -18,6 +18,8 @@ export const C2S = {
   mug: 'act.mug',
   vote: 'meeting.vote',
   say: 'chat.say',
+  /** Round 8 (GDD 3.8 "Meeting notes", 8T): a line for the meeting notes, which carry no speaker. */
+  note: 'chat.note',
   quick: 'chat.quick',
   ping: 'world.ping',
   roleReady: 'role.ready',
@@ -43,6 +45,16 @@ export const C2S = {
   sell: 'act.sell',
   /** Round 8 (GDD 3.23, 8C): deposit to or withdraw from the bank a `bank` hold opened; Session 8C reads it. */
   bank: 'act.bank',
+  /** Round 8 (GDD 3.23, 8D): Scrip into Faith at an altar in reach. */
+  donate: 'act.donate',
+  /** Round 8 (GDD 3.23, 8D): an Indulgence or a Parish Seal at an altar; a held Seal presented at a meeting. */
+  faith: 'act.faith',
+  /** Round 8 (GDD 3.23, 8D): show, burn or fence a Blackmail Notice (its Notebook entry id). */
+  notice: 'act.notice',
+  /** Round 8 (GDD 3.23, 8D): invest in the next tier of the HQ station in reach. */
+  hq: 'act.hq',
+  /** Round 8 (GDD 3.23, 8D): pay the rent due, at the bank or to the Company Clerk in reach. */
+  payRent: 'act.payRent',
 } as const;
 
 export const S2C = {
@@ -73,6 +85,9 @@ export const S2C = {
   inspectHunch: 'inspect.hunch',
   /** Round 8 (GDD 3.23, 8C): a `shop` hold opened a shop; sent by Session 8C. */
   shopOpen: 'shop.open',
+  coopHold: 'coopHold',
+  /** Round 8 (GDD 3.12, 8R), private to the nearest living Detective and Doctor: an NPC shouted for a body here. */
+  shout: 'shout',
   /** Round 8 (GDD 3.24): a mugger's demand, private to the target; sent by Session 8E's `mug.ts`. */
   mugPrompt: 'mugPrompt',
 } as const;
@@ -82,9 +97,22 @@ export type S2CType = (typeof S2C)[keyof typeof S2C];
 
 /** `gather` and `craft` are round 6 (M5b, GDD 3.14); the server refuses them until Session 6F lands. */
 export type HoldAction =
-  'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft' | 'shop' | 'bank';
+  | 'drag'
+  | 'collect'
+  | 'task'
+  | 'inspect'
+  | 'autopsy'
+  | 'gather'
+  | 'craft'
+  // Round 8 (GDD 3.23, 8C): a shop counter and the bank.
+  | 'shop'
+  | 'bank'
+  // Round 8 (GDD 3.23, 8D): the chapel altar, the Train's mailbag, the tally rack.
+  | 'altar'
+  | 'mailbag'
+  | 'rack';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
-export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke';
+export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
 /**
  * Why a meeting opened (GDD 3.3); `missing` is the roll-call of M4; `final` is the forced meeting after the Final
  * Night hunt.
@@ -98,8 +126,11 @@ export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
  */
 export type DeathCause =
   'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'bled' | 'sickened';
-/** Chat channels the server derives (GDD 3.5); the client never chooses one. */
-export type ChatChannel = 'meeting' | 'ghost' | 'cabal' | 'system';
+/**
+ * Chat channels the server derives (GDD 3.5); the client never chooses one. Round 8 (GDD 3.8, 8T): `notes` is the
+ * meeting notes, reached only by `chat.note`, whose lines carry no speaker.
+ */
+export type ChatChannel = 'meeting' | 'ghost' | 'cabal' | 'system' | 'notes';
 /** Round 8 (GDD 3.22 "Inspect"): what a glance tells of health, never the number. */
 export type InspectHealth = 'unhurt' | 'bruised' | 'badlyHurt';
 /** Round 8: the purse's jingle; `unknown` until a purse exists (8C) or when its bands are not set. */
@@ -204,8 +235,16 @@ export interface C2SPayloads {
   /** A living player's id, or `"skip"`. Changeable until the vote closes (A30). */
   'meeting.vote': { targetId: string };
   'chat.say': { text: string };
+  'chat.note': { text: string };
   'chat.quick': { phraseId: string };
   'world.ping': { x: number; y: number };
+  /** Round 8 (GDD 3.23, 8D): whole Scrip, at most `economy.json` `faith.donateMax`. */
+  'act.donate': { amount: number };
+  'act.faith': { kind: 'indulgence' | 'seal' };
+  /** `itemId` is the notice's Notebook entry id. */
+  'act.notice': { itemId: string; op: 'show' | 'burn' | 'fence' };
+  'act.hq': { stationId: string };
+  'act.payRent': Record<string, never>;
   /** Deprecated alias of `lobby.ready {ready: true}`. */
   'role.ready': Record<string, never>;
   'net.ping': { t: number };
@@ -269,7 +308,7 @@ export interface S2CPayloads {
   clueFound: { entryId: string };
   /** Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). */
   killed: { sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string };
-  /** Private: routed per recipient; `from` is a player id. */
+  /** Private: routed per recipient; `from` is a player id, `''` on `system` and `notes` (no speaker). */
   'chat.msg': { from: string; text: string; channel: ChatChannel };
   phaseChange: { phase: number; endsTick: number };
   meetingStart: { reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] };
@@ -287,6 +326,8 @@ export interface S2CPayloads {
     undealt?: string[];
   };
   noise: { sceneId: string; x: number; y: number; kind: string };
+  /** Where the shout rang; names no seat, no card and no body. */
+  shout: { sceneId: string; x: number; y: number };
   error: { code: ErrorCode; msg: string };
   /**
    * To every client whose view holds that scene: the puff of a disguise a Knife strike dropped, at (x, y). Names no
@@ -337,6 +378,8 @@ export interface S2CPayloads {
     stock: Array<{ itemId: string; price: number }>;
     buys: Array<{ itemId: string; price: number }>;
   };
+  /** Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. */
+  coopHold: { taskId: string; holders: number; progress: number };
   /**
    * Private, round 8 (GDD 3.24): a mugger demands the purse; `muggerId` is its avatar handle in the target's
    * scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`).
@@ -362,6 +405,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.light': 5,
   'meeting.vote': 2,
   'chat.say': 2,
+  'chat.note': 2,
   'chat.quick': 2,
   'world.ping': 2,
   'lobby.start': 2,
@@ -377,6 +421,12 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.buy': 5,
   'act.sell': 5,
   'act.bank': 5,
+  'act.donate': 5,
+  'act.faith': 5,
+  'act.notice': 5,
+  'act.hq': 5,
+  'act.payRent': 5,
+  'act.mug': 5,
 };
 
 export const ErrorCode = {
