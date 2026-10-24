@@ -7,6 +7,7 @@ import { addStack, canAdd, count } from './Inventory';
 import { isVerbPhase, profileOpen, reject, sceneKey, tileCentre } from './World';
 import { type PlayerSim, simOf } from './RoomSim';
 import type { MatchSeeds } from './seeds';
+import { coinsProblem, isCoins, tickCoins } from './economy/coins';
 
 /**
  * Resource nodes and gathering (round 6, M5b, GDD 3.14; docs/round6/m5b-data.md 2.1): the node pool per match from
@@ -143,6 +144,7 @@ function gatherProblem(
   p: PlayerSim,
   nodeId: string,
 ): { code: ErrorCode; msg: string } | null {
+  if (isCoins(room, p, nodeId)) return coinsProblem(room, p, nodeId); // round 8, 8C (locked): a pickup, economy/coins.ts
   if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
   if (p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
   if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
@@ -180,6 +182,7 @@ export function handleGather(room: PartyRoom, sessionId: string, nodeId: string)
  * a full inventory cancel it and yield nothing; at the end of the cast the yield goes in and the node empties.
  */
 export function tickGather(room: PartyRoom, sessionId: string, p: PlayerSim): void {
+  if (p.hold && isCoins(room, p, p.hold.targetId)) return tickCoins(room, sessionId, p); // round 8, 8C (locked)
   const hold = p.hold;
   const player = room.state.players.get(sessionId);
   if (!hold || !player) return;
