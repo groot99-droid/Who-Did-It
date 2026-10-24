@@ -360,6 +360,33 @@ checks this list, the grid, the stroke and the colours.
 
 The ability keys are `icon_ability_<abilityId>` with the ability id in lower case (round 5, art plan 4.6).
 
+### 9.1 Round-8 icons (8N, DECISIONS A172)
+
+The status and HUD icons of round 8 (`docs/round8/teardown.md` 3) are a second family, in the style the owner approved
+on `docs/round8/icons/sheet-01.png`: each sits on a 46 px square of the bone ground `#FFF1DC` with a 2 px `ink` outline
+and rounded corners, inside the 48 px grid, and draws in the world ramps of `palette.json` only (detail lines may be
+any width). One hand-written SVG master per icon, `apps/client/public/assets/ui/icons/hd/<key>.svg`, is the HD file the
+client shows as it is. The 8-bit and low-poly files beside it, `8bit/<key>.png` and `lowpoly/<key>.png` (48 px), are
+generated from the master by `pnpm --filter @wdi/sprites icons` (`tools/sprites/icons-build.ts`) and never edited by
+hand; `tools/sprites/test/icon-masters.test.ts` fails when one is missing or stale.
+
+One master holds both looks. The HD look is the file as drawn. The flat look the two pixel styles share drops every
+element marked `class="hd"` (highlights, glows, soft shades), shows every element marked `class="flat"` (hidden in the
+file with `display="none"`), and paints each gradient with its `data-flat` colour. A look marker is the first
+attribute of a self-closing element; masters use no groups, text or images.
+
+The client finds them through `apps/client/src/ui/icons.ts` (`iconUrl`, `effectIconUrl`, `iconImg`), which swaps the
+file when the art style changes; the textual name stays the image's accessible label. The key is `icon_` and a name of
+this table:
+
+| Family | Shown | Names |
+|---|---|---|
+| Effects (`EffectId`, GDD 3.22) | the body HUD's effect row; `indebted` in its own seat's view only | `effect_slowed`, `effect_wounded`, `effect_bleeding`, `effect_weakened`, `effect_poisoned`, `effect_fatigued`, `effect_stunned`, `effect_dazed`, `effect_famished`, `effect_knockedOut`, `effect_indebted` |
+| Inspect signs (`sim/inspect/read.ts`) without an effect of their own | the inspect card | `sign_bloody`, `sign_hunted` |
+
+No icon encodes a secret: a cover and its true wearer show the same icons, and the icons of private state (Indebted,
+roles, cards) appear only in their owner's view.
+
 ## 10. Isometric projection
 
 The one contract the isometric client, the exporter and the maps, and the world and character art share
