@@ -171,13 +171,15 @@ them.
 - **P1. Grounds 99's secret bosses and the lab.** Four bosses: the Timber-Wolf, the Crawler Mother, the Sleepless and the
   Choir (`10_Characters/10_Subject_Files.md`). A facility under one of the houses is never found (Ledger XVII). They
   would ride the boss NPCs of the living world (living.md 3: a node with a room-sized area). They would be secret
-  because nothing names them on screen, and the owner's answer keeps the name Grounds 99 off screen too. Open: which
-  map hosts them while BlackPine keeps its name (BlackPine at night, or a Grounds 99 variant scene set with new ids,
-  WORLD 4.3 rule 5), and whether the lab is a scene at all, given that it "is never found".
+  because nothing names them on screen, and the owner's answer keeps the name Grounds 99 off screen too. Owner's
+  answer (Q1): they sit in their own variant scenes, a scene set with new ids under a new prefix (GDD 3.13, WORLD 4.3
+  rule 5), not on BlackPine at night; no existing id is reused. Still open: whether the lab is a scene at all, given
+  that it "is never found".
 - **P2. The Secret Agent (the Hitman) as a role.** In 1952 the Pit-Poisoner's slip "is an enlistment", and the hand
   that takes it up is the Secret Agent's (Codex, Contract). Today the Hitman is a vendetta of the Killer card (GDD 3.20).
-  A role is a new card in `roles.json` with its own deck rows (GDD 3.1, 3.9), not a renamed vendetta. Open: its
-  faction, and whether it deals only on the Grounds 99 map of P1.
+  A role is a new card in `roles.json` with its own deck rows (GDD 3.1, 3.9), not a renamed vendetta. Owner's answer
+  (Q2): the Secret Agent is a special form of the Hitman, so it takes the Hitman's faction and deal rule, and it is
+  dealt only on maps where the P1 bosses are built.
 - **P3. The Port-au-Levain map.** The island under the Patent, 1787-93: the Hall of Platters and the Great Hearth, Gallows
   Square, the Windmill Cliffs, the Yeast Vault, the Salt-Flats and Smuggler's Wharf, the lighthouse (the island's, Ledger
   XII), with the Gallery, the Guild, the Commons and the Abbey of the Crust (Ledger XVIII). The Hearth comes first, and
@@ -226,10 +228,16 @@ Three limits hold for every page:
 **Requests to 6Z** (grants 8V does not hold):
 
 - **R1.** The map `name` in `maps/hollowmere.json` and `maps/blackpine.json`, to read "HollowMere" and "BlackPine" (K12).
+  Granted for the display `name` fields of maps and scenes: #243, held for the next round.
 - **R2.** `roles.json` `thief` `goal` and `win`: "Escape by the sea door at the back of the cave holding 3 Heirlooms." (K4)
+  Granted: #244, held for the next round.
 - **R3.** K11 for the art session that owns `crumb_*`, which includes retiring `cf.compressor` for a new `cf.ice_chest`.
+  Granted to 8V for the data and docs (#245, held for the next round and for 8I's `prop_ice_chest` frame); the art
+  goes to 8I as a spec.
 
 **Questions for the owner** (through 6Z):
 
 - **Q1.** P1: should the secret bosses and the lab sit on BlackPine at night, or on a Grounds 99 variant of its scenes?
-- **Q2.** P2: is the Secret Agent Village, Neutral or a third side, and does it deal only where P1 is built?
+  Answered: "they are in there own variant scenes" (owner, through 6Z, 2026-10-24).
+- **Q2.** P2: is the Secret Agent Village, Neutral or a third side, and does it deal only where P1 is built? Answered:
+  "secret Agent is just the special hitman" and "yes, only on maps with bosses" (owner, through 6Z, 2026-10-24).
