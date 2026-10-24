@@ -34,6 +34,7 @@ import { NodeView } from '../view/NodeView';
 import { TransportView } from '../view/transport/TransportView';
 import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
 import { mountShopLayer, type ShopLayer } from '../ui/shop/ShopLayer'; // round 8, 8C (locked)
+import { mountPurseHud, type PurseHud } from '../view/purse/PurseHud'; // round 8, 8C (locked)
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
@@ -139,6 +140,7 @@ export class World extends Phaser.Scene {
   private giverView!: GiverView;
   private m5b: M5bLayer | null = null;
   private shop: ShopLayer | null = null; // round 8, 8C (locked)
+  private purse: PurseHud | null = null; // round 8, 8C (locked)
   private cutscenes!: CutscenePlayer;
   private ground: GroundView | null = null;
   private bell: { x: number; y: number } | null = null;
@@ -226,6 +228,7 @@ export class World extends Phaser.Scene {
 
     this.hud = new Hud(overlayRoot());
     this.hud.setChip((this.registry.get(REG_ROLE_CHIP) as HudChip | undefined) ?? null);
+    this.purse = mountPurseHud(this, feed, this.hud.root.querySelector('.wdi-hud__tl') ?? this.hud.root); // round 8, 8C (locked)
     void loadSceneName(this.sceneId).then((scene) => this.hud.say(fill(C['hud.scene'], { scene }), 1500));
     this.hud.onNotebook(() => this.sheet.toggle());
     this.lighting = new Lighting(this, overlayRoot());
@@ -331,6 +334,7 @@ export class World extends Phaser.Scene {
       this.giverView.destroy();
       this.m5b?.destroy();
       this.shop?.destroy(); // round 8, 8C (locked)
+      this.purse?.destroy(); // round 8, 8C (locked)
       this.cutscenes.destroy();
       this.ground?.destroy();
       this.ground = null;

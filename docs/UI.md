@@ -1246,6 +1246,19 @@ trade; a refusal is the usual error line. 8H animates the panel by `wdi-anim-pan
 | `prompt.coins` | Hold E: pick up the coins | the hold prompt at dropped coins in reach (the hold lasts `economy.coinPickupS`) |
 | `shop.<id>` | Bakery, Apothecary, General Store, Market, Gamekeeper's Stall, Lodge Store, Camp Market | the panel's title, by `economy.json` shop id |
 
+#### 14.34.2 The purse counter
+
+`view/purse/PurseHud.ts`: a pill under the goal chip in the HUD's top-left column, own client only. It shows the
+purse and, for a moment after a change, the change beside it (`data-change="gain"` or `"loss"`); 8H animates the roll
+by `wdi-anim-purse`. Entering a scene shows the amount alone, never the whole purse as a gain.
+
+| Key | Text | Where |
+|---|---|---|
+| `purse.label` | Your purse | the counter's accessible name |
+| `purse.amount` | {n} Scrip | the counter |
+| `purse.gain` | +{n} | beside it after a wage, a sale or a pickup |
+| `purse.loss` | −{n} | beside it after a buy, a deposit or a theft |
+
 ### 14.38 Tasks: the chores panel, the station prompts and the village's work (7M)
 
 Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt at Start gets its screen half in the M5b layer (14.19): nothing here changes the layer's gather, craft or quest behaviour, and `ui/theme/**` is not edited; the new rules live in `ui/match.css`.
