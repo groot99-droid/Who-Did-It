@@ -32,20 +32,18 @@ beforeEach(async () => colyseus.cleanup());
 
 const WORDS = [11, 22, 33, 44] as const;
 const HOLLOWMERE = maps.hollowmere.scenes;
-const FETCH_IDS = Object.values(tasks.tasks)
-  .filter((t) => t.kind === 'fetch')
-  .map((t) => t.id);
+const TASK_IDS = Object.values(tasks.tasks).map((t) => t.id);
 const listOf = (p: PlayerState) => [...p.priv.tasks].map((t) => ({ id: t.id, done: t.done, fake: t.fake }));
 const factionOf = (party: Party, id: string): string =>
   roles.roles[party.room.state.players.get(id)!.priv.role.roleId]?.faction ?? '';
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 describe('taskPool', () => {
-  it('holds every fetch task of Hollowmere at every profile and never the co-op task', () => {
+  it('holds every task of Hollowmere at every profile, the co-op one among them (PR 4)', () => {
     for (const profile of ['small', 'medium', 'large'] as const) {
-      expect(taskPool(HOLLOWMERE, profile)).toEqual(FETCH_IDS);
+      expect(taskPool(HOLLOWMERE, profile)).toEqual(TASK_IDS);
     }
-    expect(taskPool(HOLLOWMERE, 'small')).not.toContain('shutterWindows');
+    expect(taskPool(HOLLOWMERE, 'small')).toContain('shutterWindows');
   });
 
   it('keeps only tasks whose source and a target stand on the map', () => {
@@ -70,7 +68,7 @@ describe('the deal at Start', () => {
       expect(list).toHaveLength(each);
       expect(new Set(list.map((t) => t.id)).size).toBe(each);
       for (const t of list) {
-        expect(FETCH_IDS).toContain(t.id);
+        expect(TASK_IDS).toContain(t.id);
         expect(t).toMatchObject({ done: false, fake });
       }
     }

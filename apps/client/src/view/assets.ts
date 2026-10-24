@@ -1,10 +1,19 @@
 import Phaser from 'phaser';
 import { currentStyleId, styleOf } from './artStyle';
-import { type LoadedEntry, loadsAtBoot, loadsWithMatch, mergeStyleManifest } from './manifestRules';
+import {
+  type LoadedEntry,
+  entryTexels,
+  loadsAtBoot,
+  loadsWithMatch,
+  mergeStyleManifest,
+} from './manifestRules';
+import { recordTexels, resetTexelsForTests } from './texels';
 
+export { drawScale, texelsOf } from './texels';
 export {
   type LoadedEntry,
   type ManifestEntry,
+  entryTexels,
   loadsAtBoot,
   loadsWithMatch,
   changedEntries,
@@ -132,7 +141,10 @@ export function queueEntries(
   for (const e of entries) {
     const root = e.root ?? manifest.root;
     const key = stageKey ? stageKey(e.key) : e.key;
-    if (!stageKey) loadedFrom.set(e.key, join(root, e.url));
+    if (!stageKey) {
+      loadedFrom.set(e.key, join(root, e.url));
+      recordTexels(e.key, entryTexels(e));
+    }
     switch (e.type) {
       case 'multiatlas':
         load.multiatlas(key, join(root, e.url), join(root, e.path ?? ''));
@@ -153,7 +165,15 @@ export function queueEntries(
 /** Records that a staged entry now lives under its real key. */
 export const markLoaded = (manifest: LoadedManifest, e: LoadedEntry): void => {
   loadedFrom.set(e.key, entryUrl(manifest, e));
+  recordTexels(e.key, entryTexels(e));
 };
+
+/** Test seam: forget every loaded url and texel factor. */
+export function resetLoadedForTests(): void {
+  loadedFrom.clear();
+  resetTexelsForTests();
+  resolvedManifests.clear();
+}
 
 /** `nearest` or `linear` as Phaser's filter mode. */
 export const filterMode = (f: 'nearest' | 'linear'): Phaser.Textures.FilterMode =>
