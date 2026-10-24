@@ -11,6 +11,7 @@ import { runHolds } from './Hold';
 import { handleInspect } from './inspect';
 import { queuePortal } from './PortalQueue';
 import { handleDonate, handleFaith } from './economy/faith';
+import { handlePayRent } from './economy/rent';
 import { handleNotice } from './economy/notices';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
@@ -102,6 +103,9 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.faith: // round 8, 8D (GDD 3.23)
         handleFaith(room, cmd.sessionId, payload);
+        break;
+      case C2S.payRent: // round 8, 8D (GDD 3.23)
+        handlePayRent(room, cmd.sessionId);
         break;
       default:
         // act.interact, hide, check, burst, present arrive with M4+; queued and ignored until then.
