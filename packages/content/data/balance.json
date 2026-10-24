@@ -22,7 +22,7 @@
     "roleRevealS": 20,
     "countdownS": 3,
     "graceS": 30,
-    "dayS": 60,
+    "dayS": 120,
     "duskS": 10,
     "nightS": 100,
     "voteS": 25,
@@ -110,7 +110,7 @@
     "gddRef": "3.8"
   },
   "finalNight": {
-    "afterCycle": 4,
+    "afterCycle": 5,
     "huntS": 90,
     "killCooldownS": 20,
     "skipAllowed": false,
