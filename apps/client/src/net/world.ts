@@ -139,6 +139,12 @@ export type WorldFeedEvents = {
   'inspect.noticed': S2CPayloads['inspect.noticed'];
   /** Private, round 8: a card-blind hunch, an `inspect.hunch.*` copy id. */
   'inspect.hunch': S2CPayloads['inspect.hunch'];
+  /** Private, round 8, 8C (locked; GDD 3.23): a `shop` hold opened this shop (`S2C.shopOpen`). */
+  shopOpen: {
+    shopId: string;
+    stock: Array<{ itemId: string; price: number }>;
+    buys: Array<{ itemId: string; price: number }>;
+  };
 };
 
 /** Round 6 (M5b): a resource node of the scene this client is in (`SceneState.nodes`). */
@@ -211,6 +217,11 @@ export interface WorldFeed {
   taskBar(): number;
   /** Round 6 (6I): this player's own inventory slots, in slot order. */
   inventory(): StackSnap[];
+  /** Round 8, 8C (locked; GDD 3.23): this player's own purse, `Private.purse`. */
+  purse(): number;
+  /** Round 8, 8C (locked): `act.buy` and `act.sell` at the shop a `shop` hold opened. */
+  buy(shopId: string, itemId: string, qty: number): void;
+  sell(shopId: string, itemId: string, qty: number): void;
   /** Round 6 (6I): `quest.accept { questId }`. */
   questAccept(questId: string): void;
   /** Round 6 (6I): `quest.turnIn { questId }`. */
