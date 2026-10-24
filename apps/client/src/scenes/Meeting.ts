@@ -4,8 +4,10 @@ import { type MeetingFeed, REG_MEETING } from '../net/meeting';
 import { REG_WORLD, type WorldFeed } from '../net/world';
 import { NotebookPanel } from '../view/NotebookPanel';
 import { mountMeeting, type MeetingScreen } from '../ui/Meeting';
+import { CIVIC_COPY } from '../ui/copy/civic';
 import { NOTES_COPY } from '../ui/copy/notes';
 import { mountMeetingNotes } from '../ui/meetingNotes';
+import { mountMeetingPapers } from '../ui/econ/meetingPapers';
 import { overlayRoot } from '../ui/dom';
 import { mountMatchArtSwitch } from '../ui/artStyle/ArtStyleSwitch';
 import { drawPortrait } from '../ui/portrait';
@@ -45,6 +47,9 @@ export class Meeting extends Phaser.Scene {
     // The Notebook tab shows this player's own entries from the world feed (M | N seam, A38).
     const world = this.registry.get(REG_WORLD) as WorldFeed | undefined;
     if (world) this.screen.addTab('notebook', 'Notebook', (panel) => new NotebookPanel(panel, world));
+    // Round 8, 8D (GDD 3.23): presenting a Seal or an Indulgence, and showing or burning a notice.
+    if (world)
+      this.screen.addTab('papers', CIVIC_COPY['papers.tab'], (panel) => mountMeetingPapers(panel, world));
     // Round 8, 8T (GDD 3.8): the meeting notes, which carry no speaker.
     this.screen.addTab('notes', NOTES_COPY['meeting.tab.notes'], (panel) => mountMeetingNotes(panel, feed));
     const refresh = () => this.screen?.update();

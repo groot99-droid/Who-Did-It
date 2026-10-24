@@ -50,6 +50,19 @@ export const CIVIC_COPY = {
 
   'civic.close': 'Close',
 
+  // 14.35.6 The meeting's papers tab
+  'papers.tab': 'Papers',
+  'papers.lead': 'What you carry to the table. Only you see this tab.',
+  'papers.none': 'You carry nothing to lay on the table.',
+  'papers.seal': 'A Parish Seal (you hold {n})',
+  'papers.seal.hint':
+    'Every vote so far is cleared, and for a while no vote may name you. Everyone hears of it.',
+  'papers.indulgence': 'An Indulgence (you hold {n})',
+  'papers.indulgence.hint':
+    'Quietly clears the oldest notice of your look, wherever it is held. Nobody is told.',
+  'papers.present': 'Present',
+  'papers.show': 'Show',
+
   // 14.35.4 Station names
   'hq.crumbOvens': "Crumb's Ovens",
   'hq.chapel': 'Chapel',

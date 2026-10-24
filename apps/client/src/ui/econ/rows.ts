@@ -95,3 +95,26 @@ export function hqOffer(
   const next = fill(C['hq.next'], { scrip: tier.scrip, materials: itemList(tier.materials) });
   return { tier: bought, next, mine, can: mine && has && purse >= tier.scrip };
 }
+
+/** The `items.json` ids of the two things the altar sells, presented at a meeting (GDD 3.23). */
+export const PAPER_ITEMS = { indulgence: 'indulgence', seal: 'parishSeal' } as const;
+
+/**
+ * The meeting's papers tab: how many Indulgences and Seals this seat holds, and its notices, each with whether a burn
+ * would go through (a notice naming the seat's own look burns only by spending an Indulgence).
+ */
+export function paperRows(
+  notebook: readonly NotebookSnap[],
+  pockets: readonly StackSnap[],
+  look: string,
+  sceneName: (index: number) => string,
+): { indulgences: number; seals: number; notices: Array<{ id: string; line: string; canBurn: boolean }> } {
+  const held = (item: string) => pockets.reduce((n, s) => n + (s.defId === item ? s.qty : 0), 0);
+  const indulgences = held(PAPER_ITEMS.indulgence);
+  const own = new Set(notebook.filter((e) => look !== '' && e.of === look).map((e) => e.id));
+  const notices = noticeRows(notebook, sceneName).map((r) => ({
+    ...r,
+    canBurn: !own.has(r.id) || indulgences > 0,
+  }));
+  return { indulgences, seals: held(PAPER_ITEMS.seal), notices };
+}
