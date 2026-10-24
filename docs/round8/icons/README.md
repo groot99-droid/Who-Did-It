@@ -17,5 +17,5 @@ The "white" ground is the bone ramp's lightest tone (`#FFF1DC`): the palette has
   background with red and around it and seemingly dripping"), then wounded, poisoned, stunned, dazed and knocked out.
 - `icon_effect_<id>.<style>.png`: each icon's packed cell (8-bit and low poly, 24 px) or 48 px HD render.
 
-Regenerate with `pnpm --filter @wdi/sprites exec tsx icons-sheet.ts <out dir>`. Hand-made original art, CC BY 4.0
+Regenerate with `pnpm --filter @wdi/sprites icons:sheet <out.png> [key ...]`. Hand-made original art, CC BY 4.0
 (`LICENSE-ASSETS`, A19); nothing third-party or generated went into it.
