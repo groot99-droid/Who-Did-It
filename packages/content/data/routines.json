@@ -38,7 +38,12 @@
     "deadLoaf",
     "ledger",
     "counter",
-    "bank"
+    "bank",
+    "altar",
+    "mailbag",
+    "rack",
+    "hq",
+    "blackMarket"
   ],
   "lightKinds": ["lanternPost"]
 }

@@ -3496,6 +3496,17 @@ an existing `apps/server/test/*.test.ts`, anything written into ROSW.
   appended to `ROUND7_CHECKS` in `tools/auto/checks/index.ts`; `tools/auto/test/report.test.ts` reads the constants and
   needed no line. Tests in `taskPickup.test.ts`: a bar the lists do not explain, an NPC seat with a list and a logged
   `taskDone` nobody finished each fail it; a fake and a real completion by the Done control leave it quiet.
+- 2026-10-23: PR 2b (the client's pure half): `ui/tasks.ts` (task spots, prompts and chore rows from `tasks.json` and the
+  scene props, with `tasks.test.ts`), `ui/copy/tasks.ts` (the lines of UI.md 14.38), `WorldFeed.taskBar()` on the live feed
+  and both mocks. Nothing on screen yet; PR 2c mounts it. No GDD line: the rules are PR 1's and 2a's.
+- 2026-10-23: PR 2c (the screen, UI.md 14.38): `ui/Chores.ts` (the chores panel on K and the village's work bar under the
+  clock), the layer picks task spots beside nodes and givers and sends the `task` hold, a ghost keeps the layer for its tasks
+  only (GDD 3.8); CSS in `ui/match.css`, `ui/theme/**` untouched.
+- 2026-10-23: PR 3 (the `tap` kind, GDD 3.16, A151): `rules/minigames.ts` (`tapMarkerAt`, `tapSucceeds`, the
+  `TapPublic` board and the replay), `balance.json` `minigames.tap`, the zod enum and section, `view/minigames/tap.ts` with
+  its test, the registry, `board.ts` draws, the copy lines, `packages/shared/test/minigamesTap.test.ts`. Deliver a letter
+  plays it (`letterTap`); the pump, the fence and the cold room stay where 6H's and the content tests pin them. Waits on
+  6Z's `MinigameKind` line.
 - Read from ROSW (never written): the UDGT teardown chapters 00 to 03 on `claude/sweet-maxwell-lmsiw3`, and the Who Did It lore
   on `claude/sharp-mccarthy-pqi3ws` (the Canon Ledger, the Lamplighter's Round, the Gazette, the Tab Book, Fourteen Things, the
   Daybook of Crumb's Ovens, Hopscotch, three stories). Drifts noted for 6Z, not resolved here: the lore dates HollowMere to 1893
@@ -3557,6 +3568,11 @@ then docs/round8/README.md, seams.md and the documents your brief names. Branch 
 | **8L. Anti-cheat** | Opus 5.5 | Code | `claude/r8-anticheat` | `teardown.md` 1: blood by range, night sight on the server, the leak test, replay, the vote delay (A170) |
 | **8M. Rules** | Opus 5.5 | Code and docs | `claude/r8-rules` | `teardown.md` 2: match length, the Final Night hunt and trial, card text from the data (A171) |
 | **8N. Icons** | Fable 5.1 | Art | `claude/r8-icons` | `teardown.md` 3: every status and HUD icon drawn, in all three styles (A172) |
+| **8Q. Habitats** | Opus 5.5 | Code | `claude/r8-habitats` | `living.md` 1, 2: the reachability fix, the world index, habitats, packing, passive flight, bosses, the fence and Final Night wolves (A175) |
+| **8R. Hive** | Opus 5.5 | Code | `claude/r8-hive` | `living.md` 3: the public blackboard, triggers, fair senses, the body bands, the shout, the night bell (A176) |
+| **8S. Roles** | Opus 5.5 | Code | `claude/r8-roles` | `living.md` 4: NPC tasks, `dustCompare`, `autopsy`, `salts`, NPC ability use, sharing and the hard-mode gate (A177) |
+| **8T. Talk** | Opus 5.5 | Code | `claude/r8-talk` | `living.md` 5: meeting notes, NPC lines from templates and Claude, red herrings, the filter and the replay log (A178) |
+| **8U. Briarberry** | Fable 5.1 | Content | `claude/r8-briarberry` | `living.md` 6: the briar node, the berry, the Doctor's recipes, gifts and stock by difficulty (A179) |
 
 ### Round 8 briefs
 
@@ -3674,7 +3690,33 @@ Spawned after the owner's teardown answers. Contract: `docs/round8/teardown.md`,
   3. After the owner's yes, draw the set in 8-bit, low poly and HD into the UI atlas.
   4. Wire the effect icons into the HUD and the bloodied mark over a figure, with 8H's helpers.
 
+### Round 8 addendum B briefs (A173, A174)
+
+The owner's living-world request of 2026-10-24. Contract: `docs/round8/living.md`, with seams.md for everything shared.
+
+- **8Q. Habitats** (`living.md` 1, 2; after 8A and 8E land).
+  1. Roam goals only on tiles reachable inside the area, and the auto invariant `mobStuck` (the frozen bat), alone.
+  2. The world index `sim/world/index.ts`: reachable components, footprints, occupancy, `freeTile`, density.
+  3. Habitats: the columns, the seeded partition and migration, acts, packing, passive flight and return, bosses.
+  4. The fence intruder wolf and the Final Night's village wolves. GDD 3.15.
+- **8R. Hive** (`living.md` 3; starts now).
+  1. The blackboard and trigger registry with `hiveNoSecrets`.
+  2. Fair senses: `canSee` and the lights for sight, NPC listeners on `emitNoise`.
+  3. The body bands, the `shout` event with its HUD cue, and the night bell (A174). GDD 3.8 and 3.12.
+- **8S. Roles** (`living.md` 4; after 8A and 8E land, on 8R's hive).
+  1. NPC seats dealt tasks and doing them.
+  2. Server code for `dustCompare`, `autopsy` and `salts`, for every seat.
+  3. NPC Detectives and Doctors using them and `bandage`; sharing, and the hard-mode briarberry gate. GDD 3.12.
+- **8T. Talk** (`living.md` 5; starts now).
+  1. The meeting-notes channel, anonymous and rate-limited, with templates only.
+  2. The off-tick queue, the Messages API behind the server key, caps, the filter and the `MatchLog` replay.
+  3. Red herrings and satirical lines. GDD 3.8 and 3.25.
+- **8U. Briarberry** (`living.md` 6; after 8A, 8C and 8E land).
+  1. The `briar` node and `briarberry`, the bleed and its floor on hard.
+  2. The Doctor's recipes; the gift, stock and harvest rules by difficulty. GDD 3.14 and 3.25.
+
 ### Round 8 log: 6Z
 
 - 2026-10-23: the contract `docs/round8/` and A134, A135 written from the owner's requests and answers. The
   sixteen reference pictures are described in `art.md` 1 and not committed.
+- 2026-10-24: the living-world addendum `docs/round8/living.md` with A173 and A174, from the owner's request and answers; 8Q to 8U added.

@@ -47,6 +47,9 @@ def _args(argv: list[str]) -> argparse.Namespace:
     p.add_argument("--passes", default=",".join(rc.PASSES))
     p.add_argument("--dirs", default=",".join(rc.DIRECTIONS))
     p.add_argument("--out", required=True)
+    p.add_argument("--style", default="8bit", choices=rc.ART_STYLES,
+                   help="art style: hd renders at twice the display scale with the HD finish (art.md 3)")
+    p.add_argument("--textured", action="store_true", help="the library's roles in place of flat materials")
     return p.parse_args(argv)
 
 
@@ -57,7 +60,14 @@ def load_rig(path: str | None) -> bpy.types.Scene:
     return build_rig.build()
 
 
+# Called with the scene before every render; static_common registers the `--textured` retexture here so the
+# world scripts that render straight through `render_to` (buildings, ground) get it as the sheets do.
+BEFORE_RENDER: list = []
+
+
 def render_to(scene: bpy.types.Scene, path: str) -> None:
+    for hook in BEFORE_RENDER:
+        hook(scene)
     scene.render.filepath = os.path.abspath(path)
     bpy.ops.render.render(write_still=True)
 
@@ -95,11 +105,11 @@ def _opaque_rows(cell) -> tuple[int, int]:
     return (int(h - 1 - rows.max()), int(h - 1 - rows.min()))  # top, bottom from the top edge
 
 
-def _place(scene, cam, cell: int, feet_row: float, width: int | None = None) -> None:
+def _place(scene, cam, cell: int, feet_row: float, width: int | None = None, factor: int = 1) -> None:
     """IsoCam at the display scale with the world origin on `feet_row` of a `cell` px square (or a
-    `width` x `cell` frame)."""
+    `width` x `cell` frame), rendered at `factor` times that (rig_common.STYLE_FACTOR)."""
     w = width or cell
-    scene.render.resolution_x, scene.render.resolution_y = w, cell
+    scene.render.resolution_x, scene.render.resolution_y = w * factor, cell * factor
     cam.data.ortho_scale = rc.ortho_scale(max(w, cell))
     cam.data.shift_y = rc.camera_shift_y(feet_row, cell) * cell / max(w, cell)
 
@@ -322,12 +332,17 @@ def render_character(scene, args) -> None:
         for obj in objs:
             if part != "blood" and not obj.get("wdi_glow"):
                 build_rig.add_outline(obj, "character")
+    if args.textured:
+        from materials import retexture
+
+        retexture.retexture(col.all_objects, args.style, retexture.FIGURE_ROLES)
     saved = {(o.name, i): s.material for objs in parts.values() for o in objs for i, s in enumerate(o.material_slots)}
     overrides = _override_materials()
     step = rc.frame_step(scene.render.fps / scene.render.fps_base)
+    factor = rc.STYLE_FACTOR[args.style]
     out_root = os.path.join(args.out, args.body)
-    manifest = {"version": 1, "body": args.body, "cell": rc.CELL_PX, "fps": rc.OUTPUT_FPS,
-                "passes": args.passes.split(","), "frames": {}}
+    manifest = {"version": 1, "body": args.body, "cell": rc.CELL_PX * factor, "fps": rc.OUTPUT_FPS,
+                "style": args.style, "factor": factor, "passes": args.passes.split(","), "frames": {}}
 
     clipped: list[str] = []
     for anim in args.anims.split(","):
@@ -336,7 +351,7 @@ def render_character(scene, args) -> None:
             raise SystemExit(f"missing action {anim!r} or armature")
         arm.animation_data_create().action = action
         cell, feet_row = rc.clip_cell(anim)
-        _place(scene, scene.camera, cell, feet_row)
+        _place(scene, scene.camera, cell, feet_row, factor=factor)
         start, end = (int(round(f)) for f in action.frame_range)
         frames = rc.sample_frames(start, end if anim in LOOPING else end + 1, step)
         expected = rc.V1_CLIPS.get(anim)
@@ -354,9 +369,9 @@ def render_character(scene, args) -> None:
                     # Every pass records the pivot, so a run that renders only overlays still writes
                     # a complete manifest; all passes of a frame project the same Feet.
                     entry = manifest["frames"].setdefault(name, {})
-                    entry["feet"] = feet_px(scene, feet, cell)
+                    entry["feet"] = feet_px(scene, feet, cell * factor)
                     if cell != rc.CELL_PX:
-                        entry["cell"] = cell
+                        entry["cell"] = cell * factor
                     if pass_name == "body" and touches_border(path):
                         entry["clipped"] = True
                         clipped.append(name)
@@ -372,6 +387,14 @@ def main() -> None:
     args = _args(sys.argv)
     os.makedirs(args.out, exist_ok=True)
     scene = load_rig(args.rig)
+    if args.style == "hd" and not args.smoke:
+        from materials import hd
+
+        hd.apply(scene)
+        if os.environ.get("WDI_HD_PBR"):  # the rough PBR + HDRI look of the owner's look sheet
+            from materials import pbr
+
+            pbr.apply(scene)
     if args.smoke:
         smoke(scene, args.out)
     elif args.char:

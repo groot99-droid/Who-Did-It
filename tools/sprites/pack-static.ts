@@ -160,6 +160,36 @@ export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
     'spot_trunk',
     'spot_wineRack',
     'spot_woodBox',
+    // Round 8 (8J, art.md 4.2): St Brannock's.
+    'prop_stained_glass',
+    'prop_stained_glass_e',
+    'prop_candle_stand',
+    'prop_hymn_board',
+    'prop_memorial',
+    'prop_lectern',
+    'prop_pulpit',
+    'prop_font',
+    'prop_votive_rack',
+    'prop_alms_box',
+    'prop_flower_stand',
+    'prop_altar',
+    'prop_bookcase',
+    'prop_bookcase_b',
+    'prop_tin_cabinet',
+    'prop_tin_cabinet_b',
+    'prop_fireplace_e',
+    'prop_armchair',
+    'prop_lamp_table',
+    'prop_boot_rack',
+    'prop_coat_stand',
+    'prop_vane_portrait',
+    'prop_draped_window',
+    'prop_sideboard',
+    'prop_nightstand',
+    'prop_dressing_table',
+    'prop_washstand',
+    'prop_blanket_chest',
+    'prop_linen_press',
   ],
   props_blackpine: [
     'prop_anvil',
@@ -225,6 +255,12 @@ export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
     'prop_wheelbarrow',
     'prop_window',
     'prop_workbench',
+    // Round 8 (8K, A166): BlackPine's own economy frames for 8C's and 8D's kinds.
+    'prop_altar',
+    'prop_bank',
+    'prop_blackMarket',
+    'prop_counter',
+    'prop_rack',
   ],
 };
 
@@ -286,6 +322,33 @@ export async function packCapped(
   return { atlas: { textures, meta }, pages };
 }
 
+/**
+ * `packCapped` on the smallest page that still holds every frame on one page: the packer's own sizing can
+ * grow both sides of a page it could have kept at half the area (round 8, 8J: the 6-page budget, SPRITES 10.14).
+ */
+export async function packSmallest(
+  textureName: string,
+  inputs: PackInput[],
+  w: number,
+  h: number,
+  on: boolean = finishEnabled('main'),
+): Promise<PackResult> {
+  const best = await packCapped(textureName, inputs, w, h, on);
+  if (best.atlas.textures.length !== 1) return best;
+  const area = (r: PackResult) => r.atlas.textures[0]!.size.w * r.atlas.textures[0]!.size.h;
+  let out = best;
+  for (const [cw, ch] of [
+    [w / 2, h],
+    [w, h / 2],
+    [w / 2, h / 2],
+  ] as const) {
+    if (cw * ch >= area(out)) continue;
+    const r = await packCapped(textureName, inputs, cw, ch, on);
+    if (r.atlas.textures.length === 1 && area(r) < area(out)) out = r;
+  }
+  return out;
+}
+
 /** The frame names a static atlas must hold exactly. */
 export function expectedFrames(atlas: StaticAtlas): string[] {
   if (atlas.startsWith('iso_kit_')) return kitFrameNames();
@@ -298,6 +361,8 @@ export function expectedFrames(atlas: StaticAtlas): string[] {
 export interface StaticManifest {
   version: number;
   atlas: StaticAtlas;
+  /** Render px per display px of the frames (the HD style, hd.ts); absent or 1 otherwise. */
+  factor?: number;
   frames: Record<
     string,
     { file: string; cell: number | [number, number]; pivot?: [number, number]; clipped?: boolean }
@@ -334,25 +399,31 @@ export function staticAnims(texture: string, frameNames: string[]): { anims: Pha
   };
 }
 
-/** Pack a static sheet; the frame set must match the keys of docs/SPRITES.md 8 exactly. */
+/**
+ * Pack a static sheet; the frame set must match the keys of docs/SPRITES.md 8 exactly. `texels` (render px
+ * per display px, the HD style's factor) scales the page cap with the frames.
+ */
 export async function packStatic(
   manifest: StaticManifest,
   inputs: PackInput[],
   on: boolean = finishEnabled('main'),
+  texels = 1,
+  subset = false,
 ): Promise<Map<string, Buffer>> {
   // Slices are whatever the footprints cut (slice.ts): a building atlas holds only slices, a map's prop
-  // atlas its frame list plus the slices of its multi-tile props.
+  // atlas its frame list plus the slices of its multi-tile props. A `subset` (a partial render for review)
+  // packs what it holds.
   const got = inputs.map((i) => i.name).sort();
   const sliced = manifest.atlas.startsWith('bld_') || manifest.atlas.startsWith('props_');
   const want = manifest.atlas.startsWith('bld_') ? [] : expectedFrames(manifest.atlas);
-  const missing = want.filter((n) => !got.includes(n));
+  const missing = subset ? [] : want.filter((n) => !got.includes(n));
   const extra = got.filter((n) => !want.includes(n) && !(sliced && SLICE_RE.test(n)));
   if (missing.length || extra.length) {
     throw new Error(`${manifest.atlas}: missing [${missing.join(', ')}], unexpected [${extra.join(', ')}]`);
   }
   const cap = pageCap(manifest.atlas);
   const { atlas, pages } = cap
-    ? await packCapped(manifest.atlas, inputs, cap[0], cap[1], on)
+    ? await packSmallest(manifest.atlas, inputs, cap[0] * texels, cap[1] * texels, on)
     : await packFrames(manifest.atlas, inputs);
   applyStaticPivots(atlas, manifest);
   const out = new Map<string, Buffer>(pages);
@@ -373,15 +444,16 @@ export function readStatic(dir: string): { manifest: StaticManifest; inputs: Pac
   return { manifest, inputs };
 }
 
-// CLI: tsx tools/sprites/pack-static.ts <render dir, e.g. build/render/props> <out dir>
+// CLI: tsx tools/sprites/pack-static.ts <render dir, e.g. build/render/props> <out dir> [--subset]
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const [renderDir, outDir] = process.argv.slice(2);
+  const subset = process.argv.includes('--subset');
+  const [renderDir, outDir] = process.argv.slice(2).filter((a) => a !== '--subset');
   if (!renderDir || !outDir) {
-    console.error('usage: tsx pack-static.ts <render dir> <out dir>');
+    console.error('usage: tsx pack-static.ts <render dir> <out dir> [--subset]');
     process.exit(2);
   }
   const { manifest, inputs } = readStatic(renderDir);
-  const files = await packStatic(manifest, inputs);
+  const files = await packStatic(manifest, inputs, undefined, 1, subset);
   writeFiles(outDir, files);
   console.log(`pack-static: ${[...files.keys()].join(', ')} -> ${outDir}`);
 }
