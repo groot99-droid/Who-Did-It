@@ -781,7 +781,9 @@ aim list wait for 5F's `ui/SeatPicker.ts` and a mount point in the world HUD (5I
 Session 5J, round 5. The lobby's map row of GDD 3.13 (`ui/lobby/MapPicker.ts`, module `ui/copy/maps.ts`). It
 shows only in the main mode (`showsMapRow`), under the frozen test id `map-select`, whose `data-map` is the
 map shown as chosen. Each map shows its `name` and `blurb` from `maps/<id>.json` (data, not copy) and its
-`thumb_<mapId>` image once the manifest has it. `{name}` is a map's `name`.
+`thumb_<mapId>` image once the manifest has it. `{name}` is a map's `name`. The blurbs follow the canon of
+`docs/round8/canon.md` (round 8, 8V): HollowMere is the railroad town on a drowned mere, BlackPine the Syndicate's
+timber and coal camp.
 
 | Id | Text | Notes |
 |---|---|---|
@@ -831,6 +833,9 @@ present only when the cutscene is skippable. Reduce-motion turns camera moves in
 | `cs.hollowmere.<line>` | the opening's captions | `title`, `seven`, `laid`, `own`, `train`, `dusk`, `end`, `vicar`, `letter`, `nobody`, `check`, `miss`; the Bible's Book I.1 trimmed |
 | `cs.blackpine.<line>` | the BlackPine opening's captions (7A) | `title`, `intake`, `owns`, `day`, `night`, `pines`, `adits`, `blind`, `dawn`; the Bible's Book III.2 trimmed |
 | `cs.death<Cause>.line` | the death cutscenes' one whispered line each | `Knife`, `Poison`, `Shot`, `Ejected`, `Wolf` (6J); `Creature`, `Bled`, `Sickened` (round 8, 8A, GDD 3.22) |
+
+Both openings already agree with the canon (`docs/round8/canon.md` 2): the station sign, the Barons and the train of
+Ledger I; the Harrow Timber & Coal Syndicate and the rack of Ledger VIII. They name no killer and not the Beast.
 
 Frozen test ids: `cutscene` (the layer, with `data-cutscene`), `cutscene-caption`, `cutscene-skip`.
 ### 14.22 Sound settings (6L)
@@ -1449,6 +1454,7 @@ leaves `notes` lines out. A refused note (too soon, past the cap) is the usual r
 | `notes.send` | Pin the note | the send button's label |
 | `notes.empty` | No notes yet | the list, before the first note |
 | `notes.ghost` | The dead leave no notes | the field, disabled, for a ghost |
+| `meeting.reason.final` | The Final Night: the village must choose | the meeting's reason line for the Final Night's forced meeting (reason `final`, GDD 3.2) |
 
 ### 14.41 The shout (8R)
 

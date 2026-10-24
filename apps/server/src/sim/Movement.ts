@@ -2,6 +2,7 @@ import { balance } from '@wdi/content';
 import { TICK_RATE, TILE_PX, moveAabb } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { AnimId, FOOT_HALF_PX, INPUT_STALE_TICKS, StatusBit } from './constants';
+import { moodIdleOf } from './npc/needs';
 import { type MoveInput, type PlayerSim, simOf } from './RoomSim';
 import { isWorldPhase, navGrid, sceneKey } from './World';
 import { bodySpeedPxPerTick, overlayBody } from './body/run';
@@ -123,6 +124,7 @@ export function publishPresence(
 ): void {
   presence.x = Math.round(p.x);
   presence.y = Math.round(p.y);
-  presence.animId = p.hold !== null ? AnimId.interact : moving ? AnimId.walk : AnimId.idle;
+  // Round 8, 8E (contract request in its PR): a still seat in a mood shows that mood's idle (`sim/npc/needs.ts`).
+  presence.animId = p.hold !== null ? AnimId.interact : moving ? AnimId.walk : (moodIdleOf(p) ?? AnimId.idle);
   presence.statusBits = statusBitsOf(p, tick);
 }
