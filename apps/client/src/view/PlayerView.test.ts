@@ -44,6 +44,10 @@ class Fake {
   setScale() {
     return this;
   }
+  setDisplaySize(w: number, h: number) {
+    this.calls.push(`size ${w}x${h}`);
+    return this;
+  }
   setOrigin() {
     return this;
   }
@@ -99,6 +103,7 @@ function scene(animKeys: string[], textures = ['char_detective', 'ovl_detective'
         sprite: make('sprite'),
         text: make('text'),
         rectangle: make('rectangle'),
+        image: make('image'),
         container: (_x: number, _y: number, kids: Fake[]) => make('container')().add(kids),
       },
       textures: { exists: (k: string) => textures.includes(k) },
@@ -290,6 +295,29 @@ describe('PlayerView (motion.md 1)', () => {
       expect(s.tweens).toEqual([]);
       expect(marks(s, 'ellipse')).toHaveLength(1);
       expect(marks(s, 'text')).toHaveLength(3);
+    });
+  });
+
+  describe('the bloodied mark (teardown.md 3)', () => {
+    it('shows the bleeding icon over a Bloody figure at 24 px, hides it at a door and when the blood is gone', () => {
+      const t = scene(keysOf(V1), ['char_detective', 'ovl_detective', 'mark_bleeding']);
+      const v = build(t);
+      const mark = t.made.find((f) => f.kind === 'image')!;
+      expect(mark.calls).toContain('size 24x24');
+      expect(mark.visible).toBe(false);
+      v.setBlood(true);
+      expect(mark.visible).toBe(true);
+      v.pose('se', AnimId.idle, StatusBit.transit);
+      expect(mark.visible).toBe(false);
+      v.pose('se', AnimId.idle, 0);
+      expect(mark.visible).toBe(true);
+      v.setBlood(false);
+      expect(mark.visible).toBe(false);
+    });
+
+    it('draws nothing extra while the mark image is not loaded', () => {
+      view.setBlood(true);
+      expect(s.made.some((f) => f.kind === 'image')).toBe(false);
     });
   });
 });

@@ -1,24 +1,14 @@
-// The review sheet of the round-8 status icons (8N, teardown.md 3) for the owner's look sign-off: each icon of the
-// first sheet in the three art styles, at HUD size (the 24 px cell drawn at 2x, as the client draws it) and
-// enlarged eight times so the drawing can be judged. Labels are Inter (OFL), the placeholder tools' font.
+// The review sheet of the round-8 icons (8N, teardown.md 3) for the owner's look: each master in the three art
+// styles, at HUD size (the 48 px file as the client draws it) and enlarged four times so the drawing can be judged.
+// Labels are Inter (OFL), the placeholder tools' font.
 //
-//   tsx tools/sprites/icons-sheet.ts <out dir>        writes sheet-01.png and one PNG per icon and style
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+//   tsx tools/sprites/icons-sheet.ts <out.png> [key ...]     every master, or the keys given, in that order
+import { writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createCanvas, ImageData, type SKRSContext2D } from '@napi-rs/canvas';
 import { encodePng, type Rgba } from './bleed.ts';
-import {
-  CELL,
-  type EffectIconId,
-  FIRST_SHEET,
-  GRID,
-  GROUND,
-  type IconStyleId,
-  iconSvg,
-  rasterise,
-  renderIcon,
-} from './icons.ts';
+import { GRID, GROUND, type IconStyleId, masterKeys, readMaster, renderIcon } from './icons.ts';
 import { paletteFile } from './palette.ts';
 import { FONT, registerFont } from './placeholder-kit.ts';
 import { upscaleNearest } from './pixel.ts';
@@ -28,23 +18,9 @@ const STYLES: ReadonlyArray<[IconStyleId, string]> = [
   ['lowpoly', 'Low poly'],
   ['hd', 'HD'],
 ];
-/** The label of each icon on the sheet: the effect's name as the HUD will read it. */
-const NAMES: Record<string, string> = {
-  bleeding: 'Bleeding',
-  wounded: 'Wounded',
-  poisoned: 'Poisoned',
-  stunned: 'Stunned',
-  dazed: 'Dazed',
-  knockedOut: 'Knocked out',
-  slowed: 'Slowed',
-  weakened: 'Weakened',
-  fatigued: 'Fatigued',
-  famished: 'Famished',
-  indebted: 'Indebted',
-};
 
-const HUD = CELL * 2;
-const BIG = CELL * 8;
+const HUD = GRID;
+const BIG = GRID * 4;
 const PAD = 24;
 const LABEL_W = 150;
 const COL_W = HUD + 16 + BIG + 40;
@@ -59,19 +35,16 @@ function blit(g: SKRSContext2D, img: Rgba, x: number, y: number): void {
 }
 
 /** The HUD-size and enlarged renders of one icon in one style. */
-async function cell(id: EffectIconId, style: IconStyleId): Promise<[Rgba, Rgba]> {
-  if (style === 'hd')
-    return [await rasterise(iconSvg(id, 'hd', HUD), HUD), await rasterise(iconSvg(id, 'hd', BIG), BIG)];
-  const packed = await renderIcon(id, style);
-  return [upscaleNearest(packed, 2), upscaleNearest(packed, 8)];
+async function cell(svg: string, style: IconStyleId): Promise<[Rgba, Rgba]> {
+  if (style === 'hd') return [await renderIcon(svg, 'hd', HUD), await renderIcon(svg, 'hd', BIG)];
+  const shipped = await renderIcon(svg, style);
+  return [shipped, upscaleNearest(shipped, BIG / HUD)];
 }
 
-export async function sheet(
-  ids: readonly EffectIconId[],
-): Promise<{ png: Buffer; cells: Map<string, Rgba> }> {
+export async function sheet(keys: readonly string[]): Promise<Buffer> {
   registerFont();
   const w = PAD + LABEL_W + STYLES.length * COL_W;
-  const h = PAD + 36 + ids.length * (BIG + PAD) + 24;
+  const h = PAD + 36 + keys.length * (BIG + PAD) + 24;
   const canvas = createCanvas(w, h);
   const g = canvas.getContext('2d');
   g.fillStyle = paletteFile.colors['slate']!;
@@ -82,27 +55,23 @@ export async function sheet(
   g.font = `13px ${FONT}`;
   g.fillStyle = paletteFile.colors['fog']!;
   STYLES.forEach(([style], i) => {
-    const note = style === 'hd' ? 'vector, drawn at size' : 'the 24 px cell at 2x, and at 8x';
+    const note = style === 'hd' ? 'the SVG master, drawn at size' : 'the generated 48 px file, and at 4x';
     g.fillText(note, PAD + LABEL_W + i * COL_W, PAD + 32);
   });
-  const cells = new Map<string, Rgba>();
-  for (const [row, id] of ids.entries()) {
+  for (const [row, key] of keys.entries()) {
+    const svg = readMaster(key);
     const y = PAD + 36 + row * (BIG + PAD);
     g.fillStyle = paletteFile.colors['bone']!;
     g.font = `18px ${FONT}`;
-    g.fillText(NAMES[id] ?? id, PAD, y + 24);
+    g.fillText(label(key), PAD, y + 24);
     g.fillStyle = paletteFile.colors['fog']!;
     g.font = `13px ${FONT}`;
-    g.fillText(`icon_effect_${id}`, PAD, y + 44);
+    g.fillText(key, PAD, y + 44);
     for (const [col, [style]] of STYLES.entries()) {
       const x = PAD + LABEL_W + col * COL_W;
-      const [small, big] = await cell(id, style);
+      const [small, big] = await cell(svg, style);
       blit(g, small, x, y);
       blit(g, big, x + HUD + 16, y);
-      cells.set(
-        `${id}.${style}`,
-        style === 'hd' ? await rasterise(iconSvg(id, 'hd', GRID), GRID) : await renderIcon(id, style),
-      );
     }
   }
   // The ground under every icon, said on the sheet so the owner can ask for pure white instead.
@@ -114,26 +83,23 @@ export async function sheet(
     h - 14,
   );
   const d = g.getImageData(0, 0, w, h);
-  const png = encodePng({ width: w, height: h, data: new Uint8Array(d.data.buffer.slice(0)) });
-  return { png, cells };
+  return encodePng({ width: w, height: h, data: new Uint8Array(d.data.buffer.slice(0)) });
 }
 
-async function main(out: string): Promise<void> {
-  mkdirSync(out, { recursive: true });
-  const { png, cells } = await sheet(FIRST_SHEET);
-  writeFileSync(join(out, 'sheet-01.png'), png);
-  for (const [key, img] of cells) {
-    const [id, style] = key.split('.') as [EffectIconId, IconStyleId];
-    writeFileSync(join(out, `icon_effect_${id}.${style}.png`), encodePng(img));
-    if (style === 'hd') writeFileSync(join(out, `icon_effect_${id}.hd.svg`), iconSvg(id, 'hd'));
-  }
-}
+/** A key read as words: `icon_effect_knockedOut` is "knocked out". */
+const label = (key: string): string => {
+  const w = key
+    .replace(/^icon_[a-z]+_/, '')
+    .replace(/([A-Z])/g, ' $1')
+    .toLowerCase();
+  return w.charAt(0).toUpperCase() + w.slice(1);
+};
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const out = process.argv[2];
+  const [out, ...keys] = process.argv.slice(2);
   if (!out) {
-    console.error('usage: tsx icons-sheet.ts <out dir>');
+    console.error('usage: tsx icons-sheet.ts <out.png> [key ...]');
     process.exit(2);
   }
-  await main(resolve(out));
+  writeFileSync(resolve(out), await sheet(keys.length > 0 ? keys : masterKeys()));
 }

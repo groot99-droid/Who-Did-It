@@ -178,7 +178,7 @@ rerender them as 8 bit and low poly for better texture in those games?"
 |---|---|---|
 | **8-bit** | 1k, toned toward the role's palette ramp before render | The existing pixel finish (`palettize.py`, oklab match). The grain survives as the dither patterns `style.json` already asks for on plaster, stone and wood |
 | **Low poly** | 1k, toned toward the palette and slightly posterised, so the look stays stylised and never photographic (`styleAvoid`) | As today: box-downscaled, linear filtering |
-| **HD** | 2k (4k where a surface fills the frame), untoned colour, normal and roughness; one Poly Haven HDRI as soft fill only | The HD finish of 3 |
+| **HD** | 2k (4k where a surface fills the frame), untoned colour, normal and roughness | Two finishes on one key light (A164, the owner's look-sheet pick): figures, props, clues, ground and effects in the HD finish of 3 with the maps as bump; buildings and the kit in PBR on the same maps with one Poly Haven HDRI (CC0, in the lock) as soft fill only |
 
 - **The key light stays A9's at 225° in every style.** The sprites keep matching the game's lighting layer, and the
   HDRI never decides a shadow's direction.

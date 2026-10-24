@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Fatigued: a face spent and panting, eyes half shut, sweat running. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <radialGradient id="g1" data-flat="#C08A66" gradientUnits="userSpaceOnUse" cx="18" cy="19" r="19"><stop offset="0" stop-color="#DDB08E"/><stop offset="1" stop-color="#C08A66"/></radialGradient>
+  <linearGradient id="g2" data-flat="#93C2E0" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C3EAF2"/><stop offset="1" stop-color="#93C2E0"/></linearGradient>
+  <linearGradient id="g3" data-flat="#93C2E0" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C3EAF2"/><stop offset="1" stop-color="#93C2E0"/></linearGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<circle cx="21" cy="26" r="15" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M12,23 L19,23 A3.5,3 0 0 1 12,23 Z" fill="#12141C" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M24,23 L31,23 A3.5,3 0 0 1 24,23 Z" fill="#12141C" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse cx="21.5" cy="33" rx="3.8" ry="3.2" fill="#7E1119" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M39,6 Q45,14 39,18 Q33,14 39,6 Z" fill="url(#g2)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M41,24 Q45,30 41,33 Q37,30 41,24 Z" fill="url(#g3)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse class="hd" cx="14" cy="16" rx="3" ry="1.6" fill="#FFF1DC" opacity="0.7"/>
+</svg>

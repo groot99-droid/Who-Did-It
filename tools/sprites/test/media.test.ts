@@ -1,4 +1,8 @@
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { encodeWebp } from '../bleed.ts';
 import musicJson from '../../../packages/content/data/music.json' with { type: 'json' };
 import { artStyles, styleFile } from '../palette.ts';
 import {
@@ -54,6 +58,18 @@ describe('the committed media manifests', () => {
     expect(hd?.root).toBe('hd/');
     expect(styleBytes(hd?.root ?? 'hd/')).toBeLessThanOrEqual(BUDGET.hdBytes);
     expect(BUDGET.hdBytes).toBeLessThan(BUDGET.siteBytes);
+  });
+
+  it('count the HD row by the bytes of its WebP pages, beside their atlas json (A164, option 1)', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'wdi-hd-bytes-'));
+    mkdirSync(join(dir, 'hd', 'props'), { recursive: true });
+    const img = { width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(200) };
+    const page = encodeWebp(img);
+    const json = Buffer.from('{"textures":[{"image":"props-0.webp"}]}');
+    writeFileSync(join(dir, 'hd', 'props', 'props-0.webp'), page);
+    writeFileSync(join(dir, 'hd', 'props', 'props.json'), json);
+    writeFileSync(join(dir, 'other.png'), Buffer.alloc(1000));
+    expect(styleBytes('hd/', dir)).toBe(page.length + json.length);
   });
 
   it('keep public/assets within 150 MB', () => {
