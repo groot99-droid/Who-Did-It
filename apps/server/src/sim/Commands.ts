@@ -10,6 +10,10 @@ import { handleQuestAccept, handleQuestTurnIn } from './Quests';
 import { runHolds } from './Hold';
 import { handleInspect } from './inspect';
 import { queuePortal } from './PortalQueue';
+import { handleDonate, handleFaith } from './economy/faith';
+import { handlePayRent } from './economy/rent';
+import { handleHq } from './economy/hq';
+import { handleNotice } from './economy/notices';
 import { handleMug } from './townsfolk/mug';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
@@ -91,6 +95,22 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.bank:
         handleBank(room, cmd.sessionId, payload);
+        break;
+      // Round 8 (GDD 3.23, 8D): the civic commands; each refuses until its loop lands.
+      case C2S.notice:
+        handleNotice(room, cmd.sessionId, payload);
+        break;
+      case C2S.donate: // round 8, 8D (GDD 3.23)
+        handleDonate(room, cmd.sessionId, payload);
+        break;
+      case C2S.faith: // round 8, 8D (GDD 3.23)
+        handleFaith(room, cmd.sessionId, payload);
+        break;
+      case C2S.payRent: // round 8, 8D (GDD 3.23)
+        handlePayRent(room, cmd.sessionId);
+        break;
+      case C2S.hq: // round 8, 8D (GDD 3.23)
+        handleHq(room, cmd.sessionId, payload);
         break;
       // Round 8 (8E, GDD 3.24): the answer to a mugging prompt.
       case C2S.mug:

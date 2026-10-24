@@ -48,7 +48,9 @@ class FakeSprite {
 
 function fakeScene(withBreak: boolean) {
   const sprites: FakeSprite[] = [];
+  const played: string[] = [];
   const scene = {
+    registry: { get: () => ({ play: (k: string) => played.push(k) }) },
     textures: { exists: () => true, get: () => ({ has: () => true }) },
     anims: { exists: (k: string) => withBreak && k.endsWith('/break') },
     /** The viewer sees x below 500. */
@@ -63,7 +65,7 @@ function fakeScene(withBreak: boolean) {
       },
     },
   } as unknown as Phaser.Scene;
-  return { scene, sprites };
+  return { scene, sprites, played };
 }
 
 const node = (active: boolean): NodeSnap => ({ id: 'n1', resource: 'tinOre', x: 64, y: 64, active });
@@ -162,5 +164,20 @@ describe('NodeView breaks (motion.md 2, round 8 8G)', () => {
       expect(sprites[0]!.calls, name).toEqual([]);
       expect(sprites[0]!.destroyed, name).toBe(true);
     }
+  });
+
+  it('sounds the break as the yield is taken, the coins as a heap is swept up, and nothing for a regrowth or a reset', () => {
+    const { scene, played } = fakeScene(true);
+    const view = new NodeView(scene, () => true);
+    view.update([node(true), coins, tree], 0);
+    view.update([node(false), coins, tree], 0);
+    view.update([node(true), coins, tree], 0);
+    view.update([node(true), tree], 0);
+    expect(played).toEqual(['break_ore', 'fx_coins']);
+    const reset = fakeScene(true);
+    const quiet = new NodeView(reset.scene, () => false);
+    quiet.update([coins, tree], 0);
+    quiet.update([], 0);
+    expect(reset.played).toEqual([]);
   });
 });

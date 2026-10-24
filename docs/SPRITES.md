@@ -50,8 +50,10 @@
 Example: `out/<body>/scarf/char_villager_walk_se_003.png`. Frame numbers start at `000` and are
 contiguous per clip and direction.
 
-**Body ids** are the look ids of `looks.json` (`^[a-z][a-z0-9]*$`) plus `villager` for figures that
-are not seats. A look names a character, and in the main mode a look is public by design; the three
+**Body ids** are the look ids of `looks.json` (`^[a-z][a-z0-9]*$`) plus the `villager` family of its
+`villagers` section (round 8: `villager`, `villagerelder`, `villagergoodwife`, `villagerlass`, `villagerclerk`),
+the figures that are not seats: the ambient townsfolk and the quest givers, and the plain `villager` as a seat's
+fallback body (10.13). A villager look carries no card's signature prop and no hat-trait shape. A look names a character, and in the main mode a look is public by design; the three
 cover cards (Killer, Accomplice, Drifter) never get a body, so no world key, frame or file ever names a
 role that hides.
 
@@ -126,11 +128,18 @@ manifest.json` (generated placeholders) have the same keys; `?art=placeholder` p
 
 **Art styles (A79).** The real art ships in each style of `style.json` `artStyles`. The 8-bit style is
 `assets/manifest.json` (`"art": "real"`). The low-poly style is `assets/lowpoly/manifest.json`
-(`"art": "lowpoly"`), with its files under `assets/lowpoly/` and its URLs relative to that folder. A style
+(`"art": "lowpoly"`), with its files under `assets/lowpoly/` and its URLs relative to that folder. The HD style
+is `assets/hd/manifest.json` (`"art": "hd"`, A164), under `assets/hd/`. A style
 manifest re-skins keys of the 8-bit manifest only: same type, frame names, cells, pivots and `maps`,
-and the style's `filter` on every filtered texture (`tools/sprites/test/styles.test.ts`). The client
-loads the player's style and falls back key by key to the 8-bit entry for any key the style lacks. Switching
-style mid-match swaps the textures in place, by key. `?art=placeholder` overrides every style.
+and the style's `filter` on every filtered texture (`tools/sprites/test/styles.test.ts`). A style packed
+larger than the 8-bit set says so with `texels`: the manifest's top-level value is the factor of every texture
+entry, and an entry's own value overrides it (HD: 2 for a page drawn at display size, 4 for a sprite the 8-bit
+set halves). The client draws a texture at its usual scale over its texel factor, so a frame covers the same
+screen pixels in every style; an animation carries no factor. The client
+loads the player's style and falls back key by key to the 8-bit entry for any key the style lacks (at that
+entry's own factor). Switching
+style mid-match swaps the textures in place, by key. HD is fetched only once picked, and only offered where
+the device meets the style's `requires` (GDD 3.13). `?art=placeholder` overrides every style.
 
 ```json
 {
@@ -270,6 +279,7 @@ at the tile centre and y-sorted by that point, like a character's feet.
 | `prop_noticeBoard` | `noticeBoard` | Notice board with pinned papers (`ov.board`) |
 | `prop_kitChest` | `kitChest` | Iron-banded chest for ejected kits (`ov.chest`) |
 | `prop_lanternPost_lit`, `prop_lanternPost_unlit` | `lanternPost` | Lantern post, glass lit (`lantern`) or dark (`ov.lantern_0..3`) |
+| `prop_hq_0` .. `prop_hq_3` | `hq` (`<prefix>.hq_<station>`) | Round 8 (8G): an HQ station, one frame a tier shared by every role station: the staked site (0), the braced frame (1), boarded walls under an awning (2), the plastered, slate-roofed office with its lit sign (3). The row draws `prop_hq_0`; `view/hq/HqView.ts` swaps in `feed.hqTiers()`'s tier through `StaticView.setFrame` and throws `buildDust` on a rise seen happening |
 
 The bakery keys use the `kind` of `packages/content/data/scenes/bakery.json` `props[]`, or the id tail
 when the kind is not a prop name (`bk.flour_sacks` is a `taskSource`). A prop spanning several tiles is
@@ -961,7 +971,7 @@ and out.
 | `props` | `multiatlas`, `nearest` | shared props `prop_<kind>[_<state>]` (`prop_lanternPost_lit`/`_unlit`, lit in the `dusk` and `night` parts of the day); multi-tile slices `prop_<kind>#<dx>_<dy>`; spots `spot_<variant>`; portal frames `portal_<kind>_<s\|e\|sill>`, `portal_hatch`, `portal_drop`, `portal_boarded_<s\|e\|sill>` | at boot |
 | `props_<mapId>` | `multiatlas`, `nearest` | the map's own props, in the same grammar; looked up before `props` | with its map |
 | `char_<lookId>`, `ovl_<lookId>`, `anims_<lookId>` | as the looks catalogue (5L) | characters in 64 px packed cells, atlas `<dir>` in the screen frame | at boot |
-| `char_villager`, `ovl_villager`, `anims_villager` | as the looks | the plain base body | only with `?art=placeholder` in round 5: every seat has a look, and no figure that is not a seat exists until round 6's mobs |
+| `char_villager`, `ovl_villager`, `anims_villager` and the family's (`villagerelder`, `villagergoodwife`, `villagerlass`, `villagerclerk`) | as the looks | the villager family of `looks.json` `villagers` (round 8, A161): the ambient townsfolk's figures and the seat's fallback body | at boot in every real manifest; the placeholder manifest carries the plain villager only (until round 8 the villager loaded only with `?art=placeholder`, C11) |
 | `clues` | `multiatlas`, `linear` | decals finished at display size and drawn through the decal transform (10.5), which rotates them | at boot |
 | `vfx`, `anims_vfx` | `multiatlas`, `nearest`; animation | effects finished at display size; `SpriteCam` frames re-rendered by `IsoCam` | at boot |
 | `thumb_<mapId>` | `image` | 480 x 270 lobby thumbnail of the hub | at boot |
@@ -974,7 +984,8 @@ and out.
 - **Mode entries.** The `modes` field left with the quick mode (round 7, A115); no entry carries it.
 - **Boot.** An entry without `maps` loads at boot.
 - **Both manifests** (real and `?art=placeholder`) carry the same keys and the same `maps`, the
-  villager aside (in the placeholder manifest only, once 5L's L4 lands); `manifest.test.ts` checks both.
+  villager family aside (every real manifest carries exactly the `villagers` ids of `looks.json`, the placeholder
+  manifest the plain villager only; round 8, A161); `manifest.test.ts` checks both.
 - **Filters.** The `nearest` of this table holds while `style.json` `pixelFinish.enabled.main` is true; with it off,
   every main-mode world texture is `linear` (10.3). `clues` is always `linear`.
 - **Prop lookup.** The order is `props_<mapId>`, then `props`; within each, `prop_<kind>[_<state>]`, then
@@ -993,11 +1004,12 @@ Page-equivalents are of 2048². These are the art plan's numbers (`docs/round5/a
 | Environment per map | ≤ 1.8: ground 1280 x 1792 (0.55), kit ≤ 1024² (0.25), buildings ≤ 2048 x 1024 (0.5), map props ≤ 1024² (0.25), shared props ≤ 1024² (0.25) |
 | Boot effects | `clues` ≤ 512² (0.06), `vfx` ≤ 512 x 2048 (0.25) |
 | Characters (the deck's 10 world looks, A50) | ≤ 3.75: each look's `char_<lookId>` ≤ 1024² and `ovl_<lookId>` ≤ 1024 x 512 (0.375). About 3 expected, since most looks pack onto a 1024 x 512 body page |
-| Resident pages | ≤ 6.1 (ASSETS 6.8; 6.0 until round 8, when 6Z granted the 0.1 for the node break page, A142). The worst case, one map's environment, the boot effects and the 10 largest looks, is 6.02 (low-poly HollowMere) |
+| Resident pages | ≤ 9 (ASSETS 6.8; 6 until round 8, 6.1 with the node break page of A142, 8 by 6Z's round-8 ruling, A141, 9 by the owner's option B of 2026-10-24, A161: plan B frame counts, limp and stagger in four directions, the townsfolk's shorter clip set; a look's lazy clip pages are transient and outside the sum). The worst case is one map's environment, the boot atlases (effects, nodes, tools, mobs, givers), the deck's 10 world looks and the villager family, which is resident on every map for the townsfolk (A161). Measured with the four-heads figures on the round-8 base of 2026-10-24: 8-bit 7.55 (Hollowmere) and 7.42 (Blackpine); low poly 8.02 (Hollowmere) and 7.77 (Blackpine); the deck alone 5.92 / 5.80 / 6.14 / 5.89 (the five clips; the stand-in estimate for option B is about 8.1 and 8.8 on Hollowmere, and the packed figures follow with the clips, PR 3). The character atlas json is written on one line (`atlasJson`, A161), which keeps the default style's first load under ASSETS 6.8's 12 MB with the family resident |
 | Static world sprites per scene | ≤ 1 200; the World hides those outside the view grown by 2 tiles, re-checked when the camera moves more than a tile |
 
-`char_villager` and `ovl_villager` load only with `?art=placeholder` in round 5 (10.13), so they count in no
-budget. `tools/sprites/test/budget.test.ts` asserts each cap and, for each map, the resident sum.
+The villager family's five looks count in the resident sum since round 8 (10.13; in round 5 the villager loaded only
+with `?art=placeholder` and counted in no budget). `tools/sprites/test/budget.test.ts` asserts each cap and, for each
+map, the resident sum.
 
 **Round 8 re-plan (8F, art.md 2, motion.md 1): the measured cost.** Each shipped look packs its 304 frames per
 pass (five clips, 8 directions) on one 1024² body page at a fill of 0.42-0.47 (about 1 500 trimmed px a frame,
@@ -1006,8 +1018,8 @@ pass (five clips, 8 directions) on one 1024² body page at a fill of 0.42-0.47 (
 16 clips; the frame plan of A141 (idle 12, walk, run, limp, stagger 8 each, swing, strike, knockdown, getup,
 inspect, eat, rob 6 each, die and interact 8, hurt 3, threaten, cower, stomp, stunned 4 each, fidget 6, down 2) is
 129 frames a direction, 1 032 a pass. At the measured cost that is one 2048² body page and one 1024² overlay
-page a look (1.25), 12.5 for ten looks and a worst-case resident of 14.6 against the cap of 8 (6 until round 8;
-A141 carries 6Z's ruling and the four-direction plan that fits under it). Halving the
+page a look (1.25), 12.5 for ten looks and a worst-case resident of 14.6 against the cap of 9 (6 until round 8, 8 until the owner's
+option B; A141 carries 6Z's ruling and the four-direction plan, A161 the owner's option B that fits under 9). Halving the
 packed cell's density does not help: 128 px packed cells (A135) quadruple every frame, so even today's five
 clips would need a 2048² body page. The character budget therefore cannot hold the full clip table at any cell
 size without a DECISIONS row; A141 asks 6Z for it and names the fallbacks (one-shots in four directions, fewer

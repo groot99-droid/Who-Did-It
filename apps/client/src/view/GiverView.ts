@@ -3,6 +3,7 @@ import metrics from '@wdi/content/data/metrics.json';
 import { TILE_PX } from '@wdi/shared/constants';
 import { toScreen } from '@wdi/shared/iso';
 import { BIAS, depthAt } from './iso';
+import { drawScale } from './texels';
 import { giverAnimKey } from './m5bFrames';
 
 const ATLAS = 'givers';
@@ -60,7 +61,7 @@ export class GiverView {
     if (this.scene.textures.exists(ATLAS) && this.scene.textures.get(ATLAS).has(frame)) {
       const sprite = this.scene.add
         .sprite(at.x, at.y, ATLAS, frame)
-        .setScale(metrics.iso.artScale)
+        .setScale(drawScale(ATLAS, metrics.iso.artScale))
         .setDepth(depth);
       if (this.scene.anims.exists(key)) sprite.play(key);
       return sprite;

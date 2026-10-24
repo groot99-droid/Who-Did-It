@@ -181,7 +181,8 @@ export class EntityView {
     const s = t.samples.at(now - delay);
     if (s) {
       t.view.setPosition(s.x, s.y);
-      t.view.pose(dirFromYaw(s.yaw), s.animId, (p.statusBits & StatusBit.transit) !== 0);
+      // The whole status word: the view picks the gaits, the loops and the signs from it (motion.md 1, PlayerView).
+      t.view.pose(dirFromYaw(s.yaw), s.animId, p.statusBits);
     }
   }
 }
