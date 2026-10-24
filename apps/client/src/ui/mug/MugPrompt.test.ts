@@ -83,7 +83,7 @@ describe('mountMugPrompt', () => {
     expect(panel.open()).toBe(true);
     expect(root.byTestId('mug-title')?.content).toBe('Tallyman wants your purse.');
     expect(root.byTestId('mug-timer')?.content).toBe('6 s to choose');
-    // Part one: Pay alone; Run and Fight join with the fists (A161).
+    // Part one: Pay alone; Run and Fight join with the fists (A180).
     expect(root.byTestId('mug-flee')).toBeUndefined();
     expect(root.byTestId('mug-fight')).toBeUndefined();
     tick += 2 * TICK_RATE;

@@ -39,7 +39,7 @@ import {
 /**
  * The mugging (round 8, GDD 3.24, docs/round8/townsfolk.md 3 and 4; Session 8E): the roll rises with the purse band
  * and the mood and is zero with company or a lit light; the walk-up, the threat and the prompt; Pay, the silent
- * take and the escape through a door (Flee and Fight are part two, A161); the cooldown; nothing of it on the wire.
+ * take and the escape through a door (Flee and Fight are part two, A180); the cooldown; nothing of it on the wire.
  */
 
 /** The cellar is not the hub, is dark by day and has no creature spawner. */
@@ -271,7 +271,7 @@ describe('a mugging', () => {
     expect(untilMugged(party, human)).toBe(true);
     untilPrompt(party, human);
     const errors = () => party.humans[0]!.log.filter((e) => e.type === 'error').length;
-    handleMug(room, human, { choice: 'fight' }); // the fists are not in yet (A161 part two)
+    handleMug(room, human, { choice: 'fight' }); // the fists are not in yet (A180 part two)
     handleMug(room, human, { choice: 'flee' }); // nor the chase
     handleMug(room, human, { choice: 'rob' });
     expect(muggingOf(room, human)?.state).toBe('prompt');

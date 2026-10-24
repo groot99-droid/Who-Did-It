@@ -5,7 +5,7 @@ export const MUG_COPY = {
   'mug.hint': 'Pay a share of your purse.',
   'mug.timer': '{s} s to choose',
   'mug.pay': 'Pay',
-  /** Join the panel with the fists (DECISIONS A161, part two). */
+  /** Join the panel with the fists (DECISIONS A180, part two). */
   'mug.flee': 'Run',
   'mug.fight': 'Fight',
 } as const;

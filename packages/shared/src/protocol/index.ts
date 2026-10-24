@@ -255,7 +255,7 @@ export interface C2SPayloads {
   'act.bank': { op: 'deposit' | 'withdraw'; amount: number };
   /**
    * Round 8 (GDD 3.24): the target's answer to its open `mugPrompt`. Refused 422 with no prompt open; `flee` and
-   * `fight` are refused until the fists land (DECISIONS A161).
+   * `fight` are refused until the fists land (DECISIONS A180).
    */
   'act.mug': { choice: 'pay' | 'fight' | 'flee' };
 }

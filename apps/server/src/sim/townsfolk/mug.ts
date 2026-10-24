@@ -22,7 +22,7 @@ import { walkFigure } from './walk';
  * with a Weakened or Fatigued target and with a long time alone beside a heavy purse, and falls with the mugger's
  * fear and a lit light in the target's hand (`mugChance`). The mugger walks up, threatens, and the target chooses
  * within `moods.mug.answerS`: Pay loses `share` of the purse (banked Scrip is safe). A human answers with `act.mug`
- * (`handleMug`); an NPC seat pays. This is part one (DECISIONS A161): a silent target is taken for the share, a
+ * (`handleMug`); an NPC seat pays. This is part one (DECISIONS A180): a silent target is taken for the share, a
  * target that leaves the scene escapes, and `flee` (the chase) and `fight` are refused until 8A's fists land
  * (body.md 4). Every move of Scrip goes through `movePurse` (a figure's take sits in its `@figure:<id>` account),
  * every mugging leaves a `scuffle` clue, and nothing of it reaches the wire but the prompt and the drawn threat.
@@ -214,7 +214,7 @@ export function runMuggings(room: PartyRoom): void {
     const t = simOf(room).players.get(target);
     if (!t) continue;
     const dist = Math.hypot(t.x - m.x, t.y - m.y);
-    // An NPC seat mugs only within reach: its walk-up waits on a react line in `npc/world.ts` (A161, open).
+    // An NPC seat mugs only within reach: its walk-up waits on a react line in `npc/world.ts` (A180, open).
     if (m.figure === null && dist > reach) continue;
     const chance = mugChance(factorsOf(room, m, target, tick - since.sinceTick >= ticksOf(c.longAloneS)));
     if (chance <= 0) continue;
@@ -255,7 +255,7 @@ function advance(room: PartyRoom, mg: Mugging): void {
   const at = muggerAt(room, mg);
   if (mg.figure) mg.figure.moving = false;
   if (!t || t.dead || !t.placed || at === null) return end(room, mg, 'lost');
-  // A target through a door while its answer is due has run; the chase lands with Flee (A161).
+  // A target through a door while its answer is due has run; the chase lands with Flee (A180).
   if (t.sceneIdx !== at.sceneIdx) return end(room, mg, mg.state === 'prompt' ? 'escaped' : 'lost');
   const reach = c.reachTiles * TILE_PX;
   switch (mg.state) {
@@ -351,7 +351,7 @@ function end(room: PartyRoom, mg: Mugging, outcome: MugOutcome): void {
 
 /**
  * `act.mug { choice }` from the target (the `Commands.ts` line, consumed in `step()`): only while its prompt
- * is open. `flee` and `fight` are refused until the fists land (A161 part two, body.md 4).
+ * is open. `flee` and `fight` are refused until the fists land (A180 part two, body.md 4).
  */
 export function handleMug(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   const mg = memoryOf(room).byTarget.get(sessionId);
