@@ -259,9 +259,9 @@ describe('balance (GDD 3.3, 3.9)', () => {
     expect(col('cabalWin')).toEqual(['villageAtMostOne', 'villageAtMostOne', ...Array(5).fill('parity')]);
   });
 
-  it('makes a cycle of 170 s from day, dusk and night', () => {
+  it('makes a cycle of 230 s from day, dusk and night', () => {
     const { dayS, duskS, nightS } = balance.phases;
-    expect(dayS + duskS + nightS).toBe(170);
+    expect(dayS + duskS + nightS).toBe(230);
   });
 
   it('gates the Killer Lock at 6+ players', () => {
