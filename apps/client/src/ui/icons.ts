@@ -11,6 +11,25 @@ export const ICON_KEYS: ReadonlySet<string> = new Set([
   ...EFFECT_KEYS.map((k) => `icon_effect_${k}`),
   'icon_sign_bloody',
   'icon_sign_hunted',
+  ...[
+    'scrip',
+    'purse',
+    'till',
+    'wages',
+    'deposit',
+    'withdraw',
+    'rent',
+    'quota',
+    'faith',
+    'rumour',
+    'blackmail',
+    'hq1',
+    'hq2',
+    'hq3',
+    'blackMarket',
+  ].map((k) => `icon_econ_${k}`),
+  ...['health', 'stamina', 'strike'].map((k) => `icon_body_${k}`),
+  ...['notes', 'shout', 'vote', 'bell', 'report'].map((k) => `icon_talk_${k}`),
 ]);
 
 /** The URL of an icon in an art style (the current one by default), or null when the icon is not drawn. */

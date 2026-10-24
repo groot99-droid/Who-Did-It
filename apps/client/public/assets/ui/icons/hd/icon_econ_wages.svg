@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Wages: the day's pay packet, a coin on its flap. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g1" data-flat="#DCC4A1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0DEB3"/><stop offset="1" stop-color="#DCC4A1"/></linearGradient>
+  <radialGradient id="g2" data-flat="#F2B33D" gradientUnits="userSpaceOnUse" cx="30" cy="26" r="10"><stop offset="0" stop-color="#FFD48A"/><stop offset="1" stop-color="#F2B33D"/></radialGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<rect x="5" y="13" width="30" height="22" rx="2" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="5,14 20,26 35,14" fill="none" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="33" cy="33.5" r="8" fill="#A07C36" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="33" cy="31" r="8" fill="url(#g2)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="33" cy="31" r="4" fill="none" stroke="#A07C36" stroke-width="1.6"/>
+</svg>
