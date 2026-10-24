@@ -2,6 +2,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { registerInvariant } from '../auto/invariants';
 import { runBank } from './bank';
 import { runCivic } from './civic';
+import { runCoins } from './coins';
 import { runStakes, scripConserved } from './purse';
 import { runWages } from './wages';
 
@@ -16,6 +17,7 @@ registerInvariant('scripConserved', scripConserved);
 export function runEconomy(room: PartyRoom): void {
   runStakes(room);
   runWages(room);
+  runCoins(room);
   runBank(room);
   runCivic(room); // round 8, 8D (GDD 3.23)
 }
