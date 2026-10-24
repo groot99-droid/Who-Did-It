@@ -57,15 +57,14 @@ describe('NPC talk from the model (GDD 3.25)', () => {
     bell(party);
     toFirstCall(party, fake.prompts);
     advance(party, 2);
-    expect(lines(party)).toEqual([]);
+    expect(lines(party).filter((l) => l.source === 'model')).toEqual([]);
     for (const prompt of fake.prompts) expect(prompt).not.toMatch(/townsfolk|killer|cabal|detective/i);
     fake.answer({ text: '"The well was busy at dusk."', tokens: 50 });
     await sleep(0);
     advance(party, 1);
-    const said = lines(party);
-    expect(said.length).toBeGreaterThan(0);
-    for (const line of said)
-      expect(line).toMatchObject({ text: 'The well was busy at dusk.', source: 'model' });
+    const said = lines(party).filter((l) => l.source === 'model');
+    expect(said).toHaveLength(fake.prompts.length);
+    for (const line of said) expect(line.text).toBe('The well was busy at dusk.');
   });
 
   it('a late or unusable answer gives the template line at the deadline', async () => {

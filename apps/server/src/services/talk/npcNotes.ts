@@ -3,12 +3,13 @@ import { TICK_RATE, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { meetingTranscript, noteRefusal, postNote } from '../../sim/Chat';
 import { type FlowState, type MeetingStat, flowOf } from '../../sim/Flow';
+import { isNpcSeat } from '../../sim/Npc';
 import { simOf } from '../../sim/RoomSim';
 import { talkTransport } from './claude';
 import { publicFacts } from './facts';
 import { filterLine } from './filter';
 import { TALK_SYSTEM, talkPrompt } from './prompt';
-import { templateNote } from './templates';
+import { herringNote, smallTalkNote, templateNote } from './templates';
 
 /** One note an NPC seat wrote, as the match log keeps it (GDD 3.25 "Replay"). */
 export interface TalkLine {
@@ -31,6 +32,8 @@ interface NotePlan {
   meeting: MeetingStat;
   ticks: number[];
   pending: Pending | null;
+  /** This seat's first note of the meeting is a red herring (GDD 3.25 "Misdirection"). */
+  herring: boolean;
 }
 
 /** Per match (the flow, replaced on the way back to the lobby): the caps' counters and every note written. */
@@ -44,6 +47,29 @@ interface TalkMatch {
 const plans = new WeakMap<PartyRoom, Map<string, NotePlan>>();
 const matches = new WeakMap<FlowState, TalkMatch>();
 const replays = new WeakMap<PartyRoom, readonly TalkLine[]>();
+const herringSeats = new WeakMap<MeetingStat, Set<string>>();
+
+/**
+ * The seats whose first note of this meeting is a red herring: `talk.npc.herringsPerMeeting` living NPC seats, drawn
+ * once a meeting from the `talk:~herrings` stream, whatever their cards.
+ */
+function herringsOf(room: PartyRoom, meeting: MeetingStat): Set<string> {
+  let seats = herringSeats.get(meeting);
+  if (seats) return seats;
+  const rng = room.seeds.get('talk', '~herrings');
+  const ids: string[] = [];
+  room.state.players.forEach((p: PlayerState, id: string) => {
+    if (p.alive && isNpcSeat(room, id)) ids.push(id);
+  });
+  const { min, max } = balance.talk.npc.herringsPerMeeting;
+  const k = Math.min(ids.length, min + Math.floor(rng() * (max - min + 1)));
+  for (let i = 0; i < k; i++) {
+    const j = i + Math.floor(rng() * (ids.length - i));
+    [ids[i], ids[j]] = [ids[j]!, ids[i]!];
+  }
+  herringSeats.set(meeting, (seats = new Set(ids.slice(0, k))));
+  return seats;
+}
 
 function matchOf(room: PartyRoom): TalkMatch {
   const flow = flowOf(room);
@@ -101,7 +127,12 @@ export function runNpcNotes(room: PartyRoom, player: PlayerState): void {
   let plan = seats.get(id);
   const tick = room.state.tick;
   if (plan?.meeting !== meeting) {
-    plan = { meeting, ticks: drawTicks(room, id, tick), pending: null };
+    plan = {
+      meeting,
+      ticks: drawTicks(room, id, tick),
+      pending: null,
+      herring: herringsOf(room, meeting).has(id),
+    };
     seats.set(id, plan);
   }
   const next = plan.ticks[0];
@@ -116,12 +147,23 @@ export function runNpcNotes(room: PartyRoom, player: PlayerState): void {
     return;
   }
   const facts = publicFacts(room, id);
-  const fallback = templateNote(facts, room.seeds.get('talk', id));
+  const rng = room.seeds.get('talk', id);
+  // Every kind is drawn at every note, so the stream moves alike whatever is posted (and a replay draws the same).
+  const fallback = templateNote(facts, rng);
+  const herring = herringNote(facts, rng);
+  const smallTalk = smallTalkNote(rng);
+  const uKind = rng();
   const replay = replays.get(room);
   if (replay) {
     const nth = match.lines.filter((l) => l.seat === id).length;
     const logged = replay.filter((l) => l.seat === id)[nth];
     say(room, plan, match, id, logged?.text ?? fallback, logged?.source ?? 'template');
+    return;
+  }
+  if (plan.herring || uKind < balance.talk.npc.smallTalkChance) {
+    const text = plan.herring ? herring : smallTalk;
+    plan.herring = false;
+    say(room, plan, match, id, text, 'template');
     return;
   }
   if (!modelOn(room, match)) {
