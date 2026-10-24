@@ -4,7 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { alphaBleed } from './bleed.ts';
+import { alphaBleed, decodePng, encodePng } from './bleed.ts';
 import type { PhaserAnim } from './gen-anims.ts';
 import { FPS, staticFrameNames } from './keys.ts';
 import { finishEnabled } from './palette.ts';
@@ -218,6 +218,19 @@ export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
     'prop_tea_table',
     'prop_writing_desk',
     'prop_birdcage',
+    // Mallory's apothecary (and Hollowmere's shop counter, 8C's `counter` kind).
+    'prop_counter',
+    'prop_counter_case',
+    'prop_counter_case_b',
+    'prop_apoth_drawers',
+    'prop_jar_shelf',
+    'prop_jar_shelf_b',
+    'prop_herb_rack',
+    'prop_still',
+    'prop_mortar_table',
+    'prop_show_globe',
+    'prop_leech_jar',
+    'prop_drying_frame',
   ],
   props_blackpine: [
     'prop_anvil',
@@ -354,7 +367,8 @@ export async function packCapped(
     const png = raw.get(t.image);
     if (!png) throw new Error(`packer page ${t.image} missing`);
     t.image = `${textureName}-${i}.png`;
-    pages.set(t.image, png);
+    // Re-encoded (lossless): the packer's own PNG writer leaves a quarter of the bytes on the table (8J, round 8).
+    pages.set(t.image, encodePng(decodePng(png)));
     t.frames.sort((a, b) => (a.filename < b.filename ? -1 : 1));
   });
   const packed = textures.reduce((n, t) => n + t.frames.length, 0);
