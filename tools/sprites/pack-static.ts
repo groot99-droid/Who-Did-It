@@ -4,7 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { alphaBleed } from './bleed.ts';
+import { alphaBleed, decodePng, encodePng } from './bleed.ts';
 import type { PhaserAnim } from './gen-anims.ts';
 import { FPS, staticFrameNames } from './keys.ts';
 import { finishEnabled } from './palette.ts';
@@ -367,7 +367,8 @@ export async function packCapped(
     const png = raw.get(t.image);
     if (!png) throw new Error(`packer page ${t.image} missing`);
     t.image = `${textureName}-${i}.png`;
-    pages.set(t.image, png);
+    // Re-encoded (lossless): the packer's own PNG writer leaves a quarter of the bytes on the table (8J, round 8).
+    pages.set(t.image, encodePng(decodePng(png)));
     t.frames.sort((a, b) => (a.filename < b.filename ? -1 : 1));
   });
   const packed = textures.reduce((n, t) => n + t.frames.length, 0);
