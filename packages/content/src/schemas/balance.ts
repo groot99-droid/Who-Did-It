@@ -300,16 +300,18 @@ export const BalanceFile = z.strictObject({
   /** Round 6 (GDD 3.16): placeholders until Session 6E tunes them. */
   quests: Section({ maxActive: z.number().int().nonnegative() }),
   /**
-   * GDD 3.16: the four station mini-games' numbers, read by `rules/minigames.ts` as `MinigameBases`. Crates: drag
+   * GDD 3.16: the five station mini-games' numbers, read by `rules/minigames.ts` as `MinigameBases`. Crates: drag
    * `steps` crates, then release the needle inside a `bandFrac` band. Pour: `steps` pours filling at `ratePerS` of the
    * bowl a second, released inside `bandFrac`. Slide: `steps` bannetons. Stoke: each tap adds `stokePerTap` heat,
-   * heat falls `ratePerS` a second; hold inside `bandFrac` for `holdS`.
+   * heat falls `ratePerS` a second; hold inside `bandFrac` for `holdS`. Tap (round 7, 7M): a marker sweeps the track
+   * once per `periodS`; tap inside a `bandFrac` band `steps` times in a row, a miss starting the run again.
    */
   minigames: Section({
     crates: z.strictObject({ steps: Count, bandFrac: Frac }),
     pour: z.strictObject({ steps: Count, ratePerS: Frac, bandFrac: Frac }),
     slide: z.strictObject({ steps: Count }),
     stoke: z.strictObject({ stokePerTap: Frac, ratePerS: Frac, bandFrac: Frac, holdS: Seconds }),
+    tap: z.strictObject({ steps: Count, periodS: Seconds, bandFrac: Frac }),
   }),
   /**
    * Round 7 (GDD 3.3): the Daily Train of a map with a `station`. It stops `arriveAtS` into each day and delivers
