@@ -30,6 +30,7 @@ import { CutscenePlayer } from '../view/cutscene/CutscenePlayer';
 import { GiverView } from '../view/GiverView';
 import { MobView } from '../view/MobView';
 import { VfxView } from '../view/vfx/VfxView';
+import { HqView } from '../view/hq/HqView';
 import { NodeView } from '../view/NodeView';
 import { TransportView } from '../view/transport/TransportView';
 import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
@@ -138,6 +139,7 @@ export class World extends Phaser.Scene {
   private mobView!: MobView;
   private vfxView!: VfxView; // round 8, 8G (locked)
   private transportView!: TransportView; // round 8, 8G (locked)
+  private hqView!: HqView; // round 8, 8G (locked)
   private giverView!: GiverView;
   private m5b: M5bLayer | null = null;
   private shop: ShopLayer | null = null; // round 8, 8C (locked)
@@ -223,6 +225,7 @@ export class World extends Phaser.Scene {
     this.mobView = new MobView(this);
     this.vfxView = new VfxView(this); // round 8, 8G (locked)
     this.transportView = new TransportView(this); // round 8, 8G (locked)
+    this.hqView = new HqView(this.statics, this.vfxView); // round 8, 8G (locked)
     this.giverView = new GiverView(this);
     this.m5b = mountM5bLayer(this);
     this.shop = mountShopLayer(this); // round 8, 8C (locked)
@@ -334,6 +337,7 @@ export class World extends Phaser.Scene {
       this.mobView.destroy();
       this.vfxView.destroy(); // round 8, 8G (locked)
       this.transportView.destroy(); // round 8, 8G (locked)
+      this.hqView.destroy(); // round 8, 8G (locked)
       this.giverView.destroy();
       this.m5b?.destroy();
       this.shop?.destroy(); // round 8, 8C (locked)
@@ -383,6 +387,7 @@ export class World extends Phaser.Scene {
     this.syncBodies(bodies);
     this.drawDoors(clock.tick);
     this.transportView.update(this.sceneId, this.portals, feed, clock.tick, this.time.now); // round 8, 8G (locked)
+    this.hqView.update(feed.hqTiers()); // round 8, 8G (locked)
     this.updateTarget(self, clues, bodies);
     this.updateHold(self, clues);
     this.footsteps(now);

@@ -109,7 +109,10 @@
     { "id": "fo.brush_w", "kind": "hide", "variant": "brush", "x": 6, "y": 26, "childOnly": false },
     { "id": "fo.brush_e", "kind": "hide", "variant": "brush", "x": 36, "y": 20, "childOnly": false }
   ],
-  "props": [{ "id": "fo.planks", "kind": "taskSource", "x": 16, "y": 29, "item": "planks" }],
+  "props": [
+    { "id": "fo.planks", "kind": "taskSource", "x": 16, "y": 29, "item": "planks" },
+    { "id": "fo.hq_lodge", "kind": "hq", "x": 19, "y": 10 }
+  ],
   "gates": [],
   "paths": [
     {
@@ -240,7 +243,7 @@
     "TlllllpllllllllllllllllllllllllllllllllT",
     "TlllllpllllllllllllTTllllllllllllllTTTlT",
     "TllTTTTllllllllllllTTllllllllllllllTTTlT",
-    "TllTTTTllllTTTlllllTTlllllTTTTlllllllllT",
+    "TllTTTTllllTTTlllllPTlllllTTTTlllllllllT",
     "TlllllpllllTTTllllllllllllTTTTlllllllllT",
     "TlllllpllllTTTlllllllllllllllllllllllllT",
     "TlllllpppppppppppppppppppppppppppppppplT",
