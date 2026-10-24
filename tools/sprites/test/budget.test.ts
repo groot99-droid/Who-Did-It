@@ -76,6 +76,12 @@ describe.each(artStyles().filter((s) => hasManifest(s.root)))(
       }
     });
 
+    it('adds no page for the bloodied mark: one 48 px image (teardown.md 3, SPRITES 9.1)', () => {
+      const mark = pages.filter((p) => p.key === 'mark_bleeding');
+      expect(mark.map((p) => [p.width, p.height])).toEqual([[48, 48]]);
+      expect(equiv(mark)).toBeLessThan(0.001);
+    });
+
     for (const [prefix, cap] of DOM_BYTES) {
       it(`keeps the ${prefix}* DOM images within ${cap} bytes`, () => {
         const bytes = pages

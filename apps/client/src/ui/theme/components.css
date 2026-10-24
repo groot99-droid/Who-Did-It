@@ -543,6 +543,20 @@
   height: 16px;
 }
 
+/* Round-8 icons (ui/icons.ts, SPRITES 9.1) carry their own bone ground, so they need no disc. The 8-bit file is
+   a 24 px cell doubled: drawn at 24 px it is exact on a 2x screen, and nearest scaling keeps it sharp elsewhere. */
+.wdi-r8icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  vertical-align: middle;
+}
+
+:root[data-art-style='8bit'] .wdi-r8icon {
+  image-rendering: pixelated;
+}
+
 .wdi-icon--lg {
   width: 32px;
   height: 32px;
