@@ -2,7 +2,16 @@ import balance from '@wdi/content/data/balance.json';
 import metrics from '@wdi/content/data/metrics.json';
 import { describe, expect, it } from 'vitest';
 import { AnimId, StatusBit } from './animIds';
-import { type Clip, clipFor, dirFor, dirFromYaw, FOUR_DIR_CLIPS, RUN_SPEED_PX } from './poses';
+import {
+  type Clip,
+  clipFor,
+  dirFor,
+  dirFromYaw,
+  FOUR_DIR_CLIPS,
+  LAZY_CLIPS,
+  RUN_SPEED_PX,
+  wantedClip,
+} from './poses';
 
 describe('dirFromYaw (SPRITES 10.4)', () => {
   it('turns the world yaw into the atlas direction of the screen frame', () => {
@@ -106,15 +115,42 @@ describe('clipFor', () => {
     });
   });
 
+  describe('wantedClip and the lazy pair (SPRITES 3, A161)', () => {
+    it('names the clip before the fallback, so the view can fetch a lazy page the look lacks', () => {
+      expect(wantedClip(AnimId.rob)).toBe('rob');
+      expect(wantedClip(AnimId.idle, { bits: StatusBit.down, speed: 0 })).toBe('down');
+      expect(wantedClip(AnimId.walk, { bits: StatusBit.limp, speed: 0 })).toBe('limp');
+      expect(wantedClip(AnimId.walk, { bits: 0, speed: RUN_SPEED_PX * 2 })).toBe('run');
+      expect(wantedClip(99)).toBe('idle');
+      expect(clipFor(AnimId.rob, v1)).toEqual({ clip: 'interact', tick: false });
+    });
+    it('lists the six rare clips of the lazy pair, the rest resident', () => {
+      expect([...LAZY_CLIPS].sort()).toEqual(['down', 'eat', 'getup', 'knockdown', 'rob', 'threaten']);
+      for (const c of [
+        'idle',
+        'walk',
+        'run',
+        'limp',
+        'stagger',
+        'strike',
+        'hurt',
+        'inspect',
+        'cower',
+      ] as const) {
+        expect(LAZY_CLIPS.has(c), c).toBe(false);
+      }
+    });
+  });
+
   describe('dirFor (SPRITES 3: four-direction clips)', () => {
-    it('keeps the eight directions of a gait, a strike and a hit', () => {
-      for (const c of ['idle', 'walk', 'run', 'limp', 'stagger', 'swing', 'strike', 'hurt', 'die'] as const) {
+    it('keeps the eight directions of a walk, a run, a strike and a hit', () => {
+      for (const c of ['idle', 'walk', 'run', 'swing', 'strike', 'hurt', 'die'] as const) {
         expect(FOUR_DIR_CLIPS.has(c), c).toBe(false);
         expect(dirFor(c, 'n')).toBe('n');
         expect(dirFor(c, 'w')).toBe('w');
       }
     });
-    it('rounds a straight facing to the next diagonal clockwise for a one-shot or a mood idle', () => {
+    it('rounds a straight facing to the next diagonal clockwise for a slowed gait, a one-shot or a mood idle', () => {
       for (const c of FOUR_DIR_CLIPS) {
         expect(dirFor(c, 'n'), c).toBe('ne');
         expect(dirFor(c, 'e'), c).toBe('se');
@@ -130,7 +166,9 @@ describe('clipFor', () => {
         'getup',
         'inspect',
         'knockdown',
+        'limp',
         'rob',
+        'stagger',
         'stomp',
         'stunned',
         'threaten',

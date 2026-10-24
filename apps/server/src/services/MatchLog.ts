@@ -1,4 +1,5 @@
 import type { SeedWords } from '../sim/seeds';
+import type { TalkLine } from './talk/npcNotes';
 
 /**
  * One JSON line per finished match on stdout, for the playtest metrics (ROADMAP 7.5). Tests replace
@@ -37,6 +38,8 @@ export interface MatchRecord {
     ejectedRole?: string;
     ejectionCorrect?: boolean;
   }[];
+  /** Round 8, 8T: every NPC meeting note and its source, for `setTalkReplay`; absent when no NPC wrote. */
+  talk?: TalkLine[];
 }
 
 export const matchLog = {

@@ -4,6 +4,10 @@ import { AnimId, StatusBit } from './animIds';
 import { PlayerView } from './PlayerView';
 import { RUN_SPEED_PX } from './poses';
 
+// The loader module pulls in Phaser, which does not load under node; PlayerView reaches it through a dynamic import.
+const loadLazyLook = vi.fn();
+vi.mock('./assets', () => ({ loadLazyLook }));
+
 // PlayerView on a fake scene (motion.md 1, 4): which animation keys each clip plays, the four-direction rounding,
 // the fallbacks of a look without the round-8 clips, the speed-picked gait and the sign marks per status bit.
 
@@ -125,8 +129,10 @@ function scene(animKeys: string[], textures = ['char_detective', 'ovl_detective'
 const DIRS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
 const FOUR = ['ne', 'se', 'sw', 'nw'] as const;
 const V1 = ['idle', 'walk', 'swing', 'interact', 'die'];
-const R8_EIGHT = ['run', 'limp', 'stagger', 'strike', 'hurt'];
+const R8_EIGHT = ['run', 'strike', 'hurt'];
 const R8_FOUR = [
+  'limp',
+  'stagger',
   'knockdown',
   'down',
   'getup',
@@ -164,7 +170,10 @@ describe('PlayerView (motion.md 1)', () => {
     s = scene(keysOf([...V1, ...R8_EIGHT, ...R8_FOUR]));
     view = build(s);
   });
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    loadLazyLook.mockClear();
+  });
 
   for (const clip of [...R8_EIGHT, ...R8_FOUR]) {
     const id = AnimId[clip as keyof typeof AnimId];
@@ -218,6 +227,30 @@ describe('PlayerView (motion.md 1)', () => {
       'char/detective/walk/se@0',
       'char/detective/die/se@0',
       'char/detective/interact/se@0',
+    ]);
+  });
+
+  it('asks for the lazy pair once when a look lacks a rare clip, and never without a loader', async () => {
+    // A V1 look wants `rob`: the fallback plays now, assets.ts fetches char_<look>_2 (SPRITES 3, A161).
+    s = scene(keysOf(V1));
+    view = build(s);
+    view.pose('se', AnimId.rob, 0);
+    view.pose('se', AnimId.idle, StatusBit.down);
+    expect(loadLazyLook).not.toHaveBeenCalled();
+    const load = { start: vi.fn(), once: vi.fn() };
+    s = scene(keysOf(V1));
+    (s.scene as unknown as { load: unknown }).load = load;
+    view = build(s);
+    view.pose('se', AnimId.walk, StatusBit.limp);
+    expect(loadLazyLook).not.toHaveBeenCalled();
+    view.pose('se', AnimId.rob, 0);
+    view.pose('se', AnimId.eat, 0);
+    await vi.waitFor(() => expect(loadLazyLook).toHaveBeenCalledTimes(1));
+    expect(loadLazyLook).toHaveBeenCalledWith(s.scene, 'detective');
+    expect(played(s)).toEqual([
+      'char/detective/walk/se@0',
+      'char/detective/interact/se@0',
+      'char/detective/idle/se@0',
     ]);
   });
 

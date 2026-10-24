@@ -938,6 +938,27 @@ with `desperateNeeds` or more needs over the threshold it is Desperate; with non
 Anger remembers who struck, robbed or taxed the seat until it cools to zero; the mugging (below) and relations
 (3.22) read it. A new card (3.12: the brain forgets) starts every need at zero.
 
+**Ambient townsfolk (8E, A160).** Each map holds `townsfolk.count[profile]` figures that are not seats: no card, no
+vote, no task list, no part in any win. The map's named figure comes first (HollowMere's Company Clerk, BlackPine's
+Tallyman: the `named` rows of `routines.json` `townsfolk`), then one stallholder per shop prop (`fixed`), then
+villagers to fill. They are spawned at the deal, each with a `townsfolk:<figure>` stream of its own (never a seat's),
+a home (a lit interior, the persona rule of 3.12) and a route: a named figure walks its row's prop kinds in order
+(the Clerk the ledger, the notice board, the tavern window and the pump; the Tallyman the tally rack, the notice
+board, the pump and a basin), a stallholder keeps its one counter, a villager draws `npc.routine.favouriteStations`
+favourites among the seats' stations. By day a figure walks to its next station at `walkTilesPerS`, works it for
+`stationDwellS` (the interact clip), then idles for `idleS` with chance `idleChance`; a walk longer than
+`npc.routine.maxWalkS` is given up. In the night class it goes home and stands there. It crosses portals like a seat
+and stands still for the door's transit on the far side, under a new handle. Outside the world phases it holds
+still where it is; the lobby clears every figure.
+
+On the wire a figure is a scene `Avatar` under an opaque handle like a seat's (3.17) with a `villager` look (never
+a card's: 8F's variants all begin `villager`), the `townsfolk.height` height, no status bit and never the ghost
+tag, so nothing but the drawn figure tells it apart; its id never leaves the server. Needs and moods tick for it as
+for a seat (the mood idle shows while it stands), it hears the same bus events, and it counts the bodies it sees.
+The Knife never finds it (its handle resolves to no seat) and a vote for it is refused. The invariant `figureNotSeat`
+(auto 50) checks that no figure is in any seat list, vote, death or meeting, and that no figure avatar carries a
+seat's handle, the ghost tag or a card's look.
+
 ### 3.25 The living world
 
 Round 8 addendum B (A173, A174; `docs/round8/living.md`). Sessions 8Q, 8R, 8S, 8T and 8U write this section with their code.
@@ -946,4 +967,7 @@ Round 8 addendum B (A173, A174; `docs/round8/living.md`). Sessions 8Q, 8R, 8S, 8
 - **Talk** (8T). NPC lines in meeting notes (3.8) come from templates, or from Claude when the server holds a key, off the tick and logged for replay; one to three a meeting are red herrings, slightly off.
   - **Input.** A line is built only from facts every seat at the table has: the round, the meeting's reason, the caller's and the body's names, the roll-call's missing names and the other living seats' names (`services/talk/facts.ts`). Never a card, a cover, a private view or which seats are NPCs.
   - **Templates.** `services/talk/templates.ts`: questions and remarks that name seats by name and never name a card, a role or a faction. A template whose name has nothing to fill (no body at a bell meeting) is not drawn; the bell question is drawn only at a bell meeting. Each line draws two uniforms from the seat's `talk` stream, whatever is drawn.
+  - **Model.** With `ANTHROPIC_API_KEY` on the server, and never in an auto run, a replay or a test, a note's text comes from the Messages API (the model id is the server's `WDI_TALK_MODEL`, else the fast small model). The prompt is the input above, the writer's own name, what it found itself, and the last `talk.model.transcriptLines` lines of the meeting (named chat with its speaker, notes with none); never its card. The call runs off the tick: at the note's tick the template line is drawn first, always, and the call starts; a later tick posts the answer, or the template line once `talk.model.timeoutS` passes or for any answer but a plain finished one. Per match at most `talk.model.callsPerMatch` calls and `talk.model.tokensPerMatch` tokens; past either, templates only.
+  - **Filter.** A model line keeps its first line without quotes, at most `talk.model.maxChars`; it is thrown away for the template if it says the writer is not a person, holds a slur, or names a card or a faction beside a seat's name or the writer's own "I", unless that seat claimed that card in public.
+  - **Replay.** Every NPC note goes to the match log's `talk` rows (tick, seat, text, template or model); a replay posts each seat's n-th logged note and calls nothing.
 - **Briarberry.** The Doctor's healing ingredient, picked from briar bushes that make the picker bleed (on hard down to half health, never to death); easy villagers gift it, normal shops sell it, hard only grows it (8U).

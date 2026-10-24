@@ -233,8 +233,10 @@ describe('creatures in a match', () => {
     const at = floorNear(party.room, 'cave_entry', bat.x, bat.y, 1, 2);
     const id = human(party);
     placeSeat(party, id, 'cave_entry', at.x, at.y);
-    advance(party, 30 * TICK_RATE);
-    expect(hpOf(party.room, id)).toBeLessThan(balance.body.maxHp);
+    // The lowest health across the window, not its last reading: regeneration can refill an early bite by then.
+    let lowest = balance.body.maxHp;
+    advance(party, 30 * TICK_RATE, () => (lowest = Math.min(lowest, hpOf(party.room, id))));
+    expect(lowest).toBeLessThan(balance.body.maxHp);
     expect(simOf(party.room).players.get(id)!.dead).toBe(false);
     // Its bites come between chase cycles and regeneration refills most of them (a standing seat lasts minutes,
     // or longer when the roam takes the bat out of its senses), so the kill is proved at the edge: the seat is
