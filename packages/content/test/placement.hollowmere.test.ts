@@ -137,7 +137,7 @@ const RULES: PlacementRules = {
     shaping_table: 'free',
     water_bucket: 'free',
     milk_churn: 'free',
-    compressor: 'free',
+    ice_chest: 'free',
     couche_rack: 'free',
     // Pennock's barn, the cellar under the square, and the tavern back room's black market (8D's).
     harness_rack: 'hung',

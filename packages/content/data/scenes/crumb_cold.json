@@ -8,7 +8,7 @@
   "biome": "house",
   "dark": false,
   "size": { "w": 12, "h": 9 },
-  "notes": "La Chambre Froide: the walk-in behind Crumb's Ovens, its slatted shelves of butter, milk crocks, eggs and yeast furred with frost along the back wall under one cold bulb, the frosted compressor in the corner, churns from the Pennock farm by the walls, two crates of milk bottles in the middle; its steel door opens east onto the bakery (round 8, 8J).",
+  "notes": "La Chambre Froide: the walk-in behind Crumb's Ovens, its slatted shelves of butter, milk crocks, eggs and yeast furred with frost along the back wall under one oil lamp, a zinc-lined ice chest in the corner, churns from the Pennock farm by the walls, two crates of milk bottles in the middle; its iron-strapped door opens east onto the bakery (round 8, 8J; the ice chest replaced the compressor in round 8, 8V, canon.md K11).",
   "worldRef": "4.3",
   "portals": [
     {
@@ -59,7 +59,7 @@
     { "id": "cf.wall_bulb", "kind": "dressing", "x": 6, "y": 0 },
     { "id": "cf.cold_shelf_1", "kind": "dressing", "x": 7, "y": 0 },
     { "id": "cf.cold_shelf_2", "kind": "dressing", "x": 8, "y": 0 },
-    { "id": "cf.compressor", "kind": "dressing", "x": 10, "y": 1 },
+    { "id": "cf.ice_chest", "kind": "dressing", "x": 10, "y": 1 },
     { "id": "cf.milk_churn_0", "kind": "dressing", "x": 1, "y": 3 },
     { "id": "cf.milk_churn_1", "kind": "dressing", "x": 1, "y": 4 },
     { "id": "cf.tin_crate", "kind": "dressing", "x": 1, "y": 5 },
