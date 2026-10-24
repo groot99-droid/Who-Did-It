@@ -19,12 +19,13 @@ interface Manifest {
 const read = (rel: string) => JSON.parse(readFileSync(join(ASSETS, rel), 'utf8')) as Manifest;
 
 describe('art styles (DECISIONS A79, SPRITES 5)', () => {
-  it('ship 8-bit (finished, nearest, root manifest) and low poly (unfinished, linear), 8-bit by default', () => {
-    expect(artStyles().map((s) => s.id)).toEqual(['8bit', 'lowpoly']);
+  it('ship 8-bit (finished, nearest, root manifest), low poly and HD (unfinished, linear), 8-bit by default', () => {
+    expect(artStyles().map((s) => s.id)).toEqual(['8bit', 'lowpoly', 'hd']);
     expect(defaultArtStyle().id).toBe('8bit');
     expect(artStyle('8bit')).toMatchObject({ pixelFinish: true, filter: 'nearest', root: '' });
     expect(artStyle('lowpoly')).toMatchObject({ pixelFinish: false, filter: 'linear', root: 'lowpoly/' });
-    expect(() => artStyle('hd')).toThrow(/unknown art style/);
+    expect(artStyle('hd')).toMatchObject({ pixelFinish: false, filter: 'linear', root: 'hd/' });
+    expect(() => artStyle('vaporwave')).toThrow(/unknown art style/);
   });
 
   // A style manifest other than the root one is optional while its art is made: a key it lacks falls back to

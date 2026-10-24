@@ -6,6 +6,7 @@ import { toScreen } from '@wdi/shared/iso';
 import type { AvatarSnap, DoorSnap } from '../../net/world';
 import { BIAS, depthAt } from '../iso';
 import { reducedMotion as prefersReducedMotion } from '../vfx/motion';
+import { Sfx, TRANSPORT } from '../vfx/sfx';
 import {
   climbHeight,
   elevationOf,
@@ -106,11 +107,13 @@ export class TransportView {
   private graph: { scenes: SceneGraph; maps: MapList } | null = null;
   /** Settles once the scene graph is loaded: until then no Train is drawn and a ladder climbs down. */
   readonly ready: Promise<void>;
+  private readonly sfx: Sfx;
 
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly reducedMotion: () => boolean = prefersReducedMotion,
   ) {
+    this.sfx = new Sfx(scene);
     this.ready = import('@wdi/content').then(({ scenes, maps }) => {
       this.graph = { scenes: scenes as unknown as SceneGraph, maps: maps as MapList };
       this.track = trainTrack(this.graph.scenes, this.graph.maps, this.sceneId);
@@ -155,6 +158,8 @@ export class TransportView {
           g: this.scene.add.graphics(),
         };
         this.swings.set(d.id, s);
+        const heard = at(p.x, p.y);
+        this.sfx.play(TRANSPORT[kind], heard.x, heard.y);
       }
       this.draw(s, p, (d.swingUntilTick - tick) / TICK_RATE, reduced);
     }

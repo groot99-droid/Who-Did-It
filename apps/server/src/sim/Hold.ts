@@ -12,6 +12,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isVerbPhase, reject, sceneKey } from './World';
 import { handleCraft, tickCraft } from './Craft';
+import { tickCoop } from './Coop';
 import { handleTaskHold } from './Minigames';
 import { handleBankHold } from './economy/bank';
 import { handleShopHold } from './economy/shops';
@@ -116,6 +117,11 @@ export function runHolds(room: PartyRoom): void {
     }
     if (isCivicHold(hold.action)) {
       tickCivicHold(room, sessionId, p); // round 8, 8D: the mailbag, altar and rack holds (GDD 3.23)
+      continue;
+    }
+    // Round 7, 7M: the co-op task's hold runs and finishes in sim/Coop.ts (GDD 3.5).
+    if (hold.action === 'task') {
+      tickCoop(room, sessionId, p);
       continue;
     }
     // Moving, leaving a verb phase, dying, a crossing or a vanished clue all cancel the hold.

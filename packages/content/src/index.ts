@@ -61,6 +61,7 @@ import hollowmereJson from '../data/maps/hollowmere.json' with { type: 'json' };
 import blackpineJson from '../data/maps/blackpine.json' with { type: 'json' };
 
 import { AbilitiesFile } from './schemas/abilities.js';
+import { fillRoles } from './cardText.js';
 import { BalanceFile, type BalanceRow, type Profile } from './schemas/balance.js';
 import { CluesFile } from './schemas/clues.js';
 import { ItemsFile } from './schemas/items.js';
@@ -82,6 +83,7 @@ import { TraitsFile } from './schemas/traits.js';
 import { DEFAULT_MAP, MAP_IDS, MapFile, type MapId } from './schemas/maps.js';
 import { assertValid, type Content } from './validate.js';
 
+export * from './cardText.js';
 export * from './schemas/common.js';
 export * from './schemas/palette.js';
 export * from './schemas/metrics.js';
@@ -183,7 +185,7 @@ export function parseContent(raw: {
   economy: unknown;
   relations: unknown;
 }): Omit<Content, 'scenes' | 'maps'> {
-  return {
+  const parsed = {
     palette: PaletteFile.parse(raw.palette),
     metrics: MetricsFile.parse(raw.metrics),
     style: StyleFile.parse(raw.style),
@@ -210,6 +212,8 @@ export function parseContent(raw: {
     economy: EconomyFile.parse(raw.economy),
     relations: RelationsFile.parse(raw.relations),
   };
+  // Round 8 (A171): the role text's number tokens are filled from the data here, before anything reads a role.
+  return { ...parsed, roles: fillRoles(parsed.roles, parsed) };
 }
 
 export const content: Content = {

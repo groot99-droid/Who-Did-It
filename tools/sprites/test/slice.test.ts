@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { decodePng, type Rgba } from '../bleed.ts';
 import type { MultiAtlas } from '../pack.ts';
-import { SLICE_RE } from '../pack-static.ts';
+import { SLICE_RE, bldPropFrames } from '../pack-static.ts';
 import { finishEnabled, paletteFile } from '../palette.ts';
 import { audit } from '../pixel.ts';
 import { sliceFrame, tileIndex } from '../slice.ts';
@@ -64,10 +64,12 @@ describe('the shipped building atlases (art plan 3.4, 1.4)', () => {
       () => {
         const atlas = JSON.parse(readFileSync(file, 'utf8')) as MultiAtlas;
         const pivots = new Map<string, string>();
+        const props = bldPropFrames(map); // the map's own props pack here too (BLD_PROPS_MAPS)
         for (const t of atlas.textures) {
           expect(t.size.w, t.image).toBeLessThanOrEqual(2048);
           expect(t.size.h, t.image).toBeLessThanOrEqual(1024);
           for (const f of t.frames) {
+            if (props.includes(f.filename)) continue;
             expect(f.filename).toMatch(SLICE_RE);
             const art = f.filename.split('#')[0]!;
             const pivot = `${f.pivot!.x * f.sourceSize.w},${f.pivot!.y * f.sourceSize.h}`;
