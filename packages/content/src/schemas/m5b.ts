@@ -47,6 +47,8 @@ export type RecipesFile = z.infer<typeof RecipesFile>;
 export const MobDef = z.strictObject({
   id: Id,
   name: z.string().min(1),
+  /** Hit points (round 8, 8G): fists, bolts and lights take them off; at zero it dies (GDD 3.15, body.md 4). */
+  hp: z.number().int().positive(),
   speedTilesPerS: z.number().positive(),
   /** How far it notices a seat, and how close a light must be for it to flee. */
   senseTiles: Tiles,
@@ -74,6 +76,8 @@ export const Quest = z.strictObject({
   kind: QuestKind,
   wants: z.array(z.strictObject({ item: Id, qty: Qty })).min(1),
   reward: z.array(z.strictObject({ item: Id, qty: Qty })),
+  /** Round 8 (GDD 3.23, 8C): the Scrip the giver pays on the turn-in, beside the items (0 when absent). */
+  scrip: z.number().int().nonnegative().optional(),
   /** A copy id of the client's `ui/copy/m5b.ts` for the giver's lines. */
   copyId: z.string().regex(/^[a-z][A-Za-z0-9.]*$/),
 });

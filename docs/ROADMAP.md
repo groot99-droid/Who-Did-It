@@ -111,4 +111,6 @@ The playtest kit lives in `docs/PLAYTESTS/`: `README.md` is the run sheet (owner
 
 ### 7.8 V2 outline
 
+V2 is the sequel **"Who Did It Too?"**: first person will never be this game (owner, A168). It keeps the frozen ids, the shared server, the rules and the world data. The R8 and R9 work runs in the owner's build order: town moods, then the law, then evolutions and vendetta dilemmas, then the economy, then Port-au-Levain, then story mode. The owner rates them all equally, so this is sequencing, not priority. Each round's contract opens with an intent brief: what the round should feel like, what the owner likes, and what it must never do.
+
 After the V1 beta: (1) 3D `ISceneCollider` from Blender navmesh exports; (2) `input.move` uses `yaw`; (3) cone + occlusion visibility predicate; (4) Three.js or Babylon.js renderer loading the same GLB sources used for the sprite renders; (5) Medium, the Beast, bats, spatial audio, voice chat. Gate: V1 rules tests green and content JSON frozen behind `schemaVersion`.

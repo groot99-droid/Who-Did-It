@@ -1,0 +1,62 @@
+{
+  "gddRef": "3.23",
+  "stakes": {
+    "tiers": { "modest": { "min": 8, "max": 14 }, "comfortable": { "min": 24, "max": 34 } },
+    "byLook": {
+      "detective": "comfortable",
+      "doctor": "comfortable",
+      "baker": "comfortable",
+      "vicar": "modest",
+      "watchman": "modest",
+      "herbalist": "modest",
+      "gamekeeper": "modest",
+      "lamplighter": "modest",
+      "fisher": "modest",
+      "tinner": "modest"
+    },
+    "default": "modest"
+  },
+  "shops": {
+    "bakery": { "prop": "bk.shop_counter", "sells": ["flour"], "buys": [] },
+    "apothecary": { "prop": "as.shop_counter", "sells": ["bandage", "salts"], "buys": [] },
+    "store": {
+      "prop": "tb.shop_counter",
+      "sells": ["rope", "oil", "candle", "planks"],
+      "buys": []
+    },
+    "market": {
+      "prop": "ov.shop_market",
+      "sells": [],
+      "buys": ["timber", "stone", "resin", "herb", "mushroom", "tinOre"]
+    },
+    "gamekeeper": { "prop": "fo.shop_stall", "sells": ["snare", "torch"], "buys": [] },
+    "bpStore": {
+      "prop": "bl.shop_store",
+      "sells": ["rope", "oil", "candle", "planks"],
+      "buys": []
+    },
+    "bpGamekeeper": { "prop": "bl.shop_stall", "sells": ["snare", "torch"], "buys": [] },
+    "bpMarket": {
+      "prop": "bc.shop_market",
+      "sells": [],
+      "buys": ["timber", "stone", "resin", "herb", "mushroom", "tinOre"]
+    }
+  },
+  "prices": {
+    "flour": { "ask": 2 },
+    "bandage": { "ask": 4 },
+    "salts": { "ask": 5 },
+    "rope": { "ask": 3 },
+    "oil": { "ask": 2 },
+    "candle": { "ask": 1 },
+    "planks": { "ask": 3 },
+    "snare": { "ask": 4 },
+    "torch": { "ask": 3 },
+    "timber": { "pay": 1 },
+    "stone": { "pay": 1 },
+    "resin": { "pay": 2 },
+    "herb": { "pay": 2 },
+    "mushroom": { "pay": 2 },
+    "tinOre": { "pay": 3 }
+  }
+}

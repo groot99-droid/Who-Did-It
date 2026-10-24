@@ -296,7 +296,9 @@ export function findTells(rec: Recording): Tell[] {
         if (!ok) tell('T5', id, r.tick, `${r.s.hold.action} ${r.s.hold.targetId}`);
       }
       if (r.sceneChanged) {
-        if (before.s.mode === 'routine' && before.live && r.tick - entered < 600 && isWorld(r.phase)) {
+        // A crossing on the tick the brain turns home is the trip home, not leaving too soon (round 8, 6Z for 8J).
+        const routine = before.s.mode === 'routine' && r.s.mode === 'routine';
+        if (routine && before.live && r.tick - entered < 600 && isWorld(r.phase)) {
           tell('T6', id, r.tick, `crossed ${r.tick - entered} ticks after entering`);
         }
         entered = r.tick;
