@@ -43,7 +43,8 @@ export interface PackInput {
 
 export interface AtlasFrame {
   filename: string;
-  rotated: boolean;
+  /** Always false from the packer (`allowRotation: false`); a character atlas leaves it out (Phaser reads it as false). */
+  rotated?: boolean;
   trimmed: boolean;
   sourceSize: { w: number; h: number };
   spriteSourceSize: { x: number; y: number; w: number; h: number };
@@ -194,6 +195,8 @@ export async function packCharacter(
       }
       const { atlas, pages, finished } = packed;
       applyPivots(atlas, manifest);
+      // Nothing is rotated, and fifteen looks repeat the field on every frame (6Z's grant on #194, ASSETS 6.8).
+      for (const t of atlas.textures) for (const f of t.frames) if (!f.rotated) delete f.rotated;
       textures.push({ key, atlas });
       // A finished page (256 colours or fewer, every alpha 0 or 255: the 8-bit style) is written indexed, the
       // same pixels at a quarter of the bytes, which keeps the option-B clip table inside the first-load budget

@@ -233,6 +233,17 @@ describe('gen-anims', () => {
     expect(anims[2]!.frames[0]!.key).toBe('ovl_tester');
   });
 
+  it('leaves the unrotated flag out of a character atlas', async () => {
+    const { manifest, frames } = synthetic();
+    const files = await packCharacter('tester', frames, manifest);
+    for (const key of ['char_tester.json', 'ovl_tester.json']) {
+      const atlas = JSON.parse(files.get(key)!.toString()) as MultiAtlas;
+      const all = atlas.textures.flatMap((t) => t.frames);
+      expect(all.length, key).toBeGreaterThan(0);
+      for (const f of all) expect('rotated' in f, f.filename).toBe(false);
+    }
+  });
+
   it.skipIf(!finishEnabled('main'))(
     'writes a finished page indexed, the same pixels at fewer bytes',
     async () => {
