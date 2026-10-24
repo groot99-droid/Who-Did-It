@@ -46,6 +46,11 @@ export async function bootNpcServer(): Promise<{
 }> {
   process.env.WDI_DEBUG = '1';
   const colyseus = await boot(createServer({ ipBurst: 1e5, ipPerMin: 1e8, globalPerMin: 1e8 }));
+  // No server-side keep-alive timeout: a test that steps a match synchronously for seconds (`recordMatch`) holds both
+  // keep-alive timers past their 5 s, and when the loop frees the server closes the pooled socket just as the next
+  // matchmake `fetch` reuses it (ECONNRESET, CI on `npcTells` E2). The client still closes its idle sockets itself.
+  const http = colyseus.server.transport.server;
+  if (http) http.keepAliveTimeout = 0;
   return {
     colyseus,
     release: async () => {
