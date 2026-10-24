@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Indebted: a bill owed, sealed in red (private: only the debtor's own view shows it). -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g1" data-flat="#DCC4A1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0DEB3"/><stop offset="1" stop-color="#DCC4A1"/></linearGradient>
+  <radialGradient id="g2" data-flat="#B3121F" gradientUnits="userSpaceOnUse" cx="28" cy="32" r="8"><stop offset="0" stop-color="#B3121F"/><stop offset="1" stop-color="#B3121F"/></radialGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<polygon points="10,5 32,5 39,12 39,43 10,43" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="32,5 32,12 39,12" fill="#BFA27E" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="15" y1="13" x2="27" y2="13" stroke="#12141C" stroke-width="2" stroke-linecap="round"/>
+<line x1="15" y1="19" x2="34" y2="19" stroke="#12141C" stroke-width="2" stroke-linecap="round"/>
+<line x1="15" y1="25" x2="34" y2="25" stroke="#12141C" stroke-width="2" stroke-linecap="round"/>
+<line x1="15" y1="31" x2="22" y2="31" stroke="#12141C" stroke-width="2" stroke-linecap="round"/>
+<circle cx="30" cy="35" r="7" fill="url(#g2)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="30" cy="35" r="3.2" fill="#7E1119"/>
+<ellipse class="hd" cx="27.5" cy="31.5" rx="1.8" ry="1" fill="#FFF1DC" opacity="0.6"/>
+</svg>
