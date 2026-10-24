@@ -52,12 +52,13 @@ async function world(humans: number, keep: number): Promise<{ party: Party; npcs
 }
 
 /**
- * The ticks a report takes `tiles` from a body: the noticing stagger, the walk, the difficulty row's delay and 2 s of
- * slack. The routine alone, which found such a body only by chance, took longer in both regression cases.
+ * The ticks a report takes `tiles` from a body: a noticing stagger per reaction, the walk, the difficulty row's delay
+ * and 2 s of slack. A heard scream is two reactions (the scream, then the body once seen), each with its own stagger.
+ * The routine alone, which found such a body only by chance, took longer in both regression cases.
  */
-const deadline = (party: Party, tiles: number) =>
+const deadline = (party: Party, tiles: number, reactions = 1) =>
   seconds(
-    balance.npc.hive.staggerS.max +
+    reactions * balance.npc.hive.staggerS.max +
       tiles / balance.movement.walkTilesPerS +
       difficultyRow(party.room).reportDelayS +
       2,
@@ -88,7 +89,7 @@ describe('the body bands (8R)', () => {
     expect(simOf(party.room).reportedBodies.size).toBe(0);
     emitNoise(party.room, 'forest', px(13), px(1), balance.noise.killScream, 'scream', dead);
     const requests = requestsOf(party);
-    for (let i = 0; i < deadline(party, 6) && requests.length === 0; i++) advance(party, 1);
+    for (let i = 0; i < deadline(party, 6, 2) && requests.length === 0; i++) advance(party, 1);
     expect(requests).toEqual([expect.objectContaining({ reason: 'body', callerId: a })]);
   });
 
