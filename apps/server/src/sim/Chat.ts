@@ -28,11 +28,29 @@ export function handleSay(room: PartyRoom, sessionId: string, payload: Record<st
     if (bodyBlocksAct(room, sessionId)) return refuse(room, sessionId, ErrorCode.cannot, 'not now'); // round 8, 8A
     channel = 'meeting';
   }
+  if (channel === 'meeting') heard(room, room.state.players.get(sessionId)?.name ?? '', text); // round 8, 8T: the meeting so far, for NPC talk
   for (const client of room.clients) {
     if (channel === 'ghost' && !sim.players.get(client.sessionId)?.dead) continue;
     client.send(S2C.chatMsg, { from: sessionId, text, channel });
   }
 }
+
+/** Per meeting, every line said aloud: the named chat with its speaker's name, a note with none (`who: ''`). */
+const transcripts = new WeakMap<MeetingStat, { who: string; text: string }[]>();
+
+function heard(room: PartyRoom, who: string, text: string): void {
+  const meeting = flowOf(room).current;
+  if (meeting === null) return;
+  const lines = transcripts.get(meeting) ?? [];
+  lines.push({ who, text });
+  transcripts.set(meeting, lines);
+}
+
+/** The current meeting's public lines in order (GDD 3.25 "Input"): what every living seat has read. */
+export const meetingTranscript = (room: PartyRoom): readonly { who: string; text: string }[] => {
+  const meeting = flowOf(room).current;
+  return meeting === null ? [] : (transcripts.get(meeting) ?? []);
+};
 
 /** Per meeting (the flow's `current` stat), each seat's notes so far and the tick of its last one. */
 const noteLog = new WeakMap<MeetingStat, Map<string, { count: number; lastTick: number }>>();
@@ -65,6 +83,7 @@ export function postNote(room: PartyRoom, seatId: string, raw: string): boolean 
   const mine = seats.get(seatId) ?? { count: 0, lastTick: 0 };
   seats.set(seatId, { count: mine.count + 1, lastTick: room.state.tick });
   room.broadcast(S2C.chatMsg, { from: '', text, channel: 'notes' });
+  heard(room, '', text);
   emitSim(room, { tick: room.state.tick, kind: 'talk.line', data: { channel: 'notes' } });
   return true;
 }
