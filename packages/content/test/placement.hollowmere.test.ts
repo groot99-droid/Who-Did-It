@@ -139,6 +139,16 @@ const RULES: PlacementRules = {
     milk_churn: 'free',
     compressor: 'free',
     couche_rack: 'free',
+    // Pennock's barn, the cellar under the square, and the tavern back room's black market (8D's).
+    harness_rack: 'hung',
+    tool_rack: 'hung',
+    lantern_hook: 'hung',
+    ossuary: 'hung',
+    cobweb: 'hung',
+    hay_bale: 'free',
+    feed_trough: 'free',
+    wine_cask: 'free',
+    blackMarket: 'free',
     wakeTable: 'surface',
     plate: 'overlay',
     crepe: 'doorOverlay',
@@ -204,7 +214,7 @@ const RULES: PlacementRules = {
         'wall_bulb',
       ],
     },
-    lantern: { props: ['lanternPost', 'drowned_lantern'] },
+    lantern: { props: ['lanternPost', 'drowned_lantern', 'lantern_hook'] },
     fire: { props: ['oven', 'brickOven', 'fireplace_e', 'inglenook_e', 'still'] },
     torch: { props: [], wall: true },
     window: {
@@ -235,20 +245,6 @@ const PENDING: Partial<Record<SceneId, readonly string[]>> = {
     'light ov.lt_platform (lantern) at 60,30 hangs on nothing that could hold it',
   ],
   forest: ['light fo.lt_gate_lantern (lantern) at 21,28 hangs on nothing that could hold it'],
-  barn: [
-    'prop ba.study_key stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)',
-    'light ba.lt_lantern (lantern) at 10,6 hangs on nothing that could hold it',
-  ],
-  cellar: [
-    'prop cl.study_key stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)',
-    'prop cl.study_key faces south into no floor (its front is hidden)',
-    'wall-hung prop cl.study_key has no wall behind it',
-    'prop cl.gas_alcove_n stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)',
-    'prop cl.gas_alcove_s stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)',
-    'light cl.lt_torch_well (torch) at 14,2 hangs on nothing that could hold it',
-    'light cl.lt_torch_trap (torch) at 25,8 hangs on nothing that could hold it',
-    'light cl.lt_torch_crypt (torch) at 2,8 hangs on nothing that could hold it',
-  ],
   forest_deep: [
     'prop fd.den faces south into no floor (its front is hidden)',
     'light fd.lt_clamp (fire) at 37,8 hangs on nothing that could hold it',
@@ -325,9 +321,9 @@ describe('the placement check', () => {
 
   it('refuses a lamp light with no lamp under it, and takes moonlight anywhere outside', () => {
     const s = copy('chapel');
-    s.lights!.find((l) => l.id === 'ch.lt_candles')!.x = 9;
+    s.lights!.find((l) => l.id === 'ch.lt_candles')!.x = 7; // the chancel floor beside the altar
     expect(check(s)).toEqual(
-      expect.arrayContaining(['light ch.lt_candles (lamp) at 9,1 hangs on nothing that could hold it']),
+      expect.arrayContaining(['light ch.lt_candles (lamp) at 7,1 hangs on nothing that could hold it']),
     );
     expect(check(copy('forest')).some((p) => p.includes('fo.lt_moon_clearing'))).toBe(false);
   });
