@@ -265,7 +265,13 @@
     "contract": { "offTargetRestS": 30 },
     "gddRef": "3.20"
   },
-  "economy": { "heavyPurse": 20, "taskWage": 3, "coinPickupS": 1, "gddRef": "3.23" },
+  "economy": {
+    "heavyPurse": 20,
+    "taskWage": 3,
+    "heistShare": 0.5,
+    "coinPickupS": 1,
+    "gddRef": "3.23"
+  },
   "chat": {
     "maxChars": 200,
     "quickChatRadiusTiles": 5,

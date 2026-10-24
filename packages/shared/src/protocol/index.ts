@@ -39,6 +39,8 @@ export const C2S = {
   buy: 'act.buy',
   /** Round 8 (GDD 3.23, 8C): sell to the shop the seat holds open; Session 8C reads it. */
   sell: 'act.sell',
+  /** Round 8 (GDD 3.23, 8C): deposit to or withdraw from the bank a `bank` hold opened; Session 8C reads it. */
+  bank: 'act.bank',
 } as const;
 
 export const S2C = {
@@ -242,6 +244,11 @@ export interface C2SPayloads {
   'act.buy': { shopId: string; itemId: string; qty: number };
   /** Round 8 (GDD 3.23, 8C): `qty` of `itemId` from the inventory to `shopId`, at its `pay` each, into the purse. */
   'act.sell': { shopId: string; itemId: string; qty: number };
+  /**
+   * Round 8 (GDD 3.23, 8C): moves `amount` Scrip between the purse and the bank, at the bank counter a `bank` hold
+   * opened and that stays in reach. Refused 422 when the side it draws on holds less.
+   */
+  'act.bank': { op: 'deposit' | 'withdraw'; amount: number };
 }
 
 export interface S2CPayloads {
@@ -355,6 +362,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.inspect': 5,
   'act.buy': 5,
   'act.sell': 5,
+  'act.bank': 5,
 };
 
 export const ErrorCode = {

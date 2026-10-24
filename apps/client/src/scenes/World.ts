@@ -29,6 +29,7 @@ import { ClueView } from '../view/ClueView';
 import { CutscenePlayer } from '../view/cutscene/CutscenePlayer';
 import { GiverView } from '../view/GiverView';
 import { MobView } from '../view/MobView';
+import { VfxView } from '../view/vfx/VfxView';
 import { NodeView } from '../view/NodeView';
 import { TransportView } from '../view/transport/TransportView';
 import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
@@ -133,6 +134,7 @@ export class World extends Phaser.Scene {
   // Round 6 (locked lines): the M5b views (6I) and the cutscene player (6J).
   private nodeView!: NodeView;
   private mobView!: MobView;
+  private vfxView!: VfxView; // round 8, 8G (locked)
   private transportView!: TransportView; // round 8, 8G (locked)
   private giverView!: GiverView;
   private m5b: M5bLayer | null = null;
@@ -215,6 +217,7 @@ export class World extends Phaser.Scene {
     this.clueView = new ClueView(this);
     this.nodeView = new NodeView(this);
     this.mobView = new MobView(this);
+    this.vfxView = new VfxView(this); // round 8, 8G (locked)
     this.transportView = new TransportView(this); // round 8, 8G (locked)
     this.giverView = new GiverView(this);
     this.m5b = mountM5bLayer(this);
@@ -323,6 +326,7 @@ export class World extends Phaser.Scene {
       this.clueView.destroy();
       this.nodeView.destroy();
       this.mobView.destroy();
+      this.vfxView.destroy(); // round 8, 8G (locked)
       this.transportView.destroy(); // round 8, 8G (locked)
       this.giverView.destroy();
       this.m5b?.destroy();
@@ -367,6 +371,7 @@ export class World extends Phaser.Scene {
     this.clueView.update(clues, this.time.now);
     this.nodeView.update(feed.nodes(), this.time.now); // round 6, 6I (locked)
     this.mobView.update(feed.mobs(), this.time.now); // round 6, 6I (locked)
+    this.vfxView.update(feed.avatars(), feed.mobs(), this.time.now); // round 8, 8G (locked)
     this.syncBodies(bodies);
     this.drawDoors(clock.tick);
     this.transportView.update(this.sceneId, this.portals, feed, clock.tick, this.time.now); // round 8, 8G (locked)

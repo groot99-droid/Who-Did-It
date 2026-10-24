@@ -13,7 +13,7 @@ import { TOWN, balanceOf, movePurse } from './purse';
  * moves through `movePurse`: a purchase burns to the town, a sale mints from it.
  */
 
-type Problem = { code: ErrorCode; msg: string };
+export type Problem = { code: ErrorCode; msg: string };
 
 /** The shop each seat holds open, keyed by the match's `MatchSeeds` like the purse ledger. */
 const opened = new WeakMap<object, Map<string, string>>();
@@ -30,14 +30,16 @@ function openOf(room: PartyRoom): Map<string, string> {
 const shopOfProp = (propId: string): string | undefined =>
   Object.keys(economy.shops).find((id) => economy.shops[id]!.prop === propId);
 
-/** Why `sessionId` cannot trade at `shopId` now: a living seat, a verb phase, the counter in its scene and reach. */
-function counterProblem(room: PartyRoom, sessionId: string, shopId: string): Problem | null {
+/**
+ * Why `sessionId` cannot use the economy static `propId` now: a living seat, a verb phase, the prop in its scene and
+ * in reach (the bank's counter shares it).
+ */
+export function counterProblem(room: PartyRoom, sessionId: string, propId: string): Problem | null {
   if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
   const p = simOf(room).players.get(sessionId);
   if (!p || !p.placed || p.dead) return { code: ErrorCode.cannot, msg: 'not now' };
-  const shop = economy.shops[shopId];
-  const prop = shop && scenes[sceneKey(p.sceneIdx)]?.props.find((q) => q.id === shop.prop);
-  if (!prop) return { code: ErrorCode.cannot, msg: 'no shop here' };
+  const prop = scenes[sceneKey(p.sceneIdx)]?.props.find((q) => q.id === propId);
+  if (!prop) return { code: ErrorCode.cannot, msg: 'nothing here' };
   const reach = balance.doors.reachTiles * TILE_PX;
   if (Math.hypot(p.x - tileCentre(prop.x, TILE_PX), p.y - tileCentre(prop.y, TILE_PX)) > reach)
     return { code: ErrorCode.outOfRange, msg: 'too far' };
@@ -51,7 +53,7 @@ const priced = (items: readonly string[], side: 'ask' | 'pay') =>
 export function handleShopHold(room: PartyRoom, sessionId: string, propId: string): void {
   const shopId = shopOfProp(propId);
   const problem = shopId
-    ? counterProblem(room, sessionId, shopId)
+    ? counterProblem(room, sessionId, propId)
     : { code: ErrorCode.cannot, msg: 'no shop here' };
   if (problem || !shopId) {
     reject(room, sessionId, problem?.code ?? ErrorCode.cannot, problem?.msg ?? 'no shop here');
@@ -77,7 +79,7 @@ function tradeProblem(room: PartyRoom, sessionId: string, payload: Record<string
   )
     return { code: ErrorCode.cannot, msg: 'cannot do that' };
   if (openOf(room).get(sessionId) !== shopId) return { code: ErrorCode.cannot, msg: 'no shop open' };
-  return counterProblem(room, sessionId, shopId);
+  return counterProblem(room, sessionId, economy.shops[shopId]?.prop ?? '');
 }
 
 /** `act.buy {shopId, itemId, qty}`: the purse pays `ask` each to the town, and the items go to the inventory. */

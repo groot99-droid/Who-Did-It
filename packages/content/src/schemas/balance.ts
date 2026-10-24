@@ -310,6 +310,8 @@ export const BalanceFile = z.strictObject({
     heavyPurse: z.number().int().positive(),
     /** The wage of one finished task, real or fake alike. */
     taskWage: z.number().int().nonnegative(),
+    /** The share of every bank balance a cracked strongbox carries off (rounded down per seat). */
+    heistShare: z.number().min(0).max(1),
     /** The hold that picks up a coins node on the ground (all of it). */
     coinPickupS: z.number().positive(),
   }),

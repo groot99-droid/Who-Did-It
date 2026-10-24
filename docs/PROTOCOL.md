@@ -36,6 +36,7 @@
 | `act.inspect` | `{ targetId: string }` | 5/s | Round 8 (GDD 3.22): an avatar handle in reach, in any world phase; refused 422, 424 or 427. |
 | `act.buy` | `{ shopId: string; itemId: string; qty: number }` | 5/s | Round 8 (GDD 3.23, 8C): `qty` of `itemId` from `shopId`, which a `shop` hold opened and whose counter is still in reach, at its `ask` each, paid from the purse. Refused 422 when the purse or the inventory falls short. |
 | `act.sell` | `{ shopId: string; itemId: string; qty: number }` | 5/s | Round 8 (GDD 3.23, 8C): `qty` of `itemId` from the inventory to `shopId`, at its `pay` each, into the purse. |
+| `act.bank` | `{ op: 'deposit' \| 'withdraw'; amount: number }` | 5/s | Round 8 (GDD 3.23, 8C): moves `amount` Scrip between the purse and the bank, at the bank counter a `bank` hold opened and that stays in reach. Refused 422 when the side it draws on holds less. |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
 
