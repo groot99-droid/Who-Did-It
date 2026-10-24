@@ -1,6 +1,8 @@
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { registerInvariant } from '../auto/invariants';
+import { runBank } from './bank';
 import { runStakes, scripConserved } from './purse';
+import { runWages } from './wages';
 
 // Registered here, not in `purse.ts`, which the lobby imports before the invariant registry exists.
 registerInvariant('scripConserved', scripConserved);
@@ -12,4 +14,6 @@ registerInvariant('scripConserved', scripConserved);
  */
 export function runEconomy(room: PartyRoom): void {
   runStakes(room);
+  runWages(room);
+  runBank(room);
 }
