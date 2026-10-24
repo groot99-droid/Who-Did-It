@@ -17,7 +17,7 @@ import {
   startParty,
   until,
 } from './flowHelpers';
-import { act, errorCodes, readyKnife, setPhase, teleport } from './killHelpers';
+import { act, errorCodes, placeAtPx, readyKnife, setPhase, teleport } from './killHelpers';
 import { type Match, sleep, stateOf } from './simHelpers';
 
 vi.setConfig({ testTimeout: 40_000 });
@@ -156,8 +156,9 @@ describe('the face changes only unseen', () => {
   it('a crossing applies a pending disguise: the old scene keeps the old face, the new scene shows the target', async () => {
     const m = await night();
     teleport(m, m.bots[1]!, 'overworld', 33, 22); // company, so nothing applies yet
+    placeAtPx(m, m.bots[1]!, sim(m, 0).x + TILE_PX, sim(m, 0).y); // within the night radius (8L)
     settle(m, m.bots[1]!);
-    for (const i of [2, 3, 4]) teleport(m, m.bots[i]!, 'tavern_bar', 3 + i, 4);
+    for (const i of [2, 3, 4]) teleport(m, m.bots[i]!, 'tavern_bar', 3 + i, 9); // by the front door (8L)
     settle(m, ...m.bots.slice(2));
     await impersonate(m, idOf(m, 3));
     const old = seat(m, 0).priv.avatar;
