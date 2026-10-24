@@ -1,6 +1,98 @@
 {
  "anims": [
   {
+   "key": "blood/doctor/cower/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/cower/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/cower/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/cower/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/cower/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
    "key": "blood/doctor/die/e",
    "frames": [
     {
@@ -313,6 +405,250 @@
    "repeat": 0
   },
   {
+   "key": "blood/doctor/fidget/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/fidget/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/fidget/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/fidget/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/fidget/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/hurt/e",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/e/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/e/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/e/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/hurt/n",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/n/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/n/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/n/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/hurt/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/ne/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/hurt/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/nw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/hurt/s",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/s/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/s/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/s/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/hurt/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/se/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/hurt/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/sw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/hurt/w",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/w/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/w/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/hurt/w/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
    "key": "blood/doctor/idle/e",
    "frames": [
     {
@@ -338,14 +674,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/e/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/e/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/e/007"
     }
    ],
    "frameRate": 12,
@@ -377,14 +705,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/n/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/n/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/n/007"
     }
    ],
    "frameRate": 12,
@@ -416,14 +736,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/ne/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/ne/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/ne/007"
     }
    ],
    "frameRate": 12,
@@ -455,14 +767,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/nw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/nw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/nw/007"
     }
    ],
    "frameRate": 12,
@@ -494,14 +798,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/s/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/s/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/s/007"
     }
    ],
    "frameRate": 12,
@@ -533,14 +829,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/se/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/se/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/se/007"
     }
    ],
    "frameRate": 12,
@@ -572,14 +860,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/sw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/sw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/sw/007"
     }
    ],
    "frameRate": 12,
@@ -611,18 +891,102 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/idle/w/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/w/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/idle/w/007"
     }
    ],
    "frameRate": 12,
    "repeat": -1
+  },
+  {
+   "key": "blood/doctor/inspect/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/inspect/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/inspect/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/inspect/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/inspect/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
   },
   {
    "key": "blood/doctor/interact/e",
@@ -650,14 +1014,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/e/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/e/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/e/007"
     }
    ],
    "frameRate": 12,
@@ -689,14 +1045,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/n/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/n/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/n/007"
     }
    ],
    "frameRate": 12,
@@ -728,14 +1076,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/ne/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/ne/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/ne/007"
     }
    ],
    "frameRate": 12,
@@ -767,14 +1107,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/nw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/nw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/nw/007"
     }
    ],
    "frameRate": 12,
@@ -806,14 +1138,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/s/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/s/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/s/007"
     }
    ],
    "frameRate": 12,
@@ -845,14 +1169,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/se/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/se/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/se/007"
     }
    ],
    "frameRate": 12,
@@ -884,14 +1200,6 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/sw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/sw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/sw/007"
     }
    ],
    "frameRate": 12,
@@ -923,14 +1231,870 @@
     {
      "key": "ovl_doctor",
      "frame": "blood/doctor/interact/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/limp/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/ne/000"
     },
     {
      "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/w/006"
+     "frame": "blood/doctor/limp/ne/001"
     },
     {
      "key": "ovl_doctor",
-     "frame": "blood/doctor/interact/w/007"
+     "frame": "blood/doctor/limp/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/ne/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/ne/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/limp/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/nw/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/nw/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/limp/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/se/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/se/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/limp/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/sw/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/sw/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/limp/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/run/e",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/e/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/e/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/e/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/e/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/e/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/run/n",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/n/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/n/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/n/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/n/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/n/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/run/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/ne/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/ne/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/run/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/nw/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/nw/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/run/s",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/s/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/s/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/s/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/s/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/s/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/run/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/se/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/se/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/run/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/sw/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/sw/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/run/w",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/w/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/w/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/w/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/w/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/w/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/run/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/stagger/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/ne/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/ne/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/stagger/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/nw/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/nw/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/stagger/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/se/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/se/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/stagger/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/sw/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/sw/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stagger/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/stomp/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/stomp/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/stomp/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/stomp/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stomp/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/strike/e",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/e/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/e/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/e/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/e/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/strike/n",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/n/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/n/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/n/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/n/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/strike/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/strike/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/strike/s",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/s/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/s/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/s/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/s/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/strike/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/strike/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/strike/w",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/w/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/w/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/w/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/strike/w/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/doctor/stunned/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/stunned/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/stunned/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/doctor/stunned/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "blood/doctor/stunned/sw/003"
     }
    ],
    "frameRate": 12,
@@ -1497,6 +2661,98 @@
    "repeat": -1
   },
   {
+   "key": "char/doctor/cower/ne",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/ne/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/ne/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/ne/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/cower/nw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/nw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/nw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/nw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/cower/se",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/se/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/se/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/se/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/cower/sw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/sw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/sw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/sw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/cower/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
    "key": "char/doctor/die/e",
    "frames": [
     {
@@ -1809,6 +3065,250 @@
    "repeat": 0
   },
   {
+   "key": "char/doctor/fidget/ne",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/ne/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/ne/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/ne/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/fidget/nw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/nw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/nw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/nw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/fidget/se",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/se/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/se/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/se/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/fidget/sw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/sw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/sw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/sw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/fidget/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/hurt/e",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/e/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/e/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/e/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/hurt/n",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/n/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/n/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/n/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/hurt/ne",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/ne/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/ne/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/ne/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/hurt/nw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/nw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/nw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/nw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/hurt/s",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/s/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/s/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/s/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/hurt/se",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/se/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/se/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/se/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/hurt/sw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/sw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/sw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/sw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/hurt/w",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/w/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/w/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/hurt/w/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
    "key": "char/doctor/idle/e",
    "frames": [
     {
@@ -1834,14 +3334,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/e/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/e/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/e/007"
     }
    ],
    "frameRate": 12,
@@ -1873,14 +3365,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/n/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/n/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/n/007"
     }
    ],
    "frameRate": 12,
@@ -1912,14 +3396,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/ne/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/ne/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/ne/007"
     }
    ],
    "frameRate": 12,
@@ -1951,14 +3427,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/nw/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/nw/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/nw/007"
     }
    ],
    "frameRate": 12,
@@ -1990,14 +3458,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/s/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/s/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/s/007"
     }
    ],
    "frameRate": 12,
@@ -2029,14 +3489,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/se/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/se/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/se/007"
     }
    ],
    "frameRate": 12,
@@ -2068,14 +3520,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/sw/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/sw/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/sw/007"
     }
    ],
    "frameRate": 12,
@@ -2107,18 +3551,102 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/idle/w/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/w/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/idle/w/007"
     }
    ],
    "frameRate": 12,
    "repeat": -1
+  },
+  {
+   "key": "char/doctor/inspect/ne",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/ne/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/ne/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/ne/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/inspect/nw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/nw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/nw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/nw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/inspect/se",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/se/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/se/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/se/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/inspect/sw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/sw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/sw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/sw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/inspect/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
   },
   {
    "key": "char/doctor/interact/e",
@@ -2146,14 +3674,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/e/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/e/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/e/007"
     }
    ],
    "frameRate": 12,
@@ -2185,14 +3705,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/n/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/n/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/n/007"
     }
    ],
    "frameRate": 12,
@@ -2224,14 +3736,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/ne/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/ne/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/ne/007"
     }
    ],
    "frameRate": 12,
@@ -2263,14 +3767,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/nw/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/nw/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/nw/007"
     }
    ],
    "frameRate": 12,
@@ -2302,14 +3798,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/s/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/s/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/s/007"
     }
    ],
    "frameRate": 12,
@@ -2341,14 +3829,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/se/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/se/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/se/007"
     }
    ],
    "frameRate": 12,
@@ -2380,14 +3860,6 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/sw/005"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/sw/006"
-    },
-    {
-     "key": "char_doctor",
-     "frame": "char/doctor/interact/sw/007"
     }
    ],
    "frameRate": 12,
@@ -2419,14 +3891,870 @@
     {
      "key": "char_doctor",
      "frame": "char/doctor/interact/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/limp/ne",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/ne/000"
     },
     {
      "key": "char_doctor",
-     "frame": "char/doctor/interact/w/006"
+     "frame": "char/doctor/limp/ne/001"
     },
     {
      "key": "char_doctor",
-     "frame": "char/doctor/interact/w/007"
+     "frame": "char/doctor/limp/ne/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/ne/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/ne/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/limp/nw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/nw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/nw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/nw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/nw/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/nw/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/limp/se",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/se/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/se/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/se/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/se/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/se/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/limp/sw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/sw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/sw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/sw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/sw/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/sw/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/limp/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/run/e",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/e/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/e/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/e/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/e/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/e/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/run/n",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/n/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/n/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/n/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/n/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/n/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/run/ne",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/ne/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/ne/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/ne/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/ne/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/ne/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/run/nw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/nw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/nw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/nw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/nw/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/nw/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/run/s",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/s/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/s/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/s/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/s/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/s/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/run/se",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/se/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/se/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/se/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/se/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/se/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/run/sw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/sw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/sw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/sw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/sw/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/sw/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/run/w",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/w/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/w/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/w/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/w/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/w/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/run/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/stagger/ne",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/ne/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/ne/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/ne/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/ne/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/ne/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/stagger/nw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/nw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/nw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/nw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/nw/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/nw/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/stagger/se",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/se/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/se/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/se/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/se/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/se/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/stagger/sw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/sw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/sw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/sw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/sw/003"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/sw/004"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stagger/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/stomp/ne",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/ne/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/ne/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/ne/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/stomp/nw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/nw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/nw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/nw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/stomp/se",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/se/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/se/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/se/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/stomp/sw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/sw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/sw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/sw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stomp/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/strike/e",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/e/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/e/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/e/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/e/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/strike/n",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/n/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/n/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/n/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/n/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/strike/ne",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/ne/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/ne/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/ne/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/strike/nw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/nw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/nw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/nw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/strike/s",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/s/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/s/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/s/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/s/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/strike/se",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/se/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/se/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/se/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/strike/sw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/sw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/sw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/sw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/strike/w",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/w/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/w/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/w/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/strike/w/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/doctor/stunned/ne",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/ne/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/ne/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/ne/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/stunned/nw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/nw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/nw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/nw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/stunned/se",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/se/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/se/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/se/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/doctor/stunned/sw",
+   "frames": [
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/sw/000"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/sw/001"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/sw/002"
+    },
+    {
+     "key": "char_doctor",
+     "frame": "char/doctor/stunned/sw/003"
     }
    ],
    "frameRate": 12,
@@ -2993,6 +5321,98 @@
    "repeat": -1
   },
   {
+   "key": "scarf/doctor/cower/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/cower/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/cower/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/cower/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/cower/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
    "key": "scarf/doctor/die/e",
    "frames": [
     {
@@ -3305,6 +5725,250 @@
    "repeat": 0
   },
   {
+   "key": "scarf/doctor/fidget/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/fidget/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/fidget/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/fidget/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/fidget/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/hurt/e",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/e/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/e/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/e/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/hurt/n",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/n/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/n/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/n/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/hurt/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/ne/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/hurt/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/nw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/hurt/s",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/s/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/s/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/s/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/hurt/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/se/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/hurt/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/sw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/hurt/w",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/w/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/w/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/hurt/w/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
    "key": "scarf/doctor/idle/e",
    "frames": [
     {
@@ -3330,14 +5994,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/e/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/e/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/e/007"
     }
    ],
    "frameRate": 12,
@@ -3369,14 +6025,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/n/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/n/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/n/007"
     }
    ],
    "frameRate": 12,
@@ -3408,14 +6056,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/ne/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/ne/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/ne/007"
     }
    ],
    "frameRate": 12,
@@ -3447,14 +6087,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/nw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/nw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/nw/007"
     }
    ],
    "frameRate": 12,
@@ -3486,14 +6118,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/s/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/s/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/s/007"
     }
    ],
    "frameRate": 12,
@@ -3525,14 +6149,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/se/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/se/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/se/007"
     }
    ],
    "frameRate": 12,
@@ -3564,14 +6180,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/sw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/sw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/sw/007"
     }
    ],
    "frameRate": 12,
@@ -3603,18 +6211,102 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/idle/w/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/w/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/idle/w/007"
     }
    ],
    "frameRate": 12,
    "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/inspect/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/inspect/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/inspect/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/inspect/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/inspect/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
   },
   {
    "key": "scarf/doctor/interact/e",
@@ -3642,14 +6334,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/e/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/e/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/e/007"
     }
    ],
    "frameRate": 12,
@@ -3681,14 +6365,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/n/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/n/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/n/007"
     }
    ],
    "frameRate": 12,
@@ -3720,14 +6396,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/ne/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/ne/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/ne/007"
     }
    ],
    "frameRate": 12,
@@ -3759,14 +6427,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/nw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/nw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/nw/007"
     }
    ],
    "frameRate": 12,
@@ -3798,14 +6458,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/s/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/s/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/s/007"
     }
    ],
    "frameRate": 12,
@@ -3837,14 +6489,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/se/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/se/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/se/007"
     }
    ],
    "frameRate": 12,
@@ -3876,14 +6520,6 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/sw/005"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/sw/006"
-    },
-    {
-     "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/sw/007"
     }
    ],
    "frameRate": 12,
@@ -3915,14 +6551,870 @@
     {
      "key": "ovl_doctor",
      "frame": "scarf/doctor/interact/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/limp/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/ne/000"
     },
     {
      "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/w/006"
+     "frame": "scarf/doctor/limp/ne/001"
     },
     {
      "key": "ovl_doctor",
-     "frame": "scarf/doctor/interact/w/007"
+     "frame": "scarf/doctor/limp/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/ne/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/ne/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/limp/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/nw/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/nw/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/limp/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/se/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/se/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/limp/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/sw/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/sw/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/limp/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/run/e",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/e/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/e/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/e/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/e/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/e/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/run/n",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/n/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/n/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/n/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/n/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/n/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/run/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/ne/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/ne/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/run/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/nw/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/nw/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/run/s",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/s/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/s/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/s/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/s/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/s/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/run/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/se/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/se/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/run/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/sw/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/sw/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/run/w",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/w/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/w/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/w/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/w/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/w/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/run/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/stagger/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/ne/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/ne/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/stagger/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/nw/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/nw/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/stagger/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/se/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/se/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/stagger/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/sw/003"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/sw/004"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stagger/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/stomp/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/stomp/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/stomp/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/stomp/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stomp/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/strike/e",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/e/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/e/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/e/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/e/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/strike/n",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/n/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/n/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/n/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/n/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/strike/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/strike/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/strike/s",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/s/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/s/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/s/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/s/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/strike/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/strike/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/strike/w",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/w/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/w/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/w/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/strike/w/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/doctor/stunned/ne",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/ne/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/ne/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/ne/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/stunned/nw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/nw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/nw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/nw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/stunned/se",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/se/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/se/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/se/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/doctor/stunned/sw",
+   "frames": [
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/sw/000"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/sw/001"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/sw/002"
+    },
+    {
+     "key": "ovl_doctor",
+     "frame": "scarf/doctor/stunned/sw/003"
     }
    ],
    "frameRate": 12,
