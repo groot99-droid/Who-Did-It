@@ -5,7 +5,7 @@ import { fill } from './copy';
 import { TASK_COPY as C } from './copy/tasks';
 import { itemName } from './Inventory';
 
-/** One row of `tasks.json` as the client reads it (the `fetch` kind; the co-op task has no station hold yet). */
+/** One row of `tasks.json` as the client reads it: the `fetch` kind, or the `coop` kind's hold (GDD 3.5). */
 export interface TaskDef {
   id: string;
   name: string;
@@ -15,26 +15,36 @@ export interface TaskDef {
   source?: { scene: string; prop: string };
   targets: Array<{ scene: string; prop: string }>;
   nightOnly?: boolean;
+  coopPlayers?: number;
+  coopRadiusTiles?: number;
+  holdS?: number;
 }
 export const TASKS = tasks.tasks as Record<string, TaskDef>;
 
-/** A task's source or target prop in the scene this client is in, in world px, with what it asks for. */
+/**
+ * A task's source or target prop in the scene this client is in, in world px, with what it asks for. A `coop` spot is
+ * the shared hold's prop, offered to every seat in the scene whether or not the task is on its list (GDD 3.5), within
+ * `reach` px rather than the station reach; `players` is how many hands it takes.
+ */
 export interface TaskSpot {
   kind: 'task';
   taskId: string;
-  step: 'source' | 'target';
+  step: 'source' | 'target' | 'coop';
   x: number;
   y: number;
   name: string;
   tool: string | undefined;
   fake: boolean;
   nightOnly: boolean;
+  reach?: number;
+  players?: number;
 }
 
 /**
  * The spots of this seat's unfinished tasks in `sceneId`: a source while the tool is not in the pockets (a fake task
- * has no tool to fetch, so its source always offers the motion), every target. `propAt` is the scene's prop centre by
- * content id, or null when the prop is not in the file.
+ * has no tool to fetch, so its source always offers the motion), every target; and the co-op holds of the scene, for
+ * everyone, since a helping hand counts too (GDD 3.5). `propAt` is the scene's prop centre by content id, or null when
+ * the prop is not in the file.
  */
 export function taskSpots(
   mine: readonly TaskSnap[],
@@ -43,6 +53,27 @@ export function taskSpots(
   has: (item: string) => boolean,
 ): TaskSpot[] {
   const out: TaskSpot[] = [];
+  for (const d of Object.values(TASKS)) {
+    if (d.kind !== 'coop') continue;
+    const entry = mine.find((t) => t.id === d.id);
+    for (const n of d.targets) {
+      const at = n.scene === sceneId ? propAt(n.prop) : null;
+      if (!at) continue;
+      out.push({
+        kind: 'task',
+        taskId: d.id,
+        step: 'coop',
+        x: at.x,
+        y: at.y,
+        name: d.name,
+        tool: undefined,
+        fake: entry?.fake ?? false,
+        nightOnly: d.nightOnly === true,
+        reach: (d.coopRadiusTiles ?? 2) * TILE_PX,
+        players: d.coopPlayers ?? 2,
+      });
+    }
+  }
   for (const t of mine) {
     const d = TASKS[t.id];
     if (!d || t.done || d.kind !== 'fetch') continue;
@@ -71,6 +102,7 @@ export function taskSpots(
 /** The prompt at a spot; `night` is whether the clock stands at night (a `nightOnly` task waits for it). */
 export function taskPrompt(s: TaskSpot, has: (item: string) => boolean, night: boolean): string {
   const tool = s.tool ? itemName(s.tool) : '';
+  if (s.step === 'coop') return fill(C['prompt.task.coop'], { name: s.name, n: s.players ?? 2 });
   if (s.step === 'source')
     return s.fake || !s.tool
       ? fill(C['prompt.task.do'], { name: s.name })
@@ -80,17 +112,27 @@ export function taskPrompt(s: TaskSpot, has: (item: string) => boolean, night: b
   return fill(C['prompt.task.do'], { name: s.name });
 }
 
+/** The prompt while this seat holds a co-op spot: the hands on it against the hands it takes (GDD 3.5). */
+export function coopPrompt(holders: number, players: number): string {
+  return fill(C[holders < players ? 'prompt.task.coop.wait' : 'prompt.task.coop.hold'], {
+    holders,
+    n: players,
+  });
+}
+
 export interface ChoreRow {
   id: string;
   name: string;
   done: boolean;
   fake: boolean;
-  /** `fetch`: the tool is still to fetch at the source; `bring`: carried (or not needed), go to a target. */
-  step: 'fetch' | 'bring' | 'done';
+  /** `fetch`: the tool is still to fetch at the source; `bring`: carried (or not needed), go to a target; `coop`: the shared hold. */
+  step: 'fetch' | 'bring' | 'coop' | 'done';
   tool: string | undefined;
   from: string | undefined;
   to: string[];
   nightOnly: boolean;
+  /** The hands a `coop` row takes. */
+  players?: number;
 }
 
 /** The rows of the chores panel, in deal order: what to fetch, where to bring it, which are done. */
@@ -105,11 +147,12 @@ export function choreRows(mine: readonly TaskSnap[], has: (item: string) => bool
       name: d.name,
       done: t.done,
       fake: t.fake,
-      step: t.done ? 'done' : fetching ? 'fetch' : 'bring',
+      step: t.done ? 'done' : d.kind === 'coop' ? 'coop' : fetching ? 'fetch' : 'bring',
       tool: d.tool,
       from: d.source?.scene,
       to: [...new Set(d.targets.map((n) => n.scene))],
       nightOnly: d.nightOnly === true,
+      ...(d.kind === 'coop' ? { players: d.coopPlayers ?? 2 } : {}),
     });
   }
   return rows;
@@ -120,6 +163,7 @@ export function choreLine(r: ChoreRow, sceneName: (id: string) => string): strin
   if (r.step === 'done') return C['chores.done'];
   const scene = (r.step === 'fetch' ? [r.from ?? ''] : r.to).map(sceneName).join(', ');
   if (r.step === 'fetch') return fill(C['chores.fetch'], { tool: itemName(r.tool ?? ''), scene });
+  if (r.step === 'coop') return fill(C['chores.coop'], { n: r.players ?? 2, scene });
   return fill(C[r.fake || !r.tool ? 'chores.go' : 'chores.bring'], { scene });
 }
 

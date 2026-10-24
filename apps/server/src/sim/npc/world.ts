@@ -7,6 +7,8 @@ import { sceneKey } from '../World';
 import { hubOf, mapScenesOf } from '../MapSites';
 import { fleeCreature } from '../mobs/flee';
 import { canSee } from '../Sight';
+import { runBodyBands } from './hive/bands';
+import { seesPoint } from './hive/senses';
 import { difficultyRow } from './difficulty';
 import { updateNeeds } from './needs';
 import type { Brain, NpcMemory } from './memory';
@@ -53,7 +55,7 @@ function observe(room: PartyRoom, brain: Brain, player: PlayerState, p: PlayerSi
   const tick = room.state.tick;
   scene.bodies.forEach((body) => {
     if (body.hidden || brain.seenBodies.has(body.id)) return;
-    if (Math.hypot(body.x - p.x, body.y - p.y) > sight) return;
+    if (!seesPoint(room, p, p.sceneIdx, body.x, body.y)) return; // round 8, 8R: fair sight (granted by 6Z)
     brain.seenBodies.add(body.id);
     if (!brain.ownBodies.has(body.id) && !sim.reportedBodies.has(body.id)) {
       brain.startleUntilTick = tick + spanTicks(playRng(room, player.id), balance.npc.react.startleS);
@@ -69,7 +71,7 @@ function observe(room: PartyRoom, brain: Brain, player: PlayerState, p: PlayerSi
   const meta = sim.clueMeta;
   scene.clues.forEach((clue) => {
     if (brain.seenClues.has(clue.id) || meta.get(clue.id)?.collectors.has(player.id)) return;
-    if (Math.hypot(clue.x - p.x, clue.y - p.y) > sight) return;
+    if (!seesPoint(room, p, p.sceneIdx, clue.x, clue.y)) return; // round 8, 8R: fair sight (granted by 6Z)
     brain.seenClues.add(clue.id);
     if (playRng(room, player.id)() < balance.npc.react.collectChance && brain.pendingClue === '') {
       brain.pendingClue = clue.id;
@@ -295,31 +297,7 @@ export function runWorldNpc(
     brain.mode = 'react';
     return stand(p);
   }
-  const sight = sightPx(room);
-  let best: { id: string; x: number; y: number; d: number } | null = null;
-  room.state.scenes.get(sceneKey(p.sceneIdx))?.bodies.forEach((body) => {
-    if (body.hidden || sim.reportedBodies.has(body.id) || brain.ownBodies.has(body.id)) return;
-    const d = Math.hypot(body.x - p.x, body.y - p.y);
-    if (d <= sight && (best === null || d < best.d)) best = { id: body.id, x: body.x, y: body.y, d };
-  });
-  const body = best as { id: string; x: number; y: number; d: number } | null;
-  if (body && tick >= brain.bodyRetryTick) {
-    brain.mode = 'react';
-    brain.act = null;
-    releaseClaims(mem, id);
-    const reach = rangePx('report') * STRIKE_MARGIN;
-    if (body.d > reach) {
-      if (walkTo(room, brain, p, body.x, body.y, reach / GOAL_SLACK) === 'stuck')
-        brain.bodyRetryTick = tick + TICK_RATE;
-      return;
-    }
-    const since = brain.reachedBodyTick.get(body.id) ?? tick;
-    brain.reachedBodyTick.set(body.id, since);
-    if (tick - since >= Math.round(diff.reportDelayS * TICK_RATE)) {
-      runAction(room, id, 'act.reportBody', { bodyId: body.id });
-    }
-    return stand(p);
-  }
+  if (runBodyBands(room, mem, brain, player, p)) return; // round 8, 8R: the body bands (GDD 3.12, granted by 6Z)
 
   // Night: keep to lit scenes (GDD 3.12 "Night"). The leave delay is drawn on the first such tick, even while a
   // placement idle still holds the seat.
