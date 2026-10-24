@@ -55,8 +55,21 @@ export async function bootNpcServer(): Promise<{
   };
 }
 
+const isReset = (err: unknown): boolean => {
+  const e = err as { code?: unknown; cause?: { code?: unknown } } | null;
+  return e?.code === 'ECONNRESET' || e?.cause?.code === 'ECONNRESET';
+};
+
+/** One retry on a reset matchmake request, nothing else (CI runners drop the odd socket). */
 async function connect(join: () => Promise<Room>): Promise<Human> {
-  const room = await join();
+  let room: Room;
+  try {
+    room = await join();
+  } catch (err) {
+    if (!isReset(err)) throw err;
+    await sleep(100);
+    room = await join();
+  }
   const human: Human = { room, id: room.sessionId, log: [] };
   room.onMessage('*', (type: string | number, payload: unknown) =>
     human.log.push({ type: String(type), payload }),
