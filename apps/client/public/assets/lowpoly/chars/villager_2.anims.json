@@ -1,0 +1,1012 @@
+{
+ "anims": [
+  {
+   "key": "blood/villager/down/ne",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/down/ne/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/down/ne/001"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villager/down/nw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/down/nw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/down/nw/001"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villager/down/se",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/down/se/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/down/se/001"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villager/down/sw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/down/sw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/down/sw/001"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villager/eat/ne",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/ne/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/ne/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/ne/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villager/eat/nw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/nw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/nw/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/nw/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villager/eat/se",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/se/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/se/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/se/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villager/eat/sw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/sw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/sw/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/sw/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/eat/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villager/getup/ne",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/ne/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/ne/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/ne/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villager/getup/nw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/nw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/nw/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/nw/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villager/getup/se",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/se/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/se/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/se/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villager/getup/sw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/sw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/sw/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/sw/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/getup/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villager/knockdown/ne",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/ne/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/ne/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/ne/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villager/knockdown/nw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/nw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/nw/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/nw/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villager/knockdown/se",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/se/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/se/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/se/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villager/knockdown/sw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/sw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/sw/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/sw/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "blood/villager/knockdown/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villager/down/ne",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/down/ne/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/down/ne/001"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villager/down/nw",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/down/nw/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/down/nw/001"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villager/down/se",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/down/se/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/down/se/001"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villager/down/sw",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/down/sw/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/down/sw/001"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villager/eat/ne",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/ne/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/ne/001"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/ne/002"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villager/eat/nw",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/nw/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/nw/001"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/nw/002"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villager/eat/se",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/se/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/se/001"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/se/002"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villager/eat/sw",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/sw/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/sw/001"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/sw/002"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/eat/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villager/getup/ne",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/ne/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/ne/001"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/ne/002"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villager/getup/nw",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/nw/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/nw/001"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/nw/002"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villager/getup/se",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/se/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/se/001"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/se/002"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villager/getup/sw",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/sw/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/sw/001"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/sw/002"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/getup/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villager/knockdown/ne",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/ne/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/ne/001"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/ne/002"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villager/knockdown/nw",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/nw/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/nw/001"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/nw/002"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villager/knockdown/se",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/se/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/se/001"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/se/002"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villager/knockdown/sw",
+   "frames": [
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/sw/000"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/sw/001"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/sw/002"
+    },
+    {
+     "key": "char_villager_2",
+     "frame": "char/villager/knockdown/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villager/down/ne",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/down/ne/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/down/ne/001"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villager/down/nw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/down/nw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/down/nw/001"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villager/down/se",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/down/se/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/down/se/001"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villager/down/sw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/down/sw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/down/sw/001"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villager/eat/ne",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/ne/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/ne/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/ne/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villager/eat/nw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/nw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/nw/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/nw/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villager/eat/se",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/se/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/se/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/se/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villager/eat/sw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/sw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/sw/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/sw/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/eat/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villager/getup/ne",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/ne/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/ne/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/ne/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villager/getup/nw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/nw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/nw/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/nw/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villager/getup/se",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/se/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/se/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/se/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villager/getup/sw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/sw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/sw/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/sw/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/getup/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villager/knockdown/ne",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/ne/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/ne/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/ne/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villager/knockdown/nw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/nw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/nw/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/nw/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villager/knockdown/se",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/se/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/se/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/se/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villager/knockdown/sw",
+   "frames": [
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/sw/000"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/sw/001"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/sw/002"
+    },
+    {
+     "key": "ovl_villager_2",
+     "frame": "scarf/villager/knockdown/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  }
+ ]
+}
