@@ -16,7 +16,7 @@ import {
   NODE_PAGE,
   BREAK_FRAMES,
   NODE_STATES,
-  RESOURCE_IDS,
+  NODE_IDS,
   TOOL_IDS,
   glowFrame,
   heldFrame,
@@ -41,7 +41,7 @@ type Frame = { name: string; png: Buffer; pivot: readonly [number, number] };
 function nodeFrames(): Frame[] {
   const size = NODE_CELL / 2;
   const [x, y] = [NODE_GROUND[0] / 2, NODE_GROUND[1] / 2];
-  return RESOURCE_IDS.flatMap((id) =>
+  return NODE_IDS.flatMap((id) =>
     NODE_STATES.map((state) => {
       const c = createCanvas(size, size);
       const g = c.getContext('2d');
