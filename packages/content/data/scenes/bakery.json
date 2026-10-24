@@ -159,7 +159,8 @@
     { "id": "bk.bread_basket_1", "kind": "dressing", "x": 1, "y": 9 },
     { "id": "bk.barrel", "kind": "dressing", "x": 2, "y": 9 },
     { "id": "bk.bread_basket_2", "kind": "dressing", "x": 16, "y": 9 },
-    { "id": "bk.rug", "kind": "dressing", "x": 8, "y": 8 }
+    { "id": "bk.rug", "kind": "dressing", "x": 8, "y": 8 },
+    { "id": "bk.hq_ovens", "kind": "hq", "x": 13, "y": 3 }
   ],
   "gates": [],
   "paths": [],
@@ -186,7 +187,7 @@
     "WWWWPwPPwPPwPPwWWW",
     "WWWPfwwwwwwwwwwwPW",
     "WWPPfwwwwwwwwwwwwW",
-    "WPfPfwwwwwwwwWPPPW",
+    "WPfPfwwwwwwwwPPPPW",
     "WffffPPPPPPPwPwwwW",
     "WPfffPPPPPPPwwwwwP",
     "WwwwwwwwwwwwwwwwwW",

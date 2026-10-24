@@ -61,7 +61,10 @@ export function kitFrameNames(): string[] {
   return KIT_FRAMES.flatMap(([k, h]) => [0, 1, 2, 3].map((v) => `${k}/${h}/${v}`)).sort();
 }
 
-/** The boot atlas `props` since round 5 (art plan 3.5-3.7): shared props, spots and the 20 portal frames. */
+/**
+ * The boot atlas `props` since round 5 (art plan 3.5-3.7): shared props, spots and the 20 portal frames, and since
+ * round 8 the four HQ tiers every role station shares (`prop_hq_<tier>`, motion.md 2).
+ */
 export const PROPS_FRAMES: readonly string[] = [
   'portal_boarded_e',
   'portal_boarded_s',
@@ -83,6 +86,10 @@ export const PROPS_FRAMES: readonly string[] = [
   'portal_stairs_e',
   'portal_stairs_s',
   'portal_stairs_sill',
+  'prop_hq_0',
+  'prop_hq_1',
+  'prop_hq_2',
+  'prop_hq_3',
   'prop_kitChest',
   'prop_lanternPost_lit',
   'prop_lanternPost_unlit',

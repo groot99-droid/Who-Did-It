@@ -111,6 +111,7 @@
   ],
   "props": [
     { "id": "fo.planks", "kind": "taskSource", "x": 16, "y": 29, "item": "planks" },
+    { "id": "fo.hq_lodge", "kind": "hq", "x": 19, "y": 10 },
     { "id": "fo.signpost", "kind": "dressing", "x": 21, "y": 12 },
     { "id": "fo.signpost_1", "kind": "dressing", "x": 7, "y": 12 },
     { "id": "fo.fern_0", "kind": "dressing", "x": 9, "y": 14 },
@@ -278,7 +279,7 @@
     "TlllllpllllllllllllllllllllllllllllllllT",
     "TllllPpllllllllllllTTllllllllllllllTTTlT",
     "TllTTTTllllllllllllTTllllllllllllllTTTlT",
-    "TllTTTTllllTTTlllllTTlllllTTTTlllllllllT",
+    "TllTTTTllllTTTlllllPTlllllTTTTlllllllllT",
     "TlllllpllllTTTllllllllllllTTTTllllPllllT",
     "TlllllpPlllTTTllPllllPlllllPlllllllllllT",
     "TlllllpppppppppppppppppppppppppppppppplT",
