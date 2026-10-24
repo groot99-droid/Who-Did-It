@@ -48,6 +48,11 @@ export const MetricsFile = z.strictObject({
     viewTilesHigh: z.number().positive(),
     /** Camera zoom snaps down to a multiple of this, so an art pixel is a whole number of screen pixels. */
     zoomStep: z.number().positive(),
+    /**
+     * Round 8 (8F): figures are drawn this much larger than true scale against props and tiles, anchored at the
+     * feet pivot, on top of `artScale` and the GDD 3.1 height factor.
+     */
+    figureScale: z.number().positive(),
   }),
   /** GDD 3.13, WORLD 4.7: the darkness layer. */
   lighting: z.strictObject({

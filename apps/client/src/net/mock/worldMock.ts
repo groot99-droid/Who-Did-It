@@ -23,6 +23,7 @@ import type {
   MobSnap,
   NodeSnap,
   QuestSnap,
+  TaskSnap,
   StackSnap,
 } from '../world';
 import { MockM5b, type MockSceneM5b } from './m5bMock';
@@ -511,6 +512,10 @@ export class MockWorldFeed implements WorldFeed {
     return this.m5b.inventory();
   }
 
+  tasks(): TaskSnap[] {
+    return this.m5b.tasks();
+  }
+
   questAccept(questId: string): void {
     const me = this.actors.get(this.selfId);
     const refusal = me && this.m5b.questAccept(questId, me, this.content.scenes);
@@ -529,6 +534,21 @@ export class MockWorldFeed implements WorldFeed {
 
   minigameResult(_taskId: string, _answer: unknown): void {
     // The mock has no task layer: `?minigame=<kind>` opens a modal whose result is dropped here.
+  }
+
+  /** Round 8 (8B): the mock reads every bot as unhurt and sign-free; no reach or cooldown check. */
+  inspect(targetId: string): void {
+    const b = [...this.actors.values()].find((a) => a.handle === targetId && a.id !== this.selfId);
+    if (!b) return;
+    const look = this.actors.get(b.lookOf)?.look ?? b.look;
+    this.bus.emit('inspect.result', {
+      targetId,
+      lookId: look,
+      signs: [],
+      health: 'unhurt',
+      purse: 'unknown',
+      light: false,
+    });
   }
 
   dispose(): void {
