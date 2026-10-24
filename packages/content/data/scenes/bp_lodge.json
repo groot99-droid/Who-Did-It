@@ -123,7 +123,7 @@
     { "id": "bl.footlocker_3", "kind": "dressing", "x": 19, "y": 8 },
     { "id": "bl.shop_store", "kind": "counter", "x": 12, "y": 7 },
     { "id": "bl.shop_stall", "kind": "counter", "x": 12, "y": 6 },
-    { "id": "bl.shop_black_market", "kind": "blackMarket", "x": 1, "y": 8 }
+    { "id": "bl.shop_black_market", "kind": "blackMarket", "x": 16, "y": 3 }
   ],
   "gates": [],
   "paths": [],
@@ -136,12 +136,12 @@
     "########################",
     "#H##.#.#.####.#######H.#",
     "#...........#.#######..#",
-    "#...........#..#...#...#",
+    "#...........#..##..#...#",
     "#...######..#..........#",
     "#...######..#.........SD",
     "##..........#....#.....#",
     "#...........#..........#",
-    "##.............#...#...#",
+    "#..............#...#...#",
     "##........B...#######..#",
     "##.##.S.......#######H.#",
     "######D#################"
@@ -150,12 +150,12 @@
     "WWWWWWWWWWWWWWWWWWWWWWWW",
     "WWPPwPwPwPPPWwPPPPPPPWwW",
     "WlfffwwwwwwwWwPPPPPPPwwW",
-    "WwwwwwwwwwwwWwwPwwwPwwwW",
+    "WwwwwwwwwwwwWwwPPwwPwwwW",
     "WwwwPPPPPPwwWwwwwwwwwwwW",
     "WwwwPPPPPPwwWwwwwwwwwddW",
     "WPwwwwwwwwwwPwwwwPwwwwwW",
     "WwwwwwwwwwwwPwwwwwwwwwwW",
-    "WPwwwwwwwwwwwwwPwwwPwwwW",
+    "WwwwwwwwwwwwwwwPwwwPwwwW",
     "WPwwwwwwwwwwwwPPPPPPPwwW",
     "WPwPPdddwwwwwwPPPPPPPWwW",
     "WWWWWWWWWWWWWWWWWWWWWWWW"
