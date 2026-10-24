@@ -1,6 +1,7 @@
-import { createCanvas } from '@napi-rs/canvas';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { describe, expect, it } from 'vitest';
-import { alphaBleed, bleed, decodePng, encodeIndexedPng, encodePng } from '../bleed.ts';
+import { alphaBleed, bleed, decodePng, encodeIndexedPng, encodePng, encodeWebp } from '../bleed.ts';
+import { imageSize } from './realAssets.ts';
 
 describe('bleed', () => {
   it('decodes what canvas encodes and round-trips through its own encoder', () => {
@@ -77,5 +78,34 @@ describe('bleed', () => {
     g.fillRect(4, 4, 6, 7);
     const png = c.toBuffer('image/png');
     expect(alphaBleed(png).equals(alphaBleed(png))).toBe(true);
+  });
+});
+
+describe('encodeWebp', () => {
+  // A 64 x 32 sprite: an opaque gradient block, a half-alpha band and a clear border.
+  const img = { width: 64, height: 32, data: new Uint8Array(64 * 32 * 4) };
+  for (let y = 4; y < 28; y++) {
+    for (let x = 4; x < 60; x++) img.data.set([x * 4, y * 8, 120, x < 50 ? 255 : 128], (y * 64 + x) * 4);
+  }
+
+  it('writes a lossy WebP with alpha that decodes to the same picture', async () => {
+    const webp = encodeWebp(img, 90);
+    expect(webp.toString('ascii', 0, 4)).toBe('RIFF');
+    expect(webp.toString('ascii', 8, 12)).toBe('WEBP');
+    expect(imageSize(webp)).toEqual({ width: 64, height: 32 });
+    const back = await loadImage(webp);
+    const g = createCanvas(64, 32).getContext('2d');
+    g.drawImage(back, 0, 0);
+    const px = (x: number, y: number) => [...g.getImageData(x, y, 1, 1).data];
+    expect(px(0, 0)[3]).toBe(0);
+    expect(px(20, 16)[3]).toBe(255);
+    expect(Math.abs(px(55, 16)[3]! - 128)).toBeLessThanOrEqual(2);
+    const [r, gr, b] = px(20, 16);
+    expect(Math.abs(r! - 80) + Math.abs(gr! - 128) + Math.abs(b! - 120)).toBeLessThan(24);
+  });
+
+  it('is smaller at a lower quality and deterministic at one quality', () => {
+    expect(encodeWebp(img, 90).equals(encodeWebp(img, 90))).toBe(true);
+    expect(encodeWebp(img, 40).length).toBeLessThan(encodeWebp(img, 90).length);
   });
 });

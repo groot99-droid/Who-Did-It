@@ -729,6 +729,12 @@
       "url": "vfx/vfx.anims.json"
     },
     {
+      "key": "mark_bleeding",
+      "type": "image",
+      "url": "ui/icons/8bit/icon_effect_bleeding.png",
+      "filter": "nearest"
+    },
+    {
       "key": "bld_hollowmere",
       "type": "multiatlas",
       "url": "buildings/bld_hollowmere.json",

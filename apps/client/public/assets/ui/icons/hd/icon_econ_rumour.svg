@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Rumour: a whisper passed on, a speech balloon trailing dots. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g1" data-flat="#A6AEBA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D9D2C2"/><stop offset="1" stop-color="#A6AEBA"/></linearGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<path d="M8,10 L40,10 Q43,10 43,13 L43,28 Q43,31 40,31 L22,31 L13,39 L15,31 L8,31 Q5,31 5,28 L5,13 Q5,10 8,10 Z" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="15" cy="20.5" r="2.6" fill="#12141C"/>
+<circle cx="24" cy="20.5" r="2.6" fill="#12141C"/>
+<circle cx="33" cy="20.5" r="2.6" fill="#12141C"/>
+<circle cx="8" cy="42" r="1.6" fill="#12141C"/>
+</svg>

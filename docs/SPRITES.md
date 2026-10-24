@@ -419,6 +419,40 @@ checks this list, the grid, the stroke and the colours.
 
 The ability keys are `icon_ability_<abilityId>` with the ability id in lower case (round 5, art plan 4.6).
 
+### 9.1 Round-8 icons (8N, DECISIONS A172)
+
+The status and HUD icons of round 8 (`docs/round8/teardown.md` 3) are a second family, in the style the owner approved
+on `docs/round8/icons/sheet-01.png`: each sits on a 46 px square of the bone ground `#FFF1DC` with a 2 px `ink` outline
+and rounded corners, inside the 48 px grid, and draws in the world ramps of `palette.json` only (detail lines may be
+any width). One hand-written SVG master per icon, `apps/client/public/assets/ui/icons/hd/<key>.svg`, is the HD file the
+client shows as it is. The 8-bit and low-poly files beside it, `8bit/<key>.png` and `lowpoly/<key>.png` (48 px), are
+generated from the master by `pnpm --filter @wdi/sprites icons` (`tools/sprites/icons-build.ts`) and never edited by
+hand; `tools/sprites/test/icon-masters.test.ts` fails when one is missing or stale.
+
+One master holds both looks. The HD look is the file as drawn. The flat look the two pixel styles share drops every
+element marked `class="hd"` (highlights, glows, soft shades), shows every element marked `class="flat"` (hidden in the
+file with `display="none"`), and paints each gradient with its `data-flat` colour. A look marker is the first
+attribute of a self-closing element; masters use no groups, text or images.
+
+The client finds them through `apps/client/src/ui/icons.ts` (`iconUrl`, `effectIconUrl`, `iconImg`), which swaps the
+file when the art style changes; the textual name stays the image's accessible label. The key is `icon_` and a name of
+this table:
+
+| Family | Shown | Names |
+|---|---|---|
+| Effects (`EffectId`, GDD 3.22) | the body HUD's effect row; `indebted` in its own seat's view only | `effect_slowed`, `effect_wounded`, `effect_bleeding`, `effect_weakened`, `effect_poisoned`, `effect_fatigued`, `effect_stunned`, `effect_dazed`, `effect_famished`, `effect_knockedOut`, `effect_indebted` |
+| Inspect signs (`sim/inspect/read.ts`) without an effect of their own | the inspect card | `sign_bloody`, `sign_hunted` |
+| Economy (GDD 3.23, 8C and 8D) | the purse, the shop, the bank, the civic panel and the HQ badge; curfew has none, so a barred door reads as a plain locked one | `econ_scrip`, `econ_purse`, `econ_till`, `econ_wages`, `econ_deposit`, `econ_withdraw`, `econ_rent`, `econ_quota`, `econ_faith`, `econ_rumour`, `econ_blackmail`, `econ_hq1`, `econ_hq2`, `econ_hq3`, `econ_blackMarket` |
+| Body (GDD 3.22) | the body HUD's bars and the strike button | `body_health`, `body_stamina`, `body_strike` |
+| Talk and hive | the meeting notes tab, the hive shout, the vote, the bell and the report button | `talk_notes`, `talk_shout`, `talk_vote`, `talk_bell`, `talk_report` |
+
+The bloodied mark over a figure (`PlayerView.setBlood`) is the bleeding icon as a world image: the manifest key
+`mark_bleeding`, one 48 px `image` entry per style pointing at that style's file (the placeholder set uses the 8-bit
+one), drawn at 24 px above the nameplate. It adds no atlas page and patches no vfx sheet; `budget.test.ts` checks it.
+
+No icon encodes a secret: a cover and its true wearer show the same icons, and the icons of private state (Indebted,
+roles, cards) appear only in their owner's view.
+
 ## 10. Isometric projection
 
 The one contract the isometric client, the exporter and the maps, and the world and character art share

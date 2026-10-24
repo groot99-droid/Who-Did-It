@@ -3,6 +3,7 @@
 // RGB a renderer stores under transparency (the "ink halo"). Canvas libraries premultiply and would
 // zero that RGB again, so this file reads and writes 8-bit RGBA PNGs itself through node:zlib.
 import { deflateSync, inflateSync } from 'node:zlib';
+import { createCanvas, ImageData } from '@napi-rs/canvas';
 
 export interface Rgba {
   width: number;
@@ -266,4 +267,17 @@ export function bleed(img: Rgba, passes = 2): Rgba {
 /** Decode, bleed and re-encode one PNG. */
 export function alphaBleed(png: Buffer, passes = 2): Buffer {
   return encodePng(bleed(decodePng(png), passes));
+}
+
+/**
+ * Encode straight RGBA as a lossy WebP at `quality` (0-100), the HD world pages' format (DECISIONS A164, the
+ * budget's option 1). The canvas premultiplies, so the colour under fully transparent pixels is lost; that is
+ * safe because the client uploads every texture premultiplied (Phaser's default `pma`), where such a pixel
+ * weighs nothing under linear filtering. Partial alpha keeps its bled colour.
+ */
+export function encodeWebp(img: Rgba, quality = 90): Buffer {
+  const canvas = createCanvas(img.width, img.height);
+  const pixels = new Uint8ClampedArray(img.data.buffer, img.data.byteOffset, img.data.byteLength);
+  canvas.getContext('2d').putImageData(new ImageData(pixels, img.width, img.height), 0, 0);
+  return canvas.encodeSync('webp', quality);
 }

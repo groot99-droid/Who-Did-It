@@ -31,6 +31,8 @@ export interface Atlas {
     image: string;
     frames: Array<{ filename: string; sourceSize: { w: number; h: number } }>;
   }>;
+  /** hd.ts writes the factor here; a slice's frame size cannot measure it (`withTexels`). */
+  meta?: { texels?: number };
 }
 
 /** Where the builder reads from: the 8-bit manifest and the files of a style root ('' is the 8-bit root). */
@@ -95,15 +97,22 @@ function measure(e: BaseEntry, src: HdSources, root: string): number | null {
   }
   const baseFrames = frameSizes(base);
   const hdFrames = frameSizes(hd);
-  const first = [...hdFrames.keys()].find((f) => baseFrames.has(f));
-  if (first === undefined)
-    throw new Error(`hd-manifest: ${e.key}: no frame name in common with the 8-bit atlas`);
-  const t = texelFactor(hdFrames.get(first)!, baseFrames.get(first)!, `${e.key} ${first}`);
-  for (const [name, size] of hdFrames) {
-    const b = baseFrames.get(name);
-    if (b === undefined) throw new Error(`hd-manifest: ${e.key}: frame ${name} is not in the 8-bit atlas`);
-    if (texelFactor(size, b, `${e.key} ${name}`) !== t)
-      throw new Error(`hd-manifest: ${e.key}: frame ${name} is not at factor ${t} like ${first}`);
+  for (const name of hdFrames.keys()) {
+    if (!baseFrames.has(name))
+      throw new Error(`hd-manifest: ${e.key}: frame ${name} is not in the 8-bit atlas`);
+  }
+  // A slice is cropped to its box at HD and keeps its whole canvas in 8-bit: only whole frames measure.
+  const whole = [...hdFrames.keys()].filter((f) => !f.includes('#'));
+  const stated = hd.meta?.texels;
+  if (stated !== undefined && (!Number.isInteger(stated) || stated < 1))
+    throw new Error(`hd-manifest: ${e.key}: meta.texels ${stated} is not a whole factor`);
+  const first = whole[0];
+  if (first === undefined && stated === undefined)
+    throw new Error(`hd-manifest: ${e.key}: only slices and no meta.texels to say their factor`);
+  const t = stated ?? texelFactor(hdFrames.get(first!)!, baseFrames.get(first!)!, `${e.key} ${first}`);
+  for (const name of whole) {
+    if (texelFactor(hdFrames.get(name)!, baseFrames.get(name)!, `${e.key} ${name}`) !== t)
+      throw new Error(`hd-manifest: ${e.key}: frame ${name} is not at factor ${t}`);
   }
   return t;
 }

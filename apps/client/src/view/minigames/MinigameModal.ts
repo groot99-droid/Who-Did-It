@@ -1,7 +1,8 @@
 import balance from '@wdi/content/data/balance.json';
+import tasks from '@wdi/content/data/tasks.json';
 import { M5B_COPY as C } from '../../ui/copy/m5b';
 import { h } from '../../ui/dom';
-import { MINIGAMES, type MiniGame, type MiniGameFactory, type MiniGameSpec } from './registry';
+import { MINIGAMES, skinOf, type MiniGame, type MiniGameFactory, type MiniGameSpec } from './registry';
 import { bandRng } from './board';
 import type { MinigameKind } from '@wdi/shared/protocol';
 
@@ -20,6 +21,10 @@ export interface MinigameModal {
   readonly root: HTMLElement;
   close(): void;
 }
+
+/** The task's own name (`tasks.json`), so the board says which work it is. */
+const taskName = (taskId: string): string =>
+  (tasks.tasks as Record<string, { name?: string } | undefined>)[taskId]?.name ?? '';
 
 const specOf = (kind: MinigameKind): MiniGameSpec => ({ kind, ...balance.minigames[kind] }) as MiniGameSpec;
 
@@ -68,6 +73,7 @@ export function openMinigame(
       'div',
       { class: 'wdi-m5b__panel wdi-m5b__panel--modal' },
       h('header', { class: 'wdi-m5b__head' }, h('h2', {}, C[open.fake ? 'mini.fake' : 'mini.title']), cancel),
+      h('p', { class: 'wdi-m5b__sub', 'data-testid': 'minigame-task' }, taskName(open.taskId)),
       stage,
       status,
       h('div', { class: 'wdi-m5b__foot' }, assist),
@@ -98,6 +104,7 @@ export function openMinigame(
       root: stage,
       spec: specOf(open.kind),
       rng: bandRng(open.kind, open.public),
+      skin: skinOf(open.taskId, open.kind),
       steps: (open.public as { steps?: number }).steps,
       holdS: (open.public as { holdS?: number }).holdS,
       onDone: () => finish(),

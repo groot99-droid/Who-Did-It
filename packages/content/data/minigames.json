@@ -6,63 +6,72 @@
       "kind": "pour",
       "task": "lightLanterns",
       "difficulty": 2,
-      "assistS": 20
+      "assistS": 20,
+      "skin": { "station": "lantern", "pieces": ["oil"] }
     },
     "pumpSlide": {
       "id": "pumpSlide",
       "kind": "slide",
       "task": "fixPump",
       "difficulty": 3,
-      "assistS": 20
+      "assistS": 20,
+      "skin": { "station": "pump", "pieces": ["washer"] }
     },
     "letterTap": {
       "id": "letterTap",
       "kind": "tap",
       "task": "deliverLetter",
       "difficulty": 1,
-      "assistS": 20
+      "assistS": 20,
+      "skin": { "station": "door", "pieces": ["letter"] }
     },
     "fenceCrates": {
       "id": "fenceCrates",
       "kind": "crates",
       "task": "mendFence",
       "difficulty": 2,
-      "assistS": 20
+      "assistS": 20,
+      "skin": { "station": "fence", "pieces": ["plank"] }
     },
     "flourCrates": {
       "id": "flourCrates",
       "kind": "crates",
       "task": "fetchFlour",
       "difficulty": 1,
-      "assistS": 20
+      "assistS": 20,
+      "skin": { "station": "flour bin", "pieces": ["sack"] }
     },
     "doughPour": {
       "id": "doughPour",
       "kind": "pour",
       "task": "mixDough",
       "difficulty": 2,
-      "assistS": 20
+      "assistS": 20,
+      "skin": { "station": "mixer", "pieces": ["flour", "water"] }
     },
     "ovenStoke": {
       "id": "ovenStoke",
       "kind": "stoke",
       "task": "stokeOven",
       "difficulty": 2,
-      "assistS": 20
+      "assistS": 20,
+      "skin": { "station": "brick oven", "pieces": ["oak"] }
     },
     "coldCrates": {
       "id": "coldCrates",
       "kind": "crates",
       "task": "stockColdRoom",
       "difficulty": 1,
-      "assistS": 20
+      "assistS": 20,
+      "skin": { "station": "cart", "pieces": ["crate"] }
     },
     "proofSlide": {
       "id": "proofSlide",
       "kind": "slide",
       "task": "proofLoaves",
       "difficulty": 2,
-      "assistS": 20
+      "assistS": 20,
+      "skin": { "station": "proofer", "pieces": ["banneton"] }
     }
   }
 }
