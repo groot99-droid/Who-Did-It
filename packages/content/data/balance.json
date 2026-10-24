@@ -280,6 +280,23 @@
       "fallS": 180
     },
     "want": { "lightPurse": 10, "lightRiseS": 240, "debtRiseS": 120, "wage": 0.4, "sale": 0.2 },
+    "mug": {
+      "chancePerS": { "light": 0.01, "heavy": 0.04 },
+      "moodMul": 1,
+      "fearMul": 1,
+      "nightMul": 2,
+      "weakMul": 1.5,
+      "longAloneS": 30,
+      "longAloneMul": 1.5,
+      "lightMul": 0.25,
+      "reachTiles": 1.25,
+      "approachS": 10,
+      "threatS": 1.5,
+      "answerS": 6,
+      "share": 0.3,
+      "chaseS": 5,
+      "cooldownS": 120
+    },
     "weights": {
       "hungry": { "work": 1.6, "stroll": 1, "idle": 0.6 },
       "scared": { "work": 0.6, "stroll": 0.5, "idle": 2 },

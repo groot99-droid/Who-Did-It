@@ -54,6 +54,8 @@ export const Clue = z.strictObject({
     'drop',
     'ability',
     'static',
+    /** Round 8 (GDD 3.24, 8E): left by a mugging. */
+    'mugging',
   ]),
   params: z.record(z.string().regex(/^[a-z][A-Za-z0-9]*$/), z.number()).optional(),
   description: z.string().min(1),
