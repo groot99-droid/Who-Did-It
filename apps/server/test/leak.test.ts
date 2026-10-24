@@ -164,6 +164,7 @@ describe('the leak audit (8L)', () => {
     expect(await until(() => avatarsHeld(m.bots[1]!).length > 0)).toBe(true);
     // The audit judges a patch only on the tick it was encoded. A loaded runner decodes ticks late, so the clock
     // stops here: patches still go out, and every one is decoded on the server's current tick.
+    expect(await until(() => m.room.state.tick >= a.settledFrom)).toBe(true);
     clockOf(m.room).paused = true;
     // White-box: bypass `writeAvatar` for seat 0's avatar every few ms, as a regression would.
     const timer = setInterval(() => {
