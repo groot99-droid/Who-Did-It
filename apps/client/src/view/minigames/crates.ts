@@ -3,6 +3,7 @@ import { fill } from '../../ui/copy';
 import { MINIGAME_COPY as C } from '../../ui/copy/minigames';
 import { h } from '../../ui/dom';
 import type { MiniGameFactory } from './registry';
+import { DEFAULT_SKINS, pieceAt } from './skin';
 import { ART_H, ART_W, box, COLORS, createStage, inside, loop, type Rect } from './draw';
 
 const SPEC = balance.minigames.crates;
@@ -71,6 +72,8 @@ export class CratesModel {
 
 export const cratesGame: MiniGameFactory = (host) => {
   const model = new CratesModel(host.rng, host.steps);
+  const skin = host.skin ?? DEFAULT_SKINS.crates;
+  const piece = pieceAt(skin, 0);
   const stage = createStage(host.root);
   const hint = h('p', { class: 'wdi-hint', 'data-testid': 'minigame-crates-hint' });
   const stopBtn = h(
@@ -81,7 +84,7 @@ export const cratesGame: MiniGameFactory = (host) => {
   const load = h(
     'button',
     { type: 'button', class: 'wdi-btn wdi-btn--sm', 'data-testid': 'minigame-load' },
-    C['minigame.crates.load'],
+    fill(C['minigame.crates.load'], { piece }),
   );
   host.root.append(hint, load, stopBtn);
   const shelf = (i: number): Rect => ({ x: 6, y: 8 + i * 28, w: CRATE_SIZE.w, h: CRATE_SIZE.h });
@@ -92,7 +95,7 @@ export const cratesGame: MiniGameFactory = (host) => {
   const say = () => {
     hint.textContent = model.dialLive
       ? C['minigame.crates.dial']
-      : fill(C['minigame.crates.hint'], { steps: model.steps });
+      : fill(C['minigame.crates.hint'], { steps: model.steps, piece, station: skin.station });
     stopBtn.hidden = !model.dialLive;
     load.hidden = model.cartCount >= model.steps;
   };
@@ -103,10 +106,10 @@ export const cratesGame: MiniGameFactory = (host) => {
     const g = stage.ctx;
     g.fillStyle = COLORS.slate;
     g.fillRect(0, 0, ART_W, ART_H);
-    box(g, CART, COLORS.fog, 'cart');
+    box(g, CART, COLORS.fog, skin.station);
     for (const i of onShelf) {
       const r = i === dragging?.i ? { ...CRATE_SIZE, x: dragging.x, y: dragging.y } : shelf(i);
-      box(g, r, COLORS.mustard, 'crate');
+      box(g, r, COLORS.mustard, piece);
     }
     for (let i = 0; i < model.cartCount; i++) {
       box(
@@ -160,6 +163,8 @@ export const cratesGame: MiniGameFactory = (host) => {
   stage.canvas.addEventListener('pointerdown', down);
   stage.canvas.addEventListener('pointermove', move);
   stage.canvas.addEventListener('pointerup', up);
+  // A touch the browser takes back (a scroll, a call) puts the crate back on the shelf instead of leaving it held.
+  stage.canvas.addEventListener('pointercancel', () => (dragging = null));
   stopBtn.addEventListener('click', stopNeedle);
   // The keyboard and tap route: load the next crate without dragging it.
   load.addEventListener('click', () => {
