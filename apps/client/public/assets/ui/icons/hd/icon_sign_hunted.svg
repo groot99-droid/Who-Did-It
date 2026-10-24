@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Inspect sign "A hunted look": a face with wide eyes glancing aside, brows knotted, a bead of sweat. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <radialGradient id="g1" data-flat="#C08A66" gradientUnits="userSpaceOnUse" cx="18" cy="17" r="23"><stop offset="0" stop-color="#DDB08E"/><stop offset="1" stop-color="#C08A66"/></radialGradient>
+  <linearGradient id="g2" data-flat="#93C2E0" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C3EAF2"/><stop offset="1" stop-color="#93C2E0"/></linearGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<circle cx="24" cy="26" r="18" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse cx="16" cy="26" rx="6" ry="8" fill="#FFF1DC"/>
+<ellipse cx="32" cy="26" rx="6" ry="8" fill="#FFF1DC"/>
+<circle cx="19" cy="26" r="3" fill="#12141C"/>
+<circle cx="35" cy="26" r="3" fill="#12141C"/>
+<line x1="10" y1="15" x2="20" y2="11.5" stroke="#12141C" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="28" y1="11.5" x2="38" y2="15" stroke="#12141C" stroke-width="2.6" stroke-linecap="round"/>
+<line x1="20" y1="37" x2="28" y2="37" stroke="#12141C" stroke-width="2" stroke-linecap="round"/>
+<path d="M41,29 Q45,35 41,38 Q37,35 41,29 Z" fill="url(#g2)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse class="hd" cx="13" cy="15" rx="2.6" ry="1.4" fill="#FFF1DC" opacity="0.6"/>
+</svg>

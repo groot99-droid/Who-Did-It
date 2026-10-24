@@ -3,6 +3,7 @@ import { fill } from '../../ui/copy';
 import { MINIGAME_COPY as C } from '../../ui/copy/minigames';
 import { h } from '../../ui/dom';
 import type { MiniGameFactory } from './registry';
+import { DEFAULT_SKINS, pieceAt } from './skin';
 import { box, COLORS, createStage, inside, loop, type Rect } from './draw';
 
 const SPEC = balance.minigames.slide;
@@ -62,16 +63,18 @@ export class SlideModel {
 
 export const slideGame: MiniGameFactory = (host) => {
   const model = new SlideModel(host.rng, host.steps);
+  const skin = host.skin ?? DEFAULT_SKINS.slide;
+  const piece = pieceAt(skin, 0);
   const stage = createStage(host.root);
   const hint = h(
     'p',
     { class: 'wdi-hint', 'data-testid': 'minigame-slide-hint' },
-    fill(C['minigame.slide.hint'], { steps: model.steps }),
+    fill(C['minigame.slide.hint'], { steps: model.steps, piece }),
   );
   const load = h(
     'button',
     { type: 'button', class: 'wdi-btn wdi-btn--sm', 'data-testid': 'minigame-slide-next' },
-    C['minigame.slide.next'],
+    fill(C['minigame.slide.next'], { piece }),
   );
   host.root.append(hint, load);
   const rack: Rect = { x: 8, y: 36, w: BANNETON.w, h: BANNETON.h };
@@ -84,19 +87,19 @@ export const slideGame: MiniGameFactory = (host) => {
     const g = stage.ctx;
     g.fillStyle = COLORS.slate;
     g.fillRect(0, 0, 160, 100);
-    box(g, CABINET, COLORS.lantern);
+    box(g, CABINET, COLORS.lantern, skin.station);
     for (let i = 0; i < model.steps; i++) {
       const r = slotRect(i);
       box(
         g,
         r,
         model.isFilled(i) ? COLORS.bone : i === model.glowing ? COLORS.mustard : COLORS.ink,
-        model.isFilled(i) ? 'banneton' : '',
+        model.isFilled(i) ? piece : '',
       );
     }
     if (!model.done) {
       const r = dragging === null ? rack : { ...BANNETON, ...dragging };
-      box(g, r, COLORS.bone, 'banneton');
+      box(g, r, COLORS.bone, piece);
     }
   };
   const down = (e: PointerEvent) => {
@@ -119,6 +122,7 @@ export const slideGame: MiniGameFactory = (host) => {
   stage.canvas.addEventListener('pointerdown', down);
   stage.canvas.addEventListener('pointermove', move);
   stage.canvas.addEventListener('pointerup', up);
+  stage.canvas.addEventListener('pointercancel', () => (dragging = null));
   // The keyboard and tap route: slide the next banneton into the glowing slot.
   load.addEventListener('click', () => {
     const r = slotRect(Math.max(0, model.glowing));
