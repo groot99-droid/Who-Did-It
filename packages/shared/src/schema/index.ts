@@ -214,6 +214,10 @@ export const Private = schema(
     vendetta: str(),
     /** Round 8 (GDD 3.22, schema version 6): this seat's body; empty until Session 8A fills it. */
     body: BodyState,
+    /** Round 8 (GDD 3.23, 8C): the Scrip this seat carries; others learn only its band, by inspect. */
+    purse: u32(),
+    /** Round 8 (GDD 3.23, 8C): the Scrip this seat keeps at the bank, safe from muggings and knockouts. */
+    bank: u32(),
   },
   'Private',
 );

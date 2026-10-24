@@ -302,6 +302,25 @@ anim plays at 12 fps once (`repeat: 0`) and Phaser holds its last frame. Every f
 | `vfx_dust_step` | 6 | `IsoCam`, 64 px (round 5) | Puff at a boot; ends empty |
 | `vfx_disguise` | 8 | `IsoCam`, 128 px, pivot at the feet (round 5) | Fog and slate smoke rising feet to head round one turning mustard spark, gone by frame 7; only where a Knife strike drops a disguise |
 
+**Round-8 effects** (8G, motion.md 2; DECISIONS A162) are runtime particles, not atlas frames: `view/vfx/VfxView.ts`
+draws seven small shapes once at boot (`fx_spark`, `fx_drop`, `fx_puff`, `fx_coin`, `fx_star`, `fx_chip`,
+`fx_slip`, white with an ink rim, tinted per particle from the world ramps) and bursts them at a figure's feet at
+the art's scale, so they cost no atlas page and keep their size against any figure. `fxSpecs.ts` holds each
+effect's shape, tints, count, speed, spread, gravity and life:
+
+| Effect | Plays when (`fxTriggers.ts`, public fields only) |
+|---|---|
+| `hitSpark` | an avatar's or a creature's `animId` turns to `hurt` |
+| `blood` | an avatar gains the `bleeding` bit |
+| `poisonPuff` | an avatar gains the `poisoned` bit |
+| `fallDust`, `koStars` | an avatar's `animId` turns to `knockdown` (a creature's fall gives `fallDust`) |
+| `crumbs` | `eat` (the Wake Loaf) |
+| `coinBurst` | `rob`; 8C calls `play` for a dropped purse and a sale |
+| `stepDust` | every stride at a walk or a run |
+| `buildDust`, `ledger`, `mailbag` | called by 8D: an HQ tier going up, the Clerk's round, the mailbag collected |
+
+Under reduced motion a burst is a static mark of three particles, cut after 400 ms.
+
 **Body.** The body on the floor is the last frame of `die` (`char/<body>/die/<dir>/007`, with the
 `scarf` and `blood` overlays on the same tail), held by the one-shot anim; no separate key.
 Review sheet: `assets/source/review/villager-body-contact.png`.
@@ -1056,7 +1075,7 @@ pnpm --filter @wdi/sprites m5b
 
 | Key | Type | Frames | Packed cell, pivot | Loaded |
 |---|---|---|---|---|
-| `nodes` | multiatlas, one page ≤ 512 x 256 (`NODE_PAGE`) | `node_<snake id>/ready`, `node_<snake id>/spent` and `node_<snake id>/break/<000-007>` (round 8, 8G) for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`); the stem is the row's `sprite` | 64 x 64, (32, 48): the ground point under the tile centre | boot |
+| `nodes` | multiatlas, one page ≤ 512 x 256 (`NODE_PAGE`) | `node_<snake id>/ready`, `node_<snake id>/spent` and `node_<snake id>/break/<000-007>` (round 8, 8G) for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`), whose stem is the row's `sprite`, and for `coins`, the heap a knockout or a mugging drops (8C, GDD 3.23), which has no `resources.json` row and plays its break as a pickup removes it | 64 x 64, (32, 48): the ground point under the tile centre | boot |
 | `anims_nodes` | animation | `node_<snake id>/break`: 12 fps once; the client plays it forward as the yield is taken and backwards as the node regrows | | boot |
 | `tools` | multiatlas, one page ≤ 512² | `held_<itemId>/<dir>` for `torch`, `snare`, `spade`, `lockpicks`, `lantern`, `crowbar` (8 screen-frame directions); `glow_lantern/<0-3>`, `glow_torch/<0-3>` | held: 64 x 64, (32, 56), the characters' feet; glow: 32 x 32, centred | boot |
 | `anims_tools` | animation | `glow_lantern`, `glow_torch`: 4 frames at 8 fps, looping | | boot |
