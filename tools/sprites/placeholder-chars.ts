@@ -339,6 +339,13 @@ export function placeholderEntries(): PlaceholderEntry[] {
       entries: [
         { key: 'vfx', type: 'multiatlas', url: 'vfx/vfx.json', path: 'vfx/', filter: 'nearest' },
         { key: 'anims_vfx', type: 'animation', url: 'vfx/vfx.anims.json' },
+        // The bloodied mark is the 8-bit bleeding icon itself (SPRITES 9.1): no greybox stands in for it.
+        {
+          key: 'mark_bleeding',
+          type: 'image',
+          url: '../ui/icons/8bit/icon_effect_bleeding.png',
+          filter: 'nearest',
+        },
       ],
       files: async () => {
         const vfx = vfxFrames();
