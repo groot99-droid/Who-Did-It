@@ -203,18 +203,21 @@ export function gidOf(char: string, cell: number): number {
   return 1 + 20 * m + cell;
 }
 
-// CLI: tsx tileset.ts <render dir, e.g. build/render/ground> <out dir> [--finish on|off]
+// CLI: tsx tileset.ts <render dir, e.g. build/render/ground> <out dir> [--finish on|off] [--themes a,b]
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   const fi = args.indexOf('--finish');
+  const ti = args.indexOf('--themes');
   const on = fi >= 0 ? args[fi + 1] === 'on' : finishEnabled('main');
-  const [renderDir, outDir] = fi < 0 ? args : args.filter((_, i) => i !== fi && i !== fi + 1);
+  const themes = ti >= 0 ? args[ti + 1]!.split(',') : GROUND_THEMES;
+  const flags = new Set([fi, ti].filter((i) => i >= 0).flatMap((i) => [i, i + 1]));
+  const [renderDir, outDir] = args.filter((_, i) => !flags.has(i));
   if (!renderDir || !outDir) {
-    console.error('usage: tsx tileset.ts <render dir> <out dir> [--finish on|off]');
+    console.error('usage: tsx tileset.ts <render dir> <out dir> [--finish on|off] [--themes a,b]');
     process.exit(2);
   }
   mkdirSync(outDir, { recursive: true });
-  for (const theme of GROUND_THEMES) {
+  for (const theme of themes) {
     const sheet = buildTileset(
       (char, v) => decodePng(readFileSync(join(renderDir, theme, `${GROUND_NAMES[char]}_${v}.png`))),
       on,
