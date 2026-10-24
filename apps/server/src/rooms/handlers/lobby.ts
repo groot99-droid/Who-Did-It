@@ -34,13 +34,14 @@ import {
 import { dealMainDeck } from '../../sim/Deck';
 import { dealTasks } from '../../sim/Tasks';
 import { refuse, setPhase } from '../../sim/Flow';
-import { handleSay } from '../../sim/Chat';
+import { handleNote, handleSay } from '../../sim/Chat';
 import { handleVote } from '../../sim/Meeting';
 import { newestNpcSeat, isNpcSeat, releaseNpcSeat } from '../../sim/Npc';
 import { addNpcSeat, fillNpcSeats } from '../../sim/npc/seats';
 import { MatchSeeds } from '../../sim/seeds';
 import { simOf } from '../../sim/RoomSim';
 import { mapIdOfRoom } from '../../sim/MapSites';
+import { dealPurses } from '../../sim/economy/purse';
 
 /**
  * Flow messages: the lobby and role-card flow plus the meeting vote and chat (consumed by the phase
@@ -57,6 +58,7 @@ const LOBBY_TYPES: readonly string[] = [
   C2S.coverPick,
   C2S.vote,
   C2S.say,
+  C2S.note, // round 8, 8T (6Z's grant)
   C2S.lobbySettings,
   C2S.lobbyAddNpc,
   C2S.lobbyRemoveNpc,
@@ -149,6 +151,9 @@ export function runLobbyCommands(room: PartyRoom): void {
         break;
       case C2S.say:
         handleSay(room, cmd.sessionId, payload);
+        break;
+      case C2S.note: // round 8, 8T (6Z's grant): the meeting notes (GDD 3.8)
+        handleNote(room, cmd.sessionId, payload);
         break;
       case C2S.lobbySettings:
         handleSettings(room, cmd.sessionId, payload);
@@ -275,6 +280,7 @@ export function startMatch(room: PartyRoom): void {
   // Round 5, 5F: the cover hints, each cover seat's preset `coverLook` and the Cabal mates' `mateLooks`.
   assignCovers(room, dealt);
   dealTasks(room, dealt); // round 7, 7M: every seat's task list, real or fake, on its own stream (GDD 3.5)
+  dealPurses(room); // round 8, 8C: purses and banks emptied; the stakes follow the public looks (GDD 3.23)
 
   void room.lock();
   setPhase(room, Phase.roleReveal, balance.phases.roleRevealS);

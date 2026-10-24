@@ -17,7 +17,9 @@ import { type Rng, sfc32 } from '@wdi/shared';
  * - `minigame`: the station-task puzzles (6H), keyed by seat id, so no public draw shares a seat's board;
  * - `contract`, `events`: the Bible's mail stream and world events (rounds 7 and 9, docs/round6/bible-seams.md);
  * - `vendetta`: a Killer card's vendetta, keyed by seat id (round 7, GDD 3.20);
- * - `tasks`: the task deal, the real and the fake lists (round 7, 7M, GDD 3.5).
+ * - `tasks`: the task deal, the real and the fake lists (round 7, 7M, GDD 3.5);
+ * - `purse`: each seat's starting stake, keyed by seat id (round 8, GDD 3.23);
+ * - `talk`: an NPC seat's meeting notes, keyed by seat id (round 8, 8T, GDD 3.8), so a note moves no other stream.
  */
 export type StreamName =
   | 'deal'
@@ -32,7 +34,9 @@ export type StreamName =
   | 'contract'
   | 'events'
   | 'vendetta'
-  | 'tasks';
+  | 'tasks'
+  | 'purse'
+  | 'talk';
 
 /** Four 32-bit seed words of one sfc32 stream. */
 export type SeedWords = readonly [number, number, number, number];
@@ -56,9 +60,29 @@ function fnv1a(key: string): number {
 
 export class MatchSeeds {
   private readonly streams = new Map<string, Rng>();
+  /** Round 8, 8L (A170): the words each stream id was seeded from, for the match log's replay record. */
+  private readonly words = new Map<string, SeedWords>();
+  /** Round 8, 8L: the logged words a replay seeds from, by stream id (`MatchSeeds.replay`). */
+  private replayed?: Readonly<Record<string, SeedWords>>;
 
   /** `fixed` is undefined in production; only the test helper `fixSeeds` ever supplies it. */
   constructor(private readonly fixed?: FixedSeeds) {}
+
+  /**
+   * Round 8, 8L (A170): seeds every stream id listed in `words` from exactly those words (a match log's `seeds`), so
+   * the logged match's draws come out again; an id that is not listed keeps crypto words. Stream independence holds:
+   * each id still has its own four words.
+   */
+  static replay(words: Readonly<Record<string, SeedWords>>): MatchSeeds {
+    const seeds = new MatchSeeds();
+    seeds.replayed = words;
+    return seeds;
+  }
+
+  /** Round 8, 8L (A170): every stream id drawn so far and its seed words. Server stdout only, never the wire. */
+  recorded(): Record<string, SeedWords> {
+    return Object.fromEntries(this.words);
+  }
 
   /**
    * The stream `name` (or `name:key`), created on first use and kept for the rest of the match. A keyed stream
@@ -72,7 +96,14 @@ export class MatchSeeds {
     if (!rng) {
       const fixed = this.fixed?.[name];
       const [a, b, c, d] = fixed ?? cryptoWords();
-      rng = sfc32(a, b, c, fixed && key !== undefined ? (d ^ fnv1a(key)) >>> 0 : d);
+      const seed: SeedWords = this.replayed?.[id] ?? [
+        a,
+        b,
+        c,
+        fixed && key !== undefined ? (d ^ fnv1a(key)) >>> 0 : d,
+      ]; // round 8, 8L
+      rng = sfc32(...seed); // round 8, 8L: the recorded words
+      this.words.set(id, seed); // round 8, 8L
       this.streams.set(id, rng);
     }
     return rng;

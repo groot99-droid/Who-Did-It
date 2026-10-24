@@ -8,7 +8,7 @@
   "biome": "house",
   "dark": false,
   "size": { "w": 18, "h": 11 },
-  "notes": "Two rooms split by a wall. Company store: counter with a hiding spot behind it, empty shelves. Manager's office: payroll ledger open at a torn page, the safe, the map table, the dead telephone, a wardrobe, the strongroom door (body spot). Door south.",
+  "notes": "Two rooms split by a wall. Company store: counter with a hiding spot behind it, empty shelves. Manager's office: payroll ledger open at a torn page, the safe, the map table, the dead telephone, a wardrobe, the strongroom door (body spot). Door south. Round 8 (8K): the store shelves and the telephone stand in front of their walls; wall shelves, a barrel and crates in the store, a bench and a lamp table for the queue; a chair behind the desk, a cupboard, a window and a coat rack in the office.",
   "worldRef": "4.10",
   "portals": [
     {
@@ -56,7 +56,7 @@
     }
   ],
   "props": [
-    { "id": "bo.shelves", "kind": "decor", "x": 3, "y": 0 },
+    { "id": "bo.shelves", "kind": "decor", "x": 2, "y": 1 },
     { "id": "bo.ledger_desk", "kind": "decor", "x": 13, "y": 3 },
     { "id": "bo.safe", "kind": "decor", "x": 16, "y": 1 },
     {
@@ -66,38 +66,50 @@
       "y": 6,
       "footprint": { "x": 11, "y": 6, "w": 2, "h": 2 }
     },
-    { "id": "bo.telephone", "kind": "decor", "x": 10, "y": 0 }
+    { "id": "bo.telephone", "kind": "decor", "x": 10, "y": 1 },
+    { "id": "bo.wall_shelf_0", "kind": "dressing", "x": 4, "y": 1 },
+    { "id": "bo.wall_shelf_1", "kind": "dressing", "x": 6, "y": 1 },
+    { "id": "bo.barrel", "kind": "dressing", "x": 8, "y": 1 },
+    { "id": "bo.side_table", "kind": "dressing", "x": 1, "y": 5 },
+    { "id": "bo.bench", "kind": "dressing", "x": 1, "y": 8 },
+    { "id": "bo.crates", "kind": "dressing", "x": 3, "y": 9 },
+    { "id": "bo.sacks", "kind": "dressing", "x": 6, "y": 9 },
+    { "id": "bo.chair", "kind": "dressing", "x": 14, "y": 3 },
+    { "id": "bo.cupboard", "kind": "dressing", "x": 14, "y": 1 },
+    { "id": "bo.window", "kind": "dressing", "x": 15, "y": 1 },
+    { "id": "bo.coat_rack", "kind": "dressing", "x": 16, "y": 5 },
+    { "id": "bo.bank_counter", "kind": "bank", "x": 9, "y": 5 }
   ],
   "gates": [],
   "paths": [],
   "lights": [
-    { "id": "bo.lt_desk_lamp", "kind": "lamp", "x": 13, "y": 4, "radiusTiles": 2 },
-    { "id": "bo.lt_store_lamp", "kind": "lamp", "x": 5, "y": 6, "radiusTiles": 2 }
+    { "id": "bo.lt_desk_lamp", "kind": "lamp", "x": 13, "y": 3, "radiusTiles": 2 },
+    { "id": "bo.lt_store_lamp", "kind": "lamp", "x": 1, "y": 5, "radiusTiles": 2.5 }
   ],
   "grid": [
     "##################",
-    "#........#..B...##",
+    "#.#.#.#.###.B.####",
     "#........#.......#",
-    "#........#...#...#",
+    "#........#...##..#",
     "#.#####H.#.......#",
-    "#........#.......#",
+    "##.......#......##",
     "#........#.##....#",
     "#..........##....#",
-    "#...............H#",
-    "#.......S........#",
+    "##..............H#",
+    "#..#..#.S........#",
     "########D#########"
   ],
   "material": [
-    "WWWPWWWWWWPWWWWWWW",
-    "WwwwwwwwwWwwWwwwPW",
+    "WWWWWWWWWWWWWWWWWW",
+    "WwPwPwPwPWPwWwPPPW",
     "WwwwwwwwwWwwwwwwwW",
-    "WwwwwwwwwWwwwPwwwW",
+    "WwwwwwwwwWwwwPPwwW",
     "WwKKKKKKwWwwwwwwwW",
-    "WwwwwwwwwWwwwwwwwW",
+    "WPwwwwwwwPwwwwwwPW",
     "WwwwwwwwwWwPPwwwwW",
     "WwwwwwwwwwwPPwwwwW",
-    "WwwwwwwwwwwwwwwwWW",
-    "WwwwwwwwwwwwwwwwwW",
+    "WPwwwwwwwwwwwwwwWW",
+    "WwwPwwPdddwwwwwwwW",
     "WWWWWWWWWWWWWWWWWW"
   ]
 }

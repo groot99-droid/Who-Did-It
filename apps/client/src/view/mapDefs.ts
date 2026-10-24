@@ -88,15 +88,27 @@ function solidDef(o: MapObject, ctx: DefContext): StaticDef | null {
   };
 }
 
+/**
+ * The art stems a prop is looked up by, in order (SPRITES 3): its kind, its id tail, then the tail without a
+ * trailing `_<n>`, so `bm.ore_cart_0` and `bw.kiln_1` share one frame.
+ */
+export function propStems(kind: string, id: string): string[] {
+  const tail = id.includes('.') ? id.slice(id.indexOf('.') + 1) : id;
+  return [...new Set([kind, tail, tail.replace(/_\d+$/, '')])];
+}
+
 function propDefs(o: MapObject, ctx: DefContext): StaticDef[] {
-  const tail = o.name.includes('.') ? o.name.slice(o.name.indexOf('.') + 1) : o.name;
+  const stems = propStems(o.type, o.name);
   const label = INTERACTABLE_PROPS[o.type];
   const boxPx = PROP_BOX_PX[o.type] ?? DEFAULT_PROP_BOX_PX;
   const fp = parseFootprint(o.props.footprint);
   if (fp && (fp.w > 1 || fp.h > 1)) {
-    const art = find(ctx, [`prop_${o.type}#0_0`]);
+    const art = find(
+      ctx,
+      stems.map((s) => `prop_${s}#0_0`),
+    );
     if (art)
-      return sliceDefs(o.name, art.atlas, `prop_${o.type}`, fp, boxPx).map((d) => ({
+      return sliceDefs(o.name, art.atlas, art.frame.slice(0, -'#0_0'.length), fp, boxPx).map((d) => ({
         ...d,
         occluder: false,
         autoOccluder: true,
@@ -117,7 +129,12 @@ function propDefs(o: MapObject, ctx: DefContext): StaticDef[] {
   const { tx, ty } = tile(o);
   const c = centre(tx, ty);
   const lit = o.type === 'lanternPost' ? find(ctx, [`prop_${o.type}_lit`]) : null;
-  const art = lit ?? find(ctx, [`prop_${o.type}`, `prop_${tail}`]);
+  const art =
+    lit ??
+    find(
+      ctx,
+      stems.map((s) => `prop_${s}`),
+    );
   if (art) {
     const def: StaticDef = {
       ...base(o.name, c.x, c.y),

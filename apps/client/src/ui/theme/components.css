@@ -3248,3 +3248,328 @@ button.wdi-map__option,
     outline-offset: 6px;
   }
 }
+
+/* Panels open and close. A panel shown by clearing `hidden` replays its entrance on every open, because an
+   animation restarts when an element leaves display: none, and so does every row inside it. Closing animates
+   where the browser can hold `display` through a transition (allow-discrete) and is instant elsewhere; the
+   panel stops taking the pointer the moment it is hidden, so its logic never waits on the motion. A panel
+   built fresh each time (the meeting, a dialog) plays the entrance once as it mounts. */
+:is(
+  .wdi-m5b__panel,
+  .wdi-settings__panel,
+  .wdi-notebook-sheet__page,
+  .wdi-meet__board,
+  .wdi-meet__side,
+  .wdi-anim-panel
+) {
+  animation: wdi-panel-in var(--wdi-dur-panel) var(--wdi-ease-out) backwards;
+}
+
+:is(.wdi-m5b__panel, .wdi-settings__panel, .wdi-notebook-sheet, .wdi-anim-panel) {
+  transition:
+    opacity var(--wdi-dur-panel-out) var(--wdi-ease-in),
+    translate var(--wdi-dur-panel-out) var(--wdi-ease-in),
+    display var(--wdi-dur-panel-out) allow-discrete;
+}
+
+:is(.wdi-m5b__panel, .wdi-settings__panel, .wdi-notebook-sheet, .wdi-anim-panel)[hidden] {
+  display: none;
+  opacity: 0;
+  translate: 0 calc(var(--wdi-rise) / 2);
+  pointer-events: none;
+}
+
+/* Scrims and veils behind a panel fade rather than travel. */
+:is(.wdi-m5b__modal, .wdi-notebook-sheet, .wdi-anim-veil) {
+  animation: wdi-fade var(--wdi-dur-panel) var(--wdi-ease-out) backwards;
+}
+
+.wdi-meet__side {
+  animation-delay: calc(var(--wdi-stagger) * 3);
+}
+
+@keyframes wdi-panel-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--wdi-rise);
+    scale: 0.98;
+  }
+}
+
+/* Lists stagger in as their panel opens: each of the first ten rows waits one --wdi-stagger more than the
+   one above it, and the rest arrive with the tenth, so a long list is never slow to read. */
+:is(.wdi-m5b__list, .wdi-notebook__list, .wdi-portraits, .wdi-deck__cards, .wdi-menu-parties, .wdi-anim-list)
+  > * {
+  animation: wdi-row-in var(--wdi-dur-panel) var(--wdi-ease-out) backwards;
+  animation-delay: calc(var(--wdi-stagger) * 10);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(1) {
+  animation-delay: calc(var(--wdi-stagger) * 0);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(2) {
+  animation-delay: calc(var(--wdi-stagger) * 1);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(3) {
+  animation-delay: calc(var(--wdi-stagger) * 2);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(4) {
+  animation-delay: calc(var(--wdi-stagger) * 3);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(5) {
+  animation-delay: calc(var(--wdi-stagger) * 4);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(6) {
+  animation-delay: calc(var(--wdi-stagger) * 5);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(7) {
+  animation-delay: calc(var(--wdi-stagger) * 6);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(8) {
+  animation-delay: calc(var(--wdi-stagger) * 7);
+}
+
+:where(
+    .wdi-m5b__list,
+    .wdi-notebook__list,
+    .wdi-portraits,
+    .wdi-deck__cards,
+    .wdi-menu-parties,
+    .wdi-anim-list
+  )
+  > :nth-child(9) {
+  animation-delay: calc(var(--wdi-stagger) * 8);
+}
+
+@keyframes wdi-row-in {
+  from {
+    opacity: 0;
+    translate: 0 calc(var(--wdi-rise) / 2);
+  }
+}
+
+/* Activation (ui/theme/motion.ts puts these classes on a control and takes them off at animationend). */
+.wdi-fx-flash {
+  animation: wdi-flash var(--wdi-dur-flash) var(--wdi-ease-out);
+}
+
+.wdi-fx-refused {
+  animation: wdi-refused var(--wdi-dur-shake) var(--wdi-ease);
+}
+
+.wdi-fx-pop {
+  animation: wdi-pop var(--wdi-dur-panel) var(--wdi-ease-spring) backwards;
+}
+
+@keyframes wdi-flash {
+  from {
+    filter: brightness(1.5);
+    scale: 1.06;
+  }
+}
+
+@keyframes wdi-refused {
+  20%,
+  60% {
+    translate: calc(-1 * var(--wdi-shake)) 0;
+  }
+  40%,
+  80% {
+    translate: var(--wdi-shake) 0;
+  }
+  0%,
+  90% {
+    box-shadow: var(--wdi-glow-hazard);
+  }
+}
+
+@keyframes wdi-pop {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+/* The cooldown sweep: a night shade over the control that unwinds clockwise. It is status, as the busy
+   spinner is, so its time is the caller's (--wdi-cooldown-ms, the card's cooldown) and not a motion token,
+   and it runs under reduced motion too. */
+@property --_sweep {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+.wdi-fx-cooling {
+  position: relative;
+}
+
+.wdi-fx-cooling::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: conic-gradient(rgb(var(--wdi-night-rgb) / 0.6) calc(var(--_sweep) * 1turn), transparent 0);
+  pointer-events: none;
+  animation: wdi-sweep var(--wdi-cooldown-ms) linear forwards;
+}
+
+@keyframes wdi-sweep {
+  from {
+    --_sweep: 1;
+  }
+  to {
+    --_sweep: 0;
+  }
+}
+
+/* The E prompt pops in as it appears, and its bar fills smoothly between frames while E is held; the bar
+   glows as it fills. A task's mini-game opening rides the panel entrance above (`.wdi-m5b__modal`). */
+.wdi-m5b__prompt:not([hidden]) {
+  animation: wdi-pop var(--wdi-dur-panel) var(--wdi-ease-spring) backwards;
+}
+
+.wdi-m5b__bar > i {
+  transition: width var(--wdi-dur-press) linear;
+  box-shadow: 0 0 var(--wdi-space-2) rgb(var(--wdi-teal-rgb) / 0.6);
+}
+
+/* Scene transitions per portal kind (view/Transition.ts `portalTransition`): a door wipes and a ladder
+   irises (the Round 6 layers above); an arrival at the Train station fades through lantern-lit carriage
+   windows sliding past, the night between them, before the platform lifts. The layer's half time is the
+   router's (`--wdi-transition-ms`); reduced motion hides the layer, as for the others. */
+.wdi-transition--station {
+  opacity: 0;
+  background-color: var(--wdi-night);
+  background-image: repeating-linear-gradient(
+    to right,
+    rgb(var(--wdi-lantern-rgb) / 0.35) 0 var(--wdi-space-7),
+    transparent var(--wdi-space-7) calc(var(--wdi-space-7) * 3)
+  );
+  background-size: calc(var(--wdi-space-7) * 3) 30%;
+  background-position: 0 50%;
+  background-repeat: repeat-x;
+  transition-property: opacity, background-position;
+}
+
+.wdi-transition--station.wdi-transition--covered {
+  opacity: 1;
+  background-position: calc(var(--wdi-space-7) * -6) 50%;
+}
+
+.wdi-transition--station.wdi-transition--lifted {
+  opacity: 0;
+  background-position: calc(var(--wdi-space-7) * -12) 50%;
+}
+
+/* A climb (a ladder, shaft or stair that changes height) irises as the meeting does, with rungs passing the
+   way the seat goes: up the ladder the rungs fall away below, down it they rise past. */
+.wdi-transition--climbUp,
+.wdi-transition--climbDown {
+  clip-path: circle(0% at 50% 50%);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgb(var(--wdi-lantern-rgb) / 0.22) 0 var(--wdi-space-2),
+    transparent var(--wdi-space-2) var(--wdi-space-7)
+  );
+  background-size: 40% var(--wdi-space-7);
+  background-position: 50% 0;
+  background-repeat: repeat-y;
+  transition-property: clip-path, background-position;
+}
+
+.wdi-transition--climbUp.wdi-transition--covered,
+.wdi-transition--climbDown.wdi-transition--covered {
+  clip-path: circle(75% at 50% 50%);
+}
+
+.wdi-transition--climbUp.wdi-transition--lifted,
+.wdi-transition--climbDown.wdi-transition--lifted {
+  clip-path: circle(0% at 50% 50%);
+}
+
+.wdi-transition--climbUp.wdi-transition--covered {
+  background-position: 50% calc(var(--wdi-space-7) * 4);
+}
+
+.wdi-transition--climbUp.wdi-transition--lifted {
+  background-position: 50% calc(var(--wdi-space-7) * 8);
+}
+
+.wdi-transition--climbDown.wdi-transition--covered {
+  background-position: 50% calc(var(--wdi-space-7) * -4);
+}
+
+.wdi-transition--climbDown.wdi-transition--lifted {
+  background-position: 50% calc(var(--wdi-space-7) * -8);
+}

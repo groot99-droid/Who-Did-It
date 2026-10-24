@@ -23,7 +23,7 @@ export type PlaceClass =
   'hung' | 'hungEast' | 'front' | 'frontEast' | 'free' | 'floor' | 'overlay' | 'doorOverlay' | 'surface';
 
 export interface PlacementRules {
-  /** The class of a prop, by kind, or by id tail for `decor` and `taskSource` (whose art is keyed by the tail). */
+  /** The class of a prop, by kind, or by id tail (or its stem) for `decor`, `dressing` and `taskSource`. */
   props: Record<string, PlaceClass>;
   /** The class of a spot variant (hiding and body spots stand on their own `H` or `B` tile). */
   spots: Record<string, Exclude<PlaceClass, 'floor' | 'overlay' | 'doorOverlay' | 'surface'>>;
@@ -49,9 +49,20 @@ const NEIGHBOURS = [
   [-1, 0],
 ] as const;
 
-/** The art key of a prop: its kind, or its id tail for the kinds whose art is keyed by the tail. */
-export const propKey = (p: { id: string; kind: string }): string =>
-  p.kind === 'decor' || p.kind === 'taskSource' ? p.id.slice(p.id.indexOf('.') + 1) : p.kind;
+const BY_TAIL = new Set(['decor', 'dressing', 'taskSource']);
+
+/**
+ * The art key of a prop: its kind, or, for the kinds whose art is keyed by the tail, its id tail, falling back to
+ * the tail without a trailing `_<n>` when `known` lacks the numbered tail (SPRITES 3: `ch.pew_3` is a `pew`).
+ */
+export const propKey = (
+  p: { id: string; kind: string },
+  known: (key: string) => boolean = () => false,
+): string => {
+  if (!BY_TAIL.has(p.kind)) return p.kind;
+  const tail = p.id.slice(p.id.indexOf('.') + 1);
+  return known(tail) ? tail : tail.replace(/_\d+$/, '');
+};
 
 const ECONOMY = ['shop_', 'bank_', 'altar_', 'rack_', 'mailbag_', 'hq_'];
 const isEconomy = (id: string) => ECONOMY.some((e) => id.slice(id.indexOf('.') + 1).startsWith(e));
@@ -105,13 +116,14 @@ export function placementProblems(
   for (const b of scene.buildings ?? [])
     for (let y = b.footprint.y; y < b.footprint.y + b.footprint.h; y++)
       for (let x = b.footprint.x; x < b.footprint.x + b.footprint.w; x++) buildingAt.set(key(x, y), b.id);
-  const classOf = (p: Scene['props'][number]): PlaceClass | undefined => rules.props[propKey(p)];
+  const artKey = (p: Scene['props'][number]): string => propKey(p, (k) => Object.hasOwn(rules.props, k));
+  const classOf = (p: Scene['props'][number]): PlaceClass | undefined => rules.props[artKey(p)];
   const holder = new Map<string, Scene['props'][number]>();
   const overlays: Array<Scene['props'][number]> = [];
   for (const p of scene.props) {
     const cls = classOf(p);
     if (cls === undefined && !isEconomy(p.id)) {
-      out.push(`prop ${p.id} (${propKey(p)}) has no placement class`);
+      out.push(`prop ${p.id} (${artKey(p)}) has no placement class`);
       continue;
     }
     if (cls === 'overlay' || cls === 'doorOverlay') {
@@ -214,7 +226,7 @@ export function placementProblems(
     const need = rules.lights[l.kind];
     if (!need) continue;
     const p = holder.get(key(l.x, l.y)) ?? overlays.find((o) => o.x === l.x && o.y === l.y);
-    const onProp = p !== undefined && need.props.includes(propKey(p));
+    const onProp = p !== undefined && need.props.includes(artKey(p));
     const onWall =
       need.wall === true && grid(l.x, l.y) === '#' && p === undefined && !buildingAt.has(key(l.x, l.y));
     const onBuilding = need.building === true && buildingAt.has(key(l.x, l.y));

@@ -8,7 +8,7 @@
   "biome": "house",
   "dark": false,
   "size": { "w": 24, "h": 12 },
-  "notes": "One room split by a half wall. Mess hall: long table, iron range (fire), wash basin (Blood wash), coat pegs, wood box. Bunk room: two bunk rows with a hiding spot under each end bunk, root cellar hatch (body spot). Front door south, side door east.",
+  "notes": "One room split by a half wall. Mess hall: long table, iron range (fire), wash basin (Blood wash), coat pegs, wood box. Bunk room: two bunk rows with a hiding spot under each end bunk, root cellar hatch (body spot). Front door south, side door east. Round 8 (8K): the range, basin and pegs stand in front of the north wall; a window, shelf, firewood and a bucket line it; sacks, crates and a barrel by the front door; a lamp table and four footlockers in the bunk room.",
   "worldRef": "4.10",
   "portals": [
     {
@@ -83,8 +83,8 @@
     }
   ],
   "props": [
-    { "id": "bl.stove", "kind": "oven", "x": 0, "y": 3 },
-    { "id": "bl.basin", "kind": "basin", "x": 9, "y": 0 },
+    { "id": "bl.stove", "kind": "oven", "x": 3, "y": 1 },
+    { "id": "bl.basin", "kind": "basin", "x": 9, "y": 1 },
     {
       "id": "bl.mess_table",
       "kind": "decor",
@@ -106,41 +106,57 @@
       "y": 9,
       "footprint": { "x": 14, "y": 9, "w": 7, "h": 2 }
     },
-    { "id": "bl.pegs", "kind": "decor", "x": 11, "y": 0 }
+    { "id": "bl.pegs", "kind": "decor", "x": 11, "y": 1 },
+    { "id": "bl.firewood", "kind": "dressing", "x": 2, "y": 1 },
+    { "id": "bl.window", "kind": "dressing", "x": 5, "y": 1 },
+    { "id": "bl.wall_shelf", "kind": "dressing", "x": 7, "y": 1 },
+    { "id": "bl.barrel", "kind": "dressing", "x": 1, "y": 9 },
+    { "id": "bl.crates", "kind": "dressing", "x": 1, "y": 10 },
+    { "id": "bl.sacks", "kind": "dressing", "x": 3, "y": 10 },
+    { "id": "bl.coat_rack", "kind": "dressing", "x": 4, "y": 10 },
+    { "id": "bl.bucket", "kind": "dressing", "x": 10, "y": 1 },
+    { "id": "bl.stool", "kind": "dressing", "x": 1, "y": 6 },
+    { "id": "bl.side_table", "kind": "dressing", "x": 17, "y": 6 },
+    { "id": "bl.footlocker_0", "kind": "dressing", "x": 15, "y": 3 },
+    { "id": "bl.footlocker_1", "kind": "dressing", "x": 19, "y": 3 },
+    { "id": "bl.footlocker_2", "kind": "dressing", "x": 15, "y": 8 },
+    { "id": "bl.footlocker_3", "kind": "dressing", "x": 19, "y": 8 },
+    { "id": "bl.shop_store", "kind": "counter", "x": 12, "y": 7 },
+    { "id": "bl.shop_stall", "kind": "counter", "x": 12, "y": 6 }
   ],
   "gates": [],
   "paths": [],
   "lights": [
-    { "id": "bl.lt_stove", "kind": "fire", "x": 1, "y": 3, "radiusTiles": 2.5 },
-    { "id": "bl.lt_lamp_mess", "kind": "lamp", "x": 7, "y": 7, "radiusTiles": 2.5 },
-    { "id": "bl.lt_lamp_bunks", "kind": "lamp", "x": 17, "y": 5, "radiusTiles": 2 }
+    { "id": "bl.lt_stove", "kind": "fire", "x": 3, "y": 1, "radiusTiles": 2.5 },
+    { "id": "bl.lt_lamp_mess", "kind": "lamp", "x": 7, "y": 4, "radiusTiles": 2.5 },
+    { "id": "bl.lt_lamp_bunks", "kind": "lamp", "x": 17, "y": 6, "radiusTiles": 2 }
   ],
   "grid": [
     "########################",
-    "#H..........#.#######H.#",
+    "#H##.#.#.####.#######H.#",
     "#...........#.#######..#",
-    "#...........#..........#",
+    "#...........#..#...#...#",
     "#...######..#..........#",
     "#...######..#.........SD",
+    "##..........#....#.....#",
     "#...........#..........#",
-    "#...........#..........#",
-    "#......................#",
-    "#.........B...#######..#",
-    "#.....S.......#######H.#",
+    "#..............#...#...#",
+    "##........B...#######..#",
+    "##.##.S.......#######H.#",
     "######D#################"
   ],
   "material": [
-    "WWWWWWWWWPWPWWWWWWWWWWWW",
-    "WWwwwwwwwwwwWwPPPPPPPWwW",
-    "WwwwwwwwwwwwWwPPPPPPPwwW",
-    "PwwwwwwwwwwwWwwwwwwwwwwW",
+    "WWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWPPwPwPwPPPWwPPPPPPPWwW",
+    "WlfffwwwwwwwWwPPPPPPPwwW",
+    "WwwwwwwwwwwwWwwPwwwPwwwW",
     "WwwwPPPPPPwwWwwwwwwwwwwW",
-    "WwwwPPPPPPwwWwwwwwwwwwwW",
-    "WwwwwwwwwwwwWwwwwwwwwwwW",
-    "WwwwwwwwwwwwWwwwwwwwwwwW",
-    "WwwwwwwwwwwwwwwwwwwwwwwW",
-    "WwwwwwwwwwwwwwPPPPPPPwwW",
-    "WwwwwwwwwwwwwwPPPPPPPWwW",
+    "WwwwPPPPPPwwWwwwwwwwwddW",
+    "WPwwwwwwwwwwPwwwwPwwwwwW",
+    "WwwwwwwwwwwwPwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwwPwwwPwwwW",
+    "WPwwwwwwwwwwwwPPPPPPPwwW",
+    "WPwPPdddwwwwwwPPPPPPPWwW",
     "WWWWWWWWWWWWWWWWWWWWWWWW"
   ]
 }

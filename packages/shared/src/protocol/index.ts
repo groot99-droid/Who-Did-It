@@ -16,6 +16,8 @@ export const C2S = {
   light: 'act.light',
   vote: 'meeting.vote',
   say: 'chat.say',
+  /** Round 8 (GDD 3.8 "Meeting notes", 8T): a line for the meeting notes, which carry no speaker. */
+  note: 'chat.note',
   quick: 'chat.quick',
   ping: 'world.ping',
   roleReady: 'role.ready',
@@ -35,6 +37,22 @@ export const C2S = {
   minigameResult: 'minigame.result',
   /** Round 8 (GDD 3.22 "Inspect"): study the seat in reach; `sim/inspect/` (8B) handles it. */
   inspect: 'act.inspect',
+  /** Round 8 (GDD 3.23, 8C): buy from the shop the seat holds open; Session 8C reads it. */
+  buy: 'act.buy',
+  /** Round 8 (GDD 3.23, 8C): sell to the shop the seat holds open; Session 8C reads it. */
+  sell: 'act.sell',
+  /** Round 8 (GDD 3.23, 8C): deposit to or withdraw from the bank a `bank` hold opened; Session 8C reads it. */
+  bank: 'act.bank',
+  /** Round 8 (GDD 3.23, 8D): Scrip into Faith at an altar in reach. */
+  donate: 'act.donate',
+  /** Round 8 (GDD 3.23, 8D): an Indulgence or a Parish Seal at an altar; a held Seal presented at a meeting. */
+  faith: 'act.faith',
+  /** Round 8 (GDD 3.23, 8D): show, burn or fence a Blackmail Notice (its Notebook entry id). */
+  notice: 'act.notice',
+  /** Round 8 (GDD 3.23, 8D): invest in the next tier of the HQ station in reach. */
+  hq: 'act.hq',
+  /** Round 8 (GDD 3.23, 8D): pay the rent due, at the bank or to the Company Clerk in reach. */
+  payRent: 'act.payRent',
 } as const;
 
 export const S2C = {
@@ -63,15 +81,31 @@ export const S2C = {
   inspectNoticed: 'inspect.noticed',
   /** Round 8, private to the inspected seat: a card-blind hunch from a `relations.json` row's note. Sent by 8B. */
   inspectHunch: 'inspect.hunch',
+  /** Round 8 (GDD 3.23, 8C): a `shop` hold opened a shop; sent by Session 8C. */
+  shopOpen: 'shop.open',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
 export type S2CType = (typeof S2C)[keyof typeof S2C];
 
 /** `gather` and `craft` are round 6 (M5b, GDD 3.14); the server refuses them until Session 6F lands. */
-export type HoldAction = 'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft';
+export type HoldAction =
+  | 'drag'
+  | 'collect'
+  | 'task'
+  | 'inspect'
+  | 'autopsy'
+  | 'gather'
+  | 'craft'
+  // Round 8 (GDD 3.23, 8C): a shop counter and the bank.
+  | 'shop'
+  | 'bank'
+  // Round 8 (GDD 3.23, 8D): the chapel altar, the Train's mailbag, the tally rack.
+  | 'altar'
+  | 'mailbag'
+  | 'rack';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
-export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke';
+export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
 /**
  * Why a meeting opened (GDD 3.3); `missing` is the roll-call of M4; `final` is the forced meeting after the Final
  * Night hunt.
@@ -85,8 +119,11 @@ export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
  */
 export type DeathCause =
   'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'bled' | 'sickened';
-/** Chat channels the server derives (GDD 3.5); the client never chooses one. */
-export type ChatChannel = 'meeting' | 'ghost' | 'cabal' | 'system';
+/**
+ * Chat channels the server derives (GDD 3.5); the client never chooses one. Round 8 (GDD 3.8, 8T): `notes` is the
+ * meeting notes, reached only by `chat.note`, whose lines carry no speaker.
+ */
+export type ChatChannel = 'meeting' | 'ghost' | 'cabal' | 'system' | 'notes';
 /** Round 8 (GDD 3.22 "Inspect"): what a glance tells of health, never the number. */
 export type InspectHealth = 'unhurt' | 'bruised' | 'badlyHurt';
 /** Round 8: the purse's jingle; `unknown` until a purse exists (8C) or when its bands are not set. */
@@ -191,8 +228,16 @@ export interface C2SPayloads {
   /** A living player's id, or `"skip"`. Changeable until the vote closes (A30). */
   'meeting.vote': { targetId: string };
   'chat.say': { text: string };
+  'chat.note': { text: string };
   'chat.quick': { phraseId: string };
   'world.ping': { x: number; y: number };
+  /** Round 8 (GDD 3.23, 8D): whole Scrip, at most `economy.json` `faith.donateMax`. */
+  'act.donate': { amount: number };
+  'act.faith': { kind: 'indulgence' | 'seal' };
+  /** `itemId` is the notice's Notebook entry id. */
+  'act.notice': { itemId: string; op: 'show' | 'burn' | 'fence' };
+  'act.hq': { stationId: string };
+  'act.payRent': Record<string, never>;
   /** Deprecated alias of `lobby.ready {ready: true}`. */
   'role.ready': Record<string, never>;
   'net.ping': { t: number };
@@ -228,6 +273,18 @@ export interface C2SPayloads {
   'minigame.result': { taskId: string; answer: unknown };
   /** Round 8 (GDD 3.22): an avatar handle in reach, in any world phase; refused 422, 424 or 427. */
   'act.inspect': { targetId: string };
+  /**
+   * Round 8 (GDD 3.23, 8C): `qty` of `itemId` from `shopId`, which a `shop` hold opened and whose counter is still in
+   * reach, at its `ask` each, paid from the purse. Refused 422 when the purse or the inventory falls short.
+   */
+  'act.buy': { shopId: string; itemId: string; qty: number };
+  /** Round 8 (GDD 3.23, 8C): `qty` of `itemId` from the inventory to `shopId`, at its `pay` each, into the purse. */
+  'act.sell': { shopId: string; itemId: string; qty: number };
+  /**
+   * Round 8 (GDD 3.23, 8C): moves `amount` Scrip between the purse and the bank, at the bank counter a `bank` hold
+   * opened and that stays in reach. Refused 422 when the side it draws on holds less.
+   */
+  'act.bank': { op: 'deposit' | 'withdraw'; amount: number };
 }
 
 export interface S2CPayloads {
@@ -239,7 +296,7 @@ export interface S2CPayloads {
   clueFound: { entryId: string };
   /** Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). */
   killed: { sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string };
-  /** Private: routed per recipient; `from` is a player id. */
+  /** Private: routed per recipient; `from` is a player id, `''` on `system` and `notes` (no speaker). */
   'chat.msg': { from: string; text: string; channel: ChatChannel };
   phaseChange: { phase: number; endsTick: number };
   meetingStart: { reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] };
@@ -298,6 +355,15 @@ export interface S2CPayloads {
   'inspect.noticed': { lookId: string };
   /** Private, round 8: an `inspect.hunch.*` copy id. */
   'inspect.hunch': { copyId: string };
+  /**
+   * Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each
+   * price, `buys` what it pays for. Answered with `act.buy` and `act.sell`.
+   */
+  'shop.open': {
+    shopId: string;
+    stock: Array<{ itemId: string; price: number }>;
+    buys: Array<{ itemId: string; price: number }>;
+  };
 }
 
 export type ErrorPayload = S2CPayloads['error'];
@@ -318,6 +384,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.light': 5,
   'meeting.vote': 2,
   'chat.say': 2,
+  'chat.note': 2,
   'chat.quick': 2,
   'world.ping': 2,
   'lobby.start': 2,
@@ -330,6 +397,14 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'quest.turnIn': 2,
   'minigame.result': 2,
   'act.inspect': 5,
+  'act.buy': 5,
+  'act.sell': 5,
+  'act.bank': 5,
+  'act.donate': 5,
+  'act.faith': 5,
+  'act.notice': 5,
+  'act.hq': 5,
+  'act.payRent': 5,
 };
 
 export const ErrorCode = {

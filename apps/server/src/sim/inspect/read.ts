@@ -38,7 +38,8 @@ export const SIGN_OF_EFFECT: readonly (readonly [number, string])[] = [
 
 /** The avatar's signs: its public bits, then the close-look effects of the seat behind it. */
 export function signsOf(avatar: AvatarState, player: PlayerState | undefined): string[] {
-  const bits = SIGN_OF_BIT.filter(([bit]) => (avatar.statusBits & bit) !== 0).map(([, id]) => id);
+  const shown = avatar.statusBits | avatar.nearBits; // round 8, 8L: Blood rides `nearBits`
+  const bits = SIGN_OF_BIT.filter(([bit]) => (shown & bit) !== 0).map(([, id]) => id);
   const body = (player?.priv as { body?: { effects?: Iterable<{ id: number }> } } | undefined)?.body;
   const on = new Set<number>();
   for (const effect of body?.effects ?? []) on.add(effect.id);

@@ -75,6 +75,9 @@ export const MAP_SLICED_PROPS: Record<string, ReadonlyArray<{ art: string; w: nu
     { art: 'prop_doughMixer', w: 2, h: 2 },
     { art: 'prop_brickOven', w: 2, h: 2 },
     { art: 'prop_proofingCabinet', w: 3, h: 2 },
+    // Round 8 (8J, art.md 4.2): St Brannock's pews.
+    { art: 'prop_pew', w: 4, h: 1 },
+    { art: 'prop_dining_table', w: 4, h: 1 },
   ],
   props_blackpine: [
     { art: 'prop_trestle', w: 3, h: 2 },
@@ -487,7 +490,7 @@ export function placeholderEntries(): PlaceholderEntry[] {
       files: async () => {
         const clues = await packFrames('clues', clueFrames());
         const files = inFolder('clues/', clues.pages);
-        files.set('clues/clues.json', Buffer.from(atlasJson(clues.atlas)));
+        files.set('clues/clues.json', Buffer.from(atlasJson(clues.atlas, true)));
         return files;
       },
     },

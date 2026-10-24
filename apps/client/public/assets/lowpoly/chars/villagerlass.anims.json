@@ -1,0 +1,4492 @@
+{
+ "anims": [
+  {
+   "key": "blood/villagerlass/die/e",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/e/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/e/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/e/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/e/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/e/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/e/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/e/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/die/n",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/n/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/n/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/n/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/n/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/n/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/n/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/n/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/die/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/ne/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/ne/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/ne/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/ne/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/ne/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/ne/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/ne/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/die/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/nw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/nw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/nw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/nw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/nw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/nw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/nw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/die/s",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/s/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/s/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/s/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/s/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/s/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/s/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/s/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/die/se",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/se/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/se/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/se/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/se/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/se/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/se/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/se/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/die/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/sw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/sw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/sw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/sw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/sw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/sw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/sw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/die/w",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/w/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/w/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/w/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/w/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/w/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/w/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/w/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/idle/e",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/e/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/e/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/e/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/e/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/e/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/e/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/e/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/idle/n",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/n/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/n/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/n/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/n/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/n/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/n/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/n/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/idle/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/ne/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/ne/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/ne/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/ne/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/ne/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/ne/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/ne/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/idle/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/nw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/nw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/nw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/nw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/nw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/nw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/nw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/idle/s",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/s/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/s/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/s/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/s/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/s/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/s/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/s/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/idle/se",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/se/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/se/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/se/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/se/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/se/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/se/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/se/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/idle/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/sw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/sw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/sw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/sw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/sw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/sw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/sw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/idle/w",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/w/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/w/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/w/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/w/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/w/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/w/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/w/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/interact/e",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/e/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/e/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/e/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/e/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/e/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/e/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/e/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/interact/n",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/n/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/n/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/n/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/n/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/n/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/n/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/n/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/interact/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/ne/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/ne/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/ne/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/ne/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/ne/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/ne/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/ne/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/interact/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/nw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/nw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/nw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/nw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/nw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/nw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/nw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/interact/s",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/s/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/s/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/s/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/s/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/s/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/s/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/s/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/interact/se",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/se/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/se/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/se/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/se/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/se/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/se/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/se/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/interact/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/sw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/sw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/sw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/sw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/sw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/sw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/sw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/interact/w",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/w/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/w/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/w/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/w/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/w/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/w/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/w/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/swing/e",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/e/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/e/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/e/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/e/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/e/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/swing/n",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/n/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/n/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/n/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/n/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/n/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/swing/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/ne/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/ne/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/ne/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/ne/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/ne/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/swing/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/nw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/nw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/nw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/nw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/nw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/swing/s",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/s/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/s/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/s/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/s/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/s/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/swing/se",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/se/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/se/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/se/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/se/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/se/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/swing/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/sw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/sw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/sw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/sw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/sw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/swing/w",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/w/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/w/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/w/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/w/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/w/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagerlass/walk/e",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/e/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/e/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/e/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/e/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/e/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/e/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/e/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/walk/n",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/n/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/n/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/n/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/n/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/n/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/n/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/n/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/walk/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/ne/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/ne/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/ne/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/ne/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/ne/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/ne/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/ne/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/walk/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/nw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/nw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/nw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/nw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/nw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/nw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/nw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/walk/s",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/s/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/s/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/s/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/s/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/s/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/s/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/s/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/walk/se",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/se/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/se/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/se/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/se/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/se/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/se/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/se/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/walk/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/sw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/sw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/sw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/sw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/sw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/sw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/sw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagerlass/walk/w",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/w/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/w/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/w/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/w/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/w/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/w/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/w/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "blood/villagerlass/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/die/e",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/e/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/e/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/e/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/e/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/e/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/e/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/e/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/die/n",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/n/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/n/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/n/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/n/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/n/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/n/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/n/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/die/ne",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/ne/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/ne/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/ne/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/ne/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/ne/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/ne/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/ne/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/die/nw",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/nw/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/nw/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/nw/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/nw/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/nw/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/nw/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/nw/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/die/s",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/s/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/s/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/s/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/s/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/s/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/s/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/s/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/die/se",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/se/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/se/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/se/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/se/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/se/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/se/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/se/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/die/sw",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/sw/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/sw/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/sw/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/sw/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/sw/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/sw/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/sw/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/die/w",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/w/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/w/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/w/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/w/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/w/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/w/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/w/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/idle/e",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/e/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/e/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/e/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/e/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/e/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/e/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/e/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/idle/n",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/n/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/n/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/n/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/n/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/n/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/n/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/n/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/idle/ne",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/ne/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/ne/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/ne/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/ne/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/ne/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/ne/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/ne/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/idle/nw",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/nw/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/nw/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/nw/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/nw/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/nw/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/nw/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/nw/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/idle/s",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/s/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/s/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/s/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/s/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/s/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/s/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/s/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/idle/se",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/se/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/se/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/se/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/se/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/se/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/se/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/se/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/idle/sw",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/sw/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/sw/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/sw/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/sw/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/sw/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/sw/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/sw/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/idle/w",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/w/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/w/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/w/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/w/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/w/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/w/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/w/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/interact/e",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/e/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/e/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/e/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/e/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/e/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/e/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/e/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/interact/n",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/n/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/n/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/n/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/n/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/n/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/n/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/n/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/interact/ne",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/ne/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/ne/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/ne/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/ne/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/ne/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/ne/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/ne/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/interact/nw",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/nw/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/nw/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/nw/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/nw/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/nw/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/nw/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/nw/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/interact/s",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/s/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/s/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/s/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/s/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/s/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/s/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/s/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/interact/se",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/se/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/se/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/se/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/se/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/se/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/se/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/se/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/interact/sw",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/sw/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/sw/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/sw/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/sw/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/sw/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/sw/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/sw/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/interact/w",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/w/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/w/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/w/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/w/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/w/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/w/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/w/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/swing/e",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/e/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/e/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/e/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/e/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/e/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/swing/n",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/n/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/n/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/n/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/n/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/n/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/swing/ne",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/ne/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/ne/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/ne/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/ne/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/ne/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/swing/nw",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/nw/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/nw/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/nw/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/nw/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/nw/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/swing/s",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/s/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/s/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/s/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/s/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/s/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/swing/se",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/se/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/se/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/se/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/se/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/se/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/swing/sw",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/sw/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/sw/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/sw/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/sw/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/sw/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/swing/w",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/w/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/w/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/w/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/w/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/w/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagerlass/walk/e",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/e/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/e/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/e/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/e/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/e/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/e/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/e/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/walk/n",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/n/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/n/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/n/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/n/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/n/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/n/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/n/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/walk/ne",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/ne/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/ne/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/ne/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/ne/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/ne/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/ne/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/ne/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/walk/nw",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/nw/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/nw/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/nw/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/nw/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/nw/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/nw/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/nw/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/walk/s",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/s/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/s/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/s/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/s/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/s/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/s/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/s/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/walk/se",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/se/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/se/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/se/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/se/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/se/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/se/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/se/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/walk/sw",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/sw/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/sw/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/sw/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/sw/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/sw/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/sw/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/sw/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagerlass/walk/w",
+   "frames": [
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/w/000"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/w/001"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/w/002"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/w/003"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/w/004"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/w/005"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/w/006"
+    },
+    {
+     "key": "char_villagerlass",
+     "frame": "char/villagerlass/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/die/e",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/e/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/e/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/e/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/e/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/e/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/e/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/e/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/die/n",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/n/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/n/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/n/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/n/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/n/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/n/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/n/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/die/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/ne/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/ne/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/ne/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/ne/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/ne/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/ne/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/ne/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/die/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/nw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/nw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/nw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/nw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/nw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/nw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/nw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/die/s",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/s/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/s/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/s/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/s/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/s/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/s/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/s/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/die/se",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/se/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/se/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/se/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/se/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/se/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/se/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/se/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/die/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/sw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/sw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/sw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/sw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/sw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/sw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/sw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/die/w",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/w/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/w/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/w/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/w/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/w/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/w/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/w/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/idle/e",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/e/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/e/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/e/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/e/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/e/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/e/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/e/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/idle/n",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/n/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/n/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/n/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/n/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/n/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/n/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/n/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/idle/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/ne/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/ne/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/ne/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/ne/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/ne/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/ne/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/ne/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/idle/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/nw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/nw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/nw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/nw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/nw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/nw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/nw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/idle/s",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/s/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/s/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/s/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/s/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/s/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/s/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/s/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/idle/se",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/se/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/se/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/se/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/se/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/se/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/se/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/se/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/idle/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/sw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/sw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/sw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/sw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/sw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/sw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/sw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/idle/w",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/w/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/w/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/w/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/w/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/w/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/w/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/w/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/interact/e",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/e/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/e/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/e/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/e/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/e/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/e/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/e/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/interact/n",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/n/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/n/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/n/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/n/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/n/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/n/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/n/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/interact/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/ne/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/ne/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/ne/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/ne/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/ne/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/ne/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/ne/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/interact/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/nw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/nw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/nw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/nw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/nw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/nw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/nw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/interact/s",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/s/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/s/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/s/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/s/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/s/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/s/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/s/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/interact/se",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/se/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/se/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/se/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/se/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/se/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/se/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/se/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/interact/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/sw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/sw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/sw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/sw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/sw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/sw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/sw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/interact/w",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/w/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/w/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/w/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/w/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/w/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/w/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/w/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/swing/e",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/e/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/e/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/e/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/e/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/e/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/swing/n",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/n/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/n/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/n/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/n/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/n/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/swing/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/ne/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/ne/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/ne/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/ne/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/ne/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/swing/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/nw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/nw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/nw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/nw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/nw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/swing/s",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/s/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/s/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/s/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/s/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/s/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/swing/se",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/se/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/se/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/se/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/se/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/se/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/swing/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/sw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/sw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/sw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/sw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/sw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/swing/w",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/w/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/w/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/w/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/w/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/w/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagerlass/walk/e",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/e/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/e/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/e/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/e/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/e/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/e/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/e/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/walk/n",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/n/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/n/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/n/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/n/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/n/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/n/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/n/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/walk/ne",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/ne/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/ne/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/ne/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/ne/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/ne/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/ne/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/ne/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/walk/nw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/nw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/nw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/nw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/nw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/nw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/nw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/nw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/walk/s",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/s/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/s/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/s/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/s/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/s/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/s/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/s/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/walk/se",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/se/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/se/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/se/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/se/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/se/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/se/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/se/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/walk/sw",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/sw/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/sw/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/sw/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/sw/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/sw/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/sw/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/sw/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagerlass/walk/w",
+   "frames": [
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/w/000"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/w/001"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/w/002"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/w/003"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/w/004"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/w/005"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/w/006"
+    },
+    {
+     "key": "ovl_villagerlass",
+     "frame": "scarf/villagerlass/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  }
+ ]
+}
