@@ -5,6 +5,8 @@ import { runDebugStart } from '../rooms/handlers/movement';
 import { publishAvatars } from './Avatars';
 import { runDecay } from './Clues';
 import { runAuto } from './auto/Auto';
+// Round 8, 8E: before the vendettas, so `figureNotSeat` registers ahead of 7H's checks (their test pins them last).
+import { runTownsfolk } from './townsfolk/run';
 import { runEvents } from './events/bus';
 import { runEconomy } from './economy/run';
 import './tasks/invariants'; // round 7, 7M: the taskBar invariant's host (locked line, granted by 6Z; above 7H's so its four stay last)
@@ -50,6 +52,7 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   syncRoster(room);
   runAuto(room); // round 6, 6A: the auto commands, Start inside the step (locked call site)
   runNpcs(room); // M3c: NPC brains write their inputs and verbs (round 4, S)
+  runTownsfolk(room); // round 8, 8E: ambient figures' brains write their inputs (locked call site)
   applyInputs(room);
   moveAndCollide(room);
   publishAvatars(room); // round 5, 5F: presence onto avatars (locked call site)

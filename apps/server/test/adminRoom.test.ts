@@ -15,6 +15,7 @@ import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { createServer } from '../src/server';
 import { adminConfig, signAdminToken } from '../src/services/adminAuth';
 import { simOf } from '../src/sim/RoomSim';
+import { figuresOf } from '../src/sim/townsfolk/figures';
 import { emitSim } from '../src/sim/events/bus';
 import { autoOf } from '../src/sim/auto/Auto';
 import { clockOf } from '../src/sim/auto/clock';
@@ -155,14 +156,20 @@ describe('with the variables set', () => {
 
     const seats = new Set<string>();
     let avatars = 0;
+    let figures = 0;
     state.scenes.forEach((scene: SceneStateType) =>
       scene.avatars?.forEach((a) => {
+        if (!a.seat) {
+          figures++;
+          return;
+        } // round 8, 8E: an ambient figure (GDD 3.24) is no seat's
         avatars++;
         if (a.seat) seats.add(a.seat);
       }),
     );
     expect(avatars).toBeGreaterThan(0);
     expect(seats.size).toBe(avatars);
+    expect(figures).toBe(figuresOf(room).size); // round 8, 8E: the admin sees every ambient figure
     for (const seat of seats) expect(room.state.players.has(seat)).toBe(true);
     await admin.leave();
   });

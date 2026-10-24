@@ -68,6 +68,8 @@ const store = new WeakMap<Brain, Needs>();
 /** The idle a still seat shows this tick, by its sim; absent when its mood is Calm (or it is not an NPC). */
 const idles = new WeakMap<PlayerSim, number>();
 const wired = new WeakSet<PartyRoom>();
+/** The brains of the ambient townsfolk figures by figure id (`sim/townsfolk/`), so an event naming a figure finds its needs. */
+const figureBrains = new WeakMap<PartyRoom, Map<string, Brain>>();
 
 const clamp = (v: number): number => Math.min(1, Math.max(0, v));
 
@@ -91,11 +93,24 @@ export function needsOf(brain: Brain): Needs {
   return n;
 }
 
-/** The mood of an NPC seat, or null for a seat with no brain (a human, or one not yet ticked). */
-export function moodOf(room: PartyRoom, seat: string): Mood | null {
-  const brain = npcMemory(room).brains.get(seat);
-  const n = brain === undefined ? undefined : store.get(brain);
+/** The mood of an NPC seat or a townsfolk figure, or null for one with no brain (a human, or one not yet ticked). */
+export function moodOf(room: PartyRoom, id: string): Mood | null {
+  const n = needsById(room, id);
   return n?.mood ?? null;
+}
+
+/** The mood idle of a brain (a townsfolk figure's, `sim/townsfolk/`); undefined for the plain idle. */
+export function moodIdleFor(brain: Brain): number | undefined {
+  const n = store.get(brain);
+  return n === undefined ? undefined : (IDLE_OF[n.mood] ?? undefined);
+}
+
+/** `sim/townsfolk/`: a figure's brain answers to its id on the bus (`body.hit`, `rob`, `eat`, `eject`) until unbound. */
+export function bindFigureNeeds(room: PartyRoom, id: string, brain: Brain | null): void {
+  let brains = figureBrains.get(room);
+  if (!brains) figureBrains.set(room, (brains = new Map()));
+  if (brain === null) brains.delete(id);
+  else brains.set(id, brain);
 }
 
 /** The mood idle a still seat shows (the `publishPresence` line, `sim/Movement.ts`); undefined for the plain idle. */
@@ -144,7 +159,7 @@ const FAMISHED_EFFECT = 9;
 const INDEBTED_EFFECT = 11;
 
 /** Another living seat placed in the scene within day sight: company (and, for 8E's mugging, the end of being alone). */
-function hasCompany(room: PartyRoom, seat: string, p: PlayerSim): boolean {
+function hasCompany(room: PartyRoom, seat: string, p: { sceneIdx: number; x: number; y: number }): boolean {
   const reach = balance.vision.dayTiles * TILE_PX;
   for (const [id, o] of simOf(room).players) {
     if (id === seat || o.dead || !o.placed || o.sceneIdx !== p.sceneIdx) continue;
@@ -161,10 +176,10 @@ function chaserOf(room: PartyRoom, seat: string): string | null {
   return null;
 }
 
-/** The brain's needs by seat id, when that seat is an NPC that has ticked. */
-function needsBySeat(room: PartyRoom, seat: unknown): Needs | null {
-  if (typeof seat !== 'string') return null;
-  const brain = npcMemory(room).brains.get(seat);
+/** The needs behind an NPC seat id or a townsfolk figure id, when that brain has ticked. */
+function needsById(room: PartyRoom, id: unknown): Needs | null {
+  if (typeof id !== 'string') return null;
+  const brain = npcMemory(room).brains.get(id) ?? figureBrains.get(room)?.get(id);
   const n = brain === undefined ? undefined : store.get(brain);
   return n ?? null;
 }
@@ -192,32 +207,32 @@ function wire(room: PartyRoom): void {
   wired.add(room);
   const m = balance.moods;
   onSim(room, 'body.hit', (e: SimEvent) => {
-    const n = needsBySeat(room, e.data?.target);
+    const n = needsById(room, e.data?.target);
     if (!n) return;
     n.fear = clamp(n.fear + m.fear.struck);
     n.anger = clamp(n.anger + m.anger.struck);
     if (typeof e.data?.by === 'string') n.angryAt = e.data.by;
   });
   onSim(room, 'rob', (e: SimEvent) => {
-    const n = needsBySeat(room, e.data?.target);
+    const n = needsById(room, e.data?.target);
     if (!n) return;
     n.anger = clamp(n.anger + m.anger.robbed);
     if (typeof e.data?.by === 'string') n.angryAt = e.data.by;
   });
   const taxed = (e: SimEvent) => {
-    const n = needsBySeat(room, e.seat ?? e.data?.seat);
+    const n = needsById(room, e.seat ?? e.data?.seat);
     if (n) n.anger = clamp(n.anger + m.anger.taxed);
   };
   onSim(room, 'rent.paid', taxed);
   onSim(room, 'quota.met', taxed);
   onSim(room, 'purse', (e: SimEvent) => {
-    const n = needsBySeat(room, e.seat ?? e.data?.seat);
+    const n = needsById(room, e.seat ?? e.data?.seat);
     if (!n) return;
     if (e.data?.reason === 'wage') n.want = clamp(n.want - m.want.wage);
     else if (e.data?.reason === 'sale') n.want = clamp(n.want - m.want.sale);
   });
   onSim(room, 'eat', (e: SimEvent) => {
-    const n = needsBySeat(room, e.seat ?? e.data?.seat);
+    const n = needsById(room, e.seat ?? e.data?.seat);
     if (!n) return;
     n.hunger = clamp(n.hunger - m.hunger.mealRelief);
     n.anger = clamp(n.anger - m.anger.mealRelief);
@@ -231,7 +246,25 @@ function wire(room: PartyRoom): void {
       if (e.seat !== undefined && topSuspect(brain) === e.seat)
         n.anger = clamp(n.anger - m.anger.ejectionRelief);
     }
+    // The townsfolk hear of it too (a living figure keeps its binding; a dead one is unbound).
+    for (const brain of figureBrains.get(room)?.values() ?? []) {
+      const n = store.get(brain);
+      if (n) n.fear = clamp(n.fear + m.fear.ejection);
+    }
   });
+}
+
+/** Who a tick of needs is about: an NPC seat (`updateNeeds`) or a townsfolk figure (`sim/townsfolk/`). */
+export interface NeedSubject {
+  /** The seat id or the figure id (what the `mood` event names). */
+  id: string;
+  sceneIdx: number;
+  x: number;
+  y: number;
+  /** Standing in its home scene. */
+  home: boolean;
+  /** A burning light in hand (a figure carries none). */
+  light: boolean;
 }
 
 /**
@@ -239,20 +272,38 @@ function wire(room: PartyRoom): void {
  * by their rates, then the mood is settled and its idle recorded for `publishPresence`.
  */
 export function updateNeeds(room: PartyRoom, brain: Brain, seat: string): void {
-  wire(room);
   const p = simOf(room).players.get(seat);
   if (!p) return;
+  const scene = sceneKey(p.sceneIdx);
+  const idle = tickNeeds(room, brain, {
+    id: seat,
+    sceneIdx: p.sceneIdx,
+    x: p.x,
+    y: p.y,
+    home: brain.persona?.home === scene,
+    light: lightBurns(room, seat),
+  });
+  if (idle === undefined) idles.delete(p);
+  else idles.set(p, idle);
+}
+
+/**
+ * One tick of needs for `s` on `brain` (the seat hook above, and every townsfolk figure's tick): the rates, the
+ * mood, then the mood idle to show while still (undefined for the plain idle).
+ */
+export function tickNeeds(room: PartyRoom, brain: Brain, s: NeedSubject): number | undefined {
+  wire(room);
   const m = balance.moods;
   const n = needsOf(brain);
   const dt = 1 / TICK_RATE;
   const phase = room.state.phase;
-  const scene = sceneKey(p.sceneIdx);
-  const home = brain.persona?.home === scene;
+  const scene = sceneKey(s.sceneIdx);
+  const home = s.home;
   const lit = litAtNight(scene);
   const cls = phaseClassOf(phase);
 
   // Hunger: time without food, faster when Famished; a meal at home (the `eat` event is the Wake Loaf).
-  const rise = (dt / m.hunger.riseS) * (hasEffect(room, seat, FAMISHED_EFFECT) ? m.hunger.famishedMul : 1);
+  const rise = (dt / m.hunger.riseS) * (hasEffect(room, s.id, FAMISHED_EFFECT) ? m.hunger.famishedMul : 1);
   n.hunger = clamp(n.hunger + rise - (home ? dt / m.hunger.homeFallS : 0));
 
   // Fear: bodies seen (own ones too: card-blind), a creature's chase, the dark outdoors alone without a light; falls
@@ -262,12 +313,11 @@ export function updateNeeds(room: PartyRoom, brain: Brain, seat: string): void {
     n.fear = clamp(n.fear + m.fear.body * (bodies - n.bodiesSeen));
     n.bodiesSeen = bodies;
   }
-  const chaser = chaserOf(room, seat);
+  const chaser = chaserOf(room, s.id);
   if (chaser !== null && chaser !== n.chasedBy) n.fear = clamp(n.fear + m.fear.chase);
   n.chasedBy = chaser;
-  const company = hasCompany(room, seat, p);
-  if (cls === 'night' && !lit && !company && !lightBurns(room, seat))
-    n.fear = clamp(n.fear + dt / m.fear.darkRiseS);
+  const company = hasCompany(room, s.id, s);
+  if (cls === 'night' && !lit && !company && !s.light) n.fear = clamp(n.fear + dt / m.fear.darkRiseS);
   if (cls === 'day' || lit || home || company) n.fear = clamp(n.fear - dt / m.fear.fallS);
 
   // Anger cools with time; the events above heat it.
@@ -275,14 +325,12 @@ export function updateNeeds(room: PartyRoom, brain: Brain, seat: string): void {
   if (n.anger === 0) n.angryAt = null;
 
   // Want: a light purse and debt (8C's and 8D's rows, read when they exist); wages and sales relieve it.
-  const purse = purseOf(room, seat);
+  const purse = purseOf(room, s.id);
   if (purse !== null && purse < m.want.lightPurse) n.want = clamp(n.want + dt / m.want.lightRiseS);
-  if (hasEffect(room, seat, INDEBTED_EFFECT)) n.want = clamp(n.want + dt / m.want.debtRiseS);
+  if (hasEffect(room, s.id, INDEBTED_EFFECT)) n.want = clamp(n.want + dt / m.want.debtRiseS);
 
-  settleMood(room, seat, n);
-  const idle = IDLE_OF[n.mood];
-  if (idle === null) idles.delete(p);
-  else idles.set(p, idle);
+  settleMood(room, s.id, n);
+  return IDLE_OF[n.mood] ?? undefined;
 }
 
 /** The strongest need over the threshold, Desperate with `desperateNeeds` over it, Calm with none; held `moodHoldS`. */
