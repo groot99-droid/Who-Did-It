@@ -101,6 +101,14 @@ export const MinigameDef = z.strictObject({
   difficulty: z.number().int().min(1).max(5),
   /** Seconds before the Done control appears, as GDD 3.16 sets it. */
   assistS: Seconds,
+  /**
+   * How the widget draws its station (7M PR 5, A151 (3)): the station's own object and the pieces the hands move,
+   * one per step (the last repeats). Labels stand in for atlas frames; a skin changes no rule.
+   */
+  skin: z.strictObject({
+    station: z.string().min(1).max(16),
+    pieces: z.array(z.string().min(1).max(12)).min(1),
+  }),
 });
 export type MinigameDef = z.infer<typeof MinigameDef>;
 

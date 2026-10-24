@@ -4,6 +4,7 @@ import { fill } from '../../ui/copy';
 import { MINIGAME_COPY as C } from '../../ui/copy/minigames';
 import { h } from '../../ui/dom';
 import type { MiniGameFactory } from './registry';
+import { DEFAULT_SKINS } from './skin';
 import { ART_H, ART_W, box, COLORS, createStage, loop, type Rect } from './draw';
 
 const SPEC = balance.minigames.tap;
@@ -66,6 +67,7 @@ export class TapModel {
 
 export const tapGame: MiniGameFactory = (host) => {
   const model = new TapModel(host.rng, host.steps);
+  const skin = host.skin ?? DEFAULT_SKINS.tap;
   const stage = createStage(host.root);
   const hint = h(
     'p',
@@ -92,7 +94,7 @@ export const tapGame: MiniGameFactory = (host) => {
     const g = stage.ctx;
     g.fillStyle = COLORS.slate;
     g.fillRect(0, 0, ART_W, ART_H);
-    box(g, { x: 60, y: 8, w: 40, h: 28 }, COLORS.fog, 'station');
+    box(g, { x: 60, y: 8, w: 40, h: 28 }, COLORS.fog, skin.station);
     box(g, track, COLORS.bone);
     g.fillStyle = COLORS.teal;
     g.fillRect(track.x + track.w * model.band, track.y, track.w * model.bandFrac, track.h);

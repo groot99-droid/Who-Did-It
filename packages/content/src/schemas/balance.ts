@@ -420,6 +420,20 @@ export const BalanceFile = z.strictObject({
       /** When they fall: fractions of the discussion plus the vote time, from the discussion's first tick. */
       windowFrac: FracSpan,
     }),
+    /** The model's notes (GDD 3.25 "Talk"), only with the server key: a late answer gives the template line. */
+    model: z.strictObject({
+      /** A call not answered in this many seconds gives the template line. */
+      timeoutS: z.number().positive(),
+      /** Per match, at most this many calls and this many tokens, in and out; past either, templates only. */
+      callsPerMatch: z.number().int().nonnegative(),
+      tokensPerMatch: z.number().int().nonnegative(),
+      /** `max_tokens` of one call. */
+      maxTokens: z.number().int().positive(),
+      /** A line longer than this is thrown away for the template. */
+      maxChars: z.number().int().positive(),
+      /** The meeting so far, as the model reads it: the last this many lines. */
+      transcriptLines: z.number().int().positive(),
+    }),
   }),
 });
 export type BalanceFile = z.infer<typeof BalanceFile>;
