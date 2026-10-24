@@ -166,7 +166,9 @@ LOOKS: dict[str, dict] = {
         "interact": "kneel",
         "parts": ["hair_short", "plait", "jerkin", "belt", "ore_dust", "felt_hat", "candle", "pick"],
     },
-    # The plain base: review renders in round 5, placeholder only in the manifests (art plan 4.2).
+    # The villager family (round 8, townsfolk.md 2; looks.json `villagers`): the plain base and four variants
+    # the ambient townsfolk wear. Each reads by one silhouette change, carries no trade prop and no hat-trait
+    # shape, and keeps the scarf band clear. The plain base is also the seat's fallback body (SPRITES 10.13).
     "villager": {
         "skin": 3,
         "hair": ("wood", 3),
@@ -177,9 +179,67 @@ LOOKS: dict[str, dict] = {
         "interact": "waist",
         "parts": ["hair_short"],
     },
+    # The elder: bald with a bone fringe and whiskers, a long slate coat, bent over a stick.
+    "villagerelder": {
+        "skin": 2,
+        "hair": ("bone", 2),
+        "jacket": ("slate", 1),
+        "shirt": ("bone", 1),
+        "trousers": ("ink", 1),
+        "boots": ("ink", 0),
+        "coat": ("slate", 0),
+        "coat_hem": 0.50,
+        "belt": ("wood", 0),
+        "interact": "waist",
+        "parts": ["fringe", "whiskers", "long_coat", "belt", "stick"],
+    },
+    # The goodwife: a bonnet and a fog shawl over a long slate skirt, a basket on the arm.
+    "villagergoodwife": {
+        "skin": 3,
+        "hair": ("ink", 1),
+        "jacket": ("fog", 0),
+        "shirt": ("bone", 2),
+        "trousers": ("slate", 0),
+        "boots": ("ink", 0),
+        "coat": ("slate", 1),
+        "cape": ("fog", 1),
+        "hat": ("bone", 2),
+        "interact": "waist",
+        "parts": ["hair_bun", "shoulder_cape", "skirt_long", "hand_basket", "bonnet"],
+    },
+    # The lass: a kerchief over a plait, an apron over a fog skirt, a pail in hand.
+    "villagerlass": {
+        "skin": 4,
+        "hair": ("wood", 2),
+        "jacket": ("slate", 2),
+        "shirt": ("bone", 2),
+        "trousers": ("fog", 0),
+        "boots": ("wood", 1),
+        "coat": ("fog", 0),
+        "apron": ("bone", 1),
+        "hat": ("fog", 2),
+        "interact": "waist",
+        "parts": ["plait", "kerchief", "skirt_long", "apron_pockets", "pail"],
+    },
+    # The clerk (the Company Clerk, the Tallyman, a stallholder): shirt sleeves in garters, a slate waistcoat,
+    # spectacles, a ledger under the arm.
+    "villagerclerk": {
+        "skin": 1,
+        "hair": ("ink", 0),
+        "jacket": ("slate", 2),
+        "shirt": ("bone", 2),
+        "sleeve": ("bone", 2),
+        "waistcoat": ("slate", 1),
+        "trousers": ("ink", 1),
+        "boots": ("ink", 0),
+        "belt": ("ink", 0),
+        "interact": "waist",
+        "parts": ["hair_short", "spectacles", "waistcoat", "belt", "sleeve_garters", "ledger"],
+    },
 }
 
-WORLD_LOOKS: tuple[str, ...] = tuple(k for k in LOOKS if k != "villager")
+VILLAGERS: tuple[str, ...] = tuple(k for k in LOOKS if k.startswith("villager"))
+WORLD_LOOKS: tuple[str, ...] = tuple(k for k in LOOKS if k not in VILLAGERS)
 
 
 def skin_colour(tone: int) -> tuple[str, int]:

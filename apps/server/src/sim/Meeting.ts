@@ -11,6 +11,8 @@ import { onMeetingOpenDisguise } from './Impersonate';
 import { beginAim, holdReveal, onMeetingOpenNight } from './NightPowers';
 import { type MeetingRequest, simOf } from './RoomSim';
 import { evaluateWin, endMatch } from './Win';
+import { civicMeetingStart } from './economy/civic';
+import { FAITH_COPY, sealBlocks } from './economy/faith';
 
 /**
  * Everyone, living or dead, goes to the map's meeting spawns on the hub (`meetingSpawnsOf`) without a
@@ -75,6 +77,7 @@ export function openMeeting(room: PartyRoom, req: MeetingRequest): void {
   });
   setPhase(room, Phase.meetingDiscussion, countRow(state.players.size).discussionS);
   votesOpenTick.set(room, state.tick + Math.round(balance.meeting.minVoteS * TICK_RATE));
+  civicMeetingStart(room); // round 8, 8D: `sealShield(room)` and `gazette(room)` (locked hook, GDD 3.23)
 }
 
 /**
@@ -104,6 +107,7 @@ export function handleVote(room: PartyRoom, sessionId: string, payload: Record<s
     typeof target === 'string' &&
     (target === SKIP_VOTE ? balance.meeting.skipAllowed : isLiving(room, target));
   if (!ok) return refuse(room, sessionId, ErrorCode.cannot, 'no such candidate');
+  if (sealBlocks(room, target)) return refuse(room, sessionId, ErrorCode.cannot, FAITH_COPY.blocked); // Round 8, 8D
   voter.priv.myVote = target;
   voter.hasVoted = countsVote(room, sessionId); // round 7, 7H: a doubted Vicar's vote stays unseen (GDD 3.20)
   emitSim(room, { tick: room.state.tick, kind: 'vote', seat: sessionId, data: { target } }); // round 6, 6B

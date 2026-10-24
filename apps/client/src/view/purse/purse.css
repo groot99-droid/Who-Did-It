@@ -1,0 +1,27 @@
+/* The purse counter (UI.md 14.34.2, Session 8C): a pill in the HUD's top-left column, under the goal chip. 8H animates
+   the roll and the change by `wdi-anim-purse` and `[data-change]`. */
+.wdi-purse {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wdi-space-2);
+  min-height: var(--wdi-touch);
+  margin-top: var(--wdi-space-2);
+  padding: var(--wdi-space-1) var(--wdi-space-3);
+  font-family: var(--wdi-font-pixel-text);
+  font-size: var(--wdi-text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--wdi-warm);
+  background: var(--wdi-scrim);
+  border: var(--wdi-stroke-w) solid var(--wdi-stroke);
+  border-radius: var(--wdi-radius-pill);
+  box-shadow: inset 0 0 0 1px var(--wdi-hairline);
+}
+
+.wdi-purse[hidden],
+.wdi-purse__change[hidden] {
+  display: none;
+}
+
+.wdi-purse__change {
+  font-weight: 700;
+}
