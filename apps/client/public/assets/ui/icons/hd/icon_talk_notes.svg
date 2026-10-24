@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Meeting notes: a notebook page and its pencil. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g1" data-flat="#DCC4A1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0DEB3"/><stop offset="1" stop-color="#DCC4A1"/></linearGradient>
+  <linearGradient id="g2" data-flat="#F2B33D" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD48A"/><stop offset="1" stop-color="#F2B33D"/></linearGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<rect x="7" y="6" width="27" height="36" rx="2" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="12" cy="12" r="1.4" fill="#12141C"/>
+<circle cx="12" cy="24" r="1.4" fill="#12141C"/>
+<circle cx="12" cy="36" r="1.4" fill="#12141C"/>
+<line x1="17" y1="13" x2="29" y2="13" stroke="#12141C" stroke-width="2" stroke-linecap="round"/>
+<line x1="17" y1="20" x2="29" y2="20" stroke="#12141C" stroke-width="2" stroke-linecap="round"/>
+<line x1="17" y1="27" x2="23" y2="27" stroke="#12141C" stroke-width="2" stroke-linecap="round"/>
+<polygon points="36,12 42,18 27,33 21,35 23,29" fill="url(#g2)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="21,35 23,29 27,33" fill="#12141C"/>
+</svg>

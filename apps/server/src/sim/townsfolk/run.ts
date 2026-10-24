@@ -39,6 +39,7 @@ export function runTownsfolk(room: PartyRoom): void {
   if (phase === Phase.lobby) {
     if (memory.spawned) clearTownsfolk(room);
     clearMuggings(room);
+    portals.delete(room); // the next match may draw another profile or map
     return;
   }
   // The muggings first (GDD 3.24): a mugger figure is walked or held by `mug.ts`, not by its routine below; outside
@@ -92,12 +93,7 @@ function stepFigure(room: PartyRoom, f: Figure): void {
 
   // Another scene first: the first portal on the way, then through it.
   if (act.goal.scene !== here) {
-    const portal = firstPortalToward(
-      here,
-      simOf(room).profile,
-      (s) => s === act.goal.scene,
-      mapScenesOf(room),
-    );
+    const portal = portalToward(room, here, act.goal.scene);
     if (!portal) {
       f.act = null;
       return;
@@ -130,6 +126,20 @@ function stepFigure(room: PartyRoom, f: Figure): void {
       act.untilTick = tick + spanTicks(figureRng(room, f), t.idleS);
     }
   }
+}
+
+/** The first portal from one scene toward another, by room: the profile and the map are fixed for the match. */
+const portals = new WeakMap<PartyRoom, Map<string, Portal | null>>();
+function portalToward(room: PartyRoom, from: SceneId, to: SceneId): Portal | null {
+  let byRoute = portals.get(room);
+  if (!byRoute) portals.set(room, (byRoute = new Map()));
+  const key = `${from}>${to}`;
+  let portal = byRoute.get(key);
+  if (portal === undefined) {
+    portal = firstPortalToward(from, simOf(room).profile, (s) => s === to, mapScenesOf(room));
+    byRoute.set(key, portal);
+  }
+  return portal;
 }
 
 /** The next station of the route: a fixed figure's one prop, the named loop in order, a villager's favourites. */

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Slowed: a snail creeping along, its shell on its back. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g1" data-flat="#DCC4A1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0DEB3"/><stop offset="1" stop-color="#DCC4A1"/></linearGradient>
+  <radialGradient id="g2" data-flat="#94603F" gradientUnits="userSpaceOnUse" cx="24" cy="20" r="15"><stop offset="0" stop-color="#B57F54"/><stop offset="1" stop-color="#94603F"/></radialGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<path d="M7,39 C6,31 10,26 15,29 L38,34 C43,35 44,39 40,40 L9,40 C8,40 7,40 7,39 Z" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="11" y1="29" x2="8" y2="19" stroke="#12141C" stroke-width="2" stroke-linecap="round"/>
+<line x1="15" y1="29" x2="16" y2="18" stroke="#12141C" stroke-width="2" stroke-linecap="round"/>
+<circle cx="8" cy="18" r="2.2" fill="#12141C"/>
+<circle cx="16" cy="17" r="2.2" fill="#12141C"/>
+<circle cx="28" cy="25" r="11" fill="url(#g2)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M28,25 A2,2 0 0 1 32,25 A4,4 0 0 1 24,25 A6,6 0 0 1 36,25 A8,8 0 0 1 20,25" fill="none" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse class="hd" cx="23" cy="18" rx="2.6" ry="1.4" fill="#FFF1DC" opacity="0.7"/>
+</svg>

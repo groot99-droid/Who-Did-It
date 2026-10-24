@@ -4,6 +4,7 @@ import type { ChatLine, MeetingStart, VoteResult } from '../net/meeting';
 import { SKIP } from '../net/meeting';
 import { fill } from './copy';
 import { MEETING_COPY as C } from './copy/meeting';
+import { NOTES_COPY } from './copy/notes';
 import { roleTitle } from './RoleCard';
 
 // The meeting and game-over lines. Wording lives in `copy/meeting.ts` (docs/UI.md 14); these functions pick
@@ -36,6 +37,7 @@ export function reasonLine(start: MeetingStart | null, nameOf: NameOf): string {
       ? fill(C['meeting.reason.bodyUnknown'], { caller })
       : fill(C['meeting.reason.body'], { caller, victim: nameOf(start.bodyOf) });
   }
+  if (start.reason === 'final') return NOTES_COPY['meeting.reason.final']; // round 8, 8T (6Z's grant): GDD 3.2 Final Night
   return C['meeting.reason.missing'];
 }
 

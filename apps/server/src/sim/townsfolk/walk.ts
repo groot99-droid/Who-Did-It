@@ -5,9 +5,6 @@ import { simOf } from '../RoomSim';
 import { navGrid, sceneKey, tileCentre } from '../World';
 import type { Figure } from './figures';
 
-/** A path is rebuilt from where the figure stands at least this often. */
-const REPLAN_TICKS = TICK_RATE;
-
 export type WalkResult = 'arrived' | 'walking' | 'stuck';
 
 /**
@@ -22,8 +19,10 @@ export function walkFigure(room: PartyRoom, f: Figure, tx: number, ty: number, r
   const here = { x: Math.floor(f.x / TILE_PX), y: Math.floor(f.y / TILE_PX) };
   const key = `${f.sceneIdx}:${Math.round(tx)}:${Math.round(ty)}`;
   let plan = f.brain.path;
-  const onPlan = plan?.tiles.some((t) => t.x === here.x && t.y === here.y) ?? false;
-  if (!plan || plan.key !== key || !onPlan || tick - plan.bornTick >= REPLAN_TICKS) {
+  let at = plan?.tiles.findIndex((t) => t.x === here.x && t.y === here.y) ?? -1;
+  // A figure is never collided and its scene's grid never changes: a path holds until its goal changes or the
+  // figure steps off it.
+  if (!plan || plan.key !== key || at < 0) {
     const tiles = tilePath(
       grid.w,
       grid.h,
@@ -35,10 +34,9 @@ export function walkFigure(room: PartyRoom, f: Figure, tx: number, ty: number, r
     );
     plan = tiles ? { key, scene: f.sceneIdx, bornTick: tick, tiles } : null;
     f.brain.path = plan;
+    at = Math.max(0, plan?.tiles.findIndex((t) => t.x === here.x && t.y === here.y) ?? 0);
   }
   if (!plan) return 'stuck';
-  let at = plan.tiles.findIndex((t) => t.x === here.x && t.y === here.y);
-  if (at < 0) at = 0;
   const next = plan.tiles[at + 1];
   const aim = next ? { x: tileCentre(next.x, TILE_PX), y: tileCentre(next.y, TILE_PX) } : { x: tx, y: ty };
   const dx = aim.x - f.x;

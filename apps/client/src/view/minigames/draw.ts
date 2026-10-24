@@ -23,6 +23,11 @@ export function createStage(root: HTMLElement): Stage {
   canvas.style.width = `${ART_W * SCALE}px`;
   canvas.style.maxWidth = '100%';
   canvas.style.imageRendering = 'pixelated';
+  // Touch (UI.md 14.19.6, the teardown's phone check): a drag on the board never scrolls or zooms the page, and a
+  // long press neither selects nor opens the callout.
+  canvas.style.touchAction = 'none';
+  canvas.style.userSelect = 'none';
+  canvas.style.setProperty('-webkit-touch-callout', 'none');
   const ctx = canvas.getContext('2d');
   if (ctx === null) throw new Error('2d canvas unavailable');
   root.append(canvas);

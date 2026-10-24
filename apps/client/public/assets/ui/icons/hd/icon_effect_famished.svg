@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Famished: an empty bowl, the spoon left in it. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g1" data-flat="#744733" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#94603F"/><stop offset="1" stop-color="#744733"/></linearGradient>
+  <linearGradient id="g2" data-flat="#A6AEBA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C3EAF2"/><stop offset="1" stop-color="#A6AEBA"/></linearGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<rect x="16" y="35" width="16" height="6" rx="1.5" fill="#55332A" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M6,24 L42,24 A18,14 0 0 1 6,24 Z" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse cx="24" cy="24" rx="18" ry="5" fill="#3A231F" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="28,24 32.5,26.5 45,11 41,7.5" fill="url(#g2)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse class="hd" cx="14" cy="30" rx="3" ry="1.4" fill="#FFF1DC" opacity="0.5"/>
+</svg>

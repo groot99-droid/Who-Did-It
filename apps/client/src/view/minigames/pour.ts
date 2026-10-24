@@ -2,6 +2,7 @@ import balance from '@wdi/content/data/balance.json';
 import { MINIGAME_COPY as C } from '../../ui/copy/minigames';
 import { h } from '../../ui/dom';
 import type { MiniGameFactory } from './registry';
+import { DEFAULT_SKINS, pieceAt } from './skin';
 import { ART_W, box, COLORS, createStage, loop } from './draw';
 
 const SPEC = balance.minigames.pour;
@@ -75,6 +76,7 @@ export class PourModel {
 
 export const pourGame: MiniGameFactory = (host) => {
   const model = new PourModel(host.rng, host.steps);
+  const skin = host.skin ?? DEFAULT_SKINS.pour;
   const stage = createStage(host.root);
   const hint = h('p', { class: 'wdi-hint', 'data-testid': 'minigame-pour-hint' }, C['minigame.pour.hint']);
   const hold = h(
@@ -90,7 +92,7 @@ export const pourGame: MiniGameFactory = (host) => {
     const g = stage.ctx;
     g.fillStyle = COLORS.slate;
     g.fillRect(0, 0, ART_W, 100);
-    box(g, bowl, COLORS.fog);
+    box(g, bowl, COLORS.fog, skin.station);
     const fillColor = model.step === 0 ? COLORS.bone : COLORS.moon;
     g.fillStyle = fillColor;
     g.fillRect(
@@ -103,7 +105,9 @@ export const pourGame: MiniGameFactory = (host) => {
     g.fillStyle = COLORS.mustard;
     g.fillRect(bowl.x - 4, bandY, bowl.w + 8, (bowl.h - 4) * model.bandFrac);
     g.fillStyle = COLORS.ink;
-    g.fillText(model.step === 0 ? C['minigame.pour.flour'] : C['minigame.pour.water'], 4, 10);
+    // Its own size: the station's label just set the box's small one.
+    g.font = '10px sans-serif';
+    g.fillText(pieceAt(skin, model.step), 4, 10);
   };
 
   const press = (e: Event) => {
@@ -128,6 +132,8 @@ export const pourGame: MiniGameFactory = (host) => {
     el.addEventListener('pointerdown', press);
     el.addEventListener('pointerup', release);
     el.addEventListener('pointerleave', release);
+    // A touch the browser takes back ends the pour, as a lifted finger does; a held pour would run on to a spill.
+    el.addEventListener('pointercancel', release);
   }
   const halt = loop((dt) => {
     if (model.tick(dt) === 'spilled') say(C['minigame.pour.spilled']);

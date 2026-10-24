@@ -3,6 +3,7 @@ import { fill } from '../../ui/copy';
 import { MINIGAME_COPY as C } from '../../ui/copy/minigames';
 import { h } from '../../ui/dom';
 import type { MiniGameFactory } from './registry';
+import { DEFAULT_SKINS, pieceAt } from './skin';
 import { box, COLORS, createStage, loop, type Rect } from './draw';
 
 const SPEC = balance.minigames.stoke;
@@ -54,6 +55,7 @@ export class StokeModel {
 
 export const stokeGame: MiniGameFactory = (host) => {
   const model = new StokeModel(host.rng, undefined, undefined, undefined, host.holdS);
+  const skin = host.skin ?? DEFAULT_SKINS.stoke;
   const stage = createStage(host.root);
   const hint = h(
     'p',
@@ -64,7 +66,7 @@ export const stokeGame: MiniGameFactory = (host) => {
   const tap = h(
     'button',
     { type: 'button', class: 'wdi-btn wdi-btn--primary', 'data-testid': 'minigame-stoke-tap' },
-    C['minigame.stoke.tap'],
+    fill(C['minigame.stoke.tap'], { piece: pieceAt(skin, 0) }),
   );
   host.root.append(hint, progress, tap);
   const gauge: Rect = { x: 70, y: 10, w: 20, h: 80 };
@@ -73,7 +75,7 @@ export const stokeGame: MiniGameFactory = (host) => {
     const g = stage.ctx;
     g.fillStyle = COLORS.slate;
     g.fillRect(0, 0, 160, 100);
-    box(g, { x: 8, y: 30, w: 50, h: 50 }, COLORS.blood, 'oven');
+    box(g, { x: 8, y: 30, w: 50, h: 50 }, COLORS.blood, skin.station);
     box(g, gauge, COLORS.bone);
     g.fillStyle = model.inBand ? COLORS.teal : COLORS.mustard;
     g.fillRect(
