@@ -13,6 +13,8 @@ import { type PlayerSim, simOf } from './RoomSim';
 import { isVerbPhase, reject, sceneKey } from './World';
 import { handleCraft, tickCraft } from './Craft';
 import { handleTaskHold } from './Minigames';
+import { handleBankHold } from './economy/bank';
+import { handleShopHold } from './economy/shops';
 import { handleGather, tickGather } from './Resources';
 import { handleCivicHold, isCivicHold, tickCivicHold } from './economy/holds';
 
@@ -66,6 +68,15 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
   // Round 6 (6H): a station task's hold opens its mini-game (GDD 3.16); the answer arrives as `minigame.result`.
   if (action === 'task' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
     handleTaskHold(room, sessionId, targetId);
+    return;
+  }
+  // Round 8, 8C (locked; GDD 3.23): a `shop` or `bank` hold opens that counter for `act.buy`, `act.sell`, `act.bank`.
+  if (action === 'shop' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
+    handleShopHold(room, sessionId, targetId);
+    return;
+  }
+  if (action === 'bank' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
+    handleBankHold(room, sessionId, targetId);
     return;
   }
   if (isCivicHold(action)) return handleCivicHold(room, sessionId, action, targetId); // round 8, 8D (GDD 3.23)

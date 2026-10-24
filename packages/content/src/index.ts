@@ -27,7 +27,6 @@ import relationsJson from '../data/relations.json' with { type: 'json' };
 import evolutionsJson from '../data/evolutions.json' with { type: 'json' };
 import lawsJson from '../data/laws.json' with { type: 'json' };
 import eventsJson from '../data/events.json' with { type: 'json' };
-// Round 8 (GDD 3.23): Book IV's numbers.
 import economyJson from '../data/economy.json' with { type: 'json' };
 import overworldJson from '../data/scenes/overworld.json' with { type: 'json' };
 import tavernBarJson from '../data/scenes/tavern_bar.json' with { type: 'json' };
