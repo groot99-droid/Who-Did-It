@@ -60,3 +60,107 @@ export function refusedIn(root: { querySelector(sel: string): MotionTarget | nul
   const el = root.querySelector(PRESSED);
   if (el) refused(el);
 }
+
+/** What bodyMotion reads from 8A's body panel each time it redraws: the health meter and the chips' effects. */
+export interface BodyFrame {
+  hp: number;
+  effects: readonly string[];
+}
+
+/** What changed between two frames of the body panel: a hit landed, effects arrived, effects were cured. */
+export interface BodyChange {
+  hit: boolean;
+  fresh: string[];
+  cured: string[];
+}
+
+/** Compares two frames. The first frame (prev null) changes nothing, so a panel that mounts mid-game is quiet. */
+export function bodyChange(prev: BodyFrame | null, next: BodyFrame): BodyChange {
+  if (prev === null) return { hit: false, fresh: [], cured: [] };
+  return {
+    hit: next.hp < prev.hp,
+    fresh: next.effects.filter((e) => !prev.effects.includes(e)),
+    cured: prev.effects.filter((e) => !next.effects.includes(e)),
+  };
+}
+
+export const BODY_FX = { hit: 'wdi-fx-hit', fresh: 'is-fresh', cured: 'is-cured' } as const;
+
+/** How long a new chip is tracked across the panel's redraws: longer than any pulse token, so the pulse ends first. */
+const FRESH_MS = 3000;
+
+/**
+ * The body panel's one-shot motion (round 8, 8H; UI.md 9): 8A's BodyHud redraws its chips every second, so CSS
+ * alone cannot tell a new hit or a new effect from a redraw. This watches the panel's DOM and only adds classes:
+ * the health bar flashes on a hit, a new chip pulses, and a cured chip leaves a copy that fades out (the next
+ * redraw clears it). It reads no game state beyond what the panel shows. Returns a function that stops it.
+ */
+export function bodyMotion(root: HTMLElement): () => void {
+  const meter = (): HTMLElement | null => root.querySelector('.wdi-body__bar--health');
+  const chip = (key: string): HTMLElement | null =>
+    root.querySelector(`.wdi-body__chip[data-effect="${key}"]`);
+  const frame = (): BodyFrame => ({
+    hp: Number(meter()?.getAttribute('aria-valuenow') ?? 0),
+    effects: [...root.querySelectorAll<HTMLElement>('.wdi-body__chip:not(.is-cured)')].map(
+      (el) => el.dataset.effect ?? '',
+    ),
+  });
+  let prev: BodyFrame | null = root.hidden ? null : frame();
+  // A pulse outlives the one-second redraw that would drop it: the class is put back on each redraw until it ends.
+  const fresh = new Map<string, number>();
+  const texts = new Map<string, string>();
+  const observer = new MutationObserver(() => {
+    if (root.hidden) {
+      prev = null;
+      return;
+    }
+    const next = frame();
+    const change = bodyChange(prev, next);
+    prev = next;
+    const now = performance.now();
+    if (change.hit) {
+      const bar = meter();
+      if (bar) replay(bar, BODY_FX.hit);
+    }
+    for (const key of change.fresh) fresh.set(key, now);
+    for (const [key, since] of fresh) {
+      const el = chip(key);
+      if (now - since > FRESH_MS || !el) {
+        fresh.delete(key);
+        continue;
+      }
+      // A redraw makes a new chip: start its pulse where the last one was, so it plays once.
+      el.style.animationDelay = `${-Math.round(now - since)}ms`;
+      el.classList.add(BODY_FX.fresh);
+    }
+    const list = root.querySelector<HTMLElement>('.wdi-body__effects');
+    for (const key of change.cured) {
+      if (!list) break;
+      const ghost = document.createElement('li');
+      ghost.className = `wdi-body__chip wdi-body__chip--${key} ${BODY_FX.cured}`;
+      ghost.dataset.effect = key;
+      ghost.textContent = texts.get(key) ?? '';
+      ghost.setAttribute('aria-hidden', 'true');
+      list.hidden = false;
+      list.append(ghost);
+      ghost.addEventListener(
+        'animationend',
+        () => {
+          ghost.remove();
+          if (list.childElementCount === 0) list.hidden = true;
+        },
+        { once: true },
+      );
+    }
+    // Each chip's text, so a cured chip's copy reads the same as the chip did.
+    for (const el of root.querySelectorAll<HTMLElement>('.wdi-body__chip:not(.is-cured)'))
+      texts.set(el.dataset.effect ?? '', el.textContent ?? '');
+  });
+  observer.observe(root, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: ['aria-valuenow', 'hidden'],
+  });
+  return () => observer.disconnect();
+}

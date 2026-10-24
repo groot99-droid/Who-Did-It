@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { cooldown, flash, FX, refused, refusedIn, type MotionTarget } from './motion';
+import { BODY_FX, bodyChange, cooldown, flash, FX, refused, refusedIn, type MotionTarget } from './motion';
 
 // Round 8 (8H, docs/UI.md 9): the interface's motion reads tokens only, and every duration or distance token
 // has its zero under prefers-reduced-motion, so a rule written against the tokens needs no reduced twin.
@@ -136,5 +136,49 @@ describe('economy HUD motion (8H step 5)', () => {
     expect(hud).toMatch(/dataset\.change = .*'gain' : 'loss'/);
     for (const sel of ['.wdi-anim-purse[data-change]', "[data-change='gain']", "[data-change='loss']"])
       expect(block8h()).toContain(sel);
+  });
+});
+
+describe('body HUD motion (8H step 5)', () => {
+  const hud = readFileSync(join(THEME, '..', '..', 'view', 'body', 'BodyHud.ts'), 'utf8');
+
+  it('stays quiet on the first frame, then sees a hit, new effects and cures', () => {
+    expect(bodyChange(null, { hp: 3, effects: ['bleeding'] })).toEqual({ hit: false, fresh: [], cured: [] });
+    const prev = { hp: 5, effects: ['bleeding', 'dazed'] };
+    expect(bodyChange(prev, { hp: 4, effects: ['dazed', 'wounded'] })).toEqual({
+      hit: true,
+      fresh: ['wounded'],
+      cured: ['bleeding'],
+    });
+    expect(bodyChange(prev, { hp: 6, effects: prev.effects }).hit).toBe(false);
+  });
+
+  it("reads 8A's panel hooks: the state classes, the chips' data-effect and the health meter", () => {
+    for (const hook of [
+      "'is-wounded'",
+      "'is-down'",
+      "'is-fatigued'",
+      "'data-effect'",
+      'wdi-body__chip--',
+      "'aria-valuenow'",
+    ])
+      expect(hud).toContain(hook);
+    expect(hud).toContain('wdi-body__bar--${kind}');
+  });
+
+  it('draws every body hook in the 8H block', () => {
+    const css = block8h();
+    for (const sel of [
+      '.wdi-body__fill',
+      `.wdi-body__bar--health.${BODY_FX.hit}`,
+      `.wdi-body__chip.${BODY_FX.fresh}`,
+      `.wdi-body__chip.${BODY_FX.cured}`,
+      '.wdi-body.is-wounded',
+      '.wdi-body.is-down',
+      '.wdi-body.is-fatigued',
+      '.wdi-body__chip--bleeding',
+      '.wdi-body__chip--dazed',
+    ])
+      expect(css, sel).toContain(sel);
   });
 });
