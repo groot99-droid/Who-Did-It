@@ -1,14 +1,19 @@
+import { economy } from '@wdi/content';
 import { ErrorCode, Phase } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { emitSim } from '../events/bus';
 import { simOf } from '../RoomSim';
 import { isVerbPhase, reject } from '../World';
+import { spendIndulgence } from './faith';
+import { perkMul } from './perks';
+import { TOWN, movePurse } from './purse';
+import { nearProp } from './reach';
 import { dropNotice, ledgerOf, noticeLine, systemLine } from './rumours';
 
 /**
  * `act.notice {itemId, op}` (round 8, GDD 3.23), Session 8D: a Blackmail Notice is shown at a meeting (a public
- * line), burnt, or fenced at the black market (with the purse). `itemId` is the notice's Notebook entry id. A seat
- * never burns a notice that names its own look: only an Indulgence cleanses its own name.
+ * line), burnt, or fenced at the black market for Scrip. `itemId` is the notice's Notebook entry id. A seat
+ * burns a notice that names its own look only by spending an Indulgence.
  */
 
 const isMeeting = (phase: number) => phase === Phase.meetingDiscussion || phase === Phase.meetingVote;
@@ -37,11 +42,18 @@ export function handleNotice(room: PartyRoom, seat: string, payload: Record<stri
   }
   if (op === 'burn') {
     if (!isVerbPhase(phase) && !isMeeting(phase)) return reject(room, seat, ErrorCode.wrongPhase, 'not now');
-    if (notice.look === player.look) return reject(room, seat, ErrorCode.cannot, NOTICE_COPY.ownName);
+    if (notice.look === player.look && !spendIndulgence(room, seat))
+      return reject(room, seat, ErrorCode.cannot, NOTICE_COPY.ownName);
     dropNotice(room, itemId);
     emitSim(room, { tick: room.state.tick, kind: 'notice.burnt', seat, data: { noticeId: itemId } });
     return;
   }
-  // `fence` waits for the purse (8C's `movePurse`).
-  reject(room, seat, ErrorCode.cannot, 'cannot do that');
+  if (op !== 'fence') return;
+  if (!isVerbPhase(phase)) return reject(room, seat, ErrorCode.wrongPhase, 'not now');
+  if (!nearProp(room, seat, economy.notices.blackMarkets))
+    return reject(room, seat, ErrorCode.outOfRange, 'no buyer here');
+  dropNotice(room, itemId);
+  const price = Math.round(economy.notices.fencePrice * perkMul(room, seat, 'fenceGain'));
+  movePurse(room, TOWN, seat, price, 'fence');
+  emitSim(room, { tick: room.state.tick, kind: 'notice.fenced', seat, data: { noticeId: itemId } });
 }
