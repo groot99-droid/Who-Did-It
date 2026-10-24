@@ -1179,17 +1179,17 @@ Session 7G, round 7 (DECISIONS A111). The owner's admin page (14.23) wears the t
 
 Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaGoal(id)`). The role card (`ui/RoleCard.ts`, 7F renders it) reads `Private.vendetta` (GDD 3.20): a Killer's own vendetta id, or for the Accomplice the ids of the Killers it knows, joined by commas. An empty value shows no line. No other seat's card, no world label and no toast names a vendetta; the doubted Vicar's note is its own.
 
-| Key | Text | Where |
-|---|---|---|
-| `vendetta.label` | Vendetta | the heading of the goal line on a Killer's card |
-| `vendetta.goal.zealot` | Zealot: stay near the Vicar until doubt takes the flock. | a Killer holding conversion |
-| `vendetta.goal.activist` | Activist: tamper with two of the company’s work stations. | a Killer holding sabotage |
-| `vendetta.goal.bandit` | Bandit: crack the manor’s strongbox after dark, alone. | a Killer holding heist |
-| `vendetta.goal.hitman` | Hitman: the Train brings you a contract. Take only its mark. | a Killer holding contract |
-| `vendetta.mate` | Your Killer’s vendetta: {goal} | the Accomplice's card, once per Killer it knows; `{goal}` is that Killer's goal line |
-| `vendetta.note.doubt` | Doubt took the flock: your vote did not carry. | the Vicar's own Notebook entry of kind `NoteKind.doubt`, written at the reveal of the doubted meeting |
-| `vendetta.note.contract` | The mail brought a contract: {name}. | the Hitman's own Notebook entry of kind `NoteKind.contract` (`of` the target seat, `{name}` its seat name), written at the first Train arrival |
-| `vendetta.contract.accept` | Accept | the button on that contract entry while the offer is open (no `contract` quest yet, the mark on the roster); it sends `quest.accept { questId: 'contract' }` |
+| Key                        | Text                                                         |
+| -------------------------- | ------------------------------------------------------------ |
+| `vendetta.label`           | Vendetta                                                     |
+| `vendetta.goal.zealot`     | Zealot: stay near the Vicar until doubt takes the flock.     |
+| `vendetta.goal.activist`   | Activist: tamper with two of the company’s work stations.    |
+| `vendetta.goal.bandit`     | Bandit: crack the manor’s strongbox after dark, alone.       |
+| `vendetta.goal.hitman`     | Hitman: the Train brings you a contract. Take only its mark. |
+| `vendetta.mate`            | Your Killer’s vendetta: {goal}                               |
+| `vendetta.note.doubt`      | Doubt took the flock: your vote did not carry.               |
+| `vendetta.note.contract`   | The mail brought a contract: {name}.                         |
+| `vendetta.contract.accept` | Accept                                                       |
 
 ### 14.33 Inspect (8B)
 
@@ -1281,6 +1281,8 @@ Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt 
 
 **Chores (K).** `ui/Chores.ts mountChores`, the QuestLog's panel pattern and classes (`wdi-m5b__panel/row/done/empty`), fourth button of the layer's key row. One row per dealt task in deal order: the name, then `chores.fetch` "Fetch the {tool} from {scene}", `chores.bring` "Bring it to {scene}", `chores.go` "Go to {scene}" for a task without a tool, `chores.night` "After dark." under a `nightOnly` one, `chores.done` "Done" (name struck through). A fake list shows the same rows under the hint `chores.show` "A show of work": the list is `Private.tasks`, so only its holder sees that line. `chores.none` "No chores on your list." for a seat dealt none (an NPC seat, or Blackpine). Escape closes it with the other panels. Testids `chores`, `chores-list`, `chores-show`, `chores-empty`, `chore-<taskId>` (with `data-step` fetch, bring or done), `chores-close`.
 
+**The co-op hold (GDD 3.5 "Shutter the windows").** `taskSpots` also offers every `coop` task's prop in the scene to every seat, with the task on its list or not, within `coopRadiusTiles` of it rather than the station reach (`nearest` honours a spot's own `reach`); its prompt is `prompt.task.coop` "Hold E: {name} (takes {n})". Holding E (or tapping the prompt) sends the `task` hold and keeps it, like a gather: the prompt turns to `prompt.task.coop.wait` "Waiting for hands: {holders} of {n}" or `prompt.task.coop.hold` "Keep holding: {holders} of {n}" from the server's `coopHold` (`WorldFeedEvents.coopHold`), and the prompt's bar is that shared progress, not a local clock. Letting go (the release, the prompt again, or walking off) sends `on: false` and says `toast.task.coop.cancel` "You let go."; `coopHold` at progress 1 ends the hold with `toast.task.coop.done` "Done, together.", whatever the seat's list said. The chores panel shows the task with `chores.coop` "Takes {n} hands, at {scene}" (`data-step` coop). The mock (`?mock=1`) plays the hold with a phantom second hand that joins after a second.
+
 **The village's work.** `mountWorkBar`: the public task bar (`GameState.taskBar`, `WorldFeed.taskBar()`) as a thin meter with its percentage under the clock, `role="progressbar"` with `aria-valuenow`, title and label `work.title` "The village's work", `work.pct` "{pct}%". Its fill moves in 300 ms, none under reduced motion. Testids `work`, `work-pct`.
 
 **Ghosts.** GDD 3.8 lets a ghost finish its own tasks, so the layer stays up for a dead seat with `data-ghost` on its root: only task spots are picked, the pockets, crafting and quests buttons hide and their panels close, and no gather or craft can start. The chores panel and the bar remain.
@@ -1295,6 +1297,11 @@ Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt 
 | `prompt.task.night` | Only at night: {name}            |
 | `toast.task.took`   | Took the {tool}.                 |
 | `toast.task.show`   | You make a show of it.           |
+| `prompt.task.coop`  | Hold E: {name} (takes {n})       |
+| `prompt.task.coop.wait` | Waiting for hands: {holders} of {n} |
+| `prompt.task.coop.hold` | Keep holding: {holders} of {n} |
+| `toast.task.coop.done` | Done, together.               |
+| `toast.task.coop.cancel` | You let go.                 |
 | `chores.title`      | Chores                           |
 | `chores.key`        | K                                |
 | `chores.none`       | No chores on your list.          |
@@ -1302,8 +1309,25 @@ Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt 
 | `chores.fetch`      | Fetch the {tool} from {scene}    |
 | `chores.bring`      | Bring it to {scene}              |
 | `chores.go`         | Go to {scene}                    |
+| `chores.coop`       | Takes {n} hands, at {scene}      |
 | `chores.night`      | After dark.                      |
 | `chores.done`       | Done                             |
 | `chores.close`      | Close                            |
 | `work.title`        | The village's work               |
 | `work.pct`          | {pct}%                           |
+
+### 14.40 Meeting notes (8T)
+
+Lines are in `apps/client/src/ui/copy/notes.ts` (`NOTES_COPY`); the tab is `ui/meetingNotes.ts` (GDD 3.8 "Meeting
+notes"). A note carries no speaker, so the tab shows only its text, and no line here names a seat. The named chat log
+leaves `notes` lines out. A refused note (too soon, past the cap) is the usual refusal toast of 14.3.
+
+| Key | Text | Where |
+|---|---|---|
+| `meeting.tab.notes` | Notes | the meeting tab beside Report, Chat and Notebook |
+| `notes.title` | Meeting notes | the tab's accessible label |
+| `notes.hint` | Notes carry no name. Anyone at the table may have written one. | above the notes |
+| `notes.placeholder` | Leave a note | the field, a living seat |
+| `notes.send` | Pin the note | the send button's label |
+| `notes.empty` | No notes yet | the list, before the first note |
+| `notes.ghost` | The dead leave no notes | the field, disabled, for a ghost |

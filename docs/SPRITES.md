@@ -128,11 +128,18 @@ manifest.json` (generated placeholders) have the same keys; `?art=placeholder` p
 
 **Art styles (A79).** The real art ships in each style of `style.json` `artStyles`. The 8-bit style is
 `assets/manifest.json` (`"art": "real"`). The low-poly style is `assets/lowpoly/manifest.json`
-(`"art": "lowpoly"`), with its files under `assets/lowpoly/` and its URLs relative to that folder. A style
+(`"art": "lowpoly"`), with its files under `assets/lowpoly/` and its URLs relative to that folder. The HD style
+is `assets/hd/manifest.json` (`"art": "hd"`, A164), under `assets/hd/`. A style
 manifest re-skins keys of the 8-bit manifest only: same type, frame names, cells, pivots and `maps`,
-and the style's `filter` on every filtered texture (`tools/sprites/test/styles.test.ts`). The client
-loads the player's style and falls back key by key to the 8-bit entry for any key the style lacks. Switching
-style mid-match swaps the textures in place, by key. `?art=placeholder` overrides every style.
+and the style's `filter` on every filtered texture (`tools/sprites/test/styles.test.ts`). A style packed
+larger than the 8-bit set says so with `texels`: the manifest's top-level value is the factor of every texture
+entry, and an entry's own value overrides it (HD: 2 for a page drawn at display size, 4 for a sprite the 8-bit
+set halves). The client draws a texture at its usual scale over its texel factor, so a frame covers the same
+screen pixels in every style; an animation carries no factor. The client
+loads the player's style and falls back key by key to the 8-bit entry for any key the style lacks (at that
+entry's own factor). Switching
+style mid-match swaps the textures in place, by key. HD is fetched only once picked, and only offered where
+the device meets the style's `requires` (GDD 3.13). `?art=placeholder` overrides every style.
 
 ```json
 {

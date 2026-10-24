@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "art": "hd",
+  "texels": 2,
+  "entries": [{ "key": "tiles_grass", "type": "image", "url": "tiles_grass.png", "filter": "linear" }]
+}
