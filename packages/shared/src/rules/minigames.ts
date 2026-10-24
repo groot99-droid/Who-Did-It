@@ -1,4 +1,4 @@
-// Round 6 (M5b, GDD 3.16): the main-mode mini-games, pure. `generateMinigame` builds a puzzle from a seeded rng and
+// Round 6 (M5b, GDD 3.16): the main-mode mini-games, pure; round 7 (7M) adds the `tap` kind. `generateMinigame` builds a puzzle from a seeded rng and
 // `checkMinigame` judges an answer. The server keeps the puzzle in room memory and sends `public` in `minigameStart`;
 // a Cabal seat's fake task runs the same puzzle and never moves the task bar. `@wdi/shared` cannot import
 // `@wdi/content`, so the caller passes the numbers of `balance.json` `minigames` in as `MinigameBases`. Every answer
@@ -12,6 +12,8 @@ export interface MinigameBases {
   pour: { steps: number; ratePerS: number; bandFrac: number };
   slide: { steps: number };
   stoke: { stokePerTap: number; ratePerS: number; bandFrac: number; holdS: number };
+  /** Round 7 (7M): a marker sweeps the track once per `periodS`; tap inside a `bandFrac` band `steps` times running. */
+  tap: { steps: number; periodS: number; bandFrac: number };
 }
 
 export interface MinigamePuzzle {
@@ -46,6 +48,13 @@ export interface StokePublic {
   holdS: number;
   bandStart: number;
 }
+export interface TapPublic {
+  steps: number;
+  periodS: number;
+  bandFrac: number;
+  /** The band's start for each hit in turn (0 to 1 along the track). */
+  bands: number[];
+}
 
 /** Answers, by kind. Times are seconds since the mini-game opened. */
 export interface CratesAnswer {
@@ -60,6 +69,10 @@ export interface SlideAnswer {
   slots: number[];
 }
 export interface StokeAnswer {
+  taps: number[];
+}
+export interface TapAnswer {
+  /** Every tap, in order, hits and misses alike; the replay counts the hits in a row. */
   taps: number[];
 }
 
@@ -108,6 +121,13 @@ export function generateMinigame(
       const pub: SlidePublic = { steps, order };
       return { kind, public: pub, solution: { steps, order: [...order] } };
     }
+    case 'tap': {
+      const b = bases.tap;
+      const steps = b.steps + more;
+      const bands = Array.from({ length: steps }, () => rng() * (1 - b.bandFrac));
+      const pub: TapPublic = { steps, periodS: b.periodS, bandFrac: b.bandFrac, bands };
+      return { kind, public: pub, solution: { ...pub, bands: [...bands] } };
+    }
     case 'stoke': {
       const b = bases.stoke;
       const pub: StokePublic = {
@@ -149,6 +169,25 @@ export function stokeSucceeds(s: StokePublic, taps: readonly number[]): boolean 
   return false;
 }
 
+/** The tap marker's place on the track (0 to 1) after `t` seconds: a triangle wave, back and forth once per `periodS`. */
+export function tapMarkerAt(t: number, periodS: number): number {
+  const p = (t / periodS) % 1;
+  return p < 0.5 ? p * 2 : 2 - p * 2;
+}
+
+/**
+ * Replays the taps (the client's `TapModel`): each tap inside the current band is a hit and moves on to the next band;
+ * a tap outside starts the run again from the first band. Done when `steps` hits land in a row.
+ */
+export function tapSucceeds(s: TapPublic, taps: readonly number[]): boolean {
+  let hits = 0;
+  for (const t of taps) {
+    hits = inBand(tapMarkerAt(t, s.periodS), s.bands[hits]!, s.bandFrac) ? hits + 1 : 0;
+    if (hits >= s.steps) return true;
+  }
+  return false;
+}
+
 export function checkMinigame(puzzle: MinigamePuzzle, answer: unknown): boolean {
   if (typeof answer !== 'object' || answer === null) return false;
   const a = answer as Record<string, unknown>;
@@ -179,6 +218,14 @@ export function checkMinigame(puzzle: MinigamePuzzle, answer: unknown): boolean 
         taps !== null &&
         taps.every((t, i) => t >= 0 && (i === 0 || t >= taps[i - 1]!)) &&
         stokeSucceeds(puzzle.solution as StokePublic, taps)
+      );
+    }
+    case 'tap': {
+      const taps = numList(a.taps);
+      return (
+        taps !== null &&
+        taps.every((t, i) => t >= 0 && (i === 0 || t >= taps[i - 1]!)) &&
+        tapSucceeds(puzzle.solution as TapPublic, taps)
       );
     }
   }
