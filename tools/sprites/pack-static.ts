@@ -278,6 +278,8 @@ export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
     'prop_rubble',
     'prop_miners_lamp',
     'prop_ore_pile',
+    // The platform's mail crane (8D's mailbag, seams 2).
+    'prop_mailbag',
   ],
   props_blackpine: [
     'prop_anvil',
