@@ -23,7 +23,7 @@ import { type Figure, figuresOf } from './figures';
  * 8A's fists (body.md 4): until then no answer is taken as a Pay, and `fight` is refused. Every move of Scrip
  * goes through `movePurse` (a figure's take sits in its `@figure:<id>` account), every mugging leaves a `scuffle`
  * clue, and nothing of it reaches the wire but the prompt and the drawn threat. This step holds the roll and its
- * memory; the walk-up, the threat, the prompt and the take follow (DECISIONS A161).
+ * memory; the walk-up, the threat, the prompt and the take follow (DECISIONS A180).
  */
 
 export type MugChoice = 'pay' | 'fight' | 'flee';

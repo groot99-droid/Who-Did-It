@@ -815,7 +815,7 @@ knockout (3.22, the reduced body) reaches a figure only once the strike hook of 
 `figureNotSeat` (auto 50) checks that no figure is in any seat list, vote, death or meeting, and that no figure
 avatar carries a seat's handle, the ghost tag or a card's look.
 
-**The mugging (8E, A161).** A Hungry, Angry or Desperate figure or NPC seat that is alone with one seat rolls each
+**The mugging (8E, A180).** A Hungry, Angry or Desperate figure or NPC seat that is alone with one seat rolls each
 second for a mugging, on its own stream (`townsfolk:<figure>`, or the NPC's choices stream) and only while in such a
 mood, so a calm match draws nothing new. "Alone" is the A100 room rule (3.12): any scene but the map's hub, the only
 other living seat there, no other figure present, not crossing a door, within `npc.aloneKill.sightTiles`. A seat
@@ -824,4 +824,4 @@ mugged. The chance per second is `moods.mug.chancePerS` by the target's purse ba
 the need behind the mugger's mood, times `nightMul` in the night class, `weakMul` for a Weakened or Fatigued target
 (3.22) and `longAloneMul` after `longAloneS` alone beside a heavy purse; the mugger's own Fear (`fearMul`) and a
 light burning in the target's hand (`lightMul`) lower it. What the roll starts, the walk-up, the threat and the
-target's answer, is the next step of A161.
+target's answer, is the next step of A180.
