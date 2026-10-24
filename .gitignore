@@ -14,3 +14,6 @@ assets/external/
 
 # The published client's server URL is deliberately committed (ARCHITECTURE 5.10).
 !apps/client/.env.production
+
+# The material library cache (docs/round8/art.md 5): Poly Haven files fetched by tools/blender/materials/fetch.py
+tools/blender/.cache/

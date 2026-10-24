@@ -223,6 +223,8 @@ export interface WorldFeed {
   quests(): QuestSnap[];
   /** Round 7 (7M): this player's own task list, in deal order (`Private.tasks`). */
   tasks(): TaskSnap[];
+  /** Round 7 (7M): the village's work, the public task bar of GDD 3.5 (`GameState.taskBar`, 0 to 100). */
+  taskBar(): number;
   /** Round 6 (6I): this player's own inventory slots, in slot order. */
   inventory(): StackSnap[];
   /** Round 8 (8A): this seat's own body, or null while the row is empty (the lobby, the card, a ghost). */

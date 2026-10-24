@@ -62,6 +62,63 @@ under CC0 1.0** (`LICENSES/CC0-1.0.txt`, `docs/DECISIONS.md` A17). Hand-made ori
 | `apps/client/public/assets/audio/music/lobby_contemplation.ogg`                               | Contemplation                                                                                                                | Pro Sensory (OpenGameArt)       | https://opengameart.org/content/contemplation-0      | CC0-1.0 | First 60 s of `Contemplation.mp3` (sha256 `283962d3a975c93613c46cda30c9f0816176ae3e2899f961591a49e2d41b4bf3`), fetched 2026-10-22; -18 LUFS, peak under -1 dBTP, 20 ms fades, Vorbis q3. The `lobby` playlist, a CC0 bed because the sound library holds no melodic bed (owner, 2026-10-22; Session 6L) |
 | `apps/client/public/assets/audio/music/end_the_fade.ogg`                                      | The Fade                                                                                                                     | breadman (OpenGameArt)          | https://opengameart.org/content/the-fade             | CC0-1.0 | `the_fade.mp3` (sha256 `4b06076d31f0de2c3784d3c66c12da620465bd02a02e85630e66a818912afd1f`), fetched 2026-10-22; -18 LUFS, peak under -1 dBTP, 20 ms fades, Vorbis q3. The end-screen playlists `*_gameover` and `onub_over`, a CC0 bed for the same reason (owner, 2026-10-22; Session 6L)              |
 
+### Poly Haven material library (round 8)
+
+The roles of `tools/blender/materials/roles.py` draw on these CC0 textures, pinned by md5 in
+`tools/blender/materials/polyhaven.lock.json` and fetched at build time into the git-ignored cache by `fetch.py`
+(`docs/round8/art.md` 5, `docs/DECISIONS.md` A144, A155). The sources are never committed; the renders that use
+them are credited in the tables below by key. Licence text: `LICENSES/vendors/polyhaven-materials-license-2026-10-23.txt`.
+
+| Slug                     | Title                  | Authors                           | URL                                            | Licence | Roles                |
+| ------------------------ | ---------------------- | --------------------------------- | ---------------------------------------------- | ------- | -------------------- |
+| `bark_brown_02`          | Bark Brown 02          | Rob Tuytel                        | https://polyhaven.com/a/bark_brown_02          | CC0-1.0 | `bark`               |
+| `brown_leather`          | Brown Leather          | Rob Tuytel                        | https://polyhaven.com/a/brown_leather          | CC0-1.0 | `leather`            |
+| `brown_mud_02`           | Brown Mud 02           | Rob Tuytel                        | https://polyhaven.com/a/brown_mud_02           | CC0-1.0 | `mud_brown`          |
+| `brown_mud_rocks_01`     | Brown Mud Rocks 01     | Rob Tuytel                        | https://polyhaven.com/a/brown_mud_rocks_01     | CC0-1.0 | `mud_rocks`          |
+| `brown_planks_05`        | Brown Planks 05        | Rob Tuytel                        | https://polyhaven.com/a/brown_planks_05        | CC0-1.0 | `wood_plank`         |
+| `clean_pebbles`          | Clean Pebbles          | Charlotte Baglioni, Dario Barresi | https://polyhaven.com/a/clean_pebbles          | CC0-1.0 | `pebbles`            |
+| `curly_teddy_natural`    | Curly Teddy Natural    | Rico Cilliers, colormass          | https://polyhaven.com/a/curly_teddy_natural    | CC0-1.0 | `fur`                |
+| `dirt_floor`             | Dirt Floor             | eye-candy.xyz                     | https://polyhaven.com/a/dirt_floor             | CC0-1.0 | `soil`               |
+| `forest_floor`           | Forest Floor           | eye-candy.xyz                     | https://polyhaven.com/a/forest_floor           | CC0-1.0 | `forest_floor`       |
+| `forest_ground_04`       | Forest Ground 04       | Rico Cilliers, Rob Tuytel         | https://polyhaven.com/a/forest_ground_04       | CC0-1.0 | `forest_ground`      |
+| `forest_ground_05`       | Forest Ground 05       | Charlotte Baglioni                | https://polyhaven.com/a/forest_ground_05       | CC0-1.0 | `forest_ground_dark` |
+| `forest_leaves_02`       | Forest Leaves 02       | Rob Tuytel                        | https://polyhaven.com/a/forest_leaves_02       | CC0-1.0 | `leaf_litter`        |
+| `forrest_ground_01`      | Forest Ground 01       | Rob Tuytel                        | https://polyhaven.com/a/forrest_ground_01      | CC0-1.0 | `needles`            |
+| `gravel`                 | Gravel                 | Dimitrios Savva                   | https://polyhaven.com/a/gravel                 | CC0-1.0 | `gravel`             |
+| `gravel_floor`           | Gravel Floor           | Jenelle van Heerden, Matterfield  | https://polyhaven.com/a/gravel_floor           | CC0-1.0 | `gravel_floor`       |
+| `gravel_stones`          | Gravel Stones          | Amal Kumar                        | https://polyhaven.com/a/gravel_stones          | CC0-1.0 | `gravel_stones`      |
+| `green_metal_rust`       | Green Metal Rust       | Rob Tuytel                        | https://polyhaven.com/a/green_metal_rust       | CC0-1.0 | `copper`             |
+| `hessian_380`            | Hessian 380            | Rico Cilliers, colormass          | https://polyhaven.com/a/hessian_380            | CC0-1.0 | `flour_sack`         |
+| `leafy_grass`            | Leafy Grass            | Charlotte Baglioni                | https://polyhaven.com/a/leafy_grass            | CC0-1.0 | `grass`              |
+| `metal_plate`            | Metal Plate            | Rob Tuytel                        | https://polyhaven.com/a/metal_plate            | CC0-1.0 | `iron`               |
+| `moss_wood`              | Moss Wood              | Rob Tuytel                        | https://polyhaven.com/a/moss_wood              | CC0-1.0 | `moss`               |
+| `mossy_cobblestone`      | Mossy Cobblestone      | Sơn Nguyễn                        | https://polyhaven.com/a/mossy_cobblestone      | CC0-1.0 | `cobble`             |
+| `mossy_rock`             | Mossy Rock             | Rob Tuytel                        | https://polyhaven.com/a/mossy_rock             | CC0-1.0 | `moss_rock`          |
+| `mud_cracked_dry_03`     | Mud Cracked Dry 03     | Dario Barresi, Dimitrios Savva    | https://polyhaven.com/a/mud_cracked_dry_03     | CC0-1.0 | `bread_crust`        |
+| `mud_forest`             | Mud Forest             | eye-candy.xyz                     | https://polyhaven.com/a/mud_forest             | CC0-1.0 | `mud`                |
+| `muddy_tracks`           | Muddy Tracks           | Amal Kumar                        | https://polyhaven.com/a/muddy_tracks           | CC0-1.0 | `mud_track`          |
+| `old_wood_floor`         | Old Wood Floor         | Guillaume Monsergent              | https://polyhaven.com/a/old_wood_floor         | CC0-1.0 | `wood_floor`         |
+| `pine_bark`              | Pine Bark              | Dimitrios Savva                   | https://polyhaven.com/a/pine_bark              | CC0-1.0 | `pine_bark`          |
+| `poly_wool_herringbone`  | Poly Wool Herringbone  | Rico Cilliers, colormass          | https://polyhaven.com/a/poly_wool_herringbone  | CC0-1.0 | `wool`               |
+| `red_brick_03`           | Red Brick 03           | Rob Tuytel                        | https://polyhaven.com/a/red_brick_03           | CC0-1.0 | `brick`              |
+| `river_small_rocks`      | River Small Rocks      | Rico Cilliers, Rob Tuytel         | https://polyhaven.com/a/river_small_rocks      | CC0-1.0 | `river_rocks`        |
+| `rock_face`              | Rock Face              | Dario Barresi, Greg Zaal          | https://polyhaven.com/a/rock_face              | CC0-1.0 | `rock_face`          |
+| `rock_ground`            | Rock Ground            | Rob Tuytel                        | https://polyhaven.com/a/rock_ground            | CC0-1.0 | `rock_ground`        |
+| `rock_wall_08`           | Rock Wall 08           | Amal Kumar                        | https://polyhaven.com/a/rock_wall_08           | CC0-1.0 | `stone_wall`         |
+| `rocky_gravel`           | Rocky Gravel           | Dario Barresi, Dimitrios Savva    | https://polyhaven.com/a/rocky_gravel           | CC0-1.0 | `rocky_gravel`       |
+| `rocky_trail`            | Rocky Trail            | Amal Kumar                        | https://polyhaven.com/a/rocky_trail            | CC0-1.0 | `rocky_trail`        |
+| `roof_slates_02`         | Roof Slates 02         | Rob Tuytel                        | https://polyhaven.com/a/roof_slates_02         | CC0-1.0 | `slate_roof`         |
+| `rough_linen`            | Rough Linen            | Rico Cilliers, colormass          | https://polyhaven.com/a/rough_linen            | CC0-1.0 | `linen`              |
+| `rust_coarse_01`         | Rust Coarse 01         | Dimitrios Savva, Rico Cilliers    | https://polyhaven.com/a/rust_coarse_01         | CC0-1.0 | `rust`               |
+| `slate_floor_02`         | Slate Floor 02         | Dimitrios Savva                   | https://polyhaven.com/a/slate_floor_02         | CC0-1.0 | `slate_floor`        |
+| `stone_floor`            | Stone Floor            | Dimitrios Savva                   | https://polyhaven.com/a/stone_floor            | CC0-1.0 | `flagstone`          |
+| `thatch_roof_angled`     | Thatch Roof Angled     | Dimitrios Savva, Rob Tuytel       | https://polyhaven.com/a/thatch_roof_angled     | CC0-1.0 | `thatch`             |
+| `weathered_plank_siding` | Weathered Plank Siding | Dimitrios Savva                   | https://polyhaven.com/a/weathered_plank_siding | CC0-1.0 | `wood_boards`        |
+| `weathered_planks`       | Weathered Planks       | Dario Barresi, Dimitrios Savva    | https://polyhaven.com/a/weathered_planks       | CC0-1.0 | `wood_rough`         |
+| `withered_grass`         | Withered Grass         | Charlotte Baglioni                | https://polyhaven.com/a/withered_grass         | CC0-1.0 | `grass_dry`          |
+| `wood_trunk_wall`        | Wood Trunk Wall        | Amal Kumar                        | https://polyhaven.com/a/wood_trunk_wall        | CC0-1.0 | `logs`               |
+| `worn_mossy_plasterwall` | Worn Mossy Plasterwall | Amal Kumar                        | https://polyhaven.com/a/worn_mossy_plasterwall | CC0-1.0 | `plaster`            |
+
 ## Generated assets
 
 | Files                                                                                     | Tool                                                                                                                                                                                                                                                               | Model / feature                                                                                                                                         | Date                        | Generation id                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Catalog id                                                                                                                                                                            | Notes                                                                                                                                                                                                                                                                                                                                            |

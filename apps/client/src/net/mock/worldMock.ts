@@ -148,6 +148,8 @@ export class MockWorldFeed implements WorldFeed {
   private still = false;
   private clueSeq = 0;
   private handleSeq = 0;
+  /** Where `?scene=&spawn=` starts the own seat, or null for the overworld square. */
+  private startAt: { sceneId: string; spawn: string; facing: string } | null = null;
   /** The own seat's disguise, applied at once in the mock (the server waits until the seat is unseen). */
   private disguised = false;
   private readonly m5b: MockM5b;
@@ -192,6 +194,16 @@ export class MockWorldFeed implements WorldFeed {
       const spawn = this.content.scenes.overworld?.spawns.find((s) => s.id === `square_${i}`);
       if (spawn) this.place(body, 'overworld', spawn);
     });
+    // Round 8 (8J): `?scene=<id>&spawn=<id>` starts the own seat at that spawn (the scene's first when the spawn is
+    // unknown), so the room screenshots of art.md 4 reach any scene without walking there.
+    const shotScene = q.get('scene');
+    const shot = shotScene ? this.content.scenes[shotScene] : undefined;
+    const self = this.actors.get(this.selfId);
+    const shotSpawn = shot?.spawns.find((s) => s.id === q.get('spawn')) ?? shot?.spawns[0];
+    if (shotScene && shotSpawn && self) {
+      this.place(self, shotScene, shotSpawn);
+      this.startAt = { sceneId: shotScene, spawn: shotSpawn.id, facing: shotSpawn.facing };
+    }
     // Round 6 (6I): `?m5b=1` stands the own seat beside the overworld's quest giver with a spade and a kit of nodes.
     let kit: { scene: string; x: number; y: number } | null = null;
     const giver = this.content.scenes.overworld?.givers?.[0];
@@ -244,7 +256,8 @@ export class MockWorldFeed implements WorldFeed {
     if (this.opening) this.bus.emit('cutscene', { id: 'openingHollowmere' });
     const me = this.actors.get(this.selfId);
     const spawn = this.content.scenes.overworld?.spawns.find((s) => s.id === 'square_0');
-    if (me && spawn)
+    if (this.startAt) this.bus.emit('sceneEnter', this.startAt);
+    else if (me && spawn)
       this.bus.emit('sceneEnter', { sceneId: 'overworld', spawn: spawn.id, facing: spawn.facing });
     // Under ?cutscene=1 the ghost dies once the World first reads the feed, so the death cutscene has a World to play on.
     if (this.ghost && this.opening) {
@@ -522,6 +535,10 @@ export class MockWorldFeed implements WorldFeed {
 
   tasks(): TaskSnap[] {
     return this.m5b.tasks();
+  }
+
+  taskBar(): number {
+    return this.m5b.taskBar();
   }
 
   questAccept(questId: string): void {

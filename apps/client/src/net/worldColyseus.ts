@@ -54,6 +54,8 @@ interface AvatarState {
   yaw: number;
   animId: number;
   statusBits: number;
+  /** Round 8 (8L): the bits seen only from close by (Blood); the server sends them only in range. */
+  nearBits?: number;
   transitUntilTick: number;
   seat?: string;
 }
@@ -70,6 +72,7 @@ interface SceneStateLike {
 }
 interface GameStateLike {
   tick: number;
+  taskBar?: number;
   phase: number;
   phaseEndsTick: number;
   startTick: number;
@@ -156,7 +159,7 @@ export class ColyseusWorldFeed implements WorldFeed {
           y: a.y,
           yaw: a.yaw,
           animId: a.animId,
-          statusBits: a.statusBits,
+          statusBits: a.statusBits | (a.nearBits ?? 0),
           transitUntilTick: a.transitUntilTick,
           ...(a.seat ? { seat: a.seat } : {}),
         }),
@@ -320,6 +323,10 @@ export class ColyseusWorldFeed implements WorldFeed {
       .get(this.selfId)
       ?.priv?.tasks?.forEach((t) => out.push({ id: t.id, done: t.done, fake: t.fake }));
     return out;
+  }
+
+  taskBar(): number {
+    return this.state.taskBar ?? 0;
   }
 
   questAccept(questId: string): void {
