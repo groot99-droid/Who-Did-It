@@ -246,6 +246,7 @@ export function validateContent(c: Content): string[] {
   checkStakes(c, err);
   // Round 8 (GDD 3.22): the relations table's sides and the inspect bands.
   checkRelations(c, err);
+  checkShops(c, err);
 
   return errors;
 }
@@ -789,4 +790,46 @@ function checkStakes(c: Content, err: (msg: string) => void): void {
     if (t.min < heavy && t.max >= heavy)
       err(`economy.json: stake tier "${id}" straddles balance economy.heavyPurse`);
   }
+}
+
+/**
+ * Round 8 (GDD 3.23, 8C): a shop is one `counter` static named `<prefix>.shop_<tail>`. Until 8J and 8K place a row its
+ * prefix must still name a scene; once placed it must be a `counter`, and every `counter` belongs to one shop. A shop
+ * trades only items that drop (never a role's kit) at a price it names, and pays less than it asks.
+ */
+function checkShops(c: Content, err: (msg: string) => void): void {
+  const { shops, prices } = c.economy;
+  const byPrefix = new Map(Object.values(c.scenes).map((s) => [s.prefix, s]));
+  const owner = new Map<string, string>();
+  const used = new Set<string>();
+  for (const [id, shop] of Object.entries(shops)) {
+    const [prefix, tail] = shop.prop.split('.') as [string, string];
+    const scene = byPrefix.get(prefix);
+    if (!scene) err(`economy.json: shop ${id} prop ${shop.prop} names no scene prefix`);
+    if (!tail.startsWith('shop_')) err(`economy.json: shop ${id} prop ${shop.prop} lacks the shop_ tail`);
+    const placed = scene?.props.find((p) => p.id === shop.prop);
+    if (placed && placed.kind !== 'counter')
+      err(`economy.json: shop ${id} prop ${shop.prop} is not a counter`);
+    if (owner.has(shop.prop)) err(`economy.json: shops ${owner.get(shop.prop)} and ${id} share ${shop.prop}`);
+    owner.set(shop.prop, id);
+    for (const [list, side] of [
+      [shop.sells, 'ask'],
+      [shop.buys, 'pay'],
+    ] as const) {
+      for (const item of list) {
+        used.add(item);
+        const def = c.items.items[item];
+        if (!def) err(`economy.json: shop ${id} trades unknown item ${item}`);
+        else if (def.roleBound) err(`economy.json: shop ${id} trades role-bound ${item}`);
+        if (prices[item]?.[side] === undefined)
+          err(`economy.json: shop ${id} trades ${item} with no ${side}`);
+      }
+    }
+  }
+  for (const item of Object.keys(prices))
+    if (!used.has(item)) err(`economy.json: price for ${item}, which no shop trades`);
+  for (const scene of Object.values(c.scenes))
+    for (const p of scene.props)
+      if (p.kind === 'counter' && !owner.has(p.id))
+        err(`scene ${scene.id}: counter ${p.id} belongs to no shop`);
 }
