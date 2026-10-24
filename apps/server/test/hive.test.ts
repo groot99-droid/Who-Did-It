@@ -65,8 +65,11 @@ describe('the hive blackboard (8R, A176)', () => {
     }
     const sightings = [...board.all('sighting')];
     expect(sightings.length).toBeGreaterThan(0);
-    const scene = party.room.state.scenes.get('overworld')!;
-    for (const fact of sightings) expect(fact.lookOf).toBe(scene.avatars.get(fact.ref)?.lookOf);
+    for (const fact of sightings) {
+      const av = party.room.state.scenes.get(fact.sceneId!)?.avatars.get(fact.ref);
+      expect(av).toBeDefined();
+      expect(fact.lookOf).toBe(av!.lookOf);
+    }
     expect(hiveFailures(party)).toEqual([]);
   });
 
