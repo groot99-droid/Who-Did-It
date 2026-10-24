@@ -20,6 +20,7 @@
 | `act.light` | `{ on: boolean }` | 5/s | Round 6: `on` lights the carried Lantern or Torch, or puts it out; refused 422 without one. |
 | `meeting.vote` | `{ targetId: string }` | 2/s | A living player's id, or `"skip"`. Changeable until the vote closes (A30). |
 | `chat.say` | `{ text: string }` | 2/s | - |
+| `chat.note` | `{ text: string }` | 2/s | - |
 | `chat.quick` | `{ phraseId: string }` | 2/s | - |
 | `world.ping` | `{ x: number; y: number }` | 2/s | - |
 | `role.ready` | `Record<string, never>` | - | Deprecated alias of `lobby.ready {ready: true}`. |
@@ -48,7 +49,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `sceneEnter` | `{ sceneId: string; spawn: string; facing: string }` | Private. |
 | `clueFound` | `{ entryId: string }` | Private. |
 | `killed` | `{ sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string }` | Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). |
-| `chat.msg` | `{ from: string; text: string; channel: ChatChannel }` | Private: routed per recipient; `from` is a player id. |
+| `chat.msg` | `{ from: string; text: string; channel: ChatChannel }` | Private: routed per recipient; `from` is a player id, `''` on `system` and `notes` (no speaker). |
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
 | `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). |
