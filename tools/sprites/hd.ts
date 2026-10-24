@@ -139,13 +139,27 @@ export async function hdStatic(renderDir: string, subset = false): Promise<Map<s
       ]),
     ) as StaticManifest['frames'],
   };
-  if (!subset) return packStatic(manifest, inputs, false, texels);
+  if (!subset) return withTexels(await packStatic(manifest, inputs, false, texels), manifest.atlas, texels);
   const cap = pageCap(manifest.atlas) ?? [2048, 2048];
   const { atlas, pages } = await packCapped(manifest.atlas, inputs, cap[0] * texels, cap[1] * texels, false);
   applyStaticPivots(atlas, manifest);
   const out = new Map<string, Buffer>(pages);
   out.set(`${manifest.atlas}.json`, Buffer.from(atlasJson(atlas)));
-  return out;
+  return withTexels(out, manifest.atlas, texels);
+}
+
+/**
+ * The texel factor written into an HD atlas json's `meta.texels`. A slice (`<frame>#<x>_<y>`) is cropped to its
+ * own box at HD but keeps its building's whole canvas in 8-bit, so its size cannot measure the factor;
+ * hd-manifest.ts reads it from here instead.
+ */
+export function withTexels(files: Map<string, Buffer>, atlas: string, texels: number): Map<string, Buffer> {
+  const name = `${atlas}.json`;
+  const json = files.get(name);
+  if (!json) throw new Error(`hd: ${atlas}: the packer wrote no ${name}`);
+  const parsed = JSON.parse(json.toString('utf8')) as MultiAtlas & { meta: { texels?: number } };
+  parsed.meta = { ...parsed.meta, texels };
+  return new Map(files).set(name, Buffer.from(atlasJson(parsed, true)));
 }
 
 /** The quality of the HD world pages as lossy WebP (A164, the budget's option 1). */
