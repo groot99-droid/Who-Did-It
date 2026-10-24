@@ -99,6 +99,22 @@ export function moodOf(room: PartyRoom, id: string): Mood | null {
   return n?.mood ?? null;
 }
 
+/** How strong a mood is: the need behind it (the strongest need when Desperate), 0 when Calm; the mugging roll reads it. */
+export function moodStrength(n: Needs): number {
+  switch (n.mood) {
+    case 'hungry':
+      return n.hunger;
+    case 'scared':
+      return n.fear;
+    case 'angry':
+      return n.anger;
+    case 'desperate':
+      return Math.max(n.hunger, n.fear, n.anger, n.want);
+    default:
+      return 0;
+  }
+}
+
 /** The mood idle of a brain (a townsfolk figure's, `sim/townsfolk/`); undefined for the plain idle. */
 export function moodIdleFor(brain: Brain): number | undefined {
   const n = store.get(brain);
@@ -144,10 +160,10 @@ function purseOf(room: PartyRoom, seat: string): number | null {
 }
 
 /**
- * Whether 8A's `Private.body.effects` carries an effect (seams.md 2 ids: Famished 9, Indebted 11), read without a
- * compile-time dependency on its schema row; false until it exists.
+ * Whether 8A's `Private.body.effects` carries an effect (seams.md 2 ids: Famished 9, Indebted 11; the mugging reads
+ * Weakened 4 and Fatigued 6), read without a compile-time dependency on its schema row; false until it exists.
  */
-function hasEffect(room: PartyRoom, seat: string, id: number): boolean {
+export function hasBodyEffect(room: PartyRoom, seat: string, id: number): boolean {
   const priv = room.state.players.get(seat)?.priv as unknown as
     { body?: { effects?: Iterable<{ id?: unknown }> } } | undefined;
   const effects = priv?.body?.effects;
@@ -303,7 +319,8 @@ export function tickNeeds(room: PartyRoom, brain: Brain, s: NeedSubject): number
   const cls = phaseClassOf(phase);
 
   // Hunger: time without food, faster when Famished; a meal at home (the `eat` event is the Wake Loaf).
-  const rise = (dt / m.hunger.riseS) * (hasEffect(room, s.id, FAMISHED_EFFECT) ? m.hunger.famishedMul : 1);
+  const rise =
+    (dt / m.hunger.riseS) * (hasBodyEffect(room, s.id, FAMISHED_EFFECT) ? m.hunger.famishedMul : 1);
   n.hunger = clamp(n.hunger + rise - (home ? dt / m.hunger.homeFallS : 0));
 
   // Fear: bodies seen (own ones too: card-blind), a creature's chase, the dark outdoors alone without a light; falls
@@ -327,7 +344,7 @@ export function tickNeeds(room: PartyRoom, brain: Brain, s: NeedSubject): number
   // Want: a light purse and debt (8C's and 8D's rows, read when they exist); wages and sales relieve it.
   const purse = purseOf(room, s.id);
   if (purse !== null && purse < m.want.lightPurse) n.want = clamp(n.want + dt / m.want.lightRiseS);
-  if (hasEffect(room, s.id, INDEBTED_EFFECT)) n.want = clamp(n.want + dt / m.want.debtRiseS);
+  if (hasBodyEffect(room, s.id, INDEBTED_EFFECT)) n.want = clamp(n.want + dt / m.want.debtRiseS);
 
   settleMood(room, s.id, n);
   return IDLE_OF[n.mood] ?? undefined;
