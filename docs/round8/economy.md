@@ -31,7 +31,8 @@ under its own name. BlackPine's quota tax is built (8D).
   - each quest turn-in pays (`quests.json` gains a `scrip` reward);
   - selling gathered materials (timber, stone, resin, herb, mushroom, tin ore) at the market pays its price.
 - **Shops.** Stalls and counters are scene statics with `shop` rows in `economy.json`: the bakery (Wake Loaf,
-  flour), the apothecary (bandage, salts, remedy), the general store (rope, lantern oil, candle, planks) and the
+  flour), the apothecary (bandage and salts only: the Remedy is the Herbalist's role-bound kit,
+  `roleBound` in `items.json`, and no shop sells a role-bound item), the general store (rope, lantern oil, candle, planks) and the
   Gamekeeper's lodge (snare, torch). Buying is an `act.hold` on the counter with the shop panel (8H). Prices are
   numbers in `economy.json`.
 - **The bank** (HollowMere's manor hall / strongbox room; BlackPine's intake office):
