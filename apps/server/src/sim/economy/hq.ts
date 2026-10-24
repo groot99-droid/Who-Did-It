@@ -17,10 +17,10 @@ import { nearProp } from './reach';
  */
 
 /**
- * The perks of a bought tier switch on through `perks.ts`, so buying waits for the owner's sign-off of the tiers and
- * perks (A139 (9)). The owner's yes is this one line.
+ * The perks of a bought tier switch on through `perks.ts`, so buying waited for the owner's sign-off of the tiers and
+ * perks (A139 (9)). The owner approved them as proposed on 2026-10-24; tests may still shut the gate.
  */
-export const hqGate = { open: false };
+export const hqGate = { open: true };
 
 /** `act.hq {stationId}`: the next tier, paid whole (Scrip and materials) or not at all. */
 export function handleHq(room: PartyRoom, seat: string, payload: Record<string, unknown>): void {

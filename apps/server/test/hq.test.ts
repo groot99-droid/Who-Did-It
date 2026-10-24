@@ -39,12 +39,9 @@ afterAll(async () => {
   delete process.env.WDI_DEBUG;
   await colyseus.shutdown();
 });
-beforeEach(async () => {
-  hqGate.open = true;
-  await colyseus.cleanup();
-});
+beforeEach(async () => colyseus.cleanup());
 afterEach(() => {
-  hqGate.open = false;
+  hqGate.open = true;
 });
 
 /** A day on HollowMere: seat 0 walks in the chapel's look at the station with Scrip and the first two tiers' goods. */
@@ -65,7 +62,8 @@ async function atStation(n: number): Promise<Match> {
 }
 
 describe('HQ tiers (GDD 3.23)', () => {
-  it('stay closed until the owner signs off the tiers and perks', async () => {
+  it('are open since the owner signed off; a shut gate (kept as a fixture) refuses', async () => {
+    expect(hqGate.open).toBe(true);
     const m = await atStation(1);
     hqGate.open = false;
     await act(m.bots[0]!, 'act.hq', { stationId: 'chapel' });

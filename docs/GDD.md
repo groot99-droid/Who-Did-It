@@ -807,8 +807,8 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   station's `hq_` prop on its map, and walking in the station's **public look**, buys the next tier with `act.hq`: the
   tier's Scrip and materials, all or nothing. The right follows the look, not the card (A131), so a cover-wearer
   invests like the card it wears. A tier is public (`GameState.hq`, station id to tier) and names no buyer. Every
-  bought tier of a station gives its perks to every seat walking in that look. Buying stays closed, awaiting the
-  owner: `hqGate.open` in `sim/economy/hq.ts` is false until the owner signs off the tiers and perks (DECISIONS A139).
+  bought tier of a station gives its perks to every seat walking in that look. The owner approved the tiers and
+  perks as proposed (2026-10-24), so buying is open (`hqGate.open` in `sim/economy/hq.ts`; DECISIONS A139).
 
 ### 3.24 Moods, mugging and townsfolk
 
