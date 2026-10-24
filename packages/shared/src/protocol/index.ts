@@ -16,6 +16,8 @@ export const C2S = {
   light: 'act.light',
   vote: 'meeting.vote',
   say: 'chat.say',
+  /** Round 8 (GDD 3.8 "Meeting notes", 8T): a line for the meeting notes, which carry no speaker. */
+  note: 'chat.note',
   quick: 'chat.quick',
   ping: 'world.ping',
   roleReady: 'role.ready',
@@ -117,8 +119,11 @@ export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
  */
 export type DeathCause =
   'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'bled' | 'sickened';
-/** Chat channels the server derives (GDD 3.5); the client never chooses one. */
-export type ChatChannel = 'meeting' | 'ghost' | 'cabal' | 'system';
+/**
+ * Chat channels the server derives (GDD 3.5); the client never chooses one. Round 8 (GDD 3.8, 8T): `notes` is the
+ * meeting notes, reached only by `chat.note`, whose lines carry no speaker.
+ */
+export type ChatChannel = 'meeting' | 'ghost' | 'cabal' | 'system' | 'notes';
 /** Round 8 (GDD 3.22 "Inspect"): what a glance tells of health, never the number. */
 export type InspectHealth = 'unhurt' | 'bruised' | 'badlyHurt';
 /** Round 8: the purse's jingle; `unknown` until a purse exists (8C) or when its bands are not set. */
@@ -223,6 +228,7 @@ export interface C2SPayloads {
   /** A living player's id, or `"skip"`. Changeable until the vote closes (A30). */
   'meeting.vote': { targetId: string };
   'chat.say': { text: string };
+  'chat.note': { text: string };
   'chat.quick': { phraseId: string };
   'world.ping': { x: number; y: number };
   /** Round 8 (GDD 3.23, 8D): whole Scrip, at most `economy.json` `faith.donateMax`. */
@@ -290,7 +296,7 @@ export interface S2CPayloads {
   clueFound: { entryId: string };
   /** Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). */
   killed: { sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string };
-  /** Private: routed per recipient; `from` is a player id. */
+  /** Private: routed per recipient; `from` is a player id, `''` on `system` and `notes` (no speaker). */
   'chat.msg': { from: string; text: string; channel: ChatChannel };
   phaseChange: { phase: number; endsTick: number };
   meetingStart: { reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] };
@@ -378,6 +384,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.light': 5,
   'meeting.vote': 2,
   'chat.say': 2,
+  'chat.note': 2,
   'chat.quick': 2,
   'world.ping': 2,
   'lobby.start': 2,
