@@ -8,7 +8,7 @@
   "biome": "house",
   "dark": false,
   "size": { "w": 12, "h": 9 },
-  "notes": "Le Pétrin: the dough mixer in the back corner, sacks of farine along the west wall, the shaping table and the water buckets.",
+  "notes": "Le Pétrin: the dough mixer in the back corner with the water buckets beside it, sacks of farine along the west wall, the old kneading trough and a flour barrel on the east, the shaping tables in the middle under their lamp, the recipe slate and a shelf of tins on the back wall (round 8, 8J).",
   "worldRef": "4.3",
   "portals": [
     {
@@ -47,31 +47,41 @@
       "x": 6,
       "y": 2,
       "footprint": { "x": 6, "y": 1, "w": 2, "h": 2 }
-    }
+    },
+    { "id": "cm.chalkboard", "kind": "dressing", "x": 3, "y": 0 },
+    { "id": "cm.shelf", "kind": "dressing", "x": 9, "y": 0 },
+    { "id": "cm.flour_sacks_0", "kind": "dressing", "x": 1, "y": 1 },
+    { "id": "cm.flour_sacks_1", "kind": "dressing", "x": 1, "y": 3 },
+    { "id": "cm.flour_sacks_2", "kind": "dressing", "x": 1, "y": 4 },
+    { "id": "cm.water_bucket", "kind": "dressing", "x": 8, "y": 1 },
+    { "id": "cm.dough_trough", "kind": "dressing", "x": 10, "y": 1 },
+    { "id": "cm.barrel", "kind": "dressing", "x": 10, "y": 2 },
+    { "id": "cm.shaping_table_0", "kind": "dressing", "x": 4, "y": 4 },
+    { "id": "cm.shaping_table_1", "kind": "dressing", "x": 5, "y": 4 }
   ],
   "gates": [],
   "paths": [],
   "lights": [{ "id": "cm.lt_lamp", "kind": "lamp", "x": 5, "y": 4, "radiusTiles": 3 }],
   "grid": [
     "############",
-    "#.....##...#",
-    "#H....##...#",
-    "#..........#",
-    "#..........#",
+    "##....###.##",
+    "#H....##..##",
+    "##.........#",
+    "##..##.....#",
     "#..........#",
     "#..........#",
     "#.....S...B#",
     "######D#####"
   ],
   "material": [
-    "WWWWWWWWWWWW",
-    "WfffffPPfffW",
-    "WfffffPPfffW",
+    "WWWPWWWWWPWW",
+    "WPffffPPPfPW",
+    "WfffffPPffPW",
+    "WPfffffffffW",
+    "WPffPPfffffW",
     "WffffffffffW",
     "WffffffffffW",
     "WffffffffffW",
-    "WffffffffffW",
-    "WffffffffffW",
-    "WWWWWWWWWWWW"
+    "WWWWWWwWWWWW"
   ]
 }

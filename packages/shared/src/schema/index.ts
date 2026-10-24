@@ -306,6 +306,11 @@ export const GameState = schema(
     winner: u8(),
     /** Round 8 (the Bible's law pipeline, docs/round6/bible-seams.md 2.2): 0 until then. Public. */
     lawStage: u8(),
+    /**
+     * Round 8 (GDD 3.23, docs/round8/seams.md 1 row 4), Session 8D: each HQ station's bought tier (0 to 3) by
+     * `economy.json` station id. Public: a building visibly upgrades. No row names who bought it.
+     */
+    hq: t.map('uint8'),
   },
   'GameState',
 );

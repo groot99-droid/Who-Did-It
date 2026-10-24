@@ -103,6 +103,24 @@ export class StaticView {
     }
   }
 
+  /**
+   * Round 8, 8G (granted): swaps one static's frame (an HQ station's tier, motion.md 2) and says where it stands
+   * (world px). A greybox static, or a frame its atlas lacks, stays as it is (null). Its bounds, and whether it hides
+   * you, follow the new art.
+   */
+  setFrame(id: string, frame: string): { x: number; y: number } | null {
+    const i = this.byId.get(id);
+    if (!i || !(i.obj instanceof Phaser.GameObjects.Sprite) || !i.obj.texture.has(frame)) return null;
+    const at = { x: i.def.x, y: i.def.y };
+    if (i.obj.frame.name === frame) return at;
+    i.obj.setFrame(frame);
+    if (!i.obj.texture.get(frame).customPivot) i.obj.setOrigin(0.5, 1);
+    if (i.def.autoOccluder) i.def = { ...i.def, occluder: propOccludes(i.obj.displayHeight * i.obj.originY) };
+    i.bounds = i.obj.getBounds();
+    this.lastCull = null;
+    return at;
+  }
+
   private show(i: Item): void {
     const on = i.shown && i.inView;
     i.obj.setVisible(on);

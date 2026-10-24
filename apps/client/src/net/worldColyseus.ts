@@ -20,6 +20,7 @@ import type {
   QuestSnap,
   TaskSnap,
   StackSnap,
+  CivicAct,
 } from './world';
 
 // Reads the live room. The state is the shared schema of @wdi/shared; the client keeps loose structural
@@ -39,6 +40,7 @@ interface PlayerState {
     quests?: { forEach(cb: (q: QuestSnap) => void): void };
     tasks?: { forEach(cb: (t: TaskSnap) => void): void };
     purse?: number;
+    faith?: number; // round 8, 8D
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
@@ -71,6 +73,8 @@ interface SceneStateLike {
 interface GameStateLike {
   tick: number;
   taskBar?: number;
+  /** Round 8, 8D: `GameState.hq`, station id to bought tier. */
+  hq?: { forEach(cb: (tier: number, id: string) => void): void };
   phase: number;
   phaseEndsTick: number;
   startTick: number;
@@ -102,6 +106,8 @@ export class ColyseusWorldFeed implements WorldFeed {
       room.onMessage(type, (m: never) => this.bus.emit(type, m));
     // Round 8, 8C (locked): the shop a `shop` hold opened.
     room.onMessage('shop.open', (m: WorldFeedEvents['shopOpen']) => this.bus.emit('shopOpen', m));
+    room.onMessage('coopHold', (m: WorldFeedEvents['coopHold']) => this.bus.emit('coopHold', m));
+    room.onMessage('shout', (m: WorldFeedEvents['shout']) => this.bus.emit('shout', m)); // round 8, 8R
   }
 
   /** Set by the private `killed` message or a false roster `alive`; cleared when the lobby returns. */
@@ -331,6 +337,21 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   sell(shopId: string, itemId: string, qty: number): void {
     this.room.send('act.sell', { shopId, itemId, qty });
+  }
+
+  // Round 8, 8D (GDD 3.23): Faith, the public HQ tiers and the civic acts.
+  faith(): number {
+    return this.state.players.get(this.selfId)?.priv?.faith ?? 0;
+  }
+
+  hqTiers(): Record<string, number> {
+    const out: Record<string, number> = {};
+    this.state.hq?.forEach((tier, id) => (out[id] = tier));
+    return out;
+  }
+
+  civic(type: CivicAct, payload: object): void {
+    this.room.send(type, payload);
   }
 
   questAccept(questId: string): void {

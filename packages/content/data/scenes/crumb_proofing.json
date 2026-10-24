@@ -8,7 +8,7 @@
   "biome": "house",
   "dark": false,
   "size": { "w": 12, "h": 10 },
-  "notes": "La Chambre de Pousse: the glass-fronted proofing cabinet in the middle of the room, couche trays stacked by the east wall, sacks of farine by the west wall and three hanging bulbs.",
+  "notes": "La Chambre de Pousse: the glass-fronted proofing cabinet in the middle of the room under the bulb that keeps it warm, couche trolleys either side of the tray stack by the east wall, sacks of farine by the west wall, three bulbs on iron arms and the proving times chalked on the slate (round 8, 8J).",
   "worldRef": "4.3",
   "portals": [
     {
@@ -54,21 +54,29 @@
       "x": 5,
       "y": 3,
       "footprint": { "x": 4, "y": 2, "w": 3, "h": 2 }
-    }
+    },
+    { "id": "cp.wall_bulb_0", "kind": "dressing", "x": 2, "y": 0 },
+    { "id": "cp.wall_bulb_1", "kind": "dressing", "x": 5, "y": 0 },
+    { "id": "cp.chalkboard", "kind": "dressing", "x": 7, "y": 0 },
+    { "id": "cp.wall_bulb_2", "kind": "dressing", "x": 9, "y": 0 },
+    { "id": "cp.couche_rack_0", "kind": "dressing", "x": 10, "y": 2 },
+    { "id": "cp.couche_rack_1", "kind": "dressing", "x": 10, "y": 4 },
+    { "id": "cp.flour_sacks_0", "kind": "dressing", "x": 1, "y": 3 },
+    { "id": "cp.flour_sacks_1", "kind": "dressing", "x": 1, "y": 4 }
   ],
   "gates": [],
   "paths": [],
   "lights": [
-    { "id": "cp.lt_bulb_w", "kind": "lamp", "x": 2, "y": 1, "radiusTiles": 2 },
-    { "id": "cp.lt_bulb_e", "kind": "lamp", "x": 9, "y": 1, "radiusTiles": 2 },
-    { "id": "cp.lt_cabinet", "kind": "lamp", "x": 5, "y": 4, "radiusTiles": 2 }
+    { "id": "cp.lt_bulb_w", "kind": "lamp", "x": 2, "y": 0, "radiusTiles": 2 },
+    { "id": "cp.lt_bulb_e", "kind": "lamp", "x": 9, "y": 0, "radiusTiles": 2 },
+    { "id": "cp.lt_cabinet", "kind": "lamp", "x": 5, "y": 0, "radiusTiles": 2 }
   ],
   "grid": [
     "############",
     "#..........#",
-    "#B..###....#",
-    "#...###...H#",
-    "#..........#",
+    "#B..###...##",
+    "##..###...H#",
+    "##........##",
     "#..........#",
     "#..........#",
     "#..........#",
@@ -76,15 +84,15 @@
     "#####D######"
   ],
   "material": [
-    "WWWWWWWWWWWW",
+    "WWPWWPWPWPWW",
     "WccccccccccW",
-    "WcccPPPccccW",
-    "WcccPPPccccW",
-    "WccccccccccW",
-    "WccccccccccW",
-    "WccccccccccW",
+    "WcccPPPcccPW",
+    "WPccPPPccccW",
+    "WPccccccccPW",
     "WccccccccccW",
     "WccccccccccW",
-    "WWWWWWWWWWWW"
+    "WccccccccccW",
+    "WccccccccccW",
+    "WWWWWwWWWWWW"
   ]
 }
