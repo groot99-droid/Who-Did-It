@@ -7,10 +7,7 @@
       "task": "lightLanterns",
       "difficulty": 2,
       "assistS": 20,
-      "skin": {
-        "station": "lantern",
-        "pieces": ["oil"]
-      }
+      "skin": { "station": "lantern", "pieces": ["oil"] }
     },
     "pumpSlide": {
       "id": "pumpSlide",
@@ -18,10 +15,7 @@
       "task": "fixPump",
       "difficulty": 3,
       "assistS": 20,
-      "skin": {
-        "station": "pump",
-        "pieces": ["washer"]
-      }
+      "skin": { "station": "pump", "pieces": ["washer"] }
     },
     "letterTap": {
       "id": "letterTap",
@@ -29,10 +23,7 @@
       "task": "deliverLetter",
       "difficulty": 1,
       "assistS": 20,
-      "skin": {
-        "station": "door",
-        "pieces": ["letter"]
-      }
+      "skin": { "station": "door", "pieces": ["letter"] }
     },
     "fenceCrates": {
       "id": "fenceCrates",
@@ -40,10 +31,7 @@
       "task": "mendFence",
       "difficulty": 2,
       "assistS": 20,
-      "skin": {
-        "station": "fence",
-        "pieces": ["plank"]
-      }
+      "skin": { "station": "fence", "pieces": ["plank"] }
     },
     "flourCrates": {
       "id": "flourCrates",
@@ -51,10 +39,7 @@
       "task": "fetchFlour",
       "difficulty": 1,
       "assistS": 20,
-      "skin": {
-        "station": "flour bin",
-        "pieces": ["sack"]
-      }
+      "skin": { "station": "flour bin", "pieces": ["sack"] }
     },
     "doughPour": {
       "id": "doughPour",
@@ -62,10 +47,7 @@
       "task": "mixDough",
       "difficulty": 2,
       "assistS": 20,
-      "skin": {
-        "station": "mixer",
-        "pieces": ["flour", "water"]
-      }
+      "skin": { "station": "mixer", "pieces": ["flour", "water"] }
     },
     "ovenStoke": {
       "id": "ovenStoke",
@@ -73,10 +55,7 @@
       "task": "stokeOven",
       "difficulty": 2,
       "assistS": 20,
-      "skin": {
-        "station": "brick oven",
-        "pieces": ["oak"]
-      }
+      "skin": { "station": "brick oven", "pieces": ["oak"] }
     },
     "coldCrates": {
       "id": "coldCrates",
@@ -84,10 +63,7 @@
       "task": "stockColdRoom",
       "difficulty": 1,
       "assistS": 20,
-      "skin": {
-        "station": "cart",
-        "pieces": ["crate"]
-      }
+      "skin": { "station": "cart", "pieces": ["crate"] }
     },
     "proofSlide": {
       "id": "proofSlide",
@@ -95,10 +71,7 @@
       "task": "proofLoaves",
       "difficulty": 2,
       "assistS": 20,
-      "skin": {
-        "station": "proofer",
-        "pieces": ["banneton"]
-      }
+      "skin": { "station": "proofer", "pieces": ["banneton"] }
     }
   }
 }
