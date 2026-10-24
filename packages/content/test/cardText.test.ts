@@ -1,13 +1,22 @@
 import { describe, expect, it } from 'vitest';
-import { content, type Content } from '../src/index.js';
+import rolesJson from '../data/roles.json';
+import {
+  CARD_FIELDS,
+  CARD_TOKEN,
+  type CardField,
+  content,
+  type Content,
+  fillCard,
+  fillRoles,
+} from '../src/index.js';
 
 // Round 8 (8M, DECISIONS A171; teardown.md 2.3): the card-text drift test. Every number typed into a role's text
 // (`goal`, `cardText`, `beware`, `win`) is bound to the data it states, and must equal it. A number with no binding
 // fails, so a new number in a card cannot ship without saying where it comes from. Spelled-out counts ("one arrest")
-// are words, not numbers, and are not read here.
+// are read in step 4 below: each is a `{word:…}` token or listed in NUMBER_WORDS_EXEMPT with its reason.
 
-const FIELDS = ['goal', 'cardText', 'beware', 'win'] as const;
-type Field = (typeof FIELDS)[number];
+const FIELDS = CARD_FIELDS;
+type Field = CardField;
 
 /** A number as typed: an integer or a decimal, signed only when the sign starts a word ("-1 tile", not "4-5"). */
 const NUMBER = /(?:(?<![\w.])[-+])?\d+(?:\.\d+)?/g;
@@ -178,5 +187,135 @@ describe('the card text agrees with the data (teardown.md 2.3)', () => {
 
   it('fails when an unshipped role ships with its number still typed', () => {
     expect(drifted((c) => (c.roles.roles.thief!.ships = 'V1'))).toHaveLength(2);
+  });
+});
+
+/** A count spelled out, one to ten or once and twice (the drift test above reads digits only). */
+const NUMBER_WORD = /\b(?:one|two|three|four|five|six|seven|eight|nine|ten|once|twice)\b/gi;
+
+/** Count words that are not a number in the data, each with the reason it stays typed. */
+export const NUMBER_WORDS_EXEMPT: readonly (Omit<Binding, 'values' | 'source'> & { reason: string })[] = [
+  {
+    role: 'killer',
+    field: 'goal',
+    phrase: 'one villager',
+    reason: 'the rule is named for it (villageAtMostOne)',
+  },
+  { role: 'killer', field: 'cardText', phrase: 'clean one clue', reason: 'the Rag cleans one clue per use' },
+  {
+    role: 'watchman',
+    field: 'beware',
+    phrase: 'two nights running',
+    reason: 'watchRepeatAllowed false bars the next night, so "two" is what running means',
+  },
+  {
+    role: 'herbalist',
+    field: 'goal',
+    phrase: 'Save one life and end one',
+    reason: 'each power targets one seat (target: seat)',
+  },
+  { role: 'gamekeeper', field: 'goal', phrase: 'the right one', reason: 'a pronoun, not a count' },
+  {
+    role: 'gamekeeper',
+    field: 'cardText',
+    phrase: 'the one you take is the one who came',
+    reason: 'pronouns',
+  },
+];
+
+// Step 4 (A171): roles.json holds tokens and the loader fills them, so the words are the ones typed before.
+describe('the card text is generated from the data (teardown.md 2.3)', () => {
+  const raw = rolesJson.roles as Record<string, Record<CardField, string>>;
+
+  it('ships the words exactly as they were typed', () => {
+    const r = content.roles.roles;
+    expect(r.killer?.goal).toBe(
+      'Kill until the Cabal matches the village (one villager left at 4-5), and never get voted out.',
+    );
+    expect(r.killer?.beware).toBe(
+      'Clues match your own traits whatever face you wear; your height never changes; Blood shows within 3 tiles; ' +
+        'a guarded target voids your kill.',
+    );
+    expect(r.killer?.win).toBe(
+      'Parity at 6+ players, living Village at most 1 at 4-5, or the Final Night vote fails.',
+    );
+    expect(r.detective?.beware).toContain('If you die the Magnifier drops and anyone can Inspect in 6 s.');
+    expect(r.child?.beware).toBe('Top kill target; vision -1 tile; cannot pick up items.');
+    expect(r.ranger?.beware).toBe('Bolts are loud (noise 10).');
+    for (const role of Object.values(r)) for (const f of CARD_FIELDS) expect(role[f]).not.toMatch(/[{}]/);
+  });
+
+  it('keeps every bound number in roles.json as a token', () => {
+    const typed: string[] = [];
+    for (const [id, role] of Object.entries(raw)) {
+      for (const field of CARD_FIELDS) {
+        let rest = role[field].replace(CARD_TOKEN, '');
+        for (const u of UNSHIPPED.filter((x) => x.role === id && x.field === field))
+          rest = rest.replace(u.phrase, '');
+        // The threshold is the rule's own name (`villageAtMostOne`), not a tunable number.
+        rest = rest.replace('at most 1 at', '');
+        typed.push(...[...rest.matchAll(NUMBER)].map((m) => `${id}.${field}: ${m[0]}`));
+      }
+    }
+    expect(typed).toEqual([]);
+  });
+
+  it('ships the spelled-out counts exactly as they were typed', () => {
+    const r = content.roles.roles;
+    expect(r.ranger?.goal).toBe('Hunt the wolves and make your one arrest count.');
+    expect(r.ranger?.cardText).toBe('You hunt wolves. One arrest per match: be right.');
+    expect(r.vicar?.goal).toBe("Learn one soul's faction each night and steer the vote.");
+    expect(r.vicar?.cardText).toContain('Each night, learn where one soul stands,');
+    expect(r.watchman?.goal).toBe('Stand guard over one neighbour each night.');
+    expect(r.watchman?.cardText).toContain('Each night, choose one door to stand by;');
+    expect(r.herbalist?.goal).toBe('Save one life and end one, once each, and be right both times.');
+    expect(r.herbalist?.cardText).toMatch(/^One bottle saves, one bottle ends\. /);
+    expect(r.doctor?.beware).toBe('Two-Killer games outpace your bandages.');
+  });
+
+  it('keeps every count word in roles.json as a token or a listed exemption', () => {
+    const typed: string[] = [];
+    for (const [id, role] of Object.entries(raw)) {
+      for (const field of CARD_FIELDS) {
+        let rest = role[field].replace(CARD_TOKEN, '');
+        for (const e of NUMBER_WORDS_EXEMPT.filter((x) => x.role === id && x.field === field)) {
+          expect(rest, `${id}.${field}: the exempt words "${e.phrase}"`).toContain(e.phrase);
+          rest = rest.replace(e.phrase, '');
+        }
+        typed.push(...[...rest.matchAll(NUMBER_WORD)].map((m) => `${id}.${field}: ${m[0]}`));
+      }
+    }
+    expect(typed).toEqual([]);
+  });
+
+  it('writes a count in the words its token asks for', () => {
+    const data = structuredClone(content);
+    data.abilities.abilities.arrest!.usesPerMatch = 2;
+    data.balance.nightPowers.perNight = 3;
+    data.roles.roles.herbalist!.startKit[0]!.qty = 2;
+    const r = fillRoles(rolesJson as unknown as typeof content.roles, data).roles;
+    expect(r.ranger?.cardText).toBe('You hunt wolves. Two arrest per match: be right.');
+    expect(r.vicar?.goal).toBe("Learn three soul's faction each night and steer the vote.");
+    expect(r.herbalist?.goal).toContain('twice each');
+    expect(fillCard(content, '{times:balance.noise.bolt}')).toBe('10 times');
+    expect(fillCard(content, '{Word:balance.noise.bolt}')).toBe('Ten');
+    expect(fillCard(content, '{word:balance.vision.childDeltaTiles}')).toBe('-1');
+    expect(fillCard(content, '{word:byCount.parity.from}')).toBe('six');
+  });
+
+  it('follows the data when it moves', () => {
+    const data = structuredClone(content);
+    data.clues.clues.blood!.params!.visibleTiles = 4;
+    data.balance.byCount['5'].cabalWin = 'parity';
+    const killer = fillRoles(rolesJson as unknown as typeof content.roles, data).roles.killer!;
+    expect(killer.beware).toContain('Blood shows within 4 tiles');
+    expect(killer.win).toBe(
+      'Parity at 5+ players, living Village at most 1 at 4, or the Final Night vote fails.',
+    );
+  });
+
+  it('refuses a token that names nothing', () => {
+    expect(() => fillCard(content, 'within {clues.clues.blood.params.range} tiles')).toThrow(/not a number/);
+    expect(() => fillCard(content, 'at {byCount.never.from}')).toThrow(/no party size/);
   });
 });
