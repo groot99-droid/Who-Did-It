@@ -98,9 +98,10 @@ export class PlayerView {
     this.blood.setVisible(false);
     this.body.setVisible(this.hasArt);
     this.scarf.setTint(SCARF_TINT[look.scarf] ?? SCARF_TINT[0]);
-    // The scarf and hat are the villager's overlays; a deck look wears its own, baked into the body.
+    // The scarf is the villager family's overlay (the townsfolk's variants too, looks.json `villagers`); a deck
+    // look wears its own, baked into the body. The hat passes exist only on the placeholder villager.
     this.hatPass = this.bodyId === BODY ? (HATS[look.hat] ?? null) : null;
-    this.scarf.setVisible(this.bodyId === BODY);
+    this.scarf.setVisible(this.bodyId.startsWith(BODY));
     const shape = SCARF_SHAPE[look.scarf] ?? SCARF_SHAPE[0];
     this.plate = scene.add
       .text(0, -Math.round(HEAD_PX * scale + 18), `${shape} ${name}`, {

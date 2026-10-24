@@ -427,7 +427,7 @@ export async function packStatic(
     : await packFrames(manifest.atlas, inputs);
   applyStaticPivots(atlas, manifest);
   const out = new Map<string, Buffer>(pages);
-  out.set(`${manifest.atlas}.json`, Buffer.from(atlasJson(atlas)));
+  out.set(`${manifest.atlas}.json`, Buffer.from(atlasJson(atlas, true)));
   if (manifest.atlas === 'vfx') {
     out.set('vfx.anims.json', Buffer.from(`${JSON.stringify(staticAnims('vfx', got), null, 1)}\n`));
   }
