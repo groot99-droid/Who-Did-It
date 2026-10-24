@@ -23,6 +23,15 @@
 | What the well gives and how often | "you walk up to the well, a mini screen pops up you have luck meter on drop of a coin, 10 percent chance "luck" escape death once, 20 percent coin back, 20 percent rare item, 25 chance nothing, 25 percent chance loitering (increases suspicion). the well can only be used once a day and it increases 10x per day, this is on a per player basis." |
 | How long and hard a station game is | "Varies by station" (per station in round 2, with the mock-up in front of the owner) |
 
+### Round 2 (2026-10-24, the shelves and the well's unknowns, answered in the session)
+
+| Question | Owner's answer, verbatim |
+|---|---|
+| How the reader behaves at a shelf | "Pull a spine, leaf pages": 3 to 5 spines, drag one out to open it, pages turn by drag or swipe with two large arrows on touch, letters unfold as one sheet, walking away closes it |
+| The well's coin and what grows "10x per day" | "1 scrip, price x10 each day": day 1 costs 1 scrip, day 2 10, day 3 100, per player; one play per player per day cycle; "coin back" returns what was paid; the coin goes to the town till |
+| The rare-item band and loitering | "role flavored finds with first loitering option": the rare band draws from a role-neutral list plus one item that helps the seat's own card (a bandage for a Doctor, a snare for a Gamekeeper); loitering is +2 suspicion with every NPC seat that saw the figure at the well, with a log line only the seat sees ("You dawdled at the well.") |
+| How "luck" escapes death once | "Silent charm, Remedy-like": the seat holds an invisible charm; the first Knife strike that would kill leaves it Wounded at 1 HP instead and the charm is spent; nobody else sees it until the strike |
+
 ## 2. The rules every widget keeps (6Z, 2026-10-24)
 
 1. Every widget action is a queued command the server consumes in `step()`; nothing mutates state in a message callback
@@ -90,28 +99,30 @@ Every row keeps the task's effect and wage: the hands change, the rules do not, 
 GDD row comes with it (3.26 the reader, 3.27 the well). A fetch task still needs its tool and its node; the global
 task bar still wins at 100%.
 
-## 4. The well, as the owner set it (round 1) and as 7M reads it
+## 4. The well, as the owner set it (rounds 1 and 2)
 
-The owner's words are in section 1. 7M's reading, to be confirmed in round 2 (the questions follow each point):
-
-- **Coin.** A seat drops one coin of Scrip (8C's purse) to play; with no coin the meter will not spin. The coin is a
-  sink to the town till. *Round 2: is the coin 1 scrip?*
-- **Once a day, 10x.** One play per seat per day cycle, and the price multiplies by ten each day the same seat plays:
-  1, then 10, then 100. *Round 2: is it the price that grows tenfold, or something else?*
+- **Coin.** One play costs Scrip from the seat's purse (8C), paid to the town till: `well.priceDay1` 1 on the seat's
+  first play of the match, then ten times the last price on each later day (1, 10, 100, `well.priceGrowth` 10). No
+  coin, no spin. One play per seat per day cycle (`well.playsPerDay` 1). All of it per seat.
 - **Luck meter.** The widget: the coin drops, a needle spins and settles on one of five bands. Reduced motion: no
-  spin, the needle fades in on its band. The server rolls on the `'well'` stream; the client only shows the roll.
-- **The table**, rolled server-side, per the owner: 10% **Luck** (escape death once: a one-time death save, the way
-  the Herbalist's Remedy survives the first strike, GDD 3.2; the charm is private, nothing shows on the figure),
-  20% **coin back**, 20% **rare item** (*round 2: which items; a lock pick for anyone is 8A's*), 25% **nothing** (a
-  bucket of cold water), 25% **loitering**, which raises the seat's suspicion through 8B's relations machinery
-  (`Brain.suspicion`, GDD 3.22). *Round 2: by how much, and in whose eyes: the NPC seats that saw the figure at the
-  well?*
+  spin, the needle fades in on its band. The server rolls on the `'well'` stream before the needle moves; the client
+  only shows the roll it is sent.
+- **The table** (`balance.json` `well.bands`, rolled server-side, the owner's numbers): 10% **luck**, a silent
+  charm: the first Knife strike that would kill the seat leaves it Wounded at 1 HP and spends the charm, as the
+  Herbalist's Remedy (GDD 3.2), private until the strike, nothing on the figure; 20% **coin back**, what was paid
+  returns to the purse; 20% **rare item**, one draw from a role-neutral list (`well.finds`: lock pick for any role,
+  lens, chalk, rope, lantern oil) plus one entry that helps the seat's own card (`well.cardFinds`, keyed by role: a
+  bandage for the Doctor, a snare for the Gamekeeper, and so on), so the draw never leaves the private view and a
+  found item only hints at a role when its owner uses it in public, as any kit item does; 25% **nothing**, a bucket
+  of cold water; 25% **loitering**, +2 suspicion (`well.loiterSuspicion`) with every NPC seat that saw the figure at
+  the well, through 8B's relations machinery (`Brain.suspicion`, GDD 3.22), and a log line only the seat sees, "You
+  dawdled at the well."
 - **Secrecy.** The roll goes to the private view. Others see a figure at the well for the widget's length, the same
-  whatever was rolled, so the band cannot be read from outside.
+  whatever was rolled, so the band cannot be read from outside; a seat with a spent or unspent charm looks the same.
 
-The death save needs an effect from 8A (`body.md` 3), the coin an 8C purse call, the suspicion an 8B call, the rare
-item table 8A or 8D; 7M writes the rule (`@wdi/shared` `rules/well.ts`, pure, numbers from `balance.json` `well`),
-the server station and the widget.
+The charm is an effect from 8A (`body.md` 3), the coin an 8C purse call, the suspicion an 8B call, the role-neutral
+lock pick an 8A item; 7M writes the rule (`@wdi/shared` `rules/well.ts`, pure, numbers from `balance.json` `well`),
+the server station and the widget, and the GDD 3.27 section with the 3.5 row.
 
 ## 5. The reader and the lore data
 
