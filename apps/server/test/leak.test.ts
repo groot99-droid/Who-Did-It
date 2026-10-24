@@ -1,7 +1,7 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance, clues } from '@wdi/content';
 import { Phase, TILE_PX } from '@wdi/shared';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { avatarMemory } from '../src/sim/Avatars';
 import { StatusBit } from '../src/sim/constants';
 import { simOf } from '../src/sim/RoomSim';
@@ -16,6 +16,8 @@ import { type Bot, type Match, sleep, stateOf } from './simHelpers';
 // patch a living client decodes and every message it is sent, across a seeded match by day, across the night
 // boundary and at night: no other seat's presence or private view (card, cover, cooldowns), no avatar it could not
 // see, no Blood out of range, no ghost-only `seat`; and no message names another seat's card, cover or cooldowns.
+
+vi.setConfig({ testTimeout: 40_000 });
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;

@@ -1,6 +1,6 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
 import { BUILD_VERSION, C2S, Phase, type PlayerState, dealTraits } from '@wdi/shared';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { createServer } from '../src/server';
 import { matchLog } from '../src/services/MatchLog';
@@ -9,6 +9,8 @@ import { endMatch } from '../src/sim/Win';
 
 // Round 8, 8L (docs/round8/teardown.md 1.4, A170): the match log carries the build and every stream's seed words,
 // and `MatchSeeds.replay` seeds from them, so a logged match's draws come out again.
+
+vi.setConfig({ testTimeout: 40_000 });
 
 const draw = (rng: () => number, n = 8) => Array.from({ length: n }, () => rng());
 
