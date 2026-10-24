@@ -38,6 +38,7 @@
 | `quest.accept` | `{ questId: string }` | 2/s | Round 6 (M5b, GDD 3.16): a `quests.json` id whose giver stands in reach. Refused 422 until Session 6H lands. |
 | `quest.turnIn` | `{ questId: string }` | 2/s | Round 6 (M5b, GDD 3.16): an accepted quest whose wants the inventory holds, at its giver. Refused 422 until 6H. |
 | `minigame.result` | `{ taskId: string; answer: unknown }` | 2/s | Round 6 (M5b, GDD 3.16): the answer to the `minigameStart` of `taskId`; the server checks it against the solution it kept and completes the task. Refused 422 until Session 6H lands. |
+| `act.inspect` | `{ targetId: string }` | 5/s | Round 8 (GDD 3.22): an avatar handle in reach, in any world phase; refused 422, 424 or 427. |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
 
@@ -62,6 +63,9 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `shot` | `{ fromId: string; targetId: string; role: string }` | Public, only during a reveal: the ejected Gamekeeper shot `targetId`, whose role was `role` (GDD 3.2). |
 | `cutscene` | `{ id: string; scope?: 'all' }` | Round 6 (M5c, GDD 3.18): play the cutscene `id` of `packages/content/data/cutscenes/`. Broadcast once for a map's opening at `beginPlay`; `scope: 'all'` marks a memorial every client plays (round 7). The server never waits for a client to finish it. A death's cutscene travels on `killed.cutsceneId` instead. |
 | `minigameStart` | `{ taskId: string; kind: MinigameKind; public: unknown }` | Private, round 6 (M5b, GDD 3.16): a station task's hold opened its mini-game; `public` is the puzzle without its solution (`rules/minigames.ts generate`). Answered with `minigame.result`. |
+| `inspect.result` | `{ targetId: string; lookId: string; signs: string[]; health: InspectHealth; purse: InspectPurse; light: boolean; tool?: string; }` | Private, round 8 (GDD 3.22): the inspected avatar's drawn look and what the eye reads of it. `signs` are copy ids of `ui/copy/inspect.ts` taken only from the avatar's public status bits; `light` is a burning light in hand. Never a card, a cover, a vendetta or an inventory. |
+| `inspect.noticed` | `{ lookId: string }` | Private, round 8: the look the inspector is drawn as. |
+| `inspect.hunch` | `{ copyId: string }` | Private, round 8: an `inspect.hunch.*` copy id. |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 

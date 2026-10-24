@@ -11,6 +11,8 @@ import {
   MOB_ANIM,
   MOB_ANIMS,
   MOB_IDS,
+  BREAK_FPS,
+  BREAK_FRAMES,
   NODE_STATES,
   RESOURCE_IDS,
   TOOL_IDS,
@@ -23,6 +25,8 @@ import {
   mobAnim,
   mobFrame,
   mobFrameList,
+  nodeBreakAnim,
+  nodeBreakFrame,
   nodeFrame,
   pageOf,
   snakeOf,
@@ -46,7 +50,10 @@ interface Atlas {
 }
 
 const WANT = {
-  nodes: RESOURCE_IDS.flatMap((id) => NODE_STATES.map((s) => nodeFrame(id, s))).sort(),
+  nodes: RESOURCE_IDS.flatMap((id) => [
+    ...NODE_STATES.map((s) => nodeFrame(id, s)),
+    ...Array.from({ length: BREAK_FRAMES }, (_, n) => nodeBreakFrame(id, n)),
+  ]).sort(),
   tools: [
     ...TOOL_IDS.flatMap((t) => DIRECTIONS.map((d) => heldFrame(t, d))),
     ...GLOWS.flatMap((g) => Array.from({ length: GLOW_FRAMES }, (_, n) => glowFrame(g, n))),
@@ -93,7 +100,8 @@ describe('M5b art (SPRITES 12)', () => {
       expect(MOB_IDS, id).toContain(id);
       expect(m.sprite).toBe(`mob_${id}`);
     }
-    expect(WANT.mobs).toHaveLength(MOB_IDS.length * DIRECTIONS.length * 14);
+    const perDir = MOB_ANIMS.reduce((n, a) => n + MOB_ANIM[a].frames, 0);
+    expect(WANT.mobs).toHaveLength(MOB_IDS.length * DIRECTIONS.length * perDir);
   });
 
   it('draws every quest npc of quests.json in 8 directions, all in the villager body', () => {
@@ -133,6 +141,16 @@ describe('M5b art (SPRITES 12)', () => {
     });
   }
 
+  it('breaks every resource node once from anims_nodes (round 8, 8G: motion.md 2)', () => {
+    const a = json<{ anims: Array<{ key: string; repeat: number; frameRate: number; frames: unknown[] }> }>(
+      join(ASSETS, 'm5b', 'nodes.anims.json'),
+    );
+    expect(a.anims.map((x) => [x.key, x.repeat, x.frameRate, x.frames.length])).toEqual(
+      RESOURCE_IDS.map((id) => [nodeBreakAnim(id), 0, BREAK_FPS, BREAK_FRAMES]),
+    );
+    expect(nodeBreakFrame('tinOre', 3)).toBe('node_tin_ore/break/003');
+  });
+
   it('loops both glows from anims_tools', () => {
     const a = json<{ anims: Array<{ key: string; repeat: number; frames: unknown[] }> }>(
       join(ASSETS, 'm5b', 'tools.anims.json'),
@@ -142,7 +160,16 @@ describe('M5b art (SPRITES 12)', () => {
     );
   });
 
-  it('plays each mob animation in each direction, looping all but the attack', () => {
+  it('draws the round-8 clips for every creature: the bite sequence, hurt, death and flee (motion.md 2)', () => {
+    expect(MOB_ANIMS).toEqual(['idle', 'walk', 'attack', 'hurt', 'death', 'flee']);
+    // Crouch, crouch, lunge, bite, recoil, settle: one frame per beat so the bite reads.
+    expect(MOB_ANIM.attack.frames).toBeGreaterThanOrEqual(6);
+    for (const once of ['attack', 'hurt', 'death'] as const) expect(MOB_ANIM[once].repeat, once).toBe(0);
+    for (const loop of ['idle', 'walk', 'flee'] as const) expect(MOB_ANIM[loop].repeat, loop).toBe(-1);
+    expect(MOB_ANIM.flee.fps).toBeGreaterThan(MOB_ANIM.walk.fps);
+  });
+
+  it('plays each mob animation in each direction, looping all but the attack, the hurt and the death', () => {
     const a = json<{ anims: Array<{ key: string; repeat: number; frameRate: number; frames: unknown[] }> }>(
       join(ASSETS, 'm5b', 'mobs.anims.json'),
     );

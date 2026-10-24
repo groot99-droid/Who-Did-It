@@ -34,12 +34,14 @@ describe.each(maps)('the props of %s resolve to frames (SPRITES 10.13, art plan 
   const shared = frames('props/props.json');
   const own = frames(`props/props_${map}.json`);
   const has = (name: string) => own.has(name) || shared.has(name) || own.has(`${name}#0_0`);
-  /** props_<mapId>, then props; within each prop_<kind>[_<state>], then prop_<id tail>. */
+  /** props_<mapId>, then props; within each prop_<kind>[_<state>], prop_<id tail>, then the tail without _<n> (SPRITES 3). */
   const resolves = (kind: string, id: string) => {
     const tail = id.slice(id.lastIndexOf('.') + 1);
     const state = [...own, ...shared].some((f) => f.startsWith(`prop_${kind}_`));
-    if (kind === 'decor' || kind === 'taskSource') return has(`prop_${tail}`);
-    return has(`prop_${kind}`) || state || has(`prop_${tail}`);
+    const stem = tail.replace(/_\d+$/, '');
+    if (kind === 'decor' || kind === 'dressing' || kind === 'taskSource')
+      return has(`prop_${tail}`) || has(`prop_${stem}`);
+    return has(`prop_${kind}`) || state || has(`prop_${tail}`) || has(`prop_${stem}`);
   };
 
   it.each(scenes)('%s', (sceneId) => {

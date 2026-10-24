@@ -6,6 +6,7 @@ import { handleMinigameResult } from './Minigames';
 import { handleLight } from './mobs/light';
 import { handleQuestAccept, handleQuestTurnIn } from './Quests';
 import { runHolds } from './Hold';
+import { handleInspect } from './inspect';
 import { queuePortal } from './PortalQueue';
 import { handleNotice } from './economy/notices';
 
@@ -74,6 +75,10 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.light:
         handleLight(room, cmd.sessionId, payload);
+        break;
+      // Round 8 (GDD 3.22 "Inspect"): 8B's `sim/inspect/`.
+      case C2S.inspect:
+        handleInspect(room, cmd.sessionId, payload);
         break;
       // Round 8 (GDD 3.23, 8D): the civic commands; each refuses until its loop lands.
       case C2S.notice:
