@@ -816,7 +816,7 @@ knockout (3.22, the reduced body) reaches a figure only once the strike hook of 
 `figureNotSeat` (auto 50) checks that no figure is in any seat list, vote, death or meeting, and that no figure
 avatar carries a seat's handle, the ghost tag or a card's look.
 
-**The mugging (8E, A161).** A Hungry, Angry or Desperate figure or NPC seat that is alone with one seat rolls each
+**The mugging (8E, A180).** A Hungry, Angry or Desperate figure or NPC seat that is alone with one seat rolls each
 second for a mugging, on its own stream (`townsfolk:<figure>`, or the NPC's choices stream) and only while in such a
 mood, so a calm match draws nothing new. "Alone" is the A100 room rule (3.12): any scene but the map's hub, the only
 other living seat there, no other figure present, not crossing a door, within `npc.aloneKill.sightTiles`. A seat
@@ -826,7 +826,7 @@ the need behind the mugger's mood, times `nightMul` in the night class, `weakMul
 (3.22) and `longAloneMul` after `longAloneS` alone beside a heavy purse; the mugger's own Fear (`fearMul`) and a
 light burning in the target's hand (`lightMul`) lower it. A figure walks up to within
 `reachTiles` (giving up after `approachS`); an NPC seat mugs only a seat already within reach until its walk-up
-lands (A161, open). The mugger stands and threatens for `threatS` (the `threaten` clip on a figure; an NPC seat
+lands (A180, open). The mugger stands and threatens for `threatS` (the `threaten` clip on a figure; an NPC seat
 holds its mood idle until 8A's one-shot slot lands), then the target has `answerS` to answer by the private prompt
 (UI 14.37):
 - **Pay**: `share` of the purse (rounded, at least one Scrip) moves to the mugger through 3.23's one function; a
@@ -834,7 +834,7 @@ holds its mood idle until 8A's one-shot slot lands), then the target has `answer
 - **Silence**: the share is taken when the answer runs out (the strike, once the fists land).
 - **A door**: a target that leaves the scene while its answer is due escapes, with nothing taken.
 - **Flee** (a chase of `chaseS`, the share taken if the mugger reaches the target) and **Fight** (strikes on both
-  sides, 3.22) are part two of A161, after 8A's fists; until then both answers are refused.
+  sides, 3.22) are part two of A180, after 8A's fists; until then both answers are refused.
 
 A mugged NPC seat pays. Every mugging ends with `mug.end` on the bus, a `scuffle` clue (3.4) where the target
 stood showing the mugger's height, and a robbed seat angry at its mugger
