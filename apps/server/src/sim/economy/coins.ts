@@ -2,7 +2,7 @@ import { balance } from '@wdi/content';
 import { ErrorCode, Node, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { type PlayerSim, simOf } from '../RoomSim';
-import { emitSim } from '../events/bus';
+import { type SimEvent, emitSim, onSim } from '../events/bus';
 import { isVerbPhase, sceneKey } from '../World';
 import { balanceOf, movePurse } from './purse';
 
@@ -53,6 +53,23 @@ export function dropCoins(room: PartyRoom, seat: string, amount: number): string
   node.respawnTick = 0;
   scene.nodes.set(id, node);
   return id;
+}
+
+const subscribed = new WeakSet<PartyRoom>();
+
+/** The bus's `body.ko` (8A): `body.koPurseShare` of the downed seat's purse, rounded down, drops where it lies. */
+export function onKnockout(room: PartyRoom, event: SimEvent): void {
+  const seat = event.seat;
+  if (!seat) return;
+  const amount = Math.floor(balanceOf(room, seat) * balance.body.koPurseShare);
+  if (amount > 0) dropCoins(room, seat, amount);
+}
+
+/** `runEconomy`: subscribes the knockout's coin drop once per room. */
+export function runCoins(room: PartyRoom): void {
+  if (subscribed.has(room)) return;
+  subscribed.add(room);
+  onSim(room, 'body.ko', (e, r) => onKnockout(r, e));
 }
 
 /** Why a pickup cannot run this tick, or null: the gather checks without a tool or a pocket. */

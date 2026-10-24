@@ -842,7 +842,7 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   its panel, privately: what it sells at its `ask` and what it buys at its `pay` (`economy.json` `prices`). A living
   seat in a world phase other than the immunity window buys and sells while the counter stays within
   `doors.reachTiles`. A purchase is refused, and nothing changes, when the purse or the inventory falls short. The
-  bakery sells flour, the apothecary bandages and salts, the general store (HollowMere's tavern bar, BlackPine's
+  bakery sells flour and the Wake Loaf, the apothecary bandages and salts, the general store (HollowMere's tavern bar, BlackPine's
   lodge) rope, lantern oil, candles and planks, and the Gamekeeper's stall (HollowMere's forest edge, BlackPine's
   lodge) snares and torches. The market (HollowMere's square, BlackPine's camp) sells nothing and buys timber, stone,
   resin, herbs, mushrooms and tin ore. No shop trades a role's kit, and an item a shop both sells and buys pays
@@ -853,7 +853,8 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   heist reaches it: when the Bandit cracks the strongbox, the box carries off `economy.heistShare` of every seat's
   bank balance (rounded down per seat) as its loot, and the cracker pockets it. A suddenly heavy purse is the
   heist's tell, though wages and sales can make anyone rich.
-- **Coins on the ground.** A knockout or a mugging drops part of the purse where the seat lies, as a heap of coins
+- **Coins on the ground.** A knockout or a mugging drops part of the purse where the seat lies (a knockout
+  `body.koPurseShare` of it, rounded down; nothing if that is under one Scrip), as a heap of coins
   anyone alive can pick up with the gather hold (`economy.coinPickupS`, within reach). The first to finish takes the
   whole heap, and it never comes back.
 - **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice. It leaves only as a

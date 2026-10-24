@@ -17,7 +17,7 @@
     "default": "modest"
   },
   "shops": {
-    "bakery": { "prop": "bk.shop_counter", "sells": ["flour"], "buys": [] },
+    "bakery": { "prop": "bk.shop_counter", "sells": ["flour", "wakeLoaf"], "buys": [] },
     "apothecary": { "prop": "as.shop_counter", "sells": ["bandage", "salts"], "buys": [] },
     "store": {
       "prop": "tb.shop_counter",
@@ -44,6 +44,7 @@
   },
   "prices": {
     "flour": { "ask": 2 },
+    "wakeLoaf": { "ask": 3 },
     "bandage": { "ask": 4 },
     "salts": { "ask": 5 },
     "rope": { "ask": 3 },
