@@ -42,6 +42,8 @@ Turns rendered frames into the atlases the client loads (`docs/SPRITES.md`). Typ
 | `test/slice.test.ts` | Tile assignment by majority, edge fallback and footprint clamp on a fixture; the shipped `bld_<mapId>` atlases hold only slices that share their building's pivot, on pages within 2048 x 1024, under the finish in world colours |
 | `test/refs.test.ts` | Every reference file exists, every crop lies inside its image, output names are unique |
 | `test/world.test.ts` | Each shipped style manifest holds every 5K key with the 8-bit URL, frame names, source sizes and pivots, pages within their caps, full ground sheets and thumbnails under 100 kB |
+| `hd.ts` | The HD style's build (art.md 3, DECISIONS A164): packs `--style hd` renders unhalved and unfinished at `factor` render px per display px, alpha-bled with the extrude ring, page caps and ground cells `factor` times larger, the same keys and pivot fractions as the 8-bit set; CLI `hd ground\|static\|slice\|char <render dir> <out dir> [--subset]` |
+| `test/hd.test.ts` | The texel factor from a manifest or an image, the HD tileset layout and masks, one-to-one slicing with pivots in render px, a subset packed at twice the cap |
 | `test/bleed.test.ts` | PNG round trip, one and two bleed rings, determinism |
 
 ```sh
