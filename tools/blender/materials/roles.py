@@ -23,6 +23,9 @@ STYLE_RESOLUTION = {"8bit": "1k", "lowpoly": "1k", "hd": "2k"}
 # How far a style pulls the photo toward its role's ramp colour (0 = the photo), and low poly's posterise levels.
 STYLE_TONE = {"8bit": 0.45, "lowpoly": 0.45, "hd": 0.0}
 POSTERISE_LEVELS = {"lowpoly": 6}
+# The sky the PBR finish fills the world with (`pbr.py`, A164): a Poly Haven HDRI, locked and fetched like the textures.
+HDRIS = {"sky": "kloofendal_48d_partly_cloudy_puresky"}
+HDRI_RESOLUTION = "1k"
 
 
 @dataclass(frozen=True)
@@ -126,6 +129,17 @@ def texture_file(slug: str, map_name: str, res: str) -> str:
     if map_name not in MAPS or res not in RESOLUTIONS:
         raise ValueError(f"no {map_name} at {res}; maps are {list(MAPS)}, resolutions {RESOLUTIONS}")
     return f"{slug}_{MAPS[map_name]}_{res}.jpg"
+
+
+def hdri_file(slug: str, res: str = HDRI_RESOLUTION) -> str:
+    """The cache file name of an HDRI (the lock's `url` keeps the API's own)."""
+    return f"{slug}_{res}.hdr"
+
+
+def hdri_path(name: str = "sky", cache: str = CACHE_DIR) -> str:
+    """Cache path of one of `HDRIS`, beside the textures under its slug."""
+    slug = HDRIS[name]
+    return os.path.join(cache, slug, hdri_file(slug))
 
 
 def texture_path(role_name: str, map_name: str = "diff", res: str | None = None, style: str | None = None,
