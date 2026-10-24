@@ -3,3 +3,6 @@ export * from './state';
 export * from './effects';
 export * from './damage';
 export * from './run';
+export * from './verbs';
+export * from './fists';
+export * from './cures';
