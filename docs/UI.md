@@ -1245,3 +1245,40 @@ trade; a refusal is the usual error line. 8H animates the panel by `wdi-anim-pan
 | `shop.close` | Close | the panel's close button |
 | `prompt.coins` | Hold E: pick up the coins | the hold prompt at dropped coins in reach (the hold lasts `economy.coinPickupS`) |
 | `shop.<id>` | Bakery, Apothecary, General Store, Market, Gamekeeper's Stall, Lodge Store, Camp Market | the panel's title, by `economy.json` shop id |
+
+### 14.38 Tasks: the chores panel, the station prompts and the village's work (7M)
+
+Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt at Start gets its screen half in the M5b layer (14.19): nothing here changes the layer's gather, craft or quest behaviour, and `ui/theme/**` is not edited; the new rules live in `ui/match.css`.
+
+**Spots.** `ui/tasks.ts taskSpots` turns this seat's unfinished `fetch` tasks into targets in the current scene, from `tasks.json` and the scene file's props (loaded lazily, as the givers are): a real task's source while its tool is not in the pockets, a fake task's source always (its holder makes the same motion at the same shelf and takes nothing, 3.5), and every target. The layer's E picks the nearest of the active nodes, the givers and these spots; a spot wins a tie. Pressing E (or the prompt) sends the `task` hold once: at the source the server's pick-up puts the tool in the pockets and the layer says so when they change (`toast.task.took`); a fake list's holder gets `toast.task.show` instead, on the client only, so the wire carries the same hold either way. At a station the hold opens the mini-game as before (14.19.5).
+
+**Prompts** (`ui/copy/tasks.ts`, read by `taskPrompt`): `prompt.task.take` "Press E: take the {tool}" at a real source; `prompt.task.do` "Press E: {name}" at a fake source, or at a station with the tool in hand; `prompt.task.tool` "Needs the {tool}: {name}" at a station without it; `prompt.task.night` "Only at night: {name}" at a `nightOnly` station by day (the server refuses the same, 3.5). A fake task never says what it needs: it has nothing to fetch, and its prompt reads like a real task's with the tool in hand.
+
+**Chores (K).** `ui/Chores.ts mountChores`, the QuestLog's panel pattern and classes (`wdi-m5b__panel/row/done/empty`), fourth button of the layer's key row. One row per dealt task in deal order: the name, then `chores.fetch` "Fetch the {tool} from {scene}", `chores.bring` "Bring it to {scene}", `chores.go` "Go to {scene}" for a task without a tool, `chores.night` "After dark." under a `nightOnly` one, `chores.done` "Done" (name struck through). A fake list shows the same rows under the hint `chores.show` "A show of work": the list is `Private.tasks`, so only its holder sees that line. `chores.none` "No chores on your list." for a seat dealt none (an NPC seat, or Blackpine). Escape closes it with the other panels. Testids `chores`, `chores-list`, `chores-show`, `chores-empty`, `chore-<taskId>` (with `data-step` fetch, bring or done), `chores-close`.
+
+**The village's work.** `mountWorkBar`: the public task bar (`GameState.taskBar`, `WorldFeed.taskBar()`) as a thin meter with its percentage under the clock, `role="progressbar"` with `aria-valuenow`, title and label `work.title` "The village's work", `work.pct` "{pct}%". Its fill moves in 300 ms, none under reduced motion. Testids `work`, `work-pct`.
+
+**Ghosts.** GDD 3.8 lets a ghost finish its own tasks, so the layer stays up for a dead seat with `data-ghost` on its root: only task spots are picked, the pockets, crafting and quests buttons hide and their panels close, and no gather or craft can start. The chores panel and the bar remain.
+
+**Copy table.**
+
+| Key                 | Line                             |
+| ------------------- | -------------------------------- |
+| `prompt.task.take`  | Press E: take the {tool}         |
+| `prompt.task.do`    | Press E: {name}                  |
+| `prompt.task.tool`  | Needs the {tool}: {name}         |
+| `prompt.task.night` | Only at night: {name}            |
+| `toast.task.took`   | Took the {tool}.                 |
+| `toast.task.show`   | You make a show of it.           |
+| `chores.title`      | Chores                           |
+| `chores.key`        | K                                |
+| `chores.none`       | No chores on your list.          |
+| `chores.show`       | A show of work                   |
+| `chores.fetch`      | Fetch the {tool} from {scene}    |
+| `chores.bring`      | Bring it to {scene}              |
+| `chores.go`         | Go to {scene}                    |
+| `chores.night`      | After dark.                      |
+| `chores.done`       | Done                             |
+| `chores.close`      | Close                            |
+| `work.title`        | The village's work               |
+| `work.pct`          | {pct}%                           |

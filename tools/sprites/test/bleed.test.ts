@@ -26,6 +26,30 @@ describe('bleed', () => {
     expect([...two.data.subarray(0, 4)]).toEqual([200, 100, 50, 0]);
   });
 
+  it('round-trips every PNG filter and picks per row with byte-stable output', () => {
+    // Noise, flat runs, a vertical gradient and a repeated row: rows that favour different filters.
+    const w = 24;
+    const h = 8;
+    const data = new Uint8Array(w * h * 4);
+    let seed = 7;
+    for (let i = 0; i < data.length; i++) {
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+      const y = Math.floor(i / 4 / w);
+      data[i] = y < 2 ? seed & 0xff : y < 4 ? 90 : y < 6 ? (i % (w * 4)) & 0xff : data[i - w * 4]!;
+    }
+    const img = { width: w, height: h, data };
+    for (const f of [0, 1, 2, 3, 4] as const) {
+      const png = encodePng(img, f);
+      expect(decodePng(png).data, `filter ${f}`).toEqual(data);
+    }
+    const adaptive = encodePng(img);
+    expect(decodePng(adaptive).data).toEqual(data);
+    expect(adaptive.equals(encodePng(img))).toBe(true);
+    expect(adaptive.length).toBeLessThanOrEqual(
+      Math.min(...[0, 1, 2, 3, 4].map((f) => encodePng(img, f as 0).length)),
+    );
+  });
+
   it('is deterministic', () => {
     const c = createCanvas(16, 16);
     const g = c.getContext('2d');
