@@ -28,6 +28,7 @@ import {
   tileCentre,
 } from './World';
 import { spawnTeachingClue } from './Clues';
+import { curfewBars } from './economy/rent';
 import { reconcileViews } from './Visibility';
 
 const ticks = (seconds: number): number => Math.round(seconds * TICK_RATE);
@@ -178,6 +179,11 @@ export function runPortals(room: PartyRoom): void {
     }
     if (portal.lock !== null && !p.dead) {
       // Keys are inventory items and arrive with M5; until then a keyed door stays locked.
+      reject(room, req.sessionId, ErrorCode.locked, 'locked');
+      continue;
+    }
+    // Round 8, 8D (GDD 3.23): from dusk an Indebted seat's curfew doors refuse it like a locked one.
+    if (curfewBars(room, req.sessionId, portal.to)) {
       reject(room, req.sessionId, ErrorCode.locked, 'locked');
       continue;
     }

@@ -127,3 +127,14 @@ describe('activation helpers (motion.ts)', () => {
     for (const cls of Object.values(FX)) expect(block8h()).toContain(`.${cls}`);
   });
 });
+
+describe('economy HUD motion (8H step 5)', () => {
+  const hud = readFileSync(join(THEME, '..', '..', 'view', 'purse', 'PurseHud.ts'), 'utf8');
+
+  it("draws 8C's purse hooks: the class and both change states", () => {
+    expect(hud).toContain("'wdi-purse wdi-anim-purse'");
+    expect(hud).toMatch(/dataset\.change = .*'gain' : 'loss'/);
+    for (const sel of ['.wdi-anim-purse[data-change]', "[data-change='gain']", "[data-change='loss']"])
+      expect(block8h()).toContain(sel);
+  });
+});

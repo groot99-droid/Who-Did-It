@@ -17,6 +17,7 @@ export const NOISE_KEYS = [
   'goat',
   'wispRattle',
   'shot',
+  'shout',
 ] as const;
 export const NoiseKey = z.enum(NOISE_KEYS);
 export type NoiseKey = z.infer<typeof NoiseKey>;
@@ -128,6 +129,8 @@ export const BalanceFile = z.strictObject({
   finalNight: Section({
     afterCycle: z.number().int().positive(),
     huntS: Seconds,
+    /** Round 8 (GDD 3.3): the discussion of the trial, the forced meeting after the hunt; longer than any meeting's. */
+    trialS: Seconds,
     killCooldownS: Seconds,
     skipAllowed: z.boolean(),
     tieEjectsNobody: z.boolean(),
@@ -285,6 +288,16 @@ export const BalanceFile = z.strictObject({
     aloneKill: z.strictObject({ afterS: Seconds, sightTiles: Tiles }),
     /** NPC night powers (GDD 3.2, 3.12): the use tick over dusk plus night, and the Last Shot delay. */
     nightPower: z.strictObject({ windowFrac: FracSpan, lastShotS: Span }),
+    /**
+     * Round 8 (8R, GDD 3.12 "The hive"): a reaction becomes due a `staggerS` after it is first proposed (a hash of
+     * the seat and the reaction, never a draw); a heard noise, shout or bell stays on the board for `memoryS`.
+     */
+    hive: z.strictObject({ staggerS: Span, memoryS: Seconds }),
+    /**
+     * Round 8, 8R (GDD 3.12): the body bands, in tiles from the body: walk to it, shout for the Detective and the
+     * Doctor, and stay to report it or run for the bell.
+     */
+    body: z.strictObject({ pullTiles: Tiles, shoutTiles: Tiles, bellTiles: Tiles }),
     /** Round 6 (GDD 3.19): an NPC at one goal and one tile for longer than this fails the stuck invariant. */
     stuckInvariantS: Seconds,
   }),
@@ -356,6 +369,22 @@ export const BalanceFile = z.strictObject({
     maxChars: z.number().int().positive(),
     quickChatRadiusTiles: Tiles,
     quickChat: z.array(z.strictObject({ id: Id, text: z.string().min(1) })).length(8),
+  }),
+  /** Round 8 (GDD 3.8 "Meeting notes", 3.25), 8T's keys. */
+  talk: Section({
+    /** A seat writes at most one note in this many seconds, human or NPC alike. */
+    noteGapS: Seconds,
+    /** A seat writes at most this many notes in one meeting. */
+    notesPerMeeting: z.number().int().positive(),
+    npc: z.strictObject({
+      /** The notes an NPC seat means to write in a meeting, drawn per meeting from its `talk` stream. */
+      notesPerMeeting: z.strictObject({
+        min: z.number().int().nonnegative(),
+        max: z.number().int().nonnegative(),
+      }),
+      /** When they fall: fractions of the discussion plus the vote time, from the discussion's first tick. */
+      windowFrac: FracSpan,
+    }),
   }),
 });
 export type BalanceFile = z.infer<typeof BalanceFile>;

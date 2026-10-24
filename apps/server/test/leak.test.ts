@@ -3,6 +3,7 @@ import { balance, clues } from '@wdi/content';
 import { Phase, TILE_PX } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { avatarMemory } from '../src/sim/Avatars';
+import { clockOf } from '../src/sim/auto/clock';
 import { StatusBit } from '../src/sim/constants';
 import { simOf } from '../src/sim/RoomSim';
 import { canSee } from '../src/sim/Sight';
@@ -123,17 +124,16 @@ describe('the leak audit (8L)', () => {
     sim(m, 0).bloodyUntilTick = m.room.state.tick + 20 * 3600;
     const a = audit(m);
     moved(m, a);
-    await sleep(500);
+    // Wait on the count rather than the clock: a loaded runner can judge no patch at all in a fixed half second.
+    expect(await until(() => a.checked > 10, 10_000)).toBe(true);
     const byDay = a.checked;
-    expect(byDay).toBeGreaterThan(10);
 
     // Day to dusk to night through the phase clock itself (`runPhases`), the boundary A190 closes.
     await skipPhase(m);
     expect(m.room.state.phase).toBe(Phase.dusk);
     await skipPhase(m);
     expect(m.room.state.phase).toBe(Phase.night);
-    await sleep(500);
-    expect(a.checked).toBeGreaterThan(byDay + 10);
+    expect(await until(() => a.checked > byDay + 10, 10_000)).toBe(true);
     const seenBy0 = avatarsHeld(m.bots[0]!).map((h) => avatarMemory(m.room).seatOf.get(h.handle));
     expect(seenBy0.sort()).toEqual([0, 1, 2].map((i) => m.bots[i]!.id).sort()); // night is narrower
 
@@ -162,6 +162,10 @@ describe('the leak audit (8L)', () => {
     const a = audit(m);
     moved(m, a);
     expect(await until(() => avatarsHeld(m.bots[1]!).length > 0)).toBe(true);
+    // The audit judges a patch only on the tick it was encoded. A loaded runner decodes ticks late, so the clock
+    // stops here: patches still go out, and every one is decoded on the server's current tick.
+    expect(await until(() => m.room.state.tick >= a.settledFrom)).toBe(true);
+    clockOf(m.room).paused = true;
     // White-box: bypass `writeAvatar` for seat 0's avatar every few ms, as a regression would.
     const timer = setInterval(() => {
       const handle = avatarMemory(m.room).handleOf.get(m.bots[0]!.id) ?? '';
@@ -170,5 +174,6 @@ describe('the leak audit (8L)', () => {
     }, 5);
     expect(await until(() => a.leaks.some((l) => l.includes('Blood')))).toBe(true);
     clearInterval(timer);
+    clockOf(m.room).paused = false;
   });
 });

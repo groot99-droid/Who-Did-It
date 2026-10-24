@@ -10,6 +10,7 @@ import {
   firstLoadBytes,
   readManifest,
   siteBytes,
+  styleBytes,
   type MusicManifest,
   type SfxManifest,
   type VideoManifest,
@@ -46,6 +47,13 @@ describe('the committed media manifests', () => {
     const style = artStyles().find((s) => s.id === styleFile.artStyles.default);
     expect(style).toBeDefined();
     expect(firstLoadBytes(style?.root ?? '')).toBeLessThanOrEqual(BUDGET.firstLoadBytes);
+  });
+
+  it('keep the HD style within 80 MB, lazy behind the pick and inside the site cap (A164)', () => {
+    const hd = artStyles().find((s) => s.id === 'hd');
+    expect(hd?.root).toBe('hd/');
+    expect(styleBytes(hd?.root ?? 'hd/')).toBeLessThanOrEqual(BUDGET.hdBytes);
+    expect(BUDGET.hdBytes).toBeLessThan(BUDGET.siteBytes);
   });
 
   it('keep public/assets within 150 MB', () => {

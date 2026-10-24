@@ -3,8 +3,9 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DIRECTIONS, V1_CLIPS, type Anim } from '../keys.ts';
 import type { MultiAtlas } from '../pack.ts';
-import { worldLooks } from '../placeholder-chars.ts';
-import { ASSETS } from './realAssets.ts';
+import { artStyles } from '../palette.ts';
+import { villagerLooks, worldLooks } from '../placeholder-chars.ts';
+import { ASSETS, hasManifest } from './realAssets.ts';
 
 /** Art plan 4.3: one character per world look, 304 frames per pass, three passes on shared pivots. */
 const SPEC = join(import.meta.dirname, '../../blender/looks_spec.py');
@@ -41,17 +42,34 @@ const expectedTails = (look: string) =>
 
 describe('the world looks (art plan 4.3, looks.json)', () => {
   const looks = worldLooks().map((l) => l.id);
+  const family = villagerLooks().map((l) => l.id);
 
-  it('builds exactly the looks.json looks with a body, plus the villager', () => {
-    expect(specLooks().sort()).toEqual([...looks, 'villager'].sort());
+  it('builds exactly the looks.json looks with a body, plus the villager family', () => {
+    expect(specLooks().sort()).toEqual([...looks, ...family].sort());
   });
 
-  for (const [label, rel, base] of [
-    ['real', 'manifest.json', ASSETS],
-    ['placeholder', 'placeholder/manifest.json', join(ASSETS, 'placeholder')],
-  ] as const) {
+  // The deck looks in both manifests; the family (round 8, A161) in every real style's, the placeholder's keeps the
+  // plain villager only (manifest.test.ts).
+  const sets: Array<[string, string, string, string[]]> = [
+    // A style still rendering its characters (HD, A164) lists none and falls back per key (A80); the guard keys on the
+    // manifest, and manifest.test.ts checks that every style it skips is in that state.
+    ...artStyles()
+      .filter(
+        (s) =>
+          hasManifest(s.root) &&
+          manifestAt(join(s.root, 'manifest.json')).some((e) => e.key.startsWith('char_')),
+      )
+      .map((s): [string, string, string, string[]] => [
+        s.id,
+        join(s.root, 'manifest.json'),
+        join(ASSETS, s.root),
+        s.root === '' ? [...looks, ...family] : family,
+      ]),
+    ['placeholder', 'placeholder/manifest.json', join(ASSETS, 'placeholder'), looks],
+  ];
+  for (const [label, rel, base, ids] of sets) {
     const entries = new Map(manifestAt(rel).map((e) => [e.key, e]));
-    for (const look of looks) {
+    for (const look of ids) {
       it(`${label}: char_${look} and ovl_${look} hold 5 clips x 8 directions, three passes on one pivot`, () => {
         const body = entries.get(`char_${look}`);
         const ovl = entries.get(`ovl_${look}`);

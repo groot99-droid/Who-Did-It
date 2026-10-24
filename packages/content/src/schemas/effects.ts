@@ -18,6 +18,7 @@ export const EFFECT_IDS = [
   'famished',
   'knockedOut',
   'indebted',
+  'charm',
 ] as const;
 export const EffectKey = z.enum(EFFECT_IDS);
 export type EffectKey = z.infer<typeof EffectKey>;

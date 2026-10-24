@@ -9,7 +9,14 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { decodePng, encodePng } from './bleed.ts';
 import { writeFiles } from './pack.ts';
-import { KIT_THEMES, packStatic, readStatic, type StaticManifest } from './pack-static.ts';
+import {
+  KIT_THEMES,
+  SLICE_RE,
+  bldPropFrames,
+  packStatic,
+  readStatic,
+  type StaticManifest,
+} from './pack-static.ts';
 import { artStyle, artStyles, type ArtStyle } from './palette.ts';
 import { finishFolder } from './pixel.ts';
 import { thumbnail } from './review-world.ts';
@@ -43,20 +50,25 @@ async function pack(
   work: string,
   out: string,
   on: boolean,
-  o: { display?: boolean; sliced?: string } = {},
+  o: { display?: boolean; sliced?: string; keep?: (frame: string) => boolean } = {},
 ) {
   rmSync(work, { recursive: true, force: true });
   if (existsSync(src)) finishFolder(src, work, { display: o.display === true, on });
+  const target = join(work, 'manifest.json');
   if (o.sliced) {
     const { files, manifest } = sliceFolder(o.sliced, on);
     writeFiles(work, files);
-    const target = join(work, 'manifest.json');
     if (existsSync(target)) {
       const old = JSON.parse(readFileSync(target, 'utf8')) as StaticManifest;
-      manifest.atlas = old.atlas;
+      // The sliced render names the atlas; a props render merged into it (BLD_PROPS_MAPS) does not rename it.
       manifest.frames = { ...old.frames, ...manifest.frames };
     }
     writeFileSync(target, `${JSON.stringify(manifest, null, 1)}\n`);
+  }
+  if (o.keep) {
+    const m = JSON.parse(readFileSync(target, 'utf8')) as StaticManifest;
+    m.frames = Object.fromEntries(Object.entries(m.frames).filter(([name]) => o.keep!(name)));
+    writeFileSync(target, `${JSON.stringify(m, null, 1)}\n`);
   }
   const { manifest, inputs } = readStatic(work);
   writeFiles(out, await packStatic(manifest, inputs, on));
@@ -87,12 +99,22 @@ export async function buildStyle(
   await pack(join(render, 'props'), join(tmp, 'props'), join(root, 'props'), on);
   await pack(join(render, 'clues'), join(tmp, 'clues'), join(root, 'clues'), on, { display: true });
   for (const map of WORLD_MAPS) {
+    // BLD_PROPS_MAPS: those props are rendered with the map's others and packed with its buildings.
+    const bld = bldPropFrames(map);
     await pack(join(render, `props_${map}`), join(tmp, `props_${map}`), join(root, 'props'), on, {
       sliced: join(render, `props_${map}_sliced`),
+      keep: (f) => !bld.includes(f),
     });
-    await pack('', join(tmp, `bld_${map}`), join(root, 'buildings'), on, {
-      sliced: join(render, `bld_${map}`),
-    });
+    await pack(
+      bld.length ? join(render, `props_${map}`) : '',
+      join(tmp, `bld_${map}`),
+      join(root, 'buildings'),
+      on,
+      {
+        sliced: join(render, `bld_${map}`),
+        keep: (f) => bld.includes(f) || SLICE_RE.test(f),
+      },
+    );
   }
   mkdirSync(join(root, 'thumbs'), { recursive: true });
   for (const map of WORLD_MAPS)

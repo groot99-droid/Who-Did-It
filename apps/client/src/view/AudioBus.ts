@@ -29,6 +29,25 @@ export const AUDIO_KEYS = [
   'train_brake',
   'ferry_horn',
   'crows',
+  // Round 8 (docs/round8/motion.md 2): creatures, resource breaks, effects and transport; owner-approved 2026-10-24.
+  'mob_wolf_attack',
+  'mob_hurt_wolf',
+  'mob_hurt_boar',
+  'mob_hurt_small',
+  'mob_death',
+  'break_wood',
+  'break_stone',
+  'break_ore',
+  'break_pluck',
+  'break_resin',
+  'fx_hit',
+  'fx_coins',
+  'fx_poison',
+  'fx_fall',
+  'fx_knockout',
+  'hatch_open',
+  'ladder_climb',
+  'portal_veil',
 ] as const;
 export type AudioKey = (typeof AUDIO_KEYS)[number];
 

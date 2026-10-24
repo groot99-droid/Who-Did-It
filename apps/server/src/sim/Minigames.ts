@@ -1,23 +1,22 @@
-import { balance, minigames, scenes, tasks } from '@wdi/content';
+import { balance, minigames, tasks } from '@wdi/content';
 import {
   ErrorCode,
-  LedgerLine,
   Phase,
   S2C,
   TICK_RATE,
-  TILE_PX,
   checkMinigame,
   generateMinigame,
   type MinigamePuzzle,
   type PlayerState,
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
-import { emitSim } from './events/bus';
+import { handleCoopHold } from './Coop';
 import { martyrOf } from './Memorial';
 import { type PlayerSim, simOf } from './RoomSim';
+import { atNode, completeTask } from './tasks/complete';
 import { endMatch } from './Win';
-import { addStack, canAdd, count, take } from './Inventory';
-import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
+import { addStack, canAdd, count } from './Inventory';
+import { isVerbPhase, reject } from './World';
 
 /**
  * Main-mode mini-games (round 6, M5b, GDD 3.16; docs/round6/m5b-data.md 2.3): a station task's `task` hold sends
@@ -42,17 +41,6 @@ function openOf(room: PartyRoom): Map<string, Open> {
 }
 
 type Problem = { code: ErrorCode; msg: string };
-
-/** Whether `p` stands in `node`'s scene within `doors.reachTiles` of its prop (the station reach of GDD 3.5). */
-function atNode(p: PlayerSim, node: { scene: string; prop: string }): boolean {
-  const here = sceneKey(p.sceneIdx);
-  const prop = node.scene === here ? scenes[here]?.props.find((q) => q.id === node.prop) : undefined;
-  return (
-    prop !== undefined &&
-    Math.hypot(p.x - tileCentre(prop.x, TILE_PX), p.y - tileCentre(prop.y, TILE_PX)) <=
-      balance.doors.reachTiles * TILE_PX
-  );
-}
 
 /** Why this seat cannot work `taskId` now, or null: the checks that start a mini-game and that finish it. */
 function taskProblem(
@@ -112,8 +100,13 @@ export function handleTaskHold(room: PartyRoom, sessionId: string, taskId: strin
   const p = simOf(room).players.get(sessionId);
   const def = Object.values(minigames.minigames).find((m) => m.task === taskId);
   if (!player || !p) return;
-  // Round 7 (7M, GDD 3.5): at the task's source the same hold picks its deliverable up instead.
+  // Round 7 (7M, GDD 3.5): the co-op task is a press-and-hold with no puzzle (`sim/Coop.ts`); at a fetch task's
+  // source the same hold picks its deliverable up instead.
   const task = tasks.tasks[taskId];
+  if (task?.kind === 'coop') {
+    handleCoopHold(room, sessionId, taskId);
+    return;
+  }
   const entry = player.priv.tasks.find((t) => t.id === taskId);
   if (entry && !entry.done && task?.kind === 'fetch' && task.source && atNode(p, task.source)) {
     pickUp(room, sessionId, player, p, entry.fake, task.tool, task.toolQty ?? 1);
@@ -179,36 +172,6 @@ export function recomputeTaskBar(room: PartyRoom): void {
   if (value === 100 && phase >= Phase.grace && phase < Phase.gameOver) endMatch(room, 'village');
 }
 
-function complete(
-  room: PartyRoom,
-  sessionId: string,
-  player: PlayerState,
-  p: PlayerSim,
-  taskId: string,
-): void {
-  const entry = player.priv.tasks.find((t) => t.id === taskId);
-  const task = tasks.tasks[taskId];
-  if (!entry || !task) return;
-  if (!entry.fake && task.tool !== undefined) take(player, task.tool, task.toolQty ?? 1);
-  entry.done = true;
-  // The Claimed alibi entry of GDD 3.5: the time and the scene, written for a fake task exactly as for a real one.
-  const line = new LedgerLine();
-  line.sceneId = p.sceneIdx;
-  line.tick = room.state.tick;
-  player.priv.ledger.push(line);
-  // Round 7 (7M, A133 (9)): the completion on the sim bus, for the log and the wages of round 8. A fake task fires it
-  // too, so no listener can treat the two differently by accident; `data.fake` never reaches a client.
-  emitSim(room, {
-    tick: room.state.tick,
-    kind: 'taskDone',
-    seat: sessionId,
-    sceneId: sceneKey(p.sceneIdx),
-    data: { taskId, fake: entry.fake },
-  });
-  if (!entry.fake) recomputeTaskBar(room);
-  openOf(room).delete(sessionId);
-}
-
 /**
  * `minigame.result {taskId, answer}` (locked call site in `sim/Commands.ts`): a right answer completes the task, a wrong
  * one completes nothing and the puzzle stays open. `{assist: true}` is the Done control, accepted once the puzzle has
@@ -245,5 +208,6 @@ export function handleMinigameResult(
     reject(room, sessionId, ErrorCode.cannot, 'try again');
     return;
   }
-  complete(room, sessionId, player, p, taskId);
+  completeTask(room, sessionId, player, p, taskId);
+  openOf(room).delete(sessionId);
 }
