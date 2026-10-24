@@ -1,11 +1,11 @@
 import type Phaser from 'phaser';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AnimId, StatusBit } from './animIds';
 import { PlayerView } from './PlayerView';
 import { RUN_SPEED_PX } from './poses';
 
 // PlayerView on a fake scene (motion.md 1, 4): which animation keys each clip plays, the four-direction rounding,
-// the fallbacks of a look without the round-8 clips and the speed-picked gait.
+// the fallbacks of a look without the round-8 clips, the speed-picked gait and the sign marks per status bit.
 
 /** A game object that records what the view asks of it; every setter chains. */
 class Fake {
@@ -73,6 +73,8 @@ interface Scene {
   tweens: string[];
   anims: Set<string>;
   now: number;
+  /** How many objects the constructor made; the rest are sign marks. */
+  base: number;
   scene: Phaser.Scene;
 }
 
@@ -90,6 +92,7 @@ function scene(animKeys: string[], textures = ['char_detective', 'ovl_detective'
     tweens,
     anims,
     now: 0,
+    base: 0,
     scene: {
       add: {
         ellipse: make('ellipse'),
@@ -142,7 +145,12 @@ const played = (s: Scene) =>
   body(s)
     .calls.filter((c) => c.startsWith('play'))
     .map((c) => c.slice(5));
-const build = (s: Scene) => new PlayerView(s.scene, 'Ada', look, false);
+const marks = (s: Scene, kind?: string) => s.made.slice(s.base).filter((f) => !kind || f.kind === kind);
+const build = (s: Scene) => {
+  const v = new PlayerView(s.scene, 'Ada', look, false);
+  s.base = s.made.length;
+  return v;
+};
 
 describe('PlayerView (motion.md 1)', () => {
   let s: Scene;
@@ -151,6 +159,7 @@ describe('PlayerView (motion.md 1)', () => {
     s = scene(keysOf([...V1, ...R8_EIGHT, ...R8_FOUR]));
     view = build(s);
   });
+  afterEach(() => vi.unstubAllGlobals());
 
   for (const clip of [...R8_EIGHT, ...R8_FOUR]) {
     const id = AnimId[clip as keyof typeof AnimId];
@@ -235,5 +244,52 @@ describe('PlayerView (motion.md 1)', () => {
     view.setPosition(500, 0);
     view.pose('se', AnimId.walk, 0);
     expect(played(s)).toEqual(['char/detective/walk/se@0']);
+  });
+
+  describe('the signs', () => {
+    it('draws the blood pass with a drip trail and a red tick while bleeding, and clears them', () => {
+      view.pose('se', AnimId.idle, StatusBit.bleeding);
+      const blood = s.made.filter((f) => f.kind === 'sprite')[3]!;
+      expect(blood.visible).toBe(true);
+      expect(blood.calls).toContain('play blood/detective/idle/se@0');
+      expect(marks(s, 'rectangle')).toHaveLength(1);
+      expect(marks(s, 'ellipse')).toHaveLength(3);
+      expect(s.tweens.filter((t) => t === 'add ellipse')).toHaveLength(3);
+      view.pose('se', AnimId.idle, 0);
+      expect(blood.visible).toBe(false);
+      expect(marks(s).every((m) => m.calls.includes('destroy'))).toBe(true);
+    });
+
+    it('keeps the blood pass up for a Bloody figure after the bleeding stops', () => {
+      view.setBlood(true);
+      view.pose('se', AnimId.idle, StatusBit.bleeding);
+      view.pose('se', AnimId.idle, 0);
+      expect(s.made.filter((f) => f.kind === 'sprite')[3]!.visible).toBe(true);
+    });
+
+    it('casts the body green while poisoned', () => {
+      view.pose('se', AnimId.idle, StatusBit.poisoned);
+      expect(body(s).calls).toContain('tint 5fc266');
+      view.pose('se', AnimId.idle, 0);
+      expect(body(s).calls.at(-1)).toBe('tint ffffff');
+    });
+
+    it('orbits three stars while dazed and flickers four sparks while stunned', () => {
+      view.pose('se', AnimId.idle, StatusBit.dazed);
+      expect(marks(s, 'text')).toHaveLength(3);
+      expect(s.tweens).toContain('add object');
+      view.pose('se', AnimId.idle, StatusBit.stunned);
+      expect(s.tweens).toContain('kill');
+      expect(marks(s, 'rectangle').filter((m) => !m.calls.includes('destroy'))).toHaveLength(4);
+      expect(s.tweens.filter((t) => t === 'add rectangle')).toHaveLength(4);
+    });
+
+    it('draws each sign as a static mark under reduced motion', () => {
+      vi.stubGlobal('matchMedia', () => ({ matches: true }));
+      view.pose('se', AnimId.idle, StatusBit.bleeding | StatusBit.dazed | StatusBit.stunned);
+      expect(s.tweens).toEqual([]);
+      expect(marks(s, 'ellipse')).toHaveLength(1);
+      expect(marks(s, 'text')).toHaveLength(3);
+    });
   });
 });
