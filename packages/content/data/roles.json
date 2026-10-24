@@ -246,9 +246,9 @@
       "look": null,
       "ships": "V1.5",
       "firstPlayable": false,
-      "goal": "Escape by the cave sea exit holding 3 Heirlooms.",
+      "goal": "Escape by the sea door at the back of the cave holding 3 Heirlooms.",
       "winsWith": "self",
-      "win": "Escape by the cave sea exit holding 3 Heirlooms.",
+      "win": "Escape by the sea door at the back of the cave holding 3 Heirlooms.",
       "parity": "village",
       "startKit": [
         { "item": "lockpicks", "qty": 5 },
