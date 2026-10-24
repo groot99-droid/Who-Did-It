@@ -49,6 +49,12 @@ const TABLE: Record<string, 'work' | 'social' | 'rest' | 'ignore'> = {
   ledger: 'ignore',
   // Round 8 (8J, 8K): set dressing is scenery, never a station; its art resolves by id tail (SPRITES 3).
   dressing: 'ignore',
+  // Round 8 (GDD 3.23, 8D): the economy statics are no NPC station.
+  altar: 'ignore',
+  mailbag: 'ignore',
+  rack: 'ignore',
+  hq: 'ignore',
+  blackMarket: 'ignore',
 };
 
 function classOf(kind: string): string | undefined {

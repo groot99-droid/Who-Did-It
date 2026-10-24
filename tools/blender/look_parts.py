@@ -529,7 +529,8 @@ def spectacles(b: Builder, spec: dict) -> None:
 
 @piece
 def waistcoat(b: Builder, spec: dict) -> None:
-    b.part("Waistcoat", "body", spec["shirt"], "chest", [
+    """The front panel of a waistcoat with a watch chain; `waistcoat` names its colour, else the shirt's."""
+    b.part("Waistcoat", "body", spec.get("waistcoat", spec["shirt"]), "chest", [
         (frustum, dict(z0=C0 - 0.02, z1=C1 - 0.05, bottom=(0.24, 0.02), top=(0.17, 0.02), offset=(0, 0.125))),
     ], bevel=0.004)
     b.part("WatchChain", "body", ("brass", 2), "chest", [
@@ -968,4 +969,100 @@ def pick(b: Builder, spec: dict) -> None:
     ], bevel=0)
     b.part("PickHead", "body", ("stone", 4), "chest", [
         (rod, dict(a=(0.23, -0.14, 1.54), b=(0.23, -0.30, 1.22), width=0.045)),
+    ], bevel=0)
+
+
+# ---------------------------------------------------------------- the villager family (round 8, townsfolk.md 2)
+# The ambient townsfolk's variants dress the plain base with one silhouette change each and carry no trade
+# prop and no hat-trait shape (no flat cap, no bowler), so a villager never reads as a seat's hat clue.
+
+
+@piece
+def bonnet(b: Builder, spec: dict) -> None:
+    """A goodwife's bonnet: a soft crown tied under the chin, a shelf of brim shading the brow."""
+    c = spec["hat"]
+    b.part("BonnetCrown", "body", c, "head", [
+        (frustum, dict(z0=H1 - 0.16, z1=H1 + 0.02, bottom=(0.33, 0.33), top=(0.24, 0.24), offset=(0, -0.03))),
+    ], bevel=0.015)
+    b.part("BonnetBrim", "body", c, "head", [
+        (box, dict(center=(0.0, 0.19, H1 - 0.07), size=(0.34, 0.12, 0.05))),
+    ], bevel=0.008)
+    b.part("BonnetTies", "body", (c[0], max(0, c[1] - 1)), "head", [
+        (rod, dict(a=(0.14, 0.10, H0 + 0.08), b=(0.06, 0.13, H0 - 0.06), width=0.025)),
+        (rod, dict(a=(-0.14, 0.10, H0 + 0.08), b=(-0.06, 0.13, H0 - 0.06), width=0.025)),
+    ], bevel=0)
+
+
+@piece
+def kerchief(b: Builder, spec: dict) -> None:
+    """A head kerchief knotted at the nape, the hair showing at the front and the plait below."""
+    c = spec["hat"]
+    b.part("Kerchief", "body", c, "head", [
+        (frustum, dict(z0=H1 - 0.15, z1=H1 + 0.015, bottom=(HEAD_W + 0.03, HEAD_D + 0.02), top=(0.24, 0.24),
+                       offset=(0, -0.02))),
+        (box, dict(center=(0.0, -0.17, H0 + 0.22), size=(0.10, 0.06, 0.08))),  # the knot
+    ], bevel=0.01)
+
+
+@piece
+def stick(b: Builder, spec: dict) -> None:
+    """A walking stick carried mid-shaft in the left hand (the swing is right-handed), its knob at the belt and
+    its tip at the knee: short enough that the interact reach, which turns the hand forward, keeps it in the cell."""
+    x = -HAND_X - 0.02
+    b.part("Stick", "body", ("wood", 1), "prop.L", [
+        (rod, dict(a=(x, 0.06, PROP_Z + 0.26), b=(x - 0.02, 0.09, KNEE), width=0.035)),
+    ], bevel=0)
+    b.part("StickKnob", "body", ("wood", 2), "prop.L", [
+        (box, dict(center=(x, 0.06, PROP_Z + 0.27), size=(0.07, 0.07, 0.06))),
+    ], bevel=0.01)
+
+
+@piece
+def hand_basket(b: Builder, spec: dict) -> None:
+    """A wicker basket on the left arm, a cloth over its load."""
+    x = -HAND_X - 0.04
+    b.part("HandBasket", "body", ("wood", 3), "prop.L", [
+        (frustum, dict(z0=PROP_Z - 0.24, z1=PROP_Z - 0.04, bottom=(0.16, 0.24), top=(0.20, 0.30), offset=(x, 0.04))),
+        (rod, dict(a=(x, -0.10, PROP_Z - 0.04), b=(x, 0.04, PROP_Z + 0.08), width=0.025)),
+        (rod, dict(a=(x, 0.04, PROP_Z + 0.08), b=(x, 0.18, PROP_Z - 0.04), width=0.025)),
+    ], bevel=0.008)
+    b.part("BasketCloth", "body", ("bone", 2), "prop.L", [
+        (box, dict(center=(x, 0.04, PROP_Z - 0.03), size=(0.17, 0.26, 0.03))),
+    ], bevel=0)
+
+
+@piece
+def pail(b: Builder, spec: dict) -> None:
+    """A wooden pail in the right hand: slate hoops, a rope handle."""
+    x = HAND_X + 0.04
+    b.part("Pail", "body", ("wood", 2), "prop.R", [
+        (cylinder, dict(z0=PROP_Z - 0.30, z1=PROP_Z - 0.06, r0=0.09, r1=0.11, segments=8, center=(x, 0.04))),
+    ], bevel=0.008)
+    b.part("PailHoops", "body", ("slate", 0), "prop.R", [
+        (cylinder, dict(z0=PROP_Z - 0.28, z1=PROP_Z - 0.25, r0=0.095, r1=0.097, segments=8, center=(x, 0.04))),
+        (cylinder, dict(z0=PROP_Z - 0.10, z1=PROP_Z - 0.07, r0=0.111, r1=0.113, segments=8, center=(x, 0.04))),
+    ], bevel=0)
+    b.part("PailHandle", "body", ("wood", 1), "prop.R", [
+        (rod, dict(a=(x, -0.07, PROP_Z - 0.06), b=(x, 0.04, PROP_Z + 0.04), width=0.02)),
+        (rod, dict(a=(x, 0.04, PROP_Z + 0.04), b=(x, 0.15, PROP_Z - 0.06), width=0.02)),
+    ], bevel=0)
+
+
+@piece
+def sleeve_garters(b: Builder, spec: dict) -> None:
+    """Garters above the elbows holding the shirt sleeves up: the clerk's desk habit."""
+    for s, x in sides():
+        b.part(f"Garter.{s}", "body", ("ink", 0), f"upper_arm.{s}", [
+            (ring, dict(z=ELBOW_Z + 0.10, radius=0.08, tube=0.015, segments=8, center=(x * 0.258, 0.0))),
+        ], bevel=0)
+
+
+@piece
+def ledger(b: Builder, spec: dict) -> None:
+    """A long ledger tucked under the left arm (it rides the upper arm): ink boards round bone pages."""
+    b.part("LedgerBoards", "body", ("ink", 1), "upper_arm.L", [
+        (box, dict(center=(-0.32, 0.0, 1.05), size=(0.06, 0.24, 0.30))),
+    ], bevel=0.006)
+    b.part("LedgerPages", "body", ("bone", 2), "upper_arm.L", [
+        (box, dict(center=(-0.32, 0.0, 1.05), size=(0.04, 0.25, 0.31))),
     ], bevel=0)

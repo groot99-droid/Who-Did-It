@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { GddRef, Id, LookId, PaletteToken, Ships } from './common.js';
+import { RampName } from './palette.js';
 
 /** Clips every world character renders, in 8 directions (SPRITES 3; `swing` is AnimId 2, `interact` AnimId 4). */
 export const LookClip = z.enum(['idle', 'walk', 'swing', 'interact', 'die']);
@@ -40,10 +41,33 @@ export const Look = z.strictObject({
 });
 export type Look = z.infer<typeof Look>;
 
+/**
+ * A look of the villager family (round 8, townsfolk.md 2, DECISIONS A161): the ambient townsfolk's figures and the
+ * seat's fallback body. No card, no portrait, no signature prop and no hat-trait shape, so a townsfolk figure never
+ * reads as a seat; the server's townsfolk pick from the family and a cover can never take one.
+ */
+export const VillagerLook = z.strictObject({
+  id: LookId.regex(/^villager/, 'a villager look id starts with `villager`'),
+  name: z.string().min(1),
+  bodyAtlas: z.string().regex(/^char_villager[a-z0-9]*$/),
+  overlayAtlas: z.string().regex(/^ovl_villager[a-z0-9]*$/),
+  silhouette: z.string().min(1),
+  /** World ramps (ASSETS 6.1), since the family is rendered from the rig and never generated from a prompt. */
+  palette: z.strictObject({ base: RampName, second: RampName, accent: RampName }),
+  notes: z.string().min(1),
+  ships: Ships,
+  gddRef: GddRef,
+});
+export type VillagerLook = z.infer<typeof VillagerLook>;
+
 export const LooksFile = z.strictObject({
   gddRef: GddRef,
   clips: z.array(LookClip).min(1),
   passes: z.array(LookPass),
   looks: z.record(LookId, Look),
+  /** The villager family, keyed by id; the plain `villager` is its base. */
+  villagers: z
+    .record(LookId, VillagerLook)
+    .refine((v) => 'villager' in v, "the plain villager is the family's base"),
 });
 export type LooksFile = z.infer<typeof LooksFile>;

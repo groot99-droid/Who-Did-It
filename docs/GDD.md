@@ -175,7 +175,14 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
 - (M3) The win check runs when a death is recorded and, for an ejection, when the reveal ends, so the tally, the stamp and the role line always show first; it never runs on a bare tick. A tied vote, or a Skip plurality, ejects nobody. (M5a) A Nightshade death and a Last Shot are deaths like a kill; the win check of a batch that holds a dying Gamekeeper waits until its aim closes, then runs once for every death of the batch. Meeting requests and phase changes never wait for an aim (3.2).
 - (M5a) **What a meeting reveals.** An ejection reveals the ejected seat's role card and the look it wore ("Bo was the Killer, walking as the Baker"); a shot fired at the reveal reveals its target's role too. A death in the world (Knife, Nightshade, a shot) only flips `alive` when the next meeting opens; it reveals no role until game over, which shows every seat's role, the look it wore and the two undealt cards (3.17).
 
-- (Round 8, A174) **The bell at night.** The bell may be rung at night, by a seat or an NPC, while an unreported body lies in the world; with no such body the night rule above stands. **Meeting notes** (8T): a second meeting channel whose lines carry no speaker, open to every living seat, rate-limited by `balance.json` `talk`; NPC seats write there too (3.25). 8R and 8T write the detail with their code.
+- (Round 8, A174) **The bell at night.** The bell may be rung at night, by a seat or an NPC, while an unreported body lies in the world; with no such body the night rule above stands. 8R writes the detail of the bell with its code.
+- (Round 8, 8T) **Meeting notes.** A second meeting channel beside the named chat, whose lines carry no speaker: a
+  note reaches every client with no name, and nothing on the wire says who wrote it. Every living seat may write one
+  in the discussion, the vote and the reveal (`chat.note`); a ghost may not, and a ghost still reads them. The line is
+  trimmed and cut to `chat.maxChars` like a chat line. A seat writes at most `talk.notesPerMeeting` (4) notes a
+  meeting and at most one every `talk.noteGapS` (6 s); a note outside a meeting is refused with 425, one too soon or
+  past the cap with 424. NPC seats write notes too, under the same limits, so their lines hide among the humans'
+  (3.12, 3.25). Named chat is unchanged.
 
 ### 3.9 Balance by player count
 
@@ -225,7 +232,11 @@ The section keeps its number so 3.12 to 3.21 keep theirs.
 
 - **Seats.** Start is enabled with at least 1 human. With fewer than `players.min` players the server adds NPCs up to `players.min` when Start is accepted, before it deals, so the full deck row is always dealt (M3c; the A28 cut row is gone); the leader may add NPCs by hand in the lobby with "Add NPC" up to `players.max` and remove them again, the newest seat first (M3c). A human joining a full lobby takes an NPC's seat, the newest first (M3c). (M5a) An NPC seat is never Ready the moment it appears: a seat added with Add NPC, and every NPC seat when a match returns to the lobby, turns Ready 2-9 s later (`npc.ready.delayS`), each on its own draw, the way a human clicks.
 - **Same game.** NPCs are dealt from the same deck and can hold any card, the Killer included; their cards are as secret as a human's. Rules, the practice label at 4 (3.1, 3.9) and any ranking depend only on the total player count, never on how many seats are NPCs. (M5a) In the main mode an NPC walks as its card's character like every seat; an NPC cover role wears the look it was shown and never Impersonates (3.17); an NPC holding a night power uses it as 3.2 says, at the moment "Meetings, the role card and night powers" below gives.
-- **Hidden seats.** Nothing a client receives marks a seat as an NPC: `isNpc` lives in room memory only, and NPCs take human-style names from a name pool, are never the party leader, and carry an id of the same shape as a session id; the party publishes only how many seats are NPCs, never which (M3c). (M5a) **Everything an NPC shows is something a human can do the same way in the same place.** It walks at walking speed and never runs or sneaks. It never turns on the spot: it faces where it last stepped, and it ends every approach to a station with a step toward the station. It starts a hold only with the verb a human uses (`act.hold`), so it plays the `interact` animation only while a hold the server accepted from it runs, and it works with that animation only at stations where a human could start the same hold (`routines.json` `holds`; there are none in M5a, so at every station it simply stands, idle). Its ready and vote ticks are spread over the spans a human uses (below). NPCs never chat, which a table that knows each other will notice; nothing on the wire confirms it.
+- **Hidden seats.** Nothing a client receives marks a seat as an NPC: `isNpc` lives in room memory only, and NPCs take human-style names from a name pool, are never the party leader, and carry an id of the same shape as a session id; the party publishes only how many seats are NPCs, never which (M3c). (M5a) **Everything an NPC shows is something a human can do the same way in the same place.** It walks at walking speed and never runs or sneaks. It never turns on the spot: it faces where it last stepped, and it ends every approach to a station with a step toward the station. It starts a hold only with the verb a human uses (`act.hold`), so it plays the `interact` animation only while a hold the server accepted from it runs, and it works with that animation only at stations where a human could start the same hold (`routines.json` `holds`; there are none in M5a, so at every station it simply stands, idle). Its ready and vote ticks are spread over the spans a human uses (below). (Round 8, 8T) An NPC never writes in the named chat; it writes meeting notes (3.8), which carry no speaker, so a
+  table cannot tell its notes from a human's: each NPC seat, whatever its card, means to write 1 to 3 notes a meeting
+  (`talk.npc.notesPerMeeting`), at ticks drawn over 0.05-0.8 (`talk.npc.windowFrac`) of the discussion plus the vote
+  time from its own `talk:<seatId>` stream, and a note the limits refuse waits for the next tick. Its lines come from
+  the templates of 3.25 and name seats only by name.
 - **Animation (M5a, every seat).** A seat shows `interact` (`Presence.animId` 4) on every tick an `act.hold` of its own runs, whatever the hold, human or NPC; it shows `walk` only on a tick its body actually moved, so a seat pushing against a wall stands idle instead of walking in place; `idle` otherwise. One `interact` id serves every hold, as one `swing` serves every strike, so the animation never tells one action or role from another.
 - **Difficulty.** A lobby setting, Easy / Normal / Hard, default `npc.defaultDifficulty`. It is enabled only when the party holds at least `npc.difficultyMinNpcs` NPC seats; with fewer, NPCs play the default. The setting and the mode survive the return to the lobby after a match (M3c). Each level is a row of `balance.json` `npc.difficulty`:
 
@@ -481,14 +492,17 @@ against `quests.maxActive`. The lobby and the role card clear every seat's quest
 round-7 vendetta seam and are refused in round 6.
 
 **Mini-games.** Every fetch task of 3.5 plays a mini-game at its target in place of the plain 2 s hold: the hold
-opens it, the server keeps the solution, and the task completes only when the client's answer checks. The four
-kinds, first made for the quick mode (3.11), are crates, pour, slide and stoke. (6H)
+opens it, the server keeps the solution, and the task completes only when the client's answer checks. The five
+kinds are crates, pour, slide and stoke, first made for the quick mode (3.11), and the tap (round 7, 7M, A151): a
+marker sweeps a track back and forth once per `minigames.tap.periodS`, and the player taps while it crosses the band
+(`bandFrac` of the track, at a place drawn for each hit), `steps` times in a row; a tap outside the band starts the
+run again from the first band. (6H)
 
 | Task | Mini-game | Difficulty (1-5) |
 |---|---|---|
 | Light the lanterns | pour | 2 |
 | Fix the well pump | slide | 3 |
-| Deliver a letter | slide | 1 |
+| Deliver a letter | tap | 1 |
 | Mend the fence | crates | 2 |
 | Fetch the flour | crates | 1 |
 | Mix the dough | pour | 2 |
@@ -503,13 +517,15 @@ the task within reach, in the task's own time of day (Light the lanterns only at
 seat's own list that is not done; a real task also needs its deliverable in the inventory, which completion takes, and
 a fake task needs none. The server draws the puzzle from a stream of its own keyed by seat, sends the client its
 statement (the board it draws: the bands, the lit order) and keeps it; the answer is a record of what the player did
-(crates placed and the needle's stop, how long each pour was held, the slots filled in order, the stoke's taps), which
+(crates placed and the needle's stop, how long each pour was held, the slots filled in order, the stoke's taps, the
+tap's every tap, hit or miss), which
 the server replays against the puzzle, so a bare "done" completes nothing. The Done control sends an assist answer the
 server accepts only once the puzzle has been open for `assistS`. Each two difficulty levels above 1 add one step (one
 second of hold for the stoke) to the base numbers of `balance.json` `minigames`. Completion marks the task done, writes the
 alibi entry (the scene and the tick, into the seat's own ledger) and, for a real task, raises the bar to the finished
 real tasks over all real tasks; a ghost's finished tasks count in full up to `tasks.ghostShareCap` of the bar. Leaving
-the node, or a phase where verbs do not work, drops the open puzzle.
+the node, or a phase where verbs do not work, drops the open puzzle. Each two difficulty levels above 1 add one hit to
+the tap as they add a step to the others.
 
 ### 3.17 Characters and disguise
 
@@ -761,6 +777,32 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 - **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice. It leaves only as a
   purchase, rent, a fine, a donation or an HQ tier. Theft, drops, pickups and the bank only move it.
 
+- **Faith** (8D). Donating Scrip at an altar (`act.donate`, within verb reach, up to `faith.donateMax` at a time)
+  earns `faith.perScrip` Faith per Scrip, up to `faith.max`; Faith is private (`Private.faith`). There is an altar in
+  the chapel and a wayside altar on each map's hub. Faith plus Scrip buys, at an altar (`act.faith {kind}`):
+  - an **Indulgence** (`faith.indulgence`). Burning a held notice that names your own look spends one. Presented in a
+    meeting it is always spent and silently voids the one oldest notice naming your look, wherever it is held;
+    nothing reports whether one was voided;
+  - a **Parish Seal** (`faith.seal`, at most `faith.holdMax` held). Presented in a meeting, it posts a public line
+    under your public name ("the charge is a matter for the Church"), clears every vote cast so far, and for
+    `faith.sealShieldS` refuses any vote naming you. The shield ends with the meeting. The full heresy trial waits for
+    R9's Tribunal.
+
+- **Rumours** (8D). The server keeps a rumour ledger: every `notices.sampleS` it writes down each drawn look that
+  stands in a scene with at least one other figure, so a line is only ever what an observer could have seen, and it
+  names a look, never a seat or a card. Each Train delivery fills the mailbag beside the platform (HollowMere) with
+  `notices.slipsPerBag` ledger slips from the sightings since the last bag, night first, one per look; an uncollected
+  bag is replaced. Collecting it (`act.hold`, `clues.collectHoldS` within verb reach) turns the slips into Blackmail
+  Notices, private Notebook entries, up to `notices.maxHeld` held at once. A notice can be:
+  - shown at a meeting, where it becomes a public line;
+  - burnt, except one that names the holder's own look (only an Indulgence clears your own name);
+  - fenced at the black market (the tavern back room; BlackPine's lodge), within verb reach, for
+    `notices.fencePrice` Scrip from the town.
+
+  A notice neither shown nor cleansed `notices.gazetteAfterRounds` day cycles after it was made is printed by the
+  Gazette at the next meeting's start and leaves its holder's Notebook. BlackPine has no Train this round, so no
+  mailbag.
+
 ### 3.24 Moods, mugging and townsfolk
 
 Round 8 (A134, A135; `docs/round8/townsfolk.md`).
@@ -796,5 +838,7 @@ Anger remembers who struck, robbed or taxed the seat until it cools to zero; the
 Round 8 addendum B (A173, A174; `docs/round8/living.md`). Sessions 8Q, 8R, 8S, 8T and 8U write this section with their code.
 - **The world index.** Every scene knows its reachable floor, its occupied tiles and a density cap, so nothing spawns in a tree, a wall or off the map (8Q).
 - **The hive.** NPCs share one public blackboard with potential, state and proximity triggers; it never holds a card, a cover or a private view (8R).
-- **Talk.** NPC lines in meeting notes come from templates, or from Claude when the server holds a key, off the tick and logged for replay; one to three a meeting are red herrings, slightly off (8T).
+- **Talk** (8T). NPC lines in meeting notes (3.8) come from templates, or from Claude when the server holds a key, off the tick and logged for replay; one to three a meeting are red herrings, slightly off.
+  - **Input.** A line is built only from facts every seat at the table has: the round, the meeting's reason, the caller's and the body's names, the roll-call's missing names and the other living seats' names (`services/talk/facts.ts`). Never a card, a cover, a private view or which seats are NPCs.
+  - **Templates.** `services/talk/templates.ts`: questions and remarks that name seats by name and never name a card, a role or a faction. A template whose name has nothing to fill (no body at a bell meeting) is not drawn; the bell question is drawn only at a bell meeting. Each line draws two uniforms from the seat's `talk` stream, whatever is drawn.
 - **Briarberry.** The Doctor's healing ingredient, picked from briar bushes that make the picker bleed (on hard down to half health, never to death); easy villagers gift it, normal shops sell it, hard only grows it (8U).
