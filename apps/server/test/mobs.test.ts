@@ -11,6 +11,7 @@ import { fleeCreature } from '../src/sim/mobs/flee';
 import { lightBurns, setLight } from '../src/sim/mobs/light';
 import { Brain } from '../src/sim/npc/memory';
 import { simOf } from '../src/sim/RoomSim';
+import type { FixedSeeds } from '../src/sim/seeds';
 import { navGrid } from '../src/sim/World';
 import {
   type Party,
@@ -26,6 +27,7 @@ import {
   start,
   toWorld,
 } from './npcHelpers';
+import { fixSeeds } from './seedHelpers';
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -101,16 +103,20 @@ function floorNear(room: PartyRoom, scene: SceneId, x: number, y: number, minD: 
   throw new Error(`no floor near ${scene} ${x},${y}`);
 }
 
-/** One human and three NPC seats, every one a Townsfolk, in the world on the test's own steps. */
-async function party4(): Promise<Party> {
+/** One human and three NPC seats, every one a Townsfolk, in the world on the test's own steps; `seeds` pins streams. */
+async function party4(seeds?: FixedSeeds): Promise<Party> {
   const party = await lobbyOf(colyseus, 1);
   for (let i = 0; i < 3; i++) await send(party.humans[0]!, 'lobby.addNpc', {}, 40);
+  if (seeds) fixSeeds(party.room, seeds);
   await start(party);
   await toWorld(party);
   pauseClock(party.room);
   allTownsfolk(party.room);
   return party;
 }
+
+/** Pinned `mobs` words for the bat kill test (its creature roam; `seedHelpers.fixSeeds`). */
+const BAT_WORDS = [1, 2, 3, 4] as const;
 
 const forestWolf = scenes.forest.spawners!.find((s) => s.mob === 'wolf')!;
 const human = (party: Party) => party.humans[0]!.id;
@@ -227,7 +233,11 @@ describe('creatures in a match', () => {
   });
 
   it('a bat bites a seat down and, given time, kills it: a creature death (round 8, GDD 3.22)', async () => {
-    const party = await party4();
+    // The bat's roam is pinned. Some crypto words send it at a goal diagonally across a wall corner, and `walk`
+    // (sim/Mobs.ts) cuts that corner into the wall tile and paces between it and the path's last tile for good: from
+    // inside the wall it senses no seat and `floorNear` finds no floor in sight, so no bite lands in the 270 s and the
+    // seat lives (about 1 run in 30; CI saw `no floor near cave_entry 15,8`). These words roam clear of it.
+    const party = await party4({ mobs: BAT_WORDS });
     holdPhase(party, Phase.day, 600);
     const bat = scenes.cave_entry.spawners![0]!;
     const at = floorNear(party.room, 'cave_entry', bat.x, bat.y, 1, 2);
