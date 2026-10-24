@@ -3,7 +3,7 @@ import { readdirSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { packAsync } from 'free-tex-packer-core';
-import { alphaBleed, decodePng, type Rgba } from './bleed.ts';
+import { alphaBleed, decodePng, encodeIndexedPng, type Rgba } from './bleed.ts';
 import { applyPivots, buildAnims, type FeetManifest } from './gen-anims.ts';
 import {
   CHAR_PAGE,
@@ -140,6 +140,12 @@ export function atlasJson(atlas: MultiAtlas, pretty = false): string {
   return `${pretty ? JSON.stringify(atlas, null, 1) : JSON.stringify(atlas)}\n`;
 }
 
+/** The page as an indexed PNG when it has 256 colours or fewer and hard alpha, else null. */
+function indexedPage(png: Buffer): Buffer | null {
+  const img = decodePng(png);
+  return hasPartialAlpha(img) ? null : encodeIndexedPng(img);
+}
+
 function hasPartialAlpha(img: Rgba): boolean {
   for (let i = 3; i < img.data.length; i += 4) if (img.data[i] !== 0 && img.data[i] !== 255) return true;
   return false;
@@ -185,14 +191,18 @@ export async function packCharacter(
       if (packed.atlas.textures.length > 1 && !packed.finished && !lazy && key === textureKey('body', body)) {
         packed = await packFrames(key, frames, { w: size.w, h: size.h * 2 }, true);
       }
-      const { atlas, pages } = packed;
+      const { atlas, pages, finished } = packed;
       applyPivots(atlas, manifest);
       textures.push({ key, atlas });
-      for (const [name, png] of pages) out.set(name, png);
+      // A finished page (256 colours or fewer, every alpha 0 or 255: the 8-bit style) is written indexed, the
+      // same pixels at a quarter of the bytes, which keeps the option-B clip table inside the first-load budget
+      // (ASSETS 6.8, SPRITES 3; 6Z's grant on #194). Any other page stays RGBA.
+      for (const [name, png] of pages) out.set(name, (finished && indexedPage(png)) || png);
       out.set(`${key}.json`, Buffer.from(atlasJson(atlas)));
     }
     if (lazy && textures.length === 0) continue;
-    const anims = `${JSON.stringify(buildAnims(textures), null, 1)}\n`;
+    // One line like the atlas json (A161): the fifteen looks' frame lists are a measurable part of the first load.
+    const anims = `${JSON.stringify(buildAnims(textures))}\n`;
     out.set(`${body}${lazy ? '_2' : ''}.anims.json`, Buffer.from(anims));
   }
   return out;

@@ -20,7 +20,11 @@ import {
   textureKey,
   type Dir,
 } from '../keys.ts';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { decodePng, encodeIndexedPng } from '../bleed.ts';
 import { atlasJson, packCharacter, packFrames, type MultiAtlas, type PackInput } from '../pack.ts';
+import { finishEnabled } from '../palette.ts';
 
 /** A 128 px cell, transparent except a w x h block whose bottom centre is the feet point. */
 function cell(feet: [number, number], w: number, h: number, shade: string): Buffer {
@@ -212,7 +216,9 @@ describe('gen-anims', () => {
       'ovl_tester.json',
       'tester.anims.json',
     ]);
-    const { anims } = JSON.parse(files.get('tester.anims.json')!.toString()) as ReturnType<typeof buildAnims>;
+    const animsText = files.get('tester.anims.json')!.toString();
+    expect(animsText.slice(0, -1), 'one line like the atlas json').not.toContain('\n');
+    const { anims } = JSON.parse(animsText) as ReturnType<typeof buildAnims>;
     expect(anims.map((a) => a.key)).toEqual([
       'char/tester/walk/e',
       'char/tester/walk/n',
@@ -225,6 +231,43 @@ describe('gen-anims', () => {
       [0, 1, 2].map((i) => ({ key: 'char_tester', frame: `char/tester/walk/n/00${i}` })),
     );
     expect(anims[2]!.frames[0]!.key).toBe('ovl_tester');
+  });
+
+  it.skipIf(!finishEnabled('main'))(
+    'writes a finished page indexed, the same pixels at fewer bytes',
+    async () => {
+      const { manifest, frames } = synthetic();
+      const files = await packCharacter('tester', frames, manifest);
+      const page = files.get('char_tester-0.png')!;
+      expect(page[25], 'colour type').toBe(3);
+      const rgba = (await packFrames('char_tester', frames.get('body')!, undefined, true)).pages.get(
+        'char_tester-0.png',
+      )!;
+      expect(decodePng(page).data).toEqual(decodePng(rgba).data);
+      expect(page.length).toBeLessThan(rgba.length);
+    },
+  );
+
+  it('keeps a page with partial alpha RGBA', async () => {
+    const { manifest, frames } = synthetic();
+    // A block drawn at a half-pixel offset has antialiased edges: partial alpha, so the set is not finished.
+    const soft = frames
+      .get('body')!
+      .map((f, i) => (i ? f : { ...f, png: cell([64.5, 112], 20, 30, '#6F7A8C') }));
+    const files = await packCharacter('tester', new Map([...frames, ['body', soft]]), manifest);
+    expect(files.get('char_tester-0.png')![25], 'colour type').toBe(6);
+    expect(files.get('ovl_tester-0.png')![25], 'colour type').toBe(3);
+  });
+
+  it.skipIf(!finishEnabled('main'))('round-trips a committed 8-bit page byte for byte', () => {
+    const file = join(import.meta.dirname, '../../../apps/client/public/assets/chars/char_villager-0.png');
+    const png = readFileSync(file);
+    expect(png[25], 'colour type').toBe(3);
+    const img = decodePng(png);
+    const again = encodeIndexedPng(img)!;
+    expect(again.equals(png), "the committed page is the encoder's own output").toBe(true);
+    expect(decodePng(again).data).toEqual(img.data);
+    expect(encodeIndexedPng(img)!.equals(again), 'deterministic').toBe(true);
   });
 
   it('keeps a look on one page per texture, or spills to a second when it does not fit', async () => {
