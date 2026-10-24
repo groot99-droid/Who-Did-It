@@ -1,6 +1,6 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance, effects, mobs } from '@wdi/content';
-import { EffectId, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { EffectId, EffectState, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { matchEvents } from '../src/sim/auto/log';
@@ -324,5 +324,48 @@ describe('bodies (GDD 3.22)', () => {
     advance(party, 1);
     expect(bodyOf(room, id)).toBeUndefined();
     expect(room.state.players.get(id)!.priv.body.toJSON()).toMatchObject({ hp: 0, maxHp: 0 });
+  });
+
+  it('leaves a foreign effect row (8D’s Indebted) alone: a tick, its own effects coming and going, a knockout and a death never touch it', async () => {
+    const party = await party4();
+    const room = party.room;
+    const id = me(party);
+    const body = bodyOf(room, id)!;
+    const wire = room.state.players.get(id)!.priv.body;
+    const foreign = new EffectState();
+    foreign.id = EffectId.indebted;
+    foreign.untilTick = 0;
+    foreign.stacks = 3;
+    wire.effects.push(foreign);
+    const stillThere = () =>
+      expect(wire.effects.toArray().filter((e) => e.id === EffectId.indebted)).toMatchObject([
+        { untilTick: 0, stacks: 3 },
+      ]);
+    advance(party, S(2));
+    stillThere();
+    applyEffect(room, id, body, 'dazed');
+    advance(party, 1);
+    stillThere();
+    expect(wire.effects.toArray().map((e) => e.id)).toEqual([EffectId.indebted, EffectId.dazed]);
+    advance(party, S(effects.effects.dazed.durationS) + 1);
+    stillThere();
+    expect(wire.effects.toArray().map((e) => e.id)).toEqual([EffectId.indebted]);
+    body.hp = b.damage.strike.dmg;
+    expect(hurt(room, id, b.damage.strike, { source: 'strike', by: other(party) })).toBe('down');
+    advance(party, 1);
+    expect(hasEffect(body, 'knockedOut')).toBe(true);
+    stillThere();
+    advance(party, S(b.koS) + 1);
+    expect(hasEffect(body, 'knockedOut')).toBe(false);
+    stillThere();
+    expect(
+      hurt(room, id, { dmg: b.maxHp, effects: {}, kills: true }, { source: 'wolf', cause: 'creature' }),
+    ).toBe('dead');
+    advance(party, 2);
+    expect(sim(party, id).dead).toBe(true);
+    expect(bodyOf(room, id)).toBeUndefined();
+    expect(wire.toJSON()).toMatchObject({ hp: 0, maxHp: 0 });
+    stillThere();
+    expect(wire.effects.length).toBe(1);
   });
 });

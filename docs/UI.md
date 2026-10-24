@@ -311,6 +311,8 @@ for a selection, `-hazard` for a cue. Never a black shadow.
 | pop (`pop`; the E prompt appearing) | 200 ms, from 0.6 | `--wdi-ease-spring` | appears in place |
 | cooldown sweep (`cooldown`) | the card's cooldown | linear | kept (it is status) |
 | the E hold fill | follows the hold, smoothed over 60 ms | linear | kept, unsmoothed |
+| purse change (`.wdi-anim-purse[data-change]`, `--wdi-dur-panel`, `--wdi-rise`) | 200 ms roll of the amount, up on a gain and down on a loss; the change label springs in | `--wdi-ease-out` | the new amount and label at once |
+| coins to or from the purse (`--wdi-dur-slow`) | 360 ms, three coins flying in on a gain with a warm glow, out on a loss | `--wdi-ease-in` in, `--wdi-ease-out` out | none |
 | scene cover into the world, per portal (`view/Transition.ts` `portalTransition`) | `balance.ui.transitionS.fade` (GDD 3.13) | ease-in-out | a cut |
 | toast, dialog, stamp rise | 220 ms | `--wdi-ease` | appears in place |
 | the card flip | 600 ms | `--wdi-ease` | swap, no rotation |
@@ -352,6 +354,14 @@ clockwise over the card's cooldown. Each restarts its animation on every call an
 (8A's strike button flashes and cools, 8C's shop buttons flash); the world scene's error handler calls
 `refusedIn(overlay)`, which shakes whichever E prompt is showing as the refusal toast appears. The E prompt pops in as it
 appears and its bar fills smoothly while E is held; a task's mini-game opens with the panel entrance.
+
+Economy HUD (8H, A143). 8C's purse counter (14.34.2) carries `.wdi-anim-purse` and, for the moment its change
+shows, `[data-change="gain"|"loss"]`. The 8H block rolls the amount in from below on a gain and from above on a loss,
+springs the change label in (mustard on a gain; a loss keeps the counter's warm colour, since `--wdi-danger` is for
+paper), glows the pill warm on a gain, and draws three coins flying into the pill on a gain (a wage, a sale) or out of it
+on a loss (a buy). A wage, a shop sale and a shop buy all reach the purse as a change, so the counter's motion covers
+them; the shop's own buttons flash or shake through `flash` and `refused`. `motion.test.ts` holds the hook names
+against `PurseHud.ts`.
 
 Transitions and transport (8H, A143). The World's cover follows the portal the seat came through (GDD
 3.13): `wipe` for a door, `iris` for a level stair or crawl, `climbUp` and `climbDown` (the iris with
@@ -1220,6 +1230,46 @@ Lines are in `apps/client/src/ui/copy/inspect.ts` (`INSPECT_COPY`, `inspectLine(
 | `inspect.hunch.confession` | They watched you as if waiting for a confession. | a warm toast to the inspected seat, a `relations.json` note |
 | `inspect.hunch.blessing` | They looked at you the way one looks for a blessing. | a warm toast to the inspected seat, a `relations.json` note |
 | `inspect.hunch.pockets` | Their glance went to your pockets. | a warm toast to the inspected seat, a `relations.json` note |
+
+### 14.34 Scrip (8C)
+
+Lines are in `apps/client/src/ui/copy/scrip.ts` (`SCRIP_COPY`, `shopName(id)`). The shop panel (`ui/shop/ShopPanel.ts`)
+opens on `shop.open` after a `shop` hold at a counter (GDD 3.23); it lists what the shop sells and what it wants, one
+item per press, and greys a Buy the purse cannot cover or a Sell with nothing in the pockets. The server decides each
+trade; a refusal is the usual error line. 8H animates the panel by `wdi-anim-panel` and `wdi-anim-list`.
+A trade that lands (the purse moves its way) flashes its button and pops the purse line; an error line while it
+waits shakes the button instead (`ui/shop/feedback.ts`, with 8H's `flash`, `pop` and `refused`).
+
+#### 14.34.1 The shop panel
+
+| Key | Text | Where |
+|---|---|---|
+| `prompt.shop` | Hold E: trade at the {shop} | the hold prompt at a counter in reach |
+| `shop.sells` | For sale | the heading of the shop's stock |
+| `shop.buys` | Wanted | the heading of what the shop buys |
+| `shop.none` | Nothing here. | a shop with neither list |
+| `shop.price` | {n} Scrip | each row's price, its ask or its pay |
+| `shop.buy` | Buy | a stock row's button (one item) |
+| `shop.sell` | Sell | a wanted row's button (one item) |
+| `shop.have` | You have {n} | each row: how many the pockets hold |
+| `shop.short` | Not enough Scrip | a stock row the purse cannot cover |
+| `shop.purse` | Your purse: {n} Scrip | under the shop's name |
+| `shop.close` | Close | the panel's close button |
+| `prompt.coins` | Hold E: pick up the coins | the hold prompt at dropped coins in reach (the hold lasts `economy.coinPickupS`) |
+| `shop.<id>` | Bakery, Apothecary, General Store, Market, Gamekeeper's Stall, Lodge Store, Camp Market | the panel's title, by `economy.json` shop id |
+
+#### 14.34.2 The purse counter
+
+`view/purse/PurseHud.ts`: a pill under the goal chip in the HUD's top-left column, own client only. It shows the
+purse and, for a moment after a change, the change beside it (`data-change="gain"` or `"loss"`); 8H animates the roll
+by `wdi-anim-purse`. Entering a scene shows the amount alone, never the whole purse as a gain.
+
+| Key | Text | Where |
+|---|---|---|
+| `purse.label` | Your purse | the counter's accessible name |
+| `purse.amount` | {n} Scrip | the counter |
+| `purse.gain` | +{n} | beside it after a wage, a sale or a pickup |
+| `purse.loss` | −{n} | beside it after a buy, a deposit or a theft |
 
 ### 14.38 Tasks: the chores panel, the station prompts and the village's work (7M)
 

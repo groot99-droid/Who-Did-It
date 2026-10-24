@@ -10,6 +10,7 @@ import {
   type PlayerState,
 } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
+import { runNpcNotes } from '../../services/talk/npcNotes';
 import { markCardReady } from '../Covers';
 import { flowOf } from '../Flow';
 import { handleVote } from '../Meeting';
@@ -106,6 +107,7 @@ export function runMeetingVotes(
 ): void {
   void mem;
   if (p.dead) return;
+  runNpcNotes(room, player); // round 8, 8T (6Z's grant): the meeting notes (GDD 3.8)
   const tick = room.state.tick;
   const id = player.id;
   if (brain.voteAtTick < 0) {

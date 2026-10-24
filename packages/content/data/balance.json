@@ -300,5 +300,11 @@
       { "id": "go", "text": "Go" }
     ],
     "gddRef": "3.5"
+  },
+  "talk": {
+    "noteGapS": 6,
+    "notesPerMeeting": 4,
+    "npc": { "notesPerMeeting": { "min": 1, "max": 3 }, "windowFrac": { "min": 0.05, "max": 0.8 } },
+    "gddRef": "3.8"
   }
 }
