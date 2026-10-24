@@ -3573,6 +3573,7 @@ then docs/round8/README.md, seams.md and the documents your brief names. Branch 
 | **8S. Roles** | Opus 5.5 | Code | `claude/r8-roles` | `living.md` 4: NPC tasks, `dustCompare`, `autopsy`, `salts`, NPC ability use, sharing and the hard-mode gate (A177) |
 | **8T. Talk** | Opus 5.5 | Code | `claude/r8-talk` | `living.md` 5: meeting notes, NPC lines from templates and Claude, red herrings, the filter and the replay log (A178) |
 | **8U. Briarberry** | Fable 5.1 | Content | `claude/r8-briarberry` | `living.md` 6: the briar node, the berry, the Doctor's recipes, gifts and stock by difficulty (A179) |
+| **8V. Canon** | Fable 5.1 | Docs and content | `claude/r8-canon` | `teardown.md` 4: the lore of ROSW `creative-writing/vault/` into the game's names and text, `docs/round8/canon.md` (A201) |
 
 ### Round 8 briefs
 
@@ -3715,8 +3716,16 @@ The owner's living-world request of 2026-10-24. Contract: `docs/round8/living.md
   1. The `briar` node and `briarberry`, the bleed and its floor on hard.
   2. The Doctor's recipes; the gift, stock and harvest rules by difficulty. GDD 3.14 and 3.25.
 
+### Round 8 addendum C brief (A201)
+
+- **8V. Canon** (`teardown.md` 4; starts now). Reads ROSW `creative-writing/vault/` (`project: who-did-it`), the Ledger and the Codex first; ROSW is read-only from here.
+  1. `docs/round8/canon.md`: every ruling of A201 and every lore fact the game shows, mapped to its file, id, copy and GDD row; each conflict with today's data or features and its working fix; the proposals (secret bosses, the special ending, the Agent, the future and colony maps) for the owner.
+  2. The text pass: names, blurbs, quest givers, cutscene and UI copy, WORLD.md and GDD wording. Ids, scene ids and atlas keys stay frozen. Questions to the owner go through AskUserQuestion in 8V's own session.
+  3. With 7M: the shelf and letter pages of `lore.json` drawn from the vault works, each citing its vault path; CREDITS rows where the text is quoted.
+
 ### Round 8 log: 6Z
 
 - 2026-10-23: the contract `docs/round8/` and A134, A135 written from the owner's requests and answers. The
   sixteen reference pictures are described in `art.md` 1 and not committed.
 - 2026-10-24: the living-world addendum `docs/round8/living.md` with A173 and A174, from the owner's request and answers; 8Q to 8U added.
+- 2026-10-24: the lore merged in ROSW (Pipelines-Plugin #17); A201 and 8V added for the canon pass.

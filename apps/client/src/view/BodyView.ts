@@ -2,6 +2,7 @@ import type Phaser from 'phaser';
 import palette from '@wdi/content/data/palette.json';
 import { isoDepth, toScreen } from '@wdi/shared/iso';
 import { BIAS } from './iso';
+import { drawScale } from './texels';
 import { BODY, HATS, HEIGHT_SCALE, type PlayerLook, SCARF_TINT } from './PlayerView';
 
 const BODY_TEXTURE = `char_${BODY}`;
@@ -26,7 +27,10 @@ export class BodyView {
     const shadow = scene.add.ellipse(0, 0, 54, 27, 0x12141c, 0.45);
     const parts: Phaser.GameObjects.GameObject[] = [shadow];
     const base = scene.textures.exists(BODY_TEXTURE) ? lastFrame(scene, 'char/villager/die/s') : null;
-    const art = scene.add.container(0, 0).setScale(HEIGHT_SCALE[look.height] ?? 1);
+    // Drawn at the texel factor of the body texture (HD, A164) times the trait's height.
+    const art = scene.add
+      .container(0, 0)
+      .setScale((HEIGHT_SCALE[look.height] ?? 1) * drawScale(BODY_TEXTURE));
     if (base) {
       art.add(scene.add.sprite(0, 0, base[0], base[1]));
       const scarf = lastFrame(scene, 'scarf/villager/die/s');
