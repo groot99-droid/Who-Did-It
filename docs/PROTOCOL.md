@@ -22,6 +22,11 @@
 | `chat.say` | `{ text: string }` | 2/s | - |
 | `chat.quick` | `{ phraseId: string }` | 2/s | - |
 | `world.ping` | `{ x: number; y: number }` | 2/s | - |
+| `act.donate` | `{ amount: number }` | 5/s | Round 8 (GDD 3.23, 8D): whole Scrip, at most `economy.json` `faith.donateMax`. |
+| `act.faith` | `{ kind: 'indulgence' \| 'seal' }` | 5/s | - |
+| `act.notice` | `{ itemId: string; op: 'show' \| 'burn' \| 'fence' }` | 5/s | `itemId` is the notice's Notebook entry id. |
+| `act.hq` | `{ stationId: string }` | 5/s | - |
+| `act.payRent` | `Record<string, never>` | 5/s | - |
 | `role.ready` | `Record<string, never>` | - | Deprecated alias of `lobby.ready {ready: true}`. |
 | `net.ping` | `{ t: number }` | - | - |
 | `lobby.start` | `Record<string, never>` | 2/s | Leader only, phase lobby, at least 1 human (GDD 3.12). Refused with error 422 otherwise. |
@@ -175,7 +180,20 @@ export interface CreateOptions extends JoinOptions {
 
 ```ts
 export type HoldAction =
-  'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft' | 'shop' | 'bank';
+  | 'drag'
+  | 'collect'
+  | 'task'
+  | 'inspect'
+  | 'autopsy'
+  | 'gather'
+  | 'craft'
+  // Round 8 (GDD 3.23, 8C): a shop counter and the bank.
+  | 'shop'
+  | 'bank'
+  // Round 8 (GDD 3.23, 8D): the chapel altar, the Train's mailbag, the tally rack.
+  | 'altar'
+  | 'mailbag'
+  | 'rack';
 ```
 
 ```ts

@@ -10,6 +10,7 @@ import { onMeetingOpenDisguise } from './Impersonate';
 import { beginAim, holdReveal, onMeetingOpenNight } from './NightPowers';
 import { type MeetingRequest, simOf } from './RoomSim';
 import { evaluateWin, endMatch } from './Win';
+import { civicMeetingStart } from './economy/civic';
 
 /**
  * Everyone, living or dead, goes to the map's meeting spawns on the hub (`meetingSpawnsOf`) without a
@@ -73,6 +74,7 @@ export function openMeeting(room: PartyRoom, req: MeetingRequest): void {
   });
   setPhase(room, Phase.meetingDiscussion, countRow(state.players.size).discussionS);
   votesOpenTick.set(room, state.tick + Math.round(balance.meeting.minVoteS * TICK_RATE));
+  civicMeetingStart(room); // round 8, 8D: `sealShield(room)` and `gazette(room)` (locked hook, GDD 3.23)
 }
 
 /**

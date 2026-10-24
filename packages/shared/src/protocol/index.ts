@@ -41,6 +41,16 @@ export const C2S = {
   sell: 'act.sell',
   /** Round 8 (GDD 3.23, 8C): deposit to or withdraw from the bank a `bank` hold opened; Session 8C reads it. */
   bank: 'act.bank',
+  /** Round 8 (GDD 3.23, 8D): Scrip into Faith at an altar in reach. */
+  donate: 'act.donate',
+  /** Round 8 (GDD 3.23, 8D): an Indulgence or a Parish Seal at an altar; a held Seal presented at a meeting. */
+  faith: 'act.faith',
+  /** Round 8 (GDD 3.23, 8D): show, burn or fence a Blackmail Notice (its Notebook entry id). */
+  notice: 'act.notice',
+  /** Round 8 (GDD 3.23, 8D): invest in the next tier of the HQ station in reach. */
+  hq: 'act.hq',
+  /** Round 8 (GDD 3.23, 8D): pay the rent due, at the bank or to the Company Clerk in reach. */
+  payRent: 'act.payRent',
 } as const;
 
 export const S2C = {
@@ -78,7 +88,20 @@ export type S2CType = (typeof S2C)[keyof typeof S2C];
 
 /** `gather` and `craft` are round 6 (M5b, GDD 3.14); the server refuses them until Session 6F lands. */
 export type HoldAction =
-  'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft' | 'shop' | 'bank';
+  | 'drag'
+  | 'collect'
+  | 'task'
+  | 'inspect'
+  | 'autopsy'
+  | 'gather'
+  | 'craft'
+  // Round 8 (GDD 3.23, 8C): a shop counter and the bank.
+  | 'shop'
+  | 'bank'
+  // Round 8 (GDD 3.23, 8D): the chapel altar, the Train's mailbag, the tally rack.
+  | 'altar'
+  | 'mailbag'
+  | 'rack';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
 /**
@@ -202,6 +225,13 @@ export interface C2SPayloads {
   'chat.say': { text: string };
   'chat.quick': { phraseId: string };
   'world.ping': { x: number; y: number };
+  /** Round 8 (GDD 3.23, 8D): whole Scrip, at most `economy.json` `faith.donateMax`. */
+  'act.donate': { amount: number };
+  'act.faith': { kind: 'indulgence' | 'seal' };
+  /** `itemId` is the notice's Notebook entry id. */
+  'act.notice': { itemId: string; op: 'show' | 'burn' | 'fence' };
+  'act.hq': { stationId: string };
+  'act.payRent': Record<string, never>;
   /** Deprecated alias of `lobby.ready {ready: true}`. */
   'role.ready': Record<string, never>;
   'net.ping': { t: number };
@@ -363,6 +393,11 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.buy': 5,
   'act.sell': 5,
   'act.bank': 5,
+  'act.donate': 5,
+  'act.faith': 5,
+  'act.notice': 5,
+  'act.hq': 5,
+  'act.payRent': 5,
 };
 
 export const ErrorCode = {

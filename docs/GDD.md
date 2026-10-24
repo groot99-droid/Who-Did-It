@@ -766,6 +766,21 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 - **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice. It leaves only as a
   purchase, rent, a fine, a donation or an HQ tier. Theft, drops, pickups and the bank only move it.
 
+- **Rumours** (8D). The server keeps a rumour ledger: every `notices.sampleS` it writes down each drawn look that
+  stands in a scene with at least one other figure, so a line is only ever what an observer could have seen, and it
+  names a look, never a seat or a card. Each Train delivery fills the mailbag beside the platform (HollowMere) with
+  `notices.slipsPerBag` ledger slips from the sightings since the last bag, night first, one per look; an uncollected
+  bag is replaced. Collecting it (`act.hold`, `clues.collectHoldS` within verb reach) turns the slips into Blackmail
+  Notices, private Notebook entries, up to `notices.maxHeld` held at once. A notice can be:
+  - shown at a meeting, where it becomes a public line;
+  - burnt, except one that names the holder's own look (only an Indulgence clears your own name);
+  - fenced at the black market (the tavern back room; BlackPine's lodge) for `notices.fencePrice` Scrip, once the
+    purse lands (until then the server refuses it).
+
+  A notice neither shown nor cleansed `notices.gazetteAfterRounds` day cycles after it was made is printed by the
+  Gazette at the next meeting's start and leaves its holder's Notebook. BlackPine has no Train this round, so no
+  mailbag.
+
 ### 3.24 Moods, mugging and townsfolk
 
 Round 8 (A134, A135; `docs/round8/townsfolk.md`).
