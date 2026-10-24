@@ -83,6 +83,9 @@ export const S2C = {
   inspectHunch: 'inspect.hunch',
   /** Round 8 (GDD 3.23, 8C): a `shop` hold opened a shop; sent by Session 8C. */
   shopOpen: 'shop.open',
+  coopHold: 'coopHold',
+  /** Round 8 (GDD 3.12, 8R), private to the nearest living Detective and Doctor: an NPC shouted for a body here. */
+  shout: 'shout',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
@@ -314,6 +317,8 @@ export interface S2CPayloads {
     undealt?: string[];
   };
   noise: { sceneId: string; x: number; y: number; kind: string };
+  /** Where the shout rang; names no seat, no card and no body. */
+  shout: { sceneId: string; x: number; y: number };
   error: { code: ErrorCode; msg: string };
   /**
    * To every client whose view holds that scene: the puff of a disguise a Knife strike dropped, at (x, y). Names no
@@ -364,6 +369,8 @@ export interface S2CPayloads {
     stock: Array<{ itemId: string; price: number }>;
     buys: Array<{ itemId: string; price: number }>;
   };
+  /** Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. */
+  coopHold: { taskId: string; holders: number; progress: number };
 }
 
 export type ErrorPayload = S2CPayloads['error'];

@@ -78,4 +78,24 @@ describe('effects from the public feed (motion.md 2, round 8 8G)', () => {
       expect(FX[k].lifespanMs, k).toBeLessThanOrEqual(1200);
     }
   });
+
+  it('sounds the hits, the poison, the knockout, the robbery and the creatures, and nothing for a first sighting', () => {
+    const cues = (r: { cues: Array<{ key: string }> }) => r.cues.map((c) => c.key);
+    expect(cues(avatarFx(was(AnimId.idle), avatar(R8.anim.hurt), 0))).toEqual(['fx_hit']);
+    expect(cues(avatarFx(was(AnimId.idle), avatar(AnimId.idle, R8.bit.poisoned), 0))).toEqual(['fx_poison']);
+    expect(cues(avatarFx(was(AnimId.idle), avatar(R8.anim.knockdown), 0))).toEqual([
+      'fx_fall',
+      'fx_knockout',
+    ]);
+    expect(cues(avatarFx(was(AnimId.idle), avatar(R8.anim.rob), 0))).toEqual(['fx_coins']);
+    expect(cues(avatarFx(was(AnimId.idle), avatar(AnimId.walk), 1000))).toEqual([]);
+    expect(cues(mobFx(was(AnimId.idle), mob(R8.anim.hurt), 0))).toEqual(['mob_hurt_wolf']);
+    expect(cues(mobFx(was(AnimId.idle), { ...mob(R8.anim.hurt), kind: 'rat' }, 0))).toEqual([
+      'mob_hurt_small',
+    ]);
+    expect(cues(mobFx(was(AnimId.idle), mob(AnimId.idle, R8.mobDead), 0))).toEqual(['mob_death']);
+    expect(cues(mobFx(was(AnimId.idle), mob(AnimId.swing), 0))).toEqual(['mob_wolf_attack']);
+    expect(cues(mobFx(was(AnimId.idle), { ...mob(AnimId.swing), kind: 'boar' }, 0))).toEqual([]);
+    expect(cues(mobFx(undefined, mob(AnimId.swing), 0))).toEqual([]);
+  });
 });

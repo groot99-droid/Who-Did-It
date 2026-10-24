@@ -187,6 +187,7 @@ describe('the round-6 invariants', () => {
       'killClues',
       'scripConserved',
       'taskBar',
+      'hiveNoSecrets',
       'vendettaOnce',
       'contractQuest',
       'strongboxOnce',

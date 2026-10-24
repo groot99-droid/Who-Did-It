@@ -5,6 +5,7 @@ import traits from '@wdi/content/data/traits.json';
 import { ClueKind } from '@wdi/shared/constants';
 import type { ClueSnap } from '../net/world';
 import { DEPTH, decalHolder } from './iso';
+import { drawScale } from './texels';
 
 const ATLAS = 'clues';
 const HEIGHT_CODE = ['s', 'm', 't'];
@@ -143,7 +144,7 @@ export class ClueView {
     tint: number | null = null,
   ): Phaser.GameObjects.GameObject {
     if (key !== '' && this.frame(key)) {
-      const sprite = this.scene.add.sprite(x, y, ATLAS, key).setRotation(rotation);
+      const sprite = this.scene.add.sprite(x, y, ATLAS, key).setRotation(rotation).setScale(drawScale(ATLAS));
       return tint === null ? sprite : sprite.setTint(tint);
     }
     return this.scene.add.circle(x, y, 7, teal, 0.9).setStrokeStyle(2, 0x12141c);
