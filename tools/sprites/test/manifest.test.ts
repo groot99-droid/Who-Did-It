@@ -109,7 +109,8 @@ describe('asset manifests (docs/SPRITES.md 5, 10.13)', () => {
   });
 
   it('load every lazy pair with no map, in every real manifest (SPRITES 3)', () => {
-    for (const style of artStyles()) {
+    // A style still rendering its characters (HD, A164) has no manifest yet; the test above covers it.
+    for (const style of shippedStyles()) {
       const m = read(join(style.root, 'manifest.json'));
       const lazy = m.entries.filter((e) => /_2$/.test(e.key));
       expect(lazy.length, style.id).toBeGreaterThan(0);
