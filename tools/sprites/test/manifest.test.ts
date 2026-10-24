@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { artStyles, finishEnabled } from '../palette.ts';
 import { villagerLooks } from '../placeholder-chars.ts';
 import { LEGACY } from './legacy.ts';
+import { hasManifest } from './realAssets.ts';
 
 const ASSETS = join(import.meta.dirname, '../../../apps/client/public/assets');
 
@@ -30,6 +31,13 @@ const familyKeys = (id: string) => [`char_${id}`, `ovl_${id}`, `anims_${id}`];
 const FAMILY_KEYS = FAMILY.flatMap(familyKeys);
 /** World textures whose filter follows style.json `pixelFinish.enabled.main` (SPRITES 5, 10.3). */
 const WORLD_PREFIXES = ['iso_ground_', 'iso_kit_', 'bld_', 'props', 'char_', 'ovl_', 'vfx'];
+/** The styles whose manifest lists characters: one still rendering (HD, A164) falls back per key (A80). */
+const shippedStyles = () =>
+  artStyles().filter(
+    (s) =>
+      hasManifest(s.root) &&
+      read(join(s.root, 'manifest.json')).entries.some((e) => e.key.startsWith('char_')),
+  );
 
 describe('asset manifests (docs/SPRITES.md 5, 10.13)', () => {
   const real = read('manifest.json');
@@ -49,7 +57,7 @@ describe('asset manifests (docs/SPRITES.md 5, 10.13)', () => {
 
   it('carry exactly the looks.json villager family in every real manifest, with full frames', () => {
     expect(FAMILY).toContain('villager');
-    for (const style of artStyles()) {
+    for (const style of shippedStyles()) {
       const m = read(join(style.root, 'manifest.json'));
       const keys = m.entries.map((e) => e.key).filter((k) => /^(?:char|ovl|anims)_villager/.test(k));
       expect(keys.sort(), style.id).toEqual([...FAMILY_KEYS].sort());
@@ -100,7 +108,7 @@ describe('asset manifests (docs/SPRITES.md 5, 10.13)', () => {
 });
 
 describe('character atlas json (A161, #184 request 4)', () => {
-  const roots = [...artStyles().map((s) => s.root), 'placeholder/'];
+  const roots = [...shippedStyles().map((s) => s.root), 'placeholder/'];
   it('is written on one line in every style, so a re-pack never grows the first load back', () => {
     const files = roots.flatMap((root) =>
       readdirSync(join(ASSETS, root, 'chars'))

@@ -5,7 +5,7 @@ import { DIRECTIONS, V1_CLIPS, type Anim } from '../keys.ts';
 import type { MultiAtlas } from '../pack.ts';
 import { artStyles } from '../palette.ts';
 import { villagerLooks, worldLooks } from '../placeholder-chars.ts';
-import { ASSETS } from './realAssets.ts';
+import { ASSETS, hasManifest } from './realAssets.ts';
 
 /** Art plan 4.3: one character per world look, 304 frames per pass, three passes on shared pivots. */
 const SPEC = join(import.meta.dirname, '../../blender/looks_spec.py');
@@ -51,12 +51,19 @@ describe('the world looks (art plan 4.3, looks.json)', () => {
   // The deck looks in both manifests; the family (round 8, A161) in every real style's, the placeholder's keeps the
   // plain villager only (manifest.test.ts).
   const sets: Array<[string, string, string, string[]]> = [
-    ...artStyles().map((s): [string, string, string, string[]] => [
-      s.id,
-      join(s.root, 'manifest.json'),
-      join(ASSETS, s.root),
-      s.root === '' ? [...looks, ...family] : family,
-    ]),
+    // A style still rendering its characters (HD, A164) lists none and falls back per key (A80).
+    ...artStyles()
+      .filter(
+        (s) =>
+          hasManifest(s.root) &&
+          manifestAt(join(s.root, 'manifest.json')).some((e) => e.key.startsWith('char_')),
+      )
+      .map((s): [string, string, string, string[]] => [
+        s.id,
+        join(s.root, 'manifest.json'),
+        join(ASSETS, s.root),
+        s.root === '' ? [...looks, ...family] : family,
+      ]),
     ['placeholder', 'placeholder/manifest.json', join(ASSETS, 'placeholder'), looks],
   ];
   for (const [label, rel, base, ids] of sets) {
