@@ -832,7 +832,26 @@ Round 8 (A134, A135; `docs/round8/townsfolk.md`).
 - **Mugging.** A hungry, angry or desperate figure alone with a seat may mug it. A heavier purse raises the chance;
   company and a lit light lower it.
 
-Session 8E writes this section. The numbers are `balance.json` `moods` and `townsfolk`.
+The numbers are `balance.json` `moods` and `townsfolk`.
+
+**Needs and moods (8E, A140).** Every NPC seat carries four needs in server memory, each a level from 0 to 1:
+Hunger, Fear, Anger and Want. They never reach a client, a match log line or a random stream. They move on what
+happens to the seat, never on its card, so a Killer cowers at a body like anyone else (its own kills included).
+A need ticks only on the ticks the seat's brain runs (not while it is busy at a station, or dead), so every rate
+below is awake time.
+
+| Need | Rises with | Falls with |
+|---|---|---|
+| Hunger | time (`moods.hunger.riseS`), `famishedMul` times faster while Famished (3.22) | a meal (the `eat` event, `mealRelief`), standing at home (`homeFallS`) |
+| Fear | each body seen (`fear.body`), a creature's chase (`chase`, once per chase), being struck (`struck`), an ejection (`ejection`, every living NPC), the dark: a night phase outdoors in an unlit scene (3.12), alone and without a burning light (`darkRiseS`) | a day phase, a lit scene, home, or company (another living seat within `vision.dayTiles`), over `fallS` |
+| Anger | being struck (`anger.struck`), robbed (`robbed`), rent or quota taken (`taxed`) | time (`fallS`); a meal (`mealRelief`); the ejection of the seat it suspects most (`ejectionRelief`) |
+| Want | a purse under `want.lightPurse` Scrip (`lightRiseS`), Indebted (`debtRiseS`) | a wage (`wage`), a sale (`sale`) |
+
+The **mood** built on the needs (the stacked PR) is what shows: a need itself is never a word, a clip or a number
+on the wire.
+
+Anger remembers who struck, robbed or taxed the seat until it cools to zero; the mugging (below) and relations
+(3.22) read it. A new card (3.12: the brain forgets) starts every need at zero.
 
 ### 3.25 The living world
 

@@ -268,6 +268,45 @@ export const BalanceFile = z.strictObject({
     /** Round 6 (GDD 3.19): an NPC at one goal and one tile for longer than this fails the stuck invariant. */
     stuckInvariantS: Seconds,
   }),
+  /**
+   * Round 8 (GDD 3.24, Session 8E): the needs and moods of NPC seats and ambient townsfolk. A need is a 0..1 level in
+   * room memory; `threshold` is where it counts, `desperateNeeds` how many over it make Desperate, `moodHoldS` how long
+   * a mood holds before it may change. A `riseS` or `fallS` is the time a need takes to cross the whole scale at that
+   * rate; the other keys are the jump one event gives. `weights` scale the routine's draw per mood (`moodWeights`).
+   */
+  moods: Section({
+    /** Hunger rises over `riseS` (`famishedMul` times faster under 8A's Famished), falls at home and on a meal. */
+    hunger: z.strictObject({
+      riseS: Seconds,
+      homeFallS: Seconds,
+      mealRelief: Chance,
+      famishedMul: z.number().positive(),
+    }),
+    fear: z.strictObject({
+      body: Chance,
+      chase: Chance,
+      struck: Chance,
+      ejection: Chance,
+      darkRiseS: Seconds,
+      fallS: Seconds,
+    }),
+    anger: z.strictObject({
+      struck: Chance,
+      robbed: Chance,
+      taxed: Chance,
+      ejectionRelief: Chance,
+      mealRelief: Chance,
+      fallS: Seconds,
+    }),
+    /** `lightPurse` is in Scrip (8C's purse): below it Want rises over `lightRiseS`; Indebted (8D) over `debtRiseS`. */
+    want: z.strictObject({
+      lightPurse: z.number().int().nonnegative(),
+      lightRiseS: Seconds,
+      debtRiseS: Seconds,
+      wage: Chance,
+      sale: Chance,
+    }),
+  }),
   /** Round 6 (GDD 3.14). Each resource's own gather hold and respawn are rows of resources.json. */
   resources: Section({
     /** The share of each node pool that is active in a match. */
