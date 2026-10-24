@@ -3,7 +3,7 @@ import { NoteKind, Phase, TILE_PX } from '@wdi/shared';
 import { describe, expect, it } from 'vitest';
 import type { NotebookSnap } from '../../net/world';
 import { CIVIC_COPY, stationName } from '../copy/civic';
-import { canAfford, civicSpots, hqOffer, noticeRows } from './rows';
+import { canAfford, civicSpots, hqOffer, noticeRows, PAPER_ITEMS, paperRows } from './rows';
 
 describe('civicSpots', () => {
   it('finds the altar, the mailbag, a rack, the back room, a station and a bank, and skips the rest', () => {
@@ -45,6 +45,25 @@ describe('noticeRows', () => {
     expect(rows.map((r) => r.id)).toEqual(['a', 'c']);
     expect(rows[0]!.line).toMatch(/look, in the Cellar, at night\.$/);
     expect(rows[1]!.line).toBe("A figure in a stranger's look, in the Cellar, by day.");
+  });
+
+  it("counts the meeting's papers, and burns a notice of the seat's own look only with an Indulgence", () => {
+    const notebook = [
+      entry('a', NoteKind.notice, 'baker', Phase.day),
+      entry('b', NoteKind.notice, 'vicar', Phase.day),
+    ];
+    const seal = { defId: PAPER_ITEMS.seal, qty: 1 };
+    const none = paperRows(notebook, [seal], 'baker', () => 'the Cellar');
+    expect(none).toMatchObject({ indulgences: 0, seals: 1 });
+    expect(none.notices.map((r) => [r.id, r.canBurn])).toEqual([
+      ['a', false],
+      ['b', true],
+    ]);
+    const one = paperRows(notebook, [seal, { defId: PAPER_ITEMS.indulgence, qty: 2 }], 'baker', () => '');
+    expect(one.indulgences).toBe(2);
+    expect(one.notices.every((r) => r.canBurn)).toBe(true);
+    // Before the card closes the look is '', and no notice counts as the seat's own.
+    expect(paperRows(notebook, [], '', () => '').notices.every((r) => r.canBurn)).toBe(true);
   });
 });
 

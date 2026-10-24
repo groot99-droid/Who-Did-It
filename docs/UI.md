@@ -1328,7 +1328,7 @@ Lines are in `apps/client/src/ui/copy/civic.ts` (`CIVIC_COPY`, `stationName(id)`
 (`ui/econ/CivicLayer.ts`) shows one prompt at the civic prop in reach (GDD 3.23). At the mailbag and a tally rack, E is
 held (`act.hold`). At an altar, the back room, an HQ station or a bank counter, E opens the civic panel
 (`ui/econ/CivicPanel.ts`), redrawn for that prop. The server decides every act; a refusal is the usual error line.
-Showing a notice, and presenting an Indulgence or a Seal, happen at a meeting and wait for the meeting panel's hook.
+Showing a notice, and presenting an Indulgence or a Seal, happen at a meeting, in the meeting's Papers tab (14.35.6).
 8H animates the panel by `wdi-anim-panel` and its lists by `wdi-anim-list`.
 
 #### 14.35.1 The prompts
@@ -1393,6 +1393,25 @@ Showing a notice, and presenting an Indulgence or a Seal, happen at a meeting an
 | `bank.lead` | Rent falls due at midday and is owed by dusk. Pay all you owe at once. | under it |
 | `bank.pay` | Pay what you owe | `act.payRent`, the whole debt or nothing |
 | `civic.close` | Close | the panel's close button |
+
+#### 14.35.6 The meeting's Papers tab
+
+`ui/econ/meetingPapers.ts`, a tab of the meeting's side panel (`MeetingScreen.addTab`, mounted in `scenes/Meeting.ts`
+beside the Notebook). Every seat sees the tab, so its presence says nothing; its rows are this seat's own. A row shows
+only what the seat holds: a Seal, an Indulgence, each notice.
+
+| Key | Text | Where |
+|---|---|---|
+| `papers.tab` | Papers | the tab's label |
+| `papers.lead` | What you carry to the table. Only you see this tab. | the tab's first line |
+| `papers.none` | You carry nothing to lay on the table. | when the seat holds none of them |
+| `papers.seal` | A Parish Seal (you hold {n}) | the Seal row |
+| `papers.seal.hint` | Every vote so far is cleared, and for a while no vote may name you. Everyone hears of it. | under it |
+| `papers.indulgence` | An Indulgence (you hold {n}) | the Indulgence row |
+| `papers.indulgence.hint` | Quietly clears the oldest notice of your look, wherever it is held. Nobody is told. | under it |
+| `papers.present` | Present | `act.faith {kind}` in a meeting |
+| `papers.show` | Show | `act.notice {op: 'show'}`, a notice row (the line is `notice.line`) |
+| `notice.burn` | Burn | `act.notice {op: 'burn'}`, held back on a notice of the seat's own look without an Indulgence |
 
 ### 14.36 Townsfolk (8E)
 
