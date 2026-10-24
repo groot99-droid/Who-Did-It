@@ -728,6 +728,8 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 - **The band.** Others never see the number. Inspect shows "a light purse" below `economy.heavyPurse` and "a heavy
   purse" from it. Every stake tier lies wholly on one side of that line, so at Start the band says the look's tier
   and nothing more.
+- **Wages.** The town pays `economy.taskWage` for each finished task, a fake task exactly as a real one, so a purse
+  never tells a worker from a pretender. A quest turn-in pays the quest's `scrip` (`quests.json`) beside its items.
 - **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice. It leaves only as a
   purchase, rent, a fine, a donation or an HQ tier. Theft, drops, pickups and the bank only move it.
 
