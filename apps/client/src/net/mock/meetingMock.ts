@@ -142,6 +142,11 @@ export class MockMeetingFeed implements MeetingFeed {
     return this.begun;
   }
 
+  /** The mock takes a vote at once (its specs vote on open), so it never holds the buttons. */
+  votesOpenTick(): number {
+    return 0;
+  }
+
   result(): VoteResult | null {
     return this.tally;
   }
