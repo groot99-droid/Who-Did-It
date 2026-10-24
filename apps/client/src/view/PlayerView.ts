@@ -1,11 +1,13 @@
-import Phaser from 'phaser';
+import type Phaser from 'phaser';
 import metrics from '@wdi/content/data/metrics.json';
 import palette from '@wdi/content/data/palette.json';
 import traits from '@wdi/content/data/traits.json';
 import type { Direction } from '@wdi/shared/direction';
 import { isoDepth, toScreen } from '@wdi/shared/iso';
+import { StatusBit } from './animIds';
+import { TELEPORT_PX } from './interpolation';
 import { BIAS } from './iso';
-import { type Clip, clipFor, dirFromYaw } from './poses';
+import { type Clip, clipFor, dirFor, dirFromYaw } from './poses';
 
 export { dirFromYaw };
 
@@ -29,6 +31,7 @@ export const FIGURE_SCALE = metrics.iso.artScale * metrics.iso.figureScale;
 export const HEIGHT_SCALE = traits.axes.height.values.map((v) => v.spriteScale * FIGURE_SCALE);
 /** The standing figure's cap in packed px (SPRITES 1): the nameplate and the tick sit above it. */
 const HEAD_PX = metrics.maxStandingSilhouettePx / metrics.iso.artScale;
+const hex = (c: string) => Number.parseInt(c.slice(1), 16);
 
 export interface PlayerLook {
   /** The look id of the deck (`char/<lookId>/...`, SPRITES 3); the plain villager body when absent or not loaded. */
@@ -53,6 +56,9 @@ export class PlayerView {
   private hatPass: string | null = null;
   private bloodOn = false;
   private readonly plateColor: string;
+  /** The last drawn feet position and its time, for the speed the gaits read. */
+  private last: { x: number; y: number; t: number } | null = null;
+  private speed = 0;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -91,13 +97,7 @@ export class PlayerView {
     const art = scene.add.container(0, 0, [this.body, this.scarf, this.hat, this.blood]).setScale(scale);
     // The greybox mark of an interact pose a look has no clip for: a small teal tick above the head.
     this.tick = scene.add
-      .rectangle(
-        0,
-        -Math.round(HEAD_PX * scale + 8),
-        10,
-        10,
-        Number.parseInt(palette.colors.teal.slice(1), 16),
-      )
+      .rectangle(0, -Math.round(HEAD_PX * scale + 8), 10, 10, hex(palette.colors.teal))
       .setAngle(45)
       .setVisible(false);
     this.root = scene.add.container(0, 0, [shadow, art, this.tick, this.plate]);
@@ -107,11 +107,18 @@ export class PlayerView {
     }
   }
 
-  /** Poses the sprite for a facing and an animation id; `transit` hides the nameplate at the door. */
-  pose(dir: Direction, animId: number, transit: boolean): void {
+  /**
+   * Poses the sprite for a facing, an animation id and the presence's status bits (motion.md 1): the gaits and
+   * the status loops come from the bits and the drawn speed (poses.ts), and `transit` hides the nameplate at the
+   * door. A plain boolean is the transit flag alone (round 5 callers).
+   */
+  pose(dir: Direction, animId: number, status: number | boolean): void {
+    const bits = typeof status === 'number' ? status : status ? StatusBit.transit : 0;
+    const transit = (bits & StatusBit.transit) !== 0;
     this.plate.setVisible(!transit);
-    const key = (clip: Clip) => `${this.bodyId}/${clip}/${dir}`;
-    const { clip, tick } = clipFor(animId, (c) => this.scene.anims.exists(`char/${key(c)}`));
+    const key = (clip: Clip) => `${this.bodyId}/${clip}/${dirFor(clip, dir)}`;
+    const has = (c: Clip) => this.scene.anims.exists(`char/${key(c)}`);
+    const { clip, tick } = clipFor(animId, has, { bits, speed: this.speed });
     this.tick.setVisible(tick && !transit);
     if (!this.hasArt) return;
     const tail = key(clip);
@@ -153,8 +160,18 @@ export class PlayerView {
     if (this.scene.anims.exists(key)) sprite.play({ key, startFrame });
   }
 
-  /** `x`, `y` are the feet in world px; the sprite stands at their projection and sorts by its screen y. */
+  /**
+   * `x`, `y` are the feet in world px; the sprite stands at their projection and sorts by its screen y. The drawn
+   * speed (world px per second, smoothed over two frames) feeds the gaits; a teleport counts as standing still.
+   */
   setPosition(x: number, y: number): void {
+    const t = this.scene.time?.now ?? 0;
+    if (this.last && t > this.last.t) {
+      const d = Math.hypot(x - this.last.x, y - this.last.y);
+      const now = d >= TELEPORT_PX ? 0 : (d * 1000) / (t - this.last.t);
+      this.speed = (this.speed + now) / 2;
+    }
+    this.last = { x, y, t };
     const s = toScreen(x, y);
     this.root.setPosition(s.x, s.y).setDepth(isoDepth(x, y) + BIAS.character);
   }
