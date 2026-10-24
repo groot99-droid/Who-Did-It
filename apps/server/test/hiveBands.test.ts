@@ -5,6 +5,8 @@ import { Phase, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
 import { runAction } from '../src/sim/Actions';
 import { spawnBody } from '../src/sim/Bodies';
 import { runInvariants } from '../src/sim/auto/invariants';
+import { mobBodies } from '../src/sim/Mobs';
+import { MobState } from '../src/sim/mobs/ai';
 import { emitNoise } from '../src/sim/Noise';
 import { difficultyRow } from '../src/sim/npc/difficulty';
 import { hiveOf } from '../src/sim/npc/hive';
@@ -89,7 +91,18 @@ describe('the body bands (8R)', () => {
     expect(simOf(party.room).reportedBodies.size).toBe(0);
     emitNoise(party.room, 'forest', px(13), px(1), balance.noise.killScream, 'scream', dead);
     const requests = requestsOf(party);
-    for (let i = 0; i < deadline(party, 6, 2) && requests.length === 0; i++) advance(party, 1);
+    // The forest's creatures wake at night and an NPC one chases flees the scene first (GDD 3.15); this case is about
+    // the scream, so they are put back to idle after every step, as in npcRoutine.test.ts. The flee is mobs.test.ts's.
+    const calm = () => {
+      for (const body of mobBodies(party.room).values()) {
+        body.mind.state = MobState.idle;
+        body.mind.prey = null;
+      }
+    };
+    for (let i = 0; i < deadline(party, 6, 2) && requests.length === 0; i++) {
+      advance(party, 1);
+      calm();
+    }
     expect(requests).toEqual([expect.objectContaining({ reason: 'body', callerId: a })]);
   });
 
