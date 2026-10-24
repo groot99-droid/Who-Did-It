@@ -1,13 +1,17 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance } from '@wdi/content';
-import { Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { Phase, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { runAction } from '../src/sim/Actions';
 import { spawnBody } from '../src/sim/Bodies';
+import { runInvariants } from '../src/sim/auto/invariants';
 import { emitNoise } from '../src/sim/Noise';
 import { difficultyRow } from '../src/sim/npc/difficulty';
+import { hiveOf } from '../src/sim/npc/hive';
 import { npcMemory } from '../src/sim/npc/memory';
 import { simOf } from '../src/sim/RoomSim';
 import { record } from './killHelpers';
+import { sleep } from './simHelpers';
 import {
   type Party,
   advance,
@@ -22,7 +26,7 @@ import {
   toWorld,
 } from './npcHelpers';
 
-// Round 8, 8R (A174, A176; GDD 3.12): the body bands. The forest's open top row
+// Round 8, 8R (A174, A176; GDD 3.8, 3.12): the body bands, the shout and the night bell. The forest's open top row
 // (y 1) holds no scene light, as nightSight.test.ts and hiveSenses.test.ts use it.
 
 let colyseus: ColyseusTestServer;
@@ -88,6 +92,45 @@ describe('the body bands (8R)', () => {
     expect(requests).toEqual([expect.objectContaining({ reason: 'body', callerId: a })]);
   });
 
+  it('the shout reaches the nearest Detective on its own client only; the board keeps where, never who', async () => {
+    const { party, npcs } = await world(2, 1);
+    const [a, dead] = npcs as [string, string];
+    const [holder, other] = party.humans as [(typeof party.humans)[0], (typeof party.humans)[0]];
+    setRole(party.room, holder.id, 'detective');
+    holdPhase(party, Phase.day, 120);
+    placeSeat(party, a, 'forest', 7, 1);
+    spawnBody(party.room, 'forest', dead, 10, 1);
+    let shoutFact = false;
+    for (let i = 0; i < seconds(5); i++) {
+      advance(party, 1);
+      const [fact] = hiveOf(party.room).all('shout');
+      if (fact) {
+        shoutFact = true;
+        expect(Object.keys(fact).sort()).toEqual(['kind', 'ref', 'sceneId', 'tick', 'x', 'y']);
+      }
+      expect(runInvariants(party.room).filter((f) => f.name === 'hiveNoSecrets')).toEqual([]);
+    }
+    expect(shoutFact).toBe(true);
+    await sleep(300);
+    const shouts = (h: typeof holder) => h.log.filter((m) => m.type === S2C.shout).map((m) => m.payload);
+    expect(shouts(holder)).toEqual([{ sceneId: 'forest', x: expect.any(Number), y: expect.any(Number) }]);
+    expect(shouts(other)).toEqual([]);
+  });
+
+  it('the first NPC in the bell band stays by the body; the next runs for the bell and rings it at night', async () => {
+    const { party, npcs } = await world(1, 2);
+    const [a, b, dead] = npcs as [string, string, string];
+    holdPhase(party, Phase.night, 120);
+    placeSeat(party, a, 'overworld', 28, 22);
+    placeSeat(party, b, 'overworld', 29, 22);
+    spawnBody(party.room, 'overworld', dead, 28, 21);
+    const requests = requestsOf(party);
+    for (let i = 0; i < seconds(20) && requests.length === 0; i++) advance(party, 1);
+    expect(requests).toHaveLength(1);
+    expect(requests[0]!.reason).toBe('bell');
+    expect([a, b]).toContain(requests[0]!.callerId);
+  });
+
   it('waits through immunity by the body instead of a refused report, and reports once a verb works', async () => {
     const { party, npcs } = await world(1, 1);
     const [a, dead] = npcs as [string, string];
@@ -100,5 +143,21 @@ describe('the body bands (8R)', () => {
     holdPhase(party, Phase.day, 120);
     for (let i = 0; i < seconds(10) && requests.length === 0; i++) advance(party, 1);
     expect(requests).toEqual([expect.objectContaining({ reason: 'body', callerId: a })]);
+  });
+});
+
+describe('the night bell (A174)', () => {
+  it('rings at night only while an unreported body lies in the world', async () => {
+    const { party, npcs } = await world(1, 1);
+    const [, dead] = npcs as [string, string];
+    const human = party.humans[0]!.id;
+    holdPhase(party, Phase.night, 120);
+    placeSeat(party, human, 'overworld', 28, 21);
+    const requests = requestsOf(party);
+    runAction(party.room, human, 'act.bell', {});
+    expect(requests).toEqual([]);
+    spawnBody(party.room, 'forest', dead, 7, 1);
+    runAction(party.room, human, 'act.bell', {});
+    expect(requests).toEqual([expect.objectContaining({ reason: 'bell', callerId: human })]);
   });
 });

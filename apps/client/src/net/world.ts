@@ -147,6 +147,8 @@ export type WorldFeedEvents = {
   };
   /** Private, round 7 (7M, GDD 3.5): the hands on the co-op hold this seat is in and its shared progress (0 to 1). */
   coopHold: { taskId: string; holders: number; progress: number };
+  /** Private, round 8 (8R, GDD 3.12): an NPC shouted for a body here; to the nearest Detective and Doctor only. */
+  shout: S2CPayloads['shout'];
 };
 
 /** Round 6 (M5b): a resource node of the scene this client is in (`SceneState.nodes`). */
