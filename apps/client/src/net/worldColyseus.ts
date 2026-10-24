@@ -93,6 +93,9 @@ export class ColyseusWorldFeed implements WorldFeed {
     room.onMessage('minigameStart', (m: WorldFeedEvents['minigameStart']) =>
       this.bus.emit('minigameStart', m),
     );
+    // Round 8 (8B): inspect's three private messages.
+    for (const type of ['inspect.result', 'inspect.noticed', 'inspect.hunch'] as const)
+      room.onMessage(type, (m: never) => this.bus.emit(type, m));
     room.onMessage('mugPrompt', (m: WorldFeedEvents['mugPrompt']) => this.bus.emit('mugPrompt', m));
   }
 
@@ -322,6 +325,10 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   minigameResult(taskId: string, answer: unknown): void {
     this.room.send('minigame.result', { taskId, answer });
+  }
+
+  inspect(targetId: string): void {
+    this.room.send('act.inspect', { targetId });
   }
 
   mug(choice: 'pay' | 'fight' | 'flee'): void {

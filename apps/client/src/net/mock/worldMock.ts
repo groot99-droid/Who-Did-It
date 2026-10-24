@@ -536,6 +536,21 @@ export class MockWorldFeed implements WorldFeed {
     // The mock has no task layer: `?minigame=<kind>` opens a modal whose result is dropped here.
   }
 
+  /** Round 8 (8B): the mock reads every bot as unhurt and sign-free; no reach or cooldown check. */
+  inspect(targetId: string): void {
+    const b = [...this.actors.values()].find((a) => a.handle === targetId && a.id !== this.selfId);
+    if (!b) return;
+    const look = this.actors.get(b.lookOf)?.look ?? b.look;
+    this.bus.emit('inspect.result', {
+      targetId,
+      lookId: look,
+      signs: [],
+      health: 'unhurt',
+      purse: 'unknown',
+      light: false,
+    });
+  }
+
   mug(_choice: 'pay' | 'fight' | 'flee'): void {
     // The mock has no townsfolk, so nothing mugs.
   }

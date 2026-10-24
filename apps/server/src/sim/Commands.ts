@@ -2,10 +2,13 @@ import type { Client } from '@colyseus/core';
 import { C2S } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { runAction } from './Actions';
+import { handleBank } from './economy/bank';
+import { handleBuy, handleSell } from './economy/shops';
 import { handleMinigameResult } from './Minigames';
 import { handleLight } from './mobs/light';
 import { handleQuestAccept, handleQuestTurnIn } from './Quests';
 import { runHolds } from './Hold';
+import { handleInspect } from './inspect';
 import { queuePortal } from './PortalQueue';
 import { handleMug } from './townsfolk/mug';
 
@@ -74,6 +77,20 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.light:
         handleLight(room, cmd.sessionId, payload);
+        break;
+      // Round 8 (GDD 3.22 "Inspect"): 8B's `sim/inspect/`.
+      case C2S.inspect:
+        handleInspect(room, cmd.sessionId, payload);
+        break;
+      // Round 8, 8C (locked; GDD 3.23): trading at the shop, and banking at the bank, a hold opened.
+      case C2S.buy:
+        handleBuy(room, cmd.sessionId, payload);
+        break;
+      case C2S.sell:
+        handleSell(room, cmd.sessionId, payload);
+        break;
+      case C2S.bank:
+        handleBank(room, cmd.sessionId, payload);
         break;
       // Round 8 (8E, GDD 3.24): the answer to a mugging prompt.
       case C2S.mug:

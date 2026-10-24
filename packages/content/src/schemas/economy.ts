@@ -1,13 +1,20 @@
 import { z } from 'zod';
-import { GddRef, Id } from './common.js';
+import { GddRef, Id, PrefixedId } from './common.js';
 
 // Round 8 (GDD 3.23; docs/round8/economy.md 2), Session 8C: the Scrip numbers that are not `balance.json` `economy`.
-// `shops` and `prices` are filled by the shops step; 8D adds its own top-level keys beside these.
+// 8D adds its own top-level keys beside these.
 
 const Scrip = z.number().int().nonnegative();
 
 /** A stake tier: the purse a seat starts with is drawn uniformly in [min, max]. */
 const StakeTier = z.strictObject({ min: Scrip, max: Scrip }).refine((t) => t.min <= t.max, 'min > max');
+
+const Shop = z.strictObject({ prop: PrefixedId, sells: z.array(Id), buys: z.array(Id) });
+
+const Price = z
+  .strictObject({ ask: Scrip.positive().optional(), pay: Scrip.positive().optional() })
+  .refine((p) => p.ask !== undefined || p.pay !== undefined, 'a price needs ask or pay')
+  .refine((p) => p.ask === undefined || p.pay === undefined || p.pay < p.ask, 'pay must be below ask');
 
 export const EconomyFile = z.strictObject({
   gddRef: GddRef,
@@ -20,7 +27,12 @@ export const EconomyFile = z.strictObject({
     byLook: z.record(Id, Id),
     default: Id,
   }),
-  shops: z.record(Id, z.unknown()),
-  prices: z.record(Id, Scrip),
+  /**
+   * A shop is one scene static (`prop`, a prop of kind `counter`): the items it sells at their `ask` and the items it
+   * buys at their `pay`.
+   */
+  shops: z.record(Id, Shop),
+  /** Per item: what a shop asks for one (`ask`) and what a shop pays for one (`pay`). */
+  prices: z.record(Id, Price),
 });
 export type EconomyFile = z.infer<typeof EconomyFile>;
