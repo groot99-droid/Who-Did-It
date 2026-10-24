@@ -18,7 +18,9 @@ const volume = (id: string, kind: 'book' | 'letter' | 'ledger' | 'clipping', pag
 
 const mapOf = (propId: string): string | undefined => {
   const scene = Object.values(content.scenes).find((s) => s.props.some((p) => p.id === propId));
-  return Object.entries(content.maps).find(([, m]) => scene && m.scenes.includes(scene.id))?.[0];
+  return Object.entries(content.maps).find(
+    ([, m]) => scene && (m.scenes as readonly string[]).includes(scene.id),
+  )?.[0];
 };
 
 describe('lore.json', () => {
