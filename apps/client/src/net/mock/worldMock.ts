@@ -34,6 +34,7 @@ import type {
   QuestSnap,
   TaskSnap,
   StackSnap,
+  CivicAct,
 } from '../world';
 import { MockM5b, type MockSceneM5b } from './m5bMock';
 import { TASKS } from '../../ui/tasks';
@@ -560,6 +561,17 @@ export class MockWorldFeed implements WorldFeed {
   buy(_shopId: string, _itemId: string, _qty: number): void {}
 
   sell(_shopId: string, _itemId: string, _qty: number): void {}
+
+  // Round 8, 8D: the mock town has no altar, station or bank, so no Faith and nothing built.
+  faith(): number {
+    return 0;
+  }
+
+  hqTiers(): Record<string, number> {
+    return {};
+  }
+
+  civic(_type: CivicAct, _payload: object): void {}
 
   questAccept(questId: string): void {
     const me = this.actors.get(this.selfId);

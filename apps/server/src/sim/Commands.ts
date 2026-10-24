@@ -12,6 +12,7 @@ import { handleInspect } from './inspect';
 import { queuePortal } from './PortalQueue';
 import { handleDonate, handleFaith } from './economy/faith';
 import { handlePayRent } from './economy/rent';
+import { handleHq } from './economy/hq';
 import { handleNotice } from './economy/notices';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
@@ -106,6 +107,9 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.payRent: // round 8, 8D (GDD 3.23)
         handlePayRent(room, cmd.sessionId);
+        break;
+      case C2S.hq: // round 8, 8D (GDD 3.23)
+        handleHq(room, cmd.sessionId, payload);
         break;
       default:
         // act.interact, hide, check, burst, present arrive with M4+; queued and ignored until then.

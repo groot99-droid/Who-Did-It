@@ -1271,6 +1271,78 @@ by `wdi-anim-purse`. Entering a scene shows the amount alone, never the whole pu
 | `purse.gain` | +{n} | beside it after a wage, a sale or a pickup |
 | `purse.loss` | −{n} | beside it after a buy, a deposit or a theft |
 
+### 14.35 Rent, Faith, rumours and HQ (8D)
+
+Lines are in `apps/client/src/ui/copy/civic.ts` (`CIVIC_COPY`, `stationName(id)`). The civic layer
+(`ui/econ/CivicLayer.ts`) shows one prompt at the civic prop in reach (GDD 3.23). At the mailbag and a tally rack, E is
+held (`act.hold`). At an altar, the back room, an HQ station or a bank counter, E opens the civic panel
+(`ui/econ/CivicPanel.ts`), redrawn for that prop. The server decides every act; a refusal is the usual error line.
+Showing a notice, and presenting an Indulgence or a Seal, happen at a meeting and wait for the meeting panel's hook.
+8H animates the panel by `wdi-anim-panel` and its lists by `wdi-anim-list`.
+
+#### 14.35.1 The prompts
+
+| Key | Text | Where |
+|---|---|---|
+| `prompt.altar` | Press E: the altar | the prompt at an altar in reach |
+| `prompt.mailbag` | Hold E: collect the mailbag | the hold prompt at the mailbag (the hold lasts `clues.collectHoldS`) |
+| `prompt.rack` | Hold E: hand in your quota | the hold prompt at a tally rack |
+| `prompt.market` | Press E: the back-room buyer | the prompt at the back-room buyer (the black market) |
+| `prompt.hq` | Press E: the {station} | the prompt at an HQ station, by its name |
+| `prompt.bank` | Press E: pay what you owe | the prompt at a bank counter |
+
+#### 14.35.2 The altar
+
+| Key | Text | Where |
+|---|---|---|
+| `altar.title` | The altar | the altar panel's title |
+| `altar.faith` | Your Faith: {n} of {max} | under the title: the own Faith |
+| `altar.purse` | Your purse: {n} Scrip | under it: the purse |
+| `altar.donate` | Give {n} Scrip | the two give buttons (1, and 5 or `faith.donateMax`) |
+| `altar.indulgence` | An Indulgence | a row: the Indulgence |
+| `altar.indulgence.hint` | Clears one rumour of your look. {faith} Faith and {scrip} Scrip. | its line, with its price |
+| `altar.seal` | A Parish Seal | a row: the Parish Seal |
+| `altar.seal.hint` | Presented at a meeting, the Church holds the charge. {faith} Faith and {scrip} Scrip. | its line, with its price |
+| `altar.buy` | Buy | each row's button |
+| `altar.short` | Not enough Faith or Scrip | a row the Faith or the purse cannot cover |
+
+#### 14.35.3 The back room and the notices
+
+| Key | Text | Where |
+|---|---|---|
+| `market.title` | The back room | the back room's title |
+| `market.lead` | A man who buys what people would rather keep quiet. | under it |
+| `market.none` | You hold no notices. | no notice held |
+| `notice.line` | A figure in {look}'s look, in {place}, {when}. | each held notice (`{when}` one of the four below) |
+| `notice.fence` | Sell for {n} Scrip | a notice's sell button (`notices.fencePrice`) |
+| `notice.burn` | Burn | a notice's burn button (your own look's needs an Indulgence) |
+| `notice.when.day` | by day | grace and day |
+| `notice.when.dusk` | at dusk | dusk |
+| `notice.when.night` | at night | night |
+| `notice.when.finalNight` | on the last night | the Final Night |
+| `notice.stranger` | a stranger | a look with no name |
+
+#### 14.35.4 The HQ panel
+
+| Key | Text | Where |
+|---|---|---|
+| `hq.tier` | Built: {n} of 3 | the bought tier |
+| `hq.next` | Next: {scrip} Scrip, {materials} | the next tier's price |
+| `hq.done` | Fully built. | all three tiers built |
+| `hq.build` | Build | the build button |
+| `hq.notYours` | Only someone in the {look} look may build here. | a seat not in the station look |
+| `hq.short` | Not enough Scrip or materials | the Scrip or the materials fall short |
+| `hq.<id>` | Crumb's Ovens, Chapel, Surgery, Gamekeeper's Lodge, Detective's Office, Lamplighter's Store | the panel's title, by `economy.json` station id |
+
+#### 14.35.5 The bank counter
+
+| Key | Text | Where |
+|---|---|---|
+| `bank.title` | The Company ledger | the bank panel's title |
+| `bank.lead` | Rent falls due at midday and is owed by dusk. Pay all you owe at once. | under it |
+| `bank.pay` | Pay what you owe | `act.payRent`, the whole debt or nothing |
+| `civic.close` | Close | the panel's close button |
+
 ### 14.38 Tasks: the chores panel, the station prompts and the village's work (7M)
 
 Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt at Start gets its screen half in the M5b layer (14.19): nothing here changes the layer's gather, craft or quest behaviour, and `ui/theme/**` is not edited; the new rules live in `ui/match.css`.
