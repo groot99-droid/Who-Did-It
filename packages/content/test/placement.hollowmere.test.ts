@@ -198,15 +198,6 @@ const PENDING: Partial<Record<SceneId, readonly string[]>> = {
     'light bk.lt_lamp_table (lamp) at 8,6 hangs on nothing that could hold it',
     'light bk.lt_lamp_counter (lamp) at 14,6 hangs on nothing that could hold it',
   ],
-  manor_hall: [
-    'wall-hung spot mh.curtain_alcove has no wall behind it',
-    'light mh.lt_lamp_w (lamp) at 7,7 hangs on nothing that could hold it',
-    'light mh.lt_lamp_e (lamp) at 21,7 hangs on nothing that could hold it',
-  ],
-  manor_upper: [
-    'prop mu.study_door faces south into no floor (its front is hidden)',
-    'light mu.lt_lamp (lamp) at 12,6 hangs on nothing that could hold it',
-  ],
   barn: [
     'prop ba.study_key stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)',
     'light ba.lt_lantern (lantern) at 10,6 hangs on nothing that could hold it',
