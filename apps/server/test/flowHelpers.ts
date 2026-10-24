@@ -3,6 +3,7 @@ import { boot } from '@colyseus/testing';
 import { Phase, type PlayerState } from '@wdi/shared';
 import { createServer } from '../src/server';
 import { simOf } from '../src/sim/RoomSim';
+import { openVotesNow } from '../src/sim/Meeting';
 import { type Bot, type Match, sleep, startMatch, stateOf } from './simHelpers';
 
 /** Boots a test server with the debug handlers on; call `release` in afterAll. */
@@ -124,8 +125,11 @@ export async function openMeeting(m: Match, callerIdx = 1, bodyIdx?: number): Pr
   await until(() => m.room.state.phase === Phase.meetingDiscussion);
 }
 
-export const vote = (m: Match, i: number, target: string): void =>
+/** Round 8, 8L: the specs vote at once, so the helper opens the votes white-box; voteDelay.test.ts covers the delay. */
+export function vote(m: Match, i: number, target: string): void {
+  openVotesNow(m.room);
   (m.bots[i] as Bot).room.send('meeting.vote', { targetId: target });
+}
 
 /**
  * Everyone alive casts `pick(i)`; resolves once the room reaches the reveal and every client

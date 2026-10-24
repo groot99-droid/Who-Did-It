@@ -13,10 +13,13 @@ import { openMinigame, type MinigameModal } from '../view/minigames/MinigameModa
 import { loadGivers, type GiverSpot } from '../view/GiverView';
 import { fill } from './copy';
 import { M5B_COPY as C } from './copy/m5b';
+import { TASK_COPY as TC } from './copy/tasks';
+import { mountChores, mountWorkBar } from './Chores';
 import { mountCrafting } from './Crafting';
 import { h, isTyping, overlayRoot } from './dom';
 import { itemName, mountInventory, stacksOf, type Panel } from './Inventory';
 import { mountQuestLog } from './QuestLog';
+import { loadPropAt, loadSceneNameOf, taskPrompt, taskSpots, type TaskSpot } from './tasks';
 
 const REACH_PX = balance.doors.reachTiles * TILE_PX;
 const RES = resources.resources as Record<
@@ -27,10 +30,13 @@ const RECIPES = recipes.recipes as Record<string, { craftS: number; out: string 
 const NPC_NAME = (id: string): string => (quests.npcs as Record<string, { name: string }>)[id]?.name ?? id;
 /** Mock and server phase ids with the world running: grace, day, dusk, night. */
 const WORLD_PHASES = new Set([2, 3, 4, 5]);
+/** The phases a `nightOnly` task (GDD 3.5) can be worked in: night and the final night. */
+const NIGHT_PHASES = new Set([5, 11]);
 
 type Target =
   | { kind: 'node'; id: string; resource: string; x: number; y: number }
-  | { kind: 'giver'; npc: string; x: number; y: number };
+  | { kind: 'giver'; npc: string; x: number; y: number }
+  | TaskSpot;
 
 interface Hold {
   action: 'gather' | 'craft';
@@ -75,9 +81,17 @@ export function nearest<T extends { x: number; y: number }>(
   return best;
 }
 
-/** The prompt line for a target, or the cancel line while holding; null when there is nothing to offer. */
-export function promptFor(t: Target | null, hasTool: (item: string) => boolean): string | null {
+/**
+ * The prompt line for a target, or the cancel line while holding; null when there is nothing to offer. `night` is
+ * whether the clock stands at night, which a `nightOnly` task's station waits for (round 7, 7M).
+ */
+export function promptFor(
+  t: Target | null,
+  hasTool: (item: string) => boolean,
+  night = false,
+): string | null {
   if (!t) return null;
+  if (t.kind === 'task') return taskPrompt(t, hasTool, night);
   if (t.kind === 'giver') return fill(C['prompt.giver'], { name: NPC_NAME(t.npc) });
   const res = RES[t.resource];
   const what = res?.name ?? t.resource;
@@ -103,7 +117,9 @@ export function devBoard(kind: MinigameKind, seed = 7) {
  * Round 6, Session 6I: the DOM half of M5b on top of the World. `scenes/World.ts` constructs it beside the three views
  * and routes E to `use`: it owns the pockets (I), crafting (C) and quest (J, or T at a giver) panels, the hold prompt
  * for gathering (hold E, or tap the prompt), the crafting hold, and the mini-game modal opened by
- * `S2C.minigameStart`. It follows the scene's own update, so nothing else in the World calls it.
+ * `S2C.minigameStart`. It follows the scene's own update, so nothing else in the World calls it. Round 7 (7M, UI.md
+ * 14.38): the chores panel (K), the task prompts at a task's source and stations, and the village's work bar; a ghost
+ * keeps the layer for its own tasks only (GDD 3.8), with no gathering, crafting or quests.
  */
 export function mountM5bLayer(scene: Phaser.Scene, parent: HTMLElement = overlayRoot()): M5bLayer | null {
   const feed = scene.registry.get(REG_WORLD) as WorldFeed | undefined;
@@ -118,8 +134,14 @@ class Layer implements M5bLayer {
   private readonly inv: Panel;
   private readonly craft: Panel;
   private readonly questLog: Panel;
+  private readonly chores: Panel;
+  private readonly work: { update(pct: number): void; destroy(): void };
   private readonly keys: HTMLElement;
   private givers: GiverSpot[] = [];
+  private propAt: (propId: string) => { x: number; y: number } | null = () => null;
+  private sceneName: (id: string) => string = (id) => id;
+  /** A pick-up sent: the pockets when it went, and how long to wait for them to change before saying nothing. */
+  private picking: { sig: string; tool: string; until: number } | null = null;
   private target: Target | null = null;
   private hold: Hold | null = null;
   private modal: MinigameModal | null = null;
@@ -153,10 +175,11 @@ class Layer implements M5bLayer {
     });
     this.keys = h(
       'nav',
-      { class: 'wdi-m5b__keys', 'aria-label': 'Pockets, crafting and quests' },
+      { class: 'wdi-m5b__keys', 'aria-label': 'Pockets, crafting, quests and chores' },
       this.keyButton('inv', C['inv.title'], C['inv.key'], () => this.inv.toggle()),
       this.keyButton('craft', C['craft.title'], C['craft.key'], () => this.craft.toggle()),
       this.keyButton('quests', C['quest.title'], C['quest.key'], () => this.questLog.toggle()),
+      this.keyButton('chores', TC['chores.title'], TC['chores.key'], () => this.chores.toggle()),
     );
     this.root = h(
       'div',
@@ -184,6 +207,12 @@ class Layer implements M5bLayer {
       accept: (id) => feed.questAccept(id),
       turnIn: (id) => feed.questTurnIn(id),
     });
+    this.chores = mountChores(this.root, {
+      tasks: () => feed.tasks(),
+      inventory: () => feed.inventory(),
+      sceneName: (id) => this.sceneName(id),
+    });
+    this.work = mountWorkBar(this.root);
     this.prompt.addEventListener('click', () => this.press(true, true));
 
     const keyDown = (e: KeyboardEvent) => this.onKey(e, true);
@@ -206,7 +235,11 @@ class Layer implements M5bLayer {
       () => scene.events.off('sleep', sleep),
       () => scene.events.off('wake', wake),
     );
-    if (this.sceneId) void loadGivers(this.sceneId).then((g) => (this.givers = this.gone ? [] : g));
+    if (this.sceneId) {
+      void loadGivers(this.sceneId).then((g) => (this.givers = this.gone ? [] : g));
+      void loadPropAt(this.sceneId).then((f) => (this.propAt = f));
+    }
+    void loadSceneNameOf().then((f) => (this.sceneName = f));
     this.devMinigame();
   }
 
@@ -229,7 +262,7 @@ class Layer implements M5bLayer {
   /** `?minigame=<kind>`: opens that kind's board at once and judges the answer in place (a demo and test hook). */
   private devMinigame(): void {
     const kind = new URLSearchParams(location.search).get('minigame') as MinigameKind | null;
-    if (!kind || !['crates', 'pour', 'slide', 'stoke'].includes(kind)) return;
+    if (!kind || !['crates', 'pour', 'slide', 'stoke', 'tap'].includes(kind)) return;
     const board = devBoard(kind);
     const verdict = (taskId: string, answer: unknown) => {
       const ok = checkMinigame(board.puzzle, answer);
@@ -284,8 +317,11 @@ class Layer implements M5bLayer {
       case 'KeyT':
         if (down && this.target?.kind === 'giver') this.questLog.open();
         break;
+      case 'KeyK':
+        if (down) this.chores.toggle();
+        break;
       case 'Escape':
-        if (down) for (const p of [this.inv, this.craft, this.questLog]) p.close();
+        if (down) for (const p of this.panels()) p.close();
         break;
     }
   }
@@ -302,11 +338,22 @@ class Layer implements M5bLayer {
     return true;
   }
 
-  /** E or the prompt pressed or released: start a gather on the node in reach, or stop the hold. */
+  private panels(): Panel[] {
+    return [this.inv, this.craft, this.questLog, this.chores];
+  }
+
+  /**
+   * E or the prompt pressed or released: start a gather on the node in reach, or stop the hold; at a task's source or
+   * station, send the task hold (the server's instant pick-up or opener, GDD 3.5) and say what came of it.
+   */
   private press(down: boolean, toggle: boolean): void {
     const t = this.target;
     if (t?.kind === 'giver') {
       if (down) this.questLog.open();
+      return;
+    }
+    if (t?.kind === 'task') {
+      if (down && !this.hold) this.workTask(t);
       return;
     }
     if (toggle && this.hold) return this.cancelHold(true);
@@ -315,6 +362,14 @@ class Layer implements M5bLayer {
     const res = RES[t.resource];
     if (res?.tool && !this.has(res.tool)) return;
     this.begin('gather', t.id, (res?.gatherS ?? 3) * 1000);
+  }
+
+  /** The task hold at `t`. At the source a real task's pick-up shows when the pockets change; a fake one is theatre. */
+  private workTask(t: TaskSpot): void {
+    this.feed.hold('task', t.taskId, true);
+    if (t.step !== 'source') return;
+    if (t.fake || !t.tool) this.say(TC['toast.task.show']);
+    else this.picking = { sig: this.pocketSig(), tool: t.tool, until: performance.now() + 1500 };
   }
 
   private toggleCraft(recipeId: string): void {
@@ -389,34 +444,64 @@ class Layer implements M5bLayer {
   private tick(nodes: readonly NodeSnap[]): void {
     if (this.gone) return;
     const clock = this.feed.clock();
-    const live = WORLD_PHASES.has(clock.phase) && !this.feed.dead() && !this.asleep;
+    // A ghost keeps the layer for its own tasks (GDD 3.8): no node, giver, gather or craft, the chores and the bar stay.
+    const ghost = this.feed.dead();
+    const live = WORLD_PHASES.has(clock.phase) && !this.asleep;
     this.root.hidden = !live || this.asleep;
-    if (this.toastUntil > 0 && performance.now() > this.toastUntil) {
+    this.root.toggleAttribute('data-ghost', live && ghost);
+    const now = performance.now();
+    if (this.toastUntil > 0 && now > this.toastUntil) {
       this.toastEl.hidden = true;
       this.toastUntil = 0;
     }
     if (!live) return this.cancelHold(false);
+    if (ghost) {
+      this.cancelHold(false);
+      for (const p of [this.inv, this.craft, this.questLog]) p.close();
+    }
     const me = this.self();
-    this.target = me ? this.pick(me, nodes) : null;
+    this.target = me ? this.pick(me, ghost ? [] : nodes, ghost) : null;
     this.runHold(me, nodes);
-    this.drawPrompt();
+    this.runPick(now);
+    this.drawPrompt(NIGHT_PHASES.has(clock.phase));
+    this.work.update(this.feed.taskBar());
     // Each open panel redraws only when what it shows changed.
-    for (const p of [this.inv, this.craft, this.questLog]) p.update();
+    for (const p of this.panels()) p.update();
   }
 
-  private pick(me: { x: number; y: number }, nodes: readonly NodeSnap[]): Target | null {
+  /** The nearest of the active nodes, the givers and this seat's task spots; a task spot wins a tie. */
+  private pick(me: { x: number; y: number }, nodes: readonly NodeSnap[], ghost: boolean): Target | null {
+    const ts = nearest(
+      me,
+      taskSpots(this.feed.tasks(), this.sceneId, this.propAt, (item) => this.has(item)),
+    );
     const ns = nearest(
       me,
       nodes.filter((n) => n.active),
     );
-    const gs = nearest(
-      me,
-      this.givers.map((g) => ({ x: (g.x + 0.5) * TILE_PX, y: (g.y + 0.5) * TILE_PX, npc: g.npc })),
-    );
-    const dn = ns ? Math.hypot(me.x - ns.x, me.y - ns.y) : Infinity;
-    const dg = gs ? Math.hypot(me.x - gs.x, me.y - gs.y) : Infinity;
+    const gs = ghost
+      ? null
+      : nearest(
+          me,
+          this.givers.map((g) => ({ x: (g.x + 0.5) * TILE_PX, y: (g.y + 0.5) * TILE_PX, npc: g.npc })),
+        );
+    const d = (t: { x: number; y: number } | null) => (t ? Math.hypot(me.x - t.x, me.y - t.y) : Infinity);
+    const dt = d(ts);
+    const dn = d(ns);
+    const dg = d(gs);
+    if (ts && dt <= dn && dt <= dg) return ts;
     if (ns && dn <= dg) return { kind: 'node', id: ns.id, resource: ns.resource, x: ns.x, y: ns.y };
     return gs ? { kind: 'giver', npc: gs.npc, x: gs.x, y: gs.y } : null;
+  }
+
+  /** The pick-up sent from a task's source: the pockets changing is the yes; past the wait, nothing is said. */
+  private runPick(now: number): void {
+    const pk = this.picking;
+    if (!pk) return;
+    if (this.pocketSig() !== pk.sig) {
+      this.picking = null;
+      this.say(fill(TC['toast.task.took'], { tool: itemName(pk.tool) }));
+    } else if (now > pk.until) this.picking = null;
   }
 
   /** Ends a hold that finished (the pockets changed), lost its node or was left (the player moved). */
@@ -442,8 +527,10 @@ class Layer implements M5bLayer {
     }
   }
 
-  private drawPrompt(): void {
-    const text = this.hold ? C['prompt.gather.cancel'] : promptFor(this.target, (item) => this.has(item));
+  private drawPrompt(night: boolean): void {
+    const text = this.hold
+      ? C['prompt.gather.cancel']
+      : promptFor(this.target, (item) => this.has(item), night);
     this.prompt.hidden = text === null;
     const label = this.prompt.firstElementChild as HTMLElement;
     if (label.textContent !== (text ?? '')) label.textContent = text ?? '';
@@ -456,7 +543,8 @@ class Layer implements M5bLayer {
     this.cancelHold(false);
     this.modal?.close();
     for (const off of this.offs) off();
-    for (const p of [this.inv, this.craft, this.questLog]) p.destroy();
+    for (const p of this.panels()) p.destroy();
+    this.work.destroy();
     this.root.remove();
   }
 }

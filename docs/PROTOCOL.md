@@ -180,7 +180,7 @@ export type HoldAction =
 ```
 
 ```ts
-export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke';
+export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
 ```
 
 ```ts

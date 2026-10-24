@@ -1,4 +1,4 @@
-import type { CratesPublic, PourPublic, SlidePublic, StokePublic } from '@wdi/shared/rules';
+import type { CratesPublic, PourPublic, SlidePublic, StokePublic, TapPublic } from '@wdi/shared/rules';
 import type { MinigameKind } from '@wdi/shared/protocol';
 
 // Round 6 (6I, docs/round6/m5b-data.md 2.3): the main-mode mini-game wraps the widgets of `view/minigames/`, which
@@ -9,7 +9,7 @@ const clamp01 = (x: number): number => Math.min(0.999999, Math.max(0, x));
 
 /**
  * The `rng` that makes a widget draw the server's board. Crates and stoke take one draw for the band, the pour one per
- * step, the slide a Fisher-Yates shuffle (inverted so the shuffle lands on `order`). A widget that draws more than the
+ * step, the tap one per band, the slide a Fisher-Yates shuffle (inverted so the shuffle lands on `order`). A widget that draws more than the
  * list holds gets the list again from its start.
  */
 export function bandRng(kind: MinigameKind, pub: unknown): () => number {
@@ -32,6 +32,10 @@ export function drawsOf(kind: MinigameKind, pub: unknown): number[] {
     case 'stoke': {
       const p = pub as StokePublic;
       return [clamp01((p.bandStart - 0.3) / (0.6 - p.bandFrac))];
+    }
+    case 'tap': {
+      const p = pub as TapPublic;
+      return p.bands.map((b) => clamp01(b / (1 - p.bandFrac)));
     }
     case 'slide': {
       const order = (pub as SlidePublic).order;

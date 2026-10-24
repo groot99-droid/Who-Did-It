@@ -82,7 +82,7 @@ export type S2CType = (typeof S2C)[keyof typeof S2C];
 export type HoldAction =
   'drag' | 'collect' | 'task' | 'inspect' | 'autopsy' | 'gather' | 'craft' | 'shop' | 'bank';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
-export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke';
+export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
 /**
  * Why a meeting opened (GDD 3.3); `missing` is the roll-call of M4; `final` is the forced meeting after the Final
  * Night hunt.

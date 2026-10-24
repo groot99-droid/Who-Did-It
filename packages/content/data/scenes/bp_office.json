@@ -77,7 +77,8 @@
     { "id": "bo.chair", "kind": "dressing", "x": 14, "y": 3 },
     { "id": "bo.cupboard", "kind": "dressing", "x": 14, "y": 1 },
     { "id": "bo.window", "kind": "dressing", "x": 15, "y": 1 },
-    { "id": "bo.coat_rack", "kind": "dressing", "x": 16, "y": 5 }
+    { "id": "bo.coat_rack", "kind": "dressing", "x": 16, "y": 5 },
+    { "id": "bo.bank_counter", "kind": "bank", "x": 9, "y": 5 }
   ],
   "gates": [],
   "paths": [],
@@ -104,7 +105,7 @@
     "WwwwwwwwwWwwwwwwwW",
     "WwwwwwwwwWwwwPPwwW",
     "WwKKKKKKwWwwwwwwwW",
-    "WPwwwwwwwWwwwwwwPW",
+    "WPwwwwwwwPwwwwwwPW",
     "WwwwwwwwwWwPPwwwwW",
     "WwwwwwwwwwwPPwwwwW",
     "WPwwwwwwwwwwwwwwWW",
