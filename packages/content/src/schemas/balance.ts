@@ -102,7 +102,8 @@ export const BalanceFile = z.strictObject({
   /** Keyed "4".."10". Cabal size and which specials play come from roles.json decks. */
   byCount: byPlayerCount(BalanceRow),
   meeting: Section({
-    voteOpensImmediately: z.boolean(),
+    /** Round 8 (8L, A190): a vote cast before this many seconds of the discussion is refused (GDD 3.8). */
+    minVoteS: Seconds,
     endsWhenAllVoted: z.boolean(),
     secretVotes: z.boolean(),
     skipAllowed: z.boolean(),
@@ -303,6 +304,17 @@ export const BalanceFile = z.strictObject({
     heist: z.strictObject({ crackS: Seconds }),
     /** The Knife's extra rest after a strike on anyone but a living contract target. */
     contract: z.strictObject({ offTargetRestS: Seconds }),
+  }),
+  /** Round 8 (GDD 3.23), 8C's keys. */
+  economy: Section({
+    /** A purse of this many Scrip or more reads "a heavy purse" at inspect. */
+    heavyPurse: z.number().int().positive(),
+    /** The wage of one finished task, real or fake alike. */
+    taskWage: z.number().int().nonnegative(),
+    /** The share of every bank balance a cracked strongbox carries off (rounded down per seat). */
+    heistShare: z.number().min(0).max(1),
+    /** The hold that picks up a coins node on the ground (all of it). */
+    coinPickupS: z.number().positive(),
   }),
   chat: Section({
     /** A `chat.say` line is cut to this many characters (GDD 3.5). */

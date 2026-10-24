@@ -1,5 +1,5 @@
 import { balance } from '@wdi/content';
-import { Phase, type PlayerState, S2C, TICK_RATE, Winner, checkWin } from '@wdi/shared';
+import { BUILD_VERSION, Phase, type PlayerState, S2C, TICK_RATE, Winner, checkWin } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { logMatch } from '../services/MatchLog';
 import { resetCoversForLobby } from './Covers';
@@ -60,6 +60,8 @@ export function endMatch(room: PartyRoom, winner: 'village' | 'cabal'): void {
     kills: flow.kills,
     vanished: flow.vanished,
     players,
+    build: BUILD_VERSION, // round 8, 8L: the replay record (A170)
+    seeds: room.seeds.recorded(),
     meetings: flow.meetings.map((m) => ({
       round: m.round,
       reason: m.reason,

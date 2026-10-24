@@ -8,18 +8,20 @@ import { type PlayerSim, simOf } from './RoomSim';
 import { navGrid, sceneKey } from './World';
 
 /**
- * Dark visibility (round 6, M5b, GDD 3.7 and 3.15; docs/round6/m5b-data.md 2.2). In a dark scene a living viewer
- * sees another avatar only along a clear line of sight over the scene's grid (walls, and the `u` material that is
- * walkable but blocks sight), and only when it stands within the night radius, `vision.nightTiles`, plus
- * `vision.lanternTiles` for each of the two whose light burns, or inside the pool of a scene light burning now. Any
- * other scene is seen whole, as before. `reconcileAvatars` (sim/Visibility.ts) filters a living viewer's wanted set
- * through it and only ever removes; ghosts and the admin view never come here.
+ * Dark visibility (round 6, M5b, GDD 3.7 and 3.15; docs/round6/m5b-data.md 2.2). In a dark scene, and since round 8
+ * (8L, A170) in every scene at night and in the Final Night (`dayPartOf` 'night'), a living viewer sees another
+ * avatar only along a clear line of sight over the scene's grid (walls, and the `u` material that is walkable but
+ * blocks sight), and only when it stands within the night radius, `vision.nightTiles`, plus `vision.lanternTiles`
+ * for each of the two whose light burns, or inside the pool of a scene light burning now. Any other scene and phase
+ * is seen whole, as before. `reconcileAvatars` (sim/Visibility.ts) filters a living viewer's wanted set through it
+ * and only ever removes; ghosts and the admin view never come here.
  */
 export function canSee(room: PartyRoom, viewer: PlayerSim, target: PlayerSim): boolean {
   if (viewer === target) return true;
   const sceneId = sceneKey(viewer.sceneIdx);
   const scene = scenes[sceneId];
-  if (!isDarkScene(scene)) return true;
+  const part = dayPartOf(room.state.phase);
+  if (!isDarkScene(scene) && part !== 'night') return true;
   const seats = seatsOf(room, viewer, target);
   // A seat that just left stands at the door of this scene as a transit tail: that is where it is seen.
   const at = target.sceneIdx === viewer.sceneIdx ? target : tailIn(room, sceneId, seats.target);
@@ -28,7 +30,7 @@ export function canSee(room: PartyRoom, viewer: PlayerSim, target: PlayerSim): b
   const lit = (seat: string | null) => (seat !== null && lightBurns(room, seat) ? v.lanternTiles : 0);
   const radius = (v.nightTiles + lit(seats.viewer) + lit(seats.target)) * TILE_PX;
   const inPool = () =>
-    burningLights(scene, dayPartOf(room.state.phase) ?? 'night', TILE_PX, false).some(
+    burningLights(scene, part ?? 'night', TILE_PX, false).some(
       (l) => Math.hypot(at.x - l.x, at.y - l.y) <= l.r,
     );
   if (Math.hypot(at.x - viewer.x, at.y - viewer.y) > radius && !inPool()) return false;

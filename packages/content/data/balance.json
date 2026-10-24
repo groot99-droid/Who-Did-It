@@ -98,7 +98,7 @@
     }
   },
   "meeting": {
-    "voteOpensImmediately": true,
+    "minVoteS": 15,
     "endsWhenAllVoted": true,
     "secretVotes": true,
     "skipAllowed": true,
@@ -264,6 +264,13 @@
     "heist": { "crackS": 8 },
     "contract": { "offTargetRestS": 30 },
     "gddRef": "3.20"
+  },
+  "economy": {
+    "heavyPurse": 20,
+    "taskWage": 3,
+    "heistShare": 0.5,
+    "coinPickupS": 1,
+    "gddRef": "3.23"
   },
   "chat": {
     "maxChars": 200,

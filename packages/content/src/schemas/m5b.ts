@@ -76,6 +76,8 @@ export const Quest = z.strictObject({
   kind: QuestKind,
   wants: z.array(z.strictObject({ item: Id, qty: Qty })).min(1),
   reward: z.array(z.strictObject({ item: Id, qty: Qty })),
+  /** Round 8 (GDD 3.23, 8C): the Scrip the giver pays on the turn-in, beside the items (0 when absent). */
+  scrip: z.number().int().nonnegative().optional(),
   /** A copy id of the client's `ui/copy/m5b.ts` for the giver's lines. */
   copyId: z.string().regex(/^[a-z][A-Za-z0-9.]*$/),
 });

@@ -8,6 +8,12 @@
 
 - Character cells are **128 px displayed cells, packed at 64 px** (10.3). One tile is 64 px = 1 m
   (`TILE_PX`, `WORLD.md` 4.2). A standing 1.7 m villager is about 100 px tall in the cell.
+- **Proportions (round 8, 8F, A161).** The figure is 1.7 m and about four heads tall (a 0.40 m head on a
+  0.52 m shoulder, wide hands and boots), so the head is a quarter of the figure and reads at 64 px packed. Nothing
+  may rise above the crown by more than about 0.05 m: the 112 px cap (`maxStandingSilhouettePx`, 10.3) leaves
+  four or five rows above a bare head, and a lean away from the camera, a hat brim's far end or a prop behind the
+  figure lifts on screen by half its depth. `tools/blender/probe_cap.py`, the highest projected vertex of every clip, not
+  the render, is the check; the clips take a lean with bent knees for the same reason.
 - Animations play at **12 fps**. The rig renders the source clip with `frame_step` so the output is
   12 fps whatever the clip's scene rate.
 - Height traits are not separate art: the client scales the sprite by the GDD 3.1 factor, anchored at
@@ -295,6 +301,25 @@ anim plays at 12 fps once (`repeat: 0`) and Phaser holds its last frame. Every f
 | `vfx_vote_stamp` | 10 | straight down, 256 px | Stamp slams down and lifts, leaving the `blood` seal (UI, reveal) |
 | `vfx_dust_step` | 6 | `IsoCam`, 64 px (round 5) | Puff at a boot; ends empty |
 | `vfx_disguise` | 8 | `IsoCam`, 128 px, pivot at the feet (round 5) | Fog and slate smoke rising feet to head round one turning mustard spark, gone by frame 7; only where a Knife strike drops a disguise |
+
+**Round-8 effects** (8G, motion.md 2; DECISIONS A162) are runtime particles, not atlas frames: `view/vfx/VfxView.ts`
+draws seven small shapes once at boot (`fx_spark`, `fx_drop`, `fx_puff`, `fx_coin`, `fx_star`, `fx_chip`,
+`fx_slip`, white with an ink rim, tinted per particle from the world ramps) and bursts them at a figure's feet at
+the art's scale, so they cost no atlas page and keep their size against any figure. `fxSpecs.ts` holds each
+effect's shape, tints, count, speed, spread, gravity and life:
+
+| Effect | Plays when (`fxTriggers.ts`, public fields only) |
+|---|---|
+| `hitSpark` | an avatar's or a creature's `animId` turns to `hurt` |
+| `blood` | an avatar gains the `bleeding` bit |
+| `poisonPuff` | an avatar gains the `poisoned` bit |
+| `fallDust`, `koStars` | an avatar's `animId` turns to `knockdown` (a creature's fall gives `fallDust`) |
+| `crumbs` | `eat` (the Wake Loaf) |
+| `coinBurst` | `rob`; 8C calls `play` for a dropped purse and a sale |
+| `stepDust` | every stride at a walk or a run |
+| `buildDust`, `ledger`, `mailbag` | called by 8D: an HQ tier going up, the Clerk's round, the mailbag collected |
+
+Under reduced motion a burst is a static mark of three particles, cut after 400 ms.
 
 **Body.** The body on the floor is the last frame of `die` (`char/<body>/die/<dir>/007`, with the
 `scarf` and `blood` overlays on the same tail), held by the one-shot anim; no separate key.
@@ -981,7 +1006,8 @@ pass (five clips, 8 directions) on one 1024² body page at a fill of 0.42-0.47 (
 16 clips; the frame plan of A141 (idle 12, walk, run, limp, stagger 8 each, swing, strike, knockdown, getup,
 inspect, eat, rob 6 each, die and interact 8, hurt 3, threaten, cower, stomp, stunned 4 each, fidget 6, down 2) is
 129 frames a direction, 1 032 a pass. At the measured cost that is one 2048² body page and one 1024² overlay
-page a look (1.25), 12.5 for ten looks and a worst-case resident of 14.6 against the cap of 6. Halving the
+page a look (1.25), 12.5 for ten looks and a worst-case resident of 14.6 against the cap of 8 (6 until round 8;
+A141 carries 6Z's ruling and the four-direction plan that fits under it). Halving the
 packed cell's density does not help: 128 px packed cells (A135) quadruple every frame, so even today's five
 clips would need a 2048² body page. The character budget therefore cannot hold the full clip table at any cell
 size without a DECISIONS row; A141 asks 6Z for it and names the fallbacks (one-shots in four directions, fewer
@@ -1049,7 +1075,7 @@ pnpm --filter @wdi/sprites m5b
 
 | Key | Type | Frames | Packed cell, pivot | Loaded |
 |---|---|---|---|---|
-| `nodes` | multiatlas, one page ≤ 512 x 256 (`NODE_PAGE`) | `node_<snake id>/ready`, `node_<snake id>/spent` and `node_<snake id>/break/<000-007>` (round 8, 8G) for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`); the stem is the row's `sprite` | 64 x 64, (32, 48): the ground point under the tile centre | boot |
+| `nodes` | multiatlas, one page ≤ 512 x 256 (`NODE_PAGE`) | `node_<snake id>/ready`, `node_<snake id>/spent` and `node_<snake id>/break/<000-007>` (round 8, 8G) for each resource (`timber`, `stone`, `tin_ore`, `resin`, `herb`, `mushroom`), whose stem is the row's `sprite`, and for `coins`, the heap a knockout or a mugging drops (8C, GDD 3.23), which has no `resources.json` row and plays its break as a pickup removes it | 64 x 64, (32, 48): the ground point under the tile centre | boot |
 | `anims_nodes` | animation | `node_<snake id>/break`: 12 fps once; the client plays it forward as the yield is taken and backwards as the node regrows | | boot |
 | `tools` | multiatlas, one page ≤ 512² | `held_<itemId>/<dir>` for `torch`, `snare`, `spade`, `lockpicks`, `lantern`, `crowbar` (8 screen-frame directions); `glow_lantern/<0-3>`, `glow_torch/<0-3>` | held: 64 x 64, (32, 56), the characters' feet; glow: 32 x 32, centred | boot |
 | `anims_tools` | animation | `glow_lantern`, `glow_torch`: 4 frames at 8 fps, looping | | boot |

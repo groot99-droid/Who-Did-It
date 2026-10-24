@@ -3,11 +3,12 @@ import { artStyles } from '../palette.ts';
 import { hasManifest, type Page, realPages } from './realAssets.ts';
 
 /**
- * Art plan 1.4 (SPRITES 10.14): the page caps, the 6-page resident limit and the DOM byte caps, for each art
- * style separately (1.9: one style is resident at a time).
+ * Art plan 1.4 (SPRITES 10.14): the page caps, the resident limit and the DOM byte caps, for each art style
+ * separately (1.9: one style is resident at a time). The resident cap went from 6 to 8 page-equivalents in round 8
+ * (DECISIONS A141, 6Z's ruling): the four-heads figures' overlay pages and 8G's node page are inside it.
  */
 const PAGE = 2048 * 2048;
-const RESIDENT_CAP = 6.1;
+const RESIDENT_CAP = 8.0;
 const LOOKS_COUNTED = 10;
 
 /** [prefix, width cap, height cap]; the first matching prefix wins, so `props_` precedes `props`. */
