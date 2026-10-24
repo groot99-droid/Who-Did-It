@@ -14,6 +14,7 @@ import './npc/hive/invariant'; // round 8, 8R: hiveNoSecrets's host, as 7M's abo
 import { runVendettas } from './vendettas/run';
 import { runMemorial } from './Memorial';
 import { runMobs } from './Mobs';
+import { runBody } from './body/run';
 import { runQuests } from './Quests';
 import { runResources } from './Resources';
 import { runTrain } from './Train';
@@ -63,6 +64,7 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   runDecay(room); // M3: clue decay and cap
   runResources(room); // round 6, 6F (locked call site)
   runMobs(room); // round 6, 6G (locked call site)
+  runBody(room); // round 8, 8A: effects, regen, stamina, knockout and wake (locked call site)
   runQuests(room); // round 6, 6H (locked call site)
   runHunger(room); // round 5, 5G (locked call site)
   const sim = simOf(room);

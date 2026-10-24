@@ -249,7 +249,7 @@ function stepBody(room: PartyRoom, body: MobBody, part: DayPart): void {
       body.reachSinceTick = tick;
       body.swingUntilTick = tick + SWING_TICKS;
       body.yaw = Math.atan2(prey.x - body.x, -(prey.y - body.y));
-      hurtByCreature(room, mind.prey, body.def.kills);
+      hurtByCreature(room, mind.prey, body.def); // round 8, 8A: the bite carries its row (GDD 3.22)
     }
   } else body.reachSinceTick = -1;
 }
