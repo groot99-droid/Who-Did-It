@@ -1485,12 +1485,15 @@ def harness_rack():
     """Tack on pegs along the boards: a horse collar, a coiled lead, a bridle and the pelt of the wolf over it."""
     return [back_panel("Boards", T("wood", 2), 0.9, 2.1, 0.0),
             part("Pegs", T("wood", 4), *[B(x, 0.3, 1.5, 0.04, 0.16, 0.04) for x in (-0.3, 0.0, 0.3)]),
-            part("Collar", T("litter", 1), C(-0.3, 0.26, 1.05, 0.17, 0.08, 12), bevel=0.02),
-            part("Hames", T("brass", 1), B(-0.3, 0.2, 1.15, 0.3, 0.02, 0.04), outline=False),
-            part("Lead", T("plaster", 1), *[C(0.0, 0.3, 1.2 + 0.05 * k, 0.12 - 0.01 * k, 0.04, 10) for k in range(3)]),
+            part("Collar", T("litter", 1), B(-0.42, 0.26, 1.1, 0.07, 0.08, 0.36), B(-0.18, 0.26, 1.1, 0.07, 0.08, 0.36),
+                 B(-0.3, 0.26, 1.3, 0.31, 0.08, 0.07), bevel=0.02),
+            part("Hames", T("brass", 1), *[B(x, 0.21, 1.12, 0.03, 0.02, 0.4) for x in (-0.42, -0.18)], outline=False),
+            part("Lead", T("plaster", 1), B(-0.06, 0.3, 1.2, 0.03, 0.03, 0.4), B(0.06, 0.3, 1.2, 0.03, 0.03, 0.4),
+                 B(0.0, 0.3, 1.0, 0.15, 0.03, 0.03)),
             part("Bridle", T("wood", 1), B(0.3, 0.3, 1.25, 0.04, 0.02, 0.45), B(0.3, 0.3, 1.05, 0.2, 0.02, 0.04)),
             part("Bit", T("slate", 3), B(0.3, 0.28, 1.0, 0.12, 0.02, 0.03), outline=False),
-            part("Pelt", T("fog", 0), S(blob(0.05, 0.36, 0.3, 0.2, [(0.12, 5, 0.3)], n=14), 1.6, 1.64), outline=False)]
+            part("Pelt", T("stone", 3), B(0.02, 0.33, 1.72, 0.7, 0.03, 0.22), B(-0.2, 0.33, 1.52, 0.16, 0.03, 0.2),
+                 B(0.26, 0.33, 1.5, 0.14, 0.03, 0.24), outline=False)]
 
 
 def tool_rack():
@@ -1520,15 +1523,17 @@ def lantern_hook():
 
 
 def wine_cask():
-    """A hogshead of the Lantern's red on its cradle in the cellar, a spigot, a drip stain and a tally chalked on."""
-    return [part("Cradle", T("wood", 1), *[B(x, 0, 0.12, 0.1, 0.8, 0.24) for x in (-0.3, 0.3)]),
-            part("Cask", T("wood", 3), C(0, 0.38, 0.52, 0.34, 0.76, 14, rt=None), bevel=0.02),
-            part("Hoops", T("ink", 1), *[C(0, 0.38 - d, 0.52, 0.355, 0.04, 14) for d in (0.1, 0.36, 0.62)],
+    """A hogshead of the Lantern's red stood on chocks in the cellar, a spigot, a drip stain and a tally chalked on."""
+    return [part("Chocks", T("wood", 1), *[B(x, 0.05, 0.04, 0.12, 0.7, 0.08) for x in (-0.22, 0.22)]),
+            part("Cask", T("wood", 3), C(0, 0.05, 0.08, 0.3, 0.42, 14, rt=0.36), C(0, 0.05, 0.5, 0.36, 0.42, 14, rt=0.3),
+                 bevel=0.02),
+            part("Hoops", T("ink", 1), *[C(0, 0.05, z, r, 0.04, 14) for z, r in ((0.14, 0.315), (0.48, 0.365),
+                                                                                    (0.84, 0.315))],
                  outline=False),
-            part("Spigot", T("brass", 1), B(0, -0.4, 0.4, 0.05, 0.1, 0.05)),
-            part("Stain", F("blood", 0), S(blob(0, -0.48, 0.12, 0.08, [(0.1, 3, 0.2)], n=10), 0.005, 0.01),
+            part("Spigot", T("brass", 1), B(0, -0.33, 0.28, 0.05, 0.1, 0.05)),
+            part("Stain", F("blood", 0), S(blob(0, -0.42, 0.12, 0.08, [(0.1, 3, 0.2)], n=10), 0.005, 0.01),
                  outline=False),
-            part("Tally", F("bone", 2), *[B(-0.12 + 0.05 * k, -0.37, 0.7, 0.012, 0.005, 0.12) for k in range(4)],
+            part("Tally", F("bone", 2), *[B(-0.12 + 0.05 * k, -0.33, 0.66, 0.012, 0.005, 0.12) for k in range(4)],
                  outline=False)]
 
 
@@ -1549,9 +1554,9 @@ def cobweb():
     """Webs sagging between the cellar's beam and its wall, and a wine bottle nobody came back for."""
     return [back_panel("Wall", T("stone", 2), 0.9, 1.8, 0.0),
             part("Beam", T("wood", 1), B(0, 0.2, 1.75, 0.9, 0.4, 0.1)),
-            part("Web", F("fog", 2), *[B(-0.3 + 0.12 * k, 0.32, 1.5 - 0.03 * abs(k - 2), 0.01, 0.01, 0.4)
-                                       for k in range(5)],
-                 *[B(-0.06, 0.32, 1.38 + 0.08 * k, 0.5 - 0.08 * k, 0.01, 0.01) for k in range(4)], outline=False),
+            part("Web", F("bone", 3), *[B(-0.3 + 0.12 * k, 0.31, 1.5 - 0.03 * abs(k - 2), 0.016, 0.016, 0.4)
+                                        for k in range(5)],
+                 *[B(-0.06, 0.31, 1.38 + 0.08 * k, 0.5 - 0.08 * k, 0.016, 0.016) for k in range(4)], outline=False),
             part("Bottle", T("moss", 0), C(0.25, 0.25, 0.0, 0.06, 0.24, 8), C(0.25, 0.25, 0.24, 0.02, 0.08, 6))]
 
 
