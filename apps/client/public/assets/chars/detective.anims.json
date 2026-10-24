@@ -1,6 +1,98 @@
 {
  "anims": [
   {
+   "key": "blood/detective/cower/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/cower/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/cower/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/cower/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/cower/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
    "key": "blood/detective/die/e",
    "frames": [
     {
@@ -313,6 +405,250 @@
    "repeat": 0
   },
   {
+   "key": "blood/detective/fidget/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/fidget/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/fidget/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/fidget/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/fidget/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/hurt/e",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/e/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/e/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/e/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/hurt/n",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/n/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/n/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/n/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/hurt/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/ne/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/hurt/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/nw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/hurt/s",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/s/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/s/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/s/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/hurt/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/se/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/hurt/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/sw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/hurt/w",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/w/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/w/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/hurt/w/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
    "key": "blood/detective/idle/e",
    "frames": [
     {
@@ -338,14 +674,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/idle/e/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/e/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/e/007"
     }
    ],
    "frameRate": 12,
@@ -377,14 +705,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/idle/n/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/n/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/n/007"
     }
    ],
    "frameRate": 12,
@@ -416,14 +736,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/idle/ne/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/ne/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/ne/007"
     }
    ],
    "frameRate": 12,
@@ -455,14 +767,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/idle/nw/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/nw/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/nw/007"
     }
    ],
    "frameRate": 12,
@@ -494,14 +798,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/idle/s/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/s/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/s/007"
     }
    ],
    "frameRate": 12,
@@ -533,14 +829,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/idle/se/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/se/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/se/007"
     }
    ],
    "frameRate": 12,
@@ -572,14 +860,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/idle/sw/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/sw/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/sw/007"
     }
    ],
    "frameRate": 12,
@@ -611,18 +891,102 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/idle/w/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/w/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/idle/w/007"
     }
    ],
    "frameRate": 12,
    "repeat": -1
+  },
+  {
+   "key": "blood/detective/inspect/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/inspect/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/inspect/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/inspect/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/inspect/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
   },
   {
    "key": "blood/detective/interact/e",
@@ -650,14 +1014,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/interact/e/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/e/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/e/007"
     }
    ],
    "frameRate": 12,
@@ -689,14 +1045,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/interact/n/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/n/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/n/007"
     }
    ],
    "frameRate": 12,
@@ -728,14 +1076,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/interact/ne/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/ne/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/ne/007"
     }
    ],
    "frameRate": 12,
@@ -767,14 +1107,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/interact/nw/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/nw/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/nw/007"
     }
    ],
    "frameRate": 12,
@@ -806,14 +1138,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/interact/s/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/s/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/s/007"
     }
    ],
    "frameRate": 12,
@@ -845,14 +1169,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/interact/se/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/se/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/se/007"
     }
    ],
    "frameRate": 12,
@@ -884,14 +1200,6 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/interact/sw/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/sw/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "blood/detective/interact/sw/007"
     }
    ],
    "frameRate": 12,
@@ -923,14 +1231,870 @@
     {
      "key": "ovl_detective",
      "frame": "blood/detective/interact/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/limp/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/ne/000"
     },
     {
      "key": "ovl_detective",
-     "frame": "blood/detective/interact/w/006"
+     "frame": "blood/detective/limp/ne/001"
     },
     {
      "key": "ovl_detective",
-     "frame": "blood/detective/interact/w/007"
+     "frame": "blood/detective/limp/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/ne/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/ne/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/limp/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/nw/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/nw/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/limp/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/se/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/se/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/limp/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/sw/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/sw/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/limp/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/run/e",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/e/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/e/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/e/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/e/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/e/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/run/n",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/n/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/n/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/n/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/n/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/n/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/run/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/ne/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/ne/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/run/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/nw/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/nw/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/run/s",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/s/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/s/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/s/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/s/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/s/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/run/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/se/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/se/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/run/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/sw/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/sw/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/run/w",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/w/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/w/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/w/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/w/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/w/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/run/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/stagger/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/ne/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/ne/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/stagger/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/nw/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/nw/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/stagger/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/se/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/se/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/stagger/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/sw/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/sw/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stagger/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/stomp/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/stomp/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/stomp/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/stomp/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stomp/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/strike/e",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/e/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/e/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/e/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/e/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/strike/n",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/n/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/n/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/n/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/n/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/strike/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/strike/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/strike/s",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/s/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/s/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/s/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/s/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/strike/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/strike/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/strike/w",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/w/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/w/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/w/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/strike/w/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/detective/stunned/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/stunned/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/stunned/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/detective/stunned/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "blood/detective/stunned/sw/003"
     }
    ],
    "frameRate": 12,
@@ -1497,6 +2661,98 @@
    "repeat": -1
   },
   {
+   "key": "char/detective/cower/ne",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/ne/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/ne/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/ne/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/cower/nw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/nw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/nw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/nw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/cower/se",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/se/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/se/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/se/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/cower/sw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/sw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/sw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/sw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/cower/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
    "key": "char/detective/die/e",
    "frames": [
     {
@@ -1809,6 +3065,250 @@
    "repeat": 0
   },
   {
+   "key": "char/detective/fidget/ne",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/ne/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/ne/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/ne/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/fidget/nw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/nw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/nw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/nw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/fidget/se",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/se/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/se/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/se/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/fidget/sw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/sw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/sw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/sw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/fidget/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/hurt/e",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/e/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/e/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/e/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/hurt/n",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/n/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/n/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/n/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/hurt/ne",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/ne/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/ne/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/ne/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/hurt/nw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/nw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/nw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/nw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/hurt/s",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/s/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/s/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/s/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/hurt/se",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/se/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/se/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/se/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/hurt/sw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/sw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/sw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/sw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/hurt/w",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/w/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/w/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/hurt/w/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
    "key": "char/detective/idle/e",
    "frames": [
     {
@@ -1834,14 +3334,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/idle/e/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/e/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/e/007"
     }
    ],
    "frameRate": 12,
@@ -1873,14 +3365,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/idle/n/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/n/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/n/007"
     }
    ],
    "frameRate": 12,
@@ -1912,14 +3396,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/idle/ne/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/ne/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/ne/007"
     }
    ],
    "frameRate": 12,
@@ -1951,14 +3427,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/idle/nw/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/nw/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/nw/007"
     }
    ],
    "frameRate": 12,
@@ -1990,14 +3458,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/idle/s/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/s/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/s/007"
     }
    ],
    "frameRate": 12,
@@ -2029,14 +3489,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/idle/se/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/se/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/se/007"
     }
    ],
    "frameRate": 12,
@@ -2068,14 +3520,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/idle/sw/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/sw/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/sw/007"
     }
    ],
    "frameRate": 12,
@@ -2107,18 +3551,102 @@
     {
      "key": "char_detective",
      "frame": "char/detective/idle/w/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/w/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/idle/w/007"
     }
    ],
    "frameRate": 12,
    "repeat": -1
+  },
+  {
+   "key": "char/detective/inspect/ne",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/ne/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/ne/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/ne/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/inspect/nw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/nw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/nw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/nw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/inspect/se",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/se/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/se/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/se/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/inspect/sw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/sw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/sw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/sw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/inspect/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
   },
   {
    "key": "char/detective/interact/e",
@@ -2146,14 +3674,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/interact/e/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/e/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/e/007"
     }
    ],
    "frameRate": 12,
@@ -2185,14 +3705,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/interact/n/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/n/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/n/007"
     }
    ],
    "frameRate": 12,
@@ -2224,14 +3736,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/interact/ne/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/ne/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/ne/007"
     }
    ],
    "frameRate": 12,
@@ -2263,14 +3767,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/interact/nw/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/nw/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/nw/007"
     }
    ],
    "frameRate": 12,
@@ -2302,14 +3798,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/interact/s/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/s/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/s/007"
     }
    ],
    "frameRate": 12,
@@ -2341,14 +3829,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/interact/se/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/se/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/se/007"
     }
    ],
    "frameRate": 12,
@@ -2380,14 +3860,6 @@
     {
      "key": "char_detective",
      "frame": "char/detective/interact/sw/005"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/sw/006"
-    },
-    {
-     "key": "char_detective",
-     "frame": "char/detective/interact/sw/007"
     }
    ],
    "frameRate": 12,
@@ -2419,14 +3891,870 @@
     {
      "key": "char_detective",
      "frame": "char/detective/interact/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/limp/ne",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/ne/000"
     },
     {
      "key": "char_detective",
-     "frame": "char/detective/interact/w/006"
+     "frame": "char/detective/limp/ne/001"
     },
     {
      "key": "char_detective",
-     "frame": "char/detective/interact/w/007"
+     "frame": "char/detective/limp/ne/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/ne/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/ne/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/limp/nw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/nw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/nw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/nw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/nw/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/nw/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/limp/se",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/se/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/se/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/se/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/se/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/se/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/limp/sw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/sw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/sw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/sw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/sw/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/sw/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/limp/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/run/e",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/e/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/e/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/e/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/e/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/e/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/run/n",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/n/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/n/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/n/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/n/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/n/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/run/ne",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/ne/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/ne/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/ne/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/ne/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/ne/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/run/nw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/nw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/nw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/nw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/nw/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/nw/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/run/s",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/s/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/s/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/s/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/s/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/s/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/run/se",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/se/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/se/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/se/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/se/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/se/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/run/sw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/sw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/sw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/sw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/sw/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/sw/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/run/w",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/w/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/w/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/w/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/w/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/w/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/run/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/stagger/ne",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/ne/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/ne/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/ne/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/ne/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/ne/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/stagger/nw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/nw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/nw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/nw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/nw/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/nw/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/stagger/se",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/se/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/se/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/se/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/se/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/se/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/stagger/sw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/sw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/sw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/sw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/sw/003"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/sw/004"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stagger/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/stomp/ne",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/ne/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/ne/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/ne/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/stomp/nw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/nw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/nw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/nw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/stomp/se",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/se/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/se/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/se/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/stomp/sw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/sw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/sw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/sw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stomp/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/strike/e",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/e/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/e/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/e/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/e/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/strike/n",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/n/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/n/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/n/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/n/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/strike/ne",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/ne/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/ne/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/ne/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/strike/nw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/nw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/nw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/nw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/strike/s",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/s/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/s/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/s/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/s/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/strike/se",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/se/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/se/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/se/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/strike/sw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/sw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/sw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/sw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/strike/w",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/w/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/w/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/w/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/strike/w/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/detective/stunned/ne",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/ne/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/ne/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/ne/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/stunned/nw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/nw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/nw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/nw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/stunned/se",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/se/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/se/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/se/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/detective/stunned/sw",
+   "frames": [
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/sw/000"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/sw/001"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/sw/002"
+    },
+    {
+     "key": "char_detective",
+     "frame": "char/detective/stunned/sw/003"
     }
    ],
    "frameRate": 12,
@@ -2993,6 +5321,98 @@
    "repeat": -1
   },
   {
+   "key": "scarf/detective/cower/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/cower/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/cower/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/cower/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/cower/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
    "key": "scarf/detective/die/e",
    "frames": [
     {
@@ -3305,6 +5725,250 @@
    "repeat": 0
   },
   {
+   "key": "scarf/detective/fidget/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/fidget/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/fidget/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/fidget/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/fidget/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/hurt/e",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/e/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/e/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/e/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/hurt/n",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/n/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/n/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/n/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/hurt/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/ne/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/hurt/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/nw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/hurt/s",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/s/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/s/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/s/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/hurt/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/se/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/hurt/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/sw/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/hurt/w",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/w/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/w/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/hurt/w/002"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
    "key": "scarf/detective/idle/e",
    "frames": [
     {
@@ -3330,14 +5994,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/idle/e/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/e/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/e/007"
     }
    ],
    "frameRate": 12,
@@ -3369,14 +6025,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/idle/n/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/n/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/n/007"
     }
    ],
    "frameRate": 12,
@@ -3408,14 +6056,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/idle/ne/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/ne/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/ne/007"
     }
    ],
    "frameRate": 12,
@@ -3447,14 +6087,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/idle/nw/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/nw/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/nw/007"
     }
    ],
    "frameRate": 12,
@@ -3486,14 +6118,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/idle/s/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/s/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/s/007"
     }
    ],
    "frameRate": 12,
@@ -3525,14 +6149,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/idle/se/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/se/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/se/007"
     }
    ],
    "frameRate": 12,
@@ -3564,14 +6180,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/idle/sw/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/sw/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/sw/007"
     }
    ],
    "frameRate": 12,
@@ -3603,18 +6211,102 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/idle/w/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/w/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/idle/w/007"
     }
    ],
    "frameRate": 12,
    "repeat": -1
+  },
+  {
+   "key": "scarf/detective/inspect/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/inspect/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/inspect/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/inspect/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/inspect/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
   },
   {
    "key": "scarf/detective/interact/e",
@@ -3642,14 +6334,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/interact/e/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/e/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/e/007"
     }
    ],
    "frameRate": 12,
@@ -3681,14 +6365,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/interact/n/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/n/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/n/007"
     }
    ],
    "frameRate": 12,
@@ -3720,14 +6396,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/interact/ne/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/ne/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/ne/007"
     }
    ],
    "frameRate": 12,
@@ -3759,14 +6427,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/interact/nw/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/nw/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/nw/007"
     }
    ],
    "frameRate": 12,
@@ -3798,14 +6458,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/interact/s/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/s/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/s/007"
     }
    ],
    "frameRate": 12,
@@ -3837,14 +6489,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/interact/se/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/se/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/se/007"
     }
    ],
    "frameRate": 12,
@@ -3876,14 +6520,6 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/interact/sw/005"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/sw/006"
-    },
-    {
-     "key": "ovl_detective",
-     "frame": "scarf/detective/interact/sw/007"
     }
    ],
    "frameRate": 12,
@@ -3915,14 +6551,870 @@
     {
      "key": "ovl_detective",
      "frame": "scarf/detective/interact/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/limp/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/ne/000"
     },
     {
      "key": "ovl_detective",
-     "frame": "scarf/detective/interact/w/006"
+     "frame": "scarf/detective/limp/ne/001"
     },
     {
      "key": "ovl_detective",
-     "frame": "scarf/detective/interact/w/007"
+     "frame": "scarf/detective/limp/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/ne/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/ne/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/limp/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/nw/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/nw/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/limp/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/se/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/se/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/limp/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/sw/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/sw/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/limp/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/run/e",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/e/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/e/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/e/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/e/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/e/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/run/n",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/n/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/n/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/n/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/n/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/n/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/run/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/ne/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/ne/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/run/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/nw/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/nw/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/run/s",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/s/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/s/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/s/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/s/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/s/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/run/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/se/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/se/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/run/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/sw/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/sw/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/run/w",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/w/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/w/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/w/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/w/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/w/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/run/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/stagger/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/ne/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/ne/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/stagger/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/nw/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/nw/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/stagger/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/se/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/se/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/stagger/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/sw/003"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/sw/004"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stagger/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/stomp/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/stomp/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/stomp/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/stomp/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stomp/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/strike/e",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/e/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/e/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/e/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/e/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/strike/n",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/n/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/n/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/n/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/n/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/strike/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/strike/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/strike/s",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/s/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/s/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/s/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/s/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/strike/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/strike/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/sw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/strike/w",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/w/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/w/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/w/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/strike/w/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/detective/stunned/ne",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/ne/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/ne/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/ne/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/ne/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/stunned/nw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/nw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/nw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/nw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/nw/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/stunned/se",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/se/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/se/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/se/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/se/003"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/detective/stunned/sw",
+   "frames": [
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/sw/000"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/sw/001"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/sw/002"
+    },
+    {
+     "key": "ovl_detective",
+     "frame": "scarf/detective/stunned/sw/003"
     }
    ],
    "frameRate": 12,

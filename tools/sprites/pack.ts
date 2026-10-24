@@ -79,6 +79,7 @@ export async function packFrames(
   textureName: string,
   inputs: PackInput[],
   page: { w: number; h: number } = { w: PACK_OPTIONS.width, h: PACK_OPTIONS.height },
+  tight = false,
 ): Promise<PackResult> {
   const names = new Set<string>();
   for (const i of inputs) {
@@ -90,11 +91,16 @@ export async function packFrames(
     .map((i) => ({ path: `${i.name}.png`, contents: i.png }));
   // The packer's extrude resizes edge strips bilinearly, which adds partial alpha and off-palette colours.
   // Finished frames (the pixel finish on: alpha 0 or 255, drawn with nearest filtering) pack without it;
-  // the padding alone keeps them apart. Unfinished art keeps the extrude, byte for byte as before.
+  // the padding alone keeps them apart. Unfinished art keeps the extrude, byte for byte as before, except a
+  // `tight` set (a character's pages, A161): the round-8 clip table fills a 1024² body page to 0.9 in the 8-bit
+  // style and the low-poly frames' soft edges spill it, so those pack without the extrude and at padding 1, which
+  // keeps the neighbour's texel out of the bilinear footprint (no mipmaps) and, alpha-bled and premultiplied,
+  // draws without a fringe.
   const finished = finishEnabled('main') && inputs.every((i) => !hasPartialAlpha(decodePng(i.png)));
   const out = await packAsync(files, {
     ...PACK_OPTIONS,
-    extrude: finished ? 0 : PACK_OPTIONS.extrude,
+    extrude: finished || tight ? 0 : PACK_OPTIONS.extrude,
+    padding: tight && !finished ? 1 : PACK_OPTIONS.padding,
     width: page.w,
     height: page.h,
     textureName,
@@ -172,7 +178,7 @@ export async function packCharacter(
       [textureKey('scarf', body, lazy), overlayFrames, pageSizes.overlay],
     ] as const) {
       if (frames.length === 0) continue;
-      const { atlas, pages } = await packFrames(key, frames, size);
+      const { atlas, pages } = await packFrames(key, frames, size, true);
       applyPivots(atlas, manifest);
       textures.push({ key, atlas });
       for (const [name, png] of pages) out.set(name, png);
