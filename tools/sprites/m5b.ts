@@ -193,7 +193,7 @@ export async function packM5b(
   if (atlas.textures.length !== 1) throw new Error(`${texture}: ${atlas.textures.length} pages, want 1`);
   setPivots(atlas, new Map(frames.map((f) => [f.name, f.pivot])));
   const out = new Map(pages);
-  out.set(`${texture}.json`, Buffer.from(atlasJson(atlas)));
+  out.set(`${texture}.json`, Buffer.from(atlasJson(atlas, true)));
   return out;
 }
 

@@ -10,6 +10,8 @@ import { handleQuestAccept, handleQuestTurnIn } from './Quests';
 import { runHolds } from './Hold';
 import { handleInspect } from './inspect';
 import { queuePortal } from './PortalQueue';
+import { handleDonate, handleFaith } from './economy/faith';
+import { handleNotice } from './economy/notices';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
 export interface QueuedCommand {
@@ -90,6 +92,16 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.bank:
         handleBank(room, cmd.sessionId, payload);
+        break;
+      // Round 8 (GDD 3.23, 8D): the civic commands; each refuses until its loop lands.
+      case C2S.notice:
+        handleNotice(room, cmd.sessionId, payload);
+        break;
+      case C2S.donate: // round 8, 8D (GDD 3.23)
+        handleDonate(room, cmd.sessionId, payload);
+        break;
+      case C2S.faith: // round 8, 8D (GDD 3.23)
+        handleFaith(room, cmd.sessionId, payload);
         break;
       default:
         // act.interact, hide, check, burst, present arrive with M4+; queued and ignored until then.
