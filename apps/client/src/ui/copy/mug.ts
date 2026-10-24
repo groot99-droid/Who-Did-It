@@ -1,4 +1,4 @@
-// UI.md 14.37 the mugging prompt (Session 8E, round 8; GDD 3.24): the lines of the panel a mugged player sees. A
+// UI.md 14.36.1 the mugging prompt (Session 8E, round 8; GDD 3.24): the lines of the panel a mugged player sees. A
 // screen reads its lines from here, never from a literal. Values in braces are filled with `fill()`.
 export const MUG_COPY = {
   'mug.title': '{name} wants your purse.',

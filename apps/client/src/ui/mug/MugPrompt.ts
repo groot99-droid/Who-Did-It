@@ -6,7 +6,7 @@ import { h } from '../dom';
 import './mug.css';
 
 /**
- * UI.md 14.37 the mugging prompt (Session 8E, round 8; GDD 3.24): the private `mugPrompt { muggerId, endsTick }`
+ * UI.md 14.36.1 the mugging prompt (Session 8E, round 8; GDD 3.24): the private `mugPrompt { muggerId, endsTick }`
  * opens a veil and a glass panel naming the mugger with the seconds left to answer, and a choice sends
  * `act.mug { choice }`. Nothing of the mugging is public: the prompt is the only wire trace, and the panel names the
  * mugger by the look its avatar wears (a figure's villager look, a seat's character), never by a seat. Part one

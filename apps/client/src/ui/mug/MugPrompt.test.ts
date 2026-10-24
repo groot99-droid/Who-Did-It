@@ -6,7 +6,7 @@ import { MUG_COPY } from '../copy';
 import { type FakeNode, installFakeDom } from '../main/fakeDom';
 import { type MugChoice, mountMugPrompt, muggerName, remainingS } from './MugPrompt';
 
-/** The mugging prompt (UI.md 14.37, GDD 3.24): opens on the private prompt, counts down, answers and closes. */
+/** The mugging prompt (UI.md 14.36.1, GDD 3.24): opens on the private prompt, counts down, answers and closes. */
 
 const avatar = (handle: string, lookOf: string): AvatarSnap =>
   ({

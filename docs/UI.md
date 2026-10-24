@@ -1355,7 +1355,7 @@ Lines are in `apps/client/src/ui/copy/townsfolk.ts` (`TOWNSFOLK_COPY`, `figureNa
 | `meeting.townsfolk.lost.one` | The wolves took one of the townsfolk. | the meeting text when one figure died since the last meeting |
 | `meeting.townsfolk.lost.many` | The wolves took {n} of the townsfolk. | the meeting text when more did; `{n}` is the count |
 
-### 14.37 The mugging prompt (8E)
+#### 14.36.1 The mugging prompt
 
 Lines are in `apps/client/src/ui/copy/mug.ts` (`MUG_COPY`); the panel is `apps/client/src/ui/mug/MugPrompt.ts` (`mountMugPrompt(root, feed, send)`), mounted by the World scene once the `mugPrompt` feed event lands. A private `mugPrompt { muggerId, endsTick }` (GDD 3.24) opens it over the world: a veil, and a glass panel with the mugger's name (`figureName` for a villager look, the character's name for any other look; a handle no avatar wears reads as a villager), the hint, the seconds left until `endsTick` by the feed clock (refreshed four times a second; at zero the panel closes by itself, the server having taken its share), and the choices. A choice sends `act.mug { choice }` and closes the panel; a second prompt replaces the first. Part one (DECISIONS A180) offers Pay alone; Run and Fight join the panel with the fists. Motion: the panel carries 8H's `wdi-anim-panel`, the veil `wdi-anim-veil` and the choice row `wdi-anim-list`, and nothing else of 8H's.
 
