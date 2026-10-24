@@ -33,6 +33,8 @@ import { VfxView } from '../view/vfx/VfxView';
 import { NodeView } from '../view/NodeView';
 import { TransportView } from '../view/transport/TransportView';
 import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
+import { mountShopLayer, type ShopLayer } from '../ui/shop/ShopLayer'; // round 8, 8C (locked)
+import { mountPurseHud, type PurseHud } from '../view/purse/PurseHud'; // round 8, 8C (locked)
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
@@ -137,6 +139,8 @@ export class World extends Phaser.Scene {
   private transportView!: TransportView; // round 8, 8G (locked)
   private giverView!: GiverView;
   private m5b: M5bLayer | null = null;
+  private shop: ShopLayer | null = null; // round 8, 8C (locked)
+  private purse: PurseHud | null = null; // round 8, 8C (locked)
   private cutscenes!: CutscenePlayer;
   private ground: GroundView | null = null;
   private bell: { x: number; y: number } | null = null;
@@ -219,10 +223,12 @@ export class World extends Phaser.Scene {
     this.transportView = new TransportView(this); // round 8, 8G (locked)
     this.giverView = new GiverView(this);
     this.m5b = mountM5bLayer(this);
+    this.shop = mountShopLayer(this); // round 8, 8C (locked)
     this.entities = new EntityView(this, feed.selfId);
 
     this.hud = new Hud(overlayRoot());
     this.hud.setChip((this.registry.get(REG_ROLE_CHIP) as HudChip | undefined) ?? null);
+    this.purse = mountPurseHud(this, feed, this.hud.root.querySelector('.wdi-hud__tl') ?? this.hud.root); // round 8, 8C (locked)
     void loadSceneName(this.sceneId).then((scene) => this.hud.say(fill(C['hud.scene'], { scene }), 1500));
     this.hud.onNotebook(() => this.sheet.toggle());
     this.lighting = new Lighting(this, overlayRoot());
@@ -327,6 +333,8 @@ export class World extends Phaser.Scene {
       this.transportView.destroy(); // round 8, 8G (locked)
       this.giverView.destroy();
       this.m5b?.destroy();
+      this.shop?.destroy(); // round 8, 8C (locked)
+      this.purse?.destroy(); // round 8, 8C (locked)
       this.cutscenes.destroy();
       this.ground?.destroy();
       this.ground = null;
@@ -421,6 +429,7 @@ export class World extends Phaser.Scene {
 
   /** E / Use: the M5b layer takes it for a node or a giver in reach; otherwise the clue, body, bell and door verbs. */
   private useKey(down: boolean): void {
+    if (this.shop?.use(down)) return; // round 8, 8C (locked): a shop counter in reach
     if (this.m5b?.use(down)) return;
     if (down) this.startUse();
     else this.endUse();

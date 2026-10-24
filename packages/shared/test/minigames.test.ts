@@ -17,6 +17,7 @@ const BASES: MinigameBases = {
   pour: { steps: 2, ratePerS: 0.35, bandFrac: 0.12 },
   slide: { steps: 4 },
   stoke: { stokePerTap: 0.15, ratePerS: 0.08, bandFrac: 0.18, holdS: 3 },
+  tap: { steps: 3, periodS: 1.4, bandFrac: 0.18 }, // 7M: the round-7 kind, tested in minigamesTap.test.ts
 };
 const KINDS: MinigameKind[] = ['crates', 'pour', 'slide', 'stoke'];
 const gen = (kind: MinigameKind, difficulty = 1, seed = 7) =>

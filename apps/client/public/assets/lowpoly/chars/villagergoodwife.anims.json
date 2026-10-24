@@ -1,0 +1,4492 @@
+{
+ "anims": [
+  {
+   "key": "blood/villagergoodwife/die/e",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/e/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/e/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/e/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/e/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/e/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/e/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/e/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/die/n",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/n/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/n/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/n/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/n/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/n/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/n/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/n/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/die/ne",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/ne/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/ne/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/ne/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/ne/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/ne/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/ne/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/ne/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/die/nw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/nw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/nw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/nw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/nw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/nw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/nw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/nw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/die/s",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/s/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/s/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/s/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/s/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/s/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/s/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/s/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/die/se",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/se/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/se/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/se/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/se/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/se/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/se/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/se/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/die/sw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/sw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/sw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/sw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/sw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/sw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/sw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/sw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/die/w",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/w/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/w/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/w/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/w/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/w/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/w/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/w/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/idle/e",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/e/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/e/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/e/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/e/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/e/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/e/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/e/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/idle/n",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/n/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/n/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/n/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/n/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/n/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/n/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/n/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/idle/ne",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/ne/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/ne/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/ne/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/ne/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/ne/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/ne/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/ne/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/idle/nw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/nw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/nw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/nw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/nw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/nw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/nw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/nw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/idle/s",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/s/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/s/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/s/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/s/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/s/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/s/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/s/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/idle/se",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/se/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/se/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/se/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/se/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/se/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/se/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/se/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/idle/sw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/sw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/sw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/sw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/sw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/sw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/sw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/sw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/idle/w",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/w/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/w/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/w/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/w/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/w/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/w/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/w/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/interact/e",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/e/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/e/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/e/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/e/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/e/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/e/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/e/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/interact/n",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/n/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/n/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/n/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/n/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/n/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/n/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/n/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/interact/ne",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/ne/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/ne/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/ne/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/ne/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/ne/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/ne/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/ne/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/interact/nw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/nw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/nw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/nw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/nw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/nw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/nw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/nw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/interact/s",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/s/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/s/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/s/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/s/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/s/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/s/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/s/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/interact/se",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/se/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/se/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/se/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/se/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/se/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/se/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/se/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/interact/sw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/sw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/sw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/sw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/sw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/sw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/sw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/sw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/interact/w",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/w/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/w/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/w/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/w/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/w/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/w/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/w/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/swing/e",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/e/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/e/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/e/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/e/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/e/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/swing/n",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/n/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/n/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/n/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/n/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/n/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/swing/ne",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/ne/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/ne/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/ne/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/ne/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/ne/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/swing/nw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/nw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/nw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/nw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/nw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/nw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/swing/s",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/s/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/s/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/s/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/s/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/s/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/swing/se",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/se/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/se/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/se/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/se/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/se/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/swing/sw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/sw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/sw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/sw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/sw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/sw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/swing/w",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/w/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/w/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/w/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/w/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/w/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "blood/villagergoodwife/walk/e",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/e/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/e/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/e/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/e/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/e/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/e/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/e/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/walk/n",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/n/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/n/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/n/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/n/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/n/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/n/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/n/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/walk/ne",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/ne/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/ne/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/ne/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/ne/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/ne/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/ne/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/ne/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/walk/nw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/nw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/nw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/nw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/nw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/nw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/nw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/nw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/walk/s",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/s/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/s/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/s/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/s/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/s/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/s/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/s/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/walk/se",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/se/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/se/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/se/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/se/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/se/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/se/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/se/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/walk/sw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/sw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/sw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/sw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/sw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/sw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/sw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/sw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "blood/villagergoodwife/walk/w",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/w/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/w/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/w/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/w/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/w/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/w/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/w/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "blood/villagergoodwife/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/die/e",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/e/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/e/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/e/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/e/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/e/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/e/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/e/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/die/n",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/n/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/n/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/n/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/n/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/n/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/n/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/n/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/die/ne",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/ne/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/ne/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/ne/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/ne/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/ne/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/ne/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/ne/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/die/nw",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/nw/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/nw/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/nw/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/nw/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/nw/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/nw/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/nw/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/die/s",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/s/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/s/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/s/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/s/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/s/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/s/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/s/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/die/se",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/se/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/se/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/se/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/se/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/se/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/se/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/se/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/die/sw",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/sw/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/sw/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/sw/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/sw/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/sw/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/sw/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/sw/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/die/w",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/w/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/w/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/w/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/w/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/w/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/w/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/w/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/idle/e",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/e/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/e/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/e/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/e/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/e/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/e/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/e/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/idle/n",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/n/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/n/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/n/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/n/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/n/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/n/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/n/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/idle/ne",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/ne/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/ne/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/ne/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/ne/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/ne/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/ne/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/ne/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/idle/nw",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/nw/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/nw/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/nw/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/nw/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/nw/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/nw/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/nw/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/idle/s",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/s/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/s/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/s/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/s/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/s/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/s/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/s/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/idle/se",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/se/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/se/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/se/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/se/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/se/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/se/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/se/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/idle/sw",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/sw/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/sw/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/sw/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/sw/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/sw/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/sw/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/sw/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/idle/w",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/w/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/w/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/w/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/w/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/w/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/w/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/w/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/interact/e",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/e/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/e/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/e/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/e/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/e/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/e/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/e/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/interact/n",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/n/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/n/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/n/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/n/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/n/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/n/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/n/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/interact/ne",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/ne/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/ne/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/ne/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/ne/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/ne/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/ne/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/ne/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/interact/nw",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/nw/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/nw/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/nw/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/nw/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/nw/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/nw/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/nw/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/interact/s",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/s/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/s/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/s/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/s/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/s/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/s/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/s/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/interact/se",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/se/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/se/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/se/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/se/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/se/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/se/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/se/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/interact/sw",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/sw/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/sw/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/sw/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/sw/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/sw/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/sw/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/sw/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/interact/w",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/w/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/w/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/w/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/w/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/w/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/w/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/w/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/swing/e",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/e/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/e/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/e/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/e/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/e/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/swing/n",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/n/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/n/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/n/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/n/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/n/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/swing/ne",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/ne/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/ne/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/ne/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/ne/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/ne/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/swing/nw",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/nw/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/nw/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/nw/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/nw/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/nw/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/swing/s",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/s/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/s/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/s/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/s/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/s/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/swing/se",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/se/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/se/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/se/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/se/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/se/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/swing/sw",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/sw/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/sw/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/sw/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/sw/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/sw/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/swing/w",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/w/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/w/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/w/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/w/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/w/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "char/villagergoodwife/walk/e",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/e/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/e/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/e/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/e/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/e/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/e/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/e/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/walk/n",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/n/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/n/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/n/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/n/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/n/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/n/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/n/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/walk/ne",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/ne/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/ne/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/ne/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/ne/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/ne/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/ne/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/ne/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/walk/nw",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/nw/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/nw/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/nw/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/nw/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/nw/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/nw/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/nw/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/walk/s",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/s/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/s/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/s/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/s/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/s/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/s/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/s/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/walk/se",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/se/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/se/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/se/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/se/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/se/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/se/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/se/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/walk/sw",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/sw/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/sw/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/sw/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/sw/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/sw/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/sw/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/sw/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "char/villagergoodwife/walk/w",
+   "frames": [
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/w/000"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/w/001"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/w/002"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/w/003"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/w/004"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/w/005"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/w/006"
+    },
+    {
+     "key": "char_villagergoodwife",
+     "frame": "char/villagergoodwife/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/die/e",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/e/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/e/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/e/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/e/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/e/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/e/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/e/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/die/n",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/n/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/n/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/n/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/n/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/n/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/n/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/n/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/die/ne",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/ne/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/ne/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/ne/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/ne/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/ne/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/ne/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/ne/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/die/nw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/nw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/nw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/nw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/nw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/nw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/nw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/nw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/die/s",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/s/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/s/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/s/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/s/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/s/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/s/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/s/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/die/se",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/se/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/se/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/se/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/se/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/se/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/se/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/se/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/die/sw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/sw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/sw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/sw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/sw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/sw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/sw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/sw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/die/w",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/w/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/w/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/w/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/w/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/w/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/w/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/w/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/die/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/idle/e",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/e/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/e/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/e/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/e/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/e/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/e/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/e/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/idle/n",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/n/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/n/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/n/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/n/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/n/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/n/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/n/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/idle/ne",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/ne/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/ne/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/ne/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/ne/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/ne/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/ne/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/ne/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/idle/nw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/nw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/nw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/nw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/nw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/nw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/nw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/nw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/idle/s",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/s/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/s/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/s/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/s/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/s/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/s/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/s/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/idle/se",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/se/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/se/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/se/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/se/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/se/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/se/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/se/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/idle/sw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/sw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/sw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/sw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/sw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/sw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/sw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/sw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/idle/w",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/w/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/w/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/w/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/w/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/w/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/w/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/w/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/idle/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/interact/e",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/e/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/e/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/e/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/e/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/e/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/e/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/e/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/interact/n",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/n/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/n/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/n/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/n/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/n/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/n/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/n/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/interact/ne",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/ne/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/ne/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/ne/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/ne/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/ne/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/ne/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/ne/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/interact/nw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/nw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/nw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/nw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/nw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/nw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/nw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/nw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/interact/s",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/s/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/s/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/s/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/s/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/s/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/s/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/s/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/interact/se",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/se/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/se/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/se/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/se/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/se/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/se/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/se/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/interact/sw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/sw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/sw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/sw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/sw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/sw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/sw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/sw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/interact/w",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/w/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/w/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/w/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/w/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/w/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/w/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/w/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/interact/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/swing/e",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/e/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/e/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/e/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/e/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/e/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/e/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/swing/n",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/n/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/n/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/n/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/n/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/n/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/n/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/swing/ne",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/ne/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/ne/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/ne/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/ne/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/ne/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/ne/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/swing/nw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/nw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/nw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/nw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/nw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/nw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/nw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/swing/s",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/s/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/s/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/s/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/s/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/s/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/s/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/swing/se",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/se/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/se/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/se/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/se/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/se/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/se/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/swing/sw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/sw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/sw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/sw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/sw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/sw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/sw/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/swing/w",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/w/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/w/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/w/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/w/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/w/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/swing/w/005"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
+   "key": "scarf/villagergoodwife/walk/e",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/e/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/e/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/e/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/e/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/e/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/e/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/e/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/e/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/walk/n",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/n/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/n/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/n/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/n/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/n/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/n/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/n/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/n/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/walk/ne",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/ne/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/ne/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/ne/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/ne/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/ne/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/ne/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/ne/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/ne/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/walk/nw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/nw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/nw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/nw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/nw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/nw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/nw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/nw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/nw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/walk/s",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/s/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/s/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/s/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/s/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/s/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/s/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/s/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/s/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/walk/se",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/se/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/se/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/se/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/se/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/se/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/se/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/se/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/se/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/walk/sw",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/sw/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/sw/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/sw/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/sw/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/sw/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/sw/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/sw/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/sw/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  },
+  {
+   "key": "scarf/villagergoodwife/walk/w",
+   "frames": [
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/w/000"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/w/001"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/w/002"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/w/003"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/w/004"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/w/005"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/w/006"
+    },
+    {
+     "key": "ovl_villagergoodwife",
+     "frame": "scarf/villagergoodwife/walk/w/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": -1
+  }
+ ]
+}

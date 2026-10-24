@@ -18,7 +18,8 @@ import { type Rng, sfc32 } from '@wdi/shared';
  * - `contract`, `events`: the Bible's mail stream and world events (rounds 7 and 9, docs/round6/bible-seams.md);
  * - `vendetta`: a Killer card's vendetta, keyed by seat id (round 7, GDD 3.20);
  * - `tasks`: the task deal, the real and the fake lists (round 7, 7M, GDD 3.5);
- * - `purse`: each seat's starting stake, keyed by seat id (round 8, GDD 3.23).
+ * - `purse`: each seat's starting stake, keyed by seat id (round 8, GDD 3.23);
+ * - `talk`: an NPC seat's meeting notes, keyed by seat id (round 8, 8T, GDD 3.8), so a note moves no other stream.
  */
 export type StreamName =
   | 'deal'
@@ -34,7 +35,8 @@ export type StreamName =
   | 'events'
   | 'vendetta'
   | 'tasks'
-  | 'purse';
+  | 'purse'
+  | 'talk';
 
 /** Four 32-bit seed words of one sfc32 stream. */
 export type SeedWords = readonly [number, number, number, number];

@@ -38,6 +38,7 @@ interface PlayerState {
     inventory?: { slots?: { forEach(cb: (s: StackSnap) => void): void } };
     quests?: { forEach(cb: (q: QuestSnap) => void): void };
     tasks?: { forEach(cb: (t: TaskSnap) => void): void };
+    purse?: number;
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
@@ -99,6 +100,8 @@ export class ColyseusWorldFeed implements WorldFeed {
     // Round 8 (8B): inspect's three private messages.
     for (const type of ['inspect.result', 'inspect.noticed', 'inspect.hunch'] as const)
       room.onMessage(type, (m: never) => this.bus.emit(type, m));
+    // Round 8, 8C (locked): the shop a `shop` hold opened.
+    room.onMessage('shop.open', (m: WorldFeedEvents['shopOpen']) => this.bus.emit('shopOpen', m));
   }
 
   /** Set by the private `killed` message or a false roster `alive`; cleared when the lobby returns. */
@@ -315,6 +318,19 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   taskBar(): number {
     return this.state.taskBar ?? 0;
+  }
+
+  // Round 8, 8C (locked; GDD 3.23): the purse and the shop's trades.
+  purse(): number {
+    return this.state.players.get(this.selfId)?.priv?.purse ?? 0;
+  }
+
+  buy(shopId: string, itemId: string, qty: number): void {
+    this.room.send('act.buy', { shopId, itemId, qty });
+  }
+
+  sell(shopId: string, itemId: string, qty: number): void {
+    this.room.send('act.sell', { shopId, itemId, qty });
   }
 
   questAccept(questId: string): void {

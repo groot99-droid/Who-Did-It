@@ -15,9 +15,9 @@
       "difficulty": 3,
       "assistS": 20
     },
-    "letterSlide": {
-      "id": "letterSlide",
-      "kind": "slide",
+    "letterTap": {
+      "id": "letterTap",
+      "kind": "tap",
       "task": "deliverLetter",
       "difficulty": 1,
       "assistS": 20

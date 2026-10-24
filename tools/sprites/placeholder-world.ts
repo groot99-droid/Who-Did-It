@@ -490,7 +490,7 @@ export function placeholderEntries(): PlaceholderEntry[] {
       files: async () => {
         const clues = await packFrames('clues', clueFrames());
         const files = inFolder('clues/', clues.pages);
-        files.set('clues/clues.json', Buffer.from(atlasJson(clues.atlas)));
+        files.set('clues/clues.json', Buffer.from(atlasJson(clues.atlas, true)));
         return files;
       },
     },

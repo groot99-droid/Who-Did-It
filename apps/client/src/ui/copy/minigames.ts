@@ -1,4 +1,4 @@
-// The four mini-games of the main mode's task stations (GDD 3.16). They came from the quick mode's station rooms,
+// The mini-games of the main mode's task stations (GDD 3.16). They came from the quick mode's station rooms,
 // which left the game with it (DECISIONS A115); the lines are unchanged.
 
 export const MINIGAME_COPY = {
@@ -16,6 +16,11 @@ export const MINIGAME_COPY = {
   'minigame.stoke.hint': 'Tap to feed the fire. Hold the needle in the band for {holdS} s.',
   'minigame.stoke.tap': 'Feed oak',
   'minigame.stoke.progress': '{s} s held',
+  // Round 7 (7M, GDD 3.16): the tap.
+  'minigame.tap.hint': 'Tap as the marker crosses the band, {steps} times running.',
+  'minigame.tap.tap': 'Tap',
+  'minigame.tap.progress': '{hits} of {steps}',
+  'minigame.tap.miss': 'Missed. From the top.',
 } as const;
 
 export type MinigameCopyId = keyof typeof MINIGAME_COPY;
