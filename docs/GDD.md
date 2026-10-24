@@ -784,8 +784,8 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   tally rack (`act.hold`, `clues.collectHoldS` within verb reach). At dusk a seat short of its quota is fined
   `quota.fine` from its purse, and what the purse cannot cover joins its debt. Debt carries over from day to day.
 - **Indebted.** A seat that still owes at dusk becomes Indebted (`EffectId.indebted`, its own view only). No bit is
-  drawn; inspect reads "a hunted look". From dusk to dawn the doors of its map's `curfew` scenes refuse it as a locked
-  door does, so it sleeps rough. Paying its debt clears it. Forced labour waits for R9's law pipeline.
+  drawn; inspect reads "a hunted look". From dusk to dawn the doors from outdoors into its map's `curfew` scenes refuse
+  it as a locked door does, so it sleeps rough; a seat already inside still moves between the rooms and can leave. Paying its debt clears it. Forced labour waits for R9's law pipeline.
 
 - **Faith** (8D). Donating Scrip at an altar (`act.donate`, within verb reach, up to `faith.donateMax` at a time)
   earns `faith.perScrip` Faith per Scrip, up to `faith.max`; Faith is private (`Private.faith`). There is an altar in

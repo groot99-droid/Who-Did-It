@@ -5,7 +5,7 @@ import { emitSim } from '../events/bus';
 import { take, count } from '../Inventory';
 import { mapIdOfRoom, mapScenesOf } from '../MapSites';
 import { simOf } from '../RoomSim';
-import { isVerbPhase, reject } from '../World';
+import { isVerbPhase, reject, sceneKey } from '../World';
 import { balanceOf, movePurse, TOWN } from './purse';
 import { perkMul } from './perks';
 import { nearProp } from './reach';
@@ -80,10 +80,15 @@ function setIndebted(room: PartyRoom, seat: string, on: boolean): void {
     );
 }
 
-/** Whether a door into `to` refuses this seat now: an Indebted living seat after dark, at a curfew scene. */
+/**
+ * Whether a door into `to` refuses this seat now: an Indebted living seat after dark, crossing from outdoors into a
+ * curfew scene. Only the house door is locked: a seat already inside moves between its rooms and can always leave.
+ */
 export function curfewBars(room: PartyRoom, seat: string, to: string | null): boolean {
   if (to === null || !AFTER_DARK.has(room.state.phase)) return false;
-  if (simOf(room).players.get(seat)?.dead !== false || !isIndebted(room, seat)) return false;
+  const p = simOf(room).players.get(seat);
+  if (p?.dead !== false || !isIndebted(room, seat)) return false;
+  if (scenes[sceneKey(p.sceneIdx)]?.kind !== 'exterior') return false;
   return economy.curfew[mapIdOfRoom(room)]?.includes(to) ?? false;
 }
 

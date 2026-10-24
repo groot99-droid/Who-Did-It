@@ -143,6 +143,10 @@ describe('the curfew door (GDD 3.23)', () => {
     expect(curfewBars(m.room, a.id, curfew[0]!)).toBe(true);
     expect(curfewBars(m.room, a.id, 'overworld')).toBe(false);
     expect(curfewBars(m.room, b.id, curfew[0]!)).toBe(false);
+    // Only the house door is locked: inside, an Indebted seat still moves between rooms and goes out.
+    teleport(m, a, 'apoth_loft', 2, 2);
+    expect(curfewBars(m.room, a.id, 'apoth_shop')).toBe(false);
+    expect(curfewBars(m.room, a.id, 'overworld')).toBe(false);
 
     teleport(m, a, 'overworld', 28, 35);
     teleport(m, b, 'overworld', 28, 35);
