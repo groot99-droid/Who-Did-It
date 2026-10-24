@@ -8,7 +8,7 @@
   "biome": "village",
   "dark": false,
   "size": { "w": 64, "h": 48 },
-  "notes": "Square with bell and well; 4 lantern posts; fence line NE. NW Manor Rise and NE paddock are gated shut below Medium. The Daily Train's platform and spur on the east edge (round 7). Round 8 (8J): the market's buyer at the square's north-west corner among sacks, a barrel and bales; settles round the bell; each house front carries its trade's clutter where it meets the ground; a wayside shrine by the chapel yard; the mail crane, a lantern and a settle on the platform; barrels and planks on the quay with a landing lantern; stumps, stones and bracken along the gate road.",
+  "notes": "Square with bell and well; 4 lantern posts; fence line NE. NW Manor Rise and NE paddock are gated shut below Medium. The Daily Train's platform and spur on the east edge (round 7). Round 8 (8J): the market's buyer at the square's north-west corner among sacks, a barrel and bales; settles round the bell; each house front carries its trade's clutter where it meets the ground; a wayside shrine on the lane below the chapel; the mail crane, a lantern and a settle on the platform; barrels and planks on the quay with a landing lantern; stumps, stones and bracken along the gate road.",
   "worldRef": "4.3",
   "portals": [
     {
@@ -307,8 +307,8 @@
     { "id": "ov.tin_crate_1", "kind": "dressing", "x": 46, "y": 43 },
     { "id": "ov.lantern_pole_1", "kind": "dressing", "x": 44, "y": 40 },
     { "id": "ov.shop_market", "kind": "counter", "x": 25, "y": 16 },
-    { "id": "ov.altar_shrine", "kind": "altar", "x": 13, "y": 28 },
-    { "id": "ov.mailbag_platform", "kind": "mailbag", "x": 61, "y": 31 }
+    { "id": "ov.altar_shrine", "kind": "altar", "x": 12, "y": 35 },
+    { "id": "ov.mailbag_platform", "kind": "mailbag", "x": 61, "y": 29 }
   ],
   "gates": [
     { "id": "ov.gate_manor", "minProfile": "medium", "x": 21, "y": 10, "w": 1, "h": 2 },
@@ -418,8 +418,8 @@
     {
       "id": "ov.lt_shrine",
       "kind": "lamp",
-      "x": 13,
-      "y": 28,
+      "x": 12,
+      "y": 35,
       "radiusTiles": 1.5,
       "phases": ["dusk", "night"]
     }
@@ -456,14 +456,14 @@
     "#........................S...S....S.............#.S..#.........#",
     "#............................................................#.#",
     "#.....................#...............#........................#",
-    "#.#########..#...........############...#####................#.#",
-    "#.#########..............############..######..................#",
+    "#.#########..............############...#####................#.#",
+    "#.#########..............############..######................#.#",
     "#.#########...#..#..#..H.############...#####...............S..#",
-    "#.#########..............###########DS..#####................#.#",
+    "#.#########..............###########DS..#####..................#",
     "#.########DS.............############...#####..................#",
     "#.#########...#..#..#....############..######................#.#",
     "#.#########..............###D########...#####..................#",
-    "#.#########..............##.S...#.......#####..................#",
+    "#.#########.#............##.S...#.......#####..................#",
     "#.......................................#####..................#",
     "#####..##############################...####...................#",
     "#####..##############################...####...................#",
@@ -506,14 +506,14 @@
     "TpggggggggggggggggggggccccccccccccccccccggggggggPggggPgggggggg=T",
     "TpggggggggggggggggggggccccccccccccccccccgggggggggggggggggggwwP=T",
     "TpggggggggggggggggggggPcccccccccccccccPcgggggggggggggggggggwww=T",
-    "TpPPPPPPPPPddPdddddddddggPPPPPPPPPPPPgggPPPPPggggggggggggggwwP=T",
-    "TpPPPPPPPPPddddddddddddggPPPPPPPPPPPPggPPPPPPggggggggggggggwww=T",
+    "TpPPPPPPPPPddddddddddddggPPPPPPPPPPPPgggPPPPPggggggggggggggwwP=T",
+    "TpPPPPPPPPPddddddddddddggPPPPPPPPPPPPggPPPPPPggggggggggggggwwP=T",
     "TpPPPPPPPPPdddPddPddPddggPPPPPPPPPPPPgggPPPPPggggggggggggggwww=T",
-    "TpPPPPPPPPPddddddddddddggPPPPPPPPPPPggggPPPPPggggggggggggggwwP=T",
+    "TpPPPPPPPPPddddddddddddggPPPPPPPPPPPggggPPPPPggggggggggggggwww=T",
     "TpPPPPPPPPdddddddddddddggPPPPPPPPPPPPgggPPPPPggggggggggggggwww=T",
     "TpPPPPPPPPPdddRddRddRddggPPPPPPPPPPPPggPPPPPPggggggggggggggwwP=T",
     "TpPPPPPPPPPddddddddddddggPPPgPPPPPPPPgggPPPPPggggggggggggggwww=T",
-    "TpPPPPPPPPPddddddddddddggPPgggggPgggggggPPPPPggggggggggggggggg=T",
+    "TpPPPPPPPPPdPddddddddddggPPgggggPgggggggPPPPPggggggggggggggggg=T",
     "TpppppppppppppppppppppppppppppppppppppppPPPPPppppppppppppppppp=T",
     "XXXXXppXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXgggXXXXwwwwwwwwwwwwwwwwwwwX",
     "XXXXXppXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXgggXXXXwwwwwwwwwwwwwwwwwwwX",
