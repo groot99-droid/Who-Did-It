@@ -2,16 +2,29 @@ import { createCanvas } from '@napi-rs/canvas';
 import { describe, expect, it } from 'vitest';
 import { applyPivots, buildAnims, fileStemOf, type FeetManifest } from '../gen-anims.ts';
 import {
+  CLIP_CELL,
+  CLIP_NAMES,
   DIRECTIONS,
+  FAMILY_DROPS,
   PASSES,
+  R8_CLIPS,
   V1_CLIPS,
   animKey,
+  frameCounts,
   frameFileName,
   frameKey,
+  isLazy,
+  lookClips,
+  lookTails,
   parseFrameFileName,
+  textureKey,
   type Dir,
 } from '../keys.ts';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { decodePng, encodeIndexedPng } from '../bleed.ts';
 import { atlasJson, packCharacter, packFrames, type MultiAtlas, type PackInput } from '../pack.ts';
+import { finishEnabled } from '../palette.ts';
 
 /** A 128 px cell, transparent except a w x h block whose bottom centre is the feet point. */
 function cell(feet: [number, number], w: number, h: number, shade: string): Buffer {
@@ -65,7 +78,7 @@ describe('keys', () => {
     expect(PASSES).toEqual(['body', 'scarf', 'blood']);
     expect(Object.keys(V1_CLIPS)).toEqual(['idle', 'walk', 'swing', 'interact', 'die']);
     const perPass = Object.values(V1_CLIPS).reduce((n, c) => n + c.frames, 0) * DIRECTIONS.length;
-    expect(perPass).toBe(304);
+    expect(perPass).toBe(272); // 304 until the owner's option B trimmed idle and interact to 6 (A161)
     expect(animKey('blood', 'villager', 'die', 'nw')).toBe('blood/villager/die/nw');
     expect(fileStemOf('scarf/villager/walk/se/003')).toBe('char_villager_walk_se_003');
   });
@@ -73,6 +86,62 @@ describe('keys', () => {
   it('rejects role-like or malformed names', () => {
     expect(() => parseFrameFileName('char_villager_dance_n_000')).toThrow();
     expect(() => frameFileName({ body: 'old_man', anim: 'walk', dir: 'n', index: 0 })).toThrow();
+  });
+
+  it("carries the clip table of SPRITES 3 at the frame counts of the owner's option B (A161)", () => {
+    expect(parseFrameFileName('char_villager_knockdown_ne_003').anim).toBe('knockdown');
+    expect(CLIP_NAMES).toHaveLength(21);
+    const table = Object.fromEntries(
+      CLIP_NAMES.map((c) => [c, [R8_CLIPS[c].frames, R8_CLIPS[c].dirs.length]]),
+    );
+    expect(table).toEqual({
+      idle: [6, 8],
+      walk: [8, 8],
+      swing: [6, 8],
+      interact: [6, 8],
+      die: [8, 8],
+      run: [6, 8],
+      strike: [4, 8],
+      hurt: [3, 8],
+      limp: [6, 4],
+      stagger: [6, 4],
+      inspect: [4, 4],
+      cower: [4, 4],
+      fidget: [4, 4],
+      stomp: [4, 4],
+      stunned: [4, 4],
+      knockdown: [4, 4],
+      down: [2, 4],
+      getup: [4, 4],
+      rob: [4, 4],
+      eat: [4, 4],
+      threaten: [4, 4],
+    });
+    expect(CLIP_NAMES.filter((c) => R8_CLIPS[c].lazy)).toEqual([
+      'knockdown',
+      'down',
+      'getup',
+      'rob',
+      'eat',
+      'threaten',
+    ]);
+    expect(isLazy('down') && !isLazy('limp') && !isLazy('dance')).toBe(true);
+    expect(CLIP_CELL).toEqual({
+      die: [256, 128],
+      knockdown: [256, 128],
+      down: [256, 128],
+      getup: [256, 128],
+    });
+    // A deck look renders 504 resident frames a pass and 88 lazy; the villager family drops five clips: 408 and 56.
+    expect(frameCounts('baker')).toEqual({ resident: 504, lazy: 88 });
+    expect([...lookClips('baker').keys()]).toEqual(CLIP_NAMES);
+    expect(frameCounts('villagerelder')).toEqual({ resident: 408, lazy: 56 });
+    expect([...lookClips('villager').keys()]).toEqual(CLIP_NAMES.filter((c) => !FAMILY_DROPS.includes(c)));
+    expect(lookTails('villager', true)).toHaveLength(56);
+    expect(lookTails('baker', false)[0]).toBe('baker/idle/n/000');
+    expect(lookTails('baker', false).filter((t) => t.includes('/limp/'))).toHaveLength(24);
+    expect(textureKey('body', 'baker', true)).toBe('char_baker_2');
+    expect(textureKey('blood', 'baker', true)).toBe('ovl_baker_2');
   });
 });
 
@@ -147,7 +216,9 @@ describe('gen-anims', () => {
       'ovl_tester.json',
       'tester.anims.json',
     ]);
-    const { anims } = JSON.parse(files.get('tester.anims.json')!.toString()) as ReturnType<typeof buildAnims>;
+    const animsText = files.get('tester.anims.json')!.toString();
+    expect(animsText.slice(0, -1), 'one line like the atlas json').not.toContain('\n');
+    const { anims } = JSON.parse(animsText) as ReturnType<typeof buildAnims>;
     expect(anims.map((a) => a.key)).toEqual([
       'char/tester/walk/e',
       'char/tester/walk/n',
@@ -160,6 +231,54 @@ describe('gen-anims', () => {
       [0, 1, 2].map((i) => ({ key: 'char_tester', frame: `char/tester/walk/n/00${i}` })),
     );
     expect(anims[2]!.frames[0]!.key).toBe('ovl_tester');
+  });
+
+  it('leaves the unrotated flag out of a character atlas', async () => {
+    const { manifest, frames } = synthetic();
+    const files = await packCharacter('tester', frames, manifest);
+    for (const key of ['char_tester.json', 'ovl_tester.json']) {
+      const atlas = JSON.parse(files.get(key)!.toString()) as MultiAtlas;
+      const all = atlas.textures.flatMap((t) => t.frames);
+      expect(all.length, key).toBeGreaterThan(0);
+      for (const f of all) expect('rotated' in f, f.filename).toBe(false);
+    }
+  });
+
+  it.skipIf(!finishEnabled('main'))(
+    'writes a finished page indexed, the same pixels at fewer bytes',
+    async () => {
+      const { manifest, frames } = synthetic();
+      const files = await packCharacter('tester', frames, manifest);
+      const page = files.get('char_tester-0.png')!;
+      expect(page[25], 'colour type').toBe(3);
+      const rgba = (await packFrames('char_tester', frames.get('body')!, undefined, true)).pages.get(
+        'char_tester-0.png',
+      )!;
+      expect(decodePng(page).data).toEqual(decodePng(rgba).data);
+      expect(page.length).toBeLessThan(rgba.length);
+    },
+  );
+
+  it('keeps a page with partial alpha RGBA', async () => {
+    const { manifest, frames } = synthetic();
+    // A block drawn at a half-pixel offset has antialiased edges: partial alpha, so the set is not finished.
+    const soft = frames
+      .get('body')!
+      .map((f, i) => (i ? f : { ...f, png: cell([64.5, 112], 20, 30, '#6F7A8C') }));
+    const files = await packCharacter('tester', new Map([...frames, ['body', soft]]), manifest);
+    expect(files.get('char_tester-0.png')![25], 'colour type').toBe(6);
+    expect(files.get('ovl_tester-0.png')![25], 'colour type').toBe(3);
+  });
+
+  it.skipIf(!finishEnabled('main'))('round-trips a committed 8-bit page byte for byte', () => {
+    const file = join(import.meta.dirname, '../../../apps/client/public/assets/chars/char_villager-0.png');
+    const png = readFileSync(file);
+    expect(png[25], 'colour type').toBe(3);
+    const img = decodePng(png);
+    const again = encodeIndexedPng(img)!;
+    expect(again.equals(png), "the committed page is the encoder's own output").toBe(true);
+    expect(decodePng(again).data).toEqual(img.data);
+    expect(encodeIndexedPng(img)!.equals(again), 'deterministic').toBe(true);
   });
 
   it('keeps a look on one page per texture, or spills to a second when it does not fit', async () => {

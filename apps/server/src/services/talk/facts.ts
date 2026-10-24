@@ -4,7 +4,8 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 /**
  * What an NPC seat may talk about (GDD 3.25 "Talk"): only what every seat at the table can see. Names, the public
  * `alive` flag, the meeting's reason, caller, body and roll-call; never a card, a cover, a private view or which
- * seats are NPCs. When 8R's hive lands, its public read replaces the body of this function and nothing else.
+ * seats are NPCs. The hive's board (`sim/npc/hive/board.ts`) holds no meeting facts: it keeps only the world phases,
+ * so the meeting's public state is read here directly.
  */
 export interface PublicFacts {
   round: number;

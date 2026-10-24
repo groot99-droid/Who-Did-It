@@ -7,15 +7,108 @@ export type Dir = (typeof DIRECTIONS)[number];
 export const PASSES = ['body', 'scarf', 'blood'] as const;
 export type Pass = (typeof PASSES)[number];
 
-/** V1 clips: frame count and whether the anim loops (docs/SPRITES.md 3); 304 frames per pass. */
+/**
+ * The V1 clips: frame count and whether the anim loops (docs/SPRITES.md 3); 272 frames per pass since the owner's
+ * option B trimmed idle and interact to 6 (A161; 304 until then). The placeholder figures render these five.
+ */
 export const V1_CLIPS = {
-  idle: { frames: 8, loop: true },
+  idle: { frames: 6, loop: true },
   walk: { frames: 8, loop: true },
   swing: { frames: 6, loop: false },
-  interact: { frames: 8, loop: true },
+  interact: { frames: 6, loop: true },
   die: { frames: 8, loop: false },
 } as const;
 export type Anim = keyof typeof V1_CLIPS;
+
+/** The four diagonals a four-direction clip renders, never mirrored (SPRITES 3). */
+export const FOUR_DIRS = ['ne', 'se', 'sw', 'nw'] as const satisfies readonly Dir[];
+
+export interface ClipSpec {
+  frames: number;
+  loop: boolean;
+  /** The directions rendered: all eight, or the four diagonals. */
+  dirs: readonly Dir[];
+  /** On the look's lazy second pair of pages (`char_<look>_2`, `ovl_<look>_2`), loaded on first use. */
+  lazy: boolean;
+}
+const clip = (frames: number, loop: boolean, dirs: readonly Dir[] = DIRECTIONS, lazy = false): ClipSpec => ({
+  frames,
+  loop,
+  dirs,
+  lazy,
+});
+
+/**
+ * The clip table of a look (SPRITES 3; the rig's copy is `tools/blender/rig_common.py` `R8_CLIPS`), at the frame
+ * counts of the owner's option B (A161): the V1 five, `run`, `strike` and `hurt` in eight directions; `limp`,
+ * `stagger`, the one-shots and the mood idles in four; the rare clips on the lazy pair, outside the resident cap.
+ */
+export const R8_CLIPS = {
+  idle: clip(6, true),
+  walk: clip(8, true),
+  swing: clip(6, false),
+  interact: clip(6, true),
+  die: clip(8, false),
+  run: clip(6, true),
+  limp: clip(6, true, FOUR_DIRS),
+  stagger: clip(6, true, FOUR_DIRS),
+  strike: clip(4, false),
+  hurt: clip(3, false),
+  inspect: clip(4, false, FOUR_DIRS),
+  cower: clip(4, true, FOUR_DIRS),
+  fidget: clip(4, true, FOUR_DIRS),
+  stomp: clip(4, true, FOUR_DIRS),
+  stunned: clip(4, true, FOUR_DIRS),
+  knockdown: clip(4, false, FOUR_DIRS, true),
+  down: clip(2, true, FOUR_DIRS, true),
+  getup: clip(4, false, FOUR_DIRS, true),
+  rob: clip(4, false, FOUR_DIRS, true),
+  eat: clip(4, false, FOUR_DIRS, true),
+  threaten: clip(4, false, FOUR_DIRS, true),
+} as const satisfies Record<string, ClipSpec>;
+export type Clip = keyof typeof R8_CLIPS;
+export const CLIP_NAMES = Object.keys(R8_CLIPS) as Clip[];
+
+/**
+ * The clips a townsfolk look never plays (option B, A161; seams.md 5): a villager figure is never a seat, so the
+ * family renders neither the Knife's swing nor strike, rob, threaten or inspect.
+ */
+export const FAMILY_DROPS: readonly Clip[] = ['swing', 'strike', 'rob', 'threaten', 'inspect'];
+/** Every townsfolk look id begins with this (looks.json `villagers`). */
+export const VILLAGER_PREFIX = 'villager';
+export const isVillager = (body: string): boolean => body.startsWith(VILLAGER_PREFIX);
+
+/** The clip table of one look, in table order: every clip of a deck look, less `FAMILY_DROPS` for the family. */
+export function lookClips(body: string): ReadonlyMap<Clip, ClipSpec> {
+  const drops = isVillager(body) ? new Set<Clip>(FAMILY_DROPS) : new Set<Clip>();
+  return new Map(CLIP_NAMES.filter((c) => !drops.has(c)).map((c) => [c, R8_CLIPS[c]]));
+}
+
+/** True for a clip on the lazy pair; false for a resident clip or a name the table lacks. */
+export const isLazy = (anim: string): boolean =>
+  (R8_CLIPS as Record<string, ClipSpec | undefined>)[anim]?.lazy === true;
+
+/** The frame tails `<body>/<anim>/<dir>/<nnn>` of one look's resident or lazy clips, in table order. */
+export function lookTails(body: string, lazy: boolean): string[] {
+  const tails: string[] = [];
+  for (const [anim, c] of lookClips(body)) {
+    if (c.lazy !== lazy) continue;
+    for (const dir of c.dirs)
+      for (let i = 0; i < c.frames; i++) tails.push(`${body}/${anim}/${dir}/${String(i).padStart(3, '0')}`);
+  }
+  return tails;
+}
+
+/** The rendered frames a pass of one look (SPRITES 3): the deck 504 resident and 88 lazy, the family 408 and 56. */
+export function frameCounts(body: string): { resident: number; lazy: number } {
+  let resident = 0;
+  let lazy = 0;
+  for (const c of lookClips(body).values()) {
+    if (c.lazy) lazy += c.frames * c.dirs.length;
+    else resident += c.frames * c.dirs.length;
+  }
+  return { resident, lazy };
+}
 
 /** Render cells at the display scale; the pixel finish halves them (64 px packed, feet at 56; SPRITES 10.3). */
 export const CELL_PX = 128;
@@ -25,10 +118,16 @@ export const CHAR_PAGE = { w: 1024, h: 1024 } as const;
 export const OVL_PAGE = { w: 1024, h: 512 } as const;
 export const FPS = 12;
 /** Clips rendered in a larger cell, as [cell px, feet row px] (tools/blender/rig_common.py CLIP_CELL). */
-export const CLIP_CELL: Partial<Record<Anim, readonly [number, number]>> = { die: [256, 128] };
+export const CLIP_CELL: Partial<Record<Clip, readonly [number, number]>> = {
+  die: [256, 128],
+  knockdown: [256, 128],
+  down: [256, 128],
+  getup: [256, 128],
+};
 
-export const FRAME_RE =
-  /^char_(\w+)_(idle|walk|run|interact|swing|carry|die|hide)_(n|ne|e|se|s|sw|w|nw)_(\d{3})$/;
+/** Every anim name a frame may carry: the clip table plus `carry` and `hide`, reserved and never rendered. */
+export const ANIM_NAMES: readonly string[] = [...CLIP_NAMES, 'carry', 'hide'];
+export const FRAME_RE = new RegExp(`^char_(\\w+)_(${ANIM_NAMES.join('|')})_(n|ne|e|se|s|sw|w|nw)_(\\d{3})$`);
 export const BODY_RE = /^[a-z][a-z0-9]*$/;
 
 export interface FrameId {
@@ -69,8 +168,9 @@ export function frameKey(pass: Pass, f: FrameId): string {
   return `${animKey(pass, f.body, f.anim, f.dir)}/${String(f.index).padStart(3, '0')}`;
 }
 
-export function textureKey(pass: Pass, body: string): string {
-  return pass === 'body' ? `char_${body}` : `ovl_${body}`;
+/** `char_<body>` and `ovl_<body>`; the lazy pair of a look (SPRITES 3) is `char_<body>_2` and `ovl_<body>_2`. */
+export function textureKey(pass: Pass, body: string, lazy = false): string {
+  return `${pass === 'body' ? `char_${body}` : `ovl_${body}`}${lazy ? '_2' : ''}`;
 }
 
 // ---------------------------------------------------------------- static sheets (docs/SPRITES.md 8)
