@@ -3,9 +3,10 @@ import { cratesGame } from './crates';
 import { pourGame } from './pour';
 import { slideGame } from './slide';
 import { stokeGame } from './stoke';
+import { tapGame } from './tap';
 
 type Bases = typeof balance.minigames;
-export type MiniKind = 'crates' | 'pour' | 'slide' | 'stoke';
+export type MiniKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
 /** One kind's numbers from `balance.json` `minigames` (GDD 3.16), tagged with the kind. */
 export type MiniGameSpec = { [K in MiniKind]: { kind: K } & Bases[K] }[MiniKind];
 
@@ -36,4 +37,5 @@ export const MINIGAMES: Partial<Record<MiniKind, MiniGameFactory>> = {
   pour: pourGame,
   slide: slideGame,
   stoke: stokeGame,
+  tap: tapGame,
 };
