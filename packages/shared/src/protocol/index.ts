@@ -426,6 +426,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.notice': 5,
   'act.hq': 5,
   'act.payRent': 5,
+  'act.mug': 5,
 };
 
 export const ErrorCode = {
