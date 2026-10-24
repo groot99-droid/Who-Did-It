@@ -6,6 +6,7 @@ import { BIAS, depthAt } from './iso';
 import { drawScale } from './texels';
 import { nodeBreakKey, nodeChange, nodeFrame } from './m5bFrames';
 import { reducedMotion as prefersReducedMotion } from './vfx/motion';
+import { NODE_BREAK, Sfx } from './vfx/sfx';
 
 const ATLAS = 'nodes';
 interface Drawn {
@@ -29,10 +30,13 @@ export class NodeView {
   private readonly drawn = new Map<string, Drawn>();
   /** Swept-up nodes still playing their break. */
   private readonly leaving = new Set<Phaser.GameObjects.Sprite>();
+  private readonly sfx: Sfx;
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly reducedMotion: () => boolean = prefersReducedMotion,
-  ) {}
+  ) {
+    this.sfx = new Sfx(scene);
+  }
 
   get count(): number {
     return this.drawn.size;
@@ -91,6 +95,8 @@ export class NodeView {
   private pose(d: Drawn, resource: string, active: boolean): void {
     d.active = active;
     const seq = ++d.seq;
+    // The yield taken sounds its break, under reduced motion too; a regrowth is silent.
+    if (!active) this.sfx.play(NODE_BREAK[resource], d.obj.x, d.obj.y);
     if (!d.art) {
       (d.obj as Phaser.GameObjects.Ellipse).setFillStyle(active ? 0x7a9a5a : 0x4a4f5c, 0.9);
       return;
@@ -120,6 +126,7 @@ export class NodeView {
   private sweep(d: Drawn, kept: boolean): void {
     const key = nodeBreakKey(d.resource);
     const seen = this.scene.cameras.main.worldView.contains(d.obj.x, d.obj.y);
+    if (kept && seen && d.active) this.sfx.play(NODE_BREAK[d.resource], d.obj.x, d.obj.y);
     if (!kept || !seen || !d.art || !d.active || this.reducedMotion() || !this.scene.anims.exists(key)) {
       d.obj.destroy();
       return;

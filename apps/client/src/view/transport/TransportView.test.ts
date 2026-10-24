@@ -48,9 +48,14 @@ class FakeGraphics {
 
 function setup(reduced = false) {
   const made: FakeGraphics[] = [];
-  const scene = { add: { graphics: () => made[made.push(new FakeGraphics()) - 1] } };
+  const played: string[] = [];
+  const scene = {
+    add: { graphics: () => made[made.push(new FakeGraphics()) - 1] },
+    cameras: { main: { worldView: { contains: () => true } } },
+    registry: { get: () => ({ play: (k: string) => played.push(k) }) },
+  };
   const view = new TransportView(scene as unknown as Phaser.Scene, () => reduced);
-  return { view, made };
+  return { view, made, played };
 }
 
 const avatar = (handle: string, x: number, y: number) => ({ handle, x, y }) as AvatarSnap;
@@ -102,5 +107,19 @@ describe('TransportView (round 8, 8G: motion.md 2)', () => {
     view.pulse('train_arrive', 10);
     view.update('bp_camp', [], feed([]), 0, 20);
     expect(made).toHaveLength(0);
+  });
+
+  it('sounds a hatch, a ladder and a veil as each starts to swing, and leaves a door to the World', () => {
+    const { view, played } = setup();
+    const portals = [
+      DOOR,
+      { id: 'ov.cellar', x: 100, y: 100, kind: 'hatch', face: null },
+      { id: 'ov.well', x: 300, y: 100, kind: 'hatch', face: null },
+      { id: 'ov.path', x: 500, y: 100, kind: 'edge', face: null },
+    ];
+    const swings = portals.map((p) => ({ id: p.id, state: 0, swingUntilTick: 200 }));
+    view.update('overworld', portals, feed(swings), 150, 0);
+    view.update('overworld', portals, feed(swings), 151, 0);
+    expect(played).toEqual(['hatch_open', 'ladder_climb', 'portal_veil']);
   });
 });
