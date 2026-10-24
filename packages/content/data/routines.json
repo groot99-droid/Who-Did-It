@@ -36,7 +36,9 @@
     "wakeTable",
     "plate",
     "deadLoaf",
-    "ledger"
+    "ledger",
+    "counter",
+    "bank"
   ],
   "lightKinds": ["lanternPost"]
 }

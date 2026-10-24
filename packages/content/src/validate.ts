@@ -14,6 +14,7 @@ import type { CutscenesFile } from './schemas/cutscenes.js';
 import type { MusicFile } from './schemas/music.js';
 import type { MinigamesFile, MobsFile, QuestsFile, RecipesFile, ResourcesFile } from './schemas/m5b.js';
 import type { EventsFile, EvolutionsFile, LawsFile, VendettasFile } from './schemas/bible.js';
+import type { RelationsFile } from './schemas/relations.js';
 import type { Scene, SceneId } from './schemas/scene.js';
 import type { StyleFile } from './schemas/style.js';
 import type { TasksFile } from './schemas/tasks.js';
@@ -21,6 +22,8 @@ import type { TraitsFile } from './schemas/traits.js';
 import { MAP_IDS, type MapFile, type MapId } from './schemas/maps.js';
 import { checkMaps, checkSceneWorld } from './validateWorld.js';
 import { checkVendettas } from './validateVendettas.js';
+import type { EconomyFile } from './schemas/economy.js';
+import { checkRelations } from './validateRelations.js';
 
 export interface Content {
   palette: PaletteFile;
@@ -49,6 +52,10 @@ export interface Content {
   evolutions: EvolutionsFile;
   laws: LawsFile;
   events: EventsFile;
+  // Round 8 (GDD 3.23).
+  economy: EconomyFile;
+  // Round 8 (GDD 3.22), Session 8B.
+  relations: RelationsFile;
 }
 
 const maxProfile = (a: Profile, b: Profile): Profile => (PROFILE_RANK[a] >= PROFILE_RANK[b] ? a : b);
@@ -236,6 +243,10 @@ export function validateContent(c: Content): string[] {
   checkM5b(c, err);
   // Round 7 (GDD 3.20): the vendettas' cards, maps and kinds.
   checkVendettas(c, err);
+  checkStakes(c, err);
+  // Round 8 (GDD 3.22): the relations table's sides and the inspect bands.
+  checkRelations(c, err);
+  checkShops(c, err);
 
   return errors;
 }
@@ -752,4 +763,76 @@ export function checkGrid(scene: Scene): string[] {
     }
   }
   return errors;
+}
+
+/**
+ * Round 8 (GDD 3.23, 8C): the starting stake is card-blind. It follows a look a card shows in the world, never a
+ * cover card's own, every tier is worn by some look (so a cover can carry it), and every tier lies on one side of
+ * `economy.heavyPurse`, so the purse band at Start says the look's tier and nothing more.
+ */
+function checkStakes(c: Content, err: (msg: string) => void): void {
+  const { stakes } = c.economy;
+  const heavy = c.balance.economy.heavyPurse;
+  const coverLooks = new Set(
+    Object.values(c.roles.roles)
+      .filter((r) => r.cover)
+      .map((r) => r.look),
+  );
+  const worn = new Set(Object.values(stakes.byLook));
+  if (!stakes.tiers[stakes.default]) err(`economy.json: stakes.default "${stakes.default}" is not a tier`);
+  for (const [look, tier] of Object.entries(stakes.byLook)) {
+    if (!c.looks.looks[look]) err(`economy.json: stakes.byLook "${look}" is not a look`);
+    if (coverLooks.has(look)) err(`economy.json: stakes.byLook "${look}" is a cover card's look`);
+    if (!stakes.tiers[tier]) err(`economy.json: stakes.byLook "${look}" names no tier "${tier}"`);
+  }
+  for (const [id, t] of Object.entries(stakes.tiers)) {
+    if (!worn.has(id)) err(`economy.json: stake tier "${id}" is worn by no look`);
+    if (t.min < heavy && t.max >= heavy)
+      err(`economy.json: stake tier "${id}" straddles balance economy.heavyPurse`);
+  }
+}
+
+/**
+ * Round 8 (GDD 3.23, 8C): a shop is one `counter` static named `<prefix>.shop_<tail>`. Until 8J and 8K place a row its
+ * prefix must still name a scene; once placed it must be a `counter`, and every `counter` belongs to one shop. A shop
+ * trades only items that drop (never a role's kit) at a price it names, and pays less than it asks.
+ */
+function checkShops(c: Content, err: (msg: string) => void): void {
+  const { shops, prices } = c.economy;
+  const byPrefix = new Map(Object.values(c.scenes).map((s) => [s.prefix, s]));
+  const owner = new Map<string, string>();
+  const used = new Set<string>();
+  for (const [id, shop] of Object.entries(shops)) {
+    const [prefix, tail] = shop.prop.split('.') as [string, string];
+    const scene = byPrefix.get(prefix);
+    if (!scene) err(`economy.json: shop ${id} prop ${shop.prop} names no scene prefix`);
+    if (!tail.startsWith('shop_')) err(`economy.json: shop ${id} prop ${shop.prop} lacks the shop_ tail`);
+    const placed = scene?.props.find((p) => p.id === shop.prop);
+    if (placed && placed.kind !== 'counter')
+      err(`economy.json: shop ${id} prop ${shop.prop} is not a counter`);
+    if (owner.has(shop.prop)) err(`economy.json: shops ${owner.get(shop.prop)} and ${id} share ${shop.prop}`);
+    owner.set(shop.prop, id);
+    for (const [list, side] of [
+      [shop.sells, 'ask'],
+      [shop.buys, 'pay'],
+    ] as const) {
+      for (const item of list) {
+        used.add(item);
+        const def = c.items.items[item];
+        if (!def) err(`economy.json: shop ${id} trades unknown item ${item}`);
+        else if (def.roleBound) err(`economy.json: shop ${id} trades role-bound ${item}`);
+        if (prices[item]?.[side] === undefined)
+          err(`economy.json: shop ${id} trades ${item} with no ${side}`);
+      }
+    }
+  }
+  for (const item of Object.keys(prices))
+    if (!used.has(item)) err(`economy.json: price for ${item}, which no shop trades`);
+  for (const scene of Object.values(c.scenes))
+    for (const p of scene.props) {
+      if (p.kind === 'counter' && !owner.has(p.id))
+        err(`scene ${scene.id}: counter ${p.id} belongs to no shop`);
+      if (p.kind === 'bank' && !p.id.startsWith(`${scene.prefix}.bank_`))
+        err(`scene ${scene.id}: bank ${p.id} lacks the bank_ tail`);
+    }
 }
