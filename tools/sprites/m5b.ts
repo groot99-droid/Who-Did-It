@@ -20,6 +20,11 @@ import { finishRender } from './pixel.ts';
 /** Resource ids (`resources.json`) in file order; a node's frames are `node_<snake id>/<state>`. */
 export const RESOURCE_IDS = ['timber', 'stone', 'tinOre', 'resin', 'herb', 'mushroom'] as const;
 export type ResourceId = (typeof RESOURCE_IDS)[number];
+/**
+ * Every node drawn on the `nodes` page: the resources, then the coins a knockout or a mugging drops (8C, GDD 3.23),
+ * which have no `resources.json` row (Scrip is not a material) and are swept up whole, never spent.
+ */
+export const NODE_IDS = [...RESOURCE_IDS, 'coins'] as const;
 /** The craftable tools (`recipes.json`, GDD 3.5), each with a held overlay `held_<itemId>/<dir>`. */
 export const TOOL_IDS = ['torch', 'snare', 'spade', 'lockpicks', 'lantern', 'crowbar'] as const;
 export type ToolId = (typeof TOOL_IDS)[number];
@@ -108,7 +113,7 @@ export function m5bFrames(atlas: M5bAtlas, style: ArtStyle): M5bFrame[] {
       pivot: half(MOB_FEET),
     }));
   if (atlas === 'nodes')
-    return RESOURCE_IDS.flatMap((id) => [
+    return NODE_IDS.flatMap((id) => [
       ...NODE_STATES.map((state) => ({
         name: nodeFrame(id, state),
         img: fin(render(NODE_CELL, (g) => drawNode(g, id, state, NODE_GROUND))),
@@ -214,7 +219,7 @@ export function toolAnims(texture = 'tools'): string {
 
 /** The node breaks (`anims_nodes`): one per resource, `BREAK_FPS`, once; the client plays it backwards to regrow. */
 export function nodeAnims(texture = 'nodes'): string {
-  const anims = RESOURCE_IDS.map((id) => ({
+  const anims = NODE_IDS.map((id) => ({
     key: nodeBreakAnim(id),
     frames: Array.from({ length: BREAK_FRAMES }, (_, n) => ({ key: texture, frame: nodeBreakFrame(id, n) })),
     frameRate: BREAK_FPS,
