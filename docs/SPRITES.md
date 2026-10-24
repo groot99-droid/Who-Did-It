@@ -279,6 +279,7 @@ at the tile centre and y-sorted by that point, like a character's feet.
 | `prop_noticeBoard` | `noticeBoard` | Notice board with pinned papers (`ov.board`) |
 | `prop_kitChest` | `kitChest` | Iron-banded chest for ejected kits (`ov.chest`) |
 | `prop_lanternPost_lit`, `prop_lanternPost_unlit` | `lanternPost` | Lantern post, glass lit (`lantern`) or dark (`ov.lantern_0..3`) |
+| `prop_hq_0` .. `prop_hq_3` | `hq` (`<prefix>.hq_<station>`) | Round 8 (8G): an HQ station, one frame a tier shared by every role station: the staked site (0), the braced frame (1), boarded walls under an awning (2), the plastered, slate-roofed office with its lit sign (3). The row draws `prop_hq_0`; `view/hq/HqView.ts` swaps in `feed.hqTiers()`'s tier through `StaticView.setFrame` and throws `buildDust` on a rise seen happening |
 
 The bakery keys use the `kind` of `packages/content/data/scenes/bakery.json` `props[]`, or the id tail
 when the kind is not a prop name (`bk.flour_sacks` is a `taskSource`). A prop spanning several tiles is

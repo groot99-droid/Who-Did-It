@@ -456,11 +456,11 @@ describe("Crumb's Ovens' station rooms (A116, A118)", () => {
     for (const id of rooms) {
       const s = scenes[id];
       expect(
-        s.props.map((p) => p.kind),
+        s.props.filter((p) => p.kind !== 'dressing').map((p) => p.kind),
         id,
       ).toEqual([station[id]]);
       expect(routines.activities.work?.kinds, id).toContain(station[id]);
-      const f = s.props[0]!.footprint!;
+      const f = s.props.find((p) => p.kind === station[id])!.footprint!;
       for (let y = f.y; y < f.y + f.h; y++)
         for (let x = f.x; x < f.x + f.w; x++) {
           expect(s.grid[y]![x], `${id} ${x},${y}`).toBe('#');

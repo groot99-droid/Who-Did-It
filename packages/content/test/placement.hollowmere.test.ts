@@ -25,7 +25,6 @@ const RULES: PlacementRules = {
     bench: 'front',
     safe: 'front',
     flourBin: 'front',
-    deadLoaf: 'front',
     coldShelves: 'front',
     proofingCabinet: 'front',
     brickOven: 'front',
@@ -84,6 +83,90 @@ const RULES: PlacementRules = {
     coat_stand: 'free',
     nightstand: 'free',
     blanket_chest: 'free',
+    // The Drowned Lantern and its back room.
+    bottle_shelf: 'hung',
+    bottle_shelf_b: 'hung',
+    tide_chart: 'hung',
+    chalkboard: 'hung',
+    ship_wheel: 'hung',
+    store_shelf: 'hung',
+    store_shelf_b: 'hung',
+    inglenook_e: 'hungEast',
+    bar_counter: 'front',
+    bar_counter_taps: 'front',
+    bar_counter_lamp: 'front',
+    keg_rack: 'front',
+    piano: 'front',
+    tavern_table: 'free',
+    tavern_table_b: 'free',
+    card_table: 'free',
+    settle: 'free',
+    log_basket: 'free',
+    barrel: 'free',
+    bottle_crate: 'free',
+    rug: 'floor',
+    sawdust: 'floor',
+    // Widow Vane's.
+    tea_table: 'free',
+    writing_desk: 'front',
+    birdcage: 'free',
+    // Mallory's apothecary, and Hollowmere's shop counter (8C's `counter`).
+    counter: 'front',
+    counter_case: 'front',
+    counter_case_b: 'front',
+    apoth_drawers: 'front',
+    jar_shelf: 'hung',
+    jar_shelf_b: 'hung',
+    herb_rack: 'hung',
+    still: 'free',
+    mortar_table: 'free',
+    show_globe: 'free',
+    leech_jar: 'free',
+    drying_frame: 'free',
+    // Crumb's Ovens and its four rooms. A dead loaf lies on a stone ledge seen from any side.
+    deadLoaf: 'free',
+    bread_shelf: 'hung',
+    bread_shelf_b: 'hung',
+    peel_rack: 'hung',
+    cold_shelf: 'hung',
+    wall_bulb: 'hung',
+    bread_case: 'front',
+    cooling_rack: 'free',
+    bread_basket: 'free',
+    dough_trough: 'free',
+    shaping_table: 'free',
+    water_bucket: 'free',
+    milk_churn: 'free',
+    compressor: 'free',
+    couche_rack: 'free',
+    // Pennock's barn, the cellar under the square, and the tavern back room's black market (8D's).
+    harness_rack: 'hung',
+    tool_rack: 'hung',
+    lantern_hook: 'hung',
+    ossuary: 'hung',
+    cobweb: 'hung',
+    hay_bale: 'free',
+    feed_trough: 'free',
+    wine_cask: 'free',
+    blackMarket: 'free',
+    // The square, the house fronts, the platform's mail crane (8D's mailbag) and the quay.
+    mailbag: 'free',
+    // The wood beyond the gate, the deep wood and Vane's flooded gallery.
+    pit_prop: 'hung',
+    stump: 'free',
+    boulder: 'free',
+    fern: 'free',
+    fallen_log: 'free',
+    signpost: 'free',
+    woodpile: 'free',
+    lantern_pole: 'free',
+    rubble: 'free',
+    ore_pile: 'free',
+    mushrooms: 'floor',
+    leaf_litter: 'floor',
+    snare: 'floor',
+    bones: 'floor',
+    miners_lamp: 'floor',
     wakeTable: 'surface',
     plate: 'overlay',
     crepe: 'doorOverlay',
@@ -137,10 +220,21 @@ const RULES: PlacementRules = {
         'lamp_table',
         'dining_table',
         'nightstand',
+        'bar_counter_lamp',
+        'tavern_table',
+        'tavern_table_b',
+        'card_table',
+        'tea_table',
+        'counter',
+        'mortar_table',
+        'show_globe',
+        'shaping_table',
+        'wall_bulb',
+        'miners_lamp',
       ],
     },
-    lantern: { props: ['lanternPost', 'drowned_lantern'] },
-    fire: { props: ['oven', 'brickOven', 'fireplace_e'] },
+    lantern: { props: ['lanternPost', 'drowned_lantern', 'lantern_hook', 'lantern_pole'] },
+    fire: { props: ['oven', 'brickOven', 'fireplace_e', 'inglenook_e', 'still', 'clamp'] },
     torch: { props: [], wall: true },
     window: {
       props: ['window', 'stained_glass', 'stained_glass_e', 'draped_window'],
@@ -161,78 +255,7 @@ const RULES: PlacementRules = {
  * Scenes not yet dressed by 8J, with the problems they still have: each room's pull request fixes its scene and
  * takes it off this list, and the test fails on an entry that no longer fails, so the list only shrinks.
  */
-const PENDING: Partial<Record<SceneId, readonly string[]>> = {
-  overworld: [
-    'light ov.lt_tavern_window (window) at 31,35 hangs on nothing that could hold it',
-    'light ov.lt_bakery_window (window) at 44,20 hangs on nothing that could hold it',
-    'light ov.lt_apoth_window (window) at 53,25 hangs on nothing that could hold it',
-    'light ov.lt_chapel_window (window) at 11,30 hangs on nothing that could hold it',
-    'light ov.lt_platform (lantern) at 60,30 hangs on nothing that could hold it',
-  ],
-  tavern_bar: [
-    'prop tb.shutters faces south into no floor (its front is hidden)',
-    'wall-hung prop tb.shutters has no wall behind it',
-    'prop tb.flour_bin faces south into no floor (its front is hidden)',
-    'light tb.lt_hearth (fire) at 1,3 hangs on nothing that could hold it',
-    'light tb.lt_lamp_bar (lamp) at 15,2 hangs on nothing that could hold it',
-    'light tb.lt_lamp_room (lamp) at 7,8 hangs on nothing that could hold it',
-  ],
-  tavern_back: ['light tk.lt_lamp (lamp) at 6,4 hangs on nothing that could hold it'],
-  apoth_shop: [
-    'prop as.bench faces south into no floor (its front is hidden)',
-    'light as.lt_lamp (lamp) at 8,3 hangs on nothing that could hold it',
-    'light as.lt_shelf (lamp) at 4,1 hangs on nothing that could hold it',
-  ],
-  apoth_loft: ['light al.lt_green_lamp (lamp) at 6,1 hangs on nothing that could hold it'],
-  widow_parlour: [
-    'prop wp.letter_box faces south into no floor (its front is hidden)',
-    'spot wp.pantry faces south into no floor',
-    'light wp.lt_lamp (lamp) at 8,5 hangs on nothing that could hold it',
-  ],
-  widow_bedroom: ['light wb.lt_candle (lamp) at 6,1 hangs on nothing that could hold it'],
-  forest: ['light fo.lt_gate_lantern (lantern) at 21,28 hangs on nothing that could hold it'],
-  bakery: [
-    'prop bk.deadloaf_0 faces south into no floor (its front is hidden)',
-    'prop bk.deadloaf_1 faces south into no floor (its front is hidden)',
-    'prop bk.ledger faces south into no floor (its front is hidden)',
-    'light bk.lt_lamp_table (lamp) at 8,6 hangs on nothing that could hold it',
-    'light bk.lt_lamp_counter (lamp) at 14,6 hangs on nothing that could hold it',
-  ],
-  barn: [
-    'prop ba.study_key stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)',
-    'light ba.lt_lantern (lantern) at 10,6 hangs on nothing that could hold it',
-  ],
-  cellar: [
-    'prop cl.study_key stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)',
-    'prop cl.study_key faces south into no floor (its front is hidden)',
-    'wall-hung prop cl.study_key has no wall behind it',
-    'prop cl.gas_alcove_n stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)',
-    'prop cl.gas_alcove_s stands on a walkable tile or a door or spot (it is solid, so it needs a "#" tile)',
-    'light cl.lt_torch_well (torch) at 14,2 hangs on nothing that could hold it',
-    'light cl.lt_torch_trap (torch) at 25,8 hangs on nothing that could hold it',
-    'light cl.lt_torch_crypt (torch) at 2,8 hangs on nothing that could hold it',
-  ],
-  forest_deep: [
-    'prop fd.den faces south into no floor (its front is hidden)',
-    'light fd.lt_clamp (fire) at 37,8 hangs on nothing that could hold it',
-    'light fd.lt_drowned (lantern) at 10,29 hangs on nothing that could hold it',
-  ],
-  cave_gallery: [
-    'spot cg.ore_chute faces south into no floor',
-    'light cg.lt_lamp_ore (lamp) at 19,4 hangs on nothing that could hold it',
-  ],
-  crumb_cold: ['light cf.lt_lamp (lamp) at 6,3 hangs on nothing that could hold it'],
-  crumb_mixing: ['light cm.lt_lamp (lamp) at 5,4 hangs on nothing that could hold it'],
-  crumb_oven: [
-    'light co.lt_bulb (lamp) at 3,1 hangs on nothing that could hold it',
-    'light co.lt_oven (fire) at 6,3 hangs on nothing that could hold it',
-  ],
-  crumb_proofing: [
-    'light cp.lt_bulb_w (lamp) at 2,1 hangs on nothing that could hold it',
-    'light cp.lt_bulb_e (lamp) at 9,1 hangs on nothing that could hold it',
-    'light cp.lt_cabinet (lamp) at 5,4 hangs on nothing that could hold it',
-  ],
-};
+const PENDING: Partial<Record<SceneId, readonly string[]>> = {};
 
 const taskPropsOf = (sceneId: string): Set<string> =>
   new Set(
@@ -272,6 +295,10 @@ describe('the placement check', () => {
 
   it('refuses a wall-hung prop with floor behind it, and a front facing a wall', () => {
     const s = copy('tavern_bar');
+    Object.assign(
+      s.props.find((p) => p.id === 'tb.shutters')!,
+      { x: 14, y: 11 },
+    );
     expect(check(s)).toEqual(
       expect.arrayContaining([
         'prop tb.shutters faces south into no floor (its front is hidden)',
@@ -295,9 +322,9 @@ describe('the placement check', () => {
 
   it('refuses a lamp light with no lamp under it, and takes moonlight anywhere outside', () => {
     const s = copy('chapel');
-    s.lights!.find((l) => l.id === 'ch.lt_candles')!.x = 9;
+    s.lights!.find((l) => l.id === 'ch.lt_candles')!.x = 7; // the chancel floor beside the altar
     expect(check(s)).toEqual(
-      expect.arrayContaining(['light ch.lt_candles (lamp) at 9,1 hangs on nothing that could hold it']),
+      expect.arrayContaining(['light ch.lt_candles (lamp) at 7,1 hangs on nothing that could hold it']),
     );
     expect(check(copy('forest')).some((p) => p.includes('fo.lt_moon_clearing'))).toBe(false);
   });

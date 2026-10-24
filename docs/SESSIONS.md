@@ -3507,6 +3507,14 @@ an existing `apps/server/test/*.test.ts`, anything written into ROSW.
   its test, the registry, `board.ts` draws, the copy lines, `packages/shared/test/minigamesTap.test.ts`. Deliver a letter
   plays it (`letterTap`); the pump, the fence and the cold room stay where 6H's and the content tests pin them. Waits on
   6Z's `MinigameKind` line.
+- 2026-10-23: PR 4a (no behaviour change): `sim/tasks/complete.ts` (`atNode` and `completeTask`, moved out of
+  `Minigames.ts` so the co-op hold and the stations share them without a cycle), `rules/minigames.ts` gains `coopTicks`,
+  `coopDone`, `coopProgress` with `minigamesCoop.test.ts`. PR 4b (the co-op hold, GDD 3.5, A133 (11)): `sim/Coop.ts`
+  (`handleCoopHold`, `tickCoop`, the shared count per task), the pool admits the co-op task, one routing line in
+  `sim/Hold.ts` `runHolds`, the `coopHold` S2C row (6Z's, granted with the condition that every holder hears the same bytes, which `coopHold.test.ts` pins), tests in `test/coopHold.test.ts`. PR 4c (the
+  client, UI.md 14.38): the co-op spot offered to every seat at the shutters (`ui/tasks.ts`), the held `task` hold in
+  `M5bLayer.ts` with the prompt and bar fed by `coopHold` (`WorldFeedEvents.coopHold`, both feeds; the mock plays a
+  phantom second hand), the chores row, the copy; tests in `ui/tasks.test.ts`.
 - Read from ROSW (never written): the UDGT teardown chapters 00 to 03 on `claude/sweet-maxwell-lmsiw3`, and the Who Did It lore
   on `claude/sharp-mccarthy-pqi3ws` (the Canon Ledger, the Lamplighter's Round, the Gazette, the Tab Book, Fourteen Things, the
   Daybook of Crumb's Ovens, Hopscotch, three stories). Drifts noted for 6Z, not resolved here: the lore dates HollowMere to 1893

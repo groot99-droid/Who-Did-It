@@ -8,7 +8,7 @@
   "biome": "house",
   "dark": false,
   "size": { "w": 12, "h": 10 },
-  "notes": "Oil barrel (task tool).",
+  "notes": "Mrs Grieves's stores and card room; the oil barrel (task tool).",
   "worldRef": "4.3",
   "portals": [
     {
@@ -66,32 +66,45 @@
       "childOnly": false
     }
   ],
-  "props": [{ "id": "tk.oil_barrel", "kind": "taskSource", "x": 0, "y": 7, "item": "oil" }],
+  "props": [
+    { "id": "tk.oil_barrel", "kind": "taskSource", "x": 0, "y": 7 },
+    { "id": "tk.store_shelf_0", "kind": "dressing", "x": 2, "y": 0 },
+    { "id": "tk.store_shelf_b_0", "kind": "dressing", "x": 3, "y": 0 },
+    { "id": "tk.store_shelf_1", "kind": "dressing", "x": 8, "y": 0 },
+    { "id": "tk.store_shelf_b_1", "kind": "dressing", "x": 9, "y": 0 },
+    { "id": "tk.card_table", "kind": "dressing", "x": 5, "y": 4 },
+    { "id": "tk.tin_crate", "kind": "dressing", "x": 10, "y": 1 },
+    { "id": "tk.barrel_0", "kind": "dressing", "x": 1, "y": 8 },
+    { "id": "tk.barrel_1", "kind": "dressing", "x": 2, "y": 8 },
+    { "id": "tk.bottle_crate", "kind": "dressing", "x": 3, "y": 8 },
+    { "id": "tk.flour_sacks", "kind": "dressing", "x": 6, "y": 8 },
+    { "id": "tk.shop_black_market", "kind": "blackMarket", "x": 10, "y": 3 }
+  ],
   "gates": [],
   "paths": [],
-  "lights": [{ "id": "tk.lt_lamp", "kind": "lamp", "x": 6, "y": 4, "radiusTiles": 2 }],
+  "lights": [{ "id": "tk.lt_lamp", "kind": "lamp", "x": 5, "y": 4, "radiusTiles": 2 }],
   "grid": [
     "######D#####",
-    "#.....S....#",
+    "#.....S...##",
     "#H.........#",
-    "#..........#",
-    "#..........#",
+    "#.........##",
+    "#....#.....#",
     "#..........#",
     "#.......SD.#",
     "#..........#",
-    "#.........B#",
+    "####..#...B#",
     "############"
   ],
   "material": [
-    "WWWWWWWWWWWW",
+    "WWPPWWWWPPWW",
+    "WwwwwwwwwwPW",
     "WwwwwwwwwwwW",
-    "WwwwwwwwwwwW",
-    "WwwwwwwwwwwW",
-    "WwwwwwwwwwwW",
+    "WwwwwwwwwwPW",
+    "WwwwwPwwwwwW",
     "WwwwwwwwwwwW",
     "WwwwwwwwwwwW",
     "PwwwwwwwwwwW",
-    "WwwwwwwwwwwW",
+    "WPPPwwPwwwwW",
     "WWWWWWWWWWWW"
   ]
 }

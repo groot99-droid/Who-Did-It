@@ -8,7 +8,7 @@
   "biome": "house",
   "dark": false,
   "size": { "w": 12, "h": 9 },
-  "notes": "Single candle.",
+  "notes": "A single candle by the bed; the mirror hung in black; his photographs over the bed.",
   "worldRef": "4.3",
   "portals": [
     {
@@ -55,27 +55,47 @@
       "childOnly": false
     }
   ],
-  "props": [{ "id": "wb.candle", "kind": "lamp", "x": 6, "y": 0 }],
+  "props": [
+    { "id": "wb.candle", "kind": "lamp", "x": 7, "y": 3 },
+    { "id": "wb.photos", "kind": "decor", "x": 8, "y": 0 },
+    { "id": "wb.draped_window", "kind": "dressing", "x": 5, "y": 0 },
+    { "id": "wb.dressing_table", "kind": "dressing", "x": 3, "y": 1 },
+    { "id": "wb.washstand", "kind": "dressing", "x": 6, "y": 1 },
+    { "id": "wb.blanket_chest", "kind": "dressing", "x": 8, "y": 4 },
+    { "id": "wb.linen_press", "kind": "dressing", "x": 10, "y": 3 },
+    { "id": "wb.rug", "kind": "dressing", "x": 5, "y": 5 }
+  ],
   "gates": [],
   "paths": [],
-  "lights": [{ "id": "wb.lt_candle", "kind": "lamp", "x": 6, "y": 1, "radiusTiles": 1.5 }],
+  "lights": [
+    { "id": "wb.lt_candle", "kind": "lamp", "x": 7, "y": 3, "radiusTiles": 2 },
+    {
+      "id": "wb.lt_window",
+      "kind": "window",
+      "x": 5,
+      "y": 0,
+      "radiusTiles": 2.5,
+      "phases": ["day", "dusk"]
+    },
+    { "id": "wb.lt_moon", "kind": "moon", "x": 5, "y": 0, "radiusTiles": 2, "phases": ["night"] }
+  ],
   "grid": [
     "############",
-    "#H........B#",
+    "#H.#..#...B#",
     "#..........#",
-    "#.......H..#",
-    "#..........#",
+    "#......#H.##",
+    "#.......#..#",
     "#..........#",
     "#..........#",
     "#..S.......#",
     "###D########"
   ],
   "material": [
-    "WWWWWWPWWWWW",
+    "WWWWWPWWPWWW",
+    "WwwPwwPwwwwW",
     "WwwwwwwwwwwW",
-    "WwwwwwwwwwwW",
-    "WwwwwwwwwwwW",
-    "WwwwwwwwwwwW",
+    "WwwwwwwPwwPW",
+    "WwwwwwwwPwwW",
     "WwwwwwwwwwwW",
     "WwwwwwwwwwwW",
     "WwwwwwwwwwwW",
