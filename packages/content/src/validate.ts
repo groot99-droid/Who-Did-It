@@ -26,6 +26,8 @@ import { checkVendettas } from './validateVendettas.js';
 import type { EconomyFile } from './schemas/economy.js';
 import { checkEconomy } from './validateEconomy.js';
 import { checkRelations } from './validateRelations.js';
+import type { LoreFile } from './schemas/lore.js';
+import { checkLore } from './validateLore.js';
 
 export interface Content {
   palette: PaletteFile;
@@ -60,6 +62,8 @@ export interface Content {
   economy: EconomyFile;
   // Round 8 (GDD 3.22), Session 8B.
   relations: RelationsFile;
+  // Round 8 (GDD 3.26), 7M.
+  lore: LoreFile;
 }
 
 const maxProfile = (a: Profile, b: Profile): Profile => (PROFILE_RANK[a] >= PROFILE_RANK[b] ? a : b);
@@ -260,6 +264,8 @@ export function validateContent(c: Content): string[] {
   // Round 8 (GDD 3.22): the relations table's sides and the inspect bands.
   checkRelations(c, err);
   checkShops(c, err);
+  // Round 8 (GDD 3.26): the shelf reader's books, letters, ledgers and clippings.
+  checkLore(c, err);
 
   return errors;
 }
