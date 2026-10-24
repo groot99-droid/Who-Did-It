@@ -111,7 +111,8 @@
   },
   "finalNight": {
     "afterCycle": 5,
-    "huntS": 90,
+    "huntS": 45,
+    "trialS": 120,
     "killCooldownS": 20,
     "skipAllowed": false,
     "tieEjectsNobody": true,
@@ -171,6 +172,7 @@
     "goat": 4,
     "wispRattle": 2,
     "shot": 10,
+    "shout": 8,
     "portalFactor": 0.5,
     "gddRef": "3.7"
   },
@@ -238,6 +240,8 @@
     "ready": { "delayS": { "min": 2, "max": 9 } },
     "aloneKill": { "afterS": 30, "sightTiles": 20 },
     "nightPower": { "windowFrac": { "min": 0.1, "max": 0.8 }, "lastShotS": { "min": 2, "max": 8 } },
+    "hive": { "staggerS": { "min": 0.3, "max": 2.5 }, "memoryS": 10 },
+    "body": { "pullTiles": 10, "shoutTiles": 5, "bellTiles": 2 },
     "stuckInvariantS": 20,
     "gddRef": "3.12"
   },

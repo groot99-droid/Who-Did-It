@@ -175,15 +175,23 @@ describe('the style formula and the pixel finish (ASSETS 6.4, 6.11)', () => {
     expect(style.pixelFinish.enabled).toEqual({ main: true });
   });
 
-  it('ships the 8-bit and low-poly art styles, 8-bit by default, HD reserved (A79)', () => {
+  it('ships the 8-bit, low-poly and HD art styles, 8-bit by default, nothing reserved (A79, A164)', () => {
     const a = style.artStyles;
     expect(a.default).toBe('8bit');
-    expect(a.reserved).toEqual(['hd']);
+    expect(a.reserved).toEqual([]);
     expect(a.styles.map((s) => [s.id, s.pixelFinish, s.filter, s.root])).toEqual([
       ['8bit', true, 'nearest', ''],
       ['lowpoly', false, 'linear', 'lowpoly/'],
+      ['hd', false, 'linear', 'hd/'],
     ]);
     for (const s of a.styles) expect(s.drawScale, s.id).toBe(metrics.iso.artScale);
+  });
+
+  it('gates HD on the device (art.md 3, GDD 3.13) and the other styles on nothing', () => {
+    const by = Object.fromEntries(style.artStyles.styles.map((s) => [s.id, s.requires]));
+    expect(by['8bit']).toBeUndefined();
+    expect(by['lowpoly']).toBeUndefined();
+    expect(by['hd']).toEqual({ screenHeightPx: 900, deviceMemoryGb: 4, texturePx: 4096 });
   });
 });
 

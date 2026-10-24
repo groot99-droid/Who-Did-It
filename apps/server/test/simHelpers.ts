@@ -24,6 +24,28 @@ export interface Match {
 
 export const stateOf = (bot: Bot) => bot.room.state as unknown as GameStateType;
 
+const isConnReset = (err: unknown): boolean => {
+  const e = err as { code?: string; cause?: { code?: string } } | undefined;
+  return e?.code === 'ECONNRESET' || e?.cause?.code === 'ECONNRESET';
+};
+
+/**
+ * Creates the leader's party. Round 8 (granted by 6Z): after a test that blocks the event loop for
+ * seconds (invariants.test.ts's auto match), the server's keep-alive timer can close the idle socket
+ * just as the next matchmake request reuses it, and CI saw `MatchMakeError: fetch failed` (ECONNRESET).
+ * Only that connect error is retried, at most twice, with a short backoff.
+ */
+async function createParty(colyseus: ColyseusTestServer): Promise<Room> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await colyseus.sdk.create('party', opts('Bot0'));
+    } catch (err) {
+      if (attempt >= 2 || !isConnReset(err)) throw err;
+      await sleep(50 * (attempt + 1));
+    }
+  }
+}
+
 /**
  * Creates a party of `n` bots, starts the world with the debug helper and waits until all are placed.
  * Every server message is recorded (`lastEvent`). `roles` writes a role white-box per bot name (the
@@ -35,7 +57,7 @@ export async function startMatch(
   n: number,
   roleByName: Record<string, string> = {},
 ): Promise<Match> {
-  const leader = await colyseus.sdk.create('party', opts('Bot0'));
+  const leader = await createParty(colyseus);
   const rooms = [leader];
   for (let i = 1; i < n; i++) rooms.push(await colyseus.sdk.joinById(leader.roomId, opts(`Bot${i}`)));
   const bots: Bot[] = rooms.map((room) => {

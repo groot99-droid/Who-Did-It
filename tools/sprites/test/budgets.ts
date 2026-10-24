@@ -12,6 +12,8 @@ export const BUDGET = {
   introVideoBytes: 5 * MB,
   posterBytes: 60 * 1000,
   firstLoadBytes: 12 * MB,
+  /** The HD style (A164): every file under `assets/hd/`, fetched only when a player picks HD; inside the site cap. */
+  hdBytes: 80 * MB,
   siteBytes: 150 * MB,
 } as const;
 

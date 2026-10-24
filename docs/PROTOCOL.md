@@ -60,6 +60,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). |
 | `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). |
 | `noise` | `{ sceneId: string; x: number; y: number; kind: string }` | - |
+| `shout` | `{ sceneId: string; x: number; y: number }` | Where the shout rang; names no seat, no card and no body. |
 | `error` | `{ code: ErrorCode; msg: string }` | - |
 | `vfx` | `{ sceneId: string; x: number; y: number; kind: 'disguise' }` | To every client whose view holds that scene: the puff of a disguise a Knife strike dropped, at (x, y). Names no handle or seat. Sent only from `handleKill` (GDD 3.17). |
 | `aim` | `{ endsTick: number }` | Private, a dying Gamekeeper: pick a seat with `act.ability {abilityId: 'lastShot'}` before `endsTick` (GDD 3.2). |
@@ -71,6 +72,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `inspect.noticed` | `{ lookId: string }` | Private, round 8: the look the inspector is drawn as. |
 | `inspect.hunch` | `{ copyId: string }` | Private, round 8: an `inspect.hunch.*` copy id. |
 | `shop.open` | `{ shopId: string; stock: Array<{ itemId: string; price: number }>; buys: Array<{ itemId: string; price: number }>; }` | Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. |
+| `coopHold` | `{ taskId: string; holders: number; progress: number }` | Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 
