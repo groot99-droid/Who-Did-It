@@ -46,13 +46,13 @@ Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accompl
 | **Killer** (Cabal) | Yes | Parity (6+), or living Village <= 1 (4-5), or the Final Night vote fails | Knife (bound), Skeleton Key, Bloody Rag x2, Bucket | **Kill** (CD by table; resolved on the validated tick; spawns clues; you gain Blood 60 s) (M3: reach 1.5 tiles plus what the target moved in the last 250 ms, with a clear straight line; a protected target voids the strike, spends the protection, and you still gain Blood and rest the Knife; the victim becomes a ghost at once, the body and both clues appear in the scene, a scream rings within 8 tiles.) (M5a: only at dusk, at night and in the Final Night hunt.) **Impersonate** (dusk, night and the Final Night hunt; 45 s CD from the drop): for 15 s your character shows one living seat's name, look, scarf and hat glyph, at your own height; the face changes and drops only out of sight, except that your next Knife strike drops it in place with a puff (3.17). **Drag body** (hold E, 50% speed; into a body spot = hidden; leaves a drag smear). | Walk in a borrowed character. Strike after dark when the room is empty, clean one clue, wash at the well, then be the loudest voice asking who did it. | Clues match your own traits whatever face you wear; your height never changes; Blood shows within 3 tiles; a guarded target voids your kill. |
 | **Accomplice** (Cabal) | Yes | As Killer | Plant Kit x3, Crowbar | **Plant Clue** (60 s CD): a footprint or thread with chosen traits. **Crowbar**: break a locked door (5 s, noise 10). (M5a) **Inherit**: when the last Killer dies or is ejected the Knife passes to you (kill CD +10 s; your Hunger clock starts in the round you inherit). The seat then plays as the **heir** card (`roles.json` `heir`: the Accomplice's kit and Plant Clue and Crowbar, plus the Knife); its public look is unchanged and only a private message tells it. | You never hold the knife, only the alibi. Forge trails, break the right doors, vouch at the right moment. | Inspect marks plants Forged; a Forged entry tells the village an Accomplice exists; your cover is a claim someone may test. |
 | **Detective** (Village) | No | All Cabal dead or ejected | Magnifier, Notebook, Lens x3, Fingerprint Kit | **Inspect** (3 s, 1 Lens; +1 Lens per meeting, max 3): reveals a clue's hidden attribute, exposes forgeries, marks it Verified. **Dust / Compare**: lift a print (2 charges) and compare any two: Match / No match. | Collect, inspect, cross-reference. Your Verified clues narrow the board; the village does the rest. | Prime target; the Rag erases clues; forgeries cost Lenses; Compare never gives a name. If you die the Magnifier drops and anyone can Inspect in 6 s. |
-| **Doctor** (Village) | No | Village | Medkit x2, Bandage x2, Salts x1 | **Bandage** (60 s CD, not self): (M3: instant, 1.5 tiles, one Bandage from the kit; the knockback, blackout and witness entries come with M4.) the target survives the next kill attempt within 60 s; both are knocked back, the target's screen blacks out 1.5 s and gets the attacker's height as a Claimed entry; witnesses within 3 tiles get height + scarf as Claimed; the attacker still gains Blood. **Autopsy** (8 s): time of death +/-45 s and cause (knife / wolf / poison / shot), posts Verified. **Salts**: cure Wounded or Snare. | Keep people alive and read the dead. Your autopsy says when; that is what breaks alibis. | Two-Killer games outpace your bandages. |
+| **Doctor** (Village) | No | Village | Medkit x2, Bandage x2, Salts x1 | **Bandage** (60 s CD, not self): (M3: instant, 1.5 tiles, one Bandage from the kit; the knockback, blackout and witness entries come with M4.) the target survives the next kill attempt within 60 s; both are knocked back, the target's screen blacks out 1.5 s and gets the attacker's height as a Claimed entry; witnesses within 3 tiles get height + scarf as Claimed; the attacker still gains Blood. **Autopsy** (8 s): time of death +/-45 s and cause (knife / wolf / poison / shot), posts Verified. **Salts**: cure Slowed or Poisoned (3.22). | Keep people alive and read the dead. Your autopsy says when; that is what breaks alibis. | Two-Killer games outpace your bandages. |
 | **Vicar** (Village) | No | Village | Candle x2, Pocket Watch | (M5a) **Hear Confession** (night power, once per night, not self): pick a seat from the list; your Notebook gets its faction (Village, Cabal or Neutral) as Verified. | Everyone in Hollowmere confesses to you sooner or later. Each night, learn where one soul stands, then choose how much to say. | Everyone can see you are the Vicar, the Cabal first among them; if your card was not dealt, a Cabal player may wear your face and lie in your name. |
 | **Watchman** (Village) | No | Village | Lantern, Pocket Watch | (M5a) **Keep Watch** (night power, once per night; not self, and never the seat you watched the night before): the seat survives the first Knife strike before the night ends; the strike fails as on a Bandaged target, and your Notebook gets "Your watch held" as Verified. | You walk the lanes after dark. Each night, choose one door to stand by; if a blade comes for that soul tonight, it fails. | You cannot watch yourself or the same soul two nights running; poison and the Gamekeeper's shot go past you. |
 | **Herbalist** (Village) | No | Village | Remedy x1, Nightshade x1, Candle | (M5a) **Remedy** (night power, once per match, self allowed): the seat survives the first Knife strike before the next meeting opens; your Notebook records it when it holds. **Nightshade** (night power, once per match, not self): the seat dies when the night ends, wherever it stands, and leaves no trait clues. | One bottle saves, one bottle ends. Pour the first where the knife will fall and the second only where you are certain. | Nightshade kills a villager as readily as a killer, and a Remedy cannot stop it. |
 | **Gamekeeper** (Village) | No | Village | Fowling Piece (bound), Lantern | (M5a) **Last Shot** (passive): when you are killed, poisoned or ejected you have 10 s, before you learn any role, to pick one living seat from the list; it dies too (a shot rings 10 tiles where it stands). You may hold your fire. (M5a) A Knife strike blacks out your screen at once, as a Bandaged target's does: you aim from the list on what you saw before the blow. | Vane paid you to keep the wood. If they come for you, you will not go alone; make sure the one you take is the one who came. | You never see the blow that fells you, and the face that walked up may have been borrowed; a wasted shot kills a friend. |
 | **Butler** (Village; not dealt until M4) | No | Village | Master Keyring, Candle x2 | **Lock / Unlock** any house door instantly (10 s CD; locks keep people out, never in). **Ledger**: at each meeting, privately lists for each living player the last house they entered this cycle (house only, no time). | You know every door in Hollowmere. Control the wings, read the ledger, say who went where. | Universal access makes you the obvious suspect; Skeleton Key use looks like yours. |
-| **Child** (Village; not dealt until M4) | No | Village | Slingshot, Chalk, Candle | **Silent hide** (instant, no noise; adults cannot Check a crawlspace). **Witness** (passive): with line of sight within 6 tiles of a kill, "The Child saw it" posts height + scarf as Verified at the next meeting. **Slingshot**: 1 s stun (30 s CD). | You are small and quiet. Hide, watch, remember. | Top kill target; vision -1 tile; cannot pick up items. |
+| **Child** (Village; not dealt until M4) | No | Village | Slingshot, Chalk, Candle | **Silent hide** (instant, no noise; adults cannot Check a crawlspace). **Witness** (passive): with line of sight within 6 tiles of a kill, "The Child saw it" posts height + scarf as Verified at the next meeting. **Slingshot**: a small hit from 5 tiles that Stuns (3.22; 30 s CD). | You are small and quiet. Hide, watch, remember. | Top kill target; vision -1 tile; cannot pick up items. |
 | **Townsfolk** (Village), dealt as the professions below | No | Village | Lantern, Pocket Watch, Chalk, Rope | **Tasks**. **Chalk**: floor marks visible to all. **Rope**: free a snared player. Two Emergency Bell pulls per match (others have one). | Do your chores with others to build alibis, mark what you see, vote with evidence. | Weak alone; strong in pairs. |
 | **Lamplighter**, **Baker**, **Fisher**, **Tinner** (Village, professions) | No | Village | As Townsfolk | As Townsfolk | Lamplighter: You light the lanterns that keep the wolves off the square. Work beside others, mark what you see, vote with evidence. Baker: Up before anyone, flour to the elbows. Do your chores in company, mark what you see, vote with evidence. Fisher: The fog keeps the boats in. Mend the nets beside a neighbour, mark what you see, vote with evidence. Tinner: The mine is shut; your hands are not. Work in pairs, mark what you see, vote with evidence. | As Townsfolk |
 | **Drifter** (Neutral) | Yes | Get ejected (solo win; the match continues and the end screen lists you among the winners). | Replica Knife, Bloody Rag x1 | **Act Shifty**: fake noise rings (20 s CD). **Fake Blood**: 30 s (1 use, world only; meetings show portraits). | You want to hang. Be suspicious enough to be voted out, not so obvious they ignore you. | A calm village; dying to the Killer is a loss; counts as nobody for parity; you wear a cover like the Cabal, but alone. |
@@ -133,8 +133,9 @@ Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife,
 | Bloody Rag, Bucket | Erase one clue; wash Blood at water | V1 |
 | Plant Kit, Crowbar | Fake trait clue; break a locked door (door stays broken) | V1 |
 | Magnifier, Notebook, Lens, Fingerprint Kit | Inspect; auto-log; charges; Dust and Compare | V1 |
-| Medkit, Bandage, Salts | Heal 1 HP; kill immunity 60 s; cure status | V1 |
-| Remedy, Nightshade, Fowling Piece | Herbalist's save and poison (one each); the Gamekeeper's Last Shot | V1 |
+| Medkit, Bandage, Salts | Heal and stop Bleeding; kill immunity 60 s and stop Bleeding; cure Slowed or Poisoned (3.22) | V1 |
+| Remedy, Nightshade, Fowling Piece | Herbalist's save and poison (one each), and the Remedy cures Poisoned by day (3.22); the Gamekeeper's Last Shot | V1 |
+| Wake Loaf | Food: cures Famished and Weakened and restores stamina (3.22) | V1 |
 | Lantern, Candle | Carried light radius 4 / 2; wolves flee light within 4 tiles; off = stealthier | V1 |
 | Pocket Watch, Chalk, Rope | Time; floor marks; free a snared player | V1 |
 | Oil, Wrench, Planks, Letter, Flour | Task deliverables fetched from other scenes | V1 |
@@ -148,7 +149,7 @@ Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife,
 
 ### 3.6 PvE
 
-Players have 2 HP, regenerating 1 per 90 s; the Knife does 2. At 1 HP you are **Wounded**: 0.8x speed and a drip trail for 20 s. **Wolves** (3, forest interior loops, night): 1 damage, chase unlit players, flee any lantern or candle within 4 tiles, die to one bolt, blocked by a mended fence; a broken fence pulls one wolf into the village at night (the Cabal's reason not to mend it). The forest gate has a 6-tile safe clearing. V1 has no well fall and no bear traps; the well ladder into the cellar (`ov.well`) opens at the Large profile in V1 as a plain portal. V1.5: bear traps placed by the Ranger, a Shove verb at the well. V2: the Beast and Cave Gate, bats, bog lurker, crows.
+Round 8 (3.22, DECISIONS A134, A136) replaced the two-hit-point model: a seat has `body.maxHp` (100) health, and the Knife still kills outright whatever the health (A89). Under `body.woundedBelow` (30) you are **Wounded**: 0.8x speed and a drip trail until healing takes you back over the threshold (`effects.json` `wounded`). **Wolves** (3, forest interior loops, dusk and night): a bite takes 25 health and starts Bleeding half the time (3.15), chase unlit players, flee any lantern or candle within 4 tiles, die to one bolt, blocked by a mended fence; a broken fence pulls one wolf into the village at night (the Cabal's reason not to mend it). The forest gate has a 6-tile safe clearing. V1 has no well fall and no bear traps; the well ladder into the cellar (`ov.well`) opens at the Large profile in V1 as a plain portal. V1.5: bear traps placed by the Ranger, a Shove verb at the well. V2: the Beast and Cave Gate, bats, bog lurker, crows.
 
 ### 3.7 Stealth, hiding and doors
 
@@ -420,12 +421,12 @@ which never strays further from it than its `leashTiles` and walks its `pathId` 
 at most 3 spawners (`mobs.maxPerScene`). Creatures are not seats: they carry no handle, no role and no look, and
 they are drawn from the scene state for everyone in the scene.
 
-| Creature | Where | Speed | Senses | Flees light within | Attack | Kills |
-|---|---|---|---|---|---|---|
-| Wolf | the forests' wolf loops, dusk and night | 3.6 tiles/s | 6 tiles | 4 tiles | after 1 s in reach | yes |
-| Boar | the Fenwood, Blackpine Woods, day and dusk | 3.2 tiles/s | 4 tiles | 2 tiles | after 1.5 s in reach | no |
-| Bat | the caves | 4 tiles/s | 5 tiles | 3 tiles | after 2 s in reach | no |
-| Rat | the caves past the Tin Gallery mouth | 2.5 tiles/s | 3 tiles | 2 tiles | after 2 s in reach | no |
+| Creature | Where | Speed | Senses | Flees light within | Attack | Bite (3.22) | Health | Kills |
+|---|---|---|---|---|---|---|---|---|
+| Wolf | the forests' wolf loops, dusk and night | 3.6 tiles/s | 6 tiles | 4 tiles | after 1 s in reach | 25, Bleeding 50% | 36 | yes, cause `wolf` |
+| Boar | the Fenwood, Blackpine Woods, day and dusk | 3.2 tiles/s | 4 tiles | 2 tiles | after 1.5 s in reach | 18, Bleeding 30% | 48 | yes, cause `creature` |
+| Bat | the caves | 4 tiles/s | 5 tiles | 3 tiles | after 2 s in reach | 6 | 10 | yes, cause `creature` |
+| Rat | the caves past the Tin Gallery mouth | 2.5 tiles/s | 3 tiles | 2 tiles | after 2 s in reach | 5, Poisoned 50% | 8 | yes, cause `creature` |
 
 **Behaviour.** A creature idles or roams its loop; it chases a living seat it senses and can see (3.7) for at most
 6 s (`mobs.chaseS`), then returns to its spawner and starts no new chase for as long; it flees any lit flame within
@@ -433,21 +434,23 @@ its flee radius, carried or standing (a lit carried light, or a burning lantern,
 moss, moonlight, daylight shafts and windows are not flames), and walks home once out of its reach. (6G) It walks
 tile paths whose every tile lies inside its leash, so it never strays further; a loop point beyond the leash is
 pulled in to its edge, and at each point it pauses as a wandering NPC does (`npc.wander.stepMinS` to `stepMaxS`). A
-seat in transit or a ghost is never sensed, and nothing it senses depends on a card. (6G) Its attack lands 1 damage
-(`health.wolfDamage`) each time the seat has stayed in reach (1.5 tiles, 3.7) and in sight for its attack time.
-Creature bites are the only damage the server counts in hit points: a seat regains 1 HP every 90 s after its last
-bite, up to 2 (3.6), and Wounded's slower walk and drip trail are not applied yet. A wolf's bite that takes a seat to
-0 HP is a death with the cause `wolf`: the body is left where it fell and the kill scream rings (3.7), with no clue
-of a killer, so the Killer's "blame the wolves" cover of WORLD 4.6 has a real alibi; the other creatures wound but
-never take a seat below 1 HP. (6G) Wolves keep 3.6's flee radius (`balance.wolves.fleeLightTiles`, which their row
+seat in transit or a ghost is never sensed, and nothing it senses depends on a card. (6G; round 8, 8A) Its attack
+lands its row's bite (`mobs.json` `dmg`, each effect by its chance) each time the seat has stayed in reach (1.5
+tiles, 3.7) and in sight for its attack time; a bite is a row of the damage table of 3.22, so the health it takes
+regenerates and its Bleeding or Poisoned is cured like any other hit's. A bite that takes a seat to zero health is a
+death, cause `wolf` for a wolf and `creature` for the boar, the bat and the rat (the owner's answer, DECISIONS A134:
+creatures kill): the body is left where it fell and the kill scream rings (3.7), with no clue of a killer, so the
+Killer's "blame the wolves" cover of WORLD 4.6 has a real alibi. A creature's own health (`mobs.json` `hp`, the
+table's Health column) is what a seat's fists must take to kill it (3.22, A142). (6G) Wolves keep 3.6's flee radius (`balance.wolves.fleeLightTiles`, which their row
 equals) and stay in the woods by their leash; the mended fence and the bolt do not touch them yet. An NPC seat a
 creature chases runs for the nearest open door of its scene and takes it, or straight away from the creature when
 there is none (3.12; live once the NPC brain's call lands, DECISIONS A89). Creatures use the `mobs` random stream,
 keyed per spawner, and never a secret stream.
 
-**Hit points and how a creature is drawn (round 8, 8G).** Each creature row carries `hp`: the wolf 36, the boar 48,
-the bat 10 and the rat 8. Fists, bolts and lights take them off (3.22; the damage is 8A's table), and a creature at
-0 dies. Everyone in the scene sees the same creature: its bite as a sequence (it crouches, lunges and bites, then
+**How a creature is drawn (round 8, 8G).** Fists, bolts and lights take a creature's health off (3.22; the damage
+is 8A's table) and a creature at zero health dies, where it lies for `body.creatureCorpseS` 10 s before its row goes;
+its spawner stands empty until its next waking part of the day (3.22).
+Everyone in the scene sees the same creature: its bite as a sequence (it crouches, lunges and bites, then
 recoils), a flinch with a white flash when a hit lands, a `flee` gait while it runs from a light, and a fall onto
 its side when it dies, where it lies until the server removes it and then fades. Under reduced motion the flash
 and the fade are cut and the clips still play. None of this carries a card or a seat.
@@ -705,17 +708,89 @@ The numbers are `balance.json` `party` (`profileCodeLength`, `friendsMax`, `invi
 
 ### 3.22 Bodies: health, stamina and effects
 
-Round 8 (DECISIONS A134, A135; the contract is `docs/round8/body.md`). Every seat has health and stamina, which only
-the seat itself sees. Attacks drain health by the damage table, and effects (Slowed, Wounded, Bleeding, Weakened,
-Poisoned, Fatigued, Stunned, Dazed, Famished, Knocked out) apply, tick and are cured as listed. Every card can
-strike with its fists.
-- **Death.** A seat dies only to creatures, to Bleeding or Poisoned at zero health, and to the existing kills (the
-  Knife, Nightshade's poison, the last shot, ejection).
-- **Knockout.** Fists, a mugging or the slingshot at zero health knock a seat out, and it wakes Dazed.
-- **Inspect.** Anyone can inspect a seat or a figure in reach and learns only its physical signs.
+Round 8 (DECISIONS A134, A135, A136; the contract is `docs/round8/body.md`). Every seat has a body: health, stamina
+and the effects on it, in room memory and sent only to the seat itself (`Private.body`, schema version 6). No other
+client and no public field ever carries a number of it: the drawn figure shows only the physical signs of the
+effects table (its `statusBits`) and the one-shot clips of a hit, a knockdown and a getting up. A ghost has no body.
+NPC seats have bodies like anyone; ambient townsfolk (3.24) hold a reduced one, health and effects without stamina.
+The numbers are `balance.json` `body` and `effects.json`.
 
-Session 8A writes this section's rules and corrects 3.6 and 3.15 where the two-hit-point model is replaced; 8B
-writes the inspect paragraph. The numbers are `balance.json` `body` and `effects.json`.
+**Health.** `body.maxHp` 100. Out of combat (no hit for `body.regenAfterS`, 8 s) it regenerates `body.regenHpPerS`
+2 per second, never while Bleeding or Poisoned. Under `body.woundedBelow` 30 the seat is Wounded (3.6).
+
+**Stamina.** `body.maxStamina` 100. Running costs `body.runCostPerS` 12 per second; walking and standing regain
+`body.staminaRegenPerS` 6 per second (half that while Famished). At zero the seat is **Fatigued**: it walks when it
+asks to run and strikes slower, until stamina is back over `body.fatigueRecover` 25. A strike costs
+`body.strikeStamina` 15.
+
+**The damage table.** Every attack but the Knife is a row with its damage, the chance of each effect and what zero
+health from it means. The Knife, Nightshade's poison, the Last Shot and the vote kill as before (3.2, 3.8), whatever
+the health (A89). A Weakened striker's fist lands half its damage.
+
+| Source | Damage | Effects it may apply | At zero health |
+|---|---|---|---|
+| Fists (`strike`, every card) | 8 | Dazed 10%, Weakened 20% | knocked out |
+| Mugging blow (3.24) | 8 | as fists | knocked out |
+| Slingshot (`slingshot`, the Child) | 4 | Stunned | knocked out |
+| Wolf bite | 25 | Bleeding 50% | death, cause `wolf` |
+| Boar bite | 18 | Bleeding 30% | death, cause `creature` |
+| Bat bite | 6 | none | death, cause `creature` |
+| Rat bite | 5 | Poisoned 50% | death, cause `creature` |
+| Bleeding | 1.5 per second | none | death, cause `bled` |
+| Poisoned | 0.5 per second | Weakened, 2% per second | death, cause `sickened` |
+
+A death by `bled` or `sickened` leaves the body where the seat fell, with no scream, no killer and no clue; a death by
+`creature` is like `wolf` (3.15). The dead seat's body row empties with the ghost handoff. Bodies tick only in the
+world phases: a meeting, the role card and game over freeze health, stamina and every effect clock. Effect chances
+roll on the body's own stream, never a secret one.
+
+**Fists** (`strike`): every card, in every world phase, a 2 s cooldown and 1.2 tiles of reach (`abilities.json`), at
+the stamina cost above. It hurts seats, ambient townsfolk and creatures; a creature at zero health (`mobs.json` `hp`,
+3.15) dies where it stands and lies there for `body.creatureCorpseS` 10 s (A142), then its row goes and its spawner
+stands empty until the creature's next waking part of the day; a corpse is no target. The swing is public to everyone
+who can see it (3.7) and leaves no clue unless blood is drawn. A strike names its target as the Kill does (an avatar
+handle, 3.17) or by a creature's id; a knocked-out seat is refused, never struck again. A Fatigued striker's cooldown
+is 1.5x. The Child's **slingshot** (`slingshot`) is a small hit from 5 tiles with the Slingshot in the kit, every 30 s,
+and Stuns.
+
+**The knockout.** At zero health from fists, a mugging or the slingshot the seat is knocked out for `body.koS` 20 s:
+it lies where it fell (`down`), cannot move, act or hold, takes no second knockout, and drops the hold it had; the
+knockout drops `body.koPurseShare` (half) of its purse where it lies (3.23, with 8C). It wakes at `body.koWakeHp` 20
+health, Dazed; a meeting's gather wakes it at once. A knockout is never a death: no body on the floor, no meeting, no
+clue but the dropped coins. A killing bite still kills a downed seat. Keep Watch and the Remedy refuse a knocked-out
+seat as a target (body.md 5); the Knife, Nightshade and the Last Shot do not.
+
+**Effects.** Each is a row of `effects.json`. A timed effect's fresh application restarts its clock and adds a stack;
+an effect without a duration lasts until cured or until its condition ends. The sign is what everyone sees on the
+figure (its `StatusBit`, seams.md 2); an effect without one shows only to Inspect (8B).
+
+| Effect | Does | Lasts | From | Cured by | Sign |
+|---|---|---|---|---|---|
+| Slowed | 0.7x speed | 12 s | a snare, deep mud (to come) | time, Salts | limp |
+| Wounded | 0.8x speed, a drip trail | while health is under 30 | low health | healing over the threshold | limp |
+| Bleeding | 1.5 health per second, no regeneration | until cured | wolf and boar bites | Bandage, Medkit | bleeding, a drip trail |
+| Weakened | fists land half their damage | 60 s | heavy hits, Poisoned | food | none |
+| Poisoned | 0.5 health per second, no regeneration, Weakened 2% per second | 90 s | rat bites, bad food (to come) | Remedy, Salts | poisoned, a green cast |
+| Fatigued | no running, strike cooldown 1.5x | until stamina is over 25 | stamina at zero | rest, a Wake Loaf | fatigued, a stagger |
+| Stunned | no move, no act | 1.5 s | the slingshot | time | stunned |
+| Dazed | 0.85x speed | 8 s | waking from a knockout, a heavy fist | time | dazed, a stagger and stars |
+| Famished | stamina regenerates at half rate | until fed | `body.famishedAfterS` 480 s without food | any food | none |
+| Knocked out | see above | `body.koS` | fists, a mugging, the slingshot | time, a meeting | down |
+| Indebted | an economy status (3.23, 8D) | until paid | unpaid rent | paying | none |
+| Charmed | one silent charge: the first killing Knife strike spends it and leaves the seat Wounded at 1 health | until spent | the well (7M, stations.md 4) | being spent | none |
+
+Rows that another system writes onto the body's effect list (Indebted, 3.23) are left as the body's clock finds
+them: it never decays, clears or resets them, on a wake, a knockout or a death. The Charmed row is reserved here;
+the well sets it and the Knife spends it in a later 8A pull request.
+
+The curing items: the Medkit's `heal` restores `body.healHp` 40 and stops Bleeding (self or a seat in reach); the
+Doctor's Bandage also stops Bleeding; Salts cure Slowed and Poisoned; the Herbalist's Remedy cures Poisoned as
+`antidote`, by day as by night, whoever holds it; the Wake Loaf (`wakeLoaf`, a food bought at the bakery and baked at
+Crumb's Ovens) cures Famished and Weakened and restores stamina. The Medkit, Salts and the Remedy work on the actor
+when no target is named; an item is never spent on a seat it would not change.
+
+- **Inspect.** Anyone can inspect a seat or a figure in reach and learns only its physical signs; 8B writes the
+  paragraph (`docs/round8/body.md` 7).
 
 **Inspect** (8B, A137). In any world phase, a living seat can study another living seat it can see within
 `relations.json` `inspect.rangeTiles`, once per `inspect.cooldownS`. The inspector learns, privately:
@@ -880,7 +955,8 @@ a card's: 8F's variants all begin `villager`), the `townsfolk.height` height, no
 tag, so nothing but the drawn figure tells it apart; its id never leaves the server. Needs and moods tick for it as
 for a seat (the mood idle shows while it stands), it hears the same bus events, and it counts the bodies it sees.
 The Knife never finds it (its handle resolves to no seat), a vote for it is refused, and it dies only to a creature
-that kills (the wolf: `health.wolfDamage` off `health.maxHp`, regained like a seat's). Its body lies where it fell
+that kills (the wolf's `mobs.json` `dmg` off its reduced body's `body.maxHp`, regained like a seat's, 3.22; any
+other creature leaves it at one). Its body lies where it fell
 as a public `Body` that opens no meeting (it counts as reported from the start) until the next meeting clears every
 such body and the meeting text says how many the creatures took (`ui/copy/townsfolk.ts`, UI 14.36). A fist's
 knockout (3.22, the reduced body) reaches a figure only once the strike hook of A160 lands. The invariant
@@ -906,4 +982,7 @@ Round 8 addendum B (A173, A174; `docs/round8/living.md`). Sessions 8Q, 8R, 8S, 8
 - **Talk** (8T). NPC lines in meeting notes (3.8) come from templates, or from Claude when the server holds a key, off the tick and logged for replay; one to three a meeting are red herrings, slightly off.
   - **Input.** A line is built only from facts every seat at the table has: the round, the meeting's reason, the caller's and the body's names, the roll-call's missing names and the other living seats' names (`services/talk/facts.ts`). Never a card, a cover, a private view or which seats are NPCs.
   - **Templates.** `services/talk/templates.ts`: questions and remarks that name seats by name and never name a card, a role or a faction. A template whose name has nothing to fill (no body at a bell meeting) is not drawn; the bell question is drawn only at a bell meeting. Each line draws two uniforms from the seat's `talk` stream, whatever is drawn.
+  - **Model.** With `ANTHROPIC_API_KEY` on the server, and never in an auto run, a replay or a test, a note's text comes from the Messages API (the model id is the server's `WDI_TALK_MODEL`, else the fast small model). The prompt is the input above, the writer's own name, what it found itself, and the last `talk.model.transcriptLines` lines of the meeting (named chat with its speaker, notes with none); never its card. The call runs off the tick: at the note's tick the template line is drawn first, always, and the call starts; a later tick posts the answer, or the template line once `talk.model.timeoutS` passes or for any answer but a plain finished one. Per match at most `talk.model.callsPerMatch` calls and `talk.model.tokensPerMatch` tokens; past either, templates only.
+  - **Filter.** A model line keeps its first line without quotes, at most `talk.model.maxChars`; it is thrown away for the template if it says the writer is not a person, holds a slur, or names a card or a faction beside a seat's name or the writer's own "I", unless that seat claimed that card in public.
+  - **Replay.** Every NPC note goes to the match log's `talk` rows (tick, seat, text, template or model); a replay posts each seat's n-th logged note and calls nothing.
 - **Briarberry.** The Doctor's healing ingredient, picked from briar bushes that make the picker bleed (on hard down to half health, never to death); easy villagers gift it, normal shops sell it, hard only grows it (8U).

@@ -97,6 +97,7 @@ describe('shared basics', () => {
       famished: 9,
       knockedOut: 10,
       indebted: 11,
+      charm: 12, // reserved for 7M's well (6Z, 2026-10-24; GDD 3.22)
     });
   });
 });

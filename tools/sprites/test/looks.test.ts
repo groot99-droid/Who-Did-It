@@ -1,13 +1,17 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { DIRECTIONS, V1_CLIPS, type Anim } from '../keys.ts';
+import { DIRECTIONS, V1_CLIPS, frameCounts, lookTails, type Anim } from '../keys.ts';
 import type { MultiAtlas } from '../pack.ts';
 import { artStyles } from '../palette.ts';
 import { villagerLooks, worldLooks } from '../placeholder-chars.ts';
 import { ASSETS, hasManifest } from './realAssets.ts';
 
-/** Art plan 4.3: one character per world look, 304 frames per pass, three passes on shared pivots. */
+/**
+ * Art plan 4.3 and SPRITES 3: one character per world look and per townsfolk variant, three passes on shared pivots;
+ * a real look's resident clips on `char_<look>` and `ovl_<look>`, its lazy clips on the `_2` pair (A161), the
+ * placeholder looks the V1 five.
+ */
 const SPEC = join(import.meta.dirname, '../../blender/looks_spec.py');
 
 /** The look ids of looks_spec.py's LOOKS dict (its keys sit at four spaces of indent). */
@@ -30,7 +34,7 @@ function frames(base: string, entry: Entry) {
   return new Map(atlas.textures.flatMap((t) => t.frames.map((f) => [f.filename, f] as const)));
 }
 
-const expectedTails = (look: string) =>
+const v1Tails = (look: string) =>
   (Object.keys(V1_CLIPS) as Anim[]).flatMap((anim) =>
     DIRECTIONS.flatMap((d) =>
       Array.from(
@@ -39,6 +43,23 @@ const expectedTails = (look: string) =>
       ),
     ),
   );
+
+/** The body atlas and the overlay atlas of a pair hold exactly `tails`, three passes on one pivot per frame. */
+function expectPair(base: string, body: Entry, ovl: Entry, tails: string[]) {
+  const b = frames(base, body);
+  const o = frames(base, ovl);
+  expect([...b.keys()].sort()).toEqual(tails.map((t) => `char/${t}`));
+  for (const pass of ['scarf', 'blood']) {
+    const got = [...o.keys()].filter((k) => k.startsWith(`${pass}/`)).sort();
+    expect(got, pass).toEqual(tails.map((t) => `${pass}/${t}`));
+  }
+  for (const t of tails) {
+    const pivot = b.get(`char/${t}`)!.pivot;
+    expect(pivot, t).toBeDefined();
+    expect(o.get(`scarf/${t}`)!.pivot, t).toEqual(pivot);
+    expect(o.get(`blood/${t}`)!.pivot, t).toEqual(pivot);
+  }
+}
 
 describe('the world looks (art plan 4.3, looks.json)', () => {
   const looks = worldLooks().map((l) => l.id);
@@ -49,8 +70,8 @@ describe('the world looks (art plan 4.3, looks.json)', () => {
   });
 
   // The deck looks in both manifests; the family (round 8, A161) in every real style's, the placeholder's keeps the
-  // plain villager only (manifest.test.ts).
-  const sets: Array<[string, string, string, string[]]> = [
+  // plain villager only (manifest.test.ts). A real look carries the clip table, the placeholder figures the V1 five.
+  const sets: Array<[string, string, string, string[], boolean]> = [
     // A style still rendering its characters (HD, A164) lists none and falls back per key (A80); the guard keys on the
     // manifest, and manifest.test.ts checks that every style it skips is in that state.
     ...artStyles()
@@ -59,36 +80,37 @@ describe('the world looks (art plan 4.3, looks.json)', () => {
           hasManifest(s.root) &&
           manifestAt(join(s.root, 'manifest.json')).some((e) => e.key.startsWith('char_')),
       )
-      .map((s): [string, string, string, string[]] => [
+      .map((s): [string, string, string, string[], boolean] => [
         s.id,
         join(s.root, 'manifest.json'),
         join(ASSETS, s.root),
         s.root === '' ? [...looks, ...family] : family,
+        true,
       ]),
-    ['placeholder', 'placeholder/manifest.json', join(ASSETS, 'placeholder'), looks],
+    ['placeholder', 'placeholder/manifest.json', join(ASSETS, 'placeholder'), looks, false],
   ];
-  for (const [label, rel, base, ids] of sets) {
+  for (const [label, rel, base, ids, real] of sets) {
     const entries = new Map(manifestAt(rel).map((e) => [e.key, e]));
     for (const look of ids) {
-      it(`${label}: char_${look} and ovl_${look} hold 5 clips x 8 directions, three passes on one pivot`, () => {
+      const { resident, lazy } = frameCounts(look);
+      it(`${label}: char_${look} and ovl_${look} hold the ${real ? `${resident} resident` : '272 V1'} frames, three passes on one pivot`, () => {
         const body = entries.get(`char_${look}`);
         const ovl = entries.get(`ovl_${look}`);
         expect(body && ovl && entries.has(`anims_${look}`)).toBeTruthy();
-        const tails = expectedTails(look).sort();
-        expect(tails).toHaveLength(304);
-        const b = frames(base, body!);
-        const o = frames(base, ovl!);
-        expect([...b.keys()].sort()).toEqual(tails.map((t) => `char/${t}`));
-        for (const pass of ['scarf', 'blood']) {
-          const got = [...o.keys()].filter((k) => k.startsWith(`${pass}/`)).sort();
-          expect(got, pass).toEqual(tails.map((t) => `${pass}/${t}`));
-        }
-        for (const t of tails) {
-          const pivot = b.get(`char/${t}`)!.pivot;
-          expect(pivot, t).toBeDefined();
-          expect(o.get(`scarf/${t}`)!.pivot, t).toEqual(pivot);
-          expect(o.get(`blood/${t}`)!.pivot, t).toEqual(pivot);
-        }
+        const tails = (real ? lookTails(look, false) : v1Tails(look)).sort();
+        expect(tails).toHaveLength(real ? resident : 272);
+        expectPair(base, body!, ovl!, tails);
+      });
+      if (!real) continue;
+      it(`${label}: char_${look}_2 and ovl_${look}_2 hold the ${lazy} lazy frames, loaded with no map`, () => {
+        const body = entries.get(`char_${look}_2`);
+        const ovl = entries.get(`ovl_${look}_2`);
+        const anims = entries.get(`anims_${look}_2`);
+        expect(body && ovl && anims).toBeTruthy();
+        for (const e of [body!, ovl!, anims!]) expect((e as { maps?: string[] }).maps, e.key).toEqual([]);
+        const tails = lookTails(look, true).sort();
+        expect(tails).toHaveLength(lazy);
+        expectPair(base, body!, ovl!, tails);
       });
     }
   }

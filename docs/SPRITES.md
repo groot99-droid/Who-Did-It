@@ -72,19 +72,78 @@ tail on every layer:
 Round 5: the hat passes are gone (hats are nameplate glyphs, GDD 3.1); a look's body is one 1024² page and its
 overlays one 1024 x 512 page (art plan 1.4).
 
+Round 8 (A161): a look's **lazy clips** (the `lazy` column below) pack the same way onto a second pair,
+`char_<body>_2` and `ovl_<body>_2`, with their own animation file `anims_<body>_2`; the frame and anim keys keep the
+grammar above, only the texture differs. The manifest rows of the pair carry `maps: []` (they load with no map:
+neither at boot nor with the match, SPRITES 5), and `view/assets.ts` `loadLazyLook` fetches the three on the first
+frame a figure of that look needs one of them; until they arrive `PlayerView` plays the fallback of `poses.ts`.
+The pair is transient and outside the resident cap of 10.14.
+
+The table fills a look's 1024² body page past 0.9 at padding 2 in either style (the Vicar's robe spilled eight
+frames in the 8-bit style; the low-poly frames' soft edges, about 5 % more trimmed area a frame, spill it with the
+packer's extrude); so a character's pages pack `tight` (`pack.ts` `packFrames`): no extrude and padding 1 in both
+styles. Under nearest filtering (the finish on) that is a whole texel between neighbours; under linear filtering
+(no mipmaps) it keeps the neighbour's texel out of the bilinear footprint, so an alpha-bled and premultiplied
+low-poly frame draws without a fringe. A low-poly body that still spills its 1024² page takes one 1024 x 2048 page
+(0.5 page-equivalents instead of 0.25; 6Z's decision of 2026-10-24, inside the cap of 9 of 10.14); the 8-bit bodies
+and every overlay and lazy page keep their caps. The world atlases keep 10.3's settings.
+
+The table also doubles a look's bytes on disk, and the first load of the default style is capped (ASSETS 6.8,
+`media.test.ts`). So `packCharacter` writes a finished page (the world palette, alpha 0 or 255: the 8-bit style)
+as an indexed PNG (`bleed.ts` `encodeIndexedPng`: a palette of at most 256 RGBA entries, exact, unfiltered rows,
+deterministic), the same pixels at about a quarter of the RGBA bytes (a 1024² body page about 0.16 MB instead of
+0.63), and the anims json on one line like the atlas json (A161). A page of more colours (the low-poly style's
+soft edges) stays RGBA. Measured on the default style with the fifteen option-B looks: the first load figure in
+10.14. The world packers keep their RGBA pages; the same call shrinks any finished page.
+
 Frame names inside an atlas are the anim key plus `/` and the three-digit frame number:
 `scarf/villager/walk/se/003`. The packer derives them from the rendered file name and its pass folder.
 
-Clips and frame counts for V1 (`ASSETS.md` 6.3). `run`, `carry` and `hide` are reserved by the regex
-and arrive after the M3 gate.
+Clips and frame counts for V1 (`ASSETS.md` 6.3), at the owner's option B of 2026-10-24 (A161: `idle` and
+`interact` were 8 until then, 304 frames a pass; now 272). `carry` and `hide` are reserved by the regex and never
+rendered; the round-8 clips follow the table. The placeholder figures (`?art=placeholder`) render these five only.
 
 | Anim | Frames | Repeat | Notes |
 |---|---|---|---|
-| `idle` | 8 | loop | |
+| `idle` | 6 | loop | |
 | `walk` | 8 | loop | |
-| `swing` | 6 | once | Shared by Kill, Crowbar and Check (`ARCHITECTURE.md` 5.4); never role-specific |
-| `interact` | 8 | loop | A V1 clip of every look, in 8 directions, `Presence.animId` 4: one id for every hold, as `swing` is for every strike, so it never tells one action or role from another |
+| `swing` | 6 | once | Shared by Kill, Crowbar and Check (`ARCHITECTURE.md` 5.4); never role-specific. Not rendered for the villager family |
+| `interact` | 6 | loop | A V1 clip of every look, in 8 directions, `Presence.animId` 4: one id for every hold, as `swing` is for every strike, so it never tells one action or role from another |
 | `die` | 8 | once, hold last frame | The last frame is the body on the floor. Rendered in 256 px cells with the feet at the centre (a fallen body reaches about 90 px below the feet); trim and the pivot hide the difference |
+
+**Round 8 clips** (motion.md 1, DECISIONS A141 and A161, 8F; the table is `tools/blender/rig_common.py` `R8_CLIPS`
+and `tools/sprites/keys.ts` `R8_CLIPS`, with their tests). The frame counts are the owner's option B (A161, plan B of
+8F's measured table). `run`, `strike` and `hurt` render in 8 directions like the V1 five; `limp`, `stagger`, the
+one-shots and the mood idles render in the four diagonals `ne`, `se`, `sw`, `nw` only, never mirrored, and the
+client plays the nearest diagonal for a figure facing `n`, `e`, `s` or `w` (`poses.ts` `dirFor`). The rare clips
+sit on the lazy pair of pages per look (above), loaded on first use. Every key of a clip is placed in normalised
+time, so a frame count that the budget trims changes one table row and nothing in the keys. `knockdown`, `down`
+and `getup` render in `die`'s 256 px cell.
+
+| Anim | Frames | Repeat | Directions | Page | Plays when |
+|---|---|---|---|---|---|
+| `run` | 6 | loop | 8 | resident | the client, above walking speed |
+| `strike` | 4 | once | 8 | resident | fists (body.md 4); `swing` stays the Knife's. Not rendered for the villager family |
+| `hurt` | 3 | once | 8 | resident | a hit lands |
+| `limp` | 6 | loop | 4 | resident | the client, under the `limp` bit (Slowed, Wounded) |
+| `stagger` | 6 | loop | 4 | resident | the client, under `fatigued` or `dazed` |
+| `stunned` | 4 | loop | 4 | resident | the client, under the `stunned` bit |
+| `inspect` | 4 | once | 4 | resident | inspect (body.md 7). Not rendered for the villager family |
+| `cower` | 4 | loop | 4 | resident | a Scared idle |
+| `fidget` | 4 | loop | 4 | resident | a restless idle |
+| `stomp` | 4 | loop | 4 | resident | an Angry idle |
+| `knockdown` | 4 | once, hold last frame | 4 | lazy | health reaches zero by fists; ends in the `down` pose |
+| `down` | 2 | loop | 4 | lazy | the client, under the `down` bit |
+| `getup` | 4 | once | 4 | lazy | waking; `knockdown` reversed through a sit and a kneel |
+| `rob` | 4 | once | 4 | lazy | robbing a knocked-out seat. Not rendered for the villager family |
+| `eat` | 4 | once | 4 | lazy | eating a Wake Loaf |
+| `threaten` | 4 | once | 4 | lazy | a mugging's threat. Not rendered for the villager family |
+
+Per deck look that is 504 resident frames a pass (47 x 8 directions and 32 x 4) and 88 lazy (22 x 4), against
+the 304 of V1. The **villager family** (`looks.json` `villagers`, A161) renders without `swing`, `strike`, `rob`,
+`threaten` and `inspect`: a townsfolk figure is never a seat, so it never plays them (`rig_common.look_clips`,
+`keys.ts` `lookClips`; `poses.ts` falls back to `idle` or `interact` if one is ever sent), which makes 408 resident
+frames a pass (37 x 8 and 28 x 4) and 56 lazy (14 x 4). The measured page cost and the cap are in 10.14 and A161.
 
 Prop frames (round 8, 8K) are looked up in `props_<mapId>`, then `props`, and within each atlas by stem in this
 order: the exact state frame where the kind has one (`prop_lanternPost_lit`), then `prop_<kind>`, then
@@ -381,7 +440,7 @@ this table:
 
 | Family | Shown | Names |
 |---|---|---|
-| Effects (`EffectId`, GDD 3.22) | the body HUD's effect row; `indebted` in its own seat's view only | `effect_slowed`, `effect_wounded`, `effect_bleeding`, `effect_weakened`, `effect_poisoned`, `effect_fatigued`, `effect_stunned`, `effect_dazed`, `effect_famished`, `effect_knockedOut`, `effect_indebted` |
+| Effects (`EffectId`, GDD 3.22) | the body HUD's effect row; `indebted` in its own seat's view only | `effect_slowed`, `effect_wounded`, `effect_bleeding`, `effect_weakened`, `effect_poisoned`, `effect_fatigued`, `effect_stunned`, `effect_dazed`, `effect_famished`, `effect_knockedOut`, `effect_indebted`, `effect_charm` (8A's stand-in) |
 | Inspect signs (`sim/inspect/read.ts`) without an effect of their own | the inspect card | `sign_bloody`, `sign_hunted` |
 | Economy (GDD 3.23, 8C and 8D) | the purse, the shop, the bank, the civic panel and the HQ badge; curfew has none, so a barred door reads as a plain locked one | `econ_scrip`, `econ_purse`, `econ_till`, `econ_wages`, `econ_deposit`, `econ_withdraw`, `econ_rent`, `econ_quota`, `econ_faith`, `econ_rumour`, `econ_blackmail`, `econ_hq1`, `econ_hq2`, `econ_hq3`, `econ_blackMarket` |
 | Body (GDD 3.22) | the body HUD's bars and the strike button | `body_health`, `body_stamina`, `body_strike` |
@@ -695,7 +754,8 @@ re-rendered by `IsoCam` under the same keys.
 colour, and a 2 x 2 mode downscale keeps one-pixel lines; alpha bleed is harmless and no longer needed under
 nearest filtering. With it off, a 2 x 2 box downscale keeps partial alpha and the frames are alpha-bled
 (`bleed.ts`) for linear filtering. Either way, frames are packed with trim and padding 2, and cells, pivots and
-packed sizes are the same. The ground tileset, `clues` and `vfx` are drawn at display size: finished, then
+packed sizes are the same; the one exception is a character's pages in either style (section 3, A161): no
+extrude and padding 1, so the round-8 clip table fits the body page. The ground tileset, `clues` and `vfx` are drawn at display size: finished, then
 doubled with nearest scaling (or, with the finish off, shipped at the display scale).
 
 ### 10.4 Directions
@@ -1037,8 +1097,8 @@ Page-equivalents are of 2048². These are the art plan's numbers (`docs/round5/a
 |---|---|
 | Environment per map | ≤ 1.8: ground 1280 x 1792 (0.55), kit ≤ 1024² (0.25), buildings ≤ 2048 x 1024 (0.5), map props ≤ 1024² (0.25), shared props ≤ 1024² (0.25) |
 | Boot effects | `clues` ≤ 512² (0.06), `vfx` ≤ 512 x 2048 (0.25) |
-| Characters (the deck's 10 world looks, A50) | ≤ 3.75: each look's `char_<lookId>` ≤ 1024² and `ovl_<lookId>` ≤ 1024 x 512 (0.375). About 3 expected, since most looks pack onto a 1024 x 512 body page |
-| Resident pages | ≤ 9 (ASSETS 6.8; 6 until round 8, 6.1 with the node break page of A142, 8 by 6Z's round-8 ruling, A141, 9 by the owner's option B of 2026-10-24, A161: plan B frame counts, limp and stagger in four directions, the townsfolk's shorter clip set; a look's lazy clip pages are transient and outside the sum). The worst case is one map's environment, the boot atlases (effects, nodes, tools, mobs, givers), the deck's 10 world looks and the villager family, which is resident on every map for the townsfolk (A161). Measured with the four-heads figures on the round-8 base of 2026-10-24: 8-bit 7.55 (Hollowmere) and 7.42 (Blackpine); low poly 8.02 (Hollowmere) and 7.77 (Blackpine); the deck alone 5.92 / 5.80 / 6.14 / 5.89 (the five clips; the stand-in estimate for option B is about 8.1 and 8.8 on Hollowmere, and the packed figures follow with the clips, PR 3). The character atlas json is written on one line (`atlasJson`, A161), which keeps the default style's first load under ASSETS 6.8's 12 MB with the family resident |
+| Characters (the deck's 10 world looks, A50) | each look's `char_<lookId>` ≤ 1024² and `ovl_<lookId>` ≤ 1024 x 512 (0.375); a low-poly body that spills at the round-8 clip table ≤ 1024 x 2048 (0.5, section 3). Since option B (A161) the deck fills its 1024² body pages: packed, the ten looks are 3.69 in the 8-bit style and 4.00 in low poly, where the Baker's body is the one that takes the tall page |
+| Resident pages | ≤ 9 (ASSETS 6.8; 6 until round 8, 6.1 with the node break page of A142, 8 by 6Z's round-8 ruling, A141, 9 by the owner's option B of 2026-10-24, A161: plan B frame counts, limp and stagger in four directions, the townsfolk's shorter clip set; a look's lazy clip pages are transient and outside the sum). The worst case is one map's environment, the boot atlases (effects, nodes, tools, mobs, givers), the deck's 10 world looks and the villager family, which is resident on every map for the townsfolk (A161). Measured on the packed option-B clips of the fifteen looks (PR 3, 2026-10-24): 8-bit 7.73 (Hollowmere) and 7.55 (Blackpine); low poly 8.14 (Hollowmere) and 7.95 (Blackpine), the fifteen looks 5.44 and 5.88 of it (the stand-in estimate was about 8.1 and 8.8 on Hollowmere). The character atlas json is written on one line (`atlasJson`, A161), which kept the default style's first load under ASSETS 6.8's 12 MB with the family resident; with the option-B clips the 8-bit pages are written indexed and the anims json on one line (3), which holds the first load at 11.50 MB (10.97 MiB; measured at the final pack, PR 3; the low-poly style's, reported and not capped, is 33.11 MB) |
 | Static world sprites per scene | ≤ 1 200; the World hides those outside the view grown by 2 tiles, re-checked when the camera moves more than a tile |
 
 The villager family's five looks count in the resident sum since round 8 (10.13; in round 5 the villager loaded only

@@ -53,10 +53,16 @@ export const MobDef = z.strictObject({
   /** How far it notices a seat, and how close a light must be for it to flee. */
   senseTiles: Tiles,
   fleeLightTiles: Tiles,
-  /** Seconds in reach before its attack lands; `kills` whether that attack is a `wolf` death. */
+  /**
+   * Seconds in reach before its attack lands; `kills` whether zero health from it is a death (`wolf` for the wolf,
+   * `creature` for the rest; GDD 3.22, round 8: every creature kills).
+   */
   attackS: Seconds,
   kills: z.boolean(),
   sprite: SpriteKey,
+  /** Round 8 (GDD 3.22, Session 8A): the health its attack takes and the effects it may apply (`hp` above is 8G's). */
+  dmg: z.number().int().positive(),
+  effects: z.record(z.string().regex(/^[a-z][A-Za-z0-9]*$/), z.number().min(0).max(1)),
 });
 export type MobDef = z.infer<typeof MobDef>;
 
