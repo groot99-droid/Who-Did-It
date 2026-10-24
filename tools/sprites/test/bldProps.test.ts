@@ -47,7 +47,7 @@ describe('BLD_PROPS_MAPS', () => {
   });
 
   it("packs the props into the building page's free room, keeping its size", async () => {
-    const { manifest, inputs } = sheet(20);
+    const { manifest, inputs } = sheet(18);
     const atlas = JSON.parse(
       (await packStatic(manifest, inputs, false)).get('bld_hollowmere.json')!.toString('utf8'),
     ) as MultiAtlas;
