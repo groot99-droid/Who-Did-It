@@ -28,16 +28,15 @@ function nodeOpen(node: Node, map: ReadonlySet<string>, profile: Profile): boole
 }
 
 /**
- * The pool a match deals from (GDD 3.5): every fetch task whose source and at least one target stand on the map at
- * the profile, in `tasks.json` order. A map without them (Blackpine today) has an empty pool and deals nothing. The
- * co-op task joins the pool when its two-player hold lands (7M, PR 4).
+ * The pool a match deals from (GDD 3.5): every task whose source (if any) and at least one target stand on the map at
+ * the profile, in `tasks.json` order; the co-op task counts like a fetch one (PR 4). A map without them (Blackpine
+ * today) has an empty pool and deals nothing.
  */
 export function taskPool(mapScenes: readonly string[], profile: Profile): string[] {
   const map = new Set<string>(mapScenes);
   return Object.values(tasks.tasks)
     .filter(
       (t) =>
-        t.kind === 'fetch' &&
         (t.source === undefined || nodeOpen(t.source, map, profile)) &&
         t.targets.some((n) => nodeOpen(n, map, profile)),
     )

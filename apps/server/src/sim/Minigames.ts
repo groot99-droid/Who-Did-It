@@ -10,6 +10,7 @@ import {
   type PlayerState,
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { handleCoopHold } from './Coop';
 import { martyrOf } from './Memorial';
 import { type PlayerSim, simOf } from './RoomSim';
 import { atNode, completeTask } from './tasks/complete';
@@ -99,8 +100,13 @@ export function handleTaskHold(room: PartyRoom, sessionId: string, taskId: strin
   const p = simOf(room).players.get(sessionId);
   const def = Object.values(minigames.minigames).find((m) => m.task === taskId);
   if (!player || !p) return;
-  // Round 7 (7M, GDD 3.5): at the task's source the same hold picks its deliverable up instead.
+  // Round 7 (7M, GDD 3.5): the co-op task is a press-and-hold with no puzzle (`sim/Coop.ts`); at a fetch task's
+  // source the same hold picks its deliverable up instead.
   const task = tasks.tasks[taskId];
+  if (task?.kind === 'coop') {
+    handleCoopHold(room, sessionId, taskId);
+    return;
+  }
   const entry = player.priv.tasks.find((t) => t.id === taskId);
   if (entry && !entry.done && task?.kind === 'fetch' && task.source && atNode(p, task.source)) {
     pickUp(room, sessionId, player, p, entry.fake, task.tool, task.toolQty ?? 1);
