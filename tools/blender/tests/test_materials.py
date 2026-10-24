@@ -28,7 +28,8 @@ class Roles(unittest.TestCase):
                     entry = lock["assets"][r.slug]["files"][res][m]
                     self.assertEqual(entry["file"], roles.texture_file(r.slug, m, res))
                     self.assertRegex(entry["md5"], r"^[0-9a-f]{32}$")
-        self.assertEqual(set(lock["assets"]), set(roles.slugs()))  # nothing locked that no role names
+        # Nothing locked that no role names, the PBR finish's sky aside.
+        self.assertEqual(set(lock["assets"]), set(roles.slugs()) | set(roles.HDRIS.values()))
 
     def test_legacy_tables_mirror_env_kits(self):
         """The tables `env/kits.py` still renders from, mirrored here slug for slug (6Z's condition on #138)."""
@@ -185,6 +186,47 @@ class Fetcher(unittest.TestCase):
         self.assertEqual(fetch.credits_rows(lock), [
             "| `brown_planks_05` | Brown Planks 05 | Rob Tuytel | https://polyhaven.com/a/brown_planks_05 | CC0-1.0 "
             "| `wood_plank` |"])
+
+    def test_hdri_is_locked_fetched_and_credited_like_a_texture(self):
+        slug = roles.HDRIS["sky"]
+        res = roles.HDRI_RESOLUTION
+        data = b"not really an hdr " * 50
+        path = os.path.join(self.root.name, "file", "ph-assets", "HDRIs", "hdr", res)
+        os.makedirs(path, exist_ok=True)
+        with open(os.path.join(path, f"{slug}_{res}.hdr"), "wb") as fh:
+            fh.write(data)
+        url = f"https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/{res}/{slug}_{res}.hdr"
+        with open(os.path.join(self.root.name, "files", slug), "w") as fh:
+            json.dump({"hdri": {res: {"hdr": {"size": len(data), "md5": hashlib.md5(data).hexdigest(), "url": url},
+                                      "exr": {"size": 9, "md5": "b" * 32, "url": url[:-3] + "exr"}}},
+                       "tonemapped": {}}, fh)
+        with open(os.path.join(self.root.name, "info", slug), "w") as fh:
+            json.dump({"name": "Sky", "authors": {"Greg Zaal": "Original", "Jarod Guest": "Sky edits"}}, fh)
+        entry = fetch.lock_hdri(slug, self.base)
+        self.assertEqual(entry["type"], "hdri")
+        self.assertEqual(entry["files"], {res: {"hdr": {"file": roles.hdri_file(slug), "md5": hashlib.md5(data).hexdigest(),
+                                                        "size": len(data), "url": url}}})
+        lock = {"version": fetch.LOCK_VERSION, "userAgent": roles.USER_AGENT, "sources": fetch.SOURCE, "assets": {slug: entry}}
+        lock_path = os.path.join(self.root.name, "lock-hdri.json")
+        with open(lock_path, "w") as fh:
+            fh.write(fetch.dump_lock(lock))
+        self.assertEqual(json.loads(fetch.dump_lock(lock)), lock)
+        cache = os.path.join(self.root.name, "cache-hdri")
+        counts = fetch.fetch(fetch.hdri_slugs(), [res], ["hdr"], cache, lock_path, self.base, log=lambda *a: None)
+        self.assertEqual(counts, {"kept": 0, "fetched": 1})
+        # pbr.py finds it where `roles.hdri_path` says, beside the textures under its slug.
+        self.assertTrue(os.path.exists(roles.hdri_path("sky", cache)))
+        self.assertEqual(roles.hdri_path("sky", cache), os.path.join(cache, slug, f"{slug}_{res}.hdr"))
+        self.assertEqual(fetch.credits_rows(lock), [
+            f"| `{slug}` | Sky | Greg Zaal, Jarod Guest | https://polyhaven.com/a/{slug} | CC0-1.0 "
+            "| the world fill of the PBR finish (`materials/pbr.py`) |"])
+
+    def test_the_committed_lock_holds_the_sky(self):
+        lock = fetch.load_lock()
+        for slug in fetch.hdri_slugs():
+            entry = lock["assets"][slug]
+            self.assertEqual(entry["type"], "hdri")
+            self.assertEqual(entry["files"][roles.HDRI_RESOLUTION]["hdr"]["file"], roles.hdri_file(slug))
 
 
 if __name__ == "__main__":
