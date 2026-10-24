@@ -83,7 +83,9 @@ The table fills a look's 1024² body page to about 0.9 in the 8-bit style, and t
 (about 5 % more trimmed area a frame) spill it with the packer's extrude; so a character's pages pack `tight`
 (`pack.ts` `packFrames`): with the finish on as before (no extrude, padding 2), with it off without the extrude and
 at padding 1, which keeps the neighbour's texel out of the bilinear footprint (no mipmaps) and, alpha-bled and
-premultiplied, draws without a fringe. The world atlases keep 10.3's settings.
+premultiplied, draws without a fringe. A low-poly body that still spills its 1024² page takes one 1024 x 2048 page
+(0.5 page-equivalents instead of 0.25; 6Z's decision of 2026-10-24, inside the cap of 9 of 10.14); the 8-bit bodies
+and every overlay and lazy page keep their caps. The world atlases keep 10.3's settings.
 
 Frame names inside an atlas are the anim key plus `/` and the three-digit frame number:
 `scarf/villager/walk/se/003`. The packer derives them from the rendered file name and its pass folder.
@@ -1044,7 +1046,7 @@ Page-equivalents are of 2048². These are the art plan's numbers (`docs/round5/a
 |---|---|
 | Environment per map | ≤ 1.8: ground 1280 x 1792 (0.55), kit ≤ 1024² (0.25), buildings ≤ 2048 x 1024 (0.5), map props ≤ 1024² (0.25), shared props ≤ 1024² (0.25) |
 | Boot effects | `clues` ≤ 512² (0.06), `vfx` ≤ 512 x 2048 (0.25) |
-| Characters (the deck's 10 world looks, A50) | ≤ 3.75: each look's `char_<lookId>` ≤ 1024² and `ovl_<lookId>` ≤ 1024 x 512 (0.375). About 3 expected, since most looks pack onto a 1024 x 512 body page |
+| Characters (the deck's 10 world looks, A50) | each look's `char_<lookId>` ≤ 1024² and `ovl_<lookId>` ≤ 1024 x 512 (0.375); a low-poly body that spills at the round-8 clip table ≤ 1024 x 2048 (0.5, section 3). Since option B (A161) the deck fills its 1024² body pages, so the ten looks are 3.75 in the 8-bit style and up to 5 in low poly |
 | Resident pages | ≤ 9 (ASSETS 6.8; 6 until round 8, 6.1 with the node break page of A142, 8 by 6Z's round-8 ruling, A141, 9 by the owner's option B of 2026-10-24, A161: plan B frame counts, limp and stagger in four directions, the townsfolk's shorter clip set; a look's lazy clip pages are transient and outside the sum). The worst case is one map's environment, the boot atlases (effects, nodes, tools, mobs, givers), the deck's 10 world looks and the villager family, which is resident on every map for the townsfolk (A161). Measured with the four-heads figures on the round-8 base of 2026-10-24: 8-bit 7.55 (Hollowmere) and 7.42 (Blackpine); low poly 8.02 (Hollowmere) and 7.77 (Blackpine); the deck alone 5.92 / 5.80 / 6.14 / 5.89 (the five clips; the stand-in estimate for option B is about 8.1 and 8.8 on Hollowmere, and the packed figures follow with the clips, PR 3). The character atlas json is written on one line (`atlasJson`, A161), which keeps the default style's first load under ASSETS 6.8's 12 MB with the family resident |
 | Static world sprites per scene | ≤ 1 200; the World hides those outside the view grown by 2 tiles, re-checked when the camera moves more than a tile |
 

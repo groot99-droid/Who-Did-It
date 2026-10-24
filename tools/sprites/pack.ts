@@ -69,6 +69,8 @@ export interface PackResult {
   atlas: MultiAtlas;
   /** Page images, file name -> PNG bytes; names match `textures[i].image`. */
   pages: Map<string, Buffer>;
+  /** Whether the frames carried the pixel finish (alpha 0 or 255 under the main finish) and packed without extrude. */
+  finished?: boolean;
 }
 
 /**
@@ -127,7 +129,7 @@ export async function packFrames(
   });
   const packed = textures.reduce((n, t) => n + t.frames.length, 0);
   if (packed !== inputs.length) throw new Error(`packed ${packed} of ${inputs.length} frames`);
-  return { atlas: { textures, meta }, pages };
+  return { atlas: { textures, meta }, pages, finished };
 }
 
 /**
@@ -158,7 +160,8 @@ const animOf = (name: string): string => name.split('/')[2] ?? '';
  * from the Feet manifest, and `<body>.anims.json`; the lazy clips of the table (SPRITES 3, A161) go the same
  * way onto `char_<body>_2`, `ovl_<body>_2` and `<body>_2.anims.json`, a pair the client loads on first use.
  * Returns output file name -> bytes. A set that does not fit its page size spills onto a second page, which
- * budget.test.ts refuses for a look.
+ * budget.test.ts refuses for a look, except a low-poly body (the finish off) at the round-8 clip table: that one
+ * gets a single page twice as tall instead (6Z's decision of 2026-10-24 on #194, A161; SPRITES 3, 10.14).
  */
 export async function packCharacter(
   body: string,
@@ -178,7 +181,11 @@ export async function packCharacter(
       [textureKey('scarf', body, lazy), overlayFrames, pageSizes.overlay],
     ] as const) {
       if (frames.length === 0) continue;
-      const { atlas, pages } = await packFrames(key, frames, size, true);
+      let packed = await packFrames(key, frames, size, true);
+      if (packed.atlas.textures.length > 1 && !packed.finished && !lazy && key === textureKey('body', body)) {
+        packed = await packFrames(key, frames, { w: size.w, h: size.h * 2 }, true);
+      }
+      const { atlas, pages } = packed;
       applyPivots(atlas, manifest);
       textures.push({ key, atlas });
       for (const [name, png] of pages) out.set(name, png);

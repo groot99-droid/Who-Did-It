@@ -48,9 +48,12 @@ describe.each(artStyles().filter((s) => hasManifest(s.root)))(
     for (const p of gpu) {
       const cap = CAPS.find(([x]) => p.key.startsWith(x));
       if (!cap) continue;
-      it(`${p.key} page ${p.width} x ${p.height} is within ${cap[1]} x ${cap[2]}`, () => {
+      // A low-poly body at the round-8 clip table may take one page twice as tall (6Z's decision on #194, A161).
+      const tall = cap[0] === 'char_' && !style.pixelFinish && lookOf(p.key) !== undefined;
+      const h = tall ? cap[2] * 2 : cap[2];
+      it(`${p.key} page ${p.width} x ${p.height} is within ${cap[1]} x ${h}`, () => {
         expect(p.width).toBeLessThanOrEqual(cap[1]);
-        expect(p.height).toBeLessThanOrEqual(cap[2]);
+        expect(p.height).toBeLessThanOrEqual(h);
       });
     }
 
