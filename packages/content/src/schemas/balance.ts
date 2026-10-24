@@ -102,7 +102,8 @@ export const BalanceFile = z.strictObject({
   /** Keyed "4".."10". Cabal size and which specials play come from roles.json decks. */
   byCount: byPlayerCount(BalanceRow),
   meeting: Section({
-    voteOpensImmediately: z.boolean(),
+    /** Round 8 (8L, A190): a vote cast before this many seconds of the discussion is refused (GDD 3.8). */
+    minVoteS: Seconds,
     endsWhenAllVoted: z.boolean(),
     secretVotes: z.boolean(),
     skipAllowed: z.boolean(),
@@ -268,16 +269,18 @@ export const BalanceFile = z.strictObject({
   /** Round 6 (GDD 3.16): placeholders until Session 6E tunes them. */
   quests: Section({ maxActive: z.number().int().nonnegative() }),
   /**
-   * GDD 3.16: the four station mini-games' numbers, read by `rules/minigames.ts` as `MinigameBases`. Crates: drag
+   * GDD 3.16: the five station mini-games' numbers, read by `rules/minigames.ts` as `MinigameBases`. Crates: drag
    * `steps` crates, then release the needle inside a `bandFrac` band. Pour: `steps` pours filling at `ratePerS` of the
    * bowl a second, released inside `bandFrac`. Slide: `steps` bannetons. Stoke: each tap adds `stokePerTap` heat,
-   * heat falls `ratePerS` a second; hold inside `bandFrac` for `holdS`.
+   * heat falls `ratePerS` a second; hold inside `bandFrac` for `holdS`. Tap (round 7, 7M): a marker sweeps the track
+   * once per `periodS`; tap inside a `bandFrac` band `steps` times in a row, a miss starting the run again.
    */
   minigames: Section({
     crates: z.strictObject({ steps: Count, bandFrac: Frac }),
     pour: z.strictObject({ steps: Count, ratePerS: Frac, bandFrac: Frac }),
     slide: z.strictObject({ steps: Count }),
     stoke: z.strictObject({ stokePerTap: Frac, ratePerS: Frac, bandFrac: Frac, holdS: Seconds }),
+    tap: z.strictObject({ steps: Count, periodS: Seconds, bandFrac: Frac }),
   }),
   /**
    * Round 7 (GDD 3.3): the Daily Train of a map with a `station`. It stops `arriveAtS` into each day and delivers
@@ -322,6 +325,22 @@ export const BalanceFile = z.strictObject({
     maxChars: z.number().int().positive(),
     quickChatRadiusTiles: Tiles,
     quickChat: z.array(z.strictObject({ id: Id, text: z.string().min(1) })).length(8),
+  }),
+  /** Round 8 (GDD 3.8 "Meeting notes", 3.25), 8T's keys. */
+  talk: Section({
+    /** A seat writes at most one note in this many seconds, human or NPC alike. */
+    noteGapS: Seconds,
+    /** A seat writes at most this many notes in one meeting. */
+    notesPerMeeting: z.number().int().positive(),
+    npc: z.strictObject({
+      /** The notes an NPC seat means to write in a meeting, drawn per meeting from its `talk` stream. */
+      notesPerMeeting: z.strictObject({
+        min: z.number().int().nonnegative(),
+        max: z.number().int().nonnegative(),
+      }),
+      /** When they fall: fractions of the discussion plus the vote time, from the discussion's first tick. */
+      windowFrac: FracSpan,
+    }),
   }),
 });
 export type BalanceFile = z.infer<typeof BalanceFile>;

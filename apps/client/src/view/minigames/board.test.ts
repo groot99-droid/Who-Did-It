@@ -84,6 +84,7 @@ describe('the widgets rebuild the server board and answer for it', () => {
         pour: { holdsS: [] },
         slide: { slots: [] },
         stoke: { taps: [] },
+        tap: { taps: [] }, // 7M: the round-7 kind; its own test is tap.test.ts
       };
       expect(checkMinigame(puzzle, empty[kind])).toBe(false);
     }

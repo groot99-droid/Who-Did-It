@@ -225,6 +225,8 @@ export const Private = schema(
     purse: u32(),
     /** Round 8 (GDD 3.23, 8C): the Scrip this seat keeps at the bank, safe from muggings and knockouts. */
     bank: u32(),
+    /** Round 8 (GDD 3.23, 8D): the Faith this seat has earned by donating at an altar. */
+    faith: u16(),
   },
   'Private',
 );

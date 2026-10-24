@@ -1,5 +1,5 @@
 import { balance } from '@wdi/content';
-import { ErrorCode, Phase, type PlayerState, S2C, SKIP_VOTE, resolveVotes } from '@wdi/shared';
+import { ErrorCode, Phase, type PlayerState, S2C, SKIP_VOTE, TICK_RATE, resolveVotes } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { enterScene } from './Portals';
 import { emitSim } from './events/bus';
@@ -10,6 +10,8 @@ import { onMeetingOpenDisguise } from './Impersonate';
 import { beginAim, holdReveal, onMeetingOpenNight } from './NightPowers';
 import { type MeetingRequest, simOf } from './RoomSim';
 import { evaluateWin, endMatch } from './Win';
+import { civicMeetingStart } from './economy/civic';
+import { FAITH_COPY, sealBlocks } from './economy/faith';
 
 /**
  * Everyone, living or dead, goes to the map's meeting spawns on the hub (`meetingSpawnsOf`) without a
@@ -25,6 +27,14 @@ function placeAtSquare(room: PartyRoom, announce: boolean): void {
     enterScene(room, player, p, site.sceneId, site.spawn, false, announce);
   });
   sim.viewsDirty = true;
+}
+
+/** Round 8 (8L, A190): the tick each room's votes open, `meeting.minVoteS` after its meeting opened (GDD 3.8). */
+const votesOpenTick = new WeakMap<PartyRoom, number>();
+
+/** White-box (tests): the current meeting's votes open now, as if `meeting.minVoteS` had passed. */
+export function openVotesNow(room: PartyRoom): void {
+  votesOpenTick.set(room, room.state.tick);
 }
 
 /**
@@ -64,13 +74,26 @@ export function openMeeting(room: PartyRoom, req: MeetingRequest): void {
     missing: [],
   });
   setPhase(room, Phase.meetingDiscussion, countRow(state.players.size).discussionS);
+  votesOpenTick.set(room, state.tick + Math.round(balance.meeting.minVoteS * TICK_RATE));
+  civicMeetingStart(room); // round 8, 8D: `sealShield(room)` and `gazette(room)` (locked hook, GDD 3.23)
 }
 
-/** `meeting.vote`: a living player, in discussion or vote, for a living player or Skip; changeable. */
+/**
+ * `meeting.vote`: a living player, in discussion or vote, for a living player or Skip; changeable. A vote before
+ * `meeting.minVoteS` of the discussion is refused with the reason (round 8, 8L), so an agreed instant vote cannot land.
+ */
 export function handleVote(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   const phase = room.state.phase;
   if (phase !== Phase.meetingDiscussion && phase !== Phase.meetingVote) {
     return refuse(room, sessionId, ErrorCode.wrongPhase, 'no vote open');
+  }
+  if (room.state.tick < (votesOpenTick.get(room) ?? 0)) {
+    return refuse(
+      room,
+      sessionId,
+      ErrorCode.wrongPhase,
+      `votes open ${balance.meeting.minVoteS} s into the discussion`,
+    );
   }
   const sim = simOf(room);
   const voter = room.state.players.get(sessionId);
@@ -82,6 +105,7 @@ export function handleVote(room: PartyRoom, sessionId: string, payload: Record<s
     typeof target === 'string' &&
     (target === SKIP_VOTE ? balance.meeting.skipAllowed : isLiving(room, target));
   if (!ok) return refuse(room, sessionId, ErrorCode.cannot, 'no such candidate');
+  if (sealBlocks(room, target)) return refuse(room, sessionId, ErrorCode.cannot, FAITH_COPY.blocked); // Round 8, 8D
   voter.priv.myVote = target;
   voter.hasVoted = countsVote(room, sessionId); // round 7, 7H: a doubted Vicar's vote stays unseen (GDD 3.20)
   emitSim(room, { tick: room.state.tick, kind: 'vote', seat: sessionId, data: { target } }); // round 6, 6B

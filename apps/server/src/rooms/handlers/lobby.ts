@@ -34,7 +34,7 @@ import {
 import { dealMainDeck } from '../../sim/Deck';
 import { dealTasks } from '../../sim/Tasks';
 import { refuse, setPhase } from '../../sim/Flow';
-import { handleSay } from '../../sim/Chat';
+import { handleNote, handleSay } from '../../sim/Chat';
 import { handleVote } from '../../sim/Meeting';
 import { newestNpcSeat, isNpcSeat, releaseNpcSeat } from '../../sim/Npc';
 import { addNpcSeat, fillNpcSeats } from '../../sim/npc/seats';
@@ -58,6 +58,7 @@ const LOBBY_TYPES: readonly string[] = [
   C2S.coverPick,
   C2S.vote,
   C2S.say,
+  C2S.note, // round 8, 8T (6Z's grant)
   C2S.lobbySettings,
   C2S.lobbyAddNpc,
   C2S.lobbyRemoveNpc,
@@ -150,6 +151,9 @@ export function runLobbyCommands(room: PartyRoom): void {
         break;
       case C2S.say:
         handleSay(room, cmd.sessionId, payload);
+        break;
+      case C2S.note: // round 8, 8T (6Z's grant): the meeting notes (GDD 3.8)
+        handleNote(room, cmd.sessionId, payload);
         break;
       case C2S.lobbySettings:
         handleSettings(room, cmd.sessionId, payload);
