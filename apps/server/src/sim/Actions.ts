@@ -2,6 +2,7 @@ import { abilities, roles } from '@wdi/content';
 import { ErrorCode, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { resolveHandle } from './Avatars';
+import { bodyBlocksAct } from './body/run';
 import { handleHold } from './Hold';
 import { handleImpersonate } from './Impersonate';
 import { handleKill } from './Kill';
@@ -42,6 +43,8 @@ function livingActor(room: PartyRoom, sessionId: string, needBellPhase = false):
   if (p.dead || !p.placed) reject(room, sessionId, ErrorCode.cannot, 'not now');
   else if (!phaseOk) reject(room, sessionId, ErrorCode.wrongPhase, 'not now');
   else if (room.state.tick < p.busyUntilTick) reject(room, sessionId, ErrorCode.busy, 'busy');
+  else if (bodyBlocksAct(room, sessionId))
+    reject(room, sessionId, ErrorCode.cannot, 'not now'); // round 8, 8A
   else return p;
   return null;
 }

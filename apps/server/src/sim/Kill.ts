@@ -4,6 +4,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { POSITION_RING_TICKS } from './constants';
 import { resolveHandle } from './Avatars';
 import { spawnBody } from './Bodies';
+import { bodyBlocksAct } from './body/run';
 import { spawnKillClues } from './Clues';
 import { markDead } from './Death';
 import { emitSim } from './events/bus';
@@ -59,6 +60,7 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
     reject(room, sessionId, ErrorCode.cannot, 'no knife');
     return;
   }
+  if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, ErrorCode.cannot, 'not now'); // round 8, 8A
   const targetId = resolveHandle(room, sessionId, payload.targetId);
   const target = targetId === null ? undefined : sim.players.get(targetId);
   if (targetId === null || !target || targetId === sessionId) {
@@ -122,14 +124,32 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
 }
 
 /**
- * A wolf's last bite (GDD 3.15, Session 6G): the `wolf` death, the body where the seat fell and the kill scream,
- * with no clue of a killer (no height, no scarf, no blood on anyone). Called from `mobs/hurt.ts` only.
+ * A creature's last bite (GDD 3.15, Session 6G; round 8, 8A: the cause is `wolf` for the wolf and `creature` for
+ * the rest, GDD 3.22): the death, the body where the seat fell and the kill scream, with no clue of a killer (no
+ * height, no scarf, no blood on anyone). Called from `sim/body/damage.ts` only.
  */
-export function creatureKill(room: PartyRoom, victimId: string): void {
+export function creatureKill(room: PartyRoom, victimId: string, cause: 'wolf' | 'creature' = 'wolf'): void {
   const victim = simOf(room).players.get(victimId);
   if (!victim || victim.dead) return;
   const sceneId = sceneKey(victim.sceneIdx);
-  markDead(room, victimId, 'wolf');
+  markDead(room, victimId, cause);
   spawnBody(room, sceneId, victimId, Math.floor(victim.x / TILE_PX), Math.floor(victim.y / TILE_PX));
   emitNoise(room, sceneId, victim.x, victim.y, balance.noise.killScream, 'scream', victimId);
+}
+
+/**
+ * Round 8 (GDD 3.22, Session 8A, the cause lines of docs/round8/seams.md 5): a death by Bleeding (`bled`) or
+ * Poisoned (`sickened`). The body lies where the seat fell; no scream, no killer, no clue.
+ */
+export function quietDeath(room: PartyRoom, victimId: string, cause: 'bled' | 'sickened'): void {
+  const victim = simOf(room).players.get(victimId);
+  if (!victim || victim.dead) return;
+  markDead(room, victimId, cause);
+  spawnBody(
+    room,
+    sceneKey(victim.sceneIdx),
+    victimId,
+    Math.floor(victim.x / TILE_PX),
+    Math.floor(victim.y / TILE_PX),
+  );
 }

@@ -46,6 +46,8 @@ export function decodePng(png: Buffer): Rgba {
   let height = 0;
   let channels = 0;
   const idat: Buffer[] = [];
+  let plte: Buffer | undefined;
+  let trns: Buffer | undefined;
   while (off < png.length) {
     const len = png.readUInt32BE(off);
     const type = png.toString('latin1', off + 4, off + 8);
@@ -54,11 +56,13 @@ export function decodePng(png: Buffer): Rgba {
       width = body.readUInt32BE(0);
       height = body.readUInt32BE(4);
       const [depth, colour, , , interlace] = [body[8], body[9], body[10], body[11], body[12]];
-      if (depth !== 8 || interlace !== 0 || (colour !== 6 && colour !== 2)) {
+      if (depth !== 8 || interlace !== 0 || (colour !== 6 && colour !== 2 && colour !== 3)) {
         throw new Error(`unsupported PNG (depth ${depth}, colour type ${colour}, interlace ${interlace})`);
       }
-      channels = colour === 6 ? 4 : 3;
-    } else if (type === 'IDAT') idat.push(body);
+      channels = colour === 6 ? 4 : colour === 2 ? 3 : 1;
+    } else if (type === 'PLTE') plte = body;
+    else if (type === 'tRNS') trns = body;
+    else if (type === 'IDAT') idat.push(body);
     else if (type === 'IEND') break;
     off += 12 + len;
   }
@@ -80,6 +84,16 @@ export function decodePng(png: Buffer): Rgba {
   }
   if (channels === 4) return { width, height, data: rows };
   const data = new Uint8Array(width * height * 4);
+  if (channels === 1) {
+    // Indexed (colour type 3, as encodeIndexedPng writes): PLTE holds the RGB, tRNS the alpha of the first entries.
+    if (!plte) throw new Error('indexed PNG without PLTE');
+    for (let i = 0; i < width * height; i++) {
+      const n = rows[i]!;
+      data.set(plte.subarray(n * 3, n * 3 + 3), i * 4);
+      data[i * 4 + 3] = trns && n < trns.length ? trns[n]! : 255;
+    }
+    return { width, height, data };
+  }
   for (let i = 0; i < width * height; i++) {
     data.set(rows.subarray(i * 3, i * 3 + 3), i * 4);
     data[i * 4 + 3] = 255;
@@ -155,6 +169,53 @@ export function encodePng(img: Rgba, filter?: PngFilter): Buffer {
   return Buffer.concat([
     SIGNATURE,
     chunk('IHDR', ihdr),
+    chunk('IDAT', deflateSync(raw, { level: 9 })),
+    chunk('IEND', Buffer.alloc(0)),
+  ]);
+}
+
+/**
+ * Encode straight RGBA as an 8-bit indexed PNG (colour type 3: PLTE, tRNS for every entry with alpha under 255),
+ * exact for an image of at most 256 distinct RGBA values, or `null` when it has more. Rows are unfiltered (indices
+ * are not a gradient) and deflated at level 9, so the same image always gives the same bytes. A finished page
+ * (the 8-bit style: the world palette, alpha 0 or 255) holds a few dozen colours and shrinks to about a quarter of
+ * its RGBA bytes (SPRITES 3, the first-load budget of ASSETS 6.8).
+ */
+export function encodeIndexedPng(img: Rgba): Buffer | null {
+  const { width, height, data } = img;
+  const index = new Map<number, number>();
+  const raw = Buffer.alloc(height * (width + 1));
+  for (let y = 0; y < height; y++) {
+    raw[y * (width + 1)] = 0;
+    for (let x = 0; x < width; x++) {
+      const at = (y * width + x) * 4;
+      const key = (data[at]! << 24) | (data[at + 1]! << 16) | (data[at + 2]! << 8) | data[at + 3]!;
+      let n = index.get(key);
+      if (n === undefined) {
+        if (index.size === 256) return null;
+        n = index.size;
+        index.set(key, n);
+      }
+      raw[y * (width + 1) + 1 + x] = n;
+    }
+  }
+  const plte = Buffer.alloc(index.size * 3);
+  const trns = Buffer.alloc(index.size, 255);
+  for (const [key, n] of index) {
+    plte.set([(key >>> 24) & 0xff, (key >>> 16) & 0xff, (key >>> 8) & 0xff], n * 3);
+    trns[n] = key & 0xff;
+  }
+  let opaque = index.size;
+  while (opaque > 0 && trns[opaque - 1] === 255) opaque--;
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(width, 0);
+  ihdr.writeUInt32BE(height, 4);
+  ihdr.set([8, 3, 0, 0, 0], 8);
+  return Buffer.concat([
+    SIGNATURE,
+    chunk('IHDR', ihdr),
+    chunk('PLTE', plte),
+    ...(opaque > 0 ? [chunk('tRNS', trns.subarray(0, opaque))] : []),
     chunk('IDAT', deflateSync(raw, { level: 9 })),
     chunk('IEND', Buffer.alloc(0)),
   ]);

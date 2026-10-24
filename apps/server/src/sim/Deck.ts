@@ -2,6 +2,7 @@ import { balance, deckFor, roles } from '@wdi/content';
 import { dealDeck } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { flowOf } from './Flow';
+import { initBodies } from './body/state';
 import { drawVendettas } from './vendettas/state';
 
 // The main-mode deal from the deck (GDD 3.1, round-5 `deck/wire.md` 4.4 and 5). Session 5G owns this file; the hook
@@ -59,6 +60,7 @@ export function dealMainDeck(room: PartyRoom, ids: readonly string[]): Map<strin
   flow.deck = cards;
   flow.undealt = deal.undealt;
   drawVendettas(room, dealt); // round 7, 7H: one vendetta per Killer seat, on its own stream (GDD 3.20)
+  initBodies(room); // round 8, 8A: every seat whole at the deal (GDD 3.22, locked call site)
   return dealt;
 }
 
