@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import minigames from '@wdi/content/data/minigames.json';
 import { MINIGAME_COPY as C } from '../../ui/copy/minigames';
+import type { MinigameKind } from '@wdi/shared/protocol';
 import { DEFAULT_SKINS, pieceAt, skinOf } from './skin';
 
-const rows = Object.values(minigames.minigames);
+const rows = Object.values(minigames.minigames).map((m) => ({ ...m, kind: m.kind as MinigameKind }));
 
 describe('station skins (7M PR 5, A151 (3))', () => {
   it('draws every row as its own station, no two rows the same', () => {
