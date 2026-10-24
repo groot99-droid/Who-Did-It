@@ -20,7 +20,7 @@ the shipped art is packed under `apps/client/public/assets/` by the PRs that fol
 |---|---|
 | `figure-<label>.png` | The baker idling south, south-east and south-west at zoom 2 |
 | `room-<label>.png` | HollowMere: the tavern whole at zoom 1 above, its door and front wall at zoom 2 below |
-| `building-<label>.png` | BlackPine: the lodge whole at zoom 1 above, its middle at zoom 2 below |
+| `building-<label>.png` | BlackPine: the lodge whole at zoom 1, its door end at zoom 2 beside it |
 | `contact-figure.png` | Every `figure-*` side by side, full size |
 | `contact-room.png` | Every `room-*` side by side at half size |
 | `contact-building.png` | Every `building-*` side by side at half size |
