@@ -69,6 +69,7 @@ interface SceneStateLike {
 }
 interface GameStateLike {
   tick: number;
+  taskBar?: number;
   phase: number;
   phaseEndsTick: number;
   startTick: number;
@@ -310,6 +311,10 @@ export class ColyseusWorldFeed implements WorldFeed {
       .get(this.selfId)
       ?.priv?.tasks?.forEach((t) => out.push({ id: t.id, done: t.done, fake: t.fake }));
     return out;
+  }
+
+  taskBar(): number {
+    return this.state.taskBar ?? 0;
   }
 
   questAccept(questId: string): void {
