@@ -168,7 +168,8 @@ describe('the leak audit (8L)', () => {
       const avatar = m.room.state.scenes.get('forest')?.avatars.get(handle);
       if (avatar) avatar.statusBits |= StatusBit.bloody;
     }, 5);
-    expect(await until(() => a.leaks.some((l) => l.includes('Blood')))).toBe(true);
+    // Only a patch decoded on the tick it was encoded is judged, which a loaded runner can delay for seconds.
+    expect(await until(() => a.leaks.some((l) => l.includes('Blood')), 20_000)).toBe(true);
     clearInterval(timer);
   });
 });

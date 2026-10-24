@@ -155,6 +155,7 @@ describe('the party list', () => {
       opts('Priv', { visibility: 'private', invited: [friend] }),
     );
     await until((r) => r.some((p) => p.code === open.roomId));
+    await until((r) => r.some((p) => p.code === priv.roomId), friend); // the private row publishes on its own step
 
     const none = await fetchParties();
     expect(none.map((p) => p.code)).toEqual([open.roomId]);
