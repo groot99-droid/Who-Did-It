@@ -8,6 +8,7 @@ Pure Python (no bpy). A role is a Poly Haven texture slug, the metres one repeat
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass
 
 USER_AGENT = "who-did-it-build"
@@ -133,3 +134,29 @@ def texture_path(role_name: str, map_name: str = "diff", res: str | None = None,
     r = role(role_name)
     res = res or STYLE_RESOLUTION.get(style or "8bit", "1k")
     return os.path.join(cache, r.slug, texture_file(r.slug, map_name, res))
+
+
+# ---------------------------------------------------------------- the retexture tables (retexture.py, pure)
+
+# World ramp -> role for props, kit and buildings; a ramp not listed (ink, moon, lantern, blood, skin) stays flat.
+WORLD_ROLES = {
+    "wood": "wood_plank", "stone": "stone_wall", "plaster": "plaster", "brick": "brick", "bone": "linen",
+    "litter": "thatch", "moss": "moss", "slate": "iron", "fog": "stone_wall", "brass": "iron", "teal": "wool",
+}
+# The same for a figure's garments: a wood-ramp garment is leather, a litter-ramp one fur.
+FIGURE_ROLES = {
+    "bone": "linen", "fog": "wool", "wood": "leather", "slate": "wool", "stone": "iron", "brick": "wool",
+    "moss": "wool", "litter": "fur", "plaster": "linen", "teal": "wool", "brass": "iron",
+}
+# Today's textured wall materials, `KitTex_<surface>` and `BldTex_<surface>[_#hex]` (env/kits.py, build_buildings.py).
+LEGACY_RE = re.compile(r"^(?:KitTex|BldTex)_([a-z_]+?)(?:_(#[0-9A-Fa-f]{6}))?$")
+LEGACY_EXTRA = {"shakes": "wood_plank"}  # build_buildings renders shakes from the planks texture
+
+
+def legacy_role(material_name: str) -> tuple[str, str | None] | None:
+    """(role, tint hex or None) for a legacy textured material's name; None for any other name."""
+    m = LEGACY_RE.match(material_name)
+    if not m:
+        return None
+    role_name = LEGACY_SURFACES.get(m.group(1)) or LEGACY_EXTRA.get(m.group(1))
+    return None if role_name is None else (role_name, m.group(2))
