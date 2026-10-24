@@ -1,7 +1,7 @@
 {
   "id": "hollowmere",
   "name": "HollowMere",
-  "blurb": "Fog-bound harbour hamlet: lanes, a tavern and a manor, two woods and Vane's flooded tin gallery.",
+  "blurb": "Railroad town on a drowned mere: lanes, a tavern and a manor, two woods and Vane's flooded tin gallery.",
   "modes": ["main"],
   "theme": "harbour",
   "scenes": [

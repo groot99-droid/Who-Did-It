@@ -2,7 +2,7 @@
 
 A browser multiplayer hidden-role game for 4 to 10 players, played from a link.
 Open the page, **Create Party** or **Join Party** with a 5-character code, press Start, and
-each player receives a secret role card. Then the village of Hollowmere opens up: enter houses,
+each player receives a secret role card. Then the village of HollowMere opens up: enter houses,
 climb to lofts, slip into the forest and the cave, find bodies, collect clues, and vote on who
 did it before the Cabal reaches parity.
 
@@ -60,7 +60,7 @@ Unset any one of them and the room and both routes disappear. Details: [Architec
 ## Documents
 
 - [Game design](docs/GDD.md), the only source of rules and numbers together with `balance.json`
-- [World bible](docs/WORLD.md), Hollowmere and its 14 scenes
+- [World bible](docs/WORLD.md), HollowMere and its 14 scenes
 - [Architecture](docs/ARCHITECTURE.md), lobby codes, role secrecy, netcode, deployment
 - [Asset pipeline](docs/ASSETS.md), Blender rig, Higgsfield, Adobe, licensing
 - [Roadmap](docs/ROADMAP.md), milestones M0-M7 and the first 14 days

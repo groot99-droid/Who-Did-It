@@ -52,7 +52,7 @@ describe.each([4, 5, 6])('win conditions at %i seats', (n) => {
     const payload = gameOver(m)!;
     expect(payload.winner).toBe(Winner.village);
     expect((payload.roles as Record<string, string>)[idOf(m, 0)]).toBe('killer');
-    expect(typeof payload.summary).toBe('string');
+    expect(payload.summary).toBe('The Cabal is gone from HollowMere. The Village wins.'); // the map's display name
     // No sceneEnter after the reveal: the client goes straight to the end screen.
     const enters = events(m.bots[1]!, 'sceneEnter').length;
     await sleep(200);

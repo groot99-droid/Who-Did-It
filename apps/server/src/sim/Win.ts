@@ -1,12 +1,14 @@
-import { balance } from '@wdi/content';
+import { balance, maps } from '@wdi/content';
 import { BUILD_VERSION, Phase, type PlayerState, S2C, TICK_RATE, Winner, checkWin } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { logMatch } from '../services/MatchLog';
+import { talkLog } from '../services/talk/npcNotes';
 import { resetCoversForLobby } from './Covers';
 import { gameOverExtras } from './Deck';
 import { countRow, factionOf, flowOf, resetFlow, roleIdOf, rolesOf, setPhase } from './Flow';
 import { resetNightForLobby } from './NightPowers';
 import { simOf } from './RoomSim';
+import { mapIdOfRoom } from './MapSites';
 import { isNpcSeat, resetNpcsForLobby } from './Npc';
 import { SCENE_KEYS } from './World';
 
@@ -20,10 +22,11 @@ export function evaluateWin(room: PartyRoom): 'village' | 'cabal' | null {
   return checkWin(living, countRow(room.state.players.size).cabalWin);
 }
 
-const SUMMARY = {
-  village: 'The Cabal is gone from Hollowmere. The Village wins.',
-  cabal: 'The Cabal holds Hollowmere. The Village is lost.',
-} as const;
+/** The end-of-match line, naming the map the room played by its display name (`maps/<id>.json` `name`). */
+const summaryOf = (winner: 'village' | 'cabal', town: string): string =>
+  winner === 'village'
+    ? `The Cabal is gone from ${town}. The Village wins.`
+    : `The Cabal holds ${town}. The Village is lost.`;
 
 /** Game over: the phase, the winner, the gameOver message and the match-log line (A30). */
 export function endMatch(room: PartyRoom, winner: 'village' | 'cabal'): void {
@@ -35,7 +38,7 @@ export function endMatch(room: PartyRoom, winner: 'village' | 'cabal'): void {
   room.broadcast(S2C.gameOver, {
     winner: state.winner,
     roles: rolesOf(room),
-    summary: SUMMARY[winner],
+    summary: summaryOf(winner, maps[mapIdOfRoom(room)].name),
     ...gameOverExtras(room),
   });
 
@@ -73,6 +76,7 @@ export function endMatch(room: PartyRoom, winner: 'village' | 'cabal'): void {
         ejectionCorrect: m.ejectionCorrect,
       }),
     })),
+    ...talkLog(room), // round 8, 8T: the NPC notes, so a replay never calls the model (GDD 3.25)
   });
 }
 

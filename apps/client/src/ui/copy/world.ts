@@ -46,7 +46,7 @@ export const WORLD_COPY = {
   'hud.card': 'Role card (Tab)',
   'hud.notebook': 'Notebook (N)',
   'hud.notebook.close': 'Close notebook',
-  'hud.scene': 'Hollowmere: {scene}',
+  'hud.scene': '{map}: {scene}',
   'phase.grace': 'Grace',
   'phase.day': 'Day',
   'phase.dusk': 'Dusk',

@@ -14,6 +14,13 @@ export function loadSceneNames(): Promise<(index: number) => string> {
   return loaded;
 }
 
+/** The display name of a map by its id ("HollowMere"); the id itself until it loads. */
+export function loadMapName(id: string): Promise<string> {
+  return import('@wdi/content').then(
+    ({ maps }) => (maps as Record<string, { name?: string }>)[id]?.name ?? id,
+  );
+}
+
 /** The display name of a scene by its id ("The Drowned Lantern"); the id with underscores spelled out until it loads. */
 export function loadSceneName(id: string): Promise<string> {
   return import('@wdi/content').then(

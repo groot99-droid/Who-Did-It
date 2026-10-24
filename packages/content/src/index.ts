@@ -19,6 +19,8 @@ import musicJson from '../data/music.json' with { type: 'json' };
 import resourcesJson from '../data/resources.json' with { type: 'json' };
 import recipesJson from '../data/recipes.json' with { type: 'json' };
 import mobsJson from '../data/mobs.json' with { type: 'json' };
+// Round 8 (GDD 3.22, Session 8A): the effects table.
+import effectsJson from '../data/effects.json' with { type: 'json' };
 import questsJson from '../data/quests.json' with { type: 'json' };
 import minigamesJson from '../data/minigames.json' with { type: 'json' };
 import vendettasJson from '../data/vendettas.json' with { type: 'json' };
@@ -74,6 +76,7 @@ import { CutscenesFile } from './schemas/cutscenes.js';
 import { MusicFile } from './schemas/music.js';
 import { MinigamesFile, MobsFile, QuestsFile, RecipesFile, ResourcesFile } from './schemas/m5b.js';
 import { EventsFile, EvolutionsFile, LawsFile, VendettasFile } from './schemas/bible.js';
+import { EffectsFile } from './schemas/effects.js';
 import { EconomyFile } from './schemas/economy.js';
 import { RelationsFile } from './schemas/relations.js';
 import { SCENE_IDS, Scene, type SceneId } from './schemas/scene.js';
@@ -103,6 +106,7 @@ export * from './schemas/cutscenes.js';
 export * from './schemas/music.js';
 export * from './schemas/m5b.js';
 export * from './schemas/bible.js';
+export * from './schemas/effects.js';
 export * from './schemas/economy.js';
 export * from './schemas/relations.js';
 export { validateContent, type Content } from './validate.js';
@@ -182,6 +186,7 @@ export function parseContent(raw: {
   evolutions: unknown;
   laws: unknown;
   events: unknown;
+  effects: unknown;
   economy: unknown;
   relations: unknown;
 }): Omit<Content, 'scenes' | 'maps'> {
@@ -209,6 +214,7 @@ export function parseContent(raw: {
     evolutions: EvolutionsFile.parse(raw.evolutions),
     laws: LawsFile.parse(raw.laws),
     events: EventsFile.parse(raw.events),
+    effects: EffectsFile.parse(raw.effects),
     economy: EconomyFile.parse(raw.economy),
     relations: RelationsFile.parse(raw.relations),
   };
@@ -241,6 +247,7 @@ export const content: Content = {
     evolutions: evolutionsJson,
     laws: lawsJson,
     events: eventsJson,
+    effects: effectsJson,
     economy: economyJson,
     relations: relationsJson,
   }),
@@ -275,6 +282,7 @@ export const {
   evolutions,
   laws,
   events,
+  effects,
   economy,
   relations,
 } = content;

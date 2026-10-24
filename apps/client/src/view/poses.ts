@@ -82,8 +82,13 @@ const FALLBACK: Partial<Record<Clip, Clip>> = {
   interact: 'idle',
 };
 
-/** Clips rendered in the four diagonals only (SPRITES 3): the one-shots and the mood idles. */
+/**
+ * Clips rendered in the four diagonals only (SPRITES 3, the owner's option B of A161): the slowed gaits, the
+ * one-shots and the mood idles.
+ */
 export const FOUR_DIR_CLIPS: ReadonlySet<Clip> = new Set<Clip>([
+  'limp',
+  'stagger',
   'knockdown',
   'down',
   'getup',
@@ -128,18 +133,26 @@ export interface Motion {
 const STILL: Motion = { bits: 0, speed: 0 };
 
 /**
- * The clip for `animId` under the figure's status bits and speed (motion.md 1; the comments of animIds.ts): the
- * server sends the one-shots and the mood idles, the client picks the gaits and the status loops. A knocked-out
- * figure lies `down` and a stunned one sways `stunned` whatever idle or walk the server sends; a moving figure
- * limps under `limp`, staggers under `fatigued` or `dazed`, runs above `RUN_SPEED_PX`, else walks. A look without
- * the clip falls back (`FALLBACK`); a look without `interact` plays `idle`, and `tick` asks the greybox to mark the
- * hold with a small teal tick above the head instead (npc.md 4).
+ * The clips of a look's lazy pair (SPRITES 3, A161: `char_<look>_2`), loaded on the first frame a figure wants
+ * one; until then the figure plays the fallback and `PlayerView` asks `assets.ts` for the pair.
  */
-export function clipFor(
-  animId: number,
-  has: (clip: Clip) => boolean,
-  motion: Motion = STILL,
-): { clip: Clip; tick: boolean } {
+export const LAZY_CLIPS: ReadonlySet<Clip> = new Set<Clip>([
+  'knockdown',
+  'down',
+  'getup',
+  'rob',
+  'eat',
+  'threaten',
+]);
+
+/**
+ * The clip a figure wants for `animId` under its status bits and speed, before any fallback (motion.md 1; the
+ * comments of animIds.ts): the server sends the one-shots and the mood idles, the client picks the gaits and the
+ * status loops. A knocked-out figure lies `down` and a stunned one sways `stunned` whatever idle or walk the server
+ * sends; a moving figure limps under `limp`, staggers under `fatigued` or `dazed`, runs above `RUN_SPEED_PX`, else
+ * walks.
+ */
+export function wantedClip(animId: number, motion: Motion = STILL): Clip {
   let clip = CLIP_OF[animId] ?? 'idle';
   if (clip === 'idle' || clip === 'walk') {
     if (motion.bits & StatusBit.down) clip = 'down';
@@ -150,7 +163,21 @@ export function clipFor(
       else if (motion.speed > RUN_SPEED_PX) clip = 'run';
     }
   }
-  const wanted = clip;
+  return clip;
+}
+
+/**
+ * The clip for `animId` under the figure's status bits and speed (`wantedClip`). A look without the clip falls
+ * back (`FALLBACK`); a look without `interact` plays `idle`, and `tick` asks the greybox to mark the hold with a
+ * small teal tick above the head instead (npc.md 4).
+ */
+export function clipFor(
+  animId: number,
+  has: (clip: Clip) => boolean,
+  motion: Motion = STILL,
+): { clip: Clip; tick: boolean } {
+  const wanted = wantedClip(animId, motion);
+  let clip = wanted;
   while (clip !== 'idle' && !has(clip)) clip = FALLBACK[clip] ?? 'idle';
   const hold = wanted === 'interact' || wanted === 'inspect' || wanted === 'rob';
   return { clip, tick: hold && clip === 'idle' };

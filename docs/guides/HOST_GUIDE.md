@@ -18,7 +18,7 @@ filled with NPC villagers at Start, and even a single human can start a match fo
 
 ## Lobby settings
 
-- **Map**: Hollowmere or Blackpine.
+- **Map**: HollowMere or BlackPine.
 - **Add NPC / Remove NPC** and **NPC difficulty**: fill or thin the table with bots.
 - **Art style** (landing page): 8-bit or low poly, per player, changed at any time.
 - **Sound** (gear): music, effects and mute, per player.

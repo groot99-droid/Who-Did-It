@@ -36,6 +36,8 @@ export const ClueKind = {
   clawMarks: 8,
   /** A Hungry Killer's glowing footprints (GDD 3.3): `value` the height index, `dir` the facing. */
   hungerPrints: 9,
+  /** Round 8 (8E, GDD 3.24): scuffed ground where a mugging happened; `value` the mugger's height index. */
+  scuffle: 10,
 } as const;
 export type ClueKindId = (typeof ClueKind)[keyof typeof ClueKind];
 
@@ -80,7 +82,8 @@ export type NpcLevelId = (typeof NpcLevel)[keyof typeof NpcLevel];
 /**
  * Round 8 (GDD 3.22, docs/round8/seams.md 2): the effect ids of `EffectState.id`, u8 on the wire; `effects.json`
  * keys its rows by the string. Append-only. `indebted` is the economy status 8D sets (GDD 3.23); it is defined
- * here so every session shares one table.
+ * here so every session shares one table. `charm` is reserved for 7M's well (round 8, stations.md 4): one silent
+ * charge that the first killing Knife strike spends, leaving the seat Wounded at 1 health (GDD 3.22).
  */
 export const EffectId = {
   slowed: 1,
@@ -94,6 +97,7 @@ export const EffectId = {
   famished: 9,
   knockedOut: 10,
   indebted: 11,
+  charm: 12,
 } as const;
 export type EffectKey = keyof typeof EffectId;
 export type EffectIdValue = (typeof EffectId)[EffectKey];

@@ -93,13 +93,13 @@ describe('resources and recipes', () => {
 });
 
 describe('mobs', () => {
-  it('has the four mobs, and only the wolf kills', () => {
+  it('has the four mobs, and every one kills at zero health (GDD 3.22)', () => {
     expect(Object.keys(content.mobs.mobs).sort()).toEqual(['bat', 'boar', 'rat', 'wolf']);
-    expect(
-      Object.values(content.mobs.mobs)
-        .filter((m) => m.kills)
-        .map((m) => m.id),
-    ).toEqual(['wolf']);
+    expect(Object.values(content.mobs.mobs).every((m) => m.kills)).toBe(true);
+    for (const m of Object.values(content.mobs.mobs)) {
+      expect(m.hp).toBeGreaterThan(0);
+      expect(m.dmg).toBeLessThan(content.balance.body.maxHp);
+    }
   });
 
   it('rejects a spawner of an unknown mob and a crowded scene', () => {

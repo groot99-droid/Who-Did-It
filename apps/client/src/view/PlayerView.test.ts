@@ -4,6 +4,10 @@ import { AnimId, StatusBit } from './animIds';
 import { PlayerView } from './PlayerView';
 import { RUN_SPEED_PX } from './poses';
 
+// The loader module pulls in Phaser, which does not load under node; PlayerView reaches it through a dynamic import.
+const loadLazyLook = vi.fn();
+vi.mock('./assets', () => ({ loadLazyLook }));
+
 // PlayerView on a fake scene (motion.md 1, 4): which animation keys each clip plays, the four-direction rounding,
 // the fallbacks of a look without the round-8 clips, the speed-picked gait and the sign marks per status bit.
 
@@ -42,6 +46,10 @@ class Fake {
     this.calls.push('destroy');
   }
   setScale() {
+    return this;
+  }
+  setDisplaySize(w: number, h: number) {
+    this.calls.push(`size ${w}x${h}`);
     return this;
   }
   setOrigin() {
@@ -99,6 +107,7 @@ function scene(animKeys: string[], textures = ['char_detective', 'ovl_detective'
         sprite: make('sprite'),
         text: make('text'),
         rectangle: make('rectangle'),
+        image: make('image'),
         container: (_x: number, _y: number, kids: Fake[]) => make('container')().add(kids),
       },
       textures: { exists: (k: string) => textures.includes(k) },
@@ -120,8 +129,10 @@ function scene(animKeys: string[], textures = ['char_detective', 'ovl_detective'
 const DIRS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
 const FOUR = ['ne', 'se', 'sw', 'nw'] as const;
 const V1 = ['idle', 'walk', 'swing', 'interact', 'die'];
-const R8_EIGHT = ['run', 'limp', 'stagger', 'strike', 'hurt'];
+const R8_EIGHT = ['run', 'strike', 'hurt'];
 const R8_FOUR = [
+  'limp',
+  'stagger',
   'knockdown',
   'down',
   'getup',
@@ -159,7 +170,10 @@ describe('PlayerView (motion.md 1)', () => {
     s = scene(keysOf([...V1, ...R8_EIGHT, ...R8_FOUR]));
     view = build(s);
   });
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    loadLazyLook.mockClear();
+  });
 
   for (const clip of [...R8_EIGHT, ...R8_FOUR]) {
     const id = AnimId[clip as keyof typeof AnimId];
@@ -213,6 +227,30 @@ describe('PlayerView (motion.md 1)', () => {
       'char/detective/walk/se@0',
       'char/detective/die/se@0',
       'char/detective/interact/se@0',
+    ]);
+  });
+
+  it('asks for the lazy pair once when a look lacks a rare clip, and never without a loader', async () => {
+    // A V1 look wants `rob`: the fallback plays now, assets.ts fetches char_<look>_2 (SPRITES 3, A161).
+    s = scene(keysOf(V1));
+    view = build(s);
+    view.pose('se', AnimId.rob, 0);
+    view.pose('se', AnimId.idle, StatusBit.down);
+    expect(loadLazyLook).not.toHaveBeenCalled();
+    const load = { start: vi.fn(), once: vi.fn() };
+    s = scene(keysOf(V1));
+    (s.scene as unknown as { load: unknown }).load = load;
+    view = build(s);
+    view.pose('se', AnimId.walk, StatusBit.limp);
+    expect(loadLazyLook).not.toHaveBeenCalled();
+    view.pose('se', AnimId.rob, 0);
+    view.pose('se', AnimId.eat, 0);
+    await vi.waitFor(() => expect(loadLazyLook).toHaveBeenCalledTimes(1));
+    expect(loadLazyLook).toHaveBeenCalledWith(s.scene, 'detective');
+    expect(played(s)).toEqual([
+      'char/detective/walk/se@0',
+      'char/detective/interact/se@0',
+      'char/detective/idle/se@0',
     ]);
   });
 
@@ -290,6 +328,29 @@ describe('PlayerView (motion.md 1)', () => {
       expect(s.tweens).toEqual([]);
       expect(marks(s, 'ellipse')).toHaveLength(1);
       expect(marks(s, 'text')).toHaveLength(3);
+    });
+  });
+
+  describe('the bloodied mark (teardown.md 3)', () => {
+    it('shows the bleeding icon over a Bloody figure at 24 px, hides it at a door and when the blood is gone', () => {
+      const t = scene(keysOf(V1), ['char_detective', 'ovl_detective', 'mark_bleeding']);
+      const v = build(t);
+      const mark = t.made.find((f) => f.kind === 'image')!;
+      expect(mark.calls).toContain('size 24x24');
+      expect(mark.visible).toBe(false);
+      v.setBlood(true);
+      expect(mark.visible).toBe(true);
+      v.pose('se', AnimId.idle, StatusBit.transit);
+      expect(mark.visible).toBe(false);
+      v.pose('se', AnimId.idle, 0);
+      expect(mark.visible).toBe(true);
+      v.setBlood(false);
+      expect(mark.visible).toBe(false);
+    });
+
+    it('draws nothing extra while the mark image is not loaded', () => {
+      view.setBlood(true);
+      expect(s.made.some((f) => f.kind === 'image')).toBe(false);
     });
   });
 });

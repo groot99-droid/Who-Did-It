@@ -1019,13 +1019,21 @@ def stick(b: Builder, spec: dict) -> None:
 
 @piece
 def hand_basket(b: Builder, spec: dict) -> None:
-    """A wicker basket on the left arm, a cloth over its load."""
+    """A wicker basket on the left arm, a cloth over its load; with ``basket_load`` ``"loaves"`` (the Baker,
+    the owner's ruling of 2026-10-24) three golden loaves stand proud of the rim instead."""
     x = -HAND_X - 0.04
     b.part("HandBasket", "body", ("wood", 3), "prop.L", [
         (frustum, dict(z0=PROP_Z - 0.24, z1=PROP_Z - 0.04, bottom=(0.16, 0.24), top=(0.20, 0.30), offset=(x, 0.04))),
         (rod, dict(a=(x, -0.10, PROP_Z - 0.04), b=(x, 0.04, PROP_Z + 0.08), width=0.025)),
         (rod, dict(a=(x, 0.04, PROP_Z + 0.08), b=(x, 0.18, PROP_Z - 0.04), width=0.025)),
     ], bevel=0.008)
+    if spec.get("basket_load") == "loaves":
+        b.part("BasketLoaves", "body", ("brass", 2), "prop.L", [
+            (box, dict(center=(x, -0.04, PROP_Z - 0.02), size=(0.12, 0.07, 0.07))),
+            (box, dict(center=(x, 0.05, PROP_Z - 0.01), size=(0.12, 0.07, 0.08))),
+            (box, dict(center=(x, 0.13, PROP_Z - 0.02), size=(0.12, 0.06, 0.07))),
+        ], bevel=0.015)
+        return
     b.part("BasketCloth", "body", ("bone", 2), "prop.L", [
         (box, dict(center=(x, 0.04, PROP_Z - 0.03), size=(0.17, 0.26, 0.03))),
     ], bevel=0)

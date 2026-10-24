@@ -45,5 +45,23 @@
     "hq",
     "blackMarket"
   ],
-  "lightKinds": ["lanternPost"]
+  "lightKinds": ["lanternPost"],
+  "townsfolk": {
+    "clerk": {
+      "maps": ["hollowmere"],
+      "look": "villager",
+      "named": true,
+      "fixed": false,
+      "stations": ["ledger", "noticeBoard", "window", "pump"]
+    },
+    "tallyman": {
+      "maps": ["blackpine"],
+      "look": "villager",
+      "named": true,
+      "fixed": false,
+      "stations": ["rack", "noticeBoard", "pump", "basin"]
+    },
+    "stallholder": { "look": "villager", "named": false, "fixed": true, "stations": ["shop"] },
+    "villager": { "look": "villager", "named": false, "fixed": false, "stations": [] }
+  }
 }

@@ -2,6 +2,7 @@
 // roster and deck rows add up, and every scene grid agrees with its portals, spawns and spots.
 import type { AbilitiesFile } from './schemas/abilities.js';
 import { PROFILE_RANK, type BalanceFile, type Profile } from './schemas/balance.js';
+import { EFFECT_IDS, type EffectsFile } from './schemas/effects.js';
 import type { CluesFile } from './schemas/clues.js';
 import { PLAYER_COUNTS } from './schemas/common.js';
 import type { ItemsFile } from './schemas/items.js';
@@ -53,6 +54,8 @@ export interface Content {
   evolutions: EvolutionsFile;
   laws: LawsFile;
   events: EventsFile;
+  /** Round 8 (GDD 3.22): the effects table (Session 8A). */
+  effects: EffectsFile;
   // Round 8 (GDD 3.23).
   economy: EconomyFile;
   // Round 8 (GDD 3.22), Session 8B.
@@ -331,6 +334,39 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
       err(`scene ${scene.id}: ${spawners.length} spawners, above mobs.maxPerScene`);
     }
   }
+  // Round 8 (GDD 3.22, Session 8A): every effect row keyed by its id and every id present; each cure is an item or
+  // `food`; each effect a damage row, a creature or another effect names exists; the body's thresholds are sound.
+  const effectRows = c.effects.effects;
+  for (const [key, row] of Object.entries(effectRows)) {
+    if (key !== row.id) err(`effects.json: key "${key}" holds record with id "${row.id}"`);
+  }
+  for (const id of EFFECT_IDS) if (!Object.hasOwn(effectRows, id)) err(`effects.json: missing row ${id}`);
+  for (const effect of Object.values(effectRows)) {
+    for (const cure of effect.cures) {
+      if (cure !== 'food' && !Object.hasOwn(items.items, cure))
+        err(`effects.json: ${effect.id} cured by unknown item ${cure}`);
+    }
+    for (const applied of Object.keys(effect.applies ?? {})) {
+      if (!Object.hasOwn(effectRows, applied))
+        err(`effects.json: ${effect.id} applies unknown effect ${applied}`);
+    }
+  }
+  const checkDamageEffects = (where: string, row: { effects: Record<string, number> }) => {
+    for (const id of Object.keys(row.effects)) {
+      if (!Object.hasOwn(effectRows, id)) err(`${where}: applies unknown effect ${id}`);
+    }
+  };
+  for (const [id, row] of Object.entries(c.balance.body.damage))
+    checkDamageEffects(`balance.json body.damage.${id}`, row);
+  for (const mob of Object.values(mobs.mobs)) checkDamageEffects(`mobs.json ${mob.id}`, mob);
+  const body = c.balance.body;
+  if (body.koWakeHp >= body.maxHp) err('balance.json body.koWakeHp: must be under maxHp');
+  if (body.woundedBelow >= body.maxHp) err('balance.json body.woundedBelow: must be under maxHp');
+  if (body.fatigueRecover > body.maxStamina)
+    err('balance.json body.fatigueRecover: must be at most maxStamina');
+  if (body.strikeStamina > body.maxStamina)
+    err('balance.json body.strikeStamina: must be at most maxStamina');
+
   // Per map and per party profile: a small party must be able to make every tool from the scenes open to it.
   const inHand = new Map<string, Set<string>>();
   for (const map of Object.values(c.maps)) {

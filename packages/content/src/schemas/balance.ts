@@ -64,6 +64,22 @@ const TileSpan = z.strictObject({ min: z.number().int().positive(), max: z.numbe
 const FracSpan = z.strictObject({ min: Chance, max: Chance });
 /** The next activity's weights in one phase class; each row sums to 1 (validate.ts). */
 const RoutineWeights = z.strictObject({ work: Chance, stroll: Chance, idle: Chance });
+/**
+ * One row of the damage table (GDD 3.22, round 8): the health it takes, each effect it may apply with its chance,
+ * and whether zero health from it is a death (else a knockout). The effect keys are `effects.json` ids.
+ */
+export const DamageRow = z.strictObject({
+  dmg: z.number().int().positive(),
+  effects: z.record(z.string().regex(/^[a-z][A-Za-z0-9]*$/), Chance),
+  kills: z.boolean(),
+});
+export type DamageRow = z.infer<typeof DamageRow>;
+/** A mood's factors on the routine weights (round 8, GDD 3.24). */
+const MoodWeights = z.strictObject({
+  work: z.number().nonnegative(),
+  stroll: z.number().nonnegative(),
+  idle: z.number().nonnegative(),
+});
 
 export const BalanceFile = z.strictObject({
   gddRef: GddRef,
@@ -156,14 +172,37 @@ export const BalanceFile = z.strictObject({
     capPerScene: z.number().int().positive(),
     collectHoldS: Seconds,
   }),
-  health: Section({
+  /**
+   * Round 8 (GDD 3.22, Session 8A; docs/round8/body.md 2-5): the body, replacing the two-hit-point `health` block.
+   * Every attack is a row of `damage` (creatures carry theirs in `mobs.json`); the effects' numbers are
+   * `effects.json`.
+   */
+  body: Section({
     maxHp: z.number().int().positive(),
-    regenHp: z.number().int().positive(),
-    regenEveryS: Seconds,
-    knifeDamage: z.number().int().positive(),
-    wolfDamage: z.number().int().positive(),
-    woundedS: Seconds,
-    woundedSpeedFactor: z.number().positive().max(1),
+    /** Health regained per second out of combat (no hit for `regenAfterS`), never while an effect blocks it. */
+    regenHpPerS: z.number().positive(),
+    regenAfterS: Seconds,
+    maxStamina: z.number().int().positive(),
+    /** Stamina running costs per second; walking and standing regain `staminaRegenPerS`. */
+    runCostPerS: z.number().positive(),
+    staminaRegenPerS: z.number().positive(),
+    /** Fatigued ends once stamina is back over this. */
+    fatigueRecover: z.number().int().positive(),
+    /** Health under this is Wounded. */
+    woundedBelow: z.number().int().positive(),
+    /** No food for this long is Famished. */
+    famishedAfterS: Seconds,
+    /** A knockout lasts this long; the seat wakes at `koWakeHp`, Dazed, having dropped `koPurseShare` of its purse. */
+    koS: Seconds,
+    koWakeHp: z.number().int().positive(),
+    koPurseShare: z.number().min(0).max(1),
+    /** Stamina one strike costs. */
+    strikeStamina: z.number().int().positive(),
+    /** Health a medkit (`heal`) restores. */
+    healHp: z.number().int().positive(),
+    /** How long a dead creature's row stays in the scene before it goes (GDD 3.15, A142). */
+    creatureCorpseS: Seconds,
+    damage: z.strictObject({ strike: DamageRow, mugging: DamageRow, slingshot: DamageRow }),
   }),
   movement: Section({
     walkTilesPerS: z.number().positive(),
@@ -268,6 +307,93 @@ export const BalanceFile = z.strictObject({
     /** Round 6 (GDD 3.19): an NPC at one goal and one tile for longer than this fails the stuck invariant. */
     stuckInvariantS: Seconds,
   }),
+  /**
+   * Round 8 (GDD 3.24, Session 8E): the needs and moods of NPC seats and ambient townsfolk. A need is a 0..1 level in
+   * room memory; `threshold` is where it counts, `desperateNeeds` how many over it make Desperate, `moodHoldS` how long
+   * a mood holds before it may change. A `riseS` or `fallS` is the time a need takes to cross the whole scale at that
+   * rate; the other keys are the jump one event gives. `weights` scale the routine's draw per mood (`moodWeights`).
+   */
+  moods: Section({
+    threshold: Chance,
+    desperateNeeds: z.number().int().positive(),
+    moodHoldS: Seconds,
+    /** Hunger rises over `riseS` (`famishedMul` times faster under 8A's Famished), falls at home and on a meal. */
+    hunger: z.strictObject({
+      riseS: Seconds,
+      homeFallS: Seconds,
+      mealRelief: Chance,
+      famishedMul: z.number().positive(),
+    }),
+    fear: z.strictObject({
+      body: Chance,
+      chase: Chance,
+      struck: Chance,
+      ejection: Chance,
+      darkRiseS: Seconds,
+      fallS: Seconds,
+    }),
+    anger: z.strictObject({
+      struck: Chance,
+      robbed: Chance,
+      taxed: Chance,
+      ejectionRelief: Chance,
+      mealRelief: Chance,
+      fallS: Seconds,
+    }),
+    /** `lightPurse` is in Scrip (8C's purse): below it Want rises over `lightRiseS`; Indebted (8D) over `debtRiseS`. */
+    want: z.strictObject({
+      lightPurse: z.number().int().nonnegative(),
+      lightRiseS: Seconds,
+      debtRiseS: Seconds,
+      wage: Chance,
+      sale: Chance,
+    }),
+    /**
+     * The mugging (GDD 3.24): a Hungry, Angry or Desperate figure or NPC seat alone with a seat rolls each second
+     * `chancePerS[band]` of the target's purse band, times `1 + moodMul * strength` (the need behind its mood), times
+     * `1 - fearMul * fear`, times `nightMul` in the night class, `weakMul` for a Weakened or Fatigued target,
+     * `longAloneMul` after `longAloneS` alone with a heavy purse, `lightMul` when the target's light burns. The
+     * mugger walks up (`approachS` at most, within `reachTiles`), threatens for `threatS`, and the target answers
+     * within `answerS`; Pay loses `share` of the purse; Flee is chased for `chaseS`. Each side waits `cooldownS`.
+     */
+    mug: z.strictObject({
+      chancePerS: z.strictObject({ light: Chance, heavy: Chance }),
+      moodMul: z.number().nonnegative(),
+      fearMul: z.number().nonnegative(),
+      nightMul: z.number().nonnegative(),
+      weakMul: z.number().nonnegative(),
+      longAloneS: Seconds,
+      longAloneMul: z.number().nonnegative(),
+      lightMul: z.number().nonnegative(),
+      reachTiles: z.number().positive(),
+      approachS: Seconds,
+      threatS: Seconds,
+      answerS: Seconds,
+      share: Chance,
+      chaseS: Seconds,
+      cooldownS: Seconds,
+    }),
+    weights: z.strictObject({
+      hungry: MoodWeights,
+      scared: MoodWeights,
+      angry: MoodWeights,
+      desperate: MoodWeights,
+    }),
+  }),
+  /**
+   * Round 8 (GDD 3.24, Session 8E): the ambient townsfolk. `count` is how many figures a map holds at each party
+   * profile (the named figure and the stallholders of `routines.json` `townsfolk` first); a figure walks at
+   * `walkTilesPerS`, works a station for `stationDwellS`, then idles for `idleS` with chance `idleChance`; `height`
+   * is the trait index it is drawn at.
+   */
+  townsfolk: Section({
+    count: z.strictObject({ small: Count, medium: Count, large: Count }),
+    walkTilesPerS: z.number().positive(),
+    stationDwellS: Span,
+    idleS: Span,
+    idleChance: Chance,
+    height: z.number().int().nonnegative(),
+  }),
   /** Round 6 (GDD 3.14). Each resource's own gather hold and respawn are rows of resources.json. */
   resources: Section({
     /** The share of each node pool that is active in a match. */
@@ -351,6 +477,20 @@ export const BalanceFile = z.strictObject({
       }),
       /** When they fall: fractions of the discussion plus the vote time, from the discussion's first tick. */
       windowFrac: FracSpan,
+    }),
+    /** The model's notes (GDD 3.25 "Talk"), only with the server key: a late answer gives the template line. */
+    model: z.strictObject({
+      /** A call not answered in this many seconds gives the template line. */
+      timeoutS: z.number().positive(),
+      /** Per match, at most this many calls and this many tokens, in and out; past either, templates only. */
+      callsPerMatch: z.number().int().nonnegative(),
+      tokensPerMatch: z.number().int().nonnegative(),
+      /** `max_tokens` of one call. */
+      maxTokens: z.number().int().positive(),
+      /** A line longer than this is thrown away for the template. */
+      maxChars: z.number().int().positive(),
+      /** The meeting so far, as the model reads it: the last this many lines. */
+      transcriptLines: z.number().int().positive(),
     }),
   }),
 });

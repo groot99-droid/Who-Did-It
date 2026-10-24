@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Rent: a house with the coin it is owed. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g1" data-flat="#DCC4A1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0DEB3"/><stop offset="1" stop-color="#DCC4A1"/></linearGradient>
+  <linearGradient id="g2" data-flat="#AA5A39" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C8744A"/><stop offset="1" stop-color="#AA5A39"/></linearGradient>
+  <radialGradient id="g3" data-flat="#F2B33D" gradientUnits="userSpaceOnUse" cx="32" cy="32" r="9"><stop offset="0" stop-color="#FFD48A"/><stop offset="1" stop-color="#F2B33D"/></radialGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<rect x="8" y="22" width="24" height="20" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="4,24 20,9 36,24" fill="url(#g2)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="16" y="31" width="8" height="11" fill="#55332A" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="35" cy="36.5" r="8" fill="#A07C36" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="35" cy="34" r="8" fill="url(#g3)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="35" cy="34" r="4" fill="none" stroke="#A07C36" stroke-width="1.6"/>
+</svg>

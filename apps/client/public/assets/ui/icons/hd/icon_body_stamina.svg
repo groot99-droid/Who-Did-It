@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Stamina: a bolt of lantern light, the wind in the legs. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g1" data-flat="#FFB457" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD48A"/><stop offset="1" stop-color="#FFB457"/></linearGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<polygon points="28,4 10,27 22,27 18,44 38,19 26,19 32,4" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon class="flat" display="none" points="26,19 38,19 18,44 22,30" fill="#DA9348"/>
+<ellipse class="hd" cx="25" cy="10" rx="1.4" ry="3" fill="#FFF1DC" opacity="0.7"/>
+</svg>

@@ -143,7 +143,7 @@
       "parity": "village",
       "startKit": [{ "item": "masterKeyring", "qty": 1 }, { "item": "candle", "qty": 2 }],
       "abilities": ["lockUnlock", "ledger"],
-      "cardText": "You know every door in Hollowmere. Control the wings, read the ledger, say who went where.",
+      "cardText": "You know every door in HollowMere. Control the wings, read the ledger, say who went where.",
       "beware": "Universal access makes you the obvious suspect; Skeleton Key use looks like yours.",
       "bellPulls": 1,
       "gddRef": "3.2"
@@ -294,7 +294,7 @@
       "parity": "village",
       "startKit": [{ "item": "candle", "qty": 2 }, { "item": "pocketWatch", "qty": 1 }],
       "abilities": ["confession"],
-      "cardText": "Everyone in Hollowmere confesses to you sooner or later. Each night, learn where {word:balance.nightPowers.perNight} soul stands, then choose how much to say.",
+      "cardText": "Everyone in HollowMere confesses to you sooner or later. Each night, learn where {word:balance.nightPowers.perNight} soul stands, then choose how much to say.",
       "beware": "Everyone can see you are the Vicar, the Cabal first among them; if your card was not dealt, a Cabal player may wear your face and lie in your name.",
       "bellPulls": 1,
       "gddRef": "3.2"
