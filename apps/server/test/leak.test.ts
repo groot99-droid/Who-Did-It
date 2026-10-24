@@ -123,17 +123,16 @@ describe('the leak audit (8L)', () => {
     sim(m, 0).bloodyUntilTick = m.room.state.tick + 20 * 3600;
     const a = audit(m);
     moved(m, a);
-    await sleep(500);
+    // Wait on the count rather than the clock: a loaded runner can judge no patch at all in a fixed half second.
+    expect(await until(() => a.checked > 10, 10_000)).toBe(true);
     const byDay = a.checked;
-    expect(byDay).toBeGreaterThan(10);
 
     // Day to dusk to night through the phase clock itself (`runPhases`), the boundary A190 closes.
     await skipPhase(m);
     expect(m.room.state.phase).toBe(Phase.dusk);
     await skipPhase(m);
     expect(m.room.state.phase).toBe(Phase.night);
-    await sleep(500);
-    expect(a.checked).toBeGreaterThan(byDay + 10);
+    expect(await until(() => a.checked > byDay + 10, 10_000)).toBe(true);
     const seenBy0 = avatarsHeld(m.bots[0]!).map((h) => avatarMemory(m.room).seatOf.get(h.handle));
     expect(seenBy0.sort()).toEqual([0, 1, 2].map((i) => m.bots[i]!.id).sort()); // night is narrower
 
@@ -168,7 +167,8 @@ describe('the leak audit (8L)', () => {
       const avatar = m.room.state.scenes.get('forest')?.avatars.get(handle);
       if (avatar) avatar.statusBits |= StatusBit.bloody;
     }, 5);
-    expect(await until(() => a.leaks.some((l) => l.includes('Blood')))).toBe(true);
+    // Only a patch decoded on the tick it was encoded is judged, which a loaded runner can delay for seconds.
+    expect(await until(() => a.leaks.some((l) => l.includes('Blood')), 20_000)).toBe(true);
     clearInterval(timer);
   });
 });
