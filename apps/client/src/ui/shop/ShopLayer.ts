@@ -64,6 +64,9 @@ class Layer implements ShopLayer {
     const onOpen = (o: Parameters<ShopPanel['show']>[0]) => this.panel.show(o);
     feed.bus.on('shopOpen', onOpen);
     this.offs.push(() => feed.bus.off('shopOpen', onOpen));
+    const onError = () => this.panel.refused();
+    feed.bus.on('error', onError);
+    this.offs.push(() => feed.bus.off('error', onError));
     const sleep = () => (this.root.hidden = true);
     const wake = () => (this.root.hidden = false);
     scene.events.on('sleep', sleep);
