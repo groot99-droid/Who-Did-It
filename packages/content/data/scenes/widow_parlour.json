@@ -8,7 +8,7 @@
   "biome": "house",
   "dark": false,
   "size": { "w": 16, "h": 11 },
-  "notes": "Portrait turned to the wall; letter box.",
+  "notes": "The portrait turned to the wall; tea laid for two, one cup never used; the letter box by the door.",
   "worldRef": "4.3",
   "portals": [
     {
@@ -49,7 +49,7 @@
     { "id": "bedroom", "x": 3, "y": 1, "z": 0, "facing": "s" }
   ],
   "spots": [
-    { "id": "wp.pantry", "kind": "hide", "variant": "pantry", "x": 1, "y": 9, "childOnly": false },
+    { "id": "wp.pantry", "kind": "hide", "variant": "pantry", "x": 1, "y": 1, "childOnly": false },
     {
       "id": "wp.crawl_stairs",
       "kind": "hide",
@@ -60,36 +60,63 @@
     }
   ],
   "props": [
-    { "id": "wp.letter_box", "kind": "taskSource", "x": 15, "y": 8, "item": "letter" },
-    { "id": "wp.portrait", "kind": "decor", "x": 8, "y": 0 }
+    { "id": "wp.letter_box", "kind": "taskSource", "x": 14, "y": 0 },
+    { "id": "wp.portrait", "kind": "decor", "x": 8, "y": 0 },
+    { "id": "wp.clock", "kind": "dressing", "x": 2, "y": 0 },
+    { "id": "wp.draped_window_0", "kind": "dressing", "x": 5, "y": 0 },
+    { "id": "wp.draped_window_1", "kind": "dressing", "x": 11, "y": 0 },
+    { "id": "wp.writing_desk", "kind": "dressing", "x": 7, "y": 1 },
+    { "id": "wp.sideboard", "kind": "dressing", "x": 10, "y": 1 },
+    { "id": "wp.fireplace_e", "kind": "dressing", "x": 0, "y": 5 },
+    { "id": "wp.armchair_0", "kind": "dressing", "x": 1, "y": 3 },
+    { "id": "wp.lamp_table", "kind": "dressing", "x": 1, "y": 4 },
+    { "id": "wp.tea_table", "kind": "dressing", "x": 7, "y": 5 },
+    { "id": "wp.armchair_1", "kind": "dressing", "x": 6, "y": 4 },
+    { "id": "wp.rug", "kind": "dressing", "x": 6, "y": 6 },
+    { "id": "wp.birdcage", "kind": "dressing", "x": 1, "y": 8 },
+    { "id": "wp.coat_stand", "kind": "dressing", "x": 14, "y": 7 },
+    { "id": "wp.boot_rack", "kind": "dressing", "x": 14, "y": 9 }
   ],
   "gates": [],
   "paths": [],
-  "lights": [{ "id": "wp.lt_lamp", "kind": "lamp", "x": 8, "y": 5, "radiusTiles": 2 }],
+  "lights": [
+    { "id": "wp.lt_lamp", "kind": "lamp", "x": 7, "y": 5, "radiusTiles": 2.5 },
+    { "id": "wp.lt_lamp_chair", "kind": "lamp", "x": 1, "y": 4, "radiusTiles": 1.5 },
+    { "id": "wp.lt_fire", "kind": "fire", "x": 0, "y": 5, "radiusTiles": 3 },
+    {
+      "id": "wp.lt_window",
+      "kind": "window",
+      "x": 5,
+      "y": 0,
+      "radiusTiles": 3,
+      "phases": ["day", "dusk"]
+    },
+    { "id": "wp.lt_moon", "kind": "moon", "x": 11, "y": 0, "radiusTiles": 2, "phases": ["night"] }
+  ],
   "grid": [
     "###D############",
-    "#..S.........H.#",
+    "#H.S...#..#..H.#",
     "#..............#",
+    "##.............#",
+    "##....#........#",
+    "#......#......SD",
     "#..............#",
-    "#..............#",
-    "#.............SD",
-    "#..............#",
-    "#..............#",
-    "#..............#",
-    "#H.............#",
+    "#.............##",
+    "##.............#",
+    "#.............##",
     "################"
   ],
   "material": [
-    "WWWWWWWWPWWWWWWW",
+    "WWPWWPWWPWWPWWPW",
+    "WwwwwwwPwwPwwwwW",
     "WwwwwwwwwwwwwwwW",
+    "WPwwwwwwwwwwwwwW",
+    "WPwwwwPwwwwwwwwW",
+    "PwwwwwwPwwwwwwwW",
     "WwwwwwwwwwwwwwwW",
-    "WwwwwwwwwwwwwwwW",
-    "WwwwwwwwwwwwwwwW",
-    "WwwwwwwwwwwwwwwW",
-    "WwwwwwwwwwwwwwwW",
-    "WwwwwwwwwwwwwwwW",
-    "WwwwwwwwwwwwwwwP",
-    "WwwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwPW",
+    "WPwwwwwwwwwwwwwW",
+    "WwwwwwwwwwwwwwPW",
     "WWWWWWWWWWWWWWWW"
   ]
 }

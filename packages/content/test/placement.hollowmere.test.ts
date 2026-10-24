@@ -107,6 +107,10 @@ const RULES: PlacementRules = {
     bottle_crate: 'free',
     rug: 'floor',
     sawdust: 'floor',
+    // Widow Vane's.
+    tea_table: 'free',
+    writing_desk: 'front',
+    birdcage: 'free',
     wakeTable: 'surface',
     plate: 'overlay',
     crepe: 'doorOverlay',
@@ -164,6 +168,7 @@ const RULES: PlacementRules = {
         'tavern_table',
         'tavern_table_b',
         'card_table',
+        'tea_table',
       ],
     },
     lantern: { props: ['lanternPost', 'drowned_lantern'] },
@@ -202,12 +207,6 @@ const PENDING: Partial<Record<SceneId, readonly string[]>> = {
     'light as.lt_shelf (lamp) at 4,1 hangs on nothing that could hold it',
   ],
   apoth_loft: ['light al.lt_green_lamp (lamp) at 6,1 hangs on nothing that could hold it'],
-  widow_parlour: [
-    'prop wp.letter_box faces south into no floor (its front is hidden)',
-    'spot wp.pantry faces south into no floor',
-    'light wp.lt_lamp (lamp) at 8,5 hangs on nothing that could hold it',
-  ],
-  widow_bedroom: ['light wb.lt_candle (lamp) at 6,1 hangs on nothing that could hold it'],
   forest: ['light fo.lt_gate_lantern (lantern) at 21,28 hangs on nothing that could hold it'],
   bakery: [
     'prop bk.deadloaf_0 faces south into no floor (its front is hidden)',
