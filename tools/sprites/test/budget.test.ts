@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { artStyles } from '../palette.ts';
+import { villagerLooks } from '../placeholder-chars.ts';
 import { hasManifest, type Page, realPages } from './realAssets.ts';
 
 /**
@@ -9,7 +10,8 @@ import { hasManifest, type Page, realPages } from './realAssets.ts';
  */
 const PAGE = 2048 * 2048;
 const RESIDENT_CAP = 8.0;
-const LOOKS_COUNTED = 10;
+/** The deck's ten world looks plus the villager family, resident on every map for the townsfolk (A161). */
+const LOOKS_COUNTED = 10 + villagerLooks().length;
 
 /** [prefix, width cap, height cap]; the first matching prefix wins, so `props_` precedes `props`. */
 const CAPS: Array<[string, number, number]> = [
