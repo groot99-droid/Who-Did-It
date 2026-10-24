@@ -3688,3 +3688,132 @@ button.wdi-map__option,
     scale: 0.6;
   }
 }
+
+/* Body HUD (8H, step 5; UI.md 9). 8A's body panel (view/body/BodyHud.ts) carries its states as classes
+   (`is-wounded`, `is-down`, `is-fatigued`) and its effects as chips with `data-effect`; bodyMotion (motion.ts)
+   adds the one-shot classes CSS cannot see: `wdi-fx-hit` on the health bar when it drops, `is-fresh` on a new
+   chip, and a fading `is-cured` copy of a chip that went away in its own `.wdi-body-ghosts` layer. The vignette
+   and the Dazed blur are status, so they stay under reduced motion; only their movement goes. Everything here
+   is this seat's own view. */
+.wdi-body__fill {
+  transition:
+    width var(--wdi-dur-slow) var(--wdi-ease-out),
+    background-color var(--wdi-dur-base) var(--wdi-ease);
+}
+
+/* The track shakes, not the panel: a translate on the panel would hold the fixed vignette below inside it. */
+.wdi-body__bar--health.wdi-fx-hit .wdi-body__track {
+  animation: wdi-body-hit var(--wdi-dur-shake) var(--wdi-ease-out);
+}
+
+.wdi-body.is-wounded .wdi-body__bar--health .wdi-body__fill {
+  animation: wdi-body-state var(--wdi-dur-slow) var(--wdi-ease-spring);
+}
+
+.wdi-body.is-down .wdi-body__bar--health,
+.wdi-body.is-fatigued .wdi-body__bar--stamina .wdi-body__fill {
+  animation: wdi-body-breathe var(--wdi-dur-loop) var(--wdi-ease) infinite alternate;
+}
+
+.wdi-body__chip.is-fresh {
+  animation: wdi-body-fresh var(--wdi-dur-loop) var(--wdi-ease-out) backwards;
+}
+
+/* A cured chip's copy, drawn by bodyMotion in its own layer where the chip last sat. */
+.wdi-body-ghosts {
+  display: contents;
+}
+
+.wdi-body-ghosts > .wdi-body__chip {
+  position: fixed;
+  pointer-events: none;
+}
+
+.wdi-body__chip.is-cured {
+  animation: wdi-body-cured var(--wdi-dur-slow) var(--wdi-ease-in) forwards;
+}
+
+/* The low-health vignette: a faint red edge while hurt, pulsing while Bleeding. Fixed to the viewport and under
+   the HUD's own controls (the HUD is its stacking context). */
+.wdi-body.is-wounded::before,
+.wdi-body.is-down::before,
+.wdi-body:has(.wdi-body__chip--bleeding)::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgb(var(--wdi-blood-rgb) / 0.35) 100%);
+}
+
+.wdi-body:has(.wdi-body__chip--bleeding)::before {
+  background: radial-gradient(ellipse at center, transparent 45%, rgb(var(--wdi-blood-rgb) / 0.5) 100%);
+  animation: wdi-body-bleed var(--wdi-dur-loop) var(--wdi-ease) infinite alternate;
+}
+
+/* Dazed: the world goes soft for this seat only (its own body panel shows the chip; no one else's does). */
+#game canvas {
+  transition: filter var(--wdi-dur-slow) var(--wdi-ease);
+}
+
+body:has(.wdi-body .wdi-body__chip--dazed) #game canvas {
+  filter: blur(var(--wdi-blur-dazed));
+}
+
+@keyframes wdi-body-hit {
+  from {
+    background-color: rgb(var(--wdi-bone-rgb) / 0.9);
+    box-shadow: 0 0 var(--wdi-space-2) rgb(var(--wdi-blood-rgb) / 0.9);
+  }
+  25% {
+    translate: calc(-1 * var(--wdi-shake)) 0;
+  }
+  50% {
+    translate: var(--wdi-shake) 0;
+  }
+  75% {
+    translate: calc(-0.5 * var(--wdi-shake)) 0;
+  }
+}
+
+@keyframes wdi-body-state {
+  40% {
+    scale: 1 1.6;
+    filter: brightness(1.6);
+  }
+}
+
+@keyframes wdi-body-breathe {
+  to {
+    opacity: 0.55;
+  }
+}
+
+@keyframes wdi-body-fresh {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+  20% {
+    opacity: 1;
+    scale: 1.15;
+  }
+  35% {
+    scale: 1;
+    box-shadow: 0 0 var(--wdi-space-2) rgb(var(--wdi-bone-rgb) / 0.8);
+  }
+}
+
+@keyframes wdi-body-cured {
+  to {
+    opacity: 0;
+    scale: 0.6;
+    translate: 0 calc(var(--wdi-rise) * -1);
+  }
+}
+
+@keyframes wdi-body-bleed {
+  from {
+    opacity: 0.55;
+  }
+}

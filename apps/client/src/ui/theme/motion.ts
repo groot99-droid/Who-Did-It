@@ -60,3 +60,110 @@ export function refusedIn(root: { querySelector(sel: string): MotionTarget | nul
   const el = root.querySelector(PRESSED);
   if (el) refused(el);
 }
+
+/** What bodyMotion reads from 8A's body panel each time it redraws: the health meter and the chips' effects. */
+export interface BodyFrame {
+  hp: number;
+  effects: readonly string[];
+}
+
+/** What changed between two frames of the body panel: a hit landed, effects arrived, effects were cured. */
+export interface BodyChange {
+  hit: boolean;
+  fresh: string[];
+  cured: string[];
+}
+
+/** Compares two frames. The first frame (prev null) changes nothing, so a panel that mounts mid-game is quiet. */
+export function bodyChange(prev: BodyFrame | null, next: BodyFrame): BodyChange {
+  if (prev === null) return { hit: false, fresh: [], cured: [] };
+  return {
+    hit: next.hp < prev.hp,
+    fresh: next.effects.filter((e) => !prev.effects.includes(e)),
+    cured: prev.effects.filter((e) => !next.effects.includes(e)),
+  };
+}
+
+export const BODY_FX = { hit: 'wdi-fx-hit', fresh: 'is-fresh', cured: 'is-cured' } as const;
+
+/** How long a new chip is tracked across the panel's redraws: longer than any pulse token, so the pulse ends first. */
+const FRESH_MS = 3000;
+
+/**
+ * The body panel's one-shot motion (round 8, 8H; UI.md 9; granted by 6Z, World.ts bodyMotion): 8A's BodyHud
+ * redraws its chips every second, so CSS alone cannot tell a new hit or a new effect from a redraw. This watches
+ * the panel and adds no node to it and changes none of its content: it puts classes on the health bar (a hit)
+ * and on a new chip (a pulse, resumed across redraws through its animation delay), and draws a cured chip's
+ * fading copy in a layer of its own beside the panel. It stops itself once the panel leaves the page.
+ * Returns a function that stops it sooner.
+ */
+export function bodyMotion(root: HTMLElement): () => void {
+  const meter = (): HTMLElement | null => root.querySelector('.wdi-body__bar--health');
+  const chips = (): HTMLElement[] => [...root.querySelectorAll<HTMLElement>('.wdi-body__chip')];
+  const frame = (): BodyFrame => ({
+    hp: Number(meter()?.getAttribute('aria-valuenow') ?? 0),
+    effects: chips().map((el) => el.dataset.effect ?? ''),
+  });
+  let prev: BodyFrame | null = root.hidden ? null : frame();
+  const fresh = new Map<string, number>();
+  // Each chip as it last looked, so a cured chip's copy reads the same and sits where the chip sat.
+  const seen = new Map<string, { text: string; rect: DOMRect }>();
+  const ghosts = document.createElement('div');
+  ghosts.className = 'wdi-body-ghosts';
+  ghosts.setAttribute('aria-hidden', 'true');
+  root.after(ghosts);
+
+  const stop = (): void => {
+    observer.disconnect();
+    ghosts.remove();
+  };
+  const observer = new MutationObserver(() => {
+    if (!root.isConnected) return stop();
+    if (root.hidden) {
+      prev = null;
+      return;
+    }
+    const next = frame();
+    const change = bodyChange(prev, next);
+    prev = next;
+    const now = performance.now();
+    if (change.hit) {
+      const bar = meter();
+      if (bar) replay(bar, BODY_FX.hit);
+    }
+    for (const key of change.fresh) fresh.set(key, now);
+    for (const [key, since] of fresh) {
+      const el = root.querySelector<HTMLElement>(`.wdi-body__chip[data-effect="${key}"]`);
+      if (now - since > FRESH_MS || !el) {
+        fresh.delete(key);
+        continue;
+      }
+      // A redraw makes a new chip: start its pulse where the last one was, so it plays once.
+      el.style.animationDelay = `${-Math.round(now - since)}ms`;
+      el.classList.add(BODY_FX.fresh);
+    }
+    for (const key of change.cured) {
+      const was = seen.get(key);
+      if (!was) continue;
+      const ghost = document.createElement('span');
+      ghost.className = `wdi-body__chip wdi-body__chip--${key} ${BODY_FX.cured}`;
+      ghost.textContent = was.text;
+      ghost.style.left = `${was.rect.left}px`;
+      ghost.style.top = `${was.rect.top}px`;
+      ghosts.append(ghost);
+      ghost.addEventListener('animationend', () => ghost.remove(), { once: true });
+    }
+    seen.clear();
+    for (const el of chips())
+      seen.set(el.dataset.effect ?? '', { text: el.textContent ?? '', rect: el.getBoundingClientRect() });
+  });
+  observer.observe(root, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: ['aria-valuenow', 'hidden'],
+  });
+  // The panel leaving the page is a change to its parent, not to the panel: watch the parent for that too.
+  if (root.parentNode) observer.observe(root.parentNode, { childList: true });
+  return stop;
+}

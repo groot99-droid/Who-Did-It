@@ -219,6 +219,7 @@
   --wdi-nudge: 2px; /* a list row leaning in on hover */
   --wdi-rise: 8px; /* how far a panel or row travels in */
   --wdi-shake: 4px; /* a refused shake's swing */
+  --wdi-blur-dazed: 3px; /* the world going soft while Dazed: status, so it stays under reduced motion */
 
   /* ---- layers ---- */
   --wdi-z-hud: 10;

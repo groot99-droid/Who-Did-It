@@ -20,7 +20,7 @@ import {
 } from '../net/world';
 import { LOOKS_COPY, WORLD_COPY as C, fill } from '../ui/copy';
 import { overlayRoot } from '../ui/dom';
-import { refusedIn } from '../ui/theme/motion';
+import { bodyMotion, refusedIn } from '../ui/theme/motion';
 import { mountSeatPicker } from '../ui/SeatPicker';
 import { INSPECT_PROMPT, INSPECT_REACH_TILES, type InspectBinding, bindInspect } from '../ui/inspect/bind';
 import { bindShout } from '../ui/hive/shout';
@@ -240,6 +240,7 @@ export class World extends Phaser.Scene {
 
     this.hud = new Hud(overlayRoot());
     this.bodyHud = mountBodyHud(this.hud.root); // round 8, 8A: the body panel, bottom-left (UI.md 14.32)
+    bodyMotion(this.bodyHud.root); // round 8, 8H (locked): hit flash, fresh and cured effect chips (UI.md 9)
     this.hud.setChip((this.registry.get(REG_ROLE_CHIP) as HudChip | undefined) ?? null);
     this.purse = mountPurseHud(this, feed, this.hud.root.querySelector('.wdi-hud__tl') ?? this.hud.root); // round 8, 8C (locked)
     void loadSceneName(this.sceneId).then((scene) => this.hud.say(fill(C['hud.scene'], { scene }), 1500));
