@@ -252,8 +252,11 @@ export const BalanceFile = z.strictObject({
     aloneKill: z.strictObject({ afterS: Seconds, sightTiles: Tiles }),
     /** NPC night powers (GDD 3.2, 3.12): the use tick over dusk plus night, and the Last Shot delay. */
     nightPower: z.strictObject({ windowFrac: FracSpan, lastShotS: Span }),
-    /** Round 8 (8R, GDD 3.12 "The hive"): a heard noise, shout or bell stays on the board for `memoryS`. */
-    hive: z.strictObject({ memoryS: Seconds }),
+    /**
+     * Round 8 (8R, GDD 3.12 "The hive"): a reaction becomes due a `staggerS` after it is first proposed (a hash of
+     * the seat and the reaction, never a draw); a heard noise, shout or bell stays on the board for `memoryS`.
+     */
+    hive: z.strictObject({ staggerS: Span, memoryS: Seconds }),
     /** Round 6 (GDD 3.19): an NPC at one goal and one tile for longer than this fails the stuck invariant. */
     stuckInvariantS: Seconds,
   }),
