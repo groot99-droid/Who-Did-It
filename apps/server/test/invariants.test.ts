@@ -185,6 +185,7 @@ describe('the round-6 invariants', () => {
       'step',
       'matchLength',
       'killClues',
+      'scripConserved',
       'taskBar',
       'vendettaOnce',
       'contractQuest',
