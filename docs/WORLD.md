@@ -6,7 +6,7 @@
 
 ### 4.1 Setting
 
-**Hollowmere**, a fog-bound harbour hamlet on a northern coast, autumn 1931. The storm closed the only road; the fog hides the sea. Lord Aldous Vane, owner of the shuttered tin mine, died three nights ago and his will names "whoever remains when the last lantern goes out". The flooded lowest gallery leaks "mere-rot" into the marsh, which makes the wolves bold and wakes something in the sea cave (the Beast, V2). Tone: toon-noir, chunky villagers in trench coats and wool caps, wet cobbles, amber lantern light against slate-blue dusk. Landmark NPCs (Mrs Grieves the tavern keeper, Old Fennick at the light, Father Bray, Doc Mallory, Tuck the ferry boy) are environmental storytelling and shop signage in V1; a Grieves tab book that mirrors the Ledger is V1.5. One bell stands on the square: it is the Emergency Bell, the Final Night object and the Butler's remote pull (V1.5). The chapel rope is decoration.
+**HollowMere**, a railroad town at the end of the Thorne & Expanse Line in Coldwater Territory, December 1893, the year of the Panic (`docs/round8/canon.md`, A201). There is no sea: the lake that named the town drained into Vane's tin gallery and left a drowned mere of black water, reed and freezing mud, and the fog lies on it. The storm closed the coach road on 19 December, so the train is the only way out until the last one leaves on the 23rd. Lord Aldous Vane, owner of the shuttered tin mine, died on the island, Port-au-Levain, and has been "three nights" dead by the telegraph ever since; his will names "whoever remains when the last lantern goes out". The flooded lowest gallery leaks "mere-rot" into the marsh, which makes the wolves bold and wakes something asleep in the Tin Gallery (the Beast, V2; it is never named or explained). Tone: toon-noir, chunky villagers in trench coats and wool caps, wet cobbles, amber lantern light against slate-blue dusk. Landmark NPCs (Mrs Grieves the tavern keeper, Old Fennick at the old lake-light on the marsh edge, Doc Mallory, Tuck the ferry boy who poles the channels, Harbourmaster Pell at the marsh dock) are environmental storytelling and shop signage in V1; a Grieves tab book that mirrors the Ledger is V1.5. One bell stands on the square: it is the Emergency Bell, the Final Night object and the Butler's remote pull (V1.5). The chapel rope is decoration: Father Bray, the old priest, is gone, dead or fled, and the new Vicar came on the train.
 
 **The wake-loaf custom.** Tamsin Crumb runs Crumb's Ovens on the east lane between the square and the apothecary. The night before a will is read she bakes one loaf per mourner and three for the dead, each with a wax-sealed crumb token inside, and lays them on her Wake Table. In the main match the bakery is an ordinary Small-profile house with a fetch task and, since round 7, four station rooms behind its back wall (A116), and Tamsin joins the landmark NPCs as signage and ledger flavour. The quick mode that was played around the Wake Table and in the loft above the ovens was removed in round 7 (GDD 3.11, A115).
 
@@ -86,7 +86,7 @@ New objects use typed prefixes:
 | `crumb_mixing` | Crumb's mixing room | Small | 12x9 | house | `cm.door` -> `bakery.mixing_room` | flour sacks / trunk | Le Pétrin (`station_mixer`): the dough mixer in the back corner, sacks of farine along the west wall; one lamp. The mixer (`doughMixer`) stands at 6,1 2x2 |
 | `crumb_oven` | Crumb's oven room | Small | 12x10 | house | `co.door` -> `bakery.oven_room` | bread rack / wood box | Le Four à Pain (`onub_station_oven`): the brick dome oven, its fire always lit, and a hanging bulb. The oven (`brickOven`) stands at 6,1 2x2 |
 | `crumb_proofing` | Crumb's proofing room | Small | 12x10 | house | `cp.door` -> `bakery.proofing_room` | tray stack / flour sacks | La Chambre de Pousse (`station_proofing`): the glass-fronted proofing cabinet mid-room, three warm lamps. The cabinet (`proofingCabinet`) stands at 4,2 3x2 |
-| `cave_entry` | Tin Gallery mouth | Small | 20x14 | cave (dark) | `ce.mouth` -> `forest.cave_side`; `ce.gallery` -> `cave_gallery.upper` [M, boarded below]; `ce.sea` boarded (V1.5 Thief exit, low tide on Nights 2 and 4) | stalagmites / pool niche | Three patches of bioluminescent moss and daylight at the mouth |
+| `cave_entry` | Tin Gallery mouth | Small | 20x14 | cave (dark) | `ce.mouth` -> `forest.cave_side`; `ce.gallery` -> `cave_gallery.upper` [M, boarded below]; `ce.sea` boarded (V1.5 Thief exit: the sea door, the boards at the back of the cave that the low water clears on Nights 2 and 4) | stalagmites / pool niche | Three patches of bioluminescent moss and daylight at the mouth |
 | `cave_gallery` | The Flooded Gallery | Medium | 40x28 | cave (dark) | `cg.upper` -> `cave_entry.gallery`; `cg.fen` -> `forest_deep.adit_side` | ore chute, timber crib / sump | Vane's lowest gallery, flooded, the mere-rot glowing teal on the water; the broken pumping engine under the sinkhole shaft (lands `sink_landing`); the ore chamber with a VANE TIN CO crate |
 | `manor_hall` | Vane Manor, hall | Medium | 28x16 | house | `mh.front`, `mh.back` -> overworld; `mh.stairs` -> `manor_upper.stairs` | wardrobes x2, curtain alcove (off the main sightline) / – | Stopped clock at 11:47; safe |
 | `manor_upper` | Vane Manor, upstairs | Medium | 24x12 | house | `mu.stairs` -> `manor_hall.stairs`; `mu.balcony` -> `overworld.balcony_drop` (one-way, noise 9, 90 s footprints at landing) | under beds, attic hatch / – | Locked study (`key_study` in the cellar [L] or the loft [M]) |
@@ -94,7 +94,7 @@ New objects use typed prefixes:
 | `chapel` | St Brannock's | Large | 18x12 | house | `ch.door` -> overworld; `ch.crypt` -> `cellar.crypt` | confessional / crypt niche | Silent zone: no footstep noise; candles, moonlight through the window |
 | `cellar` | The Undercroft | Large | 28x16 | house (dark) | `cl.well` -> `overworld.well`; `cl.trap` -> `tavern_back.trap`; `cl.crypt` -> `chapel.crypt` | wine racks / dump spot | Dark scene, a torch at each way in; gas pockets in marked side alcoves (V1.5) |
 
-V1.5: `cottage_fisher`, `lighthouse` (3 stacked rooms), cave `sea_exit`. These are new ids appended to `SCENE_IDS` when they ship. All ids, spawn ids and portal ids are frozen in `packages/content/data/scenes/*.json`; V2 reads the same graph.
+V1.5: `cottage_fisher`, cave `sea_exit` (the sea door), and the south-east light: the Company's lamp on an iron post at the mere's south-east edge, a light on the overworld rather than a scene (HollowMere has no lighthouse; the planned `lighthouse` id never shipped). These are new ids appended to `SCENE_IDS` when they ship. All ids, spawn ids and portal ids are frozen in `packages/content/data/scenes/*.json`; V2 reads the same graph.
 
 **Blackpine** (4.10)
 
@@ -122,8 +122,8 @@ V1.5: `cottage_fisher`, `lighthouse` (3 stacked rooms), cave `sea_exit`. These a
    │                └──────────────────┘                              │
    │ CHAPEL [L] ── graveyard ── TAVERN ─ alley ─ (fisher cottage V1.5)│
    │ (crypt)                    (trapdoor L)                          │
-   │          cliff path                 ──── DOCK ─── boats          │
- S └──────────────── sea / fog ───────────────────── (lighthouse V1.5)┘
+   │          cliff path                 ── MARSH DOCK ── skiff       │
+ S └─────────────── the mere / fog ─────────────────── (SE light V1.5)┘
 ```
 
 Crumb's Ovens (`bakery`) stands on the east lane between the square and the apothecary: one door, a lit window.
@@ -135,7 +135,7 @@ Crumb's Ovens (`bakery`) stands on the east lane between the square and the apot
 (M5a) **Reading the sketch isometrically.** The sketch and every grid are drawn north-up; the client turns them so that north-west is up (SPRITES 10).
 
 - The north and west boundaries are the back of the picture and carry the tall edges: cliffs, tree lines, the manor rise.
-- The south and east boundaries are the front and are drawn low: sea, sills, fences.
+- The south and east boundaries are the front and are drawn low: the mere, sills, fences.
 - A tall solid (building, wall, tree, cliff) hides the tiles north and west of it. It turns translucent while it is in front of your own character (GDD 3.13).
 
 **Layout rules for every scene:**
@@ -169,7 +169,7 @@ One `portals.schema.json` in `@wdi/content` (zod): `id` (`scene.portal`, globall
 | Mere-wolf | V1 | forest loops (3); 1 enters the village at night when the fence is broken | Patrols; chases unlit players; flees lantern or candle within 4 tiles; dies to a bolt | 1 damage, 2 HP players | Kill in the forest to blame wolves; the knife still leaves a Thread and Autopsy says "knife" |
 | Bog-wisp | V1.5 | marsh, cave pools | Lures; blinds light radius 5 s | Nuisance | Blinds witnesses |
 | The Beast | V2 | cave, released by the Accomplice or at cycle 4 | 2 hits kill; drawn to light | Lethal to lone players | Cave bodies get Ichor + Drag Marks |
-| Crows, rats, gulls | V2 | rooftops, attic, lighthouse | Noise amplifiers | Social | Running = being seen |
+| Crows, rats, gulls | V2 | rooftops, attic, the marsh dock | Noise amplifiers | Social | Running = being seen |
 
 **M5b creatures and the material economy (round 6).** Round 6 adds the boar of the Fenwood and Blackpine Woods and
 the bats and rats of the caves (the cave rats arrive before the V2 rooftop ones), alongside the wolves; their rules
@@ -178,7 +178,7 @@ timber, resin and herbs, caves tin ore, stone and mushrooms, the Blackpine yard 
 stone. Stations are the props already standing in houses (the basins of the apothecary, the bakery,
 the bunkhouse and the forge; the ovens of the bakery and the bunkhouse), so crafting pulls players back from the
 wild into lit, watched rooms. Quest givers stand where the world puts them: Harbourmaster Pell by Hollowmere's
-dock, Mother Moll at her charcoal hut in the Fenwood, Foreman Hask on the Blackpine yard, Ada Kerrow at the forge
+marsh dock, Mother Moll at her charcoal hut in the Fenwood, Foreman Hask on the Blackpine yard, Ada Kerrow at the forge
 and the collier at the kilns. The macro-economy of the owner's Bible (scrip, faith, rumour, HQ tiers) is round 8
 (`docs/round6/bible-seams.md` 2.2): its raw materials will be these same resources.
 
@@ -223,7 +223,7 @@ Black crepe on the manor door; stopped clock at 11:47; tide chart with the next 
 
 ### 4.9 V2 notes
 
-Keep every scene, portal, spawn and clue id; 1 tile = 1 m. Manor floors, the cellar and the lighthouse become real volumes while `zoneId` keeps their visibility and Ledger scope; cottages, tavern, chapel and barn stay portal-loaded. One-way drops become ledges, the hollow log a crouch tunnel, the tide a water volume. Baked sprites are discarded for the original Blender meshes.
+Keep every scene, portal, spawn and clue id; 1 tile = 1 m. Manor floors and the cellar become real volumes while `zoneId` keeps their visibility and Ledger scope; cottages, tavern, chapel and barn stay portal-loaded. One-way drops become ledges, the hollow log a crouch tunnel, the tide a water volume. Baked sprites are discarded for the original Blender meshes.
 
 ### 4.10 Blackpine
 
