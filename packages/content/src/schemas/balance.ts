@@ -326,5 +326,21 @@ export const BalanceFile = z.strictObject({
     quickChatRadiusTiles: Tiles,
     quickChat: z.array(z.strictObject({ id: Id, text: z.string().min(1) })).length(8),
   }),
+  /** Round 8 (GDD 3.8 "Meeting notes", 3.25), 8T's keys. */
+  talk: Section({
+    /** A seat writes at most one note in this many seconds, human or NPC alike. */
+    noteGapS: Seconds,
+    /** A seat writes at most this many notes in one meeting. */
+    notesPerMeeting: z.number().int().positive(),
+    npc: z.strictObject({
+      /** The notes an NPC seat means to write in a meeting, drawn per meeting from its `talk` stream. */
+      notesPerMeeting: z.strictObject({
+        min: z.number().int().nonnegative(),
+        max: z.number().int().nonnegative(),
+      }),
+      /** When they fall: fractions of the discussion plus the vote time, from the discussion's first tick. */
+      windowFrac: FracSpan,
+    }),
+  }),
 });
 export type BalanceFile = z.infer<typeof BalanceFile>;
