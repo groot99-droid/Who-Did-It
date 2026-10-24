@@ -3,7 +3,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { decodePng, encodePng, type Rgba } from '../bleed.ts';
-import { hdSlices, hdStatic, hdTileset, texelsOf, texelsOfSize } from '../hd.ts';
+import { hdSlices, hdStatic, hdTileset, texelsOf, texelsOfSize, webpPages } from '../hd.ts';
+import { imageSize } from './realAssets.ts';
 import type { MultiAtlas } from '../pack.ts';
 import { CELL_H, CELL_W, COLUMNS, GROUND_ROWS, inDiamond } from '../tileset.ts';
 
@@ -142,5 +143,26 @@ describe('hd static sheet', () => {
     expect(f.pivot).toEqual({ x: 0.5, y: Math.round((176 / 192) * 10000) / 10000 });
     expect(atlas.textures[0]!.size.w).toBeLessThanOrEqual(1024 * TEXELS);
     await expect(hdStatic(dir, false)).rejects.toThrow(/missing/);
+  });
+});
+
+describe('hd webp pages', () => {
+  it('re-encodes every PNG page as WebP, points the atlas at it and passes other files through', () => {
+    const atlas = {
+      textures: [{ image: 'props-0.png', format: 'RGBA8888', size: { w: 8, h: 4 }, scale: 1, frames: [] }],
+    };
+    const anims = Buffer.from('{"anims":[]}\n');
+    const out = webpPages(
+      new Map([
+        ['props-0.png', encodePng(solid(8, 4, [200, 40, 40]))],
+        ['props.json', Buffer.from(JSON.stringify(atlas))],
+        ['vfx.anims.json', anims],
+      ]),
+    );
+    expect([...out.keys()].sort()).toEqual(['props-0.webp', 'props.json', 'vfx.anims.json']);
+    expect(imageSize(out.get('props-0.webp')!)).toEqual({ width: 8, height: 4 });
+    const json = JSON.parse(out.get('props.json')!.toString('utf8')) as MultiAtlas;
+    expect(json.textures.map((t) => t.image)).toEqual(['props-0.webp']);
+    expect(out.get('vfx.anims.json')).toBe(anims);
   });
 });

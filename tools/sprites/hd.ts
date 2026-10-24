@@ -7,19 +7,22 @@
 // the usual scale.
 //
 //   tsx hd.ts ground <render dir>/ground <out dir>               iso_ground_<theme>.png for each theme rendered
-//   tsx hd.ts static <render dir>/<atlas> <out dir> [--subset]   kit, props, clues (pack-static at hd caps)
+//   tsx hd.ts static <render dir>/<atlas> <out dir> [--subset] [--webp]   kit, props, clues, buildings (pack-static
+//                                                                          at hd caps)
 //   tsx hd.ts slice <render dir>/<bld_<map>> <out dir>           buildings and multi-tile props, 1:1 tile index
 //   tsx hd.ts char <render dir> <out dir>                         a look's passes (pack.ts at hd pages)
 //
 // `--subset` packs whatever frames a partial render holds (the look proposal); without it the frame set must
-// be the atlas's whole key list, as pack-static.ts checks.
+// be the atlas's whole key list, as pack-static.ts checks. `--webp` writes the pages as lossy WebP at q90 and
+// points the atlas json at them (the budget's option 1, A164); the slices `slice` writes are the lossless
+// inputs of `static`, so a building atlas takes `--webp` where it is packed.
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { alphaBleed, bleed, decodePng, encodePng, type Rgba } from './bleed.ts';
+import { alphaBleed, bleed, decodePng, encodePng, encodeWebp, type Rgba } from './bleed.ts';
 import { CHAR_PAGE, OVL_PAGE } from './keys.ts';
 import { crop } from './pixel.ts';
-import { atlasJson, packCharacter, readRender, writeFiles } from './pack.ts';
+import { atlasJson, packCharacter, readRender, writeFiles, type MultiAtlas } from './pack.ts';
 import {
   applyStaticPivots,
   packCapped,
@@ -145,6 +148,32 @@ export async function hdStatic(renderDir: string, subset = false): Promise<Map<s
   return out;
 }
 
+/** The quality of the HD world pages as lossy WebP (A164, the budget's option 1). */
+export const WEBP_QUALITY = 90;
+
+/**
+ * A packed atlas's files with every PNG page re-encoded as lossy WebP and every atlas json pointing at the
+ * `.webp` pages; any other file passes through.
+ */
+export function webpPages(files: Map<string, Buffer>, quality = WEBP_QUALITY): Map<string, Buffer> {
+  const webp = (name: string) => name.replace(/\.png$/, '.webp');
+  const out = new Map<string, Buffer>();
+  for (const [name, bytes] of files) {
+    if (name.endsWith('.png')) {
+      out.set(webp(name), encodeWebp(decodePng(bytes), quality));
+    } else if (name.endsWith('.json')) {
+      const json = JSON.parse(bytes.toString('utf8')) as Partial<MultiAtlas>;
+      if (!Array.isArray(json.textures)) {
+        out.set(name, bytes);
+        continue;
+      }
+      for (const t of json.textures) t.image = webp(t.image);
+      out.set(name, Buffer.from(atlasJson(json as MultiAtlas, true)));
+    } else out.set(name, bytes);
+  }
+  return out;
+}
+
 /** The box [x, y, w, h] of an image's pixels with alpha, or null for an empty image. */
 export function alphaBox(img: Rgba): [number, number, number, number] | null {
   let x0 = img.width;
@@ -232,9 +261,16 @@ function writeSlices(outDir: string, result: { files: Map<string, Buffer>; manif
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   const subset = args.includes('--subset');
+  const webp = args.includes('--webp');
   const [mode, renderDir, outDir] = args.filter((a) => !a.startsWith('--'));
   if (!mode || !renderDir || !outDir || !['ground', 'static', 'slice', 'char'].includes(mode)) {
-    console.error('usage: tsx hd.ts ground|static|slice|char <render dir> <out dir> [--subset]');
+    console.error('usage: tsx hd.ts ground|static|slice|char <render dir> <out dir> [--subset] [--webp]');
+    process.exit(2);
+  }
+  if (webp && mode !== 'static') {
+    console.error(
+      'hd: --webp packs pages, so it goes on static (a building atlas: on the static run of its slices)',
+    );
     process.exit(2);
   }
   if (mode === 'slice') {
@@ -246,7 +282,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       mode === 'ground'
         ? hdGround(renderDir)
         : mode === 'static'
-          ? await hdStatic(renderDir, subset)
+          ? await hdStatic(renderDir, subset).then((f) => (webp ? webpPages(f) : f))
           : await hdCharacter(renderDir);
     writeFiles(outDir, files);
     console.log(`hd: ${[...files.keys()].join(', ')} -> ${outDir}`);
