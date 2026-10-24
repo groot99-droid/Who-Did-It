@@ -47,10 +47,20 @@ interface LookRow {
 }
 const LOOKS_JSON = join(import.meta.dirname, '../../packages/content/data/looks.json');
 
+const looksDoc = () =>
+  JSON.parse(readFileSync(LOOKS_JSON, 'utf8')) as {
+    looks: Record<string, LookRow>;
+    villagers: Record<string, LookRow>;
+  };
+
 /** Every look of looks.json, in file order: the world looks and the portrait-only cover cards. */
 export function allLooks(): LookRow[] {
-  const doc = JSON.parse(readFileSync(LOOKS_JSON, 'utf8')) as { looks: Record<string, LookRow> };
-  return Object.values(doc.looks);
+  return Object.values(looksDoc().looks);
+}
+
+/** The villager family of looks.json (round 8, A161): the plain base and the townsfolk variants, in file order. */
+export function villagerLooks(): LookRow[] {
+  return Object.values(looksDoc().villagers);
 }
 
 /** The world looks (a non-null `bodyAtlas`), in file order; the cover cards have no body. */

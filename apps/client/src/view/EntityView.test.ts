@@ -10,6 +10,7 @@ interface Made {
   look: { height: number; scarf: number; hat: number };
   isSelf: boolean;
   pos: [number, number][];
+  poses: [string, number, number | boolean][];
   destroyed: boolean;
   alpha: boolean;
   blood: boolean;
@@ -21,13 +22,15 @@ vi.mock('./PlayerView', () => ({
     readonly root = {};
     private readonly rec: Made;
     constructor(_scene: unknown, name: string, look: Made['look'], isSelf: boolean) {
-      this.rec = { name, look, isSelf, pos: [], destroyed: false, alpha: false, blood: false };
+      this.rec = { name, look, isSelf, pos: [], poses: [], destroyed: false, alpha: false, blood: false };
       made.push(this.rec);
     }
     setPosition(x: number, y: number) {
       this.rec.pos.push([x, y]);
     }
-    pose() {}
+    pose(dir: string, animId: number, status: number | boolean) {
+      this.rec.poses.push([dir, animId, status]);
+    }
     setBlood(on: boolean) {
       this.rec.blood = on;
     }
@@ -202,6 +205,16 @@ describe('EntityView (GDD 3.17)', () => {
     expect(ann.alpha).toBe(true);
     expect(ann.blood).toBe(true);
     expect(kay.blood).toBe(false);
+  });
+
+  it('poses every sprite with the whole status word, so the view picks the gaits, loops and signs (motion.md 1)', () => {
+    const v = view();
+    const bits = StatusBit.limp | StatusBit.bleeding | StatusBit.transit;
+    v.update(roster, 0, [avatar('h-me', SELF), avatar('h-a', 'a', { animId: 1, statusBits: bits })], 'h-me');
+    const ann = live().find((m) => m.name === 'Ann')!;
+    expect(ann.poses.at(-1)).toEqual(['s', 1, bits]);
+    // Never the transit flag alone: the limp and the bleeding would be lost on the way to the view.
+    expect(ann.poses.every(([, , status]) => typeof status === 'number')).toBe(true);
   });
 
   it('skips an avatar whose roster row is unknown', () => {
