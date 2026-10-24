@@ -60,7 +60,132 @@
      }
     },
     {
+     "filename": "prop_apoth_drawers",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_armchair",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_bar_counter",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_bar_counter_lamp",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_bar_counter_taps",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_barrel",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -136,6 +261,56 @@
     },
     {
      "filename": "prop_bench",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_birdcage",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_blackMarket",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -236,6 +411,81 @@
     },
     {
      "filename": "prop_boot_rack",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_bottle_crate",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_bottle_shelf",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_bottle_shelf_b",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -386,6 +636,56 @@
     },
     {
      "filename": "prop_candle_stand",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_card_table",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_chalkboard",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -632,6 +932,81 @@
      "pivot": {
       "x": 0.5,
       "y": 0.8286
+     }
+    },
+    {
+     "filename": "prop_counter",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_counter_case",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_counter_case_b",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -1010,6 +1385,31 @@
      }
     },
     {
+     "filename": "prop_drying_frame",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_fence",
      "rotated": false,
      "trimmed": true,
@@ -1335,7 +1735,132 @@
      }
     },
     {
+     "filename": "prop_herb_rack",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_hymn_board",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_inglenook_e",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_jar_shelf",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_jar_shelf_b",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_keg_rack",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -1460,6 +1985,31 @@
      }
     },
     {
+     "filename": "prop_leech_jar",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_letter_box",
      "rotated": false,
      "trimmed": true,
@@ -1535,7 +2085,57 @@
      }
     },
     {
+     "filename": "prop_log_basket",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_memorial",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_mortar_table",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -1782,6 +2382,31 @@
      "pivot": {
       "x": 0.5,
       "y": 0.8333
+     }
+    },
+    {
+     "filename": "prop_piano",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -2210,6 +2835,31 @@
      }
     },
     {
+     "filename": "prop_rug",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_safe",
      "rotated": false,
      "trimmed": true,
@@ -2232,6 +2882,31 @@
      "pivot": {
       "x": 0.5,
       "y": 0.8
+     }
+    },
+    {
+     "filename": "prop_sawdust",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -2260,6 +2935,31 @@
      }
     },
     {
+     "filename": "prop_settle",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_shelf",
      "rotated": false,
      "trimmed": true,
@@ -2282,6 +2982,56 @@
      "pivot": {
       "x": 0.5,
       "y": 0.8571
+     }
+    },
+    {
+     "filename": "prop_ship_wheel",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_show_globe",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -2336,6 +3086,181 @@
     },
     {
      "filename": "prop_stained_glass_e",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_still",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_store_shelf",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_store_shelf_b",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_tavern_table",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_tavern_table_b",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_tea_table",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_tide_chart",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -2782,6 +3707,31 @@
      "pivot": {
       "x": 0.5,
       "y": 0.8571
+     }
+    },
+    {
+     "filename": "prop_writing_desk",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {

@@ -26,6 +26,24 @@
     { "key": "train_arrive", "url": "train_arrive.ogg", "gain": 1 },
     { "key": "train_brake", "url": "train_brake.ogg", "gain": 1 },
     { "key": "ferry_horn", "url": "ferry_horn.ogg", "gain": 1 },
-    { "key": "crows", "url": "crows.ogg", "gain": 1 }
+    { "key": "crows", "url": "crows.ogg", "gain": 1 },
+    { "key": "mob_wolf_attack", "url": "mob_wolf_attack.ogg", "gain": 1 },
+    { "key": "mob_hurt_wolf", "url": "mob_hurt_wolf.ogg", "gain": 1 },
+    { "key": "mob_hurt_boar", "url": "mob_hurt_boar.ogg", "gain": 1 },
+    { "key": "mob_hurt_small", "url": "mob_hurt_small.ogg", "gain": 1 },
+    { "key": "mob_death", "url": "mob_death.ogg", "gain": 1 },
+    { "key": "break_wood", "url": "break_wood.ogg", "gain": 1 },
+    { "key": "break_stone", "url": "break_stone.ogg", "gain": 1 },
+    { "key": "break_ore", "url": "break_ore.ogg", "gain": 1 },
+    { "key": "break_pluck", "url": "break_pluck.ogg", "gain": 1 },
+    { "key": "break_resin", "url": "break_resin.ogg", "gain": 1 },
+    { "key": "fx_hit", "url": "fx_hit.ogg", "gain": 1 },
+    { "key": "fx_coins", "url": "fx_coins.ogg", "gain": 1 },
+    { "key": "fx_poison", "url": "fx_poison.ogg", "gain": 1 },
+    { "key": "fx_fall", "url": "fx_fall.ogg", "gain": 1 },
+    { "key": "fx_knockout", "url": "fx_knockout.ogg", "gain": 1 },
+    { "key": "hatch_open", "url": "hatch_open.ogg", "gain": 1 },
+    { "key": "ladder_climb", "url": "ladder_climb.ogg", "gain": 1 },
+    { "key": "portal_veil", "url": "portal_veil.ogg", "gain": 1 }
   ]
 }

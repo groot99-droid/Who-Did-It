@@ -1179,17 +1179,17 @@ Session 7G, round 7 (DECISIONS A111). The owner's admin page (14.23) wears the t
 
 Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaGoal(id)`). The role card (`ui/RoleCard.ts`, 7F renders it) reads `Private.vendetta` (GDD 3.20): a Killer's own vendetta id, or for the Accomplice the ids of the Killers it knows, joined by commas. An empty value shows no line. No other seat's card, no world label and no toast names a vendetta; the doubted Vicar's note is its own.
 
-| Key | Text | Where |
-|---|---|---|
-| `vendetta.label` | Vendetta | the heading of the goal line on a Killer's card |
-| `vendetta.goal.zealot` | Zealot: stay near the Vicar until doubt takes the flock. | a Killer holding conversion |
-| `vendetta.goal.activist` | Activist: tamper with two of the company’s work stations. | a Killer holding sabotage |
-| `vendetta.goal.bandit` | Bandit: crack the manor’s strongbox after dark, alone. | a Killer holding heist |
-| `vendetta.goal.hitman` | Hitman: the Train brings you a contract. Take only its mark. | a Killer holding contract |
-| `vendetta.mate` | Your Killer’s vendetta: {goal} | the Accomplice's card, once per Killer it knows; `{goal}` is that Killer's goal line |
-| `vendetta.note.doubt` | Doubt took the flock: your vote did not carry. | the Vicar's own Notebook entry of kind `NoteKind.doubt`, written at the reveal of the doubted meeting |
-| `vendetta.note.contract` | The mail brought a contract: {name}. | the Hitman's own Notebook entry of kind `NoteKind.contract` (`of` the target seat, `{name}` its seat name), written at the first Train arrival |
-| `vendetta.contract.accept` | Accept | the button on that contract entry while the offer is open (no `contract` quest yet, the mark on the roster); it sends `quest.accept { questId: 'contract' }` |
+| Key                        | Text                                                         |
+| -------------------------- | ------------------------------------------------------------ |
+| `vendetta.label`           | Vendetta                                                     |
+| `vendetta.goal.zealot`     | Zealot: stay near the Vicar until doubt takes the flock.     |
+| `vendetta.goal.activist`   | Activist: tamper with two of the company’s work stations.    |
+| `vendetta.goal.bandit`     | Bandit: crack the manor’s strongbox after dark, alone.       |
+| `vendetta.goal.hitman`     | Hitman: the Train brings you a contract. Take only its mark. |
+| `vendetta.mate`            | Your Killer’s vendetta: {goal}                               |
+| `vendetta.note.doubt`      | Doubt took the flock: your vote did not carry.               |
+| `vendetta.note.contract`   | The mail brought a contract: {name}.                         |
+| `vendetta.contract.accept` | Accept                                                       |
 
 ### 14.33 Inspect (8B)
 
@@ -1271,6 +1271,78 @@ by `wdi-anim-purse`. Entering a scene shows the amount alone, never the whole pu
 | `purse.gain` | +{n} | beside it after a wage, a sale or a pickup |
 | `purse.loss` | −{n} | beside it after a buy, a deposit or a theft |
 
+### 14.35 Rent, Faith, rumours and HQ (8D)
+
+Lines are in `apps/client/src/ui/copy/civic.ts` (`CIVIC_COPY`, `stationName(id)`). The civic layer
+(`ui/econ/CivicLayer.ts`) shows one prompt at the civic prop in reach (GDD 3.23). At the mailbag and a tally rack, E is
+held (`act.hold`). At an altar, the back room, an HQ station or a bank counter, E opens the civic panel
+(`ui/econ/CivicPanel.ts`), redrawn for that prop. The server decides every act; a refusal is the usual error line.
+Showing a notice, and presenting an Indulgence or a Seal, happen at a meeting and wait for the meeting panel's hook.
+8H animates the panel by `wdi-anim-panel` and its lists by `wdi-anim-list`.
+
+#### 14.35.1 The prompts
+
+| Key | Text | Where |
+|---|---|---|
+| `prompt.altar` | Press E: the altar | the prompt at an altar in reach |
+| `prompt.mailbag` | Hold E: collect the mailbag | the hold prompt at the mailbag (the hold lasts `clues.collectHoldS`) |
+| `prompt.rack` | Hold E: hand in your quota | the hold prompt at a tally rack |
+| `prompt.market` | Press E: the back-room buyer | the prompt at the back-room buyer (the black market) |
+| `prompt.hq` | Press E: the {station} | the prompt at an HQ station, by its name |
+| `prompt.bank` | Press E: pay what you owe | the prompt at a bank counter |
+
+#### 14.35.2 The altar
+
+| Key | Text | Where |
+|---|---|---|
+| `altar.title` | The altar | the altar panel's title |
+| `altar.faith` | Your Faith: {n} of {max} | under the title: the own Faith |
+| `altar.purse` | Your purse: {n} Scrip | under it: the purse |
+| `altar.donate` | Give {n} Scrip | the two give buttons (1, and 5 or `faith.donateMax`) |
+| `altar.indulgence` | An Indulgence | a row: the Indulgence |
+| `altar.indulgence.hint` | Clears one rumour of your look. {faith} Faith and {scrip} Scrip. | its line, with its price |
+| `altar.seal` | A Parish Seal | a row: the Parish Seal |
+| `altar.seal.hint` | Presented at a meeting, the Church holds the charge. {faith} Faith and {scrip} Scrip. | its line, with its price |
+| `altar.buy` | Buy | each row's button |
+| `altar.short` | Not enough Faith or Scrip | a row the Faith or the purse cannot cover |
+
+#### 14.35.3 The back room and the notices
+
+| Key | Text | Where |
+|---|---|---|
+| `market.title` | The back room | the back room's title |
+| `market.lead` | A man who buys what people would rather keep quiet. | under it |
+| `market.none` | You hold no notices. | no notice held |
+| `notice.line` | A figure in {look}'s look, in {place}, {when}. | each held notice (`{when}` one of the four below) |
+| `notice.fence` | Sell for {n} Scrip | a notice's sell button (`notices.fencePrice`) |
+| `notice.burn` | Burn | a notice's burn button (your own look's needs an Indulgence) |
+| `notice.when.day` | by day | grace and day |
+| `notice.when.dusk` | at dusk | dusk |
+| `notice.when.night` | at night | night |
+| `notice.when.finalNight` | on the last night | the Final Night |
+| `notice.stranger` | a stranger | a look with no name |
+
+#### 14.35.4 The HQ panel
+
+| Key | Text | Where |
+|---|---|---|
+| `hq.tier` | Built: {n} of 3 | the bought tier |
+| `hq.next` | Next: {scrip} Scrip, {materials} | the next tier's price |
+| `hq.done` | Fully built. | all three tiers built |
+| `hq.build` | Build | the build button |
+| `hq.notYours` | Only someone in the {look} look may build here. | a seat not in the station look |
+| `hq.short` | Not enough Scrip or materials | the Scrip or the materials fall short |
+| `hq.<id>` | Crumb's Ovens, Chapel, Surgery, Gamekeeper's Lodge, Detective's Office, Lamplighter's Store | the panel's title, by `economy.json` station id |
+
+#### 14.35.5 The bank counter
+
+| Key | Text | Where |
+|---|---|---|
+| `bank.title` | The Company ledger | the bank panel's title |
+| `bank.lead` | Rent falls due at midday and is owed by dusk. Pay all you owe at once. | under it |
+| `bank.pay` | Pay what you owe | `act.payRent`, the whole debt or nothing |
+| `civic.close` | Close | the panel's close button |
+
 ### 14.38 Tasks: the chores panel, the station prompts and the village's work (7M)
 
 Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt at Start gets its screen half in the M5b layer (14.19): nothing here changes the layer's gather, craft or quest behaviour, and `ui/theme/**` is not edited; the new rules live in `ui/match.css`.
@@ -1280,6 +1352,8 @@ Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt 
 **Prompts** (`ui/copy/tasks.ts`, read by `taskPrompt`): `prompt.task.take` "Press E: take the {tool}" at a real source; `prompt.task.do` "Press E: {name}" at a fake source, or at a station with the tool in hand; `prompt.task.tool` "Needs the {tool}: {name}" at a station without it; `prompt.task.night` "Only at night: {name}" at a `nightOnly` station by day (the server refuses the same, 3.5). A fake task never says what it needs: it has nothing to fetch, and its prompt reads like a real task's with the tool in hand.
 
 **Chores (K).** `ui/Chores.ts mountChores`, the QuestLog's panel pattern and classes (`wdi-m5b__panel/row/done/empty`), fourth button of the layer's key row. One row per dealt task in deal order: the name, then `chores.fetch` "Fetch the {tool} from {scene}", `chores.bring` "Bring it to {scene}", `chores.go` "Go to {scene}" for a task without a tool, `chores.night` "After dark." under a `nightOnly` one, `chores.done` "Done" (name struck through). A fake list shows the same rows under the hint `chores.show` "A show of work": the list is `Private.tasks`, so only its holder sees that line. `chores.none` "No chores on your list." for a seat dealt none (an NPC seat, or Blackpine). Escape closes it with the other panels. Testids `chores`, `chores-list`, `chores-show`, `chores-empty`, `chore-<taskId>` (with `data-step` fetch, bring or done), `chores-close`.
+
+**The co-op hold (GDD 3.5 "Shutter the windows").** `taskSpots` also offers every `coop` task's prop in the scene to every seat, with the task on its list or not, within `coopRadiusTiles` of it rather than the station reach (`nearest` honours a spot's own `reach`); its prompt is `prompt.task.coop` "Hold E: {name} (takes {n})". Holding E (or tapping the prompt) sends the `task` hold and keeps it, like a gather: the prompt turns to `prompt.task.coop.wait` "Waiting for hands: {holders} of {n}" or `prompt.task.coop.hold` "Keep holding: {holders} of {n}" from the server's `coopHold` (`WorldFeedEvents.coopHold`), and the prompt's bar is that shared progress, not a local clock. Letting go (the release, the prompt again, or walking off) sends `on: false` and says `toast.task.coop.cancel` "You let go."; `coopHold` at progress 1 ends the hold with `toast.task.coop.done` "Done, together.", whatever the seat's list said. The chores panel shows the task with `chores.coop` "Takes {n} hands, at {scene}" (`data-step` coop). The mock (`?mock=1`) plays the hold with a phantom second hand that joins after a second.
 
 **The village's work.** `mountWorkBar`: the public task bar (`GameState.taskBar`, `WorldFeed.taskBar()`) as a thin meter with its percentage under the clock, `role="progressbar"` with `aria-valuenow`, title and label `work.title` "The village's work", `work.pct` "{pct}%". Its fill moves in 300 ms, none under reduced motion. Testids `work`, `work-pct`.
 
@@ -1295,6 +1369,11 @@ Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt 
 | `prompt.task.night` | Only at night: {name}            |
 | `toast.task.took`   | Took the {tool}.                 |
 | `toast.task.show`   | You make a show of it.           |
+| `prompt.task.coop`  | Hold E: {name} (takes {n})       |
+| `prompt.task.coop.wait` | Waiting for hands: {holders} of {n} |
+| `prompt.task.coop.hold` | Keep holding: {holders} of {n} |
+| `toast.task.coop.done` | Done, together.               |
+| `toast.task.coop.cancel` | You let go.                 |
 | `chores.title`      | Chores                           |
 | `chores.key`        | K                                |
 | `chores.none`       | No chores on your list.          |
@@ -1302,8 +1381,25 @@ Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt 
 | `chores.fetch`      | Fetch the {tool} from {scene}    |
 | `chores.bring`      | Bring it to {scene}              |
 | `chores.go`         | Go to {scene}                    |
+| `chores.coop`       | Takes {n} hands, at {scene}      |
 | `chores.night`      | After dark.                      |
 | `chores.done`       | Done                             |
 | `chores.close`      | Close                            |
 | `work.title`        | The village's work               |
 | `work.pct`          | {pct}%                           |
+
+### 14.40 Meeting notes (8T)
+
+Lines are in `apps/client/src/ui/copy/notes.ts` (`NOTES_COPY`); the tab is `ui/meetingNotes.ts` (GDD 3.8 "Meeting
+notes"). A note carries no speaker, so the tab shows only its text, and no line here names a seat. The named chat log
+leaves `notes` lines out. A refused note (too soon, past the cap) is the usual refusal toast of 14.3.
+
+| Key | Text | Where |
+|---|---|---|
+| `meeting.tab.notes` | Notes | the meeting tab beside Report, Chat and Notebook |
+| `notes.title` | Meeting notes | the tab's accessible label |
+| `notes.hint` | Notes carry no name. Anyone at the table may have written one. | above the notes |
+| `notes.placeholder` | Leave a note | the field, a living seat |
+| `notes.send` | Pin the note | the send button's label |
+| `notes.empty` | No notes yet | the list, before the first note |
+| `notes.ghost` | The dead leave no notes | the field, disabled, for a ghost |

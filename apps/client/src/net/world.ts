@@ -145,6 +145,8 @@ export type WorldFeedEvents = {
     stock: Array<{ itemId: string; price: number }>;
     buys: Array<{ itemId: string; price: number }>;
   };
+  /** Private, round 7 (7M, GDD 3.5): the hands on the co-op hold this seat is in and its shared progress (0 to 1). */
+  coopHold: { taskId: string; holders: number; progress: number };
 };
 
 /** Round 6 (M5b): a resource node of the scene this client is in (`SceneState.nodes`). */
@@ -187,6 +189,9 @@ export interface TaskSnap {
   fake: boolean;
 }
 
+/** Round 8, 8D (GDD 3.23): the civic acts a client sends through `WorldFeed.civic`. */
+export type CivicAct = 'act.donate' | 'act.faith' | 'act.notice' | 'act.hq' | 'act.payRent';
+
 export interface WorldFeed {
   readonly bus: Emitter<WorldFeedEvents>;
   readonly selfId: string;
@@ -222,6 +227,12 @@ export interface WorldFeed {
   /** Round 8, 8C (locked): `act.buy` and `act.sell` at the shop a `shop` hold opened. */
   buy(shopId: string, itemId: string, qty: number): void;
   sell(shopId: string, itemId: string, qty: number): void;
+  /** Round 8, 8D (GDD 3.23): this player's own Faith, `Private.faith`. */
+  faith(): number;
+  /** Round 8, 8D: each HQ station's bought tier by station id (`GameState.hq`, public; a station absent is unbuilt). */
+  hqTiers(): Record<string, number>;
+  /** Round 8, 8D: one of the civic acts at the altar, the black market, a station or a bank counter. */
+  civic(type: CivicAct, payload: object): void;
   /** Round 6 (6I): `quest.accept { questId }`. */
   questAccept(questId: string): void;
   /** Round 6 (6I): `quest.turnIn { questId }`. */

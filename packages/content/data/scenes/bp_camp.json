@@ -234,7 +234,8 @@
     { "id": "bc.log_1", "kind": "dressing", "x": 36, "y": 33 },
     { "id": "bc.saw_horse", "kind": "dressing", "x": 41, "y": 32 },
     { "id": "bc.bucket", "kind": "dressing", "x": 32, "y": 20 },
-    { "id": "bc.shop_market", "kind": "counter", "x": 20, "y": 11 }
+    { "id": "bc.shop_market", "kind": "counter", "x": 20, "y": 11 },
+    { "id": "bc.altar_shrine", "kind": "altar", "x": 4, "y": 21 }
   ],
   "gates": [],
   "paths": [],
@@ -349,7 +350,7 @@
     "##......##############............................#....#",
     "###.....####D#########.S.........S..H..................#",
     "####........S.#.H#..........#...#.................######",
-    "#........................#.....#..................######",
+    "#...#....................#.....#..................######",
     "DS.....................S.........S................######",
     "#...........................#.....................######",
     "###......................S.....S..############....######",
@@ -391,7 +392,7 @@
     "TTddddddPPPPPPPPPPPPPPddddddddddddddddddddddddddddPddddF",
     "TTTdddddPPPPgPPPPPPPPPdddddddddddddddddddddddddddddddddF",
     "TTTPddddddddddPddPddddddddddPdddPdddddddddddddddddOOOOOO",
-    "TppddddddddddddddddddddddPdddddPddddddddddddddddddOOOOOO",
+    "TppdPddddddddddddddddddddPdddddPddddddddddddddddddOOOOOO",
     "TppdddddddddddddddddddddddddddddddddddddddddddddddOOOOOO",
     "TppdddddddddddddddddddddddddPdddddddddddddddddddddOOOOOO",
     "TTTdddddddddddddddddddddddddddddddPPPPPPPPPPPPddddOOOOOO",
