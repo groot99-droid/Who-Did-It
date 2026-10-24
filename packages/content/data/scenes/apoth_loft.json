@@ -8,7 +8,7 @@
   "biome": "house",
   "dark": true,
   "size": { "w": 12, "h": 9 },
-  "notes": "Near-dark, one green lamp.",
+  "notes": "Near-dark, one green lamp by the bed. Mallory's loft is her drying room: herbs hung from the rafters and on the walls, two slatted frames of petals and roots shedding onto the boards, sacks and crates of empties along the walls, a jar shelf of what is not for the shop, and the trunk at the foot of the room.",
   "worldRef": "4.3",
   "portals": [
     {
@@ -48,32 +48,43 @@
     },
     { "id": "al.trunk", "kind": "body", "variant": "trunk", "x": 2, "y": 7, "childOnly": false }
   ],
-  "props": [{ "id": "al.green_lamp", "kind": "lamp", "x": 6, "y": 0 }],
+  "props": [
+    { "id": "al.green_lamp", "kind": "lamp", "x": 8, "y": 5 },
+    { "id": "al.herb_rack_0", "kind": "dressing", "x": 3, "y": 0 },
+    { "id": "al.jar_shelf_b", "kind": "dressing", "x": 7, "y": 0 },
+    { "id": "al.herb_rack_1", "kind": "dressing", "x": 8, "y": 0 },
+    { "id": "al.drying_frame_0", "kind": "dressing", "x": 5, "y": 1 },
+    { "id": "al.drying_frame_1", "kind": "dressing", "x": 6, "y": 1 },
+    { "id": "al.flour_sacks", "kind": "dressing", "x": 1, "y": 4 },
+    { "id": "al.tin_crate", "kind": "dressing", "x": 1, "y": 5 },
+    { "id": "al.barrel", "kind": "dressing", "x": 10, "y": 3 },
+    { "id": "al.bottle_crate", "kind": "dressing", "x": 4, "y": 7 }
+  ],
   "gates": [],
   "paths": [],
   "lights": [
-    { "id": "al.lt_green_lamp", "kind": "lamp", "x": 6, "y": 1, "radiusTiles": 2, "color": "teal" }
+    { "id": "al.lt_green_lamp", "kind": "lamp", "x": 8, "y": 5, "radiusTiles": 2, "color": "teal" }
   ],
   "grid": [
     "############",
-    "#DS.......H#",
+    "#DS..##...H#",
     "#..........#",
-    "#..........#",
-    "#..........#",
-    "#..........#",
+    "#.........##",
+    "##.........#",
+    "##......#..#",
     "#........H.#",
-    "#.B........#",
+    "#.B.#......#",
     "############"
   ],
   "material": [
-    "WWWWWWPWWWWW",
+    "WWWPWWWPPWWW",
+    "WwwwwPPwwwwW",
+    "WwwwllllwwwW",
+    "WwwwwwwwwwPW",
+    "WPwwwwwwwwwW",
+    "WPwwwwwwPwwW",
     "WwwwwwwwwwwW",
-    "WwwwwwwwwwwW",
-    "WwwwwwwwwwwW",
-    "WwwwwwwwwwwW",
-    "WwwwwwwwwwwW",
-    "WwwwwwwwwwwW",
-    "WwwwwwwwwwwW",
+    "WwwwPwwwwwwW",
     "WWWWWWWWWWWW"
   ]
 }
