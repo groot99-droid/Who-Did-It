@@ -3,7 +3,16 @@ import balanceJson from '@wdi/content/data/balance.json';
 import metricsJson from '@wdi/content/data/metrics.json';
 import abilitiesJson from '@wdi/content/data/abilities.json';
 import cluesJson from '@wdi/content/data/clues.json';
-import { type NavData, NavGrid, TICK_RATE, TILE_PX, moveAabb } from '@wdi/shared';
+import {
+  type NavData,
+  NavGrid,
+  TICK_RATE,
+  TILE_PX,
+  coopDone,
+  coopProgress,
+  coopTicks,
+  moveAabb,
+} from '@wdi/shared';
 import { ClueKind, NotebookStatus } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
 import type { HoldAction } from '@wdi/shared/protocol';
@@ -27,6 +36,7 @@ import type {
   StackSnap,
 } from '../world';
 import { MockM5b, type MockSceneM5b } from './m5bMock';
+import { TASKS } from '../../ui/tasks';
 
 // A local stand-in for the server's movement stage, used behind ?mock=1 until a server is attached. It runs
 // the same collision (`@wdi/shared`) and the same speed table (balance.json) as apps/server/src/sim, with
@@ -136,6 +146,8 @@ export class MockWorldFeed implements WorldFeed {
   private readonly clueMap = new Map<string, MockClue>();
   private readonly book: NotebookSnap[] = [];
   private holding: { clueId: string; since: number } | null = null;
+  private coop: { taskId: string; since: number; holders: number; progress: number; ticks?: number } | null =
+    null;
   private killReadyTick = 0;
   /** The tick the open Last Shot aim ends; -1 when none is open. */
   private aimEndsTick = -1;
@@ -439,6 +451,13 @@ export class MockWorldFeed implements WorldFeed {
   }
 
   hold(action: HoldAction, targetId: string, on: boolean): void {
+    if (action === 'task') {
+      // Round 7 (7M, GDD 3.5): the co-op hold, with a phantom second hand that joins after a second.
+      const task = TASKS[targetId];
+      this.coop =
+        on && task?.kind === 'coop' ? { taskId: targetId, since: this.tick, holders: 0, progress: 0 } : null;
+      return;
+    }
     if (action === 'gather' || action === 'craft') {
       const me = this.actors.get(this.selfId);
       if (!me || this.ghost) return;
@@ -686,6 +705,29 @@ export class MockWorldFeed implements WorldFeed {
     this.bus.emit('phaseChange', { phase: PHASE_ORDER[this.phaseIdx]!.id, endsTick: this.phaseEndsTick });
   }
 
+  /** The mock co-op hold: one hand for a second, then the phantom's joins and the shared count runs to `holdS`. */
+  private runCoop(): void {
+    const c = this.coop;
+    if (!c) return;
+    const task = TASKS[c.taskId];
+    const moved = this.move !== null && Math.hypot(this.move.dx, this.move.dy) > 1e-3;
+    if (!task || moved) {
+      this.coop = null;
+      return;
+    }
+    const players = task.coopPlayers ?? 2;
+    const holders = this.tick - c.since >= TICK_RATE ? players : 1;
+    c.ticks = coopTicks(c.ticks ?? 0, holders, players);
+    const done = coopDone(c.ticks, task.holdS ?? 4, TICK_RATE);
+    const progress = done ? 1 : coopProgress(c.ticks, task.holdS ?? 4, TICK_RATE);
+    if (holders !== c.holders || progress !== c.progress) {
+      c.holders = holders;
+      c.progress = progress;
+      this.bus.emit('coopHold', { taskId: c.taskId, holders, progress });
+    }
+    if (done) this.coop = null;
+  }
+
   private runHold(me: Actor): void {
     const h = this.holding;
     if (!h) return;
@@ -753,6 +795,7 @@ export class MockWorldFeed implements WorldFeed {
     const me = this.actors.get(this.selfId);
     if (me) {
       this.runHold(me);
+      this.runCoop();
       this.m5b.step(this.tick, me, me.moving);
       this.m5b.refreshQuests();
     }
