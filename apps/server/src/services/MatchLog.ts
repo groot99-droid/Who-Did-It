@@ -1,3 +1,5 @@
+import type { SeedWords } from '../sim/seeds';
+
 /**
  * One JSON line per finished match on stdout, for the playtest metrics (ROADMAP 7.5). Tests replace
  * `matchLog.write` to capture the line.
@@ -21,6 +23,10 @@ export interface MatchRecord {
     /** NPC seat (GDD 3.12); stdout only, never on the wire. */
     isNpc?: boolean;
   }[];
+  /** Round 8, 8L (A170): the build that played the match (`BUILD_VERSION`). */
+  build: string;
+  /** Round 8, 8L: every stream id the match drew from and its seed words, for `MatchSeeds.replay`. */
+  seeds: Record<string, SeedWords>;
   meetings: {
     round: number;
     reason: string;
