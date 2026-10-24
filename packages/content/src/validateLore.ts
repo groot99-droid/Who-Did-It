@@ -3,7 +3,7 @@ import type { LoreFile } from './schemas/lore.js';
 import type { Scene, SceneId } from './schemas/scene.js';
 
 /**
- * Round 8 (GDD 3.26), 7M: every shelf of `lore.json` is a prop on a scene; volume ids are unique across the file; a
+ * Round 8 (GDD 3.26), 7M: every shelf of `lore.json` is a prop on a scene; volume ids are unique across the file; every page cites its source lines; a
  * shelf of books shows `reader.spinesMin` to `reader.spinesMax` spines; a letter is one sheet; no page is longer than
  * `reader.pageMaxChars`, so the reader shows it whole.
  */
@@ -26,6 +26,12 @@ export function checkLore(
       seen.set(v.id, propId);
       if (v.kind === 'letter' && v.pages.length !== 1)
         err(`${at}: letter ${v.id} unfolds as one sheet, not ${v.pages.length}`);
+      if (v.pageLines.length !== v.pages.length)
+        err(`${at}: ${v.id} has ${v.pages.length} pages but ${v.pageLines.length} line ranges`);
+      v.pageLines.forEach((range, i) => {
+        const [first, last] = range.split('-').map(Number) as [number, number];
+        if (first > last) err(`${at}: ${v.id} page ${i + 1} range ${range} ends before it starts`);
+      });
       v.pages.forEach((page, i) => {
         if (page.length > pageMaxChars)
           err(`${at}: ${v.id} page ${i + 1} is ${page.length} characters, over ${pageMaxChars}`);

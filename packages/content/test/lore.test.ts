@@ -14,6 +14,7 @@ const volume = (id: string, kind: 'book' | 'letter' | 'ledger' | 'clipping', pag
   title: id,
   kind,
   pages,
+  pageLines: pages.map(() => '1-1'),
 });
 
 const mapOf = (propId: string): string | undefined => {
@@ -32,9 +33,14 @@ describe('lore.json', () => {
     expect([...kinds].sort()).toEqual(['book', 'clipping', 'ledger', 'letter']);
   });
 
-  it('ships pages the reader shows whole, placeholders until the codex is written', () => {
-    // Owner (A200 round 1): every page reads "fill later" for now; 8V replaces pages in place and the ids stay.
-    expect(content.lore.shelves['as.shelf']!.volumes[0]!.pages).toEqual([LORE_PLACEHOLDER]);
+  it('ships pages the reader shows whole, each quoted from its vault work', () => {
+    // 8V filled the pages that read "fill later" (A200 round 1); the ids stayed.
+    const volumes = Object.values(content.lore.shelves).flatMap((s) => s.volumes);
+    for (const v of volumes) {
+      expect(v.source, v.id).toBeDefined();
+      expect(v.pages, v.id).not.toContain(LORE_PLACEHOLDER);
+      expect(v.pageLines.length, v.id).toBe(v.pages.length);
+    }
     const pages = Object.values(content.lore.shelves).flatMap((s) => s.volumes.flatMap((v) => v.pages));
     expect(pages.length).toBeGreaterThan(0);
     for (const page of pages) expect(page.length).toBeLessThanOrEqual(content.balance.reader.pageMaxChars);
@@ -66,13 +72,34 @@ describe('lore.json', () => {
   it('unfolds a letter as one sheet and keeps every page short enough to read whole', () => {
     const max = content.balance.reader.pageMaxChars;
     const errors = broken((c) => {
-      c.lore.shelves['wp.letter_box']!.volumes[0]!.pages = ['one', 'two'];
-      c.lore.shelves['bk.ledger']!.volumes[0]!.pages = ['x'.repeat(max + 1)];
+      const letter = c.lore.shelves['wp.letter_box']!.volumes[0]!;
+      [letter.pages, letter.pageLines] = [['one', 'two'], ['1-1', '2-2']];
+      const ledger = c.lore.shelves['bk.ledger']!.volumes[0]!;
+      [ledger.pages, ledger.pageLines] = [['x'.repeat(max + 1)], ['1-1']];
     });
     expect([...errors].sort()).toEqual([
       'lore.json bk.ledger: crumbsDaybook page 1 is 601 characters, over 600',
       'lore.json wp.letter_box: letter oneShot unfolds as one sheet, not 2',
     ]);
+  });
+
+  it('requires one source line range per page, first line no later than the last', () => {
+    const errors = broken((c) => {
+      c.lore.shelves['ov.board']!.volumes[0]!.pageLines = ['5-9', '10-12'];
+      c.lore.shelves['bk.ledger']!.volumes[0]!.pageLines = ['9-5'];
+    });
+    expect([...errors].sort()).toEqual([
+      `lore.json bk.ledger: crumbsDaybook page 1 range 9-5 ends before it starts`,
+      `lore.json ov.board: ${content.lore.shelves['ov.board']!.volumes[0]!.id} has ${content.lore.shelves['ov.board']!.volumes[0]!.pages.length} pages but 2 line ranges`,
+    ]);
+    for (const bad of ['', '12', '0-4', '4-', 'a-b', '3-4,7-9']) {
+      const v = { ...volume('a', 'clipping'), pageLines: [bad] };
+      const file = { gddRef: '3.26', shelves: { 'ov.board': { title: 'B', volumes: [v] } } };
+      expect(LoreFile.safeParse(file).success, bad).toBe(false);
+    }
+    const none = { id: 'a', title: 'a', kind: 'clipping', pages: ['x'] };
+    const file = { gddRef: '3.26', shelves: { 'ov.board': { title: 'B', volumes: [none] } } };
+    expect(LoreFile.safeParse(file).success).toBe(false);
   });
 
   it('refuses an empty page, an unknown kind and a source outside the vault', () => {
