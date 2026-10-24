@@ -1311,3 +1311,4 @@ leaves `notes` lines out. A refused note (too soon, past the cap) is the usual r
 | `notes.send` | Pin the note | the send button's label |
 | `notes.empty` | No notes yet | the list, before the first note |
 | `notes.ghost` | The dead leave no notes | the field, disabled, for a ghost |
+| `meeting.reason.final` | The Final Night: the village must choose | the meeting's reason line for the Final Night's forced meeting (reason `final`, GDD 3.2) |
