@@ -19,7 +19,9 @@ describe('round-8 icon masters (docs/SPRITES.md 9.1)', () => {
   it('are the keys listed in SPRITES.md 9.1 (each `icon_` and a name of its table)', () => {
     const section = readFileSync(SPRITES, 'utf8').split('### 9.1')[1]!.split('\n## ')[0]!;
     const rows = section.split('\n').filter((l) => l.startsWith('| ') && !l.startsWith('| Family'));
-    const listed = rows.flatMap((r) => [...r.matchAll(/`([a-z]+_[A-Za-z]+)`/g)].map((m) => `icon_${m[1]}`));
+    const listed = rows.flatMap((r) =>
+      [...r.matchAll(/`([a-z]+_[A-Za-z0-9]+)`/g)].map((m) => `icon_${m[1]}`),
+    );
     expect(keys).toEqual(listed.sort());
   });
 
