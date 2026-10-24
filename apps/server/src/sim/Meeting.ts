@@ -9,6 +9,7 @@ import { countRow, factionOf, flowOf, refuse, roleIdOf, rolesOf, setPhase } from
 import { hubOf, meetingSpawnsOf } from './MapSites';
 import { onMeetingOpenDisguise } from './Impersonate';
 import { beginAim, holdReveal, onMeetingOpenNight } from './NightPowers';
+import { clearFigureBodies } from './townsfolk/figures';
 import { type MeetingRequest, simOf } from './RoomSim';
 import { evaluateWin, endMatch } from './Win';
 import { civicMeetingStart } from './economy/civic';
@@ -54,6 +55,7 @@ export function openMeeting(room: PartyRoom, req: MeetingRequest): void {
   });
   onMeetingOpenDisguise(room);
   wakeAll(room); // round 8, 8A: the gather wakes every knocked-out seat (GDD 3.22, locked call site)
+  clearFigureBodies(room); // round 8, 8E: the creatures' takings leave with the meeting line (locked call site)
   placeAtSquare(room, false);
   state.players.forEach((player: PlayerState) => {
     player.hasVoted = false;
