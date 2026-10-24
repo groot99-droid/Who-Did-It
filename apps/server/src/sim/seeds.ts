@@ -19,6 +19,7 @@ import { type Rng, sfc32 } from '@wdi/shared';
  * - `vendetta`: a Killer card's vendetta, keyed by seat id (round 7, GDD 3.20);
  * - `tasks`: the task deal, the real and the fake lists (round 7, 7M, GDD 3.5);
  * - `body`: the effect chance rolls of the body (round 8, 8A, GDD 3.22; docs/round8/body.md 3), never a secret one.
+ * - `purse`: each seat's starting stake, keyed by seat id (round 8, GDD 3.23).
  */
 export type StreamName =
   | 'deal'
@@ -34,7 +35,8 @@ export type StreamName =
   | 'events'
   | 'vendetta'
   | 'tasks'
-  | 'body'; // round 8, 8A
+  | 'body' // round 8, 8A
+  | 'purse';
 
 /** Four 32-bit seed words of one sfc32 stream. */
 export type SeedWords = readonly [number, number, number, number];

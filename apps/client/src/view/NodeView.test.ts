@@ -38,7 +38,12 @@ class FakeSprite {
     this.done = [];
     for (const fn of fns) fn();
   }
-  destroy() {}
+  x = 0;
+  y = 0;
+  destroyed = false;
+  destroy() {
+    this.destroyed = true;
+  }
 }
 
 function fakeScene(withBreak: boolean) {
@@ -46,9 +51,13 @@ function fakeScene(withBreak: boolean) {
   const scene = {
     textures: { exists: () => true, get: () => ({ has: () => true }) },
     anims: { exists: (k: string) => withBreak && k.endsWith('/break') },
+    /** The viewer sees x below 500. */
+    cameras: { main: { worldView: { contains: (x: number) => x < 500 } } },
     add: {
-      sprite: () => {
+      sprite: (x: number, y: number) => {
         const s = new FakeSprite();
+        s.x = x;
+        s.y = y;
         sprites.push(s);
         return s;
       },
@@ -58,6 +67,8 @@ function fakeScene(withBreak: boolean) {
 }
 
 const node = (active: boolean): NodeSnap => ({ id: 'n1', resource: 'tinOre', x: 64, y: 64, active });
+const coins: NodeSnap = { id: 'coins.0', resource: 'coins', x: 64, y: 64, active: true };
+const tree: NodeSnap = { id: 'n2', resource: 'timber', x: 96, y: 64, active: true };
 
 describe('NodeView breaks (motion.md 2, round 8 8G)', () => {
   it('chooses break, regrow or a cut', () => {
@@ -103,6 +114,53 @@ describe('NodeView breaks (motion.md 2, round 8 8G)', () => {
       view.update([node(true)], 0);
       view.update([node(false)], 0);
       expect(sprites[0]!.calls).toEqual(['frame node_tin_ore/spent']);
+    }
+  });
+
+  it('sweeps up a coins heap the server removed: the break plays once where it lay, then the sprite goes', () => {
+    expect(nodeBreakKey('coins')).toBe('node_coins/break');
+    const { scene, sprites } = fakeScene(true);
+    const view = new NodeView(scene, () => false);
+    view.update([coins, tree], 0);
+    view.update([tree], 0);
+    expect(view.has('coins.0')).toBe(false);
+    expect(sprites[0]!.calls).toEqual(['play node_coins/break']);
+    expect(sprites[0]!.destroyed).toBe(false);
+    sprites[0]!.finish();
+    expect(sprites[0]!.destroyed).toBe(true);
+  });
+
+  it('removes a node at once under reduced motion, and a sweep still playing goes with the view', () => {
+    const reduced = fakeScene(true);
+    const quiet = new NodeView(reduced.scene, () => true);
+    quiet.update([coins, tree], 0);
+    quiet.update([tree], 0);
+    expect(reduced.sprites[0]!.calls).toEqual([]);
+    expect(reduced.sprites[0]!.destroyed).toBe(true);
+    const moving = fakeScene(true);
+    const view = new NodeView(moving.scene, () => false);
+    view.update([coins, tree], 0);
+    view.update([tree], 0);
+    view.destroy();
+    expect(moving.sprites[0]!.destroyed).toBe(true);
+  });
+
+  it('plays no break when the heap leaves with a scene change, a feed reset, or off screen', () => {
+    const cases: Array<[string, NodeSnap[], NodeSnap[]]> = [
+      // The portal fade: the feed already carries the next scene's nodes, none of the old ones.
+      ['scene change', [coins, tree], [{ ...tree, id: 'n9' }]],
+      // A reconnect: the feed empties, then refills.
+      ['feed reset', [coins, tree], []],
+      // A heap the viewer could not see.
+      ['off screen', [{ ...coins, x: 900 }, tree], [tree]],
+    ];
+    for (const [name, before, after] of cases) {
+      const { scene, sprites } = fakeScene(true);
+      const view = new NodeView(scene, () => false);
+      view.update(before, 0);
+      view.update(after, 0);
+      expect(sprites[0]!.calls, name).toEqual([]);
+      expect(sprites[0]!.destroyed, name).toBe(true);
     }
   });
 });

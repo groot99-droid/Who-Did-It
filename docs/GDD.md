@@ -794,6 +794,37 @@ Round 8 (A134, A135; `docs/round8/economy.md`): the Bible's Book IV on today's m
 Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `economy.json` and `balance.json`
 `economy`.
 
+**Scrip** (8C, A138). Every seat carries a purse and keeps a bank balance, and only the seat sees either number.
+- **The stake.** At Start each seat draws its stake on a stream of its own. It is paid the moment the looks are
+  public (before grace), from the range of the tier its **public look** names in `economy.json` `stakes`, never from
+  its card, so a seat wearing a cover carries the purse of the look it wears. A seat with no look takes the default
+  tier.
+- **The band.** Others never see the number. Inspect shows "a light purse" below `economy.heavyPurse` and "a heavy
+  purse" from it. Every stake tier lies wholly on one side of that line, so at Start the band says the look's tier
+  and nothing more.
+- **Wages.** The town pays `economy.taskWage` for each finished task, a fake task exactly as a real one, so a purse
+  never tells a worker from a pretender. A quest turn-in pays the quest's `scrip` (`quests.json`) beside its items.
+- **Shops.** A shop is a counter or stall in a scene (`economy.json` `shops`). Holding the action key at it opens
+  its panel, privately: what it sells at its `ask` and what it buys at its `pay` (`economy.json` `prices`). A living
+  seat in a world phase other than the immunity window buys and sells while the counter stays within
+  `doors.reachTiles`. A purchase is refused, and nothing changes, when the purse or the inventory falls short. The
+  bakery sells flour, the apothecary bandages and salts, the general store (HollowMere's tavern bar, BlackPine's
+  lodge) rope, lantern oil, candles and planks, and the Gamekeeper's stall (HollowMere's forest edge, BlackPine's
+  lodge) snares and torches. The market (HollowMere's square, BlackPine's camp) sells nothing and buys timber, stone,
+  resin, herbs, mushrooms and tin ore. No shop trades a role's kit, and an item a shop both sells and buys pays
+  less than it asks.
+- **The bank.** HollowMere's manor hall and BlackPine's intake office each have a bank counter. Holding the action
+  key at it opens the seat's account, and the seat then deposits from its purse or withdraws to it, the whole amount
+  or nothing, while the counter stays within reach. Banked Scrip is safe from a mugging and a knockout. Only the
+  heist reaches it: when the Bandit cracks the strongbox, the box carries off `economy.heistShare` of every seat's
+  bank balance (rounded down per seat) as its loot, and the cracker pockets it. A suddenly heavy purse is the
+  heist's tell, though wages and sales can make anyone rich.
+- **Coins on the ground.** A knockout or a mugging drops part of the purse where the seat lies, as a heap of coins
+  anyone alive can pick up with the gather hold (`economy.coinPickupS`, within reach). The first to finish takes the
+  whole heap, and it never comes back.
+- **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice. It leaves only as a
+  purchase, rent, a fine, a donation or an HQ tier. Theft, drops, pickups and the bank only move it.
+
 ### 3.24 Moods, mugging and townsfolk
 
 Round 8 (A134, A135; `docs/round8/townsfolk.md`).
