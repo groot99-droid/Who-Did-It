@@ -296,6 +296,25 @@ anim plays at 12 fps once (`repeat: 0`) and Phaser holds its last frame. Every f
 | `vfx_dust_step` | 6 | `IsoCam`, 64 px (round 5) | Puff at a boot; ends empty |
 | `vfx_disguise` | 8 | `IsoCam`, 128 px, pivot at the feet (round 5) | Fog and slate smoke rising feet to head round one turning mustard spark, gone by frame 7; only where a Knife strike drops a disguise |
 
+**Round-8 effects** (8G, motion.md 2; DECISIONS A162) are runtime particles, not atlas frames: `view/vfx/VfxView.ts`
+draws seven small shapes once at boot (`fx_spark`, `fx_drop`, `fx_puff`, `fx_coin`, `fx_star`, `fx_chip`,
+`fx_slip`, white with an ink rim, tinted per particle from the world ramps) and bursts them at a figure's feet at
+the art's scale, so they cost no atlas page and keep their size against any figure. `fxSpecs.ts` holds each
+effect's shape, tints, count, speed, spread, gravity and life:
+
+| Effect | Plays when (`fxTriggers.ts`, public fields only) |
+|---|---|
+| `hitSpark` | an avatar's or a creature's `animId` turns to `hurt` |
+| `blood` | an avatar gains the `bleeding` bit |
+| `poisonPuff` | an avatar gains the `poisoned` bit |
+| `fallDust`, `koStars` | an avatar's `animId` turns to `knockdown` (a creature's fall gives `fallDust`) |
+| `crumbs` | `eat` (the Wake Loaf) |
+| `coinBurst` | `rob`; 8C calls `play` for a dropped purse and a sale |
+| `stepDust` | every stride at a walk or a run |
+| `buildDust`, `ledger`, `mailbag` | called by 8D: an HQ tier going up, the Clerk's round, the mailbag collected |
+
+Under reduced motion a burst is a static mark of three particles, cut after 400 ms.
+
 **Body.** The body on the floor is the last frame of `die` (`char/<body>/die/<dir>/007`, with the
 `scarf` and `blood` overlays on the same tail), held by the one-shot anim; no separate key.
 Review sheet: `assets/source/review/villager-body-contact.png`.
