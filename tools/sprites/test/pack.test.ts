@@ -11,7 +11,7 @@ import {
   parseFrameFileName,
   type Dir,
 } from '../keys.ts';
-import { packCharacter, packFrames, type MultiAtlas, type PackInput } from '../pack.ts';
+import { atlasJson, packCharacter, packFrames, type MultiAtlas, type PackInput } from '../pack.ts';
 
 /** A 128 px cell, transparent except a w x h block whose bottom centre is the feet point. */
 function cell(feet: [number, number], w: number, h: number, shade: string): Buffer {
@@ -110,6 +110,15 @@ describe('packFrames', () => {
   it('refuses duplicate frame names', async () => {
     const body = synthetic().frames.get('body')!;
     await expect(packFrames('x', [body[0]!, body[0]!])).rejects.toThrow(/duplicate/);
+  });
+
+  it('writes the atlas json on one line that parses back to the same frames (A161, #184 request 4)', async () => {
+    const { atlas } = await packFrames('char_tester', synthetic().frames.get('body')!);
+    const text = atlasJson(atlas);
+    expect(text.endsWith('\n')).toBe(true);
+    expect(text.slice(0, -1)).not.toContain('\n');
+    expect(JSON.parse(text)).toEqual(atlas);
+    expect(JSON.parse(atlasJson(atlas, true))).toEqual(atlas);
   });
 });
 

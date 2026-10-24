@@ -271,6 +271,7 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
     }
     const stick = log.scrollTop + log.clientHeight >= log.scrollHeight - 8;
     for (const line of lines.slice(rendered)) {
+      if (line.channel === 'notes') continue; // round 8, 8T: the notes tab shows these, with no speaker
       const tag = chatTag(line);
       log.append(
         h(

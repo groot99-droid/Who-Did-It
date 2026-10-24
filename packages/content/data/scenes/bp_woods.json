@@ -139,7 +139,8 @@
     { "id": "bw.firewood_1", "kind": "dressing", "x": 29, "y": 25 },
     { "id": "bw.wheelbarrow", "kind": "dressing", "x": 25, "y": 29 },
     { "id": "bw.axe_block_1", "kind": "dressing", "x": 29, "y": 30 },
-    { "id": "bw.sacks", "kind": "dressing", "x": 20, "y": 31 }
+    { "id": "bw.sacks", "kind": "dressing", "x": 20, "y": 31 },
+    { "id": "bw.hq_lodge", "kind": "hq", "x": 30, "y": 13 }
   ],
   "gates": [],
   "paths": [
@@ -293,7 +294,7 @@
     "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllTTTgggggPggPgggggTTT",
     "TTTTTTTTTTTTTTTTTTTTTTTTTTTTllllTTTTgggggggggggPgTTT",
     "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlulTTTTgggPgggggggggTTT",
-    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlTlTTTTgggggggggggggTTT",
+    "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlPlTTTTgggggggggggggTTT",
     "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllTTlTgggglllgggggggTT",
     "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllTllllllllllllllTTTTT",
     "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTlllTlTTlTTTlllTTTllTTTT",

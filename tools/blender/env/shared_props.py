@@ -245,3 +245,84 @@ PROPS = {
     "spot_sump": (64, 48, sump),
     **portal_frames(),
 }
+
+
+# ---------------------------------------------------------------- HQ tiers (round 8, 8G; GDD 3.23, motion.md 2)
+# One frame a tier, the same for every role station: the site as the map starts, then each bought tier on the
+# same tile. The front is -Y and the open side -X, so the back walls never hide what is built.
+
+H = 0.36  # half the footprint, metres: the posts stay inside the one-tile cell
+
+
+def _stakes():
+    return [part("HqStakes", T("wood", 2), *[B(sx * H, sy * H, 0.18, 0.06, 0.06, 0.36) for sx in (1, -1)
+                                             for sy in (1, -1)], bevel=0.01)]
+
+
+def _sign(z=0.9, x=-0.24, y=-0.31, lit=False):
+    objs = [part("HqSignPost", T("wood", 2), B(x, y, z / 2, 0.06, 0.06, z)),
+            part("HqSign", T("wood", 4), B(x, y - 0.02, z - 0.06, 0.34, 0.04, 0.2), bevel=0.01),
+            part("HqSignMark", T("brass", 1), B(x, y - 0.045, z - 0.06, 0.16, 0.012, 0.08), outline=False)]
+    if lit:
+        objs.append(part("HqLamp", F("lantern", 3), B(x + 0.2, y - 0.04, z + 0.06, 0.08, 0.08, 0.1), outline=False))
+    return objs
+
+
+def _posts(h):
+    return [part("HqPosts", T("wood", 3), *[B(sx * H, sy * H, h / 2, 0.08, 0.08, h) for sx in (1, -1)
+                                            for sy in (1, -1)], bevel=0.01)]
+
+
+def hq_site():
+    """Tier 0: a staked plot with its line, two planks waiting and a blank sign."""
+    line = [B(0, sy * H, 0.3, 2 * H, 0.012, 0.012) for sy in (1, -1)] + [B(sx * H, 0, 0.3, 0.012, 2 * H, 0.012)
+                                                                          for sx in (1, -1)]
+    return [*_stakes(), part("HqLine", F("bone", 3), *line, outline=False),
+            part("HqPlanks", T("wood", 4), B(0.1, 0.04, 0.03, 0.5, 0.1, 0.05), B(0.08, 0.16, 0.08, 0.48, 0.1, 0.05),
+                 bevel=0.01),
+            *_sign(0.7)]
+
+
+def hq_frame():
+    """Tier 1: a plank floor, four posts and the top beams, braced."""
+    return [part("HqFloor", T("wood", 3), B(0, 0, 0.04, 2 * H + 0.08, 2 * H + 0.08, 0.08), bevel=0.01),
+            *_posts(1.5),
+            part("HqBeams", T("wood", 2), *[B(0, sy * H, 1.5, 2 * H + 0.1, 0.08, 0.08) for sy in (1, -1)],
+                 *[B(sx * H, 0, 1.5, 0.08, 2 * H + 0.1, 0.08) for sx in (1, -1)]),
+            part("HqBrace", T("wood", 2), (frustum, dict(z0=0.3, z1=1.3, bottom=(0.06, 0.06), top=(0.06, 0.06),
+                                                        offset=(-H + 0.1, H), top_offset=(H - 0.1, H)))),
+            *_sign(0.8)]
+
+
+def hq_boarded():
+    """Tier 2: boarded back walls, a counter board and a canvas awning over the front."""
+    return [part("HqFloor", T("wood", 3), B(0, 0, 0.04, 2 * H + 0.08, 2 * H + 0.08, 0.08), bevel=0.01),
+            *_posts(1.5),
+            part("HqWalls", T("wood", 4), B(0, H, 0.78, 2 * H, 0.06, 1.4), B(H, 0, 0.78, 0.06, 2 * H, 1.4)),
+            part("HqBoards", T("wood", 2), *[B(0, H - 0.035, z, 2 * H, 0.012, 0.025) for z in (0.4, 0.8, 1.2)],
+                 *[B(H - 0.035, 0, z, 0.012, 2 * H, 0.025) for z in (0.4, 0.8, 1.2)], outline=False),
+            part("HqCounter", T("wood", 4), B(0, -H + 0.06, 0.6, 2 * H, 0.14, 0.08), B(0, -H + 0.06, 0.3, 2 * H, 0.06, 0.6)),
+            part("HqAwning", T("teal", 0), (frustum, dict(z0=1.5, z1=1.62, bottom=(2 * H + 0.08, 0.5),
+                                                          top=(2 * H + 0.08, 0.04), offset=(0, -0.26),
+                                                          top_offset=(0, 0.0)))),
+            *_sign(0.85)]
+
+
+def hq_finished():
+    """Tier 3: stone footings, plastered walls under a slate roof, a lit lamp and the station's brass sign."""
+    return [part("HqFooting", T("stone", 3), B(0, 0, 0.08, 2 * H + 0.12, 2 * H + 0.12, 0.16), bevel=0.02),
+            part("HqWalls", T("plaster", 2), B(0, H, 0.9, 2 * H, 0.08, 1.48), B(H, 0, 0.9, 0.08, 2 * H, 1.48)),
+            *_posts(1.66),
+            part("HqCounter", T("wood", 4), B(0, -H + 0.06, 0.66, 2 * H, 0.16, 0.08), B(0, -H + 0.06, 0.38, 2 * H, 0.06, 0.5)),
+            part("HqRoof", T("slate", 2), (frustum, dict(z0=1.66, z1=2.1, bottom=(2 * H + 0.2, 2 * H + 0.2),
+                                                        top=(2 * H + 0.1, 0.06)))),
+            part("HqRidge", T("slate", 0), B(0, 0, 2.11, 2 * H + 0.1, 0.08, 0.04)),
+            *_sign(1.0, lit=True)]
+
+
+PROPS.update({
+    "prop_hq_0": (64, 64, hq_site),
+    "prop_hq_1": (64, 96, hq_frame),
+    "prop_hq_2": (64, 96, hq_boarded),
+    "prop_hq_3": (64, 112, hq_finished),
+})

@@ -58,5 +58,166 @@
     "herb": { "pay": 2 },
     "mushroom": { "pay": 2 },
     "tinOre": { "pay": 3 }
+  },
+  "rent": { "maps": ["hollowmere"], "amount": 6, "dueAtDayFrac": 0.5 },
+  "quota": {
+    "maps": ["blackpine"],
+    "qty": 2,
+    "items": ["timber", "stone"],
+    "fine": 8,
+    "racks": ["bs.rack_tally"]
+  },
+  "curfew": {
+    "hollowmere": ["tavern_bar", "widow_parlour", "bakery", "apoth_shop", "manor_hall", "barn"],
+    "blackpine": ["bp_lodge", "bp_office", "bp_smithy"]
+  },
+  "faith": {
+    "altars": ["ov.altar_shrine", "ch.altar_main", "bc.altar_shrine"],
+    "perScrip": 1,
+    "donateMax": 20,
+    "max": 200,
+    "indulgence": { "faith": 10, "scrip": 4 },
+    "seal": { "faith": 20, "scrip": 8 },
+    "sealShieldS": 20,
+    "holdMax": 1
+  },
+  "notices": {
+    "mailbags": ["ov.mailbag_platform"],
+    "blackMarkets": ["tk.shop_black_market", "bl.shop_black_market"],
+    "slipsPerBag": 3,
+    "maxHeld": 4,
+    "fencePrice": 6,
+    "sampleS": 10,
+    "gazetteAfterRounds": 1
+  },
+  "hq": {
+    "stations": {
+      "crumbOvens": {
+        "look": "baker",
+        "props": { "hollowmere": "bk.hq_ovens", "blackpine": "bl.hq_ovens" },
+        "tiers": [
+          {
+            "scrip": 10,
+            "materials": [{ "item": "flour", "qty": 2 }],
+            "perks": { "shopDiscount": 0.8 }
+          },
+          {
+            "scrip": 20,
+            "materials": [{ "item": "timber", "qty": 2 }, { "item": "stone", "qty": 1 }],
+            "perks": { "fenceGain": 1.5 }
+          },
+          {
+            "scrip": 35,
+            "materials": [{ "item": "stone", "qty": 2 }, { "item": "tinOre", "qty": 1 }],
+            "perks": { "staminaRegen": 1.2, "famishedImmune": 1 }
+          }
+        ]
+      },
+      "chapel": {
+        "look": "vicar",
+        "props": { "hollowmere": "ov.hq_chapel", "blackpine": "bc.hq_chapel" },
+        "tiers": [
+          {
+            "scrip": 10,
+            "materials": [{ "item": "candle", "qty": 2 }],
+            "perks": { "faithGain": 1.25 }
+          },
+          {
+            "scrip": 20,
+            "materials": [{ "item": "timber", "qty": 2 }, { "item": "resin", "qty": 1 }],
+            "perks": { "indulgenceFaith": 0.5 }
+          },
+          {
+            "scrip": 35,
+            "materials": [{ "item": "stone", "qty": 2 }, { "item": "tinOre", "qty": 1 }],
+            "perks": { "sealShield": 1.5 }
+          }
+        ]
+      },
+      "surgery": {
+        "look": "doctor",
+        "props": { "hollowmere": "as.hq_surgery", "blackpine": "bl.hq_infirmary" },
+        "tiers": [
+          {
+            "scrip": 10,
+            "materials": [{ "item": "herb", "qty": 2 }],
+            "perks": { "shopDiscount": 0.8 }
+          },
+          {
+            "scrip": 20,
+            "materials": [{ "item": "herb", "qty": 2 }, { "item": "mushroom", "qty": 1 }],
+            "perks": { "healGain": 1.25 }
+          },
+          {
+            "scrip": 35,
+            "materials": [{ "item": "resin", "qty": 2 }, { "item": "tinOre", "qty": 1 }],
+            "perks": { "hpRegen": 1.2 }
+          }
+        ]
+      },
+      "lodge": {
+        "look": "gamekeeper",
+        "props": { "hollowmere": "fo.hq_lodge", "blackpine": "bw.hq_lodge" },
+        "tiers": [
+          {
+            "scrip": 10,
+            "materials": [{ "item": "timber", "qty": 2 }],
+            "perks": { "shopDiscount": 0.8 }
+          },
+          {
+            "scrip": 20,
+            "materials": [{ "item": "timber", "qty": 2 }, { "item": "resin", "qty": 1 }],
+            "perks": { "rentDue": 0.5 }
+          },
+          {
+            "scrip": 35,
+            "materials": [{ "item": "stone", "qty": 2 }, { "item": "tinOre", "qty": 1 }],
+            "perks": { "creatureDmg": 0.8 }
+          }
+        ]
+      },
+      "office": {
+        "look": "detective",
+        "props": { "hollowmere": "ov.hq_office", "blackpine": "bo.hq_office" },
+        "tiers": [
+          {
+            "scrip": 10,
+            "materials": [{ "item": "candle", "qty": 1 }],
+            "perks": { "slipsExtra": 1 }
+          },
+          {
+            "scrip": 20,
+            "materials": [{ "item": "timber", "qty": 2 }, { "item": "tinOre", "qty": 1 }],
+            "perks": { "noticesHeld": 2 }
+          },
+          {
+            "scrip": 35,
+            "materials": [{ "item": "stone", "qty": 2 }, { "item": "tinOre", "qty": 1 }],
+            "perks": { "slipsExtra": 2 }
+          }
+        ]
+      },
+      "store": {
+        "look": "lamplighter",
+        "props": { "hollowmere": "ov.hq_store", "blackpine": "bc.hq_store" },
+        "tiers": [
+          {
+            "scrip": 10,
+            "materials": [{ "item": "oil", "qty": 1 }],
+            "perks": { "shopDiscount": 0.8 }
+          },
+          {
+            "scrip": 20,
+            "materials": [{ "item": "timber", "qty": 2 }, { "item": "resin", "qty": 1 }],
+            "perks": { "quotaDue": 0.5 }
+          },
+          {
+            "scrip": 35,
+            "materials": [{ "item": "stone", "qty": 2 }, { "item": "tinOre", "qty": 1 }],
+            "perks": { "lightGain": 1.25 }
+          }
+        ]
+      }
+    }
   }
 }

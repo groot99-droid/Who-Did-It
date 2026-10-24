@@ -1,6 +1,7 @@
 import type { SceneId } from '@wdi/content';
 import { S2C, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { hearNoise } from './npc/hive/senses';
 import { simOf } from './RoomSim';
 import { sceneIndex } from './World';
 
@@ -20,6 +21,7 @@ export function emitNoise(
   const sim = simOf(room);
   const reach = radiusTiles * TILE_PX;
   const idx = sceneIndex(sceneId);
+  hearNoise(room, sceneId, x, y, radiusTiles, kind, exceptId); // round 8, 8R: NPC listeners (one line, granted by 6Z)
   for (const client of room.clients) {
     const player = room.state.players.get(client.sessionId);
     const p = sim.players.get(client.sessionId);

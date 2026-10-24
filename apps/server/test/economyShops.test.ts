@@ -42,21 +42,30 @@ const fixtures: Array<[Spot, string]> = [
   [MARKET, economy.shops.market!.prop],
 ];
 
+const moved: Array<[Prop, number, number]> = [];
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
 beforeAll(async () => {
   ({ colyseus, release } = await bootNpcServer());
-  for (const [at, id] of fixtures)
-    scenes[at.scene].props.push({ id, kind: 'counter', x: at.x, y: at.y } as Prop);
+  for (const [at, id] of fixtures) {
+    const placed = scenes[at.scene].props.find((p) => p.id === id);
+    if (placed) {
+      // A counter the scene already places moves onto the fixture tile for these tests.
+      moved.push([placed, placed.x, placed.y]);
+      Object.assign(placed, { x: at.x, y: at.y });
+    } else scenes[at.scene].props.push({ id, kind: 'counter', x: at.x, y: at.y } as Prop);
+  }
 });
 afterAll(async () => {
   for (const [at, id] of fixtures) {
+    if (moved.some(([p]) => p.id === id)) continue;
     const props = scenes[at.scene].props;
     props.splice(
       props.findIndex((p) => p.id === id),
       1,
     );
   }
+  for (const [p, x, y] of moved) Object.assign(p, { x, y });
   await release();
 });
 

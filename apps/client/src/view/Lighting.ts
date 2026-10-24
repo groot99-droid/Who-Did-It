@@ -5,6 +5,7 @@ import { toScreen } from '@wdi/shared/iso';
 import { REG_WORLD, type WorldFeed } from '../net/world';
 import { h } from '../ui/dom';
 import { type DayPart } from './dayPart';
+import { drawScale } from './texels';
 import { tokenColour, type PaletteToken } from './greyboxColours';
 import { DEPTH } from './iso';
 import { lanternCarriers, type Carrier } from './m5bFrames';
@@ -212,7 +213,7 @@ export class Lighting {
         const art =
           this.scene.textures.exists('tools') && this.scene.textures.get('tools').has(LANTERN_FRAME);
         img = art
-          ? this.scene.add.sprite(0, 0, 'tools', LANTERN_FRAME)
+          ? this.scene.add.sprite(0, 0, 'tools', LANTERN_FRAME).setScale(drawScale('tools'))
           : this.scene.add.image(0, 0, LIGHT_KEY).setTint(tokenColour('lantern'));
         img.setBlendMode(Phaser.BlendModes.ADD).setDepth(DEPTH.glow);
         if (art && this.scene.anims.exists(LANTERN_ANIM))

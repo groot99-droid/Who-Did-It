@@ -69,6 +69,7 @@ describe('shared basics', () => {
     expect(priv.quests.length).toBe(0);
     expect(priv.role.evolvedFrom).toBe('');
     expect(new GameState().lawStage).toBe(0);
+    expect(new GameState().hq.size).toBe(0);
   });
 
   it('adds the round-7 profile empty (docs/round7/parties.md 2)', () => {
