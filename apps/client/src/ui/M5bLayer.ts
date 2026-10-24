@@ -11,6 +11,8 @@ import { REG_WORLD, type NodeSnap, type WorldFeed } from '../net/world';
 import { StatusBit } from '../view/animIds';
 import { openMinigame, type MinigameModal } from '../view/minigames/MinigameModal';
 import { loadGivers, type GiverSpot } from '../view/GiverView';
+import { reachPx } from '../view/body/verbs'; // round 8, 8A
+import { nearestAvatar } from '../view/targets'; // round 8, 8A
 import { fill } from './copy';
 import { M5B_COPY as C } from './copy/m5b';
 import { TASK_COPY as TC } from './copy/tasks';
@@ -216,6 +218,8 @@ class Layer implements M5bLayer {
       inventory: () => feed.inventory(),
       lit: () => this.lit(),
       light: (on) => feed.light(on),
+      use: (id, target) => feed.ability(id, target), // round 8, 8A
+      near: (tiles) => nearestAvatar(feed.avatars(), feed.selfHandle(), reachPx(tiles)), // round 8, 8A
     });
     this.craft = mountCrafting(this.root, {
       inventory: () => feed.inventory(),

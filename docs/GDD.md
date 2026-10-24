@@ -750,8 +750,9 @@ the stamina cost above. It hurts seats, ambient townsfolk and creatures; a creat
 3.15) dies where it stands and lies there for `body.creatureCorpseS` 10 s (A142), then its row goes and its spawner
 stands empty until the creature's next waking part of the day; a corpse is no target. The swing is public to everyone
 who can see it (3.7) and leaves no clue unless blood is drawn. A strike names its target as the Kill does (an avatar
-handle, 3.17) or by a creature's id; a knocked-out seat is refused, never struck again. A Fatigued striker's cooldown
-is 1.5x. The Child's **slingshot** (`slingshot`) is a small hit from 5 tiles with the Slingshot in the kit, every 30 s,
+handle, 3.17) or by a creature's id; a knocked-out seat is refused, never struck again. On the client the key is X (a
+Strike disc on touch): it swings at the nearest other figure in reach, else the nearest living creature (UI.md
+14.32). A Fatigued striker's cooldown is 1.5x. The Child's **slingshot** (`slingshot`) is a small hit from 5 tiles with the Slingshot in the kit, every 30 s,
 and Stuns.
 
 **The knockout.** At zero health from fists, a mugging or the slingshot the seat is knocked out for `body.koS` 20 s:
@@ -788,7 +789,9 @@ The curing items: the Medkit's `heal` restores `body.healHp` 40 and stops Bleedi
 Doctor's Bandage also stops Bleeding; Salts cure Slowed and Poisoned; the Herbalist's Remedy cures Poisoned as
 `antidote`, by day as by night, whoever holds it; the Wake Loaf (`wakeLoaf`, a food bought at the bakery and baked at
 Crumb's Ovens) cures Famished and Weakened and restores stamina. The Medkit, Salts and the Remedy work on the actor
-when no target is named; an item is never spent on a seat it would not change.
+when no target is named; an item is never spent on a seat it would not change. The pockets offer a Use button for the
+items any holder may use (the Medkit, the Remedy, a food), on yourself or on the seat beside you; a role's own item
+verbs (the Bandage, the Salts, the slingshot) are keys of its card (UI.md 14.32).
 
 - **Inspect.** Anyone can inspect a seat or a figure in reach and learns only its physical signs; 8B writes the
   paragraph (`docs/round8/body.md` 7).

@@ -1,4 +1,5 @@
 import { WORLD_COPY as C } from '../ui/copy';
+import { BODY_COPY } from '../ui/copy/body'; // round 8, 8A
 import { h } from '../ui/dom';
 import '../view/hud.css';
 import type { InputSource } from './InputController';
@@ -11,9 +12,14 @@ export interface TouchHandlers {
   onUse(on: boolean): void;
   /** The Act disc (Q): the first ability of the card, fired on pointerdown. */
   onAct(): void;
+  /** Round 8 (8A): the Strike disc (X), the fists at the nearest target in reach, fired on pointerdown. */
+  onStrike(): void;
 }
 
-/** One stick and four discs (Use E, Act Q held-free; Run and Sneak held). Shown on touch screens or with ?touch=1. */
+/**
+ * One stick and five discs (Use E, Act Q and Strike X held-free; Run and Sneak held). Shown on touch screens or with
+ * ?touch=1.
+ */
 export class TouchControls implements InputSource {
   readonly root: HTMLElement;
   private readonly knob: HTMLElement;
@@ -54,8 +60,10 @@ export class TouchControls implements InputSource {
     this.actBtn = disc('Q', C['touch.act'], { 'data-testid': 'touch-act' });
     const run = disc('Run', C['touch.run']);
     const sneak = disc('Shift', C['touch.sneak']);
+    const strike = disc('X', BODY_COPY['body.strike'], { 'data-testid': 'touch-strike' }); // round 8, 8A
     press(this.useBtn, handlers.onUse);
     press(this.actBtn, (on) => on && handlers.onAct());
+    press(strike, (on) => on && handlers.onStrike()); // round 8, 8A
     press(run, (on) => (this.run = on));
     press(sneak, (on) => (this.sneakOn = on));
     this.root = h(
@@ -65,7 +73,7 @@ export class TouchControls implements InputSource {
       h(
         'div',
         { class: 'wdi-hud__br' },
-        h('div', { class: 'wdi-touch-cluster' }, this.actBtn, this.useBtn, run, sneak),
+        h('div', { class: 'wdi-touch-cluster' }, this.actBtn, this.useBtn, run, sneak, strike), // round 8, 8A
       ),
     );
     parent.append(this.root);
