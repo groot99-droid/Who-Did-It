@@ -5,7 +5,7 @@
   "characterCellPx": 128,
   "maxStandingSilhouettePx": 112,
   "maxSilhouetteTiles": 1.75,
-  "characterHeadsTall": 5,
+  "characterHeadsTall": 4,
   "camera": {
     "tiltXDeg": 60,
     "yawZDeg": 45,
