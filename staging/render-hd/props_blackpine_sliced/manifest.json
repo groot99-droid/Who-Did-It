@@ -1,0 +1,152 @@
+{
+  "atlas": "props_blackpine",
+  "factor": 2,
+  "frames": {
+    "prop_bunks_n": {
+      "cell": [
+        640,
+        720
+      ],
+      "file": "prop_bunks_n.png",
+      "footprint": [
+        7,
+        2
+      ],
+      "pivot": [
+        320.0,
+        544
+      ],
+      "tiles": "prop_bunks_n.tiles.png"
+    },
+    "prop_bunks_s": {
+      "cell": [
+        640,
+        720
+      ],
+      "file": "prop_bunks_s.png",
+      "footprint": [
+        7,
+        2
+      ],
+      "pivot": [
+        320.0,
+        544
+      ],
+      "tiles": "prop_bunks_s.tiles.png"
+    },
+    "prop_forge": {
+      "cell": [
+        320,
+        560
+      ],
+      "file": "prop_forge.png",
+      "footprint": [
+        3,
+        1
+      ],
+      "pivot": [
+        160.0,
+        464
+      ],
+      "tiles": "prop_forge.tiles.png"
+    },
+    "prop_head_saw": {
+      "cell": [
+        384,
+        592
+      ],
+      "file": "prop_head_saw.png",
+      "footprint": [
+        3,
+        2
+      ],
+      "pivot": [
+        192.0,
+        480
+      ],
+      "tiles": "prop_head_saw.tiles.png"
+    },
+    "prop_kiln_0": {
+      "cell": [
+        320,
+        560
+      ],
+      "file": "prop_kiln_0.png",
+      "footprint": [
+        2,
+        2
+      ],
+      "pivot": [
+        160.0,
+        464
+      ],
+      "tiles": "prop_kiln_0.tiles.png"
+    },
+    "prop_kiln_1": {
+      "cell": [
+        320,
+        560
+      ],
+      "file": "prop_kiln_1.png",
+      "footprint": [
+        2,
+        2
+      ],
+      "pivot": [
+        160.0,
+        464
+      ],
+      "tiles": "prop_kiln_1.tiles.png"
+    },
+    "prop_map_table": {
+      "cell": [
+        320,
+        560
+      ],
+      "file": "prop_map_table.png",
+      "footprint": [
+        2,
+        2
+      ],
+      "pivot": [
+        160.0,
+        464
+      ],
+      "tiles": "prop_map_table.tiles.png"
+    },
+    "prop_mess_table": {
+      "cell": [
+        576,
+        688
+      ],
+      "file": "prop_mess_table.png",
+      "footprint": [
+        6,
+        2
+      ],
+      "pivot": [
+        288.0,
+        528
+      ],
+      "tiles": "prop_mess_table.tiles.png"
+    },
+    "prop_trestle": {
+      "cell": [
+        384,
+        592
+      ],
+      "file": "prop_trestle.png",
+      "footprint": [
+        3,
+        2
+      ],
+      "pivot": [
+        192.0,
+        480
+      ],
+      "tiles": "prop_trestle.tiles.png"
+    }
+  },
+  "style": "hd",
+  "version": 1
+}

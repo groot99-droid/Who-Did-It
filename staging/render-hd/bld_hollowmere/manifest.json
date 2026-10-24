@@ -1,0 +1,152 @@
+{
+  "atlas": "bld_hollowmere",
+  "factor": 2,
+  "frames": {
+    "apoth": {
+      "cell": [
+        1216,
+        1008
+      ],
+      "file": "apoth.png",
+      "footprint": [
+        10,
+        8
+      ],
+      "pivot": [
+        608.0,
+        688
+      ],
+      "tiles": "apoth.tiles.png"
+    },
+    "bakery": {
+      "cell": [
+        704,
+        752
+      ],
+      "file": "bakery.png",
+      "footprint": [
+        6,
+        4
+      ],
+      "pivot": [
+        352.0,
+        560
+      ],
+      "tiles": "bakery.tiles.png"
+    },
+    "barn": {
+      "cell": [
+        1024,
+        912
+      ],
+      "file": "barn.png",
+      "footprint": [
+        10,
+        5
+      ],
+      "pivot": [
+        512.0,
+        640
+      ],
+      "tiles": "barn.tiles.png"
+    },
+    "chapel": {
+      "cell": [
+        1152,
+        976
+      ],
+      "file": "chapel.png",
+      "footprint": [
+        9,
+        8
+      ],
+      "pivot": [
+        576.0,
+        672
+      ],
+      "tiles": "chapel.tiles.png"
+    },
+    "manor": {
+      "cell": [
+        1280,
+        1040
+      ],
+      "file": "manor.png",
+      "footprint": [
+        13,
+        6
+      ],
+      "pivot": [
+        640.0,
+        704
+      ],
+      "tiles": "manor.tiles.png"
+    },
+    "mollHut": {
+      "cell": [
+        512,
+        656
+      ],
+      "file": "mollHut.png",
+      "footprint": [
+        4,
+        3
+      ],
+      "pivot": [
+        256.0,
+        512
+      ],
+      "tiles": "mollHut.tiles.png"
+    },
+    "netloft": {
+      "cell": [
+        960,
+        880
+      ],
+      "file": "netloft.png",
+      "footprint": [
+        5,
+        9
+      ],
+      "pivot": [
+        480.0,
+        624
+      ],
+      "tiles": "netloft.tiles.png"
+    },
+    "tavern": {
+      "cell": [
+        1280,
+        1040
+      ],
+      "file": "tavern.png",
+      "footprint": [
+        12,
+        7
+      ],
+      "pivot": [
+        640.0,
+        704
+      ],
+      "tiles": "tavern.tiles.png"
+    },
+    "widow": {
+      "cell": [
+        1024,
+        912
+      ],
+      "file": "widow.png",
+      "footprint": [
+        8,
+        7
+      ],
+      "pivot": [
+        512.0,
+        640
+      ],
+      "tiles": "widow.tiles.png"
+    }
+  },
+  "style": "hd",
+  "version": 1
+}
