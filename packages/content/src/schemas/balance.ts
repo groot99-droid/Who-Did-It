@@ -259,6 +259,11 @@ export const BalanceFile = z.strictObject({
      * the seat and the reaction, never a draw); a heard noise, shout or bell stays on the board for `memoryS`.
      */
     hive: z.strictObject({ staggerS: Span, memoryS: Seconds }),
+    /**
+     * Round 8, 8R (GDD 3.12): the body bands, in tiles from the body: walk to it, shout for the Detective and the
+     * Doctor, and stay to report it or run for the bell (the shout and the bell land in 8R's next PR).
+     */
+    body: z.strictObject({ pullTiles: Tiles, shoutTiles: Tiles, bellTiles: Tiles }),
     /** Round 6 (GDD 3.19): an NPC at one goal and one tile for longer than this fails the stuck invariant. */
     stuckInvariantS: Seconds,
   }),

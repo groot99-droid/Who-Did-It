@@ -16,26 +16,16 @@ import { type Match, startMatch } from './simHelpers';
 const chapel = economy.hq.stations.chapel!;
 const [first, second] = chapel.tiers as [(typeof chapel.tiers)[0], (typeof chapel.tiers)[0]];
 
-/** The chapel station's `hq_` row lands with 8G's tier props, so these tests stand it on an overworld floor tile. */
-const spot = (() => {
-  const grid = scenes.overworld.grid;
-  for (let y = 30; y < grid.length; y++) {
-    const x = grid[y]!.indexOf('...');
-    if (x >= 0) return { x: x + 1, y };
-  }
-  throw new Error('no floor on the overworld');
-})();
-const station = { id: chapel.props.hollowmere!, kind: 'hq', x: spot.x, y: spot.y };
-type Prop = (typeof scenes.overworld.props)[number];
+/** HollowMere's real tier props (8G): the chapel's on the overworld, the ovens' in the bakery. */
+const station = scenes.overworld.props.find((p) => p.id === chapel.props.hollowmere)!;
+const spot = { x: station.x + 1, y: station.y };
 
 let colyseus: ColyseusTestServer;
 beforeAll(async () => {
-  scenes.overworld.props.push(station as Prop);
   process.env.WDI_DEBUG = '1';
   colyseus = await boot(createServer({ ipBurst: 1e5, ipPerMin: 1e8, globalPerMin: 1e8 }));
 });
 afterAll(async () => {
-  scenes.overworld.props.splice(scenes.overworld.props.indexOf(station as Prop), 1);
   delete process.env.WDI_DEBUG;
   await colyseus.shutdown();
 });
@@ -56,7 +46,7 @@ async function atStation(n: number): Promise<Match> {
     for (const s of [...first.materials, ...second.materials]) addStack(playerOf(m, b), s.item, s.qty);
   });
   setPhase(m, Phase.day);
-  teleport(m, m.bots[0]!, 'overworld', spot.x + 1, spot.y);
+  teleport(m, m.bots[0]!, 'overworld', spot.x, spot.y);
   await sleep(100);
   return m;
 }
@@ -103,34 +93,28 @@ describe('HQ tiers (GDD 3.23)', () => {
     // Seat 1 is dealt the Killer and wears the Vicar's look as its cover; seat 0 holds the Vicar's look too.
     playerOf(m, b).priv.role.roleId = 'killer';
     playerOf(m, b).look = chapel.look;
-    teleport(m, b, 'overworld', spot.x + 1, spot.y);
+    teleport(m, b, 'overworld', spot.x, spot.y);
     await act(b, 'act.hq', { stationId: 'chapel' });
     expect(errorCodes(b)).toEqual([]);
     expect(m.room.state.hq.get('chapel')).toBe(1);
     expect(perkMul(m.room, b.id, 'faithGain')).toBe(perkMul(m.room, a.id, 'faithGain'));
 
     // At another look's station, the cover-wearer and a true wearer get the same refusal, word for word.
-    const ovens = economy.hq.stations.crumbOvens!;
-    const oven = { id: ovens.props.hollowmere!, kind: 'hq', x: spot.x, y: spot.y };
-    const props = scenes.overworld.props;
-    props.splice(props.indexOf(station as Prop), 1, oven as Prop);
-    try {
-      for (const bot of [a, b]) {
-        bot.events.length = 0;
-        await act(bot, 'act.hq', { stationId: 'crumbOvens' });
-      }
-      const refusal = (bot: Match['bots'][0]) => eventsOf(bot, 'error').map((e) => JSON.stringify(e));
-      expect(refusal(a)).toHaveLength(1);
-      expect(refusal(b)).toEqual(refusal(a));
-    } finally {
-      props.splice(props.indexOf(oven as Prop), 1, station as Prop);
+    const ovens = scenes.bakery.props.find((p) => p.id === economy.hq.stations.crumbOvens!.props.hollowmere)!;
+    for (const bot of [a, b]) {
+      teleport(m, bot, 'bakery', ovens.x, ovens.y - 1);
+      bot.events.length = 0;
+      await act(bot, 'act.hq', { stationId: 'crumbOvens' });
     }
+    const refusal = (bot: Match['bots'][0]) => eventsOf(bot, 'error').map((e) => JSON.stringify(e));
+    expect(refusal(a)).toHaveLength(1);
+    expect(refusal(b)).toEqual(refusal(a));
   });
 
   it('refuses another look, a seat out of reach, an unknown station and a tier it cannot pay for', async () => {
     const m = await atStation(3);
     const [a, b, c] = m.bots as [Match['bots'][0], Match['bots'][0], Match['bots'][0]];
-    teleport(m, b, 'overworld', spot.x + 1, spot.y);
+    teleport(m, b, 'overworld', spot.x, spot.y);
     await act(b, 'act.hq', { stationId: 'chapel' });
     expect(errorCodes(b)).toContain(ErrorCode.cannot);
     await act(c, 'act.hq', { stationId: 'chapel' });

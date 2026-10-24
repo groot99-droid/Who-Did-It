@@ -37,6 +37,8 @@ export function factProblem(room: PartyRoom, fact: Fact): string | null {
     const avatar = scene?.avatars.get(fact.ref);
     if (avatar && avatar.lookOf !== fact.lookOf) return 'lookOf is not the drawn look';
   }
+  // A shout is role-blind: where it rang, never who shouted, who was called or for which card (8R, A176).
+  if (fact.kind === 'shout' && fact.what !== undefined) return 'a shout carries a what';
   if (fact.what !== undefined && fact.kind !== 'creature' && ROLE_IDS.has(fact.what))
     return 'what names a card';
   return null;
