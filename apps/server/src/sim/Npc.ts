@@ -10,6 +10,7 @@ import {
   syncNpcCount,
   timingRng,
 } from './npc/memory';
+import { runHive } from './npc/hive';
 import { readyOnRoleCard, runMeetingVotes } from './npc/meeting';
 import { drawPersonas, releaseClaims } from './npc/routine';
 import { runWorldNpc } from './npc/world';
@@ -25,6 +26,7 @@ export function runNpcs(room: PartyRoom): void {
   const mem = npcMemory(room);
   const state = room.state;
   for (const id of [...mem.ids]) if (!state.players.has(id)) releaseNpcSeat(room, id);
+  runHive(room); // round 8, 8R: the public blackboard and its triggers (one line, granted by 6Z)
   for (const cmd of mem.debug.splice(0)) {
     if (typeof cmd.walk === 'boolean') mem.walk = cmd.walk;
     if (typeof cmd.routine === 'boolean') mem.routine = cmd.routine;

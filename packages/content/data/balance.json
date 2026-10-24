@@ -238,6 +238,7 @@
     "ready": { "delayS": { "min": 2, "max": 9 } },
     "aloneKill": { "afterS": 30, "sightTiles": 20 },
     "nightPower": { "windowFrac": { "min": 0.1, "max": 0.8 }, "lastShotS": { "min": 2, "max": 8 } },
+    "hive": { "memoryS": 10 },
     "stuckInvariantS": 20,
     "gddRef": "3.12"
   },
