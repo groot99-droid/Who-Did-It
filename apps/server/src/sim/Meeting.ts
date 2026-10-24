@@ -75,7 +75,10 @@ export function openMeeting(room: PartyRoom, req: MeetingRequest): void {
     ...(req.bodyOf !== undefined && { bodyOf: req.bodyOf }),
     missing: [],
   });
-  setPhase(room, Phase.meetingDiscussion, countRow(state.players.size).discussionS);
+  // The trial after the Final Night hunt has its own, longer discussion (GDD 3.3); the phases are the same.
+  const discussionS =
+    req.reason === 'final' ? balance.finalNight.trialS : countRow(state.players.size).discussionS;
+  setPhase(room, Phase.meetingDiscussion, discussionS);
   votesOpenTick.set(room, state.tick + Math.round(balance.meeting.minVoteS * TICK_RATE));
   civicMeetingStart(room); // round 8, 8D: `sealShield(room)` and `gazette(room)` (locked hook, GDD 3.23)
 }
