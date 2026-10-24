@@ -279,6 +279,12 @@ export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
     'prop_wheelbarrow',
     'prop_window',
     'prop_workbench',
+    // Round 8 (8K, A166): BlackPine's own economy frames for 8C's and 8D's kinds.
+    'prop_altar',
+    'prop_bank',
+    'prop_blackMarket',
+    'prop_counter',
+    'prop_rack',
   ],
 };
 
