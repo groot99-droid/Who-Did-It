@@ -1295,3 +1295,19 @@ Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt 
 | `chores.close`      | Close                            |
 | `work.title`        | The village's work               |
 | `work.pct`          | {pct}%                           |
+
+### 14.40 Meeting notes (8T)
+
+Lines are in `apps/client/src/ui/copy/notes.ts` (`NOTES_COPY`); the tab is `ui/meetingNotes.ts` (GDD 3.8 "Meeting
+notes"). A note carries no speaker, so the tab shows only its text, and no line here names a seat. The named chat log
+leaves `notes` lines out. A refused note (too soon, past the cap) is the usual refusal toast of 14.3.
+
+| Key | Text | Where |
+|---|---|---|
+| `meeting.tab.notes` | Notes | the meeting tab beside Report, Chat and Notebook |
+| `notes.title` | Meeting notes | the tab's accessible label |
+| `notes.hint` | Notes carry no name. Anyone at the table may have written one. | above the notes |
+| `notes.placeholder` | Leave a note | the field, a living seat |
+| `notes.send` | Pin the note | the send button's label |
+| `notes.empty` | No notes yet | the list, before the first note |
+| `notes.ghost` | The dead leave no notes | the field, disabled, for a ghost |
