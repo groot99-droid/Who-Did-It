@@ -61,7 +61,8 @@
   "props": [
     { "id": "as.basin", "kind": "basin", "x": 8, "y": 0 },
     { "id": "as.bench", "kind": "taskSource", "x": 17, "y": 8, "item": "wrench" },
-    { "id": "as.shelf", "kind": "decor", "x": 4, "y": 0 }
+    { "id": "as.shelf", "kind": "decor", "x": 4, "y": 0 },
+    { "id": "as.hq_surgery", "kind": "hq", "x": 14, "y": 6 }
   ],
   "gates": [],
   "paths": [],
@@ -89,7 +90,7 @@
     "WwwwwwwwwwwwwwwwwW",
     "WwwwwwwwwwwwwwwwwW",
     "WwwwwwwwwwwwwwwwwW",
-    "WwwwwwwwwwKKKKKwwW",
+    "WwwwwwwwwwKKKKPwwW",
     "WwwwwwwwwwwwwwwwwW",
     "WwwwwwwwwwwwwwwwwP",
     "WwwwwwwwwwwwwwwwwW",
