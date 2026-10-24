@@ -22,23 +22,20 @@ function floorPair(sceneId: SceneId): { x: number; y: number } {
   throw new Error(`no floor in ${sceneId}`);
 }
 
-/** The bank counter and the tally rack land with their art (8J, 8K), so these tests stand their own. */
+/** The bank counter lands with its art (8J), so these tests stand their own; the mill's tally rack is in (8K). */
 const HALL = floorPair('manor_hall');
-const MILL = floorPair('bp_mill');
 const bank = { id: 'mh.test_bank', kind: 'bank', x: HALL.x, y: HALL.y };
-const rack = { id: economy.quota.racks[0]!, kind: 'rack', x: MILL.x, y: MILL.y };
+const rack = scenes.bp_mill.props.find((p) => p.id === economy.quota.racks[0])!;
 type Prop = (typeof scenes.manor_hall.props)[number];
 
 let colyseus: ColyseusTestServer;
 beforeAll(async () => {
   scenes.manor_hall.props.push(bank as Prop);
-  scenes.bp_mill.props.push(rack as Prop);
   process.env.WDI_DEBUG = '1';
   colyseus = await boot(createServer({ ipBurst: 1e5, ipPerMin: 1e8, globalPerMin: 1e8 }));
 });
 afterAll(async () => {
   scenes.manor_hall.props.splice(scenes.manor_hall.props.indexOf(bank as Prop), 1);
-  scenes.bp_mill.props.splice(scenes.bp_mill.props.indexOf(rack as Prop), 1);
   delete process.env.WDI_DEBUG;
   await colyseus.shutdown();
 });
@@ -203,7 +200,7 @@ describe('the quota (GDD 3.23)', () => {
     expect(kinds(m, a.id)).toContain('quota.due');
     const [item] = economy.quota.items;
     addStack(playerOf(m, a), item!, economy.quota.qty + 1);
-    teleport(m, a, 'bp_mill', rack.x + 1, rack.y);
+    teleport(m, a, 'bp_mill', rack.x - 1, rack.y);
     await act(a, 'act.hold', { action: 'rack', targetId: rack.id, on: true }, 2600);
     expect(count(playerOf(m, a), item!)).toBe(1);
     expect(duesOf(m.room).hauled.get(a.id)).toBe(economy.quota.qty);
