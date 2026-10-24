@@ -1227,6 +1227,8 @@ Lines are in `apps/client/src/ui/copy/scrip.ts` (`SCRIP_COPY`, `shopName(id)`). 
 opens on `shop.open` after a `shop` hold at a counter (GDD 3.23); it lists what the shop sells and what it wants, one
 item per press, and greys a Buy the purse cannot cover or a Sell with nothing in the pockets. The server decides each
 trade; a refusal is the usual error line. 8H animates the panel by `wdi-anim-panel` and `wdi-anim-list`.
+A trade that lands (the purse moves its way) flashes its button and pops the purse line; an error line while it
+waits shakes the button instead (`ui/shop/feedback.ts`, with 8H's `flash`, `pop` and `refused`).
 
 #### 14.34.1 The shop panel
 
