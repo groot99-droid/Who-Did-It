@@ -14,6 +14,7 @@ import type { CutscenesFile } from './schemas/cutscenes.js';
 import type { MusicFile } from './schemas/music.js';
 import type { MinigamesFile, MobsFile, QuestsFile, RecipesFile, ResourcesFile } from './schemas/m5b.js';
 import type { EventsFile, EvolutionsFile, LawsFile, VendettasFile } from './schemas/bible.js';
+import type { RelationsFile } from './schemas/relations.js';
 import type { Scene, SceneId } from './schemas/scene.js';
 import type { StyleFile } from './schemas/style.js';
 import type { TasksFile } from './schemas/tasks.js';
@@ -23,6 +24,7 @@ import { checkMaps, checkSceneWorld } from './validateWorld.js';
 import { checkVendettas } from './validateVendettas.js';
 import type { EconomyFile } from './schemas/economy.js';
 import { checkEconomy } from './validateEconomy.js';
+import { checkRelations } from './validateRelations.js';
 
 export interface Content {
   palette: PaletteFile;
@@ -53,6 +55,8 @@ export interface Content {
   events: EventsFile;
   /** Round 8 (GDD 3.23). */
   economy: EconomyFile;
+  // Round 8 (GDD 3.22), Session 8B.
+  relations: RelationsFile;
 }
 
 const maxProfile = (a: Profile, b: Profile): Profile => (PROFILE_RANK[a] >= PROFILE_RANK[b] ? a : b);
@@ -242,6 +246,8 @@ export function validateContent(c: Content): string[] {
   checkVendettas(c, err);
   // Round 8 (GDD 3.23): the economy's props, items, looks and curfew scenes.
   checkEconomy(c, err);
+  // Round 8 (GDD 3.22): the relations table's sides and the inspect bands.
+  checkRelations(c, err);
 
   return errors;
 }

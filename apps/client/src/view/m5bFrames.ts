@@ -17,14 +17,45 @@ export function nodeFrame(resource: string, active: boolean): string {
   return `${stem}/${active ? 'ready' : 'spent'}`;
 }
 
-/** The clip of an `AnimId`: attack frames for a swing, walk for a walk, idle otherwise (SPRITES 10.14). */
-export function mobClip(animId: number): 'idle' | 'walk' | 'attack' {
-  return animId === AnimId.swing ? 'attack' : animId === AnimId.walk ? 'walk' : 'idle';
+/** A node's break animation `node_<snake id>/break` (round 8, 8G): once on collection, backwards as it regrows. */
+export function nodeBreakKey(resource: string): string {
+  return `${NODE_ROWS[resource]?.sprite ?? `node_${resource}`}/break`;
+}
+
+/**
+ * What a node does when its `active` flag changes: break (forward) as its yield is taken, regrow (the break
+ * reversed) as it returns, or a cut to the new frame when the art has no break or the player asked for reduced motion.
+ */
+export function nodeChange(active: boolean, hasBreak: boolean, reduced: boolean): 'break' | 'regrow' | 'cut' {
+  if (!hasBreak || reduced) return 'cut';
+  return active ? 'regrow' : 'break';
+}
+
+/**
+ * `Mob.state` on the wire (the server's `sim/mobs/ai.ts` `MobState`): the view reads only `flee` and `dead`. A creature
+ * asleep for its part of the day leaves the feed, so `dead` in the feed is a creature killed (round 8, 8G).
+ */
+export const MobWireState = { flee: 3, dead: 4 } as const;
+/** `AnimId.hurt` of seams.md 2, which 8A appends to `animIds.ts`; a creature's flinch when a hit lands. */
+export const MOB_HURT_ANIM = 6;
+
+export type MobClip = 'idle' | 'walk' | 'attack' | 'hurt' | 'death' | 'flee';
+
+/**
+ * The clip of a creature (SPRITES 10.14, motion.md 2): `death` once killed, the flinch on a hit, the attack on a
+ * swing, and while it moves the `flee` gait when it runs from a light, else the walk.
+ */
+export function mobClip(animId: number, state = 0): MobClip {
+  if (state === MobWireState.dead) return 'death';
+  if (animId === MOB_HURT_ANIM) return 'hurt';
+  if (animId === AnimId.swing) return 'attack';
+  if (animId === AnimId.walk) return state === MobWireState.flee ? 'flee' : 'walk';
+  return 'idle';
 }
 
 /** The animation key `mob_<id>/<clip>/<dir>`; the facing is the world-frame yaw, turned into the screen frame. */
-export function mobAnimKey(kind: string, animId: number, yaw: number): string {
-  return `${MOB_ROWS[kind]?.sprite ?? `mob_${kind}`}/${mobClip(animId)}/${screenDirOfYaw(yaw)}`;
+export function mobAnimKey(kind: string, animId: number, yaw: number, state = 0): string {
+  return `${MOB_ROWS[kind]?.sprite ?? `mob_${kind}`}/${mobClip(animId, state)}/${screenDirOfYaw(yaw)}`;
 }
 
 /** The world-frame vector of a `scene.givers[].facing` name (the frozen direction names of the scene files). */

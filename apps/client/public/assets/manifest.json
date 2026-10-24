@@ -415,6 +415,11 @@
       "filter": "nearest"
     },
     {
+      "key": "anims_nodes",
+      "type": "animation",
+      "url": "m5b/nodes.anims.json"
+    },
+    {
       "key": "tools",
       "type": "multiatlas",
       "url": "m5b/tools.json",
