@@ -182,6 +182,8 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
   let lastKillAt = 0;
   const reported = new Set<string>();
   let voteRefusals = 0;
+  /** Round 8 (8L): a vote before `meeting.minVoteS` of the discussion is refused, so the bot waits it out. */
+  let votesOpenAt = 0;
   let resolveCard!: (c: RoleRevealPayload) => void;
   const cardPromise = new Promise<RoleRevealPayload>((r) => (resolveCard = r));
 
@@ -202,6 +204,7 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
   room.onMessage('meetingStart', (m: { bodyOf?: string }) => {
     stats.meetings++;
     voteRefusals = 0;
+    votesOpenAt = Date.now() + balance.meeting.minVoteS * 1000;
     if (m?.bodyOf) reported.add(`body_${m.bodyOf}`);
   });
 
@@ -216,9 +219,9 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
       dead = false;
       reported.clear();
     }
-    // Meetings: vote as soon as one opens, again if the server has not recorded it.
+    // Meetings: vote as soon as the votes open, again if the server has not recorded it.
     if (isMeeting(state.phase)) {
-      if (!dead && !me.hasVoted && now - lastVoteAt > 700) {
+      if (!dead && !me.hasVoted && now >= votesOpenAt && now - lastVoteAt > 700) {
         lastVoteAt = now;
         const roster: Array<{ id: string; name: string; alive: boolean }> = [];
         state.players.forEach((p) => roster.push({ id: p.id, name: p.name, alive: p.alive }));
