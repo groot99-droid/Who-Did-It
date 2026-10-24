@@ -12,7 +12,7 @@ the shipped art is packed under `apps/client/public/assets/` by the PRs that fol
 | `lowpoly` | The low-poly style (no finish, six-level posterise) with the library | `--style lowpoly --textured` |
 | `hd` | HD toon at twice the display scale, flat ramps (A164) | `--style hd` |
 | `hdtex` | HD toon at twice the display scale with the library's 2k maps as bump | `--style hd --textured` |
-| `pbr` | The `docs/round8/art.md` 5 line as written: untoned PBR with an HDRI as fill. A rough, unshipped path (`tools/blender/materials/pbr.py`), rendered only for this sheet | `WDI_HD_PBR=1`, `--style hd --textured` |
+| `pbr` | The `docs/round8/art.md` 5 line as written: untoned PBR with an HDRI as fill (`tools/blender/materials/pbr.py`). The owner's pick for buildings and the kit (A164); figures, props, clues and ground ship as `hdtex` | `WDI_HD_PBR=1`, `--style hd --textured` |
 
 ## The files
 
