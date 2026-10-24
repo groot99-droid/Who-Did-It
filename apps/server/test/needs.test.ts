@@ -3,9 +3,9 @@ import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance } from '@wdi/content';
 import { Phase, TICK_RATE } from '@wdi/shared';
 import { spawnBody } from '../src/sim/Bodies';
-import { emitSim, type SimEvent } from '../src/sim/events/bus';
+import { emitSim, onSim, type SimEvent } from '../src/sim/events/bus';
 import { npcMemory } from '../src/sim/npc/memory';
-import { needsOf } from '../src/sim/npc/needs';
+import { MOOD_ANIM, moodIdleOf, moodOf, moodWeights, needsOf } from '../src/sim/npc/needs';
 import { simOf } from '../src/sim/RoomSim';
 import { openRun } from './killHelpers';
 import {
@@ -22,8 +22,8 @@ import {
 } from './npcHelpers';
 
 /**
- * Needs (round 8, GDD 3.24, docs/round8/townsfolk.md 1; Session 8E): the needs rise and fall with their events and
- * nothing of it reaches a client. The mood tests are the stacked PR's.
+ * Needs and moods (round 8, GDD 3.24, docs/round8/townsfolk.md 1 and 4; Session 8E): the needs rise and fall with
+ * their events, the mood picks the routine variant and the idle, and nothing of it reaches a client.
  */
 
 const RUN = openRun('overworld', 8);
@@ -69,6 +69,8 @@ describe('needs', () => {
     const { party, a } = await world();
     const n = needsFor(party, a);
     const before = n.hunger;
+    // Standing still, so its routine never takes it home or busies it at a station while hunger rises.
+    npcMemory(party.room).walk = false;
     advance(party, ticksOf(m.hunger.riseS / 10));
     expect(n.hunger).toBeGreaterThan(before);
     expect(n.hunger).toBeCloseTo(before + 0.1, 1);
@@ -157,5 +159,92 @@ describe('needs', () => {
     fire(party, { kind: 'eject', seat: others[0]!, data: { role: 'townsfolk' } });
     expect(n.fear).toBeCloseTo(m.fear.ejection, 2);
     expect(n.anger).toBeCloseTo(1 - m.anger.ejectionRelief, 2);
+  });
+});
+
+describe('moods', () => {
+  it('is the strongest need over the threshold, Desperate with two, and holds moodHoldS', async () => {
+    const { party, a } = await world();
+    const n = needsFor(party, a);
+    expect(n.mood).toBe('calm');
+    n.fear = m.threshold + 0.1;
+    advance(party, 1);
+    expect(n.mood).toBe('scared');
+    expect(moodOf(party.room, a)).toBe('scared');
+    // A second need over the threshold does not take the mood before the hold has run.
+    n.anger = 1;
+    advance(party, 1);
+    expect(n.mood).toBe('scared');
+    advance(party, ticksOf(m.moodHoldS));
+    expect(n.mood).toBe('desperate');
+    // One need left over the threshold: the strongest one names the mood, after its own hold.
+    n.fear = 0;
+    n.anger = 1;
+    advance(party, 1);
+    expect(n.mood).toBe('desperate');
+    advance(party, ticksOf(m.moodHoldS));
+    expect(n.mood).toBe('angry');
+  });
+
+  it('emits a server-only mood event on every change, naming the figure', async () => {
+    const { party, a } = await world();
+    const n = needsFor(party, a);
+    const heard: SimEvent[] = [];
+    onSim(party.room, 'mood', (e) => heard.push(e));
+    n.hunger = 1;
+    advance(party, 2);
+    expect(heard).toEqual([expect.objectContaining({ kind: 'mood', data: { figure: a, mood: 'hungry' } })]);
+  });
+
+  it('shifts the routine weights by mood and keeps them a distribution', () => {
+    const base = balance.npc.routine.weights.day;
+    const brain = npcMemory({ state: { players: new Map() } } as never).brain('x');
+    expect(moodWeights(brain, base)).toBe(base);
+    const n = needsOf(brain);
+    n.mood = 'scared';
+    const scared = moodWeights(brain, base);
+    expect(scared.idle).toBeGreaterThan(base.idle);
+    expect(scared.work + scared.stroll + scared.idle).toBeCloseTo(1, 9);
+    n.mood = 'hungry';
+    expect(moodWeights(brain, base).work).toBeGreaterThan(base.work);
+    n.mood = 'angry';
+    expect(moodWeights(brain, base).stroll).toBeGreaterThan(base.stroll);
+  });
+
+  it('shows the mood idle while the seat stands still, and the plain idle when Calm', async () => {
+    const { party, a } = await world();
+    const n = needsFor(party, a);
+    const presence = party.room.state.players.get(a)!.presence;
+    const stillTicks = (): number[] => {
+      const seen: number[] = [];
+      advance(party, ticksOf(4), () => {
+        const p = simOf(party.room).players.get(a)!;
+        if (p.vx === 0 && p.vy === 0 && p.hold === null) seen.push(presence.animId);
+      });
+      return seen;
+    };
+    n.fear = 1;
+    advance(party, 1);
+    const scared = stillTicks();
+    expect(scared.length).toBeGreaterThan(0);
+    expect(new Set(scared)).toEqual(new Set([MOOD_ANIM.cower]));
+    n.fear = 0;
+    advance(party, ticksOf(m.moodHoldS) + 1);
+    expect(n.mood).toBe('calm');
+    expect(moodIdleOf(simOf(party.room).players.get(a)!)).toBeUndefined();
+    const moodIdles = new Set<number>(Object.values(MOOD_ANIM));
+    advance(party, ticksOf(4), () => expect(moodIdles.has(presence.animId)).toBe(false));
+  });
+
+  it('never reaches the wire: no need or mood field in the whole state', async () => {
+    const { party, a } = await world();
+    const n = needsFor(party, a);
+    n.hunger = n.fear = n.anger = n.want = 1;
+    advance(party, 2);
+    expect(n.mood).toBe('desperate');
+    const text = JSON.stringify(party.room.state.toJSON());
+    for (const word of ['mood', 'hunger', 'fear', 'anger', 'want', 'needs', 'desperate']) {
+      expect(text.toLowerCase(), word).not.toContain(`"${word}"`);
+    }
   });
 });
