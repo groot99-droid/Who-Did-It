@@ -1560,6 +1560,152 @@ def cobweb():
             part("Bottle", T("moss", 0), C(0.25, 0.25, 0.0, 0.06, 0.24, 8), C(0.25, 0.25, 0.24, 0.02, 0.08, 6))]
 
 
+BARK = ["#24171A", "#3A231F", "#55332A", "#744733"]
+LEAF = ["#1B261B", "#26361F", "#3A5A33", "#4F8A4A"]
+ROCK = ["#2E2A2D", "#453E3F", "#5E5553", "#7A7067"]
+
+
+def stump(seed="stump"):
+    """A felled pine's stump, moss on its north side, the woodsman's axe left bitten into it."""
+    rnd = random.Random(seed)
+    return [kenney("nature-kit", rnd.choice(["stump_oldTall", "stump_roundDetailed"]), size=0.7, ramp=BARK),
+            part("Moss", T("moss", 2), B(0, 0.22, 0.3, 0.4, 0.1, 0.25), bevel=0.04, outline=False),
+            part("Haft", T("wood", 4), B(0.2, -0.1, 0.62, 0.04, 0.04, 0.4)),
+            part("Head", T("slate", 3), B(0.2, -0.02, 0.48, 0.03, 0.16, 0.1))]
+
+
+def boulder(seed="boulder"):
+    """A grey boulder sunk in the leaf litter, lichen on its crown and ferns at its foot."""
+    rnd = random.Random(seed)
+    return [kenney("nature-kit", rnd.choice(["rock_largeA", "rock_largeC", "rock_largeE"]), size=0.85, ramp=ROCK),
+            kenney("nature-kit", "grass_leafs", size=0.5, ramp=LEAF, at=(-0.25, -0.25, 0)),
+            part("Lichen", T("bone", 0), *[B(rnd.uniform(-0.2, 0.2), rnd.uniform(-0.1, 0.1), 0.6, 0.12, 0.1, 0.02)
+                                           for _ in range(3)], outline=False)]
+
+
+def fern(seed="fern"):
+    """Bracken and a bramble at the path's edge, a few red berries in it."""
+    rnd = random.Random(seed)
+    objs = [kenney("nature-kit", rnd.choice(["plant_bushDetailed", "plant_bush", "grass_leafsLarge"]), size=0.8,
+                   ramp=LEAF, rot=rnd.uniform(0, 6))]
+    objs.append(part("Berries", T("blood", 2), *[C(rnd.uniform(-0.3, 0.3), rnd.uniform(-0.3, 0.0),
+                                                   rnd.uniform(0.2, 0.4), 0.03, 0.05, 6) for _ in range(5)],
+                     outline=False))
+    return objs
+
+
+def mushrooms(seed="mush"):
+    """A ring of toadstools in the moss, one kicked over."""
+    rnd = random.Random(seed)
+    return [part("Moss", T("moss", 1), S(blob(0, 0, 0.36, 0.3, [(0.12, 5, rnd.random() * 6)], n=14), 0, 0.01),
+                 outline=False),
+            kenney("nature-kit", "mushroom_redGroup", size=0.45, ramp=["#4A0D12", "#7E1119", "#D9D2C2"],
+                   at=(0.08, 0.05, 0)),
+            kenney("nature-kit", "mushroom_tan", size=0.18, ramp=["#5C4A2A", "#80683A", "#DCC4A1"],
+                   at=(-0.22, -0.12, 0))]
+
+
+def fallen_log():
+    """A wind-thrown trunk across the undergrowth, its root plate torn up, toadstools along the rot."""
+    return [kenney("nature-kit", "log", size=1.0, ramp=BARK, rot=0.6),
+            kenney("nature-kit", "stump_old", size=0.4, ramp=BARK, at=(-0.32, 0.25, 0)),
+            kenney("nature-kit", "mushroom_tanGroup", size=0.25, ramp=["#5C4A2A", "#80683A", "#DCC4A1"],
+                   at=(0.15, -0.2, 0))]
+
+
+def signpost():
+    """A fingerpost at a fork of the trail, its arms carved for the village, the mere and the old adit."""
+    return [part("Post", T("wood", 2), B(0, 0, 0.8, 0.1, 0.1, 1.6), bevel=0.01),
+            part("Arms", T("wood", 4), B(0.22, 0, 1.42, 0.5, 0.04, 0.14), B(-0.2, 0, 1.2, 0.46, 0.04, 0.13),
+                 B(0, 0.2, 1.0, 0.04, 0.44, 0.12)),
+            part("Letters", F("ink", 0), *[B(0.1 + 0.08 * k, -0.025, 1.42, 0.05, 0.005, 0.05) for k in range(4)],
+                 *[B(-0.32 + 0.08 * k, -0.025, 1.2, 0.05, 0.005, 0.05) for k in range(3)], outline=False),
+            kenney("nature-kit", "grass", size=0.4, ramp=LEAF, at=(0.0, -0.1, 0))]
+
+
+def woodpile():
+    """The gamekeeper's stacked logs, a bucksaw hung on the end."""
+    return [kenney("nature-kit", "log_stackLarge", size=0.9, ramp=BARK),
+            part("Saw", T("slate", 3), B(0.46, -0.1, 0.35, 0.02, 0.4, 0.06), outline=False)]
+
+
+def lantern_pole():
+    """A crooked ash pole by the gate with a storm lantern swinging from its crook, to light walkers home."""
+    return [part("Pole", T("wood", 2), B(0, 0.1, 0.9, 0.09, 0.09, 1.8), B(0, -0.06, 1.78, 0.07, 0.36, 0.07)),
+            part("Frame", T("ink", 1), C(0, -0.2, 1.22, 0.11, 0.04, 10), C(0, -0.2, 1.48, 0.07, 0.06, 10),
+                 B(0, -0.2, 1.62, 0.02, 0.02, 0.16)),
+            part("Glass", F("lantern", 2), C(0, -0.2, 1.26, 0.08, 0.2, 10), outline=False),
+            part("Flame", F("lantern", 4), C(0, -0.2, 1.32, 0.025, 0.07, 6, rt=0.0), outline=False),
+            kenney("nature-kit", "rock_smallC", size=0.3, ramp=ROCK, at=(0.15, 0.2, 0))]
+
+
+def leaf_litter(seed="leaves"):
+    """Fallen oak leaves drifted against a root, a few twigs in them."""
+    rnd = random.Random(seed)
+    return [part("Leaves", T("litter", 1), S(blob(0, 0, 0.4, 0.32, [(0.15, 6, rnd.random() * 6)], n=16), 0, 0.008),
+                 outline=False),
+            part("Bright", T("brick", 4), *[B(rnd.uniform(-0.3, 0.3), rnd.uniform(-0.25, 0.25), 0.012, 0.06, 0.04,
+                                                0.004) for _ in range(8)], outline=False),
+            part("Twigs", T("wood", 2), *[B(rnd.uniform(-0.25, 0.25), rnd.uniform(-0.2, 0.2), 0.014, 0.22, 0.015,
+                                              0.012) for _ in range(3)], outline=False)]
+
+
+def snare():
+    """A gamekeeper's wire snare on a hazel peg across a run, a tuft of fur caught in it."""
+    return [part("Peg", T("wood", 3), B(-0.2, 0.1, 0.08, 0.04, 0.04, 0.16)),
+            part("Wire", T("brass", 0), B(0.0, 0.1, 0.12, 0.4, 0.012, 0.012), C(0.24, 0.1, 0.06, 0.1, 0.012, 10),
+                 outline=False),
+            part("Fur", T("stone", 4), B(0.28, 0.06, 0.04, 0.08, 0.06, 0.04), outline=False),
+            part("Run", T("litter", 0), S(blob(0.1, 0, 0.42, 0.12, [], n=10), 0, 0.005), outline=False)]
+
+
+def bones():
+    """Gnawed bones and a sheep's skull before the wolf's den, the earth scraped bare."""
+    rnd = random.Random("bones")
+    return [part("Scrape", T("litter", 0), S(blob(0, 0, 0.4, 0.3, [(0.1, 4, 0.5)], n=14), 0, 0.006), outline=False),
+            part("Bones", T("bone", 1), *[B(rnd.uniform(-0.25, 0.25), rnd.uniform(-0.2, 0.2), 0.02, 0.24, 0.035, 0.03)
+                                          for _ in range(5)]),
+            part("Skull", T("bone", 2), C(0.15, -0.05, 0.0, 0.09, 0.12, 10, rt=0.06))]
+
+
+def pit_prop():
+    """A miner's timber set against the gallery rock: two legs and a cap, a tin tag of the last inspection."""
+    return [part("Rock", T("stone", 1), B(0, 0.25, 1.1, 0.96, 0.5, 2.2), bevel=0.06),
+            part("Legs", T("wood", 2), *[B(x, -0.08, 1.0, 0.12, 0.12, 2.0) for x in (-0.36, 0.36)], bevel=0.01),
+            part("Cap", T("wood", 3), B(0, -0.08, 2.02, 0.94, 0.16, 0.14), bevel=0.01),
+            part("Wedges", T("wood", 4), *[B(x, -0.08, 1.9, 0.08, 0.14, 0.06) for x in (-0.2, 0.2)]),
+            part("Tag", T("slate", 3), B(0.36, -0.15, 1.3, 0.08, 0.01, 0.06), outline=False),
+            part("Seep", F("teal", 0), B(-0.1, -0.005, 0.8, 0.12, 0.01, 1.2), outline=False)]
+
+
+def rubble(seed="rubble"):
+    """Fallen roof stone in a heap, a snapped timber sticking out of it."""
+    rnd = random.Random(seed)
+    objs = [kenney("nature-kit", m, size=s, ramp=ROCK, at=at, rot=rnd.uniform(0, 6))
+            for m, s, at in (("rock_largeB", 0.6, (0.05, 0.1, 0)), ("rock_smallA", 0.3, (-0.25, -0.15, 0)),
+                             ("rock_smallE", 0.25, (0.28, -0.2, 0)))]
+    objs.append(part("Timber", T("wood", 2), B(-0.1, 0.0, 0.35, 0.6, 0.1, 0.1)))
+    return objs
+
+
+def miners_lamp():
+    """A miner's lamp dropped on the gallery floor, still alight, its oil bottle and a pick beside it."""
+    return [part("Lamp", T("brass", 1), C(0, 0, 0.0, 0.08, 0.14, 10), C(0, 0, 0.14, 0.05, 0.04, 8)),
+            part("Glass", F("lantern", 3), C(0, 0, 0.18, 0.045, 0.08, 8), outline=False),
+            part("Flame", F("lantern", 4), C(0, 0, 0.2, 0.015, 0.05, 6, rt=0.0), outline=False),
+            part("Bottle", T("moss", 0), C(0.2, 0.1, 0.0, 0.04, 0.12, 8), outline=False),
+            part("Pick", T("wood", 4), B(-0.15, -0.15, 0.02, 0.5, 0.035, 0.035)),
+            part("PickHead", T("slate", 3), B(-0.38, -0.15, 0.03, 0.04, 0.24, 0.04))]
+
+
+def ore_pile():
+    """Tin ore broken out of the face and heaped for the cart, a shovel stood in it."""
+    return [kenney("nature-kit", "rock_smallFlatA", size=0.8, ramp=["#2C3240", "#3A4356", "#5E6C84"]),
+            kenney("nature-kit", "rock_smallD", size=0.4, ramp=["#2C3240", "#3A4356", "#5E6C84"], at=(0.1, 0.05, 0.1)),
+            part("Shovel", T("wood", 4), B(-0.2, 0.15, 0.5, 0.04, 0.04, 0.8)),
+            part("Blade", T("slate", 3), B(-0.2, 0.15, 0.12, 0.2, 0.03, 0.22))]
+
+
 def _crates(n=3):
     rnd = random.Random(f"crates{n}")
     return [kenney("survival-kit", "box-large", height=0.5, ramp=["#3A231F", "#744733", "#B57F54"],
@@ -1795,5 +1941,21 @@ PROPS = {
     "prop_wine_cask": (64, 80, wine_cask),
     "prop_ossuary": (64, 112, lambda: on_wall(ossuary())),
     "prop_cobweb": (64, 128, lambda: on_wall(cobweb())),
+    # The wood beyond the gate, the deep wood and Vane's flooded gallery.
+    "prop_stump": (64, 80, stump),
+    "prop_boulder": (64, 80, boulder),
+    "prop_fern": (64, 80, fern),
+    "prop_mushrooms": (64, 48, mushrooms),
+    "prop_fallen_log": (64, 64, fallen_log),
+    "prop_signpost": (64, 112, signpost),
+    "prop_woodpile": (64, 80, woodpile),
+    "prop_lantern_pole": (64, 128, lantern_pole),
+    "prop_leaf_litter": (64, 48, leaf_litter),
+    "prop_snare": (64, 48, snare),
+    "prop_bones": (64, 48, bones),
+    "prop_pit_prop": (64, 128, pit_prop),
+    "prop_rubble": (64, 64, rubble),
+    "prop_miners_lamp": (64, 48, miners_lamp),
+    "prop_ore_pile": (64, 64, ore_pile),
     **SPOTS,
 }
