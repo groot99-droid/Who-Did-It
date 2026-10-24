@@ -769,6 +769,11 @@ figure (its `StatusBit`, seams.md 2); an effect without one shows only to Inspec
 | Famished | stamina regenerates at half rate | until fed | `body.famishedAfterS` 480 s without food | any food | none |
 | Knocked out | see above | `body.koS` | fists, a mugging, the slingshot | time, a meeting | down |
 | Indebted | an economy status (3.23, 8D) | until paid | unpaid rent | paying | none |
+| Charmed | one silent charge: the first killing Knife strike spends it and leaves the seat Wounded at 1 health | until spent | the well (7M, stations.md 4) | being spent | none |
+
+Rows that another system writes onto the body's effect list (Indebted, 3.23) are left as the body's clock finds
+them: it never decays, clears or resets them, on a wake, a knockout or a death. The Charmed row is reserved here;
+the well sets it and the Knife spends it in a later 8A pull request.
 
 The curing items: the Medkit's `heal` restores `body.healHp` 40 and stops Bleeding (self or a seat in reach); the
 Doctor's Bandage also stops Bleeding; Salts cure Slowed and Poisoned; the Herbalist's Remedy cures Poisoned as
