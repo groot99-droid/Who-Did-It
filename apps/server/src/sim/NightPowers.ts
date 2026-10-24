@@ -15,7 +15,7 @@ import {
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { spawnBody } from './Bodies';
-import { knockedOut } from './body/run';
+import { knockedOut } from './body/effects';
 import { markDead } from './Death';
 import { finishFinalNight } from './FinalNight';
 import { factionOf, flowOf } from './Flow';

@@ -4,6 +4,8 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { speedPxPerTick } from '../Movement';
 import { type MoveInput, type PlayerSim, simOf } from '../RoomSim';
 import { isWorldPhase } from '../World';
+import '../townsfolk/invariants'; // round 8, 8A: the registry runs in import order, figureNotSeat before bodyBounds
+import './invariants'; // the `bodyBounds` check registers with the body stage
 import { die, showClip, wake } from './damage';
 import {
   blocksAct,
@@ -11,7 +13,6 @@ import {
   blocksRun,
   deriveEffects,
   factorOf,
-  hasEffect,
   speedFactorOf,
   statusBitsOf,
   tickEffects,
@@ -105,12 +106,6 @@ export function overlayBody(
 export function bodyBlocksAct(room: PartyRoom, sessionId: string): boolean {
   const body = bodyOf(room, sessionId);
   return body !== undefined && blocksAct(body);
-}
-
-/** Whether a seat lies knocked out (the night powers' Keep Watch and Remedy refuse it, body.md 5; GDD 3.22). */
-export function knockedOut(room: PartyRoom, sessionId: string): boolean {
-  const body = bodyOf(room, sessionId);
-  return body !== undefined && hasEffect(body, 'knockedOut');
 }
 
 /**

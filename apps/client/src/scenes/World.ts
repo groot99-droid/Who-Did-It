@@ -26,6 +26,7 @@ import { INSPECT_PROMPT, INSPECT_REACH_TILES, type InspectBinding, bindInspect }
 import { bindShout } from '../ui/hive/shout';
 import { AUDIO_KEYS, type AudioKey, AudioBus } from '../view/AudioBus';
 import { BodyView } from '../view/BodyView';
+import { type BodyHud, mountBodyHud } from '../view/body/BodyHud'; // round 8, 8A
 import { ClueView } from '../view/ClueView';
 import { CutscenePlayer } from '../view/cutscene/CutscenePlayer';
 import { GiverView } from '../view/GiverView';
@@ -152,6 +153,7 @@ export class World extends Phaser.Scene {
   private statics!: StaticView;
   private readonly bodyViews = new Map<string, BodyView>();
   private hud!: Hud;
+  private bodyHud!: BodyHud; // round 8, 8A
   private lighting!: Lighting;
   private sheet!: NotebookSheet;
   private audio!: AudioBus;
@@ -234,6 +236,7 @@ export class World extends Phaser.Scene {
     this.entities = new EntityView(this, feed.selfId);
 
     this.hud = new Hud(overlayRoot());
+    this.bodyHud = mountBodyHud(this.hud.root); // round 8, 8A: the body panel, bottom-left (UI.md 14.32)
     this.hud.setChip((this.registry.get(REG_ROLE_CHIP) as HudChip | undefined) ?? null);
     this.purse = mountPurseHud(this, feed, this.hud.root.querySelector('.wdi-hud__tl') ?? this.hud.root); // round 8, 8C (locked)
     void loadSceneName(this.sceneId).then((scene) => this.hud.say(fill(C['hud.scene'], { scene }), 1500));
@@ -351,6 +354,7 @@ export class World extends Phaser.Scene {
       this.statics.destroy();
       for (const b of this.bodyViews.values()) b.destroy();
       this.bodyViews.clear();
+      this.bodyHud.destroy(); // round 8, 8A
       this.hud.destroy();
       this.lighting.destroy();
       this.sheet.destroy();
@@ -375,6 +379,7 @@ export class World extends Phaser.Scene {
     const clock = feed.clock();
     const endsTick = clock.phaseEndsTick;
     this.hud.setTimer(endsTick > 0 ? endsTick - clock.tick : null);
+    this.bodyHud.update(feed.body(), clock.tick); // round 8, 8A
     const darkness = darknessOf(clock.phase, clock.phaseEndsTick - clock.tick);
     this.hud.setPhase(PHASE_LABEL[clock.phase] ?? '', darkness >= 1);
     this.watchPhase(clock.phase);

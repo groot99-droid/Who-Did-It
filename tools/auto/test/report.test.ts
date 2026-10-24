@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { registeredInvariants } from '../../../apps/server/src/sim/auto/invariants';
-import { ROUND6_CHECKS, ROUND7_CHECKS, missingChecks } from '../checks';
+import { ROUND6_CHECKS, ROUND7_CHECKS, ROUND8_CHECKS, missingChecks } from '../checks';
 import { type MatchLine, readLines, summarize } from '../report/summary';
 
 const line = (over: Partial<MatchLine>): MatchLine => ({
@@ -18,9 +18,10 @@ const line = (over: Partial<MatchLine>): MatchLine => ({
 
 describe('tools/auto checks', () => {
   it('registers every round-6 check on import', () => {
-    expect(missingChecks([...ROUND6_CHECKS, ...ROUND7_CHECKS])).toEqual([]);
-    expect(missingChecks(['privLeak'])).toHaveLength(ROUND6_CHECKS.length + ROUND7_CHECKS.length - 1);
-    expect(registeredInvariants()).toEqual([...ROUND6_CHECKS, ...ROUND7_CHECKS]);
+    const all = [...ROUND8_CHECKS, ...ROUND6_CHECKS, ...ROUND7_CHECKS]; // round 8, 8A: the body stage's register first here
+    expect(missingChecks(all)).toEqual([]);
+    expect(missingChecks(['privLeak'])).toHaveLength(all.length - 1);
+    expect(registeredInvariants()).toEqual(all);
   });
 });
 
