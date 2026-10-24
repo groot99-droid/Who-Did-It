@@ -95,16 +95,56 @@ function chunk(type: string, body: Buffer): Buffer {
   return Buffer.concat([head, body, crc]);
 }
 
-/** Encode straight RGBA as an 8-bit PNG (filter Up on every row, deterministic zlib level 9). */
-export function encodePng(img: Rgba): Buffer {
+/** The five PNG row filters (None, Sub, Up, Average, Paeth). */
+export type PngFilter = 0 | 1 | 2 | 3 | 4;
+
+/** One row filtered with `filter`, written at `out[at..at + stride)`; returns the sum of absolute residuals. */
+function filterRow(
+  data: Uint8Array,
+  stride: number,
+  y: number,
+  filter: PngFilter,
+  out: Buffer,
+  at: number,
+): number {
+  let sum = 0;
+  for (let x = 0; x < stride; x++) {
+    const a = x >= 4 ? data[y * stride + x - 4]! : 0;
+    const b = y > 0 ? data[(y - 1) * stride + x]! : 0;
+    const c = x >= 4 && y > 0 ? data[(y - 1) * stride + x - 4]! : 0;
+    const pred =
+      filter === 0 ? 0 : filter === 1 ? a : filter === 2 ? b : filter === 3 ? (a + b) >> 1 : paeth(a, b, c);
+    const v = (data[y * stride + x]! - pred) & 0xff;
+    out[at + x] = v;
+    sum += v < 128 ? v : 256 - v;
+  }
+  return sum;
+}
+
+/**
+ * Encode straight RGBA as an 8-bit PNG: each row takes the filter with the smallest sum of absolute residuals
+ * (the standard heuristic, round 8), or `filter` for every row when given; deterministic zlib level 9.
+ */
+export function encodePng(img: Rgba, filter?: PngFilter): Buffer {
   const { width, height, data } = img;
   const stride = width * 4;
   const raw = Buffer.alloc(height * (stride + 1));
+  const trial = Buffer.alloc(stride);
   for (let y = 0; y < height; y++) {
-    raw[y * (stride + 1)] = 2;
-    for (let x = 0; x < stride; x++) {
-      const up = y > 0 ? data[(y - 1) * stride + x]! : 0;
-      raw[y * (stride + 1) + 1 + x] = (data[y * stride + x]! - up) & 0xff;
+    const at = y * (stride + 1) + 1;
+    if (filter !== undefined) {
+      raw[at - 1] = filter;
+      filterRow(data, stride, y, filter, raw, at);
+      continue;
+    }
+    let best = Number.POSITIVE_INFINITY;
+    for (const f of [0, 1, 2, 3, 4] as const) {
+      const sum = filterRow(data, stride, y, f, trial, 0);
+      if (sum < best) {
+        best = sum;
+        raw[at - 1] = f;
+        trial.copy(raw, at, 0, stride);
+      }
     }
   }
   const ihdr = Buffer.alloc(13);

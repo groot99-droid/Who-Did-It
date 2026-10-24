@@ -58,6 +58,11 @@ export interface MeetingFeed {
   myVote(): string;
   /** The last `meetingStart` and `voteResult` of this meeting, so a screen that mounts late still renders. */
   started(): MeetingStart | null;
+  /**
+   * Round 8 (8L, GDD 3.8): the tick votes open, `meeting.minVoteS` after the `meetingStart` this feed saw; 0 when it
+   * saw none (the server still refuses an early vote).
+   */
+  votesOpenTick(): number;
   result(): VoteResult | null;
   /** The last `gameOver`, kept for the GameOver screen. */
   over(): GameOver | null;

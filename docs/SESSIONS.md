@@ -3502,6 +3502,11 @@ an existing `apps/server/test/*.test.ts`, anything written into ROSW.
 - 2026-10-23: PR 2c (the screen, UI.md 14.38): `ui/Chores.ts` (the chores panel on K and the village's work bar under the
   clock), the layer picks task spots beside nodes and givers and sends the `task` hold, a ghost keeps the layer for its tasks
   only (GDD 3.8); CSS in `ui/match.css`, `ui/theme/**` untouched.
+- 2026-10-23: PR 3 (the `tap` kind, GDD 3.16, A151): `rules/minigames.ts` (`tapMarkerAt`, `tapSucceeds`, the
+  `TapPublic` board and the replay), `balance.json` `minigames.tap`, the zod enum and section, `view/minigames/tap.ts` with
+  its test, the registry, `board.ts` draws, the copy lines, `packages/shared/test/minigamesTap.test.ts`. Deliver a letter
+  plays it (`letterTap`); the pump, the fence and the cold room stay where 6H's and the content tests pin them. Waits on
+  6Z's `MinigameKind` line.
 - Read from ROSW (never written): the UDGT teardown chapters 00 to 03 on `claude/sweet-maxwell-lmsiw3`, and the Who Did It lore
   on `claude/sharp-mccarthy-pqi3ws` (the Canon Ledger, the Lamplighter's Round, the Gazette, the Tab Book, Fourteen Things, the
   Daybook of Crumb's Ovens, Hopscotch, three stories). Drifts noted for 6Z, not resolved here: the lore dates HollowMere to 1893

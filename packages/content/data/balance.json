@@ -22,7 +22,7 @@
     "roleRevealS": 20,
     "countdownS": 3,
     "graceS": 30,
-    "dayS": 60,
+    "dayS": 120,
     "duskS": 10,
     "nightS": 100,
     "voteS": 25,
@@ -98,7 +98,7 @@
     }
   },
   "meeting": {
-    "voteOpensImmediately": true,
+    "minVoteS": 15,
     "endsWhenAllVoted": true,
     "secretVotes": true,
     "skipAllowed": true,
@@ -110,7 +110,7 @@
     "gddRef": "3.8"
   },
   "finalNight": {
-    "afterCycle": 4,
+    "afterCycle": 5,
     "huntS": 90,
     "killCooldownS": 20,
     "skipAllowed": false,
@@ -250,6 +250,7 @@
     "pour": { "steps": 2, "ratePerS": 0.35, "bandFrac": 0.12 },
     "slide": { "steps": 4 },
     "stoke": { "stokePerTap": 0.15, "ratePerS": 0.08, "bandFrac": 0.18, "holdS": 3 },
+    "tap": { "steps": 3, "periodS": 1.4, "bandFrac": 0.18 },
     "gddRef": "3.16"
   },
   "train": { "arriveAtS": 5, "deliveryAfterS": 8, "hearTiles": 20, "gddRef": "3.3" },
@@ -287,5 +288,11 @@
       { "id": "go", "text": "Go" }
     ],
     "gddRef": "3.5"
+  },
+  "talk": {
+    "noteGapS": 6,
+    "notesPerMeeting": 4,
+    "npc": { "notesPerMeeting": { "min": 1, "max": 3 }, "windowFrac": { "min": 0.05, "max": 0.8 } },
+    "gddRef": "3.8"
   }
 }
