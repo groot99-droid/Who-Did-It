@@ -125,8 +125,12 @@ function recordedDay() {
 }
 
 const idleMin = () => Math.round(balance.npc.routine.idleS.min * TICK_RATE);
+/** The held day is recorded in a hook with its own time, so no test's 5 s pays for it (granted by 6Z). */
+const DAY_TIMEOUT_MS = 20_000;
 
 describe('the privacy rule (npc.md part 2, section 2)', () => {
+  beforeAll(async () => void (await recordedDay()), DAY_TIMEOUT_MS);
+
   it('P1: routines.holds is empty in M5a', () => {
     expect(Object.keys(routines.holds)).toEqual([]);
   });
@@ -159,6 +163,8 @@ describe('the privacy rule (npc.md part 2, section 2)', () => {
 });
 
 describe('routines over a held day (npc.md part 2, section 4)', () => {
+  beforeAll(async () => void (await recordedDay()), DAY_TIMEOUT_MS);
+
   it('R1: no 400 non-exempt ticks without a still run of idleS.min', async () => {
     const { rows } = await recordedDay();
     for (const [id, list] of rows) {

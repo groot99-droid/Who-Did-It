@@ -1,5 +1,5 @@
 // Per-frame origins and Phaser anim definitions from the rig's manifest.json (docs/SPRITES.md 4, 5).
-import { V1_CLIPS, FPS, parseFrameFileName, type Anim } from './keys.ts';
+import { R8_CLIPS, FPS, parseFrameFileName, type Clip, type ClipSpec } from './keys.ts';
 import type { MultiAtlas } from './pack.ts';
 
 export interface FeetManifest {
@@ -66,7 +66,7 @@ export function buildAnims(textures: { key: string; atlas: MultiAtlas }[]): { an
     const g = groups.get(animKey)!;
     g.frames.sort();
     const anim = parseFrameFileName(fileStemOf(g.frames[0]!)).anim;
-    const clip = V1_CLIPS[anim as Anim] as { loop: boolean } | undefined;
+    const clip = R8_CLIPS[anim as Clip] as ClipSpec | undefined;
     anims.push({
       key: animKey,
       frames: g.frames.map((frame) => ({ key: g.texture, frame })),

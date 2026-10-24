@@ -31,8 +31,11 @@ export const ROUND7_CHECKS = [
   'taskBar',
 ] as const;
 
-/** The body check of `docs/round8/body.md` 8 (GDD 3.22). */
-export const ROUND8_CHECKS = ['bodyBounds'] as const;
+/**
+ * The round-8 checks in their registration order: 8E's `figureNotSeat` (docs/round8/townsfolk.md 4, GDD 3.24), which
+ * the body stage imports first, then the body check of `docs/round8/body.md` 8 (GDD 3.22).
+ */
+export const ROUND8_CHECKS = ['figureNotSeat', 'bodyBounds'] as const;
 
 /** The round-6, round-7 and round-8 checks missing from `names`. */
 export function missingChecks(names: readonly string[]): string[] {

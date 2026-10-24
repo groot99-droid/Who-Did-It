@@ -4,7 +4,7 @@
 
 ## 1. Vision & pillars
 
-A storm has closed the road and fog hides the sea. Hollowmere is cut off, Lord Vane is dead, and someone among you is still killing. Find them before the last lantern goes out.
+A storm has closed the coach road and fog lies on the drowned mere. HollowMere is cut off but for the train, Lord Vane is dead, and someone among you is still killing. Find them before the last lantern goes out.
 
 Who Did It is a 5-10 player (4 = practice; NPCs fill the seats below 4, see 3.12) hidden-role game played from a link. It crosses Among Us (tasks, bodies, emergency meetings), Mafia (hidden factions, a vote as the climax), a whodunit (physical clues with hidden attributes, a Detective who verifies them) and Hello Neighbor (houses you enter, doors that lock, hiding spots). V1 is isometric 2.5D in Phaser with pre-rendered Blender sprites (3.13); V2 is first-person 3D on the same server, rules and world data.
 
@@ -57,7 +57,7 @@ Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accompl
 | **Lamplighter**, **Baker**, **Fisher**, **Tinner** (Village, professions) | No | Village | As Townsfolk | As Townsfolk | Lamplighter: You light the lanterns that keep the wolves off the square. Work beside others, mark what you see, vote with evidence. Baker: Up before anyone, flour to the elbows. Do your chores in company, mark what you see, vote with evidence. Fisher: The fog keeps the boats in. Mend the nets beside a neighbour, mark what you see, vote with evidence. Tinner: The mine is shut; your hands are not. Work in pairs, mark what you see, vote with evidence. | As Townsfolk |
 | **Drifter** (Neutral) | Yes | Get ejected (solo win; the match continues and the end screen lists you among the winners). | Replica Knife, Bloody Rag x1 | **Act Shifty**: fake noise rings (20 s CD). **Fake Blood**: 30 s (1 use, world only; meetings show portraits). | You want to hang. Be suspicious enough to be voted out, not so obvious they ignore you. | A calm village; dying to the Killer is a loss; counts as nobody for parity; you wear a cover like the Cabal, but alone. |
 | **Ranger** (Village, V1.5) | No | Village | Crossbow + 2 Bolts, Snare x2, Torch | **Shoot** a wolf: it dies. **Arrest** (1 bolt on a player): the target is cuffed and dragged to the square; the next meeting opens with them as a Case Closed suspect. **Snare**: holds 4 s and logs the name. | You hunt wolves. One arrest per match: be right. | Bolts are loud (noise 10). |
-| **Thief** (Neutral, V1.5) | Decided when it ships | Escape by the cave sea exit holding 3 Heirlooms | Lockpicks x5, Sack, Smoke Bomb | Pickpocket (40 s CD), Lockpick (2 s, noise 5), Smoke (4 s). | Nobody's hero. | Thefts look like Killer activity; counts as Village for parity. |
+| **Thief** (Neutral, V1.5) | Decided when it ships | Escape by the sea door at the back of the cave holding 3 Heirlooms | Lockpicks x5, Sack, Smoke Bomb | Pickpocket (40 s CD), Lockpick (2 s, noise 5), Smoke (4 s). | Nobody's hero. | Thefts look like Killer activity; counts as Village for parity. |
 | **Medium** (Village, V2) | No | Village | Seance Chalk, Candle x3 | Seance at a body (8 s): the ghost picks 1 of 8 phrases. | You hear the dead. | Cabal ghosts may lie. |
 
 The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 start kit. Values the table leaves open (decided 2026-10-10, Session C): Kill, Bandage, Salts, Medkit and Rope reach 1.5 tiles; Bandage is instant and knocks both players back 1 tile; Plant Clue takes 2 s; Dust takes 2 s; the Slingshot reaches 5 tiles; Act Shifty's fake rings use the run radius. Universal verbs: Report and the Bell reach 2 tiles; Collect is a 2 s hold. `abilities.json` holds every verb with a number; an item's `use` points at its verb.
@@ -217,7 +217,7 @@ The Knife works only after dark (3.3), about 110 s of each 230 s cycle, so a coo
 
 **V1 (beta)**: everything in 3.1-3.9 marked V1: Butler, Child, Accomplice, Drifter; Lens charges, Dust / Compare, Autopsy, Bandage, Ledger, Witness, Plant Clue, Rag, Bucket; Case Board with suspect sets and Corroborated; 6 task types incl. 1 co-op; wolves, fence; hiding spots, Burst Out, Check; door states, Skeleton Key, Crowbar; Hunger, Final Night vote, missing-person roll-call; quick-chat, Cabal and ghost channels; scene profiles Small / Medium / Large; 10-player rules; the n+2 deck, professions, public looks and covers, Impersonate, the Vicar, Watchman, Herbalist and Gamekeeper (M5a).
 
-**V1.5**: Ranger (Arrest), Thief, Heirlooms, cave sea exit, Handcuffs, Forged Alibi, the Killer's Lock door, Candles for all, Wisp, Butler Bell, lit-window silhouettes, proximity chat toggle, faction-only reveal, fisher cottage, lighthouse, lobby role toggles, radius + occluder visibility (dark scenes first, M5b; 3.13), Lottie reveal, Light2D experiment, spectator mode.
+**V1.5**: Ranger (Arrest), Thief, Heirlooms, the cave's sea door, Handcuffs, Forged Alibi, the Killer's Lock door, Candles for all, Wisp, Butler Bell, lit-window silhouettes, proximity chat toggle, faction-only reveal, fisher cottage, lighthouse, lobby role toggles, radius + occluder visibility (dark scenes first, M5b; 3.13), Lottie reveal, Light2D experiment, spectator mode.
 
 **V2**: Medium, the Beast and Cave Gate, bats, bog lurker, crows, poison, voice chat, cosmetics; first-person renderer.
 
@@ -295,8 +295,8 @@ A rule that says "the square" or "the overworld" means the map's hub and these s
 
 | Map | Setting | Small (4-6) | Medium adds | Large adds |
 |---|---|---|---|---|
-| **Hollowmere** | Fog-bound harbour hamlet, autumn 1931 (WORLD 4.1) | the village; the tavern and its back room; the apothecary and its loft; the widow's parlour and bedroom; Crumb's Ovens and its four station rooms (cold, mixing, oven and proofing; round 7, A116); Gallows Wood (forest); the Tin Gallery mouth (cave) | **the Fenwood** (forest) and **the Flooded Gallery** (cave); Vane Manor (hall, upstairs); Hale Barn | St Brannock's; the Undercroft |
-| **Blackpine** | The Vane company's logging camp and tin mine up the valley, the same night (WORLD 4.10) | the camp; the bunkhouse; the sawmill; Blackpine Woods (forest); the Workings (cave) | the Company Office; the Forge | the Deep Level (cave) |
+| **Hollowmere** | Railroad town on a drowned mere, Coldwater Territory, December 1893 (WORLD 4.1) | the village; the tavern and its back room; the apothecary and its loft; the widow's parlour and bedroom; Crumb's Ovens and its four station rooms (cold, mixing, oven and proofing; round 7, A116); Gallows Wood (forest); the Tin Gallery mouth (cave) | **the Fenwood** (forest) and **the Flooded Gallery** (cave); Vane Manor (hall, upstairs); Hale Barn | St Brannock's; the Undercroft |
+| **Blackpine** | The Harrow Syndicate's timber and coal camp over Vane's old tin workings, up the valley, the same night (WORLD 4.10) | the camp; the bunkhouse; the sawmill; Blackpine Woods (forest); the Workings (cave) | the Company Office; the Forge | the Deep Level (cave) |
 
 Hollowmere's new forest and cave close a loop from the Medium profile up: the village, Gallows Wood, the Fenwood, the Flooded Gallery, the Tin Gallery mouth and back to Gallows Wood. A one-way sinkhole also drops from the Fenwood into the Gallery. Below Medium their doors stay boarded, so a small party keeps the old, tighter Hollowmere with one forest and one cave. Blackpine is the tighter and wilder map. Its loop runs from the camp through the woods, in at the Workings' vent drift and back out of the adit. A one-way log chute drops from the woods to the camp. The Large profile adds a second way under the hill: the woods' drowned adit to the Deep Level, and the Deep Level's ladder up to the Workings.
 
@@ -310,7 +310,7 @@ Forest and cave scenes already carry the places where M5b puts resource nodes, c
 **Isometric presentation (M5a).** Both modes show the world in a 2:1 dimetric isometric view, seen from the south-east (SPRITES 10, WORLD 4.2):
 
 - A tile is a 128 x 64 px diamond. World north points to the upper right of the screen, and straight up is world north-west.
-- Characters, props, buildings and ground are pre-rendered from that one camera. Each player picks an **art style** at the click of a button, in the lobby or the in-match menu, without leaving the match: **8-bit** (the default, a pixel-art finish), **Low poly** (the same renders without the finish, smooth-filtered) or **HD** (the same renders at twice the display scale with soft shadows and a smooth finish, A164). HD is offered only where the device can hold it: a screen at least 900 px tall, at least 4 GB of device memory where the browser reports it, and WebGL textures of 4096 px (`style.json` `artStyles` `requires`); elsewhere it shows disabled with the reason, and a stored HD pick falls back to 8-bit. HD's files are fetched only when a player picks it. The pick is the player's own, kept in the browser and never sent to the server, so two players at one table may see different styles (`style.json` `artStyles`, A79). Only the picture changes: an HD frame covers the same screen pixels as its 8-bit frame.
+- Characters, props, buildings and ground are pre-rendered from that one camera. Each player picks an **art style** at the click of a button, in the lobby or the in-match menu, without leaving the match: **8-bit** (the default, a pixel-art finish), **Low poly** (the same renders without the finish, smooth-filtered) or **HD** (the same renders at twice the display scale with soft shadows: a smooth textured finish on figures and props, lit materials under a sky on buildings and the kit, A164). HD is offered only where the device can hold it: a screen at least 900 px tall, at least 4 GB of device memory where the browser reports it, and WebGL textures of 4096 px (`style.json` `artStyles` `requires`); elsewhere it shows disabled with the reason, and a stored HD pick falls back to 8-bit. HD's files are fetched only when a player picks it. The pick is the player's own, kept in the browser and never sent to the server, so two players at one table may see different styles (`style.json` `artStyles`, A79). Only the picture changes: an HD frame covers the same screen pixels as its 8-bit frame.
 - Only the picture changes. The server, every rule, distance and radius in this document, the collision box and every id stay on the square 64 px grid.
 
 **Interiors are cutaways.** The north and west walls stand at full height, the south and east walls are drawn as low sills, and inner walls are drawn at half height, so a room can always be read.
@@ -479,7 +479,7 @@ a giver on its hub and others in its wild places:
 
 | Giver | Where | Quest | Wants | Reward |
 |---|---|---|---|---|
-| Harbourmaster Pell | Hollowmere village, by the dock | Caulk the skiff | 2 Pine Resin, 1 Timber | Lantern |
+| Harbourmaster Pell | Hollowmere village, by the marsh dock | Caulk the skiff | 2 Pine Resin, 1 Timber | Lantern |
 | Mother Moll | the Fenwood, her charcoal hut (Medium) | Moll's herbs | 4 Herbs | Bandage |
 | | | Moll's mushrooms | 3 Mushrooms | Salts |
 | Foreman Hask | the Blackpine yard | Stack the yard | 4 Timber | Crowbar |
@@ -914,7 +914,72 @@ Round 8 (A134, A135; `docs/round8/townsfolk.md`).
 - **Mugging.** A hungry, angry or desperate figure alone with a seat may mug it. A heavier purse raises the chance;
   company and a lit light lower it.
 
-Session 8E writes this section. The numbers are `balance.json` `moods` and `townsfolk`.
+The numbers are `balance.json` `moods` and `townsfolk`.
+
+**Needs and moods (8E, A140).** Every NPC seat carries four needs in server memory, each a level from 0 to 1:
+Hunger, Fear, Anger and Want. They never reach a client, a match log line or a random stream. They move on what
+happens to the seat, never on its card, so a Killer cowers at a body like anyone else (its own kills included).
+A need ticks only on the ticks the seat's brain runs (not while it is busy at a station, or dead), so every rate
+below is awake time.
+
+| Need | Rises with | Falls with |
+|---|---|---|
+| Hunger | time (`moods.hunger.riseS`), `famishedMul` times faster while Famished (3.22) | a meal (the `eat` event, `mealRelief`), standing at home (`homeFallS`) |
+| Fear | each body seen (`fear.body`), a creature's chase (`chase`, once per chase), being struck (`struck`), an ejection (`ejection`, every living NPC), the dark: a night phase outdoors in an unlit scene (3.12), alone and without a burning light (`darkRiseS`) | a day phase, a lit scene, home, or company (another living seat within `vision.dayTiles`), over `fallS` |
+| Anger | being struck (`anger.struck`), robbed (`robbed`), rent or quota taken (`taxed`) | time (`fallS`); a meal (`mealRelief`); the ejection of the seat it suspects most (`ejectionRelief`) |
+| Want | a purse under `want.lightPurse` Scrip (`lightRiseS`), Indebted (`debtRiseS`) | a wage (`wage`), a sale (`sale`) |
+
+The **mood** is the strongest need at or over `moods.threshold`: Hungry, Scared, Angry, or Desperate for Want;
+with `desperateNeeds` or more needs over the threshold it is Desperate; with none, Calm. A mood holds at least
+`moodHoldS` before it changes, so a seat does not flicker. A mood shows in two ways only:
+
+- **The routine draw.** The class's work, stroll and idle weights (3.12) are scaled by `moods.weights[mood]` and
+  renormalised: a Hungry seat works more, a Scared one idles more, an Angry or Desperate one strolls more. The
+  richer habits of `townsfolk.md` 1 (home earlier, the bakery, the quiet places, lingering near the one it is angry
+  at) wait on routine hooks that do not exist yet (A140, open).
+- **The idle.** While it stands still a Scared seat cowers, a Hungry or Desperate one fidgets, an Angry one stomps
+  (the `cower`, `fidget` and `stomp` clips of 3.22); a Calm seat shows the plain idle. A client receives the clip id
+  and nothing else, so a mood is a thing to notice, never a word.
+
+Anger remembers who struck, robbed or taxed the seat until it cools to zero; the mugging (below) and relations
+(3.22) read it. A new card (3.12: the brain forgets) starts every need at zero.
+
+**Ambient townsfolk (8E, A160).** Each map holds `townsfolk.count[profile]` figures that are not seats: no card, no
+vote, no task list, no part in any win. The map's named figure comes first (HollowMere's Company Clerk, BlackPine's
+Tallyman: the `named` rows of `routines.json` `townsfolk`), then one stallholder per shop prop (`fixed`), then
+villagers to fill. They are spawned at the deal, each with a `townsfolk:<figure>` stream of its own (never a seat's),
+a home (a lit interior, the persona rule of 3.12) and a route: a named figure walks its row's prop kinds in order
+(the Clerk the ledger, the notice board, the tavern window and the pump; the Tallyman the tally rack, the notice
+board, the pump and a basin), a stallholder keeps its one counter, a villager draws `npc.routine.favouriteStations`
+favourites among the seats' stations. By day a figure walks to its next station at `walkTilesPerS`, works it for
+`stationDwellS` (the interact clip), then idles for `idleS` with chance `idleChance`; a walk longer than
+`npc.routine.maxWalkS` is given up. In the night class it goes home and stands there. It crosses portals like a seat
+and stands still for the door's transit on the far side, under a new handle. Outside the world phases it holds
+still where it is; the lobby clears every figure.
+
+On the wire a figure is a scene `Avatar` under an opaque handle like a seat's (3.17) with a `villager` look (never
+a card's: 8F's variants all begin `villager`), the `townsfolk.height` height, no status bit and never the ghost
+tag, so nothing but the drawn figure tells it apart; its id never leaves the server. Needs and moods tick for it as
+for a seat (the mood idle shows while it stands), it hears the same bus events, and it counts the bodies it sees.
+The Knife never finds it (its handle resolves to no seat), a vote for it is refused, and it dies only to a creature
+that kills (the wolf's `mobs.json` `dmg` off its reduced body's `body.maxHp`, regained like a seat's, 3.22; any
+other creature leaves it at one). Its body lies where it fell
+as a public `Body` that opens no meeting (it counts as reported from the start) until the next meeting clears every
+such body and the meeting text says how many the creatures took (`ui/copy/townsfolk.ts`, UI 14.36). A fist's
+knockout (3.22, the reduced body) reaches a figure only once the strike hook of A160 lands. The invariant
+`figureNotSeat` (auto 50) checks that no figure is in any seat list, vote, death or meeting, and that no figure
+avatar carries a seat's handle, the ghost tag or a card's look.
+
+**The mugging (8E, A180).** A Hungry, Angry or Desperate figure or NPC seat that is alone with one seat rolls each
+second for a mugging, on its own stream (`townsfolk:<figure>`, or the NPC's choices stream) and only while in such a
+mood, so a calm match draws nothing new. "Alone" is the A100 room rule (3.12): any scene but the map's hub, the only
+other living seat there, no other figure present, not crossing a door, within `npc.aloneKill.sightTiles`. A seat
+wearing the Watchman's look (the badge everyone sees, never the card) or one with nothing in its purse is never
+mugged. The chance per second is `moods.mug.chancePerS` by the target's purse band (3.23), times `1 + moodMul` by
+the need behind the mugger's mood, times `nightMul` in the night class, `weakMul` for a Weakened or Fatigued target
+(3.22) and `longAloneMul` after `longAloneS` alone beside a heavy purse; the mugger's own Fear (`fearMul`) and a
+light burning in the target's hand (`lightMul`) lower it. What the roll starts, the walk-up, the threat and the
+target's answer, is the next step of A180.
 
 ### 3.25 The living world
 
@@ -924,4 +989,7 @@ Round 8 addendum B (A173, A174; `docs/round8/living.md`). Sessions 8Q, 8R, 8S, 8
 - **Talk** (8T). NPC lines in meeting notes (3.8) come from templates, or from Claude when the server holds a key, off the tick and logged for replay; one to three a meeting are red herrings, slightly off.
   - **Input.** A line is built only from facts every seat at the table has: the round, the meeting's reason, the caller's and the body's names, the roll-call's missing names and the other living seats' names (`services/talk/facts.ts`). Never a card, a cover, a private view or which seats are NPCs.
   - **Templates.** `services/talk/templates.ts`: questions and remarks that name seats by name and never name a card, a role or a faction. A template whose name has nothing to fill (no body at a bell meeting) is not drawn; the bell question is drawn only at a bell meeting. Each line draws two uniforms from the seat's `talk` stream, whatever is drawn.
+  - **Model.** With `ANTHROPIC_API_KEY` on the server, and never in an auto run, a replay or a test, a note's text comes from the Messages API (the model id is the server's `WDI_TALK_MODEL`, else the fast small model). The prompt is the input above, the writer's own name, what it found itself, and the last `talk.model.transcriptLines` lines of the meeting (named chat with its speaker, notes with none); never its card. The call runs off the tick: at the note's tick the template line is drawn first, always, and the call starts; a later tick posts the answer, or the template line once `talk.model.timeoutS` passes or for any answer but a plain finished one. Per match at most `talk.model.callsPerMatch` calls and `talk.model.tokensPerMatch` tokens; past either, templates only.
+  - **Filter.** A model line keeps its first line without quotes, at most `talk.model.maxChars`; it is thrown away for the template if it says the writer is not a person, holds a slur, or names a card or a faction beside a seat's name or the writer's own "I", unless that seat claimed that card in public.
+  - **Replay.** Every NPC note goes to the match log's `talk` rows (tick, seat, text, template or model); a replay posts each seat's n-th logged note and calls nothing.
 - **Briarberry.** The Doctor's healing ingredient, picked from briar bushes that make the picker bleed (on hard down to half health, never to death); easy villagers gift it, normal shops sell it, hard only grows it (8U).

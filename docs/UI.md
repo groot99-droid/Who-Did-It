@@ -781,7 +781,9 @@ aim list wait for 5F's `ui/SeatPicker.ts` and a mount point in the world HUD (5I
 Session 5J, round 5. The lobby's map row of GDD 3.13 (`ui/lobby/MapPicker.ts`, module `ui/copy/maps.ts`). It
 shows only in the main mode (`showsMapRow`), under the frozen test id `map-select`, whose `data-map` is the
 map shown as chosen. Each map shows its `name` and `blurb` from `maps/<id>.json` (data, not copy) and its
-`thumb_<mapId>` image once the manifest has it. `{name}` is a map's `name`.
+`thumb_<mapId>` image once the manifest has it. `{name}` is a map's `name`. The blurbs follow the canon of
+`docs/round8/canon.md` (round 8, 8V): HollowMere is the railroad town on a drowned mere, BlackPine the Syndicate's
+timber and coal camp.
 
 | Id | Text | Notes |
 |---|---|---|
@@ -831,6 +833,9 @@ present only when the cutscene is skippable. Reduce-motion turns camera moves in
 | `cs.hollowmere.<line>` | the opening's captions | `title`, `seven`, `laid`, `own`, `train`, `dusk`, `end`, `vicar`, `letter`, `nobody`, `check`, `miss`; the Bible's Book I.1 trimmed |
 | `cs.blackpine.<line>` | the BlackPine opening's captions (7A) | `title`, `intake`, `owns`, `day`, `night`, `pines`, `adits`, `blind`, `dawn`; the Bible's Book III.2 trimmed |
 | `cs.death<Cause>.line` | the death cutscenes' one whispered line each | `Knife`, `Poison`, `Shot`, `Ejected`, `Wolf` (6J); `Creature`, `Bled`, `Sickened` (round 8, 8A, GDD 3.22) |
+
+Both openings already agree with the canon (`docs/round8/canon.md` 2): the station sign, the Barons and the train of
+Ledger I; the Harrow Timber & Coal Syndicate and the rack of Ledger VIII. They name no killer and not the Beast.
 
 Frozen test ids: `cutscene` (the layer, with `data-cutscene`), `cutscene-caption`, `cutscene-skip`.
 ### 14.22 Sound settings (6L)
@@ -1389,6 +1394,18 @@ Showing a notice, and presenting an Indulgence or a Seal, happen at a meeting an
 | `bank.pay` | Pay what you owe | `act.payRent`, the whole debt or nothing |
 | `civic.close` | Close | the panel's close button |
 
+### 14.36 Townsfolk (8E)
+
+Lines are in `apps/client/src/ui/copy/townsfolk.ts` (`TOWNSFOLK_COPY`, `figureName(lookId)`). An ambient figure (GDD 3.24) is an avatar whose `lookOf` is a `villager` look id rather than a seat: its nameplate is `figureName(lookOf)`, the plain `figure.villager` for a look with no line of its own, and it never shows a scarf, a hat glyph or a mask. The meeting text reads the count of townsfolk the creatures took since the last meeting (`meetingStart.figuresLost`, once that field lands) and adds one line below the reason; no count, no line.
+
+| Key | Text | Where |
+|---|---|---|
+| `figure.villager` | Villager | the nameplate of any `villager` look without a line of its own |
+| `figure.villager_clerk` | Company Clerk | the nameplate of HollowMere's Clerk (8F's look) |
+| `figure.villager_tallyman` | Tallyman | the nameplate of BlackPine's Tallyman (8F's look) |
+| `meeting.townsfolk.lost.one` | The wolves took one of the townsfolk. | the meeting text when one figure died since the last meeting |
+| `meeting.townsfolk.lost.many` | The wolves took {n} of the townsfolk. | the meeting text when more did; `{n}` is the count |
+
 ### 14.38 Tasks: the chores panel, the station prompts and the village's work (7M)
 
 Session 7M, round 7 (GDD 3.5, DECISIONS A133). The task list each seat is dealt at Start gets its screen half in the M5b layer (14.19): nothing here changes the layer's gather, craft or quest behaviour, and `ui/theme/**` is not edited; the new rules live in `ui/match.css`.
@@ -1449,6 +1466,7 @@ leaves `notes` lines out. A refused note (too soon, past the cap) is the usual r
 | `notes.send` | Pin the note | the send button's label |
 | `notes.empty` | No notes yet | the list, before the first note |
 | `notes.ghost` | The dead leave no notes | the field, disabled, for a ghost |
+| `meeting.reason.final` | The Final Night: the village must choose | the meeting's reason line for the Final Night's forced meeting (reason `final`, GDD 3.2) |
 
 ### 14.41 The shout (8R)
 

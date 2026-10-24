@@ -12,8 +12,10 @@ Character passes:
 
 The character .blend holds a collection `Export` with the armature, mesh parts tagged by the custom
 property `wdi_part` (body, scarf, blood), an empty named `Feet` between the feet, and one action per
-clip named after it (`idle`, `walk`, `swing`, `interact`, `die`). Every frame renders through IsoCam at
-the display scale; `pnpm --filter @wdi/sprites pixel` finishes the folder to packed size (SPRITES 10.3).
+clip named after it (the look's clips of rig_common.look_clips: the twenty-one of R8_CLIPS for a deck look,
+sixteen for the villager family). Each clip renders its own directions (eight, or the four diagonals) in its
+own cell. Every frame renders through IsoCam at the display scale; `pnpm --filter @wdi/sprites pixel`
+finishes the folder to packed size (SPRITES 10.3).
 Without `--rig` the rig is built in memory by build_rig.py.
 """
 
@@ -32,7 +34,7 @@ import build_rig  # noqa: E402
 import palettize  # noqa: E402
 import rig_common as rc  # noqa: E402
 
-LOOPING = {"idle", "walk", "interact", "run", "carry"}
+LOOPING = {name for name, clip in rc.R8_CLIPS.items() if clip.loop}
 SMOKE_LIFT_PX = 24
 
 
@@ -43,9 +45,10 @@ def _args(argv: list[str]) -> argparse.Namespace:
     p.add_argument("--rig", help="render_rig.blend to open instead of building the rig in memory")
     p.add_argument("--char", help="character .blend with an Export collection")
     p.add_argument("--body", default="villager")
-    p.add_argument("--anims", default=",".join(rc.V1_CLIPS), help="comma list of clips")
+    p.add_argument("--anims", default="", help="comma list of clips; by default the look's own (rig_common.look_clips)")
     p.add_argument("--passes", default=",".join(rc.PASSES))
-    p.add_argument("--dirs", default=",".join(rc.DIRECTIONS))
+    p.add_argument("--dirs", default="",
+                   help="comma list of directions, cut to each clip's own (rig_common.R8_CLIPS); by default every one")
     p.add_argument("--out", required=True)
     p.add_argument("--style", default="8bit", choices=rc.ART_STYLES,
                    help="art style: hd renders at twice the display scale with the HD finish (art.md 3)")
@@ -345,19 +348,24 @@ def render_character(scene, args) -> None:
                 "style": args.style, "factor": factor, "passes": args.passes.split(","), "frames": {}}
 
     clipped: list[str] = []
-    for anim in args.anims.split(","):
+    own = rc.look_clips(args.body)
+    wanted_dirs = args.dirs.split(",") if args.dirs else list(rc.DIRECTIONS)
+    for anim in (args.anims.split(",") if args.anims else list(own)):
         action = bpy.data.actions.get(anim)
         if action is None or arm is None:
             raise SystemExit(f"missing action {anim!r} or armature")
+        if anim not in own:
+            print(f"warning: {anim} is not a clip of {args.body} (rig_common.look_clips)")
         arm.animation_data_create().action = action
         cell, feet_row = rc.clip_cell(anim)
         _place(scene, scene.camera, cell, feet_row, factor=factor)
         start, end = (int(round(f)) for f in action.frame_range)
         frames = rc.sample_frames(start, end if anim in LOOPING else end + 1, step)
-        expected = rc.V1_CLIPS.get(anim)
-        if expected and len(frames) != expected:
-            print(f"warning: {anim} samples {len(frames)} frames, V1 expects {expected}")
-        for d_index in (rc.DIRECTIONS.index(d) for d in args.dirs.split(",")):
+        table = rc.R8_CLIPS.get(anim)
+        if table and len(frames) != table.frames:
+            print(f"warning: {anim} samples {len(frames)} frames, the table expects {table.frames}")
+        dirs = [d for d in wanted_dirs if table is None or d in table.dirs]
+        for d_index in (rc.DIRECTIONS.index(d) for d in dirs):
             turntable.rotation_euler.z = rc.turntable_z(d_index)
             for pass_name in manifest["passes"]:
                 setup_pass(pass_name, parts, overrides, saved)
@@ -391,10 +399,14 @@ def main() -> None:
         from materials import hd
 
         hd.apply(scene)
-        if os.environ.get("WDI_HD_PBR"):  # the rough PBR + HDRI look of the owner's look sheet
+        if os.environ.get("WDI_HD_PBR"):  # the PBR finish of the buildings and the kit (A164)
             from materials import pbr
 
             pbr.apply(scene)
+        elif os.environ.get("WDI_HD_SKY"):  # the PBR sky under the toon HD: the A164 ambient test
+            from materials import pbr
+
+            pbr.sky(scene)
     if args.smoke:
         smoke(scene, args.out)
     elif args.char:

@@ -258,6 +258,62 @@
     "stuckInvariantS": 20,
     "gddRef": "3.12"
   },
+  "moods": {
+    "threshold": 0.5,
+    "desperateNeeds": 2,
+    "moodHoldS": 5,
+    "hunger": { "riseS": 480, "homeFallS": 60, "mealRelief": 1, "famishedMul": 2 },
+    "fear": {
+      "body": 0.4,
+      "chase": 0.5,
+      "struck": 0.3,
+      "ejection": 0.2,
+      "darkRiseS": 90,
+      "fallS": 120
+    },
+    "anger": {
+      "struck": 0.4,
+      "robbed": 0.6,
+      "taxed": 0.3,
+      "ejectionRelief": 0.5,
+      "mealRelief": 0.3,
+      "fallS": 180
+    },
+    "want": { "lightPurse": 10, "lightRiseS": 240, "debtRiseS": 120, "wage": 0.4, "sale": 0.2 },
+    "mug": {
+      "chancePerS": { "light": 0.01, "heavy": 0.04 },
+      "moodMul": 1,
+      "fearMul": 1,
+      "nightMul": 2,
+      "weakMul": 1.5,
+      "longAloneS": 30,
+      "longAloneMul": 1.5,
+      "lightMul": 0.25,
+      "reachTiles": 1.25,
+      "approachS": 10,
+      "threatS": 1.5,
+      "answerS": 6,
+      "share": 0.3,
+      "chaseS": 5,
+      "cooldownS": 120
+    },
+    "weights": {
+      "hungry": { "work": 1.6, "stroll": 1, "idle": 0.6 },
+      "scared": { "work": 0.6, "stroll": 0.5, "idle": 2 },
+      "angry": { "work": 0.8, "stroll": 1.8, "idle": 0.6 },
+      "desperate": { "work": 0.5, "stroll": 2, "idle": 0.6 }
+    },
+    "gddRef": "3.24"
+  },
+  "townsfolk": {
+    "count": { "small": 3, "medium": 4, "large": 6 },
+    "walkTilesPerS": 2.5,
+    "stationDwellS": { "min": 20, "max": 60 },
+    "idleS": { "min": 2, "max": 6 },
+    "idleChance": 0.5,
+    "height": 1,
+    "gddRef": "3.24"
+  },
   "resources": { "poolActiveFrac": 0.5, "stackMax": 5, "gddRef": "3.14" },
   "mobs": { "maxPerScene": 3, "chaseS": 6, "gddRef": "3.15" },
   "quests": { "maxActive": 2, "gddRef": "3.16" },
@@ -309,6 +365,14 @@
     "noteGapS": 6,
     "notesPerMeeting": 4,
     "npc": { "notesPerMeeting": { "min": 1, "max": 3 }, "windowFrac": { "min": 0.05, "max": 0.8 } },
+    "model": {
+      "timeoutS": 4,
+      "callsPerMatch": 60,
+      "tokensPerMatch": 120000,
+      "maxTokens": 512,
+      "maxChars": 140,
+      "transcriptLines": 20
+    },
     "gddRef": "3.8"
   }
 }

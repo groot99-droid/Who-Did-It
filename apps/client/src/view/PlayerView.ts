@@ -8,7 +8,7 @@ import { StatusBit } from './animIds';
 import { TELEPORT_PX } from './interpolation';
 import { BIAS } from './iso';
 import { drawScale } from './texels';
-import { type Clip, clipFor, dirFor, dirFromYaw } from './poses';
+import { type Clip, clipFor, dirFor, dirFromYaw, LAZY_CLIPS, wantedClip } from './poses';
 import { reducedMotion } from './vfx/motion';
 
 export { dirFromYaw };
@@ -33,6 +33,12 @@ export const FIGURE_SCALE = metrics.iso.artScale * metrics.iso.figureScale;
 export const HEIGHT_SCALE = traits.axes.height.values.map((v) => v.spriteScale * FIGURE_SCALE);
 /** The standing figure's cap in packed px (SPRITES 1): the nameplate and the tick sit above it. */
 const HEAD_PX = metrics.maxStandingSilhouettePx / metrics.iso.artScale;
+/**
+ * The bloodied mark over a figure (teardown.md 3, 8N): the bleeding icon (`mark_bleeding`, one 48 px image per art
+ * style, SPRITES 9.1) drawn at the 24 px of its cell, above the nameplate.
+ */
+export const BLOOD_MARK = 'mark_bleeding';
+const MARK_PX = 24;
 const hex = (c: string) => Number.parseInt(c.slice(1), 16);
 /** The physical signs' colours (motion.md 1): the world palette's ramps and tokens (ASSETS 6.1). */
 const POISON_CAST = hex(palette.world.ramps.moss[4]!);
@@ -61,10 +67,15 @@ export class PlayerView {
   /** `char/<bodyId>/...`: the look's own id, or the plain villager when the look is not loaded (SPRITES 10.13). */
   private readonly bodyId: string;
   private readonly tick: Phaser.GameObjects.Rectangle;
+  /** The bloodied mark, or null before its image is loaded (the placeholder set has none). */
+  private readonly bloodMark: Phaser.GameObjects.Image | null;
   private readonly scale: number;
   private anim = '';
+  /** Whether this view has asked for its look's lazy pair. */
+  private lazyAsked = false;
   private hatPass: string | null = null;
   private bloodOn = false;
+  private transit = false;
   private bleeding = false;
   private readonly plateColor: string;
   /** The last drawn feet position and its time, for the speed the gaits read. */
@@ -121,7 +132,15 @@ export class PlayerView {
       .rectangle(0, -Math.round(HEAD_PX * scale + 8), 10, 10, hex(palette.colors.teal))
       .setAngle(45)
       .setVisible(false);
+    this.bloodMark = scene.textures.exists(BLOOD_MARK)
+      ? scene.add
+          .image(0, -Math.round(HEAD_PX * scale + 18 + 20), BLOOD_MARK)
+          .setOrigin(0.5, 1)
+          .setDisplaySize(MARK_PX, MARK_PX)
+          .setVisible(false)
+      : null;
     this.root = scene.add.container(0, 0, [shadow, art, this.tick, this.plate]);
+    if (this.bloodMark) this.root.add(this.bloodMark);
     if (!this.hasArt) {
       // No texture at all: a bare capsule (packed px, scaled with the art) keeps the game playable.
       art.add(scene.add.rectangle(0, -20, 14, 40, 0x6f7a8c).setStrokeStyle(2, 0x12141c));
@@ -137,9 +156,14 @@ export class PlayerView {
     const bits = typeof status === 'number' ? status : status ? StatusBit.transit : 0;
     const transit = (bits & StatusBit.transit) !== 0;
     this.plate.setVisible(!transit);
+    this.transit = transit;
+    this.bloodMark?.setVisible(this.bloodOn && !transit);
     const key = (clip: Clip) => `${this.bodyId}/${clip}/${dirFor(clip, dir)}`;
     const has = (c: Clip) => this.scene.anims.exists(`char/${key(c)}`);
-    const { clip, tick } = clipFor(animId, has, { bits, speed: this.speed });
+    const motion = { bits, speed: this.speed };
+    const wanted = wantedClip(animId, motion);
+    if (LAZY_CLIPS.has(wanted) && !has(wanted)) this.requestLazy();
+    const { clip, tick } = clipFor(animId, has, motion);
     this.tick.setVisible(tick && !transit);
     this.showSigns(bits & SIGN_BITS);
     if (!this.hasArt) return;
@@ -156,11 +180,13 @@ export class PlayerView {
 
   /**
    * The `blood` pass (torso and hands) while the Blood status is up and the viewer is within range
-   * (docs/SPRITES.md 6). Without the art the player gets a red mark on the nameplate instead.
+   * (docs/SPRITES.md 6), with the bleeding icon above the nameplate (teardown.md 3). Without the art the player
+   * gets a red mark on the nameplate instead.
    */
   setBlood(on: boolean): void {
     if (on === this.bloodOn) return;
     this.bloodOn = on;
+    this.bloodMark?.setVisible(on && !this.transit);
     this.syncBlood();
     this.paintPlate();
   }
@@ -282,6 +308,17 @@ export class PlayerView {
 
   private play(sprite: Phaser.GameObjects.Sprite, key: string, startFrame: number): void {
     if (this.scene.anims.exists(key)) sprite.play({ key, startFrame });
+  }
+
+  /**
+   * Asks `assets.ts` for the look's lazy pair (SPRITES 3, A161) the first time a figure wants one of its clips; the
+   * figure plays the fallback until the pair is in and the next pose picks the clip up. The loader module pulls in
+   * Phaser, so it is reached lazily, and never on a scene without a loader (the tests' fakes).
+   */
+  private requestLazy(): void {
+    if (this.lazyAsked || !this.hasArt || !this.scene.load) return;
+    this.lazyAsked = true;
+    void import('./assets').then((m) => m.loadLazyLook(this.scene, this.bodyId));
   }
 
   /**

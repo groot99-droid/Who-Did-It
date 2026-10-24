@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Wounded: a limb wrapped in bandage, blood soaking through the middle wrap. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g1" data-flat="#C08A66" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#DDB08E"/><stop offset="1" stop-color="#C08A66"/></linearGradient>
+  <linearGradient id="g2" data-flat="#D9D2C2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g3" data-flat="#D9D2C2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g4" data-flat="#D9D2C2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g5" data-flat="#D9D2C2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <radialGradient id="g6" data-flat="#B3121F" gradientUnits="userSpaceOnUse" cx="23.4" cy="21.8" r="7.4"><stop offset="0" stop-color="#B3121F"/><stop offset="1" stop-color="#B3121F"/></radialGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<path d="M6.3,33.2 L33.2,6.3 A6,6 0 0 1 41.7,14.8 L14.8,41.7 A6,6 0 0 1 6.3,33.2 Z" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path class="flat" display="none" d="M12,38.8 L38.8,12 A6,6 0 0 1 41.7,14.8 L14.8,41.7 A6,6 0 0 1 12,38.8 Z" fill="#94603F" />
+<polygon points="8.1,29.3 12.3,25.1 24,34.6 19.8,38.8" fill="url(#g2)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="11.3" y1="26.8" x2="22.2" y2="35.7" stroke="#B2AA99" stroke-width="1" stroke-linecap="round"/>
+<polygon points="13,24.4 18.7,18.7 30.4,28.2 24.7,33.9" fill="url(#g3)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="18.7,18.7 24.4,13 36,22.6 30.4,28.2" fill="url(#g4)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="25.1,12.3 29.3,8.1 41,17.6 36.7,21.9" fill="url(#g5)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<line x1="28.2" y1="9.9" x2="39.2" y2="18.7" stroke="#B2AA99" stroke-width="1" stroke-linecap="round"/>
+<ellipse cx="25.1" cy="23.6" rx="5.5" ry="4.6" fill="url(#g6)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse cx="25.6" cy="24.6" rx="2.8" ry="2" fill="#7E1119" />
+<ellipse class="hd" cx="23.1" cy="21.8" rx="1.4" ry="0.8" fill="#B3121F" opacity="0.7"/>
+</svg>

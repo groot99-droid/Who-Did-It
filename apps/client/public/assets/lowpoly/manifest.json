@@ -22,6 +22,28 @@
       "url": "chars/detective.anims.json"
     },
     {
+      "key": "char_detective_2",
+      "type": "multiatlas",
+      "url": "chars/char_detective_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_detective_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_detective_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_detective_2",
+      "type": "animation",
+      "url": "chars/detective_2.anims.json",
+      "maps": []
+    },
+    {
       "key": "char_doctor",
       "type": "multiatlas",
       "url": "chars/char_doctor.json",
@@ -39,6 +61,28 @@
       "key": "anims_doctor",
       "type": "animation",
       "url": "chars/doctor.anims.json"
+    },
+    {
+      "key": "char_doctor_2",
+      "type": "multiatlas",
+      "url": "chars/char_doctor_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_doctor_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_doctor_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_doctor_2",
+      "type": "animation",
+      "url": "chars/doctor_2.anims.json",
+      "maps": []
     },
     {
       "key": "char_vicar",
@@ -60,6 +104,28 @@
       "url": "chars/vicar.anims.json"
     },
     {
+      "key": "char_vicar_2",
+      "type": "multiatlas",
+      "url": "chars/char_vicar_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_vicar_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_vicar_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_vicar_2",
+      "type": "animation",
+      "url": "chars/vicar_2.anims.json",
+      "maps": []
+    },
+    {
       "key": "char_watchman",
       "type": "multiatlas",
       "url": "chars/char_watchman.json",
@@ -77,6 +143,28 @@
       "key": "anims_watchman",
       "type": "animation",
       "url": "chars/watchman.anims.json"
+    },
+    {
+      "key": "char_watchman_2",
+      "type": "multiatlas",
+      "url": "chars/char_watchman_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_watchman_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_watchman_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_watchman_2",
+      "type": "animation",
+      "url": "chars/watchman_2.anims.json",
+      "maps": []
     },
     {
       "key": "char_herbalist",
@@ -98,6 +186,28 @@
       "url": "chars/herbalist.anims.json"
     },
     {
+      "key": "char_herbalist_2",
+      "type": "multiatlas",
+      "url": "chars/char_herbalist_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_herbalist_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_herbalist_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_herbalist_2",
+      "type": "animation",
+      "url": "chars/herbalist_2.anims.json",
+      "maps": []
+    },
+    {
       "key": "char_gamekeeper",
       "type": "multiatlas",
       "url": "chars/char_gamekeeper.json",
@@ -115,6 +225,28 @@
       "key": "anims_gamekeeper",
       "type": "animation",
       "url": "chars/gamekeeper.anims.json"
+    },
+    {
+      "key": "char_gamekeeper_2",
+      "type": "multiatlas",
+      "url": "chars/char_gamekeeper_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_gamekeeper_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_gamekeeper_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_gamekeeper_2",
+      "type": "animation",
+      "url": "chars/gamekeeper_2.anims.json",
+      "maps": []
     },
     {
       "key": "char_lamplighter",
@@ -136,6 +268,28 @@
       "url": "chars/lamplighter.anims.json"
     },
     {
+      "key": "char_lamplighter_2",
+      "type": "multiatlas",
+      "url": "chars/char_lamplighter_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_lamplighter_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_lamplighter_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_lamplighter_2",
+      "type": "animation",
+      "url": "chars/lamplighter_2.anims.json",
+      "maps": []
+    },
+    {
       "key": "char_baker",
       "type": "multiatlas",
       "url": "chars/char_baker.json",
@@ -153,6 +307,28 @@
       "key": "anims_baker",
       "type": "animation",
       "url": "chars/baker.anims.json"
+    },
+    {
+      "key": "char_baker_2",
+      "type": "multiatlas",
+      "url": "chars/char_baker_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_baker_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_baker_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_baker_2",
+      "type": "animation",
+      "url": "chars/baker_2.anims.json",
+      "maps": []
     },
     {
       "key": "char_fisher",
@@ -174,6 +350,28 @@
       "url": "chars/fisher.anims.json"
     },
     {
+      "key": "char_fisher_2",
+      "type": "multiatlas",
+      "url": "chars/char_fisher_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_fisher_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_fisher_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_fisher_2",
+      "type": "animation",
+      "url": "chars/fisher_2.anims.json",
+      "maps": []
+    },
+    {
       "key": "char_tinner",
       "type": "multiatlas",
       "url": "chars/char_tinner.json",
@@ -191,6 +389,28 @@
       "key": "anims_tinner",
       "type": "animation",
       "url": "chars/tinner.anims.json"
+    },
+    {
+      "key": "char_tinner_2",
+      "type": "multiatlas",
+      "url": "chars/char_tinner_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_tinner_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_tinner_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_tinner_2",
+      "type": "animation",
+      "url": "chars/tinner_2.anims.json",
+      "maps": []
     },
     {
       "key": "char_villager",
@@ -212,6 +432,28 @@
       "url": "chars/villager.anims.json"
     },
     {
+      "key": "char_villager_2",
+      "type": "multiatlas",
+      "url": "chars/char_villager_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_villager_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_villager_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_villager_2",
+      "type": "animation",
+      "url": "chars/villager_2.anims.json",
+      "maps": []
+    },
+    {
       "key": "char_villagerelder",
       "type": "multiatlas",
       "url": "chars/char_villagerelder.json",
@@ -229,6 +471,28 @@
       "key": "anims_villagerelder",
       "type": "animation",
       "url": "chars/villagerelder.anims.json"
+    },
+    {
+      "key": "char_villagerelder_2",
+      "type": "multiatlas",
+      "url": "chars/char_villagerelder_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_villagerelder_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_villagerelder_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_villagerelder_2",
+      "type": "animation",
+      "url": "chars/villagerelder_2.anims.json",
+      "maps": []
     },
     {
       "key": "char_villagergoodwife",
@@ -250,6 +514,28 @@
       "url": "chars/villagergoodwife.anims.json"
     },
     {
+      "key": "char_villagergoodwife_2",
+      "type": "multiatlas",
+      "url": "chars/char_villagergoodwife_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_villagergoodwife_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_villagergoodwife_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_villagergoodwife_2",
+      "type": "animation",
+      "url": "chars/villagergoodwife_2.anims.json",
+      "maps": []
+    },
+    {
       "key": "char_villagerlass",
       "type": "multiatlas",
       "url": "chars/char_villagerlass.json",
@@ -269,6 +555,28 @@
       "url": "chars/villagerlass.anims.json"
     },
     {
+      "key": "char_villagerlass_2",
+      "type": "multiatlas",
+      "url": "chars/char_villagerlass_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_villagerlass_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_villagerlass_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_villagerlass_2",
+      "type": "animation",
+      "url": "chars/villagerlass_2.anims.json",
+      "maps": []
+    },
+    {
       "key": "char_villagerclerk",
       "type": "multiatlas",
       "url": "chars/char_villagerclerk.json",
@@ -286,6 +594,28 @@
       "key": "anims_villagerclerk",
       "type": "animation",
       "url": "chars/villagerclerk.anims.json"
+    },
+    {
+      "key": "char_villagerclerk_2",
+      "type": "multiatlas",
+      "url": "chars/char_villagerclerk_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "ovl_villagerclerk_2",
+      "type": "multiatlas",
+      "url": "chars/ovl_villagerclerk_2.json",
+      "path": "chars/",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "anims_villagerclerk_2",
+      "type": "animation",
+      "url": "chars/villagerclerk_2.anims.json",
+      "maps": []
     },
     {
       "key": "portrait_detective",
@@ -397,6 +727,12 @@
       "key": "anims_vfx",
       "type": "animation",
       "url": "vfx/vfx.anims.json"
+    },
+    {
+      "key": "mark_bleeding",
+      "type": "image",
+      "url": "../ui/icons/lowpoly/icon_effect_bleeding.png",
+      "filter": "linear"
     },
     {
       "key": "bld_hollowmere",

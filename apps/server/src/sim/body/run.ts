@@ -4,6 +4,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { speedPxPerTick } from '../Movement';
 import { type MoveInput, type PlayerSim, simOf } from '../RoomSim';
 import { isWorldPhase } from '../World';
+import '../townsfolk/invariants'; // round 8, 8A: the registry runs in import order, figureNotSeat before bodyBounds
 import './invariants'; // the `bodyBounds` check registers with the body stage
 import { die, showClip, wake } from './damage';
 import {
