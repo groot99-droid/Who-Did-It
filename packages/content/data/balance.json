@@ -111,7 +111,8 @@
   },
   "finalNight": {
     "afterCycle": 5,
-    "huntS": 90,
+    "huntS": 45,
+    "trialS": 120,
     "killCooldownS": 20,
     "skipAllowed": false,
     "tieEjectsNobody": true,

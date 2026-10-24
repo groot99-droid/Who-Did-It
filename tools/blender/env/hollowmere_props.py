@@ -1073,6 +1073,387 @@ def bedside_candle():
             part("Book", T("ink", 1), B(-0.08, -0.1, 0.65, 0.14, 0.1, 0.03), outline=False)]
 
 
+# ---------------------------------------------------------------- Mallory's apothecary (round 8, 8J: art.md 4.2)
+
+JAR_TONES = [("moss", 2), ("teal", 1), ("blood", 1), ("lantern", 1), ("moon", 3), ("bone", 2)]
+
+
+def _jars(rnd, y, z, x0=-0.4, x1=0.4, big=False):
+    """A shelf run of apothecary jars: glass in the house colours, each with a paper label and a cork."""
+    runs, x = {}, x0
+    while x < x1:
+        r = rnd.choice(JAR_TONES)
+        w = rnd.uniform(0.05, 0.08) if big else rnd.uniform(0.035, 0.055)
+        h = rnd.uniform(0.14, 0.22) if big else rnd.uniform(0.1, 0.16)
+        runs.setdefault(r, []).append(C(x, y, z, w, h, 8))
+        runs.setdefault(("cork", 0), []).append(C(x, y, z + h, w * 0.6, 0.03, 6))
+        runs.setdefault(("label", 0), []).append(B(x, y - w, z + h * 0.45, w * 1.1, 0.005, h * 0.3))
+        x += w * 2 + rnd.uniform(0.02, 0.05)
+    tone = {("cork", 0): T("litter", 2), ("label", 0): T("bone", 3)}
+    return [part(f"Jars{r}{i}{z}", tone.get((r, i)) or F(r, i), *shapes, outline=False)
+            for (r, i), shapes in runs.items()]
+
+
+def counter():
+    """Hollowmere's shop counter (8C's `counter` kind): a panelled front, a scrubbed top worn pale where the coins
+    are counted, a brass bell, the day book open on its strap and a little oil lamp at the end."""
+    return [part("Body", T("wood", 1), B(0, 0.05, 0.47, 1.0, 0.8, 0.94)),
+            part("Panels", T("wood", 2), *[B(sx * 0.24, -0.355, 0.47, 0.4, 0.01, 0.66) for sx in (1, -1)],
+                 outline=False),
+            part("Top", T("wood", 4), B(0, 0.0, 0.97, 1.0, 0.92, 0.06)),
+            part("Worn", F("wood", 5), B(0.0, -0.1, 1.001, 0.36, 0.28, 0.002), outline=False),
+            part("Book", T("bone", 3), B(-0.22, 0.05, 1.01, 0.3, 0.22, 0.02)),
+            part("Strap", T("blood", 0), B(-0.22, 0.05, 1.025, 0.03, 0.23, 0.005), outline=False),
+            part("Bell", T("brass", 2), C(0.08, -0.15, 1.0, 0.06, 0.06, 10, rt=0.02), C(0.08, -0.15, 1.06, 0.01, 0.04, 6)),
+            part("Font", T("brass", 1), C(0.33, 0.15, 1.0, 0.06, 0.08, 8, rt=0.05)),
+            part("Chimney", F("lantern", 3), C(0.33, 0.15, 1.08, 0.035, 0.14, 8, rt=0.025), outline=False)]
+
+
+def counter_case(seed="a"):
+    """A glazed counter case of remedies laid on green baize: tins of salts, rolled bandages, a tray of pills (on
+    the second, jars of horehound drops and a great pot of goose-grease ointment)."""
+    return [part("Body", T("wood", 1), B(0, 0.05, 0.32, 1.0, 0.8, 0.64)),
+            part("Panel", T("wood", 2), B(0, -0.355, 0.32, 0.86, 0.01, 0.44), outline=False),
+            part("Baize", F("moss", 1), B(0, 0.05, 0.645, 0.92, 0.72, 0.01), outline=False),
+            *([part("Drops", F("lantern", 1), *[C(x, 0.15, 0.65, 0.07, 0.16, 8) for x in (-0.3, -0.12, 0.06)],
+                    outline=False),
+               part("Lids", T("brass", 1), *[C(x, 0.15, 0.81, 0.07, 0.02, 8) for x in (-0.3, -0.12, 0.06)]),
+               part("Ointment", T("bone", 2), C(0.26, -0.12, 0.65, 0.12, 0.14, 12, rt=0.1)),
+               part("Paper", T("bone", 3), C(0.26, -0.12, 0.79, 0.1, 0.01, 12), outline=False)] if seed == "b" else
+              [part("Tins", T("fog", 2), *[C(x, 0.15, 0.65, 0.07, 0.06, 10) for x in (-0.3, -0.12)]),
+               part("Bandages", T("bone", 3), *[C(x, -0.12, 0.65, 0.06, 0.1, 10) for x in (0.12, 0.3)]),
+               part("Pills", T("blood", 2), *[B(-0.2 + 0.05 * k, -0.15, 0.66, 0.025, 0.025, 0.02) for k in range(5)],
+                    outline=False)]),
+            part("Frame", T("brass", 1), *[B(x, y, 0.82, 0.03, 0.03, 0.35) for x in (-0.48, 0.48) for y in (-0.34, 0.44)],
+                 *[B(0, y, 1.0, 1.0, 0.03, 0.03) for y in (-0.34, 0.44)],
+                 *[B(x, 0.05, 1.0, 0.03, 0.8, 0.03) for x in (-0.48, 0.48)]),
+            part("Glint", F("bone", 3), B(-0.2, -0.36, 0.85, 0.03, 0.005, 0.22), B(0.1, 0.0, 1.01, 0.3, 0.03, 0.003),
+                 outline=False)]
+
+
+def apoth_drawers():
+    """Mallory's drawer wall: eight rows of little labelled drawers with bone knobs, the names in her hand
+    (Valerian, Rue, Foxglove), and a ladder hooked on the rail for the top ones."""
+    rows, cols = 8, 6
+    fronts = [B(-0.4 + 0.16 * c, -0.31, 0.2 + 0.24 * r, 0.14, 0.01, 0.2) for r in range(rows) for c in range(cols)]
+    return [part("Carcass", T("wood", 1), B(0, 0.1, 1.15, 1.0, 0.8, 2.3)),
+            part("Fronts", T("wood", 3), *fronts, outline=False),
+            part("Labels", T("bone", 3), *[B(-0.4 + 0.16 * c, -0.32, 0.27 + 0.24 * r, 0.08, 0.005, 0.04)
+                                           for r in range(rows) for c in range(cols)], outline=False),
+            part("Knobs", T("bone", 2), *[B(-0.4 + 0.16 * c, -0.325, 0.22 + 0.24 * r, 0.025, 0.01, 0.025)
+                                          for r in range(rows) for c in range(cols)], outline=False),
+            part("Cornice", T("wood", 3), B(0, 0.08, 2.34, 1.0, 0.86, 0.08)),
+            part("Rail", T("brass", 1), B(0, -0.36, 2.2, 1.0, 0.03, 0.03)),
+            part("Ladder", T("wood", 4), *[B(sx * 0.12 + 0.25, -0.45, 1.1, 0.04, 0.04, 2.2) for sx in (1, -1)],
+                 *[B(0.25, -0.45, z, 0.24, 0.03, 0.03) for z in (0.35, 0.75, 1.15, 1.55, 1.95)]),
+            part("Open", F("ink", 0), B(0.08, -0.33, 0.92, 0.14, 0.01, 0.16), outline=False)]
+
+
+def jar_shelf(seed="a"):
+    """Wall shelves of jars, tinctures and dried things, a skull among them on the second (bought from a ship's
+    surgeon, she says)."""
+    rnd = random.Random(f"jars{seed}")
+    objs = [back_panel("Wall", T("plaster", 1), 0.9, 2.1, 0.0),
+            part("Shelves", T("wood", 3), *[B(0, 0.3, z, 0.96, 0.2, 0.04) for z in (0.55, 1.05, 1.55)]),
+            part("Brackets", T("ink", 1), *[B(sx * 0.4, 0.33, z - 0.08, 0.03, 0.14, 0.12) for sx in (1, -1)
+                                           for z in (0.55, 1.05, 1.55)], outline=False)]
+    for z in (0.57, 1.07, 1.57):
+        objs += _jars(rnd, 0.28, z, big=z < 1.0)
+    if seed == "b":
+        objs += [part("Skull", T("bone", 2), C(0.3, 0.27, 1.07, 0.08, 0.12, 10, rt=0.06), bevel=0.03),
+                 part("Sockets", F("ink", 0), *[B(0.3 + dx, 0.19, 1.14, 0.03, 0.01, 0.03) for dx in (-0.03, 0.03)],
+                      outline=False)]
+    return objs
+
+
+def herb_rack():
+    """A drying rack on the wall: bunches of yarrow, sage and nightshade hung head down, their shadows on the
+    plaster, a paper twist of seed pinned under each."""
+    rnd = random.Random("herbs")
+    tones = [("moss", 2), ("moss", 3), ("litter", 2), ("moss", 1)]
+    runs = {}
+    for k in range(6):
+        x = -0.38 + 0.15 * k
+        h = rnd.uniform(0.3, 0.45)
+        runs.setdefault(rnd.choice(tones), []).append(C(x, 0.3, 1.72 - h, 0.09, h, 7, rt=0.025))
+        runs.setdefault(rnd.choice(tones), []).append(C(x + 0.03, 0.27, 1.72 - h * 0.8, 0.05, h * 0.6, 5, rt=0.02))
+    return ([back_panel("Wall", T("plaster", 2), 0.9, 2.1, 0.0),
+             part("Pole", T("wood", 2), B(0, 0.3, 1.8, 0.96, 0.05, 0.05)),
+             part("Pegs", T("wood", 1), *[B(sx * 0.42, 0.36, 1.8, 0.04, 0.08, 0.04) for sx in (1, -1)]),
+             part("Ties", T("bone", 1), *[B(-0.38 + 0.15 * k, 0.3, 1.75, 0.03, 0.03, 0.06) for k in range(6)],
+                  outline=False),
+             part("Twists", T("bone", 3), *[B(-0.38 + 0.15 * k, 0.34, 0.95, 0.05, 0.01, 0.08) for k in range(6)],
+                  outline=False)]
+            + [part(f"Herbs{r}{i}", T(r, i), *shapes, bevel=0.02) for (r, i), shapes in runs.items()])
+
+
+def still():
+    """The copper still on its brick stove: pot, swan neck and worm tub, a flask catching the drip and the coals
+    showing red through the stove door."""
+    return [part("Stove", T("brick", 2), B(0, 0.05, 0.3, 0.6, 0.6, 0.6), bevel=0.01),
+            part("Door", T("ink", 1), B(0, -0.255, 0.22, 0.24, 0.01, 0.18), outline=False),
+            part("Coals", F("blood", 2), B(0, -0.26, 0.2, 0.18, 0.005, 0.08), outline=False),
+            part("Glow", F("lantern", 1), B(0, -0.262, 0.24, 0.1, 0.004, 0.03), outline=False),
+            part("Pot", T("brick", 4), C(0, 0.05, 0.6, 0.24, 0.3, 14, rt=0.16), bevel=0.02),
+            part("Head", T("brick", 5), C(0, 0.05, 0.9, 0.14, 0.14, 12, rt=0.06)),
+            part("Neck", T("brick", 4), B(0.2, 0.05, 1.04, 0.36, 0.05, 0.05), B(0.36, 0.05, 0.9, 0.05, 0.05, 0.3)),
+            part("Tub", T("wood", 2), C(0.34, 0.05, 0.0, 0.14, 0.7, 10)),
+            part("Hoops", T("ink", 1), *[C(0.34, 0.05, z, 0.145, 0.03, 10) for z in (0.12, 0.55)], outline=False),
+            part("Spout", T("brick", 4), B(0.34, -0.1, 0.3, 0.03, 0.12, 0.03)),
+            part("Flask", F("teal", 1), C(0.34, -0.24, 0.0, 0.08, 0.16, 10, rt=0.03), outline=False),
+            part("Flue", T("ink", 1), C(-0.18, 0.25, 0.6, 0.05, 1.3, 8))]
+
+
+def mortar_table():
+    """Her dispensing table: a marble slab for rolling pills, the mortar and pestle, brass scales with their
+    weights in a row, the prescription book and a lamp turned up for close work."""
+    return [part("Legs", T("wood", 1), *[B(sx * 0.4, sy * 0.3, 0.37, 0.07, 0.07, 0.74) for sx in (1, -1)
+                                         for sy in (1, -1)]),
+            part("Shelf", T("wood", 2), B(0, 0, 0.18, 0.86, 0.66, 0.04)),
+            part("Bottles", F("moss", 2), *[C(x, 0.05, 0.2, 0.05, 0.14, 8) for x in (-0.25, -0.1, 0.25)], outline=False),
+            part("Top", T("wood", 3), B(0, 0, 0.76, 0.96, 0.74, 0.05)),
+            part("Slab", T("bone", 2), B(-0.22, 0.1, 0.795, 0.36, 0.3, 0.03)),
+            part("Mortar", T("stone", 4), C(-0.22, -0.18, 0.785, 0.09, 0.1, 10, rt=0.11)),
+            part("Pestle", T("bone", 1), B(-0.18, -0.18, 0.92, 0.03, 0.03, 0.18)),
+            part("Scales", T("brass", 2), C(0.18, 0.05, 0.785, 0.07, 0.03, 8), B(0.18, 0.05, 0.95, 0.02, 0.02, 0.32),
+                 B(0.18, 0.05, 1.11, 0.32, 0.02, 0.02)),
+            part("Pans", T("brass", 1), *[C(0.18 + dx, 0.05, 1.0, 0.07, 0.015, 10) for dx in (-0.15, 0.15)]),
+            part("Weights", T("brass", 1), *[C(0.08 + 0.05 * k, -0.22, 0.785, 0.015 + 0.006 * k, 0.03, 6)
+                                             for k in range(4)], outline=False),
+            part("Book", T("blood", 0), B(0.32, -0.2, 0.8, 0.2, 0.14, 0.04)),
+            part("Font", T("brass", 1), C(-0.36, 0.25, 0.785, 0.06, 0.08, 8, rt=0.05)),
+            part("Chimney", F("lantern", 3), C(-0.36, 0.25, 0.865, 0.035, 0.15, 8, rt=0.025), outline=False)]
+
+
+def show_globe():
+    """The apothecary's sign in the window: a great glass carboy of green water on a turned stand, a lamp set
+    behind it at night so the colour shows down the street."""
+    return [part("Stand", T("wood", 2), C(0, 0, 0, 0.22, 0.06, 10), C(0, 0, 0.06, 0.06, 0.7, 8),
+                 C(0, 0, 0.76, 0.16, 0.04, 10)),
+            part("Globe", T("teal", 1), C(0, 0, 0.8, 0.1, 0.12, 14, rt=0.21), C(0, 0, 0.92, 0.21, 0.14, 14, rt=0.17),
+                 C(0, 0, 1.06, 0.17, 0.1, 14, rt=0.07), bevel=0.02),
+            part("Shine", F("teal", 2), B(-0.1, -0.17, 0.98, 0.04, 0.005, 0.1), outline=False),
+            part("Neck", T("teal", 0), C(0, 0, 1.16, 0.05, 0.14, 8, rt=0.04)),
+            part("Stopper", T("brass", 2), C(0, 0, 1.3, 0.07, 0.04, 8, rt=0.03)),
+            part("Lamp", T("brass", 1), C(0.1, 0.25, 0.8, 0.05, 0.07, 8, rt=0.04)),
+            part("Flame", F("lantern", 3), B(0.1, 0.25, 0.9, 0.03, 0.03, 0.05), outline=False)]
+
+
+def leech_jar():
+    """A tall stoneware leech jar with a pierced lid on a three-legged stool; one leech on the outside."""
+    return [part("Stool", T("wood", 2), C(0, 0, 0.42, 0.2, 0.04, 10),
+                 *[B(0.13 * math.cos(a), 0.13 * math.sin(a), 0.21, 0.04, 0.04, 0.42) for a in (0.5, 2.6, 4.7)]),
+            part("Jar", T("bone", 2), C(0, 0, 0.46, 0.15, 0.42, 12, rt=0.11), bevel=0.02),
+            part("Band", T("teal", 0), C(0, 0, 0.62, 0.145, 0.06, 12), outline=False),
+            part("Lid", T("bone", 1), C(0, 0, 0.88, 0.12, 0.04, 12, rt=0.08), C(0, 0, 0.92, 0.03, 0.04, 6)),
+            part("Holes", F("ink", 0), *[B(0.06 * math.cos(a), 0.06 * math.sin(a), 0.905, 0.015, 0.015, 0.005)
+                                         for a in (0.3, 1.8, 3.4, 4.9)], outline=False),
+            part("Leech", F("ink", 1), B(-0.07, -0.13, 0.75, 0.025, 0.01, 0.06), outline=False)]
+
+
+def drying_frame():
+    """The loft's drying frame: four slatted trays of petals, roots and rosehips stacked in a wooden rack, a
+    sack of more waiting at its foot."""
+    tones = [("blood", 1), ("moss", 2), ("litter", 2), ("lantern", 0)]
+    return [part("Posts", T("wood", 2), *[B(sx * 0.4, sy * 0.3, 0.7, 0.06, 0.06, 1.4) for sx in (1, -1) for sy in (1, -1)]),
+            part("Trays", T("wood", 3), *[B(0, 0, z, 0.82, 0.62, 0.03) for z in (0.3, 0.6, 0.9, 1.2)]),
+            *[part(f"Dried{k}", T(*tones[k]), B(0, 0, z + 0.025, 0.72, 0.52, 0.025), outline=False, bevel=0.01)
+              for k, z in enumerate((0.3, 0.6, 0.9, 1.2))],
+            part("Sack", T("litter", 2), C(0.25, -0.3, 0, 0.14, 0.3, 10, rt=0.08), bevel=0.04)]
+
+
+# ---------------------------------------------------------------- Crumb's Ovens and its four rooms (8J, art.md 4.2)
+
+
+def _loaves(rnd, y, z, x0=-0.38, x1=0.38, kinds="round"):
+    """A shelf run of Tamsin's bread: cobs, bloomers and twisted plaits, or baguettes stood in a basket."""
+    out, x, k = [], x0, 0
+    while x < x1:
+        if kinds == "long":
+            out.append(part(f"Stick{z}{k}", T("brass", rnd.choice((1, 2))),
+                            C(x, y, z, 0.035, rnd.uniform(0.32, 0.42), 8, rt=0.025), bevel=0.01))
+            x += 0.08
+        else:
+            out += loaf(f"Loaf{z}{k}", x + 0.08, y, z)
+            x += rnd.uniform(0.2, 0.26)
+        k += 1
+    return out
+
+
+def bread_shelf(seed="a"):
+    """The shop's bread wall: three boards of the day's bake behind a price card (on the second, baguettes stood in
+    a wicker basket and paper bags hung on a nail)."""
+    rnd = random.Random(f"bread{seed}")
+    objs = [back_panel("Wall", T("plaster", 2), 0.9, 2.1, 0.0),
+            part("Boards", T("wood", 3), *[B(0, 0.3, z, 0.96, 0.24, 0.04) for z in (0.5, 1.0, 1.5)]),
+            part("Brackets", T("ink", 1), *[B(sx * 0.4, 0.33, z - 0.08, 0.03, 0.14, 0.12) for sx in (1, -1)
+                                           for z in (0.5, 1.0, 1.5)], outline=False),
+            part("Card", T("bone", 3), B(0.3, 0.17, 1.62, 0.18, 0.01, 0.12), outline=False)]
+    objs += _loaves(rnd, 0.28, 1.04) + _loaves(rnd, 0.28, 1.54)
+    if seed == "b":
+        objs += [part("Basket", T("litter", 2), C(-0.15, 0.28, 0.54, 0.2, 0.22, 10, rt=0.16), bevel=0.02)]
+        objs += _loaves(rnd, 0.28, 0.6, -0.3, 0.0, "long")
+        objs += [part("Bags", T("bone", 2), *[B(0.3 + 0.04 * k, 0.2, 0.75 - 0.02 * k, 0.16, 0.01, 0.22)
+                                              for k in range(3)], outline=False)]
+    else:
+        objs += _loaves(rnd, 0.28, 0.54)
+    return objs
+
+
+def peel_rack():
+    """Peels and scrapers on a peg rail by the oven, the long-handled peel worn black at its blade."""
+    return [back_panel("Wall", T("plaster", 1), 0.9, 2.1, 0.0),
+            part("Rail", T("wood", 2), B(0, 0.34, 1.75, 0.96, 0.06, 0.08)),
+            part("Pegs", T("wood", 1), *[B(x, 0.3, 1.75, 0.04, 0.1, 0.04) for x in (-0.3, 0.0, 0.3)], outline=False),
+            part("Handles", T("wood", 4), *[B(x, 0.3, 1.0, 0.04, 0.04, 1.5) for x in (-0.3, 0.0)]),
+            part("Blades", T("wood", 3), B(-0.3, 0.3, 0.32, 0.26, 0.02, 0.3), B(0.0, 0.3, 0.3, 0.22, 0.02, 0.26)),
+            part("Scorch", F("ink", 1), B(-0.3, 0.29, 0.22, 0.24, 0.005, 0.1), outline=False),
+            part("Scraper", T("slate", 2), B(0.3, 0.3, 1.5, 0.16, 0.02, 0.1), B(0.3, 0.3, 1.6, 0.04, 0.03, 0.12)),
+            part("Cloth", T("bone", 2), B(0.3, 0.28, 1.25, 0.18, 0.01, 0.34), outline=False)]
+
+
+def bread_case():
+    """The bakery's glazed counter: buns, a slab of saffron cake and a plate of wake biscuits on paper doilies."""
+    rnd = random.Random("case")
+    return [part("Body", T("wood", 1), B(0, 0.05, 0.32, 1.0, 0.8, 0.64)),
+            part("Panel", T("wood", 2), B(0, -0.355, 0.32, 0.86, 0.01, 0.44), outline=False),
+            part("Doilies", T("bone", 3), *[C(x, 0.05, 0.645, 0.15, 0.005, 12) for x in (-0.28, 0.0, 0.28)],
+                 outline=False),
+            part("Buns", T("brass", 2), *[C(-0.28 + rnd.uniform(-0.05, 0.05), 0.05 + rnd.uniform(-0.06, 0.06), 0.65,
+                                            0.05, 0.05, 8, rt=0.02) for _ in range(4)], bevel=0.01),
+            part("Cake", T("lantern", 1), B(0.0, 0.05, 0.69, 0.22, 0.12, 0.08), bevel=0.01),
+            part("Biscuits", T("brass", 1), *[C(0.28 + 0.04 * k, 0.05 - 0.03 * k, 0.65 + 0.012 * k, 0.05, 0.012, 10)
+                                              for k in range(3)], outline=False),
+            part("Frame", T("brass", 1), *[B(x, y, 0.82, 0.03, 0.03, 0.35) for x in (-0.48, 0.48) for y in (-0.34, 0.44)],
+                 *[B(0, y, 1.0, 1.0, 0.03, 0.03) for y in (-0.34, 0.44)],
+                 *[B(x, 0.05, 1.0, 0.03, 0.8, 0.03) for x in (-0.48, 0.48)]),
+            part("Glint", F("bone", 3), B(-0.2, -0.36, 0.85, 0.03, 0.005, 0.22), outline=False)]
+
+
+def cooling_rack():
+    """A tall cooling rack on castors, its wire shelves of loaves still steaming from the oven."""
+    rnd = random.Random("cooling")
+    objs = [part("Frame", T("slate", 2), *[B(sx * 0.38, sy * 0.26, 0.8, 0.04, 0.04, 1.6) for sx in (1, -1)
+                                           for sy in (1, -1)]),
+            part("Wires", T("slate", 3), *[B(0, 0, z, 0.78, 0.54, 0.015) for z in (0.25, 0.6, 0.95, 1.3)],
+                 outline=False),
+            part("Castors", T("ink", 1), *[C(sx * 0.38, sy * 0.26, 0, 0.04, 0.05, 6) for sx in (1, -1) for sy in (1, -1)],
+                 outline=False)]
+    for z in (0.27, 0.62, 0.97, 1.32):
+        objs += _loaves(rnd, rnd.uniform(-0.08, 0.08), z, -0.32, 0.3)
+    return objs
+
+
+def bread_basket():
+    """A wicker basket of cobs on the floor, a linen cloth half over them."""
+    return ([part("Basket", T("litter", 2), C(0, 0, 0, 0.3, 0.3, 12, rt=0.36), bevel=0.02),
+             part("Weave", T("litter", 1), *[C(0, 0, z, 0.31 + z * 0.2, 0.02, 12) for z in (0.08, 0.2)], outline=False)]
+            + loaf("BasketA", -0.1, 0.05, 0.28) + loaf("BasketB", 0.12, -0.05, 0.3)
+            + [part("Linen", T("bone", 3), B(0.12, 0.08, 0.38, 0.3, 0.26, 0.02), outline=False)])
+
+
+def dough_trough():
+    """The mixing room's old kneading trough on trestles, the lid propped up and the dough rising under a cloth."""
+    return [part("Trestles", T("wood", 1), *[B(sx * 0.36, 0, 0.3, 0.06, 0.6, 0.6) for sx in (1, -1)]),
+            part("Trough", T("wood", 3), (frustum, dict(z0=0.55, z1=0.85, bottom=(0.8, 0.4), top=(0.94, 0.56)))),
+            part("Dough", T("bone", 2), B(0, -0.04, 0.85, 0.8, 0.44, 0.03), outline=False, bevel=0.02),
+            part("Cloth", T("plaster", 3), B(-0.1, -0.04, 0.875, 0.5, 0.4, 0.01), outline=False),
+            part("Lid", T("wood", 4), B(0, 0.32, 1.1, 0.94, 0.04, 0.5)),
+            part("Dust", T("bone", 3), S(blob(0.05, -0.32, 0.3, 0.1, [], n=10), 0, 0.005), outline=False)]
+
+
+def shaping_table():
+    """The shaping bench: a floured top with dough balls in a row, a scraper and a hanging oil lamp for the
+    early bake."""
+    return [part("Legs", T("wood", 1), *[B(sx * 0.42, sy * 0.3, 0.38, 0.07, 0.07, 0.76) for sx in (1, -1)
+                                         for sy in (1, -1)]),
+            part("Shelf", T("wood", 2), B(0, 0, 0.18, 0.88, 0.66, 0.04)),
+            part("Sack", T("bone", 2), C(-0.2, 0.05, 0.2, 0.14, 0.24, 10, rt=0.08), bevel=0.04),
+            part("Top", T("wood", 4), B(0, 0, 0.78, 0.98, 0.76, 0.06)),
+            part("Flour", T("bone", 3), S(blob(0, 0, 0.36, 0.26, [(0.1, 4, 0.5)], n=14), 0.81, 0.812), outline=False),
+            part("Balls", T("bone", 2), *[C(-0.3 + 0.15 * k, -0.12, 0.81, 0.06, 0.05, 8, rt=0.03) for k in range(5)],
+                 bevel=0.01),
+            part("Scraper", T("slate", 2), B(0.28, 0.15, 0.82, 0.14, 0.02, 0.06)),
+            part("Font", T("brass", 1), C(0.32, 0.28, 0.81, 0.06, 0.08, 8, rt=0.05)),
+            part("Chimney", F("lantern", 3), C(0.32, 0.28, 0.89, 0.035, 0.15, 8, rt=0.025), outline=False)]
+
+
+def water_bucket():
+    """Two oak buckets of well water for the dough, a ladle hooked over one."""
+    return [part("Buckets", T("wood", 3), *[C(x, y, 0, 0.17, 0.4, 10, rt=0.2) for x, y in ((-0.18, 0.1), (0.18, -0.08))]),
+            part("Hoops", T("ink", 1), *[C(x, y, z, 0.185, 0.03, 10) for x, y in ((-0.18, 0.1), (0.18, -0.08))
+                                         for z in (0.08, 0.3)], outline=False),
+            part("Water", F("moon", 2), *[C(x, y, 0.36, 0.17, 0.01, 10) for x, y in ((-0.18, 0.1), (0.18, -0.08))],
+                 outline=False),
+            part("Ladle", T("brass", 1), B(0.18, -0.08, 0.5, 0.03, 0.03, 0.3), C(0.18, -0.2, 0.62, 0.05, 0.03, 8))]
+
+
+def milk_churn():
+    """Churns from the Pennock farm, the lids chained, a crust of frost at their shoulders."""
+    return [part("Churns", T("slate", 3), *[C(x, y, 0, 0.15, 0.55, 12, rt=0.11) for x, y in ((-0.17, 0.08), (0.18, -0.06))],
+                 bevel=0.02),
+            part("Necks", T("slate", 2), *[C(x, y, 0.55, 0.09, 0.14, 10) for x, y in ((-0.17, 0.08), (0.18, -0.06))]),
+            part("Lids", T("slate", 4), *[C(x, y, 0.69, 0.11, 0.04, 10) for x, y in ((-0.17, 0.08), (0.18, -0.06))]),
+            part("Frost", F("moon", 3), *[C(x, y, 0.42, 0.155, 0.03, 12) for x, y in ((-0.17, 0.08), (0.18, -0.06))],
+                 outline=False),
+            part("Tag", T("blood", 1), B(0.18, -0.2, 0.3, 0.06, 0.01, 0.08), outline=False)]
+
+
+def cold_shelf():
+    """The walk-in's slatted shelves: butter in paper, crocks of milk, cakes of yeast in a tin and a rime of frost."""
+    rnd = random.Random("cold")
+    objs = [back_panel("Wall", T("plaster", 3), 0.9, 2.1, 0.0),
+            part("Slats", T("wood", 3), *[B(0, 0.3, z, 0.96, 0.24, 0.04) for z in (0.5, 1.0, 1.5)]),
+            part("Frost", F("moon", 3), *[B(0, 0.38, z + 0.03, 0.96, 0.06, 0.02) for z in (0.5, 1.0, 1.5)],
+                 outline=False)]
+    objs += [part("Butter", T("bone", 3), *[B(-0.35 + 0.17 * k, 0.28, 1.06, 0.13, 0.1, 0.08) for k in range(4)],
+                  bevel=0.01),
+             part("Crocks", T("bone", 1), *[C(-0.3 + 0.2 * k + rnd.uniform(-0.03, 0.03), 0.28, 0.52, 0.07, 0.18, 10)
+                                            for k in range(4)]),
+             part("Yeast", T("slate", 2), B(0.2, 0.28, 1.6, 0.3, 0.16, 0.12)),
+             part("Label", T("blood", 1), B(0.2, 0.19, 1.65, 0.12, 0.005, 0.05), outline=False),
+             part("Eggs", T("bone", 2), *[C(-0.3 + 0.07 * k, 0.28, 1.54, 0.03, 0.05, 6) for k in range(4)])]
+    return objs
+
+
+def compressor():
+    """The frosted compressor from the owner's picture: a green-painted motor on a cast base, its coil furred white,
+    a gauge and a belt guard."""
+    return [part("Base", T("slate", 1), B(0, 0, 0.12, 0.86, 0.6, 0.24), bevel=0.02),
+            part("Motor", T("moss", 1), C(-0.18, 0, 0.24, 0.18, 0.5, 12), bevel=0.02),
+            part("Pump", T("moss", 2), B(0.22, 0, 0.5, 0.3, 0.3, 0.5), bevel=0.02),
+            part("Coil", T("slate", 3), *[C(0.22, 0.05, z, 0.14, 0.03, 10) for z in (0.8, 0.9, 1.0, 1.1)]),
+            part("Rime", F("bone", 3), *[C(0.22, 0.05, z + 0.02, 0.15, 0.015, 10) for z in (0.8, 0.9, 1.0, 1.1)],
+                 outline=False),
+            part("Guard", T("ink", 1), B(-0.38, 0.05, 0.5, 0.06, 0.44, 0.44)),
+            part("Gauge", T("bone", 3), C(0.22, -0.16, 0.62, 0.07, 0.02, 10), outline=False),
+            part("Needle", F("blood", 1), B(0.24, -0.18, 0.64, 0.04, 0.005, 0.01), outline=False)]
+
+
+def couche_rack():
+    """A trolley of couche boards, the shaped loaves proving in folds of floured linen."""
+    rnd = random.Random("couche")
+    objs = [part("Frame", T("wood", 2), *[B(sx * 0.4, sy * 0.28, 0.8, 0.05, 0.05, 1.6) for sx in (1, -1)
+                                          for sy in (1, -1)]),
+            part("Boards", T("wood", 3), *[B(0, 0, z, 0.8, 0.56, 0.03) for z in (0.25, 0.6, 0.95, 1.3)]),
+            part("Linen", T("plaster", 3), *[B(0, 0, z + 0.03, 0.76, 0.52, 0.02) for z in (0.25, 0.6, 0.95, 1.3)],
+                 outline=False)]
+    for z in (0.3, 0.65, 1.0, 1.35):
+        objs.append(part(f"Proving{z}", T("bone", 2), *[C(-0.25 + 0.17 * k, rnd.uniform(-0.05, 0.05), z, 0.06, 0.05,
+                                                          8, rt=0.04) for k in range(4)], bevel=0.01))
+    return objs
+
+
+def wall_bulb():
+    """One of the Crumb rooms' bulbs: a lamp on an iron arm from the wall, its flex stapled down the plaster."""
+    return [back_panel("Wall", T("plaster", 2), 0.9, 2.1, 0.0),
+            part("Plate", T("ink", 1), C(0, 0.37, 1.7, 0.08, 0.02, 10)),
+            part("Arm", T("ink", 1), B(0, 0.22, 1.72, 0.03, 0.3, 0.03), B(0, 0.08, 1.62, 0.03, 0.03, 0.2)),
+            part("Shade", T("moss", 1), C(0, 0.08, 1.42, 0.16, 0.1, 12, rt=0.05)),
+            part("Bulb", F("lantern", 3), C(0, 0.08, 1.34, 0.06, 0.09, 10, rt=0.03), outline=False),
+            part("Flex", T("ink", 0), B(0.2, 0.37, 1.1, 0.01, 0.01, 1.2), outline=False)]
+
+
 def _crates(n=3):
     rnd = random.Random(f"crates{n}")
     return [kenney("survival-kit", "box-large", height=0.5, ramp=["#3A231F", "#744733", "#B57F54"],
@@ -1271,5 +1652,33 @@ PROPS = {
     "prop_tea_table": (64, 80, tea_table),
     "prop_writing_desk": (64, 96, writing_desk),
     "prop_birdcage": (64, 112, birdcage),
+    # Mallory's apothecary.
+    "prop_counter": (64, 96, counter),
+    "prop_counter_case": (64, 96, counter_case),
+    "prop_counter_case_b": (64, 96, lambda: counter_case("b")),
+    "prop_apoth_drawers": (64, 128, apoth_drawers),
+    "prop_jar_shelf": (64, 128, lambda: on_wall(jar_shelf())),
+    "prop_jar_shelf_b": (64, 128, lambda: on_wall(jar_shelf("b"))),
+    "prop_herb_rack": (64, 128, lambda: on_wall(herb_rack())),
+    "prop_still": (64, 128, still),
+    "prop_mortar_table": (64, 96, mortar_table),
+    "prop_show_globe": (64, 96, show_globe),
+    "prop_leech_jar": (64, 80, leech_jar),
+    "prop_drying_frame": (64, 112, drying_frame),
+    # Crumb's Ovens and its four rooms.
+    "prop_bread_shelf": (64, 128, lambda: on_wall(bread_shelf())),
+    "prop_bread_shelf_b": (64, 128, lambda: on_wall(bread_shelf("b"))),
+    "prop_peel_rack": (64, 128, lambda: on_wall(peel_rack())),
+    "prop_bread_case": (64, 96, bread_case),
+    "prop_cooling_rack": (64, 112, cooling_rack),
+    "prop_bread_basket": (64, 64, bread_basket),
+    "prop_dough_trough": (64, 96, dough_trough),
+    "prop_shaping_table": (64, 96, shaping_table),
+    "prop_water_bucket": (64, 80, water_bucket),
+    "prop_milk_churn": (64, 80, milk_churn),
+    "prop_cold_shelf": (64, 128, lambda: on_wall(cold_shelf())),
+    "prop_compressor": (64, 96, compressor),
+    "prop_couche_rack": (64, 112, couche_rack),
+    "prop_wall_bulb": (64, 128, lambda: on_wall(wall_bulb())),
     **SPOTS,
 }

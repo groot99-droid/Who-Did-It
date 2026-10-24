@@ -12,6 +12,7 @@ import {
   sliceDefs,
 } from './statics';
 import { BIAS } from './iso';
+import { hqFrame } from './hq/HqView';
 
 export interface DefContext {
   mapId: string;
@@ -129,12 +130,8 @@ function propDefs(o: MapObject, ctx: DefContext): StaticDef[] {
   const { tx, ty } = tile(o);
   const c = centre(tx, ty);
   const lit = o.type === 'lanternPost' ? find(ctx, [`prop_${o.type}_lit`]) : null;
-  const art =
-    lit ??
-    find(
-      ctx,
-      stems.map((s) => `prop_${s}`),
-    );
+  // Round 8, 8G: an HQ station stands as its staked site until HqView swaps in its bought tier (motion.md 2).
+  const art = lit ?? find(ctx, o.type === 'hq' ? [hqFrame(0)] : stems.map((s) => `prop_${s}`));
   if (art) {
     const def: StaticDef = {
       ...base(o.name, c.x, c.y),

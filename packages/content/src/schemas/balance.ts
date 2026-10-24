@@ -118,6 +118,8 @@ export const BalanceFile = z.strictObject({
   finalNight: Section({
     afterCycle: z.number().int().positive(),
     huntS: Seconds,
+    /** Round 8 (GDD 3.3): the discussion of the trial, the forced meeting after the hunt; longer than any meeting's. */
+    trialS: Seconds,
     killCooldownS: Seconds,
     skipAllowed: z.boolean(),
     tieEjectsNobody: z.boolean(),

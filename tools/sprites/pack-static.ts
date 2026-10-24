@@ -4,7 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { alphaBleed } from './bleed.ts';
+import { alphaBleed, decodePng, encodePng } from './bleed.ts';
 import type { PhaserAnim } from './gen-anims.ts';
 import { FPS, staticFrameNames } from './keys.ts';
 import { finishEnabled } from './palette.ts';
@@ -61,7 +61,10 @@ export function kitFrameNames(): string[] {
   return KIT_FRAMES.flatMap(([k, h]) => [0, 1, 2, 3].map((v) => `${k}/${h}/${v}`)).sort();
 }
 
-/** The boot atlas `props` since round 5 (art plan 3.5-3.7): shared props, spots and the 20 portal frames. */
+/**
+ * The boot atlas `props` since round 5 (art plan 3.5-3.7): shared props, spots and the 20 portal frames, and since
+ * round 8 the four HQ tiers every role station shares (`prop_hq_<tier>`, motion.md 2).
+ */
 export const PROPS_FRAMES: readonly string[] = [
   'portal_boarded_e',
   'portal_boarded_s',
@@ -83,6 +86,10 @@ export const PROPS_FRAMES: readonly string[] = [
   'portal_stairs_e',
   'portal_stairs_s',
   'portal_stairs_sill',
+  'prop_hq_0',
+  'prop_hq_1',
+  'prop_hq_2',
+  'prop_hq_3',
   'prop_kitChest',
   'prop_lanternPost_lit',
   'prop_lanternPost_unlit',
@@ -218,6 +225,34 @@ export const MAP_PROPS_FRAMES: Readonly<Record<string, readonly string[]>> = {
     'prop_tea_table',
     'prop_writing_desk',
     'prop_birdcage',
+    // Mallory's apothecary (and Hollowmere's shop counter, 8C's `counter` kind).
+    'prop_counter',
+    'prop_counter_case',
+    'prop_counter_case_b',
+    'prop_apoth_drawers',
+    'prop_jar_shelf',
+    'prop_jar_shelf_b',
+    'prop_herb_rack',
+    'prop_still',
+    'prop_mortar_table',
+    'prop_show_globe',
+    'prop_leech_jar',
+    'prop_drying_frame',
+    // Crumb's Ovens and its four rooms.
+    'prop_bread_shelf',
+    'prop_bread_shelf_b',
+    'prop_peel_rack',
+    'prop_bread_case',
+    'prop_cooling_rack',
+    'prop_bread_basket',
+    'prop_dough_trough',
+    'prop_shaping_table',
+    'prop_water_bucket',
+    'prop_milk_churn',
+    'prop_cold_shelf',
+    'prop_compressor',
+    'prop_couche_rack',
+    'prop_wall_bulb',
   ],
   props_blackpine: [
     'prop_anvil',
@@ -354,7 +389,8 @@ export async function packCapped(
     const png = raw.get(t.image);
     if (!png) throw new Error(`packer page ${t.image} missing`);
     t.image = `${textureName}-${i}.png`;
-    pages.set(t.image, png);
+    // Re-encoded (lossless): the packer's own PNG writer leaves a quarter of the bytes on the table (8J, round 8).
+    pages.set(t.image, encodePng(decodePng(png)));
     t.frames.sort((a, b) => (a.filename < b.filename ? -1 : 1));
   });
   const packed = textures.reduce((n, t) => n + t.frames.length, 0);

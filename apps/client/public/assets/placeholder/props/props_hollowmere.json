@@ -60,6 +60,31 @@
      }
     },
     {
+     "filename": "prop_apoth_drawers",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_armchair",
      "rotated": false,
      "trimmed": true,
@@ -461,6 +486,106 @@
     },
     {
      "filename": "prop_bottle_shelf_b",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_bread_basket",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_bread_case",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_bread_shelf",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_bread_shelf_b",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -910,6 +1035,181 @@
      }
     },
     {
+     "filename": "prop_cold_shelf",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_compressor",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_cooling_rack",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_couche_rack",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_counter",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_counter_case",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_counter_case_b",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_crepe",
      "rotated": false,
      "trimmed": true,
@@ -1210,6 +1510,31 @@
      }
     },
     {
+     "filename": "prop_dough_trough",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_draped_window",
      "rotated": false,
      "trimmed": true,
@@ -1282,6 +1607,31 @@
      "pivot": {
       "x": 0.5,
       "y": 0.8
+     }
+    },
+    {
+     "filename": "prop_drying_frame",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -1610,6 +1960,31 @@
      }
     },
     {
+     "filename": "prop_herb_rack",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_hymn_board",
      "rotated": false,
      "trimmed": true,
@@ -1636,6 +2011,56 @@
     },
     {
      "filename": "prop_inglenook_e",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_jar_shelf",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_jar_shelf_b",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -1785,6 +2210,31 @@
      }
     },
     {
+     "filename": "prop_leech_jar",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_letter_box",
      "rotated": false,
      "trimmed": true,
@@ -1910,6 +2360,56 @@
      }
     },
     {
+     "filename": "prop_milk_churn",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_mortar_table",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_nightstand",
      "rotated": false,
      "trimmed": true,
@@ -2007,6 +2507,31 @@
      "pivot": {
       "x": 0.5,
       "y": 0.8333
+     }
+    },
+    {
+     "filename": "prop_peel_rack",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
      }
     },
     {
@@ -2710,6 +3235,31 @@
      }
     },
     {
+     "filename": "prop_shaping_table",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_shelf",
      "rotated": false,
      "trimmed": true,
@@ -2736,6 +3286,31 @@
     },
     {
      "filename": "prop_ship_wheel",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_show_globe",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -2811,6 +3386,31 @@
     },
     {
      "filename": "prop_stained_glass_e",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_still",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
@@ -3360,7 +3960,57 @@
      }
     },
     {
+     "filename": "prop_wall_bulb",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "prop_washstand",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 15,
+      "y": 15,
+      "w": 34,
+      "h": 34
+     },
+     "frame": {
+      "x": 148,
+      "y": 436,
+      "w": 34,
+      "h": 34
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_water_bucket",
      "rotated": false,
      "trimmed": true,
      "sourceSize": {
