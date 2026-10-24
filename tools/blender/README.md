@@ -26,7 +26,9 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 | `env/ambience.py` | Fetches the four CC0 OpenGameArt ambient sources and masters `amb_village`, `amb_house`, `amb_forest`, `amb_cave` with ffmpeg (loop, mono, -18 LUFS, 2 s crossfade seam, Vorbis q5); pure Python, no `bpy` |
 | `build_vfx.py` | Animates the four M3 VFX frame by frame at 12 fps (`vfx_blood_pool`, `vfx_blood_splat`, `vfx_vote_stamp`, `vfx_dust_step`) |
 | `palettize.py` | Snaps materials to the 64-colour world palette (OKLab), light and shadow from the ramp neighbours; fails on untextured PBR |
-| `tests/test_rig_common.py` | Unit tests (`pnpm --filter @wdi/blender test`, no Blender needed) |
+| `materials/roles.py`, `materials/polyhaven.lock.json`, `materials/fetch.py`, `materials/nodes.py` | The material library (round 8, art.md 5): 47 roles (`wood_plank`, `plaster`, `cobble`, `iron`, `wool`, the ground roles of both themes, ...) each naming a CC0 Poly Haven slug, its texel density in metres per repeat and the world ramp it is toned toward; the lock pins every diffuse, normal and roughness map at 1k and 2k by md5; `fetch.py` (stdlib) fills the git-ignored cache `tools/blender/.cache/materials/` and refuses a hash mismatch, `fetch.py lock` rebuilds the lock from the API, `fetch.py credits` prints the CREDITS rows; `nodes.py` builds a role's material per style (8-bit and low poly toned and toon-banded at 1k, low poly posterised; HD untoned PBR at 2k) |
+| `materials/hd.py`, `materials/retexture.py` | The HD finish (`--style hd`, art.md 3, DECISIONS A164): EEVEE soft shadows onto a shadow catcher, fast-GI ambient occlusion, the `WDI_Toon` ramp with soft band edges and a `Normal` input, a rim in the lamp colour, the outline hull culled from the shadow pass; every script renders at `rig_common.STYLE_FACTOR` times the display scale and writes `style` and `factor` into its manifest. `retexture.py` (`--textured`, any style) swaps each flat world-ramp material for the ramp's role material (`roles.WORLD_ROLES`, the figures' `FIGURE_ROLES`), tinted to the very colour it replaces, before every render |
+| `tests/test_rig_common.py`, `tests/test_materials.py` | Unit tests (`pnpm --filter @wdi/blender test`, no Blender needed; the art-style switch, the HD constants and the retexture tables too); the material tests run `fetch.py` against a fake server |
 | `tests/make_dummy_char.py` | Builds a capsule character that follows the contract below, for pipeline tests |
 
 ## Commands
@@ -36,6 +38,14 @@ rebuilds `render_rig.blend` from code, and `batch_render.py` builds it in memory
 # apps/client/public/assets/calibration/{calibration_sheet.png,calibration.json} (the JSON stays in display px)
 blender -b --factory-startup -P tools/blender/batch_render.py -- --smoke --out build/calib-raw
 pnpm --filter @wdi/sprites pixel ../../build/calib-raw ../../apps/client/public/assets/calibration
+
+# The material library cache (round 8): every role at the resolution a style reads (1k for 8-bit and low poly, 2k for HD)
+python3 tools/blender/materials/fetch.py --style hd            # or --roles wood_plank,plaster --res 1k
+
+# Any render script in another art style (round 8, art.md 3): `--style hd` renders at twice the display scale with
+# the HD finish (then tools/sprites/hd.ts packs it unhalved), `--textured` swaps flat materials for the library's
+# roles in any style; both go before the script's own flags and work on batch_render.py too.
+EGL_PLATFORM=surfaceless python3 tools/blender/build_kit.py -- --style hd --textured --out build/render-hd
 
 # The rig file, for opening in the UI
 blender -b --factory-startup -P tools/blender/build_rig.py -- --out tools/blender/build/render_rig.blend

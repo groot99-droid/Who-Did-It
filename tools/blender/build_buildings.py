@@ -107,6 +107,10 @@ SLICED_PROPS = {
         "prop_doughMixer": (2, 2, "dough_mixer"),
         "prop_brickOven": (2, 2, "brick_oven"),
         "prop_proofingCabinet": (3, 2, "proofing_cabinet"),
+        # Round 8 (8J, art.md 4.2): St Brannock's pews, four seats wide, facing the altar (north).
+        "prop_pew": (4, 1, "pew"),
+        # Vane Manor's dining table, laid for a dinner nobody ate.
+        "prop_dining_table": (4, 1, "dining_table"),
     },
     "blackpine": {
         "prop_trestle": (3, 2, "trestle"),
@@ -459,7 +463,53 @@ def forge(w, h):
             part("Bellows", T("litter", 1), B(0.3, -h / 2, 0.7, 0.5, 0.4, 0.3))]
 
 
-SLICED_BUILDERS = {"wake_table": wake_table, "cold_shelves": cold_shelves, "dough_mixer": dough_mixer,
+def pew(w, h):
+    """An oak box pew facing north: the seat, a high back on its south side with the hymn shelf for the row
+    behind, carved bench ends, a kneeler, and what the last service left on it."""
+    y_seat, y_back = -h * 0.5, -h + 0.12
+    ends = [B(x, -h / 2, 0.5, 0.08, h - 0.15, 1.0) for x in (0.06, w - 0.06)]
+    return [part("Ends", T("wood", 2), *ends, bevel=0.02),
+            part("Poppies", T("wood", 3), *[C(x, -h / 2, 1.0, 0.06, 0.1, 6, rt=0.02) for x in (0.06, w - 0.06)]),
+            part("Seat", T("wood", 3), B(w / 2, y_seat, 0.45, w - 0.16, 0.42, 0.06)),
+            part("Back", T("wood", 2), B(w / 2, y_back, 0.72, w - 0.16, 0.06, 0.55), bevel=0.01),
+            part("Rail", T("wood", 4), B(w / 2, y_back, 1.0, w - 0.12, 0.09, 0.04)),
+            part("Shelf", T("wood", 3), B(w / 2, y_back - 0.08, 0.82, w - 0.2, 0.12, 0.03)),
+            part("Hymnals", T("blood", 0), *[B(0.5 + 0.7 * k, y_back - 0.08, 0.88, 0.14, 0.09, 0.1) for k in range(5)]),
+            part("Kneeler", T("blood", 1), B(w / 2, -0.15, 0.08, w - 0.3, 0.16, 0.1), bevel=0.02),
+            part("Book", T("ink", 1), B(w * 0.3, y_seat + 0.05, 0.5, 0.16, 0.12, 0.04)),
+            part("Hat", T("ink", 1), C(w * 0.72, y_seat, 0.48, 0.12, 0.02, 10), C(w * 0.72, y_seat, 0.5, 0.07, 0.08, 10))]
+
+
+def dining_table(w, h):
+    """The Vanes' mahogany dining table, laid for eight: a runner, plates and glasses, the candelabrum lit in
+    the middle (its light sits on the second tile), and one chair on the south side pushed back askew."""
+    yc = -h / 2
+    legs = [B(x, y, 0.36, 0.08, 0.08, 0.72) for x in (0.25, w - 0.25) for y in (yc + 0.25, yc - 0.25)]
+    chairs_n = [B(x, yc + 0.42, 0.45, 0.38, 0.06, 0.9) for x in (0.7, 2.0, 3.3)]
+    seats = [B(x, yc + sy * 0.32, 0.44, 0.38, 0.36, 0.05) for x in (0.7, 2.0, 3.3) for sy in (1, -1)]
+    objs = [part("Top", T("wood", 1), B(w / 2, yc, 0.74, w - 0.2, 0.62, 0.05), bevel=0.01),
+            part("Legs", T("wood", 1), *legs),
+            part("Runner", T("bone", 3), B(w / 2, yc, 0.768, w - 0.6, 0.24, 0.005), outline=False),
+            part("Plates", T("bone", 2), *[C(x, yc + sy * 0.2, 0.765, 0.09, 0.015, 10) for x in (0.7, 2.0, 3.3)
+                                          for sy in (1, -1)], C(0.18, yc, 0.765, 0.09, 0.015, 10)),
+            part("Glasses", F("moon", 4), *[C(x + 0.14, yc + sy * 0.2, 0.765, 0.025, 0.1, 6) for x in (0.7, 2.0, 3.3)
+                                           for sy in (1, -1)], outline=False),
+            part("Wine", F("blood", 2), C(2.14, yc - 0.2, 0.765, 0.022, 0.05, 6), outline=False),
+            part("Chairs", T("wood", 2), *chairs_n, *seats),
+            part("Pads", T("blood", 1), *[B(x, yc + sy * 0.32, 0.475, 0.32, 0.3, 0.02) for x in (0.7, 2.0, 3.3)
+                                          for sy in (1, -1)], outline=False),
+            part("Arms", T("brass", 2), C(1.5, yc, 0.77, 0.08, 0.04, 8), C(1.5, yc, 0.81, 0.025, 0.3, 6),
+                 B(1.5, yc, 1.1, 0.4, 0.03, 0.03)),
+            part("Candles", T("bone", 3), *[C(1.5 + dx, yc, 1.12, 0.02, 0.14, 6) for dx in (-0.19, 0, 0.19)]),
+            part("Flames", F("lantern", 3), *[B(1.5 + dx, yc, 1.3, 0.025, 0.025, 0.05) for dx in (-0.19, 0, 0.19)],
+                 outline=False)]
+    askew = part("Pushed", T("wood", 2), B(0, 0, 0.45, 0.38, 0.06, 0.9), B(0, 0.18, 0.44, 0.38, 0.36, 0.05))
+    askew.location = (2.6, yc - 0.62, 0)
+    askew.rotation_euler.z = 0.5
+    return objs + [askew]
+
+
+SLICED_BUILDERS = {"wake_table": wake_table, "pew": pew, "dining_table": dining_table, "cold_shelves": cold_shelves, "dough_mixer": dough_mixer,
                    "brick_oven": brick_oven, "proofing_cabinet": proofing_cabinet, "hanging_oak": hanging_oak, "clamp": clamp, "pump_beam": pump_beam,
                    "trestle": trestle, "mess_table": mess_table, "bunks": bunks, "head_saw": head_saw, "kiln": kiln,
                    "map_table": map_table, "forge": forge}
@@ -509,11 +559,15 @@ def render_pair(scene, objs, w: int, h: int, out_dir: str, name: str) -> dict:
     pivot = (cw / 2, TOP + (w + h) * 16)
     sc.iso_frame(scene, cw, ch, pivot, target=(w / 2, -h / 2, 0.0))
     render_to(scene, os.path.join(out_dir, f"{name}.png"))
-    # The tile map: every slot coded, raw output, no anti-aliasing so no code is blended.
+    # The tile map: every slot coded, raw output, no anti-aliasing so no code is blended. The HD shadow
+    # catcher under the building stays out of it: coded, its plane put the whole frame in tile (0, 0).
     saved = {}
     code = code_material(w, h)
+    hidden = [o for o in scene.objects if o.name in sc.RIG_PLANES and not o.hide_render]
+    for o in hidden:
+        o.hide_render = True
     for o in scene.objects:
-        if o.type == "MESH":
+        if o.type == "MESH" and o.name not in sc.RIG_PLANES:
             saved[o.name] = [s.material for s in o.material_slots]
             for s in o.material_slots:
                 s.material = code
@@ -521,6 +575,8 @@ def render_pair(scene, objs, w: int, h: int, out_dir: str, name: str) -> dict:
     scene.view_settings.view_transform, scene.render.filter_size, scene.eevee.taa_render_samples = "Raw", 0.0, 1
     render_to(scene, os.path.join(out_dir, f"{name}.tiles.png"))
     scene.view_settings.view_transform, scene.render.filter_size, scene.eevee.taa_render_samples = vt, fs, taa
+    for o in hidden:
+        o.hide_render = False
     for o in scene.objects:
         if o.name in saved:
             for s, m in zip(o.material_slots, saved[o.name]):
@@ -545,7 +601,8 @@ def write_manifest(out_dir: str, atlas: str, frames: dict) -> None:
         with open(path) as fh:
             frames = {**json.load(fh)["frames"], **frames}
     with open(path, "w") as fh:
-        json.dump({"version": 1, "atlas": atlas, "frames": frames}, fh, indent=2, sort_keys=True)
+        json.dump({"version": 1, "atlas": atlas, "style": sc.STYLE, "factor": sc.FACTOR, "frames": frames}, fh,
+                  indent=2, sort_keys=True)
         fh.write("\n")
     print(f"{atlas}: {len(frames)} -> {out_dir}")
 
