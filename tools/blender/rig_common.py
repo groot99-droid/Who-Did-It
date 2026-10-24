@@ -73,6 +73,70 @@ FILL_LIGHT = {"azimuth": 45.0, "elevation": 55.0, "strength": 0.6, "color_token"
 AREA_WATTS_PER_SUN_M2 = 3.67
 WORLD_STRENGTH = 0.15
 
+# ---------------------------------------------------------------- art styles (docs/round8/art.md 3, DECISIONS A164)
+
+ART_STYLES = ("8bit", "lowpoly", "hd")
+# Render px per display px. 8-bit and low poly render at the display scale and tools/sprites finishes them to
+# half of it; HD renders at twice the display scale and ships unhalved, so a texel lands on a screen pixel at
+# zoom 2 (the largest of SPRITES 10.9). Metres, cameras, pivots in display px and every key stay the same.
+STYLE_FACTOR = {"8bit": 1, "lowpoly": 1, "hd": 2}
+# The HD finish (materials/hd.py): no pixel finish, so a wider film filter and more samples; the key light casts
+# soft shadows onto a shadow catcher under the subject; EEVEE's fast GI as ambient occlusion; the toon ramp
+# interpolates between its three tones instead of stepping; a rim in the lamp colour on every toon material.
+# The HD shadow catcher's object name (materials/hd.py adds it; a code pass hides it, static_common.RIG_PLANES).
+CATCHER_NAME = "ShadowCatcher"
+HD = {
+    "taaSamples": 32,
+    "filterSize": 1.5,
+    "keyAngleDeg": 3.0,
+    "shadowRays": 4,
+    "shadowSteps": 16,
+    "aoDistance": 1.0,
+    "rimToken": "lantern",
+    "rimAmount": 0.3,
+    # World statics take no rim: its mask is the view-facing angle, which covers a whole roof slope turned from
+    # the camera, so at 0.3 the tavern's back slope rendered lantern tan. The 8-bit world has no rim either.
+    "rimAmountWorld": 0.0,
+    # The catcher's alpha is catcherStrength where the ground is fully shadowed; catcherLit is the luma the toon
+    # ramp sees on unshadowed ground (the measurement above TOON_RAMP_STOPS).
+    "catcherStrength": 0.6,
+    "catcherLit": 0.77,
+    # The catcher stays clear until the luma falls this far below catcherLit: lit ground renders a little under
+    # the measurement (the fast GI, the wider filter), and without the margin every HD frame carried a 4 % ink
+    # haze over its whole cell.
+    "catcherHaze": 0.1,
+    # Half-width of the soft edge on each toon ramp stop; the bump a textured material's diffuse luma makes.
+    "bandSoft": 0.08,
+    "bumpStrength": 0.4,
+    "bumpDistance": 0.05,
+}
+
+
+def style_from_argv(argv: list[str]) -> tuple[str, bool]:
+    """Strip `--style <id>` and `--textured` out of `argv` in place; returns (style, textured).
+
+    Every render script takes the two switches this way, so their own parsers never see them. `--textured` swaps
+    the flat world-palette materials for the material library's roles by ramp (materials/retexture.py).
+    """
+    style, textured = "8bit", False
+    i = 0
+    while i < len(argv):
+        if argv[i] == "--style" and i + 1 < len(argv):
+            style = argv[i + 1]
+            del argv[i : i + 2]
+        elif argv[i].startswith("--style="):
+            style = argv[i].split("=", 1)[1]
+            del argv[i]
+        elif argv[i] == "--textured":
+            textured = True
+            del argv[i]
+        else:
+            i += 1
+    if style not in ART_STYLES:
+        raise ValueError(f"unknown art style {style!r}; the styles are {', '.join(ART_STYLES)}")
+    return style, textured
+
+
 # docs/ASSETS.md 6.1; machine copy in packages/content/data/palette.json.
 PALETTE = {
     "ink": "#12141C",

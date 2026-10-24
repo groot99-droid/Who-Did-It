@@ -8,6 +8,12 @@
 
 - Character cells are **128 px displayed cells, packed at 64 px** (10.3). One tile is 64 px = 1 m
   (`TILE_PX`, `WORLD.md` 4.2). A standing 1.7 m villager is about 100 px tall in the cell.
+- **Proportions (round 8, 8F, A161).** The figure is 1.7 m and about four heads tall (a 0.40 m head on a
+  0.52 m shoulder, wide hands and boots), so the head is a quarter of the figure and reads at 64 px packed. Nothing
+  may rise above the crown by more than about 0.05 m: the 112 px cap (`maxStandingSilhouettePx`, 10.3) leaves
+  four or five rows above a bare head, and a lean away from the camera, a hat brim's far end or a prop behind the
+  figure lifts on screen by half its depth. `tools/blender/probe_cap.py`, the highest projected vertex of every clip, not
+  the render, is the check; the clips take a lean with bent knees for the same reason.
 - Animations play at **12 fps**. The rig renders the source clip with `frame_step` so the output is
   12 fps whatever the clip's scene rate.
 - Height traits are not separate art: the client scales the sprite by the GDD 3.1 factor, anchored at
@@ -1000,7 +1006,8 @@ pass (five clips, 8 directions) on one 1024² body page at a fill of 0.42-0.47 (
 16 clips; the frame plan of A141 (idle 12, walk, run, limp, stagger 8 each, swing, strike, knockdown, getup,
 inspect, eat, rob 6 each, die and interact 8, hurt 3, threaten, cower, stomp, stunned 4 each, fidget 6, down 2) is
 129 frames a direction, 1 032 a pass. At the measured cost that is one 2048² body page and one 1024² overlay
-page a look (1.25), 12.5 for ten looks and a worst-case resident of 14.6 against the cap of 6. Halving the
+page a look (1.25), 12.5 for ten looks and a worst-case resident of 14.6 against the cap of 8 (6 until round 8;
+A141 carries 6Z's ruling and the four-direction plan that fits under it). Halving the
 packed cell's density does not help: 128 px packed cells (A135) quadruple every frame, so even today's five
 clips would need a 2048² body page. The character budget therefore cannot hold the full clip table at any cell
 size without a DECISIONS row; A141 asks 6Z for it and names the fallbacks (one-shots in four directions, fewer

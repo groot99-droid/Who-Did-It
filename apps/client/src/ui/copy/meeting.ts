@@ -13,6 +13,7 @@ export const MEETING_COPY = {
   'meeting.discuss': 'Talk it over',
   'meeting.vote.open': 'Votes are secret until the reveal',
   'meeting.vote.hint': 'Tap a portrait to vote, or Skip',
+  'meeting.vote.wait': 'Votes open in {s} s. Talk it over first',
   'meeting.vote.skip': 'Skip',
   'meeting.vote.mine': 'Your vote: {name}',
   'meeting.vote.mineSkip': 'Your vote: Skip',
