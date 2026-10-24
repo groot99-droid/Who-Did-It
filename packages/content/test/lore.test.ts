@@ -73,7 +73,10 @@ describe('lore.json', () => {
     const max = content.balance.reader.pageMaxChars;
     const errors = broken((c) => {
       const letter = c.lore.shelves['wp.letter_box']!.volumes[0]!;
-      [letter.pages, letter.pageLines] = [['one', 'two'], ['1-1', '2-2']];
+      [letter.pages, letter.pageLines] = [
+        ['one', 'two'],
+        ['1-1', '2-2'],
+      ];
       const ledger = c.lore.shelves['bk.ledger']!.volumes[0]!;
       [ledger.pages, ledger.pageLines] = [['x'.repeat(max + 1)], ['1-1']];
     });
@@ -85,13 +88,18 @@ describe('lore.json', () => {
 
   it('requires one source line range per page, first line no later than the last', () => {
     const errors = broken((c) => {
-      c.lore.shelves['ov.board']!.volumes[0]!.pageLines = ['5-9', '10-12'];
-      c.lore.shelves['bk.ledger']!.volumes[0]!.pageLines = ['9-5'];
+      const clipping = c.lore.shelves['ov.board']!.volumes[0]!;
+      clipping.pageLines = [...clipping.pageLines, '10-12'];
+      const ledger = c.lore.shelves['bk.ledger']!.volumes[0]!;
+      ledger.pageLines = ledger.pageLines.map(() => '9-5');
     });
-    expect([...errors].sort()).toEqual([
-      `lore.json bk.ledger: crumbsDaybook page 1 range 9-5 ends before it starts`,
-      `lore.json ov.board: ${content.lore.shelves['ov.board']!.volumes[0]!.id} has ${content.lore.shelves['ov.board']!.volumes[0]!.pages.length} pages but 2 line ranges`,
-    ]);
+    const clipping = content.lore.shelves['ov.board']!.volumes[0]!;
+    const ledger = content.lore.shelves['bk.ledger']!.volumes[0]!;
+    expect(errors).toContain(
+      `lore.json ov.board: ${clipping.id} has ${clipping.pages.length} pages but ${clipping.pages.length + 1} line ranges`,
+    );
+    expect(errors).toContain('lore.json bk.ledger: crumbsDaybook page 1 range 9-5 ends before it starts');
+    expect(errors).toHaveLength(1 + ledger.pages.length);
     for (const bad of ['', '12', '0-4', '4-', 'a-b', '3-4,7-9']) {
       const v = { ...volume('a', 'clipping'), pageLines: [bad] };
       const file = { gddRef: '3.26', shelves: { 'ov.board': { title: 'B', volumes: [v] } } };
