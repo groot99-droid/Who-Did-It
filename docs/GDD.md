@@ -271,6 +271,7 @@ The section keeps its number so 3.12 to 3.21 keep theirs.
 - **Scope.** NPCs ship in M3c (ROADMAP 7.1) after the first playable, inside the room as entities rather than clients. (M5a) The routines replace the M3c wander, which stays only as the fallback above. NPC seats keep a Notebook only for the clues they collect and do no tasks until M4d; when a human station hold ships, its row in `routines.json` `holds` turns NPC work at those stations into the same hold, with no change to the brain.
 
 - **The hive and the body bands (round 8, A173; 8R and 8S write the detail with their code).** Every NPC seat and figure reads one public blackboard of what anyone there could perceive (3.25). An NPC that sees a body walks to it within `npc.body.pullTiles` (10), shouts for the nearest Detective and Doctor within `npc.body.shoutTiles` (5) and runs for the bell within `npc.body.bellTiles` (2), then reports after `reportDelayS`. NPC seats do their tasks, use their card's abilities, and share what they find on the Case Board and in meeting notes; on hard an NPC shares with a player only after that player gives it a briarberry. This replaces "NPCs never chat" above once 8T lands.
+  - **The blackboard (8R, A176).** Each room keeps one board of the public world, rebuilt every tick. It holds bodies, creatures, clues and figures by the look they draw, the phase and the lobby difficulty, and the noises, shouts and bell heard in the last 10 s (`npc.hive.memoryS`). It never holds a card, a cover, a private view, a vendetta or which seats are NPCs; each NPC reads it only through its own senses, and the auto invariant `hiveNoSecrets` checks every entry.
 
 ### 3.13 Maps and presentation
 
@@ -835,7 +836,7 @@ Session 8E writes this section. The numbers are `balance.json` `moods` and `town
 
 Round 8 addendum B (A173, A174; `docs/round8/living.md`). Sessions 8Q, 8R, 8S, 8T and 8U write this section with their code.
 - **The world index.** Every scene knows its reachable floor, its occupied tiles and a density cap, so nothing spawns in a tree, a wall or off the map (8Q).
-- **The hive.** NPCs share one public blackboard with potential, state and proximity triggers; it never holds a card, a cover or a private view (8R).
+- **The hive.** NPCs share one public blackboard with potential, state and proximity triggers; it never holds a card, a cover or a private view (8R; the detail is 3.12 "The hive and the body bands").
 - **Talk** (8T). NPC lines in meeting notes (3.8) come from templates, or from Claude when the server holds a key, off the tick and logged for replay; one to three a meeting are red herrings, slightly off.
   - **Input.** A line is built only from facts every seat at the table has: the round, the meeting's reason, the caller's and the body's names, the roll-call's missing names and the other living seats' names (`services/talk/facts.ts`). Never a card, a cover, a private view or which seats are NPCs.
   - **Templates.** `services/talk/templates.ts`: questions and remarks that name seats by name and never name a card, a role or a faction. A template whose name has nothing to fill (no body at a bell meeting) is not drawn; the bell question is drawn only at a bell meeting. Each line draws two uniforms from the seat's `talk` stream, whatever is drawn.
