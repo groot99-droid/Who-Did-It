@@ -32,6 +32,45 @@ class FrameNames(unittest.TestCase):
         self.assertEqual(rc.PASSES, ("body", "scarf", "blood"))
 
 
+class Round8Clips(unittest.TestCase):
+    """The clip table of docs/round8/motion.md 1 under 6Z's budget ruling (A141)."""
+
+    def test_names_follow_the_anim_ids(self):
+        # The client's AnimId order (apps/client/src/view/animIds.ts) without `carry` and `hide`, which no look renders.
+        order = ("idle", "walk", "swing", "die", "interact", "strike", "hurt", "knockdown", "down", "getup", "run",
+                 "limp", "stagger", "stunned", "inspect", "threaten", "cower", "fidget", "stomp", "eat", "rob")
+        self.assertEqual(set(rc.R8_CLIPS), set(order))
+        self.assertTrue(set(rc.R8_CLIPS) <= set(rc.ANIMS))
+        self.assertEqual(rc.ANIMS[:8], ("idle", "walk", "run", "interact", "swing", "carry", "die", "hide"))
+
+    def test_v1_clips_keep_their_frames(self):
+        for name, n in rc.V1_CLIPS.items():
+            self.assertEqual((rc.R8_CLIPS[name].frames, rc.R8_CLIPS[name].dirs), (n, rc.DIRECTIONS), name)
+
+    def test_directions_and_lazy_page(self):
+        eight = {"idle", "walk", "swing", "interact", "die", "run", "limp", "stagger", "strike", "hurt"}
+        lazy = {"knockdown", "down", "getup", "rob", "eat", "threaten"}
+        for name, clip in rc.R8_CLIPS.items():
+            self.assertEqual(clip.dirs, rc.DIRECTIONS if name in eight else rc.FOUR_DIRS, name)
+            self.assertEqual(clip.lazy, name in lazy, name)
+        self.assertEqual(rc.FOUR_DIRS, ("ne", "se", "sw", "nw"))
+        self.assertTrue(set(rc.FOUR_DIRS) <= set(rc.DIRECTIONS))
+
+    def test_loops_and_spans(self):
+        loops = {"idle", "walk", "interact", "run", "limp", "stagger", "down", "stunned", "cower", "fidget", "stomp"}
+        for name, clip in rc.R8_CLIPS.items():
+            self.assertEqual(clip.loop, name in loops, name)
+            # 24 fps keys sampled every 2 frames: a loop spans 2n (its last key repeats the first), a one-shot 2(n-1).
+            span = clip.span()
+            self.assertEqual(span, 2 * clip.frames if clip.loop else 2 * (clip.frames - 1), name)
+            self.assertEqual(len(rc.sample_frames(1, 1 + span if clip.loop else 2 + span, 2)), clip.frames, name)
+
+    def test_every_round8_frame_is_valid(self):
+        names = {rc.frame_name("villager", a, d, i)
+                 for a, c in rc.R8_CLIPS.items() for d in c.dirs for i in range(c.frames)}
+        self.assertEqual(len(names), sum(c.frames * len(c.dirs) for c in rc.R8_CLIPS.values()))
+
+
 class Directions(unittest.TestCase):
     def test_order_and_turntable(self):
         # SPRITES 10.3: TT.rotation_euler.z = 45 deg - i * 45 deg; +Y (world north) renders as ne.
@@ -46,7 +85,8 @@ class Directions(unittest.TestCase):
 class IsoCam(unittest.TestCase):
     def test_constants(self):
         self.assertEqual((rc.CAMERA_TILT_DEG, rc.CAMERA_YAW_DEG), (60.0, 45.0))
-        self.assertEqual((rc.CELL_PX, rc.FEET_ROW_PX, rc.CLIP_CELL), (128, 112, {"die": (256, 128)}))
+        self.assertEqual((rc.CELL_PX, rc.FEET_ROW_PX), (128, 112))
+        self.assertEqual(rc.CLIP_CELL, {a: (256, 128) for a in ("die", "knockdown", "down", "getup")})
         self.assertEqual(rc.Z_SCALE, 0.75)
         self.assertEqual(rc.ENV_ROOT_SCALE, (1.0, 1.0, 0.75))
         self.assertEqual(rc.CHAR_ROOT_SCALE, (0.75, 0.75, 0.75))

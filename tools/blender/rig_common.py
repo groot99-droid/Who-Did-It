@@ -14,17 +14,51 @@ import re
 # TT.rotation_euler.z = 45 deg - i * 45 deg under IsoCam.
 DIRECTIONS = ("n", "ne", "e", "se", "s", "sw", "w", "nw")
 
-ANIMS = ("idle", "walk", "run", "interact", "swing", "carry", "die", "hide")
+# Round 8 appends the clips of docs/round8/motion.md 1 (ids in seams.md 2), keeping the old order.
+R8_ANIMS = ("strike", "hurt", "knockdown", "down", "getup", "limp", "stagger", "stunned", "inspect", "threaten",
+            "cower", "fidget", "stomp", "eat", "rob")
+ANIMS = ("idle", "walk", "run", "interact", "swing", "carry", "die", "hide", *R8_ANIMS)
 
 # V1 clips and frame counts (docs/ASSETS.md 6.3, round 5): 38 frames x 8 directions = 304 per pass.
 V1_CLIPS = {"idle": 8, "walk": 8, "swing": 6, "interact": 8, "die": 8}
 
+# The four screen diagonals a 4-direction clip renders (6Z's budget ruling, round 8: one-shots and mood idles in
+# four rendered directions, never mirrored). The client plays the nearest of the four.
+FOUR_DIRS = ("ne", "se", "sw", "nw")
+
+
+class Clip:
+    """A clip's rendered frames, whether it loops, its directions and whether it sits on the lazy second page."""
+
+    def __init__(self, frames: int, loop: bool, dirs: tuple[str, ...] = DIRECTIONS, lazy: bool = False):
+        self.frames, self.loop, self.dirs, self.lazy = frames, loop, dirs, lazy
+
+    def span(self) -> int:
+        """Scene frames from the first key to the last at 24 fps sampled every 2: a loop's last key repeats its
+        first and is not rendered, a one-shot renders its last key."""
+        return 2 * self.frames if self.loop else 2 * (self.frames - 1)
+
+
+# Round 8 clips (motion.md 1, the budget ruling of A141's open column): the V1 five, the gaits and `strike` and
+# `hurt` in eight directions; the one-shots and mood idles in four; the rare clips on a lazy second page. The frame
+# counts are the full plan sent to 6Z with the measured budget; a clip that the budget trims gets fewer frames
+# here and nowhere else, since every key of build_looks.py is placed in normalised time.
+R8_CLIPS: dict[str, Clip] = {
+    "idle": Clip(8, True), "walk": Clip(8, True), "swing": Clip(6, False), "interact": Clip(8, True),
+    "die": Clip(8, False),
+    "run": Clip(8, True), "limp": Clip(8, True), "stagger": Clip(8, True),
+    "strike": Clip(6, False), "hurt": Clip(4, False),
+    "inspect": Clip(6, False, FOUR_DIRS), "cower": Clip(6, True, FOUR_DIRS), "fidget": Clip(6, True, FOUR_DIRS),
+    "stomp": Clip(6, True, FOUR_DIRS), "stunned": Clip(6, True, FOUR_DIRS),
+    "knockdown": Clip(6, False, FOUR_DIRS, lazy=True), "down": Clip(4, True, FOUR_DIRS, lazy=True),
+    "getup": Clip(6, False, FOUR_DIRS, lazy=True), "rob": Clip(6, False, FOUR_DIRS, lazy=True),
+    "eat": Clip(6, False, FOUR_DIRS, lazy=True), "threaten": Clip(6, False, FOUR_DIRS, lazy=True),
+}
+
 # Round 5: hats are nameplate glyphs, so the hat passes are gone (art plan 4.2).
 PASSES = ("body", "scarf", "blood")
 
-FRAME_RE = re.compile(
-    r"^char_(\w+)_(idle|walk|run|interact|swing|carry|die|hide)_(n|ne|e|se|s|sw|w|nw)_(\d{3})$"
-)
+FRAME_RE = re.compile(r"^char_(\w+)_(" + "|".join(ANIMS) + r")_(n|ne|e|se|s|sw|w|nw)_(\d{3})$")
 BODY_RE = re.compile(r"^[a-z][a-z0-9]*$")
 
 CELL_PX = 128
@@ -46,9 +80,10 @@ CHAR_ROOT_SCALE = (Z_SCALE, Z_SCALE, Z_SCALE)
 FEET_ROW_PX = 112
 
 # Clips that need a bigger cell, as (cell px, feet row px). A fallen body reaches about 115 display px
-# to the side of the feet, so die renders 256 px cells with the feet at the centre; the scale stays
+# to the side of the feet, so die and the knockout set (knockdown, down, getup; round 8) render 256 px cells with
+# the feet at the centre; the scale stays
 # the display scale. The packer trims every frame and the per-frame Feet pivot keeps clips registered.
-CLIP_CELL = {"die": (256, 128)}
+CLIP_CELL = {"die": (256, 128), "knockdown": (256, 128), "down": (256, 128), "getup": (256, 128)}
 
 # Inverted-hull outline thickness per asset class, metres (Solidify thickness).
 # -0.022 m at the display scale lands on one art pixel after the 2 x 2 finish (art plan S3.3).

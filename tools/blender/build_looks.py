@@ -5,8 +5,8 @@
 
 Each look is written as `<out>/<lookId>.blend`, a character file under the contract of
 tools/blender/README.md: an `Export` collection, mesh parts tagged `wdi_part` (body, scarf, blood), a
-`Feet` empty at the origin, and one action per clip (`idle`, `walk`, `swing`, `interact`, `die`) at 24 fps,
-which batch_render.py samples to 12 fps. The .blend files are git-ignored masters; the scripts are the
+`Feet` empty at the origin, and one action per clip of rig_common.R8_CLIPS (the V1 five, then the round-8
+clips of docs/round8/motion.md 1) at 24 fps, which batch_render.py samples to 12 fps. The .blend files are git-ignored masters; the scripts are the
 true source. All looks share the base's proportions, the 22-bone armature, the clips and the Feet pivot;
 looks_spec.py names each look's colours, its `interact` base and its costume pieces (look_parts.py).
 
@@ -27,6 +27,7 @@ import bpy
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import look_parts as lp  # noqa: E402
 import looks_spec  # noqa: E402
+import rig_common as rc  # noqa: E402
 from look_parts import box, cylinder, frustum, ring  # noqa: E402
 
 FPS = 24
@@ -204,13 +205,17 @@ def arms(fr: float = 0, fl: float | None = None, er: float = 8, el: float | None
             "forearm.R": (er, 0, 0), "forearm.L": (el, 0, 0)}
 
 
+def _drop(deg: float) -> float:
+    """The root's offset that keeps the soles on the ground under crouch(deg)."""
+    return -(lp.CROTCH - lp.ANKLE) * (1 - math.cos(math.radians(deg)))
+
+
 def crouch(deg: float) -> dict:
     """Knees bent by `deg`: thighs forward, shins back, feet level, and the root dropped so the soles stay on the
     ground (the hip drop of two equal segments bent the same way). A crouch keeps a lean's head height inside
     the cell: a lean away from the camera lifts the crown on screen."""
-    drop = (lp.CROTCH - lp.ANKLE) * (1 - math.cos(math.radians(deg)))
     return {"thigh.R": (deg, 0, 0), "thigh.L": (deg, 0, 0), "shin.R": (-2 * deg, 0, 0), "shin.L": (-2 * deg, 0, 0),
-            "foot.R": (deg, 0, 0), "foot.L": (deg, 0, 0), "root": (0, 0, 0, 0, -drop, 0)}
+            "foot.R": (deg, 0, 0), "foot.L": (deg, 0, 0), "root": (0, 0, 0, 0, _drop(deg), 0)}
 
 
 def interact_keys(base: str, raise_deg: float = 95) -> list[tuple[int, dict]]:
@@ -311,7 +316,237 @@ def make_actions(arm, spec: dict) -> None:
               "forearm.L": (5, 0, 0), "thigh.R": (3, 0, -22), "thigh.L": (3, 0, 22), "head": (0, 20, 0),
               "root": (90, -45, 0, 0, 0.13, 0)}),
     ])
+    make_r8_actions(arm, held_hands(arm))
     arm.animation_data.action = None
+
+
+# The hand each round-8 clip acts with: a look that carries a prop in that hand plays the clip mirrored.
+ACTING = {"strike": "R", "threaten": "R", "inspect": "R", "eat": "R", "hurt": "L"}
+_OTHER = {"R": "L", "L": "R"}
+
+
+def mirror(pose: dict) -> dict:
+    """The pose reflected through the figure's mid plane (x = 0): sides swap, Y and Z rotations and the X offset
+    change sign. Every bone's local X is world X (the module docstring), so this holds for every bone."""
+    out = {}
+    for bone, (rx, ry, rz, *loc) in pose.items():
+        if bone[-2:] in (".R", ".L"):
+            bone = bone[:-1] + _OTHER[bone[-1]]
+        out[bone] = (rx, -ry, -rz, *([-loc[0], loc[1], loc[2]] if loc else []))
+    return out
+
+
+def carry(pose: dict, side: str) -> dict:
+    """The pose with the `side` arm held low, as it carries a prop: a raised or swung hand would lift a bag, a pail
+    or a lantern pole out of the cell (SPRITES 1)."""
+    sign = -1 if side == "R" else 1
+    rx = pose.get(f"upper_arm.{side}", (0,))[0]
+    ex = pose.get(f"forearm.{side}", (8,))[0]
+    return {**pose, f"upper_arm.{side}": (max(-12, min(12, rx)), 0, sign * SPREAD),
+            f"forearm.{side}": (max(0, min(15, ex)), 0, 0)}
+
+
+def held_hands(arm) -> set[str]:
+    """The sides whose hand carries a prop part (look_parts.py binds those to `prop.R` or `prop.L`)."""
+    return {o.parent_bone[-1] for o in arm.children if o.parent_bone in ("prop.R", "prop.L")}
+
+
+def _clip(arm, name: str, keys: list[tuple[float, dict]], held: set[str] = frozenset()) -> None:
+    """An action keyed in normalised time: t in [0, 1] lands on scene frame 1 + t * span, where the span comes
+    from the clip's rendered frame count in rig_common.R8_CLIPS. A loop's t = 1 key repeats its t = 0 key, a
+    one-shot's t = 1 key is its last rendered frame. A clip that the budget trims changes one table row.
+
+    `held` names the hands that carry a prop: the clip is mirrored when it acts with one of them, then every
+    carrying hand is held low."""
+    span = rc.R8_CLIPS[name].span()
+    if ACTING.get(name) in held:
+        keys = [(t, mirror(pose)) for t, pose in keys]
+    for side in held:
+        keys = [(t, carry(pose, side)) for t, pose in keys]
+    _action(arm, name, [(1 + round(t * span), pose) for t, pose in keys])
+
+
+# The downed pose of knockdown, down and getup: on the back, turned to the left like die, one knee up and the
+# arms at the sides, so it reads as alive beside die's spread-eagle.
+DOWN = {"upper_arm.R": (-20, 0, -35), "upper_arm.L": (-15, 0, 35), "forearm.R": (25, 0, 0), "forearm.L": (20, 0, 0),
+        "thigh.R": (8, 0, -8), "thigh.L": (35, 0, 6), "shin.L": (-60, 0, 0), "foot.L": (20, 0, 0),
+        "head": (-8, 12, 0), "root": (90, -45, 0, 0, 0.13, 0)}
+# Fists at the chest: the guard of strike and stomp.
+GUARD = {"upper_arm.R": (35, 0, -8), "upper_arm.L": (35, 0, 8), "forearm.R": (105, 0, 0), "forearm.L": (105, 0, 0)}
+
+
+def make_r8_actions(arm, held: set[str]) -> None:
+    """The round-8 clips (motion.md 1). Gaits loop in eight directions; the one-shots and mood idles render in the
+    four diagonals; the leans stay small and the knees take the weight, as in swing, so a raised hand or a hat
+    keeps inside the cell (SPRITES 1)."""
+    def clip(name: str, keys: list[tuple[float, dict]]) -> None:
+        _clip(arm, name, keys, held)
+
+    # Run: a 0.7 m stride, the trunk leaning in, elbows bent near 70 degrees, the hips dropping at each contact.
+    # The bounce goes down, not up, and the lean stays at 6 degrees: either lifts a hat crown on screen when the
+    # runner faces away (the headroom of SPRITES 1).
+    run = lambda s: {"thigh.R": (s * 30, 0, 0), "thigh.L": (-s * 30, 0, 0),  # noqa: E731
+                     "shin.R": (-10, 0, 0) if s > 0 else (-55, 0, 0), "shin.L": (-55, 0, 0) if s > 0 else (-10, 0, 0),
+                     **arms(-s * 32, s * 32, 70, 70), "spine": (-6, 5 * s, 0), "chest": (-2, 0, 0),
+                     "root": (0, 0, 0, 0, -0.04, 0)}
+    flight = lambda s: {"thigh.R": (-6, 0, 0) if s > 0 else (32, 0, 0),  # noqa: E731
+                        "thigh.L": (32, 0, 0) if s > 0 else (-6, 0, 0),
+                        "shin.R": (-25, 0, 0) if s > 0 else (-90, 0, 0), "shin.L": (-90, 0, 0) if s > 0 else (-25, 0, 0),
+                        **arms(0, 0, 75, 75), "spine": (-6, 0, 0), "chest": (-2, 0, 0), "root": (0, 0, 0, 0, -0.01, 0)}
+    clip("run", [(0, run(1)), (0.25, flight(1)), (0.5, run(-1)), (0.75, flight(-1)), (1, run(1))])
+    # Limp: the right knee stays straight; the hips dip onto it at its stance and hike to swing it through.
+    limp = [
+        (0, {"thigh.R": (14, 0, 0), "thigh.L": (-14, 0, 0), "shin.L": (-10, 0, 0), **arms(-10, 12, 10, 10),
+             "spine": (-4, 0, 0), "root": (0, 0, 0, 0, -0.012, 0)}),
+        (0.25, {"thigh.R": (-2, 0, 0), "thigh.L": (10, 0, 0), "shin.L": (-50, 0, 0), **arms(0, 0, 14, 10),
+                "spine": (-7, 0, -7), "head": (-6, 0, -4), "root": (0, 0, 0, 0.02, -0.035, 0)}),
+        (0.5, {"thigh.R": (-12, 0, 0), "thigh.L": (16, 0, 0), **arms(12, -10, 10, 10), "spine": (-5, 0, -3),
+               "root": (0, 0, 0, 0.01, -0.02, 0)}),
+        (0.75, {"thigh.R": (6, 0, -8), "thigh.L": (0, 0, 0), "shin.L": (-8, 0, 0), **arms(4, 0, 10, 10),
+                "spine": (-3, 0, 5), "root": (0, 0, 0, -0.01, -0.008, 0)}),
+    ]
+    clip("limp", limp + [(1, limp[0][1])])
+    # Stagger: the body sways side to side, the spine rolling against the hips, a foot thrown out to catch it,
+    # the arms loose and lagging.
+    sway = lambda s: {**crouch(18), "root": (0, 0, 0, 0.05 * s, _drop(18), 0), "spine": (-4, 0, -8 * s),  # noqa: E731
+                      "head": (-8, 0, 10 * s),
+                      "upper_arm.R": (-4, 0, -SPREAD - 10 - 8 * s), "upper_arm.L": (-4, 0, SPREAD + 10 - 8 * s),
+                      "forearm.R": (15, 0, 0), "forearm.L": (15, 0, 0),
+                      "thigh.R" if s > 0 else "thigh.L": (10, 0, -10 * s), "shin.R" if s < 0 else "shin.L": (-25, 0, 0)}
+    mid = lambda s: {"spine": (-8, 0, 3 * s), "head": (-12, 0, -4 * s),  # noqa: E731
+                     **arms(8, 8, 25, 25), **crouch(14)}
+    clip("stagger", [(0, sway(1)), (0.25, mid(1)), (0.5, sway(-1)), (0.75, mid(-1)), (1, sway(1))])
+    # Strike: guard up, the right fist drawn back with a chest twist, a straight cross at shoulder height with the
+    # left foot forward, back to guard, then rest. The fist stays below the head.
+    clip("strike", [
+        (0, {**arms()}),
+        (0.2, {**GUARD, "chest": (0, -8, 0), **crouch(6)}),
+        (0.4, {**GUARD, "upper_arm.R": (25, 0, -16), "forearm.R": (120, 0, 0), "chest": (2, -22, 0),
+               "head": (0, 18, 0), **crouch(10)}),
+        (0.6, {**GUARD, "upper_arm.R": (82, 0, 4), "forearm.R": (8, 0, 0), "chest": (-6, 20, 0), "head": (0, -14, 0),
+               "thigh.L": (18, 0, 0), "thigh.R": (-8, 0, 0), "shin.R": (-12, 0, 0)}),
+        (0.8, {**GUARD, "chest": (0, 4, 0), **crouch(6)}),
+        (1, {**arms()}),
+    ])
+    # Hurt: a flinch back from a blow, the left forearm up across the chest, then most of the way back.
+    clip("hurt", [
+        (0, {**arms()}),
+        (1 / 3, {**arms(-6, 30, 25, 95), "spine": (4, 0, 4), "head": (6, 0, 8), **crouch(14),
+                 "root": (0, 0, 0, 0, _drop(14), 0.03)}),
+        (2 / 3, {**arms(-2, 12, 15, 40), "spine": (3, 0, 2), "head": (4, 0, 3), **crouch(5)}),
+        (1, {**arms()}),
+    ])
+    # Knockdown: the knees buckle and the body falls back and to the left, as die does, landing in DOWN.
+    clip("knockdown", [
+        (0, {**arms()}),
+        (0.2, {**arms(-20, -20, 30, 30), "chest": (10, 0, 0), "head": (12, 0, 0),
+               "thigh.R": (22, 0, 0), "thigh.L": (22, 0, 0), "shin.R": (-38, 0, 0), "shin.L": (-38, 0, 0),
+               "root": (0, 0, 0, 0, -0.07, 0)}),
+        (0.4, {**arms(-45, -45, 20, 20), "chest": (12, 0, 0), "head": (16, 0, 0),
+               "thigh.R": (35, 0, 0), "thigh.L": (32, 0, 0), "shin.R": (-50, 0, 0), "shin.L": (-55, 0, 0),
+               "root": (30, -20, 0, 0, -0.10, 0)}),
+        (0.6, {**arms(-80, -80, 10, 10), "chest": (5, 0, 0), "head": (10, 0, 0),
+               "thigh.R": (25, 0, 0), "thigh.L": (30, 0, 0), "shin.R": (-25, 0, 0), "shin.L": (-45, 0, 0),
+               "root": (65, -38, 0, 0, 0.03, 0)}),
+        (0.8, {**DOWN, "upper_arm.R": (-50, 0, -30), "upper_arm.L": (-45, 0, 30), "head": (4, 6, 0),
+               "root": (86, -44, 0, 0, 0.12, 0)}),
+        (1, DOWN),
+    ])
+    # Down: lying in DOWN, breathing; the raised knee rocks and the head turns a little.
+    clip("down", [
+        (0, DOWN),
+        (0.25, {**DOWN, "chest": (-4, 0, 0), "thigh.L": (32, 0, 9), "head": (-8, 16, 0)}),
+        (0.5, {**DOWN, "chest": (-1, 0, 0), "forearm.R": (35, 0, 0)}),
+        (0.75, {**DOWN, "chest": (-4, 0, 0), "thigh.L": (37, 0, 3), "head": (-8, 8, 0)}),
+        (1, DOWN),
+    ])
+    # Getup: from DOWN the trunk rises on the arms to a sit, rolls forward onto the right knee, pushes up on the
+    # left knee to a crouch and stands.
+    clip("getup", [
+        (0, DOWN),
+        (0.2, {"upper_arm.R": (-45, 0, -25), "upper_arm.L": (-45, 0, 25), "forearm.R": (20, 0, 0),
+               "forearm.L": (20, 0, 0), "thigh.R": (20, 0, -6), "thigh.L": (45, 0, 6), "shin.R": (-30, 0, 0),
+               "shin.L": (-80, 0, 0), "head": (-15, 6, 0), "root": (55, -32, 0, 0, 0.10, 0)}),
+        (0.4, {"upper_arm.R": (-35, 0, -20), "upper_arm.L": (-35, 0, 20), "forearm.R": (10, 0, 0),
+               "forearm.L": (10, 0, 0), "thigh.R": (75, 0, -4), "thigh.L": (85, 0, 4), "shin.R": (-95, 0, 0),
+               "shin.L": (-120, 0, 0), "spine": (-18, 0, 0), "head": (-8, 0, 0),
+               "root": (0, -18, 0, 0, -(lp.CROTCH - 0.14), 0)}),
+        (0.6, {"root": (0, -6, 0, 0, -0.14, 0.08), "spine": (-22, 0, 0), "chest": (-6, 0, 0), "head": (-6, 0, 0),
+               "thigh.L": (45, 0, 0), "shin.L": (-68, 0, 0), "thigh.R": (20, 0, 0), "shin.R": (-65, 0, 0),
+               "foot.R": (30, 0, 0), "upper_arm.L": (40, 0, 5), "forearm.L": (45, 0, 0),
+               "upper_arm.R": (20, 0, -SPREAD), "forearm.R": (20, 0, 0)}),
+        (0.8, {**arms(10, 25, 15, 40), "spine": (-12, 0, 0), "head": (-4, 0, 0), **crouch(25)}),
+        (1, {**arms()}),
+    ])
+    # Stunned: a slow, flattened circle of the hips with the head lolling against it, the knees soft, the arms
+    # hanging. The circle is mostly sideways: a drift away from the camera lifts the figure on screen.
+    def daze(a: float) -> dict:
+        c, s = math.cos(a), math.sin(a)
+        return {"spine": (-4 + 3 * s, 0, -5 * c), "head": (-12 + 5 * s, 0, 11 * c), "neck": (-4, 0, 4 * c),
+                **arms(-3, -3, 6, 6), **crouch(12), "root": (0, 0, 0, 0.03 * c, _drop(12), 0.012 * s)}
+    clip("stunned", [(i / 3, daze(2 * math.pi * i / 3)) for i in range(4)])
+    # Inspect: a lean in on bent knees, the right hand shading the brow, a look left and right, back.
+    brow = {**crouch(8), "upper_arm.R": (68, 0, 6), "forearm.R": (118, 0, 0), "spine": (-7, 0, 0),
+            "chest": (-4, 0, 0), "upper_arm.L": (0, 0, SPREAD), "forearm.L": (10, 0, 0)}
+    clip("inspect", [
+        (0, {**arms()}),
+        (0.2, {**brow, "upper_arm.R": (40, 0, 0), "forearm.R": (80, 0, 0), "head": (-8, 0, 0)}),
+        (0.4, {**brow, "head": (-10, 0, 0)}),
+        (0.6, {**brow, "head": (-10, 16, 0), "neck": (0, 6, 0)}),
+        (0.8, {**brow, "head": (-10, -16, 0), "neck": (0, -6, 0)}),
+        (1, {**arms()}),
+    ])
+    # Cower: a deep crouch, the head down, both forearms crossed before the face, shivering.
+    def shiver(s: float) -> dict:
+        return {**crouch(30), "spine": (-20, 0, 2 * s), "chest": (-8, 0, 0), "head": (-22, 0, -3 * s),
+                "upper_arm.R": (62, 0, 22), "upper_arm.L": (66, 0, -22), "forearm.R": (112, 0, 0),
+                "forearm.L": (108, 0, 0), "root": (0, 0, 0, 0.006 * s, _drop(30), 0)}
+    clip("cower", [(0, shiver(1)), (1 / 3, shiver(-1)), (2 / 3, shiver(0.4)), (1, shiver(1))])
+    # Fidget: the weight shifts from foot to foot while the hands rub together at the waist.
+    def fidget(s: float, r: float) -> dict:
+        return {"root": (0, 0, 0, 0.02 * s, -0.004, 0), "hips": (0, 0, 3 * s), "spine": (-2, 0, -4 * s),
+                "head": (-6, 4 * s, 2 * s), "upper_arm.R": (24, 0, 12), "upper_arm.L": (24, 0, -12),
+                "forearm.R": (78 + 6 * r, 0, 0), "forearm.L": (78 - 6 * r, 0, 0),
+                "thigh.R" if s < 0 else "thigh.L": (6, 0, 0), "shin.R" if s < 0 else "shin.L": (-12, 0, 0)}
+    clip("fidget", [(0, fidget(1, 1)), (1 / 3, fidget(0, -1)), (2 / 3, fidget(-1, 1)), (1, fidget(1, 1))])
+    # Stomp: fists clenched low, the right knee lifts and stamps, then the left.
+    fists = {"upper_arm.R": (8, 0, -14), "upper_arm.L": (8, 0, 14), "forearm.R": (40, 0, 0), "forearm.L": (40, 0, 0)}
+    lift = lambda side: {**fists, f"thigh.{side}": (55, 0, 0), f"shin.{side}": (-75, 0, 0),  # noqa: E731
+                         "spine": (2, 0, 0), "head": (-4, 0, 0), "root": (0, 0, 0, 0, 0.0, 0)}
+    stamp = {**fists, **crouch(8), "chest": (-7, 0, 0), "head": (-10, 0, 0)}
+    clip("stomp", [(0, stamp), (1 / 6, lift("R")), (2 / 6, stamp), (3 / 6, {**fists, **crouch(3)}),
+                         (4 / 6, lift("L")), (5 / 6, stamp), (1, stamp)])
+    # Eat: the right hand to the mouth, the head chewing, the hand down again.
+    mouth = {"upper_arm.R": (32, 0, 12), "forearm.R": (132, 0, 0), "upper_arm.L": (0, 0, SPREAD),
+             "forearm.L": (12, 0, 0)}
+    clip("eat", [
+        (0, {**arms()}),
+        (0.2, {**mouth, "head": (-6, 0, 0)}),
+        (0.4, {**mouth, "head": (-12, 0, 2), "forearm.R": (120, 0, 0)}),
+        (0.6, {**mouth, "head": (-4, 0, -2), "forearm.R": (110, 0, 0)}),
+        (0.8, {**mouth, "head": (-10, 0, 0), "forearm.R": (60, 0, 0), "upper_arm.R": (15, 0, 4)}),
+        (1, {**arms()}),
+    ])
+    # Threaten: a step in on the left foot, the right fist at the chest, the left hand pointing and jabbing.
+    point = lambda jab: {"upper_arm.R": (22, 0, -6), "forearm.R": (118, 0, 0),  # noqa: E731
+                         "upper_arm.L": (70 + 8 * jab, 0, 4), "forearm.L": (8 - 6 * jab, 0, 0),
+                         "chest": (-5 - 3 * jab, -10, 0), "head": (-6, 10, 0), "thigh.L": (16, 0, 0),
+                         "thigh.R": (-8, 0, 0), "shin.R": (-8, 0, 0)}
+    clip("threaten", [(0, {**arms()}), (0.2, {**point(0), "upper_arm.L": (40, 0, 4), "forearm.L": (60, 0, 0)}),
+                            (0.4, point(1)), (0.6, point(0)), (0.8, point(1)), (1, {**arms()})])
+    # Rob: a deep stoop over the body on the ground, the hands rummaging low, one stashing at the chest, back up.
+    # A stoop rather than interact's kneel: a long robe kneeling reaches the cell's bottom edge.
+    stoop = lambda t: {**crouch(34), "spine": (-24, 0, 0), "chest": (-8, 0, 0), "head": (-14, 0, 0),  # noqa: E731
+                       "upper_arm.R": (42 + 8 * t, 0, -6), "upper_arm.L": (40 - 8 * t, 0, 6),
+                       "forearm.R": (30 - 10 * t, 0, 0), "forearm.L": (30 + 10 * t, 0, 0)}
+    clip("rob", [
+        (0, {**arms()}),
+        (0.2, {**arms(20, 20, 30, 30), "spine": (-12, 0, 0), **crouch(20)}),
+        (0.4, stoop(1)),
+        (0.6, stoop(-1)),
+        (0.8, {**stoop(0), "upper_arm.R": (28, 0, -2), "forearm.R": (118, 0, 0), "head": (-6, 14, 0)}),
+        (1, {**arms()}),
+    ])
 
 
 # ---------------------------------------------------------------- build
