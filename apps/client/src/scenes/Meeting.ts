@@ -4,6 +4,8 @@ import { type MeetingFeed, REG_MEETING } from '../net/meeting';
 import { REG_WORLD, type WorldFeed } from '../net/world';
 import { NotebookPanel } from '../view/NotebookPanel';
 import { mountMeeting, type MeetingScreen } from '../ui/Meeting';
+import { NOTES_COPY } from '../ui/copy/notes';
+import { mountMeetingNotes } from '../ui/meetingNotes';
 import { overlayRoot } from '../ui/dom';
 import { mountMatchArtSwitch } from '../ui/artStyle/ArtStyleSwitch';
 import { drawPortrait } from '../ui/portrait';
@@ -43,6 +45,8 @@ export class Meeting extends Phaser.Scene {
     // The Notebook tab shows this player's own entries from the world feed (M | N seam, A38).
     const world = this.registry.get(REG_WORLD) as WorldFeed | undefined;
     if (world) this.screen.addTab('notebook', 'Notebook', (panel) => new NotebookPanel(panel, world));
+    // Round 8, 8T (GDD 3.8): the meeting notes, which carry no speaker.
+    this.screen.addTab('notes', NOTES_COPY['meeting.tab.notes'], (panel) => mountMeetingNotes(panel, feed));
     const refresh = () => this.screen?.update();
     // The stamp lands with the reveal: one sound for an ejection or any turned-out seat (silent until the
     // audio manifest lists `stamp`, and when the World scene has not published its bus).

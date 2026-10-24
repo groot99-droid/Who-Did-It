@@ -1,6 +1,6 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { type LoadedEntry, changedEntries, mergeStyleManifest } from './manifestRules';
+import { type LoadedEntry, changedEntries, entryTexels, mergeStyleManifest } from './manifestRules';
 
 const base = {
   entries: [
@@ -81,6 +81,38 @@ describe('mergeStyleManifest', () => {
     expect(byKey(merged, 'anims_a')?.filter).toBeUndefined();
   });
 
+  it("gives a style texture the manifest's texel factor unless it names one, and never to an animation (A164)", () => {
+    const merged = mergeStyleManifest(
+      base,
+      {
+        texels: 2,
+        entries: [
+          { key: 'char_a', type: 'multiatlas', url: 'c.json', texels: 4 },
+          { key: 'tiles_grass', type: 'image', url: 'g.png' },
+          { key: 'anims_a', type: 'animation', url: 'a.json', texels: 4 },
+        ],
+      },
+      ROOT,
+      'linear',
+    );
+    expect(entryTexels(byKey(merged, 'char_a')!)).toBe(4);
+    expect(entryTexels(byKey(merged, 'tiles_grass')!)).toBe(2);
+    expect(byKey(merged, 'anims_a')?.texels).toBeUndefined();
+    // The 8-bit entry a style lacks keeps the 8-bit frame size.
+    expect(entryTexels(byKey(merged, 'iso_ground_harbour')!)).toBe(1);
+  });
+
+  it('reads a texel factor of 1 from a style without one, and ignores a factor that is not a whole number', () => {
+    const merged = mergeStyleManifest(
+      base,
+      { entries: [{ key: 'tiles_grass', type: 'image', url: 'g.png', texels: 1.5 }] },
+      ROOT,
+      'linear',
+    );
+    expect(entryTexels(byKey(merged, 'tiles_grass')!)).toBe(1);
+    expect(entryTexels({ key: 'k', type: 'image', url: 'k.png' })).toBe(1);
+  });
+
   it('adds a key only the style has', () => {
     const merged = mergeStyleManifest(
       base,
@@ -132,5 +164,18 @@ describe('the shipped manifests', () => {
     const keys = merged.entries.map((x) => x.key);
     for (const x of under.entries) expect(keys).toContain(x.key);
     expect(merged.entries.filter((x) => x.root === 'l/')).toHaveLength(style.entries.length);
+  });
+
+  it('give every HD entry an 8-bit key and a whole texel factor above 1, once the HD set ships', () => {
+    const url = new URL('../../public/assets/hd/manifest.json', import.meta.url);
+    if (!existsSync(url)) return;
+    const under = { root: '8/', ...read('../../public/assets/manifest.json') };
+    const style = read('../../public/assets/hd/manifest.json');
+    const keys = new Set(under.entries.map((x) => x.key));
+    for (const x of style.entries) expect(keys).toContain(x.key);
+    const merged = mergeStyleManifest(under, style, 'h/', 'linear');
+    for (const x of merged.entries.filter((y) => y.root === 'h/' && y.type !== 'animation')) {
+      expect(entryTexels(x)).toBeGreaterThan(1);
+    }
   });
 });
