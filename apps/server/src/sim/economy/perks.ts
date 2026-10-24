@@ -4,7 +4,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 /**
  * The HQ perks (round 8, GDD 3.23), Session 8D. A station's bought tiers give their perks to every seat walking in
  * the station's look (A131's rule: the look, never the card), so the reads take the seat's public look. Tiers are
- * public: they live in `tiersOf` (mirrored to `GameState.hq` once its row lands) and every tier up to the bought one
+ * public: they live in `tiersOf` (mirrored to `GameState.hq` by `hq.ts`) and every tier up to the bought one
  * applies.
  */
 
