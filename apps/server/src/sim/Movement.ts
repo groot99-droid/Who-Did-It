@@ -5,6 +5,7 @@ import { AnimId, FOOT_HALF_PX, INPUT_STALE_TICKS, StatusBit } from './constants'
 import { moodIdleOf } from './npc/needs';
 import { type MoveInput, type PlayerSim, simOf } from './RoomSim';
 import { isWorldPhase, navGrid, sceneKey } from './World';
+import { bodySpeedPxPerTick, overlayBody } from './body/run';
 
 const PX_PER_TICK = (tilesPerS: number): number => (tilesPerS * TILE_PX) / TICK_RATE;
 
@@ -57,7 +58,7 @@ export function applyInputs(room: PartyRoom): void {
       continue;
     }
     if (tick < p.busyUntilTick) continue;
-    const speed = speedPxPerTick(p.input.sprint, p.input.sneak);
+    const speed = bodySpeedPxPerTick(room, sessionId, p.input); // round 8, 8A: the effects' factors (GDD 3.22)
     p.vx = p.input.dx * speed;
     p.vy = p.input.dy * speed;
     const player = room.state.players.get(sessionId);
@@ -99,6 +100,7 @@ export function moveAndCollide(room: PartyRoom): void {
     }
     p.pushRing();
     publishPresence(player.presence, p, p.x !== x0 || p.y !== y0, tick);
+    overlayBody(room, sessionId, player.presence); // round 8, 8A: the effects' bits and clips (GDD 3.22)
   }
 }
 

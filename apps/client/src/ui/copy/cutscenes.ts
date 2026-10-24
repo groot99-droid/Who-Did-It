@@ -29,6 +29,10 @@ export const CUTSCENE_COPY = {
   'cs.deathShot.line': 'One shot, and the whole square goes quiet.',
   'cs.deathEjected.line': 'The town has spoken.',
   'cs.deathWolf.line': 'The pines were not empty.',
+  // Round 8 (8A, GDD 3.22): the body's deaths
+  'cs.deathCreature.line': 'Small teeth, and too many of them.',
+  'cs.deathBled.line': 'You pressed the wound. The cold pressed harder.',
+  'cs.deathSickened.line': 'The fever took what the cup had left.',
 
   // 14.30 The Vicar's memorial (round 7, 7I): played to every seat at the reveal after the Vicar falls to the Knife
   'cs.memorial.vicar': 'In memory of the Vicar of HollowMere, who fell to the Knife.',

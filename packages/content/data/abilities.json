@@ -141,9 +141,9 @@
       "castS": 0,
       "rangeTiles": 1.5,
       "consumes": "salts",
-      "effect": "Cures Wounded or Snared.",
+      "effect": "Cures Slowed and Poisoned.",
       "ships": "V1",
-      "gddRef": "3.2"
+      "gddRef": "3.22"
     },
     "lockUnlock": {
       "id": "lockUnlock",
@@ -200,10 +200,9 @@
       "castS": 0,
       "rangeTiles": 5,
       "requires": "slingshot",
-      "params": { "stunS": 1 },
-      "effect": "Stuns a player briefly.",
+      "effect": "A small hit from range that Stuns (balance.json body.damage.slingshot); at zero health the target is knocked out.",
       "ships": "V1",
-      "gddRef": "3.2"
+      "gddRef": "3.22"
     },
     "tasks": {
       "id": "tasks",
@@ -398,10 +397,9 @@
       "castS": 0,
       "rangeTiles": 1.5,
       "consumes": "medkit",
-      "params": { "hp": 1 },
-      "effect": "Heals 1 HP.",
+      "effect": "Restores body.healHp health and stops Bleeding; self or a seat in reach.",
       "ships": "V1",
-      "gddRef": "3.5"
+      "gddRef": "3.22"
     },
     "light": {
       "id": "light",
@@ -573,6 +571,45 @@
       "effect": "When you are killed, poisoned or ejected you may pick one living seat within the aim time, before you learn any role; it dies too. Accepted only while you aim. Not self.",
       "ships": "V1",
       "gddRef": "3.2"
+    },
+    "strike": {
+      "id": "strike",
+      "name": "Strike",
+      "scope": "universal",
+      "kind": "active",
+      "target": "player",
+      "cooldownS": 2,
+      "castS": 0,
+      "rangeTiles": 1.2,
+      "effect": "Fists, every card, every world phase: a small hit that costs stamina (balance.json body.strikeStamina, body.damage.strike). At zero health the target is knocked out, never killed. Public: the swing plays for everyone in sight; no clue unless blood is drawn.",
+      "ships": "V1",
+      "gddRef": "3.22"
+    },
+    "antidote": {
+      "id": "antidote",
+      "name": "Antidote",
+      "scope": "universal",
+      "kind": "active",
+      "target": "player",
+      "cooldownS": 10,
+      "castS": 0,
+      "rangeTiles": 1.5,
+      "requires": "remedy",
+      "effect": "The Remedy by day, whoever holds it (the Herbalist's, kept): cures Poisoned on a seat in reach.",
+      "ships": "V1",
+      "gddRef": "3.22"
+    },
+    "eat": {
+      "id": "eat",
+      "name": "Eat",
+      "scope": "item",
+      "kind": "active",
+      "target": "self",
+      "castS": 0,
+      "consumes": "wakeLoaf",
+      "effect": "Eats a food item: cures Famished and Weakened; a Wake Loaf also restores stamina to full.",
+      "ships": "V1",
+      "gddRef": "3.22"
     }
   }
 }

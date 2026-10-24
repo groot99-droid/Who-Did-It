@@ -16,19 +16,25 @@ import { matchEvents } from './log';
  */
 export type Invariant = (room: PartyRoom) => InvariantFailure | null;
 
-const registry = new Map<string, Invariant>();
+// round 8, 8A: a hoisted function, not a module `const`, so a check on this module's own import path (the body's,
+// through `AdminView` and the handlers) can register while this module is still loading.
+function registry(): Map<string, Invariant> {
+  const self = registry as typeof registry & { map?: Map<string, Invariant> };
+  return (self.map ??= new Map());
+}
 
 export function registerInvariant(name: string, fn: Invariant): void {
-  registry.set(name, fn);
+  registry().set(name, fn); // round 8, 8A
 }
 
 export function registeredInvariants(): readonly string[] {
-  return [...registry.keys()];
+  return [...registry().keys()]; // round 8, 8A
 }
 
 export function runInvariants(room: PartyRoom): InvariantFailure[] {
   const failures: InvariantFailure[] = [];
-  for (const [name, fn] of registry) {
+  for (const [name, fn] of registry()) {
+    // round 8, 8A
     const failure = fn(room);
     if (failure) failures.push({ ...failure, name });
   }

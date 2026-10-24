@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Charmed: a four-leaf clover, the well's one silent save (8A; a stand-in until 8N draws its own). -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <linearGradient id="g1" data-flat="#26361F" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3A5A33"/><stop offset="1" stop-color="#26361F"/></linearGradient>
+  <linearGradient id="g2" data-flat="#5FC266" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A8F09A"/><stop offset="1" stop-color="#5FC266"/></linearGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<path d="M24,26 Q27,34 33,40" fill="none" stroke="#12141C" stroke-width="2" stroke-linecap="round"/>
+<circle cx="24" cy="15" r="7" fill="url(#g2)" stroke="#12141C" stroke-width="2"/>
+<circle cx="33" cy="22" r="7" fill="url(#g2)" stroke="#12141C" stroke-width="2"/>
+<circle cx="15" cy="22" r="7" fill="url(#g2)" stroke="#12141C" stroke-width="2"/>
+<circle cx="24" cy="29" r="7" fill="url(#g2)" stroke="#12141C" stroke-width="2"/>
+<circle cx="24" cy="22" r="3" fill="url(#g1)" stroke="#12141C" stroke-width="2"/>
+<ellipse class="hd" cx="21.5" cy="12.5" rx="2" ry="1.2" fill="#FFF1DC" opacity="0.7"/>
+<ellipse class="hd" cx="12.5" cy="19.5" rx="2" ry="1.2" fill="#FFF1DC" opacity="0.7"/>
+</svg>

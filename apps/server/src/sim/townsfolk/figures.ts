@@ -2,23 +2,17 @@ import {
   type SceneId,
   type TownsfolkRow,
   balance,
+  mobs,
   profileFor,
   routines,
   scenes,
   type Profile,
 } from '@wdi/content';
-import {
-  Avatar,
-  type AvatarState,
-  MAX_PLAYERS,
-  MIN_PLAYERS_TO_START,
-  type Rng,
-  TICK_RATE,
-  TILE_PX,
-} from '@wdi/shared';
+import { Avatar, type AvatarState, MAX_PLAYERS, MIN_PLAYERS_TO_START, type Rng, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { avatarMemory, newHandle } from '../Avatars';
 import { spawnBody } from '../Bodies';
+import { ensureBody, removeBody } from '../body/state';
 import { AnimId } from '../constants';
 import { emitSim } from '../events/bus';
 import { hubOf, mapIdOfRoom, mapScenesOf, startSpawnsOf } from '../MapSites';
@@ -71,8 +65,6 @@ export interface Figure {
   stations: readonly Station[];
   nextStation: number;
   act: FigureAct | null;
-  hp: number;
-  hurtAtTick: number;
   dead: boolean;
   /** Mid-mugging (`mug.ts`): the `threaten` clip while it stands over its target. */
   threatening: boolean;
@@ -252,8 +244,6 @@ function makeFigure(
     stations: [],
     nextStation: 0,
     act: null,
-    hp: balance.health.maxHp,
-    hurtAtTick: -1,
     dead: false,
     threatening: false,
   };
@@ -303,6 +293,7 @@ function makeFigure(
     }
   }
   memory.figures.set(id, f);
+  ensureBody(room, id, true); // its health lives in the body (GDD 3.22): no stamina, regained like a seat's
   bindFigureNeeds(room, id, brain);
   rehandleFigure(room, f);
 }
@@ -375,19 +366,17 @@ export function publishFigure(room: PartyRoom, f: Figure): void {
 }
 
 /**
- * A creature's attack lands on a living figure (the `mobs/hurt.ts` rule: `health.wolfDamage` off `health.maxHp`,
- * regained like a seat's); returns whether it killed. Only a creature that `kills` can take a figure to zero.
+ * A creature's attack lands on a living figure: the wolf's `mobs.json` damage off its body's health, which
+ * `body/run.ts` regains like a seat's (GDD 3.22). Returns whether it killed. Only a creature that `kills` can take
+ * a figure to zero; any other leaves it at one.
  */
 export function hurtFigure(room: PartyRoom, id: string, kills: boolean): boolean {
   const f = townsfolkMemory(room).figures.get(id);
   if (!f || f.dead) return false;
-  const h = balance.health;
-  const every = Math.max(1, Math.round(h.regenEveryS * TICK_RATE));
-  const regained = f.hurtAtTick < 0 ? 0 : Math.floor((room.state.tick - f.hurtAtTick) / every) * h.regenHp;
-  const hp = Math.max(kills ? 0 : 1, Math.min(h.maxHp, f.hp + regained) - h.wolfDamage);
-  f.hp = hp;
-  f.hurtAtTick = room.state.tick;
-  if (hp > 0) return false;
+  const body = ensureBody(room, id, true);
+  body.hp = Math.max(kills ? 0 : 1, body.hp - mobs.mobs.wolf!.dmg);
+  body.lastHurtTick = room.state.tick;
+  if (body.hp > 0) return false;
   killFigure(room, f);
   return true;
 }
@@ -403,6 +392,7 @@ function killFigure(room: PartyRoom, f: Figure): void {
   f.moving = false;
   dropHandle(room, f);
   bindFigureNeeds(room, f.id, null);
+  removeBody(room, f.id);
   const sceneId = sceneKey(f.sceneIdx);
   spawnBody(room, sceneId, f.id, Math.floor(f.x / TILE_PX), Math.floor(f.y / TILE_PX));
   const bodyId = `body_${f.id}`;
@@ -440,6 +430,7 @@ export function clearTownsfolk(room: PartyRoom): void {
   for (const f of memory.figures.values()) {
     dropHandle(room, f);
     bindFigureNeeds(room, f.id, null);
+    removeBody(room, f.id);
   }
   for (const { bodyId, scene } of memory.lost) room.state.scenes.get(scene)?.bodies.delete(bodyId);
   memory.figures.clear();

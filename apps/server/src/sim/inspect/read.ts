@@ -48,9 +48,9 @@ export function signsOf(avatar: AvatarState, player: PlayerState | undefined): s
 
 export const lightOf = (avatar: AvatarState): boolean => (avatar.statusBits & LANTERN_BIT) !== 0;
 
-/** The seat's health as a fraction of its whole; one line to change when 8A's body lands. */
+/** The seat's health as a fraction of its whole (8A's body, `balance.body`: the line 8B left to change). */
 function healthFraction(room: PartyRoom, seat: string): number {
-  return hpOf(room, seat) / Math.max(1, balance.health.maxHp);
+  return hpOf(room, seat) / Math.max(1, balance.body.maxHp);
 }
 
 export function healthBand(room: PartyRoom, seat: string): InspectHealth {
