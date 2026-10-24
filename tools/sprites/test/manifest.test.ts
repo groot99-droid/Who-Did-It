@@ -1,9 +1,10 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { artStyles, finishEnabled } from '../palette.ts';
+import { artStyles, defaultArtStyle, finishEnabled } from '../palette.ts';
 import { villagerLooks } from '../placeholder-chars.ts';
 import { LEGACY } from './legacy.ts';
+import { hasManifest } from './realAssets.ts';
 
 const ASSETS = join(import.meta.dirname, '../../../apps/client/public/assets');
 
@@ -30,6 +31,18 @@ const familyKeys = (id: string) => [`char_${id}`, `ovl_${id}`, `anims_${id}`];
 const FAMILY_KEYS = FAMILY.flatMap(familyKeys);
 /** World textures whose filter follows style.json `pixelFinish.enabled.main` (SPRITES 5, 10.3). */
 const WORLD_PREFIXES = ['iso_ground_', 'iso_kit_', 'bld_', 'props', 'char_', 'ovl_', 'vfx'];
+/**
+ * The styles whose manifest lists characters. The guard keys on the manifest, never on the style id: a style still
+ * rendering its characters (HD, A164) has no manifest or one without a `char_` key and falls back per key (A80), and
+ * the full checks apply the moment its manifest lists them. `skips only a style still rendering` below keeps the
+ * guard from hiding a style that should ship.
+ */
+const shippedStyles = () =>
+  artStyles().filter(
+    (s) =>
+      hasManifest(s.root) &&
+      read(join(s.root, 'manifest.json')).entries.some((e) => e.key.startsWith('char_')),
+  );
 
 describe('asset manifests (docs/SPRITES.md 5, 10.13)', () => {
   const real = read('manifest.json');
@@ -47,9 +60,27 @@ describe('asset manifests (docs/SPRITES.md 5, 10.13)', () => {
     expect(shape(placeholder)).toEqual(shape(real));
   });
 
+  it('skips only a style still rendering its characters, as A80 allows (A164)', () => {
+    const shipped = new Set(shippedStyles().map((s) => s.id));
+    for (const style of artStyles().filter((s) => !shipped.has(s.id))) {
+      // The 8-bit root always ships; a default a player cannot pick would have no fallback.
+      expect(style.root, style.id).not.toBe('');
+      expect(style.id, style.id).not.toBe(defaultArtStyle().id);
+      // No packed character atlas sits under the root unlisted: the atlases arrive with the manifest entries.
+      const chars = join(ASSETS, style.root, 'chars');
+      const atlases = existsSync(chars)
+        ? readdirSync(chars).filter((f) => /^(char|ovl)_[a-z0-9]+\.json$/.test(f))
+        : [];
+      expect(atlases, style.id).toEqual([]);
+      // A manifest that exists lists something: a style never ships an empty one.
+      if (hasManifest(style.root))
+        expect(read(join(style.root, 'manifest.json')).entries.length, style.id).toBeGreaterThan(0);
+    }
+  });
+
   it('carry exactly the looks.json villager family in every real manifest, with full frames', () => {
     expect(FAMILY).toContain('villager');
-    for (const style of artStyles()) {
+    for (const style of shippedStyles()) {
       const m = read(join(style.root, 'manifest.json'));
       const keys = m.entries.map((e) => e.key).filter((k) => /^(?:char|ovl|anims)_villager/.test(k));
       expect(keys.sort(), style.id).toEqual([...FAMILY_KEYS].sort());
@@ -100,7 +131,7 @@ describe('asset manifests (docs/SPRITES.md 5, 10.13)', () => {
 });
 
 describe('character atlas json (A161, #184 request 4)', () => {
-  const roots = [...artStyles().map((s) => s.root), 'placeholder/'];
+  const roots = [...shippedStyles().map((s) => s.root), 'placeholder/'];
   it('is written on one line in every style, so a re-pack never grows the first load back', () => {
     const files = roots.flatMap((root) =>
       readdirSync(join(ASSETS, root, 'chars'))

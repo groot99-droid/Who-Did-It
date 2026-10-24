@@ -71,6 +71,8 @@ export interface MeetingFeed {
   /** `targetId` is a living player's id or `"skip"`. */
   vote(targetId: string): void;
   say(text: string): void;
+  /** Round 8 (GDD 3.8): a line for the meeting notes, which reach everyone with no speaker. */
+  note(text: string): void;
   dispose(): void;
 }
 
