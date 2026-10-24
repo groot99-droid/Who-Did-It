@@ -108,7 +108,8 @@ export const BalanceFile = z.strictObject({
   /** Keyed "4".."10". Cabal size and which specials play come from roles.json decks. */
   byCount: byPlayerCount(BalanceRow),
   meeting: Section({
-    voteOpensImmediately: z.boolean(),
+    /** Round 8 (8L, A190): a vote cast before this many seconds of the discussion is refused (GDD 3.8). */
+    minVoteS: Seconds,
     endsWhenAllVoted: z.boolean(),
     secretVotes: z.boolean(),
     skipAllowed: z.boolean(),

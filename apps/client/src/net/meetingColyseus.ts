@@ -1,5 +1,7 @@
 import mitt, { type Emitter } from 'mitt';
 import type { Room } from '@colyseus/sdk';
+import balance from '@wdi/content/data/balance.json';
+import { TICK_RATE } from '@wdi/shared/constants';
 import type {
   ChatLine,
   GameOver,
@@ -38,6 +40,7 @@ interface GameStateLike {
 export class ColyseusMeetingFeed implements MeetingFeed {
   readonly bus: Emitter<MeetingFeedEvents> = mitt<MeetingFeedEvents>();
   private begun: MeetingStart | null = null;
+  private openTick = 0;
   private tally: VoteResult | null = null;
   private final: GameOver | null = null;
   private log: ChatLine[] = [];
@@ -49,6 +52,7 @@ export class ColyseusMeetingFeed implements MeetingFeed {
     this.offs.push(
       room.onMessage('meetingStart', (m: MeetingStart) => {
         this.begun = m;
+        this.openTick = this.state.tick + balance.meeting.minVoteS * TICK_RATE;
         this.tally = null;
         this.log = [];
         this.bus.emit('meetingStart', m);
@@ -123,6 +127,10 @@ export class ColyseusMeetingFeed implements MeetingFeed {
 
   started(): MeetingStart | null {
     return this.begun;
+  }
+
+  votesOpenTick(): number {
+    return this.openTick;
   }
 
   result(): VoteResult | null {
