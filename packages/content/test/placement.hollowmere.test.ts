@@ -84,6 +84,29 @@ const RULES: PlacementRules = {
     coat_stand: 'free',
     nightstand: 'free',
     blanket_chest: 'free',
+    // The Drowned Lantern and its back room.
+    bottle_shelf: 'hung',
+    bottle_shelf_b: 'hung',
+    tide_chart: 'hung',
+    chalkboard: 'hung',
+    ship_wheel: 'hung',
+    store_shelf: 'hung',
+    store_shelf_b: 'hung',
+    inglenook_e: 'hungEast',
+    bar_counter: 'front',
+    bar_counter_taps: 'front',
+    bar_counter_lamp: 'front',
+    keg_rack: 'front',
+    piano: 'front',
+    tavern_table: 'free',
+    tavern_table_b: 'free',
+    card_table: 'free',
+    settle: 'free',
+    log_basket: 'free',
+    barrel: 'free',
+    bottle_crate: 'free',
+    rug: 'floor',
+    sawdust: 'floor',
     wakeTable: 'surface',
     plate: 'overlay',
     crepe: 'doorOverlay',
@@ -137,10 +160,14 @@ const RULES: PlacementRules = {
         'lamp_table',
         'dining_table',
         'nightstand',
+        'bar_counter_lamp',
+        'tavern_table',
+        'tavern_table_b',
+        'card_table',
       ],
     },
     lantern: { props: ['lanternPost', 'drowned_lantern'] },
-    fire: { props: ['oven', 'brickOven', 'fireplace_e'] },
+    fire: { props: ['oven', 'brickOven', 'fireplace_e', 'inglenook_e'] },
     torch: { props: [], wall: true },
     window: {
       props: ['window', 'stained_glass', 'stained_glass_e', 'draped_window'],
@@ -169,15 +196,6 @@ const PENDING: Partial<Record<SceneId, readonly string[]>> = {
     'light ov.lt_chapel_window (window) at 11,30 hangs on nothing that could hold it',
     'light ov.lt_platform (lantern) at 60,30 hangs on nothing that could hold it',
   ],
-  tavern_bar: [
-    'prop tb.shutters faces south into no floor (its front is hidden)',
-    'wall-hung prop tb.shutters has no wall behind it',
-    'prop tb.flour_bin faces south into no floor (its front is hidden)',
-    'light tb.lt_hearth (fire) at 1,3 hangs on nothing that could hold it',
-    'light tb.lt_lamp_bar (lamp) at 15,2 hangs on nothing that could hold it',
-    'light tb.lt_lamp_room (lamp) at 7,8 hangs on nothing that could hold it',
-  ],
-  tavern_back: ['light tk.lt_lamp (lamp) at 6,4 hangs on nothing that could hold it'],
   apoth_shop: [
     'prop as.bench faces south into no floor (its front is hidden)',
     'light as.lt_lamp (lamp) at 8,3 hangs on nothing that could hold it',
@@ -272,6 +290,10 @@ describe('the placement check', () => {
 
   it('refuses a wall-hung prop with floor behind it, and a front facing a wall', () => {
     const s = copy('tavern_bar');
+    Object.assign(
+      s.props.find((p) => p.id === 'tb.shutters')!,
+      { x: 14, y: 11 },
+    );
     expect(check(s)).toEqual(
       expect.arrayContaining([
         'prop tb.shutters faces south into no floor (its front is hidden)',
