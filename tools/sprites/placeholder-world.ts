@@ -525,7 +525,7 @@ export function placeholderEntries(): PlaceholderEntry[] {
         }
         // The greybox keeps every map prop here, BLD_PROPS_MAPS or not: it is outside the texture budget.
         const want = [...names].sort();
-        return inFolder('props/', await packStatic(props.manifest, props.inputs, undefined, want));
+        return inFolder('props/', await packStatic(props.manifest, props.inputs, undefined, 1, false, want));
       },
     })),
     ...Object.entries(MAP_BUILDINGS).map(([map, buildings]): PlaceholderEntry => ({
@@ -548,7 +548,7 @@ export function placeholderEntries(): PlaceholderEntry[] {
           Object.assign(manifest.frames, s.frames);
           inputs.push(...s.inputs);
         }
-        return inFolder('buildings/', await packStatic(manifest, inputs, undefined, []));
+        return inFolder('buildings/', await packStatic(manifest, inputs, undefined, 1, false, []));
       },
     })),
     ...Object.values(GROUND_MAPS).map((map): PlaceholderEntry => ({

@@ -27,8 +27,11 @@ export interface SliceSource {
   footprint: [number, number];
 }
 
-/** Tile index (dy * 256 + dx, or -1) of each packed pixel, from the display-size tile map. */
-export function tileIndex(tiles: Rgba, w: number, h: number): Int32Array {
+/**
+ * Tile index (dy * 256 + dx, or -1) of each packed pixel, from the display-size tile map: the tile most of
+ * the pixel's `block` x `block` source block stands over (2 for a halved frame, 1 for the HD style's).
+ */
+export function tileIndex(tiles: Rgba, w: number, h: number, block = 2): Int32Array {
   const code = (x: number, y: number) => {
     const o = (y * tiles.width + x) * 4;
     if (tiles.data[o + 3]! < 128 || tiles.data[o]! === 0 || tiles.data[o + 1]! === 0) return -1;
@@ -38,14 +41,11 @@ export function tileIndex(tiles: Rgba, w: number, h: number): Int32Array {
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const counts = new Map<number, number>();
-      for (const [dx, dy] of [
-        [0, 0],
-        [1, 0],
-        [0, 1],
-        [1, 1],
-      ] as const) {
-        const c = code(2 * x + dx, 2 * y + dy);
-        if (c >= 0) counts.set(c, (counts.get(c) ?? 0) + 1);
+      for (let dy = 0; dy < block; dy++) {
+        for (let dx = 0; dx < block; dx++) {
+          const c = code(block * x + dx, block * y + dy);
+          if (c >= 0) counts.set(c, (counts.get(c) ?? 0) + 1);
+        }
       }
       let best = -1;
       let n = 0;
