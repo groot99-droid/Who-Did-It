@@ -33,6 +33,13 @@ _MATS: dict[str, bpy.types.Material] = {}
 
 def apply(scene: bpy.types.Scene) -> None:
     """The HDRI world now, the material swap before every render."""
+    sky(scene)
+    batch_render.BEFORE_RENDER.append(lambda s: convert(s.objects))
+
+
+def sky(scene: bpy.types.Scene) -> None:
+    """The locked HDRI as the world's background at `HDRI_STRENGTH`. On its own (`WDI_HD_SKY=1`) it puts the same
+    ambient under the toon HD figures as under the PBR buildings, their bands kept: the A164 ambient test."""
     path = roles.hdri_path()
     if not os.path.exists(path):
         raise FileNotFoundError(f"{path}: run `python3 tools/blender/materials/fetch.py --style hd`")
@@ -43,7 +50,6 @@ def apply(scene: bpy.types.Scene) -> None:
     env.image = bpy.data.images.load(path, check_existing=True)
     links.new(env.outputs["Color"], bg.inputs["Color"])
     bg.inputs["Strength"].default_value = HDRI_STRENGTH
-    batch_render.BEFORE_RENDER.append(lambda s: convert(s.objects))
 
 
 def convert(objects) -> int:
