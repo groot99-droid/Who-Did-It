@@ -41,6 +41,7 @@ import { addNpcSeat, fillNpcSeats } from '../../sim/npc/seats';
 import { MatchSeeds } from '../../sim/seeds';
 import { simOf } from '../../sim/RoomSim';
 import { mapIdOfRoom } from '../../sim/MapSites';
+import { dealPurses } from '../../sim/economy/purse';
 
 /**
  * Flow messages: the lobby and role-card flow plus the meeting vote and chat (consumed by the phase
@@ -275,6 +276,7 @@ export function startMatch(room: PartyRoom): void {
   // Round 5, 5F: the cover hints, each cover seat's preset `coverLook` and the Cabal mates' `mateLooks`.
   assignCovers(room, dealt);
   dealTasks(room, dealt); // round 7, 7M: every seat's task list, real or fake, on its own stream (GDD 3.5)
+  dealPurses(room); // round 8, 8C: purses and banks emptied; the stakes follow the public looks (GDD 3.23)
 
   void room.lock();
   setPhase(room, Phase.roleReveal, balance.phases.roleRevealS);

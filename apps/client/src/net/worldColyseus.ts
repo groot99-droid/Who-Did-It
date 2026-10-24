@@ -51,6 +51,8 @@ interface AvatarState {
   yaw: number;
   animId: number;
   statusBits: number;
+  /** Round 8 (8L): the bits seen only from close by (Blood); the server sends them only in range. */
+  nearBits?: number;
   transitUntilTick: number;
   seat?: string;
 }
@@ -67,6 +69,7 @@ interface SceneStateLike {
 }
 interface GameStateLike {
   tick: number;
+  taskBar?: number;
   phase: number;
   phaseEndsTick: number;
   startTick: number;
@@ -93,6 +96,9 @@ export class ColyseusWorldFeed implements WorldFeed {
     room.onMessage('minigameStart', (m: WorldFeedEvents['minigameStart']) =>
       this.bus.emit('minigameStart', m),
     );
+    // Round 8 (8B): inspect's three private messages.
+    for (const type of ['inspect.result', 'inspect.noticed', 'inspect.hunch'] as const)
+      room.onMessage(type, (m: never) => this.bus.emit(type, m));
   }
 
   /** Set by the private `killed` message or a false roster `alive`; cleared when the lobby returns. */
@@ -150,7 +156,7 @@ export class ColyseusWorldFeed implements WorldFeed {
           y: a.y,
           yaw: a.yaw,
           animId: a.animId,
-          statusBits: a.statusBits,
+          statusBits: a.statusBits | (a.nearBits ?? 0),
           transitUntilTick: a.transitUntilTick,
           ...(a.seat ? { seat: a.seat } : {}),
         }),
@@ -307,6 +313,10 @@ export class ColyseusWorldFeed implements WorldFeed {
     return out;
   }
 
+  taskBar(): number {
+    return this.state.taskBar ?? 0;
+  }
+
   questAccept(questId: string): void {
     this.room.send('quest.accept', { questId });
   }
@@ -321,6 +331,10 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   minigameResult(taskId: string, answer: unknown): void {
     this.room.send('minigame.result', { taskId, answer });
+  }
+
+  inspect(targetId: string): void {
+    this.room.send('act.inspect', { targetId });
   }
 
   dispose(): void {
