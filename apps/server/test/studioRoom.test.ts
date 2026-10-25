@@ -111,6 +111,12 @@ describe('with the admin variables set', () => {
     expect(got.last?.sceneId).toBe(room.sim.sceneId);
     client.send(STUDIO_C2S.move, { seq: 5, dx: 1, dy: 0 });
     expect(await until(() => room.sim.lastSeq === 5, 3000)).toBe(true);
+    // S1b: a teleport and noclip over the wire, applied in the step and echoed in the snapshot and the log.
+    client.send(STUDIO_C2S.teleport, { sceneId: 'bakery', spawnId: 'door' });
+    client.send(STUDIO_C2S.noclip, { on: true });
+    expect(await until(() => got.last?.noclip === true, 3000)).toBe(true);
+    expect(got.last).toMatchObject({ sceneId: 'bakery', tx: 8, ty: 9 });
+    expect(got.lines.some((l) => l.includes('teleport bakery door'))).toBe(true);
     expect(got.errors).toEqual([]);
     await client.leave();
   });
@@ -118,11 +124,13 @@ describe('with the admin variables set', () => {
   it('refuses a bad command with a 422 and ignores an admin or party command', async () => {
     const { client, got, room } = await open();
     client.send(STUDIO_C2S.give, null);
+    client.send(STUDIO_C2S.teleport, { sceneId: 'atlantis', spawnId: 'door' });
+    client.send(STUDIO_C2S.portal, { portalId: 'nowhere' });
     client.send('admin.clock', { scale: 10 });
     client.send('lobby.start', {});
-    expect(await until(() => got.errors.length === 1, 3000)).toBe(true);
+    expect(await until(() => got.errors.length === 3, 3000)).toBe(true);
     await sleep(200);
-    expect(got.errors).toEqual(['422 bad payload']);
+    expect(got.errors).toEqual(['422 bad payload', '422 no such scene', '422 no such door']);
     expect(room.sim.clock.scale).toBe(1);
     await client.leave();
   });

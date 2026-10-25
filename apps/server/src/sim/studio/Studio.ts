@@ -1,15 +1,16 @@
-import { SCENE_IDS, type Profile, type SceneId, scenes } from '@wdi/content';
+import { PROFILE_RANK, SCENE_IDS, type Profile, type SceneId, scenes } from '@wdi/content';
 import {
   TILE_PX,
   moveAabb,
+  overlapsSolid,
   type StudioDayPhase,
   type StudioS2CPayloads,
   type StudioSpawn,
 } from '@wdi/shared';
-import { FOOT_HALF_PX, INPUT_STALE_TICKS } from '../constants';
+import { FOOT_HALF_PX, INPUT_STALE_TICKS, PORTAL_REACH_TILES } from '../constants';
 import { parseMove, speedPxPerTick } from '../Movement';
 import type { MoveInput } from '../RoomSim';
-import { navGrid, tileCentre } from '../World';
+import { navGrid, profileOpen, tileCentre } from '../World';
 import { type SimClock, stepsThisTick } from '../auto/clock';
 
 /**
@@ -39,13 +40,24 @@ export interface StudioSim {
   log: string[];
 }
 
-export type StudioCommand = { kind: 'move'; raw: unknown };
+export type StudioCommand =
+  | { kind: 'move'; raw: unknown }
+  | { kind: 'noclip'; on: boolean }
+  | { kind: 'teleport'; sceneId?: SceneId; spawnId?: string; x?: number; y?: number }
+  | { kind: 'portal'; portalId: string }
+  | { kind: 'profile'; profile: Profile };
 
 /** Commands waiting for the step; a flood past this is refused (`busy`). */
 export const MAX_STUDIO_COMMANDS = 64;
 
 /** The scene the Studio opens on: the first of the frozen id list. */
 export const STUDIO_START_SCENE: SceneId = SCENE_IDS[0]!;
+
+const isProfile = (v: unknown): v is Profile => typeof v === 'string' && Object.hasOwn(PROFILE_RANK, v);
+const isTileInt = (v: unknown): v is number =>
+  Number.isInteger(v) && (v as number) >= 0 && (v as number) < 1024;
+export const isStudioScene = (v: unknown): v is SceneId =>
+  typeof v === 'string' && (SCENE_IDS as readonly string[]).includes(v);
 
 export function createStudio(sceneId: SceneId = STUDIO_START_SCENE): StudioSim {
   const sim: StudioSim = {
@@ -92,10 +104,64 @@ export function parseStudio(type: string, raw: unknown): StudioCommand | string 
     typeof raw === 'object' && raw !== null && !Array.isArray(raw) ? (raw as Record<string, unknown>) : null;
   if (type === 'studio.move') return { kind: 'move', raw };
   if (p === null) return 'bad payload';
-  return 'unknown command';
+  switch (type) {
+    case 'studio.noclip':
+      return typeof p.on === 'boolean' ? { kind: 'noclip', on: p.on } : 'bad noclip';
+    case 'studio.teleport': {
+      const sceneId = p.sceneId;
+      if (sceneId !== undefined && !isStudioScene(sceneId)) return 'no such scene';
+      const hasTile = p.x !== undefined || p.y !== undefined;
+      if (hasTile && (!isTileInt(p.x) || !isTileInt(p.y) || p.spawnId !== undefined)) return 'bad tile';
+      if (!hasTile && typeof p.spawnId !== 'string') return 'bad teleport';
+      return {
+        kind: 'teleport',
+        ...(sceneId !== undefined ? { sceneId } : {}),
+        ...(hasTile ? { x: p.x as number, y: p.y as number } : { spawnId: p.spawnId as string }),
+      };
+    }
+    case 'studio.portal':
+      return typeof p.portalId === 'string' ? { kind: 'portal', portalId: p.portalId } : 'bad portal';
+    case 'studio.profile':
+      return isProfile(p.profile) ? { kind: 'profile', profile: p.profile } : 'bad profile';
+    default:
+      return 'unknown command';
+  }
 }
 
-const grid = (sim: StudioSim) => navGrid(sim.sceneId, sim.profile);
+const grid = (sim: StudioSim, sceneId: SceneId = sim.sceneId) => navGrid(sceneId, sim.profile);
+
+/** A figure fits here: inside the scene, and off the walls unless noclip. */
+function fits(sim: StudioSim, sceneId: SceneId, x: number, y: number): boolean {
+  const g = grid(sim, sceneId);
+  if (x < 0 || y < 0 || x >= g.w * g.tile || y >= g.h * g.tile) return false;
+  return sim.noclip || !overlapsSolid(g, x, y, FOOT_HALF_PX, FOOT_HALF_PX);
+}
+
+/** Loads a scene at a spawn (or a tile); false, and nothing changes, when the target does not exist or is a wall. */
+function enter(
+  sim: StudioSim,
+  sceneId: SceneId,
+  at: { spawnId: string } | { x: number; y: number },
+): boolean {
+  let tx: number;
+  let ty: number;
+  if ('spawnId' in at) {
+    const spawn = scenes[sceneId].spawns.find((s) => s.id === at.spawnId);
+    if (!spawn) return false;
+    tx = spawn.x;
+    ty = spawn.y;
+  } else {
+    tx = at.x;
+    ty = at.y;
+  }
+  const x = tileCentre(tx, TILE_PX);
+  const y = tileCentre(ty, TILE_PX);
+  if (!fits(sim, sceneId, x, y)) return false;
+  if (sceneId !== sim.sceneId) say(sim, `scene ${sceneId}`);
+  sim.sceneId = sceneId;
+  place(sim, x, y);
+  return true;
+}
 
 /** Applies one queued command; a refusal is returned for the room to send, and changes nothing. */
 export function applyStudio(sim: StudioSim, cmd: StudioCommand): string | null {
@@ -108,6 +174,34 @@ export function applyStudio(sim: StudioSim, cmd: StudioCommand): string | null {
       }
       return null;
     }
+    case 'noclip':
+      sim.noclip = cmd.on;
+      say(sim, `noclip ${cmd.on ? 'on' : 'off'}`);
+      return null;
+    case 'teleport': {
+      const sceneId = cmd.sceneId ?? sim.sceneId;
+      const at = cmd.spawnId !== undefined ? { spawnId: cmd.spawnId } : { x: cmd.x!, y: cmd.y! };
+      if (!enter(sim, sceneId, at)) return 'cannot stand there';
+      say(sim, `teleport ${sceneId} ${'spawnId' in at ? at.spawnId : `${at.x},${at.y}`}`);
+      return null;
+    }
+    case 'portal': {
+      const portal = scenes[sim.sceneId].portals.find((p) => p.id === cmd.portalId);
+      if (!portal) return 'no such door';
+      const d = Math.hypot(sim.x - tileCentre(portal.x, TILE_PX), sim.y - tileCentre(portal.y, TILE_PX));
+      if (d > PORTAL_REACH_TILES * TILE_PX) return 'too far';
+      if (!profileOpen(portal.minProfile, sim.profile) || portal.to === null || portal.toSpawn === null) {
+        return 'door shut';
+      }
+      if (!isStudioScene(portal.to) || !enter(sim, portal.to, { spawnId: portal.toSpawn }))
+        return 'door shut';
+      say(sim, `door ${portal.id}`);
+      return null;
+    }
+    case 'profile':
+      sim.profile = cmd.profile;
+      say(sim, `profile ${cmd.profile}`);
+      return null;
   }
 }
 
