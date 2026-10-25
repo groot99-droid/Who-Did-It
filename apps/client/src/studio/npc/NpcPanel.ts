@@ -18,6 +18,8 @@ export interface NpcPanelDeps {
   mapId: MapId | null;
   onClear: () => void;
   onClose: () => void;
+  /** The people section (N4), mounted under the routes with the same PR note. */
+  extra?: (root: HTMLElement, note: () => string) => Screen;
 }
 
 export function mountNpcPanel(root: HTMLElement, d: NpcPanelDeps): Screen {
@@ -195,9 +197,11 @@ export function mountNpcPanel(root: HTMLElement, d: NpcPanelDeps): Screen {
   m.bus.addEventListener('change', render);
   render();
   root.append(panel);
+  const extra = d.extra?.(panel, () => note.value.trim());
   return {
     destroy() {
       m.bus.removeEventListener('change', render);
+      extra?.destroy();
       panel.remove();
     },
   };
