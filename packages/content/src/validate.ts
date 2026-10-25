@@ -396,7 +396,8 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
 
   // Quests and mini-games (GDD 3.16): each npc stands once and wants what the scenes open with its own scene can
   // yield or make; rewards ship in V1.
-  const looks = new Set(Object.keys(c.looks.looks));
+  // A giver wears the villager family, never a card's look (3.16 "Givers"; round 9, N1).
+  const villagers = new Set(Object.keys(c.looks.villagers));
   const standsOn = new Map<string, string>();
   for (const map of Object.values(c.maps)) {
     for (const sceneId of map.scenes) {
@@ -409,8 +410,8 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
   }
   for (const npc of Object.values(quests.npcs)) {
     if (!standsOn.has(npc.id)) err(`quests.json: npc ${npc.id} stands nowhere`);
-    if (npc.look !== 'villager' && !looks.has(npc.look))
-      err(`quests.json: npc ${npc.id} unknown look ${npc.look}`);
+    if (!villagers.has(npc.look))
+      err(`quests.json: npc ${npc.id} look ${npc.look} is not of the villager family`);
     if (!Object.values(quests.quests).some((q) => q.giver === npc.id))
       err(`quests.json: npc ${npc.id} gives nothing`);
   }

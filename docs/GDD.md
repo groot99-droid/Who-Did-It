@@ -473,8 +473,9 @@ is 6G's.)
 Round 6 (ROADMAP M5b). The rows are `quests.json`, `minigames.json` and the scenes' `givers`; sentences marked (6H)
 are the server's behaviour and may be corrected by Session 6H.
 
-**Givers.** A quest giver is a figure standing at a scene spot, never a seat: it wears the `villager` body (so it
-can never be mistaken for a seat's character), faces its spot's direction and carries a quest marker. Each map has
+**Givers.** A quest giver is a figure standing at a scene spot, never a seat: it wears the `villager` body or one of
+its family's variants (`looks.json` `villagers`; round 9, N1), never a card's look (so it can never be mistaken for
+a seat's character), faces its spot's direction and carries a quest marker. Each map has
 a giver on its hub and others in its wild places:
 
 | Giver | Where | Quest | Wants | Reward |

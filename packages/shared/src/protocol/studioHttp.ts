@@ -109,5 +109,4 @@ export interface StudioNpcDraftRequest {
   roomId: string;
   routines?: unknown;
   quests?: unknown;
-  looks?: unknown;
 }
