@@ -8,6 +8,9 @@ later UI session.
 **Status.** Design only (owner, 2026-10-24). The timings come from `world-mode.md` 7. Every claim about today's
 client and server cites a file and line at `88453d9`, or a GDD section. Nothing here is built.
 
+**Owner answers folded in (9D, 2026-10-25).** `owner-answers.md` overrides this document where they disagree. Changed
+paragraphs are marked "(owner answer <ID>)", and section 14 lists the reconciliations.
+
 ## 0. What the meeting is today
 
 | Today | Where |
@@ -32,13 +35,17 @@ ejection and its reveal (`Meeting.ts:88-182`).
 |---|---|---|---|---|
 | 1 | Arrival (role card and the Killer's pick) | Start | 30 s (`phases.roleRevealS`) | The role reveal (GDD 3.3), longer for the pick (`world-mode.md` 4.1) |
 | 2 | Dawn and the train | The day phase begins | about 8 s overlay, during the day clock | Nothing (new). The train is a scene event today (GDD 3.3) |
-| 3 | The Inquest | A body is reported, or the bell is rung | Discussion `byCount.*.discussionS`, then a 15 s finding | The meeting's discussion, vote and reveal |
-| 4 | The Tribunal | The Police Officer brings a cuffed suspect to the bell; or the Activist's Redemption trial opens | 30 s case, 30 s defence, 8 s verdict | The ejection (and the round-8 `lawStage` seam) |
+| 3 | The Inquest | A body is reported (the bell no longer opens one, owner answer WM2) | Discussion `byCount.*.discussionS`, then a 15 s finding | The meeting's discussion, vote and reveal |
+| 4 | The Tribunal | A cuffed suspect reaches the county jail after a manhunt (owner answer WM2); or the Activist's Redemption trial opens | 30 s case, 30 s defence, 8 s verdict | The ejection (and the round-8 `lawStage` seam) |
 | 5 | The Final Night and the end trial | After `finalNight.afterCycle` cycles | Hunt 135 s, then the end trial: 120 s, then 8 s per case | `FinalNight.ts` hunt and forced vote |
 | 6 | On the line | A seat dies by day | Until the next train | The ghost view, for a day death (`world-mode.md` 6) |
 | 7 | The victories ledger | The match ends | 30 s (`phases.gameOverS`) | The game-over screen (GDD 3.8) |
 | 8 | Story chapter cards | A beat of a story chapter fires | Until dismissed (the clock pauses) | Nothing (new, `world-mode.md` 9) |
 | 9 | The Vicar's memorial | The Vicar dies by the Knife | The video's length | Unchanged (GDD 3.20, the `memorial.vicar` cutscene) |
+| 10 | The petition and the manhunt | A human opens a petition; it opens a manhunt when signed | Not a pause: a form, then a 120 s world phase with a banner | Nothing (new, owner answer WM2; 13) |
+| 11 | The briefing | 30 s after any clue is created | A toast and a police-board line, no pause | Nothing (new, owner answer WM2; 13) |
+| 12 | Asleep, and the night skip | A seat holds at its bed; every active player is asleep | The sleeper's dimmed view; the skip is a dawn | Nothing (new, follow-up 2; 13) |
+| 13 | The county jail | A sentence of jail | Until the next dawn; the world, in the cell scene | Nothing (new, owner answers LW9, WM11; 13) |
 
 **What full-screen means.** Today the meeting is a centred card over the dimmed world (0). A phase screen fills the
 viewport: edge to edge, the world hidden behind it, with the clock and the phase name in a top band. A phone gets
@@ -60,8 +67,14 @@ bus (GDD 3.20).
 | Beat | When | Shows | Lasts |
 |---|---|---|---|
 | Dawn card | The day phase opens | "Day N" and the weather of the map; the cycle bar (`N` of `finalNight.afterCycle`) | 3 s, then it shrinks into the HUD's clock |
-| The train | `train.arrive` | The whistle (`train_arrive`), a lower-third banner "The 6:10 is in", and the **manifest**: the portraits and character names of the seats returning on it (`world-mode.md` 6). Unchanged by the train, a public death stays public | 5 s banner, the manifest stays in the HUD's log |
+| The train | `train.arrive` | The whistle (`train_arrive`), a lower-third banner "The 6:10 is in", and the **manifest**: the portraits and character names of the seats returning on it (`world-mode.md` 6) and of the seats released from the county jail. Unchanged by the train, a public death stays public. On the Hitman's arrival day the manifest adds the public sign, "A stranger's coat was seen on the 6:10" (owner answer WM9, `world-mode.md` 1.5) | 5 s banner, the manifest stays in the HUD's log |
 | The mail | `train.delivery` | Each seat's own mail, privately: a contract for the Hitman's mark (`contract.ts:58`), a letter for a quest. Nothing public | A toast, then the Notebook |
+
+**After a night skip** (follow-up 2, owner answer NW2) the dawn card reads "You slept through" before "Day N", and
+the day starts as any other.
+
+**Owing the line** (owner answer WM1). The returning seat's "You are back" card also shows, privately, the fare it now
+owes and what that does to its prices and stock (`world-mode.md` 6).
 
 **Who sees what.** The banner and the manifest are public: who stepped off the train is something the platform
 sees. The returning seat is placed on `hm.station` (the map's station scene) and its screen fades from the On the
@@ -83,14 +96,15 @@ The Inquest replaces the meeting. The town gathers in the square (`placeAtSquare
 and the evidence are laid out, and the town talks. Nobody votes and nobody is ejected. Its outcome is the **finding**:
 the Case Board's suspect set, made public.
 
-**Opens when.** A body is reported or the bell is rung, as a meeting opens today (GDD 3.3, 3.4). The meeting's
-locked call sites run first (`Meeting.ts:50-58,85`).
+**Opens when.** A body is reported, as a meeting opens today (GDD 3.3, 3.4). The bell no longer opens an Inquest: it
+only gathers NPCs (owner answer WM2, `world-mode.md` 3.1; 14, R2). The meeting's locked call sites run first
+(`Meeting.ts:50-58,85`).
 
 **Layout** (full screen, three columns on a wide screen, stacked on a phone):
 
 | Region | Shows | Who |
 |---|---|---|
-| Top band | "Inquest", the reason (a body, the bell), the caller's portrait, the phase clock | All |
+| Top band | "Inquest", the reason (a body), the caller's portrait, the phase clock | All |
 | Left: the body | The body's portrait, character name, where it was found, the death cause the Doctor confirmed (or "unknown") | All. The cause stays private until the Doctor confirms it, as today (GDD 3.4) |
 | Centre: the board | The Case Board: every presented entry as a card (Verified, Claimed, Forged, Doubted), grouped by trait. The suspect set shown as a row of portraits, with "Fits" or "Ruled out" on each | All, with private marks on the seat's own entries |
 | Right: the town | Every figure at the Inquest as a portrait and character name (`world-mode.md` 4.3). A seat that presented has a pin; a seat on the line is greyed with "On the line" | All |
@@ -115,8 +129,8 @@ as today.
 |---|---|
 | "The town believes it was one of these" and the suspect set, at most `meeting.suspectSetMax` (3) portraits | GDD 3.4. Doubted and Forged entries are left out (`world-mode.md` 5) |
 | "No one fits" when the set is empty | |
-| A stamp "Case ready" if the set is exactly one seat | That seat can now be arrested (4) |
-| The Detective's stamp, private to the Detective | `lawStage` 0 to 1 when the Detective stamps the file (`world-mode.md` 3) |
+| A stamp "Case ready" if the set is exactly one seat, and a **Petition** button | Any living, free human may open a petition against that figure from here (13; owner answer WM2) |
+| The Detective's stamp, private to the Detective | `lawStage` 0 to 1 when the Detective stamps the file (`world-mode.md` 3). The Detective's file counts as one signature on a petition it supports |
 
 **NPCs at the Inquest.** At a drawn tick inside `npc.present.windowFrac` (it was `npc.vote.windowFrac`, 0.3 to 0.9
 of the discussion; `npc/meeting.ts:101`), each NPC presents its best Claimed entry with chance
@@ -130,17 +144,18 @@ The Tribunal is the trial of one arrested seat (route 1 of `world-mode.md` 3), a
 
 **Opens when.** One of:
 
-- the Police Officer cuffs a seat and brings it to the bell (the arrest of Bible I.6). Cuffing is a hold
-  (`clues.collectHoldS`-length, kept) and is refused on a seat in its acquittal grace (`trial.acquittalGraceS`, 30 s);
+- a manhunt ends with a cuffed seat walked to the county jail (owner answer WM2; 13). Cuffing is a hold
+  (`law.cuffHoldS`) by any seat or a Constable, and a petition is refused against a seat in its grace after a
+  dismissal (`trial.acquittalGraceS`, 30 s);
 - the Activist's Redemption trial: after the Baron's death, the town tries her (Bible I.5 II).
 
 **Layout.**
 
 | Region | Shows | Who |
 |---|---|---|
-| Top band | "Tribunal", the accused's portrait and character name, the charge ("the deaths of ..."), the clock | All |
+| Top band | "Tribunal", the accused's portrait and character name, the charge from the petition ("murder", "robbery", "conspiring with the Killer"; `world-mode.md` 5), the clock | All |
 | Left: the prosecution | The arresting seat's portrait and the entries it filed, as cards | All |
-| Centre: the scales | A balance with a pan for matches and a pan for exclusions. Each card lands in a pan as it is presented. A marker on the beam shows where the verdict stands: Acquittal, Heavy Fine, Death (`trial.fineAt`, `trial.deathAt`) | All |
+| Centre: the scales | A balance with a pan for matches and a pan for exclusions. Each card lands in a pan as it is presented. A marker on the beam shows where the finding stands: Dismissed, Proven, Murder proven (`trial.convictAt`, `trial.murderAt`; owner answer WM11) | All |
 | Right: the defence | The accused's own presented entries (it may present `meeting.presentPerPlayer` like anyone) | All |
 | Bottom: the seat's hand | As at the Inquest | Own seat |
 
@@ -156,11 +171,16 @@ The Tribunal is the trial of one arrested seat (route 1 of `world-mode.md` 3), a
 
 **The verdict card.**
 
+The verdict is the finding and then the sentence of the charge (owner answer WM11, `world-mode.md` 5):
+
 | Verdict | Card | After |
 |---|---|---|
-| Acquittal | "Released" and the accused's portrait | 30 s of protection from arrest |
-| Heavy Fine | "Fined" and what was taken (purse, weapons) | A Killer's checklist resets, privately (`world-mode.md` 5) |
-| Death | "Sentenced", then the gallows cut | The accused dies for good and becomes a ghost. The role is shown, as an ejection's is today (`Meeting.ts:162-165`). A Gamekeeper fires its Last Shot here (`world-mode.md` 5). The Drifter's Gallows victory |
+| Dismissed | "Case dismissed" and the accused's portrait | 30 s of protection from a new petition |
+| Fine | "Fined" and what was taken | A theft returns the goods; a Killer's checklist resets, privately |
+| Jail | "Jailed until dawn", and for a robbery "Goods to the town chest" | The seat is walked to the cell (13). The victim of a robbery is told privately where its goods went (owner answer LW9) |
+| Fine, demotion and jail | "Fined, stripped of the road, jailed" | A conspirator's evolved road reverts to its base card. Only for minion, brute and extortionist types |
+| Defrocked | "Defrocked" | The religious conspirator's Faith goes to 0 and the chapel bars it (a proposal, `world-mode.md` 5) |
+| Death | "Sentenced", then the gallows cut | Murder only. The accused dies for good and becomes a ghost. The role is shown, as an ejection's is today (`Meeting.ts:162-165`). A Gamekeeper fires its Last Shot here (`world-mode.md` 5). The Drifter's Gallows victory |
 
 **The role on the verdict.** A death sentence shows the true role, so a convicted Killer is shown as the Killer
 and the town learns which look it wore. This is the only time a cover is lifted before game over, the same as an
@@ -180,7 +200,7 @@ Village, anything else for the Cabal (`FinalNight.ts:18-57`; GDD 3.3, 3.8).
 | The hunt | 135 s (`finalNight.huntS`) | The world. The Knife with a 60 s cooldown (`finalNight.killCooldownS`). The HUD shows only the clock |
 | The gathering | 3 s | The square, by lantern light |
 | The end trial: filing | 120 s (`finalNight.trialS`) | Every living seat may file a case: pick one accused and present up to `meeting.presentPerPlayer` entries. NPCs file as at the Inquest. The screen shows each filed case as a column with its accused and its cards |
-| The end trial: verdicts | 8 s per case, strongest first | Each case on the scales (4). The first Death verdict on the Killer ends the trial with route 3 (`world-mode.md` 3). A Death on anyone else hangs that seat and the next case is read |
+| The end trial: verdicts | 8 s per case, strongest first | Each case on the scales (4), sentenced by its charge (owner answer WM11). The first murder conviction of the Killer ends the trial with route 3 (`world-mode.md` 3). A murder conviction of anyone else hangs that seat; a lesser sentence is read out; then the next case is read |
 | No case | 8 s | "The Killer walks free", and the Killer's Unseen victory (`world-mode.md` 2) |
 
 **The strongest case first.** Cases are ordered by their match count, then by fewer exclusions, then by the
@@ -217,9 +237,11 @@ Replaces the game-over screen. Today it names the winning faction and the Drifte
 |---|---|
 | Top band | "The week is over", how it ended (the Killer stopped by a route, or Unseen), and the match length |
 | The Killer | The Killer's seat name, its true look beside the look it wore, its vendetta, and how far its checklist got |
-| Victories | One row per seat that won: the seat's name, character, portrait and the kind of victory (Law, Peaceful, Heir, Bounty, Dead Letter, Role, Town, Trade, Verdict, Gallows, Getaway, Unseen, a vendetta's kind). Grouped by kind, the stopping route first |
+| Victories | One row per seat that won: the seat's name, character, portrait and the kind of victory (Law, Peaceful, Heir, Bounty, Dead Letter, Role, Town, Trade, Verdict, Gallows, Getaway, Unseen, Paint The Town Red, a vendetta's kind). Grouped by kind, the stopping route first |
+| Paint The Town Red (owner answer WM3) | In a 2-human match: each Killer's unique kills and total kills, ranked by total, beside the target |
+| The Hitman (owner answers WM9, WM10) | If he came: the day he arrived, the seat that was turned and its dormant role, and how far the two chances got (`world-mode.md` 1.5) |
 | Everyone else | The other seats, with their characters, roles and names. This is where player names and characters are paired for the first time (`world-mode.md` 4.3) |
-| Timeline | The match's key events on a strip: deaths, trains, Inquests, Tribunals, the Final Night |
+| Timeline | The match's key events on a strip: deaths, trains, Inquests, petitions, manhunts, Tribunals, night skips, the Hitman's arrival, the Final Night |
 
 **Timing.** `phases.gameOverS`, 30 s, then the lobby, as today (`Win.ts:88-149`, `resetToLobby`).
 
@@ -244,6 +266,11 @@ Today the role card shows the card and, for a cover role, a look picker with hin
 | Bandit (a Killer with the heist) | As the Killer, without the pick: his own look shown instead | 30 s |
 | Accomplice, Drifter | The card and the pick, from what the Killer left. The Accomplice sees the Killer's pick live | 30 s |
 | Everyone else | The card, its goal and its chores. Partners of a vendetta are told "Someone in town wants you dead" or the like, by role, without naming the vendetta | 30 s |
+| Both Killers in Paint The Town Red (owner answer WM3) | The Killer card, the goal and the target, each other's worn look as Cabal mates see it today, and the pick | 30 s |
+
+**The Hitman's card** (owner answer WM9) is not shown at Arrival. The turned seat gets it at its delivery (2): a
+private full-screen card, the contract, the mark's look and the train it must catch, closed by a button while the world
+runs on (the clock does not pause for one seat).
 
 ## 10. The art style in the menu
 
@@ -276,6 +303,14 @@ widths (phone 390 px, laptop 1280 px, wide 1920 px). The UI session builds them 
 | M10 | The victories ledger | `mockups/ledger.html` | none | 5 winners of 4 kinds, the Killer's true and worn looks, the timeline |
 | M11 | A story chapter card | `mockups/story-card.html` | none | A title card and a beat card |
 | M12 | The lobby's art-style card | `mockups/lobby.html` (update) | `lobby.html` | Unchanged; adds the "menu only" note to the in-match settings panel |
+| M13 | The petition form (owner answer WM2) | `mockups/petition.html` | M6 | The accused, the charge picker, the supporting entries, the signatures with the 60 s clock |
+| M14 | The manhunt banner | `mockups/manhunt.html` | `hud.html` | The banner and clock, the accused marked on the map, the cuff prompt |
+| M15 | Inspect: Walk with me (owner answer WM2) | `mockups/inspect-pair.html` | `hud.html` | The new section on an inspected figure, the request, the waiting state |
+| M16 | The county jail (LW9, LW10, WM11) | `mockups/jail.html` | none | The cell with 3 seats, the three mini-game prompts, the time to dawn |
+| M17 | Asleep (follow-up 2) | `mockups/asleep.html` | `hud.html` | The dimmed view, "2 of 3 in bed", the wake hint |
+| M18 | The lock-pick mini-game (owner answer LT2) | `mockups/lockpick.html` | `minigame.html` if present, else none | The cylinder, the pick, the tension meter, a snapped pick |
+| M19 | The inventory and crafting grid (owner answer LT4) | `mockups/inventory.html` | none | Hotbar, pack, belt, equipment slots, the 2 by 2 grid and its output, a 3 by 3 workbench grid |
+| M20 | The Hitman's card and the briefing toast (WM9, WM2) | `mockups/hitman-card.html` | `rolecard-front.html` | The private contract card; a briefing toast over the HUD |
 
 **Common rules for the mock-ups** (UI.md is the source of the tokens):
 
@@ -299,3 +334,57 @@ For the round-10 build plan (`gdd-map.md`). Design only: nothing here is a contr
 | Ledger | `Win.ts`: the victories list | `ui/GameOver` reworked |
 | Story cards | The beat runner (`world-mode.md` 9) | New `ui/StoryCard.ts` |
 | Art style | none | `world-mode.md` 10 |
+| Petition and manhunt | New `sim/law/Petition.ts`, `sim/law/Manhunt.ts`, `sim/law/Constables.ts`; the briefing | New `ui/Petition.ts`, a HUD banner |
+| Walk with me | `sim/inspect/index.ts`: the pair request; `npc/` answers it | A section in the inspect panel |
+| Jail | New `sim/Jail.ts`; the `cj.` scene; sentences in `sim/Tribunal.ts` | The cell scene's prompts |
+| Sleep | New `sim/Sleep.ts`: the bed hold, the active count, the skip in `Phases.ts` | `ui/Asleep.ts` overlay |
+
+## 13. The new screens of the owner answers
+
+Not pauses: none of these stops the clock for anyone but story mode's cards (8). Each keeps the rule that nothing waits
+on an NPC (second follow-up).
+
+### 13.1 The petition (owner answer WM2)
+
+| Step | Shows | Who |
+|---|---|---|
+| Open | From the Case Board's suspect row, the police board, or a sighting in the Notebook: the accused's portrait and character name, a charge picker (the crimes of `world-mode.md` 5), and the opener's supporting entries | The opener |
+| Sign | A toast to every living, free human: "A petition against the Baker's look: robbery. Sign?", with the entries attached and a 60 s clock (`petition.openS`) | All living, free humans |
+| Opens a manhunt | When `petition.signaturesMin` others have signed. The form closes and the banner of 13.2 opens | All |
+| Lapses | At the clock's end without enough names: "The petition lapsed." | The signers |
+
+### 13.2 The manhunt
+
+A banner in the top band: "Manhunt: the Baker's look", the clock (`manhunt.durationS`), and on each signer's map the
+accused's last-seen scene, refreshed every `notices.sampleS`. The cuff prompt shows within reach. On a cuff the banner
+reads "Cuffed" and the Tribunal of 4 opens once the accused reaches the jail (a 5 s walk, or at once if the scene has no
+path). The accused sees the banner too: it knows it is hunted.
+
+### 13.3 The briefing
+
+A toast in every HUD log and a line on the police board, `law.briefingAfterS` (30 s) after a clue is created
+(`world-mode.md` 3.1). It never opens a screen.
+
+### 13.4 Asleep (follow-up 2, owner answers NW1, NW2)
+
+The sleeper's view dims to its bedroom, sound drops, and a counter shows "2 of 3 in bed" (the count of active players,
+never their names). A move or a hit wakes it. When the skip fires, every client plays the dawn card of 2 with "You slept
+through".
+
+### 13.5 The county jail
+
+The cell is a scene, not a screen: the jailed seats walk in it, talk, and use its three mini-game props (`world-mode.md`
+5.1). The top band shows "County jail" and the time to dawn. A jailed seat cannot open the petition form or sign.
+
+## 14. Reconciled
+
+- **R2. The bell.** The Inquest opens only on a reported body; the Tribunal opens at the jail; the bell only gathers
+  NPCs (3, 4; `world-mode.md` 3.1).
+- **R3. The petition is not a vote.** The petition form collects signatures to start a manhunt and never decides guilt;
+  the Tribunal's scales do (4, 13.1).
+- **R10. The verdict card.** The scales show a finding (Dismissed, Proven, Murder proven), and the card shows the charge's
+  sentence (4).
+- **No NPC holds a screen open** (second follow-up, owner answer NW4). NPCs present evidence and sign petitions only in
+  time the players already spend; a petition, a manhunt or a night skip never waits for an NPC.
+
+The full list of reconciliations is in `world-mode.md` 12 and `gdd-map.md` 4.

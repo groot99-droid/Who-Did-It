@@ -2,6 +2,8 @@
 
 Status: design only, for owner review. Nothing here is built, no game file changes, and `GDD.md` is untouched. The brief (`owner-brief.md`, item 9 and the follow-up on the rogue, item 10) asks for "a logic table to capture all of this and make the game make sense at a logic based level": every placed thing has a purpose and a tool or action that works on it, an axe cuts the lumber piles, a pickaxe breaks the boulders, chests are placed by rules, and a rogue can gather food, make his own lock picks and skip the tax. This document is that table: what it is (sections 2 to 4), what it does to the 605 props (5), the chests (6), the resource nodes (7), the new gear (8), how it plugs into the tables that exist (9), and the table itself (10). Numbers marked _proposed_ move into `packages/content/data` when the owner approves; this document does not own any number. Refusal wording and the reason list are in `failures.md`.
 
+**Owner answers folded in (9D, 2026-10-25).** `owner-answers.md` overrides this document where they disagree. Changed paragraphs are marked "(owner answer <ID>)": the tool walls (LT1), the resource chains (LT1), the lock-pick mini-game (LT2), the inventory and crafting grid (LT4) and the depletion of stock (LT7) are the five that differ from 9B's defaults; LT3, LT5, LT6, LT8 and LT9 kept them. Section 14 lists the reconciliations.
+
 ## 1. What is wrong today
 
 All counts come from `docs/round9/tools/prop-census.mjs`, which only reads `packages/content/data/scenes/*.json`.
@@ -22,7 +24,7 @@ An **interaction** is a verb that a **tool** (or bare hands) performs on a **tar
 
 Three rules keep it sane:
 
-1. **A tool makes it faster, bigger or possible. Bare hands always get a little where a thing is loose.** A woodpile gives a few split logs by hand; an axe gives more, faster. A boulder cannot be broken by hand. A lock cannot be picked by hand. That is the line between a speed-up and a wall, and the table states which each interaction is.
+1. **A pile that cannot be used today opens to its tool (owner answer LT1).** The owner: "if you cant currently access a resouce pile in this game, a tool should unlock it: there are these piles of stuff representing cut log piles, barrels, crates, trees, etc." So every pile that is decoration today (log piles, woodpiles, stumps, trees, boulders, rock and ore piles, nailed crates) is walled by its tool: an axe for wood, a pickaxe for stone, a crowbar or hammer for a crate. Bare hands get nothing from a pile. The 65 gathering nodes, which players can use by hand today, keep their bare-hands gather (14, R8), and open containers (barrels, sacks, drawers) still open by hand (6.1). 9B's "bare hands always get a little" is retired.
 2. **Every interaction has a failure line per reason in the world's voice** (`failures.md` section 5), so "you need a pickaxe" is part of the data, not a code path.
 3. **Nothing in the table is secret.** A prop's state (chopped, broken, looted) is public to the scene. What a container holds is private to whoever opens it, rolled on a stream of its own (section 6.4).
 
@@ -64,8 +66,8 @@ Proposed; the file is not created in this round. Style follows the other content
       "verb": "chop", "label": "Chop", "target": "lumber", "handler": "stock", "status": "live",
       "phases": ["day", "night"], "ownership": "wild", "ships": "V1",
       "modes": [
-        { "tool": { "tag": "cut", "tier": 1 }, "holdS": 4, "drops": [{ "item": "timber", "qty": [2, 3] }], "wear": 1, "noise": "chop" },
-        { "tool": null,                        "holdS": 8, "drops": [{ "item": "timber", "qty": [1, 1] }], "wear": 0, "noise": null, "only": ["firewood", "log_basket", "woodpile"] }
+        // owner answer LT1: no bare-hands mode on a pile; logs go to the mill (7.1)
+        { "tool": { "tag": "cut", "tier": 1 }, "holdS": 4, "drops": [{ "item": "logs", "qty": [2, 3] }], "wear": 1, "noise": "chop" }
       ],
       "after": { "state": "cut", "respawnS": 300 },
       "fail": {
@@ -81,7 +83,7 @@ Proposed; the file is not created in this round. Style follows the other content
       "modes": [
         { "tool": { "tag": "break", "tier": 1 }, "holdS": 6, "drops": [{ "item": "stone", "qty": [2, 3] }, { "item": "tinOre", "qty": [1, 1], "chance": 0.25 }], "wear": 2, "noise": "smash" }
       ],
-      "after": { "state": "rubble", "respawnS": null },
+      "after": { "state": "rubble", "respawnS": 1200 }, // owner answer LT7: depleted stock comes back
       "fail": { "NEED_TOOL": "The boulder does not care. You would want a pickaxe." }
     },
 
@@ -89,7 +91,8 @@ Proposed; the file is not created in this round. Style follows the other content
       "verb": "pick", "label": "Pick the lock", "target": "lockedDoor", "handler": "lock", "status": "nfy",
       "feature": "lock picking", "phases": ["day", "night"], "ownership": "owned", "ships": "V1.5",
       "modes": [
-        { "tool": { "tag": "pick", "tier": 1 }, "holdS": 5, "consumes": [{ "item": "lockpicks", "qty": 1 }], "noise": "lockpick", "leaves": "print", "unlocks": true },
+        // owner answer LT2: the pick runs the lock-pick mini-game (8.5); a pick breaks only on a snap
+        { "tool": { "tag": "pick", "tier": 1 }, "minigame": "lockpick", "noise": "lockpick", "leaves": "scratch", "fineChance": 0.1, "unlocks": true },
         { "tool": { "tag": "pry", "tier": 1 },  "holdS": 3, "wear": 1, "noise": "crowbar", "unlocks": "broken" }
       ],
       "fail": {
@@ -139,14 +142,18 @@ export const Mode = z.strictObject({
   tool: z.strictObject({ tag: Tag, tier: z.number().int().min(1).max(3) }).nullable(),
   /** Stems this mode applies to when the class has several (the bare-hands woodpile). Default: all. */
   only: z.array(z.string()).optional(),
-  holdS: z.number().positive(),
+  holdS: z.number().positive().optional(), // required unless `minigame` is set
   drops: z.array(Drop).optional(),
   loot: Id.optional(), // key of lootTables
   consumes: z.array(z.strictObject({ item: Id, qty: z.number().int().positive() })).optional(),
   /** Uses taken from the tool's durability; 0 = none. */
   wear: z.number().int().min(0).default(0),
   noise: NoiseKey.nullable().default(null),
-  leaves: z.enum(['print']).optional(),
+  leaves: z.enum(['print', 'scratch']).optional(), // scratch: the role-neutral picked-lock clue (owner-brief follow-up 2)
+  /** owner answer LT2: a mode may run a mini-game (3.16) in place of a plain hold. */
+  minigame: Id.optional(),
+  /** Chance a Notice-free fine lands anyway (owner-brief follow-up 2, lock picking). */
+  fineChance: z.number().min(0).max(1).optional(),
   unlocks: z.union([z.literal(true), z.literal('broken')]).optional(),
 });
 
@@ -238,8 +245,9 @@ Reconciling with the 516: 89 props are neither `dressing` nor `decor`. 68 of the
 
 | Group | Stems (count) | n | Hand | Tool → result |
 | --- | --- | ---: | --- | --- |
-| Lumber | stump 15, timber_set 8, log 6, firewood 5, log_basket 5, fallen_log 3, woodpile 3, planks 3 | 48 | firewood, log_basket, woodpile, planks: take 1 (slow) | **Axe** cuts: woodpile 3 timber, log and fallen_log 3, stump 1 timber and a little resin, timber_set 2 with a rockfall risk in a cave. `planks`: take 1 Planks by hand (owned: theft in a shop or yard) |
-| Stone | boulder 10, rock_pile 4, ore_pile 4, rubble 2 | 20 | rock_pile, ore_pile: take 1 (slow) | **Pickaxe** breaks a boulder into 2 to 3 stone and sometimes tin ore; rock_pile 2 stone; ore_pile 2 tin ore; rubble clears to uncover a small cache |
+| Lumber | stump 15, timber_set 8, log 6, firewood 5, log_basket 5, fallen_log 3, woodpile 3, planks 3 | 48 | planks only: take 1 Planks (owned: theft in a shop or yard). Every other lumber stem needs the axe (owner answer LT1) | **Axe** cuts: woodpile 3 logs, log and fallen_log 3, stump 1 log and a little resin, timber_set 2 with a rockfall risk in a cave. Logs become Timber at the mill (7.1) |
+| Stone | boulder 10, rock_pile 4, ore_pile 4, rubble 2 | 20 | none (owner answer LT1) | **Pickaxe** breaks a boulder into 2 to 3 stone and sometimes tin ore; rock_pile 2 stone; ore_pile 2 tin ore; rubble clears to uncover a small cache |
+| Trees (new class, owner answer LT1) | the scenes' tree props and tree-tile clusters; the census lists them as `keep` landscape today (5.3) | n/a | none | **Axe** fells: 3 logs, then a stump that regrows (`respawnS`, 7). Round 10 adds `tree` stems to the census mapping |
 | Forage and water | mushrooms 10, water_bucket 6, bucket 4, snare 3 | 23 | mushrooms: forage 1; water_bucket: fill a Bucket (needs one); snare: disarm | **Skinning knife** skins a creature corpse for hide and game (8.4). Disarmed snare gives a Snare |
 | Stations | saw_horse 2, workbench 2, grindstone 2, anvil 1, forge 1, kiln 2, mortar_table 1, still 1, shaping_table 3, dough_trough 1, peel_rack 2, couche_rack 2, drying_frame 3 | 23 | Craft a recipe (9.4) | Saw horse: Timber to Planks. Grindstone restores a tool's durability. Kiln: Tin Ore to Tin Ingot. Forge and anvil: tier-2 tools and armour. Mortar table and still: Salts, Bandage. Bakery stations: dough then loaf. Drying frame: herbs keep longer |
 | Haul | wheelbarrow 6 | 6 | Load and push: carry capacity for materials (P2) | none |
@@ -314,7 +322,7 @@ An `empty` entry is a normal weight, so the player learns a barrel is usually ba
 - Contents are rolled **once per container at Start** on a new stream `loot` (`sim/seeds.ts`), independent of every secret stream (CLAUDE.md: nothing secret shares a stream with anything public) and of the order players act. Two players opening the same chest an hour apart find the same thing; the first takes it.
 - Which containers are active and what they hold is **server-only** until opened. The wire carries only each prop's public state (searched, open, broken); an opened container tells the scene it was opened and by nobody in particular, unless a witness saw (the Notice system of 3.23).
 - A looted container does not refill. Stock containers (a tool cache) restock only at Start.
-- The hub `kitChest` stops being a special prop. GDD 3.5 says an ejected Village role's kit goes to a chest at the square; with voting gone (`phases.md`) that sentence has no trigger, so the hub chest becomes the town's **lost-and-found**: kit confiscated by an arrest goes into it and anyone can take it (the evidence route, `world-mode.md`). Open question 3.
+- The hub `kitChest` stops being a special prop. GDD 3.5 says an ejected Village role's kit goes to a chest at the square; with voting gone (`phases.md`) that sentence has no trigger, so the hub chest becomes the town's **lost-and-found** (owner answer LT3: default): kit confiscated by an arrest goes into it and anyone can take it (the evidence route, `world-mode.md`). It is also the **town chest** of owner answer LW9: a convicted robber's stolen goods go into it, and the victim, told privately, must race anyone else who knows (`world-mode.md` 8). Its contents are public to whoever opens it, and nothing in it is role-bound.
 
 ## 7. Nodes and props
 
@@ -322,8 +330,46 @@ The 65 nodes keep their pools and respawns (`NodeSpot.pool`, `poolActiveFrac`). 
 
 - **Anchor.** `NodeSpot` gets an optional `prop` (a prop id). A node with an anchor draws the prop's `whole` or `cut` frame in place of the floating `node_*` sprite and is gathered by the interaction of the prop's class. `prop-census.mjs --nodes` puts only 8 of the 65 within 2.5 tiles of a matching prop, so round 10 either moves a node to its nearest stump, ore pile or mushroom patch or adds an anchor prop beside it (a stump for a timber node). The `--nodes` report lists each node and its nearest prop.
 - **One engine.** A resource gather is an interaction on class `node:<resource>`: `handler: "gather"` (the current `handleGather`) with `modes` that carry the tool. Tin Ore keeps a hard tool (a `dig` mode, the Spade); a pickaxe also qualifies at tier 1 (_proposed_). Timber and stone get a bare mode, slow and small, and a tool mode that is faster and bigger, so the axe and the pickaxe speed supply up rather than gate it.
-- **Stock props are finite, nodes are renewable.** A woodpile gives its timber once and returns after `respawnS`; a node follows `resources.json` `respawnS`. Both are the same code, and `after.respawnS: null` means never within a match.
+- **Stock props are finite, and everything comes back (owner answer LT7).** A woodpile gives its logs once and returns after `respawnS`; a node follows `resources.json` `respawnS`. Both are the same code. Every pile now has a respawn, boulders and rubble included (P: 1200 s, about 2.5 days of 480 s; a tree's stump 900 s), so `respawnS: null` is kept only for the one-shot containers of 6.4 and the strongbox.
+- **Bare hands on nodes stay (owner answer LT1; 14, R8).** A node is gathered by hand as today. Timber and stone nodes keep their tool mode as a speed-up (about twice as fast, owner answer LT5: default); Tin Ore keeps its dig wall.
 - **Supply check.** Today 16 timber nodes, half active (8), each 1 timber per 3 s hold and 90 s respawn. A tool must raise the ceiling without breaking the quota and rent loops (`economy.json` `rent`, `quota`), so the proposed numbers keep a piled yield (2 to 3) below the 90 s respawn of three nodes, and the build session checks the totals against the day length of `world-mode.md` before any value is final. Open question 5.
+
+### 7.1 Resource chains (owner answer LT1)
+
+The owner: "there also needs to be resource logic, for example taking wood from trees need to be turned into lumber at the lumber mill, grain and other food items can be used at the bakery to create different recipes, for this you must use different sections of the bakery to make parts of dishes and bring them together in the oven. these dishes can be used for high scrip prices, favors, or buffs like max health up, stamina never drains, or other buffs distributed across different items."
+
+**Wood.** Trees and log piles give **Logs** (a new raw item, `logs`). Logs are turned into **Timber** (the item every recipe already uses; no id changes) at the lumber mill's head saw (`bp_mill`, the `head_saw` prop moves from `keep` to `interact`: 1 log to 2 timber, 4 s, P) or, slowly, at a saw horse (1 log to 1 timber, 8 s, P; HollowMere has two). The 16 timber nodes keep giving Timber directly: they are the lumber camp's cut stacks.
+
+| Raw | Station | Out | Next |
+|---|---|---|---|
+| Logs (axe on a tree or pile) | head saw (`bp_mill`) or saw horse | Timber | Planks at the saw horse; tools at the workbench; the quota rack |
+| Stone, Tin Ore (pickaxe) | kiln | Tin Ingot | forge and anvil (BlackPine first, owner answer LT9: default) |
+| Hide (skinning knife, owner answer LW13: default) | workbench | Leather | Leather jerkin |
+
+**The bakery's sections.** A dish is made in parts at different stations of Crumb's Ovens and the bakery, and the parts come together in the oven. Each part is an item (P names), and each station is a prop the census already counts:
+
+| Section (scene, prop) | Makes | From |
+|---|---|---|
+| Flour bin (`bakery`, `flourBin`) | Flour | grain sacks (a `pantry` loot draw) or the shop |
+| Mixing room (`crumb_mixing`, `doughMixer`, `dough_trough`) | Dough | Flour, water (a filled Bucket) |
+| Proofing room (`crumb_proofing`, `proofingCabinet`, `couche_rack`) | Proofed dough | Dough, and time (P: a tenth of a day) |
+| Cold room (`crumb_cold`, `coldShelves`) | Filling | Berries, Game, Mushrooms, Herbs, or Cream (the goat, `goat`) |
+| Shaping tables (`shaping_table`) | Shaped pastry | Proofed dough, Filling |
+| The oven (`crumb_oven`, `oven`, `peel_rack`) | **The dish** | the parts, brought together |
+
+**Dishes and what they are for.** Each dish has one use from the owner's three: a high Scrip price, a favour, or a buff. A buff lasts until the next dawn (P) and only one dish buff runs at a time.
+
+| Dish (P) | Parts | Use |
+|---|---|---|
+| Wake Loaf (exists) | Proofed dough | Food; the Baker's morning task |
+| Game Pie | Shaped pastry, Game filling | **High price**: the market buys it at 12 Scrip (P) |
+| Berry Tart | Shaped pastry, Berry filling | **Buff**: max health +10 (14, R12) |
+| Miner's Pasty | Shaped pastry, Mushroom and Game filling | **Buff**: stamina never drains, for a quarter of the day |
+| Herb Bread | Proofed dough, Herb filling | **Buff**: poison resistance, as armour's (8.2) |
+| Funeral Cake | Shaped pastry, Cream filling | **Favour**: a quest-giver or the Undertaker counts it as a finished errand step (`living-world.md` 1.3) |
+| Night Bun | Proofed dough, Cream filling | **Buff**: warmth at night (Fear rises slower, `moods.fear.darkRiseS`) |
+
+Recipes live in `recipes.json`, with a new optional `parts` list (each part an item and the station that makes it) and `buff` (an effect id in `effects.json`). The Baker's card makes each dish faster (P: half the time) but nobody is barred from any step, so a dish never marks the Baker (10.1). A dish's buff is a Private effect; the drawn figure shows none.
 
 ## 8. New items
 
@@ -338,25 +384,27 @@ All values _proposed_; they move to `items.json` and `balance.json`.
 | Pickaxe | break 1, dig 1 | 20 | General store, mine `tool_rack`, `mineStash`, recipe (timber 1, tin ore 2 at a workbench) |
 | Iron pickaxe | break 2, dig 1 | 40 | Forge |
 | Spade (exists) | dig 1 | 20 | as today |
-| Lockpicks (exists) | pick 1 | charges | recipe: 1 tin ore at a basin (`recipes.json`), found, or bought at the black market |
+| Lockpicks (exists) | pick 1 | charges; one is lost only when the pick snaps in the mini-game (8.5, owner answer LT2) | recipe: 1 tin ore at a basin (`recipes.json`), found, or bought at the black market |
 | Fine pick | pick 2 | charges | Forge, or loot in a tier-3 chest |
 | Crowbar (exists) | pry 1 | 20 | recipe as today |
 | Hammer | pry 1 (crates only) | 40 | tool_rack |
 | Skinning knife | skin 1 | 20 | Gamekeeper's stall, general store, `toolshed` and `forager` loot (8.4) |
 
-Tier 2 opens what tier 1 cannot (a strongbox lock, a granite boulder, a thick log). Tools wear: each use takes `wear`, and a worn tool breaks with a line ("The axe handle splits."). The grindstone restores it, which gives the camp's grindstones and the smithy a use. A tool's `kind` is `tool`, so it takes an inventory slot (open question 4).
+Tier 2 opens what tier 1 cannot (a strongbox lock, a granite boulder, a thick log). Tools wear: each use takes `wear`, and a worn tool breaks with a line ("The axe handle splits."). The grindstone restores it, which gives the camp's grindstones and the smithy a use. A tool's `kind` is `tool`, so it goes to a belt slot first, then the pack (8.6, owner answer LT4).
 
 ### 8.2 Armour
 
 Armour is a separate equipment slot, not an inventory item. Two slots, `body` and `head`; tiers 1 to 3.
 
-| Item | Slot | Tier | Damage taken (_proposed_) | Source |
-| --- | --- | ---: | --- | --- |
-| Quilted coat | body | 1 | ×0.85 | General store, `armoury` loot, recipe (cloth) |
-| Leather jerkin | body | 2 | ×0.70 | Recipe: hide from a wolf or boar skinned with a skinning knife, at a workbench |
-| Tin mail | body | 3 | ×0.55; walking speed ×0.95; footsteps +1 tile | Forge (tin ingot), `armoury` loot |
-| Miner's cap | head | 1 | ×0.90 | BlackPine office, mine `tool_rack` |
-| Tin helm | head | 2 | ×0.80 | Forge |
+Owner-brief follow-up 2 asked for armour that is "a little more complicated (poison resistance, blood clotting for bless, etc)", and owner answer LW8 accepted the default: each body tier cuts damage to 80%, 65% and 50%, with one or two resistances, and heavier armour costs stamina.
+
+| Item | Slot | Tier | Damage taken (_proposed_) | Resistances (owner answer LW8) | Weight | Source |
+| --- | --- | ---: | --- | --- | --- | --- |
+| Quilted coat | body | 1 | ×0.80 | Warmth: Fear rises slower at night | none | General store, `armoury` loot, recipe (cloth) |
+| Leather jerkin | body | 2 | ×0.65 | Clotting: Bleeding stops in half the time | stamina regen ×0.9 | Recipe: hide from a wolf or boar skinned with a skinning knife, at a workbench |
+| Tin mail | body | 3 | ×0.50 | Clotting; poison resistance: Poisoned drains at half rate | stamina regen ×0.8; walking speed ×0.95; footsteps +1 tile | Forge (tin ingot), `armoury` loot |
+| Miner's cap | head | 1 | ×0.90 | Lamp: light radius +1 tile in a dark scene | none | BlackPine office, mine `tool_rack` |
+| Tin helm | head | 2 | ×0.80 | Daze resistance: Dazed lasts half as long | stamina regen ×0.95 | Forge |
 
 Rules:
 
@@ -380,9 +428,45 @@ Today damage comes only from `balance.body.damage` and the mobs' `dmg`. A `weapo
 
 Every weapon has `kills: false` against a seat: a player is never killed by anything except the Knife and a creature's bite (the pacing rule in the round-9 plan). Against creatures a weapon deals `dmg` × `creatureMult`; wolf (36 HP) takes three hatchet blows, which is the point of carrying one. Bleeding stops at 1 HP (`world-mode.md`). A tool used as a weapon wears faster (`wear` 2 per blow), so the axe in the Killer's hand costs it an axe.
 
+Resistances are new optional fields on an item's `armor` block (`resist: { poisoned, bleeding, fear, dazed }`, each a multiplier on the effect's rate or length), read by `body/effects.ts`. They never touch the Knife.
+
 ### 8.4 Skinning
 
 A creature corpse (`creatureCorpseS` 10 in `balance.body`) can be skinned with a **Skinning knife** (item `skinningKnife`, tag `skin` 1, `roleBound: false`, durability 20, sold at the gamekeeper's stall and the general store, found in `toolshed` and `forager` loot) for hide (wolf 2, boar 2, bat and rat none) and game (wolf 1, boar 2; bat and rat none; _proposed_). Hide is the leather jerkin's material; game is the stew's (9.6). The Knife and the Replica Knife are role kit and have no part in it: if the Killer's Knife could skin, only the Killer could ever hold hide or wear a jerkin, and the leather would mark them. This ties the mobs (9C bosses and drops) to gear without another item class.
+
+### 8.5 The lock-pick mini-game (owner answer LT2)
+
+The owner: "i want a traditional lock pick game, rotating clicking, pushing and pulling lock pick, lock pick tension causing it to break if player isn't careful". It replaces 9B's 5 s toll and is a new kind in `minigames.json` beside crates, pour, slide, stoke and tap (GDD 3.16), so it inherits the server-kept solution and the replayed answer.
+
+| Part | How it plays |
+| --- | --- |
+| The cylinder | A lock has pins by tier (P: tier 1 three pins, tier 2 four, tier 3 five). Each pin has a hidden set point, drawn at Start on a new public-safe stream `locks` (no secret shares it) |
+| Push and pull | The player moves the pick in and out along the pins (pull back, push forward) to choose a pin |
+| Rotate and click | Lifting the chosen pin while turning the tension wrench clicks it into place at its set point; the click is a sound and a small jolt |
+| Tension | A meter rises while the wrench turns against an unset pin. Past the band (P: `minigames.lockpick.snapAt` 0.85) the pick **snaps**: one Lockpicks charge is spent and the pins drop. Gentle tension sets nothing; too much breaks the pick |
+| Tier | A pick of a lower tier than the lock has a narrower band, so it snaps sooner; the Fine pick widens it |
+| Done | All pins set: the lock opens (`unlocks`) |
+
+**What stays from 9B and follow-up 2.** The attempt makes the `lockpick` noise while it lasts; an opened lock leaves the role-neutral **scratch clue** (owner-brief follow-up 2: it points to no role) and rolls `fineChance` (P: 0.1) for a small trespass fine even with no witness; a witness still writes a Notice. The Done control after `assistS` (GDD 3.16) does not apply: a lock has no base result, it is open or not.
+
+**NPCs.** An NPC picks a lock by a drawn success chance per pin in the time a human takes (second follow-up: NPCs do every action a player can), on the NPC's own stream.
+
+### 8.6 The inventory and the crafting grid (owner answer LT4)
+
+The owner: "default option is fine, but pockets need to be bigger, i want a inventory exactly like minecraft with crafting table in it." So 9B's default (2 belt slots for tools, equipment slots for armour and one weapon) stays, and the pack grows into a grid with a crafting square, as in Minecraft.
+
+| Part | Slots (_proposed_) | Holds |
+| --- | ---: | --- |
+| Hotbar | 6 | Anything; the number keys and the touch strip select one. The held item is the hotbar's selected slot |
+| Pack | 18 (3 rows of 6) | Anything. Today's pack is 5 |
+| Belt | 2 | Items of kind `tool` only (9B default) |
+| Equipment | head, body, weapon | Armour (8.2) and one weapon (8.3) |
+| Crafting square | 2 by 2, and one output slot | Hand recipes, made anywhere |
+| Stacks | materials up to 16, food up to 4, tools and gear 1 | `resources.stackMax` (5 today) becomes per-kind |
+
+**Crafting.** The inventory screen always shows the 2 by 2 square. At a **workbench** (the `workbench` prop, 9.4) the square becomes 3 by 3 for the bigger recipes: tools, armour, the club. Recipes are shapeless by default: the grid matches the set of inputs, not their places. A tool recipe may carry an optional `shape` so that an axe is laid out like an axe, as in Minecraft. Station recipes (the oven's dishes, the kiln, the forge) stay at their stations: their prop opens a station grid with the station's own recipes. The server checks every craft (rule 7 of `living-world.md` 0): the client sends the grid, the server matches it and moves the items inside `step()`.
+
+**Rules that keep it safe.** A role-bound item cannot be placed in a crafting grid, and no recipe takes one (10.1). The inventory is private, as today. Everything not bound drops on death or can be robbed (`world-mode.md` 8), so a bigger pack is a bigger loss (14, R14).
 
 ## 9. How the table extends what exists
 
@@ -391,7 +475,7 @@ A creature corpse (`creatureCorpseS` 10 in `balance.body`) can be skinned with a
 `holds` is a map from prop kind to the hold an NPC starts there; the brain refuses its own cycles after one refusal (`routine.ts:758-763`). It is `{}`, so NPCs only stand and walk. Proposed:
 
 - `holds` and `activities[].kinds` accept **class ids** as well as prop kinds, so `"holds": { "lumber": "interact" }` sends a lumberjack figure to chop and an NPC with a Lockpicks pick locks. A `townsfolk` row gains `carries: ["axe"]` so an NPC's hold is not refused for a missing tool; an NPC without it gets `NEED_TOOL` and ends the cycle, like a human.
-- An NPC's work is **cosmetic by default** (the animation and the noise run, the prop's state does not change), so NPCs never empty the stock a player came for. Open question 7 lets the gatherer figures actually deplete a pile, which turns the rogue's competition into a world rule.
+- **NPCs use up stock, and it comes back (owner answer LT7).** The owner: "yes but it comes back after sometime". An NPC's hold changes the prop's state and takes the drops like a player's, so a lumberjack figure who chops the square's pile leaves a stump, and the pile returns after its `respawnS` (7). This matches the second follow-up: an NPC sells only what it gathered or bought, and a stall can run empty (owner answer NW3: default). Chore pay is re-tuned with depletion on (`living-world.md` 1.6).
 - The `ignore` list shrinks to the kinds that really are never stations. Today 17 kinds are in it; after the table every kind is a class or is `keep`.
 - This is the hook for `living-world.md`: a living world's chores are interactions with an NPC doer.
 
@@ -411,7 +495,7 @@ Recipes already name a `station` prop kind (`basin`, `oven`). Proposed new stati
 
 `lock: { keyId }` gains an optional `tier` (additive): `{ keyId, tier }`. A portal with a lock is a `lockedDoor` target; `pick_lock` (3.1) opens it at tier ≤ the pick's tier, a key item whose id equals `keyId` opens it silently, and a crowbar breaks it for good (the door "stays broken", GDD 3.5). `Portals.ts:180-183` calls the resolver instead of refusing every keyed door. No existing door is locked in the data, so the round-10 scene edit chooses which doors lock (the manor study first, since `mu.study_door` and the Study Key caches in the barn and the cellar are already placed).
 
-**Curfew doors.** From dusk an Indebted seat's curfew doors are refused by `curfewBars` (`Portals.ts:187`), and the curfew list in `economy.json` names the scenes: tavern_bar, widow_parlour, bakery, apoth_shop, manor_hall and barn on HollowMere; bp_lodge, bp_office and bp_smithy on BlackPine. For the lock-picking path (the rogue who dodges the curfew and the tax) to exist, **the round-10 scene edit must give the portals into those scenes a `lock` (`keyId` and `tier`)**, and `curfewBars` must call the resolver instead of refusing outright: a curfew door is then a locked door at night, which a pick, a key or a crowbar opens, with a print and noise, and `CURFEW` is the refusal only for a seat with none of them. Without the `lock` on those portals `pick_lock` has nothing to open there.
+**Curfew doors.** From dusk an Indebted seat's curfew doors are refused by `curfewBars` (`Portals.ts:187`), and the curfew list in `economy.json` names the scenes: tavern_bar, widow_parlour, bakery, apoth_shop, manor_hall and barn on HollowMere; bp_lodge, bp_office and bp_smithy on BlackPine. For the lock-picking path (the rogue who dodges the curfew and the tax) to exist, **the round-10 scene edit must give the portals into those scenes a `lock` (`keyId` and `tier`)**, and `curfewBars` must call the resolver instead of refusing outright: a curfew door is then a locked door at night, which a pick, a key or a crowbar opens, with a scratch clue and noise (owner-brief follow-up 2), and `CURFEW` is the refusal only for a seat with none of them. Without the `lock` on those portals `pick_lock` has nothing to open there.
 
 ### 9.6 Rows for the living world (9C): berries, game, stew
 
@@ -441,19 +525,22 @@ Rows are what a seat holds, columns what it works on. A cell is the verb and the
 
 | Object | Bare hands | Axe | Pickaxe | Spade | Lockpicks | Crowbar | Key | Skinning knife |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Woodpile / firewood / log basket | Take 1 | **Chop** 2 to 3 timber | – | – | – | – | – | – |
-| Log / fallen log | – | **Chop** 3 timber | – | – | – | – | – | – |
-| Stump | – | **Grub** 1 timber, resin | – | – | – | – | – | – |
-| Mine timber set | – | **Cut** 2 timber (rockfall risk) | – | – | – | **Pry** 1 timber (rockfall) | – | – |
+| Tree (owner answer LT1) | – | **Fell** 3 logs | – | – | – | – | – | – |
+| Woodpile / firewood / log basket | – (owner answer LT1) | **Chop** 2 to 3 logs | – | – | – | – | – | – |
+| Log / fallen log | – | **Chop** 3 logs | – | – | – | – | – | – |
+| Stump | – | **Grub** 1 log, resin | – | – | – | – | – | – |
+| Mine timber set | – | **Cut** 2 logs (rockfall risk) | – | – | – | **Pry** 1 log (rockfall) | – | – |
 | Boulder | – | – | **Break** 2 to 3 stone, tin ore sometimes | – | – | – | – | – |
-| Rock pile / ore pile | Take 1 | – | **Break** 2 stone or tin ore | – | – | – | – | – |
+| Rock pile / ore pile | – (owner answer LT1) | – | **Break** 2 stone or tin ore | – | – | – | – | – |
 | Rubble | Clear slowly | – | **Clear** and uncover a cache | Dig | – | – | – | – |
 | Tin seam (node) | – | – | **Mine** tin ore | **Dig** tin ore | – | – | – | – |
 | Barrel / sack / hay / churn | **Search** | – | – | – | – | – | – | – |
 | Nailed crate | – | Smash (noise 10) | – | – | – | **Pry** (noise 10) | – | – |
-| Locked chest / footlocker | – | – | – | – | **Pick** (print, noise 5) | **Pry** (broken, noise 10) | **Open** (silent) | – |
+| Locked chest / footlocker | – | – | – | – | **Pick**: the mini-game (scratch, noise 5, owner answer LT2) | **Pry** (broken, noise 10) | **Open** (silent) | – |
 | Strongbox | – | – | – | – | – | – | **Open** (its key only) | – |
-| Locked door | – | – | – | – | **Pick** | **Break** (stays broken) | **Open** | – |
+| Locked door | – | – | – | – | **Pick**: the mini-game | **Break** (stays broken) | **Open** | – |
+| Head saw / saw horse (owner answer LT1) | **Saw** logs into timber | – | – | – | – | – | – | – |
+| Bakery section (owner answer LT1) | **Make** a dish's part; the oven brings the parts together (7.1) | – | – | – | – | – | – | – |
 | Shop shelf (owned) | **Take** (theft) | – | – | – | – | – | – | – |
 | Wolf / boar corpse | – | – | – | – | – | – | – | **Skin** for hide and game |
 | Berry bush (node) | **Forage** berries | – | – | – | – | – | – | – |
@@ -470,7 +557,7 @@ The rule (CLAUDE.md, role secrecy): holding or using an item must not mark a sea
 - The Master Keyring (a Cabal item, `use: lockUnlock`) keeps its own ability, which locks and unlocks any door. It is not a table verb; the table's `pick_lock` and the Skeleton Key and Crowbar stay open to every seat, so a lock that opens is not proof of a Cabal card.
 - The Slingshot and Crossbow in 8.3 are role kit, listed for their damage numbers only. The new weapons (club, hatchet, axe, pickaxe) are neutral, so armed gear does not mark a role either.
 - Nothing in the table reads or writes a seat's role card, inventory or notebook beyond the acting seat, and containers roll on a stream no secret shares (6.4).
-- Left open (not a role leak): a Killer who picks a lock leaves a print and noise like anyone, so the lock tells nobody anything about roles; the tool and the print are the evidence, not the card.
+- Left open (not a role leak): a Killer who picks a lock leaves a scratch and noise like anyone, so the lock tells nobody anything about roles; the tool and the scratch are the evidence, not the card (owner-brief follow-up 2).
 
 ## 11. Checking the rogue
 
@@ -482,11 +569,13 @@ The owner's example: "the rogue who refused to buy bread and gathers food instea
 | Make lock picks | Tin Ore (a Spade or a Pickaxe on a seam, or a boulder), then the existing `lockpicks` recipe at a basin; the rogue needs no shop |
 | Open what the tax guards | `pick_lock` on the curfew-locked door or the owned shelf (`ownership: "owned"`, `crime: "theft" / "trespass"`) |
 | Skip the tax | Rent and quota are paid in Scrip or items (`economy.json`); an owned container or a seam gives a way to earn without the shop; the quota rack takes timber and stone, both now easy to obtain with the right tool |
-| Be caught | A witness or a print (`leaves: "print"`) writes a Notice; the Watchman's arrest route (`world-mode.md`) reads it |
+| Be caught | A witness writes a Notice, and the scratch (`leaves: "scratch"`) tells the town a lock was picked; a petition and a manhunt (`world-mode.md` 3.1, owner answer WM2) read them |
 
 `emergent-play.md` (9C) traces this in full; the table's job is that no step needs code outside it. The one thing it cannot supply alone is the tax's own consequences, which `economy.json` already owns.
 
 ## 12. Build plan for round 10 (not this PR)
+
+**Superseded by `round10-plan.md`** (9D), which orders these steps with the rest of the round and adds the owner answers' work: the tool walls and trees (LT1), the mill and the bakery's sections (LT1), the lock-pick mini-game (LT2), the inventory and grid (LT4) and depletion (LT7). 9B's list is kept below as written.
 
 Pull requests under 400 lines, one concern each, in this order. Each keeps the build green and changes no game balance until the last.
 
@@ -503,7 +592,7 @@ The validator in step 1 is the safety net for the rest: it fails when a scene fi
 
 ## 13. Open questions for the owner
 
-Each has a default the build uses unless the owner answers otherwise.
+**All answered (owner, 2026-10-25; `owner-answers.md`).** LT1 different (tools unlock piles, plus resource chains: 2, 5.1, 7, 7.1), LT2 different (a real lock-pick mini-game: 8.5), LT3 default (6.4), LT4 different (bigger pockets, a Minecraft-style inventory with a crafting grid: 8.6), LT5 default (7), LT6 default (8.2), LT7 different (NPCs use up stock and it comes back: 7, 9.1), LT8 default, LT9 default (7.1). The questions as asked:
 
 1. **A tool is a speed-up or a wall?** Rule 1 makes lumber and loose stone available by hand, slowly, and walls only boulders, locks and nailed crates. _Default:_ as written. Alternative: wall everything behind a tool, as the owner's phrasing ("an axe should be able to cut up the lumber piles") may mean.
 2. **Is a crate or a lock a puzzle, or a toll?** A lock picks in 5 s with a consumed pick. _Default:_ a toll (a hold, a noise, a print), no mini-game. Alternative: a lock-picking mini-game in the style of 3.16.
@@ -514,3 +603,14 @@ Each has a default the build uses unless the owner answers otherwise.
 7. **Do NPCs deplete stock?** _Default:_ no, their work is cosmetic. Alternative: gatherer figures take from piles and the world runs short, which makes the rogue's competition real.
 8. **How strict is ownership?** Taking from a shop shelf is theft only when a witness or a camera of the town sees it. _Default:_ a witness (an NPC or a seat in sight) writes a Notice, as 3.23 does for other crimes. Alternative: every taking from an owned thing is logged and billed.
 9. **Do iron tools and tin mail exist before BlackPine's forge?** The only forge and anvil are in `bp_smithy`. _Default:_ tier 2 is BlackPine-first; HollowMere reaches it by carrying ingots across (they are items). Alternative: a HollowMere smithy (a new scene id appended to `SCENE_IDS`).
+
+## 14. Reconciled
+
+- **R8. Tool walls (LT1) against "every need has three sources" (`emergent-play.md` E1) and today's bare-hands nodes.** Piles are walled by their tool; the 65 nodes keep the bare-hands gather players already have. So wood and stone still have a no-tool source (a node), a buy (the general store sells Timber, Planks and Stone), a chore pay (`living-world.md` 2.2), and the tool route, which is now the big yield. E1 still passes.
+- **R9. Depletion (LT7) against cosmetic NPC work (9B 9.1) and chore pay.** NPC holds now take real stock, which is the same rule as "an NPC sells only what it gathered" (second follow-up, NW3). Every pile respawns, boulders included, so the town is never stripped for the match. Chore pay is tuned after depletion is on, in the balance lab.
+- **R12. Max-health dishes against "health is 100%".** A Berry Tart raises max health and the jail's yard fight lowers it (`world-mode.md` 5.1). Health is shown as a percentage of the seat's own max, so 100% stays "full". The max is bounded (P: 80 to 120) so neither the tart nor the yard can run away.
+- **R13. The lock-pick mini-game (LT2) against the K factor and the scratch clue.** The mini-game replaces 9B's 5 s hold and keeps its consequences: the noise, the role-neutral scratch clue of follow-up 2 (in place of 9B's print), the small fine chance and a witness's Notice. Its timing is a person's own action, so the pacing factor is 1 (`world-mode.md` 7).
+- **R14. A bigger pack (LT4) against robbery (LW9).** More slots means a knocked-out seat can lose more. Bound kit, armour and the bank are never taken, and a convicted robber's goods go to the town chest (6.4).
+- **R18. The scratch clue against 9B's print.** Follow-up 2 keeps a scratch clue "that doesn't point to any role" for a picked lock, so the scratch replaces 9B's print there. A crowbar leaves the broken door; a key leaves nothing. Prints stay where GDD 3.4 already puts them.
+
+The full list is in `gdd-map.md` 4.

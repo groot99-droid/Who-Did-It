@@ -6,6 +6,8 @@ The owner's words are in `owner-brief.md`. This document answers parts 3, 4, 5, 
 
 **Sources.** `GDD.md` 3.14 to 3.16, 3.21 to 3.26; `quests.json`, `tasks.json`, `minigames.json`, `economy.json`, `mobs.json`, `routines.json`, `lore.json`, `balance.json`; `docs/round8/canon.md`; and, from ROSW (read-only, through the `udgt-consult` skill), the teardown answers and the vault's `10_Characters/10_Subject_Files.md` and the Codex Bestiary.
 
+**Owner answers folded in (9D, 2026-10-25).** `owner-answers.md` and the owner-brief follow-ups override this document where they disagree. LW1 to LW8 and LW10 to LW13 took the default; LW9 differs (a beating knocks out and robs, `world-mode.md` 8). The second follow-up adds role NPCs that are never idle (1.8), sleeping (`world-mode.md` 7.3), armour with properties (5.1), the county jail (`world-mode.md` 5.1), accounts for achievements (4.4) and rent in Scrip or labour. WM2 adds the Constables (1.1) and pairing up (1.4); LT1 the resource chains and dishes (2.7); LT2 the lock-pick mini-game (2.6); LT7 depletion (1.6). Changed paragraphs are marked "(owner answer <ID>)" or "(follow-up 2)", and section 8 lists the reconciliations.
+
 **Sibling documents.** 9A owns `world-mode.md` and `phases.md`, and with them the full pacing table (every timer, 480 s day and 300 s night) and the train respawn. 9B owns `logic-table.md`: the tool × object table and the names of axes, pickaxes, armour and new items. 9B's table landed as draft #266 (head `6106134`); the item, tool, armour and weapon names below are reconciled against it, and where this document needs something 9B does not have, it is listed as a request in section 7.
 
 ## 0. Rules this design keeps
@@ -17,13 +19,13 @@ These come from `CLAUDE.md` and the GDD, and every section below is checked agai
 3. **Frozen ids.** Scene, portal, spawn, prop, clue and quest ids do not change. New content adds new ids with new prefixes.
 4. **Conservation.** Scrip enters the town only as a stake, a wage, a sale or a fenced notice, and leaves only as a purchase, rent, a fine, a donation or an HQ tier (GDD 3.23). Anything new that pays Scrip is a wage or a sale, and anything new that takes it is a purchase or a fine.
 5. **Role-neutral tools.** A crafted tool says nothing about who made it (GDD 3.14). Gear, chores and errands are open to every card.
-6. **The server keeps nothing between matches** (GDD 3.21). Section 4.4 prices what changing that would cost.
+6. **The server keeps nothing between matches** (GDD 3.21). Section 4.4 prices what changing that would cost. Accounts are wanted later (follow-up 2) and get their own design pass; round 10 keeps achievements on the device (owner answer LW5: default).
 7. **Anti-cheat.** The owner chose "Full anti-cheat" (teardown stage 4). Nothing the client reports can grant power. This decides where achievements live (4.4).
 8. **No model id, no generated text in data.** NPC chat stays template-first with the optional model path of GDD 3.25.
 
 ## 1. Citizens: NPCs that walk, chat and give tasks
 
-### 1.1 Four kinds of walker
+### 1.1 Five kinds of walker
 
 | Kind | What it is today | Role in this design |
 |---|---|---|
@@ -31,6 +33,7 @@ These come from `CLAUDE.md` and the GDD, and every section below is checked agai
 | Ambient townsfolk | Walk station to station, have needs and moods, are not seats, die only to creatures (GDD 3.24) | The new errand givers. They already walk, so the walking is free. |
 | NPC seats | Hold a card, wear a card's look, post meeting notes (GDD 3.25) | Never talk in words outside meetings. Their barks use the quick-chat pool only (1.4). |
 | Human seats | Players | Use quick-chat, as today. |
+| **Constables** (new, owner answer WM2) | none | The law: figures, not seats, wearing a `constable` look. They walk to clues, verify them at twice a Detective's rate, post a briefing 30 s after any clue is created, join manhunts and cuff. They can Talk (a figure may), and their tips are briefing lines (`world-mode.md` 3.1). |
 
 The key fact is in GDD 3.24: a townsfolk figure wears the `villager` look, and no seat ever does (a cover role wears another *card's* look). So a figure can already be told from a seat by sight, and giving figures a talk verb reveals nothing a player cannot see. NPC seats get no talk verb, so that nobody can learn "this figure answers me, so it is not a player" about a card-look. That one rule keeps the whole feature secrecy-safe.
 
@@ -94,6 +97,8 @@ Meetings change under 9A (no voting, full-screen phases), so this section covers
 | A response takes the same time whatever it says | no timing tell |
 | No NPC seat answers Talk | keeps 1.1 |
 
+**Walk with me (owner answer WM2).** The inspect panel gains a pairing section on every figure (`world-mode.md` 3.1). It is not Talk: a human, an NPC seat and a townsperson all answer it, after a delay drawn from one distribution, so offering it on NPC seats breaks nothing of 1.1 (8, R6). A Scared villager is likelier to say yes, and an NPC seat says yes with a chance that does not depend on its card.
+
 **Model path.** The optional model line of GDD 3.25 applies to "Pass the time" only, filtered as before, off the tick, logged for replay. Tips and errands are always templates.
 
 ### 1.5 Standing
@@ -112,7 +117,7 @@ Each map keeps a private per-seat **standing** with its town, from chores and er
 | Tallyman | `rack` | none | counts the rack |
 | Villager | `workstation` kinds already in `routines.json` | none | pump, oven, goat, fence |
 
-An NPC without its tool gets `NEED_TOOL` and ends the cycle, like a human, which is what the figure's cosmetic work shows. **Depletion** (9B open question 7): while NPC work is cosmetic, a player chore and a figure's chore are the same action with different effects, so a chore never competes with an NPC for stock. If the owner turns depletion on, gatherer figures take from piles and the world runs short; the rogue's competition in `emergent-play.md` then becomes real, and chore pay must be re-tuned. Default: off.
+An NPC without its tool gets `NEED_TOOL` and ends the cycle, like a human. **Depletion is on (owner answer LT7).** The owner: "yes but it comes back after sometime". Gatherer figures take from piles like a player, the stock returns after each pile's respawn (`logic-table.md` 7), and the rogue's competition in `emergent-play.md` is real. Chore pay is re-tuned with depletion on (8, R9).
 
 ### 1.7 The 23 lore-hook props (9B 5.3)
 
@@ -146,6 +151,20 @@ An NPC without its tool gets `NEED_TOOL` and ends the cycle, like a human, which
 
 The lines are drafts for the lore session (8V's successor) to approve: they are found-object description, not story, so none can contradict a ruling. The scene (`as.`, `bk.` and so on) is shown by the prop id, so the reader code needs no new map.
 
+### 1.8 Role NPCs are never idle (follow-up 2, owner answers NW3, NW4)
+
+The owner, verbatim: "NPC with roles are almost never idle they act like they are doing tasks that a the view can interpret as a real player, they also do every action a real player can which is what allows them to trade with you, if a NPC sells an object it's because it collected it, but also the game should never have to wait on NPCs to vote or take up time in a cut scene only real players".
+
+| Rule | Design |
+|---|---|
+| Never idle | An NPC seat's routine (GDD 3.12) is a chain of real actions: chores, tasks, gathering, crafting, trading, errands, lore reading. `townsfolk.idleChance` keeps its meaning for figures only; an NPC seat idles only between actions, for at most a human's pause (P: 2 to 6 s, `npc.wander.*`) |
+| Reads as a person | It takes the paths, holds and stops a human takes, and its pace is drawn from the same ranges. A watcher cannot tell it from a player by what it does |
+| Every action a player can | It gathers with tools, crafts in the grid (`logic-table.md` 8.6), picks locks by the mini-game's chance (8.5), sleeps, petitions, signs, joins a manhunt, pairs up, banks, pays rent, and trades with any seat by the shop panel |
+| Sells what it has | An NPC's stall holds only what that NPC gathered, crafted or bought. A stall can be empty (owner answer NW3: default), and its restocking is visible: you see the NPC gathering |
+| Never waits | Nothing waits on an NPC: no vote, no cutscene, no petition, no night skip (owner answer NW4: default). NPCs speak at an Inquest only in the time players already spend talking |
+
+The Killer, living as an NPC's card, is held to the same look: a human Killer who idles more than an NPC would stands out, which is the owner's "perform life as a villager".
+
 ## 2. How the systems feed each other
 
 ### 2.1 The loop
@@ -167,6 +186,10 @@ Read a row as "this system gives these things to that system". An item reaches a
 | **Bosses** (3) | gear, nerve, a team | a unique drop, a lore page, a step | Gear, Achievements, Lore | a variant scene |
 | **Gear** (5) | materials + Scrip | less damage taken, more reach, a better tool | Mobs, Bosses, Gathering | durability, repair |
 | **Achievements** (4) | any of the above | a title, a trim, a start option | the player | none |
+| **Resource chains** (2.7, owner answer LT1) | logs, grain, food items | timber at the mill; a dish from the bakery's sections | Scrip (a high price), favours, buffs | the parts, the stations, the time |
+| **The law** (owner answer WM2) | clues, petitions, signatures | briefings, manhunts, Tribunals, sentences | the town chest, the jail, Scrip (fines) | evidence |
+| **The county jail** (follow-up 2) | a sentence | a buff or a debuff from its mini-games | Gear, Body | one night, once a day each |
+| **Death's cost** (owner answer WM1) | a death by day | the returner's fare debt: higher prices, lower stock and wages | Scrip, Shops | paid like rent |
 
 ### 2.2 Tasks and chores
 
@@ -219,13 +242,24 @@ The five kinds plus the tap already exist and the server replays the answer. New
 
 | Where | Kind reused | Result |
 |---|---|---|
-| Picking a lock (optional, 9B open question 2) | slide (pins) | success, a faster hold, or a snapped pick. 9B's default is a plain hold with a print; this stays off unless the owner picks the mini-game |
+| Picking a lock (owner answer LT2) | a new `lockpick` kind (rotate, click, push and pull, tension) | open, or a snapped pick. The owner chose the real mini-game (`logic-table.md` 8.5); the plain hold is retired |
+| The county jail (follow-up 2, owner answer LW10) | tap (the gym), crates (the yard fight), pour (scrubbing) | Strength up; a max-health loss for the loser of a fight; time off a sentence (`world-mode.md` 5.1) |
+| The bakery's sections (owner answer LT1) | pour (dough), stoke (the oven) | a dish's quality tier (`logic-table.md` 7.1) |
 | Tempering at the forge | stoke | gear quality tier |
 | Haggling at a stall | tap | a small price change either way |
 | Altar offering | pour | Faith bonus |
 | Butchering game | crates | yield |
 
 A tier is "ok / clean / flawless". Only the third is rare. The result changes quality, never the possibility, so a player who dislikes mini-games can use the Done control after `assistS` and get the base result.
+
+### 2.7 Resource chains and dishes (owner answer LT1)
+
+The chains are `logic-table.md` 7.1: logs to timber at the lumber mill, and dishes made in parts across the bakery's sections and brought together in the oven. Here they join the loop:
+
+- **High prices.** A Game Pie sells to the market for well over its parts, which is a sale (rule 4), so Scrip stays conserved.
+- **Favours.** A Funeral Cake or another favour dish counts as a finished errand step with a quest-giver (1.3) and raises standing (1.5).
+- **Buffs.** Max health up, stamina that never drains for a part of the day, poison resistance, warmth at night. A buff is a Private effect until the next dawn, one at a time, and never a power over another seat (rule 7). Achievements stay cosmetic (owner answer LW6: default); dishes are the one place a player cooks up power, and anyone can cook.
+- **Rent and the rogue.** A dish pays rent in kind at the market's price (`emergent-play.md` T1), so a cook can live without coin.
 
 ## 3. Mob bosses
 
@@ -250,7 +284,7 @@ A tier is "ok / clean / flawless". Only the third is rare. The result changes qu
 
 ### 3.3 What this round does
 
-Design only. This round writes nothing that places a boss. It commits two things: that every boss lives on a variant scene, and that the town maps stay boss-free. The questionnaire asks whether bosses are scheduled for round 10 (open question 6).
+Design only. This round writes nothing that places a boss. It commits two things: that every boss lives on a variant scene, and that the town maps stay boss-free. Bosses come no earlier than round 11 (owner answer LW7: default).
 
 ## 4. Achievements
 
@@ -261,6 +295,8 @@ An achievement is a **step** in a tree. A step has an id, a short in-world title
 Rewards are cosmetic or sideways: a title, a scarf trim, a journal flourish, a start option chosen from two (for example "begin with a Candle or a Bandage"). They never raise damage, speed, health or income. A step that grants power would make the owner's "full anti-cheat" decision matter, and 4.4 shows why that is costly.
 
 ### 4.2 The tree
+
+**Skill trees and trophies (owner answer LW5: default).** The owner asked that achievements feel like skill trees and trophies and stay with a player once accounts exist. The tree below is the skill tree; a finished branch earns a trophy, shown on the profile card and the end screen. Achievements live on the device in round 10 (4.4, option A) and move to accounts when accounts ship.
 
 Six branches grow from one root, **Newcomer** (finish a night). A branch is a chain with forks; each fork is a different way to continue, so two players on one branch rarely share a path.
 
@@ -316,7 +352,9 @@ The server keeps nothing between matches (GDD 3.21). Three options:
 | **B. Signed receipt** | At game over the server signs a small blob (`{profile, steps earned this match, counters}`) with a server secret (HMAC) and sends it; the device stores it and sends it back at join | A, plus cross-match counters that cannot be forged | one secret in the server's environment; no database; about a day of work; the receipt can be copied to another device | a copied receipt shares a title; fine for cosmetics, wrong for power |
 | **C. Server store** | A database keyed by an account | everything, across devices | new infrastructure (a database on Railway), accounts and sign-in (the profile code "proves nothing" per GDD 3.21, so identity must be real), privacy duties, backup, and a change to GDD 3.21's promise | the largest build; a data-protection question for a game for friends |
 
-**Recommendation.** Ship **A** first for the display (titles, trims), because the owner's players are friends on their own devices. Add **B** only if the owner wants counters that cross matches ("open 50 locks") or wants unlocks to unlock *options* at the start of a match. Keep power out of every unlock so that a forged or copied record cannot hurt anyone. Decline **C** until the game has players the owner does not know. A step earned **inside** a match (most of them) needs no storage at all: it lives in the match log and the end screen.
+**Chosen (owner answer LW5: default): A in round 10, accounts later.** Accounts are a new system with their own design pass (`gdd-map.md` 3.21 and its new accounts section); option C is what they become, and the device record migrates to them once.
+
+**Recommendation (9C, kept).** Ship **A** first for the display (titles, trims), because the owner's players are friends on their own devices. Add **B** only if the owner wants counters that cross matches ("open 50 locks") or wants unlocks to unlock *options* at the start of a match. Keep power out of every unlock so that a forged or copied record cannot hurt anyone. Decline **C** until the game has players the owner does not know. A step earned **inside** a match (most of them) needs no storage at all: it lives in the match log and the end screen.
 
 Whichever is chosen, an achievement record never carries a role of a match in progress, and a record shown on a device is the player's own, never sent to anyone else's screen.
 
@@ -336,13 +374,15 @@ Armour is an equipment slot, not an inventory item (9B 8.2): `body` and `head`, 
 | Miner's cap | head | 1 | BlackPine office, mine rack |
 | Tin helm | head | 2 | the forge |
 
+**Properties (owner answer LW8: default).** A tier lets through 80%, 65% or 50% of the damage (`armor.tierMult`), and each piece has one or two resistances (`armor.resist`, `logic-table.md` 8.2): poison resistance (Poisoned wears off sooner), clotting (Bleeding stops sooner), warmth at night, and a stamina weight on the heavier tiers. A resistance is a Private effect of the wearer, like a dish's buff (2.7).
+
 **What armour changes.** Creature bites, fists, mugging blows and weapon strikes (9B's rule). It never changes the Knife, Nightshade or the Last Shot, because those kill "as before whatever the health" (A89) and a role's power must not depend on a purchasable item. Reductions multiply under 9B's cap, with the Lodge's `creatureDmg` perk. Heavy armour is slower and louder (9B), which a Killer feels as much as a Hunter.
 
 **What armour shows.** It is public and role-neutral. Whether it is drawn on the figure is 9B's open question 6; 9B's default is HUD and icon only in round 10.
 
 ### 5.2 Weapons
 
-9B 8.3 gives each weapon its own numbers: Club, Hatchet/Axe, Pickaxe, Slingshot, Crossbow, with Fists as the unarmed baseline. Every weapon has `kills: false` against a seat, so a player dies only to the Knife or a creature's bite (the pacing rule of the round-9 plan). Against creatures a weapon deals its damage times `creatureMult`.
+9B 8.3 gives each weapon its own numbers: Club, Hatchet/Axe, Pickaxe, Slingshot, Crossbow, with Fists as the unarmed baseline. Every weapon has `kills: false` against a seat, so a player dies only to the Knife or a creature's bite (the pacing rule of the round-9 plan). **A beating knocks out and robs (owner answer LW9).** The owner: "beating someone till knock can get you reported, other player doesnt die just loses all there stuff". At zero the victim is knocked out; the attacker may take everything it carries except role-bound kit, armour and the bank; the victim, or any witness, can report it as assault, and if the attacker is caught the goods go to the town chest, where anyone who knows can claim them first (`world-mode.md` 5 and 8). Against creatures a weapon deals its damage times `creatureMult`.
 
 An axe and a pickaxe are **tools first**. A seat carrying one is not marked as armed in any way a client sees, so carrying a work tool is never a tell. Using a tool as a weapon wears it faster (9B), so the axe in a fight costs the axe.
 
@@ -352,7 +392,7 @@ Tools and their tiers are 9B 8.1 (Axe, Iron axe, Pickaxe, Iron pickaxe, Spade, L
 
 ### 5.4 Hide and skinning (a secrecy finding for 9B)
 
-9B 8.4 lets a creature corpse be skinned "with any Knife (or Replica Knife)". The Knife is the Killer's kit and the Replica Knife the Drifter's (`items.json` `roleBound`). So only a Killer or a Drifter could ever hold hide, and a seat seen with hide, or wearing a Leather jerkin, would be marked as one of them. That breaks role secrecy and the gear tier above. **Request:** skinning must use a role-neutral tool (for example the Hatchet or a new plain Skinning knife that is not the Knife), and 9B 10's Knife column should lose the Skin cell.
+9B 8.4 lets a creature corpse be skinned "with any Knife (or Replica Knife)". The Knife is the Killer's kit and the Replica Knife the Drifter's (`items.json` `roleBound`). So only a Killer or a Drifter could ever hold hide, and a seat seen with hide, or wearing a Leather jerkin, would be marked as one of them. That breaks role secrecy and the gear tier above. **Request:** skinning must use a role-neutral tool (for example the Hatchet or a new plain Skinning knife that is not the Knife), and 9B 10's Knife column should lose the Skin cell. **Settled (owner answer LW13: default):** anyone skins, with a skinning knife any role can buy at the general store.
 
 ## 6. Pacing
 
@@ -369,7 +409,7 @@ The owner: kills from hostile mobs need to do less damage, and bleeding and pois
 | Bat | 6 | 3 | none | none | 17 → 34 |
 | Rat | 5, Poisoned 50% | 2 | Poisoned 50% | Poisoned 30% | 20 → 50 |
 
-Armour (5.1) then scales these again. Bite *intervals* (`attackS`) stay, so a creature is no faster, only gentler; flight and light still work.
+The owner took these (owner answer LW11: default): one wolf chase leaves about 28% health, a second before healing still kills. Armour (5.1) then scales these again. Bite *intervals* (`attackS`) stay, so a creature is no faster, only gentler; flight and light still work.
 
 **Effects stop at 1 HP.** Bleeding and Poisoned drain health but never to zero: they leave the seat Wounded (under `woundedBelow`) and cure on the normal items. Only a Knife strike or a creature's bite takes health to zero. That removes the `bled` and `sickened` causes of GDD 3.22 and their two death cutscenes from play; 9A's world-mode table carries the exact wording. The teardown's "mobs are second layer" answer ("A second layer") is why mobs soften and do not vanish.
 
@@ -381,9 +421,9 @@ Armour (5.1) then scales these again. Bite *intervals* (`attackS`) stay, so a cr
 |---|---|
 | Errand cool-down | a fraction of the day (P: one tenth), not seconds |
 | Chore pay and cap | wage sized to the same ratio as the 3-Scrip task wage; cap per day, not per second |
-| Node respawn, mob spawn | 9A scales them; this document asks only that gathering feel like a task (a node should return within one day) |
+| Node respawn, mob spawn | 9A scales them; with depletion on (owner answer LT7) every node and pile returns, a pile within one day and the boulder in 1200 s (`logic-table.md` 7) |
 | Hunger | `famishedAfterS` and `moods.hunger.riseS` scale with the day so a player eats about once a day (9A) |
-| Lock picked, fine | a lock picked leaves a print and noise (9B table), and a witness writes a Notice for trespass (9B 11). Any fine is the town's reply to that Notice, in `economy.json`'s terms, not a new rule here |
+| Lock picked, fine | a lock picked by the mini-game (owner answer LT2) leaves a scratch on the lock and noise, carries a fine chance (`fineChance` 0.1), and a witness writes a Notice for trespass (`logic-table.md` 8.5, 11). A fine is `trial.trespassFine` (`world-mode.md` 5) |
 
 ## 7. What this asks of other documents
 
@@ -392,14 +432,16 @@ Armour (5.1) then scales these again. Bite *intervals* (`attackS`) stay, so a cr
 | Role-neutral skinning (5.4) | 9B `logic-table.md` 8.4, 10 | secrecy |
 | `berries` node, `game` item and a `stew` recipe at an oven (the table has the Wake Loaf bake, 9.4, but no cooked meal from gathered food) | 9B | emergent-play F1, F3 |
 | Rent in kind, rent by labour, a purse-only Clerk round | `gdd-map.md` and GDD 3.23 | emergent-play T1 to T3 |
-| Refusal reasons for "no axe", "no lockpick" | 9B `failures.md` (9B 10 already has the lines) | 5.3 |
+| Refusal reasons for "no axe", "no lockpick", a snapped pick, no bed | 9B `failures.md` 4.9 | 5.3, 1.8 |
+| The NPC-seat routine that is never idle, and its trading (1.8) | `gdd-map.md` 3.12, 3.25 | follow-up 2 |
+| Accounts (4.4) | `gdd-map.md`, its accounts section | owner answer LW5 |
 | Day/night scale, train respawn, the `bled`/`sickened` removal | 9A `world-mode.md` | 6 |
 | What replaces meetings and the Final Night | 9A `phases.md` | 1.4, 2.5 |
 | GDD sections: 3.5, 3.14, 3.15, 3.16, 3.22 (damage table), 3.23, 3.24 (moods as words for figures), 3.25, 3.26 | `gdd-map.md` | after owner approval |
 
 ## Open questions for the owner
 
-Each has a proposed default. 6Z collects these in the questionnaire.
+Answered (`owner-answers.md`, 2026-10-24). LW1 to LW8 and LW10 to LW13 took the default; LW9 differs. The questionnaire's numbering is not this list's: LW8 is armour (8 here), LW9 the player kill (9 here), LW10 the jail and LW11 the bites (10 here). The list is kept as asked; each answer is in place above.
 
 1. **Can a townsfolk figure say its need in words?** (1.2) Proposed: yes for figures, no for NPC seats, which amends GDD 3.24. Default: yes.
 2. **Should a figure's tip name a look and a place?** (1.4) Proposed: yes, as a rumour-ledger line. Default: yes, one tip per Talk, with a short cool-down per figure.
@@ -414,3 +456,14 @@ Each has a proposed default. 6Z collects these in the questionnaire.
 11. **Does a picked lock leave a print and let a witness write a Notice?** (6.2) This is 9B's rule. Default: yes.
 12. **Is Faith fed by presence?** (2.5) Proposed: a chapel vigil, the shrine chore, devotional reading and scared villagers. Default: yes, all four.
 13. **Who may skin a creature?** (5.4) 9B's "any Knife" would make hide a Killer or Drifter tell. Proposed: a role-neutral skinning tool. Default: yes.
+
+## 8. Reconciled
+
+Where an owner answer met this document or another, and how it was settled. The full list, R1 to R18, is in `gdd-map.md` 4.
+
+- **R6. Pairing up against "no talk verb on NPC seats" (WM2 against 1.1).** "Walk with me" is not Talk and gives no words; humans, NPC seats and townsfolk answer it from one delay distribution, and an NPC seat's yes does not depend on its card (1.4). Nothing tells a player from an NPC seat.
+- **R9. Depletion against cosmetic NPC work (LT7 against 1.6).** Depletion on makes NPC gathering real; chore pay and the gather wages are re-tuned in the balance lab (`round10-plan.md`).
+- **R15. Never idle against the quiet NPC seat (follow-up 2 against 1.1).** An NPC seat now does every action a player can, trade included, and still never talks in words outside the phases: actions read as a person, words would not (1.8).
+- **R17. Constables are figures (WM2 against GDD 3.24).** They wear their own `constable` look, never a card's and never `villager`, so they can Talk without telling a player anything about a seat (1.1).
+- **LW9 against open question 9.** The question asked whether melee kills a seat; the answer keeps "no" and adds the knockout and robbery (5.2). Only the Killer's strike and a creature's bite kill.
+- **2.6 slide against the lock-pick mini-game (LT2).** The optional pins slide is replaced by the `lockpick` kind; the plain hold and its print are retired for the scratch (2.6, 6.2).
