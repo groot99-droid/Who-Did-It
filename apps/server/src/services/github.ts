@@ -41,11 +41,20 @@ export interface GitHub {
   readonly repo: string;
   /** The repository's default branch name. */
   defaultBranch(): Promise<string>;
+  /** Creates `branch` from the head of `from`; a `GitHubError` 422 when it exists already. */
+  createBranch(branch: string, from: string): Promise<void>;
   /** Creates `branch` from the head of `from` unless it exists; resolves either way. */
   ensureBranch(branch: string, from: string): Promise<void>;
   /** Creates or replaces one file on a branch from base64 content; resolves to its blob URL. */
   putFile(branch: string, path: string, base64: string, message: string): Promise<string>;
   createIssue(title: string, body: string, labels: string[]): Promise<{ number: number; url: string }>;
+  /** Opens a draft pull request of `head` into `base`. */
+  createDraftPull(
+    head: string,
+    base: string,
+    title: string,
+    body: string,
+  ): Promise<{ number: number; url: string }>;
   /** Issues (not pull requests) carrying `label`, open and closed, newest first, at most 50. */
   listIssues(label: string): Promise<GitHubIssue[]>;
   listComments(issue: number): Promise<GitHubComment[]>;
@@ -98,11 +107,14 @@ export function createGitHub(token: string, deps: { fetch?: typeof fetch; repo?:
     async defaultBranch() {
       return (await must<{ default_branch: string }>('GET', '')).default_branch;
     },
-    async ensureBranch(branch, from) {
-      if ((await headSha(branch)) !== null) return;
+    async createBranch(branch, from) {
       const sha = await headSha(from);
       if (sha === null) throw new GitHubError(404, `GET /git/ref/heads/${from}`);
       await must('POST', '/git/refs', { ref: `refs/heads/${branch}`, sha });
+    },
+    async ensureBranch(branch, from) {
+      if ((await headSha(branch)) !== null) return;
+      await this.createBranch(branch, from);
     },
     async putFile(branch, path, base64, message) {
       const existing = await call<{ sha: string }>(
@@ -124,6 +136,16 @@ export function createGitHub(token: string, deps: { fetch?: typeof fetch; repo?:
         title,
         body,
         labels,
+      });
+      return { number: res.number, url: res.html_url };
+    },
+    async createDraftPull(head, base, title, body) {
+      const res = await must<{ number: number; html_url: string }>('POST', '/pulls', {
+        head,
+        base,
+        title,
+        body,
+        draft: true,
       });
       return { number: res.number, url: res.html_url };
     },
