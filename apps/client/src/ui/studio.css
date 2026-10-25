@@ -40,6 +40,12 @@
   overflow-y: auto;
 }
 
+.wdi-studio__warn {
+  font-size: 11px;
+  margin: 0;
+  padding-left: 16px;
+}
+
 .wdi-studio [aria-pressed='true'],
 .wdi-studio [aria-current='true'] {
   outline: 2px solid currentcolor;
