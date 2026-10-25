@@ -9,6 +9,7 @@ describe('readFlags', () => {
       joinCode: null,
       resumeCode: null,
       admin: false,
+      studio: false,
     });
   });
 
@@ -46,5 +47,12 @@ describe('readFlags', () => {
     expect(f.joinCode).toBeNull();
     expect(f.resumeCode).toBeNull();
     expect(readFlags('', '#/adminx').admin).toBe(false);
+  });
+
+  it('reads the studio route and keeps it apart from the admin one', () => {
+    expect(readFlags('', '#/studio').studio).toBe(true);
+    expect(readFlags('', '#/studio').admin).toBe(false);
+    expect(readFlags('', '#/admin?token=abc').studio).toBe(false);
+    expect(readFlags('', '#/studiox').studio).toBe(false);
   });
 });

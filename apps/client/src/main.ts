@@ -4,6 +4,7 @@ import { Landing } from './scenes/Landing';
 import { Lobby } from './scenes/Lobby';
 import { Preload } from './scenes/Preload';
 import { Admin } from './scenes/Admin';
+import { Studio } from './scenes/Studio';
 import { GameOver } from './scenes/GameOver';
 import { Intro } from './scenes/Intro';
 import { Meeting } from './scenes/Meeting';
@@ -24,7 +25,7 @@ const game = new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Boot, Preload, Landing, Lobby, RoleReveal, World, Meeting, GameOver, Admin, Intro],
+  scene: [Boot, Preload, Landing, Lobby, RoleReveal, World, Meeting, GameOver, Admin, Studio, Intro],
 });
 
 // The mock e2e (`?mock=1`) reads textures and scenes through this handle; a real match never sets it.

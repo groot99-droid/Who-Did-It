@@ -1523,3 +1523,16 @@ Lines are in `apps/client/src/ui/copy/hive.ts` (`HIVE_COPY`); the binder is `ui/
 | Key | Text | Where |
 |---|---|---|
 | `hive.shout` | Someone is shouting for help in {place} | a hazard toast; `{place}` is the scene's name |
+
+
+### 14.42 The Studio (9T)
+
+Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `scenes/Studio.ts` at `#/studio`, behind the admin sign-in (`docs/round9/admin-studio.md` 2). Tooling copy for one reader; no player ever sees it. Values in braces are filled with `fill()`.
+
+| Key | Text | Where |
+|---|---|---|
+| `studio.title` | Studio | the Studio page |
+| `studio.signin.lead` | Sign in with the owner’s GitHub account to walk the world. | the Studio page |
+| `studio.signin.button` | Sign in with GitHub | the Studio page |
+| `studio.signin.failed` | The Studio refused this sign-in. Sign in again. | the Studio page |
+| `studio.connecting` | Joining the Studio... | the Studio page |
