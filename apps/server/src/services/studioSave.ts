@@ -81,8 +81,11 @@ export function diffSummary(before: Scene, after: Scene): string[] {
   return out;
 }
 
-/** Checks an untrusted scene from the editor against the committed content; throws `SaveRefused`. */
-export function checkSave(raw: unknown, committed: typeof content = content): CheckedSave {
+/**
+ * The checks a save and a Studio draft share (admin-studio.md 5): the schema, unknown keys, the frozen ids and the
+ * whole content's validator with the edit in place. Returns the parsed scene; throws `SaveRefused`.
+ */
+export function checkScene(raw: unknown, committed: typeof content = content): Scene {
   const id = (raw as { id?: unknown } | null)?.id;
   if (typeof id !== 'string' || !(SCENE_IDS as readonly string[]).includes(id))
     throw new SaveRefused(['unknown scene: the Studio edits the scenes of SCENE_IDS only']);
@@ -102,7 +105,13 @@ export function checkSave(raw: unknown, committed: typeof content = content): Ch
   }
   problems.push(...validateContent({ ...committed, scenes: { ...committed.scenes, [id]: scene } }));
   if (problems.length) throw new SaveRefused(problems);
-  const summary = diffSummary(before, scene);
+  return scene;
+}
+
+/** Checks an untrusted scene from the editor against the committed content; throws `SaveRefused`. */
+export function checkSave(raw: unknown, committed: typeof content = content): CheckedSave {
+  const scene = checkScene(raw, committed);
+  const summary = diffSummary(committed.scenes[scene.id as SceneId], scene);
   if (summary.length === 0) throw new SaveRefused(['nothing changed']);
   const nav = navFromGrid(scene);
   // The file keeps the editor's key order (the committed file's): zod's output follows the schema's order instead.

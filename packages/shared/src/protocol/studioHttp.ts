@@ -66,3 +66,18 @@ export interface StudioSaveRefused {
   error: string;
   problems: string[];
 }
+
+/**
+ * `POST /studio/draft` (Walk it): the edited scene for the owner's open Studio room (`room.roomId`), checked as a save
+ * is (an unchanged scene is fine) and never written anywhere. A refusal is a `StudioSaveRefused` with 422; 404 when
+ * the room is gone. `studio.draft {scene: null}` over the room drops it.
+ */
+export interface StudioDraftRequest {
+  roomId: string;
+  scene: unknown;
+}
+
+/** 202 of `POST /studio/draft`: queued; the room's next snapshot carries `draft: true`. */
+export interface StudioDraftResponse {
+  queued: true;
+}
