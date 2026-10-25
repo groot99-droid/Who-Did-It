@@ -15,6 +15,7 @@ export const STUDIO_C2S = {
   spawn: 'studio.spawn',
   clearSpawns: 'studio.clearSpawns',
   give: 'studio.give',
+  draft: 'studio.draft',
 } as const;
 
 export const STUDIO_S2C = {
@@ -74,6 +75,11 @@ export interface StudioC2SPayloads {
   'studio.clearSpawns': Record<string, never>;
   /** Put an `items.json` item in the admin figure's hands. */
   'studio.give': { itemId: string };
+  /**
+   * Drop the draft (admin-studio.md 3 "Walk it"). A draft scene itself is posted to `POST /studio/draft` with this
+   * room's id, since a scene is larger than one socket message; a teleport or a door to another scene drops it too.
+   */
+  'studio.draft': { scene: null };
 }
 
 export interface StudioS2CPayloads {
@@ -98,6 +104,8 @@ export interface StudioS2CPayloads {
     spawns: StudioSpawn[];
     /** Item ids the admin figure holds, in the order given. */
     items: string[];
+    /** True when the current scene is an unsaved draft (`studio.draft`); false or absent, the committed scene. */
+    draft?: boolean;
   };
   /** New lines of the Studio room's log (applied and refused commands, scene loads); the client keeps the last 50. */
   'studio.log': { lines: string[] };

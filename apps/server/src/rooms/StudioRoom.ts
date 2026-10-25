@@ -1,4 +1,5 @@
 import { type AuthContext, type Client, Room } from '@colyseus/core';
+import type { Scene } from '@wdi/content';
 import {
   BUILD_VERSION,
   ErrorCode,
@@ -56,6 +57,17 @@ export class StudioRoom extends Room {
       this.sim.commands.push(cmd);
     });
     this.setFixedTimestep(() => this.tick(), TICK_RATE);
+  }
+
+  /**
+   * A draft `POST /studio/draft` has checked: queued like any command, so only the step applies it. A room whose owner
+   * is not connected takes none (`no room`, which the route answers as its generic 404).
+   */
+  queueDraft(scene: Scene): 'queued' | 'no room' | 'busy' {
+    if (this.ownerId === null || !this.clients.getById(this.ownerId)) return 'no room';
+    if (this.sim.commands.length >= MAX_STUDIO_COMMANDS) return 'busy';
+    this.sim.commands.push({ kind: 'draft', scene });
+    return 'queued';
   }
 
   private tick(): void {
