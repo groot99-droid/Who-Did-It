@@ -584,6 +584,8 @@ Round 6 (ROADMAP M5d). An owner-only room runs a match in which every seat is an
 
 **Replay.** An auto match fixes the seed words of every random stream and the seat ids before Start, so the same words and ids replay the same match tick for tick. The headless runner (`pnpm auto`) plays such matches with no network and no client and prints one line per match (winner, ticks, rounds, invariant failures); a failure is printed with the seed words of every stream and the seat ids, which the admin page can set to watch it again. The runner's `--seed` decides every match's words, so a run with the same flags plays the same matches.
 
+**The Studio.** Round 9. Beside the auto room, behind the same sign-in, the owner has a Studio (`#/studio`): a creative mode that walks one scene at a time with one admin figure (noclip, teleport, time of day, pause, steps and the speeds above, stand-in figures, any item in hand), a room editor that saves a scene as a draft pull request, and reports (a screenshot and a note) filed as issues. It is tooling: it is never a `party` room, deals no cards, runs no match and changes no rule or number of this document. The contract is `docs/round9/admin-studio.md`.
+
 ### 3.20 Vendettas
 
 Round 7 (ROADMAP R7). A Killer's card carries one of four vendettas drawn at the deal (conversion, sabotage,
