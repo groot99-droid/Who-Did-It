@@ -1,6 +1,14 @@
 // Round 9 (9T, docs/round9/admin-studio.md 3): the editor's pure edits on a scene's grid (and its material rows, when
 // it has them): paint a rectangle, flood fill, resize. The result is a new scene or an error line, like `sceneEdit.ts`.
-import type { Scene } from '@wdi/content';
+import {
+  biomeOf,
+  DEFAULT_FLOOR,
+  DEFAULT_SOLID,
+  FLOOR_MATERIALS,
+  GROUND_ROWS,
+  SOLID_MATERIALS,
+  type Scene,
+} from '@wdi/content';
 import { KINDS, listOf, type Edit } from './sceneEdit';
 
 export const GRID_CHARS = ['.', '#', 'D', 'S', 'H', 'B'] as const;
@@ -125,4 +133,73 @@ export function resize(scene: Scene, w: number, h: number): Edit {
       ...(scene.material === undefined ? {} : { material: rows(scene.material, floor) }),
     },
   };
+}
+
+export interface MaterialInfo {
+  /** The character in a scene's `material` rows. */
+  ch: string;
+  name: string;
+  solid: boolean;
+  /** Row of this material in an isometric ground tileset, when the tileset draws it (`GROUND_ROWS`). */
+  groundRow: number | null;
+}
+
+/** Every material of the legend, floors first and then solids, as the palette lists them. */
+export const MATERIALS: readonly MaterialInfo[] = [
+  ...Object.entries(FLOOR_MATERIALS).map(([ch, name]) => ({ ch, name: name as string, solid: false })),
+  ...Object.entries(SOLID_MATERIALS).map(([ch, name]) => ({ ch, name: name as string, solid: true })),
+].map((m) => ({ ...m, groundRow: GROUND_ROWS.includes(m.ch) ? GROUND_ROWS.indexOf(m.ch) : null }));
+
+const isSolidMaterial = (ch: string) => ch in SOLID_MATERIALS;
+
+/** The scene's material rows, or the biome's defaults for every tile (a solid on `#`, a floor elsewhere). */
+export function materialRows(scene: Scene): string[] {
+  if (scene.material !== undefined) return scene.material;
+  const biome = biomeOf(scene);
+  return scene.grid.map((row) =>
+    [...row].map((ch) => (ch === SOLID ? DEFAULT_SOLID[biome] : DEFAULT_FLOOR[biome])).join(''),
+  );
+}
+
+/**
+ * Paints a material on the tiles. The grid follows the legend: a floor material turns a `#` tile to floor, a solid one
+ * turns a `.` or `S` tile to `#`; `D`, `H` and `B` accept either class. A scene without `material` rows gets them from
+ * its biome's defaults first.
+ */
+export function paintMaterial(scene: Scene, tiles: Array<{ x: number; y: number }>, ch: string): Edit {
+  if (!MATERIALS.some((m) => m.ch === ch)) return { error: `${ch} is not a material` };
+  const solid = isSolidMaterial(ch);
+  const grid = scene.grid.map((r) => r.split(''));
+  const rows = materialRows(scene).map((r) => r.split(''));
+  for (const { x, y } of tiles) {
+    if (!inside(scene, x, y)) return { error: `tile ${x},${y} is outside the scene` };
+    const was = grid[y]![x]!;
+    if (solid && (was === '.' || was === 'S')) grid[y]![x] = SOLID;
+    else if (!solid && was === SOLID) grid[y]![x] = '.';
+    rows[y]![x] = ch;
+  }
+  return { scene: { ...scene, grid: grid.map((r) => r.join('')), material: rows.map((r) => r.join('')) } };
+}
+
+/** The 4-connected run of tiles with the same material as the one at x,y. */
+export function materialRegion(scene: Scene, x: number, y: number) {
+  const rows = materialRows(scene);
+  const want = rows[y]?.[x];
+  const seen = new Set<number>();
+  const out: Array<{ x: number; y: number }> = [];
+  const stack = [{ x, y }];
+  while (stack.length > 0) {
+    const t = stack.pop()!;
+    const key = t.y * scene.size.w + t.x;
+    if (!inside(scene, t.x, t.y) || seen.has(key) || rows[t.y]?.[t.x] !== want) continue;
+    seen.add(key);
+    out.push(t);
+    stack.push(
+      { x: t.x + 1, y: t.y },
+      { x: t.x - 1, y: t.y },
+      { x: t.x, y: t.y + 1 },
+      { x: t.x, y: t.y - 1 },
+    );
+  }
+  return out;
 }

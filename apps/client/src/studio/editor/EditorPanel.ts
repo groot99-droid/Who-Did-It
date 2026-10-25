@@ -1,16 +1,42 @@
 // Round 9 (9T, docs/round9/admin-studio.md 3): the editor's side panel: the palette, the selected object's fields,
 // undo and redo, and the diff. It only calls the session; the view draws what the session holds.
-import { SCENE_IDS } from '@wdi/content';
+import { mapOf, maps, SCENE_IDS, type SceneId } from '@wdi/content';
+import palette from '@wdi/content/data/palette.json';
 import { STUDIO_COPY as C, fill } from '../../ui/copy';
 import { h, type Screen } from '../../ui/dom';
 import { spawnsOf } from '../model';
-import { GRID_CHARS, type Cell, type Tool } from './gridEdit';
+import { GRID_CHARS, MATERIALS, type Cell, type Tool } from './gridEdit';
 import { find, KINDS, pairedPortal, type Kind } from './sceneEdit';
 import { scenes, type Scene } from '@wdi/content';
 import type { SaveApi } from '../saveApi';
 import { SaveError } from '../saveApi';
 import type { EditorSession } from './session';
 import { templatesFor } from './templates';
+
+/** The palette colour each material's swatch falls back to where the tileset has no art for it. */
+const MATERIAL_CHIP: Record<string, keyof typeof palette.colors> = {
+  g: 'teal',
+  l: 'mustard',
+  m: 'teal',
+  p: 'bone',
+  d: 'mustard',
+  c: 'fog',
+  f: 'moon',
+  w: 'lantern',
+  r: 'slate',
+  s: 'slate',
+  '~': 'moon',
+  u: 'teal',
+  '=': 'fog',
+  O: 'moon',
+  W: 'blood',
+  T: 'teal',
+  R: 'slate',
+  X: 'fog',
+  F: 'mustard',
+  K: 'lantern',
+  P: 'magenta',
+};
 
 export function mountEditorPanel(
   root: HTMLElement,
@@ -65,6 +91,30 @@ export function mountEditorPanel(
   for (const c of GRID_CHARS) cellSel.append(h('option', { value: c }, cellName(c)));
   cellSel.value = s.cell;
   cellSel.addEventListener('change', () => s.setCell(cellSel.value as Cell));
+  // The material palette: one swatch per legend character, showing the tileset's own ground art where it has a row.
+  const swatches = new Map<string, HTMLButtonElement>();
+  const theme = maps[mapOf(s.scene.id as SceneId)].theme;
+  const groundUrl = `${import.meta.env.BASE_URL}assets/ground/iso_ground_${theme}.png`;
+  const matBar = h('div', { class: 'wdi-studio__materials', hidden: true, ...tid('studio-edit-materials') });
+  for (const m of MATERIALS) {
+    const chip = h('span', { class: 'wdi-studio__chip' });
+    chip.style.background = palette.colors[MATERIAL_CHIP[m.ch] ?? 'slate'];
+    if (m.groundRow !== null) {
+      const probe = new Image();
+      probe.onload = () => {
+        chip.style.background = `url(${groundUrl}) 0 ${-m.groundRow! * 32}px / 320px auto`;
+      };
+      probe.src = groundUrl;
+    }
+    const b = btn(`studio-edit-material-${m.name}`, '', () =>
+      s.setMaterial(s.material === m.ch ? null : m.ch),
+    );
+    b.className = 'wdi-studio__swatch';
+    b.title = m.solid ? C['studio.edit.material.solid'] : C['studio.edit.material.floor'];
+    b.append(chip, h('span', {}, m.name));
+    swatches.set(m.ch, b);
+    matBar.append(b);
+  }
   const num = (id: string, value: number) =>
     h('input', { type: 'number', min: 1, max: 200, class: 'wdi-admin__field', value, ...tid(id) });
   const wIn = num('studio-edit-width', s.scene.size.w);
@@ -213,7 +263,10 @@ export function mountEditorPanel(
     fillPicked();
     problem.textContent = s.error;
     problem.hidden = s.error === '';
-    cellSel.hidden = !['brush', 'rect', 'fill'].includes(s.tool);
+    const painting = ['brush', 'rect', 'fill'].includes(s.tool);
+    cellSel.hidden = !painting;
+    matBar.hidden = !painting;
+    for (const [ch, b] of swatches) b.setAttribute('aria-pressed', String(s.material === ch));
     pathBar.hidden = s.tool !== 'path';
     gateBar.hidden = s.tool !== 'gate';
     routes.replaceChildren(
@@ -255,6 +308,7 @@ export function mountEditorPanel(
     },
     h('h2', {}, C['studio.edit.title']),
     h('div', { class: 'wdi-admin__group' }, h('span', {}, C['studio.edit.tool']), toolSel, cellSel),
+    matBar,
     gateBar,
     pathBar,
     routes,
