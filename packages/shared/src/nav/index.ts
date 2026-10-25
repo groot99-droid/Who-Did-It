@@ -95,3 +95,4 @@ export function navProblem(d: unknown): string | null {
   if (!Array.isArray(n.gates)) return 'gates must be an array';
   return null;
 }
+export * from './fromGrid';
