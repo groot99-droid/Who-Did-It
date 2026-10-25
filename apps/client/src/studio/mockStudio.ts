@@ -3,9 +3,10 @@
 import mitt from 'mitt';
 import { SCENE_IDS } from '@wdi/content';
 import { TILE_PX } from '@wdi/shared/constants';
-import type { StudioC2SPayloads, StudioC2SType } from '@wdi/shared/protocol';
+import type { StudioC2SPayloads, StudioC2SType, StudioReportRow } from '@wdi/shared/protocol';
 import type { StudioLink, StudioLinkEvents, StudioSnapshot } from '../admin/StudioNet';
 import { spawnsOf } from './model';
+import type { ReportApi } from './reportApi';
 
 /** Every payload field at once: the mock reads whichever the message carries. */
 type Loose = Partial<
@@ -120,3 +121,22 @@ export function createMockStudio(): StudioLink {
     close: () => clearInterval(timer),
   };
 }
+
+/** `?mock=1` has no server: a report is kept in memory and the Inbox lists what was sent this visit. */
+const mockReports: StudioReportRow[] = [];
+export const mockReportApi: ReportApi = {
+  send(req) {
+    const number = mockReports.length + 1;
+    mockReports.unshift({
+      number,
+      title: req.note.slice(0, 60),
+      state: 'open',
+      url: '#',
+      createdAt: new Date().toISOString(),
+      body: req.note,
+      comments: [],
+    });
+    return Promise.resolve({ id: `mock/${number}`, number, url: '#' });
+  },
+  list: () => Promise.resolve({ reports: [...mockReports] }),
+};

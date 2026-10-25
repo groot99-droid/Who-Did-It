@@ -19,6 +19,8 @@ export interface ControlDeps {
   onSignOut: () => void;
   /** Switches the art style live (the Studio may; the game itself does not). */
   onStyle: (id: string) => void;
+  onReport: () => void;
+  onInbox: () => void;
 }
 
 export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
@@ -169,6 +171,11 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
     group(C['studio.style'], style),
     group(C['studio.spawn'], kind, ref, spawn, clear),
     group(C['studio.give'], item, give, holding),
+    group(
+      C['studio.report'],
+      btn('studio-report-open', C['studio.report'], d.onReport),
+      btn('studio-inbox-open', C['studio.inbox'], d.onInbox),
+    ),
     btn('studio-signout', C['studio.signout'], d.onSignOut),
     h('details', {}, h('summary', {}, C['studio.log']), log),
   );

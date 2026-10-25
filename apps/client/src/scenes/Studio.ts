@@ -6,15 +6,20 @@ import { toScreen } from '@wdi/shared/iso';
 import { setRoute } from '../flags';
 import { captureToken, clearToken, loginUrl, type TokenStore } from '../admin/AdminNet';
 import { connectStudio, type StudioLink } from '../admin/StudioNet';
+import { BUILD_VERSION } from '../health';
 import { mountControls } from '../studio/Controls';
-import { createMockStudio } from '../studio/mockStudio';
+import { createMockStudio, mockReportApi } from '../studio/mockStudio';
+import { mountInbox } from '../studio/InboxPanel';
+import { mountReportPanel } from '../studio/ReportPanel';
+import { createReportApi, type ReportApi } from '../studio/reportApi';
+import { requestOf } from '../studio/reportContext';
 import { figuresOf, FIGURE_ID } from '../studio/figures';
 import { OverlayView } from '../studio/OverlayView';
 import { moveOf, moveToSend, StudioStore } from '../studio/model';
 import { clearStudioMarker, setStudioMarker } from '../studio/route';
 import { STUDIO_COPY as C } from '../ui/copy';
 import { h, overlayRoot, type Screen } from '../ui/dom';
-import { requestArtStyle } from '../view/artStyle';
+import { currentStyleId, requestArtStyle } from '../view/artStyle';
 import { applyFilters, peekManifest, queueMatchEntries, sceneMapKey, sceneMapUrl } from '../view/assets';
 import { EntityView } from '../view/EntityView';
 import { GroundView } from '../view/GroundView';
@@ -73,6 +78,8 @@ export class Studio extends Phaser.Scene {
   private onMouse = (e: PointerEvent) => {
     this.mouse = { x: this.scale.transformX(e.pageX), y: this.scale.transformY(e.pageY) };
   };
+  private api: ReportApi | null = null;
+  private dialog: Screen | null = null;
   private moveSeq = 0;
   private lastMove = '';
   private moveTimer: number | null = null;
@@ -92,6 +99,7 @@ export class Studio extends Phaser.Scene {
       return;
     }
     const token = captureToken(location.hash, this.tokens, () => setRoute('studio'));
+    this.api = token === null ? null : createReportApi(token);
     clearStudioMarker(this.tokens);
     if (token === null) {
       this.showSignIn(false);
@@ -134,12 +142,58 @@ export class Studio extends Phaser.Scene {
         store: this.store,
         onSignOut: () => this.signOut(),
         onStyle: (id) => void requestArtStyle(id),
+        onReport: () => void this.openReport(),
+        onInbox: () => this.openInbox(),
       }),
     );
     this.startInput();
   }
 
+  /** F8 or the Report button: the canvas as it is now, in a dialog to mark up and send. */
+  private async openReport(): Promise<void> {
+    const snapshot = this.store.snapshot;
+    if (this.dialog !== null || snapshot === null) return;
+    const image = await new Promise<HTMLImageElement | null>((done) =>
+      this.game.renderer.snapshot((img) => done(img instanceof HTMLImageElement ? img : null)),
+    );
+    const api = this.api ?? mockReportApi;
+    if (image === null || this.dialog !== null) return;
+    this.dialog = mountReportPanel(overlayRoot(), {
+      image,
+      build: (png, note) =>
+        requestOf(
+          png,
+          note,
+          {
+            snapshot: this.store.snapshot ?? snapshot,
+            build: BUILD_VERSION,
+            style: currentStyleId(),
+            overlays: this.store.overlays,
+          },
+          this.store.log,
+        ),
+      send: (req) => api.send(req),
+      onClose: () => this.closeDialog(),
+    });
+  }
+
+  private openInbox(): void {
+    if (this.dialog !== null) return;
+    this.dialog = mountInbox(overlayRoot(), this.api ?? mockReportApi, () => this.closeDialog());
+  }
+
+  private closeDialog(): void {
+    this.dialog?.destroy();
+    this.dialog = null;
+  }
+
   private key(e: KeyboardEvent, down: boolean): void {
+    if (down && e.code === 'F8') {
+      e.preventDefault();
+      if (this.dialog === null) void this.openReport();
+      else this.closeDialog();
+      return;
+    }
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
     if (e.target instanceof HTMLSelectElement) return;
     if (down) this.pressed.add(e.code);
@@ -286,6 +340,8 @@ export class Studio extends Phaser.Scene {
   }
 
   private signOut(): void {
+    this.closeDialog();
+    this.api = null;
     clearToken(this.tokens);
     const link = this.link;
     this.link = null;
@@ -312,6 +368,7 @@ export class Studio extends Phaser.Scene {
 
   private teardown(): void {
     this.stopInput();
+    this.closeDialog();
     this.dropWorld();
     this.link?.close();
     this.link = null;

@@ -1577,3 +1577,23 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.items` | Holding: {items} | the Studio page |
 | `studio.items.none` | Holding nothing | the Studio page |
 | `studio.log` | Studio log | the Studio page |
+| `studio.report` | Report | the Studio page |
+| `studio.report.title` | Report a problem | the Studio page |
+| `studio.report.arrow` | Arrow | the Studio page |
+| `studio.report.circle` | Circle | the Studio page |
+| `studio.report.undo` | Undo mark | the Studio page |
+| `studio.report.note` | What is wrong, or what should change? | the Studio page |
+| `studio.report.send` | Send report | the Studio page |
+| `studio.report.sending` | Sending... | the Studio page |
+| `studio.report.sent` | Sent as issue #{number}. | the Studio page |
+| `studio.report.failed` | The report was not sent: {why} | the Studio page |
+| `studio.report.offline` | The report was not sent: the server did not answer. | the Studio page |
+| `studio.report.close` | Close | the Studio page |
+| `studio.inbox` | Inbox | the Studio page |
+| `studio.inbox.title` | Reports | the Studio page |
+| `studio.inbox.loading` | Loading reports... | the Studio page |
+| `studio.inbox.empty` | No reports yet. | the Studio page |
+| `studio.inbox.count` | {n} reports | the Studio page |
+| `studio.inbox.open` | Open | the Studio page |
+| `studio.inbox.answered` | Answered | the Studio page |
+| `studio.inbox.fixed` | Fixed | the Studio page |
