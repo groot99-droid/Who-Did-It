@@ -23,10 +23,6 @@ export interface ControlDeps {
   onReport: () => void;
   onInbox: () => void;
   onEdit: () => void;
-  /** Temporary NPC button until the mode toggle (9U) lands. */
-  onNpc: () => void;
-  /** Temporary until the mode toggle lands: opens the Overview. */
-  onOverview: () => void;
 }
 
 export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
@@ -106,8 +102,6 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
     send('studio.noclip', { on: !(store.snapshot?.noclip ?? false) }),
   );
   const edit = btn('studio-edit', C['studio.edit'], d.onEdit);
-  const npc = btn('studio-npc-open', C['studio.npc'], d.onNpc);
-  const overview = btn('studio-overview-open', C['studio.overview'], d.onOverview);
   const phaseButtons = STUDIO_DAY_PHASES.map((phase: StudioDayPhase) =>
     btn(`studio-time-${phase}`, C[`studio.time.${phase}`], () => send('studio.time', { phase })),
   );
@@ -203,8 +197,6 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
     group(C['studio.scene'], search, sceneList, spawnPick, go),
     noclip,
     edit,
-    npc,
-    overview,
     group(C['studio.time'], ...phaseButtons, scrub),
     group(C['studio.speed'], ...scaleButtons, pause, step),
     group(C['studio.profile'], ...profileButtons),

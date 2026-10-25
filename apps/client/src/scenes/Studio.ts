@@ -30,6 +30,7 @@ import { requestOf } from '../studio/reportContext';
 import { figuresOf, FIGURE_ID } from '../studio/figures';
 import { OverlayView } from '../studio/OverlayView';
 import { moveOf, moveToSend, spawnsOf, StudioStore } from '../studio/model';
+import { modeOfScene, registerMode } from '../studio/modes';
 import { clearStudioMarker, setStudioMarker } from '../studio/route';
 import { STUDIO_COPY as C } from '../ui/copy';
 import { h, overlayRoot, type Screen } from '../ui/dom';
@@ -112,6 +113,8 @@ export class Studio extends Phaser.Scene {
   /** The Overview (round 9, admin-studio.md 8): its pending door edits outlive the panel, and a scene it enters waits for the world. */
   private readonly overview = new OverviewModel();
   private overviewPanel: Screen | null = null;
+  /** Removes the Overview and NPC modes from the header toggle (they exist while a link does). */
+  private dropModes: Array<() => void> = [];
   private pendingEdit: string | null = null;
   private moveSeq = 0;
   private lastMove = '';
@@ -158,6 +161,16 @@ export class Studio extends Phaser.Scene {
 
   private begin(link: StudioLink): void {
     this.link = link;
+    this.dropModes = [
+      registerMode('overview', () => {
+        this.openOverview();
+        return { destroy: () => this.closeOverview() };
+      }),
+      registerMode('npc', () => {
+        this.openNpc();
+        return { destroy: () => this.closeNpc() };
+      }),
+    ];
     link.bus.on('snapshot', (s) => this.store.applySnapshot(s));
     link.bus.on('log', (lines) => this.store.addLog(lines));
     link.bus.on('refused', (msg) => {
@@ -167,6 +180,8 @@ export class Studio extends Phaser.Scene {
     link.bus.on('closed', () => {
       if (this.link !== link) return;
       this.link = null;
+      this.dropModes.forEach((drop) => drop());
+      this.dropModes = [];
       this.npc?.view.destroy();
       this.npc?.unfollow();
       this.npc?.people.destroy();
@@ -192,8 +207,6 @@ export class Studio extends Phaser.Scene {
         onReport: () => void this.openReport(),
         onInbox: () => this.openInbox(),
         onEdit: () => this.toggleEdit(),
-        onNpc: () => this.toggleNpc(),
-        onOverview: () => this.toggleOverview(),
       }),
     );
     this.startInput();
@@ -240,20 +253,24 @@ export class Studio extends Phaser.Scene {
     );
   }
 
-  /** Overview on or off: the cards of the current map over the world. */
-  private toggleOverview(): void {
-    if (this.overviewPanel !== null) return this.closeOverview();
+  /** The Overview mode: the cards of the current map over the world. */
+  private openOverview(): void {
+    if (this.overviewPanel !== null) return;
     const sceneId = this.store.snapshot?.sceneId;
     if (sceneId === undefined) return;
     if (this.editor !== null) this.stopEdit();
-    this.closeNpc();
     this.overviewPanel = mountOverview(overlayRoot(), {
       model: this.overview,
       sceneId,
       api: this.saveApi ?? mockSaveApi,
       onEnter: (id) => this.enterFromOverview(id),
-      onClose: () => this.closeOverview(),
+      onClose: () => this.leaveMode(),
     });
+  }
+
+  /** A mode's own Close button: back to the editor that fits the scene the room is in. */
+  private leaveMode(): void {
+    this.store.setMode(modeOfScene(this.store.snapshot?.sceneId ?? ''));
   }
 
   private closeOverview(): void {
@@ -263,6 +280,7 @@ export class Studio extends Phaser.Scene {
 
   /** A card was clicked: go to the scene (the first spawn) and open its editor, on the Overview's session, once it is drawn. */
   private enterFromOverview(sceneId: string): void {
+    this.store.setMode(modeOfScene(sceneId));
     this.closeOverview();
     if (this.store.snapshot?.sceneId === sceneId) return this.openEditor(this.overview.sessionFor(sceneId));
     const spawnId = spawnsOf(sceneId)[0];
@@ -271,12 +289,11 @@ export class Studio extends Phaser.Scene {
     this.link.send('studio.teleport', { sceneId, spawnId });
   }
 
-  /** NPC on: routes and stations of the townsfolk are drawn over the scene, editable, with a live preview in the room. */
-  private toggleNpc(): void {
-    if (this.npc !== null) return this.closeNpc();
+  /** The NPC mode: routes and stations of the townsfolk are drawn over the scene, editable, with a live preview in the room. */
+  private openNpc(): void {
+    if (this.npc !== null) return;
     const snap = this.store.snapshot;
     if (snap === null || this.link === null) return;
-    this.closeOverview();
     const link = this.link;
     const model = new NpcModel();
     const people = new PeopleModel(() => this.store.snapshot?.sceneId ?? null);
@@ -293,7 +310,7 @@ export class Studio extends Phaser.Scene {
         roomId: link.roomId,
         mapId: mapOf(snap.sceneId as SceneId),
         onClear: () => clearNpcDraft(link),
-        onClose: () => this.closeNpc(),
+        onClose: () => this.leaveMode(),
         extra: (el, note) =>
           mountPeoplePanel(el, {
             model: people,
@@ -631,6 +648,8 @@ export class Studio extends Phaser.Scene {
   }
 
   private signOut(): void {
+    this.dropModes.forEach((drop) => drop());
+    this.dropModes = [];
     this.closeNpc();
     this.closeDialog();
     this.api = null;
@@ -662,6 +681,8 @@ export class Studio extends Phaser.Scene {
   }
 
   private teardown(): void {
+    this.dropModes.forEach((drop) => drop());
+    this.dropModes = [];
     this.stopInput();
     this.closeDialog();
     this.closeOverview();

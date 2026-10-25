@@ -142,6 +142,9 @@ destroyed when another is. The header toggle lists World and Room always and Ove
 their sessions add one `registerMode` call and no toggle code. `StudioStore.mode` is the current mode (World first); in
 World and Room it follows the scene the owner stands in, in Overview and NPC it stays where the owner put it. The scene
 list shows the exteriors in World, the interiors in Room and every scene in the others (`scenesFor`).
+`scenes/Studio.ts` registers Overview and NPC when it has a link and removes them when the link goes; the temporary
+Overview and NPC buttons are gone, so the toggle is the only way in. A panel's Close button returns to the World or Room
+mode that fits the scene.
 
 | PR | Session | What |
 |---|---|---|
