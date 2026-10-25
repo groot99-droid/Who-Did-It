@@ -208,6 +208,23 @@ if (process.argv.includes('--nodes')) {
       tally.set(k, (tally.get(k) ?? 0) + 1);
       console.log(`${n.id.padEnd(20)} ${n.resource.padEnd(9)} ${best ? `${best.stem} (${best.kind}) ${best.d.toFixed(1)}` : '-'}`);
     }
+  // A node "has its prop" when a prop of a matching stem stands within 2.5 tiles.
+  const MATCH = {
+    timber: ['stump', 'log', 'fallen_log', 'firewood', 'woodpile'],
+    stone: ['boulder', 'rock_pile', 'ore_pile', 'rubble'],
+    tinOre: ['ore_pile', 'rock_pile'],
+    mushroom: ['mushrooms'],
+    herb: ['fern'],
+    resin: ['stump', 'log', 'fallen_log'],
+  };
+  let anchored = 0;
+  let nodeTotal = 0;
+  for (const s of scenes)
+    for (const n of s.nodes ?? []) {
+      nodeTotal += 1;
+      if (s.props.some((p) => Math.hypot(p.x - n.x, p.y - n.y) <= 2.5 && (MATCH[n.resource] ?? []).includes(stemOf(p)))) anchored += 1;
+    }
+  console.log(`\nnodes with a matching prop within 2.5 tiles: ${anchored} of ${nodeTotal}`);
   console.log('\nresource -> nearest prop within 2.5 tiles');
   for (const [k, n] of [...tally].sort((a, b) => a[0].localeCompare(b[0]))) console.log(`${String(n).padStart(3)}  ${k}`);
 }
