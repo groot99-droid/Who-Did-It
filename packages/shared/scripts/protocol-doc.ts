@@ -101,7 +101,13 @@ export function renderProtocolDoc(): string {
   ]
     .map((n) => '```ts\n' + declarationText(admin, n) + '\n```')
     .join('\n\n');
-  const studioNamed = ['StudioDayPhase', 'StudioSpawnKind', 'StudioSpawn', 'StudioJoinOptions']
+  const studioNamed = [
+    'StudioDayPhase',
+    'StudioSpawnKind',
+    'StudioStandInState',
+    'StudioSpawn',
+    'StudioJoinOptions',
+  ]
     .map((n) => '```ts\n' + declarationText(studio, n) + '\n```')
     .join('\n\n');
   const errors = Object.entries(ErrorCode)

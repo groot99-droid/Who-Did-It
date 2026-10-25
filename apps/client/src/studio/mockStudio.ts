@@ -103,6 +103,11 @@ export function createMockStudio(): StudioLink {
           ref: q.ref ?? '',
           x: s.tx,
           y: s.ty,
+          px: s.tx * TILE_PX + TILE_PX / 2,
+          py: s.ty * TILE_PX + TILE_PX / 2,
+          yaw: 0,
+          moving: false,
+          state: 'stand',
         });
         return;
       case 'studio.clearSpawns':
