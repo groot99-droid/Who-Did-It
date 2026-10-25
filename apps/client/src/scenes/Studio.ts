@@ -466,7 +466,8 @@ export class Studio extends Phaser.Scene {
     }
     const want = this.draft !== null && snap.sceneId === this.draft.scene.id ? this.draft.scene : null;
     // While the editor is open it owns the art (`onEdit`); the committed art returns when it closes.
-    if (this.editor === null && want !== this.drawnDraft && !this.loading) this.buildWorld(this.sceneId, want);
+    if (this.editor === null && want !== this.drawnDraft && !this.loading)
+      this.buildWorld(this.sceneId, want);
   }
 
   /** The arrows and WASD scroll the camera while editing, since the figure stands still. */
