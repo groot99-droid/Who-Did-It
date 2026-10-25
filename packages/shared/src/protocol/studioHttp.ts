@@ -43,18 +43,34 @@ export interface StudioReportsResponse {
   reports: StudioReportRow[];
 }
 
+/** The content files besides scenes that `POST /studio/save` takes (admin-studio.md 8, N1), under `packages/content/data/`. */
+export const STUDIO_DATA_FILES = ['routines.json', 'quests.json', 'lore.json', 'talk.json'] as const;
+export type StudioDataFile = (typeof STUDIO_DATA_FILES)[number];
+/** A file of the save allowlist: one of `STUDIO_DATA_FILES`, or `scenes/<id>.json` for an id of `SCENE_IDS`. */
+export type StudioSaveFile = StudioDataFile | `scenes/${string}.json`;
+
 /**
- * `POST /studio/save`: an edited scene of `SCENE_IDS`, as the JSON of its file, with keys in the file's order. The
- * server re-runs every check and regenerates the nav; `nav`, when sent, must equal what it regenerates.
+ * `POST /studio/save`: one edited content file, as its whole JSON with keys in the file's order. The server parses it
+ * with its schema, refuses a key the schema does not know at any depth, re-runs `validateContent` with the edit in
+ * place, writes it in the content's layout and opens one draft PR. A scene file also has its nav and tilemap
+ * regenerated; `nav`, when sent with a scene, must equal what the server regenerates.
+ *
+ * The older body `{ scene, nav?, note? }` is still taken and means `{ file: 'scenes/<scene.id>.json', json: scene }`.
  */
 export interface StudioSaveRequest {
-  scene: unknown;
+  file?: StudioSaveFile;
+  json?: unknown;
+  /** The older scene body; not sent with `file`. */
+  scene?: unknown;
   nav?: unknown;
   /** The owner's note for the PR body, up to 50 000 characters. */
   note?: string;
 }
 
-/** 201: the draft PR opened on `branch` (`studio/<scene>-<yyyymmdd-hhmm>`). */
+/**
+ * 201: the draft PR opened on `branch`, `studio/<stem>-<yyyymmdd-hhmm>`, where the stem is the scene id or the data
+ * file's name without `.json` (`studio/routines-20261025-1400`); 409 when the same file was saved that minute.
+ */
 export interface StudioSaveResponse {
   branch: string;
   number: number;
@@ -80,4 +96,18 @@ export interface StudioDraftRequest {
 /** 202 of `POST /studio/draft`: queued; the room's next snapshot carries `draft: true`. */
 export interface StudioDraftResponse {
   queued: true;
+}
+
+/**
+ * `POST /studio/npc-draft` (admin-studio.md 8, live preview): edited NPC data for the owner's open Studio room. Each
+ * file sent is checked as a save is (an unchanged file is fine) with the others sent in place, and never written
+ * anywhere; at least one is sent, and a file not sent stays the committed one. The room's stand-ins and givers then
+ * use it until it is cleared with `studio.npcDraft {npc: null}` over the room or the room closes. Same gate, caps and
+ * answers as `POST /studio/draft`: 202 queued, 422 a `StudioSaveRefused`, 404 the room is gone, 429 busy.
+ */
+export interface StudioNpcDraftRequest {
+  roomId: string;
+  routines?: unknown;
+  quests?: unknown;
+  looks?: unknown;
 }
