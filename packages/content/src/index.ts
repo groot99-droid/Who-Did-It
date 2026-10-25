@@ -112,7 +112,8 @@ export * from './schemas/effects.js';
 export * from './schemas/economy.js';
 export * from './schemas/relations.js';
 export * from './schemas/lore.js';
-export { validateContent, type Content } from './validate.js';
+export { checkGrid, validateContent, type Content } from './validate.js';
+export { checkSceneWorld } from './validateWorld.js';
 export { navs, NavFile } from './nav.js';
 
 const sceneJson: Record<SceneId, unknown> = {

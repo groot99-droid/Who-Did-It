@@ -83,6 +83,8 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
   );
   const routes = h('div', { ...tid('studio-edit-routes') });
 
+  const checks = h('div', { ...tid('studio-edit-checks') });
+
   const picked = h('div', { class: 'wdi-studio__picked', ...tid('studio-edit-selected') });
   const problem = h('p', { class: 'wdi-admin__problem', role: 'alert', ...tid('studio-edit-error') });
   const undo = btn('studio-edit-undo', C['studio.edit.undo'], () => s.undo());
@@ -161,6 +163,19 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
     if (document.activeElement !== hIn) hIn.value = String(s.scene.size.h);
     undo.disabled = !s.canUndo;
     redo.disabled = !s.canRedo;
+    const c = s.checks;
+    const list = (title: string, lines: string[], cls: string) =>
+      lines.length === 0
+        ? []
+        : [h('span', {}, title), h('ul', { class: cls }, ...lines.map((l) => h('li', {}, l)))];
+    checks.replaceChildren(
+      ...(c.errors.length + c.warnings.length === 0
+        ? [h('p', {}, C['studio.edit.checks.ok'])]
+        : [
+            ...list(C['studio.edit.checks.errors'], c.errors, 'wdi-admin__problem'),
+            ...list(C['studio.edit.checks.warnings'], c.warnings, 'wdi-studio__warn'),
+          ]),
+    );
     diff.textContent = s.diff.length === 0 ? C['studio.edit.nodiff'] : s.diff.join('\n');
     if (s.name === '' && document.activeElement !== name) name.value = '';
   };
@@ -189,6 +204,8 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
     picked,
     problem,
     h('div', { class: 'wdi-admin__group' }, undo, redo),
+    h('h3', {}, C['studio.edit.checks']),
+    checks,
     h('span', {}, C['studio.edit.diff']),
     diff,
   );

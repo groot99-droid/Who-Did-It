@@ -2,6 +2,7 @@
 // the history of edits, the selection and the palette choice. The view and the panel read it and call it.
 import mitt from 'mitt';
 import { scenes, type Scene } from '@wdi/content';
+import { checkScene, type Checks } from './checks';
 import { diffScene } from './diffScene';
 import type { Gate, Path } from '@wdi/content';
 import { paint, rectTiles, regionTiles, resize, type Cell, type Tool } from './gridEdit';
@@ -46,6 +47,13 @@ export class EditorSession {
   }
   get canRedo(): boolean {
     return this.history.canRedo;
+  }
+  private checked: { scene: Scene; result: Checks } | null = null;
+  /** The live checks of the current scene, run once per edit. */
+  get checks(): Checks {
+    if (this.checked?.scene !== this.scene)
+      this.checked = { scene: this.scene, result: checkScene(this.scene) };
+    return this.checked.result;
   }
   get diff(): string[] {
     return diffScene(this.base, this.scene);

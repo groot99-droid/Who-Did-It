@@ -1643,3 +1643,7 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.edit.pathClear` | Clear corners | the Studio editor |
 | `studio.edit.routes` | Gates and paths | the Studio editor |
 | `studio.edit.routeRemove` | Remove {id} | the Studio editor |
+| `studio.edit.checks` | Checks | the Studio editor |
+| `studio.edit.checks.ok` | Every check passes | the Studio editor |
+| `studio.edit.checks.errors` | Errors (a save is refused) | the Studio editor |
+| `studio.edit.checks.warnings` | Warnings | the Studio editor |
