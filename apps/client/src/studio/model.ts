@@ -3,6 +3,7 @@ import mitt from 'mitt';
 import { SCENE_IDS, type SceneId, items, looks, mobs, routines, scenes } from '@wdi/content';
 import { worldMove } from '../input/vectors';
 import type { StudioSnapshot } from '../admin/StudioNet';
+import type { OverlayId } from './overlayData';
 
 /** The server keeps the last 50 log lines and so does the client (docs/PROTOCOL.md, studio.log). */
 export const LOG_LINES = 50;
@@ -12,11 +13,18 @@ export class StudioStore {
   readonly bus = mitt<{ change: undefined }>();
   snapshot: StudioSnapshot | null = null;
   log: string[] = [];
+  /** The overlays switched on; they are the owner's view, so they survive a scene change. */
+  readonly overlays = new Set<OverlayId>();
   /** The last refused command's message; it stays until the owner sends the next command. */
   refused = '';
 
   applySnapshot(s: StudioSnapshot): void {
     this.snapshot = s;
+    this.bus.emit('change', undefined);
+  }
+
+  toggleOverlay(id: OverlayId): void {
+    if (!this.overlays.delete(id)) this.overlays.add(id);
     this.bus.emit('change', undefined);
   }
 
@@ -41,6 +49,7 @@ export class StudioStore {
     this.snapshot = null;
     this.log = [];
     this.refused = '';
+    this.overlays.clear();
     this.bus.emit('change', undefined);
   }
 }

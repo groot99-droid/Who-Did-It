@@ -46,6 +46,17 @@ describe('StudioStore', () => {
     expect(seen).toHaveBeenCalledTimes(3);
   });
 
+  it('toggles overlays on and off and clears them on reset', () => {
+    const s = new StudioStore();
+    s.toggleOverlay('collision');
+    s.toggleOverlay('ids');
+    expect([...s.overlays]).toEqual(['collision', 'ids']);
+    s.toggleOverlay('collision');
+    expect([...s.overlays]).toEqual(['ids']);
+    s.reset();
+    expect(s.overlays.size).toBe(0);
+  });
+
   it('keeps the last 50 log lines', () => {
     const s = new StudioStore();
     s.addLog(Array.from({ length: 40 }, (_, i) => `a${i}`));
