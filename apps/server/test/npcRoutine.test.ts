@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import type { Client } from '@colyseus/core';
 import { balance, navs, profileFor, routines, scenes, type Scene, type SceneId } from '@wdi/content';
@@ -127,6 +127,9 @@ function recordedDay() {
 const idleMin = () => Math.round(balance.npc.routine.idleS.min * TICK_RATE);
 /** The held day is recorded in a hook with its own time, so no test's 5 s pays for it (granted by 6Z). */
 const DAY_TIMEOUT_MS = 20_000;
+// Several tests here step minutes of match synchronously (R9, R10, R17); under load they outrun vitest's 5 s
+// default, so every test in this file gets the hooks' time. No assertion depends on it.
+vi.setConfig({ testTimeout: DAY_TIMEOUT_MS });
 
 describe('the privacy rule (npc.md part 2, section 2)', () => {
   beforeAll(async () => void (await recordedDay()), DAY_TIMEOUT_MS);
