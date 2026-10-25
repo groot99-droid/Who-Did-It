@@ -208,6 +208,24 @@ describe('with the variables set', () => {
     await human.room.leave();
   });
 
+  // Round 9 (docs/round9/admin-studio.md 5): the Studio routes register with the gate; with no GitHub token set they
+  // answer the NFY line to a good bearer and 403 to anyone else.
+  it('serves the Studio routes beside the admin room, NFY without the GitHub token', async () => {
+    expect(process.env.WDI_ADMIN_GITHUB_TOKEN).toBeUndefined();
+    const url = 'http://localhost:2568/studio/reports';
+    const bad = await fetch(url, { headers: { Authorization: 'Bearer nope' } });
+    expect(bad.status).toBe(403);
+    const good = await fetch(url, { headers: { Authorization: `Bearer ${tokenFor()}` } });
+    expect(good.status).toBe(503);
+    expect(((await good.json()) as { error: string }).error).toMatch(/^NFY: /);
+    const post = await fetch('http://localhost:2568/studio/report', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tokenFor()}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: '', note: '' }),
+    });
+    expect(post.status).toBe(503);
+  });
+
   it('keeps an admin client apart from a party room of the same server', async () => {
     const party = await lobbyOf(colyseus, 1);
     const admin = await create();
