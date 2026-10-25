@@ -12,17 +12,23 @@ export class StudioStore {
   readonly bus = mitt<{ change: undefined }>();
   snapshot: StudioSnapshot | null = null;
   log: string[] = [];
-  /** The last refused command's message, '' once a command is accepted by the next snapshot. */
+  /** The last refused command's message; it stays until the owner sends the next command. */
   refused = '';
 
   applySnapshot(s: StudioSnapshot): void {
     this.snapshot = s;
-    this.refused = '';
     this.bus.emit('change', undefined);
   }
 
   addLog(lines: readonly string[]): void {
     this.log = [...this.log, ...lines].slice(-LOG_LINES);
+    this.bus.emit('change', undefined);
+  }
+
+  /** Forgets the refusal: the next command is about to go out. */
+  clearRefusal(): void {
+    if (this.refused === '') return;
+    this.refused = '';
     this.bus.emit('change', undefined);
   }
 

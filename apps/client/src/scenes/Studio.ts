@@ -119,7 +119,10 @@ export class Studio extends Phaser.Scene {
     const root = this.mount(h('div', { class: 'wdi-admin' }));
     this.screens.push(
       mountControls(root.el, {
-        send: (type, payload) => link.send(type, payload),
+        send: (type, payload) => {
+          this.store.clearRefusal();
+          link.send(type, payload);
+        },
         store: this.store,
         onSignOut: () => this.signOut(),
         onStyle: (id) => void requestArtStyle(id),

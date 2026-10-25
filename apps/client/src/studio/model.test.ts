@@ -23,16 +23,18 @@ const snap = (over: Partial<StudioSnapshot> = {}): StudioSnapshot => ({
 });
 
 describe('StudioStore', () => {
-  it('keeps the newest snapshot and clears a refusal with it', () => {
+  it('keeps the newest snapshot and a refusal until the next command goes out', () => {
     const s = new StudioStore();
     const seen = vi.fn();
     s.bus.on('change', seen);
     s.refuse('cannot stand there');
-    expect(s.refused).toBe('cannot stand there');
     s.applySnapshot(snap());
-    expect(s.refused).toBe('');
     expect(s.snapshot?.tick).toBe(7);
-    expect(seen).toHaveBeenCalledTimes(2);
+    expect(s.refused).toBe('cannot stand there');
+    s.clearRefusal();
+    expect(s.refused).toBe('');
+    s.clearRefusal();
+    expect(seen).toHaveBeenCalledTimes(3);
   });
 
   it('keeps the last 50 log lines', () => {
