@@ -57,6 +57,16 @@ describe('checkDataSave', () => {
     expect(problems(() => checkDataSave('quests.json', orphan)).join('\n')).toContain('foreman');
   });
 
+  it("dresses a quest NPC in the villager family only, never a card's look (role secrecy)", () => {
+    const quests = raw('quests.json');
+    quests.npcs.smith.look = 'villagerelder';
+    expect(checkDataSave('quests.json', quests).summary).toEqual(['- npcs: changed `smith`']);
+    quests.npcs.smith.look = 'detective';
+    expect(problems(() => checkDataSave('quests.json', quests))).toContain(
+      'quests.json: npc smith look detective is not of the villager family',
+    );
+  });
+
   it('refuses a talk line that names a role (role secrecy)', () => {
     const talk = raw('talk.json');
     talk.notes.push({ text: 'The Killer is among us.' });
