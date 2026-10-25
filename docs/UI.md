@@ -1536,3 +1536,35 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.signin.button` | Sign in with GitHub | the Studio page |
 | `studio.signin.failed` | The Studio refused this sign-in. Sign in again. | the Studio page |
 | `studio.connecting` | Joining the Studio... | the Studio page |
+| `studio.signout` | Sign out | the Studio page |
+| `studio.status` | {scene} · tile {tx},{ty} · tick {tick} | the Studio page |
+| `studio.scene` | Scenes | the Studio page |
+| `studio.scene.search` | Search scenes | the Studio page |
+| `studio.teleport` | Go | the Studio page |
+| `studio.noclip` | Noclip | the Studio page |
+| `studio.time` | Time of day | the Studio page |
+| `studio.time.dawn` | Dawn | the Studio page |
+| `studio.time.day` | Day | the Studio page |
+| `studio.time.dusk` | Dusk | the Studio page |
+| `studio.time.night` | Night | the Studio page |
+| `studio.speed` | Speed | the Studio page |
+| `studio.speed.pick` | {scale}x | the Studio page |
+| `studio.pause` | Pause | the Studio page |
+| `studio.resume` | Resume | the Studio page |
+| `studio.step` | Step | the Studio page |
+| `studio.profile` | Profile | the Studio page |
+| `studio.profile.small` | Small | the Studio page |
+| `studio.profile.medium` | Medium | the Studio page |
+| `studio.profile.large` | Large | the Studio page |
+| `studio.style` | Art style | the Studio page |
+| `studio.spawn` | Spawn | the Studio page |
+| `studio.spawn.kind.mob` | Mob | the Studio page |
+| `studio.spawn.kind.townsfolk` | Townsfolk | the Studio page |
+| `studio.spawn.kind.look` | Look | the Studio page |
+| `studio.spawn.add` | Spawn here | the Studio page |
+| `studio.spawn.clear` | Clear spawns | the Studio page |
+| `studio.give` | Give | the Studio page |
+| `studio.give.add` | Give item | the Studio page |
+| `studio.items` | Holding: {items} | the Studio page |
+| `studio.items.none` | Holding nothing | the Studio page |
+| `studio.log` | Studio log | the Studio page |
