@@ -327,13 +327,24 @@ export type StudioSpawnKind = 'mob' | 'townsfolk' | 'look';
 ```
 
 ```ts
+export type StudioStandInState = 'stand' | 'idle' | 'walk' | 'chase' | 'flee' | 'work';
+```
+
+```ts
 export interface StudioSpawn {
   id: string;
   kind: StudioSpawnKind;
   /** The mob, townsfolk or look id. */
   ref: string;
+  /** The tile it stands on now. */
   x: number;
   y: number;
+  /** Its feet in world pixels, its facing (world frame, as the admin figure's `yaw`) and whether it moved. */
+  px: number;
+  py: number;
+  yaw: number;
+  moving: boolean;
+  state: StudioStandInState;
 }
 ```
 
