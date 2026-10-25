@@ -2,6 +2,8 @@
 
 Status: design only, for owner review. Nothing here is built. Brief item 8 (`owner-brief.md`): "stuff just says can't do that yet, if it's a problem on my side mark it with NFY, if it takes an unlock creatively say why it fails." This document counts every refusal the server can send, replaces the free-text messages with a closed list of reasons, says when a refusal is `NFY` and when it names what is missing, and fixes the client so the reason reaches the player. Rules and numbers stay in `GDD.md` and `packages/content/data`; every number below marked _proposed_ moves into data when the owner approves.
 
+**Owner answers folded in (9D, 2026-10-25).** All eight failure-message questions (FM1 to FM8) took the default, so the rules of sections 3 to 6 stand as written. Other answers add refusals: the tool walls on piles (LT1), the lock-pick mini-game (LT2), the inventory (LT4), the law, the jail and sleeping (WM2, WM11, LW9, follow-up 2). They are in sections 4.9 and 5, marked "(owner answer <ID>)". Section 10 lists the reconciliations.
+
 ## 1. What the player sees today, and why
 
 Every refusal is one frame, `S2C.error { code, msg }`, built by `reject()` (`apps/server/src/sim/World.ts:59`). The server writes `msg` as a debug word (`'not now'`, `'cannot do that'`). The client throws it away:
@@ -153,6 +155,26 @@ Sites by reason, from the generator behind the appendix: `PHASE_CLOSED` 27, `BAD
 
 New reasons the logic table adds, none of which exists today (so none has a site yet): `NEED_KEY`, and the per-interaction `fail` lines of section 5.
 
+### 4.9 Reasons the owner answers add
+
+None exists today, so none has a site yet. Each joins the enum with a line in the copy table.
+
+| Reason | Code | Args | Line (draft) | From |
+| --- | ---: | --- | --- | --- |
+| `IN_JAIL` | 422 | `untilDawn` | You are in the county jail until dawn. | `world-mode.md` 5.1 (owner answers WM11, LW9) |
+| `ASLEEP` | 426 | none | _never shown_: any input wakes the sleeper instead | `world-mode.md` 7.3 (follow-up 2) |
+| `NO_BED` | 422 | none | This is not your bed. Your own is at home. | `world-mode.md` 7.3 |
+| `BOARDED_HOME` | 428 | none | Your house is boarded up. Pay what you owe, or find a cot. | owner answer EP3 |
+| `PETITION_GRACE` | 422 | `readyInS` | The case was just dismissed. Wait {readyInS} s. | `world-mode.md` 3.1 (owner answer WM2) |
+| `PETITION_OPEN` | 422 | none | A petition is already open against them. Sign that one. | `world-mode.md` 3.1 |
+| `NOT_HUNTED` | 422 | none | There is no warrant for them. Petition first. | `world-mode.md` 3.1 (cuffing without a manhunt) |
+| `PICK_SNAPPED` | 422 | none | The pick snaps. Ease the tension next time. | `logic-table.md` 8.5 (owner answer LT2) |
+| `GRID_NO_RECIPE` | 422 | none | Nothing comes of that. | `logic-table.md` 8.6 (owner answer LT4) |
+| `GRID_BOUND` | 422 | `item` | {item} stays with you. It cannot be worked. | `logic-table.md` 8.6 (a role-bound item; the line names the item, never the role) |
+| `NEEDS_PART` | 422 | `missing` | The oven wants the parts first: {missing}. | `logic-table.md` 7.1 (owner answer LT1) |
+
+`PACK_FULL` keeps its line with the bigger pack (LT4); `NEED_TOOL` covers every pile now walled by its tool (LT1).
+
 ## 5. In-world lines come from the interaction, not the reason
 
 A generic `NEED_TOOL` line is a fallback. The table of `logic-table.md` gives each interaction its own `fail` lines, keyed by reason, because the owner's example is specific to the lock and the tool:
@@ -160,8 +182,11 @@ A generic `NEED_TOOL` line is a fallback. The table of `logic-table.md` gives ea
 | Interaction (logic-table.md) | Reason | Line (draft) |
 | --- | --- | --- |
 | Pick a lock, no pick | `NEED_TOOL` (`pick`) | Failed to pick the lock. Looks like you might need a lock pick. |
-| Pick a lock, tier too low | `NEED_TOOL` (`pick`, tier 2) | The pick bends. This lock wants a finer one. |
-| Chop a lumber pile, no axe | `NEED_TOOL` (`cut`) | You tug at the timber. It will not come apart by hand. An axe would. |
+| Pick a lock, tier too low | `NEED_TOOL` (`pick`, tier 2) | The pick bends. This lock wants a finer one. (With the mini-game, owner answer LT2, a low-tier pick may still try, with a narrow band; the line shows only on a snap, as `PICK_SNAPPED`) |
+| Chop a lumber pile, no axe | `NEED_TOOL` (`cut`) | You tug at the timber. It will not come apart by hand. An axe would. (Owner answer LT1: by hand it gives nothing) |
+| Fell a tree, no axe | `NEED_TOOL` (`cut`) | The trunk will not move for your hands. An axe would fell it. (owner answer LT1) |
+| Take from a rock or ore pile, no pickaxe | `NEED_TOOL` (`break`) | The pile is packed hard. A pickaxe would break it loose. (owner answer LT1) |
+| Saw logs, not at a saw | `NEED_STATION` | Logs want a saw. The lumber mill has one, or a saw horse will do slowly. (owner answer LT1) |
 | Break a boulder, no pickaxe | `NEED_TOOL` (`break`) | The boulder does not care. You would want a pickaxe. |
 | Dig a tin seam, no spade | `NEED_TOOL` (`dig`) | The seam will not give. A spade would. |
 | Pry a nailed crate | `NEED_TOOL` (`pry`) | The lid is nailed down. Something to lever it with would help. |
@@ -210,7 +235,7 @@ Tests: every `RefusalReason` has a line (a type-level check on the `Record`); ev
 
 ## 8. Open questions for the owner
 
-Each has a proposed default that the build uses unless the owner answers otherwise.
+**All answered: FM1 to FM8 took the default (owner, 2026-10-25; `owner-answers.md`).** NFY shows in every playtest build and one switch hides it before release (FM1); lines name the exact item (FM2); plain second person, no jokes (FM3); a voided kill stays silent (FM4); a second identical refusal in 30 s adds a hint (FM5); ghosts get the same lines (FM6); the client may grey a tool or key check, never a hidden one (FM7); general copy in the client, each object's lines in the table (FM8). The questions as asked:
 
 1. **How loud is `NFY`?** The brief wants it for the owner's own testing. _Default:_ shown in every build while the game is in playtest; a single flag hides it before release, in which case an `NFY` reads "Nothing happens" and is logged. Alternative: always show it.
 2. **Does a missing-unlock line name the exact item?** "You might need a lock pick" tells a new player what to hunt for; some prefer a riddle ("something thin and bent"). _Default:_ name the item, as the owner's example does.
@@ -615,3 +640,10 @@ Generated from `grep -rn "ErrorCode\." apps/server/src` (tests excluded) and che
 | Site | Code | Message today | Proposed reason |
 | --- | --- | --- | --- |
 | `95` | cannot | cannot do that | `BAD_REQUEST` |
+
+## 10. Reconciled
+
+- **The bell's ding is not a refusal (owner answer WM2).** Ringing the bell with no purpose answers with a ding, which is the bell working, so it is neither `NFY` nor a refusal line.
+- **A refused pairing is an answer, not a refusal (owner answer WM2).** "Walk with me" declined by a figure shows the figure's answer ("Not tonight."), drawn and timed alike for a human, an NPC seat and a townsperson (`world-mode.md` 12, R6). It never uses a `RefusalReason`, so the reason list cannot tell a person from an NPC.
+- **A protected Killer's strike stays silent (FM4) while sentences are public.** `VOIDED` is unchanged. The Tribunal's verdict is public (`phases.md` 4); a refusal never echoes it.
+- **NFY for the parts not yet built.** Until each owner-answer system ships, its verb answers `NFY` with a feature tag: `lock-pick mini-game`, `crafting grid`, `petition`, `manhunt`, `county jail`, `sleeping`, `the mill`, `bakery sections`. The `interactions.json` `status: "nfy"` rule covers the table's verbs; the new handlers register theirs.

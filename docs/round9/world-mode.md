@@ -914,5 +914,5 @@ Where an owner answer met another rule, this is how the design settles it. Each 
   walking to the houses (a cold oven, an empty stall). No field, toast or list ever names the turned seat or says that a
   Hitman is active beyond the public signs (1.5).
 
-R8, R9, R12, R13 and R15 are in `logic-table.md`, `living-world.md` and `emergent-play.md`. The full list is in
+R8, R9, R12, R13, R15, R17 and R18 are in `logic-table.md`, `living-world.md` and `emergent-play.md`. The full list is in
 `gdd-map.md` 4.
