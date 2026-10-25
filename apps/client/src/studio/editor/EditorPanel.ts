@@ -45,7 +45,7 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
   tplSel.addEventListener('change', choose);
 
   const toolSel = h('select', { class: 'wdi-admin__field', ...tid('studio-edit-tool') });
-  for (const t of ['objects', 'brush', 'rect', 'fill'] as const)
+  for (const t of ['objects', 'brush', 'rect', 'fill', 'gate', 'path'] as const)
     toolSel.append(h('option', { value: t }, C[`studio.edit.tool.${t}`]));
   toolSel.addEventListener('change', () => s.setTool(toolSel.value as Tool));
   const cellName = (c: Cell) =>
@@ -62,6 +62,26 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
     h('input', { type: 'number', min: 1, max: 200, class: 'wdi-admin__field', value, ...tid(id) });
   const wIn = num('studio-edit-width', s.scene.size.w);
   const hIn = num('studio-edit-height', s.scene.size.h);
+
+  const profileSel = h('select', { class: 'wdi-admin__field', ...tid('studio-edit-profile') });
+  for (const p of ['small', 'medium', 'large']) profileSel.append(h('option', { value: p }, p));
+  profileSel.addEventListener('change', () => s.setGateProfile(profileSel.value as 'small'));
+  const pathSel = h('select', { class: 'wdi-admin__field', ...tid('studio-edit-pathkind') });
+  for (const k of ['patrol', 'wolfLoop']) pathSel.append(h('option', { value: k }, k));
+  pathSel.addEventListener('change', () => s.setPathKind(pathSel.value as 'patrol'));
+  const pathBar = h(
+    'div',
+    { class: 'wdi-admin__group', hidden: true, ...tid('studio-edit-pathbar') },
+    pathSel,
+    btn('studio-edit-pathfinish', C['studio.edit.pathFinish'], () => s.finishPath()),
+    btn('studio-edit-pathclear', C['studio.edit.pathClear'], () => s.clearDraft()),
+  );
+  const gateBar = h(
+    'div',
+    { class: 'wdi-admin__group', hidden: true },
+    field('studio-edit-gateprofile', C['studio.edit.profile'], profileSel),
+  );
+  const routes = h('div', { ...tid('studio-edit-routes') });
 
   const picked = h('div', { class: 'wdi-studio__picked', ...tid('studio-edit-selected') });
   const problem = h('p', { class: 'wdi-admin__problem', role: 'alert', ...tid('studio-edit-error') });
@@ -126,7 +146,16 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
     fillPicked();
     problem.textContent = s.error;
     problem.hidden = s.error === '';
-    cellSel.hidden = s.tool === 'objects';
+    cellSel.hidden = !['brush', 'rect', 'fill'].includes(s.tool);
+    pathBar.hidden = s.tool !== 'path';
+    gateBar.hidden = s.tool !== 'gate';
+    routes.replaceChildren(
+      ...[...s.scene.gates, ...s.scene.paths].map((o) =>
+        btn(`studio-edit-route-${o.id}`, fill(C['studio.edit.routeRemove'], { id: o.id }), () =>
+          s.removeRoute(o.id),
+        ),
+      ),
+    );
     toolSel.value = s.tool;
     if (document.activeElement !== wIn) wIn.value = String(s.scene.size.w);
     if (document.activeElement !== hIn) hIn.value = String(s.scene.size.h);
@@ -144,6 +173,9 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
     },
     h('h2', {}, C['studio.edit.title']),
     h('div', { class: 'wdi-admin__group' }, h('span', {}, C['studio.edit.tool']), toolSel, cellSel),
+    gateBar,
+    pathBar,
+    routes,
     h('div', { class: 'wdi-admin__group' }, h('span', {}, C['studio.edit.add']), kindSel, tplSel, name),
     h(
       'div',

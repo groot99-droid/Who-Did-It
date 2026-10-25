@@ -1635,3 +1635,11 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.edit.width` | Width | the Studio editor |
 | `studio.edit.height` | Height | the Studio editor |
 | `studio.edit.resize` | Resize | the Studio editor |
+| `studio.edit.tool.gate` | Gate | the Studio editor |
+| `studio.edit.tool.path` | Path | the Studio editor |
+| `studio.edit.profile` | Gate opens at profile | the Studio editor |
+| `studio.edit.pathKind` | Path kind | the Studio editor |
+| `studio.edit.pathFinish` | Finish path | the Studio editor |
+| `studio.edit.pathClear` | Clear corners | the Studio editor |
+| `studio.edit.routes` | Gates and paths | the Studio editor |
+| `studio.edit.routeRemove` | Remove {id} | the Studio editor |

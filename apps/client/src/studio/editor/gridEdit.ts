@@ -5,7 +5,7 @@ import { KINDS, listOf, type Edit } from './sceneEdit';
 
 export const GRID_CHARS = ['.', '#', 'D', 'S', 'H', 'B'] as const;
 export type Cell = (typeof GRID_CHARS)[number];
-export type Tool = 'objects' | 'brush' | 'rect' | 'fill';
+export type Tool = 'objects' | 'brush' | 'rect' | 'fill' | 'gate' | 'path';
 
 export const MAX_SIDE = 200;
 
