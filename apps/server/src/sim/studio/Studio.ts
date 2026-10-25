@@ -2,6 +2,7 @@ import {
   PROFILE_RANK,
   SCENE_IDS,
   type Profile,
+  type Scene,
   type SceneId,
   items,
   looks,
@@ -10,9 +11,11 @@ import {
   scenes,
 } from '@wdi/content';
 import {
+  NavGrid,
   STUDIO_DAY_PHASES,
   TILE_PX,
   moveAabb,
+  navFromGrid,
   overlapsSolid,
   type ClockScale,
   type StudioDayPhase,
@@ -48,9 +51,21 @@ export interface StudioSim {
   spawns: Map<SceneId, StandIn[]>;
   nextSpawn: number;
   items: string[];
+  /**
+   * An unsaved edit of one scene (`studio.draft`, admin-studio.md 3 "Walk it"): checked as a save is, used in place of
+   * the committed scene for collision, doors and stand-ins in this room only, and never written anywhere. It lasts
+   * until it is cleared or the figure goes to another scene.
+   */
+  draft: StudioDraft | null;
   commands: StudioCommand[];
   /** Lines not yet sent to the client. */
   log: string[];
+}
+
+export interface StudioDraft {
+  scene: Scene;
+  /** The nav rebuilt from the draft's grid (`navFromGrid`), one grid per profile as it is asked for. */
+  grids: Map<Profile, NavGrid>;
 }
 
 export type StudioCommand =
@@ -63,7 +78,9 @@ export type StudioCommand =
   | { kind: 'clock'; scale?: ClockScale; paused?: boolean; step?: number }
   | { kind: 'spawn'; spawn: StudioSpawnKind; ref: string; x?: number; y?: number }
   | { kind: 'clearSpawns' }
-  | { kind: 'give'; itemId: string };
+  | { kind: 'give'; itemId: string }
+  /** A scene already checked by `checkScene` (the draft route), or null to drop the draft. */
+  | { kind: 'draft'; scene: Scene | null };
 
 /** Commands waiting for the step; a flood past this is refused (`busy`). */
 export const MAX_STUDIO_COMMANDS = 64;
@@ -99,6 +116,7 @@ export function createStudio(sceneId: SceneId = STUDIO_START_SCENE): StudioSim {
     spawns: new Map(),
     nextSpawn: 1,
     items: [],
+    draft: null,
     commands: [],
     log: [],
   };
@@ -188,6 +206,9 @@ export function parseStudio(type: string, raw: unknown): StudioCommand | string 
     }
     case 'studio.clearSpawns':
       return { kind: 'clearSpawns' };
+    case 'studio.draft':
+      // A scene is too big for one socket message (4 KB): it comes through `POST /studio/draft`, which checks it.
+      return p.scene === null ? { kind: 'draft', scene: null } : 'send a draft scene by POST /studio/draft';
     case 'studio.give':
       return typeof p.itemId === 'string' && Object.hasOwn(items.items, p.itemId)
         ? { kind: 'give', itemId: p.itemId }
@@ -197,7 +218,20 @@ export function parseStudio(type: string, raw: unknown): StudioCommand | string 
   }
 }
 
-const grid = (sim: StudioSim, sceneId: SceneId = sim.sceneId) => navGrid(sceneId, sim.profile);
+/** The scene the Studio runs for an id: the draft when it is that scene's, else the committed one. */
+export const sceneOf = (sim: StudioSim, sceneId: SceneId = sim.sceneId): Scene =>
+  sim.draft?.scene.id === sceneId ? sim.draft.scene : scenes[sceneId];
+
+function grid(sim: StudioSim, sceneId: SceneId = sim.sceneId): NavGrid {
+  const draft = sim.draft;
+  if (draft?.scene.id !== sceneId) return navGrid(sceneId, sim.profile);
+  let g = draft.grids.get(sim.profile);
+  if (!g) {
+    g = new NavGrid(navFromGrid(draft.scene), sim.profile);
+    draft.grids.set(sim.profile, g);
+  }
+  return g;
+}
 
 /** A figure fits here: inside the scene, and off the walls unless noclip. */
 function fits(sim: StudioSim, sceneId: SceneId, x: number, y: number): boolean {
@@ -215,7 +249,7 @@ function enter(
   let tx: number;
   let ty: number;
   if ('spawnId' in at) {
-    const spawn = scenes[sceneId].spawns.find((s) => s.id === at.spawnId);
+    const spawn = sceneOf(sim, sceneId).spawns.find((s) => s.id === at.spawnId);
     if (!spawn) return false;
     tx = spawn.x;
     ty = spawn.y;
@@ -227,6 +261,7 @@ function enter(
   const y = tileCentre(ty, TILE_PX);
   if (!fits(sim, sceneId, x, y)) return false;
   if (sceneId !== sim.sceneId) say(sim, `scene ${sceneId}`);
+  if (sim.draft !== null && sim.draft.scene.id !== sceneId) dropDraft(sim);
   sim.sceneId = sceneId;
   place(sim, x, y);
   return true;
@@ -255,7 +290,7 @@ export function applyStudio(sim: StudioSim, cmd: StudioCommand): string | null {
       return null;
     }
     case 'portal': {
-      const portal = scenes[sim.sceneId].portals.find((p) => p.id === cmd.portalId);
+      const portal = sceneOf(sim).portals.find((p) => p.id === cmd.portalId);
       if (!portal) return 'no such door';
       const d = Math.hypot(sim.x - tileCentre(portal.x, TILE_PX), sim.y - tileCentre(portal.y, TILE_PX));
       if (d > PORTAL_REACH_TILES * TILE_PX) return 'too far';
@@ -288,7 +323,7 @@ export function applyStudio(sim: StudioSim, cmd: StudioCommand): string | null {
       const ty = cmd.y ?? Math.floor(sim.y / TILE_PX);
       const g = grid(sim);
       if (tx >= g.w || ty >= g.h) return 'bad tile';
-      const spawn = newStandIn(`sp${sim.nextSpawn++}`, cmd.spawn, cmd.ref, sim.sceneId, tx, ty);
+      const spawn = newStandIn(`sp${sim.nextSpawn++}`, cmd.spawn, cmd.ref, sceneOf(sim), tx, ty);
       list.push(spawn);
       sim.spawns.set(sim.sceneId, list);
       say(sim, `spawn ${spawn.id} ${cmd.spawn} ${cmd.ref} ${tx},${ty}`);
@@ -303,6 +338,44 @@ export function applyStudio(sim: StudioSim, cmd: StudioCommand): string | null {
       sim.items.push(cmd.itemId);
       say(sim, `give ${cmd.itemId}`);
       return null;
+    case 'draft':
+      return cmd.scene === null ? (dropDraft(sim), null) : loadDraft(sim, cmd.scene);
+  }
+}
+
+/**
+ * Walks a draft: the figure goes to its scene, on the tile it stands on when that is the draft's scene and still open,
+ * else at the draft's first spawn. The scene's stand-ins are dropped, since their stations may have moved.
+ */
+function loadDraft(sim: StudioSim, scene: Scene): string | null {
+  const sceneId = scene.id as SceneId;
+  const before = sim.draft;
+  sim.draft = { scene, grids: new Map() };
+  const here = { x: Math.floor(sim.x / TILE_PX), y: Math.floor(sim.y / TILE_PX) };
+  const first = scene.spawns[0];
+  const ok =
+    (sceneId === sim.sceneId && enter(sim, sceneId, here)) ||
+    (first !== undefined && enter(sim, sceneId, { spawnId: first.id }));
+  if (!ok) {
+    sim.draft = before;
+    return 'cannot stand there';
+  }
+  sim.spawns.delete(sceneId);
+  if (before !== null && before.scene.id !== sceneId) sim.spawns.delete(before.scene.id as SceneId);
+  say(sim, `draft ${sceneId} (unsaved)`);
+  return null;
+}
+
+function dropDraft(sim: StudioSim): void {
+  const draft = sim.draft;
+  if (draft === null) return;
+  sim.draft = null;
+  sim.spawns.delete(draft.scene.id as SceneId);
+  say(sim, `draft ${draft.scene.id} dropped`);
+  // The committed scene may wall the tile the draft left open.
+  if (draft.scene.id === sim.sceneId && !fits(sim, sim.sceneId, sim.x, sim.y)) {
+    const spawn = scenes[sim.sceneId].spawns[0];
+    if (spawn) place(sim, tileCentre(spawn.x, TILE_PX), tileCentre(spawn.y, TILE_PX));
   }
 }
 
@@ -350,7 +423,7 @@ export function stepStudio(sim: StudioSim, lastStepMs = 0): string[] {
     walk(sim);
     stepStandIns(sim.spawns.get(sim.sceneId) ?? [], {
       tick: sim.tick,
-      sceneId: sim.sceneId,
+      scene: sceneOf(sim),
       grid: grid(sim),
       phase: sim.time.phase,
       admin: { x: sim.x, y: sim.y },
@@ -376,5 +449,6 @@ export function studioSnapshot(sim: StudioSim): StudioS2CPayloads['studio.snapsh
     time: { ...sim.time },
     spawns: (sim.spawns.get(sim.sceneId) ?? []).map(standInRow),
     items: [...sim.items],
+    draft: sim.draft !== null,
   };
 }

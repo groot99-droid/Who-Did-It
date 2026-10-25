@@ -308,12 +308,13 @@ Round 9 (`docs/round9/admin-studio.md` 2). Accepted by the `studio` room alone, 
 | `studio.spawn` | `{ kind: StudioSpawnKind; ref: string; x?: number; y?: number }` | A stand-in on a tile of the current scene, at the figure's feet when `x`, `y` are absent. |
 | `studio.clearSpawns` | `Record<string, never>` | - |
 | `studio.give` | `{ itemId: string }` | Put an `items.json` item in the admin figure's hands. |
+| `studio.draft` | `{ scene: null }` | Drop the draft (admin-studio.md 3 "Walk it"). A draft scene itself is posted to `POST /studio/draft` with this room's id, since a scene is larger than one socket message; a teleport or a door to another scene drops it too. |
 
 ### Server to client
 
 | Type | Payload | Notes |
 |---|---|---|
-| `studio.snapshot` | `{ tick: number; sceneId: string; profile: 'small' \| 'medium' \| 'large'; /** The admin figure's feet in world pixels, and the tile under them. */ x: number; y: number; tx: number; ty: number; /** World-frame facing in radians, as `Presence.yaw`. */ yaw: number; moving: boolean; noclip: boolean; scale: ClockScale; paused: boolean; time: { phase: StudioDayPhase; t: number }; /** The stand-ins of the current scene. */ spawns: StudioSpawn[]; /** Item ids the admin figure holds, in the order given. */ items: string[]; }` | Every tick to the one Studio client: the whole Studio state (it is small). |
+| `studio.snapshot` | `{ tick: number; sceneId: string; profile: 'small' \| 'medium' \| 'large'; /** The admin figure's feet in world pixels, and the tile under them. */ x: number; y: number; tx: number; ty: number; /** World-frame facing in radians, as `Presence.yaw`. */ yaw: number; moving: boolean; noclip: boolean; scale: ClockScale; paused: boolean; time: { phase: StudioDayPhase; t: number }; /** The stand-ins of the current scene. */ spawns: StudioSpawn[]; /** Item ids the admin figure holds, in the order given. */ items: string[]; /** True when the current scene is an unsaved draft (`studio.draft`); false or absent, the committed scene. */ draft?: boolean; }` | Every tick to the one Studio client: the whole Studio state (it is small). |
 | `studio.log` | `{ lines: string[] }` | New lines of the Studio room's log (applied and refused commands, scene loads); the client keeps the last 50. |
 
 ### Studio payload types
