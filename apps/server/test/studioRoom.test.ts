@@ -111,18 +111,56 @@ describe('with the admin variables set', () => {
     expect(got.last?.sceneId).toBe(room.sim.sceneId);
     client.send(STUDIO_C2S.move, { seq: 5, dx: 1, dy: 0 });
     expect(await until(() => room.sim.lastSeq === 5, 3000)).toBe(true);
+    // S1b: a teleport and noclip over the wire, applied in the step and echoed in the snapshot and the log.
+    client.send(STUDIO_C2S.teleport, { sceneId: 'bakery', spawnId: 'door' });
+    client.send(STUDIO_C2S.noclip, { on: true });
+    expect(await until(() => got.last?.noclip === true, 3000)).toBe(true);
+    expect(got.last).toMatchObject({ sceneId: 'bakery', tx: 8, ty: 9 });
+    expect(got.lines.some((l) => l.includes('teleport bakery door'))).toBe(true);
+    // S1c: a stand-in, an item and the time of day.
+    client.send(STUDIO_C2S.spawn, { kind: 'mob', ref: 'wolf' });
+    client.send(STUDIO_C2S.give, { itemId: 'knife' });
+    client.send(STUDIO_C2S.time, { phase: 'night', t: 0 });
+    expect(await until(() => got.last?.items.length === 1, 3000)).toBe(true);
+    expect(got.last).toMatchObject({ time: { phase: 'night' } });
+    expect(got.last?.spawns.map((s) => s.ref)).toEqual(['wolf']);
     expect(got.errors).toEqual([]);
+    await client.leave();
+  });
+
+  it('pauses, single-steps exactly and resumes', async () => {
+    const { client, got, room } = await open();
+    client.send(STUDIO_C2S.clock, { paused: true });
+    expect(await until(() => got.last?.paused === true, 3000)).toBe(true);
+    const frozen = room.sim.tick;
+    await sleep(300);
+    expect(room.sim.tick).toBe(frozen);
+    client.send(STUDIO_C2S.clock, { step: 3 });
+    expect(await until(() => room.sim.tick === frozen + 3, 3000)).toBe(true);
+    await sleep(200);
+    expect(room.sim.tick).toBe(frozen + 3);
+    client.send(STUDIO_C2S.clock, { paused: false, scale: 10 });
+    expect(await until(() => room.sim.tick > frozen + 50, 3000)).toBe(true);
     await client.leave();
   });
 
   it('refuses a bad command with a 422 and ignores an admin or party command', async () => {
     const { client, got, room } = await open();
     client.send(STUDIO_C2S.give, null);
+    client.send(STUDIO_C2S.give, { itemId: 'lightsaber' });
+    client.send(STUDIO_C2S.teleport, { sceneId: 'atlantis', spawnId: 'door' });
+    client.send(STUDIO_C2S.portal, { portalId: 'nowhere' });
     client.send('admin.clock', { scale: 10 });
     client.send('lobby.start', {});
-    expect(await until(() => got.errors.length === 1, 3000)).toBe(true);
+    expect(await until(() => got.errors.length === 4, 3000)).toBe(true);
     await sleep(200);
-    expect(got.errors).toEqual(['422 bad payload']);
+    expect(got.errors).toEqual([
+      '422 bad payload',
+      '422 no such item',
+      '422 no such scene',
+      '422 no such door',
+    ]);
+    expect(got.last?.items).toEqual([]);
     expect(room.sim.clock.scale).toBe(1);
     await client.leave();
   });

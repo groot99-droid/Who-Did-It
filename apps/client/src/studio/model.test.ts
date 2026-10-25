@@ -1,6 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
+import { SCENE_IDS } from '@wdi/content';
 import type { StudioSnapshot } from '../admin/StudioNet';
-import { LOG_LINES, moveOf, moveToSend, StudioStore } from './model';
+import {
+  filterIds,
+  LOG_LINES,
+  moveOf,
+  moveToSend,
+  spawnsOf,
+  STUDIO_LISTS,
+  statusOf,
+  StudioStore,
+} from './model';
 
 const snap = (over: Partial<StudioSnapshot> = {}): StudioSnapshot => ({
   tick: 7,
@@ -22,16 +32,29 @@ const snap = (over: Partial<StudioSnapshot> = {}): StudioSnapshot => ({
 });
 
 describe('StudioStore', () => {
-  it('keeps the newest snapshot and clears a refusal with it', () => {
+  it('keeps the newest snapshot and a refusal until the next command goes out', () => {
     const s = new StudioStore();
     const seen = vi.fn();
     s.bus.on('change', seen);
     s.refuse('cannot stand there');
-    expect(s.refused).toBe('cannot stand there');
     s.applySnapshot(snap());
-    expect(s.refused).toBe('');
     expect(s.snapshot?.tick).toBe(7);
-    expect(seen).toHaveBeenCalledTimes(2);
+    expect(s.refused).toBe('cannot stand there');
+    s.clearRefusal();
+    expect(s.refused).toBe('');
+    s.clearRefusal();
+    expect(seen).toHaveBeenCalledTimes(3);
+  });
+
+  it('toggles overlays on and off and clears them on reset', () => {
+    const s = new StudioStore();
+    s.toggleOverlay('collision');
+    s.toggleOverlay('ids');
+    expect([...s.overlays]).toEqual(['collision', 'ids']);
+    s.toggleOverlay('collision');
+    expect([...s.overlays]).toEqual(['ids']);
+    s.reset();
+    expect(s.overlays.size).toBe(0);
   });
 
   it('keeps the last 50 log lines', () => {
@@ -52,6 +75,26 @@ describe('StudioStore', () => {
   });
 });
 
+describe('pickers', () => {
+  it('filters ids case-insensitively', () => {
+    expect(filterIds(['bakery', 'bp_camp', 'Barn'], 'BA')).toEqual(['bakery', 'Barn']);
+    expect(filterIds(['a', 'b'], '  ')).toEqual(['a', 'b']);
+  });
+
+  it('lists every frozen scene id, in order, and the spawns of one', () => {
+    expect(STUDIO_LISTS.scenes).toEqual([...SCENE_IDS]);
+    expect(spawnsOf('bakery')).toContain('door');
+    expect(spawnsOf('nowhere')).toEqual([]);
+  });
+
+  it('offers mobs, townsfolk, looks and items from the content', () => {
+    expect(STUDIO_LISTS.mob).toContain('wolf');
+    expect(STUDIO_LISTS.townsfolk).toContain('clerk');
+    expect(STUDIO_LISTS.look.length).toBeGreaterThan(0);
+    expect(STUDIO_LISTS.items).toContain('knife');
+  });
+});
+
 describe('moveOf', () => {
   it('is still with no key held', () => {
     expect(moveOf(new Set())).toEqual({ dx: 0, dy: 0, sprint: false });
@@ -65,6 +108,13 @@ describe('moveOf', () => {
     const opposite = moveOf(new Set(['KeyD', 'KeyA']));
     expect(opposite.dx).toBeCloseTo(0);
     expect(opposite.dy).toBeCloseTo(0);
+  });
+});
+
+describe('statusOf', () => {
+  it('fills the line and is empty before the first snapshot', () => {
+    expect(statusOf(snap(), '{scene} {tx},{ty} #{tick}')).toBe('bakery 3,4 #7');
+    expect(statusOf(null, '{scene}')).toBe('');
   });
 });
 

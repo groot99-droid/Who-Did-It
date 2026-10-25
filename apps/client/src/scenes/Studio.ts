@@ -6,11 +6,20 @@ import { toScreen } from '@wdi/shared/iso';
 import { setRoute } from '../flags';
 import { captureToken, clearToken, loginUrl, type TokenStore } from '../admin/AdminNet';
 import { connectStudio, type StudioLink } from '../admin/StudioNet';
+import { BUILD_VERSION } from '../health';
+import { mountControls } from '../studio/Controls';
+import { createMockStudio, mockReportApi } from '../studio/mockStudio';
+import { mountInbox } from '../studio/InboxPanel';
+import { mountReportPanel } from '../studio/ReportPanel';
+import { createReportApi, type ReportApi } from '../studio/reportApi';
+import { requestOf } from '../studio/reportContext';
 import { figuresOf, FIGURE_ID } from '../studio/figures';
+import { OverlayView } from '../studio/OverlayView';
 import { moveOf, moveToSend, StudioStore } from '../studio/model';
 import { clearStudioMarker, setStudioMarker } from '../studio/route';
 import { STUDIO_COPY as C } from '../ui/copy';
 import { h, overlayRoot, type Screen } from '../ui/dom';
+import { currentStyleId, requestArtStyle } from '../view/artStyle';
 import { applyFilters, peekManifest, queueMatchEntries, sceneMapKey, sceneMapUrl } from '../view/assets';
 import { EntityView } from '../view/EntityView';
 import { GroundView } from '../view/GroundView';
@@ -20,6 +29,7 @@ import { readSceneMap, type SceneMap, type TiledMap } from '../view/sceneMap';
 import { StaticView } from '../view/StaticView';
 import { getFlags } from './registry';
 import '../ui/admin.css';
+import '../ui/studio.css';
 
 const colorOf = (hex: string) => Number.parseInt(hex.slice(1), 16);
 /**
@@ -58,10 +68,18 @@ export class Studio extends Phaser.Scene {
   private ground: GroundView | null = null;
   private statics: StaticView | null = null;
   private entities: EntityView | null = null;
+  private overlay: OverlayView | null = null;
   private markers!: Phaser.GameObjects.Graphics;
   private markerLabels: Phaser.GameObjects.Text[] = [];
   private lastTick = -1;
   private pressed = new Set<string>();
+  /** The mouse in game px, tracked on the window because the HUD's DOM layer sits over the canvas. */
+  private mouse: { x: number; y: number } | null = null;
+  private onMouse = (e: PointerEvent) => {
+    this.mouse = { x: this.scale.transformX(e.pageX), y: this.scale.transformY(e.pageY) };
+  };
+  private api: ReportApi | null = null;
+  private dialog: Screen | null = null;
   private moveSeq = 0;
   private lastMove = '';
   private moveTimer: number | null = null;
@@ -76,7 +94,12 @@ export class Studio extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#14110f');
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.teardown());
     this.markers = this.add.graphics().setDepth(1_000_000);
+    if (getFlags(this).mock) {
+      this.begin(createMockStudio());
+      return;
+    }
     const token = captureToken(location.hash, this.tokens, () => setRoute('studio'));
+    this.api = token === null ? null : createReportApi(token);
     clearStudioMarker(this.tokens);
     if (token === null) {
       this.showSignIn(false);
@@ -109,10 +132,68 @@ export class Studio extends Phaser.Scene {
       this.store.reset();
       this.showSignIn(true);
     });
+    const root = this.mount(h('div', { class: 'wdi-admin' }));
+    this.screens.push(
+      mountControls(root.el, {
+        send: (type, payload) => {
+          this.store.clearRefusal();
+          link.send(type, payload);
+        },
+        store: this.store,
+        onSignOut: () => this.signOut(),
+        onStyle: (id) => void requestArtStyle(id),
+        onReport: () => void this.openReport(),
+        onInbox: () => this.openInbox(),
+      }),
+    );
     this.startInput();
   }
 
+  /** F8 or the Report button: the canvas as it is now, in a dialog to mark up and send. */
+  private async openReport(): Promise<void> {
+    const snapshot = this.store.snapshot;
+    if (this.dialog !== null || snapshot === null) return;
+    const image = await new Promise<HTMLImageElement | null>((done) =>
+      this.game.renderer.snapshot((img) => done(img instanceof HTMLImageElement ? img : null)),
+    );
+    const api = this.api ?? mockReportApi;
+    if (image === null || this.dialog !== null) return;
+    this.dialog = mountReportPanel(overlayRoot(), {
+      image,
+      build: (png, note) =>
+        requestOf(
+          png,
+          note,
+          {
+            snapshot: this.store.snapshot ?? snapshot,
+            build: BUILD_VERSION,
+            style: currentStyleId(),
+            overlays: this.store.overlays,
+          },
+          this.store.log,
+        ),
+      send: (req) => api.send(req),
+      onClose: () => this.closeDialog(),
+    });
+  }
+
+  private openInbox(): void {
+    if (this.dialog !== null) return;
+    this.dialog = mountInbox(overlayRoot(), this.api ?? mockReportApi, () => this.closeDialog());
+  }
+
+  private closeDialog(): void {
+    this.dialog?.destroy();
+    this.dialog = null;
+  }
+
   private key(e: KeyboardEvent, down: boolean): void {
+    if (down && e.code === 'F8') {
+      e.preventDefault();
+      if (this.dialog === null) void this.openReport();
+      else this.closeDialog();
+      return;
+    }
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
     if (e.target instanceof HTMLSelectElement) return;
     if (down) this.pressed.add(e.code);
@@ -120,12 +201,14 @@ export class Studio extends Phaser.Scene {
   }
 
   private startInput(): void {
+    window.addEventListener('pointermove', this.onMouse);
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
     this.moveTimer = window.setInterval(() => this.sendMove(), MOVE_MS);
   }
 
   private stopInput(): void {
+    window.removeEventListener('pointermove', this.onMouse);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('keyup', this.onKeyUp);
     if (this.moveTimer !== null) window.clearInterval(this.moveTimer);
@@ -181,11 +264,14 @@ export class Studio extends Phaser.Scene {
       }),
     );
     this.entities = new EntityView(this, '', () => undefined);
+    this.overlay = new OverlayView(this);
     this.cameras.main.setBackgroundColor(colorOf(palette.colors[this.map.voidColour])).setRoundPixels(true);
     this.lastTick = -1;
   }
 
   private dropWorld(): void {
+    this.overlay?.destroy();
+    this.overlay = null;
     this.entities?.destroy();
     this.statics?.set([]);
     this.statics?.destroy();
@@ -210,6 +296,7 @@ export class Studio extends Phaser.Scene {
     const cam = this.cameras.main;
     const obj = this.entities.objectOf(FIGURE_ID);
     if (obj) cam.startFollow(obj, true, 0.15, 0.15);
+    this.overlay?.update(this.store.overlays, snap, this.mouse);
     this.statics.update(null, this.game.loop.delta / 1000, cam.worldView);
   }
 
@@ -252,6 +339,21 @@ export class Studio extends Phaser.Scene {
     );
   }
 
+  private signOut(): void {
+    this.closeDialog();
+    this.api = null;
+    clearToken(this.tokens);
+    const link = this.link;
+    this.link = null;
+    link?.close();
+    this.stopInput();
+    this.clearScreens();
+    this.dropWorld();
+    this.sceneId = '';
+    this.store.reset();
+    this.showSignIn(false);
+  }
+
   private mount<T extends HTMLElement>(el: T): Screen & { el: T } {
     overlayRoot().append(el);
     const screen = { el, destroy: () => el.remove() };
@@ -266,6 +368,7 @@ export class Studio extends Phaser.Scene {
 
   private teardown(): void {
     this.stopInput();
+    this.closeDialog();
     this.dropWorld();
     this.link?.close();
     this.link = null;
