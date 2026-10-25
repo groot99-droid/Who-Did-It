@@ -1671,6 +1671,46 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.edit.save` | Save as a draft PR | the Studio editor |
 | `studio.edit.saving` | Saving... | the Studio editor |
 | `studio.edit.saved` | Draft PR #{number} opened on {branch} | the Studio editor |
+| `studio.npc` | NPC | the Studio HUD; temporary button until the mode toggle lands |
+| `studio.npc.title` | NPC routines | the NPC panel |
+| `studio.npc.phase.dawn` / `.day` / `.dusk` / `.night` | Dawn / Day / Dusk / Night | the NPC panel's phase scrubber |
+| `studio.npc.class` | Phase class: {cls} | the NPC panel, under the scrubber |
+| `studio.npc.figure` | Townsfolk | the NPC panel's kind picker |
+| `studio.npc.otherMap` | {id} (not on this map) | the kind picker, for a kind that does not walk this map |
+| `studio.npc.maps` / `.maps.all` | Maps it walks / Empty means every map. | the NPC panel |
+| `studio.npc.fixed` | Fixed: stands at its props, no route | the NPC panel |
+| `studio.npc.stations` / `.stations.any` | Stations, in route order / No stations: it may use any prop that is not ignored. | the NPC panel |
+| `studio.npc.up` / `.down` / `.remove` / `.add` | Up / Down / Remove / Add a station | the station list |
+| `studio.npc.holds` / `.hold.none` | Holds / No hold | the NPC panel |
+| `studio.npc.undo` / `.preview` / `.preview.clear` | Undo / Preview in the room / Clear preview | the NPC panel |
+| `studio.npc.previewing` | Previewing: the room uses your routines | the NPC panel while a draft is up |
+| `studio.npc.save` / `.saving` / `.saved` | Save as a draft PR / Saving... / Draft PR #{number} opened on {branch} | the NPC panel |
+| `studio.npc.note` / `.close` / `.unused` | Note for the PR / Close / Not used in this phase | the NPC panel |
+| `studio.people.title` | People | the NPC panel's People section |
+| `studio.people.givers` | Quest givers here | the NPC panel's People section |
+| `studio.people.givers.none` | No quest givers in this scene. | the NPC panel's People section |
+| `studio.people.giver.move` | Move (click a tile) | the NPC panel's People section |
+| `studio.people.giver.remove` | Remove | the NPC panel's People section |
+| `studio.people.giver.add` | Add a giver | the NPC panel's People section |
+| `studio.people.giver.name` | id name (lowercase) | the NPC panel's People section |
+| `studio.people.giver.npc` | Quest NPC | the NPC panel's People section |
+| `studio.people.giver.facing` | Facing | the NPC panel's People section |
+| `studio.people.giver.at` | Tile {x},{y} | the NPC panel's People section |
+| `studio.people.npc` | Quest NPC | the NPC panel's People section |
+| `studio.people.npc.name` | Name | the NPC panel's People section |
+| `studio.people.npc.look` | Look (villager family) | the NPC panel's People section |
+| `studio.people.talk` | Meeting-note lines | the NPC panel's People section |
+| `studio.people.talk.list.notes` | Notes | the NPC panel's People section |
+| `studio.people.talk.list.herrings` | Red herrings | the NPC panel's People section |
+| `studio.people.talk.list.smallTalk` | Small talk | the NPC panel's People section |
+| `studio.people.talk.fills` | Placeholders: {fills} | the NPC panel's People section |
+| `studio.people.talk.when` | Any time | the NPC panel's People section |
+| `studio.people.talk.add` | Add a line | the NPC panel's People section |
+| `studio.people.talk.remove` | Remove | the NPC panel's People section |
+| `studio.people.preview` | Preview NPCs in the room | the NPC panel's People section |
+| `studio.people.save` | Save people as draft PRs | the NPC panel's People section |
+| `studio.people.saved` | {n} draft PRs opened | the NPC panel's People section |
+| `studio.people.undo` | Undo | the NPC panel's People section |
 | `studio.overview` | Overview | the Studio Overview (9W) |
 | `studio.overview.title` | Overview of {map} | the Studio Overview (9W) |
 | `studio.overview.layout.auto` | Automatic layout: maps/{map}.json has no layout, so cards sit in columns by doors from the hub. | the Studio Overview (9W) |
