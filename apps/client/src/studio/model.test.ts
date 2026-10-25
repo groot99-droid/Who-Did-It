@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { StudioSnapshot } from '../admin/StudioNet';
-import { LOG_LINES, moveOf, StudioStore } from './model';
+import { LOG_LINES, moveOf, moveToSend, StudioStore } from './model';
 
 const snap = (over: Partial<StudioSnapshot> = {}): StudioSnapshot => ({
   tick: 7,
@@ -65,5 +65,23 @@ describe('moveOf', () => {
     const opposite = moveOf(new Set(['KeyD', 'KeyA']));
     expect(opposite.dx).toBeCloseTo(0);
     expect(opposite.dy).toBeCloseTo(0);
+  });
+});
+
+describe('moveToSend', () => {
+  const held = { dx: 1, dy: 0, sprint: false };
+  const still = { dx: 0, dy: 0, sprint: false };
+
+  it('resends a held vector every tick, so the room never sees 250 ms of silence', () => {
+    const first = moveToSend(held, '');
+    expect(first.send).toBe(true);
+    expect(moveToSend(held, first.sig).send).toBe(true);
+  });
+
+  it('sends one stop when the keys come up, then nothing while still', () => {
+    const walking = moveToSend(held, '').sig;
+    const stop = moveToSend(still, walking);
+    expect(stop.send).toBe(true);
+    expect(moveToSend(still, stop.sig).send).toBe(false);
   });
 });
