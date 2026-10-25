@@ -1,11 +1,24 @@
-import { PROFILE_RANK, SCENE_IDS, type Profile, type SceneId, scenes } from '@wdi/content';
 import {
+  PROFILE_RANK,
+  SCENE_IDS,
+  type Profile,
+  type SceneId,
+  items,
+  looks,
+  mobs,
+  routines,
+  scenes,
+} from '@wdi/content';
+import {
+  STUDIO_DAY_PHASES,
   TILE_PX,
   moveAabb,
   overlapsSolid,
+  type ClockScale,
   type StudioDayPhase,
   type StudioS2CPayloads,
   type StudioSpawn,
+  type StudioSpawnKind,
 } from '@wdi/shared';
 import { FOOT_HALF_PX, INPUT_STALE_TICKS, PORTAL_REACH_TILES } from '../constants';
 import { parseMove, speedPxPerTick } from '../Movement';
@@ -45,10 +58,20 @@ export type StudioCommand =
   | { kind: 'noclip'; on: boolean }
   | { kind: 'teleport'; sceneId?: SceneId; spawnId?: string; x?: number; y?: number }
   | { kind: 'portal'; portalId: string }
-  | { kind: 'profile'; profile: Profile };
+  | { kind: 'profile'; profile: Profile }
+  | { kind: 'time'; phase: StudioDayPhase; t: number }
+  | { kind: 'clock'; scale?: ClockScale; paused?: boolean; step?: number }
+  | { kind: 'spawn'; spawn: StudioSpawnKind; ref: string; x?: number; y?: number }
+  | { kind: 'clearSpawns' }
+  | { kind: 'give'; itemId: string };
 
 /** Commands waiting for the step; a flood past this is refused (`busy`). */
 export const MAX_STUDIO_COMMANDS = 64;
+/** Stand-ins per scene, and items in hand: tooling caps, not game numbers. */
+export const MAX_STUDIO_SPAWNS = 64;
+export const MAX_STUDIO_ITEMS = 32;
+/** One `studio.clock {step}` runs at most this many ticks, as `admin.clock`. */
+export const MAX_STUDIO_STEP = 100;
 
 /** The scene the Studio opens on: the first of the frozen id list. */
 export const STUDIO_START_SCENE: SceneId = SCENE_IDS[0]!;
@@ -95,6 +118,13 @@ const say = (sim: StudioSim, line: string): void => {
   sim.log.push(`t${sim.tick} ${line}`);
 };
 
+const ref = (kind: StudioSpawnKind, id: string): boolean =>
+  kind === 'mob'
+    ? Object.hasOwn(mobs.mobs, id)
+    : kind === 'townsfolk'
+      ? Object.hasOwn(routines.townsfolk, id)
+      : id === 'villager' || Object.hasOwn(looks.looks, id);
+
 /**
  * The command of an untrusted `studio.*` payload, or a refusal reason. Shapes and ids only; whether a tile is free
  * or a door is in reach is the step's question, since only the step knows where the figure stands.
@@ -123,6 +153,45 @@ export function parseStudio(type: string, raw: unknown): StudioCommand | string 
       return typeof p.portalId === 'string' ? { kind: 'portal', portalId: p.portalId } : 'bad portal';
     case 'studio.profile':
       return isProfile(p.profile) ? { kind: 'profile', profile: p.profile } : 'bad profile';
+    case 'studio.time': {
+      if (!(STUDIO_DAY_PHASES as readonly unknown[]).includes(p.phase)) return 'bad time';
+      const t = p.t === undefined ? 0.5 : p.t;
+      if (typeof t !== 'number' || !(t >= 0 && t <= 1)) return 'bad time';
+      return { kind: 'time', phase: p.phase as StudioDayPhase, t };
+    }
+    case 'studio.clock': {
+      const { scale, paused, step } = p;
+      if (scale !== undefined && ![1, 2, 5, 10].includes(scale as number)) return 'bad clock';
+      if (paused !== undefined && typeof paused !== 'boolean') return 'bad clock';
+      const okStep = Number.isInteger(step) && (step as number) >= 1 && (step as number) <= MAX_STUDIO_STEP;
+      if (step !== undefined && !okStep) return 'bad clock';
+      if (scale === undefined && paused === undefined && step === undefined) return 'bad clock';
+      return {
+        kind: 'clock',
+        ...(scale !== undefined ? { scale: scale as ClockScale } : {}),
+        ...(paused !== undefined ? { paused: paused as boolean } : {}),
+        ...(step !== undefined ? { step: step as number } : {}),
+      };
+    }
+    case 'studio.spawn': {
+      const kind = p.kind;
+      if (kind !== 'mob' && kind !== 'townsfolk' && kind !== 'look') return 'bad spawn';
+      if (typeof p.ref !== 'string' || !ref(kind, p.ref)) return 'no such figure';
+      const hasTile = p.x !== undefined || p.y !== undefined;
+      if (hasTile && (!isTileInt(p.x) || !isTileInt(p.y))) return 'bad tile';
+      return {
+        kind: 'spawn',
+        spawn: kind,
+        ref: p.ref,
+        ...(hasTile ? { x: p.x as number, y: p.y as number } : {}),
+      };
+    }
+    case 'studio.clearSpawns':
+      return { kind: 'clearSpawns' };
+    case 'studio.give':
+      return typeof p.itemId === 'string' && Object.hasOwn(items.items, p.itemId)
+        ? { kind: 'give', itemId: p.itemId }
+        : 'no such item';
     default:
       return 'unknown command';
   }
@@ -201,6 +270,38 @@ export function applyStudio(sim: StudioSim, cmd: StudioCommand): string | null {
     case 'profile':
       sim.profile = cmd.profile;
       say(sim, `profile ${cmd.profile}`);
+      return null;
+    case 'time':
+      sim.time = { phase: cmd.phase, t: cmd.t };
+      say(sim, `time ${cmd.phase} ${cmd.t}`);
+      return null;
+    case 'clock':
+      if (cmd.scale !== undefined) sim.clock.scale = cmd.scale;
+      if (cmd.paused !== undefined) sim.clock.paused = cmd.paused;
+      if (cmd.step !== undefined) sim.clock.pendingSteps += cmd.step;
+      say(sim, `clock ${sim.clock.scale}x${sim.clock.paused ? ' paused' : ''}`);
+      return null;
+    case 'spawn': {
+      const list = sim.spawns.get(sim.sceneId) ?? [];
+      if (list.length >= MAX_STUDIO_SPAWNS) return 'too many spawns';
+      const tx = cmd.x ?? Math.floor(sim.x / TILE_PX);
+      const ty = cmd.y ?? Math.floor(sim.y / TILE_PX);
+      const g = grid(sim);
+      if (tx >= g.w || ty >= g.h) return 'bad tile';
+      const spawn: StudioSpawn = { id: `sp${sim.nextSpawn++}`, kind: cmd.spawn, ref: cmd.ref, x: tx, y: ty };
+      list.push(spawn);
+      sim.spawns.set(sim.sceneId, list);
+      say(sim, `spawn ${spawn.id} ${cmd.spawn} ${cmd.ref} ${tx},${ty}`);
+      return null;
+    }
+    case 'clearSpawns':
+      sim.spawns.clear();
+      say(sim, 'clear spawns');
+      return null;
+    case 'give':
+      if (sim.items.length >= MAX_STUDIO_ITEMS) return 'hands full';
+      sim.items.push(cmd.itemId);
+      say(sim, `give ${cmd.itemId}`);
       return null;
   }
 }

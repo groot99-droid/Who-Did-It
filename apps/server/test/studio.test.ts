@@ -1,6 +1,7 @@
 import { TILE_PX } from '@wdi/shared';
 import { describe, expect, it } from 'vitest';
 import {
+  MAX_STUDIO_SPAWNS,
   STUDIO_START_SCENE,
   type StudioSim,
   createStudio,
@@ -149,5 +150,97 @@ describe('moving through the world (S1b)', () => {
     sim.log.length = 0;
     send(sim, ['studio.noclip', { on: true }], ['studio.portal', { portalId: 'bk.oven_room' }]);
     expect(sim.log).toEqual([`t${sim.tick - 1} noclip on`, `t${sim.tick - 1} refused portal: too far`]);
+  });
+});
+
+describe('time, clock, stand-ins and items (S1c)', () => {
+  const bakery = () => {
+    const sim = createStudio();
+    expect(send(sim, ['studio.teleport', { sceneId: 'bakery', spawnId: 'door' }])).toEqual([]);
+    return sim;
+  };
+
+  it('pauses the figure, single-steps exactly, and runs 10 ticks a tick at 10x', () => {
+    const sim = bakery();
+    send(sim, ['studio.clock', { paused: true }]);
+    const frozen = sim.tick;
+    const x = sim.x;
+    hold(sim, 1, 0, 5);
+    expect(sim.tick).toBe(frozen);
+    expect(sim.x).toBe(x);
+    send(sim, ['studio.clock', { step: 3 }]);
+    expect(sim.tick).toBe(frozen + 3);
+    // Commands still apply while paused.
+    expect(send(sim, ['studio.teleport', { x: 3, y: 9 }])).toEqual([]);
+    expect(studioSnapshot(sim).tx).toBe(3);
+    send(sim, ['studio.clock', { paused: false, scale: 10 }]);
+    const t = sim.tick;
+    stepStudio(sim);
+    expect(sim.tick).toBe(t + 10);
+  });
+
+  it('sets the time of day', () => {
+    const sim = createStudio();
+    send(sim, ['studio.time', { phase: 'dusk', t: 0.25 }]);
+    expect(studioSnapshot(sim).time).toEqual({ phase: 'dusk', t: 0.25 });
+  });
+
+  it('places stand-ins of every kind on the current scene, gives items, and clears', () => {
+    const sim = bakery();
+    expect(
+      send(
+        sim,
+        ['studio.spawn', { kind: 'mob', ref: 'wolf' }],
+        ['studio.spawn', { kind: 'townsfolk', ref: 'clerk', x: 4, y: 8 }],
+        ['studio.spawn', { kind: 'look', ref: 'detective', x: 5, y: 8 }],
+        ['studio.spawn', { kind: 'look', ref: 'villager', x: 6, y: 8 }],
+        ['studio.give', { itemId: 'knife' }],
+      ),
+    ).toEqual([]);
+    const snap = studioSnapshot(sim);
+    expect(snap.spawns.map((s) => [s.kind, s.ref, s.x, s.y])).toEqual([
+      ['mob', 'wolf', 8, 9],
+      ['townsfolk', 'clerk', 4, 8],
+      ['look', 'detective', 5, 8],
+      ['look', 'villager', 6, 8],
+    ]);
+    expect(new Set(snap.spawns.map((s) => s.id)).size).toBe(4);
+    expect(snap.items).toEqual(['knife']);
+    // Stand-ins belong to their scene.
+    send(sim, ['studio.portal', { portalId: 'bk.door' }]);
+    expect(studioSnapshot(sim).spawns).toEqual([]);
+    send(sim, ['studio.teleport', { sceneId: 'bakery', spawnId: 'door' }]);
+    expect(studioSnapshot(sim).spawns).toHaveLength(4);
+    send(sim, ['studio.clearSpawns', {}]);
+    expect(studioSnapshot(sim).spawns).toEqual([]);
+  });
+
+  it('caps the stand-ins of a scene', () => {
+    const sim = bakery();
+    for (let i = 0; i < MAX_STUDIO_SPAWNS; i++)
+      sim.commands.push({ kind: 'spawn', spawn: 'mob', ref: 'rat' });
+    expect(stepStudio(sim)).toEqual([]);
+    expect(send(sim, ['studio.spawn', { kind: 'mob', ref: 'rat' }])).toEqual(['too many spawns']);
+  });
+
+  it('refuses bad shapes and unknown ids, and changes nothing', () => {
+    const sim = bakery();
+    const before = studioSnapshot(sim);
+    const bad: [string, unknown][] = [
+      ['studio.time', { phase: 'noon' }],
+      ['studio.time', { phase: 'day', t: 2 }],
+      ['studio.clock', { scale: 3 }],
+      ['studio.clock', { step: 1e9 }],
+      ['studio.clock', {}],
+      ['studio.spawn', { kind: 'dragon', ref: 'wolf' }],
+      ['studio.spawn', { kind: 'mob', ref: 'unicorn' }],
+      ['studio.spawn', { kind: 'look', ref: 'wolf' }],
+      ['studio.spawn', { kind: 'mob', ref: 'wolf', x: 1 }],
+      ['studio.spawn', { kind: 'mob', ref: 'constructor' }],
+      ['studio.give', { itemId: 'lightsaber' }],
+      ['studio.give', { itemId: 'toString' }],
+    ];
+    expect(send(sim, ...bad)).toHaveLength(bad.length);
+    expect(studioSnapshot(sim)).toEqual({ ...before, tick: before.tick + 1 });
   });
 });
