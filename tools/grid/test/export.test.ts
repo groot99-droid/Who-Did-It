@@ -2,7 +2,8 @@ import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { createNavGrid } from '@wdi/shared';
+import { createNavGrid, navFromGrid } from '@wdi/shared';
+import { formatJson } from '../../../packages/content/scripts/lint-data.mjs';
 import type { Scene } from '@wdi/content';
 import {
   SCENES_DIR,
@@ -263,5 +264,12 @@ describe('grid exporter', () => {
 
   it('keeps the committed outputs up to date', () => {
     for (const o of buildOutputs(scenes)) expect(readFileSync(o.path, 'utf8'), o.path).toBe(o.text);
+  });
+
+  it("regenerates every committed scene's nav byte for byte with the shared navFromGrid (round 9)", () => {
+    for (const scene of scenes) {
+      const path = join(SCENES_DIR, `${scene.id}.nav.json`);
+      expect(formatJson(navFromGrid(scene)), path).toBe(readFileSync(path, 'utf8'));
+    }
   });
 });
