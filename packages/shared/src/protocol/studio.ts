@@ -32,14 +32,27 @@ export const STUDIO_DAY_PHASES: readonly StudioDayPhase[] = ['dawn', 'day', 'dus
 /** What a stand-in figure is: a `mobs.json` mob, a `routines.json` townsfolk figure, or a `looks.json` look. */
 export type StudioSpawnKind = 'mob' | 'townsfolk' | 'look';
 
-/** A stand-in placed by the owner; it stands on its tile (no brain runs in S1). Tile coordinates. */
+/**
+ * What a stand-in is doing: a mob idles, roams, chases the admin figure or flees a flame; a townsfolk figure walks
+ * its stations and works at each; a look, and a fixed townsfolk figure, stands.
+ */
+export type StudioStandInState = 'stand' | 'idle' | 'walk' | 'chase' | 'flee' | 'work';
+
+/** A stand-in placed by the owner, live since S4: it runs its kind's brain on the Studio clock. */
 export interface StudioSpawn {
   id: string;
   kind: StudioSpawnKind;
   /** The mob, townsfolk or look id. */
   ref: string;
+  /** The tile it stands on now. */
   x: number;
   y: number;
+  /** Its feet in world pixels, its facing (world frame, as the admin figure's `yaw`) and whether it moved. */
+  px: number;
+  py: number;
+  yaw: number;
+  moving: boolean;
+  state: StudioStandInState;
 }
 
 export interface StudioC2SPayloads {
