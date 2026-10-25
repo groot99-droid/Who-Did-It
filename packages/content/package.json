@@ -17,6 +17,11 @@
       "development": "./src/nav.ts",
       "default": "./dist/src/nav.js"
     },
+    "./tilemap": {
+      "types": "./src/tilemap.ts",
+      "development": "./src/tilemap.ts",
+      "default": "./dist/src/tilemap.js"
+    },
     "./server": {
       "types": "./src/server.ts",
       "development": "./src/server.ts",
