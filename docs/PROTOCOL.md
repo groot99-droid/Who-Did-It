@@ -309,12 +309,13 @@ Round 9 (`docs/round9/admin-studio.md` 2). Accepted by the `studio` room alone, 
 | `studio.clearSpawns` | `Record<string, never>` | - |
 | `studio.give` | `{ itemId: string }` | Put an `items.json` item in the admin figure's hands. |
 | `studio.draft` | `{ scene: null }` | Drop the draft (admin-studio.md 3 "Walk it"). A draft scene itself is posted to `POST /studio/draft` with this room's id, since a scene is larger than one socket message; a teleport or a door to another scene drops it too. |
+| `studio.npcDraft` | `{ npc: null }` | Drop the NPC draft (admin-studio.md 8); the NPC data itself is posted to `POST /studio/npc-draft`. |
 
 ### Server to client
 
 | Type | Payload | Notes |
 |---|---|---|
-| `studio.snapshot` | `{ tick: number; sceneId: string; profile: 'small' \| 'medium' \| 'large'; /** The admin figure's feet in world pixels, and the tile under them. */ x: number; y: number; tx: number; ty: number; /** World-frame facing in radians, as `Presence.yaw`. */ yaw: number; moving: boolean; noclip: boolean; scale: ClockScale; paused: boolean; time: { phase: StudioDayPhase; t: number }; /** The stand-ins of the current scene. */ spawns: StudioSpawn[]; /** Item ids the admin figure holds, in the order given. */ items: string[]; /** True when the current scene is an unsaved draft (`studio.draft`); false or absent, the committed scene. */ draft?: boolean; }` | Every tick to the one Studio client: the whole Studio state (it is small). |
+| `studio.snapshot` | `{ tick: number; sceneId: string; profile: 'small' \| 'medium' \| 'large'; /** The admin figure's feet in world pixels, and the tile under them. */ x: number; y: number; tx: number; ty: number; /** World-frame facing in radians, as `Presence.yaw`. */ yaw: number; moving: boolean; noclip: boolean; scale: ClockScale; paused: boolean; time: { phase: StudioDayPhase; t: number }; /** The stand-ins of the current scene. */ spawns: StudioSpawn[]; /** Item ids the admin figure holds, in the order given. */ items: string[]; /** True when the current scene is an unsaved draft (`studio.draft`); false or absent, the committed scene. */ draft?: boolean; /** True while an NPC draft (`POST /studio/npc-draft`) is loaded; false or absent, the committed NPC data. */ npcDraft?: boolean; /** The current scene's quest givers, with the NPC draft's names and looks when one is loaded (round 9, N1). */ givers?: StudioGiver[]; }` | Every tick to the one Studio client: the whole Studio state (it is small). |
 | `studio.log` | `{ lines: string[] }` | New lines of the Studio room's log (applied and refused commands, scene loads); the client keeps the last 50. |
 
 ### Studio payload types
@@ -346,6 +347,8 @@ export interface StudioSpawn {
   yaw: number;
   moving: boolean;
   state: StudioStandInState;
+  /** The look it wears (round 9, N1): a townsfolk figure's `routines.json` look, a look's own id, the NPC draft's when one is loaded; absent for a mob. */
+  look?: string;
 }
 ```
 

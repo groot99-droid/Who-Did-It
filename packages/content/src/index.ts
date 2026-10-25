@@ -31,6 +31,8 @@ import evolutionsJson from '../data/evolutions.json' with { type: 'json' };
 import lawsJson from '../data/laws.json' with { type: 'json' };
 import eventsJson from '../data/events.json' with { type: 'json' };
 import economyJson from '../data/economy.json' with { type: 'json' };
+// Round 9 (GDD 3.25, N2): the NPC seats' meeting-note lines.
+import talkJson from '../data/talk.json' with { type: 'json' };
 import overworldJson from '../data/scenes/overworld.json' with { type: 'json' };
 import tavernBarJson from '../data/scenes/tavern_bar.json' with { type: 'json' };
 import tavernBackJson from '../data/scenes/tavern_back.json' with { type: 'json' };
@@ -81,6 +83,7 @@ import { EffectsFile } from './schemas/effects.js';
 import { EconomyFile } from './schemas/economy.js';
 import { RelationsFile } from './schemas/relations.js';
 import { LoreFile } from './schemas/lore.js';
+import { TalkFile } from './schemas/talk.js';
 import { SCENE_IDS, Scene, type SceneId } from './schemas/scene.js';
 import { StyleFile } from './schemas/style.js';
 import { TasksFile } from './schemas/tasks.js';
@@ -112,6 +115,7 @@ export * from './schemas/effects.js';
 export * from './schemas/economy.js';
 export * from './schemas/relations.js';
 export * from './schemas/lore.js';
+export * from './schemas/talk.js';
 export { checkGrid, validateContent, type Content } from './validate.js';
 export { checkSceneWorld } from './validateWorld.js';
 export { navs, NavFile } from './nav.js';
@@ -194,6 +198,7 @@ export function parseContent(raw: {
   economy: unknown;
   relations: unknown;
   lore: unknown;
+  talk: unknown;
 }): Omit<Content, 'scenes' | 'maps'> {
   const parsed = {
     palette: PaletteFile.parse(raw.palette),
@@ -223,6 +228,7 @@ export function parseContent(raw: {
     economy: EconomyFile.parse(raw.economy),
     relations: RelationsFile.parse(raw.relations),
     lore: LoreFile.parse(raw.lore),
+    talk: TalkFile.parse(raw.talk),
   };
   // Round 8 (A171): the role text's number tokens are filled from the data here, before anything reads a role.
   return { ...parsed, roles: fillRoles(parsed.roles, parsed) };
@@ -257,6 +263,7 @@ export const content: Content = {
     economy: economyJson,
     relations: relationsJson,
     lore: loreJson,
+    talk: talkJson,
   }),
   scenes: parseScenes(),
   maps: parseMaps(),
@@ -293,6 +300,7 @@ export const {
   economy,
   relations,
   lore,
+  talk,
 } = content;
 
 function countKey(playerCount: number): `${4 | 5 | 6 | 7 | 8 | 9 | 10}` {

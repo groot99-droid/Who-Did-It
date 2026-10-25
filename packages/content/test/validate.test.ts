@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { content, parseContent, Scene, validateContent, type Content } from '../src/index.js';
+import { content, parseContent, Scene, TalkFile, validateContent, type Content } from '../src/index.js';
 
 function broken(edit: (c: Content) => void): string[] {
   const copy = structuredClone(content);
@@ -156,5 +156,25 @@ describe('validateContent rejects cutscene data', () => {
     expect(errors).toEqual(
       expect.arrayContaining([expect.stringContaining('opening "openingBlackpine" steps run')]),
     );
+  });
+});
+
+describe('talk.json (round 9, N2)', () => {
+  it('refuses a placeholder its list cannot fill, a doubled one and a stray brace', () => {
+    const bad = (patch: Partial<TalkFile>) => TalkFile.safeParse({ ...content.talk, ...patch }).success;
+    expect(bad({})).toBe(true);
+    expect(bad({ notes: [{ text: 'Poor {seat}.' }] })).toBe(false);
+    expect(bad({ herrings: [{ text: '{seat} and {seat}.' }] })).toBe(false);
+    expect(bad({ smallTalk: ['Pass the {body}.'] })).toBe(false);
+    expect(bad({ smallTalk: ['A brace } here.'] })).toBe(false);
+    expect(bad({ notes: [{ text: 'Hm.', when: 'always' as never }] })).toBe(false);
+  });
+
+  it('refuses a line that names a role, a word of a role name or a faction', () => {
+    for (const line of ['The Doctor did it.', 'Ask the knife-bearer.', 'The cabal is here.', 'A thief!']) {
+      const c: Content = { ...content, talk: { ...content.talk, smallTalk: [line] } };
+      expect(validateContent(c).some((e) => e.startsWith('talk.json smallTalk.0'))).toBe(true);
+    }
+    expect(validateContent(content)).toEqual([]);
   });
 });
