@@ -136,3 +136,140 @@
   align-items: center;
   max-width: min(320px, 90vw);
 }
+
+/* Round 9 (9W): the Overview, the zoomed-out map of cards and door links. */
+.wdi-overview.wdi-overview {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  bottom: 8px;
+  left: 344px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+  justify-content: flex-start;
+  background-color: rgb(var(--wdi-night-rgb) / 0.94);
+  padding: 8px;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.wdi-overview header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wdi-overview h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.wdi-overview.wdi-overview > * {
+  flex: none;
+  margin: 0;
+}
+
+.wdi-overview.wdi-overview > .wdi-overview__scroll {
+  flex: 1 1 0;
+  min-height: 200px;
+  overflow: auto;
+}
+
+.wdi-overview__stage {
+  position: relative;
+}
+
+.wdi-overview__links {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.wdi-overview__link {
+  stroke: currentcolor;
+  stroke-opacity: 0.5;
+  stroke-width: 1.5;
+}
+
+.wdi-overview__drag {
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+
+.wdi-overview__end {
+  fill: currentcolor;
+  pointer-events: all;
+  cursor: grab;
+}
+
+.wdi-overview__card {
+  position: absolute;
+}
+
+.wdi-overview__card > button {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  padding: 2px 6px;
+}
+
+.wdi-overview__card strong {
+  font-size: 11px;
+  line-height: 1.1;
+}
+
+.wdi-overview__card small {
+  font-size: 9px;
+}
+
+.wdi-overview__card--exterior > button {
+  outline: 2px solid currentcolor;
+}
+
+.wdi-overview__spawns {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 3;
+  flex-wrap: wrap;
+  gap: 2px;
+  width: 240px;
+  padding: 4px;
+  background: var(--wdi-glass-fill);
+}
+
+.wdi-overview--dragging .wdi-overview__card:hover .wdi-overview__spawns {
+  display: flex;
+}
+
+.wdi-overview__chip {
+  padding: 2px 6px;
+  font-size: 11px;
+  box-shadow: inset 0 0 0 1px currentcolor;
+}
+
+.wdi-overview__chip:hover {
+  outline: 2px solid currentcolor;
+}
+
+.wdi-overview__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.wdi-overview__list li {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
