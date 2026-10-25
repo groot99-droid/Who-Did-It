@@ -1541,6 +1541,15 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.scene` | Scenes | the Studio page |
 | `studio.scene.search` | Search scenes | the Studio page |
 | `studio.teleport` | Go | the Studio page |
+| `studio.overlays` | Overlays | the Studio page |
+| `studio.overlay.collision` | Collision grid | the Studio page |
+| `studio.overlay.nav` | Walkable links | the Studio page |
+| `studio.overlay.coords` | Tile under the cursor | the Studio page |
+| `studio.overlay.ids` | Ids | the Studio page |
+| `studio.overlay.lights` | Light radii | the Studio page |
+| `studio.overlay.sight` | Sight radius | the Studio page |
+| `studio.overlay.footprints` | Footprints | the Studio page |
+| `studio.overlay.gating` | Hidden at this profile | the Studio page |
 | `studio.noclip` | Noclip | the Studio page |
 | `studio.time` | Time of day | the Studio page |
 | `studio.time.dawn` | Dawn | the Studio page |

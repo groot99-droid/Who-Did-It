@@ -9,6 +9,7 @@ import { connectStudio, type StudioLink } from '../admin/StudioNet';
 import { mountControls } from '../studio/Controls';
 import { createMockStudio } from '../studio/mockStudio';
 import { figuresOf, FIGURE_ID } from '../studio/figures';
+import { OverlayView } from '../studio/OverlayView';
 import { moveOf, moveToSend, StudioStore } from '../studio/model';
 import { clearStudioMarker, setStudioMarker } from '../studio/route';
 import { STUDIO_COPY as C } from '../ui/copy';
@@ -62,10 +63,16 @@ export class Studio extends Phaser.Scene {
   private ground: GroundView | null = null;
   private statics: StaticView | null = null;
   private entities: EntityView | null = null;
+  private overlay: OverlayView | null = null;
   private markers!: Phaser.GameObjects.Graphics;
   private markerLabels: Phaser.GameObjects.Text[] = [];
   private lastTick = -1;
   private pressed = new Set<string>();
+  /** The mouse in game px, tracked on the window because the HUD's DOM layer sits over the canvas. */
+  private mouse: { x: number; y: number } | null = null;
+  private onMouse = (e: PointerEvent) => {
+    this.mouse = { x: this.scale.transformX(e.pageX), y: this.scale.transformY(e.pageY) };
+  };
   private moveSeq = 0;
   private lastMove = '';
   private moveTimer: number | null = null;
@@ -140,12 +147,14 @@ export class Studio extends Phaser.Scene {
   }
 
   private startInput(): void {
+    window.addEventListener('pointermove', this.onMouse);
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
     this.moveTimer = window.setInterval(() => this.sendMove(), MOVE_MS);
   }
 
   private stopInput(): void {
+    window.removeEventListener('pointermove', this.onMouse);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('keyup', this.onKeyUp);
     if (this.moveTimer !== null) window.clearInterval(this.moveTimer);
@@ -201,11 +210,14 @@ export class Studio extends Phaser.Scene {
       }),
     );
     this.entities = new EntityView(this, '', () => undefined);
+    this.overlay = new OverlayView(this);
     this.cameras.main.setBackgroundColor(colorOf(palette.colors[this.map.voidColour])).setRoundPixels(true);
     this.lastTick = -1;
   }
 
   private dropWorld(): void {
+    this.overlay?.destroy();
+    this.overlay = null;
     this.entities?.destroy();
     this.statics?.set([]);
     this.statics?.destroy();
@@ -230,6 +242,7 @@ export class Studio extends Phaser.Scene {
     const cam = this.cameras.main;
     const obj = this.entities.objectOf(FIGURE_ID);
     if (obj) cam.startFollow(obj, true, 0.15, 0.15);
+    this.overlay?.update(this.store.overlays, snap, this.mouse);
     this.statics.update(null, this.game.loop.delta / 1000, cam.worldView);
   }
 

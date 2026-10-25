@@ -5,6 +5,7 @@ import { STUDIO_DAY_PHASES } from '@wdi/shared/protocol';
 import { fill, STUDIO_COPY as C } from '../ui/copy';
 import { h, type Screen } from '../ui/dom';
 import { ART_STYLES, currentStyleId } from '../view/artStyle';
+import { OVERLAYS } from './overlayData';
 import { CLOCK_SCALES, filterIds, spawnsOf, STUDIO_LISTS, statusOf, type StudioStore } from './model';
 
 export type StudioSend = <K extends StudioC2SType>(type: K, payload: StudioC2SPayloads[K]) => void;
@@ -129,6 +130,15 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
   });
   const holding = h('p', { class: 'wdi-admin__status', ...tid('studio-items') });
 
+  const overlayBoxes = OVERLAYS.map((id) => {
+    const box = h('input', { type: 'checkbox', ...tid(`studio-overlay-${id}`) });
+    box.addEventListener('change', () => store.toggleOverlay(id));
+    return {
+      id,
+      box,
+      row: h('label', { class: 'wdi-admin__row' }, box, h('span', {}, C[`studio.overlay.${id}`])),
+    };
+  });
   const status = h('p', { class: 'wdi-admin__status', role: 'status', ...tid('studio-status') });
   const problem = h('p', {
     class: 'wdi-admin__problem',
@@ -155,6 +165,7 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
     group(C['studio.time'], ...phaseButtons, scrub),
     group(C['studio.speed'], ...scaleButtons, pause, step),
     group(C['studio.profile'], ...profileButtons),
+    group(C['studio.overlays'], ...overlayBoxes.map((o) => o.row)),
     group(C['studio.style'], style),
     group(C['studio.spawn'], kind, ref, spawn, clear),
     group(C['studio.give'], item, give, holding),
@@ -177,6 +188,7 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
       s === null || s.items.length === 0
         ? C['studio.items.none']
         : fill(C['studio.items'], { items: s.items.join(', ') });
+    for (const o of overlayBoxes) o.box.checked = store.overlays.has(o.id);
     problem.hidden = store.refused === '';
     problem.textContent = store.refused;
     log.textContent = store.log.join('\n');
