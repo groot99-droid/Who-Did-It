@@ -5,7 +5,16 @@ import { scenes, type Scene } from '@wdi/content';
 import { checkScene, type Checks } from './checks';
 import { diffScene } from './diffScene';
 import type { Gate, Path } from '@wdi/content';
-import { paint, rectTiles, regionTiles, resize, type Cell, type Tool } from './gridEdit';
+import {
+  materialRegion,
+  paint,
+  paintMaterial,
+  rectTiles,
+  regionTiles,
+  resize,
+  type Cell,
+  type Tool,
+} from './gridEdit';
 import { EditHistory } from './history';
 import { addGate, addPath, removeRoute, setGateProfile } from './routeEdit';
 import { pickAt } from './pick';
@@ -26,6 +35,8 @@ export class EditorSession {
   /** What a click or drag does: pick and place objects, or paint the grid with `cell`. */
   tool: Tool = 'objects';
   cell: Cell = '#';
+  /** A material character to paint instead of a class; null paints `cell`. */
+  material: string | null = null;
   name = '';
   /** The corners clicked so far for a path being drawn. */
   draft: Array<{ x: number; y: number }> = [];
@@ -85,11 +96,20 @@ export class EditorSession {
   }
   setCell(cell: Cell): void {
     this.cell = cell;
+    this.material = null;
+    this.bus.emit('change', undefined);
+  }
+  setMaterial(material: string | null): void {
+    this.material = material;
     this.bus.emit('change', undefined);
   }
   /** One undo step that sets the tiles to the chosen grid character. */
   paintTiles(tiles: Array<{ x: number; y: number }>): void {
-    this.apply(paint(this.scene, tiles, this.cell));
+    this.apply(
+      this.material === null
+        ? paint(this.scene, tiles, this.cell)
+        : paintMaterial(this.scene, tiles, this.material),
+    );
   }
   /** The end of a rectangle drag. */
   paintRect(a: { x: number; y: number }, b: { x: number; y: number }): void {
@@ -129,7 +149,9 @@ export class EditorSession {
   /** A click on a tile: place the palette's choice there, or else select what is on it. */
   click(tx: number, ty: number): void {
     if (this.tool === 'fill') {
-      this.paintTiles(regionTiles(this.scene, tx, ty));
+      this.paintTiles(
+        this.material === null ? regionTiles(this.scene, tx, ty) : materialRegion(this.scene, tx, ty),
+      );
       return;
     }
     if (this.tool === 'path') {

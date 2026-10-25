@@ -1632,6 +1632,9 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.edit.cell.S` | Stairs | the Studio editor |
 | `studio.edit.cell.H` | Hatch | the Studio editor |
 | `studio.edit.cell.B` | Bed | the Studio editor |
+| `studio.edit.material` | Material | the Studio editor |
+| `studio.edit.material.floor` | Floor material: the tile becomes floor | the Studio editor |
+| `studio.edit.material.solid` | Solid material: the tile becomes solid | the Studio editor |
 | `studio.edit.width` | Width | the Studio editor |
 | `studio.edit.height` | Height | the Studio editor |
 | `studio.edit.resize` | Resize | the Studio editor |

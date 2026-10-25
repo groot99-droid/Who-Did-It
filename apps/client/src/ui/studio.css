@@ -272,4 +272,26 @@
   display: flex;
   gap: 4px;
   align-items: center;
+
+.wdi-studio__materials {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 100%;
+}
+
+.wdi-studio__swatch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  font-size: 11px;
+}
+
+.wdi-studio__chip {
+  flex: none;
+  width: 32px;
+  height: 16px;
+  border-radius: 2px;
+  image-rendering: pixelated;
 }

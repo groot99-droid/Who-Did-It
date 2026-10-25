@@ -16,6 +16,7 @@ export const STUDIO_C2S = {
   clearSpawns: 'studio.clearSpawns',
   give: 'studio.give',
   draft: 'studio.draft',
+  npcDraft: 'studio.npcDraft',
 } as const;
 
 export const STUDIO_S2C = {
@@ -54,6 +55,19 @@ export interface StudioSpawn {
   yaw: number;
   moving: boolean;
   state: StudioStandInState;
+  /** The look it wears (round 9, N1): a townsfolk figure's `routines.json` look, a look's own id, the NPC draft's when one is loaded; absent for a mob. */
+  look?: string;
+}
+
+/** A quest giver of the current scene (round 9, N1): the scene's `givers` row with its `quests.json` NPC's name and look. */
+export interface StudioGiver {
+  id: string;
+  npc: string;
+  name: string;
+  look: string;
+  x: number;
+  y: number;
+  facing: string;
 }
 
 export interface StudioC2SPayloads {
@@ -80,6 +94,8 @@ export interface StudioC2SPayloads {
    * room's id, since a scene is larger than one socket message; a teleport or a door to another scene drops it too.
    */
   'studio.draft': { scene: null };
+  /** Drop the NPC draft (admin-studio.md 8); the NPC data itself is posted to `POST /studio/npc-draft`. */
+  'studio.npcDraft': { npc: null };
 }
 
 export interface StudioS2CPayloads {
@@ -106,6 +122,10 @@ export interface StudioS2CPayloads {
     items: string[];
     /** True when the current scene is an unsaved draft (`studio.draft`); false or absent, the committed scene. */
     draft?: boolean;
+    /** True while an NPC draft (`POST /studio/npc-draft`) is loaded; false or absent, the committed NPC data. */
+    npcDraft?: boolean;
+    /** The current scene's quest givers, with the NPC draft's names and looks when one is loaded (round 9, N1). */
+    givers?: StudioGiver[];
   };
   /** New lines of the Studio room's log (applied and refused commands, scene loads); the client keeps the last 50. */
   'studio.log': { lines: string[] };
