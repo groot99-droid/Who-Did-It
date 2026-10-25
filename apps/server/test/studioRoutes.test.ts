@@ -265,7 +265,9 @@ describe('POST /studio/save', () => {
       fromB64(gh.files.get(`${branch}:packages/content/data/scenes/bakery.nav.json`)?.content),
     );
     expect(nav.solid[6]).toBe('1' + '0'.repeat(15) + '11');
-    const tilemap = fromB64(gh.files.get(`${branch}:apps/client/public/assets/scenes/bakery/tilemap.json`)?.content);
+    const tilemap = fromB64(
+      gh.files.get(`${branch}:apps/client/public/assets/scenes/bakery/tilemap.json`)?.content,
+    );
     expect(JSON.parse(tilemap)).toMatchObject({ orientation: 'isometric', width: 18, height: 11 });
     const pull = gh.pulls[0]!;
     expect(pull).toMatchObject({ head: branch, base: 'main', title: 'Studio: bakery', draft: true });
