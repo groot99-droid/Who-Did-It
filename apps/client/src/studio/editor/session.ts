@@ -3,6 +3,7 @@
 import mitt from 'mitt';
 import { scenes, type Scene } from '@wdi/content';
 import { diffScene } from './diffScene';
+import { paint, rectTiles, regionTiles, resize, type Cell, type Tool } from './gridEdit';
 import { EditHistory } from './history';
 import { pickAt } from './pick';
 import { needlesOf, portalsTo, referencesTo } from './references';
@@ -19,6 +20,9 @@ export class EditorSession {
   selection: Pick | null = null;
   /** The palette's choice; null means clicking selects and drags instead of placing. */
   palette: { kind: Kind; label: string } | null = null;
+  /** What a click or drag does: pick and place objects, or paint the grid with `cell`. */
+  tool: Tool = 'objects';
+  cell: Cell = '#';
   name = '';
   /** The last refused edit, until the next one succeeds. */
   error = '';
@@ -61,12 +65,36 @@ export class EditorSession {
     this.palette = choice;
     this.bus.emit('change', undefined);
   }
+  setTool(tool: Tool): void {
+    this.tool = tool;
+    this.bus.emit('change', undefined);
+  }
+  setCell(cell: Cell): void {
+    this.cell = cell;
+    this.bus.emit('change', undefined);
+  }
+  /** One undo step that sets the tiles to the chosen grid character. */
+  paintTiles(tiles: Array<{ x: number; y: number }>): void {
+    this.apply(paint(this.scene, tiles, this.cell));
+  }
+  /** The end of a rectangle drag. */
+  paintRect(a: { x: number; y: number }, b: { x: number; y: number }): void {
+    this.paintTiles(rectTiles(a, b));
+  }
+  resizeTo(w: number, h: number): void {
+    this.apply(resize(this.scene, w, h));
+  }
   setName(name: string): void {
     this.name = name.trim();
   }
 
   /** A click on a tile: place the palette's choice there, or else select what is on it. */
   click(tx: number, ty: number): void {
+    if (this.tool === 'fill') {
+      this.paintTiles(regionTiles(this.scene, tx, ty));
+      return;
+    }
+    if (this.tool !== 'objects') return;
     const p = this.palette;
     if (p === null) return this.select(pickAt(this.scene, tx, ty));
     const t = templatesFor(p.kind, this.scene.id).find((e) => e.label === p.label);

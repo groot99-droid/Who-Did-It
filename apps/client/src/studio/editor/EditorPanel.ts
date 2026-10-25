@@ -4,6 +4,7 @@ import { SCENE_IDS } from '@wdi/content';
 import { STUDIO_COPY as C, fill } from '../../ui/copy';
 import { h, type Screen } from '../../ui/dom';
 import { spawnsOf } from '../model';
+import { GRID_CHARS, type Cell, type Tool } from './gridEdit';
 import { find, KINDS, pairedPortal, type Kind } from './sceneEdit';
 import { scenes, type Scene } from '@wdi/content';
 import type { EditorSession } from './session';
@@ -42,6 +43,25 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
   };
   kindSel.addEventListener('change', choose);
   tplSel.addEventListener('change', choose);
+
+  const toolSel = h('select', { class: 'wdi-admin__field', ...tid('studio-edit-tool') });
+  for (const t of ['objects', 'brush', 'rect', 'fill'] as const)
+    toolSel.append(h('option', { value: t }, C[`studio.edit.tool.${t}`]));
+  toolSel.addEventListener('change', () => s.setTool(toolSel.value as Tool));
+  const cellName = (c: Cell) =>
+    c === '.'
+      ? C['studio.edit.cell.floor']
+      : c === '#'
+        ? C['studio.edit.cell.solid']
+        : C[`studio.edit.cell.${c}`];
+  const cellSel = h('select', { class: 'wdi-admin__field', hidden: true, ...tid('studio-edit-cell') });
+  for (const c of GRID_CHARS) cellSel.append(h('option', { value: c }, cellName(c)));
+  cellSel.value = s.cell;
+  cellSel.addEventListener('change', () => s.setCell(cellSel.value as Cell));
+  const num = (id: string, value: number) =>
+    h('input', { type: 'number', min: 1, max: 200, class: 'wdi-admin__field', value, ...tid(id) });
+  const wIn = num('studio-edit-width', s.scene.size.w);
+  const hIn = num('studio-edit-height', s.scene.size.h);
 
   const picked = h('div', { class: 'wdi-studio__picked', ...tid('studio-edit-selected') });
   const problem = h('p', { class: 'wdi-admin__problem', role: 'alert', ...tid('studio-edit-error') });
@@ -106,6 +126,10 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
     fillPicked();
     problem.textContent = s.error;
     problem.hidden = s.error === '';
+    cellSel.hidden = s.tool === 'objects';
+    toolSel.value = s.tool;
+    if (document.activeElement !== wIn) wIn.value = String(s.scene.size.w);
+    if (document.activeElement !== hIn) hIn.value = String(s.scene.size.h);
     undo.disabled = !s.canUndo;
     redo.disabled = !s.canRedo;
     diff.textContent = s.diff.length === 0 ? C['studio.edit.nodiff'] : s.diff.join('\n');
@@ -119,7 +143,17 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
       ...tid('studio-editor'),
     },
     h('h2', {}, C['studio.edit.title']),
+    h('div', { class: 'wdi-admin__group' }, h('span', {}, C['studio.edit.tool']), toolSel, cellSel),
     h('div', { class: 'wdi-admin__group' }, h('span', {}, C['studio.edit.add']), kindSel, tplSel, name),
+    h(
+      'div',
+      { class: 'wdi-admin__group' },
+      field('studio-edit-w', C['studio.edit.width'], wIn),
+      field('studio-edit-h', C['studio.edit.height'], hIn),
+      btn('studio-edit-resize', C['studio.edit.resize'], () =>
+        s.resizeTo(Number(wIn.value), Number(hIn.value)),
+      ),
+    ),
     picked,
     problem,
     h('div', { class: 'wdi-admin__group' }, undo, redo),
