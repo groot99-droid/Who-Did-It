@@ -43,6 +43,14 @@ vi.setConfig({ testTimeout: 60_000 });
 
 const opts = (name: string) => ({ name, build: BUILD_VERSION, deviceId: `dev-${name}` });
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/** Waits until `cond` holds: the room steps on its own clock, so under load a fixed sleep can end before it has. */
+async function until(cond: () => boolean, what: string, ms = 10_000): Promise<void> {
+  const end = Date.now() + ms;
+  while (!cond()) {
+    if (Date.now() > end) throw new Error(`timed out waiting for ${what}`);
+    await sleep(25);
+  }
+}
 
 let colyseus: ColyseusTestServer;
 beforeAll(async () => {
@@ -87,6 +95,12 @@ async function onCard(count: number, before?: (room: PartyRoom) => void) {
   const p = await party(count, before);
   p.bots[0]?.room.send(C2S.lobbyStart, {});
   await sleep(350);
+  await until(
+    () =>
+      p.room.state.phase === Phase.roleReveal &&
+      p.bots.every((b) => stateOf(b).phase === Phase.roleReveal && received(b, S2C.roleReveal).length > 0),
+    'the role card',
+  );
   expect(p.room.state.phase).toBe(Phase.roleReveal);
   return p;
 }
@@ -110,10 +124,15 @@ const isCover = (card: string): boolean => roles.roles[card]?.cover === true;
 const lookIdOf = (card: string): string => roles.roles[card]?.look ?? '';
 const cardOf = (bot: Bot) => received<RoleRevealPayload>(bot, S2C.roleReveal)[0] as RoleRevealPayload;
 
-/** Ends the card on the next tick, white-box. */
-async function closeCard(room: PartyRoom): Promise<void> {
+/** Ends the card on the next tick, white-box; with `bots`, also waits for their state to see the next phase. */
+async function closeCard(room: PartyRoom, bots: Bot[] = []): Promise<void> {
   room.state.phaseEndsTick = room.state.tick;
   await sleep(300);
+  await until(() => room.state.phase !== Phase.roleReveal, 'the card to close');
+  await until(
+    () => bots.every((b) => stateOf(b).phase === room.state.phase),
+    'the clients to see the next phase',
+  );
 }
 
 describe('the deal and the hints (P13)', () => {
@@ -331,7 +350,7 @@ describe('P8: a cover seat is indistinguishable from a non-cover seat (fuzz, 50 
     for (let game = 0; game < 50; game++) {
       const n = 4 + (game % 7);
       const { bots, room } = await onCard(n);
-      await closeCard(room);
+      await closeCard(room, bots);
       const observer = bots.find((b) => roles.roles[roleOf({ room }, b)]?.faction !== 'cabal') as Bot;
       const rows = new Map<string, Record<string, unknown>>();
       stateOf(observer).players.forEach((p: PlayerState, id: string) => {
