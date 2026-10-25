@@ -3,6 +3,7 @@ import mitt from 'mitt';
 import { SCENE_IDS, type SceneId, items, looks, mobs, routines, scenes } from '@wdi/content';
 import { worldMove } from '../input/vectors';
 import type { StudioSnapshot } from '../admin/StudioNet';
+import { modeOfScene, type StudioMode } from './modes';
 import type { OverlayId } from './overlayData';
 
 /** The server keeps the last 50 log lines and so does the client (docs/PROTOCOL.md, studio.log). */
@@ -19,9 +20,21 @@ export class StudioStore {
   refused = '';
   /** The editor is open: the sim is paused and the view shows the scene's objects. */
   editing = false;
+  /** The header toggle's mode (docs/round9/admin-studio.md 8); World is the first. */
+  mode: StudioMode = 'world';
 
   applySnapshot(s: StudioSnapshot): void {
+    const was = this.snapshot?.sceneId;
     this.snapshot = s;
+    // World and Room follow the scene the owner is standing in; Overview and NPC stay where the owner put them.
+    if (s.sceneId !== was && (this.mode === 'world' || this.mode === 'room'))
+      this.mode = modeOfScene(s.sceneId);
+    this.bus.emit('change', undefined);
+  }
+
+  setMode(mode: StudioMode): void {
+    if (this.mode === mode) return;
+    this.mode = mode;
     this.bus.emit('change', undefined);
   }
 
@@ -57,6 +70,7 @@ export class StudioStore {
     this.log = [];
     this.refused = '';
     this.editing = false;
+    this.mode = 'world';
     this.overlays.clear();
     this.bus.emit('change', undefined);
   }
