@@ -12,6 +12,10 @@ import { createMockStudio, mockReportApi, mockSaveApi } from '../studio/mockStud
 import { EditorView } from '../studio/editor/EditorView';
 import { mountEditorPanel } from '../studio/editor/EditorPanel';
 import { EditorSession } from '../studio/editor/session';
+import { NpcModel } from '../studio/npc/NpcModel';
+import { NpcView } from '../studio/npc/NpcView';
+import { mountNpcPanel } from '../studio/npc/NpcPanel';
+import { clearNpcDraft, createNpcDraftApi, mockNpcDraftApi, type NpcDraftApi } from '../studio/npc/npcApi';
 import { mountInbox } from '../studio/InboxPanel';
 import { mountReportPanel } from '../studio/ReportPanel';
 import { createReportApi, type ReportApi } from '../studio/reportApi';
@@ -86,6 +90,8 @@ export class Studio extends Phaser.Scene {
   private api: ReportApi | null = null;
   private saveApi: SaveApi | null = null;
   private draftApi: DraftApi | null = null;
+  private npcDraftApi: NpcDraftApi | null = null;
+  private npc: { view: NpcView; panel: Screen } | null = null;
   /** Walk it: the scene the room serves as an unsaved draft, and the editing session to return to. */
   private draft: { scene: Scene; session: EditorSession; seen: boolean } | null = null;
   /** The draft scene the world views were built from, or null while they show the committed scene. */
@@ -116,6 +122,7 @@ export class Studio extends Phaser.Scene {
     this.api = token === null ? null : createReportApi(token);
     this.saveApi = token === null ? null : createSaveApi(token);
     this.draftApi = token === null ? null : createDraftApi(token);
+    this.npcDraftApi = token === null ? null : createNpcDraftApi(token);
     clearStudioMarker(this.tokens);
     if (token === null) {
       this.showSignIn(false);
@@ -143,6 +150,9 @@ export class Studio extends Phaser.Scene {
     link.bus.on('closed', () => {
       if (this.link !== link) return;
       this.link = null;
+      this.npc?.view.destroy();
+      this.npc?.panel.destroy();
+      this.npc = null;
       this.stopInput();
       this.clearScreens();
       this.draft = null;
@@ -162,6 +172,7 @@ export class Studio extends Phaser.Scene {
         onReport: () => void this.openReport(),
         onInbox: () => this.openInbox(),
         onEdit: () => this.toggleEdit(),
+        onNpc: () => this.toggleNpc(),
       }),
     );
     this.startInput();
@@ -202,6 +213,35 @@ export class Studio extends Phaser.Scene {
     const snap = this.store.snapshot;
     if (snap === null || this.link === null || this.map === null) return;
     this.openEditor(new EditorSession(snap.sceneId));
+  }
+
+  /** NPC on: routes and stations of the townsfolk are drawn over the scene, editable, with a live preview in the room. */
+  private toggleNpc(): void {
+    if (this.npc !== null) return this.closeNpc();
+    const snap = this.store.snapshot;
+    if (snap === null || this.link === null) return;
+    const link = this.link;
+    const model = new NpcModel();
+    this.npc = {
+      view: new NpcView(this, model, () => this.store.snapshot?.sceneId ?? null),
+      panel: mountNpcPanel(overlayRoot(), {
+        model,
+        saveApi: this.saveApi ?? mockSaveApi,
+        draftApi: this.npcDraftApi ?? mockNpcDraftApi,
+        roomId: link.roomId,
+        mapId: mapOf(snap.sceneId as SceneId),
+        onClear: () => clearNpcDraft(link),
+        onClose: () => this.closeNpc(),
+      }),
+    };
+  }
+
+  private closeNpc(): void {
+    if (this.npc === null) return;
+    this.npc.view.destroy();
+    this.npc.panel.destroy();
+    this.npc = null;
+    if (this.link !== null) clearNpcDraft(this.link);
   }
 
   private openEditor(session: EditorSession): void {
@@ -386,6 +426,7 @@ export class Studio extends Phaser.Scene {
   }
 
   private dropWorld(): void {
+    this.closeNpc();
     if (this.editor !== null) this.stopEdit();
     this.overlay?.destroy();
     this.overlay = null;
@@ -478,6 +519,7 @@ export class Studio extends Phaser.Scene {
   }
 
   private signOut(): void {
+    this.closeNpc();
     this.closeDialog();
     this.api = null;
     clearToken(this.tokens);
