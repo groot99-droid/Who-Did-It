@@ -2,7 +2,7 @@
 // scene or an error line; nothing here touches Phaser or the network, so the whole of it is tested.
 import type { Scene } from '@wdi/content';
 
-export const KINDS = ['props', 'portals', 'spawns', 'spots', 'lights'] as const;
+export const KINDS = ['props', 'portals', 'spawns', 'spots', 'lights', 'buildings'] as const;
 export type Kind = (typeof KINDS)[number];
 export interface Pick {
   kind: Kind;
@@ -17,7 +17,11 @@ export type Edit = { scene: Scene } | { error: string };
 
 const NAME = /^[a-z][a-z0-9_]*$/;
 
-export const listOf = (scene: Scene, kind: Kind): Obj[] => (scene[kind] ?? []) as Obj[];
+/** A building has no tile of its own: the editor reads its footprint's corner as one, and `swap` drops it again. */
+export const listOf = (scene: Scene, kind: Kind): Obj[] =>
+  kind === 'buildings'
+    ? (scene.buildings ?? []).map((b) => ({ ...b, x: b.footprint.x, y: b.footprint.y }))
+    : ((scene[kind] ?? []) as Obj[]);
 export const find = (scene: Scene, pick: Pick): Obj | undefined =>
   listOf(scene, pick.kind).find((o) => o.id === pick.id);
 
@@ -25,7 +29,11 @@ const inside = (scene: Scene, x: number, y: number) =>
   Number.isInteger(x) && Number.isInteger(y) && x >= 0 && y >= 0 && x < scene.size.w && y < scene.size.h;
 
 function swap(scene: Scene, kind: Kind, f: (list: Obj[]) => Obj[]): Scene {
-  return { ...scene, [kind]: f(listOf(scene, kind)) } as Scene;
+  const next = f(listOf(scene, kind));
+  return {
+    ...scene,
+    [kind]: kind === 'buildings' ? next.map(({ x: _x, y: _y, ...rest }) => rest) : next,
+  } as Scene;
 }
 
 /** A new object's id: `<prefix>.<name>`, and a spawn's plain `<name>` (spawn ids are local to their scene). */

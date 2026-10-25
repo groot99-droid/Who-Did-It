@@ -1607,6 +1607,7 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.edit.kind.spawns` | Spawns | the Studio editor |
 | `studio.edit.kind.spots` | Spots | the Studio editor |
 | `studio.edit.kind.lights` | Lights | the Studio editor |
+| `studio.edit.kind.buildings` | Buildings | the Studio editor |
 | `studio.edit.selected` | {kind} {id} at {x},{y} | the Studio editor |
 | `studio.edit.nothing` | Nothing selected | the Studio editor |
 | `studio.edit.duplicate` | Duplicate | the Studio editor |

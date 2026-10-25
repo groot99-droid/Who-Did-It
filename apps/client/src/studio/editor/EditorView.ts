@@ -17,6 +17,7 @@ const KIND_COLOUR: Record<Kind, string> = {
   spawns: palette.colors.bone,
   spots: palette.colors.magenta,
   lights: palette.colors.lantern,
+  buildings: palette.colors.blood,
 };
 
 const GRID_COLOUR: Record<string, string> = {
