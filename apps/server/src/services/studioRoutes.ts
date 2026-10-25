@@ -2,12 +2,14 @@ import { randomBytes } from 'node:crypto';
 import type { Application, Request, Response } from 'express';
 import { BUILD_VERSION } from '@wdi/shared';
 import { type AdminConfig, verifyAdminToken } from './adminAuth';
-import type { GitHub } from './github';
+import { type GitHub, GitHubError } from './github';
+import { SaveRefused, checkSave } from './studioSave';
 import { isAllowedOrigin } from './matchmakeGuard';
 import { TokenBucket } from './TokenBucket';
 
 /**
  * The Studio's HTTP routes (round 9, docs/round9/admin-studio.md 5): `POST /studio/report` and `GET /studio/reports`.
+ * `POST /studio/save` re-checks an edited scene (`studioSave.ts`) and opens a draft PR with it and its nav.
  * Registered only beside the admin gate (`server.ts`); each checks the admin bearer token before anything else and
  * is rate limited. Without `WDI_ADMIN_GITHUB_TOKEN` (`github` null) they answer 503 with the NFY line, and the rest
  * of the Studio still works. The server keeps nothing: the screenshot and the issue live on GitHub.
@@ -19,6 +21,10 @@ export const REPORT_BRANCH = 'admin-reports';
 /** Contract limits: a screenshot over 4 MB is refused; 30 reports an hour. */
 export const MAX_SCREENSHOT_BYTES = 4 * 1024 * 1024;
 export const REPORTS_PER_HOUR = 30;
+/** Contract limit: 20 saves an hour. */
+export const SAVES_PER_HOUR = 20;
+/** The largest scene file is about 21 KB; a save body past this is not read. */
+const MAX_SAVE_BYTES = 1024 * 1024;
 /** Inbox reads: tooling caps, not game numbers. */
 export const READS_PER_MIN = 60;
 /** The base64 of 4 MB plus the note and the context; a body past this is not read. */
@@ -144,6 +150,7 @@ export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: St
   const now = deps.now ?? Date.now;
   const reports = new TokenBucket(REPORTS_PER_HOUR, REPORTS_PER_HOUR / 3600, now());
   const reads = new TokenBucket(READS_PER_MIN, READS_PER_MIN / 60, now());
+  const saves = new TokenBucket(SAVES_PER_HOUR, SAVES_PER_HOUR / 3600, now());
 
   const cors = (req: Request, res: Response): void => {
     const origin = req.headers.origin;
@@ -160,6 +167,10 @@ export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: St
     return deps.github;
   };
   const fail = (res: Response, e: unknown): void => {
+    if (e instanceof SaveRefused) {
+      res.status(422).json({ error: e.message, problems: e.problems });
+      return;
+    }
     const status = e instanceof HttpError ? e.status : 502;
     const error = e instanceof HttpError ? e.message : 'GitHub refused the request';
     if (!(e instanceof HttpError))
@@ -167,7 +178,7 @@ export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: St
     res.status(status).json({ error });
   };
 
-  for (const path of ['/studio/report', '/studio/reports']) {
+  for (const path of ['/studio/report', '/studio/reports', '/studio/save']) {
     app.options(path, (req, res) => {
       cors(req, res);
       res.set({
@@ -199,6 +210,51 @@ export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: St
       const title = `Studio report${scene ? ` (${scene})` : ''}: ${first}`;
       const issue = await github.createIssue(title, reportBody(input, imageUrl), [REPORT_LABEL]);
       res.status(201).json({ id: `${day}/${id}`, number: issue.number, url: issue.url });
+    } catch (e) {
+      fail(res, e);
+    }
+  });
+
+  app.post('/studio/save', async (req, res) => {
+    cors(req, res);
+    try {
+      const github = gate(req, saves);
+      const body = await readJson(req, MAX_SAVE_BYTES);
+      const { scene, nav, note } = (typeof body === 'object' && body !== null ? body : {}) as Record<
+        string,
+        unknown
+      >;
+      if (note !== undefined && typeof note !== 'string') throw new HttpError(422, 'bad body');
+      if (typeof note === 'string' && note.length > MAX_NOTE_CHARS) throw new HttpError(413, 'note too long');
+      const save = checkSave(scene);
+      if (nav !== undefined && JSON.stringify(nav) !== JSON.stringify(save.nav))
+        throw new SaveRefused(["the editor's nav does not match the grid"]);
+      const d = new Date(now());
+      const stamp = `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}-${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}`;
+      const id = save.scene.id;
+      const branch = `studio/${id}-${stamp}`;
+      const base = await github.defaultBranch();
+      try {
+        await github.createBranch(branch, base);
+      } catch (e) {
+        if (e instanceof GitHubError && e.status === 422)
+          throw new HttpError(409, 'this scene was saved this minute; try again in a minute');
+        throw e;
+      }
+      const dir = 'packages/content/data/scenes';
+      const b64 = (text: string): string => Buffer.from(text, 'utf8').toString('base64');
+      await github.putFile(branch, `${dir}/${id}.json`, b64(save.sceneText), `Studio: ${id}`);
+      await github.putFile(branch, `${dir}/${id}.nav.json`, b64(save.navText), `Studio: ${id} nav`);
+      const prBody = [
+        typeof note === 'string' && note.trim() ? note : '_No note._',
+        '## Changes',
+        save.summary.join('\n'),
+        '## Checks',
+        'The server re-ran the scene schema and the whole content validator with this scene in place, and regenerated the nav from the grid (`navFromGrid`).',
+        `Build \`${BUILD_VERSION}\``,
+      ].join('\n\n');
+      const pull = await github.createDraftPull(branch, base, `Studio: ${id}`, prBody);
+      res.status(201).json({ branch, number: pull.number, url: pull.url });
     } catch (e) {
       fail(res, e);
     }

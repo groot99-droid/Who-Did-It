@@ -1,14 +1,17 @@
+import { readFileSync } from 'node:fs';
 import { Readable } from 'node:stream';
 import { BUILD_VERSION } from '@wdi/shared';
 import type { Application } from 'express';
 import { describe, expect, it } from 'vitest';
 import { type AdminConfig, adminConfig, signAdminToken } from '../src/services/adminAuth';
 import { createGitHub } from '../src/services/github';
+import { formatDataJson } from '../src/services/studioSave';
 import {
   MAX_LOG_LINES,
   MAX_SCREENSHOT_BYTES,
   NFY_TOKEN,
   REPORTS_PER_HOUR,
+  SAVES_PER_HOUR,
   installStudioRoutes,
 } from '../src/services/studioRoutes';
 import { FAKE_TOKEN, fakeGitHub } from './fakeGitHub';
@@ -225,5 +228,99 @@ describe('CORS', () => {
       origin: 'https://groot99-droid.github.io',
     });
     expect(res.headers['Cache-Control']).toBe('no-store');
+  });
+});
+
+/** The bakery as its file, with one tile by the east wall made a wall (grid and material), as the editor sends it. */
+function editedBakery(): { grid: string[]; material: string[]; portals: Array<{ id: string }> } {
+  const s = JSON.parse(
+    readFileSync(new URL('../../../packages/content/data/scenes/bakery.json', import.meta.url), 'utf8'),
+  );
+  const put = (row: string, ch: string) => row.slice(0, 16) + ch + row.slice(17);
+  s.grid[6] = put(s.grid[6], '#');
+  s.material[6] = put(s.material[6], 'W');
+  return s;
+}
+const fromB64 = (b64: string | undefined) => Buffer.from(b64 ?? '', 'base64').toString('utf8');
+
+describe('POST /studio/save', () => {
+  it('re-checks the scene, commits it and its regenerated nav on a studio branch, and opens a draft PR', async () => {
+    const { call, gh } = harness();
+    const scene = editedBakery();
+    const res = await call('POST', '/studio/save', {
+      auth: bearer(),
+      body: { scene, note: 'Close the east gap.' },
+    });
+    expect(res.status).toBe(201);
+    expect(res.body).toEqual({
+      branch: 'studio/bakery-20261025-0405',
+      number: 101,
+      url: expect.stringContaining('/pull/101'),
+    });
+    const branch = 'studio/bakery-20261025-0405';
+    expect(gh.refs.get(branch)).toBe('sha-main');
+    const file = fromB64(gh.files.get(`${branch}:packages/content/data/scenes/bakery.json`)?.content);
+    expect(file).toBe(formatDataJson(scene));
+    const nav = JSON.parse(
+      fromB64(gh.files.get(`${branch}:packages/content/data/scenes/bakery.nav.json`)?.content),
+    );
+    expect(nav.solid[6]).toBe('1' + '0'.repeat(15) + '11');
+    const pull = gh.pulls[0]!;
+    expect(pull).toMatchObject({ head: branch, base: 'main', title: 'Studio: bakery', draft: true });
+    expect(pull.body.startsWith('Close the east gap.')).toBe(true);
+    expect(pull.body).toContain('- grid: 1 row changed');
+    expect(pull.body.trimEnd().endsWith(`Build \`${BUILD_VERSION}\``)).toBe(true);
+    expect(JSON.stringify(gh.calls.map((c) => c.body))).not.toContain(FAKE_TOKEN);
+  });
+
+  it('refuses an invalid scene and a frozen-id rename with 422 and every problem, and calls no GitHub', async () => {
+    const { call, gh } = harness();
+    const bad = editedBakery();
+    bad.grid[2] = 'Z' + bad.grid[2]!.slice(1);
+    const r1 = await call('POST', '/studio/save', { auth: bearer(), body: { scene: bad } });
+    expect(r1).toMatchObject({ status: 422, body: { problems: ['grid.2: grid rows use only # D S H B .'] } });
+    const renamed = editedBakery();
+    renamed.portals[0] = { ...renamed.portals[0]!, id: 'bk.front_door' };
+    const r2 = await call('POST', '/studio/save', { auth: bearer(), body: { scene: renamed } });
+    expect(r2.status).toBe(422);
+    expect((r2.body as { problems: string[] }).problems).toContain(
+      'frozen id removed or renamed: portals bk.door',
+    );
+    const nav = await call('POST', '/studio/save', {
+      auth: bearer(),
+      body: { scene: editedBakery(), nav: { w: 1 } },
+    });
+    expect(nav).toMatchObject({ status: 422, body: { error: "the editor's nav does not match the grid" } });
+    expect((await call('POST', '/studio/save', { auth: bearer(), raw: '{' })).status).toBe(422);
+    expect(gh.calls.filter((c) => c.method !== 'GET')).toEqual([]);
+  });
+
+  it('refuses a second save of the scene in the same minute with 409', async () => {
+    const { call, gh } = harness();
+    expect(
+      (await call('POST', '/studio/save', { auth: bearer(), body: { scene: editedBakery() } })).status,
+    ).toBe(201);
+    const again = await call('POST', '/studio/save', { auth: bearer(), body: { scene: editedBakery() } });
+    expect(again.status).toBe(409);
+    expect(gh.pulls).toHaveLength(1);
+  });
+
+  it('is gated: 403 without the token, the NFY line without GitHub, and 20 saves an hour', async () => {
+    const { call, gh, advance } = harness();
+    expect(
+      (await call('POST', '/studio/save', { auth: 'Bearer x', body: { scene: editedBakery() } })).status,
+    ).toBe(403);
+    expect(gh.calls).toEqual([]);
+    const off = harness(false);
+    expect(await off.call('POST', '/studio/save', { auth: bearer(), body: {} })).toMatchObject({
+      status: 503,
+      body: { error: NFY_TOKEN },
+    });
+    for (let i = 0; i < SAVES_PER_HOUR; i++) {
+      expect((await call('POST', '/studio/save', { auth: bearer(), body: { scene: {} } })).status).toBe(422);
+    }
+    expect((await call('POST', '/studio/save', { auth: bearer(), body: { scene: {} } })).status).toBe(429);
+    advance(3600_000 / SAVES_PER_HOUR);
+    expect((await call('POST', '/studio/save', { auth: bearer(), body: { scene: {} } })).status).toBe(422);
   });
 });

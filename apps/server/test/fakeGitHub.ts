@@ -1,5 +1,5 @@
 /**
- * An in-memory GitHub REST API for the Studio's client (round 9): refs, contents, issues and comments of one
+ * An in-memory GitHub REST API for the Studio's client (round 9): refs, contents, issues, comments and pull requests of one
  * repository, served through an injectable `fetch`. It records every call with its Authorization header, so a test
  * can check where the token went. The token used in tests is made up.
  */
@@ -23,6 +23,14 @@ export function fakeGitHub(repo = 'groot99-droid/Who-Did-It') {
     state: 'open' | 'closed';
   }> = [];
   const comments = new Map<number, Array<{ user: { login: string }; body: string; created_at: string }>>();
+  const pulls: Array<{
+    number: number;
+    head: string;
+    base: string;
+    title: string;
+    body: string;
+    draft: boolean;
+  }> = [];
   const calls: FakeCall[] = [];
   let failWith: number | null = null;
   let n = 0;
@@ -96,6 +104,19 @@ export function fakeGitHub(repo = 'groot99-droid/Who-Did-It') {
         }));
       return reply(200, rows);
     }
+    if (method === 'POST' && path === '/pulls') {
+      if (!refs.has(body.head) || !refs.has(body.base)) return reply(422, { message: 'Validation Failed' });
+      const number = 100 + pulls.length + 1;
+      pulls.push({
+        number,
+        head: body.head,
+        base: body.base,
+        title: body.title,
+        body: body.body,
+        draft: body.draft,
+      });
+      return reply(201, { number, html_url: `https://github.com/${repo}/pull/${number}` });
+    }
     const thread = /^\/issues\/(\d+)\/comments$/.exec(path);
     if (method === 'GET' && thread) return reply(200, comments.get(Number(thread[1])) ?? []);
     return reply(404, {});
@@ -106,6 +127,7 @@ export function fakeGitHub(repo = 'groot99-droid/Who-Did-It') {
     refs,
     files,
     issues,
+    pulls,
     calls,
     comment(issue: number, login: string, text: string) {
       const list = comments.get(issue) ?? [];
