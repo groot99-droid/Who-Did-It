@@ -1,3 +1,5 @@
+import palette from '@wdi/content/data/palette.json';
+
 // Round 9 (9T): the pen of the report tool, as plain geometry so it is tested. Points are canvas px.
 export interface Pt {
   x: number;
@@ -31,7 +33,7 @@ export const circleOf = (from: Pt, to: Pt): { c: Pt; r: number } => ({
 export function paint(ctx: CanvasRenderingContext2D, marks: readonly Mark[]): void {
   ctx.lineWidth = 4;
   ctx.lineCap = 'round';
-  ctx.strokeStyle = '#ff3b30';
+  ctx.strokeStyle = palette.colors.magenta;
   for (const m of marks) {
     ctx.beginPath();
     if (m.tool === 'circle') {

@@ -24,7 +24,7 @@ async function call<T>(f: typeof fetch, url: string, token: string, body?: unkno
       authorization: `Bearer ${token}`,
       ...(body === undefined ? {} : { 'content-type': 'application/json' }),
     },
-    body: body === undefined ? undefined : JSON.stringify(body),
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
   const json = (await res.json().catch(() => ({}))) as T & { error?: string };
   if (!res.ok) throw new ReportError(res.status, json.error ?? `HTTP ${res.status}`);
