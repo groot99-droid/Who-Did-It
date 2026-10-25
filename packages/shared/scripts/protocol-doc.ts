@@ -11,6 +11,7 @@ import { ErrorCode, JOIN_ERROR_CODE, JOIN_ERROR_MESSAGE, RATE_LIMITS } from '../
 const here = dirname(fileURLToPath(import.meta.url));
 export const PROTOCOL_SOURCE = resolve(here, '../src/protocol/index.ts');
 export const ADMIN_SOURCE = resolve(here, '../src/protocol/admin.ts');
+export const STUDIO_SOURCE = resolve(here, '../src/protocol/studio.ts');
 export const PROTOCOL_DOC = resolve(here, '../../../docs/PROTOCOL.md');
 
 const oneLine = (text: string) => text.replace(/\s+/g, ' ').trim();
@@ -54,6 +55,14 @@ export function renderProtocolDoc(): string {
   const s2c = members(source, 'S2CPayloads');
   const adminC2s = members(admin, 'AdminC2SPayloads');
   const adminS2c = members(admin, 'AdminS2CPayloads');
+  const studio = ts.createSourceFile(
+    STUDIO_SOURCE,
+    readFileSync(STUDIO_SOURCE, 'utf8'),
+    ts.ScriptTarget.ES2022,
+    true,
+  );
+  const studioC2s = members(studio, 'StudioC2SPayloads');
+  const studioS2c = members(studio, 'StudioS2CPayloads');
   const limit = (type: string) => {
     const n = (RATE_LIMITS as Record<string, number | undefined>)[type];
     return n === undefined ? '-' : `${n}/s`;
@@ -91,6 +100,9 @@ export function renderProtocolDoc(): string {
     'AdminJoinOptions',
   ]
     .map((n) => '```ts\n' + declarationText(admin, n) + '\n```')
+    .join('\n\n');
+  const studioNamed = ['StudioDayPhase', 'StudioSpawnKind', 'StudioSpawn', 'StudioJoinOptions']
+    .map((n) => '```ts\n' + declarationText(studio, n) + '\n```')
     .join('\n\n');
   const errors = Object.entries(ErrorCode)
     .map(([name, code]) => `| ${code} | \`${name}\` |`)
@@ -139,6 +151,26 @@ ${rows(adminS2c, false)}
 ### Admin payload types
 
 ${adminNamed}
+
+## Studio (WDI_ADMIN only)
+
+Round 9 (\`docs/round9/admin-studio.md\` 2). Accepted by the \`studio\` room alone, which is registered beside \`admin\` behind the same gate and joined with the same \`{ build, token }\`; it is not a \`party\` room and a \`party\` room drops every \`studio.*\` message. Every command is queued and applied inside the step; a refused one answers \`error\` with 422 and a short \`msg\`.
+
+### Client to server
+
+| Type | Payload | Notes |
+|---|---|---|
+${rows(studioC2s, false)}
+
+### Server to client
+
+| Type | Payload | Notes |
+|---|---|---|
+${rows(studioS2c, false)}
+
+### Studio payload types
+
+${studioNamed}
 
 ## Error codes
 

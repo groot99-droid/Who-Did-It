@@ -478,3 +478,6 @@ export interface CreateOptions extends JoinOptions {
 
 // Round 6: the admin wire (docs/round6/auto-admin.md 6), accepted by the `admin` room only.
 export * from './admin';
+
+// Round 9: the Studio wire (docs/round9/admin-studio.md 2), accepted by the `studio` room only.
+export * from './studio';

@@ -290,6 +290,60 @@ export interface AdminJoinOptions {
 }
 ```
 
+## Studio (WDI_ADMIN only)
+
+Round 9 (`docs/round9/admin-studio.md` 2). Accepted by the `studio` room alone, which is registered beside `admin` behind the same gate and joined with the same `{ build, token }`; it is not a `party` room and a `party` room drops every `studio.*` message. Every command is queued and applied inside the step; a refused one answers `error` with 422 and a short `msg`.
+
+### Client to server
+
+| Type | Payload | Notes |
+|---|---|---|
+| `studio.move` | `{ seq: number; dx: number; dy: number; sprint?: boolean }` | Walk, as `input.move`: `seq` grows, the vector is normalised on the server, `sprint` runs. |
+| `studio.noclip` | `{ on: boolean }` | Walk through walls (only the scene's edge stops the figure). |
+| `studio.teleport` | `{ sceneId?: string; spawnId?: string; x?: number; y?: number }` | To a spawn of a scene, or to a tile (`x`, `y`) of a scene (the current one when `sceneId` is absent). |
+| `studio.portal` | `{ portalId: string }` | Go through a door in reach, as in the game: the next scene loads at the door's `toSpawn`. |
+| `studio.profile` | `{ profile: 'small' \| 'medium' \| 'large' }` | The scene profile the collision and the door gating use (GDD 3.13); the Studio starts at `large`. |
+| `studio.time` | `{ phase: StudioDayPhase; t?: number }` | - |
+| `studio.clock` | `{ scale?: ClockScale; paused?: boolean; step?: number }` | The round-6 clock: speed, pause, or `step` ticks (1 to 100) while paused. |
+| `studio.spawn` | `{ kind: StudioSpawnKind; ref: string; x?: number; y?: number }` | A stand-in on a tile of the current scene, at the figure's feet when `x`, `y` are absent. |
+| `studio.clearSpawns` | `Record<string, never>` | - |
+| `studio.give` | `{ itemId: string }` | Put an `items.json` item in the admin figure's hands. |
+
+### Server to client
+
+| Type | Payload | Notes |
+|---|---|---|
+| `studio.snapshot` | `{ tick: number; sceneId: string; profile: 'small' \| 'medium' \| 'large'; /** The admin figure's feet in world pixels, and the tile under them. */ x: number; y: number; tx: number; ty: number; /** World-frame facing in radians, as `Presence.yaw`. */ yaw: number; moving: boolean; noclip: boolean; scale: ClockScale; paused: boolean; time: { phase: StudioDayPhase; t: number }; /** The stand-ins of the current scene. */ spawns: StudioSpawn[]; /** Item ids the admin figure holds, in the order given. */ items: string[]; }` | Every tick to the one Studio client: the whole Studio state (it is small). |
+| `studio.log` | `{ lines: string[] }` | New lines of the Studio room's log (applied and refused commands, scene loads); the client keeps the last 50. |
+
+### Studio payload types
+
+```ts
+export type StudioDayPhase = 'dawn' | 'day' | 'dusk' | 'night';
+```
+
+```ts
+export type StudioSpawnKind = 'mob' | 'townsfolk' | 'look';
+```
+
+```ts
+export interface StudioSpawn {
+  id: string;
+  kind: StudioSpawnKind;
+  /** The mob, townsfolk or look id. */
+  ref: string;
+  x: number;
+  y: number;
+}
+```
+
+```ts
+export interface StudioJoinOptions {
+  build: string;
+  token: string;
+}
+```
+
 ## Error codes
 
 `error {code, msg}` carries one of these inside a room.
