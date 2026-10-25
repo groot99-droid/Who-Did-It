@@ -28,6 +28,8 @@ import { checkEconomy } from './validateEconomy.js';
 import { checkRelations } from './validateRelations.js';
 import type { LoreFile } from './schemas/lore.js';
 import { checkLore } from './validateLore.js';
+import type { TalkFile } from './schemas/talk.js';
+import { checkTalk } from './validateTalk.js';
 
 export interface Content {
   palette: PaletteFile;
@@ -64,6 +66,8 @@ export interface Content {
   relations: RelationsFile;
   // Round 8 (GDD 3.26), 7M.
   lore: LoreFile;
+  /** Round 9 (GDD 3.25, N2): the NPC seats' meeting-note lines. */
+  talk: TalkFile;
 }
 
 const maxProfile = (a: Profile, b: Profile): Profile => (PROFILE_RANK[a] >= PROFILE_RANK[b] ? a : b);
@@ -266,6 +270,7 @@ export function validateContent(c: Content): string[] {
   checkShops(c, err);
   // Round 8 (GDD 3.26): the shelf reader's books, letters, ledgers and clippings.
   checkLore(c, err);
+  checkTalk(c, err);
 
   return errors;
 }
