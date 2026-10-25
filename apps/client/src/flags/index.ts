@@ -11,6 +11,8 @@ export interface Flags {
   resumeCode: string | null;
   /** `#/admin`: the owner's admin page (round 6, docs/round6/auto-admin.md 8); `Preload` starts `Admin` instead of `Landing`. */
   admin: boolean;
+  /** `#/studio`: the owner's Studio (round 9, docs/round9/admin-studio.md); `Preload` starts `Studio` instead of `Landing`. */
+  studio: boolean;
 }
 
 const CODE_RE = /^[A-Za-z0-9]{5}$/;
@@ -33,10 +35,11 @@ export function readFlags(search: string, hash: string): Flags {
     joinCode: route[0] === 'join' ? code : null,
     resumeCode: route[0] === 'lobby' ? code : null,
     admin: route[0]?.split('?')[0] === 'admin',
+    studio: route[0]?.split('?')[0] === 'studio',
   };
 }
 
-export function setRoute(route: '' | 'admin' | `join/${string}` | `lobby/${string}`): void {
+export function setRoute(route: '' | 'admin' | 'studio' | `join/${string}` | `lobby/${string}`): void {
   const hash = route === '' ? '' : `#/${route}`;
   history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
 }
