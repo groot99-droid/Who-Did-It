@@ -1,5 +1,7 @@
 // Round 9 (9T, docs/round9/admin-studio.md 2): what each Studio overlay draws, from the scene JSON and the nav
 // bitmap of `@wdi/content`. Pure (tile coordinates, no Phaser), so it is tested; `OverlayView` paints it.
+import mobs from '@wdi/content/data/mobs.json';
+import { TILE_PX } from '@wdi/shared/constants';
 import { balance, navs, type Profile, type SceneId, scenes } from '@wdi/content';
 import type { StudioDayPhase } from '@wdi/shared/protocol';
 
@@ -131,4 +133,15 @@ export function hiddenAtProfile(id: string, profile: Profile): Hidden[] {
     out.push({ id: p.id, x: p.x, y: p.y, hiddenAt: PROFILES.filter((q) => !p.profiles!.includes(q)) });
   }
   return out;
+}
+
+/** The sense range of each mob stand-in, in tiles (GDD 3.15): where it notices the figure and gives chase. */
+export function senseRings(
+  spawns: ReadonlyArray<{ id: string; kind: string; ref: string; px: number; py: number }>,
+): Ring[] {
+  const table = mobs.mobs as Record<string, { senseTiles: number }>;
+  return spawns.flatMap((sp) => {
+    const m = sp.kind === 'mob' ? table[sp.ref] : undefined;
+    return m ? [{ id: sp.id, x: sp.px / TILE_PX, y: sp.py / TILE_PX, r: m.senseTiles }] : [];
+  });
 }

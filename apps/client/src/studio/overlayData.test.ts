@@ -6,6 +6,7 @@ import {
   idLabels,
   lightRings,
   OVERLAYS,
+  senseRings,
   solidTiles,
   visionTiles,
   walkLinks,
@@ -73,5 +74,15 @@ describe('sight and gating overlays', () => {
 
   it('names the overlays once each', () => {
     expect(new Set(OVERLAYS).size).toBe(OVERLAYS.length);
+  });
+});
+
+describe('sense rings', () => {
+  it('rings each mob stand-in at its feet with its sense range and skips the rest', () => {
+    const rings = senseRings([
+      { id: 'a', kind: 'mob', ref: 'wolf', px: 64, py: 96 },
+      { id: 'b', kind: 'look', ref: 'baker', px: 0, py: 0 },
+    ]);
+    expect(rings).toEqual([{ id: 'a', x: 1, y: 1.5, r: 6 }]);
   });
 });

@@ -23,10 +23,7 @@ export interface StudioFigures {
   markers: Array<{ id: string; label: string; x: number; y: number }>;
 }
 
-/** Tile centre in world px. */
-const centre = (tile: number, tilePx: number) => (tile + 0.5) * tilePx;
-
-export function figuresOf(s: StudioSnapshot, tilePx: number): StudioFigures {
+export function figuresOf(s: StudioSnapshot): StudioFigures {
   const players = [player(FIGURE_ID, 'You', FIGURE_LOOK)];
   const avatars: AvatarSnap[] = [
     {
@@ -43,8 +40,9 @@ export function figuresOf(s: StudioSnapshot, tilePx: number): StudioFigures {
   ];
   const markers: StudioFigures['markers'] = [];
   for (const sp of s.spawns) {
-    const x = centre(sp.x, tilePx);
-    const y = centre(sp.y, tilePx);
+    // Its feet, not its tile: the server steps a stand-in every tick, so the figure glides between tiles.
+    const x = sp.px;
+    const y = sp.py;
     if (sp.kind === 'look') {
       players.push(player(sp.id, sp.ref, sp.ref));
       avatars.push({
@@ -53,8 +51,8 @@ export function figuresOf(s: StudioSnapshot, tilePx: number): StudioFigures {
         height: 1,
         x,
         y,
-        yaw: 0,
-        animId: AnimId.idle,
+        yaw: sp.yaw,
+        animId: sp.moving ? AnimId.walk : AnimId.idle,
         statusBits: 0,
         transitUntilTick: 0,
       });

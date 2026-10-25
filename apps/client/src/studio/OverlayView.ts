@@ -11,6 +11,7 @@ import {
   hiddenAtProfile,
   idLabels,
   lightRings,
+  senseRings,
   type OverlayId,
   solidTiles,
   visionTiles,
@@ -49,7 +50,7 @@ export class OverlayView {
 
   /** Redraws when something it shows changed, and keeps the cursor's tile label under the pointer. */
   update(on: ReadonlySet<OverlayId>, s: StudioSnapshot, pointer: { x: number; y: number } | null): void {
-    const sig = `${[...on].sort().join()}|${s.sceneId}|${s.profile}|${s.time.phase}|${s.tx},${s.ty}`;
+    const sig = `${[...on].sort().join()}|${s.sceneId}|${s.profile}|${s.time.phase}|${s.tx},${s.ty}|${on.has('sight') ? s.spawns.map((p) => `${p.id}:${p.x},${p.y}`).join() : ''}`;
     if (sig !== this.sig) {
       this.sig = sig;
       this.redraw(on, s);
@@ -106,6 +107,12 @@ export class OverlayView {
       const c = toScreen(s.x, s.y);
       const e = radiusEllipse(visionTiles(s.time.phase));
       g.lineStyle(2, colorOf(palette.colors.bone), 0.9).strokeEllipse(c.x, c.y, e.rx * 2, e.ry * 2);
+      g.lineStyle(2, colorOf(palette.colors.blood), 0.8);
+      for (const r of senseRings(s.spawns)) {
+        const m = toScreen(r.x * TILE_PX, r.y * TILE_PX);
+        const re = radiusEllipse(r.r);
+        g.strokeEllipse(m.x, m.y, re.rx * 2, re.ry * 2);
+      }
     }
     if (on.has('gating')) {
       for (const h of hiddenAtProfile(s.sceneId, s.profile)) {

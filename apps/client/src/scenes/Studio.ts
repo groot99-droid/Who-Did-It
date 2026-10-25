@@ -2,7 +2,6 @@ import Phaser from 'phaser';
 import palette from '@wdi/content/data/palette.json';
 import { mapOf, type Scene, type SceneId } from '@wdi/content';
 import { tilemapFor } from '@wdi/content/tilemap';
-import { TILE_PX } from '@wdi/shared/constants';
 import { toScreen } from '@wdi/shared/iso';
 import { setRoute } from '../flags';
 import { captureToken, clearToken, loginUrl, type TokenStore } from '../admin/AdminNet';
@@ -408,7 +407,7 @@ export class Studio extends Phaser.Scene {
     this.followDraft(snap);
     if (snap.tick !== this.lastTick) {
       this.lastTick = snap.tick;
-      const f = figuresOf(snap, TILE_PX);
+      const f = figuresOf(snap);
       this.entities.setDelayMs(remoteDelayMs(snap.scale));
       this.entities.update(f.players, performance.now(), f.avatars, '');
       this.drawMarkers(f.markers);
