@@ -6,7 +6,7 @@ The owner's words are in `owner-brief.md`. This document answers parts 3, 4, 5, 
 
 **Sources.** `GDD.md` 3.14 to 3.16, 3.21 to 3.26; `quests.json`, `tasks.json`, `minigames.json`, `economy.json`, `mobs.json`, `routines.json`, `lore.json`, `balance.json`; `docs/round8/canon.md`; and, from ROSW (read-only, through the `udgt-consult` skill), the teardown answers and the vault's `10_Characters/10_Subject_Files.md` and the Codex Bestiary.
 
-**Sibling documents.** 9A owns `world-mode.md` and `phases.md`, and with them the full pacing table (every timer, 480 s day and 300 s night) and the train respawn. 9B owns `logic-table.md`: the tool × object table and the names of axes, pickaxes, armour and new items. 9B had not landed when this was written, so every item, tool or verb id I need that is not already in `items.json` carries a **[T:]** tag. It is a placeholder, and the two documents reconcile on 9B's names before either merges.
+**Sibling documents.** 9A owns `world-mode.md` and `phases.md`, and with them the full pacing table (every timer, 480 s day and 300 s night) and the train respawn. 9B owns `logic-table.md`: the tool × object table and the names of axes, pickaxes, armour and new items. 9B's table landed as draft #266 (head `6106134`); the item, tool, armour and weapon names below are reconciled against it, and where this document needs something 9B does not have, it is listed as a request in section 7.
 
 ## 0. Rules this design keeps
 
@@ -62,7 +62,7 @@ The five givers keep their rows. Each gains a short chain, so the player has a r
 |---|---|---|---|
 | Harbourmaster Pell | Caulk the skiff (2 Pine Resin, 1 Timber → Lantern) | Ferry run: carry a slip across the mere to Tuck | **Trade**: Tuck sells charts (Discovery 2.4) |
 | Mother Moll | Moll's herbs, Moll's mushrooms | Brew with Moll: she teaches a Stew or a Remedy recipe | **Food** or **Cure**, one only per match |
-| Ada Kerrow | The smith's ore (3 Tin Ore → Lantern) | Temper: teaches the first Tinplate piece (5.1) | **Gear** |
+| Ada Kerrow | The smith's ore (3 Tin Ore → Lantern) | Temper: teaches the Tin mail recipe (5.1) | **Gear** |
 | Foreman Hask | Stack the yard (4 Timber → Crowbar) | Count the rack with the Tallyman | **Labour** |
 | The Collier | The collier's stone (3 Stone → Torch) | Fire a kiln: a Stoke mini-game with a prize | **Fire** |
 
@@ -100,6 +100,52 @@ Meetings change under 9A (no voting, full-screen phases), so this section covers
 
 Each map keeps a private per-seat **standing** with its town, from chores and errands (P: three steps, Stranger → Known → Trusted). It changes prices and offers slightly, never the rules: a Known seat sees one more errand slot; a Trusted seat sees the stallholders' discount (the 0.8 of `hq.stations.*.shopDiscount` stacks no further; the larger discount wins). Standing is not shown to anyone else and does not persist past the match (4.4).
 
+### 1.6 NPC chore hooks (9B 9.1)
+
+9B lets `routines.json` `holds` and the activity `kinds` name **class ids** as well as prop kinds, adds `carries` to a `townsfolk` row, and makes an NPC's work cosmetic by default (the animation and noise run; the prop's state does not change). This design uses those hooks and adds no engine:
+
+| Figure | `holds` class (9B names) | `carries` | Chore it shows |
+|---|---|---|---|
+| Lumberjack villager | `lumber` | axe | chops the lumber pile on the square |
+| Stallholder | its counter | none | restocks (the Restock errand reads the same stock) |
+| Clerk | `ledger`, `noticeBoard` | none | the rent round |
+| Tallyman | `rack` | none | counts the rack |
+| Villager | `workstation` kinds already in `routines.json` | none | pump, oven, goat, fence |
+
+An NPC without its tool gets `NEED_TOOL` and ends the cycle, like a human, which is what the figure's cosmetic work shows. **Depletion** (9B open question 7): while NPC work is cosmetic, a player chore and a figure's chore are the same action with different effects, so a chore never competes with an NPC for stock. If the owner turns depletion on, gatherer figures take from piles and the world runs short; the rogue's competition in `emergent-play.md` then becomes real, and chore pay must be re-tuned. Default: off.
+
+### 1.7 The 23 lore-hook props (9B 5.3)
+
+9B keeps 204 props as decoration but singles out 23 that carry the lore. Each gets a one-line `examine`, shown when a seat holds the action key at it. The text is the same bytes for every seat, names no role, killer or Beast, and keeps to the canon of `docs/round8/canon.md` (found papers only; Grounds 99 never appears). A line may carry a `lead` (2.4) in the data.
+
+| Prop id | Examine line |
+|---|---|
+| `mh.vane_portrait` | Lord Vane in oils, stiff-necked. The frame is dusty everywhere but the corners. |
+| `mu.vane_portrait` | A smaller Vane, younger, painted before the money. |
+| `wp.portrait` | Widow Vane's portrait hangs turned to the wall. |
+| `ch.memorial` | Names cut into brass. The last line has room for more. |
+| `ch.hymn_board` | The numbers on the board are for a hymn nobody has sung this week. |
+| `tb.tide_chart` | The next low tide is circled twice in pencil. |
+| `tb.ship_wheel` | A ship's wheel in a town with no sea. Someone spun it last. |
+| `as.show_globe` | A glass globe of coloured water. Mallory keeps it for the light. |
+| `tb.photos` | Drowned sailors in frames, and a gap on the wall where a frame hung. |
+| `wb.photos` | Portraits in a widow's bedroom, one with its face scratched away. |
+| `bm.tally_board` | A chalked tally, one name rubbed out and the rack beneath it still full. |
+| `bo.map_table` | The Syndicate's survey, with the old tin workings crossed in red. |
+| `bk.chalkboard` | Crumb's loaves for the day. The last line is a wake order. |
+| `cm.chalkboard` | The mixing sums, in a baker's hand. |
+| `cp.chalkboard` | The proof times, and a note not to open the cabinet early. |
+| `tb.chalkboard` | The tavern's slate, and a debt or two. |
+| `bo.telephone` | Harrow's new line. It rarely works. |
+| `bo.ledger_desk` | The payroll desk. The pen is dry and the blotter is not. |
+| `wp.writing_desk` | A widow's desk with the drawers shut and the key gone. |
+| `fd.hanging_oak` | An old oak with a rope worn smooth into a branch. |
+| `fd.drowned_lantern` | A lantern in the black water, still lit. |
+| `wp.birdcage` | An empty cage with the door left open. |
+| `tb.piano` | A piano with one key held down by a coin. |
+
+The lines are drafts for the lore session (8V's successor) to approve: they are found-object description, not story, so none can contradict a ruling. The scene (`as.`, `bk.` and so on) is shown by the prop id, so the reader code needs no new map.
+
 ## 2. How the systems feed each other
 
 ### 2.1 The loop
@@ -108,7 +154,7 @@ Read a row as "this system gives these things to that system". An item reaches a
 
 | System | Takes in | Gives out | Feeds | Sink / limit |
 |---|---|---|---|---|
-| **Gathering** (GDD 3.14) | tools, time, risk (mobs) | Timber, Stone, Resin, Herbs, Mushrooms, Tin Ore, **Game, Berries** [T:] | Crafting, Shops (market buys), Quests, Quota | node respawn |
+| **Gathering** (GDD 3.14) | tools, time, risk (mobs) | Timber, Stone, Resin, Herbs, Mushrooms, Tin Ore, **Game, Berries** (requests to 9B, section 7) | Crafting, Shops (market buys), Quests, Quota | node respawn |
 | **Crafting** | materials, a station, a recipe | tools, food, gear | Gathering (better tools), Tasks (deliverables), Gear | materials |
 | **Tasks** (GDD 3.5) | a deliverable, a mini-game | the task bar, a wage of 3 Scrip, an alibi entry | the win (town), Scrip | task list |
 | **Chores** (new, 2.2) | time at a station | a smaller wage, materials, standing, an alibi entry | Scrip, Crafting, Standing | per-day cap |
@@ -133,11 +179,11 @@ Read a row as "this system gives these things to that system". An item reaches a
 | Pay | `economy.taskWage` 3 Scrip | smaller (P: one Scrip, or an item), capped per day (P: three paid chores a day per seat) |
 | Mini-game | for fetch tasks | a short one on the best chores |
 
-A chore is the work activity of GDD 3.12 opened to players. The station kinds already exist (pump, flour bin, oven, basin, goat, fence, window, cold shelves). Examples: draw a bucket at the pump, sweep the square (a boulder-free path), feed the goat, turn the loaves, split logs at the woodpile with an axe [T:]. The same chore at the same station is what a townsfolk figure is doing, so doing it beside one is both safe and sensible.
+A chore is the work activity of GDD 3.12 opened to players. The station kinds already exist (pump, flour bin, oven, basin, goat, fence, window, cold shelves). Examples: draw a bucket at the pump, sweep the square (a boulder-free path), feed the goat, turn the loaves, chop the lumber pile on the square with an axe (9B: `chop_lumber`). The same chore at the same station is what a townsfolk figure is doing, so doing it beside one is both safe and sensible.
 
 ### 2.3 Scrip
 
-Faucets and sinks are already conserved (GDD 3.23). The new faucets are chores (small, capped), errands (paid by the giver's own purse, which the server tops from the same rule as a wage) and a food sale to Hungry figures. The new sinks are tool and gear repair, bought tiers, recipes taught for a fee and the fine for a picked lock (6.2). The design target is a ratio, not a figure: over a normal day a player who only chores should afford a bandage and a meal and not much more, so nobody can buy their way past the economy (P, tuned in the balance lab the owner asked for in teardown stage 4).
+Faucets and sinks are already conserved (GDD 3.23). The new faucets are chores (small, capped), errands (paid by the giver's own purse, which the server tops from the same rule as a wage) and a food sale to Hungry figures. The new sinks are tool and gear repair, bought tiers, recipes taught for a fee and the town's reply to a picked lock (6.2). The design target is a ratio, not a figure: over a normal day a player who only chores should afford a bandage and a meal and not much more, so nobody can buy their way past the economy (P, tuned in the balance lab the owner asked for in teardown stage 4).
 
 ### 2.4 Lore and discovery
 
@@ -173,7 +219,7 @@ The five kinds plus the tap already exist and the server replays the answer. New
 
 | Where | Kind reused | Result |
 |---|---|---|
-| Picking a lock | slide (pins) | success, clean (no scratch clue), or snapped pick |
+| Picking a lock (optional, 9B open question 2) | slide (pins) | success, a faster hold, or a snapped pick. 9B's default is a plain hold with a print; this stays off unless the owner picks the mini-game |
 | Tempering at the forge | stoke | gear quality tier |
 | Haggling at a stall | tap | a small price change either way |
 | Altar offering | pour | Faith bonus |
@@ -219,7 +265,7 @@ Rewards are cosmetic or sideways: a title, a scarf trim, a journal flourish, a s
 Six branches grow from one root, **Newcomer** (finish a night). A branch is a chain with forks; each fork is a different way to continue, so two players on one branch rarely share a path.
 
 ```
-Newcomer ─┬─ Hands ──── Cutter ─┬─ Smith ──── Tinplate ── Flawless
+Newcomer ─┬─ Hands ──── Cutter ─┬─ Smith ──── Tin mail ── Flawless
           │             Miner   └─ Carpenter ─ Fenceman
           ├─ Hearth ─── Forager ─┬─ Cook ───── Host
           │                      └─ Trapper ─── Furrier
@@ -234,8 +280,8 @@ Newcomer ─┬─ Hands ──── Cutter ─┬─ Smith ──── Tinpla
 
 | Branch | Theme | Step examples (condition) |
 |---|---|---|
-| Hands | Gather, craft | Cutter: fell 5 trees; Smith: craft a tool at a forge; Flawless: a flawless temper; Fenceman: mend the fence twice |
-| Hearth | Food, trade | Forager: gather food 5 times; Cook: cook a meal; Host: feed 3 Hungry figures; Furrier: craft a Hide piece |
+| Hands | Gather, craft | Cutter: chop 5 lumber piles; Smith: craft a tool at a forge; Flawless: a flawless temper; Fenceman: mend the fence twice |
+| Hearth | Food, trade | Forager: gather food 5 times; Cook: cook a meal; Host: feed 3 Hungry figures; Furrier: craft a Leather jerkin |
 | Heart | Faith | Candle: tend the shrine; Vigil: three vigils; Tither: donate 20; Indulged: burn an Indulgence |
 | Wits | Lore, discovery | Reader: turn 20 pages; Scholar: finish 3 volumes; Pathfinder: follow 3 leads; Archivist: read every volume of a shelf |
 | Nerve | Mobs, bosses | Survivor: survive a night; Hunter: kill 5 creatures; Boss-bearer: bring down a boss; Evader: lose a wolf without a bite; Unseen: pass a night with no one seeing you inside a locked room |
@@ -276,50 +322,37 @@ Whichever is chosen, an achievement record never carries a role of a match in pr
 
 ## 5. Gear
 
-Names are placeholders to reconcile with 9B (**[T:]**). Everything below is role-neutral (rule 5) except the Knife, the Skeleton Key and the other kit that `items.json` already binds to a card.
+Names, slots, tiers and numbers are 9B's (`logic-table.md` 8, all values proposed there and moved to `items.json` and `balance.json` on approval). This section says how gear joins the loops and what it must not do. Everything is role-neutral (`roleBound: false`) except the kit that `items.json` already binds to a card.
 
 ### 5.1 Armour
 
-There is no armour today. One slot (body) keeps the inventory pressure at its current five slots, and armour is **worn**, not carried, so it takes no inventory slot.
+Armour is an equipment slot, not an inventory item (9B 8.2): `body` and `head`, three body tiers and two head tiers.
 
-| Tier | Name [T:] | Made from | Station | Damage taken from creatures | Notes |
-|---|---|---|---|---|---|
-| 0 | none | | | 100% | starting state |
-| 1 | Hide Jerkin | Hide (from boar, wolf) + Resin | any | P: 80% | hunted, not bought |
-| 2 | Tinplate Vest | Tin Ore + Hide | forge or basin | P: 65% | taught by Ada Kerrow's chain (1.3) |
-| 3 | Company Plate | Tin Ore + Stone + a taught recipe | forge | P: 50% | needs a Flawless temper (2.6) |
+| Item (9B) | Slot | Tier | Source |
+|---|---|---|---|
+| Quilted coat | body | 1 | General store, `armoury` loot |
+| Leather jerkin | body | 2 | hide from a skinned wolf or boar, at a workbench |
+| Tin mail | body | 3 | the forge; taught in Ada Kerrow's chain (1.3) |
+| Miner's cap | head | 1 | BlackPine office, mine rack |
+| Tin helm | head | 2 | the forge |
 
-**What armour changes.** Only creature bites and fists and mugging blows (the damage table of GDD 3.22). **It never changes the Knife**, Nightshade, the Last Shot, or any killing power, because those kill "as before whatever the health" (A89) and a role's power must not depend on a purchasable item. A failed Knife strike on an armoured seat would also be a tell, so it does not exist.
+**What armour changes.** Creature bites, fists, mugging blows and weapon strikes (9B's rule). It never changes the Knife, Nightshade or the Last Shot, because those kill "as before whatever the health" (A89) and a role's power must not depend on a purchasable item. Reductions multiply under 9B's cap, with the Lodge's `creatureDmg` perk. Heavy armour is slower and louder (9B), which a Killer feels as much as a Hunter.
 
-**What armour shows.** Armour is public: a tint or an overlay on the drawn figure, role-neutral, the same on every look. It tells everyone how well-equipped a seat is and nothing else. The art cost is one overlay per tier per art style (8-bit, low-poly, HD), a task for the art sessions. If the owner wants a cheaper start, tier 1 and 2 can ship as a tint of the existing body sprite.
+**What armour shows.** It is public and role-neutral. Whether it is drawn on the figure is 9B's open question 6; 9B's default is HUD and icon only in round 10.
 
 ### 5.2 Weapons
 
-Today: Fists (8), the Child's Slingshot (4), the Ranger's crossbow and bolts, the Gamekeeper's fowling piece, and the Knife. A weapon that wounds a seat knocks it out and never kills (the rule of this round: only the Killer's strike or a creature's bite kills; A89 and GDD 3.22). Weapons are role-neutral tools, not kit.
+9B 8.3 gives each weapon its own numbers: Club, Hatchet/Axe, Pickaxe, Slingshot, Crossbow, with Fists as the unarmed baseline. Every weapon has `kills: false` against a seat, so a player dies only to the Knife or a creature's bite (the pacing rule of the round-9 plan). Against creatures a weapon deals its damage times `creatureMult`.
 
-| Weapon [T:] | Made from | Damage (P) | Reach (P) | Cost per swing (P) | Notes |
-|---|---|---|---|---|---|
-| Fists | | 8 (GDD 3.22) | 1.2 tiles | stamina 15 | today |
-| Cudgel | Timber | 14 | 1.2 | stamina 15 | the first upgrade |
-| Hatchet | Timber + Tin Ore | 18 | 1.2 | stamina 18 | also an axe (cuts lumber piles) |
-| Spear | Timber + Tin Ore | 20 | 2.0 | stamina 20, slow | keeps wolves at a reach |
-| Pickaxe | Timber + Tin Ore | 16 | 1.2 | stamina 18 | also breaks boulders |
-| Crossbow + bolts | existing | 24 | 6 | one bolt | a ranged option |
-
-An axe and a pickaxe are **tools first**, as the owner said ("an axe should be able to cut up the random lumber piles"). Their damage is a side effect, and a seat carrying one is not marked as armed in any way a client sees, so carrying a work tool is never a tell.
+An axe and a pickaxe are **tools first**. A seat carrying one is not marked as armed in any way a client sees, so carrying a work tool is never a tell. Using a tool as a weapon wears it faster (9B), so the axe in a fight costs the axe.
 
 ### 5.3 Tools and durability
 
-| Tool [T:] | Does | Wears out? |
-|---|---|---|
-| Axe | Fell trees, cut lumber piles | after P: 25 swings; repaired at the forge for a Scrip fee |
-| Pickaxe | Break boulders, mine Tin Ore | same |
-| Spade (exists) | Tin Ore today | unchanged until 9B decides |
-| Lockpicks (exists) | Open a lock once, as a `charge` | consumed |
-| Whetstone | Repairs a tool | consumed |
-| Hide knife | Skin a creature for Hide | wears |
+Tools and their tiers are 9B 8.1 (Axe, Iron axe, Pickaxe, Iron pickaxe, Spade, Lockpicks, Fine pick, Crowbar, Hammer). They wear; a worn tool breaks with a line ("The axe handle splits."); a grindstone restores it. That gives the camp's grindstones and the smithy a use and gives Scrip a sink, and it makes the lock-pick maker of `emergent-play.md` a real trade. Durability numbers are 9B's.
 
-Wear creates a Scrip sink and a reason to visit the forge, and it makes the lock-pick maker of `emergent-play.md` a real trade.
+### 5.4 Hide and skinning (a secrecy finding for 9B)
+
+9B 8.4 lets a creature corpse be skinned "with any Knife (or Replica Knife)". The Knife is the Killer's kit and the Replica Knife the Drifter's (`items.json` `roleBound`). So only a Killer or a Drifter could ever hold hide, and a seat seen with hide, or wearing a Leather jerkin, would be marked as one of them. That breaks role secrecy and the gear tier above. **Request:** skinning must use a role-neutral tool (for example the Hatchet or a new plain Skinning knife that is not the Knife), and 9B 10's Knife column should lose the Skin cell.
 
 ## 6. Pacing
 
@@ -350,16 +383,18 @@ Armour (5.1) then scales these again. Bite *intervals* (`attackS`) stay, so a cr
 | Chore pay and cap | wage sized to the same ratio as the 3-Scrip task wage; cap per day, not per second |
 | Node respawn, mob spawn | 9A scales them; this document asks only that gathering feel like a task (a node should return within one day) |
 | Hunger | `famishedAfterS` and `moods.hunger.riseS` scale with the day so a player eats about once a day (9A) |
-| Lock picked, fine | a lock picked in a curfew scene leaves a scratch clue (a new `scratch` clue that says "this was picked" and nothing about who) and risks a small fine from the town (P: the rent amount's fraction), a tax in the world's voice |
+| Lock picked, fine | a lock picked leaves a print and noise (9B table), and a witness writes a Notice for trespass (9B 11). Any fine is the town's reply to that Notice, in `economy.json`'s terms, not a new rule here |
 
 ## 7. What this asks of other documents
 
 | Needs | From | Why |
 |---|---|---|
-| Tool × object table and the ids of axe, pickaxe, hide, game, berries, stew | 9B `logic-table.md` | 1.2, 2.1, 5 |
-| Refusal reasons for "no axe", "no lockpick", "too heavy" | 9B `failures.md` | 5.3, `emergent-play.md` |
+| Role-neutral skinning (5.4) | 9B `logic-table.md` 8.4, 10 | secrecy |
+| `berries` node, `game` item and a `stew` recipe at an oven (the table has the Wake Loaf bake, 9.4, but no cooked meal from gathered food) | 9B | emergent-play F1, F3 |
+| Rent in kind, rent by labour, a purse-only Clerk round | `gdd-map.md` and GDD 3.23 | emergent-play T1 to T3 |
+| Refusal reasons for "no axe", "no lockpick" | 9B `failures.md` (9B 10 already has the lines) | 5.3 |
 | Day/night scale, train respawn, the `bled`/`sickened` removal | 9A `world-mode.md` | 6 |
-| What replaces meetings and the Final Night | 9A `phases.md` | 1.4 (Talk in phases), 2.5 (vigil) |
+| What replaces meetings and the Final Night | 9A `phases.md` | 1.4, 2.5 |
 | GDD sections: 3.5, 3.14, 3.15, 3.16, 3.22 (damage table), 3.23, 3.24 (moods as words for figures), 3.25, 3.26 | `gdd-map.md` | after owner approval |
 
 ## Open questions for the owner
@@ -373,8 +408,9 @@ Each has a proposed default. 6Z collects these in the questionnaire.
 5. **Where do achievements live?** (4.4) Proposed: option A now, option B only for cross-match counters, option C not at all. Default: A.
 6. **Do unlocks ever change play?** (4.1) Proposed: no, they are cosmetic or a start option of equal power. Default: no.
 7. **Are bosses scheduled?** (3.3) Proposed: not before round 11; the town maps never get one. Default: lore only for now.
-8. **How hard may armour make a creature?** (5.1) Proposed: 80%, 65%, 50%. Default: those, tuned in the balance lab.
+8. **Armour strength?** (5.1) Use 9B's tiers and cap. Default: 9B's values, tuned in the balance lab.
 9. **Do melee weapons ever kill a seat?** (5.2) Proposed: no; only the Killer's strike and a creature's bite kill. Default: no.
 10. **Mob bite sizes?** (6.1) Proposed: 12, 9, 3 and 2. Default: those.
-11. **Should a picked lock leave a mark and risk a fine?** (6.2) Proposed: a role-neutral scratch clue and a small fine in a curfew scene. Default: yes.
+11. **Does a picked lock leave a print and let a witness write a Notice?** (6.2) This is 9B's rule. Default: yes.
 12. **Is Faith fed by presence?** (2.5) Proposed: a chapel vigil, the shrine chore, devotional reading and scared villagers. Default: yes, all four.
+13. **Who may skin a creature?** (5.4) 9B's "any Knife" would make hide a Killer or Drifter tell. Proposed: a role-neutral skinning tool. Default: yes.

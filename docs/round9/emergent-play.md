@@ -4,7 +4,7 @@ Session 9C, plan item 6. Design only: this document changes no code, data, test 
 
 > Players should be able to work with features to create their own way of playing like the rouge who refused to buy bread and gathers food instead and makes his own lock picks to avoid paying taxes, this is something only a person could easily come up with but the game logic needs to think about all of those possibilities.
 
-The systems it walks through are in `living-world.md` (the loops, chores, chat, gear, bosses and achievements) and, for the rules of each tool and object, 9B's `logic-table.md`. 9B had not landed when this was written, so a rule or an id that depends on it is tagged **[T:]** and the two documents reconcile on 9B's names before either merges. A number marked **(P)** is a proposal; one with no mark is quoted from `GDD.md` or the data.
+The systems it walks through are in `living-world.md` (the loops, chores, chat, gear, bosses and achievements) and, for the rules of each tool and object, 9B's `logic-table.md`. 9B landed as draft #266 (head `6106134`) and the ids below follow it; the few things its table does not yet have are tagged **[T:]** and listed as requests in section 5. A number marked **(P)** is a proposal; one with no mark is quoted from `GDD.md` or the data.
 
 ## 1. The rule behind the example
 
@@ -24,7 +24,7 @@ The rogue is a seat of any card (rule 5 of `living-world.md` 0: gear, chores and
 
 - **Today**: it works in the round-8 build.
 - **New**: it needs a rule this round designs.
-- **[T:]**: it depends on a name or a rule in 9B's table.
+- **[T:]**: it needs something 9B's table does not have yet (a request, section 5).
 
 When a step is blocked, the player sees a reason in the world's voice (owner brief, part 8), never "can't do that yet". The lines below are examples for 9B's `failures.md`.
 
@@ -34,12 +34,12 @@ When a step is blocked, the player sees a reason in the world's voice (owner bri
 
 | Path | Steps | Today / New | If blocked, the line |
 |---|---|---|---|
-| **F1 Forage and cook** | 1. Gather Mushrooms and Herbs at the Gallows Wood or Fenwood nodes (hold, 2 s). 2. Gather Berries from a wild bush [T: berries node]. 3. Cook a Stew at an oven (Crumb's Ovens or the bunkhouse) from Mushrooms, Herbs and water [T: stew recipe]. 4. Eat. The `eat` event clears Famished and Hunger. | Gather today; berries, stew and `eat` of a crafted meal **New** | "You are hungry, and there is nothing here to cook with." / "The mushrooms are raw. You'll need a fire." |
+| **F1 Forage and cook** | 1. Gather Mushrooms and Herbs at the Gallows Wood or Fenwood nodes (hold, 2 s). 2. Gather Berries from a wild bush [T: berries node]. 3. Cook a Stew at an oven (Crumb's Ovens or the bunkhouse) from Mushrooms, Herbs and water [T: stew recipe]. Or bake a Wake Loaf from Flour at an oven, which 9B already adds (9B 9.4). 4. Eat. The `eat` event clears Famished and Hunger. | Gather today; berries, stew and `eat` of a crafted meal **New** | "You are hungry, and there is nothing here to cook with." / "The mushrooms are raw. You'll need a fire." |
 | **F2 Raw and risky** | Eat Mushrooms or Berries uncooked. A cooked meal heals more. Raw food has a chance (P: one in three) of Poisoned, which cannot take health below 1 (effects stop at 1 HP, `living-world.md` 6.1). | **New** | "That did not agree with you." |
-| **F3 Trap and hunt** | 1. Craft a Snare (2 Herbs, 1 Timber, anywhere; today). 2. Set it on a game trail [T: snare verb; today the verb is off, GDD 3.14]. 3. Return later and take Game. 4. Skin it with a Hide knife, cook at an oven. Or hunt with a Cudgel or Spear, at the cost of a bite or two (12 from a wolf, 9 from a boar, P). | Snare craft today; the verb and Game **New** | "The snare is empty. Nothing came by." / "The wolf has torn it." |
+| **F3 Trap and hunt** | 1. Craft a Snare (2 Herbs, 1 Timber, anywhere; today). 2. Set it on a game trail (9B has the snare verb: set and disarm). 3. Return later and take Game [T: game item]. 4. Cook at an oven. Or hunt with a Club or a Hatchet, and skin the corpse for hide with a role-neutral tool [T: `living-world.md` 5.4], at the cost of a bite or two (12 from a wolf, 9 from a boar, P). | Snare craft today; the verb is 9B's; Game **New** | "The snare is empty. Nothing came by." / "The wolf has torn it." |
 | **F4 Work for it** | Stoke the oven at Crumb's (a chore, `living-world.md` 2.2). Mrs Crumb pays one loaf for the shift (P). Or do the *Fetch the flour* task and keep the sack. | Chore **New**; the task and the sack exist | "Crumb waves you off. Come back when the ovens need stoking." |
 | **F5 Errand** | Moll's mushrooms (3 Mushrooms) pay Salts; her chain (`living-world.md` 1.3) teaches a Stew. A Hungry villager pays Scrip for a meal; the rogue sells one, not buys one. | Quest today; Stew teach and the Feed errand **New** | "Moll is busy at the kettle." |
-| **F6 Lift it** | Take a loaf from the cooling rack or lift it from the stall [T: steal verb]. The stallholder gets Angry (GDD 3.24), the rogue loses standing with the town, and an Angry figure may mug him later. | **New** | "The baker is watching. Not now." |
+| **F6 Lift it** | Take a loaf from the cooling rack or lift it from the stall (9B: Take from an owned shelf is theft). The stallholder gets Angry (GDD 3.24), a witness writes a Notice, the rogue loses standing, and an Angry figure may mug him later. | 9B's `theft`; standing is `living-world.md` 1.5 | "The baker is watching. Not now." |
 | **F7 Go without** | Do nothing. Famished halves stamina regeneration; the hunger rate is `moods.hunger.riseS` (9A scales it to the day). Home eases it (`homeFallS`). | Today | none |
 
 **What the logic must guarantee.** One of F1 to F7 is open to every seat at the start of every day. The world does not gate all of them behind money: F1, F3, F4, F5 and F7 cost no Scrip. That is rule E1.
@@ -50,18 +50,18 @@ When a step is blocked, the player sees a reason in the world's voice (owner bri
 
 | Step | Action | Station / tool | Today / New |
 |---|---|---|---|
-| 1 | Gather Timber (hold; an axe [T:] cuts the lumber pile on the square, and wood piles are free materials) | axe [T:] or hands | Gather today; axe and lumber pile **[T:]** |
-| 2 | Gather Stone (a pickaxe [T:] breaks a boulder) | pickaxe [T:] or hands | Gather today; pickaxe and boulder **[T:]** |
+| 1 | Gather Timber (hold; an Axe chops the lumber pile on the square, and by hand a pile still gives one) | Axe or hands | Gather today; Axe and lumber pile are 9B's |
+| 2 | Gather Stone (a Pickaxe breaks a boulder) | Pickaxe or hands | Gather today; Pickaxe and boulder are 9B's |
 | 3 | Craft a Spade: 2 Timber, 1 Stone | a basin: the apothecary, Crumb's Ovens, the bunkhouse or the forge; 3 s | Today |
 | 4 | Dig Tin Ore (needs the Spade) | the Tin Gallery mouth; bats and rats are there (their bites are softened, `living-world.md` 6.1) | Today |
 | 5 | Craft Lockpicks: 1 Tin Ore | a basin; 3 s | Today |
-| 6 | Pick the lock: a slide mini-game for the pins | on the locked door or chest [T: pick verb] | **New** |
+| 6 | Pick the lock: a hold of about 5 s (9B's default; a pin mini-game is its open question 2) | on the locked door or chest | 9B's `pick_lock` |
 
 If a step fails, the player is told why in the world's voice. The owner's own example is the model: "Failed to pick the lock. Looks like you might need a lock pick." The rest follow it: no Spade ("The ore won't give. You need something to dig with."), no basin ("There is nothing here to work metal on."), no pins ("The lock won't give. You'll need a pick.").
 
-**The result.** The pick opens the door and is spent (it is a `charge`). A **clean** slide leaves no mark; a rushed one leaves a **scratch** clue (a new, role-neutral clue that says "this was picked" and nothing about who). A snapped pick is lost with no entry. A picked door stays unlocked for the day unless a seat with a key locks it again.
+**The result.** The pick opens the door and is spent (it is a `charge`). The pick leaves a **print** and a little noise (9B 10); it is the existing print clue, so a Detective with a Fingerprint Kit can compare it, as with a Skeleton Key. A picked door stays unlocked for the day unless a seat with a key locks it again.
 
-**Why it is not strictly best.** It costs a whole chain (E3): a Spade, a trip into the caves, a slot in a five-slot inventory (the picks take one), a risk of a scratch clue, and wear on the tools if the logic table adds durability (`living-world.md` 5.3).
+**Why it is not strictly best.** It costs a whole chain (E3): a Spade, a trip into the caves, a slot in a five-slot inventory (the picks take one), a print and noise at the door, and wear on the tools (9B 8.1).
 
 ### 2.3 Dodges the tax
 
@@ -79,7 +79,7 @@ The rogue pays neither in Scrip. Every route below leaves the town a legal answe
 | **T3 Bank first** | Deposit the purse before the Clerk's round. The Clerk collects from a purse only; banked Scrip is safe (GDD 3.23). The debt stays, so Indebted still applies at dusk. | Bank safe today; Clerk's walk and its purse-only rule **New** | Does not remove the debt |
 | **T4 Go rough** | Stay Indebted and sleep outside: carry a Torch or stay by a lantern post (wolves flee light within 4 tiles), wear armour (tier 1 or 2, `living-world.md` 5.1) and keep a snare line. | Indebted and curfew today; gear **New** | Wolves at night, through a 300 s night with no roof |
 | **T5 The chapel** | The chapel is not a curfew scene. An Indebted seat may sleep there. A vigil (`living-world.md` 2.5) earns Faith for the night. | Today (the chapel is not in `curfew`); vigil **New** | The company of whoever else keeps vigil |
-| **T6 Pick the curfew door** | Use the Lockpicks of 2.2 on the bakery, the tavern or the manor hall's curfew door. The door is a lock like any other. | **New** | A scratch clue, a chance of a fine in the world's voice (P), and whoever stands inside |
+| **T6 Pick the curfew door** | Use the Lockpicks of 2.2 on the bakery, the tavern or the manor hall's curfew door. The door is a lock like any other. | **New** | A print, noise, and a Notice if a witness is in sight (9B 11); whoever stands inside |
 | **T7 Avoid the collector** | The Clerk's round follows public stations (the ledger, the notice board, the tavern window and the pump). The rogue is elsewhere when it passes. | Routes exist; collection **New** | Predictable route, so the Clerk is late, not absent |
 | **T8 Free quota** | At BlackPine the quota is already paid in kind. Cut a lumber pile with an axe, or break a boulder, and haul the yield to a tally rack. | **New** (axe, pickaxe, piles) | The haul |
 | **T9 Do not hold Scrip** | A seat with an empty purse is never mugged (GDD 3.24), cannot be fined more than it holds, and has nothing to lose to a knockout (3.22). | Today | Cannot buy anything |
@@ -98,10 +98,10 @@ The rogue's day, as the logic would run it. Times are shown as fractions of the 
 | Noon | Pays the Clerk in Timber; gets a rent receipt | Rent, barter, standing |
 | Afternoon | Crafts Lockpicks at the forge; sets a snare | Basin, Tin Ore, snare |
 | Dusk | Is not Indebted. Reads a book at the manor to follow a lead | Lore, leads, curfew |
-| Night | Picks the curfew lock on the bakery for the oven's warmth; leaves a scratch | Lockpicks, clue, fine |
+| Night | Picks the curfew lock on the bakery for the oven's warmth; leaves a print | Lockpicks, print, Notice |
 | Late night | Cooks at the bakery oven with what he gathered | Stew |
 
-A Killer living as a villager (owner brief, "Disguises") can run exactly this day: all of it is role-neutral, and the chores give a real alibi entry. A Detective who finds a scratch clue learns that a door was picked, not who picked it.
+A Killer living as a villager (owner brief, "Disguises") can run exactly this day: all of it is role-neutral, and the chores give a real alibi entry. A Detective who finds a print learns that a door was picked and can compare it.
 
 ## 4. Three more player-invented strategies
 
@@ -129,16 +129,16 @@ A seat that never carries a weapon or a magnifier and solves it by reading and a
 
 | Uses | Must hold | Must stop |
 |---|---|---|
-| Talk with a figure for a tip (a look and a scene, `living-world.md` 1.4), shelves and leads, ledger slips, the notice boards, alibi entries, scratch clues | Tips are public facts only (no card), the same to every asker, and capped per figure | A tip that reveals a role or a kill. Tips are drawn from the same rumour ledger as Blackmail Notices, which already names looks and never seats or cards. |
+| Talk with a figure for a tip (a look and a scene, `living-world.md` 1.4), shelves and leads, ledger slips, the notice boards, alibi entries, prints | Tips are public facts only (no card), the same to every asker, and capped per figure | A tip that reveals a role or a kill. Tips are drawn from the same rumour ledger as Blackmail Notices, which already names looks and never seats or cards. |
 
 ## 5. What it asks of the logic table
 
 | Need | From | Where |
 |---|---|---|
 | The `needs` list and the three-sources test of 1 | 9B | `logic-table.md` |
-| Stew, Berries, Game, Hide, axe, pickaxe, whetstone, hide knife ids | 9B | `logic-table.md`, `items.json` |
-| A steal verb and a scratch clue | 9B, GDD 3.4, 3.7 | `logic-table.md`, `failures.md` |
-| The pick verb, and the curfew lock as an ordinary lock | 9B | `logic-table.md` |
+| A `berries` node, a `game` item, a `stew` recipe, role-neutral skinning | 9B (the rest, axe, pickaxe, grindstone, Wake Loaf bake, is already in the table) | `logic-table.md`, `items.json` |
+| Theft from an owned shelf | already 9B's (`ownership: owned`, crime `theft`) | `logic-table.md` 10 |
+| The curfew lock as a `lockedDoor` target (9B 9.5 locks no door in data yet; the round-10 scene edit must lock the curfew doors) | 9B, round-10 scene edit | `logic-table.md` 9.5 |
 | Rent in kind, rent by labour, purse-only collection | `living-world.md` 1.2 and GDD 3.23 | `gdd-map.md` |
 | Day length, hunger rate | 9A | `world-mode.md` |
 
@@ -147,7 +147,7 @@ A seat that never carries a weapon or a magnifier and solves it by reading and a
 Each has a proposed default. 6Z collects these in the questionnaire.
 
 1. **Is raw foraged food edible, with a risk?** (2.1, F2) Proposed: yes, one chance in three of Poisoned, never lethal. Default: yes.
-2. **Does a curfew door yield to Lockpicks?** (2.3, T6) Proposed: yes, as any lock does, with a scratch clue and a small fine risk. Default: yes.
+2. **Does a curfew door yield to Lockpicks?** (2.3, T6) Proposed: yes, as any lock does, with a print and, if a witness is in sight, a Notice (9B 11). Default: yes.
 3. **Can rent be paid in goods or in labour?** (2.3, T1 and T2) Proposed: both. Default: both, labour at a lower rate.
 4. **Does the Clerk collect from the purse only?** (2.3, T3) Proposed: yes, so the bank hides money but not the debt. Default: yes.
 5. **May a seat steal from a stall?** (2.1, F6) Proposed: yes, with Anger, lost standing and a later mugging risk. Default: yes.
