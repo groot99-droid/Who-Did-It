@@ -277,7 +277,10 @@ describe('gen-anims', () => {
     const img = decodePng(png);
     const again = encodeIndexedPng(img)!;
     expect(again.equals(png), "the committed page is the encoder's own output").toBe(true);
-    expect(decodePng(again).data).toEqual(img.data);
+    // A native byte compare: toEqual walks the 4 MB of pixels element by element (about 19 s of the old 20 s).
+    const back = decodePng(again);
+    expect([back.width, back.height]).toEqual([img.width, img.height]);
+    expect(Buffer.compare(back.data, img.data), 'the same RGBA bytes').toBe(0);
     expect(encodeIndexedPng(img)!.equals(again), 'deterministic').toBe(true);
   });
 
