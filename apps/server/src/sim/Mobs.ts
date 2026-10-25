@@ -287,8 +287,12 @@ function walk(room: PartyRoom, body: MobBody, goal: { x: number; y: number }, st
     plan.tiles.findIndex((t) => t.x === here.x && t.y === here.y),
   );
   const next = plan.tiles[at + 1];
-  // Past the last tile it closes on the goal itself, unless the goal stands in a wall.
-  if (!next && grid.solidAt(gx, gy)) return false;
+  // Past the last tile it closes on the goal itself, unless the goal stands in a wall or the straight line to it cuts
+  // a wall's corner: it would step into that wall, be routed back to the last tile and pace between the two for good.
+  if (!next && (grid.solidAt(gx, gy) || segmentBlocked(grid, body.x, body.y, goal.x, goal.y))) {
+    if (goal === body.goal) body.goal = null; // a roam takes it as reached and picks again
+    return false;
+  }
   const aim = next ? { x: tileCentre(next.x, TILE_PX), y: tileCentre(next.y, TILE_PX) } : goal;
   const dx = aim.x - body.x;
   const dy = aim.y - body.y;
