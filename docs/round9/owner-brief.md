@@ -88,3 +88,20 @@ On 9C's living-world proposals (the owner's replies follow each one):
 7. **Lock picking** keeps the role-neutral scratch clue (reinstated over 9C's drop), plus a small chance of a fine.
 8. **Rent** is paid in Scrip or labour. If you can't pay, goods are taken; if you have no goods, your house is boarded up.
 9. **The rogue** is a play style any role can follow (confirmed).
+
+## Third follow-up: "function without the killer" (2026-10-25, verbatim)
+
+> Just to clarify one thing, I meant the “game should function without the killer”, a story mode would have you completing multiple roles thematically through a single game including the killer, what I was referring to is that the multiplayer world shouldn’t feel like the killer is the only role who does anything and everyone just outlives him, the goal is to create a world where every player feels like they have a role and them getting killed actually impacts everyone, the gameplay isn’t dependent on the killer the kill is the variable that starts the games downward spiral.
+
+### 6Z's reading (this answers questionnaire question WM1)
+
+1. **The world works on its own.** Every role has its own daily work, goals and win conditions, so the town is a full game even before anyone dies. The Killer is not the engine of play. The kill is the variable that starts the town's downward spiral.
+2. **A death has to hurt the town.** Each role keeps something running that everyone depends on. When that role dies, the loss shows up for everyone. For example:
+   - with the Baker gone, no bread;
+   - with the Lamplighter gone, the streets go dark sooner and creatures come closer;
+   - with the Doctor gone, wounds stop healing;
+   - with the Vicar gone, Faith dries up.
+
+   The round-10 plan gives every role a "what breaks when I'm gone" row, and the morning train only partly restores it (a daytime death returns, but the day's work is lost).
+3. **Story mode is one player playing several roles in one game.** The player takes several roles in turn, following the story's themes, the Killer among them. This replaces 9A's "fixed actions as one role" reading in `world-mode.md` section 9. It still runs on the auto-mode harness, with the player's seat moving between roles at chapter breaks.
+4. 9A's two engine points stay. The engine keeps an AI Killer (story mode and all-AI test matches need it), and in multiplayer a human is always the Killer.
