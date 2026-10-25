@@ -10,6 +10,7 @@ export { LOOKS_COPY } from './looks';
 export { CUTSCENE_COPY, cutsceneLine } from './cutscenes';
 export { SETTINGS_COPY } from './settings';
 export { ADMIN_COPY } from './admin';
+export { STUDIO_COPY } from './studio';
 export { MENU_COPY } from './menu';
 export { TOWNSFOLK_COPY, figureName, townsfolkLostLine } from './townsfolk';
 export { MUG_COPY } from './mug';
