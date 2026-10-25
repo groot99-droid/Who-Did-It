@@ -8,6 +8,11 @@ kill, and the art-style lock. The full-screen pauses that replace the meeting ar
 and `balance.json` stand. Every number below is a proposal. Each claim about today's game cites a GDD section or a
 file and line at `88453d9`.
 
+**Owner answers folded in (9D, 2026-10-25).** The questionnaire answers (`owner-answers.md`) and the three owner-brief
+follow-ups override this document wherever they disagree. Every paragraph they changed is marked "(owner answer
+<ID>)". Where an answer collides with another rule, the reconciliation is written in place and listed in section 12,
+"Reconciled". The GDD sections each change lands in are in `gdd-map.md`; the build order is in `round10-plan.md`.
+
 **Sources.**
 
 - The owner's words: `owner-brief.md`, quoted verbatim where a rule rests on them.
@@ -79,8 +84,13 @@ The roster has 22 roles, and 13 of them have a card and a look today (`looks.jso
 - **Load.** An NPC seat is a full sim seat (GDD 3.12). A 15 to 22 seat room is a soak-test item for the build plan
   (`gdd-map.md`).
 
-**One Killer.** World mode deals exactly one Killer card, with one vendetta, whatever the human count. The 10-seat
-deck's second Killer existed because of parity at 10 seats (GDD 3.9), and world mode drops parity as a win (2).
+**One dealt Killer, plus the Hitman who may arrive (owner answers WM9, WM3).** World mode deals exactly one Killer
+card at Start, with one vendetta among the Zealot, the Activist and the Bandit, whatever the human count. The 10-seat
+deck's second Killer existed because of parity at 10 seats (GDD 3.9), and world mode drops parity as a win (2). Two
+exceptions:
+
+- **The Hitman is never dealt.** He may arrive between days 3 and 5, as a human or an NPC by party size (1.5).
+- **Two humans play two Killers** against the town, in "Paint The Town Red" (1.6).
 
 ### 1.3 Who must be human
 
@@ -91,20 +101,23 @@ The owner's rules, verbatim:
 - "you must also assign the player who is required for example: Zealot(human) must always have a Vicar(human), this
   makes the gameplay a minimum of 3 players for the zealot, activist, bandit, and even more for the Hitman".
 
-A Zealot and a Vicar are only 2. The owner's minimum of 3 means one more human is needed. **9A reads the third human
-as the law: the Detective.** The evidence-and-arrest route (3) runs through the Detective's ladder (Bible I.6). With
-an NPC Detective, a 2-human match would be a duel that NPCs judge. This reading is open question 2.
+A Zealot and a Vicar are only 2. The owner's minimum of 3 means one more human is needed.
 
-| Vendetta | Partner the lore pairs it with (must be human) | Why that partner | The law (human) | Extra | Minimum humans |
-|---|---|---|---|---|---|
-| Zealot (conversion) | Vicar | The Zealot hunts the Vicar and Skin-Walks in his robes (Bible I.5 I; Codex, Conversion) | Detective | none | **3** |
-| Activist (sabotage) | Company Clerk | The Baron's man: protects the Baron when he comes by train and becomes the Baron's Heir (Bible I.5 II, I.7) | Detective | none | **3** |
-| Bandit (heist) | Bartender | The Vigilante: "if they gun down the Bandit, they claim the bounty" (Bible I.7) | Detective (the Police must cuff him, Bible I.5 III) | none | **3** |
-| Hitman (contract) | Postmaster | Carries the black-wax letter, and can steam it open (the Handler road, Bible I.5 IV, I.7) | Detective | The mark: a human who is not the Postmaster or the Detective | **4** |
+**The third human is not the law (owner answer WM2).** 9A read the third human as the Detective; the owner answered
+"no, I mentioned law enforcement NPCs". The law is a set of NPC figures, the **Constables** (3.1), who work the
+Detective's way at a quicker rate. So the third human is any roster card, dealt like every other human seat (1.4 step
+5). The Detective card stays in the roster and goes to a human or an NPC like any other card.
 
-**The Hitman's 4th human.** A contract on an NPC is no contest, so the mark must be a human. The mark is never the
-Postmaster, who would read his own death warrant, and never the Detective, so the case and the mark stay in
-different hands. That makes "even more for the Hitman" exactly 4.
+| Vendetta | Partner the lore pairs it with (must be human) | Why that partner | Extra | Minimum humans |
+|---|---|---|---|---|
+| Zealot (conversion) | Vicar | The Zealot hunts the Vicar and Skin-Walks in his robes (Bible I.5 I; Codex, Conversion) | any third human | **3** |
+| Activist (sabotage) | Company Clerk | The Baron's man: protects the Baron when he comes by train and becomes the Baron's Heir (Bible I.5 II, I.7) | any third human | **3** |
+| Bandit (heist) | Bartender | The Vigilante: "if they gun down the Bandit, they claim the bounty" (Bible I.7) | any third human (the Constables cuff him, Bible I.5 III) | **3** |
+| Hitman (contract) | Postmaster | Carries the black-wax letter, and can steam it open (the Handler road, Bible I.5 IV, I.7) | Not dealt: he arrives (1.5) | none (1.5) |
+
+**The Hitman's mark (owner answers WM9, WM10).** The Hitman is no longer dealt at Start, so he needs no minimum.
+When he arrives (1.5) his contract names a human mark if one is free (not the dealt Killer, not the Postmaster, not
+the Hitman himself), else an NPC.
 
 **Interim partners, until the trades ship** (built cards only):
 
@@ -113,7 +126,9 @@ different hands. That makes "even more for the Hitman" exactly 4.
 | Zealot | Vicar | Already built. `needsCard: "vicar"` is the seam (`vendettas.json`) |
 | Activist | Watchman | Stands at one door each night (Keep Watch), so he is the one who can guard the Baron |
 | Bandit | Gamekeeper | The only other gun (`fowlingPiece`): the Vigilante's stand-in |
-| Hitman | none | The mail arrives without a Postmaster (GDD 3.20, `train.arrive`). The minimum is then 3: Hitman, Detective and the mark |
+| Hitman | none | The mail arrives without a Postmaster (GDD 3.20, `train.arrive`). The arrival of 1.5 needs no partner |
+
+The interim partners stand (owner answer WM8: default).
 
 ### 1.4 The deal order
 
@@ -122,21 +137,20 @@ The deal runs at Start, before the role card, on the `deal` stream (`sim/seeds.t
 
 | Step | What happens | Draws |
 |---|---|---|
-| 1 | Count the humans, H. With H = 1 it is story mode (9), not this deal | none |
+| 1 | Count the humans, H. With H = 1 it is story mode (9), and with H = 2 it is Paint The Town Red (1.6), not this deal | none |
 | 2 | One human is dealt the Killer card | `deal` |
-| 3 | The Killer draws one vendetta among the rows whose minimum is at most H and whose map rule holds (`maps`, `needsScene`, as today) | `vendetta:<seat>` |
+| 3 | The Killer draws one vendetta among the Zealot, Activist and Bandit rows whose minimum is at most H and whose map rule holds (`maps`, `needsScene`, as today). The Hitman row is never drawn here (owner answer WM10) | `vendetta:<seat>` |
 | 4 | That vendetta's partners go to humans (1.3) | `deal` |
-| 5 | The Detective goes to a human, if one is left | `deal` |
-| 6 | Each remaining human gets a random roster card, except the Accomplice below 6 humans | `deal` |
+| 5 | Each remaining human gets a random roster card, except the Accomplice below 6 humans. No card is reserved for the law (owner answer WM2) | `deal` |
+| 6 | The Hitman's arrival is drawn: whether he comes, on which day, and whether a human or an NPC is turned (1.5) | `hitman` (new, secret) |
 | 7 | The Killer picks, on the role card, which NPC-held card to wear (4) | none (a choice) |
 | 8 | An NPC seat is created for every card still unheld except the worn one. NPC names come from `npcNames`, as today | `npcNames` |
 
 | Humans | What the deal allows |
 |---|---|
 | 1 | Story mode (9) |
-| 2 | No vendetta has its partners. The Killer is dealt with no vendetta and plays the plain Killer (open question 3) |
-| 3 | Zealot, Activist, Bandit (and, before the Postmaster ships, Hitman) |
-| 4-10 | All four vendettas |
+| 2 | Paint The Town Red: both humans are Killers, with no vendetta (1.6, owner answer WM3) |
+| 3-10 | Zealot, Activist, Bandit; the Hitman may arrive (1.5) |
 | 6-10 | A human may also be dealt the Accomplice |
 
 **Why the Accomplice waits for 6 humans.** A human Accomplice takes one human away from the village side. Below 6
@@ -144,6 +158,77 @@ humans, a human Accomplice beside the Killer would leave at most 3 humans on the
 
 `players.max` stays 10 humans. The room's seat count becomes the roster size minus the worn card (8). That count is
 the same in every match of a map: the Bandit (4) is the one exception, and its look is public anyway (4.2).
+
+### 1.5 The Hitman's arrival (owner answers WM9, WM10)
+
+The owner, verbatim: "the hit man can (lower to higher chance depending on player pool) appear anywhere between days
+3 and 5. when the hitman arrives everyone will see signs. as soon as the hitman is active, that roles place in the
+town goes dormant, this causes a noticeable shift in the economy that by going to the individual roles houses you can
+find out who the hitman is and try to stop them, if you fail report what you saw as fast as possible before they reach
+the train, if you fail again they win in one day." And: "in player parties of 3 the hitman is never human, at 4 very
+low chance, at 5 low chance, 6 40% hitman will be player, and so on, max player pool hitman 100% percent appears and
+is human".
+
+**How it is drawn.** At Start, on a new secret stream `hitman` (`sim/seeds.ts`), the server draws three things and
+tells nobody: whether the Hitman comes, on which day (3, 4 or 5, uniform), and whether a human or an NPC is turned.
+
+| Humans | Comes (P) | Human, if he comes (P) |
+|---|---|---|
+| 3 | 0.5 | 0 (owner) |
+| 4 | 0.6 | 0.1 ("very low") |
+| 5 | 0.7 | 0.2 ("low") |
+| 6 | 0.8 | 0.4 (owner) |
+| 7 | 0.85 | 0.55 |
+| 8 | 0.9 | 0.7 |
+| 9 | 0.95 | 0.85 |
+| 10 | 1 (owner) | 1 (owner) |
+
+The numbers would be new `balance.json` keys under `hitman.byHumans`. The owner fixed 3, 6 and 10; the rest are
+proposals that rise evenly.
+
+**Who is turned.** The lore's Hitman returns: "nobody starts as the Hitman" (Codex, Contract), the mail turns a
+townsman into one. On the arrival day's `train.delivery`, the black-wax letter reaches one seat:
+
+- a human, if the draw says human: any human who is not the dealt Killer, the Accomplice or a vendetta partner, drawn on
+  `hitman`;
+- else an NPC seat, drawn the same way. The engine keeps an NPC Killer (open question 1, answered by the third
+  follow-up), and the human-Killer rule binds the dealt Killer only (12, R5).
+
+The turned seat keeps its card in public and its life in private: it is now a cover role whose worn card is its own,
+and its Private view gains the Hitman's contract and true look (4.4).
+
+**The signs.** At the arrival, everyone sees a public sign that names nobody: the black-wax mailbag on the platform, a
+crow on the station roof, and a line in the dawn manifest, "A stranger's coat was seen on the 6:10" (`phases.md` 2).
+
+**The dormant role.** From the arrival, the turned seat's role stops doing its town work: its stall does not restock,
+its station stays cold, its home shows a dark window, and the "what breaks when I'm gone" row of its role
+(`round10-plan.md` 5) takes effect as if it had died. A turned NPC simply stops its routine there; a turned human can
+still work, but each day's output of its role drops to `hitman.dormantOutput` (P: 0) of normal. The shift is a fact of
+the world, seen by walking to the houses; no field ever names the turned seat (12, R16).
+
+**Stopping him, in two chances.**
+
+| Stage | What the town does | If it fails |
+|---|---|---|
+| 1. Find him | Read the economy: the dormant house names the role, and the role names a look. Petition and run a manhunt (3.1) | The Hitman makes the kill after dark |
+| 2. Report before the train | From the kill to the next morning's train, any seat may report what it saw to a Constable (a look and a scene, 3.1). A report with a matching Verified entry convenes an immediate manhunt at the station | He boards the train: the Contract victory, one day after the kill ("they win in one day") |
+
+A Hitman cuffed at either stage goes to a Tribunal (`phases.md` 4), and a murder conviction stops him (5).
+
+### 1.6 Two humans: Paint The Town Red (owner answer WM3)
+
+The owner, verbatim: "in two players as killers vs the NPCs and environment. goal 'Paint The Town Red', kill as many
+NPCs roles as possible before you get caught. each kill counts towards the win even if they come back but duplicate
+kills don't count towards wins just total kills."
+
+| Rule | Design |
+|---|---|
+| The deal | Both humans get the Killer card, with no vendetta. Each picks a worn card (4.1). No Hitman arrival |
+| The town | Every other roster card is an NPC seat. The Constables (3.1) hunt the Killers; with no human on the town side, the Constables file their own petitions (12, R3) |
+| The score | A kill of a roster NPC seat counts once toward the win (its unique count) and every time toward the total. A seat killed, returned by train and killed again adds to the total only |
+| The train | Every NPC death returns on the next morning's train, after dark too, so the town never runs out (12, R4) |
+| Caught | A Killer convicted of murder is hanged (5) and its run ends. The other Killer plays on |
+| The win | The two share the **Paint The Town Red** victory when their combined unique count reaches `paintTown.winUnique` (P: half the NPC seats) before both are caught or the end trial closes. The ledger ranks them by total kills (`phases.md` 7) |
 
 ## 2. How each role wins
 
@@ -160,11 +245,13 @@ condition.
 | Zealot | Founding a Following: sigils on 5 key buildings, 6 followers at the Deep Cave Altar or the desecrated chapel, then a 15 s Dark Mass at the altar | Vendetta: Following | lore (Bible I.5 I; Codex, Conversion) |
 | Activist | Workplace Disarray (1 to 3 acts), Public Unrest, the Baron killed when he comes by train, and then she survives the Redemption trial. She then becomes plain Townsfolk | Vendetta: Redemption | lore (Bible I.5 II). The "Emergency Town Vote" becomes the evidence trial (5) |
 | Bandit | Robs the bakery (leaving a coin tip), the chapel plate and the bank vault, then robs the train's express safe and rides out | Vendetta: Getaway | lore (Bible I.5 III; Codex, Heist) |
-| Hitman | Kills the mark, then boards the next train out | Vendetta: Contract | lore (Bible I.5 IV). Dealt at the start, not mailed to a townsman (4.4) |
+| Hitman | Kills the mark, then boards the next train out | Vendetta: Contract | lore (Bible I.5 IV). Mailed to a townsman between days 3 and 5 (1.5, owner answers WM9, WM10) |
+| Paint The Town Red (2 humans) | The pair's unique NPC kills reach the target before both are caught | Paint The Town Red | owner answer WM3 (1.6) |
 | Any Killer, not stopped | Reaches the end trial (6) unconvicted, with the vendetta unfinished | Unseen (a lesser victory) | 9A, from today's "the Final Night vote fails" (GDD 3.8) |
 | Accomplice | The Killer wins in any way | Shares the Killer's kind | GDD 3.2 ("As Killer") |
 | Drifter | Is convicted to death at a trial | Gallows | lore (Codex, "wants to be chosen for it"); was "get ejected" (GDD 3.2) |
-| Detective, Police Officer, Judge | Stops the Killer by arrest and conviction (route 1) | Law | lore (Bible I.6) |
+| Detective, Police Officer, Judge | Stops the Killer by a petition, a manhunt and a conviction it filed the evidence for (route 1) | Law | lore (Bible I.6); the arrest is now the manhunt's (3.1, owner answer WM2) |
+| Any human who signed and cuffed | The cuffed suspect is convicted of murder (route 1) | Law | owner answer WM2 |
 | Vicar | Converts every living seat to the faith | Peaceful | lore (Bible I.5 I) |
 | Vicar (martyr) | Dies by the Knife. The match's win is unchanged, and the room's next match offers the Ascended Vicar | none (memorial) | GDD 3.20; Bible I.5 I |
 | Doctor | Every body of the match autopsied, and no seat lost for good to a bleed or poison that she was in reach to treat | Healer | 9A ("Keep people alive and read the dead") |
@@ -197,7 +284,7 @@ victories".
 
 | Route | How | Who earns it | Victory |
 |---|---|---|---|
-| **1. Evidence and arrest** | The Detective verifies enough clues against one suspect to stamp the case file and becomes the Police Officer (`GameState.lawStage` 0 to 1, a seam since round 6). The Officer cuffs the suspect and brings him to the bell, which opens a **Tribunal** (`phases.md` 4). The verdict is computed from the evidence (5). A death sentence on the Killer stops it | The seat that made the arrest. Every seat whose Verified entry the verdict counted shares it | Law |
+| **1. Evidence and arrest** (owner answer WM2) | Evidence builds against one suspect (from any seat, and from the Constables' briefings). A human launches a **petition** to pursue the suspect; once signed, a **manhunt** opens (3.1). Whoever cuffs the suspect brings him to the county jail, which opens a **Tribunal** (`phases.md` 4). The verdict is computed from the evidence and the sentence from the crime (5). A murder conviction stops the Killer | The seat that cuffed, the petition's signers, and every seat whose Verified entry the verdict counted | Law |
 | **2. Role goals** | A role goal that foils the vendetta: the Vicar converts everyone before the Zealot's Mass; the Clerk keeps the Baron alive until nightfall; the Bartender guns down the Bandit; the Postmaster burns the contract; Nightshade or the Last Shot takes the Killer; the task bar fills first | The seat whose goal did it (for the task bar: every seat that finished a chore) | That role's kind (Peaceful, Heir, Bounty, Dead Letter, Role, Town) |
 | **3. The end trial** | After the Final Night hunt, the **end trial** (`phases.md` 5) tries every filed case, strongest first. A conviction of the Killer stops it. With no case strong enough, the Killer is Unseen (2) | The seat that filed the convicting case | Verdict |
 
@@ -209,9 +296,67 @@ Rules that hold for all three routes:
   award their victories to the seats that also met them.
 - **The match ends** when the Killer is stopped and every open personal goal is settled, or at the end of the end
   trial, whichever comes first.
-- **Stopped is not always dead.** A Killer convicted to a Heavy Fine is not stopped: Bible I.6 says the fine "resets
-  their active heist/sabotage checklist without killing them". Only a death sentence, a death after dark or a foiled
-  vendetta stops the Killer.
+- **Stopped is not always dead.** A Killer convicted only of a lesser crime (5) is not stopped: Bible I.6 says the fine
+  "resets their active heist/sabotage checklist without killing them". Only a murder conviction, a death after dark or
+  a foiled vendetta stops the Killer.
+
+### 3.1 The law: Constables, petitions and the manhunt (owner answer WM2)
+
+The owner, verbatim: "law enforcement NPCs. they work the same, but at a quicker rate and leave briefing 30s after any
+clue is created, there is a petition request form the players can launch whether to pursue and bring to trial the
+perpetrator, this is how random npcs or non-killer roles end up in jail, face a fine, meet the gallows, or dismiss
+cases. this replaces the bell which can now only be used to gather NPCs for tasks like the activist, vicar, or other.
+this results in different things for differnt roles, the default for no purpose is just a ding. also when a petition
+is signed by the players, a man hunt period is convened where you hunt the suspect and cuff them but be careful you
+could always lose the fight so travel in pairs or groups. there should also be a feature to pair up with NPCs at night
+to stay safe, it should be an added section in inspect."
+
+**The Constables.** A new class of figure, not seats (like the townsfolk of GDD 3.24), so they may talk (`living-world.md`
+1.1). Two per map (P), wearing a new figure look `constable` (beside `villager`; `gdd-map.md` 3.17). They work the
+Detective's way: they walk to clues, inspect them and verify their traits, at `law.speedMult` (P: 2) times a
+Detective's rate. They read only what the world shows (a clue, a sighting, a Notice), never a card.
+
+**The briefing.** `law.briefingAfterS` (owner: 30 s) after any clue is created, the Constables post a **briefing**: a
+public line on the police board and in every HUD log, "Constables' briefing: a footprint by the bakery door, a tall
+figure", naming the clue's kind, its scene and any trait they have verified by then. It names a look's traits, never a
+seat or a card, and a Forged clue is briefed like any other until someone verifies it as Forged.
+
+**The petition.** Any living, free human may open a petition at the police board or from the Case Board: pick one
+accused figure (by character, 4.3) and a charge (the crimes of 5). It lists the entries that support
+it. It opens a manhunt once signed by the opener and `petition.signaturesMin` (P: 1) other living, free humans within
+`petition.openS` (P: 60 s), else it lapses. It is not a vote (12, R3): nobody votes against anyone, the accused is
+never removed by it, and the verdict still comes from the evidence at the Tribunal. NPCs may sign, but a petition never
+waits for one.
+
+**The manhunt.** A world phase, not a pause, of `manhunt.durationS` (P: 120 s, a quarter of the day): the accused's
+figure is marked on every signer's map, and any seat may cuff it.
+
+- **Cuffing** is a hold of `law.cuffHoldS` (P: 3 s) next to the accused, stopped if the accused moves away or strikes.
+- **The accused can fight back.** Fists and weapons knock out (GDD 3.22); a knocked-out hunter is robbed by the rules of
+  lw9 (8). So "travel in pairs or groups": two hunters can cuff while one is struck. A Killer may use the Knife only
+  after dark, as always.
+- **The Constables join** every manhunt and cuff at their own rate. With no human left free to hunt, they finish it.
+- **When it ends.** On a cuff the accused is walked to the county jail and the Tribunal opens. If time runs out, the
+  case stays on the board and a new petition may open after `petition.cooldownS` (P: 120 s).
+
+**The bell now only gathers NPCs.** The bell no longer opens a meeting. Ringing it calls the NPC figures and seats in
+the scene to the square for a role's own purpose, and what it does depends on the ringer's card:
+
+| Ringer | What the gathering is for |
+|---|---|
+| Activist | The Public Unrest act: a crowd to rouse (Bible I.5 II) |
+| Vicar | A sermon: the gathered NPCs gain Faith toward conversion (2, the Vicar's Peaceful win) |
+| Zealot | Followers counted for the Following (2) |
+| Company Clerk | The rent round: debtors gather to pay (`emergent-play.md` T7) |
+| Anyone else | A ding, and nothing more |
+
+The effect is the ringer's own, so watching who answers the bell tells nothing of the ringer's card that the effect does
+not show; a cover role who rings gets the ding (the worn card's purpose is a power, and a look is not a power, 4.1).
+
+**Pairing up at night (inspect).** The inspect panel (GDD 3.4 "Inspect") gains a section, **Walk with me**, on every
+figure, human or NPC, seat or townsperson. A request pairs the two until dawn: the partner follows within 2 tiles, and
+a pair counts as "not alone" for the Killer's and the NPC's alone-kill rules. A human answers it; an NPC answers after a
+delay drawn like a human's, and may refuse (12, R6). A pair is no shield against a partner who is the Killer.
 
 ## 4. Disguises
 
@@ -226,7 +371,8 @@ Today a cover role picks among the undealt cards and may wear a dealt one, which
 pick"; `deck.ts:50`). World mode keeps the mechanism and changes what is offered:
 
 - **What is offered.** On the role card, the Killer's picker lists every card the deal gave an NPC (1.4 step 6),
-  apart from two kinds: its vendetta's partners and the Detective, which are human, and the Accomplice and the Drifter.
+  apart from two kinds: its vendetta's partners, which are human, and the Accomplice and the Drifter (owner answer WM2: the
+  Detective is no longer reserved for a human).
   The first hint is the deal's next undealt-order card, as `coverHints` picks it today.
 - **Withdrawing the NPC.** The picked card is withdrawn: no NPC seat is created for it (1.4 step 8). So no two
   figures ever share a look, and the "counter-claim" duplicate of GDD 3.17 cannot happen.
@@ -279,9 +425,10 @@ small badge on the Killer's own HUD shows the look everyone else sees.
 GDD 3.17 says "You see yourself in the borrowed look"; this replaces it. Impersonate (GDD 3.17) keeps working on top
 of the worn look, and the Killer's own screen still shows the true look, with the badge showing the borrowed face.
 
-**The lore's Hitman.** The Hitman is dealt at the start, which departs from the lore: "nobody starts as the Hitman"
-(Codex, Contract), where the mail turns a townsman into one. The owner's rule that a human always holds the Killer
-wins over that. The lore's version survives as the Postmaster's Handler road (2).
+**The lore's Hitman (owner answers WM9, WM10).** The Hitman is no longer dealt at the start. He is mailed to a townsman
+between days 3 and 5 (1.5), which is the lore's own version: "nobody starts as the Hitman" (Codex, Contract). The
+turned seat's true look becomes `hitman` on its own screen from the delivery, and its public look stays its card's.
+The Postmaster's Handler road (2) still shares the Hitman's win.
 
 ### 4.5 How this fits the secrecy rules
 
@@ -318,14 +465,57 @@ score uses only what the Case Board already knows (GDD 3.4):
 - **An exclusion** is a Verified entry that rules the accused out. Forged entries count for nothing.
 - **Doubted entries** (the Zealot's consequence above) count for nothing.
 
-| Score | Verdict (Bible I.6) | Effect |
-|---|---|---|
-| Any exclusion, or fewer than 2 matches | Acquittal | The accused walks, with 30 s of protection from arrest |
-| 2 matches | Heavy Fine | Strips the purse and confiscates weapons. A Killer's vendetta checklist resets |
-| 3 matches or more, or the suspect set is exactly the accused (GDD 3.4) | Death | The accused is hanged and dies for good |
+**The sentence depends on the crime (owner answer WM11).** The owner, verbatim: "death is crime dependent, kill=death,
+conspiring with killer = fine + demotion from gained role + jail (only applies for minion types, brute types, and
+extortionist types not religious types like cultist or priest). continue this logic for the rest of the crimes, rumors
+turned to a case = fine, etc". So the score decides only whether the charge is **proven**; the charge decides the
+sentence.
 
-The thresholds would be new `balance.json` keys: `trial.fineAt` 2 and `trial.deathAt` 3. A Doubted or Forged entry
-never counts, so the Accomplice's plants (GDD 3.2) work only until the Detective inspects them, as today.
+| Score | Finding |
+|---|---|
+| Any exclusion, or fewer than `trial.convictAt` (P: 2) matches | **Dismissed.** The accused walks, with `trial.acquittalGraceS` (30 s) of protection from a new petition |
+| `trial.convictAt` matches or more | **Proven**, for every charge but murder |
+| `trial.murderAt` (P: 3) matches or more, or the suspect set is exactly the accused (GDD 3.4) | **Proven**, murder too |
+
+A murder charge with 2 matches is proven as the lesser charge the petition named beside it, else dismissed.
+
+| Crime | Who can be charged | Sentence |
+|---|---|---|
+| Murder (a kill) | Anyone | **Death**: hanged, dies for good, the role shown (`phases.md` 4) |
+| Conspiring with the Killer | Minion, brute and extortionist types: the Accomplice, the Fence, the Handler, the Grave Robber, the Ration Tyrant, the Extortionist (a new `crimeType` tag on cards and evolutions) | **Fine** (the purse) + **demotion** (an evolved road returns to its base card; the Accomplice loses the Inherit right) + **jail** until the next dawn (5.1) |
+| Conspiring, religious types | The Zealot's followers (cultists) and a priest's road | Not the sentence above (owner). Proposed: **Defrocked**: Faith set to 0 and the chapel's services barred for the match. New question to the owner (12) |
+| Robbery and heist (the Bandit's acts, a mugging, a knockout robbery) | Anyone | **Jail** until the next dawn, and the goods go to the town chest (8; owner answer LW9). A Killer's vendetta checklist resets (Bible I.6) |
+| Assault (a knockout, no robbery) | Anyone | **Jail** until the next dawn |
+| Sabotage (the Activist's acts) | Anyone | **Fine** + **jail** until the next dawn; the checklist resets |
+| Theft (an owned shelf, `logic-table.md` 10) | Anyone | **Fine** of `trial.theftFineMult` (P: 2) times the goods' price, the goods returned |
+| Trespass (a picked lock, a broken door) | Anyone | **Fine** (`trial.trespassFine`, P: 4 Scrip) |
+| Rumour turned to a case (a Blackmail Notice that reached a petition) | Anyone | **Fine** (owner) |
+
+A fine takes what the purse holds and never the bank; a seat that cannot pay serves the shortfall in jail (P: until
+the next dawn). The keys would be new in `balance.json` `trial`. A Doubted or Forged entry never counts, so the
+Accomplice's plants (GDD 3.2) work only until someone verifies them, as today.
+
+**This is how NPCs and non-Killer roles reach jail, a fine or the gallows** (owner answer WM2): a petition may name
+any figure that is a seat, and the evidence and the crime decide the rest. A townsperson figure (GDD 3.24) is never a
+seat, so it is never charged.
+
+### 5.1 The county jail (owner-brief follow-up 2, owner answers LW9, LW10)
+
+A single-room cell scene that holds several seats at once, on a new prefix (`cj.`, ids appended to `SCENE_IDS`; GDD
+3.13), one per map region (P: one shared by HollowMere and BlackPine). A jailed seat:
+
+- is placed in the cell and cannot leave by any portal until its sentence ends at the next dawn's train (the release
+  is announced in the manifest, `phases.md` 2);
+- is not "active" for sleeping (7.3, owner answer NW1), and cannot sign petitions or hunt;
+- can talk to its cellmates, and can play the **jail mini-games**, each once a day:
+
+| Mini-game | Kind reused (GDD 3.16) | Result |
+|---|---|---|
+| Hit the gym (the yard) | tap | Win: Strength up for the match (P: fists and weapons +2 damage). Lose: nothing |
+| Yard fight (owner answer LW10) | crates | Win: a small purse from the loser's stake (P: 2 Scrip from the jail pot). Lose: max health −10 for the rest of the match (the replacement for the scene the owner's brief named) |
+| Scrub the cells | pour | A Scrip of wage, and one hour (P: a tenth of a day) off the sentence |
+
+A Killer in jail is out of play for the night, which the Killer feels: it cannot strike from a cell.
 
 ## 6. The train brings back the day's dead
 
@@ -338,7 +528,8 @@ night, the Final Night) is for good. Why:
 - the vendettas that need a death (the Vicar, the Baron, the mark) still mean something;
 - the Vicar's martyrdom stays possible.
 
-The other reading, "any death of that game day", would undo every kill each morning. That is open question 5.
+The other reading, "any death of that game day", would undo every kill each morning. The owner kept daylight only
+(owner answer WM5: default). The one exception is Paint The Town Red, where every NPC death returns (1.6; 12, R4).
 
 **What kills by day**, once effects no longer kill (7):
 
@@ -359,7 +550,27 @@ Nightshade resolves when the night ends (GDD 3.2), so its death counts as after 
 | Purse | Dropped with the body | Comes back empty, so the coins are a find for whoever reaches the body |
 | Health, stamina, effects | none | Arrives at a proposed `respawn.hp` of 50, with no effects and full stamina |
 | Cooldowns | Frozen | Resume where they stood |
+| Debt (owner answer WM1) | none | Arrives **Owing the line** (below): the fare is a debt, and the seat's trade suffers until it is paid |
 | View | The **On the line** screen (`phases.md` 6): a dark carriage and the time to the train. No ghost view, no roles, no ghost chat | The world, at the platform |
+
+**A death hurts the town, and the returner comes back in debt (owner answer WM1, third follow-up).** The owner, in
+chat: "the gameplay isn't dependent on the killer the kill is the variable that starts the games downward spiral",
+and in the questionnaire: "it doesn't have enough of a repercussion, players when they die and come back are indebted,
+this causes there prices to rise, stock to be lower than normal and more." So a death costs the town twice:
+
+1. **While the seat is gone**, its role's town work stops: the "what breaks when I'm gone" row of every role
+   (`round10-plan.md` 5). The Baker gone means no bread; the Lamplighter gone means the streets go dark sooner and
+   creatures come closer; the Doctor gone means wounds stop healing; the Vicar gone means Faith dries up.
+2. **After the train**, the seat is **Owing the line**: it owes the fare, `respawn.fareDebt` (P: 6 Scrip, one rent),
+   to the Company Clerk, and every death adds another fare. Until the debt is paid:
+   - its role's goods and services cost `respawn.priceMult` (P: 1.5) times as much, from its stall or its hands;
+   - its stock restocks at `respawn.stockMult` (P: 0.5) of normal, and its daily output (bread, lamp oil, cures) is cut
+     by the same factor;
+   - its own wages and sales pay `respawn.wageMult` (P: 0.5), the "and more" (the Company takes its cut);
+   - the debt is paid like rent (Scrip or labour, `emergent-play.md` T1, T2) and the Clerk collects it from the purse.
+
+   An NPC seat owes the line like a human, so a dead NPC Baker's dear, thin bread is the town's lasting cost. Owing the
+   line is not the rent's **Indebted** status and brings no curfew by itself (12, R7).
 
 **Why there is no ghost view while on the line.** Today a ghost sees every role and reads the ghost and Cabal
 channels (GDD 3.7, GDD 2 step 9). A seat that comes back must not have seen any of that. So a seat on the line gets
@@ -377,7 +588,8 @@ nothing from the world; only a death after dark makes a ghost.
 | The Ascended Vicar | The next match's candidate (GDD 3.20) | Unchanged. The lore's Ascended Vicar "steps off the morning train" (Bible I.5 I), which this rule now matches |
 | Win counts | Parity counts the living (`Win.ts:16-23`) | There is no parity (2). The Vicar's "every living seat" and any count of the living leave out seats on the line until they arrive |
 | Vendettas | A vendetta ends when its seat dies (GDD 3.20) | It ends only on a death after dark. A Hitman's mark killed by a creature by day returns, and the contract stays open. Today it "lapses unpaid" (`contract.ts:113`) |
-| Inherit | The Accomplice takes the Knife when the last Killer dies (GDD 3.2) | Only on a death after dark, and only a human Accomplice inherits. Otherwise the human-Killer rule would break (open question 1) |
+| Inherit | The Accomplice takes the Knife when the last Killer dies (GDD 3.2) | Only on a death after dark, and only a human Accomplice inherits. Otherwise the human-Killer rule would break (open question 1). A Hitman's death never passes the Knife: he is an arrival, not the dealt Killer |
+| Prices and stock | Fixed per shop (`economy.json`) | Owing the line moves the returner's own prices and stock (above, owner answer WM1) |
 
 ## 7. Pacing
 
@@ -410,7 +622,7 @@ Each value is listed old against proposed. Keys that do not change are grouped a
 | `byCount.10.globalKillLockS` | 15 | 45 | N | |
 | `byCount.*.tasksEach` | 3 / 3 / 4 / 4 / 4 / 4 / 5 | 12 / 12 / 16 / 16 / 16 / 16 / 20 | D | Keyed by humans in world mode |
 | `byCount.*.cabalWin` | the parity rule | removed | none | No parity (2) |
-| `finalNight.afterCycle` | 5 | 5 | K | About 70 min of world time. See open question 6 |
+| `finalNight.afterCycle` | 5 | 5 | K | About 70 min of world time (owner answer WM6: keep 5 cycles) |
 | `finalNight.huntS` | 45 | 135 | N | |
 | `finalNight.killCooldownS` | 20 | 60 | N | |
 | `finalNight.trialS` | 120 | 120 | K | Now the end trial's discussion |
@@ -420,7 +632,7 @@ Each value is listed old against proposed. Keys that do not change are grouped a
 | `snowball.killCooldownPenaltyS` | 10 | 30 | N | |
 | `snowball.lastKillerCooldownDeltaS` | -5 | -15 | N | |
 | `body.famishedAfterS` | 480 | 1680 | C | About 2 cycles, as today |
-| `tasks.martyrS` | 600 | 2100 | C | The owner's "10 minutes". See open question 7 |
+| `tasks.martyrS` | 600 | 2100 | C | The owner's "10 minutes", stretched (owner answer WM7: default) |
 | `train.arriveAtS` | 5 | 20 | D | |
 | `train.deliveryAfterS` | 8 | 32 | D | |
 | `vendettas.conversion.shareS` | 45 | 160 | C | Shared time counts in every world phase |
@@ -457,6 +669,12 @@ Each value is listed old against proposed. Keys that do not change are grouped a
 - clue decay in `clues.json` (footprints 90 s: C; "1 cycle" stays as written);
 - creature spawns in `mobs.json` and resource respawns in `resources.json` (owned by 9C).
 
+**New keys the owner answers add** (all proposals, each owned by the section named): `hitman.byHumans.*` (1.5),
+`paintTown.winUnique` (1.6), `law.speedMult`, `law.briefingAfterS` 30 (owner), `law.cuffHoldS`, `petition.*`,
+`manhunt.durationS` (3.1), `trial.convictAt`, `trial.murderAt`, `trial.theftFineMult`, `trial.trespassFine` (5),
+`jail.*` (5.1), `respawn.fareDebt`, `respawn.priceMult`, `respawn.stockMult`, `respawn.wageMult` (6) and `sleep.*`
+(7.3). They replace the round-9 `trial.fineAt` and `trial.deathAt`.
+
 ### 7.2 What the numbers do
 
 | Measure | Today | Proposed |
@@ -466,6 +684,26 @@ Each value is listed old against proposed. Keys that do not change are grouped a
 | Strikes per Killer per night at the 6-7 row | 3 (110 / 35) | 3 (330 / 105) |
 | Match, 5 cycles plus the Final Night, without pauses | about 20 min | about 70 min |
 | Day vs night | 120 / 100 | 480 / 300 |
+
+### 7.3 Sleeping skips the night (owner-brief follow-up 2, owner answers NW1, NW2, EP3)
+
+The owner, verbatim: "I'd also like to add sleeping in your bed, when all active players do this the game skips
+night."
+
+- **A bed is a hold.** Every role's home has a bed (a new `bed` prop kind at each home's existing bed dressing, no id
+  renamed). Holding the action key at your own bed after dusk starts **asleep**: the screen dims, the world's sound
+  drops, and any move or a hit wakes you.
+- **Who counts.** Only active players: living, free and connected humans (owner answer NW1). Ghosts, seats on the line
+  (6), seats in jail (5.1) and disconnected seats are left out. NPCs never count and never hold the night open
+  (second follow-up: "the game should never have to wait on NPCs").
+- **The skip.** When every active player is asleep for `sleep.confirmS` (P: 3 s), the night ends as a normal dawn
+  does (owner answer NW2): the Knife's window, night creature spawns and night tasks end early, and the morning train
+  comes. A human Killer who stays awake is not in bed, so the night cannot skip while he is up (NW2).
+- **Asleep is vulnerable.** A sleeper is alone for the alone-kill rules unless paired (3.1), and a strike or a bite
+  wakes it after the damage lands.
+- **No bed, no skip.** A boarded-up house (rent, owner answer EP3) has no bed. A seat without one may sleep on a
+  chapel cot (free) or rent a tavern bed (P: 2 Scrip); a seat with neither cannot sleep and so holds the night open,
+  which is the price of the debt. The cot and the tavern bed are a proposal and a new question (12).
 
 ## 8. Effects that do not kill
 
@@ -486,11 +724,29 @@ whatever the health").
 |---|---|---|
 | Bleeding | 1.5 per second; death at zero, cause `bled` | 1.5 per second; stops at 1 health; never a death |
 | Poisoned | 0.5 per second; death at zero, cause `sickened` | 0.5 per second; stops at 1 health; never a death |
-| Wolf bite | 25 | Kills only on the bite that takes the last health. Damage per 9C (`living-world.md`); 9A suggests 15 |
-| Boar bite | 18 | As above; 9A suggests 10 |
-| Bat bite | 6 | As above; 9A suggests 4 |
-| Rat bite | 5 | As above; 9A suggests 3 |
-| Fists, mugging, slingshot | knockout at zero | Unchanged |
+| Wolf bite | 25 | 12. Kills only on the bite that takes the last health (owner answer LW11: default; `living-world.md` 6.1) |
+| Boar bite | 18 | 9, as above |
+| Bat bite | 6 | 3, as above |
+| Rat bite | 5 | 2, as above |
+| Fists, mugging, slingshot, weapons | knockout at zero | Knockout at zero, and never a death. A knockout by a seat can be reported as assault; the attacker may rob the victim of everything it carries except role-bound kit (owner answer LW9; 12, R1, R14) |
+
+**No seat kills a seat, except the Killer (owner-brief follow-up 2, owner answer LW9).** The owner, verbatim: "beating
+someone till knock can get you reported, other player doesnt die just loses all there stuff, if the abuser gets caught
+the victim can get their stuff back from the town chest, but hurry up other players can get to it first if they know
+about it". So:
+
+- **The knockout.** Fists or a weapon take a seat to 0 and it is knocked out (`body.koS`, GDD 3.22), as today. It never
+  dies of it.
+- **The robbery.** The attacker may then hold over the victim (P: 3 s) to take everything in its pack, belt and purse.
+  The victim's armour, its bound kit (the Knife, the Fowling Piece, the Magnifier and every `roleBound` item) and its
+  bank are never taken (12, R14).
+- **The report.** The victim, or any witness, can petition against the attacker on a charge of assault, or robbery when
+  goods were taken (3.1, 5). The victim's own sighting is a Verified entry.
+- **The town chest.** If the attacker is convicted, the stolen goods it still carries go into the town chest, the hub's
+  lost-and-found (`logic-table.md` 6.4, owner answer LT3). The verdict card says so in public; the victim is told
+  privately. Anyone may take from the chest, first come, so the victim must hurry.
+- **Who dies at all.** Only the Killer's strike and a creature's bite take health to 0 as a death; Nightshade, the Last
+  Shot and a death sentence kill outright as before.
 
 Where it changes in the code:
 
@@ -511,6 +767,17 @@ triggering the action".
 at fixed beats, and the player plays through them and triggers them. These are the ensemble arcs of Bible V.1: the
 Baker's Fence or Ration Tyrant path, the Postmaster's, the Undertaker's and so on.
 
+**One player, several roles (third follow-up, owner answer WM1B).** The owner: "a story mode would have you completing
+multiple roles thematically through a single game including the killer". So a story is one match in several
+**chapters**, and the player's seat moves to a new role at each chapter break, at set story points, the Killer among
+them. Each role's part is a short thematic chapter. At a break:
+
+- the chapter card (`phases.md` 8) closes the old role and opens the new one;
+- the old role's seat is handed to the NPC brain, which carries on its routine from where the player left it;
+- the new role's seat is handed to the player, with its own Private view; nothing of the old role's private view
+  carries over except what the story's beats hand on (a letter, a lead);
+- the Killer's chapter shows the true look on the player's screen (4.4), as in multiplayer.
+
 **What it builds on** (`apps/server/src/sim/auto/Auto.ts`, GDD 3.19):
 
 | The harness gives | Where | Story mode needs |
@@ -525,13 +792,14 @@ Baker's Fence or Ration Tyrant path, the Postmaster's, the Undertaker's and so o
 
 | Piece | What |
 |---|---|
-| `story.json` (new content) | The chapters. For each: map, the player's card, the Killer's vendetta (held by an NPC: open question 1), the seed words, and the **beats**, each a trigger (a `SimEvent` pattern on the bus, `sim/events/bus.ts`) and an action (a cutscene, a line, a quest step, an NPC order) |
+| `story.json` (new content) | The chapters. For each: map, the player's card for that chapter (several per story, WM1B), the Killer's vendetta (held by an NPC outside the Killer's own chapter), the seed words, and the **beats**, each a trigger (a `SimEvent` pattern on the bus, `sim/events/bus.ts`) and an action (a cutscene, a line, a quest step, an NPC order) |
 | A beat runner | A Step stage that watches the bus for each beat's trigger and runs its action once. It writes nothing secret to a public field |
 | The menu entry | "Story" on the title screen. It opens the chapter list and starts a story room |
 | Chapter cards | `phases.md` 8 |
 
-**Scope for round 10.** One chapter on HollowMere, built from today's cards: the Baker's day, with the Bandit as the
-NPC Killer and the Fence road as the turn. The trades' chapters follow their cards.
+**Scope for round 10 (owner answer WM1B).** One story on HollowMere in three chapters, built from today's cards: the
+Baker's day, then the Watchman's night, then the Bandit's heist, with the Fence road as the turn. A seat handover at a
+chapter break is new harness work (a seat that changes controller mid-match). The trades' chapters follow their cards.
 
 ## 10. The art style is chosen in the menu only
 
@@ -558,7 +826,23 @@ The style is fixed from Start to game over. The pick stays per player and never 
 
 ## 11. Open questions for the owner
 
-Each has 9A's proposed default, which the docs assume until the owner answers.
+**All answered (owner, 2026-10-25; `owner-answers.md`).** The list below is kept as it was asked; the answers rule.
+
+| # | Question | Answer | Where it landed |
+|---|---|---|---|
+| 1 | Function with the Killer | The third follow-up and WM1: the world works without depending on the Killer, every death hurts the town, and a returner comes back indebted. The engine keeps the NPC Killer | 6, 1.5, `round10-plan.md` 5 |
+| 2 | The third human | WM2, different: the law is NPC Constables, with petitions and manhunts; the bell only gathers NPCs | 1.3, 3, 3.1 |
+| 3 | Two humans | WM3, different: Paint The Town Red | 1.6 |
+| 4 | Nameplates | WM4, default | 4.3 |
+| 5 | The train's "in the day" | WM5, default | 6 |
+| 6 | Match length | WM6, default: 5 cycles | 7.1 |
+| 7 | The martyr's ten minutes | WM7, default: stretched | 7.1 |
+| 8 | The trades | WM8, default: interim partners | 1.3 |
+| 9 | One Killer | WM9, different: the Hitman may arrive on days 3 to 5 | 1.2, 1.5 |
+| 10 | The Hitman at the start | WM10, different: never dealt; human by party size | 1.5, 4.4 |
+| 11 | Verdict thresholds | WM11, different: the sentence depends on the crime | 5, 5.1 |
+
+Each had 9A's proposed default:
 
 1. **"The game should also technically be able to function with the killer (even though it never will)."** Does this
    mean (a) a match must work with no Killer at all, or (b) the engine must allow an NPC Killer?
@@ -588,3 +872,47 @@ Each has 9A's proposed default, which the docs assume until the owner answers.
     road.
 11. **Verdict thresholds.** Is a death sentence at 3 matching Verified entries, a fine at 2, and acquittal below that
     right (5)? Default: yes, tuned on playtests.
+
+## 12. Reconciled
+
+Where an owner answer met another rule, this is how the design settles it. Each item is marked where it applies.
+
+- **R1. Player kills and the jail (LW9 against follow-up 2).** Follow-up 2 said a player-on-player killing ends in a
+  day in the county jail; LW9 then said nobody dies of a beating. Settled: no seat kills another, except the Killer's
+  strike. A beating knocks out and may rob; assault and robbery are crimes whose sentence is jail until the next dawn
+  (5, 5.1, 8). The 9A rule "only the Killer's strike and a creature's bite kill" stands, and LW9's options (a) and (b)
+  both retire.
+- **R2. The bell (WM2 against the Inquest and the Tribunal).** The bell opened meetings and, in 9A, the Tribunal. Now an
+  Inquest opens only on a reported body, and a Tribunal opens when a cuffed suspect reaches the county jail. The bell
+  gathers NPCs for the ringer's own purpose, else it dings (3.1; `phases.md` 3, 4).
+- **R3. The petition against "voting has got to go".** A petition is a signature threshold to start a manhunt. Nobody
+  votes on guilt, nobody is removed by it, and the evidence alone decides the verdict at the Tribunal. A petition never
+  waits on an NPC. In Paint The Town Red, with no human on the town side, the Constables open their own petitions on a
+  briefing that fits one figure (3.1, 1.6).
+- **R4. Paint The Town Red against one Killer, the human-Killer rule and WM5.** Two humans are both Killers (an
+  exception to 1.2). Both are human, so the human-Killer rule holds. "Each kill counts towards the win even if they come
+  back" needs NPCs to return after a night death, so in this mode every NPC death returns on the morning train, while
+  the Killers' own deaths after dark are for good.
+- **R5. The Hitman's arrival against "a human always holds the Killer".** The rule binds the dealt Killer. The Hitman
+  is an arrival, mailed to a townsman, and may be an NPC by the owner's own table (WM10). He never inherits or passes
+  the Knife.
+- **R6. Pairing up with NPCs (WM2) against "NPC seats never talk" (`living-world.md` 1.1).** Walk with me is in the
+  inspect panel of every figure, human, NPC seat or townsperson, and every answer, yes or no, comes after a delay drawn
+  from the same distribution. So a pairing answer tells nothing about who is a person.
+- **R7. Owing the line (WM1) against the rent's Indebted.** Indebted is the rent's status and carries the curfew. Owing
+  the line is a second debt in the same ledger with its own effects on prices, stock and wages, and no curfew of its
+  own. A seat that owes both has both.
+- **R10. The verdict (WM11) against 9A's thresholds.** The score says whether a charge is proven; the crime sets the
+  sentence. Murder keeps the higher bar of 3 matches, so the old `trial.deathAt` 3 lives on as `trial.murderAt`.
+- **R11. Sleeping against the Killer, the jail and rent.** A human Killer awake holds the night open (NW2); jailed seats
+  and seats on the line do not count (NW1); a boarded-up house has no bed (EP3), so a homeless seat sleeps on a chapel
+  cot or a tavern bed, or holds the night open (7.3).
+- **R14. Robbery against role secrecy.** "Loses all there stuff" cannot include role kit: a robbed Knife would name the
+  Killer. Bound kit, armour and the bank stay with the victim; everything else in its pack, belt and purse can be taken
+  (8).
+- **R16. The Hitman's dormant role against role secrecy.** The economy shift is world state that anyone sees by
+  walking to the houses (a cold oven, an empty stall). No field, toast or list ever names the turned seat or says that a
+  Hitman is active beyond the public signs (1.5).
+
+R8, R9, R12, R13 and R15 are in `logic-table.md`, `living-world.md` and `emergent-play.md`. The full list is in
+`gdd-map.md` 4.
