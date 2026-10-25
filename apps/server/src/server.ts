@@ -2,6 +2,7 @@ import { defineRoom, defineServer } from 'colyseus';
 import { BUILD_VERSION } from '@wdi/shared';
 import { AdminRoom } from './rooms/AdminRoom';
 import { PartyRoom } from './rooms/PartyRoom';
+import { StudioRoom } from './rooms/StudioRoom';
 import { adminConfig, installAdminAuth } from './services/adminAuth';
 import {
   type GuardLimits,
@@ -20,12 +21,13 @@ export function createServer(limits: Partial<GuardLimits> = {}) {
   installCors();
   installMatchmakeGuard(limits);
   // Round 6 (docs/round6/auto-admin.md 7, Session 6C): the owner's admin room and its GitHub-login routes exist only
-  // when every WDI_ADMIN_* variable is set; `adminConfig` is null otherwise and nothing below registers them.
+  // when every WDI_ADMIN_* variable is set; `adminConfig` is null otherwise and nothing below registers them. Round 9
+  // (docs/round9/admin-studio.md 1): the Studio room sits behind the same gate.
   const admin = adminConfig();
   return defineServer({
     greet: false,
     rooms: admin
-      ? { party: defineRoom(PartyRoom), admin: defineRoom(AdminRoom) }
+      ? { party: defineRoom(PartyRoom), admin: defineRoom(AdminRoom), studio: defineRoom(StudioRoom) }
       : { party: defineRoom(PartyRoom) },
     express: (app) => {
       if (admin) installAdminAuth(app, admin);

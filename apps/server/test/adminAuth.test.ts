@@ -273,6 +273,20 @@ describe('the registration gate (server.ts)', () => {
     expect(err).toEqual({ code: JOIN_ERROR_CODE, message: JOIN_ERROR_MESSAGE });
   });
 
+  // Round 9 (docs/round9/admin-studio.md 1): the Studio room sits behind the same gate.
+  it('has no studio room without the variables, even for a good token', async () => {
+    const token = signAdminToken(cfg, {
+      sub: 'owner-login',
+      id: 1,
+      exp: Math.floor(Date.now() / 1000) + 600,
+    });
+    const err = await colyseus.sdk
+      .create('studio', { build: BUILD_VERSION, token })
+      .then(() => null)
+      .catch((e: { code?: number; message?: string }) => ({ code: e.code, message: e.message }));
+    expect(err).toEqual({ code: JOIN_ERROR_CODE, message: JOIN_ERROR_MESSAGE });
+  });
+
   it('has no login routes without the variables', async () => {
     for (const path of ['/auth/github/login', '/auth/github/callback?code=x&state=y']) {
       const res = await fetch(`http://localhost:2568${path}`, { redirect: 'manual' });
