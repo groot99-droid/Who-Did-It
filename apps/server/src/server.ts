@@ -4,6 +4,8 @@ import { AdminRoom } from './rooms/AdminRoom';
 import { PartyRoom } from './rooms/PartyRoom';
 import { StudioRoom } from './rooms/StudioRoom';
 import { adminConfig, installAdminAuth } from './services/adminAuth';
+import { createGitHub, githubToken } from './services/github';
+import { installStudioRoutes } from './services/studioRoutes';
 import {
   type GuardLimits,
   allowRoute,
@@ -30,7 +32,12 @@ export function createServer(limits: Partial<GuardLimits> = {}) {
       ? { party: defineRoom(PartyRoom), admin: defineRoom(AdminRoom), studio: defineRoom(StudioRoom) }
       : { party: defineRoom(PartyRoom) },
     express: (app) => {
-      if (admin) installAdminAuth(app, admin);
+      if (admin) {
+        installAdminAuth(app, admin);
+        // Round 9 (docs/round9/admin-studio.md 5): without WDI_ADMIN_GITHUB_TOKEN the routes answer the NFY line.
+        const token = githubToken();
+        installStudioRoutes(app, admin, { github: token === null ? null : createGitHub(token) });
+      }
       // One proxy hop on Render and Railway. This only affects Express's `req.ip`; the matchmake bucket
       // derives the caller address itself (`clientIp` in matchmakeGuard.ts).
       app.set('trust proxy', 1);
