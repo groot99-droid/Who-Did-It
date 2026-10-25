@@ -124,6 +124,12 @@ describe('with the admin variables set', () => {
     expect(await until(() => got.last?.items.length === 1, 3000)).toBe(true);
     expect(got.last).toMatchObject({ time: { phase: 'night' } });
     expect(got.last?.spawns.map((s) => s.ref)).toEqual(['wolf']);
+    // S4: the row is live, with its feet, facing and state.
+    expect(got.last?.spawns[0]).toMatchObject({
+      kind: 'mob',
+      px: expect.any(Number),
+      state: expect.any(String),
+    });
     expect(got.errors).toEqual([]);
     await client.leave();
   });
