@@ -9,6 +9,9 @@ import { connectStudio, type StudioLink } from '../admin/StudioNet';
 import { BUILD_VERSION } from '../health';
 import { mountControls } from '../studio/Controls';
 import { createMockStudio, mockReportApi } from '../studio/mockStudio';
+import { EditorView } from '../studio/editor/EditorView';
+import { mountEditorPanel } from '../studio/editor/EditorPanel';
+import { EditorSession } from '../studio/editor/session';
 import { mountInbox } from '../studio/InboxPanel';
 import { mountReportPanel } from '../studio/ReportPanel';
 import { createReportApi, type ReportApi } from '../studio/reportApi';
@@ -80,6 +83,7 @@ export class Studio extends Phaser.Scene {
   };
   private api: ReportApi | null = null;
   private dialog: Screen | null = null;
+  private editor: { session: EditorSession; view: EditorView; panel: Screen } | null = null;
   private moveSeq = 0;
   private lastMove = '';
   private moveTimer: number | null = null;
@@ -144,6 +148,7 @@ export class Studio extends Phaser.Scene {
         onStyle: (id) => void requestArtStyle(id),
         onReport: () => void this.openReport(),
         onInbox: () => this.openInbox(),
+        onEdit: () => this.toggleEdit(),
       }),
     );
     this.startInput();
@@ -175,6 +180,30 @@ export class Studio extends Phaser.Scene {
       send: (req) => api.send(req),
       onClose: () => this.closeDialog(),
     });
+  }
+
+  /** Edit on: the sim pauses, the camera is the owner's to pan, the scene's objects are drawn and editable. */
+  private toggleEdit(): void {
+    if (this.editor !== null) return this.stopEdit();
+    const snap = this.store.snapshot;
+    if (snap === null || this.link === null || this.map === null) return;
+    this.link.send('studio.clock', { paused: true });
+    const session = new EditorSession(snap.sceneId);
+    this.editor = {
+      session,
+      view: new EditorView(this, session),
+      panel: mountEditorPanel(overlayRoot(), session),
+    };
+    this.cameras.main.stopFollow();
+    this.store.setEditing(true);
+  }
+
+  private stopEdit(): void {
+    this.editor?.view.destroy();
+    this.editor?.panel.destroy();
+    this.editor = null;
+    this.link?.send('studio.clock', { paused: false });
+    this.store.setEditing(false);
   }
 
   private openInbox(): void {
@@ -217,7 +246,7 @@ export class Studio extends Phaser.Scene {
   }
 
   private sendMove(): void {
-    if (this.link === null) return;
+    if (this.link === null || this.editor !== null) return;
     const m = moveOf(this.pressed);
     const { send, sig } = moveToSend(m, this.lastMove);
     if (!send) return;
@@ -270,6 +299,7 @@ export class Studio extends Phaser.Scene {
   }
 
   private dropWorld(): void {
+    if (this.editor !== null) this.stopEdit();
     this.overlay?.destroy();
     this.overlay = null;
     this.entities?.destroy();
@@ -295,9 +325,17 @@ export class Studio extends Phaser.Scene {
     }
     const cam = this.cameras.main;
     const obj = this.entities.objectOf(FIGURE_ID);
-    if (obj) cam.startFollow(obj, true, 0.15, 0.15);
+    if (this.editor !== null) this.panCamera(cam);
+    else if (obj) cam.startFollow(obj, true, 0.15, 0.15);
     this.overlay?.update(this.store.overlays, snap, this.mouse);
     this.statics.update(null, this.game.loop.delta / 1000, cam.worldView);
+  }
+
+  /** The arrows and WASD scroll the camera while editing, since the figure stands still. */
+  private panCamera(cam: Phaser.Cameras.Scene2D.Camera): void {
+    const m = moveOf(this.pressed);
+    cam.scrollX += m.dx * 8;
+    cam.scrollY += m.dy * 8;
   }
 
   private drawMarkers(list: ReadonlyArray<{ label: string; x: number; y: number }>): void {
