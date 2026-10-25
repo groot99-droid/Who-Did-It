@@ -49,9 +49,7 @@ describe('checkNpcDraft', () => {
     expect(npc.routines.townsfolk.porter?.stations).toEqual(['pump']);
     expect(npc.quests).toBe(content.quests);
     expect(npc.looks).toBe(content.looks);
-    expect(checkNpcDraft({ quests: raw('quests.json'), looks: raw('looks.json') }).routines).toBe(
-      content.routines,
-    );
+    expect(checkNpcDraft({ quests: raw('quests.json') }).routines).toBe(content.routines);
   });
 
   it('refuses nothing sent, unknown keys, and a broken reference', () => {
@@ -64,7 +62,7 @@ describe('checkNpcDraft', () => {
       }
       return '';
     };
-    expect(refused({})).toBe('send routines, quests or looks');
+    expect(refused({})).toBe('send routines or quests');
     const deep = withPorter();
     deep.townsfolk.porter.colour = 'red';
     expect(refused({ routines: deep })).toMatch(/routines.json townsfolk.porter.*colour/);
@@ -91,6 +89,14 @@ describe('POST /studio/npc-draft', () => {
       body: { roomId: 'r', routines: { ...withPorter(), extra: 1 } },
     });
     expect(bad.status).toBe(422);
+    const looks = await call('POST', '/studio/npc-draft', {
+      auth: bearer(),
+      body: { roomId: 'r', routines: withPorter(), looks: raw('looks.json') },
+    });
+    expect(looks).toMatchObject({
+      status: 422,
+      body: { error: expect.stringContaining('looks.json is not edited') },
+    });
     expect(
       (await call('POST', '/studio/npc-draft', { auth: bearer(), body: { roomId: 'a/b' } })).status,
     ).toBe(422);

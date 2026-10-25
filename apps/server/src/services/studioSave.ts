@@ -1,6 +1,5 @@
 import {
   LoreFile,
-  LooksFile,
   QuestsFile,
   RoutinesFile,
   SCENE_IDS,
@@ -158,7 +157,7 @@ export function unknownKeys(raw: unknown, parsed: unknown, path: string[]): stri
 
 /**
  * The data files a save may write besides scenes (admin-studio.md 8, N1), each with its key in `Content` and its
- * schema. `looks.json` is not saved from the Studio; the NPC draft may preview it (`checkNpcDraft`).
+ * schema. `looks.json` is never edited from the Studio: which look a figure wears is its routines or quests entry.
  */
 const DATA_FILES = {
   'routines.json': { key: 'routines', schema: RoutinesFile },
@@ -169,7 +168,6 @@ const DATA_FILES = {
 const NPC_FILES = {
   routines: RoutinesFile,
   quests: QuestsFile,
-  looks: LooksFile,
 } as const;
 type NpcKey = keyof typeof NPC_FILES;
 
@@ -257,6 +255,7 @@ export function checkDataSave(
 export interface NpcData {
   routines: typeof content.routines;
   quests: typeof content.quests;
+  /** Always the committed looks: the draft never edits `looks.json` (6Z, admin-studio.md 8). */
   looks: typeof content.looks;
 }
 
@@ -269,7 +268,7 @@ export function checkNpcDraft(
   committed: typeof content = content,
 ): NpcData {
   const keys = (Object.keys(NPC_FILES) as NpcKey[]).filter((k) => body[k] !== undefined);
-  if (keys.length === 0) throw new SaveRefused(['send routines, quests or looks']);
+  if (keys.length === 0) throw new SaveRefused(['send routines or quests']);
   const out: NpcData = { routines: committed.routines, quests: committed.quests, looks: committed.looks };
   const problems: string[] = [];
   for (const k of keys) {

@@ -21,7 +21,7 @@ import { TokenBucket } from './TokenBucket';
  * `POST /studio/save` re-checks an edited scene (`studioSave.ts`) and opens a draft PR with it and its nav.
  * Since N1 (admin-studio.md 8) it also takes `{ file, json }` for the data files of the allowlist (`studioSave.ts`).
  * `POST /studio/draft` runs the same checks and hands the scene to the owner's Studio room to walk, unsaved;
- * `POST /studio/npc-draft` does the same for edited NPC data (routines, quests, looks).
+ * `POST /studio/npc-draft` does the same for edited NPC data (routines and quests; `looks.json` is never edited).
  * Registered only beside the admin gate (`server.ts`); each checks the admin bearer token before anything else and
  * is rate limited. Without `WDI_ADMIN_GITHUB_TOKEN` (`github` null) they answer 503 with the NFY line, and the rest
  * of the Studio still works. The server keeps nothing: the screenshot and the issue live on GitHub.
@@ -380,7 +380,9 @@ export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: St
         typeof body === 'object' && body !== null ? body : {}
       ) as Record<string, unknown>;
       if (typeof roomId !== 'string' || !/^[\w-]{1,64}$/.test(roomId)) throw new HttpError(422, 'bad body');
-      const npc = checkNpcDraft({ routines, quests, looks });
+      if (looks !== undefined)
+        throw new SaveRefused(["looks.json is not edited: a figure's look is its routines or quests entry"]);
+      const npc = checkNpcDraft({ routines, quests });
       const sent = deps.npcDrafts?.(roomId, npc) ?? 'no room';
       if (sent === 'no room') throw new HttpError(404, 'not found');
       if (sent === 'busy') throw new HttpError(429, 'busy');
