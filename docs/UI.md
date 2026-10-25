@@ -1597,3 +1597,26 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.inbox.open` | Open | the Studio page |
 | `studio.inbox.answered` | Answered | the Studio page |
 | `studio.inbox.fixed` | Fixed | the Studio page |
+| `studio.edit` | Edit | the Studio editor |
+| `studio.edit.title` | Editor | the Studio editor |
+| `studio.edit.add` | Add | the Studio editor |
+| `studio.edit.select` | Select and move | the Studio editor |
+| `studio.edit.name` | Name for the new object | the Studio editor |
+| `studio.edit.kind.props` | Props | the Studio editor |
+| `studio.edit.kind.portals` | Portals | the Studio editor |
+| `studio.edit.kind.spawns` | Spawns | the Studio editor |
+| `studio.edit.kind.spots` | Spots | the Studio editor |
+| `studio.edit.kind.lights` | Lights | the Studio editor |
+| `studio.edit.selected` | {kind} {id} at {x},{y} | the Studio editor |
+| `studio.edit.nothing` | Nothing selected | the Studio editor |
+| `studio.edit.duplicate` | Duplicate | the Studio editor |
+| `studio.edit.delete` | Delete | the Studio editor |
+| `studio.edit.undo` | Undo | the Studio editor |
+| `studio.edit.redo` | Redo | the Studio editor |
+| `studio.edit.radius` | Radius (tiles) | the Studio editor |
+| `studio.edit.to` | Leads to | the Studio editor |
+| `studio.edit.toSpawn` | Arrives at | the Studio editor |
+| `studio.edit.paired` | Other side: {id} | the Studio editor |
+| `studio.edit.unpaired` | No door on the other side yet | the Studio editor |
+| `studio.edit.diff` | Changes | the Studio editor |
+| `studio.edit.nodiff` | No changes | the Studio editor |

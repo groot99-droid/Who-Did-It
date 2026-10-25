@@ -17,9 +17,16 @@ export class StudioStore {
   readonly overlays = new Set<OverlayId>();
   /** The last refused command's message; it stays until the owner sends the next command. */
   refused = '';
+  /** The editor is open: the sim is paused and the view shows the scene's objects. */
+  editing = false;
 
   applySnapshot(s: StudioSnapshot): void {
     this.snapshot = s;
+    this.bus.emit('change', undefined);
+  }
+
+  setEditing(on: boolean): void {
+    this.editing = on;
     this.bus.emit('change', undefined);
   }
 
@@ -49,6 +56,7 @@ export class StudioStore {
     this.snapshot = null;
     this.log = [];
     this.refused = '';
+    this.editing = false;
     this.overlays.clear();
     this.bus.emit('change', undefined);
   }

@@ -21,6 +21,7 @@ export interface ControlDeps {
   onStyle: (id: string) => void;
   onReport: () => void;
   onInbox: () => void;
+  onEdit: () => void;
 }
 
 export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
@@ -71,6 +72,7 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
   const noclip = btn('studio-noclip', C['studio.noclip'], () =>
     send('studio.noclip', { on: !(store.snapshot?.noclip ?? false) }),
   );
+  const edit = btn('studio-edit', C['studio.edit'], d.onEdit);
   const phaseButtons = STUDIO_DAY_PHASES.map((phase: StudioDayPhase) =>
     btn(`studio-time-${phase}`, C[`studio.time.${phase}`], () => send('studio.time', { phase })),
   );
@@ -164,6 +166,7 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
     problem,
     group(C['studio.scene'], search, sceneList, spawnPick, go),
     noclip,
+    edit,
     group(C['studio.time'], ...phaseButtons, scrub),
     group(C['studio.speed'], ...scaleButtons, pause, step),
     group(C['studio.profile'], ...profileButtons),
@@ -185,6 +188,7 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
     const s = store.snapshot;
     status.textContent = statusOf(s, C['studio.status']);
     noclip.setAttribute('aria-pressed', String(s?.noclip ?? false));
+    edit.setAttribute('aria-pressed', String(store.editing));
     pause.textContent = s?.paused ? C['studio.resume'] : C['studio.pause'];
     scaleButtons.forEach((b, i) => b.setAttribute('aria-pressed', String(s?.scale === CLOCK_SCALES[i])));
     phaseButtons.forEach((b, i) =>
