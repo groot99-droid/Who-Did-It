@@ -68,6 +68,7 @@ export const STUDIO_COPY = {
   'studio.edit.kind.spawns': 'Spawns',
   'studio.edit.kind.spots': 'Spots',
   'studio.edit.kind.lights': 'Lights',
+  'studio.edit.kind.buildings': 'Buildings',
   'studio.edit.selected': '{kind} {id} at {x},{y}',
   'studio.edit.nothing': 'Nothing selected',
   'studio.edit.duplicate': 'Duplicate',

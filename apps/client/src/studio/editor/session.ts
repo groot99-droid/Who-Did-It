@@ -19,7 +19,8 @@ import { EditHistory } from './history';
 import { addGate, addPath, removeRoute, setGateProfile } from './routeEdit';
 import { pickAt } from './pick';
 import { needlesOf, portalsTo, referencesTo } from './references';
-import { duplicate, find, move, patch, place, remove, type Edit, type Kind, type Pick } from './sceneEdit';
+import { duplicateAny, moveAny, placeAny, removeAny } from './blockEdit';
+import { find, patch, type Edit, type Kind, type Pick } from './sceneEdit';
 import { templatesFor } from './templates';
 
 const content = scenes as unknown as Record<string, Scene>;
@@ -164,7 +165,7 @@ export class EditorSession {
     if (p === null) return this.select(pickAt(this.scene, tx, ty));
     const t = templatesFor(p.kind, this.scene.id).find((e) => e.label === p.label);
     if (t === undefined) return;
-    const made = place(this.scene, p.kind, this.name, tx, ty, t.fields);
+    const made = placeAny(this.scene, p.kind, this.name, tx, ty, t.fields);
     if (this.apply(made, undefined)) {
       this.selection = {
         kind: p.kind,
@@ -176,7 +177,7 @@ export class EditorSession {
   }
 
   moveSelected(tx: number, ty: number): void {
-    if (this.selection !== null) this.apply(move(this.scene, this.selection, tx, ty));
+    if (this.selection !== null) this.apply(moveAny(this.scene, this.selection, tx, ty));
   }
   patchSelected(fields: Record<string, unknown>): void {
     if (this.selection !== null) this.apply(patch(this.scene, this.selection, fields));
@@ -184,7 +185,7 @@ export class EditorSession {
   duplicateSelected(): void {
     const sel = this.selection;
     if (sel === null) return;
-    const copy = duplicate(this.scene, sel, this.name);
+    const copy = duplicateAny(this.scene, sel, this.name);
     if (this.apply(copy)) {
       this.selection = {
         kind: sel.kind,
@@ -204,7 +205,7 @@ export class EditorSession {
   removeSelected(): void {
     const sel = this.selection;
     if (sel === null) return;
-    if (this.apply(remove(this.scene, sel, this.base, this.refsOf(sel)))) this.selection = null;
+    if (this.apply(removeAny(this.scene, sel, this.base, this.refsOf(sel)))) this.selection = null;
     this.bus.emit('change', undefined);
   }
 

@@ -23,7 +23,7 @@ const inside = (scene: Scene, x: number, y: number) =>
   x >= 0 && y >= 0 && x < scene.size.w && y < scene.size.h;
 
 /** The material character a tile of the other class gets: the commonest one of its class in the scene's own rows. */
-function materialFor(scene: Scene, solid: boolean): string | null {
+export function materialFor(scene: Scene, solid: boolean): string | null {
   if (scene.material === undefined) return null;
   const count = new Map<string, number>();
   for (let y = 0; y < scene.size.h; y++)
@@ -107,8 +107,6 @@ export function cutBy(scene: Scene, w: number, h: number): string[] {
     }
   for (const g of scene.gates) if (g.x + g.w > w || g.y + g.h > h) out.push(g.id);
   for (const p of scene.paths) if (p.points.some((q) => q.x >= w || q.y >= h)) out.push(p.id);
-  for (const b of scene.buildings ?? [])
-    if (b.footprint.x + b.footprint.w > w || b.footprint.y + b.footprint.h > h) out.push(b.id);
   return out;
 }
 

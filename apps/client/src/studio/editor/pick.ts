@@ -16,7 +16,7 @@ const covers = (
 
 /** The object at a tile: a single-tile object before a footprint prop, lights last (they cover no tile but their own). */
 export function pickAt(scene: Scene, tx: number, ty: number): Pick | null {
-  const order = ['spawns', 'portals', 'spots', 'lights', 'props'] as const;
+  const order = ['spawns', 'portals', 'spots', 'lights', 'props', 'buildings'] as const;
   for (const kind of order) {
     const hit = listOf(scene, kind).find((o) => covers(o as never, tx, ty));
     if (hit !== undefined) return { kind, id: hit.id };
