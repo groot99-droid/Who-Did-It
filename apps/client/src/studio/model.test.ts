@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { SCENE_IDS } from '@wdi/content';
 import type { StudioSnapshot } from '../admin/StudioNet';
-import { filterIds, LOG_LINES, moveOf, spawnsOf, STUDIO_LISTS, statusOf, StudioStore } from './model';
+import { LOG_LINES, moveOf, StudioStore } from './model';
 
 const snap = (over: Partial<StudioSnapshot> = {}): StudioSnapshot => ({
   tick: 7,
@@ -53,26 +52,6 @@ describe('StudioStore', () => {
   });
 });
 
-describe('pickers', () => {
-  it('filters ids case-insensitively', () => {
-    expect(filterIds(['bakery', 'bp_camp', 'Barn'], 'BA')).toEqual(['bakery', 'Barn']);
-    expect(filterIds(['a', 'b'], '  ')).toEqual(['a', 'b']);
-  });
-
-  it('lists every frozen scene id, in order, and the spawns of one', () => {
-    expect(STUDIO_LISTS.scenes).toEqual([...SCENE_IDS]);
-    expect(spawnsOf('bakery')).toContain('door');
-    expect(spawnsOf('nowhere')).toEqual([]);
-  });
-
-  it('offers mobs, townsfolk, looks and items from the content', () => {
-    expect(STUDIO_LISTS.mob).toContain('wolf');
-    expect(STUDIO_LISTS.townsfolk).toContain('clerk');
-    expect(STUDIO_LISTS.look.length).toBeGreaterThan(0);
-    expect(STUDIO_LISTS.items).toContain('knife');
-  });
-});
-
 describe('moveOf', () => {
   it('is still with no key held', () => {
     expect(moveOf(new Set())).toEqual({ dx: 0, dy: 0, sprint: false });
@@ -86,12 +65,5 @@ describe('moveOf', () => {
     const opposite = moveOf(new Set(['KeyD', 'KeyA']));
     expect(opposite.dx).toBeCloseTo(0);
     expect(opposite.dy).toBeCloseTo(0);
-  });
-});
-
-describe('statusOf', () => {
-  it('fills the line and is empty before the first snapshot', () => {
-    expect(statusOf(snap(), '{scene} {tx},{ty} #{tick}')).toBe('bakery 3,4 #7');
-    expect(statusOf(null, '{scene}')).toBe('');
   });
 });
