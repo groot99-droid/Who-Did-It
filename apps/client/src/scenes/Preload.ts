@@ -8,6 +8,7 @@ import { MusicBus } from '../view/MusicBus';
 import { installMusicDirector } from '../view/MusicDirector';
 import { overlayRoot } from '../ui/dom';
 import { REG_MUSIC, getFlags, getNet } from './registry';
+import { wantsStudio } from './Studio';
 
 /**
  * Loads the asset manifest by key (placeholder or real art, ?art=placeholder), draws the greybox tileset
@@ -28,7 +29,8 @@ export class Preload extends Phaser.Scene {
     this.registry.set(REG_MUSIC, new MusicBus());
     installMusicDirector(this.game, getNet(this));
     const loading = mountLoadingScreen(this, overlayRoot());
-    const first = flags.admin ? 'Admin' : 'Intro';
+    // The GitHub callback always lands on `#/admin?token=...`; the Studio's sign-in button leaves a marker to come back to it.
+    const first = flags.studio || (flags.admin && wantsStudio()) ? 'Studio' : flags.admin ? 'Admin' : 'Intro';
     void resolveManifest(flags.art, base).then(
       (manifest) => {
         queueManifest(this.load, manifest);
