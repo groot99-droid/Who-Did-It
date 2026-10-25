@@ -36,3 +36,55 @@ The owner wrote this after the first playtest of the round-8 build. It is kept h
 - **Unanswered:** whether "The game should also technically be able to function with the killer (even though it never will)" means a match must work with no Killer, or that the engine must allow an NPC Killer. This goes into the round-9 questionnaire.
 
 The approved round-9 plan and its deliverables (`world-mode.md`, `phases.md`, `logic-table.md`, `failures.md`, `living-world.md`, `emergent-play.md`, `gdd-map.md`) are in `docs/round9/README.md`.
+
+## Second follow-up (2026-10-25, verbatim)
+
+> I’d also like to add sleeping in your bed, when all active players do this the game skips night. Also add that NPC with roles are almost never idle they act like they are doing tasks that a the view can interpret as a real player, they also do every action a real player can which is what allows them to trade with you, if a NPC sells an object it’s because it collected it, but also the game should never have to wait on NPCs to vote or take up time in a cut scene only real players
+
+On 9C's living-world proposals (the owner's replies follow each one):
+
+> Weaker creatures: a wolf bite drops from 25 damage to 12, a boar's from 18 to 9, a bat's from 6 to 3 and a rat's from 5 to 2.
+> Good but health should be 100%, how does that change things
+
+> Armour: three tiers that cut damage taken to 80%, 65% and 50%.
+> This is good but amor should be a little more complicated (poison resistance, blood clotting for bless, etc)
+
+> Who can kill: only the Killer's strike and a creature's bite kill a player; other weapons can't.
+> No players can be killed by other players but then they spend the day in the county jail (a single roomed cell map that can hold multiple people at once with mini games in jail that can give you debuffs or buffs like hitting the gym (strength up), dropping the soap (health maximum decrease for the rest of the game, a little HIV joke)
+
+> Achievements: stored on the device for now.
+> When players make an account achievements stay with them. The achievements should mimic the complexity of skill trees and trophies.
+
+> Lock picking: a picked lock leaves a scratch clue that doesn't point to any role, plus a small chance of a fine.
+
+> Rent: you can pay it in scrip or labour, goods are taken from you if you can’t pay, if no goods house gets boarded up.
+
+> The rogue: a play style any role can follow, not a role of its own.
+
+### 6Z's reading (for the round-10 plan, owner to correct)
+
+1. **Sleeping skips the night.** A bed is a hold. When every active human player is asleep in a bed, the night ends and the morning train arrives. Asleep means vulnerable. NPCs never hold the night open.
+2. **Role NPCs are never idle.** They run task-like routines that a watching player cannot tell from a human's. An NPC can do every action a player can, including trade. An NPC sells only what it has itself gathered or bought (no stock from nowhere). Nothing ever waits on an NPC: no NPC vote or cutscene time holds a phase. Only human players' actions gate the clock.
+3. **Health at 100%.** Max health is already 100 (`balance.json` `body.maxHp`), so health reads as a percentage. With the halved bites:
+   - **Wolf:** bites every 1 s for a 6 s chase (`mobs.json`, `balance.json` `mobs.chaseS`). That was 6 × 25 = 150, dead in about 4 s. It becomes 6 × 12 = 72, so a full chase leaves you at about 28%. Healing starts only 8 s after the last hit (`regenAfterS`), so a second chase without a light or shelter would still kill.
+   - **Boar:** about 4 bites a chase, 36% (it was 72%).
+   - **Bat:** about 3 bites, 9%, and it can only drain you to half (A173).
+   - **Rat:** about 3 bites, 6%.
+
+   In short, one creature encounter becomes something you survive and run from, not instant death.
+4. **Armour has properties, not just a damage cut.** Each piece has a damage factor plus resistances. Examples: poison resistance (a shorter or weaker Poisoned), clotting (Bleeding stops sooner; the owner wrote "bless", read here as bleed), cold or night resistance, and stamina weight.
+5. **Player kills and the county jail.** The owner's sentence reads two ways, so it goes to the questionnaire:
+   - **(a)** Players can kill each other, and the one who kills spends the rest of that day in the county jail.
+   - **(b)** Players can't kill each other; a would-be killing blow sends the victim to jail instead.
+
+   6Z proposes (a) as the default, because jail then works as the punishment for murder.
+
+   Either way, the county jail is a single-room cell scene (new ids under a new prefix) that holds several people at once. It has jail mini-games that grant buffs or debuffs, for example working out in the yard for strength, or a lasting max-health loss.
+
+   **6Z flags one line:** the "dropping the soap … HIV joke" is a prison-rape and HIV joke that would land badly with a lot of players. The design offers the same mechanic (a lasting max-health loss) through a different scene, such as a yard fight or a bad meal. The owner decides.
+
+   This rule replaces 9A's "only the Killer's strike and a creature's bite kill", so the round-10 plan re-derives how the Killer's vendettas interact with jail.
+6. **Achievements need accounts.** They are stored on the device until accounts exist; with an account they follow the player. They form skill trees plus trophies. Accounts are a new system: today GDD 3.21 keeps profiles on the device and the server keeps nothing.
+7. **Lock picking** keeps the role-neutral scratch clue (reinstated over 9C's drop), plus a small chance of a fine.
+8. **Rent** is paid in Scrip or labour. If you can't pay, goods are taken; if you have no goods, your house is boarded up.
+9. **The rogue** is a play style any role can follow (confirmed).
