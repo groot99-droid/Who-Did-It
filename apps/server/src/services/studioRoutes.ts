@@ -1,15 +1,17 @@
 import { randomBytes } from 'node:crypto';
 import type { Application, Request, Response } from 'express';
-import { BUILD_VERSION } from '@wdi/shared';
+import type { Scene } from '@wdi/content';
+import { BUILD_VERSION, type StudioDraftResponse } from '@wdi/shared';
 import { type AdminConfig, verifyAdminToken } from './adminAuth';
 import { type GitHub, GitHubError } from './github';
-import { SaveRefused, checkSave } from './studioSave';
+import { SaveRefused, checkSave, checkScene } from './studioSave';
 import { isAllowedOrigin } from './matchmakeGuard';
 import { TokenBucket } from './TokenBucket';
 
 /**
  * The Studio's HTTP routes (round 9, docs/round9/admin-studio.md 5): `POST /studio/report` and `GET /studio/reports`.
  * `POST /studio/save` re-checks an edited scene (`studioSave.ts`) and opens a draft PR with it and its nav.
+ * `POST /studio/draft` runs the same checks and hands the scene to the owner's Studio room to walk, unsaved.
  * Registered only beside the admin gate (`server.ts`); each checks the admin bearer token before anything else and
  * is rate limited. Without `WDI_ADMIN_GITHUB_TOKEN` (`github` null) they answer 503 with the NFY line, and the rest
  * of the Studio still works. The server keeps nothing: the screenshot and the issue live on GitHub.
@@ -25,8 +27,9 @@ export const REPORTS_PER_HOUR = 30;
 export const SAVES_PER_HOUR = 20;
 /** The largest scene file is about 21 KB; a save body past this is not read. */
 const MAX_SAVE_BYTES = 1024 * 1024;
-/** Inbox reads: tooling caps, not game numbers. */
+/** Inbox reads and Walk-it drafts: tooling caps, not game numbers. */
 export const READS_PER_MIN = 60;
+export const DRAFTS_PER_HOUR = 120;
 /** The base64 of 4 MB plus the note and the context; a body past this is not read. */
 const MAX_BODY_BYTES = Math.ceil((MAX_SCREENSHOT_BYTES * 4) / 3) + 256 * 1024;
 /** An issue body holds 65 536 characters; the note keeps room for the context. */
@@ -36,8 +39,16 @@ const MAX_VALUE_CHARS = 500;
 export const MAX_LOG_LINES = 50;
 const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
+/**
+ * Where a checked draft goes: `queued`, or why not. `server.ts` finds the room among this process's rooms only, so a
+ * draft reaches the room when the route and the room share a process, as the server runs today (one process); a
+ * server split over processes would have to route the draft to the room's process.
+ */
+export type DraftSink = (roomId: string, scene: Scene) => 'queued' | 'no room' | 'busy';
+
 export interface StudioRouteDeps {
   github: GitHub | null;
+  drafts?: DraftSink;
   now?: () => number;
 }
 
@@ -151,6 +162,7 @@ export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: St
   const reports = new TokenBucket(REPORTS_PER_HOUR, REPORTS_PER_HOUR / 3600, now());
   const reads = new TokenBucket(READS_PER_MIN, READS_PER_MIN / 60, now());
   const saves = new TokenBucket(SAVES_PER_HOUR, SAVES_PER_HOUR / 3600, now());
+  const drafts = new TokenBucket(DRAFTS_PER_HOUR, DRAFTS_PER_HOUR / 3600, now());
 
   const cors = (req: Request, res: Response): void => {
     const origin = req.headers.origin;
@@ -158,11 +170,14 @@ export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: St
     res.set('Cache-Control', 'no-store');
   };
   /** The bearer check, then the bucket: an unsigned caller never spends the owner's budget. */
-  const gate = (req: Request, bucket: TokenBucket): GitHub => {
+  const auth = (req: Request, bucket: TokenBucket): void => {
     const header = req.get('authorization') ?? '';
     const token = header.startsWith('Bearer ') ? header.slice(7) : null;
     if (verifyAdminToken(cfg, token, now) === null) throw new HttpError(403, 'forbidden');
     if (!bucket.take(now())) throw new HttpError(429, 'too many requests');
+  };
+  const gate = (req: Request, bucket: TokenBucket): GitHub => {
+    auth(req, bucket);
     if (deps.github === null) throw new HttpError(503, NFY_TOKEN);
     return deps.github;
   };
@@ -178,7 +193,7 @@ export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: St
     res.status(status).json({ error });
   };
 
-  for (const path of ['/studio/report', '/studio/reports', '/studio/save']) {
+  for (const path of ['/studio/report', '/studio/reports', '/studio/save', '/studio/draft']) {
     app.options(path, (req, res) => {
       cors(req, res);
       res.set({
@@ -261,6 +276,28 @@ export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: St
       ].join('\n\n');
       const pull = await github.createDraftPull(branch, base, `Studio: ${id}`, prBody);
       res.status(201).json({ branch, number: pull.number, url: pull.url });
+    } catch (e) {
+      fail(res, e);
+    }
+  });
+
+  // A draft needs no GitHub token: nothing is written anywhere. The room applies it inside its step.
+  app.post('/studio/draft', async (req, res) => {
+    cors(req, res);
+    try {
+      auth(req, drafts);
+      const body = await readJson(req, MAX_SAVE_BYTES);
+      const { roomId, scene } = (typeof body === 'object' && body !== null ? body : {}) as Record<
+        string,
+        unknown
+      >;
+      if (typeof roomId !== 'string' || !/^[\w-]{1,64}$/.test(roomId)) throw new HttpError(422, 'bad body');
+      const checked = checkScene(scene);
+      const sent = deps.drafts?.(roomId, checked) ?? 'no room';
+      // One answer for a bad id, a party room, an empty Studio room: the route does not tell room ids apart.
+      if (sent === 'no room') throw new HttpError(404, 'not found');
+      if (sent === 'busy') throw new HttpError(429, 'busy');
+      res.status(202).json({ queued: true } satisfies StudioDraftResponse);
     } catch (e) {
       fail(res, e);
     }

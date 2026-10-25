@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { type ColyseusTestServer, boot } from '@colyseus/testing';
 import {
   BUILD_VERSION,
@@ -130,6 +131,39 @@ describe('with the admin variables set', () => {
       px: expect.any(Number),
       state: expect.any(String),
     });
+    expect(got.errors).toEqual([]);
+    await client.leave();
+  });
+
+  it('takes a draft from POST /studio/draft into this room, and drops it over the socket (S5)', async () => {
+    const { client, got, room } = await open();
+    const scene = JSON.parse(
+      readFileSync(new URL('../../../packages/content/data/scenes/bakery.json', import.meta.url), 'utf8'),
+    );
+    const post = (roomId: string) =>
+      colyseus.http
+        .post('/studio/draft', {
+          headers: { authorization: `Bearer ${tokenFor()}`, 'content-type': 'application/json' },
+          body: JSON.stringify({ roomId, scene }),
+        })
+        .then(
+          (r: { statusCode: number }) => r.statusCode,
+          (e: { statusCode?: number }) => e.statusCode,
+        );
+    expect(await post(client.roomId)).toBe(202);
+    expect(await until(() => got.last?.draft === true, 3000)).toBe(true);
+    expect(got.last).toMatchObject({ sceneId: 'bakery', tx: 8, ty: 9 });
+    expect(room.sim.draft?.scene.id).toBe('bakery');
+    // The same 404 for an unknown id, a party room and a Studio room with no owner: room ids can't be probed.
+    expect(await post('no-such-room')).toBe(404);
+    const party = await lobbyOf(colyseus, 1);
+    expect(await post(party.room.roomId)).toBe(404);
+    const empty = await colyseus.createRoom('studio', {});
+    expect(await post(empty.roomId)).toBe(404);
+    expect((empty as unknown as StudioRoom).sim.commands).toEqual([]);
+    client.send(STUDIO_C2S.draft, { scene: null });
+    expect(await until(() => got.last?.draft === false, 3000)).toBe(true);
+    expect(got.lines.some((l) => l.endsWith('draft bakery dropped'))).toBe(true);
     expect(got.errors).toEqual([]);
     await client.leave();
   });
