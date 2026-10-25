@@ -14,6 +14,7 @@ import { adminConfig, verifyAdminToken } from '../services/adminAuth';
 import { genericJoinError } from '../services/matchmakeGuard';
 import {
   MAX_STUDIO_COMMANDS,
+  type StudioNpcData,
   type StudioSim,
   createStudio,
   parseStudio,
@@ -67,6 +68,14 @@ export class StudioRoom extends Room {
     if (this.ownerId === null || !this.clients.getById(this.ownerId)) return 'no room';
     if (this.sim.commands.length >= MAX_STUDIO_COMMANDS) return 'busy';
     this.sim.commands.push({ kind: 'draft', scene });
+    return 'queued';
+  }
+
+  /** NPC data `POST /studio/npc-draft` has checked, queued as `queueDraft` queues a scene. */
+  queueNpcDraft(npc: StudioNpcData): 'queued' | 'no room' | 'busy' {
+    if (this.ownerId === null || !this.clients.getById(this.ownerId)) return 'no room';
+    if (this.sim.commands.length >= MAX_STUDIO_COMMANDS) return 'busy';
+    this.sim.commands.push({ kind: 'npcDraft', npc });
     return 'queued';
   }
 

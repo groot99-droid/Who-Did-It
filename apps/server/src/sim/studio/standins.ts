@@ -1,4 +1,12 @@
-import { type DayPart, type MobDef, type Scene, balance, mobs, routines } from '@wdi/content';
+import {
+  type DayPart,
+  type MobDef,
+  type RoutinesFile,
+  type Scene,
+  balance,
+  mobs,
+  routines,
+} from '@wdi/content';
 import {
   type Rng,
   type StudioDayPhase,
@@ -77,15 +85,18 @@ function rngFor(id: string): Rng {
   return mulberry32(h >>> 0);
 }
 
-/** A townsfolk kind's stations in the scene: its prop kinds in route order, or any station prop when it lists none. */
-function stationsOf(scene: Scene, ref: string): Point[] {
-  const row = routines.townsfolk[ref];
+/**
+ * A townsfolk kind's stations in the scene: its prop kinds in route order, or any station prop when it lists none.
+ * `table` is the committed routines, or the Studio's NPC draft of them (admin-studio.md 8).
+ */
+export function stationsOf(scene: Scene, ref: string, table: RoutinesFile = routines): Point[] {
+  const row = table.townsfolk[ref];
   if (!row || row.fixed) return [];
   const props = scene.props;
   const picked =
     row.stations.length > 0
       ? row.stations.flatMap((kind) => props.filter((p) => p.kind === kind))
-      : props.filter((p) => !routines.ignore.includes(p.kind));
+      : props.filter((p) => !table.ignore.includes(p.kind));
   return picked.map((p) => ({ x: tileCentre(p.x, TILE_PX), y: tileCentre(p.y, TILE_PX) }));
 }
 
@@ -96,6 +107,7 @@ export function newStandIn(
   scene: Scene,
   tx: number,
   ty: number,
+  table: RoutinesFile = routines,
 ) {
   const x = tileCentre(tx, TILE_PX);
   const y = tileCentre(ty, TILE_PX);
@@ -116,14 +128,15 @@ export function newStandIn(
     path: null,
     mind: def ? newMind() : null,
     def,
-    stations: kind === 'townsfolk' ? stationsOf(scene, ref) : [],
+    stations: kind === 'townsfolk' ? stationsOf(scene, ref, table) : [],
     station: 0,
     workUntilTick: 0,
   };
   return b;
 }
 
-export const standInRow = (b: StandIn): StudioSpawn => ({
+/** The wire row; `look` is the look it wears (`lookOfStandIn`), absent for a mob. */
+export const standInRow = (b: StandIn, look?: string): StudioSpawn => ({
   id: b.id,
   kind: b.kind,
   ref: b.ref,
@@ -134,6 +147,7 @@ export const standInRow = (b: StandIn): StudioSpawn => ({
   yaw: b.yaw,
   moving: b.moving,
   state: b.state,
+  ...(look !== undefined ? { look } : {}),
 });
 
 /** The Studio's time of day as a light's part of the day (dawn burns as dusk, as `mobs/spawn.ts` `dayPartOf`). */

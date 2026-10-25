@@ -1,6 +1,6 @@
 // Round 9 (9T, docs/round9/admin-studio.md 3): the diff panel's lines, a scene against its committed self.
 import type { Scene } from '@wdi/content';
-import { KINDS, listOf, type Obj } from './sceneEdit';
+import { listOf, PLACEABLE, type Obj } from './sceneEdit';
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -26,7 +26,7 @@ export function diffScene(base: Scene, cur: Scene): string[] {
     }
     for (const id of old.keys()) if (!next.has(id)) out.push(`- ${kind} ${id}`);
   }
-  for (const kind of KINDS) {
+  for (const kind of PLACEABLE) {
     const was = new Map(listOf(base, kind).map((o) => [o.id, o]));
     const now = new Map(listOf(cur, kind).map((o) => [o.id, o]));
     for (const [id, o] of now) {

@@ -4,14 +4,24 @@ import type { Scene } from '@wdi/content';
 import { BUILD_VERSION, type StudioDraftResponse } from '@wdi/shared';
 import { type AdminConfig, verifyAdminToken } from './adminAuth';
 import { type GitHub, GitHubError } from './github';
-import { SaveRefused, checkSave, checkScene } from './studioSave';
+import {
+  type NpcData,
+  SaveRefused,
+  checkDataSave,
+  checkNpcDraft,
+  checkSave,
+  checkScene,
+  isDataFile,
+} from './studioSave';
 import { isAllowedOrigin } from './matchmakeGuard';
 import { TokenBucket } from './TokenBucket';
 
 /**
  * The Studio's HTTP routes (round 9, docs/round9/admin-studio.md 5): `POST /studio/report` and `GET /studio/reports`.
  * `POST /studio/save` re-checks an edited scene (`studioSave.ts`) and opens a draft PR with it and its nav.
- * `POST /studio/draft` runs the same checks and hands the scene to the owner's Studio room to walk, unsaved.
+ * Since N1 (admin-studio.md 8) it also takes `{ file, json }` for the data files of the allowlist (`studioSave.ts`).
+ * `POST /studio/draft` runs the same checks and hands the scene to the owner's Studio room to walk, unsaved;
+ * `POST /studio/npc-draft` does the same for edited NPC data (routines and quests; `looks.json` is never edited).
  * Registered only beside the admin gate (`server.ts`); each checks the admin bearer token before anything else and
  * is rate limited. Without `WDI_ADMIN_GITHUB_TOKEN` (`github` null) they answer 503 with the NFY line, and the rest
  * of the Studio still works. The server keeps nothing: the screenshot and the issue live on GitHub.
@@ -46,9 +56,13 @@ const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
  */
 export type DraftSink = (roomId: string, scene: Scene) => 'queued' | 'no room' | 'busy';
 
+/** Where a checked NPC draft goes, as `DraftSink`. */
+export type NpcDraftSink = (roomId: string, npc: NpcData) => 'queued' | 'no room' | 'busy';
+
 export interface StudioRouteDeps {
   github: GitHub | null;
   drafts?: DraftSink;
+  npcDrafts?: NpcDraftSink;
   now?: () => number;
 }
 
@@ -157,6 +171,65 @@ export const reportState = (state: 'open' | 'closed', comments: number): 'open' 
 
 const pad = (n: number): string => String(n).padStart(2, '0');
 
+/** What one save writes: the files, the branch stem, the PR title, its change list and its checks paragraph. */
+export interface SavePlan {
+  stem: string;
+  title: string;
+  files: Array<{ path: string; text: string; message: string }>;
+  summary: string[];
+  checks: string;
+}
+
+const DATA_DIR = 'packages/content/data';
+
+/**
+ * The save of an untrusted body (admin-studio.md 5 and 8): `{ file, json }` for a file of the allowlist, or the older
+ * `{ scene }`, which is `{ file: 'scenes/<id>.json', json: scene }`. Throws `SaveRefused` or a 422 `HttpError`.
+ */
+export function planSave(file: unknown, json: unknown, scene: unknown, nav: unknown): SavePlan {
+  if (file === undefined) return planScene(scene, nav, null);
+  if (scene !== undefined) throw new HttpError(422, 'bad body');
+  if (isDataFile(file)) {
+    if (nav !== undefined) throw new HttpError(422, 'bad body');
+    const save = checkDataSave(file, json);
+    return {
+      stem: file.slice(0, -'.json'.length),
+      title: file,
+      files: [{ path: `${DATA_DIR}/${file}`, text: save.text, message: `Studio: ${file}` }],
+      summary: save.summary,
+      checks: `The server re-ran the \`${file}\` schema, refused unknown keys and re-ran the whole content validator with this file in place.`,
+    };
+  }
+  const m = typeof file === 'string' ? /^scenes\/([a-z_]+)\.json$/.exec(file) : null;
+  if (m === null) throw new SaveRefused(['not a file the Studio saves']);
+  return planScene(json, nav, m[1]!);
+}
+
+function planScene(scene: unknown, nav: unknown, fileId: string | null): SavePlan {
+  const save = checkSave(scene);
+  const id = save.scene.id;
+  if (fileId !== null && fileId !== id)
+    throw new SaveRefused([`the file is scenes/${fileId}.json, the scene is ${id}`]);
+  if (nav !== undefined && JSON.stringify(nav) !== JSON.stringify(save.nav))
+    throw new SaveRefused(["the editor's nav does not match the grid"]);
+  return {
+    stem: id,
+    title: id,
+    files: [
+      { path: `${DATA_DIR}/scenes/${id}.json`, text: save.sceneText, message: `Studio: ${id}` },
+      { path: `${DATA_DIR}/scenes/${id}.nav.json`, text: save.navText, message: `Studio: ${id} nav` },
+      {
+        path: `apps/client/public/assets/scenes/${id}/tilemap.json`,
+        text: save.tilemapText,
+        message: `Studio: ${id} tilemap`,
+      },
+    ],
+    summary: save.summary,
+    checks:
+      'The server re-ran the scene schema and the whole content validator with this scene in place, and regenerated the nav and the tilemap from the grid, as `pnpm grid:export` does.',
+  };
+}
+
 export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: StudioRouteDeps): void {
   const now = deps.now ?? Date.now;
   const reports = new TokenBucket(REPORTS_PER_HOUR, REPORTS_PER_HOUR / 3600, now());
@@ -193,7 +266,13 @@ export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: St
     res.status(status).json({ error });
   };
 
-  for (const path of ['/studio/report', '/studio/reports', '/studio/save', '/studio/draft']) {
+  for (const path of [
+    '/studio/report',
+    '/studio/reports',
+    '/studio/save',
+    '/studio/draft',
+    '/studio/npc-draft',
+  ]) {
     app.options(path, (req, res) => {
       cors(req, res);
       res.set({
@@ -235,46 +314,34 @@ export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: St
     try {
       const github = gate(req, saves);
       const body = await readJson(req, MAX_SAVE_BYTES);
-      const { scene, nav, note } = (typeof body === 'object' && body !== null ? body : {}) as Record<
-        string,
-        unknown
-      >;
+      const { file, json, scene, nav, note } = (
+        typeof body === 'object' && body !== null ? body : {}
+      ) as Record<string, unknown>;
       if (note !== undefined && typeof note !== 'string') throw new HttpError(422, 'bad body');
       if (typeof note === 'string' && note.length > MAX_NOTE_CHARS) throw new HttpError(413, 'note too long');
-      const save = checkSave(scene);
-      if (nav !== undefined && JSON.stringify(nav) !== JSON.stringify(save.nav))
-        throw new SaveRefused(["the editor's nav does not match the grid"]);
+      const save = planSave(file, json, scene, nav);
       const d = new Date(now());
       const stamp = `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}-${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}`;
-      const id = save.scene.id;
-      const branch = `studio/${id}-${stamp}`;
+      const branch = `studio/${save.stem}-${stamp}`;
       const base = await github.defaultBranch();
       try {
         await github.createBranch(branch, base);
       } catch (e) {
         if (e instanceof GitHubError && e.status === 422)
-          throw new HttpError(409, 'this scene was saved this minute; try again in a minute');
+          throw new HttpError(409, 'this file was saved this minute; try again in a minute');
         throw e;
       }
-      const dir = 'packages/content/data/scenes';
       const b64 = (text: string): string => Buffer.from(text, 'utf8').toString('base64');
-      await github.putFile(branch, `${dir}/${id}.json`, b64(save.sceneText), `Studio: ${id}`);
-      await github.putFile(branch, `${dir}/${id}.nav.json`, b64(save.navText), `Studio: ${id} nav`);
-      await github.putFile(
-        branch,
-        `apps/client/public/assets/scenes/${id}/tilemap.json`,
-        b64(save.tilemapText),
-        `Studio: ${id} tilemap`,
-      );
+      for (const f of save.files) await github.putFile(branch, f.path, b64(f.text), f.message);
       const prBody = [
         typeof note === 'string' && note.trim() ? note : '_No note._',
         '## Changes',
         save.summary.join('\n'),
         '## Checks',
-        'The server re-ran the scene schema and the whole content validator with this scene in place, and regenerated the nav and the tilemap from the grid, as `pnpm grid:export` does.',
+        save.checks,
         `Build \`${BUILD_VERSION}\``,
       ].join('\n\n');
-      const pull = await github.createDraftPull(branch, base, `Studio: ${id}`, prBody);
+      const pull = await github.createDraftPull(branch, base, `Studio: ${save.title}`, prBody);
       res.status(201).json({ branch, number: pull.number, url: pull.url });
     } catch (e) {
       fail(res, e);
@@ -295,6 +362,28 @@ export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: St
       const checked = checkScene(scene);
       const sent = deps.drafts?.(roomId, checked) ?? 'no room';
       // One answer for a bad id, a party room, an empty Studio room: the route does not tell room ids apart.
+      if (sent === 'no room') throw new HttpError(404, 'not found');
+      if (sent === 'busy') throw new HttpError(429, 'busy');
+      res.status(202).json({ queued: true } satisfies StudioDraftResponse);
+    } catch (e) {
+      fail(res, e);
+    }
+  });
+
+  // As `/studio/draft`, for the NPC editor's preview (admin-studio.md 8): no GitHub, nothing written.
+  app.post('/studio/npc-draft', async (req, res) => {
+    cors(req, res);
+    try {
+      auth(req, drafts);
+      const body = await readJson(req, MAX_SAVE_BYTES);
+      const { roomId, routines, quests, looks } = (
+        typeof body === 'object' && body !== null ? body : {}
+      ) as Record<string, unknown>;
+      if (typeof roomId !== 'string' || !/^[\w-]{1,64}$/.test(roomId)) throw new HttpError(422, 'bad body');
+      if (looks !== undefined)
+        throw new SaveRefused(["looks.json is not edited: a figure's look is its routines or quests entry"]);
+      const npc = checkNpcDraft({ routines, quests });
+      const sent = deps.npcDrafts?.(roomId, npc) ?? 'no room';
       if (sent === 'no room') throw new HttpError(404, 'not found');
       if (sent === 'busy') throw new HttpError(429, 'busy');
       res.status(202).json({ queued: true } satisfies StudioDraftResponse);

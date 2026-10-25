@@ -4,9 +4,13 @@ import {
   type Profile,
   type Scene,
   type SceneId,
+  type LooksFile,
+  type QuestsFile,
+  type RoutinesFile,
   items,
   looks,
   mobs,
+  quests,
   routines,
   scenes,
 } from '@wdi/content';
@@ -19,6 +23,7 @@ import {
   overlapsSolid,
   type ClockScale,
   type StudioDayPhase,
+  type StudioGiver,
   type StudioS2CPayloads,
   type StudioSpawnKind,
 } from '@wdi/shared';
@@ -27,7 +32,7 @@ import { parseMove, speedPxPerTick } from '../Movement';
 import type { MoveInput } from '../RoomSim';
 import { navGrid, profileOpen, tileCentre } from '../World';
 import { type SimClock, stepsThisTick } from '../auto/clock';
-import { type StandIn, newStandIn, standInRow, stepStandIns } from './standins';
+import { type StandIn, newStandIn, standInRow, stationsOf, stepStandIns } from './standins';
 
 /**
  * Creative mode (round 9, docs/round9/admin-studio.md 2): one scene of `@wdi/content`, one admin figure, the stand-ins
@@ -57,10 +62,27 @@ export interface StudioSim {
    * until it is cleared or the figure goes to another scene.
    */
   draft: StudioDraft | null;
+  /**
+   * Edited NPC data (`POST /studio/npc-draft`, admin-studio.md 8): checked as a save is, read by the stand-ins and
+   * the givers in place of the committed files until it is cleared or the room closes; never written anywhere.
+   */
+  npc: StudioNpcData | null;
   commands: StudioCommand[];
   /** Lines not yet sent to the client. */
   log: string[];
 }
+
+/** The NPC files a Studio room reads (N1): the routines, the quest NPCs and the looks. */
+export interface StudioNpcData {
+  routines: RoutinesFile;
+  quests: QuestsFile;
+  looks: LooksFile;
+}
+
+const COMMITTED_NPC: StudioNpcData = { routines, quests, looks };
+
+/** The NPC data the room runs: the draft when one is loaded, else the committed files. */
+export const npcOf = (sim: StudioSim): StudioNpcData => sim.npc ?? COMMITTED_NPC;
 
 export interface StudioDraft {
   scene: Scene;
@@ -80,7 +102,9 @@ export type StudioCommand =
   | { kind: 'clearSpawns' }
   | { kind: 'give'; itemId: string }
   /** A scene already checked by `checkScene` (the draft route), or null to drop the draft. */
-  | { kind: 'draft'; scene: Scene | null };
+  | { kind: 'draft'; scene: Scene | null }
+  /** NPC data already checked by `checkNpcDraft` (the NPC draft route), or null to drop it. */
+  | { kind: 'npcDraft'; npc: StudioNpcData | null };
 
 /** Commands waiting for the step; a flood past this is refused (`busy`). */
 export const MAX_STUDIO_COMMANDS = 64;
@@ -117,6 +141,7 @@ export function createStudio(sceneId: SceneId = STUDIO_START_SCENE): StudioSim {
     nextSpawn: 1,
     items: [],
     draft: null,
+    npc: null,
     commands: [],
     log: [],
   };
@@ -136,12 +161,17 @@ const say = (sim: StudioSim, line: string): void => {
   sim.log.push(`t${sim.tick} ${line}`);
 };
 
-const ref = (kind: StudioSpawnKind, id: string): boolean =>
+/** Whether a stand-in's id exists in the NPC data the room runs (the draft's, when one is loaded). */
+const ref = (npc: StudioNpcData, kind: StudioSpawnKind, id: string): boolean =>
   kind === 'mob'
     ? Object.hasOwn(mobs.mobs, id)
     : kind === 'townsfolk'
-      ? Object.hasOwn(routines.townsfolk, id)
-      : id === 'villager' || Object.hasOwn(looks.looks, id);
+      ? Object.hasOwn(npc.routines.townsfolk, id)
+      : id === 'villager' || Object.hasOwn(npc.looks.looks, id);
+
+/** The look a stand-in wears: a townsfolk figure's routines look, a look's own id; none for a mob. */
+const lookOf = (npc: StudioNpcData, kind: StudioSpawnKind, id: string): string | undefined =>
+  kind === 'townsfolk' ? npc.routines.townsfolk[id]?.look : kind === 'look' ? id : undefined;
 
 /**
  * The command of an untrusted `studio.*` payload, or a refusal reason. Shapes and ids only; whether a tile is free
@@ -194,7 +224,9 @@ export function parseStudio(type: string, raw: unknown): StudioCommand | string 
     case 'studio.spawn': {
       const kind = p.kind;
       if (kind !== 'mob' && kind !== 'townsfolk' && kind !== 'look') return 'bad spawn';
-      if (typeof p.ref !== 'string' || !ref(kind, p.ref)) return 'no such figure';
+      // A townsfolk or look id is checked in the step, against the NPC draft when one is loaded.
+      if (typeof p.ref !== 'string' || !/^[\w.-]{1,64}$/.test(p.ref)) return 'no such figure';
+      if (kind === 'mob' && !ref(COMMITTED_NPC, kind, p.ref)) return 'no such figure';
       const hasTile = p.x !== undefined || p.y !== undefined;
       if (hasTile && (!isTileInt(p.x) || !isTileInt(p.y))) return 'bad tile';
       return {
@@ -209,6 +241,8 @@ export function parseStudio(type: string, raw: unknown): StudioCommand | string 
     case 'studio.draft':
       // A scene is too big for one socket message (4 KB): it comes through `POST /studio/draft`, which checks it.
       return p.scene === null ? { kind: 'draft', scene: null } : 'send a draft scene by POST /studio/draft';
+    case 'studio.npcDraft':
+      return p.npc === null ? { kind: 'npcDraft', npc: null } : 'send NPC data by POST /studio/npc-draft';
     case 'studio.give':
       return typeof p.itemId === 'string' && Object.hasOwn(items.items, p.itemId)
         ? { kind: 'give', itemId: p.itemId }
@@ -317,13 +351,22 @@ export function applyStudio(sim: StudioSim, cmd: StudioCommand): string | null {
       say(sim, `clock ${sim.clock.scale}x${sim.clock.paused ? ' paused' : ''}`);
       return null;
     case 'spawn': {
+      if (!ref(npcOf(sim), cmd.spawn, cmd.ref)) return 'no such figure';
       const list = sim.spawns.get(sim.sceneId) ?? [];
       if (list.length >= MAX_STUDIO_SPAWNS) return 'too many spawns';
       const tx = cmd.x ?? Math.floor(sim.x / TILE_PX);
       const ty = cmd.y ?? Math.floor(sim.y / TILE_PX);
       const g = grid(sim);
       if (tx >= g.w || ty >= g.h) return 'bad tile';
-      const spawn = newStandIn(`sp${sim.nextSpawn++}`, cmd.spawn, cmd.ref, sceneOf(sim), tx, ty);
+      const spawn = newStandIn(
+        `sp${sim.nextSpawn++}`,
+        cmd.spawn,
+        cmd.ref,
+        sceneOf(sim),
+        tx,
+        ty,
+        npcOf(sim).routines,
+      );
       list.push(spawn);
       sim.spawns.set(sim.sceneId, list);
       say(sim, `spawn ${spawn.id} ${cmd.spawn} ${cmd.ref} ${tx},${ty}`);
@@ -340,7 +383,42 @@ export function applyStudio(sim: StudioSim, cmd: StudioCommand): string | null {
       return null;
     case 'draft':
       return cmd.scene === null ? (dropDraft(sim), null) : loadDraft(sim, cmd.scene);
+    case 'npcDraft':
+      if (cmd.npc === null && sim.npc === null) return null;
+      sim.npc = cmd.npc;
+      restation(sim);
+      say(sim, cmd.npc === null ? 'NPC draft dropped' : 'NPC draft (unsaved)');
+      return null;
   }
+}
+
+/**
+ * After the NPC data changes, every stand-in reads it again: a townsfolk figure takes its kind's new stations from
+ * the first, and one whose kind or look the data no longer holds is removed.
+ */
+function restation(sim: StudioSim): void {
+  const npc = npcOf(sim);
+  for (const [sceneId, list] of sim.spawns) {
+    const kept = list.filter((b) => ref(npc, b.kind, b.ref));
+    for (const b of kept)
+      if (b.kind === 'townsfolk') {
+        b.stations = stationsOf(sceneOf(sim, sceneId), b.ref, npc.routines);
+        b.station = 0;
+        b.workUntilTick = 0;
+        b.path = null;
+      }
+    if (kept.length < list.length) say(sim, `${list.length - kept.length} stand-ins left the NPC data`);
+    sim.spawns.set(sceneId, kept);
+  }
+}
+
+/** The current scene's quest givers, with the names and looks of the NPC data the room runs. */
+function giversOf(sim: StudioSim): StudioGiver[] {
+  const npcs = npcOf(sim).quests.npcs;
+  return (sceneOf(sim).givers ?? []).flatMap((g) => {
+    const n = npcs[g.npc];
+    return n ? [{ id: g.id, npc: g.npc, name: n.name, look: n.look, x: g.x, y: g.y, facing: g.facing }] : [];
+  });
 }
 
 /**
@@ -447,8 +525,10 @@ export function studioSnapshot(sim: StudioSim): StudioS2CPayloads['studio.snapsh
     scale: sim.clock.scale,
     paused: sim.clock.paused,
     time: { ...sim.time },
-    spawns: (sim.spawns.get(sim.sceneId) ?? []).map(standInRow),
+    spawns: (sim.spawns.get(sim.sceneId) ?? []).map((b) => standInRow(b, lookOf(npcOf(sim), b.kind, b.ref))),
     items: [...sim.items],
     draft: sim.draft !== null,
+    npcDraft: sim.npc !== null,
+    givers: giversOf(sim),
   };
 }

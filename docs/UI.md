@@ -1607,6 +1607,10 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.edit.kind.spawns` | Spawns | the Studio editor |
 | `studio.edit.kind.spots` | Spots | the Studio editor |
 | `studio.edit.kind.lights` | Lights | the Studio editor |
+| `studio.edit.kind.buildings` | Buildings | the Studio editor |
+| `studio.edit.kind.nodes` | Resource nodes | the Studio editor |
+| `studio.edit.kind.spawners` | Creature spawners | the Studio editor |
+| `studio.edit.kind.givers` | Quest givers | the Studio editor |
 | `studio.edit.selected` | {kind} {id} at {x},{y} | the Studio editor |
 | `studio.edit.nothing` | Nothing selected | the Studio editor |
 | `studio.edit.duplicate` | Duplicate | the Studio editor |
@@ -1632,6 +1636,9 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.edit.cell.S` | Stairs | the Studio editor |
 | `studio.edit.cell.H` | Hatch | the Studio editor |
 | `studio.edit.cell.B` | Bed | the Studio editor |
+| `studio.edit.material` | Material | the Studio editor |
+| `studio.edit.material.floor` | Floor material: the tile becomes floor | the Studio editor |
+| `studio.edit.material.solid` | Solid material: the tile becomes solid | the Studio editor |
 | `studio.edit.width` | Width | the Studio editor |
 | `studio.edit.height` | Height | the Studio editor |
 | `studio.edit.resize` | Resize | the Studio editor |
@@ -1671,3 +1678,18 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.npc.previewing` | Previewing: the room uses your routines | the NPC panel while a draft is up |
 | `studio.npc.save` / `.saving` / `.saved` | Save as a draft PR / Saving... / Draft PR #{number} opened on {branch} | the NPC panel |
 | `studio.npc.note` / `.close` / `.unused` | Note for the PR / Close / Not used in this phase | the NPC panel |
+| `studio.overview` | Overview | the Studio Overview (9W) |
+| `studio.overview.title` | Overview of {map} | the Studio Overview (9W) |
+| `studio.overview.layout.auto` | Automatic layout: maps/{map}.json has no layout, so cards sit in columns by doors from the hub. | the Studio Overview (9W) |
+| `studio.overview.layout.map` | Layout from maps/{map}.json. | the Studio Overview (9W) |
+| `studio.overview.help` | Click a card to open the scene. Drag a link’s dot onto a spawn of another scene to re-target the door. | the Studio Overview (9W) |
+| `studio.overview.enter` | Open {scene} | the Studio Overview (9W) |
+| `studio.overview.kind.exterior` | World | the Studio Overview (9W) |
+| `studio.overview.kind.interior` | Room | the Studio Overview (9W) |
+| `studio.overview.links` | Doors as a list | the Studio Overview (9W) |
+| `studio.overview.to` | Scene that {portal} leads to | the Studio Overview (9W) |
+| `studio.overview.spawn` | Spawn that {portal} lands on | the Studio Overview (9W) |
+| `studio.overview.changed` | Unsaved doors in: {scenes} | the Studio Overview (9W) |
+| `studio.overview.failed` | Not saved: {why} | the Studio Overview (9W) |
+| `studio.overview.save` | Save changed scenes as draft PRs | the Studio Overview (9W) |
+| `studio.overview.close` | Close | the Studio Overview (9W) |
