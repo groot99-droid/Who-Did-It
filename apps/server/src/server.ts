@@ -1,4 +1,4 @@
-import { defineRoom, defineServer } from 'colyseus';
+import { defineRoom, defineServer, matchMaker } from 'colyseus';
 import { BUILD_VERSION } from '@wdi/shared';
 import { AdminRoom } from './rooms/AdminRoom';
 import { PartyRoom } from './rooms/PartyRoom';
@@ -36,7 +36,13 @@ export function createServer(limits: Partial<GuardLimits> = {}) {
         installAdminAuth(app, admin);
         // Round 9 (docs/round9/admin-studio.md 5): without WDI_ADMIN_GITHUB_TOKEN the routes answer the NFY line.
         const token = githubToken();
-        installStudioRoutes(app, admin, { github: token === null ? null : createGitHub(token) });
+        installStudioRoutes(app, admin, {
+          github: token === null ? null : createGitHub(token),
+          drafts: (roomId, scene) => {
+            const room = matchMaker.getLocalRoomById(roomId);
+            return room instanceof StudioRoom ? room.queueDraft(scene) : 'no room';
+          },
+        });
       }
       // One proxy hop on Render and Railway. This only affects Express's `req.ip`; the matchmake bucket
       // derives the caller address itself (`clientIp` in matchmakeGuard.ts).

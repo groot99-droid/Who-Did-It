@@ -1,4 +1,4 @@
-import { type DayPart, type MobDef, type SceneId, balance, mobs, routines, scenes } from '@wdi/content';
+import { type DayPart, type MobDef, type Scene, balance, mobs, routines } from '@wdi/content';
 import {
   type Rng,
   type StudioDayPhase,
@@ -62,7 +62,8 @@ export interface StandIn {
 /** What a stand-in senses of the Studio this tick. */
 export interface StandInWorld {
   tick: number;
-  sceneId: SceneId;
+  /** The scene the stand-ins stand in: the committed one, or the Studio's draft of it. */
+  scene: Scene;
   grid: Grid;
   phase: StudioDayPhase;
   /** The admin figure's feet. */
@@ -77,10 +78,10 @@ function rngFor(id: string): Rng {
 }
 
 /** A townsfolk kind's stations in the scene: its prop kinds in route order, or any station prop when it lists none. */
-function stationsOf(sceneId: SceneId, ref: string): Point[] {
+function stationsOf(scene: Scene, ref: string): Point[] {
   const row = routines.townsfolk[ref];
   if (!row || row.fixed) return [];
-  const props = scenes[sceneId].props;
+  const props = scene.props;
   const picked =
     row.stations.length > 0
       ? row.stations.flatMap((kind) => props.filter((p) => p.kind === kind))
@@ -92,7 +93,7 @@ export function newStandIn(
   id: string,
   kind: StudioSpawnKind,
   ref: string,
-  sceneId: SceneId,
+  scene: Scene,
   tx: number,
   ty: number,
 ) {
@@ -115,7 +116,7 @@ export function newStandIn(
     path: null,
     mind: def ? newMind() : null,
     def,
-    stations: kind === 'townsfolk' ? stationsOf(sceneId, ref) : [],
+    stations: kind === 'townsfolk' ? stationsOf(scene, ref) : [],
     station: 0,
     workUntilTick: 0,
   };
@@ -218,7 +219,7 @@ function stepMob(b: StandIn, w: StandInWorld): void {
   const mind = b.mind!;
   let flame: Point | null = null;
   let best = def.fleeLightTiles * TILE_PX;
-  for (const l of burningLights(scenes[w.sceneId], partOf(w.phase), TILE_PX, true)) {
+  for (const l of burningLights(w.scene, partOf(w.phase), TILE_PX, true)) {
     const d = Math.hypot(l.x - b.x, l.y - b.y);
     if (d <= best) [flame, best] = [l, d];
   }

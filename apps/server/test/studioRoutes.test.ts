@@ -9,6 +9,8 @@ import { formatDataJson } from '../src/services/studioSave';
 import {
   MAX_LOG_LINES,
   MAX_SCREENSHOT_BYTES,
+  DRAFTS_PER_HOUR,
+  type DraftSink,
   NFY_TOKEN,
   REPORTS_PER_HOUR,
   SAVES_PER_HOUR,
@@ -39,7 +41,7 @@ const png = (extra = 16) =>
 type Out = { status: number; headers: Record<string, string>; body: unknown };
 
 /** The routes on a fake app; a call streams its body as the request, like Node's IncomingMessage. */
-function harness(withGitHub = true) {
+function harness(withGitHub = true, drafts?: DraftSink) {
   const gh = fakeGitHub();
   let clock = T0;
   const routes = new Map<string, (req: unknown, res: unknown) => unknown>();
@@ -48,6 +50,7 @@ function harness(withGitHub = true) {
   const app = { get: add('GET'), post: add('POST'), options: add('OPTIONS') };
   installStudioRoutes(app as unknown as Application, cfg, {
     github: withGitHub ? createGitHub(FAKE_TOKEN, { fetch: gh.fetch }) : null,
+    ...(drafts ? { drafts } : {}),
     now: () => clock,
   });
   const call = async (
@@ -326,5 +329,85 @@ describe('POST /studio/save', () => {
     expect((await call('POST', '/studio/save', { auth: bearer(), body: { scene: {} } })).status).toBe(429);
     advance(3600_000 / SAVES_PER_HOUR);
     expect((await call('POST', '/studio/save', { auth: bearer(), body: { scene: {} } })).status).toBe(422);
+  });
+});
+
+describe('POST /studio/draft', () => {
+  /** A sink that records what reached the room, as `server.ts` queues it on the Studio room. */
+  const sink = (answer: ReturnType<DraftSink> = 'queued') => {
+    const got: Array<{ roomId: string; scene: { id: string; grid: string[] } }> = [];
+    const fn: DraftSink = (roomId, scene) => {
+      got.push({ roomId, scene });
+      return answer;
+    };
+    return { got, fn };
+  };
+
+  it('checks the scene and hands it to the room without GitHub, with no write anywhere', async () => {
+    const room = sink();
+    const { call, gh } = harness(false, room.fn);
+    const scene = editedBakery();
+    const res = await call('POST', '/studio/draft', { auth: bearer(), body: { roomId: 'Ab_c-1', scene } });
+    expect(res).toMatchObject({ status: 202, body: { queued: true } });
+    expect(room.got).toHaveLength(1);
+    expect(room.got[0]!.roomId).toBe('Ab_c-1');
+    expect(room.got[0]!.scene.grid[6]).toBe(scene.grid[6]);
+    expect(gh.calls).toEqual([]);
+    const same = JSON.parse(
+      readFileSync(new URL('../../../packages/content/data/scenes/bakery.json', import.meta.url), 'utf8'),
+    );
+    expect(
+      (await call('POST', '/studio/draft', { auth: bearer(), body: { roomId: 'r', scene: same } })).status,
+    ).toBe(202);
+  });
+
+  it('refuses what a save refuses, with every problem, and reaches no room', async () => {
+    const room = sink();
+    const { call } = harness(true, room.fn);
+    const colour = editedBakery();
+    (colour.portals[0] as Record<string, unknown>).colour = 'red';
+    const renamed = editedBakery();
+    renamed.portals[0]!.id = 'bk.front';
+    for (const scene of [colour, renamed]) {
+      const res = await call('POST', '/studio/draft', { auth: bearer(), body: { roomId: 'r', scene } });
+      expect(res.status).toBe(422);
+      expect((res.body as { problems: string[] }).problems.length).toBeGreaterThan(0);
+    }
+    const bad = await call('POST', '/studio/draft', { auth: bearer(), body: { roomId: 'r', scene: colour } });
+    expect((bad.body as { problems: string[] }).problems.join('\n')).toContain('colour');
+    for (const roomId of [undefined, '', 'a/b', 'x'.repeat(65)]) {
+      const res = await call('POST', '/studio/draft', {
+        auth: bearer(),
+        body: { roomId, scene: editedBakery() },
+      });
+      expect(res).toMatchObject({ status: 422, body: { error: 'bad body' } });
+    }
+    expect(room.got).toEqual([]);
+  });
+
+  it('answers 404 without the room, 429 when its queue is full, and is gated and limited', async () => {
+    const body = { roomId: 'r', scene: editedBakery() };
+    expect((await harness(true).call('POST', '/studio/draft', { auth: bearer(), body })).status).toBe(404);
+    expect(
+      (await harness(true, sink('no room').fn).call('POST', '/studio/draft', { auth: bearer(), body }))
+        .status,
+    ).toBe(404);
+    expect(
+      (await harness(true, sink('busy').fn).call('POST', '/studio/draft', { auth: bearer(), body })).status,
+    ).toBe(429);
+    const room = sink();
+    const { call } = harness(true, room.fn);
+    const big = await call('POST', '/studio/draft', {
+      auth: bearer(),
+      raw: JSON.stringify({ roomId: 'r', scene: { pad: 'x'.repeat(1024 * 1024) } }),
+    });
+    expect(big).toMatchObject({ status: 413, body: { error: 'too large' } });
+    expect(room.got).toEqual([]);
+    expect((await call('POST', '/studio/draft', { body })).status).toBe(403);
+    expect((await call('POST', '/studio/draft', { auth: bearer('someone-else'), body })).status).toBe(403);
+    for (let i = 1; i < DRAFTS_PER_HOUR; i++)
+      expect((await call('POST', '/studio/draft', { auth: bearer(), body })).status).toBe(202);
+    expect((await call('POST', '/studio/draft', { auth: bearer(), body })).status).toBe(429);
+    expect(room.got).toHaveLength(DRAFTS_PER_HOUR - 1);
   });
 });
