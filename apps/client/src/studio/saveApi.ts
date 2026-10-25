@@ -1,18 +1,10 @@
 // Round 9 (9T, docs/round9/admin-studio.md 3 and 5): the Studio's save route, with an injectable `fetch`. The request
-// and answer types mirror `StudioSaveRequest` and `StudioSaveResponse` of `studioHttp.ts` (S3).
+// and answer types are those of `studioHttp.ts` (S3).
+import type { StudioSaveRefused, StudioSaveRequest, StudioSaveResponse } from '@wdi/shared/protocol';
 import { SERVER_URL } from '../health';
 
-export interface SaveRequest {
-  /** The scene exactly as the editor holds it: no extra keys, the server refuses unknown ones. */
-  scene: unknown;
-  /** The owner's note for the PR body. */
-  note?: string;
-}
-export interface SaveResponse {
-  branch: string;
-  number: number;
-  url: string;
-}
+export type SaveRequest = StudioSaveRequest;
+export type SaveResponse = StudioSaveResponse;
 export interface SaveApi {
   save(req: SaveRequest): Promise<SaveResponse>;
 }
@@ -42,10 +34,7 @@ export function createSaveApi(
         headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
         body: JSON.stringify(req),
       });
-      const json = (await res.json().catch(() => ({}))) as Partial<SaveResponse> & {
-        error?: string;
-        problems?: string[];
-      };
+      const json = (await res.json().catch(() => ({}))) as Partial<SaveResponse> & Partial<StudioSaveRefused>;
       if (!res.ok) throw new SaveError(res.status, json.error ?? `HTTP ${res.status}`, json.problems ?? []);
       return json as SaveResponse;
     },
