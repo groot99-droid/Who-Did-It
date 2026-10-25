@@ -27,6 +27,8 @@ export type StudioLinkEvents = {
 
 /** What the page depends on; `connectStudio` and `mockStudio` implement it. */
 export interface StudioLink {
+  /** The room's id, which `POST /studio/draft` names so the draft reaches this connection's room. */
+  readonly roomId: string;
   readonly bus: Emitter<StudioLinkEvents>;
   send<K extends StudioC2SType>(type: K, payload: StudioC2SPayloads[K]): void;
   close(): void;
@@ -46,6 +48,7 @@ export async function connectStudio(
   room.onMessage('error', (m: { msg?: string }) => bus.emit('refused', m.msg ?? ''));
   room.onLeave((code) => bus.emit('closed', { reason: String(code) }));
   return {
+    roomId: room.roomId,
     bus,
     send: (type, payload) => room.send(type, payload),
     close: () => void room.leave(true),

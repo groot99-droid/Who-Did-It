@@ -12,7 +12,12 @@ import { SaveError } from '../saveApi';
 import type { EditorSession } from './session';
 import { templatesFor } from './templates';
 
-export function mountEditorPanel(root: HTMLElement, s: EditorSession, api: SaveApi): Screen {
+export function mountEditorPanel(
+  root: HTMLElement,
+  s: EditorSession,
+  api: SaveApi,
+  walk: () => Promise<void>,
+): Screen {
   const tid = (id: string) => ({ 'data-testid': id });
   const btn = (id: string, text: string, on: () => void) => {
     const b = h('button', { type: 'button', class: 'wdi-admin__btn', ...tid(id) }, text);
@@ -126,6 +131,24 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession, api: SaveA
     );
   });
   let saving = false;
+  const walkOut = h('div', { role: 'status', ...tid('studio-edit-walkout') });
+  const walkBtn = btn('studio-edit-walk', C['studio.edit.walk'], () => {
+    walkBtn.disabled = true;
+    walkOut.replaceChildren(h('p', {}, C['studio.edit.walking']));
+    void walk().then(
+      () => refresh(),
+      (e: unknown) => {
+        const lines =
+          e instanceof SaveError && e.problems.length > 0
+            ? e.problems
+            : [e instanceof Error ? e.message : String(e)];
+        walkOut.replaceChildren(
+          h('ul', { class: 'wdi-admin__problem', role: 'alert' }, ...lines.map((l) => h('li', {}, l))),
+        );
+        refresh();
+      },
+    );
+  });
 
   const picked = h('div', { class: 'wdi-studio__picked', ...tid('studio-edit-selected') });
   const problem = h('p', { class: 'wdi-admin__problem', role: 'alert', ...tid('studio-edit-error') });
@@ -218,6 +241,7 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession, api: SaveA
             ...list(C['studio.edit.checks.warnings'], c.warnings, 'wdi-studio__warn'),
           ]),
     );
+    walkBtn.disabled = c.errors.length > 0;
     saveBtn.disabled = saving || c.errors.length > 0 || s.diff.length === 0;
     diff.textContent = s.diff.length === 0 ? C['studio.edit.nodiff'] : s.diff.join('\n');
     if (s.name === '' && document.activeElement !== name) name.value = '';
@@ -251,6 +275,8 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession, api: SaveA
     checks,
     h('span', {}, C['studio.edit.diff']),
     diff,
+    walkBtn,
+    walkOut,
     note,
     saveBtn,
     saveOut,

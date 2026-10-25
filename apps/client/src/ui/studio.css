@@ -125,3 +125,14 @@
   max-width: 100%;
   box-sizing: border-box;
 }
+
+.wdi-studio__walkbar.wdi-studio__walkbar {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  max-width: min(320px, 90vw);
+}
