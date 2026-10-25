@@ -90,3 +90,13 @@ export function statusOf(s: StudioSnapshot | null, line: string): string {
     .replace('{ty}', String(s.ty))
     .replace('{tick}', String(s.tick));
 }
+
+/**
+ * What the 20 Hz move timer sends: a held vector every tick (the room drops a move after 5 ticks of silence), a
+ * stop once when the keys come up, nothing while still. `last` is the previous call's `sig`.
+ */
+export function moveToSend(m: MoveState, last: string): { send: boolean; sig: string } {
+  const sig = `${m.dx.toFixed(2)},${m.dy.toFixed(2)},${m.sprint}`;
+  const still = m.dx === 0 && m.dy === 0;
+  return { send: !(still && sig === last), sig };
+}

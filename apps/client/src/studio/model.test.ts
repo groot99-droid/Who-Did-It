@@ -1,7 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
 import { SCENE_IDS } from '@wdi/content';
 import type { StudioSnapshot } from '../admin/StudioNet';
-import { filterIds, LOG_LINES, moveOf, spawnsOf, STUDIO_LISTS, statusOf, StudioStore } from './model';
+import {
+  filterIds,
+  LOG_LINES,
+  moveOf,
+  moveToSend,
+  spawnsOf,
+  STUDIO_LISTS,
+  statusOf,
+  StudioStore,
+} from './model';
 
 const snap = (over: Partial<StudioSnapshot> = {}): StudioSnapshot => ({
   tick: 7,
@@ -95,5 +104,23 @@ describe('statusOf', () => {
   it('fills the line and is empty before the first snapshot', () => {
     expect(statusOf(snap(), '{scene} {tx},{ty} #{tick}')).toBe('bakery 3,4 #7');
     expect(statusOf(null, '{scene}')).toBe('');
+  });
+});
+
+describe('moveToSend', () => {
+  const held = { dx: 1, dy: 0, sprint: false };
+  const still = { dx: 0, dy: 0, sprint: false };
+
+  it('resends a held vector every tick, so the room never sees 250 ms of silence', () => {
+    const first = moveToSend(held, '');
+    expect(first.send).toBe(true);
+    expect(moveToSend(held, first.sig).send).toBe(true);
+  });
+
+  it('sends one stop when the keys come up, then nothing while still', () => {
+    const walking = moveToSend(held, '').sig;
+    const stop = moveToSend(still, walking);
+    expect(stop.send).toBe(true);
+    expect(moveToSend(still, stop.sig).send).toBe(false);
   });
 });

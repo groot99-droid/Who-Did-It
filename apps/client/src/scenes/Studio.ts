@@ -9,7 +9,7 @@ import { connectStudio, type StudioLink } from '../admin/StudioNet';
 import { mountControls } from '../studio/Controls';
 import { createMockStudio } from '../studio/mockStudio';
 import { figuresOf, FIGURE_ID } from '../studio/figures';
-import { moveOf, StudioStore } from '../studio/model';
+import { moveOf, moveToSend, StudioStore } from '../studio/model';
 import { clearStudioMarker, setStudioMarker } from '../studio/route';
 import { STUDIO_COPY as C } from '../ui/copy';
 import { h, overlayRoot, type Screen } from '../ui/dom';
@@ -26,9 +26,11 @@ import '../ui/admin.css';
 import '../ui/studio.css';
 
 const colorOf = (hex: string) => Number.parseInt(hex.slice(1), 16);
-/** `studio.move` goes out at 20 Hz, like `input.move`; an unchanged vector repeats at 4 Hz so the room keeps it. */
+/**
+ * `studio.move` goes out every room tick (20 Hz), like `input.move`: the room drops a held move after 5 ticks of
+ * silence, so a held vector is resent each tick and a zero vector is sent once (it stops the figure at once).
+ */
 const MOVE_MS = 50;
-const REPEAT_MS = 250;
 
 /** The tab's session storage, or a throwaway object where the browser blocks it. */
 function sessionStore(): TokenStore {
@@ -66,7 +68,6 @@ export class Studio extends Phaser.Scene {
   private pressed = new Set<string>();
   private moveSeq = 0;
   private lastMove = '';
-  private lastSentAt = 0;
   private moveTimer: number | null = null;
   private onKeyDown = (e: KeyboardEvent) => this.key(e, true);
   private onKeyUp = (e: KeyboardEvent) => this.key(e, false);
@@ -155,12 +156,9 @@ export class Studio extends Phaser.Scene {
   private sendMove(): void {
     if (this.link === null) return;
     const m = moveOf(this.pressed);
-    const sig = `${m.dx.toFixed(2)},${m.dy.toFixed(2)},${m.sprint}`;
-    const now = performance.now();
-    if (sig === this.lastMove && now - this.lastSentAt < REPEAT_MS) return;
-    if (sig === this.lastMove && m.dx === 0 && m.dy === 0) return;
+    const { send, sig } = moveToSend(m, this.lastMove);
+    if (!send) return;
     this.lastMove = sig;
-    this.lastSentAt = now;
     this.link.send('studio.move', { seq: ++this.moveSeq, dx: m.dx, dy: m.dy, sprint: m.sprint });
   }
 
