@@ -72,3 +72,27 @@ export function setGateProfile(scene: Scene, id: string, minProfile: Gate['minPr
   if (!scene.gates.some((g) => g.id === id)) return { error: `${id} is not a gate of this scene` };
   return { scene: { ...scene, gates: scene.gates.map((g) => (g.id === id ? { ...g, minProfile } : g)) } };
 }
+
+/** Moves a gate so its corner lands on a tile; the whole rectangle must lie on floor inside the scene. */
+export function moveGate(scene: Scene, id: string, x: number, y: number): Edit {
+  const g = scene.gates.find((e) => e.id === id);
+  if (g === undefined) return { error: `${id} is not a gate of this scene` };
+  if (x < 0 || y < 0 || x + g.w > scene.size.w || y + g.h > scene.size.h)
+    return { error: 'the gate would leave the scene' };
+  for (let j = y; j < y + g.h; j++)
+    for (let i = x; i < x + g.w; i++)
+      if (scene.grid[j]?.[i] !== '.') return { error: `tile ${i},${j} is not floor` };
+  return { scene: { ...scene, gates: scene.gates.map((e) => (e.id === id ? { ...e, x, y } : e)) } };
+}
+
+/** Moves a path so its first corner lands on a tile; every corner moves by the same step and stays inside. */
+export function movePath(scene: Scene, id: string, x: number, y: number): Edit {
+  const p = scene.paths.find((e) => e.id === id);
+  if (p === undefined) return { error: `${id} is not a path of this scene` };
+  const dx = x - p.points[0]!.x;
+  const dy = y - p.points[0]!.y;
+  const points = p.points.map((q) => ({ x: q.x + dx, y: q.y + dy }));
+  if (points.some((q) => q.x < 0 || q.y < 0 || q.x >= scene.size.w || q.y >= scene.size.h))
+    return { error: 'the path would leave the scene' };
+  return { scene: { ...scene, paths: scene.paths.map((e) => (e.id === id ? { ...e, points } : e)) } };
+}

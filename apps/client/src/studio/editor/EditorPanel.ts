@@ -6,7 +6,7 @@ import { STUDIO_COPY as C, fill } from '../../ui/copy';
 import { h, type Screen } from '../../ui/dom';
 import { spawnsOf } from '../model';
 import { GRID_CHARS, MATERIALS, type Cell, type Tool } from './gridEdit';
-import { find, KINDS, pairedPortal, type Kind } from './sceneEdit';
+import { find, pairedPortal, PLACEABLE, type Kind } from './sceneEdit';
 import { scenes, type Scene } from '@wdi/content';
 import type { SaveApi } from '../saveApi';
 import { SaveError } from '../saveApi';
@@ -55,7 +55,7 @@ export function mountEditorPanel(
 
   const kindSel = h('select', { class: 'wdi-admin__field', ...tid('studio-edit-kind') });
   kindSel.append(h('option', { value: '' }, C['studio.edit.select']));
-  for (const k of KINDS) kindSel.append(h('option', { value: k }, C[`studio.edit.kind.${k}`]));
+  for (const k of PLACEABLE) kindSel.append(h('option', { value: k }, C[`studio.edit.kind.${k}`]));
   const tplSel = h('select', { class: 'wdi-admin__field', hidden: true, ...tid('studio-edit-template') });
   const name = h('input', {
     class: 'wdi-admin__field',

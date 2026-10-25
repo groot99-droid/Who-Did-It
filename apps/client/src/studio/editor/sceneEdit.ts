@@ -2,7 +2,19 @@
 // scene or an error line; nothing here touches Phaser or the network, so the whole of it is tested.
 import type { Scene } from '@wdi/content';
 
-export const KINDS = ['props', 'portals', 'spawns', 'spots', 'lights', 'buildings'] as const;
+/** Everything a click can select. The first group is placed from the palette; gates and paths have their own tools. */
+export const PLACEABLE = [
+  'props',
+  'portals',
+  'spawns',
+  'spots',
+  'lights',
+  'buildings',
+  'nodes',
+  'spawners',
+  'givers',
+] as const;
+export const KINDS = [...PLACEABLE, 'gates', 'paths'] as const;
 export type Kind = (typeof KINDS)[number];
 export interface Pick {
   kind: Kind;
@@ -17,11 +29,16 @@ export type Edit = { scene: Scene } | { error: string };
 
 const NAME = /^[a-z][a-z0-9_]*$/;
 
-/** A building has no tile of its own: the editor reads its footprint's corner as one, and `swap` drops it again. */
+/**
+ * A building has no tile of its own and a path none either: the editor reads a building's footprint corner and a
+ * path's first corner as one, and `swap` drops it again.
+ */
 export const listOf = (scene: Scene, kind: Kind): Obj[] =>
   kind === 'buildings'
     ? (scene.buildings ?? []).map((b) => ({ ...b, x: b.footprint.x, y: b.footprint.y }))
-    : ((scene[kind] ?? []) as Obj[]);
+    : kind === 'paths'
+      ? scene.paths.map((p) => ({ ...p, x: p.points[0]!.x, y: p.points[0]!.y }))
+      : ((scene[kind] ?? []) as Obj[]);
 export const find = (scene: Scene, pick: Pick): Obj | undefined =>
   listOf(scene, pick.kind).find((o) => o.id === pick.id);
 
@@ -32,7 +49,7 @@ function swap(scene: Scene, kind: Kind, f: (list: Obj[]) => Obj[]): Scene {
   const next = f(listOf(scene, kind));
   return {
     ...scene,
-    [kind]: kind === 'buildings' ? next.map(({ x: _x, y: _y, ...rest }) => rest) : next,
+    [kind]: kind === 'buildings' || kind === 'paths' ? next.map(({ x: _x, y: _y, ...rest }) => rest) : next,
   } as Scene;
 }
 
