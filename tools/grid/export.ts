@@ -9,7 +9,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { NAV_VERSION, type NavData, TILE_PX, navProblem } from '@wdi/shared';
+import { NAV_SOLID_CHARS as SOLID, type NavData, TILE_PX, navFromGrid } from '@wdi/shared';
 import {
   BLEND_RANK,
   DEFAULT_FLOOR,
@@ -52,7 +52,6 @@ export function assertGroundCell(w: number, h: number, what: string): void {
     throw new Error(`${what}: ground cell ${w}x${h}, must be ${ISO_TILE_W}x${ISO_TILE_H}`);
 }
 
-const SOLID = new Set(['#', 'D', 'H', 'B']);
 const FLOORS = new Set(Object.keys(FLOOR_MATERIALS));
 const KIT: Record<string, string> = {
   W: 'wall',
@@ -77,26 +76,10 @@ const LIGHT_COLOR: Record<Light['kind'], string> = {
   shaft: 'moon',
 };
 
+/** The scene's nav (the function lives in @wdi/shared so the Studio can regenerate it; round 9). */
 export function navFor(scene: Scene): NavData {
-  const { w, h } = scene.size;
-  if (scene.grid.length !== h)
-    throw new Error(`${scene.id}: grid has ${scene.grid.length} rows, size.h is ${h}`);
-  const solid = scene.grid.map((row, y) => {
-    if (row.length !== w) throw new Error(`${scene.id}: row ${y} has ${row.length} columns, size.w is ${w}`);
-    return [...row].map((ch) => (SOLID.has(ch) ? '1' : '0')).join('');
-  });
-  const nav: NavData = {
-    version: NAV_VERSION,
-    sceneId: scene.id,
-    tile: TILE_PX,
-    w,
-    h,
-    solid,
-    gates: scene.gates.map((g) => ({ id: g.id, minProfile: g.minProfile, x: g.x, y: g.y, w: g.w, h: g.h })),
-  };
+  const nav = navFromGrid(scene);
   assertNavTile(nav.tile, scene.id);
-  const problem = navProblem(nav);
-  if (problem !== null) throw new Error(`${scene.id}: ${problem}`);
   return nav;
 }
 

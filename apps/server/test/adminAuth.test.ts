@@ -288,7 +288,8 @@ describe('the registration gate (server.ts)', () => {
   });
 
   it('has no login routes without the variables', async () => {
-    for (const path of ['/auth/github/login', '/auth/github/callback?code=x&state=y']) {
+    // Round 9: the Studio's routes sit behind the same gate.
+    for (const path of ['/auth/github/login', '/auth/github/callback?code=x&state=y', '/studio/reports']) {
       const res = await fetch(`http://localhost:2568${path}`, { redirect: 'manual' });
       expect(res.status, path).toBe(404);
     }
