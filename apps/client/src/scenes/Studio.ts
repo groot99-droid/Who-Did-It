@@ -12,6 +12,8 @@ import { EditorView } from '../studio/editor/EditorView';
 import { mountEditorPanel } from '../studio/editor/EditorPanel';
 import { tilemapOf } from '../studio/editor/artOf';
 import { EditorSession } from '../studio/editor/session';
+import { OverviewModel } from '../studio/overview/model';
+import { mountOverview } from '../studio/overview/OverviewPanel';
 import { mountInbox } from '../studio/InboxPanel';
 import { mountReportPanel } from '../studio/ReportPanel';
 import { createReportApi, type ReportApi } from '../studio/reportApi';
@@ -20,7 +22,7 @@ import { clearDraft, createDraftApi, draftOn, mockDraftApi, type DraftApi } from
 import { requestOf } from '../studio/reportContext';
 import { figuresOf, FIGURE_ID } from '../studio/figures';
 import { OverlayView } from '../studio/OverlayView';
-import { moveOf, moveToSend, StudioStore } from '../studio/model';
+import { moveOf, moveToSend, spawnsOf, StudioStore } from '../studio/model';
 import { clearStudioMarker, setStudioMarker } from '../studio/route';
 import { STUDIO_COPY as C } from '../ui/copy';
 import { h, overlayRoot, type Screen } from '../ui/dom';
@@ -98,6 +100,10 @@ export class Studio extends Phaser.Scene {
   private mock = false;
   private dialog: Screen | null = null;
   private editor: { session: EditorSession; view: EditorView; panel: Screen } | null = null;
+  /** The Overview (round 9, admin-studio.md 8): its pending door edits outlive the panel, and a scene it enters waits for the world. */
+  private readonly overview = new OverviewModel();
+  private overviewPanel: Screen | null = null;
+  private pendingEdit: string | null = null;
   private moveSeq = 0;
   private lastMove = '';
   private moveTimer: number | null = null;
@@ -144,11 +150,15 @@ export class Studio extends Phaser.Scene {
     this.link = link;
     link.bus.on('snapshot', (s) => this.store.applySnapshot(s));
     link.bus.on('log', (lines) => this.store.addLog(lines));
-    link.bus.on('refused', (msg) => this.store.refuse(msg));
+    link.bus.on('refused', (msg) => {
+      this.pendingEdit = null;
+      this.store.refuse(msg);
+    });
     link.bus.on('closed', () => {
       if (this.link !== link) return;
       this.link = null;
       this.stopInput();
+      this.closeOverview();
       this.clearScreens();
       this.draft = null;
       this.store.reset();
@@ -167,6 +177,7 @@ export class Studio extends Phaser.Scene {
         onReport: () => void this.openReport(),
         onInbox: () => this.openInbox(),
         onEdit: () => this.toggleEdit(),
+        onOverview: () => this.toggleOverview(),
       }),
     );
     this.startInput();
@@ -206,7 +217,41 @@ export class Studio extends Phaser.Scene {
     if (this.draft !== null) return this.backToEdit();
     const snap = this.store.snapshot;
     if (snap === null || this.link === null || this.map === null) return;
-    this.openEditor(new EditorSession(snap.sceneId));
+    this.openEditor(
+      this.overview.has(snap.sceneId)
+        ? this.overview.sessionFor(snap.sceneId)
+        : new EditorSession(snap.sceneId),
+    );
+  }
+
+  /** Overview on or off: the cards of the current map over the world. */
+  private toggleOverview(): void {
+    if (this.overviewPanel !== null) return this.closeOverview();
+    const sceneId = this.store.snapshot?.sceneId;
+    if (sceneId === undefined) return;
+    if (this.editor !== null) this.stopEdit();
+    this.overviewPanel = mountOverview(overlayRoot(), {
+      model: this.overview,
+      sceneId,
+      api: this.saveApi ?? mockSaveApi,
+      onEnter: (id) => this.enterFromOverview(id),
+      onClose: () => this.closeOverview(),
+    });
+  }
+
+  private closeOverview(): void {
+    this.overviewPanel?.destroy();
+    this.overviewPanel = null;
+  }
+
+  /** A card was clicked: go to the scene (the first spawn) and open its editor, on the Overview's session, once it is drawn. */
+  private enterFromOverview(sceneId: string): void {
+    this.closeOverview();
+    if (this.store.snapshot?.sceneId === sceneId) return this.openEditor(this.overview.sessionFor(sceneId));
+    const spawnId = spawnsOf(sceneId)[0];
+    if (spawnId === undefined || this.link === null) return;
+    this.pendingEdit = sceneId;
+    this.link.send('studio.teleport', { sceneId, spawnId });
   }
 
   private openEditor(session: EditorSession): void {
@@ -442,6 +487,10 @@ export class Studio extends Phaser.Scene {
     if (snap.sceneId !== this.sceneId && !this.loading) this.enterScene(snap.sceneId);
     if (this.map === null || this.entities === null || this.statics === null) return;
     if (snap.sceneId !== this.sceneId) return;
+    if (this.pendingEdit === this.sceneId) {
+      this.pendingEdit = null;
+      if (this.editor === null) this.openEditor(this.overview.sessionFor(this.sceneId));
+    }
     this.followDraft(snap);
     if (snap.tick !== this.lastTick) {
       this.lastTick = snap.tick;
@@ -525,6 +574,7 @@ export class Studio extends Phaser.Scene {
     this.link = null;
     link?.close();
     this.stopInput();
+    this.closeOverview();
     this.clearScreens();
     this.walkBar = null;
     this.draft = null;
@@ -549,6 +599,7 @@ export class Studio extends Phaser.Scene {
   private teardown(): void {
     this.stopInput();
     this.closeDialog();
+    this.closeOverview();
     this.dropWorld();
     this.link?.close();
     this.link = null;

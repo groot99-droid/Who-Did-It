@@ -1,6 +1,16 @@
-import { SCENE_IDS, Scene, type SceneId, content, validateContent } from '@wdi/content';
+import {
+  LoreFile,
+  QuestsFile,
+  RoutinesFile,
+  SCENE_IDS,
+  Scene,
+  type SceneId,
+  TalkFile,
+  content,
+  validateContent,
+} from '@wdi/content';
 import { tilemapFor } from '@wdi/content/tilemap';
-import { type NavData, navFromGrid } from '@wdi/shared';
+import { type NavData, type StudioDataFile, navFromGrid } from '@wdi/shared';
 
 /**
  * The server's half of a Studio save (round 9, docs/round9/admin-studio.md 5): it never trusts the editor. The scene
@@ -143,6 +153,136 @@ export function unknownKeys(raw: unknown, parsed: unknown, path: string[]): stri
       ? unknownKeys(v, (parsed as Record<string, unknown>)[k], [...path, k])
       : [[...path, k].join('.')],
   );
+}
+
+/**
+ * The data files a save may write besides scenes (admin-studio.md 8, N1), each with its key in `Content` and its
+ * schema. `looks.json` is never edited from the Studio: which look a figure wears is its routines or quests entry.
+ */
+const DATA_FILES = {
+  'routines.json': { key: 'routines', schema: RoutinesFile },
+  'quests.json': { key: 'quests', schema: QuestsFile },
+  'lore.json': { key: 'lore', schema: LoreFile },
+  'talk.json': { key: 'talk', schema: TalkFile },
+} as const satisfies Record<StudioDataFile, unknown>;
+const NPC_FILES = {
+  routines: RoutinesFile,
+  quests: QuestsFile,
+} as const;
+type NpcKey = keyof typeof NPC_FILES;
+
+export const isDataFile = (file: unknown): file is StudioDataFile =>
+  typeof file === 'string' && Object.hasOwn(DATA_FILES, file);
+
+/** The part of a zod schema a save reads. */
+interface Schema {
+  safeParse(
+    raw: unknown,
+  ):
+    | { success: true; data: unknown }
+    | { success: false; error: { issues: ReadonlyArray<{ path: PropertyKey[]; message: string }> } };
+}
+
+/** Parses one untrusted file with its schema and refuses a key the schema does not know, at any depth. */
+function parseStrict(label: string, schema: Schema, raw: unknown): unknown {
+  const parsed = schema.safeParse(raw);
+  if (!parsed.success)
+    throw new SaveRefused(
+      parsed.error.issues.slice(0, 50).map((i) => `${label} ${i.path.map(String).join('.')}: ${i.message}`),
+    );
+  const unknown = unknownKeys(raw, parsed.data, []);
+  if (unknown.length) throw new SaveRefused(unknown.map((p) => `${label}: unknown key: ${p}`));
+  return parsed.data;
+}
+
+/** What changed in a data file: each top-level key, and inside a record the added, removed and changed entries. */
+export function dataSummary(before: unknown, after: unknown): string[] {
+  const a = before as Record<string, unknown>;
+  const b = after as Record<string, unknown>;
+  const out: string[] = [];
+  for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) {
+    const x = a[k];
+    const y = b[k];
+    if (JSON.stringify(x) === JSON.stringify(y)) continue;
+    const isRecord = (v: unknown) => v !== null && typeof v === 'object' && !Array.isArray(v);
+    if (!isRecord(x) || !isRecord(y)) {
+      out.push(`- \`${k}\` changed`);
+      continue;
+    }
+    const rx = x as Record<string, unknown>;
+    const ry = y as Record<string, unknown>;
+    const list = (ids: string[]) => ids.map((id) => `\`${id}\``).join(', ');
+    const added = Object.keys(ry).filter((id) => !Object.hasOwn(rx, id));
+    const removed = Object.keys(rx).filter((id) => !Object.hasOwn(ry, id));
+    const edited = Object.keys(ry).filter(
+      (id) => Object.hasOwn(rx, id) && JSON.stringify(rx[id]) !== JSON.stringify(ry[id]),
+    );
+    const parts = [
+      added.length ? `added ${list(added)}` : '',
+      removed.length ? `removed ${list(removed)}` : '',
+      edited.length ? `changed ${list(edited)}` : '',
+    ].filter(Boolean);
+    out.push(`- ${k}: ${parts.join('; ') || 'reordered'}`);
+  }
+  return out;
+}
+
+export interface CheckedDataSave {
+  file: StudioDataFile;
+  text: string;
+  summary: string[];
+}
+
+/**
+ * Checks an untrusted data file of the allowlist (admin-studio.md 8, N1) as a scene save is checked: its schema,
+ * unknown keys, and the whole content's validator with the edit in place. The file keeps the editor's key order.
+ */
+export function checkDataSave(
+  file: StudioDataFile,
+  raw: unknown,
+  committed: typeof content = content,
+): CheckedDataSave {
+  const { key, schema } = DATA_FILES[file];
+  const data = parseStrict(file, schema, raw);
+  const problems = validateContent({ ...committed, [key]: data });
+  if (problems.length) throw new SaveRefused(problems);
+  const summary = dataSummary(committed[key], data);
+  if (summary.length === 0) throw new SaveRefused(['nothing changed']);
+  return { file, text: formatDataJson(raw), summary };
+}
+
+/** The NPC data the Studio room's stand-ins and givers read: the draft's files, the committed ones otherwise. */
+export interface NpcData {
+  routines: typeof content.routines;
+  quests: typeof content.quests;
+  /** Always the committed looks: the draft never edits `looks.json` (6Z, admin-studio.md 8). */
+  looks: typeof content.looks;
+}
+
+/**
+ * The NPC draft of `POST /studio/npc-draft` (admin-studio.md 8, live preview): each file sent checked as a save is,
+ * with every file sent in place at once (an unchanged file is fine). At least one is sent; throws `SaveRefused`.
+ */
+export function checkNpcDraft(
+  body: Partial<Record<NpcKey, unknown>>,
+  committed: typeof content = content,
+): NpcData {
+  const keys = (Object.keys(NPC_FILES) as NpcKey[]).filter((k) => body[k] !== undefined);
+  if (keys.length === 0) throw new SaveRefused(['send routines or quests']);
+  const out: NpcData = { routines: committed.routines, quests: committed.quests, looks: committed.looks };
+  const problems: string[] = [];
+  for (const k of keys) {
+    try {
+      (out as unknown as Record<NpcKey, unknown>)[k] = parseStrict(`${k}.json`, NPC_FILES[k], body[k]);
+    } catch (e) {
+      if (!(e instanceof SaveRefused)) throw e;
+      problems.push(...e.problems);
+    }
+  }
+  if (problems.length) throw new SaveRefused(problems);
+  problems.push(...validateContent({ ...committed, ...out }));
+  if (problems.length) throw new SaveRefused(problems);
+  return out;
 }
 
 const WIDTH = 100;

@@ -1,0 +1,39 @@
+{
+  "gddRef": "3.25",
+  "notes": [
+    { "text": "Who saw {body} last?" },
+    { "text": "Where was everyone when {body} was found?" },
+    { "text": "{body} was fine this morning. What changed?" },
+    { "text": "Did anyone hear anything near {body}?" },
+    { "text": "{caller}, what did you see before you called us?" },
+    { "text": "Whoever rang the bell, say why.", "when": "bell" },
+    { "text": "Where is {missing}?" },
+    { "text": "Has anyone seen {name} today?" },
+    { "text": "{name}, where were you after dark?" },
+    { "text": "I saw nothing odd today. That worries me." },
+    { "text": "Let us not vote blind." },
+    { "text": "Skip if nobody is sure." },
+    { "text": "Someone here knows more than they say." },
+    { "text": "Read the Case Board before you vote." },
+    { "text": "I kept to the square most of the day." },
+    { "text": "Two of us saying the same thing is not proof." }
+  ],
+  "herrings": [
+    { "text": "Poor {seat}. Who found the body?", "when": "body" },
+    { "text": "Who found the body this time?", "when": "bell" },
+    { "text": "Why ring the bell when nobody is hurt?", "when": "report" },
+    { "text": "{seat}, why did you call us here?", "when": "caller" },
+    { "text": "Where is {seat}? Nobody has seen them all day." },
+    { "text": "Night {wrongRound} and still no answer." }
+  ],
+  "smallTalk": [
+    "Can I get a cup of coffee?",
+    "Is there any more of that pie?",
+    "Who left the gate open again?",
+    "Must we do this before supper?",
+    "I only came for the biscuits.",
+    "Does anyone else smell bread?",
+    "My feet are sore. Can we sit?",
+    "Someone owes me a shilling."
+  ]
+}

@@ -28,6 +28,8 @@ import { checkEconomy } from './validateEconomy.js';
 import { checkRelations } from './validateRelations.js';
 import type { LoreFile } from './schemas/lore.js';
 import { checkLore } from './validateLore.js';
+import type { TalkFile } from './schemas/talk.js';
+import { checkTalk } from './validateTalk.js';
 
 export interface Content {
   palette: PaletteFile;
@@ -64,6 +66,8 @@ export interface Content {
   relations: RelationsFile;
   // Round 8 (GDD 3.26), 7M.
   lore: LoreFile;
+  /** Round 9 (GDD 3.25, N2): the NPC seats' meeting-note lines. */
+  talk: TalkFile;
 }
 
 const maxProfile = (a: Profile, b: Profile): Profile => (PROFILE_RANK[a] >= PROFILE_RANK[b] ? a : b);
@@ -266,6 +270,7 @@ export function validateContent(c: Content): string[] {
   checkShops(c, err);
   // Round 8 (GDD 3.26): the shelf reader's books, letters, ledgers and clippings.
   checkLore(c, err);
+  checkTalk(c, err);
 
   return errors;
 }
@@ -391,7 +396,8 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
 
   // Quests and mini-games (GDD 3.16): each npc stands once and wants what the scenes open with its own scene can
   // yield or make; rewards ship in V1.
-  const looks = new Set(Object.keys(c.looks.looks));
+  // A giver wears the villager family, never a card's look (3.16 "Givers"; round 9, N1).
+  const villagers = new Set(Object.keys(c.looks.villagers));
   const standsOn = new Map<string, string>();
   for (const map of Object.values(c.maps)) {
     for (const sceneId of map.scenes) {
@@ -404,8 +410,8 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
   }
   for (const npc of Object.values(quests.npcs)) {
     if (!standsOn.has(npc.id)) err(`quests.json: npc ${npc.id} stands nowhere`);
-    if (npc.look !== 'villager' && !looks.has(npc.look))
-      err(`quests.json: npc ${npc.id} unknown look ${npc.look}`);
+    if (!villagers.has(npc.look))
+      err(`quests.json: npc ${npc.id} look ${npc.look} is not of the villager family`);
     if (!Object.values(quests.quests).some((q) => q.giver === npc.id))
       err(`quests.json: npc ${npc.id} gives nothing`);
   }

@@ -140,4 +140,21 @@ export const STUDIO_COPY = {
   'studio.inbox.open': 'Open',
   'studio.inbox.answered': 'Answered',
   'studio.inbox.fixed': 'Fixed',
+  'studio.overview': 'Overview',
+  'studio.overview.title': 'Overview of {map}',
+  'studio.overview.layout.auto':
+    'Automatic layout: maps/{map}.json has no layout, so cards sit in columns by doors from the hub.',
+  'studio.overview.layout.map': 'Layout from maps/{map}.json.',
+  'studio.overview.help':
+    'Click a card to open the scene. Drag a link’s dot onto a spawn of another scene to re-target the door.',
+  'studio.overview.enter': 'Open {scene}',
+  'studio.overview.kind.exterior': 'World',
+  'studio.overview.kind.interior': 'Room',
+  'studio.overview.links': 'Doors as a list',
+  'studio.overview.to': 'Scene that {portal} leads to',
+  'studio.overview.spawn': 'Spawn that {portal} lands on',
+  'studio.overview.changed': 'Unsaved doors in: {scenes}',
+  'studio.overview.failed': 'Not saved: {why}',
+  'studio.overview.save': 'Save changed scenes as draft PRs',
+  'studio.overview.close': 'Close',
 } as const;
