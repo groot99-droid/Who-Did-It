@@ -42,7 +42,8 @@ Proposed; the file is not created in this round. Style follows the other content
     "break": { "name": "Breaking",     "tiers": 2 },
     "dig":   { "name": "Digging",      "tiers": 1 },
     "pick":  { "name": "Lock picking", "tiers": 3 },
-    "pry":   { "name": "Prying",       "tiers": 2 }
+    "pry":   { "name": "Prying",       "tiers": 2 },
+    "skin":  { "name": "Skinning",     "tiers": 1 }
   },
 
   // Target classes: what a placed thing IS. Matched by prop kind + id stem, resource id, portal lock, or a tag on a scene.
@@ -128,7 +129,7 @@ import { z } from 'zod';
 import { GddRef, Id, PropKind } from './common.js';
 import { NoiseKey } from './balance.js';
 
-const Tag = z.enum(['cut', 'break', 'dig', 'pick', 'pry']); // grows by append only, like SCENE_IDS
+const Tag = z.enum(['cut', 'break', 'dig', 'pick', 'pry', 'skin']); // grows by append only, like SCENE_IDS
 const Qty = z.tuple([z.number().int().positive(), z.number().int().positive()]);
 
 export const Drop = z.strictObject({ item: Id, qty: Qty, chance: z.number().gt(0).max(1).optional() });
@@ -239,7 +240,7 @@ Reconciling with the 516: 89 props are neither `dressing` nor `decor`. 68 of the
 | --- | --- | ---: | --- | --- |
 | Lumber | stump 15, timber_set 8, log 6, firewood 5, log_basket 5, fallen_log 3, woodpile 3, planks 3 | 48 | firewood, log_basket, woodpile, planks: take 1 (slow) | **Axe** cuts: woodpile 3 timber, log and fallen_log 3, stump 1 timber and a little resin, timber_set 2 with a rockfall risk in a cave. `planks`: take 1 Planks by hand (owned: theft in a shop or yard) |
 | Stone | boulder 10, rock_pile 4, ore_pile 4, rubble 2 | 20 | rock_pile, ore_pile: take 1 (slow) | **Pickaxe** breaks a boulder into 2 to 3 stone and sometimes tin ore; rock_pile 2 stone; ore_pile 2 tin ore; rubble clears to uncover a small cache |
-| Forage and water | mushrooms 10, water_bucket 6, bucket 4, snare 3 | 23 | mushrooms: forage 1; water_bucket: fill a Bucket (needs one); snare: disarm | **Knife** (any) skins a creature corpse for hide (8.4). Disarmed snare gives a Snare |
+| Forage and water | mushrooms 10, water_bucket 6, bucket 4, snare 3 | 23 | mushrooms: forage 1; water_bucket: fill a Bucket (needs one); snare: disarm | **Skinning knife** skins a creature corpse for hide and game (8.4). Disarmed snare gives a Snare |
 | Stations | saw_horse 2, workbench 2, grindstone 2, anvil 1, forge 1, kiln 2, mortar_table 1, still 1, shaping_table 3, dough_trough 1, peel_rack 2, couche_rack 2, drying_frame 3 | 23 | Craft a recipe (9.4) | Saw horse: Timber to Planks. Grindstone restores a tool's durability. Kiln: Tin Ore to Tin Ingot. Forge and anvil: tier-2 tools and armour. Mortar table and still: Salts, Bandage. Bakery stations: dough then loaf. Drying frame: herbs keep longer |
 | Haul | wheelbarrow 6 | 6 | Load and push: carry capacity for materials (P2) | none |
 | Wake scene and hazards | plate 10, deadLoaf 3, wakeTable 1, gasPocket 2, lockedDoor 1 | 17 | plate and loaf: serve or eat (events, 9C); gasPocket: the lantern flame test; lockedDoor | lockedDoor: pick (Lockpicks) or pry (Crowbar) or the Study Key |
@@ -341,6 +342,7 @@ All values _proposed_; they move to `items.json` and `balance.json`.
 | Fine pick | pick 2 | charges | Forge, or loot in a tier-3 chest |
 | Crowbar (exists) | pry 1 | 20 | recipe as today |
 | Hammer | pry 1 (crates only) | 40 | tool_rack |
+| Skinning knife | skin 1 | 20 | Gamekeeper's stall, general store, `toolshed` and `forager` loot (8.4) |
 
 Tier 2 opens what tier 1 cannot (a strongbox lock, a granite boulder, a thick log). Tools wear: each use takes `wear`, and a worn tool breaks with a line ("The axe handle splits."). The grindstone restores it, which gives the camp's grindstones and the smithy a use. A tool's `kind` is `tool`, so it takes an inventory slot (open question 4).
 
@@ -351,7 +353,7 @@ Armour is a separate equipment slot, not an inventory item. Two slots, `body` an
 | Item | Slot | Tier | Damage taken (_proposed_) | Source |
 | --- | --- | ---: | --- | --- |
 | Quilted coat | body | 1 | ×0.85 | General store, `armoury` loot, recipe (cloth) |
-| Leather jerkin | body | 2 | ×0.70 | Recipe: hide from wolf or boar skinned with a knife, at a workbench |
+| Leather jerkin | body | 2 | ×0.70 | Recipe: hide from a wolf or boar skinned with a skinning knife, at a workbench |
 | Tin mail | body | 3 | ×0.55; walking speed ×0.95; footsteps +1 tile | Forge (tin ingot), `armoury` loot |
 | Miner's cap | head | 1 | ×0.90 | BlackPine office, mine `tool_rack` |
 | Tin helm | head | 2 | ×0.80 | Forge |
@@ -380,7 +382,7 @@ Every weapon has `kills: false` against a seat: a player is never killed by anyt
 
 ### 8.4 Skinning
 
-A creature corpse (`creatureCorpseS` 10 in `balance.body`) can be skinned with any Knife (or Replica Knife) for hide (wolf 2, boar 2, bat and rat none). Hide is the leather jerkin's material. This ties the mobs (9C bosses and drops) to gear without another item class.
+A creature corpse (`creatureCorpseS` 10 in `balance.body`) can be skinned with a **Skinning knife** (item `skinningKnife`, tag `skin` 1, `roleBound: false`, durability 20, sold at the gamekeeper's stall and the general store, found in `toolshed` and `forager` loot) for hide (wolf 2, boar 2, bat and rat none) and game (wolf 1, boar 2; bat and rat none; _proposed_). Hide is the leather jerkin's material; game is the stew's (9.6). The Knife and the Replica Knife are role kit and have no part in it: if the Killer's Knife could skin, only the Killer could ever hold hide or wear a jerkin, and the leather would mark them. This ties the mobs (9C bosses and drops) to gear without another item class.
 
 ## 9. How the table extends what exists
 
@@ -409,11 +411,35 @@ Recipes already name a `station` prop kind (`basin`, `oven`). Proposed new stati
 
 `lock: { keyId }` gains an optional `tier` (additive): `{ keyId, tier }`. A portal with a lock is a `lockedDoor` target; `pick_lock` (3.1) opens it at tier ≤ the pick's tier, a key item whose id equals `keyId` opens it silently, and a crowbar breaks it for good (the door "stays broken", GDD 3.5). `Portals.ts:180-183` calls the resolver instead of refusing every keyed door. No existing door is locked in the data, so the round-10 scene edit chooses which doors lock (the manor study first, since `mu.study_door` and the Study Key caches in the barn and the cellar are already placed).
 
+**Curfew doors.** From dusk an Indebted seat's curfew doors are refused by `curfewBars` (`Portals.ts:187`), and the curfew list in `economy.json` names the scenes: tavern_bar, widow_parlour, bakery, apoth_shop, manor_hall and barn on HollowMere; bp_lodge, bp_office and bp_smithy on BlackPine. For the lock-picking path (the rogue who dodges the curfew and the tax) to exist, **the round-10 scene edit must give the portals into those scenes a `lock` (`keyId` and `tier`)**, and `curfewBars` must call the resolver instead of refusing outright: a curfew door is then a locked door at night, which a pick, a key or a crowbar opens, with a print and noise, and `CURFEW` is the refusal only for a seat with none of them. Without the `lock` on those portals `pick_lock` has nothing to open there.
+
+### 9.6 Rows for the living world (9C): berries, game, stew
+
+Three additions so foraging and hunting feed a meal, none of which exists in the data today. Values are _proposed_.
+
+```jsonc
+// resources.json
+"berries": { "id": "berries", "name": "Berries", "gatherS": 2, "yield": 2, "respawnS": 75, "sprite": "node_berries" }
+
+// items.json
+"berries": { "id": "berries", "name": "Berries", "kind": "material", "roleBound": false, "onDeath": "drops", "tooltip": "Crafting: stew. Wanted by quest givers.", "ships": "V1", "gddRef": "3.14" },
+"game":    { "id": "game",    "name": "Game",    "kind": "material", "roleBound": false, "onDeath": "drops", "tooltip": "Meat from a skinned creature. Crafting: stew.", "ships": "V1", "gddRef": "3.14" },
+"stew":    { "id": "stew",    "name": "Stew",    "kind": "food",     "roleBound": false, "onDeath": "drops", "use": "eat", "tooltip": "Hot food: cures Famished and restores stamina.", "ships": "V1", "gddRef": "3.22" }
+
+// recipes.json
+"stew": { "id": "stew", "out": "stew", "qty": 1, "in": [{ "item": "game", "qty": 1 }, { "item": "herb", "qty": 1 }, { "item": "mushroom", "qty": 1 }], "station": "oven", "craftS": 4 }
+```
+
+- **`berries` node.** A seventh resource. Round 10 adds `NodeSpot`s in `forest`, `forest_deep` and `bp_woods` (new ids under each prefix, one shared pool per scene so half are active, like the other six), each anchored to a bush prop (a new `berry_bush` stem, art task) per section 7. Class `node:berries`, interaction `forage_berries`, a bare-hands mode only (no tool wall for food). The market buys it (`economy.json` `shops.market.buys` and a `prices` entry).
+- **`game` item.** Dropped by skinning a wolf or a boar with the Skinning knife (8.4). It is also sold at no shop, so meat is a hunter's resource.
+- **`stew` recipe.** At an `oven` (the bakery oven or the tavern stove), so the table already has the station. `stew` uses the same `eat` ability as the Wake Loaf; `body/verbs.ts` `handleEat` is generalised from one food id to every `kind: "food"` item in the build step. A Wake Loaf recipe (Flour at an `oven`) sits beside it (9.4), so bread and stew are the two meals a player can make instead of buy.
+- **The rogue's meal** (section 11) is then: forage berries, herbs and mushrooms, hunt for game, cook stew.
+
 ## 10. The table
 
 Rows are what a seat holds, columns what it works on. A cell is the verb and the result; `–` means the failure line of the column's interaction runs (`NEED_TOOL` naming the right tool). Proposed numbers are the _first_ guess; the table is the structure.
 
-| Object | Bare hands | Axe | Pickaxe | Spade | Lockpicks | Crowbar | Key | Knife |
+| Object | Bare hands | Axe | Pickaxe | Spade | Lockpicks | Crowbar | Key | Skinning knife |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Woodpile / firewood / log basket | Take 1 | **Chop** 2 to 3 timber | – | – | – | – | – | – |
 | Log / fallen log | – | **Chop** 3 timber | – | – | – | – | – | – |
@@ -429,10 +455,22 @@ Rows are what a seat holds, columns what it works on. A cell is the verb and the
 | Strongbox | – | – | – | – | – | – | **Open** (its key only) | – |
 | Locked door | – | – | – | – | **Pick** | **Break** (stays broken) | **Open** | – |
 | Shop shelf (owned) | **Take** (theft) | – | – | – | – | – | – | – |
-| Wolf / boar corpse | – | – | – | – | – | – | – | **Skin** for hide |
+| Wolf / boar corpse | – | – | – | – | – | – | – | **Skin** for hide and game |
+| Berry bush (node) | **Forage** berries | – | – | – | – | – | – | – |
 | Snare in the wild | **Disarm** | – | – | – | – | – | – | – |
 
 Failure lines used by the table (full set in the `fail` blocks of `interactions.json`; wording rules in `failures.md`): the owner's lock line, "Failed to pick the lock. Looks like you might need a lock pick."; lumber, "You tug at the timber. It will not come apart by hand. An axe would."; boulder, "The boulder does not care. You would want a pickaxe."; seam, "The seam will not give. A spade would."; nailed crate, "The lid is nailed down. Something to lever it with would help."; locked chest with no key or pick, "The lock holds. It wants a key, or a pick."
+
+### 10.1 Secrecy check: no verb depends on a role's item
+
+The rule (CLAUDE.md, role secrecy): holding or using an item must not mark a seat's role. A verb in the table that only a role-bound item could perform would make that role's holder the only one who could ever do it, and a sighting of the result would mark them. The check, over every verb and tool in sections 3 to 10:
+
+- The `roleBound: true` items in `items.json` are Knife, Master Keyring, Magnifier, Notebook, Slingshot, Replica Knife, Crossbow, Seance Chalk, Remedy, Nightshade and Fowling Piece. The table uses **none** of them as a tool. A validator rule enforces it: no `modes[].tool` may resolve to an item with `roleBound: true`.
+- Found and fixed: skinning was written for the Knife and Replica Knife (the Killer's and the Drifter's). It now needs the neutral Skinning knife (8.4), so hide, game and the jerkin are reachable by every seat.
+- The Master Keyring (a Cabal item, `use: lockUnlock`) keeps its own ability, which locks and unlocks any door. It is not a table verb; the table's `pick_lock` and the Skeleton Key and Crowbar stay open to every seat, so a lock that opens is not proof of a Cabal card.
+- The Slingshot and Crossbow in 8.3 are role kit, listed for their damage numbers only. The new weapons (club, hatchet, axe, pickaxe) are neutral, so armed gear does not mark a role either.
+- Nothing in the table reads or writes a seat's role card, inventory or notebook beyond the acting seat, and containers roll on a stream no secret shares (6.4).
+- Left open (not a role leak): a Killer who picks a lock leaves a print and noise like anyone, so the lock tells nobody anything about roles; the tool and the print are the evidence, not the card.
 
 ## 11. Checking the rogue
 
@@ -440,7 +478,7 @@ The owner's example: "the rogue who refused to buy bread and gathers food instea
 
 | Step | Row the table needs |
 | --- | --- |
-| Skip the bread | Forage (mushrooms, herbs: bare hands, section 5.1) and **bake** (Flour from the bakery sacks, or searched stores, at an `oven`: the Wake Loaf recipe, 9.4) |
+| Skip the bread | Forage (mushrooms, herbs, berries: bare hands, section 5.1 and 9.6), hunt (game from a skinned boar), **cook stew**, or **bake** (Flour from the bakery sacks, or searched stores, at an `oven`: the Wake Loaf recipe, 9.4) |
 | Make lock picks | Tin Ore (a Spade or a Pickaxe on a seam, or a boulder), then the existing `lockpicks` recipe at a basin; the rogue needs no shop |
 | Open what the tax guards | `pick_lock` on the curfew-locked door or the owned shelf (`ownership: "owned"`, `crime: "theft" / "trespass"`) |
 | Skip the tax | Rent and quota are paid in Scrip or items (`economy.json`); an owned container or a seam gives a way to earn without the shop; the quota rack takes timber and stone, both now easy to obtain with the right tool |
@@ -457,7 +495,7 @@ Pull requests under 400 lines, one concern each, in this order. Each keeps the b
 3. **Tools and the first four interactions.** Axe, Pickaxe, items and recipes; `chop_lumber`, `break_boulder`, `gather` migrated for tin ore; the grindstone. Test: yields, wear, break, respawn.
 4. **State on the wire and art frames.** `PropState`; the sprite packer's `_cut`, `_rubble`, `_open`, `_broken` frames.
 5. **Containers.** The `loot` stream, activation, tables, `search` and `lock`, `containerSlots` for the six empty places, `Portal.lock.tier`. Test: determinism for a seed, no secret leaked to a seat that did not open it, reachability on the nav grid, per-scene counts match 6.2.
-6. **Gear.** Armour slots, `weapon` blocks, the forge and kiln recipes, skinning. Test: the Knife ignores armour; the cap holds; bleeding never kills.
+6. **Gear.** Armour slots, `weapon` blocks, the forge and kiln recipes, skinning. Test: the Knife ignores armour; the cap holds; bleeding never kills; no table verb requires a `roleBound` item (10.1).
 7. **NPC holds.** `holds`, `carries`, cosmetic work, the lumberjack figure.
 8. **Client.** The use prompt reads the table and greys a verb with the missing tool; failures per `failures.md`.
 
