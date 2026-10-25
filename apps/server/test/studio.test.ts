@@ -75,3 +75,79 @@ describe('the Studio sim', () => {
     expect(studioSnapshot(sim)).toEqual({ ...before, tick: before.tick + 2 });
   });
 });
+
+describe('moving through the world (S1b)', () => {
+  const bakery = () => {
+    const sim = createStudio();
+    expect(send(sim, ['studio.teleport', { sceneId: 'bakery', spawnId: 'door' }])).toEqual([]);
+    return sim;
+  };
+
+  it('walks through walls to the edge of the scene under noclip', () => {
+    const sim = bakery();
+    send(sim, ['studio.noclip', { on: true }]);
+    hold(sim, -1, 0, 80);
+    expect(studioSnapshot(sim)).toMatchObject({ tx: 0, noclip: true });
+    expect(sim.x).toBeGreaterThanOrEqual(0);
+  });
+
+  it('teleports to a spawn of any scene or a tile; a wall tile only under noclip', () => {
+    const sim = createStudio();
+    expect(send(sim, ['studio.teleport', { sceneId: 'bakery', spawnId: 'oven_room' }])).toEqual([]);
+    expect(studioSnapshot(sim)).toMatchObject({ sceneId: 'bakery', tx: 5, ty: 1 });
+    expect(send(sim, ['studio.teleport', { x: 3, y: 9 }])).toEqual([]);
+    expect(studioSnapshot(sim)).toMatchObject({ sceneId: 'bakery', tx: 3, ty: 9 });
+    for (const bad of [
+      { x: 0, y: 0 },
+      { x: 99, y: 0 },
+      { sceneId: 'bakery', spawnId: 'nowhere' },
+    ]) {
+      expect(send(sim, ['studio.teleport', bad])).toEqual(['cannot stand there']);
+    }
+    expect(studioSnapshot(sim)).toMatchObject({ tx: 3, ty: 9 });
+    send(sim, ['studio.noclip', { on: true }]);
+    expect(send(sim, ['studio.teleport', { x: 0, y: 0 }])).toEqual([]);
+    expect(studioSnapshot(sim)).toMatchObject({ tx: 0, ty: 0 });
+  });
+
+  it('goes through a door in reach to its target spawn, and refuses one out of reach', () => {
+    const sim = bakery();
+    expect(send(sim, ['studio.portal', { portalId: 'bk.oven_room' }])).toEqual(['too far']);
+    expect(send(sim, ['studio.portal', { portalId: 'bk.nope' }])).toEqual(['no such door']);
+    expect(sim.sceneId).toBe('bakery');
+    expect(send(sim, ['studio.portal', { portalId: 'bk.door' }])).toEqual([]);
+    expect(sim.sceneId).toBe('overworld');
+    expect(sim.log.some((l) => l.endsWith('door bk.door'))).toBe(true);
+  });
+
+  it('sets the profile', () => {
+    const sim = createStudio();
+    send(sim, ['studio.profile', { profile: 'small' }]);
+    expect(studioSnapshot(sim).profile).toBe('small');
+  });
+
+  it('refuses bad shapes and unknown ids, and changes nothing', () => {
+    const sim = bakery();
+    const before = studioSnapshot(sim);
+    const bad: [string, unknown][] = [
+      ['studio.noclip', { on: 'yes' }],
+      ['studio.teleport', { sceneId: 'atlantis', spawnId: 'door' }],
+      ['studio.teleport', { x: 1.5, y: 2 }],
+      ['studio.teleport', { x: -1, y: 2 }],
+      ['studio.teleport', { x: 1, y: 2, spawnId: 'door' }],
+      ['studio.teleport', {}],
+      ['studio.portal', { portalId: 7 }],
+      ['studio.profile', { profile: 'huge' }],
+      ['studio.profile', { profile: '__proto__' }],
+    ];
+    expect(send(sim, ...bad)).toHaveLength(bad.length);
+    expect(studioSnapshot(sim)).toEqual({ ...before, tick: before.tick + 1 });
+  });
+
+  it('logs each applied and refused command with its tick', () => {
+    const sim = bakery();
+    sim.log.length = 0;
+    send(sim, ['studio.noclip', { on: true }], ['studio.portal', { portalId: 'bk.oven_room' }]);
+    expect(sim.log).toEqual([`t${sim.tick - 1} noclip on`, `t${sim.tick - 1} refused portal: too far`]);
+  });
+});
