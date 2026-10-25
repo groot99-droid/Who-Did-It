@@ -3,8 +3,10 @@
 import mitt from 'mitt';
 import { scenes, type Scene } from '@wdi/content';
 import { diffScene } from './diffScene';
+import type { Gate, Path } from '@wdi/content';
 import { paint, rectTiles, regionTiles, resize, type Cell, type Tool } from './gridEdit';
 import { EditHistory } from './history';
+import { addGate, addPath, removeRoute, setGateProfile } from './routeEdit';
 import { pickAt } from './pick';
 import { needlesOf, portalsTo, referencesTo } from './references';
 import { duplicate, find, move, patch, place, remove, type Edit, type Kind, type Pick } from './sceneEdit';
@@ -24,6 +26,10 @@ export class EditorSession {
   tool: Tool = 'objects';
   cell: Cell = '#';
   name = '';
+  /** The corners clicked so far for a path being drawn. */
+  draft: Array<{ x: number; y: number }> = [];
+  pathKind: Path['kind'] = 'patrol';
+  gateProfile: Gate['minProfile'] = 'small';
   /** The last refused edit, until the next one succeeds. */
   error = '';
 
@@ -84,6 +90,30 @@ export class EditorSession {
   resizeTo(w: number, h: number): void {
     this.apply(resize(this.scene, w, h));
   }
+  /** The end of a gate drag. */
+  addGateBetween(a: { x: number; y: number }, b: { x: number; y: number }): void {
+    if (this.apply(addGate(this.scene, this.name, a, b, this.gateProfile))) this.name = '';
+  }
+  finishPath(): void {
+    if (this.apply(addPath(this.scene, this.name, this.pathKind, this.draft))) {
+      this.name = '';
+      this.draft = [];
+    }
+  }
+  clearDraft(): void {
+    this.draft = [];
+    this.bus.emit('change', undefined);
+  }
+  setPathKind(kind: Path['kind']): void {
+    this.pathKind = kind;
+  }
+  setGateProfile(profile: Gate['minProfile'], id?: string): void {
+    this.gateProfile = profile;
+    if (id !== undefined) this.apply(setGateProfile(this.scene, id, profile));
+  }
+  removeRoute(id: string): void {
+    this.apply(removeRoute(this.scene, id, this.base));
+  }
   setName(name: string): void {
     this.name = name.trim();
   }
@@ -92,6 +122,11 @@ export class EditorSession {
   click(tx: number, ty: number): void {
     if (this.tool === 'fill') {
       this.paintTiles(regionTiles(this.scene, tx, ty));
+      return;
+    }
+    if (this.tool === 'path') {
+      this.draft = [...this.draft, { x: tx, y: ty }];
+      this.bus.emit('change', undefined);
       return;
     }
     if (this.tool !== 'objects') return;

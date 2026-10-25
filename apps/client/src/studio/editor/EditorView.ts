@@ -38,7 +38,7 @@ export class EditorView {
   private readonly redraw = () => this.draw();
   private readonly down = (p: Phaser.Input.Pointer) => {
     const t = this.tileOf(p);
-    if (this.session.tool === 'brush' || this.session.tool === 'rect') {
+    if (this.session.tool === 'brush' || this.session.tool === 'rect' || this.session.tool === 'gate') {
       this.trail = [t];
       return;
     }
@@ -56,6 +56,7 @@ export class EditorView {
     this.trail = null;
     if (trail !== null) {
       if (this.session.tool === 'rect') this.session.paintRect(trail[0]!, this.tileOf(p));
+      else if (this.session.tool === 'gate') this.session.addGateBetween(trail[0]!, this.tileOf(p));
       else this.session.paintTiles(trail);
       return;
     }
@@ -96,6 +97,24 @@ export class EditorView {
             true,
           );
         }),
+      );
+    }
+    for (const gate of s.scene.gates)
+      for (let j = 0; j < gate.h; j++)
+        for (let i = 0; i < gate.w; i++)
+          g.lineStyle(2, colorOf(palette.colors.mustard), 0.9).strokePoints(
+            poly(tileDiamond(gate.x + i, gate.y + j)),
+            true,
+            true,
+          );
+    const loops = [...s.scene.paths.map((p) => p.points), s.draft];
+    for (const pts of loops) {
+      if (pts.length === 0) continue;
+      const line = pts.map((q) => toScreen((q.x + 0.5) * TILE_PX, (q.y + 0.5) * TILE_PX));
+      g.lineStyle(2, colorOf(palette.colors.teal), 0.9).strokePoints(
+        line.map((q) => new Phaser.Math.Vector2(q.x, q.y)),
+        pts !== s.draft,
+        pts !== s.draft,
       );
     }
     for (const kind of KINDS) {
