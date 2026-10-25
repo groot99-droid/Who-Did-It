@@ -19,19 +19,46 @@ const KIND_COLOUR: Record<Kind, string> = {
   lights: palette.colors.lantern,
 };
 
+const GRID_COLOUR: Record<string, string> = {
+  '#': palette.colors.blood,
+  D: palette.colors.mustard,
+  S: palette.colors.teal,
+  H: palette.colors.moon,
+  B: palette.colors.magenta,
+};
+
 type Fp = { x: number; y: number; w: number; h: number };
 
 export class EditorView {
   private readonly g: Phaser.GameObjects.Graphics;
   private readonly texts: Phaser.GameObjects.Text[] = [];
   private grab: { x: number; y: number } | null = null;
+  /** The tiles a brush stroke has crossed, or the corner a rectangle began at. */
+  private trail: Array<{ x: number; y: number }> | null = null;
   private readonly redraw = () => this.draw();
   private readonly down = (p: Phaser.Input.Pointer) => {
     const t = this.tileOf(p);
+    if (this.session.tool === 'brush' || this.session.tool === 'rect') {
+      this.trail = [t];
+      return;
+    }
     this.session.click(t.x, t.y);
     this.grab = this.session.palette === null && this.session.selection !== null ? t : null;
   };
+  private readonly move = (p: Phaser.Input.Pointer) => {
+    if (this.trail === null || !p.isDown || this.session.tool !== 'brush') return;
+    const t = this.tileOf(p);
+    const last = this.trail[this.trail.length - 1]!;
+    if (last.x !== t.x || last.y !== t.y) this.trail.push(t);
+  };
   private readonly up = (p: Phaser.Input.Pointer) => {
+    const trail = this.trail;
+    this.trail = null;
+    if (trail !== null) {
+      if (this.session.tool === 'rect') this.session.paintRect(trail[0]!, this.tileOf(p));
+      else this.session.paintTiles(trail);
+      return;
+    }
     const from = this.grab;
     this.grab = null;
     if (from === null) return;
@@ -46,6 +73,7 @@ export class EditorView {
     this.g = scene.add.graphics().setDepth(DEPTH);
     session.bus.on('change', this.redraw);
     scene.input.on('pointerdown', this.down);
+    scene.input.on('pointermove', this.move);
     scene.input.on('pointerup', this.up);
     this.draw();
   }
@@ -59,6 +87,17 @@ export class EditorView {
     const s = this.session;
     const g = this.g.clear();
     for (const t of this.texts.splice(0)) t.destroy();
+    if (s.tool !== 'objects') {
+      s.scene.grid.forEach((row, y) =>
+        [...row].forEach((ch, x) => {
+          if (ch === '.') return;
+          g.fillStyle(colorOf(GRID_COLOUR[ch] ?? palette.colors.bone), 0.35).fillPoints(
+            poly(tileDiamond(x, y)),
+            true,
+          );
+        }),
+      );
+    }
     for (const kind of KINDS) {
       for (const o of listOf(s.scene, kind)) {
         const picked = s.selection?.kind === kind && s.selection.id === o.id;
@@ -104,6 +143,7 @@ export class EditorView {
   destroy(): void {
     this.session.bus.off('change', this.redraw);
     this.scene.input.off('pointerdown', this.down);
+    this.scene.input.off('pointermove', this.move);
     this.scene.input.off('pointerup', this.up);
     this.g.destroy();
     for (const t of this.texts.splice(0)) t.destroy();

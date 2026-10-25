@@ -1620,3 +1620,18 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.edit.unpaired` | No door on the other side yet | the Studio editor |
 | `studio.edit.diff` | Changes | the Studio editor |
 | `studio.edit.nodiff` | No changes | the Studio editor |
+| `studio.edit.tool` | Tool | the Studio editor |
+| `studio.edit.tool.objects` | Objects | the Studio editor |
+| `studio.edit.tool.brush` | Brush | the Studio editor |
+| `studio.edit.tool.rect` | Rectangle | the Studio editor |
+| `studio.edit.tool.fill` | Fill | the Studio editor |
+| `studio.edit.cell` | Tile | the Studio editor |
+| `studio.edit.cell.floor` | Floor | the Studio editor |
+| `studio.edit.cell.solid` | Solid | the Studio editor |
+| `studio.edit.cell.D` | Door | the Studio editor |
+| `studio.edit.cell.S` | Stairs | the Studio editor |
+| `studio.edit.cell.H` | Hatch | the Studio editor |
+| `studio.edit.cell.B` | Bed | the Studio editor |
+| `studio.edit.width` | Width | the Studio editor |
+| `studio.edit.height` | Height | the Studio editor |
+| `studio.edit.resize` | Resize | the Studio editor |
