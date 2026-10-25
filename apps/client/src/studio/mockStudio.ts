@@ -7,6 +7,7 @@ import type { StudioC2SPayloads, StudioC2SType, StudioReportRow } from '@wdi/sha
 import type { StudioLink, StudioLinkEvents, StudioSnapshot } from '../admin/StudioNet';
 import { spawnsOf } from './model';
 import type { ReportApi } from './reportApi';
+import type { SaveApi } from './saveApi';
 
 /** Every payload field at once: the mock reads whichever the message carries. */
 type Loose = Partial<
@@ -144,4 +145,9 @@ export const mockReportApi: ReportApi = {
     return Promise.resolve({ id: `mock/${number}`, number, url: '#' });
   },
   list: () => Promise.resolve({ reports: [...mockReports] }),
+};
+
+/** The save route in mock mode: it answers a made-up draft PR and keeps nothing. */
+export const mockSaveApi: SaveApi = {
+  save: () => Promise.resolve({ branch: 'studio/mock', number: 0, url: '#' }),
 };

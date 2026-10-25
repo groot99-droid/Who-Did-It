@@ -7,10 +7,12 @@ import { spawnsOf } from '../model';
 import { GRID_CHARS, type Cell, type Tool } from './gridEdit';
 import { find, KINDS, pairedPortal, type Kind } from './sceneEdit';
 import { scenes, type Scene } from '@wdi/content';
+import type { SaveApi } from '../saveApi';
+import { SaveError } from '../saveApi';
 import type { EditorSession } from './session';
 import { templatesFor } from './templates';
 
-export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
+export function mountEditorPanel(root: HTMLElement, s: EditorSession, api: SaveApi): Screen {
   const tid = (id: string) => ({ 'data-testid': id });
   const btn = (id: string, text: string, on: () => void) => {
     const b = h('button', { type: 'button', class: 'wdi-admin__btn', ...tid(id) }, text);
@@ -84,6 +86,46 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
   const routes = h('div', { ...tid('studio-edit-routes') });
 
   const checks = h('div', { ...tid('studio-edit-checks') });
+
+  const note = h('textarea', {
+    class: 'wdi-admin__field',
+    rows: 3,
+    maxlength: 50000,
+    placeholder: C['studio.edit.note'],
+    'aria-label': C['studio.edit.note'],
+    ...tid('studio-edit-note'),
+  });
+  const saveOut = h('div', { role: 'status', ...tid('studio-edit-saveout') });
+  const saveBtn = btn('studio-edit-save', C['studio.edit.save'], () => {
+    saving = true;
+    refresh();
+    saveOut.replaceChildren(h('p', {}, C['studio.edit.saving']));
+    void api.save({ scene: s.scene, note: note.value }).then(
+      (r) => {
+        saving = false;
+        saveOut.replaceChildren(
+          h(
+            'a',
+            { href: r.url, target: '_blank', rel: 'noopener' },
+            fill(C['studio.edit.saved'], { number: r.number, branch: r.branch }),
+          ),
+        );
+        refresh();
+      },
+      (e: unknown) => {
+        saving = false;
+        const lines =
+          e instanceof SaveError && e.problems.length > 0
+            ? e.problems
+            : [e instanceof Error ? e.message : String(e)];
+        saveOut.replaceChildren(
+          h('ul', { class: 'wdi-admin__problem', role: 'alert' }, ...lines.map((l) => h('li', {}, l))),
+        );
+        refresh();
+      },
+    );
+  });
+  let saving = false;
 
   const picked = h('div', { class: 'wdi-studio__picked', ...tid('studio-edit-selected') });
   const problem = h('p', { class: 'wdi-admin__problem', role: 'alert', ...tid('studio-edit-error') });
@@ -176,6 +218,7 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
             ...list(C['studio.edit.checks.warnings'], c.warnings, 'wdi-studio__warn'),
           ]),
     );
+    saveBtn.disabled = saving || c.errors.length > 0 || s.diff.length === 0;
     diff.textContent = s.diff.length === 0 ? C['studio.edit.nodiff'] : s.diff.join('\n');
     if (s.name === '' && document.activeElement !== name) name.value = '';
   };
@@ -208,6 +251,9 @@ export function mountEditorPanel(root: HTMLElement, s: EditorSession): Screen {
     checks,
     h('span', {}, C['studio.edit.diff']),
     diff,
+    note,
+    saveBtn,
+    saveOut,
   );
   root.append(panel);
   s.bus.on('change', refresh);

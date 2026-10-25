@@ -8,13 +8,14 @@ import { captureToken, clearToken, loginUrl, type TokenStore } from '../admin/Ad
 import { connectStudio, type StudioLink } from '../admin/StudioNet';
 import { BUILD_VERSION } from '../health';
 import { mountControls } from '../studio/Controls';
-import { createMockStudio, mockReportApi } from '../studio/mockStudio';
+import { createMockStudio, mockReportApi, mockSaveApi } from '../studio/mockStudio';
 import { EditorView } from '../studio/editor/EditorView';
 import { mountEditorPanel } from '../studio/editor/EditorPanel';
 import { EditorSession } from '../studio/editor/session';
 import { mountInbox } from '../studio/InboxPanel';
 import { mountReportPanel } from '../studio/ReportPanel';
 import { createReportApi, type ReportApi } from '../studio/reportApi';
+import { createSaveApi, type SaveApi } from '../studio/saveApi';
 import { requestOf } from '../studio/reportContext';
 import { figuresOf, FIGURE_ID } from '../studio/figures';
 import { OverlayView } from '../studio/OverlayView';
@@ -82,6 +83,7 @@ export class Studio extends Phaser.Scene {
     this.mouse = { x: this.scale.transformX(e.pageX), y: this.scale.transformY(e.pageY) };
   };
   private api: ReportApi | null = null;
+  private saveApi: SaveApi | null = null;
   private dialog: Screen | null = null;
   private editor: { session: EditorSession; view: EditorView; panel: Screen } | null = null;
   private moveSeq = 0;
@@ -104,6 +106,7 @@ export class Studio extends Phaser.Scene {
     }
     const token = captureToken(location.hash, this.tokens, () => setRoute('studio'));
     this.api = token === null ? null : createReportApi(token);
+    this.saveApi = token === null ? null : createSaveApi(token);
     clearStudioMarker(this.tokens);
     if (token === null) {
       this.showSignIn(false);
@@ -192,7 +195,7 @@ export class Studio extends Phaser.Scene {
     this.editor = {
       session,
       view: new EditorView(this, session),
-      panel: mountEditorPanel(overlayRoot(), session),
+      panel: mountEditorPanel(overlayRoot(), session, this.saveApi ?? mockSaveApi),
     };
     this.cameras.main.stopFollow();
     this.store.setEditing(true);

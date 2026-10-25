@@ -1647,3 +1647,7 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.edit.checks.ok` | Every check passes | the Studio editor |
 | `studio.edit.checks.errors` | Errors (a save is refused) | the Studio editor |
 | `studio.edit.checks.warnings` | Warnings | the Studio editor |
+| `studio.edit.note` | Note for the pull request | the Studio editor |
+| `studio.edit.save` | Save as a draft PR | the Studio editor |
+| `studio.edit.saving` | Saving... | the Studio editor |
+| `studio.edit.saved` | Draft PR #{number} opened on {branch} | the Studio editor |
