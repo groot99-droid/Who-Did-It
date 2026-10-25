@@ -42,6 +42,10 @@ export function createServer(limits: Partial<GuardLimits> = {}) {
             const room = matchMaker.getLocalRoomById(roomId);
             return room instanceof StudioRoom ? room.queueDraft(scene) : 'no room';
           },
+          npcDrafts: (roomId, npc) => {
+            const room = matchMaker.getLocalRoomById(roomId);
+            return room instanceof StudioRoom ? room.queueNpcDraft(npc) : 'no room';
+          },
         });
       }
       // One proxy hop on Render and Railway. This only affects Express's `req.ip`; the matchmake bucket
