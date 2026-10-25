@@ -1608,6 +1608,9 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.edit.kind.spots` | Spots | the Studio editor |
 | `studio.edit.kind.lights` | Lights | the Studio editor |
 | `studio.edit.kind.buildings` | Buildings | the Studio editor |
+| `studio.edit.kind.nodes` | Resource nodes | the Studio editor |
+| `studio.edit.kind.spawners` | Creature spawners | the Studio editor |
+| `studio.edit.kind.givers` | Quest givers | the Studio editor |
 | `studio.edit.selected` | {kind} {id} at {x},{y} | the Studio editor |
 | `studio.edit.nothing` | Nothing selected | the Studio editor |
 | `studio.edit.duplicate` | Duplicate | the Studio editor |

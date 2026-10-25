@@ -9,7 +9,7 @@ import {
   SOLID_MATERIALS,
   type Scene,
 } from '@wdi/content';
-import { KINDS, listOf, type Edit } from './sceneEdit';
+import { listOf, PLACEABLE, type Edit } from './sceneEdit';
 
 export const GRID_CHARS = ['.', '#', 'D', 'S', 'H', 'B'] as const;
 export type Cell = (typeof GRID_CHARS)[number];
@@ -99,7 +99,7 @@ export function regionTiles(scene: Scene, x: number, y: number) {
 /** Ids of what a shrink to w x h would cut: any object, gate, path or building with a tile outside. */
 export function cutBy(scene: Scene, w: number, h: number): string[] {
   const out: string[] = [];
-  for (const kind of KINDS)
+  for (const kind of PLACEABLE)
     for (const o of listOf(scene, kind)) {
       const fp = (o as { footprint?: { x: number; y: number; w: number; h: number } }).footprint;
       const far = fp === undefined ? { x: o.x, y: o.y } : { x: fp.x + fp.w - 1, y: fp.y + fp.h - 1 };

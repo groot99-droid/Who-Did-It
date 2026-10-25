@@ -4,6 +4,7 @@
 // footprint (a building's doors, the plates on a table) rides along. Pure, like `sceneEdit.ts`.
 import { biomeOf, DEFAULT_FLOOR, type Scene } from '@wdi/content';
 import { materialFor } from './gridEdit';
+import { moveGate, movePath, removeRoute } from './routeEdit';
 import {
   duplicate,
   find,
@@ -181,8 +182,13 @@ function roomFor(scene: Scene, fp: Rect, self: string): Rect | null {
 export const isBlock = (scene: Scene, pick: Pick) => footprintOf(find(scene, pick)) !== undefined;
 
 /** `move`, `place`, `duplicate` and `remove` for any object: a block goes through its footprint's cells. */
-export const moveAny = (scene: Scene, pick: Pick, x: number, y: number): Edit =>
-  isBlock(scene, pick) ? moveBlock(scene, pick, x, y) : move(scene, pick, x, y);
+export function moveAny(scene: Scene, pick: Pick, x: number, y: number): Edit {
+  if (pick.kind === 'gates') return moveGate(scene, pick.id, x, y);
+  if (pick.kind === 'paths') return movePath(scene, pick.id, x, y);
+  return isBlock(scene, pick) ? moveBlock(scene, pick, x, y) : move(scene, pick, x, y);
+}
+
+const ROUTE = new Set<Kind>(['gates', 'paths']);
 
 export function placeAny(
   scene: Scene,
@@ -192,6 +198,7 @@ export function placeAny(
   y: number,
   template: object,
 ): Edit {
+  if (ROUTE.has(kind)) return { error: 'gates and paths are drawn with their own tools' };
   const made = place(scene, kind, name, x, y, template);
   const fp = footprintOf(template);
   if ('error' in made || fp === undefined) return made;
@@ -199,6 +206,7 @@ export function placeAny(
 }
 
 export function duplicateAny(scene: Scene, pick: Pick, name: string): Edit {
+  if (ROUTE.has(pick.kind)) return { error: 'draw a gate or a path again to make another' };
   const fp = footprintOf(find(scene, pick));
   if (fp === undefined) return duplicate(scene, pick, name);
   const at = roomFor(scene, fp, pick.id);
@@ -208,5 +216,6 @@ export function duplicateAny(scene: Scene, pick: Pick, name: string): Edit {
 }
 
 export function removeAny(scene: Scene, pick: Pick, base: Scene, refs: readonly string[]): Edit {
+  if (ROUTE.has(pick.kind)) return removeRoute(scene, pick.id, base);
   return isBlock(scene, pick) ? removeBlock(scene, pick, base, refs) : remove(scene, pick, base, refs);
 }

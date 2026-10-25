@@ -5,7 +5,7 @@ import palette from '@wdi/content/data/palette.json';
 import { TILE_PX } from '@wdi/shared/constants';
 import { radiusEllipse, toScreen, toWorld } from '@wdi/shared/iso';
 import { tileDiamond } from '../../view/iso';
-import { KINDS, listOf, type Kind } from './sceneEdit';
+import { listOf, PLACEABLE, type Kind } from './sceneEdit';
 import type { EditorSession } from './session';
 
 const DEPTH = 2_100_000;
@@ -18,6 +18,11 @@ const KIND_COLOUR: Record<Kind, string> = {
   spots: palette.colors.magenta,
   lights: palette.colors.lantern,
   buildings: palette.colors.blood,
+  nodes: palette.colors.moon,
+  spawners: palette.colors.magenta,
+  givers: palette.colors.bone,
+  gates: palette.colors.mustard,
+  paths: palette.colors.teal,
 };
 
 const GRID_COLOUR: Record<string, string> = {
@@ -100,25 +105,33 @@ export class EditorView {
         }),
       );
     }
+    const sel = s.selection;
     for (const gate of s.scene.gates)
       for (let j = 0; j < gate.h; j++)
         for (let i = 0; i < gate.w; i++)
-          g.lineStyle(2, colorOf(palette.colors.mustard), 0.9).strokePoints(
-            poly(tileDiamond(gate.x + i, gate.y + j)),
-            true,
-            true,
-          );
-    const loops = [...s.scene.paths.map((p) => p.points), s.draft];
-    for (const pts of loops) {
+          g.lineStyle(
+            sel?.kind === 'gates' && sel.id === gate.id ? 4 : 2,
+            colorOf(palette.colors.mustard),
+            0.9,
+          ).strokePoints(poly(tileDiamond(gate.x + i, gate.y + j)), true, true);
+    const loops = [
+      ...s.scene.paths.map((p) => ({ id: p.id, points: p.points })),
+      { id: '', points: s.draft },
+    ];
+    for (const { id, points: pts } of loops) {
       if (pts.length === 0) continue;
       const line = pts.map((q) => toScreen((q.x + 0.5) * TILE_PX, (q.y + 0.5) * TILE_PX));
-      g.lineStyle(2, colorOf(palette.colors.teal), 0.9).strokePoints(
+      g.lineStyle(
+        sel?.kind === 'paths' && sel.id === id ? 4 : 2,
+        colorOf(palette.colors.teal),
+        0.9,
+      ).strokePoints(
         line.map((q) => new Phaser.Math.Vector2(q.x, q.y)),
-        pts !== s.draft,
-        pts !== s.draft,
+        id !== '',
+        id !== '',
       );
     }
-    for (const kind of KINDS) {
+    for (const kind of PLACEABLE) {
       for (const o of listOf(s.scene, kind)) {
         const picked = s.selection?.kind === kind && s.selection.id === o.id;
         const colour = colorOf(KIND_COLOUR[kind]);
