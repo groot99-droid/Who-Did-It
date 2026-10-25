@@ -122,6 +122,7 @@ export function createMockStudio(): StudioLink {
     }
   };
   return {
+    roomId: 'mock',
     bus,
     send: handle,
     close: () => clearInterval(timer),

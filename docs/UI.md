@@ -1648,6 +1648,11 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.edit.checks.errors` | Errors (a save is refused) | the Studio editor |
 | `studio.edit.checks.warnings` | Warnings | the Studio editor |
 | `studio.edit.note` | Note for the pull request | the Studio editor |
+| `studio.edit.walk` | Walk it | the Studio editor; uploads the edited scene as an unsaved draft and returns to the world |
+| `studio.edit.walking` | Loading the draft... | the Studio editor, while the draft uploads |
+| `studio.walk.title` | Walking an unsaved draft | the walk bar shown while the room serves the draft |
+| `studio.walk.back` | Back to editing | the walk bar; reopens the editor on the same session |
+| `studio.walk.discard` | Discard draft | the walk bar; the room serves the committed scene again |
 | `studio.edit.save` | Save as a draft PR | the Studio editor |
 | `studio.edit.saving` | Saving... | the Studio editor |
 | `studio.edit.saved` | Draft PR #{number} opened on {branch} | the Studio editor |

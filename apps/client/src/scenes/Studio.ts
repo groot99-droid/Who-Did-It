@@ -1,11 +1,11 @@
 import Phaser from 'phaser';
 import palette from '@wdi/content/data/palette.json';
-import { mapOf, type SceneId } from '@wdi/content';
-import { TILE_PX } from '@wdi/shared/constants';
+import { mapOf, type Scene, type SceneId } from '@wdi/content';
+import { tilemapFor } from '@wdi/content/tilemap';
 import { toScreen } from '@wdi/shared/iso';
 import { setRoute } from '../flags';
 import { captureToken, clearToken, loginUrl, type TokenStore } from '../admin/AdminNet';
-import { connectStudio, type StudioLink } from '../admin/StudioNet';
+import { connectStudio, type StudioLink, type StudioSnapshot } from '../admin/StudioNet';
 import { BUILD_VERSION } from '../health';
 import { mountControls } from '../studio/Controls';
 import { createMockStudio, mockReportApi, mockSaveApi } from '../studio/mockStudio';
@@ -16,6 +16,7 @@ import { mountInbox } from '../studio/InboxPanel';
 import { mountReportPanel } from '../studio/ReportPanel';
 import { createReportApi, type ReportApi } from '../studio/reportApi';
 import { createSaveApi, type SaveApi } from '../studio/saveApi';
+import { clearDraft, createDraftApi, draftOn, mockDraftApi, type DraftApi } from '../studio/draftApi';
 import { requestOf } from '../studio/reportContext';
 import { figuresOf, FIGURE_ID } from '../studio/figures';
 import { OverlayView } from '../studio/OverlayView';
@@ -84,6 +85,12 @@ export class Studio extends Phaser.Scene {
   };
   private api: ReportApi | null = null;
   private saveApi: SaveApi | null = null;
+  private draftApi: DraftApi | null = null;
+  /** Walk it: the scene the room serves as an unsaved draft, and the editing session to return to. */
+  private draft: { scene: Scene; session: EditorSession; seen: boolean } | null = null;
+  /** The draft scene the world views were built from, or null while they show the committed scene. */
+  private drawnDraft: Scene | null = null;
+  private mock = false;
   private dialog: Screen | null = null;
   private editor: { session: EditorSession; view: EditorView; panel: Screen } | null = null;
   private moveSeq = 0;
@@ -100,13 +107,15 @@ export class Studio extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#14110f');
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.teardown());
     this.markers = this.add.graphics().setDepth(1_000_000);
-    if (getFlags(this).mock) {
+    this.mock = getFlags(this).mock;
+    if (this.mock) {
       this.begin(createMockStudio());
       return;
     }
     const token = captureToken(location.hash, this.tokens, () => setRoute('studio'));
     this.api = token === null ? null : createReportApi(token);
     this.saveApi = token === null ? null : createSaveApi(token);
+    this.draftApi = token === null ? null : createDraftApi(token);
     clearStudioMarker(this.tokens);
     if (token === null) {
       this.showSignIn(false);
@@ -136,6 +145,7 @@ export class Studio extends Phaser.Scene {
       this.link = null;
       this.stopInput();
       this.clearScreens();
+      this.draft = null;
       this.store.reset();
       this.showSignIn(true);
     });
@@ -188,25 +198,81 @@ export class Studio extends Phaser.Scene {
   /** Edit on: the sim pauses, the camera is the owner's to pan, the scene's objects are drawn and editable. */
   private toggleEdit(): void {
     if (this.editor !== null) return this.stopEdit();
+    if (this.draft !== null) return this.backToEdit();
     const snap = this.store.snapshot;
     if (snap === null || this.link === null || this.map === null) return;
-    this.link.send('studio.clock', { paused: true });
-    const session = new EditorSession(snap.sceneId);
+    this.openEditor(new EditorSession(snap.sceneId));
+  }
+
+  private openEditor(session: EditorSession): void {
+    this.link?.send('studio.clock', { paused: true });
     this.editor = {
       session,
       view: new EditorView(this, session),
-      panel: mountEditorPanel(overlayRoot(), session, this.saveApi ?? mockSaveApi),
+      panel: mountEditorPanel(overlayRoot(), session, this.saveApi ?? mockSaveApi, () => this.walkIt()),
     };
     this.cameras.main.stopFollow();
     this.store.setEditing(true);
   }
 
-  private stopEdit(): void {
+  private closeEditor(): void {
     this.editor?.view.destroy();
     this.editor?.panel.destroy();
     this.editor = null;
     this.link?.send('studio.clock', { paused: false });
     this.store.setEditing(false);
+  }
+
+  /** Edit off: the sim runs again and a draft in the room is dropped. */
+  private stopEdit(): void {
+    this.closeEditor();
+    this.endWalk();
+  }
+
+  /** Walk it: the room serves the edited scene unsaved (S5); the editor steps aside, keeping its session. */
+  private async walkIt(): Promise<void> {
+    const ed = this.editor;
+    if (ed === null || this.link === null) return;
+    const scene = ed.session.scene;
+    await (this.draftApi ?? mockDraftApi).upload(this.link.roomId, scene);
+    this.draft = { scene, session: ed.session, seen: false };
+    this.closeEditor();
+    const bar = this.mount(
+      h(
+        'section',
+        { class: 'wdi-admin__controls wdi-studio__walkbar', 'data-testid': 'studio-walkbar' },
+        h('span', {}, C['studio.walk.title']),
+        this.walkBtn('studio-walk-back', C['studio.walk.back'], () => this.backToEdit()),
+        this.walkBtn('studio-walk-discard', C['studio.walk.discard'], () => this.endWalk()),
+      ),
+    );
+    this.walkBar = bar;
+  }
+
+  private walkBar: Screen | null = null;
+
+  private walkBtn(testid: string, label: string, onClick: () => void): HTMLButtonElement {
+    const b = h('button', { type: 'button', class: 'wdi-admin__btn', 'data-testid': testid }, label);
+    b.addEventListener('click', onClick);
+    return b;
+  }
+
+  /** The walk bar's way back: the editor reopens on the same session; the room keeps the draft until the next Walk it. */
+  private backToEdit(): void {
+    const d = this.draft;
+    if (d === null) return;
+    this.walkBar?.destroy();
+    this.walkBar = null;
+    this.openEditor(d.session);
+  }
+
+  /** Leaves Walk it for good: the bar goes, the room serves the committed scene, the world redraws it. */
+  private endWalk(): void {
+    this.walkBar?.destroy();
+    this.walkBar = null;
+    if (this.draft === null) return;
+    this.draft = null;
+    if (this.link !== null) clearDraft(this.link);
   }
 
   private openInbox(): void {
@@ -276,9 +342,27 @@ export class Studio extends Phaser.Scene {
     }
   }
 
-  private buildWorld(sceneId: string): void {
-    this.dropWorld();
+  /** The tilemap cache key of a scene's map, or of the draft's, which is built in the browser from the edited scene. */
+  private mapKeyOf(sceneId: string, draft: Scene | null): string {
     const key = sceneMapKey(sceneId);
+    if (draft === null) return key;
+    const draftKey = `${key}:draft`;
+    this.cache.tilemap.remove(draftKey);
+    this.cache.tilemap.add(draftKey, { format: Phaser.Tilemaps.Formats.TILED_JSON, data: tilemapFor(draft) });
+    return draftKey;
+  }
+
+  private buildWorld(sceneId: string, draft: Scene | null = null): void {
+    this.dropWorld();
+    let key: string;
+    try {
+      key = this.mapKeyOf(sceneId, draft);
+      this.drawnDraft = draft;
+    } catch (e) {
+      this.store.refuse(e instanceof Error ? e.message : String(e));
+      this.drawnDraft = null;
+      key = sceneMapKey(sceneId);
+    }
     if (!this.cache.tilemap.exists(key)) return;
     this.sceneId = sceneId;
     this.map = readSceneMap(this.cache.tilemap.get(key).data as TiledMap);
@@ -311,6 +395,7 @@ export class Studio extends Phaser.Scene {
     this.ground?.destroy();
     this.entities = this.statics = this.ground = null;
     this.map = null;
+    this.drawnDraft = null;
   }
 
   override update(): void {
@@ -319,9 +404,10 @@ export class Studio extends Phaser.Scene {
     if (snap.sceneId !== this.sceneId && !this.loading) this.enterScene(snap.sceneId);
     if (this.map === null || this.entities === null || this.statics === null) return;
     if (snap.sceneId !== this.sceneId) return;
+    this.followDraft(snap);
     if (snap.tick !== this.lastTick) {
       this.lastTick = snap.tick;
-      const f = figuresOf(snap, TILE_PX);
+      const f = figuresOf(snap);
       this.entities.setDelayMs(remoteDelayMs(snap.scale));
       this.entities.update(f.players, performance.now(), f.avatars, '');
       this.drawMarkers(f.markers);
@@ -332,6 +418,17 @@ export class Studio extends Phaser.Scene {
     else if (obj) cam.startFollow(obj, true, 0.15, 0.15);
     this.overlay?.update(this.store.overlays, snap, this.mouse);
     this.statics.update(null, this.game.loop.delta / 1000, cam.worldView);
+  }
+
+  /** The world shows the draft while the room serves it; the room dropping it (a door to another scene) ends Walk it. */
+  private followDraft(snap: StudioSnapshot): void {
+    const d = this.draft;
+    if (d !== null && !this.mock) {
+      if (draftOn(snap)) d.seen = true;
+      else if (d.seen) this.endWalk();
+    }
+    const want = this.draft !== null && snap.sceneId === this.draft.scene.id ? this.draft.scene : null;
+    if (want !== this.drawnDraft && !this.loading) this.buildWorld(this.sceneId, want);
   }
 
   /** The arrows and WASD scroll the camera while editing, since the figure stands still. */
@@ -389,6 +486,8 @@ export class Studio extends Phaser.Scene {
     link?.close();
     this.stopInput();
     this.clearScreens();
+    this.walkBar = null;
+    this.draft = null;
     this.dropWorld();
     this.sceneId = '';
     this.store.reset();
