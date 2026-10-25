@@ -15,6 +15,7 @@ const colorOf = (hex: string) => Number.parseInt(hex.slice(1), 16);
 export class NpcView {
   private readonly g: Phaser.GameObjects.Graphics;
   private readonly texts: Phaser.GameObjects.Text[] = [];
+  private framed = '';
   private readonly redraw = () => this.draw();
 
   constructor(
@@ -39,6 +40,10 @@ export class NpcView {
     const stops = row.fixed ? [] : routeOf(world, row, this.model.routines, cls);
     const centre = (x: number, y: number) => toScreen((x + 0.5) * TILE_PX, (y + 0.5) * TILE_PX);
     const live = stops.filter((s) => s.active);
+    this.frame(
+      stops.map((st) => centre(st.x, st.y)),
+      id!,
+    );
     this.g.lineStyle(2, colorOf(palette.colors.teal), 0.8);
     this.g.beginPath();
     live.forEach((s, i) => {
@@ -64,6 +69,21 @@ export class NpcView {
           .setAlpha(s.active ? 1 : 0.4),
       );
     }
+  }
+
+  /** Brings the route into the camera when the figure, phase or scene changes, so the markers are in view. */
+  private frame(points: Array<{ x: number; y: number }>, sceneId: string): void {
+    const key = `${sceneId}|${this.model.figure}|${this.model.phase}`;
+    if (key === this.framed || points.length === 0) return;
+    this.framed = key;
+    const xs = points.map((q) => q.x);
+    const ys = points.map((q) => q.y);
+    const w = Math.max(...xs) - Math.min(...xs) + 160;
+    const h = Math.max(...ys) - Math.min(...ys) + 160;
+    const cam = this.scene.cameras.main;
+    cam.stopFollow();
+    cam.setZoom(Math.min(1, Math.max(0.25, Math.min((cam.width * 0.5) / w, cam.height / h))));
+    cam.centerOn((Math.max(...xs) + Math.min(...xs)) / 2, (Math.max(...ys) + Math.min(...ys)) / 2);
   }
 
   destroy(): void {

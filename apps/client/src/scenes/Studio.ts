@@ -241,6 +241,7 @@ export class Studio extends Phaser.Scene {
     this.npc.view.destroy();
     this.npc.panel.destroy();
     this.npc = null;
+    this.cameras.main.setZoom(1);
     if (this.link !== null) clearNpcDraft(this.link);
   }
 
@@ -355,7 +356,7 @@ export class Studio extends Phaser.Scene {
   }
 
   private sendMove(): void {
-    if (this.link === null || this.editor !== null) return;
+    if (this.link === null || this.editor !== null || this.npc !== null) return;
     const m = moveOf(this.pressed);
     const { send, sig } = moveToSend(m, this.lastMove);
     if (!send) return;
@@ -455,7 +456,7 @@ export class Studio extends Phaser.Scene {
     }
     const cam = this.cameras.main;
     const obj = this.entities.objectOf(FIGURE_ID);
-    if (this.editor !== null) this.panCamera(cam);
+    if (this.editor !== null || this.npc !== null) this.panCamera(cam);
     else if (obj) cam.startFollow(obj, true, 0.15, 0.15);
     this.overlay?.update(this.store.overlays, snap, this.mouse);
     this.statics.update(null, this.game.loop.delta / 1000, cam.worldView);

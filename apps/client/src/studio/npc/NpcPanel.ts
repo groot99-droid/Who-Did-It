@@ -39,7 +39,7 @@ export function mountNpcPanel(root: HTMLElement, d: NpcPanelDeps): Screen {
     ...tid('studio-npc-figure'),
   });
   figure.addEventListener('change', () => m.select(figure.value));
-  const body = h('div', { class: 'wdi-admin__group', ...tid('studio-npc-body') });
+  const body = h('div', { class: 'wdi-npc__body', ...tid('studio-npc-body') });
   const problems = h('ul', { class: 'wdi-studio__warn', role: 'alert', ...tid('studio-npc-problems') });
   const out = h('p', { role: 'status', ...tid('studio-npc-out') });
   const note = h('textarea', {
@@ -162,8 +162,7 @@ export function mountNpcPanel(root: HTMLElement, d: NpcPanelDeps): Screen {
         ? h('p', {}, C['studio.npc.stations.any'])
         : h('ol', {}, ...row.stations.map((_, i) => stationRow(row.stations, i))),
       add,
-      h('span', {}, C['studio.npc.holds']),
-      holds,
+      h('details', {}, h('summary', {}, C['studio.npc.holds']), holds),
     );
     problems.replaceChildren(...m.problems.map((p) => h('li', {}, p)));
   };
@@ -176,7 +175,7 @@ export function mountNpcPanel(root: HTMLElement, d: NpcPanelDeps): Screen {
   const panel = h(
     'section',
     {
-      class: 'wdi-admin__controls wdi-studio__editor',
+      class: 'wdi-admin__controls wdi-studio__editor wdi-npc',
       'aria-label': C['studio.npc.title'],
       ...tid('studio-npc-panel'),
     },

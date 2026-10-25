@@ -136,3 +136,27 @@
   align-items: center;
   max-width: min(320px, 90vw);
 }
+
+.wdi-npc__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.wdi-npc__body ol,
+.wdi-npc__body ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.wdi-npc__body li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.wdi-studio__editor.wdi-npc {
+  flex-wrap: nowrap;
+}
