@@ -17,7 +17,6 @@ import {
   type ClockScale,
   type StudioDayPhase,
   type StudioS2CPayloads,
-  type StudioSpawn,
   type StudioSpawnKind,
 } from '@wdi/shared';
 import { FOOT_HALF_PX, INPUT_STALE_TICKS, PORTAL_REACH_TILES } from '../constants';
@@ -25,6 +24,7 @@ import { parseMove, speedPxPerTick } from '../Movement';
 import type { MoveInput } from '../RoomSim';
 import { navGrid, profileOpen, tileCentre } from '../World';
 import { type SimClock, stepsThisTick } from '../auto/clock';
+import { type StandIn, newStandIn, standInRow, stepStandIns } from './standins';
 
 /**
  * Creative mode (round 9, docs/round9/admin-studio.md 2): one scene of `@wdi/content`, one admin figure, the stand-ins
@@ -44,8 +44,8 @@ export interface StudioSim {
   lastSeq: number;
   time: { phase: StudioDayPhase; t: number };
   clock: SimClock;
-  /** Stand-ins by scene; ids are `sp1`, `sp2`, ... for the room's life. */
-  spawns: Map<SceneId, StudioSpawn[]>;
+  /** Stand-ins by scene, each with its brain (`standins.ts`); ids are `sp1`, `sp2`, ... for the room's life. */
+  spawns: Map<SceneId, StandIn[]>;
   nextSpawn: number;
   items: string[];
   commands: StudioCommand[];
@@ -288,7 +288,7 @@ export function applyStudio(sim: StudioSim, cmd: StudioCommand): string | null {
       const ty = cmd.y ?? Math.floor(sim.y / TILE_PX);
       const g = grid(sim);
       if (tx >= g.w || ty >= g.h) return 'bad tile';
-      const spawn: StudioSpawn = { id: `sp${sim.nextSpawn++}`, kind: cmd.spawn, ref: cmd.ref, x: tx, y: ty };
+      const spawn = newStandIn(`sp${sim.nextSpawn++}`, cmd.spawn, cmd.ref, sim.sceneId, tx, ty);
       list.push(spawn);
       sim.spawns.set(sim.sceneId, list);
       say(sim, `spawn ${spawn.id} ${cmd.spawn} ${cmd.ref} ${tx},${ty}`);
@@ -332,7 +332,7 @@ function walk(sim: StudioSim): void {
 
 /**
  * The room's step: every queued command first (paused or not, so a teleport works on a frozen world), then as many
- * ticks of the figure as the round-6 clock says (`stepsThisTick`: the scale under the budget, or the single steps
+ * ticks of the figure and its scene's stand-ins as the round-6 clock says (`stepsThisTick`: the scale under the budget, or the single steps
  * asked while paused). Returns the refusals, each to send to the client.
  */
 export function stepStudio(sim: StudioSim, lastStepMs = 0): string[] {
@@ -348,6 +348,13 @@ export function stepStudio(sim: StudioSim, lastStepMs = 0): string[] {
   for (let i = 0; i < ticks; i++) {
     sim.tick++;
     walk(sim);
+    stepStandIns(sim.spawns.get(sim.sceneId) ?? [], {
+      tick: sim.tick,
+      sceneId: sim.sceneId,
+      grid: grid(sim),
+      phase: sim.time.phase,
+      admin: { x: sim.x, y: sim.y },
+    });
   }
   return refusals;
 }
@@ -367,7 +374,7 @@ export function studioSnapshot(sim: StudioSim): StudioS2CPayloads['studio.snapsh
     scale: sim.clock.scale,
     paused: sim.clock.paused,
     time: { ...sim.time },
-    spawns: (sim.spawns.get(sim.sceneId) ?? []).map((s) => ({ ...s })),
+    spawns: (sim.spawns.get(sim.sceneId) ?? []).map(standInRow),
     items: [...sim.items],
   };
 }
