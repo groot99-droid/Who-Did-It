@@ -1,4 +1,5 @@
 import { SCENE_IDS, Scene, type SceneId, content, validateContent } from '@wdi/content';
+import { tilemapFor } from '@wdi/content/tilemap';
 import { type NavData, navFromGrid } from '@wdi/shared';
 
 /**
@@ -6,7 +7,9 @@ import { type NavData, navFromGrid } from '@wdi/shared';
  * is parsed with the content's zod schema and the whole content is validated again with the edit in place of the
  * committed scene, so a broken reference anywhere (a clue, a task, a routine, a portal of another scene) refuses
  * the save. Ids are frozen (CLAUDE.md, WORLD 4.3): the scene keeps its id and prefix, and no portal, spawn or spot
- * id of the committed scene may disappear, so a rename is refused. The nav is regenerated here from the grid.
+ * id of the committed scene may disappear, so a rename is refused. A key the schema does not know, at any depth, is
+ * refused rather than dropped, so nothing unchecked reaches the repo. The nav and the client's tilemap are
+ * regenerated here, with the functions `pnpm grid:export` uses (`navFromGrid`, `@wdi/content/tilemap`).
  */
 
 /** The object lists of a scene that carry ids. */
@@ -31,6 +34,8 @@ export interface CheckedSave {
   nav: NavData;
   sceneText: string;
   navText: string;
+  /** `apps/client/public/assets/scenes/<id>/tilemap.json`, as the exporter writes it. */
+  tilemapText: string;
   /** Markdown lines naming what changed against the committed scene. */
   summary: string[];
 }
@@ -88,7 +93,7 @@ export function checkSave(raw: unknown, committed: typeof content = content): Ch
       parsed.error.issues.slice(0, 50).map((i) => `${i.path.join('.') || 'scene'}: ${i.message}`),
     );
   const scene = parsed.data;
-  const problems: string[] = [];
+  const problems: string[] = unknownKeys(raw, scene, []).map((p) => `unknown key: ${p}`);
   if (scene.prefix !== before.prefix) problems.push(`prefix is frozen: ${before.prefix}`);
   for (const kind of FROZEN) {
     const now = idsOf(scene, kind);
@@ -101,7 +106,34 @@ export function checkSave(raw: unknown, committed: typeof content = content): Ch
   if (summary.length === 0) throw new SaveRefused(['nothing changed']);
   const nav = navFromGrid(scene);
   // The file keeps the editor's key order (the committed file's): zod's output follows the schema's order instead.
-  return { scene, nav, sceneText: formatDataJson(raw), navText: formatDataJson(nav), summary };
+  return {
+    scene,
+    nav,
+    sceneText: formatDataJson(raw),
+    navText: formatDataJson(nav),
+    tilemapText: tilemapText(scene),
+    summary,
+  };
+}
+
+/** A scene's tilemap file, byte for byte what `tools/grid/export.ts` writes. */
+export const tilemapText = (scene: Scene): string => JSON.stringify(tilemapFor(scene)) + '\n';
+
+/**
+ * The paths of keys in the raw body that the parsed scene lacks (zod strips an unknown key of a non-strict object
+ * instead of refusing it). The sceneText is the raw body, so every key in it must have been checked.
+ */
+export function unknownKeys(raw: unknown, parsed: unknown, path: string[]): string[] {
+  if (Array.isArray(raw))
+    return Array.isArray(parsed)
+      ? raw.flatMap((v, i) => unknownKeys(v, parsed[i], [...path, String(i)]))
+      : [];
+  if (raw === null || typeof raw !== 'object' || parsed === null || typeof parsed !== 'object') return [];
+  return Object.entries(raw).flatMap(([k, v]) =>
+    Object.hasOwn(parsed, k)
+      ? unknownKeys(v, (parsed as Record<string, unknown>)[k], [...path, k])
+      : [[...path, k].join('.')],
+  );
 }
 
 const WIDTH = 100;

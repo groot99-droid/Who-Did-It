@@ -245,12 +245,18 @@ export function installStudioRoutes(app: Application, cfg: AdminConfig, deps: St
       const b64 = (text: string): string => Buffer.from(text, 'utf8').toString('base64');
       await github.putFile(branch, `${dir}/${id}.json`, b64(save.sceneText), `Studio: ${id}`);
       await github.putFile(branch, `${dir}/${id}.nav.json`, b64(save.navText), `Studio: ${id} nav`);
+      await github.putFile(
+        branch,
+        `apps/client/public/assets/scenes/${id}/tilemap.json`,
+        b64(save.tilemapText),
+        `Studio: ${id} tilemap`,
+      );
       const prBody = [
         typeof note === 'string' && note.trim() ? note : '_No note._',
         '## Changes',
         save.summary.join('\n'),
         '## Checks',
-        'The server re-ran the scene schema and the whole content validator with this scene in place, and regenerated the nav from the grid (`navFromGrid`).',
+        'The server re-ran the scene schema and the whole content validator with this scene in place, and regenerated the nav and the tilemap from the grid, as `pnpm grid:export` does.',
         `Build \`${BUILD_VERSION}\``,
       ].join('\n\n');
       const pull = await github.createDraftPull(branch, base, `Studio: ${id}`, prBody);

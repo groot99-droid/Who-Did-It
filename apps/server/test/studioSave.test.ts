@@ -2,9 +2,18 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { SaveRefused, checkSave, diffSummary, formatDataJson } from '../src/services/studioSave';
+import { SCENE_IDS, scenes } from '@wdi/content';
+import {
+  SaveRefused,
+  checkSave,
+  diffSummary,
+  formatDataJson,
+  tilemapText,
+  unknownKeys,
+} from '../src/services/studioSave';
 
 const DIR = fileURLToPath(new URL('../../../packages/content/data/scenes', import.meta.url));
+const TILEMAPS = fileURLToPath(new URL('../../client/public/assets/scenes', import.meta.url));
 /** A fresh copy of a committed scene file, as the editor sends it. */
 type RawScene = Record<string, unknown> & {
   grid: string[];
@@ -92,5 +101,27 @@ describe('the Studio save checks', () => {
       '- props: added `bk.new_stool`; removed `bk.wake_table`',
       '- fields: `notes`',
     ]);
+  });
+
+  it("writes the tilemap the grid exporter writes: every committed scene's, byte for byte", () => {
+    for (const id of SCENE_IDS) {
+      const path = join(TILEMAPS, id, 'tilemap.json');
+      expect(tilemapText(scenes[id]), path).toBe(readFileSync(path, 'utf8'));
+    }
+    const save = checkSave(walledBakery());
+    expect(save.tilemapText).toBe(tilemapText(save.scene));
+    expect(save.tilemapText).not.toBe(readFileSync(join(TILEMAPS, 'bakery', 'tilemap.json'), 'utf8'));
+  });
+
+  it('refuses a key the schema does not know at any depth, rather than committing it unchecked', () => {
+    const s = walledBakery();
+    s.portals[0] = { ...s.portals[0]!, colour: 'red' };
+    const problems = refused(s);
+    expect(problems.some((p) => p.includes('portals.0') && p.includes('colour'))).toBe(true);
+    expect(unknownKeys({ a: { b: [{ c: 1, d: 2 }] }, e: 3 }, { a: { b: [{ c: 1 }] } }, [])).toEqual([
+      'a.b.0.d',
+      'e',
+    ]);
+    expect(unknownKeys(raw('bakery'), scenes.bakery, [])).toEqual([]);
   });
 });
