@@ -106,6 +106,45 @@ Each under 400 lines, each with tests; the build green at every merge.
 | **T4** | 9T | Editor 1: props and portals, spawns, lights; undo and redo; the diff panel | T2 |
 | **T5** | 9T | Editor 2: grid paint, resize, paths and gates; live checks; Walk it; Save | T4, S3 |
 
+## 8. Modes: Overview, World, Room and NPC (owner, 2026-10-25)
+
+The owner's words: "the toggle button is for world editor, room editor, npc editor", and for the two map modes, "one
+is Overview which is the zoomed out map, and world editor is the first" (the outdoor maps). The NPC editor covers
+all four of: routes and schedules, placement and spawns, dialogue and tips, looks and outfits.
+
+A mode toggle in the Studio header switches between four modes. Creative mode (section 2) runs underneath all of
+them; Edit, Report and the Inbox work in every mode.
+
+- **Overview.** A zoomed-out map of every scene of the current map (`SCENE_IDS`, grouped by `maps/<mapId>.json`),
+  drawn as cards with their door links between them (portal `to` and `toSpawn`). Click a card to enter it in the
+  World or Room editor; drag a door link's end to re-target a portal (a scene edit, saved through section 5's save).
+  New scenes are out of scope here (ids are frozen and appended by hand, GDD 3.13).
+- **World editor.** Section 3's editor on the outdoor scenes (`kind` not `interior`): the material palette, moving
+  and rotating buildings, multi-tile props, trees and other kit, roads and paths, gates.
+- **Room editor.** Section 3's editor on the interiors (`kind: interior`): the same tools, scoped to the room.
+- **NPC editor.** Edits the NPC data, never a seat's card or anything secret (CLAUDE.md role secrecy):
+  - *Routes and schedules:* `routines.json` (activities, holds, each townsfolk's `stations`, `maps`, `fixed`); drawn
+    as paths and station markers over the world, with a phase scrubber to preview who goes where.
+  - *Placement and spawns:* where townsfolk and quest givers start (`givers` in scenes, townsfolk homes and stations).
+  - *Dialogue and tips:* the NPC lines. Today the small-talk and template lines live in code
+    (`apps/server/src/services/talk/templates.ts`), so the first step moves them into a content file with a zod schema,
+    unchanged, before the editor can edit them. Quest NPC names and `lore.json` shelves are already data.
+  - *Looks and outfits:* which look of `looks.json` each townsfolk and quest NPC wears (existing art only).
+  - Saving goes through a generalised save route: `POST /studio/save` takes `{ file, json }` for a fixed allowlist
+    of content files (`scenes/*.json`, `routines.json`, `quests.json`, `lore.json`, the new lines file), re-runs
+    `validateContent` with the edit swapped in, refuses unknown keys, and opens one draft PR, like a scene save.
+  - Live preview: the Studio room loads the edited NPC data like a draft scene (section 3, Walk it), so stand-ins
+    walk the edited routes before saving.
+
+| PR | Session | What |
+|---|---|---|
+| **M1** | 9U | The mode toggle; Room and World editors scoped by scene kind (after 9U's redraw, palette, buildings and rotation PRs) |
+| **M2** | 9W | Overview: the scene cards and door links, enter a scene, re-target a portal |
+| **N1** | 9V | Server: the save route for the content allowlist, and the NPC-data draft for live preview |
+| **N2** | 9V | The NPC lines move from `templates.ts` into a content file with a schema, unchanged |
+| **N3** | 9W | NPC editor 1: routes, schedules and stations over the world, with the phase scrubber |
+| **N4** | 9W | NPC editor 2: placement, looks, dialogue lines; Save |
+
 ## 7. Not in scope
 
 Editing art (the Blender masters stay as they are), editing `balance.json` or any rule, editing Blackpine is

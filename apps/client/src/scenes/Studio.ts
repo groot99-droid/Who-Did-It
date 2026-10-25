@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import palette from '@wdi/content/data/palette.json';
 import { mapOf, type Scene, type SceneId } from '@wdi/content';
-import { tilemapFor } from '@wdi/content/tilemap';
 import { toScreen } from '@wdi/shared/iso';
 import { setRoute } from '../flags';
 import { captureToken, clearToken, loginUrl, type TokenStore } from '../admin/AdminNet';
@@ -11,6 +10,7 @@ import { mountControls } from '../studio/Controls';
 import { createMockStudio, mockReportApi, mockSaveApi } from '../studio/mockStudio';
 import { EditorView } from '../studio/editor/EditorView';
 import { mountEditorPanel } from '../studio/editor/EditorPanel';
+import { tilemapOf } from '../studio/editor/artOf';
 import { EditorSession } from '../studio/editor/session';
 import { mountInbox } from '../studio/InboxPanel';
 import { mountReportPanel } from '../studio/ReportPanel';
@@ -42,6 +42,8 @@ const colorOf = (hex: string) => Number.parseInt(hex.slice(1), 16);
  * silence, so a held vector is resent each tick and a zero vector is sent once (it stops the figure at once).
  */
 const MOVE_MS = 50;
+/** The world art catches up with the edits this long after the last one, so a burst of strokes redraws once. */
+const ART_DEBOUNCE_MS = 150;
 
 /** The tab's session storage, or a throwaway object where the browser blocks it. */
 function sessionStore(): TokenStore {
@@ -90,6 +92,9 @@ export class Studio extends Phaser.Scene {
   private draft: { scene: Scene; session: EditorSession; seen: boolean } | null = null;
   /** The draft scene the world views were built from, or null while they show the committed scene. */
   private drawnDraft: Scene | null = null;
+  /** The editing session's scene when it opened: the committed art shows it until the first edit is drawn. */
+  private openScene: Scene | null = null;
+  private artTimer: number | null = null;
   private mock = false;
   private dialog: Screen | null = null;
   private editor: { session: EditorSession; view: EditorView; panel: Screen } | null = null;
@@ -206,6 +211,8 @@ export class Studio extends Phaser.Scene {
 
   private openEditor(session: EditorSession): void {
     this.link?.send('studio.clock', { paused: true });
+    this.openScene = session.scene;
+    session.bus.on('change', this.onEdit);
     this.editor = {
       session,
       view: new EditorView(this, session),
@@ -215,7 +222,21 @@ export class Studio extends Phaser.Scene {
     this.store.setEditing(true);
   }
 
+  /** The world art follows the edited scene: a moved or deleted prop, a painted wall or floor shows in the real art. */
+  private onEdit = (): void => {
+    if (this.artTimer !== null) window.clearTimeout(this.artTimer);
+    this.artTimer = window.setTimeout(() => {
+      this.artTimer = null;
+      const ed = this.editor;
+      if (ed === null || ed.session.scene === (this.drawnDraft ?? this.openScene)) return;
+      this.rebuildArt(ed.session.scene);
+    }, ART_DEBOUNCE_MS);
+  };
+
   private closeEditor(): void {
+    if (this.artTimer !== null) window.clearTimeout(this.artTimer);
+    this.artTimer = null;
+    this.editor?.session.bus.off('change', this.onEdit);
     this.editor?.view.destroy();
     this.editor?.panel.destroy();
     this.editor = null;
@@ -348,12 +369,30 @@ export class Studio extends Phaser.Scene {
     if (draft === null) return key;
     const draftKey = `${key}:draft`;
     this.cache.tilemap.remove(draftKey);
-    this.cache.tilemap.add(draftKey, { format: Phaser.Tilemaps.Formats.TILED_JSON, data: tilemapFor(draft) });
+    this.cache.tilemap.add(draftKey, { format: Phaser.Tilemaps.Formats.TILED_JSON, data: tilemapOf(draft) });
     return draftKey;
   }
 
   private buildWorld(sceneId: string, draft: Scene | null = null): void {
     this.dropWorld();
+    if (!this.drawArt(sceneId, draft)) return;
+    this.entities = new EntityView(this, '', () => undefined);
+    this.overlay = new OverlayView(this);
+    this.lastTick = -1;
+  }
+
+  /** Swaps the ground and the statics for the art of an edited scene, leaving the editor, figures and overlays alone. */
+  private rebuildArt(scene: Scene): void {
+    if (this.map === null || scene.id !== this.sceneId) return;
+    this.statics?.set([]);
+    this.statics?.destroy();
+    this.ground?.destroy();
+    this.ground = this.statics = null;
+    this.drawArt(this.sceneId, scene);
+  }
+
+  /** The ground and statics of the committed scene, or of `draft`; false when the scene's map is not loaded. */
+  private drawArt(sceneId: string, draft: Scene | null): boolean {
     let key: string;
     try {
       key = this.mapKeyOf(sceneId, draft);
@@ -363,7 +402,7 @@ export class Studio extends Phaser.Scene {
       this.drawnDraft = null;
       key = sceneMapKey(sceneId);
     }
-    if (!this.cache.tilemap.exists(key)) return;
+    if (!this.cache.tilemap.exists(key)) return false;
     this.sceneId = sceneId;
     this.map = readSceneMap(this.cache.tilemap.get(key).data as TiledMap);
     this.ground = new GroundView(this, key, this.map);
@@ -379,10 +418,8 @@ export class Studio extends Phaser.Scene {
         hasFrame: (atlas, frame) => this.textures.exists(atlas) && this.textures.get(atlas).has(frame),
       }),
     );
-    this.entities = new EntityView(this, '', () => undefined);
-    this.overlay = new OverlayView(this);
     this.cameras.main.setBackgroundColor(colorOf(palette.colors[this.map.voidColour])).setRoundPixels(true);
-    this.lastTick = -1;
+    return true;
   }
 
   private dropWorld(): void {
@@ -428,7 +465,9 @@ export class Studio extends Phaser.Scene {
       else if (d.seen) this.endWalk();
     }
     const want = this.draft !== null && snap.sceneId === this.draft.scene.id ? this.draft.scene : null;
-    if (want !== this.drawnDraft && !this.loading) this.buildWorld(this.sceneId, want);
+    // While the editor is open it owns the art (`onEdit`); the committed art returns when it closes.
+    if (this.editor === null && want !== this.drawnDraft && !this.loading)
+      this.buildWorld(this.sceneId, want);
   }
 
   /** The arrows and WASD scroll the camera while editing, since the figure stands still. */
