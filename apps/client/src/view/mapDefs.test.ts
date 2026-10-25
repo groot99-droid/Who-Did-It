@@ -176,3 +176,52 @@ describe('mapStatics: spots and portals', () => {
     expect(defDepth(overlay)).toBeGreaterThan(defDepth(defs[0]!));
   });
 });
+
+describe('mapStatics: turned props and buildings (WORLD 4.3)', () => {
+  const withFrames = (...f: string[]): DefContext => ({
+    ...ctx,
+    hasFrame: (atlas, frame) => f.includes(`${atlas}:${frame}`),
+  });
+
+  it('draws a quarter-turned prop from its own frame, else the plain frame mirrored', () => {
+    const m = map({ props: [obj('ov.crate', 'crate', 64, 64, [['rot', '90']])] });
+    const plain = mapStatics(m, withFrames('props_hollowmere:prop_crate'));
+    expect(plain[0]).toMatchObject({ frame: 'prop_crate', flipX: true });
+    const own = mapStatics(m, withFrames('props_hollowmere:prop_crate', 'props_hollowmere:prop_crate@r90'));
+    expect(own[0]!.frame).toBe('prop_crate@r90');
+    expect(own[0]!.flipX).toBeUndefined();
+  });
+
+  it('shows a 180 turn and a prop without `rot` unmirrored', () => {
+    const half = map({ props: [obj('ov.crate', 'crate', 64, 64, [['rot', '180']])] });
+    expect(mapStatics(half, withFrames('props_hollowmere:prop_crate'))[0]!.flipX).toBeUndefined();
+    const none = map({ props: [obj('ov.crate', 'crate', 64, 64)] });
+    expect(mapStatics(none, withFrames('props_hollowmere:prop_crate'))[0]!.flipX).toBeUndefined();
+  });
+
+  it('transposes and mirrors the slices of a sideways building without art of its own', () => {
+    const m = map({
+      buildings: [
+        obj(
+          'ov.bld_shed',
+          'building',
+          64,
+          64,
+          [
+            ['art', 'shed'],
+            ['rot', '90'],
+          ],
+          128,
+          192,
+        ),
+      ],
+    });
+    const defs = mapStatics(m, ctx);
+    expect(defs).toHaveLength(6);
+    const slice = defs.find((d) => d.id === 'ov.bld_shed#1_2')!;
+    expect(slice).toMatchObject({ frame: 'shed#2_1', flipX: true });
+    const own = mapStatics(m, withFrames('bld_hollowmere:shed@r90#0_0'));
+    expect(own.find((d) => d.id === 'ov.bld_shed#1_2')).toMatchObject({ frame: 'shed@r90#1_2' });
+    expect(own[0]!.flipX).toBeUndefined();
+  });
+});

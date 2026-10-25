@@ -36,6 +36,8 @@ export interface StaticDef {
   autoOccluder?: boolean;
   /** Not drawn until `setShown(id, true)` (the boarded overlay of a portal). */
   hidden?: boolean;
+  /** Drawn mirrored: the stand-in for a quarter turn the atlas has no `@r<deg>` frame for (WORLD 4.3). */
+  flipX?: boolean;
 }
 
 export type KitKind = 'wall' | 'tree' | 'boulder' | 'cliff' | 'fence' | 'stack';
@@ -74,6 +76,9 @@ export function kitOccludes(kind: KitKind, height: KitHeight): boolean {
 export const propOccludes = (risePx: number): boolean => risePx > TALL_PROP_PX;
 
 /** The frame name of one building slice (SPRITES 10.5). */
+/** `@r<deg>` names the art of a turned prop or building (WORLD 4.3); 0 is the plain stem. */
+export const turnedStem = (stem: string, rot: number): string => (rot === 0 ? stem : `${stem}@r${rot}`);
+
 export const sliceFrame = (art: string, dx: number, dy: number): string => `${art}#${dx}_${dy}`;
 
 /** A building or multi-tile prop footprint, in tiles. */
@@ -95,6 +100,7 @@ export function sliceDefs(
   fp: Footprint,
   heightPx: number,
   bias: number = BIAS.kit,
+  transpose = false,
 ): StaticDef[] {
   const out: StaticDef[] = [];
   const cx = (fp.x + fp.w / 2) * TILE_PX;
@@ -104,7 +110,8 @@ export function sliceDefs(
       out.push({
         id: `${id}#${dx}_${dy}`,
         atlas,
-        frame: sliceFrame(art, dx, dy),
+        frame: transpose ? sliceFrame(art, dy, dx) : sliceFrame(art, dx, dy),
+        ...(transpose ? { flipX: true } : {}),
         x: cx,
         y: cy,
         depthX: (fp.x + dx + 0.5) * TILE_PX,
