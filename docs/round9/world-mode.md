@@ -370,7 +370,7 @@ them."
 Today a cover role picks among the undealt cards and may wear a dealt one, which doubles a look (GDD 3.17, "The cover
 pick"; `deck.ts:50`). World mode keeps the mechanism and changes what is offered:
 
-- **What is offered.** On the role card, the Killer's picker lists every card the deal gave an NPC (1.4 step 6),
+- **What is offered.** On the role card, the Killer's picker lists every card the deal gave an NPC (1.4 step 5),
   apart from two kinds: its vendetta's partners, which are human, and the Accomplice and the Drifter (owner answer WM2: the
   Detective is no longer reserved for a human).
   The first hint is the deal's next undealt-order card, as `coverHints` picks it today.
