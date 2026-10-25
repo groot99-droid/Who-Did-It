@@ -71,7 +71,7 @@ From the brief, plus today's answers:
   - Mobs do 25, 18, 6 and 5 damage against 100 health, and there are no bosses.
   - There are no achievements or progression of any kind.
   - Only 5 fixed NPCs give quests, and walking townsfolk give nothing.
-  - Story mode can build on the auto-mode harness (`sim/auto/Auto.ts`), which runs seeded matches with one seat taken by a human.
+  - Story mode can build on the auto-mode harness (`sim/auto/Auto.ts`), which runs seeded all-NPC matches. Correction (9A): the harness has no human seat today (`Auto.ts:152`: "No leader and no human"), so story mode needs one added.
 
 ## Deliverables
 
@@ -136,3 +136,10 @@ Each session uses the `udgt-consult` skill on ROSW teardowns to explain why thin
 - A coverage table in `docs/round9/README.md` maps each of the brief's 11 parts and each answer above to the doc section that handles it. I check that nothing is left uncovered.
 - The prop audit in the logic table is produced by a script and repeatable: a count of props per kind from `packages/content/data/scenes/*.json` that adds up to 605.
 - The owner approves the docs in the questionnaire before any `GDD.md` edit or any code is written.
+
+## Status (2026-10-25)
+
+- Deliverables 1 to 6 are merged: #265, #266, #267.
+- The owner's later rules are in `owner-brief.md`: #268 and #269.
+- The owner's questionnaire answers are verbatim in `owner-answers.md`.
+- Deliverable 7 (`gdd-map.md` and the round-10 build plan) folds those answers into the design.
