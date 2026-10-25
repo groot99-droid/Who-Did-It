@@ -15,6 +15,9 @@ import { EditorSession } from '../studio/editor/session';
 import { NpcModel } from '../studio/npc/NpcModel';
 import { NpcView } from '../studio/npc/NpcView';
 import { mountNpcPanel } from '../studio/npc/NpcPanel';
+import { PeopleModel } from '../studio/npc/PeopleModel';
+import { PeopleView } from '../studio/npc/PeopleView';
+import { mountPeoplePanel } from '../studio/npc/PeoplePanel';
 import { clearNpcDraft, createNpcDraftApi, mockNpcDraftApi, type NpcDraftApi } from '../studio/npc/npcApi';
 import { OverviewModel } from '../studio/overview/model';
 import { mountOverview } from '../studio/overview/OverviewPanel';
@@ -95,7 +98,7 @@ export class Studio extends Phaser.Scene {
   private saveApi: SaveApi | null = null;
   private draftApi: DraftApi | null = null;
   private npcDraftApi: NpcDraftApi | null = null;
-  private npc: { view: NpcView; panel: Screen } | null = null;
+  private npc: { view: NpcView; people: PeopleView; panel: Screen; unfollow: () => void } | null = null;
   /** Walk it: the scene the room serves as an unsaved draft, and the editing session to return to. */
   private draft: { scene: Scene; session: EditorSession; seen: boolean } | null = null;
   /** The draft scene the world views were built from, or null while they show the committed scene. */
@@ -165,6 +168,8 @@ export class Studio extends Phaser.Scene {
       if (this.link !== link) return;
       this.link = null;
       this.npc?.view.destroy();
+      this.npc?.unfollow();
+      this.npc?.people.destroy();
       this.npc?.panel.destroy();
       this.npc = null;
       this.stopInput();
@@ -274,8 +279,13 @@ export class Studio extends Phaser.Scene {
     this.closeOverview();
     const link = this.link;
     const model = new NpcModel();
+    const people = new PeopleModel(() => this.store.snapshot?.sceneId ?? null);
+    const follow = () => people.sync();
+    this.store.bus.on('change', follow);
     this.npc = {
       view: new NpcView(this, model, () => this.store.snapshot?.sceneId ?? null),
+      people: new PeopleView(this, people),
+      unfollow: () => this.store.bus.off('change', follow),
       panel: mountNpcPanel(overlayRoot(), {
         model,
         saveApi: this.saveApi ?? mockSaveApi,
@@ -284,6 +294,14 @@ export class Studio extends Phaser.Scene {
         mapId: mapOf(snap.sceneId as SceneId),
         onClear: () => clearNpcDraft(link),
         onClose: () => this.closeNpc(),
+        extra: (el, note) =>
+          mountPeoplePanel(el, {
+            model: people,
+            saveApi: this.saveApi ?? mockSaveApi,
+            draftApi: this.npcDraftApi ?? mockNpcDraftApi,
+            roomId: link.roomId,
+            note,
+          }),
       }),
     };
   }
@@ -291,6 +309,8 @@ export class Studio extends Phaser.Scene {
   private closeNpc(): void {
     if (this.npc === null) return;
     this.npc.view.destroy();
+    this.npc.unfollow();
+    this.npc.people.destroy();
     this.npc.panel.destroy();
     this.npc = null;
     this.cameras.main.setZoom(1);
