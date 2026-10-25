@@ -278,6 +278,27 @@ describe('creatures in a match', () => {
     expect(party.room.state.scenes.get('cave_entry')!.bodies.has(`body_${id}`)).toBe(true);
   });
 
+  it('a roaming bat never closes on its goal through a wall corner (it once paced inside a wall for good)', async () => {
+    // These `mobs` words once sent the bat at a goal diagonally across the corner of solid tile (15,8): it stepped into
+    // the wall and paced between it and its path's last tile for the rest of the day (sim/Mobs.ts `walk`).
+    const party = await party4({ mobs: [2382158811, 228878859, 3604910573, 2327810908] });
+    holdPhase(party, Phase.day, 600);
+    const bat = scenes.cave_entry.spawners![0]!;
+    const grid = navGrid('cave_entry', simOf(party.room).profile);
+    const tiles = new Set<string>();
+    for (let i = 0; i < 120 * TICK_RATE; i++) {
+      advance(party, 1);
+      const b = mobBodies(party.room).get(bat.id);
+      if (!b) continue;
+      const tx = Math.floor(b.x / TILE_PX);
+      const ty = Math.floor(b.y / TILE_PX);
+      expect(grid.solidAt(tx, ty), `the bat stands in a wall at ${tx},${ty}`).toBe(false);
+      tiles.add(`${tx}:${ty}`);
+    }
+    // It keeps roaming rather than standing at one corner.
+    expect(tiles.size).toBeGreaterThan(2);
+  });
+
   it('keeps the tick p95 under 15 ms with 10 seats and the wolves awake', async () => {
     const party = await standardParty(colyseus, 'S1');
     pauseClock(party.room);
