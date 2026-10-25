@@ -7,6 +7,7 @@ import { h, type Screen } from '../ui/dom';
 import { ART_STYLES, currentStyleId } from '../view/artStyle';
 import { OVERLAYS } from './overlayData';
 import { CLOCK_SCALES, filterIds, spawnsOf, STUDIO_LISTS, statusOf, type StudioStore } from './model';
+import { availableModes, panelOf, scenesFor, type StudioMode } from './modes';
 
 export type StudioSend = <K extends StudioC2SType>(type: K, payload: StudioC2SPayloads[K]) => void;
 
@@ -50,7 +51,7 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
   const sceneList = h('ul', { class: 'wdi-studio__scenes', ...tid('studio-scenes') });
   const fillScenes = () => {
     sceneList.replaceChildren(
-      ...filterIds(STUDIO_LISTS.scenes, search.value).map((id) => {
+      ...filterIds(scenesFor(store.mode, STUDIO_LISTS.scenes), search.value).map((id) => {
         const b = btn(`studio-scene-${id}`, id, () => pick(id));
         b.setAttribute('aria-current', String(store.snapshot?.sceneId === id));
         return h('li', {}, b);
@@ -68,6 +69,34 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
       send('studio.teleport', { sceneId: picked, spawnId: spawnPick.value });
     }
   });
+
+  // Modes (docs/round9/admin-studio.md 8): World and Room scope the scene list and the editor by scene kind; the
+  // others plug in through `registerMode` and show once registered.
+  const modeBar = h('div', { class: 'wdi-admin__group', role: 'group', 'aria-label': C['studio.mode'] });
+  let offered = '';
+  const fillModes = () => {
+    const modes = availableModes();
+    if (modes.join() === offered) return;
+    offered = modes.join();
+    modeBar.replaceChildren(
+      h('span', {}, C['studio.mode']),
+      ...modes.map((m) => btn(`studio-mode-${m}`, C[`studio.mode.${m}`], () => store.setMode(m))),
+    );
+  };
+  let shown: { mode: StudioMode; screen: Screen | null } | null = null;
+  const syncMode = () => {
+    fillModes();
+    for (const b of modeBar.querySelectorAll('button'))
+      b.setAttribute('aria-pressed', String(b.dataset.testid === `studio-mode-${store.mode}`));
+    if (shown?.mode === store.mode) return;
+    shown?.screen?.destroy();
+    const panel = panelOf(store.mode);
+    shown = {
+      mode: store.mode,
+      screen: panel?.({ root, send, sceneId: () => store.snapshot?.sceneId ?? null }) ?? null,
+    };
+    fillScenes();
+  };
 
   const noclip = btn('studio-noclip', C['studio.noclip'], () =>
     send('studio.noclip', { on: !(store.snapshot?.noclip ?? false) }),
@@ -164,6 +193,7 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
     { class: 'wdi-admin__controls wdi-studio', 'aria-label': C['studio.title'], ...tid('studio-controls') },
     status,
     problem,
+    modeBar,
     group(C['studio.scene'], search, sceneList, spawnPick, go),
     noclip,
     edit,
@@ -203,6 +233,7 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
     problem.hidden = store.refused === '';
     problem.textContent = store.refused;
     log.textContent = store.log.join('\n');
+    syncMode();
     for (const li of sceneList.querySelectorAll('button')) {
       li.setAttribute('aria-current', String(li.dataset.testid === `studio-scene-${s?.sceneId}`));
     }
@@ -214,6 +245,7 @@ export function mountControls(root: HTMLElement, d: ControlDeps): Screen {
   return {
     destroy() {
       store.bus.off('change', refresh);
+      shown?.screen?.destroy();
       bar.remove();
     },
   };

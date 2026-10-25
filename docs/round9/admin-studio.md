@@ -136,6 +136,13 @@ them; Edit, Report and the Inbox work in every mode.
   - Live preview: the Studio room loads the edited NPC data like a draft scene (section 3, Walk it), so stand-ins
     walk the edited routes before saving.
 
+**The hook (M1).** `apps/client/src/studio/modes.ts` holds `StudioMode` (`overview | world | room | npc`) and
+`registerMode(mode, panel)`: a panel is `(ctx: { root, send, sceneId }) => Screen`, mounted when its mode is picked and
+destroyed when another is. The header toggle lists World and Room always and Overview and NPC once they register, so
+their sessions add one `registerMode` call and no toggle code. `StudioStore.mode` is the current mode (World first); in
+World and Room it follows the scene the owner stands in, in Overview and NPC it stays where the owner put it. The scene
+list shows the exteriors in World, the interiors in Room and every scene in the others (`scenesFor`).
+
 | PR | Session | What |
 |---|---|---|
 | **M1** | 9U | The mode toggle; Room and World editors scoped by scene kind (after 9U's redraw, palette, buildings and rotation PRs) |

@@ -1538,6 +1538,11 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.connecting` | Joining the Studio... | the Studio page |
 | `studio.signout` | Sign out | the Studio page |
 | `studio.status` | {scene} · tile {tx},{ty} · tick {tick} | the Studio page |
+| `studio.mode` | Mode | the Studio header: the mode toggle |
+| `studio.mode.overview` | Overview | the Studio mode toggle, once Overview is registered |
+| `studio.mode.world` | World editor | the Studio mode toggle |
+| `studio.mode.room` | Room editor | the Studio mode toggle |
+| `studio.mode.npc` | NPC editor | the Studio mode toggle, once the NPC editor is registered |
 | `studio.scene` | Scenes | the Studio page |
 | `studio.scene.search` | Search scenes | the Studio page |
 | `studio.teleport` | Go | the Studio page |
