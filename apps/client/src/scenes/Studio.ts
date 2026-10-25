@@ -6,11 +6,14 @@ import { toScreen } from '@wdi/shared/iso';
 import { setRoute } from '../flags';
 import { captureToken, clearToken, loginUrl, type TokenStore } from '../admin/AdminNet';
 import { connectStudio, type StudioLink } from '../admin/StudioNet';
+import { mountControls } from '../studio/Controls';
+import { createMockStudio } from '../studio/mockStudio';
 import { figuresOf, FIGURE_ID } from '../studio/figures';
 import { moveOf, StudioStore } from '../studio/model';
 import { clearStudioMarker, setStudioMarker } from '../studio/route';
 import { STUDIO_COPY as C } from '../ui/copy';
 import { h, overlayRoot, type Screen } from '../ui/dom';
+import { requestArtStyle } from '../view/artStyle';
 import { applyFilters, peekManifest, queueMatchEntries, sceneMapKey, sceneMapUrl } from '../view/assets';
 import { EntityView } from '../view/EntityView';
 import { GroundView } from '../view/GroundView';
@@ -20,6 +23,7 @@ import { readSceneMap, type SceneMap, type TiledMap } from '../view/sceneMap';
 import { StaticView } from '../view/StaticView';
 import { getFlags } from './registry';
 import '../ui/admin.css';
+import '../ui/studio.css';
 
 const colorOf = (hex: string) => Number.parseInt(hex.slice(1), 16);
 /** `studio.move` goes out at 20 Hz, like `input.move`; an unchanged vector repeats at 4 Hz so the room keeps it. */
@@ -75,6 +79,10 @@ export class Studio extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#14110f');
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.teardown());
     this.markers = this.add.graphics().setDepth(1_000_000);
+    if (getFlags(this).mock) {
+      this.begin(createMockStudio());
+      return;
+    }
     const token = captureToken(location.hash, this.tokens, () => setRoute('studio'));
     clearStudioMarker(this.tokens);
     if (token === null) {
@@ -108,6 +116,15 @@ export class Studio extends Phaser.Scene {
       this.store.reset();
       this.showSignIn(true);
     });
+    const root = this.mount(h('div', { class: 'wdi-admin' }));
+    this.screens.push(
+      mountControls(root.el, {
+        send: (type, payload) => link.send(type, payload),
+        store: this.store,
+        onSignOut: () => this.signOut(),
+        onStyle: (id) => void requestArtStyle(id),
+      }),
+    );
     this.startInput();
   }
 
@@ -252,6 +269,19 @@ export class Studio extends Phaser.Scene {
         button,
       ),
     );
+  }
+
+  private signOut(): void {
+    clearToken(this.tokens);
+    const link = this.link;
+    this.link = null;
+    link?.close();
+    this.stopInput();
+    this.clearScreens();
+    this.dropWorld();
+    this.sceneId = '';
+    this.store.reset();
+    this.showSignIn(false);
   }
 
   private mount<T extends HTMLElement>(el: T): Screen & { el: T } {
