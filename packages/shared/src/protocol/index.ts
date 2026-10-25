@@ -481,3 +481,5 @@ export * from './admin';
 
 // Round 9: the Studio wire (docs/round9/admin-studio.md 2), accepted by the `studio` room only.
 export * from './studio';
+// Round 9: the Studio's HTTP routes (docs/round9/admin-studio.md 5).
+export * from './studioHttp';
