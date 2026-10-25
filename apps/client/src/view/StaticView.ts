@@ -140,6 +140,7 @@ export class StaticView {
         .setDepth(depth);
       // Frames carry their own pivot (the ground point, SPRITES 10.5); a frame without one stands on its bottom edge.
       if (!tex.get(def.frame).customPivot) sprite.setOrigin(0.5, 1);
+      if (def.flipX === true) sprite.setFlipX(true);
       // A prop's art decides whether it hides you: a frame that rises more than 96 px above its pivot does.
       const owned = def.autoOccluder
         ? { ...def, occluder: propOccludes(sprite.displayHeight * sprite.originY) }

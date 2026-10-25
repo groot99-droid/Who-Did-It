@@ -40,6 +40,12 @@
   overflow-y: auto;
 }
 
+.wdi-studio__hint {
+  font-size: 11px;
+  margin: 0;
+  opacity: 0.8;
+}
+
 .wdi-studio__warn {
   font-size: 11px;
   margin: 0;

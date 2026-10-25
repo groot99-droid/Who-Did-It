@@ -47,6 +47,8 @@
 
 Doors of scenes outside the profile render boarded, and the portal rejects with `CLOSED`. `zoneId` (visibility, Ledger, noise) equals `sceneId` in V1.
 
+**Rotation (round 9).** A prop and a building may carry `rot`: 0, 90, 180 or 270, a clockwise quarter turn of the art (absent is 0). The footprint is stored already turned, so a 90 or 270 turn of a 3x2 building is a 2x3 footprint at the same corner, and the grid, the `P` material and every rule of the footprint hold for it as written. The art is `prop_<stem>@r<deg>` (a footprint prop's slices `prop_<stem>@r<deg>#<dx>_<dy>`, a building's `<art>@r<deg>#<dx>_<dy>`). Where an atlas has no frame for the angle the client draws the plain art instead: a 90 or 270 turn transposes the slices of a footprint and mirrors every sprite, a 180 turn shows the plain art, and the Studio editor says "no art for this angle yet". A spawn's and a quest giver's `facing` is their turn and takes the same quarter steps in the editor.
+
 **Biome and darkness (M5a).** Every scene names its `biome`: `village`, `house`, `forest` or `cave`. It picks the default ground and walls, the sound bed and the look. A `dark` scene is night in every phase (GDD 3.13): every cave, the Undercroft and the apothecary loft.
 
 **Frozen ids (M5a; the validator and a test enforce them).**

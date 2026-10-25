@@ -1615,6 +1615,9 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.edit.nothing` | Nothing selected | the Studio editor |
 | `studio.edit.duplicate` | Duplicate | the Studio editor |
 | `studio.edit.delete` | Delete | the Studio editor |
+| `studio.edit.rotate` | Turn 90° | the Studio editor |
+| `studio.edit.noTurnArt` | No art for this angle yet: it is drawn mirrored until the art is made. | the Studio editor, under a turned prop or building |
+| `studio.edit.keys` | Keys: R turns the selection, Delete or Backspace removes it. | the Studio editor |
 | `studio.edit.undo` | Undo | the Studio editor |
 | `studio.edit.redo` | Redo | the Studio editor |
 | `studio.edit.radius` | Radius (tiles) | the Studio editor |

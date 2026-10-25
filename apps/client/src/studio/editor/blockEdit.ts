@@ -10,6 +10,7 @@ import {
   find,
   listOf,
   move,
+  patch,
   place,
   remove,
   type Edit,
@@ -218,4 +219,72 @@ export function duplicateAny(scene: Scene, pick: Pick, name: string): Edit {
 export function removeAny(scene: Scene, pick: Pick, base: Scene, refs: readonly string[]): Edit {
   if (ROUTE.has(pick.kind)) return removeRoute(scene, pick.id, base);
   return isBlock(scene, pick) ? removeBlock(scene, pick, base, refs) : remove(scene, pick, base, refs);
+}
+
+const FACINGS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
+const withRot = (o: object, rot: number): object => {
+  const { rot: _r, ...rest } = o as { rot?: number };
+  return rot === 0 ? rest : { ...rest, rot };
+};
+
+/**
+ * A quarter turn clockwise (WORLD 4.3). A spawn or a quest giver turns its facing two steps; a prop or building
+ * takes the next `rot`. A 90 or 270 turn of a block swaps its footprint's sides at its corner: what stands in it
+ * (plates, lights) is transposed with it, a door cannot be and stops the turn; the new tiles must be open floor.
+ */
+export function rotate(scene: Scene, pick: Pick): Edit {
+  const o = find(scene, pick);
+  if (o === undefined) return { error: `${pick.id} is not in this scene` };
+  if (pick.kind === 'spawns' || pick.kind === 'givers') {
+    const i = FACINGS.indexOf((o as unknown as { facing: (typeof FACINGS)[number] }).facing);
+    return patch(scene, pick, { facing: FACINGS[(i + 2) % 8] });
+  }
+  if (pick.kind !== 'props' && pick.kind !== 'buildings')
+    return { error: `a ${pick.kind} object does not turn` };
+  const rot = (((o as { rot?: number }).rot ?? 0) + 90) % 360;
+  const fp = footprintOf(o);
+  const turned = (s: Scene, to?: Rect): Scene => {
+    const set = (e: { id: string }) =>
+      e.id === pick.id ? withRot({ ...e, ...(to === undefined ? {} : { footprint: to }) }, rot) : e;
+    return pick.kind === 'props'
+      ? { ...s, props: s.props.map((e) => set(e) as never) }
+      : { ...s, buildings: (s.buildings ?? []).map((e) => set(e) as never) };
+  };
+  if (fp === undefined || rot % 180 === 0) return { scene: turned(scene) };
+  const to = { x: fp.x, y: fp.y, w: fp.h, h: fp.w };
+  const riders = ridersOf(scene, pick, fp);
+  const door = riders.find((r) => r.kind === 'portals');
+  if (door !== undefined) return { error: `${door.id} is a door of ${pick.id}; move it before turning` };
+  const why = blocked(scene, to, fp, pick.id, riders);
+  if (why !== null) return { error: why };
+  const c = cellsOf(scene);
+  const floor = floorMaterial(scene);
+  for (const [tx, ty] of tilesOf(fp)) {
+    c.grid[ty]![tx] = '.';
+    if (c.material !== null) c.material[ty]![tx] = floor;
+  }
+  for (const [tx, ty] of tilesOf(to)) {
+    c.grid[ty]![tx] = '#';
+    if (c.material !== null) c.material[ty]![tx] = 'P';
+  }
+  const flip = <T extends { x: number; y: number }>(e: T): T => ({
+    ...e,
+    x: fp.x + (e.y - fp.y),
+    y: fp.y + (e.x - fp.x),
+  });
+  const rides = (kind: Kind) => (e: { id: string }) => riders.some((r) => r.kind === kind && r.id === e.id);
+  const next = turned(withCells(scene, c), to);
+  return {
+    scene: {
+      ...next,
+      spots: next.spots.map((e) => (rides('spots')(e) ? flip(e) : e)),
+      props: next.props.map((e) => (rides('props')(e) ? flip(e) : e)),
+      ...(next.lights === undefined
+        ? {}
+        : { lights: next.lights.map((e) => (rides('lights')(e) ? flip(e) : e)) }),
+      ...(next.nodes === undefined
+        ? {}
+        : { nodes: next.nodes.map((n) => (inRect(fp, n.x, n.y) ? flip(n) : n)) }),
+    },
+  };
 }

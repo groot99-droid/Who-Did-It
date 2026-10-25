@@ -19,7 +19,7 @@ import { EditHistory } from './history';
 import { addGate, addPath, removeRoute, setGateProfile } from './routeEdit';
 import { pickAt } from './pick';
 import { needlesOf, portalsTo, referencesTo } from './references';
-import { duplicateAny, moveAny, placeAny, removeAny } from './blockEdit';
+import { duplicateAny, moveAny, placeAny, removeAny, rotate } from './blockEdit';
 import { find, patch, type Edit, type Kind, type Pick } from './sceneEdit';
 import { templatesFor } from './templates';
 
@@ -45,6 +45,8 @@ export class EditorSession {
   gateProfile: Gate['minProfile'] = 'small';
   /** The last refused edit, until the next one succeeds. */
   error = '';
+  /** Whether an atlas frame exists; the Studio sets it once the art is loaded, for the "no art for this angle" badge. */
+  hasFrame: ((atlas: string, frame: string) => boolean) | null = null;
 
   constructor(sceneId: string) {
     this.base = structuredClone(content[sceneId]!);
@@ -178,6 +180,9 @@ export class EditorSession {
 
   moveSelected(tx: number, ty: number): void {
     if (this.selection !== null) this.apply(moveAny(this.scene, this.selection, tx, ty));
+  }
+  rotateSelected(): void {
+    if (this.selection !== null) this.apply(rotate(this.scene, this.selection));
   }
   patchSelected(fields: Record<string, unknown>): void {
     if (this.selection !== null) this.apply(patch(this.scene, this.selection, fields));
