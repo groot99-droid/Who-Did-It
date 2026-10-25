@@ -213,6 +213,7 @@ export class Studio extends Phaser.Scene {
     this.link?.send('studio.clock', { paused: true });
     this.openScene = session.scene;
     session.bus.on('change', this.onEdit);
+    session.hasFrame = (atlas, frame) => this.textures.exists(atlas) && this.textures.get(atlas).has(frame);
     this.editor = {
       session,
       view: new EditorView(this, session),

@@ -6,6 +6,7 @@ import { STUDIO_COPY as C, fill } from '../../ui/copy';
 import { h, type Screen } from '../../ui/dom';
 import { spawnsOf } from '../model';
 import { GRID_CHARS, MATERIALS, type Cell, type Tool } from './gridEdit';
+import { lacksTurnArt } from './artOf';
 import { find, pairedPortal, PLACEABLE, type Kind } from './sceneEdit';
 import { scenes, type Scene } from '@wdi/content';
 import type { SaveApi } from '../saveApi';
@@ -37,6 +38,9 @@ const MATERIAL_CHIP: Record<string, keyof typeof palette.colors> = {
   K: 'lantern',
   P: 'magenta',
 };
+
+/** The kinds a quarter turn means something for: art for props and buildings, facing for spawns and givers. */
+const TURNS: readonly Kind[] = ['props', 'buildings', 'spawns', 'givers'];
 
 export function mountEditorPanel(
   root: HTMLElement,
@@ -227,6 +231,12 @@ export function mountEditorPanel(
       btn('studio-edit-duplicate', C['studio.edit.duplicate'], () => s.duplicateSelected()),
       btn('studio-edit-delete', C['studio.edit.delete'], () => s.removeSelected()),
     ];
+    if (TURNS.includes(s.selection.kind))
+      kids.push(btn('studio-edit-rotate', C['studio.edit.rotate'], () => s.rotateSelected()));
+    if (s.hasFrame !== null && lacksTurnArt(s.scene, s.selection, s.hasFrame))
+      kids.push(
+        h('p', { class: 'wdi-studio__warn', ...tid('studio-edit-noturnart') }, C['studio.edit.noTurnArt']),
+      );
     if (s.selection.kind === 'lights') {
       const r = h('input', {
         type: 'number',
@@ -324,6 +334,7 @@ export function mountEditorPanel(
     ),
     picked,
     problem,
+    h('p', { class: 'wdi-studio__hint', ...tid('studio-edit-keys') }, C['studio.edit.keys']),
     h('div', { class: 'wdi-admin__group' }, undo, redo),
     h('h3', {}, C['studio.edit.checks']),
     checks,
@@ -335,11 +346,23 @@ export function mountEditorPanel(
     saveBtn,
     saveOut,
   );
+  // R turns the selection and Delete or Backspace removes it, unless a field has the keyboard.
+  const onKey = (e: KeyboardEvent) => {
+    const t = e.target as HTMLElement | null;
+    if (t !== null && ['INPUT', 'SELECT', 'TEXTAREA'].includes(t.tagName)) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === 'r' || e.key === 'R') s.rotateSelected();
+    else if (e.key === 'Delete' || e.key === 'Backspace') s.removeSelected();
+    else return;
+    e.preventDefault();
+  };
+  window.addEventListener('keydown', onKey);
   root.append(panel);
   s.bus.on('change', refresh);
   refresh();
   return {
     destroy() {
+      window.removeEventListener('keydown', onKey);
       s.bus.off('change', refresh);
       panel.remove();
     },

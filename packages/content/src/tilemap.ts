@@ -361,7 +361,7 @@ export function tilemapFor(scene: Scene, mapId: MapId = mapOf(scene.id as SceneI
             'building',
             b.footprint.x,
             b.footprint.y,
-            [str('art', b.art)],
+            [str('art', b.art), ...(b.rot ? [str('rot', String(b.rot))] : [])],
             b.footprint.w,
             b.footprint.h,
           ),
@@ -371,7 +371,10 @@ export function tilemapFor(scene: Scene, mapId: MapId = mapOf(scene.id as SceneI
         'props',
         scene.props.map((p) => {
           const f = p.footprint;
-          return obj(p.id, p.kind, p.x, p.y, f ? [str('footprint', `${f.x},${f.y},${f.w},${f.h}`)] : []);
+          return obj(p.id, p.kind, p.x, p.y, [
+            ...(f ? [str('footprint', `${f.x},${f.y},${f.w},${f.h}`)] : []),
+            ...(p.rot ? [str('rot', String(p.rot))] : []),
+          ]);
         }),
       ),
       group(

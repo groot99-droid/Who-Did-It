@@ -10,6 +10,8 @@ import {
   parseKitFrame,
   propOccludes,
   sliceDefs,
+  sliceFrame,
+  turnedStem,
 } from './statics';
 import { BIAS } from './iso';
 import { hqFrame } from './hq/HqView';
@@ -98,7 +100,20 @@ export function propStems(kind: string, id: string): string[] {
   return [...new Set([kind, tail, tail.replace(/_\d+$/, '')])];
 }
 
+/** A quarter turn read from a Tiled object's `rot` property; anything else is 0. */
+export const rotOf = (o: MapObject): 0 | 90 | 180 | 270 => {
+  const r = Number(o.props.rot);
+  return r === 90 || r === 180 || r === 270 ? r : 0;
+};
+/** True for the turns that swap a footprint's sides, so a mirrored stand-in is the nearest picture. */
+const sideways = (rot: number) => rot === 90 || rot === 270;
+
+/** The frames a turned prop is looked up by: its own `@r<deg>` art first, then the plain stems. */
+const turnedFrames = (stems: string[], rot: number, plain: (s: string) => string): string[] =>
+  rot === 0 ? stems.map(plain) : [...stems.map((s) => plain(turnedStem(s, rot))), ...stems.map(plain)];
+
 function propDefs(o: MapObject, ctx: DefContext): StaticDef[] {
+  const rot = rotOf(o);
   const stems = propStems(o.type, o.name);
   const label = INTERACTABLE_PROPS[o.type];
   const boxPx = PROP_BOX_PX[o.type] ?? DEFAULT_PROP_BOX_PX;
@@ -106,10 +121,20 @@ function propDefs(o: MapObject, ctx: DefContext): StaticDef[] {
   if (fp && (fp.w > 1 || fp.h > 1)) {
     const art = find(
       ctx,
-      stems.map((s) => `prop_${s}#0_0`),
+      turnedFrames(stems, rot, (s) => `prop_${s}#0_0`),
     );
+    // Without its own turned art a sideways prop is the plain art with its slices transposed and mirrored.
+    const own = art !== null && art.frame.includes('@r');
     if (art)
-      return sliceDefs(o.name, art.atlas, art.frame.slice(0, -'#0_0'.length), fp, boxPx).map((d) => ({
+      return sliceDefs(
+        o.name,
+        art.atlas,
+        art.frame.slice(0, -'#0_0'.length),
+        fp,
+        boxPx,
+        BIAS.kit,
+        sideways(rot) && !own,
+      ).map((d) => ({
         ...d,
         occluder: false,
         autoOccluder: true,
@@ -131,7 +156,7 @@ function propDefs(o: MapObject, ctx: DefContext): StaticDef[] {
   const c = centre(tx, ty);
   const lit = o.type === 'lanternPost' ? find(ctx, [`prop_${o.type}_lit`]) : null;
   // Round 8, 8G: an HQ station stands as its staked site until HqView swaps in its bought tier (motion.md 2).
-  const art = lit ?? find(ctx, o.type === 'hq' ? [hqFrame(0)] : stems.map((s) => `prop_${s}`));
+  const art = lit ?? find(ctx, o.type === 'hq' ? [hqFrame(0)] : turnedFrames(stems, rot, (s) => `prop_${s}`));
   if (art) {
     const def: StaticDef = {
       ...base(o.name, c.x, c.y),
@@ -140,6 +165,7 @@ function propDefs(o: MapObject, ctx: DefContext): StaticDef[] {
       autoOccluder: true,
       heightPx: boxPx,
     };
+    if (sideways(rot) && !art.frame.includes('@r')) def.flipX = true;
     if (lit) def.frameAlt = `prop_${o.type}_unlit`;
     return [def];
   }
@@ -212,7 +238,13 @@ export function mapStatics(map: SceneMap, ctx: DefContext): StaticDef[] {
       h: Math.round(o.height / TILE_PX),
     };
     if (fp.w < 1 || fp.h < 1) continue;
-    out.push(...sliceDefs(o.name, `bld_${ctx.mapId}`, art, fp, BUILDING_BOX_PX));
+    const rot = rotOf(o);
+    const atlas = `bld_${ctx.mapId}`;
+    const turned = turnedStem(art, rot);
+    const own = rot !== 0 && ctx.hasFrame(atlas, sliceFrame(turned, 0, 0));
+    out.push(
+      ...sliceDefs(o.name, atlas, own ? turned : art, fp, BUILDING_BOX_PX, BIAS.kit, sideways(rot) && !own),
+    );
   }
   for (const o of map.props) out.push(...propDefs(o, ctx));
   for (const o of map.interact) out.push(spotDef(o, ctx));

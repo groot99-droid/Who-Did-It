@@ -177,6 +177,13 @@ export const Spot = z.strictObject({
 });
 export type Spot = z.infer<typeof Spot>;
 
+/**
+ * A quarter turn of a prop's or building's art (WORLD 4.3). Absent means 0. The footprint is the turned one: a
+ * 90 or 270 turn of a 3x2 building is stored as a 2x3 footprint.
+ */
+export const Rot = z.union([z.literal(0), z.literal(90), z.literal(180), z.literal(270)]);
+export type Rot = z.infer<typeof Rot>;
+
 /** Interactable or landmark objects (the `interact` layer of a later Tiled export). */
 export const Prop = z.strictObject({
   id: PrefixedId,
@@ -190,6 +197,7 @@ export const Prop = z.strictObject({
   ships: Ships.optional(),
   /** Tiles a multi-tile prop covers (all solid, holding its anchor); its art is one slice per tile (SPRITES 10.5). */
   footprint: Rect.optional(),
+  rot: Rot.optional(),
 });
 export type Prop = z.infer<typeof Prop>;
 
@@ -219,6 +227,7 @@ export const Building = z.strictObject({
   /** Frame stem in `bld_<mapId>`: the slices are `<art>#<dx>_<dy>` (SPRITES 10.13). */
   art: Id,
   footprint: Rect,
+  rot: Rot.optional(),
 });
 export type Building = z.infer<typeof Building>;
 
