@@ -2,11 +2,13 @@ import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { createNavGrid, navFromGrid } from '@wdi/shared';
+import { NAV_SOLID_CHARS, createNavGrid, navFromGrid } from '@wdi/shared';
+import { GRID_SOLID_CHARS, tilemapFor as contentTilemapFor } from '@wdi/content/tilemap';
 import { formatJson } from '../../../packages/content/scripts/lint-data.mjs';
 import type { Scene } from '@wdi/content';
 import {
   SCENES_DIR,
+  TILEMAP_DIR,
   SIDE,
   assertGroundCell,
   assertNavTile,
@@ -271,5 +273,13 @@ describe('grid exporter', () => {
       const path = join(SCENES_DIR, `${scene.id}.nav.json`);
       expect(formatJson(navFromGrid(scene)), path).toBe(readFileSync(path, 'utf8'));
     }
+  });
+
+  it('builds the tilemap with the @wdi/content/tilemap module the Studio server imports (round 9)', () => {
+    expect([...GRID_SOLID_CHARS].sort()).toEqual([...NAV_SOLID_CHARS].sort());
+    expect(tilemapFor).toBe(contentTilemapFor);
+    const bakery = byId('bakery');
+    const path = join(TILEMAP_DIR, 'bakery', 'tilemap.json');
+    expect(JSON.stringify(contentTilemapFor(bakery)) + '\n').toBe(readFileSync(path, 'utf8'));
   });
 });
