@@ -1,5 +1,7 @@
 # Round 9: the living world (9C)
 
+> **Follow-up 4 (owner, 2026-10-26).** `followup-4.md` makes the Clerk and the Constables guard NPCs (2.2), adds NPC hardships and the Clerk's ledger (2.6), sets a 12-cycle match that needs more tasks, chores, quests and spawns (2.8), and lets every vendetta sabotage by day with two lethal hazards (2.10). It overrides this file where they disagree.
+
 Session 9C, plan items 5 and 6. This is a design document: it changes no code, data, test or `GDD.md`. Every number marked **(P)** is a proposal that would go to `balance.json` or a data file if the owner approves it, and no other document may restate it. Every number without a mark is quoted from `GDD.md` or the data, and the cell names where.
 
 The owner's words are in `owner-brief.md`. This document answers parts 3, 4, 5, 6 and 7 of the brief: longer days and softer mobs, integrated systems, branching achievements, gear, and a world with more NPCs that walk, chat and give tasks. `emergent-play.md` answers part 10 using the systems below.

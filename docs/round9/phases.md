@@ -1,5 +1,7 @@
 # Round 9 (9A): the phase screens
 
+> **Follow-up 4 (owner, 2026-10-26).** `followup-4.md` adds the Dusk Train (2.6) to section 2, makes the Defrocked verdict reversible by the chapel cot (2.3) in section 4, adds Exhaustion after a night skip (2.11) to section 12, and sets a 12-cycle match (2.8). It overrides this file where they disagree.
+
 World mode has no vote (`world-mode.md` 5). The pauses that the meeting, the vote and the reveal fill today become
 full-screen **phases**: the town gathers, evidence is laid out, and the server reads the verdict. This document
 lists every such screen: what it shows, who sees what, and how long it lasts. It ends with a mock-up list for a

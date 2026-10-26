@@ -143,3 +143,4 @@ Each session uses the `udgt-consult` skill on ROSW teardowns to explain why thin
 - The owner's later rules are in `owner-brief.md`: #268 and #269.
 - The owner's questionnaire answers are verbatim in `owner-answers.md`.
 - Deliverable 7 (`gdd-map.md` and the round-10 build plan) folds those answers into the design.
+- The owner's follow-up calls of 2026-10-26 (28 answers and five fixes) are in `followup-4.md`. It overrides the other documents where they disagree.
