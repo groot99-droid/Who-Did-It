@@ -45,6 +45,8 @@ export class PlayerSim {
   bloodyUntilTick = 0;
   /** A Bandage protects this player until this tick (GDD 3.2). */
   bandagedUntilTick = 0;
+  /** A Bandaged strike blacks this seat's screen out until this tick: its view holds no avatars (GDD 3.2). */
+  blindUntilTick = 0;
   /** The `act.hold` in progress, re-validated every tick (ARCHITECTURE 5.6). */
   hold: { action: string; targetId: string; startTick: number } | null = null;
   /** Notebook entries written so far; the next `NotebookEntry.id` is `entry_<n + 1>` (counted per player). */
@@ -72,6 +74,7 @@ export class PlayerSim {
     this.dead = false;
     this.bloodyUntilTick = 0;
     this.bandagedUntilTick = 0;
+    this.blindUntilTick = 0;
     this.hold = null;
     this.entrySeq = 0;
     this.bellPulls = 0;

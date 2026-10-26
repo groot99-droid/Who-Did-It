@@ -118,7 +118,7 @@ function reconcileAvatars(
   const held = heldOf(room, sessionId);
   const ghostViewer = viewerSim.dead;
   const wanted = new Set<string>();
-  if (world && !isAiming(room, sessionId)) {
+  if (world && !isAiming(room, sessionId) && viewerSim.blindUntilTick <= room.state.tick) {
     const scene = room.state.scenes.get(sceneKey(viewerSim.sceneIdx));
     scene?.avatars.forEach((_avatar, handle) => {
       const seat = memory.seatOf.get(handle);

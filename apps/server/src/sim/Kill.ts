@@ -13,6 +13,7 @@ import { endImpersonation } from './Impersonate';
 import { spendProtection } from './NightPowers';
 import { emitNoise } from './Noise';
 import { type PlayerSim, simOf } from './RoomSim';
+import { onBandagedStrike } from './Struck';
 import { isKillPhase, navGrid, reject, sceneKey } from './World';
 
 /** Kill cooldown in ticks for this party size (GDD 3.9; the row is cut to 4-10 like the deal). */
@@ -108,6 +109,7 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
   }
   if (target.bandagedUntilTick > tick) {
     target.bandagedUntilTick = 0;
+    onBandagedStrike(room, sessionId, targetId); // the target's blackout and the Claimed entries (GDD 3.2)
     reject(room, sessionId, ErrorCode.cannot, 'nothing happens');
     return;
   }
