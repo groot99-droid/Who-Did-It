@@ -2,7 +2,7 @@ import { ColyseusTestServer, boot } from '@colyseus/testing';
 import { avatarsHeld, handleOf as h } from './avatarHelpers';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { abilities, balance, clues } from '@wdi/content';
-import { ErrorCode, ItemStack, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { ClueKind, ErrorCode, ItemStack, NotebookStatus, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import { createServer } from '../src/server';
 import { handleKill } from '../src/sim/Kill';
 import { StatusBit } from '../src/sim/constants';
@@ -240,6 +240,32 @@ describe('kill', () => {
     // The next strike waits for the cooldown.
     await strike(m);
     expect(errorCodes(k)).toEqual([ErrorCode.cannot, ErrorCode.cooldown]);
+  });
+
+  it('blacks the Bandaged target out and writes Claimed entries for it and a near witness only (GDD 3.2)', async () => {
+    const m = await party();
+    const [k, v, near, far] = [m.bots[0]!, m.bots[1]!, m.bots[2]!, m.bots[3]!];
+    teleport(m, near, 'overworld', 29, ROW);
+    simOfBot(m, v).bandagedUntilTick = m.room.state.tick + 1000;
+    const height = playerOf(m, k).traits.height;
+    const scarf = playerOf(m, k).traits.scarf;
+    await strike(m);
+    const claimed = (bot: typeof k) =>
+      [...playerOf(m, bot).priv.notebook]
+        .filter((e) => e.status === NotebookStatus.claimed)
+        .map((e) => [e.clueKind, e.value]);
+    expect(simOfBot(m, v).blindUntilTick).toBeGreaterThan(m.room.state.tick);
+    expect(claimed(v)).toEqual([[ClueKind.footprints, height]]);
+    expect(claimed(near)).toEqual([
+      [ClueKind.footprints, height],
+      [ClueKind.thread, scarf],
+    ]);
+    expect(claimed(far)).toEqual([]);
+    expect(claimed(k)).toEqual([]);
+    // The blackout holds the target no avatars for blackoutS, then the view comes back.
+    expect(avatarsHeld(v)).toEqual([]);
+    await sleep((abilities.abilities.bandage!.params!.blackoutS! + 0.5) * 1000);
+    expect(avatarsHeld(v).length).toBeGreaterThan(0);
   });
 });
 
