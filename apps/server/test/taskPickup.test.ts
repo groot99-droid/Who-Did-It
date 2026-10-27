@@ -1,6 +1,6 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { scenes, tasks } from '@wdi/content';
+import { items, scenes, tasks } from '@wdi/content';
 import {
   ErrorCode,
   ItemStack,
@@ -107,7 +107,7 @@ describe('the pick-up at a task source (GDD 3.5)', () => {
     const { party, h, me } = await world();
     assign(me, 'fixPump');
     stand(party, h, BENCH);
-    for (const item of ['oil', 'planks', 'letter', 'flour', 'bucket']) give(me, item, 1);
+    for (let i = 0; i < items.inventorySlots; i++) give(me, 'oil', 1); // every slot used
     await hold(party, h, 'fixPump');
     expect(qty(me, FIX.tool!)).toBe(0);
     expect(errors(h)).toEqual([ErrorCode.cannot]);
