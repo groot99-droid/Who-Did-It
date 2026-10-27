@@ -1,6 +1,6 @@
 {
   "gddRef": "3.5",
-  "inventorySlots": 5,
+  "inventorySlots": 24,
   "items": {
     "knife": {
       "id": "knife",

@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { recipes, scenes } from '@wdi/content';
+import { items, recipes, scenes } from '@wdi/content';
 import { C2S, ErrorCode, TICK_RATE } from '@wdi/shared';
 import { mapScenesOf } from '../src/sim/MapSites';
 import { addStack, count } from '../src/sim/Inventory';
@@ -115,12 +115,12 @@ describe('craft', () => {
   it('crafts from a full inventory, the inputs freeing the slot the tool takes', async () => {
     const p = await party();
     const { seat } = standBy(p, null);
-    for (let i = 0; i < 3; i++) addStack(seat, 'crowbar', 1);
-    give(seat, { timber: 1, resin: 1 }); // five slots
+    for (let i = 0; i < items.inventorySlots - 2; i++) addStack(seat, 'crowbar', 1);
+    give(seat, { timber: 1, resin: 1 }); // every slot used
     await craft(p, 'torch');
     advance(p, cast('torch'));
     expect(count(seat, 'torch')).toBe(1);
-    expect(seat.priv.inventory.slots.length).toBe(4);
+    expect(seat.priv.inventory.slots.length).toBe(items.inventorySlots - 1);
   });
 
   it('leaves no mark of the crafter: any role may craft a lantern', async () => {
