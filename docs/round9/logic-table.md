@@ -460,7 +460,7 @@ The owner: "default option is fine, but pockets need to be bigger, i want a inve
 | Part | Slots (_proposed_) | Holds |
 | --- | ---: | --- |
 | Hotbar | 6 | Anything; the number keys and the touch strip select one. The held item is the hotbar's selected slot |
-| Pack | 18 (3 rows of 6) | Anything. Today's pack is 5 |
+| Pack | 18 (3 rows of 6) | Anything. Until this screen ships the whole inventory is one list of 24 (`items.inventorySlots`), the hotbar and the pack together |
 | Belt | 2 | Items of kind `tool` only (9B default) |
 | Equipment | head, body, weapon | Armour (8.2) and one weapon (8.3) |
 | Crafting square | 2 by 2, and one output slot | Hand recipes, made anywhere |

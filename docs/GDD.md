@@ -125,7 +125,7 @@ Wolf kills spawn Fur and Claw Marks (decay 1 cycle), no footprints. Collecting: 
 
 ### 3.5 Items and tasks
 
-Inventory: 5 slots, Q drops, everything drops on death; role-bound items (Knife, Replica Knife, Master Keyring, Magnifier, Notebook, Slingshot, Remedy, Nightshade, Fowling Piece; V1.5 Crossbow) never drop except the Magnifier (drops as a 6 s Inspect for anyone); an ejected Village role's kit goes to a chest at the square.
+Inventory: 24 slots (the round-10 screen splits them into a hotbar of 6 and a pack of 18, and adds belt and equipment slots), Q drops, everything drops on death; role-bound items (Knife, Replica Knife, Master Keyring, Magnifier, Notebook, Slingshot, Remedy, Nightshade, Fowling Piece; V1.5 Crossbow) never drop except the Magnifier (drops as a 6 s Inspect for anyone); an ejected Village role's kit goes to a chest at the square.
 
 | Item | Effect | Ships |
 |---|---|---|

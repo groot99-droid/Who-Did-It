@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { balance, resources, scenes } from '@wdi/content';
+import { balance, items, resources, scenes } from '@wdi/content';
 import { C2S, ErrorCode, Phase, TICK_RATE, TILE_PX, type SceneStateType } from '@wdi/shared';
 import { addStack, count } from '../src/sim/Inventory';
 import { activeInPool } from '../src/sim/Resources';
@@ -198,10 +198,10 @@ describe('gather', () => {
     expect(node.active).toBe(false);
   });
 
-  it('refuses a gather with no room for the yield: five slots, five stacks', async () => {
+  it('refuses a gather with no room for the yield: every slot a stack', async () => {
     const p = await party();
     const { human, seat, row } = await atNode(p, 'herb');
-    for (let i = 0; i < 5; i++) addStack(seat, 'crowbar', 1);
+    for (let i = 0; i < items.inventorySlots; i++) addStack(seat, 'crowbar', 1);
     await hold(p, 'gather', row.id);
     expect(errors(human)).toContain(ErrorCode.cannot);
     advance(p, castTicks(resources.resources.herb!.gatherS));

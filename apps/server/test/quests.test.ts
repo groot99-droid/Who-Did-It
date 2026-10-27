@@ -1,6 +1,6 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { quests } from '@wdi/content';
+import { items, quests } from '@wdi/content';
 import { resetToLobby } from '../src/sim/Win';
 import { ErrorCode, ItemStack, Phase, type PlayerState } from '@wdi/shared';
 import {
@@ -147,17 +147,14 @@ describe('quest progress and turn-in', () => {
     const { party, h, me } = await world();
     stand(party, h, { scene: 'bp_woods', x: 24, y: 30 });
     give(me, 'stone', 5); // 3 are wanted, so the stack stays
-    for (const id of ['knife', 'bandage', 'salts', 'crowbar']) give(me, id, 1);
+    for (let i = 1; i < items.inventorySlots; i++) give(me, 'crowbar', 1); // every other slot used
     await say(party, h, 'quest.accept', 'colliersStone');
     await new Promise((r) => setTimeout(r, 600));
     await say(party, h, 'quest.turnIn', 'colliersStone');
     expect(me.priv.quests[0]?.done).toBe(false);
     expect(me.priv.inventory.slots.map((s) => [s.defId, s.qty])).toEqual([
       ['stone', 5],
-      ['knife', 1],
-      ['bandage', 1],
-      ['salts', 1],
-      ['crowbar', 1],
+      ...Array.from({ length: items.inventorySlots - 1 }, () => ['crowbar', 1]),
     ]);
     expect(errors(h)).toContain(ErrorCode.cannot);
   });

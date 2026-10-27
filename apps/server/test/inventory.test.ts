@@ -18,8 +18,8 @@ const give = (p: PlayerState, item: string, qty: number) => {
 };
 
 describe('inventory', () => {
-  it('has five slots and stacks a material to stackMax in one slot', () => {
-    expect(items.inventorySlots).toBe(5);
+  it('has 24 slots and stacks a material to stackMax in one slot', () => {
+    expect(items.inventorySlots).toBe(24);
     const p = seat();
     expect(addStack(p, 'timber', balance.resources.stackMax)).toBe(true);
     expect(slots(p)).toEqual(['timberx5']);
@@ -37,17 +37,17 @@ describe('inventory', () => {
 
   it('gives a tool a slot of its own and refuses what does not fit, changing nothing', () => {
     const p = seat();
-    for (let i = 0; i < 5; i++) expect(addStack(p, 'crowbar', 1)).toBe(true);
+    for (let i = 0; i < items.inventorySlots; i++) expect(addStack(p, 'crowbar', 1)).toBe(true);
     expect(addStack(p, 'crowbar', 1)).toBe(false);
     expect(addStack(p, 'timber', 1)).toBe(false);
-    expect(slots(p)).toHaveLength(5);
+    expect(slots(p)).toHaveLength(items.inventorySlots);
 
     const q = seat();
     addStack(q, 'timber', 5);
-    for (let i = 0; i < 3; i++) addStack(q, 'crowbar', 1); // four slots used
+    for (let i = 0; i < items.inventorySlots - 2; i++) addStack(q, 'crowbar', 1); // all but one slot used
     expect(canAdd(q, 'timber', 6)).toBe(false);
     expect(addStack(q, 'timber', 6)).toBe(false);
-    expect(slots(q)).toEqual(['timberx5', 'crowbarx1', 'crowbarx1', 'crowbarx1']);
+    expect(slots(q)).toEqual(['timberx5', ...Array<string>(items.inventorySlots - 2).fill('crowbarx1')]);
     expect(addStack(q, 'timber', 5)).toBe(true);
   });
 
@@ -91,16 +91,16 @@ describe('inventory', () => {
 describe('exchange', () => {
   it('takes and gives as one change, the takes freeing slots for the gives', () => {
     const p = seat();
-    for (let i = 0; i < 4; i++) addStack(p, 'crowbar', 1);
-    addStack(p, 'timber', 1); // five slots used
+    for (let i = 0; i < items.inventorySlots - 1; i++) addStack(p, 'crowbar', 1);
+    addStack(p, 'timber', 1); // every slot used
     expect(canExchange(p, [{ item: 'timber', qty: 1 }], [{ item: 'torch', qty: 1 }])).toBe(true);
     expect(exchange(p, [{ item: 'timber', qty: 1 }], [{ item: 'torch', qty: 1 }])).toBe(true);
-    expect(slots(p)).toEqual(['crowbarx1', 'crowbarx1', 'crowbarx1', 'crowbarx1', 'torchx1']);
+    expect(slots(p)).toEqual([...Array<string>(items.inventorySlots - 1).fill('crowbarx1'), 'torchx1']);
   });
 
   it('changes nothing when the takes are short or the gives do not fit', () => {
     const p = seat();
-    for (let i = 0; i < 5; i++) addStack(p, 'crowbar', 1);
+    for (let i = 0; i < items.inventorySlots; i++) addStack(p, 'crowbar', 1);
     const before = slots(p);
     expect(exchange(p, [{ item: 'timber', qty: 1 }], [])).toBe(false);
     expect(exchange(p, [{ item: 'crowbar', qty: 1 }], [{ item: 'torch', qty: 2 }])).toBe(false);

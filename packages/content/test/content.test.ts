@@ -311,7 +311,7 @@ describe('items (GDD 3.5)', () => {
   it('keeps the Knife bound and lets the Magnifier drop as an Inspect station', () => {
     expect(items.items.knife).toMatchObject({ roleBound: true, onDeath: 'kept' });
     expect(items.items.magnifier).toMatchObject({ roleBound: true, onDeath: 'inspectStation' });
-    expect(items.inventorySlots).toBe(5);
+    expect(items.inventorySlots).toBe(24);
   });
 
   it('gives every V1 start kit item a V1 record', () => {
