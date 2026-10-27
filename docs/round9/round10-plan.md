@@ -1,5 +1,7 @@
 # Round 9 (9D): the round-10 build plan
 
+> **Follow-up 4 (owner, 2026-10-26).** `followup-4.md` adds work to this plan: guard NPCs, hardships and the Clerk's ledger, the Dusk Train and the Hitman's day weapon, sabotage hazards, Exhaustion, beds that restore stamina, and content for a 12-cycle match. Its section 4 lists the new keys. It overrides this file where they disagree.
+
 Session 9D, deliverable 7 of `README.md`. Design only: this document plans code, it writes none. It orders the
 round-10 pull requests that build the round-9 design (`gdd-map.md` says which GDD section each one changes). It
 supersedes the build lists in `logic-table.md` 12 and `failures.md` 7, which it absorbs.

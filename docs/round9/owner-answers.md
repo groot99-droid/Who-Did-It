@@ -4,6 +4,8 @@ The owner answered all 54 questions in the round-9 questionnaire (https://claude
 
 Totals: 42 defaults accepted, 12 answered differently.
 
+The owner's later chat rules and the 28-question follow-up form (2026-10-26) are in `followup-4.md`, verbatim.
+
 ## World mode: dealing, the Killer and the train
 
 Design doc: `docs/round9/world-mode.md`.

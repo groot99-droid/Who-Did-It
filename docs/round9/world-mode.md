@@ -13,6 +13,11 @@ follow-ups override this document wherever they disagree. Every paragraph they c
 <ID>)". Where an answer collides with another rule, the reconciliation is written in place and listed in section 12,
 "Reconciled". The GDD sections each change lands in are in `gdd-map.md`; the build order is in `round10-plan.md`.
 
+**Follow-up 4 (owner, 2026-10-26).** `followup-4.md` records the owner's 28 follow-up answers and the rules they
+decide. It overrides this document where they disagree, and each paragraph it changed is marked "(F4 <id>)". The big
+ones: a 12-cycle match, the Dusk Train and the Hitman's day weapon, guard NPCs, petitions at 30% of the humans, a
+two-match murder threshold and a reversible defrocking.
+
 **Sources.**
 
 - The owner's words: `owner-brief.md`, quoted verbatim where a rule rests on them.
@@ -175,16 +180,16 @@ tells nobody: whether the Hitman comes, on which day (3, 4 or 5, uniform), and w
 | Humans | Comes (P) | Human, if he comes (P) |
 |---|---|---|
 | 3 | 0.5 | 0 (owner) |
-| 4 | 0.6 | 0.1 ("very low") |
-| 5 | 0.7 | 0.2 ("low") |
+| 4 | 0.6 | 0.15 (owner, F4 a12) |
+| 5 | 0.7 | 0.25 (owner, F4 a12) |
 | 6 | 0.8 | 0.4 (owner) |
 | 7 | 0.85 | 0.55 |
 | 8 | 0.9 | 0.7 |
 | 9 | 0.95 | 0.85 |
 | 10 | 1 (owner) | 1 (owner) |
 
-The numbers would be new `balance.json` keys under `hitman.byHumans`. The owner fixed 3, 6 and 10; the rest are
-proposals that rise evenly.
+The numbers would be new `balance.json` keys under `hitman.byHumans`. The owner fixed the human column (F4 a12), and he
+can only come between days 3 and 5 (F4 a13).
 
 **Who is turned.** The lore's Hitman returns: "nobody starts as the Hitman" (Codex, Contract), the mail turns a
 townsman into one. On the arrival day's `train.delivery`, the black-wax letter reaches one seat:
@@ -206,12 +211,19 @@ its station stays cold, its home shows a dark window, and the "what breaks when 
 still work, but each day's output of its role drops to `hitman.dormantOutput` (P: 0) of normal. The shift is a fact of
 the world, seen by walking to the houses; no field ever names the turned seat (12, R16).
 
+**Dormant look, hardships and the Dusk Train (F4 b1 to b6).** The dormant role is vacant at night (a dark window, a cold
+station) and thin and dear by day (the stall open, the stock low, the same look as a seat Owing the line). In every match,
+one to two other NPC seats at a time go broke from triggers spread across the game and show the same sign, so a dark shop
+alone never names the Hitman; the Company Clerk's ledger lists rent boardings only. A second train, the Dusk Train, leaves at
+dusk, and the Hitman carries a day weapon that hurts only his mark (`followup-4.md` 2.6). The rest of this section's
+"after dark" and "next morning's train" read as "by day" and "the Dusk Train".
+
 **Stopping him, in two chances.**
 
 | Stage | What the town does | If it fails |
 |---|---|---|
-| 1. Find him | Read the economy: the dormant house names the role, and the role names a look. Petition and run a manhunt (3.1) | The Hitman makes the kill after dark |
-| 2. Report before the train | From the kill to the next morning's train, any seat may report what it saw to a Constable (a look and a scene, 3.1). A report with a matching Verified entry convenes an immediate manhunt at the station | He boards the train: the Contract victory, one day after the kill ("they win in one day") |
+| 1. Find him | Read the economy: the dormant house names the role, and the role names a look. Petition and run a manhunt (3.1) | The Hitman makes the kill by day, with his concealed weapon (F4 b6) |
+| 2. Report before the train | From the kill until the Dusk Train leaves (F4 b6), any seat may report what it saw to a Constable (a look and a scene, 3.1). A report with a matching Verified entry convenes an immediate manhunt at the station | He boards the Dusk Train: the Contract victory (F4 b6) ("they win in one day") |
 
 A Hitman cuffed at either stage goes to a Tribunal (`phases.md` 4), and a murder conviction stops him (5).
 
@@ -228,7 +240,8 @@ kills don't count towards wins just total kills."
 | The score | A kill of a roster NPC seat counts once toward the win (its unique count) and every time toward the total. A seat killed, returned by train and killed again adds to the total only |
 | The train | Every NPC death returns on the next morning's train, after dark too, so the town never runs out (12, R4) |
 | Caught | A Killer convicted of murder is hanged (5) and its run ends. The other Killer plays on |
-| The win | The two share the **Paint The Town Red** victory when their combined unique count reaches `paintTown.winUnique` (P: half the NPC seats) before both are caught or the end trial closes. The ledger ranks them by total kills (`phases.md` 7) |
+| The win | The two share the **Paint The Town Red** victory when their combined unique count reaches `paintTown.winUnique` (P: half the NPC seats), or when the three pillars (the Vicar, the Company Clerk and the Constables) are dead at the same
+moment before the morning train (F4 a2, a3), before both are caught or the end trial closes. The ledger ranks them by total kills (`phases.md` 7) |
 
 ## 2. How each role wins
 
@@ -316,6 +329,10 @@ to stay safe, it should be an added section in inspect."
 Detective's way: they walk to clues, inspect them and verify their traits, at `law.speedMult` (P: 2) times a
 Detective's rate. They read only what the world shows (a clue, a sighting, a Notice), never a card.
 
+**Guard NPCs (F4 a4).** The Constables and the Company Clerk are no longer figures that only walk. They are NPCs "that don't
+move very far and fight when hit" (owner): each keeps to a post within `guard.leashTiles`, has health, and fights back when
+struck. The Knife can hit them in every mode, and they stay out of the deck (no card, no seat, no meeting notes).
+
 **The briefing.** `law.briefingAfterS` (owner: 30 s) after any clue is created, the Constables post a **briefing**: a
 public line on the police board and in every HUD log, "Constables' briefing: a footprint by the bakery door, a tall
 figure", naming the clue's kind, its scene and any trait they have verified by then. It names a look's traits, never a
@@ -323,8 +340,9 @@ seat or a card, and a Forged clue is briefed like any other until someone verifi
 
 **The petition.** Any living, free human may open a petition at the police board or from the Case Board: pick one
 accused figure (by character, 4.3) and a charge (the crimes of 5). It lists the entries that support
-it. It opens a manhunt once signed by the opener and `petition.signaturesMin` (P: 1) other living, free humans within
-`petition.openS` (P: 60 s), else it lapses. It is not a vote (12, R3): nobody votes against anyone, the accused is
+it. It opens a manhunt once signed by the opener and ceil(`petition.othersPct`, owner: 30%, of the living, free humans)
+others within `petition.openS` (P: 60 s), else it lapses. That is 1 other at 3 humans, 2 at 4 to 6 and 3 at 7 to 10, and a
+Constable may sign as one of them at 5 humans or fewer once the case holds 2 Verified matches (F4 a1, c9). It is not a vote (12, R3): nobody votes against anyone, the accused is
 never removed by it, and the verdict still comes from the evidence at the Tribunal. NPCs may sign, but a petition never
 waits for one.
 
@@ -483,7 +501,7 @@ A murder charge with 2 matches is proven as the lesser charge the petition named
 |---|---|---|
 | Murder (a kill) | Anyone | **Death**: hanged, dies for good, the role shown (`phases.md` 4) |
 | Conspiring with the Killer | Minion, brute and extortionist types: the Accomplice, the Fence, the Handler, the Grave Robber, the Ration Tyrant, the Extortionist (a new `crimeType` tag on cards and evolutions) | **Fine** (the purse) + **demotion** (an evolved road returns to its base card; the Accomplice loses the Inherit right) + **jail** until the next dawn (5.1) |
-| Conspiring, religious types | The Zealot's followers (cultists) and a priest's road | Not the sentence above (owner). Proposed: **Defrocked**: Faith set to 0 and the chapel's services barred for the match. New question to the owner (12) |
+| Conspiring, religious types | The Zealot's followers (cultists), the High Priest and the Vicar | Not the sentence above (owner). **Defrocked**, and only on a verdict Proven at the murder threshold (F4 a5): the title is stripped, the chapel's services are barred, Faith from the other sources runs at half rate, and two nights slept on the chapel cot return the title (F4 a6, a7; `followup-4.md` 2.3) |
 | Robbery and heist (the Bandit's acts, a mugging, a knockout robbery) | Anyone | **Jail** until the next dawn, and the goods go to the town chest (8; owner answer LW9). A Killer's vendetta checklist resets (Bible I.6) |
 | Assault (a knockout, no robbery) | Anyone | **Jail** until the next dawn |
 | Sabotage (the Activist's acts) | Anyone | **Fine** + **jail** until the next dawn; the checklist resets |
@@ -567,7 +585,9 @@ this causes there prices to rise, stock to be lower than normal and more." So a 
    - its stock restocks at `respawn.stockMult` (P: 0.5) of normal, and its daily output (bread, lamp oil, cures) is cut
      by the same factor;
    - its own wages and sales pay `respawn.wageMult` (P: 0.5), the "and more" (the Company takes its cut);
-   - the debt is paid like rent (Scrip or labour, `emergent-play.md` T1, T2) and the Clerk collects it from the purse.
+   - the debt is paid like rent (Scrip or labour, `emergent-play.md` T1, T2) and the Clerk collects it from the purse;
+   - a **Clerk labour errand** clears the fare outright, so the debt never locks a seat out, and the balance lab checks that
+     a normal routine clears it within `respawn.clearTargetDays` (owner: 2 days; F4 a10, a11).
 
    An NPC seat owes the line like a human, so a dead NPC Baker's dear, thin bread is the town's lasting cost. Owing the
    line is not the rent's **Indebted** status and brings no curfew by itself (12, R7).
@@ -620,9 +640,9 @@ Each value is listed old against proposed. Keys that do not change are grouped a
 | `phases.gameOverS` | 20 | 30 | none | More winners to list |
 | `byCount.*.killCooldownS` | 60 / 60 / 35 / 35 / 30 / 30 / 40 | 180 / 180 / 105 / 105 / 90 / 90 / 120 | N | Keeps the strikes per night of GDD 3.9 |
 | `byCount.10.globalKillLockS` | 15 | 45 | N | |
-| `byCount.*.tasksEach` | 3 / 3 / 4 / 4 / 4 / 4 / 5 | 12 / 12 / 16 / 16 / 16 / 16 / 20 | D | Keyed by humans in world mode |
+| `byCount.*.tasksEach` | 3 / 3 / 4 / 4 / 4 / 4 / 5 | 29 / 29 / 38 / 38 / 38 / 38 / 48 | D | Keyed by humans in world mode; 12 / 12 / 16 / 16 / 16 / 16 / 20 times 12 over 5 for the 12 cycles (F4 c2) |
 | `byCount.*.cabalWin` | the parity rule | removed | none | No parity (2) |
-| `finalNight.afterCycle` | 5 | 5 | K | About 70 min of world time (owner answer WM6: keep 5 cycles) |
+| `finalNight.afterCycle` | 5 | 12 | K | About 170 min of world time (F4 c2: 12 cycles; it supersedes owner answer WM6's 5) |
 | `finalNight.huntS` | 45 | 135 | N | |
 | `finalNight.killCooldownS` | 20 | 60 | N | |
 | `finalNight.trialS` | 120 | 120 | K | Now the end trial's discussion |
@@ -682,7 +702,7 @@ Each value is listed old against proposed. Keys that do not change are grouped a
 | A cycle | 230 s | 810 s |
 | Dark time per cycle (dusk and night) | 110 s | 330 s |
 | Strikes per Killer per night at the 6-7 row | 3 (110 / 35) | 3 (330 / 105) |
-| Match, 5 cycles plus the Final Night, without pauses | about 20 min | about 70 min |
+| Match, 5 cycles plus the Final Night, without pauses | about 20 min | about 70 min (12 cycles: about 170 min, F4 c2) |
 | Day vs night | 120 / 100 | 480 / 300 |
 
 ### 7.3 Sleeping skips the night (owner-brief follow-up 2, owner answers NW1, NW2, EP3)
@@ -703,7 +723,9 @@ night."
   wakes it after the damage lands.
 - **No bed, no skip.** A boarded-up house (rent, owner answer EP3) has no bed. A seat without one may sleep on a
   chapel cot (free) or rent a tavern bed (P: 2 Scrip); a seat with neither cannot sleep and so holds the night open,
-  which is the price of the debt. The cot and the tavern bed are a proposal and a new question (12).
+  which is the price of the debt. The cot (free, 50% stamina and a minor Faith buff) and the tavern bed (2 Scrip, 100% stamina, clears Slowed, Stunned,
+  Poisoned and Famished) are fixed (F4 a8, a9), and a home bed restores 100% and clears nothing. The last human awake after
+  the rest are asleep and 60 s of grace is Exhausted the next day: maximum stamina and its regeneration both halved (F4 c7, c8).
 
 ## 8. Effects that do not kill
 

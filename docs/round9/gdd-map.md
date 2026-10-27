@@ -1,5 +1,7 @@
 # Round 9 (9D): the GDD map
 
+> **Follow-up 4 (owner, 2026-10-26).** `followup-4.md` adds to the GDD sections below: 3.3 (12 cycles, the Dusk Train), 3.8 (win routes and the two-match murder threshold), 3.20 (sabotage hazards, the Hitman's day weapon), 3.22 (beds restore stamina) and 3.24 (guard NPCs). It overrides this file where they disagree.
+
 Session 9D, deliverable 7 of `README.md`. Design only: this document changes no code, data, test or `GDD.md`. It
 says, for every section of `GDD.md` that the round-9 design changes, **what changes**, **which design document and
 section holds the design**, and **which `balance.json` keys and content files change**. It is the checklist for the
