@@ -22,8 +22,8 @@ import { isOnLine } from './Train';
  * `sleep.confirmS` of the night, the night ends through the normal dawn (`phaseEndsTick`, `Phases.ts`).
  *
  * Active means a living, placed, connected human; an NPC seat never counts, so nothing waits on one. The jail (B5)
- * is not built yet, so `inJail` says no; `onTheLine` is C1's `isOnLine` (a seat waiting for the morning train). Homes and
- * sleepers are room memory keyed by the match's `MatchSeeds`; the homes draw only from the `homes` stream.
+ * is not built yet, so `inJail` says no; `onTheLine` is C1's `isOnLine` (a seat waiting for the morning train).
+ * Homes and sleepers are room memory keyed by the match's `MatchSeeds`; the homes draw only from the `homes` stream.
  */
 
 export const BED_KINDS = ['bed', 'cot', 'innBed'] as const;
