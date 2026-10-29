@@ -59,7 +59,10 @@ describe('ambient townsfolk', () => {
     const room = party.room;
     const sim = simOf(room);
     const figures = figuresOf(room);
-    expect(figures.size).toBe(balance.townsfolk.count[sim.profile]);
+    // Round 10, B1: the guards (the Clerk and two Constables) spawn beyond the count.
+    const guards = [...figures.values()].filter((f) => f.row.guard === true).length;
+    expect(guards).toBe(3);
+    expect(figures.size).toBe(balance.townsfolk.count[sim.profile] + guards);
     expect(namedFigure(room, 'clerk')?.kind).toBe('clerk'); // HollowMere's Company Clerk
     const handles = avatarMemory(room);
     for (const [id, f] of figures) {
@@ -68,7 +71,7 @@ describe('ambient townsfolk', () => {
       expect(f.handle).not.toBeNull();
       const avatar = avatarOf(room, f.handle as string)!;
       expect(avatar).toBeDefined();
-      expect(avatar.lookOf).toBe('villager');
+      expect(avatar.lookOf).toBe(f.kind === 'constable' ? 'constable' : 'villager');
       expect(avatar.seat).toBe('');
       expect(avatar.statusBits & StatusBit.ghost).toBe(0);
       expect(handles.seatOf.has(f.handle as string)).toBe(false);
