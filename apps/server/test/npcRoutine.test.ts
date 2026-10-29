@@ -462,13 +462,13 @@ describe('the night (R9, R10)', () => {
       for (const id of ids) {
         const b = mem.brain(id);
         if (b.leaveAtTick >= 0 && !leave.has(id)) leave.set(id, b.leaveAtTick);
-        // The 30 s dusk (round 10, A5) lets a wolf reach a waiting NPC before its delay is out; R9 is about the leave.
         const body = bodyOf(party.room, id);
         if (body) body.hp = body.maxHp;
       }
       // Round 6 (6G): the forest's wolves wake at dusk and an NPC a wolf chases flees the scene at once. R9 is about
       // the night leave, so the creatures are put back to idle after every step (brains run before the creatures in
       // a step, so none sees a chase); the flee itself is `mobs.test.ts`'s.
+      // A wolf can still bite within a step, so the NPCs' health is put back too: the isolation is complete (round 10, A5).
       for (const body of mobBodies(party.room).values()) {
         body.mind.state = MobState.idle;
         body.mind.prey = null;
