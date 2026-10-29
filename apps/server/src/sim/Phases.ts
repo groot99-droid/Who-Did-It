@@ -1,5 +1,5 @@
 import { balance, roles } from '@wdi/content';
-import { ErrorCode, Phase, type PlayerState, TICK_RATE } from '@wdi/shared';
+import { Phase, type PlayerState, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { fixedDealFits } from './Deck';
 import { beginFinalNight, endHunt, enforceFinalVote, isFinalNightRound } from './FinalNight';
@@ -132,18 +132,18 @@ function runDebugCommands(room: PartyRoom): void {
         Object.values(fixed).every((r) => typeof r === 'string' && known[r] !== undefined);
       const valid = strings && fixedDealFits(fixed as Record<string, string>, room.state.players.size);
       if (valid) flow.fixedDeal = { ...(fixed as Record<string, string>) };
-      else refuse(room, cmd.sessionId, ErrorCode.cannot, 'bad deal');
+      else refuse(room, cmd.sessionId, 'BAD_REQUEST');
       continue;
     }
     const name = payload.phase;
     const target = typeof name === 'string' ? CLOCK_PHASES[name] : undefined;
     if (name !== undefined && !target) {
-      refuse(room, cmd.sessionId, ErrorCode.cannot, 'unknown phase');
+      refuse(room, cmd.sessionId, 'BAD_REQUEST');
       continue;
     }
     if (target) {
       if (!isWorldPhase(room.state.phase)) {
-        refuse(room, cmd.sessionId, ErrorCode.wrongPhase, 'not now');
+        refuse(room, cmd.sessionId, 'PHASE_CLOSED');
         continue;
       }
       if (target.phase === Phase.immunity) enterImmunity(room);
