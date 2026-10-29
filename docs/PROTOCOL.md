@@ -62,7 +62,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). |
 | `noise` | `{ sceneId: string; x: number; y: number; kind: string }` | - |
 | `shout` | `{ sceneId: string; x: number; y: number }` | Where the shout rang; names no seat, no card and no body. |
-| `error` | `{ code: ErrorCode; msg: string }` | - |
+| `error` | `{ code: ErrorCode; msg: string; reason?: RefusalReason; args?: RefusalArgs; interaction?: string }` | A refusal, to the refused client only (round 10, A1; docs/round9/failures.md 6.1). `reason` is a `RefusalReason` (append-only), `args` its ids and numbers, `interaction` the logic-table entry that refused; `code` is `REASON_CODE[reason]`. The client shows the reason's line, never `msg`, which stays for logs and for a server site not yet converted. |
 | `vfx` | `{ sceneId: string; x: number; y: number; kind: 'disguise' }` | To every client whose view holds that scene: the puff of a disguise a Knife strike dropped, at (x, y). Names no handle or seat. Sent only from `handleKill` (GDD 3.17). |
 | `aim` | `{ endsTick: number }` | Private, a dying Gamekeeper: pick a seat with `act.ability {abilityId: 'lastShot'}` before `endsTick` (GDD 3.2). |
 | `inherit` | `Record<string, never>` | Private, an Accomplice: the Knife passed to you (GDD 3.2 Inherit); nothing public changes. |
@@ -372,6 +372,21 @@ export interface StudioJoinOptions {
 | 426 | `busy` |
 | 427 | `outOfRange` |
 | 428 | `closed` |
+
+## Refusal reasons
+
+Since round 10 (A1), `error` also carries `reason`, its `args` and the `interaction` that refused; the code is derived
+from the reason. The list is append-only; the client's line for each is `apps/client/src/ui/copy/refusals.ts`.
+
+| Code | Reasons, in list order |
+|---|---|
+| 422 | `NFY`, `BAD_REQUEST` (never shown), `DEBUG_ONLY` (never shown), `NOT_IN_PLAY`, `DOWN_OR_STUNNED`, `SPENT`, `NOT_LEADER`, `LOBBY_RULE`, `NO_TARGET`, `NOTHING_THERE`, `TARGET_DOWN`, `NOTHING_TO_CURE`, `VOIDED`, `NO_WAY`, `NOT_AIMED`, `ALREADY_DONE`, `ALREADY_HAVE`, `NEED_TOOL`, `NEED_ITEM`, `NEED_MATERIALS`, `NEED_STATION`, `NEED_SCRIP`, `NEED_FAITH`, `NOT_YOUR_POWER`, `PACK_FULL`, `FAITH_FULL`, `COUNTER_CLOSED`, `NOT_FOR_SALE`, `NOT_BOUGHT_HERE`, `NOTHING_OWED`, `SEAL_BLOCKS`, `OWN_NAME`, `NOT_YOURS`, `TASK_TAKEN`, `TOO_MANY_QUESTS`, `LOOK_TAKEN`, `SAY_SOMETHING` (never shown), `IN_JAIL`, `NO_BED`, `PETITION_GRACE`, `PETITION_OPEN`, `NOT_HUNTED`, `PICK_SNAPPED`, `GRID_NO_RECIPE`, `GRID_BOUND`, `NEEDS_PART` |
+| 423 | `NEED_KEY`, `LOCKED`, `CURFEW` |
+| 424 | `COOLDOWN`, `CHAT_RATE` |
+| 425 | `PHASE_CLOSED`, `LOBBY_ONLY` |
+| 426 | `BUSY`, `ASLEEP` (never shown) |
+| 427 | `TOO_FAR`, `NO_COUNTER` |
+| 428 | `BOARDED`, `BOARDED_HOME` |
 
 ## Join errors
 

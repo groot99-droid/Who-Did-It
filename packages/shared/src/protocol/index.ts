@@ -1,4 +1,5 @@
 // Message names, payloads and error codes of docs/ARCHITECTURE.md 5.5.
+import type { ErrorCode, RefusalArgs, RefusalReason } from './refusals';
 
 export const C2S = {
   move: 'input.move',
@@ -328,7 +329,13 @@ export interface S2CPayloads {
   noise: { sceneId: string; x: number; y: number; kind: string };
   /** Where the shout rang; names no seat, no card and no body. */
   shout: { sceneId: string; x: number; y: number };
-  error: { code: ErrorCode; msg: string };
+  /**
+   * A refusal, to the refused client only (round 10, A1; docs/round9/failures.md 6.1). `reason` is a
+   * `RefusalReason` (append-only), `args` its ids and numbers, `interaction` the logic-table entry that refused;
+   * `code` is `REASON_CODE[reason]`. The client shows the reason's line, never `msg`, which stays for logs and for
+   * a server site not yet converted.
+   */
+  error: { code: ErrorCode; msg: string; reason?: RefusalReason; args?: RefusalArgs; interaction?: string };
   /**
    * To every client whose view holds that scene: the puff of a disguise a Knife strike dropped, at (x, y). Names no
    * handle or seat. Sent only from `handleKill` (GDD 3.17).
@@ -429,16 +436,8 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.mug': 5,
 };
 
-export const ErrorCode = {
-  cannot: 422,
-  locked: 423,
-  cooldown: 424,
-  wrongPhase: 425,
-  busy: 426,
-  outOfRange: 427,
-  closed: 428,
-} as const;
-export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
+// Round 10, A1: the codes live beside the refusal reasons that derive them (`REASON_CODE`).
+export { ErrorCode } from './refusals';
 
 /** Every joinById failure (missing, locked, full, version mismatch) returns exactly this (5.3). */
 export const JOIN_ERROR_CODE = 404;
@@ -475,6 +474,9 @@ export interface CreateOptions extends JoinOptions {
   /** Profile codes the leader invited, capped by balance.json `party.invitedMax`; ignored for an open party. */
   invited?: string[];
 }
+
+// Round 10, A1: refusal reasons and the error frame (docs/round9/failures.md 4 to 6).
+export * from './refusals';
 
 // Round 6: the admin wire (docs/round6/auto-admin.md 6), accepted by the `admin` room only.
 export * from './admin';
