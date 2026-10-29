@@ -316,9 +316,10 @@ The rig's changes are made to `WDI_Toon` only:
 Neither reaches a figure. Today's HD figures therefore carry the HD shadows, AO and catcher with stepped 8-bit bands,
 and `--textured` does nothing on a figure. The HD timings of 6.1 were measured with this defect.
 
-**The fix, first in the build plan:** after the import, remap every `WDI_Toon.*` group (and `OutlineInk.*`) onto the
-rig's own with `user_remap`. A `bpy` test (5.3's job) asserts that a figure uses only the rig's groups. 11B's
-look.md 1.3 cites this.
+**The fix:** after the import, remap every `WDI_Toon.*` group (and `OutlineInk.*`) onto the rig's own with
+`user_remap`. 10Y fixes it in round 10, for the constable (6Z, 2026-10-29). Round 11 keeps that remap. Before
+the first re-render, the build plan checks that the remap is in place and adds a `bpy` test, if 10Y's change has
+none: 5.3's job, asserting that an imported figure uses only the rig's groups. 11B's look.md 1.3 cites this.
 
 ### 5.5 How a re-render lands
 
