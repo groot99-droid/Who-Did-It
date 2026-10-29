@@ -1,4 +1,4 @@
-import { balance, resources, scenes } from '@wdi/content';
+import { balance, items, resources, scenes } from '@wdi/content';
 import type { Resource, SceneId } from '@wdi/content';
 import { Node, Phase, TICK_RATE, TILE_PX, type PlayerState, type Rng } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
@@ -130,6 +130,15 @@ export function runResources(room: PartyRoom): void {
   }
 }
 
+/** The gather hold in seconds: a held tool of the resource's `fastTool` tag shortens it, bare hands still gather. */
+function gatherSeconds(player: PlayerState, resource: Resource): number {
+  const fast = resource.fastTool;
+  const tooled =
+    fast !== undefined &&
+    Object.values(items.items).some((it) => (it.tool?.[fast.tag] ?? 0) >= 1 && count(player, it.id) > 0);
+  return tooled ? fast.gatherS : resource.gatherS;
+}
+
 /** Ticks a resource takes to respawn after a gather. */
 export const respawnTicks = (resourceId: string): number =>
   Math.round((resources.resources[resourceId]?.respawnS ?? 0) * TICK_RATE);
@@ -188,7 +197,7 @@ export function tickGather(room: PartyRoom, sessionId: string, p: PlayerSim): vo
   }
   const node = nodeFor(room, p, hold.targetId) as NodeState;
   const resource = resources.resources[node.resource] as Resource;
-  if (room.state.tick - hold.startTick < Math.round(resource.gatherS * TICK_RATE)) return;
+  if (room.state.tick - hold.startTick < Math.round(gatherSeconds(player, resource) * TICK_RATE)) return;
   p.hold = null;
   addStack(player, resource.id, resource.yield); // `gatherProblem` just proved it fits
   node.active = false;

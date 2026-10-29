@@ -405,6 +405,9 @@ it.
 | Lockpicks | 1 Tin Ore | a basin | 3 s |
 | Lantern | 1 Tin Ore, 1 Pine Resin | an oven | 4 s |
 | Crowbar | 2 Tin Ore, 1 Timber | an oven | 4 s |
+| Axe | 2 Timber, 1 Stone | a basin | 4 s |
+| Pickaxe | 1 Timber, 2 Tin Ore | a basin | 4 s |
+| Hammer | 1 Timber, 1 Tin Ore | a basin | 3 s |
 
 Basins stand in the apothecary, Crumb's Ovens, the bunkhouse and the forge; ovens in Crumb's Ovens and the bunkhouse,
 so both maps craft every tool at the Small profile. The Torch is a carried light like the Lantern (radius 4, 3.5) and
@@ -428,7 +431,31 @@ refused `NOTHING_THERE` until it comes back; an interaction not built yet answer
 tool or a full pack cancel the hold with nothing done. At its end the drops land (their amounts drawn from the `loot`
 stream), the tool loses `wear` uses and breaks when its uses run out, the prop takes its new state (public to the
 scene, never who changed it) until its respawn, and the mode's noise sounds. An NPC seat's hold runs through the same
-rules. Until A11 adds the tool walls the table holds no interaction, so nothing plays differently yet.
+rules.
+
+**Tool walls** (round 10, A11). The piles of the world open only to their tool; bare hands get nothing, and the
+refusal `NEED_TOOL` names the tool. Tools carry tags and uses: the Axe (`cut` 1, 20 uses), the Pickaxe (`break` 1 and
+`dig` 1, 20), the Hammer (`pry` 1, 40), the Crowbar (`pry` 1, 20), the Spade (`dig` 1, 20) and the Lockpicks (`pick` 1);
+none is role-bound, and the content check refuses a wall that no neutral tool can run, or whose tool no seat can come by
+(a recipe's product or a loot-table item; logic-table 10.1).
+
+| Prop (stems) | Tool | Hold | Drops | Wear | Comes back |
+|---|---|---|---|---|---|
+| Woodpile, firewood, log, fallen log, log basket | Axe | 4 s | 2 to 3 Logs | 1 | 300 s |
+| Stump | Axe | 3 s | 1 Log, Resin half the time | 1 | 900 s |
+| Mine timber set | Axe 5 s, 2 Logs; or Crowbar 6 s, 1 Log | | | 1 | 600 s |
+| Boulder | Pickaxe | 6 s | 2 to 3 Stone, Tin Ore a quarter of the time | 2 | 1200 s |
+| Rock pile | Pickaxe | 4 s | 2 Stone | 1 | 600 s |
+| Rubble | Pickaxe as the rock pile, or bare hands | 12 s | 1 Stone | 0 | 600 s |
+| Ore pile | Pickaxe | 4 s | 2 Tin Ore | 1 | 600 s |
+| Nailed crate | Crowbar or Hammer | 3 s | 1 Timber, 60% | 1 | stays open |
+
+**Logs** are the raw wood of a pile; they stack as a material and wait for the mill's saw, which turns them into Timber
+(a later step). A worn tool breaks when its uses run out (one is taken); the wear is server memory per seat and tool.
+**Nodes keep bare hands** (owner answer LT1): a Timber node holds 3 s by hand and 1.5 s with an Axe in the inventory, a
+Stone node the same with a Pickaxe; Tin Ore still needs the Spade. A tool speeds supply up, it does not gate it.
+Chopping and breaking make no noise yet (the noise table has no chop or smash row); the Crowbar's pry sounds at 10.
+Nothing sells the tools yet, so a seat crafts one (the table above) or takes one from the world once chests land.
 
 ### 3.15 Mobs
 
