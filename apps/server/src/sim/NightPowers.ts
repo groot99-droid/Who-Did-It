@@ -1,7 +1,6 @@
 import { abilities, balance, roles } from '@wdi/content';
 import {
   type DeathCause,
-  ErrorCode,
   NotebookEntry,
   NotebookStatus,
   NoteKind,
@@ -25,6 +24,7 @@ import { dropNightMemory, nightOf } from './nightMemory';
 import { npcMemory } from './npc/memory';
 import { type PlayerSim, simOf } from './RoomSim';
 import { reject, sceneKey } from './World';
+import { refusal, type Refusal } from './refusal';
 
 // Night powers, protections, Nightshade, the Last Shot and Inherit (GDD 3.2, round-5 `deck/wire.md` 5). Session
 // 5G owns this file; the hooks below are called from their locked sites (wire.md 8.1). The memory is
@@ -62,11 +62,6 @@ function badTarget(room: PartyRoom, actor: string, target: unknown, allowSelf: b
   return !player || !player.alive || (target === actor && !allowSelf);
 }
 
-interface Refusal {
-  code: ErrorCode;
-  msg: string;
-}
-
 /**
  * The refusals of a night power, in the order of `deck/wire.md` 5, for a human or an NPC (`ability` is a power
  * other than the Last Shot). Null when the power may be used on `target`.
@@ -75,34 +70,33 @@ function powerProblem(room: PartyRoom, seat: string, ability: string, target: un
   const def = abilities.abilities[ability];
   const player = room.state.players.get(seat);
   const p = simOf(room).players.get(seat);
-  if (!def || !player?.priv || !p) return { code: ErrorCode.cannot, msg: 'cannot do that' };
+  if (!def || !player?.priv || !p) return refusal('BAD_REQUEST');
   if (!roles.roles[player.priv.role.roleId]?.abilities.includes(ability)) {
-    return { code: ErrorCode.cannot, msg: 'cannot do that' };
+    return refusal('NOT_YOUR_POWER');
   }
-  if (p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
+  if (p.dead || !p.placed) return refusal('NOT_IN_PLAY', undefined, { msg: 'not now' });
   const phase = POWER_PHASE[room.state.phase];
   if (phase === undefined || !(def.phases as readonly string[] | undefined)?.includes(phase)) {
-    return { code: ErrorCode.wrongPhase, msg: 'not now' };
+    return refusal('PHASE_CLOSED', undefined, { msg: 'not now' });
   }
   const mem = nightOf(room);
   if ((mem.used.get(seat)?.size ?? 0) > 0 && mem.used.get(seat)?.has(ability)) {
-    return { code: ErrorCode.cooldown, msg: 'used tonight' };
+    return refusal('SPENT', { what: 'power' }, { msg: 'used tonight' });
   }
   if (def.consumes !== undefined) {
     const left = player.priv.inventory.slots.some((s) => s.defId === def.consumes && s.qty > 0);
-    if (!left) return { code: ErrorCode.cannot, msg: 'none left' };
+    if (!left) return refusal('SPENT', { what: 'stock' }, { msg: 'none left' });
   }
-  if (badTarget(room, seat, target, def.allowSelf === true))
-    return { code: ErrorCode.cannot, msg: 'no target' };
+  if (badTarget(room, seat, target, def.allowSelf === true)) return refusal('NO_TARGET');
   if ((ability === 'keepWatch' || ability === 'remedy') && knockedOut(room, target as string))
-    return { code: ErrorCode.cannot, msg: 'no target' }; // round 8, 8A: a downed seat (GDD 3.22, body.md 5)
+    return refusal('NO_TARGET'); // round 8, 8A: a downed seat (GDD 3.22, body.md 5)
   if (
     ability === 'keepWatch' &&
     !balance.nightPowers.watchRepeatAllowed &&
     mem.watched.get(seat)?.night === mem.night - 1 &&
     mem.watched.get(seat)?.seat === target
   ) {
-    return { code: ErrorCode.cannot, msg: 'watched last night' };
+    return refusal('SPENT', { what: 'power' }, { msg: 'watched last night' });
   }
   return null;
 }
@@ -157,9 +151,9 @@ function applyPower(room: PartyRoom, seat: string, ability: string, target: stri
 export function handleNightPower(room: PartyRoom, seat: string, payload: Record<string, unknown>): void {
   const ability = payload.abilityId;
   if (ability === 'lastShot') return handleLastShot(room, seat, payload);
-  if (typeof ability !== 'string') return reject(room, seat, ErrorCode.cannot, 'cannot do that');
+  if (typeof ability !== 'string') return reject(room, seat, 'BAD_REQUEST');
   const problem = powerProblem(room, seat, ability, payload.targetId);
-  if (problem) return reject(room, seat, problem.code, problem.msg);
+  if (problem) return reject(room, seat, problem);
   applyPower(room, seat, ability, payload.targetId as string);
 }
 

@@ -33,12 +33,6 @@ describe('sendRefusal (round 10, A2)', () => {
     ]);
   });
 
-  it('keeps the legacy code and message form for sites A3 has not moved, with no reason', () => {
-    const { room, sent } = fakeRoom();
-    sendRefusal(room, 'a', ErrorCode.busy, 'busy');
-    expect(sent).toEqual([[S2C.error, { code: ErrorCode.busy, msg: 'busy' }]]);
-  });
-
   it('sends nothing to a client that has gone', () => {
     const { room, sent } = fakeRoom();
     sendRefusal(room, 'gone', 'NFY');
