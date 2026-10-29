@@ -1,15 +1,8 @@
 import { balance, roles } from '@wdi/content';
-import {
-  type ErrorCode,
-  Phase,
-  type PlayerState,
-  S2C,
-  TICK_RATE,
-  type TeamId,
-  type WinFaction,
-} from '@wdi/shared';
+import { Phase, type PlayerState, S2C, TICK_RATE, type TeamId, type WinFaction } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { dayPartOf } from './mobs/spawn';
+import { sendRefusal } from './refusal';
 import { reconcileViews } from './Visibility';
 
 /** Shared plumbing of the match flow (phases, meetings, win): room-memory state and small helpers. */
@@ -95,9 +88,8 @@ export function setPhase(room: PartyRoom, phase: number, seconds: number): void 
   room.broadcast(S2C.phaseChange, { phase, endsTick: state.phaseEndsTick });
 }
 
-export function refuse(room: PartyRoom, sessionId: string, code: ErrorCode, msg: string): void {
-  room.clients.getById(sessionId)?.send(S2C.error, { code, msg });
-}
+/** Sends one refusal (`sendRefusal`): a reason with its args, or the legacy code and message. */
+export const refuse = sendRefusal;
 
 /** Rows of `balance.byCount` exist for 4 to 10; a smaller or larger party reads the nearest row. */
 export const countRow = (seats: number) => balance.byCount[String(Math.min(10, Math.max(4, seats))) as '4'];

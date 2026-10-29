@@ -3,7 +3,7 @@ import { MAP_IDS, abilities, balance, cutscenes, items, roles } from '@wdi/conte
 import {
   ABILITY_KEYS,
   C2S,
-  ErrorCode,
+  type ErrorCode,
   Inventory,
   ItemStack,
   NpcLevel,
@@ -12,6 +12,7 @@ import {
   type PlayerState,
   Presence,
   Private,
+  REASON_CODE,
   Role,
   Traits,
   S2C,
@@ -19,6 +20,7 @@ import {
   TRAIT_IDS,
   dealTraits,
   openingFor,
+  type RefusalReason,
   type RoleRevealPayload,
   type TeamId,
 } from '@wdi/shared';
@@ -106,17 +108,23 @@ export function buildRoleReveal(
   };
 }
 
-/** Why Start is refused, or null. A non-leader always gets the generic 422, whatever the phase. */
-export function startRefusal(room: PartyRoom, sessionId: string): ErrorCode | null {
-  if (room.state.leaderId !== sessionId) return ErrorCode.cannot;
-  if (room.state.phase !== Phase.lobby) return ErrorCode.wrongPhase;
+/** Why Start is refused, or null. A non-leader always gets `NOT_LEADER`, whatever the phase. */
+export function startRefusalReason(room: PartyRoom, sessionId: string): RefusalReason | null {
+  if (room.state.leaderId !== sessionId) return 'NOT_LEADER';
+  if (room.state.phase !== Phase.lobby) return 'LOBBY_ONLY';
   let humans = 0;
   room.state.players.forEach((p: PlayerState, id: string) => {
     if (p.connected && !isNpcSeat(room, id)) humans++;
   });
   // Round 6 (docs/round6/auto-admin.md 3, locked): an auto match has no human and needs none.
-  if (simOf(room).auto === null && humans < balance.lobby.startMinHumans) return ErrorCode.cannot;
+  if (simOf(room).auto === null && humans < balance.lobby.startMinHumans) return 'LOBBY_RULE';
   return null;
+}
+
+/** The legacy code of `startRefusalReason`, or null. */
+export function startRefusal(room: PartyRoom, sessionId: string): ErrorCode | null {
+  const reason = startRefusalReason(room, sessionId);
+  return reason === null ? null : REASON_CODE[reason];
 }
 
 /** Consumed inside the fixed step; nothing here runs in a message callback. */
@@ -127,8 +135,10 @@ export function runLobbyCommands(room: PartyRoom): void {
     const payload = (cmd.payload ?? {}) as Record<string, unknown>;
     switch (cmd.type) {
       case C2S.lobbyStart: {
-        const refusal = startRefusal(room, cmd.sessionId);
-        if (refusal !== null) refuse(room, cmd.sessionId, refusal, 'cannot start');
+        const refusal = startRefusalReason(room, cmd.sessionId);
+        if (refusal === 'LOBBY_RULE')
+          refuse(room, cmd.sessionId, refusal, { rule: 'tooFewHumans' }, { msg: 'cannot start' });
+        else if (refusal !== null) refuse(room, cmd.sessionId, refusal, undefined, { msg: 'cannot start' });
         else startMatch(room);
         break;
       }
@@ -199,8 +209,9 @@ export function removeNewestNpcSeat(room: PartyRoom): boolean {
  */
 function handleSettings(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   if (room.state.leaderId !== sessionId)
-    return refuse(room, sessionId, ErrorCode.cannot, 'cannot change settings');
-  if (room.state.phase !== Phase.lobby) return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
+    return refuse(room, sessionId, 'NOT_LEADER', undefined, { msg: 'cannot change settings' });
+  if (room.state.phase !== Phase.lobby)
+    return refuse(room, sessionId, 'LOBBY_ONLY', undefined, { msg: 'not now' });
   const { npcDifficulty, map } = payload;
   const settings = room.state.settings;
   const levels: unknown[] = Object.values(NpcLevel);
@@ -208,25 +219,30 @@ function handleSettings(room: PartyRoom, sessionId: string, payload: Record<stri
     npcDifficulty !== undefined &&
     (!levels.includes(npcDifficulty) || settings.npcSeats < balance.npc.difficultyMinNpcs);
   const badMap = map !== undefined && !(MAP_IDS as readonly unknown[]).includes(map);
-  if (badLevel || badMap) return refuse(room, sessionId, ErrorCode.cannot, 'bad setting');
+  if (badLevel || badMap) return refuse(room, sessionId, 'BAD_REQUEST', undefined, { msg: 'bad setting' });
   if (typeof npcDifficulty === 'number') settings.npcDifficulty = npcDifficulty;
   if (typeof map === 'string') settings.map = map;
 }
 
 /** `lobby.addNpc`: leader, lobby, below `players.max`. */
 function handleAddNpc(room: PartyRoom, sessionId: string): void {
-  if (room.state.leaderId !== sessionId) return refuse(room, sessionId, ErrorCode.cannot, 'cannot add');
-  if (room.state.phase !== Phase.lobby) return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
+  if (room.state.leaderId !== sessionId)
+    return refuse(room, sessionId, 'NOT_LEADER', undefined, { msg: 'cannot add' });
+  if (room.state.phase !== Phase.lobby)
+    return refuse(room, sessionId, 'LOBBY_ONLY', undefined, { msg: 'not now' });
   if (addNpcSeat(room, room.seeds.get('npcNames')) === null) {
-    refuse(room, sessionId, ErrorCode.cannot, 'party is full');
+    refuse(room, sessionId, 'LOBBY_RULE', { rule: 'full' }, { msg: 'party is full' });
   }
 }
 
 /** `lobby.removeNpc`: leader, lobby; removes the most recently added NPC seat (it never names one). */
 function handleRemoveNpc(room: PartyRoom, sessionId: string): void {
-  if (room.state.leaderId !== sessionId) return refuse(room, sessionId, ErrorCode.cannot, 'cannot remove');
-  if (room.state.phase !== Phase.lobby) return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
-  if (!removeNewestNpcSeat(room)) refuse(room, sessionId, ErrorCode.cannot, 'no NPC seats');
+  if (room.state.leaderId !== sessionId)
+    return refuse(room, sessionId, 'NOT_LEADER', undefined, { msg: 'cannot remove' });
+  if (room.state.phase !== Phase.lobby)
+    return refuse(room, sessionId, 'LOBBY_ONLY', undefined, { msg: 'not now' });
+  if (!removeNewestNpcSeat(room))
+    refuse(room, sessionId, 'LOBBY_RULE', { rule: 'noNpcSeats' }, { msg: 'no NPC seats' });
 }
 
 /** Phase timers owned by the lobby flow: the role card ends when all are Ready or the card time elapses. */
