@@ -211,6 +211,13 @@ export const BodyState = schema(
   'BodyState',
 );
 
+/**
+ * Round 10, B8 (GDD 3.31, seams.md 3 row 10): this seat's Walk with me. `state` is a `PairPhase`; `handle` the other
+ * figure's avatar handle in this seat's scene, '' while it is elsewhere (handles re-roll on every entry), never a
+ * seat id. Own view only: nothing public shows a pair.
+ */
+export const PairState = schema({ state: u8(), handle: str() }, 'PairState');
+
 export const Private = schema(
   {
     role: Role,
@@ -242,6 +249,8 @@ export const Private = schema(
     bank: u32(),
     /** Round 8 (GDD 3.23, 8D): the Faith this seat has earned by donating at an altar. */
     faith: u16(),
+    /** Round 10, B8 (schema version 7): Walk with me. */
+    pair: PairState,
   },
   'Private',
 );

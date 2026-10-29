@@ -23,6 +23,10 @@ export const C2S = {
   invSelect: 'inv.select',
   /** Round 10, A13 (GDD 3.30): the crafting grid's cells; `sim/Craft.ts`. */
   craftGrid: 'craft.grid',
+  /** Round 10, B8 (GDD 3.31, seams.md 3 row 10): ask a figure in reach to walk with you; `sim/law/Pairing.ts`. */
+  pairAsk: 'pair.ask',
+  /** Round 10, B8: answer an ask (`yes`), or end a pair (`yes: false` while paired). */
+  pairAnswer: 'pair.answer',
   vote: 'meeting.vote',
   say: 'chat.say',
   /** Round 8 (GDD 3.8 "Meeting notes", 8T): a line for the meeting notes, which carry no speaker. */
@@ -314,6 +318,9 @@ export interface C2SPayloads {
    */
   'inv.move': { from: number; to: number };
   /** Round 10, A12 (GDD 3.30): the hotbar slot whose item is held; refused `BAD_REQUEST` outside the hotbar. */
+  /** `targetId` is the asked figure's avatar handle in the asker's scene. */
+  'pair.ask': { targetId: string };
+  'pair.answer': { yes: boolean };
   'inv.select': { slot: number };
   /**
    * Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and
@@ -461,6 +468,8 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'inv.move': 10,
   'inv.select': 10,
   'craft.grid': 5,
+  'pair.ask': 2,
+  'pair.answer': 2,
 };
 
 // Round 10, A1: the codes live beside the refusal reasons that derive them (`REASON_CODE`).

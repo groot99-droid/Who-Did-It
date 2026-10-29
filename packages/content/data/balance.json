@@ -386,5 +386,13 @@
     "gddRef": "3.8"
   },
   "inventory": { "hotbar": 6, "belt": 2, "gddRef": "3.30" },
+  "pairing": {
+    "answerS": { "min": 5, "max": 9 },
+    "yesChance": 0.5,
+    "scaredMult": 1.6,
+    "followTiles": 2,
+    "apartS": 20,
+    "gddRef": "3.31"
+  },
   "guard": { "leashTiles": 6, "angerS": 20, "gddRef": "3.24" }
 }
