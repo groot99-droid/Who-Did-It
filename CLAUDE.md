@@ -86,7 +86,10 @@ Versions are pinned in `docs/ARCHITECTURE.md` 5.1. Sessions never upgrade depend
 
 ## Compact instructions
 
-Every session compacts its context at 400k tokens (`.claude/settings.json`, `autoCompactWindow`). When a
+Every session compacts its context at the size of its kind of work (DECISIONS A223): 500k for precise work, 800k
+for work that needs more context, 300k for testing, fixing and organizing. `.claude/settings.json` (`autoCompactWindow`)
+holds the 500k default; the window is read when a session starts, so a 300k or 800k session is spawned from its tier
+branch (`docs/round10/README.md`, "Compaction"). When a
 compaction summary is written for a session of `docs/SESSIONS.md`, it keeps, in this order: the session id
 (for example 6F) and its branch; the PR split step it is on and which PRs are open, merged or unpushed; the
 files it has edited since its last push; every contract request it has made in a PR description and whether

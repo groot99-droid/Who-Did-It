@@ -17,6 +17,9 @@
 | [round5/](round5/README.md) | The round-5 contract documents: the owner's brief, the ONUB v2 contract, the deck wire and data, the world and maps, the NPC routines, the art plan, and the seams of the pre-seed (every hook and its locked call site). |
 | [round6/](round6/README.md) | The round-6 contract documents: the owner's brief and the Bible, the admin auto-mode, cutscenes and music, M5b, the Bible's seams across rounds 7 to 9, the media brief, and the seams of the pre-seed. |
 | [round7/](round7/README.md) | The round-7 contract documents: the whole-game re-skin to the owner's two mockups, open and private parties with profiles and friends, the map intro tracks and cinematic openings, and the vendettas, the Daily Train and the Vicar's memorial. |
+| [round8/](round8/README.md) | The round-8 contract documents: bodies, coin, motion and art, the teardown answers, the living world, the canon, and the seams of the round. |
+| [round9/](round9/README.md) | The round-9 design of world mode: the core loop, the full-screen phases, the logic table, the refusal reasons, the living world, emergent play, the owner's answers and follow-ups, the GDD map, the round-10 build plan and the admin Studio. |
+| [round10/](round10/README.md) | The round-10 contract: the sessions that build world mode, their models and compaction sizes, and the seams they share. |
 | [SESSIONS.md](SESSIONS.md) | The parallel build sessions, round by round: path ownership, branches, PR base, seams, briefs and the integration logs. |
 
 Rule: a mechanic change updates `GDD.md` in the same pull request. Numbers never live in two documents.
