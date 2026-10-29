@@ -121,6 +121,10 @@ export function resetToLobby(room: PartyRoom): void {
     priv.role.team = 0;
     priv.inventory.slots.clear();
     priv.inventory.selected = 0; // round 10, A12
+    priv.home = ''; // round 10, A7
+    priv.asleep = false;
+    priv.inBed = 0;
+    priv.inBedOf = 0;
     priv.notebook.clear();
     priv.tasks.clear();
     priv.quests.clear(); // round 6 (6H): a new match starts with no quest

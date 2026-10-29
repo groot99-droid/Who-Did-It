@@ -15,6 +15,8 @@ import { schema, t } from '@colyseus/schema';
 // `Avatar.nearBits`) join version 6 without another bump. Version 7 (round 10, docs/round10/seams.md 3): A10's
 // `SceneState.propStates` and A12's `ItemStack.slot` and `Inventory.selected` (A245); the other round-10 rows
 // join version 7.
+// A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5) and C1 adds `Private.onLine`
+// (row 6) to version 7.
 
 export const SCHEMA_VERSION = 7;
 
@@ -242,6 +244,16 @@ export const Private = schema(
     bank: u32(),
     /** Round 8 (GDD 3.23, 8D): the Faith this seat has earned by donating at an altar. */
     faith: u16(),
+    /** Round 10 (GDD 3.32, A7): this seat's home, a scene id whose `bed` is its own; '' before the match. */
+    home: str(),
+    /** Round 10 (GDD 3.32, A7): whether this seat lies asleep in a bed; only its owner learns it. */
+    asleep: bool(),
+    /**
+     * Round 10 (GDD 3.32, A7): while this seat sleeps, how many active players are in bed (`inBed`) of how many
+     * there are (`inBedOf`), never a name; both 0 while it is awake, so an awake seat learns nothing (PH 13.4).
+     */
+    inBed: u8(),
+    inBedOf: u8(),
     /** Round 10 (GDD 3.22, C1): this seat died by day and waits for the morning train; it gets no ghost view. */
     onLine: bool(),
   },

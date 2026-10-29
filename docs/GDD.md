@@ -462,7 +462,7 @@ none is role-bound, and the content check refuses a wall that no neutral tool ca
 **Nodes keep bare hands** (owner answer LT1): a Timber node holds 3 s by hand and 1.5 s with an Axe in the inventory, a
 Stone node the same with a Pickaxe; Tin Ore still needs the Spade. A tool speeds supply up, it does not gate it.
 Chopping and breaking make no noise yet (the noise table has no chop or smash row); the Crowbar's pry sounds at 10.
-Nothing sells the tools yet, so a seat crafts one (the table above) or takes one from the world once chests land.
+The general stores sell the Axe, the Pickaxe and the Hammer (3.23 Shops; prices in `economy.json`, proposals for the balance lab), and a seat can also craft one (the table above). **Depletion (round 10, D2; owner answer LT7).** Every pile above comes back after its own time, and an NPC seat's gather empties a pile like a human's, through the same resolver: it breaks rubble by hand, the cleared pile stays no station until its time has run, and a seat that finds one spent walks on. No seat is dealt a free tool, since a seat working a tool-walled pile before any human could own the tool would tell an NPC; an NPC comes by a tool as any seat does (a card's start kit, or buying it at the general store; a later step, D2b).
 
 ### 3.15 Mobs
 
@@ -909,7 +909,7 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   seat in a world phase other than the immunity window buys and sells while the counter stays within
   `doors.reachTiles`. A purchase is refused, and nothing changes, when the purse or the inventory falls short. The
   bakery sells flour and the Wake Loaf, the apothecary bandages and salts, the general store (HollowMere's tavern bar, BlackPine's
-  lodge) rope, lantern oil, candles and planks, and the Gamekeeper's stall (HollowMere's forest edge, BlackPine's
+  lodge) rope, lantern oil, candles, planks and the three tools (the Axe, the Pickaxe and the Hammer, round 10 D2), and the Gamekeeper's stall (HollowMere's forest edge, BlackPine's
   lodge) snares and torches. The market (HollowMere's square, BlackPine's camp) sells nothing and buys timber, stone,
   resin, herbs, mushrooms and tin ore. No shop trades a role's kit, and an item a shop both sells and buys pays
   less than it asks.
@@ -1164,7 +1164,35 @@ petition and the manhunt are B2 to B4; until then a Constable keeps its post.
 
 ### 3.32 Sleeping
 
-Round 10, A7 (`docs/round9/gdd-map.md` 2.6). Not built yet: the step that builds it writes this section.
+Round 10, A7 (`docs/round9/gdd-map.md` 2.6; `docs/round9/world-mode.md` 7.3; `docs/round9/followup-4.md` 2.4 and
+2.11). A7a builds beds, homes and the night skip; A7b adds what each bed restores and Exhaustion.
+
+**Homes.** At the start of a match each human seat draws a home from the `homes` stream, never from its card: an
+interior an NPC could call home (3.12) that has a `bed`, distinct from the NPC homes and from each other while the map
+has enough, then shared. Only the seat itself learns its home (`Private.home`).
+
+**Beds.** A bed is a prop of kind `bed` (one in each home interior), `cot` (the chapel's) or `innBed` (the tavern's back
+room). A seat lies down with the `sleep` hold at a bed within reach, at dusk or at night; any other phase refuses
+`PHASE_CLOSED`, and there is no sleeping in the Final Night's hunt.
+
+| Bed | Who may sleep there | Refusal |
+| --- | --- | --- |
+| Home `bed` | the seat whose home it is, while its house is not boarded | another seat's bed: `NO_BED`; a boarded house: `BOARDED_HOME` |
+| Chapel `cot` | anyone, free | none |
+| Tavern `innBed` | anyone, for `balance.sleep.innBedScrip` from the purse | a short purse: `NEED_SCRIP` |
+
+Until D7 boards houses, a house counts as boarded while its seat is Indebted (3.23).
+
+**Asleep.** A sleeper stays in its bed. Its first input wakes it and does nothing else: a move wakes it without a
+step, and any other act wakes it and is refused `ASLEEP`, which is never shown; chat is not an act. A hit wakes it
+after the damage lands. Dawn wakes every sleeper, and a sleeper who dies or leaves is gone from the count. While a seat
+sleeps, its own view shows how many active players are in bed and of how many, never who.
+
+**The skip.** Active players are the living, placed, connected humans. NPC seats never count, so nothing waits on
+one. When every active player has been asleep for `balance.sleep.confirmS` of the night, the night ends as a normal
+dawn does: the next day, or the Final Night when the round calls for it. A human who stays awake, a Killer or anyone,
+holds the night open. Still waits: the county jail (B5) and the line (the respawn step) will leave their seats out of
+the active players.
 
 ### 3.33 The Hitman's arrival
 

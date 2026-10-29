@@ -250,7 +250,7 @@
         "pump brickOven coldShelves dartboard doughMixer fence flourBin goat ledger mailbag",
         "proofingCabinet rack window bank teachingClue"
       ],
-      "interact": ["lockedDoor gasPocket plate deadLoaf wakeTable bed"],
+      "interact": ["lockedDoor gasPocket plate deadLoaf wakeTable bed cot innBed"],
       "container": ["kitChest keyCache"]
     },
     "stems": {
