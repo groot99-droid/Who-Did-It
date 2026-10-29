@@ -33,12 +33,9 @@ export const WORLD_COPY = {
   'refuse.busy': 'Your hands are full',
   'refuse.cooldown': 'Not ready yet',
   'refuse.reach': 'Too far',
-  'refuse.nothing': 'Nothing happens',
-  'refuse.reported': 'Someone already reported this body',
   'refuse.bell': 'The bell is spent for you',
   'refuse.locked': 'Locked',
   'refuse.closed': 'Boarded up',
-  'refuse.generic': 'That did not work',
   'refuse.nobody': 'Nobody close enough',
 
   // 14.4 HUD and log

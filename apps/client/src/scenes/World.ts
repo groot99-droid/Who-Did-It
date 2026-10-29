@@ -3,6 +3,7 @@ import abilitiesJson from '@wdi/content/data/abilities.json';
 import balance from '@wdi/content/data/balance.json';
 import palette from '@wdi/content/data/palette.json';
 import { Phase } from '@wdi/shared';
+import type { ErrorPayload } from '@wdi/shared/protocol';
 import { TICK_RATE, TILE_PX } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
 import { toScreen, toWorld } from '@wdi/shared/iso';
@@ -19,6 +20,7 @@ import {
   type WorldFeed,
 } from '../net/world';
 import { LOOKS_COPY, WORLD_COPY as C, fill } from '../ui/copy';
+import { NOTHING_HAPPENS, interactionFails, isNfy, refusalText } from '../ui/copy/refusals';
 import { overlayRoot } from '../ui/dom';
 import { bodyMotion, refusedIn } from '../ui/theme/motion';
 import { mountSeatPicker } from '../ui/SeatPicker';
@@ -175,7 +177,6 @@ export class World extends Phaser.Scene {
   private focusEntry: { had: number; until: number } | null = null;
   private wasDead = false;
   /** What the last verb was, so a bare 422 reads as the deck's line for that verb. */
-  private lastVerb: 'kill' | 'report' | 'other' = 'other';
   private lastPhase = -1;
   private stepAt = 0;
 
@@ -192,7 +193,6 @@ export class World extends Phaser.Scene {
     this.hold = null;
     this.focusEntry = null;
     this.wasDead = false;
-    this.lastVerb = 'other';
   }
 
   preload(): void {
@@ -279,8 +279,9 @@ export class World extends Phaser.Scene {
 
     const net = getNet(this);
     const onNoise = (n: NoisePulse) => this.ring(n);
-    const onError = (e: { code?: number; msg: string }) => {
-      this.hud.say(this.refusal(e));
+    const onError = (e: ErrorPayload) => {
+      const line = this.refusal(e);
+      if (line !== null) this.hud.say(line, undefined, isNfy(e.reason) ? 'nfy' : undefined);
       refusedIn(overlayRoot()); // round 8, 8H (locked): the refused prompt shakes (UI.md 9)
       if (e.code === 423 || e.code === 428) this.audio.play('door_locked');
     };
@@ -485,7 +486,6 @@ export class World extends Phaser.Scene {
     if (!t) return this.hud.toast(C['toast.nothing'], 'interact');
     switch (t.kind) {
       case 'body':
-        this.lastVerb = 'report';
         this.feed.reportBody(t.id);
         break;
       case 'bell':
@@ -531,7 +531,6 @@ export class World extends Phaser.Scene {
     const near = this.nearestPlayer((def.rangeTiles ?? PORTAL_REACH_TILES) + TARGET_SLACK_TILES);
     if (!near) return this.hud.say(C['refuse.nobody']);
     if (row.id === 'kill') {
-      this.lastVerb = 'kill';
       this.feed.kill(near);
     } else this.feed.ability(row.id, near);
   }
@@ -757,16 +756,10 @@ export class World extends Phaser.Scene {
     if (this.feed.dead()) this.hud.say(C['ghost.walk'], 5000);
   }
 
-  /** The deck's line for a refusal code; a bare 422 reads by the last verb (UI.md 14.3). */
-  private refusal(e: { code?: number; msg: string }): string {
-    if (e.code === undefined) return e.msg;
-    if (e.code === 422)
-      return this.lastVerb === 'kill'
-        ? C['refuse.nothing']
-        : this.lastVerb === 'report'
-          ? C['refuse.reported']
-          : C['refuse.generic'];
-    return REFUSAL[e.code] ?? C['refuse.generic'];
+  /** The line for a refusal: the server's reason (UI.md 14.43), else the code of a server that sends none (14.3). */
+  private refusal(e: ErrorPayload): string | null {
+    if (e.reason === undefined) return REFUSAL[e.code ?? 0] ?? NOTHING_HAPPENS;
+    return refusalText(e, { dev: import.meta.env.DEV, fails: interactionFails });
   }
 
   private footsteps(now: number): void {
