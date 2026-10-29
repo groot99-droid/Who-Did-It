@@ -1,5 +1,5 @@
 import { balance } from '@wdi/content';
-import { ErrorCode, NoteKind, QuestState, TICK_RATE } from '@wdi/shared';
+import { NoteKind, QuestState, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import type { SimEvent } from '../events/bus';
 import { addNote } from '../NightPowers';
@@ -92,7 +92,7 @@ function accept(room: PartyRoom, seat: string): boolean {
 
 /** `quest.accept {questId:'contract'}`: from anywhere, for the holder of an open contract; anyone else is refused. */
 export function acceptContract(room: PartyRoom, sessionId: string): void {
-  if (!accept(room, sessionId)) reject(room, sessionId, ErrorCode.cannot, 'cannot do that');
+  if (!accept(room, sessionId)) reject(room, sessionId, 'BAD_REQUEST');
 }
 
 /** The bus's `kill` (a landed strike, `seat` the victim, `data.by` the striker): the rest off the target. */

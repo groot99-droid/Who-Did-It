@@ -1,5 +1,5 @@
 import { balance, relations } from '@wdi/content';
-import { ErrorCode, Phase, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { Phase, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { avatarMemory, avatarOf } from '../Avatars';
 import { emitSim } from '../events/bus';
@@ -24,11 +24,10 @@ export function handleInspect(room: PartyRoom, sessionId: string, payload: Recor
   const actor = sim.players.get(sessionId);
   if (!player || !actor) return;
   const tick = room.state.tick;
-  if (actor.dead || !actor.placed) return reject(room, sessionId, ErrorCode.cannot, 'not now');
-  if (!isWorldPhase(room.state.phase)) return reject(room, sessionId, ErrorCode.wrongPhase, 'not now');
-  if (tick < actor.busyUntilTick) return reject(room, sessionId, ErrorCode.busy, 'busy');
-  if (tick < (player.priv.cooldownEndTick.get('inspect') ?? 0))
-    return reject(room, sessionId, ErrorCode.cooldown, 'not ready');
+  if (actor.dead || !actor.placed) return reject(room, sessionId, 'NOT_IN_PLAY');
+  if (!isWorldPhase(room.state.phase)) return reject(room, sessionId, 'PHASE_CLOSED');
+  if (tick < actor.busyUntilTick) return reject(room, sessionId, 'BUSY');
+  if (tick < (player.priv.cooldownEndTick.get('inspect') ?? 0)) return reject(room, sessionId, 'COOLDOWN');
 
   const memory = avatarMemory(room);
   const handle = typeof payload.targetId === 'string' ? payload.targetId : '';
@@ -46,10 +45,10 @@ export function handleInspect(room: PartyRoom, sessionId: string, payload: Recor
     target.sceneIdx !== actor.sceneIdx ||
     !canSee(room, actor, target)
   ) {
-    return reject(room, sessionId, ErrorCode.cannot, 'no one there');
+    return reject(room, sessionId, 'NO_TARGET');
   }
   if (Math.hypot(target.x - actor.x, target.y - actor.y) > relations.inspect.rangeTiles * TILE_PX)
-    return reject(room, sessionId, ErrorCode.outOfRange, 'too far');
+    return reject(room, sessionId, 'TOO_FAR', { of: 'person' });
 
   player.priv.cooldownEndTick.set('inspect', tick + Math.round(relations.inspect.cooldownS * TICK_RATE));
   const targetPlayer = room.state.players.get(seat);

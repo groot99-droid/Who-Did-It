@@ -1,11 +1,11 @@
 import { balance, scenes } from '@wdi/content';
-import { ErrorCode } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { emitSim, onSim } from '../events/bus';
 import { reject, sceneKey } from '../World';
 import { simOf } from '../RoomSim';
 import { balanceOf, bankAccount, movePurse } from './purse';
 import { counterProblem } from './shops';
+import { refusal } from '../refusal';
 
 /**
  * The bank (round 8, GDD 3.23; docs/round8/economy.md 2), Session 8C: HollowMere's manor hall and BlackPine's intake
@@ -35,11 +35,9 @@ export function handleBankHold(room: PartyRoom, sessionId: string, propId: strin
   const p = simOf(room).players.get(sessionId);
   const prop = p && scenes[sceneKey(p.sceneIdx)]?.props.find((q) => q.id === propId);
   const problem =
-    prop?.kind === 'bank'
-      ? counterProblem(room, sessionId, propId)
-      : { code: ErrorCode.cannot, msg: 'no bank here' };
+    prop?.kind === 'bank' ? counterProblem(room, sessionId, propId) : refusal('NO_COUNTER', { kind: 'bank' });
   if (problem) {
-    reject(room, sessionId, problem.code, problem.msg);
+    reject(room, sessionId, problem);
     return;
   }
   openOf(room).set(sessionId, propId);
@@ -49,21 +47,21 @@ export function handleBankHold(room: PartyRoom, sessionId: string, propId: strin
 export function handleBank(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   const { op, amount } = payload;
   if ((op !== 'deposit' && op !== 'withdraw') || !Number.isSafeInteger(amount) || (amount as number) < 1) {
-    reject(room, sessionId, ErrorCode.cannot, 'cannot do that');
+    reject(room, sessionId, 'BAD_REQUEST');
     return;
   }
   const propId = openOf(room).get(sessionId);
   const problem = propId
     ? counterProblem(room, sessionId, propId)
-    : { code: ErrorCode.cannot, msg: 'no bank open' };
+    : refusal('COUNTER_CLOSED', { kind: 'bank' });
   if (problem) {
-    reject(room, sessionId, problem.code, problem.msg);
+    reject(room, sessionId, problem);
     return;
   }
   const [from, to] =
     op === 'deposit' ? [sessionId, bankAccount(sessionId)] : [bankAccount(sessionId), sessionId];
   if (balanceOf(room, from) < (amount as number)) {
-    reject(room, sessionId, ErrorCode.cannot, 'not enough Scrip');
+    reject(room, sessionId, 'NEED_SCRIP');
     return;
   }
   movePurse(room, from, to, amount as number, 'bank');
