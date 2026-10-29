@@ -1,5 +1,5 @@
 import type { Client } from '@colyseus/core';
-import { MAX_PLAYERS, ADMIN_C2S, ErrorCode, S2C } from '@wdi/shared';
+import { MAX_PLAYERS, ADMIN_C2S, S2C, refusalFrame } from '@wdi/shared';
 import type { PartyRoom } from '../PartyRoom';
 import {
   AUTO_STREAMS,
@@ -59,7 +59,8 @@ export function parseSetup(raw: unknown): AutoOptions | null {
  * be stepped. Called from `AdminRoom.onCreate` only, so a `party` room never has them.
  */
 export function registerAdminHandlers(room: PartyRoom): void {
-  const refuse = (client: Client, msg: string) => client.send(S2C.error, { code: ErrorCode.cannot, msg });
+  const refuse = (client: Client, msg: string) =>
+    client.send(S2C.error, refusalFrame('BAD_REQUEST', undefined, { msg }));
   const queue = (client: Client, cmd: AutoCommand): void => {
     const auto = autoOf(room);
     if (!auto || !isAdminClient(room, client.sessionId)) return;
