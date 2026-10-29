@@ -242,5 +242,18 @@
       "ships": "V1",
       "gddRef": "3.17"
     }
+  },
+  "figures": {
+    "constable": {
+      "id": "constable",
+      "name": "a Constable",
+      "bodyAtlas": "char_constable",
+      "overlayAtlas": "ovl_constable",
+      "silhouette": "A tall domed helmet over a high-collared tunic, a short baton at the right hip.",
+      "palette": { "base": "ink", "second": "slate", "accent": "bone" },
+      "notes": "The county's law, sent up the line (round 10, B1): an ink tunic buttoned to a high collar, slate trousers, ink boots, a domed ink helmet with a bone badge, a wood baton in a bone frog at the right hip. Never a card's look and never the villager family's. Interact: hands behind the back, the head bowed to read. Until its art lands the client draws the plain villager.",
+      "ships": "V1",
+      "gddRef": "3.17"
+    }
   }
 }
