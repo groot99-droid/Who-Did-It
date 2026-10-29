@@ -3,12 +3,20 @@ import { REG_WORLD, type AvatarSnap, type PlayerSnap, type WorldFeed } from '../
 import { type PlayerLook, PlayerView, dirFromYaw } from './PlayerView';
 import { REMOTE_DELAY_MS, SELF_DELAY_MS, SampleBuffer } from './interpolation';
 import { StatusBit } from './animIds';
+import { looks } from '@wdi/content';
+import { figureName } from '../ui/copy';
 import cluesJson from '@wdi/content/data/clues.json';
 import { TILE_PX } from '@wdi/shared/constants';
 
 const BLOOD_SIGHT_PX = cluesJson.clues.blood.params.visibleTiles * TILE_PX;
 /** The mask glyph on a ghost's nameplate over a borrowed face (GDD 3.17). */
 export const MASK_GLYPH = '\u{1F3AD}';
+
+/** The look ids of figures that are not seats: the villager family and, once it exists, the `figures` family. */
+const FIGURE_LOOKS: ReadonlySet<string> = new Set([
+  ...Object.keys(looks.villagers),
+  ...Object.keys((looks as { figures?: Record<string, unknown> }).figures ?? {}),
+]);
 
 /** What the view reads of the feed besides the roster; the World's registry feed provides it. */
 export type AvatarSource = Pick<WorldFeed, 'avatars' | 'selfHandle'> & Partial<Pick<WorldFeed, 'bus'>>;
@@ -118,7 +126,16 @@ export class EntityView {
     for (const a of list) {
       if (a.handle === own) continue;
       const shown = roster.get(a.lookOf);
-      if (!shown) continue;
+      if (!shown) {
+        // A figure (townsfolk, constable) wears a non-seat look: no seat traits, no roster row, no true-seat mask.
+        if (!FIGURE_LOOKS.has(a.lookOf)) continue;
+        present.add(a.handle);
+        const name = this.label?.(a.handle) ?? figureName(a.lookOf);
+        const look = { height: a.height, scarf: 0, hat: 0, lookId: a.lookOf };
+        const t = this.ensure(a.handle, `figure:${a.lookOf}:${a.height}:${name}`, name, look, false);
+        this.drawAvatar(t, a, selfPr, now);
+        continue;
+      }
       present.add(a.handle);
       const true_ = this.ghost && a.seat !== undefined ? roster.get(a.seat) : undefined;
       const masked = true_ !== undefined && a.seat !== a.lookOf;
@@ -131,11 +148,7 @@ export class EntityView {
         ...(shown.look ? { lookId: shown.look } : {}),
       };
       const t = this.ensure(a.handle, `${a.lookOf}:${shown.look}:${a.height}:${name}`, name, look, false);
-      const bloody = (a.statusBits & StatusBit.bloody) !== 0;
-      const near = selfPr !== null && Math.hypot(a.x - selfPr.x, a.y - selfPr.y) <= BLOOD_SIGHT_PX;
-      t.view.setBlood(bloody && near);
-      t.view.setGhost((a.statusBits & StatusBit.ghost) !== 0);
-      this.pose(t, a, now, this.delayMs);
+      this.drawAvatar(t, a, selfPr, now);
     }
 
     for (const [id, t] of this.tracked) {
@@ -155,6 +168,15 @@ export class EntityView {
     this.off.length = 0;
     for (const t of this.tracked.values()) t.view.destroy();
     this.tracked.clear();
+  }
+
+  /** Blood, ghost and pose of one avatar's sprite. */
+  private drawAvatar(t: Tracked, a: AvatarSnap, selfPr: { x: number; y: number } | null, now: number): void {
+    const bloody = (a.statusBits & StatusBit.bloody) !== 0;
+    const near = selfPr !== null && Math.hypot(a.x - selfPr.x, a.y - selfPr.y) <= BLOOD_SIGHT_PX;
+    t.view.setBlood(bloody && near);
+    t.view.setGhost((a.statusBits & StatusBit.ghost) !== 0);
+    this.pose(t, a, now, this.delayMs);
   }
 
   /** The sprite under `id`, rebuilt when what it shows changed. */

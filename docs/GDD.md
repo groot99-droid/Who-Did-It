@@ -1114,6 +1114,17 @@ screen offers only the moves that land. `inv.select` picks the held hotbar slot.
 the purse. Bound kit (`onDeath: kept`), the gear slots and the bank stay with the seat. A match's end empties the
 inventory and the held slot resets to the first.
 
+**The crafting grid** (A13a). `craft.grid {size, cells}` sends the grid row by row: `size` 2 (the pocket square, always
+there) or 3 (within reach of a workbench), each cell an item id or empty, one unit per cell. The server matches a hand
+recipe (one with no station): a recipe is **shapeless** (the cells hold exactly its inputs, in any places) unless it
+carries a `shape`, rows of item ids that the cells must show, anywhere in the grid and mirrored (the Torch is a Pine
+Resin over a Timber; the Snare is shapeless). A pattern wider than the pocket square needs a workbench too. The check
+runs in this order: a malformed grid refuses `BAD_REQUEST`; a role-bound item in any cell refuses `GRID_BOUND` whatever
+the recipes say (and no recipe takes one); a 3 by 3 grid or a wide pattern away from a workbench refuses `NEED_STATION`
+(workbench); nothing matching refuses `GRID_NO_RECIPE`; cells the seat does not hold refuse `NEED_MATERIALS`; a product
+that does not fit refuses `PACK_FULL`. On a match the inputs go and the product arrives as one change inside `step()`,
+with no hold. Station recipes (the basin's Axe, the oven's Lantern) stay at their stations and the older `craft` hold.
+
 ### 3.31 Law enforcement and petitions
 
 Round 10, B1 to B4 (`docs/round9/gdd-map.md` 2.5). Not built yet: the step that builds it writes this section.
