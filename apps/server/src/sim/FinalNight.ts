@@ -1,5 +1,5 @@
 import { balance, roles } from '@wdi/content';
-import { ErrorCode, Phase, type PlayerState, SKIP_VOTE, TICK_RATE } from '@wdi/shared';
+import { Phase, type PlayerState, SKIP_VOTE, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { flowOf, refuse, setPhase } from './Flow';
 import { openMeeting } from './Meeting';
@@ -39,7 +39,7 @@ export function enforceFinalVote(room: PartyRoom): void {
     if (player.priv?.myVote !== SKIP_VOTE) return;
     player.priv.myVote = '';
     player.hasVoted = false;
-    refuse(room, id, ErrorCode.cannot, 'no skip in the final vote');
+    refuse(room, id, 'BAD_REQUEST');
   });
 }
 

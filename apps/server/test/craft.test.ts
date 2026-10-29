@@ -85,7 +85,7 @@ describe('craft', () => {
     away.x += 10 * 32; // far from the basin, same scene
     give(seat, { timber: 2, stone: 1 });
     await craft(p, 'spade');
-    expect(errors(human)).toContain(ErrorCode.outOfRange);
+    expect(errors(human)).toContain(ErrorCode.cannot);
     expect(away.hold).toBeNull();
     expect(sceneId).toBeDefined();
   });

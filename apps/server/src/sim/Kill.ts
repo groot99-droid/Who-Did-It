@@ -1,5 +1,5 @@
 import { abilities, balance, clues, roles } from '@wdi/content';
-import { ErrorCode, S2C, TICK_RATE, TILE_PX, segmentBlocked, validateKill } from '@wdi/shared';
+import { REASON_CODE, S2C, TICK_RATE, TILE_PX, segmentBlocked, validateKill } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { POSITION_RING_TICKS } from './constants';
 import { resolveHandle } from './Avatars';
@@ -15,6 +15,7 @@ import { emitNoise } from './Noise';
 import { type PlayerSim, simOf } from './RoomSim';
 import { onBandagedStrike } from './Struck';
 import { isKillPhase, navGrid, reject, sceneKey } from './World';
+import { refusal, type Refusal } from './refusal';
 
 /** Kill cooldown in ticks for this party size (GDD 3.9; the row is cut to 4-10 like the deal). */
 function killCooldownTicks(room: PartyRoom): number {
@@ -52,6 +53,15 @@ function sendDisguisePuff(room: PartyRoom, actor: PlayerSim): void {
  * (locked call sites): `targetId` is resolved through `resolveHandle` (5F); an accepted strike ends a disguise
  * (5F, with the puff) and may spend a protection (5G) before the Bandage check.
  */
+/** The reason of `validateKill`'s verdict (the shared rule keeps its legacy code and words). */
+function killRefusal(verdict: { code: number; msg: string }): Refusal {
+  if (verdict.code === REASON_CODE.PHASE_CLOSED) return refusal('PHASE_CLOSED');
+  if (verdict.code === REASON_CODE.BUSY) return refusal('BUSY');
+  if (verdict.code === REASON_CODE.COOLDOWN) return refusal('COOLDOWN');
+  if (verdict.code === REASON_CODE.TOO_FAR) return refusal('TOO_FAR', { of: 'person' });
+  return refusal(verdict.msg === 'not now' ? 'NOT_IN_PLAY' : 'NO_TARGET');
+}
+
 export function handleKill(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   const sim = simOf(room);
   const tick = room.state.tick;
@@ -59,14 +69,14 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
   const actor = sim.players.get(sessionId);
   if (!player || !actor) return;
   if (!roles.roles[player.priv.role.roleId]?.abilities.includes('kill')) {
-    reject(room, sessionId, ErrorCode.cannot, 'no knife');
+    reject(room, sessionId, 'NEED_ITEM', { need: 'knife' });
     return;
   }
-  if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, ErrorCode.cannot, 'not now'); // round 8, 8A
+  if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, 'DOWN_OR_STUNNED'); // round 8, 8A
   const targetId = resolveHandle(room, sessionId, payload.targetId);
   const target = targetId === null ? undefined : sim.players.get(targetId);
   if (targetId === null || !target || targetId === sessionId) {
-    reject(room, sessionId, ErrorCode.cannot, 'no target');
+    reject(room, sessionId, 'NO_TARGET');
     return;
   }
   const grid = navGrid(sceneKey(actor.sceneIdx), sim.profile);
@@ -91,7 +101,7 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
     solidBetween: (ax, ay, bx, by) => segmentBlocked(grid, ax, ay, bx, by),
   });
   if (!verdict.ok) {
-    reject(room, sessionId, verdict.code as ErrorCode, verdict.msg);
+    reject(room, sessionId, killRefusal(verdict));
     return;
   }
   // A strike drops the striker's disguise in place, voided or not (GDD 3.17).
@@ -104,16 +114,16 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
   const sceneId = sceneKey(actor.sceneIdx);
   // A Watch or a Remedy voids the strike exactly as a Bandage does (GDD 3.2, 5G).
   if (spendProtection(room, targetId, sessionId)) {
-    reject(room, sessionId, ErrorCode.cannot, 'nothing happens');
+    reject(room, sessionId, 'VOIDED');
     return;
   }
   if (target.bandagedUntilTick > tick) {
     target.bandagedUntilTick = 0;
     onBandagedStrike(room, sessionId, targetId); // the target's blackout and the Claimed entries (GDD 3.2)
-    reject(room, sessionId, ErrorCode.cannot, 'nothing happens');
+    reject(room, sessionId, 'VOIDED');
     return;
   }
-  if (spendCharm(room, targetId)) return reject(room, sessionId, ErrorCode.cannot, 'nothing happens'); // round 8, 8A
+  if (spendCharm(room, targetId)) return reject(room, sessionId, 'VOIDED'); // round 8, 8A
 
   const tx = Math.floor(target.x / TILE_PX);
   const ty = Math.floor(target.y / TILE_PX);
