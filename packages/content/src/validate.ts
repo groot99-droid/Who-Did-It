@@ -30,7 +30,7 @@ import type { LoreFile } from './schemas/lore.js';
 import { checkLore } from './validateLore.js';
 import type { TalkFile } from './schemas/talk.js';
 import { checkTalk } from './validateTalk.js';
-import type { InteractionsFile } from './schemas/interactions.js';
+import { classesOfProp, type InteractionsFile } from './schemas/interactions.js';
 import { checkInteractions } from './validateInteractions.js';
 
 export interface Content {
@@ -721,11 +721,14 @@ function checkRoutines(c: Content, err: (msg: string) => void): void {
       return ch === '.' || ch === 'S';
     };
     for (const prop of scene.props) {
-      if (!known.has(prop.kind)) {
+      // Round 10 (D1): a prop whose class is a station is one, whatever its kind.
+      const [cls] = classesOfProp(c.interactions, prop);
+      const station = stationKinds.has(prop.kind) || (cls !== undefined && stationKinds.has(cls));
+      if (!station && !known.has(prop.kind)) {
         err(`routines.json: prop kind "${prop.kind}" (${prop.id}) is neither a station nor ignored`);
         continue;
       }
-      if (!stationKinds.has(prop.kind)) continue;
+      if (!station) continue;
       const { x, y } = prop;
       const stand = [
         [x, y],
