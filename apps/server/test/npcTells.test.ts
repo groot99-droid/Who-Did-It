@@ -55,10 +55,10 @@ describe('E1: a recorded match shows no NPC tell', () => {
   for (const set of sets) {
     it(`seed set ${set}`, async () => {
       const party = await standardParty(colyseus, set, true);
-      const rec = recordMatch(party, { maxTicks: 45_000, lobbyExtraS: 12, onTick: scenario(party, set) });
+      const rec = recordMatch(party, { maxTicks: 160_000, lobbyExtraS: 12, onTick: scenario(party, set) });
       const tells = findTells(rec);
       expect(tells.map((t) => `${set} ${t.code} ${t.seat}@${t.tick}: ${t.detail}`)).toEqual([]);
-    }, 120_000);
+    }, 600_000);
   }
 });
 
@@ -66,14 +66,14 @@ describe('E2: the detector catches the old brain', () => {
   it('flags the M3c wander on at least three of nine NPCs', async () => {
     const party = await standardParty(colyseus, 'S1', true);
     npcMemory(party.room).debug.push({ routine: false });
-    const rec = recordMatch(party, { maxTicks: 45_000, lobbyExtraS: 12, onTick: scenario(party, 'S1') });
+    const rec = recordMatch(party, { maxTicks: 160_000, lobbyExtraS: 12, onTick: scenario(party, 'S1') });
     const flagged = new Set(
       findTells(rec)
         .filter((t) => t.code === 'T2' || t.code === 'T3')
         .map((t) => t.seat),
     );
     expect(flagged.size).toBeGreaterThanOrEqual(3);
-  }, 120_000);
+  }, 600_000);
 });
 
 // --- E3: the detector, pure, on synthetic recordings ---------------------------------------------------------

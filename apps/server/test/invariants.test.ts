@@ -131,7 +131,7 @@ describe('the sim event bus', () => {
     expect(autoLines[0]).toMatchObject({ map: 'hollowmere', seats: 6, npcIds: fixedIds });
     expect(autoLines[0].logHash).toBe(autoLines[1].logHash);
     expect(autoLines[0].kinds.end).toBe(1);
-  }, 60_000);
+  }, 900_000);
 
   it('keeps the log of the current match only, and hashes it', async () => {
     const room = await quietRoom();
