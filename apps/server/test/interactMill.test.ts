@@ -1,7 +1,8 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { C2S, TICK_RATE, type RefusalFrame } from '@wdi/shared';
-import { addStack, count } from '../src/sim/Inventory';
+import { addStack, count, take } from '../src/sim/Inventory';
+import { interactReady } from '../src/sim/interact/resolve';
 import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
 import { sleep } from './simHelpers';
 
@@ -60,5 +61,25 @@ describe.each([
     advance(p, (saw.holdS + 2) * TICK_RATE);
     expect(refusals(p).at(-1)).toMatchObject({ reason: 'NEED_ITEM' });
     expect(count(seat, 'timber')).toBe(0);
+  });
+});
+
+describe('the logs a saw consumes', () => {
+  it('cancels the hold when the logs leave the pack mid-hold, and gives no Timber', async () => {
+    const p = await at(SAW, 1);
+    const seat = p.room.state.players.get(p.humans[0]!.id)!;
+    await hold(p, SAW.target);
+    advance(p, 2 * TICK_RATE);
+    take(seat, 'logs', 1);
+    advance(p, (SAW.holdS + 2) * TICK_RATE);
+    expect(count(seat, 'timber')).toBe(0);
+  });
+
+  it('is no station for a seat without logs (interactReady), and is one with them', async () => {
+    const p = await at(SAW, 0);
+    const seat = p.room.state.players.get(p.humans[0]!.id)!;
+    expect(interactReady(p.room, seat, 'bp_mill', 'bs.head_saw')).toBe(false);
+    addStack(seat, 'logs', 1);
+    expect(interactReady(p.room, seat, 'bp_mill', 'bs.head_saw')).toBe(true);
   });
 });
