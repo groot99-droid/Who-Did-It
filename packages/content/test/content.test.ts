@@ -260,16 +260,16 @@ describe('balance (GDD 3.3, 3.9)', () => {
   it('copies the per-count table', () => {
     const col = <K extends keyof ReturnType<typeof balanceFor>>(k: K) =>
       [4, 5, 6, 7, 8, 9, 10].map((n) => balanceFor(n)[k]);
-    expect(col('killCooldownS')).toEqual([60, 60, 35, 35, 30, 30, 40]);
+    expect(col('killCooldownS')).toEqual([180, 180, 105, 105, 90, 90, 120]);
     expect(col('discussionS')).toEqual([60, 60, 75, 75, 90, 90, 90]);
-    expect(col('tasksEach')).toEqual([3, 3, 4, 4, 4, 4, 5]);
-    expect(col('globalKillLockS')).toEqual([0, 0, 0, 0, 0, 0, 15]);
+    expect(col('tasksEach')).toEqual([29, 29, 38, 38, 38, 38, 48]);
+    expect(col('globalKillLockS')).toEqual([0, 0, 0, 0, 0, 0, 45]);
     expect(col('cabalWin')).toEqual(['villageAtMostOne', 'villageAtMostOne', ...Array(5).fill('parity')]);
   });
 
-  it('makes a cycle of 230 s from day, dusk and night', () => {
+  it('makes a cycle of 810 s from day, dusk and night', () => {
     const { dayS, duskS, nightS } = balance.phases;
-    expect(dayS + duskS + nightS).toBe(230);
+    expect(dayS + duskS + nightS).toBe(810);
   });
 
   it('gates the Killer Lock at 6+ players', () => {

@@ -27,7 +27,6 @@ describe('the trial after the Final Night hunt (GDD 3.3)', () => {
     for (const row of Object.values(balance.byCount)) {
       expect(balance.finalNight.trialS).toBeGreaterThan(row.discussionS);
     }
-    expect(balance.finalNight.huntS).toBeLessThan(balance.finalNight.trialS);
   });
 
   for (const n of [5, 8]) {

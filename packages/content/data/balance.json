@@ -22,9 +22,9 @@
     "roleRevealS": 20,
     "countdownS": 3,
     "graceS": 30,
-    "dayS": 120,
-    "duskS": 10,
-    "nightS": 100,
+    "dayS": 480,
+    "duskS": 30,
+    "nightS": 300,
     "voteS": 25,
     "revealS": 8,
     "immunityS": 15,
@@ -34,64 +34,64 @@
   },
   "byCount": {
     "4": {
-      "killCooldownS": 60,
+      "killCooldownS": 180,
       "globalKillLockS": 0,
       "discussionS": 60,
-      "tasksEach": 3,
+      "tasksEach": 29,
       "cabalWin": "villageAtMostOne",
       "profile": "small",
       "gddRef": "3.9"
     },
     "5": {
-      "killCooldownS": 60,
+      "killCooldownS": 180,
       "globalKillLockS": 0,
       "discussionS": 60,
-      "tasksEach": 3,
+      "tasksEach": 29,
       "cabalWin": "villageAtMostOne",
       "profile": "small",
       "gddRef": "3.9"
     },
     "6": {
-      "killCooldownS": 35,
+      "killCooldownS": 105,
       "globalKillLockS": 0,
       "discussionS": 75,
-      "tasksEach": 4,
+      "tasksEach": 38,
       "cabalWin": "parity",
       "profile": "small",
       "gddRef": "3.9"
     },
     "7": {
-      "killCooldownS": 35,
+      "killCooldownS": 105,
       "globalKillLockS": 0,
       "discussionS": 75,
-      "tasksEach": 4,
+      "tasksEach": 38,
       "cabalWin": "parity",
       "profile": "medium",
       "gddRef": "3.9"
     },
     "8": {
-      "killCooldownS": 30,
+      "killCooldownS": 90,
       "globalKillLockS": 0,
       "discussionS": 90,
-      "tasksEach": 4,
+      "tasksEach": 38,
       "cabalWin": "parity",
       "profile": "medium",
       "gddRef": "3.9"
     },
     "9": {
-      "killCooldownS": 30,
+      "killCooldownS": 90,
       "globalKillLockS": 0,
       "discussionS": 90,
-      "tasksEach": 4,
+      "tasksEach": 38,
       "cabalWin": "parity",
       "profile": "large",
       "gddRef": "3.9"
     },
     "10": {
-      "killCooldownS": 40,
-      "globalKillLockS": 15,
+      "killCooldownS": 120,
+      "globalKillLockS": 45,
       "discussionS": 90,
-      "tasksEach": 5,
+      "tasksEach": 48,
       "cabalWin": "parity",
       "profile": "large",
       "gddRef": "3.9"
@@ -110,23 +110,23 @@
     "gddRef": "3.8"
   },
   "finalNight": {
-    "afterCycle": 5,
-    "huntS": 45,
+    "afterCycle": 12,
+    "huntS": 135,
     "trialS": 120,
-    "killCooldownS": 20,
+    "killCooldownS": 60,
     "skipAllowed": false,
     "tieEjectsNobody": true,
     "reportEndsHunt": true,
     "gddRef": "3.8"
   },
-  "impersonate": { "applyWindowS": 10, "durationS": 15, "cooldownS": 45, "gddRef": "3.17" },
+  "impersonate": { "applyWindowS": 10, "durationS": 45, "cooldownS": 135, "gddRef": "3.17" },
   "nightPowers": { "perNight": 1, "watchRepeatAllowed": false, "gddRef": "3.2" },
   "snowball": {
     "villageMargin": 2,
-    "killCooldownPenaltyS": 10,
+    "killCooldownPenaltyS": 30,
     "nextKillTraitClues": 3,
     "lastKillerMinAlive": 6,
-    "lastKillerCooldownDeltaS": -5,
+    "lastKillerCooldownDeltaS": -15,
     "gddRef": "3.9"
   },
   "hunger": { "cyclesWithoutKill": 2, "trailEveryS": 1, "gddRef": "3.8" },
@@ -147,7 +147,7 @@
     "staminaRegenPerS": 6,
     "fatigueRecover": 25,
     "woundedBelow": 30,
-    "famishedAfterS": 480,
+    "famishedAfterS": 1680,
     "koS": 20,
     "koWakeHp": 20,
     "koPurseShare": 0.5,
@@ -194,7 +194,7 @@
     "cabalFakeList": true,
     "ghostShareCap": 0.25,
     "martyrWeight": 10,
-    "martyrS": 600,
+    "martyrS": 2100,
     "gddRef": "3.5"
   },
   "wolves": {
@@ -248,10 +248,10 @@
       "afterPlacementIdleS": { "min": 3, "max": 8 },
       "collectChance": 0.5
     },
-    "night": { "leaveDelayS": { "min": 0, "max": 15 } },
+    "night": { "leaveDelayS": { "min": 0, "max": 45 } },
     "vote": { "windowFrac": { "min": 0.3, "max": 0.9 } },
     "ready": { "delayS": { "min": 2, "max": 9 } },
-    "aloneKill": { "afterS": 30, "sightTiles": 20 },
+    "aloneKill": { "afterS": 90, "sightTiles": 20 },
     "nightPower": { "windowFrac": { "min": 0.1, "max": 0.8 }, "lastShotS": { "min": 2, "max": 8 } },
     "hive": { "staggerS": { "min": 0.3, "max": 2.5 }, "memoryS": 10 },
     "body": { "pullTiles": 10, "shoutTiles": 5, "bellTiles": 2 },
@@ -262,14 +262,14 @@
     "threshold": 0.5,
     "desperateNeeds": 2,
     "moodHoldS": 5,
-    "hunger": { "riseS": 480, "homeFallS": 60, "mealRelief": 1, "famishedMul": 2 },
+    "hunger": { "riseS": 1680, "homeFallS": 60, "mealRelief": 1, "famishedMul": 2 },
     "fear": {
       "body": 0.4,
       "chase": 0.5,
       "struck": 0.3,
       "ejection": 0.2,
-      "darkRiseS": 90,
-      "fallS": 120
+      "darkRiseS": 270,
+      "fallS": 420
     },
     "anger": {
       "struck": 0.4,
@@ -277,9 +277,9 @@
       "taxed": 0.3,
       "ejectionRelief": 0.5,
       "mealRelief": 0.3,
-      "fallS": 180
+      "fallS": 630
     },
-    "want": { "lightPurse": 10, "lightRiseS": 240, "debtRiseS": 120, "wage": 0.4, "sale": 0.2 },
+    "want": { "lightPurse": 10, "lightRiseS": 840, "debtRiseS": 420, "wage": 0.4, "sale": 0.2 },
     "mug": {
       "chancePerS": { "light": 0.01, "heavy": 0.04 },
       "moodMul": 1,
@@ -295,7 +295,7 @@
       "answerS": 6,
       "share": 0.3,
       "chaseS": 5,
-      "cooldownS": 120
+      "cooldownS": 420
     },
     "weights": {
       "hungry": { "work": 1.6, "stroll": 1, "idle": 0.6 },
@@ -326,7 +326,7 @@
     "gddRef": "3.16"
   },
   "reader": { "spinesMin": 3, "spinesMax": 5, "pageMaxChars": 600, "gddRef": "3.26" },
-  "train": { "arriveAtS": 5, "deliveryAfterS": 8, "hearTiles": 20, "gddRef": "3.3" },
+  "train": { "arriveAtS": 20, "deliveryAfterS": 32, "hearTiles": 20, "gddRef": "3.3" },
   "ui": {
     "transitionS": { "fade": 0.4, "iris": 0.6, "wipe": 0.7 },
     "loading": { "showAfterS": 0.3, "tipEveryS": 4 },
@@ -334,10 +334,10 @@
   },
   "ghosts": { "wispsPerCycle": 1, "gddRef": "3.7" },
   "vendettas": {
-    "conversion": { "shareS": 45 },
+    "conversion": { "shareS": 160 },
     "sabotage": { "tamperS": 6, "stations": 2, "undoTasks": 1 },
     "heist": { "crackS": 8 },
-    "contract": { "offTargetRestS": 30 },
+    "contract": { "offTargetRestS": 90 },
     "gddRef": "3.20"
   },
   "economy": {
