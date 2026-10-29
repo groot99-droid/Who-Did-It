@@ -34,11 +34,11 @@ const savedDay = { ...weights.day };
 afterEach(() => void Object.assign(weights.day, savedDay));
 
 describe('depletion', () => {
-  it('every pile of the logic table comes back, and only a nailed crate stays open', () => {
+  it('every pile of the logic table comes back, and only a nailed crate and a picked lock stay open', () => {
     for (const [id, it] of Object.entries(interactions.interactions)) {
       if (it.after === undefined) continue;
       const stays = it.after.respawnS === null;
-      expect(stays, id).toBe(it.target === 'crateNailed');
+      expect(stays, id).toBe(['crateNailed', 'lockedDoor'].includes(it.target));
     }
   });
 
