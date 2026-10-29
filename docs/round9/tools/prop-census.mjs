@@ -106,45 +106,24 @@ const scenes = files.map((f) => JSON.parse(readFileSync(join(dir, f), 'utf8')));
 const stemOf = (p) => (p.id.split('.')[1] ?? p.id).replace(/_?\d+$/, '');
 
 /**
- * The proposed decision per placed thing (logic-table.md 5). Four values:
+ * The decision per placed thing (logic-table.md 5), read from the census of `interactions.json` since round 10 (A9),
+ * whose validator fails a prop with no decision. Four values:
  *   live       the sim or the economy already reads the kind; the logic table only formalises it
  *   interact   a tool, a station or a bare-hands verb does something to it
  *   container  it holds loot drawn from a table (search, pry or pick)
  *   keep       decoration, on purpose (cover, a sight-line, a light, a room's identity)
  * A `dressing` or `decor` stem is looked up by stem; every other kind is looked up by kind.
  */
-const BY_KIND = {
-  hq: 'live', counter: 'live', lanternPost: 'live', taskSource: 'live', basin: 'live', altar: 'live', bell: 'live',
-  blackMarket: 'live', lamp: 'live', noticeBoard: 'live', oven: 'live', pump: 'live', brickOven: 'live',
-  coldShelves: 'live', dartboard: 'live', doughMixer: 'live', fence: 'live', flourBin: 'live', goat: 'live',
-  ledger: 'live', mailbag: 'live', proofingCabinet: 'live', rack: 'live', window: 'live', bank: 'live',
-  teachingClue: 'live',
-  kitChest: 'container', keyCache: 'container',
-  lockedDoor: 'interact', gasPocket: 'interact',
-  plate: 'interact', deadLoaf: 'interact', wakeTable: 'interact', // placed for the wake scene; no server code reads them
+const census = JSON.parse(readFileSync(join(dir, '..', 'interactions.json'), 'utf8')).census;
+const toMap = (lists) => {
+  const m = new Map();
+  for (const [d, entries] of Object.entries(lists)) for (const e of entries) for (const n of e.split(/\s+/)) m.set(n, d);
+  return m;
 };
-const BY_STEM = {
-  container: `barrel crates crate tin_crate bottle_crate footlocker blanket_chest wine_cask flour_sacks sacks hay_bale
-    bread_basket alms_box safe tin_cabinet tin_cabinet_b apoth_drawers cupboard sideboard nightstand linen_press
-    dressing_table powder_kegs ossuary milk_churn bookcase bookcase_b bread_shelf bread_shelf_b bread_case cooling_rack
-    counter_case counter_case_b store_shelf store_shelf_b jar_shelf jar_shelf_b bottle_shelf bottle_shelf_b cold_shelf
-    herb_rack leech_jar rope_coil bones tool_rack axe_block keg_rack`,
-  interact: `stump log fallen_log firewood woodpile timber_set log_basket boulder rock_pile ore_pile rubble planks
-    mushrooms water_bucket bucket snare wheelbarrow drying_frame saw_horse grindstone workbench anvil forge kiln
-    mortar_table still shaping_table dough_trough peel_rack couche_rack`,
-  keep: `fern leaf_litter cobweb rug wall_bulb draped_window window stained_glass stained_glass_e signpost lamp_table
-    lamp_post lantern_hook lantern_pole wall_lamp miners_lamp candle_stand votive_rack fireplace_e inglenook_e clock
-    coat_stand coat_rack armchair settle stool pew bench tavern_table tavern_table_b card_table dining_table tea_table
-    side_table vane_portrait chalkboard tide_chart hymn_board memorial portrait photos pit_prop sawdust cart
-    harness_rack boot_rack washstand wall_shelf shelf flower_stand feed_trough bar_counter bar_counter_lamp
-    bar_counter_taps counter_case_x birdcage chair compressor font lectern piano pulpit scarecrow ship_wheel show_globe
-    tin_cabinet_x writing_desk bunks_n bunks_s clamp crepe den drowned_lantern flume gearing hanging_oak head_saw
-    ledger_desk map_table mess_table ore_cart pegs pump_beam refuge_table rope shelves tally_board telephone trestle
-    mortar_x`,
-};
-const stemDecision = new Map();
-for (const [d, list] of Object.entries(BY_STEM)) for (const s of list.split(/\s+/)) stemDecision.set(s, d);
-const decide = (p) => (p.kind === 'dressing' || p.kind === 'decor' ? stemDecision.get(stemOf(p)) : BY_KIND[p.kind]);
+const kindDecision = toMap(census.kinds);
+const stemDecision = toMap(census.stems);
+const decide = (p) =>
+  p.kind === 'dressing' || p.kind === 'decor' ? stemDecision.get(stemOf(p)) : kindDecision.get(p.kind);
 
 if (process.argv.includes('--audit')) {
   const tally = { live: 0, interact: 0, container: 0, keep: 0 };
