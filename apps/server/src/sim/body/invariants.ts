@@ -4,7 +4,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { registerInvariant } from '../auto/invariants';
 import { simOf } from '../RoomSim';
 import { isWorldPhase } from '../World';
-import { bodies } from './state';
+import { bodies, ownsWireEffect } from './state';
 
 /**
  * The body invariant (round 8, 8A; GDD 3.22, docs/round8/body.md 8), registered beside round 6's seven checks and
@@ -59,11 +59,14 @@ function bodyBounds(room: PartyRoom): InvariantFailure | null {
   for (const [id, p] of sim.players) {
     const wire = room.state.players.get(id)?.priv.body;
     const since = lingeringOf(room).get(id) ?? room.state.tick;
-    if (p.dead && wire && (wire.hp !== 0 || wire.effects.length !== 0) && room.state.tick > since)
-      return fail(
-        room,
-        `${id}: a dead seat still reads health ${wire.hp} with ${wire.effects.length} effects`,
-      );
+    // A foreign row (Indebted, 3.23) is left as found, on a death too (GDD 3.22), so only the body's own rows count.
+    const own = wire
+      ? Array.from({ length: wire.effects.length }, (_, i) => wire.effects.at(i)).filter(
+          (e) => e && ownsWireEffect(e.id),
+        ).length
+      : 0;
+    if (p.dead && wire && (wire.hp !== 0 || own !== 0) && room.state.tick > since)
+      return fail(room, `${id}: a dead seat still reads health ${wire.hp} with ${own} effects`);
     if (!p.dead && isWorldPhase(room.state.phase) && bodies(room).size > 0 && !bodies(room).has(id))
       return fail(room, `${id}: a living seat without a body`);
   }
