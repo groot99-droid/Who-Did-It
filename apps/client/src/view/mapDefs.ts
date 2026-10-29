@@ -32,6 +32,10 @@ export const INTERACTABLE_PROPS: Record<string, string> = {
   taskSource: 'Task',
   lanternPost: 'Lamp',
   oven: 'Oven',
+  // Round 10, A7 (GDD 3.32): the beds a seat sleeps in.
+  bed: 'Bed',
+  cot: 'Cot',
+  innBed: 'Bed',
 };
 
 /** Height in screen px of the greybox of a prop kind, and of a building. */

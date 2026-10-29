@@ -935,6 +935,92 @@
      }
     }
    ]
+  },
+  {
+   "image": "props-1.png",
+   "format": "RGBA8888",
+   "size": {
+    "w": 64,
+    "h": 32
+   },
+   "scale": 1,
+   "frames": [
+    {
+     "filename": "prop_bed",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 48
+     },
+     "spriteSourceSize": {
+      "x": 9,
+      "y": 20,
+      "w": 46,
+      "h": 24
+     },
+     "frame": {
+      "x": 2,
+      "y": 2,
+      "w": 46,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.6667
+     }
+    },
+    {
+     "filename": "prop_cot",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 48
+     },
+     "spriteSourceSize": {
+      "x": 9,
+      "y": 20,
+      "w": 46,
+      "h": 24
+     },
+     "frame": {
+      "x": 2,
+      "y": 2,
+      "w": 46,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.6667
+     }
+    },
+    {
+     "filename": "prop_innBed",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 48
+     },
+     "spriteSourceSize": {
+      "x": 9,
+      "y": 20,
+      "w": 46,
+      "h": 24
+     },
+     "frame": {
+      "x": 2,
+      "y": 2,
+      "w": 46,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.6667
+     }
+    }
+   ]
   }
  ],
  "meta": {
