@@ -79,7 +79,7 @@ So that the owner can see why nothing moves:
 | The camera angles (tilt 60°, yaw 45°) | Every atlas re-rendered. `@wdi/shared/iso` and its test, the tilemap exporter (5J), every scene's tilemap, the occlusion shells and the decal transform changed. The 2:1 diamond is what keeps tiles on whole pixels. A different tilt breaks that. |
 | The display scale (90.51 px per m) | The same as the angles, because the 128 x 64 diamond is that scale. |
 | `iso.zScale` (0.75) | Every world frame re-rendered. Walls' `wallHeightM` reads, the 96 px occluder rule (SPRITES 10.7), `topPadPx` and the 112 px cap all re-measured. |
-| The packed character cell (64 px, 128 in HD) | It is a budget line, 11B's. A141 and SPRITES 10.14 already show that 128 px packed cells quadruple every frame and break the resident cap. |
+| The packed character cell (64 px; 256 px in HD) | It is a budget line, 11B's. A141 and SPRITES 10.14 already show that 128 px packed cells quadruple every frame and break the resident cap. HD renders its 128 px display cell at `STYLE_FACTOR` 2, and `hd.ts` packs it unhalved, so the HD cell is 256 px packed (art.md 3; the manifests write `cell` 256). SPRITES 10.14's "the 128 px packed cell is the HD style's" does not match the code. The round-11 plan corrects that line. |
 | `figureScale` | A client number: no re-render. It stays 1 unless the owner's playtest asks for larger figures (art.md 2). |
 | The 112 px cap | The four-heads base is designed to it (`probe_cap.py`). Raising it means a taller cell and every look re-probed. |
 
