@@ -39,7 +39,6 @@
     "orePile": "interact",
     "counter": "shop"
   },
-  "carries": [],
   "ignore": [
     "dressing",
     "kitChest",

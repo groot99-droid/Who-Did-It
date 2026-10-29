@@ -15,7 +15,6 @@ import {
 import { MAX_PLAYERS, MIN_PLAYERS_TO_START, Phase, TICK_RATE, TILE_PX, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { handleHold } from '../Hold';
-import { addStack } from '../Inventory';
 import { mapScenesOf } from '../MapSites';
 import { type PlayerSim, simOf } from '../RoomSim';
 import { navGrid, profileOpen, sceneIndex, sceneKey, tileCentre } from '../World';
@@ -190,14 +189,10 @@ export function drawPersona(
 export function drawPersonas(room: PartyRoom, mem: NpcMemory): void {
   const profile = profileForParty(room);
   const taken = new Set<SceneId>();
-  for (const [i, id] of mem.order.entries()) {
+  for (const id of mem.order) {
     const persona = drawPersona(room, id, taken, profile);
     mem.brain(id).persona = persona;
     if (persona.home) taken.add(persona.home);
-    // Round 10, D2: the seat's tool, by seat order, so its gathers take real stock (no draw).
-    const tool = routines.carries[i % Math.max(1, routines.carries.length)];
-    const player = room.state.players.get(id);
-    if (tool !== undefined && player) addStack(player, tool, 1);
   }
 }
 
