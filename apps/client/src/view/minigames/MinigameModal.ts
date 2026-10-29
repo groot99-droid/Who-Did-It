@@ -2,7 +2,14 @@ import balance from '@wdi/content/data/balance.json';
 import tasks from '@wdi/content/data/tasks.json';
 import { M5B_COPY as C } from '../../ui/copy/m5b';
 import { h } from '../../ui/dom';
-import { MINIGAMES, skinOf, type MiniGame, type MiniGameFactory, type MiniGameSpec, type MiniKind } from './registry';
+import {
+  MINIGAMES,
+  skinOf,
+  type MiniGame,
+  type MiniGameFactory,
+  type MiniGameSpec,
+  type MiniKind,
+} from './registry';
 import { bandRng } from './board';
 import type { MinigameKind } from '@wdi/shared/protocol';
 
