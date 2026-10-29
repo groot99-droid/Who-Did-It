@@ -3892,3 +3892,39 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   `train.dusk.*` keys of the balance schema. BlackPine has no station (GDD 3.3, the Daily Train), so its daylight deaths stay final;
   whether it gets one is the owner's question. 10A's A7a grant: greybox `bed`, `cot` and `innBed` frames from
   `tools/sprites/placeholder.ts` and their `INTERACTABLE_PROPS` labels, until the real art.
+- 2026-10-29: A12a (#323) merged at 7052180, A11 (#327) at e9b2335, #329 (the README's compaction fix and wire row 6)
+  at 159caaa, A7a's bed frames (#331) at a9079c8, A12b (#324) at 558d05f, A3b (#328) at f337983 and A4 (#330) at
+  86e8422, which ends 10G's steps. 10B started from `claude/r10-tier-800k` with the base at f337983 merged in, on B1,
+  and reports an 800000 window (threshold 767000). A7a may run to about 474 lines in one pull request, 311 of them
+  code, and A13b to about 692: the inventory screen always shows its crafting square (logic-table 8.6), and the
+  screen's half of a split would still pass 400. Grants: 10F's D1 rewrites the npcRoutine tests P1, P3, R5 and P4 in
+  place and adds P1b (a station found by its class, the human given the class's tool first, the keys with no station
+  on S1 skipped through an explicit list asserted equal to the computed set, the shop hold asserting the shop is
+  open); 10B's B1 adds hooks in 10D's `sim/townsfolk/{figures,run,mug,invariants}.ts` (`figureNotSeat` still refuses
+  a card's look), about six lines in 10C's `sim/body/fists.ts`, optional fields in the content schemas `looks.ts`,
+  `routines.ts` and `validate.ts`, and the counts in `townsfolk.test.ts`. A guard's foe never goes on the wire as a
+  seat id. On 10H's request for A13a, wire row 7 (`craft.grid`).
+- 2026-10-29: #334 (wire row 7) merged at 551e61e, D1 (#333) at 4aa365b and 10H's figures fix (#338) at ab1430e,
+  which draws the townsfolk figures from their own look and `figureName`, never from the roster (A160's open EntityView
+  item). 10G and 10F are done. 10D started from the base at 4aa365b, on D2. Grants: 10A's A7a adds `homes` to the
+  stream allowlist of `npcRoutine.test.ts` R17 (the human seats' homes, drawn from their own stream, never the
+  deal's); A7b adds the optional `maxStaminaFactor` to the effects schema, appends `exhausted` (13) to `EffectId`
+  with no public status bit, and draws `icon_effect_exhausted.svg` in the house style. A holdout whose card holds a
+  night power, or who is on a manhunt, is never Exhausted (followup-4 2.11). Round 11's planning starts at the
+  playtest gate (`docs/round11/README.md`).
+
+## Round 11 (planning, started 2026-10-29)
+
+Round 11 plans **the full Blender makeover** while round 10 builds. The owner set it on 2026-10-29: the pipeline half
+(camera, lighting, materials, render passes and budgets) starts when round 10's playtest gate opens, and the asset list
+is filled in at round 10's content freeze. The contract is `docs/round11/README.md`. A round-11 planning session
+writes under `docs/round11/` and nowhere else; `round11-plan.md` follows the owner's answers, and the round builds
+after round 10's final sweep.
+
+| Session | Model | Compaction | Spawned from | Writes | Starts |
+|---|---|---|---|---|---|
+| **11A. The render pipeline** | Opus | 800k | `claude/r10-tier-800k` | `docs/round11/pipeline.md` | when the playtest gate opens |
+| **11B. Materials, styles and budgets** | Opus | 800k | `claude/r10-tier-800k` | `docs/round11/look.md` | when the playtest gate opens |
+
+A session is spawned with the prompt "You are session 11X of docs/SESSIONS.md Round 11 (Opus, 800k). Read
+docs/round11/README.md, then the documents and tools your part names." 6Z adds the spawn branch and the first branch.

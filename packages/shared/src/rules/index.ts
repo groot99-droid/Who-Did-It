@@ -14,3 +14,5 @@ export * from './cutscenes';
 export * from './minigames';
 // Round 10, A12 (GDD 3.30): the inventory's slot layout.
 export * from './inventory';
+// Round 10, A13 (GDD 3.30): the crafting grid's match.
+export * from './craftGrid';

@@ -44,6 +44,7 @@ the full check. A JSON conflict keeps both sides' keys. A conflict in another se
 | 4 | Two client messages, queued and consumed in `step()` and refused with A1's reasons: `inv.move {from, to}` moves, swaps or merges whole stacks between slots, checking what each slot takes; `inv.select {slot}` picks the held hotbar slot. Nothing public shows the held item | from the own client; the result only in its private view | A12 |
 | 5 | Sleeping: `Private.home`, the seat's home scene id, drawn at the deal from the bed interiors of the NPC persona pool and never from the card, so it says nothing about a cover; `Private.asleep`; and, written only while the seat is asleep, `Private.inBed` and `Private.inBedOf`, the counts for `phases.md` 13.4's "2 of 3 in bed" (active seats in bed, active seats in all), zero while awake. No count is public, and no name goes out | own client only | A7a (joins 7) |
 | 6 | On the line: `Private.onLine`, true from a daylight death until the morning train returns the seat. `S2C.killed` keeps its shape and carries `roles: {}` while the seat is on the line, so a seat that returns never had the ghost view; an on-line seat gets no scene, no avatars and no ghost channel | own client only | C1 (joins 7) |
+| 7 | The crafting grid: `craft.grid {size, cells}`, a client message queued and consumed in `step()` and refused with A1's reasons. The inputs and the product move only in the seat's private inventory (row 1), and the craft has no hold, so nothing public shows that a seat crafted or what | from the own client; the result only in its private view | A13a |
 
 Every other round-10 row is added here by 6Z when a session asks, before it lands. What must never go on the wire:
 who is awake by name (A8), who signed a petition beyond the count the screen shows, the Hitman's seat, a hardship's
@@ -65,8 +66,8 @@ A session edits outside its paths only through a shared file of section 1, or wi
 | 10D | `minigames.json`, `sim/Minigames.ts` (lock-pick, jail), `sim/economy/rent.ts`, `economy.json`, `quests.json`, `lore.json` tips, `sim/townsfolk/*`, the bakery and mill scenes' props |
 | 10E | `achievements.json`, `story.json`, the achievement step evaluation, the client's device record, the chapter cards |
 | 10X, 10Y | anything, one fix per pull request, after checking no live session owns the path (10X server, rules and content; 10Y client, copy and art) |
-| 10Z | `docs/**` |
-| 6Z | `docs/round10/**`, the Round 10 section of `docs/SESSIONS.md`, A223 and A224 |
+| 10Z | `docs/**`, except `docs/round11/**` (round 11's planning, `docs/round11/README.md`) |
+| 6Z | `docs/round10/**`, the Round 10 section of `docs/SESSIONS.md`, A223 and A224; `docs/round11/README.md` and the Round 11 section |
 
 Where two sessions' files meet (A6 and C1 in `sim/Death.ts`, A12 and C6 in a robbery, D1 and B1 in the NPC routines),
 the later session builds on the merged earlier one and does not reshape it.

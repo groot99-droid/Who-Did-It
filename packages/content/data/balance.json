@@ -235,7 +235,7 @@
       },
       "stationDwellS": { "min": 12, "max": 30 },
       "workPauseS": { "min": 1, "max": 3 },
-      "idleS": { "min": 2, "max": 8 },
+      "idleS": { "min": 2, "max": 6 },
       "idleChanceAfterLeg": 0.6,
       "strollTiles": { "min": 3, "max": 10 },
       "sceneDwellS": { "min": 30, "max": 90 },
@@ -385,5 +385,6 @@
     },
     "gddRef": "3.8"
   },
-  "inventory": { "hotbar": 6, "belt": 2, "gddRef": "3.30" }
+  "inventory": { "hotbar": 6, "belt": 2, "gddRef": "3.30" },
+  "guard": { "leashTiles": 6, "angerS": 20, "gddRef": "3.24" }
 }

@@ -233,7 +233,7 @@ The section keeps its number so 3.12 to 3.21 keep theirs.
 
 - **Seats.** Start is enabled with at least 1 human. With fewer than `players.min` players the server adds NPCs up to `players.min` when Start is accepted, before it deals, so the full deck row is always dealt (M3c; the A28 cut row is gone); the leader may add NPCs by hand in the lobby with "Add NPC" up to `players.max` and remove them again, the newest seat first (M3c). A human joining a full lobby takes an NPC's seat, the newest first (M3c). (M5a) An NPC seat is never Ready the moment it appears: a seat added with Add NPC, and every NPC seat when a match returns to the lobby, turns Ready 2-9 s later (`npc.ready.delayS`), each on its own draw, the way a human clicks.
 - **Same game.** NPCs are dealt from the same deck and can hold any card, the Killer included; their cards are as secret as a human's. Rules, the practice label at 4 (3.1, 3.9) and any ranking depend only on the total player count, never on how many seats are NPCs. (M5a) In the main mode an NPC walks as its card's character like every seat; an NPC cover role wears the look it was shown and never Impersonates (3.17); an NPC holding a night power uses it as 3.2 says, at the moment "Meetings, the role card and night powers" below gives.
-- **Hidden seats.** Nothing a client receives marks a seat as an NPC: `isNpc` lives in room memory only, and NPCs take human-style names from a name pool, are never the party leader, and carry an id of the same shape as a session id; the party publishes only how many seats are NPCs, never which (M3c). (M5a) **Everything an NPC shows is something a human can do the same way in the same place.** It walks at walking speed and never runs or sneaks. It never turns on the spot: it faces where it last stepped, and it ends every approach to a station with a step toward the station. It starts a hold only with the verb a human uses (`act.hold`), so it plays the `interact` animation only while a hold the server accepted from it runs, and it works with that animation only at stations where a human could start the same hold (`routines.json` `holds`; there are none in M5a, so at every station it simply stands, idle). Its ready and vote ticks are spread over the spans a human uses (below). (Round 8, 8T) An NPC never writes in the named chat; it writes meeting notes (3.8), which carry no speaker, so a
+- **Hidden seats.** Nothing a client receives marks a seat as an NPC: `isNpc` lives in room memory only, and NPCs take human-style names from a name pool, are never the party leader, and carry an id of the same shape as a session id; the party publishes only how many seats are NPCs, never which (M3c). (M5a) **Everything an NPC shows is something a human can do the same way in the same place.** It walks at walking speed and never runs or sneaks. It never turns on the spot: it faces where it last stepped, and it ends every approach to a station with a step toward the station. It starts a hold only with the verb a human uses (`act.hold`), so it plays the `interact` animation only while a hold the server accepted from it runs, and it works with that animation only at stations where a human could start the same hold (`routines.json` `holds`; round 10, D1: the gather classes and the counters, Chores below). Its ready and vote ticks are spread over the spans a human uses (below). (Round 8, 8T) An NPC never writes in the named chat; it writes meeting notes (3.8), which carry no speaker, so a
   table cannot tell its notes from a human's: each NPC seat, whatever its card, means to write 1 to 3 notes a meeting
   (`talk.npc.notesPerMeeting`), at ticks drawn over 0.05-0.8 (`talk.npc.windowFrac`) of the discussion plus the vote
   time from its own `talk:<seatId>` stream, and a note the limits refuse waits for the next tick. Its lines come from
@@ -250,7 +250,7 @@ The section keeps its number so 3.12 to 3.21 keep theirs.
 
 - **Routines (M5a, main mode).** In a world phase an NPC runs a routine instead of the M3c wander.
   - **Persona.** When the match is dealt, each NPC draws a **home**, one interior scene of the map that is open at the party's size and lit at night (see Night; no two NPCs share a home while the map has enough), and **3 favourite stations** (`npc.routine.favouriteStations`), in 3 different scenes where the map allows.
-  - **Stations.** A station is a prop whose kind `routines.json` lists under an activity: **work** (the task benches and sources, the pump, the flour bin, the oven, the basins, the goat, the fence, the shutters) by day; **social** (the notice board, the dartboard, the bell, the lamps, the furniture and decorations) by day and by night; **rest** (the lantern posts) by night. Grace, day and immunity are the **day** class of phases; dusk, night and the Final Night hunt the **night** class (`routines.json` `phaseClasses`). Props of any other kind (the kit chest, the teaching clue, keys, gas pockets, locked doors, the frozen round-4 bakery props) are never stations.
+  - **Stations.** A station is a prop whose kind, or whose class in the logic table (3.14, round 10 D1), `routines.json` lists under an activity; a prop's class wins over its kind: **work** (the task benches and sources, the pump, the flour bin, the oven, the basins, the goat, the fence, the shutters) by day; **gather** (the lumber, stump, timber-set, boulder, rock-pile and ore-pile classes) by day; **trade** (the shop counters) by day; **social** (the notice board, the dartboard, the bell, the lamps, the furniture and decorations) by day and by night; **rest** (the lantern posts) by night. Grace, day and immunity are the **day** class of phases; dusk, night and the Final Night hunt the **night** class (`routines.json` `phaseClasses`). Props of any other kind or class (the kit chest, the teaching clue, keys, gas pockets, locked doors, the frozen round-4 bakery props) are never stations.
   - **Choosing.** Whenever an activity ends, the NPC draws the next one from its phase class's weights:
 
     | Class | work | stroll | idle |
@@ -258,10 +258,15 @@ The section keeps its number so 3.12 to 3.21 keep theirs.
     | Day (`npc.routine.weights.day`) | 0.5 | 0.3 | 0.2 |
     | Night (`npc.routine.weights.night`) | 0.2 | 0.3 | 0.5 |
 
-  - **Work.** The NPC walks to a station and stays 12-30 s (`npc.routine.stationDwellS`): about 2 stations in a 60 s day. A station qualifies when its activity is open in the phase class, its prop and scene are present and open at the party's size, its scene belongs to the map and is reachable, at night its scene is lit, it is not the station the NPC just left, and no other NPC is at it or heading for it. Until the NPC's **scene dwell** has run (30-90 s, `npc.routine.sceneDwellS`, drawn at every scene entry and at every placement on the square) only stations of its own scene qualify; once it has run, only stations of scenes one open door away do, so the NPC moves on one scene at a time and never passes through a scene without its dwell (a Killer NPC's hunt, below, is the exception). It takes a favourite when one qualifies, else a qualifying station at random; when no station of another scene qualifies it falls back to its own scene's, and when none qualifies at all it strolls instead. It stands at the centre of a floor tile orthogonally next to the station, inside the verb reach (1.5 tiles, 3.7), and takes one last step toward the station, so it faces it. If another seat already stands on that tile when it arrives, it idles where it is and picks again. Where `routines.json` `holds` names a hold for that kind of prop, it works in cycles: it starts that hold with the human verb and, when the hold ends, pauses 1-3 s (`npc.routine.workPauseS`) before the next; a refused hold ends the cycles for that visit and it just stands. Where `holds` names none (every station in M5a), it stands there, idle, for the whole dwell.
+  - **Work.** The NPC walks to a station and, where `holds` names a hold for it, works it for up to 12-30 s (`npc.routine.stationDwellS`); a station with no hold is a **stop** of an idle's length (`npc.routine.idleS`), which counts as its stand between actions. A station qualifies when its activity is open in the phase class, its prop and scene are present and open at the party's size, its scene belongs to the map and is reachable, at night its scene is lit, it is not the station the NPC just left, no other NPC is at it or heading for it, no other seat is running a hold on its prop, and the NPC can work it now (Chores). Until the NPC's **scene dwell** has run (30-90 s, `npc.routine.sceneDwellS`, drawn at every scene entry and at every placement on the square) only stations of its own scene qualify; once it has run, only stations of scenes one open door away do, so the NPC moves on one scene at a time and never passes through a scene without its dwell (a Killer NPC's hunt, below, is the exception). It takes a favourite when one qualifies, else a qualifying station at random; when no station of another scene qualifies it falls back to its own scene's, and when none qualifies at all it strolls instead. It stands at the centre of a floor tile orthogonally next to the station, inside the verb reach (1.5 tiles, 3.7), and takes one last step toward the station, so it faces it. If another seat already stands on that tile when it arrives, it idles where it is and picks again. Where `routines.json` `holds` names a hold for that class or kind of prop, it works in cycles: it starts that hold with the human verb and, when the hold ends, pauses 1-3 s (`npc.routine.workPauseS`) before the next; a refused hold ends the visit on the next tick (round 10, D1; before it, the NPC stood out the dwell).
+  - **Chores (round 10, D1; living-world.md 1.8).** An NPC seat is never idle: its routine is a chain of real actions a watcher reads as a player's, and it idles only between actions.
+    - **Gather.** At a logic-table prop it holds `act.hold {action: 'interact'}` through the same resolver as a human (3.14). The station qualifies only while some mode runs with the tools the seat holds and the prop is not spent, so it meets the same walls as a human: no axe, no chopping, and bare hands break only rubble. The drops land in its own pack.
+    - **Trade.** At a shop counter it opens the shop with `act.hold {action: 'shop'}` and sells, with `act.sell`, everything it holds that the shop buys, then pauses 1-3 s (`workPauseS`) and moves on. A counter qualifies only while the seat holds something its shop buys, so an NPC sells only what it gathered, crafted or bought, and an empty pack never walks to a counter.
+    - **Nothing waits on it.** When another seat, human or NPC, runs a hold on the prop it is working, the seat finishes its own hold, starts no other, and steps off after a 1-3 s pause (`workPauseS`, never on the same tick); no NPC picks a prop another seat is holding.
+    - **Between actions.** A stand (an idle, a stop, a leg pause) is never followed by another: the next choice after one is an action, the idle band of the draw read as work or stroll by their weights (no extra draw), and a walk that cannot start after a stand turns into a second of the M3c wander (Fallback) rather than an idle. An idle that runs out is followed on the same tick.
   - **Stroll.** The NPC walks to a random floor tile of its own scene 3-10 tiles away along a path (`npc.routine.strollTiles`).
-  - **Idle.** The NPC stands still 2-8 s (`npc.routine.idleS`), facing where it last walked.
-  - **Legs and pauses.** A walk inside one scene that ends at a portal, and a stroll, is a **leg**; after a leg the NPC idles 2-8 s with chance 0.6 (`npc.routine.idleChanceAfterLeg`); the last walk to a station ends in work, not in an idle. An NPC that has walked 12 s (`npc.routine.maxWalkS`) without standing still for 2 s (`idleS` minimum) stops and idles 2-8 s, then goes on with what it was doing. A goal it has no path to, whose crossing is refused, or on which it moves less than a quarter tile in 2 s (`npc.routine.stuckS`) is dropped: it idles and picks again, never the same station.
+  - **Idle.** The NPC stands still 2-6 s (`npc.routine.idleS`; 2-8 s before round 10, D1), facing where it last walked.
+  - **Legs and pauses.** A walk inside one scene that ends at a portal, and a stroll, is a **leg**; after a leg the NPC idles 2-6 s with chance 0.6 (`npc.routine.idleChanceAfterLeg`); the last walk to a station ends in work, not in an idle. An NPC that has walked 12 s (`npc.routine.maxWalkS`) without standing still for 2 s (`idleS` minimum) stops and idles 2-6 s, then goes on with what it was doing. A goal it has no path to, whose crossing is refused, or on which it moves less than a quarter tile in 2 s (`npc.routine.stuckS`) is dropped: it idles (or, just after a stand, wanders a second) and picks again, never the same station.
   - **Clues.** The first time an NPC sees a clue it has not collected (inside its vision radius, 3.7), it decides with chance 0.5 (`npc.react.collectChance`) to collect it; at its next choice, if it is still in the clue's scene and the clue is still there, it walks to the clue and holds Collect exactly as a human does (2 s, 3.4), and the entry goes to a Notebook nothing reads. It never tries during immunity, when no verb works.
   - **Fallback.** In a scene with neither a qualifying station nor a stroll tile, the NPC walks as in M3c: a new heading every 1-3 s (`npc.wander.stepMinS` to `npc.wander.stepMaxS`), aimed at the nearest portal with chance 0.25 (`npc.wander.portalSteerChance`), a portal in reach taken with chance 0.4 (`npc.wander.portalChance`), until it reaches a scene with somewhere to go.
   - **Targets.** An NPC walks for about a third of a day. The server tests hold every NPC to walking at most 60% and at least 10% of a day, to a still stretch of at least 2 s in every 20 s of day, and to no portal crossing before its scene dwell has run (outside the exceptions below).
@@ -585,6 +590,11 @@ the tap as they add a step to the others.
 **Decision (owner, 2026-10-17, A49):** every seat walks the main-mode world as its card's character, so roles are public by sight, except the cover roles, which always wear another card's look; the Killer can also borrow a living seat's face for a few seconds. In the quick mode (3.11) role art is private (your own card and night scene) and public only at game over.
 
 **Looks.** Every card of a deck is a character, a row of `looks.json`: a portrait (the role card, the meeting roster, the reveals, the end screen) and, for a non-cover card, a world character drawn in the 8 directions under `char/<lookId>/<anim>/<dir>` at the seat's height scale with its scarf tinted. The three cover cards (Killer, Accomplice, Drifter) have portraits only and no world character: nobody ever walks as a Killer. Look ids are public and name the character (`vicar`, `baker`), and every client loads the characters and portraits of the match's whole deck before the role card closes, so what a client loads never depends on its own card.
+
+**Figure looks (round 10, B1).** Besides the cards' looks and the villager family, `looks.json` `figures` holds
+the looks of figures that are not seats and not townsfolk: the `constable` (3.31) alone. A figure look has no card
+and no portrait, and a cover can never take one. Its atlas keys are `char/constable/<anim>/<dir>`; until its art
+lands the client draws its fallback villager body in its place; the wire always says `constable`.
 
 **The public look.** `Player.look` holds each seat's look id. It is empty for every seat during the role card and is written for every seat in the same tick when the card closes: a non-cover seat's look is its card's, a cover seat's is the look it picked. From then on the roster, the nameplate, the meeting portraits and a seat's body all show that look, for the whole match.
 
@@ -1021,6 +1031,19 @@ knockout (3.22, the reduced body) reaches a figure only once the strike hook of 
 `figureNotSeat` (auto 50) checks that no figure is in any seat list, vote, death or meeting, and that no figure
 avatar carries a seat's handle, the ghost tag or a card's look.
 
+**Guard figures (round 10, B1, A229; F4 2.2).** The Company Clerk and the two Constables of every map (3.31) are
+guards: figures that "don't move very far and fight when hit" (the owner). A guard row of `routines.json`
+`townsfolk` (`guard`, with `count` figures, the Constables 2) spawns after the counted townsfolk, so it never takes
+a place of `townsfolk.count`. Its **post** is the first prop on the map of its row's kinds (the second Constable
+starts from the row's second kind, so the two keep different posts); it walks only its row's props in the post's
+scene within `guard.leashTiles`, and by night it stands at its post. It has the reduced body of a figure. A seat's
+fist or slingshot (3.22) lands on a guard's body like a seat's: at zero health it is knocked out for `body.koS` and
+stands down. A guard still standing turns on the seat that struck it and swings the fist's row at it on the strike's
+cooldown while that seat stays in its scene, within its leash and on its feet, for `guard.angerS`; then it walks back
+to its post. Its blows knock out, never kill. A guard reads only who struck it, never a card, and never mugs. The
+Knife does not reach a guard yet (C5). A Constable wears the `constable` look (3.17); the Clerk keeps the villager's.
+`figureNotSeat` accepts the `figures` looks of `looks.json` beside the villager family.
+
 **The mugging (8E, A180).** A Hungry, Angry or Desperate figure or NPC seat that is alone with one seat rolls each
 second for a mugging, on its own stream (`townsfolk:<figure>`, or the NPC's choices stream) and only while in such a
 mood, so a calm match draws nothing new. "Alone" is the A100 room rule (3.12): any scene but the map's hub, the only
@@ -1105,13 +1128,35 @@ A gain that does not all fit changes nothing and refuses `PACK_FULL`. A take emp
 or swaps it with the stack there when each slot takes the other's item; anything else refuses `BAD_REQUEST`, since the
 screen offers only the moves that land. `inv.select` picks the held hotbar slot. Both are consumed in `step()`.
 
+**The screen** (A13b, UI.md 14.44). The inventory screen (I) draws the hotbar, the pack, the belt and the head, body
+and weapon slots as grids with the crafting square beside them. Pick a stack, then a slot: the slots that would refuse
+the move are dimmed, so the screen offers only the moves that land. The hotbar strip is on screen during a match and its
+slots, or the keys 1 to 6, select the held one. The square previews the product and Take sends `craft.grid`.
+
 **A dropped body.** When a body is dropped (the train's return, a robbery), it loses the hotbar, the pack, the belt and
 the purse. Bound kit (`onDeath: kept`), the gear slots and the bank stay with the seat. A match's end empties the
 inventory and the held slot resets to the first.
 
+**The crafting grid** (A13a). `craft.grid {size, cells}` sends the grid row by row: `size` 2 (the pocket square, always
+there) or 3 (within reach of a workbench), each cell an item id or empty, one unit per cell. The server matches a hand
+recipe (one with no station): a recipe is **shapeless** (the cells hold exactly its inputs, in any places) unless it
+carries a `shape`, rows of item ids that the cells must show, anywhere in the grid and mirrored (the Torch is a Pine
+Resin over a Timber; the Snare is shapeless). A pattern wider than the pocket square needs a workbench too. The check
+runs in this order: a malformed grid refuses `BAD_REQUEST`; a role-bound item in any cell refuses `GRID_BOUND` whatever
+the recipes say (and no recipe takes one); a 3 by 3 grid or a wide pattern away from a workbench refuses `NEED_STATION`
+(workbench); nothing matching refuses `GRID_NO_RECIPE`; cells the seat does not hold refuse `NEED_MATERIALS`; a product
+that does not fit refuses `PACK_FULL`. On a match the inputs go and the product arrives as one change inside `step()`,
+with no hold. Station recipes (the basin's Axe, the oven's Lantern) stay at their stations and the older `craft` hold.
+
 ### 3.31 Law enforcement and petitions
 
-Round 10, B1 to B4 (`docs/round9/gdd-map.md` 2.5). Not built yet: the step that builds it writes this section.
+Round 10, B1 to B4 (`docs/round9/gdd-map.md` 2.5; `docs/round9/world-mode.md` 3.1, `followup-4.md` 2.1 and 2.2).
+
+**The Constables (B1, A229).** The county's law: two figures per map, never seats (3.24), with no card, no vote, no
+task list and no part in any win, wearing the `constable` look (3.17). They are guards (3.24): each keeps a post at
+the square (HollowMere's notice board and bell, BlackPine's camp board and bell) within `guard.leashTiles`, has
+health, and fights back when struck. They read only what the world shows, never a card. The briefing, the
+petition and the manhunt are B2 to B4; until then a Constable keeps its post.
 
 ### 3.32 Sleeping
 

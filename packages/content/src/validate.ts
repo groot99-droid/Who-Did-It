@@ -30,7 +30,7 @@ import type { LoreFile } from './schemas/lore.js';
 import { checkLore } from './validateLore.js';
 import type { TalkFile } from './schemas/talk.js';
 import { checkTalk } from './validateTalk.js';
-import type { InteractionsFile } from './schemas/interactions.js';
+import { classesOfProp, type InteractionsFile } from './schemas/interactions.js';
 import { checkInteractions } from './validateInteractions.js';
 
 export interface Content {
@@ -656,6 +656,22 @@ function checkDecksAndLooks(c: Content, err: (msg: string) => void): void {
     }
     if (!dealt.has(look.role)) err(`${where}: no deck deals ${look.role} (orphan art)`);
   }
+
+  // Round 10, B1 (GDD 3.17): a figure look is its own, never a card's or the villager family's; a townsfolk row
+  // wears a villager look or a figure look, never a card's.
+  const figures = looks.figures ?? {};
+  for (const [key, look] of Object.entries(figures)) {
+    if (key !== look.id) err(`looks.json figures: key "${key}" holds look "${look.id}"`);
+    if (key in looks.looks || key in looks.villagers) err(`looks.json figures: "${key}" is already a look`);
+    if (look.bodyAtlas !== `char_${key}` || look.overlayAtlas !== `ovl_${key}`)
+      err(`looks.json figures: ${key}'s atlases must be char_${key} and ovl_${key}`);
+  }
+  for (const [kind, row] of Object.entries(c.routines.townsfolk)) {
+    if (!(row.look in looks.villagers) && !(row.look in figures))
+      err(`routines.json townsfolk ${kind}: look ${row.look} is neither a villager nor a figure look`);
+    if (row.count !== undefined && !row.named)
+      err(`routines.json townsfolk ${kind}: count needs a named row`);
+  }
 }
 
 /**
@@ -705,11 +721,14 @@ function checkRoutines(c: Content, err: (msg: string) => void): void {
       return ch === '.' || ch === 'S';
     };
     for (const prop of scene.props) {
-      if (!known.has(prop.kind)) {
+      // Round 10 (D1): a prop whose class is a station is one, whatever its kind.
+      const [cls] = classesOfProp(c.interactions, prop);
+      const station = stationKinds.has(prop.kind) || (cls !== undefined && stationKinds.has(cls));
+      if (!station && !known.has(prop.kind)) {
         err(`routines.json: prop kind "${prop.kind}" (${prop.id}) is neither a station nor ignored`);
         continue;
       }
-      if (!stationKinds.has(prop.kind)) continue;
+      if (!station) continue;
       const { x, y } = prop;
       const stand = [
         [x, y],

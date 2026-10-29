@@ -1,6 +1,8 @@
 import {
   balance,
   biomeOf,
+  classesOfProp,
+  interactions,
   isDarkScene,
   profileFor,
   routines,
@@ -16,6 +18,7 @@ import { handleHold } from '../Hold';
 import { mapScenesOf } from '../MapSites';
 import { type PlayerSim, simOf } from '../RoomSim';
 import { navGrid, profileOpen, sceneIndex, sceneKey, tileCentre } from '../World';
+import { holdOf, otherAt, sellAt, workable } from './chores';
 import { type Act, type Brain, type NpcMemory, playRng } from './memory';
 import { moodWeights } from './needs';
 import { GOAL_SLACK, drive, firstPortalToward, stand, walkThrough, walkTo, wander } from './walk';
@@ -60,11 +63,16 @@ export function litAtNight(id: SceneId): boolean {
   return lit;
 }
 
-/** A station of the map: a prop whose kind `routines.json` lists, with the floor tiles it can be worked from. */
+/**
+ * A station of the map: a prop whose kind or class (`interactions.json`, round 10 D1) `routines.json` lists, with the
+ * floor tiles it can be worked from.
+ */
 export interface Station {
   propId: string;
   scene: SceneId;
   kind: string;
+  /** The prop's class in the logic table, when it has one. */
+  cls?: string;
   activity: string;
   x: number;
   y: number;
@@ -96,7 +104,8 @@ function indexOf(map: readonly SceneId[], profile: Profile): StationIndex {
       if (!profileOpen(scene.profile, profile)) continue;
       const grid = navGrid(sceneId, profile);
       for (const prop of scene.props) {
-        const activity = ACTIVITY_OF.get(prop.kind);
+        const [cls] = classesOfProp(interactions, prop);
+        const activity = (cls !== undefined ? ACTIVITY_OF.get(cls) : undefined) ?? ACTIVITY_OF.get(prop.kind);
         if (activity === undefined) continue;
         if (prop.profiles !== undefined && !prop.profiles.includes(profile)) continue;
         const stands = (
@@ -114,6 +123,7 @@ function indexOf(map: readonly SceneId[], profile: Profile): StationIndex {
           propId: prop.id,
           scene: sceneId,
           kind: prop.kind,
+          ...(cls !== undefined ? { cls } : {}),
           activity,
           x: prop.x,
           y: prop.y,
@@ -236,6 +246,7 @@ function walkToPoint(
 ): Walk {
   const key = `${p.sceneIdx}:${Math.round(x)}:${Math.round(y)}`;
   const r = walkTo(room, brain, p, x, y, reachPx);
+  if (r === 'walking') brain.rested = false;
   if (r === 'arrived') {
     brain.goalKey = '';
     return 'arrived';
@@ -255,6 +266,7 @@ function walkPortal(room: PartyRoom, brain: Brain, p: PlayerSim, id: string, por
   if (!portal) return 'stuck';
   const key = `portal:${p.sceneIdx}:${portalId}`;
   const r = walkThrough(room, brain, p, id, portal);
+  if (r === 'walking') brain.rested = false;
   if (r === 'arrived') {
     brain.goalKey = '';
     brain.crossingUntil = room.state.tick + 3 * TICK_RATE;
@@ -351,7 +363,7 @@ function openStations(
     if (st.propId === brain.lastStationId) return false;
     const owner = mem.claims.get(st.propId);
     if (owner !== undefined && owner !== player.id) return false;
-    return reach.has(st.scene) && (!litOnly || litAtNight(st.scene));
+    return reach.has(st.scene) && (!litOnly || litAtNight(st.scene)) && workable(room, player, st);
   });
 }
 
@@ -446,12 +458,26 @@ function pickStroll(room: PartyRoom, p: PlayerSim, rng: () => number): { x: numb
   return pick(rng, found);
 }
 
-const idleAct = (rng: () => number, tick: number): Act => ({
-  kind: 'idle',
-  untilTick: tick + spanTicks(rng, balance.npc.routine.idleS),
-  stationId: '',
-  goal: null,
-});
+/** An idle stand of `idleS`; the seat has rested, so its next choice is an action (round 10, D1). */
+function idleAct(brain: Brain, rng: () => number, tick: number): Act {
+  brain.rested = true;
+  return {
+    kind: 'idle',
+    untilTick: tick + spanTicks(rng, balance.npc.routine.idleS),
+    stationId: '',
+    goal: null,
+  };
+}
+
+/**
+ * A walk that could not go on: the seat idles where it is, or, when it has just rested, wanders a second instead, so a
+ * stand never follows a stand (D1).
+ */
+function afterStuck(brain: Brain, rng: () => number, tick: number): void {
+  if (!brain.rested) return void (brain.act = idleAct(brain, rng, tick));
+  brain.act = null;
+  brain.fallbackUntilTick = tick + TICK_RATE;
+}
 
 /** The next activity (GDD 3.12 "Choosing"); `restrict` is the wait in an unlit scene at night: strolls and idles only. */
 function choose(
@@ -494,6 +520,11 @@ function choose(
   let kind: 'work' | 'stroll' | 'idle' = u < w.work ? 'work' : u < w.work + w.stroll ? 'stroll' : 'idle';
   // A Killer NPC with prey in sight of the map goes hunting at once, whatever the weights drew.
   if (killer && cls === 'night' && preyStations(room, mem, brain, player, p).length > 0) kind = 'work';
+  // Round 10 (D1): an NPC seat idles only between actions, so a stand never follows a stand. The same uniform, read
+  // inside the idle band, picks work or stroll by their weights (no draw).
+  const busy = w.work + w.stroll;
+  if (kind === 'idle' && brain.rested && busy > 0)
+    kind = ((u - busy) / Math.max(w.idle, 1e-9)) * busy < w.work ? 'work' : 'stroll';
   if (restrict && kind === 'work') kind = 'stroll';
   if (kind === 'work') {
     const trip = pickStation(room, mem, brain, player, p, cls, killer);
@@ -529,7 +560,7 @@ function choose(
     brain.fallbackUntilTick = tick + TICK_RATE;
     return;
   }
-  brain.act = idleAct(rng, tick);
+  brain.act = idleAct(brain, rng, tick);
 }
 
 // --- one tick ------------------------------------------------------------------------------------------------
@@ -539,6 +570,7 @@ export function legPause(room: PartyRoom, brain: Brain, id: string): void {
   const rng = playRng(room, id);
   if (rng() < balance.npc.routine.idleChanceAfterLeg) {
     brain.pauseUntilTick = room.state.tick + spanTicks(rng, balance.npc.routine.idleS);
+    brain.rested = true;
   }
 }
 
@@ -614,6 +646,11 @@ export function runRoutine(
     }
   }
   releaseClaims(mem, id, act && (act.kind === 'travel' || act.kind === 'work') ? act.stationId : '');
+  // An idle that has run out is followed on the same tick (D1: no still tick between a stand and the next action).
+  if (act?.kind === 'idle' && tick >= act.untilTick) {
+    brain.act = null;
+    act = null;
+  }
 
   if (!act) {
     choose(room, mem, brain, player, p, cls, killer, restrict);
@@ -629,18 +666,16 @@ export function runRoutine(
 
   switch (act.kind) {
     case 'idle':
-      if (tick >= act.untilTick) {
-        brain.act = null;
-        return stand(p);
-      }
       return stand(p);
 
     case 'stroll': {
       const goal = act.goal as NonNullable<Act['goal']>;
       const r = walkToPoint(room, brain, p, goal.x, goal.y, ARRIVE_REACH_PX);
       if (r === 'walking') return;
-      brain.act = r === 'arrived' ? null : idleAct(playRng(room, id), tick);
-      if (r === 'arrived') legPause(room, brain, id);
+      if (r === 'arrived') {
+        brain.act = null;
+        legPause(room, brain, id);
+      } else afterStuck(brain, playRng(room, id), tick);
       return;
     }
 
@@ -648,7 +683,7 @@ export function runRoutine(
       return runTravel(room, mem, brain, player, p, act, index);
 
     case 'work':
-      return runWork(room, brain, p, id, act, index);
+      return runWork(room, brain, player, p, act, index);
 
     case 'collect':
       return runCollect(room, brain, p, id, act);
@@ -672,7 +707,7 @@ function runTravel(
   if (act.hunt === true) brain.mode = 'react';
   const drop = (): void => {
     endAct(brain);
-    brain.act = idleAct(rng, tick);
+    afterStuck(brain, rng, tick);
     brain.path = null;
     brain.goalKey = '';
   };
@@ -711,10 +746,13 @@ function runTravel(
   const r = walkToPoint(room, brain, p, act.goal.x, act.goal.y, ARRIVE_REACH_PX);
   if (r === 'walking') return;
   if (r === 'stuck' || occupied(room, id, p.sceneIdx, act.goal.x, act.goal.y)) return drop();
-  // Arrived: the visit begins, with one last step toward the prop so the seat faces it.
+  // Arrived: the visit begins, with one last step toward the prop so the seat faces it. A station with a hold is worked
+  // for the dwell; one without is a stop of an idle's length, which counts as the stand between actions (D1).
+  const worked = holdOf(st) !== undefined;
+  if (!worked) brain.rested = true;
   brain.act = {
     kind: 'work',
-    untilTick: tick + spanTicks(rng, balance.npc.routine.stationDwellS),
+    untilTick: tick + spanTicks(rng, worked ? balance.npc.routine.stationDwellS : balance.npc.routine.idleS),
     stationId: st.propId,
     goal: act.goal,
     faced: true,
@@ -726,14 +764,15 @@ function runTravel(
 function runWork(
   room: PartyRoom,
   brain: Brain,
+  player: PlayerState,
   p: PlayerSim,
-  id: string,
   act: Act,
   index: StationIndex,
 ): void {
   const tick = room.state.tick;
+  const id = player.id;
   const st = index.byId.get(act.stationId) as Station;
-  if (tick >= act.untilTick) {
+  if (tick >= act.untilTick || act.refused === true) {
     if (p.hold !== null)
       handleHold(room, id, { action: p.hold.action, targetId: p.hold.targetId, on: false });
     endAct(brain);
@@ -751,8 +790,29 @@ function runWork(
     brain.goalKey = '';
     return stand(p);
   }
-  const hold = routines.holds[st.kind];
-  if (hold !== undefined && act.refused !== true) {
+  const hold = holdOf(st);
+  if (hold === 'shop') {
+    // A counter: one sale of what it holds, then the pause before the next action.
+    if (act.traded !== true) {
+      sellAt(room, id, player, st);
+      act.traded = true;
+      act.untilTick = Math.min(
+        act.untilTick,
+        tick + spanTicks(playRng(room, id), balance.npc.routine.workPauseS),
+      );
+    }
+    return stand(p);
+  }
+  // Nothing waits on the seat (D1): with another seat working the prop it finishes its own hold, starts no new one and
+  // steps off after a pause of `workPauseS`, as anyone leaves a busy station.
+  if (hold !== undefined && p.hold === null && act.yielding !== true && otherAt(room, id, st.propId)) {
+    act.yielding = true;
+    act.untilTick = Math.min(
+      act.untilTick,
+      tick + spanTicks(playRng(room, id), balance.npc.routine.workPauseS),
+    );
+  }
+  if (hold !== undefined && act.yielding !== true) {
     if (p.hold !== null) act.holding = true;
     else if (act.holding === true) {
       // The hold ended: a pause of `workPauseS`, then the next cycle.
@@ -766,10 +826,13 @@ function runWork(
 function startHold(room: PartyRoom, brain: Brain, p: PlayerSim, id: string, hold: string, st: Station): void {
   brain.holdTries++;
   handleHold(room, id, { action: hold, targetId: st.propId, on: true });
-  // Nothing running right after the call means the server refused it: the cycles end for this visit.
+  // Nothing running right after the call means the server refused it: the visit ends on the next tick.
   if (brain.act) {
     if (p.hold === null) brain.act.refused = true;
-    else brain.act.holding = true;
+    else {
+      brain.act.holding = true;
+      brain.rested = false;
+    }
   }
 }
 
@@ -791,10 +854,7 @@ function runCollect(room: PartyRoom, brain: Brain, p: PlayerSim, id: string, act
   }
   const r = walkToPoint(room, brain, p, clue.x, clue.y, CLUE_WALK_REACH_PX);
   if (r === 'walking') return;
-  if (r === 'stuck') {
-    brain.act = idleAct(playRng(room, id), tick);
-    return;
-  }
+  if (r === 'stuck') return afterStuck(brain, playRng(room, id), tick);
   handleHold(room, id, { action: 'collect', targetId: clue.id, on: true });
   act.faced = true;
   if (p.hold === null) brain.act = null;
