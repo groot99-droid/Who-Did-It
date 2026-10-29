@@ -236,6 +236,8 @@ export const Private = schema(
     bank: u32(),
     /** Round 8 (GDD 3.23, 8D): the Faith this seat has earned by donating at an altar. */
     faith: u16(),
+    /** Round 10 (GDD 3.22, C1): this seat died by day and waits for the morning train; it gets no ghost view. */
+    onLine: bool(),
   },
   'Private',
 );

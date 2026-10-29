@@ -326,7 +326,13 @@
     "gddRef": "3.16"
   },
   "reader": { "spinesMin": 3, "spinesMax": 5, "pageMaxChars": 600, "gddRef": "3.26" },
-  "train": { "arriveAtS": 20, "deliveryAfterS": 32, "hearTiles": 20, "gddRef": "3.3" },
+  "train": {
+    "arriveAtS": 20,
+    "deliveryAfterS": 32,
+    "hearTiles": 20,
+    "dusk": { "leaveAtS": 15 },
+    "gddRef": "3.3"
+  },
   "ui": {
     "transitionS": { "fade": 0.4, "iris": 0.6, "wipe": 0.7 },
     "loading": { "showAfterS": 0.3, "tipEveryS": 4 },
@@ -380,5 +386,6 @@
       "transcriptLines": 20
     },
     "gddRef": "3.8"
-  }
+  },
+  "respawn": { "hp": 50, "gddRef": "3.22" }
 }

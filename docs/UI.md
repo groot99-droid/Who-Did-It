@@ -1750,3 +1750,13 @@ Lines are in `apps/client/src/ui/copy/refusals.ts` (`REFUSAL_COPY`, `refusalLine
   that makes it read "Nothing happens." before release (FM1).
 - No line names a role or an ability (rule 4; the test reads `roles.json` and `abilities.json`). A per-interaction
   `fail` line of `interactions.json` wins over these when the refusal names its interaction (A4).
+
+### 14.47 The train's returns (10C, round 10)
+
+Session 10C, C1 (DECISIONS A230). The server's lines go on the `chat.msg` `system` channel to every seat, like the
+arrival line of 14.30. The On-the-line screen and the dawn manifest come with C1b.
+
+| Line | Text | Where |
+|---|---|---|
+| a seat back on the morning train (server, `Train.ts` `trainReturnLine`) | {name} steps off the train. | `chat.msg` `system`, every seat, at the arrival |
+| the Dusk Train (server, `Train.ts` `TRAIN_DUSK_LINE`) | The dusk train pulls out of the station. | `chat.msg` `system`, every seat, once per dusk |
