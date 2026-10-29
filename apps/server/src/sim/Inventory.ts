@@ -216,6 +216,51 @@ export function exchange(player: PlayerState, takes: readonly Stack[], gives: re
   return true;
 }
 
+/** The stack in `slot`, if any. */
+export function stackAt(player: PlayerState, slot: number): InstanceType<typeof ItemStack> | undefined {
+  return slotsOf(player).find((s) => s.slot === slot);
+}
+
+/**
+ * Moves the stack in `from` to `to` (`inv.move`): into an empty slot, onto a stack of the same item as far as it
+ * fits, or swapped with the stack there when each slot takes the other's item. Null when it moved, else the reason:
+ * always `BAD_REQUEST`, since the screen offers only the moves that can land.
+ */
+export function move(player: PlayerState, from: number, to: number): RefusalReason | null {
+  settle(player);
+  const a = stackAt(player, from);
+  if (!a || from === to || areaOf(LAYOUT, to) === null) return 'BAD_REQUEST';
+  if (!accepts(to, a.defId)) return 'BAD_REQUEST'; // the screen offers only the slots that take it (A13)
+  const b = stackAt(player, to);
+  if (!b) {
+    a.slot = to;
+    return null;
+  }
+  if (b.defId === a.defId && b.qty < stackLimit(a.defId)) {
+    const put = Math.min(stackLimit(a.defId) - b.qty, a.qty);
+    b.qty += put;
+    if (put === a.qty) slotsOf(player).splice(slotsOf(player).indexOf(a), 1);
+    else a.qty -= put;
+    return null;
+  }
+  if (!accepts(from, b.defId)) return 'BAD_REQUEST';
+  b.slot = from;
+  a.slot = to;
+  return null;
+}
+
+/** Selects the hotbar slot whose item is held (`inv.select`). Null when selected, else the reason. */
+export function select(player: PlayerState, slot: number): RefusalReason | null {
+  if (areaOf(LAYOUT, slot) !== 'hotbar') return 'BAD_REQUEST';
+  player.priv.inventory.selected = slot;
+  return null;
+}
+
+/** The item id in the selected hotbar slot, or '' for an empty hand. */
+export function heldItem(player: PlayerState): string {
+  return stackAt(player, player.priv.inventory.selected)?.defId ?? '';
+}
+
 /**
  * Empties what a dropped body loses (`docs/round9/round10-plan.md` A12; the train's return and a robbery use it):
  * the hotbar, the pack, the belt and the purse. Bound kit (`onDeath: kept`), the equipment slots and the bank stay.

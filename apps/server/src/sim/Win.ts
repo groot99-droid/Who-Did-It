@@ -116,6 +116,7 @@ export function resetToLobby(room: PartyRoom): void {
     priv.role.roleId = '';
     priv.role.team = 0;
     priv.inventory.slots.clear();
+    priv.inventory.selected = 0; // round 10, A12
     priv.home = ''; // round 10, A7
     priv.asleep = false;
     priv.inBed = 0;
