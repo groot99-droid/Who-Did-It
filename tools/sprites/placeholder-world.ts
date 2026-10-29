@@ -380,6 +380,10 @@ const PROP_CELLS: Record<string, [number, number]> = {
   prop_lanternPost_unlit: [64, 128],
   prop_bell: [64, 128],
   prop_oven: [64, 96],
+  // Round 10, A7: the beds lie flat, like a sill.
+  prop_bed: [64, 48],
+  prop_cot: [64, 48],
+  prop_innBed: [64, 48],
   prop_deadLoaf: [64, 80],
   prop_ledger: [64, 80],
   prop_dartboard: [64, 96],

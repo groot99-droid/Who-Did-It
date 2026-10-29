@@ -15,6 +15,7 @@ import { handlePayRent } from './economy/rent';
 import { handleHq } from './economy/hq';
 import { handleNotice } from './economy/notices';
 import { handleMug } from './townsfolk/mug';
+import { handleInvMove, handleInvSelect } from './InventoryMoves';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
 export interface QueuedCommand {
@@ -115,6 +116,13 @@ export function runCommands(room: PartyRoom): void {
       // Round 8 (8E, GDD 3.24): the answer to a mugging prompt.
       case C2S.mug:
         handleMug(room, cmd.sessionId, payload);
+        break;
+      // Round 10, A12 (GDD 3.30): the inventory screen's moves.
+      case C2S.invMove:
+        handleInvMove(room, cmd.sessionId, payload);
+        break;
+      case C2S.invSelect:
+        handleInvSelect(room, cmd.sessionId, payload);
         break;
       default:
         // act.interact, hide, check, burst, present arrive with M4+; queued and ignored until then.

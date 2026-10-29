@@ -68,21 +68,25 @@ describe('night powers: refusals in order (deck/wire.md 5)', () => {
       ErrorCode.cannot,
       ErrorCode.cannot,
       ErrorCode.cannot,
-      ErrorCode.cooldown,
+      ErrorCode.cannot,
     ]);
-    expect(refusals(vicar).at(-1)).toMatchObject({ msg: 'used tonight' });
+    expect(refusals(vicar).at(-1)).toMatchObject({ msg: 'used tonight', reason: 'SPENT' });
 
     const herbalist = m.bots[3]!;
     playerOf(m, herbalist).priv.inventory.slots.clear();
     await power(herbalist, 'poison', id(m, 5));
-    expect(refusals(herbalist)).toEqual([{ code: ErrorCode.cannot, msg: 'none left' }]);
+    expect(refusals(herbalist)).toEqual([
+      { code: ErrorCode.cannot, msg: 'none left', reason: 'SPENT', args: { what: 'stock' } },
+    ]);
 
     // The dead come first, whatever the phase.
     simOf(m.room).players.get(id(m, 1))!.dead = true;
     await toPhase(m, Phase.day);
     const before = refusals(vicar).length;
     await power(vicar, 'confession', id(m, 5));
-    expect(refusals(vicar).slice(before)).toEqual([{ code: ErrorCode.cannot, msg: 'not now' }]);
+    expect(refusals(vicar).slice(before)).toEqual([
+      { code: ErrorCode.cannot, msg: 'not now', reason: 'NOT_IN_PLAY' },
+    ]);
   });
 
   it('refuses a public ghost as a target, the Watchman himself, and the same soul two nights running', async () => {
@@ -96,7 +100,12 @@ describe('night powers: refusals in order (deck/wire.md 5)', () => {
     expect(errorCodes(watchman)).toEqual([ErrorCode.cannot, ErrorCode.cannot]);
     await toPhase(m, Phase.dusk); // the next night
     await power(watchman, 'keepWatch', id(m, 6));
-    expect(refusals(watchman).at(-1)).toEqual({ code: ErrorCode.cannot, msg: 'watched last night' });
+    expect(refusals(watchman).at(-1)).toEqual({
+      code: ErrorCode.cannot,
+      msg: 'watched last night',
+      reason: 'SPENT',
+      args: { what: 'power' },
+    });
     await power(watchman, 'keepWatch', id(m, 0));
     expect(notes(m, watchman).map((e) => e.of)).toEqual([id(m, 6), id(m, 0)]);
   });
@@ -208,11 +217,7 @@ describe('protections and Nightshade (GDD 3.2)', () => {
     await power(herb, 'remedy', id(m, 5));
     expect(doctor).toBeDefined();
     for (let i = 0; i < 3; i++) await strike(m);
-    expect(refusals(killer).map((r) => r.msg)).toEqual([
-      'nothing happens',
-      'nothing happens',
-      'nothing happens',
-    ]);
+    expect(refusals(killer).map((r) => r.reason)).toEqual(['VOIDED', 'VOIDED', 'VOIDED']);
     expect(target.dead).toBe(false);
     expect(target.bandagedUntilTick).toBe(0);
     expect(notes(m, watchman).map((e) => e.note)).toEqual([NoteKind.watching, NoteKind.watchHeld]);

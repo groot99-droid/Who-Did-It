@@ -1,6 +1,5 @@
 import { balance, minigames, tasks } from '@wdi/content';
 import {
-  ErrorCode,
   Phase,
   S2C,
   TICK_RATE,
@@ -17,6 +16,7 @@ import { atNode, completeTask } from './tasks/complete';
 import { endMatch } from './Win';
 import { addStack, canAdd, count } from './Inventory';
 import { isVerbPhase, reject } from './World';
+import { refusal, type Refusal } from './refusal';
 
 /**
  * Main-mode mini-games (round 6, M5b, GDD 3.16; docs/round6/m5b-data.md 2.3): a station task's `task` hold sends
@@ -40,7 +40,7 @@ function openOf(room: PartyRoom): Map<string, Open> {
   return m;
 }
 
-type Problem = { code: ErrorCode; msg: string };
+type Problem = Refusal;
 
 /** Why this seat cannot work `taskId` now, or null: the checks that start a mini-game and that finish it. */
 function taskProblem(
@@ -49,21 +49,20 @@ function taskProblem(
   player: PlayerState,
   taskId: string,
 ): Problem | null {
-  if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
+  if (!isVerbPhase(room.state.phase)) return refusal('PHASE_CLOSED');
   // A ghost finishes its own tasks (GDD 3.8; the bar caps its share, 3.5), so `dead` is no bar here (7M).
-  if (!p || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
-  if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
+  if (!p || !p.placed) return refusal('NOT_IN_PLAY');
+  if (room.state.tick < p.busyUntilTick) return refusal('BUSY');
   const entry = player.priv.tasks.find((t) => t.id === taskId);
   const task = tasks.tasks[taskId];
-  if (!entry || entry.done || !task || task.kind !== 'fetch')
-    return { code: ErrorCode.cannot, msg: 'not your task' };
+  if (!entry || entry.done || !task || task.kind !== 'fetch') return refusal('NOT_YOURS', { what: 'task' });
   if (task.nightOnly && room.state.phase !== Phase.night && room.state.phase !== Phase.finalNight) {
-    return { code: ErrorCode.wrongPhase, msg: 'only at night' };
+    return refusal('PHASE_CLOSED', { until: 'night' });
   }
-  if (!task.targets.some((t) => atNode(p, t))) return { code: ErrorCode.outOfRange, msg: 'too far' };
+  if (!task.targets.some((t) => atNode(p, t))) return refusal('TOO_FAR', { of: 'task' });
   // A fake task (a Cabal seat's alibi list) needs no deliverable; a real one carries it to the node.
   if (!entry.fake && task.tool !== undefined && count(player, task.tool) < (task.toolQty ?? 1))
-    return { code: ErrorCode.cannot, msg: 'you lack the tool' };
+    return refusal('NEED_TOOL');
   return null;
 }
 
@@ -82,12 +81,12 @@ function pickUp(
   tool: string | undefined,
   qty: number,
 ): void {
-  if (!isVerbPhase(room.state.phase)) return reject(room, sessionId, ErrorCode.wrongPhase, 'not now');
-  if (!p.placed) return reject(room, sessionId, ErrorCode.cannot, 'not now');
-  if (room.state.tick < p.busyUntilTick) return reject(room, sessionId, ErrorCode.busy, 'busy');
+  if (!isVerbPhase(room.state.phase)) return reject(room, sessionId, 'PHASE_CLOSED');
+  if (!p.placed) return reject(room, sessionId, 'NOT_IN_PLAY');
+  if (room.state.tick < p.busyUntilTick) return reject(room, sessionId, 'BUSY');
   if (fake || tool === undefined) return;
-  if (count(player, tool) >= qty) return reject(room, sessionId, ErrorCode.cannot, 'you carry it already');
-  if (!canAdd(player, tool, qty)) return reject(room, sessionId, ErrorCode.cannot, 'no room in your pockets');
+  if (count(player, tool) >= qty) return reject(room, sessionId, 'ALREADY_HAVE', { item: tool });
+  if (!canAdd(player, tool, qty)) return reject(room, sessionId, 'PACK_FULL');
   addStack(player, tool, qty);
 }
 
@@ -112,11 +111,9 @@ export function handleTaskHold(room: PartyRoom, sessionId: string, taskId: strin
     pickUp(room, sessionId, player, p, entry.fake, task.tool, task.toolQty ?? 1);
     return;
   }
-  const problem = def
-    ? taskProblem(room, p, player, taskId)
-    : { code: ErrorCode.cannot, msg: 'cannot do that' };
+  const problem = def ? taskProblem(room, p, player, taskId) : refusal('BAD_REQUEST');
   if (problem || !def) {
-    reject(room, sessionId, problem?.code ?? ErrorCode.cannot, problem?.msg ?? 'cannot do that');
+    reject(room, sessionId, problem ?? refusal('BAD_REQUEST'));
     return;
   }
   // The puzzle is the seat's own business: a stream keyed by seat, shared with nothing public (`sim/seeds.ts`).
@@ -188,13 +185,13 @@ export function handleMinigameResult(
   const { taskId, answer } = payload;
   if (!player || !p) return;
   if (!open || typeof taskId !== 'string' || open.taskId !== taskId) {
-    reject(room, sessionId, ErrorCode.cannot, 'nothing open');
+    reject(room, sessionId, 'NOTHING_THERE');
     return;
   }
   const problem = taskProblem(room, p, player, taskId);
   if (problem) {
     openOf(room).delete(sessionId);
-    reject(room, sessionId, problem.code, problem.msg);
+    reject(room, sessionId, problem);
     return;
   }
   const def = Object.values(minigames.minigames).find((m) => m.task === taskId);
@@ -205,7 +202,7 @@ export function handleMinigameResult(
     def !== undefined &&
     room.state.tick - open.startTick >= Math.round(def.assistS * TICK_RATE);
   if (!assisted && !checkMinigame(open.puzzle, answer)) {
-    reject(room, sessionId, ErrorCode.cannot, 'try again');
+    reject(room, sessionId, 'BAD_REQUEST');
     return;
   }
   completeTask(room, sessionId, player, p, taskId);

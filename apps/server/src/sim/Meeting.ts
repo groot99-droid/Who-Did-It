@@ -1,5 +1,5 @@
 import { balance } from '@wdi/content';
-import { ErrorCode, Phase, type PlayerState, S2C, SKIP_VOTE, TICK_RATE, resolveVotes } from '@wdi/shared';
+import { Phase, type PlayerState, S2C, SKIP_VOTE, TICK_RATE, resolveVotes } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { wakeAll } from './body/damage';
 import { enterScene } from './Portals';
@@ -13,7 +13,7 @@ import { clearFigureBodies } from './townsfolk/figures';
 import { type MeetingRequest, simOf } from './RoomSim';
 import { evaluateWin, endMatch } from './Win';
 import { civicMeetingStart } from './economy/civic';
-import { FAITH_COPY, sealBlocks } from './economy/faith';
+import { sealBlocks } from './economy/faith';
 
 /**
  * Everyone, living or dead, goes to the map's meeting spawns on the hub (`meetingSpawnsOf`) without a
@@ -92,27 +92,24 @@ export function openMeeting(room: PartyRoom, req: MeetingRequest): void {
 export function handleVote(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   const phase = room.state.phase;
   if (phase !== Phase.meetingDiscussion && phase !== Phase.meetingVote) {
-    return refuse(room, sessionId, ErrorCode.wrongPhase, 'no vote open');
+    return refuse(room, sessionId, 'PHASE_CLOSED');
   }
   if (room.state.tick < (votesOpenTick.get(room) ?? 0)) {
-    return refuse(
-      room,
-      sessionId,
-      ErrorCode.wrongPhase,
-      `votes open ${balance.meeting.minVoteS} s into the discussion`,
-    );
+    return refuse(room, sessionId, 'PHASE_CLOSED', undefined, {
+      msg: `votes open ${balance.meeting.minVoteS} s into the discussion`,
+    });
   }
   const sim = simOf(room);
   const voter = room.state.players.get(sessionId);
   if (!voter?.priv || !sim.players.get(sessionId) || sim.players.get(sessionId)?.dead) {
-    return refuse(room, sessionId, ErrorCode.cannot, 'ghosts do not vote');
+    return refuse(room, sessionId, 'NOT_IN_PLAY', { why: 'ghost' });
   }
   const target = payload.targetId;
   const ok =
     typeof target === 'string' &&
     (target === SKIP_VOTE ? balance.meeting.skipAllowed : isLiving(room, target));
-  if (!ok) return refuse(room, sessionId, ErrorCode.cannot, 'no such candidate');
-  if (sealBlocks(room, target)) return refuse(room, sessionId, ErrorCode.cannot, FAITH_COPY.blocked); // Round 8, 8D
+  if (!ok) return refuse(room, sessionId, 'BAD_REQUEST');
+  if (sealBlocks(room, target)) return refuse(room, sessionId, 'SEAL_BLOCKS'); // Round 8, 8D
   voter.priv.myVote = target;
   voter.hasVoted = countsVote(room, sessionId); // round 7, 7H: a doubted Vicar's vote stays unseen (GDD 3.20)
   emitSim(room, { tick: room.state.tick, kind: 'vote', seat: sessionId, data: { target } }); // round 6, 6B
