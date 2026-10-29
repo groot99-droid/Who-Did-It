@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { GddRef, Id, Ships, Tiles } from './common.js';
+import { ToolTag } from './interactions.js';
 
 export const Item = z.strictObject({
   id: Id,
@@ -25,6 +26,10 @@ export const Item = z.strictObject({
   /** Ability in abilities.json this item performs, if any. */
   use: Id.optional(),
   lightRadiusTiles: Tiles.optional(),
+  /** Round 10 (A10; logic-table.md 3.3): the capability tags this tool carries, each with its tier. */
+  tool: z.partialRecord(ToolTag, z.number().int().min(1).max(3)).optional(),
+  /** Round 10 (A10): uses before the tool breaks, each worn by an interaction's `wear`; absent = it lasts. */
+  uses: z.number().int().positive().optional(),
   tooltip: z.string().min(1),
   ships: Ships,
   gddRef: GddRef,

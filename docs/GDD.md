@@ -418,8 +418,17 @@ by kind, and the content check refuses a scene that places a prop with no decisi
 (a kind, a stem, a resource node or a locked portal), and no prop belongs to two classes, so a hold on it has one answer.
 An **interaction** is a verb on a class, with its modes best first: the tool a mode needs (a capability tag and tier,
 or bare hands), a hold or a mini-game, its drops or loot, the wear and the noise, and a failure line per refusal
-reason. Today the table registers the live kinds as classes and holds no interaction, so nothing plays differently; the
-resolver (A10) and the tool walls (A11) give it behaviour.
+reason. A tool is an item with capability tags (`cut`, `break`, `dig`, `pick`, `pry`, `skin`), each with a tier, and
+optionally a number of uses.
+
+**Interacting** (round 10, A10) is a hold (E) on a prop, beside the older verbs. The server finds the prop's class and
+its interaction (the one the held item named, else the first the seat can run), then the first mode whose tool the seat
+holds; a seat with none is refused `NEED_TOOL`, naming the plainest tool that would do. A prop already changed is
+refused `NOTHING_THERE` until it comes back; an interaction not built yet answers `NFY`. Moving, a phase change, a lost
+tool or a full pack cancel the hold with nothing done. At its end the drops land (their amounts drawn from the `loot`
+stream), the tool loses `wear` uses and breaks when its uses run out, the prop takes its new state (public to the
+scene, never who changed it) until its respawn, and the mode's noise sounds. An NPC seat's hold runs through the same
+rules. Until A11 adds the tool walls the table holds no interaction, so nothing plays differently yet.
 
 ### 3.15 Mobs
 
