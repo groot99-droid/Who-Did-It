@@ -49,7 +49,7 @@ const KIND_KEY = new Map<number, string>(Object.entries(ClueKind).map(([k, v]) =
 
 const memories = new WeakMap<PartyRoom, LawMemory>();
 function memoryOf(room: PartyRoom): LawMemory {
-  let memory = memories.get(room);
+  const memory = memories.get(room);
   if (memory) return memory;
   const m: LawMemory = { pending: [], posted: [], said: new Map() };
   memories.set(room, m);
