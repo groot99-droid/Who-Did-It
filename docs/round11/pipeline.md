@@ -16,9 +16,9 @@ another of the owner's sessions is building the 3D asset pipelines (section 7).
 1. **Camera and scale: nothing moves** (section 2). IsoCam, the display scale, `iso.zScale`, the cells, the cap, the
    pivots and the turntable stay exactly as SPRITES 10.3 states them. Every key, pivot and page the client loads
    stays valid, so the makeover is art in the same frames and no client change.
-2. **Light: one key for every style, AO baked everywhere, no cast shadows on the world** (section 3). The key keeps
-   A9's camera-frame azimuth and elevation. Every style bakes ambient occlusion. Figures bake their own soft contact
-   shadow. Under this key a building's cast shadow lands mostly under its own roof (the samples show it), so the
+2. **Light: one key for every style, AO and contact shadows baked, no cast shadows on the world** (section 3). The
+   key keeps A9's camera-frame azimuth and elevation. The renders may bake ambient occlusion and figures' contact
+   shadows in every style; how much each style takes is 11B's (look.md 4.4). Under this key a building's cast shadow lands mostly under its own roof (the samples show it), so the
    world bakes none. The day parts, the lamps and the dark stay the client's.
 3. **Passes: keep `body`, `scarf`, `blood` and the building tile map, and add one, `emit`** (section 4). `emit` is a
    mask of what glows (lit windows, lamps, the forge, cave moss) on the static atlases. The darkness layer cuts it
@@ -138,9 +138,10 @@ What it shows:
 
 - **One key for every style.** It keeps A9's camera-frame azimuth and elevation (225° and 55° in camera frame;
   `rig_common.KEY_LIGHT` is the copy). This is art.md 5's rule already, and the toon ramp stops stay as measured.
-- **AO baked in every style.** It is HD's fast-GI AO at its distance, now also in 8-bit and low poly. Because the
-  ramp is stepped, an 8-bit face changes only where AO crosses a stop. The look of each style's AO is 11B's
-  (look.md) to tune.
+- **AO available in every style.** It is HD's fast-GI AO, which costs nothing measurable at the display scale.
+  Because the ramp is stepped, an 8-bit face changes only where AO crosses a stop. How much each style takes is
+  11B's: look.md 4.4 keeps HD as it is, gives low poly half, and proposes no AO for 8-bit unless the first smoke
+  sheet shows it leaves every band unchanged.
 - **Figures bake their soft self-shadow and contact shadow in every style.** The arm on the coat, the hat on the
   face, a dark patch at the feet. The client's ellipse stays: it is what a figure stands on in every light.
 - **No cast shadow on the world.** Under this key it is mostly hidden, it is the expensive part of a render, and it
@@ -200,9 +201,8 @@ pivots, and adds no new framing code.
   precedent.
 - **Figures.** A figure's carried lamp is the client's `setCarried`, so figures get no `emit`.
 - **Memory.** A mask page is RGBA in VRAM like any page. The masks are small and trimmed. In the tavern frame the
-  emitting pixels are 3 % of the building's own pixels. The cap is **11B's** number, for one `emit` page per map plus one for
-  the shared props. My estimate for 11B is at most 512² per map (0.0625 page-equivalents of 2048²) and 256² for the
-  shared props. Asked of 11B on 2026-10-29.
+  emitting pixels are 3 % of the building's own pixels. The cap is **11B's** number: look.md 5.3 sets one `emit` page per
+  map plus one for the shared props, counted in the resident sum in every phase.
 
 ### 4.3 The passes not proposed, and why
 
@@ -224,7 +224,7 @@ pivots, and adds no new framing code.
 The page cost of each pass is 11B's, in `docs/round11/look.md` 5.3. 11B's table counts the list of 4.1 as kept
 (`body`, `scarf`, `blood`, `emit`) and the passes of 4.3 as not proposed. My inputs to it were these:
 
-- `emit`: the emitting pixels are 3 % of the tavern's own, so an estimate of at most 512² a map and 256² shared.
+- `emit`: the emitting pixels are 3 % of the tavern's own, so an estimate of at most 512² a map and 256² shared, which 11B took as the cap.
 - The shadow layer: it covers about three quarters of its building's own area (measured on the tavern).
 - Normals: one more page for every page they cover.
 
@@ -389,8 +389,9 @@ seconds to a minute each. That is an hour or two a map a style, plus the shadow-
   - Run 4 sessions for the figures (about 2 to 3 h each) and one per map for the world.
   - The setup script installs `bpy==5.2.0` and the EGL packages. That is the environment's setting, which the
     owner changes in its settings page; this document cannot.
-- HD figures render at **`taaSamples` 8** (`rig_common.HD`; the look is 11B's to confirm from the sample above), in
-  the same fan-out: about 10 h each over 4 sessions.
+- HD figures render at **`taaSamples` 8** (`rig_common.HD`), in the same fan-out: about 10 h each over 4 sessions.
+  11B accepts 8 (look.md 4.4) provided the first HD sheet shows no noise in the soft band edges or the catcher
+  shadow; otherwise 16.
 - The laptop is optional. It is worth one measured frame (the calibration sheet and one HD look) before anything is
   planned on it. If it is much faster, HD moves there.
 - Every batch keeps to one host (5.1).
@@ -449,8 +450,8 @@ Each question has a proposed default. A session in doubt takes the default.
 
 1. **P1. Camera and scale stay exactly as today?** (2.2) Proposed: yes; the makeover is new art in today's frames,
    with no client change. Default: yes.
-2. **P2. One light for every style: A9's key, AO baked in every style, contact shadows on figures, no cast shadows
-   on the world?** (3.2) Proposed: yes. Default: yes.
+2. **P2. One light for every style: A9's key, AO and figures' contact shadows baked (in each style's measure,
+   look.md 4.4), no cast shadows on the world?** (3.2) Proposed: yes. Default: yes.
 3. **P3. Long shadows on buildings, as a separate ground layer the client fades at dusk?** (4.3) Proposed: no, not in
    round 11; under today's key they are mostly hidden under the roofs. Default: no.
 4. **P4. Normal-mapped lighting (lamps that light walls as you carry them)?** (4.3) Proposed: no; it doubles every
