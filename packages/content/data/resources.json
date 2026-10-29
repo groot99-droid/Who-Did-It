@@ -58,7 +58,7 @@
       "gatherS": 4,
       "yield": 2,
       "respawnS": 300,
-      "sprite": "node_timber"
+      "sprite": "node_logs"
     }
   }
 }
