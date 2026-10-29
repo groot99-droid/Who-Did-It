@@ -60,6 +60,17 @@ export const VillagerLook = z.strictObject({
 });
 export type VillagerLook = z.infer<typeof VillagerLook>;
 
+/**
+ * Round 10, B1 (GDD 3.17, 3.31): the look of a figure that is neither a seat nor of the villager family, the
+ * `constable` alone. No card and no portrait, so a cover can never take one.
+ */
+export const FigureLook = VillagerLook.extend({
+  id: LookId,
+  bodyAtlas: z.string().regex(/^char_[a-z][a-z0-9]*$/),
+  overlayAtlas: z.string().regex(/^ovl_[a-z][a-z0-9]*$/),
+});
+export type FigureLook = z.infer<typeof FigureLook>;
+
 export const LooksFile = z.strictObject({
   gddRef: GddRef,
   clips: z.array(LookClip).min(1),
@@ -69,5 +80,7 @@ export const LooksFile = z.strictObject({
   villagers: z
     .record(LookId, VillagerLook)
     .refine((v) => 'villager' in v, "the plain villager is the family's base"),
+  /** Round 10, B1: the figure looks, keyed by id (the Constables'). */
+  figures: z.record(LookId, FigureLook).optional(),
 });
 export type LooksFile = z.infer<typeof LooksFile>;

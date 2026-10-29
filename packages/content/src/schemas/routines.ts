@@ -31,13 +31,19 @@ export type RoutineActivity = z.infer<typeof RoutineActivity>;
  * Round 8 (GDD 3.24, Session 8E): one kind of ambient townsfolk figure. `stations` are prop kinds in route order (an
  * empty list means any station of the map, drawn from the figure's `townsfolk` stream); a `named` figure walks once
  * per map it lists (the Company Clerk, the Tallyman); a `fixed` figure stands one per such prop (a stallholder).
- * `look` is a `villager` look id (seams.md 2: never a card's look). A kind no map holds yet is inert.
+ * `look` is a `villager` look id or a `figures` look id (seams.md 2: never a card's look). A kind no map holds yet is
+ * inert.
  */
 export const TownsfolkRow = z.strictObject({
   maps: z.array(MapId).min(1).optional(),
-  look: z.string().regex(/^villager/),
+  /** A villager look, or (round 10, B1) a `looks.json` `figures` look; never a card's (validate.ts). */
+  look: z.string().min(1),
   named: z.boolean(),
   fixed: z.boolean(),
+  /** Round 10, B1 (GDD 3.24): a guard keeps a post within `guard.leashTiles` and fights back when struck. */
+  guard: z.boolean().optional(),
+  /** Round 10, B1: how many figures of a named row each map holds (the Constables 2); 1 when unset. */
+  count: z.number().int().positive().optional(),
   stations: z.array(PropKind),
 });
 export type TownsfolkRow = z.infer<typeof TownsfolkRow>;

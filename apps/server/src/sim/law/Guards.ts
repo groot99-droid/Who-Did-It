@@ -68,7 +68,10 @@ export function leashRoute(row: TownsfolkRow, index: number, props: readonly Sta
 export function bindGuard(f: Figure): void {
   const first = f.stations[0];
   const stand = first?.stands[0];
-  const post = first && stand ? { scene: first.scene, x: tileCentre(stand.x, TILE_PX), y: tileCentre(stand.y, TILE_PX) } : null;
+  const post =
+    first && stand
+      ? { scene: first.scene, x: tileCentre(stand.x, TILE_PX), y: tileCentre(stand.y, TILE_PX) }
+      : null;
   if (!post) return;
   f.home = post.scene;
   guards.set(f, { post, foe: null, foeUntilTick: 0, nextSwingTick: 0 });
@@ -82,7 +85,8 @@ export function guardNightAct(f: Figure): FigureAct | null {
 }
 
 const withinLeash = (g: GuardState, sceneIdx: number, x: number, y: number): boolean =>
-  sceneIdx === sceneIndex(g.post.scene) && Math.hypot(x - g.post.x, y - g.post.y) <= balance.guard.leashTiles * TILE_PX;
+  sceneIdx === sceneIndex(g.post.scene) &&
+  Math.hypot(x - g.post.x, y - g.post.y) <= balance.guard.leashTiles * TILE_PX;
 
 /**
  * A guard's tick before its routine (`townsfolk/run.ts`): knocked out it stands; with a foe in its scene and leash
@@ -173,7 +177,14 @@ export function guardTarget(
 }
 
 /** A seat's fist or slingshot lands on a guard: its body takes the row, and a guard still standing turns on the seat. */
-export function strikeGuard(room: PartyRoom, f: Figure, row: DamageRow, by: string, source: string, factor = 1): void {
+export function strikeGuard(
+  room: PartyRoom,
+  f: Figure,
+  row: DamageRow,
+  by: string,
+  source: string,
+  factor = 1,
+): void {
   const g = guards.get(f);
   const out = hurt(room, f.id, row, { source, by, factor });
   if (!g) return;

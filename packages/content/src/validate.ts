@@ -656,6 +656,22 @@ function checkDecksAndLooks(c: Content, err: (msg: string) => void): void {
     }
     if (!dealt.has(look.role)) err(`${where}: no deck deals ${look.role} (orphan art)`);
   }
+
+  // Round 10, B1 (GDD 3.17): a figure look is its own, never a card's or the villager family's; a townsfolk row
+  // wears a villager look or a figure look, never a card's.
+  const figures = looks.figures ?? {};
+  for (const [key, look] of Object.entries(figures)) {
+    if (key !== look.id) err(`looks.json figures: key "${key}" holds look "${look.id}"`);
+    if (key in looks.looks || key in looks.villagers) err(`looks.json figures: "${key}" is already a look`);
+    if (look.bodyAtlas !== `char_${key}` || look.overlayAtlas !== `ovl_${key}`)
+      err(`looks.json figures: ${key}'s atlases must be char_${key} and ovl_${key}`);
+  }
+  for (const [kind, row] of Object.entries(c.routines.townsfolk)) {
+    if (!(row.look in looks.villagers) && !(row.look in figures))
+      err(`routines.json townsfolk ${kind}: look ${row.look} is neither a villager nor a figure look`);
+    if (row.count !== undefined && !row.named)
+      err(`routines.json townsfolk ${kind}: count needs a named row`);
+  }
 }
 
 /**

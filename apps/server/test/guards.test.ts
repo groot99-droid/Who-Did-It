@@ -129,7 +129,13 @@ describe('guard figures (GDD 3.24, 3.31)', () => {
     // Out of the leash, it lets the striker go and walks back to its post.
     const hp = bodyOf(room, human)!.hp;
     const post = postOf(f);
-    placeSeat(party, human, sceneKey(post.idx), Math.floor(post.x / TILE_PX) + balance.guard.leashTiles + 4, Math.floor(post.y / TILE_PX));
+    placeSeat(
+      party,
+      human,
+      sceneKey(post.idx),
+      Math.floor(post.x / TILE_PX) + balance.guard.leashTiles + 4,
+      Math.floor(post.y / TILE_PX),
+    );
     advance(party, S(10));
     expect(bodyOf(room, human)!.hp).toBeGreaterThanOrEqual(hp);
     expect(onLeash(f)).toBe(true);
