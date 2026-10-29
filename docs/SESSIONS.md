@@ -3861,3 +3861,15 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
 
 - 2026-10-29: the contract `docs/round10/` with A223 and A224; the GDD stubs 3.27 to 3.33; the compaction default
   500k and the two tier branches. 10A, 10F and 10H spawned.
+- 2026-10-29: #314 merged at 580e5d9, and 10A, 10F and 10H started from it at 500k (each session reports a 500000
+  window). A9 (#315) merged. Seams changes on 10F's request: `SceneState.propStates` becomes wire row 3 (public to the
+  scene, never who changed a prop); `SCHEMA_VERSION` goes to 7 in whichever of A12 and A10 merges first; A10 adds
+  the optional `tool` and `uses` item fields. 10H holds a grant for the A5 test edits it listed (taskDeal, trial,
+  npcRoutine R9, invariants and npcTells; seams.md 1).
+- 2026-10-29: #318 (the seams above) merged at ad1ebf3, and A1 (#316) at 6654e42. 10G started from
+  `claude/r10-tier-300k` with the base at 6654e42 merged in, and reports a 300000 window. In R9, 10H restores the
+  NPCs' health each tick, which completes the test's existing isolation from the wolves (seams.md 1). On 10A's
+  request for A12: wire row 1 gains `ItemStack.slot` and `Inventory.selected`; wire row 4 adds the `inv.move`
+  and `inv.select` messages; 10A's paths gain `inventory.*`, the per-kind `resources.stackMax` and the optional
+  `equip` item field. Its grant covers the inventory, resources, quests, taskPickup and craft tests, where only
+  a filler or an expected count changes.
