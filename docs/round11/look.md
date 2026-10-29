@@ -71,9 +71,10 @@ copy of the toon node group, so after import every look material points at **`WD
 So the look sheet's `figure-hdtex` column and A164's description of the HD figure finish describe what the tools mean
 to do, not what `batch_render.py` does with a `build_looks.py` file today. The fix is one line after the import (remap
 every `WDI_Toon.*` group onto `WDI_Toon`, `bpy.types.NodeTree.user_remap`), and a test that renders a textured
-figure and checks a material slot changed. It is a tooling change, so it is 11A's to plan and the build round's to
-make (README, "Rules for both sessions"); 6Z was told on 2026-10-29 because round 10's `constable` render is the next
-figure through that path. The samples of section 9 apply the remap in a scratch wrapper, never in `tools/`.
+figure and checks a material slot changed. It is a tooling change, so it is 11A's to plan (`pipeline.md` 5.4, first
+in its build plan, reproduced there) and the build round's to make. 6Z was told on 2026-10-29 and has logged the
+one-line fix for round 10's 10Y, before the `constable` render; the existing figure pages are not re-rendered now,
+because round 11 re-renders them. The samples of section 9 apply the remap in a scratch wrapper, never in `tools/`.
 
 ## 2. The makeover's look in one paragraph
 
@@ -106,7 +107,7 @@ Today a surface's material is chosen three ways: a flat `WDI_Toon` with three he
   - HD figures, props, clues, ground, effects: the toon bands with soft edges and the diffuse luma as a bump (today's
     `hdtex`), tone 0;
   - HD buildings and kit: the Principled BSDF on the same maps under the sky (today's `pbr.py`).
-- **The role table is the swap point.** One row changes a surface everywhere, in every style and in V2 (section 6).
+- **The role table is the swap point.** One row changes a surface everywhere, in every style and in V2 (section 8).
   The owner's own Poly Haven favourites join by slug (A144's open line); ambientCG joins under its own source in the
   same lock (art.md 5).
 
@@ -128,7 +129,7 @@ renders at twice that, 181.02). The sampling a texture needs is about two texels
 - **The 1k maps are enough for every sprite render**, HD included, except the rock face, which reads soft at HD
   (_proposed_: render `rock_face` at 2k in HD only). The 2k maps that HD reads today are filtered away by the render.
 - **The 2k maps are V2's.** A first-person wall wants 1k to 2k texels per metre; 2k over a 2 m role gives 1024. So the
-  lock keeps 1k and 2k, the sprite renders read 1k, and V2 reads 2k at run time (as compressed textures, 6.4).
+  lock keeps 1k and 2k, the sprite renders read 1k, and V2 reads 2k at run time (as compressed textures, 8.1).
 - **Cloth at 0.5 m** gives 2048 texels per metre from a 1k map, far past any figure render. Its grain survives only
   as tone, which is why the measurements in 4.2 matter more than the texture choice for figures.
 
@@ -153,8 +154,9 @@ of a frame, teal only as a light source, magenta never) bind every style.
 ### 3.4 What the makeover changes in the toon ramp
 
 Nothing in the numbers. The ramp stops (0.25 / 0.65) are measured against 11A's key light and camera
-(`tools/blender/README.md`, "IsoCam calibration"); if 11A moves either, the stops are re-measured on the smoke block
-by the same method and recorded in 11A's section. The HD finish keeps its `bandSoft` (0.08) and rim; with the defect
+(`tools/blender/README.md`, "IsoCam calibration"), and 11A moves neither: the camera, the 90.51 px a metre, the 0.75
+`zScale`, the key at 225° / 55° in the camera frame and the stops all stay (`pipeline.md` 2, 3.2). So 3.2's density
+table and this section stand as written. The HD finish keeps its `bandSoft` (0.08) and rim; with the defect
 of 1.3 fixed, the rim reaches figures for the first time, so the build round re-checks the rim amount (0.3) on a
 figure sheet before it renders in bulk.
 
@@ -180,10 +182,10 @@ frames, so the "look" column scales the measured frame cost to the whole residen
 | Column | Finish | Packed cell | Trimmed px a frame | Body page bytes a frame (PNG) | A look's 504 body frames | Body area a look (page-equivalents) |
 |---|---|---|---|---|---|---|
 | `8bit` | today's 8-bit: finished, indexed PNG | 64 px | 1 729 | 355 B | 179 KB | 0.21 |
-| `8bit-tex` | 8-bit with garment roles (the 1.3 remap applied) | 64 px | 1 729 | 346 B | 174 KB | 0.21 |
+| `8bit-tex` | 8-bit with the ramp-table roles (the 1.3 remap applied) | 64 px | 1 729 | 346 B | 174 KB | 0.21 |
 | `lowpoly` | today's low poly: unfinished, alpha-bled RGBA | 64 px | 1 823 | 2 489 B | 1.25 MB | 0.22 |
-| `lowpoly-tex` | low poly with garment roles | 64 px | 1 823 | 2 428 B | 1.22 MB | 0.22 |
-| `hd-tex` | HD at texels 4 as A164 writes it, garment roles, soft bands and rim (remap applied), `body` pass, `s`, `se`, `sw` | 256 px | 45 144 | 34 987 B | 17.6 MB | 5.4 |
+| `lowpoly-tex` | low poly with the ramp-table roles | 64 px | 1 823 | 2 428 B | 1.22 MB | 0.22 |
+| `hd-tex` | HD at texels 4 as A164 writes it, the ramp-table roles, soft bands and rim (remap applied), `body` pass, `s`, `se`, `sw` | 256 px | 45 144 | 34 987 B | 17.6 MB | 5.4 |
 
 - **The check against what ships.** The shipped 8-bit baker body page is 407 B a frame over its 504 frames, the
   low-poly one 2 690 B: the idle sample is within 15% of the whole look, so the extrapolation holds.
@@ -214,7 +216,25 @@ frames, so the "look" column scales the measured frame cost to the whole residen
   goes green-grey, her stockings purple, her boots near black), which is the colour drift 3.3's tone check exists to
   catch.
 - **HD**: environment in HD (toon HD and PBR as A164 split it); figures by option 5.4. Garment roles are an HD
-  finish: they read as cloth only at HD's density.
+  finish: they read as cloth only at HD's density. But not through today's ramp table: with the 1.3 remap applied,
+  `FIGURE_ROLES` (ramp to role) dresses the baker's skin and hair as leather, her coat as leather and her bone apron as
+  blue-grey wool, so the HD figure reads as a carved wooden doll (the `hd-tex` column of the sheet, section 9). A
+  figure's role must be named per garment in `looks_spec.py` (6.2), with skin, hair and eyes-free faces on flat or
+  `face` roles; the ramp table is not fit for figures.
+- **The sky under HD figures** (A164's open line: the PBR sky under the toon bands, `WDI_HD_SKY=1`): measured, it
+  changes the figure very little (the `hd-tex + sky` column against `hd-tex`). _Proposed_: figures render without the
+  sky, and the flatter-ambient question is closed as "not visible".
+
+### 4.4 The finish settings this document owns per style
+
+- **Baked AO and contact shadow** (11A proposes them in every style, `pipeline.md` 3): HD at today's strength
+  (`aoDistance` 1.0, catcher 0.6). Low poly at half (`aoDistance` 0.5, catcher 0.3), so a posterised face does not
+  gain a band from it. 8-bit only where it survives the finish without moving a face's band on the smoke block (the
+  ramp measurement of `tools/blender/README.md`); _proposed_: the catcher at 0.3 and no AO in 8-bit, decided on the
+  build round's first figure sheet.
+- **HD samples.** 11A measured `taaSamples` 32 to 8 as 3.6 times faster (19.7 to 5.5 s a frame) for a mean difference
+  of 0.44/255 on the figure. **Accepted** for every HD render, on the condition that the build round's first HD sheet
+  shows no visible noise in the soft band edges and the catcher's shadow; if it does, 16.
 
 ## 5. Budgets
 
@@ -262,13 +282,15 @@ When a set is over a budget, the build round applies these in order and stops at
 | body | 0.25 (one 1024² page; 0.5 for a tall low-poly body) | 3.75 to 4.0 | 1.8 (all of it) | today |
 | scarf + blood overlays | 0.125 (one 1024 x 512) | 1.9 | none | today |
 | a normal pass (for run-time lighting) | 0.25 | 3.75 | up to 1.8 | would break the cap in every style |
-| an emissive mask (lamps, windows) | none for figures | none | a few frames on the props page | fits |
-| a baked contact shadow | 0 (baked into the body pass, as HD's catcher already is) | 0 | 0 | fits |
+| a baked contact shadow and AO | 0 (baked into the body pass, as HD's catcher already is) | 0 | 0 | fits |
+| `emit` (11A, statics only: lamp flames, lit windows) | none | none | **cap: 512² a map (0.0625) plus 256² shared (0.016)** | fits; counted in the resident sum in every phase |
 | a depth pass | as normal | as normal | as normal | would break the cap |
 
   So any per-pixel run-time lighting pass (normal, depth) does not fit the cap of 9 for figures, and costs another
-  1.8 per map for the environment. _Proposed_ to 11A: bake light into the colour pass and keep run-time lighting the
-  layer of SPRITES 10.11 (pools and glows), as today.
+  1.8 per map for the environment. 11A's pass list (`pipeline.md` 4) keeps body, scarf and blood, adds `emit` for
+  statics and proposes no normal, depth, shadow-layer or separate AO pass; this table is the budget for it. With
+  `emit` at its cap and the `constable` resident (6.2), the low-poly worst case on Hollowmere is about 8.14 + 0.08 +
+  0.5 = 8.72, under 9. The sprite materials need no roughness or normal maps at run time: those are V2's (3.2, 8.1).
 
 ### 5.4 HD: the figures do not fit, and three ways out
 
@@ -290,8 +312,8 @@ The three ways out:
 
 - **HD-1, the low-poly figure in the HD world (_proposed_).** `assets/hd/` carries no `char_*` or `ovl_*`; the client
   falls back per key to the low-poly entry (a change to A80's fallback order for HD: hd, then lowpoly, then 8-bit).
-  HD resident: about 10.8 + 5.9 = 16.7. Bytes: no figure bytes in the HD set. The HD figure is the low-poly one with
-  the textures of 4.3, drawn with linear filtering, so it matches the world's finish, at half the HD world's density.
+  HD resident: about 10.8 + 5.9 = 16.7. Bytes: no figure bytes in the HD set. The HD figure is the flat low-poly one of
+  4.3, drawn with linear filtering, so it matches the world's finish, at half the HD world's density.
 - **HD-2, HD figures at texels 2 as KTX2.** Basis UASTC or BC7 at 8 bits a pixel is a quarter of RGBA's memory, so
   24 page-equivalents of figures cost what 6 cost uncompressed. It needs Phaser 4's compressed-texture loader
   (`ARCHITECTURE.md` 5.1 pins Phaser 4.2.1; KTX support to be verified by the build round), a transcoder in the
@@ -367,13 +389,13 @@ manifest (today the test skips styles with no manifest, so HD has never been che
   (it is resident on every map with the Constables), so it adds about 0.375 (8-bit) to 0.5 (low poly) to 5.3's
   figures.
 - **Triangles.** Measured from `build_looks.py --look all`: 1 588 (the plain villager) to 3 228 (the gamekeeper), 2 600
-  on average. The sprite renders do not care; V2 does (6.4).
+  on average. The sprite renders do not care; V2 does (8.2).
 
 ### 6.3 The overlays' look per style
 
 | Pass | 8-bit | Low poly | HD |
 |---|---|---|---|
-| body | toon, finished | toon, textured, posterised | soft toon, textured, AO, rim, contact shadow |
+| body | toon, flat, finished | toon, flat, unfinished | soft toon, roles per garment (6.2), AO, rim, contact shadow (if HD ships figures, 5.4) |
 | scarf | bone ramp, finished | bone ramp, unfinished | bone ramp, soft bands (the body's finish) |
 | blood | flat blood | flat blood | flat blood (no rim, no AO: it is a mask) |
 
@@ -405,9 +427,9 @@ Where it meets this plan:
   generations. Whether a Meshy output on the owner's plan counts as the owner's own work is not something this session
   can read from here (question 10.8).
 - **The budgets meet.** `glb_inspect.py`'s `--budget` grammar is the natural form for the per-class model budgets of
-  6.4; the plan writes them in that grammar so the owner's pipeline and this repo check the same numbers. This repo
+  8.2; the plan writes them in that grammar so the owner's pipeline and this repo check the same numbers. This repo
   does not import ROSW code (it is a separate repo); the build round writes its own check from the same table.
-- **LODs meet.** `assemble-3d` makes LODs as decimate ratios; 6.4 proposes the same form, so a model assembled there
+- **LODs meet.** `assemble-3d` makes LODs as decimate ratios; 8.1 proposes the same form, so a model assembled there
   arrives with V2's LODs already made.
 - **Where Blender runs** is 11A's (README, 11A, "Where Blender runs"); this section only says what crosses the
   boundary: a GLB master in, role-renamed slots and renders out.
@@ -453,12 +475,27 @@ checkout with the other masters. It changes no render, no page and no budget of 
 
 ## 9. The sample sheets
 
-In `docs/round11/samples/look/`, PNG, SAMPLES_TOTAL in all (the cap is 5 MB):
+In `docs/round11/samples/look/`, PNG, 189 KB in all (the cap is 5 MB):
 
-SAMPLES_TABLE
+| File | What it shows |
+|---|---|
+| `figure-styles.png` | The baker, `idle` frame 0, `s`, `se`, `sw` (rows), drawn as at zoom 2: 8-bit and low poly packed frames scaled 4 times (nearest for 8-bit, linear for low poly), HD frames 1:1. Columns: `8bit` (today), `8bit-tex` (garment roles, remap applied), `lowpoly` (today), `lowpoly-tex`, `hd as-is` (`--style hd --textured` exactly as `batch_render.py` runs today: the textures and the band edits do not reach the figure, 1.3), `hd flat` (HD with the remap, no textures: soft bands and rim reach the figure), `hd-tex` (HD with the remap and the ramp-table roles), `hd-tex + sky` (the same under `WDI_HD_SKY=1`) |
+
+What to look at:
+
+- `8bit` against `8bit-tex` and `lowpoly` against `lowpoly-tex`: the grain at 64 px, and low poly's hue drift (4.3).
+- `hd as-is` against `hd flat`: what the 1.3 fix changes on an HD figure: the soft band edges and the rim; the shadow
+  and AO are the same in both.
+- `hd-tex`: why figure roles must be named per garment (4.3, 6.2).
+- `hd-tex + sky` against `hd-tex`: the A164 ambient test.
+- Every HD column against the 8-bit and low-poly ones: the size of the contact shadow, which is what makes an HD frame
+  25 times the area of a low-poly one (4.2).
+
+The cost table of 4.2 comes from the same renders. The rooms and buildings in each style are round 8's sheet
+(`docs/round8/hd-look/`), unchanged by this round's proposals.
 
 How they were made: `build_looks.py --look baker`; `batch_render.py --char baker.blend --anims idle` with the flags
-of each column, the remap of 1.3 applied in a scratch wrapper for the columns marked "fixed"; `pixel.ts` and `pack.ts`
+of each column, the remap of 1.3 applied in a scratch wrapper for every column but `8bit`, `lowpoly` and `hd as-is`; `pixel.ts` and `pack.ts`
 for 8-bit and low poly, `hd.ts char` for HD; composed and shrunk to PNG-8 with Pillow. Nothing was written under
 `tools/`, `apps/` or `assets/`.
 
@@ -493,3 +530,7 @@ _proposed_.
 13. **V2 export with every master (GLB, role slots, LODs 0.5 and 0.25)?** Default: **yes** (section 8).
 14. **A new run-time lighting pass (normals or depth for sprites)?** Default: **no**; light stays baked into the colour
     pass and the lighting layer stays as SPRITES 10.11 has it (5.3). 11A owns the pass list and may answer this first.
+15. **The PBR sky under HD figures (A164's open ambient test)?** Default: **no**: measured, it barely changes the
+    figure (section 9), so figures render without it and the question closes.
+16. **HD render samples at 8 (11A's measurement, 3.6 times faster)?** Default: **yes**, with 16 if the first HD sheet
+    shows noise (4.4).
