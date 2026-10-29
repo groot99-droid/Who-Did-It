@@ -171,6 +171,7 @@ export function drawNode(g: SKRSContext2D, id: string, state: 'ready' | 'spent',
   const ready = state === 'ready';
   switch (id) {
     case 'timber':
+    case 'logs':
       if (ready) {
         log(g, x - 30, y - 10, 10, 40);
         log(g, x - 10, y, 10, 40);
@@ -392,7 +393,8 @@ export function drawNodeBreak(g: SKRSContext2D, id: string, n: number, o: Pt): v
   drawNode(g, id, 'spent', o);
   g.restore();
   switch (id) {
-    case 'timber': {
+    case 'timber':
+    case 'logs': {
       // The stack shudders, then splits: the logs sink and the splinters fly.
       const shake = n < 2 ? (n ? -2 : 2) : 0;
       fading(g, id, [x + shake, y], 1 - k * 1.2, 1 + k * 0.15, 1 - k * 0.7);
@@ -590,6 +592,36 @@ export function drawHeld(g: SKRSContext2D, tool: string, dir: Dir, hand: Pt): vo
         [10, 44],
       ]);
       seg(g, c('stone', 5), [11, 42], [18, 37], 2);
+      break;
+    case 'axe':
+      bar(g, c('wood', 4), [-4, -20], [6, 26], 4);
+      poly(g, c('stone', 3), [
+        [2, 22],
+        [16, 18],
+        [20, 34],
+        [8, 38],
+      ]);
+      seg(g, c('stone', 5), [17, 20], [19, 33], 2);
+      break;
+    case 'pickaxe':
+      bar(g, c('wood', 4), [-4, -20], [6, 26], 4);
+      poly(g, c('stone', 3), [
+        [-12, 24],
+        [14, 20],
+        [20, 26],
+        [-6, 32],
+      ]);
+      seg(g, c('stone', 5), [-10, 27], [18, 24], 2);
+      break;
+    case 'hammer':
+      bar(g, c('wood', 4), [-4, -20], [6, 26], 4);
+      poly(g, c('stone', 3), [
+        [-4, 20],
+        [16, 16],
+        [18, 28],
+        [-2, 32],
+      ]);
+      seg(g, c('stone', 5), [15, 18], [17, 27], 2);
       break;
     case 'lockpicks':
       g.beginPath();

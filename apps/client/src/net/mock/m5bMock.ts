@@ -14,7 +14,7 @@ import type { MobSnap, NodeSnap, QuestSnap, TaskSnap } from '../world';
 
 const REACH_PX = balanceJson.doors.reachTiles * TILE_PX;
 const SLOTS = itemsJson.inventorySlots;
-const STACK_MAX = balanceJson.resources.stackMax;
+const STACK_MAX = balanceJson.resources.stackMax.material; // round 10, A12: the mock stacks materials only
 const RESOURCES = resourcesJson.resources as Record<
   string,
   { id: string; gatherS: number; yield: number; respawnS: number; tool?: string }

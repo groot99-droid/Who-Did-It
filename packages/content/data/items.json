@@ -77,7 +77,9 @@
       "use": "crowbar",
       "tooltip": "Break a locked door; it stays broken.",
       "ships": "V1",
-      "gddRef": "3.5"
+      "gddRef": "3.5",
+      "tool": { "pry": 1 },
+      "uses": 20
     },
     "magnifier": {
       "id": "magnifier",
@@ -354,7 +356,8 @@
       "use": "lockpick",
       "tooltip": "Open a locked door.",
       "ships": "V1.5",
-      "gddRef": "3.5"
+      "gddRef": "3.5",
+      "tool": { "pick": 1 }
     },
     "sack": {
       "id": "sack",
@@ -449,7 +452,9 @@
       "onDeath": "drops",
       "tooltip": "Dig tin ore out of a seam.",
       "ships": "V1",
-      "gddRef": "3.14"
+      "gddRef": "3.14",
+      "tool": { "dig": 1 },
+      "uses": 20
     },
     "timber": {
       "id": "timber",
@@ -551,6 +556,52 @@
       "tooltip": "Present it at a meeting: the vote begins again, and for a short while no vote may name you.",
       "ships": "V1",
       "gddRef": "3.23"
+    },
+    "logs": {
+      "id": "logs",
+      "name": "Logs",
+      "kind": "material",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Raw wood from a pile or a tree. Crafting waits for the mill.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "axe": {
+      "id": "axe",
+      "name": "Axe",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tool": { "cut": 1 },
+      "uses": 20,
+      "tooltip": "Chops woodpiles, logs and stumps. Wears with use.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "pickaxe": {
+      "id": "pickaxe",
+      "name": "Pickaxe",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tool": { "break": 1, "dig": 1 },
+      "uses": 20,
+      "tooltip": "Breaks boulders and rock piles; digs a tin seam. Wears with use.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "hammer": {
+      "id": "hammer",
+      "name": "Hammer",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tool": { "pry": 1 },
+      "uses": 40,
+      "tooltip": "Pries open a nailed crate. Wears with use.",
+      "ships": "V1",
+      "gddRef": "3.14"
     }
   }
 }

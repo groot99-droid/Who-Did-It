@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { GddRef, Id, LookId, Seconds, Tiles } from './common.js';
+import { ToolTag } from './interactions.js';
 
 // M5b content (GDD 3.14 to 3.16, round 6, Session 6E; docs/round6/m5b-data.md 1): resources, recipes, mobs, quests and
 // the main-mode mini-games. Pre-seeded by 6Z as empty records with these shapes; 6E fills the rows and may widen a
@@ -22,6 +23,8 @@ export const Resource = z.strictObject({
   respawnS: Seconds,
   /** An item the gatherer must hold (a spade for ore), or none. */
   tool: Id.optional(),
+  /** Round 10 (A11): a held item with this capability tag cuts the gather hold to `gatherS` (bare hands still gather). */
+  fastTool: z.strictObject({ tag: ToolTag, gatherS: Seconds }).optional(),
   sprite: SpriteKey,
 });
 export type Resource = z.infer<typeof Resource>;

@@ -85,7 +85,7 @@ describe('craft', () => {
     away.x += 10 * 32; // far from the basin, same scene
     give(seat, { timber: 2, stone: 1 });
     await craft(p, 'spade');
-    expect(errors(human)).toContain(ErrorCode.outOfRange);
+    expect(errors(human)).toContain(ErrorCode.cannot);
     expect(away.hold).toBeNull();
     expect(sceneId).toBeDefined();
   });
@@ -115,7 +115,7 @@ describe('craft', () => {
   it('crafts from a full inventory, the inputs freeing the slot the tool takes', async () => {
     const p = await party();
     const { seat } = standBy(p, null);
-    for (let i = 0; i < items.inventorySlots - 2; i++) addStack(seat, 'crowbar', 1);
+    for (let i = 0; i < items.inventorySlots - 2; i++) addStack(seat, 'oil', 1);
     give(seat, { timber: 1, resin: 1 }); // every slot used
     await craft(p, 'torch');
     advance(p, cast('torch'));

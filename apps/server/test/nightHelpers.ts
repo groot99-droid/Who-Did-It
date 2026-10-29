@@ -39,8 +39,10 @@ export const power = (bot: Bot, abilityId: string, targetId?: string) =>
 export const notes = (m: Match, bot: Bot): InstanceType<typeof NotebookEntry>[] =>
   [...playerOf(m, bot).priv.notebook].filter((e) => e.note > 0);
 
-/** The (code, msg) pairs a bot was refused with, in order. */
-export const refusals = (bot: Bot): Array<{ code: number; msg: string }> =>
-  bot.events.filter((e) => e.type === 'error').map((e) => e.payload as { code: number; msg: string });
+/** The error frames (code, msg, reason and args) a bot was refused with, in order. */
+export const refusals = (bot: Bot): Array<{ code: number; msg: string; reason?: string; args?: unknown }> =>
+  bot.events
+    .filter((e) => e.type === 'error')
+    .map((e) => e.payload as { code: number; msg: string; reason?: string; args?: unknown });
 
 export { errorCodes, simOfBot };
