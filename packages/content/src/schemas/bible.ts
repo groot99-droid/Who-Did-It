@@ -59,7 +59,19 @@ export const LawStage = z.strictObject({
   /** The verdicts the Tribunal may return at this stage. */
   verdicts: z.array(z.enum(['release', 'exile', 'hang'])).min(1),
 });
-export const LawsFile = z.strictObject({ gddRef: GddRef, laws: z.record(Id, LawStage) });
+/**
+ * Round 10, B2 (GDD 3.31, UI 14.46): the Constables' briefing lines. `{clue}` and `{scene}` in both, `{trait}` in
+ * `withTrait`; D9's Constable tips read them here.
+ */
+export const BriefingLines = z.strictObject({
+  line: z.string().includes('{clue}').includes('{scene}'),
+  withTrait: z.string().includes('{clue}').includes('{scene}').includes('{trait}'),
+});
+export const LawsFile = z.strictObject({
+  gddRef: GddRef,
+  laws: z.record(Id, LawStage),
+  briefing: BriefingLines.optional(),
+});
 export type LawsFile = z.infer<typeof LawsFile>;
 
 /** One row of the propagation matrix: who hears what, and what it does to them. */

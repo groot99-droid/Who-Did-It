@@ -1763,3 +1763,17 @@ Lines are in `apps/client/src/ui/copy/refusals.ts` (`REFUSAL_COPY`, `refusalLine
   from "you are missing something". `NFY_SHOWN` (14.43) is the release switch.
 - The refused prompt keeps its shake (`refusedIn`, UI.md 9), and the door sound still follows the legacy code.
 
+### 14.46 The law (10B, round 10)
+
+The server fills these templates (`packages/content/data/laws.json` `briefing`, read by
+`apps/server/src/sim/law/Briefing.ts` and, with D9, by a Constable's tips) and sends them on the `system` chat
+channel, the same words to every client (GDD 3.31):
+
+| Moment | Line |
+|---|---|
+| A briefing, an Anyone clue with a trait | Constables' briefing: {clue} in {scene}, {trait}. |
+| A briefing, no trait | Constables' briefing: {clue} in {scene}. |
+
+`{clue}` is the clue's `clues.json` name in lower case, `{scene}` the scene's name and `{trait}` the trait's
+`traits.json` label in lower case. A line never names a seat, a handle, a card or a time, and never says Forged
+or Verified.
