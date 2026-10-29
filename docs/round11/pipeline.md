@@ -24,7 +24,8 @@ another of the owner's sessions is building the 3D asset pipelines (section 7).
    mask of what glows (lit windows, lamps, the forge, cave moss) on the static atlases. The darkness layer cuts it
    out at night, so a lit window stays lit. Normals, depth, a separate AO and a separate shadow layer were rendered
    and are not proposed.
-4. **Tooling: render records instead of hoping for identical bytes** (section 5). Every batch writes a
+4. **Tooling: fix the figures' toon group first, then render records instead of hoping for identical bytes**
+   (section 5). Every batch writes a
    `render.lock.json` (inputs, Blender build, host). A re-render skips what did not change. Kenney packs get a hash
    lock like Poly Haven's, because a pinned Kenney URL has already rotted. CI gains an optional `bpy` smoke job.
 5. **Where Blender runs: cloud sessions for the display-scale set, HD at 8 TAA samples, the laptop optional**
@@ -218,17 +219,23 @@ pivots, and adds no new framing code.
   replace a system that works with one more page per atlas.
 - **Separate AO.** Baked (3.2). A separate pass would only let the client scale it, which nobody needs.
 
-### 4.4 Each pass's cost, for 11B
+### 4.4 Each pass's cost
 
-These are per page of the atlas the pass belongs to, in 11B's page-equivalents (VRAM uncompressed, 2048² RGBA =
-16 MiB). 11B's budgets decide which ones fit.
+The page cost of each pass is 11B's, in `docs/round11/look.md` 5.3. 11B's table counts the list of 4.1 as kept
+(`body`, `scarf`, `blood`, `emit`) and the passes of 4.3 as not proposed. My inputs to it were these:
 
-| Pass | Page cost | Render cost on this container (section 6) |
-|---|---|---|
-| `body`, `scarf`, `blood` | as today (SPRITES 10.14): overlays are the `ovl_<look>` page | measured: about 1.25 s a 128 px frame each, in 8-bit |
-| `emit` | ≤ 0.0625 a map + 0.016 shared, estimated | about 5 s a building frame |
-| shadow layer (P3) | the layer covers about three quarters of its building's own area (measured on the tavern), so about 0.37 a map for HollowMere's 0.5 building page | about 40 s a building frame |
-| normal (P4) | +100 % of every page it covers | about 27 to 33 s a building frame |
+- `emit`: the emitting pixels are 3 % of the tavern's own, so an estimate of at most 512² a map and 256² shared.
+- The shadow layer: it covers about three quarters of its building's own area (measured on the tavern).
+- Normals: one more page for every page they cover.
+
+The render cost is this document's. It is measured on this container (section 6):
+
+| Pass | Render time |
+|---|---|
+| `body`, `scarf`, `blood` | about 1.25 s a 128 px frame each, in 8-bit |
+| `emit` | about 5 s a building frame |
+| shadow layer (P3) | about 40 s a building frame |
+| normal (P4) | about 27 to 33 s a building frame |
 
 ## 5. The tooling
 
@@ -295,7 +302,25 @@ the raw renders are never committed.
 | render locks | `@wdi/sprites` vitest | every shipped atlas has its `render.lock.json`, and the frames match | none |
 | source locks | `@wdi/blender` unittest | `kits.lock.json` and `polyhaven.lock.json` are well-formed, every role and kit id resolves | none |
 
-### 5.4 How a re-render lands
+### 5.4 A defect to fix before any re-render
+
+11B found it, and I reproduced it on this container. `batch_render.import_character` appends a look's `.blend`,
+and the look carries its own copy of the toon node group. That copy arrives as `WDI_Toon.001` beside the rig's
+`WDI_Toon`, and every figure material uses the copy.
+
+The rig's changes are made to `WDI_Toon` only:
+
+- `materials/hd.smooth_toon_group`: the soft bands, the rim and the `Normal` input;
+- the `--textured` role swap.
+
+Neither reaches a figure. Today's HD figures therefore carry the HD shadows, AO and catcher with stepped 8-bit bands,
+and `--textured` does nothing on a figure. The HD timings of 6.1 were measured with this defect.
+
+**The fix, first in the build plan:** after the import, remap every `WDI_Toon.*` group (and `OutlineInk.*`) onto the
+rig's own with `user_remap`. A `bpy` test (5.3's job) asserts that a figure uses only the rig's groups. 11B's
+look.md 1.3 cites this.
+
+### 5.5 How a re-render lands
 
 These are art-drop pull requests as in ASSETS 6.6, cut so that each stays reviewable and under GitHub's limits:
 
@@ -321,7 +346,7 @@ These are art-drop pull requests as in ASSETS 6.6, cut so that each stays review
 | `batch_render.py --smoke` (the calibration sheet) | 44 s |
 | `build_looks.py --look baker` (the master) | 1.1 s |
 | The Baker's `walk`, 8 directions x 8 frames x 3 passes, 8-bit (128 px cells) | 241 s for 192 frames: **1.25 s a frame** |
-| The same in HD (256 px cells, `taaSamples` 32, shadows, AO) | 21.5 s a frame for every pass (stopped after 22 frames) |
+| The same in HD (256 px cells, `taaSamples` 32, shadows, AO; with the defect of 5.4) | 21.5 s a frame for every pass (stopped after 22 frames) |
 | HD `idle`, one direction, `taaSamples` 32 against 8 | 118 s against 36 s for 6 frames: **about 19.7 against 5.5 s a frame**. The difference is a mean of 0.44 of 255 on the figure, and 0.3 % of its pixels differ by more than 16 levels |
 | The tavern frame at the display scale (1408 x 1104): A / B / C of 3.2 | 9.6 / 9.2 / 54 s |
 | Its passes: `emit` / shadow layer / normal / depth / AO | 5 / 40 / 27 / 27 / 29 s |
@@ -341,6 +366,10 @@ one:
 | Display scale (8-bit and low poly) | 1.25 s | about **9 h** |
 | HD at today's 32 samples | 21.5 s | about **156 h** |
 | HD at 8 samples | 5.5 s | about **40 h** |
+
+11B measured that HD figures at their 256 px packed cell cannot fit any resident cap, and its look.md proposes
+HD-1: the HD world, with figures falling back to low poly. If the owner takes HD-1, the HD figure rows above are not
+rendered at all, and the HD set is the world only.
 
 The world is small beside this. A map's buildings, props, kit and ground come to a few hundred frames of a few
 seconds to a minute each. That is an hour or two a map a style, plus the shadow-free AO cost, which is none.
