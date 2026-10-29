@@ -17,6 +17,7 @@ import { handleNotice } from './economy/notices';
 import { handleMug } from './townsfolk/mug';
 import { handleCraftGrid } from './Craft';
 import { handleInvMove, handleInvSelect } from './InventoryMoves';
+import { wakeOnInput } from './Sleep';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
 export interface QueuedCommand {
@@ -61,6 +62,8 @@ export function runCommands(room: PartyRoom): void {
     const player = room.state.players.get(cmd.sessionId);
     if (!player) continue;
     const payload = (cmd.payload ?? {}) as Record<string, unknown>;
+    // Round 10, A7 (GDD 3.32): a sleeper's first input wakes it and is refused, silently; chat is not an act.
+    if (cmd.type !== C2S.say && wakeOnInput(room, cmd.sessionId, true)) continue;
     switch (cmd.type) {
       case C2S.enterPortal:
         queuePortal(room, cmd.sessionId, payload);

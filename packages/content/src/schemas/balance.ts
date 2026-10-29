@@ -519,5 +519,12 @@ export const BalanceFile = z.strictObject({
    * stays within the leash.
    */
   guard: Section({ leashTiles: Tiles, angerS: Seconds }),
+  /** Round 10, A7 (GDD 3.32): sleeping through the night. */
+  sleep: Section({
+    /** Every active player asleep this long ends the night. */
+    confirmS: Seconds,
+    /** The tavern bed's price, paid from the purse when the sleeper lies down. */
+    innBedScrip: z.number().int().nonnegative(),
+  }),
 });
 export type BalanceFile = z.infer<typeof BalanceFile>;
