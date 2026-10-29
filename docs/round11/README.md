@@ -125,4 +125,5 @@ because each reads most of the art record: ASSETS 6, SPRITES 1 to 12, `docs/roun
 
 ## Status (2026-10-29)
 
-- This contract. 11A and 11B start when A13 merges.
+- This contract (#339).
+- The playtest gate opened when round 10's A13b merged (4a8e70f), and 11A and 11B started.
