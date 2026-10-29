@@ -411,6 +411,16 @@ so both maps craft every tool at the Small profile. The Torch is a carried light
 ships in V1. The Lockpicks and the Snare can be crafted, carried, traded and dropped; their verbs (Pick a lock, Set a
 snare) are the V1.5 abilities of 3.5 and stay off until they ship.
 
+**The logic table** (round 10, A9; `interactions.json`, `docs/round9/logic-table.md`). Every placed prop has one census
+decision: `live` (the sim reads its kind today), `interact` (a tool, a station or a bare-hands verb works on it),
+`container` (it holds loot) or `keep` (decoration on purpose); `dressing` and `decor` props are decided by stem, the rest
+by kind, and the content check refuses a scene that places a prop with no decision. A **class** names what a prop is
+(a kind, a stem, a resource node or a locked portal), and no prop belongs to two classes, so a hold on it has one answer.
+An **interaction** is a verb on a class, with its modes best first: the tool a mode needs (a capability tag and tier,
+or bare hands), a hold or a mini-game, its drops or loot, the wear and the noise, and a failure line per refusal
+reason. Today the table registers the live kinds as classes and holds no interaction, so nothing plays differently; the
+resolver (A10) and the tool walls (A11) give it behaviour.
+
 ### 3.15 Mobs
 
 Round 6 (ROADMAP M5b). The rows are `mobs.json` and the scenes' `spawners`; sentences marked (6G) are the server's
