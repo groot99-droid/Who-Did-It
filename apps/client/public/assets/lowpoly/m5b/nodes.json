@@ -510,6 +510,256 @@
      }
     },
     {
+     "filename": "node_logs/break/000",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 14,
+      "y": 21,
+      "w": 36,
+      "h": 33
+     },
+     "frame": {
+      "x": 3,
+      "y": 44,
+      "w": 36,
+      "h": 33
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_logs/break/001",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 24,
+      "w": 36,
+      "h": 30
+     },
+     "frame": {
+      "x": 3,
+      "y": 159,
+      "w": 36,
+      "h": 30
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_logs/break/002",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 26,
+      "w": 37,
+      "h": 28
+     },
+     "frame": {
+      "x": 43,
+      "y": 119,
+      "w": 37,
+      "h": 28
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_logs/break/003",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 29,
+      "w": 38,
+      "h": 25
+     },
+     "frame": {
+      "x": 63,
+      "y": 75,
+      "w": 38,
+      "h": 25
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_logs/break/004",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 12,
+      "y": 32,
+      "w": 38,
+      "h": 22
+     },
+     "frame": {
+      "x": 3,
+      "y": 231,
+      "w": 38,
+      "h": 22
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_logs/break/005",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 11,
+      "y": 34,
+      "w": 40,
+      "h": 20
+     },
+     "frame": {
+      "x": 191,
+      "y": 230,
+      "w": 40,
+      "h": 20
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_logs/break/006",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 10,
+      "y": 37,
+      "w": 43,
+      "h": 17
+     },
+     "frame": {
+      "x": 180,
+      "y": 207,
+      "w": 43,
+      "h": 17
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_logs/break/007",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 6,
+      "y": 37,
+      "w": 53,
+      "h": 17
+     },
+     "frame": {
+      "x": 121,
+      "y": 207,
+      "w": 53,
+      "h": 17
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_logs/ready",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 13,
+      "y": 21,
+      "w": 36,
+      "h": 33
+     },
+     "frame": {
+      "x": 23,
+      "y": 3,
+      "w": 36,
+      "h": 33
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
+     "filename": "node_logs/spent",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 64
+     },
+     "spriteSourceSize": {
+      "x": 18,
+      "y": 37,
+      "w": 27,
+      "h": 17
+     },
+     "frame": {
+      "x": 217,
+      "y": 3,
+      "w": 27,
+      "h": 17
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.75
+     }
+    },
+    {
      "filename": "node_mushroom/break/000",
      "rotated": false,
      "trimmed": true,

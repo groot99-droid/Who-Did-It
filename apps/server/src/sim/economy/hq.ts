@@ -1,5 +1,4 @@
 import { economy } from '@wdi/content';
-import { ErrorCode } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { emitSim } from '../events/bus';
 import { canExchange, exchange } from '../Inventory';
@@ -27,19 +26,18 @@ export function handleHq(room: PartyRoom, seat: string, payload: Record<string, 
   const { stationId } = payload;
   const player = room.state.players.get(seat);
   if (!player?.priv || typeof stationId !== 'string') return;
-  if (!hqGate.open) return reject(room, seat, ErrorCode.cannot, 'not yet');
-  if (!isVerbPhase(room.state.phase)) return reject(room, seat, ErrorCode.wrongPhase, 'not now');
+  if (!hqGate.open) return reject(room, seat, 'NFY', { feature: 'the headquarters' });
+  if (!isVerbPhase(room.state.phase)) return reject(room, seat, 'PHASE_CLOSED');
   const station = Object.hasOwn(economy.hq.stations, stationId) ? economy.hq.stations[stationId] : undefined;
   const prop = station?.props[mapIdOfRoom(room)];
   if (!station || !prop || !nearProp(room, seat, [prop]))
-    return reject(room, seat, ErrorCode.outOfRange, 'no station here');
-  if (player.look !== station.look) return reject(room, seat, ErrorCode.cannot, 'not yours to build');
+    return reject(room, seat, 'NO_COUNTER', { kind: 'station' });
+  if (player.look !== station.look) return reject(room, seat, 'NOT_YOURS', { what: 'build' });
   const bought = tiersOf(room).get(stationId) ?? 0;
   const tier = station.tiers[bought];
-  if (!tier) return reject(room, seat, ErrorCode.cannot, 'fully built');
-  if (balanceOf(room, seat) < tier.scrip) return reject(room, seat, ErrorCode.cannot, 'not enough Scrip');
-  if (!canExchange(player, tier.materials, []))
-    return reject(room, seat, ErrorCode.cannot, 'missing materials');
+  if (!tier) return reject(room, seat, 'ALREADY_DONE', { what: 'built' });
+  if (balanceOf(room, seat) < tier.scrip) return reject(room, seat, 'NEED_SCRIP');
+  if (!canExchange(player, tier.materials, [])) return reject(room, seat, 'NEED_MATERIALS');
   if (movePurse(room, seat, TOWN, tier.scrip, 'hq') !== tier.scrip) return;
   exchange(player, tier.materials, []);
   tiersOf(room).set(stationId, bought + 1);

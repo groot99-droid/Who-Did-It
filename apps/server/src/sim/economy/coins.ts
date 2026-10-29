@@ -1,10 +1,11 @@
 import { balance } from '@wdi/content';
-import { ErrorCode, Node, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { Node, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { type PlayerSim, simOf } from '../RoomSim';
 import { type SimEvent, emitSim, onSim } from '../events/bus';
 import { isVerbPhase, sceneKey } from '../World';
 import { balanceOf, movePurse } from './purse';
+import { refusal, type Refusal } from '../refusal';
 
 /**
  * Coins on the ground (round 8, GDD 3.23; docs/round8/economy.md 2), Session 8C. A knockout (8A's `body.ko`) or a
@@ -73,18 +74,14 @@ export function runCoins(room: PartyRoom): void {
 }
 
 /** Why a pickup cannot run this tick, or null: the gather checks without a tool or a pocket. */
-export function coinsProblem(
-  room: PartyRoom,
-  p: PlayerSim,
-  nodeId: string,
-): { code: ErrorCode; msg: string } | null {
-  if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
-  if (p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
-  if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
+export function coinsProblem(room: PartyRoom, p: PlayerSim, nodeId: string): Refusal | null {
+  if (!isVerbPhase(room.state.phase)) return refusal('PHASE_CLOSED');
+  if (p.dead || !p.placed) return refusal('NOT_IN_PLAY');
+  if (room.state.tick < p.busyUntilTick) return refusal('BUSY');
   const node = coinsNode(room, p, nodeId);
-  if (!node || !node.active) return { code: ErrorCode.cannot, msg: 'nothing there' };
+  if (!node || !node.active) return refusal('NOTHING_THERE');
   if (Math.hypot(p.x - node.x, p.y - node.y) > balance.doors.reachTiles * TILE_PX) {
-    return { code: ErrorCode.outOfRange, msg: 'too far' };
+    return refusal('TOO_FAR');
   }
   return null;
 }

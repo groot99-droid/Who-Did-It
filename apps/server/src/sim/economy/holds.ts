@@ -1,5 +1,5 @@
 import { balance, economy, scenes } from '@wdi/content';
-import { ErrorCode, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { type PlayerSim, simOf } from '../RoomSim';
 import { mapScenesOf } from '../MapSites';
@@ -7,6 +7,7 @@ import { isVerbPhase, reject, sceneIndex, tileCentre } from '../World';
 import { bagFull, collectMailbag, mailbagOf } from './rumours';
 import { haul, haulable } from './rent';
 import { perkSum } from './perks';
+import { refusal } from '../refusal';
 
 /**
  * The civic holds of round 8 (GDD 3.23), Session 8D: `act.hold` on the mailbag and on a tally rack. `Hold.ts` hands
@@ -37,17 +38,14 @@ function spotOf(room: PartyRoom, action: string, targetId: string): Spot | null 
 }
 
 function problem(room: PartyRoom, seat: string, p: PlayerSim, action: string, targetId: string) {
-  if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
-  if (p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
-  if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
+  if (!isVerbPhase(room.state.phase)) return refusal('PHASE_CLOSED');
+  if (p.dead || !p.placed) return refusal('NOT_IN_PLAY');
+  if (room.state.tick < p.busyUntilTick) return refusal('BUSY');
   const spot = spotOf(room, action, targetId);
-  if (!spot || spot.id !== targetId || spot.sceneIdx !== p.sceneIdx)
-    return { code: ErrorCode.cannot, msg: 'nothing there' };
-  if (Math.hypot(p.x - spot.x, p.y - spot.y) > balance.doors.reachTiles * TILE_PX)
-    return { code: ErrorCode.outOfRange, msg: 'too far' };
-  if (action === 'mailbag' && !bagFull(room)) return { code: ErrorCode.cannot, msg: 'the bag is empty' };
-  if (action === 'rack' && haulable(room, seat) === 0)
-    return { code: ErrorCode.cannot, msg: 'nothing to haul' };
+  if (!spot || spot.id !== targetId || spot.sceneIdx !== p.sceneIdx) return refusal('NOTHING_THERE');
+  if (Math.hypot(p.x - spot.x, p.y - spot.y) > balance.doors.reachTiles * TILE_PX) return refusal('TOO_FAR');
+  if (action === 'mailbag' && !bagFull(room)) return refusal('SPENT', { what: 'stock' });
+  if (action === 'rack' && haulable(room, seat) === 0) return refusal('NOTHING_THERE');
   return null;
 }
 
@@ -56,7 +54,7 @@ export function handleCivicHold(room: PartyRoom, seat: string, action: string, t
   const p = simOf(room).players.get(seat);
   if (!p || typeof targetId !== 'string') return;
   const why = problem(room, seat, p, action, targetId);
-  if (why) return reject(room, seat, why.code, why.msg);
+  if (why) return reject(room, seat, why);
   if (p.hold?.action === action && p.hold.targetId === targetId) return;
   p.hold = { action, targetId, startTick: room.state.tick };
 }

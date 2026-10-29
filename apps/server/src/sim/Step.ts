@@ -17,6 +17,7 @@ import { runMobs } from './Mobs';
 import { runBody } from './body/run';
 import { runQuests } from './Quests';
 import { runResources } from './Resources';
+import { runInteract } from './interact/resolve';
 import { runTrain } from './Train';
 import { runCommands } from './Commands';
 import { runHunger } from './Hunger';
@@ -63,6 +64,7 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   runPortals(room);
   runDecay(room); // M3: clue decay and cap
   runResources(room); // round 6, 6F (locked call site)
+  runInteract(room); // round 10, A10: the logic table's prop states
   runMobs(room); // round 6, 6G (locked call site)
   runBody(room); // round 8, 8A: effects, regen, stamina, knockout and wake (locked call site)
   runQuests(room); // round 6, 6H (locked call site)

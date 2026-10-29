@@ -49,9 +49,12 @@ describe('recipeRows', () => {
     const lockpicks = rows.find((r) => r.id === 'lockpicks')!;
     expect(lockpicks.missing).toEqual([]);
     expect(rows.map((r) => r.id).sort()).toEqual([
+      'axe',
       'crowbar',
+      'hammer',
       'lantern',
       'lockpicks',
+      'pickaxe',
       'snare',
       'spade',
       'torch',

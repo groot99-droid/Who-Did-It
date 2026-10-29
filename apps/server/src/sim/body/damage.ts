@@ -3,7 +3,7 @@ import { type DeathCause, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { AnimId } from '../constants';
 import { emitSim } from '../events/bus';
-import { creatureKill, quietDeath } from '../Kill';
+import { creatureKill } from '../Kill';
 import { mobBodies } from '../Mobs';
 import { simOf } from '../RoomSim';
 import { applyEffect, cureEffect, deriveEffects, hasEffect } from './effects';
@@ -71,14 +71,9 @@ export function hurt(room: PartyRoom, target: string, row: DamageRow, hit: Hit):
   return 'down';
 }
 
-/** A death the body made: a creature's (`wolf`, `creature`) or a drain's (`bled`, `sickened`). The ghost has no body. */
-export function die(
-  room: PartyRoom,
-  target: string,
-  cause: DeathCause & ('wolf' | 'creature' | 'bled' | 'sickened'),
-): void {
-  if (cause === 'bled' || cause === 'sickened') quietDeath(room, target, cause);
-  else creatureKill(room, target, cause);
+/** A death the body made: a creature's bite (`wolf`, `creature`); drains stop at 1 health (A6). The ghost has no body. */
+export function die(room: PartyRoom, target: string, cause: DeathCause & ('wolf' | 'creature')): void {
+  creatureKill(room, target, cause);
   removeBody(room, target);
 }
 

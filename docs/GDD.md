@@ -405,6 +405,9 @@ it.
 | Lockpicks | 1 Tin Ore | a basin | 3 s |
 | Lantern | 1 Tin Ore, 1 Pine Resin | an oven | 4 s |
 | Crowbar | 2 Tin Ore, 1 Timber | an oven | 4 s |
+| Axe | 2 Timber, 1 Stone | a basin | 4 s |
+| Pickaxe | 1 Timber, 2 Tin Ore | a basin | 4 s |
+| Hammer | 1 Timber, 1 Tin Ore | a basin | 3 s |
 
 Basins stand in the apothecary, Crumb's Ovens, the bunkhouse and the forge; ovens in Crumb's Ovens and the bunkhouse,
 so both maps craft every tool at the Small profile. The Torch is a carried light like the Lantern (radius 4, 3.5) and
@@ -418,8 +421,41 @@ by kind, and the content check refuses a scene that places a prop with no decisi
 (a kind, a stem, a resource node or a locked portal), and no prop belongs to two classes, so a hold on it has one answer.
 An **interaction** is a verb on a class, with its modes best first: the tool a mode needs (a capability tag and tier,
 or bare hands), a hold or a mini-game, its drops or loot, the wear and the noise, and a failure line per refusal
-reason. Today the table registers the live kinds as classes and holds no interaction, so nothing plays differently; the
-resolver (A10) and the tool walls (A11) give it behaviour.
+reason. A tool is an item with capability tags (`cut`, `break`, `dig`, `pick`, `pry`, `skin`), each with a tier, and
+optionally a number of uses.
+
+**Interacting** (round 10, A10) is a hold (E) on a prop, beside the older verbs. The server finds the prop's class and
+its interaction (the one the held item named, else the first the seat can run), then the first mode whose tool the seat
+holds; a seat with none is refused `NEED_TOOL`, naming the plainest tool that would do. A prop already changed is
+refused `NOTHING_THERE` until it comes back; an interaction not built yet answers `NFY`. Moving, a phase change, a lost
+tool or a full pack cancel the hold with nothing done. At its end the drops land (their amounts drawn from the `loot`
+stream), the tool loses `wear` uses and breaks when its uses run out, the prop takes its new state (public to the
+scene, never who changed it) until its respawn, and the mode's noise sounds. An NPC seat's hold runs through the same
+rules.
+
+**Tool walls** (round 10, A11). The piles of the world open only to their tool; bare hands get nothing, and the
+refusal `NEED_TOOL` names the tool. Tools carry tags and uses: the Axe (`cut` 1, 20 uses), the Pickaxe (`break` 1 and
+`dig` 1, 20), the Hammer (`pry` 1, 40), the Crowbar (`pry` 1, 20), the Spade (`dig` 1, 20) and the Lockpicks (`pick` 1);
+none is role-bound, and the content check refuses a wall that no neutral tool can run, or whose tool no seat can come by
+(a recipe's product or a loot-table item; logic-table 10.1).
+
+| Prop (stems) | Tool | Hold | Drops | Wear | Comes back |
+|---|---|---|---|---|---|
+| Woodpile, firewood, log, fallen log, log basket | Axe | 4 s | 2 to 3 Logs | 1 | 300 s |
+| Stump | Axe | 3 s | 1 Log, Resin half the time | 1 | 900 s |
+| Mine timber set | Axe 5 s, 2 Logs; or Crowbar 6 s, 1 Log | | | 1 | 600 s |
+| Boulder | Pickaxe | 6 s | 2 to 3 Stone, Tin Ore a quarter of the time | 2 | 1200 s |
+| Rock pile | Pickaxe | 4 s | 2 Stone | 1 | 600 s |
+| Rubble | Pickaxe as the rock pile, or bare hands | 12 s | 1 Stone | 0 | 600 s |
+| Ore pile | Pickaxe | 4 s | 2 Tin Ore | 1 | 600 s |
+| Nailed crate | Crowbar or Hammer | 3 s | 1 Timber, 60% | 1 | stays open |
+
+**Logs** are the raw wood of a pile; they stack as a material and wait for the mill's saw, which turns them into Timber
+(a later step). A worn tool breaks when its uses run out (one is taken); the wear is server memory per seat and tool.
+**Nodes keep bare hands** (owner answer LT1): a Timber node holds 3 s by hand and 1.5 s with an Axe in the inventory, a
+Stone node the same with a Pickaxe; Tin Ore still needs the Spade. A tool speeds supply up, it does not gate it.
+Chopping and breaking make no noise yet (the noise table has no chop or smash row); the Crowbar's pry sounds at 10.
+Nothing sells the tools yet, so a seat crafts one (the table above) or takes one from the world once chests land.
 
 ### 3.15 Mobs
 
@@ -433,10 +469,10 @@ they are drawn from the scene state for everyone in the scene.
 
 | Creature | Where | Speed | Senses | Flees light within | Attack | Bite (3.22) | Health | Kills |
 |---|---|---|---|---|---|---|---|---|
-| Wolf | the forests' wolf loops, dusk and night | 3.6 tiles/s | 6 tiles | 4 tiles | after 1 s in reach | 25, Bleeding 50% | 36 | yes, cause `wolf` |
-| Boar | the Fenwood, BlackPine Woods, day and dusk | 3.2 tiles/s | 4 tiles | 2 tiles | after 1.5 s in reach | 18, Bleeding 30% | 48 | yes, cause `creature` |
-| Bat | the caves | 4 tiles/s | 5 tiles | 3 tiles | after 2 s in reach | 6 | 10 | yes, cause `creature` |
-| Rat | the caves past the Tin Gallery mouth | 2.5 tiles/s | 3 tiles | 2 tiles | after 2 s in reach | 5, Poisoned 50% | 8 | yes, cause `creature` |
+| Wolf | the forests' wolf loops, dusk and night | 3.6 tiles/s | 6 tiles | 4 tiles | after 1 s in reach | 12, Bleeding 35% | 36 | yes, cause `wolf` |
+| Boar | the Fenwood, BlackPine Woods, day and dusk | 3.2 tiles/s | 4 tiles | 2 tiles | after 1.5 s in reach | 9, Bleeding 20% | 48 | yes, cause `creature` |
+| Bat | the caves | 4 tiles/s | 5 tiles | 3 tiles | after 2 s in reach | 3 | 10 | yes, cause `creature` |
+| Rat | the caves past the Tin Gallery mouth | 2.5 tiles/s | 3 tiles | 2 tiles | after 2 s in reach | 2, Poisoned 30% | 8 | yes, cause `creature` |
 
 **Behaviour.** A creature idles or roams its loop; it chases a living seat it senses and can see (3.7) for at most
 6 s (`mobs.chaseS`), then returns to its spawner and starts no new chase for as long; it flees any lit flame within
@@ -446,7 +482,7 @@ tile paths whose every tile lies inside its leash, so it never strays further; a
 pulled in to its edge, and at each point it pauses as a wandering NPC does (`npc.wander.stepMinS` to `stepMaxS`). A
 seat in transit or a ghost is never sensed, and nothing it senses depends on a card. (6G; round 8, 8A) Its attack
 lands its row's bite (`mobs.json` `dmg`, each effect by its chance) each time the seat has stayed in reach (1.5
-tiles, 3.7) and in sight for its attack time; a bite is a row of the damage table of 3.22, so the health it takes
+tiles, 3.7) and in sight for its attack time (round 10, A6: bites are about half what they were, so a whole wolf chase of `mobs.chaseS` leaves about 28% health, and a second chase before healing still kills; the attack times are unchanged); a bite is a row of the damage table of 3.22, so the health it takes
 regenerates and its Bleeding or Poisoned is cured like any other hit's. A bite that takes a seat to zero health is a
 death, cause `wolf` for a wolf and `creature` for the boar, the bat and the rat (the owner's answer, DECISIONS A134:
 creatures kill): the body is left where it fell and the kill scream rings (3.7), with no clue of a killer, so the
@@ -581,7 +617,7 @@ Round 6 (ROADMAP M5c). Cutscenes are data (`packages/content/data/cutscenes/`) p
 
 **Video steps (round 7, 7A, DECISIONS A101).** A cutscene may play one of the game's videos (a row of `assets/video/manifest.json`): full frame, under the cutscene's captions and its Skip, with the video's own sound at the player's music volume (muted if the browser refuses sound without a tap). The cutscene ends when the video ends, or at its `maxS` if that comes first. A video that cannot play (no row, no file, a decode error) is dropped and the rest of the cutscene plays over the world. The memorials use it (DECISIONS A113); captions meant to sit over the picture start with it (`withPrevious`).
 
-**Death cutscenes (6J).** A seat that dies by the knife, poison, the Gamekeeper's shot, a vote, a wolf or, since round 8 (8A, 3.22), another creature's bite (`creature`), Bleeding (`bled`) or Poisoned (`sickened`) is told so in its private `killed`, which names the cutscene of that cause (`cutsceneId`); a vanishing has none. The client plays it before the ghost handoff: a sound, one whispered line, and the last frame held for four seconds at most, skippable like the opening. The id is the victim's own news, so it reveals nothing the `cause` beside it does not. A seat voted out hears it while the meeting has the World asleep, so its cutscene plays when the World is rebuilt after the meeting.
+**Death cutscenes (6J).** A seat that dies by the knife, poison, the Gamekeeper's shot, a vote, a wolf or, since round 8 (8A, 3.22), another creature's bite (`creature`; Bleeding and Poisoned no longer kill, round 10, A6) is told so in its private `killed`, which names the cutscene of that cause (`cutsceneId`); a vanishing has none. The client plays it before the ghost handoff: a sound, one whispered line, and the last frame held for four seconds at most, skippable like the opening. The id is the victim's own news, so it reveals nothing the `cause` beside it does not. A seat voted out hears it while the meeting has the World asleep, so its cutscene plays when the World is rebuilt after the meeting.
 
 **Music (6L).** Each map plays one playlist per class, chosen by the phase and mapped in `music.json`: `loading` from the map's load to the opening (no map lists one since round 7: the lobby piece plays on through the load, so a load that finishes after the opening has started can never cut its piece off), `opening` with the opening cutscene, `lobby` between matches, `day` (dawn included), `dusk`, `night`, `meeting` (the discussion, the vote, the reveal and the immunity beat), `finalNight` and `gameOver`. A phase that stays in its class changes nothing, so a track is never restarted. **The opening piece (round 7, 7A, DECISIONS A101)** is the map's intro track of speech and music: it starts when the opening's `cutscene` message arrives, plays once and whole, never loops, and is silent at its end; the class the phase wants by then (the `day`, even while grace still runs) cross-fades in only when the piece ends or the seat skips the opening. A seat that skips also skips the rest of the piece. Port-au-Levain's piece waits for its map (round 8). Playlists cross-fade; their tracks, gains and fade seconds are in `audio/music/manifest.json`. Music is fetched only after Start (the lobby warms the first track of the picked map's day theme, never more) and has its own budget (ASSETS 6.8), separate from effects. Every player has a music slider, an effects slider and a mute (UI 14.22), kept on their own device and never sent; a class with no playlist, or a playlist with no track, is silence. No role, cover or secret is a class: the server sends nothing, and the pick depends only on public phases.
 
@@ -745,15 +781,15 @@ the health (A89). A Weakened striker's fist lands half its damage.
 | Fists (`strike`, every card) | 8 | Dazed 10%, Weakened 20% | knocked out |
 | Mugging blow (3.24) | 8 | as fists | knocked out |
 | Slingshot (`slingshot`, the Child) | 4 | Stunned | knocked out |
-| Wolf bite | 25 | Bleeding 50% | death, cause `wolf` |
-| Boar bite | 18 | Bleeding 30% | death, cause `creature` |
-| Bat bite | 6 | none | death, cause `creature` |
-| Rat bite | 5 | Poisoned 50% | death, cause `creature` |
-| Bleeding | 1.5 per second | none | death, cause `bled` |
-| Poisoned | 0.5 per second | Weakened, 2% per second | death, cause `sickened` |
+| Wolf bite | 12 | Bleeding 35% | death, cause `wolf` |
+| Boar bite | 9 | Bleeding 20% | death, cause `creature` |
+| Bat bite | 3 | none | death, cause `creature` |
+| Rat bite | 2 | Poisoned 30% | death, cause `creature` |
+| Bleeding | 1.5 per second | none | stops at 1 health (Wounded) |
+| Poisoned | 0.5 per second | Weakened, 2% per second | stops at 1 health (Wounded) |
 
-A death by `bled` or `sickened` leaves the body where the seat fell, with no scream, no killer and no clue; a death by
-`creature` is like `wolf` (3.15). Each of the three has its death cutscene (3.18), one whispered line as the others. The
+**Effects stop at 1 health** (round 10, A6). Bleeding and Poisoned drain health but never to zero: they leave the seat Wounded (under `body.woundedBelow`) until cured, and cure on the normal items. Only the Knife, Nightshade, the Last Shot, the vote and a creature's bite end a life, so the causes `bled` and `sickened` and their two death cutscenes retire. A death by
+`creature` is like `wolf` (3.15), with its death cutscene (3.18), one whispered line as the others. The
 dead seat's body row empties with the ghost handoff. Bodies tick only in the
 world phases: a meeting, the role card and game over freeze health, stamina and every effect clock. Effect chances
 roll on the body's own stream, never a secret one.
