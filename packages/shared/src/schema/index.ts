@@ -12,8 +12,8 @@ import { schema, t } from '@colyseus/schema';
 // sessions fill them (docs/round6/seams.md 1.1). Version 4 (round 7, A104): `Player.profile`,
 // `Private.vendetta` (A112). Version 5 (round 7, A115): the quick mode's fields are gone. Version 6 (round 8,
 // A135, docs/round8/seams.md 1): `Private.body` (8A); the later round-8 rows (`purse`, `bank`, `faith`, `hq`, 8L's
-// `Avatar.nearBits`) join version 6 without another bump. Version 7 (round 10, docs/round10/seams.md 3): the first of
-// A10's `SceneState.propStates` and A12's private inventory bumps it; the other joins 7.
+// `Avatar.nearBits`) join version 6 without another bump. Version 7 (round 10, docs/round10/seams.md 3): A10's
+// `SceneState.propStates` and A12's `ItemStack.slot` (A245); the other round-10 rows join version 7.
 // A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` to version 7.
 
 export const SCHEMA_VERSION = 7;
@@ -170,7 +170,9 @@ export const SceneState = schema(
  * before it evolved, '' for every card today. Own view only, like the rest of `Private`.
  */
 export const Role = schema({ roleId: str(), team: u8(), evolvedFrom: str() }, 'Role');
-export const ItemStack = schema({ defId: str(), qty: u8() }, 'ItemStack');
+/** `slot` (round 10, A12, GDD 3.30): where the stack sits, a slot number of `rules/inventory.ts` `slotLayout`. */
+export const ItemStack = schema({ defId: str(), qty: u8(), slot: u8() }, 'ItemStack');
+/** `slots` lists the occupied slots only, each stack naming its own `slot` (round 10, A12). Own view only. */
 export const Inventory = schema({ slots: t.array(ItemStack) }, 'Inventory');
 export const NotebookEntry = schema(
   {

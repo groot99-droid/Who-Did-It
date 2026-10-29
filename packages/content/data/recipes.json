@@ -48,6 +48,30 @@
       "in": [{ "item": "tinOre", "qty": 2 }, { "item": "timber", "qty": 1 }],
       "station": "oven",
       "craftS": 4
+    },
+    "axe": {
+      "id": "axe",
+      "out": "axe",
+      "qty": 1,
+      "in": [{ "item": "timber", "qty": 2 }, { "item": "stone", "qty": 1 }],
+      "station": "basin",
+      "craftS": 4
+    },
+    "pickaxe": {
+      "id": "pickaxe",
+      "out": "pickaxe",
+      "qty": 1,
+      "in": [{ "item": "timber", "qty": 1 }, { "item": "tinOre", "qty": 2 }],
+      "station": "basin",
+      "craftS": 4
+    },
+    "hammer": {
+      "id": "hammer",
+      "out": "hammer",
+      "qty": 1,
+      "in": [{ "item": "timber", "qty": 1 }, { "item": "tinOre", "qty": 1 }],
+      "station": "basin",
+      "craftS": 3
     }
   }
 }

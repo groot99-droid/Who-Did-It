@@ -18,7 +18,7 @@ import { artStyles, type ArtStyle } from './palette.ts';
 import { finishRender } from './pixel.ts';
 
 /** Resource ids (`resources.json`) in file order; a node's frames are `node_<snake id>/<state>`. */
-export const RESOURCE_IDS = ['timber', 'stone', 'tinOre', 'resin', 'herb', 'mushroom'] as const;
+export const RESOURCE_IDS = ['timber', 'stone', 'tinOre', 'resin', 'herb', 'mushroom', 'logs'] as const;
 export type ResourceId = (typeof RESOURCE_IDS)[number];
 /**
  * Every node drawn on the `nodes` page: the resources, then the coins a knockout or a mugging drops (8C, GDD 3.23),
@@ -26,7 +26,17 @@ export type ResourceId = (typeof RESOURCE_IDS)[number];
  */
 export const NODE_IDS = [...RESOURCE_IDS, 'coins'] as const;
 /** The craftable tools (`recipes.json`, GDD 3.5), each with a held overlay `held_<itemId>/<dir>`. */
-export const TOOL_IDS = ['torch', 'snare', 'spade', 'lockpicks', 'lantern', 'crowbar'] as const;
+export const TOOL_IDS = [
+  'torch',
+  'snare',
+  'spade',
+  'lockpicks',
+  'lantern',
+  'crowbar',
+  'axe',
+  'pickaxe',
+  'hammer',
+] as const;
 export type ToolId = (typeof TOOL_IDS)[number];
 export const NODE_STATES = ['ready', 'spent'] as const;
 export const GLOWS = ['lantern', 'torch'] as const;

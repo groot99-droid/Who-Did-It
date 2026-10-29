@@ -201,7 +201,7 @@ describe('gather', () => {
   it('refuses a gather with no room for the yield: every slot a stack', async () => {
     const p = await party();
     const { human, seat, row } = await atNode(p, 'herb');
-    for (let i = 0; i < items.inventorySlots; i++) addStack(seat, 'crowbar', 1);
+    for (let i = 0; i < items.inventorySlots; i++) addStack(seat, 'oil', 1);
     await hold(p, 'gather', row.id);
     expect(errors(human)).toContain(ErrorCode.cannot);
     advance(p, castTicks(resources.resources.herb!.gatherS));

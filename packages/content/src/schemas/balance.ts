@@ -398,8 +398,10 @@ export const BalanceFile = z.strictObject({
   resources: Section({
     /** The share of each node pool that is active in a match. */
     poolActiveFrac: Chance,
-    /** The most units of one material a slot holds. */
-    stackMax: z.number().int().positive(),
+    /**
+     * Round 10, A12 (GDD 3.30): the most units of one item a slot holds, by item kind; a kind not listed holds 1.
+     */
+    stackMax: z.partialRecord(z.enum(['material', 'food']), z.number().int().positive()),
   }),
   /** Round 6 (GDD 3.15): placeholders until Session 6E tunes them. */
   mobs: Section({ maxPerScene: z.number().int().nonnegative(), chaseS: Seconds }),
@@ -506,6 +508,11 @@ export const BalanceFile = z.strictObject({
       transcriptLines: z.number().int().positive(),
     }),
   }),
+  /**
+   * Round 10, A12 (GDD 3.30): the slots of a seat's inventory. `items.inventorySlots` is the hotbar and the pack
+   * together; the first `hotbar` of them are the hotbar. The `belt` slots take tools only.
+   */
+  inventory: Section({ hotbar: z.number().int().positive(), belt: z.number().int().nonnegative() }),
   /** Round 10, A7 (GDD 3.32): sleeping through the night. */
   sleep: Section({
     /** Every active player asleep this long ends the night. */

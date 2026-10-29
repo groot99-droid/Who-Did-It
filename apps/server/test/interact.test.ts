@@ -45,12 +45,16 @@ const chop: Interaction = {
   ships: 'V1',
 };
 
+// A11 put the real woodpile wall in the table; the fixture stands in for it, so the real class steps aside.
+const realLumber = interactions.classes.lumber;
 beforeEach(() => {
+  delete interactions.classes.lumber;
   interactions.classes.testLumber = { name: 'Test lumber', match: { stems: ['woodpile'] } };
   interactions.interactions.testChop = chop;
   items.items.testAxe = { ...items.items.spade!, id: 'testAxe', name: 'Test axe', tool: { cut: 1 }, uses: 2 };
 });
 afterEach(() => {
+  if (realLumber) interactions.classes.lumber = realLumber;
   delete interactions.classes.testLumber;
   delete interactions.interactions.testChop;
   delete items.items.testAxe;
@@ -84,7 +88,7 @@ describe('the resolver', () => {
     await hold(p);
     expect(refusals(p).at(-1)).toMatchObject({
       reason: 'NEED_TOOL',
-      args: { need: 'testAxe', tier: 1 },
+      args: { need: 'axe', tier: 1 },
       msg: LINE,
       interaction: 'testChop',
     });
