@@ -104,9 +104,12 @@ export function checkInteractions(
     }
     for (const m of it.modes)
       if (m.tool !== null) {
-        const carriers = Object.values(c.items.items).filter((i) => (i.tool?.[m.tool!.tag] ?? 0) >= m.tool!.tier);
+        const carriers = Object.values(c.items.items).filter(
+          (i) => (i.tool?.[m.tool!.tag] ?? 0) >= m.tool!.tier,
+        );
         // Logic table 10.1: no verb needs a role's item, and a wall's tool is one a seat can come by.
-        if (!carriers.some((i) => !i.roleBound)) err(`${where}: no neutral item carries ${m.tool.tag} ${m.tool.tier}`);
+        if (!carriers.some((i) => !i.roleBound))
+          err(`${where}: no neutral item carries ${m.tool.tag} ${m.tool.tier}`);
         else if (!carriers.some((i) => !i.roleBound && obtainable(i.id)))
           err(`${where}: nobody can come by a ${m.tool.tag} ${m.tool.tier} tool`);
       }

@@ -93,7 +93,9 @@ describe('interactions.json: the census (logic-table.md 5)', () => {
       broken((c) => {
         c.interactions.classes.testLumber = { name: 'Lumber', match: { stems: ['barrel'], kinds: ['bell'] } };
       }),
-    ).toEqual(expect.arrayContaining([expect.stringMatching(/prop \w+\.\w+ matches classes bell, testLumber/)]));
+    ).toEqual(
+      expect.arrayContaining([expect.stringMatching(/prop \w+\.\w+ matches classes bell, testLumber/)]),
+    );
   });
 });
 
