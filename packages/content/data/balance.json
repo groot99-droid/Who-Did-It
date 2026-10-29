@@ -387,5 +387,6 @@
   },
   "inventory": { "hotbar": 6, "belt": 2, "gddRef": "3.30" },
   "guard": { "leashTiles": 6, "angerS": 20, "gddRef": "3.24" },
-  "law": { "speedMult": 2, "briefingAfterS": 30, "gddRef": "3.31" }
+  "law": { "speedMult": 2, "briefingAfterS": 30, "gddRef": "3.31" },
+  "sleep": { "confirmS": 3, "innBedScrip": 2, "gddRef": "3.32" }
 }

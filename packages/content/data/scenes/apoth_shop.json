@@ -88,7 +88,8 @@
     { "id": "as.rug", "kind": "dressing", "x": 4, "y": 8 },
     { "id": "as.flour_sacks", "kind": "dressing", "x": 1, "y": 3 },
     { "id": "as.barrel", "kind": "dressing", "x": 1, "y": 4 },
-    { "id": "as.hq_surgery", "kind": "hq", "x": 16, "y": 4 }
+    { "id": "as.hq_surgery", "kind": "hq", "x": 16, "y": 4 },
+    { "id": "as.bed", "kind": "bed", "x": 1, "y": 5 }
   ],
   "gates": [],
   "paths": [],
