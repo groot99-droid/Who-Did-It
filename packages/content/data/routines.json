@@ -19,13 +19,26 @@
         "proofingCabinet"
       ]
     },
+    "gather": {
+      "phases": ["day"],
+      "kinds": ["lumber", "stump", "timberSet", "boulder", "rockPile", "orePile"]
+    },
+    "trade": { "phases": ["day"], "kinds": ["counter"] },
     "social": {
       "phases": ["day", "night"],
       "kinds": ["noticeBoard", "dartboard", "bell", "lamp", "decor"]
     },
     "rest": { "phases": ["night"], "kinds": ["lanternPost"] }
   },
-  "holds": {},
+  "holds": {
+    "lumber": "interact",
+    "stump": "interact",
+    "timberSet": "interact",
+    "boulder": "interact",
+    "rockPile": "interact",
+    "orePile": "interact",
+    "counter": "shop"
+  },
   "ignore": [
     "dressing",
     "kitChest",
@@ -37,7 +50,6 @@
     "plate",
     "deadLoaf",
     "ledger",
-    "counter",
     "bank",
     "altar",
     "mailbag",

@@ -98,8 +98,10 @@ export class Brain {
   /** A grace or immunity placement happened and has not been handled yet. */
   placementPending = false;
   placementIdleUntilTick = -1;
-  /** Hold attempts at the current station visit (a refusal ends the cycles; tests count them). */
+  /** Hold attempts at the current station visit (a refusal ends the visit; tests count them). */
   holdTries = 0;
+  /** The seat last stood still between actions (an idle, a stop, a leg pause): its next choice is an action (D1). */
+  rested = false;
   /** The next lobby ready (after Add NPC and after the return to the lobby); -1 when none. */
   lobbyReadyAtTick = -1;
   /** A body approach that found no path is retried after this tick. */
@@ -122,6 +124,9 @@ export interface Act {
   holding?: boolean;
   holdAgainTick?: number;
   refused?: boolean;
+  /** Work at a counter: the sale was made; work with a hold: another seat holds the prop, so the visit ends (D1). */
+  traded?: boolean;
+  yielding?: boolean;
 }
 
 /** A `debug.npc` payload waiting for the step (WDI_DEBUG only). */
