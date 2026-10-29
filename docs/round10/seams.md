@@ -42,7 +42,7 @@ the full check. A JSON conflict keeps both sides' keys. A conflict in another se
 | 2 | The error frame's optional `reason`, `args` and `interaction` (A1) | the refused client only | A1 (protocol, not schema) |
 | 3 | `SceneState.propStates`: per scene, `PropState {id, state, untilTick}`, the prop states of `logic-table.md` 3.4 (whole, cut, rubble, searched, open, broken); never who changed one | public to the scene | A10 (bumps to 7 if first) |
 | 4 | Two client messages, queued and consumed in `step()` and refused with A1's reasons: `inv.move {from, to}` moves, swaps or merges whole stacks between slots, checking what each slot takes; `inv.select {slot}` picks the held hotbar slot. Nothing public shows the held item | from the own client; the result only in its private view | A12 |
-| 5 | Sleeping: `Private.home`, the seat's home scene id, drawn at the deal from the bed interiors of the NPC persona pool and never from the card, so it says nothing about a cover; `Private.asleep`; and, written only while the seat is asleep, the counts for `phases.md` 13.4's "2 of 3 in bed" (active seats in bed, active seats in all). No count is public, and no name goes out | own client only | A7a (joins 7) |
+| 5 | Sleeping: `Private.home`, the seat's home scene id, drawn at the deal from the bed interiors of the NPC persona pool and never from the card, so it says nothing about a cover; `Private.asleep`; and, written only while the seat is asleep, `Private.inBed` and `Private.inBedOf`, the counts for `phases.md` 13.4's "2 of 3 in bed" (active seats in bed, active seats in all), zero while awake. No count is public, and no name goes out | own client only | A7a (joins 7) |
 
 Every other round-10 row is added here by 6Z when a session asks, before it lands. What must never go on the wire:
 who is awake by name (A8), who signed a petition beyond the count the screen shows, the Hitman's seat, a hardship's
@@ -73,7 +73,8 @@ the later session builds on the merged earlier one and does not reshape it.
 ## 5. Reserved rows
 
 - **Decisions.** 10A A225, 10F A226, 10H A227, 10G A228, 10B A229, 10C A230, 10D A231, 10E A232, 10X A233, 10Y A234,
-  10Z A235. A second row takes the number plus 20 (10A's second is A245).
+  10Z A235. A session's nth row takes its first number plus 20 × (n − 1): 10A's are A225, A245, A265 and A285, 10F's
+  A226, A246, A266 and so on. Rows stay in number order in the table.
 - **Copy** (`UI.md` 14). 10A 14.43, 10H 14.44, 10G 14.45, 10B 14.46, 10C 14.47, 10D 14.48, 10E 14.49.
 
 ## 6. Invariants and checks
