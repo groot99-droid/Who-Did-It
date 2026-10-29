@@ -1150,6 +1150,22 @@ dawn does: the next day, or the Final Night when the round calls for it. A human
 holds the night open. Still waits: the county jail (B5) and the line (the respawn step) will leave their seats out of
 the active players.
 
+**What a night in bed restores (A7b).** A seat still asleep when the night turns to day is restored by its bed; one
+who woke in the night gets nothing.
+
+| Bed | Stamina | Also |
+| --- | --- | --- |
+| Home `bed` | to `balance.sleep.restore.bed` of the maximum (all of it) | nothing |
+| Tavern `innBed` | to `restore.innBed` (all of it) | cures `sleep.innBedCures`: Slowed, Stunned, Poisoned and Famished, and counts as a meal |
+| Chapel `cot` | up to `restore.cot` (half), never lowering it | `sleep.cotFaith` Faith (P: 5, up to the Faith maximum), withheld from a seat the chapel bars |
+
+**Exhaustion (A7b).** In the night, when every active player but one is asleep, that one is the holdout. A holdout
+alone for `balance.sleep.holdoutGraceS` (60 s) is **Exhausted** from the next dawn to the next dusk: maximum stamina
+and its regeneration are both halved (`effects.json` `exhausted`). Going to bed after the grace does not undo it. A
+card with a power that works in the night (`abilities.json` `phases`) and a seat on a manhunt are never Exhausted. The
+effect lives in the seat's own view only, with no sign on the figure. Still waits: the chapel's bar (the Defrocked
+sentence) and the manhunt (B4).
+
 ### 3.33 The Hitman's arrival
 
 Round 10, C4 (`docs/round9/gdd-map.md` 2.7). Not built yet: the step that builds it writes this section.
