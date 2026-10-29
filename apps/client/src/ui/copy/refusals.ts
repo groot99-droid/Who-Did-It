@@ -1,6 +1,7 @@
 // UI.md 14.43 Refusals (Session 10A, round 10, A1; docs/round9/failures.md 3 to 5). One line per `RefusalReason`;
 // the server sends ids and numbers, never sentences, and the line names an item by its `items.json` name. A reason
 // added to the shared list without a line here fails the typecheck (the mapped type below).
+import interactionsData from '@wdi/content/data/interactions.json';
 import items from '@wdi/content/data/items.json';
 import {
   isRefusalReason,
@@ -182,6 +183,21 @@ export const REFUSAL_COPY: { readonly [R in RefusalReason]: Line<R> } = {
       : 'The oven wants the parts first.',
 };
 
+/** The per-interaction `fail` lines of `interactions.json`, by interaction id and then reason (failures.md 5). */
+export type InteractionFails = (interaction: string) => Readonly<Record<string, string>> | undefined;
+
+const TABLE = interactionsData.interactions as unknown as Record<string, { fail?: Record<string, string> }>;
+
+/** The `fail` lines of `interactions.json` (the logic table), by interaction id. */
+export const interactionFails: InteractionFails = (interaction) => TABLE[interaction]?.fail;
+
+/** The refusal fields of an `error` frame. */
+export interface RefusalIn {
+  reason?: unknown;
+  args?: unknown;
+  interaction?: string;
+}
+
 export interface RefusalLineOptions {
   /** A development build: a silent or unknown reason shows a `Bug:` line instead of nothing. */
   dev: boolean;
@@ -202,4 +218,20 @@ export function refusalLine(reason: unknown, args: unknown, opts: RefusalLineOpt
   const line = typeof entry === 'function' ? (entry as (a: typeof values) => string)(values) : entry;
   if (SILENT_REASONS.has(reason) && !opts.dev) return null;
   return line === '' ? null : line;
+}
+
+/** True for the `NFY` reason ("the game is unfinished"), which the log draws apart from a missing-thing line. */
+export const isNfy = (reason: unknown): boolean => reason === 'NFY';
+
+/**
+ * What a refusal shows (failures.md 6.2): the interaction's own `fail` line for the reason when the frame names one,
+ * else the general line of the reason. Null when nothing is shown.
+ */
+export function refusalText(
+  e: RefusalIn,
+  opts: RefusalLineOptions & { fails?: InteractionFails },
+): string | null {
+  const own =
+    e.interaction && typeof e.reason === 'string' ? opts.fails?.(e.interaction)?.[e.reason] : undefined;
+  return own ?? refusalLine(e.reason, e.args, opts);
 }

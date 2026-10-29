@@ -1,5 +1,5 @@
 import { abilities, roles } from '@wdi/content';
-import { ErrorCode, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { resolveHandle } from './Avatars';
 import { cureBy } from './body/cures';
@@ -42,11 +42,11 @@ export function livingActor(room: PartyRoom, sessionId: string, needBellPhase = 
   const phaseOk = needBellPhase
     ? phase === Phase.grace || phase === Phase.day // the Bell is silent after dark (GDD 3.3, M5a)
     : isVerbPhase(phase);
-  if (p.dead || !p.placed) reject(room, sessionId, ErrorCode.cannot, 'not now');
-  else if (!phaseOk) reject(room, sessionId, ErrorCode.wrongPhase, 'not now');
-  else if (room.state.tick < p.busyUntilTick) reject(room, sessionId, ErrorCode.busy, 'busy');
+  if (p.dead || !p.placed) reject(room, sessionId, 'NOT_IN_PLAY');
+  else if (!phaseOk) reject(room, sessionId, 'PHASE_CLOSED');
+  else if (room.state.tick < p.busyUntilTick) reject(room, sessionId, 'BUSY');
   else if (bodyBlocksAct(room, sessionId))
-    reject(room, sessionId, ErrorCode.cannot, 'not now'); // round 8, 8A
+    reject(room, sessionId, 'DOWN_OR_STUNNED'); // round 8, 8A
   else return p;
   return null;
 }
@@ -75,7 +75,7 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
     case 'eat':
       return handleBodyAbility(room, sessionId, payload);
     default:
-      reject(room, sessionId, ErrorCode.cannot, 'cannot do that');
+      reject(room, sessionId, 'NFY', { feature: 'this action' });
   }
 }
 
@@ -85,32 +85,32 @@ function handleBandage(room: PartyRoom, sessionId: string, payload: Record<strin
   const player = room.state.players.get(sessionId);
   if (!def || !player) return;
   if (!roles.roles[player.priv.role.roleId]?.abilities.includes('bandage')) {
-    reject(room, sessionId, ErrorCode.cannot, 'no bandage');
+    reject(room, sessionId, 'NOT_YOUR_POWER');
     return;
   }
   const actor = livingActor(room, sessionId);
   if (!actor) return;
   const tick = room.state.tick;
   if (tick < (player.priv.cooldownEndTick.get('bandage') ?? 0)) {
-    reject(room, sessionId, ErrorCode.cooldown, 'not ready');
+    reject(room, sessionId, 'COOLDOWN');
     return;
   }
   // `target: 'player'`: an avatar handle, resolved to a seat (round 5, 5F's `resolveHandle`).
   const targetId = resolveHandle(room, sessionId, payload.targetId);
   const target = targetId !== null && targetId !== sessionId ? simOf(room).players.get(targetId) : undefined;
   if (!target || target.dead || !target.placed || target.sceneIdx !== actor.sceneIdx) {
-    reject(room, sessionId, ErrorCode.cannot, 'no target');
+    reject(room, sessionId, 'NO_TARGET');
     return;
   }
   if (Math.hypot(target.x - actor.x, target.y - actor.y) > (def.rangeTiles ?? 0) * TILE_PX) {
-    reject(room, sessionId, ErrorCode.outOfRange, 'too far');
+    reject(room, sessionId, 'TOO_FAR', { of: 'person' });
     return;
   }
   const slots = player.priv.inventory.slots;
   const at = slots.findIndex((s) => s.defId === (def.consumes ?? 'bandage') && s.qty > 0);
   const stack = slots[at];
   if (!stack) {
-    reject(room, sessionId, ErrorCode.cannot, 'no bandages left');
+    reject(room, sessionId, 'SPENT', { what: 'stock' });
     return;
   }
   if (stack.qty <= 1) slots.splice(at, 1);
@@ -131,18 +131,18 @@ function handleReport(room: PartyRoom, sessionId: string, payload: Record<string
       ? room.state.scenes.get(sceneKey(actor.sceneIdx))?.bodies.get(bodyId)
       : undefined;
   if (typeof bodyId !== 'string' || !body) {
-    reject(room, sessionId, ErrorCode.cannot, 'no body there');
+    reject(room, sessionId, 'NOTHING_THERE');
     return;
   }
   if (
     Math.hypot(body.x - actor.x, body.y - actor.y) >
     (abilities.abilities.report?.rangeTiles ?? 0) * TILE_PX
   ) {
-    reject(room, sessionId, ErrorCode.outOfRange, 'too far');
+    reject(room, sessionId, 'TOO_FAR', { of: 'body' });
     return;
   }
   if (sim.reportedBodies.has(bodyId)) {
-    reject(room, sessionId, ErrorCode.cannot, 'already reported');
+    reject(room, sessionId, 'ALREADY_DONE', { what: 'report' });
     return;
   }
   sim.reportedBodies.add(bodyId);
@@ -167,16 +167,16 @@ function handleBell(room: PartyRoom, sessionId: string): void {
   const bell = bellOf(room);
   if (!player || !actor || !bell) return;
   if (sceneKey(actor.sceneIdx) !== hubOf(room)) {
-    reject(room, sessionId, ErrorCode.outOfRange, 'too far');
+    reject(room, sessionId, 'TOO_FAR', { of: 'bell' });
     return;
   }
   const reach = (abilities.abilities.bell?.rangeTiles ?? 0) * TILE_PX;
   if (Math.hypot(actor.x - tileCentre(bell.x, TILE_PX), actor.y - tileCentre(bell.y, TILE_PX)) > reach) {
-    reject(room, sessionId, ErrorCode.outOfRange, 'too far');
+    reject(room, sessionId, 'TOO_FAR', { of: 'bell' });
     return;
   }
   if (actor.bellPulls >= (roles.roles[player.priv.role.roleId]?.bellPulls ?? 0)) {
-    reject(room, sessionId, ErrorCode.cannot, 'the rope is spent');
+    reject(room, sessionId, 'SPENT', { what: 'power' });
     return;
   }
   actor.bellPulls++;

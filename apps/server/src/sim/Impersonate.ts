@@ -1,5 +1,5 @@
 import { balance, roles } from '@wdi/content';
-import { ErrorCode, Phase, TICK_RATE } from '@wdi/shared';
+import { Phase, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { avatarMemory, rehandle } from './Avatars';
 import { reject } from './World';
@@ -126,12 +126,12 @@ export function handleImpersonate(room: PartyRoom, seat: string, payload: Record
   const p = simOf(room).players.get(seat);
   if (!player || !p) return;
   if (!roles.roles[player.priv.role.roleId]?.abilities.includes('impersonate')) {
-    return reject(room, seat, ErrorCode.cannot, 'cannot do that');
+    return reject(room, seat, 'BAD_REQUEST');
   }
-  if (p.dead || !p.placed) return reject(room, seat, ErrorCode.cannot, 'cannot do that');
-  if (!isDisguisePhase(room.state.phase)) return reject(room, seat, ErrorCode.wrongPhase, 'not now');
+  if (p.dead || !p.placed) return reject(room, seat, 'NOT_IN_PLAY');
+  if (!isDisguisePhase(room.state.phase)) return reject(room, seat, 'PHASE_CLOSED');
   const tick = room.state.tick;
-  if (tick < p.busyUntilTick) return reject(room, seat, ErrorCode.busy, 'busy');
+  if (tick < p.busyUntilTick) return reject(room, seat, 'BUSY');
   const memory = avatarMemory(room);
   const current = memory.disguise.get(seat);
   if (current) {
@@ -139,11 +139,11 @@ export function handleImpersonate(room: PartyRoom, seat: string, payload: Record
     return;
   }
   if (tick < (player.priv.cooldownEndTick.get('impersonate') ?? 0)) {
-    return reject(room, seat, ErrorCode.cooldown, 'not ready');
+    return reject(room, seat, 'COOLDOWN');
   }
   const target = payload.targetId;
   if (typeof target !== 'string' || target === seat || room.state.players.get(target)?.alive !== true) {
-    return reject(room, seat, ErrorCode.cannot, 'no target');
+    return reject(room, seat, 'NO_TARGET');
   }
   memory.disguise.set(seat, {
     as: target,

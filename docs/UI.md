@@ -1750,6 +1750,18 @@ Lines are in `apps/client/src/ui/copy/refusals.ts` (`REFUSAL_COPY`, `refusalLine
   that makes it read "Nothing happens." before release (FM1).
 - No line names a role or an ability (rule 4; the test reads `roles.json` and `abilities.json`). A per-interaction
   `fail` line of `interactions.json` wins over these when the refusal names its interaction (A4).
+### 14.45 Showing a refusal (10G, round 10)
+
+`World.ts` shows the server's reason, never its `msg` (the `lastVerb` guess and `refuse.generic` are gone):
+
+- **Which line.** The interaction's own `fail` line for the reason when the frame names an interaction
+  (`interactions.json`, `refusalText` in `apps/client/src/ui/copy/refusals.ts`), else the general line of 14.43. A
+  server that sends no reason still gets the deck line of its code (14.3), and a bare 422 reads "Nothing happens".
+- **Silent reasons** show nothing in a release build; an unknown reason reads "Nothing happens" (a development build
+  reads `Bug: unhandled refusal <reason>`).
+- **`NFY`** goes through the same log line, drawn apart: muted and italic, so a tester can tell "the game is unfinished"
+  from "you are missing something". `NFY_SHOWN` (14.43) is the release switch.
+- The refused prompt keeps its shake (`refusedIn`, UI.md 9), and the door sound still follows the legacy code.
 
 ### 14.47 The train's returns (10C, round 10)
 

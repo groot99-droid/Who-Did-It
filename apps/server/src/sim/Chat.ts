@@ -1,5 +1,5 @@
 import { balance } from '@wdi/content';
-import { type ChatChannel, ErrorCode, Phase, S2C, TICK_RATE } from '@wdi/shared';
+import { type ChatChannel, Phase, REASON_CODE, type RefusalReason, S2C, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { emitSim } from './events/bus';
 import { type MeetingStat, flowOf, refuse } from './Flow';
@@ -20,14 +20,14 @@ export function handleSay(room: PartyRoom, sessionId: string, payload: Record<st
   if (!speaker || !room.state.players.has(sessionId)) return;
   const text =
     typeof payload.text === 'string' ? payload.text.trim().slice(0, balance.chat.maxChars).trim() : '';
-  if (text === '') return refuse(room, sessionId, ErrorCode.cannot, 'say something');
+  if (text === '') return refuse(room, sessionId, 'SAY_SOMETHING');
   if (isOnLine(room, sessionId)) return refuse(room, sessionId, 'NOT_IN_PLAY'); // round 10, C1: no ghost chat on the line
   let channel: ChatChannel = 'ghost';
   if (!speaker.dead) {
     if (!SPEAKING_PHASES.includes(room.state.phase)) {
-      return refuse(room, sessionId, ErrorCode.wrongPhase, 'not now');
+      return refuse(room, sessionId, 'PHASE_CLOSED');
     }
-    if (bodyBlocksAct(room, sessionId)) return refuse(room, sessionId, ErrorCode.cannot, 'not now'); // round 8, 8A
+    if (bodyBlocksAct(room, sessionId)) return refuse(room, sessionId, 'DOWN_OR_STUNNED'); // round 8, 8A
     channel = 'meeting';
   }
   if (channel === 'meeting') heard(room, room.state.players.get(sessionId)?.name ?? '', text); // round 8, 8T: the meeting so far, for NPC talk
@@ -59,17 +59,23 @@ export const meetingTranscript = (room: PartyRoom): readonly { who: string; text
 const noteLog = new WeakMap<MeetingStat, Map<string, { count: number; lastTick: number }>>();
 
 /** Why `seatId` may not write a note now, or null (GDD 3.8 "Meeting notes"): the same gate for humans and NPCs. */
-export function noteRefusal(room: PartyRoom, seatId: string): ErrorCode | null {
+export function noteReason(room: PartyRoom, seatId: string): RefusalReason | null {
   const p = simOf(room).players.get(seatId);
-  if (!p || p.dead) return ErrorCode.cannot;
+  if (!p || p.dead) return 'NOT_IN_PLAY';
   const meeting = flowOf(room).current;
-  if (!SPEAKING_PHASES.includes(room.state.phase) || meeting === null) return ErrorCode.wrongPhase;
+  if (!SPEAKING_PHASES.includes(room.state.phase) || meeting === null) return 'PHASE_CLOSED';
   const mine = noteLog.get(meeting)?.get(seatId);
   if (mine === undefined) return null;
   const t = balance.talk;
-  if (mine.count >= t.notesPerMeeting) return ErrorCode.cooldown;
-  if (room.state.tick - mine.lastTick < t.noteGapS * TICK_RATE) return ErrorCode.cooldown;
+  if (mine.count >= t.notesPerMeeting) return 'CHAT_RATE';
+  if (room.state.tick - mine.lastTick < t.noteGapS * TICK_RATE) return 'CHAT_RATE';
   return null;
+}
+
+/** The legacy code of `noteReason`, or null. */
+export function noteRefusal(room: PartyRoom, seatId: string): number | null {
+  const reason = noteReason(room, seatId);
+  return reason === null ? null : REASON_CODE[reason];
 }
 
 /**
@@ -96,8 +102,8 @@ export function handleNote(room: PartyRoom, sessionId: string, payload: Record<s
   if (!room.state.players.has(sessionId)) return;
   const text =
     typeof payload.text === 'string' ? payload.text.trim().slice(0, balance.chat.maxChars).trim() : '';
-  if (text === '') return refuse(room, sessionId, ErrorCode.cannot, 'say something');
-  const refusal = noteRefusal(room, sessionId);
-  if (refusal !== null) return refuse(room, sessionId, refusal, 'not now');
+  if (text === '') return refuse(room, sessionId, 'SAY_SOMETHING');
+  const why = noteReason(room, sessionId);
+  if (why !== null) return refuse(room, sessionId, why);
   postNote(room, sessionId, text);
 }
