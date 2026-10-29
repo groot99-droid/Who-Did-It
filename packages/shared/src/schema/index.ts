@@ -12,9 +12,10 @@ import { schema, t } from '@colyseus/schema';
 // sessions fill them (docs/round6/seams.md 1.1). Version 4 (round 7, A104): `Player.profile`,
 // `Private.vendetta` (A112). Version 5 (round 7, A115): the quick mode's fields are gone. Version 6 (round 8,
 // A135, docs/round8/seams.md 1): `Private.body` (8A); the later round-8 rows (`purse`, `bank`, `faith`, `hq`, 8L's
-// `Avatar.nearBits`) join version 6 without another bump.
+// `Avatar.nearBits`) join version 6 without another bump. Version 7 (round 10, docs/round10/seams.md 3): the first of
+// A10's `SceneState.propStates` and A12's private inventory bumps it; the other joins 7.
 
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 
 /**
  * View tags (Visibility.ts): `presence` and `priv` are the numeric tags 1 and 2, granted one by one; `ghost`
@@ -102,6 +103,12 @@ export const Node = schema(
  * Round 6 (M5b, GDD 3.15): a creature of the scene, public like a prop, with no seat and no handle. `kind` is a
  * `mobs.json` id, `state` its FSM state index (`sim/mobs/ai.ts`). Empty until Session 6G fills it.
  */
+/**
+ * Round 10 (A10; logic-table.md 3.4): a prop whose state the logic table changed (`cut`, `rubble`, `searched`, `open`,
+ * `broken`), public to the scene; a prop with no entry is `whole`. `untilTick` is when it comes back (0 = never). It
+ * never says who changed it.
+ */
+export const PropState = schema({ id: str(), state: str(), untilTick: u32() }, 'PropState');
 export const Mob = schema(
   { id: str(), kind: str(), x: i16(), y: i16(), yaw: f32(), animId: u8(), state: u8() },
   'Mob',
@@ -149,6 +156,8 @@ export const SceneState = schema(
     nodes: t.map(Node),
     /** Round 6 (M5b): creatures, public to the scene; empty until Session 6G. */
     mobs: t.map(Mob),
+    /** Round 10 (A10): the logic table's prop states, public to the scene. */
+    propStates: t.map(PropState),
   },
   'SceneState',
 );
