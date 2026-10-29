@@ -1,5 +1,5 @@
 import { abilities, balance, roles } from '@wdi/content';
-import { ErrorCode, NoteKind, Phase, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { NoteKind, Phase, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { DeathCause } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { spawnBody } from './Bodies';
@@ -93,12 +93,12 @@ function fire(room: PartyRoom, shooter: string, targetId: string): void {
 export function handleLastShot(room: PartyRoom, seat: string, payload: Record<string, unknown>): void {
   const aim = nightOf(room).aims.get(seat);
   if (!aim || room.state.tick >= aim.untilTick || aim.shot) {
-    return reject(room, seat, ErrorCode.cannot, 'cannot do that');
+    return reject(room, seat, 'NOT_AIMED');
   }
   const targetId = payload.targetId;
   const target = typeof targetId === 'string' ? room.state.players.get(targetId) : undefined;
   if (typeof targetId !== 'string' || !target || !target.alive || targetId === seat) {
-    return reject(room, seat, ErrorCode.cannot, 'no target');
+    return reject(room, seat, 'NO_TARGET');
   }
   fire(room, seat, targetId);
 }

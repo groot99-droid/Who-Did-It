@@ -1,5 +1,5 @@
 import type { Emitter } from 'mitt';
-import type { HoldAction, S2CPayloads } from '@wdi/shared/protocol';
+import type { ErrorPayload, HoldAction, S2CPayloads } from '@wdi/shared/protocol';
 
 // What the World scene needs from the network. `ColyseusWorldFeed` reads the room state, the mock feed
 // (?mock=1) simulates the same data locally; the scene cannot tell them apart. Kept apart from
@@ -117,7 +117,7 @@ export interface MoveCmd {
 export type WorldFeedEvents = {
   sceneEnter: SceneEnter;
   noise: NoisePulse;
-  error: { code: number; msg: string };
+  error: ErrorPayload;
   /** Private: this player was killed and is now a ghost. */
   killed: { sceneId: string; cause: string; roles: Record<string, string>; cutsceneId?: string };
   /** Private: a collect finished; the entry is in `notebook()`. */

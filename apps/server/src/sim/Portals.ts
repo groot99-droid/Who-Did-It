@@ -1,7 +1,6 @@
 import { balance, profileFor, scenes, type Portal, type SceneId } from '@wdi/content';
 import {
   DIRECTIONS,
-  ErrorCode,
   MAX_PLAYERS,
   MIN_PLAYERS_TO_START,
   S2C,
@@ -154,42 +153,42 @@ export function runPortals(room: PartyRoom): void {
     const p = sim.players.get(req.sessionId);
     if (!player || !p) continue;
     if (!isWorldPhase(room.state.phase) || !p.placed) {
-      reject(room, req.sessionId, ErrorCode.wrongPhase, 'not now');
+      reject(room, req.sessionId, 'PHASE_CLOSED');
       continue;
     }
     // A ghost has no busy state and no lock to respect (A30).
     if (!p.dead && tick < p.busyUntilTick) {
-      reject(room, req.sessionId, ErrorCode.busy, 'busy');
+      reject(room, req.sessionId, 'BUSY');
       continue;
     }
     const from = sceneKey(p.sceneIdx);
     const portal = scenes[from].portals.find((q) => q.id === req.portalId);
     if (!portal) {
-      reject(room, req.sessionId, ErrorCode.cannot, 'no such door');
+      reject(room, req.sessionId, 'NOTHING_THERE');
       continue;
     }
     const dist = Math.hypot(p.x - tileCentre(portal.x, TILE_PX), p.y - tileCentre(portal.y, TILE_PX));
     if (dist > PORTAL_REACH_TILES * TILE_PX) {
-      reject(room, req.sessionId, ErrorCode.outOfRange, 'too far');
+      reject(room, req.sessionId, 'TOO_FAR', { of: 'door' });
       continue;
     }
     if (!profileOpen(portal.minProfile, sim.profile) || portal.to === null || portal.toSpawn === null) {
-      reject(room, req.sessionId, ErrorCode.closed, 'boarded up');
+      reject(room, req.sessionId, 'BOARDED');
       continue;
     }
     if (portal.lock !== null && !p.dead) {
       // Keys are inventory items and arrive with M5; until then a keyed door stays locked.
-      reject(room, req.sessionId, ErrorCode.locked, 'locked');
+      reject(room, req.sessionId, 'LOCKED');
       continue;
     }
     // Round 8, 8D (GDD 3.23): from dusk an Indebted seat's curfew doors refuse it like a locked one.
     if (curfewBars(room, req.sessionId, portal.to)) {
-      reject(room, req.sessionId, ErrorCode.locked, 'locked');
+      reject(room, req.sessionId, 'CURFEW');
       continue;
     }
     // A ghost's crossing is a plain move: no transit, no door swing, no noise (A30).
     if (!isSceneId(portal.to) || !enterScene(room, player, p, portal.to, portal.toSpawn, !p.dead)) {
-      reject(room, req.sessionId, ErrorCode.cannot, 'no way through');
+      reject(room, req.sessionId, 'NO_WAY');
       continue;
     }
     crossed = true;

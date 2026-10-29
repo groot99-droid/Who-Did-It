@@ -1776,3 +1776,17 @@ Lines are in `apps/client/src/ui/copy/m5b.ts` (`M5B_COPY`, keys `inv.*`, `hotbar
   square. A role-bound item cannot be placed (`grid.bound` on hover); the 3 by 3 button asks the server, which
   refuses `NEED_STATION` (workbench) away from one. The refusals read their lines from 14.43.
 - The Light, Douse and Use buttons of 14.19.2 and 14.32 sit in a row under the grid for each stack that has the verb.
+
+### 14.45 Showing a refusal (10G, round 10)
+
+`World.ts` shows the server's reason, never its `msg` (the `lastVerb` guess and `refuse.generic` are gone):
+
+- **Which line.** The interaction's own `fail` line for the reason when the frame names an interaction
+  (`interactions.json`, `refusalText` in `apps/client/src/ui/copy/refusals.ts`), else the general line of 14.43. A
+  server that sends no reason still gets the deck line of its code (14.3), and a bare 422 reads "Nothing happens".
+- **Silent reasons** show nothing in a release build; an unknown reason reads "Nothing happens" (a development build
+  reads `Bug: unhandled refusal <reason>`).
+- **`NFY`** goes through the same log line, drawn apart: muted and italic, so a tester can tell "the game is unfinished"
+  from "you are missing something". `NFY_SHOWN` (14.43) is the release switch.
+- The refused prompt keeps its shake (`refusedIn`, UI.md 9), and the door sound still follows the legacy code.
+
