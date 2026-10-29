@@ -1,5 +1,5 @@
 import { type DayPart, type Scene, items } from '@wdi/content';
-import { ErrorCode, type PlayerState } from '@wdi/shared';
+import { type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { simOf } from '../RoomSim';
 import { reject } from '../World';
@@ -51,11 +51,11 @@ export function handleLight(room: PartyRoom, sessionId: string, payload: Record<
   const p = simOf(room).players.get(sessionId);
   const player = room.state.players.get(sessionId);
   if (!p || !player || p.dead || !p.placed || typeof payload.on !== 'boolean') {
-    reject(room, sessionId, ErrorCode.cannot, 'not now');
+    reject(room, sessionId, 'NOT_IN_PLAY');
     return;
   }
   if (payload.on && !holdsLight(player)) {
-    reject(room, sessionId, ErrorCode.cannot, 'no light');
+    reject(room, sessionId, 'NEED_ITEM');
     return;
   }
   setLight(room, sessionId, payload.on);

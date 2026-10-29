@@ -1,5 +1,5 @@
 import { balance, economy, scenes } from '@wdi/content';
-import { EffectId, EffectState, ErrorCode, Phase, type PlayerState, TICK_RATE } from '@wdi/shared';
+import { EffectId, EffectState, Phase, type PlayerState, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { emitSim } from '../events/bus';
 import { take, count } from '../Inventory';
@@ -141,11 +141,11 @@ const banksOf = (room: PartyRoom): string[] =>
 export function handlePayRent(room: PartyRoom, seat: string): void {
   const d = duesOf(room);
   if (!room.state.players.get(seat)?.priv) return;
-  if (!isVerbPhase(room.state.phase)) return reject(room, seat, ErrorCode.wrongPhase, 'not now');
-  if (!nearProp(room, seat, banksOf(room))) return reject(room, seat, ErrorCode.outOfRange, 'no bank here');
+  if (!isVerbPhase(room.state.phase)) return reject(room, seat, 'PHASE_CLOSED');
+  if (!nearProp(room, seat, banksOf(room))) return reject(room, seat, 'NO_COUNTER', { kind: 'bank' });
   const owed = d.debt.get(seat) ?? 0;
-  if (owed === 0) return reject(room, seat, ErrorCode.cannot, 'you owe nothing');
-  if (balanceOf(room, seat) < owed) return reject(room, seat, ErrorCode.cannot, 'not enough Scrip');
+  if (owed === 0) return reject(room, seat, 'NOTHING_OWED');
+  if (balanceOf(room, seat) < owed) return reject(room, seat, 'NEED_SCRIP');
   if (movePurse(room, seat, TOWN, owed, 'rent') !== owed) return;
   d.debt.delete(seat);
   setIndebted(room, seat, false);

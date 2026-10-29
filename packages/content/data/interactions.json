@@ -1,0 +1,83 @@
+{
+  "gddRef": "3.14",
+  "tags": {
+    "cut": { "name": "Cutting", "tiers": 2 },
+    "break": { "name": "Breaking", "tiers": 2 },
+    "dig": { "name": "Digging", "tiers": 1 },
+    "pick": { "name": "Lock picking", "tiers": 3 },
+    "pry": { "name": "Prying", "tiers": 2 },
+    "skin": { "name": "Skinning", "tiers": 1 }
+  },
+  "classes": {
+    "hq": { "name": "Headquarters station", "match": { "kinds": ["hq"] } },
+    "counter": { "name": "Shop counter", "match": { "kinds": ["counter"] } },
+    "lanternPost": { "name": "Lantern post", "match": { "kinds": ["lanternPost"] } },
+    "taskSource": { "name": "Task source", "match": { "kinds": ["taskSource"] } },
+    "basin": { "name": "Basin", "match": { "kinds": ["basin"] } },
+    "altar": { "name": "Altar", "match": { "kinds": ["altar"] } },
+    "bell": { "name": "Bell", "match": { "kinds": ["bell"] } },
+    "blackMarket": { "name": "Black market", "match": { "kinds": ["blackMarket"] } },
+    "lamp": { "name": "Lamp", "match": { "kinds": ["lamp"] } },
+    "noticeBoard": { "name": "Notice board", "match": { "kinds": ["noticeBoard"] } },
+    "oven": { "name": "Oven", "match": { "kinds": ["oven"] } },
+    "pump": { "name": "Pump", "match": { "kinds": ["pump"] } },
+    "brickOven": { "name": "Brick oven", "match": { "kinds": ["brickOven"] } },
+    "coldShelves": { "name": "Cold shelves", "match": { "kinds": ["coldShelves"] } },
+    "dartboard": { "name": "Dartboard", "match": { "kinds": ["dartboard"] } },
+    "doughMixer": { "name": "Dough mixer", "match": { "kinds": ["doughMixer"] } },
+    "fence": { "name": "Fence", "match": { "kinds": ["fence"] } },
+    "flourBin": { "name": "Flour bin", "match": { "kinds": ["flourBin"] } },
+    "goat": { "name": "Goat", "match": { "kinds": ["goat"] } },
+    "ledger": { "name": "Ledger", "match": { "kinds": ["ledger"] } },
+    "mailbag": { "name": "Mailbag", "match": { "kinds": ["mailbag"] } },
+    "proofingCabinet": { "name": "Proofing cabinet", "match": { "kinds": ["proofingCabinet"] } },
+    "rack": { "name": "Rack", "match": { "kinds": ["rack"] } },
+    "window": { "name": "Window", "match": { "kinds": ["window"] } },
+    "bank": { "name": "Bank", "match": { "kinds": ["bank"] } },
+    "teachingClue": { "name": "Teaching clue", "match": { "kinds": ["teachingClue"] } }
+  },
+  "interactions": {},
+  "lootTables": {},
+  "census": {
+    "kinds": {
+      "live": [
+        "hq counter lanternPost taskSource basin altar bell blackMarket lamp noticeBoard oven",
+        "pump brickOven coldShelves dartboard doughMixer fence flourBin goat ledger mailbag",
+        "proofingCabinet rack window bank teachingClue"
+      ],
+      "interact": ["lockedDoor gasPocket plate deadLoaf wakeTable bed"],
+      "container": ["kitChest keyCache"]
+    },
+    "stems": {
+      "interact": [
+        "stump log fallen_log firewood woodpile timber_set log_basket planks tree boulder",
+        "rock_pile ore_pile rubble mushrooms berry_bush water_bucket bucket snare wheelbarrow",
+        "drying_frame saw_horse grindstone workbench anvil forge kiln mortar_table still",
+        "shaping_table dough_trough peel_rack couche_rack"
+      ],
+      "container": [
+        "barrel crates crate tin_crate bottle_crate footlocker blanket_chest wine_cask",
+        "flour_sacks sacks hay_bale bread_basket alms_box safe tin_cabinet tin_cabinet_b",
+        "apoth_drawers cupboard sideboard nightstand linen_press dressing_table powder_kegs",
+        "ossuary milk_churn bookcase bookcase_b bread_shelf bread_shelf_b bread_case",
+        "cooling_rack counter_case counter_case_b store_shelf store_shelf_b jar_shelf",
+        "jar_shelf_b bottle_shelf bottle_shelf_b cold_shelf herb_rack leech_jar rope_coil",
+        "bones tool_rack axe_block keg_rack"
+      ],
+      "keep": [
+        "fern leaf_litter cobweb rug wall_bulb draped_window window stained_glass",
+        "stained_glass_e signpost lamp_table lamp_post lantern_hook lantern_pole wall_lamp",
+        "miners_lamp candle_stand votive_rack fireplace_e inglenook_e clock coat_stand",
+        "coat_rack armchair settle stool pew bench tavern_table tavern_table_b card_table",
+        "dining_table tea_table side_table vane_portrait chalkboard tide_chart hymn_board",
+        "memorial portrait photos pit_prop sawdust cart harness_rack boot_rack washstand",
+        "wall_shelf shelf flower_stand feed_trough bar_counter bar_counter_lamp",
+        "bar_counter_taps counter_case_x birdcage chair compressor font lectern piano pulpit",
+        "scarecrow ship_wheel show_globe tin_cabinet_x writing_desk bunks_n bunks_s clamp",
+        "crepe den drowned_lantern flume gearing hanging_oak head_saw ledger_desk map_table",
+        "mess_table ore_cart pegs pump_beam refuge_table rope shelves tally_board telephone",
+        "trestle mortar_x"
+      ]
+    }
+  }
+}

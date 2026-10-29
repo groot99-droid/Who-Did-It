@@ -1,4 +1,5 @@
 // Message names, payloads and error codes of docs/ARCHITECTURE.md 5.5.
+import type { ErrorCode, RefusalArgs, RefusalReason } from './refusals';
 
 export const C2S = {
   move: 'input.move',
@@ -110,7 +111,9 @@ export type HoldAction =
   // Round 8 (GDD 3.23, 8D): the chapel altar, the Train's mailbag, the tally rack.
   | 'altar'
   | 'mailbag'
-  | 'rack';
+  | 'rack'
+  // Round 10 (A10): any prop the logic table answers for (`interactions.json`).
+  | 'interact';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
 /**
@@ -121,11 +124,11 @@ export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
 /**
  * How a player died; `vanished` is the disconnect death of GDD 3.8 (M7); `poison` is Nightshade, `shot` the
  * Gamekeeper's Last Shot (GDD 3.2); `wolf` is a mob kill in the dark (GDD 3.15, round 6, Session 6G). Round 8
- * (GDD 3.22, Session 8A; append-only): `creature` is a kill by any other creature, `bled` and `sickened` are
- * Bleeding and Poisoned at zero health.
+ * (GDD 3.22, Session 8A): `creature` is a kill by any other creature. Round 10 (A6) retires `bled` and `sickened`:
+ * Bleeding and Poisoned stop at 1 health, so only the Knife, a vote and a creature's bite end a life.
  */
-export type DeathCause =
-  'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'bled' | 'sickened';
+/** The causes a death carries. `bled` and `sickened` retired in round 10 (A6): Bleeding and Poisoned stop at 1 health, and the two ids are never reused. */
+export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature';
 /**
  * Chat channels the server derives (GDD 3.5); the client never chooses one. Round 8 (GDD 3.8, 8T): `notes` is the
  * meeting notes, reached only by `chat.note`, whose lines carry no speaker.
@@ -221,7 +224,8 @@ export interface C2SPayloads {
    */
   'act.ability': { abilityId: string; targetId?: string };
   /** Re-validated every tick. */
-  'act.hold': { action: HoldAction; targetId: string; on: boolean };
+  /** Round 10 (A10): `via` names the item an `interact` hold should use when a prop takes several verbs. */
+  'act.hold': { action: HoldAction; targetId: string; on: boolean; via?: string };
   'act.hide': { spotId: string };
   'act.check': { spotId: string };
   'act.burst': { spotId: string };
@@ -328,7 +332,13 @@ export interface S2CPayloads {
   noise: { sceneId: string; x: number; y: number; kind: string };
   /** Where the shout rang; names no seat, no card and no body. */
   shout: { sceneId: string; x: number; y: number };
-  error: { code: ErrorCode; msg: string };
+  /**
+   * A refusal, to the refused client only (round 10, A1; docs/round9/failures.md 6.1). `reason` is a
+   * `RefusalReason` (append-only), `args` its ids and numbers, `interaction` the logic-table entry that refused;
+   * `code` is `REASON_CODE[reason]`. The client shows the reason's line, never `msg`, which stays for logs and for
+   * a server site not yet converted.
+   */
+  error: { code: ErrorCode; msg: string; reason?: RefusalReason; args?: RefusalArgs; interaction?: string };
   /**
    * To every client whose view holds that scene: the puff of a disguise a Knife strike dropped, at (x, y). Names no
    * handle or seat. Sent only from `handleKill` (GDD 3.17).
@@ -429,16 +439,8 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.mug': 5,
 };
 
-export const ErrorCode = {
-  cannot: 422,
-  locked: 423,
-  cooldown: 424,
-  wrongPhase: 425,
-  busy: 426,
-  outOfRange: 427,
-  closed: 428,
-} as const;
-export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
+// Round 10, A1: the codes live beside the refusal reasons that derive them (`REASON_CODE`).
+export { ErrorCode } from './refusals';
 
 /** Every joinById failure (missing, locked, full, version mismatch) returns exactly this (5.3). */
 export const JOIN_ERROR_CODE = 404;
@@ -475,6 +477,9 @@ export interface CreateOptions extends JoinOptions {
   /** Profile codes the leader invited, capped by balance.json `party.invitedMax`; ignored for an open party. */
   invited?: string[];
 }
+
+// Round 10, A1: refusal reasons and the error frame (docs/round9/failures.md 4 to 6).
+export * from './refusals';
 
 // Round 6: the admin wire (docs/round6/auto-admin.md 6), accepted by the `admin` room only.
 export * from './admin';

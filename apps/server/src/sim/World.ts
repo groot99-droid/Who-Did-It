@@ -1,6 +1,6 @@
 import { PROFILE_RANK, SCENE_IDS, type Profile, type SceneId, abilities, navs, scenes } from '@wdi/content';
-import { ErrorCode, NavGrid, Phase, S2C } from '@wdi/shared';
-import type { PartyRoom } from '../rooms/PartyRoom';
+import { NavGrid, Phase } from '@wdi/shared';
+import { sendRefusal } from './refusal';
 
 /** Scene ids by `Player.sceneId` index; the order is the frozen id list of @wdi/content. */
 export const SCENE_KEYS: readonly SceneId[] = SCENE_IDS;
@@ -56,6 +56,4 @@ export const isKillPhase = (phase: number): boolean =>
 export const isVerbPhase = (phase: number): boolean => isWorldPhase(phase) && phase !== Phase.immunity;
 
 /** Sends one refusal to one client (the `error` message of ARCHITECTURE 5.5). */
-export function reject(room: PartyRoom, sessionId: string, code: ErrorCode, msg: string): void {
-  room.clients.getById(sessionId)?.send(S2C.error, { code, msg });
-}
+export const reject = sendRefusal;

@@ -2,7 +2,7 @@ import { type AuthContext, type Client, Room } from '@colyseus/core';
 import type { Scene } from '@wdi/content';
 import {
   BUILD_VERSION,
-  ErrorCode,
+  refusalFrame,
   MAX_MESSAGES_PER_SECOND,
   S2C,
   STUDIO_C2S,
@@ -96,7 +96,7 @@ export class StudioRoom extends Room {
   }
 
   private refuse(client: Client, msg: string): void {
-    client.send(S2C.error, { code: ErrorCode.cannot, msg });
+    client.send(S2C.error, refusalFrame('BAD_REQUEST', undefined, { msg }));
   }
 
   override onJoin(client: Client) {

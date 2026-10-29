@@ -149,7 +149,7 @@ describe('bodies (GDD 3.22)', () => {
     expect(b.damage).not.toHaveProperty('kill');
   });
 
-  it('Bleeding drains health, blocks regeneration and kills with the cause bled; a bandage stops it', async () => {
+  it('Bleeding drains health, blocks regeneration and stops at 1 health; a bandage stops it', async () => {
     const party = await party4();
     const room = party.room;
     const id = me(party);
@@ -167,21 +167,19 @@ describe('bodies (GDD 3.22)', () => {
         .filter((e) => e.kind === 'body.effect')
         .map((e) => e.data?.on),
     ).toEqual([true, false]);
-    // Left to bleed from low health: a quiet death where it stood, the body on the floor, no killer and no scream.
+    // Left to bleed from low health: the drain stops at 1 health and the seat lives, Wounded (round 10, A6).
     const victim = other(party);
     const v = bodyOf(room, victim)!;
     v.hp = 2;
     applyEffect(room, victim, v, 'bleeding');
-    const noises = matchEvents(room).filter((e) => e.kind === 'noise').length;
-    advance(party, S(3));
-    expect(sim(party, victim).dead).toBe(true);
-    expect(deathOf(room, victim)).toEqual({ cause: 'bled' });
-    expect(room.state.scenes.get('overworld')!.bodies.has(`body_${victim}`)).toBe(true);
-    expect(matchEvents(room).filter((e) => e.kind === 'noise').length).toBe(noises);
-    expect(room.state.players.get(victim)!.priv.body.hp).toBe(0);
+    advance(party, S(10));
+    expect(sim(party, victim).dead).toBe(false);
+    expect(v.hp).toBe(1);
+    expect(hasEffect(v, 'wounded')).toBe(true);
+    expect(deathOf(room, victim)).toBeUndefined();
   });
 
-  it('Poisoned drains to the cause sickened and spreads Weakened by its chance', async () => {
+  it('Poisoned drains to 1 health at most and spreads Weakened by its chance', async () => {
     const party = await party4();
     const room = party.room;
     const id = me(party);
@@ -195,7 +193,9 @@ describe('bodies (GDD 3.22)', () => {
     expect(hasEffect(body, 'weakened')).toBe(true);
     body.hp = 1;
     advance(party, S(3));
-    expect(deathOf(room, id)).toEqual({ cause: 'sickened' });
+    expect(sim(party, id).dead).toBe(false);
+    expect(body.hp).toBe(1);
+    expect(deathOf(room, id)).toBeUndefined();
   });
 
   it('health regenerates only after regenAfterS without a hit; Wounded follows the threshold', async () => {

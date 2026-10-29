@@ -1726,3 +1726,27 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.overview.failed` | Not saved: {why} | the Studio Overview (9W) |
 | `studio.overview.save` | Save changed scenes as draft PRs | the Studio Overview (9W) |
 | `studio.overview.close` | Close | the Studio Overview (9W) |
+
+### 14.43 Refusals (10A, round 10)
+
+Lines are in `apps/client/src/ui/copy/refusals.ts` (`REFUSAL_COPY`, `refusalLine`), one per `RefusalReason` of
+`packages/shared/src/protocol/refusals.ts`; the typecheck fails a reason without one. The words are the drafts of
+`docs/round9/failures.md` 4.1 to 4.9 (FM3: plain second person, no jokes), with these rules:
+
+- **Fills.** An item is named by its `items.json` name, lower case with its article ("a spade", "some salts"); a list
+  reads "timber, pine resin and stone"; seconds and shortfalls round up to whole numbers. Each line reads whole
+  without its args ("Not ready yet.", "Too far. Step closer.", "You are short of Scrip.").
+- **`PHASE_CLOSED`** waits for the day, dusk, nightfall, dawn, a meeting or "the match to begin". **`TOO_FAR`** names
+  them, the body, the clue, the door, the task, the pile, the counter or the bell. **`LOCKED`** is the owner's line
+  ("Failed to pick the lock. Looks like you might need a lock pick.") with no pick, "Your pick is too thin for this
+  lock." with too thin a one, and "It is locked." otherwise.
+- **`ALREADY_DONE`**: "Someone already reported this body.", "That is in your Notebook already.", "That is built as
+  far as it goes.", else "That is done already." **`LOBBY_RULE`**: "The party needs more players to start.", "The
+  party is full.", "There is no NPC seat to remove."
+- **Never shown.** `BAD_REQUEST` and `DEBUG_ONLY` show nothing in release (dev: "Bug: bad request"); `SAY_SOMETHING`
+  and `ASLEEP` show nothing in any build. An unknown reason reads "Nothing happens." in release and "Bug: unhandled
+  refusal {reason}" in dev; `VOIDED` reads "Nothing happens." whatever stopped the strike (FM4).
+- **`NFY`** reads "NFY: {feature}." with the tag of the unbuilt system (`NFY_FEATURES`); `NFY_SHOWN` is the one switch
+  that makes it read "Nothing happens." before release (FM1).
+- No line names a role or an ability (rule 4; the test reads `roles.json` and `abilities.json`). A per-interaction
+  `fail` line of `interactions.json` wins over these when the refusal names its interaction (A4).
