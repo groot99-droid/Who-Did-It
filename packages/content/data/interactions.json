@@ -261,9 +261,7 @@
         }
       ],
       "ownership": "public",
-      "fail": {
-        "NEED_ITEM": "The saw is idle. It wants logs on the carriage."
-      },
+      "fail": { "NEED_ITEM": "The saw is idle. It wants logs on the carriage." },
       "ships": "V1",
       "hint": "Logs from a pile or a tree become Timber here: one log, two Timber."
     },
@@ -285,9 +283,7 @@
         }
       ],
       "ownership": "public",
-      "fail": {
-        "NEED_ITEM": "Nothing to saw. The horse wants a log across it."
-      },
+      "fail": { "NEED_ITEM": "Nothing to saw. The horse wants a log across it." },
       "ships": "V1",
       "hint": "Slow work by hand: one log, one Timber. The mill's head saw does twice as much."
     }
