@@ -17,3 +17,6 @@ assets/external/
 
 # The material library cache (docs/round8/art.md 5): Poly Haven files fetched by tools/blender/materials/fetch.py
 tools/blender/.cache/
+
+# A session's own Claude Code settings (docs/round10/README.md, "Compaction")
+.claude/settings.local.json

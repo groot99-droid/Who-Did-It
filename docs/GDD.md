@@ -1020,3 +1020,31 @@ Round 8 addendum C (A200; `docs/round8/stations.md` 5), 7M. The owner: "walking 
 - **What can be read.** `lore.json` keys each readable prop by its id: shelves, a writing desk, the letter box, the bakery's daybook, the office's payroll desk and both notice boards, on Hollowmere and Blackpine. Each holds volumes: a **book** (leafed page by page), a **letter** (one sheet, unfolded), a **ledger** (columns) or a **clipping** (pinned). A shelf of books shows `reader.spinesMin` to `reader.spinesMax` spines (owner, round 2), and no page is longer than `reader.pageMaxChars`, so the reader shows it whole at 1280x720 and on a phone.
 - **The text.** Every page is quoted verbatim from the owner's vault work its volume names (`source`), as whole source lines; `pageLines` holds one `first-last` line range per page. The owner chose "fill later" for round 1 and 8W (round 8) filled the pages. A page is markdown as the data holds it, and the markup counts toward `pageMaxChars`; the reader renders bold, italic and blockquote, and shows any other markup as plain text. No page names the Beast or a killer or shows a role (`docs/round8/canon.md` 7). Ids are frozen; titles and pages are text.
 - **Secrecy.** A volume is the same bytes for every seat and shows no card, cover or private view. The server keeps nothing of what a seat read.
+
+### 3.27 The county jail
+
+Round 10, B5 (`docs/round9/gdd-map.md` 2.1). Not built yet: the step that builds it writes this section.
+
+### 3.28 Accounts and achievements
+
+Round 10, E1 (`docs/round9/gdd-map.md` 2.2). Not built yet: the step that builds it writes this section.
+
+### 3.29 The lock-pick mini-game
+
+Round 10, D5 (`docs/round9/gdd-map.md` 2.3). Not built yet: the step that builds it writes this section.
+
+### 3.30 The inventory and crafting
+
+Round 10, A12 and A13 (`docs/round9/gdd-map.md` 2.4). Not built yet: the step that builds it writes this section.
+
+### 3.31 Law enforcement and petitions
+
+Round 10, B1 to B4 (`docs/round9/gdd-map.md` 2.5). Not built yet: the step that builds it writes this section.
+
+### 3.32 Sleeping
+
+Round 10, A7 (`docs/round9/gdd-map.md` 2.6). Not built yet: the step that builds it writes this section.
+
+### 3.33 The Hitman's arrival
+
+Round 10, C4 (`docs/round9/gdd-map.md` 2.7). Not built yet: the step that builds it writes this section.

@@ -3749,3 +3749,115 @@ The owner's living-world request of 2026-10-24. Contract: `docs/round8/living.md
   `schemas/lore.ts`, `validateLore.ts` (`checkLore`), `balance.json` `reader` (3 to 5 spines, the page length) and
   `test/lore.test.ts`. The placement is 7M's proposal for 8V and the owner; it goes to the owner through 6Z before it
   merges.
+
+## Round 10 (started 2026-10-29, after round 9's #313 landed at 72f1b69)
+
+Round 10 builds **world mode**, the round-9 design, from `docs/round9/round10-plan.md` as amended by
+`docs/round9/followup-4.md` (which wins where they disagree). The owner started it on 2026-10-29 (DECISIONS A223) and
+the contract is `docs/round10/` (A224). The rules of rounds 1 to 9 still hold:
+- Draft PRs go against `claude/zen-turing-m1jnw0`, one per plan step, under 400 lines, each green.
+- Run `pnpm lint && pnpm typecheck && pnpm test` clean before every push.
+- Pinned versions only. No model identifiers in committed files, except the Model column of the table below.
+- `docs/GDD.md` changes in the same PR as a behaviour change.
+- Numbers live only in `docs/GDD.md` and `packages/content/data`.
+- 6Z merges. A session subscribes to its own PR, fixes its CI, answers review, writes "Complete" at the top of the
+  description when the PR is ready, and tells 6Z in one line (`send_message` to `@parent`).
+
+**Models** (the owner, 2026-10-29: "opus, sonnet, and fable towards the end to fix all other issues"): Opus for
+the contracts and the cross-system sessions, Sonnet for the sessions that follow a merged contract, Fable for the
+fixes and the sweep at the end. A session may fan out Sonnet subagents for repetitive passes.
+
+**Context** (A223): every session compacts at the size of its kind of work, 500k for precise work, 800k for work
+that needs more context, 300k for testing, fixing and organizing. The window is read when a session starts, so 6Z
+spawns a 300k or 800k session from `claude/r10-tier-300k` or `claude/r10-tier-800k` (the base plus one settings
+commit), and a 500k session from the base. A session's PR branches always start from
+`origin/claude/zen-turing-m1jnw0`, never from its spawn branch (`docs/round10/README.md`, "Compaction").
+
+**Shared files, ids, the wire, path ownership and the merge order** are `docs/round10/seams.md`, which holds them
+once. A session's decisions go under its reserved row and its copy under its UI.md 14 subsection (seams.md 5).
+
+| Session | Model | Compaction | Spawned from | Pull requests | Starts |
+|---|---|---|---|---|---|
+| **6Z. Orchestrator** | Opus | 300k | — | the contract, merges, spawns, the owner's questions | now |
+| **10A. The slice's contracts** | Opus | 500k | base | A1, A12, A7 | now |
+| **10F. The logic table** | Opus | 500k | base | A9, A10, D1 | now |
+| **10H. The slice's rules** | Sonnet | 500k | base | A5, A6, A11, A13, A8 | now |
+| **10G. The refusal sweep** | Sonnet | 300k | `claude/r10-tier-300k` | A2, A3, A4 | when A1 merges |
+| **10B. The law** | Opus | 800k | `claude/r10-tier-800k` | B1 to B8 | when A3, A6 and A10 merge |
+| **10C. Death's cost and arrivals** | Opus | 800k | `claude/r10-tier-800k` | C1 to C7 | when A6 merges |
+| **10D. The living world** | Sonnet | 500k | base | D2 to D9 | when A11 and D1 merge |
+| **10E. Achievements and story** | Sonnet | 500k | base | E1, E2 | when B6 merges |
+| **10X. Fixes: server and rules** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | toward the end |
+| **10Y. Fixes: client and screens** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | toward the end |
+| **10Z. The final sweep** | Fable | 800k | `claude/r10-tier-800k` | S6 | last |
+
+A session is spawned with the prompt "You are session 10X of docs/SESSIONS.md Round 10 (model, compaction size).
+Read your brief there, then docs/round10/README.md, docs/round10/seams.md, docs/round9/round10-plan.md and
+docs/round9/followup-4.md, and the design sections your pull requests name." 6Z adds the first step and its branch.
+
+### Round 10 briefs
+
+Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds only the follow-up-4 work
+(`followup-4.md` 2) the step carries, and the order.
+
+- **10A. The slice's contracts** (plan 3).
+  1. **A1, refusal reasons.** Every reason of `failures.md` 4.1 to 4.9, the `NFY` tag and its feature tags, the
+     error frame and the copy lines, so no later step waits for a reason.
+  2. **A12, the inventory on the server.** Today's pack is 24 slots in one list (`items.inventorySlots`, #313):
+     split it into the hotbar, the pack, the belt and the three equipment slots, the stacks by kind, and
+     `SCHEMA_VERSION` 7 (seams.md 3).
+  3. **A7, sleeping on the server**, with beds restoring stamina (F4 2.4: the home bed, the tavern bed, the chapel
+     cot and what each clears) and Exhaustion (F4 2.11, `sleep.holdoutGraceS`). Split it in two if it passes 400
+     lines.
+- **10F. The logic table** (plan 3, 4).
+  1. **A9, the schema and validator**, with the census mapping (`docs/round9/tools/prop-census.mjs`).
+  2. **A10, the resolver**, behind the legacy dispatch.
+  3. **D1, never-idle NPC seats**, after A10 and A12: the action chains, an NPC hold through the same resolver, and
+     guard NPCs' posts and leash (F4 2.2) as routine data that 10B's Constables reuse.
+- **10H. The slice's rules** (plan 3).
+  1. **A5, pacing**, with 12 cycles (F4 2.8: `finalNight.afterCycle` 12 and `byCount.*.tasksEach`).
+  2. **A6, weaker mobs and effects that stop at 1 HP.**
+  3. **A11, tools on piles** (after A10).
+  4. **A13, the inventory screen and the grid** (after A12), and tell 6Z: the playtest gate follows it.
+  5. **A8, the sleeping screen** (after A7), with the Exhausted mark on the own body HUD only.
+- **10G. The refusal sweep** (plan 3). A2, then A3 in one or two parts by directory, then A4 with the golden test of
+  `failures.md` 5. The codemod changes only the reason argument and its test assertion (the grant of seams.md 1);
+  any refusal whose wording or behaviour looks wrong goes on a list in the PR description for 10X.
+- **10B. The law** (plan 4, all Opus).
+  - B1 Constables, as guard NPCs (F4 2.2): a post, `guard.leashTiles`, health, and they fight when struck; the Clerk
+    becomes a guard NPC in the same step.
+  - B3 petitions with the others-needed rule and the Constable's signature at 5 humans or fewer (F4 2.1).
+  - B5 the jail, with the search of a jailed seat's pack for full vendetta tool sets (F4 2.9).
+  - B6 the Tribunal with `trial.murderAt` 2 and the Clerk's ledger leads (F4 2.7), defrocking and the cot's undoing
+    (F4 2.3), and the sabotage charge (F4 2.10).
+  - B2, B4, B7 and B8 as the plan has them.
+- **10C. Death's cost and arrivals** (plan 4).
+  - C1 the train's returns, with the Dusk Train (F4 2.6).
+  - C2 Owing the line, with the halved income and the Clerk's labour errand (F4 2.5) and the balance lab's
+    two-day check.
+  - C3, then C4 the Hitman with the human-if-he-comes table, days 3 to 5, the dormant look, the day weapon and the
+    hardships with the Clerk's ledger (F4 2.6), on the `hitman` and `hardship` streams.
+  - C5 Paint The Town Red with the three pillars (F4 2.2). C6 after B6.
+  - **C7, sabotage hazards** (F4 2.10, new): the wolf through a broken fence and the Tin Gallery cave-in, a day death
+    that returns on the train; after C1 and B6 (the charge).
+- **10D. The living world** (plan 4). D2 to D9 in the plan's order, D7 after A7 and D5, D8 after B5; the chores and
+  quests the 12-cycle match needs (F4 2.8) join D9.
+- **10E. Achievements and story** (plan 4). E1, then E2.
+- **10X. Fixes: server and rules** (Fable). Starts when 10B, 10C and 10D have opened their last PR. One fix per PR,
+  each with a test that failed before it:
+  1. the lists the round's PRs left for later (10G's refusal list first), and every parked review finding;
+  2. flaky and skipped tests, and the `pnpm auto` invariants at 50 matches;
+  3. `NFY` tags whose system has shipped, and the "still waits" lines of `GDD.md` (the Bandage knockback);
+  4. the owner's playtest notes on rules and balance, through the balance lab;
+  5. the stale draft #245 (land it or close it with the owner).
+- **10Y. Fixes: client and screens** (Fable). Same start and rules as 10X, on the client: the screens the round
+  added, every refusal's line on a phone, the e2e and screenshot sets, the Studio NPC editor's save verified end to
+  end (round 9), missing atlas keys (`constable`), copy drift against UI.md 14.
+- **10Z. The final sweep** (Fable; plan 4, S6). When every other round-10 PR has merged: DECISIONS rows for every
+  owner answer and R1 to R18, the check that every `gdd-map.md` row's GDD edit landed, the cross-references of the
+  round-9 and round-10 docs, `pnpm docs:protocol`, and the round-10 integration log below.
+
+### Round 10 log: 6Z
+
+- 2026-10-29: the contract `docs/round10/` with A223 and A224; the GDD stubs 3.27 to 3.33; the compaction default
+  500k and the two tier branches. 10A, 10F and 10H spawned.
