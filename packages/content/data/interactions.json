@@ -34,9 +34,214 @@
     "rack": { "name": "Rack", "match": { "kinds": ["rack"] } },
     "window": { "name": "Window", "match": { "kinds": ["window"] } },
     "bank": { "name": "Bank", "match": { "kinds": ["bank"] } },
-    "teachingClue": { "name": "Teaching clue", "match": { "kinds": ["teachingClue"] } }
+    "teachingClue": { "name": "Teaching clue", "match": { "kinds": ["teachingClue"] } },
+    "lumber": {
+      "name": "Lumber",
+      "match": { "stems": ["woodpile", "firewood", "log", "fallen_log", "log_basket"] }
+    },
+    "stump": { "name": "Stump", "match": { "stems": ["stump"] } },
+    "timberSet": { "name": "Mine timber set", "match": { "stems": ["timber_set"] } },
+    "boulder": { "name": "Boulder", "match": { "stems": ["boulder"] } },
+    "rockPile": { "name": "Rock pile", "match": { "stems": ["rock_pile", "rubble"] } },
+    "orePile": { "name": "Ore pile", "match": { "stems": ["ore_pile"] } },
+    "crateNailed": {
+      "name": "Nailed crate",
+      "match": { "stems": ["crates", "crate", "tin_crate", "bottle_crate"] }
+    }
   },
-  "interactions": {},
+  "interactions": {
+    "chopLumber": {
+      "verb": "chop",
+      "label": "Chop",
+      "target": "lumber",
+      "handler": "stock",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [
+        {
+          "tool": { "tag": "cut", "tier": 1 },
+          "holdS": 4,
+          "drops": [{ "item": "logs", "qty": [2, 3] }],
+          "wear": 1,
+          "noise": null
+        }
+      ],
+      "after": { "state": "cut", "respawnS": 300 },
+      "ownership": "wild",
+      "fail": {
+        "NEED_TOOL": "You tug at the timber. It will not come apart by hand. An axe would.",
+        "NOTHING_THERE": "Somebody has already taken what there was."
+      },
+      "ships": "V1",
+      "hint": "Axes hang in the lumber camp and sell at the general store."
+    },
+    "grubStump": {
+      "verb": "grub",
+      "label": "Grub",
+      "target": "stump",
+      "handler": "stock",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [
+        {
+          "tool": { "tag": "cut", "tier": 1 },
+          "holdS": 3,
+          "drops": [
+            { "item": "logs", "qty": [1, 1] },
+            { "item": "resin", "qty": [1, 1], "chance": 0.5 }
+          ],
+          "wear": 1,
+          "noise": null
+        }
+      ],
+      "after": { "state": "cut", "respawnS": 900 },
+      "ownership": "wild",
+      "fail": {
+        "NEED_TOOL": "The stump holds its roots. An axe would get it out.",
+        "NOTHING_THERE": "Somebody has already taken what there was."
+      },
+      "ships": "V1"
+    },
+    "cutTimberSet": {
+      "verb": "cut",
+      "label": "Cut",
+      "target": "timberSet",
+      "handler": "stock",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [
+        {
+          "tool": { "tag": "cut", "tier": 1 },
+          "holdS": 5,
+          "drops": [{ "item": "logs", "qty": [2, 2] }],
+          "wear": 1,
+          "noise": null
+        },
+        {
+          "tool": { "tag": "pry", "tier": 1 },
+          "holdS": 6,
+          "drops": [{ "item": "logs", "qty": [1, 1] }],
+          "wear": 1,
+          "noise": "crowbar"
+        }
+      ],
+      "after": { "state": "cut", "respawnS": 600 },
+      "ownership": "wild",
+      "fail": {
+        "NEED_TOOL": "The timbers are set too hard to pull by hand. An axe, or a bar to lever with.",
+        "NOTHING_THERE": "Somebody has already taken what there was."
+      },
+      "ships": "V1"
+    },
+    "breakBoulder": {
+      "verb": "break",
+      "label": "Break",
+      "target": "boulder",
+      "handler": "stock",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [
+        {
+          "tool": { "tag": "break", "tier": 1 },
+          "holdS": 6,
+          "drops": [
+            { "item": "stone", "qty": [2, 3] },
+            { "item": "tinOre", "qty": [1, 1], "chance": 0.25 }
+          ],
+          "wear": 2,
+          "noise": null
+        }
+      ],
+      "after": { "state": "rubble", "respawnS": 1200 },
+      "ownership": "wild",
+      "fail": {
+        "NEED_TOOL": "The boulder does not care. You would want a pickaxe.",
+        "NOTHING_THERE": "Somebody has already taken what there was."
+      },
+      "ships": "V1",
+      "hint": "Pickaxes hang on the mine tool racks."
+    },
+    "breakRock": {
+      "verb": "break",
+      "label": "Break",
+      "target": "rockPile",
+      "handler": "stock",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [
+        {
+          "tool": { "tag": "break", "tier": 1 },
+          "holdS": 4,
+          "drops": [{ "item": "stone", "qty": [2, 2] }],
+          "wear": 1,
+          "noise": null
+        },
+        {
+          "tool": null,
+          "holdS": 12,
+          "drops": [{ "item": "stone", "qty": [1, 1] }],
+          "wear": 0,
+          "noise": null,
+          "only": ["rubble"]
+        }
+      ],
+      "after": { "state": "cleared", "respawnS": 600 },
+      "ownership": "wild",
+      "fail": {
+        "NEED_TOOL": "The pile is too hard to shift by hand. A pickaxe would.",
+        "NOTHING_THERE": "Somebody has already taken what there was."
+      },
+      "ships": "V1"
+    },
+    "breakOre": {
+      "verb": "break",
+      "label": "Break",
+      "target": "orePile",
+      "handler": "stock",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [
+        {
+          "tool": { "tag": "break", "tier": 1 },
+          "holdS": 4,
+          "drops": [{ "item": "tinOre", "qty": [2, 2] }],
+          "wear": 1,
+          "noise": null
+        }
+      ],
+      "after": { "state": "cleared", "respawnS": 600 },
+      "ownership": "wild",
+      "fail": {
+        "NEED_TOOL": "The ore is locked in the rock. A pickaxe would break it free.",
+        "NOTHING_THERE": "Somebody has already taken what there was."
+      },
+      "ships": "V1"
+    },
+    "pryCrate": {
+      "verb": "pry",
+      "label": "Pry",
+      "target": "crateNailed",
+      "handler": "stock",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [
+        {
+          "tool": { "tag": "pry", "tier": 1 },
+          "holdS": 3,
+          "drops": [{ "item": "timber", "qty": [1, 1], "chance": 0.6 }],
+          "wear": 1,
+          "noise": "crowbar"
+        }
+      ],
+      "after": { "state": "broken", "respawnS": null },
+      "ownership": "wild",
+      "fail": {
+        "NEED_TOOL": "The lid is nailed down. Something to lever it with would help.",
+        "NOTHING_THERE": "Somebody has already taken what there was."
+      },
+      "ships": "V1"
+    }
+  },
   "lootTables": {},
   "census": {
     "kinds": {

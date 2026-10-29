@@ -7,7 +7,8 @@
       "gatherS": 3,
       "yield": 1,
       "respawnS": 90,
-      "sprite": "node_timber"
+      "sprite": "node_timber",
+      "fastTool": { "tag": "cut", "gatherS": 1.5 }
     },
     "stone": {
       "id": "stone",
@@ -15,7 +16,8 @@
       "gatherS": 3,
       "yield": 1,
       "respawnS": 120,
-      "sprite": "node_stone"
+      "sprite": "node_stone",
+      "fastTool": { "tag": "break", "gatherS": 1.5 }
     },
     "tinOre": {
       "id": "tinOre",
@@ -49,6 +51,14 @@
       "yield": 1,
       "respawnS": 75,
       "sprite": "node_mushroom"
+    },
+    "logs": {
+      "id": "logs",
+      "name": "Logs",
+      "gatherS": 4,
+      "yield": 2,
+      "respawnS": 300,
+      "sprite": "node_timber"
     }
   }
 }
