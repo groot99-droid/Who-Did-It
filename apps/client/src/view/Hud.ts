@@ -182,8 +182,8 @@ export class Hud {
   }
 
   /** A short line in the log, top right; it fades out by itself. */
-  say(text: string, ms = 2600): void {
-    const line = h('p', { class: 'wdi-log__line' }, text);
+  say(text: string, ms = 2600, kind?: 'nfy'): void {
+    const line = h('p', { class: kind ? `wdi-log__line wdi-log__line--${kind}` : 'wdi-log__line' }, text);
     this.log.append(line);
     while (this.log.children.length > 4) this.log.firstElementChild?.remove();
     this.later(() => line.remove(), ms);
