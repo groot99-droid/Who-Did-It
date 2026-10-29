@@ -3893,12 +3893,14 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   whether it gets one is the owner's question. 10A's A7a grant: greybox `bed`, `cot` and `innBed` frames from
   `tools/sprites/placeholder.ts` and their `INTERACTABLE_PROPS` labels, until the real art.
 - 2026-10-29: A12a (#323) merged at 7052180, A11 (#327) at e9b2335, #329 (the README's compaction fix and wire row 6)
-  at 159caaa, A7a's bed frames (#331) at a9079c8, A12b (#324) at 558d05f and A3b (#328) at f337983. 10B started from
-  `claude/r10-tier-800k` with the base at f337983 merged in, on B1, and reports an 800000 window (threshold 767000).
-  A7a may run to about 474 lines in one pull request, 311 of them code. Grants: 10F's D1 rewrites the npcRoutine
-  tests P1, P3, R5 and P4 in place and adds P1b (a station found by its class, the human given the class's tool
-  first, the keys with no station on S1 skipped through an explicit list asserted equal to the computed set, the shop
-  hold asserting the shop is open); 10B's B1 adds hooks in 10D's `sim/townsfolk/{figures,run,mug,invariants}.ts`
-  (`figureNotSeat` still refuses a card's look), about six lines in 10C's `sim/body/fists.ts`, optional fields in the
-  content schemas `looks.ts`, `routines.ts` and `validate.ts`, and the counts in `townsfolk.test.ts`. A guard's foe
-  never goes on the wire as a seat id. On 10H's request for A13a, wire row 7 (`craft.grid`).
+  at 159caaa, A7a's bed frames (#331) at a9079c8, A12b (#324) at 558d05f, A3b (#328) at f337983 and A4 (#330) at
+  86e8422, which ends 10G's steps. 10B started from `claude/r10-tier-800k` with the base at f337983 merged in, on B1,
+  and reports an 800000 window (threshold 767000). A7a may run to about 474 lines in one pull request, 311 of them
+  code, and A13b to about 692: the inventory screen always shows its crafting square (logic-table 8.6), and the
+  screen's half of a split would still pass 400. Grants: 10F's D1 rewrites the npcRoutine tests P1, P3, R5 and P4 in
+  place and adds P1b (a station found by its class, the human given the class's tool first, the keys with no station
+  on S1 skipped through an explicit list asserted equal to the computed set, the shop hold asserting the shop is
+  open); 10B's B1 adds hooks in 10D's `sim/townsfolk/{figures,run,mug,invariants}.ts` (`figureNotSeat` still refuses
+  a card's look), about six lines in 10C's `sim/body/fists.ts`, optional fields in the content schemas `looks.ts`,
+  `routines.ts` and `validate.ts`, and the counts in `townsfolk.test.ts`. A guard's foe never goes on the wire as a
+  seat id. On 10H's request for A13a, wire row 7 (`craft.grid`).
