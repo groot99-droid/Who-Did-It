@@ -419,12 +419,18 @@ describe('the privacy rule, plumbing (P1b, P4)', () => {
       const party = await standardParty(colyseus, 'S1');
       const human = party.humans[0]!.id;
       const seat = party.room.state.players.get(human)!;
-      // D1: a hold key is a class id or a kind; a class with no prop on the map has no station to try.
+      // D1: a hold key is a class id or a kind; the keys with no prop on the S1 map are named, so a lookup bug fails.
+      const NO_STATION_ON_S1 = ['timberSet'];
+      const stations = stationsOf(mapScenesOf(party.room), simOf(party.room).profile);
+      const missing = Object.keys(routines.holds).filter(
+        (k) => !stations.some((s) => (s.cls ?? s.kind) === k),
+      );
+      expect(missing).toEqual(NO_STATION_ON_S1);
+      let checked = 0;
       for (const [key, action] of Object.entries(routines.holds)) {
-        const st = stationsOf(mapScenesOf(party.room), simOf(party.room).profile).find(
-          (s) => (s.cls ?? s.kind) === key,
-        );
+        const st = stations.find((s) => (s.cls ?? s.kind) === key);
         if (!st) continue;
+        checked++;
         // D1: an interact hold needs the class's tool, as a human comes by it.
         seat.priv.inventory.slots.clear();
         for (const it of Object.values(interactions.interactions).filter((i) => i.target === key))
@@ -448,6 +454,7 @@ describe('the privacy rule, plumbing (P1b, P4)', () => {
           ).toBe(true);
         } else expect(simOf(party.room).players.get(human)!.hold?.targetId, key).toBe(st.propId);
       }
+      expect(checked).toBe(Object.keys(routines.holds).length - NO_STATION_ON_S1.length);
     },
   );
 
