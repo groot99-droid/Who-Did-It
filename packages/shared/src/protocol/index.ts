@@ -17,6 +17,10 @@ export const C2S = {
   light: 'act.light',
   /** Round 8 (GDD 3.24): the answer to a `mugPrompt`; `sim/townsfolk/mug.ts` (8E) handles it. */
   mug: 'act.mug',
+  /** Round 10, A12 (GDD 3.30): move a stack between two slots of the own inventory; `sim/InventoryMoves.ts`. */
+  invMove: 'inv.move',
+  /** Round 10, A12 (GDD 3.30): pick the held hotbar slot. */
+  invSelect: 'inv.select',
   vote: 'meeting.vote',
   say: 'chat.say',
   /** Round 8 (GDD 3.8 "Meeting notes", 8T): a line for the meeting notes, which carry no speaker. */
@@ -301,6 +305,14 @@ export interface C2SPayloads {
    * `fight` are refused until the fists land (DECISIONS A180).
    */
   'act.mug': { choice: 'pay' | 'fight' | 'flee' };
+  /**
+   * Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`):
+   * into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to`
+   * does not take the item (the belt takes tools, gear its own slot) or `from` is empty.
+   */
+  'inv.move': { from: number; to: number };
+  /** Round 10, A12 (GDD 3.30): the hotbar slot whose item is held; refused `BAD_REQUEST` outside the hotbar. */
+  'inv.select': { slot: number };
 }
 
 export interface S2CPayloads {
@@ -437,6 +449,8 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.hq': 5,
   'act.payRent': 5,
   'act.mug': 5,
+  'inv.move': 10,
+  'inv.select': 10,
 };
 
 // Round 10, A1: the codes live beside the refusal reasons that derive them (`REASON_CODE`).
