@@ -73,6 +73,18 @@ export function checkInteractions(
   for (const kind of censusMap(t.census.kinds).entries())
     if (kind[1] === 'live' && !classKinds.has(kind[0])) err(`${file}: live kind ${kind[0]} has no class`);
 
+  // Round 10 (A13; logic-table 8.6, 10.1): no recipe takes a role-bound item, and a shape shows exactly the inputs.
+  for (const [id, r] of Object.entries(c.recipes.recipes)) {
+    for (const i of r.in)
+      if (c.items.items[i.item]?.roleBound) err(`recipes.json ${id}: takes the role-bound item ${i.item}`);
+    if (r.shape) {
+      const shown = r.shape.flat().filter((x): x is string => x !== null);
+      const need = r.in.flatMap((i) => Array.from({ length: i.qty }, () => i.item));
+      if (shown.slice().sort().join() !== need.slice().sort().join())
+        err(`recipes.json ${id}: its shape does not show its inputs`);
+    }
+  }
+
   const made = new Set(Object.values(c.recipes.recipes).map((r) => r.out));
   const looted = new Set(Object.values(t.lootTables).flatMap((l) => l.entries.map((e) => e.item)));
   const obtainable = (id: string) => made.has(id) || looted.has(id);
