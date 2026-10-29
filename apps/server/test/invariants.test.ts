@@ -18,15 +18,19 @@ import { idOf, murder, until } from './flowHelpers';
 import { advance, pauseClock } from './npcHelpers';
 import { toNight } from './phaseHelpers';
 import { type Match, sleep, startMatch } from './simHelpers';
+import { shortClock } from './shortClock';
 
 // Round 6, 6B (docs/round6/auto-admin.md 5): the sim event bus, the match log, and the invariant registry.
 
 let colyseus: ColyseusTestServer;
+let restoreClock: () => void;
 beforeAll(async () => {
+  restoreClock = shortClock(); // a 230 s cycle: the 810 s one is `pnpm auto`'s (round 10, A5)
   process.env.WDI_DEBUG = '1';
   colyseus = await bootAutoServer();
 });
 afterAll(async () => {
+  restoreClock();
   delete process.env.WDI_DEBUG;
   await colyseus.shutdown();
 });

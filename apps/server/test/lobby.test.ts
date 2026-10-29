@@ -111,7 +111,9 @@ describe('Start (leader only, consumed inside the step)', () => {
     bots[2]?.room.send(C2S.lobbyStart, {});
     await sleep(300);
     expect(room.state.phase).toBe(Phase.lobby);
-    expect(received(bots[2] as Bot, S2C.error)).toEqual([{ code: ErrorCode.cannot, msg: 'cannot start' }]);
+    expect(received(bots[2] as Bot, S2C.error)).toEqual([
+      { code: ErrorCode.cannot, msg: 'cannot start', reason: 'NOT_LEADER' },
+    ]);
     for (const bot of bots) expect(received(bot, S2C.roleReveal)).toHaveLength(0);
   });
 

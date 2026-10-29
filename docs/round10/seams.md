@@ -38,9 +38,10 @@ the full check. A JSON conflict keeps both sides' keys. A conflict in another se
 
 | Order | Row | Class | Pull request |
 |---|---|---|---|
-| 1 | The private inventory: hotbar 6, pack 18, belt 2, `head`, `body`, `weapon` (`round10-plan.md` A12) | own client only | A12 (bumps to 7 if first) |
+| 1 | The private inventory: hotbar 6, pack 18, belt 2, `head`, `body`, `weapon` (`round10-plan.md` A12); each `ItemStack` carries its `slot`, and `Inventory.selected` is the held hotbar slot | own client only | A12 (bumps to 7 if first) |
 | 2 | The error frame's optional `reason`, `args` and `interaction` (A1) | the refused client only | A1 (protocol, not schema) |
 | 3 | `SceneState.propStates`: per scene, `PropState {id, state, untilTick}`, the prop states of `logic-table.md` 3.4 (whole, cut, rubble, searched, open, broken); never who changed one | public to the scene | A10 (bumps to 7 if first) |
+| 4 | Two client messages, queued and consumed in `step()` and refused with A1's reasons: `inv.move {from, to}` moves, swaps or merges whole stacks between slots, checking what each slot takes; `inv.select {slot}` picks the held hotbar slot. Nothing public shows the held item | from the own client; the result only in its private view | A12 |
 
 Every other round-10 row is added here by 6Z when a session asks, before it lands. What must never go on the wire:
 who is awake by name (A8), who signed a petition beyond the count the screen shows, the Hitman's seat, a hardship's
@@ -53,7 +54,7 @@ A session edits outside its paths only through a shared file of section 1, or wi
 
 | Session | Owns |
 |---|---|
-| 10A | `packages/shared/src/protocol/refusals.ts` and the error frame, `apps/client/src/ui/copy/refusals.ts`, `sim/Inventory.ts`, the private view's inventory rows, `sim/Sleep.ts`, `sim/Phases.ts` night end, `bed` props |
+| 10A | `packages/shared/src/protocol/refusals.ts` and the error frame, `apps/client/src/ui/copy/refusals.ts`, `sim/Inventory.ts`, the private view's inventory rows and the `inv.*` messages, `balance.json` `inventory.*` and the per-kind `resources.stackMax` (with its `balance.ts` schema), the optional `equip` field of `packages/content/src/schemas/items.ts` (A12; D6 fills the data), `sim/Sleep.ts`, `sim/Phases.ts` night end, `bed` props |
 | 10F | `packages/content/src/schemas/interactions.ts`, `validate.ts` (interactions), `interactions.json`, `sim/interact/`, `act.hold {action: 'interact'}`, the optional `tool` and `uses` fields of `packages/content/src/schemas/items.ts` (A10; A11 fills the data), then `sim/npc/*` and `routines.json` action chains (D1) |
 | 10H | `abilities.json` and `clues.json` clocks, `mobs.json`, `effects.json`, `sim/body/effects.ts` and `damage.ts`, `sim/Death.ts` causes (A6), `items.json` and `recipes.json` tools, `resources.json`, `sim/Resources.ts` (A11), `ui/Inventory.ts`, `ui/Crafting.ts`, `sim/Craft.ts` (A13), the asleep overlay (A8) |
 | 10G | refusal sites in `apps/server/src/rooms/**` and `apps/server/src/sim/**` (the reason argument only), `apps/client/src/net/` refusal handler, the toast, the use prompt |
