@@ -510,6 +510,56 @@
      }
     },
     {
+     "filename": "prop_bed",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 48
+     },
+     "spriteSourceSize": {
+      "x": 9,
+      "y": 20,
+      "w": 46,
+      "h": 24
+     },
+     "frame": {
+      "x": 2,
+      "y": 676,
+      "w": 46,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.6667
+     }
+    },
+    {
+     "filename": "prop_cot",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 48
+     },
+     "spriteSourceSize": {
+      "x": 9,
+      "y": 20,
+      "w": 46,
+      "h": 24
+     },
+     "frame": {
+      "x": 2,
+      "y": 676,
+      "w": 46,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.6667
+     }
+    },
+    {
      "filename": "prop_hq_0",
      "rotated": false,
      "trimmed": true,
@@ -607,6 +657,31 @@
      "pivot": {
       "x": 0.5,
       "y": 0.75
+     }
+    },
+    {
+     "filename": "prop_innBed",
+     "rotated": false,
+     "trimmed": true,
+     "sourceSize": {
+      "w": 64,
+      "h": 48
+     },
+     "spriteSourceSize": {
+      "x": 9,
+      "y": 20,
+      "w": 46,
+      "h": 24
+     },
+     "frame": {
+      "x": 2,
+      "y": 676,
+      "w": 46,
+      "h": 24
+     },
+     "pivot": {
+      "x": 0.5,
+      "y": 0.6667
      }
     },
     {
@@ -850,7 +925,7 @@
      },
      "frame": {
       "x": 2,
-      "y": 676,
+      "y": 704,
       "w": 46,
       "h": 24
      },
