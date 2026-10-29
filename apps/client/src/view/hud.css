@@ -38,6 +38,12 @@
   margin: 0;
 }
 
+/* NFY: the game is unfinished here, not something the player lacks (failures.md 6.2). */
+.wdi-log__line--nfy {
+  opacity: 0.7;
+  font-style: italic;
+}
+
 /* The prompt is the one toast that stays while a target is in reach. */
 .wdi-hud-prompt {
   animation: none;
