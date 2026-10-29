@@ -3934,6 +3934,10 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
     appended after A7b's `exhausted` (D4a merges after A7b), the buff in `sim/body/effects.ts` with its icons, the
     dish rows and the optional `parts` and `buff` fields, and the stem stations of `sim/Craft.ts`.
   - D3's grant: the `consumes` check in 10F's resolver (`problemOf` and `interactReady`), so a saw takes a seat's Logs.
+- 2026-10-29: on 10B's plan for B8, wire row 10: Walk with me. Every answer reaches the asker at one delay drawn on
+  `pairing`, whoever the target is, because a person's held answer and an NPC's think time would be two distributions
+  (R6). A pair shields a seat only against a third party, and only while its partner shares its scene (`world-mode.md`
+  3.1). B8a builds while B2 is in review; once B2 merges, B3 to B6 come before B8b, since 10E, C6 and C7 wait on B6.
 
 ## Round 11 (planning, started 2026-10-29)
 
