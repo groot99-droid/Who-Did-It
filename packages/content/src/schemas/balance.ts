@@ -514,6 +514,12 @@ export const BalanceFile = z.strictObject({
    * together; the first `hotbar` of them are the hotbar. The `belt` slots take tools only.
    */
   inventory: Section({ hotbar: z.number().int().positive(), belt: z.number().int().nonnegative() }),
+  /**
+   * Round 10, B1 (GDD 3.24, F4 2.2): the guard figures, the Constables and the Company Clerk. A guard walks only the
+   * stations within `leashTiles` of its post and keeps after a seat that struck it for `angerS`, while that seat
+   * stays within the leash.
+   */
+  guard: Section({ leashTiles: Tiles, angerS: Seconds }),
   /** Round 10, A7 (GDD 3.32): sleeping through the night. */
   sleep: Section({
     /** Every active player asleep this long ends the night. */

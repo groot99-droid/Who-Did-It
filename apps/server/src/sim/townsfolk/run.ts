@@ -2,6 +2,7 @@ import { type Portal, type SceneId, balance, scenes } from '@wdi/content';
 import { DIRECTIONS, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { PORTAL_REACH_TILES } from '../constants';
+import { guardNightAct, stepGuard } from '../law/Guards';
 import { mapScenesOf } from '../MapSites';
 import { tickNeeds } from '../npc/needs';
 import { type Station, phaseClassOf, spanTicks } from '../npc/routine';
@@ -81,6 +82,7 @@ function stepFigure(room: PartyRoom, f: Figure): void {
     light: false,
   });
   if (mugging) return;
+  if (stepGuard(room, f)) return; // a guard down, or fighting back (round 10, B1)
 
   const cls = phaseClassOf(room.state.phase);
   if (cls === 'night') {
@@ -189,6 +191,8 @@ function nextAct(room: PartyRoom, f: Figure): FigureAct | null {
 
 /** By night: home, to a prop's stand there if the scene has one, else its first spawn; a figure with no home stays. */
 function homeAct(room: PartyRoom, f: Figure): FigureAct | null {
+  const post = guardNightAct(f); // a guard stands at its post (round 10, B1)
+  if (post) return post;
   const home = f.home;
   if (home === null) return null;
   const grid = navGrid(home, simOf(room).profile);

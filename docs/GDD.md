@@ -460,7 +460,7 @@ none is role-bound, and the content check refuses a wall that no neutral tool ca
 **Nodes keep bare hands** (owner answer LT1): a Timber node holds 3 s by hand and 1.5 s with an Axe in the inventory, a
 Stone node the same with a Pickaxe; Tin Ore still needs the Spade. A tool speeds supply up, it does not gate it.
 Chopping and breaking make no noise yet (the noise table has no chop or smash row); the Crowbar's pry sounds at 10.
-Nothing sells the tools yet, so a seat crafts one (the table above) or takes one from the world once chests land.
+The general stores sell the Axe, the Pickaxe and the Hammer (3.23 Shops; prices in `economy.json`, proposals for the balance lab), and a seat can also craft one (the table above). **Depletion (round 10, D2; owner answer LT7).** Every pile above comes back after its own time, and an NPC seat's gather empties a pile like a human's, through the same resolver: it breaks rubble by hand, the cleared pile stays no station until its time has run, and a seat that finds one spent walks on. No seat is dealt a free tool, since a seat working a tool-walled pile before any human could own the tool would tell an NPC; an NPC comes by a tool as any seat does (a card's start kit, or buying it at the general store; a later step, D2b).
 
 ### 3.15 Mobs
 
@@ -590,6 +590,11 @@ the tap as they add a step to the others.
 **Decision (owner, 2026-10-17, A49):** every seat walks the main-mode world as its card's character, so roles are public by sight, except the cover roles, which always wear another card's look; the Killer can also borrow a living seat's face for a few seconds. In the quick mode (3.11) role art is private (your own card and night scene) and public only at game over.
 
 **Looks.** Every card of a deck is a character, a row of `looks.json`: a portrait (the role card, the meeting roster, the reveals, the end screen) and, for a non-cover card, a world character drawn in the 8 directions under `char/<lookId>/<anim>/<dir>` at the seat's height scale with its scarf tinted. The three cover cards (Killer, Accomplice, Drifter) have portraits only and no world character: nobody ever walks as a Killer. Look ids are public and name the character (`vicar`, `baker`), and every client loads the characters and portraits of the match's whole deck before the role card closes, so what a client loads never depends on its own card.
+
+**Figure looks (round 10, B1).** Besides the cards' looks and the villager family, `looks.json` `figures` holds
+the looks of figures that are not seats and not townsfolk: the `constable` (3.31) alone. A figure look has no card
+and no portrait, and a cover can never take one. Its atlas keys are `char/constable/<anim>/<dir>`; until its art
+lands the client draws its fallback villager body in its place; the wire always says `constable`.
 
 **The public look.** `Player.look` holds each seat's look id. It is empty for every seat during the role card and is written for every seat in the same tick when the card closes: a non-cover seat's look is its card's, a cover seat's is the look it picked. From then on the roster, the nameplate, the meeting portraits and a seat's body all show that look, for the whole match.
 
@@ -900,7 +905,7 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   seat in a world phase other than the immunity window buys and sells while the counter stays within
   `doors.reachTiles`. A purchase is refused, and nothing changes, when the purse or the inventory falls short. The
   bakery sells flour and the Wake Loaf, the apothecary bandages and salts, the general store (HollowMere's tavern bar, BlackPine's
-  lodge) rope, lantern oil, candles and planks, and the Gamekeeper's stall (HollowMere's forest edge, BlackPine's
+  lodge) rope, lantern oil, candles, planks and the three tools (the Axe, the Pickaxe and the Hammer, round 10 D2), and the Gamekeeper's stall (HollowMere's forest edge, BlackPine's
   lodge) snares and torches. The market (HollowMere's square, BlackPine's camp) sells nothing and buys timber, stone,
   resin, herbs, mushrooms and tin ore. No shop trades a role's kit, and an item a shop both sells and buys pays
   less than it asks.
@@ -1026,6 +1031,19 @@ knockout (3.22, the reduced body) reaches a figure only once the strike hook of 
 `figureNotSeat` (auto 50) checks that no figure is in any seat list, vote, death or meeting, and that no figure
 avatar carries a seat's handle, the ghost tag or a card's look.
 
+**Guard figures (round 10, B1, A229; F4 2.2).** The Company Clerk and the two Constables of every map (3.31) are
+guards: figures that "don't move very far and fight when hit" (the owner). A guard row of `routines.json`
+`townsfolk` (`guard`, with `count` figures, the Constables 2) spawns after the counted townsfolk, so it never takes
+a place of `townsfolk.count`. Its **post** is the first prop on the map of its row's kinds (the second Constable
+starts from the row's second kind, so the two keep different posts); it walks only its row's props in the post's
+scene within `guard.leashTiles`, and by night it stands at its post. It has the reduced body of a figure. A seat's
+fist or slingshot (3.22) lands on a guard's body like a seat's: at zero health it is knocked out for `body.koS` and
+stands down. A guard still standing turns on the seat that struck it and swings the fist's row at it on the strike's
+cooldown while that seat stays in its scene, within its leash and on its feet, for `guard.angerS`; then it walks back
+to its post. Its blows knock out, never kill. A guard reads only who struck it, never a card, and never mugs. The
+Knife does not reach a guard yet (C5). A Constable wears the `constable` look (3.17); the Clerk keeps the villager's.
+`figureNotSeat` accepts the `figures` looks of `looks.json` beside the villager family.
+
 **The mugging (8E, A180).** A Hungry, Angry or Desperate figure or NPC seat that is alone with one seat rolls each
 second for a mugging, on its own stream (`townsfolk:<figure>`, or the NPC's choices stream) and only while in such a
 mood, so a calm match draws nothing new. "Alone" is the A100 room rule (3.12): any scene but the map's hub, the only
@@ -1110,13 +1128,35 @@ A gain that does not all fit changes nothing and refuses `PACK_FULL`. A take emp
 or swaps it with the stack there when each slot takes the other's item; anything else refuses `BAD_REQUEST`, since the
 screen offers only the moves that land. `inv.select` picks the held hotbar slot. Both are consumed in `step()`.
 
+**The screen** (A13b, UI.md 14.44). The inventory screen (I) draws the hotbar, the pack, the belt and the head, body
+and weapon slots as grids with the crafting square beside them. Pick a stack, then a slot: the slots that would refuse
+the move are dimmed, so the screen offers only the moves that land. The hotbar strip is on screen during a match and its
+slots, or the keys 1 to 6, select the held one. The square previews the product and Take sends `craft.grid`.
+
 **A dropped body.** When a body is dropped (the train's return, a robbery), it loses the hotbar, the pack, the belt and
 the purse. Bound kit (`onDeath: kept`), the gear slots and the bank stay with the seat. A match's end empties the
 inventory and the held slot resets to the first.
 
+**The crafting grid** (A13a). `craft.grid {size, cells}` sends the grid row by row: `size` 2 (the pocket square, always
+there) or 3 (within reach of a workbench), each cell an item id or empty, one unit per cell. The server matches a hand
+recipe (one with no station): a recipe is **shapeless** (the cells hold exactly its inputs, in any places) unless it
+carries a `shape`, rows of item ids that the cells must show, anywhere in the grid and mirrored (the Torch is a Pine
+Resin over a Timber; the Snare is shapeless). A pattern wider than the pocket square needs a workbench too. The check
+runs in this order: a malformed grid refuses `BAD_REQUEST`; a role-bound item in any cell refuses `GRID_BOUND` whatever
+the recipes say (and no recipe takes one); a 3 by 3 grid or a wide pattern away from a workbench refuses `NEED_STATION`
+(workbench); nothing matching refuses `GRID_NO_RECIPE`; cells the seat does not hold refuse `NEED_MATERIALS`; a product
+that does not fit refuses `PACK_FULL`. On a match the inputs go and the product arrives as one change inside `step()`,
+with no hold. Station recipes (the basin's Axe, the oven's Lantern) stay at their stations and the older `craft` hold.
+
 ### 3.31 Law enforcement and petitions
 
-Round 10, B1 to B4 (`docs/round9/gdd-map.md` 2.5). Not built yet: the step that builds it writes this section.
+Round 10, B1 to B4 (`docs/round9/gdd-map.md` 2.5; `docs/round9/world-mode.md` 3.1, `followup-4.md` 2.1 and 2.2).
+
+**The Constables (B1, A229).** The county's law: two figures per map, never seats (3.24), with no card, no vote, no
+task list and no part in any win, wearing the `constable` look (3.17). They are guards (3.24): each keeps a post at
+the square (HollowMere's notice board and bell, BlackPine's camp board and bell) within `guard.leashTiles`, has
+health, and fights back when struck. They read only what the world shows, never a card. The briefing, the
+petition and the manhunt are B2 to B4; until then a Constable keeps its post.
 
 ### 3.32 Sleeping
 

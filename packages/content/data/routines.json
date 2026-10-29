@@ -67,6 +67,7 @@
       "look": "villager",
       "named": true,
       "fixed": false,
+      "guard": true,
       "stations": ["ledger", "noticeBoard", "window", "pump"]
     },
     "tallyman": {
@@ -75,6 +76,14 @@
       "named": true,
       "fixed": false,
       "stations": ["rack", "noticeBoard", "pump", "basin"]
+    },
+    "constable": {
+      "look": "constable",
+      "named": true,
+      "fixed": false,
+      "guard": true,
+      "count": 2,
+      "stations": ["noticeBoard", "bell", "pump"]
     },
     "stallholder": { "look": "villager", "named": false, "fixed": true, "stations": ["shop"] },
     "villager": { "look": "villager", "named": false, "fixed": false, "stations": [] }

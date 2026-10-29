@@ -21,6 +21,8 @@ export const C2S = {
   invMove: 'inv.move',
   /** Round 10, A12 (GDD 3.30): pick the held hotbar slot. */
   invSelect: 'inv.select',
+  /** Round 10, A13 (GDD 3.30): the crafting grid's cells; `sim/Craft.ts`. */
+  craftGrid: 'craft.grid',
   vote: 'meeting.vote',
   say: 'chat.say',
   /** Round 8 (GDD 3.8 "Meeting notes", 8T): a line for the meeting notes, which carry no speaker. */
@@ -313,6 +315,13 @@ export interface C2SPayloads {
   'inv.move': { from: number; to: number };
   /** Round 10, A12 (GDD 3.30): the hotbar slot whose item is held; refused `BAD_REQUEST` outside the hotbar. */
   'inv.select': { slot: number };
+  /**
+   * Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and
+   * `size * size` cells, each an item id or null. The server matches a recipe, takes the inputs and gives the product
+   * inside `step()`. Refused `GRID_BOUND` for a role-bound item, `GRID_NO_RECIPE` when nothing matches,
+   * `NEED_MATERIALS` when the seat holds fewer than the cells show, `NEED_STATION` for a 3x3 away from a workbench.
+   */
+  'craft.grid': { size: 2 | 3; cells: Array<string | null> };
 }
 
 export interface S2CPayloads {
@@ -451,6 +460,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.mug': 5,
   'inv.move': 10,
   'inv.select': 10,
+  'craft.grid': 5,
 };
 
 // Round 10, A1: the codes live beside the refusal reasons that derive them (`REASON_CODE`).

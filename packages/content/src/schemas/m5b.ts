@@ -41,6 +41,11 @@ export const Recipe = z.strictObject({
   /** The prop kind of the station the craft hold needs, or null for anywhere. */
   station: PropKind.nullable(),
   craftS: Seconds,
+  /**
+   * Round 10 (A13): rows of item ids (null = an empty cell) the crafting grid must show, as in Minecraft: the pattern
+   * is matched wherever it sits in the grid, and mirrored. Absent = shapeless: the grid matches the set of inputs.
+   */
+  shape: z.array(z.array(Id.nullable()).min(1)).min(1).optional(),
 });
 export type Recipe = z.infer<typeof Recipe>;
 

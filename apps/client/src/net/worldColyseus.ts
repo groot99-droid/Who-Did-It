@@ -38,7 +38,10 @@ interface PlayerState {
   presence?: PresenceState;
   priv?: {
     notebook?: { forEach(cb: (e: Required<NotebookSnap>) => void): void };
-    inventory?: { slots?: { forEach(cb: (s: StackSnap) => void): void } };
+    inventory?: {
+      slots?: { forEach(cb: (s: StackSnap & { slot: number }) => void): void };
+      selected?: number;
+    };
     quests?: { forEach(cb: (q: QuestSnap) => void): void };
     body?: Omit<OwnBodySnap, 'effects'> & { effects: { forEach(cb: (e: OwnEffectSnap) => void): void } };
     tasks?: { forEach(cb: (t: TaskSnap) => void): void };
@@ -314,8 +317,12 @@ export class ColyseusWorldFeed implements WorldFeed {
     const out: StackSnap[] = [];
     this.state.players
       .get(this.selfId)
-      ?.priv?.inventory?.slots?.forEach((s) => out.push({ defId: s.defId, qty: s.qty }));
+      ?.priv?.inventory?.slots?.forEach((s) => out.push({ defId: s.defId, qty: s.qty, slot: s.slot }));
     return out;
+  }
+
+  selectedSlot(): number {
+    return this.state.players.get(this.selfId)?.priv?.inventory?.selected ?? 0;
   }
 
   /** Round 8 (8A): the own `Private.body`; null while the row is empty (`maxHp` 0: the lobby, the card, a ghost). */
@@ -377,6 +384,18 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   light(on: boolean): void {
     this.room.send('act.light', { on });
+  }
+
+  invMove(from: number, to: number): void {
+    this.room.send('inv.move', { from, to });
+  }
+
+  invSelect(slot: number): void {
+    this.room.send('inv.select', { slot });
+  }
+
+  craftGrid(size: 2 | 3, cells: Array<string | null>): void {
+    this.room.send('craft.grid', { size, cells });
   }
 
   minigameResult(taskId: string, answer: unknown): void {
