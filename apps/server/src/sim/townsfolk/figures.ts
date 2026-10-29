@@ -15,6 +15,7 @@ import { spawnBody } from '../Bodies';
 import { ensureBody, removeBody } from '../body/state';
 import { AnimId } from '../constants';
 import { emitSim } from '../events/bus';
+import { bindGuard, guardClip, guardPlans, leashRoute } from '../law/Guards';
 import { hubOf, mapIdOfRoom, mapScenesOf, startSpawnsOf } from '../MapSites';
 import { Brain } from '../npc/memory';
 import { bindFigureNeeds, moodIdleFor } from '../npc/needs';
@@ -183,6 +184,8 @@ interface Plan {
   row: TownsfolkRow;
   /** A fixed figure's one prop. */
   pinned: Station | null;
+  /** A guard row's nth figure (round 10, B1). */
+  index?: number;
 }
 
 /**
@@ -202,7 +205,7 @@ export function spawnTownsfolk(room: PartyRoom): void {
     ([, row]) => row.maps === undefined || row.maps.includes(mapId),
   );
   const plan: Plan[] = [];
-  for (const [kind, row] of rows) if (row.named) plan.push({ kind, row, pinned: null });
+  for (const [kind, row] of rows) if (row.named && !row.guard) plan.push({ kind, row, pinned: null });
   for (const [kind, row] of rows) {
     if (row.named || !row.fixed) continue;
     for (const s of props) if (row.stations.includes(s.kind)) plan.push({ kind, row, pinned: s });
@@ -214,6 +217,8 @@ export function spawnTownsfolk(room: PartyRoom): void {
     plan.push({ kind, row, pinned: null });
   }
   for (const p of plan.slice(0, n)) makeFigure(room, memory, p, map, profile, props);
+  // Round 10, B1: the guards (the Clerk, the Constables) after the counted figures, never taking their places.
+  for (const p of guardPlans(rows)) makeFigure(room, memory, p, map, profile, props);
 }
 
 function makeFigure(
@@ -256,6 +261,7 @@ function makeFigure(
   // The route: the pinned prop, the row's kinds in order (the first prop of each on the map), or favourites among
   // the seats' stations for a row that names none.
   if (plan.pinned) f.stations = [plan.pinned];
+  else if (plan.row.guard) f.stations = leashRoute(plan.row, plan.index ?? 0, props);
   else if (plan.row.stations.length > 0) {
     const route: Station[] = [];
     for (const kind of plan.row.stations) {
@@ -274,6 +280,7 @@ function makeFigure(
     }
     f.stations = favourites;
   }
+  if (plan.row.guard) bindGuard(f); // its home is its post's scene (round 10, B1)
   brain.persona = { home: f.home, favourites: f.stations.map((s) => s.propId) };
   // Where it starts: its first station's stand, else its home's first spawn, else the hub's first start spawn.
   const first = f.stations[0];
@@ -363,6 +370,8 @@ export function publishFigure(room: PartyRoom, f: Figure): void {
     return;
   }
   writeFigure(avatar, f);
+  const clip = guardClip(room, f); // a guard's strike, flinch and knockdown (round 10, B1)
+  if (clip !== null && avatar.animId !== clip) avatar.animId = clip;
 }
 
 /**

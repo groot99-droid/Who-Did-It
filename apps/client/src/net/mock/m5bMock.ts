@@ -159,6 +159,20 @@ export class MockM5b {
     return this.stacks.map((s) => ({ ...s }));
   }
 
+  /** The held hotbar slot of the mock. */
+  selected = 0;
+
+  /** Round 10 (A13): the mock keeps stacks in a list; a move re-numbers the slot, a swap trades the two. */
+  invMove(from: number, to: number): void {
+    this.stacks.forEach((s, i) => (s.slot ??= i)); // from here on every stack names its slot
+    const at = (n: number) => this.stacks.findIndex((s) => s.slot === n);
+    const a = at(from);
+    if (a < 0 || from === to) return;
+    const b = at(to);
+    if (b >= 0) this.stacks[b] = { ...(this.stacks[b] as StackSnap), slot: from };
+    this.stacks[a] = { ...(this.stacks[a] as StackSnap), slot: to };
+  }
+
   get lanternLit(): boolean {
     return this.lit;
   }

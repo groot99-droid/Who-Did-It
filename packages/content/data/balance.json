@@ -392,5 +392,6 @@
     "gddRef": "3.8"
   },
   "inventory": { "hotbar": 6, "belt": 2, "gddRef": "3.30" },
+  "guard": { "leashTiles": 6, "angerS": 20, "gddRef": "3.24" },
   "respawn": { "hp": 50, "gddRef": "3.22" }
 }

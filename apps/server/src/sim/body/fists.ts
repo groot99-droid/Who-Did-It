@@ -4,7 +4,9 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { AnimId } from '../constants';
 import { emitSim } from '../events/bus';
 import { type MobBody, mobBodies } from '../Mobs';
+import { guardTarget, strikeGuard } from '../law/Guards';
 import { MobState } from '../mobs/ai';
+import { figureOfHandle } from '../townsfolk/figures';
 import { reject } from '../World';
 import { CLIP_TICKS, hurt, showClip } from './damage';
 import { factorOf, hasEffect } from './effects';
@@ -43,6 +45,10 @@ export function handleStrike(room: PartyRoom, sessionId: string, payload: Record
   if (!v) return;
   const b = balance.body;
   const mob = typeof payload.targetId === 'string' ? mobBodies(room).get(payload.targetId) : undefined;
+  const guard = mob
+    ? undefined
+    : guardTarget(room, sessionId, v, payload.targetId, (h) => figureOfHandle(room, h));
+  if (guard === null) return; // round 10, B1: a guard's handle, refused
   let targetId: string | null = null;
   if (mob) {
     if (mob.site.sceneIdx !== v.actor.sceneIdx || mob.mind.state === MobState.dead) {
@@ -53,7 +59,7 @@ export function handleStrike(room: PartyRoom, sessionId: string, payload: Record
       reject(room, sessionId, 'TOO_FAR', { of: 'person' });
       return;
     }
-  } else {
+  } else if (!guard) {
     targetId = seatInReach(room, sessionId, v, payload.targetId);
     if (targetId === null) return;
     if (hasEffect(bodyOf(room, targetId)!, 'knockedOut')) {
@@ -69,6 +75,7 @@ export function handleStrike(room: PartyRoom, sessionId: string, payload: Record
   );
   showClip(v.body, AnimId.strike, v.tick);
   if (mob) hurtCreature(room, mob, Math.max(0, Math.round(b.damage.strike.dmg * factor)), sessionId);
+  else if (guard) strikeGuard(room, guard, b.damage.strike, sessionId, 'strike', factor);
   else if (targetId !== null)
     hurt(room, targetId, b.damage.strike, { source: 'strike', by: sessionId, factor });
 }
@@ -128,6 +135,14 @@ export function runCreatures(room: PartyRoom): void {
 export function handleSlingshot(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   const v = openVerb(room, sessionId, 'slingshot');
   if (!v) return;
+  const guard = guardTarget(room, sessionId, v, payload.targetId, (h) => figureOfHandle(room, h));
+  if (guard === null) return;
+  if (guard) {
+    startCooldown(v);
+    showClip(v.body, AnimId.strike, v.tick);
+    strikeGuard(room, guard, balance.body.damage.slingshot, sessionId, 'slingshot');
+    return;
+  }
   const targetId = seatInReach(room, sessionId, v, payload.targetId);
   if (targetId === null) return;
   if (hasEffect(bodyOf(room, targetId)!, 'knockedOut')) {
