@@ -1,5 +1,5 @@
 import { economy } from '@wdi/content';
-import { ErrorCode, Phase } from '@wdi/shared';
+import { Phase } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { emitSim } from '../events/bus';
 import { simOf } from '../RoomSim';
@@ -30,28 +30,27 @@ export function handleNotice(room: PartyRoom, seat: string, payload: Record<stri
   const player = room.state.players.get(seat);
   const p = simOf(room).players.get(seat);
   const notice = ledgerOf(room).notices.get(itemId);
-  if (!player || !p || p.dead) return reject(room, seat, ErrorCode.cannot, 'not now');
-  if (!notice || notice.holder !== seat) return reject(room, seat, ErrorCode.cannot, 'no such notice');
+  if (!player || !p || p.dead) return reject(room, seat, 'NOT_IN_PLAY');
+  if (!notice || notice.holder !== seat) return reject(room, seat, 'NOTHING_THERE');
   const phase = room.state.phase;
   if (op === 'show') {
-    if (!isMeeting(phase)) return reject(room, seat, ErrorCode.wrongPhase, 'only at a meeting');
+    if (!isMeeting(phase)) return reject(room, seat, 'PHASE_CLOSED', { until: 'meeting' });
     dropNotice(room, itemId);
     systemLine(room, NOTICE_COPY.shown(player.name, noticeLine(notice)));
     emitSim(room, { tick: room.state.tick, kind: 'notice.shown', seat, data: { noticeId: itemId } });
     return;
   }
   if (op === 'burn') {
-    if (!isVerbPhase(phase) && !isMeeting(phase)) return reject(room, seat, ErrorCode.wrongPhase, 'not now');
-    if (notice.look === player.look && !spendIndulgence(room, seat))
-      return reject(room, seat, ErrorCode.cannot, NOTICE_COPY.ownName);
+    if (!isVerbPhase(phase) && !isMeeting(phase)) return reject(room, seat, 'PHASE_CLOSED');
+    if (notice.look === player.look && !spendIndulgence(room, seat)) return reject(room, seat, 'OWN_NAME');
     dropNotice(room, itemId);
     emitSim(room, { tick: room.state.tick, kind: 'notice.burnt', seat, data: { noticeId: itemId } });
     return;
   }
   if (op !== 'fence') return;
-  if (!isVerbPhase(phase)) return reject(room, seat, ErrorCode.wrongPhase, 'not now');
+  if (!isVerbPhase(phase)) return reject(room, seat, 'PHASE_CLOSED');
   if (!nearProp(room, seat, economy.notices.blackMarkets))
-    return reject(room, seat, ErrorCode.outOfRange, 'no buyer here');
+    return reject(room, seat, 'NO_COUNTER', { kind: 'buyer' });
   dropNotice(room, itemId);
   const price = Math.round(economy.notices.fencePrice * perkMul(room, seat, 'fenceGain'));
   movePurse(room, TOWN, seat, price, 'fence');

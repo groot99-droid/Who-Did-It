@@ -128,13 +128,12 @@ export function deriveEffects(room: PartyRoom, target: string, body: Body): void
 
 /**
  * One tick of the effects on: the timed ones wear off, the draining ones take their health per second and the
- * ones that spread roll their chance per second (`applies`). Returns the cause of a death the drain made, else
- * null; the caller resolves it (`bled` for Bleeding, `sickened` for Poisoned).
+ * ones that spread roll their chance per second (`applies`). A drain stops at 1 health (round 10, A6, GDD 3.22):
+ * Bleeding and Poisoned leave a seat Wounded and never kill; only the Knife and a creature's bite take it to zero.
  */
-export function tickEffects(room: PartyRoom, target: string, body: Body): 'bled' | 'sickened' | null {
+export function tickEffects(room: PartyRoom, target: string, body: Body): void {
   const tick = room.state.tick;
   const dt = 1 / TICK_RATE;
-  let drainedBy: EffectKey | null = null;
   for (const [id, on] of [...body.effects]) {
     if (on.untilTick > 0 && tick >= on.untilTick) {
       cureEffect(room, target, body, id);
@@ -142,8 +141,7 @@ export function tickEffects(room: PartyRoom, target: string, body: Body): 'bled'
     }
     const def = effectDef(id);
     if (def.hpPerS !== undefined && body.hp > 0) {
-      body.hp = Math.max(0, body.hp - def.hpPerS * dt);
-      if (body.hp === 0) drainedBy ??= id;
+      body.hp = Math.max(Math.min(1, body.hp), body.hp - def.hpPerS * dt);
     }
     if (def.applies) {
       for (const [spread, chance] of Object.entries(def.applies) as [EffectKey, number][]) {
@@ -151,8 +149,6 @@ export function tickEffects(room: PartyRoom, target: string, body: Body): 'bled'
       }
     }
   }
-  if (drainedBy === null) return null;
-  return drainedBy === 'bleeding' ? 'bled' : 'sickened';
 }
 
 /**

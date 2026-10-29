@@ -1,6 +1,6 @@
 import { balance, resources, scenes } from '@wdi/content';
 import type { Resource, SceneId } from '@wdi/content';
-import { ErrorCode, Node, Phase, TICK_RATE, TILE_PX, type PlayerState, type Rng } from '@wdi/shared';
+import { Node, Phase, TICK_RATE, TILE_PX, type PlayerState, type Rng } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { mapScenesOf } from './MapSites';
 import { addStack, canAdd, count } from './Inventory';
@@ -8,6 +8,7 @@ import { isVerbPhase, profileOpen, reject, sceneKey, tileCentre } from './World'
 import { type PlayerSim, simOf } from './RoomSim';
 import type { MatchSeeds } from './seeds';
 import { coinsProblem, isCoins, tickCoins } from './economy/coins';
+import { refusal, type Refusal } from './refusal';
 
 /**
  * Resource nodes and gathering (round 6, M5b, GDD 3.14; docs/round6/m5b-data.md 2.1): the node pool per match from
@@ -138,27 +139,22 @@ function nodeFor(room: PartyRoom, p: PlayerSim, nodeId: string): NodeState | und
 }
 
 /** Why a gather hold cannot run this tick, or null (also the check that starts it). */
-function gatherProblem(
-  room: PartyRoom,
-  player: PlayerState,
-  p: PlayerSim,
-  nodeId: string,
-): { code: ErrorCode; msg: string } | null {
+function gatherProblem(room: PartyRoom, player: PlayerState, p: PlayerSim, nodeId: string): Refusal | null {
   if (isCoins(room, p, nodeId)) return coinsProblem(room, p, nodeId); // round 8, 8C (locked): a pickup, economy/coins.ts
-  if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
-  if (p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
-  if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
+  if (!isVerbPhase(room.state.phase)) return refusal('PHASE_CLOSED');
+  if (p.dead || !p.placed) return refusal('NOT_IN_PLAY');
+  if (room.state.tick < p.busyUntilTick) return refusal('BUSY');
   const node = nodeFor(room, p, nodeId);
   const resource = node ? resources.resources[node.resource] : undefined;
-  if (!node || !resource) return { code: ErrorCode.cannot, msg: 'nothing there' };
-  if (!node.active) return { code: ErrorCode.cannot, msg: 'nothing left' };
+  if (!node || !resource) return refusal('NOTHING_THERE');
+  if (!node.active) return refusal('SPENT', { what: 'stock' });
   if (Math.hypot(p.x - node.x, p.y - node.y) > balance.doors.reachTiles * TILE_PX) {
-    return { code: ErrorCode.outOfRange, msg: 'too far' };
+    return refusal('TOO_FAR', { of: 'pile' });
   }
   if (resource.tool !== undefined && count(player, resource.tool) === 0) {
-    return { code: ErrorCode.cannot, msg: 'needs a tool' };
+    return refusal('NEED_TOOL', { need: resource.tool });
   }
-  if (!canAdd(player, resource.id, resource.yield)) return { code: ErrorCode.cannot, msg: 'no room' };
+  if (!canAdd(player, resource.id, resource.yield)) return refusal('PACK_FULL');
   return null;
 }
 
@@ -169,7 +165,7 @@ export function handleGather(room: PartyRoom, sessionId: string, nodeId: string)
   if (!player || !p) return;
   const problem = gatherProblem(room, player, p, nodeId);
   if (problem) {
-    reject(room, sessionId, problem.code, problem.msg);
+    reject(room, sessionId, problem);
     return;
   }
   // Pressing again on the same node keeps the original start; another target restarts.

@@ -1,5 +1,4 @@
 import { balance } from '@wdi/content';
-import { ErrorCode } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { AnimId } from '../constants';
 import { emitSim } from '../events/bus';
@@ -37,11 +36,11 @@ export function handleCure(
   if (!body || item === undefined) return;
   const heals = id === 'heal' ? balance.body.healHp : 0;
   if (!curesSomething(effectsOn(body), item) && (heals === 0 || body.hp >= body.maxHp)) {
-    reject(room, sessionId, ErrorCode.cannot, 'nothing to cure');
+    reject(room, sessionId, 'NOTHING_TO_CURE');
     return;
   }
   if (v.def.consumes !== undefined && !take(v.player, v.def.consumes, 1)) {
-    reject(room, sessionId, ErrorCode.cannot, 'none left');
+    reject(room, sessionId, 'SPENT', { what: 'stock' });
     return;
   }
   cureWith(room, targetId, body, item);
@@ -60,7 +59,7 @@ export function handleEat(room: PartyRoom, sessionId: string): void {
   if (!v) return;
   const item = v.def.consumes;
   if (item === undefined || !take(v.player, item, 1)) {
-    reject(room, sessionId, ErrorCode.cannot, 'nothing to eat');
+    reject(room, sessionId, 'NOTHING_TO_CURE');
     return;
   }
   v.body.lastAteTick = v.tick;

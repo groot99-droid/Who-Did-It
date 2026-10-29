@@ -6,7 +6,7 @@ import { type MoveInput, type PlayerSim, simOf } from '../RoomSim';
 import { isWorldPhase } from '../World';
 import '../townsfolk/invariants'; // round 8, 8A: the registry runs in import order, figureNotSeat before bodyBounds
 import './invariants'; // the `bodyBounds` check registers with the body stage
-import { die, showClip, wake } from './damage';
+import { showClip, wake } from './damage';
 import {
   blocksAct,
   blocksRegen,
@@ -66,11 +66,7 @@ function tickBody(room: PartyRoom, id: string, body: Body, p: PlayerSim | undefi
       body.stamina = Math.min(body.maxStamina, body.stamina + regen);
     }
   }
-  const cause = tickEffects(room, id, body);
-  if (cause !== null) {
-    die(room, id, cause);
-    return;
-  }
+  tickEffects(room, id, body);
   const rested = tick - body.lastHurtTick >= Math.round(b.regenAfterS * TICK_RATE);
   if (body.hp > 0 && body.hp < body.maxHp && rested && !blocksRegen(body)) {
     body.hp = Math.min(body.maxHp, body.hp + b.regenHpPerS * dt);

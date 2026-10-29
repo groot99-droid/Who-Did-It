@@ -1,5 +1,5 @@
 import { balance } from '@wdi/content';
-import { ErrorCode, TICK_RATE } from '@wdi/shared';
+import { TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { AnimId } from '../constants';
 import { emitSim } from '../events/bus';
@@ -46,18 +46,18 @@ export function handleStrike(room: PartyRoom, sessionId: string, payload: Record
   let targetId: string | null = null;
   if (mob) {
     if (mob.site.sceneIdx !== v.actor.sceneIdx || mob.mind.state === MobState.dead) {
-      reject(room, sessionId, ErrorCode.cannot, 'no target');
+      reject(room, sessionId, 'NO_TARGET');
       return;
     }
     if (!inReach(v, mob.x, mob.y)) {
-      reject(room, sessionId, ErrorCode.outOfRange, 'too far');
+      reject(room, sessionId, 'TOO_FAR', { of: 'person' });
       return;
     }
   } else {
     targetId = seatInReach(room, sessionId, v, payload.targetId);
     if (targetId === null) return;
     if (hasEffect(bodyOf(room, targetId)!, 'knockedOut')) {
-      reject(room, sessionId, ErrorCode.cannot, 'already down');
+      reject(room, sessionId, 'TARGET_DOWN');
       return;
     }
   }
@@ -131,7 +131,7 @@ export function handleSlingshot(room: PartyRoom, sessionId: string, payload: Rec
   const targetId = seatInReach(room, sessionId, v, payload.targetId);
   if (targetId === null) return;
   if (hasEffect(bodyOf(room, targetId)!, 'knockedOut')) {
-    reject(room, sessionId, ErrorCode.cannot, 'already down');
+    reject(room, sessionId, 'TARGET_DOWN');
     return;
   }
   startCooldown(v);
