@@ -455,8 +455,10 @@ none is role-bound, and the content check refuses a wall that no neutral tool ca
 | Ore pile | Pickaxe | 4 s | 2 Tin Ore | 1 | 600 s |
 | Nailed crate | Crowbar or Hammer | 3 s | 1 Timber, 60% | 1 | stays open |
 
-**Logs** are the raw wood of a pile; they stack as a material and wait for the mill's saw, which turns them into Timber
-(a later step). A worn tool breaks when its uses run out (one is taken); the wear is server memory per seat and tool.
+**Logs** are the raw wood of a pile; they stack as a material and become Timber only at a saw (round 10, D3): the mill's
+head saw (BlackPine, `bp_mill`) turns one Log into 2 Timber in 4 s, a saw horse (the mill and the lumber camp) one into 1
+Timber in 8 s, bare-handed, by day, with no tool wear and no noise yet. A seat with no Log is refused `NEED_ITEM`. The Timber nodes
+still give Timber directly (they are the camp's cut stacks). A worn tool breaks when its uses run out (one is taken); the wear is server memory per seat and tool.
 **Nodes keep bare hands** (owner answer LT1): a Timber node holds 3 s by hand and 1.5 s with an Axe in the inventory, a
 Stone node the same with a Pickaxe; Tin Ore still needs the Spade. A tool speeds supply up, it does not gate it.
 Chopping and breaking make no noise yet (the noise table has no chop or smash row); the Crowbar's pry sounds at 10.
