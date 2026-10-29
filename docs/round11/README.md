@@ -100,11 +100,12 @@ because each reads most of the art record: ASSETS 6, SPRITES 1 to 12, `docs/roun
   `packages/`, `tools/` or `assets/`, or in any other document. GDD and DECISIONS are not edited: the plan's approval
   takes its DECISIONS row then. Round 10's sessions own everything else (`docs/round10/seams.md` 4).
 - **A number lives once.** 11A owns the camera, the scale, the light directions and the list of passes. 11B owns the
-  materials, the palette, the styles and the budgets. Each references the other's by section. A disagreement goes to
-  6Z.
-- **Questions for the owner.** Each session writes its questions into `docs/round11/questions.md` under its own
-  heading, each with a proposed default (the form of round 9's questionnaire). 6Z sends the questionnaire when both
-  drafts are in. A session in doubt takes its proposed default, marks it _proposed_ and carries on.
+  materials, the palette, the styles and the budgets. Each references the other's by section. The two talk directly
+  through `send_message` (6Z gives each the other's session id), and a disagreement goes to 6Z.
+- **Questions for the owner.** Each session ends its own document with a "Questions for the owner" section, each
+  question with a proposed default (the form of round 9's questionnaire). When both drafts are in, 6Z assembles them
+  into `docs/round11/questions.md` and sends it to the owner. A session in doubt takes its proposed default, marks it
+  _proposed_ and carries on.
 - **Sample renders.** These are allowed and encouraged: the owner chooses a look better from a sheet (round 8's HD look
   sheet).
   - A session may install Blender in its own container (`pip install bpy` at the rig's 5.2 version) and render with the
