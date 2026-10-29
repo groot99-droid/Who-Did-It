@@ -6,7 +6,15 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
-import { ErrorCode, JOIN_ERROR_CODE, JOIN_ERROR_MESSAGE, RATE_LIMITS } from '../src/protocol/index';
+import {
+  ErrorCode,
+  JOIN_ERROR_CODE,
+  JOIN_ERROR_MESSAGE,
+  RATE_LIMITS,
+  REASON_CODE,
+  REFUSAL_REASONS,
+  SILENT_REASONS,
+} from '../src/protocol/index';
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const PROTOCOL_SOURCE = resolve(here, '../src/protocol/index.ts');
@@ -113,6 +121,12 @@ export function renderProtocolDoc(): string {
   const errors = Object.entries(ErrorCode)
     .map(([name, code]) => `| ${code} | \`${name}\` |`)
     .join('\n');
+  const reasons = Object.values(ErrorCode)
+    .map((code) => {
+      const named = REFUSAL_REASONS.filter((r) => REASON_CODE[r] === code);
+      return `| ${code} | ${named.map((r) => `\`${r}\`${SILENT_REASONS.has(r) ? ' (never shown)' : ''}`).join(', ')} |`;
+    })
+    .join('\n');
 
   return `# Wire protocol
 
@@ -185,6 +199,15 @@ ${studioNamed}
 | Code | Name |
 |---|---|
 ${errors}
+
+## Refusal reasons
+
+Since round 10 (A1), \`error\` also carries \`reason\`, its \`args\` and the \`interaction\` that refused; the code is derived
+from the reason. The list is append-only; the client's line for each is \`apps/client/src/ui/copy/refusals.ts\`.
+
+| Code | Reasons, in list order |
+|---|---|
+${reasons}
 
 ## Join errors
 

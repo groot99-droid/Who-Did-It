@@ -14,6 +14,7 @@ export { STUDIO_COPY } from './studio';
 export { MENU_COPY } from './menu';
 export { TOWNSFOLK_COPY, figureName, townsfolkLostLine } from './townsfolk';
 export { MUG_COPY } from './mug';
+export { REFUSAL_COPY, refusalLine } from './refusals'; // round 10, A1
 
 /** Replaces `{key}` placeholders; a missing key is left as is so the gap shows in a test. */
 export function fill(line: string, values: Record<string, string | number>): string {
