@@ -431,11 +431,11 @@ export const BalanceFile = z.strictObject({
    * Round 7 (GDD 3.3): the Daily Train of a map with a `station`. It stops `arriveAtS` into each day and delivers
    * `deliveryAfterS` later; the seats of the hub within `hearTiles` of the platform hear it.
    */
+  /** Round 10 (C1, GDD 3.3): `dusk.leaveAtS`, the Dusk Train's leaving, into dusk. */
   train: Section({
     arriveAtS: z.number().nonnegative(),
     deliveryAfterS: Seconds,
     hearTiles: Tiles,
-    /** Round 10 (C1, GDD 3.3): the Dusk Train leaves `leaveAtS` into dusk. */
     dusk: z.strictObject({ leaveAtS: z.number().nonnegative() }),
   }),
   /** Round 10 (C1, GDD 3.22): a seat the morning train brings back arrives with `hp` health. */

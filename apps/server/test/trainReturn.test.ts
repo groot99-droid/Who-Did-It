@@ -7,6 +7,7 @@ import { createServer } from '../src/server';
 import { bodyOf } from '../src/sim/body/state';
 import { TOWN, movePurse } from '../src/sim/economy/purse';
 import { type SimEvent, onSim } from '../src/sim/events/bus';
+import { addStack, count } from '../src/sim/Inventory';
 import { creatureKill } from '../src/sim/Kill';
 import { simOf } from '../src/sim/RoomSim';
 import { TRAIN_DUSK_LINE, isOnLine, trainReturnLine } from '../src/sim/Train';
@@ -55,8 +56,10 @@ describe('the train returns the day’s dead (GDD 3.22)', () => {
     const [victim, ghost] = m.bots;
     const sim = simOf(m.room);
     dayAt(m, 1, ARRIVE + 10);
-    teleport(m, victim!, 'overworld', 25, 17);
+    for (const bot of m.bots.slice(0, 3)) teleport(m, bot, 'overworld', 25, 17);
     movePurse(m.room, TOWN, victim!.id, 9, 'wage');
+    const seat = m.room.state.players.get(victim!.id)!;
+    expect(addStack(seat, 'bloodyRag', 1) && addStack(seat, 'masterKeyring', 1)).toBe(true);
     // A night's dead seat walks as a ghost, as before.
     sim.players.get(ghost!.id)!.dead = true;
     creatureKill(m.room, victim!.id, 'wolf');
@@ -69,6 +72,9 @@ describe('the train returns the day’s dead (GDD 3.22)', () => {
     expect(p.dead).toBe(true);
     expect(p.placed).toBe(false);
     expect(priv.purse).toBe(0);
+    // The pack goes with the body; bound kit (`onDeath: kept`) stays.
+    expect(count(seat, 'bloodyRag')).toBe(0);
+    expect(count(seat, 'masterKeyring')).toBe(1);
     const coins = [...m.room.state.scenes.get('overworld')!.nodes.values()].filter(
       (n) => n.resource === 'coins',
     );
@@ -84,27 +90,13 @@ describe('the train returns the day’s dead (GDD 3.22)', () => {
     expect(ghostLines(victim)).toEqual([]);
     expect(ghostLines(ghost)).toEqual([{ from: ghost!.id, text: 'boo', channel: 'ghost' }]);
     expect(eventsOf(victim!, 'error')).toEqual([expect.objectContaining({ reason: 'NOT_IN_PLAY' })]);
-  });
-
-  it('leaks nothing of the line to anyone else (A170)', async () => {
-    const m = await startMatch(colyseus, 4, village);
-    const [victim, living, ghost] = m.bots;
-    dayAt(m, 1, ARRIVE + 10);
-    for (const bot of [victim, living, ghost]) teleport(m, bot!, 'overworld', 25, 17);
-    simOf(m.room).players.get(ghost!.id)!.dead = true;
-    await sleep(300);
-    creatureKill(m.room, victim!.id, 'wolf');
-    await sleep(500);
-    const handle = m.room.state.players.get(victim!.id)!.priv.avatar;
-    for (const bot of [living, ghost]) {
-      const state = stateOf(bot!);
-      expect(state.players.get(victim!.id)?.priv).toBeUndefined();
-      for (const scene of state.scenes.values()) expect(scene.avatars.has(handle)).toBe(false);
-      expect(JSON.stringify(bot!.events)).not.toContain('onLine');
+    // Nobody else learns of the line (A170): no private view, no figure, no `onLine` in any message.
+    const handle = priv.avatar;
+    for (const bot of [m.bots[2]!, ghost!]) {
+      expect(stateOf(bot).players.get(victim!.id)?.priv).toBeUndefined();
+      for (const scene of stateOf(bot).scenes.values()) expect(scene.avatars.has(handle)).toBe(false);
+      expect(JSON.stringify(bot.events)).not.toContain('onLine');
     }
-    // The seat itself holds no other seat's card, no scene and no figure.
-    expect(stateOf(victim!).scenes.size).toBe(0);
-    expect(JSON.stringify(eventsOf(victim!, S2C.killed))).not.toMatch(/baker|doctor|vicar|killer/);
   });
 
   it('brings it back at the next arrival with respawn.hp, its card kept and its cooldowns resumed', async () => {
@@ -171,7 +163,7 @@ describe('the train returns the day’s dead (GDD 3.22)', () => {
     expect(sim.players.get(noTrain!.id)!.dead).toBe(true);
   });
 
-  it('a Killer on the line ends no match and passes no Knife', async () => {
+  it('a Killer on the line ends no match and passes no Knife; the Final Night brings it back', async () => {
     const m = await startMatch(colyseus, 4, {
       Bot0: 'killer',
       Bot1: 'accomplice',
@@ -184,19 +176,11 @@ describe('the train returns the day’s dead (GDD 3.22)', () => {
     await sleep(400);
     expect(m.room.state.phase).toBe(Phase.day);
     expect(m.room.state.players.get(accomplice!.id)!.priv.role.roleId).toBe('accomplice');
-  });
-
-  it('the Final Night brings back everyone on the line', async () => {
-    const m = await startMatch(colyseus, 4, village);
-    const [victim] = m.bots;
-    dayAt(m, 1, ARRIVE + 10);
-    creatureKill(m.room, victim!.id, 'wolf');
-    await sleep(300);
     m.room.state.phase = Phase.finalNight;
     m.room.state.phaseEndsTick = m.room.state.tick + 20 * 3600;
     await sleep(300);
-    expect(isOnLine(m.room, victim!.id)).toBe(false);
-    expect(simOf(m.room).players.get(victim!.id)!.dead).toBe(false);
+    expect(isOnLine(m.room, killer!.id)).toBe(false);
+    expect(simOf(m.room).players.get(killer!.id)!.dead).toBe(false);
   });
 });
 

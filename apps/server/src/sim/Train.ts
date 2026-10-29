@@ -5,6 +5,7 @@ import { ensureBody, removeBody } from './body/state';
 import { dropCoins } from './economy/coins';
 import { balanceOf } from './economy/purse';
 import { emitSim } from './events/bus';
+import { strip } from './Inventory';
 import { secondsToTicks } from './Flow';
 import { mapIdOfRoom, stationOf } from './MapSites';
 import { emitNoise } from './Noise';
@@ -21,7 +22,7 @@ import { isWorldPhase } from './World';
  *
  * Round 10 (C1, GDD 3.3, 3.22; docs/round9/world-mode.md 6): the morning Train also brings back the day's dead. A seat
  * that dies in a daylight phase (grace, day, immunity) to a bite or a shot is **on the line** until the next arrival:
- * unplaced, with no ghost view, its purse dropped where it fell. At the arrival it steps onto the platform with
+ * unplaced, with no ghost view, its pack gone and its purse dropped where it fell. At the arrival it steps onto the platform with
  * `respawn.hp`, full stamina and no effects, its card, notebook and quests kept and its cooldowns resumed where they
  * stood. The Final Night brings back everyone still on the line. The Dusk Train leaves `train.dusk.leaveAtS` into each
  * dusk (`train.dusk`) and brings nobody back (followup-4 2.6).
@@ -68,7 +69,7 @@ export function returnsOnTrain(room: PartyRoom, cause: DeathCause): boolean {
 
 /**
  * Puts a seat that just died by day on the line (`markDead` only): its purse drops where it fell (a find for whoever
- * reaches the body), then it leaves the world, so no verb, view or ghost channel reaches it until the Train.
+ * reaches the body) and its pack empties (`strip`: bound kit and the equipment stay), then it leaves the world, so no verb, view or ghost channel reaches it until the Train.
  */
 export function boardLine(room: PartyRoom, seat: string): void {
   const p = simOf(room).players.get(seat);
@@ -76,6 +77,7 @@ export function boardLine(room: PartyRoom, seat: string): void {
   if (!p || !player) return;
   const purse = balanceOf(room, seat);
   if (purse > 0) dropCoins(room, seat, purse);
+  strip(player); // the pack goes with the body; it lies nowhere until C6's town chest holds lost property
   lineOf(room).set(seat, { deathTick: room.state.tick, round: room.state.round });
   p.placed = false;
   p.input = null;
