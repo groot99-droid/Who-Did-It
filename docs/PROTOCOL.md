@@ -44,8 +44,6 @@
 | `act.sell` | `{ shopId: string; itemId: string; qty: number }` | 5/s | Round 8 (GDD 3.23, 8C): `qty` of `itemId` from the inventory to `shopId`, at its `pay` each, into the purse. |
 | `act.bank` | `{ op: 'deposit' \| 'withdraw'; amount: number }` | 5/s | Round 8 (GDD 3.23, 8C): moves `amount` Scrip between the purse and the bank, at the bank counter a `bank` hold opened and that stays in reach. Refused 422 when the side it draws on holds less. |
 | `act.mug` | `{ choice: 'pay' \| 'fight' \| 'flee' }` | 5/s | Round 8 (GDD 3.24): the target's answer to its open `mugPrompt`. Refused 422 with no prompt open; `flee` and `fight` are refused until the fists land (DECISIONS A180). |
-| `inv.move` | `{ from: number; to: number }` | 10/s | Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`): into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to` does not take the item (the belt takes tools, gear its own slot) or `from` is empty. |
-| `inv.select` | `{ slot: number }` | 10/s | Round 10, A12 (GDD 3.30): the hotbar slot whose item is held; refused `BAD_REQUEST` outside the hotbar. |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
 

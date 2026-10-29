@@ -1053,7 +1053,7 @@ private view only (nobody else's client receives them):
 
 | Area | Slots | Holds |
 | --- | --- | --- |
-| Hotbar | the first `balance.inventory.hotbar` general slots | anything; the selected one is the held item |
+| Hotbar | the first `balance.inventory.hotbar` general slots | anything |
 | Pack | the rest of `items.inventorySlots` | anything |
 | Belt | `balance.inventory.belt` | items of kind `tool` only |
 | Head, body, weapon | one each | an item whose `equip` names that slot (none until D6) |
@@ -1065,13 +1065,9 @@ A stack names its own slot, and one slot holds one stack. An item stacks up to `
 opens new ones: a tool on the belt first, then the hotbar, then the pack; anything else in the hotbar, then the pack.
 A gain that does not all fit changes nothing and refuses `PACK_FULL`. A take empties the newest stacks first.
 
-**Moving and holding.** `inv.move` moves a stack into an empty slot, onto a stack of the same item as far as it fits,
-or swaps it with the stack there when each slot takes the other's item; anything else refuses `BAD_REQUEST`, since the
-screen offers only the moves that land. `inv.select` picks the held hotbar slot. Both are consumed in `step()`.
-
 **A dropped body.** When a body is dropped (the train's return, a robbery), it loses the hotbar, the pack, the belt and
 the purse. Bound kit (`onDeath: kept`), the gear slots and the bank stay with the seat. A match's end empties the
-inventory and the held slot resets to the first.
+inventory.
 
 ### 3.31 Law enforcement and petitions
 
