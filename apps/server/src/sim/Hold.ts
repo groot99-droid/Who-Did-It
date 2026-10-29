@@ -12,6 +12,7 @@ import { handleShopHold } from './economy/shops';
 import { handleGather, tickGather } from './Resources';
 import { handleCivicHold, isCivicHold, tickCivicHold } from './economy/holds';
 import { refusal, type Refusal } from './refusal';
+import { handleInteract, tickInteract } from './interact/resolve';
 
 const CLUE_TEACHING = 'clue_teaching';
 
@@ -71,6 +72,11 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
     return;
   }
   if (isCivicHold(action)) return handleCivicHold(room, sessionId, action, targetId); // round 8, 8D (GDD 3.23)
+  // Round 10, A10: the logic table's resolver (sim/interact/resolve.ts), beside the legacy actions above.
+  if (action === 'interact' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
+    const via = typeof payload.via === 'string' && payload.via.length <= 64 ? payload.via : undefined;
+    return handleInteract(room, sessionId, targetId, via);
+  }
   if (action !== 'collect' || typeof targetId !== 'string' || targetId.length === 0 || targetId.length > 64) {
     reject(room, sessionId, 'NFY', { feature: 'this action' });
     return;
@@ -103,6 +109,10 @@ export function runHolds(room: PartyRoom): void {
     if (hold.action === 'gather' || hold.action === 'craft') {
       if (hold.action === 'gather') tickGather(room, sessionId, p);
       else tickCraft(room, sessionId, p);
+      continue;
+    }
+    if (hold.action === 'interact') {
+      tickInteract(room, sessionId, p); // round 10, A10
       continue;
     }
     if (isCivicHold(hold.action)) {
