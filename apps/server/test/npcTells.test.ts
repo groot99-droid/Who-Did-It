@@ -7,6 +7,7 @@ import { simOf } from '../src/sim/RoomSim';
 import { sceneIndex } from '../src/sim/World';
 import { endMatch } from '../src/sim/Win';
 import { openRun } from './killHelpers';
+import { shortClock } from './shortClock';
 import { type Party, bootNpcServer, npcIdsOf, standardParty, type SeedSet } from './npcHelpers';
 import { type Recording, type SeatSample, type TickSample, findTells, recordMatch } from './npcTells';
 
@@ -14,10 +15,15 @@ import { type Recording, type SeatSample, type TickSample, findTells, recordMatc
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
+let restoreClock: () => void;
 beforeAll(async () => {
+  restoreClock = shortClock(); // a 230 s cycle: the 810 s one is `pnpm auto`'s (round 10, A5)
   ({ colyseus, release } = await bootNpcServer());
 });
-afterAll(async () => release());
+afterAll(async () => {
+  restoreClock();
+  await release();
+});
 beforeEach(async () => colyseus.cleanup());
 
 const RUN = openRun('overworld', 8);
@@ -55,10 +61,10 @@ describe('E1: a recorded match shows no NPC tell', () => {
   for (const set of sets) {
     it(`seed set ${set}`, async () => {
       const party = await standardParty(colyseus, set, true);
-      const rec = recordMatch(party, { maxTicks: 160_000, lobbyExtraS: 12, onTick: scenario(party, set) });
+      const rec = recordMatch(party, { maxTicks: 45_000, lobbyExtraS: 12, onTick: scenario(party, set) });
       const tells = findTells(rec);
       expect(tells.map((t) => `${set} ${t.code} ${t.seat}@${t.tick}: ${t.detail}`)).toEqual([]);
-    }, 600_000);
+    }, 120_000);
   }
 });
 
@@ -66,14 +72,14 @@ describe('E2: the detector catches the old brain', () => {
   it('flags the M3c wander on at least three of nine NPCs', async () => {
     const party = await standardParty(colyseus, 'S1', true);
     npcMemory(party.room).debug.push({ routine: false });
-    const rec = recordMatch(party, { maxTicks: 160_000, lobbyExtraS: 12, onTick: scenario(party, 'S1') });
+    const rec = recordMatch(party, { maxTicks: 45_000, lobbyExtraS: 12, onTick: scenario(party, 'S1') });
     const flagged = new Set(
       findTells(rec)
         .filter((t) => t.code === 'T2' || t.code === 'T3')
         .map((t) => t.seat),
     );
     expect(flagged.size).toBeGreaterThanOrEqual(3);
-  }, 600_000);
+  }, 120_000);
 });
 
 // --- E3: the detector, pure, on synthetic recordings ---------------------------------------------------------

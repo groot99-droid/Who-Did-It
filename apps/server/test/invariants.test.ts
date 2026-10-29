@@ -18,15 +18,19 @@ import { idOf, murder, until } from './flowHelpers';
 import { advance, pauseClock } from './npcHelpers';
 import { toNight } from './phaseHelpers';
 import { type Match, sleep, startMatch } from './simHelpers';
+import { shortClock } from './shortClock';
 
 // Round 6, 6B (docs/round6/auto-admin.md 5): the sim event bus, the match log, and the invariant registry.
 
 let colyseus: ColyseusTestServer;
+let restoreClock: () => void;
 beforeAll(async () => {
+  restoreClock = shortClock(); // a 230 s cycle: the 810 s one is `pnpm auto`'s (round 10, A5)
   process.env.WDI_DEBUG = '1';
   colyseus = await bootAutoServer();
 });
 afterAll(async () => {
+  restoreClock();
   delete process.env.WDI_DEBUG;
   await colyseus.shutdown();
 });
@@ -131,7 +135,7 @@ describe('the sim event bus', () => {
     expect(autoLines[0]).toMatchObject({ map: 'hollowmere', seats: 6, npcIds: fixedIds });
     expect(autoLines[0].logHash).toBe(autoLines[1].logHash);
     expect(autoLines[0].kinds.end).toBe(1);
-  }, 900_000);
+  }, 60_000);
 
   it('keeps the log of the current match only, and hashes it', async () => {
     const room = await quietRoom();
