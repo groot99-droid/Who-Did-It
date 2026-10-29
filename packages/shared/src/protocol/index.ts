@@ -111,7 +111,9 @@ export type HoldAction =
   // Round 8 (GDD 3.23, 8D): the chapel altar, the Train's mailbag, the tally rack.
   | 'altar'
   | 'mailbag'
-  | 'rack';
+  | 'rack'
+  // Round 10 (A10): any prop the logic table answers for (`interactions.json`).
+  | 'interact';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
 /**
@@ -125,6 +127,7 @@ export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
  * (GDD 3.22, Session 8A): `creature` is a kill by any other creature. Round 10 (A6) retires `bled` and `sickened`:
  * Bleeding and Poisoned stop at 1 health, so only the Knife, a vote and a creature's bite end a life.
  */
+/** The causes a death carries. `bled` and `sickened` retired in round 10 (A6): Bleeding and Poisoned stop at 1 health, and the two ids are never reused. */
 export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature';
 /**
  * Chat channels the server derives (GDD 3.5); the client never chooses one. Round 8 (GDD 3.8, 8T): `notes` is the
@@ -221,7 +224,8 @@ export interface C2SPayloads {
    */
   'act.ability': { abilityId: string; targetId?: string };
   /** Re-validated every tick. */
-  'act.hold': { action: HoldAction; targetId: string; on: boolean };
+  /** Round 10 (A10): `via` names the item an `interact` hold should use when a prop takes several verbs. */
+  'act.hold': { action: HoldAction; targetId: string; on: boolean; via?: string };
   'act.hide': { spotId: string };
   'act.check': { spotId: string };
   'act.burst': { spotId: string };
