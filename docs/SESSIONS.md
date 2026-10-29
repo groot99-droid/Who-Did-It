@@ -3904,3 +3904,27 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   a card's look), about six lines in 10C's `sim/body/fists.ts`, optional fields in the content schemas `looks.ts`,
   `routines.ts` and `validate.ts`, and the counts in `townsfolk.test.ts`. A guard's foe never goes on the wire as a
   seat id. On 10H's request for A13a, wire row 7 (`craft.grid`).
+- 2026-10-29: #334 (wire row 7) merged at 551e61e, D1 (#333) at 4aa365b and 10H's figures fix (#338) at ab1430e,
+  which draws the townsfolk figures from their own look and `figureName`, never from the roster (A160's open EntityView
+  item). 10G and 10F are done. 10D started from the base at 4aa365b, on D2. Grants: 10A's A7a adds `homes` to the
+  stream allowlist of `npcRoutine.test.ts` R17 (the human seats' homes, drawn from their own stream, never the
+  deal's); A7b adds the optional `maxStaminaFactor` to the effects schema, appends `exhausted` (13) to `EffectId`
+  with no public status bit, and draws `icon_effect_exhausted.svg` in the house style. A holdout whose card holds a
+  night power, or who is on a manhunt, is never Exhausted (followup-4 2.11). Round 11's planning starts at the
+  playtest gate (`docs/round11/README.md`).
+
+## Round 11 (planning, started 2026-10-29)
+
+Round 11 plans **the full Blender makeover** while round 10 builds. The owner set it on 2026-10-29: the pipeline half
+(camera, lighting, materials, render passes and budgets) starts when round 10's playtest gate opens, and the asset list
+is filled in at round 10's content freeze. The contract is `docs/round11/README.md`. A round-11 planning session
+writes under `docs/round11/` and nowhere else; `round11-plan.md` follows the owner's answers, and the round builds
+after round 10's final sweep.
+
+| Session | Model | Compaction | Spawned from | Writes | Starts |
+|---|---|---|---|---|---|
+| **11A. The render pipeline** | Opus | 800k | `claude/r10-tier-800k` | `docs/round11/pipeline.md` | when the playtest gate opens |
+| **11B. Materials, styles and budgets** | Opus | 800k | `claude/r10-tier-800k` | `docs/round11/look.md` | when the playtest gate opens |
+
+A session is spawned with the prompt "You are session 11X of docs/SESSIONS.md Round 11 (Opus, 800k). Read
+docs/round11/README.md, then the documents and tools your part names." 6Z adds the spawn branch and the first branch.
