@@ -2,6 +2,7 @@ import { abilities, roles } from '@wdi/content';
 import { ItemStack, S2C, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { countRow } from './Flow';
+import { settle } from './Inventory';
 import { nightOf } from './nightMemory';
 import { simOf } from './RoomSim';
 
@@ -37,6 +38,7 @@ export function runInherit(room: PartyRoom): void {
     knife.defId = 'knife';
     knife.qty = 1;
     player.priv.inventory.slots.push(knife);
+    settle(player); // round 10, A12: the Knife takes a free slot
   }
   const tick = room.state.tick;
   const bonusS = abilities.abilities.inherit?.params?.killCooldownBonusS ?? 0;

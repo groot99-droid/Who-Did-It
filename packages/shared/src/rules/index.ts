@@ -12,3 +12,5 @@ export * from './npc';
 // Round 6 (docs/round6/seams.md 1.1): 6J fills cutscenes, 6H fills minigames; nobody else edits this file.
 export * from './cutscenes';
 export * from './minigames';
+// Round 10, A12 (GDD 3.30): the inventory's slot layout.
+export * from './inventory';

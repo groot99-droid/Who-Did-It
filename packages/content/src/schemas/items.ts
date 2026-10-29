@@ -25,6 +25,8 @@ export const Item = z.strictObject({
   /** Ability in abilities.json this item performs, if any. */
   use: Id.optional(),
   lightRadiusTiles: Tiles.optional(),
+  /** Round 10, A12 (GDD 3.30): the equipment slot this item fits; none fits one until armour and weapons (D6). */
+  equip: z.enum(['head', 'body', 'weapon']).optional(),
   tooltip: z.string().min(1),
   ships: Ships,
   gddRef: GddRef,
@@ -33,6 +35,7 @@ export type Item = z.infer<typeof Item>;
 
 export const ItemsFile = z.strictObject({
   gddRef: GddRef,
+  /** The hotbar and the pack together (GDD 3.30); `balance.inventory.hotbar` of them are the hotbar. */
   inventorySlots: z.number().int().positive(),
   items: z.record(Id, Item),
 });

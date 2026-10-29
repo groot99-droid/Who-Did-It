@@ -1045,7 +1045,33 @@ Round 10, D5 (`docs/round9/gdd-map.md` 2.3). Not built yet: the step that builds
 
 ### 3.30 The inventory and crafting
 
-Round 10, A12 and A13 (`docs/round9/gdd-map.md` 2.4). Not built yet: the step that builds it writes this section.
+Round 10, A12 and A13 (`docs/round9/gdd-map.md` 2.4; `docs/round9/logic-table.md` 8.6; DECISIONS A245). A12 builds the
+slots and their rules on the server; A13 writes the screen and the crafting grid into this section.
+
+**The slots.** A seat's inventory is `items.inventorySlots` general slots plus a belt and three gear slots, all in its
+private view only (nobody else's client receives them):
+
+| Area | Slots | Holds |
+| --- | --- | --- |
+| Hotbar | the first `balance.inventory.hotbar` general slots | anything; the selected one is the held item |
+| Pack | the rest of `items.inventorySlots` | anything |
+| Belt | `balance.inventory.belt` | items of kind `tool` only |
+| Head, body, weapon | one each | an item whose `equip` names that slot (none until D6) |
+
+A stack names its own slot, and one slot holds one stack. An item stacks up to `balance.resources.stackMax` of its kind
+(materials and food); any other kind stacks 1.
+
+**Adding.** A gain (a gather, a craft, a quest reward, a pickup) tops up the seat's open stacks of that item first, then
+opens new ones: a tool on the belt first, then the hotbar, then the pack; anything else in the hotbar, then the pack.
+A gain that does not all fit changes nothing and refuses `PACK_FULL`. A take empties the newest stacks first.
+
+**Moving and holding.** `inv.move` moves a stack into an empty slot, onto a stack of the same item as far as it fits,
+or swaps it with the stack there when each slot takes the other's item; anything else refuses `BAD_REQUEST`, since the
+screen offers only the moves that land. `inv.select` picks the held hotbar slot. Both are consumed in `step()`.
+
+**A dropped body.** When a body is dropped (the train's return, a robbery), it loses the hotbar, the pack, the belt and
+the purse. Bound kit (`onDeath: kept`), the gear slots and the bank stay with the seat. A match's end empties the
+inventory and the held slot resets to the first.
 
 ### 3.31 Law enforcement and petitions
 

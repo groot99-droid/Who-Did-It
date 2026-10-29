@@ -314,7 +314,11 @@
     "height": 1,
     "gddRef": "3.24"
   },
-  "resources": { "poolActiveFrac": 0.5, "stackMax": 5, "gddRef": "3.14" },
+  "resources": {
+    "poolActiveFrac": 0.5,
+    "stackMax": { "material": 16, "food": 4 },
+    "gddRef": "3.14"
+  },
   "mobs": { "maxPerScene": 3, "chaseS": 6, "gddRef": "3.15" },
   "quests": { "maxActive": 2, "gddRef": "3.16" },
   "minigames": {
@@ -380,5 +384,6 @@
       "transcriptLines": 20
     },
     "gddRef": "3.8"
-  }
+  },
+  "inventory": { "hotbar": 6, "belt": 2, "gddRef": "3.30" }
 }

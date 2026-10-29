@@ -35,7 +35,7 @@ describe('shared basics', () => {
 
   it('builds state with defaults', () => {
     const s = new GameState();
-    expect(SCHEMA_VERSION).toBe(6);
+    expect(SCHEMA_VERSION).toBe(7);
     expect(s.schemaVersion).toBe(SCHEMA_VERSION);
     expect(s.settings).toBeInstanceOf(Settings);
     expect('mode' in s.settings).toBe(false);
