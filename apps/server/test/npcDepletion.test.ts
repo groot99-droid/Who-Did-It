@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { balance, interactions, routines } from '@wdi/content';
+import { balance, interactions } from '@wdi/content';
 import { Phase, TICK_RATE } from '@wdi/shared';
 import { addStack, count } from '../src/sim/Inventory';
 import { workable } from '../src/sim/npc/chores';
@@ -40,16 +40,6 @@ describe('depletion', () => {
       const stays = it.after.respawnS === null;
       expect(stays, id).toBe(it.target === 'crateNailed');
     }
-  });
-
-  it('deals each NPC seat a work tool by seat order, with no draw', async () => {
-    const party = await standardParty(colyseus, 'S1');
-    const ids = npcIdsOf('S1');
-    expect(ids.length).toBeGreaterThan(1);
-    ids.forEach((id, i) => {
-      const tool = routines.carries[i % routines.carries.length]!;
-      expect(count(party.room.state.players.get(id)!, tool), id).toBe(1);
-    });
   });
 
   it('an NPC chops a pile for real: the pile stays cut, then returns and is a station again', async () => {

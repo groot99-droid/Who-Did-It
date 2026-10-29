@@ -460,7 +460,7 @@ none is role-bound, and the content check refuses a wall that no neutral tool ca
 **Nodes keep bare hands** (owner answer LT1): a Timber node holds 3 s by hand and 1.5 s with an Axe in the inventory, a
 Stone node the same with a Pickaxe; Tin Ore still needs the Spade. A tool speeds supply up, it does not gate it.
 Chopping and breaking make no noise yet (the noise table has no chop or smash row); the Crowbar's pry sounds at 10.
-The general stores sell the Axe, the Pickaxe and the Hammer (3.23 Shops; prices in `economy.json`, proposals for the balance lab), and a seat can also craft one (the table above). **Depletion (round 10, D2; owner answer LT7).** Every pile above comes back after its own time, and an NPC seat's gather empties a pile like a human's: `routines.json` `carries` deals each NPC seat a tool with its persona, in seat order (Axe, then Pickaxe, cycling; no draw, so no stream moves), the pile it works stays cut or cleared until its time has run, and a seat that finds it spent walks on.
+The general stores sell the Axe, the Pickaxe and the Hammer (3.23 Shops; prices in `economy.json`, proposals for the balance lab), and a seat can also craft one (the table above). **Depletion (round 10, D2; owner answer LT7).** Every pile above comes back after its own time, and an NPC seat's gather empties a pile like a human's: `routines.json` `carries` deals each NPC seat a tool with its persona, in seat order (empty until the tests that assume bare-handed NPCs are updated (6Z grant pending); Axe, then Pickaxe, cycling; no draw, so no stream moves), the pile it works stays cut or cleared until its time has run, and a seat that finds it spent walks on.
 
 ### 3.15 Mobs
 
