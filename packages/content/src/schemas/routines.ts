@@ -56,6 +56,11 @@ export const RoutinesFile = z.strictObject({
    * prop's class wins over its kind (round 10, D1).
    */
   holds: z.record(PropKind, RoutineHold),
+  /**
+   * Tool item ids an NPC seat is dealt with its persona, in seat order and cycling (round 10, D2): a gatherer works
+   * real stock with a real tool, so depletion (LT7) is not cosmetic. No draw, so no stream moves.
+   */
+  carries: z.array(Id),
   /** Prop kinds that are never stations. */
   ignore: z.array(PropKind),
   /** Prop kinds that light an exterior scene at night. */
