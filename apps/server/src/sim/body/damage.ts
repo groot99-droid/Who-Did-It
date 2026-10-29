@@ -72,11 +72,7 @@ export function hurt(room: PartyRoom, target: string, row: DamageRow, hit: Hit):
 }
 
 /** A death the body made: a creature's bite (`wolf`, `creature`); drains stop at 1 health (A6). The ghost has no body. */
-export function die(
-  room: PartyRoom,
-  target: string,
-  cause: DeathCause & ('wolf' | 'creature'),
-): void {
+export function die(room: PartyRoom, target: string, cause: DeathCause & ('wolf' | 'creature')): void {
   creatureKill(room, target, cause);
   removeBody(room, target);
 }
