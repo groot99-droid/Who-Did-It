@@ -3912,6 +3912,17 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   with no public status bit, and draws `icon_effect_exhausted.svg` in the house style. A holdout whose card holds a
   night power, or who is on a manhunt, is never Exhausted (followup-4 2.11). Round 11's planning starts at the
   playtest gate (`docs/round11/README.md`).
+- 2026-10-29: A13a (#332) merged at 203206d, B1 (#336) at cccd160, the round-11 contract (#339) at 65c2851 and A13b
+  (#335) at 4a8e70f. A13 is done, so **the playtest gate is open** and the owner has been told. Sleeping lands after the
+  gate: A7a, then A8's bed prompt. 10H plans A8 until A7a merges. Rulings:
+  - **D2 deals NPC seats no tools.** A free tool would be a tell (a seat working a pile before anyone could own the
+    tool), so `carries` goes. D2b later lets an NPC buy a tool at the store with the human verb. Its grant covers
+    npcRoutine P3, P4, R5/R6, R10, R13 and R17 (`loot` joins R17's allowlist for gathers), npcChores "stands still"
+    and, with a reason, npcTells.
+  - **B2, the briefing, is wire row 8**, a system line. A Constable reads a clue as a collector would, so the trait
+    is named only for a clue anyone may read (GDD 3.4). The felt's hat and prints are briefed as kind and place. A
+    briefing never says Forged or Verified, writes no Notebook entry and changes no clue. Its lines live in
+    `laws.json`. 10B's grant: one call line, `runLaw(room)`, in `sim/Step.ts` after `runDecay`.
 
 ## Round 11 (planning, started 2026-10-29)
 
@@ -3928,3 +3939,9 @@ after round 10's final sweep.
 
 A session is spawned with the prompt "You are session 11X of docs/SESSIONS.md Round 11 (Opus, 800k). Read
 docs/round11/README.md, then the documents and tools your part names." 6Z adds the spawn branch and the first branch.
+
+### Round 11 log: 6Z
+
+- 2026-10-29: the playtest gate opened when A13b merged (4a8e70f). 6Z merged the base into `claude/r10-tier-800k`
+  (08ddb21) and started 11A on `claude/r11-a-pipeline` and 11B on `claude/r11-b-look`. Each has the other's session
+  id.
