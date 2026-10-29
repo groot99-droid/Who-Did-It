@@ -1,3 +1,4 @@
+import { looks } from '@wdi/content';
 import { type InvariantFailure } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { registerInvariant } from '../auto/invariants';
@@ -27,7 +28,8 @@ registerInvariant('figureNotSeat', (room: PartyRoom): InvariantFailure | null =>
         if (avatar.seat !== '') return fail(`figure ${id}'s avatar names a seat`);
         if ((avatar.statusBits & StatusBit.ghost) !== 0)
           return fail(`figure ${id}'s avatar wears the ghost bit`);
-        if (!avatar.lookOf.startsWith('villager'))
+        // A villager look, or a `figures` look of looks.json (round 10, B1); never a card's.
+        if (!(avatar.lookOf in looks.villagers) && !(avatar.lookOf in (looks.figures ?? {})))
           return fail(`figure ${id} wears the look ${avatar.lookOf}`);
       }
     }
