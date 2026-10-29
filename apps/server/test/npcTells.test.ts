@@ -7,6 +7,7 @@ import { simOf } from '../src/sim/RoomSim';
 import { sceneIndex } from '../src/sim/World';
 import { endMatch } from '../src/sim/Win';
 import { openRun } from './killHelpers';
+import { shortClock } from './shortClock';
 import { type Party, bootNpcServer, npcIdsOf, standardParty, type SeedSet } from './npcHelpers';
 import { type Recording, type SeatSample, type TickSample, findTells, recordMatch } from './npcTells';
 
@@ -14,10 +15,15 @@ import { type Recording, type SeatSample, type TickSample, findTells, recordMatc
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
+let restoreClock: () => void;
 beforeAll(async () => {
+  restoreClock = shortClock(); // a 230 s cycle: the 810 s one is `pnpm auto`'s (round 10, A5)
   ({ colyseus, release } = await bootNpcServer());
 });
-afterAll(async () => release());
+afterAll(async () => {
+  restoreClock();
+  await release();
+});
 beforeEach(async () => colyseus.cleanup());
 
 const RUN = openRun('overworld', 8);
