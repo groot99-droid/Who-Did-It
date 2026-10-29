@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   CENSUS_DECISIONS,
+  Item,
   Mode,
   classesOfProp,
   content,
@@ -168,5 +169,16 @@ describe('interactions.json: modes and interactions (logic-table.md 3.2)', () =>
         'interactions.json chopLumber: dig has no tier 2',
       ]),
     );
+  });
+});
+
+describe('items.json: tool tags and uses (A10; logic-table.md 3.3)', () => {
+  const item = (patch: object) => Item.safeParse({ ...content.items.items.spade, ...patch }).success;
+
+  it('takes a tier per capability tag and a positive number of uses', () => {
+    expect(item({ tool: { cut: 1, break: 2 }, uses: 20 })).toBe(true);
+    expect(item({ tool: { saw: 1 } })).toBe(false);
+    expect(item({ tool: { cut: 4 } })).toBe(false);
+    expect(item({ uses: 0 })).toBe(false);
   });
 });
