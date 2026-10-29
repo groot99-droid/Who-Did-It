@@ -12,9 +12,10 @@ import { schema, t } from '@colyseus/schema';
 // sessions fill them (docs/round6/seams.md 1.1). Version 4 (round 7, A104): `Player.profile`,
 // `Private.vendetta` (A112). Version 5 (round 7, A115): the quick mode's fields are gone. Version 6 (round 8,
 // A135, docs/round8/seams.md 1): `Private.body` (8A); the later round-8 rows (`purse`, `bank`, `faith`, `hq`, 8L's
-// `Avatar.nearBits`) join version 6 without another bump.
+// `Avatar.nearBits`) join version 6 without another bump. Version 7 (round 10, docs/round10/seams.md 3): the
+// round-10 rows, among them `Private.home`, `asleep`, `inBed` and `inBedOf` (A7).
 
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 
 /**
  * View tags (Visibility.ts): `presence` and `priv` are the numeric tags 1 and 2, granted one by one; `ghost`
@@ -227,6 +228,16 @@ export const Private = schema(
     bank: u32(),
     /** Round 8 (GDD 3.23, 8D): the Faith this seat has earned by donating at an altar. */
     faith: u16(),
+    /** Round 10 (GDD 3.32, A7): this seat's home, a scene id whose `bed` is its own; '' before the match. */
+    home: str(),
+    /** Round 10 (GDD 3.32, A7): whether this seat lies asleep in a bed; only its owner learns it. */
+    asleep: bool(),
+    /**
+     * Round 10 (GDD 3.32, A7): while this seat sleeps, how many active players are in bed (`inBed`) of how many
+     * there are (`inBedOf`), never a name; both 0 while it is awake, so an awake seat learns nothing (PH 13.4).
+     */
+    inBed: u8(),
+    inBedOf: u8(),
   },
   'Private',
 );

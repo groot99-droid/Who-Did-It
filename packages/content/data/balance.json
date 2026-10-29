@@ -380,5 +380,6 @@
       "transcriptLines": 20
     },
     "gddRef": "3.8"
-  }
+  },
+  "sleep": { "confirmS": 3, "innBedScrip": 2, "gddRef": "3.32" }
 }

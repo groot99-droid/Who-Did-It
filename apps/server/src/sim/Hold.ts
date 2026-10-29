@@ -19,6 +19,7 @@ import { handleBankHold } from './economy/bank';
 import { handleShopHold } from './economy/shops';
 import { handleGather, tickGather } from './Resources';
 import { handleCivicHold, isCivicHold, tickCivicHold } from './economy/holds';
+import { handleSleepHold } from './Sleep';
 
 const CLUE_TEACHING = 'clue_teaching';
 
@@ -83,6 +84,7 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
     return;
   }
   if (isCivicHold(action)) return handleCivicHold(room, sessionId, action, targetId); // round 8, 8D (GDD 3.23)
+  if (action === 'sleep') return handleSleepHold(room, sessionId, targetId); // round 10, A7 (GDD 3.32)
   if (action !== 'collect' || typeof targetId !== 'string' || targetId.length === 0 || targetId.length > 64) {
     reject(room, sessionId, ErrorCode.cannot, 'cannot do that');
     return;

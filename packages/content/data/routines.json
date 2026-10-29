@@ -43,7 +43,10 @@
     "mailbag",
     "rack",
     "hq",
-    "blackMarket"
+    "blackMarket",
+    "bed",
+    "cot",
+    "innBed"
   ],
   "lightKinds": ["lanternPost"],
   "townsfolk": {

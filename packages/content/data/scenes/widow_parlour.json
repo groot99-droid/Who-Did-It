@@ -75,7 +75,8 @@
     { "id": "wp.rug", "kind": "dressing", "x": 6, "y": 6 },
     { "id": "wp.birdcage", "kind": "dressing", "x": 1, "y": 8 },
     { "id": "wp.coat_stand", "kind": "dressing", "x": 14, "y": 7 },
-    { "id": "wp.boot_rack", "kind": "dressing", "x": 14, "y": 9 }
+    { "id": "wp.boot_rack", "kind": "dressing", "x": 14, "y": 9 },
+    { "id": "wp.bed", "kind": "bed", "x": 14, "y": 1 }
   ],
   "gates": [],
   "paths": [],

@@ -21,7 +21,8 @@ import { type Rng, sfc32 } from '@wdi/shared';
  * - `body`: the effect chance rolls of the body (round 8, 8A, GDD 3.22; docs/round8/body.md 3), never a secret one;
  * - `purse`: each seat's starting stake, keyed by seat id (round 8, GDD 3.23);
  * - `talk`: an NPC seat's meeting notes, keyed by seat id (round 8, 8T, GDD 3.8), so a note moves no other stream;
- * - `townsfolk`: the ambient townsfolk figures (round 8, 8E, GDD 3.24), keyed by figure id, never a secret draw.
+ * - `townsfolk`: the ambient townsfolk figures (round 8, 8E, GDD 3.24), keyed by figure id, never a secret draw;
+ * - `homes`: each human seat's home (round 10, A7, GDD 3.32), drawn in seat order and never from the card.
  */
 export type StreamName =
   | 'deal'
@@ -40,7 +41,8 @@ export type StreamName =
   | 'body' // round 8, 8A
   | 'purse'
   | 'talk'
-  | 'townsfolk';
+  | 'townsfolk'
+  | 'homes';
 
 /** Four 32-bit seed words of one sfc32 stream. */
 export type SeedWords = readonly [number, number, number, number];

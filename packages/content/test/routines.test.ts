@@ -57,6 +57,10 @@ const TABLE: Record<string, 'work' | 'social' | 'rest' | 'ignore'> = {
   blackMarket: 'ignore',
   counter: 'ignore',
   bank: 'ignore',
+  // Round 10 (A7, GDD 3.32): a seat sleeps in a bed; no NPC works one.
+  bed: 'ignore',
+  cot: 'ignore',
+  innBed: 'ignore',
 };
 
 function classOf(kind: string): string | undefined {
