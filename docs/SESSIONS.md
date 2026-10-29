@@ -3861,3 +3861,8 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
 
 - 2026-10-29: the contract `docs/round10/` with A223 and A224; the GDD stubs 3.27 to 3.33; the compaction default
   500k and the two tier branches. 10A, 10F and 10H spawned.
+- 2026-10-29: #314 merged at 580e5d9, and 10A, 10F and 10H started from it at 500k (each session reports a 500000
+  window). A9 (#315) merged. Seams changes on 10F's request: `SceneState.propStates` becomes wire row 3 (public to the
+  scene, never who changed a prop); `SCHEMA_VERSION` goes to 7 in whichever of A12 and A10 merges first; A10 adds
+  the optional `tool` and `uses` item fields. 10H holds a grant for the A5 test edits it listed (taskDeal, trial,
+  npcRoutine R9, invariants and npcTells; seams.md 1).

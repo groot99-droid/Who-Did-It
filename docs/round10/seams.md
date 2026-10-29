@@ -12,7 +12,7 @@ it here. Numbers stay in `GDD.md` and `packages/content/data`.
 | `docs/GDD.md` | Edit only the sections your pull request names (plan, `gdd-map.md`). The new sections 3.27 to 3.33 are stubs from the contract: fill yours, leave the others. |
 | `packages/shared/src/protocol/refusals.ts` | A1 creates it. After A1 the `RefusalReason` list is **append-only**: add at the end, never rename, renumber or reuse a reason or its code. A new reason gets its line in `apps/client/src/ui/copy/refusals.ts` in the same pull request (the type-level `Record` test fails otherwise). |
 | `apps/server/src/sim/seeds.ts` | `StreamName` is append-only. One new stream per secret draw, added in the pull request that draws it: `loot` (whichever of A10 and A11 first rolls a chest's or a pile's loot), `locks` (D5), `hitman` (C4), `hardship` (C4). Nothing public shares a secret stream. |
-| `packages/shared/src/schema/index.ts` | `SCHEMA_VERSION` goes from 6 to 7 once, in A12. Later round-10 rows join version 7 in merge order (section 3). |
+| `packages/shared/src/schema/index.ts` | `SCHEMA_VERSION` goes from 6 to 7 once, in whichever of A12 and A10 merges first; the other joins 7. Later round-10 rows join version 7 in merge order (section 3). |
 | `SCENE_IDS` and `scenes/*.json` | Append-only ids (GDD 3.13, WORLD 4.3). B5 adds the `cj.` prefix. A new prop (a `bed`, a lock, a saw horse) gets a new id; no id is renamed. |
 | `packages/content/data/events.json` | Append events; never rename one. |
 | `docs/DECISIONS.md` | Each session writes under its reserved row (section 5); nobody edits an older row. |
@@ -38,8 +38,9 @@ the full check. A JSON conflict keeps both sides' keys. A conflict in another se
 
 | Order | Row | Class | Pull request |
 |---|---|---|---|
-| 1 | The private inventory: hotbar 6, pack 18, belt 2, `head`, `body`, `weapon` (`round10-plan.md` A12) | own client only | A12 (bumps to 7) |
+| 1 | The private inventory: hotbar 6, pack 18, belt 2, `head`, `body`, `weapon` (`round10-plan.md` A12) | own client only | A12 (bumps to 7 if first) |
 | 2 | The error frame's optional `reason`, `args` and `interaction` (A1) | the refused client only | A1 (protocol, not schema) |
+| 3 | `SceneState.propStates`: per scene, `PropState {id, state, untilTick}`, the prop states of `logic-table.md` 3.4 (whole, cut, rubble, searched, open, broken); never who changed one | public to the scene | A10 (bumps to 7 if first) |
 
 Every other round-10 row is added here by 6Z when a session asks, before it lands. What must never go on the wire:
 who is awake by name (A8), who signed a petition beyond the count the screen shows, the Hitman's seat, a hardship's
@@ -53,7 +54,7 @@ A session edits outside its paths only through a shared file of section 1, or wi
 | Session | Owns |
 |---|---|
 | 10A | `packages/shared/src/protocol/refusals.ts` and the error frame, `apps/client/src/ui/copy/refusals.ts`, `sim/Inventory.ts`, the private view's inventory rows, `sim/Sleep.ts`, `sim/Phases.ts` night end, `bed` props |
-| 10F | `packages/content/src/schemas/interactions.ts`, `validate.ts` (interactions), `interactions.json`, `sim/interact/`, `act.hold {action: 'interact'}`, then `sim/npc/*` and `routines.json` action chains (D1) |
+| 10F | `packages/content/src/schemas/interactions.ts`, `validate.ts` (interactions), `interactions.json`, `sim/interact/`, `act.hold {action: 'interact'}`, the optional `tool` and `uses` fields of `packages/content/src/schemas/items.ts` (A10; A11 fills the data), then `sim/npc/*` and `routines.json` action chains (D1) |
 | 10H | `abilities.json` and `clues.json` clocks, `mobs.json`, `effects.json`, `sim/body/effects.ts` and `damage.ts`, `sim/Death.ts` causes (A6), `items.json` and `recipes.json` tools, `resources.json`, `sim/Resources.ts` (A11), `ui/Inventory.ts`, `ui/Crafting.ts`, `sim/Craft.ts` (A13), the asleep overlay (A8) |
 | 10G | refusal sites in `apps/server/src/rooms/**` and `apps/server/src/sim/**` (the reason argument only), `apps/client/src/net/` refusal handler, the toast, the use prompt |
 | 10B | `sim/law/`, `sim/Jail.ts`, `sim/Meeting.ts` removal, `laws.json`, `scenes/cj_*.json`, `looks.json` `constable`, the Constables' routine |
