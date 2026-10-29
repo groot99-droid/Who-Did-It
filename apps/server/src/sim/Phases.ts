@@ -8,6 +8,7 @@ import { enterImmunity, openMeeting, runMeeting } from './Meeting';
 import { isAiming } from './NightPowers';
 import { simOf } from './RoomSim';
 import { endMatch, evaluateWin, resetToLobby } from './Win';
+import { runSleep } from './Sleep';
 import { isWorldPhase } from './World';
 
 /**
@@ -39,6 +40,7 @@ export function runPhases(room: PartyRoom): void {
     // A body report ends the hunt at once and opens the forced meeting (GDD 3.3); nothing else opens one there.
     if (balance.finalNight.reportEndsHunt) return endHunt(room, request.callerId, request.bodyOf);
   } else if (request && isWorldPhase(state.phase)) return openMeeting(room, request);
+  runSleep(room); // round 10, A7 (GDD 3.32): every active player asleep ends the night here
   if (state.tick >= state.phaseEndsTick) advanceWorldPhase(room);
 }
 
