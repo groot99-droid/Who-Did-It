@@ -9,10 +9,10 @@ function broken(edit: (c: Content) => void): string[] {
   return validateContent(copy);
 }
 
-const TOOLS = ['lantern', 'crowbar', 'lockpicks', 'snare', 'torch', 'spade'];
+const TOOLS = ['lantern', 'crowbar', 'lockpicks', 'snare', 'torch', 'spade', 'axe', 'pickaxe', 'hammer'];
 
 describe('resources and recipes', () => {
-  it('has a recipe for each of the six tools, and every node names a resource', () => {
+  it('has a recipe for each tool, and every node names a resource', () => {
     expect(
       Object.values(content.recipes.recipes)
         .map((r) => r.out)

@@ -45,6 +45,7 @@ import { MatchSeeds } from '../../sim/seeds';
 import { simOf } from '../../sim/RoomSim';
 import { mapIdOfRoom } from '../../sim/MapSites';
 import { dealPurses } from '../../sim/economy/purse';
+import { settle } from '../../sim/Inventory';
 
 /**
  * Flow messages: the lobby and role-card flow plus the meeting vote and chat (consumed by the phase
@@ -294,6 +295,7 @@ export function startMatch(room: PartyRoom): void {
       stack.qty = k.qty;
       priv.inventory.slots.push(stack);
     }
+    settle(player); // round 10, A12: each kit stack in a slot of its own
   }
   // Round 5, 5F: the cover hints, each cover seat's preset `coverLook` and the Cabal mates' `mateLooks`.
   assignCovers(room, dealt);

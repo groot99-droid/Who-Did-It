@@ -1,5 +1,5 @@
 import type { ItemsFile } from './schemas/items.js';
-import type { MinigamesFile, ResourcesFile } from './schemas/m5b.js';
+import type { MinigamesFile, RecipesFile, ResourcesFile } from './schemas/m5b.js';
 import type { RoutinesFile } from './schemas/routines.js';
 import type { Scene, SceneId } from './schemas/scene.js';
 import {
@@ -24,6 +24,7 @@ export function checkInteractions(
     scenes: Record<SceneId, Scene>;
     items: ItemsFile;
     resources: ResourcesFile;
+    recipes: RecipesFile;
     minigames: MinigamesFile;
     routines: RoutinesFile;
   },
@@ -72,6 +73,9 @@ export function checkInteractions(
   for (const kind of censusMap(t.census.kinds).entries())
     if (kind[1] === 'live' && !classKinds.has(kind[0])) err(`${file}: live kind ${kind[0]} has no class`);
 
+  const made = new Set(Object.values(c.recipes.recipes).map((r) => r.out));
+  const looted = new Set(Object.values(t.lootTables).flatMap((l) => l.entries.map((e) => e.item)));
+  const obtainable = (id: string) => made.has(id) || looted.has(id);
   const isItem = (id: string) => Object.hasOwn(c.items.items, id);
   for (const [id, table] of Object.entries(t.lootTables))
     for (const e of table.entries)
@@ -98,6 +102,17 @@ export function checkInteractions(
         if (!(cls?.match.stems?.includes(stem) ?? false))
           err(`${where}: mode stem ${stem} is not its class's`);
     }
+    for (const m of it.modes)
+      if (m.tool !== null) {
+        const carriers = Object.values(c.items.items).filter(
+          (i) => (i.tool?.[m.tool!.tag] ?? 0) >= m.tool!.tier,
+        );
+        // Logic table 10.1: no verb needs a role's item, and a wall's tool is one a seat can come by.
+        if (!carriers.some((i) => !i.roleBound))
+          err(`${where}: no neutral item carries ${m.tool.tag} ${m.tool.tier}`);
+        else if (!carriers.some((i) => !i.roleBound && obtainable(i.id)))
+          err(`${where}: nobody can come by a ${m.tool.tag} ${m.tool.tier} tool`);
+      }
     if (it.modes.every((m) => m.tool !== null) && it.fail.NEED_TOOL === undefined)
       err(`${where}: a tool wall needs a NEED_TOOL line`);
   }
