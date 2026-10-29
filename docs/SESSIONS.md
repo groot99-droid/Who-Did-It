@@ -3878,3 +3878,10 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   skip, the homes and the `bed` props) and A7b (what a bed restores, and Exhaustion, after A6). Seams changes: wire
   row 5 `Private.home`, drawn from the NPC persona pool and never from the card; 10A's paths gain A7b's `exhausted`
   row. A conflict only in `DECISIONS.md` is resolved by keeping every row in number order, with CI as the check.
+- 2026-10-29: A10 (#321) merged at 5bdfd0c, #326 (the seams above, with the sleeper-only counts) at c069f13, A6 (#322)
+  at 84bf484 and A3a (#325) at e8719f6. 10C started from `claude/r10-tier-800k` with the base at e8719f6 merged in,
+  on C1. Grants: 10G's A3b edits to the night-power, craft and night-helper tests (the night power's "used tonight"
+  and the craft's "needs a station" now carry 422, from `SPENT` and `NEED_STATION`), and 10H's A11 edit to the
+  interact test (the fixture sets the real `lumber` class aside and restores it). Compaction: a worker restart on a
+  pull request branch read the base's 500k for 10G, so a tiered session also keeps its window in the git-ignored
+  `.claude/settings.local.json` (README, Compaction).
