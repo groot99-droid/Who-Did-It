@@ -42,6 +42,7 @@ export type StreamName =
   | 'purse'
   | 'talk'
   | 'townsfolk'
+  | 'loot' // round 10, A10: an interaction's drops (docs/round10/seams.md 1)
   | 'homes';
 
 /** Four 32-bit seed words of one sfc32 stream. */
