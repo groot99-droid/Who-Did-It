@@ -66,8 +66,8 @@ A session edits outside its paths only through a shared file of section 1, or wi
 | 10D | `minigames.json`, `sim/Minigames.ts` (lock-pick, jail), `sim/economy/rent.ts`, `economy.json`, `quests.json`, `lore.json` tips, `sim/townsfolk/*`, the bakery and mill scenes' props |
 | 10E | `achievements.json`, `story.json`, the achievement step evaluation, the client's device record, the chapter cards |
 | 10X, 10Y | anything, one fix per pull request, after checking no live session owns the path (10X server, rules and content; 10Y client, copy and art) |
-| 10Z | `docs/**` |
-| 6Z | `docs/round10/**`, the Round 10 section of `docs/SESSIONS.md`, A223 and A224 |
+| 10Z | `docs/**`, except `docs/round11/**` (round 11's planning, `docs/round11/README.md`) |
+| 6Z | `docs/round10/**`, the Round 10 section of `docs/SESSIONS.md`, A223 and A224; `docs/round11/README.md` and the Round 11 section |
 
 Where two sessions' files meet (A6 and C1 in `sim/Death.ts`, A12 and C6 in a robbery, D1 and B1 in the NPC routines),
 the later session builds on the merged earlier one and does not reshape it.
