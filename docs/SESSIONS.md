@@ -3885,3 +3885,10 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   interact test (the fixture sets the real `lumber` class aside and restores it). Compaction: a worker restart on a
   pull request branch read the base's 500k for 10G, so a tiered session also keeps its window in the git-ignored
   `.claude/settings.local.json` (README, Compaction).
+- 2026-10-29: on 10C's request for C1, wire row 6 (`Private.onLine`, and `S2C.killed` with empty `roles` while on the
+  line). C1 splits into C1a (the server, GDD 3.3 and 3.22) and C1b (the On-the-line screen and the arrival card).
+  10C's grant: a gate of one or two lines through `isOnLine()` (`sim/Train.ts`) in `sim/Visibility.ts`,
+  `sim/Chat.ts`, `sim/Portals.ts`, `sim/Inherit.ts` and 10D's `sim/Minigames.ts`, and the `respawn.*` and
+  `train.dusk.*` keys of the balance schema. BlackPine has no station (GDD 3.3, the Daily Train), so its daylight deaths stay final;
+  whether it gets one is the owner's question. 10A's A7a grant: greybox `bed`, `cot` and `innBed` frames from
+  `tools/sprites/placeholder.ts` and their `INTERACTABLE_PROPS` labels, until the real art.
