@@ -22,6 +22,20 @@ export const M5B_COPY = {
   'inv.light.on': 'Light',
   'inv.light.off': 'Douse',
   'inv.close': 'Close',
+  // 14.44 The inventory screen and the crafting square (A13, round 10)
+  'inv.hotbar': 'Hotbar',
+  'inv.pack': 'Pack',
+  'inv.belt': 'Belt',
+  'inv.head': 'Head',
+  'inv.body': 'Body',
+  'inv.weapon': 'Weapon',
+  'inv.pick': 'Pick a stack, then a slot that takes it.',
+  'hotbar.label': 'Hotbar',
+  'grid.title': 'Craft',
+  'grid.size2': '2 by 2',
+  'grid.size3': '3 by 3 (workbench)',
+  'grid.hint': 'Pick a stack, then a square. Take what comes out.',
+  'grid.bound': 'That stays with you. It cannot be worked.',
 
   // 14.19.3 Crafting
   'craft.title': 'Craft',

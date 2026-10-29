@@ -1750,3 +1750,29 @@ Lines are in `apps/client/src/ui/copy/refusals.ts` (`REFUSAL_COPY`, `refusalLine
   that makes it read "Nothing happens." before release (FM1).
 - No line names a role or an ability (rule 4; the test reads `roles.json` and `abilities.json`). A per-interaction
   `fail` line of `interactions.json` wins over these when the refusal names its interaction (A4).
+
+### 14.44 The inventory screen and the crafting square (10H, round 10)
+
+Lines are in `apps/client/src/ui/copy/m5b.ts` (`M5B_COPY`, keys `inv.*`, `hotbar.*`, `grid.*`). Item names come from
+`items.json`; no line names a role. The screen (key I, the Pockets button) draws the slots of GDD 3.30 as grids:
+
+| Key | Line |
+| --- | --- |
+| `inv.hotbar`, `inv.pack`, `inv.belt` | Hotbar, Pack, Belt |
+| `inv.head`, `inv.body`, `inv.weapon` | Head, Body, Weapon |
+| `inv.pick` | Pick a stack, then a slot that takes it. |
+| `inv.slots` | {n} of {max} slots (the count of used slots over the whole layout) |
+| `grid.title`, `grid.size2`, `grid.size3` | Craft; 2 by 2; 3 by 3 (workbench) |
+| `grid.hint` | Pick a stack, then a square. Take what comes out. |
+| `grid.bound` | That stays with you. It cannot be worked. |
+| `hotbar.label` | Hotbar |
+
+- **Moves.** Click a stack to pick it; the slots that would refuse the move (`inv.move`: the belt takes tools, a gear
+  slot its own gear, a full stack of the same item) are dimmed and cannot be clicked, so a move offered lands. Click the
+  picked stack again to put it down.
+- **The hotbar strip** is always on screen during a match: a tap or the keys 1 to 6 select the held slot
+  (`inv.select`); the held slot has a border. The same strip is the touch control.
+- **The crafting square** shows the product the shared match gives as a preview; Take sends `craft.grid` and empties the
+  square. A role-bound item cannot be placed (`grid.bound` on hover); the 3 by 3 button asks the server, which
+  refuses `NEED_STATION` (workbench) away from one. The refusals read their lines from 14.43.
+- The Light, Douse and Use buttons of 14.19.2 and 14.32 sit in a row under the grid for each stack that has the verb.

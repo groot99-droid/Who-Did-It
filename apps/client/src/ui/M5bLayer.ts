@@ -19,7 +19,9 @@ import { TASK_COPY as TC } from './copy/tasks';
 import { mountChores, mountWorkBar } from './Chores';
 import { mountCrafting } from './Crafting';
 import { h, isTyping, overlayRoot } from './dom';
+import { mountHotbar, type Hotbar } from './Hotbar';
 import { itemName, mountInventory, stacksOf, type Panel } from './Inventory';
+import { LAYOUT, slotsIn } from './slots';
 import { mountQuestLog } from './QuestLog';
 import {
   TASKS,
@@ -155,6 +157,7 @@ class Layer implements M5bLayer {
   private readonly bar: HTMLElement;
   private readonly toastEl: HTMLElement;
   private readonly inv: Panel;
+  private readonly hotbar: Hotbar;
   private readonly craft: Panel;
   private readonly questLog: Panel;
   private readonly chores: Panel;
@@ -214,8 +217,16 @@ class Layer implements M5bLayer {
       this.toastEl,
     );
     parent.append(this.root);
+    this.hotbar = mountHotbar(this.root, {
+      inventory: () => feed.inventory(),
+      selected: () => feed.selectedSlot(),
+      select: (slot) => feed.invSelect(slot),
+    });
     this.inv = mountInventory(this.root, {
       inventory: () => feed.inventory(),
+      selected: () => feed.selectedSlot(),
+      move: (from, to) => feed.invMove(from, to),
+      craftGrid: (size, cells) => feed.craftGrid(size, cells),
       lit: () => this.lit(),
       light: (on) => feed.light(on),
       use: (id, target) => feed.ability(id, target), // round 8, 8A
@@ -340,6 +351,17 @@ class Layer implements M5bLayer {
       case 'KeyI':
         if (down) this.inv.toggle();
         break;
+      case 'Digit1':
+      case 'Digit2':
+      case 'Digit3':
+      case 'Digit4':
+      case 'Digit5':
+      case 'Digit6': {
+        // Round 10 (A13): the number keys pick the held hotbar slot.
+        const slot = slotsIn(LAYOUT, 'hotbar')[Number(e.code.slice(5)) - 1];
+        if (down && slot !== undefined) this.feed.invSelect(slot);
+        break;
+      }
       case 'KeyC':
         if (down) this.craft.toggle();
         break;
@@ -524,6 +546,7 @@ class Layer implements M5bLayer {
     this.work.update(this.feed.taskBar());
     // Each open panel redraws only when what it shows changed.
     for (const p of this.panels()) p.update();
+    this.hotbar.update();
   }
 
   /** The nearest of the active nodes, the givers and this seat's task spots; a task spot wins a tie. */
@@ -615,6 +638,7 @@ class Layer implements M5bLayer {
     this.modal?.close();
     for (const off of this.offs) off();
     for (const p of this.panels()) p.destroy();
+    this.hotbar.destroy();
     this.work.destroy();
     this.root.remove();
   }

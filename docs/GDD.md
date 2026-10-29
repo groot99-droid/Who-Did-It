@@ -1105,6 +1105,11 @@ A gain that does not all fit changes nothing and refuses `PACK_FULL`. A take emp
 or swaps it with the stack there when each slot takes the other's item; anything else refuses `BAD_REQUEST`, since the
 screen offers only the moves that land. `inv.select` picks the held hotbar slot. Both are consumed in `step()`.
 
+**The screen** (A13b, UI.md 14.44). The inventory screen (I) draws the hotbar, the pack, the belt and the head, body
+and weapon slots as grids with the crafting square beside them. Pick a stack, then a slot: the slots that would refuse
+the move are dimmed, so the screen offers only the moves that land. The hotbar strip is on screen during a match and its
+slots, or the keys 1 to 6, select the held one. The square previews the product and Take sends `craft.grid`.
+
 **A dropped body.** When a body is dropped (the train's return, a robbery), it loses the hotbar, the pack, the belt and
 the purse. Bound kit (`onDeath: kept`), the gear slots and the bank stay with the seat. A match's end empties the
 inventory and the held slot resets to the first.

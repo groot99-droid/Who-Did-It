@@ -597,6 +597,21 @@ export class MockWorldFeed implements WorldFeed {
     this.m5b.light(on);
   }
 
+  selectedSlot(): number {
+    return this.m5b.selected;
+  }
+
+  invMove(from: number, to: number): void {
+    this.m5b.invMove(from, to);
+  }
+
+  invSelect(slot: number): void {
+    this.m5b.selected = slot;
+  }
+
+  /** The mock does not craft from the grid; the list in the crafting panel still works. */
+  craftGrid(_size: 2 | 3, _cells: Array<string | null>): void {}
+
   minigameResult(_taskId: string, _answer: unknown): void {
     // The mock has no task layer: `?minigame=<kind>` opens a modal whose result is dropped here.
   }
