@@ -63,7 +63,10 @@ const NIGHT: ReadonlySet<number> = new Set([Phase.night, Phase.finalNight]);
 
 /** The placed prop `targetId` in the seat's scene with the class that answers for it, or null. */
 function targetOf(room: PartyRoom, p: PlayerSim, targetId: string): Target | null {
-  const sceneId = sceneKey(p.sceneIdx);
+  return targetIn(room, sceneKey(p.sceneIdx), targetId);
+}
+
+function targetIn(room: PartyRoom, sceneId: SceneId, targetId: string): Target | null {
   const prop = scenes[sceneId].props.find((pr) => pr.id === targetId);
   if (!prop || (prop.profiles !== undefined && !prop.profiles.includes(simOf(room).profile))) return null;
   const [classId] = classesOfProp(interactions, prop);
@@ -112,6 +115,34 @@ function stateOf(room: PartyRoom, t: Target) {
   return room.state.scenes.get(t.sceneId)?.propStates.get(t.id);
 }
 
+const spent = (room: PartyRoom, t: Target): boolean => {
+  const state = stateOf(room, t);
+  return state !== undefined && (state.untilTick === 0 || room.state.tick < state.untilTick);
+};
+
+/**
+ * Whether a seat holding what `player` holds could run an interaction on prop `propId` of `sceneId` now, wherever it
+ * stands: a live interaction open in the phase, the prop not spent, a mode the seat's tools run with no mini-game.
+ * An NPC seat's routine picks only such props (round 10, D1), so it never walks to a wall it cannot pass.
+ */
+export function interactReady(
+  room: PartyRoom,
+  player: PlayerState,
+  sceneId: SceneId,
+  propId: string,
+): boolean {
+  const t = targetIn(room, sceneId, propId);
+  if (!t || !isVerbPhase(room.state.phase) || spent(room, t)) return false;
+  const cls = NIGHT.has(room.state.phase) ? 'night' : 'day';
+  return Object.values(interactions.interactions).some(
+    (it) =>
+      it.target === t.classId &&
+      it.status === 'live' &&
+      it.phases.includes(cls) &&
+      it.modes.some((m) => m.minigame === undefined && toolHeld(player, m, t) !== undefined),
+  );
+}
+
 /** Why the hold cannot start or go on this tick, or null; also picks the mode it runs. */
 function problemOf(
   room: PartyRoom,
@@ -132,9 +163,7 @@ function problemOf(
     return { problem: { reason: 'NFY', args: { feature: it.feature ?? 'this action' } }, t };
   if (!it.phases.includes(NIGHT.has(phase) ? 'night' : 'day'))
     return { problem: { reason: 'PHASE_CLOSED' }, t };
-  const state = stateOf(room, t);
-  if (state && (state.untilTick === 0 || tick < state.untilTick))
-    return { problem: { reason: 'NOTHING_THERE' }, t };
+  if (spent(room, t)) return { problem: { reason: 'NOTHING_THERE' }, t };
   if (Math.hypot(p.x - t.x, p.y - t.y) > balance.doors.reachTiles * TILE_PX)
     return { problem: { reason: 'TOO_FAR', args: { of: 'pile' } }, t };
   const modeIdx = runnable(player, it, t);
