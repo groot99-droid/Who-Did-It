@@ -898,7 +898,8 @@ describe('the hunt, the fallback and the streams (R15 to R18)', () => {
       // Round 6: the creatures draw from their own stream, keyed by spawner; the node pool (6F) from `nodes`.
       else if (name === 'mobs') expect(spawners.has(key!), k).toBe(true);
       // Round 8 (8A): a body's chance rolls (a wound's spread, a strike's knockout) draw from `body` (A49, no secret draw shares it).
-      else expect(['npcNames', 'nodes', 'body'], k).toContain(name);
+      // Round 10 (A7): the human seats' homes, drawn once on the first world tick from their own stream.
+      else expect(['npcNames', 'nodes', 'body', 'homes'], k).toContain(name);
     }
   });
 
