@@ -61,6 +61,7 @@ const STREAMS = {
   talk: 1, // round 8, 8T (with the `talk` stream)
   townsfolk: 1, // round 8, 8E
   loot: 1, // round 10, A10
+  locks: 1, // round 10, D5
 } satisfies Record<StreamName, 1>;
 export const AUTO_STREAMS = Object.keys(STREAMS) as StreamName[];
 

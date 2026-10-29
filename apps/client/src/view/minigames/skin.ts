@@ -14,6 +14,7 @@ export const DEFAULT_SKINS: Record<MinigameKind, MiniSkin> = {
   slide: { station: 'cabinet', pieces: ['banneton'] },
   stoke: { station: 'oven', pieces: ['oak'] },
   tap: { station: 'door', pieces: ['knock'] },
+  lockpick: { station: 'lock', pieces: ['pick'] },
 };
 
 /** The skin of the row that plays `taskId`, or the kind's own. */

@@ -128,7 +128,7 @@ describe('interactions.json: modes and interactions (logic-table.md 3.2)', () =>
         target: 'nowhere',
         fail: {},
         modes: [
-          { ...chop.modes[0]!, drops: [{ item: 'gold', qty: [1, 1] }], loot: 'void', minigame: 'lockpick' },
+          { ...chop.modes[0]!, drops: [{ item: 'gold', qty: [1, 1] }], loot: 'void', minigame: 'nosuch' },
         ],
       };
     });

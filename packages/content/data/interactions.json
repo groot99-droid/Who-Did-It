@@ -44,6 +44,7 @@
     "boulder": { "name": "Boulder", "match": { "stems": ["boulder"] } },
     "rockPile": { "name": "Rock pile", "match": { "stems": ["rock_pile", "rubble"] } },
     "orePile": { "name": "Ore pile", "match": { "stems": ["ore_pile"] } },
+    "lockedDoor": { "name": "Locked door", "match": { "kinds": ["lockedDoor"] } },
     "crateNailed": {
       "name": "Nailed crate",
       "match": { "stems": ["crates", "crate", "tin_crate", "bottle_crate"] }
@@ -240,6 +241,32 @@
         "NOTHING_THERE": "Somebody has already taken what there was."
       },
       "ships": "V1"
+    },
+    "pickLock": {
+      "verb": "pick",
+      "label": "Pick the lock",
+      "target": "lockedDoor",
+      "handler": "lock",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [
+        {
+          "tool": { "tag": "pick", "tier": 1 },
+          "minigame": "lockpick",
+          "noise": "lockpick",
+          "leaves": "scratch",
+          "fineChance": 0.1,
+          "unlocks": true
+        }
+      ],
+      "after": { "state": "open", "respawnS": null },
+      "ownership": "owned",
+      "crime": "trespass",
+      "fail": {
+        "NEED_TOOL": "Failed to pick the lock. Looks like you might need a lock pick.",
+        "NOTHING_THERE": "The lock is already open."
+      },
+      "ships": "V1.5"
     }
   },
   "lootTables": {},

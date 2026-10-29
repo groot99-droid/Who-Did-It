@@ -56,7 +56,7 @@ function play(kind: MinigameKind, pub: unknown): unknown {
 }
 
 describe('the widgets rebuild the server board and answer for it', () => {
-  it.each(['crates', 'pour', 'slide', 'stoke'] as MinigameKind[])(
+  it.each(['crates', 'pour', 'slide', 'stoke'] as Exclude<MinigameKind, 'lockpick'>[])(
     '%s: a played widget passes the rule on every difficulty and seed',
     (kind) => {
       for (let difficulty = 1; difficulty <= 5; difficulty++) {
@@ -77,7 +77,7 @@ describe('the widgets rebuild the server board and answer for it', () => {
   });
 
   it('an unplayed widget answers nothing that passes', () => {
-    for (const kind of ['crates', 'pour', 'slide', 'stoke'] as MinigameKind[]) {
+    for (const kind of ['crates', 'pour', 'slide', 'stoke'] as Exclude<MinigameKind, 'lockpick'>[]) {
       const puzzle = generateMinigame(kind, 1, mulberry32(3), bases);
       const empty = {
         crates: { placed: 0, stop: 0 },

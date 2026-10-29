@@ -14,6 +14,15 @@ export interface MinigameBases {
   stoke: { stokePerTap: number; ratePerS: number; bandFrac: number; holdS: number };
   /** Round 7 (7M): a marker sweeps the track once per `periodS`; tap inside a `bandFrac` band `steps` times running. */
   tap: { steps: number; periodS: number; bandFrac: number };
+  /** Round 10 (D5, GDD 3.29): the lock-pick's numbers; a caller that opens no locks may leave them out. */
+  lockpick?: {
+    pinsByTier: number[];
+    bandFrac: number;
+    lowerTierBandMult: number;
+    snapAt: number;
+    minAttemptS: number;
+    maxAttempts: number;
+  };
 }
 
 export interface MinigamePuzzle {
@@ -56,6 +65,19 @@ export interface TapPublic {
   bands: number[];
 }
 
+/** What the picker's client receives (GDD 3.29): the set points are a puzzle, not a secret, as the tap bands are. */
+export interface LockpickPublic {
+  pins: number;
+  /** Each pin's set point along its lift, 0 to 1. */
+  setPoints: number[];
+  /** A pin sets when the lift lands within `band` of its set point. */
+  band: number;
+  /** A tension at or past this snaps the pick. */
+  snapAt: number;
+  minAttemptS: number;
+  maxAttempts: number;
+}
+
 /** Answers, by kind. Times are seconds since the mini-game opened. */
 export interface CratesAnswer {
   placed: number;
@@ -74,6 +96,17 @@ export interface StokeAnswer {
 export interface TapAnswer {
   /** Every tap, in order, hits and misses alike; the replay counts the hits in a row. */
   taps: number[];
+}
+
+/** One attempt on a pin: when (seconds since opening), which pin, how far it was lifted and the tension it reached. */
+export interface LockAttempt {
+  t: number;
+  pin: number;
+  lift: number;
+  tension: number;
+}
+export interface LockpickAnswer {
+  trace: LockAttempt[];
 }
 
 /** Longest list an answer may carry, so a hostile payload costs nothing to judge. */
@@ -128,6 +161,11 @@ export function generateMinigame(
       const pub: TapPublic = { steps, periodS: b.periodS, bandFrac: b.bandFrac, bands };
       return { kind, public: pub, solution: { ...pub, bands: [...bands] } };
     }
+    case 'lockpick': {
+      if (!bases.lockpick) throw new Error('the lockpick numbers are missing');
+      const pub = generateLockpick(difficulty, difficulty, rng, bases.lockpick);
+      return { kind, public: pub, solution: { ...pub, setPoints: [...pub.setPoints] } };
+    }
     case 'stoke': {
       const b = bases.stoke;
       const pub: StokePublic = {
@@ -140,6 +178,49 @@ export function generateMinigame(
       return { kind, public: pub, solution: { ...pub } };
     }
   }
+}
+
+/**
+ * The lock-pick's puzzle (GDD 3.29): `lockTier` sets the pins (a tier 1 lock has the first of `pinsByTier`), each pin's
+ * set point is drawn clear of the ends, and a pick of a lower tier than the lock gets a narrower band.
+ */
+export function generateLockpick(
+  lockTier: number,
+  pickTier: number,
+  rng: Rng,
+  b: NonNullable<MinigameBases['lockpick']>,
+): LockpickPublic {
+  const tier = Math.max(1, Math.min(b.pinsByTier.length, lockTier));
+  const pins = b.pinsByTier[tier - 1]!;
+  const setPoints = Array.from({ length: pins }, () => 0.1 + rng() * 0.8);
+  const band = pickTier < lockTier ? b.bandFrac * b.lowerTierBandMult : b.bandFrac;
+  return { pins, setPoints, band, snapAt: b.snapAt, minAttemptS: b.minAttemptS, maxAttempts: b.maxAttempts };
+}
+
+export type LockpickOutcome = 'open' | 'snap' | 'incomplete' | 'invalid';
+
+/**
+ * Replays the attempts against the lock (the client's `LockpickModel`): each attempt names a pin, how far it was lifted
+ * and the tension reached. A tension at or past `snapAt` snaps the pick; a lift within `band` of the pin's set point
+ * sets it; the lock opens when every pin is set. Times ascend and keep `minAttemptS` apart, so no trace is faster than
+ * a hand; a malformed trace is `invalid`, and a replay that ends with pins unset is `incomplete`.
+ */
+export function lockpickOutcome(s: LockpickPublic, trace: unknown): LockpickOutcome {
+  if (!Array.isArray(trace) || trace.length === 0 || trace.length > s.maxAttempts) return 'invalid';
+  const set = new Set<number>();
+  let last = -Infinity;
+  for (const a of trace as Array<Record<string, unknown>>) {
+    if (typeof a !== 'object' || a === null) return 'invalid';
+    const { t, pin, lift, tension } = a;
+    if (!isNum(t) || !isNum(pin) || !isNum(lift) || !isNum(tension)) return 'invalid';
+    if (!Number.isInteger(pin) || pin < 0 || pin >= s.pins) return 'invalid';
+    if (lift < 0 || lift > 1 || tension < 0 || tension > 1) return 'invalid';
+    if (t < 0 || t - last < s.minAttemptS) return 'invalid';
+    last = t;
+    if (tension >= s.snapAt) return 'snap';
+    if (Math.abs(lift - s.setPoints[pin]!) <= s.band) set.add(pin);
+  }
+  return set.size === s.pins ? 'open' : 'incomplete';
 }
 
 const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
@@ -228,6 +309,8 @@ export function checkMinigame(puzzle: MinigamePuzzle, answer: unknown): boolean 
         tapSucceeds(puzzle.solution as TapPublic, taps)
       );
     }
+    case 'lockpick':
+      return lockpickOutcome(puzzle.solution as LockpickPublic, a.trace) === 'open';
   }
 }
 

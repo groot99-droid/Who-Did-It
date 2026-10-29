@@ -121,7 +121,7 @@ export type HoldAction =
   // Round 10 (A10): any prop the logic table answers for (`interactions.json`).
   | 'interact';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
-export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
+export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 /**
  * Why a meeting opened (GDD 3.3); `missing` is the roll-call of M4; `final` is the forced meeting after the Final
  * Night hunt.
