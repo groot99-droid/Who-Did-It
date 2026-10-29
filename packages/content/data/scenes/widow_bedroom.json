@@ -63,7 +63,8 @@
     { "id": "wb.washstand", "kind": "dressing", "x": 6, "y": 1 },
     { "id": "wb.blanket_chest", "kind": "dressing", "x": 8, "y": 4 },
     { "id": "wb.linen_press", "kind": "dressing", "x": 10, "y": 3 },
-    { "id": "wb.rug", "kind": "dressing", "x": 5, "y": 5 }
+    { "id": "wb.rug", "kind": "dressing", "x": 5, "y": 5 },
+    { "id": "wb.bed", "kind": "bed", "x": 9, "y": 3 }
   ],
   "gates": [],
   "paths": [],

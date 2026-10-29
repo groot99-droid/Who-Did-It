@@ -1160,7 +1160,35 @@ petition and the manhunt are B2 to B4; until then a Constable keeps its post.
 
 ### 3.32 Sleeping
 
-Round 10, A7 (`docs/round9/gdd-map.md` 2.6). Not built yet: the step that builds it writes this section.
+Round 10, A7 (`docs/round9/gdd-map.md` 2.6; `docs/round9/world-mode.md` 7.3; `docs/round9/followup-4.md` 2.4 and
+2.11). A7a builds beds, homes and the night skip; A7b adds what each bed restores and Exhaustion.
+
+**Homes.** At the start of a match each human seat draws a home from the `homes` stream, never from its card: an
+interior an NPC could call home (3.12) that has a `bed`, distinct from the NPC homes and from each other while the map
+has enough, then shared. Only the seat itself learns its home (`Private.home`).
+
+**Beds.** A bed is a prop of kind `bed` (one in each home interior), `cot` (the chapel's) or `innBed` (the tavern's back
+room). A seat lies down with the `sleep` hold at a bed within reach, at dusk or at night; any other phase refuses
+`PHASE_CLOSED`, and there is no sleeping in the Final Night's hunt.
+
+| Bed | Who may sleep there | Refusal |
+| --- | --- | --- |
+| Home `bed` | the seat whose home it is, while its house is not boarded | another seat's bed: `NO_BED`; a boarded house: `BOARDED_HOME` |
+| Chapel `cot` | anyone, free | none |
+| Tavern `innBed` | anyone, for `balance.sleep.innBedScrip` from the purse | a short purse: `NEED_SCRIP` |
+
+Until D7 boards houses, a house counts as boarded while its seat is Indebted (3.23).
+
+**Asleep.** A sleeper stays in its bed. Its first input wakes it and does nothing else: a move wakes it without a
+step, and any other act wakes it and is refused `ASLEEP`, which is never shown; chat is not an act. A hit wakes it
+after the damage lands. Dawn wakes every sleeper, and a sleeper who dies or leaves is gone from the count. While a seat
+sleeps, its own view shows how many active players are in bed and of how many, never who.
+
+**The skip.** Active players are the living, placed, connected humans. NPC seats never count, so nothing waits on
+one. When every active player has been asleep for `balance.sleep.confirmS` of the night, the night ends as a normal
+dawn does: the next day, or the Final Night when the round calls for it. A human who stays awake, a Killer or anyone,
+holds the night open. Still waits: the county jail (B5) and the line (the respawn step) will leave their seats out of
+the active players.
 
 ### 3.33 The Hitman's arrival
 

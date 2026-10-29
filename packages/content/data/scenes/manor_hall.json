@@ -130,7 +130,8 @@
     { "id": "mh.armchair", "kind": "dressing", "x": 2, "y": 7 },
     { "id": "mh.lamp_table_1", "kind": "dressing", "x": 2, "y": 8 },
     { "id": "mh.coat_stand", "kind": "dressing", "x": 4, "y": 14 },
-    { "id": "mh.boot_rack", "kind": "dressing", "x": 22, "y": 14 }
+    { "id": "mh.boot_rack", "kind": "dressing", "x": 22, "y": 14 },
+    { "id": "mh.bed", "kind": "bed", "x": 25, "y": 10 }
   ],
   "gates": [],
   "paths": [],
