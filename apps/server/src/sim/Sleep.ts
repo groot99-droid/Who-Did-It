@@ -53,7 +53,7 @@ const subscribed = new WeakSet<PartyRoom>();
 /** Not built yet (B5): no seat is in the county jail. */
 const inJail = (_room: PartyRoom, _seat: string): boolean => false;
 /** Not built yet (the respawn step): no seat is on the line. */
-const onTheLine = isOnLine; // round 10, C1: a seat that died by day waits for the morning train
+const onTheLine = (room: PartyRoom, seat: string): boolean => isOnLine(room, seat); // round 10, C1
 
 const LIE_DOWN = new Set<number>([Phase.dusk, Phase.night]);
 
