@@ -1,10 +1,11 @@
 import { balance, quests, scenes } from '@wdi/content';
-import { ErrorCode, QuestState, TILE_PX, type PlayerState } from '@wdi/shared';
+import { QuestState, TILE_PX, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { count, exchange } from './Inventory';
 import { type PlayerSim, simOf } from './RoomSim';
 import { CONTRACT_QUEST, acceptContract } from './vendettas/contract';
 import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
+import { refusal, type Refusal } from './refusal';
 
 /**
  * Quests (round 6, M5b, GDD 3.16; docs/round6/m5b-data.md 2.3): givers are scene statics; `quest.accept` and
@@ -32,10 +33,10 @@ const stateOf = (player: PlayerState, questId: string): InstanceType<typeof Ques
   player.priv.quests.find((s) => s.id === questId);
 
 /** Why this seat cannot speak to a giver now, or null: alive, placed, in the world, in a verb phase. */
-function speakProblem(room: PartyRoom, p: PlayerSim | undefined): { code: ErrorCode; msg: string } | null {
-  if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
-  if (!p || p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
-  if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
+function speakProblem(room: PartyRoom, p: PlayerSim | undefined): Refusal | null {
+  if (!isVerbPhase(room.state.phase)) return refusal('PHASE_CLOSED');
+  if (!p || p.dead || !p.placed) return refusal('NOT_IN_PLAY');
+  if (room.state.tick < p.busyUntilTick) return refusal('BUSY');
   return null;
 }
 
@@ -53,18 +54,17 @@ function questFor(room: PartyRoom, sessionId: string, payload: Record<string, un
   const player = room.state.players.get(sessionId);
   const p = simOf(room).players.get(sessionId);
   if (!player || !p) return null;
-  const refuse = (code: ErrorCode, msg: string) => {
-    reject(room, sessionId, code, msg);
+  const refuse = (problem: Refusal) => {
+    reject(room, sessionId, problem);
     return null;
   };
   const id = payload.questId;
-  if (typeof id !== 'string' || id.length === 0 || id.length > 64)
-    return refuse(ErrorCode.cannot, 'cannot do that');
+  if (typeof id !== 'string' || id.length === 0 || id.length > 64) return refuse(refusal('BAD_REQUEST'));
   const quest = quests.quests[id];
-  if (!quest || quest.kind !== 'fetch') return refuse(ErrorCode.cannot, 'cannot do that');
+  if (!quest || quest.kind !== 'fetch') return refuse(refusal('BAD_REQUEST'));
   const problem = speakProblem(room, p);
-  if (problem) return refuse(problem.code, problem.msg);
-  if (!giverInReach(p, quest.giver)) return refuse(ErrorCode.outOfRange, 'too far');
+  if (problem) return refuse(problem);
+  if (!giverInReach(p, quest.giver)) return refuse(refusal('TOO_FAR', { of: 'person' }));
   return { player, quest };
 }
 
@@ -93,12 +93,12 @@ export function handleQuestAccept(
   if (!found) return;
   const { player, quest } = found;
   if (stateOf(player, quest.id)) {
-    reject(room, sessionId, ErrorCode.cannot, 'already taken');
+    reject(room, sessionId, 'TASK_TAKEN');
     return;
   }
   const active = player.priv.quests.filter((s) => !s.done).length;
   if (active >= balance.quests.maxActive) {
-    reject(room, sessionId, ErrorCode.cannot, 'too many quests');
+    reject(room, sessionId, 'TOO_MANY_QUESTS');
     return;
   }
   const state = new QuestState();
@@ -122,15 +122,15 @@ export function handleQuestTurnIn(
   const { player, quest } = found;
   const state = stateOf(player, quest.id);
   if (!state || state.done) {
-    reject(room, sessionId, ErrorCode.cannot, 'not taken');
+    reject(room, sessionId, 'BAD_REQUEST');
     return;
   }
   if (quest.wants.some((w) => count(player, w.item) < w.qty)) {
-    reject(room, sessionId, ErrorCode.cannot, 'you lack what is wanted');
+    reject(room, sessionId, 'NEED_MATERIALS');
     return;
   }
   if (!exchange(player, quest.wants, quest.reward)) {
-    reject(room, sessionId, ErrorCode.cannot, 'no room for the reward');
+    reject(room, sessionId, 'PACK_FULL');
     return;
   }
   state.done = true;

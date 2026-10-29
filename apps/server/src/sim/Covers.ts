@@ -1,5 +1,5 @@
 import { looks, roles } from '@wdi/content';
-import { ErrorCode, Phase, type PlayerState, type RoleRevealPayload, coverHints } from '@wdi/shared';
+import { Phase, type PlayerState, type RoleRevealPayload, coverHints } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { resetAvatarsForLobby } from './Avatars';
 import { flowOf, refuse } from './Flow';
@@ -32,18 +32,18 @@ const lookIdOf = (card: string): string => roles.roles[card]?.look ?? '';
 export function handleCoverPick(room: PartyRoom, seat: string, payload: Record<string, unknown>): void {
   const priv = room.state.players.get(seat)?.priv;
   if (!priv) return;
-  if (room.state.phase !== Phase.roleReveal) return refuse(room, seat, ErrorCode.wrongPhase, 'not now');
-  if (!isCover(priv.role.roleId)) return refuse(room, seat, ErrorCode.cannot, 'cannot do that');
+  if (room.state.phase !== Phase.roleReveal) return refuse(room, seat, 'PHASE_CLOSED');
+  if (!isCover(priv.role.roleId)) return refuse(room, seat, 'BAD_REQUEST');
   const lookId = payload.lookId;
   const pickable = flowOf(room)
     .deck.filter((card) => !isCover(card))
     .map(lookIdOf);
   if (typeof lookId !== 'string' || !pickable.includes(lookId)) {
-    return refuse(room, seat, ErrorCode.cannot, 'cannot do that');
+    return refuse(room, seat, 'BAD_REQUEST');
   }
   const mates = [...priv.cabalMates];
   if (mates.some((mate) => room.state.players.get(mate)?.priv.coverLook === lookId)) {
-    return refuse(room, seat, ErrorCode.cannot, 'a teammate wears that');
+    return refuse(room, seat, 'LOOK_TAKEN');
   }
   priv.coverLook = lookId;
   for (const mate of mates) room.state.players.get(mate)?.priv.mateLooks.set(seat, lookId);

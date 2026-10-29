@@ -1,4 +1,4 @@
-import { type ErrorCode, S2C, refusalFrame } from '@wdi/shared';
+import { S2C, refusalFrame } from '@wdi/shared';
 import type { RefusalArgMap, RefusalFrame, RefusalReason } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 
@@ -18,9 +18,8 @@ export const refusal = <R extends RefusalReason>(
 ): Refusal => ({ reason, args, extra }) as Refusal;
 
 /**
- * Sends one refusal to one client (round 10, A2; docs/round9/failures.md 6.1). Two forms while the `sim/` sites
- * move over (A3): `(reason, args?, extra?)` builds the frame of `refusalFrame`; the legacy `(code, msg)` sends no
- * reason and goes when A3 has moved the last site.
+ * Sends one refusal to one client (round 10, A2 and A3; docs/round9/failures.md 6.1): either `(reason, args?, extra?)`
+ * or a `Refusal` a check returned. Both build the frame of `refusalFrame`.
  */
 export function sendRefusal<R extends RefusalReason>(
   room: PartyRoom,
@@ -30,19 +29,16 @@ export function sendRefusal<R extends RefusalReason>(
   extra?: RefusalExtra,
 ): void;
 export function sendRefusal(room: PartyRoom, sessionId: string, problem: Refusal): void;
-export function sendRefusal(room: PartyRoom, sessionId: string, code: ErrorCode, msg: string): void;
 export function sendRefusal(
   room: PartyRoom,
   sessionId: string,
-  first: RefusalReason | ErrorCode | Refusal,
+  first: RefusalReason | Refusal,
   second?: unknown,
   third?: RefusalExtra,
 ): void {
-  const frame: RefusalFrame | { code: ErrorCode; msg: string } =
-    typeof first === 'number'
-      ? { code: first, msg: second as string }
-      : typeof first === 'object'
-        ? refusalFrame(first.reason, first.args as RefusalArgMap[RefusalReason] | undefined, first.extra)
-        : refusalFrame(first, second as RefusalArgMap[RefusalReason] | undefined, third);
+  const frame: RefusalFrame =
+    typeof first === 'object'
+      ? refusalFrame(first.reason, first.args as RefusalArgMap[RefusalReason] | undefined, first.extra)
+      : refusalFrame(first, second as RefusalArgMap[RefusalReason] | undefined, third);
   room.clients.getById(sessionId)?.send(S2C.error, frame);
 }
