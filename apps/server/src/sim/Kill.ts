@@ -150,20 +150,3 @@ export function creatureKill(room: PartyRoom, victimId: string, cause: 'wolf' | 
   spawnBody(room, sceneId, victimId, Math.floor(victim.x / TILE_PX), Math.floor(victim.y / TILE_PX));
   emitNoise(room, sceneId, victim.x, victim.y, balance.noise.killScream, 'scream', victimId);
 }
-
-/**
- * Round 8 (GDD 3.22, Session 8A, the cause lines of docs/round8/seams.md 5): a death by Bleeding (`bled`) or
- * Poisoned (`sickened`). The body lies where the seat fell; no scream, no killer, no clue.
- */
-export function quietDeath(room: PartyRoom, victimId: string, cause: 'bled' | 'sickened'): void {
-  const victim = simOf(room).players.get(victimId);
-  if (!victim || victim.dead) return;
-  markDead(room, victimId, cause);
-  spawnBody(
-    room,
-    sceneKey(victim.sceneIdx),
-    victimId,
-    Math.floor(victim.x / TILE_PX),
-    Math.floor(victim.y / TILE_PX),
-  );
-}

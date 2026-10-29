@@ -208,8 +208,7 @@ export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
 ```
 
 ```ts
-export type DeathCause =
-  'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'bled' | 'sickened';
+export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature';
 ```
 
 ## Admin (WDI_ADMIN only)

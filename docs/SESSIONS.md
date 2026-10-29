@@ -3873,3 +3873,8 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   and `inv.select` messages; 10A's paths gain `inventory.*`, the per-kind `resources.stackMax` and the optional
   `equip` item field. Its grant covers the inventory, resources, quests, taskPickup and craft tests, where only
   a filler or an expected count changes.
+- 2026-10-29: A5 (#317) merged at fc1be70, A2 (#320) at aa2b3cb and #319 (the seams above) at cc20279. A12 splits
+  into A12a (#323, the layout) and A12b (#324, the moves). A7 splits into A7a (the sleep state, the bed hold, the
+  skip, the homes and the `bed` props) and A7b (what a bed restores, and Exhaustion, after A6). Seams changes: wire
+  row 5 `Private.home`, drawn from the NPC persona pool and never from the card; 10A's paths gain A7b's `exhausted`
+  row. A conflict only in `DECISIONS.md` is resolved by keeping every row in number order, with CI as the check.

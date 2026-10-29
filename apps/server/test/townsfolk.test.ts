@@ -152,8 +152,8 @@ describe('ambient townsfolk', () => {
     const sim = simOf(room);
     const f = [...figuresOf(room).values()][0]!;
     const sceneId = sceneKey(f.sceneIdx);
-    // A creature that never kills leaves it at one hit point however often it bites.
-    for (let i = 0; i < 5; i++) expect(hurtFigure(room, f.id, false)).toBe(false);
+    // A creature that never kills leaves it at one hit point however often it bites (12 bites: a bite is 12 now, A6).
+    for (let i = 0; i < 12; i++) expect(hurtFigure(room, f.id, false)).toBe(false);
     expect(f.dead).toBe(false);
     expect(hurtFigure(room, f.id, true)).toBe(true);
     expect(f.dead).toBe(true);
