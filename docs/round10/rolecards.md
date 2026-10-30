@@ -528,8 +528,8 @@ already knows:
 
 | Mode | How the client knows | What panel 2 says |
 | --- | --- | --- |
-| **Main** (today's game) | no world-mode or Paint flag in the private view | 4.2 and 4.3's "today" lines: parity, the vote, the Final Night |
-| **World mode** | B6 retires the vote. If world mode then replaces the main mode outright, the main rows retire with it and no flag is needed. If both modes live on, the card reads whatever flag the build sets. 6Z to confirm which. | No faction tally and no parity (`world-mode.md` 2): the heading reads "You win when", never "The Village wins when". Each seat's own routes, the "when built" lines of 4.3, plus `W-law`, `W-trial` and `W-town`. The Killer's vendetta is its main route, and "Unseen" is the lesser one. The Accomplice shares its Killer's kind. |
+| **Main** (today's game, until B6) | — | 4.2 and 4.3's "today" lines: parity, the vote, the Final Night. They retire at B6. Because the card builds after B6 (9), it never ships them. They stay in this document only to show today's rules. |
+| **World mode** | B6 retires the vote, and world mode then replaces the main mode outright (6Z, 2026-10-30), so it needs no flag. It is the card's default. | No faction tally and no parity (`world-mode.md` 2): the heading reads "You win when", never "The Village wins when". Each seat's own routes, the "when built" lines of 4.3, plus `W-law`, `W-trial` and `W-town`. The Killer's vendetta is its main route, and "Unseen" is the lesser one. The Accomplice shares its Killer's kind. |
 | **Paint The Town Red** (two humans) | `Private.paintTown` (seams row 18, #382) | Both Killers' panel 2 holds one shared route. |
 
 The Paint The Town Red copy (draft):
@@ -545,9 +545,25 @@ The Paint The Town Red copy (draft):
 Panel 1's Cabal well names the other Killer, as today's mates. "The town" here means the NPC seats; nothing on the card
 says which seat is an NPC, since only the deal itself is two humans and the rest NPCs (GDD 3.12, public by the mode).
 
+**Story mode** (one player, 10E's E2, three chapters with a role switch at each break) is open. 10E sets the chapter
+cards when it starts. This design proposes that a chapter card is panel 2 of the trifold for the chapter's role, and
+that the role switch reopens the card at Win. 10E decides.
+
+**World-mode copy in the mock** (the Mode select's default):
+
+| Card | Goal | You win when | You miss out when |
+| --- | --- | --- | --- |
+| Detective | Prove who holds the Knife, and bring the case to the law. | `W-law`; `W-trial` | The Killer completes the vendetta first, or reaches the end trial unconvicted. |
+| Killer | Complete your vendetta before the law catches you. | Your vendetta completes (4.4). · You reach the end trial unconvicted, the vendetta unfinished: Unseen, a lesser win. | A murder conviction, a death after dark, or your vendetta foiled. |
+| Drifter | Get yourself convicted and hanged. | A trial sentences you to death: Gallows. You win alone. | The Killer, Nightshade or a shot takes you first. · The end trial closes before any court hangs you. |
+| Baker | Keep the town fed, and bring what you see to the law. | The Wake Loaves are baked every morning: Trade. · `W-town`. · `W-law`. | The Killer completes the vendetta first. |
+
+In world mode the second heading reads "You miss out when": a seat that does not win has not lost to a side, since there
+is no side (`world-mode.md` 2). The other cards follow the same pattern, from 4.3's "when built" lines.
+
 The token `{paintTown.winUnique}` reads `balance.json` once C5 adds the key. Until then, R3's token check refuses the
-row, so it cannot ship early. The mock shows the main mode only, because world mode and Paint The Town Red have no
-built rules or flags at this base.
+row, so it cannot ship early. The mock has a Mode select: world mode (the default), Paint The Town Red (the Killer only) and
+today's main mode. It shows a key that is not in the data yet as its name in brackets.
 
 ## 5. The Daybook
 
@@ -756,7 +772,8 @@ what each one touches that a live session owns or uses (`seams.md` 4); 6Z sequen
 | **R4. The trifold** | `ui/RoleCard.ts` rewritten as `ui/card/*` (three panels, the phone strip, the reveal meter, Ready, open and close, the hit close), `match.css` card rules removed, UI.md 7 rewritten, GDD 2 step 4 | `apps/client/src/ui/card/**`, `ui/RoleCard.ts`, `ui/match.css`, `ui/main/deckChip.ts` | `RoleCard.test.ts` rewritten; e2e at 1280 and 390 for one card of each faction; the cover picker's tests kept | 10Y; 10E's chapter cards (E2) share the reveal slot |
 | **R5. The Daybook** | `ui/daybook/*`: the shell, the six tabs, the Purse and You tabs; Inventory, Crafting, Chores, QuestLog and NotebookPanel mounted inside it; the HUD button and the four key buttons removed; UI.md 6 and 14 | `apps/client/src/ui/daybook/**`, `ui/M5bLayer.ts`, `view/Hud.ts`, `view/NotebookPanel.ts` | DOM tests per tab against the mock net; e2e opening every tab by key and by tap | 10H's Inventory and Crafting (A13 merged); 10C's fare (C2) and 10D's rent (D7) for the Purse tab's lines; 10Y |
 
-R1 and R2 have no dependency between them. R3 goes after both, then R4, then R5. R4 and R5 each fit under 400 lines
+R1 and R2 have no dependency between them. R3 goes after both and after B6, then R4, then R5. R3 writes only the
+world-mode and Paint The Town Red rows, so no main-mode row is ever built and then dropped. R4 and R5 each fit under 400 lines
 only by moving the existing panels as they are: their restyle is CSS in R2's file.
 
 ### 9.1 Keys that move
@@ -796,8 +813,8 @@ Each question has a proposed default. You can answer **default** or **different*
 The build is five pull requests in the client and the content (9). Round 10's build sessions are still landing, and
 round 11 brings the art makeover.
 
-- **Proposed default:** round 10, in its tail before 10Z's final sweep, after B6 retires voting so the card's copy is
-  written once for the rules that stay.
+- **Proposed default:** round 10, in its tail before 10Z's final sweep, after B6 retires voting. World mode then
+  replaces the main mode, so the card's copy is written once, for the rules that stay.
 - **Other choices:** now, beside 10B, 10C and 10D, with more grants on shared files; or round 11, beside the art
   makeover and the portraits.
 

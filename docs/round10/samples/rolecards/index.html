@@ -263,6 +263,7 @@ ul.check li.done::before { background: var(--d-moss); border-color: var(--d-moss
 <body>
 <header class="mockbar" role="banner">
   <h1>Role Cards Mock</h1>
+  <label>Mode <select id="m-match"><option value="world">World mode</option><option value="paint">Paint The Town Red</option><option value="main">Today (until B6)</option></select></label>
   <label>Role <select id="m-role">
     <option value="detective">Detective (Village)</option>
     <option value="killer">Killer (Cabal, Zealot)</option>
@@ -303,8 +304,23 @@ function token(path, style) {
   return styled(style, at);
 }
 const fill = (t) => t.replace(/\{(?:(word|Word|times):)?([A-Za-z0-9_.]+)\}/g, (_, s, p) => token(p, s));
+/** As `fill`, but a key that a later step adds (paintTown, C5) shows as its name instead of failing. */
+const fillLater = (t) => t.replace(/\{(?:(word|Word|times):)?([A-Za-z0-9_.]+)\}/g, (m, s, p) => { try { return token(p, s); } catch { return `[${p}]`; } });
 
 // ---- Proposed copy (docs/round10/rolecards.md 4): new roles.json fields, tokens for every number. ----
+// World mode replaces the main mode at B6 (no vote, no parity, no faction tally; world-mode.md 2); Paint The Town Red is
+// the two-human mode (world-mode.md 1.6). Each card's `modes` holds the rows of each; `today` is GDD 3.8 until B6.
+const MODES = {
+  world: {
+    detective: { goal: 'Prove who holds the Knife, and bring the case to the law.', wins: ['A murder conviction stops the Killer, and you filed the evidence, signed the petition or made the cuff: Law.', 'At the end trial, the case you filed convicts the Killer: Verdict.'], loses: ['The Killer completes the vendetta first, or reaches the end trial unconvicted.'], tag: 'world-mode.md 2, 3' },
+    killer: { goal: 'Complete your vendetta before the law catches you.', wins: ['Your vendetta completes: its steps are below.', 'You reach the end trial unconvicted, the vendetta unfinished: Unseen, a lesser win.'], loses: ['A murder conviction, a death after dark, or your vendetta foiled.'], tag: 'world-mode.md 2, 3' },
+    drifter: { tips: ['Look guilty enough for a petition, not so guilty that nobody bothers.', 'Act Shifty rings fake footsteps where you stand.', 'Fake Blood shows on you in the world for {abilities.abilities.fakeBlood.params.durationS} s, once a match.'], goal: 'Get yourself convicted and hanged.', wins: ['A trial sentences you to death: Gallows. You win alone.'], loses: ['The Killer, Nightshade or a shot takes you first.', 'The end trial closes before any court hangs you.'], tag: 'world-mode.md 2' },
+    baker: { goal: 'Keep the town fed, and bring what you see to the law.', wins: ['The Wake Loaves are baked every morning: Trade.', 'The chores bar fills before the Killer’s vendetta completes: Town, for everyone who finished a chore.', 'A murder conviction you signed for or cuffed: Law.'], loses: ['The Killer completes the vendetta first.'], tag: 'world-mode.md 2, 3' },
+  },
+  paint: {
+    killer: { goal: 'Paint the town red before you are caught.', wins: ['Between you, kill {paintTown.winUnique} different townsfolk. A townsperson the train brings back and you kill again adds to your total, not to the count.', 'Or the Vicar, the Company Clerk and the Constables lie dead at the same moment before the morning train.'], loses: ['You are both convicted of murder, or the end trial closes first.'], tag: 'world-mode.md 1.6' },
+  },
+};
 const PROPOSED = {
   detective: {
     lore: 'The mainland sent you when Lord Vane was found dead. HollowMere calls you the outsider and keeps its doors shut.',
@@ -424,9 +440,14 @@ const MOTIF = { village: '<path d="M2 24V2H24M8 24V8H24" fill="none" stroke="cur
 const src = (text) => h('span', { class: 'chip src' }, text);
 
 // ---- state ----
-const ui = { role: 'detective', view: 'desktop', theme: 'light', mode: 'reveal', sources: false, cardOpen: true, panel: 0, daybook: null, picked: null, holding: 0, ready: false };
+const ui = { matchMode: 'world', role: 'detective', view: 'desktop', theme: 'light', mode: 'reveal', sources: false, cardOpen: true, panel: 0, daybook: null, picked: null, holding: 0, ready: false };
 const R = () => CONTENT.roles.roles[ui.role];
-const P = () => PROPOSED[ui.role];
+const P = () => {
+  const base = PROPOSED[ui.role];
+  const m = ui.matchMode === 'main' ? null : MODES[ui.matchMode]?.[ui.role];
+  if (!m) return { ...base, tag: 'GDD 3.8' };
+  return { ...base, ...m, vendetta: ui.matchMode === 'paint' ? null : base.vendetta };
+};
 const S = () => SAMPLE[ui.role];
 const itemName = (id) => CONTENT.items.items[id]?.name ?? id;
 const lookName = (id) => CONTENT.looks[id]?.name ?? id;
@@ -481,7 +502,7 @@ function panelWho() {
         return h('button', { type: 'button', 'aria-pressed': String(l === look), onclick: () => { ui.picked = l; render(); } }, h('b', {}, cardName(c)), h('span', {}, hints.has(c) ? 'Undealt: safe' : 'Dealt: a double'));
       })));
   }
-  if (s.mates.length) kids.push(h('div', { class: 'well' }, h('span', { class: 'mono' }, 'Your Cabal'), s.mates.join(', '), ' knows you. Your picks show to each other live.'));
+  if (s.mates.length) kids.push(h('div', { class: 'well' }, h('span', { class: 'mono' }, ui.matchMode === 'paint' ? 'The other Killer' : 'Your Cabal'), s.mates.join(', '), ui.matchMode === 'paint' ? ' paints the town with you. Your picks show to each other live.' : ' knows you. Your picks show to each other live.'));
   kids.push(h('h2', { class: 'sec' }, 'The deck', h('span', { class: 'mono', style: 'color:var(--d-soft)' }, `${deck.length} cards · public`)),
     h('div', { class: 'deck' }, deck.map((c) => h('span', { class: `pill${CONTENT.roles.roles[c].cover ? ' cover' : ''}${c === ui.role ? ' self' : ''}`, title: fill(CONTENT.roles.roles[c].goal) }, cardName(c)))),
     h('p', { class: 'secs', style: 'margin:8px 0 0' }, 'Everyone sees this list. Two cards stay undealt. Dashed cards wear another card’s face.', src('roles.json decks')));
@@ -492,9 +513,9 @@ function panelWin() {
   const r = R(), p = P(), s = S();
   const kids = [
     h('p', { class: 'eyebrow mono' }, 'How you win'),
-    h('p', { class: 'goal' }, fill(p.goal), src('proposed: roles.json goal')),
-    h('h2', { class: 'sec' }, r.winsWith === 'self' ? 'You win alone when' : `The ${FACTION[r.faction]} wins when`, h('span', { class: `pill ${r.faction === 'cabal' ? 'brick' : r.faction === 'neutral' ? 'mustard' : 'moss'}` }, r.winsWith === 'self' ? 'solo' : FACTION[r.faction])),
-    h('ol', { class: 'routes' }, p.wins.map((w) => h('li', {}, h('span', {}, fill(w), src('GDD 3.8'))))),
+    h('p', { class: 'goal' }, fillLater(p.goal), src('proposed: roles.json goal')),
+    h('h2', { class: 'sec' }, ui.matchMode === 'paint' ? 'You two win when' : ui.matchMode === 'world' ? 'You win when' : r.winsWith === 'self' ? 'You win alone when' : `The ${FACTION[r.faction]} wins when`, h('span', { class: `pill ${r.faction === 'cabal' ? 'brick' : r.faction === 'neutral' ? 'mustard' : 'moss'}` }, r.winsWith === 'self' ? 'solo' : FACTION[r.faction])),
+    h('ol', { class: 'routes' }, p.wins.map((w) => h('li', {}, h('span', {}, fillLater(w), src(p.tag))))),
   ];
   if (p.vendetta) {
     const v = p.vendetta;
@@ -503,7 +524,7 @@ function panelWin() {
       h('ul', { class: 'plain check' }, v.steps.map((t) => h('li', {}, t))),
       h('div', { class: 'well' }, h('span', { class: 'mono' }, 'Proposed'), 'Today the vendetta line reaches no screen. Its steps and their ticks join the card when the vendetta build carries them (doc 1.3).'));
   }
-  kids.push(h('h2', { class: 'sec' }, 'You lose when'), h('ul', { class: 'plain' }, p.loses.map((t) => h('li', {}, fill(t)))));
+  kids.push(h('h2', { class: 'sec' }, ui.matchMode === 'main' ? 'You lose when' : 'You miss out when'), h('ul', { class: 'plain' }, p.loses.map((t) => h('li', {}, fillLater(t)))));
   kids.push(h('h2', { class: 'sec' }, 'Beware'), h('div', { class: 'beware', role: 'note' }, h('ul', { class: 'plain', style: 'margin:0' }, p.beware.map((t) => h('li', {}, fill(t)))), src('proposed: roles.json beware')));
   kids.push(h('h2', { class: 'sec' }, 'How to play it'), h('ul', { class: 'plain check' }, p.tips.map((t) => h('li', {}, fill(t)))));
   return h('section', { class: 'panel', id: 'p1', 'aria-labelledby': 't1', role: 'region' }, kids);
@@ -713,7 +734,7 @@ function mountDaybook(host) {
 function mountHud(host) {
   const r = R(), s = S(), p = P();
   const hud = h('div', { class: 'hud' },
-    h('button', { type: 'button', class: 'hud-goal', onclick: openCard, 'aria-label': `Your card. ${fill(p.goal)} (Tab)` }, h('span', { class: 'disc' }, svg(GLYPH.card, 18)), h('span', {}, h('b', {}, 'Your card ', h('kbd', { class: 'kbd' }, 'Tab')), h('span', {}, fill(p.goal)))),
+    h('button', { type: 'button', class: 'hud-goal', onclick: openCard, 'aria-label': `Your card. ${fillLater(p.goal)} (Tab)` }, h('span', { class: 'disc' }, svg(GLYPH.card, 18)), h('span', {}, h('b', {}, 'Your card ', h('kbd', { class: 'kbd' }, 'Tab')), h('span', {}, fillLater(p.goal)))),
     h('div', { class: 'hud-clock' }, h('div', { class: 'num' }, '06:40'), h('div', { class: 'mono' }, 'Day')),
     h('div', { class: 'hud-tr' }, h('button', { type: 'button', class: 'hud-btn', onclick: () => { ui.daybook = ui.daybook ? null : 'pockets'; ui.cardOpen = false; render(); }, 'aria-label': 'Daybook (I)' }, 'Daybook', s.fare ? h('span', { class: 'badge', 'aria-hidden': 'true' }) : '', h('kbd', {}, 'I')), h('button', { type: 'button', class: 'hud-btn', 'aria-label': 'Settings' }, '⚙')),
     h('div', { class: 'hud-body' }, h('div', { class: 'mono' }, 'Health'), h('div', { class: 'bar' }, h('i', { style: 'width:100%;background:var(--wdi-teal)' })), h('div', { class: 'mono' }, 'Stamina'), h('div', { class: 'bar' }, h('i', { style: 'width:72%;background:var(--wdi-lantern)' }))),
@@ -748,11 +769,13 @@ function render() {
   if (ui.cardOpen && ui.view === 'phone') setTimeout(() => { const ps = document.querySelector('.panels'); if (ps) ps.scrollLeft = ui.panel * ps.clientWidth; }, 0);
 }
 
-for (const [id, key] of [['m-role', 'role'], ['m-view', 'view'], ['m-theme', 'theme'], ['m-mode', 'mode']]) {
+for (const [id, key] of [['m-match', 'matchMode'], ['m-role', 'role'], ['m-view', 'view'], ['m-theme', 'theme'], ['m-mode', 'mode']]) {
   document.getElementById(id).addEventListener('change', (e) => {
     ui[key] = e.target.value;
-    if (key === 'role') { ui.picked = null; ui.holding = 0; }
-    if (key === 'role' || key === 'mode') { ui.cardOpen = true; ui.daybook = null; ui.ready = false; ui.panel = 0; }
+    if (key === 'matchMode' && ui.matchMode === 'paint') { ui.role = 'killer'; document.getElementById('m-role').value = 'killer'; }
+    if (key === 'role' && ui.matchMode === 'paint' && ui.role !== 'killer') { ui.matchMode = 'world'; document.getElementById('m-match').value = 'world'; }
+    if (key === 'role' || key === 'matchMode') { ui.picked = null; ui.holding = 0; }
+    if (key === 'role' || key === 'mode' || key === 'matchMode') { ui.cardOpen = true; ui.daybook = null; ui.ready = false; ui.panel = 0; }
     render();
   });
 }
