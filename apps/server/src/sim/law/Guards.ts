@@ -191,14 +191,16 @@ export function guardClip(room: PartyRoom, f: Figure): number | null {
 
 /**
  * A body verb's target when its handle is a guard's (`fists.ts`): undefined when the handle is no guard's, null
- * with the refusal sent, else the guard, alive, standing, in the actor's scene and the verb's reach.
+ * with the refusal sent, else the guard, alive, standing, in the actor's scene and the verb's reach. The Knife
+ * (`Kill.ts`, round 10 C5) passes `allowDown`: it may take a knocked-out guard.
  */
 export function guardTarget(
   room: PartyRoom,
   sessionId: string,
-  v: Verb,
+  v: Pick<Verb, 'actor' | 'def'>,
   handle: unknown,
   figureOf: (handle: string) => Figure | undefined,
+  opts: { allowDown?: boolean } = {},
 ): Figure | null | undefined {
   if (typeof handle !== 'string') return undefined;
   const f = figureOf(handle);
@@ -212,7 +214,7 @@ export function guardTarget(
     return null;
   }
   const body = bodyOf(room, f.id);
-  if (!body || hasEffect(body, 'knockedOut')) {
+  if (!body || (!opts.allowDown && hasEffect(body, 'knockedOut'))) {
     reject(room, sessionId, 'TARGET_DOWN');
     return null;
   }
@@ -236,4 +238,15 @@ export function strikeGuard(
     g.foe = by;
     g.foeUntilTick = room.state.tick + Math.round(balance.guard.angerS * TICK_RATE);
   } else g.foe = null;
+}
+
+/** A guard back from the morning train (round 10, C5): no foe, no cuff, its post's route afresh. */
+export function returnGuard(f: Figure): void {
+  const g = guards.get(f);
+  if (!g) return;
+  g.foe = null;
+  g.foeUntilTick = 0;
+  g.cuffing = null;
+  g.cuffTicks = 0;
+  f.act = null;
 }

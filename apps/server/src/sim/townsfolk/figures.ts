@@ -391,11 +391,11 @@ export function hurtFigure(room: PartyRoom, id: string, kills: boolean): boolean
 }
 
 /**
- * The creature-only death (GDD 3.24): the avatar goes, a public `Body` lies where it fell (`body_<figureId>`,
- * never reportable: a figure's body opens no meeting, so it is marked reported from the start) until the next
- * meeting clears it with a line.
+ * A figure's death, by a creature or a seat's Knife on a guard (GDD 3.24; round 10, C5): the avatar goes, a public
+ * `Body` lies where it fell (`body_<figureId>`, never reportable: a figure's body opens no meeting, so it is marked
+ * reported from the start) until the next meeting clears it with a line.
  */
-function killFigure(room: PartyRoom, f: Figure): void {
+export function killFigure(room: PartyRoom, f: Figure, cause: 'wolf' | 'knife' = 'wolf'): void {
   f.dead = true;
   f.act = null;
   f.moving = false;
@@ -410,8 +410,34 @@ function killFigure(room: PartyRoom, f: Figure): void {
   emitSim(room, {
     tick: room.state.tick,
     kind: 'figure.death',
-    data: { figure: f.id, cause: 'wolf', sceneId },
+    data: { figure: f.id, cause, sceneId },
   });
+}
+
+/**
+ * A dead figure back on the morning train (round 10, C5: a guard in Paint The Town Red): its body leaves the scene
+ * if the meeting has not cleared it, and it stands at its first station with full health and a fresh handle.
+ */
+export function returnFigure(room: PartyRoom, f: Figure): void {
+  if (!f.dead) return;
+  const memory = townsfolkMemory(room);
+  const bodyId = `body_${f.id}`;
+  for (const scene of room.state.scenes.values()) scene.bodies.delete(bodyId);
+  simOf(room).reportedBodies.delete(bodyId);
+  memory.lost = memory.lost.filter((l) => l.bodyId !== bodyId);
+  const stand = f.stations[0]?.stands[0];
+  if (stand) {
+    f.sceneIdx = sceneIndex(f.stations[0]!.scene);
+    f.x = tileCentre(stand.x, TILE_PX);
+    f.y = tileCentre(stand.y, TILE_PX);
+  }
+  f.dead = false;
+  f.act = null;
+  f.nextStation = 0;
+  removeBody(room, f.id);
+  ensureBody(room, f.id, true);
+  bindFigureNeeds(room, f.id, f.brain);
+  rehandleFigure(room, f);
 }
 
 /**
