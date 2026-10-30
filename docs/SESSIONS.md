@@ -4258,6 +4258,37 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   early end waits on his vote as on any living seat's, because a meeting that closed without it would show his seat
   as the one not counted. His client keeps the meeting screen. Row 21 now says "nothing in the world waits on it"
   (the sleep count, the line, the train).
+- 2026-10-30: merged x5 (#403), the living figures in the seats' views (row 17). The first full check hit the
+  background job's time limit during the bot swarm, after 23 clean matches. 6Z reran the touched server suites on
+  the final head, with 27 more matches at another seed, so 50 distinct matches ran clean on the true merge. 10D's
+  D9c, which talks to those figures, merges clean on top of it.
+- 2026-10-30: before the next four merges, 6Z ran the whole stack: the base with y8, y9, y10, B5a, B5b, x7 and x1.
+  The server suite, auto 50, the grid check, lint, typecheck and the build ran clean. The one client failure was y10's
+  guard against y8's row note, which 10Y fixes in y8. Then 6Z merged B5a (#399) and B5b (#405), the county jail
+  (row 19), x7 (#404), one patch per tick, and x1 (#370), the refusal words the sweep left. Each base tree matched
+  the simulated one.
+- 2026-10-30: 6Z's grant to 10B for B5c, one change in `sim/economy/rumours.ts`: the rumour ledger never samples a
+  scene of kind `jail`. Two prisoners in the cell then make no sighting, so no notice, Gazette line, town tip or
+  `huntScene` names the cell (row 19). Also granted: cases in `rumours.test.ts`, and one clause in GDD 3.23.
+- 2026-10-30: 6Z's review of C4b (#408) set two fixes.
+  - The turning skips a seat whose pack cannot take the Derringer; dropping it or evicting a stack would be public.
+  - With B5 on the base, the turning skips a jailed seat (row 20's "free"), and the Derringer refuses `IN_JAIL` as
+    the Knife does.
+
+  Row 21 now says `Avatar.lookOf` is the seat whose face the figure draws. C4a (#401) conflicts with the base on its
+  own, so it lands with #408, whose history carries it.
+- 2026-10-30: 6Z's rulings on C4c's hardships.
+  - The pool reads only public facts: a seat alive on the roster, whose look owns a stall, with no hardship
+    running. It may be human or NPC and hold any card.
+  - Why: a pool that skipped covers or Cabal seats would clear one or two looks of suspicion at every delivery,
+    since a thin stall on a look that never died would then always mean a non-Cabal seat wearing its own look. An
+    NPC-only pool would mark NPC looks. A pool that read the sim's death would move a stock at a kill.
+  - This departs from F4 b2's "NPC seats". A hardship is only the stall's sign, so a human seat loses nothing by it,
+    and the owner can overrule.
+  - The cold station and the dark window are NFY. The Clerk's ledger becomes C4d, after its seams row.
+- 2026-10-30: two failures that no open pull request caused. The rent test's flake is a fixed `sleep(100)` before
+  an assertion that waits on the tick; 10X fixes it in x15. The m5b e2e specs fail on the base itself, and CI runs no
+  e2e, so nothing caught them; 10Y fixes them.
 
 ## Round 11 (planning, started 2026-10-29)
 
