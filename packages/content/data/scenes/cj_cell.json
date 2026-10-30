@@ -1,0 +1,57 @@
+{
+  "id": "cj_cell",
+  "prefix": "cj",
+  "name": "The county jail",
+  "zoneId": "cj_cell",
+  "profile": "small",
+  "kind": "jail",
+  "biome": "house",
+  "dark": false,
+  "size": { "w": 12, "h": 8 },
+  "notes": "The county jail's one cell (round 10, B5; world-mode 5.1): bars on the window, a bench and a bucket, room for every seat it may hold. It sits outside every map's graph and has no portals: a jailed seat is placed here and leaves on the morning train. D8 adds the yard, the gym and the scrubbing props.",
+  "worldRef": "4.3",
+  "portals": [],
+  "spawns": [
+    { "id": "cell_1", "x": 2, "y": 2, "z": 0, "facing": "s" },
+    { "id": "cell_2", "x": 4, "y": 2, "z": 0, "facing": "s" },
+    { "id": "cell_3", "x": 6, "y": 2, "z": 0, "facing": "s" },
+    { "id": "cell_4", "x": 8, "y": 2, "z": 0, "facing": "s" },
+    { "id": "cell_5", "x": 2, "y": 5, "z": 0, "facing": "s" },
+    { "id": "cell_6", "x": 4, "y": 5, "z": 0, "facing": "s" },
+    { "id": "cell_7", "x": 6, "y": 5, "z": 0, "facing": "s" },
+    { "id": "cell_8", "x": 8, "y": 5, "z": 0, "facing": "s" },
+    { "id": "cell_9", "x": 4, "y": 6, "z": 0, "facing": "s" },
+    { "id": "cell_10", "x": 7, "y": 6, "z": 0, "facing": "s" }
+  ],
+  "spots": [],
+  "props": [
+    { "id": "cj.window", "kind": "dressing", "x": 5, "y": 0 },
+    { "id": "cj.bench", "kind": "dressing", "x": 11, "y": 3 },
+    { "id": "cj.stool", "kind": "dressing", "x": 0, "y": 4 },
+    { "id": "cj.lamp", "kind": "lamp", "x": 11, "y": 1 }
+  ],
+  "gates": [],
+  "paths": [],
+  "lights": [
+    { "id": "cj.lt_lamp", "kind": "lamp", "x": 11, "y": 1, "radiusTiles": 3 },
+    {
+      "id": "cj.lt_window",
+      "kind": "window",
+      "x": 5,
+      "y": 0,
+      "radiusTiles": 2.5,
+      "phases": ["day", "dusk"]
+    },
+    { "id": "cj.lt_moon", "kind": "moon", "x": 5, "y": 0, "radiusTiles": 2, "phases": ["night"] }
+  ],
+  "grid": [
+    "############",
+    "#..........#",
+    "#.S.S.S.S..#",
+    "#..........#",
+    "#..........#",
+    "#.S.S.S.S..#",
+    "#...S..S...#",
+    "############"
+  ]
+}

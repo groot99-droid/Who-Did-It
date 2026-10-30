@@ -157,9 +157,8 @@ function gatherProblem(room: PartyRoom, player: PlayerState, p: PlayerSim, nodeI
   const resource = node ? resources.resources[node.resource] : undefined;
   if (!node || !resource) return refusal('NOTHING_THERE');
   if (!node.active) return refusal('SPENT', { what: 'stock' });
-  if (Math.hypot(p.x - node.x, p.y - node.y) > balance.doors.reachTiles * TILE_PX) {
-    return refusal('TOO_FAR', { of: 'pile' });
-  }
+  // A node is a herb patch, a tree or a vein as often as a pile, so the line names no target (A233).
+  if (Math.hypot(p.x - node.x, p.y - node.y) > balance.doors.reachTiles * TILE_PX) return refusal('TOO_FAR');
   if (resource.tool !== undefined && count(player, resource.tool) === 0) {
     return refusal('NEED_TOOL', { need: resource.tool });
   }

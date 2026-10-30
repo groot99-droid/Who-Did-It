@@ -8,7 +8,6 @@ import {
   MAX_PLAYERS,
   NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
-  PATCH_RATE_MS,
   NpcLevel,
   Phase,
   SceneState,
@@ -61,7 +60,6 @@ const isCommandType = (type: string): boolean => (Object.values(C2S) as string[]
 
 export class PartyRoom extends Room<{ state: GameStateType }> {
   override maxClients = MAX_PLAYERS;
-  override patchRate = PATCH_RATE_MS;
   /** Hard cap (ARCHITECTURE 5.11); the per-type buckets of M7 drop rather than disconnect. */
   override maxMessagesPerSecond = MAX_MESSAGES_PER_SECOND;
   readonly commands = new CommandQueue();
@@ -150,17 +148,26 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
       // Round 6 (docs/round6/auto-admin.md 2, locked): the clock says how many steps this tick runs; a `party` room
       // always runs one. The sample recorded is per step, so `tickP95` stays comparable at every scale.
       const n = stepsThisTick(clockOf(this), this.lastStepMs, autoOf(this)?.commands.length ?? 0);
-      if (n === 0) return;
-      const t0 = performance.now();
-      for (let i = 0; i < n; i++) {
-        step(this, ctx);
-        runLobbyCommands(this);
-        runLobbyPhase(this);
+      if (n > 0) {
+        const t0 = performance.now();
+        for (let i = 0; i < n; i++) {
+          step(this, ctx);
+          runLobbyCommands(this);
+          runLobbyPhase(this);
+        }
+        this.syncListing();
+        this.lastStepMs = (performance.now() - t0) / n;
+        metrics.recordTick(this.lastStepMs);
       }
-      this.syncListing();
-      this.lastStepMs = (performance.now() - t0) / n;
-      metrics.recordTick(this.lastStepMs);
+      // Round 10, x7 (A373): one patch per tick, right after its steps and never from a timer between two of them,
+      // so a client reads each tick whole and the patch cadence is the tick's; a paused clock patches what a join,
+      // a leave or a test wrote. The test helpers' `fixedStep` ends the same way.
+      this.broadcastPatch();
     }, TICK_RATE);
+    // Round 10, x7 (A373): no patch timer; the fixed step above broadcasts the tick's patch. Set after the fixed step
+    // exists: Colyseus's `patchRate` setter, given null before `setFixedTimestep`, installs a 60 Hz timer that ticks
+    // the room clock instead, which starves the fixed step's accumulator (one step a second, not twenty).
+    this.patchRate = null;
 
     registerMovement(this);
     if (process.env.WDI_DEBUG === '1') registerDebugHandlers(this);
