@@ -405,6 +405,10 @@ export class MockWorldFeed implements WorldFeed {
     return this.ghost;
   }
 
+  onLine(): boolean {
+    return false; // the mock has no train
+  }
+
   kill(targetId: string): void {
     this.ability('kill', targetId);
   }

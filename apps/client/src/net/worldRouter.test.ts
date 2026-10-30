@@ -77,6 +77,15 @@ describe('world router', () => {
     expect(calls.at(-1)).toBe('start World');
   });
 
+  it('keeps a seat on the line out of the meeting, so the On-the-line screen stays up', () => {
+    const { room, calls, active } = setup();
+    room.emit('sceneEnter', enter);
+    room.state.players.set('me', { alive: true, priv: { onLine: true } });
+    room.emit('meetingStart', start);
+    expect(active.has('Meeting')).toBe(false);
+    expect(calls).not.toContain('sleep World');
+  });
+
   it('shows game over, then the lobby when the phase returns', () => {
     const { room, calls, active } = setup();
     room.emit('sceneEnter', enter);

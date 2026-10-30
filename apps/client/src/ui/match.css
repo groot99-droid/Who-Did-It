@@ -771,3 +771,41 @@
 .wdi-sleep .wdi-sleep__through[hidden] {
   display: none;
 }
+
+/* Round 10, C1b (UI.md 14.47): On the line, the dark carriage of a seat that died by day; the world is hidden. */
+.wdi-line {
+  position: fixed;
+  inset: 0;
+  z-index: var(--wdi-z-dialog);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wdi-space-4, 16px);
+  padding: var(--wdi-space-4, 16px);
+  color: var(--wdi-night-text);
+  background: var(--wdi-night-bg);
+  text-align: center;
+  pointer-events: auto;
+}
+
+.wdi-line__band {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-2, 8px);
+}
+
+.wdi-line__band h2 {
+  margin: 0;
+  font-family: var(--wdi-font-display);
+  color: var(--wdi-night-label);
+}
+
+.wdi-line__clock {
+  color: var(--wdi-night-accent);
+}
+
+.wdi-line__kept {
+  max-width: 32rem;
+  color: var(--wdi-night-text-muted);
+}
