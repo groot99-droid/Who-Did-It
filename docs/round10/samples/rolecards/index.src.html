@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Role Cards Mock</title>
+<meta name="description" content="Who Did It, round 10 (10R): the trifold role card and the Daybook, a clickable mock filled from packages/content." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@700&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ---- Proposed tokens (docs/round10/rolecards.md 6). Reused game tokens keep their hex: ink, bone, slate, mustard,
+   moon, blood. The rest is the proposed `dossier` set, DOM only, like round 7's night set. ---- */
+:root {
+  --wdi-ink: #12141c; --wdi-bone: #d9d2c2; --wdi-slate: #2c3240; --wdi-mustard: #f2b33d;
+  --wdi-moon: #7fa8ff; --wdi-blood: #b3121f; --wdi-night: #0a0924; --wdi-lantern: #ffb457; --wdi-teal: #2ec4b6;
+  --d-paper: #eceef2; --d-card: #fbfbfc; --d-ink: var(--wdi-ink); --d-soft: #586072; --d-rule: #d3d8e0;
+  --d-well: #f1ebdd; --d-mustard-text: #8c600a; --d-mustard: var(--wdi-mustard); --d-on-mustard: var(--wdi-ink);
+  --d-moss: #2f6b45; --d-brick: #9e3b2a; --d-focus: #2d5fa8; --d-sheet: var(--wdi-slate); --d-line: var(--wdi-ink);
+  --f-display: 'Alegreya SC', Georgia, serif; --f-text: 'Alegreya Sans', system-ui, sans-serif;
+  --f-label: 'IBM Plex Mono', ui-monospace, monospace;
+  --dur: 220ms; --dur-fold: 520ms; --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  --d-paper: #2a303d; --d-card: #343b4a; --d-ink: var(--wdi-bone); --d-soft: #a9afbc; --d-rule: #4a5264;
+  --d-well: #3d4352; --d-mustard-text: var(--wdi-mustard); --d-moss: #8fcba2; --d-brick: #ec917a;
+  --d-focus: var(--wdi-moon); --d-line: var(--wdi-bone);
+  color-scheme: dark;
+}
+@media (prefers-reduced-motion: reduce) { :root { --dur: 0ms; --dur-fold: 0ms; } }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { display: flex; flex-direction: column; height: 100dvh; background: var(--wdi-night); color: var(--d-ink); font: 400 17px/1.5 var(--f-text); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--d-focus); outline-offset: 2px; }
+.mono { font-family: var(--f-label); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+.num { font-family: var(--f-label); font-variant-numeric: tabular-nums; }
+[hidden] { display: none !important; }
+
+/* ---- the mock's own controls (not part of the design) ---- */
+.mockbar { flex: none; z-index: 50; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
+  padding: 8px 16px; background: var(--d-card); border-bottom: 2px solid var(--d-line); font-size: 15px; }
+.mockbar h1 { margin: 0 8px 0 0; font: 700 20px/1.1 var(--f-display); }
+.mockbar label { display: inline-flex; gap: 6px; align-items: center; }
+.mockbar select, .mockbar button { min-height: 36px; border: 1px solid var(--d-rule); border-radius: 6px; background: var(--d-paper); color: var(--d-ink); padding: 0 10px; }
+.mockbar .note { color: var(--d-soft); font-size: 14px; margin-left: auto; }
+.stage { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.stage[data-view='phone'] { display: grid; place-items: center; padding: 16px; }
+
+/* ---- the world behind (a stand-in: night ground and a few tiles) ---- */
+.world { position: absolute; inset: 0; background:
+  radial-gradient(ellipse at 40% 55%, rgb(255 180 87 / 0.18), transparent 45%),
+  repeating-linear-gradient(30deg, rgb(127 168 255 / 0.05) 0 2px, transparent 2px 46px),
+  repeating-linear-gradient(-30deg, rgb(127 168 255 / 0.05) 0 2px, transparent 2px 46px),
+  linear-gradient(#141a2e, #0a0924); }
+.phone { position: relative; width: 390px; height: min(844px, 100%); max-width: 100%; border-radius: 36px; overflow: hidden;
+  border: 10px solid #000; box-shadow: 0 30px 80px rgb(0 0 0 / 0.5); container-type: inline-size; }
+.desk { position: absolute; inset: 0; container-type: inline-size; }
+
+/* ---- the HUD that stays (doc 5.2) ---- */
+.hud { position: absolute; inset: 0; pointer-events: none; color: var(--wdi-bone); font-size: 14px; }
+.hud > * { pointer-events: auto; }
+.hud-goal { position: absolute; left: 12px; top: 12px; display: flex; gap: 8px; align-items: center; max-width: min(360px, 60%);
+  padding: 6px 12px 6px 6px; border-radius: 999px; background: rgb(18 20 28 / 0.78); border: 1px solid rgb(217 210 194 / 0.3); cursor: pointer; text-align: left; }
+.hud-goal .disc { color: var(--wdi-ink); width: 32px; height: 32px; border-radius: 50%; background: var(--wdi-bone); display: grid; place-items: center; flex: none; }
+.hud-goal b { display: block; font: 700 15px/1.1 var(--f-display); }
+.hud-goal span { display: block; font-size: 13px; line-height: 1.25; color: rgb(217 210 194 / 0.85); }
+.hud-clock { position: absolute; left: 50%; top: 12px; translate: -50% 0; padding: 4px 14px; border-radius: 999px; background: rgb(18 20 28 / 0.8); text-align: center; }
+.hud-clock .num { font-size: 20px; color: var(--wdi-lantern); }
+.hud-tr { position: absolute; right: 12px; top: 12px; display: flex; gap: 8px; }
+.hud-btn { min-width: 44px; min-height: 44px; border-radius: 10px; border: 1px solid rgb(217 210 194 / 0.35); background: rgb(18 20 28 / 0.8); color: var(--wdi-bone); display: inline-flex; gap: 6px; align-items: center; justify-content: center; padding: 0 10px; cursor: pointer; }
+.hud-btn kbd, .kbd { font-family: var(--f-label); font-size: 12px; border: 1px solid currentColor; border-radius: 4px; padding: 0 5px; min-width: 20px; display: inline-block; text-align: center; line-height: 18px; }
+.hud-btn .badge { width: 8px; height: 8px; border-radius: 50%; background: var(--wdi-mustard); }
+.hud-body { position: absolute; left: 12px; bottom: 96px; width: 200px; }
+.bar { height: 8px; border-radius: 4px; background: rgb(217 210 194 / 0.2); overflow: hidden; margin: 4px 0; }
+.bar i { display: block; height: 100%; }
+.hud-purse { position: absolute; right: 12px; bottom: 96px; padding: 4px 12px; border-radius: 999px; background: rgb(18 20 28 / 0.8); }
+.hotbar { position: absolute; left: 50%; bottom: 16px; translate: -50% 0; display: flex; gap: 6px; }
+.hotbar button { width: 52px; height: 52px; border-radius: 8px; background: rgb(18 20 28 / 0.75); border: 1px solid rgb(217 210 194 / 0.3); color: var(--wdi-bone); font-size: 11px; line-height: 1.1; padding: 2px; position: relative; }
+.hotbar button.on { border: 2px solid var(--wdi-mustard); }
+.hotbar button .n { position: absolute; left: 4px; top: 2px; font-family: var(--f-label); font-size: 11px; opacity: 0.8; }
+.touch { position: absolute; inset: auto 0 0 0; height: 0; }
+.stick { position: absolute; left: 20px; bottom: 120px; width: 120px; height: 120px; border-radius: 50%; border: 2px solid rgb(217 210 194 / 0.4); background: rgb(18 20 28 / 0.4); }
+.stick::after { content: ''; position: absolute; inset: 34px; border-radius: 50%; background: var(--wdi-bone); }
+.stick small { position: absolute; left: 0; right: 0; bottom: -22px; text-align: center; color: rgb(217 210 194 / 0.85); font-size: 12px; }
+.sneak-toggle { position: absolute; left: 148px; bottom: 124px; }
+.cluster { position: absolute; right: 16px; bottom: 112px; display: grid; grid-template-columns: repeat(3, 60px); gap: 10px; direction: rtl; }
+.disc { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--wdi-ink); background: var(--wdi-bone); color: var(--wdi-ink); display: grid; place-content: center; text-align: center; font-size: 11px; line-height: 1.1; direction: ltr; }
+.disc b { font: 700 16px/1 var(--f-label); }
+.disc.primary { background: var(--wdi-mustard); width: 72px; height: 72px; }
+.desk .touch, .desk .sneak-toggle { display: none; }
+.phone .hud-body, .phone .hud-purse { bottom: 248px; }
+.phone .hud-body { width: 150px; }
+.phone .hotbar { bottom: 78px; }
+.phone .hotbar button { width: 44px; height: 44px; font-size: 9px; }
+.phone .hud-goal { max-width: 230px; }
+.phone .hud-goal span { display: none; }
+
+/* ---- the trifold (doc 2) ---- */
+.scrim { position: absolute; inset: 0; background: rgb(10 9 36 / 0.55); z-index: 10; }
+.card { position: absolute; z-index: 11; inset: 16px; display: flex; flex-direction: column; background: var(--d-paper);
+  border: 2px solid var(--d-line); border-radius: 8px; box-shadow: 0 24px 60px rgb(0 0 0 / 0.45); overflow: hidden; }
+.card::before { content: ''; position: absolute; inset: 5px; border: 2px solid var(--fac); border-radius: 4px; pointer-events: none; z-index: 2; }
+.card[data-faction='village'] { --fac: var(--wdi-moon); --on-fac: var(--wdi-ink); }
+.card[data-faction='cabal'] { --fac: var(--wdi-blood); --on-fac: var(--wdi-bone); }
+.card[data-faction='neutral'] { --fac: var(--wdi-mustard); --on-fac: var(--wdi-ink); }
+.motif { position: absolute; width: 26px; height: 26px; z-index: 3; color: var(--d-line); pointer-events: none; }
+.motif.tl { left: 9px; top: 9px; } .motif.tr { right: 9px; top: 9px; transform: scaleX(-1); }
+.motif.bl { left: 9px; bottom: 9px; transform: scaleY(-1); } .motif.br { right: 9px; bottom: 9px; transform: scale(-1, -1); }
+.topbar { position: relative; z-index: 4; display: flex; align-items: center; gap: 12px; padding: 14px 20px 12px 44px; background: var(--d-card); border-bottom: 2px solid var(--d-line); }
+.stripe { display: inline-flex; gap: 8px; align-items: center; padding: 4px 12px 4px 4px; border-radius: 999px; background: var(--fac); color: var(--on-fac); font-weight: 700; }
+.stripe .glyph { width: 26px; height: 26px; border-radius: 50%; background: var(--wdi-bone); color: var(--wdi-ink); display: grid; place-items: center; }
+.topbar .title { font: 700 26px/1 var(--f-display); margin: 0; }
+.topbar .spacer { flex: 1; }
+.meter { position: absolute; left: 0; right: 0; bottom: -2px; height: 4px; background: transparent; }
+.meter i { display: block; height: 100%; background: var(--d-mustard); transform-origin: left; }
+.meter i.run { animation: drain var(--hold) linear forwards; }
+@keyframes drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.btn { min-height: 44px; padding: 0 16px; border-radius: 6px; border: 1px solid var(--d-line); background: var(--d-card); color: var(--d-ink); font-weight: 700; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
+.btn.primary { background: var(--d-mustard); color: var(--d-on-mustard); border-color: var(--d-on-mustard); }
+.btn.sm { min-height: 36px; padding: 0 10px; font-weight: 500; }
+.secs { font-family: var(--f-label); font-size: 13px; color: var(--d-soft); }
+.panels { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1.1fr 1.15fr; perspective: 2200px; }
+.panel { min-height: 0; overflow: auto; padding: 22px 26px 32px; background: var(--d-paper); position: relative; scrollbar-width: thin; }
+.panel + .panel { border-left: 1px dashed var(--d-rule); box-shadow: inset 14px 0 18px -16px rgb(0 0 0 / 0.25); }
+.panel:nth-child(1) { transform-origin: right center; } .panel:nth-child(3) { transform-origin: left center; }
+.card.folded .panel:nth-child(1) { transform: rotateY(-178deg); } .card.folded .panel:nth-child(3) { transform: rotateY(178deg); }
+.card .panel:nth-child(1), .card .panel:nth-child(3) { transition: transform var(--dur-fold) var(--ease); backface-visibility: hidden; }
+.eyebrow { margin: 0 0 4px; color: var(--d-soft); }
+h2.sec { font: 700 22px/1.15 var(--f-display); margin: 22px 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--d-line); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+h2.sec:first-child { margin-top: 0; }
+h3.sub { font: 700 15px/1.2 var(--f-label); text-transform: uppercase; letter-spacing: 0.08em; color: var(--d-soft); margin: 18px 0 8px; }
+.box { background: var(--d-card); border: 1px solid var(--d-rule); border-radius: 8px; padding: 12px 14px; }
+.box + .box { margin-top: 10px; }
+.well { background: var(--d-well); border-radius: 8px; padding: 10px 14px; margin: 12px 0; }
+.well .mono { color: var(--d-mustard-text); display: block; margin-bottom: 2px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-family: var(--f-label); font-size: 12px; padding: 1px 7px; border-radius: 4px; background: var(--d-ink); color: var(--d-card); white-space: nowrap; }
+.pill { display: inline-flex; align-items: center; gap: 4px; font-family: var(--f-label); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 9px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+.pill.moss { color: var(--d-moss); } .pill.brick { color: var(--d-brick); } .pill.mustard { color: var(--d-mustard-text); } .pill.soft { color: var(--d-soft); }
+.portrait { display: grid; grid-template-columns: 112px 1fr; gap: 16px; align-items: start; }
+.portrait .pic { aspect-ratio: 2 / 3; border-radius: 6px; background: var(--d-sheet); color: var(--wdi-bone); display: grid; place-items: center; border: 2px solid var(--d-line); font: 700 40px/1 var(--f-display); position: relative; overflow: hidden; }
+.portrait .pic small { position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; font: 400 10px/1 var(--f-label); opacity: 0.8; }
+.traits { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.trait { display: inline-flex; gap: 6px; align-items: center; padding: 2px 10px 2px 6px; border-radius: 999px; background: var(--d-card); border: 1px solid var(--d-rule); font-size: 15px; }
+.lore { font-size: 18px; line-height: 1.45; font-style: italic; margin: 14px 0 0; }
+.deck { display: flex; flex-wrap: wrap; gap: 6px; }
+.deck .pill { color: var(--d-ink); }
+.deck .pill.cover { border-style: dashed; }
+.deck .pill.self { background: var(--d-ink); color: var(--d-card); }
+.goal { font: 500 21px/1.3 var(--f-text); margin: 0; }
+ol.routes { list-style: none; padding: 0; margin: 0; counter-reset: r; }
+ol.routes li { counter-increment: r; display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--d-rule); }
+ol.routes li:first-child { border-top: 0; }
+ol.routes li::before { content: counter(r); font: 700 20px/1 var(--f-display); color: var(--d-mustard-text); padding-top: 2px; }
+ul.plain { list-style: none; padding: 0; margin: 0; }
+ul.plain li { padding: 6px 0 6px 26px; position: relative; }
+ul.plain li::before { content: ''; position: absolute; left: 4px; top: 15px; width: 12px; height: 2px; background: var(--d-brick); }
+ul.check li::before { width: 12px; height: 12px; top: 11px; border: 2px solid var(--d-ink); background: none; border-radius: 2px; }
+ul.check li.done::before { background: var(--d-moss); border-color: var(--d-moss); }
+.beware { border-left: 4px solid var(--d-mustard); background: var(--d-well); border-radius: 0 8px 8px 0; padding: 10px 14px; }
+.act { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 10px 0; border-top: 1px solid var(--d-rule); }
+.act:first-of-type { border-top: 0; }
+.act .name { font-weight: 700; font-size: 17px; }
+.act .how { display: flex; gap: 6px; justify-content: flex-end; align-items: flex-start; flex-wrap: wrap; }
+.act .line { grid-column: 1 / -1; color: var(--d-ink); font-size: 16px; }
+.act .meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.key { font-family: var(--f-label); font-size: 13px; font-weight: 500; min-width: 28px; height: 28px; padding: 0 7px; border: 1px solid var(--d-ink); border-bottom-width: 3px; border-radius: 6px; display: inline-grid; place-items: center; background: var(--d-card); }
+.tapk { font-family: var(--f-label); font-size: 12px; height: 28px; padding: 0 9px; border-radius: 999px; background: var(--d-ink); color: var(--d-card); display: inline-grid; place-items: center; }
+.inputs-only-key .tapk, .inputs-only-touch .key { display: none; }
+.cd { position: relative; }
+.src { display: none; }
+.show-src .src { display: inline-flex; margin-left: 6px; vertical-align: 2px; background: var(--d-well); color: var(--d-mustard-text); }
+.picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.picker button { border: 1px solid var(--d-rule); background: var(--d-card); border-radius: 8px; padding: 8px; text-align: left; cursor: pointer; min-height: 64px; }
+.picker button[aria-pressed='true'] { border: 2px solid var(--d-ink); box-shadow: inset 0 0 0 2px var(--d-mustard); }
+.picker button b { display: block; font-size: 15px; }
+.picker button span { font-size: 13px; color: var(--d-soft); }
+.pager { display: none; }
+.tabs3 { display: none; }
+
+/* phone: one panel at a time (doc 2.3) */
+@container (max-width: 760px) {
+  .card { inset: 0; border-radius: 0; border-width: 0; }
+  .card::before, .motif { display: none; }
+  .topbar { padding: 12px 12px 10px 12px; flex-wrap: wrap; gap: 8px; }
+  .topbar .title { font-size: 22px; }
+  .topbar .secs { display: none; }
+  .tabs3 { display: flex; width: 100%; gap: 4px; order: 5; }
+  .tabs3 button { flex: 1; min-height: 40px; border: 0; border-bottom: 3px solid transparent; background: none; font-family: var(--f-label); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--d-soft); cursor: pointer; }
+  .tabs3 button[aria-selected='true'] { color: var(--d-ink); border-bottom-color: var(--d-mustard); }
+  .panels { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; perspective: none; scrollbar-width: none; }
+  .panels::-webkit-scrollbar { display: none; }
+  .panel { flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always; padding: 18px 16px 24px; }
+  .panel + .panel { border-left: 0; box-shadow: none; }
+  .card.folded .panel { transform: none; }
+  .pager { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); background: var(--d-card); border-top: 2px solid var(--d-line); }
+  .pager .dots { display: flex; gap: 8px; }
+  .pager .dots i { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--d-ink); }
+  .pager .dots i.on { background: var(--d-ink); }
+  .portrait { grid-template-columns: 84px 1fr; }
+  .portrait .pic { font-size: 30px; }
+  .card.opening { animation: rise var(--dur-fold) var(--ease); }
+}
+@keyframes rise { from { transform: translateY(40px); opacity: 0; } }
+
+/* ---- the Daybook (doc 5) ---- */
+.daybook { position: absolute; z-index: 12; top: 64px; right: 12px; bottom: 12px; width: min(620px, calc(100% - 24px)); display: flex; flex-direction: column;
+  background: var(--d-paper); border: 2px solid var(--d-line); border-radius: 8px; box-shadow: 0 24px 60px rgb(0 0 0 / 0.45); overflow: hidden; }
+.daybook.opening { animation: slide var(--dur) var(--ease); }
+@keyframes slide { from { transform: translateX(24px); opacity: 0; } }
+.db-head { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--d-card); border-bottom: 2px solid var(--d-line); }
+.db-head h2 { margin: 0; font: 700 24px/1 var(--f-display); }
+.db-tabs { display: flex; gap: 2px; padding: 0 12px; background: var(--d-card); border-bottom: 1px solid var(--d-rule); overflow-x: auto; scrollbar-width: none; }
+.db-tabs button { flex: none; min-height: 44px; padding: 0 12px; border: 0; border-bottom: 3px solid transparent; background: none; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; color: var(--d-soft); font-family: var(--f-label); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+.db-tabs button[aria-selected='true'] { color: var(--d-ink); border-bottom-color: var(--d-mustard); }
+.db-tabs .kbd { font-size: 11px; line-height: 16px; }
+.db-tabs .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--d-mustard-text); }
+.db-body { flex: 1; overflow: auto; padding: 16px; }
+.db-foot { padding: 8px 16px; border-top: 1px solid var(--d-rule); background: var(--d-card); color: var(--d-soft); font-size: 14px; display: flex; gap: 8px; align-items: center; }
+.slots { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.slot { aspect-ratio: 1; border: 1px solid var(--d-rule); border-radius: 6px; background: var(--d-card); font-size: 12px; line-height: 1.15; padding: 4px; position: relative; overflow: hidden; text-align: left; cursor: pointer; }
+.slot.empty { background: transparent; border-style: dashed; cursor: default; }
+.slot .q { position: absolute; right: 4px; bottom: 2px; font-family: var(--f-label); font-size: 12px; }
+.slot.bound::after { content: 'Bound'; position: absolute; left: 3px; bottom: 2px; font: 400 9px/1 var(--f-label); text-transform: uppercase; color: var(--d-mustard-text); }
+.slot[aria-pressed='true'] { border: 2px solid var(--d-ink); box-shadow: inset 0 0 0 2px var(--d-mustard); }
+.slot.held { border-color: var(--d-mustard-text); }
+.inv-grid { display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.craft { display: grid; grid-template-columns: repeat(2, 56px); gap: 6px; }
+.craft .slot { width: 56px; }
+.row { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--d-rule); }
+.row:first-child { border-top: 0; }
+.big { font: 700 32px/1 var(--f-label); font-variant-numeric: tabular-nums; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.stats .box { text-align: center; }
+.chore { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; padding: 10px 0; border-top: 1px solid var(--d-rule); }
+.chore:first-child { border-top: 0; }
+.tick { width: 18px; height: 18px; border: 2px solid var(--d-ink); border-radius: 3px; margin-top: 3px; }
+.tick.done { background: var(--d-moss); border-color: var(--d-moss); }
+.steps { color: var(--d-soft); font-size: 15px; }
+.progress { height: 10px; border-radius: 5px; background: var(--d-rule); overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--d-mustard); }
+@container (max-width: 760px) {
+  .daybook { inset: 0; width: auto; border-radius: 0; border: 0; }
+  .db-tabs { order: 9; border-top: 2px solid var(--d-line); border-bottom: 0; padding-bottom: env(safe-area-inset-bottom); }
+  .db-tabs button { flex: 1 0 auto; flex-direction: column; gap: 0; font-size: 11px; min-height: 52px; padding: 4px 8px; }
+  .db-tabs .kbd { display: none; }
+  .inv-grid { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .db-foot { display: none; }
+}
+@media (max-width: 760px) {
+  .mockbar { padding: 6px 10px; gap: 6px 10px; font-size: 14px; }
+  .mockbar h1, .mockbar .note, .mockbar .wide { display: none; }
+  .mockbar select { max-width: 150px; }
+  .stage[data-view='phone'] { padding: 0; }
+  .phone { width: 100%; height: 100%; border: 0; border-radius: 0; box-shadow: none; }
+}
+.legend { position: absolute; z-index: 5; left: 16px; bottom: 16px; max-width: 420px; background: var(--d-card); color: var(--d-ink); border: 1px solid var(--d-rule); border-radius: 8px; padding: 10px 14px; font-size: 14px; }
+.phone .legend, .stage[data-view='phone'] .legend { display: none; }
+</style>
+</head>
+<body>
+<header class="mockbar" role="banner">
+  <h1>Role Cards Mock</h1>
+  <label>Mode <select id="m-match"><option value="world">World mode</option><option value="paint">Paint The Town Red</option><option value="main">Today (until B6)</option></select></label>
+  <label>Role <select id="m-role">
+    <option value="detective">Detective (Village)</option>
+    <option value="killer">Killer (Cabal, Zealot)</option>
+    <option value="drifter">Drifter (Neutral, cover)</option>
+    <option value="baker">Baker (Village, profession)</option>
+  </select></label>
+  <label class="wide">View <select id="m-view"><option value="desktop">Desktop</option><option value="phone">Phone (390 px)</option></select></label>
+  <label>Paper <select id="m-theme"><option value="light">Light</option><option value="dark">Dark</option></select></label>
+  <label>Moment <select id="m-mode"><option value="reveal">Match start (the reveal)</option><option value="play">In play (reopened)</option></select></label>
+  <label><input type="checkbox" id="m-src" /> Show sources</label>
+  <button type="button" id="m-replay">Replay</button>
+  <span class="note">Every role, ability, item and number below is read from <span class="mono">packages/content</span>; lines marked <span class="mono">proposed</span> are drafts for the owner.</span>
+</header>
+<main class="stage" id="stage" data-view="desktop"></main>
+<script>
+/*@CONTENT@*/
+
+// ---- Data wins, card generated (A168): the token filler of packages/content/src/cardText.ts, ported. ----
+const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const TIMES = ['never', 'once', 'twice'];
+const styled = (style, n) => {
+  if (!style) return String(n);
+  if (style === 'times') return TIMES[n] ?? `${n} times`;
+  const w = Number.isInteger(n) ? (WORDS[n] ?? String(n)) : String(n);
+  return style === 'Word' ? w[0].toUpperCase() + w.slice(1) : w;
+};
+const sizesOf = (rule) => Object.entries(CONTENT.balance.byCount).filter(([, r]) => r.cabalWin === rule).map(([n]) => +n).sort((a, b) => a - b);
+function token(path, style) {
+  // A match token, filled by the client from the match (seams row 18): the Paint The Town Red target is
+  // ceil(winUnique × the NPC seats at the deal), at least 1; every seat but the two Killers is an NPC.
+  if (path === 'paintTown.target') {
+    const f = CONTENT.balance.paintTown?.winUnique;
+    if (typeof f !== 'number') throw new Error('paintTown.winUnique lands in C5');
+    return styled(style, Math.max(1, Math.ceil(f * (CONTENT.roles.decks[SAMPLE[ui.role].deck].cards.length - 2))));
+  }
+  if (path === 'decks.killers.max') {
+    const k = (cards) => cards.filter((id) => CONTENT.roles.roles[id]?.abilities.includes('kill')).length;
+    return styled(style, Math.max(...Object.values(CONTENT.roles.decks).map((d) => k(d.cards))));
+  }
+  const m = /^byCount\.(\w+)\.(from|sizes)$/.exec(path);
+  if (m) { const s = sizesOf(m[1]); return m[2] === 'from' ? styled(style, s[0]) : s[0] === s.at(-1) ? String(s[0]) : `${s[0]}-${s.at(-1)}`; }
+  let at = CONTENT;
+  for (const k of path.split('.')) at = at && typeof at === 'object' ? at[k] : undefined;
+  if (typeof at !== 'number') throw new Error(`card token {${path}} is not a number in the data`);
+  return styled(style, at);
+}
+const fill = (t) => t.replace(/\{(?:(word|Word|times):)?([A-Za-z0-9_.]+)\}/g, (_, s, p) => token(p, s));
+/** As `fill`, but a key that a later step adds (paintTown, C5) shows as its name instead of failing. */
+const fillLater = (t) => t.replace(/\{(?:(word|Word|times):)?([A-Za-z0-9_.]+)\}/g, (m, s, p) => { try { return token(p, s); } catch { return `[${p}]`; } });
+
+// ---- Proposed copy (docs/round10/rolecards.md 4): new roles.json fields, tokens for every number. ----
+// World mode replaces the main mode at B6 (no vote, no parity, no faction tally; world-mode.md 2); Paint The Town Red is
+// the two-human mode (world-mode.md 1.6). Each card's `modes` holds the rows of each; `today` is GDD 3.8 until B6.
+const MODES = {
+  world: {
+    detective: { goal: 'Prove who holds the Knife, and bring the case to the law.', wins: ['A murder conviction stops the Killer, and you filed the evidence, signed the petition or made the cuff: Law.', 'At the end trial, the case you filed convicts the Killer: Verdict.'], loses: ['The Killer completes the vendetta first, or reaches the end trial unconvicted.'], tag: 'world-mode.md 2, 3' },
+    killer: { goal: 'Complete your vendetta before the law catches you.', wins: ['Your vendetta completes: its steps are below.', 'You reach the end trial unconvicted, the vendetta unfinished: Unseen, a lesser win.'], loses: ['A murder conviction, a death after dark, or your vendetta foiled.'], tag: 'world-mode.md 2, 3' },
+    drifter: { tips: ['Look guilty enough for a petition, not so guilty that nobody bothers.', 'Act Shifty rings fake footsteps where you stand.', 'Fake Blood shows on you in the world for {abilities.abilities.fakeBlood.params.durationS} s, once a match.'], goal: 'Get yourself convicted and hanged.', wins: ['A trial sentences you to death: Gallows. You win alone.'], loses: ['The Killer, Nightshade or a shot takes you first.', 'The end trial closes before any court hangs you.'], tag: 'world-mode.md 2' },
+    baker: { goal: 'Keep the town fed, and bring what you see to the law.', wins: ['The Wake Loaves are baked every morning: Trade.', 'The chores bar fills before the Killer’s vendetta completes: Town, for everyone who finished a chore.', 'A murder conviction you signed for or cuffed: Law.'], loses: ['The Killer completes the vendetta first.'], tag: 'world-mode.md 2, 3' },
+  },
+  paint: {
+    killer: { goal: 'Paint the town red before you are caught.', wins: ['Between you, kill {paintTown.target} different townspeople who hold a card. The townsfolk who only walk the lanes don’t count, and a kill of someone the train brought back adds to your total, not to the count.', 'Or the Vicar, the Company Clerk and the Constables lie dead at the same moment before the morning train.'], loses: ['You are both convicted of murder, or the end trial closes first.'], tag: 'world-mode.md 1.6' },
+  },
+};
+const PROPOSED = {
+  detective: {
+    lore: 'The mainland sent you when Lord Vane was found dead. HollowMere calls you the outsider and keeps its doors shut.',
+    goal: 'Prove who holds the Knife.',
+    wins: ['Every Cabal member is dead or voted out.', 'The chores bar reaches 100%.', 'The Final Night vote takes a Cabal member.'],
+    loses: ['The Cabal matches the living village, or one villager is left at {byCount.villageAtMostOne.sizes} players.', 'The Final Night vote takes nobody, or someone else.'],
+    tips: ['Collect every clue you pass. Inspect the ones that matter: each costs a Lens.', 'Your Verified clues go on the Case Board, where everyone can read them.', 'Compare two prints to learn if they match. It never gives a name.'],
+    beware: ['You are the first one they will come for.', 'A Bloody Rag can wipe a clue before you reach it.', 'A planted clue still costs a Lens to expose.', 'If you die, anyone can pick up your Magnifier and Inspect in {abilities.abilities.inspect.params.droppedMagnifierCastS} s.'],
+  },
+  killer: {
+    lore: 'Lord Vane was the first. You walk the lanes in someone else’s coat, and the fog keeps your secrets until the lamps go out.',
+    goal: 'Thin the village after dark, and never be voted out.',
+    wins: ['Living Cabal at least match the living village ({byCount.parity.from}+ players), or one villager is left at {byCount.villageAtMostOne.sizes}.', 'The Final Night vote takes nobody, or someone who is not Cabal.'],
+    loses: ['You are voted out, killed or poisoned, and no Cabal member carries on.', 'The chores bar reaches 100%.'],
+    tips: ['The Knife works only at dusk, at night and in the Final Night hunt.', 'Strike when the room is empty. Clean one clue, then wash at the well.', 'Impersonate a living seat to walk under their name for {balance.impersonate.durationS} s.'],
+    beware: ['Every clue shows your own height and scarf, whatever face you wear.', 'Blood shows on you within {clues.clues.blood.params.visibleTiles} tiles until you wash.', 'A Bandaged or watched target survives your strike.', 'Go {word:balance.hunger.cyclesWithoutKill} full days without striking and you leave glowing footprints.'],
+    vendetta: { id: 'zealot', title: 'Zealot', line: 'You despise the Vicar and want his flock.', steps: ['Stay near the Vicar while his flock gathers.', 'Let doubt take the flock at a meeting.'] },
+  },
+  drifter: {
+    lore: 'You came in on the last train with nothing but a borrowed name. Whatever you are running from, the rope looks like rest.',
+    goal: 'Get yourself voted out.',
+    wins: ['A vote ejects you. You win alone, the match goes on, and the end screen lists you among the winners.'],
+    loses: ['The Killer, Nightshade or a shot takes you first.', 'The match ends before anyone votes you out.'],
+    tips: ['Look guilty enough to be voted out, not so guilty that nobody bothers.', 'Act Shifty rings fake footsteps where you stand.', 'Fake Blood shows on you in the world for {abilities.abilities.fakeBlood.params.durationS} s, once a match.'],
+    beware: ['A calm village never votes. Stir it.', 'You wear a cover, like the Cabal, but you are alone.', 'You do not count toward either side’s numbers.'],
+  },
+  baker: {
+    lore: 'Up before anyone, flour to the elbows. Crumb’s Ovens feeds HollowMere, and an empty shelf is the first sign something is wrong.',
+    goal: 'Work your chores in company, and vote with evidence.',
+    wins: ['Every Cabal member is dead or voted out.', 'The chores bar reaches 100%.', 'The Final Night vote takes a Cabal member.'],
+    loses: ['The Cabal matches the living village, or one villager is left at {byCount.villageAtMostOne.sizes} players.', 'The Final Night vote takes nobody, or someone else.'],
+    tips: ['Every chore you finish writes your alibi: the time and the place.', 'Work beside someone. Two alibis are stronger than one.', 'You can ring the Emergency Bell {word:roles.roles.baker.bellPulls} times a match; most cards ring it once.'],
+    beware: ['Alone, you are easy prey. In pairs, you are hard to fool.'],
+  },
+};
+// Short, plain lines for the ability rows (proposed; abilities.json `effect` stays the rules text).
+const ABILITY_LINE = {
+  kill: 'Strike a figure in reach. They die at once and leave a body and clues.',
+  impersonate: 'Walk under a living seat’s name and look. Your height stays your own.',
+  dragBody: 'Drag a body at half speed. Drop it in a body spot to hide it.',
+  inspect: 'Read what a clue hides and expose a forgery. Costs a Lens.',
+  dustCompare: 'Lift a print, or compare two: Match or No match.',
+  actShifty: 'Ring fake footsteps where you stand.',
+  fakeBlood: 'Show Blood on yourself in the world.',
+  tasks: 'Your chores fill the village bar and write your alibi.',
+  chalk: 'Draw a floor mark everyone can see.',
+  rope: 'Free a snared player in reach.',
+};
+
+// ---- The one action table (doc 3): the input code binds these ids; the card and the touch HUD draw them. ----
+const ACTIONS = [
+  { id: 'move', group: 'move', label: 'Walk', keys: ['W', 'A', 'S', 'D'], alt: 'or the arrows', touch: 'Stick', line: 'Move. Doors take you through when you walk into them with E.' },
+  { id: 'run', group: 'move', label: 'Run', keys: ['Space'], hold: true, touch: 'Push the stick to its rim', line: 'Faster, louder, and it spends stamina.' },
+  { id: 'sneak', group: 'move', label: 'Sneak', keys: ['Shift'], hold: true, touch: 'Sneak toggle', line: 'Silent footsteps at a slower walk.' },
+  { id: 'use', group: 'verb', label: 'Use', keys: ['E'], touch: 'Use', primary: true, line: 'Whatever is in reach, as the prompt says: a door, a clue (hold to collect), a body (report), the bell, a shop, a bed, a chore, a person.' },
+  { id: 'slot1', group: 'slot', slot: 0, keys: ['Q'], touch: 'Q' },
+  { id: 'slot2', group: 'slot', slot: 1, keys: ['R'], touch: 'R' },
+  { id: 'slot3', group: 'slot', slot: 2, keys: ['F'], touch: 'F' },
+  { id: 'strike', group: 'verb', label: 'Strike', keys: ['X'], touch: 'Strike', line: 'Fists. A small hit that costs stamina. It knocks out, never kills.', ability: 'strike' },
+  { id: 'hotbar', group: 'verb', label: 'Hold an item', keys: ['1', '–', '6'], touch: 'Tap the hotbar', line: 'Pick what is in your hand. Use acts with it.' },
+  { id: 'card', group: 'screen', label: 'Role card', keys: ['Tab'], touch: 'Tap the goal chip', line: 'This card.' },
+  { id: 'daybook', group: 'screen', label: 'Daybook', keys: ['I'], touch: 'Daybook button', line: 'Pockets, chores, quests, notebook, purse.' },
+  { id: 'daybook.chores', group: 'screen', label: 'Daybook: Chores', keys: ['K'], touch: 'Chores tab' },
+  { id: 'daybook.quests', group: 'screen', label: 'Daybook: Quests', keys: ['J'], touch: 'Quests tab' },
+  { id: 'daybook.notebook', group: 'screen', label: 'Daybook: Notebook', keys: ['N'], touch: 'Notebook tab' },
+  { id: 'daybook.craft', group: 'screen', label: 'Daybook: Craft', keys: ['C'], touch: 'Pockets tab' },
+  { id: 'talk', group: 'verb', label: 'Ask for work', keys: ['T'], touch: 'Use, at a giver', line: 'At a quest giver: see what they want.' },
+  { id: 'close', group: 'screen', label: 'Close', keys: ['Esc'], touch: 'Close', line: 'Closes the open screen.' },
+];
+
+// ---- Sample private state for the mock only (what the seat's own Private view would carry). ----
+const SAMPLE = {
+  you: 'Bo', traits: { height: 'tall', scarf: 'green', hat: 'bowler' },
+  detective: { deck: '8', look: 'detective', mates: [], cover: null, lens: 2,
+    hotbar: [['magnifier', 1], ['lens', 2], ['fingerprintKit', 1], ['lantern', 1], null, null], pack: [['notebook', 1], ['resin', 2], ['herb', 3]], belt: [['axe', 1], null],
+    tasks: [['fetchFlour', 'done'], ['fixPump', 'carry'], ['deliverLetter', 'todo'], ['shutterWindows', 'todo']], fake: false,
+    quests: [['mollsHerbs', 3]], purse: 14, bank: 20, fare: 0, faith: 5,
+    notes: [['Footprints, long stride', 'Tall', 'Crumb’s Ovens', '3:12', 'verified'], ['Thread on the door', 'Green scarf', 'The Drowned Lantern, back room', '3:40', 'claimed'], ['Thread on the door', 'Green scarf', 'The Drowned Lantern, back room', '3:41', 'corroborated'], ['Footprints', 'Short', 'Apothecary loft', '5:02', 'forged']] },
+  killer: { deck: '8', look: 'herbalist', mates: ['Wren'], cover: { hints: ['herbalist'], picked: 'herbalist' }, vendetta: 'zealot',
+    hotbar: [['knife', 1], ['bloodyRag', 2], ['bucket', 1], ['skeletonKey', 1], null, null], pack: [['timber', 1]], belt: [null, null],
+    tasks: [['lightLanterns', 'todo'], ['mendFence', 'done'], ['stokeOven', 'todo']], fake: true,
+    quests: [], purse: 9, bank: 0, fare: 0, faith: 0,
+    notes: [['A show of work: Mend the fence', '', 'The square', '2:10', 'claimed']] },
+  drifter: { deck: '6', look: 'lamplighter', mates: [], cover: { hints: ['lamplighter'], picked: 'lamplighter' },
+    hotbar: [['replicaKnife', 1], ['bloodyRag', 1], null, null, null, null], pack: [], belt: [null, null],
+    tasks: [['fetchFlour', 'todo'], ['fixPump', 'todo']], fake: true, quests: [], purse: 6, bank: 0, fare: 0, faith: 0, notes: [] },
+  baker: { deck: '8', look: 'baker', mates: [], cover: null,
+    hotbar: [['lantern', 1], ['pocketWatch', 1], ['chalk', 1], ['rope', 1], ['wakeLoaf', 2], null], pack: [['flour', 1], ['timber', 2]], belt: [null, null],
+    tasks: [['mixDough', 'done'], ['proofLoaves', 'done'], ['stockColdRoom', 'carry'], ['stokeOven', 'todo'], ['shutterWindows', 'todo']], fake: false,
+    quests: [['caulkTheSkiff', 1]], purse: 3, bank: 11, fare: CONTENT.balance.respawn.fareDebt, faith: 12, notes: [['Chore done: Mix the dough', '', 'Crumb’s mixing room', '1:30', 'claimed']] },
+};
+const TRAIT = { height: { short: 'Short', mid: 'Medium height', tall: 'Tall' }, scarf: { red: 'Red scarf', green: 'Green scarf', blue: 'Blue scarf' }, hat: { cap: 'Cap', bowler: 'Bowler hat', bare: 'Bare head' } };
+const SCARF_SHAPE = { red: '◆', green: '●', blue: '■' };
+const FACTION = { village: 'Village', cabal: 'Cabal', neutral: 'Neutral' };
+const SCENE = { tavern_back: 'The Drowned Lantern, back room', overworld: 'the square', apoth_shop: 'the Apothecary', widow_parlour: 'the widow’s parlour', tavern_bar: 'The Drowned Lantern', forest: 'Gallows Wood', bakery: 'Crumb’s Ovens', crumb_mixing: 'Crumb’s mixing room', crumb_oven: 'Crumb’s oven', crumb_cold: 'Crumb’s cold room', widow_bedroom: 'the widow’s bedroom', crumb_proofing: 'Crumb’s proofing room' };
+const PHASE_WORD = { dusk: 'dusk', night: 'night', finalNight: 'the Final Night' };
+
+// ---- tiny DOM helper ----
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v === false || v == null) continue;
+    if (k === 'class') el.className = v; else if (k.startsWith('on')) el.addEventListener(k.slice(2), v); else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) el.append(c.nodeType ? c : document.createTextNode(String(c)));
+  return el;
+}
+const svg = (inner, size = 18) => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('width', size); s.setAttribute('height', size); s.setAttribute('aria-hidden', 'true'); s.innerHTML = inner; return s; };
+const GLYPH = {
+  village: '<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  cabal: '<path d="M14 3l1 9-3 3-3-3 1-9zM8 15h8M12 15v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
+  neutral: '<path d="M4 8c3-2 13-2 16 0-1 7-4 10-8 10S5 15 4 8zM8.5 11h2M13.5 11h2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  card: '<path d="M6 3h9l3 3v15H6zM9 9h6M9 13h6M9 17h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  warn: '<path d="M12 4l9 16H3zM12 10v4M12 17v.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
+};
+const MOTIF = { village: '<path d="M2 24V2H24M8 24V8H24" fill="none" stroke="currentColor" stroke-width="2"/>', cabal: '<path d="M2 2L22 22M2 12L12 22M12 2L22 12" fill="none" stroke="currentColor" stroke-width="2"/>', neutral: '<path d="M2 24A22 22 0 0 1 24 2M10 24A14 14 0 0 1 24 10" fill="none" stroke="currentColor" stroke-width="2"/>' };
+const src = (text) => h('span', { class: 'chip src' }, text);
+
+// ---- state ----
+const ui = { matchMode: 'world', role: 'detective', view: 'desktop', theme: 'light', mode: 'reveal', sources: false, cardOpen: true, panel: 0, daybook: null, picked: null, holding: 0, ready: false };
+const R = () => CONTENT.roles.roles[ui.role];
+const P = () => {
+  const base = PROPOSED[ui.role];
+  const m = ui.matchMode === 'main' ? null : MODES[ui.matchMode]?.[ui.role];
+  if (!m) return { ...base, tag: 'GDD 3.8' };
+  return { ...base, ...m, vendetta: ui.matchMode === 'paint' ? null : base.vendetta };
+};
+const S = () => SAMPLE[ui.role];
+const itemName = (id) => CONTENT.items.items[id]?.name ?? id;
+const lookName = (id) => CONTENT.looks[id]?.name ?? id;
+const cardName = (id) => CONTENT.roles.roles[id]?.name ?? id;
+
+/** The card's ability rows: active and hold abilities take the slots in card order (doc 3.3); passives take none. */
+function abilityRows() {
+  let slot = 0;
+  return R().abilities.map((id) => {
+    const a = CONTENT.abilities.abilities[id];
+    const passive = a.kind === 'passive';
+    const at = passive ? -1 : slot++;
+    const action = passive ? null : ACTIONS.find((x) => x.group === 'slot' && x.slot === at);
+    let cd = a.cooldownS ?? 0;
+    if (id === 'kill') cd = CONTENT.balance.byCount[S().deck].killCooldownS;
+    return { id, a, passive, action, cd };
+  });
+}
+
+function keyCaps(action, hold) {
+  const out = [];
+  for (const k of action.keys) out.push(k === '–' ? h('span', { class: 'secs' }, 'to') : h('span', { class: 'key' }, k));
+  if (hold) out.push(h('span', { class: 'secs' }, 'hold'));
+  out.push(h('span', { class: 'tapk' }, action.touch));
+  return out;
+}
+
+function panelWho() {
+  const r = R(), p = P(), s = S();
+  const deck = CONTENT.roles.decks[s.deck].cards;
+  const cover = r.cover;
+  const look = ui.picked ?? s.look;
+  const traits = ['height', 'scarf', 'hat'].map((ax) => h('span', { class: 'trait' }, ax === 'scarf' ? SCARF_SHAPE[SAMPLE.traits.scarf] : '', TRAIT[ax][SAMPLE.traits[ax]]));
+  const kids = [
+    h('p', { class: 'eyebrow mono' }, 'Who you are'),
+    h('div', { class: 'portrait' },
+      h('div', { class: 'pic', 'aria-hidden': 'true' }, r.name[0], h('small', {}, `portrait_${r.look ?? r.id}`)),
+      h('div', {},
+        h('h2', { class: 'sec', style: 'border:0;margin:0 0 4px;padding:0' }, r.name, src('roles.json name')),
+        h('p', { style: 'margin:0' }, cover ? 'Nobody sees your card. The town sees ' : 'The town sees ', h('b', {}, lookName(look)), '.', src(cover ? 'Private.coverLook' : 'Player.look')),
+        h('div', { class: 'traits', 'aria-label': `Your traits: ${['height', 'scarf', 'hat'].map((ax) => TRAIT[ax][SAMPLE.traits[ax]]).join(', ')}` }, traits),
+        h('p', { class: 'secs', style: 'margin:6px 0 0' }, 'Traits come with your seat, not your card, and every clue you leave shows them.'))),
+    h('p', { class: 'lore' }, p.lore, src('proposed: roles.json lore')),
+  ];
+  if (cover && ui.mode === 'reveal') {
+    const hints = new Set(s.cover.hints);
+    const choices = [...s.cover.hints, ...deck.filter((c) => !CONTENT.roles.roles[c].cover && !hints.has(c))].filter((c, i, a) => a.indexOf(c) === i);
+    kids.push(h('h2', { class: 'sec' }, 'Choose your cover', h('span', { class: 'mono', style: 'color:var(--d-soft)' }, 'until Ready')),
+      h('p', { style: 'margin:0 0 10px' }, 'Pick the face you walk in for the whole match. An undealt card is safe; a dealt one means two of that figure walk the town.'),
+      h('div', { class: 'picker', role: 'group', 'aria-label': 'Your cover' }, choices.map((c) => {
+        const l = CONTENT.roles.roles[c].look;
+        return h('button', { type: 'button', 'aria-pressed': String(l === look), onclick: () => { ui.picked = l; render(); } }, h('b', {}, cardName(c)), h('span', {}, hints.has(c) ? 'Undealt: safe' : 'Dealt: a double'));
+      })));
+  }
+  if (s.mates.length) kids.push(h('div', { class: 'well' }, h('span', { class: 'mono' }, ui.matchMode === 'paint' ? 'The other Killer' : 'Your Cabal'), s.mates.join(', '), ui.matchMode === 'paint' ? ' paints the town with you. Your picks show to each other live.' : ' knows you. Your picks show to each other live.'));
+  kids.push(h('h2', { class: 'sec' }, 'The deck', h('span', { class: 'mono', style: 'color:var(--d-soft)' }, `${deck.length} cards · public`)),
+    h('div', { class: 'deck' }, deck.map((c) => h('span', { class: `pill${CONTENT.roles.roles[c].cover ? ' cover' : ''}${c === ui.role ? ' self' : ''}`, title: fill(CONTENT.roles.roles[c].goal) }, cardName(c)))),
+    h('p', { class: 'secs', style: 'margin:8px 0 0' }, 'Everyone sees this list. Two cards stay undealt. Dashed cards wear another card’s face.', src('roles.json decks')));
+  return h('section', { class: 'panel', id: 'p0', 'aria-labelledby': 't0', role: 'region' }, kids);
+}
+
+function panelWin() {
+  const r = R(), p = P(), s = S();
+  const kids = [
+    h('p', { class: 'eyebrow mono' }, 'How you win'),
+    h('p', { class: 'goal' }, fillLater(p.goal), src('proposed: roles.json goal')),
+    h('h2', { class: 'sec' }, ui.matchMode === 'paint' ? 'You two win when' : ui.matchMode === 'world' ? 'You win when' : r.winsWith === 'self' ? 'You win alone when' : `The ${FACTION[r.faction]} wins when`, h('span', { class: `pill ${r.faction === 'cabal' ? 'brick' : r.faction === 'neutral' ? 'mustard' : 'moss'}` }, r.winsWith === 'self' ? 'solo' : FACTION[r.faction])),
+    h('ol', { class: 'routes' }, p.wins.map((w) => h('li', {}, h('span', {}, fillLater(w), src(p.tag))))),
+  ];
+  if (p.vendetta) {
+    const v = p.vendetta;
+    kids.push(h('h2', { class: 'sec' }, `Your vendetta: ${v.title}`, h('span', { class: 'chip' }, CONTENT.vendettas.vendettas[v.id].kind)),
+      h('p', { style: 'margin:0 0 6px' }, v.line, src('Private.vendetta')),
+      h('ul', { class: 'plain check' }, v.steps.map((t) => h('li', {}, t))),
+      h('div', { class: 'well' }, h('span', { class: 'mono' }, 'Proposed'), 'Today the vendetta line reaches no screen. Its steps and their ticks join the card when the vendetta build carries them (doc 1.3).'));
+  }
+  kids.push(h('h2', { class: 'sec' }, ui.matchMode === 'main' ? 'You lose when' : 'You miss out when'), h('ul', { class: 'plain' }, p.loses.map((t) => h('li', {}, fillLater(t)))));
+  kids.push(h('h2', { class: 'sec' }, 'Beware'), h('div', { class: 'beware', role: 'note' }, h('ul', { class: 'plain', style: 'margin:0' }, p.beware.map((t) => h('li', {}, fill(t)))), src('proposed: roles.json beware')));
+  kids.push(h('h2', { class: 'sec' }, 'How to play it'), h('ul', { class: 'plain check' }, p.tips.map((t) => h('li', {}, fill(t)))));
+  return h('section', { class: 'panel', id: 'p1', 'aria-labelledby': 't1', role: 'region' }, kids);
+}
+
+/** How a kit item is used: through its ability's slot when the card has one, else held and used with E. */
+function kitHow(it, rows) {
+  if (!it.use) return '';
+  const row = rows.find((x) => x.id === it.use && x.action);
+  if (row) return [h('span', { class: 'key' }, row.action.keys[0]), h('span', { class: 'tapk' }, row.action.touch)];
+  return [h('span', { class: 'secs' }, 'in hand'), h('span', { class: 'key' }, 'E'), h('span', { class: 'tapk' }, 'Use')];
+}
+
+function panelDo() {
+  const r = R(), s = S();
+  const rows = abilityRows();
+  const kids = [h('p', { class: 'eyebrow mono' }, 'What you can do'), h('h2', { class: 'sec' }, 'Your card', h('span', { class: 'mono', style: 'color:var(--d-soft)' }, `${rows.length} of 3`))];
+  for (const row of rows) {
+    const a = row.a;
+    const meta = [];
+    if (a.phases) meta.push(h('span', { class: 'pill soft' }, a.phases.includes('dusk') && a.phases.includes('night') ? 'After dark' : a.phases.map((x) => PHASE_WORD[x] ?? x).join(', ')));
+    if (row.cd) meta.push(h('span', { class: 'pill soft' }, `Rests ${row.cd} s`));
+    if (a.castS) meta.push(h('span', { class: 'pill soft' }, `${a.castS} s hold`));
+    if (a.usesPerMatch) meta.push(h('span', { class: 'pill soft' }, `${styled('times', a.usesPerMatch)} a match`));
+    if (a.consumes) meta.push(h('span', { class: 'pill soft' }, `Uses a ${itemName(a.consumes)}`));
+    if (a.requires) meta.push(h('span', { class: 'pill soft' }, `Needs the ${itemName(a.requires)}`));
+    if (row.passive) meta.push(h('span', { class: 'pill mustard' }, 'Always on'));
+    if (ui.mode === 'play' && row.id === 'kill') meta.push(h('span', { class: 'pill brick' }, 'Ready in 0:42'));
+    kids.push(h('div', { class: 'act' },
+      h('span', { class: 'name' }, a.name),
+      h('span', { class: 'how' }, row.passive ? h('span', { class: 'pill mustard' }, 'No key') : keyCaps(row.action, a.kind === 'hold')),
+      h('span', { class: 'line' }, ABILITY_LINE[row.id] ?? a.effect, src('proposed line; abilities.json')),
+      h('span', { class: 'meta' }, meta)));
+  }
+  kids.push(h('h2', { class: 'sec' }, 'Your kit', src('roles.json startKit · items.json')));
+  for (const k of r.startKit) {
+    const it = CONTENT.items.items[k.item];
+    kids.push(h('div', { class: 'act' }, h('span', { class: 'name' }, it.name, k.qty > 1 ? h('span', { class: 'num' }, ` ×${k.qty}`) : ''),
+      h('span', { class: 'how' }, it.roleBound ? h('span', { class: 'pill mustard' }, 'Bound') : '', kitHow(it, rows)),
+      h('span', { class: 'line' }, it.tooltip)));
+  }
+  kids.push(h('h2', { class: 'sec' }, 'Everyone can', src('doc 3: the action table')));
+  for (const a of ACTIONS.filter((x) => x.group === 'move' || x.group === 'verb')) {
+    kids.push(h('div', { class: 'act' }, h('span', { class: 'name' }, a.label), h('span', { class: 'how' }, keyCaps(a, a.hold)), h('span', { class: 'line' }, a.line)));
+  }
+  kids.push(h('h3', { class: 'sub' }, 'Screens'));
+  for (const a of ACTIONS.filter((x) => x.group === 'screen')) {
+    kids.push(h('div', { class: 'act' }, h('span', { class: 'name' }, a.label), h('span', { class: 'how' }, keyCaps(a)), a.line ? h('span', { class: 'line' }, a.line) : ''));
+  }
+  kids.push(h('div', { class: 'well' }, h('span', { class: 'mono' }, 'Proposed'), 'Bell pulls, Lens charges and cooldowns read the live private view when the card is reopened in play.'));
+  return h('section', { class: 'panel', id: 'p2', 'aria-labelledby': 't2', role: 'region' }, kids);
+}
+
+const PANEL_NAMES = ['Who', 'Win', 'Do'];
+
+function mountCard(host) {
+  const r = R();
+  const scrim = h('div', { class: 'scrim', onclick: () => ui.mode === 'play' && closeCard() });
+  const holdS = CONTENT.balance.phases.roleRevealS;
+  const meter = h('div', { class: 'meter', 'aria-hidden': 'true' }, h('i', { class: ui.mode === 'reveal' && !ui.ready ? 'run' : '', style: `--hold:${holdS}s`, onanimationend: () => { ui.ready = true; closeCard(); } }));
+  const action = ui.mode === 'reveal'
+    ? h('button', { type: 'button', class: 'btn primary', id: 'ready', onclick: () => { ui.ready = true; closeCard(); } }, ui.ready ? 'Ready ✓' : 'Ready')
+    : h('button', { type: 'button', class: 'btn', onclick: closeCard }, 'Close', h('span', { class: 'kbd' }, 'Tab'));
+  const tabs = h('div', { class: 'tabs3', role: 'tablist', 'aria-label': 'Card panels' }, PANEL_NAMES.map((n, i) => h('button', { type: 'button', role: 'tab', id: `t${i}`, 'aria-controls': `p${i}`, 'aria-selected': String(i === ui.panel), onclick: () => goPanel(i) }, n)));
+  const top = h('div', { class: 'topbar' },
+    h('span', { class: 'stripe' }, h('span', { class: 'glyph' }, svg(GLYPH[r.faction])), FACTION[r.faction]),
+    h('h1', { class: 'title', id: 'card-title' }, r.name),
+    h('span', { class: 'spacer' }),
+    ui.mode === 'reveal' ? h('span', { class: 'secs' }, `The match starts when everyone is Ready, or in ${holdS} s`) : h('span', { class: 'secs' }, 'The world runs on behind this card'),
+    action, tabs, meter);
+  const panels = h('div', { class: 'panels' }, panelWho(), panelWin(), panelDo());
+  const prev = h('button', { type: 'button', class: 'btn sm', onclick: () => goPanel(ui.panel - 1) }, '‹ Back');
+  const next = h('button', { type: 'button', class: 'btn sm', onclick: () => goPanel(ui.panel + 1) }, 'Next ›');
+  const dots = h('div', { class: 'dots', 'aria-hidden': 'true' }, PANEL_NAMES.map((_, i) => h('i', { class: i === ui.panel ? 'on' : '' })));
+  const pager = h('nav', { class: 'pager', 'aria-label': 'Turn the card' }, prev, dots, next);
+  const motifs = ['tl', 'tr', 'bl', 'br'].map((c) => { const m = svg(MOTIF[r.faction], 26); m.setAttribute('class', `motif ${c}`); return m; });
+  const card = h('div', { class: `card folded opening ${ui.sources ? 'show-src' : ''} ${ui.view === 'phone' ? 'inputs-only-touch' : 'inputs-only-key'}`, 'data-faction': r.faction, role: 'dialog', 'aria-modal': 'false', 'aria-labelledby': 'card-title' }, motifs, top, panels, pager);
+  host.append(scrim, card);
+  requestAnimationFrame(() => requestAnimationFrame(() => card.classList.remove('folded')));
+  panels.addEventListener('scroll', () => {
+    const i = Math.round(panels.scrollLeft / Math.max(1, panels.clientWidth));
+    if (i !== ui.panel) { ui.panel = i; syncPager(card); }
+  }, { passive: true });
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' && e.target.closest('.tabs3, .pager')) goPanel(ui.panel + 1);
+    if (e.key === 'ArrowLeft' && e.target.closest('.tabs3, .pager')) goPanel(ui.panel - 1);
+  });
+  setTimeout(() => (card.querySelector('#ready') ?? card.querySelector('.btn'))?.focus({ preventScroll: true }), 30);
+}
+function syncPager(card) {
+  card.querySelectorAll('.dots i').forEach((d, i) => d.classList.toggle('on', i === ui.panel));
+  card.querySelectorAll('.tabs3 button').forEach((b, i) => b.setAttribute('aria-selected', String(i === ui.panel)));
+}
+function goPanel(i) {
+  ui.panel = Math.max(0, Math.min(2, i));
+  const panels = document.querySelector('.panels');
+  if (!panels) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  panels.scrollTo({ left: ui.panel * panels.clientWidth, behavior: reduce ? 'auto' : 'smooth' });
+  if (getComputedStyle(panels).display !== 'flex') document.getElementById(`p${ui.panel}`)?.focus?.();
+  syncPager(document.querySelector('.card'));
+}
+function closeCard() { ui.cardOpen = false; render(); setTimeout(() => document.querySelector('.hud-goal')?.focus(), 0); }
+function openCard() { ui.cardOpen = true; ui.daybook = null; ui.mode = 'play'; document.getElementById('m-mode').value = 'play'; render(); }
+
+// ---- the Daybook ----
+const DB_TABS = [
+  { id: 'pockets', label: 'Pockets', key: 'I' }, { id: 'chores', label: 'Chores', key: 'K' }, { id: 'quests', label: 'Quests', key: 'J' },
+  { id: 'notebook', label: 'Notebook', key: 'N' }, { id: 'purse', label: 'Purse', key: '' }, { id: 'self', label: 'You', key: '' },
+];
+function slotBtn(stack, extra = '') {
+  if (!stack) return h('div', { class: `slot empty ${extra}`, 'aria-label': 'Empty slot' });
+  const it = CONTENT.items.items[stack[0]];
+  return h('button', { type: 'button', class: `slot ${it?.roleBound ? 'bound' : ''} ${extra}`, title: it?.tooltip ?? '', 'aria-label': `${it?.name ?? stack[0]}${stack[1] > 1 ? `, ${stack[1]}` : ''}` }, it?.name ?? stack[0], stack[1] > 1 ? h('span', { class: 'q' }, stack[1]) : '');
+}
+function dbPockets() {
+  const s = S();
+  const pack = [...s.pack]; while (pack.length < (CONTENT.items.inventorySlots - CONTENT.balance.inventory.hotbar)) pack.push(null);
+  const held = s.hotbar[ui.holding];
+  const it = held && CONTENT.items.items[held[0]];
+  return [
+    h('div', { class: 'inv-grid' },
+      h('div', {},
+        h('h2', { class: 'sec' }, 'Hotbar', h('span', { class: 'mono', style: 'color:var(--d-soft)' }, '1 – 6 picks the held one')),
+        h('div', { class: 'slots' }, s.hotbar.map((st, i) => slotBtn(st, i === ui.holding ? 'held' : ''))),
+        h('h2', { class: 'sec' }, 'Pack', h('span', { class: 'num', style: 'font-size:13px;color:var(--d-soft)' }, `${s.pack.length} of ${(CONTENT.items.inventorySlots - CONTENT.balance.inventory.hotbar)}`)),
+        h('div', { class: 'slots' }, pack.map((st) => slotBtn(st))),
+        h('h2', { class: 'sec' }, 'Belt and gear'),
+        h('div', { class: 'slots' }, s.belt.map((st) => slotBtn(st)), ['Head', 'Body', 'Weapon'].map((g) => h('div', { class: 'slot empty', 'aria-label': `${g}: empty` }, h('span', { class: 'secs' }, g))))),
+      h('div', {},
+        h('h2', { class: 'sec' }, 'In hand'),
+        it ? h('div', { class: 'box' }, h('b', {}, it.name), h('p', { style: 'margin:4px 0 8px' }, it.tooltip), it.use ? h('button', { type: 'button', class: 'btn sm primary' }, 'Use', h('span', { class: 'kbd' }, 'E')) : h('span', { class: 'secs' }, 'Nothing to use.')) : h('p', { class: 'secs' }, 'Empty hand.'),
+        h('h2', { class: 'sec' }, 'Craft', h('span', { class: 'kbd' }, 'C')),
+        h('div', { class: 'craft' }, [0, 1, 2, 3].map(() => h('div', { class: 'slot empty' }))),
+        h('p', { class: 'secs' }, 'The pocket square, 2 by 2. A workbench in reach opens 3 by 3.'))),
+  ];
+}
+function dbChores() {
+  const s = S();
+  const done = s.tasks.filter((t) => t[1] === 'done').length;
+  const out = [h('div', { class: 'box' }, h('div', { class: 'row', style: 'border:0;padding:0 0 6px' }, h('b', {}, 'The village’s work'), h('span', { class: 'num' }, '42%')), h('div', { class: 'progress', role: 'progressbar', 'aria-valuenow': '42', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-label': 'The village’s work' }, h('i', { style: 'width:42%' })), h('p', { class: 'secs', style: 'margin:6px 0 0' }, 'Public: everyone sees the same bar. At 100% the village wins.'))];
+  out.push(h('h2', { class: 'sec' }, s.fake ? 'A show of work' : 'Your chores', h('span', { class: 'num', style: 'font-size:14px' }, `${done} of ${s.tasks.length}`)));
+  if (s.fake) out.push(h('p', { class: 'secs', style: 'margin:-4px 0 8px' }, 'Your list writes alibis but never fills the bar. Only you can see this line.'));
+  for (const [id, st] of s.tasks) {
+    const t = CONTENT.tasks.tasks[id];
+    const where = t.targets.map((x) => SCENE[x.scene] ?? x.scene).join(' or ');
+    const steps = t.kind === 'coop' ? `Takes ${t.coopPlayers} hands, at ${where}.` : st === 'carry' ? `Carrying the ${itemName(t.tool)}. Bring it to ${where}.` : `Fetch the ${itemName(t.tool)} from ${SCENE[t.source.scene] ?? t.source.scene}, bring it to ${where}.`;
+    out.push(h('div', { class: 'chore' }, h('span', { class: `tick ${st === 'done' ? 'done' : ''}`, 'aria-hidden': 'true' }), h('div', {}, h('b', {}, t.name), h('div', { class: 'steps' }, st === 'done' ? 'Done. Your alibi is in the Notebook.' : steps)), h('span', {}, t.nightOnly ? h('span', { class: 'pill soft' }, 'After dark') : st === 'carry' ? h('span', { class: 'pill mustard' }, 'Next') : '')));
+  }
+  return out;
+}
+function dbQuests() {
+  const s = S();
+  if (!s.quests.length) return [h('p', { class: 'secs' }, 'Nobody has given you work. Givers stand in the world; press T beside one.')];
+  return [h('h2', { class: 'sec' }, 'Your work', h('span', { class: 'num', style: 'font-size:14px' }, `${s.quests.length} of ${CONTENT.balance.quests.maxActive}`)), ...s.quests.map(([id, have]) => {
+    const q = CONTENT.quests.quests[id];
+    const total = q.wants.reduce((n, w) => n + w.qty, 0);
+    return h('div', { class: 'box' }, h('div', { class: 'row', style: 'border:0;padding:0' }, h('b', {}, CONTENT.quests.npcs[q.giver].name), h('span', { class: 'num' }, `${have} of ${total}`)),
+      h('p', { style: 'margin:4px 0' }, 'Wants ', q.wants.map((w) => `${w.qty} ${itemName(w.item)}`).join(', '), '. Pays ', q.reward.map((w) => `${w.qty > 1 ? w.qty + ' ' : 'a '}${itemName(w.item)}`).join(', '), ` and ${q.scrip} Scrip.`),
+      h('div', { class: 'progress' }, h('i', { style: `width:${Math.round((100 * have) / total)}%` })));
+  })];
+}
+function dbNotebook() {
+  const s = S();
+  if (!s.notes.length) return [h('p', { class: 'secs' }, 'Nothing yet. Hold E on a glowing clue to collect it.')];
+  const tone = { verified: 'moss', corroborated: 'moss', claimed: 'soft', forged: 'brick' };
+  return [h('h2', { class: 'sec' }, 'Notebook', h('span', { class: 'mono', style: 'color:var(--d-soft)' }, 'only you can read this')), ...s.notes.map(([what, trait, where, at, st]) => h('div', { class: 'row' }, h('div', {}, h('b', {}, what), trait ? ` · ${trait}` : '', h('div', { class: 'steps' }, `${where}, ${at}`)), h('span', { class: `pill ${tone[st]}` }, st === 'forged' ? '✕ forged' : st === 'claimed' ? 'claimed' : `✓ ${st}`)))];
+}
+function dbPurse() {
+  const s = S(), e = CONTENT.economy;
+  const out = [h('div', { class: 'stats' },
+    h('div', { class: 'box' }, h('div', { class: 'mono' }, 'On you'), h('div', { class: 'big' }, s.purse), h('div', { class: 'secs' }, 'Scrip. A mugging or a knockout can take it.')),
+    h('div', { class: 'box' }, h('div', { class: 'mono' }, 'In the bank'), h('div', { class: 'big' }, s.bank), h('div', { class: 'secs' }, 'Safe from thieves.')),
+    h('div', { class: 'box' }, h('div', { class: 'mono' }, 'Faith'), h('div', { class: 'big' }, s.faith), h('div', { class: 'secs' }, `Of ${e.faith.max}, from the altars.`)))];
+  out.push(h('h2', { class: 'sec' }, 'What you owe'));
+  out.push(h('div', { class: 'row' }, h('div', {}, h('b', {}, 'Rent'), h('div', { class: 'steps' }, `Due by midday at the bank counter. Miss it and you are Indebted.`)), h('span', { class: 'num big', style: 'font-size:22px' }, e.rent.amount)));
+  out.push(h('div', { class: 'row' }, h('div', {}, h('b', {}, 'The line’s fare'), h('div', { class: 'steps' }, s.fare ? `You came back on the morning train. Pay it with the rent, or clear it at the Clerk’s ledger.` : 'Nothing owed.')), h('span', { class: 'num big', style: 'font-size:22px' }, s.fare)));
+  if (s.fare) out.push(h('div', { class: 'well' }, h('span', { class: 'mono' }, 'While you owe'), `Your pay is halved (×${CONTENT.balance.respawn.wageMult}) and your stall charges more.`));
+  return out;
+}
+function dbSelf() {
+  return [h('h2', { class: 'sec' }, 'Your body'),
+    h('div', { class: 'row' }, h('span', {}, 'Health'), h('span', { class: 'num' }, `100 of ${CONTENT.balance.body.maxHp}`)),
+    h('div', { class: 'row' }, h('span', {}, 'Stamina'), h('span', { class: 'num' }, `72 of ${CONTENT.balance.body.maxStamina}`)),
+    h('div', { class: 'row' }, h('span', {}, 'Effects'), h('span', { class: 'secs' }, 'None. A chip appears on the HUD when one starts.')),
+    h('h2', { class: 'sec' }, 'Your home'),
+    h('p', {}, 'The widow’s cottage. Its bed is yours to sleep in at dusk and at night.', src('Private.home')),
+    h('h2', { class: 'sec' }, 'Your seat'),
+    h('p', {}, 'Your name, traits and look are what everyone sees. Your card, this book and your cooldowns are yours alone.')];
+}
+function mountDaybook(host) {
+  const tab = ui.daybook;
+  const body = { pockets: dbPockets, chores: dbChores, quests: dbQuests, notebook: dbNotebook, purse: dbPurse, self: dbSelf }[tab]();
+  const tabs = h('div', { class: 'db-tabs', role: 'tablist', 'aria-label': 'Daybook' }, DB_TABS.map((t) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(t.id === tab), id: `db-${t.id}`, onclick: () => { ui.daybook = t.id; render(); } }, t.label, t.id === 'purse' && S().fare ? h('i', { class: 'dot', 'aria-label': 'something owed' }) : '', t.key ? h('span', { class: 'kbd' }, t.key) : '')));
+  const book = h('section', { class: `daybook opening ${ui.sources ? 'show-src' : ''}`, role: 'dialog', 'aria-modal': 'false', 'aria-labelledby': 'db-title' },
+    h('div', { class: 'db-head' }, h('h2', { id: 'db-title' }, 'Daybook'), h('span', { class: 'mono', style: 'color:var(--d-soft)' }, 'yours alone'), h('span', { style: 'flex:1' }), h('button', { type: 'button', class: 'btn sm', onclick: () => { ui.daybook = null; render(); } }, 'Close', h('span', { class: 'kbd' }, 'Esc'))),
+    tabs, h('div', { class: 'db-body', role: 'tabpanel', 'aria-labelledby': `db-${tab}` }, body),
+    h('div', { class: 'db-foot' }, 'The world runs on. You can still walk; a hit closes the book.'));
+  host.append(book);
+  tabs.addEventListener('keydown', (e) => {
+    const i = DB_TABS.findIndex((t) => t.id === ui.daybook);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { ui.daybook = DB_TABS[(i + (e.key === 'ArrowRight' ? 1 : DB_TABS.length - 1)) % DB_TABS.length].id; render(); document.getElementById(`db-${ui.daybook}`)?.focus(); }
+  });
+}
+
+// ---- the HUD and the touch cluster, drawn from the same action table ----
+function mountHud(host) {
+  const r = R(), s = S(), p = P();
+  const hud = h('div', { class: 'hud' },
+    h('button', { type: 'button', class: 'hud-goal', onclick: openCard, 'aria-label': `Your card. ${fillLater(p.goal)} (Tab)` }, h('span', { class: 'disc' }, svg(GLYPH.card, 18)), h('span', {}, h('b', {}, 'Your card ', h('kbd', { class: 'kbd' }, 'Tab')), h('span', {}, fillLater(p.goal)))),
+    h('div', { class: 'hud-clock' }, h('div', { class: 'num' }, '06:40'), h('div', { class: 'mono' }, 'Day')),
+    h('div', { class: 'hud-tr' }, h('button', { type: 'button', class: 'hud-btn', onclick: () => { ui.daybook = ui.daybook ? null : 'pockets'; ui.cardOpen = false; render(); }, 'aria-label': 'Daybook (I)' }, 'Daybook', s.fare ? h('span', { class: 'badge', 'aria-hidden': 'true' }) : '', h('kbd', {}, 'I')), h('button', { type: 'button', class: 'hud-btn', 'aria-label': 'Settings' }, '⚙')),
+    h('div', { class: 'hud-body' }, h('div', { class: 'mono' }, 'Health'), h('div', { class: 'bar' }, h('i', { style: 'width:100%;background:var(--wdi-teal)' })), h('div', { class: 'mono' }, 'Stamina'), h('div', { class: 'bar' }, h('i', { style: 'width:72%;background:var(--wdi-lantern)' }))),
+    h('div', { class: 'hud-purse num' }, `${s.purse} Scrip`),
+    h('nav', { class: 'hotbar', 'aria-label': 'Hotbar' }, s.hotbar.map((st, i) => h('button', { type: 'button', class: i === ui.holding ? 'on' : '', onclick: () => { ui.holding = i; render(); } }, h('span', { class: 'n' }, i + 1), st ? itemName(st[0]) : ''))));
+  const slots = abilityRows().filter((x) => !x.passive);
+  const discs = [ACTIONS.find((a) => a.id === 'use'), ...slots.map((x) => x.action), ACTIONS.find((a) => a.id === 'strike')];
+  const touch = h('div', { class: 'touch' },
+    h('div', { class: 'stick' }, h('small', {}, 'Push to the rim to run')),
+    h('button', { type: 'button', class: 'disc sneak-toggle', 'aria-pressed': 'false' }, h('b', {}, '⇣'), 'Sneak'),
+    h('div', { class: 'cluster' }, discs.map((a) => {
+      const label = a.group === 'slot' ? slots.find((x) => x.action === a).a.name : a.touch;
+      return h('button', { type: 'button', class: `disc ${a.primary ? 'primary' : ''}` }, h('b', {}, a.keys[0]), label);
+    })));
+  hud.append(touch);
+  host.append(hud);
+}
+
+// ---- render ----
+function render() {
+  document.documentElement.dataset.theme = ui.theme;
+  const stage = document.getElementById('stage');
+  stage.dataset.view = ui.view;
+  stage.replaceChildren();
+  const frame = h('div', { class: ui.view === 'phone' ? 'phone' : 'desk' });
+  frame.append(h('div', { class: 'world', 'aria-hidden': 'true' }));
+  stage.append(frame);
+  mountHud(frame);
+  if (ui.cardOpen) mountCard(frame);
+  if (ui.daybook) mountDaybook(frame);
+  if (!ui.cardOpen && !ui.daybook && ui.view === 'desktop') frame.append(h('div', { class: 'legend' }, h('b', {}, 'In play. '), 'Tab or the goal chip reopens the card. I or the Daybook button opens the Daybook; K, J, N and C open it at a tab. Esc closes.'));
+  if (ui.cardOpen && ui.view === 'phone') setTimeout(() => { const ps = document.querySelector('.panels'); if (ps) ps.scrollLeft = ui.panel * ps.clientWidth; }, 0);
+}
+
+for (const [id, key] of [['m-match', 'matchMode'], ['m-role', 'role'], ['m-view', 'view'], ['m-theme', 'theme'], ['m-mode', 'mode']]) {
+  document.getElementById(id).addEventListener('change', (e) => {
+    ui[key] = e.target.value;
+    if (key === 'matchMode' && ui.matchMode === 'paint') { ui.role = 'killer'; document.getElementById('m-role').value = 'killer'; }
+    if (key === 'role' && ui.matchMode === 'paint' && ui.role !== 'killer') { ui.matchMode = 'world'; document.getElementById('m-match').value = 'world'; }
+    if (key === 'role' || key === 'matchMode') { ui.picked = null; ui.holding = 0; }
+    if (key === 'role' || key === 'mode' || key === 'matchMode') { ui.cardOpen = true; ui.daybook = null; ui.ready = false; ui.panel = 0; }
+    render();
+  });
+}
+document.getElementById('m-src').addEventListener('change', (e) => { ui.sources = e.target.checked; render(); });
+document.getElementById('m-replay').addEventListener('click', () => { ui.mode = 'reveal'; document.getElementById('m-mode').value = 'reveal'; ui.cardOpen = true; ui.ready = false; ui.daybook = null; ui.panel = 0; render(); });
+document.addEventListener('keydown', (e) => {
+  if (e.target.closest('select, input')) return;
+  if (e.key === 'Tab' && !e.shiftKey && !e.target.closest('.card, .daybook')) { e.preventDefault(); ui.cardOpen ? closeCard() : openCard(); return; }
+  if (e.key === 'Escape') { if (ui.daybook) { ui.daybook = null; render(); } else if (ui.cardOpen && ui.mode === 'play') closeCard(); return; }
+  const tab = { i: 'pockets', k: 'chores', j: 'quests', n: 'notebook', c: 'pockets' }[e.key.toLowerCase()];
+  if (tab && !e.ctrlKey && !e.metaKey) { ui.daybook = ui.daybook === tab ? null : tab; ui.cardOpen = false; render(); }
+  if (/^[1-6]$/.test(e.key) && !ui.cardOpen) { ui.holding = +e.key - 1; render(); }
+});
+if (matchMedia('(max-width: 760px)').matches) { ui.view = 'phone'; document.getElementById('m-view').value = 'phone'; }
+render();
+</script>
+</body>
+</html>
