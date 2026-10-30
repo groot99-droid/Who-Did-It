@@ -4307,6 +4307,15 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
     show whether a framed seat stole. B6b's theft fine from the goods' price, with the goods returned, reads only
     goods that a public loss names, and 10B brings its design to 6Z first.
   - Rows 15 and 19 now name the Tribunal.
+- 2026-10-30: merged D9c (#380), talking to a figure (row 16), and x2 (#375), the sound of a chop or a smash at the
+  tool walls. One check covered both, on the tree the two make together: the full server suite and auto 50 ran clean.
+  Each base tree matched the simulated one. B5c (#411), which keeps the cell out of the rumour ledger, shares only
+  DECISIONS and GDD rows with them, so its Complete on the older base stands under seams 1.
+- 2026-10-30: 6Z's review of D8 (#410), the jail's mini-games, set four fixes.
+  - The inspect line reads health against the seat's own maximum. Read against the body's default, two lost yard
+    fights would show "bruised" to every inspector for the rest of the match.
+  - A yard fight left unanswered past its time is lost, so a seat can't open the board, look and walk away.
+  - Two copy fixes: the reach refusal names no pile, and the yard's hint names no jail pot.
 
 ## Round 11 (planning, started 2026-10-29)
 
