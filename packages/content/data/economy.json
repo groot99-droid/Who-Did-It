@@ -31,7 +31,17 @@
     },
     "store": {
       "prop": "tb.shop_counter",
-      "sells": ["rope", "oil", "candle", "planks", "axe", "pickaxe", "hammer"],
+      "sells": [
+        "rope",
+        "oil",
+        "candle",
+        "planks",
+        "axe",
+        "pickaxe",
+        "hammer",
+        "quiltedCoat",
+        "skinningKnife"
+      ],
       "buys": []
     },
     "market": {
@@ -42,18 +52,28 @@
     "gamekeeper": {
       "prop": "fo.shop_stall",
       "owner": "gamekeeper",
-      "sells": ["snare", "torch"],
+      "sells": ["snare", "torch", "skinningKnife"],
       "buys": []
     },
     "bpStore": {
       "prop": "bl.shop_store",
-      "sells": ["rope", "oil", "candle", "planks", "axe", "pickaxe", "hammer"],
+      "sells": [
+        "rope",
+        "oil",
+        "candle",
+        "planks",
+        "axe",
+        "pickaxe",
+        "hammer",
+        "quiltedCoat",
+        "skinningKnife"
+      ],
       "buys": []
     },
     "bpGamekeeper": {
       "prop": "bl.shop_stall",
       "owner": "gamekeeper",
-      "sells": ["snare", "torch"],
+      "sells": ["snare", "torch", "skinningKnife"],
       "buys": []
     },
     "bpMarket": {
@@ -74,6 +94,8 @@
     "axe": { "ask": 8 },
     "pickaxe": { "ask": 10 },
     "hammer": { "ask": 6 },
+    "quiltedCoat": { "ask": 12 },
+    "skinningKnife": { "ask": 7 },
     "snare": { "ask": 4 },
     "torch": { "ask": 3 },
     "timber": { "pay": 1 },

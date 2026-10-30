@@ -463,6 +463,18 @@ export const BalanceFile = z.strictObject({
     priceMult: z.number().min(1),
     errandS: z.number().positive(),
   }),
+  /**
+   * Round 10, D6a (GDD 3.22, logic-table 8.2): armour. `tierMult` is the damage factor of an item's `armor.tier` by
+   * slot; the factors of the worn items and the Lodge's `creatureDmg` perk multiply, and the damage never falls below
+   * `cap` of what the row would have dealt.
+   */
+  armor: Section({
+    tierMult: z.strictObject({
+      body: z.array(Frac).min(1),
+      head: z.array(Frac).min(1),
+    }),
+    cap: Frac,
+  }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
     transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }),
