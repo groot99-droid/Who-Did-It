@@ -47,7 +47,7 @@ import { type CivicLayer, mountCivicLayer } from '../ui/econ/CivicLayer'; // rou
 import { type SleepLayer, mountSleepLayer } from '../ui/sleep/SleepLayer'; // round 10, A8
 import { mountPurseHud, type PurseHud } from '../view/purse/PurseHud'; // round 8, 8C (locked)
 import { type MugPrompt, mountMugPrompt } from '../ui/mug/MugPrompt';
-import { type LineScreen, lineSecondsLeft, mountOnTheLine } from '../ui/OnTheLine'; // round 10, C1b
+import { type LineScreen, bellsNext, lineSecondsLeft, mountOnTheLine } from '../ui/OnTheLine'; // round 10, C1b
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
@@ -120,11 +120,17 @@ type Target =
 
 /** Clue ids this client has already collected, per feed: the prompt does not offer them again. */
 const collectedBy = new WeakMap<WorldFeed, Set<string>>();
-/** Round 10, C1b: per feed, whether its seat was on the line and how it died; a World restart keeps it. */
-const lines = new WeakMap<WorldFeed, { on: boolean; cause: DeathCause | undefined }>();
-const lineOf = (feed: WorldFeed): { on: boolean; cause: DeathCause | undefined } => {
+/** Round 10, C1b: per feed, whether its seat was on the line and how and where it died; a World restart keeps it. */
+interface LineMemory {
+  on: boolean;
+  cause: DeathCause | undefined;
+  /** The own `killed.sceneId` (y13): the place the screen names. */
+  sceneId: string | undefined;
+}
+const lines = new WeakMap<WorldFeed, LineMemory>();
+const lineOf = (feed: WorldFeed): LineMemory => {
   let memory = lines.get(feed);
-  if (!memory) lines.set(feed, (memory = { on: false, cause: undefined }));
+  if (!memory) lines.set(feed, (memory = { on: false, cause: undefined, sceneId: undefined }));
   return memory;
 };
 
@@ -314,8 +320,10 @@ export class World extends Phaser.Scene {
     };
     const onFound = () => this.clueFound();
     // Round 6, 6J (locked): the death cutscene plays, then the ghost handoff as before.
-    const onKilled = (m: { cutsceneId?: string; cause?: string }) => {
-      lineOf(this.feed).cause = m.cause as DeathCause | undefined; // round 10, C1b: the screen's centre line
+    const onKilled = (m: { cutsceneId?: string; cause?: string; sceneId?: string }) => {
+      const memory = lineOf(this.feed); // round 10, C1b: the screen's centre line, how and where (y13)
+      memory.cause = m.cause as DeathCause | undefined;
+      memory.sceneId = m.sceneId;
       void this.cutscenes.playDeath(m.cutsceneId).then(() => this.refreshGhost());
     };
     const onAim = (m: { endsTick: number }) => this.openAim(m.endsTick);
@@ -768,13 +776,21 @@ export class World extends Phaser.Scene {
    * Round 10, C1b (GDD 3.22, UI.md 14.47): on the line the seat sees the dark carriage and the time to the train, never
    * the world (the server sends it none); when the train brings it back, the screen lifts and says so.
    */
-  private refreshLine(clock: { tick: number; phase: number; phaseEndsTick: number }): void {
+  private refreshLine(clock: { tick: number; phase: number; phaseEndsTick: number; round: number }): void {
     const memory = lineOf(this.feed);
     const on = this.feed.onLine();
     if (on) {
       memory.on = true;
-      this.line ??= mountOnTheLine(overlayRoot(), memory.cause);
-      return this.line.update(lineSecondsLeft(clock.phase, (clock.phaseEndsTick - clock.tick) / TICK_RATE));
+      this.line ??= mountOnTheLine(overlayRoot(), {
+        cause: memory.cause,
+        sceneId: memory.sceneId,
+        feed: this.feed,
+      });
+      const bells = bellsNext(clock.round); // y13: the last cycle's night ends in the bells, not a train
+      return this.line.update(
+        lineSecondsLeft(clock.phase, (clock.phaseEndsTick - clock.tick) / TICK_RATE, bells),
+        bells,
+      );
     }
     this.line?.destroy();
     this.line = null;

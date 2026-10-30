@@ -29,6 +29,7 @@ export function eligibleVendettas(room: PartyRoom, card: string, dealt: readonly
   return Object.values(vendettas.vendettas).filter(
     (v) =>
       v.role === card &&
+      v.arrival !== true &&
       (v.maps === undefined || v.maps.includes(map)) &&
       (v.needsCard === undefined || dealt.includes(v.needsCard)) &&
       (v.needsScene === undefined || profileOpen(scenes[v.needsScene].profile, profile)),
