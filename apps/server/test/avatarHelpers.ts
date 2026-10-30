@@ -30,13 +30,14 @@ export const seatAvatarsHeld = (m: Match, bot: Bot): ReturnType<typeof avatarsHe
 
 /**
  * Round 10, x5 (A353, 6Z's grant of 2026-10-30): the diff paths that are not a figure's avatar row
- * (`scenes.<scene>.avatars.<handle>` and everything under it, a row added or removed included), for an outsider's
- * "no field change" diff. Safe while no figure reacts to a seat's kill (only a creature hurts or kills a figure,
- * `townsfolk/figures.ts`); a step that gives figures such a reaction must narrow this filter.
+ * (`scenes.<scene>.avatars.<handle>`, or `avatars.<handle>` when the diff is of one scene, and everything under it,
+ * a row added or removed included), for an outsider's "no field change" diff. Safe while no figure reacts to a
+ * seat's kill or night power (only a creature hurts or kills a figure, `townsfolk/figures.ts`); a step that gives
+ * figures such a reaction must narrow this filter.
  */
 export const withoutFigureRows = (m: Match, paths: string[]): string[] =>
   paths.filter((p) => {
-    const row = /^scenes\.[^.]+\.avatars\.([^.]+)(?:\.|$)/.exec(p);
+    const row = /^(?:scenes\.[^.]+\.)?avatars\.([^.]+)(?:\.|$)/.exec(p);
     return row === null || figureOfHandle(m.room, row[1] as string) === undefined;
   });
 
