@@ -145,15 +145,8 @@ export function tickEffects(room: PartyRoom, target: string, body: Body): void {
     }
     const def = effectDef(id);
     if (def.hpPerS !== undefined && body.hp > 0) {
-      // Armour eases the drains: clotting for Bleeding, tin mail for Poisoned (round 10, D6a).
-      const worn = armourOf(room, target);
-      const drain =
-        def.hpPerS *
-        (id === 'poisoned'
-          ? (worn?.poisonDrainFactor ?? 1)
-          : id === 'bleeding'
-            ? (worn?.bleedDrainFactor ?? 1)
-            : 1);
+      // Armour eases the drains (round 10, D6a): the jerkin halves how fast a Bleeding takes health.
+      const drain = def.hpPerS * (armourOf(room, target).resist[id] ?? 1);
       body.hp = Math.max(Math.min(1, body.hp), body.hp - drain * dt);
     }
     if (def.applies) {

@@ -67,10 +67,7 @@ function tickBody(room: PartyRoom, id: string, body: Body, p: PlayerSim | undefi
     if (running) body.stamina = Math.max(0, body.stamina - b.runCostPerS * dt);
     else {
       const regen =
-        b.staminaRegenPerS *
-        factorOf(body, (d) => d.staminaRegenFactor) *
-        (armourOf(room, id)?.regenFactor ?? 1) *
-        dt;
+        b.staminaRegenPerS * factorOf(body, (d) => d.staminaRegenFactor) * armourOf(room, id).regen * dt;
       body.stamina = Math.min(body.maxStamina, body.stamina + regen);
     }
   }
@@ -91,9 +88,7 @@ export function bodySpeedPxPerTick(room: PartyRoom, sessionId: string, input: Mo
   const body = bodyOf(room, sessionId);
   if (!body) return speedPxPerTick(input.sprint, input.sneak);
   const sprint = input.sprint && body.stamina > 0 && !blocksRun(body);
-  return (
-    speedPxPerTick(sprint, input.sneak) * speedFactorOf(body) * (armourOf(room, sessionId)?.speedFactor ?? 1)
-  );
+  return speedPxPerTick(sprint, input.sneak) * speedFactorOf(body) * armourOf(room, sessionId).speed;
 }
 
 /** After `publishPresence`: the effects' status bits and a one-shot clip onto the presence (body.md 6). */
