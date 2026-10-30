@@ -89,12 +89,12 @@ describe('the Clerk’s labour errand (GDD 3.23)', () => {
 
 describe('the dear stall (GDD 3.23)', () => {
   it('asks priceMult more, rounded up, while its owner look owes the line, and charges what it shows', async () => {
-    const { party, human } = await dayAt(COUNTER);
+    const [npc] = npcIdsOf('S1') as [string];
+    const { party, human } = await dayAt(COUNTER, npc); // the owner look's wearer stays alive: its stall is at work (C3)
     const room = party.room;
     const shopId = 'bakery';
     const owner = economy.shops[shopId]!.owner!;
     const base = economy.prices.flour!.ask!;
-    const [npc] = npcIdsOf('S1') as [string];
     room.state.players.get(npc)!.look = owner;
     expect(shopIsDear(room, shopId)).toBe(false);
     addFare(room, npc);
