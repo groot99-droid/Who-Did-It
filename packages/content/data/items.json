@@ -526,6 +526,48 @@
       "ships": "V1",
       "gddRef": "3.20"
     },
+    "dough": {
+      "id": "dough",
+      "name": "Dough",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Mixed flour. Proof it, then bake it.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "proofedDough": {
+      "id": "proofedDough",
+      "name": "Proofed dough",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Risen dough, ready for the oven.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "herbFilling": {
+      "id": "herbFilling",
+      "name": "Herb filling",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Chopped herbs from the cold room, for bread.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "herbBread": {
+      "id": "herbBread",
+      "name": "Herb Bread",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "eatHerbBread",
+      "buff": "resistant",
+      "tooltip": "Eat it to take poison more lightly until the buff wears off.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
     "wakeLoaf": {
       "id": "wakeLoaf",
       "name": "Wake Loaf",

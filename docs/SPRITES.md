@@ -440,7 +440,7 @@ this table:
 
 | Family | Shown | Names |
 |---|---|---|
-| Effects (`EffectId`, GDD 3.22) | the body HUD's effect row; `indebted` in its own seat's view only | `effect_slowed`, `effect_wounded`, `effect_bleeding`, `effect_weakened`, `effect_poisoned`, `effect_fatigued`, `effect_stunned`, `effect_dazed`, `effect_famished`, `effect_knockedOut`, `effect_indebted`, `effect_charm` (8A's stand-in), `effect_exhausted` (round 10, A7b) |
+| Effects (`EffectId`, GDD 3.22) | the body HUD's effect row; `indebted` in its own seat's view only | `effect_slowed`, `effect_wounded`, `effect_bleeding`, `effect_weakened`, `effect_poisoned`, `effect_fatigued`, `effect_stunned`, `effect_dazed`, `effect_famished`, `effect_knockedOut`, `effect_indebted`, `effect_charm` (8A's stand-in), `effect_exhausted` (round 10, A7b), `effect_resistant` (round 10, D4a) |
 | Inspect signs (`sim/inspect/read.ts`) without an effect of their own | the inspect card | `sign_bloody`, `sign_hunted` |
 | Economy (GDD 3.23, 8C and 8D) | the purse, the shop, the bank, the civic panel and the HQ badge; curfew has none, so a barred door reads as a plain locked one | `econ_scrip`, `econ_purse`, `econ_till`, `econ_wages`, `econ_deposit`, `econ_withdraw`, `econ_rent`, `econ_quota`, `econ_faith`, `econ_rumour`, `econ_blackmail`, `econ_hq1`, `econ_hq2`, `econ_hq3`, `econ_blackMarket` |
 | Body (GDD 3.22) | the body HUD's bars and the strike button | `body_health`, `body_stamina`, `body_strike` |
