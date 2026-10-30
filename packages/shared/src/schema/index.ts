@@ -15,8 +15,9 @@ import { schema, t } from '@colyseus/schema';
 // `Avatar.nearBits`) join version 6 without another bump. Version 7 (round 10, docs/round10/seams.md 3): A10's
 // `SceneState.propStates` and A12's `ItemStack.slot` and `Inventory.selected` (A245); the other round-10 rows
 // join version 7.
-// A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5), C1 adds `Private.onLine`
-// (row 6), B8 adds `Private.pair` (row 10) and C2 `Private.fare` (row 11) to version 7.
+// A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5), C1 `Private.onLine` (row 6), B8
+// `Private.pair` (row 10), C2 `Private.fare` (row 11), and B3 `GameState.petition` and `Private.petitionSigned`
+// (row 13) to version 7.
 
 export const SCHEMA_VERSION = 7;
 
@@ -267,6 +268,8 @@ export const Private = schema(
     pair: PairState,
     /** Round 10 (GDD 3.23, C2): the Scrip this seat owes the line for its returns; only its owner sees it. */
     fare: u16(),
+    /** Round 10, B3 (seams.md 3 row 13): whether this seat has signed the open petition. Own view only. */
+    petitionSigned: bool(),
   },
   'Private',
 );
@@ -328,6 +331,32 @@ export const MeetingState = schema(
   'MeetingState',
 );
 
+/**
+ * Round 10, B3 (GDD 3.31, seams.md 3 row 13): one supporting entry of the open petition, as the public sees it. `value`
+ * is filled only for a kind anyone may read (footprints, thread), else 0; `backed` is a Verified or Corroborated entry.
+ * No entry id, tick, note or `of`.
+ */
+export const PetitionEntry = schema(
+  { clueKind: u8(), value: u8(), sceneId: u8(), backed: bool() },
+  'PetitionEntry',
+);
+/**
+ * Round 10, B3: the open petition, one at a time; `id` '' when none is open. `accused` a roster seat id; `needed` the
+ * other signatures it needs and `signed` how many it has, a count only: no opener and no signer is on the wire.
+ */
+export const Petition = schema(
+  {
+    id: str(),
+    accused: str(),
+    charge: str(),
+    needed: u8(),
+    signed: u8(),
+    untilTick: u32(),
+    entries: t.array(PetitionEntry),
+  },
+  'Petition',
+);
+
 export const GameState = schema(
   {
     schemaVersion: u8(SCHEMA_VERSION),
@@ -351,6 +380,8 @@ export const GameState = schema(
      * `economy.json` station id. Public: a building visibly upgrades. No row names who bought it.
      */
     hq: t.map('uint8'),
+    /** Round 10, B3 (GDD 3.31, seams.md 3 row 13): the open petition, public. */
+    petition: Petition,
   },
   'GameState',
 );

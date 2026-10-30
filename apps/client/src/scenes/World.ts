@@ -20,6 +20,7 @@ import {
   type WorldFeed,
 } from '../net/world';
 import { LOOKS_COPY, WORLD_COPY as C, fill } from '../ui/copy';
+import { RefusalHints } from '../ui/copy/refusalHint';
 import { NOTHING_HAPPENS, interactionFails, isNfy, refusalText } from '../ui/copy/refusals';
 import { overlayRoot } from '../ui/dom';
 import { bodyMotion, refusedIn } from '../ui/theme/motion';
@@ -168,6 +169,8 @@ export class World extends Phaser.Scene {
   private statics!: StaticView;
   private readonly bodyViews = new Map<string, BodyView>();
   private hud!: Hud;
+  /** Round 10, 10Y (UI.md 14.51): when each NEED_* refusal last showed, for the second one's hint. */
+  private readonly hints = new RefusalHints();
   private bodyHud!: BodyHud; // round 8, 8A
   private lighting!: Lighting;
   private sheet!: NotebookSheet;
@@ -295,7 +298,14 @@ export class World extends Phaser.Scene {
     const onNoise = (n: NoisePulse) => this.ring(n);
     const onError = (e: ErrorPayload) => {
       const line = this.refusal(e);
-      if (line !== null) this.hud.say(line, undefined, isNfy(e.reason) ? 'nfy' : undefined);
+      // Round 10, 10Y (UI.md 14.51): the second identical NEED_* in 30 s adds where the thing is found.
+      const hint = line === null ? null : this.hints.take(e, performance.now());
+      if (line !== null)
+        this.hud.say(
+          hint ? `${line} ${hint}` : line,
+          hint ? 4000 : undefined,
+          isNfy(e.reason) ? 'nfy' : undefined,
+        );
       refusedIn(overlayRoot()); // round 8, 8H (locked): the refused prompt shakes (UI.md 9)
       if (e.code === 423 || e.code === 428) this.audio.play('door_locked');
     };
