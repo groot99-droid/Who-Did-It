@@ -77,7 +77,7 @@ export const Interaction = z
     target: ClassId,
     /**
      * The server routine that runs the hold: the generic ones, or a legacy action kept as an alias. `sharpen` (round
-     * 10, x5) restores every worn tool the seat carries instead of dropping anything.
+     * 10, x9) restores every worn tool the seat carries instead of dropping anything.
      */
     handler: z.enum([
       'stock',

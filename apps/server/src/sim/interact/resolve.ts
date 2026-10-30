@@ -230,7 +230,7 @@ export function handleInteract(room: PartyRoom, sessionId: string, targetId: str
 /**
  * One tick of an interact hold (`runHolds`): moving, a phase change, a prop another seat changed, a lost tool or a
  * full pack cancel it with nothing done; at the end of `holdS` the drops land, the tool wears, the prop changes state
- * and the noise sounds. A `sharpen` hold (the grindstone, round 10, x5) instead forgets every use worn off the seat's
+ * and the noise sounds. A `sharpen` hold (the grindstone, round 10, x9) instead forgets every use worn off the seat's
  * tools, so each is whole again; a tool that broke is gone for good.
  */
 export function tickInteract(room: PartyRoom, sessionId: string, p: PlayerSim): void {
@@ -279,7 +279,7 @@ export function wear(room: PartyRoom, sessionId: string, player: PlayerState, to
   worn.set(tool, 0);
 }
 
-/** Whether a tool the seat still carries has uses worn off it (round 10, x5: the grindstone has work only then). */
+/** Whether a tool the seat still carries has uses worn off it (round 10, x9: the grindstone has work only then). */
 function hasWorn(room: PartyRoom, player: PlayerState): boolean {
   for (const [tool, n] of WORN.get(room)?.get(player.id) ?? [])
     if (n > 0 && count(player, tool) > 0) return true;

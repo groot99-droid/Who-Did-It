@@ -8,9 +8,9 @@ import { simOf } from '../src/sim/RoomSim';
 import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
 import { sleep } from './simHelpers';
 
-// Round 10, x5 (A313; GDD 3.14): the grindstone restores a worn tool. A bare-handed hold of `holdS` at the lumber
+// Round 10, x9 (A313; GDD 3.14): the grindstone restores a worn tool. A bare-handed hold of `holdS` at the lumber
 // camp's grindstone forgets every use worn off the seat's tools; a seat with nothing worn is refused ALREADY_DONE
-// with the table's line, and the Lockpicks' charges are not wear. Before x5 the stone had no class, so the hold
+// with the table's line, and the Lockpicks' charges are not wear. Before x9 the stone had no class, so the hold
 // was NO_TARGET.
 
 let colyseus: ColyseusTestServer;
@@ -60,7 +60,7 @@ async function wearAxe(p: Party): Promise<void> {
   expect(wornOf(p.room, p.humans[0]!.id, 'axe')).toBe(1);
 }
 
-describe('the grindstone (x5)', () => {
+describe('the grindstone (x9)', () => {
   it('restores a worn tool at the end of the hold and not before', async () => {
     const p = await party();
     const id = p.humans[0]!.id;

@@ -482,7 +482,7 @@ none is role-bound, and the content check refuses a wall that no neutral tool ca
 head saw (BlackPine, `bp_mill`) turns one Log into 2 Timber in 4 s, a saw horse (the mill and the lumber camp) one into 1
 Timber in 8 s, bare-handed, by day, with no tool wear and no noise yet. A seat with no Log is refused `NEED_ITEM`. The Timber nodes
 still give Timber directly (they are the camp's cut stacks). A worn tool breaks when its uses run out (one is taken); the wear is server memory per seat and tool.
-**The grindstone** (round 10, x5; A313). A hold of 6 s at a grindstone (`bc.grindstone` in the lumber camp and `bf.grindstone`
+**The grindstone** (round 10, x9; A313). A hold of 6 s at a grindstone (`bc.grindstone` in the lumber camp and `bf.grindstone`
 in the smithy, so BlackPine only: HollowMere has no grindstone, and a tool worn out there is gone), bare-handed, by day or by
 night and silent, forgets every use worn off the tools the seat carries, so each is whole again. A tool that broke is gone, and
 the Lockpicks' charges are not wear and stay as they are. A seat whose tools are whole, or that carries none, is refused
