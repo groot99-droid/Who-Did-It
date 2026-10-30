@@ -10,7 +10,7 @@ import { emitNoise } from '../Noise';
 import { simOf } from '../RoomSim';
 import { type Refusal, refusal } from '../refusal';
 import { navGrid, reject, sceneKey } from '../World';
-import { DERRINGER_ITEM, onShotArrival } from './arrival';
+import { onShotArrival } from './arrival';
 import { acceptOpenContract, openContract } from './contract';
 
 /**
@@ -26,7 +26,8 @@ import { acceptOpenContract, openContract } from './contract';
  * at the mark accepts an open contract first.
  */
 
-const DERRINGER = DERRINGER_ITEM; // the ability and the item share the id
+/** The ability's and the item's id (`arrival.ts` `DERRINGER_ITEM`; a literal, so no import cycle reads it early). */
+const DERRINGER = 'derringer';
 
 export function handleDerringer(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   const sim = simOf(room);
