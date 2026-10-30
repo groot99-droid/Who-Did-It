@@ -78,6 +78,12 @@ for (const [name, width, height, query] of [
       await page.getByTestId('craftgrid-size').click();
       await expect(page.getByTestId('craftgrid-cells').locator('button')).toHaveCount(9);
       await fits(grid, width, height);
+      // The out slot sits beside the cells behind its arrow (14.51.4), not under the first column as a tenth cell.
+      const cells = (await page.getByTestId('craftgrid-cells').boundingBox())!;
+      const out = (await page.getByTestId('craftgrid-out').boundingBox())!;
+      expect(out.x).toBeGreaterThanOrEqual(cells.x + cells.width);
+      expect(out.y).toBeGreaterThanOrEqual(cells.y);
+      expect(out.y + out.height).toBeLessThanOrEqual(cells.y + cells.height);
       await page.screenshot({ path: info.outputPath(`crafting-${name}.png`), animations: 'disabled' });
       await page.getByTestId('inventory-close').click();
 
@@ -139,6 +145,82 @@ for (const [name, width, height, query] of [
       await page.keyboard.down('Space');
       await expect(status).toHaveText('The pick snaps.', { timeout: 5000 });
       await page.keyboard.up('Space');
+    });
+
+    // The HUD's rows and the bottom band (14.51.4): with a toast on the stack and a target in reach, nothing in the
+    // top rows covers another and the band's layers (keys or cluster, hotbar, body panel, prompt, toasts) stay apart.
+    test('the HUD and the bottom band', async ({ page }, info) => {
+      await toWorld(page, `&m5b=1${query}`);
+      // Back from the line puts "You are back." on the toast stack (the toast lasts 3 s: the boxes are read at once).
+      await line(page, true, 'wolf');
+      await expect(page.getByTestId('on-the-line')).toBeVisible();
+      await line(page, false);
+      await expect(page.locator('.wdi-toast', { hasText: 'You are back.' })).toBeVisible();
+      const at: Record<string, Locator> = {
+        chip: page.locator('.wdi-hud-chip'),
+        notebook: page.getByTestId('notebook-open'),
+        clock: page.getByTestId('hud-clock'),
+        work: page.locator('.wdi-m5b__work'),
+        art: page.getByTestId('art-style'),
+        gear: page.getByTestId('settings-gear'),
+        toasts: page.locator('.wdi-hud > .wdi-toasts'),
+        prompt: page.getByTestId('m5b-prompt'),
+        body: page.getByTestId('body'),
+        hotbar: page.locator('.wdi-hotbar'),
+        keys: page.locator('.wdi-m5b__keys'),
+      };
+      const pairs: Array<[string, string]> = [
+        ['chip', 'notebook'],
+        ['chip', 'clock'],
+        ['notebook', 'clock'],
+        ['clock', 'work'],
+        ['work', 'art'],
+        ['art', 'toasts'],
+        ['gear', 'toasts'],
+        ['toasts', 'prompt'],
+        ['prompt', 'body'],
+        ['body', 'hotbar'],
+        ['hotbar', 'keys'],
+      ];
+      if (query.includes('touch=1')) {
+        at.cluster = page.locator('.wdi-touch-cluster');
+        at.discs = page.locator('.wdi-touch-abilities');
+        at.stick = page.locator('.wdi-stick');
+        // The mock's card deals the Killer, so the discs row (14.51.1) is there and raises the floor.
+        pairs.push(
+          ['hotbar', 'cluster'],
+          ['keys', 'cluster'],
+          ['hotbar', 'discs'],
+          ['keys', 'discs'],
+          ['keys', 'stick'],
+          ['body', 'stick'],
+        );
+      }
+      await expect(at.prompt!).toBeVisible();
+      await expect(at.body!).toBeVisible();
+      const box: Record<string, { x: number; y: number; width: number; height: number }> = {};
+      for (const [key, el] of Object.entries(at)) {
+        const b = await el.boundingBox();
+        expect(b, `${key} is on the screen`).not.toBeNull();
+        expect(b!.x, `${key} starts inside the viewport`).toBeGreaterThanOrEqual(-0.5);
+        expect(b!.x + b!.width, `${key} ends inside the viewport`).toBeLessThanOrEqual(width + 0.5);
+        expect(b!.y + b!.height, `${key} ends above the viewport's foot`).toBeLessThanOrEqual(height + 0.5);
+        box[key] = b!;
+      }
+      for (const [a, b] of pairs) {
+        const ra = box[a]!;
+        const rb = box[b]!;
+        const apart =
+          ra.x + ra.width <= rb.x + 0.5 ||
+          rb.x + rb.width <= ra.x + 0.5 ||
+          ra.y + ra.height <= rb.y + 0.5 ||
+          rb.y + rb.height <= ra.y + 0.5;
+        expect(apart, `${a} and ${b} do not overlap`).toBe(true);
+      }
+      // The chip's goal line ends in an ellipsis by design, so it is not put through `fits`.
+      await fits(at.hotbar!, width, height);
+      await fits(at.keys!, width, height);
+      await page.screenshot({ path: info.outputPath(`band-${name}.png`), animations: 'disabled' });
     });
   });
 }

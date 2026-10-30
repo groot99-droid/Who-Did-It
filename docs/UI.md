@@ -508,7 +508,7 @@ screenshots at 1280 x 720 and 390 x 844 in `docs/ui/`:
 | `rolecard-front`, `rolecard-back` | the Detective's card and the back of the card | 2 step 4, 3.2 |
 | `hud` | chip, night clock, log, stick and buttons, a toast over a dark world | 2 steps 5 to 7 |
 | `refusal` (10Y, round 10; from `e2e/refusals.spec.ts`, not a static page) | the greyed gather prompt and the log with a hinted refusal, the longest `fail` line and an NFY line | 14.51 |
-| `inventory`, `crafting`, `asleep`, `line`, `lockpick` (10Y, round 10; from `e2e/screens.spec.ts`, not static pages) | the Pockets screen and the crafting square over the bottom band, the asleep veil with the bed count, On the line with the train clock, the lock-pick board with a lifted pin | 14.44, 14.46, 14.47, 14.48 |
+| `inventory`, `crafting`, `asleep`, `line`, `lockpick`, `band` (10Y, round 10; from `e2e/screens.spec.ts`, not static pages) | the Pockets screen and the crafting square over the bottom band, the HUD's rows and the band on a phone (14.51.4), the asleep veil with the bed count, On the line with the train clock, the lock-pick board with a lifted pin | 14.44, 14.46, 14.47, 14.48 |
 | `touch-390w` (10Y, round 10; from `e2e/touch.spec.ts`, not a static page; 390 x 844 only) | the Killer's Kill and Lock door discs over the Use, Run, Sneak and Strike cluster on a phone | 14.51.1 |
 | `meeting` | eight portraits, the tally, chat, claim chips, the vote | 2 step 8, 3.8 |
 | `menu-mockup` (owner, Claude Design, 2026-10-23) | the round-7 menu: title, glass buttons, profile chip, sound toggle over the loop (`docs/round7/ui-reskin.md`) | 2 step 1, 3.21 |
@@ -541,7 +541,10 @@ braces is filled at run time, from state (`{name}`, `{scene}`) or from content (
 `balance.phases.duskS`, `{maxChars}` is `balance.chat.maxChars`). `{name}` is a seat's public name,
 `{scene}` a scene's `name` from `scenes/*.json` ("The Drowned Lantern"), `{role}` a role's `name`
 from `roles.json`, `{key}` the bound key shown as a keycap. Lines on the landing, lobby and role
-card already exist in `ui/{Landing,Lobby,RoleCard}.ts` and are listed in 14.11 so the deck is whole.
+card already exist in `ui/{Landing,Lobby,RoleCard}.ts` and are listed in 14.11 so the deck is whole. A table row
+that names one key gives its line as the client holds it: `ui/copy/uiDeck.test.ts` (10Y, round 10, A414) reads these
+tables and fails on a key no copy module holds or a text the client does not say; a line that moves to a later section
+leaves its old table.
 
 House style: sentence case; no exclamation marks; the second person for the player ("You are a
 ghost"); the past tense for what happened ("Hana rang the bell"); the village's own words over game
@@ -598,12 +601,13 @@ Bandage refusal reads exactly like a missed strike that the GDD calls "nothing h
 | `refuse.busy` | 426 | Your hands are full |
 | `refuse.cooldown` | 424 | Not ready yet |
 | `refuse.reach` | 427 | Too far |
-| `refuse.nothing` | 422 on `kill` | Nothing happens |
-| `refuse.reported` | 422 on `reportBody` | Someone already reported this body |
 | `refuse.bell` | a refused `bell` | The bell is spent for you |
-| `refuse.locked` | 423 | Locked (and `door_locked` plays) |
-| `refuse.closed` | 428 | Boarded up (and `door_locked` plays) |
-| `refuse.generic` | other 4xx | That did not work |
+| `refuse.locked` | 423 | Locked |
+| `refuse.closed` | 428 | Boarded up |
+
+`refuse.locked` and `refuse.closed` also play `door_locked`. The 422 lines (`kill`, `reportBody`) and the generic line
+are gone (10A, 10G): a refusal shows the line of its reason from 14.43 (`ALREADY_DONE` reads "Someone already reported
+this body.", an unknown reason "Nothing happens."), never the server's `msg` (14.45).
 
 ### 14.4 HUD and log (N)
 
@@ -616,11 +620,9 @@ Bandage refusal reads exactly like a missed strike that the GDD calls "nothing h
 | `phase.day` | Day | |
 | `phase.dusk` | Dusk | |
 | `phase.night` | Night | `--night` clock |
-| `phase.meetingDiscussion` | Discuss | |
-| `phase.meetingVote` | Vote | |
-| `phase.reveal` | Reveal | |
+| `phase.dawn` | Dawn | |
 | `phase.immunity` | Calm | kills are off; the word avoids promising more than that |
-| `phase.gameOver` | Over | |
+| `phase.finalNight` | Final night | the Final Night's clock (GDD 3.2) |
 | `log.scream` | A scream from the {dir} | `{dir}` from `dir.*` below; also `scream` plays |
 | `log.door` | A door to the {dir} | a door noise from another player |
 | `log.steps` | Footsteps to the {dir} | a run noise |
@@ -632,6 +634,9 @@ Bandage refusal reads exactly like a missed strike that the GDD calls "nothing h
 | `log.crowbar` | Wood splintering to the {dir} | the `crowbar` mode's noise |
 | `log.lockpick` | Scratching at a lock to the {dir} | the `lockpick` mode's noise; the pick's own screen says more |
 | `log.noise` | Something to the {dir} | any noise kind this client has no line for; a new server kind never reads as a door (`ui/copy/noise.ts`) |
+
+The meeting and the game over are screens of their own, not clock captions: the meeting's phase reads
+`meeting.phase.*` (14.6) and the end `over.title` (14.10).
 
 Directions (`dirFromVector` ids): `dir.n` north, `dir.ne` north-east, `dir.e` east, `dir.se`
 south-east, `dir.s` south, `dir.sw` south-west, `dir.w` west, `dir.nw` north-west.
@@ -657,15 +662,18 @@ clue reads "Footprints, long stride: Tall", as in GDD 2 step 5.
 
 | Id | Text | Notes |
 |---|---|---|
-| `meeting.title` | Meeting | header |
+| `meeting.title` | Who did it? | header |
 | `meeting.reason.body` | {caller} reported {victim}'s body | `meeting-reason`; `{victim}` is `bodyOf`'s name |
 | `meeting.reason.bell` | {caller} rang the bell | `meeting-reason` |
+| `meeting.reason.bodyUnknown` | {caller} reported a body | a `body` report whose `bodyOf` the roster lacks |
+| `meeting.reason.missing` | Roll call: someone is missing | reason `missing` |
+| `meeting.reason.none` | A meeting has been called | no `meetingStart` yet |
 | `meeting.dead.one` | {names} was found dead | system line, at the start; every death since the last meeting (A30) |
 | `meeting.dead.many` | {names} were found dead | `{names}` joined with commas and "and" |
-| `meeting.vanished` | {name} has vanished | a seat that left during play (cause `vanished`) |
 | `meeting.discuss` | Talk it over | caption beside the discussion timer |
 | `meeting.vote.open` | Votes are secret until the reveal | caption beside the vote timer; voting is open in both phases |
 | `meeting.vote.hint` | Tap a portrait to vote, or Skip | living players only |
+| `meeting.vote.wait` | Votes open in {s} s. Talk it over first | in place of the hint while votes are closed |
 | `meeting.vote.skip` | Skip | `vote-skip` button |
 | `meeting.vote.mine` | Your vote: {name} | after a vote; may change until the vote closes |
 | `meeting.vote.mineSkip` | Your vote: Skip | |
@@ -673,10 +681,21 @@ clue reads "Footprints, long stride: Tall", as in GDD 2 step 5.
 | `meeting.chip.voted` | Voted | the `hasVoted` chip on a portrait |
 | `meeting.chip.dead` | Dead | `--quiet` chip with the ghost glyph |
 | `meeting.chip.you` | You | the self tile |
-| `meeting.allVoted` | Everyone has voted | system line when the reveal starts early |
 | `meeting.tab.report` | Report | tab |
 | `meeting.tab.notebook` | Notebook | tab |
 | `meeting.tab.chat` | Chat | tab |
+| `meeting.phase.discussion` | Discuss | the phase caption (`ui/meetingText.ts`) |
+| `meeting.phase.vote` | Vote | |
+| `meeting.phase.reveal` | Reveal | |
+| `meeting.report.called` | Called | the Report tab's rows (7G): the reason line |
+| `meeting.report.found` | Found | |
+| `meeting.report.found.line` | {name} is dead. | |
+| `meeting.report.here` | Still here | |
+| `meeting.report.here.line` | {living} alive, {voted} voted | |
+
+`meeting.vanished` and `meeting.allVoted` were never built: a seat that leaves during play is a death of cause
+`vanished` on the server (`PartyRoom.ts`), and the reveal starts early once everyone has voted (`sim/Meeting.ts`) with
+no line of its own.
 
 ### 14.7 Chat (M)
 
@@ -687,21 +706,22 @@ clue reads "Footprints, long stride: Tall", as in GDD 2 step 5.
 | `chat.limit` | {n} / {maxChars} | counter, shown once the text nears the limit |
 | `chat.channel.meeting` | Meeting | channel tag on a `meeting` line |
 | `chat.channel.ghost` | Ghosts | channel tag on a `ghost` line |
-| `chat.closed` | Chat opens at the next meeting | a living player's form outside a meeting |
+| `chat.channel.cabal` | Cabal | channel tag on a `cabal` line |
 | `chat.empty` | Nothing said yet | empty log |
+
+`chat.closed` was never built: the chat form exists only in the meeting (`ui/Meeting.ts`).
 
 ### 14.8 Ghost (N in the world, M in the meeting)
 
 | Id | Text | Notes |
 |---|---|---|
-| `ghost.killed` | You were killed in {scene} | on `killed` with cause `knife` |
-| `ghost.ejected` | The village voted you out | on `killed` with cause `ejected` |
-| `ghost.vanished` | You left the match | cause `vanished`, if the client is still up |
-| `ghost.secret` | Nobody knows yet. Your body is the only sign. | after `ghost.killed`, until the next meeting |
-| `ghost.roles` | You can see every role now | the roles from `killed` |
+| `ghost.label` | You are a ghost | the goal chip once dead, in place of `hud.goal` (`view/Hud.ts`) |
 | `ghost.walk` | Walk anywhere. Only ghosts can see you. | the first World after death |
 | `ghost.noVote` | Ghosts cannot vote | in the meeting, in place of `meeting.vote.hint` |
 | `ghost.chat` | Only the dead read this | caption on a ghost's chat form |
+
+`ghost.killed`, `ghost.ejected`, `ghost.vanished`, `ghost.secret` and `ghost.roles` were never built: a death plays
+its cutscene (14.20), shows `toast.ghost` (14.1) and, since C1b, the On-the-line screen with its cause line (14.47).
 
 ### 14.9 Reveal (M)
 
@@ -719,16 +739,25 @@ clue reads "Footprints, long stride: Tall", as in GDD 2 step 5.
 
 | Id | Text | Notes |
 |---|---|---|
+| `over.title` | Game over | eyebrow over the winner |
 | `over.village` | The village wins | `gameover-winner` |
 | `over.cabal` | The Cabal wins | `gameover-winner` |
-| `over.why.cabalOut` | Every Cabal member is dead or ejected | Village win (GDD 3.8) |
-| `over.why.parity` | The Cabal matches the living village | Cabal win by `parity` (GDD 3.8) |
-| `over.why.lastVillager` | One villager is left standing | Cabal win by `villageAtMostOne` (GDD 3.8) |
+| `over.drifter` | The Drifter wins | `Winner.drifter` |
+| `over.nobody` | Nobody wins | winner 5 |
+| `over.none` | The match ended | winner 0 and any other value |
 | `over.roles` | Who was who | header of the role list |
 | `over.row` | {name}: {role} | `gameover-role-<playerId>`, with the faction chip and the ghost glyph for the dead |
+| `over.you` | (you) | after the own name in its row |
+| `over.faction.village` | Village | the faction chip of a row |
+| `over.faction.cabal` | Cabal | |
+| `over.faction.neutral` | Neutral | |
 | `over.you.won` | You won | own row's tag |
 | `over.you.lost` | You lost | own row's tag |
-| `over.lobby` | Back to the lobby in {s} | countdown from `phases.gameOverS` |
+| `over.lobby` | Back to the lobby in {s} s | countdown from `phases.gameOverS` |
+| `over.leave` | Leave party | button beside the countdown |
+
+The reason the match ended is the server's `summary` of the `gameOver` payload (`gameover-summary`), not a client
+line: `over.why.*` were never built.
 
 ### 14.11 Lines that exist today (for reference)
 
@@ -909,8 +938,10 @@ giver is in reach. A toast (`m5b-toast`, `aria-live="polite"`)
 reports a gather, a craft or a quest for a few seconds.
 
 **Panels.** Pockets lists the stacks with the slot count and, for a light in the pocket, a Light / Douse button
-(`act.light`); since round 8 (8A, 14.32) a row whose item any holder may use also carries a Use button. Craft lists the recipes with what each needs, where it is made and a Make / Stop button; a recipe
-missing inputs is listed with `craft.need` and its button disabled. Quests lists every offer in reach, then the quests
+(`act.light`); since round 8 (8A, 14.32) a row whose item any holder may use also carries a Use button. Craft lists the recipes with what each needs and where it is made. A station recipe carries a Make / Stop
+button, disabled with `craft.need` while inputs are missing; a hand recipe (no station: the Torch, the Snare, the
+Leather jerkin) carries `craft.square` instead, which closes the panel and opens Pockets on the crafting square where
+it is made (round 10, 10Y, A374, 14.51.3). Quests lists every offer in reach, then the quests
 the seat holds (taken, done) with `have of total`; Take the work and Hand it in are live only beside the giver, and a
 third quest shows `quest.full`.
 
@@ -949,6 +980,7 @@ Frozen test ids: `m5b`, `m5b-inv`, `m5b-craft`, `m5b-quests`, `m5b-prompt`, `m5b
 | `craft.key`                 | C                                                                                    |
 | `craft.station`             | At the {station}                                                                     |
 | `craft.anywhere`            | Anywhere                                                                             |
+| `craft.square`              | To the square                                                                        |
 | `craft.make`                | Make                                                                                 |
 | `craft.stop`                | Stop                                                                                 |
 | `craft.need`                | Needs {list}                                                                         |
@@ -1445,13 +1477,16 @@ only what the seat holds: a Seal, an Indulgence, each notice.
 
 ### 14.36 Townsfolk (8E)
 
-Lines are in `apps/client/src/ui/copy/townsfolk.ts` (`TOWNSFOLK_COPY`, `figureName(lookId)`). An ambient figure (GDD 3.24) is an avatar whose `lookOf` is a `villager` look id rather than a seat: its nameplate is `figureName(lookOf)`, the plain `figure.villager` for a look with no line of its own, and it never shows a scarf, a hat glyph or a mask. The meeting text reads the count of townsfolk the creatures took since the last meeting (`meetingStart.figuresLost`, once that field lands) and adds one line below the reason; no count, no line.
+Lines are in `apps/client/src/ui/copy/townsfolk.ts` (`TOWNSFOLK_COPY`, `figureName(lookId)`). An ambient figure (GDD 3.24) is an avatar whose `lookOf` is a look id of the `villagers` family or the `figures` looks of `looks.json` (a Constable, 3.31) rather than a seat: its nameplate is `figureName(lookOf)`, keyed by that look id exactly as the wire carries it (round 10, 10Y, A454: the keys 8E wrote as `figure.villager_clerk` and `figure.villager_tallyman` matched no look, so every figure read "Villager"), the plain `figure.villager` for a look with no line of its own, and it never shows a scarf, a hat glyph or a mask. The plate names what is drawn and nothing more: a figure's post (the Company Clerk, the Tallyman, a stallholder) is not on the wire (A160), and the look each post wears is the server's (`routines.json` `townsfolk` `look`). The meeting text reads the count of townsfolk the creatures took since the last meeting (`meetingStart.figuresLost`, once that field lands) and adds one line below the reason; no count, no line.
 
 | Key | Text | Where |
 |---|---|---|
-| `figure.villager` | Villager | the nameplate of any `villager` look without a line of its own |
-| `figure.villager_clerk` | Company Clerk | the nameplate of HollowMere's Clerk (8F's look) |
-| `figure.villager_tallyman` | Tallyman | the nameplate of BlackPine's Tallyman (8F's look) |
+| `figure.villager` | Villager | the nameplate of the plain `villager` look, and of any figure look without a line of its own |
+| `figure.villagerelder` | Elder | the nameplate of the `villagerelder` look (8F's family) |
+| `figure.villagergoodwife` | Goodwife | the nameplate of the `villagergoodwife` look |
+| `figure.villagerlass` | Lass | the nameplate of the `villagerlass` look |
+| `figure.villagerclerk` | Clerk | the nameplate of the `villagerclerk` look (the Company Clerk, the Tallyman and the stallholders, A161) |
+| `figure.constable` | Constable | the nameplate of the `constable` look (round 10, B1; GDD 3.31) |
 | `meeting.townsfolk.lost.one` | The wolves took one of the townsfolk. | the meeting text when one figure died since the last meeting |
 | `meeting.townsfolk.lost.many` | The wolves took {n} of the townsfolk. | the meeting text when more did; `{n}` is the count |
 
@@ -1776,12 +1811,13 @@ Lines are in `apps/client/src/ui/copy/m5b.ts` (`M5B_COPY`, keys `inv.*`, `hotbar
 | `inv.hotbar`, `inv.pack`, `inv.belt` | Hotbar, Pack, Belt |
 | `inv.head`, `inv.body`, `inv.weapon` | Head, Body, Weapon |
 | `inv.pick` | Pick a stack, then a slot that takes it. |
-| `inv.slots` | {n} of {max} slots (the count of used slots over the whole layout) |
+| `inv.slots` | {n} of {max} slots |
 | `grid.title`, `grid.size2`, `grid.size3` | Craft; 2 by 2; 3 by 3 (workbench) |
 | `grid.hint` | Pick a stack, then a square. Take what comes out. |
 | `grid.bound` | That stays with you. It cannot be worked. |
 | `hotbar.label` | Hotbar |
 
+- **The count.** `inv.slots` counts the used slots over the whole layout.
 - **Moves.** Click a stack to pick it; the slots that would refuse the move (`inv.move`: the belt takes tools, a gear
   slot its own gear, a full stack of the same item) are dimmed and cannot be clicked, so a move offered lands. Click the
   picked stack again to put it down.
@@ -1792,12 +1828,14 @@ Lines are in `apps/client/src/ui/copy/m5b.ts` (`M5B_COPY`, keys `inv.*`, `hotbar
   corner and the touch cluster the right, so the keys sit two by two beside the cluster without their key caps, the
   hotbar and the body panel start above the cluster, and the toasts above the body panel (`match.css`, the m5b
   section). The interact prompt (centred) clears the key row on a desktop and the body panel on a phone, and the toasts
-  start above the prompt. The shops' layer (8C) is a second `.wdi-m5b` after the first, so its counter prompt is hidden
-  while a board is open, or it would paint over the modal. `docs/ui/inventory-390w.png` and `inventory-1280x720.png`
-  show the band; `lockpick-390w.png` the board over it.
-- **The crafting square** shows the product the shared match gives as a preview; Take sends `craft.grid` and empties the
-  square. A role-bound item cannot be placed (`grid.bound` on hover); the 3 by 3 button asks the server, which
-  refuses `NEED_STATION` (workbench) away from one. The refusals read their lines from 14.43.
+  start above the prompt; the floor the stack rests on and the heights it adds are in 14.51.4. The shops' layer (8C)
+  is a second `.wdi-m5b` after the first, so its counter prompt is hidden while a board is open, or it would paint
+  over the modal. `docs/ui/inventory-390w.png` and `inventory-1280x720.png` show the band; `lockpick-390w.png` the
+  board over it.
+- **The crafting square** shows the product the shared match gives as a preview in the out slot, beside the cells
+  behind an arrow (14.51.4); Take sends `craft.grid` and empties the square. A role-bound item cannot be placed
+  (`grid.bound` on hover); the 3 by 3 button asks the server, which refuses `NEED_STATION` (workbench) away from one.
+  The refusals read their lines from 14.43. The Craft panel's hand rows (14.19, 14.51.3) land here.
 - The Light, Douse and Use buttons of 14.19.2 and 14.32 sit in a row under the grid for each stack that has the verb.
 
 ### 14.45 Showing a refusal (10G, round 10)
@@ -1884,6 +1922,11 @@ Resistant (`icon_effect_resistant`), named by the data and with no copy of its o
 | a snap (`minigame.lockpick.snap`) | The pick snaps. | the status line, on a release past the snap line and when a held pick snaps on its own (10Y); the server's `PICK_SNAPPED` refusal follows |
 | the Notebook entry of a Scratches clue (D5c, `notebook.entry.scratch`) | Scratches round a lock | the Notebook list, with the scene and time |
 
+**Talk (D9c).** G asks the nearest avatar in reach about the town and H asks the time (`talk.ask`, GDD 3.24); a toast
+says the ask went out ("You ask what the town is saying." / "You ask the time."), and the answer arrives as a system
+line in the chat log (`from` the figure's name). The words live in `ui/talk/talk.ts`. A seat answers nothing: the
+server refuses it like no target.
+
 ### 14.50 The law (10B, round 10)
 
 The server fills these templates (`packages/content/data/laws.json` `briefing`, read by
@@ -1954,6 +1997,42 @@ lines sit under the goal line (`card-vendetta`, `.wdi-card__vendetta`). No copy 
 is read, and nothing changes on the wire. `RoleCard.test.ts` covers the three cases; `e2e/world.spec.ts` checks the
 mock Killer's line (the mock builds its world feed on Ready, so there the line fills once the village is up and
 Tab shows it; a real room has the private view from the join).
+
+#### 14.51.3 The hand recipes point to the square (y8)
+
+Owner answer (b) on `docs/round10/rolecards.md` 1.2 (DECISIONS A374): the Craft panel (14.19.3, `ui/Crafting.ts`)
+stays, and a recipe with no station is made only in the crafting square (14.44, GDD 3.30). Its row keeps its
+inputs, `craft.anywhere` and the `craft.need` / `craft.ready` line, but its button (`craft-<id>`, still the test id)
+reads `craft.square` and is a ghost button that is never disabled: a press closes the panel and opens Pockets, whose
+square is at the foot (`CraftingDeps.openSquare`, wired in `M5bLayer.ts`). The Make / Stop button and the `craft` hold
+are unchanged for the station recipes. `isHandRecipe(row)` decides; `ui/Crafting.test.ts` checks both kinds of row with
+the fake DOM. The server still accepts a `craft` hold for a hand recipe until 10X narrows it (A374).
+
+#### 14.51.4 The phone's top rows, the band's floor and the out slot (10Y, y9)
+
+CSS only (`apps/client/src/ui/theme/components.css`, the phone block; `apps/client/src/ui/match.css`, the m5b
+section): no line changes. Checked by `apps/client/e2e/screens.spec.ts` ("the HUD and the bottom band") at 390 x 844
+with the touch controls and at 1280 x 720 (`docs/ui/band-390w.png`, `docs/ui/band-1280x720.png`): the clock and the
+chip, the hotbar and the cluster, the prompt and the body panel, the toasts and the prompt never overlap, and the out
+slot lies beside the cells.
+
+- **The top rows on a phone.** The goal chip and the Notebook button own the top row (the chip takes what leaves the
+  button its 44px); the clock sits in the second row at the right (`--wdi-hud-row2` is that row's top), the
+  village's work bar (14.38.3) under the clock, the art switch and the gear in one row under the bar with the gear
+  in the corner, and the log under them, since its lines come and go and it is the one row that grows. Side by side
+  at 56vw, the clock painted over the end of the goal line and over the Notebook button; stacked under the log, the
+  switch and the gear reached a stack of three toasts, and four log lines pushed them further.
+- **The band's floor.** `--wdi-band-floor` is the bottom of the hotbar: over the key row (36px) on a desktop, over
+  the touch cluster (232px) on a phone, or over the cluster and the card's ability discs (14.51.1: 308px) when the
+  row has one, over the two rows the keys wrap to (80px) in a narrow window without touch.
+  The body panel sits 3rem above it; on touch and in a narrow window the prompt sits above the panel (73px) and the
+  toasts above the prompt (50px); on a desktop the prompt clears the key row and the toasts the panel. The panel and
+  the prompt had been counted as 60 and 48, so the prompt brushed the panel. On a phone the stack shows its newest
+  toasts, as many whole ones as fit between the controls' row and the prompt: three (a fourth reached the art
+  switch), two over the ability discs. 14.44's band bullet is the rule; this is its measure.
+- **The out slot** of the crafting square (14.44) sits beside the cells behind an arrow, dashed and a size larger
+  (3.5rem), so it no longer reads as a tenth cell under the first column (`crafting-390w.png`,
+  `crafting-1280x720.png`).
 
 #### 14.51.5 On the line: the place, the book and the bells (y13)
 

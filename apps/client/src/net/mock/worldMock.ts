@@ -661,6 +661,9 @@ export class MockWorldFeed implements WorldFeed {
     // The mock has no task layer: `?minigame=<kind>` opens a modal whose result is dropped here.
   }
 
+  /** Round 10 (D9c): the mock has no figures to answer. */
+  talk(_targetId: string, _ask: 'town' | 'time'): void {}
+
   /** Round 8 (8B): the mock reads every bot as unhurt and sign-free; no reach or cooldown check. */
   inspect(targetId: string): void {
     const b = [...this.actors.values()].find((a) => a.handle === targetId && a.id !== this.selfId);

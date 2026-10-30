@@ -220,11 +220,18 @@ describe('EntityView (GDD 3.17)', () => {
 
   it('draws a villager figure with its look and its figure name, reading nothing from the roster', () => {
     const v = view();
-    v.update(roster, 0, [avatar('h-c', 'villagerclerk', { height: 1 }), avatar('h-v', 'villager')], 'h-me');
+    v.update(
+      roster,
+      0,
+      [avatar('h-c', 'villagerclerk', { height: 1 }), avatar('h-v', 'villager'), avatar('h-k', 'constable')],
+      'h-me',
+    );
     expect(v.has('h-c')).toBe(true);
     const names = live().map((m) => [m.name, m.look.lookId]);
     expect(names).toContainEqual([figureName('villagerclerk'), 'villagerclerk']);
     expect(names).toContainEqual([figureName('villager'), 'villager']);
+    // Round 10 (A454): a Constable's plate names what is drawn, never the villager fallback of a key no look matched.
+    expect(names).toContainEqual(['Constable', 'constable']);
     // A ghost viewer's mask needs a seat; a figure has none.
     v.setGhost(true);
     v.update(roster, 1, [avatar('h-c', 'villagerclerk')], 'h-me');

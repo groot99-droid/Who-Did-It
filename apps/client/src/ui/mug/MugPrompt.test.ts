@@ -33,9 +33,9 @@ const asEl = (n: FakeNode) => n as unknown as HTMLElement;
 
 describe('muggerName', () => {
   it('names a figure by its villager look, a seat by the character drawn, and a gone handle as a villager', () => {
-    const avatars = [avatar('h1', 'villager_clerk'), avatar('h2', 'p2'), avatar('h3', 'villager')];
+    const avatars = [avatar('h1', 'villagerclerk'), avatar('h2', 'p2'), avatar('h3', 'villager')];
     const roster = [seat('p2', 'Moll')];
-    expect(muggerName('h1', avatars, roster)).toBe('Company Clerk');
+    expect(muggerName('h1', avatars, roster)).toBe('Clerk');
     expect(muggerName('h2', avatars, roster)).toBe('Moll');
     expect(muggerName('h3', avatars, roster)).toBe('Villager');
     expect(muggerName('gone', avatars, roster)).toBe('Villager');
@@ -66,7 +66,7 @@ describe('mountMugPrompt', () => {
       asEl(root),
       {
         bus,
-        avatars: () => [avatar('h1', 'villager_tallyman')],
+        avatars: () => [avatar('h1', 'villagerlass')],
         snapshot: () => [],
         clock: () => ({ tick, phase: 3, phaseEndsTick: 0, startTick: 0, round: 1 }),
       },
@@ -81,7 +81,7 @@ describe('mountMugPrompt', () => {
     expect(root.byTestId('mug-prompt')).toBeUndefined();
     prompt(6);
     expect(panel.open()).toBe(true);
-    expect(root.byTestId('mug-title')?.content).toBe('Tallyman wants your purse.');
+    expect(root.byTestId('mug-title')?.content).toBe('Lass wants your purse.');
     expect(root.byTestId('mug-timer')?.content).toBe('6 s to choose');
     // Part one: Pay alone; Run and Fight join with the fists (A180).
     expect(root.byTestId('mug-flee')).toBeUndefined();
