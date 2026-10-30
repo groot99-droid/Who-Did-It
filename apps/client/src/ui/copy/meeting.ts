@@ -61,6 +61,11 @@ export const MEETING_COPY = {
   'over.cabal': 'The Cabal wins',
   'over.drifter': 'The Drifter wins',
   'over.nobody': 'Nobody wins',
+  // Round 10, C5 (GDD 3.8, UI.md 14.47): Paint The Town Red's win and its tally.
+  'over.paintTown': 'The Killers paint the town red',
+  'over.paint.title': 'Paint The Town Red',
+  'over.paint.target': 'The town needed {n} different kills',
+  'over.paint.row': '{name}: {unique} different, {total} in all',
   'over.none': 'The match ended',
   'over.roles': 'Who was who',
   'over.row': '{name}: {role}',

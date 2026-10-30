@@ -47,7 +47,27 @@ describe('routinesEdit', () => {
     const e = setMaps(r, id, []);
     expect('routines' in e && 'maps' in e.routines.townsfolk[id]!).toBe(false);
     const keys = 'routines' in e ? Object.keys(e.routines.townsfolk[id]!) : [];
-    expect(keys).toEqual(['look', 'named', 'fixed', 'stations']);
+    expect(keys).toEqual(Object.keys(r.townsfolk[id]!).filter((k) => k !== 'maps'));
+  });
+
+  it('keeps guard and count where the file has them, in its order (the clerk, the Constables)', () => {
+    const clerk = setStations(r, 'clerk', [
+      'pump',
+      ...r.townsfolk.clerk!.stations.filter((k) => k !== 'pump'),
+    ]);
+    expect('routines' in clerk && clerk.routines.townsfolk.clerk).toMatchObject({ guard: true });
+    expect('routines' in clerk ? Object.keys(clerk.routines.townsfolk.clerk!) : []).toEqual(
+      Object.keys(r.townsfolk.clerk!),
+    );
+    const guards = setFixed(r, 'constable', true);
+    expect('routines' in guards ? Object.keys(guards.routines.townsfolk.constable!) : []).toEqual([
+      'look',
+      'named',
+      'fixed',
+      'guard',
+      'count',
+      'stations',
+    ]);
   });
 
   it('refuses an unknown kind and sets and clears a hold', () => {
