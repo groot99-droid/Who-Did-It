@@ -1,1 +1,8 @@
-{ "gddRef": "3", "laws": {} }
+{
+  "gddRef": "3",
+  "laws": {},
+  "briefing": {
+    "line": "Constables' briefing: {clue} in {scene}.",
+    "withTrait": "Constables' briefing: {clue} in {scene}, {trait}."
+  }
+}

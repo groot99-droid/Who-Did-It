@@ -1831,3 +1831,18 @@ the train brings the seat back the screen lifts and a 3 s toast says so. The man
 | how the seat died (`line.cause.wolf`, `.creature`, `.shot`, `.other`) | A wolf took you. / Something in the dark took you. / A shot took you. / You fell by day. | On the line, centre |
 | what it keeps (`line.kept`) | Your card, your Notebook and your quests come back with you, and what you wear. Your coins lie where you fell; your pack is lost. | On the line, below |
 | back (`line.back`) | You are back. | toast, 3 s, to the returning seat, after the morning train or the Final Night's bells |
+
+### 14.50 The law (10B, round 10)
+
+The server fills these templates (`packages/content/data/laws.json` `briefing`, read by
+`apps/server/src/sim/law/Briefing.ts` and, with D9, by a Constable's tips) and sends them on the `system` chat
+channel, the same words to every client (GDD 3.31):
+
+| Moment | Line |
+|---|---|
+| A briefing, an Anyone clue with a trait | Constables' briefing: {clue} in {scene}, {trait}. |
+| A briefing, no trait | Constables' briefing: {clue} in {scene}. |
+
+`{clue}` is the clue's `clues.json` name in lower case, `{scene}` the scene's name and `{trait}` the trait's
+`traits.json` label in lower case. A line never names a seat, a handle, a card or a time, and never says Forged
+or Verified.

@@ -4,6 +4,7 @@ import { VIEW_RECONCILE_EVERY_TICKS } from '@wdi/shared';
 import { runDebugStart } from '../rooms/handlers/movement';
 import { publishAvatars } from './Avatars';
 import { runDecay } from './Clues';
+import { runLaw } from './law/Briefing';
 import { runPairing } from './law/Pairing';
 import { runAuto } from './auto/Auto';
 // Round 8, 8E: before the vendettas, so `figureNotSeat` registers ahead of 7H's checks (their test pins them last).
@@ -64,6 +65,7 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   runNightPowers(room); // round 5, 5G: night powers, aims, Inherit (locked call site)
   runPortals(room);
   runDecay(room); // M3: clue decay and cap
+  runLaw(room); // round 10, B2: the Constables' briefing
   runPairing(room); // round 10, B8: Walk with me
   runResources(room); // round 6, 6F (locked call site)
   runInteract(room); // round 10, A10: the logic table's prop states

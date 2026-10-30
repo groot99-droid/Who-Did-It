@@ -553,6 +553,11 @@ export const BalanceFile = z.strictObject({
    * stays within the leash.
    */
   guard: Section({ leashTiles: Tiles, angerS: Seconds }),
+  /**
+   * Round 10, B2 (GDD 3.31): the law. The Constables verify a clue `speedMult` times a Detective's rate (its
+   * `clues.collectHoldS`) and post a briefing `briefingAfterS` after it appears.
+   */
+  law: Section({ speedMult: z.number().positive(), briefingAfterS: Seconds }),
   /** Round 10, A7 (GDD 3.32): sleeping through the night. */
   sleep: Section({
     /** Every active player asleep this long ends the night. */
