@@ -6,6 +6,7 @@ import { emitSim } from '../events/bus';
 import { creatureKill } from '../Kill';
 import { mobBodies } from '../Mobs';
 import { simOf } from '../RoomSim';
+import { damageFactor } from './armour';
 import { applyEffect, cureEffect, deriveEffects, hasEffect } from './effects';
 import { type Body, bodies, bodyOf, bodyRng, removeBody } from './state';
 
@@ -42,7 +43,11 @@ export function hurt(room: PartyRoom, target: string, row: DamageRow, hit: Hit):
   if (!body) return 'none';
   if (hasEffect(body, 'knockedOut') && !row.kills) return 'none';
   const tick = room.state.tick;
-  const dmg = Math.max(0, Math.round(row.dmg * (hit.factor ?? 1)));
+  // The wearer's armour (round 10, D6a, GDD 3.22); the Knife never comes here, so it ignores armour.
+  const dmg = Math.max(
+    0,
+    Math.round(row.dmg * (hit.factor ?? 1) * damageFactor(room, target, hit.cause !== undefined)),
+  );
   body.hp = Math.max(0, body.hp - dmg);
   body.lastHurtTick = tick;
   const applied: EffectKey[] = [];
