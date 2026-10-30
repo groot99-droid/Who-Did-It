@@ -139,10 +139,11 @@ Inventory: 24 slots (the round-10 screen splits them into a hotbar of 6 and a pa
 | Medkit, Bandage, Salts | Heal and stop Bleeding; kill immunity 60 s and stop Bleeding; cure Slowed or Poisoned (3.22) | V1 |
 | Remedy, Nightshade, Fowling Piece | Herbalist's save and poison (one each), and the Remedy cures Poisoned by day (3.22); the Gamekeeper's Last Shot | V1 |
 | Wake Loaf | Food: cures Famished and Weakened and restores stamina (3.22) | V1 |
-| Lantern, Candle | Carried light radius 4 / 2; wolves flee light within 4 tiles; off = stealthier | V1 |
+| Lantern, Candle | Carried light radius 4 / 2; wolves flee light within 4 tiles; off = stealthier. Since round 10 (K3) every card's start kit holds a light, a Candle where it had none | V1 |
 | Pocket Watch, Chalk, Rope | Time; floor marks; free a snared player | V1 |
 | Oil, Wrench, Planks, Letter, Flour | Task deliverables fetched from other scenes | V1 |
-| Forged Alibi, Handcuffs, Crossbow kit, Lockpicks, Smoke Bomb, Heirlooms | V1.5 kits | V1.5 |
+| Handcuffs | Held in the selected hotbar slot, they cut a cuff hold (3.31) to `kit.handcuffsHoldMult` of `law.cuffHoldS`, and the cuff spends them; sold at the general store. They change nothing outside a manhunt (round 10, K3) | V1.5 |
+| Forged Alibi, Crossbow kit, Lockpicks, Smoke Bomb, Heirlooms | V1.5 kits | V1.5 |
 
 **Tasks.** Village players get 3-5 tasks; the global bar at 100% wins. Each needs a tool from another scene and a 2 s hold at the node: Light the lanterns (Oil from the tavern back room to a square lantern post, night only), Fix the well pump (Wrench from the apothecary bench), Deliver a letter (from the widow's letter box to the tavern dartboard), Mend the fence (2 Planks from the edge of Gallows Wood by the gate to the NE fence; while mended, wolves cannot enter the village), Fetch the flour (from Crumb's Ovens to the tavern); and behind Crumb's Ovens (round 7, A118) Mix the dough (Flour from the bakery's sacks to the mixer), Stoke the oven (Timber from the woodpile at the edge of Gallows Wood to the brick oven), Stock the cold room (a Bucket of well water from the pump to the cold shelves) and Proof the loaves (a Candle from the widow's bedroom to the proofing cabinet), which join the pool the deal draws from, the number dealt and the bar's maths unchanged. Co-op task (Shutter the windows, in the tavern): both players within 2 tiles of the node holding E for 4 s; progress pauses when one releases. Two-player carrying is V1.5. Completing a task writes a Claimed alibi entry (time + scene). Cabal see a fake list that writes entries but never fills the bar. Ghost task completion counts 100% but ghost contribution is capped at 25% of the bar, except the martyred Vicar's (3.20). A full bar in play ends the match for the Village.
 
@@ -541,7 +542,10 @@ in a dark scene receives another avatar only within the night radius and a clear
 grid (walls, and the `u` ground that is walkable but blocks sight), or when that avatar stands in the pool of a
 scene light burning now; a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both
 seeing and being seen, so two lit seats see each other 4 tiles further. Every light starts out: its holder lights
-it or puts it out (`act.light`), and a lit light shows on its avatar as the lantern bit, never by card. At night and
+it or puts it out (`act.light`), and a lit light shows on its avatar as the lantern bit, never by card. An NPC seat
+lights the light it holds by the rule a person would follow (round 10, K3): at dusk, by night and in a scene that is
+dark by day, a delay within `kit.npcLightDelayS` after the rule says so, and it puts it out when the rule stops, so a
+lit light marks no human. At night and
 in the Final Night every scene is dark on the server in the same way (round 8, 8L, A190), so a lantern post's pool
 on the square shows who stands in it and nothing else; by day, at dusk and at dawn an ordinary scene is sent whole
 and its darkness stays the client's picture (3.13). Ghosts see everything. (6G; 3.7's lantern line
@@ -1394,7 +1398,8 @@ filing there would tell the table that no human is left on the town side.
 
 **The manhunt (B4).** A passed petition's warrant waits its turn, and one manhunt runs at a time, for
 `manhunt.durationS` (120 s), a world phase rather than a pause. It is public as `GameState.manhunt` (the accused, its
-clock and its state: hunting, then cuffed). Any living, free seat may **cuff**: a hold of `law.cuffHoldS` (3 s) with a
+clock and its state: hunting, then cuffed). Any living, free seat may **cuff**: a hold of `law.cuffHoldS` (3 s, `kit.handcuffsHoldMult` of it with Handcuffs in the
+selected hotbar slot, which the cuff spends) with a
 figure in reach (`act.hold {action: 'cuff'}`), stopped if the cuffer moves, the figure leaves reach, the figure strikes
 or the cuffer is struck. The cuff tests the face the figure is drawn with, never the seat behind it: a figure not
 drawn as the accused is refused (`NOT_HUNTED`), the accused drawn as someone else included. It lands on the seat

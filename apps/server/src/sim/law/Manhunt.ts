@@ -3,6 +3,7 @@ import { ManhuntState, Phase, type RefusalReason, TICK_RATE, TILE_PX } from '@wd
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { avatarMemory, avatarOf, resolveHandle } from '../Avatars';
 import { emitSim, onSim } from '../events/bus';
+import { heldItem, take } from '../Inventory';
 import { isNpcSeat } from '../Npc';
 import { type PlayerSim, simOf } from '../RoomSim';
 import { isOnLine } from '../Train';
@@ -146,8 +147,13 @@ export function tickCuff(room: PartyRoom, seat: string, p: PlayerSim): void {
     p.hold = null;
     return;
   }
-  if (room.state.tick - hold.startTick < Math.round(balance.law.cuffHoldS * TICK_RATE)) return;
+  // Handcuffs in the held slot cut the hold (K3, GDD 3.5) and the cuff spends them; the hold itself shows nothing new.
+  const player = room.state.players.get(seat);
+  const cuffed = player !== undefined && heldItem(player) === 'handcuffs';
+  const holdS = balance.law.cuffHoldS * (cuffed ? balance.kit.handcuffsHoldMult : 1);
+  if (room.state.tick - hold.startTick < Math.round(holdS * TICK_RATE)) return;
   p.hold = null;
+  if (cuffed) take(player, 'handcuffs', 1);
   cuffSeat(room, r.target);
 }
 
