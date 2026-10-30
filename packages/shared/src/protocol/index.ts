@@ -23,6 +23,10 @@ export const C2S = {
   invSelect: 'inv.select',
   /** Round 10, A13 (GDD 3.30): the crafting grid's cells; `sim/Craft.ts`. */
   craftGrid: 'craft.grid',
+  /** Round 10, B8 (GDD 3.31, seams.md 3 row 10): ask a figure in reach to walk with you; `sim/law/Pairing.ts`. */
+  pairAsk: 'pair.ask',
+  /** Round 10, B8: answer an ask (`yes`), or end a pair (`yes: false` while paired). */
+  pairAnswer: 'pair.answer',
   /** Round 10, B3 (GDD 3.31, seams.md 3 row 13): open a petition at a notice board; `sim/law/Petition.ts`. */
   petitionOpen: 'petition.open',
   /** Round 10, B3: sign the open petition. */
@@ -321,6 +325,9 @@ export interface C2SPayloads {
   'inv.move': { from: number; to: number };
   /** Round 10, A12 (GDD 3.30): the hotbar slot whose item is held; refused `BAD_REQUEST` outside the hotbar. */
   'inv.select': { slot: number };
+  /** Round 10, B8 (GDD 3.31, seams.md 3 row 10): `targetId` is the asked figure's avatar handle in the asker's scene. */
+  'pair.ask': { targetId: string };
+  'pair.answer': { yes: boolean };
   /** `accused` a roster seat id; `charge` a `laws.json` crime id; `entries` the opener's Notebook entry ids. */
   'petition.open': { accused: string; charge: string; entries: string[] };
   'petition.sign': { id: string };
@@ -470,6 +477,8 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'inv.move': 10,
   'inv.select': 10,
   'craft.grid': 5,
+  'pair.ask': 2,
+  'pair.answer': 2,
   'petition.open': 2,
   'petition.sign': 2,
 };

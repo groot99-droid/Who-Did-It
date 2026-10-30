@@ -41,6 +41,12 @@ export const ClueKind = {
 } as const;
 export type ClueKindId = (typeof ClueKind)[keyof typeof ClueKind];
 
+/**
+ * Round 10, B8 (GDD 3.31): `Private.pair.state`. `asking` waits for its answer, `asked` holds a human's prompt
+ * open, `declined` shows the asker the one no line until its next ask or dawn.
+ */
+export const PairPhase = { none: 0, asking: 1, asked: 2, paired: 3, declined: 4 } as const;
+
 /** `NotebookEntry.status` values (GDD 3.4; `teaching` is the grace-phase clue of GDD 2 step 5). */
 export const NotebookStatus = {
   claimed: 0,

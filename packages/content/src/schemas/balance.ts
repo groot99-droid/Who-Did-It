@@ -536,6 +536,18 @@ export const BalanceFile = z.strictObject({
    */
   inventory: Section({ hotbar: z.number().int().positive(), belt: z.number().int().nonnegative() }),
   /**
+   * Round 10, B8 (GDD 3.31, seams.md 3 row 10): Walk with me. Every answer reaches the asker `answerS` after the ask,
+   * whoever answers; an NPC seat or a townsperson says yes with `yesChance` (times `scaredMult` while Scared); a
+   * figure partner follows within `followTiles`; a pair apart for `apartS` ends.
+   */
+  pairing: Section({
+    answerS: Span,
+    yesChance: Chance,
+    scaredMult: z.number().positive(),
+    followTiles: Tiles,
+    apartS: Seconds,
+  }),
+  /**
    * Round 10, B3 (GDD 3.31, F4 2.1): petitions. A petition needs ceil(`othersPct` x the living, free humans, the accused
    * left out) other signatures within `openS`; a lapse gives the accused and the opener `cooldownS`; at most
    * `maxEntries` entries attach; at `constableAtHumans` humans or fewer a Constable signs once on `constableMatches`

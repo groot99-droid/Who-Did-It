@@ -17,6 +17,7 @@ import { handleNotice } from './economy/notices';
 import { handleMug } from './townsfolk/mug';
 import { handleCraftGrid } from './Craft';
 import { handleInvMove, handleInvSelect } from './InventoryMoves';
+import { handlePairAnswer, handlePairAsk } from './law/Pairing';
 import { handlePetitionOpen, handlePetitionSign } from './law/Petition';
 import { wakeOnInput } from './Sleep';
 
@@ -131,6 +132,13 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.craftGrid: // round 10, A13 (GDD 3.30)
         handleCraftGrid(room, cmd.sessionId, payload);
+        break;
+      // Round 10, B8 (GDD 3.31): Walk with me.
+      case C2S.pairAsk:
+        handlePairAsk(room, cmd.sessionId, payload);
+        break;
+      case C2S.pairAnswer:
+        handlePairAnswer(room, cmd.sessionId, payload);
         break;
       // Round 10, B3 (GDD 3.31): petitions.
       case C2S.petitionOpen:

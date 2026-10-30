@@ -412,6 +412,14 @@
     "gddRef": "3.32"
   },
   "respawn": { "hp": 50, "gddRef": "3.22" },
+  "pairing": {
+    "answerS": { "min": 5, "max": 9 },
+    "yesChance": 0.5,
+    "scaredMult": 1.6,
+    "followTiles": 2,
+    "apartS": 20,
+    "gddRef": "3.31"
+  },
   "petition": {
     "othersPct": 0.3,
     "openS": 60,
