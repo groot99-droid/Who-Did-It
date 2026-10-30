@@ -8,7 +8,7 @@ import { TICK_RATE, TILE_PX } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
 import { toScreen, toWorld } from '@wdi/shared/iso';
 import { InputController } from '../input/InputController';
-import { TouchControls } from '../input/TouchControls';
+import { abilityDiscs, TouchControls } from '../input/TouchControls';
 import {
   REG_INPUT,
   REG_ROLE_CHIP,
@@ -289,9 +289,10 @@ export class World extends Phaser.Scene {
     if (flags.touch || isTouchDevice()) {
       this.touch = new TouchControls(overlayRoot(), {
         onUse: (on) => this.useKey(on),
-        onAct: () => this.abilityKey('Q'),
+        onAbility: (id) => this.useAbility(id), // round 10, 10Y (A334): one disc per active Q, R or F
         onStrike: () => this.strikeKey(), // round 8, 8A
       });
+      this.touch.setAbilities(abilityDiscs(getNet(this).roleCard));
       input.attachTouch(this.touch);
     }
 
@@ -548,10 +549,19 @@ export class World extends Phaser.Scene {
     this.hud.toast(C['toast.collect.cancel'], 'interact');
   }
 
-  /** Q, R or F: the card's ability on that key, aimed at the nearest living player in reach. */
+  /** Q, R or F: the card's ability on that key. */
   private abilityKey(slot: string): void {
-    if (this.feed.dead()) return;
     const row = getNet(this).roleCard?.abilities.find((a) => a.key === slot);
+    if (row) this.useAbility(row.id);
+  }
+
+  /**
+   * The card's ability by id, aimed at the nearest living player in reach: the one path of a key, a touch disc
+   * (round 10, 10Y, A334) and, later, a card button (rolecards.md R1). Only an active ability goes out (1.2 A2).
+   */
+  private useAbility(id: string): void {
+    if (this.feed.dead()) return;
+    const row = getNet(this).roleCard?.abilities.find((a) => a.id === id);
     const def = row ? ABILITY_DEFS[row.id] : undefined;
     if (!row || !def || def.kind !== 'active') return;
     if (def.target === 'seat') return this.pickSeat(row.id, row.name);
@@ -768,7 +778,7 @@ export class World extends Phaser.Scene {
     this.wasDead = dead;
     this.entities.setGhost(dead);
     this.hud.setGhost(dead);
-    this.touch?.setActEnabled(!dead);
+    this.touch?.setAbilitiesEnabled(!dead);
     if (dead) {
       this.endUse();
       this.hud.toast(C['toast.ghost'], 'hazard', undefined, 5000);
