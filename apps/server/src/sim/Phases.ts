@@ -6,6 +6,7 @@ import { beginFinalNight, endHunt, enforceFinalVote, isFinalNightRound } from '.
 import { countRow, flowOf, isMeetingPhase, refuse, setPhase } from './Flow';
 import { enterImmunity, openMeeting, runMeeting } from './Meeting';
 import { isAiming } from './NightPowers';
+import { takeGuardFell } from './paintTown';
 import { simOf } from './RoomSim';
 import { endMatch, evaluateWin, resetToLobby } from './Win';
 import { runSleep } from './Sleep';
@@ -50,7 +51,8 @@ export function runPhases(room: PartyRoom): void {
  */
 function drainDeaths(room: PartyRoom): boolean {
   const sim = simOf(room);
-  if (sim.deaths.length === 0) return false;
+  const guardFell = takeGuardFell(room); // round 10, C5c: a guard's death is a pillar, not a seat's death
+  if (sim.deaths.length === 0 && !guardFell) return false;
   const flow = flowOf(room);
   const events = sim.deaths;
   sim.deaths = [];

@@ -186,13 +186,13 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
     seat either has killed) reaches ceil(`paintTown.winUnique` (half) x the NPC seats at the deal), at least 1, or
     when the three pillars are dead at the same moment: the Vicar's seat, the Company Clerk and both Constables (the
     guard figures of 3.24; the Constables fall as one pillar only when both are dead). A guard's death counts toward
-    the pillars only. The game-over frame carries the target and each Killer's unique and total
+    the pillars only, and the check runs at the Knife's blow, so the pillars stand or fall at that tick. In this mode a
+    knifed guard returns on the next morning train (never the same day's), to its post with full health. The game-over frame carries the target and each Killer's unique and total
     (`gameOver.paintTown`); the end screen ranks them by total.
   - There is no parity check. A Killer dead for good (or ejected by the vote) is caught and its run ends; the other
     plays on. The Village wins when both are caught, or when the end trial closes with the town unpainted.
-  - Not built yet: the Knife on the guards and their return on the morning train (C5's guard step), and, until the
-    Constables' petitions land (10B), the Constables filing their own petitions with no human on the town side (12,
-    R3). Until then a match ends by deaths, the unique count, the pillars or the end trial.
+  - Not built yet: until the Constables' petitions land (10B), the Constables filing their own petitions with no
+    human on the town side (12, R3). Until then a match ends by deaths, the unique count, the pillars or the end trial.
 - Disconnect over 60 s = death with cause "vanished" and a body at the last position; reconnection within 60 s resumes the same role. (M3: a player who leaves during play becomes a ghost at once with no body; the window and the body arrive with reconnection in M7, A30.)
 - No Clue Surge. A wrong ejection adds 15 s to the next discussion instead.
 - (Round 8, 8L, A190) **The vote delay.** A vote cast in the first 15 s of a meeting (`meeting.minVoteS`, Final Night's included) is refused with the reason, so a vote agreed before the meeting cannot land before anyone has spoken; the portraits and Skip wait out the delay with a countdown, and a vote is changeable as before once it opens. `minVoteS` stays under the shortest discussion (the content check). It replaces `meeting.voteOpensImmediately`.
@@ -1062,7 +1062,7 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 Round 8 (A134, A135; `docs/round8/townsfolk.md`).
 - **Needs and moods.** NPC seats and the new ambient townsfolk have needs (Hunger, Fear, Anger, Want) and moods.
   These are server-only and show only as gait and idle.
-- **Townsfolk.** They are not seats, are never the Knife's prey and die only to creatures.
+- **Townsfolk.** They are not seats, are never the Knife's prey (the guards aside) and die only to creatures.
 - **Mugging.** A hungry, angry or desperate figure or NPC seat alone with a seat may mug it. A heavier purse raises
   the chance; company, the Watchman's look and a lit light lower it. The target pays or, once the fists land, runs
   or fights.
@@ -1145,8 +1145,10 @@ scene within `guard.leashTiles`, and by night it stands at its post. It has the 
 fist or slingshot (3.22) lands on a guard's body like a seat's: at zero health it is knocked out for `body.koS` and
 stands down. A guard still standing turns on the seat that struck it and swings the fist's row at it on the strike's
 cooldown while that seat stays in its scene, within its leash and on its feet, for `guard.angerS`; then it walks back
-to its post. Its blows knock out, never kill. A guard reads only who struck it, never a card, and never mugs. The
-Knife does not reach a guard yet (C5). A Constable wears the `constable` look (3.17); the Clerk keeps the villager's.
+to its post. Its blows knock out, never kill. A guard reads only who struck it, never a card, and never mugs. In
+every mode the Knife reaches a guard (round 10, C5c), standing or knocked out, with the seat Knife's reach, phase,
+cooldown, blood and scream; the guard dies as a figure does (its body until the next meeting, no clue of the
+killer's look, and no Bandage, Watch or Charm guards it) and stays dead, except in Paint The Town Red (3.8), where it rides the next morning train back. A Constable wears the `constable` look (3.17); the Clerk keeps the villager's.
 `figureNotSeat` accepts the `figures` looks of `looks.json` beside the villager family.
 
 **The mugging (8E, A180).** A Hungry, Angry or Desperate figure or NPC seat that is alone with one seat rolls each

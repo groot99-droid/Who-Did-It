@@ -1,7 +1,7 @@
 import { balance, roles } from '@wdi/content';
 import { dealDeck, paintTarget } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
-import { townsfolkMemory } from './townsfolk/figures';
+import { type Figure, returnFigure, townsfolkMemory } from './townsfolk/figures';
 import { isNpcSeat } from './Npc';
 import { simOf } from './RoomSim';
 import { isOnLine } from './Train';
@@ -12,7 +12,7 @@ import { isOnLine } from './Train';
  * death returns on the next morning train, after dark too (`Train.ts`). A Knife kill of an NPC seat by a Killer adds
  * one to that Killer's total and, the first time that Killer kills that seat, one to its unique count; the two share
  * the win when the union of their victims reaches the target, or when the Vicar's seat, the Clerk and both Constables
- * are dead at once. They lose when both are caught (dead for good) or the end trial closes. Until game over the
+ * are dead at once (a guard knifed in this mode returns on the next morning's train too). They lose when both are caught (dead for good) or the end trial closes. Until game over the
  * counts live here, in room memory keyed by the match's `MatchSeeds`: no field, line or refusal changes at a kill.
  */
 
@@ -23,6 +23,10 @@ interface PaintState {
   /** Each Killer seat's victims (unique) and its kills (total). */
   victims: Map<string, Set<string>>;
   totals: Map<string, number>;
+  /** Each dead guard figure's id and the round it died: it rides the next morning's train back (round 10, C5c). */
+  guardDeaths: Map<string, number>;
+  /** A guard died since the last win check: the step's `drainDeaths` (`Phases.ts`) runs one, as for a seat's death. */
+  guardFell: boolean;
 }
 
 const states = new WeakMap<object, PaintState>();
@@ -80,7 +84,14 @@ export function paintDeal(
 /** The deal's start: the two Killer seats and the target (`paintTarget`, `@wdi/shared`). */
 export function beginPaintTown(room: PartyRoom, killers: readonly string[], npcSeats: number): void {
   const target = paintTarget(balance.paintTown.winUnique, npcSeats);
-  states.set(room.seeds, { killers: [...killers], target, victims: new Map(), totals: new Map() });
+  states.set(room.seeds, {
+    killers: [...killers],
+    target,
+    victims: new Map(),
+    totals: new Map(),
+    guardDeaths: new Map(),
+    guardFell: false,
+  });
   for (const seat of killers) {
     const priv = room.state.players.get(seat)?.priv;
     if (priv) priv.paintTown = true;
@@ -96,6 +107,35 @@ export function onPaintDeath(room: PartyRoom, victim: string, cause: string, kil
   let mine = s.victims.get(killer);
   if (!mine) s.victims.set(killer, (mine = new Set()));
   mine.add(victim);
+}
+
+/** A guard's death (the Knife, `Kill.ts`): it counts toward the pillars only, never unique or total. */
+export function onGuardDeath(room: PartyRoom, f: Figure): void {
+  const s = stateOf(room);
+  if (!s) return;
+  s.guardDeaths.set(f.id, room.state.round);
+  s.guardFell = true;
+}
+
+/** Whether a guard died since the last call (`Phases.ts` `drainDeaths`): the pillars may all be down this tick. */
+export function takeGuardFell(room: PartyRoom): boolean {
+  const s = stateOf(room);
+  if (!s?.guardFell) return false;
+  s.guardFell = false;
+  return true;
+}
+
+/** The morning train's arrival of `round` (`Train.ts`): every guard dead since an earlier round is back at its post. */
+export function returnGuards(room: PartyRoom, round: number): void {
+  const s = stateOf(room);
+  if (!s) return;
+  for (const [id, died] of [...s.guardDeaths]) {
+    if (died >= round) continue;
+    s.guardDeaths.delete(id);
+    const f = townsfolkMemory(room).figures.get(id);
+    if (!f?.dead) continue;
+    returnFigure(room, f); // its foe and cuff were cleared at its death (`Kill.ts`, `Guards.ts` `returnGuard`)
+  }
 }
 
 /** Whether a Killer seat is caught: dead for good (dead and not waiting on the line). */
