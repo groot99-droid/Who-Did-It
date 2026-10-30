@@ -251,9 +251,13 @@ is still the main mode's:
 2. **The roster.** `maps/<id>.json` gains `roster`, the card ids the map deals (no count), validated to at most 27
    cards (the trait triples), every vendetta partner and the Killer once. HollowMere's today: the Killer, the
    Accomplice, the Drifter, the Detective, the Doctor, the Vicar, the Watchman, the Herbalist, the Gamekeeper and the
-   four professions (13); each new card joins when its pull request lands (N1 to N5, T1). The seat count is the roster
-   less one (the worn card), plus one in a Bandit match. `startSpawns`, `meetingSpawns` and the cell's spawns are
-   checked against the largest roster instead of `players.max`; `players.max` stays the cap on humans.
+   four professions (13); each new card joins when its pull request lands (N1 to N5, T1). Every cover card wears a
+   picked card, and **every worn card is withdrawn**, so no worn card has a seat (6Z's review of #420, fix 3). With W
+   the roster's wearing covers (the Killer, the Accomplice, the Drifter and, once it ships, the Thief), the seat count
+   is the roster less W, the same in every match of a map, plus one in a Bandit match (the Bandit wears his own skin).
+   The content check refuses a roster whose seat count (roster less W) is under `players.max`. `startSpawns`,
+   `meetingSpawns` and the cell's spawns are checked against the largest seat count instead of `players.max`;
+   `players.max` stays the cap on humans.
 3. **One Killer, human.** One human is dealt the Killer on `deal`. No roster holds a second Killer card (C5's Paint
    deck keeps its own). An NPC Killer stays in the engine for story mode and the auto room (WM1); this deal never makes
    one. An Accomplice inherits the Knife only when it is human (world-mode 6, "Inherit").
@@ -261,24 +265,48 @@ is still the main mode's:
    Activist, Bandit 3) is at most H and whose map rule holds. The Hitman row is never drawn (C4a).
 5. **The partners.** `needsCard` becomes `partners` (_new_, a list). The drawn vendetta's partners go to humans on
    `deal`. The interim partners stand (WM8): the Zealot's Vicar, the Activist's Watchman, the Bandit's Gamekeeper.
-6. **The other humans** draw a roster card each on `deal`, never the Accomplice below `deal.accompliceMinHumans`
-   (_new_, 6), never the Killer.
-7. **The pick.** On the role card the Killer is offered every card no human holds, but the Accomplice and the Drifter;
-   the first hint is the first offered card in `deal` order. It reaches the Killer as today's `coverHints`. The
-   Accomplice and the Drifter, human or not, pick from what the Killer left, the Accomplice seeing the Killer's pick
-   live as Cabal mates do. A Bandit has no pick. An NPC cover wears its first hint. `phases.roleRevealS` becomes 30
-   (world-mode 7.1).
-8. **The NPC seats** are created when the card closes, one for every card no human holds except the worn one, with
-   names from `npcNames` and traits on `traits`, each drawn in seat order after the humans'. During the card the roster
-   shows only the humans; at the close every NPC seat joins it in one tick with its `Player.look`, as every seat's look
-   is written in one tick today. The roster grows by the same count in every match of a map (one more with a Bandit),
-   so the growth says nothing about the pick. There is no undealt card: the roster's cards are all dealt or worn.
+6. **The other humans** draw a roster card each on `deal`, never the Killer, never the Accomplice below
+   `deal.accompliceMinHumans` (_new_, 6). **Enough looks stay free.** L is the roster's look-bearing (non-cover) cards;
+   each wearing cover needs one of them unheld. While the humans still to deal would leave fewer than W look-bearing
+   cards unheld, the next human takes a cover card instead (the Drifter, the Thief, the Accomplice from 6 humans). On
+   HollowMere's 13 cards (L = 10, W = 3), H = 10 deals the Accomplice and the Drifter to humans; with the Thief in the
+   roster, H = 10 deals all three. The content check above makes every H up to `players.max` dealable.
+7. **The pick** (6Z's ruling, A276; a departure from world-mode 4.1, which had every cover pick "from what the Killer
+   left"). At Start, on `deal`, the unheld look-bearing cards are split: the Drifter and the Thief are each dealt an
+   offered list of their own, `deal.coverListSize` (_new_, 2) cards, disjoint from each other's and from the Killer's;
+   the Killer and the Accomplice share the rest, which is always the longest list. The Killer picks first, and the
+   Accomplice picks live from what the Killer left (Cabal may know each other's pick). No list shrinks or is bumped
+   because of another seat's pick outside the Cabal, so nothing a non-Cabal cover sees tells which look the Killer
+   wears. Each list reaches its seat as today's `coverHints`, the first hint marked. A Bandit has no pick. An NPC cover
+   wears its first hint. `phases.roleRevealS` becomes 30 (world-mode 7.1). **Why:** a list that shrank live, or a
+   colliding pick bumped at the close, would tell a Drifter or a Thief which look the Killer took, which is a
+   cover-wearer's true role (CLAUDE.md).
+8. **The seats** (6Z's review, fix 1; this census's choice: every seat is made at Start). At Start, in one tick, the
+   server makes every seat of the match, human and NPC, each under a fresh id from `generateId()` that no client can
+   link to the lobby: the map from session to seat lives in room memory, and each client learns only its own seat id,
+   in its private view. Seats enter `GameState.players` in the order of their fresh ids, which tells nothing. NPC seats
+   take their names from `npcNames` and every seat its traits on `traits`, in that order. An NPC seat holds no card
+   until the card closes; then it takes one of the cards left after the picks, on `deal`, and every seat's
+   `Player.look` is written in one tick as today. There is no undealt card: the roster's cards are all held or worn.
+**Secrecy.** In world mode the Killer is always human, so anything that tells which seats are human narrows the Killer
+to the other H − 1 (GDD 3.12, "Hidden seats"). So, from Start to game over in a world match:
 
-**Secrecy.** The worn card never has a seat, so no two figures share a look and the "counter-claim" of GDD 3.17 cannot
-happen. `Player.look` carries the worn look exactly as a real one. The pick draws nothing; the human-first steps use
-`deal`, the NPC seats `npcNames` and `traits`, and the vendetta its own stream. The Killer's offered list is private
-(row 25), and it is the same list whatever the vendetta, since partners are humans and humans hold their cards anyway.
-`debug.deal` learns the human-first rule (WDI_DEBUG only).
+- **Ids.** Seat ids are fresh, never the lobby's session ids; `leaderId` is '' (the leader matters only in the lobby).
+- **Names and profiles.** `Player.name` and `Player.profile` are '' for every seat (fix 2, row 27). The game-over
+  frame pairs each seat with its name and profile.
+- **Connection.** `Player.connected` is not public per seat: it reads true for every seat. The party panel shows who is
+  connected by name only, from a `GameState.party` list of `{name, connected}` sorted by name, with no seat id.
+- **The order and the count.** Seats enter in fresh-id order, all in one tick; the count tells only "a Bandit rides",
+  which world-mode 4.2 accepts.
+- **The worn cards** never have a seat, so no two figures share a look and the "counter-claim" of GDD 3.17 cannot
+  happen. `Player.look` carries a worn look exactly as a real one.
+- **Streams.** The pick draws nothing; the human-first steps and the lists use `deal`, the NPC seats `npcNames` and
+  `traits`, the vendetta its own stream. `debug.deal` learns the human-first rule (WDI_DEBUG only).
+
+Other places that tell a human from an NPC seat, for their owners: named chat at an Inquest (NPC seats write only
+notes, B7: in world mode a named line carries the speaker's character, and NPC seats write named lines from the
+templates too, or named chat goes); the quick-chat wheel (M1's barks); the cuff, the petition's opener and signers
+(already anonymous counts). Each of their pull requests checks it.
 
 **The true look (I3).** `Private.trueLook`, the vendetta's look id (`zealot`, `activist`, `bandit`, and `hitman` from
 the turning), on the seat's own view only. The own client draws its own figure in it and shows the worn look as a HUD
@@ -289,8 +317,10 @@ vendettas with the deck, whatever its card. Seams row 26.
 nameplate reads "the Bandit" (I2), never a name, until game over or a death sentence.
 
 **Nameplates (I2).** In world mode a seat's nameplate and every portrait label read its character: the lore name and
-card name of `looks.json` (`loreName`, _new_ field), else the card name; the end screen pairs characters with player
-names. The lobby, the party list and the friends list keep names. Seams row 27.
+card name of `looks.json` (`loreName`, _new_ field), else the card name. The server sends no name or profile for a seat
+during the match (fix 2), so the anonymity holds on the wire, not only on the screen; the end screen pairs characters
+with player names from the game-over frame. The lobby, the party list and the friends list keep names, with no seat id.
+Seams row 27.
 
 ### 2.2 Routes, the ledger and conversion (I5, I6, I9)
 
@@ -396,7 +426,7 @@ B6c). Each gets a `townWork` row (I37), a look id with a placeholder (2.10), and
   by a 1 s aim (row 14's cuff, lands on the seat behind the face) and the Bolt is spent; outside a manhunt it is refused
   `NOT_HUNTED`. His Law route needs that cuff to end in a murder conviction of the Killer. Nothing bypasses the
   petition: the town still decides who is hunted.
-- **Thief** (Neutral, a cover role like the Drifter, picking among NPC cards after the Accomplice). Lockpick: the
+- **Thief** (Neutral, a cover role like the Drifter, picking from its own offered list, 2.1 step 7). Lockpick: the
   universal pick (D5) at one tier higher (`thief.pickTierBonus`, _new_, 1). Pickpocket: a 2 s hold behind a seat in
   reach (`abilities.json` `pickpocket` cooldown) takes one random non-bound item of its pack; the victim learns of the
   loss only by its inventory, and it is a theft charge (I47) if a witness's Notice or the victim petitions. Smoke: a
@@ -408,8 +438,12 @@ B6c). Each gets a `townWork` row (I37), a look id with a placeholder (2.10), and
   line and has no ghost: refused `NOTHING_THERE`, the same as at a body already heard). The ghost gets a private prompt
   of eight phrases (`seance.json`, _new_): the killer's height (3), scarf (3), "I saw nothing", "Look to the woods". It
   answers within `seance.answerS` (_new_, 20) or the line is "The dead are silent." The Medium's Notebook gets the
-  phrase as a reading of its own (row 24's `NoteKind` rule), never Verified ("Cabal ghosts may lie"). An NPC ghost answers truthfully unless Cabal, when it
-  names a trait not the killer's. Nothing else of the ghost's view reaches the Medium. A seance can run only once the
+  phrase as a reading of its own (row 24's `NoteKind` rule), never Verified ("Cabal ghosts may lie"). **An NPC ghost
+  answers like a person** (6Z's review, fix 5): after a delay drawn on its own `npcTiming:<seatId>` stream over the
+  span of `seance.answerS`, and silent with chance `seance.npcSilentChance` (_new_, 0.15), as a person might be; it
+  names the killer's trait unless Cabal, when it names a trait not the killer's, both on `npcPlay:<seatId>`. Every
+  ghost, human or NPC, makes the same draws, so neither the delay nor a silence marks a seat (A39's ready delay is the
+  precedent). Nothing else of the ghost's view reaches the Medium. A seance can run only once the
   death is public (after a meeting or a Tribunal revealed it), so it never tells of a private kill.
 - **Lobby toggles and the faction-only reveal (I16).** `Settings.roster` (_new_, the cards dropped from the roster,
   default none, the Killer and the vendetta partners never droppable); `Settings.revealMode` unlocks: `faction` shows a
@@ -493,7 +527,9 @@ B6c). Each gets a `townWork` row (I37), a look id with a placeholder (2.10), and
 
 - **Wisp.** A ghost whose death the town has seen (a meeting or a Tribunal revealed it) may Wisp once per cycle: flicker
   a lit light in its scene (the light goes out for 1 s), rattle a door (noise `noise.wispRattle`) or nudge an
-  uncollected clue one tile. A ghost of a private death has no Wisp.
+  uncollected clue one tile. A ghost of a private death has no Wisp. **NPC ghosts wisp too** (fix 5): an NPC ghost whose
+  death is public wisps once in a cycle with chance `ghosts.npcWispChance` (_new_, 0.5), at a tick and a kind drawn on
+  its own streams, so a wisp never marks a human ghost, and a known dead human never narrows the living Killer.
 - **Crows (I51).** A `crow` creature of the rooftops and the marsh dock: no attack, no health worth hunting, flies off
   (a public clip) and caws (noise `noise.crow`, _new_, 6) when a seat runs within `mobs.json` senses. Gulls are crows at
   the dock. Running near them is being heard.
@@ -518,9 +554,18 @@ B6c). Each gets a `townWork` row (I37), a look id with a placeholder (2.10), and
 - **Barks and world lines (I61).** The quick-chat pool grows by the world lines of living-world.md 1.4. Figures and NPC
   seats bark a pool line at shared moments (a bell, a wolf near, a lantern lit), drawn on their own streams; humans
   send the same lines from the wheel. No free text outside meetings.
-- **Spectator mode (I62).** A spectator joins a running party as no seat. It sees one scene at a time of its choice,
-  as a living seat in that scene would (no roles, no ghost view, no private view), delayed by `spectator.delayS` (_new_,
-  120), and no chat. At game over it sees the end screen. It never counts for anything.
+- **Spectator mode (I62).** A spectator joins a running party as no seat, and never counts for anything. Colyseus syncs
+  the public `GameState` to every client live, a spectator included (fix 6), so the two parts are:
+  - **Live** (the public root, as every player has it): the phase and its clock, the roster rows (no names and no
+    profiles during a world match, fix 2; `connected` true for all; looks, traits and `alive`, which flips only at a
+    reveal), the public petition, manhunt and Tribunal rows, `hq`, and the party panel by name. None of it locates a
+    seat or names a player: the roster carries no scene and no position, and the scene-scoped state (avatars, props,
+    clues, bodies, creatures) is behind each client's view, which a spectator's is empty of.
+  - **Delayed** by `spectator.delayS` (_new_, 120): one scene at a time of its choice, as a `spectator.frame` message
+    built from a server-side buffer of that scene's public state, as a living seat in the scene would have seen it then
+    (no roles, no ghost view, no private view). No chat.
+
+  At game over it gets the end screen, names included.
 
 ### 2.10 Looks and art
 
@@ -535,16 +580,16 @@ them; a builder waits for its row.
 
 | Order | Row | Class | Pull request |
 |---|---|---|---|
-| 25 | The world-mode deal (I1, W1): with three or more humans the deck is the map's `roster`. One human holds the Killer; the drawn vendetta's partners are humans; the Killer's offered cards reach its own client only, as today's `RoleReveal.coverHints`, and the Accomplice sees the Killer's pick live as Cabal mates do. The public `deck` of the role card and the lobby is the roster, the same in every match of a map. During the card the roster (`GameState.players`) holds only the human seats; when the card closes every NPC seat joins it in one tick, each with its `Player.look`, so the roster grows by the same count in every match of the map (one more in a Bandit match, whose look is public anyway). No seat ever wears the worn card's look, and no field, count or event tells which card was worn or that a cover was picked. Nothing new on the wire: the change is who holds what | `coverHints` own client only; the rest public as today | W1 (no schema change) |
+| 25 | The world-mode deal and the hidden seats (I1, W1a, W1b; 6Z's review of #420, fixes 1, 3 and 4): with three or more humans the deck is the map's `roster`. At Start every seat of the match, human and NPC, is made in one tick under a fresh id (`generateId()`) that no client can link to the lobby's session ids; the session-to-seat map lives in room memory, and each client learns its own seat id only in `Private.seatId` (_new_). Seats enter `GameState.players` in fresh-id order. From Start to game over `Player.name` and `Player.profile` are '' for every seat, `Player.connected` is true for every seat, and `leaderId` is ''; the party panel reads `GameState.party` (_new_), `{name, connected}` rows sorted by name with no seat id. The seat count is the roster less its wearing covers, the same in every match of the map, plus one in a Bandit match (public by design, world-mode 4.2). Every worn card is withdrawn and never has a seat. Each cover's offered cards reach its own client only, as today's `RoleReveal.coverHints`: the Drifter's and the Thief's are their own disjoint lists dealt at Start; the Killer and the Accomplice share the rest, and the Accomplice sees the Killer's pick live (Cabal). No list changes by a non-Cabal seat's pick. An NPC seat takes its card at the card's close, and every `Player.look` is written in one tick as today. The game-over frame pairs each seat id with its player's name and profile. No field, order, count or event tells a human seat from an NPC seat, which card was worn, or that a cover picked | `Private.seatId`, `coverHints` own client only; `party` and the roster public; the names at game over | W1a (joins 7), W1b |
 | 26 | The true look (I3): `Private.trueLook` (string), the look the seat's own client draws for its own figure: `zealot`, `activist` or `bandit` from the deal for the Killer of that vendetta, `hitman` from the turning (row 20) for the turned seat, '' otherwise. Every client loads the true-look atlases of every vendetta the map allows with the deck, whatever its card, so a load never tells a card. No avatar, roster row or message to another client carries it; a cover's public look stays `Player.look` | own client only | W2 (joins 7) |
-| 27 | Characters on the plate (I2): in world mode the client draws a seat's nameplate, portrait label and Tribunal or Inquest label from `Player.look` alone, through `looks.json` `loreName`; `Player.name` is drawn only in the lobby, the party list and game over. Nothing new goes on the wire: the name is already public and the label is the client's choice | public (no change) | W3 (client) |
+| 27 | Characters on the plate (I2; fix 2): during a world match the server sends no player name or profile for any seat (row 25); the client draws every nameplate, portrait label and Tribunal or Inquest label from `Player.look` through `looks.json` `loreName`, else the card's name. `S2C.gameOver.names` (_new_) `{seatId, name, profile}[]` pairs seats with players, in the game-over frame only. The lobby and the party list keep names with no seat id | names public at game over only | W1a (server), W3 (client) |
 | 28 | Routes and the ledger (I5, I6, I9): `Private.route {kind, step, of}`, the seat's own route progress, and `Private.converted` (u8), the Vicar's count of converted seats, never names. `S2C.gameOver.victories` (optional) `{seatId, kind}[]`, sent only in the game-over frame, `kind` from the append-only `Victory` list. No count, step or kind changes any other client's view before game over, and a route's progress moves only on the seat's own view | `route`, `converted` own client only; `victories` at game over | W5, W6 |
 | 29 | The seat's learning (I26, I33): `Private.recipes` (string list, recipes taught), `Private.branch` (string), `Private.standing` (u8: 0 Stranger, 1 Known, 2 Trusted). Each is moved only by the seat's own quest, chore or reading | own client only | K4, T3 |
 | 30 | Windows and stations (I38): row 3's `PropState` gains the states `lit`, `dark`, `warm`, `cold`, `missing` and `sigil`. A window and a station follow one rule of the look's work (row 15: at work, thin, gone, dormant, hardship), so a dark window and a cold station never tell a hardship from the Hitman or a seat owing the line; they read `Player.look`, `Player.alive`, the fare and the hardship, never the sim's death, `Avatar.lookOf` or the card. A silhouette is a scene `Silhouette {windowId, x, y}` sent only to seats outside in sight of the window, carrying no handle, look or height | public to the scene | T4 |
 | 31 | The snare and the smoke (I27, I14): a set snare is a scene prop `{id, x, y}` sent only to its layer and to seats within `snare.seeTiles`; a held seat shows the existing Slowed sign; the layer's Notebook entry names the drawn look (`Avatar.lookOf`), never a seat. A smoke cloud is a public scene prop for its time, and the server's sight rule treats its tiles as blocking | snare: layer and seats in reach; smoke: public to the scene | K6, N4 |
-| 32 | The Medium's seance (I15): `S2C.seance {phrases}` to the ghost alone when a seance on its body completes, `seance.answer {i}` from that ghost's client, queued and consumed in `step()`, and the Medium's Notebook entry (Claimed). The prompt reaches a ghost only for a death the town has seen; the seance on an unseen death or a day death is refused like an empty one | ghost and Medium only | N5 |
-| 33 | Spectators (I62): a `spectator` client role with a view of one scene, delayed by `spectator.delayS`, built only from the public scene state (avatars, props, clues, creatures, bodies) of that scene; never a `Private`, a role, a ghost tag or a chat channel | the spectator only | M5 |
-| 34 | The Wisp (I50): `act.wisp {kind, targetId}` from a ghost whose death is public, queued and consumed in `step()` and refused with A1's reasons; its effect is the public one any seat could cause (a light out for 1 s, a rattle's noise, a clue a tile over). Nothing names the ghost | public to the scene | M2 |
+| 32 | The Medium's seance (I15): `S2C.seance {phrases}` to the ghost alone when a seance on its body completes, `seance.answer {i}` from that ghost's client, queued and consumed in `step()`, and the Medium's Notebook reading (row 24's `NoteKind` rule). The prompt reaches a ghost only for a death the town has seen; a seance on an unseen death or a day death is refused like an empty one. An NPC ghost answers after a delay drawn on its own `npcTiming` stream within `seance.answerS` and is silent with `seance.npcSilentChance`, so neither the timing nor a silence tells an NPC ghost from a person (fix 5) | ghost and Medium only | N5 |
+| 33 | Spectators (I62; fix 6): a `spectator` client role in the room with no seat. Live, it receives only the public `GameState` root that every client receives (row 25's anonymous roster with no names, no scene and no position; the petition, manhunt and Tribunal rows; the phase); its view holds no scene-scoped state. Its picture of the world is `spectator.frame`, one scene of its choice rebuilt from a server-side buffer `spectator.delayS` old, from that scene's public state only. Never a `Private`, a role, a ghost tag or a chat channel; names only at game over | the spectator only | M5 |
+| 34 | The Wisp (I50): `act.wisp {kind, targetId}` from a ghost whose death is public, queued and consumed in `step()` and refused with A1's reasons; its effect is the public one any seat could cause (a light out for 1 s, a rattle's noise, a clue a tile over). NPC ghosts whose death is public wisp too, by `ghosts.npcWispChance` on their own streams, so a wisp never marks a human ghost (fix 5). Nothing names the ghost | public to the scene | M2 |
 
 Every row joins schema version 7 in merge order. The leak test of round 8 (A170) runs on each.
 
@@ -567,9 +612,10 @@ of this plan or of the live sessions. Models by section 0's rule.
 
 | PR | What | Paths | Tests | After |
 |---|---|---|---|---|
-| W1 | The world-mode deal (I1) | `sim/Deck.ts`, `rules/deck.ts`, `maps/*.json` `roster`, `vendettas.json` `minHumans`, `partners`, `balance.json` `deal.*`, GDD 3.1, 3.9, 3.12 | human Killer; partners human; Accomplice from 6; worn card withdrawn; seat count constant by vendetta; streams untouched | B6c; 10C's list in `Deck.ts` |
-| W2 | The true look (I3, row 26) and the Bandit's own look (I4) | `schema/`, `sim/Deck.ts`, client own figure and badge, `looks.json` | the field only on its own view; every client loads every true look | W1 |
-| W3 | Nameplates as characters (I2, row 27) | `looks.json` `loreName`, client labels, GDD 3.17 | no seat name drawn in a match; names at game over | W1; y12 (#409) |
+| W1a | Hidden seats (row 25's ids, names, profiles, connection; row 27's game-over names). About 350 lines | `packages/shared/src/schema/` (`Private.seatId`, `GameState.party`), `rooms/handlers/lobby.ts` (seats at Start), the session-to-seat map in room memory, `S2C.gameOver.names`, the client's own-seat lookup, GDD 3.12, 3.21 | no client receives a lobby session id as a seat id; no name or profile during the match; order and connection tell nothing; the leak test (A170) over a world match with 1 and 9 NPC seats | B6c |
+| W1b | The world-mode deal (I1). About 350 lines | `sim/Deck.ts`, `rules/deck.ts`, `sim/Covers.ts`, `maps/*.json` `roster`, `vendettas.json` `minHumans`, `partners`, `balance.json` `deal.*`, the content check, GDD 3.1, 3.9, 3.17 | human Killer; partners human; Accomplice from 6; every worn card withdrawn; enough looks free for every H; the Drifter's and Thief's lists disjoint and fixed; seat count constant by vendetta; streams untouched | W1a; 10C's list in `Deck.ts` |
+| W2 | The true look (I3, row 26) and the Bandit's own look (I4) | `schema/`, `sim/Deck.ts`, client own figure and badge, `looks.json` | the field only on its own view; every client loads every true look | W1b |
+| W3 | Nameplates as characters (I2, row 27), the client half | `looks.json` `loreName`, client labels, the end screen's pairing, GDD 3.17 | no seat name drawn in a match; names at game over | W1a; y12 (#409) |
 | W4 | The dawn card and the manifest (I10) | client HUD overlay, UI.md | the manifest names characters | W3 |
 | W5 | Routes: the engine, Watch, Role, Town (I6, row 28) | `sim/routes/` (new), `Private.route`, GDD 3.8 | each route meets on its event; nothing holds the match open | B6c |
 | W6 | The ledger (I5, row 28) | `S2C.gameOver.victories`, `ui/GameOver.ts` | victories only at game over | W5; C5b, C4b |
@@ -580,12 +626,12 @@ of this plan or of the live sessions. Models by section 0's rule.
 
 | PR | What | After |
 |---|---|---|
-| N1 | Butler: Lock / Unlock, the Ledger, the Killer's Lock door (I11, I17) | W1, B7 (the Inquest) |
+| N1 | Butler: Lock / Unlock, the Ledger, the Killer's Lock door (I11, I17) | W1b, B7 (the Inquest) |
 | N2 | Child: crawlspaces, Witness, the pick-up rule (I12) | 10V's hiding spots |
 | N3 | Ranger: Shoot, the Arrest (I13; Q-S1) | B4, K6 (snares) |
 | N4 | Thief: Lockpick tier, Pickpocket, Smoke (row 31), the sea door, Heirlooms (I14, I31) | S1, I47's theft (T5) |
 | N5 | Medium: the seance (I15, row 32) | B7 (a death made public) |
-| N6 | Lobby toggles and the faction-only reveal (I16); Forged Alibi (I18) | W1, B6a, 10V Inspect |
+| N6 | Lobby toggles and the faction-only reveal (I16); Forged Alibi (I18) | W1b, B6a, 10V Inspect |
 
 Each new card: `roles.json`, `abilities.json` routes (`status: live`, 10R's test), `looks.json` placeholder, GDD 3.2,
 the rolecards.md lines. Tests per card: each ability's refusals, and a secrecy test that a client of another card sees
@@ -608,7 +654,7 @@ nothing of it beyond the drawn figure.
 
 | PR | What | After | Model |
 |---|---|---|---|
-| T1 | The Trades as cards (I30; Q-S2) | W1 | Opus |
+| T1 | The Trades as cards (I30; Q-S2) | W1b | Opus |
 | T2 | Chores and errands (I33) | D9b | Sonnet |
 | T3 | Standing, examine lines, leads, Faith's sources (I33 to I35, row 29) | T2 | Sonnet |
 | T4 | Town work, windows, stations, silhouettes (I37, I38, I39, row 30) | C4c, C4d | Opus |
@@ -629,15 +675,15 @@ nothing of it beyond the drawn figure.
 
 | PR | What | After |
 |---|---|---|
-| V1 | The Following (I7) | W1, B7 (the bell) |
-| V2 | Redemption and the Baron | W1, B7, C5c (guards and the Knife) |
-| V3 | The Getaway and the six-shooter | W1, C4b (the Dusk Train) |
+| V1 | The Following (I7) | W1b, B7 (the bell) |
+| V2 | Redemption and the Baron | W1b, B7, C5c (guards and the Knife) |
+| V3 | The Getaway and the six-shooter | W1b, C4b (the Dusk Train) |
 | V4 | Plot traces and the jail search (I8) | V1 to V3, B6a |
 
 ### 4.8 Order
 
 1. Wave 1 now. 10K, 10T and 10M start their first pull requests that have no "after".
-2. 10W starts W1 when B6c merges, and runs W1 to W8 in order. 10N starts when W1 merges (N2 earlier, after 10V's
+2. 10W starts W1a when B6c merges, and runs W1a, W1b, W2 to W8 in order. 10N starts when W1b merges (N2 earlier, after 10V's
    hiding spots).
 3. The vendettas follow 10C's last step, the town's T5 follows 10B's last.
 4. 10Z sweeps after every one of these, as seams.md 7 says.
