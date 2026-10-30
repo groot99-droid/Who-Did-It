@@ -417,6 +417,7 @@ const GLYPH = {
   village: '<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
   cabal: '<path d="M14 3l1 9-3 3-3-3 1-9zM8 15h8M12 15v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
   neutral: '<path d="M4 8c3-2 13-2 16 0-1 7-4 10-8 10S5 15 4 8zM8.5 11h2M13.5 11h2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  card: '<path d="M6 3h9l3 3v15H6zM9 9h6M9 13h6M9 17h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
   warn: '<path d="M12 4l9 16H3zM12 10v4M12 17v.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
 };
 const MOTIF = { village: '<path d="M2 24V2H24M8 24V8H24" fill="none" stroke="currentColor" stroke-width="2"/>', cabal: '<path d="M2 2L22 22M2 12L12 22M12 2L22 12" fill="none" stroke="currentColor" stroke-width="2"/>', neutral: '<path d="M2 24A22 22 0 0 1 24 2M10 24A14 14 0 0 1 24 10" fill="none" stroke="currentColor" stroke-width="2"/>' };
@@ -712,7 +713,7 @@ function mountDaybook(host) {
 function mountHud(host) {
   const r = R(), s = S(), p = P();
   const hud = h('div', { class: 'hud' },
-    h('button', { type: 'button', class: 'hud-goal', onclick: openCard, 'aria-label': `Role card: ${r.name}. ${fill(p.goal)} (Tab)` }, h('span', { class: 'disc' }, svg(GLYPH[r.faction], 18)), h('span', {}, h('b', {}, r.name), h('span', {}, fill(p.goal)))),
+    h('button', { type: 'button', class: 'hud-goal', onclick: openCard, 'aria-label': `Your card. ${fill(p.goal)} (Tab)` }, h('span', { class: 'disc' }, svg(GLYPH.card, 18)), h('span', {}, h('b', {}, 'Your card ', h('kbd', { class: 'kbd' }, 'Tab')), h('span', {}, fill(p.goal)))),
     h('div', { class: 'hud-clock' }, h('div', { class: 'num' }, '06:40'), h('div', { class: 'mono' }, 'Day')),
     h('div', { class: 'hud-tr' }, h('button', { type: 'button', class: 'hud-btn', onclick: () => { ui.daybook = ui.daybook ? null : 'pockets'; ui.cardOpen = false; render(); }, 'aria-label': 'Daybook (I)' }, 'Daybook', s.fare ? h('span', { class: 'badge', 'aria-hidden': 'true' }) : '', h('kbd', {}, 'I')), h('button', { type: 'button', class: 'hud-btn', 'aria-label': 'Settings' }, '⚙')),
     h('div', { class: 'hud-body' }, h('div', { class: 'mono' }, 'Health'), h('div', { class: 'bar' }, h('i', { style: 'width:100%;background:var(--wdi-teal)' })), h('div', { class: 'mono' }, 'Stamina'), h('div', { class: 'bar' }, h('i', { style: 'width:72%;background:var(--wdi-lantern)' }))),
