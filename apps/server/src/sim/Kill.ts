@@ -68,8 +68,9 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
   const player = room.state.players.get(sessionId);
   const actor = sim.players.get(sessionId);
   if (!player || !actor) return;
+  // A seat without the power never sees the verb; only a cheat lands here, and the line names no role (A233).
   if (!roles.roles[player.priv.role.roleId]?.abilities.includes('kill')) {
-    reject(room, sessionId, 'NEED_ITEM', { need: 'knife' });
+    reject(room, sessionId, 'NOT_YOUR_POWER');
     return;
   }
   if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, 'DOWN_OR_STUNNED'); // round 8, 8A

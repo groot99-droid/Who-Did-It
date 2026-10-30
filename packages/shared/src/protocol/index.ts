@@ -137,9 +137,9 @@ export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
  * How a player died; `vanished` is the disconnect death of GDD 3.8 (M7); `poison` is Nightshade, `shot` the
  * Gamekeeper's Last Shot (GDD 3.2); `wolf` is a mob kill in the dark (GDD 3.15, round 6, Session 6G). Round 8
  * (GDD 3.22, Session 8A): `creature` is a kill by any other creature. Round 10 (A6) retires `bled` and `sickened`:
- * Bleeding and Poisoned stop at 1 health, so only the Knife, a vote and a creature's bite end a life.
+ * Bleeding and Poisoned stop at 1 health, so only the Knife, a vote and a creature's bite end a life; the two ids
+ * are never reused.
  */
-/** The causes a death carries. `bled` and `sickened` retired in round 10 (A6): Bleeding and Poisoned stop at 1 health, and the two ids are never reused. */
 export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature';
 /**
  * Chat channels the server derives (GDD 3.5); the client never chooses one. Round 8 (GDD 3.8, 8T): `notes` is the

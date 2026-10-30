@@ -100,7 +100,7 @@ interface ArgsOf {
   PHASE_CLOSED: { until?: RefusalUntil };
   NOT_IN_PLAY: { why?: 'ghost' | 'transit' };
   COOLDOWN: { readyInS?: number };
-  SPENT: { what?: 'power' | 'stock' };
+  SPENT: { what?: 'power' | 'stock' | 'match' };
   LOBBY_RULE: { rule?: RefusalLobbyRule };
   TOO_FAR: { of?: RefusalTarget };
   ALREADY_DONE: { what?: 'report' | 'notebook' | 'built' };
