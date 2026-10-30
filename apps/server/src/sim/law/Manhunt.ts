@@ -7,6 +7,7 @@ import { isNpcSeat } from '../Npc';
 import { type PlayerSim, simOf } from '../RoomSim';
 import { isOnLine } from '../Train';
 import { isVerbPhase, reject, sceneKey } from '../World';
+import { isJailed, jailSeat, untilDawnS } from './Jail';
 import { holdPetitions, warrantsOf } from './Petition';
 
 /**
@@ -19,8 +20,8 @@ import { holdPetitions, warrantsOf } from './Petition';
  * says which seat is held. The Constables cuff by the same test within their leash (`Guards.ts`). The opener and the
  * signers see, in `Private.huntScene`, where the face was last seen by the rumour ledger's rule. At the timeout, with
  * no living human but the accused out of jail and off the line, the accused is cuffed where it stands; else the case
- * stays on the board and no petition opens for `petition.cooldownS`. The cuffed seat is held (`busyUntilTick`) until
- * dawn, kept for B5's cell.
+ * stays on the board and no petition opens for `petition.cooldownS`. The cuffed seat goes to the county jail (B5,
+ * `Jail.ts`), in the face it was cuffed in; the hunt stays cuffed until the seat leaves jail or dies.
  */
 
 interface Hunt {
@@ -43,7 +44,6 @@ interface ManhuntMemory {
   /** The next warrant (`warrantsOf`) to hunt. */
   next: number;
   /** Set once a night passes while a seat is held: the next day releases it. */
-  nightSeen: boolean;
   cuffed: Cuffed[];
   nextSampleTick: number;
   /** Seat -> the last tick it struck someone, and the last tick it was struck. */
@@ -58,7 +58,6 @@ function memoryOf(room: PartyRoom): ManhuntMemory {
   const m: ManhuntMemory = {
     hunt: null,
     next: 0,
-    nightSeen: false,
     cuffed: [],
     nextSampleTick: 0,
     struck: new Map(),
@@ -76,9 +75,6 @@ function memoryOf(room: PartyRoom): ManhuntMemory {
 
 /** The seats the manhunt has cuffed this match, oldest first (B5). */
 export const cuffedOf = (room: PartyRoom): readonly Cuffed[] => memoryOf(room).cuffed;
-
-/** B5 wires the county jail; until then nobody is jailed. */
-const jailed = (_room: PartyRoom, _seat: string): boolean => false;
 
 const hunting = (room: PartyRoom): boolean => room.state.manhunt.state === ManhuntState.hunting;
 
@@ -109,8 +105,8 @@ function cuffProblem(
 ): { reason: RefusalReason } | { target: string } {
   const p = simOf(room).players.get(seat);
   if (!isVerbPhase(room.state.phase)) return { reason: 'PHASE_CLOSED' };
-  if (!p || p.dead || !p.placed || isOnLine(room, seat) || jailed(room, seat))
-    return { reason: 'NOT_IN_PLAY' };
+  if (p && isJailed(room, seat)) return { reason: 'IN_JAIL' };
+  if (!p || p.dead || !p.placed || isOnLine(room, seat)) return { reason: 'NOT_IN_PLAY' };
   if (room.state.tick < p.busyUntilTick) return { reason: 'BUSY' };
   const avatar =
     typeof handle === 'string' ? room.state.scenes.get(sceneKey(p.sceneIdx))?.avatars.get(handle) : undefined;
@@ -132,6 +128,7 @@ export function handleCuffHold(room: PartyRoom, seat: string, handle: unknown): 
   const r = cuffProblem(room, seat, handle);
   if ('reason' in r) {
     if (r.reason === 'TOO_FAR') return reject(room, seat, 'TOO_FAR', { of: 'person' });
+    if (r.reason === 'IN_JAIL') return reject(room, seat, 'IN_JAIL', { untilDawn: untilDawnS(room, seat) });
     return reject(room, seat, r.reason);
   }
   if (p.hold?.action === 'cuff' && p.hold.targetId === handle) return;
@@ -154,18 +151,15 @@ export function tickCuff(room: PartyRoom, seat: string, p: PlayerSim): void {
   cuffSeat(room, r.target);
 }
 
-/** A cuff lands (a seat's hold, a Constable's, or the timeout): the seat is held until dawn and the hunt is over. */
+/** A cuff lands (a seat's hold, a Constable's, or the timeout): the seat goes to jail in its face; the hunt is over. */
 export function cuffSeat(room: PartyRoom, seat: string): void {
   const m = memoryOf(room);
   const hunt = m.hunt;
   const p = simOf(room).players.get(seat);
   if (!hunt || !p || !hunting(room)) return;
   const tick = room.state.tick;
-  p.hold = null;
-  p.input = null;
-  p.busyUntilTick = Number.MAX_SAFE_INTEGER;
   m.cuffed.push({ seat, accused: hunt.accused, charge: hunt.charge, tick });
-  m.nightSeen = false;
+  jailSeat(room, seat, drawnAs(room, seat) || seat);
   room.state.manhunt.state = ManhuntState.cuffed;
   // Every hold on the hunt stops: the figure is held.
   for (const other of simOf(room).players.values()) if (other.hold?.action === 'cuff') other.hold = null;
@@ -217,7 +211,7 @@ function sample(room: PartyRoom, m: ManhuntMemory, hunt: Hunt): void {
 function noHunterLeft(room: PartyRoom, accused: string): boolean {
   for (const [id, p] of simOf(room).players) {
     if (id === accused || isNpcSeat(room, id) || p.dead || !p.placed) continue;
-    if (!isOnLine(room, id) && !jailed(room, id)) return false;
+    if (!isOnLine(room, id) && !isJailed(room, id)) return false;
   }
   return true;
 }
@@ -237,15 +231,9 @@ export function runManhunt(room: PartyRoom): void {
     return;
   }
   if (row.state === ManhuntState.cuffed) {
-    const phase = room.state.phase;
+    // The hunt is over once the cuffed seat leaves jail (the morning train) or dies there.
     const held = m.cuffed.at(-1);
-    const p = held ? simOf(room).players.get(held.seat) : undefined;
-    if (phase === Phase.night || phase === Phase.finalNight) m.nightSeen = true;
-    // Dawn, or a death while held (a ghost walks free): B5's cell takes over from here.
-    if (!p || p.dead || (m.nightSeen && (phase === Phase.day || phase === Phase.grace))) {
-      if (p) p.busyUntilTick = tick;
-      end(room, m);
-    }
+    if (!held || !isJailed(room, held.seat)) end(room, m);
     return;
   }
   if (!m.hunt) {

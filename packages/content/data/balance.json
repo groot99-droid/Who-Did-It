@@ -445,5 +445,6 @@
     "constableMatches": 2,
     "gddRef": "3.31"
   },
-  "manhunt": { "durationS": 120, "gddRef": "3.31" }
+  "manhunt": { "durationS": 120, "gddRef": "3.31" },
+  "jail": { "walkS": 5, "gddRef": "3.27" }
 }

@@ -1189,6 +1189,23 @@ scene: in no map's graph, with no portal in or out (WORLD 4.3), its ids prefixed
 `cell_10`, so the cell can hold every seat at once. The server alone places a seat in it, and its art takes the default
 map's theme. Its view holds only the seats inside it. D8 adds the props of the jail mini-games.
 
+**Held (B5b).** A seat the manhunt cuffs (3.31) walks for `jail.walkS` (_proposed_ 5 s), held, and is placed in the
+cell. It stays there until the next morning train, the first arrival of a later round, which sets it down at the
+station with the manifest line "{name} steps off the train."; the Final Night's bells empty the cell as they bring back
+the line. Its own view shows `Private.jailUntilTick`, the train's tick (0 when not jailed); nothing public says who is
+jailed. While jailed a seat is not active for sleeping (3.32) and cannot open or sign a petition, cuff, or use the
+Knife (`IN_JAIL {untilDawn}`). A death in jail takes the usual death path. The manhunt stays cuffed until the seat
+leaves jail or dies; then the next warrant may run.
+
+**The face it was cuffed in** (the owner, 2026-10-30: "jail and try them"; 6Z's ruling). An impersonation applied when
+the seat is cuffed is pinned from the cuff until the seat leaves jail or dies: nothing drops it, neither the cell door,
+being alone in the cell, its run out, a meeting, nor the Tribunal (B6). The cell, the Tribunal's defendant and the
+manifest draw and name that face, exactly as if the accused had been cuffed; the sentence lands on the seat held. A
+disguise still pending at the cuff is cancelled. The seat is set down at the station still in the face, and the usual
+rule applies after that (it drops when the seat is alone or passes a door). What a table can still deduce is only what
+the drawn figures show: the true accused seen in town after a public "cuffed", two of one face in the cell, and a
+hanging's roster flip (B6).
+
 ### 3.28 Accounts and achievements
 
 Round 10, E1 (`docs/round9/gdd-map.md` 2.2). Not built yet: the step that builds it writes this section.
