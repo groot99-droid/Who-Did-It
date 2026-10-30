@@ -1,7 +1,7 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance } from '@wdi/content';
 import { Phase, TICK_RATE } from '@wdi/shared';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { hasEffect } from '../src/sim/body/effects';
 import { bodyOf } from '../src/sim/body/state';
 import { addStack, count } from '../src/sim/Inventory';
@@ -41,6 +41,13 @@ async function party(): Promise<Party> {
 
 /** The old clock, in ticks, plus a margin: the buff must outlast it. */
 const OLD_CLOCK = 780 * TICK_RATE + 20;
+
+// Round 10, x18: each test steps the old clock synchronously (15,620 ticks, and the second a dusk and a night on
+// top), which under load outruns vitest's 5 s default: both timed out on the bare base in the sessions' containers
+// (6Z, 2026-10-30), while CI's runner passed them. The day timeout `npcRoutine.test.ts` uses; no assertion depends
+// on it.
+const DAY_TIMEOUT_MS = 20_000;
+vi.setConfig({ testTimeout: DAY_TIMEOUT_MS });
 
 async function eat(p: Party, h: Human): Promise<void> {
   const seat = p.room.state.players.get(h.id)!;
