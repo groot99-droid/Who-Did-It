@@ -2,11 +2,12 @@
 // register on the server (`apps/server/src/sim/auto/invariants.ts`), where the admin room runs them too; importing
 // this module makes the registration explicit and refuses a run in which a round-6 check is missing, so a run can
 // never come back clean because nothing was checked. Round 7 adds the vendetta checks (Session 7H, GDD 3.20); round 8
-// the body check (Session 8A, GDD 3.22).
+// the body check (Session 8A, GDD 3.22); round 10 the decoded-view check of `pnpm auto -- --views` (10X, x14, A453).
 import { registeredInvariants } from '../../../apps/server/src/sim/auto/invariants';
 import '../../../apps/server/src/sim/vendettas/invariants';
 import '../../../apps/server/src/sim/body/invariants';
 import '../../../apps/server/src/sim/tasks/invariants';
+import '../../../apps/server/src/sim/auto/shadowViews';
 
 /** The seven checks of `auto-admin.md` 5, in its order (DECISIONS A84 has the names). */
 export const ROUND6_CHECKS = [
@@ -37,9 +38,17 @@ export const ROUND7_CHECKS = [
  */
 export const ROUND8_CHECKS = ['figureNotSeat', 'bodyBounds'] as const;
 
-/** The round-6, round-7 and round-8 checks missing from `names`. */
+/**
+ * The round-10 check (10X, x14, A453, GDD 3.19): each seat's decoded view against the server, which only compares
+ * when the run has `--views`; it is registered either way so a run can never claim the check it did not make.
+ */
+export const ROUND10_CHECKS = ['decodedViews'] as const;
+
+/** The round-6, round-7, round-8 and round-10 checks missing from `names`. */
 export function missingChecks(names: readonly string[]): string[] {
-  return [...ROUND6_CHECKS, ...ROUND7_CHECKS, ...ROUND8_CHECKS].filter((name) => !names.includes(name));
+  return [...ROUND6_CHECKS, ...ROUND7_CHECKS, ...ROUND8_CHECKS, ...ROUND10_CHECKS].filter(
+    (name) => !names.includes(name),
+  );
 }
 
 const missing = missingChecks(registeredInvariants());

@@ -1,3 +1,4 @@
+import type { Client } from '@colyseus/core';
 import { StateView } from '@colyseus/schema';
 import { clues } from '@wdi/content';
 import { TILE_PX, VIEW_TAG } from '@wdi/shared';
@@ -29,6 +30,31 @@ function heldOf(room: PartyRoom, sessionId: string): HeldAvatars {
   if (!held) all.set(sessionId, (held = { plain: new Set(), ghost: new Set(), near: new Set() }));
   return held;
 }
+
+/**
+ * Round 10, x14 (A453): the shadow viewers of an auto match run with `pnpm auto -- --views`, one per seat, reconciled
+ * below exactly as a client's view is (`sim/auto/shadowViews.ts` encodes and decodes them). Empty in every real room:
+ * a shadow is never a client, is never the admin, and nothing it holds reaches the wire.
+ */
+export interface ShadowViewer {
+  sessionId: string;
+  view: StateView;
+}
+const shadowViewers = new WeakMap<PartyRoom, ShadowViewer[]>();
+const NO_SHADOWS: readonly ShadowViewer[] = [];
+export function addShadowViewer(room: PartyRoom, viewer: ShadowViewer): void {
+  let all = shadowViewers.get(room);
+  if (!all) shadowViewers.set(room, (all = []));
+  all.push(viewer);
+}
+export function clearShadowViewers(room: PartyRoom): void {
+  shadowViewers.delete(room);
+}
+/** The clients, then the shadow viewers (x14): every view the room reconciles. */
+const viewersOf = (room: PartyRoom): readonly (Client | ShadowViewer)[] => [
+  ...room.clients,
+  ...(shadowViewers.get(room) ?? NO_SHADOWS),
+];
 
 /**
  * `Player.presence` and `Player.priv` carry their own view tags so each can be granted alone: adding a
@@ -66,10 +92,10 @@ export function createPlayerView(room: PartyRoom, sessionId: string): StateView 
 export function reconcileViews(room: PartyRoom): void {
   const sim = simOf(room);
   const world = isWorldPhase(room.state.phase);
-  for (const client of room.clients) {
+  for (const client of viewersOf(room)) {
     // Round 6, 6C (locked): the admin room's seatless client takes the god view and nothing below.
     if (isAdminClient(room, client.sessionId)) {
-      reconcileAdminView(room, client);
+      reconcileAdminView(room, client as Client); // never a shadow (x14): the admin's id is no seat
       continue;
     }
     const view = client.view;
@@ -174,7 +200,7 @@ function reconcileAvatars(
 }
 
 /** `clues.blood.params.visibleTiles` in px: the range Blood is seen from (GDD 3.4; the client's guard reads it too). */
-const NEAR_PX = (clues.clues.blood?.params?.visibleTiles ?? 0) * TILE_PX;
+export const NEAR_PX = (clues.clues.blood?.params?.visibleTiles ?? 0) * TILE_PX;
 
 /**
  * Round 8 (8L, docs/round8/teardown.md 1): every tick, after the avatars are written (`publishAvatars`), each view
@@ -183,7 +209,7 @@ const NEAR_PX = (clues.clues.blood?.params?.visibleTiles ?? 0) * TILE_PX;
  */
 export function reconcileNear(room: PartyRoom): void {
   const sim = simOf(room);
-  for (const client of room.clients) {
+  for (const client of viewersOf(room)) {
     const viewerSim = sim.players.get(client.sessionId);
     if (!client.view || !viewerSim || isAdminClient(room, client.sessionId)) continue;
     syncNear(room, heldOf(room, client.sessionId), client.view, viewerSim);

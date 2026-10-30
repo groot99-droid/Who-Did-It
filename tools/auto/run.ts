@@ -4,7 +4,9 @@
 // four seed words of each stream so the admin page can replay it, exit 1 on any failure.
 //
 //   pnpm auto -- [--matches 20] [--seed 7] [--map hollowmere|blackpine]
-//                [--difficulty easy|normal|hard] [--seats 10] [--json]
+//                [--difficulty easy|normal|hard] [--seats 10] [--json] [--views]
+//
+// `--views` (round 10, x14, A453) decodes a shadow view per seat every tick and checks it against the server.
 import { Winner } from '@wdi/shared';
 import {
   AUTO_STREAMS,
@@ -19,7 +21,7 @@ import './checks';
 const opts = parseArgs(process.argv.slice(2).filter((a) => a !== '--'));
 if (opts === null) {
   console.error(
-    'usage: pnpm auto -- [--matches N] [--seed N] [--map ID] [--difficulty L] [--seats N] [--json]',
+    'usage: pnpm auto -- [--matches N] [--seed N] [--map ID] [--difficulty L] [--seats N] [--json] [--views]',
   );
   process.exit(2);
 }
@@ -47,6 +49,7 @@ try {
       difficulty: opts.difficulty,
       seeds: seedWordsFor(opts.seed, m, AUTO_STREAMS),
       npcIds: npcIdsFor(opts.seed, m, opts.seats),
+      views: opts.views,
     });
     const ms = Math.round(performance.now() - t0);
     if (r.failures.length > 0) failed++;
@@ -57,7 +60,7 @@ try {
     }
     out(
       `match ${m + 1}/${opts.matches} winner=${winnerName(r.winner)} ticks=${r.ticks} rounds=${r.rounds} ` +
-        `failures=${r.failures.length} ${ms}ms`,
+        `failures=${r.failures.length}${opts.views ? ` decoded=${r.decodedChecks}` : ''} ${ms}ms`,
     );
     if (r.failures.length === 0) continue;
     for (const f of r.failures) out(`  FAIL ${f.name} at tick ${f.tick}: ${f.detail}`);
