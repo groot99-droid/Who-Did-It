@@ -668,6 +668,39 @@
       "tooltip": "Pries open a nailed crate. Wears with use.",
       "ships": "V1",
       "gddRef": "3.14"
+    },
+    "skinningKnife": {
+      "id": "skinningKnife",
+      "name": "Skinning Knife",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "skin",
+      "tool": { "skin": 1 },
+      "uses": 20,
+      "tooltip": "Skins a fallen wolf or boar for hide and game. Wears with use. It is a tool, not a weapon.",
+      "ships": "V1",
+      "gddRef": "3.22"
+    },
+    "hide": {
+      "id": "hide",
+      "name": "Hide",
+      "kind": "material",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Wolf and boar hide. Stitched into a Leather jerkin.",
+      "ships": "V1",
+      "gddRef": "3.22"
+    },
+    "game": {
+      "id": "game",
+      "name": "Game",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Raw wolf or boar meat. A stew or a pie wants it; it is no meal as it is.",
+      "ships": "V1",
+      "gddRef": "3.22"
     }
   }
 }

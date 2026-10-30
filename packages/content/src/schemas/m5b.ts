@@ -73,6 +73,10 @@ export const MobDef = z.strictObject({
   /** Round 8 (GDD 3.22, Session 8A): the health its attack takes and the effects it may apply (`hp` above is 8G's). */
   dmg: z.number().int().positive(),
   effects: z.record(z.string().regex(/^[a-z][A-Za-z0-9]*$/), z.number().min(0).max(1)),
+  /** Round 10 (D6b, GDD 3.22): what a Skinning knife takes off its corpse; none for a creature that has no hide. */
+  skin: z
+    .strictObject({ hide: z.number().int().nonnegative(), game: z.number().int().nonnegative() })
+    .optional(),
 });
 export type MobDef = z.infer<typeof MobDef>;
 
