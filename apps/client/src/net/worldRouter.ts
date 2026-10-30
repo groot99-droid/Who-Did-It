@@ -166,6 +166,14 @@ export function installWorldRouter(
           feedMock.bus.on('meetingRequest', (req) => mock.openMeeting(req));
           // Test and demo hook (mock only): the same request the mock world sends at a body or the bell.
           (window as unknown as { __wdiMock?: unknown }).__wdiMock = {
+            /** Round 10, 10Y: the asleep veil (A8) and On the line (C1b) as the server's private view would send them. */
+            sleep: (asleep: boolean, inBed = 0, inBedOf = 0) => {
+              feedMock.sleeping = () => ({ asleep, inBed, inBedOf });
+            },
+            line: (on: boolean, cause?: string) => {
+              feedMock.onLine = () => on;
+              if (on && cause) feedMock.bus.emit('killed', { sceneId: 'overworld', cause, roles: {} });
+            },
             requestMeeting: (reason: MockMeetingRequest['reason'] = 'body') =>
               feedMock.bus.emit('meetingRequest', {
                 reason,
