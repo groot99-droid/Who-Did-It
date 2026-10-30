@@ -1111,7 +1111,7 @@ On the wire a figure is a scene `Avatar` under an opaque handle like a seat's (3
 a card's: 8F's variants all begin `villager`), the `townsfolk.height` height, no status bit and never the ghost
 tag, so nothing but the drawn figure tells it apart; its id never leaves the server. A seat's view holds the living
 figures of its own scene as it holds the seats there (3.17), through the same sight rule in the dark and at night
-(3.7, 3.15), and a ghost sees them as the living do (round 10, x5, A353). Needs and moods tick for it as
+(3.7, 3.15), with no near tag (its Blood range of 3.4 is a seat's), and a ghost sees them as the living do (round 10, x5, A353). Needs and moods tick for it as
 for a seat (the mood idle shows while it stands), it hears the same bus events, and it counts the bodies it sees.
 The Knife never finds it (its handle resolves to no seat), a vote for it is refused, and it dies only to a creature
 that kills (the wolf's `mobs.json` `dmg` off its reduced body's `body.maxHp`, regained like a seat's, 3.22; any

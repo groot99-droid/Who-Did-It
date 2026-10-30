@@ -207,6 +207,8 @@ function syncNear(room: PartyRoom, held: HeldAvatars, view: StateView, viewerSim
   for (const handle of held.plain) {
     const avatar = avatarOf(room, handle);
     if (!avatar) continue;
+    // Round 10, x5 (A353): a figure's row is held plain, never with the near tag (its `nearBits` are never sent).
+    if (figureOfHandle(room, handle) !== undefined) continue;
     const near = viewerSim.dead || Math.hypot(avatar.x - viewerSim.x, avatar.y - viewerSim.y) <= NEAR_PX;
     if (near && !held.near.has(handle)) {
       view.add(avatar, VIEW_TAG.near);
