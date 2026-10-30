@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { GddRef, Id, Seconds, Tiles, byPlayerCount } from './common.js';
+import { EffectKey } from './effects.js';
 
 export const NOISE_KEYS = [
   'walk',
@@ -525,6 +526,18 @@ export const BalanceFile = z.strictObject({
     confirmS: Seconds,
     /** The tavern bed's price, paid from the purse when the sleeper lies down. */
     innBedScrip: z.number().int().nonnegative(),
+    /** Round 10, A7b: the share of maximum stamina each kind of bed restores at the dawn its sleeper sleeps to. */
+    restore: z.strictObject({
+      bed: z.number().min(0).max(1),
+      cot: z.number().min(0).max(1),
+      innBed: z.number().min(0).max(1),
+    }),
+    /** The effects the tavern bed cures at that dawn (`effects.json` ids). */
+    innBedCures: z.array(EffectKey),
+    /** The Faith a night on the chapel cot gives, unless the chapel bars the sleeper. */
+    cotFaith: z.number().int().nonnegative(),
+    /** The last active player awake, alone this long while the rest sleep, is Exhausted the next day. */
+    holdoutGraceS: Seconds,
   }),
 });
 export type BalanceFile = z.infer<typeof BalanceFile>;
