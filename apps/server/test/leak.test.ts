@@ -7,6 +7,7 @@ import { clockOf } from '../src/sim/auto/clock';
 import { StatusBit } from '../src/sim/constants';
 import { simOf } from '../src/sim/RoomSim';
 import { canSee } from '../src/sim/Sight';
+import { forceArrival, isTurned, onDeliveryArrival } from '../src/sim/vendettas/arrival';
 import { avatarsHeld } from './avatarHelpers';
 import { bootFlowServer, murder, sim, skipPhase, startParty, until } from './flowHelpers';
 import { setPhase, teleport } from './killHelpers';
@@ -31,7 +32,7 @@ const NIGHT = balance.vision.nightTiles;
 /** Payload keys that would carry a seat's secret. */
 // `unique` and `total` are Paint The Town Red's counts (C5a, seams.md row 18): an object naming another seat beside
 // them would carry a Killer's tally before game over. Generic names: a future message that names a seat beside a
-// `total` of its own must rename it or extend the audit.
+// `total` of its own must rename it or extend the audit. `hitman` is the turned seat's own flag (C4a, row 20).
 const SECRET_KEYS = new Set([
   'roleId',
   'role',
@@ -44,6 +45,7 @@ const SECRET_KEYS = new Set([
   'paintTown',
   'unique',
   'total',
+  'hitman',
 ]);
 /** Payload keys that name a seat. */
 const SEAT_KEYS = new Set(['id', 'seat', 'seatId', 'playerId', 'targetId']);
@@ -166,6 +168,20 @@ describe('the leak audit (8L)', () => {
     }
     expect(seen.has(Phase.day) && seen.has(Phase.night)).toBe(true);
 
+    expect(a.leaks).toEqual([]);
+  });
+
+  it('the Hitman’s turning (C4a, seams.md 3 row 20): the sign and the mark leak nothing to another client', async () => {
+    const m = await startParty(colyseus, 6);
+    setPhase(m, Phase.day);
+    const a = audit(m);
+    moved(m, a);
+    expect(await until(() => a.checked > 5, 10_000)).toBe(true);
+    const checked = a.checked;
+    forceArrival(m.room, m.room.state.round, true);
+    onDeliveryArrival(m.room, m.room.state.round);
+    expect(await until(() => a.checked > checked + 5, 10_000)).toBe(true);
+    expect([...m.room.state.players.keys()].some((id) => isTurned(m.room, id))).toBe(true);
     expect(a.leaks).toEqual([]);
   });
 

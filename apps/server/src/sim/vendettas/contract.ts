@@ -15,7 +15,9 @@ import { vendettaHolders, vendettaOf } from './state';
  * written to its own Notebook (`NoteKind.contract`). It accepts it from anywhere as the quest `contract` of its own
  * `Private.quests` (`quest.accept`, the one line of `sim/Quests.ts`); an NPC Hitman accepts at once. While accepted
  * and the target lives, a Knife kill of anyone else rests the Knife `offTargetRestS` longer; killing the target
- * completes it and readies the Knife; the target dying any other way ends it unpaid. Session 7H.
+ * completes it and readies the Knife; the target dying any other way ends it unpaid. Session 7H. Round 10, C4: the
+ * row is an `arrival` row, never drawn at the deal; the Hitman's mail turns a seat and mails it the mark at once
+ * (`arrival.ts`), a human when one is free.
  */
 
 /** The quest id of an accepted contract; it has no `quests.json` row (a mail, not a giver's work). */
@@ -41,11 +43,12 @@ export function openContract(room: PartyRoom, seat: string): Contract | null {
   return c && !progressOf(room, seat).over ? c : null;
 }
 
-/** A holder still on its Killer card with the contract vendetta. */
+/** A holder still on its Killer card with the contract vendetta, or a seat the Hitman's mail turned (C4). */
 function hitmen(room: PartyRoom): string[] {
   return [...vendettaHolders(room).keys()].filter((seat) => {
     const v = vendettaOf(room, seat);
-    return v?.kind === 'contract' && room.state.players.get(seat)?.priv?.role.roleId === v.role;
+    const priv = room.state.players.get(seat)?.priv;
+    return v?.kind === 'contract' && (priv?.hitman === true || priv?.role.roleId === v.role);
   });
 }
 
@@ -56,24 +59,32 @@ const living = (room: PartyRoom, seat: string): boolean => {
 
 /** The bus's `train.arrive`: the first of the match brings each living Hitman its contract. */
 export function onArriveContract(room: PartyRoom): void {
+  for (const seat of hitmen(room)) offerContract(room, seat);
+}
+
+/**
+ * Mails `seat` its mark, once (the first arrival, or the Hitman's turning, round 10 C4): a living human outside the
+ * holder's Cabal when one is free (gdd-map 3.20), else any other living seat, drawn on `contract` keyed by the seat.
+ */
+export function offerContract(room: PartyRoom, seat: string): void {
   const held = contractsOf(room);
-  for (const seat of hitmen(room)) {
-    if (held.has(seat) || progressOf(room, seat).over || !living(room, seat)) continue;
-    const mates = new Set(room.state.players.get(seat)?.priv?.cabalMates ?? []);
-    const pool = [...room.state.players.keys()].filter(
-      (id) => id !== seat && !mates.has(id) && living(room, id),
-    );
-    if (pool.length === 0) {
-      emitStep(room, seat, 'vendetta.contract.lapsed');
-      progressOf(room, seat).over = true;
-      continue;
-    }
-    const target = pool[Math.floor(room.seeds.get('contract', seat)() * pool.length)]!;
-    held.set(seat, { target, accepted: false });
-    addNote(room, seat, NoteKind.contract, target);
-    emitStep(room, seat, 'vendetta.contract.offered');
-    if (isNpcSeat(room, seat)) accept(room, seat);
+  if (held.has(seat) || progressOf(room, seat).over || !living(room, seat)) return;
+  const mates = new Set(room.state.players.get(seat)?.priv?.cabalMates ?? []);
+  const pool = [...room.state.players.keys()].filter(
+    (id) => id !== seat && !mates.has(id) && living(room, id),
+  );
+  const humans = pool.filter((id) => !isNpcSeat(room, id));
+  const from = humans.length > 0 ? humans : pool;
+  if (from.length === 0) {
+    emitStep(room, seat, 'vendetta.contract.lapsed');
+    progressOf(room, seat).over = true;
+    return;
   }
+  const target = from[Math.floor(room.seeds.get('contract', seat)() * from.length)]!;
+  held.set(seat, { target, accepted: false });
+  addNote(room, seat, NoteKind.contract, target);
+  emitStep(room, seat, 'vendetta.contract.offered');
+  if (isNpcSeat(room, seat)) accept(room, seat);
 }
 
 function accept(room: PartyRoom, seat: string): boolean {

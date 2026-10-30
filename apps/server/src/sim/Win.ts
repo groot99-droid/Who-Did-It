@@ -145,6 +145,7 @@ export function resetToLobby(room: PartyRoom): void {
     priv.lensCharges = 0;
     priv.myVote = '';
     priv.paintTown = false; // round 10, C5
+    priv.hitman = false; // round 10, C4
   });
   for (const id of gone) state.players.delete(id);
   if (!state.players.has(state.leaderId)) state.leaderId = state.players.keys().next().value ?? '';

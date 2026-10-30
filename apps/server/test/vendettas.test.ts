@@ -99,15 +99,10 @@ describe('the draw', () => {
   it('offers the Zealot only with a Vicar dealt, the Bandit only where the manor is open, both only on HollowMere', () => {
     const room = fakeRoom();
     const small = (cards: string[]) => ids(eligibleVendettas(room, 'killer', [...deal(5, cards).values()]));
-    expect(small(['killer', 'vicar'])).toEqual(['zealot', 'activist', 'hitman']);
-    expect(small(['killer'])).toEqual(['activist', 'hitman']);
+    expect(small(['killer', 'vicar'])).toEqual(['zealot', 'activist']);
+    expect(small(['killer'])).toEqual(['activist']);
     const medium = [...deal(8, ['killer', 'vicar']).values()];
-    expect(ids(eligibleVendettas(room, 'killer', medium))).toEqual([
-      'zealot',
-      'activist',
-      'bandit',
-      'hitman',
-    ]);
+    expect(ids(eligibleVendettas(room, 'killer', medium))).toEqual(['zealot', 'activist', 'bandit']);
     expect(ids(eligibleVendettas(fakeRoom('blackpine'), 'killer', medium))).toEqual(['zealot', 'activist']);
     expect(eligibleVendettas(room, 'accomplice', medium)).toEqual([]);
   });
@@ -141,8 +136,8 @@ describe('the draw', () => {
       const id = vendettaOf(room, 's0')?.id ?? '';
       seen.set(id, (seen.get(id) ?? 0) + 1);
     }
-    expect([...seen.keys()].sort()).toEqual(['activist', 'bandit', 'hitman', 'zealot']);
-    for (const n of seen.values()) expect(Math.abs(n - 750)).toBeLessThan(150);
+    expect([...seen.keys()].sort()).toEqual(['activist', 'bandit', 'zealot']);
+    for (const n of seen.values()) expect(Math.abs(n - 1000)).toBeLessThan(150);
   });
 
   it("shows an Accomplice its Killers' goals on its own card and a villager nothing", () => {

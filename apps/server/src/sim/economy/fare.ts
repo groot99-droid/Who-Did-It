@@ -4,6 +4,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { emitSim } from '../events/bus';
 import { type Refusal, refusal } from '../refusal';
 import { type PlayerSim, simOf } from '../RoomSim';
+import { isTurned } from '../vendettas/arrival';
 import { isVerbPhase, reject, sceneKey } from '../World';
 import { balanceOf, movePurse, TOWN } from './purse';
 import { nearProp } from './reach';
@@ -89,14 +90,14 @@ export function payFare(room: PartyRoom, seat: string): RefusalReason | null {
 
 /**
  * Whether the shop is dear (C2b): its owner look is the public look (`Player.look`, fixed when the card closes) of a
- * seat that owes the line. Never the drawn avatar's look, so an impersonation never moves the dear stall, and never
+ * seat that owes the line, or of the Hitman's turned seat (round 10, C4a, GDD 3.33). Never the drawn avatar's look, so an impersonation never moves the dear stall, and never
  * the card, so a cover is never named. A shop with no owner is never dear.
  */
 export function shopIsDear(room: PartyRoom, shopId: string): boolean {
   const owner = economy.shops[shopId]?.owner;
   if (owner === undefined) return false;
   for (const [seat, player] of room.state.players)
-    if (player.look === owner && owesFare(room, seat)) return true;
+    if (player.look === owner && (owesFare(room, seat) || isTurned(room, seat))) return true;
   return false;
 }
 

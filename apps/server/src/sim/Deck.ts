@@ -4,6 +4,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { flowOf } from './Flow';
 import { initBodies } from './body/state';
 import { beginPaintTown, humansOf, paintDeal, paintsTown } from './paintTown';
+import { drawArrival } from './vendettas/arrival';
 import { drawVendettas } from './vendettas/state';
 
 // The main-mode deal from the deck (GDD 3.1, round-5 `deck/wire.md` 4.4 and 5). Round 10, 10C owns this file; the hook
@@ -62,6 +63,7 @@ export function dealMainDeck(room: PartyRoom, ids: readonly string[]): Map<strin
   flow.deck = cards;
   flow.undealt = deal.undealt;
   drawVendettas(room, dealt); // round 7, 7H: one vendetta per Killer seat, on its own stream (GDD 3.20)
+  drawArrival(room, ids); // round 10, C4: the Hitman's arrival, on the secret `hitman` stream (GDD 3.33)
   initBodies(room); // round 8, 8A: every seat whole at the deal (GDD 3.22, locked call site)
   return dealt;
 }
