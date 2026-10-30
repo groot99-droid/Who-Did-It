@@ -1,6 +1,8 @@
 import mitt, { type Emitter } from 'mitt';
 import type { Room } from '@colyseus/sdk';
+import balance from '@wdi/content/data/balance.json';
 import type { HoldAction } from '@wdi/shared/protocol';
+import { paintTarget } from '@wdi/shared/rules';
 import type {
   AvatarSnap,
   BodySnap,
@@ -52,6 +54,7 @@ interface PlayerState {
     inBedOf?: number;
     onLine?: boolean; // round 10, C1
     fare?: number; // round 10, C2
+    paintTown?: boolean; // round 10, C5
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
@@ -369,6 +372,14 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   taskBar(): number {
     return this.state.taskBar ?? 0;
+  }
+
+  // Round 10, C5 (GDD 3.8): Paint The Town Red's target, while this seat's `Private.paintTown` is set.
+  paintTarget(): number {
+    if (this.state.players.get(this.selfId)?.priv?.paintTown !== true) return 0;
+    let seats = 0;
+    this.state.players.forEach(() => seats++);
+    return paintTarget(balance.paintTown.winUnique, seats - 2);
   }
 
   // Round 8, 8C (locked; GDD 3.23): the purse and the shop's trades.

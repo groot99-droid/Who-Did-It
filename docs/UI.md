@@ -1853,6 +1853,11 @@ the train brings the seat back the screen lifts and a 3 s toast says so. The man
 | a stall's stock (`shop.left`, C3) | {n} left today | the shop panel, beside an item's price, at a stall with a character (`shop.open` `left`) |
 | a stall sold out (`shop.soldOut`, C3) | Sold out | the shop panel, in place of the count; the Buy button greys |
 | the Paint The Town Red win (server, `Win.ts` `summaryOf`, C5a) | {town} is painted red. The Killers win. | `gameOver.summary`, every seat |
+| the Paint The Town Red winner (`over.paintTown`, C5b) | The Killers paint the town red | the end screen's title, `Winner.paintTown` |
+| the tally's title (`over.paint.title`, C5b) | Paint The Town Red | the end screen, above the roles, in that mode only |
+| the target (`over.paint.target`, C5b) | The town needed {n} different kills | the end screen, under the tally's title |
+| a Killer's row (`over.paint.row`, C5b) | {name}: {unique} different, {total} in all | the end screen, one per Killer, ranked by total |
+| the Killers' goal (`card.paint.goal`, C5b) | Paint The Town Red: with the other Killer, kill {n} different townsfolk before you are both caught. | the role card's goal line, while `Private.paintTown` is set; {n} is `paintTarget` over the roster |
 
 ### 14.48 The lock-pick and the Resistant effect (10D, round 10)
 

@@ -258,6 +258,11 @@ export interface WorldFeed {
   purse(): number;
   /** Round 10 (C2b, GDD 3.23): the Scrip this seat owes the line (`Private.fare`), 0 when it owes none. */
   fare(): number;
+  /**
+   * Round 10 (C5, GDD 3.8): in Paint The Town Red, the unique count the two Killers need (`paintTarget` over the
+   * public roster), read only while this seat's `Private.paintTown` is set; 0 otherwise.
+   */
+  paintTarget(): number;
   /** Round 8, 8C (locked): `act.buy` and `act.sell` at the shop a `shop` hold opened. */
   buy(shopId: string, itemId: string, qty: number): void;
   sell(shopId: string, itemId: string, qty: number): void;

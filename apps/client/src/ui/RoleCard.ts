@@ -46,6 +46,8 @@ export interface RoleCardOptions {
   vendetta?(): string;
   /** Loaded textures, for the picker's portraits; none draws the initial of the look's name. */
   textures?: PortraitTextures | null;
+  /** Round 10, C5: Paint The Town Red's target, 0 outside it (`WorldFeed.paintTarget`); polled with the card. */
+  paintTarget?(): number;
 }
 
 /** The deck strip's one card: the role's name, and the look it walks as when it has one. */
@@ -147,6 +149,7 @@ export function mountRoleCard(
     );
   };
 
+  const goal = h('p', { class: 'wdi-card__goal', 'data-testid': 'card-goal' }, role.goal);
   // GDD 3.17: the look this seat walks as, the deck, and for a cover role the picker.
   const hints = role.coverHints ?? [];
   const walkLead =
@@ -199,7 +202,7 @@ export function mountRoleCard(
     ),
     picker?.el,
     role.deck !== undefined && role.deck.length > 0 && deckStrip,
-    h('p', { class: 'wdi-card__goal' }, role.goal),
+    goal,
     vendettaBox,
     abilities.length > 0 && h('ul', { class: 'wdi-card__abilities' }, ...abilities),
     items.length > 0 && h('ul', { class: 'wdi-card__inventory' }, ...items),
@@ -245,8 +248,15 @@ export function mountRoleCard(
   );
   root.append(card, chip);
 
-  // The picker keeps itself in step with the server's picks (own and mates') for as long as the card is mounted.
+  // Round 10, C5 (GDD 3.8): a Paint The Town Red Killer's goal is the shared target, once its private view says so.
+  const paint = (n: number) => {
+    if (n > 0) goal.textContent = fill(LOOKS_COPY['card.paint.goal'], { n });
+  };
+
+  // The picker, the paint target and the vendetta keep in step with the private view for as long as the card is
+  // mounted (own and mates' picks; the target; a vendetta that lands after the card).
   const pickerPoll = picker && opts.cover ? pollCover(picker, opts.cover) : null;
+  const paintPoll = opts.paintTarget ? pollEvery(opts.paintTarget, paint) : null;
   const vendettaPoll = opts.vendetta ? pollEvery(opts.vendetta, paintVendetta) : null;
 
   let open = false;
@@ -312,6 +322,7 @@ export function mountRoleCard(
     destroy: () => {
       clearTimers();
       pickerPoll?.();
+      paintPoll?.();
       vendettaPoll?.();
       document.removeEventListener('keydown', onKey);
       card.remove();
