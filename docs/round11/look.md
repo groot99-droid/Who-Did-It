@@ -289,10 +289,10 @@ When a set is over a budget, the build round applies these in order and stops at
 
   So any per-pixel run-time lighting pass (normal, depth) does not fit the cap of 9 for figures, and costs another
   1.8 per map for the environment. 11A's pass list (`pipeline.md` 4) keeps body, scarf and blood, adds `emit` for
-  statics and proposes no normal, depth or separate AO pass; CL3 adds the shadow layer (5.3.1); this table is the budget
-  for it. With
-  `emit` at its cap and the `constable` resident (6.2), the low-poly worst case on Hollowmere is about 8.14 + 0.08 +
-  0.5 = 8.72, under 9 (8.97 with the shadow layer at its cap, 5.3.1). The sprite materials need no roughness or normal maps at run time: those are V2's (3.2, 8.1).
+  statics and proposes no normal, depth or separate AO pass; CL3 adds the shadow layer (5.3.1); this table is the
+  budget for it. With `emit` at its cap and the `constable` resident (6.2), the low-poly worst case on Hollowmere is
+  about 8.14 + 0.08 + 0.5 = 8.72, under 9 (8.97 with the shadow layer at its cap, 5.3.1). The sprite materials need no
+  roughness or normal maps at run time: those are V2's (3.2, 8.1).
 
 #### 5.3.1 The long-shadow layer (CL3)
 
