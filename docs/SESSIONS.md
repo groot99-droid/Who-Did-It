@@ -4552,7 +4552,40 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   - 10C, C4d: the `ledger.read` and `ledger` messages, one command-table case, the `ledger` kind's read verb in
     `interactions.json`, the NPC read's `routines.json` rows and one line in `sim/npc/routine.ts`, and one case in
     the A170 leak test.
-  - 10T, T6b: one call line in `sim/npc/routine.ts` `pickStation` and one in `sim/townsfolk/walk.ts`.
+  - 10T, T6b: one call line in `sim/npc/routine.ts` `pickStation` and one in `sim/townsfolk/run.ts` `pickStation`,
+    where the townsfolk choose their stations.
+- 2026-10-30: grants. Each is listed in the pull request that uses it.
+  - 10B, B6d: `AUTO_EVENT_KINDS` in `test/autoHelpers.ts` and `ADMIN_EVENT_KINDS` in `sim/auto/AdminView.ts` gain
+    `endTrial.open` and `endTrial.verdict`.
+  - 10M, M1a: R17's stream list in `npcRoutine.test.ts` gains `barks`, with a comment.
+  - 10T, T6a:
+    - `mapSites.test.ts` gains `cottage_fisher` and `sea_exit`;
+    - R17 in `npcRoutine.test.ts` gets its own `loot` branch, which asserts a prop key. T6a's scenes shift the
+      persona draw, so two NPCs reach rubble props that A11's `breakRock` drops, a path latent since A11.
+- 2026-10-30: rulings.
+  - **C4b's client half** (10Y):
+    - The Derringer's key and disc come from the own pack on the client, as `useVerbOf` gives an item its verb (the
+      ability is `scope: item`). Nothing new goes on the wire.
+    - The over screen names all four `gameOver.hitman` stages. The match is over, and `gameOver.roles` names every
+      card.
+  - **`herbBreadDawn.test.ts`** (x11): its two tests run close to vitest's 5-second default in the cloud containers.
+    They failed there on the bare base and on stack11, and they pass on CI's runner. 10X gives the file the day
+    timeout `npcRoutine.test.ts` uses, as x18.
+- 2026-10-30: stack11 merged after one check of C4b, B6a, R1 and R2 on the merged tree. The check covered the full
+  suite, 50 clean bot matches and every e2e spec; its only failure was `herbBreadDawn.test.ts`'s timeout. Merged:
+  - C4b #408, with C4a #401, at e9265a2a;
+  - B6a #427 at 5671fae3;
+  - R1 #419 at 6ac53f62;
+  - R2 #423 at 1a1e494a.
+- 2026-10-30: y17 #439 merged at 04d76d35, raising CI's `server` job limit. x18 #446 merged at 8b03b36a, giving
+  `herbBreadDawn.test.ts` the day timeout. Both were checked on the merged tree, and the test passed on x18's merge.
+- 2026-10-30: the stop. The owner wrote "Get to the next stopping point then we will pick up all that is left in
+  round 10 pt2", and then "When the sessions are done and the pause has commenced, archive the sessions, move the
+  information to be done for pt2 to access later".
+  - Every session pushed its work, sent 6Z a handoff, and was archived: 10A to 10Y, and 11A and 11B.
+  - `docs/round10/part2.md` is the pickup list: the state at the stop, the merge queue, each session's handoff and
+    id, and how to resume.
+  - `docs/round10/wave2-briefs.md` keeps the briefs of 10N, 10K, 10T and 10M.
 
 ## Round 11 (planning, started 2026-10-29)
 
