@@ -102,7 +102,8 @@ and story mode are one design). The `udgt-consult` skill itself is not installed
 read from `answers.json` and the chapters directly.
 
 **Wave 1** went to 6Z on 2026-10-30 before this document was done: S1 containers, S2 berries and stew, S3 the forge,
-S4 the mugging's Flee and Fight, S5 the art style in the menu only (section 4).
+S4 the mugging's Flee and Fight, S5 the art style in the menu only (section 4). 6Z assigned them the same day: S1 to 10F, S2 and S3 to
+10H, S4 to 10D (then D4b once S2 merges), S5 to 10Y; the grindstone left S3 for 10X's x9 (A313).
 
 ## 1. The inventory
 
@@ -145,7 +146,7 @@ section 5. The ids (I1 and on) are this document's, used by sections 2 to 4.
 |---|---|---|---|---|---|
 | I21 | **Containers and loot**: barrels, sacks and shelves (search), nailed and locked chests (pry, pick, key), activation per scene, loot tables by theme, the 6 new container slots | logic-table.md 6.1 to 6.4 | **Not built.** `interactions.json` `lootTables: {}`, no container class; the `loot` stream exists (A10, A11) | yes (wave 1, S1) | None: contents are private until opened, the prop state is row 3's. The town chest (the hub `kitChest`) is C6's |
 | I22 | **Berries, Game and Stew** | logic-table.md 9.6; living-world.md 2.1 | **Partly built.** `game` and `hide` exist (D6b); no `berries` node or item, no `stew` | yes (wave 1, S2) | None |
-| I23 | **The forge chain**: the kiln's Tin Ingot; the forge and anvil's Iron axe, Iron pickaxe, Fine pick, Tin mail, Tin helm; the Miner's cap; tier-2 walls; the grindstone | logic-table.md 7.1, 8.1, 8.2; GDD 3.22 "Not built yet"; D9's "tin mail waits for round 11" | **Not built.** `forge` and `kiln` props exist in BlackPine scenes as stems; no recipe or class reads them | yes (wave 1, S3), except the cap's lamp and Warmth (2.5) | Tier-2 HollowMere access is by carrying ingots (LT9: default) |
+| I23 | **The forge chain**: the kiln's Tin Ingot; the forge and anvil's Iron axe, Iron pickaxe, Fine pick, Tin mail, Tin helm; the Miner's cap; tier-2 walls (the grindstone is 10X's x9, A313) | logic-table.md 7.1, 8.1, 8.2; GDD 3.22 "Not built yet"; D9's "tin mail waits for round 11" | **Not built.** `forge` and `kiln` props exist in BlackPine scenes as stems; no recipe or class reads them | yes (wave 1, S3), except the cap's lamp and Warmth (2.5) | Tier-2 HollowMere access is by carrying ingots (LT9: default) |
 | I24 | **Weapons**: Club, Hatchet/Axe, Pickaxe as weapons (`weapon` blocks, the weapon slot) | logic-table.md 8.3; living-world.md 5.2 | **Not built.** The weapon slot exists (A12) and takes nothing; fists are the only blow | yes | A tool as a weapon wears twice; nothing kills a seat but the Knife and a bite (A6); armour applies (D6a); the robbery (C6) is in the same file |
 | I25 | **Armour's remaining resistances**: Warmth at night, the Miner's cap lamp, louder footsteps (Tin mail), Daze resistance (Tin helm) | GDD 3.22 "Not built yet"; logic-table.md 8.2 | **Not built** | proposed (2.5) | Warmth reads Fear, which only NPC seats and figures have; a lamp is a carried light, public as the lantern bit |
 | I26 | **Recipe teaching and the chains' branch**: Moll's Food or Cure, Ada Kerrow's Temper teaching Tin mail, one branch per match; the other three givers' chains (Pell, Hask, the Collier) | living-world.md 1.3; GDD 3.16 "wait for round 11" | **Partly built.** D9a's two-step chains pay items and Scrip (`quests.json` `after`) | proposed (2.5) | A learned recipe is private; a branch is private |
@@ -225,43 +226,71 @@ value for the balance lab; every other number is a key that holds it.
 
 ### 2.1 The world-mode deal (I1, I3, I4)
 
-The deal of `world-mode.md` 1.4, as amended by F4 and 6Z's C4 and C5 rulings, in `sim/Deck.ts` beside
-`dealPaintTown`:
+6Z's ruling (2026-10-30): this goes first in wave 2, since no step of the plan builds it.
 
-1. H = the human seats. H = 1 is story mode (E2); H = 2 is Paint The Town Red (built). H from 3 deals the world.
-2. **The roster** is the map's card list, a new `maps/<id>.json` `roster` (card ids, no count), validated to hold at
-   most 27 cards (the trait triples) and every card of the `vendettas.json` partners. The room's seat count is the
-   roster less the worn card, plus one for a Bandit (4.2). Seats beyond the humans are NPC seats, named from
-   `npcNames` as today.
-3. One human is dealt the Killer on `deal`. The Killer draws its vendetta on `vendetta:<seat>` among the rows whose new
-   `minHumans` (_new_ field; Zealot, Activist, Bandit: 3) is at most H and whose map rule holds. The Hitman row is
-   never drawn (C4a).
-4. The vendetta's partners (`needsCard`, now a list, _new_ `partners`) go to humans on `deal`; the interim partners of
-   world-mode 1.3 stand: Vicar, Watchman, Gamekeeper.
-5. Each other human draws a roster card on `deal`, never the Accomplice below `deal.accompliceMinHumans` (_new_, 6).
-6. NPC seats are created for every remaining card except the one the Killer wears.
-7. **The pick.** On the role card the Killer is offered every NPC-held card but its partners, the Accomplice and the
-   Drifter; the first hint is the first offered card in `deal` order. The Accomplice and the Drifter pick from what is
-   left, the Accomplice seeing the Killer's pick live (as Cabal mates do). A Bandit has no pick. The worn card's NPC
-   seat is removed when the card closes, before `Player.look` is written, so no seat ever wears it and nothing on the
-   wire shows a seat leaving. An NPC cover wears its first hint.
+**What world mode deals today.** World mode replaced the main mode at B6 with no flag (6Z, 2026-10-30), but the deal
+is still the main mode's:
 
-**Secrecy.** The seat count is the same in every match of a map but a Bandit's; `Player.look` carries the worn look
-exactly as a real one; the pick draws nothing. `debug.deal` learns the human-first rule (WDI_DEBUG only). The worn
-card's NPC seat exists only between the deal and the card's close, in room memory, never on the roster. An NPC
-Killer stays in the engine for story mode and the auto room (WM1); the multiplayer deal never gives one.
+| Today (the base at `6c9bb79`) | Where |
+|---|---|
+| A party of 1 to 3 humans is filled with NPC seats up to `players.min` (4) at Start, and the leader may add NPCs up to `players.max` (10) | GDD 3.12; `rooms/handlers/lobby.ts` |
+| The deck is `roles.json` `decks[n]`, n the seat count clamped to 4 to 10, holding n + 2 cards | `sim/Deck.ts` `deckCardsFor` |
+| Every Killer card is dealt, to any seat on `deal`: an NPC may hold the Knife | `Deck.ts` `dealMainDeck`, `rules/deck.ts` `dealDeck` |
+| Two non-Killer cards stay undealt, and a cover role is offered those as hints (`coverHints`), private on the role card | `Deck.ts` (`flow.undealt`), `sim/Covers.ts`, `rules/deck.ts` `coverHints` |
+| The Killer draws one vendetta among the four rows; the Zealot needs a dealt Vicar (`needsCard`), the Bandit and the Hitman need the Train | `vendettas/state.ts` `drawVendettas`, `vendettas.json` |
+| The 10-seat deck deals two Killers | `roles.json` `decks["10"]` |
+| Two humans and at least one NPC play Paint The Town Red | `Deck.ts` `dealPaintTown` (C5) |
+| The card holds `phases.roleRevealS` (20 s) | `balance.json` |
+| `startSpawns` and `meetingSpawns` hold `players.max` spawns; the cell holds ten | `maps/*.json`, `scenes/cj_cell.json`, the content check |
+
+**What has to change** (`world-mode.md` 1.2 to 1.4 and 4.1, F4, 6Z's C4 and C5 rulings):
+
+1. **When it runs.** H, the human seats, decides: H = 1 is story mode (E2), H = 2 Paint The Town Red (built), H from 3
+   the world deal below. The main mode's decks stay only for the auto room and the debug deal; the lobby no longer
+   fills to `players.min` for a world match, and Add NPC is refused in world mode (the roster fixes the NPC seats).
+2. **The roster.** `maps/<id>.json` gains `roster`, the card ids the map deals (no count), validated to at most 27
+   cards (the trait triples), every vendetta partner and the Killer once. HollowMere's today: the Killer, the
+   Accomplice, the Drifter, the Detective, the Doctor, the Vicar, the Watchman, the Herbalist, the Gamekeeper and the
+   four professions (13); each new card joins when its pull request lands (N1 to N5, T1). The seat count is the roster
+   less one (the worn card), plus one in a Bandit match. `startSpawns`, `meetingSpawns` and the cell's spawns are
+   checked against the largest roster instead of `players.max`; `players.max` stays the cap on humans.
+3. **One Killer, human.** One human is dealt the Killer on `deal`. No roster holds a second Killer card (C5's Paint
+   deck keeps its own). An NPC Killer stays in the engine for story mode and the auto room (WM1); this deal never makes
+   one. An Accomplice inherits the Knife only when it is human (world-mode 6, "Inherit").
+4. **The vendetta.** The Killer draws on `vendetta:<seat>` among the rows whose new `minHumans` (_new_ field: Zealot,
+   Activist, Bandit 3) is at most H and whose map rule holds. The Hitman row is never drawn (C4a).
+5. **The partners.** `needsCard` becomes `partners` (_new_, a list). The drawn vendetta's partners go to humans on
+   `deal`. The interim partners stand (WM8): the Zealot's Vicar, the Activist's Watchman, the Bandit's Gamekeeper.
+6. **The other humans** draw a roster card each on `deal`, never the Accomplice below `deal.accompliceMinHumans`
+   (_new_, 6), never the Killer.
+7. **The pick.** On the role card the Killer is offered every card no human holds, but the Accomplice and the Drifter;
+   the first hint is the first offered card in `deal` order. It reaches the Killer as today's `coverHints`. The
+   Accomplice and the Drifter, human or not, pick from what the Killer left, the Accomplice seeing the Killer's pick
+   live as Cabal mates do. A Bandit has no pick. An NPC cover wears its first hint. `phases.roleRevealS` becomes 30
+   (world-mode 7.1).
+8. **The NPC seats** are created when the card closes, one for every card no human holds except the worn one, with
+   names from `npcNames` and traits on `traits`, each drawn in seat order after the humans'. During the card the roster
+   shows only the humans; at the close every NPC seat joins it in one tick with its `Player.look`, as every seat's look
+   is written in one tick today. The roster grows by the same count in every match of a map (one more with a Bandit),
+   so the growth says nothing about the pick. There is no undealt card: the roster's cards are all dealt or worn.
+
+**Secrecy.** The worn card never has a seat, so no two figures share a look and the "counter-claim" of GDD 3.17 cannot
+happen. `Player.look` carries the worn look exactly as a real one. The pick draws nothing; the human-first steps use
+`deal`, the NPC seats `npcNames` and `traits`, and the vendetta its own stream. The Killer's offered list is private
+(row 25), and it is the same list whatever the vendetta, since partners are humans and humans hold their cards anyway.
+`debug.deal` learns the human-first rule (WDI_DEBUG only).
 
 **The true look (I3).** `Private.trueLook`, the vendetta's look id (`zealot`, `activist`, `bandit`, and `hitman` from
 the turning), on the seat's own view only. The own client draws its own figure in it and shows the worn look as a HUD
 badge; impersonation shows the borrowed face on the badge. Every client loads every true-look atlas of the map's
-vendettas with the deck, whatever its card. Seams row 23.
+vendettas with the deck, whatever its card. Seams row 26.
 
 **The Bandit (I4).** A new card look `bandit`, public, with no worn card: the Killer's `Player.look` is `bandit`. The
 nameplate reads "the Bandit" (I2), never a name, until game over or a death sentence.
 
 **Nameplates (I2).** In world mode a seat's nameplate and every portrait label read its character: the lore name and
 card name of `looks.json` (`loreName`, _new_ field), else the card name; the end screen pairs characters with player
-names. The lobby, the party list and the friends list keep names. Seams row 24.
+names. The lobby, the party list and the friends list keep names. Seams row 27.
 
 ### 2.2 Routes, the ledger and conversion (I5, I6, I9)
 
@@ -293,14 +322,14 @@ already comes from donations and the cot; the sermon adds it: when the Vicar's c
 every seat that stands in the hub within `conversion.sermonTiles` (_new_, 6) for `conversion.sermonS` (_new_, 30)
 afterwards gains `conversion.sermonFaith` (_new_, 10), once per day per seat. A cover in the Vicar's look rings and gets
 the ding (world-mode 3.1: a look is not a power). Nobody learns another seat's Faith; the Vicar's own view gets a count
-of converted seats, never names (`Private.converted`, row 25). An NPC seat attends a sermon it hears as a reaction (the
+of converted seats, never names (`Private.converted`, row 28). An NPC seat attends a sermon it hears as a reaction (the
 bell band of 3.12) and gains Faith like anyone.
 
 **The ledger (I5).** At game over `S2C.gameOver.victories`: one row per seat that won, `{seatId, kind}`, kinds from
 `Victory` (_new_, append-only: law, peaceful, heir, bounty, deadLetter, role, town, trade, verdict, gallows, getaway,
 unseen, paintTown, following, redemption, contract, watch, healer, solo). Public at game over only, when every role is
 public anyway (GDD 3.17). Live progress is private: `Private.route {kind, step, of}` on the seat's own view, so the
-card can tick (rolecards.md 4.4). Seams row 25.
+card can tick (rolecards.md 4.4). Seams row 28.
 
 ### 2.3 The vendettas' world-mode steps (I7, I8)
 
@@ -332,7 +361,7 @@ stays its first step.
   six-shooter (`sixShooter`, bound like the Derringer of row 21) fires only at a figure drawn as a seat that holds a
   Constable's warrant against him or that struck him, by day too; its hit is a bite-class hit (damage, never the
   Knife's kill), so it can kill only as a bite does, and the death returns on the train.
-- **Plot traces (I8).** Five clue kinds appended to `ClueKind`: `candlewax` (a sigil or the Mass), `powder` (a tamper),
+- **Plot traces (I8).** Five clue kinds appended to `ClueKind` after 10V's `timeOfDeath` (12): `candlewax` (a sigil or the Mass), `powder` (a tamper),
   `casing` (the six-shooter), `flourDust` (the bakery robbery), `waxSeal` (the Hitman's opened letter). Each is laid where
   the step happened, Reader Anyone, value 0, and briefed like any clue (row 8). At a Tribunal a trace is a match only
   as part of a **set**: the warrant's or a presenter's entries holding every trace kind of one vendetta's list
@@ -350,12 +379,13 @@ B6c). Each gets a `townWork` row (I37), a look id with a placeholder (2.10), and
   locking sets the portal's public state `locked` for `doors.butlerLockS` (_new_, 90) and refuses entry from outside
   (`LOCKED`); anyone inside may always leave and unlock from within (GDD 3.7). The Ledger (`ledger`): at each Inquest
   and Tribunal open, the Butler's Notebook gets, for each living seat, the last house it entered since the last such
-  phase, as a Verified entry naming the seat (a power sees through a face, as the night powers do). The Killer's Lock
+  phase, as a reading (a `NoteKind` of its own, seams row 24, so it never attaches to a petition) naming the seat (a
+  power sees through a face, as the night powers do). The Killer's Lock
   door (`killerLock`) is the same lock for `abilities.json` `killerLock` time, as a second use of the Skeleton Key in
   the Killer's kit, so the card keeps its three abilities (GDD 3.2).
 - **Child.** Silent hide: 10V's hiding spots, plus the `crawlspace` spot kind only the Child may enter; entering is
   silent and a Check by any other card refuses (`NOTHING_THERE`, the same as an empty spot). Witness: within 6 tiles
-  and line of sight of a Knife kill, the Child's Notebook gets the killer's height and scarf as Verified, at once (not
+  and line of sight of a Knife kill, the Child's Notebook gets the killer's height and scarf as a reading (row 24's `NoteKind` rule), at once (not
   "at the next meeting"). "Cannot pick up items" becomes: the Child cannot take from a body, a coin heap or a dropped
   item (`CHILD_CANNOT`, _new_ reason); it gathers, buys, crafts and turns in quests like anyone, so the economy holds.
   Vision −1 tile by `vision.childDelta` (_new_, −1).
@@ -378,7 +408,7 @@ B6c). Each gets a `townWork` row (I37), a look id with a placeholder (2.10), and
   line and has no ghost: refused `NOTHING_THERE`, the same as at a body already heard). The ghost gets a private prompt
   of eight phrases (`seance.json`, _new_): the killer's height (3), scarf (3), "I saw nothing", "Look to the woods". It
   answers within `seance.answerS` (_new_, 20) or the line is "The dead are silent." The Medium's Notebook gets the
-  phrase as **Claimed**, never Verified ("Cabal ghosts may lie"). An NPC ghost answers truthfully unless Cabal, when it
+  phrase as a reading of its own (row 24's `NoteKind` rule), never Verified ("Cabal ghosts may lie"). An NPC ghost answers truthfully unless Cabal, when it
   names a trait not the killer's. Nothing else of the ghost's view reaches the Medium. A seance can run only once the
   death is public (after a meeting or a Tribunal revealed it), so it never tells of a private kill.
 - **Lobby toggles and the faction-only reveal (I16).** `Settings.roster` (_new_, the cards dropped from the roster,
@@ -395,7 +425,7 @@ B6c). Each gets a `townWork` row (I37), a look id with a placeholder (2.10), and
   light of radius `items.json` +1 tile in a dark scene, lit and doused with `act.light` like a lantern; it shows as the
   lantern bit (GDD 3.15). Tin mail: footsteps +1 tile (`noise.walk` + `armor.footstepTiles`, _new_). Tin helm: Dazed
   lasts half (`resist.dazed`).
-- **Recipe teaching (I26).** `Private.recipes` (_new_, ids learned), row 26. A taught recipe is a row with `taught:
+- **Recipe teaching (I26).** `Private.recipes` (_new_, ids learned), row 29. A taught recipe is a row with `taught:
   true`; the craft refuses `NOT_TAUGHT` until a quest reward, a lore lead or a chore teaches it. Moll's step 2 offers
   Stew or Remedy and the seat's pick is its one branch for the match (`branch`, private). Ada Kerrow's teaches Tin mail.
   Pell, Hask and the Collier get the second steps of living-world.md 1.3 (the Ferry run, the rack count, the kiln).
@@ -418,7 +448,7 @@ B6c). Each gets a `townWork` row (I37), a look id with a placeholder (2.10), and
 - **Chores (I33).** A chore is a station hold anyone may start at a work station of `routines.json` (`chores.json`,
   _new_): it pays `chores.wage` (_new_, 1) up to `chores.perDay` (_new_, 3) a day, writes an alibi entry, never moves
   the bar. Errands: a quest of kind `errand` offered by a figure in a mood (living-world.md 1.2 table), one at a time,
-  cooling `errands.cooldownFrac` (_new_, 0.1 of a day). Standing: `Private.standing` (row 26), three steps by chores and
+  cooling `errands.cooldownFrac` (_new_, 0.1 of a day). Standing: `Private.standing` (row 29), three steps by chores and
   errands done (`standing.knownAt`, `trustedAt`, _new_), which add one errand slot and the stallholders' discount.
 - **Examine lines and leads (I34).** `lore.json` gains `examine` lines on the 23 props (living-world.md 1.7's drafts)
   and `lead {kind, ref}` on volumes; a read lead is a private Notebook entry. Nothing on the wire beyond the reader's
@@ -500,19 +530,21 @@ never the `villager` body (which marks a figure) and never a fallback that depen
 
 ## 3. The wire
 
-Draft rows for `seams.md` 3, numbered after #400's rows 20 to 22. 6Z adds them; a builder waits for its row.
+Draft rows for `seams.md` 3, numbered after #400's rows 20 to 24 (rows 23 and 24 are 10V's evidence verbs). 6Z adds
+them; a builder waits for its row.
 
 | Order | Row | Class | Pull request |
 |---|---|---|---|
-| 23 | The true look (I3): `Private.trueLook` (string), the look the seat's own client draws for its own figure: `zealot`, `activist` or `bandit` from the deal for the Killer of that vendetta, `hitman` from the turning (row 20) for the turned seat, '' otherwise. Every client loads the true-look atlases of every vendetta the map allows with the deck, whatever its card, so a load never tells a card. No avatar, roster row or message to another client carries it; a cover's public look stays `Player.look` | own client only | W2 (joins 7) |
-| 24 | Characters on the plate (I2): in world mode the client draws a seat's nameplate, portrait label and Tribunal or Inquest label from `Player.look` alone, through `looks.json` `loreName`; `Player.name` is drawn only in the lobby, the party list and game over. Nothing new goes on the wire: the name is already public and the label is the client's choice | public (no change) | W3 (client) |
-| 25 | Routes and the ledger (I5, I6, I9): `Private.route {kind, step, of}`, the seat's own route progress, and `Private.converted` (u8), the Vicar's count of converted seats, never names. `S2C.gameOver.victories` (optional) `{seatId, kind}[]`, sent only in the game-over frame, `kind` from the append-only `Victory` list. No count, step or kind changes any other client's view before game over, and a route's progress moves only on the seat's own view | `route`, `converted` own client only; `victories` at game over | W5, W6 |
-| 26 | The seat's learning (I26, I33): `Private.recipes` (string list, recipes taught), `Private.branch` (string), `Private.standing` (u8: 0 Stranger, 1 Known, 2 Trusted). Each is moved only by the seat's own quest, chore or reading | own client only | K4, T3 |
-| 27 | Windows and stations (I38): row 3's `PropState` gains the states `lit`, `dark`, `warm`, `cold`, `missing` and `sigil`. A window and a station follow one rule of the look's work (row 15: at work, thin, gone, dormant, hardship), so a dark window and a cold station never tell a hardship from the Hitman or a seat owing the line; they read `Player.look`, `Player.alive`, the fare and the hardship, never the sim's death, `Avatar.lookOf` or the card. A silhouette is a scene `Silhouette {windowId, x, y}` sent only to seats outside in sight of the window, carrying no handle, look or height | public to the scene | T4 |
-| 28 | The snare and the smoke (I27, I14): a set snare is a scene prop `{id, x, y}` sent only to its layer and to seats within `snare.seeTiles`; a held seat shows the existing Slowed sign; the layer's Notebook entry names the drawn look (`Avatar.lookOf`), never a seat. A smoke cloud is a public scene prop for its time, and the server's sight rule treats its tiles as blocking | snare: layer and seats in reach; smoke: public to the scene | K6, N4 |
-| 29 | The Medium's seance (I15): `S2C.seance {phrases}` to the ghost alone when a seance on its body completes, `seance.answer {i}` from that ghost's client, queued and consumed in `step()`, and the Medium's Notebook entry (Claimed). The prompt reaches a ghost only for a death the town has seen; the seance on an unseen death or a day death is refused like an empty one | ghost and Medium only | N5 |
-| 30 | Spectators (I62): a `spectator` client role with a view of one scene, delayed by `spectator.delayS`, built only from the public scene state (avatars, props, clues, creatures, bodies) of that scene; never a `Private`, a role, a ghost tag or a chat channel | the spectator only | M5 |
-| 31 | The Wisp (I50): `act.wisp {kind, targetId}` from a ghost whose death is public, queued and consumed in `step()` and refused with A1's reasons; its effect is the public one any seat could cause (a light out for 1 s, a rattle's noise, a clue a tile over). Nothing names the ghost | public to the scene | M2 |
+| 25 | The world-mode deal (I1, W1): with three or more humans the deck is the map's `roster`. One human holds the Killer; the drawn vendetta's partners are humans; the Killer's offered cards reach its own client only, as today's `RoleReveal.coverHints`, and the Accomplice sees the Killer's pick live as Cabal mates do. The public `deck` of the role card and the lobby is the roster, the same in every match of a map. During the card the roster (`GameState.players`) holds only the human seats; when the card closes every NPC seat joins it in one tick, each with its `Player.look`, so the roster grows by the same count in every match of the map (one more in a Bandit match, whose look is public anyway). No seat ever wears the worn card's look, and no field, count or event tells which card was worn or that a cover was picked. Nothing new on the wire: the change is who holds what | `coverHints` own client only; the rest public as today | W1 (no schema change) |
+| 26 | The true look (I3): `Private.trueLook` (string), the look the seat's own client draws for its own figure: `zealot`, `activist` or `bandit` from the deal for the Killer of that vendetta, `hitman` from the turning (row 20) for the turned seat, '' otherwise. Every client loads the true-look atlases of every vendetta the map allows with the deck, whatever its card, so a load never tells a card. No avatar, roster row or message to another client carries it; a cover's public look stays `Player.look` | own client only | W2 (joins 7) |
+| 27 | Characters on the plate (I2): in world mode the client draws a seat's nameplate, portrait label and Tribunal or Inquest label from `Player.look` alone, through `looks.json` `loreName`; `Player.name` is drawn only in the lobby, the party list and game over. Nothing new goes on the wire: the name is already public and the label is the client's choice | public (no change) | W3 (client) |
+| 28 | Routes and the ledger (I5, I6, I9): `Private.route {kind, step, of}`, the seat's own route progress, and `Private.converted` (u8), the Vicar's count of converted seats, never names. `S2C.gameOver.victories` (optional) `{seatId, kind}[]`, sent only in the game-over frame, `kind` from the append-only `Victory` list. No count, step or kind changes any other client's view before game over, and a route's progress moves only on the seat's own view | `route`, `converted` own client only; `victories` at game over | W5, W6 |
+| 29 | The seat's learning (I26, I33): `Private.recipes` (string list, recipes taught), `Private.branch` (string), `Private.standing` (u8: 0 Stranger, 1 Known, 2 Trusted). Each is moved only by the seat's own quest, chore or reading | own client only | K4, T3 |
+| 30 | Windows and stations (I38): row 3's `PropState` gains the states `lit`, `dark`, `warm`, `cold`, `missing` and `sigil`. A window and a station follow one rule of the look's work (row 15: at work, thin, gone, dormant, hardship), so a dark window and a cold station never tell a hardship from the Hitman or a seat owing the line; they read `Player.look`, `Player.alive`, the fare and the hardship, never the sim's death, `Avatar.lookOf` or the card. A silhouette is a scene `Silhouette {windowId, x, y}` sent only to seats outside in sight of the window, carrying no handle, look or height | public to the scene | T4 |
+| 31 | The snare and the smoke (I27, I14): a set snare is a scene prop `{id, x, y}` sent only to its layer and to seats within `snare.seeTiles`; a held seat shows the existing Slowed sign; the layer's Notebook entry names the drawn look (`Avatar.lookOf`), never a seat. A smoke cloud is a public scene prop for its time, and the server's sight rule treats its tiles as blocking | snare: layer and seats in reach; smoke: public to the scene | K6, N4 |
+| 32 | The Medium's seance (I15): `S2C.seance {phrases}` to the ghost alone when a seance on its body completes, `seance.answer {i}` from that ghost's client, queued and consumed in `step()`, and the Medium's Notebook entry (Claimed). The prompt reaches a ghost only for a death the town has seen; the seance on an unseen death or a day death is refused like an empty one | ghost and Medium only | N5 |
+| 33 | Spectators (I62): a `spectator` client role with a view of one scene, delayed by `spectator.delayS`, built only from the public scene state (avatars, props, clues, creatures, bodies) of that scene; never a `Private`, a role, a ghost tag or a chat channel | the spectator only | M5 |
+| 34 | The Wisp (I50): `act.wisp {kind, targetId}` from a ghost whose death is public, queued and consumed in `step()` and refused with A1's reasons; its effect is the public one any seat could cause (a light out for 1 s, a rattle's noise, a clue a tile over). Nothing names the ghost | public to the scene | M2 |
 
 Every row joins schema version 7 in merge order. The leak test of round 8 (A170) runs on each.
 
@@ -527,7 +559,7 @@ of this plan or of the live sessions. Models by section 0's rule.
 |---|---|---|---|---|---|
 | S1 | Containers and loot (I21) | `interactions.json` (`lootTables`, container classes: search, pry, pick), `sim/interact/` (a `loot` handler on the `loot` stream, activation), `scenes/*.json` (6 `containerSlots`, new ids), GDD 3.14 | determinism per seed; one roll per container; nothing on the wire before opening; nav reachability; per-scene counts | none | Opus |
 | S2 | Berries, Game, Stew (I22) | `resources.json`, `items.json`, `recipes.json`, `economy.json` (market buys berries), scenes' `nodes`, `body/verbs.ts` `eat` for every food, GDD 3.14 | bare-handed forage; stew cures; market price under ask | none; before D4b | Sonnet |
-| S3 | The forge chain (I23) | `items.json`, `recipes.json`, `interactions.json` (tier-2 walls, `grindstone`), GDD 3.14, 3.22 | tier-2 wall refuses a tier-1 tool; armour factors; the grindstone restores uses; no recipe takes a bound item | S1 (the `armoury` table) or none | Sonnet |
+| S3 | The forge chain (I23) | `items.json`, `recipes.json`, `interactions.json` (tier-2 walls), GDD 3.14, 3.22 | tier-2 wall refuses a tier-1 tool; armour factors; no recipe takes a bound item | S1 (the `armoury` table) or none | Sonnet |
 | S4 | The mugging's Flee and Fight (GDD 3.24) | `sim/townsfolk/mug.ts` | flee's share only if caught; fight's strikes both ways | none | Sonnet (10D) |
 | S5 | The art style in the menu only (world-mode 10) | `view/Hud.ts`, `scenes/Meeting.ts`, `scenes/World.ts`, `ui/artStyle/`, `view/artStyle.ts`, GDD 3.13 | no switch in a match; a request refuses while a match runs | y9 (#402) if it touches `Hud.ts` | Sonnet (10Y) |
 
@@ -536,11 +568,11 @@ of this plan or of the live sessions. Models by section 0's rule.
 | PR | What | Paths | Tests | After |
 |---|---|---|---|---|
 | W1 | The world-mode deal (I1) | `sim/Deck.ts`, `rules/deck.ts`, `maps/*.json` `roster`, `vendettas.json` `minHumans`, `partners`, `balance.json` `deal.*`, GDD 3.1, 3.9, 3.12 | human Killer; partners human; Accomplice from 6; worn card withdrawn; seat count constant by vendetta; streams untouched | B6c; 10C's list in `Deck.ts` |
-| W2 | The true look (I3, row 23) and the Bandit's own look (I4) | `schema/`, `sim/Deck.ts`, client own figure and badge, `looks.json` | the field only on its own view; every client loads every true look | W1 |
-| W3 | Nameplates as characters (I2, row 24) | `looks.json` `loreName`, client labels, GDD 3.17 | no seat name drawn in a match; names at game over | W1; y12 (#409) |
+| W2 | The true look (I3, row 26) and the Bandit's own look (I4) | `schema/`, `sim/Deck.ts`, client own figure and badge, `looks.json` | the field only on its own view; every client loads every true look | W1 |
+| W3 | Nameplates as characters (I2, row 27) | `looks.json` `loreName`, client labels, GDD 3.17 | no seat name drawn in a match; names at game over | W1; y12 (#409) |
 | W4 | The dawn card and the manifest (I10) | client HUD overlay, UI.md | the manifest names characters | W3 |
-| W5 | Routes: the engine, Watch, Role, Town (I6, row 25) | `sim/routes/` (new), `Private.route`, GDD 3.8 | each route meets on its event; nothing holds the match open | B6c |
-| W6 | The ledger (I5, row 25) | `S2C.gameOver.victories`, `ui/GameOver.ts` | victories only at game over | W5; C5b, C4b |
+| W5 | Routes: the engine, Watch, Role, Town (I6, row 28) | `sim/routes/` (new), `Private.route`, GDD 3.8 | each route meets on its event; nothing holds the match open | B6c |
+| W6 | The ledger (I5, row 28) | `S2C.gameOver.victories`, `ui/GameOver.ts` | victories only at game over | W5; C5b, C4b |
 | W7 | Conversion and Peaceful (I9) | `sim/routes/peaceful.ts`, `economy/faith.ts`, GDD 3.23 | Faith private; the converted count names nobody | W5, B7 |
 | W8 | Trade and Healer routes | `sim/routes/` | each route, by anyone | W5, T4 (lanterns), 10V Autopsy |
 
@@ -551,8 +583,8 @@ of this plan or of the live sessions. Models by section 0's rule.
 | N1 | Butler: Lock / Unlock, the Ledger, the Killer's Lock door (I11, I17) | W1, B7 (the Inquest) |
 | N2 | Child: crawlspaces, Witness, the pick-up rule (I12) | 10V's hiding spots |
 | N3 | Ranger: Shoot, the Arrest (I13; Q-S1) | B4, K6 (snares) |
-| N4 | Thief: Lockpick tier, Pickpocket, Smoke (row 28), the sea door, Heirlooms (I14, I31) | S1, I47's theft (T5) |
-| N5 | Medium: the seance (I15, row 29) | B7 (a death made public) |
+| N4 | Thief: Lockpick tier, Pickpocket, Smoke (row 31), the sea door, Heirlooms (I14, I31) | S1, I47's theft (T5) |
+| N5 | Medium: the seance (I15, row 32) | B7 (a death made public) |
 | N6 | Lobby toggles and the faction-only reveal (I16); Forged Alibi (I18) | W1, B6a, 10V Inspect |
 
 Each new card: `roles.json`, `abilities.json` routes (`status: live`, 10R's test), `looks.json` placeholder, GDD 3.2,
@@ -566,9 +598,9 @@ nothing of it beyond the drawn figure.
 | K1 | Weapons (I24) | C6 (`body/fists.ts`) | Opus |
 | K2 | Armour's resistances (I25) | S3 | Sonnet |
 | K3 | Candles for all, Handcuffs (I28, I29) | B4 | Sonnet |
-| K4 | Recipe teaching and the chains (I26, row 26) | S3 | Sonnet |
+| K4 | Recipe teaching and the chains (I26, row 29) | S3 | Sonnet |
 | K5 | Skill checks (I36) | K4 | Sonnet |
-| K6 | Snares and Rope (I27, row 28) | none | Opus |
+| K6 | Snares and Rope (I27, row 31) | none | Opus |
 | K7 | Crows, the bog-wisp, deep mud (I51, I52, I56) | none | Sonnet |
 | K8 | The bog lurker, poison food (I53, I55) | C4c (spoiled stock) | Sonnet |
 
@@ -578,8 +610,8 @@ nothing of it beyond the drawn figure.
 |---|---|---|---|
 | T1 | The Trades as cards (I30; Q-S2) | W1 | Opus |
 | T2 | Chores and errands (I33) | D9b | Sonnet |
-| T3 | Standing, examine lines, leads, Faith's sources (I33 to I35, row 26) | T2 | Sonnet |
-| T4 | Town work, windows, stations, silhouettes (I37, I38, I39, row 27) | C4c, C4d | Opus |
+| T3 | Standing, examine lines, leads, Faith's sources (I33 to I35, row 29) | T2 | Sonnet |
+| T4 | Town work, windows, stations, silhouettes (I37, I38, I39, row 30) | C4c, C4d | Opus |
 | T5 | Theft, trespass Notices, curfew locks, forced labour, the heresy trial (I44 to I47) | B6b, B6c | Opus (to 10B as its list ends) |
 | T6 | New places (I42), mood hooks (I40) | none | Sonnet |
 
@@ -588,10 +620,10 @@ nothing of it beyond the drawn figure.
 | PR | What | After | Model |
 |---|---|---|---|
 | M1 | Barks and the world lines (I61) | none | Sonnet |
-| M2 | Wisp (I50, row 31) | B7 | Opus |
+| M2 | Wisp (I50, row 34) | B7 | Opus |
 | M3 | Shove, fists on townsfolk, two-player carrying (I57 to I59) | C6 | Sonnet |
 | M4 | The minimap and fog (I43) | none | Sonnet |
-| M5 | Spectator mode (I62, row 30) | W3 | Opus |
+| M5 | Spectator mode (I62, row 33) | W3 | Opus |
 
 ### 4.7 Vendettas (to 10C as its list ends: Opus)
 
