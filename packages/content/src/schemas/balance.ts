@@ -661,5 +661,10 @@ export const BalanceFile = z.strictObject({
     /** The last active player awake, alone this long while the rest sleep, is Exhausted the next day. */
     holdoutGraceS: Seconds,
   }),
+  /**
+   * Round 10, K6 (GDD 3.5, seams.md 3 row 31): a set snare is sent to its layer and to seats within `seeTiles` of it.
+   * The hold is `abilities.json` `snare.params.holdS`, then Slowed.
+   */
+  snare: Section({ seeTiles: Tiles }),
 });
 export type BalanceFile = z.infer<typeof BalanceFile>;

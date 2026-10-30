@@ -12,6 +12,7 @@ import { emitSim } from './events/bus';
 import { bellOf, hubOf } from './MapSites';
 import { handleNightPower } from './NightPowers';
 import { type PlayerSim, simOf } from './RoomSim';
+import { handleSnareAbility } from './snares';
 import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
 /** Dispatches the `act.*` verbs of the Round 3 brief; every payload is untrusted. */
@@ -76,6 +77,8 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
     case 'eatHerbBread':
     case 'skin':
       return handleBodyAbility(room, sessionId, payload);
+    case 'snare': // round 10, K6 (GDD 3.5): `sim/snares.ts`
+      return handleSnareAbility(room, sessionId);
     default:
       reject(room, sessionId, 'NFY', { feature: 'this action' });
   }

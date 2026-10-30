@@ -31,6 +31,7 @@ import { runPhases } from './Phases';
 import { placeNewPlayers, runPortals } from './Portals';
 import { simOf } from './RoomSim';
 import { reconcileViews } from './Visibility';
+import { runSnares } from './snares';
 
 // Fixed order inside setFixedTimestep (ARCHITECTURE 5.6). Stages without a milestone yet are empty.
 // Round 6 (docs/round6/seams.md 1.3, locked call sites): `runAuto` before the brains; `runResources`, `runMobs` and
@@ -78,6 +79,7 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
     sim.viewsDirty = false;
     reconcileViews(room);
   }
+  runSnares(room); // round 10, K6: snares spring, and each view holds the ones row 31 sends it (after the views)
   runPhases(room);
   runEvents(room); // round 6, 6B: deliver the tick's sim events (locked call site)
   runTrain(room); // round 7, 7I: the Daily Train (locked call site)

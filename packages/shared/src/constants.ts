@@ -77,6 +77,11 @@ export const NoteKind = {
   contract: 9,
   /** Round 8 (GDD 3.23): a Blackmail Notice from the mailbag; `of` is the look it names, `sceneId` and `value` (a phase) where and when. */
   notice: 10,
+  /**
+   * Round 10, K6 (GDD 3.5, seams.md 3 row 31): the layer's own snare caught a walker; `of` is the drawn look (a `looks.json`
+   * id), never a seat, and `sceneId` the snare's scene.
+   */
+  snared: 11,
 } as const;
 export type NoteKindId = (typeof NoteKind)[keyof typeof NoteKind];
 

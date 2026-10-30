@@ -3,6 +3,7 @@ import { Phase, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { speedPxPerTick } from '../Movement';
 import { type MoveInput, type PlayerSim, simOf } from '../RoomSim';
+import { heldBySnare } from '../snares';
 import { isWorldPhase } from '../World';
 import '../townsfolk/invariants'; // round 8, 8A: the registry runs in import order, figureNotSeat before bodyBounds
 import './invariants'; // the `bodyBounds` check registers with the body stage
@@ -87,6 +88,7 @@ function tickBody(room: PartyRoom, id: string, body: Body, p: PlayerSim | undefi
  * run, or has no stamina, walks when it asks to run; one that cannot move stands.
  */
 export function bodySpeedPxPerTick(room: PartyRoom, sessionId: string, input: MoveInput): number {
+  if (heldBySnare(room, sessionId)) return 0; // round 10, K6: a snare holds the feet (GDD 3.5)
   const body = bodyOf(room, sessionId);
   if (!body) return speedPxPerTick(input.sprint, input.sneak);
   const sprint = input.sprint && body.stamina > 0 && !blocksRun(body);

@@ -18,7 +18,7 @@ import { schema, t } from '@colyseus/schema';
 // A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5), C1 `Private.onLine` (row 6), B8
 // `Private.pair` (row 10), C2 `Private.fare` (row 11), B3 `GameState.petition` and `Private.petitionSigned`
 // (row 13), B4 `GameState.manhunt` and `Private.huntScene` (row 14), C5 `Private.paintTown` (row 18), and B5
-// `Private.jailUntilTick` (row 19) to version 7.
+// `Private.jailUntilTick` (row 19) to version 7. K6 adds `SceneState.snares` (row 31).
 
 export const SCHEMA_VERSION = 7;
 
@@ -114,6 +114,11 @@ export const Node = schema(
  * never says who changed it.
  */
 export const PropState = schema({ id: str(), state: str(), untilTick: u32() }, 'PropState');
+/**
+ * Round 10, K6 (GDD 3.5, seams.md 3 row 31): a set snare, at a tile centre in pixels. Each one is added to a view one by
+ * one (`sim/snares.ts`): its layer's, and the views of seats within `snare.seeTiles` of it. It never names its layer.
+ */
+export const Snare = schema({ id: str(), x: i16(), y: i16() }, 'Snare');
 export const Mob = schema(
   { id: str(), kind: str(), x: i16(), y: i16(), yaw: f32(), animId: u8(), state: u8() },
   'Mob',
@@ -163,6 +168,8 @@ export const SceneState = schema(
     mobs: t.map(Mob),
     /** Round 10 (A10): the logic table's prop states, public to the scene. */
     propStates: t.map(PropState),
+    /** Round 10, K6 (row 31): set snares, each added to a view one by one, never with the scene. */
+    snares: t.map(Snare).view(),
   },
   'SceneState',
 );
