@@ -10,6 +10,7 @@ import { spawnKillClues } from './Clues';
 import { markDead } from './Death';
 import { emitSim } from './events/bus';
 import { endImpersonation } from './Impersonate';
+import { isJailed, untilDawnS } from './law/Jail';
 import { spendProtection } from './NightPowers';
 import { emitNoise } from './Noise';
 import { type PlayerSim, simOf } from './RoomSim';
@@ -73,6 +74,8 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
     return;
   }
   if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, 'DOWN_OR_STUNNED'); // round 8, 8A
+  if (isJailed(room, sessionId))
+    return reject(room, sessionId, 'IN_JAIL', { untilDawn: untilDawnS(room, sessionId) }); // B5
   const targetId = resolveHandle(room, sessionId, payload.targetId);
   const target = targetId === null ? undefined : sim.players.get(targetId);
   if (targetId === null || !target || targetId === sessionId) {

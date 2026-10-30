@@ -121,6 +121,8 @@ interface ArgsOf {
   NOT_YOURS: { what?: 'task' | 'build' };
   CHAT_RATE: { readyInS?: number };
   PETITION_GRACE: { readyInS?: number };
+  /** Round 10, B5: the seconds until the train that releases the seat (seams.md 3 row 19). */
+  IN_JAIL: { untilDawn?: number };
   GRID_BOUND: { item?: string };
   NEEDS_PART: { missing?: string[] };
 }
