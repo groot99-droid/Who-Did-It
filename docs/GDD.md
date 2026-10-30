@@ -556,6 +556,13 @@ dropped. A quest that is done stays on the list and counts as done for the match
 against `quests.maxActive`. The lobby and the role card clear every seat's quests. Quests of kind `contract` are the
 round-7 vendetta seam and are refused in round 6.
 
+**Chains** (round 10, D9; `living-world.md` 1.3). A quest row may name an `after`: another quest of the same giver
+that the seat must have turned in before the giver offers it (the server refuses with `NOTHING_THERE`; the quest log
+shows it only then). A chain has two steps. Mother Moll's second step, Brew with Moll (2 Herb and 2 Mushroom, two
+Bandages and 6 Scrip), follows her mushrooms; Ada Kerrow's, Temper (2 Tin Ore and a Timber, a Hammer and 6 Scrip),
+follows her ore. Recipe teaching, the one-per-match branch and tin mail wait for round 11: there is no
+recipe-learning system yet, so each chain is a plain second errand. Nothing new on the wire.
+
 **Mini-games.** Every fetch task of 3.5 plays a mini-game at its target in place of the plain 2 s hold: the hold
 opens it, the server keeps the solution, and the task completes only when the client's answer checks. The five
 kinds are crates, pour, slide and stoke, first made for the quick mode (3.11), and the tap (round 7, 7M, A151): a
@@ -944,6 +951,16 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 - **Indebted.** A seat that still owes at dusk becomes Indebted (`EffectId.indebted`, its own view only). No bit is
   drawn; inspect reads "a hunted look". From dusk to dawn the doors from outdoors into its map's `curfew` scenes refuse
   it as a locked door does, so it sleeps rough; a seat already inside still moves between the rooms and can leave. Paying its debt clears it. Forced labour waits for R9's law pipeline.
+- **Rent in kind and the boarded house** (round 10, D7; owner answer EP3). `act.payRent` takes the purse first and,
+  for what is left, goods at the market's `pay` price (`economy.json` `prices`), cheapest first, whole goods only (the Clerk keeps the
+  change); it refuses
+  (`NEED_SCRIP`) when purse and goods together fall short, and takes nothing. At dusk a seat that still owes has goods
+  taken to the debt's value from its pack, the same way, and what it still owes after that is its Indebted debt as
+  before; a seat Indebted has its house boarded up, so it cannot lie down in the home bed (`BOARDED_HOME`, 3.32). The
+  chapel cot and the tavern bed are free of it. Holding a Crowbar or a Hammer, lying down on the boarded bed pries the
+  boards for the night with a crowbar's noise (`noise.crowbar`); they go back at dawn and the debt stands. Paying the
+  debt takes the boards off. Not built: a Notice for trespass on the own house if a witness sees, and picking the
+  curfew doors (they stay doors).
 
 - **Owing the line** (round 10, C2; `docs/round9/world-mode.md` 6, followup-4 2.5). Each return on the morning train
   (3.22) adds `respawn.fareDebt` (6 Scrip) to the seat's fare, owed to the Company, and every further death adds
@@ -952,8 +969,19 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   cut part is never paid out, so no coin is made or lost. `act.payRent` at a bank
   counter pays the rent first, then the whole fare when the purse covers it; a seat that owes only the fare pays it
   there too. Owing the line is not Indebted and brings no curfew of its own. The fare is private (`Private.fare`);
-  nothing public carries it. A fare is meant to clear within `respawn.clearTargetDays` (2 days). The owner look's
-  dear stall and the Clerk's labour errand come with C2b.
+  nothing public carries it. A fare is meant to clear within `respawn.clearTargetDays` (2 days).
+- **The dear stall** (C2b). A shop with an `owner` look (`economy.json`: the bakery is the Baker's, the apothecary the
+  Herbalist's, the Gamekeeper's stalls his) asks `respawn.priceMult` (1.5x, rounded up) while any seat whose public look
+  is that look owes the line, and charges what it shows. It reads the roster look, never the drawn figure or the card,
+  so an impersonation never moves it and no cover is named; a shop with no character (the stores, the markets) is never
+  dear.
+- **The Clerk's labour errand** (C2b). Holding the action key at the Company Clerk's books (a `ledger` prop:
+  HollowMere's `bk.ledger`) for `respawn.errandS` (30 s), standing still within reach, clears one fare. It is always
+  open, whether or not the Clerk stands there, so a fare never locks a seat out. An NPC seat that owes the line works
+  it too, as a trip of its day routine, and only while it owes. Tasks alone never clear a fare (an owing seat earns
+  about 1.5 Scrip a task against 6 Scrip of rent a day), so the errand is what keeps the two-day target; the
+  balance lab checks both (`packages/content/test/fareCheck.test.ts`). BlackPine has no Train, so it has no fare and
+  no errand.
 
 - **Faith** (8D). Donating Scrip at an altar (`act.donate`, within verb reach, up to `faith.donateMax` at a time)
   earns `faith.perScrip` Faith per Scrip, up to `faith.max`; Faith is private (`Private.faith`). There is an altar in
@@ -1239,6 +1267,27 @@ but only against a third party: a pair is no shield against a partner who is the
 already counts any figure in the room. Only the two seats learn of a pair, in `Private.pair` (a phase and the other
 figure's handle in the viewer's scene, '' while it is elsewhere, never a seat id); nothing public shows one. The
 inspect panel's section is B8b.
+
+**The petition (B3a, A289; seams.md 3 row 13; F4 2.1).** A living, free human (placed, not on the line, 3.22, and
+not jailed, 3.27) opens a **petition** at a notice board in reach, naming a seat of the public roster (by character:
+a sighting of a figure wearing B's look accuses B, never through an impersonation), a charge from `laws.json`
+`crimes` (the crimes of `world-mode.md` 5; their sentences are B6's), and up to `petition.maxEntries` (4) of its own
+clue entries. A night-power entry, a Forged entry or the teaching entry never attaches. One petition is open in the
+whole town at a time (`PETITION_OPEN`); after a lapse the accused and the opener wait `petition.cooldownS` (120 s)
+before naming or opening again (`PETITION_GRACE`). The petition needs ceil(`petition.othersPct` (0.3) times the
+living, free humans, the opener and the accused counted) other signatures within `petition.openS` (60 s): 1 at 3
+humans, 2 at 4 to 6, 3 at 7 to 10. The bar is fixed when the petition opens and holds for its window, and so is whether the Constables may sign, so it never
+moves at a death; a person and an NPC seat give the same bar as the accused. Any living, free human but the opener
+and the accused may sign, once, and a signature stands once given: the count never drops when a signer dies, goes
+on the line or is jailed. At `petition.constableAtHumans` (5) humans or fewer, the Constables sign once, as one
+signature, when the petition's public entries hold `petition.constableMatches` (2) backed matches against the
+accused's public traits; they never read whether a clue was planted, a role's reading or a card. With enough names
+the petition passes and leaves a warrant for the manhunt (B4); at its clock's end it lapses. The public row
+(`GameState.petition`) shows the accused, the charge, the counts and each entry as anyone may read it: the kind, the
+scene, whether it is backed (Verified or Corroborated, one mark for both), and the trait only for a kind whose
+Reader is Anyone (footprints, thread); never the opener or a signer. Only the signer learns it signed
+(`Private.petitionSigned`). A petition is not a vote: nobody is removed by it, and the verdict comes from the
+evidence at the Tribunal (B6). NPC seats do not sign yet, and a petition never waits on an NPC. The screen is B3b.
 
 ### 3.32 Sleeping
 
