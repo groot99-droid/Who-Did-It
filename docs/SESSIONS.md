@@ -3790,6 +3790,7 @@ once. A session's decisions go under its reserved row and its copy under its UI.
 | **10X. Fixes: server and rules** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | early, on 2026-10-30 |
 | **10Y. Fixes: client and screens** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | early, on 2026-10-30 |
 | **10Z. The final sweep** | Fable | 800k | `claude/r10-tier-800k` | S6 | last |
+| **10R. Role cards and the dashboard** | Opus | 800k | `claude/r10-tier-800k` | R1, the design; the build after the owner approves it | 2026-10-30, by the owner |
 
 A session is spawned with the prompt "You are session 10X of docs/SESSIONS.md Round 10 (model, compaction size).
 Read your brief there, then docs/round10/README.md, docs/round10/seams.md, docs/round9/round10-plan.md and
@@ -3853,6 +3854,21 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
 - **10Y. Fixes: client and screens** (Fable). Same start and rules as 10X, on the client: the screens the round
   added, every refusal's line on a phone, the e2e and screenshot sets, the Studio NPC editor's save verified end to
   end (round 9), missing atlas keys (`constable`), copy drift against UI.md 14.
+- **10R. Role cards and the dashboard** (Opus, 800k). Added by the owner on 2026-10-30, design only for now. Its spawn
+  prompt is its brief, and it copies the brief into the opening of `docs/round10/rolecards.md`. The brief covers:
+  - an audit of every role's card;
+  - the trifold, which fills a desktop screen and flips panel by panel on a phone;
+  - one table of every action and button, read by both the input code and the card;
+  - each role's win conditions and lore, as copy that never restates a number;
+  - the private dashboard: the chores, the inventory, the quest log, the notebook, rent and debts;
+  - the style, from round 11's questionnaire, mapped onto the game's tokens;
+  - role secrecy;
+  - the build, split into PRs;
+  - questions for the owner, each with a proposed default.
+
+  A clickable mock in `docs/round10/samples/rolecards/` goes to the owner as a page. One draft PR on
+  `claude/r10-r1-rolecards`. The build waits for the owner's approval; the proposed default is round 10's tail, before
+  10Z.
 - **10Z. The final sweep** (Fable; plan 4, S6). When every other round-10 PR has merged: DECISIONS rows for every
   owner answer and R1 to R18, the check that every `gdd-map.md` row's GDD edit landed, the cross-references of the
   round-9 and round-10 docs, `pnpm docs:protocol`, and the round-10 integration log below.
@@ -4040,6 +4056,40 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
     - D9b: widening the task deal's pool waits for the balance lab, because it changes how many tasks a seat is dealt
       and the playtest measures pacing.
     - D9c: Talk, on row 16.
+- 2026-10-30, after the owner's game ("clear to merge"): merged D6a (#363), D6b (#367), 6Z's docs (#366), D7 (#369),
+  B3a (#364), x3 (#377, the `talk.test.ts` flake), C2b (#368), D9a (#373) and y1 (#372). C2b and y1 were checked
+  first on the base they would land on: typecheck, lint and the tests of the files both sides touched.
+- 2026-10-30, the owner's report from the game: figures froze on other players' screens, mostly when people changed
+  scene or walked out of view, and the game lagged.
+  - **The frozen figures.** `Visibility.ts` removes the near tag when two figures part by more than Blood's range.
+    In `@colyseus/schema` 5.0.36, `StateView.remove(obj, tag)` also hides the object itself, so the viewer's copy
+    stops where it left the ring. The DELETE at a later scene change or re-handle is filtered by the same flag, so the
+    copy stays until the viewer changes scene. The ghost tag's removal does the same. 10X fixes it as x4: the avatar
+    is shown again with a default-tag add, which sends only fields the viewer already holds. The test reproduces the
+    freeze on the base. The DECISIONS row corrects A170's reading of a removed tag.
+  - **Figures never sent.** No townsperson or Constable was ever in a seat's view (A160's open item). 10X adds them as
+    x5, on row 17. D9c's Talk (#380) waits on it for its client half.
+  - **Lag.** Production ran far under its limits during the game: CPU at most 0.084 vCPU, memory 175 MB, and a tick's
+    p95 of 2.6 ms of 50 in a bot run. What players feel is the client pipeline and the distance to the server's
+    region:
+    - the patch timer runs beside the fixed step, so a patch carries no tick or two;
+    - samples are stamped with the client's frame time;
+    - the own sprite is drawn 100 ms behind and others 150 ms;
+    - a 250 ms input gap stops a walker.
+
+    10X's x7 sends one patch per tick and widens `INPUT_STALE_TICKS` to 10. 10Y's half stamps samples by tick, then
+    lowers the self delay. 6Z lands the new ARCHITECTURE 5.6 sentence after both. Moving the Railway region waits on
+    the owner, who was asked where the players are.
+- 2026-10-30: B4 (#381, about 650 lines) stays one PR: splitting off the Constables' cuff would leave about 560 lines
+  and part `Manhunt.ts` from its tests. B3a (612) is the precedent. Grant: the `onManhunt` line in `sim/SleepRest.ts`.
+- 2026-10-30: in C3a's review (#378), `townWork.ts` decided a look was gone from the sim's death. A Baker's stall would
+  have shown `left: 0`, and the Vicar's altar would have refused donations, the moment the seat died: that reveals a
+  kill before the meeting (GDD 3.7). Row 15 now reads the roster's `Player.alive`, which flips only at a meeting or an
+  ejection (A30), and the list of what never goes on the wire names "a kill before the meeting reveals it". 10C
+  fixes C3a with a test that a kill before a meeting leaves the stall full.
+- 2026-10-30: y1's DECISIONS row A234 had landed after A331; 6Z moved it into number order.
+- 2026-10-30: the owner asked for new role cards and a player dashboard (`docs/round10/README.md`). 6Z started 10R
+  (Opus, 800k, from `claude/r10-tier-800k` at 08ddb21) on `claude/r10-r1-rolecards` to design them.
 
 ## Round 11 (planning, started 2026-10-29)
 
@@ -4070,3 +4120,6 @@ docs/round11/README.md, then the documents and tools your part names." 6Z adds t
 - 2026-10-30: the owner answered all 22 (`docs/round11/owner-answers.md`): 21 defaults, and CL3 changed to yes, so the
   buildings' long shadows come in round 11. Three defaults still wait on the owner: the Meshy licence (SC2), the test
   phone (BU4) and the environment's setup script (RN3). 6Z asked 11A to write `round11-plan.md`, with 11B.
+- 2026-10-30: 11B's shadow-layer budget (`look.md` 5.3.1, #371) and 11A's `round11-plan.md` (#374) merged. 6Z sent
+  the owner the plan for approval with its one question, CL3a (which way the long shadows fall), with 11A's sheet. The
+  default is a sun at 25°, turned 45° from today's key.
