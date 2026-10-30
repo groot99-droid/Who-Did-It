@@ -568,6 +568,30 @@
       "ships": "V1",
       "gddRef": "3.14"
     },
+    "quiltedCoat": {
+      "id": "quiltedCoat",
+      "name": "Quilted coat",
+      "kind": "armour",
+      "roleBound": false,
+      "onDeath": "drops",
+      "equip": "body",
+      "armor": { "tier": 1 },
+      "tooltip": "A padded coat. Worn on the body, it takes a fifth off the damage you take.",
+      "ships": "V1",
+      "gddRef": "3.22"
+    },
+    "leatherJerkin": {
+      "id": "leatherJerkin",
+      "name": "Leather jerkin",
+      "kind": "armour",
+      "roleBound": false,
+      "onDeath": "drops",
+      "equip": "body",
+      "armor": { "tier": 2, "resist": { "bleeding": 0.5 }, "staminaRegenMult": 0.9 },
+      "tooltip": "Hide, stitched. Worn on the body, it cuts the damage you take and halves how fast you bleed; it tires you a little.",
+      "ships": "V1",
+      "gddRef": "3.22"
+    },
     "wakeLoaf": {
       "id": "wakeLoaf",
       "name": "Wake Loaf",
@@ -644,6 +668,39 @@
       "tooltip": "Pries open a nailed crate. Wears with use.",
       "ships": "V1",
       "gddRef": "3.14"
+    },
+    "skinningKnife": {
+      "id": "skinningKnife",
+      "name": "Skinning Knife",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "skin",
+      "tool": { "skin": 1 },
+      "uses": 20,
+      "tooltip": "Skins a fallen wolf or boar for hide and game. Wears with use. It is a tool, not a weapon.",
+      "ships": "V1",
+      "gddRef": "3.22"
+    },
+    "hide": {
+      "id": "hide",
+      "name": "Hide",
+      "kind": "material",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Wolf and boar hide. Stitched into a Leather jerkin.",
+      "ships": "V1",
+      "gddRef": "3.22"
+    },
+    "game": {
+      "id": "game",
+      "name": "Game",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Raw wolf or boar meat. A stew or a pie wants it; it is no meal as it is.",
+      "ships": "V1",
+      "gddRef": "3.22"
     }
   }
 }
