@@ -982,7 +982,7 @@ Fourteen things a shipped card shows have no server behind them:
 The Accomplice's and the Drifter's whole card rests on them. The Accomplice can Inherit, and nothing else of its own
 works. The Drifter has nothing that works but its kit's look.
 
-### 11.2 What the card does with an unbuilt ability
+### 11.2 What the card does with an unbuilt ability (Q-A4)
 
 **Proposed default:** the card shows it, greyed, with a "Coming later" pill and no keycap or disc, and a short line on
 what it will do. It never takes a live key or a phone disc. The slot keys go to the built abilities first, so a Doctor's
