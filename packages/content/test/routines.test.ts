@@ -47,7 +47,7 @@ const TABLE: Record<string, 'work' | 'trade' | 'social' | 'rest' | 'ignore'> = {
   wakeTable: 'ignore',
   plate: 'ignore',
   deadLoaf: 'ignore',
-  ledger: 'ignore',
+  ledger: 'trade', // round 10, C2b: the Clerk's labour errand, worked while a seat owes the line
   // Round 8 (8J, 8K): set dressing is scenery, never a station; its art resolves by id tail (SPRITES 3).
   dressing: 'ignore',
   // Round 8 (GDD 3.23, 8D): the economy statics are no NPC station.
@@ -79,7 +79,7 @@ describe('routines.json (GDD 3.12)', () => {
 
   it('holds the logic table on gather classes and the shop on counters (D1), and lights an exterior with lantern posts', () => {
     // Round 10 (D1): the holds name class ids of interactions.json as well as prop kinds.
-    expect(new Set(Object.values(routines.holds))).toEqual(new Set(['interact', 'shop']));
+    expect(new Set(Object.values(routines.holds))).toEqual(new Set(['interact', 'shop', 'errand'])); // C2b
     for (const key of Object.keys(routines.holds)) expect(interactions.classes[key], key).toBeDefined();
     expect(routines.lightKinds).toEqual(['lanternPost']);
     expect(routines.phaseClasses).toEqual({

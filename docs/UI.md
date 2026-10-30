@@ -1826,6 +1826,7 @@ the train brings the seat back the screen lifts and a 3 s toast says so. The man
 |---|---|---|
 | a seat back on the morning train (server, `Train.ts` `trainReturnLine`) | {name} steps off the train. | `chat.msg` `system`, every seat, at the arrival |
 | the Dusk Train (server, `Train.ts` `TRAIN_DUSK_LINE`) | The dusk train pulls out of the station. | `chat.msg` `system`, every seat, once per dusk |
+| the fare owed (`purse.fare`, C2b) | You owe the line {n} Scrip | under the own purse counter, while a fare is owed |
 | the screen's title (`line.title`) | On the line | On the line, top band |
 | the time to the train (`line.train`) | The train in {time} | On the line, top band, as m:ss |
 | how the seat died (`line.cause.wolf`, `.creature`, `.shot`, `.other`) | A wolf took you. / Something in the dark took you. / A shot took you. / You fell by day. | On the line, centre |

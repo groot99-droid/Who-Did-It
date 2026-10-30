@@ -459,6 +459,9 @@ export const BalanceFile = z.strictObject({
     fareDebt: z.number().int().positive(),
     wageMult: Frac,
     clearTargetDays: z.number().positive(),
+    /** C2b: an owing seat's look makes its shop ask this much more; the Clerk's errand is held this long. */
+    priceMult: z.number().min(1),
+    errandS: z.number().positive(),
   }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
