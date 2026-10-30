@@ -33,10 +33,10 @@
       "x": 19,
       "y": 4,
       "kind": "cave_mouth",
-      "to": null,
-      "toSpawn": null,
+      "to": "sea_exit",
+      "toSpawn": "cave",
       "oneWay": false,
-      "lock": null,
+      "lock": { "keyId": "seaBoards" },
       "window": "lowTide",
       "noise": "door",
       "elevationDelta": 0,
@@ -62,7 +62,8 @@
   ],
   "spawns": [
     { "id": "mouth", "x": 10, "y": 12, "z": 0, "facing": "n" },
-    { "id": "gallery", "x": 10, "y": 1, "z": 0, "facing": "s" }
+    { "id": "gallery", "x": 10, "y": 1, "z": 0, "facing": "s" },
+    { "id": "sea", "x": 18, "y": 4, "z": 0, "facing": "w" }
   ],
   "spots": [
     {
@@ -118,7 +119,7 @@
     "#.........S........#",
     "#..................#",
     "#..................#",
-    "#....H.##..........D",
+    "#....H.##.........SD",
     "#......##..........#",
     "#..#...............#",
     "#..#...............#",

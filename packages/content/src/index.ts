@@ -65,6 +65,8 @@ import crumbMixingJson from '../data/scenes/crumb_mixing.json' with { type: 'jso
 import crumbOvenJson from '../data/scenes/crumb_oven.json' with { type: 'json' };
 import crumbProofingJson from '../data/scenes/crumb_proofing.json' with { type: 'json' };
 import cjCellJson from '../data/scenes/cj_cell.json' with { type: 'json' };
+import cottageFisherJson from '../data/scenes/cottage_fisher.json' with { type: 'json' };
+import seaExitJson from '../data/scenes/sea_exit.json' with { type: 'json' };
 import hollowmereJson from '../data/maps/hollowmere.json' with { type: 'json' };
 import blackpineJson from '../data/maps/blackpine.json' with { type: 'json' };
 
@@ -156,6 +158,8 @@ const sceneJson: Record<SceneId, unknown> = {
   crumb_oven: crumbOvenJson,
   crumb_proofing: crumbProofingJson,
   cj_cell: cjCellJson,
+  cottage_fisher: cottageFisherJson,
+  sea_exit: seaExitJson,
 };
 
 const mapJson: Record<MapId, unknown> = {

@@ -194,6 +194,10 @@ export function checkMaps(c: MapContent): string[] {
       }
     }
     // At every profile, every open scene is reachable from the hub and leads back to it.
+    const sealed = (s: string) => {
+      const inbound = map.scenes.flatMap((from) => scenes[from]?.portals ?? []).filter((p) => p.to === s);
+      return inbound.length > 0 && inbound.every((p) => p.ships !== 'V1');
+    };
     for (const profile of PROFILES) {
       const open = map.scenes.filter(
         (s) => scenes[s] && PROFILE_RANK[scenes[s]!.profile] <= PROFILE_RANK[profile],
@@ -220,6 +224,9 @@ export function checkMaps(c: MapContent): string[] {
       const forward = reach(map.hub, edges);
       const back = reach(map.hub, (to) => open.filter((from) => edges(from).includes(to)));
       for (const s of open) {
+        // Round 10 (T6): a scene entered only by portals that ship after V1 (the sea door, behind `ce.sea`) is
+        // sealed until its step ships, so the hub need not reach it.
+        if (sealed(s)) continue;
         if (!forward.has(s)) err(`${s} is unreachable from the hub at ${profile}`);
         if (!back.has(s)) err(`${s} has no way back to the hub at ${profile}`);
       }
@@ -227,7 +234,7 @@ export function checkMaps(c: MapContent): string[] {
     // Every party size gets a forest and a cave (owner, A49).
     for (const biome of ['forest', 'cave'] as const) {
       const ok = map.scenes.some(
-        (s) => scenes[s] && scenes[s]!.profile === 'small' && biomeOf(scenes[s]!) === biome,
+        (s) => scenes[s] && !sealed(s) && scenes[s]!.profile === 'small' && biomeOf(scenes[s]!) === biome,
       );
       if (!ok) err(`has no ${biome} scene open at the Small profile`);
     }
