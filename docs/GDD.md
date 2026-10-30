@@ -1215,7 +1215,7 @@ hanging's roster flip (B6).
 `jail.gym.damage` (_proposed_ 2) to the seat's fist and slingshot damage for the rest of the match (one Strength: a second
 workout adds nothing). The yard fight, at the sparring
 post, is a crates board of one round: a right answer inside `jail.yard.boardS` (_proposed_ 20 s) wins `jail.yard.purse`
-(_proposed_ 2 Scrip) from the town; a wrong or a slow one loses, and a loss takes `jail.yard.maxHpLoss` (_proposed_ 10)
+(_proposed_ 2 Scrip) from the town; a wrong or a slow one loses (a board left unanswered past `boardS` is lost too), and a loss takes `jail.yard.maxHpLoss` (_proposed_ 10)
 off the seat's maximum health for the rest of the match, never under `jail.yard.maxHpFloor` (_proposed_ 80). Scrubbing,
 at the pail, is a pour board that pays `jail.scrub.wage` (_proposed_ 1 Scrip). The hour off the sentence the owner's
 design names is not yet built: every sentence ends at the next morning train (3.27 above), so an early release waits on

@@ -1891,6 +1891,7 @@ the board of 14.19.6 (a tap, crates, a pour); no new key and no new screen. Thei
 | the gym (`jailLift`) | Work out | the prompt on the weights |
 | the yard (`jailSpar`) | Fight in the yard | the prompt on the sparring post |
 | scrubbing (`jailScrub`) | Scrub the cells | the prompt on the pail |
+| the yard's hint (`jailSpar`) | Win and take 2 Scrip. Lose, or walk away from the fight, and your health bar stays smaller. Once a day. | the prompt's hint line |
 | a game already played | You have lifted enough for one day. / Nobody in the yard wants another round today. / The floor is clean enough for today. | the refusal, one per game |
 
 ### 14.50 The law (10B, round 10)

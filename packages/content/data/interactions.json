@@ -315,7 +315,7 @@
       "ownership": "public",
       "fail": { "NOTHING_THERE": "Nobody in the yard wants another round today." },
       "ships": "V1.5",
-      "hint": "Win and take a little of the jail pot. Lose and you keep a lasting loss of health. Once a day."
+      "hint": "Win and take 2 Scrip. Lose, or walk away from the fight, and your health bar stays smaller. Once a day."
     },
     "jailScrub": {
       "verb": "scrub",

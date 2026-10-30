@@ -14,6 +14,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { avatarMemory } from '../src/sim/Avatars';
 import { bodyOf } from '../src/sim/body/state';
 import { handleStrike } from '../src/sim/body/fists';
+import { healthBand } from '../src/sim/inspect/read';
 import { balanceOf } from '../src/sim/economy/purse';
 import { strengthOf } from '../src/sim/JailGames';
 import { isJailed } from '../src/sim/law/Jail';
@@ -194,6 +195,23 @@ describe('the jail games (GDD 3.27)', () => {
       await play(party, seat, 'yard', y.boardS + 2);
     }
     expect(bodyOf(party.room, seat)!.maxHp).toBe(y.maxHpFloor);
+  });
+
+  it('loses a yard board that is opened and never answered, and an 80/80 seat still reads unhurt', async () => {
+    const { party, seat } = await cell();
+    const y = balance.jail.yard;
+    expect(await open(party, seat, 'yard')).not.toBeNull();
+    advance(party, S(y.boardS) - 5);
+    expect(bodyOf(party.room, seat)!.maxHp).toBe(balance.body.maxHp); // still open
+    advance(party, 10);
+    expect(bodyOf(party.room, seat)!.maxHp).toBe(balance.body.maxHp - y.maxHpLoss);
+    nextDay(party);
+    await open(party, seat, 'yard');
+    advance(party, S(y.boardS) + 2);
+    const body = bodyOf(party.room, seat)!;
+    expect(body.maxHp).toBe(y.maxHpFloor);
+    body.hp = body.maxHp;
+    expect(healthBand(party.room, seat)).toBe('unhurt');
   });
 
   it('pays scrubbing a wage and moves no release', async () => {

@@ -199,8 +199,7 @@ function jailProblem(room: PartyRoom, p: PlayerSim, propId: string, jail: NonNul
   if (p.dead || !p.placed) return refusal('NOT_IN_PLAY');
   const at = lockCenter(jail.sceneId, propId);
   if (!at || p.sceneIdx !== sceneIndex(jail.sceneId)) return refusal('NO_TARGET');
-  if (Math.hypot(p.x - at.x, p.y - at.y) > balance.doors.reachTiles * TILE_PX)
-    return refusal('TOO_FAR', { of: 'pile' });
+  if (Math.hypot(p.x - at.x, p.y - at.y) > balance.doors.reachTiles * TILE_PX) return refusal('TOO_FAR');
   return null;
 }
 
@@ -233,6 +232,19 @@ export function startJailGame(
   openOf(room).set(sessionId, { taskId: t.id, puzzle, startTick: room.state.tick, jail });
   room.clients.getById(sessionId)?.send(S2C.minigameStart, { taskId: t.id, kind, public: puzzle.public });
   return true;
+}
+
+/**
+ * Step stage (`runInteract`): a yard board still open `boardS` after it opened is lost, as a slow answer is, so a fight
+ * cannot be looked at and dropped for free. The board closes for the seat; nothing is sent.
+ */
+export function runJailBoards(room: PartyRoom): void {
+  const limit = Math.round(balance.jail.yard.boardS * TICK_RATE);
+  for (const [seat, open] of [...openOf(room)])
+    if (open.jail?.game === 'yard' && room.state.tick - open.startTick > limit) {
+      openOf(room).delete(seat);
+      loseMaxHp(room, seat);
+    }
 }
 
 /** The answer to an open jail game. The yard fight is one round: a wrong or a slow answer loses it. */

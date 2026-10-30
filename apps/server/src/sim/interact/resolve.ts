@@ -23,7 +23,7 @@ import {
 } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { addStack, canAdd, count, take } from '../Inventory';
-import { startJailGame, startLockpick } from '../Minigames';
+import { runJailBoards, startJailGame, startLockpick } from '../Minigames';
 import { emitNoise } from '../Noise';
 import { type PlayerSim, simOf } from '../RoomSim';
 import type { MatchSeeds } from '../seeds';
@@ -290,6 +290,7 @@ export function runInteract(room: PartyRoom): void {
     for (const [id, s] of scene.propStates)
       if (s.untilTick !== 0 && tick >= s.untilTick) scene.propStates.delete(id);
   });
+  runJailBoards(room);
 }
 
 /** The tool uses worn off a seat's `item` (tests). */
