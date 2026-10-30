@@ -3,9 +3,12 @@ import { Phase } from '@wdi/shared';
 import { describe, expect, it } from 'vitest';
 import { ghostAfter } from '../net/worldColyseus';
 import { WORLD_COPY as C } from './copy/world';
-import { lineCause, lineClock, lineSecondsLeft } from './OnTheLine';
+import { bellsNext, lineCause, lineClock, lineSecondsLeft } from './OnTheLine';
 
-/** Round 10, C1b (GDD 3.22, UI.md 14.47): the On-the-line screen's clock and line, and the ghost flag around it. */
+/**
+ * Round 10, C1b (GDD 3.22, UI.md 14.47): the On-the-line screen's clock and line, and the ghost flag around it; y13
+ * (UI.md 14.51.5): the place in the line and the last cycle's bells.
+ */
 
 const p = balance.phases;
 const arrive = balance.train.arriveAtS;
@@ -26,6 +29,20 @@ describe('the time to the morning train', () => {
     expect(lineSecondsLeft(Phase.reveal, 4)).toBe(4 + p.immunityS + arrive);
     expect(lineSecondsLeft(Phase.immunity, 9)).toBe(9 + arrive);
   });
+  it('runs to the bells on the last cycle, with no train to arrive', () => {
+    expect(lineSecondsLeft(Phase.night, 60, true)).toBe(60);
+    expect(lineSecondsLeft(Phase.day, 100, true)).toBe(100 + p.duskS + p.nightS);
+    expect(lineSecondsLeft(Phase.meetingDiscussion, 30, true)).toBe(30 + p.voteS + p.revealS + p.immunityS);
+    expect(lineSecondsLeft(Phase.immunity, 9, true)).toBe(9);
+    expect(lineSecondsLeft(Phase.finalNight, 40, true)).toBe(40);
+  });
+  it('knows the last cycle from the day count: the day after it would be the Final Night', () => {
+    const last = balance.finalNight.afterCycle;
+    expect(bellsNext(last)).toBe(true);
+    expect(bellsNext(last + 1)).toBe(true);
+    expect(bellsNext(last - 1)).toBe(false);
+    expect(bellsNext(0)).toBe(false);
+  });
   it('reads as minutes and seconds', () => {
     expect(lineClock(0)).toBe('0:00');
     expect(lineClock(65.2)).toBe('1:06');
@@ -34,11 +51,16 @@ describe('the time to the morning train', () => {
 });
 
 describe('the cause line', () => {
-  it('names a bite or a shot, and anything else plainly', () => {
-    expect(lineCause('wolf')).toBe(C['line.cause.wolf']);
-    expect(lineCause('creature')).toBe(C['line.cause.creature']);
-    expect(lineCause('shot')).toBe(C['line.cause.shot']);
-    expect(lineCause(undefined)).toBe(C['line.cause.other']);
+  it('names a bite or a shot and where it fell, and anything else plainly', () => {
+    expect(lineCause('wolf', 'HollowMere')).toBe('A wolf took you in HollowMere.');
+    expect(lineCause('creature', 'The Low Woods')).toBe('Something in the dark took you in The Low Woods.');
+    expect(lineCause('shot', 'HollowMere')).toBe('A shot took you in HollowMere.');
+    expect(lineCause(undefined, 'HollowMere')).toBe(C['line.cause.other']);
+    expect(lineCause('knife', 'HollowMere')).toBe(C['line.cause.other']);
+  });
+  it('keeps the plain line when no killed reached this client, so no place is known', () => {
+    expect(lineCause('wolf', undefined)).toBe(C['line.cause.other']);
+    expect(lineCause('wolf', '')).toBe(C['line.cause.other']);
   });
 });
 
