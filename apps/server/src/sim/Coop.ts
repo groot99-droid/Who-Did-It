@@ -5,6 +5,7 @@ import { type PlayerSim, simOf } from './RoomSim';
 import { atNode, completeTask } from './tasks/complete';
 import { isVerbPhase, reject } from './World';
 import { refusal, type Refusal } from './refusal';
+import { clientOf } from './seatIds';
 
 /**
  * The co-op hold (round 7, 7M; GDD 3.5 "Shutter the windows", A133 (11)). A task of kind `coop` has no puzzle: its
@@ -98,7 +99,7 @@ export function tickCoop(room: PartyRoom, sessionId: string, p: PlayerSim): void
     s.holders = holders.length;
     s.progress = progress;
     for (const id of holders) {
-      room.clients.getById(id)?.send(S2C.coopHold, { taskId: task.id, holders: holders.length, progress });
+      clientOf(room, id)?.send(S2C.coopHold, { taskId: task.id, holders: holders.length, progress });
     }
   }
   if (!done) return;

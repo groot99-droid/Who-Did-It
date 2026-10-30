@@ -46,6 +46,7 @@ import { simOf } from '../../sim/RoomSim';
 import { mapIdOfRoom } from '../../sim/MapSites';
 import { dealPurses } from '../../sim/economy/purse';
 import { settle } from '../../sim/Inventory';
+import { clientOf, rekeySeats } from '../../sim/seatIds';
 
 /**
  * Flow messages: the lobby and role-card flow plus the meeting vote and chat (consumed by the phase
@@ -260,6 +261,7 @@ export function startMatch(room: PartyRoom): void {
   room.matchSeed = randomInt(2 ** 32);
   // The party fills to `players.min` with NPC seats, named from a stream apart from the deal's (GDD 3.12).
   fillNpcSeats(room, room.seeds.get('npcNames'));
+  rekeySeats(room); // round 10, W1a: a world match's seats under fresh ids, before anything is dealt (row 25)
   const ids = [...room.state.players.keys()];
   // The deal from the public deck (GDD 3.1).
   const dealt = dealMainDeck(room, ids);
@@ -312,7 +314,7 @@ export function startMatch(room: PartyRoom): void {
     }));
     const look = looks.get(id) as { height: number; scarf: number; hat: number };
     // Round 5, 5F: the main-mode card fields (deck, look, portrait, cover hints) beside the card.
-    room.clients.getById(id)?.send(S2C.roleReveal, {
+    clientOf(room, id)?.send(S2C.roleReveal, {
       ...buildRoleReveal(dealt.get(id) as string, look, ids.length, mates),
       ...mainRevealFields(room, id),
     });

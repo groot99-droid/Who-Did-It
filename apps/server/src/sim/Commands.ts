@@ -24,6 +24,7 @@ import { wakeOnInput } from './Sleep';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
 export interface QueuedCommand {
+  /** The sender's seat id: its session id in the lobby, its fresh seat id in a world match (`seatIds.ts`). */
   sessionId: string;
   type: string;
   payload: unknown;
@@ -34,7 +35,7 @@ export class CommandQueue {
   /** `input.move` keeps only the newest per client: one is applied per tick, newest wins (5.6). */
   private moves = new Map<string, unknown>();
 
-  push(client: Client, type: string, payload: unknown): void {
+  push(client: Pick<Client, 'sessionId'>, type: string, payload: unknown): void {
     if (type === C2S.move) this.moves.set(client.sessionId, payload);
     else this.items.push({ sessionId: client.sessionId, type, payload });
   }

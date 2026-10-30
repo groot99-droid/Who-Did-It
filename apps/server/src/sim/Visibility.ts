@@ -10,6 +10,7 @@ import { canSee } from './Sight';
 import { figureOfHandle } from './townsfolk/figures';
 import { isOnLine } from './Train';
 import { SCENE_KEYS, isWorldPhase, sceneKey } from './World';
+import { seatOf } from './seatIds';
 
 export { SCENE_KEYS, sceneKey };
 
@@ -73,18 +74,19 @@ export function reconcileViews(room: PartyRoom): void {
       reconcileAdminView(room, client);
       continue;
     }
+    const seat = seatOf(room, client);
     const view = client.view;
-    const viewer = room.state.players.get(client.sessionId);
-    const viewerSim = sim.players.get(client.sessionId);
+    const viewer = room.state.players.get(seat);
+    const viewerSim = sim.players.get(seat);
     if (!view || !viewer || !viewerSim) continue;
-    let held = sim.views.get(client.sessionId);
+    let held = sim.views.get(seat);
     if (!held) {
       held = { scene: null };
-      sim.views.set(client.sessionId, held);
+      sim.views.set(seat, held);
     }
 
     // Round 10 (C1): a seat on the line holds no avatar and no scene until the Train brings it back.
-    const onLine = isOnLine(room, client.sessionId);
+    const onLine = isOnLine(room, seat);
     const want = onLine ? null : sceneKey(viewerSim.sceneIdx);
     if (held.scene !== want) {
       const old = held.scene === null ? undefined : room.state.scenes.get(held.scene);
@@ -94,13 +96,13 @@ export function reconcileViews(room: PartyRoom): void {
         view.add(next);
         // Round 6, 6G (contract item): `view.add` carries the scene's current avatars in with it; count them as held
         // so `reconcileAvatars` takes back, in this same pass, every one the viewer may not see (a ghost, the dark).
-        const avatars = heldOf(room, client.sessionId).plain;
+        const avatars = heldOf(room, seat).plain;
         next.avatars.forEach((_avatar, handle) => avatars.add(handle));
       }
       held.scene = want;
     }
 
-    reconcileAvatars(room, client.sessionId, view, viewerSim, world && !onLine);
+    reconcileAvatars(room, seat, view, viewerSim, world && !onLine);
   }
 }
 
@@ -197,9 +199,10 @@ const NEAR_PX = (clues.clues.blood?.params?.visibleTiles ?? 0) * TILE_PX;
 export function reconcileNear(room: PartyRoom): void {
   const sim = simOf(room);
   for (const client of room.clients) {
-    const viewerSim = sim.players.get(client.sessionId);
+    const seat = seatOf(room, client);
+    const viewerSim = sim.players.get(seat);
     if (!client.view || !viewerSim || isAdminClient(room, client.sessionId)) continue;
-    syncNear(room, heldOf(room, client.sessionId), client.view, viewerSim);
+    syncNear(room, heldOf(room, seat), client.view, viewerSim);
   }
 }
 

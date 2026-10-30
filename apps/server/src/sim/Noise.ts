@@ -4,6 +4,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { hearNoise } from './npc/hive/senses';
 import { simOf } from './RoomSim';
 import { sceneIndex } from './World';
+import { seatOf } from './seatIds';
 
 /**
  * Sends `noise` to everyone placed in `sceneId` within `radiusTiles` of (x, y), except `exceptId`.
@@ -23,9 +24,10 @@ export function emitNoise(
   const idx = sceneIndex(sceneId);
   hearNoise(room, sceneId, x, y, radiusTiles, kind, exceptId); // round 8, 8R: NPC listeners (one line, granted by 6Z)
   for (const client of room.clients) {
-    const player = room.state.players.get(client.sessionId);
-    const p = sim.players.get(client.sessionId);
-    if (!player || !p?.placed || client.sessionId === exceptId || p.sceneIdx !== idx) continue;
+    const seat = seatOf(room, client);
+    const player = room.state.players.get(seat);
+    const p = sim.players.get(seat);
+    if (!player || !p?.placed || seat === exceptId || p.sceneIdx !== idx) continue;
     if (Math.hypot(p.x - x, p.y - y) <= reach) {
       client.send(S2C.noise, { sceneId, x: Math.round(x), y: Math.round(y), kind });
     }

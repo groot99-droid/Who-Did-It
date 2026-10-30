@@ -16,6 +16,7 @@ import { handleInteract, tickInteract } from './interact/resolve';
 import { handleSleepHold } from './Sleep';
 import { handleErrandHold, tickErrandHold } from './economy/fare';
 import { handleCuffHold, tickCuff } from './law/Manhunt';
+import { clientOf } from './seatIds';
 
 const CLUE_TEACHING = 'clue_teaching';
 
@@ -174,5 +175,5 @@ function completeCollect(
       ? NotebookStatus.teaching
       : NotebookStatus.claimed;
   player.priv.notebook.push(entry);
-  room.clients.getById(sessionId)?.send(S2C.clueFound, { entryId: entry.id });
+  clientOf(room, sessionId)?.send(S2C.clueFound, { entryId: entry.id });
 }

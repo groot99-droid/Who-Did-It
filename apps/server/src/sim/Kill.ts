@@ -17,6 +17,7 @@ import { type PlayerSim, simOf } from './RoomSim';
 import { knockBackPair, onBandagedStrike } from './Struck';
 import { isKillPhase, navGrid, reject, sceneKey } from './World';
 import { refusal, type Refusal } from './refusal';
+import { seatOf } from './seatIds';
 
 /** Kill cooldown in ticks for this party size (GDD 3.9; the row is cut to 4-10 like the deal). */
 function killCooldownTicks(room: PartyRoom): number {
@@ -43,7 +44,7 @@ function sendDisguisePuff(room: PartyRoom, actor: PlayerSim): void {
     kind: 'disguise' as const,
   };
   for (const client of room.clients) {
-    const p = sim.players.get(client.sessionId);
+    const p = sim.players.get(seatOf(room, client));
     if (p?.placed && p.sceneIdx === actor.sceneIdx) client.send(S2C.vfx, msg);
   }
 }

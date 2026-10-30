@@ -6,6 +6,7 @@ import { briefingsOf } from '../law/Briefing';
 import { simOf } from '../RoomSim';
 import { isWorldPhase, reject, sceneKey } from '../World';
 import { type Figure, figureOfHandle, figuresOf } from './figures';
+import { clientOf } from '../seatIds';
 
 /**
  * Talk to a figure (round 10, D9c; GDD 3.24 "Talk to a figure"; seams.md 3 row 16). `talk.ask {targetId, ask}` is
@@ -118,7 +119,7 @@ export function runTalk(room: PartyRoom): void {
   for (const a of due) {
     const figure = figuresOf(room).get(a.figureId);
     const asker = simOf(room).players.get(a.seat);
-    const client = room.clients.getById(a.seat);
+    const client = clientOf(room, a.seat);
     if (!figure || figure.dead || !asker || asker.dead || !client) continue;
     const name = talk.figures.names[figure.kind] ?? talk.figures.names.villager ?? '';
     const text = `${name}: ${lineFor(room, figure, a.ask, tick)}`;

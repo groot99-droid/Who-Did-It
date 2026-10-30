@@ -14,6 +14,7 @@ import { nightOf } from './nightMemory';
 import { simOf } from './RoomSim';
 import { endMatch, evaluateWin } from './Win';
 import { isWorldPhase, reject, sceneKey } from './World';
+import { clientOf } from './seatIds';
 
 // The Gamekeeper's Last Shot (GDD 3.2, 3.8; round-5 `deck/wire.md` 5). Session 5G owns this file. A dying Gamekeeper
 // (Knife, Nightshade or an ejection) gets `aim {endsTick}` for `lastShot.params.aimS`; its view holds no avatar
@@ -34,7 +35,7 @@ export function startAim(room: PartyRoom, seat: string, cause: DeathCause): bool
   const aimS = abilities.abilities.lastShot?.params?.aimS ?? 0;
   const untilTick = room.state.tick + Math.round(aimS * TICK_RATE);
   nightOf(room).aims.set(seat, { cause, sceneId: sceneKey(p.sceneIdx), untilTick, shot: false, held: false });
-  room.clients.getById(seat)?.send(S2C.aim, { endsTick: untilTick });
+  clientOf(room, seat)?.send(S2C.aim, { endsTick: untilTick });
   simOf(room).viewsDirty = true;
   return true;
 }
@@ -45,9 +46,7 @@ function closeAim(room: PartyRoom, seat: string): void {
   const aim = mem.aims.get(seat);
   if (!aim) return;
   mem.aims.delete(seat);
-  room.clients
-    .getById(seat)
-    ?.send(S2C.killed, { sceneId: aim.sceneId, cause: aim.cause, roles: rolesOf(room) });
+  clientOf(room, seat)?.send(S2C.killed, { sceneId: aim.sceneId, cause: aim.cause, roles: rolesOf(room) });
   simOf(room).viewsDirty = true;
   // The forced meeting's verdict is FinalNight.ts's; a later reveal's own check follows its hold.
   if (mem.aims.size > 0 || room.state.phase === Phase.gameOver || room.state.meeting.reason === 'final')

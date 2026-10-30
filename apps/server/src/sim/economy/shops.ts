@@ -8,6 +8,7 @@ import { TOWN, balanceOf, movePurse } from './purse';
 import { refusal, type Refusal } from '../refusal';
 import { askOf } from './fare';
 import { stockLeft, takeStock } from './townWork';
+import { clientOf } from '../seatIds';
 
 /**
  * Shops (round 8, GDD 3.23; docs/round8/economy.md 2), Session 8C. A shop is one `counter` static named by
@@ -66,7 +67,7 @@ const priced = (room: PartyRoom, shopId: string, items: readonly string[], side:
 /** `shop.open` to the seat: what the shop sells and buys now. */
 function sendShop(room: PartyRoom, sessionId: string, shopId: string): void {
   const shop = economy.shops[shopId]!;
-  room.clients.getById(sessionId)?.send(S2C.shopOpen, {
+  clientOf(room, sessionId)?.send(S2C.shopOpen, {
     shopId,
     stock: priced(room, shopId, shop.sells, 'ask'),
     buys: priced(room, shopId, shop.buys, 'pay'),

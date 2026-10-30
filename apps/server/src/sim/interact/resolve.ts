@@ -28,6 +28,7 @@ import { emitNoise } from '../Noise';
 import { type PlayerSim, simOf } from '../RoomSim';
 import type { MatchSeeds } from '../seeds';
 import { isVerbPhase, sceneKey, tileCentre } from '../World';
+import { clientOf } from '../seatIds';
 
 /**
  * The logic table's resolver (round 10, A10; docs/round9/logic-table.md 4, GDD 3.14): `act.hold {action: 'interact',
@@ -195,9 +196,7 @@ function refuse(
 ): void {
   const line = interactionId ? interactions.interactions[interactionId]?.fail[problem.reason] : undefined;
   const extra = { ...(line ? { msg: line } : {}), ...(interactionId ? { interaction: interactionId } : {}) };
-  room.clients
-    .getById(sessionId)
-    ?.send(S2C.error, refusalFrame(problem.reason, problem.args as never, extra));
+  clientOf(room, sessionId)?.send(S2C.error, refusalFrame(problem.reason, problem.args as never, extra));
 }
 
 /** `act.hold {action: 'interact', targetId, via?}` (`sim/Hold.ts`): starts the hold if it can run. */

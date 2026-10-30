@@ -39,6 +39,7 @@ import { registerMovement } from './handlers/movement';
 import { type FixedSeeds, MatchSeeds } from '../sim/seeds';
 import { autoOf } from '../sim/auto/Auto';
 import { clockOf, stepsThisTick } from '../sim/auto/clock';
+import { seatOf } from '../sim/seatIds';
 
 const codeRegistries = new WeakMap<object, CodeRegistry>();
 
@@ -141,7 +142,9 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
     this.onMessage('*', (client, type, payload) => {
       // Nothing mutates state here: the step consumes the queue (ARCHITECTURE 5.6).
       if (typeof type !== 'string' || !isCommandType(type)) return;
-      (isLobbyCommand(type) ? this.lobbyCommands : this.commands).push(client, type, payload);
+      // Round 10, W1a: the queue holds the seat id, a fresh id in a world match (`sim/seatIds.ts`).
+      const seat = { sessionId: seatOf(this, client) };
+      (isLobbyCommand(type) ? this.lobbyCommands : this.commands).push(seat, type, payload);
     });
 
     this.setFixedTimestep((ctx) => {
@@ -195,31 +198,33 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
    * for a reconnection (GDD 3.10); during play there is no window, so `onLeave` runs at once (M7).
    */
   override onDrop(client: Client) {
-    const player = this.state.players.get(client.sessionId);
+    const seat = seatOf(this, client);
+    const player = this.state.players.get(seat);
     if (!player || this.state.phase !== Phase.lobby) return;
     player.connected = false;
-    this.passLeader(client.sessionId);
+    this.passLeader(seat);
     void this.allowReconnection(client, balance.disconnect.deathAfterS).catch(() => undefined);
   }
 
   override onReconnect(client: Client) {
-    const player = this.state.players.get(client.sessionId);
+    const player = this.state.players.get(seatOf(this, client));
     if (player) player.connected = true;
   }
 
   /** The seat is gone for good: the window lapsed, or the player left on purpose. */
   override onLeave(client: Client) {
-    const player = this.state.players.get(client.sessionId);
+    const seat = seatOf(this, client);
+    const player = this.state.players.get(seat);
     if (!player) return;
     if (this.state.phase === Phase.lobby) {
-      this.state.players.delete(client.sessionId);
-      this.passLeader(client.sessionId);
+      this.state.players.delete(seat);
+      this.passLeader(seat);
       return;
     }
     // During play the seat stays and becomes a ghost with no body (A30); the next step records the death.
     player.connected = false;
-    simOf(this).deaths.push({ playerId: client.sessionId, cause: 'vanished', tick: this.state.tick });
-    this.passLeader(client.sessionId);
+    simOf(this).deaths.push({ playerId: seat, cause: 'vanished', tick: this.state.tick });
+    this.passLeader(seat);
   }
 
   /**

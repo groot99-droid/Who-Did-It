@@ -15,6 +15,7 @@ import { type MeetingRequest, simOf } from './RoomSim';
 import { evaluateWin, endMatch } from './Win';
 import { civicMeetingStart } from './economy/civic';
 import { sealBlocks } from './economy/faith';
+import { clientOf } from './seatIds';
 
 /**
  * Everyone, living or dead, goes to the map's meeting spawns on the hub (`meetingSpawnsOf`) without a
@@ -174,9 +175,11 @@ function startReveal(room: PartyRoom): void {
   }
   // An ejected Gamekeeper aims its Last Shot first (5G, `deck/wire.md` 5): its `killed` waits for the aim to close.
   if (beginAim(room, ejectedId, 'ejected')) return;
-  room.clients
-    .getById(ejectedId)
-    ?.send(S2C.killed, { sceneId: hubOf(room), cause: 'ejected', roles: rolesOf(room) });
+  clientOf(room, ejectedId)?.send(S2C.killed, {
+    sceneId: hubOf(room),
+    cause: 'ejected',
+    roles: rolesOf(room),
+  });
 }
 
 /** After the reveal: the win check for an ejection, else the announced return to the square, immunity. */

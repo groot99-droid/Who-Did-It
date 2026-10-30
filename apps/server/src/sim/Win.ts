@@ -10,6 +10,7 @@ import { resetNightForLobby } from './NightPowers';
 import { simOf } from './RoomSim';
 import { mapIdOfRoom } from './MapSites';
 import { isNpcSeat, resetNpcsForLobby } from './Npc';
+import { restoreSeats } from './seatIds';
 import { isPaintTown, paintGameOver, paintWinner } from './paintTown';
 import { isOnLine } from './Train';
 import { SCENE_KEYS } from './World';
@@ -147,6 +148,7 @@ export function resetToLobby(room: PartyRoom): void {
     priv.paintTown = false; // round 10, C5
   });
   for (const id of gone) state.players.delete(id);
+  restoreSeats(room); // round 10, W1a: the human seats back under their session ids
   if (!state.players.has(state.leaderId)) state.leaderId = state.players.keys().next().value ?? '';
 
   for (const key of SCENE_KEYS) {

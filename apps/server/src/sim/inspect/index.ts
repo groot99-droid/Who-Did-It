@@ -9,6 +9,7 @@ import { canSee } from '../Sight';
 import { isWorldPhase, reject } from '../World';
 import { healthBand, lightOf, purseBand, signsOf } from './read';
 import { matchRelations, type Seen } from './relations';
+import { clientOf } from '../seatIds';
 
 /**
  * `act.inspect { targetId }` (GDD 3.22 "Inspect"; docs/round8/body.md 7), Session 8B. A living seat studies the avatar
@@ -54,7 +55,7 @@ export function handleInspect(room: PartyRoom, sessionId: string, payload: Recor
   const targetPlayer = room.state.players.get(seat);
   const by = seenAs(room, sessionId);
   const of: Seen = { seat, look: lookOfFace(room, avatar.lookOf) };
-  room.clients.getById(sessionId)?.send(S2C.inspectResult, {
+  clientOf(room, sessionId)?.send(S2C.inspectResult, {
     targetId: handle,
     lookId: of.look,
     signs: signsOf(avatar, targetPlayer),
@@ -62,7 +63,7 @@ export function handleInspect(room: PartyRoom, sessionId: string, payload: Recor
     purse: targetPlayer ? purseBand(targetPlayer) : 'unknown',
     light: lightOf(avatar),
   });
-  const targetClient = room.clients.getById(seat);
+  const targetClient = clientOf(room, seat);
   targetClient?.send(S2C.inspectNoticed, { lookId: by.look });
 
   const rows = matchRelations(room, by, of);

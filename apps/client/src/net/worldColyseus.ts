@@ -1,5 +1,6 @@
 import mitt, { type Emitter } from 'mitt';
 import type { Room } from '@colyseus/sdk';
+import { selfSeatId } from './selfSeat';
 import balance from '@wdi/content/data/balance.json';
 import type { HoldAction } from '@wdi/shared/protocol';
 import { paintTarget } from '@wdi/shared/rules';
@@ -143,7 +144,7 @@ export class ColyseusWorldFeed implements WorldFeed {
   }
 
   get selfId(): string {
-    return this.room.sessionId;
+    return selfSeatId(this.room); // round 10, W1a: the fresh seat id in a world match
   }
 
   private get state(): GameStateLike {

@@ -1,6 +1,7 @@
 import { S2C, refusalFrame } from '@wdi/shared';
 import type { RefusalArgMap, RefusalFrame, RefusalReason } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { clientOf } from './seatIds';
 
 /** The optional parts of a refusal: a log message (the reason id when absent) and the logic-table interaction. */
 export type RefusalExtra = { msg?: string; interaction?: string };
@@ -40,5 +41,5 @@ export function sendRefusal(
     typeof first === 'object'
       ? refusalFrame(first.reason, first.args as RefusalArgMap[RefusalReason] | undefined, first.extra)
       : refusalFrame(first, second as RefusalArgMap[RefusalReason] | undefined, third);
-  room.clients.getById(sessionId)?.send(S2C.error, frame);
+  clientOf(room, sessionId)?.send(S2C.error, frame);
 }
