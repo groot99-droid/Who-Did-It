@@ -510,6 +510,7 @@ screenshots at 1280 x 720 and 390 x 844 in `docs/ui/`:
 | `meeting` | eight portraits, the tally, chat, claim chips, the vote | 2 step 8, 3.8 |
 | `menu-mockup` (owner, Claude Design, 2026-10-23) | the round-7 menu: title, glass buttons, profile chip, sound toggle over the loop (`docs/round7/ui-reskin.md`) | 2 step 1, 3.21 |
 | `lobby-mockup` (owner, Claude Design, 2026-10-23) | the round-7 lobby in three columns: code and seats, map cards and art style, the deck and Start | 2 step 3 |
+| `studio-npc-1280x720` (10Y, round 10; from `e2e/studio.spec.ts`, not a static page) | the Studio's NPC editor on the mock room after a save: the clerk's stations with the pump first, the note and the draft-PR line | 14.42, DECISIONS A314 |
 
 Owner sign-off requested on the role card and the meeting screen before the frames are final.
 
@@ -1851,6 +1852,7 @@ the train brings the seat back the screen lifts and a 3 s toast says so. The man
 | back (`line.back`) | You are back. | toast, 3 s, to the returning seat, after the morning train or the Final Night's bells |
 | a stall's stock (`shop.left`, C3) | {n} left today | the shop panel, beside an item's price, at a stall with a character (`shop.open` `left`) |
 | a stall sold out (`shop.soldOut`, C3) | Sold out | the shop panel, in place of the count; the Buy button greys |
+| the Paint The Town Red win (server, `Win.ts` `summaryOf`, C5a) | {town} is painted red. The Killers win. | `gameOver.summary`, every seat |
 
 ### 14.48 The lock-pick and the Resistant effect (10D, round 10)
 

@@ -7,7 +7,7 @@ import type { StudioC2SPayloads, StudioC2SType, StudioReportRow } from '@wdi/sha
 import type { StudioLink, StudioLinkEvents, StudioSnapshot } from '../admin/StudioNet';
 import { spawnsOf } from './model';
 import type { ReportApi } from './reportApi';
-import type { SaveApi } from './saveApi';
+import type { SaveApi, SaveRequest } from './saveApi';
 
 /** Every payload field at once: the mock reads whichever the message carries. */
 type Loose = Partial<
@@ -148,7 +148,15 @@ export const mockReportApi: ReportApi = {
   list: () => Promise.resolve({ reports: [...mockReports] }),
 };
 
-/** The save route in mock mode: it answers a made-up draft PR and keeps nothing. */
+/** The requests the mock save took, for the Studio specs (round 10, 10Y): `window.__wdiStudio.saves`. */
+const mockSaves: SaveRequest[] = [];
+if (typeof window !== 'undefined')
+  (window as unknown as { __wdiStudio?: unknown }).__wdiStudio = { saves: mockSaves };
+
+/** The save route in mock mode: it answers a made-up draft PR and keeps only the requests, for the specs. */
 export const mockSaveApi: SaveApi = {
-  save: () => Promise.resolve({ branch: 'studio/mock', number: 0, url: '#' }),
+  save: (req) => {
+    mockSaves.push(req);
+    return Promise.resolve({ branch: 'studio/mock', number: 0, url: '#' });
+  },
 };
