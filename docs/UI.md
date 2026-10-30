@@ -1207,7 +1207,7 @@ Session 7G, round 7 (DECISIONS A111). The owner's admin page (14.23) wears the t
 
 ### 14.29 Vendettas (7H)
 
-Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaGoal(id)`). The role card (`ui/RoleCard.ts`; drawn since round 10, 10Y, A354, 14.53) reads `Private.vendetta` (GDD 3.20) through the world feed's `vendetta()`: a Killer's own vendetta id, or for the Accomplice the ids of the Killers it knows, joined by commas. An empty value shows no line. No other seat's card, no world label and no toast names a vendetta; the doubted Vicar's note is its own.
+Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaGoal(id)`). The role card (`ui/RoleCard.ts`; drawn since round 10, 10Y, A354, 14.51.2) reads `Private.vendetta` (GDD 3.20) through the world feed's `vendetta()`: a Killer's own vendetta id, or for the Accomplice the ids of the Killers it knows, joined by commas. An empty value shows no line. No other seat's card, no world label and no toast names a vendetta; the doubted Vicar's note is its own.
 
 | Key                        | Text                                                         |
 | -------------------------- | ------------------------------------------------------------ |
@@ -1903,7 +1903,7 @@ centred, it hid the log's first line.
 - **The item icon** beside a `NEED_*` line (6.2) waits for `icon_item_*` art; the line carries the item's name
   until then.
 
-### 14.53 The vendetta on the card (10Y, round 10)
+#### 14.51.2 The vendetta on the card (y7)
 
 Round 10's role-card audit found that the vendetta lines of 14.29 reached no screen: the role card never read
 `Private.vendetta`, so a Killer never saw its vendetta and the Accomplice never saw its Killer's
