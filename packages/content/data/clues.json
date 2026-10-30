@@ -274,6 +274,20 @@
       "description": "Scuffed ground where a mugging happened; the stride of the prints gives the mugger's height.",
       "ships": "V1",
       "gddRef": "3.24"
+    },
+    "scratch": {
+      "id": "scratch",
+      "name": "Scratches",
+      "reveals": "picked",
+      "inWorld": true,
+      "collectible": true,
+      "decay": { "kind": "cycles", "cycles": 2 },
+      "reader": "anyone",
+      "plantable": false,
+      "source": "pick",
+      "description": "Bright scratches round a lock a pick opened. They say a lock was picked, never by whom.",
+      "ships": "V1",
+      "gddRef": "3.29"
     }
   }
 }

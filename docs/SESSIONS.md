@@ -3965,6 +3965,32 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
     attached would tell a true wearer of a look from a cover. A Verified and a Corroborated entry both show as backed.
   - A jailed seat is not free and a seat on the line is not living, so neither counts or signs. Briefings are not
     evidence. NPC seats sign later, under an R6-style timing rule.
+- 2026-10-30: #356 (row 13 and the log above) merged at ed5e79c and D4a (#357) at 01a2c9c, after a clean 50-match
+  bot run of 6Z's on it. D5b's grants: `registry.ts`, the `pub` line of `MinigameModal.ts` and `copy/minigames.ts`.
+  Row 10 gains `declined`, the asker's state after a no: it is the same whoever answered, so it tells nothing about
+  the target. On D4a:
+  - It used fewer of its grants than planned. The buff is a field of the eaten item, not of the recipe; a recipe row
+    already names its station, so there is no `parts` list; and the stem stations wait for D4b's shaping table.
+  - Its other edits outside 10D's paths were granted on review: the m5b tests of `tools/sprites`, the client and the
+    content, which list the recipes; `docs/SPRITES.md`; the `EffectId` pin; and the icons.
+  - The plan's dish buff "until dawn" is a fixed 780 s, so a dish eaten at night can carry into the next day. That is
+    for the owner and 10X to judge.
+- 2026-10-30: D5b (#358) merged at f930ae4, #360 (row 10's `declined` and the log above) at 9fee056, B8a (#355) at
+  10083ca and D5c (#361) at 2e07440, after a clean 50-match bot run of 6Z's on it. B8a's `pair.*` events carry seat
+  ids on the server bus only, as every event does (A84). D5c's grants: `ClueKind`, the clue and economy schemas, one
+  line each in `NotebookPanel.ts` and `ui/copy/world.ts`, and its own `lockpick.test.ts`. Row 12 now says what D5c
+  built: the scratch's Notebook entry is like any clue's (the scene and the time it was collected), and the fine comes
+  from the picker's purse like any other. B3a's grants: two cases in `sim/Commands.ts`; row 13's messages and fields in
+  `packages/shared`, with `PROTOCOL.md` regenerated; the `petition` section of `balance.ts`; and the optional `crimes`
+  in `schemas/bible.ts`. On 10D's plan for D6, which splits into D6a (armour) and D6b (the skinning knife):
+  - D6a's grants: the armour factor in `hurt` (`sim/body/damage.ts`), the armour reads in `sim/body/effects.ts`, the
+    `armor` block of `balance.json` with its schema, and an optional `armor` field on an item (`logic-table.md` 8.2
+    and 8.3). Damage taken is never below `armor.cap` of the blow, the Lodge's creature perk included, and the Knife,
+    Nightshade and the Last Shot never pass through it.
+  - Tin mail and the tin helm come only from the forge, which no round-10 step builds, so they wait for it.
+  - Armour shows only in its wearer's own view in round 10 (LT6). It is not drawn, so an inspect line naming it would
+    tell an impersonator from the seat whose look it wears. Drawing it on the figure is round 11's art question.
+  - A beating's robbery (C6) never takes armour (LW9).
 
 ## Round 11 (planning, started 2026-10-29)
 

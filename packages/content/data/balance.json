@@ -416,5 +416,13 @@
     "tierMult": { "body": [0.8, 0.65, 0.5], "head": [0.9, 0.8] },
     "cap": 0.5,
     "gddRef": "3.22"
+  },
+  "pairing": {
+    "answerS": { "min": 5, "max": 9 },
+    "yesChance": 0.5,
+    "scaredMult": 1.6,
+    "followTiles": 2,
+    "apartS": 20,
+    "gddRef": "3.31"
   }
 }

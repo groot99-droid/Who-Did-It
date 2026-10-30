@@ -72,6 +72,7 @@
     "fine": 8,
     "racks": ["bs.rack_tally"]
   },
+  "trespassFine": 3,
   "curfew": {
     "hollowmere": ["tavern_bar", "widow_parlour", "bakery", "apoth_shop", "manor_hall", "barn"],
     "blackpine": ["bp_lodge", "bp_office", "bp_smithy"]

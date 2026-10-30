@@ -106,6 +106,8 @@ export const EconomyFile = z.strictObject({
     fine: Count,
     racks: z.array(PrefixedId).min(1),
   }),
+  /** Scrip taken from a seat whose pick opens a lock and is caught at it (round 10, D5c, GDD 3.29). */
+  trespassFine: Count,
   /** The scenes whose doors refuse an Indebted seat from dusk until it pays (GDD 3.23), per map. */
   curfew: z.partialRecord(MapId, z.array(WorldId)),
   faith: z.strictObject({

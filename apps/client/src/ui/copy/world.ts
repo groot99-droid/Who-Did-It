@@ -71,6 +71,7 @@ export const WORLD_COPY = {
   'notebook.entry.footprints': 'Footprints, {stride}: {height}',
   'notebook.entry.thread': 'Thread, {wool} wool: {scarf}',
   'notebook.entry.felt': 'Felt: {hat}',
+  'notebook.entry.scratch': 'Scratches round a lock',
   'notebook.entry.other': 'Clue',
   'notebook.meta': '{scene}, {time}',
   'notebook.status.claimed': 'Claimed',

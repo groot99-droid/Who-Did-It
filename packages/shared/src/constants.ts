@@ -38,8 +38,16 @@ export const ClueKind = {
   hungerPrints: 9,
   /** Round 8 (8E, GDD 3.24): scuffed ground where a mugging happened; `value` the mugger's height index. */
   scuffle: 10,
+  /** Round 10 (D5c, seams.md 3 row 12, GDD 3.29): scratches round a lock a pick opened; `value` and `dir` are 0 for everyone. */
+  scratch: 11,
 } as const;
 export type ClueKindId = (typeof ClueKind)[keyof typeof ClueKind];
+
+/**
+ * Round 10, B8 (GDD 3.31): `Private.pair.state`. `asking` waits for its answer, `asked` holds a human's prompt
+ * open, `declined` shows the asker the one no line until its next ask or dawn.
+ */
+export const PairPhase = { none: 0, asking: 1, asked: 2, paired: 3, declined: 4 } as const;
 
 /** `NotebookEntry.status` values (GDD 3.4; `teaching` is the grace-phase clue of GDD 2 step 5). */
 export const NotebookStatus = {

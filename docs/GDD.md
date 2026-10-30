@@ -118,6 +118,7 @@ A knife kill spawns, server-side: the Body; **2 of the 3 trait clues** (seeded c
 | Silhouette | Height + scarf | – | Child |
 | Ledger | Last house entered per player | Per meeting | Butler |
 | Dropped items | The dead player's inventory | Never | Anyone |
+| Scratches (round 10, D5c; on the tile of a lock a pick opened) | That a lock was picked, never by whom: `value` and `dir` are 0 for every picker | 2 cycles | Anyone |
 
 Wolf kills spawn Fur and Claw Marks (decay 1 cycle), no footprints. Collecting: stand on a clue, hold E 2 s; it enters the Notebook with trait, scene and time. (M3: Footprints and Thread only; the hold is cancelled by moving, releasing, dying or a meeting, and several players may collect the same clue.) The Rag erases 1 clue (3 s, noise 4). Washing needs the Bucket and water (the well or a basin). A Wounded player's drips fade after 20 s; a one-way drop leaves a 90 s footprint trail (height) at the landing. Each scene keeps at most 40 clues; past that the oldest Claimed clue is collected first. Plants are indistinguishable until Inspected. When two different players collect the same physical clue it becomes **Corroborated** and counts as Verified for the suspect set; Townsfolk therefore have a deduction verb. **Round 10, B2:** the Constables verify every collectible clue at `law.speedMult` times a Detective's rate and brief its kind, scene and trait to everyone `law.briefingAfterS` after it appears (3.31).
 
@@ -1131,7 +1132,8 @@ trace is faster than a hand. A trace that leaves a pin unset or is malformed is 
 
 **Opening and snapping.** An opened lock becomes the public prop state `open` (3.14; it names no one). A snapped pick
 spends one Lockpicks and refuses `PICK_SNAPPED`; a charge is lost only that way. Nothing else changes in public view: the
-scratch clue and the small fine the interaction names arrive with D5c. NPC seats do not pick yet (their routine reaches
+opened lock leaves a Scratches clue (3.4), the same whoever picked, and the interaction's `fineChance` (rolled on the
+`locks` stream, a stream no client sees) may fine the picker `economy.json` `trespassFine` Scrip, taken as any fine is. NPC seats do not pick yet (their routine reaches
 only props a mode of no mini-game works, 3.12 Chores).
 
 **The screen** (round 10, D5b). The picker's dialog draws one column per pin and a tension gauge with the snap line, and never the set points: a pin that is lifted into its band under light tension clicks (a tone, a buzz, a jolt). Letting go of the pick records an attempt; the trace of attempts is the answer, and the board ends when every pin is set or the pick snaps.
@@ -1207,6 +1209,24 @@ before its time is not briefed, and the same words twice within `law.briefingAft
 alive there is no briefing (proposed; a knocked-out Constable is alive, and until C5 nothing kills a guard). It opens
 no screen, pauses nothing and waits on nobody. The server keeps the posted
 briefings in order for the police board, which shows them with the petition form (B3).
+
+**Walk with me (B8, A269; seams.md 3 row 10).** In the night phases (dusk, night, the Final Night) a living seat
+may ask a figure in inspect reach (`relations.inspect.rangeTiles`; a seat or a townsperson, by its handle) to walk with
+it until dawn. Every ask draws one delay from `pairing.answerS` (5 to 9 s, long enough to read and answer) and one
+yes roll from the `pairing` stream, whoever is asked, and the answer reaches the asker at that delay, so its timing
+never tells a person from an NPC (R6). A human target sees a private prompt until then: an early answer is held, and
+no answer is a no. An NPC seat or a townsperson says yes on the roll, `pairing.yesChance`, times
+`pairing.scaredMult` while its mood is Scared (the needs never read a card). A guard (3.24) keeps its post and always
+says no, and since no seat wears a guard's look, its no says nothing about a person. A target that is already
+asking, asked or paired says no at the delay like any other. A no is an answer, never a refusal (`failures.md` 10):
+the asker sees the same line whoever said it. A pair lasts until dawn, a death, a cancel (`pair.answer` with
+`yes: false`), or `pairing.apartS` with the two in different scenes. A townsperson or an NPC-seat partner follows
+its asker within `pairing.followTiles`, through doors like any walk; a human partner is never moved. While the two
+share a scene, a paired seat is not alone for the NPC Killer's strike roll and its kill-opportunity timer (3.12),
+but only against a third party: a pair is no shield against a partner who is the Killer. The mugging's alone rule
+already counts any figure in the room. Only the two seats learn of a pair, in `Private.pair` (a phase and the other
+figure's handle in the viewer's scene, '' while it is elsewhere, never a seat id); nothing public shows one. The
+inspect panel's section is B8b.
 
 ### 3.32 Sleeping
 

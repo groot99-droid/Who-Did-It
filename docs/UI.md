@@ -1849,6 +1849,7 @@ Resistant (`icon_effect_resistant`), named by the data and with no copy of its o
 | progress (`minigame.lockpick.progress`) | {set} of {pins} pins set | the status line |
 | a miss (`minigame.lockpick.miss`) | It slips back. | the status line |
 | a snap (`minigame.lockpick.snap`) | The pick snaps. | the status line; the server's `PICK_SNAPPED` refusal follows |
+| the Notebook entry of a Scratches clue (D5c, `notebook.entry.scratch`) | Scratches round a lock | the Notebook list, with the scene and time |
 
 ### 14.50 The law (10B, round 10)
 

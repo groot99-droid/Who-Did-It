@@ -6,6 +6,7 @@ import { type PlayerSim, simOf } from '../RoomSim';
 import { sceneKey } from '../World';
 import { hubOf, mapScenesOf } from '../MapSites';
 import { fleeCreature } from '../mobs/flee';
+import { followPartner, shielded } from '../law/Pairing';
 import { canSee } from '../Sight';
 import { runBodyBands } from './hive/bands';
 import { seesPoint } from './hive/senses';
@@ -100,6 +101,7 @@ export function preyFor(
     prey = id;
     if (tick < other.busyUntilTick) return null;
   }
+  if (prey !== null && shielded(room, prey, player.id)) return null; // round 10, B8: a pair is not alone
   return prey === null || (isNpc(prey) && !simOf(room).auto?.npcPrey) ? null : prey;
 }
 
@@ -122,6 +124,7 @@ export function companionFor(room: PartyRoom, player: PlayerState, p: PlayerSim)
     other = q;
   }
   if (found === null || other === null) return null;
+  if (shielded(room, found, player.id)) return null; // round 10, B8: a pair is not alone (a townsperson partner too)
   if (tick < other.busyUntilTick || player.priv.cabalMates.includes(found)) return null;
   if (Math.hypot(other.x - p.x, other.y - p.y) > balance.npc.aloneKill.sightTiles * TILE_PX) return null;
   return canSee(room, p, other) ? found : null;
@@ -285,6 +288,8 @@ export function runWorldNpc(
       }
     } else brain.striking = false;
   }
+
+  if (followPartner(room, brain, p, id)) return; // round 10, B8: walking with a human partner
 
   // Round 6 (6G): a creature of this scene chasing the seat comes before any body (GDD 3.15).
   if (fleeCreature(room, id, brain, p)) {

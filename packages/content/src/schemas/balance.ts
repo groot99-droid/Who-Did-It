@@ -548,6 +548,18 @@ export const BalanceFile = z.strictObject({
    */
   inventory: Section({ hotbar: z.number().int().positive(), belt: z.number().int().nonnegative() }),
   /**
+   * Round 10, B8 (GDD 3.31, seams.md 3 row 10): Walk with me. Every answer reaches the asker `answerS` after the ask,
+   * whoever answers; an NPC seat or a townsperson says yes with `yesChance` (times `scaredMult` while Scared); a
+   * figure partner follows within `followTiles`; a pair apart for `apartS` ends.
+   */
+  pairing: Section({
+    answerS: Span,
+    yesChance: Chance,
+    scaredMult: z.number().positive(),
+    followTiles: Tiles,
+    apartS: Seconds,
+  }),
+  /**
    * Round 10, B1 (GDD 3.24, F4 2.2): the guard figures, the Constables and the Company Clerk. A guard walks only the
    * stations within `leashTiles` of its post and keeps after a seat that struck it for `angerS`, while that seat
    * stays within the leash.
