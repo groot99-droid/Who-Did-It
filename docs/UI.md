@@ -582,7 +582,7 @@ disc carries the key instead.
 | `prompt.ability` | Q / R / F | {ability} {target} | an ability row of the card with a living player in reach; `{ability}` is the card row's `name` ("Kill", "Bandage") |
 | `prompt.ability.cooldown` | – | {ability} in {s} s | the same row while its cooldown runs; `{s}` is the remaining seconds |
 
-Touch labels (`.wdi-touch-btn`): `touch.use` Use, `touch.run` Run, `touch.sneak` Sneak; the Strike disc's label
+Touch labels (`.wdi-touch-btn`): `touch.use` Use, `touch.sneak` Sneak (a toggle since round 10, R1; 14.53), and `touch.run` names the stick; the Strike disc's label
 is 8A's `body.strike` (14.32); an ability disc's label is its card row's `name` (14.51.1, round 10, 10Y; `touch.act`
 Act went with the Act disc).
 
@@ -1969,3 +1969,20 @@ lines sit under the goal line (`card-vendetta`, `.wdi-card__vendetta`). No copy 
 is read, and nothing changes on the wire. `RoleCard.test.ts` covers the three cases; `e2e/world.spec.ts` checks the
 mock Killer's line (the mock builds its world feed on Ready, so there the line fills once the village is up and
 Tab shows it; a real room has the private view from the join).
+
+### 14.53 The role cards and the Satchel (10R, round 10)
+
+`docs/round10/rolecards.md`. The keys and touch controls come from one table, `apps/client/src/input/actions.ts` (R1):
+the input code, the touch HUD and the card's "What you can do" panel all read its rows, so a key changes in one place.
+
+#### 14.53.1 The action table and the phone's run and sneak (R1)
+
+| Key | Line | Where |
+| --- | --- | --- |
+| `touch.run` | Move. Push to the rim to run. | the stick's accessible name and title: running is the stick pushed to its rim (Q-C3) |
+| `touch.sneak` | Sneak | the Sneak disc, now a toggle (`aria-pressed`, `touch-sneak`); it stays on until tapped again |
+
+The Run disc is gone. A card's ability takes the slot keys Q, R and F in card order only when it is not passive
+(`cardSlots`), so the Gamekeeper's Last Shot, the Accomplice's Inherit and the professions' Tasks no longer hold a key,
+and the phone's ability discs read the same slots (14.51.1).
+

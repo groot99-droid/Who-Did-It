@@ -25,6 +25,7 @@ import { mountHotbar, type Hotbar } from './Hotbar';
 import { itemName, mountInventory, stacksOf, type Panel } from './Inventory';
 import { LAYOUT, slotsIn } from './slots';
 import { mountQuestLog } from './QuestLog';
+import { actionOfCode } from '../input/actions';
 import {
   TASKS,
   coopPrompt,
@@ -358,34 +359,31 @@ class Layer implements M5bLayer {
 
   private onKey(e: KeyboardEvent, down: boolean): void {
     if (this.asleep || e.repeat || isTyping(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
-    switch (e.code) {
-      case 'KeyI':
+    // Round 10, R1: the key's row of the action table (input/actions.ts, rolecards.md 3).
+    const action = actionOfCode(e.code);
+    if (action?.startsWith('hotbar.')) {
+      // Round 10 (A13): the number keys pick the held hotbar slot.
+      const slot = slotsIn(LAYOUT, 'hotbar')[Number(action.slice(7)) - 1];
+      if (down && slot !== undefined) this.feed.invSelect(slot);
+      return;
+    }
+    switch (action) {
+      case 'pockets':
         if (down) this.inv.toggle();
         break;
-      case 'Digit1':
-      case 'Digit2':
-      case 'Digit3':
-      case 'Digit4':
-      case 'Digit5':
-      case 'Digit6': {
-        // Round 10 (A13): the number keys pick the held hotbar slot.
-        const slot = slotsIn(LAYOUT, 'hotbar')[Number(e.code.slice(5)) - 1];
-        if (down && slot !== undefined) this.feed.invSelect(slot);
-        break;
-      }
-      case 'KeyC':
+      case 'craft':
         if (down) this.craft.toggle();
         break;
-      case 'KeyJ':
+      case 'quests':
         if (down) this.questLog.toggle();
         break;
-      case 'KeyT':
+      case 'giver':
         if (down && this.target?.kind === 'giver') this.questLog.open();
         break;
-      case 'KeyK':
+      case 'chores':
         if (down) this.chores.toggle();
         break;
-      case 'Escape':
+      case 'close':
         if (down) for (const p of this.panels()) p.close();
         break;
     }
