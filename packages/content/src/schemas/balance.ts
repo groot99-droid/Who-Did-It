@@ -661,6 +661,12 @@ export const BalanceFile = z.strictObject({
    */
   guard: Section({ leashTiles: Tiles, angerS: Seconds }),
   /**
+   * Round 10, K3 (GDD 3.5, I28, I29): Handcuffs cut a cuff hold to `handcuffsHoldMult` of `law.cuffHoldS`; an NPC seat
+   * lights a light it holds a delay within `npcLightDelayS` after the rule a human would follow says to (dusk, night,
+   * a dark scene), drawn on `npcTiming`.
+   */
+  kit: Section({ handcuffsHoldMult: Chance, npcLightDelayS: Span }),
+  /**
    * Round 10, B2 (GDD 3.31): the law. The Constables verify a clue `speedMult` times a Detective's rate (its
    * `clues.collectHoldS`) and post a briefing `briefingAfterS` after it appears. A cuff is a hold of `cuffHoldS`
    * (B4); a Constable's takes `cuffHoldS / speedMult`. The Constables file their own petition on the briefings of the

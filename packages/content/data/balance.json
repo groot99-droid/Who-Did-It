@@ -404,6 +404,7 @@
   },
   "inventory": { "hotbar": 6, "belt": 2, "gddRef": "3.30" },
   "guard": { "leashTiles": 6, "angerS": 20, "gddRef": "3.24" },
+  "kit": { "handcuffsHoldMult": 0.5, "npcLightDelayS": { "min": 2, "max": 25 }, "gddRef": "3.5" },
   "law": {
     "speedMult": 2,
     "briefingAfterS": 30,
