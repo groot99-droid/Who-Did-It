@@ -8,6 +8,7 @@ import { countsVote, hasCastDespiteDoubt } from './vendettas/conversion';
 import { countRow, factionOf, flowOf, refuse, roleIdOf, rolesOf, setPhase } from './Flow';
 import { hubOf, meetingSpawnsOf } from './MapSites';
 import { onMeetingOpenDisguise } from './Impersonate';
+import { isJailed } from './law/Jail';
 import { beginAim, holdReveal, onMeetingOpenNight } from './NightPowers';
 import { clearFigureBodies } from './townsfolk/figures';
 import { type MeetingRequest, simOf } from './RoomSim';
@@ -24,7 +25,7 @@ function placeAtSquare(room: PartyRoom, announce: boolean): void {
   const spread = meetingSpawnsOf(room);
   room.state.players.forEach((player: PlayerState, id: string) => {
     const p = sim.players.get(id);
-    if (!p?.placed) return;
+    if (!p?.placed || isJailed(room, id)) return; // the county jail keeps its prisoner (B5b, GDD 3.27)
     const site = spread[p.ordinal % spread.length]!;
     enterScene(room, player, p, site.sceneId, site.spawn, false, announce);
   });

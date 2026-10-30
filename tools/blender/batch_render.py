@@ -248,6 +248,11 @@ def import_character(path: str, turntable: bpy.types.Object) -> bpy.types.Collec
         dst.actions = list(src.actions)
     col = dst.collections[0]
     bpy.context.scene.collection.children.link(col)
+    # The look's own toon group and outline material arrive as `.001` copies beside the rig's; the figure must use
+    # the rig's own, or the HD bands and the `--textured` swap never reach it (pipeline.md 5.4, DECISIONS A434).
+    for name in (*rc.remap_copies(bpy.data.node_groups, build_rig.TOON_GROUP),
+                 *rc.remap_copies(bpy.data.materials, build_rig.OUTLINE_MATERIAL)):
+        print(f"import: {name} remapped onto the rig's own")
     for obj in col.all_objects:
         if obj.parent is None:
             obj.parent = turntable

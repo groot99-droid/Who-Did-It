@@ -232,6 +232,12 @@ export function checkMaps(c: MapContent): string[] {
       if (!ok) err(`has no ${biome} scene open at the Small profile`);
     }
   }
-  for (const s of Object.keys(c.scenes)) if (!owner.has(s)) errors.push(`scene ${s} belongs to no map`);
+  for (const [s, scene] of Object.entries(c.scenes)) {
+    // A `jail` scene (round 10, B5) sits outside every map's graph: in no map, and with no portal in or out.
+    if (scene.kind === 'jail') {
+      if (owner.has(s)) errors.push(`scene ${s}: a jail scene belongs to no map`);
+      if (scene.portals.length > 0) errors.push(`scene ${s}: a jail scene has no portals`);
+    } else if (!owner.has(s)) errors.push(`scene ${s} belongs to no map`);
+  }
   return errors;
 }
