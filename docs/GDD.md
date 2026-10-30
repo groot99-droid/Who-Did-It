@@ -894,6 +894,10 @@ an NPC, counts the inspector's drawn face the sum of their `suspicion` more; the
 inspected seat a card-blind hunch. Nothing a third client receives depends on a match. An `inert` row names a role
 or figure of a later round and never holds.
 
+**Armour** (round 10, D6a; owner answer LW8). An item with an `armor` block (`items.json`; kind `armour`) worn in the body or head slot (3.30) is armour. Its `tier` picks a factor from `balance.json` `armor.tierMult` (body 0.80, 0.65, 0.50; head 0.90, 0.80); the factors of the worn items multiply, and for a creature's bite so does the Lodge's `creatureDmg` perk (3.23), and the damage never falls below `armor.cap` (0.5) of what the row would have dealt. It applies to every attack that goes through the damage table (the fists, a mugging, the slingshot, a guard's blow, a creature); only a creature's bite is also cut by the Lodge perk; the Knife never reads it (A89), nor do Nightshade and the Last Shot, so armour never makes a seat unkillable by the Killer. The Leather jerkin (tier 2) also halves how fast a Bleeding drains health (a Bleeding has no timer, so "stops sooner" is a slower drain) and costs stamina regeneration (x0.9); an item may also carry `speedMult`. Armour is private: nothing on the wire shows it, there is no inspect line and the figure is not drawn with it; it is not role-bound and drops on death. The Quilted coat is sold at the general stores; the jerkin waits for hide (skinning, D6b). Not built yet: Warmth at night, a Miner's cap with a lamp, louder footsteps, tin mail and tin helm.
+
+**Skinning** (round 10, D6b; owner answer LW13). A Skinning knife (`skinningKnife`: tool tag `skin`, 20 uses, not role-bound, sold at the gamekeeper's stalls and the general stores) skins a fallen creature: `act.ability {abilityId: 'skin'}` takes the hide and game of the creature's `mobs.json` `skin` row (wolf hide 2, game 1; boar hide 2, game 2; bat and rat none) off the nearest corpse in reach (1.5 tiles) that has not been skinned, once, within the `body.creatureCorpseS` the corpse lies, and wears the knife one use. The Killer's Knife and the Replica Knife have no part in it, so every seat can hold hide. Three Hide stitch a Leather jerkin anywhere (no station; 6 s). Nothing is announced: no noise, no clue, nothing new on the wire. Game has no use yet (the stew and the pie, D4b). The `toolshed` and `forager` loot of the logic table has no loot tables to join, so the shops are the knife's only source.
+
 ### 3.23 The economy
 
 Round 8 (A134, A135; `docs/round8/economy.md`): the Bible's Book IV on today's maps and roles.
@@ -947,6 +951,16 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 - **Indebted.** A seat that still owes at dusk becomes Indebted (`EffectId.indebted`, its own view only). No bit is
   drawn; inspect reads "a hunted look". From dusk to dawn the doors from outdoors into its map's `curfew` scenes refuse
   it as a locked door does, so it sleeps rough; a seat already inside still moves between the rooms and can leave. Paying its debt clears it. Forced labour waits for R9's law pipeline.
+- **Rent in kind and the boarded house** (round 10, D7; owner answer EP3). `act.payRent` takes the purse first and,
+  for what is left, goods at the market's `pay` price (`economy.json` `prices`), cheapest first, whole goods only (the Clerk keeps the
+  change); it refuses
+  (`NEED_SCRIP`) when purse and goods together fall short, and takes nothing. At dusk a seat that still owes has goods
+  taken to the debt's value from its pack, the same way, and what it still owes after that is its Indebted debt as
+  before; a seat Indebted has its house boarded up, so it cannot lie down in the home bed (`BOARDED_HOME`, 3.32). The
+  chapel cot and the tavern bed are free of it. Holding a Crowbar or a Hammer, lying down on the boarded bed pries the
+  boards for the night with a crowbar's noise (`noise.crowbar`); they go back at dawn and the debt stands. Paying the
+  debt takes the boards off. Not built: a Notice for trespass on the own house if a witness sees, and picking the
+  curfew doors (they stay doors).
 
 - **Owing the line** (round 10, C2; `docs/round9/world-mode.md` 6, followup-4 2.5). Each return on the morning train
   (3.22) adds `respawn.fareDebt` (6 Scrip) to the seat's fare, owed to the Company, and every further death adds
