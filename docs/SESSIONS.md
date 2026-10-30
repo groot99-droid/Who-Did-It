@@ -4303,6 +4303,9 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   - Two secrecy calls. A death sentence shows the held seat's true role, so a seat hanged in another's face is shown
     as itself (`phases.md` 4). A fine is public as the fine assessed, never the purse. `fineJail` shows that the
     purse fell short; a silent shortfall would show it anyway, since the seat would be missing at the Return.
+  - B6a's fines come from the charge alone, with flat keys. A fine read from what the held seat actually took would
+    show whether a framed seat stole. B6b's theft fine from the goods' price, with the goods returned, reads only
+    goods that a public loss names, and 10B brings its design to 6Z first.
   - Rows 15 and 19 now name the Tribunal.
 
 ## Round 11 (planning, started 2026-10-29)
