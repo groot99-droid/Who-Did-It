@@ -1190,6 +1190,11 @@ dawn does: the next day, or the Final Night when the round calls for it. A human
 holds the night open. Still waits: the county jail (B5) and the line (the respawn step) will leave their seats out of
 the active players.
 
+**The screen** (A8, UI.md 14.46). At a bed in reach at dusk or at night the prompt offers to lie down. A sleeper's view
+dims to its bedroom and shows how many active players are in bed and of how many, never who. A move, a key or a hit
+wakes it. A sleeper who wakes because the night ended sees "You slept through", whether the night was skipped or ran
+out.
+
 ### 3.33 The Hitman's arrival
 
 Round 10, C4 (`docs/round9/gdd-map.md` 2.7). Not built yet: the step that builds it writes this section.
