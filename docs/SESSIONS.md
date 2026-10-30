@@ -3991,6 +3991,24 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   - Armour shows only in its wearer's own view in round 10 (LT6). It is not drawn, so an inspect line naming it would
     tell an impersonator from the seat whose look it wears. Drawing it on the figure is round 11's art question.
   - A beating's robbery (C6) never takes armour (LW9).
+- 2026-10-30: C2a (#359) merged at a51e0d1, ahead of D6a by `seams.md` 7's order, since both touch `balance.json`
+  at the same lines. On D6a (#363):
+  - Only a creature's bite takes the Lodge's perk: `hurt` reads the hit's `cause`, so a guard's blow takes the armour
+    alone (10D's fix on review). 6Z's 50-match bot run on it is clean.
+  - Granted on review: `sim/body/run.ts` (stamina regeneration and speed under armour) and the armour checks in
+    `content/src/validate.ts`.
+- 2026-10-30: wire row 14, the manhunt, on 10B's plan for B4:
+  - A cuff tests the figure, never the seat: `NOT_HUNTED` unless the target is drawn as the accused. A refusal that
+    read the seat behind the handle would tell an impersonator from the accused, and only the Killer impersonates.
+  - The cuff lands on the seat behind the figure, as the Kill does, so an impersonator drawn as the accused is cuffed
+    in its place. By 6Z's default for B5 the cell holds, and the Tribunal tries, the seat that was cuffed; the owner
+    may rule otherwise.
+  - The signers' map mark follows the face by the rumour ledger's rule, never the seat.
+  - The Constables keep their leash (`followup-4.md` 2.2 wins over `world-mode.md` 3.1). "With no human free, they
+    finish it" is a cuff where the accused stands at the timeout, when no living human but the accused is out of jail
+    and off the line. Asleep and knocked-out humans count as free, so no living client receives that scene.
+  - B4's grants: the `cuff` case in `sim/Hold.ts` with its interrupts; row 14 in `packages/shared`, with
+    `PROTOCOL.md` regenerated; the `manhunt` block of `balance.json` and `law.cuffHoldS`.
 
 ## Round 11 (planning, started 2026-10-29)
 
