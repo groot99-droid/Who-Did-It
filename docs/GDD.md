@@ -1132,7 +1132,7 @@ cooldown while that seat stays in its scene, within its leash and on its feet, f
 to its post. Its blows knock out, never kill. A guard reads only who struck it, never a card, and never mugs. In
 every mode the Knife reaches a guard (round 10, C5c), standing or knocked out, with the seat Knife's reach, phase,
 cooldown, blood and scream; the guard dies as a figure does (its body until the next meeting, no clue of the
-killer's look) and stays dead, except in Paint The Town Red (3.8), where it rides the next morning train back. A Constable wears the `constable` look (3.17); the Clerk keeps the villager's.
+killer's look, and no Bandage, Watch or Charm guards it) and stays dead, except in Paint The Town Red (3.8), where it rides the next morning train back. A Constable wears the `constable` look (3.17); the Clerk keeps the villager's.
 `figureNotSeat` accepts the `figures` looks of `looks.json` beside the villager family.
 
 **The mugging (8E, A180).** A Hungry, Angry or Desperate figure or NPC seat that is alone with one seat rolls each
