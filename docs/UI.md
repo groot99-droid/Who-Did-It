@@ -619,6 +619,13 @@ Bandage refusal reads exactly like a missed strike that the GDD calls "nothing h
 | `log.door` | A door to the {dir} | a door noise from another player |
 | `log.steps` | Footsteps to the {dir} | a run noise |
 | `log.bell` | The bell rings | the bell noise, before the meeting opens |
+| `log.chop` | Chopping to the {dir} | the `chop` noise of the logic table's axe modes (10Y, round 10, A254) |
+| `log.smash` | Stone breaking to the {dir} | the `smash` noise of the pickaxe and hammer modes |
+| `log.shot` | A shot from the {dir} | the `shot` noise |
+| `log.shout` | A shout from the {dir} | the `shout` noise |
+| `log.crowbar` | Wood splintering to the {dir} | the `crowbar` mode's noise |
+| `log.lockpick` | Scratching at a lock to the {dir} | the `lockpick` mode's noise; the pick's own screen says more |
+| `log.noise` | Something to the {dir} | any noise kind this client has no line for; a new server kind never reads as a door (`ui/copy/noise.ts`) |
 
 Directions (`dirFromVector` ids): `dir.n` north, `dir.ne` north-east, `dir.e` east, `dir.se`
 south-east, `dir.s` south, `dir.sw` south-west, `dir.w` west, `dir.nw` north-west.
@@ -1833,6 +1840,8 @@ the train brings the seat back the screen lifts and a 3 s toast says so. The man
 | how the seat died (`line.cause.wolf`, `.creature`, `.shot`, `.other`) | A wolf took you. / Something in the dark took you. / A shot took you. / You fell by day. | On the line, centre |
 | what it keeps (`line.kept`) | Your card, your Notebook and your quests come back with you, and what you wear. Your coins lie where you fell; your pack is lost. | On the line, below |
 | back (`line.back`) | You are back. | toast, 3 s, to the returning seat, after the morning train or the Final Night's bells |
+| a stall's stock (`shop.left`, C3) | {n} left today | the shop panel, beside an item's price, at a stall with a character (`shop.open` `left`) |
+| a stall sold out (`shop.soldOut`, C3) | Sold out | the shop panel, in place of the count; the Buy button greys |
 
 ### 14.48 The lock-pick and the Resistant effect (10D, round 10)
 

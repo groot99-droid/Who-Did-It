@@ -131,7 +131,9 @@ export type HoldAction =
   // Round 10 (A10): any prop the logic table answers for (`interactions.json`).
   | 'interact'
   // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
-  | 'sleep';
+  | 'sleep'
+  // Round 10 (B4, GDD 3.31): cuff a figure drawn as the hunted accused, by its handle.
+  | 'cuff';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 /**
@@ -420,11 +422,12 @@ export interface S2CPayloads {
   'inspect.hunch': { copyId: string };
   /**
    * Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each
-   * price, `buys` what it pays for. Answered with `act.buy` and `act.sell`.
+   * price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. Round 10 (C3, seams.md row 15): a shop
+   * with an `owner` gives each stock row how many it has `left` today, the same for every opener.
    */
   'shop.open': {
     shopId: string;
-    stock: Array<{ itemId: string; price: number }>;
+    stock: Array<{ itemId: string; price: number; left?: number }>;
     buys: Array<{ itemId: string; price: number }>;
   };
   /** Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. */

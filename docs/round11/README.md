@@ -132,3 +132,7 @@ because each reads most of the art record: ASSETS 6, SPRITES 1 to 12, `docs/roun
   the owner on 2026-10-30.
 - The owner answered on 2026-10-30 (`owner-answers.md`). Every default holds except CL3, which brings the buildings'
   long shadows into round 11. 11A writes `round11-plan.md` from the answers, with 11B.
+- 11B's budget for the shadow layer (`look.md` 5.3.1, #371) and 11A's `round11-plan.md` (#374) merged on 2026-10-30.
+  The plan waits on the owner's approval and on CL3a, which way the shadows fall (default: a sun at 25°, turned 45°).
+- The owner approved the plan on 2026-10-30, with CL3a's default (A236, `owner-answers.md`). It builds after round
+  10's final sweep (10Z) has merged. SC2, BU4 and RN3 keep their fallbacks until the owner answers them.

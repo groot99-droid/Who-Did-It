@@ -142,7 +142,8 @@ export type WorldFeedEvents = {
   /** Private, round 8, 8C (locked; GDD 3.23): a `shop` hold opened this shop (`S2C.shopOpen`). */
   shopOpen: {
     shopId: string;
-    stock: Array<{ itemId: string; price: number }>;
+    /** Round 10, C3: `left`, a stall's stock today (seams.md row 15). */
+    stock: Array<{ itemId: string; price: number; left?: number }>;
     buys: Array<{ itemId: string; price: number }>;
   };
   /** Private, round 7 (7M, GDD 3.5): the hands on the co-op hold this seat is in and its shared progress (0 to 1). */
