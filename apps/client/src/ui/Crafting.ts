@@ -65,7 +65,7 @@ const STATION_NAME: Record<string, string> = { oven: 'oven', basin: 'basin' };
  * The crafting list (UI.md 14.19.3): each recipe in `recipes.json`, its inputs, where it is made and a Make button that
  * starts the `craft` hold. The server decides: a recipe with a `station` needs a prop of that kind in reach, and a
  * refusal comes back as the usual error line. A hand recipe (no station) carries no Make: its button points to the
- * crafting square of the Pockets screen, where it is made (round 10, 10Y, A374; UI.md 14.54). Opens with C.
+ * crafting square of the Pockets screen, where it is made (round 10, 10Y, A374; UI.md 14.51.3). Opens with C.
  */
 export function mountCrafting(parent: HTMLElement, deps: CraftingDeps): Panel {
   const list = h('ul', { class: 'wdi-m5b__list', 'data-testid': 'crafting-list' });

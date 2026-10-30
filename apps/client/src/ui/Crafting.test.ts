@@ -4,7 +4,7 @@ import { isHandRecipe, mountCrafting, recipeRows } from './Crafting';
 import { type FakeNode, installFakeDom } from './main/fakeDom';
 import type { StackSnap } from '../net/world';
 
-// Round 10, 10Y (A374; UI.md 14.54): a hand recipe's row points to the crafting square; a station recipe keeps Make.
+// Round 10, 10Y (A374; UI.md 14.51.3): a hand recipe's row points to the crafting square; a station recipe keeps Make.
 
 describe('isHandRecipe', () => {
   it('is the recipes with no station', () => {
