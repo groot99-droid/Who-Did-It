@@ -62,15 +62,12 @@ const handleOf = (party: Party, seat: string) => avatarMemory(party.room).handle
 const reasons = (h: Human): string[] =>
   h.log.filter((m) => m.type === 'error').map((m) => (m.payload as { reason?: string }).reason ?? '');
 
-/** Seat 0 opens against `accused`, seat 1 signs: the petition passes and the manhunt opens on the next tick. */
+/** Seat 0 opens against `accused` and two others sign (2 of 4 humans): the petition passes, the manhunt opens. */
 function warrant(party: Party, accused: string): void {
-  const [a, b] = ids(party);
+  const [a, ...rest] = ids(party);
   handlePetitionOpen(party.room, a, { accused, charge: 'robbery', entries: [] });
-  handlePetitionSign(party.room, b, { id: party.room.state.petition.id });
-  if (accused !== b) {
-    const c = ids(party)[2];
-    handlePetitionSign(party.room, c, { id: party.room.state.petition.id });
-  }
+  for (const id of rest.filter((x) => x !== accused).slice(0, 2))
+    handlePetitionSign(party.room, id, { id: party.room.state.petition.id });
   advance(party, 1);
 }
 
@@ -114,7 +111,18 @@ describe('the manhunt (GDD 3.31)', () => {
     advance(party, 1);
     expect(row(party).state).toBe(ManhuntState.none);
     expect(simOf(party.room).players.get(d)!.busyUntilTick).toBeLessThanOrEqual(party.room.state.tick);
-    void a;
+    // A seat killed while held walks free as a ghost.
+    warrant(party, c);
+    placeSeat(party, a, 'overworld', 36, 22);
+    placeSeat(party, c, 'overworld', 37, 22);
+    advance(party, 1);
+    handleCuffHold(party.room, a, handleOf(party, c));
+    advance(party, cuffTicks + 1);
+    expect(row(party).state).toBe(ManhuntState.cuffed);
+    simOf(party.room).players.get(c)!.dead = true;
+    advance(party, 1);
+    expect(row(party).state).toBe(ManhuntState.none);
+    expect(simOf(party.room).players.get(c)!.busyUntilTick).toBeLessThanOrEqual(party.room.state.tick);
   });
 
   it('refuses NOT_HUNTED without a hunt, and stops on a move, a strike by the target, or a blow to the cuffer', async () => {

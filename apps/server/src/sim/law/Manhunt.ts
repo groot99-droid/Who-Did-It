@@ -238,11 +238,12 @@ export function runManhunt(room: PartyRoom): void {
   }
   if (row.state === ManhuntState.cuffed) {
     const phase = room.state.phase;
+    const held = m.cuffed.at(-1);
+    const p = held ? simOf(room).players.get(held.seat) : undefined;
     if (phase === Phase.night || phase === Phase.finalNight) m.nightSeen = true;
-    else if (m.nightSeen && (phase === Phase.day || phase === Phase.grace)) {
-      const held = m.cuffed.at(-1);
-      const p = held ? simOf(room).players.get(held.seat) : undefined;
-      if (p) p.busyUntilTick = tick; // dawn: B5's cell takes over from here
+    // Dawn, or a death while held (a ghost walks free): B5's cell takes over from here.
+    if (!p || p.dead || (m.nightSeen && (phase === Phase.day || phase === Phase.grace))) {
+      if (p) p.busyUntilTick = tick;
       end(room, m);
     }
     return;
