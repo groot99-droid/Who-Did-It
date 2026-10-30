@@ -580,6 +580,10 @@ export class MockWorldFeed implements WorldFeed {
   }
 
   // Round 8, 8C (locked): the mock town has no shops and an empty purse.
+  paintTarget(): number {
+    return 0; // the mock deals no Paint The Town Red
+  }
+
   fare(): number {
     return 0; // the mock has no train
   }

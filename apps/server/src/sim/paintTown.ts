@@ -1,4 +1,5 @@
 import { balance, roles } from '@wdi/content';
+import { paintTarget } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { townsfolkMemory } from './townsfolk/figures';
 import { isNpcSeat } from './Npc';
@@ -56,9 +57,9 @@ export function paintDeck(cards: readonly string[], rng: () => number): string[]
   return out;
 }
 
-/** The deal's start: the two Killer seats and the target, ceil(`paintTown.winUnique` x the NPC seats), at least 1. */
+/** The deal's start: the two Killer seats and the target (`paintTarget`, `@wdi/shared`). */
 export function beginPaintTown(room: PartyRoom, killers: readonly string[], npcSeats: number): void {
-  const target = Math.max(1, Math.ceil(balance.paintTown.winUnique * npcSeats));
+  const target = paintTarget(balance.paintTown.winUnique, npcSeats);
   states.set(room.seeds, { killers: [...killers], target, victims: new Map(), totals: new Map() });
   for (const seat of killers) {
     const priv = room.state.players.get(seat)?.priv;
