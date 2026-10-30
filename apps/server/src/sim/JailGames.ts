@@ -45,11 +45,12 @@ export const markPlayed = (room: PartyRoom, seat: string, game: JailGame): void 
   tallyOf(room, seat).played.add(keyOf(room, game));
 };
 
-/** The damage the gym added to the seat's strike. */
+/** The damage the gym added to the seat's strike (a fist or the slingshot). */
 export const strengthOf = (room: PartyRoom, seat: string): number => tallyOf(room, seat).strength;
 
+/** One Strength for the match: a second workout adds nothing. */
 export function addStrength(room: PartyRoom, seat: string): void {
-  tallyOf(room, seat).strength += balance.jail.gym.damage;
+  tallyOf(room, seat).strength = balance.jail.gym.damage;
 }
 
 /** A lost yard fight: the seat's maximum health drops by `maxHpLoss`, never under `maxHpFloor`; health follows it down. */

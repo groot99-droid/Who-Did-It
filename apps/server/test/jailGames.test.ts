@@ -16,7 +16,7 @@ import { bodyOf } from '../src/sim/body/state';
 import { handleStrike } from '../src/sim/body/fists';
 import { balanceOf } from '../src/sim/economy/purse';
 import { strengthOf } from '../src/sim/JailGames';
-import { isJailed, shaveSentence } from '../src/sim/law/Jail';
+import { isJailed } from '../src/sim/law/Jail';
 import { cuffSeat } from '../src/sim/law/Manhunt';
 import { handlePetitionOpen, handlePetitionSign } from '../src/sim/law/Petition';
 import { figuresOf } from '../src/sim/townsfolk/figures';
@@ -36,7 +36,7 @@ import {
 
 /**
  * The county jail's games (round 10, D8; GDD 3.27): the gym (Strength), the yard fight (maximum health or a little
- * purse) and scrubbing (a wage and time off the sentence), each once a day. The boards are the stations' own, answered
+ * purse) and scrubbing (a wage), each once a day. The boards are the stations' own, answered
  * here from what the client is sent.
  */
 
@@ -150,9 +150,9 @@ describe('the jail games (GDD 3.27)', () => {
     expect(reasons(party, seat).at(-1)).toBe('NOTHING_THERE');
     nextDay(party);
     await play(party, seat, 'gym');
-    expect(strengthOf(party.room, seat)).toBe(2 * balance.jail.gym.damage);
+    expect(strengthOf(party.room, seat)).toBe(balance.jail.gym.damage); // one Strength: it does not stack
 
-    // Out on the square, the same fist lands two harder per gym.
+    // Out on the square, the same fist lands two harder.
     const [a, , ,] = party.humans.map((h) => h.id);
     const victim = party.humans[0]!.id === seat ? a! : a!;
     placeSeat(party, seat, 'overworld', 34, 22);
@@ -162,7 +162,7 @@ describe('the jail games (GDD 3.27)', () => {
     const hp = bodyOf(party.room, victim)!.hp;
     handleStrike(party.room, seat, { targetId: handle });
     expect(hp - bodyOf(party.room, victim)!.hp).toBeCloseTo(
-      balance.body.damage.strike.dmg + 2 * balance.jail.gym.damage,
+      balance.body.damage.strike.dmg + balance.jail.gym.damage,
       5,
     );
   });
@@ -183,6 +183,7 @@ describe('the jail games (GDD 3.27)', () => {
     await answer(party, seat, 'yard', { placed: 99, stop: 5 }); // wrong
     expect(bodyOf(party.room, seat)!.maxHp).toBe(balance.body.maxHp - y.maxHpLoss);
     expect(bodyOf(party.room, seat)!.hp).toBeLessThanOrEqual(bodyOf(party.room, seat)!.maxHp);
+    expect(bodyOf(party.room, seat)!.hp).toBeGreaterThan(0);
     nextDay(party);
     await play(party, seat, 'yard', y.boardS + 2); // right, but slow
     expect(bodyOf(party.room, seat)!.maxHp).toBe(
@@ -195,36 +196,15 @@ describe('the jail games (GDD 3.27)', () => {
     expect(bodyOf(party.room, seat)!.maxHp).toBe(y.maxHpFloor);
   });
 
-  it('pays scrubbing a wage and takes a tenth of a day off the sentence', async () => {
+  it('pays scrubbing a wage and moves no release', async () => {
     const { party, seat } = await cell();
     const priv = party.room.state.players.get(seat)!.priv;
     const until = priv.jailUntilTick;
     const purse = balanceOf(party.room, seat);
     await play(party, seat, 'scrub');
     expect(balanceOf(party.room, seat)).toBeGreaterThan(purse);
-    const off = until - priv.jailUntilTick;
-    expect(off).toBeGreaterThan(0);
-    expect(off).toBeLessThanOrEqual(
-      Math.round(balance.jail.scrub.offDayFrac * balance.phases.dayS * TICK_RATE),
-    );
+    expect(priv.jailUntilTick).toBe(until);
     expect(isJailed(party.room, seat)).toBe(true);
-  });
-
-  it('lets a seat out when its shortened sentence runs out, with no train line', async () => {
-    const { party, seat } = await cell();
-    const priv = party.room.state.players.get(seat)!.priv;
-    shaveSentence(party.room, seat, priv.jailUntilTick); // more than is left: one tick stays
-    expect(priv.jailUntilTick).toBe(party.room.state.tick + 1);
-    advance(party, 3);
-    expect(isJailed(party.room, seat)).toBe(false);
-    expect(priv.jailUntilTick).toBe(0);
-    const lines = party.humans.flatMap((h) =>
-      h.log.filter(
-        (m) =>
-          m.type === S2C.chatMsg && (m.payload as { text: string }).text.endsWith('steps off the train.'),
-      ),
-    );
-    expect(lines).toHaveLength(0);
   });
 
   it('refuses a seat out of reach of the prop', async () => {

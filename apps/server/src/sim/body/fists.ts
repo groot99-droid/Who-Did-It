@@ -139,10 +139,14 @@ export function handleSlingshot(room: PartyRoom, sessionId: string, payload: Rec
   if (!v) return;
   const guard = guardTarget(room, sessionId, v, payload.targetId, (h) => figureOfHandle(room, h));
   if (guard === null) return;
+  const sling = {
+    ...balance.body.damage.slingshot,
+    dmg: balance.body.damage.slingshot.dmg + strengthOf(room, sessionId),
+  };
   if (guard) {
     startCooldown(v);
     showClip(v.body, AnimId.strike, v.tick);
-    strikeGuard(room, guard, balance.body.damage.slingshot, sessionId, 'slingshot');
+    strikeGuard(room, guard, sling, sessionId, 'slingshot');
     return;
   }
   const targetId = seatInReach(room, sessionId, v, payload.targetId);
@@ -153,5 +157,5 @@ export function handleSlingshot(room: PartyRoom, sessionId: string, payload: Rec
   }
   startCooldown(v);
   showClip(v.body, AnimId.strike, v.tick);
-  hurt(room, targetId, balance.body.damage.slingshot, { source: 'slingshot', by: sessionId });
+  hurt(room, targetId, sling, { source: 'slingshot', by: sessionId });
 }

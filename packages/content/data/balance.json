@@ -456,7 +456,7 @@
     "walkS": 5,
     "gym": { "difficulty": 2, "damage": 2 },
     "yard": { "difficulty": 3, "boardS": 20, "maxHpLoss": 10, "maxHpFloor": 80, "purse": 2 },
-    "scrub": { "difficulty": 2, "wage": 1, "offDayFrac": 0.1 },
+    "scrub": { "difficulty": 2, "wage": 1 },
     "gddRef": "3.27"
   }
 }

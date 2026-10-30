@@ -609,12 +609,8 @@ export const BalanceFile = z.strictObject({
       maxHpFloor: z.number().int().positive(),
       purse: z.number().int().positive(),
     }),
-    /** D8: scrubbing's pour board, the wage and the share of a day it takes off the sentence. */
-    scrub: z.strictObject({
-      difficulty: z.number().int().min(1).max(5),
-      wage: z.number().int().positive(),
-      offDayFrac: z.number().positive().max(1),
-    }),
+    /** D8: scrubbing's pour board and its wage (the hour off the sentence is NFY, GDD 3.27). */
+    scrub: z.strictObject({ difficulty: z.number().int().min(1).max(5), wage: z.number().int().positive() }),
   }),
   /**
    * Round 10, B1 (GDD 3.24, F4 2.2): the guard figures, the Constables and the Company Clerk. A guard walks only the

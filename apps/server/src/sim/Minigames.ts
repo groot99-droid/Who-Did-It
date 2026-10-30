@@ -33,7 +33,6 @@ import { atNode, completeTask } from './tasks/complete';
 import { endMatch } from './Win';
 import { decaySeconds, spawnClue } from './Clues';
 import { JAIL_GAMES, type JailGame, addStrength, loseMaxHp, markPlayed, playedToday } from './JailGames';
-import { shaveSentence } from './law/Jail';
 import { addStack, canAdd, count, take } from './Inventory';
 import { movePurse, TOWN } from './economy/purse';
 import { emitNoise } from './Noise';
@@ -192,8 +191,7 @@ function lockResult(
 }
 
 // The county jail's games (round 10, D8; GDD 3.27): the same boards as the stations', opened from a prop of the cell.
-// Once a day each; the gym adds Strength, the yard fight costs maximum health or pays a little, scrubbing pays a wage and
-// takes time off the sentence. The seat's own stream `minigame` draws the board, as for a station task.
+// Once a day each; the gym adds Strength, the yard fight costs maximum health or pays a little, scrubbing pays a wage. The seat's own stream `minigame` draws the board, as for a station task.
 
 /** Why this seat cannot work the open jail game now, or null. */
 function jailProblem(room: PartyRoom, p: PlayerSim, propId: string, jail: NonNullable<Open['jail']>) {
@@ -256,9 +254,7 @@ function jailResult(room: PartyRoom, sessionId: string, p: PlayerSim, open: Open
   if (!right) return reject(room, sessionId, 'BAD_REQUEST');
   openOf(room).delete(sessionId);
   if (jail.game === 'gym') return addStrength(room, sessionId);
-  const s = balance.jail.scrub;
-  movePurse(room, TOWN, sessionId, s.wage, 'wage');
-  shaveSentence(room, sessionId, s.offDayFrac * balance.phases.dayS * TICK_RATE);
+  movePurse(room, TOWN, sessionId, balance.jail.scrub.wage, 'wage'); // the hour off the sentence is NFY (GDD 3.27)
 }
 
 /** The `scratch` clue on the picked prop's tile: value and dir 0, so it shows nothing of the picker. */

@@ -34,8 +34,6 @@ interface Held {
   /** The seat whose face it was cuffed in (itself, or the seat it impersonated): the manifest names it. */
   face: string;
   pinned: boolean;
-  /** Ticks the scrubbing (D8) has taken off the sentence. */
-  shaved: number;
 }
 
 interface JailMemory {
@@ -91,7 +89,7 @@ export function jailSeat(room: PartyRoom, seat: string, face: string): void {
   const disguise = avatarMemory(room).disguise.get(seat);
   if (disguise && !disguise.applied) avatarMemory(room).disguise.delete(seat);
   const placeAt = tick + Math.round(balance.jail.walkS * TICK_RATE);
-  m.held.set(seat, { round: room.state.round, placeAt, face, pinned: disguise?.applied === true, shaved: 0 });
+  m.held.set(seat, { round: room.state.round, placeAt, face, pinned: disguise?.applied === true });
   p.hold = null;
   p.input = null;
   p.busyUntilTick = placeAt;
@@ -99,25 +97,10 @@ export function jailSeat(room: PartyRoom, seat: string, face: string): void {
 }
 
 /**
- * Round 10, D8: takes `ticks` off the seat's sentence (scrubbing the cells), never leaving less than a tick of it. The
- * seat is let out when its shortened sentence runs out (`runJail`), before the train when the cut is deep enough.
- * Returns the ticks taken off, 0 when the seat is not in the cell.
- */
-export function shaveSentence(room: PartyRoom, seat: string, ticks: number): number {
-  const held = memoryOf(room).held.get(seat);
-  const priv = room.state.players.get(seat)?.priv;
-  if (!held || !priv || held.placeAt >= 0 || priv.jailUntilTick === 0) return 0;
-  const cut = Math.max(0, Math.min(Math.round(ticks), priv.jailUntilTick - room.state.tick - 1));
-  held.shaved += cut;
-  priv.jailUntilTick -= cut;
-  return cut;
-}
-
-/**
  * Sets the seat down at the station with the manifest line, or at the map's meeting spawns with no line where no
  * station is, then unpins it.
  */
-function release(room: PartyRoom, m: JailMemory, seat: string, early = false): void {
+function release(room: PartyRoom, m: JailMemory, seat: string): void {
   const held = m.held.get(seat);
   const p = simOf(room).players.get(seat);
   const player = room.state.players.get(seat);
@@ -135,7 +118,7 @@ function release(room: PartyRoom, m: JailMemory, seat: string, early = false): v
   enterScene(room, player, p, site.sceneId, site.spawn, false);
   m.held.delete(seat);
   emitSim(room, { tick: room.state.tick, kind: 'jail.release', seat, sceneId: site.sceneId });
-  if (!station || early) return; // a seat let out ahead of the train is not on its manifest
+  if (!station) return;
   const name = room.state.players.get(held.face)?.name ?? player.name;
   for (const client of room.clients) {
     client.send(S2C.chatMsg, { from: '', text: trainReturnLine(name), channel: 'system' });
@@ -183,9 +166,7 @@ export function runJail(room: PartyRoom): void {
     if (station && room.state.phase === Phase.day && held.round < room.state.round) {
       const exact =
         room.state.phaseEndsTick - Math.round((balance.phases.dayS - balance.train.arriveAtS) * TICK_RATE);
-      if (player.priv.jailUntilTick !== exact - held.shaved) player.priv.jailUntilTick = exact - held.shaved;
+      if (player.priv.jailUntilTick !== exact) player.priv.jailUntilTick = exact;
     }
-    if (held.shaved > 0 && held.placeAt < 0 && tick >= player.priv.jailUntilTick)
-      release(room, m, seat, true);
   }
 }

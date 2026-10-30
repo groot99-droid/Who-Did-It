@@ -328,7 +328,7 @@
       "ownership": "public",
       "fail": { "NOTHING_THERE": "The floor is clean enough for today." },
       "ships": "V1.5",
-      "hint": "A Scrip of wage and a tenth of a day off the sentence. Once a day."
+      "hint": "A Scrip of wage. Once a day."
     },
     "pickLock": {
       "verb": "pick",
