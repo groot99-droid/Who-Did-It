@@ -8,6 +8,8 @@ export class FakeNode {
   readonly dataset: Record<string, string> = {};
   className = '';
   hidden = false;
+  /** Inline styles a screen writes (a progress bar's width); nothing reads them back. */
+  readonly style: Record<string, string> = {};
   disabled = false;
   /** The class list over `className`, the two calls the touch discs make. */
   readonly classList = {
