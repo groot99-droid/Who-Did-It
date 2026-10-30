@@ -1727,6 +1727,7 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.overview.enter` | Open {scene} | the Studio Overview (9W) |
 | `studio.overview.kind.exterior` | World | the Studio Overview (9W) |
 | `studio.overview.kind.interior` | Room | the Studio Overview (9W) |
+| `studio.overview.kind.jail` | Cell | the Studio Overview (9W); the county jail's cell (round 10, B5a) |
 | `studio.overview.links` | Doors as a list | the Studio Overview (9W) |
 | `studio.overview.to` | Scene that {portal} leads to | the Studio Overview (9W) |
 | `studio.overview.spawn` | Spawn that {portal} lands on | the Studio Overview (9W) |

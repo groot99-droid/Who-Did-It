@@ -213,6 +213,8 @@ const WORLD: Record<string, { profile: Profile; w: number; h: number; portals: s
   crumb_mixing: { profile: 'small', w: 12, h: 9, portals: ['cm.door -> bakery.mixing_room'] },
   crumb_oven: { profile: 'small', w: 12, h: 10, portals: ['co.door -> bakery.oven_room'] },
   crumb_proofing: { profile: 'small', w: 12, h: 10, portals: ['cp.door -> bakery.proofing_room'] },
+  // Round 10 (B5): the county jail's cell, outside every map's graph.
+  cj_cell: { profile: 'small', w: 12, h: 8, portals: [] },
 };
 
 const PROFILES: Profile[] = ['small', 'medium', 'large'];
@@ -332,7 +334,8 @@ describe('profile gating', () => {
 
   for (const profile of PROFILES) {
     it(`connects every ${profile}-profile scene into one walkable world`, () => {
-      const open = all.filter((s) => opensAt(s.profile, profile));
+      // A jail scene (B5) has no portal in: the server places a jailed seat in it.
+      const open = all.filter((s) => s.kind !== 'jail' && opensAt(s.profile, profile));
       for (const s of open) {
         // Every spawn an open portal lands on, plus the square spawns, is one walkable region.
         const landing = all.flatMap((from) =>

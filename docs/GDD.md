@@ -1161,7 +1161,13 @@ Round 8 addendum C (A200; `docs/round8/stations.md` 5), 7M. The owner: "walking 
 
 ### 3.27 The county jail
 
-Round 10, B5 (`docs/round9/gdd-map.md` 2.1). Not built yet: the step that builds it writes this section.
+Round 10, B5 (`docs/round9/gdd-map.md` 2.1; `world-mode.md` 5.1; owner answers LW9, LW10, WM11). B5a builds the cell;
+B5b puts the cuffed seat in it and releases it.
+
+**The cell (B5a).** One scene, `cj_cell` ("The county jail", 12x8, a house interior), serves every map. It is a `jail`
+scene: in no map's graph, with no portal in or out (WORLD 4.3), its ids prefixed `cj.`, its ten spawns `cell_1` to
+`cell_10`, so the cell can hold every seat at once. The server alone places a seat in it, and its art takes the default
+map's theme. Its view holds only the seats inside it. D8 adds the props of the jail mini-games.
 
 ### 3.28 Accounts and achievements
 

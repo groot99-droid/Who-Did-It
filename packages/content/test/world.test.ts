@@ -61,9 +61,11 @@ describe('maps and frozen ids (GDD 3.13, WORLD 4.3)', () => {
     expect(mapIdOf('nowhere')).toBe('hollowmere');
   });
 
-  it('puts every scene in exactly one map', () => {
+  it('puts every scene in exactly one map, a jail scene in none', () => {
     const listed = MAP_IDS.flatMap((id) => maps[id].scenes);
-    expect([...listed].sort()).toEqual([...SCENE_IDS].sort());
+    const jails = SCENE_IDS.filter((id) => scenes[id].kind === 'jail');
+    expect(jails).toEqual(['cj_cell']);
+    expect([...listed].sort()).toEqual(SCENE_IDS.filter((id) => !jails.includes(id)).sort());
   });
 
   it('refuses a map without a Small cave', () => {
@@ -78,6 +80,19 @@ describe('maps and frozen ids (GDD 3.13, WORLD 4.3)', () => {
     });
     expect(errors).toEqual(hit('portal ov.well leaves the map for cellar'));
     expect(errors).toEqual(hit('scene cellar belongs to no map'));
+  });
+
+  it('refuses a jail scene with a portal or in a map, and gives its art the default map', () => {
+    expect(validateContent(content)).toEqual([]);
+    expect(
+      broken((c) => {
+        c.scenes.cj_cell.portals = structuredClone(c.scenes.widow_bedroom.portals);
+      }),
+    ).toEqual(hit('scene cj_cell: a jail scene has no portals'));
+    expect(broken((c) => c.maps.hollowmere.scenes.push('cj_cell'))).toEqual(
+      hit('scene cj_cell: a jail scene belongs to no map'),
+    );
+    expect(mapOf('cj_cell')).toBe(DEFAULT_MAP);
   });
 
   it('refuses a scene unreachable from the hub', () => {
