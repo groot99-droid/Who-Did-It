@@ -12,8 +12,12 @@ const SRC = join(THEME, '../..');
 const ROOT = join(THEME, '../../../../..');
 const UI_ASSETS = join(ROOT, 'apps/client/public/assets/ui');
 const paletteFile = JSON.parse(readFileSync(join(ROOT, 'packages/content/data/palette.json'), 'utf8'));
-/** The ten tokens, then the round-7 night set: the only colours of the DOM UI. */
-const palette: Record<string, string> = { ...paletteFile.colors, ...paletteFile.night };
+/** The ten tokens, the round-7 night set, then the round-10 dossier set: the only colours of the DOM UI. */
+const palette: Record<string, string> = {
+  ...paletteFile.colors,
+  ...paletteFile.night,
+  ...paletteFile.dossier,
+};
 const paletteHex = new Set(Object.values(palette).map((h) => h.toUpperCase()));
 
 const tokens = readFileSync(join(THEME, 'tokens.css'), 'utf8');
@@ -28,8 +32,16 @@ function stylesheets(dir = SRC): [string, string][] {
 }
 const sheets = stylesheets();
 
-/** The four self-hosted families (style.json `ui.fonts`, docs/UI.md 3). */
-const FAMILIES = ['Inter', 'Oswald', 'Pixelify Sans', 'Press Start 2P'];
+/** The seven self-hosted families (style.json `ui.fonts`, docs/UI.md 3); the last three are the dossier's. */
+const FAMILIES = [
+  'Alegreya SC',
+  'Alegreya Sans',
+  'IBM Plex Mono',
+  'Inter',
+  'Oswald',
+  'Pixelify Sans',
+  'Press Start 2P',
+];
 /** What a declaration may name besides a `--wdi-font-*` token: CSS-wide keywords and generic families. */
 const GENERIC = new Set([
   'inherit',
@@ -178,35 +190,71 @@ export const TEXT_PAIRS: { fg: string; bg: string; use: string; min: number }[] 
     use: 'bare display text on the veil, 24 px and up (large text, 3:1)',
     min: 3,
   },
+  // The dossier, light paper (round 10, docs/UI.md 2): the role card and the Satchel.
+  { fg: 'ink', bg: 'sheet', use: 'dossier: text on a card', min: 4.5 },
+  { fg: 'ink', bg: 'vellum', use: 'dossier: text on the page', min: 4.5 },
+  { fg: 'ink', bg: 'well', use: 'dossier: text in a well', min: 4.5 },
+  { fg: 'pencil', bg: 'sheet', use: 'dossier: hints on a card', min: 4.5 },
+  { fg: 'pencil', bg: 'vellum', use: 'dossier: hints on the page', min: 4.5 },
+  { fg: 'pencil', bg: 'well', use: 'dossier: hints in a well', min: 4.5 },
+  { fg: 'ochre', bg: 'sheet', use: 'dossier: eyebrows and numbers on a card', min: 4.5 },
+  { fg: 'ochre', bg: 'vellum', use: 'dossier: eyebrows on the page', min: 4.5 },
+  { fg: 'ochre', bg: 'well', use: "dossier: numbers in a well, the well's rule", min: 4.5 },
+  { fg: 'moss', bg: 'sheet', use: 'dossier: done', min: 4.5 },
+  { fg: 'brick', bg: 'sheet', use: 'dossier: forged', min: 4.5 },
+  { fg: 'brick', bg: 'well', use: 'dossier: forged in a well', min: 4.5 },
+  { fg: 'focus', bg: 'vellum', use: 'dossier: the focus ring on the page (non-text, 3:1)', min: 3 },
+  { fg: 'focus', bg: 'sheet', use: 'dossier: the focus ring on a card (non-text, 3:1)', min: 3 },
+  // The dossier, dark paper: bone is its ink, mustard its numbers, moon its focus.
+  { fg: 'bone', bg: 'graphite', use: 'dossier dark: text on a card', min: 4.5 },
+  { fg: 'bone', bg: 'carbon', use: 'dossier dark: text on the page', min: 4.5 },
+  { fg: 'bone', bg: 'cellar', use: 'dossier dark: text in a well', min: 4.5 },
+  { fg: 'ash', bg: 'graphite', use: 'dossier dark: hints on a card', min: 4.5 },
+  { fg: 'ash', bg: 'carbon', use: 'dossier dark: hints on the page', min: 4.5 },
+  { fg: 'mustard', bg: 'graphite', use: 'dossier dark: eyebrows and numbers on a card', min: 4.5 },
+  { fg: 'mustard', bg: 'carbon', use: 'dossier dark: eyebrows on the page', min: 4.5 },
+  { fg: 'mustard', bg: 'cellar', use: "dossier dark: numbers in a well, the well's rule", min: 4.5 },
+  { fg: 'sage', bg: 'graphite', use: 'dossier dark: done', min: 4.5 },
+  { fg: 'blush', bg: 'graphite', use: 'dossier dark: forged (never in a well)', min: 4.5 },
+  { fg: 'moon', bg: 'carbon', use: 'dossier dark: the focus ring on the page (non-text, 3:1)', min: 3 },
+  { fg: 'moon', bg: 'graphite', use: 'dossier dark: the focus ring on a card (non-text, 3:1)', min: 3 },
 ];
 
 describe('tokens.css', () => {
-  it('mirrors palette.json colour for colour, in file order (the ten tokens, then the night set)', () => {
+  it('mirrors palette.json colour for colour, in file order (the ten tokens, the night set, the dossier set)', () => {
     const block = [...tokens.matchAll(/--wdi-([a-z]+): (#[0-9a-fA-F]{6});/g)].map((m) => [
       m[1],
       m[2]!.toUpperCase(),
     ]);
     expect(block).toEqual(Object.entries(palette));
     expect(Object.keys(paletteFile.night)).toHaveLength(5);
+    expect(Object.keys(paletteFile.dossier)).toHaveLength(16);
   });
 
-  it('carries each colour as an RGB triplet for alpha use', () => {
-    for (const [name, hex] of Object.entries(palette)) {
+  it('carries each colour of the ten and the night set as an RGB triplet for alpha use (the dossier takes no alpha)', () => {
+    for (const [name, hex] of Object.entries({ ...paletteFile.colors, ...paletteFile.night } as Record<
+      string,
+      string
+    >)) {
       expect(tokens).toContain(`--wdi-${name}-rgb: ${rgb(hex).join(' ')};`);
     }
   });
 
-  it('declares the four self-hosted families once each, and nothing else', () => {
+  it('declares the seven self-hosted families, each weight once, and nothing else', () => {
     const faces = sheets.flatMap(([path, text]) =>
-      [...text.matchAll(/@font-face\s*\{[^}]*font-family: '?([^;']+)'?;/g)].map((m) => [path, m[1]]),
+      [...text.matchAll(/@font-face\s*\{[^}]*font-family: '?([^;']+)'?;\s*font-weight: ([^;]+);/g)].map(
+        (m) => [path, m[1]!, m[2]!],
+      ),
     );
-    expect(faces.map(([, family]) => family).sort()).toEqual(FAMILIES);
+    expect([...new Set(faces.map(([, family]) => family))].sort()).toEqual(FAMILIES);
+    const weights = faces.map(([, family, weight]) => `${family} ${weight}`);
+    expect(new Set(weights).size).toBe(weights.length);
     for (const [path] of faces) expect(path).toBe(join('ui', 'theme', 'tokens.css'));
   });
 
-  it('starts every --wdi-font-* token with one of the four families', () => {
+  it('starts every --wdi-font-* token with one of the seven families', () => {
     const fontTokens = [...tokens.matchAll(/--wdi-font-[a-z-]+: ([^;]+);/g)].map((m) => m[1]!);
-    expect(fontTokens.length).toBe(4);
+    expect(fontTokens.length).toBe(7);
     for (const value of fontTokens) {
       expect(FAMILIES).toContain(value.split(',')[0]!.trim().replace(/^'|'$/g, ''));
     }
@@ -290,6 +338,9 @@ describe('tokens.css mirrors style.json ui (docs/UI.md 4, 5)', () => {
     expect(token('font-text')?.startsWith(ui.fonts.text)).toBe(true);
     expect(token('font-pixel-display')?.startsWith(`'${ui.fonts.pixelDisplay}'`)).toBe(true);
     expect(token('font-pixel-text')?.startsWith(`'${ui.fonts.pixelText}'`)).toBe(true);
+    expect(token('font-dossier-display')?.startsWith(`'${ui.fonts.dossierDisplay}'`)).toBe(true);
+    expect(token('font-dossier-text')?.startsWith(`'${ui.fonts.dossierText}'`)).toBe(true);
+    expect(token('font-dossier-mono')?.startsWith(`'${ui.fonts.dossierMono}'`)).toBe(true);
     expect(Object.values(ui.fonts).sort()).toEqual(FAMILIES);
   });
 });

@@ -42,6 +42,28 @@ export const PaletteFile = z.strictObject({
    * world palette; the accent is `lantern` above.
    */
   night: z.strictObject({ night: Hex, violet: Hex, indigo: Hex, lilac: Hex, snow: Hex }),
+  /**
+   * The dossier set of round 10 (docs/UI.md 2, DECISIONS A257): the paper of the role card and the Satchel, light
+   * (paper to focus) then dark (carbon to blush). DOM UI colours only, never in art or the world palette.
+   */
+  dossier: z.strictObject({
+    vellum: Hex,
+    sheet: Hex,
+    pencil: Hex,
+    rule: Hex,
+    well: Hex,
+    ochre: Hex,
+    moss: Hex,
+    brick: Hex,
+    focus: Hex,
+    carbon: Hex,
+    graphite: Hex,
+    ash: Hex,
+    seam: Hex,
+    cellar: Hex,
+    sage: Hex,
+    blush: Hex,
+  }),
   ambient: z.strictObject({
     day: z.strictObject({ color: Hex, intensity: z.number().min(0).max(1) }),
     night: z.strictObject({ color: Hex, intensity: z.number().min(0).max(1) }),
