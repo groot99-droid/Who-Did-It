@@ -410,6 +410,7 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
       inHand.set(`${map.id}/${profile}`, reach.have);
       for (const [id, recipe] of Object.entries(recipes.recipes)) {
         if (recipe.maps && !recipe.maps.includes(map.id)) continue;
+        if (recipe.profile && PROFILE_RANK[recipe.profile] > rank) continue;
         if (!reach.made.has(id))
           err(`map ${map.id} (${profile}): recipe ${id} cannot be crafted from its nodes`);
       }

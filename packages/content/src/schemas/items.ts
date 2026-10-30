@@ -35,7 +35,7 @@ export const Item = z.strictObject({
     .strictObject({
       tier: z.number().int().min(1).max(3),
       /** A factor on the rate or length of an effect the wearer has. */
-      resist: z.partialRecord(z.enum(['poisoned', 'bleeding']), z.number().gt(0).lte(1)).optional(),
+      resist: z.partialRecord(z.enum(['poisoned', 'bleeding', 'dazed']), z.number().gt(0).lte(1)).optional(),
       staminaRegenMult: z.number().gt(0).lte(1).optional(),
       speedMult: z.number().gt(0).lte(1).optional(),
     })

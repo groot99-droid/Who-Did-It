@@ -682,6 +682,80 @@
       "ships": "V1",
       "gddRef": "3.22"
     },
+    "tinIngot": {
+      "id": "tinIngot",
+      "name": "Tin Ingot",
+      "kind": "deliverable",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Tin Ore smelted with stone at a kiln. Forged into iron tools and tin armour.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "ironAxe": {
+      "id": "ironAxe",
+      "name": "Iron Axe",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tool": { "cut": 2 },
+      "uses": 40,
+      "tooltip": "Fells thick logs a plain axe cannot. Wears with use.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "ironPickaxe": {
+      "id": "ironPickaxe",
+      "name": "Iron Pickaxe",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tool": { "break": 2, "dig": 1 },
+      "uses": 40,
+      "tooltip": "Breaks what a plain pickaxe only scratches; digs a tin seam. Wears with use.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "finePick": {
+      "id": "finePick",
+      "name": "Fine Pick",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tool": { "pick": 2 },
+      "tooltip": "A finer lock pick for the locks a plain one cannot work.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "tinMail": {
+      "id": "tinMail",
+      "name": "Tin Mail",
+      "kind": "armour",
+      "roleBound": false,
+      "onDeath": "drops",
+      "equip": "body",
+      "armor": {
+        "tier": 3,
+        "resist": { "bleeding": 0.5, "poisoned": 0.5 },
+        "staminaRegenMult": 0.8,
+        "speedMult": 0.95
+      },
+      "tooltip": "Rings of tin. Worn on the body, it halves the damage you take, bleeding and poison; it tires and slows you.",
+      "ships": "V1",
+      "gddRef": "3.22"
+    },
+    "tinHelm": {
+      "id": "tinHelm",
+      "name": "Tin Helm",
+      "kind": "armour",
+      "roleBound": false,
+      "onDeath": "drops",
+      "equip": "head",
+      "armor": { "tier": 2, "resist": { "dazed": 0.5 }, "staminaRegenMult": 0.95 },
+      "tooltip": "A tin cap. Worn on the head, it cuts the damage you take and a daze wears off in half the time.",
+      "ships": "V1",
+      "gddRef": "3.22"
+    },
     "hide": {
       "id": "hide",
       "name": "Hide",

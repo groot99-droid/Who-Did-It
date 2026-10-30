@@ -111,14 +111,14 @@
   "props": [
     {
       "id": "bw.kiln_0",
-      "kind": "decor",
+      "kind": "kiln",
       "x": 22,
       "y": 26,
       "footprint": { "x": 22, "y": 26, "w": 2, "h": 2 }
     },
     {
       "id": "bw.kiln_1",
-      "kind": "decor",
+      "kind": "kiln",
       "x": 26,
       "y": 26,
       "footprint": { "x": 26, "y": 26, "w": 2, "h": 2 }
