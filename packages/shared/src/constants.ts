@@ -49,6 +49,9 @@ export type ClueKindId = (typeof ClueKind)[keyof typeof ClueKind];
  */
 export const PairPhase = { none: 0, asking: 1, asked: 2, paired: 3, declined: 4 } as const;
 
+/** `GameState.manhunt.state` (round 10, B4; GDD 3.31, seams.md 3 row 14). */
+export const ManhuntState = { none: 0, hunting: 1, cuffed: 2 } as const;
+
 /** `NotebookEntry.status` values (GDD 3.4; `teaching` is the grace-phase clue of GDD 2 step 5). */
 export const NotebookStatus = {
   claimed: 0,
