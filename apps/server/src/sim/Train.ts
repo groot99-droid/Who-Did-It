@@ -10,6 +10,8 @@ import { strip } from './Inventory';
 import { secondsToTicks } from './Flow';
 import { mapIdOfRoom, stationOf } from './MapSites';
 import { emitNoise } from './Noise';
+import { isNpcSeat } from './Npc';
+import { isPaintTown } from './paintTown';
 import { enterScene } from './Portals';
 import { simOf } from './RoomSim';
 import { isWorldPhase } from './World';
@@ -63,9 +65,14 @@ const DAYLIGHT: readonly number[] = [Phase.grace, Phase.day, Phase.immunity];
 /** The causes that can return: a bite or a shot. The vote, a vanished seat, the Knife and Nightshade never do. */
 const RETURNING: readonly DeathCause[] = ['wolf', 'creature', 'shot'];
 
-/** Whether a death of `cause` now goes on the line: a map with a Train, a daylight phase, a returning cause. */
-export function returnsOnTrain(room: PartyRoom, cause: DeathCause): boolean {
-  return stationOf(room) !== undefined && DAYLIGHT.includes(room.state.phase) && RETURNING.includes(cause);
+/**
+ * Whether a death of `cause` now goes on the line: a map with a Train, a daylight phase, a returning cause. In Paint
+ * The Town Red every NPC seat's death returns, after dark and to the Knife too (round 10, C5; world-mode.md 12 R4).
+ */
+export function returnsOnTrain(room: PartyRoom, cause: DeathCause, seat?: string): boolean {
+  if (stationOf(room) === undefined) return false;
+  if (seat !== undefined && isPaintTown(room) && isNpcSeat(room, seat) && cause !== 'vanished') return true;
+  return DAYLIGHT.includes(room.state.phase) && RETURNING.includes(cause);
 }
 
 /**
