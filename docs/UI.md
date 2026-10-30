@@ -505,6 +505,7 @@ screenshots at 1280 x 720 and 390 x 844 in `docs/ui/`:
 | `lobby` | code, copy link, roster of five, hints, Start with the confirm dialog | 2 step 3 |
 | `rolecard-front`, `rolecard-back` | the Detective's card and the back of the card | 2 step 4, 3.2 |
 | `hud` | chip, night clock, log, stick and buttons, a toast over a dark world | 2 steps 5 to 7 |
+| `refusal` (10Y, round 10; from `e2e/refusals.spec.ts`, not a static page) | the greyed gather prompt and the log with a hinted refusal, the longest `fail` line and an NFY line | 14.51 |
 | `meeting` | eight portraits, the tally, chat, claim chips, the vote | 2 step 8, 3.8 |
 | `menu-mockup` (owner, Claude Design, 2026-10-23) | the round-7 menu: title, glass buttons, profile chip, sound toggle over the loop (`docs/round7/ui-reskin.md`) | 2 step 1, 3.21 |
 | `lobby-mockup` (owner, Claude Design, 2026-10-23) | the round-7 lobby in three columns: code and seats, map cards and art style, the deck and Start | 2 step 3 |
@@ -915,7 +916,7 @@ Frozen test ids: `m5b`, `m5b-inv`, `m5b-craft`, `m5b-quests`, `m5b-prompt`, `m5b
 | Id                          | Text                                                                                 |
 | --------------------------- | ------------------------------------------------------------------------------------ |
 | `prompt.gather`             | Hold E: gather {what}                                                                |
-| `prompt.gather.tool`        | Needs a {tool} to gather {what}                                                      |
+| `prompt.gather.tool`        | Gather {what} (needs {tool})                                                         |
 | `prompt.gather.cancel`      | Release to stop                                                                      |
 | `prompt.giver`              | Press E: speak to {name}                                                             |
 | `toast.gather.cancel`       | You stopped gathering.                                                               |
@@ -1865,3 +1866,29 @@ channel, the same words to every client (GDD 3.31):
 `{clue}` is the clue's `clues.json` name in lower case, `{scene}` the scene's name and `{trait}` the trait's
 `traits.json` label in lower case. A line never names a seat, a handle, a card or a time, and never says Forged
 or Verified.
+
+### 14.51 Refusal lines and the greyed prompt (10Y, round 10)
+
+The display of A4 (14.45) on a phone, with its two parked items (`docs/round9/failures.md` 6.2, owner answers FM5 and
+FM7). Checked by `apps/client/e2e/refusals.spec.ts` at 390 x 844 and 1280 x 720 (`docs/ui/refusal-390w.png`,
+`docs/ui/refusal-1280x720.png`): the log stays inside the viewport and no line overflows its slab, with the longest
+`fail` line of `interactions.json` (cutTimberSet's `NEED_TOOL`) and a hinted line in it. A long `fail` line wraps
+to three rows at 390 (the one-row rule of section 14 holds for the general lines; a table line is the object's own
+words). The village's work bar (14.38.3) sits under the clock at the right on a phone, and the log starts below it:
+centred, it hid the log's first line.
+
+- **The greyed prompt.** A gather prompt whose tool is not in the pockets reads `prompt.gather.tool` (14.19:
+  "Gather Tin Ore (needs a spade)"), carries `is-blocked` and `aria-disabled`, draws muted with a dashed rule, and a
+  press shakes it (`refused`, UI.md 9) and sends nothing: the refusal is prevented, never asked for.
+  `blockedBy(target, hasTool)` in `apps/client/src/ui/M5bLayer.ts` decides; `aName` of `refusals.ts` writes the
+  article. A prop's interact prompt ("Chop (needs an axe)") follows when the client reads the logic table's prompt
+  (round 10, 10Y's y2); the rule is the same.
+- **The second refusal hints.** `RefusalHints` (`apps/client/src/ui/copy/refusalHint.ts`) remembers when each
+  `NEED_*` refusal last showed, keyed by reason, interaction and the missing item. The second identical one within
+  30 s appends the interaction's `hint` from `interactions.json` ("You need an axe. Axes hang in the lumber camp
+  and sell at the general store."); a refusal with no interaction takes the hint of the first interaction whose
+  tool tag the missing item carries (a pickaxe: the boulder's). No hint in the table, nothing appended. A hinted
+  line stays 4 s instead of the log's 2.6. The first refusal, a different one, a late one and a reason outside
+  `NEED_*` never hint.
+- **The item icon** beside a `NEED_*` line (6.2) waits for `icon_item_*` art; the line carries the item's name
+  until then.

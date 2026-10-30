@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { TILE_PX } from '@wdi/shared/constants';
 import { recipeRows } from './Crafting';
 import { itemList, itemName, stacksOf } from './Inventory';
-import { nearest, promptFor, takesUse } from './M5bLayer';
+import { blockedBy, nearest, promptFor, takesUse } from './M5bLayer';
 import { questRows } from './QuestLog';
 
 describe('takesUse (E)', () => {
@@ -106,7 +106,10 @@ describe('hold prompt targets', () => {
   });
   it('asks for the tool a resource needs before it offers the gather', () => {
     const node = { kind: 'node', id: 'n', resource: 'tinOre', x: 0, y: 0 } as const;
-    expect(promptFor(node, () => false)).toBe('Needs a Spade to gather Tin Ore');
+    expect(promptFor(node, () => false)).toBe('Gather Tin Ore (needs a spade)'); // greyed, 10Y
+    expect(blockedBy(node, () => false)).toBe('spade');
+    expect(blockedBy(node, () => true)).toBeNull();
+    expect(blockedBy({ kind: 'node', id: 't', resource: 'timber', x: 0, y: 0 }, () => false)).toBeNull();
     expect(promptFor(node, () => true)).toBe('Hold E: gather Tin Ore');
     expect(promptFor({ kind: 'giver', npc: 'moll', x: 0, y: 0 }, () => true)).toBe(
       'Press E: speak to Mother Moll',

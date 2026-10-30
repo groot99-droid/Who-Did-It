@@ -75,8 +75,11 @@ export class MockM5b {
 
   constructor(
     private readonly scenes: Record<string, MockSceneM5b>,
-    /** `?m5b=1`: a spade in the pocket, a kit of nodes beside `kit` and a station-free craft (the e2e path). */
-    private readonly kit: { scene: string; x: number; y: number } | null,
+    /**
+     * `?m5b=1`: a spade in the pocket, a kit of nodes beside `kit` and a station-free craft (the e2e path).
+     * `?m5b=bare` (round 10, 10Y) is the same kit without the spade, so the tin node's prompt greys.
+     */
+    private readonly kit: { scene: string; x: number; y: number; bare?: boolean } | null,
   ) {
     for (const [scene, content] of Object.entries(scenes)) {
       for (const n of content.nodes ?? []) {
@@ -92,7 +95,7 @@ export class MockM5b {
       }
     }
     if (kit) {
-      this.stacks.push({ defId: 'spade', qty: 1 });
+      if (!kit.bare) this.stacks.push({ defId: 'spade', qty: 1 });
       const at = (id: string, resource: string, dx: number, dy: number) =>
         this.nodeMap.set(id, {
           id,
