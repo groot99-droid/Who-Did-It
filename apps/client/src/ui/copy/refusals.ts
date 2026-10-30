@@ -177,7 +177,7 @@ export const REFUSAL_COPY: { readonly [R in RefusalReason]: Line<R> } = {
     whole(a.readyInS)
       ? `The case was just dismissed. Wait ${whole(a.readyInS)} s.`
       : 'The case was just dismissed.',
-  PETITION_OPEN: 'A petition is already open against them. Sign that one.',
+  PETITION_OPEN: 'A petition is already open. Sign that one.',
   NOT_HUNTED: 'There is no warrant for them. Petition first.',
   PICK_SNAPPED: 'The pick snaps. Ease the tension next time.',
   GRID_NO_RECIPE: 'Nothing comes of that.',

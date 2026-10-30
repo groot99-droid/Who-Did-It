@@ -6,6 +6,7 @@ import { simOf } from '../RoomSim';
 import { isVerbPhase, reject, sceneKey, tileCentre } from '../World';
 import { TOWN, balanceOf, movePurse } from './purse';
 import { refusal, type Refusal } from '../refusal';
+import { askOf } from './fare';
 
 /**
  * Shops (round 8, GDD 3.23; docs/round8/economy.md 2), Session 8C. A shop is one `counter` static named by
@@ -47,8 +48,12 @@ export function counterProblem(room: PartyRoom, sessionId: string, propId: strin
   return null;
 }
 
-const priced = (items: readonly string[], side: 'ask' | 'pay') =>
-  items.map((itemId) => ({ itemId, price: economy.prices[itemId]?.[side] ?? 0 }));
+/** A shop's list with its prices: `ask` from `askOf` (round 10, C2b: a dear stall shows what it asks), `pay` as set. */
+const priced = (room: PartyRoom, shopId: string, items: readonly string[], side: 'ask' | 'pay') =>
+  items.map((itemId) => ({
+    itemId,
+    price: (side === 'ask' ? askOf(room, shopId, itemId) : economy.prices[itemId]?.pay) ?? 0,
+  }));
 
 /** `act.hold {action: 'shop', targetId: propId}` (the one line in `sim/Hold.ts`): opens the counter's shop. */
 export function handleShopHold(room: PartyRoom, sessionId: string, propId: string): void {
@@ -62,8 +67,8 @@ export function handleShopHold(room: PartyRoom, sessionId: string, propId: strin
   openOf(room).set(sessionId, shopId);
   room.clients.getById(sessionId)?.send(S2C.shopOpen, {
     shopId,
-    stock: priced(shop.sells, 'ask'),
-    buys: priced(shop.buys, 'pay'),
+    stock: priced(room, shopId, shop.sells, 'ask'),
+    buys: priced(room, shopId, shop.buys, 'pay'),
   });
 }
 
@@ -91,7 +96,7 @@ export function handleBuy(room: PartyRoom, sessionId: string, payload: Record<st
   }
   const { shopId, itemId } = payload as { shopId: string; itemId: string };
   const qty = payload.qty as number;
-  const ask = economy.prices[itemId]?.ask;
+  const ask = askOf(room, shopId, itemId); // round 10, C2b: the price shown is the price paid
   if (!economy.shops[shopId]!.sells.includes(itemId) || ask === undefined) {
     reject(room, sessionId, 'NOT_FOR_SALE', { item: itemId });
     return;

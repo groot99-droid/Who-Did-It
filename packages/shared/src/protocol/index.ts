@@ -27,6 +27,10 @@ export const C2S = {
   pairAsk: 'pair.ask',
   /** Round 10, B8: answer an ask (`yes`), or end a pair (`yes: false` while paired). */
   pairAnswer: 'pair.answer',
+  /** Round 10, B3 (GDD 3.31, seams.md 3 row 13): open a petition at a notice board; `sim/law/Petition.ts`. */
+  petitionOpen: 'petition.open',
+  /** Round 10, B3: sign the open petition. */
+  petitionSign: 'petition.sign',
   vote: 'meeting.vote',
   say: 'chat.say',
   /** Round 8 (GDD 3.8 "Meeting notes", 8T): a line for the meeting notes, which carry no speaker. */
@@ -122,6 +126,8 @@ export type HoldAction =
   | 'altar'
   | 'mailbag'
   | 'rack'
+  // Round 10 (GDD 3.23, C2b; seams.md 3 row 11): the Clerk's labour errand at a `ledger` prop clears a fare.
+  | 'errand'
   // Round 10 (A10): any prop the logic table answers for (`interactions.json`).
   | 'interact'
   // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
@@ -324,6 +330,9 @@ export interface C2SPayloads {
   /** Round 10, B8 (GDD 3.31, seams.md 3 row 10): `targetId` is the asked figure's avatar handle in the asker's scene. */
   'pair.ask': { targetId: string };
   'pair.answer': { yes: boolean };
+  /** `accused` a roster seat id; `charge` a `laws.json` crime id; `entries` the opener's Notebook entry ids. */
+  'petition.open': { accused: string; charge: string; entries: string[] };
+  'petition.sign': { id: string };
   /**
    * Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and
    * `size * size` cells, each an item id or null. The server matches a recipe, takes the inputs and gives the product
@@ -472,6 +481,8 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'craft.grid': 5,
   'pair.ask': 2,
   'pair.answer': 2,
+  'petition.open': 2,
+  'petition.sign': 2,
 };
 
 // Round 10, A1: the codes live beside the refusal reasons that derive them (`REASON_CODE`).

@@ -1,7 +1,7 @@
 import { balance, scenes, type SceneId } from '@wdi/content';
 import { Phase, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
-import { isIndebted } from './economy/rent';
+import { isBoarded, pryBoards } from './economy/rent';
 import { balanceOf, movePurse, TOWN } from './economy/purse';
 import { nearProp } from './economy/reach';
 import { emitSim, onSim } from './events/bus';
@@ -150,7 +150,7 @@ export function handleSleepHold(room: PartyRoom, seat: string, targetId: unknown
   const kind = bed.kind as BedKind;
   if (kind === 'bed') {
     if (m.homes.get(seat) !== scene) return sendRefusal(room, seat, 'NO_BED');
-    if (isIndebted(room, seat)) return sendRefusal(room, seat, 'BOARDED_HOME'); // D7 boards the house itself
+    if (isBoarded(room, seat) && !pryBoards(room, seat)) return sendRefusal(room, seat, 'BOARDED_HOME');
   }
   if (kind === 'innBed') {
     const price = balance.sleep.innBedScrip;

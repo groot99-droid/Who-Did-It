@@ -231,18 +231,19 @@ export class MockWorldFeed implements WorldFeed {
       this.startAt = { sceneId: shotScene, spawn: shotSpawn.id, facing: shotSpawn.facing };
     }
     // Round 6 (6I): `?m5b=1` stands the own seat beside the overworld's quest giver with a spade and a kit of nodes.
-    let kit: { scene: string; x: number; y: number } | null = null;
+    let kit: { scene: string; x: number; y: number; bare?: boolean } | null = null;
     const giver = this.content.scenes.overworld?.givers?.[0];
     const me0 = this.actors.get(this.selfId);
     const navGrid = this.grid('overworld');
-    if (q.get('m5b') === '1' && giver && me0 && navGrid) {
+    const m5bQuery = q.get('m5b'); // `bare` (round 10, 10Y): the kit without the spade, so the tin node's prompt greys
+    if ((m5bQuery === '1' || m5bQuery === 'bare') && giver && me0 && navGrid) {
       const free = [-1, 1, 0, 2, -2]
         .flatMap((dy) => [-1, 1, 0, 2].map((dx) => ({ dx, dy })))
         .find(({ dx, dy }) => (dx !== 0 || dy !== 0) && !navGrid.solidAt(giver.x + dx, giver.y + dy));
       if (free) {
         me0.x = (giver.x + free.dx + 0.5) * TILE_PX;
         me0.y = (giver.y + free.dy + 0.5) * TILE_PX;
-        kit = { scene: 'overworld', x: me0.x, y: me0.y };
+        kit = { scene: 'overworld', x: me0.x, y: me0.y, bare: m5bQuery === 'bare' };
       }
     }
     this.m5b = new MockM5b(this.content.scenes, kit);
@@ -579,6 +580,10 @@ export class MockWorldFeed implements WorldFeed {
   }
 
   // Round 8, 8C (locked): the mock town has no shops and an empty purse.
+  fare(): number {
+    return 0; // the mock has no train
+  }
+
   purse(): number {
     return 0;
   }
