@@ -568,6 +568,39 @@
       "ships": "V1",
       "gddRef": "3.14"
     },
+    "quiltedCoat": {
+      "id": "quiltedCoat",
+      "name": "Quilted coat",
+      "kind": "armour",
+      "roleBound": false,
+      "onDeath": "drops",
+      "equip": "body",
+      "tooltip": "A padded coat. Worn on the body, it takes a fifth off the damage you take.",
+      "ships": "V1",
+      "gddRef": "3.22"
+    },
+    "leatherJerkin": {
+      "id": "leatherJerkin",
+      "name": "Leather jerkin",
+      "kind": "armour",
+      "roleBound": false,
+      "onDeath": "drops",
+      "equip": "body",
+      "tooltip": "Hide, stitched. Worn on the body, it cuts the damage you take and your bleeding stops sooner; it tires you a little.",
+      "ships": "V1",
+      "gddRef": "3.22"
+    },
+    "tinMail": {
+      "id": "tinMail",
+      "name": "Tin mail",
+      "kind": "armour",
+      "roleBound": false,
+      "onDeath": "drops",
+      "equip": "body",
+      "tooltip": "Heavy tin rings. Worn on the body, it halves the damage you take, stops bleeding sooner and eases poison; it slows and tires you.",
+      "ships": "V1",
+      "gddRef": "3.22"
+    },
     "wakeLoaf": {
       "id": "wakeLoaf",
       "name": "Wake Loaf",

@@ -886,6 +886,8 @@ an NPC, counts the inspector's drawn face the sum of their `suspicion` more; the
 inspected seat a card-blind hunch. Nothing a third client receives depends on a match. An `inert` row names a role
 or figure of a later round and never holds.
 
+**Armour** (round 10, D6a; owner answer LW8). The item in a seat's body slot (3.30) is its armour: a Quilted coat, a Leather jerkin or Tin mail, rows of `balance.json` `armor.items`. It multiplies the damage of every attack that goes through the damage table (the fists, a mugging, the slingshot, a creature) by its `damage` (0.80, 0.65, 0.50); the Knife never reads it (A89), nor do Nightshade and the Last Shot, so armour never makes a seat unkillable by the Killer. The jerkin and tin mail also slow a Bleeding's drain (`bleedDrainFactor` 0.5; a Bleeding has no timer, so "stops sooner" is a slower drain), tin mail halves a Poisoned's drain, and the jerkin and mail cost stamina regeneration (x0.9, x0.8) and the mail walking speed (x0.95). Armour is public kit: it reveals no role, is not role-bound and drops on death. The coat is sold at the general stores; the jerkin waits for hide (skinning, D6b) and the mail for the forge. Warmth at night and the mail's louder footsteps are not built yet.
+
 ### 3.23 The economy
 
 Round 8 (A134, A135; `docs/round8/economy.md`): the Bible's Book IV on today's maps and roles.
